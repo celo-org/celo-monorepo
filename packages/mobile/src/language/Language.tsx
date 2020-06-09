@@ -1,51 +1,63 @@
-import LanguageSelectUI from '@celo/react-components/components/LanguageSelectUI'
-import { NavigationProp, RouteProp, useNavigation, useRoute } from '@react-navigation/native'
-import React, { useState } from 'react'
+import SelectionOption from '@celo/react-components/components/SelectionOption'
+import colors from '@celo/react-components/styles/colors.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
+import { StackScreenProps } from '@react-navigation/stack'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
+import { ScrollView, StyleSheet, Text } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import { useDispatch } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { setLanguage } from 'src/app/actions'
 import { AVAILABLE_LANGUAGES } from 'src/config'
-import i18n, { Namespaces } from 'src/i18n'
-import logo from 'src/images/celo-logo.png'
+import { Namespaces } from 'src/i18n'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 
-export function Language() {
-  const [selectedAnswer, setAnswer] = useState(i18n.language || '')
-  const navigation = useNavigation<NavigationProp<StackParamList, Screens.Language>>()
-  const route = useRoute<RouteProp<StackParamList, Screens.Language>>()
+type Props = StackScreenProps<StackParamList, Screens.Language>
+
+export default function Language({ navigation, route }: Props) {
   const dispatch = useDispatch()
-  const { t } = useTranslation(Namespaces.accountScreen10)
+  const { t, i18n } = useTranslation(Namespaces.accountScreen10)
 
-  const onSelectAnswer = (language: string, code: string) => {
+  const onSelect = (language: string, code: string) => {
     CeloAnalytics.track(CustomEventNames.language_select, { language, selectedAnswer: code })
-    setAnswer(code)
-  }
-
-  const onSubmit = () => {
     const nextScreen = route.params?.nextScreen ?? Screens.JoinCelo
-    CeloAnalytics.track(CustomEventNames.nux_continue, {
-      nextScreen,
-      selectedAnswer,
-    })
-    dispatch(setLanguage(selectedAnswer))
+    dispatch(setLanguage(code))
     navigation.navigate(nextScreen)
-    dispatch(setLanguage(selectedAnswer))
   }
 
   return (
-    <LanguageSelectUI
-      logo={logo}
-      onLanguageSelected={onSelectAnswer}
-      onSubmit={onSubmit}
-      isSubmitDisabled={!selectedAnswer}
-      currentSelected={selectedAnswer}
-      languages={AVAILABLE_LANGUAGES}
-      t={t}
-    />
+    <ScrollView style={styles.container}>
+      <SafeAreaView>
+        <Text style={styles.title} testID={'ChooseLanguageTitle'}>
+          {t('chooseLanguage')}
+        </Text>
+        {AVAILABLE_LANGUAGES.map((language) => (
+          <SelectionOption
+            text={language.name}
+            key={language.code}
+            onSelect={onSelect}
+            isSelected={language.code === i18n.language}
+            data={language.code}
+            testID={`ChooseLanguage/${language.code}`}
+          />
+        ))}
+      </SafeAreaView>
+    </ScrollView>
   )
 }
 
-export default Language
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.light,
+  },
+  title: {
+    ...fontStyles.h2,
+    marginHorizontal: 16,
+    marginTop: 80,
+    marginBottom: 16,
+  },
+})
