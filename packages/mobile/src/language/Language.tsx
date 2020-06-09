@@ -32,7 +32,7 @@ export default function Language({ navigation, route }: Props) {
     <ScrollView style={styles.container}>
       <SafeAreaView>
         <Text style={styles.title} testID={'ChooseLanguageTitle'}>
-          {t('chooseLanguage')}
+          {t('selectLanguage')}
         </Text>
         {AVAILABLE_LANGUAGES.map((language) => (
           <SelectionOption
