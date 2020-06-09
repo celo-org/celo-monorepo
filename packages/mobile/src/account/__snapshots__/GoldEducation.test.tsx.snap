@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`GoldEducation renders correctly 1`] = `
+exports[`renders correctly 1`] = `
 <SafeAreaView
   style={
     Object {
@@ -17,6 +17,7 @@ exports[`GoldEducation renders correctly 1`] = `
         "width": "100%",
       }
     }
+    testID="Education/top"
   />
   <View
     style={
@@ -261,6 +262,7 @@ exports[`GoldEducation renders correctly 1`] = `
               "paddingVertical": 5,
             }
           }
+          testID="Education/progressButton"
         >
           <Text
             style={

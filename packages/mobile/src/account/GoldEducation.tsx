@@ -19,16 +19,15 @@ export default function GoldEducation() {
 
   const isCeloEducationComplete = useSelector((state) => state.goldToken.educationCompleted)
 
-  const goToExchange = () => {
+  const onFinish = () => {
     CeloAnalytics.track(CustomEventNames.exchange_gold_nux)
 
     if (isCeloEducationComplete) {
       navigateBack()
     } else {
       navigate(Screens.ExchangeHomeScreen)
+      dispatch(setEducationCompleted())
     }
-
-    dispatch(setEducationCompleted())
   }
 
   const stepInfo = useStep()
@@ -37,7 +36,7 @@ export default function GoldEducation() {
     <Education
       isClosable={isCeloEducationComplete}
       stepInfo={stepInfo}
-      onFinish={goToExchange}
+      onFinish={onFinish}
       finalButtonType={BtnTypes.TERTIARY}
       finalButtonText={t('global:done')}
       buttonText={t('global:next')}

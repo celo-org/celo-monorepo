@@ -80,9 +80,10 @@ export default class Education extends React.Component<Props, State> {
     const isLastStep = this.state.step === stepInfo.length - 1
     return (
       <SafeAreaView style={styles.root}>
-        <View style={styles.top}>
+        <View style={styles.top} testID="Education/top">
           {isClosable && (
             <TopBarIconButton
+              testID="Education/CloseIcon"
               onPress={this.goBack}
               icon={this.state.step === 0 ? <Times /> : <BackChevron color={colors.dark} />}
             />
@@ -108,6 +109,7 @@ export default class Education extends React.Component<Props, State> {
             })}
           </Swiper>
           <Button
+            testID="Education/progressButton"
             onPress={this.nextStep}
             text={isLastStep ? finalButtonText : buttonText}
             type={isLastStep && finalButtonType ? finalButtonType : BtnTypes.SECONDARY}
