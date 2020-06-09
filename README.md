@@ -121,11 +121,8 @@ The repository has the following packages (sub projects):
 - [protocol](packages/protocol) - identity, stability and other smart contracts for the Celo protocol ([docs](https://docs.celo.org/celo-codebase/protocol))
 - [react-components](packages/react-components) - no README available (improve?)
 - [terraform-modules](packages/terraform-modules) - templatized deployments of entire VM-based testnets for Google Cloud Platform
-- [transaction-metrics-exporter](packages/transaction-metrics-exporter) - monitoring tool that executes transactions on the network and exports testnet-level prometheus metrics
 - [typescript](packages/typescript) - no README available (improve?)
 - [utils](packages/utils) - no README available (improve?)
-- [verification-pool-api](packages/verification-pool-api) - service that handles a pool of Verifier App instances and requests them to direct SMS for attestation purposes (deprecated)
-- [verifier](packages/verifier) - Android verifier app to send SMS messages, enabling attestations of user phone numbers and their accounts on the Celo network
 - [web](packages/web) - Celo website ([live](https://celo.org/))
 
 Code owners for each package can be found in [.github/CODEOWNERS](.github/CODEOWNERS).

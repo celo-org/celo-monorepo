@@ -1,15 +1,15 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import fontStyles from '@celo/react-components/styles/fonts'
+import TextButton from '@celo/react-components/components/TextButton.v2'
+import colors from '@celo/react-components/styles/colors.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
 import React, { useCallback } from 'react'
-import { WithTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { Platform, StyleSheet, Text, View } from 'react-native'
 import * as AndroidOpenSettings from 'react-native-android-open-settings'
-import { Namespaces, withTranslation } from 'src/i18n'
+import { Namespaces } from 'src/i18n'
 import { navigateToURI } from 'src/utils/linking'
 
-type Props = WithTranslation
-
-function NotAuthorizedView({ t }: Props) {
+export default function NotAuthorizedView() {
+  const { t } = useTranslation(Namespaces.sendFlow7)
   const onPressSettings = useCallback(() => {
     if (Platform.OS === 'ios') {
       navigateToURI('app-settings:')
@@ -22,12 +22,7 @@ function NotAuthorizedView({ t }: Props) {
     <View style={styles.container}>
       <Text style={styles.title}>{t('cameraNotAuthorizedTitle')}</Text>
       <Text style={styles.description}>{t('cameraNotAuthorizedDescription')}</Text>
-      <Button
-        onPress={onPressSettings}
-        text={t('cameraSettings')}
-        standard={false}
-        type={BtnTypes.SECONDARY}
-      />
+      <TextButton onPress={onPressSettings}>{t('cameraSettings')}</TextButton>
     </View>
   )
 }
@@ -37,17 +32,17 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 30,
+    paddingHorizontal: 16,
   },
   title: {
     ...fontStyles.h2,
-    ...fontStyles.bold,
+    marginBottom: 8,
+    color: colors.white,
   },
   description: {
-    marginTop: 10,
-    ...fontStyles.body,
+    ...fontStyles.regular,
+    color: colors.white,
     textAlign: 'center',
+    marginBottom: 16,
   },
 })
-
-export default withTranslation(Namespaces.sendFlow7)(NotAuthorizedView)

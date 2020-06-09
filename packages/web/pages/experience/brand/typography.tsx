@@ -1,3 +1,3 @@
-import Typography from 'src/brandkit/Typography'
+import Typography from 'src/experience/brandkit/Typography'
 
 export default Typography

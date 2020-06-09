@@ -35,7 +35,7 @@ spec:
             RID=${BASH_REMATCH[1]}
             CELOTOOL="/celo-monorepo/packages/celotool/bin/celotooljs.sh";
 
-            $CELOTOOL bots auto-verify --initialWaitSeconds {{ .Values.initialWaitSeconds }} --inBetweenWaitSeconds {{ .Values.inBetweenWaitSeconds }} --attestationMax {{ .Values.maxAttestations }} --celoProvider https://{{ .Release.Namespace }}-forno.{{ .Values.domain.name }}.org --index $RID
+            exec $CELOTOOL bots auto-verify --initialWaitSeconds {{ .Values.initialWaitSeconds }} --inBetweenWaitSeconds {{ .Values.inBetweenWaitSeconds }} --attestationMax {{ .Values.maxAttestations }} --celoProvider https://{{ .Release.Namespace }}-forno.{{ .Values.domain.name }}.org --index $RID
         resources:
           requests:
             memory: 256Mi
