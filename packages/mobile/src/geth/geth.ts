@@ -1,4 +1,4 @@
-import { GenesisBlockUtils, StaticNodeUtils, BootnodeUtils } from '@celo/contractkit'
+import { BootnodeUtils, GenesisBlockUtils, StaticNodeUtils } from '@celo/contractkit'
 import BigNumber from 'bignumber.js'
 import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
@@ -88,11 +88,11 @@ async function createNewGeth(): Promise<typeof RNGeth> {
     syncMode,
     useLightweightKDF: true,
     ipcPath: IPC_PATH,
-    peerDiscovery: USE_FULL_NODE_DISCOVERY,
+    noDiscovery: !USE_FULL_NODE_DISCOVERY,
   }
 
   if (USE_FULL_NODE_DISCOVERY) {
-    const nodes = await BootnodeUtils.getBootnodesAsync(DEFAULT_TESTNET)
+    const nodes = (await BootnodeUtils.getBootnodesAsync(DEFAULT_TESTNET)).trim()
     gethOptions.bootnodeEnodes = nodes.split(';')
     Logger.debug('Geth@newGeth', 'bootnodes = ' + nodes.split(';'))
   }
