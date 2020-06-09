@@ -150,10 +150,13 @@ exports[`ImportContactsScreen renders correctly 1`] = `
   </RCTScrollView>
   <View
     style={
-      Object {
-        "alignItems": "center",
-        "margin": 30,
-      }
+      Array [
+        Object {
+          "alignItems": "center",
+          "margin": 30,
+        },
+        undefined,
+      ]
     }
   >
     <View
