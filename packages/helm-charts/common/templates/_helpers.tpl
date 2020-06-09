@@ -176,8 +176,8 @@ release: {{ .Release.Name }}
         # first check if it's syncing
         SYNCING=$(wget -q --tries=1 --timeout=5 --header "Content-Type: application/json" -O - --post-data "{\"jsonrpc\":\"2.0\",\"method\":\"eth_syncing\",\"params\":[],\"id\":65}" $RPC_URL)
         NOT_SYNCING=$(echo $SYNCING | grep -o '"result":false')
-        if [ ! $NOT_SYNCING ]; then
-          echo "Node is syncing: $SYNCING"
+        if [ ! -z "$NOT_SYNCING" ]; then
+          echo "Node is not syncing: $SYNCING"
           exit 1
         fi
 
