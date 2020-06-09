@@ -129,8 +129,8 @@ while [[ $(kubectl get pods -n ${namespace} "${node_pod}" -o 'jsonpath={..status
   sleep 10
   sleeped=$((sleeped+60))
 done
-check_pod_status
-sleep 60
+# Time to pod transit from Init -> Running
+sleep 120
 
 check_synced_false
 case ${syncmode} in
