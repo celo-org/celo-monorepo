@@ -318,7 +318,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     return concurrentMap(5, groups, (g) => this.getValidatorGroupVotes(g))
   }
 
-  _activate = proxySend(this.kit, this.contract.methods.activate)
+  private _activate = proxySend(this.kit, this.contract.methods.activate)
 
   /**
    * Activates any activatable pending votes.

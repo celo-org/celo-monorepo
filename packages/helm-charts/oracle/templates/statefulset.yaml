@@ -89,7 +89,7 @@ spec:
             ADDRESSES={{- range $index, $identity := .Values.oracle.identities -}}{{ $identity.address }},{{- end }}
             export ADDRESS=`echo -n $ADDRESSES | cut -d ',' -f $((RID + 1))`
 
-            yarn start
+            exec yarn start
         env:
         - name: REPLICA_NAME
           valueFrom:
