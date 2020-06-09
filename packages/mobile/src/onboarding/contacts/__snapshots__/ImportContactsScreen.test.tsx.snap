@@ -176,12 +176,17 @@ exports[`ImportContactsScreen renders correctly 1`] = `
     >
       <Text
         style={
-          Object {
-            "color": "#81868B",
-            "fontFamily": "Inter-SemiBold",
-            "fontSize": 16,
-            "lineHeight": 22,
-          }
+          Array [
+            Object {
+              "color": "#1AB775",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 16,
+              "lineHeight": 22,
+            },
+            Object {
+              "color": "#81868B",
+            },
+          ]
         }
       >
         global:skip

@@ -63,6 +63,7 @@ import {
   nuxNavigationOptionsNoBackButton,
 } from 'src/navigator/Headers.v2'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
+import QRNavigator from 'src/navigator/QRNavigator'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarIconButton, TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
@@ -75,8 +76,6 @@ import PaymentRequestUnavailable from 'src/paymentRequest/PaymentRequestUnavaila
 import PincodeEducation from 'src/pincode/PincodeEducation'
 import PincodeEnter from 'src/pincode/PincodeEnter'
 import PincodeSet from 'src/pincode/PincodeSet'
-import QRCode from 'src/qrcode/QRCode'
-import QRScanner from 'src/qrcode/QRScanner'
 import { RootState } from 'src/redux/reducers'
 import { store } from 'src/redux/store'
 import JoinCelo from 'src/registration/JoinCelo'
@@ -194,7 +193,7 @@ const nuxScreens = (Navigator: typeof Stack) => (
 )
 
 const sendScreenOptions = ({ route }: { route: RouteProp<StackParamList, Screens.Send> }) => {
-  const goQr = () => navigate(Screens.QRCode)
+  const goQr = () => navigate(Screens.QRNavigator)
   return {
     ...emptyHeader,
     headerLeft: () => (
@@ -258,8 +257,7 @@ const paymentRequestUnavailableScreenOptions = ({
 const sendScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen name={Screens.Send} component={Send} options={sendScreenOptions} />
-    <Navigator.Screen name={Screens.QRScanner} component={QRScanner} />
-    <Navigator.Screen name={Screens.QRCode} component={QRCode} />
+    <Navigator.Screen name={Screens.QRNavigator} component={QRNavigator} options={noHeader} />
     <Navigator.Screen
       name={Screens.SendAmount}
       component={SendAmount}

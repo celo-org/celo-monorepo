@@ -1,0 +1,36 @@
+patch-package
+--- a/node_modules/react-native-tab-view/lib/module/Pager.js
++++ b/node_modules/react-native-tab-view/lib/module/Pager.js
+@@ -326,6 +326,11 @@ export default class Pager extends React.Component {
+ 
+     _defineProperty(this, "getTranslateX", memoize((layoutWidth, routesLength, translateX) => multiply( // Make sure that the translation doesn't exceed the bounds to prevent overscrolling
+     min(max(multiply(layoutWidth, sub(routesLength, 1), DIRECTION_RIGHT), translateX), 0), I18nManager.isRTL ? -1 : 1)));
++
++    // Makes sure the reported position is based on the actual translation
++    // so our custom animation that follows it, looks good
++    // without this, it looks like it's lagging behind the gesture
++    _defineProperty(this, "reportedPosition", cond(this.layoutWidth, divide(multiply(this.translateX, -1), this.layoutWidth), this.index));
+   }
+ 
+   componentDidMount() {
+@@ -407,7 +412,7 @@ export default class Pager extends React.Component {
+     } = this.props;
+     const translateX = this.getTranslateX(this.layoutWidth, this.routesLength, this.translateX);
+     return children({
+-      position: this.position,
++      position: this.reportedPosition,
+       addListener: this.addListener,
+       removeListener: this.removeListener,
+       jumpTo: this.jumpTo,
+--- a/node_modules/react-native-tab-view/lib/module/ScrollPager.js
++++ b/node_modules/react-native-tab-view/lib/module/ScrollPager.js
+@@ -155,6 +155,9 @@ export default class ScrollPager extends React.Component {
+       removeListener: this.removeListener,
+       jumpTo: this.jumpTo,
+       render: children => /*#__PURE__*/React.createElement(Animated.ScrollView, {
++        // This component should accept ScrollView properties
++        // for now just patch what we need
++        alwaysBounceVertical: false,
+         pagingEnabled: true,
+         directionalLockEnabled: true,
+         keyboardDismissMode: "on-drag",
