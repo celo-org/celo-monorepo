@@ -35,7 +35,6 @@ describe('Transfer Works', () => {
 
   it('NUX->Language', async () => {
     await element(by.id('ChooseLanguage/en-US')).tap()
-    await element(by.id('ChooseLanguageButton')).tap()
   })
 
   it('NUX->Join', async () => {
