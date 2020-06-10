@@ -30,7 +30,7 @@ enableScreens()
 
 Logger.debug('App/init', 'Current Language: ' + i18n.language)
 YellowBox.ignoreWarnings([
-  'componentWillRe{}',
+  'componentWillReceiveProps',
   'Remote debugger', // To avoid "Remote debugger in background tab" warning
   'cancelTouches', // rn-screens warning on iOS
   'Setting a timer', // warns about long setTimeouts which are actually saga timeouts
