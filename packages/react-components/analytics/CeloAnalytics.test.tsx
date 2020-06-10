@@ -52,7 +52,7 @@ it('tracks events with subEvents correctly', () => {
       step2: 1500,
       __endTracking__: 500,
       __totalTime__: 3000,
-      address: '0xblablabla',
+      address: '0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10',
       validationType: 0,
     },
     false
