@@ -29,6 +29,7 @@ export enum Namespaces {
   paymentRequestFlow = 'paymentRequestFlow',
   walletFlow5 = 'walletFlow5',
   dappkit = 'dappkit',
+  onboarding = 'onboarding',
 }
 
 const availableResources = {

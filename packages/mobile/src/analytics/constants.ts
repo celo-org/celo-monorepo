@@ -1,13 +1,16 @@
 import { DefaultEventNames } from '@celo/react-components/analytics/constants'
 
 export enum CustomEventNames {
+  // Onboarding
   language_select = 'language_select',
   nux_continue = 'nux_continue',
   full_name_input = 'full_name_input',
   invitation_code = 'invitation_code',
   signup_submit = 'signup_submit',
-  blockChainCorruption = 'block_chain_corruption',
-  disconnect_banner = 'disconnect_banner',
+  import_contacts = 'import_contacts',
+  import_contacts_skip = 'import_contacts_skip',
+
+  // Education
   gold_cancel1 = 'gold_cancel1',
   gold_cancel2 = 'gold_cancel2',
   gold_cancel3 = 'gold_cancel3',
@@ -21,15 +24,13 @@ export enum CustomEventNames {
   dollar_cancel3 = 'dollar_cancel3',
   send_dollar_nux = 'send_dollar_nux',
   wallet_dollar_nux = 'wallet_dollar_nux',
-  send_input = 'send_input',
   transaction_details = 'transaction_details',
+
+  // Payment send
+  send_input = 'send_input',
   send_select_cancel = 'send_select_cancel',
   send_dollar_confirm = 'send_dollar_confirm',
   edit_dollar_confirm = 'edit_dollar_confirm',
-  send_invite_details = 'send_invite_details',
-  send_invite = 'send_invite',
-  edit_send_invite = 'edit_send_invite',
-
   send_cancel = 'send_cancel', // when cancel is clicked after launching send flow
   send_search = 'send_search', // when text is input into search bar
   send_scan = 'send_scan', // when scan QR icon is selected from the send screen
@@ -37,21 +38,29 @@ export enum CustomEventNames {
   send_amount_back = 'send_amount_back', // back button pressed on amount screen
   send_continue = 'send_continue', // when next button pressed on amount enter page
 
+  // Send events, separate from button tracking above
+  send_dollar_transaction = 'send_dollar_transaction',
+  send_dollar_transaction_confirmed = 'send_dollar_transaction_confirmed',
+
+  // Payment requests
   request_cancel = 'request_cancel', // when cancel is clicked after launching request flow
   request_search = 'request_search', // when text is input into search bar
   request_scan = 'request_scan', // when scan QR icon is selected from the request screen
   request_select_recipient = 'request_select_recipient', // when recipient was selected
   request_amount_back = 'request_amount_back', // back button pressed on amount screen
   request_continue = 'request_continue', // when next button pressed on amount enter page
-
-  // Send events, separate from button tracking above
-  send_dollar_transaction = 'send_dollar_transaction',
-  send_dollar_transaction_confirmed = 'send_dollar_transaction_confirmed',
-
-  fetch_balance = 'fetch_balance',
+  request_unavailable = 'request_unavailable', // when request attempted to unverified user
+  request_payment_request = 'incoming_request_payment_request',
+  request_payment_edit = 'incoming_request_payment_edit',
+  incoming_request_payment_decline = 'incoming_request_payment_decline',
+  incoming_request_payment_pay = 'incoming_request_payment_pay',
+  incoming_request_payment_review = 'incoming_request_payment_review',
+  outgoing_request_payment_review = 'outgoing_request_payment_review',
+  outgoing_request_payment_remind = 'outgoing_request_payment_remind',
+  outgoing_request_payment_cancel = 'outgoing_request_payment_cancel',
 
   // Verification event and sub-events
-  verification = 'verification',
+  verification_start = 'verification_start',
   verification_setup = 'verification_setup',
   verification_get_status = 'verification_get_status',
   verification_request_attestations = 'verification_request_attestations',
@@ -68,24 +77,25 @@ export enum CustomEventNames {
   verification_cancelled = 'verification_cancelled',
   verification_success = 'verification_success',
   verification_timed_out = 'verification_timed_out',
-
   verification_actionable_attestation_start = 'verification_actionable_attestation_start',
   verification_actionable_attestation_finish = 'verification_actionable_attestation_finish',
   verification_validate_code_start = 'verification_validate_code_start',
   verification_validate_code_finish = 'verification_validate_code_finish',
 
+  // PGPNP
   phone_number_quota_purchase_success = 'phone_number_quota_purchase_success',
   phone_number_quota_purchase_failure = 'phone_number_quota_purchase_failure',
   phone_number_quota_purchase_skip = 'phone_number_quota_purchase_skip',
 
+  // Invite
   redeem_invite_success = 'redeem_invite_success',
   redeem_invite_timed_out = 'redeem_invite_timed_out',
   redeem_invite_failed = 'redeem_invite_failed',
+  send_invite_details = 'send_invite_details',
+  send_invite = 'send_invite',
+  edit_send_invite = 'edit_send_invite',
 
-  photos_education = 'photos_education',
-  get_backup_key = 'get_backup_key',
-  earn_celo_gold = 'earn_celo_gold',
-  user_restart = 'user_restart',
+  // Pin
   pin_continue = 'pin_continue',
   pin_wallet_import = 'pin_wallet_import',
   pin_value = 'pin_value',
@@ -101,11 +111,11 @@ export enum CustomEventNames {
   invite_friends_sms = 'invite_friends_sms', // to count the # of taps on “Invite with SMS" button on Invite_Friends_Review
   invite_friends_whatsapp = 'invite_friends_whatsapp', // to count the # of taps on “Invite with WhatsApp" button on Invite_Friends_Review
 
+  // Backup Key
+  get_backup_key = 'get_backup_key',
   backup_start = 'backup_start', // ‘set up now’ button click
   backup_setup_info = 'backup_setup_info',
-
   backup_quiz_backspace = 'backup_quiz_backspace', // whenever the backspace is pressed
-
   backup_quiz_submit = 'backup_quiz_submit', // (Count # of taps on "Submit" button in Backup_Quiz)
   backup_quiz_success = 'backup_quiz_success', // (Count # of successful Account Key confirmations Backup_Quiz)
   backup_quiz_incorrect = 'backup_quiz_incorrect', // (Count # of failed Account Key confirmations Backup_Quiz)
@@ -189,17 +199,6 @@ export enum CustomEventNames {
   import_wallet_submit = 'import_wallet_submit', // to count the # of times that the “Restore Celo Wallet” button is pressed
   import_wallet_cancel = 'import_wallet_cancel', // to count the # of times that the “Cancel” button is pressed
 
-  request_payment_request = 'incoming_request_payment_request',
-  request_payment_edit = 'incoming_request_payment_edit',
-
-  incoming_request_payment_decline = 'incoming_request_payment_decline',
-  incoming_request_payment_pay = 'incoming_request_payment_pay',
-  incoming_request_payment_review = 'incoming_request_payment_review',
-
-  outgoing_request_payment_review = 'outgoing_request_payment_review',
-  outgoing_request_payment_remind = 'outgoing_request_payment_remind',
-  outgoing_request_payment_cancel = 'outgoing_request_payment_cancel',
-
   // Escrowed payments
   escrowed_payment_review = 'escrowed_payment_review',
   escrowed_payment_reclaimed_by_sender = 'escrowed_payment_reclaimed_by_sender',
@@ -224,6 +223,13 @@ export enum CustomEventNames {
   transaction_send_gas_estimated = 'transaction_send_gas_estimated',
   transaction_send_gas_hash_received = 'transaction_send_gas_hash_received',
   transaction_send_gas_receipt = 'transaction_send_gas_receipt',
+
+  // Misc
+  fetch_balance = 'fetch_balance',
+
+  // Errors
+  user_restart = 'user_restart',
+  blockChainCorruption = 'block_chain_corruption',
 }
 
 export enum CommonValues {

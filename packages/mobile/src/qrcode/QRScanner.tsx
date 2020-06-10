@@ -1,176 +1,95 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import QRCode from '@celo/react-components/icons/QRCode'
-import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import colors from '@celo/react-components/styles/colors.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
-import { useIsFocused } from '@react-navigation/native'
 import { StackScreenProps } from '@react-navigation/stack'
 import { memoize } from 'lodash'
-import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
-import { Platform, StyleSheet, Text, View } from 'react-native'
+import React, { useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
+import { StyleSheet, Text } from 'react-native'
 import { RNCamera } from 'react-native-camera'
-import SafeAreaView from 'react-native-safe-area-view'
-import { connect } from 'react-redux'
-import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import { headerWithBackButton } from 'src/navigator/Headers'
-import { navigate } from 'src/navigator/NavigationService'
+import { useSafeArea } from 'react-native-safe-area-view'
+import { Defs, Mask, Rect, Svg } from 'react-native-svg'
+import { useDispatch } from 'react-redux'
+import { Namespaces } from 'src/i18n'
 import { Screens } from 'src/navigator/Screens'
-import { StackParamList } from 'src/navigator/types'
+import { QRTabParamList } from 'src/navigator/types'
 import NotAuthorizedView from 'src/qrcode/NotAuthorizedView'
-import { RootState } from 'src/redux/reducers'
 import { handleBarcodeDetected, QrCode } from 'src/send/actions'
-import { TransactionDataInput } from 'src/send/SendAmount'
 import Logger from 'src/utils/Logger'
 
-interface StateProps {
-  scanIsForSecureSend?: true
-  transactionData?: TransactionDataInput
+type Props = StackScreenProps<QRTabParamList, Screens.QRScanner>
+
+const SeeThroughOverlay = () => {
+  const { width, height } = variables
+
+  const margin = 40
+  const centerBoxSize = width - margin * 2
+  const centerBoxBorderRadius = 8
+
+  // TODO(jeanregisser): Investigate why the mask is pixelated on iOS.
+  // It's visible on the rounded corners but since they are small, I'm ignoring it for now.
+  return (
+    <Svg height={height} width={width} viewBox={`0 0 ${width} ${height}`}>
+      <Defs>
+        <Mask id="mask" x="0" y="0" height="100%" width="100%">
+          <Rect height="100%" width="100%" fill="#fff" />
+          <Rect
+            x={margin}
+            y={(height - centerBoxSize) / 2}
+            rx={centerBoxBorderRadius}
+            ry={centerBoxBorderRadius}
+            width={centerBoxSize}
+            height={centerBoxSize}
+            fill="#000"
+          />
+        </Mask>
+      </Defs>
+      <Rect height="100%" width="100%" fill="rgba(0,0,0,0.5)" mask="url(#mask)" />
+    </Svg>
+  )
 }
 
-interface DispatchProps {
-  handleBarcodeDetected: typeof handleBarcodeDetected
-}
+export default function QRScanner({ route }: Props) {
+  const dispatch = useDispatch()
+  const { t } = useTranslation(Namespaces.sendFlow7)
+  const inset = useSafeArea()
 
-type OwnProps = StackScreenProps<StackParamList, Screens.QRScanner> & { isFocused: boolean }
-type Props = DispatchProps & WithTranslation & StateProps & OwnProps
+  const { scanIsForSecureSend, transactionData } = route.params || {}
 
-const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
-  const { route } = ownProps
-  return {
-    scanIsForSecureSend: route.params?.scanIsForSecureSend,
-    transactionData: route.params?.transactionData,
-  }
-}
-
-const mapDispatchToProps = {
-  handleBarcodeDetected,
-}
-
-const QRScannerWrapper = (props: Props) => {
-  const isFocused = useIsFocused()
-  return <QRScanner {...props} isFocused={isFocused} />
-}
-
-class QRScanner extends React.Component<Props> {
-  static navigationOptions = () => ({
-    ...headerWithBackButton,
-    headerTitle: i18n.t('sendFlow7:scanCode'),
-  })
-
-  camera: RNCamera | null = null
-
-  // This method would be called multiple times with the same
-  // QR code, so we need to catch only the first one
-  onBarCodeDetected = memoize(
-    (qrCode: QrCode) => {
-      Logger.debug('QRScanner', 'Bar code detected')
-      const { scanIsForSecureSend, transactionData } = this.props
-      this.props.handleBarcodeDetected(qrCode, scanIsForSecureSend, transactionData)
-    },
-    (qrCode) => qrCode.data
+  const onBarCodeDetected = useCallback(
+    memoize(
+      (qrCode: QrCode) => {
+        Logger.debug('QRScanner', 'Bar code detected')
+        dispatch(handleBarcodeDetected(qrCode, scanIsForSecureSend, transactionData))
+      },
+      (qrCode) => qrCode.data
+    ),
+    [scanIsForSecureSend, transactionData]
   )
 
-  onPressShowYourCode = () => {
-    navigate(Screens.QRCode)
-  }
-
-  render() {
-    const { t, scanIsForSecureSend, isFocused } = this.props
-
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.innerContainer}>
-          {(Platform.OS !== 'android' || isFocused) && (
-            <RNCamera
-              ref={(ref) => {
-                this.camera = ref
-              }}
-              style={styles.preview}
-              type={RNCamera.Constants.Type.back}
-              onBarCodeRead={this.onBarCodeDetected}
-              barCodeTypes={[RNCamera.Constants.BarCodeType.qr]}
-              flashMode={RNCamera.Constants.FlashMode.auto}
-              captureAudio={false}
-              autoFocus={RNCamera.Constants.AutoFocus.on}
-              // Passing null here since we want the default system message
-              // @ts-ignore
-              androidCameraPermissionOptions={null}
-              notAuthorizedView={<NotAuthorizedView />}
-            >
-              <View style={styles.view}>
-                <View style={styles.fillVertical} />
-                <View style={styles.cameraRow}>
-                  <View style={styles.fillHorizontal} />
-                  <View style={styles.cameraContainer}>
-                    <View style={styles.camera} />
-                    <View style={styles.infoBox}>
-                      <Text style={styles.infoText}>{t('cameraScanInfo')}</Text>
-                    </View>
-                  </View>
-                  <View style={styles.fillHorizontal} />
-                </View>
-                <View style={styles.fillVertical} />
-              </View>
-            </RNCamera>
-          )}
-        </View>
-        {!scanIsForSecureSend && (
-          <View style={styles.footerContainer}>
-            <Button
-              onPress={this.onPressShowYourCode}
-              text={t('showYourQRCode')}
-              standard={false}
-              type={BtnTypes.SECONDARY}
-            >
-              <View style={styles.footerIcon}>
-                <QRCode />
-              </View>
-            </Button>
-          </View>
-        )}
-      </SafeAreaView>
-    )
-  }
+  return (
+    <RNCamera
+      style={styles.camera}
+      type={RNCamera.Constants.Type.back}
+      onBarCodeRead={onBarCodeDetected}
+      barCodeTypes={[RNCamera.Constants.BarCodeType.qr]}
+      flashMode={RNCamera.Constants.FlashMode.auto}
+      captureAudio={false}
+      autoFocus={RNCamera.Constants.AutoFocus.on}
+      // Passing null here since we want the default system message
+      // @ts-ignore
+      androidCameraPermissionOptions={null}
+      notAuthorizedView={<NotAuthorizedView />}
+    >
+      <SeeThroughOverlay />
+      <Text style={[styles.infoText, { marginBottom: inset.bottom }]}>{t('cameraScanInfo')}</Text>
+    </RNCamera>
+  )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  innerContainer: {
-    flex: 1,
-  },
-  preview: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
   camera: {
-    height: 200,
-    width: 200,
-    borderRadius: 4,
-  },
-  view: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  fillVertical: {
-    backgroundColor: 'rgba(46, 51, 56, 0.3)',
-    width: variables.width,
-    flex: 1,
-  },
-  fillHorizontal: {
-    backgroundColor: 'rgba(46, 51, 56, 0.3)',
-    flex: 1,
-  },
-  cameraRow: {
-    display: 'flex',
-    flexDirection: 'row',
-  },
-  cameraContainer: {
-    height: 200,
   },
   infoBox: {
     paddingVertical: 9,
@@ -181,22 +100,13 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   infoText: {
-    ...fontStyles.bodySmall,
+    position: 'absolute',
+    left: 9,
+    right: 9,
+    bottom: 32,
+    ...fontStyles.small600,
     lineHeight: undefined,
     color: colors.white,
-  },
-  footerContainer: {
-    backgroundColor: colors.background,
-  },
-  footerIcon: {
-    borderWidth: 1,
-    borderRadius: 15,
-    borderColor: colors.celoGreen,
-    padding: 4,
+    textAlign: 'center',
   },
 })
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withTranslation(Namespaces.sendFlow7)(QRScannerWrapper))

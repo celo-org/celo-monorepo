@@ -121,13 +121,3 @@ export const getBalanceColor = (accountBalance: BigNumber): string => {
   }
   return colors.dark
 }
-
-export const formatDisplayName = (displayName: string) => {
-  // Default displayName is "Mobile #" when no contact is saved
-  // To make the copy nicer, we make the displayName "your contact" isntead
-  if (displayName === 'Mobile #') {
-    return { displayName: 'your contact', displayNameCapitalized: 'Your contract' }
-  }
-
-  return { displayName, displayNameCapitalized: displayName }
-}

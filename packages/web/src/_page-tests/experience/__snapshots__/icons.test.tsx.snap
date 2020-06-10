@@ -73,177 +73,462 @@ exports[`Experience/Icons renders 1`] = `
           }
         }
       >
-        <a
-          href="/experience/brand"
-        >
-          <div
-            className="css-view-1dbjc4n"
-            data-focusable={true}
-            onKeyDown={[Function]}
-            onKeyUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-            style={
-              Object {
-                "MozTransitionProperty": "opacity",
-                "MozUserSelect": "none",
-                "WebkitAlignContent": "center",
-                "WebkitBoxDirection": "normal",
-                "WebkitBoxOrient": "horizontal",
-                "WebkitFlexDirection": "row",
-                "WebkitTransitionDuration": "0.15s",
-                "WebkitTransitionProperty": "opacity",
-                "WebkitUserSelect": "none",
-                "alignContent": "center",
-                "cursor": "pointer",
-                "flexDirection": "row",
-                "msFlexDirection": "row",
-                "msFlexLinePack": "center",
-                "msTouchAction": "manipulation",
-                "msUserSelect": "none",
-                "touchAction": "manipulation",
-                "transitionDuration": "0.15s",
-                "transitionProperty": "opacity",
-                "userSelect": "none",
-              }
-            }
-            tabIndex="0"
-          >
-            <svg
-              fill="none"
-              height={30}
-              style={Object {}}
-              viewBox="0 0 85 25"
-              width={102}
-            >
-              <path
-                d="M64.2368 22.079L66.5 21.3684V2.63159L64.2368 3.34212V22.079ZM38.1316 10.7105C39.5526 10.7105 40.8684 11.3421 41.7105 12.3947L42.6316 10.2632C41.421 9.10528 39.8158 8.55264 38.1316 8.55264C34.2368 8.55264 31.5526 11.6316 31.5789 15.0263C31.6052 18.7105 34.5 21.7105 38.1316 21.7105C39.9737 21.7105 41.3684 21.1579 42.421 20.3947V17.7895C41.3158 18.8947 39.7105 19.5526 38.3158 19.5526C36.2105 19.5526 33.8421 17.8421 33.8421 15.0263C33.8421 12.4211 35.8947 10.7105 38.1316 10.7105ZM53.1842 8.55264C49.2895 8.55264 47.0263 11.6316 47.0263 15.0263C47.0263 18.7105 49.9473 21.7105 53.5789 21.7105C55.421 21.7105 56.8158 21.1579 57.8684 20.3947V17.7895C56.7631 18.8947 55.1579 19.5526 53.7631 19.5526C51.8947 19.5526 49.8421 18.3947 49.421 15.9474H59.3421V15.079C59.3421 11.4474 56.9473 8.55264 53.1842 8.55264ZM77.6316 8.55264C74 8.55264 71.0526 11.5 71.0526 15.1316C71.0526 18.7632 74 21.7105 77.6316 21.7105C81.2631 21.7105 84.2105 18.7632 84.2105 15.1316C84.2105 11.5 81.2631 8.55264 77.6316 8.55264ZM53.2105 10.7105C54.9737 10.7105 56.8421 11.8158 57 13.9474H49.421C49.5789 11.8158 51.4473 10.7105 53.2105 10.7105ZM77.6316 19.5526C75.1842 19.5526 73.2105 17.579 73.2105 15.1316C73.2105 12.6842 75.1842 10.7105 77.6316 10.7105C80.0789 10.7105 82.0526 12.6842 82.0526 15.1316C82.0526 17.579 80.0789 19.5526 77.6316 19.5526Z"
-                fill="#2E3338"
-                style={Object {}}
-              />
-              <path
-                d="M15.1316 17.1053C19.1284 17.1053 22.3684 13.8653 22.3684 9.86842C22.3684 5.87158 19.1284 2.63158 15.1316 2.63158C11.1348 2.63158 7.89476 5.87158 7.89476 9.86842C7.89476 13.8653 11.1348 17.1053 15.1316 17.1053ZM15.1316 19.7368C9.6816 19.7368 5.26318 15.3184 5.26318 9.86842C5.26318 4.41842 9.6816 0 15.1316 0C20.5816 0 25 4.41842 25 9.86842C25 15.3184 20.5816 19.7368 15.1316 19.7368Z"
-                fill="#35D07F"
-                style={Object {}}
-              />
-              <path
-                d="M9.86842 22.3684C13.8653 22.3684 17.1053 19.1284 17.1053 15.1316C17.1053 11.1348 13.8653 7.89476 9.86842 7.89476C5.87158 7.89476 2.63158 11.1348 2.63158 15.1316C2.63158 19.1284 5.87158 22.3684 9.86842 22.3684ZM9.86842 25C4.41842 25 0 20.5816 0 15.1316C0 9.6816 4.41842 5.26318 9.86842 5.26318C15.3184 5.26318 19.7368 9.6816 19.7368 15.1316C19.7368 20.5816 15.3184 25 9.86842 25Z"
-                fill="#FBCC5C"
-                style={Object {}}
-              />
-              <path
-                d="M15.4553 19.7315C16.1392 18.903 16.6292 17.932 16.89 16.8899C17.9321 16.6294 18.9029 16.1391 19.7316 15.4554C19.6937 16.6623 19.4339 17.852 18.9647 18.9646C17.8521 19.4338 16.6624 19.6936 15.4553 19.7315ZM8.11026 8.10989C7.06815 8.37042 6.09736 8.86068 5.26868 9.54436C5.30657 8.33752 5.56631 7.14778 6.03552 6.03515C7.14815 5.56594 8.33789 5.30621 9.54473 5.26831C8.86105 6.09699 8.37078 7.06778 8.11026 8.10989Z"
-                fill="#5EA33B"
-                style={Object {}}
-              />
-            </svg>
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "fontSize": "24px",
-                  "fontWeight": "400",
-                  "lineHeight": "initial",
-                  "marginLeft": "15px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              BrandKit
-            </div>
-          </div>
-        </a>
         <div
           className="css-view-1dbjc4n"
-          onClick={[Function]}
-          onMouseDown={[Function]}
-          onMouseEnter={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
+          style={
+            Object {
+              "WebkitAlignContent": "center",
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "horizontal",
+              "WebkitFlexDirection": "row",
+              "alignContent": "center",
+              "flexDirection": "row",
+              "msFlexDirection": "row",
+              "msFlexLinePack": "center",
+            }
+          }
         >
           <a
-            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
-            data-focusable={true}
-            dir="auto"
-            href="https://github.com/celo-org"
-            onClick={[Function]}
-            onMouseEnter={[Function]}
-            rel=" noopener noreferrer"
-            role="link"
-            style={
-              Object {
-                "WebkitAlignItems": "center",
-                "WebkitBoxAlign": "center",
-                "WebkitBoxFlex": 0,
-                "WebkitBoxPack": "center",
-                "WebkitFlexGrow": 0,
-                "WebkitJustifyContent": "center",
-                "alignItems": "center",
-                "backgroundColor": "rgba(0,0,0,0.00)",
-                "borderBottomColor": "rgba(0,0,0,0.00)",
-                "borderLeftColor": "rgba(0,0,0,0.00)",
-                "borderRightColor": "rgba(0,0,0,0.00)",
-                "borderTopColor": "rgba(0,0,0,0.00)",
-                "color": "rgba(46,51,56,1.00)",
-                "cursor": "pointer",
-                "display": "inline-flex",
-                "flexGrow": 0,
-                "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                "fontSize": "16px",
-                "fontWeight": "500",
-                "justifyContent": "center",
-                "lineHeight": "16px",
-                "msFlexAlign": "center",
-                "msFlexPack": "center",
-                "msFlexPositive": 0,
-                "opacity": 1,
-                "outlineColor": "transparent",
-                "textAlign": "center",
-                "textRendering": "geometricPrecision",
-                "width": "fit-content",
-              }
-            }
-            target="_blank"
+            href="/"
           >
-            github
             <div
               className="css-view-1dbjc4n"
+              data-focusable={true}
+              onKeyDown={[Function]}
+              onKeyUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
               style={
                 Object {
-                  "display": "inline-flex",
-                  "paddingLeft": "8px",
+                  "MozTransitionProperty": "opacity",
+                  "MozUserSelect": "none",
+                  "WebkitAlignContent": "center",
+                  "WebkitBoxDirection": "normal",
+                  "WebkitBoxOrient": "horizontal",
+                  "WebkitFlexDirection": "row",
+                  "WebkitTransitionDuration": "0.15s",
+                  "WebkitTransitionProperty": "opacity",
+                  "WebkitUserSelect": "none",
+                  "alignContent": "center",
+                  "cursor": "pointer",
+                  "flexDirection": "row",
+                  "msFlexDirection": "row",
+                  "msFlexLinePack": "center",
+                  "msTouchAction": "manipulation",
+                  "msUserSelect": "none",
+                  "touchAction": "manipulation",
+                  "transitionDuration": "0.15s",
+                  "transitionProperty": "opacity",
+                  "userSelect": "none",
                 }
               }
+              tabIndex="0"
             >
               <svg
                 fill="none"
-                height={22}
+                height={30}
                 style={Object {}}
-                viewBox="0 0 25 24"
-                width={22}
+                viewBox="0 0 85 25"
+                width={102}
               >
-                <title>
-                  Github
-                </title>
                 <path
-                  clipRule="evenodd"
-                  d="M12.3019 0C5.50526 0 0 5.50526 0 12.3019C0 17.7392 3.52669 22.3458 8.4127 23.977C9.0244 24.0902 9.25095 23.7126 9.25095 23.3804C9.25095 23.0858 9.2434 22.3156 9.23585 21.2885C5.81488 22.0286 5.08991 19.6422 5.08991 19.6422C4.53108 18.2225 3.72304 17.8373 3.72304 17.8373C2.60537 17.0746 3.80611 17.0897 3.80611 17.0897C5.03705 17.1803 5.69405 18.3584 5.69405 18.3584C6.78906 20.2388 8.57129 19.6951 9.27361 19.3779C9.38688 18.585 9.70406 18.0412 10.0514 17.7316C7.32524 17.4295 4.45556 16.3723 4.45556 11.66C4.45556 10.3158 4.93132 9.22074 5.72426 8.35984C5.59588 8.04266 5.17298 6.79662 5.83754 5.10501C5.83754 5.10501 6.87213 4.77274 9.22074 6.36616C10.2025 6.0943 11.2522 5.95837 12.3019 5.95082C13.344 5.95837 14.4013 6.0943 15.383 6.36616C17.7316 4.77274 18.7662 5.10501 18.7662 5.10501C19.4383 6.79662 19.0154 8.05021 18.887 8.35984C19.6724 9.22074 20.1482 10.3158 20.1482 11.66C20.1482 16.3874 17.271 17.422 14.5297 17.7316C14.9677 18.1092 15.3679 18.8644 15.3679 20.0123C15.3679 21.6586 15.3528 22.9801 15.3528 23.3879C15.3528 23.7202 15.5718 24.0978 16.1986 23.977C21.0846 22.3458 24.6038 17.7392 24.6038 12.3094C24.6038 5.50526 19.0985 0 12.3019 0Z"
+                  d="M64.2368 22.079L66.5 21.3684V2.63159L64.2368 3.34212V22.079ZM38.1316 10.7105C39.5526 10.7105 40.8684 11.3421 41.7105 12.3947L42.6316 10.2632C41.421 9.10528 39.8158 8.55264 38.1316 8.55264C34.2368 8.55264 31.5526 11.6316 31.5789 15.0263C31.6052 18.7105 34.5 21.7105 38.1316 21.7105C39.9737 21.7105 41.3684 21.1579 42.421 20.3947V17.7895C41.3158 18.8947 39.7105 19.5526 38.3158 19.5526C36.2105 19.5526 33.8421 17.8421 33.8421 15.0263C33.8421 12.4211 35.8947 10.7105 38.1316 10.7105ZM53.1842 8.55264C49.2895 8.55264 47.0263 11.6316 47.0263 15.0263C47.0263 18.7105 49.9473 21.7105 53.5789 21.7105C55.421 21.7105 56.8158 21.1579 57.8684 20.3947V17.7895C56.7631 18.8947 55.1579 19.5526 53.7631 19.5526C51.8947 19.5526 49.8421 18.3947 49.421 15.9474H59.3421V15.079C59.3421 11.4474 56.9473 8.55264 53.1842 8.55264ZM77.6316 8.55264C74 8.55264 71.0526 11.5 71.0526 15.1316C71.0526 18.7632 74 21.7105 77.6316 21.7105C81.2631 21.7105 84.2105 18.7632 84.2105 15.1316C84.2105 11.5 81.2631 8.55264 77.6316 8.55264ZM53.2105 10.7105C54.9737 10.7105 56.8421 11.8158 57 13.9474H49.421C49.5789 11.8158 51.4473 10.7105 53.2105 10.7105ZM77.6316 19.5526C75.1842 19.5526 73.2105 17.579 73.2105 15.1316C73.2105 12.6842 75.1842 10.7105 77.6316 10.7105C80.0789 10.7105 82.0526 12.6842 82.0526 15.1316C82.0526 17.579 80.0789 19.5526 77.6316 19.5526Z"
                   fill="#2E3338"
-                  fillRule="evenodd"
+                  style={Object {}}
+                />
+                <path
+                  d="M15.1316 17.1053C19.1284 17.1053 22.3684 13.8653 22.3684 9.86842C22.3684 5.87158 19.1284 2.63158 15.1316 2.63158C11.1348 2.63158 7.89476 5.87158 7.89476 9.86842C7.89476 13.8653 11.1348 17.1053 15.1316 17.1053ZM15.1316 19.7368C9.6816 19.7368 5.26318 15.3184 5.26318 9.86842C5.26318 4.41842 9.6816 0 15.1316 0C20.5816 0 25 4.41842 25 9.86842C25 15.3184 20.5816 19.7368 15.1316 19.7368Z"
+                  fill="#35D07F"
+                  style={Object {}}
+                />
+                <path
+                  d="M9.86842 22.3684C13.8653 22.3684 17.1053 19.1284 17.1053 15.1316C17.1053 11.1348 13.8653 7.89476 9.86842 7.89476C5.87158 7.89476 2.63158 11.1348 2.63158 15.1316C2.63158 19.1284 5.87158 22.3684 9.86842 22.3684ZM9.86842 25C4.41842 25 0 20.5816 0 15.1316C0 9.6816 4.41842 5.26318 9.86842 5.26318C15.3184 5.26318 19.7368 9.6816 19.7368 15.1316C19.7368 20.5816 15.3184 25 9.86842 25Z"
+                  fill="#FBCC5C"
+                  style={Object {}}
+                />
+                <path
+                  d="M15.4553 19.7315C16.1392 18.903 16.6292 17.932 16.89 16.8899C17.9321 16.6294 18.9029 16.1391 19.7316 15.4554C19.6937 16.6623 19.4339 17.852 18.9647 18.9646C17.8521 19.4338 16.6624 19.6936 15.4553 19.7315ZM8.11026 8.10989C7.06815 8.37042 6.09736 8.86068 5.26868 9.54436C5.30657 8.33752 5.56631 7.14778 6.03552 6.03515C7.14815 5.56594 8.33789 5.30621 9.54473 5.26831C8.86105 6.09699 8.37078 7.06778 8.11026 8.10989Z"
+                  fill="#5EA33B"
                   style={Object {}}
                 />
               </svg>
             </div>
           </a>
+          <a
+            href="/experience/brand"
+          >
+            <div
+              className="css-view-1dbjc4n"
+              data-focusable={true}
+              onKeyDown={[Function]}
+              onKeyUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                Object {
+                  "MozTransitionProperty": "opacity",
+                  "MozUserSelect": "none",
+                  "WebkitAlignContent": "center",
+                  "WebkitBoxDirection": "normal",
+                  "WebkitBoxOrient": "horizontal",
+                  "WebkitFlexDirection": "row",
+                  "WebkitTransitionDuration": "0.15s",
+                  "WebkitTransitionProperty": "opacity",
+                  "WebkitUserSelect": "none",
+                  "alignContent": "center",
+                  "cursor": "pointer",
+                  "flexDirection": "row",
+                  "msFlexDirection": "row",
+                  "msFlexLinePack": "center",
+                  "msTouchAction": "manipulation",
+                  "msUserSelect": "none",
+                  "touchAction": "manipulation",
+                  "transitionDuration": "0.15s",
+                  "transitionProperty": "opacity",
+                  "userSelect": "none",
+                }
+              }
+              tabIndex="0"
+            >
+              <div
+                className="css-text-901oao"
+                dir="auto"
+                style={
+                  Object {
+                    "color": "rgba(46,51,56,1.00)",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "24px",
+                    "fontWeight": "400",
+                    "lineHeight": "initial",
+                    "marginLeft": "15px",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+              >
+                BrandKit
+              </div>
+            </div>
+          </a>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitAlignContent": "center",
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "horizontal",
+              "WebkitFlexDirection": "row",
+              "alignContent": "center",
+              "flexDirection": "row",
+              "msFlexDirection": "row",
+              "msFlexLinePack": "center",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitAlignItems": "center",
+                "WebkitBoxAlign": "center",
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxOrient": "horizontal",
+                "WebkitFlexDirection": "row",
+                "alignItems": "center",
+                "flexDirection": "row",
+                "marginLeft": "30px",
+                "marginRight": "30px",
+                "msFlexAlign": "center",
+                "msFlexDirection": "row",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "WebkitAlignItems": "center",
+                  "WebkitBoxAlign": "center",
+                  "WebkitBoxDirection": "normal",
+                  "WebkitBoxOrient": "vertical",
+                  "WebkitBoxPack": "center",
+                  "WebkitFlexDirection": "column",
+                  "WebkitJustifyContent": "center",
+                  "alignItems": "center",
+                  "flexDirection": "column",
+                  "justifyContent": "center",
+                  "marginBottom": "0px",
+                  "marginLeft": "15px",
+                  "marginRight": "15px",
+                  "msFlexAlign": "center",
+                  "msFlexDirection": "column",
+                  "msFlexPack": "center",
+                  "position": "relative",
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                onClick={[Function]}
+                onMouseDown={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onResponderGrant={[Function]}
+                onResponderRelease={[Function]}
+              >
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                  data-focusable={true}
+                  dir="auto"
+                  href="/experience/events"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
+                  role="link"
+                  style={
+                    Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "WebkitBoxFlex": 0,
+                      "WebkitBoxPack": "center",
+                      "WebkitFlexGrow": 0,
+                      "WebkitJustifyContent": "center",
+                      "alignItems": "center",
+                      "backgroundColor": "rgba(0,0,0,0.00)",
+                      "borderBottomColor": "rgba(0,0,0,0.00)",
+                      "borderLeftColor": "rgba(0,0,0,0.00)",
+                      "borderRightColor": "rgba(0,0,0,0.00)",
+                      "borderTopColor": "rgba(0,0,0,0.00)",
+                      "color": "rgba(129,134,139,1.00)",
+                      "cursor": "pointer",
+                      "display": "inline-flex",
+                      "flexGrow": 0,
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "justifyContent": "center",
+                      "lineHeight": "16px",
+                      "msFlexAlign": "center",
+                      "msFlexPack": "center",
+                      "msFlexPositive": 0,
+                      "opacity": 1,
+                      "outlineColor": "transparent",
+                      "textAlign": "center",
+                      "textRendering": "geometricPrecision",
+                      "width": "fit-content",
+                    }
+                  }
+                >
+                  EventKit
+                </a>
+              </div>
+            </div>
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "WebkitAlignItems": "center",
+                  "WebkitBoxAlign": "center",
+                  "WebkitBoxDirection": "normal",
+                  "WebkitBoxOrient": "vertical",
+                  "WebkitBoxPack": "center",
+                  "WebkitFlexDirection": "column",
+                  "WebkitJustifyContent": "center",
+                  "alignItems": "center",
+                  "flexDirection": "column",
+                  "justifyContent": "center",
+                  "marginBottom": "0px",
+                  "marginLeft": "15px",
+                  "marginRight": "15px",
+                  "msFlexAlign": "center",
+                  "msFlexDirection": "column",
+                  "msFlexPack": "center",
+                  "position": "relative",
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                onClick={[Function]}
+                onMouseDown={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onResponderGrant={[Function]}
+                onResponderRelease={[Function]}
+              >
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                  data-focusable={true}
+                  dir="auto"
+                  href="/experience/brand"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
+                  role="link"
+                  style={
+                    Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "WebkitBoxFlex": 0,
+                      "WebkitBoxPack": "center",
+                      "WebkitFlexGrow": 0,
+                      "WebkitJustifyContent": "center",
+                      "alignItems": "center",
+                      "backgroundColor": "rgba(0,0,0,0.00)",
+                      "borderBottomColor": "rgba(0,0,0,0.00)",
+                      "borderLeftColor": "rgba(0,0,0,0.00)",
+                      "borderRightColor": "rgba(0,0,0,0.00)",
+                      "borderTopColor": "rgba(0,0,0,0.00)",
+                      "color": "rgba(46,51,56,1.00)",
+                      "cursor": "pointer",
+                      "display": "inline-flex",
+                      "flexGrow": 0,
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "justifyContent": "center",
+                      "lineHeight": "16px",
+                      "msFlexAlign": "center",
+                      "msFlexPack": "center",
+                      "msFlexPositive": 0,
+                      "opacity": 1,
+                      "outlineColor": "transparent",
+                      "textAlign": "center",
+                      "textRendering": "geometricPrecision",
+                      "width": "fit-content",
+                    }
+                  }
+                >
+                  BrandKit
+                </a>
+              </div>
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "bottom": "-16px",
+                    "height": "8px",
+                    "position": "absolute",
+                    "width": "7px",
+                  }
+                }
+              >
+                <svg
+                  fill="none"
+                  height={10}
+                  style={Object {}}
+                  viewBox="0 0 83 98"
+                  width={10}
+                >
+                  <g
+                    style={
+                      Object {
+                        "mixBlendMode": "normal",
+                      }
+                    }
+                  >
+                    <path
+                      d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+                      fill="#35D07F"
+                    />
+                  </g>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            onClick={[Function]}
+            onMouseDown={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onResponderGrant={[Function]}
+            onResponderRelease={[Function]}
+          >
+            <a
+              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+              data-focusable={true}
+              dir="auto"
+              href="https://github.com/celo-org"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
+              rel=" noopener noreferrer"
+              role="link"
+              style={
+                Object {
+                  "WebkitAlignItems": "center",
+                  "WebkitBoxAlign": "center",
+                  "WebkitBoxFlex": 0,
+                  "WebkitBoxPack": "center",
+                  "WebkitFlexGrow": 0,
+                  "WebkitJustifyContent": "center",
+                  "alignItems": "center",
+                  "backgroundColor": "rgba(0,0,0,0.00)",
+                  "borderBottomColor": "rgba(0,0,0,0.00)",
+                  "borderLeftColor": "rgba(0,0,0,0.00)",
+                  "borderRightColor": "rgba(0,0,0,0.00)",
+                  "borderTopColor": "rgba(0,0,0,0.00)",
+                  "color": "rgba(46,51,56,1.00)",
+                  "cursor": "pointer",
+                  "display": "inline-flex",
+                  "flexGrow": 0,
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "16px",
+                  "fontWeight": "500",
+                  "justifyContent": "center",
+                  "lineHeight": "16px",
+                  "msFlexAlign": "center",
+                  "msFlexPack": "center",
+                  "msFlexPositive": 0,
+                  "opacity": 1,
+                  "outlineColor": "transparent",
+                  "textAlign": "center",
+                  "textRendering": "geometricPrecision",
+                  "width": "fit-content",
+                }
+              }
+              target="_blank"
+            >
+              github
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "display": "inline-flex",
+                    "paddingLeft": "8px",
+                  }
+                }
+              >
+                <svg
+                  fill="none"
+                  height={22}
+                  style={Object {}}
+                  viewBox="0 0 25 24"
+                  width={22}
+                >
+                  <title>
+                    Github
+                  </title>
+                  <path
+                    clipRule="evenodd"
+                    d="M12.3019 0C5.50526 0 0 5.50526 0 12.3019C0 17.7392 3.52669 22.3458 8.4127 23.977C9.0244 24.0902 9.25095 23.7126 9.25095 23.3804C9.25095 23.0858 9.2434 22.3156 9.23585 21.2885C5.81488 22.0286 5.08991 19.6422 5.08991 19.6422C4.53108 18.2225 3.72304 17.8373 3.72304 17.8373C2.60537 17.0746 3.80611 17.0897 3.80611 17.0897C5.03705 17.1803 5.69405 18.3584 5.69405 18.3584C6.78906 20.2388 8.57129 19.6951 9.27361 19.3779C9.38688 18.585 9.70406 18.0412 10.0514 17.7316C7.32524 17.4295 4.45556 16.3723 4.45556 11.66C4.45556 10.3158 4.93132 9.22074 5.72426 8.35984C5.59588 8.04266 5.17298 6.79662 5.83754 5.10501C5.83754 5.10501 6.87213 4.77274 9.22074 6.36616C10.2025 6.0943 11.2522 5.95837 12.3019 5.95082C13.344 5.95837 14.4013 6.0943 15.383 6.36616C17.7316 4.77274 18.7662 5.10501 18.7662 5.10501C19.4383 6.79662 19.0154 8.05021 18.887 8.35984C19.6724 9.22074 20.1482 10.3158 20.1482 11.66C20.1482 16.3874 17.271 17.422 14.5297 17.7316C14.9677 18.1092 15.3679 18.8644 15.3679 20.0123C15.3679 21.6586 15.3528 22.9801 15.3528 23.3879C15.3528 23.7202 15.5718 24.0978 16.1986 23.977C21.0846 22.3458 24.6038 17.7392 24.6038 12.3094C24.6038 5.50526 19.0985 0 12.3019 0Z"
+                    fill="#2E3338"
+                    fillRule="evenodd"
+                    style={Object {}}
+                  />
+                </svg>
+              </div>
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -299,86 +584,80 @@ exports[`Experience/Icons renders 1`] = `
     >
       <div
         className="css-view-1dbjc4n"
+        id="sidebar"
         style={
           Object {
-            "MozTransitionProperty": "transform",
-            "WebkitTransitionDuration": "200ms",
-            "WebkitTransitionProperty": "-webkit-transform,transform",
-            "position": "fixed",
-            "transitionDuration": "200ms",
-            "transitionProperty": "-webkit-transform,transform",
+            "position": "sticky",
+            "top": "175px",
           }
         }
       >
         <div
           className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxDirection": "normal",
-              "WebkitBoxOrient": "horizontal",
-              "WebkitFlexDirection": "row",
-              "flexDirection": "row",
-              "marginBottom": "5px",
-              "marginLeft": "5px",
-              "marginRight": "5px",
-              "marginTop": "5px",
-              "msFlexDirection": "row",
-              "paddingBottom": "5px",
-              "paddingLeft": "5px",
-              "paddingRight": "5px",
-              "paddingTop": "5px",
-            }
-          }
+          onClick={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onResponderGrant={[Function]}
+          onResponderRelease={[Function]}
         >
-          <div
-            className="css-view-1dbjc4n"
+          <a
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+            data-focusable={true}
+            dir="auto"
+            href="/experience/brand"
             onClick={[Function]}
-            onMouseDown={[Function]}
             onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
-            onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
+            role="link"
+            style={
+              Object {
+                "WebkitAlignItems": "center",
+                "WebkitBoxAlign": "center",
+                "WebkitBoxFlex": 0,
+                "WebkitBoxPack": "center",
+                "WebkitFlexGrow": 0,
+                "WebkitJustifyContent": "center",
+                "alignItems": "center",
+                "backgroundColor": "rgba(0,0,0,0.00)",
+                "borderBottomColor": "rgba(0,0,0,0.00)",
+                "borderLeftColor": "rgba(0,0,0,0.00)",
+                "borderRightColor": "rgba(0,0,0,0.00)",
+                "borderTopColor": "rgba(0,0,0,0.00)",
+                "color": "rgba(46,51,56,1.00)",
+                "cursor": "pointer",
+                "display": "inline-flex",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "normal",
+                "justifyContent": "center",
+                "lineHeight": "16px",
+                "marginBottom": "5px",
+                "marginLeft": "5px",
+                "marginRight": "5px",
+                "marginTop": "5px",
+                "msFlexAlign": "center",
+                "msFlexPack": "center",
+                "msFlexPositive": 0,
+                "opacity": 1,
+                "outlineColor": "transparent",
+                "paddingBottom": "5px",
+                "paddingLeft": "5px",
+                "paddingRight": "5px",
+                "paddingTop": "5px",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+                "width": "fit-content",
+              }
+            }
           >
-            <a
-              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
-              data-focusable={true}
-              dir="auto"
-              href="/experience/brand"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
-              role="link"
+            <div
+              className="css-view-1dbjc4n"
               style={
                 Object {
-                  "WebkitAlignItems": "center",
-                  "WebkitBoxAlign": "center",
-                  "WebkitBoxFlex": 0,
-                  "WebkitBoxPack": "center",
-                  "WebkitFlexGrow": 0,
-                  "WebkitJustifyContent": "center",
-                  "alignItems": "center",
-                  "backgroundColor": "rgba(0,0,0,0.00)",
-                  "borderBottomColor": "rgba(0,0,0,0.00)",
-                  "borderLeftColor": "rgba(0,0,0,0.00)",
-                  "borderRightColor": "rgba(0,0,0,0.00)",
-                  "borderTopColor": "rgba(0,0,0,0.00)",
-                  "color": "rgba(46,51,56,1.00)",
-                  "cursor": "pointer",
                   "display": "inline-flex",
-                  "flexGrow": 0,
-                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "fontSize": "16px",
-                  "fontWeight": "normal",
-                  "justifyContent": "center",
-                  "lineHeight": "16px",
-                  "msFlexAlign": "center",
-                  "msFlexPack": "center",
-                  "msFlexPositive": 0,
-                  "opacity": 1,
-                  "outlineColor": "transparent",
-                  "textAlign": "center",
-                  "textRendering": "geometricPrecision",
-                  "width": "fit-content",
+                  "paddingRight": "8px",
                 }
               }
             >
@@ -387,23 +666,13 @@ exports[`Experience/Icons renders 1`] = `
                 style={
                   Object {
                     "display": "inline-flex",
-                    "paddingRight": "8px",
+                    "width": "12px",
                   }
                 }
-              >
-                <div
-                  className="css-view-1dbjc4n"
-                  style={
-                    Object {
-                      "display": "inline-flex",
-                      "width": "12px",
-                    }
-                  }
-                />
-              </div>
-              Introduction
-            </a>
-          </div>
+              />
+            </div>
+            Introduction
+          </a>
         </div>
         <div
           className="css-view-1dbjc4n"
@@ -424,73 +693,70 @@ exports[`Experience/Icons renders 1`] = `
         />
         <div
           className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxDirection": "normal",
-              "WebkitBoxOrient": "horizontal",
-              "WebkitFlexDirection": "row",
-              "flexDirection": "row",
-              "marginBottom": "5px",
-              "marginLeft": "5px",
-              "marginRight": "5px",
-              "marginTop": "5px",
-              "msFlexDirection": "row",
-              "paddingBottom": "5px",
-              "paddingLeft": "5px",
-              "paddingRight": "5px",
-              "paddingTop": "5px",
-            }
-          }
+          onClick={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onResponderGrant={[Function]}
+          onResponderRelease={[Function]}
         >
-          <div
-            className="css-view-1dbjc4n"
+          <a
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+            data-focusable={true}
+            dir="auto"
+            href="/experience/brand/logo"
             onClick={[Function]}
-            onMouseDown={[Function]}
             onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
-            onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
+            role="link"
+            style={
+              Object {
+                "WebkitAlignItems": "center",
+                "WebkitBoxAlign": "center",
+                "WebkitBoxFlex": 0,
+                "WebkitBoxPack": "center",
+                "WebkitFlexGrow": 0,
+                "WebkitJustifyContent": "center",
+                "alignItems": "center",
+                "backgroundColor": "rgba(0,0,0,0.00)",
+                "borderBottomColor": "rgba(0,0,0,0.00)",
+                "borderLeftColor": "rgba(0,0,0,0.00)",
+                "borderRightColor": "rgba(0,0,0,0.00)",
+                "borderTopColor": "rgba(0,0,0,0.00)",
+                "color": "rgba(46,51,56,1.00)",
+                "cursor": "pointer",
+                "display": "inline-flex",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "normal",
+                "justifyContent": "center",
+                "lineHeight": "16px",
+                "marginBottom": "5px",
+                "marginLeft": "5px",
+                "marginRight": "5px",
+                "marginTop": "5px",
+                "msFlexAlign": "center",
+                "msFlexPack": "center",
+                "msFlexPositive": 0,
+                "opacity": 1,
+                "outlineColor": "transparent",
+                "paddingBottom": "5px",
+                "paddingLeft": "5px",
+                "paddingRight": "5px",
+                "paddingTop": "5px",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+                "width": "fit-content",
+              }
+            }
           >
-            <a
-              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
-              data-focusable={true}
-              dir="auto"
-              href="/experience/brand/logo"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
-              role="link"
+            <div
+              className="css-view-1dbjc4n"
               style={
                 Object {
-                  "WebkitAlignItems": "center",
-                  "WebkitBoxAlign": "center",
-                  "WebkitBoxFlex": 0,
-                  "WebkitBoxPack": "center",
-                  "WebkitFlexGrow": 0,
-                  "WebkitJustifyContent": "center",
-                  "alignItems": "center",
-                  "backgroundColor": "rgba(0,0,0,0.00)",
-                  "borderBottomColor": "rgba(0,0,0,0.00)",
-                  "borderLeftColor": "rgba(0,0,0,0.00)",
-                  "borderRightColor": "rgba(0,0,0,0.00)",
-                  "borderTopColor": "rgba(0,0,0,0.00)",
-                  "color": "rgba(46,51,56,1.00)",
-                  "cursor": "pointer",
                   "display": "inline-flex",
-                  "flexGrow": 0,
-                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "fontSize": "16px",
-                  "fontWeight": "normal",
-                  "justifyContent": "center",
-                  "lineHeight": "16px",
-                  "msFlexAlign": "center",
-                  "msFlexPack": "center",
-                  "msFlexPositive": 0,
-                  "opacity": 1,
-                  "outlineColor": "transparent",
-                  "textAlign": "center",
-                  "textRendering": "geometricPrecision",
-                  "width": "fit-content",
+                  "paddingRight": "8px",
                 }
               }
             >
@@ -499,23 +765,13 @@ exports[`Experience/Icons renders 1`] = `
                 style={
                   Object {
                     "display": "inline-flex",
-                    "paddingRight": "8px",
+                    "width": "12px",
                   }
                 }
-              >
-                <div
-                  className="css-view-1dbjc4n"
-                  style={
-                    Object {
-                      "display": "inline-flex",
-                      "width": "12px",
-                    }
-                  }
-                />
-              </div>
-              Logo
-            </a>
-          </div>
+              />
+            </div>
+            Logo
+          </a>
         </div>
         <div
           className="css-view-1dbjc4n"
@@ -536,73 +792,70 @@ exports[`Experience/Icons renders 1`] = `
         />
         <div
           className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxDirection": "normal",
-              "WebkitBoxOrient": "horizontal",
-              "WebkitFlexDirection": "row",
-              "flexDirection": "row",
-              "marginBottom": "5px",
-              "marginLeft": "5px",
-              "marginRight": "5px",
-              "marginTop": "5px",
-              "msFlexDirection": "row",
-              "paddingBottom": "5px",
-              "paddingLeft": "5px",
-              "paddingRight": "5px",
-              "paddingTop": "5px",
-            }
-          }
+          onClick={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onResponderGrant={[Function]}
+          onResponderRelease={[Function]}
         >
-          <div
-            className="css-view-1dbjc4n"
+          <a
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+            data-focusable={true}
+            dir="auto"
+            href="/experience/brand/color"
             onClick={[Function]}
-            onMouseDown={[Function]}
             onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
-            onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
+            role="link"
+            style={
+              Object {
+                "WebkitAlignItems": "center",
+                "WebkitBoxAlign": "center",
+                "WebkitBoxFlex": 0,
+                "WebkitBoxPack": "center",
+                "WebkitFlexGrow": 0,
+                "WebkitJustifyContent": "center",
+                "alignItems": "center",
+                "backgroundColor": "rgba(0,0,0,0.00)",
+                "borderBottomColor": "rgba(0,0,0,0.00)",
+                "borderLeftColor": "rgba(0,0,0,0.00)",
+                "borderRightColor": "rgba(0,0,0,0.00)",
+                "borderTopColor": "rgba(0,0,0,0.00)",
+                "color": "rgba(46,51,56,1.00)",
+                "cursor": "pointer",
+                "display": "inline-flex",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "normal",
+                "justifyContent": "center",
+                "lineHeight": "16px",
+                "marginBottom": "5px",
+                "marginLeft": "5px",
+                "marginRight": "5px",
+                "marginTop": "5px",
+                "msFlexAlign": "center",
+                "msFlexPack": "center",
+                "msFlexPositive": 0,
+                "opacity": 1,
+                "outlineColor": "transparent",
+                "paddingBottom": "5px",
+                "paddingLeft": "5px",
+                "paddingRight": "5px",
+                "paddingTop": "5px",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+                "width": "fit-content",
+              }
+            }
           >
-            <a
-              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
-              data-focusable={true}
-              dir="auto"
-              href="/experience/brand/color"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
-              role="link"
+            <div
+              className="css-view-1dbjc4n"
               style={
                 Object {
-                  "WebkitAlignItems": "center",
-                  "WebkitBoxAlign": "center",
-                  "WebkitBoxFlex": 0,
-                  "WebkitBoxPack": "center",
-                  "WebkitFlexGrow": 0,
-                  "WebkitJustifyContent": "center",
-                  "alignItems": "center",
-                  "backgroundColor": "rgba(0,0,0,0.00)",
-                  "borderBottomColor": "rgba(0,0,0,0.00)",
-                  "borderLeftColor": "rgba(0,0,0,0.00)",
-                  "borderRightColor": "rgba(0,0,0,0.00)",
-                  "borderTopColor": "rgba(0,0,0,0.00)",
-                  "color": "rgba(46,51,56,1.00)",
-                  "cursor": "pointer",
                   "display": "inline-flex",
-                  "flexGrow": 0,
-                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "fontSize": "16px",
-                  "fontWeight": "normal",
-                  "justifyContent": "center",
-                  "lineHeight": "16px",
-                  "msFlexAlign": "center",
-                  "msFlexPack": "center",
-                  "msFlexPositive": 0,
-                  "opacity": 1,
-                  "outlineColor": "transparent",
-                  "textAlign": "center",
-                  "textRendering": "geometricPrecision",
-                  "width": "fit-content",
+                  "paddingRight": "8px",
                 }
               }
             >
@@ -611,23 +864,13 @@ exports[`Experience/Icons renders 1`] = `
                 style={
                   Object {
                     "display": "inline-flex",
-                    "paddingRight": "8px",
+                    "width": "12px",
                   }
                 }
-              >
-                <div
-                  className="css-view-1dbjc4n"
-                  style={
-                    Object {
-                      "display": "inline-flex",
-                      "width": "12px",
-                    }
-                  }
-                />
-              </div>
-              Color
-            </a>
-          </div>
+              />
+            </div>
+            Color
+          </a>
         </div>
         <div
           className="css-view-1dbjc4n"
@@ -648,73 +891,70 @@ exports[`Experience/Icons renders 1`] = `
         />
         <div
           className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxDirection": "normal",
-              "WebkitBoxOrient": "horizontal",
-              "WebkitFlexDirection": "row",
-              "flexDirection": "row",
-              "marginBottom": "5px",
-              "marginLeft": "5px",
-              "marginRight": "5px",
-              "marginTop": "5px",
-              "msFlexDirection": "row",
-              "paddingBottom": "5px",
-              "paddingLeft": "5px",
-              "paddingRight": "5px",
-              "paddingTop": "5px",
-            }
-          }
+          onClick={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onResponderGrant={[Function]}
+          onResponderRelease={[Function]}
         >
-          <div
-            className="css-view-1dbjc4n"
+          <a
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+            data-focusable={true}
+            dir="auto"
+            href="/experience/brand/typography"
             onClick={[Function]}
-            onMouseDown={[Function]}
             onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
-            onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
+            role="link"
+            style={
+              Object {
+                "WebkitAlignItems": "center",
+                "WebkitBoxAlign": "center",
+                "WebkitBoxFlex": 0,
+                "WebkitBoxPack": "center",
+                "WebkitFlexGrow": 0,
+                "WebkitJustifyContent": "center",
+                "alignItems": "center",
+                "backgroundColor": "rgba(0,0,0,0.00)",
+                "borderBottomColor": "rgba(0,0,0,0.00)",
+                "borderLeftColor": "rgba(0,0,0,0.00)",
+                "borderRightColor": "rgba(0,0,0,0.00)",
+                "borderTopColor": "rgba(0,0,0,0.00)",
+                "color": "rgba(46,51,56,1.00)",
+                "cursor": "pointer",
+                "display": "inline-flex",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "normal",
+                "justifyContent": "center",
+                "lineHeight": "16px",
+                "marginBottom": "5px",
+                "marginLeft": "5px",
+                "marginRight": "5px",
+                "marginTop": "5px",
+                "msFlexAlign": "center",
+                "msFlexPack": "center",
+                "msFlexPositive": 0,
+                "opacity": 1,
+                "outlineColor": "transparent",
+                "paddingBottom": "5px",
+                "paddingLeft": "5px",
+                "paddingRight": "5px",
+                "paddingTop": "5px",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+                "width": "fit-content",
+              }
+            }
           >
-            <a
-              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
-              data-focusable={true}
-              dir="auto"
-              href="/experience/brand/typography"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
-              role="link"
+            <div
+              className="css-view-1dbjc4n"
               style={
                 Object {
-                  "WebkitAlignItems": "center",
-                  "WebkitBoxAlign": "center",
-                  "WebkitBoxFlex": 0,
-                  "WebkitBoxPack": "center",
-                  "WebkitFlexGrow": 0,
-                  "WebkitJustifyContent": "center",
-                  "alignItems": "center",
-                  "backgroundColor": "rgba(0,0,0,0.00)",
-                  "borderBottomColor": "rgba(0,0,0,0.00)",
-                  "borderLeftColor": "rgba(0,0,0,0.00)",
-                  "borderRightColor": "rgba(0,0,0,0.00)",
-                  "borderTopColor": "rgba(0,0,0,0.00)",
-                  "color": "rgba(46,51,56,1.00)",
-                  "cursor": "pointer",
                   "display": "inline-flex",
-                  "flexGrow": 0,
-                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "fontSize": "16px",
-                  "fontWeight": "normal",
-                  "justifyContent": "center",
-                  "lineHeight": "16px",
-                  "msFlexAlign": "center",
-                  "msFlexPack": "center",
-                  "msFlexPositive": 0,
-                  "opacity": 1,
-                  "outlineColor": "transparent",
-                  "textAlign": "center",
-                  "textRendering": "geometricPrecision",
-                  "width": "fit-content",
+                  "paddingRight": "8px",
                 }
               }
             >
@@ -723,23 +963,13 @@ exports[`Experience/Icons renders 1`] = `
                 style={
                   Object {
                     "display": "inline-flex",
-                    "paddingRight": "8px",
+                    "width": "12px",
                   }
                 }
-              >
-                <div
-                  className="css-view-1dbjc4n"
-                  style={
-                    Object {
-                      "display": "inline-flex",
-                      "width": "12px",
-                    }
-                  }
-                />
-              </div>
-              Typography
-            </a>
-          </div>
+              />
+            </div>
+            Typography
+          </a>
         </div>
         <div
           className="css-view-1dbjc4n"
@@ -760,73 +990,70 @@ exports[`Experience/Icons renders 1`] = `
         />
         <div
           className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxDirection": "normal",
-              "WebkitBoxOrient": "horizontal",
-              "WebkitFlexDirection": "row",
-              "flexDirection": "row",
-              "marginBottom": "5px",
-              "marginLeft": "5px",
-              "marginRight": "5px",
-              "marginTop": "5px",
-              "msFlexDirection": "row",
-              "paddingBottom": "5px",
-              "paddingLeft": "5px",
-              "paddingRight": "5px",
-              "paddingTop": "5px",
-            }
-          }
+          onClick={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onResponderGrant={[Function]}
+          onResponderRelease={[Function]}
         >
-          <div
-            className="css-view-1dbjc4n"
+          <a
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+            data-focusable={true}
+            dir="auto"
+            href="/experience/brand/composition"
             onClick={[Function]}
-            onMouseDown={[Function]}
             onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
-            onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
+            role="link"
+            style={
+              Object {
+                "WebkitAlignItems": "center",
+                "WebkitBoxAlign": "center",
+                "WebkitBoxFlex": 0,
+                "WebkitBoxPack": "center",
+                "WebkitFlexGrow": 0,
+                "WebkitJustifyContent": "center",
+                "alignItems": "center",
+                "backgroundColor": "rgba(0,0,0,0.00)",
+                "borderBottomColor": "rgba(0,0,0,0.00)",
+                "borderLeftColor": "rgba(0,0,0,0.00)",
+                "borderRightColor": "rgba(0,0,0,0.00)",
+                "borderTopColor": "rgba(0,0,0,0.00)",
+                "color": "rgba(46,51,56,1.00)",
+                "cursor": "pointer",
+                "display": "inline-flex",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "normal",
+                "justifyContent": "center",
+                "lineHeight": "16px",
+                "marginBottom": "5px",
+                "marginLeft": "5px",
+                "marginRight": "5px",
+                "marginTop": "5px",
+                "msFlexAlign": "center",
+                "msFlexPack": "center",
+                "msFlexPositive": 0,
+                "opacity": 1,
+                "outlineColor": "transparent",
+                "paddingBottom": "5px",
+                "paddingLeft": "5px",
+                "paddingRight": "5px",
+                "paddingTop": "5px",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+                "width": "fit-content",
+              }
+            }
           >
-            <a
-              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
-              data-focusable={true}
-              dir="auto"
-              href="/experience/brand/composition"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
-              role="link"
+            <div
+              className="css-view-1dbjc4n"
               style={
                 Object {
-                  "WebkitAlignItems": "center",
-                  "WebkitBoxAlign": "center",
-                  "WebkitBoxFlex": 0,
-                  "WebkitBoxPack": "center",
-                  "WebkitFlexGrow": 0,
-                  "WebkitJustifyContent": "center",
-                  "alignItems": "center",
-                  "backgroundColor": "rgba(0,0,0,0.00)",
-                  "borderBottomColor": "rgba(0,0,0,0.00)",
-                  "borderLeftColor": "rgba(0,0,0,0.00)",
-                  "borderRightColor": "rgba(0,0,0,0.00)",
-                  "borderTopColor": "rgba(0,0,0,0.00)",
-                  "color": "rgba(46,51,56,1.00)",
-                  "cursor": "pointer",
                   "display": "inline-flex",
-                  "flexGrow": 0,
-                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "fontSize": "16px",
-                  "fontWeight": "normal",
-                  "justifyContent": "center",
-                  "lineHeight": "16px",
-                  "msFlexAlign": "center",
-                  "msFlexPack": "center",
-                  "msFlexPositive": 0,
-                  "opacity": 1,
-                  "outlineColor": "transparent",
-                  "textAlign": "center",
-                  "textRendering": "geometricPrecision",
-                  "width": "fit-content",
+                  "paddingRight": "8px",
                 }
               }
             >
@@ -835,23 +1062,13 @@ exports[`Experience/Icons renders 1`] = `
                 style={
                   Object {
                     "display": "inline-flex",
-                    "paddingRight": "8px",
+                    "width": "12px",
                   }
                 }
-              >
-                <div
-                  className="css-view-1dbjc4n"
-                  style={
-                    Object {
-                      "display": "inline-flex",
-                      "width": "12px",
-                    }
-                  }
-                />
-              </div>
-              Composition
-            </a>
-          </div>
+              />
+            </div>
+            Composition
+          </a>
         </div>
         <div
           className="css-view-1dbjc4n"
@@ -872,73 +1089,70 @@ exports[`Experience/Icons renders 1`] = `
         />
         <div
           className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxDirection": "normal",
-              "WebkitBoxOrient": "horizontal",
-              "WebkitFlexDirection": "row",
-              "flexDirection": "row",
-              "marginBottom": "5px",
-              "marginLeft": "5px",
-              "marginRight": "5px",
-              "marginTop": "5px",
-              "msFlexDirection": "row",
-              "paddingBottom": "5px",
-              "paddingLeft": "5px",
-              "paddingRight": "5px",
-              "paddingTop": "5px",
-            }
-          }
+          onClick={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onResponderGrant={[Function]}
+          onResponderRelease={[Function]}
         >
-          <div
-            className="css-view-1dbjc4n"
+          <a
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+            data-focusable={true}
+            dir="auto"
+            href="/experience/brand/exchange-icons"
             onClick={[Function]}
-            onMouseDown={[Function]}
             onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
-            onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
+            role="link"
+            style={
+              Object {
+                "WebkitAlignItems": "center",
+                "WebkitBoxAlign": "center",
+                "WebkitBoxFlex": 0,
+                "WebkitBoxPack": "center",
+                "WebkitFlexGrow": 0,
+                "WebkitJustifyContent": "center",
+                "alignItems": "center",
+                "backgroundColor": "rgba(0,0,0,0.00)",
+                "borderBottomColor": "rgba(0,0,0,0.00)",
+                "borderLeftColor": "rgba(0,0,0,0.00)",
+                "borderRightColor": "rgba(0,0,0,0.00)",
+                "borderTopColor": "rgba(0,0,0,0.00)",
+                "color": "rgba(46,51,56,1.00)",
+                "cursor": "pointer",
+                "display": "inline-flex",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "normal",
+                "justifyContent": "center",
+                "lineHeight": "16px",
+                "marginBottom": "5px",
+                "marginLeft": "5px",
+                "marginRight": "5px",
+                "marginTop": "5px",
+                "msFlexAlign": "center",
+                "msFlexPack": "center",
+                "msFlexPositive": 0,
+                "opacity": 1,
+                "outlineColor": "transparent",
+                "paddingBottom": "5px",
+                "paddingLeft": "5px",
+                "paddingRight": "5px",
+                "paddingTop": "5px",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+                "width": "fit-content",
+              }
+            }
           >
-            <a
-              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
-              data-focusable={true}
-              dir="auto"
-              href="/experience/brand/exchange-icons"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
-              role="link"
+            <div
+              className="css-view-1dbjc4n"
               style={
                 Object {
-                  "WebkitAlignItems": "center",
-                  "WebkitBoxAlign": "center",
-                  "WebkitBoxFlex": 0,
-                  "WebkitBoxPack": "center",
-                  "WebkitFlexGrow": 0,
-                  "WebkitJustifyContent": "center",
-                  "alignItems": "center",
-                  "backgroundColor": "rgba(0,0,0,0.00)",
-                  "borderBottomColor": "rgba(0,0,0,0.00)",
-                  "borderLeftColor": "rgba(0,0,0,0.00)",
-                  "borderRightColor": "rgba(0,0,0,0.00)",
-                  "borderTopColor": "rgba(0,0,0,0.00)",
-                  "color": "rgba(46,51,56,1.00)",
-                  "cursor": "pointer",
                   "display": "inline-flex",
-                  "flexGrow": 0,
-                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "fontSize": "16px",
-                  "fontWeight": "normal",
-                  "justifyContent": "center",
-                  "lineHeight": "16px",
-                  "msFlexAlign": "center",
-                  "msFlexPack": "center",
-                  "msFlexPositive": 0,
-                  "opacity": 1,
-                  "outlineColor": "transparent",
-                  "textAlign": "center",
-                  "textRendering": "geometricPrecision",
-                  "width": "fit-content",
+                  "paddingRight": "8px",
                 }
               }
             >
@@ -947,93 +1161,80 @@ exports[`Experience/Icons renders 1`] = `
                 style={
                   Object {
                     "display": "inline-flex",
-                    "paddingRight": "8px",
+                    "width": "12px",
                   }
                 }
-              >
-                <div
-                  className="css-view-1dbjc4n"
-                  style={
-                    Object {
-                      "display": "inline-flex",
-                      "width": "12px",
-                    }
-                  }
-                />
-              </div>
-              Exchange Icons
-            </a>
-          </div>
+              />
+            </div>
+            Exchange Icons
+          </a>
         </div>
         <div
           className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxDirection": "normal",
-              "WebkitBoxOrient": "horizontal",
-              "WebkitFlexDirection": "row",
-              "flexDirection": "row",
-              "marginBottom": "5px",
-              "marginLeft": "5px",
-              "marginRight": "5px",
-              "marginTop": "5px",
-              "msFlexDirection": "row",
-              "paddingBottom": "5px",
-              "paddingLeft": "5px",
-              "paddingRight": "5px",
-              "paddingTop": "5px",
-            }
-          }
+          onClick={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onResponderGrant={[Function]}
+          onResponderRelease={[Function]}
         >
-          <div
-            className="css-view-1dbjc4n"
+          <a
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+            data-focusable={true}
+            dir="auto"
+            href="/experience/brand/icons"
             onClick={[Function]}
-            onMouseDown={[Function]}
             onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
-            onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
+            role="link"
+            style={
+              Object {
+                "WebkitAlignItems": "center",
+                "WebkitBoxAlign": "center",
+                "WebkitBoxFlex": 0,
+                "WebkitBoxPack": "center",
+                "WebkitFlexGrow": 0,
+                "WebkitJustifyContent": "center",
+                "alignItems": "center",
+                "backgroundColor": "rgba(0,0,0,0.00)",
+                "borderBottomColor": "rgba(0,0,0,0.00)",
+                "borderLeftColor": "rgba(0,0,0,0.00)",
+                "borderRightColor": "rgba(0,0,0,0.00)",
+                "borderTopColor": "rgba(0,0,0,0.00)",
+                "color": "rgba(46,51,56,1.00)",
+                "cursor": "pointer",
+                "display": "inline-flex",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "normal",
+                "justifyContent": "center",
+                "lineHeight": "16px",
+                "marginBottom": "5px",
+                "marginLeft": "5px",
+                "marginRight": "5px",
+                "marginTop": "5px",
+                "msFlexAlign": "center",
+                "msFlexPack": "center",
+                "msFlexPositive": 0,
+                "opacity": 1,
+                "outlineColor": "transparent",
+                "paddingBottom": "5px",
+                "paddingLeft": "5px",
+                "paddingRight": "5px",
+                "paddingTop": "5px",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+                "width": "fit-content",
+              }
+            }
           >
-            <a
-              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
-              data-focusable={true}
-              dir="auto"
-              href="/experience/brand/icons"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
-              role="link"
+            <div
+              className="css-view-1dbjc4n"
               style={
                 Object {
-                  "WebkitAlignItems": "center",
-                  "WebkitBoxAlign": "center",
-                  "WebkitBoxFlex": 0,
-                  "WebkitBoxPack": "center",
-                  "WebkitFlexGrow": 0,
-                  "WebkitJustifyContent": "center",
-                  "alignItems": "center",
-                  "backgroundColor": "rgba(0,0,0,0.00)",
-                  "borderBottomColor": "rgba(0,0,0,0.00)",
-                  "borderLeftColor": "rgba(0,0,0,0.00)",
-                  "borderRightColor": "rgba(0,0,0,0.00)",
-                  "borderTopColor": "rgba(0,0,0,0.00)",
-                  "color": "rgba(46,51,56,1.00)",
-                  "cursor": "pointer",
                   "display": "inline-flex",
-                  "flexGrow": 0,
-                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "fontSize": "16px",
-                  "fontWeight": "normal",
-                  "justifyContent": "center",
-                  "lineHeight": "16px",
-                  "msFlexAlign": "center",
-                  "msFlexPack": "center",
-                  "msFlexPositive": 0,
-                  "opacity": 1,
-                  "outlineColor": "transparent",
-                  "textAlign": "center",
-                  "textRendering": "geometricPrecision",
-                  "width": "fit-content",
+                  "paddingRight": "8px",
                 }
               }
             >
@@ -1042,93 +1243,80 @@ exports[`Experience/Icons renders 1`] = `
                 style={
                   Object {
                     "display": "inline-flex",
-                    "paddingRight": "8px",
+                    "width": "12px",
                   }
                 }
-              >
-                <div
-                  className="css-view-1dbjc4n"
-                  style={
-                    Object {
-                      "display": "inline-flex",
-                      "width": "12px",
-                    }
-                  }
-                />
-              </div>
-              Icons
-            </a>
-          </div>
+              />
+            </div>
+            Icons
+          </a>
         </div>
         <div
           className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxDirection": "normal",
-              "WebkitBoxOrient": "horizontal",
-              "WebkitFlexDirection": "row",
-              "flexDirection": "row",
-              "marginBottom": "5px",
-              "marginLeft": "5px",
-              "marginRight": "5px",
-              "marginTop": "5px",
-              "msFlexDirection": "row",
-              "paddingBottom": "5px",
-              "paddingLeft": "5px",
-              "paddingRight": "5px",
-              "paddingTop": "5px",
-            }
-          }
+          onClick={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onResponderGrant={[Function]}
+          onResponderRelease={[Function]}
         >
-          <div
-            className="css-view-1dbjc4n"
+          <a
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+            data-focusable={true}
+            dir="auto"
+            href="/experience/brand/key-imagery"
             onClick={[Function]}
-            onMouseDown={[Function]}
             onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
-            onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
+            role="link"
+            style={
+              Object {
+                "WebkitAlignItems": "center",
+                "WebkitBoxAlign": "center",
+                "WebkitBoxFlex": 0,
+                "WebkitBoxPack": "center",
+                "WebkitFlexGrow": 0,
+                "WebkitJustifyContent": "center",
+                "alignItems": "center",
+                "backgroundColor": "rgba(0,0,0,0.00)",
+                "borderBottomColor": "rgba(0,0,0,0.00)",
+                "borderLeftColor": "rgba(0,0,0,0.00)",
+                "borderRightColor": "rgba(0,0,0,0.00)",
+                "borderTopColor": "rgba(0,0,0,0.00)",
+                "color": "rgba(46,51,56,1.00)",
+                "cursor": "pointer",
+                "display": "inline-flex",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "normal",
+                "justifyContent": "center",
+                "lineHeight": "16px",
+                "marginBottom": "5px",
+                "marginLeft": "5px",
+                "marginRight": "5px",
+                "marginTop": "5px",
+                "msFlexAlign": "center",
+                "msFlexPack": "center",
+                "msFlexPositive": 0,
+                "opacity": 1,
+                "outlineColor": "transparent",
+                "paddingBottom": "5px",
+                "paddingLeft": "5px",
+                "paddingRight": "5px",
+                "paddingTop": "5px",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+                "width": "fit-content",
+              }
+            }
           >
-            <a
-              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
-              data-focusable={true}
-              dir="auto"
-              href="/experience/brand/key-imagery"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
-              role="link"
+            <div
+              className="css-view-1dbjc4n"
               style={
                 Object {
-                  "WebkitAlignItems": "center",
-                  "WebkitBoxAlign": "center",
-                  "WebkitBoxFlex": 0,
-                  "WebkitBoxPack": "center",
-                  "WebkitFlexGrow": 0,
-                  "WebkitJustifyContent": "center",
-                  "alignItems": "center",
-                  "backgroundColor": "rgba(0,0,0,0.00)",
-                  "borderBottomColor": "rgba(0,0,0,0.00)",
-                  "borderLeftColor": "rgba(0,0,0,0.00)",
-                  "borderRightColor": "rgba(0,0,0,0.00)",
-                  "borderTopColor": "rgba(0,0,0,0.00)",
-                  "color": "rgba(46,51,56,1.00)",
-                  "cursor": "pointer",
                   "display": "inline-flex",
-                  "flexGrow": 0,
-                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "fontSize": "16px",
-                  "fontWeight": "normal",
-                  "justifyContent": "center",
-                  "lineHeight": "16px",
-                  "msFlexAlign": "center",
-                  "msFlexPack": "center",
-                  "msFlexPositive": 0,
-                  "opacity": 1,
-                  "outlineColor": "transparent",
-                  "textAlign": "center",
-                  "textRendering": "geometricPrecision",
-                  "width": "fit-content",
+                  "paddingRight": "8px",
                 }
               }
             >
@@ -1137,23 +1325,13 @@ exports[`Experience/Icons renders 1`] = `
                 style={
                   Object {
                     "display": "inline-flex",
-                    "paddingRight": "8px",
+                    "width": "12px",
                   }
                 }
-              >
-                <div
-                  className="css-view-1dbjc4n"
-                  style={
-                    Object {
-                      "display": "inline-flex",
-                      "width": "12px",
-                    }
-                  }
-                />
-              </div>
-              Key Imagery
-            </a>
-          </div>
+              />
+            </div>
+            Key Imagery
+          </a>
         </div>
         <div
           className="css-view-1dbjc4n"
@@ -2047,6 +2225,7 @@ exports[`Experience/Icons renders 1`] = `
     style={
       Object {
         "backgroundColor": "rgba(255,255,255,1.00)",
+        "marginTop": "50px",
         "zIndex": -10,
       }
     }
@@ -3345,6 +3524,60 @@ exports[`Experience/Icons renders 1`] = `
                   target="_blank"
                 >
                   Events
+                </a>
+              </div>
+            </div>
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "marginBottom": "8px",
+                  "marginTop": "8px",
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                onClick={[Function]}
+                onMouseDown={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onResponderGrant={[Function]}
+                onResponderRelease={[Function]}
+                style={
+                  Object {
+                    "display": "inline",
+                  }
+                }
+              >
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                  data-focusable={true}
+                  dir="auto"
+                  href="/experience/events"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
+                  rel=" noopener noreferrer"
+                  role="link"
+                  style={
+                    Object {
+                      "WebkitTextDecorationStyle": "solid",
+                      "color": "rgba(46,51,56,1.00)",
+                      "cursor": "pointer",
+                      "display": "inline",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "16px",
+                      "lineHeight": "20px",
+                      "opacity": 1,
+                      "textDecoration": "none",
+                      "textDecorationStyle": "solid",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                  target="_blank"
+                >
+                  EventKit
                 </a>
               </div>
             </div>

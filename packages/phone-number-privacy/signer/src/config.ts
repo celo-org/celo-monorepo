@@ -1,10 +1,6 @@
 import BigNumber from 'bignumber.js'
-import * as functions from 'firebase-functions'
-import Web3 from 'web3'
-import logger from './common/logger'
 
-export const DEV_MODE =
-  process.env.NODE_ENV !== 'production' || process.env.FUNCTIONS_EMULATOR === 'true'
+export const DEV_MODE = process.env.NODE_ENV !== 'production'
 
 export const DEV_PUBLIC_KEY =
   'T4u+jDHnBnWoe+c6JQ1Q47a0p2SCTbLb6DblnS0tnpzkebgP63T0RyAaYRCRmBsAE6421jwKcVRzVypCsmILPpHQ6MErykqoQ3WuCHd38PTIRWoolrmT1Wh8Z5dw6S6A'
@@ -13,6 +9,9 @@ export const DEV_POLYNOMIAL =
   'AQAAAAAAAABPi76MMecGdah75zolDVDjtrSnZIJNstvoNuWdLS2enOR5uA/rdPRHIBphEJGYGwATrjbWPApxVHNXKkKyYgs+kdDowSvKSqhDda4Id3fw9MhFaiiWuZPVaHxnl3DpLoA='
 
 interface Config {
+  server: {
+    port: string | number
+  }
   blockchain: {
     provider: string
   }
@@ -40,65 +39,37 @@ interface Config {
   }
 }
 
-let config: Config
+const toNum = (value: BigNumber.Value) => new BigNumber(value).toNumber()
 
-if (DEV_MODE) {
-  logger.debug('Running in dev mode')
-  config = {
-    blockchain: {
-      provider: 'https://alfajores-forno.celo-testnet.org',
-    },
-    salt: {
-      unverifiedQueryMax: 2,
-      additionalVerifiedQueryMax: 30,
-      queryPerTransaction: 2,
-      minDollarBalance: new BigNumber(Web3.utils.toWei('0.1')),
-    },
-    db: {
-      user: 'postgres',
-      password: 'fakePass',
-      database: 'phoneNumberPrivacy',
-      host: 'fakeHost',
-    },
-    keyVault: {
-      azureClientID: 'useMock',
-      azureClientSecret: 'useMock',
-      azureTenant: 'useMock',
-      azureVaultName: 'useMock',
-      azureSecretName: 'useMock',
-    },
-    attestations: {
-      numberAttestationsRequired: 3,
-    },
-  }
-} else {
-  const functionConfig = functions.config()
-  config = {
-    blockchain: {
-      provider: functionConfig.blockchain.provider,
-    },
-    salt: {
-      unverifiedQueryMax: functionConfig.salt.unverified_query_max,
-      additionalVerifiedQueryMax: functionConfig.salt.additional_verified_query_max,
-      queryPerTransaction: functionConfig.salt.query_per_transaction,
-      minDollarBalance: new BigNumber(functionConfig.salt.min_dollar_balance),
-    },
-    db: {
-      user: functionConfig.db.username,
-      password: functionConfig.db.pass,
-      database: functionConfig.db.name,
-      host: `/cloudsql/${functionConfig.db.host}`,
-    },
-    keyVault: {
-      azureClientID: functionConfig.keyvault.azure_client_id,
-      azureClientSecret: functionConfig.keyvault.azure_client_secret,
-      azureTenant: functionConfig.keyvault.azure_tenant,
-      azureVaultName: functionConfig.keyvault.azure_vault_name,
-      azureSecretName: functionConfig.keyvault.azure_secret_name,
-    },
-    attestations: {
-      numberAttestationsRequired: functionConfig.attestations.number_attestations_required,
-    },
-  }
+const env = process.env as any
+const config: Config = {
+  server: {
+    port: toNum(env.server_port),
+  },
+  blockchain: {
+    provider: env.blockchain_provider,
+  },
+  salt: {
+    unverifiedQueryMax: toNum(env.salt_unverified_query_max),
+    additionalVerifiedQueryMax: toNum(env.salt_additional_verified_query_max),
+    queryPerTransaction: toNum(env.salt_query_per_transaction),
+    minDollarBalance: new BigNumber(env.salt_min_dollar_balance),
+  },
+  db: {
+    user: env.db_username,
+    password: env.db_password,
+    database: env.db_database,
+    host: env.db_host,
+  },
+  keyVault: {
+    azureClientID: env.keyvault_azure_client_id,
+    azureClientSecret: env.keyvault_azure_client_secret,
+    azureTenant: env.keyvault_azure_tenant,
+    azureVaultName: env.keyvault_azure_vault_name,
+    azureSecretName: env.keyvault_azure_secret_name,
+  },
+  attestations: {
+    numberAttestationsRequired: toNum(env.attestations_number_attestations_required),
+  },
 }
 export default config

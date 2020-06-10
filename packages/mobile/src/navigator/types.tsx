@@ -9,7 +9,14 @@ import { TransactionDataInput } from 'src/send/SendAmount'
 import { ReviewProps } from 'src/transactions/TransactionReview'
 import { TransferConfirmationCardProps } from 'src/transactions/TransferConfirmationCard'
 
-// tslint:disable-next-line
+// Typed nested navigator params
+type NestedNavigatorParams<ParamList> = {
+  [K in keyof ParamList]: undefined extends ParamList[K]
+    ? { screen: K; params?: ParamList[K] }
+    : { screen: K; params: ParamList[K] }
+}[keyof ParamList]
+
+// tslint:disable-next-line: interface-over-type-literal
 export type StackParamList = {
   [Screens.Account]: undefined
   [Screens.Analytics]: undefined
@@ -71,6 +78,7 @@ export type StackParamList = {
     backupPhrase: string
   }
   [Screens.ImportWalletSocial]: undefined
+  [Screens.ImportContacts]: undefined
   [Screens.IncomingPaymentRequestListScreen]: undefined
   [Screens.Invite]: undefined
   [Screens.InviteReview]: {
@@ -82,8 +90,12 @@ export type StackParamList = {
   }
   [Screens.Licenses]: undefined
   [Screens.OutgoingPaymentRequestListScreen]: undefined
+  [Screens.PaymentRequestUnavailable]: {
+    transactionData: TransactionDataInput
+  }
   [Screens.PaymentRequestConfirmation]: {
     transactionData: TransactionDataInput
+    addressJustValidated?: boolean
   }
   [Screens.PincodeEducation]: undefined
   [Screens.PincodeEnter]: {
@@ -98,13 +110,7 @@ export type StackParamList = {
   [Screens.PhotosEducation]: undefined
   [Screens.PhotosNUX]: undefined
   [Screens.Profile]: undefined
-  [Screens.QRCode]: undefined
-  [Screens.QRScanner]:
-    | {
-        scanIsForSecureSend?: true
-        transactionData?: TransactionDataInput
-      }
-    | undefined
+  [Screens.QRNavigator]: NestedNavigatorParams<QRTabParamList> | undefined
   [Screens.ReclaimPaymentConfirmationScreen]: {
     reclaimPaymentInput: EscrowedPayment
   }
@@ -150,6 +156,17 @@ export type StackParamList = {
   [Screens.VerificationInterstitialScreen]: undefined
   [Screens.VerificationLearnMoreScreen]: undefined
   [Screens.VerificationLoadingScreen]: undefined
-  [Screens.VerificationSuccessScreen]: undefined
+  [Screens.OnboardingSuccessScreen]: undefined
   [Screens.WalletHome]: undefined
+}
+
+// tslint:disable-next-line: interface-over-type-literal
+export type QRTabParamList = {
+  [Screens.QRCode]: undefined
+  [Screens.QRScanner]:
+    | {
+        scanIsForSecureSend?: true
+        transactionData?: TransactionDataInput
+      }
+    | undefined
 }

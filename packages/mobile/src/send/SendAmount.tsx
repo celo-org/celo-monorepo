@@ -27,10 +27,10 @@ import { fetchAddressesAndValidate } from 'src/identity/actions'
 import {
   AddressValidationType,
   e164NumberToAddressSelector,
-  RecipientVerificationStatus,
   secureSendPhoneNumberMappingSelector,
 } from 'src/identity/reducer'
 import { getAddressValidationType } from 'src/identity/secureSend'
+import { RecipientVerificationStatus } from 'src/identity/types'
 import {
   convertDollarsToLocalAmount,
   convertDollarsToMaxSupportedPrecision,
@@ -153,10 +153,7 @@ function SendAmount(props: Props) {
   const isDollarBalanceSufficient = isAmountValid && newAccountBalance.isGreaterThanOrEqualTo(0)
 
   const reviewBtnDisabled =
-    !isAmountValid ||
-    (isRequest
-      ? recipientVerificationStatus !== RecipientVerificationStatus.VERIFIED
-      : recipientVerificationStatus === RecipientVerificationStatus.UNKNOWN)
+    !isAmountValid || recipientVerificationStatus === RecipientVerificationStatus.UNKNOWN
 
   const secureSendPhoneNumberMapping = useSelector(secureSendPhoneNumberMappingSelector)
   const addressValidationType: AddressValidationType = getAddressValidationType(
@@ -260,6 +257,9 @@ function SendAmount(props: Props) {
         addressValidationType,
         isPaymentRequest: true,
       })
+    } else if (recipientVerificationStatus !== RecipientVerificationStatus.VERIFIED) {
+      CeloAnalytics.track(CustomEventNames.request_unavailable, continueAnalyticsParams)
+      navigate(Screens.PaymentRequestUnavailable, { transactionData })
     } else {
       CeloAnalytics.track(CustomEventNames.request_continue, continueAnalyticsParams)
       navigate(Screens.PaymentRequestConfirmation, { transactionData })

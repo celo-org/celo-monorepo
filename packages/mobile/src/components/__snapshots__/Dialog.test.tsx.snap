@@ -176,13 +176,17 @@ exports[`renders correctly 1`] = `
           >
             <Text
               style={
-                Object {
-                  "color": "#1AB775",
-                  "fontFamily": "Inter-SemiBold",
-                  "fontSize": 16,
-                  "lineHeight": 22,
-                  "paddingTop": 16,
-                }
+                Array [
+                  Object {
+                    "color": "#1AB775",
+                    "fontFamily": "Inter-SemiBold",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  },
+                  Object {
+                    "paddingTop": 16,
+                  },
+                ]
               }
             >
               Ppess Me
