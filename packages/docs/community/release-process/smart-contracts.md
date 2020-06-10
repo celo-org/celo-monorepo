@@ -12,7 +12,7 @@ Each deployed Celo core smart contract is versioned independently, according to 
   * MINOR version when you add functionality in a backwards compatible manner, and
   * PATCH version when you make backwards compatible bug fixes.
 
-Changes to core smart contracts are made via on-chain governance, approximately four times a year. When a release is made, **all** smart contracts from the release branch that differ from the deployed smart contracts are released, and included in the **same** governance proposal.
+Changes to core smart contracts are made via on-chain Governance, approximately four times a year. When a release is made, **all** smart contracts from the release branch that differ from the deployed smart contracts are released, and included in the **same** governance proposal.
 
 ### Mixins and libraries
 Mixin contracts and libraries are considered part of the contracts that consume them. When a mixin or library has changed, all contracts that consume them should be considered to have changed as well, and thus the contracts should have their version numbers incremented and should be re-deployed as part of the next smart contract release.
@@ -45,14 +45,14 @@ This script does the following:
 
   1. Compiles the contracts at `$CURRENTLY_RELEASED_BRANCH` and confirms that the compiled bytecode matches what is currently deployed on the specified network.
   2. Compiles the contracts in the current branch and checks backwards compatibility with what is currently deployed on the specified network, with the following exceptions:
-    1. If the STORAGE version has changed, does not perform backwards compatibility checks
-    2. If the MAJOR version has changed, checks that the storage layout is backwards compatible, but does not check that the contract ABI is backwards compatible.
+     1. If the STORAGE version has changed, does not perform backwards compatibility checks
+     2. If the MAJOR version has changed, checks that the storage layout is backwards compatible, but does not check that the contract ABI is backwards compatible.
   3. For contracts that have changed, confirms that the version number in the current branch is strictly greater than the deployed version number.
   4. For contracts that have not changed, confirms that the version number in the current branch is exactly the same as the deployed version number
   5. For contracts that have changed, deploys those contracts to the specified network.
   6. Creates and submits a single governance proposal to upgrade to the newly deployed contracts.
-    1. STORAGE updates are adopted by deploying a new proxy and implementation and updating the Registry contract.
-    2. All other updates are adopted by updating the proxy contract’s implementation pointer.
+     1. STORAGE updates are adopted by deploying a new proxy and implementation and updating the Registry contract.
+     2. All other updates are adopted by updating the proxy contract’s implementation pointer.
 
 ## Testing
 
