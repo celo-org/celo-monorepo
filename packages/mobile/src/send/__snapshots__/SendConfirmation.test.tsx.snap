@@ -863,6 +863,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                 "paddingVertical": 5,
               }
             }
+            testID="ConfirmButton"
           >
             <Text
               accessibilityLabel="send"
@@ -1748,6 +1749,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                 "paddingVertical": 5,
               }
             }
+            testID="ConfirmButton"
           >
             <Text
               accessibilityLabel="send"
@@ -2630,6 +2632,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                 "paddingVertical": 5,
               }
             }
+            testID="ConfirmButton"
           >
             <Text
               accessibilityLabel="send"
@@ -3576,6 +3579,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                 "paddingVertical": 5,
               }
             }
+            testID="ConfirmButton"
           >
             <Text
               accessibilityLabel="send"
