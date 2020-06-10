@@ -155,7 +155,7 @@ exports[`ImportContactsScreen renders correctly 1`] = `
           "alignItems": "center",
           "margin": 30,
         },
-        undefined,
+        false,
       ]
     }
   >

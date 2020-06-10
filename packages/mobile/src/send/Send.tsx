@@ -196,6 +196,7 @@ class Send extends React.Component<Props, State> {
         : CustomEventNames.send_select_recipient,
       {
         recipientKind: recipient.kind,
+        didQuery: this.state.searchQuery.length > 0,
       }
     )
 

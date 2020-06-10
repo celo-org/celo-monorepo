@@ -178,7 +178,7 @@ class ImportContactScreen extends React.Component<Props, State> {
           )}
           {status > ImportContactsStatus.Stopped && this.renderImportStatus()}
         </ScrollView>
-        <View style={[styles.bottomButtonContainer, isSkipHidden ? styles.invisible : undefined]}>
+        <View style={[styles.bottomButtonContainer, isSkipHidden && styles.invisible]}>
           <TextButton
             disabled={isSkipHidden}
             onPress={this.onPressSkip}

@@ -246,6 +246,7 @@ export const PROPERTY_PATH_WHITELIST = [
   'countryCode',
   'cta',
   'currentScreen',
+  'didQuery',
   'dollarAmount',
   'dollarBalance',
   'dollarPendingBalance',
