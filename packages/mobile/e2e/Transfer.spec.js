@@ -102,8 +102,7 @@ describe('Transfer Works', () => {
       .withTimeout(20000)
 
     await element(by.id('ImportWalletBackupKeyInputField')).tap()
-    await element(by.id('ImportWalletBackupKeyInputField')).replaceText(SAMPLE_BACKUP_KEY)
-    await element(by.id('ImportWalletBackupKeyInputField')).tapReturnKey()
+    await element(by.id('ImportWalletBackupKeyInputField')).typeText(SAMPLE_BACKUP_KEY)
 
     await sleep(4000)
 
