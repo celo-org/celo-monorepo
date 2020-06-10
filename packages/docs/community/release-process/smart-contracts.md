@@ -1,7 +1,11 @@
 # Smart Contracts Release Process
 
+{% hint style="warning" %}
+This release process is a work in progress. Many infrastructure components required to execute it are not in place, and the process itself is subject to change.
+{% endhint %}
+
 ## Versioning
-Each deployed Celo core smart contract is versioned independently, according to semantic versioning, as described at semver.org, with the following modifications:
+Each deployed Celo core smart contract is versioned independently, according to semantic versioning, as described at [semver.org](https://semver.org), with the following modifications:
 
   * STORAGE version when you make incompatible storage layout changes
   * MAJOR version when you make incompatible ABI changes
@@ -15,12 +19,12 @@ Mixin contracts and libraries are considered part of the contracts that consume 
 
 ## Identifying releases
 
-Each release is identified by a unique monotonically increasing number `N`, with 1 being the first release.
+Each release is identified by a unique monotonically increasing number `N`, with `1` being the first release.
 
 ### Contracts
 Every deployed smart contract has its current version number as a constant which is publicly accessible via the `getVersion()` function, which returns the storage, major, minor, and patch version. Version number is encoded in the Solidity source and updated as part of code changes.
 
-Contracts deployed to a live network without the `getVersionNumber()` functions, such as the original set of core contracts, are to be considered version 1.0.0.0.
+Contracts deployed to a live network without the `getVersion()` function, such as the original set of core contracts, are to be considered version `1.0.0.0`.
 
 ### Git branches
 Every smart contract release has a designated branch, e.g. `release/contracts/N` in the celo-monorepo.
@@ -33,20 +37,20 @@ All release branches should be tagged as such, e.g. `celo-contracts-N`. Each sho
 ## Build process
 A new release can be built by running the following script:
 
-```
-yarn run release-contracts -d CURRENTLY_RELEASED_BRANCH -f FROM_ADDRESS -n NETWORK
+```bash
+yarn run release-contracts -d $CURRENTLY_RELEASED_BRANCH -f $FROM_ADDRESS -n $NETWORK
 ```
 
 This script does the following:
 
-  1. Compiles the contracts at `CURRENTLY_RELEASED_BRANCH` and confirms that the compiled bytecode matches what is currently deployed on the specified network.
+  1. Compiles the contracts at `$CURRENTLY_RELEASED_BRANCH` and confirms that the compiled bytecode matches what is currently deployed on the specified network.
   2. Compiles the contracts in the current branch and checks backwards compatibility with what is currently deployed on the specified network, with the following exceptions:
-  3. If the STORAGE version has changed, does not perform backwards compatibility checks
-  4. If the MAJOR version has changed, checks that the storage layout is backwards compatible, but does not check that the contract ABI is backwards compatible.
-  5. For contracts that have changed, confirms that the version number in the current branch is strictly greater than the deployed version number.
-  6. For contracts that have not changed, confirms that the version number in the current branch is exactly the same as the deployed version number
-  7. For contracts that have changed, deploys those contracts to the specified network.
-  8. Creates and submits a single governance proposal to upgrade to the newly deployed contracts.
+    1. If the STORAGE version has changed, does not perform backwards compatibility checks
+    2. If the MAJOR version has changed, checks that the storage layout is backwards compatible, but does not check that the contract ABI is backwards compatible.
+  3. For contracts that have changed, confirms that the version number in the current branch is strictly greater than the deployed version number.
+  4. For contracts that have not changed, confirms that the version number in the current branch is exactly the same as the deployed version number
+  5. For contracts that have changed, deploys those contracts to the specified network.
+  6. Creates and submits a single governance proposal to upgrade to the newly deployed contracts.
     1. STORAGE updates are adopted by deploying a new proxy and implementation and updating the Regsitry contract.
     2. All other updates are adopted by updating the proxy contract’s implementation pointer.
 
@@ -55,10 +59,10 @@ This script does the following:
 All releases should be evaluated according to the following tests.
 
 ### Unit tests
-All changes since the last release should be covered by unit tests. CI rules should be updated to enforce this.
+All changes since the last release should be covered by unit tests. Unit test coverage should be enforced by automated checks run on every commit.
 
 ### Performance
-A ceiling on the gas consumption for all common operations should be defined and enforced by CI.
+A ceiling on the gas consumption for all common operations should be defined and enforced by automated checks run on every commit.
 
 ### Backwards compatibility
 Automated checks should ensure that any new commit to `master` does not introduce a breaking change to storage layout, ABI, or other common backwards compatibility issues unless the STORAGE or MAJOR version numbers are incremented.
@@ -74,7 +78,7 @@ If patches need to be applied before the next scheduled smart contract release, 
 
 ## Promotion process 
 
-To fork development from `master`, follow these steps:
+Deploying a new contract release should occur with the following process:
 
 <table>
   <tr>
