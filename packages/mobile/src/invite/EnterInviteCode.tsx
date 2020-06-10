@@ -184,7 +184,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
             text={t('importIt')}
             standard={false}
             type={BtnTypes.SECONDARY}
-            testID="ContinueInviteButton"
+            testID="RestoreExistingWallet"
           />
         </View>
         <KeyboardSpacer />
