@@ -31,7 +31,7 @@ gpg --auto-key-locate wkd --locate-keys $EMAIL
 
 ## Documentation
 
-Documentation for client features, such as APIs and commands, are maintained in the `docs` directory within the `celo-blockchain` repository. Documentation on protocol features, such as the proof-of-stake protocol, is hosted on [docs.celo.org](https://docs.celo.org).
+Documentation for client features, such as APIs and commands, are maintained in the `docs` directory within the `celo-blockchain` repository. Documentation on protocol features, such as the proof-of-stake protocol, is hosted on [docs.celo.org](https://docs.celo.org/celo-codebase/protocol).
 
 ## Identifying releases:
 
@@ -56,17 +56,6 @@ Each released Docker image should should be tagged with it’s version number su
 
 ## Build process
 
-### Docker images
-Docker images are built automatically with [Google Cloud Build](https://cloud.google.com/cloud-build) upon pushes to `master` and all release branches. Automated builds will be tagged in [Google Container Registry](https://cloud.google.com/container-registry) with the corresponding commit hash.
-
-A signature should be produced over the image automatically build at the corresponding commit hash and included with the Github release.
-
-Release image signatures can be verified with the following command:
-
-```bash
-gpg --verify celo-blockchain-vX.Y.Z.docker.asc <(docker save us.gcr.io/celo-testnet/celo-node:vX.Y.Z)
-```
-
 ### Binaries
 Binaries for common platforms are built automatically with [Google Cloud Build](https://cloud.google.com/cloud-build) upon pushes to `master` and all release branches. 
 
@@ -75,7 +64,18 @@ A signature should be produced over the binary automatically built at the corres
 Release binary signatures can be verified with the following command:
 
 ```bash
-gpg --verify celo-blockchain-vX.Y.Z-stable.tar.gz.asc
+gpg --verify celo-blockchain-vX.Y.Z-stable.tar.gz.asc celo-blockchain-vX.Y.Z-stable.tar.gz
+```
+
+### Docker images
+Docker images are built automatically with [Google Cloud Build](https://cloud.google.com/cloud-build) upon pushes to `master` and all release branches. Automated builds will be tagged in [Google Container Registry](https://cloud.google.com/container-registry) with the corresponding commit hash.
+
+A signature should be produced over the image automatically built at the corresponding commit hash and included with the Github release.
+
+Release image signatures can be verified with the following command:
+
+```bash
+gpg --verify celo-blockchain-vX.Y.Z.docker.asc <(docker save us.gcr.io/celo-testnet/celo-node:vX.Y.Z)
 ```
 
 ## Testing
