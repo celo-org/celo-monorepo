@@ -227,6 +227,8 @@ export enum CustomEventNames {
   import_phrase_input = 'import_phrase_input', // to record the # of times a value is inputted here [we should not track the actual value of this field, just whether the user filled it out]
   import_wallet_submit = 'import_wallet_submit', // to count the # of times that the “Restore Celo Wallet” button is pressed
   import_wallet_cancel = 'import_wallet_cancel', // to count the # of times that the “Cancel” button is pressed
+  import_contacts = 'import_contacts',
+  import_contacts_skip = 'import_contacts_skip',
 
   // Escrowed payments
   escrowed_payment_review = 'escrowed_payment_review',
