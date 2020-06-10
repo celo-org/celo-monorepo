@@ -58,3 +58,21 @@ export function enterPin() {
     exec('adb shell input text 123456 && sleep 1 && adb shell input keyevent 66')
   }, 3000)
 }
+
+export async function enterPinUi() {
+  await expect(element(by.id('Pincode-Submit'))).toBeVisible()
+
+  for (const digit of DEFAULT_PIN) {
+    //await expect(element(by.text(digit))).toBeVisible()
+    await element(by.id(`digit${digit}`)).tap()
+  }
+
+  await element(by.id('Pincode-Submit')).tap()
+}
+
+export async function inputNumberKeypad(amount) {
+  const amountStr = '' + amount
+  for (const digit of amountStr) {
+    await element(by.id(`digit${digit}`)).tap()
+  }
+}

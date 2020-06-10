@@ -676,6 +676,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                 "paddingVertical": 5,
               }
             }
+            testID="ConfirmButton"
           >
             <Text
               accessibilityLabel="global:confirm"
@@ -1438,6 +1439,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 "paddingVertical": 5,
               }
             }
+            testID="ConfirmButton"
           >
             <Text
               accessibilityLabel="global:confirm"
@@ -2197,6 +2199,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 "paddingVertical": 5,
               }
             }
+            testID="ConfirmButton"
           >
             <Text
               accessibilityLabel="global:confirm"
