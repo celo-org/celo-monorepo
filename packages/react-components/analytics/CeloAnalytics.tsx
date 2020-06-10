@@ -1,7 +1,3 @@
-import {
-  EventPropertyType,
-  PropertyPathWhitelist,
-} from '@celo/react-components/analytics/constants'
 import ReactNativeLogger from '@celo/react-components/services/ReactNativeLogger'
 import Analytics, { Analytics as analytics } from '@segment/analytics-react-native'
 import Firebase from '@segment/analytics-react-native-firebase'
@@ -73,18 +69,21 @@ class CeloAnalytics {
   readonly appName: AnalyzedApps
   readonly apiKey: string | undefined
   readonly defaultTestnet: string | undefined
+  readonly propertyPathWhiteList: { [key: string]: any }
   readonly Logger: ReactNativeLogger
   readonly activeEvents: ActiveEvents = new Map()
   deviceInfo: any
 
   constructor(
     appName: AnalyzedApps,
+    propertyPathWhiteList: { [key: string]: any },
     Logger: ReactNativeLogger,
     apiKey?: string,
     defaultTestnet?: string
   ) {
     this.appName = appName
     this.Logger = Logger
+    this.propertyPathWhiteList = propertyPathWhiteList
     this.apiKey = apiKey
     this.defaultTestnet = defaultTestnet
 
@@ -105,7 +104,7 @@ class CeloAnalytics {
     return true
   }
 
-  track(eventName: string, eventProperties: EventPropertyType = {}, attachDeviceInfo = false) {
+  track(eventName: string, eventProperties = {}, attachDeviceInfo = false) {
     if (!this.isEnabled()) {
       this.Logger.info(TAG, `Analytics is disabled, not tracking event ${eventName}`)
       return
@@ -129,7 +128,7 @@ class CeloAnalytics {
   // Used with trackSubEvent and endTracking to track durations for
   // processes with multiple steps. For one-off events, use track method
   // Duplicate event properties will reflect latest value provided
-  startTracking(eventName: string, eventProperties: EventPropertyType = {}) {
+  startTracking(eventName: string, eventProperties = {}) {
     this.activeEvents.set(
       eventName,
       new Map<string, SubEventData>([
@@ -139,7 +138,7 @@ class CeloAnalytics {
   }
 
   // See startTracking
-  trackSubEvent(eventName: string, subEventName: string, eventProperties: EventPropertyType = {}) {
+  trackSubEvent(eventName: string, subEventName: string, eventProperties = {}) {
     if (!this.activeEvents.has(eventName)) {
       return this.Logger.warn(TAG, 'Attempted to track sub event for invalid event. Ignoring.')
     }
@@ -150,11 +149,7 @@ class CeloAnalytics {
   }
 
   // See startTracking
-  stopTracking(
-    eventName: string,
-    eventProperties: EventPropertyType = {},
-    attachDeviceInfo = false
-  ) {
+  stopTracking(eventName: string, eventProperties = {}, attachDeviceInfo = false) {
     if (!this.activeEvents.has(eventName)) {
       return
     }
@@ -185,7 +180,7 @@ class CeloAnalytics {
     this.track(eventName, { ...eventPropsSuperSet, ...durations }, attachDeviceInfo)
   }
 
-  page(page: string, eventProperties: EventPropertyType = {}) {
+  page(page: string, eventProperties = {}) {
     if (!this.apiKey) {
       return
     }
@@ -198,7 +193,7 @@ class CeloAnalytics {
 
   applyWhitelist(allProps: {}) {
     const whitelistedProps = {}
-    _.each(PropertyPathWhitelist, (path: string) => {
+    _.each(this.propertyPathWhiteList, (path: string) => {
       if (!_.has(allProps, path)) {
         return
       }
@@ -207,7 +202,7 @@ class CeloAnalytics {
     return whitelistedProps
   }
 
-  private getProps(eventProperties: EventPropertyType = {}): {} {
+  private getProps(eventProperties = {}): {} {
     const whitelistedProperties = this.applyWhitelist(eventProperties)
     const baseProps = {
       appName: this.appName,

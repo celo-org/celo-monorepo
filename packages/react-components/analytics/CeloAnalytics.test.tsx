@@ -1,7 +1,14 @@
 import CeloAnalytics, { AnalyzedApps } from '@celo/react-components/analytics/CeloAnalytics'
 import ReactNativeLogger from '@celo/react-components/services/ReactNativeLogger'
 
-const c = new CeloAnalytics(AnalyzedApps.Wallet, new ReactNativeLogger())
+enum MockPropertyWhitelist {
+  address = 'address',
+  validationType = 'validationType',
+  'navigation.state.routeName' = 'navigation.state.routeName',
+  title = 'title',
+}
+
+const c = new CeloAnalytics(AnalyzedApps.Wallet, MockPropertyWhitelist, new ReactNativeLogger())
 
 jest.mock('@segment/analytics-react-native', () => undefined)
 jest.mock('@segment/analytics-react-native-firebase', () => undefined)
