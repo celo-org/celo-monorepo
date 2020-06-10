@@ -23,7 +23,7 @@ forno_url=https://${network}-forno.$CLUSTER_DOMAIN_NAME.org
 node_pod="${network}-${namespace}-${syncmode}-node-0"
 
 check_pod_status() {
-  if kubectl get pods -n ${namespace} "${node_pod}" | grep -v Running; then
+  if kubectl get pods -n ${namespace} "${node_pod}" | grep -v RESTARTS | grep -v Running; then
     echo "The pod ${node_pod} failed."
     exit 1
   fi
