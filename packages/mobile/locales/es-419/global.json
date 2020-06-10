@@ -119,6 +119,7 @@
   "addressLookupFailure": "Error al buscar la dirección del número de teléfono",
   "saltFetchFailure": "Error al recuperar el secreto del número de teléfono",
   "saltQuotaExceededError": "Su cuota de búsqueda de número de teléfono está agotada",
+  "matchmakingQuotaExceededError": "El emparejamiento solo se puede hacer una vez",
   "paymentLimitReached": "El límite diario es {{dailyLimitcUSD}}CUSD ({{currencySymbol}}{{dailyLimit}})\n{{dailyRemainingcUSD}}CUSD ({{currencySymbol}}{{dailyRemaining}}) restante",
   "ordinals": [
     "cero",

@@ -26,13 +26,20 @@ export default function SendOrRequestBar() {
   }, [])
 
   return (
-    <View style={styles.container}>
-      <Button style={styles.button} size={BtnSizes.SMALL} text={t('send')} onPress={onPressSend} />
+    <View style={styles.container} testID="SendOrRequestBar">
+      <Button
+        style={styles.button}
+        size={BtnSizes.SMALL}
+        text={t('send')}
+        onPress={onPressSend}
+        testID="SendOrRequestBar/SendButton"
+      />
       <Button
         style={[styles.button, styles.requestButton]}
         size={BtnSizes.SMALL}
         text={t('paymentRequestFlow:request')}
         onPress={onPressRequest}
+        testID="SendOrRequestBar/RequestButton"
       />
       <Touchable borderless={true} onPress={onPressQrCode}>
         <QRCodeBorderlessIcon height={32} color={colors.greenUI} />
