@@ -8,6 +8,8 @@ export enum CustomEventNames {
   signup_submit = 'signup_submit',
   blockChainCorruption = 'block_chain_corruption',
   disconnect_banner = 'disconnect_banner',
+
+  // Education
   gold_cancel1 = 'gold_cancel1',
   gold_cancel2 = 'gold_cancel2',
   gold_cancel3 = 'gold_cancel3',
@@ -23,6 +25,8 @@ export enum CustomEventNames {
   wallet_dollar_nux = 'wallet_dollar_nux',
   send_input = 'send_input',
   transaction_details = 'transaction_details',
+
+  // Payment send
   send_select_cancel = 'send_select_cancel',
   send_invite_details = 'send_invite_details',
   send_invite = 'send_invite',
@@ -51,6 +55,7 @@ export enum CustomEventNames {
 
   invite_error = 'invite_error', // when there is an error sending an invite
 
+  // Payment request
   request_cancel = 'request_cancel', // when cancel is clicked after launching request flow
   request_search = 'request_search', // when text is input into search bar
   request_scan = 'request_scan', // when scan QR icon is selected from the request screen
@@ -77,7 +82,6 @@ export enum CustomEventNames {
   fetch_balance = 'fetch_balance',
 
   // Verification event and sub-events
-  verification = 'verification',
   verification_start = 'verification_start',
   verification_setup = 'verification_setup',
   verification_get_status = 'verification_get_status',

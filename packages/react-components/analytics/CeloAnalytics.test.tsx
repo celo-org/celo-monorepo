@@ -39,7 +39,7 @@ it('tracks events with subEvents correctly', () => {
   Date.now = jest.fn(() => 1000)
   c.startTracking('mockEvent')
   Date.now = jest.fn(() => 2000)
-  c.trackSubEvent('mockEvent', 'step1', { address: '0xblablabla' })
+  c.trackSubEvent('mockEvent', 'step1', { address: '0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10' })
   Date.now = jest.fn(() => 3500)
   c.trackSubEvent('mockEvent', 'step2', { validationType: 0 })
   Date.now = jest.fn(() => 4000)
