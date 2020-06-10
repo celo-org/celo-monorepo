@@ -4,7 +4,7 @@ import {
   verifyAccountClaim,
   verifyDomainRecord,
 } from '@celo/contractkit/lib/identity/claims/verify'
-import { ensureLeading0x, normalizeAddress } from '@celo/utils/lib/address'
+import { normalizeAddressWith0x, trimLeading0x } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import Logger from 'bunyan'
 import { Client } from 'pg'
@@ -40,9 +40,9 @@ async function createVerificationClaims(
   verified: boolean,
   accounts: Array<Address>
 ) {
-  await addDatabaseVerificationClaims(address.replace('0x', ''), domain, verified)
+  await addDatabaseVerificationClaims(address, domain, verified)
   await concurrentMap(CONCURRENCY, accounts, (account) =>
-    addDatabaseVerificationClaims(account.replace('0x', ''), domain, verified)
+    addDatabaseVerificationClaims(account, domain, verified)
   )
 }
 
@@ -52,7 +52,8 @@ async function addDatabaseVerificationClaims(address: string, domain: string, ve
         (decode($1, 'hex'), 'domain', $2, $3, now(), now(), now())
         ON CONFLICT (address, type, element) DO
         UPDATE SET verified=$3, timestamp=now(), updated_at=now() `
-    const values = [address, domain, verified]
+    // Trim 0x to match Blockscout convention
+    const values = [trimLeading0x(address), domain, verified]
 
     await client
       .query(query, values)
@@ -110,14 +111,13 @@ async function getVerifiedDomains(
 async function handleItem(item: { url: string; address: string }) {
   const itemLogger = operationalLogger.child({ url: item.url, address: item.address })
   try {
-    const address = ensureLeading0x(item.address)
     itemLogger.debug('fetch_metadata')
     const metadata = await IdentityMetadataWrapper.fetchFromURL(kit, item.url)
-    const verifiedAccounts = await getVerifiedAccounts(metadata, address)
-    const verifiedDomains = await getVerifiedDomains(metadata, address, itemLogger)
+    const verifiedAccounts = await getVerifiedAccounts(metadata, item.address)
+    const verifiedDomains = await getVerifiedDomains(metadata, item.address, itemLogger)
 
     await concurrentMap(CONCURRENCY, verifiedDomains, (domain) =>
-      createVerificationClaims(address, domain, true, verifiedAccounts)
+      createVerificationClaims(item.address, domain, true, verifiedAccounts)
     )
 
     itemLogger.debug(
@@ -145,12 +145,17 @@ async function main() {
     `SELECT address, url FROM celo_account WHERE url is NOT NULL `
   )
 
+  // TODO: Fetch addresses which have
+  // not opted in
+  // opted in but not registered an attestation service URL
+
   operationalLogger.debug({ length: items.length }, 'fetching all accounts')
 
   items = items || []
   items = items.map((a) => ({
     ...a,
-    address: normalizeAddress(a.address.substr(2)),
+    // Addresses are stored by blockscout as just the bytes prepended with \x
+    address: normalizeAddressWith0x(a.address.substr(2)),
   }))
 
   await concurrentMap(CONCURRENCY, items, (item) => handleItem(item))
