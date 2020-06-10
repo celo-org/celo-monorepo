@@ -97,10 +97,18 @@ class VerificationEducationScreen extends React.Component<Props, State> {
               {t('skipModal.body2')}
             </Text>
             <View style={styles.modalButtonsContainer}>
-              <TextButton onPress={this.onPressSkipCancel} style={styles.modalCancelText}>
+              <TextButton
+                onPress={this.onPressSkipCancel}
+                style={styles.modalCancelText}
+                testID="ModalCancel"
+              >
                 {t('global:cancel')}
               </TextButton>
-              <TextButton onPress={this.onPressSkipConfirm} style={styles.modalSkipText}>
+              <TextButton
+                onPress={this.onPressSkipConfirm}
+                style={styles.modalSkipText}
+                testID="ModalSkip"
+              >
                 {t('global:skip')}
               </TextButton>
             </View>
