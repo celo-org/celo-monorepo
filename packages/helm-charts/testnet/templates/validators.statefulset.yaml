@@ -158,7 +158,7 @@ spec:
           IN_MEMORY_DISCOVERY_TABLE_FLAG=""
           [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
 
-          geth \
+          exec geth \
             --bootnodes=enode://`cat /root/.celo/bootnodeEnode` \
             --password=/root/.celo/account/accountSecret \
             --unlock=${ACCOUNT_ADDRESS} \

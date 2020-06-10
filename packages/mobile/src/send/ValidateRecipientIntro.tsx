@@ -52,9 +52,12 @@ export const validateRecipientIntroScreenNavOptions = () => ({
 class ValidateRecipientIntro extends React.Component<Props> {
   onPressScanCode = () => {
     CeloAnalytics.track(CustomEventNames.send_secure_start, { method: 'scan' })
-    navigate(Screens.QRScanner, {
-      transactionData: this.props.transactionData,
-      scanIsForSecureSend: true,
+    navigate(Screens.QRNavigator, {
+      screen: Screens.QRScanner,
+      params: {
+        transactionData: this.props.transactionData,
+        scanIsForSecureSend: true,
+      },
     })
   }
 

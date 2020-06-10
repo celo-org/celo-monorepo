@@ -1,4 +1,5 @@
 import { trimLeading0x } from '@celo/utils/lib/address'
+import BN from 'bn.js'
 import { range } from 'lodash'
 import qrcode from 'qrcode'
 import querystring from 'querystring'
@@ -99,7 +100,11 @@ export function buildUri(tx: Tx, functionName?: string, abiTypes: string[] = [])
   if (functionArgs) {
     uri += `args=[${functionArgs.join(',')}]`
   }
-  uri += querystring.stringify({ ...txQueryParams })
+  const params = txQueryParams as { [key: string]: string }
+  if (txQueryParams.value instanceof BN) {
+    params.value = txQueryParams.value.toString()
+  }
+  uri += querystring.stringify({ ...params })
 
   return uri
 }

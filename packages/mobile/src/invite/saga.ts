@@ -19,7 +19,7 @@ import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import { setHasSeenVerificationNux, updateE164PhoneNumberAddresses } from 'src/identity/actions'
-import { fetchPhoneHashPrivate } from 'src/identity/privacy'
+import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import {
   Actions,
   InviteBy,

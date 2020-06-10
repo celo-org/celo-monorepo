@@ -31,9 +31,10 @@ import {
   resetVerification,
   setVerificationStatus,
 } from 'src/identity/actions'
-import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privacy'
+import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privateHashing'
 import { acceptedAttestationCodesSelector, attestationCodesSelector } from 'src/identity/reducer'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
+import { VerificationStatus } from 'src/identity/types'
 import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
@@ -44,17 +45,6 @@ const TAG = 'identity/verification'
 
 export const NUM_ATTESTATIONS_REQUIRED = 3
 export const VERIFICATION_TIMEOUT = 5 * 60 * 1000 // 5 minutes
-
-export enum VerificationStatus {
-  Failed = -1,
-  Stopped = 0,
-  Prepping = 1,
-  GettingStatus = 2,
-  RequestingAttestations = 3,
-  RevealingNumber = 4,
-  RevealAttemptFailed = 5,
-  Done = 6,
-}
 
 export enum CodeInputType {
   AUTOMATIC = 'automatic',
@@ -101,6 +91,7 @@ export function* startVerification() {
 
 export function* doVerificationFlow() {
   try {
+    CeloAnalytics.track(CustomEventNames.verification_start)
     yield put(setVerificationStatus(VerificationStatus.Prepping))
     const account: string = yield call(getConnectedUnlockedAccount)
     const e164Number: string = yield select(e164NumberSelector)

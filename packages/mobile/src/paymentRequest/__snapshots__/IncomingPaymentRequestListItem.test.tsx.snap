@@ -191,13 +191,19 @@ Array [
         >
           <Text
             style={
-              Object {
-                "color": "#1AB775",
-                "fontFamily": "Inter-SemiBold",
-                "fontSize": 14,
-                "lineHeight": 16,
-                "marginRight": 24,
-              }
+              Array [
+                Object {
+                  "color": "#1AB775",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+                Object {
+                  "fontSize": 14,
+                  "lineHeight": 16,
+                  "marginRight": 24,
+                },
+              ]
             }
           >
             global:send
@@ -223,13 +229,19 @@ Array [
         >
           <Text
             style={
-              Object {
-                "color": "#1AB775",
-                "fontFamily": "Inter-SemiBold",
-                "fontSize": 14,
-                "lineHeight": 16,
-                "marginRight": 24,
-              }
+              Array [
+                Object {
+                  "color": "#1AB775",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+                Object {
+                  "fontSize": 14,
+                  "lineHeight": 16,
+                  "marginRight": 24,
+                },
+              ]
             }
           >
             global:decline

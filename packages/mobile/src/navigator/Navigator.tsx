@@ -61,10 +61,12 @@ import {
   nuxNavigationOptionsNoBackButton,
 } from 'src/navigator/Headers.v2'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
+import QRNavigator from 'src/navigator/QRNavigator'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
 import ImportContactsScreen from 'src/onboarding/contacts/ImportContactsScreen'
+import OnboardingSuccessScreen from 'src/onboarding/success/OnboardingSuccessScreen'
 import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import OutgoingPaymentRequestListScreen from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
 import PaymentRequestConfirmation, {
@@ -76,8 +78,6 @@ import PaymentRequestUnavailable, {
 import PincodeEducation from 'src/pincode/PincodeEducation'
 import PincodeEnter from 'src/pincode/PincodeEnter'
 import PincodeSet from 'src/pincode/PincodeSet'
-import QRCode from 'src/qrcode/QRCode'
-import QRScanner from 'src/qrcode/QRScanner'
 import { RootState } from 'src/redux/reducers'
 import { store } from 'src/redux/store'
 import JoinCelo from 'src/registration/JoinCelo'
@@ -100,7 +100,6 @@ import VerificationInputScreen from 'src/verify/VerificationInputScreen'
 import VerificationInterstitialScreen from 'src/verify/VerificationInterstitialScreen'
 import VerificationLearnMoreScreen from 'src/verify/VerificationLearnMoreScreen'
 import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
-import VerificationSuccessScreen from 'src/verify/VerificationSuccessScreen'
 
 const Stack = createStackNavigator<StackParamList>()
 
@@ -147,10 +146,6 @@ const verificationScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen
         name={Screens.VerificationInputScreen}
         component={VerificationInputScreen}
-      />
-      <Navigator.Screen
-        name={Screens.VerificationSuccessScreen}
-        component={VerificationSuccessScreen}
       />
     </>
   )
@@ -199,6 +194,7 @@ const nuxScreens = (Navigator: typeof Stack) => (
       component={ImportContactsScreen}
       options={nuxNavigationOptions}
     />
+    <Navigator.Screen name={Screens.OnboardingSuccessScreen} component={OnboardingSuccessScreen} />
   </>
 )
 
@@ -210,8 +206,7 @@ const emptyWithBackButtonHeaderOption = () => ({
 const sendScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen name={Screens.Send} component={Send} options={sendScreenNavOptions} />
-    <Navigator.Screen name={Screens.QRScanner} component={QRScanner} />
-    <Navigator.Screen name={Screens.QRCode} component={QRCode} />
+    <Navigator.Screen name={Screens.QRNavigator} component={QRNavigator} options={noHeader} />
     <Navigator.Screen
       name={Screens.SendAmount}
       component={SendAmount}
@@ -428,11 +423,12 @@ const mapStateToProps = (state: RootState) => {
   return {
     language: state.app.language,
     e164Number: state.account.e164PhoneNumber,
+    acceptedTerms: state.account.acceptedTerms,
     pincodeType: state.account.pincodeType,
     redeemComplete: state.invite.redeemComplete,
     account: state.web3.account,
     hasSeenVerificationNux: state.identity.hasSeenVerificationNux,
-    acceptedTerms: state.account.acceptedTerms,
+    askedContactsPermission: state.identity.askedContactsPermission,
   }
 }
 
@@ -442,11 +438,11 @@ export function AppNavigatorNew() {
     const {
       language,
       e164Number,
+      acceptedTerms,
       pincodeType,
       redeemComplete,
       account,
       hasSeenVerificationNux,
-      acceptedTerms,
     } = mapStateToProps(store.getState())
 
     let initialRoute: Screens | undefined
