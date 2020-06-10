@@ -135,7 +135,7 @@ Distribution of an image should occur along the following schedule:
         <ol>
           <li>Ensure at least a quorum of the validator set has upgraded</li>
           <li>Submit governance proposal to increment minimum client version </li>
-        <ol>
+        </ol>
         <li>Communicate T+3w Mainnet upgrade date</li>
         <li>Tag released Docker image with <code>mainnet</code> and <code>latest</code></li>
       </ol>
