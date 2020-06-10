@@ -30,7 +30,8 @@
     "@types/uuid": "^7.0.3",
     "@types/supertest": "^2.0.9",
     "dotenv": "^8.2.0",
-    "supertest": "^4.0.2"
+    "supertest": "^4.0.2",
+    "typescript": "^3.8.3"
   },
   "engines": {
     "node": "10"
