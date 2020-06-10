@@ -186,6 +186,13 @@ exports[`PhoneNumberLookupQuotaScreen renders correctly 1`] = `
   <View>
     <View
       style={
+        Object {
+          "height": 64,
+        }
+      }
+    />
+    <View
+      style={
         Array [
           Object {
             "alignItems": "center",
@@ -196,14 +203,14 @@ exports[`PhoneNumberLookupQuotaScreen renders correctly 1`] = `
           null,
           undefined,
           Object {
-            "backgroundColor": "#42D689",
+            "backgroundColor": "#A3EBC6",
           },
         ]
       }
     >
       <View
         accessible={true}
-        focusable={true}
+        focusable={false}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -225,7 +232,7 @@ exports[`PhoneNumberLookupQuotaScreen renders correctly 1`] = `
               "justifyContent": "center",
             },
             Object {
-              "backgroundColor": "#42D689",
+              "backgroundColor": "#A3EBC6",
             },
             Object {
               "height": 50,

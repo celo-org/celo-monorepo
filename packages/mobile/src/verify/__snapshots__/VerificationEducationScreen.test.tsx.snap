@@ -139,6 +139,13 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
   </RCTScrollView>
   <View
     style={
+      Object {
+        "height": 64,
+      }
+    }
+  />
+  <View
+    style={
       Array [
         Object {
           "alignItems": "center",
@@ -149,14 +156,14 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
         null,
         undefined,
         Object {
-          "backgroundColor": "#42D689",
+          "backgroundColor": "#A3EBC6",
         },
       ]
     }
   >
     <View
       accessible={true}
-      focusable={true}
+      focusable={false}
       nativeBackgroundAndroid={
         Object {
           "attribute": "selectableItemBackground",
@@ -178,7 +185,7 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
             "justifyContent": "center",
           },
           Object {
-            "backgroundColor": "#42D689",
+            "backgroundColor": "#A3EBC6",
           },
           Object {
             "height": 50,
@@ -671,6 +678,13 @@ exports[`VerificationEducationScreen renders correctly 2`] = `
   </RCTScrollView>
   <View
     style={
+      Object {
+        "height": 64,
+      }
+    }
+  />
+  <View
+    style={
       Array [
         Object {
           "alignItems": "center",
@@ -681,14 +695,14 @@ exports[`VerificationEducationScreen renders correctly 2`] = `
         null,
         undefined,
         Object {
-          "backgroundColor": "#42D689",
+          "backgroundColor": "#A3EBC6",
         },
       ]
     }
   >
     <View
       accessible={true}
-      focusable={true}
+      focusable={false}
       nativeBackgroundAndroid={
         Object {
           "attribute": "selectableItemBackground",
@@ -710,7 +724,7 @@ exports[`VerificationEducationScreen renders correctly 2`] = `
             "justifyContent": "center",
           },
           Object {
-            "backgroundColor": "#42D689",
+            "backgroundColor": "#A3EBC6",
           },
           Object {
             "height": 50,
