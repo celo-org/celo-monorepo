@@ -36,7 +36,7 @@ Documentation for client features, such as APIs and commands, are maintained in 
 ## Identifying releases:
 
 ### Git branches
-Each minor version of celo-blockchain has its own “release branch”, e.g. `release/1.0`. 
+Each minor version of celo-blockchain has its own “release branch”, e.g. `release/1.0`.
 
 Development is done on the `master` branch, which corresponds to the next major or minor version. Changes to be included in a patch release of an existing minor version are cherry-picked to that existing release branch.
 
@@ -57,7 +57,7 @@ Each released Docker image should should be tagged with it’s version number su
 ## Build process
 
 ### Binaries
-Binaries for common platforms are built automatically with [Google Cloud Build](https://cloud.google.com/cloud-build) upon pushes to `master` and all release branches. 
+Binaries for common platforms are built automatically with [Google Cloud Build](https://cloud.google.com/cloud-build) upon pushes to `master` and all release branches.
 
 A signature should be produced over the binary automatically built at the corresponding commit hash and included in the Github release.
 
@@ -89,7 +89,7 @@ Minor and major releases are expected to go through additional rounds of manual 
 ### Source control
 Patch releases should be constructed by cherry-picking all included commits from `master` to the `release/x.y` branch. The first commit of this process should change the version number encoded in the source from `x.y.z-stable` to `x.y.z+1-unstable` and the final commit should change the version number to `x.y.z+1-stable`.
 
-Major and minor releases should be constructed by pushing a commit to the `master` branch to change the encoded version number from `x.y.z-unstable` to `x.y.z-stable`. A `release/x.y` branch should be created from this commit.  The next commit must change the version number from `x.y.z-stable` to `x.y+1.0-unstable`, or `x+1.0.0-unstable` if the next planned release is a major release. 
+Major and minor releases should be constructed by pushing a commit to the `master` branch to change the encoded version number from `x.y.z-unstable` to `x.y.z-stable`. A `release/x.y` branch should be created from this commit.  The next commit must change the version number from `x.y.z-stable` to `x.y+1.0-unstable`, or `x+1.0.0-unstable` if the next planned release is a major release.
 
 Only one commit should ever have a “stable” tag at any given version number. When that commit is created, a tag should be added along with release notes. Once the tag is published it should not be reused for any further release or chnages.
 
@@ -155,7 +155,7 @@ Bugs which affect the security, stability, or core functionality of the network 
 
 If the issue is not exploitable, release notes should describe the issue in detail and the image should be distributed publicly. If network stability is at risk, a Governance proposal may be submitted to increment the minimum client version.
 
-If the issue is exploitable and mitigations are not readily available, a patch should be prepared privately and signed binaries should be distributed from private commits. Establishing trust is key to pushing out the fix. An audit from a reputable third party may be contracted to verify the release to help earn that trust. A hotfix should be proposed to raise the minimum client version number to the patched release and then patch details made public. 
+If the issue is exploitable and mitigations are not readily available, a patch should be prepared privately and signed binaries should be distributed from private commits. Establishing trust is key to pushing out the fix. An audit from a reputable third party may be contracted to verify the release to help earn that trust. A hotfix should be proposed to raise the minimum client version number to the patched release and then patch details made public.
 
 > Pushing an upgrade with this process will be disruptive to any nodes that do not upgrade quickly. It should _only_ be used when the circumstances require it.
 
@@ -170,4 +170,4 @@ None
 ## Dependents
 
 None
- 
+

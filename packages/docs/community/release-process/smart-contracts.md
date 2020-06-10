@@ -54,7 +54,7 @@ This script does the following:
     1. STORAGE updates are adopted by deploying a new proxy and implementation and updating the Regsitry contract.
     2. All other updates are adopted by updating the proxy contract’s implementation pointer.
 
-## Testing 
+## Testing
 
 All releases should be evaluated according to the following tests.
 
@@ -74,9 +74,9 @@ All changes since the last release should be audited by a reputable third party 
 
 ### Emergency patches
 
-If patches need to be applied before the next scheduled smart contract release, they should be cherry picked to a new release branch, branched from the latest deployed release branch. 
+If patches need to be applied before the next scheduled smart contract release, they should be cherry picked to a new release branch, branched from the latest deployed release branch.
 
-## Promotion process 
+## Promotion process
 
 Deploying a new contract release should occur with the following process:
 
