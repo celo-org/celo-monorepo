@@ -54,7 +54,7 @@
   },
   "backupPhrasePlaceholder":
     "caballo leopardo perro mono tiburón tigre lémur ballena calamar lobo ardilla ratón león elefante gato langostino oso pingüino ciervo tortuga zorro cebra cabra jirafa",
-  "guides": [
+  "guide": [
     {
       "title": "La clave de su cuenta es un tipo especial de contraseña",
       "text": "La clave de su cuenta es la única manera de acceder a su cuenta"
