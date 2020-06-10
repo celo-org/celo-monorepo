@@ -3,7 +3,8 @@ import {
   CustomEventNames,
   DefaultEventNames,
   EventPropertyType,
-} from '@celo/react-components/analytics/constants'
+  PropertyPathWhitelist,
+} from 'src/analytics/constants'
 import { DEFAULT_TESTNET, SEGMENT_API_KEY } from 'src/config'
 import { store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
@@ -12,7 +13,7 @@ type EventNames = CustomEventNames | DefaultEventNames
 
 class WalletAnalytics extends CeloAnalytics {
   constructor() {
-    super(AnalyzedApps.Wallet, Logger, SEGMENT_API_KEY, DEFAULT_TESTNET)
+    super(AnalyzedApps.Wallet, PropertyPathWhitelist, Logger, SEGMENT_API_KEY, DEFAULT_TESTNET)
   }
 
   isEnabled() {

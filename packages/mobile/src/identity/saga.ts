@@ -1,4 +1,3 @@
-import { CustomEventNames } from '@celo/react-components/analytics/constants'
 import {
   cancelled,
   put,
@@ -10,6 +9,7 @@ import {
 } from 'redux-saga/effects'
 import { showErrorInline } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
   Actions,

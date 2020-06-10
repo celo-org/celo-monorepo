@@ -1,4 +1,3 @@
-import { CustomEventNames } from '@celo/react-components/analytics/constants'
 import { BtnTypes } from '@celo/react-components/components/Button'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
@@ -12,6 +11,7 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { hideAlert } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import BackupPhraseContainer, {
   BackupPhraseContainerMode,
   BackupPhraseType,
