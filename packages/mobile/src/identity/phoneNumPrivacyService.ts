@@ -18,7 +18,14 @@ export async function postToPhoneNumPrivacyService<ResponseType>(
   // Sign payload using account privkey
   const bodyString = JSON.stringify(body)
   const authHeader = await contractKit.web3.eth.sign(bodyString, account)
-  const { pgpnpUrl } = networkConfig
+  let { pgpnpUrl } = networkConfig
+
+  // TODO(Rossy) Remove when PGPNP prod is updated
+  // Hacking this in like this to minimize the changes + risk when its removed
+  if (endpoint === '/getContactMatches') {
+    pgpnpUrl = 'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net'
+  }
+
   const res = await fetch(pgpnpUrl + endpoint, {
     method: 'POST',
     headers: {
@@ -42,7 +49,7 @@ function handleFailure(res: Response) {
   Logger.error(`${TAG}@handleFailure`, `Response not okay. Status ${res.status}`)
   switch (res.status) {
     case 403:
-      throw new Error(ErrorMessages.SALT_QUOTA_EXCEEDED)
+      throw new Error(ErrorMessages.PGPNP_QUOTA_ERROR)
     default:
       throw new Error('Unknown failure')
   }
