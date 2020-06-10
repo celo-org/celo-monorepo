@@ -1,4 +1,4 @@
-import { skipTo, sleep } from './utils'
+import { skipTo, sleep, enterPinUi, inputNumberKeypad } from './utils'
 
 const ENABLE_CONTACT_IMPORT = false
 
@@ -6,10 +6,17 @@ const ENABLE_CONTACT_IMPORT = false
 // anyways the emulator currently has no contacts
 
 const SAMPLE_BACKUP_KEY =
-  'nose inherit merry deal scout boss siren soul piece become better unit observe another horn ranch velvet kid frog pretty powder convince identify guilt'
+  'general debate dial flock want basket local machine effort monitor stomach purity attend brand extend salon obscure soul open floor useful like cause exhaust'
+const SAMPLE_SAFEGUARD_PHRASE =
+  'general debate dial flock want basket local machine effort monitor stomach purity celo'
+const SAMPLE_SAFEGUARD_PHRASE_SECONDARY =
+  'celo attend brand extend salon obscure soul open floor useful like cause exhaust'
 const VERIFICATION_COUNTRY = 'Germany'
 const VERIFICATION_PHONE_NUMBER = '030 111111'
 const EXAMPLE_NAME = 'Test Name'
+const DEFAULT_RECIPIENT_PHONE_NUMBER = '+10000000000'
+const AMOUNT_TO_SEND = '0.1'
+const RANDOM_COMMENT = 'poker night winnings'
 
 // clicks an element if it sees it
 async function bannerDismiss(inElement, tapElement) {
@@ -33,12 +40,12 @@ describe('Transfer Works', () => {
     await bannerDismiss(by.id('SmartTopAlertButton'))
   })
 
-  it('NUX->Language', async () => {
+  it('Language', async () => {
     await element(by.id('ChooseLanguage/en-US')).tap()
     await element(by.id('ChooseLanguageButton')).tap()
   })
 
-  it('NUX->Join', async () => {
+  it('Join', async () => {
     await waitFor(element(by.id('JoinCeloContinueButton')))
       .toBeVisible()
       .withTimeout(2000)
@@ -53,27 +60,34 @@ describe('Transfer Works', () => {
     await element(by.id('JoinCeloContinueButton')).tap()
   })
 
-  it('NUX-Terms', async () => {
+  it('Terms', async () => {
     await element(by.id('scrollView')).scrollTo('bottom')
     expect(element(by.id('AcceptTermsButton'))).toBeVisible()
     await element(by.id('AcceptTermsButton')).tap()
   })
 
-  it('NUX->Pin', async () => {
-    await expect(element(by.id('SystemAuthTitle'))).toBeVisible()
+  it('PincodeEducation', async () => {
     await expect(element(by.id('SystemAuthContinue'))).toBeVisible()
-
-    // TODO: enter pin using custom keypad
-
     await element(by.id('SystemAuthContinue')).tap()
   })
 
-  it.skip('NUX->Invite', async () => {
+  it('Pin', async () => {
+    // Set pin
+    await enterPinUi()
+    // Verify pin
+    await enterPinUi()
+  })
+
+  // TODO(erdal) 2 new paths: using invite code, continue without
+  // TODO(erdal) get rid of sleeps if possible to make the tests faster
+
+  // Restore existing wallet
+  it('Restore Wallet Backup', async () => {
     await waitFor(element(by.id('InviteCodeTitle')))
       .toBeVisible()
-      .withTimeout(2000)
+      .withTimeout(8000)
 
-    await element(by.id('ImportExistingUsingBackupKey')).tap()
+    await element(by.id('RestoreExistingWallet')).tap()
 
     await waitFor(element(by.id('ImportWalletBackupKeyInputField')))
       .toBeVisible()
@@ -88,56 +102,82 @@ describe('Transfer Works', () => {
       .withTimeout(20000)
 
     await element(by.id('ImportWalletBackupKeyInputField')).tap()
+    await element(by.id('ImportWalletBackupKeyInputField')).typeText(SAMPLE_BACKUP_KEY)
 
-    await element(by.id('ImportWalletBackupKeyInputField')).replaceText(SAMPLE_BACKUP_KEY)
-
-    // waits for button to be enabled
-    await sleep(10000)
+    await sleep(4000)
 
     await element(by.id('ImportWalletButton')).tap()
-
-    // waits for import to finish
-    await sleep(10000)
   })
 
-  it.skip('NUX->VerifyEducation', async () => {
-    await waitFor(element(by.id('VerifyEducationHeader')))
-      .toBeVisible()
-      .withTimeout(10000000)
-
-    await waitFor(element(by.id('VerifyContinueButton')))
+  it('VerifyEducation', async () => {
+    await waitFor(element(by.id('VerificationEducationHeader')))
       .toBeVisible()
       .withTimeout(10000)
 
-    await waitFor(element(by.id('VerifyLogo')))
+    await waitFor(element(by.id('VerificationEducationContinue')))
       .toBeVisible()
-      .withTimeout(1000)
+      .withTimeout(10000)
 
-    // will skip in next test
-    // await element(by.id('VerifyContinueButton')).tap()
+    // skip
+    await element(by.id('VerificationEducationSkip')).tap()
+    // confirmation popup skip
+    await element(by.id('ModalSkip')).tap()
   })
 
-  it.skip('NUX->Verify', async () => {
+  it.skip('Verify', async () => {
     // skipping for now
-    skipTo('WalletHome')
-    await sleep(10000)
+    // TODO(erdal): implement
   })
 
-  it.skip('Wallet Home', async () => {
-    await waitFor(element(by.id('AccountOverviewInHome/dollarBalance')))
-      .toBeVisible()
-      .withTimeout(10000)
-
-    await waitFor(element(by.id('AccountOverviewInHome/goldBalance')))
+  it('Wallet Home', async () => {
+    await waitFor(element(by.id('SendOrRequestBar')))
       .toBeVisible()
       .withTimeout(10000)
   })
 
-  it.skip('Wallet Home->Send', async () => {
-    await element(by.id('SendNavigator')).tap()
+  it('Wallet Home->Send', async () => {
+    await element(by.id('SendOrRequestBar/SendButton')).tap()
 
     await waitFor(element(by.id('RecipientPicker')))
       .toBeVisible()
       .withTimeout(10000)
+
+    await waitFor(element(by.id('RecipientItem')))
+      .toBeVisible()
+      .withTimeout(4000)
+    await element(by.id('RecipientItem')).tap()
   })
+
+  it('Send -> SendAmount', async () => {
+    await waitFor(element(by.id('Review')))
+      .toBeVisible()
+      .withTimeout(10000)
+
+    await inputNumberKeypad(AMOUNT_TO_SEND)
+    await element(by.id('Review')).tap()
+  })
+
+  it('SendAmount -> SendConfirmation', async () => {
+    await waitFor(element(by.id('commentInput/send')))
+      .toBeVisible()
+      .withTimeout(10000)
+
+    await element(by.id('commentInput/send')).replaceText(RANDOM_COMMENT)
+    await element(by.id('commentInput/send')).tapReturnKey()
+
+    await element(by.id('ConfirmButton')).tap()
+  })
+
+  // TODO(erdal): implement Request path
+
+  it('SendConfirmation -> Home', async () => {
+    await waitFor(element(by.id('SendOrRequestBar')))
+      .toBeVisible()
+      .withTimeout(10000)
+
+    // TODO(erdal): look for the latest transaction and
+    // make sure it was successful
+  })
+
+  // TODO(erdal): generate a new invite
 })
