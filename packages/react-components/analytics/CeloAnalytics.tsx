@@ -1,3 +1,7 @@
+import {
+  EventPropertyType,
+  PropertyPathWhitelist,
+} from '@celo/react-components/analytics/constants'
 import ReactNativeLogger from '@celo/react-components/services/ReactNativeLogger'
 import Analytics, { Analytics as analytics } from '@segment/analytics-react-native'
 import Firebase from '@segment/analytics-react-native-firebase'
@@ -69,21 +73,18 @@ class CeloAnalytics {
   readonly appName: AnalyzedApps
   readonly apiKey: string | undefined
   readonly defaultTestnet: string | undefined
-  readonly propertyPathWhiteList: string[]
   readonly Logger: ReactNativeLogger
   readonly activeEvents: ActiveEvents = new Map()
   deviceInfo: any
 
   constructor(
     appName: AnalyzedApps,
-    propertyPathWhiteList: string[],
     Logger: ReactNativeLogger,
     apiKey?: string,
     defaultTestnet?: string
   ) {
     this.appName = appName
     this.Logger = Logger
-    this.propertyPathWhiteList = propertyPathWhiteList
     this.apiKey = apiKey
     this.defaultTestnet = defaultTestnet
 
@@ -104,7 +105,7 @@ class CeloAnalytics {
     return true
   }
 
-  track(eventName: string, eventProperties: {}, attachDeviceInfo = false) {
+  track(eventName: string, eventProperties: EventPropertyType = {}, attachDeviceInfo = false) {
     if (!this.isEnabled()) {
       this.Logger.info(TAG, `Analytics is disabled, not tracking event ${eventName}`)
       return
@@ -180,7 +181,7 @@ class CeloAnalytics {
     this.track(eventName, { ...eventPropsSuperSet, ...durations }, attachDeviceInfo)
   }
 
-  page(page: string, eventProperties: {}) {
+  page(page: string, eventProperties: EventPropertyType = {}) {
     if (!this.apiKey) {
       return
     }
@@ -193,7 +194,7 @@ class CeloAnalytics {
 
   applyWhitelist(allProps: {}) {
     const whitelistedProps = {}
-    _.each(this.propertyPathWhiteList, (path: string) => {
+    _.each(PropertyPathWhitelist, (path: string) => {
       if (!_.has(allProps, path)) {
         return
       }
@@ -202,7 +203,7 @@ class CeloAnalytics {
     return whitelistedProps
   }
 
-  private getProps(eventProperties: {}): {} {
+  private getProps(eventProperties: EventPropertyType = {}): {} {
     const whitelistedProperties = this.applyWhitelist(eventProperties)
     const baseProps = {
       appName: this.appName,

@@ -1,6 +1,7 @@
 /**
  * This is a reactnavigation SCREEN, which we use to set a PIN.
  */
+import { CustomEventNames } from '@celo/react-components/analytics/constants'
 import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -11,7 +12,6 @@ import { setPincode } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'

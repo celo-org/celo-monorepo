@@ -1,3 +1,4 @@
+import { CustomEventNames } from '@celo/react-components/analytics/constants'
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors'
@@ -7,7 +8,6 @@ import { WithTranslation } from 'react-i18next'
 import { Dimensions, Image, StyleSheet, Text, View } from 'react-native'
 import Swiper from 'react-native-swiper'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { placeholder } from 'src/images/Images'
 import { navigateBack } from 'src/navigator/NavigationService'
@@ -84,7 +84,7 @@ class Education extends React.Component<Props, State> {
 
     return (
       <View style={style.body}>
-        {/* 
+        {/*
         // @ts-ignore */}
         <Swiper
           onIndexChanged={this.setStep}

@@ -1,5 +1,5 @@
+import { DefaultEventNames } from '@celo/react-components/analytics/constants'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { DefaultEventNames } from 'src/analytics/constants'
 
 export enum Actions {
   SET_ACCOUNT = 'WEB3/SET_ACCOUNT',

@@ -1,8 +1,8 @@
+import { CustomEventNames } from '@celo/react-components/analytics/constants'
 import { Platform } from 'react-native'
 import RNExitApp from 'react-native-exit-app'
 import { RestartAndroid } from 'react-native-restart-android'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
 import { deleteChainData } from 'src/geth/geth'
 import Logger from 'src/utils/Logger'
 

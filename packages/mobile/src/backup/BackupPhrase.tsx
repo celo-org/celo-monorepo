@@ -1,3 +1,4 @@
+import { CustomEventNames } from '@celo/react-components/analytics/constants'
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import Switch from '@celo/react-components/components/Switch.v2'
 import colors from '@celo/react-components/styles/colors.v2'
@@ -9,7 +10,6 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
 import BackupPhraseContainer, {
   BackupPhraseContainerMode,
   BackupPhraseType,

@@ -1,7 +1,7 @@
+import { DefaultEventNames } from '@celo/react-components/analytics/constants'
 import { PincodeType } from 'src/account/reducer'
 import { PaymentRequest } from 'src/account/types'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { DefaultEventNames } from 'src/analytics/constants'
 
 // TODO(Rossy): Remove the _ACTION suffix from these actions for consistency with other other names
 export enum Actions {

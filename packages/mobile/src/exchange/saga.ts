@@ -3,11 +3,11 @@ import { ExchangeWrapper } from '@celo/contractkit/lib/wrappers/Exchange'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
 import { ReserveWrapper } from '@celo/contractkit/lib/wrappers/Reserve'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
+import { CustomEventNames } from '@celo/react-components/analytics/constants'
 import BigNumber from 'bignumber.js'
 import { all, call, put, select, spawn, takeEvery, takeLatest } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
@@ -127,7 +127,7 @@ export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
 
     Logger.debug(
       TAG,
-      `Retrieved exchange rate: 
+      `Retrieved exchange rate:
       ${dollarMakerExchangeRate.toString()} gold per dollar, estimated at ${dollarMakerAmount}
       ${goldMakerExchangeRate.toString()} dollar per gold, estimated at ${goldMakerAmount}`
     )
@@ -229,7 +229,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     )
     Logger.debug(
       TAG,
-      `Will receive at least ${convertedTakerAmount} 
+      `Will receive at least ${convertedTakerAmount}
       wei for ${convertedMakerAmount} wei of ${makerToken}`
     )
 

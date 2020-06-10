@@ -1,10 +1,10 @@
+import { CustomEventNames } from '@celo/react-components/analytics/constants'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet } from 'react-native'
 import { connect } from 'react-redux'
 import { PaymentRequest } from 'src/account/types'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
 import { declinePaymentRequest } from 'src/firebase/actions'
 import { Namespaces, withTranslation } from 'src/i18n'
 import {

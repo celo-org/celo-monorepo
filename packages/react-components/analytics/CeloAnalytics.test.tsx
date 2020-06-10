@@ -1,11 +1,7 @@
 import CeloAnalytics, { AnalyzedApps } from '@celo/react-components/analytics/CeloAnalytics'
 import ReactNativeLogger from '@celo/react-components/services/ReactNativeLogger'
 
-const c = new CeloAnalytics(
-  AnalyzedApps.Wallet,
-  ['navigation.state.routeName', 'title'],
-  new ReactNativeLogger()
-)
+const c = new CeloAnalytics(AnalyzedApps.Wallet, new ReactNativeLogger())
 
 jest.mock('@segment/analytics-react-native', () => undefined)
 jest.mock('@segment/analytics-react-native-firebase', () => undefined)

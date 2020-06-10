@@ -1,8 +1,8 @@
+import { CustomEventNames } from '@celo/react-components/analytics/constants'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { photosNUXCompleted } from 'src/account/actions'
 import Education from 'src/account/Education'
-import { CustomEventNames } from 'src/analytics/constants'
 import { addressBook, bigPhoneAvatar, cameraUpload } from 'src/images/Images'
 import { navigateHome } from 'src/navigator/NavigationService'
 

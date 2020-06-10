@@ -1,3 +1,4 @@
+import { CustomEventNames } from '@celo/react-components/analytics/constants'
 import SimpleMessagingCard from '@celo/react-components/components/SimpleMessagingCard'
 import colors from '@celo/react-components/styles/colors'
 import variables from '@celo/react-components/styles/variables'
@@ -9,7 +10,6 @@ import { dismissEarnRewards, dismissGetVerified, dismissInviteFriends } from 'sr
 import { getIncomingPaymentRequests, getOutgoingPaymentRequests } from 'src/account/selectors'
 import { PaymentRequest } from 'src/account/types'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
 import { PROMOTE_REWARDS_APP } from 'src/config'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentReminderSummaryNotification from 'src/escrow/EscrowedPaymentReminderSummaryNotification'
