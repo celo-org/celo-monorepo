@@ -29,14 +29,14 @@ exports[`ValidatorsList renders 1`] = `
       className="css-view-1dbjc4n"
       style={
         Object {
-          "WebkitAlignItems": "center",
-          "WebkitBoxAlign": "center",
+          "WebkitAlignItems": "stretch",
+          "WebkitBoxAlign": "stretch",
           "WebkitBoxDirection": "normal",
           "WebkitBoxOrient": "horizontal",
           "WebkitBoxPack": "justify",
           "WebkitFlexDirection": "row",
           "WebkitJustifyContent": "space-between",
-          "alignItems": "center",
+          "alignItems": "stretch",
           "backgroundColor": "rgba(46,51,56,1.00)",
           "borderBottomColor": "rgba(255,255,255,0.20)",
           "borderBottomStyle": "solid",
@@ -51,7 +51,7 @@ exports[`ValidatorsList renders 1`] = `
           "display": "flex",
           "flexDirection": "row",
           "justifyContent": "space-between",
-          "msFlexAlign": "center",
+          "msFlexAlign": "stretch",
           "msFlexDirection": "row",
           "msFlexPack": "justify",
           "position": "sticky",
@@ -106,7 +106,12 @@ exports[`ValidatorsList renders 1`] = `
       </div>
       <div
         className="css-view-1dbjc4n"
-        onClick={[Function]}
+        onMouseDown={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onResponderGrant={[Function]}
+        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",
@@ -178,7 +183,12 @@ exports[`ValidatorsList renders 1`] = `
       </div>
       <div
         className="css-view-1dbjc4n"
-        onClick={[Function]}
+        onMouseDown={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onResponderGrant={[Function]}
+        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",
@@ -252,7 +262,12 @@ exports[`ValidatorsList renders 1`] = `
       </div>
       <div
         className="css-view-1dbjc4n"
-        onClick={[Function]}
+        onMouseDown={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onResponderGrant={[Function]}
+        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",
@@ -326,7 +341,12 @@ exports[`ValidatorsList renders 1`] = `
       </div>
       <div
         className="css-view-1dbjc4n"
-        onClick={[Function]}
+        onMouseDown={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onResponderGrant={[Function]}
+        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",
@@ -400,7 +420,12 @@ exports[`ValidatorsList renders 1`] = `
       </div>
       <div
         className="css-view-1dbjc4n"
-        onClick={[Function]}
+        onMouseDown={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onResponderGrant={[Function]}
+        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",
@@ -474,7 +499,12 @@ exports[`ValidatorsList renders 1`] = `
       </div>
       <div
         className="css-view-1dbjc4n"
-        onClick={[Function]}
+        onMouseDown={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onResponderGrant={[Function]}
+        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",
@@ -548,7 +578,12 @@ exports[`ValidatorsList renders 1`] = `
       </div>
       <div
         className="css-view-1dbjc4n"
-        onClick={[Function]}
+        onMouseDown={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onResponderGrant={[Function]}
+        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",
@@ -622,7 +657,12 @@ exports[`ValidatorsList renders 1`] = `
       </div>
       <div
         className="css-view-1dbjc4n"
-        onClick={[Function]}
+        onMouseDown={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onResponderGrant={[Function]}
+        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",
@@ -696,7 +736,12 @@ exports[`ValidatorsList renders 1`] = `
       </div>
       <div
         className="css-view-1dbjc4n"
-        onClick={[Function]}
+        onMouseDown={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onResponderGrant={[Function]}
+        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",
@@ -779,18 +824,18 @@ exports[`ValidatorsList renders 1`] = `
           className="css-view-1dbjc4n"
           style={
             Object {
-              "WebkitAlignItems": "center",
-              "WebkitBoxAlign": "center",
+              "WebkitAlignItems": "stretch",
+              "WebkitBoxAlign": "stretch",
               "WebkitBoxDirection": "normal",
               "WebkitBoxOrient": "horizontal",
               "WebkitBoxPack": "justify",
               "WebkitFlexDirection": "row",
               "WebkitJustifyContent": "space-between",
-              "alignItems": "center",
+              "alignItems": "stretch",
               "display": "flex",
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "msFlexAlign": "center",
+              "msFlexAlign": "stretch",
               "msFlexDirection": "row",
               "msFlexPack": "justify",
               "paddingTop": "10px",
@@ -1073,44 +1118,9 @@ exports[`ValidatorsList renders 1`] = `
               }
             }
           >
-            <span
-              className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
-              style={
-                Object {
-                  "borderBottomWidth": "0px",
-                  "borderLeftColor": "rgba(171,173,175,1.00)",
-                  "borderLeftWidth": "0px",
-                  "borderRightWidth": "0px",
-                  "borderTopWidth": "0px",
-                  "color": "rgba(255,255,255,1.00)",
-                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "paddingLeft": "10px",
-                  "paddingRight": "10px",
-                }
-              }
-            >
-              0
-            </span>
-            <span
-              className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
-              style={
-                Object {
-                  "borderBottomWidth": "0px",
-                  "borderLeftColor": "rgba(171,173,175,1.00)",
-                  "borderLeftWidth": "1px",
-                  "borderRightWidth": "0px",
-                  "borderTopWidth": "0px",
-                  "color": "rgba(255,255,255,1.00)",
-                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "paddingLeft": "10px",
-                  "paddingRight": "10px",
-                }
-              }
-            >
-              5
-            </span>
+            0
+            /
+            5
           </span>
           <span
             className="css-text-901oao css-textHasAncestor-16my406"
@@ -1598,18 +1608,18 @@ exports[`ValidatorsList renders 1`] = `
           className="css-view-1dbjc4n"
           style={
             Object {
-              "WebkitAlignItems": "center",
-              "WebkitBoxAlign": "center",
+              "WebkitAlignItems": "stretch",
+              "WebkitBoxAlign": "stretch",
               "WebkitBoxDirection": "normal",
               "WebkitBoxOrient": "horizontal",
               "WebkitBoxPack": "justify",
               "WebkitFlexDirection": "row",
               "WebkitJustifyContent": "space-between",
-              "alignItems": "center",
+              "alignItems": "stretch",
               "display": "flex",
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "msFlexAlign": "center",
+              "msFlexAlign": "stretch",
               "msFlexDirection": "row",
               "msFlexPack": "justify",
               "paddingTop": "10px",
@@ -1892,44 +1902,9 @@ exports[`ValidatorsList renders 1`] = `
               }
             }
           >
-            <span
-              className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
-              style={
-                Object {
-                  "borderBottomWidth": "0px",
-                  "borderLeftColor": "rgba(171,173,175,1.00)",
-                  "borderLeftWidth": "0px",
-                  "borderRightWidth": "0px",
-                  "borderTopWidth": "0px",
-                  "color": "rgba(255,255,255,1.00)",
-                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "paddingLeft": "10px",
-                  "paddingRight": "10px",
-                }
-              }
-            >
-              0
-            </span>
-            <span
-              className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
-              style={
-                Object {
-                  "borderBottomWidth": "0px",
-                  "borderLeftColor": "rgba(171,173,175,1.00)",
-                  "borderLeftWidth": "1px",
-                  "borderRightWidth": "0px",
-                  "borderTopWidth": "0px",
-                  "color": "rgba(255,255,255,1.00)",
-                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "paddingLeft": "10px",
-                  "paddingRight": "10px",
-                }
-              }
-            >
-              0
-            </span>
+            0
+            /
+            0
           </span>
           <span
             className="css-text-901oao css-textHasAncestor-16my406"
@@ -2417,18 +2392,18 @@ exports[`ValidatorsList renders 1`] = `
           className="css-view-1dbjc4n"
           style={
             Object {
-              "WebkitAlignItems": "center",
-              "WebkitBoxAlign": "center",
+              "WebkitAlignItems": "stretch",
+              "WebkitBoxAlign": "stretch",
               "WebkitBoxDirection": "normal",
               "WebkitBoxOrient": "horizontal",
               "WebkitBoxPack": "justify",
               "WebkitFlexDirection": "row",
               "WebkitJustifyContent": "space-between",
-              "alignItems": "center",
+              "alignItems": "stretch",
               "display": "flex",
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "msFlexAlign": "center",
+              "msFlexAlign": "stretch",
               "msFlexDirection": "row",
               "msFlexPack": "justify",
               "paddingTop": "10px",
@@ -2711,44 +2686,9 @@ exports[`ValidatorsList renders 1`] = `
               }
             }
           >
-            <span
-              className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
-              style={
-                Object {
-                  "borderBottomWidth": "0px",
-                  "borderLeftColor": "rgba(171,173,175,1.00)",
-                  "borderLeftWidth": "0px",
-                  "borderRightWidth": "0px",
-                  "borderTopWidth": "0px",
-                  "color": "rgba(255,255,255,1.00)",
-                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "paddingLeft": "10px",
-                  "paddingRight": "10px",
-                }
-              }
-            >
-              1
-            </span>
-            <span
-              className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
-              style={
-                Object {
-                  "borderBottomWidth": "0px",
-                  "borderLeftColor": "rgba(171,173,175,1.00)",
-                  "borderLeftWidth": "1px",
-                  "borderRightWidth": "0px",
-                  "borderTopWidth": "0px",
-                  "color": "rgba(255,255,255,1.00)",
-                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "paddingLeft": "10px",
-                  "paddingRight": "10px",
-                }
-              }
-            >
-              0
-            </span>
+            1
+            /
+            0
           </span>
           <span
             className="css-text-901oao css-textHasAncestor-16my406"
@@ -3236,18 +3176,18 @@ exports[`ValidatorsList renders 1`] = `
           className="css-view-1dbjc4n"
           style={
             Object {
-              "WebkitAlignItems": "center",
-              "WebkitBoxAlign": "center",
+              "WebkitAlignItems": "stretch",
+              "WebkitBoxAlign": "stretch",
               "WebkitBoxDirection": "normal",
               "WebkitBoxOrient": "horizontal",
               "WebkitBoxPack": "justify",
               "WebkitFlexDirection": "row",
               "WebkitJustifyContent": "space-between",
-              "alignItems": "center",
+              "alignItems": "stretch",
               "display": "flex",
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "msFlexAlign": "center",
+              "msFlexAlign": "stretch",
               "msFlexDirection": "row",
               "msFlexPack": "justify",
               "paddingTop": "10px",
@@ -3530,44 +3470,9 @@ exports[`ValidatorsList renders 1`] = `
               }
             }
           >
-            <span
-              className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
-              style={
-                Object {
-                  "borderBottomWidth": "0px",
-                  "borderLeftColor": "rgba(171,173,175,1.00)",
-                  "borderLeftWidth": "0px",
-                  "borderRightWidth": "0px",
-                  "borderTopWidth": "0px",
-                  "color": "rgba(255,255,255,1.00)",
-                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "paddingLeft": "10px",
-                  "paddingRight": "10px",
-                }
-              }
-            >
-              0
-            </span>
-            <span
-              className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
-              style={
-                Object {
-                  "borderBottomWidth": "0px",
-                  "borderLeftColor": "rgba(171,173,175,1.00)",
-                  "borderLeftWidth": "1px",
-                  "borderRightWidth": "0px",
-                  "borderTopWidth": "0px",
-                  "color": "rgba(255,255,255,1.00)",
-                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "paddingLeft": "10px",
-                  "paddingRight": "10px",
-                }
-              }
-            >
-              0
-            </span>
+            0
+            /
+            0
           </span>
           <span
             className="css-text-901oao css-textHasAncestor-16my406"
@@ -4055,18 +3960,18 @@ exports[`ValidatorsList renders 1`] = `
           className="css-view-1dbjc4n"
           style={
             Object {
-              "WebkitAlignItems": "center",
-              "WebkitBoxAlign": "center",
+              "WebkitAlignItems": "stretch",
+              "WebkitBoxAlign": "stretch",
               "WebkitBoxDirection": "normal",
               "WebkitBoxOrient": "horizontal",
               "WebkitBoxPack": "justify",
               "WebkitFlexDirection": "row",
               "WebkitJustifyContent": "space-between",
-              "alignItems": "center",
+              "alignItems": "stretch",
               "display": "flex",
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "msFlexAlign": "center",
+              "msFlexAlign": "stretch",
               "msFlexDirection": "row",
               "msFlexPack": "justify",
               "paddingTop": "10px",
@@ -4349,44 +4254,9 @@ exports[`ValidatorsList renders 1`] = `
               }
             }
           >
-            <span
-              className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
-              style={
-                Object {
-                  "borderBottomWidth": "0px",
-                  "borderLeftColor": "rgba(171,173,175,1.00)",
-                  "borderLeftWidth": "0px",
-                  "borderRightWidth": "0px",
-                  "borderTopWidth": "0px",
-                  "color": "rgba(255,255,255,1.00)",
-                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "paddingLeft": "10px",
-                  "paddingRight": "10px",
-                }
-              }
-            >
-              0
-            </span>
-            <span
-              className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
-              style={
-                Object {
-                  "borderBottomWidth": "0px",
-                  "borderLeftColor": "rgba(171,173,175,1.00)",
-                  "borderLeftWidth": "1px",
-                  "borderRightWidth": "0px",
-                  "borderTopWidth": "0px",
-                  "color": "rgba(255,255,255,1.00)",
-                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "paddingLeft": "10px",
-                  "paddingRight": "10px",
-                }
-              }
-            >
-              0
-            </span>
+            0
+            /
+            0
           </span>
           <span
             className="css-text-901oao css-textHasAncestor-16my406"
@@ -4874,18 +4744,18 @@ exports[`ValidatorsList renders 1`] = `
           className="css-view-1dbjc4n"
           style={
             Object {
-              "WebkitAlignItems": "center",
-              "WebkitBoxAlign": "center",
+              "WebkitAlignItems": "stretch",
+              "WebkitBoxAlign": "stretch",
               "WebkitBoxDirection": "normal",
               "WebkitBoxOrient": "horizontal",
               "WebkitBoxPack": "justify",
               "WebkitFlexDirection": "row",
               "WebkitJustifyContent": "space-between",
-              "alignItems": "center",
+              "alignItems": "stretch",
               "display": "flex",
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "msFlexAlign": "center",
+              "msFlexAlign": "stretch",
               "msFlexDirection": "row",
               "msFlexPack": "justify",
               "paddingTop": "10px",
@@ -5168,44 +5038,9 @@ exports[`ValidatorsList renders 1`] = `
               }
             }
           >
-            <span
-              className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
-              style={
-                Object {
-                  "borderBottomWidth": "0px",
-                  "borderLeftColor": "rgba(171,173,175,1.00)",
-                  "borderLeftWidth": "0px",
-                  "borderRightWidth": "0px",
-                  "borderTopWidth": "0px",
-                  "color": "rgba(255,255,255,1.00)",
-                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "paddingLeft": "10px",
-                  "paddingRight": "10px",
-                }
-              }
-            >
-              0
-            </span>
-            <span
-              className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
-              style={
-                Object {
-                  "borderBottomWidth": "0px",
-                  "borderLeftColor": "rgba(171,173,175,1.00)",
-                  "borderLeftWidth": "1px",
-                  "borderRightWidth": "0px",
-                  "borderTopWidth": "0px",
-                  "color": "rgba(255,255,255,1.00)",
-                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "paddingLeft": "10px",
-                  "paddingRight": "10px",
-                }
-              }
-            >
-              1
-            </span>
+            0
+            /
+            1
           </span>
           <span
             className="css-text-901oao css-textHasAncestor-16my406"
