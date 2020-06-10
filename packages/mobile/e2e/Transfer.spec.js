@@ -164,6 +164,7 @@ describe('Transfer Works', () => {
       .withTimeout(10000)
 
     await element(by.id('commentInput/send')).replaceText(RANDOM_COMMENT)
+    await element(by.id('commentInput/send')).tapReturnKey()
 
     await element(by.id('ConfirmButton')).tap()
   })
