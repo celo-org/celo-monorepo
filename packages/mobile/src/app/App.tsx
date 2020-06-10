@@ -30,7 +30,7 @@ enableScreens()
 
 Logger.debug('App/init', 'Current Language: ' + i18n.language)
 YellowBox.ignoreWarnings([
-  'componentWillReceiveProps',
+  'componentWillRe{}',
   'Remote debugger', // To avoid "Remote debugger in background tab" warning
   'cancelTouches', // rn-screens warning on iOS
   'Setting a timer', // warns about long setTimeouts which are actually saga timeouts
@@ -52,7 +52,7 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 
 export class App extends React.Component {
   async componentDidMount() {
-    CeloAnalytics.track(DefaultEventNames.appLoaded, this.props, true)
+    CeloAnalytics.track(DefaultEventNames.appLoaded, {}, true)
     const appLoadedAt: Date = new Date()
     const appStartListener = DeviceEventEmitter.addListener(
       'AppStartedLoading',
