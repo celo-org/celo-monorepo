@@ -2,9 +2,8 @@ import Touchable from '@celo/react-components/components/Touchable'
 import colors, { Colors } from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { debounce } from 'lodash'
-
 import React, { ReactNode, useCallback } from 'react'
-import { StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native'
+import { ActivityIndicator, StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native'
 
 const BUTTON_TAP_DEBOUNCE_TIME = 300 // milliseconds
 const DEBOUNCE_OPTIONS = {
@@ -28,7 +27,7 @@ export interface ButtonProps {
   onPress: () => void
   style?: StyleProp<ViewStyle>
   text: string | ReactNode
-
+  showLoading?: boolean
   accessibilityLabel?: string
   type?: BtnTypes
   disabled?: boolean
@@ -37,7 +36,16 @@ export interface ButtonProps {
 }
 
 export default React.memo(function Button(props: ButtonProps) {
-  const { accessibilityLabel, disabled, size, testID, text, type = BtnTypes.PRIMARY, style } = props
+  const {
+    accessibilityLabel,
+    disabled,
+    size,
+    testID,
+    text,
+    type = BtnTypes.PRIMARY,
+    style,
+    showLoading,
+  } = props
 
   // Debounce onPress event so that it is called once on trigger and
   // consecutive calls in given period are ignored.
@@ -58,12 +66,16 @@ export default React.memo(function Button(props: ButtonProps) {
           style={getStyle(size, backgroundColor)}
           testID={testID}
         >
-          <Text
-            accessibilityLabel={accessibilityLabel}
-            style={{ ...fontStyles.regular600, color: textColor }}
-          >
-            {text}
-          </Text>
+          {showLoading ? (
+            <ActivityIndicator size="small" color={colors.celoGreen} />
+          ) : (
+            <Text
+              accessibilityLabel={accessibilityLabel}
+              style={{ ...fontStyles.regular600, color: textColor }}
+            >
+              {text}
+            </Text>
+          )}
         </Touchable>
       </View>
     </View>
