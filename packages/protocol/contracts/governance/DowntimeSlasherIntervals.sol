@@ -8,7 +8,8 @@ import "./SlasherUtil.sol";
 contract DowntimeSlasherIntervals is SlasherUtil {
   using SafeMath for uint256;
 
-  // Maps validator address -> epoch number -> a list of block intervals for which the validator has been slashed.
+  // Maps validator address -> epoch number -> a block interval for which the
+  // validator has been slashed.
   mapping(address => mapping(uint256 => uint256[2])) slashedIntervals;
 
   // Maps startBlock -> endBlock -> signature bitmap for that interval.
