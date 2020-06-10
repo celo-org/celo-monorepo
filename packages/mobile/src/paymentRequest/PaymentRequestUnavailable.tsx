@@ -20,7 +20,7 @@ const navigateHome = () => navigate(Screens.WalletHome)
 export const paymentRequestUnavailableScreenNavOptions = () => ({
   ...emptyHeader,
   headerLeft: () => <TopBarIconButton icon={<Times />} onPress={navigateHome} />,
-  headerLeftContainerStyle: { paddingLeft: 20 },
+  headerLeftContainerStyle: styles.headerContainer,
 })
 
 const PaymentRequestUnavailable = (props: Props) => {
@@ -57,6 +57,9 @@ const styles = StyleSheet.create({
     paddingVertical: 32,
     justifyContent: 'flex-start',
   },
+  headerContainer: {
+    paddingLeft: 16,
+  },
   requestHeader: {
     ...fontStyles.h2,
     paddingVertical: 20,
@@ -66,7 +69,7 @@ const styles = StyleSheet.create({
   body: {
     ...fontStyles.regular,
     textAlign: 'center',
-    paddingBottom: 20,
+    paddingBottom: 24,
   },
 })
 

@@ -116,7 +116,7 @@ export const sendScreenNavOptions = ({
         }
       />
     ),
-    headerLeftContainerStyle: { paddingLeft: 20 },
+    headerLeftContainerStyle: styles.headerContainer,
     headerRight: () => (
       <TopBarIconButton
         icon={<QRCodeBorderlessIcon height={32} color={colors.greenUI} />}
@@ -126,7 +126,7 @@ export const sendScreenNavOptions = ({
         onPress={goQr}
       />
     ),
-    headerRightContainerStyle: { paddingRight: 16 },
+    headerRightContainerStyle: styles.headerContainer,
     headerTitle: title,
   }
 }
@@ -306,7 +306,7 @@ class Send extends React.Component<Props, State> {
     return (
       // Intentionally not using SafeAreaView here as RecipientPicker
       // needs fullscreen rendering
-      <View style={style.body}>
+      <View style={styles.body}>
         <DisconnectBanner />
         <SendSearchInput isPhoneEnabled={numberVerified} onChangeText={this.onSearchQueryChanged} />
         <RecipientPicker
@@ -322,21 +322,13 @@ class Send extends React.Component<Props, State> {
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   body: {
     flex: 1,
     backgroundColor: colors.background,
   },
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-  },
-  icon: {
-    marginBottom: 20,
-    height: 60,
-    width: 60,
+  headerContainer: {
+    paddingLeft: 16,
   },
 })
 
