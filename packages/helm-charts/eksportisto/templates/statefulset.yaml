@@ -35,15 +35,24 @@ spec:
         prometheus.io/port: "8080"
         prometheus.io/scrape: "true"
     spec:
+      initContainers:
+      - name: init-sensitive-accounts
+        image: alpine
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        command: ['cp', '-L', '/var/config/sensitive-accounts.json', '/root/.eksportisto/']
+        volumeMounts:
+        - name: data
+          mountPath: /root/.eksportisto
+        - name: config
+          mountPath: /var/config
       containers:
       - name: eksportisto-{{ .Values.deploymentSuffix }}
         image: {{ .Values.imageRepository }}:{{ .Values.imageTag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         args:
-          - --nodeUri
-          - $(WEB3_PROVIDER)
-          - --datadir
-          - /root/.eksportisto
+          - "-nodeUri={{ .Values.web3Provider }}"
+          - "-datadir=/root/.eksportisto"
+          - "-sensitiveAccounts=/root/.eksportisto/sensitive-accounts.json"
         resources:
           requests:
             memory: 100Mi
@@ -54,9 +63,12 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /root/.eksportisto
-        env:
-        - name: WEB3_PROVIDER
-          value: {{ .Values.web3Provider }}
+        - name: config
+          mountPath: /var/config
       volumes:
       - name: data
         emptyDir: {}
+      - name: config
+        configMap:
+          name: config
+

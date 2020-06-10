@@ -31,6 +31,10 @@ export const pagePaths = {
     name: 'Community',
     link: '/community',
   },
+  EVENTS_KIT: {
+    name: 'EventKit',
+    link: '/experience/events',
+  },
   DEVELOPERS: {
     name: 'Developers',
     link: '/developers',
@@ -172,6 +176,33 @@ export const hashNav = {
     overview: 'overview',
   },
   brandTypography: { overview: 'overview', scale: 'type-scale' },
+  eventsIntro: {
+    overview: 'overview',
+    brandVoice: 'brand-voice',
+  },
+  eventsFlavor: {
+    overview: 'overview',
+    codeOfConduct: 'code-of-conduct',
+    foster: 'foster',
+    uniqueGifts: 'unique-gifts',
+    rituals: 'rituals',
+    tenets: 'tenets',
+  },
+  eventsResources: {
+    overview: 'overview',
+    quickTips: 'quick-tips',
+    planning: 'planning',
+    social: 'social-media',
+  },
+  eventExamples: {
+    examples: 'examples',
+    slideDecks: 'slide-decks',
+    videos: 'videos',
+  },
+  eventCircles: {
+    overview: 'overview',
+    sponsorship: 'sponsorship',
+  },
 }
 
 export default pagePaths

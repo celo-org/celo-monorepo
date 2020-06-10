@@ -50,7 +50,7 @@ import { currentAccountSelector } from 'src/web3/selectors'
 interface StateProps {
   account: string | null
   isSending: boolean
-  defaultCountryCode: string
+  defaultCountryCode: string | null
   dollarBalance: string
   appConnected: boolean
   transactionData: TransactionDataInput

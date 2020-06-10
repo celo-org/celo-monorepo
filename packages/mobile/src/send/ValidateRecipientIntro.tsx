@@ -42,9 +42,12 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
 
 class ValidateRecipientIntro extends React.Component<Props> {
   onPressScanCode = () => {
-    navigate(Screens.QRScanner, {
-      transactionData: this.props.transactionData,
-      scanIsForSecureSend: true,
+    navigate(Screens.QRNavigator, {
+      screen: Screens.QRScanner,
+      params: {
+        transactionData: this.props.transactionData,
+        scanIsForSecureSend: true,
+      },
     })
   }
 

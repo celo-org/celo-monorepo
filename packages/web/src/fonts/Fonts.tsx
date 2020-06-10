@@ -126,7 +126,7 @@ function listType(listStyle: ListType) {
     case ListType.alpha:
       return styles.alpha
     default:
-      return styles.bullet
+      return styles.initial
   }
 }
 
@@ -138,7 +138,11 @@ export function Li(props: TextProps & TextChildren) {
     props.style,
   ])
   return (
-    <Text style={style} accessibilityRole={'listitem'}>
+    <Text
+      // @ts-ignore
+      style={style}
+      accessibilityRole={'listitem'}
+    >
       {props.children}
     </Text>
   )
@@ -160,8 +164,13 @@ const styles = StyleSheet.create({
     listStyle: 'disc',
     display: 'list-item',
   },
+  initial: {
+    listStyle: 'inherit',
+    display: 'list-item',
+  },
   ul: {
     marginTop: 20,
     paddingLeft: 20,
+    listStyle: 'disc',
   },
 })

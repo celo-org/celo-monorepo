@@ -8,13 +8,10 @@ dockerfiles
 .vscode
 
 # not docker packages
-packages/analytics
 packages/blockchain-api
 packages/docs
 packages/faucet
 packages/helm-charts
 packages/mobile
 packages/notification-service
-# packages/verification-pool-api
-packages/verifier
 packages/web
