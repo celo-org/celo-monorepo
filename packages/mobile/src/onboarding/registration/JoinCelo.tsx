@@ -15,7 +15,6 @@ import { hideAlert, showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
-import NuxLogo from 'src/icons/NuxLogo'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -152,7 +151,6 @@ export class JoinCelo extends React.Component<Props, State> {
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="always"
         >
-          <NuxLogo />
           <Text style={fontStyles.h1} testID="InviteWallTitle">
             {t('welcomeCelo')}
           </Text>
