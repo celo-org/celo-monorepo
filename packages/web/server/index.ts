@@ -6,6 +6,7 @@ import expressEnforcesSsl from 'express-enforces-ssl'
 import helmet from 'helmet'
 import next from 'next'
 import nextI18NextMiddleware from 'next-i18next/middleware'
+import path from 'path'
 import { Tables } from '../fullstack/EcoFundFields'
 import addToCRM from '../server/addToCRM'
 import ecoFundSubmission from '../server/EcoFundApp'
@@ -23,6 +24,7 @@ import respondError from './respondError'
 
 const CREATED = 201
 const NO_CONTENT = 204
+const MOVED_PERMANENTLY = 301
 
 const port = parseInt(process.env.PORT, 10) || 3000
 
@@ -34,7 +36,7 @@ const handle = app.getRequestHandler()
 function wwwRedirect(req: express.Request, res: express.Response, nextAction: () => unknown) {
   if (req.headers.host.startsWith('www.')) {
     const newHost = req.headers.host.slice(4)
-    return res.redirect(301, req.protocol + '://' + newHost + req.originalUrl)
+    return res.redirect(MOVED_PERMANENTLY, req.protocol + '://' + newHost + req.originalUrl)
   }
   nextAction()
 }
@@ -121,23 +123,49 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
     res.redirect('https://forum.celo.org/t/the-great-celo-stake-off-the-details/136')
   })
 
-  // Redirects for OpenPGP Web Key Directory https://gnupg.org/blog/20161027-hosting-a-web-key-directory.html.
-  ;[
-    '/.well-known/openpgpkey/hu/:userId',
-    '/.well-known/openpgpkey/celo.org/hu/:userId',
-    '/.well-known/openpgpkey/clabs.co/hu/:userId',
-  ].forEach((path) => {
-    server.get(path, (req, res) => {
-      res.redirect(301, '/openpgpkey/clabs.co/hu/' + req.params['userId'] ?? '')
-    })
-  })
-  ;[
-    '/.well-known/openpgpkey/policy',
-    '/.well-known/openpgpkey/celo.org/policy',
-    '/.well-known/openpgpkey/clabs.co/policy',
-  ].forEach((path) => {
-    server.get(path, (_, res) => {
-      res.redirect(301, '/openpgpkey/clabs.co/policy')
+  // Redirects for OpenPGP WKD https://gnupg.org/blog/20161027-hosting-a-web-key-directory.html
+  // Content must be served on multiple paths, and cannot use a redirect.
+  ;['/.well-known/openpgpkey/hu/:userId', '/.well-known/openpgpkey/:host/hu/:userId'].forEach(
+    (route) => {
+      server.get(route, (req, res) => {
+        const host = req.params['host'] ?? req.hostname
+        if (!req.hostname.includes(host)) {
+          res.sendStatus(400)
+          return
+        }
+        const userId = req.params['userId'] ?? ''
+        if (!/\w+/.test(userId)) {
+          res.sendStatus(400)
+          return
+        }
+        res.sendFile(
+          path.join(host, 'hu', userId),
+          { root: path.join(process.cwd(), 'openpgpkey') },
+          (err) => {
+            if (err) {
+              res.sendStatus(404)
+            }
+          }
+        )
+      })
+    }
+  )
+  ;['/.well-known/openpgpkey/policy', '/.well-known/openpgpkey/:host/policy'].forEach((route) => {
+    server.get(route, (req, res) => {
+      const host = req.params['host'] ?? req.hostname
+      if (!req.hostname.includes(host)) {
+        res.sendStatus(400)
+        return
+      }
+      res.sendFile(
+        path.join(host, 'policy'),
+        { root: path.join(process.cwd(), 'openpgpkey') },
+        (err) => {
+          if (err) {
+            res.sendStatus(404)
+          }
+        }
+      )
     })
   })
 
