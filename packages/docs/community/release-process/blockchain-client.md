@@ -26,7 +26,7 @@ Work in progress: Core developer keys are not yet hosted.
 Public keys for these developers are hosted on celo.org and can be imported to `gpg` with the following command:
 
 ```bash
-gpg --auto-key-locate wkd --locate-keys $NAME@celo.org
+gpg --auto-key-locate wkd --locate-keys $EMAIL
 ```
 
 ## Documentation
