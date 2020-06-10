@@ -1,6 +1,6 @@
 ---
 title: Celo Community Code of Conduct
-description: The Celo Code of Conduct is one of the ways we bring our value of connectedness into practice. 
+description: The Celo Code of Conduct is one of the ways we bring our value of connectedness into practice.
 ---
 
 ### 1. Purpose
