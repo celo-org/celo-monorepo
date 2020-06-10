@@ -111,7 +111,7 @@ export const sendScreenNavOptions = ({
 }: {
   route: RouteProp<StackParamList, Screens.Send>
 }) => {
-  const goQr = () => navigate(Screens.QRCode)
+  const goQr = () => navigate(Screens.QRNavigator)
   const title = route.params?.isRequest
     ? i18n.t('paymentRequestFlow:request')
     : i18n.t('sendFlow7:send')
