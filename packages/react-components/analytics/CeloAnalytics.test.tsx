@@ -45,8 +45,8 @@ it('tracks events with subEvents correctly', () => {
       step2: 1500,
       __endTracking__: 500,
       __totalTime__: 3000,
-      prop1: 'value1',
-      prop2: 'value2',
+      address: '0xblablabla',
+      validationType: 0,
     },
     false
   )
