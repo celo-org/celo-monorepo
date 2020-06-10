@@ -1024,7 +1024,7 @@ workflows:
           requires:
             - lint-checks
             - contractkit-test
-      ## Enable for debug cronjob
+      ## Enable for debuging cronjob
       # - integration-sync-geth-mainnet:
       #     requires:
       #       - lint-checks

@@ -24,11 +24,6 @@ export const builder = (argv: yargs.Argv) => {
       description: 'Storageclass to use for pvcs',
       default: 'standard',
     })
-    .option('storageClass', {
-      type: 'string',
-      description: 'Storageclass to use for pvcs',
-      default: 'standard',
-    })
     .option('gethTag', {
       type: 'string',
       description: 'Celo Blockchain image tag to use',
