@@ -5,7 +5,6 @@ import SearchUser from '@celo/react-components/icons/SearchUser'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { StackScreenProps } from '@react-navigation/stack'
-import BigNumber from 'bignumber.js'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BackHandler, StyleSheet, Text, View } from 'react-native'
@@ -17,21 +16,14 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import ErrorMessageInline from 'src/components/ErrorMessageInline'
 import { Namespaces } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
-import { LOOKUP_PURCHASE_FEE } from 'src/identity/privateHashing'
+import { LOOKUP_GAS_FEE_ESTIMATE } from 'src/identity/privateHashing'
+import { isUserBalanceSufficient } from 'src/identity/utils'
 import { emptyHeader } from 'src/navigator/Headers.v2'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 
 type Props = StackScreenProps<StackParamList, Screens.PhoneNumberLookupQuota>
-
-export function isUserBalanceSufficient(userBalance: string | null, estimatedFee: number | string) {
-  if (!userBalance || new BigNumber(userBalance) < new BigNumber(estimatedFee)) {
-    return false
-  }
-
-  return true
-}
 
 export const phoneNumberLookupQuotaScreeOptions = () => ({
   ...emptyHeader,
@@ -43,7 +35,7 @@ function PhoneNumberLookupQuotaScreen(props: Props) {
   const userBalance = useSelector(stableTokenBalanceSelector)
   const { t } = useTranslation(Namespaces.nuxVerification2)
 
-  const userBalanceIsSufficient = isUserBalanceSufficient(userBalance, LOOKUP_PURCHASE_FEE)
+  const userBalanceIsSufficient = isUserBalanceSufficient(userBalance, LOOKUP_GAS_FEE_ESTIMATE)
 
   const onSkip = () => {
     CeloAnalytics.track(CustomEventNames.phone_number_quota_purchase_skip)

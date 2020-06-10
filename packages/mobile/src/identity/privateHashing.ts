@@ -7,9 +7,9 @@ import { e164NumberSelector } from 'src/account/selectors'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import networkConfig from 'src/geth/networkConfig'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
-import { isUserBalanceSufficient } from 'src/identity/PhoneNumberLookupQuotaScreen'
 import { postToPhoneNumPrivacyService } from 'src/identity/phoneNumPrivacyService'
 import { e164NumberToSaltSelector, E164NumberToSaltType } from 'src/identity/reducer'
+import { isUserBalanceSufficient } from 'src/identity/utils'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { transferStableToken } from 'src/stableToken/actions'
@@ -24,7 +24,7 @@ import { currentAccountSelector } from 'src/web3/selectors'
 const TAG = 'identity/privateHashing'
 const SIGN_MESSAGE_ENDPOINT = '/getBlindedSalt'
 export const SALT_CHAR_LENGTH = 13
-export const LOOKUP_PURCHASE_FEE = 0.01 // one penny
+export const LOOKUP_GAS_FEE_ESTIMATE = 0.03
 
 export interface PhoneNumberHashDetails {
   e164Number: string
@@ -220,7 +220,7 @@ function* navigateToQuotaPurchaseScreen() {
     const txId = generateStandbyTransactionId(ownAddress)
 
     const userBalance = yield select(stableTokenBalanceSelector)
-    const userBalanceSufficient = isUserBalanceSufficient(userBalance, LOOKUP_PURCHASE_FEE)
+    const userBalanceSufficient = isUserBalanceSufficient(userBalance, LOOKUP_GAS_FEE_ESTIMATE)
     if (!userBalanceSufficient) {
       throw Error(ErrorMessages.INSUFFICIENT_BALANCE)
     }
@@ -228,7 +228,7 @@ function* navigateToQuotaPurchaseScreen() {
     yield put(
       transferStableToken({
         recipientAddress: ownAddress, // send payment to yourself
-        amount: LOOKUP_PURCHASE_FEE.toString(),
+        amount: '0.01', // one penny
         comment: 'Lookup Quota Purchase',
         txId,
       })

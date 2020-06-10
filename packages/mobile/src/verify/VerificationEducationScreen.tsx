@@ -15,14 +15,13 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import ErrorMessageInline from 'src/components/ErrorMessageInline'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { setHasSeenVerificationNux } from 'src/identity/actions'
-import { isUserBalanceSufficient } from 'src/identity/PhoneNumberLookupQuotaScreen'
+import { isUserBalanceSufficient } from 'src/identity/utils'
 import { INVITE_FEE } from 'src/invite/saga'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 
-// Open to better suggestions for estimates
 const VERIFICATION_FEE_ESTIMATE = Number(INVITE_FEE) * 0.9
 
 interface DispatchProps {
