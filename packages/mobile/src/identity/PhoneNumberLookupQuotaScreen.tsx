@@ -6,7 +6,7 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { StackScreenProps } from '@react-navigation/stack'
 import React, { useEffect, useState } from 'react'
-import { useTranslation, WithTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { BackHandler, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { useSelector } from 'react-redux'
@@ -21,7 +21,7 @@ import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 
-type Props = WithTranslation & StackScreenProps<StackParamList, Screens.PhoneNumberLookupQuota>
+type Props = StackScreenProps<StackParamList, Screens.PhoneNumberLookupQuota>
 
 export function isUserBalanceSufficient(userBalance: string | null, estimatedFee: number) {
   if (!userBalance || Number(userBalance) < estimatedFee) {
