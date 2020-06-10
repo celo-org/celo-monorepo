@@ -105,9 +105,9 @@ Distribution of an image should occur along the following schedule:
     <td>T</td>
     <td>
       <ol>
-        <li>Publish the Git tag and signed release image.</li>
-        <li>Communicate T+1w baklava upgrade date.</li>
-        <li>Tag release image with <code>baklava</code></li>
+        <li>Publish the Git tag and signed release artifacts.</li>
+        <li>Communicate T+1w Baklava upgrade date.</li>
+        <li>Tag released Docker image with <code>baklava</code>.</li>
       </ol>
     </td>
   </tr>
@@ -115,12 +115,14 @@ Distribution of an image should occur along the following schedule:
     <td>T+1w</td>
     <td>
       <ol>
-        <li>Confirm some baklava users have upgraded without issues</li>
+        <li>Confirm Baklava users have upgraded without issues</li>
         <li>If release introduces a hard fork</li>
-        <li>Ensure at least a quorum of the validator set has upgraded</li>
-        <li>Submit governance proposal to increment minimum client version</li>
+        <ol>
+          <li>Ensure at least a quorum of the validator set has upgraded</li>
+          <li>Submit governance proposal to increment minimum client version</li>
+        </ol>
         <li>Communicate T+2w Alfajores upgrade date</li>
-        <li>Tag release image with <code>alfajores</code></li>
+        <li>Tag released Docker image with <code>alfajores</code></li>
       </ol>
     </td>
   </tr>
@@ -130,10 +132,12 @@ Distribution of an image should occur along the following schedule:
       <ol>
         <li>Confirm Alfajores users have upgraded without issues</li>
         <li>If release introduces a hard fork</li>
-        <li>Ensure at least a quorum of the validator set has upgraded</li>
-        <li>Submit governance proposal to increment minimum client version </li>
-        <li>Communicate T+3w mainnet upgrade date</li>
-        <li>Tag release image with <code>mainnet</code> and <code>latest</code></li>
+        <ol>
+          <li>Ensure at least a quorum of the validator set has upgraded</li>
+          <li>Submit governance proposal to increment minimum client version </li>
+        <ol>
+        <li>Communicate T+3w Mainnet upgrade date</li>
+        <li>Tag released Docker image with <code>mainnet</code> and <code>latest</code></li>
       </ol>
     </td>
   </tr>
@@ -141,10 +145,12 @@ Distribution of an image should occur along the following schedule:
     <td>T+3w</td>
     <td>
       <ol>
-        <li>Confirm mainnet users have upgraded without issues</li>
+        <li>Confirm Mainnet users have upgraded without issues</li>
         <li>If release introduces a hard fork</li>
-        <li>Ensure at least a quorum of the validator set has upgraded</li>
-        <li>Submit governance proposal to increment minimum client version</li>
+        <ol>
+          <li>Ensure at least a quorum of the validator set has upgraded</li>
+          <li>Submit governance proposal to increment minimum client version</li>
+        </ol>
       </ol>
     </td>
   </tr>
