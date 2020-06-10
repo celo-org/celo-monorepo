@@ -91,7 +91,7 @@ Patch releases should be constructed by cherry-picking all included commits from
 
 Major and minor releases should be constructed by pushing a commit to the `master` branch to change the encoded version number from `x.y.z-unstable` to `x.y.z-stable`. A `release/x.y` branch should be created from this commit.  The next commit must change the version number from `x.y.z-stable` to `x.y+1.0-unstable`, or `x+1.0.0-unstable` if the next planned release is a major release.
 
-Only one commit should ever have a “stable” tag at any given version number. When that commit is created, a tag should be added along with release notes. Once the tag is published it should not be reused for any further release or chnages.
+Only one commit should ever have a “stable” tag at any given version number. When that commit is created, a tag should be added along with release notes. Once the tag is published it should not be reused for any further release or changes.
 
 ### Distribution
 Distribution of an image should occur along the following schedule:
@@ -119,7 +119,7 @@ Distribution of an image should occur along the following schedule:
         <li>If release introduces a hard fork</li>
         <li>Ensure at least a quorum of the validator set has upgraded</li>
         <li>Submit governance proposal to increment minimum client version</li>
-        <li>Communicate T+2w alfajores upgrade date</li>
+        <li>Communicate T+2w Alfajores upgrade date</li>
         <li>Tag release image with `alfajores`</li>
       </ol>
     </td>
@@ -128,7 +128,7 @@ Distribution of an image should occur along the following schedule:
     <td>T+2w</td>
     <td>
       <ol>
-        <li>Confirm alfajores users have upgraded without issues</li>
+        <li>Confirm Alfajores users have upgraded without issues</li>
         <li>If release introduces a hard fork</li>
         <li>Ensure at least a quorum of the validator set has upgraded</li>
         <li>Submit governance proposal to increment minimum client version </li>

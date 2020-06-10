@@ -51,7 +51,7 @@ This script does the following:
   4. For contracts that have not changed, confirms that the version number in the current branch is exactly the same as the deployed version number
   5. For contracts that have changed, deploys those contracts to the specified network.
   6. Creates and submits a single governance proposal to upgrade to the newly deployed contracts.
-    1. STORAGE updates are adopted by deploying a new proxy and implementation and updating the Regsitry contract.
+    1. STORAGE updates are adopted by deploying a new proxy and implementation and updating the Registry contract.
     2. All other updates are adopted by updating the proxy contract’s implementation pointer.
 
 ## Testing
@@ -142,7 +142,7 @@ Deploying a new contract release should occur with the following process:
   </tr>
 </table>
 
-If the contents of the release (i.e. the source Git commit) change at any point after the release has been tagged on Github, the process should increment the release identifier, and process should start again from the beginning. If the changes are small or do not introduce new code (e.g. reverting a contract to a previous version) the audit step may be accelerated.
+If the contents of the release (i.e. source Git commit) change at any point after the release has been tagged on Github, the process should increment the release identifier, and process should start again from the beginning. If the changes are small or do not introduce new code (e.g. reverting a contract to a previous version) the audit step may be accelerated.
 
 ### Emergency patches
 
