@@ -15,7 +15,7 @@ import { Task } from 'redux-saga'
 import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'
 import { setRetryVerificationWithForno } from 'src/account/actions'
 import { e164NumberSelector } from 'src/account/selectors'
-import { showError, showMessage } from 'src/alert/actions'
+import { showError, showErrorOrFallback, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { setNumberVerified } from 'src/app/actions'
@@ -91,6 +91,7 @@ export function* startVerification() {
 
 export function* doVerificationFlow() {
   try {
+    CeloAnalytics.track(CustomEventNames.verification_start)
     yield put(setVerificationStatus(VerificationStatus.Prepping))
     const account: string = yield call(getConnectedUnlockedAccount)
     const e164Number: string = yield select(e164NumberSelector)
@@ -186,11 +187,7 @@ export function* doVerificationFlow() {
     return true
   } catch (error) {
     Logger.error(TAG, 'Error occured during verification flow', error)
-    if (error.message in ErrorMessages) {
-      yield put(showError(error.message))
-    } else {
-      yield put(showError(ErrorMessages.VERIFICATION_FAILURE))
-    }
+    yield put(showErrorOrFallback(error, ErrorMessages.VERIFICATION_FAILURE))
     yield put(setVerificationStatus(VerificationStatus.Failed))
     return false
   }

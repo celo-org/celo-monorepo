@@ -1,6 +1,7 @@
 import { ContractKit } from '@celo/contractkit'
 import crypto from 'crypto'
 import { call, put } from 'redux-saga/effects'
+import { ErrorMessages } from 'src/app/ErrorMessages'
 import { addContactsMatches } from 'src/identity/actions'
 import { postToPhoneNumPrivacyService } from 'src/identity/phoneNumPrivacyService'
 import { getUserSelfPhoneHashDetails, PhoneNumberHashDetails } from 'src/identity/privateHashing'
@@ -101,13 +102,20 @@ async function postToMatchmaking(
     hashedPhoneNumber: selfPhoneHash,
   }
 
-  const response = await postToPhoneNumPrivacyService<MatchmakingResponse>(
-    account,
-    contractKit,
-    body,
-    MATCHMAKING_ENDPOINT
-  )
-  return response.matchedContacts.map((match) => match.phoneNumber)
+  try {
+    const response = await postToPhoneNumPrivacyService<MatchmakingResponse>(
+      account,
+      contractKit,
+      body,
+      MATCHMAKING_ENDPOINT
+    )
+    return response.matchedContacts.map((match) => match.phoneNumber)
+  } catch (error) {
+    if (error.message === ErrorMessages.PGPNP_QUOTA_ERROR) {
+      throw new Error(ErrorMessages.MATHMAKING_QUOTA_EXCEEDED)
+    }
+    throw error
+  }
 }
 
 function getMatchedContacts(
