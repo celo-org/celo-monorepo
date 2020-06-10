@@ -142,6 +142,12 @@ export const mockRecipient3: RecipientWithContact = {
   address: mockAccount2Invite,
 }
 
+export const mockRecipient4: RecipientWithContact = {
+  kind: RecipientKind.Contact,
+  displayName: 'Zebra Zone',
+  contactId: 'contactId4',
+}
+
 export const mockE164NumberToInvitableRecipient = {
   [mockE164Number]: mockInvitableRecipient,
   [mockE164NumberInvite]: mockInvitableRecipient2,
