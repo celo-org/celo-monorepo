@@ -7,6 +7,7 @@ import { e164NumberSelector } from 'src/account/selectors'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import networkConfig from 'src/geth/networkConfig'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
+import { isUserBalanceSufficient } from 'src/identity/PhoneNumberLookupQuotaScreen'
 import { postToPhoneNumPrivacyService } from 'src/identity/phoneNumPrivacyService'
 import { e164NumberToSaltSelector, E164NumberToSaltType } from 'src/identity/reducer'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
@@ -219,8 +220,9 @@ function* navigateToQuotaPurchaseScreen() {
     const txId = generateStandbyTransactionId(ownAddress)
 
     const userBalance = yield select(stableTokenBalanceSelector)
-    if (!userBalance || Number(userBalance) < 0.01) {
-      throw Error('Insufficient balance to purchase lookups')
+    const userBalanceSufficient = isUserBalanceSufficient(userBalance, LOOKUP_PURCHASE_FEE)
+    if (!userBalanceSufficient) {
+      throw Error(ErrorMessages.INSUFFICIENT_BALANCE)
     }
 
     yield put(

@@ -44,7 +44,9 @@ import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
 import FeeExchangeEducation from 'src/exchange/FeeExchangeEducation'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
-import PhoneNumberLookupQuotaScreen from 'src/identity/PhoneNumberLookupQuotaScreen'
+import PhoneNumberLookupQuotaScreen, {
+  phoneNumberLookupQuotaScreeOptions,
+} from 'src/identity/PhoneNumberLookupQuotaScreen'
 import ImportWallet from 'src/import/ImportWallet'
 import ImportWalletEmpty from 'src/import/ImportWalletEmpty'
 import ImportWalletSocial from 'src/import/ImportWalletSocial'
@@ -112,6 +114,7 @@ const commonScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen
         name={Screens.PhoneNumberLookupQuota}
         component={PhoneNumberLookupQuotaScreen}
+        options={phoneNumberLookupQuotaScreeOptions}
       />
     </>
   )

@@ -5,6 +5,7 @@ import SearchUser from '@celo/react-components/icons/SearchUser'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { StackScreenProps } from '@react-navigation/stack'
+import BigNumber from 'bignumber.js'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BackHandler, StyleSheet, Text, View } from 'react-native'
@@ -17,19 +18,25 @@ import ErrorMessageInline from 'src/components/ErrorMessageInline'
 import { Namespaces } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
 import { LOOKUP_PURCHASE_FEE } from 'src/identity/privateHashing'
+import { emptyHeader } from 'src/navigator/Headers.v2'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 
 type Props = StackScreenProps<StackParamList, Screens.PhoneNumberLookupQuota>
 
-export function isUserBalanceSufficient(userBalance: string | null, estimatedFee: number) {
-  if (!userBalance || Number(userBalance) < estimatedFee) {
+export function isUserBalanceSufficient(userBalance: string | null, estimatedFee: number | string) {
+  if (!userBalance || new BigNumber(userBalance) < new BigNumber(estimatedFee)) {
     return false
   }
 
   return true
 }
+
+export const phoneNumberLookupQuotaScreeOptions = () => ({
+  ...emptyHeader,
+  gestureEnabled: false,
+})
 
 function PhoneNumberLookupQuotaScreen(props: Props) {
   const [isSending, setIsSending] = useState(false)
@@ -53,9 +60,7 @@ function PhoneNumberLookupQuotaScreen(props: Props) {
   useEffect(() => {
     BackHandler.addEventListener('hardwareBackPress', onSkip)
 
-    return function cleanup() {
-      BackHandler.removeEventListener('hardwareBackPress', onSkip)
-    }
+    return () => BackHandler.removeEventListener('hardwareBackPress', onSkip)
   }, [])
 
   return (
