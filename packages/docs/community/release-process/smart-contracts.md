@@ -89,7 +89,7 @@ Deploying a new contract release should occur with the following process:
     <td>T</td>
     <td>
       <ol>
-        <li>Create a `release/contracts/N` branch at the desired commit.</li>
+        <li>Create a <code>release/contracts/N</code> branch at the desired commit.</li>
         <li>Submit this branch to a reputable third party auditor for review.</li>
       </ol>
     </td>
@@ -100,7 +100,7 @@ Deploying a new contract release should occur with the following process:
       <ol>
         <li>Receive report from auditors.</li>
         <li>If all issues in the audit report have straightforward fixes, announce a forthcoming smart contract release. </li>
-        <li>Commit audit fixes to `master` and cherry-pick to the release branch.</li>
+        <li>Commit audit fixes to <code>master</code> and cherry-pick to the release branch.</li>
         <li>Submit audit fixes to auditors for review. </li>
       </ol>
     </td>

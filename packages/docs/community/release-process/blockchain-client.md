@@ -107,7 +107,7 @@ Distribution of an image should occur along the following schedule:
       <ol>
         <li>Publish the Git tag and signed release image.</li>
         <li>Communicate T+1w baklava upgrade date.</li>
-        <li>Tag release image with `baklava`</li>
+        <li>Tag release image with <code>baklava</code></li>
       </ol>
     </td>
   </tr>
@@ -120,7 +120,7 @@ Distribution of an image should occur along the following schedule:
         <li>Ensure at least a quorum of the validator set has upgraded</li>
         <li>Submit governance proposal to increment minimum client version</li>
         <li>Communicate T+2w Alfajores upgrade date</li>
-        <li>Tag release image with `alfajores`</li>
+        <li>Tag release image with <code>alfajores</code></li>
       </ol>
     </td>
   </tr>
@@ -133,7 +133,7 @@ Distribution of an image should occur along the following schedule:
         <li>Ensure at least a quorum of the validator set has upgraded</li>
         <li>Submit governance proposal to increment minimum client version </li>
         <li>Communicate T+3w mainnet upgrade date</li>
-        <li>Tag release image with `mainnet` and `latest`</li>
+        <li>Tag release image with <code>mainnet</code> and <code>latest</code></li>
       </ol>
     </td>
   </tr>
