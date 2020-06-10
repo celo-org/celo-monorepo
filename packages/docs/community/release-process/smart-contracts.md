@@ -128,7 +128,7 @@ Deploying a new contract release should occur with the following process:
     <td>
       <ol>
         <li>Confirm all contracts working as intended on Alfajores.</li>
-        <li>Run the smart contract release script to deploy the contracts to mainnet and submit a governance proposal.</li>
+        <li>Run the smart contract release script to deploy the contracts to Mainnet and submit a governance proposal.</li>
       </ol>
     </td>
   </tr>
@@ -136,13 +136,13 @@ Deploying a new contract release should occur with the following process:
     <td>T+5w</td>
     <td>
       <ol>
-        <li>Confirm all contracts working as intended on mainnet.</li>
+        <li>Confirm all contracts working as intended on Mainnet.</li>
       </ol>
     </td>
   </tr>
 </table>
 
-If the contents of the release (i.e. source Git commit) change at any point after the release has been tagged on Github, the process should increment the release identifier, and process should start again from the beginning. If the changes are small or do not introduce new code (e.g. reverting a contract to a previous version) the audit step may be accelerated.
+If the contents of the release (i.e. source Git commit) change at any point after the release has been tagged in Git, the process should increment the release identifier, and process should start again from the beginning. If the changes are small or do not introduce new code (e.g. reverting a contract to a previous version) the audit step may be accelerated.
 
 ### Emergency patches
 
