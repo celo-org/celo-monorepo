@@ -21,7 +21,7 @@ export default function Language({ navigation, route }: Props) {
   const dispatch = useDispatch()
   const { t, i18n } = useTranslation(Namespaces.accountScreen10)
 
-  const onSelect = (language: string, code: string) => {
+  function onSelect(language: string, code: string) {
     CeloAnalytics.track(CustomEventNames.language_select, { language, selectedAnswer: code })
     const nextScreen = route.params?.nextScreen ?? Screens.JoinCelo
     dispatch(setLanguage(code))
