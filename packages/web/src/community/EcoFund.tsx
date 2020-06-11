@@ -15,7 +15,7 @@ import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Rings from 'src/logos/RingsGlyph'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import menuItems, { hashNav } from 'src/shared/menu-items'
-import Navigation from 'src/shared/navigation'
+import Navigation from 'src/shared/Navigation'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import {
   Application,
