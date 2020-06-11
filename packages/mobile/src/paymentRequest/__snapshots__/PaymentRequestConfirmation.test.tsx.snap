@@ -416,6 +416,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                 "paddingVertical": 5,
               }
             }
+            testID="ConfirmButton"
           >
             <Text
               accessibilityLabel="request"
