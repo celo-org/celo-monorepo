@@ -2648,7 +2648,7 @@ exports[`HomePage renders 1`] = `
                     "borderLeftColor": "rgba(0,0,0,0.00)",
                     "borderRightColor": "rgba(0,0,0,0.00)",
                     "borderTopColor": "rgba(0,0,0,0.00)",
-                    "color": "rgba(46,51,56,1.00)",
+                    "color": "rgba(255,255,255,1.00)",
                     "cursor": "pointer",
                     "display": "inline-flex",
                     "flexGrow": 0,
