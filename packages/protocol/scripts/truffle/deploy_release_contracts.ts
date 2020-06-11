@@ -2,7 +2,6 @@ import { retryTx } from '@celo/protocol/lib/proxy-utils'
 import { _setInitialProxyImplementation } from '@celo/protocol/lib/web3-utils'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
-import fs = require('fs')
 import * as prompts from 'prompts'
 import {
   ReleaseGoldContract,
@@ -10,6 +9,7 @@ import {
   ReleaseGoldMultiSigProxyContract,
   ReleaseGoldProxyContract,
 } from 'types'
+import fs = require('fs')
 
 let argv: any
 let releases: any
@@ -314,6 +314,7 @@ async function handleJSONFile(err, data) {
     initialDistributionRatio: grants[0].initialDistributionRatio,
   }
   if (!argv.yesreally) {
+    const distributionRatios = [template.initialDistributionRatio]
     grants.map((grant) => {
       if (
         grant.revocable !== template.revocable ||
@@ -322,14 +323,34 @@ async function handleJSONFile(err, data) {
         grant.subjectToLiquidityProvision !== template.subjectToLiquidityProvision ||
         grant.initialDistributionRatio !== template.initialDistributionRatio
       ) {
-        console.error(
-          chalk.red(
-            'Grants are not uniformly typed.\nWe expect all grants of a given JSON to have the same boolean values for `revocable`, `canVote`, `canValidate`, and `subjectToLiquidityProvision`, as well as having the same value for `initialDistributionRatio`.\nExiting'
+        if (grant.initialDistributionRatio !== template.initialDistributionRatio) {
+          distributionRatios.push(grant.initialDistributionRatio)
+        } else {
+          console.error(
+            chalk.red(
+              'Grants are not uniformly typed.\nWe expect all grants of a given JSON to have the same boolean values for `revocable`, `canVote`, `canValidate`, and `subjectToLiquidityProvision`, as well as having the same value for `initialDistributionRatio`.\nExiting'
+            )
           )
-        )
-        process.exit(0)
+          process.exit(0)
+        }
       }
     })
+    // Multiple distribution ratios are permitted, but still warrants a confirmation.
+    if (distributionRatios.length > 1) {
+      const response = await prompts({
+        type: 'confirm',
+        name: 'confirmation',
+        message:
+          'Found more than one distribution ratio: [' +
+          distributionRatios +
+          ']. Do you want to continue? (y/n)?',
+      })
+
+      if (!response.confirmation) {
+        console.info(chalk.red('Abandoning grant deployment due to user response.'))
+        process.exit(0)
+      }
+    }
   }
 
   const totalValue = grants.reduce((sum: number, curr: any) => {
