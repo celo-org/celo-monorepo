@@ -83,7 +83,7 @@ if (DEV_MODE) {
       //   url: 'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net',
       // },
       {
-        url: 'http://localhost:3000/celo-phone-number-privacy/us-central1',
+        url: 'http://localhost:3000',
       },
     ],
     thresholdSignature: {
@@ -121,8 +121,8 @@ if (DEV_MODE) {
     },
     pgpnpServices: [],
     thresholdSignature: {
-      threshold: functionConfig.attestation.threshold_signature_threshold,
-      polynomial: functionConfig.attestation.threshold_polynomial,
+      threshold: functionConfig.threshold_signature.threshold_signature_threshold,
+      polynomial: functionConfig.threshold_signature.threshold_polynomial,
     },
   }
 }

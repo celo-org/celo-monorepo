@@ -17,9 +17,10 @@ import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
 import { CURRENCY_ENUM } from 'src/geth/consts'
+import { refreshAllBalances } from 'src/home/actions'
 import i18n from 'src/i18n'
 import { setHasSeenVerificationNux, updateE164PhoneNumberAddresses } from 'src/identity/actions'
-import { fetchPhoneHashPrivate } from 'src/identity/privacy'
+import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import {
   Actions,
   InviteBy,
@@ -334,6 +335,7 @@ export function* skipInvite() {
   Logger.debug(TAG + '@skipInvite', 'Skip invite action taken, creating account')
   try {
     yield call(getOrCreateAccount)
+    yield put(refreshAllBalances())
     yield put(setHasSeenVerificationNux(true))
     Logger.debug(TAG + '@skipInvite', 'Done skipping invite')
     navigateHome()

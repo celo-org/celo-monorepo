@@ -1,24 +1,28 @@
+import ContactCircle from '@celo/react-components/components/ContactCircle'
 import ReviewFrame from '@celo/react-components/components/ReviewFrame'
-import ReviewHeader from '@celo/react-components/components/ReviewHeader'
-import colors from '@celo/react-components/styles/colors'
-import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
+import colors from '@celo/react-components/styles/colors.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
+import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { PaymentRequestStatus } from 'src/account/types'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
+import CommentTextInput from 'src/components/CommentTextInput'
+import CurrencyDisplay, { DisplayType } from 'src/components/CurrencyDisplay'
+import TotalLineItem from 'src/components/TotalLineItem.v2'
 import { writePaymentRequest } from 'src/firebase/actions'
 import { currencyToShortMap } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
-import PaymentRequestReviewCard from 'src/paymentRequest/PaymentRequestReviewCard'
+import { getDisplayName, getRecipientThumbnail } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { ConfirmationInput, getConfirmationInput } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
@@ -32,6 +36,7 @@ interface StateProps {
   e164PhoneNumber: string
   account: string | null
   confirmationInput: ConfirmationInput
+  addressJustValidated?: boolean
 }
 
 interface DispatchProps {
@@ -43,7 +48,7 @@ const mapDispatchToProps = { showError, writePaymentRequest }
 
 const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const { route } = ownProps
-  const transactionData = route.params.transactionData
+  const { transactionData, addressJustValidated } = route.params
   const { e164NumberToAddress } = state.identity
   const { secureSendPhoneNumberMapping } = state.identity
   const confirmationInput = getConfirmationInput(
@@ -55,6 +60,7 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
     confirmationInput,
     e164PhoneNumber: state.account.e164PhoneNumber,
     account: currentAccountSelector(state),
+    addressJustValidated,
   }
 }
 
@@ -63,7 +69,25 @@ type OwnProps = StackScreenProps<StackParamList, Screens.PaymentRequestConfirmat
 type Props = DispatchProps & StateProps & WithTranslation & OwnProps
 
 class PaymentRequestConfirmation extends React.Component<Props> {
-  static navigationOptions = { header: null }
+  state = {
+    comment: '',
+  }
+
+  componentDidMount() {
+    const { addressJustValidated, t } = this.props
+    if (addressJustValidated) {
+      Logger.showMessage(t('addressConfirmed'))
+    }
+  }
+
+  onCommentChange = (comment: string) => {
+    this.setState({ comment })
+  }
+
+  onBlur = () => {
+    const comment = this.state.comment.trim()
+    this.setState({ comment })
+  }
 
   onConfirm = async () => {
     const { amount, recipient, recipientAddress: requesteeAddress } = this.props.confirmationInput
@@ -95,8 +119,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
       requesterE164Number: this.props.e164PhoneNumber,
       requesteeAddress,
       currency: currencyToShortMap[CURRENCY_ENUM.DOLLAR],
-      // NOTE: Add this back in when redesigning this screen
-      comment: 'placeholder',
+      comment: this.state.comment,
       status: PaymentRequestStatus.REQUESTED,
       notified: false,
     }
@@ -110,32 +133,60 @@ class PaymentRequestConfirmation extends React.Component<Props> {
     navigateBack()
   }
 
-  renderHeader = () => <ReviewHeader title={this.props.t('requestPayment')} />
+  renderFooter = () => {
+    const amount = {
+      value: this.props.confirmationInput.amount,
+      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code, // Only cUSD for now
+    }
+
+    return (
+      <View style={styles.feeContainer}>
+        <TotalLineItem amount={amount} />
+      </View>
+    )
+  }
 
   render() {
-    const { t } = this.props
-    const { amount, recipient, recipientAddress: requesteeAddress } = this.props.confirmationInput
+    const { t, confirmationInput } = this.props
+    const { recipient, recipientAddress: requesteeAddress } = confirmationInput
+    const amount = {
+      value: this.props.confirmationInput.amount,
+      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code, // Only cUSD for now
+    }
 
     return (
       <SafeAreaView style={styles.container}>
         <DisconnectBanner />
         <ReviewFrame
-          HeaderComponent={this.renderHeader}
+          FooterComponent={this.renderFooter}
           confirmButton={{
             action: this.onConfirm,
             text: t('request'),
             disabled: false,
           }}
-          modifyButton={{ action: this.onPressEdit, text: t('edit'), disabled: false }}
         >
-          <PaymentRequestReviewCard
-            recipient={recipient}
-            address={requesteeAddress || ''}
-            e164PhoneNumber={recipient.e164PhoneNumber}
-            // comment={reason} NOTE: Add this back in when redesigning this screen
-            value={amount}
-            currency={CURRENCY_ENUM.DOLLAR} // User can only request in Dollars
-          />
+          <View style={styles.transferContainer}>
+            <View style={styles.headerContainer}>
+              <ContactCircle
+                name={this.props.confirmationInput.recipient.displayName}
+                thumbnailPath={getRecipientThumbnail(recipient)}
+                address={requesteeAddress || ''}
+              />
+              <View style={styles.recipientInfoContainer}>
+                <Text style={styles.headerText}>{t('requesting')}</Text>
+                <Text style={styles.displayName}>
+                  {getDisplayName({ recipient, recipientAddress: requesteeAddress, t })}
+                </Text>
+              </View>
+            </View>
+            <CurrencyDisplay type={DisplayType.Default} style={styles.amount} amount={amount} />
+            <CommentTextInput
+              testID={'request'}
+              onCommentChange={this.onCommentChange}
+              comment={this.state.comment}
+              onBlur={this.onBlur}
+            />
+          </View>
         </ReviewFrame>
       </SafeAreaView>
     )
@@ -145,12 +196,38 @@ class PaymentRequestConfirmation extends React.Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
-    paddingTop: 20,
+    backgroundColor: colors.light,
+    padding: 8,
+  },
+  feeContainer: {
+    padding: 16,
+    paddingBottom: 8,
+  },
+  transferContainer: {
+    alignItems: 'flex-start',
+    paddingBottom: 24,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  recipientInfoContainer: {
+    paddingLeft: 8,
+  },
+  headerText: {
+    ...fontStyles.regular,
+    color: colors.gray4,
+  },
+  displayName: {
+    ...fontStyles.regular500,
+  },
+  amount: {
+    paddingVertical: 8,
+    ...fontStyles.largeNumber,
   },
 })
 
 export default connect<StateProps, DispatchProps, OwnProps, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.sendFlow7)(PaymentRequestConfirmation))
+)(withTranslation(Namespaces.paymentRequestFlow)(PaymentRequestConfirmation))

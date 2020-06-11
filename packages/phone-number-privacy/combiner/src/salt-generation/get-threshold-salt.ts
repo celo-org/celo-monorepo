@@ -13,13 +13,20 @@ import logger from '../common/logger'
 import config, { PgpnpServices } from '../config'
 
 const PARTIAL_SIGN_MESSAGE_ENDPOINT = '/getBlindedSalt'
+
+interface GetBlindedMessageForSaltRequest {
+  account: string
+  blindedQueryPhoneNumber: string
+  hashedPhoneNumber?: string
+}
+
 export interface SignMessageResponse {
   success: boolean
   signature: string
 }
 
 export async function handleGetDistributedBlindedMessageForSalt(
-  request: Request,
+  request: Request<{}, {}, GetBlindedMessageForSaltRequest>,
   response: Response
 ) {
   try {
@@ -73,7 +80,7 @@ function requestSigner(service: PgpnpServices, request: Request): Promise<any> {
   })
 }
 
-function isValidGetSignatureInput(requestBody: any): boolean {
+function isValidGetSignatureInput(requestBody: GetBlindedMessageForSaltRequest): boolean {
   return (
     hasValidAccountParam(requestBody) &&
     hasValidQueryPhoneNumberParam(requestBody) &&

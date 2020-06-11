@@ -2,6 +2,7 @@ import { IdentityMetadataWrapper } from '@celo/contractkit'
 import { ClaimTypes } from '@celo/contractkit/lib/identity'
 import { Validator } from '@celo/contractkit/lib/wrappers/Validators'
 import { eqAddress } from '@celo/utils/lib/address'
+import { concurrentMap } from '@celo/utils/src/async'
 import { cli } from 'cli-ux'
 import fetch from 'cross-fetch'
 import { BaseCommand } from '../../base'
@@ -55,6 +56,7 @@ export default class AttestationServicesCurrent extends BaseCommand {
         return ret
       }
 
+      ret.okStatus = true
       const statusResponseBody = await statusResponse.json()
       ret.smsProviders = statusResponseBody.smsProviders
       ret.blacklistedRegionCodes = statusResponseBody.blacklistedRegionCodes
@@ -75,7 +77,7 @@ export default class AttestationServicesCurrent extends BaseCommand {
     const validatorList = await Promise.all(
       signers.map((addr) => validators.getValidatorFromSigner(addr))
     )
-    const validatorInfo = await Promise.all(validatorList.map(this.getStatus.bind(this)))
+    const validatorInfo = await concurrentMap(10, validatorList, this.getStatus.bind(this))
 
     cli.action.stop()
     cli.table(

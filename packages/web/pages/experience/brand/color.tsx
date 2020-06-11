@@ -1,3 +1,3 @@
-import Color from 'src/brandkit/Color'
+import Color from 'src/experience/brandkit/Color'
 
 export default Color

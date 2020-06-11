@@ -16,7 +16,6 @@ import { StackParamList } from 'src/navigator/types'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { TransactionDataInput } from 'src/send/SendAmount'
-import { formatDisplayName } from 'src/utils/formatting'
 
 const AVATAR_SIZE = 120
 
@@ -43,9 +42,12 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
 
 class ValidateRecipientIntro extends React.Component<Props> {
   onPressScanCode = () => {
-    navigate(Screens.QRScanner, {
-      transactionData: this.props.transactionData,
-      scanIsForSecureSend: true,
+    navigate(Screens.QRNavigator, {
+      screen: Screens.QRScanner,
+      params: {
+        transactionData: this.props.transactionData,
+        scanIsForSecureSend: true,
+      },
     })
   }
 
@@ -61,7 +63,7 @@ class ValidateRecipientIntro extends React.Component<Props> {
 
   render() {
     const { t, recipient } = this.props
-    const { displayName, displayNameCapitalized } = formatDisplayName(recipient.displayName)
+    const { displayName, e164PhoneNumber } = recipient
 
     return (
       <SafeAreaView style={styles.container}>
@@ -73,22 +75,17 @@ class ValidateRecipientIntro extends React.Component<Props> {
               thumbnailPath={getRecipientThumbnail(recipient)}
             />
           </View>
-          <Text style={styles.h2}>
-            {t('confirmAccount.header', {
-              displayName,
-            })}
+          <Text style={styles.validationHeader}>
+            {displayName === 'Mobile #'
+              ? t('confirmAccount.headerNoDisplayName')
+              : t('confirmAccount.header', { displayName })}
           </Text>
           <Text style={styles.body}>
-            {t('secureSendExplanation.body1', {
-              e164Number: recipient.e164PhoneNumber,
-              displayName: displayNameCapitalized,
-            })}
+            {displayName === 'Mobile #' || !e164PhoneNumber
+              ? t('secureSendExplanation.body1NoDisplayName')
+              : t('secureSendExplanation.body1', { e164PhoneNumber, displayName })}
           </Text>
-          <Text style={styles.body}>
-            {t('secureSendExplanation.body2', {
-              displayName,
-            })}
-          </Text>
+          <Text style={styles.body}>{t('secureSendExplanation.body2')}</Text>
         </ScrollView>
         <View style={styles.buttonContainer}>
           <TextButton style={styles.button} onPress={this.onPressScanCode} testID={'scanQRCode'}>
@@ -117,27 +114,20 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 24,
     paddingBottom: 30,
-    flexDirection: 'column',
     justifyContent: 'flex-start',
   },
   iconContainer: {
     paddingTop: 20,
-    flexDirection: 'column',
     alignItems: 'center',
   },
   buttonContainer: {
     paddingBottom: 60,
-    flexDirection: 'column',
     alignItems: 'center',
   },
   button: {
     paddingVertical: 16,
   },
-  qrLogo: {
-    alignSelf: 'center',
-    marginBottom: 30,
-  },
-  h2: {
+  validationHeader: {
     ...fontStyles.h2,
     paddingVertical: 20,
     paddingHorizontal: 5,

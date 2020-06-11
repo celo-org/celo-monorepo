@@ -14,7 +14,6 @@ exports[`ValidateRecipientIntro renders correctly 1`] = `
     contentContainerStyle={
       Object {
         "flex": 1,
-        "flexDirection": "column",
         "justifyContent": "flex-start",
         "paddingBottom": 30,
         "paddingHorizontal": 24,
@@ -26,7 +25,6 @@ exports[`ValidateRecipientIntro renders correctly 1`] = `
         style={
           Object {
             "alignItems": "center",
-            "flexDirection": "column",
             "paddingTop": 20,
           }
         }
@@ -127,7 +125,6 @@ exports[`ValidateRecipientIntro renders correctly 1`] = `
     style={
       Object {
         "alignItems": "center",
-        "flexDirection": "column",
         "paddingBottom": 60,
       }
     }
@@ -152,13 +149,17 @@ exports[`ValidateRecipientIntro renders correctly 1`] = `
     >
       <Text
         style={
-          Object {
-            "color": "#1AB775",
-            "fontFamily": "Inter-SemiBold",
-            "fontSize": 16,
-            "lineHeight": 22,
-            "paddingVertical": 16,
-          }
+          Array [
+            Object {
+              "color": "#1AB775",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 16,
+              "lineHeight": 22,
+            },
+            Object {
+              "paddingVertical": 16,
+            },
+          ]
         }
       >
         scanQRCode
@@ -184,13 +185,17 @@ exports[`ValidateRecipientIntro renders correctly 1`] = `
     >
       <Text
         style={
-          Object {
-            "color": "#1AB775",
-            "fontFamily": "Inter-SemiBold",
-            "fontSize": 16,
-            "lineHeight": 22,
-            "paddingVertical": 16,
-          }
+          Array [
+            Object {
+              "color": "#1AB775",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 16,
+              "lineHeight": 22,
+            },
+            Object {
+              "paddingVertical": 16,
+            },
+          ]
         }
       >
         confirmAccount.button
