@@ -207,7 +207,8 @@ jobs:
       - run:
           name: Install emulator dependencies
           command: |
-            yes | sdkmanager --licenses
+            # Captures SIGPIPE 141 error but still allow repeating "y" to accept all licenses
+            yes | sdkmanager --licenses || if [ $? -ne '141' ]; then exit $?; fi;
             ./packages/mobile/scripts/install_android_emulator_image.sh
       - save_cache:
           key: android-emulator-image-v3-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
