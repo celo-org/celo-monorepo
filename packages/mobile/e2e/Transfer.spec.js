@@ -15,6 +15,7 @@ const VERIFICATION_COUNTRY = 'Germany'
 const VERIFICATION_PHONE_NUMBER = '030 111111'
 const EXAMPLE_NAME = 'Test Name'
 const DEFAULT_RECIPIENT_PHONE_NUMBER = '+10000000000'
+const DEFAULT_RECIPIENT_ADDRESS = '0x22c8a9178841ba95a944afd1a1faae517d3f5daa'
 const AMOUNT_TO_SEND = '0.1'
 const RANDOM_COMMENT = 'poker night winnings'
 
@@ -104,8 +105,6 @@ describe('Transfer Works', () => {
     await element(by.id('ImportWalletBackupKeyInputField')).tap()
     await element(by.id('ImportWalletBackupKeyInputField')).typeText(SAMPLE_BACKUP_KEY)
 
-    await sleep(4000)
-
     await element(by.id('ImportWalletButton')).tap()
   })
 
@@ -138,10 +137,13 @@ describe('Transfer Works', () => {
   it('Wallet Home->Send', async () => {
     await element(by.id('SendOrRequestBar/SendButton')).tap()
 
+    await element(by.id('RecipientSearchInput')).tap()
+    await element(by.id('RecipientSearchInput')).replaceText(DEFAULT_RECIPIENT_ADDRESS)
+    await element(by.id('RecipientSearchInput')).tapReturnKey()
+
     await waitFor(element(by.id('RecipientPicker')))
       .toBeVisible()
-      .withTimeout(10000)
-
+      .withTimeout(4000)
     await waitFor(element(by.id('RecipientItem')))
       .toBeVisible()
       .withTimeout(4000)
