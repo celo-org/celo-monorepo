@@ -213,6 +213,7 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
         "paddingVertical": 12,
       }
     }
+    testID="SendOrRequestBar"
   >
     <View
       style={
@@ -262,6 +263,7 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
               "paddingVertical": 5,
             }
           }
+          testID="SendOrRequestBar/SendButton"
         >
           <Text
             style={
@@ -331,6 +333,7 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
               "paddingVertical": 5,
             }
           }
+          testID="SendOrRequestBar/RequestButton"
         >
           <Text
             style={
@@ -627,6 +630,7 @@ exports[`Testnet banner Renders when disconnected 1`] = `
         "paddingVertical": 12,
       }
     }
+    testID="SendOrRequestBar"
   >
     <View
       style={
@@ -676,6 +680,7 @@ exports[`Testnet banner Renders when disconnected 1`] = `
               "paddingVertical": 5,
             }
           }
+          testID="SendOrRequestBar/SendButton"
         >
           <Text
             style={
@@ -745,6 +750,7 @@ exports[`Testnet banner Renders when disconnected 1`] = `
               "paddingVertical": 5,
             }
           }
+          testID="SendOrRequestBar/RequestButton"
         >
           <Text
             style={
@@ -1041,6 +1047,7 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
         "paddingVertical": 12,
       }
     }
+    testID="SendOrRequestBar"
   >
     <View
       style={
@@ -1090,6 +1097,7 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
               "paddingVertical": 5,
             }
           }
+          testID="SendOrRequestBar/SendButton"
         >
           <Text
             style={
@@ -1159,6 +1167,7 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
               "paddingVertical": 5,
             }
           }
+          testID="SendOrRequestBar/RequestButton"
         >
           <Text
             style={

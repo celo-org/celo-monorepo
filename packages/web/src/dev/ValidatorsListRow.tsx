@@ -209,8 +209,7 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            <Text style={[styles.numberBlock, styles.numberBlockFirst]}>{group.elected}</Text>
-            <Text style={[styles.numberBlock]}>{group.numMembers}</Text>
+            {group.elected}/{group.numMembers}
           </Text>
           <Text style={[styles.tableCell, styles.sizeXL, styles.tableCellBars]}>
             <Text style={[styles.tableCellBarsValue]}>
@@ -335,7 +334,7 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
                 </Text>
                 <Text style={[styles.tableCell, styles.sizeM]} />
                 <Text style={[styles.tableCell, styles.sizeM]} />
-                <Text
+                {/*                <Text
                   style={[
                     styles.tableCell,
                     styles.tableCellCenter,
@@ -346,7 +345,7 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
                   ellipsizeMode="tail"
                 >
                   {formatNumber(validator.uptime, 1)}%
-                </Text>
+                </Text>*/}
                 <Text
                   style={[
                     styles.tableCell,

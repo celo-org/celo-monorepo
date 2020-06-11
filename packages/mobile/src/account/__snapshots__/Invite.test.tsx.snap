@@ -664,6 +664,7 @@ exports[`Invite renders correctly with recipients 1`] = `
               onResponderTerminate={[Function]}
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
+              testID="RecipientItem"
             >
               <View
                 style={
@@ -793,6 +794,7 @@ exports[`Invite renders correctly with recipients 1`] = `
               onResponderTerminate={[Function]}
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
+              testID="RecipientItem"
             >
               <View
                 style={
@@ -921,6 +923,7 @@ exports[`Invite renders correctly with recipients 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            testID="RecipientItem"
           >
             <View
               style={

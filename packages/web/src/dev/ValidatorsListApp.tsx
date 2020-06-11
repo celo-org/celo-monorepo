@@ -118,7 +118,7 @@ class ValidatorsListApp extends React.PureComponent<Props> {
           path={menuItems.VALIDATORS_LIST.link}
           description="View status of Validators on the Celo Network"
         />
-        <View style={[styles.cover, styles.pStatic, compStyles.fullHeight]}>
+        <View style={[styles.cover, styles.pStaticOverflow, compStyles.fullHeight]}>
           <H2
             style={[
               textStyles.center,
