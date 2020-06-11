@@ -17,6 +17,7 @@ import { TokenTransactionType } from 'src/apollo/types'
 import BackButton from 'src/components/BackButton.v2'
 import CommentTextInput from 'src/components/CommentTextInput'
 import CurrencyDisplay, { DisplayType, FormatType } from 'src/components/CurrencyDisplay'
+import FeeDrawer from 'src/components/FeeDrawer'
 import FeeIcon from 'src/components/FeeIcon'
 import InviteOptionsModal from 'src/components/InviteOptionsModal'
 import LineItemRow from 'src/components/LineItemRow.v2'
@@ -312,6 +313,14 @@ export class SendConfirmation extends React.Component<Props, State> {
               amount={<CurrencyDisplay amount={subtotalAmount} />}
             />
           )}
+          <FeeDrawer
+            isEstimate={true}
+            inviteFee={inviteFee}
+            securityFee={securityFee}
+            currency={CURRENCY_ENUM.DOLLAR}
+            securityFeeLoading={asyncFee.loading}
+            securityFeeHasError={!!asyncFee.error}
+          />
           {isInvite && (
             <LineItemRow
               title={t('inviteFee')}
