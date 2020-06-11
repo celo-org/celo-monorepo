@@ -90,15 +90,16 @@ export class DefaultRpcCaller implements RpcCaller {
     debugRpcPayload('%O', payload)
 
     const decoratedCallback = ((error: Error, result: JsonRpcResponse): void => {
-      let err = error
+      let err: Error = error
       debugRpcResponse('%O', result)
-      // @ts-ignore
+      // The provider send call will not provide an error to the callback if
+      // the result itself specifies an error. Here, we extract the error in the
+      // result.
       if (
         result.error != null &&
         typeof result.error !== 'string' &&
         result.error.message != null
       ) {
-        // @ts-ignore
         err = new Error(result.error.message)
       }
       callback(err as any, result)
