@@ -39,12 +39,16 @@ export async function getSendTxGas(
   currency: CURRENCY_ENUM,
   params: BasicTokenTransfer
 ) {
-  Logger.debug(`${TAG}/getSendTxGas`, 'Getting gas estimate for send tx')
-  const tx = await createTokenTransferTransaction(currency, params)
-  const txParams = { from: account, feeCurrency: await getCurrencyAddress(currency) }
-  const gas = await estimateGas(tx.txo, txParams)
-  Logger.debug(`${TAG}/getSendTxGas`, `Estimated gas of ${gas.toString()}`)
-  return gas
+  try {
+    Logger.debug(`${TAG}/getSendTxGas`, 'Getting gas estimate for send tx')
+    const tx = await createTokenTransferTransaction(currency, params)
+    const txParams = { from: account, feeCurrency: await getCurrencyAddress(currency) }
+    const gas = await estimateGas(tx.txo, txParams)
+    Logger.debug(`${TAG}/getSendTxGas`, `Estimated gas of ${gas.toString()}`)
+    return gas
+  } catch (error) {
+    throw Error(ErrorMessages.INSUFFICIENT_BALANCE)
+  }
 }
 
 export async function getSendFee(
@@ -52,8 +56,12 @@ export async function getSendFee(
   currency: CURRENCY_ENUM,
   params: BasicTokenTransfer
 ) {
-  const gas = await getSendTxGas(account, currency, params)
-  return calculateFee(gas)
+  try {
+    const gas = await getSendTxGas(account, currency, params)
+    return calculateFee(gas)
+  } catch (error) {
+    throw error
+  }
 }
 
 export function* watchQrCodeDetections() {
