@@ -89,13 +89,15 @@ class VerificationEducationScreen extends React.Component<Props, State> {
           <Link onPress={this.onPressLearnMore}>{t('education.learnMore')}</Link>
         </ScrollView>
         <>
-          <ErrorMessageInline
-            error={
-              isUserBalanceSufficient(this.props.userBalance, VERIFICATION_FEE_ESTIMATE)
-                ? null
-                : ErrorMessages.INSUFFICIENT_BALANCE
-            }
-          />
+          <View style={styles.errorMessageContainer}>
+            <ErrorMessageInline
+              error={
+                isUserBalanceSufficient(this.props.userBalance, VERIFICATION_FEE_ESTIMATE)
+                  ? null
+                  : ErrorMessages.INSUFFICIENT_BALANCE
+              }
+            />
+          </View>
           <Button
             text={t('education.start')}
             disabled={!isUserBalanceSufficient(this.props.userBalance, VERIFICATION_FEE_ESTIMATE)}
@@ -183,6 +185,9 @@ const styles = StyleSheet.create({
     ...fontStyles.semiBold,
     color: colors.celoGreen,
     paddingLeft: 20,
+  },
+  errorMessageContainer: {
+    alignItems: 'center',
   },
 })
 

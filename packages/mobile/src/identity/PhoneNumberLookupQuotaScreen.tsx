@@ -68,9 +68,11 @@ function PhoneNumberLookupQuotaScreen(props: Props) {
         <View style={styles.spinnerContainer}>{isSending && <LoadingSpinner />}</View>
       </KeyboardAwareScrollView>
       <View>
-        <ErrorMessageInline
-          error={userBalanceIsSufficient ? null : ErrorMessages.INSUFFICIENT_BALANCE}
-        />
+        <View style={styles.errorMessageContainer}>
+          <ErrorMessageInline
+            error={userBalanceIsSufficient ? null : ErrorMessages.INSUFFICIENT_BALANCE}
+          />
+        </View>
         <Button
           onPress={onBuy}
           disabled={!userBalanceIsSufficient || isSending}
@@ -116,6 +118,9 @@ const styles = StyleSheet.create({
   },
   spinnerContainer: {
     height: 40,
+  },
+  errorMessageContainer: {
+    alignItems: 'center',
   },
 })
 
