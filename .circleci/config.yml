@@ -206,7 +206,7 @@ jobs:
             HOMEBREW_NO_AUTO_UPDATE=1 brew cask install android-sdk
       - run:
           name: Install emulator dependencies
-          command: bash ./packages/mobile/scripts/install_android_emulator_image.sh
+          command: yes | bash ./packages/mobile/scripts/install_android_emulator_image.sh
       - save_cache:
           key: android-emulator-image-v3-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
           paths:
