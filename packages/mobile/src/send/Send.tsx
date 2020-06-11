@@ -1,5 +1,8 @@
+import QRCodeBorderlessIcon from '@celo/react-components/icons/QRCodeBorderless'
+import Times from '@celo/react-components/icons/Times'
 import VerifyPhone from '@celo/react-components/icons/VerifyPhone'
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
+import { RouteProp } from '@react-navigation/native'
 import { StackScreenProps } from '@react-navigation/stack'
 import { throttle } from 'lodash'
 import * as React from 'react'
@@ -11,12 +14,14 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { estimateFee, FeeType } from 'src/fees/actions'
-import { Namespaces, withTranslation } from 'src/i18n'
+import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import ContactPermission from 'src/icons/ContactPermission'
 import { importContacts } from 'src/identity/actions'
 import { ContactMatches } from 'src/identity/types'
-import { navigate } from 'src/navigator/NavigationService'
+import { emptyHeader } from 'src/navigator/Headers.v2'
+import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { TopBarIconButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
 import {
   filterRecipientFactory,
@@ -88,6 +93,42 @@ const mapDispatchToProps = {
   storeLatestInRecents,
   importContacts,
   estimateFee,
+}
+
+export const sendScreenNavOptions = ({
+  route,
+}: {
+  route: RouteProp<StackParamList, Screens.Send>
+}) => {
+  const goQr = () => navigate(Screens.QRNavigator)
+  const title = route.params?.isRequest
+    ? i18n.t('paymentRequestFlow:request')
+    : i18n.t('sendFlow7:send')
+
+  return {
+    ...emptyHeader,
+    headerLeft: () => (
+      <TopBarIconButton
+        icon={<Times />}
+        onPress={navigateBack}
+        eventName={
+          route.params?.isRequest ? CustomEventNames.send_cancel : CustomEventNames.request_cancel
+        }
+      />
+    ),
+    headerLeftContainerStyle: styles.headerContainer,
+    headerRight: () => (
+      <TopBarIconButton
+        icon={<QRCodeBorderlessIcon height={32} color={colors.greenUI} />}
+        eventName={
+          route.params?.isRequest ? CustomEventNames.send_scan : CustomEventNames.request_scan
+        }
+        onPress={goQr}
+      />
+    ),
+    headerRightContainerStyle: styles.headerContainer,
+    headerTitle: title,
+  }
 }
 
 class Send extends React.Component<Props, State> {
@@ -265,7 +306,7 @@ class Send extends React.Component<Props, State> {
     return (
       // Intentionally not using SafeAreaView here as RecipientPicker
       // needs fullscreen rendering
-      <View style={style.body}>
+      <View style={styles.body}>
         <DisconnectBanner />
         <SendSearchInput isPhoneEnabled={numberVerified} onChangeText={this.onSearchQueryChanged} />
         <RecipientPicker
@@ -281,21 +322,13 @@ class Send extends React.Component<Props, State> {
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   body: {
     flex: 1,
     backgroundColor: colors.background,
   },
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-  },
-  icon: {
-    marginBottom: 20,
-    height: 60,
-    width: 60,
+  headerContainer: {
+    paddingLeft: 16,
   },
 })
 
