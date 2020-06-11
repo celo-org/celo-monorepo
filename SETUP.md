@@ -130,16 +130,17 @@ If you're building Geth for Android, you need a NDK that has a cross-compilation
 On Mac (darwin):
 ```bash
 brew cask install https://raw.githubusercontent.com/Homebrew/homebrew-cask/a39a95824122da8448dbeb0b0ca1dde78e5a793c/Casks/android-ndk.rb
-```
 
-Define the relevant environment variables, e.g.:
-
-```bash
-export NDK_VERSION=android-ndk-r19c
 export ANDROID_NDK=/usr/local/share/android-ndk
 ```
 
-and running `make ndk_bundle`. This will download the NDK for your platform.
+In `celo-blockchain`, define the relevant environment variables, e.g.:
+
+```bash
+export NDK_VERSION=android-ndk-r19c
+```
+
+and run `make ndk_bundle`. This will download the NDK for your platform.
 
 
 ## Building celo-monorepo
@@ -180,6 +181,6 @@ To build and run the mobile wallet on your iOS or Android devices see the guide 
 
 [celo-monorepo]: https://github.com/celo-org/celo-monorepo
 [celo-blockchain]: https://github.com/celo-org/celo-blockchain
-[bls-zexe]: https://github.com/celo-org/bls-zexe
+[celo-bls]: https://github.com/celo-org/celo-bls-go
 [Homebrew]: https://brew.sh
 [https://github.com/nvm-sh/nvm]: https://github.com/nvm-sh/nvm
