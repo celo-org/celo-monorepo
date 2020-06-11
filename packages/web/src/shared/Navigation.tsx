@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { StyleSheet, View } from 'react-native'
+import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native'
 import Button, { BTN } from 'src/shared/Button.3'
 import OvalCoin from 'src/shared/OvalCoin'
 import { colors, textStyles } from 'src/styles'
@@ -16,13 +16,14 @@ interface Props {
   text: string
   selected: boolean
   theme: NavigationTheme
+  style?: StyleProp<ViewStyle>
 }
 
-export default function Navigation({ link, text, selected, onPress, theme }: Props) {
+export default function Navigation({ link, text, selected, onPress, theme, style }: Props) {
   const isDark = theme === NavigationTheme.DARKGOLD || theme === NavigationTheme.DARKGREEN
   const isGold = theme === NavigationTheme.DARKGOLD
   return (
-    <View style={styles.linkWrapper}>
+    <View style={[styles.linkWrapper, style]}>
       <Button
         style={[textStyles.medium, !selected && styles.notSelected]}
         kind={isDark ? BTN.DARKNAV : BTN.NAV}

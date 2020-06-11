@@ -136,7 +136,7 @@ class ValidatorsListApp extends React.PureComponent<Props> {
                   <Navigation
                     onPress={navigate}
                     text={name}
-                    theme={NavigationTheme.DARK}
+                    theme={NavigationTheme.DARKGOLD}
                     selected={this.props.router.pathname === link}
                   />
                 </View>
