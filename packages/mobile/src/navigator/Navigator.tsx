@@ -61,7 +61,7 @@ import {
   nuxNavigationOptions,
   nuxNavigationOptionsNoBackButton,
 } from 'src/navigator/Headers.v2'
-import { navigate, navigateBack, navigateToExchangeHome } from 'src/navigator/NavigationService'
+import {navigateBack, navigateToExchangeHome } from 'src/navigator/NavigationService'
 import QRNavigator from 'src/navigator/QRNavigator'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
