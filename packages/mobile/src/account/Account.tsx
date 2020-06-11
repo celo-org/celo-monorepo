@@ -136,7 +136,7 @@ export class Account extends React.Component<Props, State> {
   }
 
   goToDataSaver = () => {
-    this.props.navigation.navigate(Screens.DataSaver)
+    this.props.navigation.navigate(Screens.DataSaver, { promptModalVisible: false })
   }
 
   goToFAQ() {
