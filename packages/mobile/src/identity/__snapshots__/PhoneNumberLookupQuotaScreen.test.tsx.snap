@@ -187,10 +187,32 @@ exports[`PhoneNumberLookupQuotaScreen renders correctly 1`] = `
     <View
       style={
         Object {
-          "height": 64,
+          "alignItems": "center",
         }
       }
-    />
+    >
+      <View
+        style={
+          Object {
+            "height": 64,
+          }
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#EA6042",
+              "fontFamily": "Inter-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+            }
+          }
+        >
+          insufficientBalance
+           
+        </Text>
+      </View>
+    </View>
     <View
       style={
         Array [
