@@ -10,8 +10,11 @@ import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import AccountNumberCard from 'src/components/AccountNumberCard'
+import BackButton from 'src/components/BackButton.v2'
 import CodeRow, { CodeRowStatus } from 'src/components/CodeRow'
 import ErrorMessageInline from 'src/components/ErrorMessageInline'
 import Modal from 'src/components/Modal'
@@ -21,6 +24,7 @@ import InfoIcon from 'src/icons/InfoIcon.v2'
 import MenuBurgerCard from 'src/icons/MenuBurgerCard'
 import { validateRecipientAddress } from 'src/identity/actions'
 import { AddressValidationType } from 'src/identity/reducer'
+import { emptyHeader } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -72,6 +76,11 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   }
 }
 
+export const validateRecipientAccountScreenNavOptions = () => ({
+  ...emptyHeader,
+  headerLeft: () => <BackButton eventName={CustomEventNames.send_secure_back} />,
+})
+
 export class ValidateRecipientAccount extends React.Component<Props, State> {
   state: State = {
     inputValue: '',
@@ -85,7 +94,11 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
       if (isPaymentRequest) {
         navigate(Screens.PaymentRequestConfirmation, { transactionData })
       } else {
-        navigate(Screens.SendConfirmation, { transactionData, addressJustValidated: true })
+        navigate(Screens.SendConfirmation, {
+          transactionData,
+          addressJustValidated: true,
+          isFromScan: this.props.route.params?.isFromScan,
+        })
       }
     }
   }
@@ -97,6 +110,12 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
       addressValidationType === AddressValidationType.FULL
         ? inputValue
         : singleDigitInputValueArr.join('')
+
+    CeloAnalytics.track(CustomEventNames.send_secure_submit, {
+      validationType: addressValidationType === AddressValidationType.FULL ? 'full' : 'partial',
+      address: inputToValidate,
+    })
+
     this.props.validateRecipientAddress(inputToValidate, addressValidationType, recipient)
   }
 
@@ -111,6 +130,14 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
   }
 
   toggleModal = () => {
+    const validationType =
+      this.props.addressValidationType === AddressValidationType.FULL ? 'full' : 'partial'
+    if (this.state.isModalVisible) {
+      CeloAnalytics.track(CustomEventNames.send_secure_info, { validationType })
+    } else {
+      CeloAnalytics.track(CustomEventNames.send_secure_info_dismissed, { validationType })
+    }
+
     this.setState({ isModalVisible: !this.state.isModalVisible })
   }
 
