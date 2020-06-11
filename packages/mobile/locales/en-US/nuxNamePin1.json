@@ -5,7 +5,7 @@
   "chooseCountryCode": "Country Code",
   "chooseCountry": "Country",
   "joinText": "The Celo Wallet helps you to send, receive, and save value on the Celo Network.",
-  "phoneNumber": "000 000 0000",
+  "phoneNumber": "Phone Number",
   "terms": {
     "title": "Terms",
     "heading1": "Data and Privacy",
@@ -27,6 +27,7 @@
     "skip": "continue without."
   },
   "fullName": "Full Name",
+  "fullNamePlaceholder": "First Last",
   "importIt": "Restore Existing Wallet",
   "cancel": "Cancel",
   "important": "Important",

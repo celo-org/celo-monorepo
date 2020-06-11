@@ -1,20 +1,31 @@
+import Expandable from '@celo/react-components/components/Expandable'
+import FormField from '@celo/react-components/components/FormField'
+import FormTextInput from '@celo/react-components/components/FormTextInput'
+import FormUnderline from '@celo/react-components/components/FormUnderline'
 import TextInput from '@celo/react-components/components/TextInput'
-import ValidatedTextInput, {
-  PhoneValidatorProps,
-} from '@celo/react-components/components/ValidatedTextInput'
-import colors from '@celo/react-components/styles/colors'
+import Touchable from '@celo/react-components/components/Touchable'
+import ValidatedTextInput from '@celo/react-components/components/ValidatedTextInput.v2'
+import colors from '@celo/react-components/styles/colors.v2'
 import SmsRetriever from '@celo/react-native-sms-retriever'
 import { Countries } from '@celo/utils/src/countries'
 import { ValidatorKind } from '@celo/utils/src/inputValidation'
 import { getRegionCodeFromCountryCode, parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as React from 'react'
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import Autocomplete from 'react-native-autocomplete-input'
+import {
+  Platform,
+  StyleProp,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native'
 
 const TAG = 'PhoneNumberInput'
 
 interface Props {
-  style?: any
+  style?: StyleProp<ViewStyle>
+  label: string
   defaultCountry?: string | null
   setE164Number: (e164Number: string) => void
   setCountryCode: (countryCode: string) => void
@@ -30,6 +41,7 @@ interface Props {
   callingCode?: boolean
   defaultCountryCode?: string
   defaultPhoneNumber?: string
+  onPressCountryCode: () => void
 }
 
 interface State {
@@ -198,15 +210,15 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
 
     return (
       <TouchableOpacity onPress={onPress}>
-        <View style={style.selectCountry}>
-          <Text style={[style.autoCompleteItemText, style.emoji]}>{emoji}</Text>
+        <View style={styles.selectCountry}>
+          <Text style={[styles.autoCompleteItemText, styles.emoji]}>{emoji}</Text>
           {this.props.callingCode && (
-            <View style={style.callingCode}>
-              <Text style={style.autoCompleteItemText}>{countryCallingCodes[0]}</Text>
+            <View style={styles.callingCode}>
+              <Text style={styles.autoCompleteItemText}>{countryCallingCodes[0]}</Text>
             </View>
           )}
-          <View style={style.countrySelectText}>
-            <Text style={style.autoCompleteItemText}>{displayName}</Text>
+          <View style={styles.countrySelectText}>
+            <Text style={styles.autoCompleteItemText}>{displayName}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -227,52 +239,40 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
   }
 
   render() {
-    const { countryCallingCode, countryQuery } = this.state
-    const filteredCountries = this.state.countries.getFilteredCountries(countryQuery)
-    const { style: propsStyle, defaultCountry: defaultCountryName } = this.props
+    const { label, style, onPressCountryCode /* defaultCountry: defaultCountryName */ } = this.props
+    const { countryCallingCode /* , countryQuery */ } = this.state
+    // const filteredCountries = this.state.countries.getFilteredCountries(countryQuery)
 
-    const { displayName: defaultDisplayName, emoji } = this.state.countries.getCountry(
-      defaultCountryName
-    )
+    // const { displayName: defaultDisplayName, emoji } = this.state.countries.getCountry(
+    //   defaultCountryName
+    // )
 
     return (
-      <View style={[propsStyle, style.container]}>
-        {!defaultDisplayName && (
-          <Autocomplete
-            autoCapitalize="none"
-            autoCorrect={false}
-            listContainerStyle={style.autoCompleteDropDown}
-            inputContainerStyle={[style.borderedBox, style.inputBox, style.inputCountry]}
-            listStyle={[style.borderedBox, style.listAutocomplete]}
-            data={filteredCountries}
-            keyExtractor={this.keyExtractor}
-            defaultValue={countryQuery}
-            onChangeText={this.changeCountryQuery}
-            onEndEditing={this.props.onEndEditingCountryCode}
-            placeholder={this.props.inputCountryPlaceholder}
-            renderItem={this.renderItem}
-            renderTextInput={this.renderTextInput}
-            testID="CountryNameField"
-          />
-        )}
-        {!!defaultDisplayName && (
-          <View style={[style.borderedBox, style.inputBox, style.defaultCountryContainer]}>
-            <Text style={style.defaultCountryFlag}>{emoji}</Text>
-            <Text style={style.defaultCountryName}>{defaultDisplayName}</Text>
-          </View>
-        )}
-        <View style={[style.phoneNumberContainer, style.borderedBox]}>
-          <Text style={style.phoneCountryCode} testID={'countryCodeText'}>
-            {countryCallingCode}
-          </Text>
-          <View style={style.line} />
-          <ValidatedTextInput<PhoneValidatorProps>
-            style={[style.inputBox, style.phoneNumberInput]}
-            placeholderTextColor={colors.inactive}
+      <FormField style={[styles.container, style]} label={label}>
+        <View style={styles.phoneNumberContainer}>
+          <Touchable onPress={onPressCountryCode} style={styles.phoneCountryCodeContainer}>
+            <>
+              <View style={{ flex: 1, justifyContent: 'center' }}>
+                <Expandable isExpandable={true} isExpanded={false}>
+                  <Text style={styles.phoneCountryCode} testID={'countryCodeText'}>
+                    {countryCallingCode}
+                  </Text>
+                </Expandable>
+              </View>
+              <FormUnderline />
+            </>
+          </Touchable>
+
+          {/* <View style={[styles.borderedBox, styles.inputBox, styles.defaultCountryContainer]}>
+            <Text style={styles.defaultCountryFlag}>{emoji}</Text>
+            <Text style={styles.defaultCountryName}>{defaultDisplayName}</Text>
+          </View> */}
+          <ValidatedTextInput
+            InputComponent={FormTextInput}
+            style={styles.phoneNumberInput}
             onChangeText={this.onChangePhoneNumber}
             onEndEditing={this.props.onEndEditingPhoneNumber}
             value={this.state.phoneNumber}
-            underlineColorAndroid="transparent"
             placeholder={this.state.inputPhonePlaceholder}
             keyboardType="phone-pad"
             testID="PhoneNumberField"
@@ -280,16 +280,13 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
             countryCallingCode={this.state.countryCallingCode}
           />
         </View>
-      </View>
+      </FormField>
     )
   }
 }
 
-const style = StyleSheet.create({
-  container: {
-    position: 'relative',
-    backgroundColor: colors.background,
-  },
+const styles = StyleSheet.create({
+  container: {},
   borderedBox: {
     borderWidth: 1,
     borderColor: colors.inputBorder,
@@ -299,19 +296,24 @@ const style = StyleSheet.create({
     height: 50,
   },
   phoneNumberContainer: {
-    marginTop: 5,
     flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 2,
+    alignItems: 'stretch',
   },
   phoneNumberInput: {
     flex: 1,
-    marginLeft: 9,
+    marginLeft: 7,
+  },
+  phoneCountryCodeContainer: {
+    // alignSelf: 'stretch',
+    // flex: 1,
+    // height: '100%',
+    width: 60,
+    alignItems: 'stretch',
+    // textAlign: 'center',
+    // backgroundColor: 'yellow',
   },
   phoneCountryCode: {
-    width: 60,
-    textAlign: 'center',
-    lineHeight: 35,
+    flex: 1,
   },
   line: {
     height: 35,

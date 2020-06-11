@@ -1,12 +1,11 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
+import FormInput from '@celo/react-components/components/FormInput'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import PhoneNumberInput from '@celo/react-components/components/PhoneNumberInput'
-import TextInput from '@celo/react-components/components/TextInput'
-import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import colors from '@celo/react-components/styles/colors.v2'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, Text } from 'react-native'
+import { ScrollView, StyleSheet } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { setName, setPhoneNumber, setPromptForno } from 'src/account/actions'
@@ -113,6 +112,8 @@ export class JoinCelo extends React.Component<Props, State> {
     }
   }
 
+  onPressCountryCode = () => {}
+
   onPressContinue = () => {
     this.props.hideAlert()
 
@@ -141,7 +142,7 @@ export class JoinCelo extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, language } = this.props
+    const { t, language, cachedCountryCode, cachedNumber } = this.props
     const { name } = this.state
 
     return (
@@ -151,21 +152,18 @@ export class JoinCelo extends React.Component<Props, State> {
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="always"
         >
-          <Text style={fontStyles.h1} testID="InviteWallTitle">
-            {t('welcomeCelo')}
-          </Text>
-          <Text style={fontStyles.bodySmall}>{t('joinText')}</Text>
-          <TextInput
+          <FormInput
+            label={t('fullName')}
             onChangeText={this.onChangeNameInput}
             value={name}
-            style={styles.nameInputField}
-            placeholderTextColor={colors.inactive}
-            underlineColorAndroid="transparent"
+            style={styles.nameInput}
             enablesReturnKeyAutomatically={true}
-            placeholder={t('fullName')}
+            placeholder={t('fullNamePlaceholder')}
             testID={'NameEntry'}
           />
           <PhoneNumberInput
+            label={t('phoneNumber')}
+            style={styles.phoneNumberInput}
             setE164Number={this.setE164Number}
             setCountryCode={this.setCountryCode}
             setIsValidNumber={this.setIsValidNumber}
@@ -174,22 +172,19 @@ export class JoinCelo extends React.Component<Props, State> {
             initialInputPhonePlaceholder={t('phoneNumber')}
             callingCode={true}
             lng={language}
-            defaultCountryCode={
-              this.props.cachedCountryCode !== '' ? this.props.cachedCountryCode : undefined
-            }
-            defaultPhoneNumber={
-              this.props.cachedNumber !== '' ? this.props.cachedNumber : undefined
-            }
+            defaultCountryCode={cachedCountryCode !== '' ? cachedCountryCode : undefined}
+            defaultPhoneNumber={cachedNumber !== '' ? cachedNumber : undefined}
+            onPressCountryCode={this.onPressCountryCode}
+          />
+          <Button
+            onPress={this.onPressContinue}
+            text={t('global:next')}
+            size={BtnSizes.MEDIUM}
+            type={BtnTypes.SECONDARY}
+            // disabled={!this.state.isValidNumber}
+            testID={'JoinCeloContinueButton'}
           />
         </ScrollView>
-        <Button
-          standard={false}
-          type={BtnTypes.PRIMARY}
-          text={t('continue')}
-          onPress={this.onPressContinue}
-          disabled={!this.state.isValidNumber}
-          testID={'JoinCeloContinueButton'}
-        />
         <KeyboardSpacer />
       </SafeAreaView>
     )
@@ -200,30 +195,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'space-between',
-    backgroundColor: colors.background,
+    backgroundColor: colors.onboardingBackground,
   },
   scrollContainer: {
-    padding: 20,
-    paddingTop: 0,
+    padding: 24,
+    paddingTop: 80,
   },
-  nameInputField: {
-    marginTop: 25,
-    alignItems: 'center',
-    borderColor: colors.inputBorder,
-    borderRadius: 3,
-    borderWidth: 1,
-    marginBottom: 6,
-    paddingLeft: 9,
-    color: colors.inactive,
-    height: 50,
-  },
-  disclaimer: {
-    ...fontStyles.bodyXSmall,
-    marginTop: 25,
-  },
-  disclamerLink: {
-    ...fontStyles.bodyXSmall,
-    textDecorationLine: 'underline',
+  nameInput: {},
+  phoneNumberInput: {
+    marginVertical: 32,
   },
 })
 
