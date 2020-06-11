@@ -121,7 +121,6 @@ The repository has the following packages (sub projects):
 - [protocol](packages/protocol) - identity, stability and other smart contracts for the Celo protocol ([docs](https://docs.celo.org/celo-codebase/protocol))
 - [react-components](packages/react-components) - no README available (improve?)
 - [terraform-modules](packages/terraform-modules) - templatized deployments of entire VM-based testnets for Google Cloud Platform
-- [transaction-metrics-exporter](packages/transaction-metrics-exporter) - monitoring tool that executes transactions on the network and exports testnet-level prometheus metrics
 - [typescript](packages/typescript) - no README available (improve?)
 - [utils](packages/utils) - no README available (improve?)
 - [web](packages/web) - Celo website ([live](https://celo.org/))
