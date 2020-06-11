@@ -46,7 +46,7 @@ describe('Education', () => {
 
   it('navigates back', () => {
     const edu = render(<Education {...educationProps} />)
-    fireEvent.press(edu.getByTestId('Education-goback'))
+    fireEvent.press(edu.getByTestId('Education/CloseIcon'))
     expect(navigateBack).toBeCalled()
   })
 })
