@@ -123,7 +123,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
     res.redirect('https://forum.celo.org/t/the-great-celo-stake-off-the-details/136')
   })
 
-  // Redirects for OpenPGP WKD https://gnupg.org/blog/20161027-hosting-a-web-key-directory.html
+  // File serving for OpenPGP WKD https://gnupg.org/blog/20161027-hosting-a-web-key-directory.html
   // Content must be served on multiple paths, and cannot use a redirect.
   ;['/.well-known/openpgpkey/hu/:userId', '/.well-known/openpgpkey/:host/hu/:userId'].forEach(
     (route) => {
