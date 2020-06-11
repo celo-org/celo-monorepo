@@ -34,9 +34,9 @@ function SelectLocalCurrency() {
   const renderItem = useCallback(
     ({ item: code }) => (
       <SelectionOption
-        word={code}
-        onSelectAnswer={onSelect}
-        selected={code === selectedCurrencyCode}
+        text={code}
+        onSelect={onSelect}
+        isSelected={code === selectedCurrencyCode}
         data={code}
       />
     ),
