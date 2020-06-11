@@ -43,7 +43,7 @@ exports[`renders correctly 1`] = `
             "fontFamily": "Inter-Regular",
             "fontSize": 16,
             "lineHeight": 22,
-            "paddingBottom": 20,
+            "paddingBottom": 24,
             "textAlign": "center",
           }
         }
