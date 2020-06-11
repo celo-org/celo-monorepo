@@ -64,13 +64,17 @@ export async function getInviteTxGas(
   amount: BigNumber.Value,
   comment: string
 ) {
-  const contractKit = await getContractKitOutsideGenerator()
-  const escrowContract = await contractKit.contracts.getEscrow()
-  return getSendTxGas(account, currency, {
-    amount,
-    comment,
-    recipientAddress: escrowContract.address,
-  })
+  try {
+    const contractKit = await getContractKitOutsideGenerator()
+    const escrowContract = await contractKit.contracts.getEscrow()
+    return getSendTxGas(account, currency, {
+      amount,
+      comment,
+      recipientAddress: escrowContract.address,
+    })
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function getInviteFee(
@@ -79,8 +83,12 @@ export async function getInviteFee(
   amount: string,
   comment: string
 ) {
-  const gas = await getInviteTxGas(account, currency, amount, comment)
-  return (await calculateFee(gas)).plus(getInvitationVerificationFeeInWei())
+  try {
+    const gas = await getInviteTxGas(account, currency, amount, comment)
+    return (await calculateFee(gas)).plus(getInvitationVerificationFeeInWei())
+  } catch (error) {
+    throw error
+  }
 }
 
 export function getInvitationVerificationFeeInDollars() {
