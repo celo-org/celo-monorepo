@@ -492,6 +492,7 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            testID="ModalCancel"
           >
             <Text
               style={
@@ -531,6 +532,7 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            testID="ModalSkip"
           >
             <Text
               style={
@@ -1053,6 +1055,7 @@ exports[`VerificationEducationScreen renders correctly 2`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            testID="ModalCancel"
           >
             <Text
               style={
@@ -1092,6 +1095,7 @@ exports[`VerificationEducationScreen renders correctly 2`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            testID="ModalSkip"
           >
             <Text
               style={
