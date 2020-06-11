@@ -20,7 +20,7 @@ enum Paths {
   work,
 }
 
-const MOVE_Y = {
+const MOVE_BY = {
   [Paths.build]: -15,
   [Paths.grow]: -30,
   [Paths.validate]: -80,
@@ -47,7 +47,9 @@ export default function Involvement() {
             style={[
               standardStyles.row,
               styles.controls,
-              { transform: [{ translateX: isMobile ? MOVE_Y[currentPath] : MOVE_Y[Paths.build] }] },
+              {
+                transform: [{ translateX: isMobile ? MOVE_BY[currentPath] : MOVE_BY[Paths.build] }],
+              },
             ]}
           >
             <Control setPath={setPath} currentPath={currentPath} path={Paths.build} />
@@ -188,12 +190,7 @@ function Content({ path }) {
       </Cell>
       {!isMobile && (
         <Cell span={Spans.half}>
-          <Photo
-            key={path}
-            image={LINKS[path].img}
-            ratio={LINKS[path].ratio || 470 / 290}
-            preview={preview}
-          />
+          <Photo key={path} image={LINKS[path].img} ratio={470 / 290} preview={preview} />
         </Cell>
       )}
     </>
