@@ -2,6 +2,10 @@ node_modules
 **/node_modules
 *node_modules
 
+# logs
+yarn-error.log
+npm-debug.log
+
 # root folders
 .github
 dockerfiles
@@ -13,5 +17,7 @@ packages/docs
 packages/faucet
 packages/helm-charts
 packages/mobile
+packages/react-components
+packages/dappkit
 packages/notification-service
 packages/web

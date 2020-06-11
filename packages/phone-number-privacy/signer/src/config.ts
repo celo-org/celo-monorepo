@@ -44,16 +44,16 @@ const toNum = (value: BigNumber.Value) => new BigNumber(value).toNumber()
 const env = process.env as any
 const config: Config = {
   server: {
-    port: toNum(env.SERVER_PORT),
+    port: toNum(env.SERVER_PORT) || 8080,
   },
   blockchain: {
     provider: env.BLOCKCHAIN_PROVIDER,
   },
   salt: {
-    unverifiedQueryMax: toNum(env.SALT_UNVERIFIED_QUERY_MAX),
-    additionalVerifiedQueryMax: toNum(env.SALT_ADDITIONAL_VERIFIED_QUERY_MAX),
-    queryPerTransaction: toNum(env.SALT_QUERY_PER_TRANSACTION),
-    minDollarBalance: new BigNumber(env.SALT_MIN_DOLLAR_BALANCE),
+    unverifiedQueryMax: toNum(env.SALT_UNVERIFIED_QUERY_MAX) || 2,
+    additionalVerifiedQueryMax: toNum(env.SALT_ADDITIONAL_VERIFIED_QUERY_MAX) || 30,
+    queryPerTransaction: toNum(env.SALT_QUERY_PER_TRANSACTION) || 2,
+    minDollarBalance: new BigNumber(env.SALT_MIN_DOLLAR_BALANCE || 100000000000000000),
   },
   db: {
     user: env.DB_USERNAME,
@@ -69,7 +69,7 @@ const config: Config = {
     azureSecretName: env.KEYVAULT_AZURE_SECRET_NAME,
   },
   attestations: {
-    numberAttestationsRequired: toNum(env.ATTESTATIONS_NUMBER_ATTESTATIONS_REQUIRED),
+    numberAttestationsRequired: toNum(env.ATTESTATIONS_NUMBER_ATTESTATIONS_REQUIRED) || 3,
   },
 }
 export default config
