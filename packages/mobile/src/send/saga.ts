@@ -145,12 +145,10 @@ function* sendPaymentOrInviteSaga({
   inviteMethod,
   firebasePendingRequestUid,
 }: SendPaymentOrInviteAction) {
+  const isInvite = !recipientAddress
   try {
-    recipientAddress
-      ? CeloAnalytics.track(CustomEventNames.send_dollar_confirm)
-      : CeloAnalytics.track(CustomEventNames.send_invite)
-    if (!recipient || (!recipient.e164PhoneNumber && !recipient.address)) {
-      throw new Error("Can't send to recipient without valid e164 number or address")
+    if (!recipient?.e164PhoneNumber && !recipient?.address) {
+      throw new Error("Can't send to recipient without valid e164PhoneNumber or address")
     }
 
     const ownAddress: string = yield select(currentAccountSelector)
@@ -177,9 +175,12 @@ function* sendPaymentOrInviteSaga({
     if (firebasePendingRequestUid) {
       yield put(completePaymentRequest(firebasePendingRequestUid))
     }
+
+    CeloAnalytics.track(CustomEventNames.send_complete, { isInvite })
     navigateHome()
     yield put(sendPaymentOrInviteSuccess())
   } catch (e) {
+    CeloAnalytics.track(CustomEventNames.send_error, { isInvite, error: e })
     yield put(showError(ErrorMessages.SEND_PAYMENT_FAILED))
     yield put(sendPaymentOrInviteFailure())
   }
