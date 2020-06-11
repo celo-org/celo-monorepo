@@ -13,4 +13,5 @@ ENV NODE_ENV production
 
 RUN yarn build
 
-ENTRYPOINT ["yarn", "start"]
+EXPOSE 8080
+ENTRYPOINT ["yarn", "start:docker"]
