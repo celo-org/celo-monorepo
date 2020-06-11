@@ -9,6 +9,7 @@ interface Props {
   onBackspacePress: () => void
   onDecimalPress?: () => void
   decimalSeparator?: string
+  testID?: string
 }
 
 function DigitButton({
