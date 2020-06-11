@@ -43,7 +43,6 @@ describe('Transfer Works', () => {
 
   it('Language', async () => {
     await element(by.id('ChooseLanguage/en-US')).tap()
-    await element(by.id('ChooseLanguageButton')).tap()
   })
 
   it('Join', async () => {
