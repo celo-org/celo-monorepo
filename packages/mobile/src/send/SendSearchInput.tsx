@@ -43,6 +43,7 @@ export function SendSearchInput(props: SendSearchInputProps) {
         title={isPhoneEnabled ? undefined : t('global:to')}
         style={styles.textInput}
         shouldShowClipboard={isValidAddress}
+        testID={'RecipientSearchInput'}
       />
     </View>
   )
