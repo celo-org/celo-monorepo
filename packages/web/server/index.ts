@@ -56,30 +56,30 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
   }
 
   // page redirects
-  ;['/careers', '/join'].forEach((path) => {
-    server.get(path, (_, res) => {
+  ;['/careers', '/join'].forEach((route) => {
+    server.get(route, (_, res) => {
       res.redirect('/jobs')
     })
   })
-  ;['/about-us'].forEach((path) => {
-    server.get(path, (_, res) => {
+  ;['/about-us'].forEach((route) => {
+    server.get(route, (_, res) => {
       res.redirect('/about')
     })
   })
-  ;['/arg_tos', '/arg_privacy', '/argentina'].forEach((path) => {
-    server.get(path, (_, res) => {
+  ;['/arg_tos', '/arg_privacy', '/argentina'].forEach((route) => {
+    server.get(route, (_, res) => {
       res.redirect('/terms')
     })
   })
   ;['/applications', '/technology', '/dev', '/devs', '/develop', '/build', '/developer'].forEach(
-    (path) => {
-      server.get(path, (_, res) => {
+    (route) => {
+      server.get(route, (_, res) => {
         res.redirect('/developers')
       })
     }
   )
-  ;['/build/validators'].forEach((path) => {
-    server.get(path, (_, res) => {
+  ;['/build/validators'].forEach((route) => {
+    server.get(route, (_, res) => {
       res.redirect('/validators/explore')
     })
   })
@@ -87,8 +87,8 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
   server.get('/build/*', (req, res) => {
     res.redirect(`/developers/${req.params[0]}`)
   })
-  ;['/app', '/test-wallet', '/mobile-app', 'build/download'].forEach((path) => {
-    server.get(path, (_, res) => {
+  ;['/app', '/test-wallet', '/mobile-app', 'build/download'].forEach((route) => {
+    server.get(route, (_, res) => {
       res.redirect('/developers/wallet')
     })
   })
@@ -128,12 +128,12 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
   ;['/.well-known/openpgpkey/hu/:userId', '/.well-known/openpgpkey/:host/hu/:userId'].forEach(
     (route) => {
       server.get(route, (req, res) => {
-        const host = req.params['host'] ?? req.hostname
+        const host = req.params.host ?? req.hostname
         if (!req.hostname.includes(host)) {
           res.sendStatus(400)
           return
         }
-        const userId = req.params['userId'] ?? ''
+        const userId = req.params.userId ?? ''
         if (!/\w+/.test(userId)) {
           res.sendStatus(400)
           return
@@ -152,7 +152,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
   )
   ;['/.well-known/openpgpkey/policy', '/.well-known/openpgpkey/:host/policy'].forEach((route) => {
     server.get(route, (req, res) => {
-      const host = req.params['host'] ?? req.hostname
+      const host = req.params.host ?? req.hostname
       if (!req.hostname.includes(host)) {
         res.sendStatus(400)
         return
