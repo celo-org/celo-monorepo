@@ -42,12 +42,9 @@ export class RpcWallet extends RemoteWallet {
       throw new Error(`RpcWallet: account already exists`)
     }
     const signer = new RpcSigner(this.rpc, address)
-    const resp = await signer.init(formattedPrivateKey, passphrase)
-    if (resp.error) {
-      throw new Error(`RpcWallet: signer init failed with ${resp.error}`)
-    }
-    this.addSigner(resp.result!, signer)
-    return resp.result!
+    const resultantAddress = await signer.init(formattedPrivateKey, passphrase)
+    this.addSigner(resultantAddress, signer)
+    return resultantAddress
   }
 
   async unlockAccount(address: string, passphrase: string, duration: number) {

@@ -28,8 +28,16 @@ export class RpcSigner implements Signer {
     protected unlockDuration = -1
   ) {}
 
-  init = (privateKey: string, passphrase: string) =>
-    this.rpc.call('personal_importRawKey', [trimLeading0x(privateKey), passphrase])
+  async init(privateKey: string, passphrase: string) {
+    const response = await this.rpc.call('personal_importRawKey', [
+      trimLeading0x(privateKey),
+      passphrase,
+    ])
+    if (response.error) {
+      throw new Error(`RpcSigner init failed with ${response.error}`)
+    }
+    return response.result!
+  }
 
   /**
    * @dev addToV is unused because the geth JSON-RPC adds this.
@@ -46,12 +54,12 @@ export class RpcSigner implements Signer {
     if (response.error) {
       throw new Error(`RpcSigner signTransaction failed with ${response.error}`)
     } else {
-      return decodeSig(response.result!)
+      return decodeSig(response.result!.raw)
     }
   }
 
   async signPersonalMessage(data: string): Promise<{ v: number; r: Buffer; s: Buffer }> {
-    const response = await this.rpc.call('eth_sign', [data])
+    const response = await this.rpc.call('eth_sign', [this.account, data])
     if (response.error) {
       throw new Error(`RpcSigner signPersonalMessage failed with ${response.error}`)
     } else {
