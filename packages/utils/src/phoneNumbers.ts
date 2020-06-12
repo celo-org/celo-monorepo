@@ -137,14 +137,16 @@ export function isE164NumberStrict(phoneNumber: string) {
 
 export function parsePhoneNumber(
   phoneNumberRaw: string,
-  defaultCountryCode: string
+  defaultCountryCode?: string
 ): ParsedPhoneNumber | null {
   try {
     if (!phoneNumberRaw || phoneNumberRaw.length < MIN_PHONE_LENGTH) {
       return null
     }
 
-    const defaultRegionCode = getRegionCodeFromCountryCode(defaultCountryCode)
+    const defaultRegionCode = defaultCountryCode
+      ? getRegionCodeFromCountryCode(defaultCountryCode)
+      : null
     const parsedNumberUnfixed = phoneUtil.parse(phoneNumberRaw, defaultRegionCode || undefined)
     const parsedCountryCode = parsedNumberUnfixed.getCountryCode()
     const parsedRegionCode = phoneUtil.getRegionCodeForNumber(parsedNumberUnfixed)

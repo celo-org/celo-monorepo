@@ -34,7 +34,7 @@ import { currentAccountSelector } from 'src/web3/selectors'
 const TAG = 'paymentRequest/confirmation'
 
 interface StateProps {
-  e164PhoneNumber: string
+  e164PhoneNumber: string | null
   account: string | null
   confirmationInput: ConfirmationInput
   addressJustValidated?: boolean
@@ -117,7 +117,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
       // Would help with protection of PII but would possibly make the UX worst?
       timestamp: new Date(),
       requesterAddress: address,
-      requesterE164Number: this.props.e164PhoneNumber,
+      requesterE164Number: this.props.e164PhoneNumber ? this.props.e164PhoneNumber : undefined,
       requesteeAddress,
       currency: currencyToShortMap[CURRENCY_ENUM.DOLLAR],
       comment: this.state.comment,
