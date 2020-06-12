@@ -1,63 +1,78 @@
+import { BtnTypes } from '@celo/react-components/components/Button.v2'
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 import Education from 'src/account/Education'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { setEducationCompleted } from 'src/goldToken/actions'
+import { Namespaces } from 'src/i18n'
 import { exchangeIcon, goldValue, shinyGold } from 'src/images/Images'
-import { navigate, navigateHome } from 'src/navigator/NavigationService'
+import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import useSelector from 'src/redux/useSelector'
 
-interface DispatchProps {
-  setEducationCompleted: typeof setEducationCompleted
-}
-type Props = DispatchProps
-export class GoldEducation extends React.Component<Props> {
-  static navigationOptions = { header: null }
+export default function GoldEducation() {
+  const { t } = useTranslation(Namespaces.global)
 
-  goToExchange = () => {
-    this.props.setEducationCompleted()
+  const dispatch = useDispatch()
+
+  const isCeloEducationComplete = useSelector((state) => state.goldToken.educationCompleted)
+
+  const onFinish = () => {
     CeloAnalytics.track(CustomEventNames.exchange_gold_nux)
-    navigate(Screens.ExchangeHomeScreen)
+
+    if (isCeloEducationComplete) {
+      navigateBack()
+    } else {
+      navigate(Screens.ExchangeHomeScreen)
+      dispatch(setEducationCompleted())
+    }
   }
 
-  goToWalletHome = () => {
-    this.props.setEducationCompleted()
-    CeloAnalytics.track(CustomEventNames.wallet_gold_nux)
-    navigateHome()
-  }
+  const stepInfo = useStep()
 
-  render() {
-    const stepInfo = [
+  return (
+    <Education
+      isClosable={isCeloEducationComplete}
+      stepInfo={stepInfo}
+      onFinish={onFinish}
+      finalButtonType={BtnTypes.TERTIARY}
+      finalButtonText={t('global:done')}
+      buttonText={t('global:next')}
+    />
+  )
+}
+
+function useStep() {
+  const { t } = useTranslation(Namespaces.goldEducation)
+
+  return React.useMemo(() => {
+    return [
       {
         image: shinyGold,
-        text: 'celoLikeGold',
         cancelEvent: CustomEventNames.gold_cancel1,
+        progressEvent: CustomEventNames.gold_educate_1_next,
         screenName: 'Gold_Nux_1',
       },
       {
         image: goldValue,
-        text: 'goldFluctuates',
         cancelEvent: CustomEventNames.gold_cancel2,
+        progressEvent: CustomEventNames.gold_educate_2_next,
         screenName: 'Gold_Nux_2',
       },
       {
         image: exchangeIcon,
-        text: 'exchange',
         cancelEvent: CustomEventNames.gold_cancel3,
+        progressEvent: CustomEventNames.gold_educate_3_next,
         screenName: 'Gold_Nux_3',
       },
-    ]
-    return (
-      <Education
-        stepInfo={stepInfo}
-        onFinish={this.goToExchange}
-        onFinishAlternate={this.goToWalletHome}
-        buttonText={'exchangeGold'}
-        linkText={'backToWallet'}
-      />
-    )
-  }
+    ].map((step, index) => {
+      return {
+        ...step,
+        title: t(`steps.${index}.title`),
+        text: t(`steps.${index}.text`),
+      }
+    })
+  }, [])
 }
-
-export default connect<{}, DispatchProps>(null, { setEducationCompleted })(GoldEducation)
