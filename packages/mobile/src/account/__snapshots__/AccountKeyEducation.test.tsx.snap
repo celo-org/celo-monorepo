@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Education renders correctly 1`] = `
+exports[`AccountKeyEducation renders correctly 1`] = `
 <SafeAreaView
   style={
     Object {
@@ -143,7 +143,7 @@ exports[`Education renders correctly 1`] = `
             }
           }
         >
-          Step 1
+          guide.0.title
         </Text>
         <Text
           style={
@@ -157,7 +157,169 @@ exports[`Education renders correctly 1`] = `
             }
           }
         >
-          The Journey Begins
+          guide.0.text
+        </Text>
+      </View>
+      <View
+        style={
+          Object {
+            "flex": 1,
+            "justifyContent": "center",
+            "marginBottom": 24,
+            "paddingHorizontal": 24,
+          }
+        }
+      >
+        <Image
+          resizeMode="contain"
+          source={
+            Object {
+              "testUri": "../../../packages/mobile/src/images/placeholder.png",
+            }
+          }
+          style={
+            Object {
+              "alignSelf": "center",
+              "height": 200,
+              "width": 200,
+            }
+          }
+        />
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 19,
+              "lineHeight": 26,
+              "marginTop": 24,
+              "textAlign": "center",
+            }
+          }
+        >
+          guide.1.title
+        </Text>
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-Regular",
+              "fontSize": 16,
+              "lineHeight": 22,
+              "paddingTop": 16,
+              "textAlign": "center",
+            }
+          }
+        >
+          guide.1.text
+        </Text>
+      </View>
+      <View
+        style={
+          Object {
+            "flex": 1,
+            "justifyContent": "center",
+            "marginBottom": 24,
+            "paddingHorizontal": 24,
+          }
+        }
+      >
+        <Image
+          resizeMode="contain"
+          source={
+            Object {
+              "testUri": "../../../packages/mobile/src/images/placeholder.png",
+            }
+          }
+          style={
+            Object {
+              "alignSelf": "center",
+              "height": 200,
+              "width": 200,
+            }
+          }
+        />
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 19,
+              "lineHeight": 26,
+              "marginTop": 24,
+              "textAlign": "center",
+            }
+          }
+        >
+          guide.2.title
+        </Text>
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-Regular",
+              "fontSize": 16,
+              "lineHeight": 22,
+              "paddingTop": 16,
+              "textAlign": "center",
+            }
+          }
+        >
+          guide.2.text
+        </Text>
+      </View>
+      <View
+        style={
+          Object {
+            "flex": 1,
+            "justifyContent": "center",
+            "marginBottom": 24,
+            "paddingHorizontal": 24,
+          }
+        }
+      >
+        <Image
+          resizeMode="contain"
+          source={
+            Object {
+              "testUri": "../../../packages/mobile/src/images/placeholder.png",
+            }
+          }
+          style={
+            Object {
+              "alignSelf": "center",
+              "height": 200,
+              "width": 200,
+            }
+          }
+        />
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 19,
+              "lineHeight": 26,
+              "marginTop": 24,
+              "textAlign": "center",
+            }
+          }
+        >
+          guide.3.title
+        </Text>
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-Regular",
+              "fontSize": 16,
+              "lineHeight": 22,
+              "paddingTop": 16,
+              "textAlign": "center",
+            }
+          }
+        >
+          guide.3.text
         </Text>
       </View>
     </Swiper>
@@ -218,7 +380,7 @@ exports[`Education renders correctly 1`] = `
               }
             }
           >
-            Done
+            global:next
           </Text>
         </View>
       </View>

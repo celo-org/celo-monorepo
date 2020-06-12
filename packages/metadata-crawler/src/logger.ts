@@ -25,3 +25,6 @@ export const logger: Logger = createLogger({
   serializers: stdSerializers,
   streams: [stream],
 })
+
+export const operationalLogger = logger.child({ logger: 'operation' })
+export const dataLogger = logger.child({ logger: 'data' })
