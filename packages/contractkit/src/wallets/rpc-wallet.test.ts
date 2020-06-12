@@ -1,7 +1,10 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/src/address'
 import { verifySignature } from '@celo/utils/src/signatureUtils'
+import net from 'net'
+import Web3 from 'web3'
 import { EncodedTransaction, Tx } from 'web3-core'
+import { newKit } from '../kit'
 import { recoverTransaction, verifyEIP712TypedDataSigner } from '../utils/signing-utils'
 import { RpcWallet } from './rpc-wallet'
 
@@ -54,6 +57,30 @@ export const ACCOUNT_ADDRESS2 = normalizeAddressWith0x(privateKeyToAddress(PRIVA
 
 const PASSPHRASE = 'ce10'
 const DURATION = 10000
+
+// ./build/bin/geth --alfajores --syncmode=lightest  --rpcapi=net,eth,web3,personal --verbosity 4
+describe.skip('rpc-wallet', () => {
+  it('should work against local geth ipc', async () => {
+    const ipcUrl = '/Users/yorhodes/Library/Celo/alfajores/geth.ipc'
+    const ipcProvider = new Web3.providers.IpcProvider(ipcUrl, net)
+    const wallet = new RpcWallet(ipcProvider)
+    await wallet.init()
+
+    // const account = await wallet.addAccount(PRIVATE_KEY1, PASSPHRASE)
+
+    await wallet.unlockAccount(ACCOUNT_ADDRESS1, PASSPHRASE, DURATION)
+
+    const kit = newKit(ipcUrl, wallet)
+    const result = await kit.web3.eth.signTransaction({
+      from: ACCOUNT_ADDRESS1,
+      to: '0x588e4b68193001e4d10928660ab4165b813717c0',
+      value: 1000,
+    })
+    console.log(result)
+    const txResult = await kit.web3.eth.sendSignedTransaction(result.raw)
+    console.log(txResult)
+  })
+})
 
 testWithGanache('rpc-wallet', (web3) => {
   const provider = web3.currentProvider
@@ -112,7 +139,7 @@ testWithGanache('rpc-wallet', (web3) => {
           try {
             await rpcWallet.unlockAccount(ACCOUNT_ADDRESS1, 'wrong_passphrase', DURATION)
           } catch (e) {
-            expect(e.message).toContain('RpcSigner unlock failed')
+            expect(e.message).toContain('RpcSigner@unlock failed')
           }
         })
 

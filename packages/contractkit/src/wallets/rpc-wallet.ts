@@ -3,9 +3,8 @@ import {
   normalizeAddressWith0x,
   privateKeyToAddress,
 } from '@celo/utils/lib/address'
-import { EncodedTransaction, provider, Tx } from 'web3-core'
+import { provider, Tx } from 'web3-core'
 import { DefaultRpcCaller, RpcCaller } from '../utils/rpc-caller'
-import { encodeTransaction, rlpEncodedTx } from '../utils/signing-utils'
 import { RemoteWallet } from './remote-wallet'
 import { RpcSigner } from './signers/rpc-signer'
 import { Signer } from './signers/signer'
@@ -62,14 +61,10 @@ export class RpcWallet extends RemoteWallet {
    * @param txParams Transaction to sign
    * @dev overrides WalletBase.signTransaction
    */
-  async signTransaction(txParams: Tx): Promise<EncodedTransaction> {
-    const rlpEncoded = rlpEncodedTx(txParams)
+  async signTransaction(txParams: Tx): Promise<any> {
     // Get the signer from the 'from' field
     const fromAddress = txParams.from!.toString()
     const signer = this.getSigner(fromAddress) as RpcSigner
-    // addToV set to 0 because geth RPC performs EIP155 replay prevention by default
-    // see: https://github.com/celo-org/celo-blockchain/blob/master/core/types/transaction_signing.go#L148
-    const signature = await signer.signTransaction(0, rlpEncoded)
-    return encodeTransaction(rlpEncoded, signature)
+    return signer.signRawTransaction(txParams)
   }
 }
