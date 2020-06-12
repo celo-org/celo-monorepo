@@ -1539,85 +1539,30 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
           </Text>
         </Text>
       </View>
-      <View
-        accessible={true}
-        focusable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackground",
-            "type": "ThemeAttrAndroid",
-          }
-        }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-      >
+      <View>
         <View
-          style={
+          accessible={true}
+          focusable={true}
+          nativeBackgroundAndroid={
             Object {
-              "flexDirection": "row",
-              "justifyContent": "space-between",
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
         >
           <View
             style={
               Object {
-                "alignItems": "center",
                 "flexDirection": "row",
+                "justifyContent": "space-between",
               }
-            }
-          >
-            <Text
-              style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Inter-Regular",
-                  "fontSize": 16,
-                  "lineHeight": 22,
-                }
-              }
-            >
-              feeEstimate
-            </Text>
-            <View
-              style={
-                Object {
-                  "transform": Array [
-                    Object {
-                      "rotate": "0deg",
-                    },
-                  ],
-                }
-              }
-            >
-              <svg
-                fill="none"
-                height={16}
-                viewBox="0 0 16 16"
-                width={16}
-              >
-                <path
-                  d="M3 6l5 5 5-5"
-                  stroke="#B4B9BD"
-                />
-              </svg>
-            </View>
-          </View>
-          <View
-            style={
-              Array [
-                Object {
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "marginVertical": 5,
-                },
-                undefined,
-              ]
             }
           >
             <View
@@ -1625,10 +1570,82 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                 Object {
                   "alignItems": "center",
                   "flexDirection": "row",
-                  "marginRight": 5,
                 }
               }
             >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  }
+                }
+              >
+                feeActual
+              </Text>
+              <View
+                style={
+                  Object {
+                    "transform": Array [
+                      Object {
+                        "rotate": "0deg",
+                      },
+                    ],
+                  }
+                }
+              >
+                <svg
+                  fill="none"
+                  height={16}
+                  viewBox="0 0 16 16"
+                  width={16}
+                >
+                  <path
+                    d="M3 6l5 5 5-5"
+                    stroke="#B4B9BD"
+                  />
+                </svg>
+              </View>
+            </View>
+            <View
+              style={
+                Array [
+                  Object {
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                    "marginVertical": 5,
+                  },
+                  undefined,
+                ]
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "marginRight": 5,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
+                      },
+                      undefined,
+                    ]
+                  }
+                >
+                  
+                </Text>
+              </View>
               <Text
                 style={
                   Array [
@@ -1642,38 +1659,23 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                   ]
                 }
               >
-                
+                <Text
+                  numberOfLines={1}
+                  style={
+                    Array [
+                      undefined,
+                      Object {
+                        "color": undefined,
+                      },
+                    ]
+                  }
+                >
+                  
+                  $
+                  0.001
+                </Text>
               </Text>
             </View>
-            <Text
-              style={
-                Array [
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Inter-Regular",
-                    "fontSize": 16,
-                    "lineHeight": 22,
-                  },
-                  undefined,
-                ]
-              }
-            >
-              <Text
-                numberOfLines={1}
-                style={
-                  Array [
-                    undefined,
-                    Object {
-                      "color": undefined,
-                    },
-                  ]
-                }
-              >
-                
-                $
-                0.001
-              </Text>
-            </Text>
           </View>
         </View>
       </View>
@@ -2249,85 +2251,30 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
           </Text>
         </Text>
       </View>
-      <View
-        accessible={true}
-        focusable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackground",
-            "type": "ThemeAttrAndroid",
-          }
-        }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-      >
+      <View>
         <View
-          style={
+          accessible={true}
+          focusable={true}
+          nativeBackgroundAndroid={
             Object {
-              "flexDirection": "row",
-              "justifyContent": "space-between",
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
         >
           <View
             style={
               Object {
-                "alignItems": "center",
                 "flexDirection": "row",
+                "justifyContent": "space-between",
               }
-            }
-          >
-            <Text
-              style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Inter-Regular",
-                  "fontSize": 16,
-                  "lineHeight": 22,
-                }
-              }
-            >
-              feeEstimate
-            </Text>
-            <View
-              style={
-                Object {
-                  "transform": Array [
-                    Object {
-                      "rotate": "0deg",
-                    },
-                  ],
-                }
-              }
-            >
-              <svg
-                fill="none"
-                height={16}
-                viewBox="0 0 16 16"
-                width={16}
-              >
-                <path
-                  d="M3 6l5 5 5-5"
-                  stroke="#B4B9BD"
-                />
-              </svg>
-            </View>
-          </View>
-          <View
-            style={
-              Array [
-                Object {
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "marginVertical": 5,
-                },
-                undefined,
-              ]
             }
           >
             <View
@@ -2335,10 +2282,82 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
                 Object {
                   "alignItems": "center",
                   "flexDirection": "row",
-                  "marginRight": 5,
                 }
               }
             >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  }
+                }
+              >
+                feeActual
+              </Text>
+              <View
+                style={
+                  Object {
+                    "transform": Array [
+                      Object {
+                        "rotate": "0deg",
+                      },
+                    ],
+                  }
+                }
+              >
+                <svg
+                  fill="none"
+                  height={16}
+                  viewBox="0 0 16 16"
+                  width={16}
+                >
+                  <path
+                    d="M3 6l5 5 5-5"
+                    stroke="#B4B9BD"
+                  />
+                </svg>
+              </View>
+            </View>
+            <View
+              style={
+                Array [
+                  Object {
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                    "marginVertical": 5,
+                  },
+                  undefined,
+                ]
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "marginRight": 5,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
+                      },
+                      undefined,
+                    ]
+                  }
+                >
+                  
+                </Text>
+              </View>
               <Text
                 style={
                   Array [
@@ -2352,38 +2371,23 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
                   ]
                 }
               >
-                
+                <Text
+                  numberOfLines={1}
+                  style={
+                    Array [
+                      undefined,
+                      Object {
+                        "color": undefined,
+                      },
+                    ]
+                  }
+                >
+                  
+                  $
+                  0.001
+                </Text>
               </Text>
             </View>
-            <Text
-              style={
-                Array [
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Inter-Regular",
-                    "fontSize": 16,
-                    "lineHeight": 22,
-                  },
-                  undefined,
-                ]
-              }
-            >
-              <Text
-                numberOfLines={1}
-                style={
-                  Array [
-                    undefined,
-                    Object {
-                      "color": undefined,
-                    },
-                  ]
-                }
-              >
-                
-                $
-                0.001
-              </Text>
-            </Text>
           </View>
         </View>
       </View>

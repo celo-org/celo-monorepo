@@ -61,8 +61,9 @@ export default function FeeDrawer({
   }
 
   return (
-    <>
-      <Touchable testID={testID} onPress={toggleExpanded}>
+    // Uses View instead of Fragment to workaround a glitch with LayoutAnimation
+    <View>
+      <Touchable onPress={toggleExpanded} testID={testID}>
         <View style={styles.totalContainer}>
           <Expandable isExpandable={true} isExpanded={expanded}>
             <Text style={styles.title}>{title}</Text>
@@ -102,7 +103,7 @@ export default function FeeDrawer({
           />
         </View>
       )}
-    </>
+    </View>
   )
 }
 

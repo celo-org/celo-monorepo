@@ -18,6 +18,7 @@ import {
 const TEST_FEE = new BigNumber(10000000000000000)
 
 jest.mock('src/send/saga')
+jest.mock('react-native/Libraries/LayoutAnimation/LayoutAnimation.js')
 
 const mockedGetSendFee = getSendFee as jest.Mock
 
@@ -43,17 +44,20 @@ describe('SendConfirmation', () => {
       },
     })
 
-    const { toJSON } = render(
+    const tree = render(
       <Provider store={store}>
         <SendConfirmation {...mockScreenProps} />
       </Provider>
     )
 
     // Initial render
-    expect(toJSON()).toMatchSnapshot()
-    // TODO: Find out why there is no handler function found for event "press"
-    // expect(queryByText('securityFee')).not.toBeNull()
-    // expect(queryByText('0.001')).toBeNull()
+    expect(tree).toMatchSnapshot()
+    fireEvent.press(tree.getByText('feeEstimate'))
+    // Run timers, because Touchable adds some delay
+    jest.runAllTimers()
+    // TODO: figure out why onPress function of Touchable isn't being called
+    // expect(tree.queryByText('securityFee')).not.toBeNull()
+    // expect(tree.queryByText('0.0100')).toBeNull()
 
     // TODO figure out why this waitForElement isn't working here and in tests below.
     // Wait for fee to be calculated and displayed
@@ -82,8 +86,11 @@ describe('SendConfirmation', () => {
 
     // Initial render
     expect(tree).toMatchSnapshot()
-    // TODO: Find a way to similate a toggle without using fireEvent.press
-    // fireEvent.press(tree.getByTestId('feeDrawer/SendConfirmation'))
+
+    fireEvent.press(tree.getByText('feeEstimate'))
+    // Run timers, because Touchable adds some delay
+    jest.runAllTimers()
+    // TODO: figure out why onPress function of Touchable isn't being called
     // expect(tree.queryByText('securityFee')).not.toBeNull()
     // expect(tree.queryByText('0.0100')).toBeNull()
 
