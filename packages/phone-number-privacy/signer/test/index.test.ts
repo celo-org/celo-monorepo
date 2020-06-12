@@ -1,12 +1,14 @@
 import request from 'supertest'
-import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
+import { computeBlindedSignature } from '../src/bls/bls-cryptography-client'
 import { authenticateUser } from '../src/common/identity'
+import { DEV_PRIVATE_KEY } from '../src/config'
 import { getTransaction } from '../src/database/database'
 import {
   getDidMatchmaking,
   incrementQueryCount,
   setDidMatchmaking,
 } from '../src/database/wrappers/account'
+import { getKeyProvider } from '../src/key-management/key-provider'
 import { getRemainingQueryCount } from '../src/salt-generation/query-quota'
 import { app } from '../src/server'
 
@@ -19,9 +21,13 @@ mockAuthenticateUser.mockReturnValue(true)
 jest.mock('../src/salt-generation/query-quota')
 const mockGetRemainingQueryCount = getRemainingQueryCount as jest.Mock
 
+jest.mock('../src/key-management/key-provider')
+const mockGetKeyProvider = getKeyProvider as jest.Mock
+mockGetKeyProvider.mockReturnValue({ getPrivateKey: jest.fn(() => DEV_PRIVATE_KEY) })
+
 jest.mock('../src/bls/bls-cryptography-client')
-const mockComputeBlindedSignature = BLSCryptographyClient.computeBlindedSignature as jest.Mock
-mockComputeBlindedSignature.mockResolvedValue(BLS_SIGNATURE)
+const mockComputeBlindedSignature = computeBlindedSignature as jest.Mock
+mockComputeBlindedSignature.mockReturnValue(BLS_SIGNATURE)
 
 jest.mock('../src/database/wrappers/account')
 const mockIncrementQueryCount = incrementQueryCount as jest.Mock
@@ -47,7 +53,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
       account,
     }
 
-    it('provides signature', (done) => {
+    it.only('provides signature', (done) => {
       mockGetRemainingQueryCount.mockReturnValue(10)
       request(app)
         .post('/getBlindedSalt')

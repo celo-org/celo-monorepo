@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
+import { computeBlindedSignature } from '../bls/bls-cryptography-client'
 import { ErrorMessages, respondWithError } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
 import {
@@ -11,6 +11,7 @@ import {
 import logger from '../common/logger'
 import { getTransaction } from '../database/database'
 import { incrementQueryCount } from '../database/wrappers/account'
+import { getKeyProvider } from '../key-management/key-provider'
 import { getRemainingQueryCount } from './query-quota'
 
 interface GetBlindedMessageForSaltRequest {
@@ -37,7 +38,6 @@ export async function handleGetBlindedMessageForSalt(
     }
 
     const { account, blindedQueryPhoneNumber, hashedPhoneNumber } = request.body
-
     const remainingQueryCount = await getRemainingQueryCount(trx, account, hashedPhoneNumber)
     if (remainingQueryCount <= 0) {
       logger.debug('rolling back db transaction due to no remaining query count')
@@ -45,7 +45,9 @@ export async function handleGetBlindedMessageForSalt(
       respondWithError(response, 403, ErrorMessages.EXCEEDED_QUOTA)
       return
     }
-    const signature = await BLSCryptographyClient.computeBlindedSignature(blindedQueryPhoneNumber)
+    const keyProvider = getKeyProvider()
+    const privateKey = await keyProvider.getPrivateKey()
+    const signature = computeBlindedSignature(blindedQueryPhoneNumber, privateKey)
     await incrementQueryCount(account, trx)
     logger.debug('committing db transactions for salt retrieval data')
     await trx.commit()
