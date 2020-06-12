@@ -16,6 +16,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import deviceInfoModule from 'react-native-device-info'
 import Account from 'src/account/Account'
 import FiatExchange from 'src/account/FiatExchange'
+import GoldEducation from 'src/account/GoldEducation'
 import { default as InviteScreen } from 'src/account/Invite'
 import {
   defaultCountryCodeSelector,
@@ -98,6 +99,8 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
 
 export default function DrawerNavigator() {
   const { t } = useTranslation(Namespaces.global)
+  const isCeloEducationComplete = useSelector((state) => state.goldToken.educationCompleted)
+
   const drawerContent = (props: DrawerContentComponentProps<DrawerContentOptions>) => (
     <CustomDrawerContent {...props} />
   )
@@ -118,8 +121,8 @@ export default function DrawerNavigator() {
         options={{ title: t('home'), drawerIcon: Home }}
       />
       <Drawer.Screen
-        name={Screens.ExchangeHomeScreen}
-        component={ExchangeHomeScreen}
+        name={isCeloEducationComplete ? Screens.ExchangeHomeScreen : Screens.GoldEducation}
+        component={isCeloEducationComplete ? ExchangeHomeScreen : GoldEducation}
         options={{ title: t('celoGold'), drawerIcon: Gold }}
       />
       <Drawer.Screen
