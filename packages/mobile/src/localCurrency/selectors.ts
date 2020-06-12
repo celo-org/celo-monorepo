@@ -27,7 +27,6 @@ const getDefaultLocalCurrencyCode = createSelector(
     // but the problem is some Android versions don't make it possible to select the appropriate language/country
     // from the device settings.
     // So here we use the country of the phone number
-
     const countryCurrencies = e164PhoneNumber
       ? getCountryCurrencies(e164PhoneNumber)
       : getCurrencies()

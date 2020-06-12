@@ -1,4 +1,4 @@
-import { Response } from 'firebase-functions'
+import { Response } from 'express'
 import logger from './logger'
 
 export enum ErrorMessages {
