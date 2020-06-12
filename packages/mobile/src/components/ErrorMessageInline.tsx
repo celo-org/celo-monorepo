@@ -38,7 +38,6 @@ const mapDispatchToProps = {
 
 type Props = DispatchProps & OwnProps & WithTranslation & StateProps
 
-// Pass null as dismissAfter value to show error indefinitely
 function ErrorMessageInline(props: Props) {
   const { error, displayMethod, dismissAfter, t } = props
 
@@ -49,7 +48,10 @@ function ErrorMessageInline(props: Props) {
   }, [error])
 
   // Keep the space empty when there isn't an inline error
-  if (!error || displayMethod !== ErrorDisplayType.INLINE) {
+  // displayMethod lives in redux store and we want to be able to use this component
+  // without populating it so much check if other types are already displayed
+  // rather than if INLINE is
+  if (!error || displayMethod === ErrorDisplayType.BANNER) {
     return <View style={dismissAfter !== null && styles.errorContainer} />
   }
 

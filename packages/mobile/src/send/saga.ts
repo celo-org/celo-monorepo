@@ -39,12 +39,16 @@ export async function getSendTxGas(
   currency: CURRENCY_ENUM,
   params: BasicTokenTransfer
 ) {
-  Logger.debug(`${TAG}/getSendTxGas`, 'Getting gas estimate for send tx')
-  const tx = await createTokenTransferTransaction(currency, params)
-  const txParams = { from: account, feeCurrency: await getCurrencyAddress(currency) }
-  const gas = await estimateGas(tx.txo, txParams)
-  Logger.debug(`${TAG}/getSendTxGas`, `Estimated gas of ${gas.toString()}`)
-  return gas
+  try {
+    Logger.debug(`${TAG}/getSendTxGas`, 'Getting gas estimate for send tx')
+    const tx = await createTokenTransferTransaction(currency, params)
+    const txParams = { from: account, feeCurrency: await getCurrencyAddress(currency) }
+    const gas = await estimateGas(tx.txo, txParams)
+    Logger.debug(`${TAG}/getSendTxGas`, `Estimated gas of ${gas.toString()}`)
+    return gas
+  } catch (error) {
+    throw Error(ErrorMessages.INSUFFICIENT_BALANCE)
+  }
 }
 
 export async function getSendFee(
@@ -52,8 +56,12 @@ export async function getSendFee(
   currency: CURRENCY_ENUM,
   params: BasicTokenTransfer
 ) {
-  const gas = await getSendTxGas(account, currency, params)
-  return calculateFee(gas)
+  try {
+    const gas = await getSendTxGas(account, currency, params)
+    return calculateFee(gas)
+  } catch (error) {
+    throw error
+  }
 }
 
 export function* watchQrCodeDetections() {
@@ -145,12 +153,10 @@ function* sendPaymentOrInviteSaga({
   inviteMethod,
   firebasePendingRequestUid,
 }: SendPaymentOrInviteAction) {
+  const isInvite = !recipientAddress
   try {
-    recipientAddress
-      ? CeloAnalytics.track(CustomEventNames.send_dollar_confirm)
-      : CeloAnalytics.track(CustomEventNames.send_invite)
-    if (!recipient || (!recipient.e164PhoneNumber && !recipient.address)) {
-      throw new Error("Can't send to recipient without valid e164 number or address")
+    if (!recipient?.e164PhoneNumber && !recipient?.address) {
+      throw new Error("Can't send to recipient without valid e164PhoneNumber or address")
     }
 
     const ownAddress: string = yield select(currentAccountSelector)
@@ -177,9 +183,12 @@ function* sendPaymentOrInviteSaga({
     if (firebasePendingRequestUid) {
       yield put(completePaymentRequest(firebasePendingRequestUid))
     }
+
+    CeloAnalytics.track(CustomEventNames.send_complete, { isInvite })
     navigateHome()
     yield put(sendPaymentOrInviteSuccess())
   } catch (e) {
+    CeloAnalytics.track(CustomEventNames.send_error, { isInvite, error: e })
     yield put(showError(ErrorMessages.SEND_PAYMENT_FAILED))
     yield put(sendPaymentOrInviteFailure())
   }
