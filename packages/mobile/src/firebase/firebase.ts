@@ -10,6 +10,8 @@ import { eventChannel, EventChannel } from 'redux-saga'
 import { call, put, select, spawn, take } from 'redux-saga/effects'
 import { NotificationReceiveState } from 'src/account/types'
 import { showError } from 'src/alert/actions'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { FIREBASE_ENABLED } from 'src/config'
@@ -173,6 +175,7 @@ export function* paymentRequestWriter({ paymentInfo }: WritePaymentRequest) {
     navigateHome()
   } catch (error) {
     Logger.error(TAG, 'Failed to write payment request to Firebase DB', error)
+    CeloAnalytics.track(CustomEventNames.request_error, { error })
     yield put(showError(ErrorMessages.PAYMENT_REQUEST_FAILED))
   }
 }
@@ -196,7 +199,7 @@ export function isVersionBelowMinimum(version: string, minVersion: string): bool
 
 /*
 Get the Version deprecation information.
-Firebase DB Format: 
+Firebase DB Format:
   (New) Add minVersion child to versions category with a string of the mininum version as string
 */
 export async function isAppVersionDeprecated() {

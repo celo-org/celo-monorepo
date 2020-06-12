@@ -3,7 +3,6 @@
   "dollarsSent": "{{Dollars}} Sent",
   "to": "To",
   "send": "Send",
-  "request": "Request",
   "payment": "Payment",
   "sendOrRequest": "Send or Request",
   "recent": "Recent",
@@ -52,18 +51,15 @@
   "inviteSent": "Invite code sent!",
   "inviteFailed": "Failure sending invite",
   "loadingContacts": "Finding your contacts",
-  "QRCode": "QR Code",
-  "shareCodeImage": "Share Code Image",
-  "scanCode": "Scan Code",
+  "myCode": "My Code",
+  "scanCode": "Scan",
   "scanQRCode": "Scan QR Code",
   "writeStorageNeededForQrDownload": "Storage write permission is needed for downloading the QR code",
-  "cameraScanInfo": "Scan code by placing it in the box",
+  "cameraScanInfo": "Center code in the box above",
   "cameraNotAuthorizedTitle": "Enable Camera",
   "cameraNotAuthorizedDescription": "Please enable the Camera in your phone’s Settings. You’ll need it to scan QR codes.",
   "cameraSettings": "Settings",
-  "showYourQRCode": "Show your QR code",
   "toSentOrRequestPayment": "to send or request payment",
-  "requestSent": "Request Sent",
   "reminderSent": "Reminder Sent",
   "reclaimPayment": "Reclaim Payment",
   "totalRefunded": "Total Refunded",
@@ -89,16 +85,20 @@
   },
   "confirmAccount": {
     "header": "Please confirm {{displayName}}'s account",
+    "headerNoDisplayName": "Please confirm your contact's account",
     "button": "Confirm Account Number"
   },
   "secureSendExplanation": {
-    "body1": "{{e164Number}} has multiple accounts associated with it. {{displayName}} could have created a new Celo account, or may have lost their phone or had their account compromised.",
+    "body1": "{{e164PhoneNumber}} has multiple accounts associated with it. {{displayName}} could have created a new Celo account, or may have lost their phone or had their account compromised.",
+    "body1NoDisplayName": "Your contact has multiple accounts associated with it. Your contact could have created a new Celo account, or may have lost their phone or had their account compromised.",
     "body2": "You must scan their QR code or confirm their account number before transacting."
   },
   "confirmAccountNumber": {
     "title": "Confirm Account Number",
     "bodyPartial": "Please ask {{displayName}} for the last four digits of their account number. It's safest to do this in person or by phone.",
+    "bodyPartialNoDisplayName": "Please ask your contact for the last four digits of their account number. It's safest to do this in person or by phone.",
     "body1Full": "Please ask {{displayName}} for their account number.",
+    "body1FullNoDisplayName": "Please ask your contact for their account number.",
     "body2Full": "We strongly recommend asking in person or over the phone, through WhatsApp or Messenger, or by email. For security, please do not use text messaging (SMS).",
     "help": "Help locating an account number",
     "submit": "Submit"
@@ -112,5 +112,6 @@
     "body3": "Account numbers begin with \"0x\" and are 42 characters long"
   },
   "transferAddressChanged": "This contact changed their account number since the transaction. This payment was sent to:",
-  "addressConfirmed": "Account number confirmed"
+  "addressConfirmed": "Account number confirmed",
+  "sending": "Sending"
 }

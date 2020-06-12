@@ -5,17 +5,16 @@
 import Touchable, { Props as TouchableProps } from '@celo/react-components/components/Touchable'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { StyleSheet, Text, TextStyle } from 'react-native'
+import { StyleProp, StyleSheet, Text, TextStyle } from 'react-native'
 
-type Props = TouchableProps & {
-  style?: TextStyle | TextStyle[]
-  testID?: string
+type Props = Omit<TouchableProps, 'style'> & {
+  style?: StyleProp<TextStyle>
 }
 
 export default function Link(props: Props) {
-  const { onPress, style: customStyle, children, disabled, testID } = props
+  const { style: customStyle, children, ...passThroughProps } = props
   return (
-    <Touchable onPress={onPress} borderless={true} disabled={disabled} testID={testID}>
+    <Touchable {...passThroughProps} borderless={true}>
       <Text style={[styles.text, customStyle]}>{children}</Text>
     </Touchable>
   )

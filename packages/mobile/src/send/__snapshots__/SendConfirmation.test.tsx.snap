@@ -6,7 +6,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
     Object {
       "backgroundColor": "#FFFFFF",
       "flex": 1,
-      "flexDirection": "column",
       "padding": 8,
     }
   }
@@ -41,7 +40,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
             style={
               Object {
                 "alignItems": "flex-start",
-                "flexDirection": "column",
                 "paddingBottom": 24,
               }
             }
@@ -103,7 +101,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
               <View
                 style={
                   Object {
-                    "flexDirection": "column",
                     "paddingLeft": 8,
                   }
                 }
@@ -118,7 +115,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                     }
                   }
                 >
-                  Sending
+                  sending
                 </Text>
                 <Text
                   style={
@@ -288,8 +285,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                           "padding": 24,
                         },
                         Object {
-                          "flex": 1,
-                          "margin": 0,
+                          "backgroundColor": "#FFFFFF",
                         },
                       ],
                     ]
@@ -298,336 +294,164 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                   <View
                     style={
                       Object {
-                        "alignItems": "stretch",
-                        "flex": 1,
-                        "justifyContent": "flex-end",
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "justifyContent": "center",
+                        "paddingVertical": 8,
+                      }
+                    }
+                  >
+                    <Image
+                      resizeMode="contain"
+                      source={
+                        Object {
+                          "testUri": "../../../packages/mobile/src/images/sms-icon.png",
+                        }
+                      }
+                      style={
+                        Object {
+                          "height": 30,
+                          "width": 30,
+                        }
+                      }
+                    />
+                    <View
+                      accessible={true}
+                      focusable={true}
+                      nativeBackgroundAndroid={
+                        Object {
+                          "attribute": "selectableItemBackgroundBorderless",
+                          "type": "ThemeAttrAndroid",
+                        }
+                      }
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
+                    >
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#1AB775",
+                              "fontFamily": "Inter-SemiBold",
+                              "fontSize": 16,
+                              "lineHeight": 22,
+                            },
+                            Object {
+                              "color": "#2E3338",
+                              "paddingLeft": 8,
+                            },
+                          ]
+                        }
+                      >
+                        inviteWithSMS
+                      </Text>
+                    </View>
+                  </View>
+                  <View
+                    style={
+                      Object {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "justifyContent": "center",
+                        "paddingVertical": 8,
+                      }
+                    }
+                  >
+                    <Image
+                      resizeMode="contain"
+                      source={
+                        Object {
+                          "testUri": "../../../packages/mobile/src/images/whatsapp-logo.png",
+                        }
+                      }
+                      style={
+                        Object {
+                          "height": 30,
+                          "width": 30,
+                        }
+                      }
+                    />
+                    <View
+                      accessible={true}
+                      focusable={true}
+                      nativeBackgroundAndroid={
+                        Object {
+                          "attribute": "selectableItemBackgroundBorderless",
+                          "type": "ThemeAttrAndroid",
+                        }
+                      }
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
+                    >
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#1AB775",
+                              "fontFamily": "Inter-SemiBold",
+                              "fontSize": 16,
+                              "lineHeight": 22,
+                            },
+                            Object {
+                              "color": "#2E3338",
+                              "paddingLeft": 8,
+                            },
+                          ]
+                        }
+                      >
+                        inviteWithWhatsapp
+                      </Text>
+                    </View>
+                  </View>
+                  <View
+                    style={
+                      Object {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "justifyContent": "center",
+                        "paddingVertical": 8,
                       }
                     }
                   >
                     <View
-                      style={
-                        Array [
-                          Object {
-                            "borderTopColor": "rgba(0, 0, 0, 0.05)",
-                            "borderTopWidth": 1,
-                          },
-                          Object {
-                            "backgroundColor": "#FFFFFF",
-                          },
-                        ]
+                      accessible={true}
+                      focusable={true}
+                      nativeBackgroundAndroid={
+                        Object {
+                          "attribute": "selectableItemBackgroundBorderless",
+                          "type": "ThemeAttrAndroid",
+                        }
                       }
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
                     >
-                      <View
+                      <Text
                         style={
                           Object {
-                            "height": 15,
+                            "color": "#1AB775",
+                            "fontFamily": "Inter-SemiBold",
+                            "fontSize": 16,
+                            "lineHeight": 22,
                           }
-                        }
-                      />
-                      <View
-                        style={
-                          Array [
-                            Object {
-                              "alignItems": "center",
-                              "borderRadius": 3,
-                              "flexDirection": "row",
-                            },
-                            null,
-                            null,
-                            undefined,
-                            Object {
-                              "backgroundColor": "transparent",
-                            },
-                          ]
                         }
                       >
-                        <View
-                          accessible={true}
-                          focusable={true}
-                          nativeBackgroundAndroid={
-                            Object {
-                              "attribute": "selectableItemBackground",
-                              "type": "ThemeAttrAndroid",
-                            }
-                          }
-                          onClick={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderMove={[Function]}
-                          onResponderRelease={[Function]}
-                          onResponderTerminate={[Function]}
-                          onResponderTerminationRequest={[Function]}
-                          onStartShouldSetResponder={[Function]}
-                          style={
-                            Array [
-                              Object {
-                                "alignItems": "center",
-                                "flex": 1,
-                                "justifyContent": "center",
-                              },
-                              Object {
-                                "backgroundColor": "transparent",
-                              },
-                              Object {
-                                "height": 50,
-                              },
-                              Object {
-                                "borderWidth": 0,
-                              },
-                            ]
-                          }
-                        >
-                          <View
-                            style={
-                              Object {
-                                "alignItems": "center",
-                                "flex": 1,
-                                "flexDirection": "row",
-                                "justifyContent": "space-between",
-                              }
-                            }
-                          >
-                            <Image
-                              resizeMode="contain"
-                              source={
-                                Object {
-                                  "testUri": "../../../packages/mobile/src/images/sms-icon.png",
-                                }
-                              }
-                              style={
-                                Object {
-                                  "height": 30,
-                                  "width": 30,
-                                }
-                              }
-                            />
-                            <Text
-                              accessibilityLabel="inviteFlow11:inviteWithSMS"
-                              style={
-                                Array [
-                                  Object {
-                                    "fontFamily": "Hind-SemiBold",
-                                    "fontSize": 16,
-                                  },
-                                  Object {
-                                    "color": "#2E3338",
-                                  },
-                                  Object {
-                                    "paddingLeft": 5,
-                                    "paddingRight": 5,
-                                  },
-                                ]
-                              }
-                            >
-                              inviteFlow11:inviteWithSMS
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                      <View
-                        style={
-                          Object {
-                            "height": 15,
-                          }
-                        }
-                      />
-                      <View
-                        style={
-                          Array [
-                            Object {
-                              "alignItems": "center",
-                              "borderRadius": 3,
-                              "flexDirection": "row",
-                            },
-                            null,
-                            null,
-                            undefined,
-                            Object {
-                              "backgroundColor": "transparent",
-                            },
-                          ]
-                        }
-                      >
-                        <View
-                          accessible={true}
-                          focusable={true}
-                          nativeBackgroundAndroid={
-                            Object {
-                              "attribute": "selectableItemBackground",
-                              "type": "ThemeAttrAndroid",
-                            }
-                          }
-                          onClick={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderMove={[Function]}
-                          onResponderRelease={[Function]}
-                          onResponderTerminate={[Function]}
-                          onResponderTerminationRequest={[Function]}
-                          onStartShouldSetResponder={[Function]}
-                          style={
-                            Array [
-                              Object {
-                                "alignItems": "center",
-                                "flex": 1,
-                                "justifyContent": "center",
-                              },
-                              Object {
-                                "backgroundColor": "transparent",
-                              },
-                              Object {
-                                "height": 50,
-                              },
-                              Object {
-                                "borderWidth": 0,
-                              },
-                            ]
-                          }
-                        >
-                          <View
-                            style={
-                              Object {
-                                "alignItems": "center",
-                                "flex": 1,
-                                "flexDirection": "row",
-                                "justifyContent": "space-between",
-                              }
-                            }
-                          >
-                            <Image
-                              resizeMode="contain"
-                              source={
-                                Object {
-                                  "testUri": "../../../packages/mobile/src/images/whatsapp-logo.png",
-                                }
-                              }
-                              style={
-                                Object {
-                                  "height": 30,
-                                  "width": 30,
-                                }
-                              }
-                            />
-                            <Text
-                              accessibilityLabel="inviteFlow11:inviteWithWhatsapp"
-                              style={
-                                Array [
-                                  Object {
-                                    "fontFamily": "Hind-SemiBold",
-                                    "fontSize": 16,
-                                  },
-                                  Object {
-                                    "color": "#2E3338",
-                                  },
-                                  Object {
-                                    "paddingLeft": 5,
-                                    "paddingRight": 5,
-                                  },
-                                ]
-                              }
-                            >
-                              inviteFlow11:inviteWithWhatsapp
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                      <View
-                        style={
-                          Object {
-                            "height": 15,
-                          }
-                        }
-                      />
-                      <View
-                        style={
-                          Array [
-                            Object {
-                              "alignItems": "center",
-                              "borderRadius": 3,
-                              "flexDirection": "row",
-                            },
-                            null,
-                            null,
-                            undefined,
-                            Object {
-                              "backgroundColor": "transparent",
-                            },
-                          ]
-                        }
-                      >
-                        <View
-                          accessible={true}
-                          focusable={true}
-                          nativeBackgroundAndroid={
-                            Object {
-                              "attribute": "selectableItemBackground",
-                              "type": "ThemeAttrAndroid",
-                            }
-                          }
-                          onClick={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderMove={[Function]}
-                          onResponderRelease={[Function]}
-                          onResponderTerminate={[Function]}
-                          onResponderTerminationRequest={[Function]}
-                          onStartShouldSetResponder={[Function]}
-                          style={
-                            Array [
-                              Object {
-                                "alignItems": "center",
-                                "flex": 1,
-                                "justifyContent": "center",
-                              },
-                              Object {
-                                "backgroundColor": "transparent",
-                              },
-                              Object {
-                                "height": 50,
-                              },
-                              Object {
-                                "borderWidth": 0,
-                              },
-                            ]
-                          }
-                        >
-                          <View
-                            style={
-                              Object {
-                                "alignItems": "center",
-                                "flex": 1,
-                                "flexDirection": "row",
-                                "justifyContent": "space-between",
-                              }
-                            }
-                          >
-                            <Text
-                              accessibilityLabel="cancel"
-                              style={
-                                Array [
-                                  Object {
-                                    "fontFamily": "Hind-SemiBold",
-                                    "fontSize": 16,
-                                  },
-                                  Object {
-                                    "color": "#42D689",
-                                  },
-                                  Object {
-                                    "paddingLeft": 5,
-                                    "paddingRight": 5,
-                                  },
-                                ]
-                              }
-                            >
-                              cancel
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                      <View
-                        style={
-                          Object {
-                            "height": 15,
-                          }
-                        }
-                      />
+                        global:cancel
+                      </Text>
                     </View>
                   </View>
                 </View>
@@ -637,7 +461,14 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
         </View>
       </View>
     </RCTScrollView>
-    <View>
+    <View
+      style={
+        Object {
+          "padding": 16,
+          "paddingBottom": 8,
+        }
+      }
+    >
       <View
         style={
           Array [
@@ -834,15 +665,15 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "lineHeight": 24,
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
                 },
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Bold",
+                  "fontFamily": "Inter-SemiBold",
                   "fontSize": 16,
-                  "lineHeight": 24,
+                  "lineHeight": 22,
                 },
               ]
             }
@@ -855,15 +686,15 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
             Array [
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 24,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
               },
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Bold",
+                "fontFamily": "Inter-SemiBold",
                 "fontSize": 16,
-                "lineHeight": 24,
+                "lineHeight": 22,
               },
             ]
           }
@@ -913,17 +744,20 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "lineHeight": 24,
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
                 },
                 Object {
-                  "color": "#81868B",
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
                 },
               ]
             }
           >
-            Celo Dollars (@
+            Celo Dollars @
              
             <Text
               numberOfLines={1}
@@ -940,7 +774,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
               $
               0.75
             </Text>
-            )
           </Text>
         </View>
         <Text
@@ -948,12 +781,15 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
             Array [
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 24,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
               },
               Object {
-                "color": "#81868B",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
               },
             ]
           }
@@ -1027,6 +863,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                 "paddingVertical": 5,
               }
             }
+            testID="ConfirmButton"
           >
             <Text
               accessibilityLabel="send"
@@ -1055,7 +892,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
     Object {
       "backgroundColor": "#FFFFFF",
       "flex": 1,
-      "flexDirection": "column",
       "padding": 8,
     }
   }
@@ -1090,7 +926,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             style={
               Object {
                 "alignItems": "flex-start",
-                "flexDirection": "column",
                 "paddingBottom": 24,
               }
             }
@@ -1152,7 +987,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               <View
                 style={
                   Object {
-                    "flexDirection": "column",
                     "paddingLeft": 8,
                   }
                 }
@@ -1167,7 +1001,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     }
                   }
                 >
-                  Sending
+                  sending
                 </Text>
                 <Text
                   style={
@@ -1337,8 +1171,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                           "padding": 24,
                         },
                         Object {
-                          "flex": 1,
-                          "margin": 0,
+                          "backgroundColor": "#FFFFFF",
                         },
                       ],
                     ]
@@ -1347,336 +1180,164 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                   <View
                     style={
                       Object {
-                        "alignItems": "stretch",
-                        "flex": 1,
-                        "justifyContent": "flex-end",
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "justifyContent": "center",
+                        "paddingVertical": 8,
+                      }
+                    }
+                  >
+                    <Image
+                      resizeMode="contain"
+                      source={
+                        Object {
+                          "testUri": "../../../packages/mobile/src/images/sms-icon.png",
+                        }
+                      }
+                      style={
+                        Object {
+                          "height": 30,
+                          "width": 30,
+                        }
+                      }
+                    />
+                    <View
+                      accessible={true}
+                      focusable={true}
+                      nativeBackgroundAndroid={
+                        Object {
+                          "attribute": "selectableItemBackgroundBorderless",
+                          "type": "ThemeAttrAndroid",
+                        }
+                      }
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
+                    >
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#1AB775",
+                              "fontFamily": "Inter-SemiBold",
+                              "fontSize": 16,
+                              "lineHeight": 22,
+                            },
+                            Object {
+                              "color": "#2E3338",
+                              "paddingLeft": 8,
+                            },
+                          ]
+                        }
+                      >
+                        inviteWithSMS
+                      </Text>
+                    </View>
+                  </View>
+                  <View
+                    style={
+                      Object {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "justifyContent": "center",
+                        "paddingVertical": 8,
+                      }
+                    }
+                  >
+                    <Image
+                      resizeMode="contain"
+                      source={
+                        Object {
+                          "testUri": "../../../packages/mobile/src/images/whatsapp-logo.png",
+                        }
+                      }
+                      style={
+                        Object {
+                          "height": 30,
+                          "width": 30,
+                        }
+                      }
+                    />
+                    <View
+                      accessible={true}
+                      focusable={true}
+                      nativeBackgroundAndroid={
+                        Object {
+                          "attribute": "selectableItemBackgroundBorderless",
+                          "type": "ThemeAttrAndroid",
+                        }
+                      }
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
+                    >
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#1AB775",
+                              "fontFamily": "Inter-SemiBold",
+                              "fontSize": 16,
+                              "lineHeight": 22,
+                            },
+                            Object {
+                              "color": "#2E3338",
+                              "paddingLeft": 8,
+                            },
+                          ]
+                        }
+                      >
+                        inviteWithWhatsapp
+                      </Text>
+                    </View>
+                  </View>
+                  <View
+                    style={
+                      Object {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "justifyContent": "center",
+                        "paddingVertical": 8,
                       }
                     }
                   >
                     <View
-                      style={
-                        Array [
-                          Object {
-                            "borderTopColor": "rgba(0, 0, 0, 0.05)",
-                            "borderTopWidth": 1,
-                          },
-                          Object {
-                            "backgroundColor": "#FFFFFF",
-                          },
-                        ]
+                      accessible={true}
+                      focusable={true}
+                      nativeBackgroundAndroid={
+                        Object {
+                          "attribute": "selectableItemBackgroundBorderless",
+                          "type": "ThemeAttrAndroid",
+                        }
                       }
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
                     >
-                      <View
+                      <Text
                         style={
                           Object {
-                            "height": 15,
+                            "color": "#1AB775",
+                            "fontFamily": "Inter-SemiBold",
+                            "fontSize": 16,
+                            "lineHeight": 22,
                           }
-                        }
-                      />
-                      <View
-                        style={
-                          Array [
-                            Object {
-                              "alignItems": "center",
-                              "borderRadius": 3,
-                              "flexDirection": "row",
-                            },
-                            null,
-                            null,
-                            undefined,
-                            Object {
-                              "backgroundColor": "transparent",
-                            },
-                          ]
                         }
                       >
-                        <View
-                          accessible={true}
-                          focusable={true}
-                          nativeBackgroundAndroid={
-                            Object {
-                              "attribute": "selectableItemBackground",
-                              "type": "ThemeAttrAndroid",
-                            }
-                          }
-                          onClick={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderMove={[Function]}
-                          onResponderRelease={[Function]}
-                          onResponderTerminate={[Function]}
-                          onResponderTerminationRequest={[Function]}
-                          onStartShouldSetResponder={[Function]}
-                          style={
-                            Array [
-                              Object {
-                                "alignItems": "center",
-                                "flex": 1,
-                                "justifyContent": "center",
-                              },
-                              Object {
-                                "backgroundColor": "transparent",
-                              },
-                              Object {
-                                "height": 50,
-                              },
-                              Object {
-                                "borderWidth": 0,
-                              },
-                            ]
-                          }
-                        >
-                          <View
-                            style={
-                              Object {
-                                "alignItems": "center",
-                                "flex": 1,
-                                "flexDirection": "row",
-                                "justifyContent": "space-between",
-                              }
-                            }
-                          >
-                            <Image
-                              resizeMode="contain"
-                              source={
-                                Object {
-                                  "testUri": "../../../packages/mobile/src/images/sms-icon.png",
-                                }
-                              }
-                              style={
-                                Object {
-                                  "height": 30,
-                                  "width": 30,
-                                }
-                              }
-                            />
-                            <Text
-                              accessibilityLabel="inviteFlow11:inviteWithSMS"
-                              style={
-                                Array [
-                                  Object {
-                                    "fontFamily": "Hind-SemiBold",
-                                    "fontSize": 16,
-                                  },
-                                  Object {
-                                    "color": "#2E3338",
-                                  },
-                                  Object {
-                                    "paddingLeft": 5,
-                                    "paddingRight": 5,
-                                  },
-                                ]
-                              }
-                            >
-                              inviteFlow11:inviteWithSMS
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                      <View
-                        style={
-                          Object {
-                            "height": 15,
-                          }
-                        }
-                      />
-                      <View
-                        style={
-                          Array [
-                            Object {
-                              "alignItems": "center",
-                              "borderRadius": 3,
-                              "flexDirection": "row",
-                            },
-                            null,
-                            null,
-                            undefined,
-                            Object {
-                              "backgroundColor": "transparent",
-                            },
-                          ]
-                        }
-                      >
-                        <View
-                          accessible={true}
-                          focusable={true}
-                          nativeBackgroundAndroid={
-                            Object {
-                              "attribute": "selectableItemBackground",
-                              "type": "ThemeAttrAndroid",
-                            }
-                          }
-                          onClick={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderMove={[Function]}
-                          onResponderRelease={[Function]}
-                          onResponderTerminate={[Function]}
-                          onResponderTerminationRequest={[Function]}
-                          onStartShouldSetResponder={[Function]}
-                          style={
-                            Array [
-                              Object {
-                                "alignItems": "center",
-                                "flex": 1,
-                                "justifyContent": "center",
-                              },
-                              Object {
-                                "backgroundColor": "transparent",
-                              },
-                              Object {
-                                "height": 50,
-                              },
-                              Object {
-                                "borderWidth": 0,
-                              },
-                            ]
-                          }
-                        >
-                          <View
-                            style={
-                              Object {
-                                "alignItems": "center",
-                                "flex": 1,
-                                "flexDirection": "row",
-                                "justifyContent": "space-between",
-                              }
-                            }
-                          >
-                            <Image
-                              resizeMode="contain"
-                              source={
-                                Object {
-                                  "testUri": "../../../packages/mobile/src/images/whatsapp-logo.png",
-                                }
-                              }
-                              style={
-                                Object {
-                                  "height": 30,
-                                  "width": 30,
-                                }
-                              }
-                            />
-                            <Text
-                              accessibilityLabel="inviteFlow11:inviteWithWhatsapp"
-                              style={
-                                Array [
-                                  Object {
-                                    "fontFamily": "Hind-SemiBold",
-                                    "fontSize": 16,
-                                  },
-                                  Object {
-                                    "color": "#2E3338",
-                                  },
-                                  Object {
-                                    "paddingLeft": 5,
-                                    "paddingRight": 5,
-                                  },
-                                ]
-                              }
-                            >
-                              inviteFlow11:inviteWithWhatsapp
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                      <View
-                        style={
-                          Object {
-                            "height": 15,
-                          }
-                        }
-                      />
-                      <View
-                        style={
-                          Array [
-                            Object {
-                              "alignItems": "center",
-                              "borderRadius": 3,
-                              "flexDirection": "row",
-                            },
-                            null,
-                            null,
-                            undefined,
-                            Object {
-                              "backgroundColor": "transparent",
-                            },
-                          ]
-                        }
-                      >
-                        <View
-                          accessible={true}
-                          focusable={true}
-                          nativeBackgroundAndroid={
-                            Object {
-                              "attribute": "selectableItemBackground",
-                              "type": "ThemeAttrAndroid",
-                            }
-                          }
-                          onClick={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderMove={[Function]}
-                          onResponderRelease={[Function]}
-                          onResponderTerminate={[Function]}
-                          onResponderTerminationRequest={[Function]}
-                          onStartShouldSetResponder={[Function]}
-                          style={
-                            Array [
-                              Object {
-                                "alignItems": "center",
-                                "flex": 1,
-                                "justifyContent": "center",
-                              },
-                              Object {
-                                "backgroundColor": "transparent",
-                              },
-                              Object {
-                                "height": 50,
-                              },
-                              Object {
-                                "borderWidth": 0,
-                              },
-                            ]
-                          }
-                        >
-                          <View
-                            style={
-                              Object {
-                                "alignItems": "center",
-                                "flex": 1,
-                                "flexDirection": "row",
-                                "justifyContent": "space-between",
-                              }
-                            }
-                          >
-                            <Text
-                              accessibilityLabel="cancel"
-                              style={
-                                Array [
-                                  Object {
-                                    "fontFamily": "Hind-SemiBold",
-                                    "fontSize": 16,
-                                  },
-                                  Object {
-                                    "color": "#42D689",
-                                  },
-                                  Object {
-                                    "paddingLeft": 5,
-                                    "paddingRight": 5,
-                                  },
-                                ]
-                              }
-                            >
-                              cancel
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                      <View
-                        style={
-                          Object {
-                            "height": 15,
-                          }
-                        }
-                      />
+                        global:cancel
+                      </Text>
                     </View>
                   </View>
                 </View>
@@ -1686,7 +1347,14 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
         </View>
       </View>
     </RCTScrollView>
-    <View>
+    <View
+      style={
+        Object {
+          "padding": 16,
+          "paddingBottom": 8,
+        }
+      }
+    >
       <View
         style={
           Array [
@@ -1883,15 +1551,15 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "lineHeight": 24,
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
                 },
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Bold",
+                  "fontFamily": "Inter-SemiBold",
                   "fontSize": 16,
-                  "lineHeight": 24,
+                  "lineHeight": 22,
                 },
               ]
             }
@@ -1904,15 +1572,15 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             Array [
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 24,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
               },
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Bold",
+                "fontFamily": "Inter-SemiBold",
                 "fontSize": 16,
-                "lineHeight": 24,
+                "lineHeight": 22,
               },
             ]
           }
@@ -1962,17 +1630,20 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "lineHeight": 24,
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
                 },
                 Object {
-                  "color": "#81868B",
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
                 },
               ]
             }
           >
-            Celo Dollars (@
+            Celo Dollars @
              
             <Text
               numberOfLines={1}
@@ -1989,7 +1660,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               $
               0.75
             </Text>
-            )
           </Text>
         </View>
         <Text
@@ -1997,12 +1667,15 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             Array [
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 24,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
               },
               Object {
-                "color": "#81868B",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
               },
             ]
           }
@@ -2076,6 +1749,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                 "paddingVertical": 5,
               }
             }
+            testID="ConfirmButton"
           >
             <Text
               accessibilityLabel="send"
@@ -2104,7 +1778,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
     Object {
       "backgroundColor": "#FFFFFF",
       "flex": 1,
-      "flexDirection": "column",
       "padding": 8,
     }
   }
@@ -2139,7 +1812,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             style={
               Object {
                 "alignItems": "flex-start",
-                "flexDirection": "column",
                 "paddingBottom": 24,
               }
             }
@@ -2201,7 +1873,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               <View
                 style={
                   Object {
-                    "flexDirection": "column",
                     "paddingLeft": 8,
                   }
                 }
@@ -2216,7 +1887,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     }
                   }
                 >
-                  Sending
+                  sending
                 </Text>
                 <Text
                   style={
@@ -2386,8 +2057,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                           "padding": 24,
                         },
                         Object {
-                          "flex": 1,
-                          "margin": 0,
+                          "backgroundColor": "#FFFFFF",
                         },
                       ],
                     ]
@@ -2396,336 +2066,164 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                   <View
                     style={
                       Object {
-                        "alignItems": "stretch",
-                        "flex": 1,
-                        "justifyContent": "flex-end",
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "justifyContent": "center",
+                        "paddingVertical": 8,
+                      }
+                    }
+                  >
+                    <Image
+                      resizeMode="contain"
+                      source={
+                        Object {
+                          "testUri": "../../../packages/mobile/src/images/sms-icon.png",
+                        }
+                      }
+                      style={
+                        Object {
+                          "height": 30,
+                          "width": 30,
+                        }
+                      }
+                    />
+                    <View
+                      accessible={true}
+                      focusable={true}
+                      nativeBackgroundAndroid={
+                        Object {
+                          "attribute": "selectableItemBackgroundBorderless",
+                          "type": "ThemeAttrAndroid",
+                        }
+                      }
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
+                    >
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#1AB775",
+                              "fontFamily": "Inter-SemiBold",
+                              "fontSize": 16,
+                              "lineHeight": 22,
+                            },
+                            Object {
+                              "color": "#2E3338",
+                              "paddingLeft": 8,
+                            },
+                          ]
+                        }
+                      >
+                        inviteWithSMS
+                      </Text>
+                    </View>
+                  </View>
+                  <View
+                    style={
+                      Object {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "justifyContent": "center",
+                        "paddingVertical": 8,
+                      }
+                    }
+                  >
+                    <Image
+                      resizeMode="contain"
+                      source={
+                        Object {
+                          "testUri": "../../../packages/mobile/src/images/whatsapp-logo.png",
+                        }
+                      }
+                      style={
+                        Object {
+                          "height": 30,
+                          "width": 30,
+                        }
+                      }
+                    />
+                    <View
+                      accessible={true}
+                      focusable={true}
+                      nativeBackgroundAndroid={
+                        Object {
+                          "attribute": "selectableItemBackgroundBorderless",
+                          "type": "ThemeAttrAndroid",
+                        }
+                      }
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
+                    >
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#1AB775",
+                              "fontFamily": "Inter-SemiBold",
+                              "fontSize": 16,
+                              "lineHeight": 22,
+                            },
+                            Object {
+                              "color": "#2E3338",
+                              "paddingLeft": 8,
+                            },
+                          ]
+                        }
+                      >
+                        inviteWithWhatsapp
+                      </Text>
+                    </View>
+                  </View>
+                  <View
+                    style={
+                      Object {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "justifyContent": "center",
+                        "paddingVertical": 8,
                       }
                     }
                   >
                     <View
-                      style={
-                        Array [
-                          Object {
-                            "borderTopColor": "rgba(0, 0, 0, 0.05)",
-                            "borderTopWidth": 1,
-                          },
-                          Object {
-                            "backgroundColor": "#FFFFFF",
-                          },
-                        ]
+                      accessible={true}
+                      focusable={true}
+                      nativeBackgroundAndroid={
+                        Object {
+                          "attribute": "selectableItemBackgroundBorderless",
+                          "type": "ThemeAttrAndroid",
+                        }
                       }
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
                     >
-                      <View
+                      <Text
                         style={
                           Object {
-                            "height": 15,
+                            "color": "#1AB775",
+                            "fontFamily": "Inter-SemiBold",
+                            "fontSize": 16,
+                            "lineHeight": 22,
                           }
-                        }
-                      />
-                      <View
-                        style={
-                          Array [
-                            Object {
-                              "alignItems": "center",
-                              "borderRadius": 3,
-                              "flexDirection": "row",
-                            },
-                            null,
-                            null,
-                            undefined,
-                            Object {
-                              "backgroundColor": "transparent",
-                            },
-                          ]
                         }
                       >
-                        <View
-                          accessible={true}
-                          focusable={true}
-                          nativeBackgroundAndroid={
-                            Object {
-                              "attribute": "selectableItemBackground",
-                              "type": "ThemeAttrAndroid",
-                            }
-                          }
-                          onClick={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderMove={[Function]}
-                          onResponderRelease={[Function]}
-                          onResponderTerminate={[Function]}
-                          onResponderTerminationRequest={[Function]}
-                          onStartShouldSetResponder={[Function]}
-                          style={
-                            Array [
-                              Object {
-                                "alignItems": "center",
-                                "flex": 1,
-                                "justifyContent": "center",
-                              },
-                              Object {
-                                "backgroundColor": "transparent",
-                              },
-                              Object {
-                                "height": 50,
-                              },
-                              Object {
-                                "borderWidth": 0,
-                              },
-                            ]
-                          }
-                        >
-                          <View
-                            style={
-                              Object {
-                                "alignItems": "center",
-                                "flex": 1,
-                                "flexDirection": "row",
-                                "justifyContent": "space-between",
-                              }
-                            }
-                          >
-                            <Image
-                              resizeMode="contain"
-                              source={
-                                Object {
-                                  "testUri": "../../../packages/mobile/src/images/sms-icon.png",
-                                }
-                              }
-                              style={
-                                Object {
-                                  "height": 30,
-                                  "width": 30,
-                                }
-                              }
-                            />
-                            <Text
-                              accessibilityLabel="inviteFlow11:inviteWithSMS"
-                              style={
-                                Array [
-                                  Object {
-                                    "fontFamily": "Hind-SemiBold",
-                                    "fontSize": 16,
-                                  },
-                                  Object {
-                                    "color": "#2E3338",
-                                  },
-                                  Object {
-                                    "paddingLeft": 5,
-                                    "paddingRight": 5,
-                                  },
-                                ]
-                              }
-                            >
-                              inviteFlow11:inviteWithSMS
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                      <View
-                        style={
-                          Object {
-                            "height": 15,
-                          }
-                        }
-                      />
-                      <View
-                        style={
-                          Array [
-                            Object {
-                              "alignItems": "center",
-                              "borderRadius": 3,
-                              "flexDirection": "row",
-                            },
-                            null,
-                            null,
-                            undefined,
-                            Object {
-                              "backgroundColor": "transparent",
-                            },
-                          ]
-                        }
-                      >
-                        <View
-                          accessible={true}
-                          focusable={true}
-                          nativeBackgroundAndroid={
-                            Object {
-                              "attribute": "selectableItemBackground",
-                              "type": "ThemeAttrAndroid",
-                            }
-                          }
-                          onClick={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderMove={[Function]}
-                          onResponderRelease={[Function]}
-                          onResponderTerminate={[Function]}
-                          onResponderTerminationRequest={[Function]}
-                          onStartShouldSetResponder={[Function]}
-                          style={
-                            Array [
-                              Object {
-                                "alignItems": "center",
-                                "flex": 1,
-                                "justifyContent": "center",
-                              },
-                              Object {
-                                "backgroundColor": "transparent",
-                              },
-                              Object {
-                                "height": 50,
-                              },
-                              Object {
-                                "borderWidth": 0,
-                              },
-                            ]
-                          }
-                        >
-                          <View
-                            style={
-                              Object {
-                                "alignItems": "center",
-                                "flex": 1,
-                                "flexDirection": "row",
-                                "justifyContent": "space-between",
-                              }
-                            }
-                          >
-                            <Image
-                              resizeMode="contain"
-                              source={
-                                Object {
-                                  "testUri": "../../../packages/mobile/src/images/whatsapp-logo.png",
-                                }
-                              }
-                              style={
-                                Object {
-                                  "height": 30,
-                                  "width": 30,
-                                }
-                              }
-                            />
-                            <Text
-                              accessibilityLabel="inviteFlow11:inviteWithWhatsapp"
-                              style={
-                                Array [
-                                  Object {
-                                    "fontFamily": "Hind-SemiBold",
-                                    "fontSize": 16,
-                                  },
-                                  Object {
-                                    "color": "#2E3338",
-                                  },
-                                  Object {
-                                    "paddingLeft": 5,
-                                    "paddingRight": 5,
-                                  },
-                                ]
-                              }
-                            >
-                              inviteFlow11:inviteWithWhatsapp
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                      <View
-                        style={
-                          Object {
-                            "height": 15,
-                          }
-                        }
-                      />
-                      <View
-                        style={
-                          Array [
-                            Object {
-                              "alignItems": "center",
-                              "borderRadius": 3,
-                              "flexDirection": "row",
-                            },
-                            null,
-                            null,
-                            undefined,
-                            Object {
-                              "backgroundColor": "transparent",
-                            },
-                          ]
-                        }
-                      >
-                        <View
-                          accessible={true}
-                          focusable={true}
-                          nativeBackgroundAndroid={
-                            Object {
-                              "attribute": "selectableItemBackground",
-                              "type": "ThemeAttrAndroid",
-                            }
-                          }
-                          onClick={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderMove={[Function]}
-                          onResponderRelease={[Function]}
-                          onResponderTerminate={[Function]}
-                          onResponderTerminationRequest={[Function]}
-                          onStartShouldSetResponder={[Function]}
-                          style={
-                            Array [
-                              Object {
-                                "alignItems": "center",
-                                "flex": 1,
-                                "justifyContent": "center",
-                              },
-                              Object {
-                                "backgroundColor": "transparent",
-                              },
-                              Object {
-                                "height": 50,
-                              },
-                              Object {
-                                "borderWidth": 0,
-                              },
-                            ]
-                          }
-                        >
-                          <View
-                            style={
-                              Object {
-                                "alignItems": "center",
-                                "flex": 1,
-                                "flexDirection": "row",
-                                "justifyContent": "space-between",
-                              }
-                            }
-                          >
-                            <Text
-                              accessibilityLabel="cancel"
-                              style={
-                                Array [
-                                  Object {
-                                    "fontFamily": "Hind-SemiBold",
-                                    "fontSize": 16,
-                                  },
-                                  Object {
-                                    "color": "#42D689",
-                                  },
-                                  Object {
-                                    "paddingLeft": 5,
-                                    "paddingRight": 5,
-                                  },
-                                ]
-                              }
-                            >
-                              cancel
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                      <View
-                        style={
-                          Object {
-                            "height": 15,
-                          }
-                        }
-                      />
+                        global:cancel
+                      </Text>
                     </View>
                   </View>
                 </View>
@@ -2735,7 +2233,14 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
         </View>
       </View>
     </RCTScrollView>
-    <View>
+    <View
+      style={
+        Object {
+          "padding": 16,
+          "paddingBottom": 8,
+        }
+      }
+    >
       <View
         style={
           Array [
@@ -2929,15 +2434,15 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "lineHeight": 24,
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
                 },
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Bold",
+                  "fontFamily": "Inter-SemiBold",
                   "fontSize": 16,
-                  "lineHeight": 24,
+                  "lineHeight": 22,
                 },
               ]
             }
@@ -2950,15 +2455,15 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             Array [
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 24,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
               },
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Bold",
+                "fontFamily": "Inter-SemiBold",
                 "fontSize": 16,
-                "lineHeight": 24,
+                "lineHeight": 22,
               },
             ]
           }
@@ -3008,17 +2513,20 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "lineHeight": 24,
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
                 },
                 Object {
-                  "color": "#81868B",
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
                 },
               ]
             }
           >
-            Celo Dollars (@
+            Celo Dollars @
              
             <Text
               numberOfLines={1}
@@ -3035,7 +2543,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               $
               0.75
             </Text>
-            )
           </Text>
         </View>
         <Text
@@ -3043,12 +2550,15 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             Array [
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 24,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
               },
               Object {
-                "color": "#81868B",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
               },
             ]
           }
@@ -3122,6 +2632,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                 "paddingVertical": 5,
               }
             }
+            testID="ConfirmButton"
           >
             <Text
               accessibilityLabel="send"
@@ -3150,7 +2661,6 @@ exports[`SendConfirmation renders correctly when there are multiple user address
     Object {
       "backgroundColor": "#FFFFFF",
       "flex": 1,
-      "flexDirection": "column",
       "padding": 8,
     }
   }
@@ -3185,7 +2695,6 @@ exports[`SendConfirmation renders correctly when there are multiple user address
             style={
               Object {
                 "alignItems": "flex-start",
-                "flexDirection": "column",
                 "paddingBottom": 24,
               }
             }
@@ -3247,7 +2756,6 @@ exports[`SendConfirmation renders correctly when there are multiple user address
               <View
                 style={
                   Object {
-                    "flexDirection": "column",
                     "paddingLeft": 8,
                   }
                 }
@@ -3262,7 +2770,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                     }
                   }
                 >
-                  Sending
+                  sending
                 </Text>
                 <Text
                   style={
@@ -3316,13 +2824,21 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                   >
                     <Text
                       style={
-                        Object {
-                          "color": "#81868B",
-                          "fontFamily": "Inter-Regular",
-                          "fontSize": 14,
-                          "lineHeight": 18,
-                          "textDecorationLine": "underline",
-                        }
+                        Array [
+                          Object {
+                            "color": "#1AB775",
+                            "fontFamily": "Inter-SemiBold",
+                            "fontSize": 16,
+                            "lineHeight": 22,
+                          },
+                          Object {
+                            "color": "#81868B",
+                            "fontFamily": "Inter-Regular",
+                            "fontSize": 14,
+                            "lineHeight": 18,
+                            "textDecorationLine": "underline",
+                          },
+                        ]
                       }
                     >
                       edit
@@ -3485,8 +3001,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                           "padding": 24,
                         },
                         Object {
-                          "flex": 1,
-                          "margin": 0,
+                          "backgroundColor": "#FFFFFF",
                         },
                       ],
                     ]
@@ -3495,336 +3010,164 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                   <View
                     style={
                       Object {
-                        "alignItems": "stretch",
-                        "flex": 1,
-                        "justifyContent": "flex-end",
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "justifyContent": "center",
+                        "paddingVertical": 8,
+                      }
+                    }
+                  >
+                    <Image
+                      resizeMode="contain"
+                      source={
+                        Object {
+                          "testUri": "../../../packages/mobile/src/images/sms-icon.png",
+                        }
+                      }
+                      style={
+                        Object {
+                          "height": 30,
+                          "width": 30,
+                        }
+                      }
+                    />
+                    <View
+                      accessible={true}
+                      focusable={true}
+                      nativeBackgroundAndroid={
+                        Object {
+                          "attribute": "selectableItemBackgroundBorderless",
+                          "type": "ThemeAttrAndroid",
+                        }
+                      }
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
+                    >
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#1AB775",
+                              "fontFamily": "Inter-SemiBold",
+                              "fontSize": 16,
+                              "lineHeight": 22,
+                            },
+                            Object {
+                              "color": "#2E3338",
+                              "paddingLeft": 8,
+                            },
+                          ]
+                        }
+                      >
+                        inviteWithSMS
+                      </Text>
+                    </View>
+                  </View>
+                  <View
+                    style={
+                      Object {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "justifyContent": "center",
+                        "paddingVertical": 8,
+                      }
+                    }
+                  >
+                    <Image
+                      resizeMode="contain"
+                      source={
+                        Object {
+                          "testUri": "../../../packages/mobile/src/images/whatsapp-logo.png",
+                        }
+                      }
+                      style={
+                        Object {
+                          "height": 30,
+                          "width": 30,
+                        }
+                      }
+                    />
+                    <View
+                      accessible={true}
+                      focusable={true}
+                      nativeBackgroundAndroid={
+                        Object {
+                          "attribute": "selectableItemBackgroundBorderless",
+                          "type": "ThemeAttrAndroid",
+                        }
+                      }
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
+                    >
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#1AB775",
+                              "fontFamily": "Inter-SemiBold",
+                              "fontSize": 16,
+                              "lineHeight": 22,
+                            },
+                            Object {
+                              "color": "#2E3338",
+                              "paddingLeft": 8,
+                            },
+                          ]
+                        }
+                      >
+                        inviteWithWhatsapp
+                      </Text>
+                    </View>
+                  </View>
+                  <View
+                    style={
+                      Object {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "justifyContent": "center",
+                        "paddingVertical": 8,
                       }
                     }
                   >
                     <View
-                      style={
-                        Array [
-                          Object {
-                            "borderTopColor": "rgba(0, 0, 0, 0.05)",
-                            "borderTopWidth": 1,
-                          },
-                          Object {
-                            "backgroundColor": "#FFFFFF",
-                          },
-                        ]
+                      accessible={true}
+                      focusable={true}
+                      nativeBackgroundAndroid={
+                        Object {
+                          "attribute": "selectableItemBackgroundBorderless",
+                          "type": "ThemeAttrAndroid",
+                        }
                       }
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
                     >
-                      <View
+                      <Text
                         style={
                           Object {
-                            "height": 15,
+                            "color": "#1AB775",
+                            "fontFamily": "Inter-SemiBold",
+                            "fontSize": 16,
+                            "lineHeight": 22,
                           }
-                        }
-                      />
-                      <View
-                        style={
-                          Array [
-                            Object {
-                              "alignItems": "center",
-                              "borderRadius": 3,
-                              "flexDirection": "row",
-                            },
-                            null,
-                            null,
-                            undefined,
-                            Object {
-                              "backgroundColor": "transparent",
-                            },
-                          ]
                         }
                       >
-                        <View
-                          accessible={true}
-                          focusable={true}
-                          nativeBackgroundAndroid={
-                            Object {
-                              "attribute": "selectableItemBackground",
-                              "type": "ThemeAttrAndroid",
-                            }
-                          }
-                          onClick={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderMove={[Function]}
-                          onResponderRelease={[Function]}
-                          onResponderTerminate={[Function]}
-                          onResponderTerminationRequest={[Function]}
-                          onStartShouldSetResponder={[Function]}
-                          style={
-                            Array [
-                              Object {
-                                "alignItems": "center",
-                                "flex": 1,
-                                "justifyContent": "center",
-                              },
-                              Object {
-                                "backgroundColor": "transparent",
-                              },
-                              Object {
-                                "height": 50,
-                              },
-                              Object {
-                                "borderWidth": 0,
-                              },
-                            ]
-                          }
-                        >
-                          <View
-                            style={
-                              Object {
-                                "alignItems": "center",
-                                "flex": 1,
-                                "flexDirection": "row",
-                                "justifyContent": "space-between",
-                              }
-                            }
-                          >
-                            <Image
-                              resizeMode="contain"
-                              source={
-                                Object {
-                                  "testUri": "../../../packages/mobile/src/images/sms-icon.png",
-                                }
-                              }
-                              style={
-                                Object {
-                                  "height": 30,
-                                  "width": 30,
-                                }
-                              }
-                            />
-                            <Text
-                              accessibilityLabel="inviteFlow11:inviteWithSMS"
-                              style={
-                                Array [
-                                  Object {
-                                    "fontFamily": "Hind-SemiBold",
-                                    "fontSize": 16,
-                                  },
-                                  Object {
-                                    "color": "#2E3338",
-                                  },
-                                  Object {
-                                    "paddingLeft": 5,
-                                    "paddingRight": 5,
-                                  },
-                                ]
-                              }
-                            >
-                              inviteFlow11:inviteWithSMS
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                      <View
-                        style={
-                          Object {
-                            "height": 15,
-                          }
-                        }
-                      />
-                      <View
-                        style={
-                          Array [
-                            Object {
-                              "alignItems": "center",
-                              "borderRadius": 3,
-                              "flexDirection": "row",
-                            },
-                            null,
-                            null,
-                            undefined,
-                            Object {
-                              "backgroundColor": "transparent",
-                            },
-                          ]
-                        }
-                      >
-                        <View
-                          accessible={true}
-                          focusable={true}
-                          nativeBackgroundAndroid={
-                            Object {
-                              "attribute": "selectableItemBackground",
-                              "type": "ThemeAttrAndroid",
-                            }
-                          }
-                          onClick={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderMove={[Function]}
-                          onResponderRelease={[Function]}
-                          onResponderTerminate={[Function]}
-                          onResponderTerminationRequest={[Function]}
-                          onStartShouldSetResponder={[Function]}
-                          style={
-                            Array [
-                              Object {
-                                "alignItems": "center",
-                                "flex": 1,
-                                "justifyContent": "center",
-                              },
-                              Object {
-                                "backgroundColor": "transparent",
-                              },
-                              Object {
-                                "height": 50,
-                              },
-                              Object {
-                                "borderWidth": 0,
-                              },
-                            ]
-                          }
-                        >
-                          <View
-                            style={
-                              Object {
-                                "alignItems": "center",
-                                "flex": 1,
-                                "flexDirection": "row",
-                                "justifyContent": "space-between",
-                              }
-                            }
-                          >
-                            <Image
-                              resizeMode="contain"
-                              source={
-                                Object {
-                                  "testUri": "../../../packages/mobile/src/images/whatsapp-logo.png",
-                                }
-                              }
-                              style={
-                                Object {
-                                  "height": 30,
-                                  "width": 30,
-                                }
-                              }
-                            />
-                            <Text
-                              accessibilityLabel="inviteFlow11:inviteWithWhatsapp"
-                              style={
-                                Array [
-                                  Object {
-                                    "fontFamily": "Hind-SemiBold",
-                                    "fontSize": 16,
-                                  },
-                                  Object {
-                                    "color": "#2E3338",
-                                  },
-                                  Object {
-                                    "paddingLeft": 5,
-                                    "paddingRight": 5,
-                                  },
-                                ]
-                              }
-                            >
-                              inviteFlow11:inviteWithWhatsapp
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                      <View
-                        style={
-                          Object {
-                            "height": 15,
-                          }
-                        }
-                      />
-                      <View
-                        style={
-                          Array [
-                            Object {
-                              "alignItems": "center",
-                              "borderRadius": 3,
-                              "flexDirection": "row",
-                            },
-                            null,
-                            null,
-                            undefined,
-                            Object {
-                              "backgroundColor": "transparent",
-                            },
-                          ]
-                        }
-                      >
-                        <View
-                          accessible={true}
-                          focusable={true}
-                          nativeBackgroundAndroid={
-                            Object {
-                              "attribute": "selectableItemBackground",
-                              "type": "ThemeAttrAndroid",
-                            }
-                          }
-                          onClick={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderMove={[Function]}
-                          onResponderRelease={[Function]}
-                          onResponderTerminate={[Function]}
-                          onResponderTerminationRequest={[Function]}
-                          onStartShouldSetResponder={[Function]}
-                          style={
-                            Array [
-                              Object {
-                                "alignItems": "center",
-                                "flex": 1,
-                                "justifyContent": "center",
-                              },
-                              Object {
-                                "backgroundColor": "transparent",
-                              },
-                              Object {
-                                "height": 50,
-                              },
-                              Object {
-                                "borderWidth": 0,
-                              },
-                            ]
-                          }
-                        >
-                          <View
-                            style={
-                              Object {
-                                "alignItems": "center",
-                                "flex": 1,
-                                "flexDirection": "row",
-                                "justifyContent": "space-between",
-                              }
-                            }
-                          >
-                            <Text
-                              accessibilityLabel="cancel"
-                              style={
-                                Array [
-                                  Object {
-                                    "fontFamily": "Hind-SemiBold",
-                                    "fontSize": 16,
-                                  },
-                                  Object {
-                                    "color": "#42D689",
-                                  },
-                                  Object {
-                                    "paddingLeft": 5,
-                                    "paddingRight": 5,
-                                  },
-                                ]
-                              }
-                            >
-                              cancel
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                      <View
-                        style={
-                          Object {
-                            "height": 15,
-                          }
-                        }
-                      />
+                        global:cancel
+                      </Text>
                     </View>
                   </View>
                 </View>
@@ -3834,7 +3177,14 @@ exports[`SendConfirmation renders correctly when there are multiple user address
         </View>
       </View>
     </RCTScrollView>
-    <View>
+    <View
+      style={
+        Object {
+          "padding": 16,
+          "paddingBottom": 8,
+        }
+      }
+    >
       <View
         style={
           Array [
@@ -4031,15 +3381,15 @@ exports[`SendConfirmation renders correctly when there are multiple user address
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "lineHeight": 24,
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
                 },
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Bold",
+                  "fontFamily": "Inter-SemiBold",
                   "fontSize": 16,
-                  "lineHeight": 24,
+                  "lineHeight": 22,
                 },
               ]
             }
@@ -4052,15 +3402,15 @@ exports[`SendConfirmation renders correctly when there are multiple user address
             Array [
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 24,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
               },
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Bold",
+                "fontFamily": "Inter-SemiBold",
                 "fontSize": 16,
-                "lineHeight": 24,
+                "lineHeight": 22,
               },
             ]
           }
@@ -4110,17 +3460,20 @@ exports[`SendConfirmation renders correctly when there are multiple user address
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "lineHeight": 24,
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
                 },
                 Object {
-                  "color": "#81868B",
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
                 },
               ]
             }
           >
-            Celo Dollars (@
+            Celo Dollars @
              
             <Text
               numberOfLines={1}
@@ -4137,7 +3490,6 @@ exports[`SendConfirmation renders correctly when there are multiple user address
               $
               0.75
             </Text>
-            )
           </Text>
         </View>
         <Text
@@ -4145,12 +3497,15 @@ exports[`SendConfirmation renders correctly when there are multiple user address
             Array [
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 24,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
               },
               Object {
-                "color": "#81868B",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
               },
             ]
           }
@@ -4224,6 +3579,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                 "paddingVertical": 5,
               }
             }
+            testID="ConfirmButton"
           >
             <Text
               accessibilityLabel="send"

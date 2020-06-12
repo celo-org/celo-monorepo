@@ -8,6 +8,8 @@ import {
   takeLeading,
 } from 'redux-saga/effects'
 import { showErrorInline } from 'src/alert/actions'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
   Actions,
@@ -16,7 +18,7 @@ import {
 } from 'src/identity/actions'
 import { checkTxsForIdentityMetadata } from 'src/identity/commentEncryption'
 import { doImportContactsWrapper, fetchAddressesAndValidateSaga } from 'src/identity/contactMapping'
-import { e164NumberToAddressSelector } from 'src/identity/reducer'
+import { AddressValidationType, e164NumberToAddressSelector } from 'src/identity/reducer'
 import { validateAndReturnMatch } from 'src/identity/secureSend'
 import { revokeVerification, startVerification } from 'src/identity/verification'
 import { Actions as TransactionActions } from 'src/transactions/actions'
@@ -52,8 +54,20 @@ export function* validateRecipientAddressSaga({
       userAddress,
       addressValidationType
     )
+
+    CeloAnalytics.track(CustomEventNames.send_secure_success, {
+      method: 'manual',
+      validationType: addressValidationType === AddressValidationType.FULL ? 'full' : 'partial',
+    })
+
     yield put(validateRecipientAddressSuccess(e164PhoneNumber, validatedAddress))
   } catch (error) {
+    CeloAnalytics.track(CustomEventNames.send_secure_incorrect, {
+      method: 'manual',
+      validationType: addressValidationType === AddressValidationType.FULL ? 'full' : 'partial',
+      error,
+    })
+
     Logger.error(TAG, 'validateRecipientAddressSaga/Address validation error: ', error)
     if (Object.values(ErrorMessages).includes(error.message)) {
       yield put(showErrorInline(error.message))

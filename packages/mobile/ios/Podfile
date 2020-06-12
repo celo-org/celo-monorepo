@@ -102,6 +102,10 @@ target "celo" do
 
   pod 'Segment-Firebase'
 
+  # RNPermissions
+  permissions_path = '../../../node_modules/react-native-permissions/ios'
+  pod 'Permission-Camera', :path => "#{permissions_path}/Camera.podspec"
+
   target "celoTests" do
     inherit! :search_paths
   end
@@ -113,6 +117,18 @@ target "celo" do
   # Note that if you have use_frameworks! enabled, Flipper will not work and
   # you should disable these next few lines.
   # add_flipper_pods!
+end
+
+# Convert all permission pods into static libraries
+# See https://github.com/react-native-community/react-native-permissions#workaround-for-use_frameworks-issues
+pre_install do |installer|
+  installer.pod_targets.each do |pod|
+    if pod.name.eql?('RNPermissions') || pod.name.start_with?('Permission-')
+      def pod.build_type;
+        Pod::BuildType.static_library
+      end
+    end
+  end
 end
 
 post_install do |installer|
