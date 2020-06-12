@@ -21,6 +21,7 @@ interface Props {
   feeLoading?: boolean
   feeHasError?: boolean
   totalFee?: BigNumber
+  testID?: string
 }
 
 export default function FeeDrawer({
@@ -32,6 +33,7 @@ export default function FeeDrawer({
   feeLoading,
   feeHasError,
   totalFee,
+  testID,
 }: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
   const [expanded, setExpanded] = useState(false)
@@ -59,8 +61,8 @@ export default function FeeDrawer({
   }
 
   return (
-    <View>
-      <Touchable onPress={toggleExpanded}>
+    <>
+      <Touchable testID={testID} onPress={toggleExpanded}>
         <View style={styles.totalContainer}>
           <Expandable isExpandable={true} isExpanded={expanded}>
             <Text style={styles.title}>{title}</Text>
@@ -100,7 +102,7 @@ export default function FeeDrawer({
           />
         </View>
       )}
-    </View>
+    </>
   )
 }
 

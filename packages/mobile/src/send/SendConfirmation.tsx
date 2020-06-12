@@ -296,11 +296,12 @@ export class SendConfirmation extends React.Component<Props, State> {
       return (
         <View style={styles.feeContainer}>
           <FeeDrawer
+            testID={'feeDrawer/SendConfirmation'}
             isEstimate={true}
+            currency={CURRENCY_ENUM.DOLLAR}
             inviteFee={inviteFee}
             isInvite={isInvite}
             securityFee={securityFee}
-            currency={CURRENCY_ENUM.DOLLAR}
             feeLoading={asyncFee.loading}
             feeHasError={!!asyncFee.error}
             totalFee={fee}
