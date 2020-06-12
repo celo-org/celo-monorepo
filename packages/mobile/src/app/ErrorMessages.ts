@@ -8,6 +8,7 @@ export enum ErrorMessages {
   NSF_GOLD = 'notEnoughGoldError',
   NSF_DOLLARS = 'notEnoughDollarsError',
   NSF_TO_SEND = 'needMoreFundsToSend',
+  INSUFFICIENT_BALANCE = 'insufficientBalance',
   INVALID_AMOUNT = 'invalidAmount',
   INVALID_BACKUP_PHRASE = 'backupKeyFlow6:invalidBackupPhrase',
   IMPORT_BACKUP_FAILED = 'backupKeyFlow6:importBackupFailed',
