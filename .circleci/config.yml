@@ -8,7 +8,7 @@ reference:
   android_config: &android_config
     working_directory: *workspace
     macos:
-      xcode: "11.3.1"
+      xcode: "11.5.0"
     shell: /bin/bash --login -eo pipefail
     environment:
       TERM: dumb
@@ -189,7 +189,7 @@ jobs:
             - yarn-v4-
       - restore_cache:
           keys:
-            - android-emulator-image-v4-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
+            - android-emulator-image-v3-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
       - run:
           name: Setup environment variables
           command: |
@@ -206,12 +206,9 @@ jobs:
             HOMEBREW_NO_AUTO_UPDATE=1 brew cask install android-sdk
       - run:
           name: Install emulator dependencies
-          command: |
-            # Captures SIGPIPE 141 error but still allow repeating "y" to accept all licenses
-            yes | sdkmanager --licenses || if [ $? -ne '141' ]; then exit $?; fi;
-            ./packages/mobile/scripts/install_android_emulator_image.sh
+          command: (yes | bash ./packages/mobile/scripts/install_android_emulator_image.sh > /dev/null) || true
       - save_cache:
-          key: android-emulator-image-v4-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
+          key: android-emulator-image-v3-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
           paths:
             - /usr/local/Caskroom/android-sdk/*
       - run:
@@ -224,9 +221,7 @@ jobs:
       - run:
           name: Create Android Virtual Device (AVD)
           command: |
-            avdmanager create avd --name Nexus_5X_API_28_x86 \
-              --package "system-images;android-28;google_apis_playstore;x86" \
-              --tag google_apis_playstore --device "Nexus 5" --abi "google_apis_playstore/x86"
+            avdmanager create avd -n Nexus_5X_API_28_x86 -k "system-images;android-26;google_apis;x86" -g google_apis -d "Nexus 5"
             # Copy device configuarion, adv for some reason doesn't
             mkdir -p ~/.android/avd/Nexus_5X_API_28_x86.avd/ && cp packages/mobile/e2e/conf/avd_conf.ini ~/.android/avd/Nexus_5X_API_28_x86.avd/config.ini
       - run:
@@ -276,10 +271,6 @@ jobs:
       - run:
           name: Make sure there's only one adb # This is probably a brew bug
           command: cp /usr/local/share/android-sdk/platform-tools/adb /usr/local/bin/adb
-      # hack alert! the emulator complains about disk space and not sure how to increase it
-      - run:
-          name: Delete Simulators
-          command: sudo rm -rf /Library/Developer/CoreSimulator/Profiles/Runtimes/
       - run:
           name: Run e2e tests
           command: |
