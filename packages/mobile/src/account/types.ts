@@ -18,7 +18,7 @@ export interface PaymentRequest {
   amount: string
   timestamp: Date
   requesterAddress: string
-  requesterE164Number: string
+  requesterE164Number?: string
   requesteeAddress: string
   currency: SHORT_CURRENCIES
   comment: string

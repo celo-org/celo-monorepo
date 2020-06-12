@@ -41,7 +41,7 @@ interface Props {
   testID?: string
   searchQuery: string
   sections: Section[]
-  defaultCountryCode: string
+  defaultCountryCode: string | null
   listHeaderComponent?: React.ComponentType<any>
   onSelectRecipient(recipient: Recipient): void
 }
@@ -94,7 +94,10 @@ export class RecipientPicker extends React.Component<RecipientProps> {
   renderItemSeparator = () => <View style={style.separator} />
 
   renderEmptyView = () => {
-    const parsedNumber = parsePhoneNumber(this.props.searchQuery, this.props.defaultCountryCode)
+    const parsedNumber = parsePhoneNumber(
+      this.props.searchQuery,
+      this.props.defaultCountryCode ? this.props.defaultCountryCode : undefined
+    )
     if (parsedNumber) {
       return this.renderSendToPhoneNumber(parsedNumber.displayNumber, parsedNumber.e164Number)
     }
