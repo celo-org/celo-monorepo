@@ -8,6 +8,8 @@ export enum CustomEventNames {
   signup_submit = 'signup_submit',
   blockChainCorruption = 'block_chain_corruption',
   disconnect_banner = 'disconnect_banner',
+
+  // Education
   gold_cancel1 = 'gold_cancel1',
   gold_cancel2 = 'gold_cancel2',
   gold_cancel3 = 'gold_cancel3',
@@ -23,9 +25,9 @@ export enum CustomEventNames {
   wallet_dollar_nux = 'wallet_dollar_nux',
   send_input = 'send_input',
   transaction_details = 'transaction_details',
+
+  // Payment send
   send_select_cancel = 'send_select_cancel',
-  send_dollar_confirm = 'send_dollar_confirm',
-  edit_dollar_confirm = 'edit_dollar_confirm',
   send_invite_details = 'send_invite_details',
   send_invite = 'send_invite',
   edit_send_invite = 'edit_send_invite',
@@ -36,7 +38,24 @@ export enum CustomEventNames {
   send_select_recipient = 'send_select_recipient', // when recipient was selected
   send_amount_back = 'send_amount_back', // back button pressed on amount screen
   send_continue = 'send_continue', // when next button pressed on amount enter page
+  send_confirm_back = 'send_confirm_back', // when back button pressed on send confirmation screen
+  send_confirm = 'send_confirm', // when send button pressed on send confirmation screen
+  send_error = 'send_error', // when there is an error sending a transaction
+  send_complete = 'send_complete', // when a send or invite transaction has successfully completed
 
+  send_secure_start = 'send_secure_start', // when either secure send scan or manual confirm button pressed
+  send_secure_cancel = 'send_secure_cancel', // when secure send flow is canceled
+  send_secure_back = 'send_secure_back', // when back button is pressed during secure send
+  send_secure_submit = 'send_secure_submit', // when an account is submitted for validation
+  send_secure_success = 'send_secure_success', // when an account has been validated
+  send_secure_incorrect = 'send_secure_incorrect', // when there's been an error validating the account
+  send_secure_info = 'send_secure_info', // when "help" button is pressed
+  send_secure_info_dismissed = 'send_secure_info_dismissed', // when "help" button is dismissed
+  send_secure_edit = 'send_secure_edit', // when "edit" address button is pressed to manually initate secure send flow
+
+  invite_error = 'invite_error', // when there is an error sending an invite
+
+  // Payment request
   request_cancel = 'request_cancel', // when cancel is clicked after launching request flow
   request_search = 'request_search', // when text is input into search bar
   request_scan = 'request_scan', // when scan QR icon is selected from the request screen
@@ -44,6 +63,17 @@ export enum CustomEventNames {
   request_amount_back = 'request_amount_back', // back button pressed on amount screen
   request_continue = 'request_continue', // when next button pressed on amount enter page
   request_unavailable = 'request_unavailable', // when request attempted to unverified user
+  request_confirm_back = 'request_confirm_back', // when back button pressed on request confirmation screen
+  request_confirm = 'request_confirm', // when request button pressed on request confirmation screen
+  request_error = 'request_error', // when there is an error requesting a transaction
+
+  incoming_request_payment_decline = 'incoming_request_payment_decline',
+  incoming_request_payment_pay = 'incoming_request_payment_pay',
+  incoming_request_payment_review = 'incoming_request_payment_review',
+
+  outgoing_request_payment_review = 'outgoing_request_payment_review',
+  outgoing_request_payment_remind = 'outgoing_request_payment_remind',
+  outgoing_request_payment_cancel = 'outgoing_request_payment_cancel',
 
   // Send events, separate from button tracking above
   send_dollar_transaction = 'send_dollar_transaction',
@@ -52,7 +82,7 @@ export enum CustomEventNames {
   fetch_balance = 'fetch_balance',
 
   // Verification event and sub-events
-  verification = 'verification',
+  verification_start = 'verification_start',
   verification_setup = 'verification_setup',
   verification_get_status = 'verification_get_status',
   verification_request_attestations = 'verification_request_attestations',
@@ -189,17 +219,8 @@ export enum CustomEventNames {
   import_phrase_input = 'import_phrase_input', // to record the # of times a value is inputted here [we should not track the actual value of this field, just whether the user filled it out]
   import_wallet_submit = 'import_wallet_submit', // to count the # of times that the “Restore Celo Wallet” button is pressed
   import_wallet_cancel = 'import_wallet_cancel', // to count the # of times that the “Cancel” button is pressed
-
-  request_payment_request = 'incoming_request_payment_request',
-  request_payment_edit = 'incoming_request_payment_edit',
-
-  incoming_request_payment_decline = 'incoming_request_payment_decline',
-  incoming_request_payment_pay = 'incoming_request_payment_pay',
-  incoming_request_payment_review = 'incoming_request_payment_review',
-
-  outgoing_request_payment_review = 'outgoing_request_payment_review',
-  outgoing_request_payment_remind = 'outgoing_request_payment_remind',
-  outgoing_request_payment_cancel = 'outgoing_request_payment_cancel',
+  import_contacts = 'import_contacts',
+  import_contacts_skip = 'import_contacts_skip',
 
   // Escrowed payments
   escrowed_payment_review = 'escrowed_payment_review',
@@ -234,66 +255,76 @@ export enum CommonValues {
   timeout = 'timeout',
 }
 
+export type EventPropertyType = {
+  [key in PropertyPathWhitelist]?: any
+}
+
 // TODO(nitya): separate this out by event name
-export const PROPERTY_PATH_WHITELIST = [
-  'address',
-  'component',
-  'countryCode',
-  'cta',
-  'currentScreen',
-  'dollarAmount',
-  'dollarBalance',
-  'dollarPendingBalance',
-  'error',
-  'exchangeInputAmount',
-  'exchangeRate',
-  'fullName',
-  'goldAmount',
-  'goldBalance',
-  'goldPendingBalance',
-  'goldToDollarExchangeRate',
-  'inputToken',
-  'inviteCode',
-  'isCorrect',
-  'issuer',
-  'label',
-  'language',
-  'localCurrency',
-  'localCurrencyAmount',
-  'localCurrencyExchangeRate',
-  'makerAmount',
-  'makerToken',
-  'makerTokenAmount',
-  'method',
-  'name',
-  'navigation.state.key',
-  'navigation.state.routeName',
-  'nextScreen',
-  'note',
-  'phoneNumber',
-  'previousScreen',
-  'query',
-  'recipientAddress',
-  'requesteeAddress',
-  'requestIndex',
-  'rootTag',
-  'routeName',
-  'screen',
-  'selectedAnswer',
-  'selectedRecipientAddress',
-  'selectedRecipientPhoneNumber',
-  'sendAmount',
-  'subtitle',
-  'success',
-  'syncProgress',
-  'takerAmount',
-  'testnet',
-  'timeElapsed',
-  'title',
-  'to',
-  'tti',
-  'txId',
-  'verificationIndex',
-  'verificationsRemaining',
-]
+export enum PropertyPathWhitelist {
+  address = 'address',
+  component = 'component',
+  context = 'context',
+  countryCode = 'countryCode',
+  cta = 'cta',
+  currentScreen = 'currentScreen',
+  didQuery = 'didQuery',
+  dollarAmount = 'dollarAmount',
+  dollarBalance = 'dollarBalance',
+  dollarPendingBalance = 'dollarPendingBalance',
+  error = 'error',
+  exchangeInputAmount = 'exchangeInputAmount',
+  exchangeRate = 'exchangeRate',
+  fullName = 'fullName',
+  goldAmount = 'goldAmount',
+  goldBalance = 'goldBalance',
+  goldPendingBalance = 'goldPendingBalance',
+  goldToDollarExchangeRate = 'goldToDollarExchangeRate',
+  inputToken = 'inputToken',
+  inviteCode = 'inviteCode',
+  isCorrect = 'isCorrect',
+  isInvite = 'isInvite',
+  issuer = 'issuer',
+  label = 'label',
+  language = 'language',
+  localCurrency = 'localCurrency',
+  localCurrencyAmount = 'localCurrencyAmount',
+  localCurrencyExchangeRate = 'localCurrencyExchangeRate',
+  makerAmount = 'makerAmount',
+  makerToken = 'makerToken',
+  makerTokenAmount = 'makerTokenAmount',
+  method = 'method',
+  name = 'name',
+  'navigation.state.key' = 'navigation.state.key',
+  'navigation.state.routeName' = 'navigation.state.routeName',
+  nextScreen = 'nextScreen',
+  note = 'note',
+  phoneNumber = 'phoneNumber',
+  previousScreen = 'previousScreen',
+  query = 'query',
+  recipientAddress = 'recipientAddress',
+  recipientKind = 'recipientKind',
+  requesteeAddress = 'requesteeAddress',
+  requestIndex = 'requestIndex',
+  rootTag = 'rootTag',
+  routeName = 'routeName',
+  screen = 'screen',
+  selectedAnswer = 'selectedAnswer',
+  selectedRecipientAddress = 'selectedRecipientAddress',
+  selectedRecipientPhoneNumber = 'selectedRecipientPhoneNumber',
+  sendAmount = 'sendAmount',
+  subtitle = 'subtitle',
+  success = 'success',
+  syncProgress = 'syncProgress',
+  takerAmount = 'takerAmount',
+  testnet = 'testnet',
+  timeElapsed = 'timeElapsed',
+  title = 'title',
+  to = 'to',
+  tti = 'tti',
+  txId = 'txId',
+  validationType = 'validationType',
+  verificationIndex = 'verificationIndex',
+  verificationsRemaining = 'verificationsRemaining',
+}
+
 export { DefaultEventNames }

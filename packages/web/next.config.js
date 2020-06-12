@@ -24,6 +24,18 @@ module.exports = withImages({
     }
 
     config.module.rules.push({
+      test: /\.md$/,
+      use: [
+        {
+          loader: 'raw-loader',
+          options: {
+            esModule: false,
+          },
+        },
+      ],
+    })
+
+    config.module.rules.push({
       loader: 'ignore-loader',
       test: /\.test.ts$/,
     })

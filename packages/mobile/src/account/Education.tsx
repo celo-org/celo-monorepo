@@ -84,7 +84,7 @@ class Education extends React.Component<Props, State> {
 
     return (
       <View style={style.body}>
-        {/* 
+        {/*
         // @ts-ignore */}
         <Swiper
           onIndexChanged={this.setStep}

@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
 import * as React from 'react'
 import Svg, { Circle, Path } from 'svgs'
 
@@ -11,7 +11,7 @@ export default class CheckCircle extends React.PureComponent<Props> {
   static defaultProps = {
     width: 24,
     height: 24,
-    color: colors.celoGreen,
+    color: colors.greenUI,
   }
 
   render() {
