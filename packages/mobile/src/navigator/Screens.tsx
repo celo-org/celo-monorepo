@@ -1,6 +1,7 @@
 export enum Screens {
   AppLoading = 'AppLoading',
   Account = 'Account',
+  AccountKeyEducation = 'AccountKeyEducation',
   Analytics = 'Analytics',
   BackupComplete = 'BackupComplete',
   BackupIntroduction = 'BackupIntroduction',
@@ -13,7 +14,6 @@ export enum Screens {
   DappKitTxDataScreen = 'DappKitTxDataScreen',
   DataSaver = 'DataSaver',
   Debug = 'Debug',
-  DollarEducation = 'DollarEducation',
   DrawerNavigator = 'DrawerNavigator',
   EditProfile = 'EditProfile',
   EnterInviteCode = 'EnterInviteCode',
