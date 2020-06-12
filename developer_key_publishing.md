@@ -132,9 +132,9 @@ You should confirm that new key files were added to the `packages/web/openpgpkey
 
 Once a new version of [celo.org](https://celo.org) is published, you will be able to verify your keys are published correctly with the key lookup instructions below.
 
-Verifying your keys are correctly added to the repository can be accomplished by pushing your changes to `dev.celo.org`.
+If you have access to the cLabs Google Cloud project, verifying your keys are correctly added to the repository can be accomplished by pushing your changes to `dev.celo.org`.
 
-If you have access and have made sure you aren't clobbering a fellow developers work on the website, run the following commands in the `packages/web` directory of `celo-monorepo`.
+After making sure you are not going to clobber another engineer's changes, run the following commands in the `packages/web` directory of `celo-monorepo`.
 
 ```bash
 yarn deploy:dev
