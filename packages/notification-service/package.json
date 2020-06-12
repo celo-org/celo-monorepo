@@ -20,7 +20,7 @@
     "@celo/utils": "0.1.9",
     "async-polling": "^0.2.1",
     "bignumber.js": "^9.0.0",
-    "dotenv": "^6.0.0",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "firebase-admin": "^8.10.0",
     "i18next": "^19.0.2",
@@ -33,7 +33,7 @@
   "devDependencies": {
     "@google-cloud/nodejs-repo-tools": "^2.3.3",
     "@types/async-polling": "^0.0.3",
-    "@types/dotenv": "^4.0.3",
+    "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.6",
     "@types/node-fetch": "^2.1.2",
     "@types/utf8": "^2.1.6",

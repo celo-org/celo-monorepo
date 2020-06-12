@@ -48,10 +48,8 @@ export async function incrementQueryCount(account: string, trx: Transaction) {
       newAccount[ACCOUNTS_COLUMNS.numLookups] = 1
       return insertRecord(newAccount)
     }
-    await trx.commit()
   } catch (e) {
     logger.error(ErrorMessages.DATABASE_UPDATE_FAILURE, e)
-    await trx.commit() // don't rollback with DB failure. commit to release lock
     return true
   }
 }

@@ -3,7 +3,6 @@
   "dollarsSent": "{{Dollars}} Enviados",
   "to": "Para",
   "send": "Envío",
-  "request": "Solicitud",
   "payment": "Pago",
   "sendOrRequest": "Enviar o solicitar",
   "characterLimitExceeded": "Límite de {{max}} caracteres superado",
@@ -52,18 +51,15 @@
   "inviteSent": "Código de invitación enviado!",
   "inviteFailed": "Falló el envío de la invitación",
   "loadingContacts": "Encontrando tus contactos",
-  "QRCode": "QR Código",
-  "shareCodeImage": "Compartir Imagen de Código",
-  "scanCode": "Escanear Código",
+  "myCode": "Mi Código",
+  "scanCode": "Escanear",
   "scanQRCode": "Escanear Código QR",
   "writeStorageNeededForQrDownload": "Se necesita permiso de escritura de almacenamiento para descargar el código QR",
-  "cameraScanInfo": "Escanee el código colocándolo en la caja",
+  "cameraScanInfo": "Centro de código en el cuadro de arriba",
   "cameraNotAuthorizedTitle": "Habilitar Cámara",
   "cameraNotAuthorizedDescription": "Habilite la cámara en la configuración de su teléfono. Lo necesitará para escanear códigos QR.",
   "cameraSettings": "Configuraciones",
-  "showYourQRCode": "Muestra tu código QR",
   "toSentOrRequestPayment": "enviar o solicitar pago",
-  "requestSent": "Solicitud Enviada",
   "reminderSent": "Recordatorio Enviado",
   "reclaimPayment": "Reclamar el Pago",
   "totalRefunded": "Total Reembolsado",
@@ -89,16 +85,20 @@
   },
   "confirmAccount": {
     "header": "Por favor confirma la cuenta de {{displayName}}",
+    "headerNoDisplayName": "Por favor confirme la cuenta de su contacto",
     "button": "Confirma el número de cuenta"
   },
   "secureSendExplanation": {
-    "body1": "{{e164Number}} tiene multipes cuentas asociadas. {{displayName}} puede haber creado una nueva cuenta de Celo, perdido su teléfono o su cuenta puede haber sido interceptada o comprometida.",
+    "body1": "{{e164PhoneNumber}} tiene multipes cuentas asociadas. {{displayName}} puede haber creado una nueva cuenta de Celo, perdido su teléfono o su cuenta puede haber sido interceptada o comprometida.",
+    "body1NoDisplayName": "Su contacto tiene varias cuentas asociadas. Su contacto podría haber creado una nueva cuenta de Celo, o podría haber perdido su teléfono o haber comprometido su cuenta.",
     "body2": "Puedes realizar esto escaneando el código QR o confirmado su número de cuenta directamente antes de realizar transacciones"
   },
   "confirmAccountNumber": {
     "title": "Confirma el número de cuenta",
     "bodyPartial": "Por favor solicita a {{displayName}} los últimos cuatro dígitos de su número de cuenta. Por razones de seguridad, preguntar en persona o por teléfono.",
+    "bodyPartialNoDisplayName": "Solicite a su contacto los últimos cuatro dígitos de su número de cuenta. Es más seguro hacerlo en persona o por teléfono.",
     "body1Full": "Por favor solicita a {{displayName}} su número de cuenta",
+    "body1FullNoDisplayName": "Solicite a su contacto su número de cuenta.",
     "body2Full": "Por razones de seguridad, por favor no utilices mensajes de texto (SMS). Se recomienda altamente preguntar en persona o por teléfono a través de WhastApp, Messenger o por correo electrónico",
     "help": "Ayude a encontrar su número de cuenta",
     "submit": "Enviar"
@@ -112,5 +112,6 @@
     "body3": "Los números de cuenta comienzan con 0x, contienen solo números y letras y tienen 42 caracteres. Haz click en el siguiente enlace para obtener ayuda"
   },
   "transferAddressChanged": "Este contacto cambió su número de cuenta desde la transacción. Este pago fue enviado a:",
-  "addressConfirmed": "Número de cuenta confirmado"
+  "addressConfirmed": "Número de cuenta confirmado",
+  "sending": "Enviando"
 }

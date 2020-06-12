@@ -5,6 +5,8 @@ exports[`InviteReview renders correctly 1`] = `
   style={
     Object {
       "flex": 1,
+      "justifyContent": "flex-start",
+      "paddingBottom": 25,
     }
   }
 >
@@ -65,15 +67,7 @@ exports[`InviteReview renders correctly 1`] = `
             }
           }
         >
-          <View
-            style={
-              Object {
-                "flexGrow": 1,
-                "justifyContent": "flex-start",
-                "paddingBottom": 25,
-              }
-            }
-          >
+          <View>
             <View
               style={
                 Object {
@@ -308,9 +302,9 @@ exports[`InviteReview renders correctly 1`] = `
                       Array [
                         Object {
                           "color": "#2E3338",
-                          "fontFamily": "Hind-Regular",
-                          "fontSize": 15,
-                          "lineHeight": 24,
+                          "fontFamily": "Inter-Regular",
+                          "fontSize": 16,
+                          "lineHeight": 22,
                         },
                         undefined,
                       ]
@@ -324,9 +318,9 @@ exports[`InviteReview renders correctly 1`] = `
                     Array [
                       Object {
                         "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 15,
-                        "lineHeight": 24,
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
                       },
                       undefined,
                     ]
@@ -375,15 +369,15 @@ exports[`InviteReview renders correctly 1`] = `
                       Array [
                         Object {
                           "color": "#2E3338",
-                          "fontFamily": "Hind-Regular",
-                          "fontSize": 15,
-                          "lineHeight": 24,
+                          "fontFamily": "Inter-Regular",
+                          "fontSize": 16,
+                          "lineHeight": 22,
                         },
                         undefined,
                       ]
                     }
                   >
-                    securityFee
+                    sendFlow7:securityFee
                   </Text>
                   <View
                     accessible={true}
@@ -490,15 +484,15 @@ exports[`InviteReview renders correctly 1`] = `
                       Array [
                         Object {
                           "color": "#2E3338",
-                          "fontFamily": "Hind-Regular",
-                          "fontSize": 15,
-                          "lineHeight": 24,
+                          "fontFamily": "Inter-Regular",
+                          "fontSize": 16,
+                          "lineHeight": 22,
                         },
                         Object {
                           "color": "#2E3338",
-                          "fontFamily": "Hind-Bold",
+                          "fontFamily": "Inter-SemiBold",
                           "fontSize": 16,
-                          "lineHeight": 24,
+                          "lineHeight": 22,
                         },
                       ]
                     }
@@ -511,15 +505,15 @@ exports[`InviteReview renders correctly 1`] = `
                     Array [
                       Object {
                         "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 15,
-                        "lineHeight": 24,
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
                       },
                       Object {
                         "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
+                        "fontFamily": "Inter-SemiBold",
                         "fontSize": 16,
-                        "lineHeight": 24,
+                        "lineHeight": 22,
                       },
                     ]
                   }
@@ -536,8 +530,7 @@ exports[`InviteReview renders correctly 1`] = `
                     }
                   >
                     
-                    $
-                    0.00
+                    -
                   </Text>
                 </Text>
               </View>
@@ -569,17 +562,20 @@ exports[`InviteReview renders correctly 1`] = `
                       Array [
                         Object {
                           "color": "#2E3338",
-                          "fontFamily": "Hind-Regular",
-                          "fontSize": 15,
-                          "lineHeight": 24,
+                          "fontFamily": "Inter-Regular",
+                          "fontSize": 16,
+                          "lineHeight": 22,
                         },
                         Object {
-                          "color": "#81868B",
+                          "color": "#9CA4A9",
+                          "fontFamily": "Inter-Regular",
+                          "fontSize": 14,
+                          "lineHeight": 18,
                         },
                       ]
                     }
                   >
-                    Celo Dollars (@
+                    Celo Dollars @
                      
                     <Text
                       numberOfLines={1}
@@ -596,7 +592,6 @@ exports[`InviteReview renders correctly 1`] = `
                       $
                       0.75
                     </Text>
-                    )
                   </Text>
                 </View>
                 <Text
@@ -604,12 +599,15 @@ exports[`InviteReview renders correctly 1`] = `
                     Array [
                       Object {
                         "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 15,
-                        "lineHeight": 24,
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
                       },
                       Object {
-                        "color": "#81868B",
+                        "color": "#9CA4A9",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 14,
+                        "lineHeight": 18,
                       },
                     ]
                   }

@@ -13,7 +13,6 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
   <RCTScrollView
     contentContainerStyle={
       Object {
-        "flexDirection": "column",
         "flexGrow": 1,
         "justifyContent": "space-between",
         "padding": 16,
@@ -498,7 +497,6 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
             style={
               Object {
                 "alignItems": "center",
-                "flexDirection": "column",
                 "justifyContent": "center",
                 "paddingVertical": 8,
               }
@@ -644,7 +642,6 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
   <RCTScrollView
     contentContainerStyle={
       Object {
-        "flexDirection": "column",
         "flexGrow": 1,
         "justifyContent": "space-between",
         "padding": 16,
@@ -1289,7 +1286,6 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
             style={
               Object {
                 "alignItems": "center",
-                "flexDirection": "column",
                 "justifyContent": "center",
                 "paddingVertical": 8,
               }

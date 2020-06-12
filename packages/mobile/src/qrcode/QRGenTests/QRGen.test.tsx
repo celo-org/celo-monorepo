@@ -4,7 +4,7 @@ import QRCode, { genMatrix } from 'src/qrcode/QRGen'
 
 describe('QRCode', () => {
   it('renders correctly', () => {
-    const tree = renderer.create(<QRCode value="celo" getRef={jest.fn()} />).toJSON()
+    const tree = renderer.create(<QRCode value="celo" svgRef={{ current: null }} />).toJSON()
     expect(tree).toMatchSnapshot()
   })
 
@@ -15,15 +15,19 @@ describe('QRCode', () => {
     // Rendering with big amount of data that should
     // throw an exception
     renderer.create(
-      <QRCode value={new Array(1000000).join('123')} onError={onErrorMock} getRef={jest.fn()} />
+      <QRCode
+        value={new Array(1000000).join('123')}
+        onError={onErrorMock}
+        svgRef={{ current: null }}
+      />
     )
-    expect(onErrorMock.mock.calls.length).toBe(2)
+    expect(onErrorMock).toBeCalledTimes(1)
   })
 
   it('does not call onError in case if value is fine', () => {
     const onErrorMock = jest.fn()
-    renderer.create(<QRCode value="123" onError={onErrorMock} getRef={jest.fn()} />)
-    expect(onErrorMock.mock.calls.length).toBe(0)
+    renderer.create(<QRCode value="123" onError={onErrorMock} svgRef={{ current: null }} />)
+    expect(onErrorMock).not.toHaveBeenCalled()
   })
 })
 

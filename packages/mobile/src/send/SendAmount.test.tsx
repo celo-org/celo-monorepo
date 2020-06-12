@@ -223,6 +223,28 @@ describe('SendAmount', () => {
       })
     })
 
+    it('navigates to PaymentRequestUnavailable screen on Request click when address is unverified', () => {
+      const store = createMockStore({
+        identity: {
+          e164NumberToAddress: {},
+          secureSendPhoneNumberMapping: {},
+        },
+        ...storeData,
+      })
+      mockTransactionData2.type = TokenTransactionType.PayRequest
+
+      const tree = render(
+        <Provider store={store}>
+          <SendAmount {...mockScreenProps(true)} />
+        </Provider>
+      )
+      enterAmount(tree, AMOUNT_VALID)
+      fireEvent.press(tree.getByTestId('Review'))
+      expect(navigate).toHaveBeenCalledWith(Screens.PaymentRequestUnavailable, {
+        transactionData: mockTransactionData2,
+      })
+    })
+
     it('navigates to PaymentRequestConfirmation screen on Request click when a manual address check is not needed', () => {
       const store = createMockStore({
         identity: {
