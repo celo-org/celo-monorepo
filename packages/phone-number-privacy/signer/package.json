@@ -1,12 +1,13 @@
 {
   "name": "@celo/phone-number-privacy-signer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Signing participator of a the PGPNP threshold signature scheme",
   "author": "Celo",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "scripts": {
     "start": "yarn build && node -r dotenv/config dist/index.js",
+    "start:docker": "yarn build && node dist/index.js",
     "clean": "tsc -b . --clean",
     "build": "tsc -b .",
     "lint": "tslint --project .",
@@ -30,7 +31,9 @@
     "@types/uuid": "^7.0.3",
     "@types/supertest": "^2.0.9",
     "dotenv": "^8.2.0",
-    "supertest": "^4.0.2"
+    "supertest": "^4.0.2",
+    "typescript": "^3.8.3",
+    "ts-node": "^8.3.0"
   },
   "engines": {
     "node": "10"
