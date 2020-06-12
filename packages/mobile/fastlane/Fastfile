@@ -42,7 +42,7 @@ platform :android do
       ENV["GRADLE_OPTS"] = '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx10000m -XX:+HeapDumpOnOutOfMemoryError"'
       gradle(task: 'assemble', build_type: environment, project_dir: 'android/')
     else
-      ENV["GRADLE_OPTS"] = '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx256m -XX:+HeapDumpOnOutOfMemoryError"'
+      ENV["GRADLE_OPTS"] = '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx10000m -XX:+HeapDumpOnOutOfMemoryError"'
       gradle(task: 'bundle' + environment + 'JsAndAssets', project_dir: 'android/')
       ENV["GRADLE_OPTS"] = '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx10000m -XX:+HeapDumpOnOutOfMemoryError"'
       gradle(task: 'bundle', build_type: environment, project_dir: 'android/', flags: '-x bundle' + environment + 'JsAndAssets')
@@ -123,6 +123,15 @@ platform :ios do
   desc 'Ship Pilot to TestFlight'
   lane :pilotapp do
     env = 'pilot'
+    build(environment: env)
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+    )
+  end
+
+  desc 'Ship Integration to TestFlight'
+  lane :integration do
+    env = 'integration'
     build(environment: env)
     upload_to_testflight(
       skip_waiting_for_build_processing: true,

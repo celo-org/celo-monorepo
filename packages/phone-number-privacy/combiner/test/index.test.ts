@@ -1,5 +1,6 @@
-import { authenticateUser, isVerified } from '../src/common/identity'
 import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
+import { authenticateUser, isVerified } from '../src/common/identity'
+import { getTransaction } from '../src/database/database'
 import {
   getDidMatchmaking,
   incrementQueryCount,
@@ -8,9 +9,8 @@ import {
 import { getNumberPairContacts, setNumberPairContacts } from '../src/database/wrappers/number-pairs'
 import { getDistributedBlindedSalt, getContactMatches } from '../src/index'
 import { getRemainingQueryCount } from '../src/salt-generation/query-quota'
-import { getTransaction } from '../src/database/database'
 
-const BLS_SIGNATURE = '6546544323114343'
+const BLS_SIGNATURE = '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A'
 
 jest.mock('../src/common/identity')
 const mockAuthenticateUser = authenticateUser as jest.Mock

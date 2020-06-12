@@ -329,7 +329,7 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
             },
           ]
         }
-        testID="ContinueInviteButton"
+        testID="RestoreExistingWallet"
       >
         <View
           style={

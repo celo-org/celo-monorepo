@@ -341,6 +341,10 @@ export class ContractKit {
       gasPrice: this.config.gasPrice,
     }
 
+    if (this.config.feeCurrency) {
+      defaultTx.feeCurrency = this.config.feeCurrency
+    }
+
     return {
       ...defaultTx,
       ...tx,

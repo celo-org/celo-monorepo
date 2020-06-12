@@ -36,6 +36,7 @@ ERC-20 contract for Celo native currency.
 ### Methods
 
 * [balanceOf](_wrappers_goldtokenwrapper_.goldtokenwrapper.md#balanceof)
+* [getPastEvents](_wrappers_goldtokenwrapper_.goldtokenwrapper.md#getpastevents)
 
 ## Constructors
 
@@ -377,3 +378,24 @@ Name | Type |
 **Returns:** *Promise‹BigNumber‹››*
 
 The balance of the specified address.
+
+___
+
+###  getPastEvents
+
+▸ **getPastEvents**(`event`: string, `options`: PastEventOptions): *Promise‹EventLog[]›*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L29)*
+
+Contract getPastEvents
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`event` | string |
+`options` | PastEventOptions |
+
+**Returns:** *Promise‹EventLog[]›*

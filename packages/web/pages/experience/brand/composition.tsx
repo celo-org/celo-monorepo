@@ -1,3 +1,3 @@
-import Composition from 'src/brandkit/Composition'
+import Composition from 'src/experience/brandkit/Composition'
 
 export default Composition

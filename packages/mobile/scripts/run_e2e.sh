@@ -12,24 +12,28 @@ export ENVFILE="${ENVFILE:-.env.test}"
 # -p: Platform (android or ios)
 # -v (Optional): Name of virual machine to run
 # -f (Optional): Fast (skip build step)
-# -r (Optional): Use release build (by default uses debug) 
+# -r (Optional): Use release build (by default uses debug)
+# -n (Optional): Network delay (gsm, hscsd, gprs, edge, umts, hsdpa, lte, evdo, none)
 # TODO ^ release doesn't work currently b.c. the run_app.sh script assumes we want a debug build
 
 PLATFORM=""
 VD_NAME="Nexus_5X_API_28_x86"
 FAST=false
 RELEASE=false
+NET_DELAY="none"
 while getopts 'p:fr' flag; do
   case "${flag}" in
     p) PLATFORM="$OPTARG" ;;
     v) VD_NAME="$OPTARG" ;;
     f) FAST=true ;;
     r) RELEASE=true ;;
+    n) NET_DELAY="$OPTARG" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
 
 [ -z "$PLATFORM" ] && echo "Need to set the PLATFORM via the -p flag" && exit 1;
+echo "Network delay: $NET_DELAY"
 
 # Start the packager and wait until ready
 startPackager() {
@@ -83,7 +87,7 @@ runTest() {
 
 # Needed by metro packager to use .e2e.ts overrides
 # See metro.config.js
-export CELO_TEST_CONFIG=e2e 
+export CELO_TEST_CONFIG=e2e
 
 # Ensure jest is accessible to detox
 cp ../../node_modules/.bin/jest node_modules/.bin/
@@ -124,18 +128,18 @@ if [ $PLATFORM = "android" ]; then
   startPackager
 
   NUM_DEVICES=`adb devices -l | wc -l`
-  if [ $NUM_DEVICES -gt 2 ]; then 
+  if [ $NUM_DEVICES -gt 2 ]; then
     echo "Emulator already running or device attached. Please shutdown / remove first"
     exit 1
   fi
 
   echo "Starting the emulator"
-  $ANDROID_HOME/emulator/emulator -avd $VD_NAME -no-boot-anim &
+  $ANDROID_HOME/emulator/emulator -avd $VD_NAME -no-boot-anim -netdelay $NET_DELAY &
 
   echo "Waiting for device to connect to Wifi, this is a good proxy the device is ready"
   until [ `adb shell dumpsys wifi | grep "mNetworkInfo" | grep "state: CONNECTED" | wc -l` -gt 0 ]
   do
-    sleep 3 
+    sleep 3
   done
 
   runTest
@@ -145,7 +149,7 @@ if [ $PLATFORM = "android" ]; then
 
 elif [ $PLATFORM = "ios" ]; then
   echo "Using platform ios"
-  
+
   if [ "$RELEASE" = false ]; then
     CONFIG_NAME="ios.sim.debug"
   else

@@ -6,7 +6,7 @@ export function hasValidAccountParam(requestBody: any): boolean {
 }
 
 export function hasValidUserPhoneNumberParam(requestBody: any): boolean {
-  return requestBody.userPhoneNumber
+  return !!requestBody.userPhoneNumber
 }
 
 export function hasValidContractPhoneNumbersParam(requestBody: any): boolean {
@@ -18,7 +18,11 @@ export function isBodyReasonablySized(requestBody: any): boolean {
 }
 
 export function hasValidQueryPhoneNumberParam(requestBody: any): boolean {
-  return requestBody.blindedQueryPhoneNumber
+  return !!requestBody.blindedQueryPhoneNumber
+}
+
+export function hasValidPhoneNumberHash(requestBody: any): boolean {
+  return requestBody.hashedPhoneNumber && isByte32(requestBody.hashedPhoneNumber)
 }
 
 export function phoneNumberHashIsValidIfExists(requestBody: any): boolean {
