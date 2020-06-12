@@ -4,16 +4,15 @@ import { createStackNavigator } from '@react-navigation/stack'
 import * as React from 'react'
 import SplashScreen from 'react-native-splash-screen'
 import Account from 'src/account/Account'
+import AccountKeyEducation from 'src/account/AccountKeyEducation'
 import Analytics from 'src/account/Analytics'
 import DataSaver from 'src/account/DataSaver'
-import DollarEducation from 'src/account/DollarEducation'
 import EditProfile from 'src/account/EditProfile'
 import FiatExchange from 'src/account/FiatExchange'
 import GoldEducation from 'src/account/GoldEducation'
 import Invite from 'src/account/Invite'
 import InviteReview from 'src/account/InviteReview'
 import Licenses from 'src/account/Licenses'
-import PhotosEducation from 'src/account/PhotosEducation'
 import Profile from 'src/account/Profile'
 import { PincodeType } from 'src/account/reducer'
 import Security from 'src/account/Security'
@@ -62,7 +61,7 @@ import {
   nuxNavigationOptions,
   nuxNavigationOptionsNoBackButton,
 } from 'src/navigator/Headers.v2'
-import { navigate, navigateBack } from 'src/navigator/NavigationService'
+import { navigateBack, navigateToExchangeHome } from 'src/navigator/NavigationService'
 import QRNavigator from 'src/navigator/QRNavigator'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
@@ -288,7 +287,6 @@ const exchangeReviewScreenOptions = ({
 }) => {
   const { makerToken } = route.params?.exchangeInput
   const isDollarToGold = makerToken === CURRENCY_ENUM.DOLLAR
-  const goExchangeHome = () => navigate(Screens.ExchangeHomeScreen)
   const title = isDollarToGold ? i18n.t('exchangeFlow9:buyGold') : i18n.t('exchangeFlow9:sellGold')
   const cancelEventName = isDollarToGold
     ? CustomEventNames.gold_buy_cancel
@@ -298,7 +296,9 @@ const exchangeReviewScreenOptions = ({
     : CustomEventNames.gold_sell_edit
   return {
     ...headerWithCancelButton,
-    headerLeft: () => <CancelButton onCancel={goExchangeHome} eventName={cancelEventName} />,
+    headerLeft: () => (
+      <CancelButton onCancel={navigateToExchangeHome} eventName={cancelEventName} />
+    ),
     headerRight: () => (
       <TopBarTextButton
         title={i18n.t('global:edit')}
@@ -333,6 +333,11 @@ const backupScreens = (Navigator: typeof Stack) => (
       name={Screens.BackupIntroduction}
       component={BackupIntroduction}
       options={navOptionsForAccount}
+    />
+    <Navigator.Screen
+      name={Screens.AccountKeyEducation}
+      component={AccountKeyEducation}
+      options={noHeader}
     />
     <Navigator.Screen
       name={Screens.BackupPhrase}
@@ -410,14 +415,12 @@ const transactionReviewOptions = ({
 const generalScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen name={Screens.SetClock} component={SetClock} />
-    <Navigator.Screen name={Screens.DollarEducation} component={DollarEducation} />
     <Navigator.Screen
       name={Screens.TransactionReview}
       component={TransactionReview}
       options={transactionReviewOptions}
     />
-    <Navigator.Screen name={Screens.PhotosEducation} component={PhotosEducation} />
-    <Navigator.Screen name={Screens.GoldEducation} component={GoldEducation} />
+    <Navigator.Screen name={Screens.GoldEducation} component={GoldEducation} options={noHeader} />
     <Navigator.Screen name={Screens.FeeEducation} component={FeeEducation} />
   </>
 )
