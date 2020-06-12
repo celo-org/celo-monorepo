@@ -1404,111 +1404,123 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 }
               }
             >
-              <h1
-                aria-level="1"
-                className="css-reset-4rbku5 css-text-901oao"
-                dir="auto"
-                role="heading"
-                style={
-                  Object {
-                    "color": "rgba(46,51,56,1.00)",
-                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                    "fontSize": "36px",
-                    "lineHeight": "40px",
-                    "marginBottom": "20px",
-                    "textRendering": "geometricPrecision",
-                    "textTransform": "none",
+              <div>
+                <h1
+                  aria-level="1"
+                  className="css-reset-4rbku5 css-text-901oao"
+                  dir="auto"
+                  id="test"
+                  role="heading"
+                  style={
+                    Object {
+                      "color": "rgba(46,51,56,1.00)",
+                      "display": "block",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "36px",
+                      "lineHeight": "40px",
+                      "textRendering": "geometricPrecision",
+                      "textTransform": "none",
+                    }
                   }
-                }
-              >
-                exchangeIcons.title
-              </h1>
-              <h4
-                aria-level="4"
-                className="css-reset-4rbku5 css-text-901oao"
-                dir="auto"
-                role="heading"
-                style={
-                  Object {
-                    "color": "rgba(46,51,56,1.00)",
-                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                    "fontSize": "24px",
-                    "lineHeight": "32px",
-                    "textRendering": "geometricPrecision",
-                    "textTransform": "none",
+                >
+                  Test
+                </h1>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "marginTop": "40px",
+                    }
                   }
-                }
-              >
-                exchangeIcons.headline
-              </h4>
-            </div>
-            <div
-              className="css-view-1dbjc4n"
-              onClick={[Function]}
-              onMouseDown={[Function]}
-              onMouseEnter={[Function]}
-              onMouseLeave={[Function]}
-              onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
-            >
-              <a
-                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
-                data-focusable={true}
-                dir="auto"
-                href="/assets/CeloMarketplaceIcons.zip"
+                >
+                  <h3
+                    aria-level="3"
+                    className="css-reset-4rbku5 css-text-901oao"
+                    dir="auto"
+                    role="heading"
+                    style={
+                      Object {
+                        "color": "rgba(46,51,56,1.00)",
+                        "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                        "fontSize": "24px",
+                        "lineHeight": "32px",
+                        "textRendering": "geometricPrecision",
+                        "textTransform": "none",
+                      }
+                    }
+                  >
+                    This is a test
+                  </h3>
+                </div>
+              </div>
+              <div
+                className="css-view-1dbjc4n"
                 onClick={[Function]}
+                onMouseDown={[Function]}
                 onMouseEnter={[Function]}
-                role="link"
-                style={
-                  Object {
-                    "WebkitAlignItems": "center",
-                    "WebkitBoxAlign": "center",
-                    "WebkitBoxFlex": 0,
-                    "WebkitBoxPack": "center",
-                    "WebkitFlexGrow": 0,
-                    "WebkitJustifyContent": "center",
-                    "alignItems": "center",
-                    "backgroundColor": "rgba(53,208,127,1.00)",
-                    "borderBottomColor": "rgba(53,208,127,1.00)",
-                    "borderBottomLeftRadius": "3px",
-                    "borderBottomRightRadius": "3px",
-                    "borderBottomWidth": "1px",
-                    "borderLeftColor": "rgba(53,208,127,1.00)",
-                    "borderLeftWidth": "1px",
-                    "borderRightColor": "rgba(53,208,127,1.00)",
-                    "borderRightWidth": "1px",
-                    "borderTopColor": "rgba(53,208,127,1.00)",
-                    "borderTopLeftRadius": "3px",
-                    "borderTopRightRadius": "3px",
-                    "borderTopWidth": "1px",
-                    "color": "rgba(255,255,255,1.00)",
-                    "cursor": "pointer",
-                    "display": "inline-flex",
-                    "flexGrow": 0,
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "16px",
-                    "fontWeight": "500",
-                    "justifyContent": "center",
-                    "lineHeight": "16px",
-                    "marginLeft": "10px",
-                    "minWidth": "150px",
-                    "msFlexAlign": "center",
-                    "msFlexPack": "center",
-                    "msFlexPositive": 0,
-                    "opacity": 1,
-                    "paddingBottom": "10px",
-                    "paddingLeft": "20px",
-                    "paddingRight": "20px",
-                    "paddingTop": "10px",
-                    "textAlign": "center",
-                    "textRendering": "geometricPrecision",
-                    "width": "fit-content",
-                  }
-                }
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onResponderGrant={[Function]}
+                onResponderRelease={[Function]}
               >
-                logo.overviewBtn
-              </a>
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                  data-focusable={true}
+                  dir="auto"
+                  href="/assets/CeloMarketplaceIcons.zip"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
+                  role="link"
+                  style={
+                    Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "WebkitBoxFlex": 0,
+                      "WebkitBoxPack": "center",
+                      "WebkitFlexGrow": 0,
+                      "WebkitJustifyContent": "center",
+                      "alignItems": "center",
+                      "backgroundColor": "rgba(53,208,127,1.00)",
+                      "borderBottomColor": "rgba(53,208,127,1.00)",
+                      "borderBottomLeftRadius": "3px",
+                      "borderBottomRightRadius": "3px",
+                      "borderBottomWidth": "1px",
+                      "borderLeftColor": "rgba(53,208,127,1.00)",
+                      "borderLeftWidth": "1px",
+                      "borderRightColor": "rgba(53,208,127,1.00)",
+                      "borderRightWidth": "1px",
+                      "borderTopColor": "rgba(53,208,127,1.00)",
+                      "borderTopLeftRadius": "3px",
+                      "borderTopRightRadius": "3px",
+                      "borderTopWidth": "1px",
+                      "color": "rgba(255,255,255,1.00)",
+                      "cursor": "pointer",
+                      "display": "inline-flex",
+                      "flexGrow": 0,
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "justifyContent": "center",
+                      "lineHeight": "16px",
+                      "marginTop": "20px",
+                      "minWidth": "150px",
+                      "msFlexAlign": "center",
+                      "msFlexPack": "center",
+                      "msFlexPositive": 0,
+                      "opacity": 1,
+                      "paddingBottom": "10px",
+                      "paddingLeft": "20px",
+                      "paddingRight": "20px",
+                      "paddingTop": "10px",
+                      "textAlign": "center",
+                      "textRendering": "geometricPrecision",
+                      "width": "fit-content",
+                    }
+                  }
+                >
+                  logo.overviewBtn
+                </a>
+              </div>
             </div>
             <div
               className="css-text-901oao"
@@ -1962,7 +1974,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                             }
                           >
                             <div
-                              aria-label="Preview of cGLD Exchange Icon"
+                              aria-label="Preview of CELO Exchange Icon"
                               className="css-view-1dbjc4n"
                               style={
                                 Object {
@@ -1986,7 +1998,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                                 style={
                                   Object {
                                     "backgroundColor": "rgba(0,0,0,0.00)",
-                                    "backgroundImage": "url(\\"/images/marketplace-icons/icon-celo-gold-color-f.svg\\")",
+                                    "backgroundImage": "url(\\"/images/marketplace-icons/icon-celo-CELO-color-f.svg\\")",
                                     "backgroundPosition": "center",
                                     "backgroundRepeat": "no-repeat",
                                     "backgroundSize": "contain",
@@ -2002,10 +2014,10 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                                 }
                               />
                               <img
-                                alt="Preview of cGLD Exchange Icon"
+                                alt="Preview of CELO Exchange Icon"
                                 className="css-accessibilityImage-9pa8cd"
                                 draggable={false}
-                                src="/images/marketplace-icons/icon-celo-gold-color-f.svg"
+                                src="/images/marketplace-icons/icon-celo-CELO-color-f.svg"
                               />
                             </div>
                           </div>
@@ -2053,7 +2065,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                             }
                           }
                         >
-                          cGLD Exchange Icon
+                          CELO Exchange Icon
                         </div>
                         <div
                           className="css-text-901oao"
@@ -2095,7 +2107,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                           data-focusable={true}
                           dir="auto"
-                          href="/assets/marketplace-icons/icon-celo-gold-color.zip"
+                          href="/assets/marketplace-icons/icon-celo-CELO-color.zip"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                           role="link"
@@ -2282,7 +2294,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                                 style={
                                   Object {
                                     "backgroundColor": "rgba(0,0,0,0.00)",
-                                    "backgroundImage": "url(\\"/images/marketplace-icons/icon-celo-dollar-black-f.svg\\")",
+                                    "backgroundImage": "url(\\"/images/marketplace-icons/icon-celo-dollar-mono-f.svg\\")",
                                     "backgroundPosition": "center",
                                     "backgroundRepeat": "no-repeat",
                                     "backgroundSize": "contain",
@@ -2301,7 +2313,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                                 alt="Preview of cUSD Exchange Icon"
                                 className="css-accessibilityImage-9pa8cd"
                                 draggable={false}
-                                src="/images/marketplace-icons/icon-celo-dollar-black-f.svg"
+                                src="/images/marketplace-icons/icon-celo-dollar-mono-f.svg"
                               />
                             </div>
                           </div>
@@ -2391,7 +2403,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                           data-focusable={true}
                           dir="auto"
-                          href="/assets/marketplace-icons/icon-celo-dollar-black.zip"
+                          href="/assets/marketplace-icons/icon-celo-dollar-mono.zip"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                           role="link"
@@ -2544,7 +2556,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                             }
                           >
                             <div
-                              aria-label="Preview of cGLD Exchange Icon"
+                              aria-label="Preview of CELO Exchange Icon"
                               className="css-view-1dbjc4n"
                               style={
                                 Object {
@@ -2569,7 +2581,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                                 style={
                                   Object {
                                     "backgroundColor": "rgba(0,0,0,0.00)",
-                                    "backgroundImage": "url(\\"/images/marketplace-icons/icon-celo-gold-black-f.svg\\")",
+                                    "backgroundImage": "url(\\"/images/marketplace-icons/icon-celo-CELO-mono-f.svg\\")",
                                     "backgroundPosition": "center",
                                     "backgroundRepeat": "no-repeat",
                                     "backgroundSize": "contain",
@@ -2585,10 +2597,10 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                                 }
                               />
                               <img
-                                alt="Preview of cGLD Exchange Icon"
+                                alt="Preview of CELO Exchange Icon"
                                 className="css-accessibilityImage-9pa8cd"
                                 draggable={false}
-                                src="/images/marketplace-icons/icon-celo-gold-black-f.svg"
+                                src="/images/marketplace-icons/icon-celo-CELO-mono-f.svg"
                               />
                             </div>
                           </div>
@@ -2636,7 +2648,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                             }
                           }
                         >
-                          cGLD Exchange Icon
+                          CELO Exchange Icon
                         </div>
                         <div
                           className="css-text-901oao"
@@ -2678,7 +2690,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                           data-focusable={true}
                           dir="auto"
-                          href="/assets/marketplace-icons/icon-celo-gold-black.zip"
+                          href="/assets/marketplace-icons/icon-celo-CELO-mono.zip"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                           role="link"
@@ -2856,7 +2868,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                                 style={
                                   Object {
                                     "backgroundColor": "rgba(0,0,0,0.00)",
-                                    "backgroundImage": "url(\\"/images/marketplace-icons/icon-celo-dollar-white-f.svg\\")",
+                                    "backgroundImage": "url(\\"/images/marketplace-icons/icon-celo-dollar-reverse-f.svg\\")",
                                     "backgroundPosition": "center",
                                     "backgroundRepeat": "no-repeat",
                                     "backgroundSize": "contain",
@@ -2875,7 +2887,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                                 alt="Preview of cUSD Exchange Icon"
                                 className="css-accessibilityImage-9pa8cd"
                                 draggable={false}
-                                src="/images/marketplace-icons/icon-celo-dollar-white-f.svg"
+                                src="/images/marketplace-icons/icon-celo-dollar-reverse-f.svg"
                               />
                             </div>
                           </div>
@@ -2965,7 +2977,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                           data-focusable={true}
                           dir="auto"
-                          href="/assets/marketplace-icons/icon-celo-dollar-white.zip"
+                          href="/assets/marketplace-icons/icon-celo-dollar-reverse.zip"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                           role="link"
@@ -3118,7 +3130,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                             }
                           >
                             <div
-                              aria-label="Preview of cGLD Exchange Icon"
+                              aria-label="Preview of CELO Exchange Icon"
                               className="css-view-1dbjc4n"
                               style={
                                 Object {
@@ -3143,7 +3155,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                                 style={
                                   Object {
                                     "backgroundColor": "rgba(0,0,0,0.00)",
-                                    "backgroundImage": "url(\\"/images/marketplace-icons/icon-celo-gold-white-f.svg\\")",
+                                    "backgroundImage": "url(\\"/images/marketplace-icons/icon-celo-CELO-reverse-f.svg\\")",
                                     "backgroundPosition": "center",
                                     "backgroundRepeat": "no-repeat",
                                     "backgroundSize": "contain",
@@ -3159,10 +3171,10 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                                 }
                               />
                               <img
-                                alt="Preview of cGLD Exchange Icon"
+                                alt="Preview of CELO Exchange Icon"
                                 className="css-accessibilityImage-9pa8cd"
                                 draggable={false}
-                                src="/images/marketplace-icons/icon-celo-gold-white-f.svg"
+                                src="/images/marketplace-icons/icon-celo-CELO-reverse-f.svg"
                               />
                             </div>
                           </div>
@@ -3210,7 +3222,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                             }
                           }
                         >
-                          cGLD Exchange Icon
+                          CELO Exchange Icon
                         </div>
                         <div
                           className="css-text-901oao"
@@ -3252,7 +3264,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                           data-focusable={true}
                           dir="auto"
-                          href="/assets/marketplace-icons/icon-celo-gold-white.zip"
+                          href="/assets/marketplace-icons/icon-celo-CELO-reverse.zip"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                           role="link"
