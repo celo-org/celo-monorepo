@@ -51,6 +51,8 @@ spec:
               trap "touch /tmp/pod/main-terminated" EXIT
               node lib/crawler.js
             env:
+            - name: LOG_FORMAT
+              value: stackdriver
             - name: PGHOST
               value: "127.0.0.1"
             - name: PGPORT
