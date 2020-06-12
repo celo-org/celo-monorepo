@@ -1,19 +1,20 @@
 import ContactCircle from '@celo/react-components/components/ContactCircle'
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import Link from '@celo/react-components/components/Link'
-import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
+import { CURRENCY_ENUM } from '@celo/utils/src'
 import BigNumber from 'bignumber.js'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { MoneyAmount, TokenTransactionType } from 'src/apollo/types'
-import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
-import FeeIcon from 'src/components/FeeIcon'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import FeeDrawer from 'src/components/FeeDrawer'
 import LineItemRow from 'src/components/LineItemRow.v2'
 import TotalLineItem from 'src/components/TotalLineItem.v2'
 import { FAQ_LINK } from 'src/config'
 import { Namespaces } from 'src/i18n'
+import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 import BottomText from 'src/transactions/BottomText'
 import CommentSection from 'src/transactions/CommentSection'
@@ -72,6 +73,9 @@ function InviteSentContent({
 }: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
   const totalAmount = amount
+  const inviteFee = getInvitationVerificationFeeInDollars()
+  // TODO: Use real fee
+  const securityFee = new BigNumber(0)
 
   return (
     <>
@@ -90,6 +94,14 @@ function InviteSentContent({
         }
       />
       <HorizontalLine />
+      <FeeDrawer
+        isEstimate={true}
+        currency={CURRENCY_ENUM.DOLLAR}
+        inviteFee={inviteFee}
+        isInvite={true}
+        securityFee={securityFee}
+        totalFee={inviteFee}
+      />
       <TotalLineItem amount={totalAmount} hideSign={true} />
       <BottomText>{t('inviteFlow11:whySendFees')}</BottomText>
     </>
@@ -154,11 +166,8 @@ function PaymentSentContent({
 }: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
   const sentAmount = amount
-  // TODO: use real fee
-  const securityFeeAmount = {
-    value: 0,
-    currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-  }
+  // TODO: Use real fee
+  const securityFee = new BigNumber(0)
   const totalAmount = amount
 
   return (
@@ -177,10 +186,11 @@ function PaymentSentContent({
         title={t('amountSent')}
         amount={<CurrencyDisplay amount={sentAmount} hideSign={true} />}
       />
-      <LineItemRow
-        title={t('securityFee')}
-        titleIcon={<FeeIcon />}
-        amount={<CurrencyDisplay amount={securityFeeAmount} formatType={FormatType.Fee} />}
+      <FeeDrawer
+        isEstimate={true}
+        currency={CURRENCY_ENUM.DOLLAR}
+        securityFee={securityFee}
+        totalFee={securityFee}
       />
       <TotalLineItem amount={totalAmount} hideSign={true} />
     </>

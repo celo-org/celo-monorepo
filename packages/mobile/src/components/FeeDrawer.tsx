@@ -7,6 +7,7 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LayoutAnimation, StyleSheet, Text, View } from 'react-native'
 import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
+import Expandable from 'src/components/Expandable'
 import FeeIcon from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow.v2'
 import { Namespaces } from 'src/i18n'
@@ -15,18 +16,22 @@ interface Props {
   isEstimate?: boolean
   currency: CURRENCY_ENUM
   inviteFee?: BigNumber
+  isInvite?: boolean
   securityFee?: BigNumber
-  securityFeeLoading?: boolean
-  securityFeeHasError?: boolean
+  feeLoading?: boolean
+  feeHasError?: boolean
+  totalFee?: BigNumber
 }
 
 export default function FeeDrawer({
   isEstimate,
-  inviteFee,
-  securityFee,
   currency,
-  securityFeeLoading,
-  securityFeeHasError,
+  inviteFee,
+  isInvite,
+  securityFee,
+  feeLoading,
+  feeHasError,
+  totalFee,
 }: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
   const [expanded, setExpanded] = useState(false)
@@ -48,17 +53,37 @@ export default function FeeDrawer({
     currencyCode: CURRENCIES[currency].code,
   }
 
+  const totalFeeAmount = totalFee && {
+    value: totalFee,
+    currencyCode: CURRENCIES[currency].code,
+  }
+
   return (
     <View>
       <Touchable onPress={toggleExpanded}>
-        <Text style={styles.title}>{title}</Text>
+        <View style={styles.totalContainer}>
+          <Expandable isExpandable={true} isExpanded={expanded}>
+            <Text style={styles.title}>{title}</Text>
+          </Expandable>
+          <LineItemRow
+            title={''}
+            amount={
+              totalFeeAmount && (
+                <CurrencyDisplay amount={totalFeeAmount} formatType={FormatType.Fee} />
+              )
+            }
+            isLoading={feeLoading}
+            hasError={feeHasError}
+          />
+        </View>
       </Touchable>
       {expanded && (
-        <View style={styles.expandedContainer}>
-          {inviteFeeAmount && (
+        <View>
+          {isInvite && inviteFeeAmount && (
             <LineItemRow
               title={t('inviteFee')}
               amount={<CurrencyDisplay amount={inviteFeeAmount} />}
+              textStyle={styles.dropDownText}
             />
           )}
           <LineItemRow
@@ -69,8 +94,9 @@ export default function FeeDrawer({
                 <CurrencyDisplay amount={securityAmount} formatType={FormatType.Fee} />
               )
             }
-            isLoading={securityFeeLoading}
-            hasError={securityFeeHasError}
+            isLoading={feeLoading}
+            hasError={feeHasError}
+            textStyle={styles.dropDownText}
           />
         </View>
       )}
@@ -79,23 +105,16 @@ export default function FeeDrawer({
 }
 
 const styles = StyleSheet.create({
-  expandedContainer: {
-    marginTop: 8,
+  totalContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   title: {
     ...fontStyles.regular,
     color: colors.dark,
   },
-  accountBox: {
-    borderRadius: 4,
-    backgroundColor: colors.gray2,
-    flexDirection: 'row',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-  },
-  accountLabel: {
-    ...fontStyles.label,
+  dropDownText: {
+    ...fontStyles.small,
     color: colors.gray4,
-    marginRight: 30,
   },
 })
