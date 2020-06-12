@@ -21,7 +21,7 @@ export default class AccountList extends BaseCommand {
     const res = this.parse(AccountList)
 
     // Retreive accounts from the connected Celo node.
-    const nodeAddresses = !res.flags.local ? await this.kit.web3.eth.getAccounts() : []
+    const allAddresses = !res.flags.local ? await this.kit.web3.eth.getAccounts() : []
 
     // Get addresses from the local wallet.
     const celoProvider: CeloProvider = this.kit.web3.currentProvider as any
@@ -33,9 +33,10 @@ export default class AccountList extends BaseCommand {
     // Display the addresses.
     const localName = res.flags.useLedger ? 'Ledger' : 'Local'
     if (res.flags.local === undefined) {
-      console.log('All Addresses: ', nodeAddresses.concat(localAddresses))
+      console.log('All Addresses: ', allAddresses)
     }
     if (!res.flags.local) {
+      const nodeAddresses = allAddresses.filter((address) => !localAddresses.includes(address))
       console.log('Keystore Addresses: ', nodeAddresses)
     }
     if (res.flags.local ?? true) {
