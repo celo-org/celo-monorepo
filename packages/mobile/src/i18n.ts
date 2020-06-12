@@ -20,7 +20,7 @@ export enum Namespaces {
   global = 'global',
   index = 'index',
   inviteFlow11 = 'inviteFlow11',
-  nuxCurrencyPhoto4 = 'nuxCurrencyPhoto4',
+  goldEducation = 'goldEducation',
   nuxNamePin1 = 'nuxNamePin1',
   nuxRestoreWallet3 = 'nuxRestoreWallet3',
   nuxVerification2 = 'nuxVerification2',
