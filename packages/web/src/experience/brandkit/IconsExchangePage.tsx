@@ -1,8 +1,9 @@
+import frontMatter from 'front-matter'
 import { NextPage } from 'next'
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import Page, { ICONS_PATH } from 'src/experience/brandkit/common/Page'
-import content from 'src/experience/brandkit/content/exchange-icons.md'
+import data from 'src/experience/brandkit/content/exchange-icons.md'
 import {
   AssetTypes,
   EXCHANGE_ICONS_PKG_TRACKING,
@@ -11,7 +12,7 @@ import {
 import CCLicense from 'src/experience/common/CCLicense'
 import { brandStyles, GAP } from 'src/experience/common/constants'
 import IconShowcase from 'src/experience/common/Showcase'
-import Markdown from 'src/experience/Markdown'
+import Markdown, { Attributes } from 'src/experience/Markdown'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import Button, { BTN } from 'src/shared/Button.3'
 import { hashNav } from 'src/shared/menu-items'
@@ -61,12 +62,13 @@ const icons = [
   },
 ]
 
+const info = frontMatter<Attributes>(data)
+
 const IconExchangePage: NextPage = React.memo(() => {
-  const { t } = useTranslation(NameSpaces.brand)
   return (
     <Page
-      title={t('exchangeIcons.title')}
-      metaDescription={t('exchangeIcons.headline')}
+      title={info.attributes.title}
+      metaDescription={info.attributes.title}
       path={ICONS_PATH}
       sections={[{ id: hashNav.brandIcons.overview, children: <Overview /> }]}
     />
@@ -94,7 +96,7 @@ function Overview() {
   return (
     <View style={styles.container}>
       <View style={brandStyles.gap}>
-        <Markdown source={content} />
+        <Markdown source={info.body} />
         <Button
           kind={BTN.PRIMARY}
           text={t('logo.overviewBtn')}

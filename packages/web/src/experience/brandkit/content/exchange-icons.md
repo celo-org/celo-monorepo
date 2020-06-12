@@ -1,3 +1,8 @@
+---
+title: Exchange Icons
+description: Get icons for representing Celo platform assets (CELO, cUSD) on exchanges.
+---
+
 ## Exchange Icons
 #### Celo is digital money powered by a two asset system.
 
