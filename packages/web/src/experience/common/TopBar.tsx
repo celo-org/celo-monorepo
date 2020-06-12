@@ -6,7 +6,7 @@ import { useScreenSize } from 'src/layout/ScreenSize'
 import LogoLightBg from 'src/logos/LogoLightBg'
 import Button, { BTN } from 'src/shared/Button.3'
 import links, { CeloLinks } from 'src/shared/menu-items'
-import Navigation, { NavigationTheme } from 'src/shared/navigation'
+import Navigation, { NavigationTheme } from 'src/shared/Navigation'
 import { colors, fonts, standardStyles } from 'src/styles'
 
 interface Props {
