@@ -225,7 +225,7 @@ jobs:
           name: Create Android Virtual Device (AVD)
           command: |
             avdmanager create avd --name Nexus_5X_API_28_x86 \
-              --package "system-images;android-28;google_apis;x86" \
+              --package "system-images;android-28;google_apis_playstore;x86" \
               --tag google_apis --device "Nexus 5" --abi "google_apis/x86"
             # Copy device configuarion, adv for some reason doesn't
             mkdir -p ~/.android/avd/Nexus_5X_API_28_x86.avd/ && cp packages/mobile/e2e/conf/avd_conf.ini ~/.android/avd/Nexus_5X_API_28_x86.avd/config.ini
