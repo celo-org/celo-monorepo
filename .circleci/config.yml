@@ -276,6 +276,10 @@ jobs:
       - run:
           name: Make sure there's only one adb # This is probably a brew bug
           command: cp /usr/local/share/android-sdk/platform-tools/adb /usr/local/bin/adb
+      # hack alert! the emulator complains about disk space and not sure how to increase it
+      - run:
+          name: Delete Simulators
+          command: sudo rm -rf /Library/Developer/CoreSimulator/Profiles/Runtimes/
       - run:
           name: Run e2e tests
           command: |
