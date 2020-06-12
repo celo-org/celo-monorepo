@@ -1,4 +1,10 @@
-import { AccountAuthRequest, CURRENCY_ENUM, SignTxRequest, TxToSignParam } from '@celo/utils'
+import {
+  AccountAuthRequest,
+  Countries,
+  CURRENCY_ENUM,
+  SignTxRequest,
+  TxToSignParam,
+} from '@celo/utils'
 import BigNumber from 'bignumber.js'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { ExchangeConfirmationCardProps } from 'src/exchange/ExchangeConfirmationCard'
@@ -84,7 +90,7 @@ export type StackParamList = {
   [Screens.InviteReview]: {
     recipient: Recipient
   }
-  [Screens.JoinCelo]: undefined
+  [Screens.JoinCelo]: { selectedCountryCodeAlpha2: string } | undefined
   [Screens.Language]: {
     nextScreen?: keyof StackParamList
   }
@@ -116,6 +122,10 @@ export type StackParamList = {
   }
   [Screens.RegulatoryTerms]: undefined
   [Screens.Security]: undefined
+  [Screens.SelectCountry]: {
+    countries: Countries
+    selectedCountryCodeAlpha2: string
+  }
   [Screens.SelectLocalCurrency]: undefined
   [Screens.Send]:
     | {

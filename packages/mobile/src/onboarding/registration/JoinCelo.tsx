@@ -3,9 +3,13 @@ import FormInput from '@celo/react-components/components/FormInput'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import PhoneNumberInput from '@celo/react-components/components/PhoneNumberInput'
 import colors from '@celo/react-components/styles/colors.v2'
+import { Countries } from '@celo/utils/src/countries'
+import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet } from 'react-native'
+import * as RNLocalize from 'react-native-localize'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { setName, setPhoneNumber, setPromptForno } from 'src/account/actions'
@@ -17,13 +21,13 @@ import { Namespaces, withTranslation } from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 
 interface StateProps {
-  language: string
   cachedName: string
   cachedNumber: string
-  cachedCountryCode: string
+  cachedCountryCallingCode: string
   pincodeType: PincodeType
   acceptedTerms: boolean
 }
@@ -36,13 +40,16 @@ interface DispatchProps {
   setName: typeof setName
 }
 
-type Props = StateProps & DispatchProps & WithTranslation
+type OwnProps = StackScreenProps<StackParamList, Screens.JoinCelo>
+
+type Props = StateProps & DispatchProps & WithTranslation & OwnProps
 
 interface State {
   name: string
+  nationalPhoneNumber: string
   e164Number: string
-  countryCode: string
   isValidNumber: boolean
+  countryCodeAlpha2: string
 }
 
 const mapDispatchToProps = {
@@ -55,51 +62,63 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
-    language: state.app.language || 'en-us',
     cachedName: state.account.name,
     cachedNumber: state.account.e164PhoneNumber,
-    cachedCountryCode: state.account.defaultCountryCode,
+    cachedCountryCallingCode: state.account.defaultCountryCode,
     pincodeType: state.account.pincodeType,
     acceptedTerms: state.account.acceptedTerms,
+  }
+}
+
+function getPhoneNumberState(
+  phoneNumber: string,
+  countryCallingCode: string,
+  countryCodeAlpha2: string
+) {
+  const phoneDetails = parsePhoneNumber(phoneNumber, countryCallingCode)
+
+  if (phoneDetails) {
+    return {
+      nationalPhoneNumber: phoneDetails.displayNumber,
+      e164Number: phoneDetails.e164Number,
+      isValidNumber: true,
+      countryCodeAlpha2: phoneDetails.regionCode!,
+    }
+  } else {
+    return {
+      nationalPhoneNumber: phoneNumber,
+      e164Number: '',
+      isValidNumber: false,
+      countryCodeAlpha2,
+    }
   }
 }
 
 export class JoinCelo extends React.Component<Props, State> {
   static navigationOptions = nuxNavigationOptions
 
+  countries = new Countries(this.props.i18n.language)
+
   state: State = {
     name: this.props.cachedName,
-    e164Number: this.props.cachedNumber,
-    countryCode: this.props.cachedCountryCode,
-    isValidNumber: this.props.cachedNumber !== '',
+    ...getPhoneNumberState(
+      this.props.cachedNumber,
+      this.props.cachedCountryCallingCode,
+      RNLocalize.getCountry()
+    ),
   }
 
-  setE164Number = (e164Number: string) => {
-    this.setState({
-      e164Number,
-    })
-  }
-
-  setCountryCode = (countryCode: string) => {
-    this.setState({
-      countryCode,
-    })
-  }
-
-  setIsValidNumber = (isValidNumber: boolean) => {
-    this.setState({
-      isValidNumber,
-    })
-  }
-
-  onChangeNameInput = (value: string) => {
-    this.setState({
-      name: value,
-    })
-  }
-
-  onChangePhoneInput = () => {
-    this.props.hideAlert()
+  UNSAFE_componentWillReceiveProps(nextProps: Props) {
+    const prevCountryCodeAlpha2 = this.state.countryCodeAlpha2
+    const countryCodeAlpha2 = nextProps.route.params?.selectedCountryCodeAlpha2
+    if (prevCountryCodeAlpha2 !== countryCodeAlpha2 && countryCodeAlpha2) {
+      const countryCallingCode = countryCodeAlpha2
+        ? this.countries.getCountryByCode(countryCodeAlpha2).countryCallingCode
+        : ''
+      this.setState((prevState) =>
+        getPhoneNumberState(prevState.nationalPhoneNumber, countryCallingCode, countryCodeAlpha2)
+      )
+    }
   }
 
   goToNextScreen = () => {
@@ -112,20 +131,42 @@ export class JoinCelo extends React.Component<Props, State> {
     }
   }
 
-  onPressCountryCode = () => {}
+  onChangeNameInput = (value: string) => {
+    this.setState({
+      name: value,
+    })
+  }
+
+  onChangePhoneNumberInput = (nationalPhoneNumber: string, countryCallingCode: string) => {
+    this.setState((prevState) =>
+      getPhoneNumberState(nationalPhoneNumber, countryCallingCode, prevState.countryCodeAlpha2)
+    )
+  }
+
+  onPressCountry = () => {
+    navigate(Screens.SelectCountry, {
+      countries: this.countries,
+      selectedCountryCodeAlpha2: this.state.countryCodeAlpha2,
+    })
+  }
 
   onPressContinue = () => {
     this.props.hideAlert()
 
-    const { name, e164Number, isValidNumber, countryCode } = this.state
-    const { cachedName, cachedNumber, cachedCountryCode } = this.props
+    const { name, e164Number, isValidNumber, countryCodeAlpha2 } = this.state
+    const countryCallingCode = this.countries.getCountryByCode(countryCodeAlpha2).countryCallingCode
+    const { cachedName, cachedNumber, cachedCountryCallingCode } = this.props
 
-    if (cachedName === name && cachedNumber === e164Number && cachedCountryCode === countryCode) {
+    if (
+      cachedName === name &&
+      cachedNumber === e164Number &&
+      cachedCountryCallingCode === countryCallingCode
+    ) {
       this.goToNextScreen()
       return
     }
 
-    if (!e164Number || !isValidNumber || !countryCode) {
+    if (!e164Number || !isValidNumber || !countryCallingCode) {
       this.props.showError(ErrorMessages.INVALID_PHONE_NUMBER)
       return
     }
@@ -136,14 +177,19 @@ export class JoinCelo extends React.Component<Props, State> {
     }
 
     this.props.setPromptForno(true) // Allow forno prompt after Welcome screen
-    this.props.setPhoneNumber(e164Number, countryCode)
+    this.props.setPhoneNumber(e164Number, countryCallingCode)
     this.props.setName(name)
     this.goToNextScreen()
   }
 
   render() {
-    const { t, language, cachedCountryCode, cachedNumber } = this.props
-    const { name } = this.state
+    const { t } = this.props
+    const { name, nationalPhoneNumber, countryCodeAlpha2 } = this.state
+
+    // Lookup by countryCodeAlpha2 is cheap
+    const country = countryCodeAlpha2
+      ? this.countries.getCountryByCode(countryCodeAlpha2)
+      : undefined
 
     return (
       <SafeAreaView style={styles.container}>
@@ -164,24 +210,17 @@ export class JoinCelo extends React.Component<Props, State> {
           <PhoneNumberInput
             label={t('phoneNumber')}
             style={styles.phoneNumberInput}
-            setE164Number={this.setE164Number}
-            setCountryCode={this.setCountryCode}
-            setIsValidNumber={this.setIsValidNumber}
-            onInputChange={this.onChangePhoneInput}
-            inputCountryPlaceholder={t('chooseCountry')}
-            initialInputPhonePlaceholder={t('phoneNumber')}
-            callingCode={true}
-            lng={language}
-            defaultCountryCode={cachedCountryCode !== '' ? cachedCountryCode : undefined}
-            defaultPhoneNumber={cachedNumber !== '' ? cachedNumber : undefined}
-            onPressCountryCode={this.onPressCountryCode}
+            country={country}
+            nationalPhoneNumber={nationalPhoneNumber}
+            onPressCountry={this.onPressCountry}
+            onChange={this.onChangePhoneNumberInput}
           />
           <Button
             onPress={this.onPressContinue}
             text={t('global:next')}
             size={BtnSizes.MEDIUM}
             type={BtnTypes.SECONDARY}
-            // disabled={!this.state.isValidNumber}
+            disabled={!this.state.isValidNumber}
             testID={'JoinCeloContinueButton'}
           />
         </ScrollView>
@@ -207,7 +246,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(
   mapStateToProps,
   mapDispatchToProps
 )(withTranslation(Namespaces.nuxNamePin1)(JoinCelo))

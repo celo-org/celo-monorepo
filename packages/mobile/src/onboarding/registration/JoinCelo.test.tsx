@@ -44,7 +44,7 @@ describe('JoinCeloScreen', () => {
           language={'en-us'}
           cachedName={''}
           cachedNumber={''}
-          cachedCountryCode={'+1'}
+          cachedCountryCallingCode={'+1'}
           pincodeType={PincodeType.Unset}
           {...getMockI18nProps()}
         />
@@ -68,7 +68,7 @@ describe('JoinCeloScreen', () => {
           language={'en-us'}
           cachedName={''}
           cachedNumber={''}
-          cachedCountryCode={''}
+          cachedCountryCallingCode={''}
           pincodeType={PincodeType.Unset}
           {...getMockI18nProps()}
         />
@@ -92,7 +92,7 @@ describe('JoinCeloScreen', () => {
           language={'en-us'}
           cachedName={''}
           cachedNumber={''}
-          cachedCountryCode={''}
+          cachedCountryCallingCode={''}
           pincodeType={PincodeType.Unset}
           {...getMockI18nProps()}
         />

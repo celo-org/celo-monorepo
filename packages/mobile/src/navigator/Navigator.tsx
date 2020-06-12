@@ -2,7 +2,7 @@ import QRCodeBorderlessIcon from '@celo/react-components/icons/QRCodeBorderless'
 import Times from '@celo/react-components/icons/Times'
 import colors from '@celo/react-components/styles/colors.v2'
 import { RouteProp } from '@react-navigation/core'
-import { createStackNavigator } from '@react-navigation/stack'
+import { createStackNavigator, TransitionPresets } from '@react-navigation/stack'
 import * as React from 'react'
 import SplashScreen from 'react-native-splash-screen'
 import Account from 'src/account/Account'
@@ -70,6 +70,7 @@ import { StackParamList } from 'src/navigator/types'
 import ImportContactsScreen from 'src/onboarding/contacts/ImportContactsScreen'
 import JoinCelo from 'src/onboarding/registration/JoinCelo'
 import RegulatoryTerms from 'src/onboarding/registration/RegulatoryTerms'
+import SelectCountry from 'src/onboarding/registration/SelectCountry'
 import OnboardingSuccessScreen from 'src/onboarding/success/OnboardingSuccessScreen'
 import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import OutgoingPaymentRequestListScreen from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
@@ -148,6 +149,15 @@ const verificationScreens = (Navigator: typeof Stack) => {
 const nuxScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen name={Screens.JoinCelo} component={JoinCelo} options={nuxNavigationOptions} />
+    <Navigator.Screen
+      // options={headerWithBackButton}
+      name={Screens.SelectCountry}
+      component={SelectCountry}
+      options={{
+        ...nuxNavigationOptions,
+        ...TransitionPresets.ModalTransition,
+      }}
+    />
     <Navigator.Screen
       name={Screens.RegulatoryTerms}
       component={RegulatoryTerms}

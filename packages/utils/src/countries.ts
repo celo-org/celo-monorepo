@@ -1,25 +1,26 @@
-import { getExampleNumber } from './phoneNumbers'
-const esData = require('@umpirsky/country-list/data/es/country.json')
 import countryData from 'country-data'
 import { notEmpty } from './collections'
+import { getExampleNumber } from './phoneNumbers'
+const esData = require('@umpirsky/country-list/data/es/country.json')
 
 interface CountryNames {
   [name: string]: string
 }
 
-export interface LocalizedCountry extends countryData.Country {
+export interface LocalizedCountry extends Omit<countryData.Country, 'countryCallingCodes'> {
   displayName: string
   names: CountryNames
   countryPhonePlaceholder: {
     national?: string | undefined
     international?: string | undefined
   }
+  countryCallingCode: string
 }
 
 const EMPTY_COUNTRY: LocalizedCountry = {
   alpha2: '',
   alpha3: '',
-  countryCallingCodes: [],
+  countryCallingCode: '',
   currencies: [],
   displayName: '',
   emoji: '',
@@ -82,18 +83,6 @@ export class Countries {
     return countryIndex !== -1 ? this.localizedCountries[countryIndex] : EMPTY_COUNTRY
   }
 
-  getCountryByPhoneCountryCode(countryCode: string): LocalizedCountry {
-    if (!countryCode) {
-      return EMPTY_COUNTRY
-    }
-
-    const country = this.localizedCountries.find(
-      (c: LocalizedCountry) => c.countryCallingCodes && c.countryCallingCodes.includes(countryCode)
-    )
-
-    return country || EMPTY_COUNTRY
-  }
-
   getCountryByCode(countryCode: string): LocalizedCountry {
     const country = this.countryMap.get(countryCode)
 
@@ -143,15 +132,24 @@ export class Countries {
           'es-419': esData[country.alpha2],
         }
 
+        // We only use the first calling code, others are irrelevant in the current dataset.
+        // Also some one them have a non standard calling code
+        // for instance: 'Antigua And Barbuda' has '+1 268', where only '+1' is expected
+        // so we fix this here
+        const countryCallingCode = country.countryCallingCodes[0].split(' ')[0]
+
         const localizedCountry = {
           names,
           displayName: names[this.language],
           countryPhonePlaceholder: {
-            national: getExampleNumber(country.countryCallingCodes[0]),
+            national: getExampleNumber(countryCallingCode),
             // Not needed right now
-            // international: getExampleNumber(country.countryCallingCodes[0], true, true),
+            // international: getExampleNumber(countryCallingCode, true, true),
           },
+          countryCallingCode,
           ...country,
+          // Use default emoji when flag emoji is missing
+          emoji: country.emoji || '🏳',
         }
 
         // use ISO 3166-1 alpha2 code as country id
@@ -163,7 +161,7 @@ export class Countries {
 
     this.countriesWithNoDiacritics = this.localizedCountries.map((country: LocalizedCountry) => ({
       displayName: removeDiacritics(country.displayName),
-      countryCode: country.countryCallingCodes[0],
+      countryCode: country.countryCallingCode,
     }))
   }
 }
