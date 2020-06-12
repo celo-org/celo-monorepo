@@ -1,6 +1,6 @@
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
-import { Request } from 'firebase-functions'
+import { Request } from 'express'
 import { getContractKit } from '../web3/contracts'
 import logger from './logger'
 
