@@ -76,6 +76,7 @@ function InviteSentContent({
   const inviteFee = getInvitationVerificationFeeInDollars()
   // TODO: Use real fee
   const securityFee = new BigNumber(0)
+  const totalFee = inviteFee.plus(securityFee)
 
   return (
     <>
@@ -99,7 +100,7 @@ function InviteSentContent({
         inviteFee={inviteFee}
         isInvite={true}
         securityFee={securityFee}
-        totalFee={inviteFee}
+        totalFee={totalFee}
       />
       <TotalLineItem amount={totalAmount} hideSign={true} />
       <BottomText>{t('inviteFlow11:whySendFees')}</BottomText>
@@ -168,6 +169,7 @@ function PaymentSentContent({
   // TODO: Use real fee
   const securityFee = new BigNumber(0)
   const totalAmount = amount
+  const totalFee = securityFee
 
   return (
     <>
@@ -185,7 +187,7 @@ function PaymentSentContent({
         title={t('amountSent')}
         amount={<CurrencyDisplay amount={sentAmount} hideSign={true} />}
       />
-      <FeeDrawer currency={CURRENCY_ENUM.DOLLAR} securityFee={securityFee} totalFee={securityFee} />
+      <FeeDrawer currency={CURRENCY_ENUM.DOLLAR} securityFee={securityFee} totalFee={totalFee} />
       <TotalLineItem amount={totalAmount} hideSign={true} />
     </>
   )
