@@ -5,7 +5,6 @@ import Touchable from 'react-native-platform-touchable'
 export interface Props extends TouchableWithoutFeedbackProps {
   borderless?: boolean
   children: React.ReactNode // must only have one direct child. see https://github.com/react-native-community/react-native-platform-touchable#touchable
-  testID?: string
 }
 
 export default class TouchableDefault extends React.PureComponent<Props> {
@@ -19,14 +18,9 @@ export default class TouchableDefault extends React.PureComponent<Props> {
       : Touchable.SelectableBackground()
   }
   render() {
-    const { onPress, children, testID, ...passThroughProps } = this.props
+    const { onPress, children, ...passThroughProps } = this.props
     return (
-      <Touchable
-        testID={testID}
-        onPress={this.delayedOnPress}
-        background={this.effect()}
-        {...passThroughProps}
-      >
+      <Touchable {...passThroughProps} onPress={this.delayedOnPress} background={this.effect()}>
         {children}
       </Touchable>
     )

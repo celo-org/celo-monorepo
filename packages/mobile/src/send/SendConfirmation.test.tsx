@@ -82,7 +82,7 @@ describe('SendConfirmation', () => {
 
     // Initial render
     expect(tree).toMatchSnapshot()
-    // TODO: Find out why there is no handler function found for event "press"
+    // TODO: Find a way to similate a toggle without using fireEvent.press
     // fireEvent.press(tree.getByTestId('feeDrawer/SendConfirmation'))
     // expect(tree.queryByText('securityFee')).not.toBeNull()
     // expect(tree.queryByText('0.0100')).toBeNull()

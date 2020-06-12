@@ -95,7 +95,6 @@ function InviteSentContent({
       />
       <HorizontalLine />
       <FeeDrawer
-        isEstimate={true}
         currency={CURRENCY_ENUM.DOLLAR}
         inviteFee={inviteFee}
         isInvite={true}
@@ -186,12 +185,7 @@ function PaymentSentContent({
         title={t('amountSent')}
         amount={<CurrencyDisplay amount={sentAmount} hideSign={true} />}
       />
-      <FeeDrawer
-        isEstimate={true}
-        currency={CURRENCY_ENUM.DOLLAR}
-        securityFee={securityFee}
-        totalFee={securityFee}
-      />
+      <FeeDrawer currency={CURRENCY_ENUM.DOLLAR} securityFee={securityFee} totalFee={securityFee} />
       <TotalLineItem amount={totalAmount} hideSign={true} />
     </>
   )
