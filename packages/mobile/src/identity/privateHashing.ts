@@ -9,9 +9,11 @@ import networkConfig from 'src/geth/networkConfig'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
 import { postToPhoneNumPrivacyService } from 'src/identity/phoneNumPrivacyService'
 import { e164NumberToSaltSelector, E164NumberToSaltType } from 'src/identity/reducer'
+import { isUserBalanceSufficient } from 'src/identity/utils'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { transferStableToken } from 'src/stableToken/actions'
+import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
 import { waitForTransactionWithId } from 'src/transactions/saga'
 import Logger from 'src/utils/Logger'
@@ -22,6 +24,7 @@ import { currentAccountSelector } from 'src/web3/selectors'
 const TAG = 'identity/privateHashing'
 const SIGN_MESSAGE_ENDPOINT = '/getBlindedSalt'
 export const SALT_CHAR_LENGTH = 13
+export const LOOKUP_GAS_FEE_ESTIMATE = 0.03
 
 export interface PhoneNumberHashDetails {
   e164Number: string
@@ -37,11 +40,11 @@ export function* fetchPhoneHashPrivate(e164Number: string) {
   } catch (error) {
     if (error.message === ErrorMessages.SALT_QUOTA_EXCEEDED) {
       Logger.error(
-        `${TAG}@fetchPrivatePhoneHash`,
+        `${TAG}@fetchPhoneHashPrivate`,
         'Salt quota exceeded, navigating to quota purchase screen'
       )
-      const quotaPurchaseSucess: boolean = yield call(navigateToQuotaPurchaseScreen)
-      if (quotaPurchaseSucess) {
+      const quotaPurchaseSuccess: boolean = yield call(navigateToQuotaPurchaseScreen)
+      if (quotaPurchaseSuccess) {
         // If quota purchase was successful, try lookup a second time
         const details: PhoneNumberHashDetails = yield call(doFetchPhoneHashPrivate, e164Number)
         return details
@@ -49,7 +52,7 @@ export function* fetchPhoneHashPrivate(e164Number: string) {
         throw new Error(ErrorMessages.SALT_QUOTA_EXCEEDED)
       }
     } else {
-      Logger.error(`${TAG}@fetchPrivatePhoneHash`, 'Unknown error', error)
+      Logger.error(`${TAG}@fetchPhoneHashPrivate`, 'Unknown error', error)
       throw new Error(ErrorMessages.SALT_FETCH_FAILURE)
     }
   }
@@ -222,6 +225,13 @@ function* navigateToQuotaPurchaseScreen() {
 
     const ownAddress: string = yield select(currentAccountSelector)
     const txId = generateStandbyTransactionId(ownAddress)
+
+    const userBalance = yield select(stableTokenBalanceSelector)
+    const userBalanceSufficient = isUserBalanceSufficient(userBalance, LOOKUP_GAS_FEE_ESTIMATE)
+    if (!userBalanceSufficient) {
+      throw Error(ErrorMessages.INSUFFICIENT_BALANCE)
+    }
+
     yield put(
       transferStableToken({
         recipientAddress: ownAddress, // send payment to yourself

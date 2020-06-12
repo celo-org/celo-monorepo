@@ -2,7 +2,8 @@ import CeloAnalytics, { AnalyzedApps } from '@celo/react-components/analytics/Ce
 import {
   CustomEventNames,
   DefaultEventNames,
-  PROPERTY_PATH_WHITELIST,
+  EventPropertyType,
+  PropertyPathWhitelist,
 } from 'src/analytics/constants'
 import { DEFAULT_TESTNET, SEGMENT_API_KEY } from 'src/config'
 import { store } from 'src/redux/store'
@@ -12,7 +13,7 @@ type EventNames = CustomEventNames | DefaultEventNames
 
 class WalletAnalytics extends CeloAnalytics {
   constructor() {
-    super(AnalyzedApps.Wallet, PROPERTY_PATH_WHITELIST, Logger, SEGMENT_API_KEY, DEFAULT_TESTNET)
+    super(AnalyzedApps.Wallet, PropertyPathWhitelist, Logger, SEGMENT_API_KEY, DEFAULT_TESTNET)
   }
 
   isEnabled() {
@@ -20,8 +21,32 @@ class WalletAnalytics extends CeloAnalytics {
     return !__DEV__ && store.getState().app.analyticsEnabled
   }
 
-  track(eventName: EventNames, eventProperties: object = {}, attachDeviceInfo: boolean = false) {
+  track(
+    eventName: EventNames,
+    eventProperties: EventPropertyType = {},
+    attachDeviceInfo: boolean = false
+  ) {
     super.track(eventName, eventProperties, attachDeviceInfo)
+  }
+
+  startTracking(eventName: EventNames, eventProperties: EventPropertyType = {}) {
+    super.startTracking(eventName, eventProperties)
+  }
+
+  trackSubEvent(
+    eventName: EventNames,
+    subEventName: EventNames,
+    eventProperties: EventPropertyType = {}
+  ) {
+    super.trackSubEvent(eventName, subEventName, eventProperties)
+  }
+
+  stopTracking(
+    eventName: EventNames,
+    eventProperties: EventPropertyType = {},
+    attachDeviceInfo: boolean = false
+  ) {
+    super.stopTracking(eventName, eventProperties, attachDeviceInfo)
   }
 }
 
