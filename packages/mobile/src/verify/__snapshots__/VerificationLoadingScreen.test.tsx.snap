@@ -16,52 +16,6 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
       }
     }
   >
-    <View
-      style={
-        Object {
-          "left": 5,
-          "position": "absolute",
-        }
-      }
-    >
-      <View
-        accessible={true}
-        focusable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackgroundBorderless",
-            "type": "ThemeAttrAndroid",
-          }
-        }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        style={
-          Object {
-            "paddingHorizontal": 20,
-            "paddingVertical": 10,
-          }
-        }
-        testID="CancelButton"
-      >
-        <Text
-          style={
-            Object {
-              "color": "#42D689",
-              "fontFamily": "Hind-SemiBold",
-              "fontSize": 14,
-              "lineHeight": 22,
-            }
-          }
-        >
-          cancel
-        </Text>
-      </View>
-    </View>
     <RCTScrollView
       contentContainerStyle={
         Object {
@@ -427,52 +381,6 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
       }
     }
   >
-    <View
-      style={
-        Object {
-          "left": 5,
-          "position": "absolute",
-        }
-      }
-    >
-      <View
-        accessible={true}
-        focusable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackgroundBorderless",
-            "type": "ThemeAttrAndroid",
-          }
-        }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        style={
-          Object {
-            "paddingHorizontal": 20,
-            "paddingVertical": 10,
-          }
-        }
-        testID="CancelButton"
-      >
-        <Text
-          style={
-            Object {
-              "color": "#42D689",
-              "fontFamily": "Hind-SemiBold",
-              "fontSize": 14,
-              "lineHeight": 22,
-            }
-          }
-        >
-          cancel
-        </Text>
-      </View>
-    </View>
     <RCTScrollView
       contentContainerStyle={
         Object {
