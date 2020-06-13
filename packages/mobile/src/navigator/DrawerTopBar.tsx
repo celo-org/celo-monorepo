@@ -3,8 +3,8 @@ import { elevationShadowStyle } from '@celo/react-components/styles/styles'
 import { useNavigation } from '@react-navigation/native'
 import * as React from 'react'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
+import Hamburger from 'src/icons/Hamburger'
 import Logo from 'src/icons/Logo.v2'
-import Hamburger from 'src/navigator/Hamburger'
 
 const DrawerTopBar = () => {
   const navigation = useNavigation()
