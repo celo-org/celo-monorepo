@@ -105,7 +105,7 @@ export class Account extends React.Component<Props, State> {
   }
 
   goToLanguageSetting = () => {
-    this.props.navigation.navigate(Screens.Language, { nextScreen: Screens.Account })
+    this.props.navigation.navigate(Screens.Language, { fromAccountScreen: true })
   }
 
   goToLocalCurrencySetting = () => {

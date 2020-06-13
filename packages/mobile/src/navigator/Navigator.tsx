@@ -107,7 +107,11 @@ const Stack = createStackNavigator<StackParamList>()
 const commonScreens = (Navigator: typeof Stack) => {
   return (
     <>
-      <Navigator.Screen name={Screens.Language} component={Language} options={noHeader} />
+      <Navigator.Screen
+        name={Screens.Language}
+        component={Language}
+        options={headerWithBackButton}
+      />
       <Navigator.Screen
         name={Screens.PincodeEnter}
         component={PincodeEnter}

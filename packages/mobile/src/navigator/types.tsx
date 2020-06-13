@@ -93,9 +93,11 @@ export type StackParamList = {
     recipient: Recipient
   }
   [Screens.JoinCelo]: undefined
-  [Screens.Language]: {
-    nextScreen?: keyof StackParamList
-  }
+  [Screens.Language]:
+    | {
+        fromAccountScreen?: boolean
+      }
+    | undefined
   [Screens.Licenses]: undefined
   [Screens.OutgoingPaymentRequestListScreen]: undefined
   [Screens.PaymentRequestUnavailable]: {
