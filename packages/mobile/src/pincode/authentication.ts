@@ -6,15 +6,17 @@ import { getContractKitOutsideGenerator, web3ForUtils } from 'src/web3/contracts
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'pincode/PhoneAuthUtils'
-const PEPPER = 'PEPPER'
-const PASSPHRASE_HASH = 'PASSPHRASE_HASH'
+enum STORAGE_KEYS {
+  PEPPER = 'PEPPER',
+  PASSPHRASE_HASH = 'PASSPHRASE_HASH',
+}
 const PEPPER_LENGTH = 64
 
 let cachedPepper: string
 let cachedPassphraseHash: string
 
 interface SecureStorage {
-  key: string
+  key: STORAGE_KEYS
   value: string
 }
 
@@ -26,16 +28,20 @@ async function securelyStoreItem({ key, value }: SecureStorage) {
   })
 }
 
+async function retrieveStoredItem(key: STORAGE_KEYS) {
+  return Keychain.getGenericPassword({
+    service: key,
+  })
+}
+
 async function retrieveOrGeneratePepper() {
   if (cachedPepper) {
     return cachedPepper
   }
-  const storedPepper = await Keychain.getGenericPassword({
-    service: PEPPER,
-  })
+  const storedPepper = await retrieveStoredItem(STORAGE_KEYS.PEPPER)
   if (!storedPepper) {
     const pepper = await asyncRandomBytes(PEPPER_LENGTH)
-    await securelyStoreItem({ key: PEPPER, value: pepper })
+    await securelyStoreItem({ key: STORAGE_KEYS.PEPPER, value: pepper })
     cachedPepper = pepper
     return cachedPepper
   }
@@ -46,7 +52,7 @@ async function retrieveOrGeneratePepper() {
 async function storePassphraseHash(pin: string) {
   const pepper = await retrieveOrGeneratePepper()
   const hash = web3ForUtils.utils.sha3(pin + pepper)
-  await securelyStoreItem({ key: PASSPHRASE_HASH, value: hash })
+  await securelyStoreItem({ key: STORAGE_KEYS.PASSPHRASE_HASH, value: hash })
 }
 
 async function checkPin(pin: string) {
@@ -79,7 +85,7 @@ async function retrievePassphraseHash() {
   }
   let credentials: false | Keychain.SharedWebCredentials
   try {
-    credentials = await Keychain.getGenericPassword({ service: PASSPHRASE_HASH })
+    credentials = await retrieveStoredItem(STORAGE_KEYS.PASSPHRASE_HASH)
   } catch (err) {
     Logger.error(`${TAG}@retrievePassphraseHash`, err)
     return null
