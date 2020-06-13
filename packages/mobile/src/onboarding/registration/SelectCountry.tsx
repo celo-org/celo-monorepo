@@ -1,19 +1,17 @@
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
+import SearchInput from '@celo/react-components/components/SearchInput'
+import colors from '@celo/react-components/styles/colors.v2'
 import { LocalizedCountry } from '@celo/utils/src/countries'
 import { StackScreenProps } from '@react-navigation/stack'
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { FlatList, StyleSheet, Text } from 'react-native'
+import { FlatList, StyleSheet, View } from 'react-native'
 import { useSafeArea } from 'react-native-safe-area-view'
 import { useDispatch } from 'react-redux'
 import { Namespaces } from 'src/i18n'
-import { LocalCurrencyCode } from 'src/localCurrency/consts'
-import { useLocalCurrencyCode } from 'src/localCurrency/hooks'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import SelectCountryItem from 'src/onboarding/registration/SelectCountryItem'
-
-const DEFAULT_CURRENCY_CODE = LocalCurrencyCode.USD
 
 const keyExtractor = (item: LocalizedCountry) => item.alpha2
 
@@ -21,10 +19,18 @@ type Props = StackScreenProps<StackParamList, Screens.SelectCountry>
 
 export default function SelectCountry({ navigation, route }: Props) {
   const { t } = useTranslation(Namespaces.accountScreen10)
-  const countries = route.params.countries
-  // tslint:disable-next-line: react-hooks-nesting
-  const selectedCurrencyCode = useLocalCurrencyCode() || DEFAULT_CURRENCY_CODE
+  const { countries, selectedCountryCodeAlpha2 } = route.params
   const dispatch = useDispatch()
+  const [searchText, setSearchText] = useState('')
+
+  const filteredCountries = useMemo(() => countries.getFilteredCountries(searchText), [
+    countries,
+    searchText,
+  ])
+
+  function onChangeText(text: string) {
+    setSearchText(text)
+  }
 
   const onSelect = useCallback(
     (country: LocalizedCountry) => {
@@ -44,40 +50,45 @@ export default function SelectCountry({ navigation, route }: Props) {
       <SelectCountryItem
         country={country}
         onSelect={onSelect}
-        isSelected={false}
-        // isSelected={code === selectedCurrencyCode}
+        isSelected={country.alpha2 === selectedCountryCodeAlpha2}
       />
     ),
-    [selectedCurrencyCode]
+    [selectedCountryCodeAlpha2]
   )
 
   const inset = useSafeArea()
 
   return (
-    <FlatList
-      contentContainerStyle={{ paddingTop: inset.top, paddingBottom: inset.bottom }}
-      // contentInsetAdjustmentBehavior="automatic"
-      stickyHeaderIndices={[0]}
-      style={styles.container}
-      data={countries.localizedCountries}
-      extraData={selectedCurrencyCode}
-      ListHeaderComponent={
-        <Text style={styles.title} testID={'ChooseLanguageTitle'}>
-          {t('selectCountryCode')}
-        </Text>
-      }
-      renderItem={renderItem}
-      keyExtractor={keyExtractor}
-    />
+    <View style={styles.container}>
+      <FlatList
+        contentContainerStyle={{ paddingBottom: inset.bottom }}
+        keyboardShouldPersistTaps={true}
+        stickyHeaderIndices={[0]}
+        style={styles.container}
+        data={filteredCountries}
+        extraData={selectedCountryCodeAlpha2}
+        ListHeaderComponent={
+          <View style={styles.searchInputContainer}>
+            <SearchInput
+              placeholder={t('global:search')}
+              value={searchText}
+              onChangeText={onChangeText}
+            />
+          </View>
+        }
+        renderItem={renderItem}
+        keyExtractor={keyExtractor}
+      />
+      <KeyboardSpacer />
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {},
-  title: {
-    ...fontStyles.h2,
-    marginHorizontal: 16,
-    paddingTop: 80,
-    marginBottom: 16,
+  container: { flex: 1 },
+  searchInputContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    backgroundColor: colors.light,
   },
 })

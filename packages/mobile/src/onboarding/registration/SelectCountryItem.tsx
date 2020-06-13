@@ -24,7 +24,10 @@ export default function SelectCountryItem({ country, isSelected, onSelect, testI
           {country.emoji}
         </Text>
         <Text style={styles.name} numberOfLines={1}>
-          {country.countryCallingCode} {country.displayName}
+          {country.displayName}
+        </Text>
+        <Text style={styles.code} numberOfLines={1}>
+          {country.countryCallingCode}
         </Text>
       </View>
     </Touchable>
@@ -37,25 +40,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginLeft: 16,
     paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderColor: colors.gray2,
-  },
-  name: {
-    ...fontStyles.regular,
-    flex: 1,
-    marginRight: 16,
   },
   flag: {
     fontSize: 20,
     marginLeft: 4,
     marginRight: 16,
   },
-  circle: {
-    paddingTop: 2,
-    height: 24,
-    width: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: colors.inactive,
+  name: {
+    ...fontStyles.regular,
+    flex: 1,
+    marginRight: 16,
+  },
+  code: {
+    ...fontStyles.regular,
+    marginRight: 16,
+    color: colors.gray4,
   },
 })

@@ -154,7 +154,11 @@ const nuxScreens = (Navigator: typeof Stack) => (
       name={Screens.SelectCountry}
       component={SelectCountry}
       options={{
-        ...nuxNavigationOptions,
+        // ...nuxNavigationOptions,
+        ...headerWithBackButton,
+        headerTitle: undefined,
+        headerTransparent: false,
+        title: i18n.t('accountScreen10:selectCountryCode'),
         ...TransitionPresets.ModalTransition,
       }}
     />
