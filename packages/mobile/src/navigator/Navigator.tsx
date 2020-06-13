@@ -200,11 +200,6 @@ const nuxScreens = (Navigator: typeof Stack) => (
   </>
 )
 
-const emptyWithBackButtonHeaderOption = () => ({
-  ...emptyHeader,
-  headerLeft: () => <BackButton />,
-})
-
 const sendScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen name={Screens.Send} component={Send} options={sendScreenNavOptions} />
@@ -242,22 +237,22 @@ const sendScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen
       name={Screens.IncomingPaymentRequestListScreen}
       component={IncomingPaymentRequestListScreen}
-      options={emptyWithBackButtonHeaderOption}
+      options={headerWithBackButton}
     />
     <Navigator.Screen
       name={Screens.OutgoingPaymentRequestListScreen}
       component={OutgoingPaymentRequestListScreen}
-      options={emptyWithBackButtonHeaderOption}
+      options={headerWithBackButton}
     />
     <Navigator.Screen
       name={Screens.EscrowedPaymentListScreen}
       component={EscrowedPaymentListScreen}
-      options={emptyWithBackButtonHeaderOption}
+      options={headerWithBackButton}
     />
     <Navigator.Screen
       name={Screens.ReclaimPaymentConfirmationScreen}
       component={ReclaimPaymentConfirmationScreen}
-      options={emptyWithBackButtonHeaderOption}
+      options={headerWithBackButton}
     />
   </>
 )
@@ -357,7 +352,7 @@ const backupScreens = (Navigator: typeof Stack) => (
 
 const settingsScreens = (Navigator: typeof Stack) => (
   <>
-    <Navigator.Screen options={headerWithBackButton} name={Screens.Account} component={Account} />
+    <Navigator.Screen options={noHeader} name={Screens.Account} component={Account} />
     <Navigator.Screen options={headerWithBackButton} name={Screens.Security} component={Security} />
     <Navigator.Screen
       options={headerWithBackButton}
