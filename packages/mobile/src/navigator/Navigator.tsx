@@ -108,7 +108,11 @@ const commonScreens = (Navigator: typeof Stack) => {
   return (
     <>
       <Navigator.Screen name={Screens.Language} component={Language} options={noHeader} />
-      <Navigator.Screen name={Screens.PincodeEnter} component={PincodeEnter} options={noHeader} />
+      <Navigator.Screen
+        name={Screens.PincodeEnter}
+        component={PincodeEnter}
+        options={headerWithBackButton}
+      />
       <Navigator.Screen name={Screens.ErrorScreen} component={ErrorScreen} options={noHeader} />
       <Navigator.Screen name={Screens.UpgradeScreen} component={UpgradeScreen} />
       <Navigator.Screen name={Screens.DappKitAccountAuth} component={DappKitAccountScreen} />
