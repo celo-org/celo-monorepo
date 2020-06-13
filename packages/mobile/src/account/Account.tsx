@@ -1,5 +1,5 @@
 import Link from '@celo/react-components/components/Link'
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { isE164Number } from '@celo/utils/src/phoneNumbers'
 import { StackScreenProps } from '@react-navigation/stack'
@@ -232,9 +232,9 @@ export class Account extends React.Component<Props, State> {
     const showSecurity = pincodeType === PincodeType.CustomPin
 
     return (
-      <ScrollView style={style.scrollView}>
-        <SafeAreaView>
-          <DrawerTopBar />
+      <SafeAreaView style={style.container}>
+        <DrawerTopBar />
+        <ScrollView>
           <View style={style.accountProfile}>
             {/* TouchableNoFeedback doesn't work here for some reason */}
             <TouchableOpacity onPress={this.onPressAvatar}>
@@ -293,15 +293,19 @@ export class Account extends React.Component<Props, State> {
               <Link onPress={this.goToTerms}>{t('termsOfServiceLink')}</Link>
             </View>
           </View>
-        </SafeAreaView>
-      </ScrollView>
+        </ScrollView>
+      </SafeAreaView>
     )
   }
 }
 
 const style = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.light,
+  },
   accountProfile: {
-    paddingBottom: 20,
+    paddingVertical: 8,
     flexDirection: 'column',
     alignItems: 'center',
   },
@@ -313,10 +317,6 @@ const style = StyleSheet.create({
   accountFooterText: {
     flexDirection: 'row',
     paddingBottom: 10,
-  },
-  scrollView: {
-    flex: 1,
-    backgroundColor: 'white',
   },
   containerList: {
     flex: 1,
