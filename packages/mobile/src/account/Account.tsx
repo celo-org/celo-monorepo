@@ -10,7 +10,7 @@ import { Clipboard, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 
 import DeviceInfo from 'react-native-device-info'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
-import { devModeTriggerClicked, resetBackupState } from 'src/account/actions'
+import { devModeTriggerClicked, toggleBackupState } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
 import SettingsItem from 'src/account/SettingsItem'
@@ -35,7 +35,7 @@ interface DispatchProps {
   setNumberVerified: typeof setNumberVerified
   resetAppOpenedState: typeof resetAppOpenedState
   setAnalyticsEnabled: typeof setAnalyticsEnabled
-  resetBackupState: typeof resetBackupState
+  toggleBackupState: typeof toggleBackupState
   devModeTriggerClicked: typeof devModeTriggerClicked
 }
 
@@ -74,7 +74,7 @@ const mapDispatchToProps = {
   setNumberVerified,
   resetAppOpenedState,
   setAnalyticsEnabled,
-  resetBackupState,
+  toggleBackupState,
   devModeTriggerClicked,
 }
 
@@ -90,7 +90,7 @@ export class Account extends React.Component<Props, State> {
 
   goToBackupScreen = () => {
     if (this.props.backupCompleted) {
-      navigateProtected(Screens.BackupIntroduction)
+      navigateProtected(Screens.BackupIntroduction, { fromAccountScreen: true })
     } else {
       this.props.navigation.navigate(Screens.BackupIntroduction)
     }
@@ -162,8 +162,8 @@ export class Account extends React.Component<Props, State> {
     this.props.revokeVerification()
   }
 
-  resetBackupState = () => {
-    this.props.resetBackupState()
+  toggleBackupState = () => {
+    this.props.toggleBackupState()
   }
 
   showDebugScreen = () => {
@@ -208,7 +208,7 @@ export class Account extends React.Component<Props, State> {
           </View>
 
           <View style={style.devSettingsItem}>
-            <TouchableOpacity onPress={this.resetBackupState}>
+            <TouchableOpacity onPress={this.toggleBackupState}>
               <Text>Reset backup state</Text>
             </TouchableOpacity>
           </View>

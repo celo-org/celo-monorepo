@@ -21,7 +21,11 @@ export type StackParamList = {
   [Screens.Account]: undefined
   [Screens.Analytics]: undefined
   [Screens.BackupComplete]: undefined
-  [Screens.BackupIntroduction]: undefined
+  [Screens.BackupIntroduction]:
+    | {
+        fromAccountScreen?: boolean
+      }
+    | undefined
   [Screens.AccountKeyEducation]:
     | undefined
     | {

@@ -123,8 +123,8 @@ export const navigateProtected: SafeNavigate = (...args) => {
   ensurePincode()
     .then((ensured) => {
       if (ensured) {
-        navigationRef.current?.dispatch(StackActions.pop({ n: 1 }))
-        navigate(...args)
+        const [routeName, params] = args
+        navigationRef.current?.dispatch(StackActions.replace({ routeName, params }))
       }
     })
     .catch((error) => {
