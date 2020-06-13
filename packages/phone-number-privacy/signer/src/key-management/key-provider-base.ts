@@ -1,23 +1,20 @@
-import { DEV_MODE, DEV_PRIVATE_KEY } from '../config'
-
 export interface KeyProvider {
-  getPrivateKey: () => Promise<string>
+  fetchPrivateKeyFromStore: () => Promise<void>
+  getPrivateKey: () => string
 }
 
 export abstract class KeyProviderBase implements KeyProvider {
   protected privateKey: string | null = null
 
-  public async getPrivateKey() {
-    if (DEV_MODE) {
-      return DEV_PRIVATE_KEY
+  public getPrivateKey() {
+    if (!this.privateKey) {
+      throw new Error('Private key is empty, provider not properly initialized')
     }
 
-    if (this.privateKey) {
-      return this.privateKey
-    }
-
-    return this.fetchPrivateKeyFromStore()
+    return this.privateKey
   }
+
+  public abstract async fetchPrivateKeyFromStore(): Promise<void>
 
   protected setPrivateKey(key: string) {
     if (!key || key.length < 40) {
@@ -25,6 +22,4 @@ export abstract class KeyProviderBase implements KeyProvider {
     }
     this.privateKey = key
   }
-
-  protected abstract async fetchPrivateKeyFromStore(): Promise<string>
 }

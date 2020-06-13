@@ -53,7 +53,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
       account,
     }
 
-    it.only('provides signature', (done) => {
+    it('provides signature', (done) => {
       mockGetRemainingQueryCount.mockReturnValue(10)
       request(app)
         .post('/getBlindedSalt')

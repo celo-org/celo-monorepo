@@ -5,7 +5,7 @@ import config from '../config'
 import { KeyProviderBase } from './key-provider-base'
 
 export class GoogleKeyProvider extends KeyProviderBase {
-  protected async fetchPrivateKeyFromStore() {
+  public async fetchPrivateKeyFromStore() {
     try {
       const { projectId, secretName, secretVersion } = config.keystore.google
 
@@ -22,7 +22,6 @@ export class GoogleKeyProvider extends KeyProviderBase {
       }
 
       this.setPrivateKey(privateKey)
-      return privateKey
     } catch (error) {
       logger.error('Error retrieving key', error)
       throw new Error(ErrorMessages.KEY_FETCH_ERROR)

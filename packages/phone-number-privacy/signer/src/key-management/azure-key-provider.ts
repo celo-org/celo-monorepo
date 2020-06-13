@@ -5,7 +5,7 @@ import config from '../config'
 import { KeyProviderBase } from './key-provider-base'
 
 export class AzureKeyProvider extends KeyProviderBase {
-  protected async fetchPrivateKeyFromStore() {
+  public async fetchPrivateKeyFromStore() {
     try {
       const { clientID, clientSecret, tenant, vaultName, secretName } = config.keystore.azure
 
@@ -18,7 +18,6 @@ export class AzureKeyProvider extends KeyProviderBase {
       const keyVaultClient = new AzureKeyVaultClient(vaultName)
       const privateKey = await keyVaultClient.getSecret(secretName)
       this.setPrivateKey(privateKey)
-      return privateKey
     } catch (error) {
       logger.error('Error retrieving key', error)
       throw new Error(ErrorMessages.KEY_FETCH_ERROR)

@@ -46,7 +46,7 @@ export async function handleGetBlindedMessageForSalt(
       return
     }
     const keyProvider = getKeyProvider()
-    const privateKey = await keyProvider.getPrivateKey()
+    const privateKey = keyProvider.getPrivateKey()
     const signature = computeBlindedSignature(blindedQueryPhoneNumber, privateKey)
     await incrementQueryCount(account, trx)
     logger.debug('committing db transactions for salt retrieval data')

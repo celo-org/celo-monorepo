@@ -8,11 +8,17 @@ You can use the following environment variables to configure the Phone Number Pr
 
 - `NODE_ENV` - `development` or `production`
 - `SERVER_PORT` - The port on which the express node app runs (8080 by default).
-- `BLOCKCHAIN_PROVIDER` - The blockchain node provider for chain state access. This could be a node with RPC set up.  For development testing you can use `https://alfajores-forno.celo-testnet.org`. For Mainnet, it would be `https://rc1-forno.celo-testnet.org`
 - `DB_HOST` - The URL under which your database is accessible. Supports Postgres, MSSQL, MySQL, MariaDB, SQLite3, Oracle.
 - `DB_USERNAME` - DB configuration: The DB username (postgres by default).
 - `DB_PASSWORD` - DB configuration: The DB password.
 - `DB_DATABASE` DB configuration: The DB database name (phoneNumberPrivacy by default).
+
+### Blockchain provider
+
+The service needs a connection to a full node in order to access chain state. The `BLOCKCHAIN_PROVIDER` config should be a url to a node with its JSON RPC enabled.
+This could be a node with RPC set up. Preferably this would be an node dedicated to this service. Alternatively, the public Forno endpoints can be used but their uptime guarantees are not as strong. For development with Alfajores, the forno url is `https://alfajores-forno.celo-testnet.org`. For Mainnet, it would be `https://rc1-forno.celo-testnet.org`
+
+- `BLOCKCHAIN_PROVIDER` - The blockchain node provider for chain state access. `
 
 ### Keystores
 
