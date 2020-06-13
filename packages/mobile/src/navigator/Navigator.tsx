@@ -148,6 +148,7 @@ const verificationScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen
         name={Screens.VerificationLoadingScreen}
         component={VerificationLoadingScreen}
+        options={headerWithCancelButton}
       />
       <Navigator.Screen
         name={Screens.VerificationInterstitialScreen}

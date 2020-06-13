@@ -10,7 +10,6 @@ import { BackHandler, ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { setRetryVerificationWithForno } from 'src/account/actions'
-import CancelButton from 'src/components/CancelButton'
 import Carousel, { CarouselItem } from 'src/components/Carousel'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -63,8 +62,6 @@ const mapStateToProps = (state: RootState): StateProps => {
 }
 
 class VerificationLoadingScreen extends React.Component<Props> {
-  static navigationOptions = { gestureEnabled: false, header: null }
-
   componentDidMount() {
     BackHandler.addEventListener('hardwareBackPress', this.handleBackButton)
     this.props.startVerification()
@@ -84,14 +81,10 @@ class VerificationLoadingScreen extends React.Component<Props> {
 
   handleBackButton = () => {
     // Cancel verification when user presses back button on this screen
-    this.onCancel()
-    return true
-  }
-
-  onCancel = () => {
     Logger.debug(TAG + '@onCancel', 'Cancelled, going back to education screen')
     this.props.cancelVerification()
     navigate(Screens.VerificationEducationScreen)
+    return true
   }
 
   didVerificationStatusChange = (prevProps: Props, status: VerificationStatus) => {
@@ -122,9 +115,6 @@ class VerificationLoadingScreen extends React.Component<Props> {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.innerContainer}>
-          <View style={styles.buttonCancelContainer}>
-            <CancelButton onCancel={this.onCancel} />
-          </View>
           <ScrollView contentContainerStyle={styles.scrollContainer}>
             <DevSkipButton nextScreen={Screens.VerificationInterstitialScreen} />
             <View style={styles.statusContainer}>
@@ -162,10 +152,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  buttonCancelContainer: {
-    position: 'absolute',
-    left: 5,
   },
   statusContainer: {
     alignItems: 'center',
