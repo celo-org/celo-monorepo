@@ -1,4 +1,3 @@
-import colorsV2 from '@celo/react-components/styles/colors.v2'
 import { elevationShadowStyle } from '@celo/react-components/styles/styles'
 import { useNavigation } from '@react-navigation/native'
 import * as React from 'react'
@@ -28,7 +27,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     height: 62,
-    backgroundColor: colorsV2.white,
+    backgroundColor: 'transparent',
     alignItems: 'flex-end',
     justifyContent: 'space-between',
     ...elevationShadowStyle(1),
