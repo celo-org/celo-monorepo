@@ -11,22 +11,27 @@ interface Props {
 export default function AccountNumber({ address }: Props) {
   // Turns '0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10'
   // into 'ce10 ce10 ce10 ce10 ce10 ce10 ce10 ce10 ce10 ce10'
-  const formattedAddress = getAddressChunks(address).join(' ')
+  const addressChunks = ['0x', ...getAddressChunks(address)]
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>0x </Text>
-      <Text style={styles.text}>{formattedAddress}</Text>
+      <Text style={[styles.text, styles.topText]}>{addressChunks.slice(0, 6).join(' ')}</Text>
+      <Text style={[styles.text, styles.bottomText]}>{addressChunks.slice(6).join(' ')}</Text>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    flex: 1,
+    width: 200,
   },
   text: {
     ...fontStyles.small,
     color: colors.gray4,
+  },
+  topText: {
+    textAlign: 'left',
+  },
+  bottomText: {
+    textAlign: 'right',
   },
 })
