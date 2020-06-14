@@ -13,7 +13,7 @@ exports[`Support renders correctly 1`] = `
     style={
       Object {
         "alignItems": "flex-end",
-        "backgroundColor": "#FFFFFF",
+        "backgroundColor": "transparent",
         "elevation": 1,
         "flexDirection": "row",
         "height": 62,

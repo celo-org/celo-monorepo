@@ -506,50 +506,57 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
                   Object {
                     "borderRadius": 8,
                   },
-                  Object {
-                    "height": 62,
-                    "justifyContent": "center",
-                    "paddingHorizontal": 16,
-                    "width": 235,
-                  },
+                  Array [
+                    Object {
+                      "justifyContent": "center",
+                    },
+                    undefined,
+                  ],
                 ]
               }
             >
-              <Text
+              <View
                 style={
-                  Array [
-                    Object {
-                      "color": "#9CA4A9",
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "textAlign": "left",
-                    },
-                  ]
+                  Object {
+                    "width": 200,
+                  }
                 }
               >
-                0x f1b1 d5a6 e772 8g30 9c4a
-              </Text>
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#9CA4A9",
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "paddingTop": 4,
-                      "textAlign": "right",
-                    },
-                  ]
-                }
-              >
-                025k 122d 71ad 75a6 1976
-              </Text>
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#9CA4A9",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "textAlign": "left",
+                      },
+                    ]
+                  }
+                >
+                  0x f1b1 d5a6 e772 8g30 9c4a
+                </Text>
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#9CA4A9",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "textAlign": "right",
+                      },
+                    ]
+                  }
+                >
+                  025k 122d 71ad 75a6 1976
+                </Text>
+              </View>
             </View>
             <Text
               style={
@@ -1281,50 +1288,57 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                   Object {
                     "borderRadius": 8,
                   },
-                  Object {
-                    "height": 62,
-                    "justifyContent": "center",
-                    "paddingHorizontal": 16,
-                    "width": 235,
-                  },
+                  Array [
+                    Object {
+                      "justifyContent": "center",
+                    },
+                    undefined,
+                  ],
                 ]
               }
             >
-              <Text
+              <View
                 style={
-                  Array [
-                    Object {
-                      "color": "#9CA4A9",
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "textAlign": "left",
-                    },
-                  ]
+                  Object {
+                    "width": 200,
+                  }
                 }
               >
-                0x f1b1 d5a6 e772 8g30 9c4a
-              </Text>
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#9CA4A9",
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "paddingTop": 4,
-                      "textAlign": "right",
-                    },
-                  ]
-                }
-              >
-                025k 122d 71ad 75a6 1976
-              </Text>
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#9CA4A9",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "textAlign": "left",
+                      },
+                    ]
+                  }
+                >
+                  0x f1b1 d5a6 e772 8g30 9c4a
+                </Text>
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#9CA4A9",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "textAlign": "right",
+                      },
+                    ]
+                  }
+                >
+                  025k 122d 71ad 75a6 1976
+                </Text>
+              </View>
             </View>
             <Text
               style={

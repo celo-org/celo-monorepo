@@ -14,7 +14,7 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
     style={
       Object {
         "alignItems": "flex-end",
-        "backgroundColor": "#FFFFFF",
+        "backgroundColor": "transparent",
         "elevation": 1,
         "flexDirection": "row",
         "height": 62,
@@ -445,7 +445,7 @@ exports[`Testnet banner Renders when disconnected 1`] = `
     style={
       Object {
         "alignItems": "flex-end",
-        "backgroundColor": "#FFFFFF",
+        "backgroundColor": "transparent",
         "elevation": 1,
         "flexDirection": "row",
         "height": 62,
@@ -876,7 +876,7 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
     style={
       Object {
         "alignItems": "flex-end",
-        "backgroundColor": "#FFFFFF",
+        "backgroundColor": "transparent",
         "elevation": 1,
         "flexDirection": "row",
         "height": 62,
