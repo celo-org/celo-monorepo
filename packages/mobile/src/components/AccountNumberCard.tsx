@@ -11,7 +11,7 @@ interface Props {
 export default function AccountNumberCard({ address, style }: Props) {
   return (
     <Card style={[styles.container, style]} rounded={true}>
-      <AccountNumber address={address} />
+      <AccountNumber address={address} touchDisabled={true} />
     </Card>
   )
 }
