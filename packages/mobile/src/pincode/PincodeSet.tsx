@@ -18,8 +18,9 @@ import { Namespaces, withTranslation } from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { isPinValid, PIN_LENGTH } from 'src/pincode/authentication'
+import { setPinCache } from 'src/pincode/PasswordCache'
 import Pincode from 'src/pincode/Pincode'
-import { isPinValid, PIN_LENGTH } from 'src/pincode/utils'
 
 interface DispatchProps {
   showError: typeof showError
@@ -75,7 +76,8 @@ export class PincodeSet extends React.Component<Props, State> {
     CeloAnalytics.track(CustomEventNames.pin_create_button)
     const { pin1, pin2 } = this.state
     if (this.isPin1Valid(pin1) && this.isPin2Valid(pin2)) {
-      this.props.setPincode(PincodeType.CustomPin, this.state.pin1)
+      this.props.setPincode(PincodeType.CustomPin)
+      setPinCache(this.state.pin1)
       navigate(Screens.EnterInviteCode)
     } else {
       this.props.showError(ErrorMessages.INCORRECT_PIN)

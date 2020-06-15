@@ -1,37 +1,29 @@
-import * as Keychain from 'react-native-keychain'
 import { asyncRandomBytes } from 'react-native-secure-randombytes'
 import { store } from 'src/redux/store'
+import { retrieveStoredItem, storeItem } from 'src/storage/keychain'
 import Logger from 'src/utils/Logger'
 import { getContractKitOutsideGenerator, web3ForUtils } from 'src/web3/contracts'
 import { currentAccountSelector } from 'src/web3/selectors'
 
-const TAG = 'pincode/PhoneAuthUtils'
+const TAG = 'pincode/authentication'
 enum STORAGE_KEYS {
   PEPPER = 'PEPPER',
-  PASSPHRASE_HASH = 'PASSPHRASE_HASH',
+  PASSWORD_HASH = 'PASSWORD_HASH',
 }
 const PEPPER_LENGTH = 64
+export const PIN_LENGTH = 6
 
 let cachedPepper: string
-let cachedPassphraseHash: string
+const cachedPasswordHashes: {
+  [account: string]: string
+} = {}
 
-interface SecureStorage {
-  key: STORAGE_KEYS
-  value: string
+export function isPinValid(pin: string) {
+  return pin.length === PIN_LENGTH
 }
 
-async function securelyStoreItem({ key, value }: SecureStorage) {
-  return Keychain.setGenericPassword('', value, {
-    service: key,
-    accessible: Keychain.ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY,
-    rules: Keychain.SECURITY_RULES.NONE,
-  })
-}
-
-async function retrieveStoredItem(key: STORAGE_KEYS) {
-  return Keychain.getGenericPassword({
-    service: key,
-  })
+function pinStorageKey(account: string) {
+  return `${STORAGE_KEYS.PASSWORD_HASH}-${account}`
 }
 
 async function retrieveOrGeneratePepper() {
@@ -41,26 +33,26 @@ async function retrieveOrGeneratePepper() {
   const storedPepper = await retrieveStoredItem(STORAGE_KEYS.PEPPER)
   if (!storedPepper) {
     const pepper = await asyncRandomBytes(PEPPER_LENGTH)
-    await securelyStoreItem({ key: STORAGE_KEYS.PEPPER, value: pepper })
+    await storeItem({ key: STORAGE_KEYS.PEPPER, value: pepper })
     cachedPepper = pepper
     return cachedPepper
   }
-  cachedPepper = storedPepper.password
+  cachedPepper = storedPepper
   return cachedPepper
 }
 
-async function storePassphraseHash(pin: string) {
+export async function storePasswordHash(pin: string, account: string) {
   const pepper = await retrieveOrGeneratePepper()
   const hash = web3ForUtils.utils.sha3(pin + pepper)
-  await securelyStoreItem({ key: STORAGE_KEYS.PASSPHRASE_HASH, value: hash })
+  await storeItem({ key: pinStorageKey(account), value: hash })
 }
 
-async function checkPin(pin: string) {
+export async function checkPin(pin: string, account: string) {
   const pepper = await retrieveOrGeneratePepper()
   const hash = web3ForUtils.utils.sha3(pin + pepper)
-  const passphraseHash = await retrievePassphraseHash()
-  if (!passphraseHash) {
-    Logger.error(`${TAG}@checkPin`, 'No passphrase hash stored')
+  const passwordHash = await retrievePasswordHash(account)
+  if (!passwordHash) {
+    Logger.error(`${TAG}@checkPin`, 'No password hash stored')
     const contractKit = await getContractKitOutsideGenerator()
     const currentAccount = currentAccountSelector(store.getState())
     if (!currentAccount) {
@@ -68,31 +60,36 @@ async function checkPin(pin: string) {
     }
     const unlocked = await contractKit.web3.eth.personal.unlockAccount(currentAccount, pin, 1)
     if (unlocked) {
-      await storePassphraseHash(pin)
+      await storePasswordHash(pin, account)
       return true
     }
     return false
   }
-  if (hash === passphraseHash) {
+  if (hash === passwordHash) {
     return true
   }
   return false
 }
 
-async function retrievePassphraseHash() {
-  if (cachedPassphraseHash) {
-    return cachedPassphraseHash
+export async function passwordForPin(pin: string) {
+  const pepper = await retrieveOrGeneratePepper()
+  return `${pepper}${pin}`
+}
+
+async function retrievePasswordHash(account: string) {
+  if (cachedPasswordHashes[account]) {
+    return cachedPasswordHashes[account]
   }
-  let credentials: false | Keychain.SharedWebCredentials
+  let hash: string | null = null
   try {
-    credentials = await retrieveStoredItem(STORAGE_KEYS.PASSPHRASE_HASH)
+    hash = await retrieveStoredItem(pinStorageKey(account))
   } catch (err) {
-    Logger.error(`${TAG}@retrievePassphraseHash`, err)
+    Logger.error(`${TAG}@retrievePasswordHash`, err)
     return null
   }
-  if (!credentials) {
+  if (!hash) {
     return null
   }
-  cachedPassphraseHash = credentials.password
-  return cachedPassphraseHash
+  cachedPasswordHashes[account] = hash
+  return cachedPasswordHashes[account]
 }

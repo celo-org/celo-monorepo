@@ -1,5 +1,4 @@
-import { randomBytes } from 'react-native-randombytes'
-import { call, put, select, takeLeading } from 'redux-saga/effects'
+import { put, select, takeLeading } from 'redux-saga/effects'
 import {
   Actions,
   SetPincodeAction,
@@ -12,25 +11,13 @@ import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { getPinFromKeystore, setPinInKeystore } from 'src/pincode/PhoneAuthUtils'
-import { getCachedPincode, setCachedPincode } from 'src/pincode/PincodeCache'
+import { getPinCache } from 'src/pincode/PasswordCache'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'account/saga'
 
-export function* setPincode({ pincodeType, pin }: SetPincodeAction) {
+export function* setPincode({ pincodeType }: SetPincodeAction) {
   try {
-    if (pincodeType === PincodeType.PhoneAuth) {
-      Logger.debug(TAG + '@setPincode', 'Setting pincode with using system auth')
-      pin = randomBytes(10).toString('hex') as string
-      yield call(setPinInKeystore, pin)
-    } else if (pincodeType === PincodeType.CustomPin && pin) {
-      Logger.debug(TAG + '@setPincode', 'Pincode set using user provided pin')
-      setCachedPincode(pin)
-    } else {
-      throw new Error('Pincode type must be phone auth or must provide pin')
-    }
-
     yield put(setPincodeSuccess(pincodeType))
     Logger.info(TAG + '@setPincode', 'Pincode set successfully')
   } catch (error) {
@@ -48,20 +35,9 @@ export function* getPincode(withVerification = true) {
     throw Error('Pin has never been set')
   }
 
-  // This method is deprecated and will be removed soon
-  // `withVerification` is ignored here (it will NOT verify PIN)
-  if (pincodeType === PincodeType.PhoneAuth) {
-    Logger.debug(TAG + '@getPincode', 'Getting pin from keystore')
-    const pin = yield call(getPinFromKeystore)
-    if (!pin) {
-      throw new Error('Keystore returned empty pin')
-    }
-    return pin
-  }
-
   if (pincodeType === PincodeType.CustomPin) {
     Logger.debug(TAG + '@getPincode', 'Getting custom pin')
-    const cachedPin = getCachedPincode()
+    const cachedPin = getPinCache()
     if (cachedPin) {
       return cachedPin
     }
@@ -78,7 +54,7 @@ export function* getPincode(withVerification = true) {
     if (!pin) {
       throw new Error('Pincode confirmation returned empty pin')
     }
-    setCachedPincode(pin)
+
     return pin
   }
 }

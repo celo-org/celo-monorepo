@@ -22,7 +22,8 @@ import { gethStartedThisSessionSelector } from 'src/geth/selectors'
 import { createCommentKey } from 'src/identity/commentEncryption'
 import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { setCachedPincode } from 'src/pincode/PincodeCache'
+import { passwordForPin, storePasswordHash } from 'src/pincode/authentication'
+import { setCachedPincode } from 'src/pincode/PasswordCache'
 import { restartApp } from 'src/utils/AppRestart'
 import { setKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
@@ -198,8 +199,8 @@ export function* getOrCreateAccount() {
 
 export function* assignAccountFromPrivateKey(privateKey: string) {
   try {
-    const pincode = yield call(getPincode, false)
-    if (!pincode) {
+    const pin = yield call(getPincode, false)
+    if (!pin) {
       Logger.error(TAG + '@assignAccountFromPrivateKey', 'Got falsy pin')
       throw Error('Cannot create account without having the pin set')
     }
@@ -208,7 +209,9 @@ export function* assignAccountFromPrivateKey(privateKey: string) {
     // This is done for all sync modes, to allow users to switch into forno mode.
     // Note that if geth is running it saves the key using web3.personal.
     const account = privateKeyToAddress(privateKey)
-    yield call(savePrivateKeyToLocalDisk, account, privateKey, pincode)
+    const password: string = yield call(passwordForPin, pin)
+    yield call(savePrivateKeyToLocalDisk, account, privateKey, password)
+    yield call(storePasswordHash, pin, account)
 
     const fornoMode = yield select(fornoSelector)
     const contractKit = yield call(getContractKit)
@@ -217,7 +220,7 @@ export function* assignAccountFromPrivateKey(privateKey: string) {
       addLocalAccount(privateKey, true)
     } else {
       try {
-        yield call(contractKit.web3.eth.personal.importRawKey, privateKey, pincode)
+        yield call(contractKit.web3.eth.personal.importRawKey, privateKey, password)
       } catch (e) {
         if (e.toString().includes('account already exists')) {
           Logger.warn(TAG + '@assignAccountFromPrivateKey', 'Attempted to import same account')
@@ -226,7 +229,7 @@ export function* assignAccountFromPrivateKey(privateKey: string) {
           throw e
         }
       }
-      yield call(contractKit.web3.eth.personal.unlockAccount, account, pincode, UNLOCK_DURATION)
+      yield call(contractKit.web3.eth.personal.unlockAccount, account, password, UNLOCK_DURATION)
       contractKit.web3.eth.defaultAccount = account
     }
 
@@ -271,21 +274,22 @@ export function* unlockAccount(account: string) {
       return true
     }
 
-    const pincode = yield call(getPincode, true)
+    const pin = yield call(getPincode, true)
+    const password: string = yield call(passwordForPin, pin)
     const fornoMode = yield select(fornoSelector)
     if (fornoMode) {
       if (accountAlreadyAddedInFornoMode) {
         Logger.info(TAG + 'unlockAccount', `Account ${account} already added to web3 for signing`)
       } else {
         Logger.info(TAG + '@unlockAccount', `unlockDuration is ignored in forno mode`)
-        const privateKey: string = yield call(readPrivateKeyFromLocalDisk, account, pincode)
+        const privateKey: string = yield call(readPrivateKeyFromLocalDisk, account, password)
         addLocalAccount(privateKey, true)
         accountAlreadyAddedInFornoMode = true
       }
       return true
     } else {
       const contractKit = yield call(getContractKit)
-      yield call(contractKit.web3.eth.personal.unlockAccount, account, pincode, UNLOCK_DURATION)
+      yield call(contractKit.web3.eth.personal.unlockAccount, account, password, UNLOCK_DURATION)
       Logger.debug(TAG + '@unlockAccount', `Account unlocked: ${account}`)
       return true
     }
@@ -355,13 +359,14 @@ export function* ensureAccountInWeb3Keystore() {
         TAG + '@ensureAccountInWeb3Keystore',
         'Importing account from private key to web3 keystore'
       )
-      const pincode = yield call(getPincode, true)
-      const privateKey: string = yield call(readPrivateKeyFromLocalDisk, currentAccount, pincode)
+      const pin = yield call(getPincode, true)
+      const password = yield call(passwordForPin, pin)
+      const privateKey: string = yield call(readPrivateKeyFromLocalDisk, currentAccount, password)
       const account: string = yield call(
         addAccountToWeb3Keystore,
         privateKey,
         currentAccount,
-        pincode
+        password
       )
       return account
     } else if (accountInWeb3Keystore.toLowerCase() === currentAccount.toLowerCase()) {

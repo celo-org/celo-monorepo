@@ -15,8 +15,8 @@ import { Namespaces, withTranslation } from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
+import { checkPin, isPinValid, PIN_LENGTH } from 'src/pincode/authentication'
 import Pincode from 'src/pincode/Pincode'
-import { isPinCorrect, isPinValid, PIN_LENGTH } from 'src/pincode/utils'
 import { RootState } from 'src/redux/reducers'
 import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
 
@@ -61,14 +61,16 @@ class PincodeEnter extends React.Component<Props, State> {
     this.setState({ pin: '' })
   }
 
-  onPressConfirm = () => {
-    const { fornoMode, route, currentAccount } = this.props
+  onPressConfirm = async () => {
+    const { route, currentAccount } = this.props
     const { pin } = this.state
     const withVerification = route.params.withVerification
     if (withVerification && currentAccount) {
-      isPinCorrect(pin, fornoMode, currentAccount)
-        .then(this.onCorrectPin)
-        .catch(this.onWrongPin)
+      if (await checkPin(pin, currentAccount)) {
+        this.onCorrectPin(pin)
+      } else {
+        this.onWrongPin()
+      }
     } else {
       this.onCorrectPin(pin)
     }
