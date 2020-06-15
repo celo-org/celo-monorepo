@@ -6,7 +6,6 @@ import { updateE164PhoneNumberSalts } from 'src/identity/actions'
 import { fetchPhoneHashPrivate, getSaltFromThresholdSignature } from 'src/identity/privateHashing'
 import { e164NumberToSaltSelector } from 'src/identity/reducer'
 import { getConnectedUnlockedAccount } from 'src/web3/saga'
-import { currentAccountSelector } from 'src/web3/selectors'
 import { mockAccount, mockE164Number, mockE164Number2 } from 'test/values'
 
 jest.mock('react-native-blind-threshold-bls', () => ({
