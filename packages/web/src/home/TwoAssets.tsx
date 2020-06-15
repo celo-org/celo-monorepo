@@ -2,7 +2,7 @@ import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { H2, H4 } from 'src/fonts/Fonts'
 import { NameSpaces, useTranslation } from 'src/i18n'
-import ExchangeCGLD from 'src/icons/ExchangeIconCGLD'
+import ExchangeCELO from 'src/icons/ExchangeIconCGLD'
 import ExchangeCUSD from 'src/icons/ExchangeIconCUSD'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenSizes, useScreenSize } from 'src/layout/ScreenSize'
@@ -50,7 +50,7 @@ export function TwoAssets() {
             size={SIZE.normal}
           />
         </AssetToken>
-        <AssetToken ticker="cGLD" info={t('cGLDinfo')} icon={<ExchangeCGLD size={ICON_SIZE} />}>
+        <AssetToken ticker="CELO" info={t('CELOinfo')} icon={<ExchangeCELO size={ICON_SIZE} />}>
           <Button
             kind={BTN.NAKED}
             text={t('learnGovernance')}

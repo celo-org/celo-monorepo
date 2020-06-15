@@ -112,13 +112,6 @@
       "@celo/utils"
     ]
   },
-  "@celo/transaction-metrics-exporter": {
-    "location": "packages/transaction-metrics-exporter",
-    "dependencies": [
-      "@celo/contractkit",
-      "@celo/utils"
-    ]
-  },
   "@celo/typescript": {
     "location": "packages/typescript",
     "dependencies": []

@@ -60,6 +60,16 @@ export const showErrorInline = (error: ErrorMessages, i18nOptions?: TOptions): S
   underlyingError: error,
 })
 
+// Useful for showing a more specific error if its a documented one, with
+// a fallback to something more generic
+export function showErrorOrFallback(error: any, fallback: ErrorMessages) {
+  if (error && Object.values(ErrorMessages).includes(error.message)) {
+    return showError(error.message)
+  } else {
+    return showError(fallback)
+  }
+}
+
 const showAlert = (
   alertType: AlertTypes,
   message: string,

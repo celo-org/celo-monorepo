@@ -84,6 +84,7 @@ export default class AttestationServicesCurrent extends BaseCommand {
       validatorInfo,
       {
         address: {},
+        affiliation: {},
         name: {},
         hasAttestationSigner: {},
         attestationServiceURL: {},

@@ -1,4 +1,5 @@
 /* tslint:disable: no-console */
+import { readFileSync } from 'fs'
 import { addCeloGethMiddleware } from 'src/lib/utils'
 import yargs from 'yargs'
 import {
@@ -28,6 +29,7 @@ interface StartArgv extends GethArgv {
   instances: number
   migrate: boolean
   migrateTo: number
+  migrationOverrides: string
   monorepoDir: string
   purge: boolean
   withProxy: boolean
@@ -117,6 +119,11 @@ export const builder = (argv: yargs.Argv) => {
       description: 'Migrate contracts to level x',
       implies: 'monorepo-dir',
     })
+    .option('migration-overrides', {
+      type: 'string',
+      description: 'Path to JSON file containing migration overrides',
+      implies: 'migrate',
+    })
     .option('monorepo-dir', {
       type: 'string',
       description: 'Directory of the mono repo',
@@ -141,6 +148,9 @@ export const handler = async (argv: StartArgv) => {
   const mnemonic = argv.mnemonic
   const migrate = argv.migrate
   const migrateTo = argv.migrateTo
+  const migrationOverrides = argv.migrationOverrides
+    ? JSON.parse(readFileSync(argv.migrationOverrides).toString())
+    : {}
   const monorepoDir = argv.monorepoDir
 
   const purge = argv.purge
@@ -156,6 +166,7 @@ export const handler = async (argv: StartArgv) => {
     networkId,
     migrate,
     migrateTo,
+    migrationOverrides,
     network,
     instances: [],
     genesisConfig: {
