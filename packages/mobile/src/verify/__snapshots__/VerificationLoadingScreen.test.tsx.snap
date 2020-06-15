@@ -16,6 +16,61 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
       }
     }
   >
+    <View
+      style={
+        Object {
+          "left": 5,
+          "position": "absolute",
+          "zIndex": 1,
+        }
+      }
+    >
+      <View
+        accessible={true}
+        focusable={true}
+        hitSlop={
+          Object {
+            "bottom": 10,
+            "left": 10,
+            "right": 10,
+            "top": 10,
+          }
+        }
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackgroundBorderless",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        testID="CancelButton"
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#1AB775",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingHorizontal": 16,
+              },
+              Object {
+                "color": "#2E3338",
+              },
+            ]
+          }
+        >
+          cancel
+        </Text>
+      </View>
+    </View>
     <RCTScrollView
       contentContainerStyle={
         Object {
@@ -381,6 +436,61 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
       }
     }
   >
+    <View
+      style={
+        Object {
+          "left": 5,
+          "position": "absolute",
+          "zIndex": 1,
+        }
+      }
+    >
+      <View
+        accessible={true}
+        focusable={true}
+        hitSlop={
+          Object {
+            "bottom": 10,
+            "left": 10,
+            "right": 10,
+            "top": 10,
+          }
+        }
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackgroundBorderless",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        testID="CancelButton"
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#1AB775",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingHorizontal": 16,
+              },
+              Object {
+                "color": "#2E3338",
+              },
+            ]
+          }
+        >
+          cancel
+        </Text>
+      </View>
+    </View>
     <RCTScrollView
       contentContainerStyle={
         Object {

@@ -2366,7 +2366,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
             }
           >
             <Text>
-              Reset backup state
+              Toggle backup state
             </Text>
           </View>
         </View>
