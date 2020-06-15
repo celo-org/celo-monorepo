@@ -25,9 +25,9 @@ import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 
 interface StateProps {
-  cachedName: string
-  cachedNumber: string
-  cachedCountryCallingCode: string
+  cachedName: string | null
+  cachedNumber: string | null
+  cachedCountryCallingCode: string | null
   pincodeType: PincodeType
   acceptedTerms: boolean
 }
@@ -100,10 +100,10 @@ export class JoinCelo extends React.Component<Props, State> {
   countries = new Countries(this.props.i18n.language)
 
   state: State = {
-    name: this.props.cachedName,
+    name: this.props.cachedName || '',
     ...getPhoneNumberState(
-      this.props.cachedNumber,
-      this.props.cachedCountryCallingCode,
+      this.props.cachedNumber || '',
+      this.props.cachedCountryCallingCode || '',
       RNLocalize.getCountry()
     ),
   }
