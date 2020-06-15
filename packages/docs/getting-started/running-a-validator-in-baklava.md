@@ -2,11 +2,11 @@
 
 The Baklava Testnet is a non-production Testnet for the Validator community. It serves several purposes:
 
-- **Operational excellence**: It helps you get familiarized with the processes that will be used to create RC1, and verify the security and stability of your infrastructure with the new software.
-- **Detecting vulnerabilities**: It helps the Celo community discover any remaining bugs before RC1.
+- **Operational excellence**: It helps you get familiarized with the processes that are being used to create Mainnet and verify the security and stability of your infrastructure with the new software.
+- **Detecting vulnerabilities**: It helps the Celo community discover issues before software and updates are promoted to Mainnet.
 - **Future testnet**: If all goes well, it will continue to function as a testnet, serving as a testing ground for changes after mainnet is launched.
 
-The Baklava testnet is the best place to get started running a validator, or test out new validator configurations before deploying to the [Release Candidate Network](rc1.md) or, in the future, Mainnet.
+The Baklava testnet is the best place to get started running a validator, or test out new validator configurations before deploying to [Mainnet](mainnet.md).
 
 {% hint style="info" %}
 A previous version of the Baklava testnet hosted The Great Celo Stake Off, however the network is now available for more general use.
@@ -352,11 +352,11 @@ celocli account:show $CELO_VALIDATOR_GROUP_RG_ADDRESS
 celocli account:show $CELO_VALIDATOR_RG_ADDRESS
 ```
 
-Lock cGLD from your `ReleaseGold` contracts to fulfill the lock-up requirements to register a Validator and Validator Group. The current requirement is 10,000 cGLD to register a Validator, and 10,000 cGLD _per member validator_ to register a Validator Group.
+Lock cGLD from your `ReleaseGold` contracts to fulfill the lock-up requirements to register a Validator and Validator Group. The current requirement is any value strictly greater than 10,000 cGLD to register a Validator, and any value strictly greater than 10,000 cGLD _per member validator_ to register a Validator Group. Here we lock up 10000.1 cGLD for each.
 
 ```bash
-celocli releasegold:locked-gold --contract $CELO_VALIDATOR_GROUP_RG_ADDRESS --action lock --value 10000e18
-celocli releasegold:locked-gold --contract $CELO_VALIDATOR_RG_ADDRESS --action lock --value 10000e18
+celocli releasegold:locked-gold --contract $CELO_VALIDATOR_GROUP_RG_ADDRESS --action lock --value 100001e17
+celocli releasegold:locked-gold --contract $CELO_VALIDATOR_RG_ADDRESS --action lock --value 100001e17
 ```
 
 Check that your cGLD was successfully locked with the following commands:
@@ -410,6 +410,8 @@ In order to validate we need to authorize the Validator signer:
 # On your local machine
 celocli releasegold:authorize --contract $CELO_VALIDATOR_RG_ADDRESS --role validator --signature 0x$CELO_VALIDATOR_SIGNER_SIGNATURE --signer $CELO_VALIDATOR_SIGNER_ADDRESS
 ```
+
+{% hint style="info" %} The first time you authorize a validator signer for a ReleaseGold account the signer address is funded 1 cGLD to cover transaction fees. Any subsequent signer keys you authorize will not be funded, and you will need to transfer a nominal amount of cGLD to them from other accounts. {% endhint %}
 
 Using the newly authorized Validator signer, register a validator on behalf of the registered Account:
 
@@ -640,7 +642,7 @@ With this proof, authorize the attestation signer on your local machine:
 # On your local machine
 export CELO_ATTESTATION_SIGNER_SIGNATURE=<ATTESTATION-SIGNER-SIGNATURE>
 export CELO_ATTESTATION_SIGNER_ADDRESS=<YOUR-ATTESTATION-SIGNER-ADDRESS>
-celocli releasegold:authorize --contract $CELO_VALIDATOR_RG_ADDRESS --role attestation --signature 0x$CELO_ATTESTATION_SIGNER_SIGNATURE --signer 0x$CELO_ATTESTATION_SIGNER_ADDRESS
+celocli releasegold:authorize --contract $CELO_VALIDATOR_RG_ADDRESS --role attestation --signature 0x$CELO_ATTESTATION_SIGNER_SIGNATURE --signer $CELO_ATTESTATION_SIGNER_ADDRESS
 ```
 
 You can now run the node for the attestation service in the background. In the below command remember to specify the password you used during the creation of the `CELO_ATTESTATION_SIGNER_ADDRESS`:
@@ -648,7 +650,7 @@ You can now run the node for the attestation service in the background. In the b
 ```bash
 # On the Attestation machine
 echo <CELO-ATTESTATION-SIGNER-PASSWORD> > .password
-docker run --name celo-attestations -it --restart always -p 127.0.0.1:8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin --unlock $CELO_ATTESTATION_SIGNER_ADDRESS --password /root/.celo/.password --bootnodes $BOOTNODE_ENODES
+docker run --name celo-attestations -it --restart always -p 127.0.0.1:8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin --unlock $CELO_ATTESTATION_SIGNER_ADDRESS --password /root/.celo/.password --bootnodes $BOOTNODE_ENODES --allow-insecure-unlock
 ```
 
 Next we will set up the Attestation Service itself. First, specify the following environment variables:
@@ -719,11 +721,16 @@ export DATABASE_URL="postgres://postgres:<DATABASE_PASSWORD>@localhost:5432/atte
 
 ## Running the Attestation Service
 
+Before running the attestation service, ensure that your local node is fully synced.
+```bash
+# On the Attestation machine
+sudo celocli node:synced --node geth.ipc
+```
 The following command for running the Attestation Service is using Twilio and uses `--network host` to access a local database (only works on Linux):
 
 ```bash
 # On the Attestation machine
-docker run --name celo-attestation-service -it --restart always --entrypoint /bin/bash --network host -e ATTESTATION_SIGNER_ADDRESS=0x$CELO_ATTESTATION_SIGNER_ADDRESS -e CELO_VALIDATOR_ADDRESS=0x$CELO_VALIDATOR_RG_ADDRESS -e CELO_PROVIDER=$CELO_PROVIDER -e DATABASE_URL=$DATABASE_URL -e SMS_PROVIDERS=twilio -e TWILIO_MESSAGING_SERVICE_SID=$TWILIO_MESSAGING_SERVICE_SID -e TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID -e TWILIO_BLACKLIST=$TWILIO_BLACKLIST -e TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN -e PORT=80 -p 80:80 $CELO_IMAGE_ATTESTATION -c " cd /celo-monorepo/packages/attestation-service && yarn run db:migrate && yarn start "
+docker run --name celo-attestation-service -it --restart always --entrypoint /bin/bash --network host -e ATTESTATION_SIGNER_ADDRESS=$CELO_ATTESTATION_SIGNER_ADDRESS -e CELO_VALIDATOR_ADDRESS=$CELO_VALIDATOR_RG_ADDRESS -e CELO_PROVIDER=$CELO_PROVIDER -e DATABASE_URL=$DATABASE_URL -e SMS_PROVIDERS=twilio -e TWILIO_MESSAGING_SERVICE_SID=$TWILIO_MESSAGING_SERVICE_SID -e TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID -e TWILIO_BLACKLIST=$TWILIO_BLACKLIST -e TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN -e PORT=80 -p 80:80 $CELO_IMAGE_ATTESTATION -c " cd /celo-monorepo/packages/attestation-service && yarn run db:migrate && yarn start "
 ```
 
 ### Registering Metadata
@@ -734,14 +741,14 @@ Run the following commands on your local machine:
 
 ```bash
 # On your local machine
-celocli account:create-metadata ./metadata.json --from 0x$CELO_VALIDATOR_RG_ADDRESS
+celocli account:create-metadata ./metadata.json --from $CELO_VALIDATOR_RG_ADDRESS
 ```
 
 The `CELO_ATTESTATION_SERVICE_URL` variable stores the URL to access the Attestation Service deployed. In the following command we specify the URL where this Attestation Service is:
 
 ```bash
 # On your local machine
-celocli account:claim-attestation-service-url ./metadata.json --url $CELO_ATTESTATION_SERVICE_URL --from 0x$CELO_ATTESTATION_SIGNER_ADDRESS
+celocli account:claim-attestation-service-url ./metadata.json --url $CELO_ATTESTATION_SERVICE_URL --from $CELO_ATTESTATION_SIGNER_ADDRESS
 ```
 
 You should now host your metadata somewhere reachable via HTTP. You can use a service like [gist.github.com](https://gist.github.com). Create a gist with the contents of the file and then click on the `Raw` button to receive the permalink to the machine-readable file.

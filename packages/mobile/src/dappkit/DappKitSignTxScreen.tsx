@@ -2,17 +2,18 @@ import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { SignTxRequest } from '@celo/utils/src/dappkit'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationParams, NavigationScreenProp } from 'react-navigation'
 import { connect } from 'react-redux'
 import { requestTxSignature } from 'src/dappkit/dappkit'
 import { Namespaces, withTranslation } from 'src/i18n'
 import DappkitExchangeIcon from 'src/icons/DappkitExchange'
 import { navigate, navigateBack, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'dappkit/DappKitSignTxScreen'
@@ -20,17 +21,13 @@ const TAG = 'dappkit/DappKitSignTxScreen'
 interface State {
   request: SignTxRequest | null
 }
-
-interface OwnProps {
-  errorMessage?: string
-  navigation?: NavigationScreenProp<NavigationParams>
-}
-
 interface DispatchProps {
   requestTxSignature: typeof requestTxSignature
 }
 
-type Props = OwnProps & DispatchProps & WithTranslation
+type Props = DispatchProps &
+  WithTranslation &
+  StackScreenProps<StackParamList, Screens.DappKitSignTxScreen>
 
 const mapDispatchToProps = {
   requestTxSignature,
@@ -43,12 +40,7 @@ class DappKitSignTxScreen extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    if (!this.props.navigation) {
-      Logger.error(TAG, 'Missing navigation props')
-      return
-    }
-
-    const request: SignTxRequest = this.props.navigation.getParam('dappKitRequest', null)
+    const request = this.props.route.params.dappKitRequest
 
     if (!request) {
       Logger.error(TAG, 'No request found in navigation props')
@@ -56,14 +48,6 @@ class DappKitSignTxScreen extends React.Component<Props, State> {
     }
 
     this.setState({ request })
-  }
-
-  getErrorMessage() {
-    return (
-      this.props.errorMessage ||
-      (this.props.navigation && this.props.navigation.getParam('errorMessage')) ||
-      ''
-    )
   }
 
   linkBack = () => {

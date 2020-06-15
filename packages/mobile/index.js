@@ -9,6 +9,7 @@ import App from 'src/app/App'
 import { installSentry } from 'src/sentry/Sentry'
 import * as Sentry from '@sentry/react-native'
 import { onBackgroundNotification } from 'src/firebase/firebase'
+import 'react-native-gesture-handler'
 
 // Set this to true, if you want to test Sentry on dev builds
 const sentryEnabled = !__DEV__ || false

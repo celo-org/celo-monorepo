@@ -3,8 +3,9 @@ import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import Invite from 'src/account/Invite'
-import { createMockStore } from 'test/utils'
-import { mockE164NumberToInvitableRecipient, mockNavigation } from 'test/values'
+import { Screens } from 'src/navigator/Screens'
+import { createMockStore, getMockStackScreenProps } from 'test/utils'
+import { mockE164NumberToInvitableRecipient } from 'test/values'
 
 describe('Invite', () => {
   it('renders correctly with recipients', () => {
@@ -14,9 +15,7 @@ describe('Invite', () => {
           recipients: { recipientCache: mockE164NumberToInvitableRecipient },
         })}
       >
-        {/*
-          // @ts-ignore */}
-        <Invite navigation={mockNavigation} />
+        <Invite {...getMockStackScreenProps(Screens.Invite)} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
@@ -25,9 +24,7 @@ describe('Invite', () => {
   it('renders correctly with no recipients', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
-        {/*
-          // @ts-ignore */}
-        <Invite navigation={mockNavigation} />
+        <Invite {...getMockStackScreenProps(Screens.Invite)} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()

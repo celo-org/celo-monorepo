@@ -1,7 +1,7 @@
 /* tslint:disable: no-console */
 import { ChildProcess, spawnSync } from 'child_process'
+import { execBackgroundCmd, execCmd } from './cmd-utils'
 import { envVar, fetchEnv, isVmBased } from './env-utils'
-import { execBackgroundCmd, execCmd } from './utils'
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))

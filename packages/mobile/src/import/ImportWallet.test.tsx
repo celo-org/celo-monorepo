@@ -4,22 +4,21 @@ import 'react-native'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import ImportWallet, { ImportWallet as ImportWalletClass } from 'src/import/ImportWallet'
-import { createMockNavigationProp, createMockStore, getMockI18nProps } from 'test/utils'
+import { Screens } from 'src/navigator/Screens'
+import { createMockStore, getMockI18nProps, getMockStackScreenProps } from 'test/utils'
 import { mockMnemonic } from 'test/values'
 
 jest.mock('src/geth/GethAwareButton', () => {
   return mockButton
 })
 
-jest.mock('react-navigation', () => ({
-  NavigationEvents: 'NavigationEvents',
-}))
+const mockScreenProps = getMockStackScreenProps(Screens.ImportWallet, { clean: true })
 
 describe('ImportWallet', () => {
   it('renders correctly and is disabled with no text', () => {
     const wrapper = render(
       <Provider store={createMockStore()}>
-        <ImportWallet />
+        <ImportWallet {...mockScreenProps} />
       </Provider>
     )
 
@@ -36,7 +35,7 @@ describe('ImportWallet', () => {
           importBackupPhrase={importFn}
           hideAlert={jest.fn()}
           isImportingWallet={false}
-          navigation={createMockNavigationProp({})}
+          {...mockScreenProps}
           {...getMockI18nProps()}
         />
       </Provider>

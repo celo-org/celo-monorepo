@@ -1,8 +1,8 @@
-import { installPrometheusIfNotExists } from 'src/lib/aks-prometheus'
 import { createNamespaceIfNotExists } from 'src/lib/cluster'
+import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { doCheckOrPromptIfStagingOrProduction } from 'src/lib/env-utils'
 import { installAndEnableMetricsDeps, redeployTiller } from 'src/lib/helm_deploy'
-import { execCmd, execCmdWithExitOnFailure, outputIncludes } from 'src/lib/utils'
+import { outputIncludes } from 'src/lib/utils'
 
 /**
  * Basic info for an AKS cluster
@@ -32,7 +32,7 @@ export async function switchToCluster(
     console.info('No azure account subscription currently set')
   }
   if (currentTenantId === null || currentTenantId.trim() !== clusterConfig.tenantId) {
-    await execCmdWithExitOnFailure(`az account set --subscription ${clusterConfig.tenantId}`)
+    await execCmdWithExitOnFailure(`az account set --subscription ${clusterConfig.subscriptionId}`)
   }
 
   let currentCluster = null
@@ -61,8 +61,7 @@ async function setupCluster(celoEnv: string, clusterConfig: AzureClusterConfig) 
   console.info('Performing any cluster setup that needs to be done...')
 
   await redeployTiller()
-  await installPrometheusIfNotExists(clusterConfig)
-  await installAndEnableMetricsDeps(false)
+  await installAndEnableMetricsDeps(true, clusterConfig)
   await installAADPodIdentity()
 }
 

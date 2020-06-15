@@ -58,20 +58,25 @@ export enum AnalyzedApps {
 
 // Map of event name to map of subEvent name to timestamp
 // Using Map to maintain insertion order
-type ActiveEvents = Map<string, Map<string, number>>
+interface SubEventData {
+  timestamp: number
+  subEventProps: {}
+}
+
+type ActiveEvents = Map<string, Map<string, SubEventData>>
 
 class CeloAnalytics {
   readonly appName: AnalyzedApps
   readonly apiKey: string | undefined
   readonly defaultTestnet: string | undefined
-  readonly propertyPathWhiteList: string[]
+  readonly propertyPathWhiteList: { [key: string]: any }
   readonly Logger: ReactNativeLogger
   readonly activeEvents: ActiveEvents = new Map()
   deviceInfo: any
 
   constructor(
     appName: AnalyzedApps,
-    propertyPathWhiteList: string[],
+    propertyPathWhiteList: { [key: string]: any },
     Logger: ReactNativeLogger,
     apiKey?: string,
     defaultTestnet?: string
@@ -99,7 +104,7 @@ class CeloAnalytics {
     return true
   }
 
-  track(eventName: string, eventProperties: {}, attachDeviceInfo = false) {
+  track(eventName: string, eventProperties = {}, attachDeviceInfo = false) {
     if (!this.isEnabled()) {
       this.Logger.info(TAG, `Analytics is disabled, not tracking event ${eventName}`)
       return
@@ -116,56 +121,66 @@ class CeloAnalytics {
       _.set(props, 'device', this.deviceInfo)
     }
     Analytics.track(eventName, props).catch((err) => {
-      this.Logger.error(TAG, `Failed to tracking event ${eventName}`, err)
+      this.Logger.error(TAG, `Failed to track event ${eventName}`, err)
     })
   }
 
   // Used with trackSubEvent and endTracking to track durations for
   // processes with multiple steps. For one-off events, use track method
-  startTracking(eventName: string) {
+  // Duplicate event properties will reflect latest value provided
+  startTracking(eventName: string, eventProperties = {}) {
     this.activeEvents.set(
       eventName,
-      new Map<string, number>([['__startTrackingTime__', Date.now()]])
+      new Map<string, SubEventData>([
+        ['__startTracking__', { timestamp: Date.now(), subEventProps: eventProperties }],
+      ])
     )
   }
 
   // See startTracking
-  trackSubEvent(eventName: string, subEventName: string) {
+  trackSubEvent(eventName: string, subEventName: string, eventProperties = {}) {
     if (!this.activeEvents.has(eventName)) {
       return this.Logger.warn(TAG, 'Attempted to track sub event for invalid event. Ignoring.')
     }
 
-    this.activeEvents.get(eventName)!.set(subEventName, Date.now())
+    this.activeEvents
+      .get(eventName)!
+      .set(subEventName, { timestamp: Date.now(), subEventProps: eventProperties })
   }
 
   // See startTracking
-  stopTracking(eventName: string, eventProperties = {}) {
+  stopTracking(eventName: string, eventProperties = {}, attachDeviceInfo = false) {
     if (!this.activeEvents.has(eventName)) {
       return
     }
 
-    const subEvents = this.activeEvents.get(eventName)!
-    if (subEvents.size === 1) {
-      return this.Logger.warn(TAG, 'stopTracking called for event without subEvents. Ignoring.')
-    }
+    this.activeEvents
+      .get(eventName)!
+      .set('__endTracking__', { timestamp: Date.now(), subEventProps: eventProperties })
 
+    const subEvents = this.activeEvents.get(eventName)!
     const durations: { [subEventName: string]: number } = {}
-    let prevEventTime = subEvents.get('__startTrackingTime__')!
-    for (const [subEventName, timestamp] of subEvents) {
-      if (subEventName === '__startTrackingTime__') {
+    let prevEventTime = subEvents.get('__startTracking__')!.timestamp
+    let eventPropsSuperSet = subEvents.get('__startTracking__')!.subEventProps
+
+    for (const [subEventName, { timestamp, subEventProps }] of subEvents) {
+      if (subEventName === '__startTracking__') {
         continue
       }
+
+      eventPropsSuperSet = { ...eventPropsSuperSet, ...subEventProps }
       durations[subEventName] = timestamp - prevEventTime
       prevEventTime = timestamp
     }
 
-    durations.__totalTime__ = Date.now() - subEvents.get('__startTrackingTime__')!
+    durations.__totalTime__ =
+      subEvents.get('__endTracking__')!.timestamp - subEvents.get('__startTracking__')!.timestamp
     this.activeEvents.delete(eventName)
 
-    this.track(eventName, { ...eventProperties, ...durations })
+    this.track(eventName, { ...eventPropsSuperSet, ...durations }, attachDeviceInfo)
   }
 
-  page(page: string, eventProperties: {}) {
+  page(page: string, eventProperties = {}) {
     if (!this.apiKey) {
       return
     }
@@ -187,7 +202,7 @@ class CeloAnalytics {
     return whitelistedProps
   }
 
-  private getProps(eventProperties: {}): {} {
+  private getProps(eventProperties = {}): {} {
     const whitelistedProperties = this.applyWhitelist(eventProperties)
     const baseProps = {
       appName: this.appName,

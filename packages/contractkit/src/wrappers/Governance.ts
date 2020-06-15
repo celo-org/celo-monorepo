@@ -1,4 +1,10 @@
-import { ensureLeading0x, NULL_ADDRESS, trimLeading0x } from '@celo/utils/lib/address'
+import {
+  bufferToHex,
+  ensureLeading0x,
+  hexToBuffer,
+  NULL_ADDRESS,
+  trimLeading0x,
+} from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import { fromFixed } from '@celo/utils/lib/fixidity'
@@ -8,13 +14,12 @@ import { Address } from '../base'
 import { Governance } from '../generated/Governance'
 import {
   BaseWrapper,
-  bufferToBytes,
-  bufferToString,
-  bytesToString,
+  bufferToSolidityBytes,
   identity,
   proxyCall,
   proxySend,
-  stringToBuffer,
+  solidityBytesToString,
+  stringIdentity,
   toTransactionObject,
   tupleParser,
   valueToBigNumber,
@@ -66,11 +71,11 @@ export type ProposalTransaction = Pick<Transaction, 'to' | 'input' | 'value'>
 export type Proposal = ProposalTransaction[]
 
 export const proposalToParams = (proposal: Proposal, descriptionURL: string): ProposalParams => {
-  const data = proposal.map((tx) => stringToBuffer(tx.input))
+  const data = proposal.map((tx) => hexToBuffer(tx.input))
   return [
     proposal.map((tx) => tx.value),
     proposal.map((tx) => tx.to!),
-    bufferToBytes(Buffer.concat(data)),
+    bufferToSolidityBytes(Buffer.concat(data)),
     data.map((inp) => inp.length),
     descriptionURL,
   ]
@@ -106,13 +111,25 @@ export interface Votes {
 export type HotfixParams = Parameters<Governance['methods']['executeHotfix']>
 export const hotfixToParams = (proposal: Proposal, salt: Buffer): HotfixParams => {
   const p = proposalToParams(proposal, '') // no description URL for hotfixes
-  return [p[0], p[1], p[2], p[3], bufferToString(salt)]
+  return [p[0], p[1], p[2], p[3], bufferToHex(salt)]
 }
 
 export interface HotfixRecord {
   approved: boolean
   executed: boolean
   preparedEpoch: BigNumber
+}
+
+export interface VoteRecord {
+  proposalID: BigNumber
+  votes: BigNumber
+  value: VoteValue
+}
+
+export interface Voter {
+  upvote: UpvoteRecord
+  votes: VoteRecord[]
+  refundedDeposits: BigNumber
 }
 
 const ZERO_BN = new BigNumber(0)
@@ -130,6 +147,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     undefined,
     valueToBigNumber
   )
+  /**
+   * Query proposal dequeue frequency.
+   * @returns Current proposal dequeue frequency in seconds.
+   */
+  lastDequeue = proxyCall(this.contract.methods.lastDequeue, undefined, valueToBigNumber)
   /**
    * Query proposal dequeue frequency.
    * @returns Current proposal dequeue frequency in seconds.
@@ -256,7 +278,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     (res) => ({
       value: res[0],
       to: res[1],
-      input: bytesToString(res[2]),
+      input: solidityBytesToString(res[2]),
     })
   )
 
@@ -353,6 +375,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   isProposalPassing = proxyCall(this.contract.methods.isProposalPassing, tupleParser(valueToString))
 
   /**
+   * Withdraws refunded proposal deposits.
+   */
+  withdraw = proxySend(this.kit, this.contract.methods.withdraw)
+
+  /**
    * Submits a new governance proposal.
    * @param proposal Governance proposal
    * @param descriptionURL A URL where further information about the proposal can be viewed
@@ -382,12 +409,43 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   )
 
   /**
+   * Returns the corresponding vote record
+   * @param voter Address of voter
+   * @param proposalID Governance proposal UUID
+   */
+  async getVoteRecord(voter: Address, proposalID: BigNumber.Value): Promise<VoteRecord | null> {
+    try {
+      const proposalIndex = await this.getDequeueIndex(proposalID)
+      const res = await this.contract.methods.getVoteRecord(voter, proposalIndex).call()
+      return {
+        proposalID: valueToBigNumber(res[0]),
+        value: Object.keys(VoteValue)[valueToInt(res[1])] as VoteValue,
+        votes: valueToBigNumber(res[2]),
+      }
+    } catch (_) {
+      // The proposal ID may not be present in the dequeued list, or the voter may not have a vote
+      // record for the proposal.
+      return null
+    }
+  }
+
+  /**
    * Returns whether a given proposal is queued.
    * @param proposalID Governance proposal UUID
    */
   isQueued = proxyCall(this.contract.methods.isQueued, tupleParser(valueToString))
 
   /**
+   * Returns the value of proposal deposits that have been refunded.
+   * @param proposer Governance proposer address.
+   */
+  getRefundedDeposits = proxyCall(
+    this.contract.methods.refundedDeposits,
+    tupleParser(stringIdentity),
+    valueToBigNumber
+  )
+
+  /*
    * Returns the upvotes applied to a given proposal.
    * @param proposalID Governance proposal UUID
    */
@@ -433,6 +491,31 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     // filter non-zero as dequeued indices are reused and `deleteDequeuedProposal` zeroes
     const dequeueIds = dequeue.map(valueToBigNumber)
     return filterZeroes ? dequeueIds.filter((id) => !id.isZero()) : dequeueIds
+  }
+
+  /*
+   * Returns the vote records for a given voter.
+   */
+  async getVoteRecords(voter: Address): Promise<VoteRecord[]> {
+    const dequeue = await this.getDequeue()
+    const voteRecords = await Promise.all(dequeue.map((id) => this.getVoteRecord(voter, id)))
+    return voteRecords.filter((record) => record != null) as VoteRecord[]
+  }
+
+  /*
+   * Returns information pertaining to a voter in governance.
+   */
+  async getVoter(account: Address): Promise<Voter> {
+    const res = await Promise.all([
+      this.getUpvoteRecord(account),
+      this.getVoteRecords(account),
+      this.getRefundedDeposits(account),
+    ])
+    return {
+      upvote: res[0],
+      votes: res[1],
+      refundedDeposits: res[2],
+    }
   }
 
   /**
@@ -610,7 +693,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * @param hash keccak256 hash of hotfix's associated abi encoded transactions
    */
   async getHotfixRecord(hash: Buffer): Promise<HotfixRecord> {
-    const res = await this.contract.methods.getHotfixRecord(bufferToString(hash)).call()
+    const res = await this.contract.methods.getHotfixRecord(bufferToHex(hash)).call()
     return {
       approved: res[0],
       executed: res[1],
@@ -625,14 +708,14 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    */
   isHotfixWhitelistedBy = proxyCall(
     this.contract.methods.isHotfixWhitelistedBy,
-    tupleParser(bufferToString, (s: Address) => identity<Address>(s))
+    tupleParser(bufferToHex, (s: Address) => identity<Address>(s))
   )
 
   /**
    * Returns whether a given hotfix can be passed.
    * @param hash keccak256 hash of hotfix's associated abi encoded transactions
    */
-  isHotfixPassing = proxyCall(this.contract.methods.isHotfixPassing, tupleParser(bufferToString))
+  isHotfixPassing = proxyCall(this.contract.methods.isHotfixPassing, tupleParser(bufferToHex))
 
   /**
    * Returns the number of validators required to reach a Byzantine quorum
@@ -649,7 +732,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    */
   hotfixWhitelistValidatorTally = proxyCall(
     this.contract.methods.hotfixWhitelistValidatorTally,
-    tupleParser(bufferToString)
+    tupleParser(bufferToHex)
   )
 
   /**
@@ -659,7 +742,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   whitelistHotfix = proxySend(
     this.kit,
     this.contract.methods.whitelistHotfix,
-    tupleParser(bufferToString)
+    tupleParser(bufferToHex)
   )
 
   /**
@@ -667,21 +750,13 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * @param hash keccak256 hash of hotfix's associated abi encoded transactions
    * @notice Only the `approver` address will succeed in sending this transaction
    */
-  approveHotfix = proxySend(
-    this.kit,
-    this.contract.methods.approveHotfix,
-    tupleParser(bufferToString)
-  )
+  approveHotfix = proxySend(this.kit, this.contract.methods.approveHotfix, tupleParser(bufferToHex))
 
   /**
    * Marks the given hotfix prepared for current epoch if quorum of validators have whitelisted it.
    * @param hash keccak256 hash of hotfix's associated abi encoded transactions
    */
-  prepareHotfix = proxySend(
-    this.kit,
-    this.contract.methods.prepareHotfix,
-    tupleParser(bufferToString)
-  )
+  prepareHotfix = proxySend(this.kit, this.contract.methods.prepareHotfix, tupleParser(bufferToHex))
 
   /**
    * Executes a given sequence of transactions if the corresponding hash is prepared and approved.

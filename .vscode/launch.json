@@ -11,7 +11,7 @@
         "--rootDir",
         "${workspaceFolder}/packages/phone-number-privacy",
         "--runInBand",
-        "${workspaceFolder}/packages/phone-number-privacy/test/*",
+        "${workspaceFolder}/packages/phone-number-privacy/test/**",
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",

@@ -7,6 +7,7 @@ import {
   registerStaticIP,
 } from './azure'
 import { createNamespaceIfNotExists } from './cluster'
+import { execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv } from './env-utils'
 import {
   deletePersistentVolumeClaims,
@@ -15,7 +16,6 @@ import {
   upgradeGenericHelmChart,
 } from './helm_deploy'
 import { deleteResource, scaleResource } from './kubernetes'
-import { execCmdWithExitOnFailure } from './utils'
 
 const helmChartPath = '../helm-charts/celo-fullnode'
 
@@ -89,6 +89,7 @@ async function helmParameters(
     `--set namespace=${kubeNamespace}`,
     `--set replicaCount=${replicaCount}`,
     `--set storage.size=${parseInt(fetchEnv(envVar.AZURE_TX_NODES_DISK_SIZE), 10)}Gi`,
+    `--set geth.expose_rpc_externally=false`,
     `--set geth.image.repository=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY)}`,
     `--set geth.image.tag=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_TAG)}`,
     `--set geth.public_ips='{${staticIps}}'`,

@@ -108,9 +108,9 @@ exports[`ImportWalletSocial renders correctly and is disabled with no text 1`] =
             style={
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-SemiBold",
+                "fontFamily": "Inter-Medium",
                 "fontSize": 16,
-                "lineHeight": 24,
+                "lineHeight": 22,
               }
             }
           >
@@ -132,19 +132,19 @@ exports[`ImportWalletSocial renders correctly and is disabled with no text 1`] =
             multiline={true}
             onChangeText={[Function]}
             placeholder="backupPhrasePlaceholder"
-            placeholderTextColor="#D1D5D8"
+            placeholderTextColor="#9CA4A9"
             rejectResponderTermination={true}
             shouldShowClipboard={[Function]}
             style={
               Array [
                 Object {
-                  "borderColor": "#D1D5D8",
+                  "borderColor": "#EDEEEF",
                   "borderRadius": 4,
                   "borderWidth": 1,
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
+                  "fontFamily": "Inter-Regular",
                   "fontSize": 16,
-                  "lineHeight": 24,
+                  "lineHeight": 22,
                   "minHeight": 125,
                   "padding": 14,
                   "paddingTop": 16,
@@ -181,9 +181,9 @@ exports[`ImportWalletSocial renders correctly and is disabled with no text 1`] =
             style={
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-SemiBold",
+                "fontFamily": "Inter-Medium",
                 "fontSize": 16,
-                "lineHeight": 24,
+                "lineHeight": 22,
               }
             }
           >
@@ -205,19 +205,19 @@ exports[`ImportWalletSocial renders correctly and is disabled with no text 1`] =
             multiline={true}
             onChangeText={[Function]}
             placeholder="backupPhrasePlaceholder"
-            placeholderTextColor="#D1D5D8"
+            placeholderTextColor="#9CA4A9"
             rejectResponderTermination={true}
             shouldShowClipboard={[Function]}
             style={
               Array [
                 Object {
-                  "borderColor": "#D1D5D8",
+                  "borderColor": "#EDEEEF",
                   "borderRadius": 4,
                   "borderWidth": 1,
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
+                  "fontFamily": "Inter-Regular",
                   "fontSize": 16,
-                  "lineHeight": 24,
+                  "lineHeight": 22,
                   "minHeight": 125,
                   "padding": 14,
                   "paddingTop": 16,

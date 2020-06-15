@@ -27,6 +27,7 @@ export const AttestationRequestType = t.type({
   issuer: AddressType,
   // io-ts way of defining optional key-value pair
   salt: t.union([t.undefined, SaltType]),
+  smsRetrieverAppSig: t.union([t.undefined, t.string]),
 })
 
 export type AttestationRequest = t.TypeOf<typeof AttestationRequestType>
@@ -47,8 +48,9 @@ function toBase64(str: string) {
   return Buffer.from(str.slice(2), 'hex').toString('base64')
 }
 
-function createAttestationTextMessage(attestationCode: string) {
-  return `<#> celo://wallet/v/${toBase64(attestationCode)} ${process.env.APP_SIGNATURE}`
+function createAttestationTextMessage(attestationCode: string, smsRetrieverAppSig?: string) {
+  const messageBase = `celo://wallet/v/${toBase64(attestationCode)}`
+  return smsRetrieverAppSig ? `<#> ${messageBase} ${smsRetrieverAppSig}` : messageBase
 }
 
 async function ensureLockedRecord(
@@ -202,7 +204,10 @@ class AttestationRequestHandler {
   }
 
   async sendSmsAndPersistAttestation(attestationCode: string) {
-    const textMessage = createAttestationTextMessage(attestationCode)
+    const textMessage = createAttestationTextMessage(
+      attestationCode,
+      this.attestationRequest.smsRetrieverAppSig
+    )
     let attestationRecord: AttestationModel | null = null
 
     const transaction = await sequelize!.transaction({ logging: this.sequelizeLogger })

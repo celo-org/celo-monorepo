@@ -30,6 +30,8 @@ export class CeloProvider {
     this.rpcCaller = new DefaultRpcCaller(existingProvider)
     this.paramsPopulator = new TxParamsNormalizer(this.rpcCaller)
     this.wallet = wallet
+
+    this.addProviderDelegatedFunctions()
   }
 
   addAccount(privateKey: string) {
@@ -181,5 +183,74 @@ export class CeloProvider {
     if (!payload.params || payload.params.length < n) {
       throw Error('Invalid params')
     }
+  }
+
+  // Functions required to act as a delefator for the existingProvider
+  private addProviderDelegatedFunctions(): void {
+    if (
+      hasProperty<{ on: (type: string, callback: () => void) => void }>(this.existingProvider, 'on')
+    ) {
+      // @ts-ignore
+      this.on = this.defaultOn
+    }
+    if (
+      hasProperty<{ once: (type: string, callback: () => void) => void }>(
+        this.existingProvider,
+        'once'
+      )
+    ) {
+      // @ts-ignore
+      this.once = this.defaultOnce
+    }
+    if (
+      hasProperty<{ removeListener: (type: string, callback: () => void) => void }>(
+        this.existingProvider,
+        'removeListener'
+      )
+    ) {
+      // @ts-ignore
+      this.removeListener = this.defaultRemoveListener
+    }
+    if (
+      hasProperty<{ removeAllListener: (type: string, callback: () => void) => void }>(
+        this.existingProvider,
+        'removeAllListener'
+      )
+    ) {
+      // @ts-ignore
+      this.removeAllListener = this.defaultRemoveAllListeners
+    }
+    if (hasProperty<{ reset: () => void }>(this.existingProvider, 'reset')) {
+      // @ts-ignore
+      this.reset = this.defaultReset
+    }
+  }
+
+  get connected() {
+    return (this.existingProvider as any).connected
+  }
+
+  supportsSubscriptions() {
+    return (this.existingProvider as any).supportsSubscriptions()
+  }
+
+  private defaultOn(type: string, callback: () => void): void {
+    ;(this.existingProvider as any).on(type, callback)
+  }
+
+  private defaultOnce(type: string, callback: () => void): void {
+    ;(this.existingProvider as any).once(type, callback)
+  }
+
+  private defaultRemoveListener(type: string, callback: () => void): void {
+    ;(this.existingProvider as any).removeListener(type, callback)
+  }
+
+  private defaultRemoveAllListeners(type: string): void {
+    ;(this.existingProvider as any).removeAllListeners(type)
+  }
+
+  private defaultReset(): void {
+    ;(this.existingProvider as any).reset()
   }
 }

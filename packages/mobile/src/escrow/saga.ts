@@ -22,18 +22,18 @@ import { CURRENCY_ENUM, SHORT_CURRENCIES } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import { Actions as IdentityActions, SetVerificationStatusAction } from 'src/identity/actions'
 import { addressToE164NumberSelector } from 'src/identity/reducer'
-import { NUM_ATTESTATIONS_REQUIRED, VerificationStatus } from 'src/identity/verification'
+import { VerificationStatus } from 'src/identity/types'
+import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
 import { TEMP_PW } from 'src/invite/saga'
 import { isValidPrivateKey } from 'src/invite/utils'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { navigateHome } from 'src/navigator/NavigationService'
 import { RootState } from 'src/redux/reducers'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { getCurrencyAddress } from 'src/tokens/saga'
 import { addStandbyTransaction, generateStandbyTransactionId } from 'src/transactions/actions'
-import { TransactionStatus } from 'src/transactions/reducer'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
+import { TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import {
   addLocalAccount,
@@ -221,7 +221,7 @@ function* reclaimFromEscrow({ paymentID }: EscrowReclaimPaymentAction) {
     yield put(fetchDollarBalance())
     yield put(fetchSentEscrowPayments())
 
-    yield call(navigate, Screens.WalletHome)
+    yield call(navigateHome)
     yield put(reclaimEscrowPaymentSuccess())
   } catch (e) {
     Logger.error(TAG + '@reclaimFromEscrow', 'Error reclaiming payment from escrow', e)

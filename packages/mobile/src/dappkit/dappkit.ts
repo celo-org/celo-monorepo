@@ -112,9 +112,11 @@ export function handleDappkitDeepLink(deepLink: string) {
         navigate(Screens.DappKitSignTxScreen, { dappKitRequest })
         break
       default:
+        navigate(Screens.ErrorScreen, { errorMessage: 'Unsupported dapp request type' })
         Logger.warn(TAG, 'Unsupported dapp request type')
     }
   } catch (error) {
+    navigate(Screens.ErrorScreen, { errorMessage: `Deep link not valid for dappkit: ${error}` })
     Logger.debug(TAG, `Deep link not valid for dappkit: ${error}`)
   }
 }

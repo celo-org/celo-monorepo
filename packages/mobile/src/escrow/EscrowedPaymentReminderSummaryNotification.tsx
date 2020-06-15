@@ -11,7 +11,7 @@ import { Namespaces, withTranslation } from 'src/i18n'
 import { inviteFriendsIcon } from 'src/images/Images'
 import { InviteDetails } from 'src/invite/actions'
 import { navigate } from 'src/navigator/NavigationService'
-import { Stacks } from 'src/navigator/Screens'
+import { Screens } from 'src/navigator/Screens'
 import SummaryNotification from 'src/notifications/SummaryNotification'
 
 interface OwnProps {
@@ -24,7 +24,7 @@ type Props = OwnProps & WithTranslation
 export class EscrowedPaymentReminderSummaryNotification extends React.Component<Props> {
   onReview = () => {
     CeloAnalytics.track(CustomEventNames.escrowed_payment_review)
-    navigate(Stacks.EscrowStack)
+    navigate(Screens.EscrowedPaymentListScreen)
   }
 
   itemRenderer = (item: EscrowedPayment) => {
@@ -38,7 +38,8 @@ export class EscrowedPaymentReminderSummaryNotification extends React.Component<
     ) : (
       <SummaryNotification<EscrowedPayment>
         items={payments}
-        title={t('escrowedPaymentReminder')}
+        title={t('escrowedPaymentReminderSummaryTitle', { count: payments.length })}
+        detailsI18nKey="walletFlow5:escrowedPaymentReminderSummaryDetails"
         icon={<Image source={inviteFriendsIcon} style={styles.image} resizeMode="contain" />}
         onReview={this.onReview}
         itemRenderer={this.itemRenderer}

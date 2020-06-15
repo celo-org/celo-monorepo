@@ -1,8 +1,9 @@
 import { DestroyArgv } from 'src/cmds/deploy/destroy'
 import { getInstanceName, getReleaseName, removeHelmRelease } from 'src/lib/blockscout'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { deleteCloudSQLInstance } from 'src/lib/helm_deploy'
-import { execCmdWithExitOnFailure, outputIncludes } from 'src/lib/utils'
+import { outputIncludes } from 'src/lib/utils'
 
 export const command = 'blockscout'
 export const describe = 'upgrade an existing deploy of the blockscout package'

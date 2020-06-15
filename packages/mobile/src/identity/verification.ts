@@ -5,21 +5,22 @@ import {
   AttestationsWrapper,
   UnselectedRequest,
 } from '@celo/contractkit/lib/wrappers/Attestations'
-import { eqAddress } from '@celo/utils/src/address'
+import { eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import { retryAsync } from '@celo/utils/src/async'
-import { extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
+import { AttestationsStatus, extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
 import { compressedPubKey } from '@celo/utils/src/commentEncryption'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import { Platform } from 'react-native'
 import { Task } from 'redux-saga'
 import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'
+import { setRetryVerificationWithForno } from 'src/account/actions'
 import { e164NumberSelector } from 'src/account/selectors'
-import { showError, showMessage } from 'src/alert/actions'
+import { showError, showErrorOrFallback, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { USE_PHONE_NUMBER_PRIVACY } from 'src/config'
+import { SMS_RETRIEVER_APP_SIGNATURE, USE_PHONE_NUMBER_PRIVACY } from 'src/config'
 import { refreshAllBalances } from 'src/home/actions'
 import {
   Actions,
@@ -30,9 +31,10 @@ import {
   resetVerification,
   setVerificationStatus,
 } from 'src/identity/actions'
-import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privacy'
+import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privateHashing'
 import { acceptedAttestationCodesSelector, attestationCodesSelector } from 'src/identity/reducer'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
+import { VerificationStatus } from 'src/identity/types'
 import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
@@ -43,17 +45,6 @@ const TAG = 'identity/verification'
 
 export const NUM_ATTESTATIONS_REQUIRED = 3
 export const VERIFICATION_TIMEOUT = 5 * 60 * 1000 // 5 minutes
-
-export enum VerificationStatus {
-  Failed = -1,
-  Stopped = 0,
-  Prepping = 1,
-  GettingStatus = 2,
-  RequestingAttestations = 3,
-  RevealingNumber = 4,
-  RevealAttemptFailed = 5,
-  Done = 6,
-}
 
 export enum CodeInputType {
   AUTOMATIC = 'automatic',
@@ -100,6 +91,7 @@ export function* startVerification() {
 
 export function* doVerificationFlow() {
   try {
+    CeloAnalytics.track(CustomEventNames.verification_start)
     yield put(setVerificationStatus(VerificationStatus.Prepping))
     const account: string = yield call(getConnectedUnlockedAccount)
     const e164Number: string = yield select(e164NumberSelector)
@@ -119,7 +111,7 @@ export function* doVerificationFlow() {
       }
     }
     const privDataKey = yield select(privateCommentKeySelector)
-    const dataKey = compressedPubKey(Buffer.from(privDataKey, 'hex'))
+    const dataKey = compressedPubKey(hexToBuffer(privDataKey))
 
     const contractKit = yield call(getContractKit)
 
@@ -195,19 +187,10 @@ export function* doVerificationFlow() {
     return true
   } catch (error) {
     Logger.error(TAG, 'Error occured during verification flow', error)
-    if (error.message in ErrorMessages) {
-      yield put(showError(error.message))
-    } else {
-      yield put(showError(ErrorMessages.VERIFICATION_FAILURE))
-    }
+    yield put(showErrorOrFallback(error, ErrorMessages.VERIFICATION_FAILURE))
     yield put(setVerificationStatus(VerificationStatus.Failed))
     return false
   }
-}
-
-interface AttestationsStatus {
-  isVerified: boolean // user has sufficiently many attestations?
-  numAttestationsRemaining: number // number of attestations still needed
 }
 
 // Requests if necessary additional attestations and returns all revealable attetations
@@ -225,6 +208,10 @@ export function* requestAndRetrieveAttestations(
     account
   )
 
+  // Any verification failure past this point will be after sending a tx
+  // so do not prompt forno retry as these failures are not always
+  // light client related, and account may have insufficient balance
+  yield put(setRetryVerificationWithForno(false))
   while (attestations.length < attestationsRemaining) {
     // Request any additional attestations beyond the original set
     yield call(
@@ -264,31 +251,18 @@ async function getAttestationsStatus(
 ): Promise<AttestationsStatus> {
   Logger.debug(TAG + '@getAttestationsStatus', 'Getting verification status from contract')
 
-  const attestationStats = await attestationsWrapper.getAttestationStat(phoneHash, account)
-  // Number of complete (verified) attestations
-  const numAttestationsCompleted = attestationStats.completed
-  // Total number of attestation requests made
-  const numAttestationRequests = attestationStats.total
-  // Number of attestations remaining to be verified
-  const numAttestationsRemaining = NUM_ATTESTATIONS_REQUIRED - numAttestationsCompleted
+  const attestationStatus = await attestationsWrapper.getVerifiedStatus(phoneHash, account)
 
   Logger.debug(
     TAG + '@getAttestationsStatus',
-    `${numAttestationsRemaining} verifications remaining. Total of ${numAttestationRequests} requested.`
+    `${attestationStatus.numAttestationsRemaining} verifications remaining. Total of ${attestationStatus.total} requested.`
   )
 
-  if (numAttestationsRemaining <= 0) {
+  if (attestationStatus.numAttestationsRemaining <= 0) {
     Logger.debug(TAG + '@getAttestationsStatus', 'User is already verified')
-    return {
-      isVerified: true,
-      numAttestationsRemaining,
-    }
   }
 
-  return {
-    isVerified: false,
-    numAttestationsRemaining,
-  }
+  return attestationStatus
 }
 
 function* requestAttestations(
@@ -490,13 +464,19 @@ function* tryRevealPhoneNumber(
   CeloAnalytics.track(CustomEventNames.verification_reveal_attestation, { issuer })
 
   try {
+    const smsAppSig =
+      Platform.OS === 'android' && USE_PHONE_NUMBER_PRIVACY
+        ? SMS_RETRIEVER_APP_SIGNATURE
+        : undefined
+
     const response = yield call(
       [attestationsWrapper, attestationsWrapper.revealPhoneNumberToIssuer],
       phoneHashDetails.e164Number,
       account,
       attestation.issuer,
       attestation.attestationServiceURL,
-      phoneHashDetails.salt
+      phoneHashDetails.salt,
+      smsAppSig
     )
     if (!response.ok) {
       const body = yield response.json()

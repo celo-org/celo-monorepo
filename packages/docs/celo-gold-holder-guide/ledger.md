@@ -13,7 +13,7 @@ The steps below require technical knowledge. You should be comfortable with the 
 Start by installing the Celo application and setting a PIN on your Ledger device by following steps 1 and 2 [on this page](https://www.ledger.com/start/).
 
 {% hint style="danger" %}
-Make sure to securely back up both the PIN and the recovery phrase, or mnemonic. If you lose them, or they are stolen, you lose access to your Celo assets with no recovery possible. The recovery phrase will be shown only once.
+Make sure to securely back up both the PIN and the recovery phrase (also known as a backup key or mnemonic). If you lose them, or they are stolen, you lose access to your Celo assets with no recovery possible. The recovery phrase will be shown only once.
 {% endhint %}
 
 Open the Ledger Live App on your computer and follow the instructions on the screen.
@@ -26,13 +26,17 @@ Click on the **Experimental features** menu.
 
 Turn on **Developer mode.**
 
+{% hint style="info" %}
+The Celo Ledger app has been approved by Ledger for inclusion in the developer store, and is undergoing additional review by the Ledger team before it is approved in the public store.
+{% endhint %}
+
 ![](https://storage.googleapis.com/celo-website/docs/ledger-settings-dev-mode.png)
 
 Exit the Settings menu by clicking on **Manager** on the left hand side bar.
 
 Search for “Celo” in the app store.
 
-Click **Install** for the Celo app, this will install the Celo App Version 1.0.1 on your device.
+Click **Install** for the Celo app, this will install the Celo App Version 1.0.3 on your device.
 
 ![](https://storage.googleapis.com/celo-website/docs/ledger-celo-app-install.png)
 
@@ -52,21 +56,7 @@ Quit the Ledger Live app on your compute but keep the Ledger wallet connected to
 
 On your Ledger Nano device enter the PIN if prompted and press both buttons at the same time to open into the `Celo app`.
 
-You will see `Pending Ledger review` on the device’s screen.
-
-{% hint style="info" %}
-`Pending Ledger review` means that the Celo app is approved to be in the developer store but undergoing additional reviews by the Leger team to be approved in the public store.
-{% endhint %}
-
 Press both buttons on the device at the same time to continue.
-
-Since most of the Celo CLI commands use smart contracts you will need to enable the Contract data option. In the Celo app navigate to `Settings` by toggling the buttons. Enter the menu by pressing both buttons at the same time.
-
-When you see `Contract data NOT Allowed` press both buttons at the same time to enable.
-
-You should now see `Contract data Allowed` on screen.
-
-Exit by toggling all the way to the right to the `Back` option and select by pressing both buttons at the same time.
 
 The Celo app is now ready for use and you should see `Application is ready` on the screen.
 
@@ -74,11 +64,19 @@ The Celo app is now ready for use and you should see `Application is ready` on t
 
 Now that you have installed the Celo app on to your ledger, you can begin to use it with the Celo CLI.
 
-Open the terminal application on your computer and install the Celo CLI (see [documentation](https://docs.celo.org/command-line-interface/introduction) for more information).
+Open the terminal application on your computer and install the [Celo CLI](https://docs.celo.org/command-line-interface/introduction):
 
 ```bash
- npm install -g @celo/celocli
+npm install -g @celo/celocli
 ```
+
+If you have previously installed the CLI, ensure that you are using version 0.0.47 or later:
+
+```bash
+celocli --version
+```
+
+And if not, upgrade by running the same command as above.
 
 You will now need to point the Celo CLI to a node that is synchronized with one of Celo’s networks. We’ll be using the [Alfajores Network](https://docs.celo.org/getting-started/alfajores-testnet).
 
@@ -88,9 +86,9 @@ Configure the Celo CLI so that it uses a cLabs node on the Alfajores network.
 celocli config:set --node https://alfajores-forno.celo-testnet.org/
 ```
 
-{% hint style="danger" %} Connecting celocli to an untrusted node may allow that node to influence the transactions sent by celocli to the Ledger for signing. When in doubt, always point celocli to a node that you trust or are running yourself. {% endhint %}
+{% hint style="danger" %} Connecting celocli to an untrusted node may allow that node to influence the transactions sent by the Celo CLI to the Ledger for signing. When in doubt, always use a node that you trust or are running yourself. {% endhint %}
 
-Check that the node is synchronized.
+Check that the node is synchronized:
 
 ```bash
 celocli node:synced
@@ -129,12 +127,6 @@ celocli account:list --useLedger --ledgerCustomAddresses "[M, N]"
 
 Before using your address on the Celo Mainnet, you may want to test it on the Celo Alfajores Testnet with the following instructions.
 
-Configure the Celo CLI so that it points to the Alfajores network.
-
-```bash
-celocli config:set --node https://alfajores-forno.celo-testnet.org/
-```
-
 Visit the Alfajores Faucet and send yourself some testnet Celo Gold at the following URL:
 
 https://celo.org/developers/faucet
@@ -142,7 +134,7 @@ https://celo.org/developers/faucet
 Check that you received the funds with the following command:
 
 ```bash
-celocli account:balance <your-address>
+celocli account:balance <your-address> --node https://alfajores-forno.celo-testnet.org/
 ```
 
 Next, you'll need to enable "Contract Data" in the ledger app. Open the Celo App on your ledger device and go to Settings, then enable "Contract Data" to "Allowed". This setting is required because the celocli uses the ERC20 "pre-wrapped" version of Celo Gold and so sending transactions requires sending data to a smart contract.
@@ -150,7 +142,7 @@ Next, you'll need to enable "Contract Data" in the ledger app. Open the Celo Ap
 Perform a test transaction by running the following command:
 
 ```bash
-celocli transfer:gold --from=<your-address> --to=0x0000000000000000000000000000000000000001 --value=10000 --useLedger
+celocli transfer:gold --from=<your-address> --to=0x0000000000000000000000000000000000000001 --value=10000 --useLedger --node https://alfajores-forno.celo-testnet.org/
 ```
 
 You'll need to then approve the transaction on the Ledger device. Toggle right on the device until you see `Approve` on screen. Press both buttons at the same time to confirm.
@@ -174,3 +166,6 @@ If you have issues connecting to the Ledger, try the following:
 - Try unplugging and replugging the device. Some devices appear to trigger a warning on Macs saying: “USB Devices Disabled. Unplug the device using too much power to re-enable USB devices” which is usually resolved by reconnecting.
 - Ensure that you are using the original cable supplied with your Ledger.
 - Ensure that your Ledger has the [latest firmware](https://support.ledger.com/hc/en-us/articles/360002731113-Update-device-firmware). For Ledger Nano S, a firmware version of 1.6 or later is required.
+- Ensure that you are running the latest version of the Celo CLI.
+
+There have been reports of a possible [issue](https://github.com/celo-org/celo-ledger-spender-app/issues/13) that appears to affect developer store apps on the Ledger Nano X including the Celo Ledger App. This is believed to be fixed in version 1.0.3. In earlier versions, a user clicking through the `Pending Ledger review` notice too rapidly can cause the device to freeze. If this occurs, wait until the device's battery is depleted, then charge and power up again. Then use Ledger Live Manager to update the installed version of the Celo Ledger App.

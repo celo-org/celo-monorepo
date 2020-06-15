@@ -18,32 +18,6 @@ exports[`BackupComplete renders correctly when social backup is complete 1`] = `
       }
     }
   >
-    <View
-      style={
-        Array [
-          Object {
-            "alignItems": "center",
-            "marginBottom": 20,
-          },
-          Object {},
-        ]
-      }
-    >
-      <Image
-        resizeMode="contain"
-        source={
-          Object {
-            "testUri": "../../../packages/mobile/src/images/coins-logo.png",
-          }
-        }
-        style={
-          Object {
-            "height": 70,
-            "width": 70,
-          }
-        }
-      />
-    </View>
     <Text
       style={
         Object {
@@ -81,60 +55,35 @@ exports[`BackupComplete renders correctly when social backup is not complete 1`]
       }
     }
   >
-    <View
-      style={
-        Array [
-          Object {
-            "alignItems": "center",
-            "marginBottom": 20,
-          },
-          Object {},
-        ]
-      }
+    <svg
+      fill="none"
+      height={32}
+      style={Object {}}
+      viewBox="0 0 18 18"
+      width={47}
+      xmlns="http://www.w3.org/2000/svg"
     >
-      <Image
-        resizeMode="contain"
-        source={
-          Object {
-            "testUri": "../../../packages/mobile/src/images/coins-logo.png",
-          }
-        }
-        style={
-          Object {
-            "height": 70,
-            "width": 70,
-          }
-        }
+      <rect
+        fill="#45CD86"
+        height="2"
+        rx="1"
+        style={Object {}}
+        transform="rotate(-135 6.89185 17.0205)"
+        width="8.33324"
+        x="6.89185"
+        y="17.0205"
       />
-    </View>
-    <Text
-      style={
-        Object {
-          "color": "#2E3338",
-          "fontFamily": "Hind-Light",
-          "fontSize": 22,
-          "marginTop": 20,
-          "paddingBottom": 20,
-          "paddingHorizontal": 40,
-          "textAlign": "center",
-        }
-      }
-    >
-      backupComplete.0
-    </Text>
-    <Text
-      style={
-        Object {
-          "color": "#2E3338",
-          "fontFamily": "Hind-Light",
-          "fontSize": 18,
-          "paddingHorizontal": 40,
-          "textAlign": "center",
-        }
-      }
-    >
-      backupComplete.1
-    </Text>
+      <rect
+        fill="#45CD86"
+        height="2"
+        rx="1"
+        style={Object {}}
+        transform="rotate(-45 5.47778 15.6064)"
+        width="14.9998"
+        x="5.47778"
+        y="15.6064"
+      />
+    </svg>
   </View>
 </SafeAreaView>
 `;

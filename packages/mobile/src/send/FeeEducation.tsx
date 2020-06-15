@@ -4,7 +4,6 @@ import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { sendFee } from 'src/images/Images'
 import { navigateBack } from 'src/navigator/NavigationService'
@@ -56,4 +55,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(withTranslation(Namespaces.sendFlow7)(FeeEducation))
+export default withTranslation(Namespaces.sendFlow7)(FeeEducation)

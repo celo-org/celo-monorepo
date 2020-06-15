@@ -24,7 +24,7 @@ const kit = newKit('https://alfajores-forno.celo-testnet.org')
 
 ## Initialize the Kit with your own node
 
-If you are hosting your own node (you can follow [this guide](../../getting-started/running-a-full-node-in-rc1.md) to run one) you can connect our ContractKit to it.
+If you are hosting your own node (you can follow [this guide](../../getting-started/running-a-full-node-in-mainnet.md) to run one) you can connect our ContractKit to it.
 
 ```ts
 import { newKit } from '@celo/contractkit'

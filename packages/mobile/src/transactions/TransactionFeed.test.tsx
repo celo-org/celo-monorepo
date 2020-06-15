@@ -4,8 +4,8 @@ import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { TokenTransactionType } from 'src/apollo/types'
-import { TransactionStatus } from 'src/transactions/reducer'
 import TransactionFeed, { FeedItem, FeedType } from 'src/transactions/TransactionFeed'
+import { TransactionStatus } from 'src/transactions/types'
 import { createMockStore } from 'test/utils'
 
 jest.mock('src/utils/time.ts')

@@ -2,7 +2,6 @@ import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { H1, H3 } from 'src/fonts/Fonts'
 import GoldStone from 'src/home/roadmap/GoldStone'
-import milestones, { Status } from 'src/home/roadmap/milestones'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import valueOFGold from 'src/icons/value-of-gold-no-axis.png'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
@@ -11,14 +10,35 @@ import CoinHalfFull from 'src/shared/CoinHalfFull'
 import HollowCoin from 'src/shared/HollowOval'
 import { hashNav } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles } from 'src/styles'
+import { Status } from './milestones'
 
-const UPCOMING = milestones.filter((milestone) => milestone.status !== Status.complete)
-const PAST = milestones.filter((milestone) => milestone.status === Status.complete)
-const PAST_CHRONOLOGICAL = PAST.slice().reverse()
+export interface MileStone {
+  date?: string
+  text: string
+  title: string
+  status: Status
+}
 
-export default React.memo(function TimeLine() {
+interface Props {
+  milestones: MileStone[]
+}
+
+export default React.memo(function TimeLine({ milestones }: Props) {
   const { t } = useTranslation(NameSpaces.home)
   const { isMobile } = useScreenSize()
+
+  const upcoming = React.useMemo(
+    () => milestones.filter((milestone) => milestone.status !== Status.complete).reverse(),
+    []
+  )
+
+  const past = React.useMemo(() => {
+    const happend = milestones.filter((milestone) => milestone.status === Status.complete)
+    if (isMobile) {
+      return happend.slice().reverse()
+    }
+    return happend
+  }, [isMobile, milestones])
 
   return (
     <>
@@ -39,19 +59,19 @@ export default React.memo(function TimeLine() {
         </Cell>
       </GridRow>
       <GridRow allStyle={styles.container}>
-        <Cell span={Spans.half} style={styles.fillSpace}>
+        <Cell span={Spans.half}>
           {isMobile && <Legend />}
           <Text style={subTitleStyle}>{t('timeline.pastTitle')}</Text>
-          {(isMobile ? PAST_CHRONOLOGICAL : PAST).map(({ key, date, status }, index) => {
+          {past.map(({ title, date, status, text }, index) => {
             return (
               <GoldStone
                 status={status}
-                key={key}
+                key={title}
                 index={index}
                 date={date}
-                title={t(`timeline.milestones.${key}.title`)}
-                text={t(`timeline.milestones.${key}.text`)}
-                isLast={index === PAST.length - 1}
+                title={title}
+                text={text}
+                isLast={index === past.length - 1}
               />
             )
           })}
@@ -59,14 +79,14 @@ export default React.memo(function TimeLine() {
         <Cell span={Spans.half}>
           {!isMobile && <Legend />}
           <Text style={subTitleStyle}>{t('timeline.upcomingTitle')}</Text>
-          {UPCOMING.map(({ key, status }, index) => (
+          {upcoming.map(({ title, status, text }, index) => (
             <GoldStone
               status={status}
-              key={key}
+              key={title}
               index={index}
-              title={t(`timeline.milestones.${key}.title`)}
-              text={t(`timeline.milestones.${key}.text`)}
-              isLast={index === UPCOMING.length - 1}
+              title={title}
+              text={text}
+              isLast={index === upcoming.length - 1}
             />
           ))}
         </Cell>

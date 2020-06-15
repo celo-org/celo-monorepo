@@ -11,7 +11,7 @@ import {
   CeloTransactionObject,
   proxyCall,
   proxySend,
-  stringToBytes,
+  stringToSolidityBytes,
   toTransactionObject,
   tupleParser,
   valueToBigNumber,
@@ -189,9 +189,9 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    * @dev Fails if the `signer` is not an account or previously authorized signer.
    * @return The associated account.
    */
-  async signerToAccount(signerAddress: Address, blockNumber?: number) {
+  async signerToAccount(signerAddress: Address) {
     const accounts = await this.kit.contracts.getAccounts()
-    return accounts.signerToAccount(signerAddress, blockNumber)
+    return accounts.signerToAccount(signerAddress)
   }
 
   /**
@@ -208,7 +208,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   ) => CeloTransactionObject<boolean> = proxySend(
     this.kit,
     this.contract.methods.updateBlsPublicKey,
-    tupleParser(stringToBytes, stringToBytes)
+    tupleParser(stringToSolidityBytes, stringToSolidityBytes)
   )
 
   /**
@@ -269,7 +269,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   }
 
   async getValidatorFromSigner(address: Address, blockNumber?: number): Promise<Validator> {
-    const account = await this.signerToAccount(address, blockNumber)
+    const account = await this.signerToAccount(address)
     if (eqAddress(account, NULL_ADDRESS) || !(await this.isValidator(account))) {
       return {
         name: 'Unregistered validator',
@@ -399,7 +399,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   ) => CeloTransactionObject<boolean> = proxySend(
     this.kit,
     this.contract.methods.registerValidator,
-    tupleParser(stringToBytes, stringToBytes, stringToBytes)
+    tupleParser(stringToSolidityBytes, stringToSolidityBytes, stringToSolidityBytes)
   )
 
   /**
@@ -552,10 +552,10 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       toBlock: blockNumber,
     })
     const validator: Validator[] = await concurrentMap(10, events, (e: EventLog) =>
-      this.getValidator(e.returnValues.validator, blockNumber)
+      this.getValidator(e.returnValues.validator)
     )
     const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) =>
-      this.getValidatorGroup(e.returnValues.group, false, blockNumber)
+      this.getValidatorGroup(e.returnValues.group, false)
     )
     return events.map(
       (e: EventLog, index: number): ValidatorReward => ({

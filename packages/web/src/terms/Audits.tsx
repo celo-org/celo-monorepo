@@ -25,7 +25,12 @@ const DATA: Audit[] = [
   },
   { auditor: 'Teserakt', title: 'Crypto Library Audit', type: 'security' },
   { auditor: 'Trailofbits', title: 'Security Audit', type: 'security' },
-  { auditor: 'Certora', title: 'Formal Verification of Smart Contracts', type: 'contracts' },
+  {
+    auditor: 'Certora',
+    title: 'Formal Verification of Celo Governance Protocols',
+    type: 'contracts',
+    link: 'https://www.certora.com/pubs/CeloMay2020.pdf',
+  },
   { auditor: 'Gauntlet', title: 'Stability Protocol Analysis', type: 'economics' },
   { auditor: 'Prysm Group', title: 'Economic Analysis', type: 'economics' },
   { auditor: 'NCC', title: 'Reserve Audit', type: 'economics' },

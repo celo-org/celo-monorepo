@@ -1,3 +1,4 @@
+import Checkmark from '@celo/react-components/icons/Checkmark'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
@@ -5,10 +6,8 @@ import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { exitBackupFlow } from 'src/app/actions'
 import { Namespaces, withTranslation } from 'src/i18n'
-import NuxLogo from 'src/icons/NuxLogo'
 import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -35,7 +34,7 @@ class BackupComplete extends React.Component<Props> {
   static navigationOptions = { header: null }
 
   componentDidMount() {
-    // Show success text for a while before leaving screen
+    // Show success check for a while before leaving screen
     const { backupCompleted, socialBackupCompleted } = this.props
     setTimeout(() => {
       if (socialBackupCompleted) {
@@ -54,13 +53,7 @@ class BackupComplete extends React.Component<Props> {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.innerContainer}>
-          <NuxLogo height={70} />
-          {backupCompleted && !socialBackupCompleted && (
-            <>
-              <Text style={styles.h1}>{t('backupComplete.0')}</Text>
-              <Text style={styles.h2}>{t('backupComplete.1')}</Text>
-            </>
-          )}
+          {backupCompleted && !socialBackupCompleted && <Checkmark height={32} />}
           {backupCompleted && socialBackupCompleted && (
             <Text style={styles.h1}>{t('backupComplete.2')}</Text>
           )}
@@ -91,8 +84,6 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-    exitBackupFlow,
-  })(withTranslation(Namespaces.backupKeyFlow6)(BackupComplete))
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+  exitBackupFlow,
+})(withTranslation(Namespaces.backupKeyFlow6)(BackupComplete))

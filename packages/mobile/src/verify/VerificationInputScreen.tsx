@@ -15,20 +15,19 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { hideAlert } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import CancelButton from 'src/components/CancelButton'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
 import { cancelVerification, receiveAttestationMessage } from 'src/identity/actions'
+import { VerificationStatus } from 'src/identity/types'
 import {
   AttestationCode,
   CodeInputType,
   NUM_ATTESTATIONS_REQUIRED,
-  VerificationStatus,
 } from 'src/identity/verification'
-import { navigate } from 'src/navigator/NavigationService'
+import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
@@ -37,7 +36,7 @@ import VerificationCodeRow from 'src/verify/VerificationCodeRow'
 const TAG = 'VerificationInputScreen'
 
 interface StateProps {
-  e164Number: string
+  e164Number: string | null
   attestationCodes: AttestationCode[]
   numCompleteAttestations: number
   verificationStatus: VerificationStatus
@@ -58,7 +57,6 @@ interface State {
   codeSubmittingStatuses: boolean[]
   isModalVisible: boolean
   isTipVisible: boolean
-  didFinish: boolean
 }
 
 const mapDispatchToProps = {
@@ -78,7 +76,7 @@ const mapStateToProps = (state: RootState): StateProps => {
 }
 
 class VerificationInputScreen extends React.Component<Props, State> {
-  static navigationOptions = { header: null }
+  static navigationOptions = { gestureEnabled: false, header: null }
 
   interval?: number
   keyboardDidShowListener?: EmitterSubscription
@@ -90,7 +88,6 @@ class VerificationInputScreen extends React.Component<Props, State> {
     codeSubmittingStatuses: [],
     isModalVisible: false,
     isTipVisible: false,
-    didFinish: false,
   }
 
   componentDidMount() {
@@ -103,8 +100,8 @@ class VerificationInputScreen extends React.Component<Props, State> {
     }, 1000)
   }
 
-  componentDidUpdate() {
-    if (this.isVerificationComplete()) {
+  componentDidUpdate(prevProps: Props) {
+    if (this.isVerificationComplete(prevProps)) {
       return this.finishVerification()
     }
     if (this.isCodeRejected() && this.isAnyCodeSubmitting()) {
@@ -116,8 +113,11 @@ class VerificationInputScreen extends React.Component<Props, State> {
     clearInterval(this.interval)
   }
 
-  isVerificationComplete = () => {
-    return this.props.numCompleteAttestations >= NUM_ATTESTATIONS_REQUIRED && !this.state.didFinish
+  isVerificationComplete = (prevProps: Props) => {
+    return (
+      prevProps.numCompleteAttestations < NUM_ATTESTATIONS_REQUIRED &&
+      this.props.numCompleteAttestations >= NUM_ATTESTATIONS_REQUIRED
+    )
   }
 
   isCodeRejected = () => {
@@ -133,9 +133,8 @@ class VerificationInputScreen extends React.Component<Props, State> {
 
   finishVerification = () => {
     Logger.debug(TAG + '@finishVerification', 'Verification finished, navigating to next screen.')
-    this.setState({ didFinish: true })
     this.props.hideAlert()
-    navigate(Screens.VerificationSuccessScreen)
+    navigate(Screens.ImportContacts)
   }
 
   onCancel = () => {
@@ -169,7 +168,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
 
   onPressSkip = () => {
     this.props.cancelVerification()
-    navigate(Screens.WalletHome)
+    navigateHome()
   }
 
   render() {
@@ -330,9 +329,7 @@ const styles = StyleSheet.create({
   modalSkipTextDisabled: { color: colors.celoGreenInactive },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    mapDispatchToProps
-  )(withTranslation(Namespaces.nuxVerification2)(VerificationInputScreen))
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation(Namespaces.nuxVerification2)(VerificationInputScreen))

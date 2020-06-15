@@ -12,13 +12,15 @@ import { showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION, USE_PHONE_NUMBER_PRIVACY } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
 import { CURRENCY_ENUM } from 'src/geth/consts'
+import { refreshAllBalances } from 'src/home/actions'
 import i18n from 'src/i18n'
 import { setHasSeenVerificationNux, updateE164PhoneNumberAddresses } from 'src/identity/actions'
+import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import {
   Actions,
   InviteBy,
@@ -55,7 +57,7 @@ import { fornoSelector } from 'src/web3/selectors'
 const TAG = 'invite/saga'
 export const TEMP_PW = 'ce10'
 export const REDEEM_INVITE_TIMEOUT = 2 * 60 * 1000 // 2 minutes
-const INVITE_FEE = '0.25'
+export const INVITE_FEE = '0.25'
 
 export async function getInviteTxGas(
   account: string,
@@ -63,13 +65,17 @@ export async function getInviteTxGas(
   amount: BigNumber.Value,
   comment: string
 ) {
-  const contractKit = await getContractKitOutsideGenerator()
-  const escrowContract = await contractKit.contracts.getEscrow()
-  return getSendTxGas(account, currency, {
-    amount,
-    comment,
-    recipientAddress: escrowContract.address,
-  })
+  try {
+    const contractKit = await getContractKitOutsideGenerator()
+    const escrowContract = await contractKit.contracts.getEscrow()
+    return getSendTxGas(account, currency, {
+      amount,
+      comment,
+      recipientAddress: escrowContract.address,
+    })
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function getInviteFee(
@@ -78,8 +84,12 @@ export async function getInviteFee(
   amount: string,
   comment: string
 ) {
-  const gas = await getInviteTxGas(account, currency, amount, comment)
-  return (await calculateFee(gas)).plus(getInvitationVerificationFeeInWei())
+  try {
+    const gas = await getInviteTxGas(account, currency, amount, comment)
+    return (await calculateFee(gas)).plus(getInvitationVerificationFeeInWei())
+  } catch (error) {
+    throw error
+  }
 }
 
 export function getInvitationVerificationFeeInDollars() {
@@ -195,16 +205,7 @@ export function* sendInvite(
 
     // If this invitation has a payment attached to it, send the payment to the escrow.
     if (currency === CURRENCY_ENUM.DOLLAR && amount) {
-      const escrowTxId = generateStandbyTransactionId(temporaryAddress + '-escrow')
-      try {
-        const phoneHash = getPhoneHash(e164Number)
-        yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress, escrowTxId))
-        yield call(waitForTransactionWithId, escrowTxId)
-        Logger.debug(TAG + '@sendInviteSaga', 'Escrowed money to new wallet')
-      } catch (e) {
-        Logger.error(TAG, 'Error sending payment to unverified user: ', e)
-        yield put(showError(ErrorMessages.ESCROW_TRANSFER_FAILED))
-      }
+      yield call(initiateEscrowTransfer, temporaryAddress, e164Number, amount)
     } else {
       Logger.error(TAG, 'Currently only dollar escrow payments are allowed')
     }
@@ -215,6 +216,25 @@ export function* sendInvite(
   } catch (e) {
     Logger.error(TAG, 'Send invite error: ', e)
     throw e
+  }
+}
+
+function* initiateEscrowTransfer(temporaryAddress: string, e164Number: string, amount: BigNumber) {
+  const escrowTxId = generateStandbyTransactionId(temporaryAddress + '-escrow')
+  try {
+    let phoneHash: string
+    if (USE_PHONE_NUMBER_PRIVACY) {
+      const phoneHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
+      phoneHash = phoneHashDetails.phoneHash
+    } else {
+      phoneHash = getPhoneHash(e164Number)
+    }
+    yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress, escrowTxId))
+    yield call(waitForTransactionWithId, escrowTxId)
+    Logger.debug(TAG + '@sendInviteSaga', 'Escrowed money to new wallet')
+  } catch (e) {
+    Logger.error(TAG, 'Error sending payment to unverified user: ', e)
+    yield put(showError(ErrorMessages.ESCROW_TRANSFER_FAILED))
   }
 }
 
@@ -323,6 +343,7 @@ export function* skipInvite() {
   Logger.debug(TAG + '@skipInvite', 'Skip invite action taken, creating account')
   try {
     yield call(getOrCreateAccount)
+    yield put(refreshAllBalances())
     yield put(setHasSeenVerificationNux(true))
     Logger.debug(TAG + '@skipInvite', 'Done skipping invite')
     navigateHome()

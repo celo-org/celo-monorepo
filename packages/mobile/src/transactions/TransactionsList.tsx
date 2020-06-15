@@ -5,24 +5,26 @@ import { Query, QueryResult } from 'react-apollo'
 import { connect } from 'react-redux'
 import { MoneyAmount, Token, TokenTransactionType, UserTransactionsQuery } from 'src/apollo/types'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
-import { refreshAllBalances } from 'src/home/actions'
 import { SENTINEL_INVITE_COMMENT } from 'src/invite/actions'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import { RootState } from 'src/redux/reducers'
-import { removeStandbyTransaction } from 'src/transactions/actions'
+import { newTransactionsInFeed } from 'src/transactions/actions'
+import { knownFeedTransactionsSelector, KnownFeedTransactionsType } from 'src/transactions/reducer'
+import TransactionFeed, { FeedItem, FeedType } from 'src/transactions/TransactionFeed'
+import { getNewTxsFromUserTxQuery, getTxsFromUserTxQuery } from 'src/transactions/transferFeedUtils'
 import {
   ExchangeStandby,
   StandbyTransaction,
   TransactionStatus,
   TransferStandby,
-} from 'src/transactions/reducer'
-import TransactionFeed, { FeedItem, FeedType } from 'src/transactions/TransactionFeed'
-import { isPresent } from 'src/utils/typescript'
+} from 'src/transactions/types'
+import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
 
+const TAG = 'transactions/TransactionsList'
 // Query poll interval
-const POLL_INTERVAL = 10000 // 10 secs
+export const POLL_INTERVAL = 10000 // 10 secs
 
 interface OwnProps {
   currency: CURRENCY_ENUM
@@ -33,11 +35,11 @@ interface StateProps {
   standbyTransactions: StandbyTransaction[]
   localCurrencyCode: LocalCurrencyCode
   localCurrencyExchangeRate: string | null | undefined
+  knownFeedTransactions: KnownFeedTransactionsType
 }
 
 interface DispatchProps {
-  removeStandbyTransaction: typeof removeStandbyTransaction
-  refreshAllBalances: typeof refreshAllBalances
+  newTransactionsInFeed: typeof newTransactionsInFeed
 }
 
 type Props = OwnProps & StateProps & DispatchProps
@@ -61,6 +63,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   standbyTransactions: state.transactions.standbyTransactions,
   localCurrencyCode: getLocalCurrencyCode(state),
   localCurrencyExchangeRate: getLocalCurrencyExchangeRate(state),
+  knownFeedTransactions: knownFeedTransactionsSelector(state),
 })
 
 function resolveAmount(
@@ -209,26 +212,15 @@ function mapInvite(tx: FeedItem): FeedItem {
   return tx
 }
 
-function getTransactions(data: UserTransactionsQuery | undefined) {
-  return data?.tokenTransactions?.edges.map((edge) => edge.node).filter(isPresent) ?? []
-}
-
 export class TransactionsList extends React.PureComponent<Props> {
-  txsFetched = (data: UserTransactionsQuery | undefined) => {
-    const transactions = getTransactions(data)
-    if (transactions.length < 1) {
+  onTxsFetched = (data: UserTransactionsQuery | undefined) => {
+    Logger.debug(TAG, 'onTxsFetched handler triggered')
+    const newTxs = getNewTxsFromUserTxQuery(data, this.props.knownFeedTransactions)
+    if (!newTxs || !newTxs.length) {
       return
     }
-    // Transaction list has changed and we need to refresh the balances
-    this.props.refreshAllBalances()
 
-    const queryDataTxHashes = new Set(transactions.map((tx) => tx?.hash))
-    const inQueryTxs = (tx: StandbyTransaction) =>
-      tx.hash && queryDataTxHashes.has(tx.hash) && tx.status !== TransactionStatus.Failed
-    const filteredStandbyTxs = this.props.standbyTransactions.filter(inQueryTxs)
-    filteredStandbyTxs.forEach((tx) => {
-      this.props.removeStandbyTransaction(tx.id)
-    })
+    this.props.newTransactionsInFeed(newTxs)
   }
 
   render() {
@@ -244,8 +236,12 @@ export class TransactionsList extends React.PureComponent<Props> {
     const token = currency === CURRENCY_ENUM.GOLD ? Token.CGld : Token.CUsd
     const kind = currency === CURRENCY_ENUM.GOLD ? FeedType.EXCHANGE : FeedType.HOME
 
-    const UserTransactions = ({ loading, error, data }: QueryResult) => {
-      const transactions = getTransactions(data).map((transaction) => ({
+    const UserTransactions = ({
+      loading,
+      error,
+      data,
+    }: QueryResult<UserTransactionsQuery | undefined>) => {
+      const transactions = getTxsFromUserTxQuery(data).map((transaction) => ({
         ...transaction,
         status: TransactionStatus.Complete,
       }))
@@ -276,14 +272,17 @@ export class TransactionsList extends React.PureComponent<Props> {
         query={TRANSACTIONS_QUERY}
         pollInterval={POLL_INTERVAL}
         variables={{ address: queryAddress, token, localCurrencyCode }}
-        onCompleted={this.txsFetched}
         children={UserTransactions}
+        onCompleted={this.onTxsFetched}
+        // Adding this option because the onCompleted doesn't work properly without it.
+        // It causes the onCompleted to trigger too often but that's okay.
+        // https://github.com/apollographql/react-apollo/issues/2293
+        notifyOnNetworkStatusChange={true}
       />
     )
   }
 }
 
 export default connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
-  removeStandbyTransaction,
-  refreshAllBalances,
+  newTransactionsInFeed,
 })(TransactionsList)
