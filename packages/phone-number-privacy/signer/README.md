@@ -11,7 +11,8 @@ You can use the following environment variables to configure the Phone Number Pr
 - `DB_HOST` - The URL under which your database is accessible. Supports Postgres, MSSQL, MySQL, MariaDB, SQLite3, Oracle.
 - `DB_USERNAME` - DB configuration: The DB username (postgres by default).
 - `DB_PASSWORD` - DB configuration: The DB password.
-- `DB_DATABASE` DB configuration: The DB database name (phoneNumberPrivacy by default).
+- `DB_DATABASE` - DB configuration: The DB database name (phoneNumberPrivacy by default).
+- `DB_USE_SSL` - DB configuration: Use SSL connection to the database (true by default).
 
 ### Blockchain provider
 

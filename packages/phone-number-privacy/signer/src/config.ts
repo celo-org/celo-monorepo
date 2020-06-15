@@ -78,7 +78,7 @@ const config: Config = {
     password: env.DB_PASSWORD,
     database: env.DB_DATABASE,
     host: env.DB_HOST,
-    ssl: !DEV_MODE,
+    ssl: env.DB_USE_SSL ?? true,
   },
   keystore: {
     type: env.KEYSTORE_TYPE,
