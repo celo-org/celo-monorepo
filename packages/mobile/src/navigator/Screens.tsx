@@ -1,6 +1,7 @@
 export enum Screens {
   AppLoading = 'AppLoading',
   Account = 'Account',
+  AccountKeyEducation = 'AccountKeyEducation',
   Analytics = 'Analytics',
   BackupComplete = 'BackupComplete',
   BackupIntroduction = 'BackupIntroduction',
@@ -13,7 +14,6 @@ export enum Screens {
   DappKitTxDataScreen = 'DappKitTxDataScreen',
   DataSaver = 'DataSaver',
   Debug = 'Debug',
-  DollarEducation = 'DollarEducation',
   DrawerNavigator = 'DrawerNavigator',
   EditProfile = 'EditProfile',
   EnterInviteCode = 'EnterInviteCode',
@@ -46,6 +46,7 @@ export enum Screens {
   PhotosNUX = 'PhotosNUX',
   Profile = 'Profile',
   PhoneNumberLookupQuota = 'PhoneNumberLookupQuota',
+  QRNavigator = 'QRNavigator',
   QRCode = 'QRCode',
   QRScanner = 'QRScanner',
   ReclaimPaymentConfirmationScreen = 'ReclaimPaymentConfirmationScreen',
@@ -69,6 +70,6 @@ export enum Screens {
   VerificationInterstitialScreen = 'VerificationInterstitialScreen',
   VerificationLearnMoreScreen = 'VerificationLearnMoreScreen',
   VerificationLoadingScreen = 'VerificationLoadingScreen',
-  VerificationSuccessScreen = 'VerificationSuccessScreen',
+  OnboardingSuccessScreen = 'OnboardingSuccessScreen',
   WalletHome = 'WalletHome',
 }

@@ -20,7 +20,7 @@ import {
   getAddressesFromLookupResult,
   lookupAttestationIdentifiers,
 } from 'src/identity/contactMapping'
-import { getUserSelfPhoneHashDetails, PhoneNumberHashDetails } from 'src/identity/privacy'
+import { getUserSelfPhoneHashDetails, PhoneNumberHashDetails } from 'src/identity/privateHashing'
 import {
   AddressToE164NumberType,
   e164NumberToAddressSelector,

@@ -13,13 +13,14 @@ import { PaymentRequestStatus } from 'src/account/types'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
+import BackButton from 'src/components/BackButton.v2'
 import CommentTextInput from 'src/components/CommentTextInput'
 import CurrencyDisplay, { DisplayType } from 'src/components/CurrencyDisplay'
 import TotalLineItem from 'src/components/TotalLineItem.v2'
 import { writePaymentRequest } from 'src/firebase/actions'
 import { currencyToShortMap } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { navigateBack } from 'src/navigator/NavigationService'
+import { emptyHeader } from 'src/navigator/Headers.v2'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { getDisplayName, getRecipientThumbnail } from 'src/recipients/recipient'
@@ -33,7 +34,7 @@ import { currentAccountSelector } from 'src/web3/selectors'
 const TAG = 'paymentRequest/confirmation'
 
 interface StateProps {
-  e164PhoneNumber: string
+  e164PhoneNumber: string | null
   account: string | null
   confirmationInput: ConfirmationInput
   addressJustValidated?: boolean
@@ -68,6 +69,11 @@ type OwnProps = StackScreenProps<StackParamList, Screens.PaymentRequestConfirmat
 
 type Props = DispatchProps & StateProps & WithTranslation & OwnProps
 
+export const paymentConfirmationScreenNavOptions = () => ({
+  ...emptyHeader,
+  headerLeft: () => <BackButton eventName={CustomEventNames.request_confirm_back} />,
+})
+
 class PaymentRequestConfirmation extends React.Component<Props> {
   state = {
     comment: '',
@@ -91,11 +97,6 @@ class PaymentRequestConfirmation extends React.Component<Props> {
 
   onConfirm = async () => {
     const { amount, recipient, recipientAddress: requesteeAddress } = this.props.confirmationInput
-
-    CeloAnalytics.track(CustomEventNames.request_payment_request, {
-      requesteeAddress,
-    })
-
     const { t } = this.props
     if (!recipient || (!recipient.e164PhoneNumber && !recipient.address)) {
       throw new Error("Can't request from recipient without valid e164 number or a wallet address")
@@ -116,7 +117,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
       // Would help with protection of PII but would possibly make the UX worst?
       timestamp: new Date(),
       requesterAddress: address,
-      requesterE164Number: this.props.e164PhoneNumber,
+      requesterE164Number: this.props.e164PhoneNumber ? this.props.e164PhoneNumber : undefined,
       requesteeAddress,
       currency: currencyToShortMap[CURRENCY_ENUM.DOLLAR],
       comment: this.state.comment,
@@ -124,13 +125,9 @@ class PaymentRequestConfirmation extends React.Component<Props> {
       notified: false,
     }
 
+    CeloAnalytics.track(CustomEventNames.request_confirm, { requesteeAddress })
     this.props.writePaymentRequest(paymentInfo)
     Logger.showMessage(t('requestSent'))
-  }
-
-  onPressEdit = () => {
-    CeloAnalytics.track(CustomEventNames.request_payment_edit)
-    navigateBack()
   }
 
   renderFooter = () => {
