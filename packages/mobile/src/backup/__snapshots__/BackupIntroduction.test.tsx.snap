@@ -442,7 +442,8 @@ exports[`BackupIntroduction renders correctly when backup not complete 1`] = `
                 "backgroundColor": "#1AB775",
                 "height": 48,
                 "justifyContent": "center",
-                "minWidth": 98,
+                "minWidth": 120,
+                "opacity": undefined,
                 "paddingHorizontal": 16,
                 "paddingVertical": 5,
               }

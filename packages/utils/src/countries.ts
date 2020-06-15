@@ -102,7 +102,7 @@ export class Countries {
           'es-419': esData[country.alpha2],
         }
 
-        const displayName = names[this.language]
+        const displayName = names[this.language] || country.name
 
         // We only use the first calling code, others are irrelevant in the current dataset.
         // Also some one them have a non standard calling code

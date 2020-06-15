@@ -170,7 +170,8 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
                   "backgroundColor": "#1AB775",
                   "height": 48,
                   "justifyContent": "center",
-                  "minWidth": 98,
+                  "minWidth": 120,
+                  "opacity": undefined,
                   "paddingHorizontal": 16,
                   "paddingVertical": 5,
                 }
@@ -959,7 +960,8 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                   "backgroundColor": "#1AB775",
                   "height": 48,
                   "justifyContent": "center",
-                  "minWidth": 98,
+                  "minWidth": 120,
+                  "opacity": undefined,
                   "paddingHorizontal": 16,
                   "paddingVertical": 5,
                 }
