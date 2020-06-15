@@ -6,7 +6,8 @@ import { colors, textStyles } from 'src/styles'
 
 export enum NavigationTheme {
   LIGHT,
-  DARK,
+  DARKGOLD,
+  DARKGREEN,
 }
 
 interface Props {
@@ -14,26 +15,25 @@ interface Props {
   onPress?: () => void
   text: string
   selected: boolean
-  theme?: NavigationTheme
+  theme: NavigationTheme
   style?: StyleProp<ViewStyle>
 }
 
 export default function Navigation({ link, text, selected, onPress, theme, style }: Props) {
+  const isDark = theme === NavigationTheme.DARKGOLD || theme === NavigationTheme.DARKGREEN
+  const isGold = theme === NavigationTheme.DARKGOLD
   return (
     <View style={[styles.linkWrapper, style]}>
       <Button
         style={[textStyles.medium, !selected && styles.notSelected]}
-        kind={theme !== NavigationTheme.DARK ? BTN.NAV : BTN.DARKNAV}
+        kind={isDark ? BTN.DARKNAV : BTN.NAV}
         href={link}
         text={text}
         onPress={onPress}
       />
       {selected && (
         <View style={styles.activeTab}>
-          <OvalCoin
-            color={theme !== NavigationTheme.DARK ? colors.primary : colors.gold}
-            size={10}
-          />
+          <OvalCoin color={isGold ? colors.gold : colors.primary} size={10} />
         </View>
       )}
     </View>
