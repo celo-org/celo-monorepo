@@ -1,4 +1,4 @@
-import { Response } from 'firebase-functions'
+import { Response } from 'express'
 import logger from './logger'
 
 export enum ErrorMessages {
@@ -12,6 +12,7 @@ export enum ErrorMessages {
   DUPLICATE_REQUEST_TO_MATCHMAKE = 'CELO_PNP_ERR_08 Attempt to request >1 matchmaking',
   UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE = 'CELO_PNP_ERR_09 Unverified user attempting to matchmake',
   UNAUTHENTICATED_USER = 'CELO_PNP_ERR_10 Missing or invalid authentication header',
+  KEY_FETCH_ERROR = 'CELO_PNP_ERR_11 Failed to retrieve key from keystore',
 }
 
 export function respondWithError(res: Response, statusCode: number, error: ErrorMessages) {

@@ -28,6 +28,11 @@ export type StackParamList = {
   [Screens.Analytics]: undefined
   [Screens.BackupComplete]: undefined
   [Screens.BackupIntroduction]: undefined
+  [Screens.AccountKeyEducation]:
+    | undefined
+    | {
+        nextScreen: keyof StackParamList
+      }
   [Screens.BackupPhrase]: undefined
   [Screens.BackupQuiz]: undefined
   [Screens.BackupSocial]: undefined
@@ -47,7 +52,6 @@ export type StackParamList = {
     promptModalVisible: boolean
   }
   [Screens.Debug]: undefined
-  [Screens.DollarEducation]: undefined
   [Screens.DrawerNavigator]: undefined
   [Screens.EditProfile]: undefined
   [Screens.EnterInviteCode]: undefined
@@ -141,6 +145,7 @@ export type StackParamList = {
   [Screens.SendConfirmation]: {
     transactionData: TransactionDataInput
     addressJustValidated?: boolean
+    isFromScan?: boolean
   }
   [Screens.SetClock]: undefined
   [Screens.Settings]: undefined
@@ -156,11 +161,13 @@ export type StackParamList = {
     transactionData: TransactionDataInput
     addressValidationType: AddressValidationType
     isPaymentRequest?: true
+    isFromScan?: boolean
   }
   [Screens.ValidateRecipientAccount]: {
     transactionData: TransactionDataInput
     addressValidationType: AddressValidationType
     isPaymentRequest?: true
+    isFromScan?: boolean
   }
   [Screens.VerificationEducationScreen]: undefined
   [Screens.VerificationInputScreen]: undefined
