@@ -59,6 +59,7 @@ import {
   HeaderTitleWithSubtitle,
   headerWithBackButton,
   headerWithCancelButton,
+  headerWithCloseButton,
   noHeader,
   nuxNavigationOptions,
   nuxNavigationOptionsNoBackButton,
@@ -583,7 +584,7 @@ function RootStackScreen() {
         name={Screens.SelectCountry}
         component={SelectCountry}
         options={{
-          ...headerWithBackButton,
+          ...headerWithCloseButton,
           headerTitle: i18n.t('accountScreen10:selectCountryCode'),
           headerTransparent: false,
         }}
