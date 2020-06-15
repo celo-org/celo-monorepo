@@ -110,7 +110,7 @@ async function getVerifiedDomains(
   return domains
 }
 
-async function processDomainClaims(item: { url: string; address: string }) {
+async function processDomainClaimForValidator(item: { url: string; address: string }) {
   const itemLogger = operationalLogger.child({ url: item.url, address: item.address })
   try {
     itemLogger.debug('fetch_metadata')
@@ -127,11 +127,36 @@ async function processDomainClaims(item: { url: string; address: string }) {
         verfiedAccountClaims: verifiedAccounts.length,
         verifiedDomainClaims: verifiedDomains.length,
       },
-      'processDomainClaims done'
+      'processDomainClaimForValidator done'
     )
   } catch (err) {
-    itemLogger.error({ err }, 'processDomainClaims error')
+    itemLogger.error({ err }, 'processDomainClaimForValidator error')
   }
+}
+
+async function processDomainClaims() {
+  let items: { address: string; url: string }[] = await jsonQuery(
+    `SELECT address, url FROM celo_account WHERE url is NOT NULL `
+  )
+
+  operationalLogger.debug({ length: items.length }, 'fetching all accounts')
+
+  items = items || []
+  items = items.map((a) => ({
+    ...a,
+    // Addresses are stored by blockscout as just the bytes prepended with \x
+    address: normalizeAddressWith0x(a.address.substr(2)),
+  }))
+
+  return concurrentMap(CONCURRENCY, items, (item) => processDomainClaimForValidator(item))
+    .then(() => {
+      operationalLogger.info('Closing DB connecting and finishing')
+    })
+    .catch((err) => {
+      operationalLogger.error({ err }, 'processDomainClaimForValidator error')
+      client.end()
+      process.exit(1)
+    })
 }
 
 async function processAttestationServiceStatusForValidator(
@@ -204,43 +229,7 @@ async function main() {
     client.connect()
   })
 
-  let items: { address: string; url: string }[] = await jsonQuery(
-    `SELECT address, url FROM celo_account WHERE url is NOT NULL `
-  )
-
-  // TODO: Fetch addresses which have
-  // not opted in
-  // opted in but not registered a metadata URL
-
-  operationalLogger.debug({ length: items.length }, 'fetching all accounts')
-
-  items = items || []
-  items = items.map((a) => ({
-    ...a,
-    // Addresses are stored by blockscout as just the bytes prepended with \x
-    address: normalizeAddressWith0x(a.address.substr(2)),
-  }))
-
-  // const itemIndex = new Set()
-  // items.forEach((item) => itemIndex.add(item.address))
-
-  // const validatorsWithoutMetadataURL = validators.filter(
-  //   (validator) => !itemIndex.has(validator.address)
-  // )
-  // const validatorsWithMetadataURL = validators.filter((validator) =>
-  //   itemIndex.has(validator.address)
-  // )
-
-  await concurrentMap(CONCURRENCY, items, (item) => processDomainClaims(item))
-    .then(() => {
-      operationalLogger.info('Closing DB connecting and finishing')
-    })
-    .catch((err) => {
-      operationalLogger.error({ err }, 'processDomainClaims error')
-      client.end()
-      process.exit(1)
-    })
-
+  await processDomainClaims()
   await processAttestationServices()
 
   client.end()
