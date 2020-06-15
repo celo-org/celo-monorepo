@@ -51,6 +51,7 @@ export default function SelectCountry({ navigation, route }: Props) {
         country={country}
         onSelect={onSelect}
         isSelected={country.alpha2 === selectedCountryCodeAlpha2}
+        testID={`Country_${country.alpha2}`}
       />
     ),
     [selectedCountryCodeAlpha2]

@@ -1,4 +1,4 @@
-import { skipTo, sleep, enterPinUi, inputNumberKeypad } from './utils'
+import { enterPinUi, inputNumberKeypad, sleep } from './utils'
 
 const ENABLE_CONTACT_IMPORT = false
 
@@ -52,7 +52,9 @@ describe('Transfer Works', () => {
 
     await element(by.id('NameEntry')).replaceText(EXAMPLE_NAME)
 
-    await element(by.id('CountryNameFieldTextInput')).replaceText(VERIFICATION_COUNTRY)
+    await element(by.id('CountrySelectionButton')).tap()
+    await element(by.id('SearchInput')).replaceText(VERIFICATION_COUNTRY)
+    await element(by.id('Country_DE')).tap()
 
     await expect(element(by.id('PhoneNumberField'))).toBeVisible()
     await element(by.id('PhoneNumberField')).replaceText(VERIFICATION_PHONE_NUMBER)
