@@ -246,28 +246,14 @@ jobs:
             HOMEBREW_NO_AUTO_UPDATE=1 brew install tree coreutils
       # Currently not used
       # - run: npm install --global react-native-kill-packager
+      - yarn_install
       - run:
-          # need to run this because it's another OS than install_dependencies job
-          name: yarn
+          name: Build mobile dependencies
           command: |
-            # TODO, Make cache work and figure out why this doesn't work
-            # if [ ! -d node_modules ]; then
-            #     echo "No cache found, install yarn. Hold tight."
-            #     yarn
-            # else
-            #   echo "Cache found, just run post-script."
-            #   yarn postinstall
-            # fi
-            yarn || yarn
+            set -euo pipefail
             yarn build \
               --scope @celo/mobile \
               --include-filtered-dependencies
-      - save_cache:
-          key: yarn-v4-macos-{{ .Branch }}-{{ checksum "yarn.lock" }}
-          paths:
-            - ~/src/node_modules
-            - ~/src/packages/*/node_modules
-            - ~/.cache/yarn
       - run:
           name: Install some extra dependencies the app needs
           command: HOMEBREW_NO_AUTO_UPDATE=1 brew install pidcat watchman
