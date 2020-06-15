@@ -113,5 +113,7 @@
   },
   "transferAddressChanged": "Este contacto cambió su número de cuenta desde la transacción. Este pago fue enviado a:",
   "addressConfirmed": "Número de cuenta confirmado",
-  "sending": "Enviando"
+  "sending": "Enviando",
+  "feeActual": "Tarifas",
+  "feeEstimate": "Tarifas estimadas"
 }
