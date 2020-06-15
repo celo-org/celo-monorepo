@@ -13,7 +13,7 @@ reference:
     environment:
       TERM: dumb
       _JAVA_OPTIONS: '-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap'
-      GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs=“-Xmx6000m -XX:+HeapDumpOnOutOfMemoryError”'
+      GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx6000m -XX:+HeapDumpOnOutOfMemoryError"'
 
 defaults: &defaults
   working_directory: ~/app
