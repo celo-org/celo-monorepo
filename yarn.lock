@@ -2591,6 +2591,13 @@
     p-defer "^3.0.0"
     protobufjs "^6.8.1"
 
+"@google-cloud/secret-manager@3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@google-cloud/secret-manager/-/secret-manager-3.0.0.tgz#31842287bd0eee380210488ae40cae3732b2b32f"
+  integrity sha512-ZAWoqiMbWv2Osx6Enq6TLPw/LR8kuSUWKhAsaJVy+q1GCR7clVNVuaPhizWIc4p88QYjW0h2j/wUBJ6OKFUmAw==
+  dependencies:
+    google-gax "^2.0.1"
+
 "@google-cloud/storage@^2.4.3":
   version "2.4.3"
   resolved "https://registry.yarnpkg.com/@google-cloud/storage/-/storage-2.4.3.tgz#d52a1937f3ea0ad3e13e947fab6154c76ab0d4ca"
@@ -2925,7 +2932,7 @@
   dependencies:
     semver "^6.2.0"
 
-"@grpc/grpc-js@~1.0.3":
+"@grpc/grpc-js@~1.0.0", "@grpc/grpc-js@~1.0.3":
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.0.5.tgz#09948c0810e62828fdd61455b2eb13d7879888b0"
   integrity sha512-Hm+xOiqAhcpT9RYM8lc15dbQD7aQurM7ZU8ulmulepiPlN7iwBXXwP3vSBUimoFoApRqz7pSIisXU8pZaCB4og==
@@ -12757,7 +12764,7 @@ ecc-jsbn@~0.1.1:
   dependencies:
     jsbn "~0.1.0"
 
-ecdsa-sig-formatter@1.0.11:
+ecdsa-sig-formatter@1.0.11, ecdsa-sig-formatter@^1.0.11:
   version "1.0.11"
   resolved "https://registry.yarnpkg.com/ecdsa-sig-formatter/-/ecdsa-sig-formatter-1.0.11.tgz#ae0f0fa2d85045ef14a817daa3ce9acd0489e5bf"
   integrity sha512-nagl3RYrbNv6kQkeJIpt6NJZy8twLB/2vtz6yN9Z4vRKHN4/QZJIEbqohALSgwKdnksuY3k5Addp5lg8sVoVcQ==
@@ -15678,6 +15685,17 @@ gaxios@^2.0.0, gaxios@^2.0.1, gaxios@^2.1.0:
     is-stream "^2.0.0"
     node-fetch "^2.3.0"
 
+gaxios@^3.0.0:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/gaxios/-/gaxios-3.0.3.tgz#497730758f5b0d43a32ebdbebe5f1bd9f7db7aed"
+  integrity sha512-PkzQludeIFhd535/yucALT/Wxyj/y2zLyrMwPcJmnLHDugmV49NvAi/vb+VUq/eWztATZCNcb8ue+ywPG+oLuw==
+  dependencies:
+    abort-controller "^3.0.0"
+    extend "^3.0.2"
+    https-proxy-agent "^5.0.0"
+    is-stream "^2.0.0"
+    node-fetch "^2.3.0"
+
 gaze@^1.0.0:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/gaze/-/gaze-1.1.2.tgz#847224677adb8870d679257ed3388fdb61e40105"
@@ -15699,6 +15717,14 @@ gcp-metadata@^3.1.0, gcp-metadata@^3.3.0:
   integrity sha512-RrASg1HaVAxoB9Q/8sYfJ++v9PMiiqIgOrOxZeagMgS4osZtICT1lKBx2uvzYgwetxj8i6K99Z0iuKMg7WraTg==
   dependencies:
     gaxios "^2.1.0"
+    json-bigint "^0.3.0"
+
+gcp-metadata@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/gcp-metadata/-/gcp-metadata-4.1.0.tgz#8b9b5903882076948554af471c838e7ea2f564b4"
+  integrity sha512-r57SV28+olVsflPlKyVig3Muo/VDlcsObMtvDGOEtEJXj+DDE8bEl0coIkXh//hbkSDTvo+f5lbihZOndYXQQQ==
+  dependencies:
+    gaxios "^3.0.0"
     json-bigint "^0.3.0"
 
 gcs-resumable-upload@^1.0.0:
@@ -16520,6 +16546,21 @@ google-auth-library@^5.0.0, google-auth-library@^5.2.2, google-auth-library@^5.5
     jws "^4.0.0"
     lru-cache "^5.0.0"
 
+google-auth-library@^6.0.0:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/google-auth-library/-/google-auth-library-6.0.1.tgz#b5bbff2583f024188a37920cb509e194f2cc4dd2"
+  integrity sha512-NWEM9W0o+fmUJMK/wEuJ1vAc8H/JAseOWB8tjOAAkz8yobU+5IDtO/rPCbbRwFF1obIOCe0lj1pkq9ld2OFZeg==
+  dependencies:
+    arrify "^2.0.0"
+    base64-js "^1.3.0"
+    ecdsa-sig-formatter "^1.0.11"
+    fast-text-encoding "^1.0.0"
+    gaxios "^3.0.0"
+    gcp-metadata "^4.1.0"
+    gtoken "^5.0.0"
+    jws "^4.0.0"
+    lru-cache "^5.0.0"
+
 google-gax@^0.25.0:
   version "0.25.5"
   resolved "https://registry.yarnpkg.com/google-gax/-/google-gax-0.25.5.tgz#90b1f63929f92f8d75a6c284356e2ff5c62e4511"
@@ -16558,6 +16599,26 @@ google-gax@^1.11.0, google-gax@^1.13.0, google-gax@^1.14.2:
     lodash.has "^4.5.2"
     node-fetch "^2.6.0"
     protobufjs "^6.8.9"
+    retry-request "^4.0.0"
+    semver "^6.0.0"
+    walkdir "^0.4.0"
+
+google-gax@^2.0.1:
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/google-gax/-/google-gax-2.6.1.tgz#ab09c4f94ccdd0a81a0f743f49fec83108587fbf"
+  integrity sha512-AKQKfaaXCJhMrP4nniz/ei7j+uyqG7nNrGmQxDBIBtDMUbZUMnH0Kw8asts35vmciEV5UeIWfclVcAU+VaJptw==
+  dependencies:
+    "@grpc/grpc-js" "~1.0.0"
+    "@grpc/proto-loader" "^0.5.1"
+    "@types/long" "^4.0.0"
+    abort-controller "^3.0.0"
+    duplexify "^3.6.0"
+    google-auth-library "^6.0.0"
+    is-stream-ended "^0.1.4"
+    lodash.at "^4.6.0"
+    lodash.has "^4.5.2"
+    node-fetch "^2.6.0"
+    protobufjs "^6.9.0"
     retry-request "^4.0.0"
     semver "^6.0.0"
     walkdir "^0.4.0"
@@ -16606,6 +16667,13 @@ google-p12-pem@^2.0.0:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/google-p12-pem/-/google-p12-pem-2.0.2.tgz#39cae8f6fcbe66a01f00be4ddf2d56b95926fa7b"
   integrity sha512-UfnEARfJKI6pbmC1hfFFm+UAcZxeIwTiEcHfqKe/drMsXD/ilnVjF7zgOGpHXyhuvX6jNJK3S8A0hOQjwtFxEw==
+  dependencies:
+    node-forge "^0.9.0"
+
+google-p12-pem@^3.0.0:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/google-p12-pem/-/google-p12-pem-3.0.1.tgz#a220c05a8d7ee9751dd133ee72ecfc855820d5ab"
+  integrity sha512-VlQgtozgNVVVcYTXS36eQz4PXPt9gIPqLOhHN0QiV6W6h4qSCNVKPtKC5INtJsaHHF2r7+nOIa26MJeJMTaZEQ==
   dependencies:
     node-forge "^0.9.0"
 
@@ -16889,6 +16957,16 @@ gtoken@^4.1.0:
     gaxios "^2.0.0"
     google-p12-pem "^2.0.0"
     jws "^3.1.5"
+    mime "^2.2.0"
+
+gtoken@^5.0.0:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/gtoken/-/gtoken-5.0.1.tgz#b93f309d89adfe230bb0f24269b978284ba89e0f"
+  integrity sha512-33w4FNDkUcyIOq/TqyC+drnKdI4PdXmWp9lZzssyEQKuvu9ZFN3KttaSnDKo52U3E51oujVGop93mKxmqO8HHg==
+  dependencies:
+    gaxios "^3.0.0"
+    google-p12-pem "^3.0.0"
+    jws "^4.0.0"
     mime "^2.2.0"
 
 gulp-cli@^2.2.0:
@@ -25967,7 +26045,7 @@ protobufjs@^5.0.3:
     glob "^7.0.5"
     yargs "^3.10.0"
 
-protobufjs@^6.8.0, protobufjs@^6.8.1, protobufjs@^6.8.6, protobufjs@^6.8.8, protobufjs@^6.8.9:
+protobufjs@^6.8.0, protobufjs@^6.8.1, protobufjs@^6.8.6, protobufjs@^6.8.8, protobufjs@^6.8.9, protobufjs@^6.9.0:
   version "6.9.0"
   resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-6.9.0.tgz#c08b2bf636682598e6fabbf0edb0b1256ff090bd"
   integrity sha512-LlGVfEWDXoI/STstRDdZZKb/qusoAWUnmLg9R8OLSO473mBLWHowx8clbX5/+mKDEI+v7GzjoK9tRPZMMcoTrg==
