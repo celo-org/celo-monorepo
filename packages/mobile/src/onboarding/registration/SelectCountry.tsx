@@ -60,22 +60,19 @@ export default function SelectCountry({ navigation, route }: Props) {
 
   return (
     <View style={styles.container}>
+      <View style={styles.searchInputContainer}>
+        <SearchInput
+          placeholder={t('global:search')}
+          value={searchText}
+          onChangeText={onChangeText}
+        />
+      </View>
       <FlatList
         contentContainerStyle={{ paddingBottom: inset.bottom }}
         keyboardShouldPersistTaps={true}
-        stickyHeaderIndices={[0]}
         style={styles.container}
         data={filteredCountries}
         extraData={selectedCountryCodeAlpha2}
-        ListHeaderComponent={
-          <View style={styles.searchInputContainer}>
-            <SearchInput
-              placeholder={t('global:search')}
-              value={searchText}
-              onChangeText={onChangeText}
-            />
-          </View>
-        }
         renderItem={renderItem}
         keyExtractor={keyExtractor}
       />
