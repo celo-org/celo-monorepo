@@ -540,7 +540,7 @@ function RootStackScreen() {
         component={SelectCountry}
         options={{
           ...headerWithCloseButton,
-          headerTitle: i18n.t('accountScreen10:selectCountryCode'),
+          headerTitle: i18n.t('onboarding:selectCountryCode'),
           headerTransparent: false,
         }}
       />

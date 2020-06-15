@@ -13,5 +13,6 @@
     }
   },
   "accountInfo": "Account Info",
-  "step": "Step {{step}} of 5"
+  "step": "Step {{step}} of 5",
+  "selectCountryCode": "Select Country Code",
 }
