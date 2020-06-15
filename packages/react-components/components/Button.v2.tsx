@@ -55,7 +55,7 @@ export default React.memo(function Button(props: ButtonProps) {
     [props.onPress, disabled]
   )
 
-  const [textColor, backgroundColor, opacity] = getColors(type, disabled)
+  const { textColor, backgroundColor, opacity } = getColors(type, disabled)
 
   return (
     <View style={getStyleForWrapper(size, style)}>
@@ -84,7 +84,7 @@ export default React.memo(function Button(props: ButtonProps) {
 })
 
 const styles = StyleSheet.create({
-  // on android Touchable Provides a ripple effeft, by itself it does not respect the border radius on Touchable
+  // on android Touchable Provides a ripple effect, by itself it does not respect the border radius on Touchable
   containRipple: {
     borderRadius: 100,
     overflow: 'hidden',
@@ -133,7 +133,7 @@ function getColors(type: BtnTypes, disabled: boolean | undefined) {
       break
   }
 
-  return [textColor, backgroundColor, opacity]
+  return { textColor, backgroundColor, opacity }
 }
 
 function getStyle(

@@ -5,15 +5,18 @@ import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { PincodeType } from 'src/account/reducer'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { Screens } from 'src/navigator/Screens'
 import JoinCelo, { JoinCelo as JoinCeloClass } from 'src/onboarding/registration/JoinCelo'
-import { createMockStore, getMockI18nProps } from 'test/utils'
+import { createMockStore, getMockI18nProps, getMockStackScreenProps } from 'test/utils'
+
+const mockScreenProps = getMockStackScreenProps(Screens.JoinCelo)
 
 describe('JoinCeloScreen', () => {
   it('renders correctly', () => {
     const store = createMockStore()
     const tree = renderer.create(
       <Provider store={store}>
-        <JoinCelo />
+        <JoinCelo {...mockScreenProps} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
@@ -23,7 +26,7 @@ describe('JoinCeloScreen', () => {
     const store = createMockStore({ alert: { underlyingError: ErrorMessages.INVALID_INVITATION } })
     const tree = renderer.create(
       <Provider store={store}>
-        <JoinCelo />
+        <JoinCelo {...mockScreenProps} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
@@ -41,12 +44,12 @@ describe('JoinCeloScreen', () => {
           setPromptForno={jest.fn()}
           setPhoneNumber={jest.fn()}
           setName={jest.fn()}
-          language={'en-us'}
           cachedName={''}
           cachedNumber={''}
           cachedCountryCallingCode={'+1'}
           pincodeType={PincodeType.Unset}
           {...getMockI18nProps()}
+          {...mockScreenProps}
         />
       </Provider>
     )
@@ -65,12 +68,12 @@ describe('JoinCeloScreen', () => {
           setPromptForno={jest.fn()}
           setPhoneNumber={jest.fn()}
           setName={jest.fn()}
-          language={'en-us'}
           cachedName={''}
           cachedNumber={''}
           cachedCountryCallingCode={''}
           pincodeType={PincodeType.Unset}
           {...getMockI18nProps()}
+          {...mockScreenProps}
         />
       </Provider>
     )
@@ -89,12 +92,12 @@ describe('JoinCeloScreen', () => {
           setPhoneNumber={jest.fn()}
           setPromptForno={jest.fn()}
           setName={jest.fn()}
-          language={'en-us'}
           cachedName={''}
           cachedNumber={''}
           cachedCountryCallingCode={''}
           pincodeType={PincodeType.Unset}
           {...getMockI18nProps()}
+          {...mockScreenProps}
         />
       </Provider>
     )
