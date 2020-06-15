@@ -110,6 +110,8 @@ Use the mapping from this list (you can use Edit>Find in your browser):
 
 - [ReleaseGold deployments on 5/27/20 ("Wave 3")](https://gist.githubusercontent.com/timmoreton/40c4a4136827c00a5cc1bc9b5885136e/raw/ebf5cb3b3934e295785d52c35e3129302592bece/CeloMainnetReleaseGoldWave3.json): includes self-custodying CoinList auction participants that completed the address submission process by 5/22/20
 
+- [ReleaseGold deployments on 6/12/20 (“Wave 4”)](https://gist.githubusercontent.com/marekolszewski/70c65c9b379fdfc892bf8ab0fb915a8c/raw/d7e22bcad1ee53dfd998c46571d1c93503119a15/CeloMainnetReleaseGoldWave4.json): includes recipients that completed the address submission process by 6/8/20
+
 If you have more than one beneficiary address, you'll want to step through this guide for each one.
 
 If you cannot locate your address in these mappings, please contact cLabs.
