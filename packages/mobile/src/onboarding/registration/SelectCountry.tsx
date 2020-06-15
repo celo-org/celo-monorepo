@@ -35,12 +35,6 @@ export default function SelectCountry({ navigation, route }: Props) {
   const onSelect = useCallback(
     (country: LocalizedCountry) => {
       navigation.navigate(Screens.JoinCelo, { selectedCountryCodeAlpha2: country.alpha2 })
-
-      // Wait for next frame before navigating back
-      // so the user can see the changed selection briefly
-      // requestAnimationFrame(() => {
-      //   navigateBack()
-      // })
     },
     [dispatch]
   )
