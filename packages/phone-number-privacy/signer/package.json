@@ -22,8 +22,8 @@
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "knex": "^0.20.13",
-    "pg": "^7.18.2",
+    "knex": "^0.21.1",
+    "pg": "^8.2.1",
     "uuid": "^7.0.3"
   },
   "devDependencies": {
