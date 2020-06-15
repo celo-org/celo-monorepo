@@ -168,13 +168,10 @@ exports[`PhoneNumberInput renders and behaves correctly 1`] = `
     </View>
     <View
       style={
-        Array [
-          Object {},
-          Object {
-            "flex": 1,
-            "marginLeft": 7,
-          },
-        ]
+        Object {
+          "flex": 1,
+          "marginLeft": 7,
+        }
       }
     >
       <View
@@ -212,10 +209,7 @@ exports[`PhoneNumberInput renders and behaves correctly 1`] = `
                 "paddingVertical": 12,
               },
               undefined,
-              Array [
-                Object {},
-                undefined,
-              ],
+              undefined,
             ]
           }
           testID="PhoneNumberField"

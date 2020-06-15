@@ -73,14 +73,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
         >
           fullName
         </Text>
-        <View
-          style={
-            Array [
-              Object {},
-              undefined,
-            ]
-          }
-        >
+        <View>
           <View
             style={
               Array [
@@ -115,10 +108,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
                     "paddingVertical": 12,
                   },
                   undefined,
-                  Array [
-                    Object {},
-                    undefined,
-                  ],
+                  undefined,
                 ]
               }
               testID="NameEntry"
@@ -271,13 +261,10 @@ exports[`JoinCeloScreen renders correctly 1`] = `
           </View>
           <View
             style={
-              Array [
-                Object {},
-                Object {
-                  "flex": 1,
-                  "marginLeft": 7,
-                },
-              ]
+              Object {
+                "flex": 1,
+                "marginLeft": 7,
+              }
             }
           >
             <View
@@ -315,10 +302,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
                       "paddingVertical": 12,
                     },
                     undefined,
-                    Array [
-                      Object {},
-                      undefined,
-                    ],
+                    undefined,
                   ]
                 }
                 testID="PhoneNumberField"
@@ -480,14 +464,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
         >
           fullName
         </Text>
-        <View
-          style={
-            Array [
-              Object {},
-              undefined,
-            ]
-          }
-        >
+        <View>
           <View
             style={
               Array [
@@ -522,10 +499,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
                     "paddingVertical": 12,
                   },
                   undefined,
-                  Array [
-                    Object {},
-                    undefined,
-                  ],
+                  undefined,
                 ]
               }
               testID="NameEntry"
@@ -678,13 +652,10 @@ exports[`JoinCeloScreen renders with an error 1`] = `
           </View>
           <View
             style={
-              Array [
-                Object {},
-                Object {
-                  "flex": 1,
-                  "marginLeft": 7,
-                },
-              ]
+              Object {
+                "flex": 1,
+                "marginLeft": 7,
+              }
             }
           >
             <View
@@ -722,10 +693,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
                       "paddingVertical": 12,
                     },
                     undefined,
-                    Array [
-                      Object {},
-                      undefined,
-                    ],
+                    undefined,
                   ]
                 }
                 testID="PhoneNumberField"
