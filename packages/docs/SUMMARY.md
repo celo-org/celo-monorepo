@@ -468,6 +468,9 @@
 - [Code of Conduct](community/code-of-conduct.md)
 - [Contributing](community/contributing.md)
 - [Grant Playbook](community/grant-playbook.md)
+- [Release Process](community/release-process/README.md)
+  - [Smart Contracts](community/release-process/smart-contracts.md)
+  - [Blockchain Client](community/release-process/blockchain-client.md)
 
 ## Important Information
 
