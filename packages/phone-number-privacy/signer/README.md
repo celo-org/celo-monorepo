@@ -65,7 +65,7 @@ Docker images for the signer service are published to Celo's [container registry
 
 `docker pull us.gcr.io/celo-testnet/celo-monorepo:phone-number-privacy-{LATEST_TAG_HERE}`
 
-For the first run, to execute the db migrations, use a run command like this:
+Before the service can work, the db migrations must be run once. So for the first run, use a run command like this:
 
 `sudo docker run -d -p 80:8080 {ENV_VARS_HERE} --entrypoint /bin/bash {IMAGE_TAG_HERE} -c " cd /celo-phone-number-privacy/signer && yarn run db:migrate && yarn start "`
 
@@ -77,7 +77,7 @@ Then check on the service to make sure its running:
 
 `docker container ls`
 
-`docker logs -f --until=5s {CONTAINER_ID_HERE}`
+`docker logs -f {CONTAINER_ID_HERE}`
 
 ### Logs
 

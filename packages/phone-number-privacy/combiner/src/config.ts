@@ -30,6 +30,7 @@ interface Config {
     password: string
     database: string
     host: string
+    ssl: boolean
   }
   keyVault: {
     azureClientID: string
@@ -67,6 +68,7 @@ if (DEV_MODE) {
       password: 'fakePass',
       database: 'phoneNumberPrivacy',
       host: 'fakeHost',
+      ssl: !DEV_MODE,
     },
     keyVault: {
       azureClientID: 'useMock',
@@ -108,6 +110,7 @@ if (DEV_MODE) {
       password: functionConfig.db.pass,
       database: functionConfig.db.name,
       host: `/cloudsql/${functionConfig.db.host}`,
+      ssl: !DEV_MODE,
     },
     keyVault: {
       azureClientID: functionConfig.keyvault.azure_client_id,

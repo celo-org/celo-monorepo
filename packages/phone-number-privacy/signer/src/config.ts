@@ -34,6 +34,7 @@ interface Config {
     password: string
     database: string
     host: string
+    ssl: boolean
   }
   keystore: {
     type: SupportedKeystore
@@ -76,6 +77,7 @@ const config: Config = {
     password: env.DB_PASSWORD,
     database: env.DB_DATABASE,
     host: env.DB_HOST,
+    ssl: !DEV_MODE,
   },
   keystore: {
     type: env.KEYSTORE_TYPE,
