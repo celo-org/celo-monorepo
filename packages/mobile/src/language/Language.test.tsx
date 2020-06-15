@@ -13,7 +13,7 @@ describe('Language', () => {
     const store = createMockStore()
     const { getByText } = render(
       <Provider store={store}>
-        <Language {...getMockStackScreenProps(Screens.Language, {})} />
+        <Language {...getMockStackScreenProps(Screens.Language)} />
       </Provider>
     )
 
