@@ -169,5 +169,6 @@
   "settings": "Settings",
   "help": "Help",
   "dismiss": "Dismiss",
-  "review": "Review"
+  "review": "Review",
+  "insufficientBalance": "Your balance is too low to make this transaction"
 }

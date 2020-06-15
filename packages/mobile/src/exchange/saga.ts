@@ -127,7 +127,7 @@ export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
 
     Logger.debug(
       TAG,
-      `Retrieved exchange rate: 
+      `Retrieved exchange rate:
       ${dollarMakerExchangeRate.toString()} gold per dollar, estimated at ${dollarMakerAmount}
       ${goldMakerExchangeRate.toString()} dollar per gold, estimated at ${goldMakerAmount}`
     )
@@ -229,7 +229,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     )
     Logger.debug(
       TAG,
-      `Will receive at least ${convertedTakerAmount} 
+      `Will receive at least ${convertedTakerAmount}
       wei for ${convertedMakerAmount} wei of ${makerToken}`
     )
 

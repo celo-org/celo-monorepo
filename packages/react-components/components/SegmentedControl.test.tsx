@@ -32,8 +32,6 @@ describe(SegmentedControl, () => {
     // expect(tab2.props.accessibilityStates).toBe(['selected'])
 
     fireEvent.press(tab1)
-    // Run timers, because Touchable adds some delay
-    jest.runAllTimers()
     expect(onChange).toHaveBeenCalledWith('Tab1', 0)
   })
 })
