@@ -84,7 +84,7 @@ export class Countries {
         const displayName = names[this.language] || country.name
 
         // We only use the first calling code, others are irrelevant in the current dataset.
-        // Also some one them have a non standard calling code
+        // Also some of them have a non standard calling code
         // for instance: 'Antigua And Barbuda' has '+1 268', where only '+1' is expected
         // so we fix this here
         const countryCallingCode = country.countryCallingCodes[0].split(' ')[0]
