@@ -112,9 +112,8 @@ export class JoinCelo extends React.Component<Props, State> {
     const prevCountryCodeAlpha2 = this.state.countryCodeAlpha2
     const countryCodeAlpha2 = nextProps.route.params?.selectedCountryCodeAlpha2
     if (prevCountryCodeAlpha2 !== countryCodeAlpha2 && countryCodeAlpha2) {
-      const countryCallingCode = countryCodeAlpha2
-        ? this.countries.getCountryByCodeAlpha2(countryCodeAlpha2).countryCallingCode
-        : ''
+      const countryCallingCode =
+        this.countries.getCountryByCodeAlpha2(countryCodeAlpha2)?.countryCallingCode ?? ''
       this.setState((prevState) =>
         getPhoneNumberState(prevState.nationalPhoneNumber, countryCallingCode, countryCodeAlpha2)
       )
@@ -155,7 +154,7 @@ export class JoinCelo extends React.Component<Props, State> {
 
     const { name, e164Number, isValidNumber, countryCodeAlpha2 } = this.state
     const countryCallingCode = this.countries.getCountryByCodeAlpha2(countryCodeAlpha2)
-      .countryCallingCode
+      ?.countryCallingCode
     const { cachedName, cachedNumber, cachedCountryCallingCode } = this.props
 
     if (
