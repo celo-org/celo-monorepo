@@ -1,6 +1,5 @@
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
 import BigNumber from 'bignumber.js'
-import { Transaction } from 'knex'
 import { isVerified } from '../common/identity'
 import logger from '../common/logger'
 import config from '../config'
@@ -12,13 +11,12 @@ import { getContractKit } from '../web3/contracts'
  * calculated query quota and the number of queries already performed.
  */
 export async function getRemainingQueryCount(
-  trx: Transaction,
   account: string,
   hashedPhoneNumber?: string
 ) {
   logger.debug('Retrieving remaining query count')
   const queryQuota = await getQueryQuota(account, hashedPhoneNumber)
-  const performedQueryCount = await getPerformedQueryCount(account, trx)
+  const performedQueryCount = await getPerformedQueryCount(account)
   return queryQuota - performedQueryCount
 }
 
