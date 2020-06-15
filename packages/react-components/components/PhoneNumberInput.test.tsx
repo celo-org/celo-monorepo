@@ -23,7 +23,7 @@ describe('PhoneNumberInput', () => {
     const { getByTestId, getByText, toJSON } = render(
       <PhoneNumberInput
         label="Phone number"
-        country={countries.getCountryByCode('FR')}
+        country={countries.getCountryByCodeAlpha2('FR')}
         nationalPhoneNumber=""
         onChange={onChange}
         onPressCountry={onPressCountry}

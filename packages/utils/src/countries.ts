@@ -17,22 +17,6 @@ export interface LocalizedCountry extends Omit<countryData.Country, 'countryCall
   countryCallingCode: string
 }
 
-const EMPTY_COUNTRY: LocalizedCountry = {
-  alpha2: '',
-  alpha3: '',
-  countryCallingCode: '',
-  currencies: [],
-  displayName: '',
-  displayNameNoDiacritics: '',
-  emoji: '',
-  ioc: '',
-  languages: [],
-  name: '',
-  names: {},
-  status: '',
-  countryPhonePlaceholder: { national: '', international: '' },
-}
-
 const removeDiacritics = (word: string) =>
   word &&
   word
@@ -62,23 +46,18 @@ export class Countries {
     this.assignCountries()
   }
 
-  getCountry(countryName?: string | null): LocalizedCountry {
+  getCountry(countryName?: string | null): LocalizedCountry | undefined {
     if (!countryName) {
-      return EMPTY_COUNTRY
+      return undefined
     }
 
     const query = removeDiacritics(countryName)
 
-    return (
-      this.localizedCountries.find((country) => country.displayNameNoDiacritics === query) ??
-      EMPTY_COUNTRY
-    )
+    return this.localizedCountries.find((country) => country.displayNameNoDiacritics === query)
   }
 
-  getCountryByCode(countryCode: string): LocalizedCountry {
-    const country = this.countryMap.get(countryCode)
-
-    return country || EMPTY_COUNTRY
+  getCountryByCodeAlpha2(countryCode: string): LocalizedCountry | undefined {
+    return this.countryMap.get(countryCode)
   }
 
   getFilteredCountries(query: string): LocalizedCountry[] {
