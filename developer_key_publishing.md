@@ -6,7 +6,7 @@ In support of these uses, [OpenPGP](https://www.openpgp.org/) public keys can be
 
 If you want to read more about OpenPGP keys, including their structure and metadata, check out [Anatomy of a GPG Key by Dave Steele](https://davesteele.github.io/gpg/2014/09/20/anatomy-of-a-gpg-key/).
 
-> Note: This guide assumes you have an @clabs.co email address, but if you do not, simply change the email domain to your primary developer email (e.g. @gmail.com for alice@gmail.com)
+> Note: This guide assumes you have an @clabs.co email address, but if you do not, simply change the email domain to your primary developer email (e.g. @example.com for alice@example.com)
 
 ## Setup
 
@@ -28,10 +28,10 @@ export REAL_NAME='your first and last name. e.g. Alice Turing'
 #### Algorithm
 OpenPGP supports a number of cryptographic algorithms including [RSA](https://en.wikipedia.org/wiki/RSA_(cryptosystem)) and [ECC](https://en.wikipedia.org/wiki/Elliptic-curve_cryptography).
 
-Here we recommend `secp256k1`, which is the algorithm underlying identify on the Celo blockchain, because it is fast, secure, and promotes interoperability within the Celo ecosystem. (It also means your `gpg` key could be used to take actions on-chain, which is pretty neat)
+Here we recommend `secp256k1`, which is the algorithm underlying identity on the Celo blockchain, because it is fast, secure, and promotes interoperability within the Celo ecosystem. (e.g. Your OpenPGP key could be used to take actions on-chain, which is pretty neat.)
 
 #### User Identifier
-In OpenPGP, each key is associated with a user identity, which is commonly an email address and your name (e.g. "Alice Turing <alice@example.com>"). A public key created by `gpg` will automatically include the username, as well as the cryptographic public key information, so when someone downloads you public key, they will know it is intended for your email address.
+In OpenPGP, each key is associated with a user identity, which is commonly an email address and your name (e.g. "Alice Turing <alice@example.com>"). A public key created by `gpg` will automatically include the username, in addition to the cryptographic public key information, so when someone downloads your public key, they will know it is intended for your email address.
 
 By publishing keys on [celo.org](https://celo.org), users can securely download any published key associated with an `@celo.org` user identifier, and know that it is the correct one because publishing to [celo.org](https://celo.org) requires approval of the Celo core developers.
 
@@ -95,9 +95,13 @@ Use the following command as a quick way to verify that your new key can be used
 gpg -u ${USER_NAME}@clabs.co -o - --sign <(head -c 256 /dev/urandom) | gpg --verify -
 ```
 
+> Note: The command above works by signing 256 bytes of random data with your new key, then verifying the signature over that data.
+
+You should see `Good signature from ...` with your real name and email.
+
 ## Key Publishing
 
-Keys are published to [celo.org](https://celo.org) using [OpenPGP WKD](https://gnupg.org/blog/20161027-hosting-a-web-key-directory.html), which is essentially just a hosted folder of public keys. Published keys are managed with Github by submitting a pull request to the `celo-monorepo`.
+Keys are published to [celo.org](https://celo.org) using [OpenPGP WKD](https://gnupg.org/blog/20161027-hosting-a-web-key-directory.html), which is essentially just a hosted folder of public keys. Published keys are managed by submitting a pull request to the `master` branch of `celo-monorepo` on [GitHub](https://github.com/celo-org/celo-monorepo).
 
 #### Configuring your key
 
@@ -107,14 +111,14 @@ The domain (e.g. `celo.org`) of the user identifier much match the site it's hos
 gpg --quick-add-uid ${USER_NAME}@clabs.co "${REAL_NAME} <${USER_NAME}@celo.org>"
 ```
 
+> Note: You do not need an `@celo.org` email address to publish a key with the `@celo.org` domain, but it must not conflict with an existing email or published key.
+
 Additionally you may want to add identities for `staging.celo.org` and `dev.celo.org` so you can confirm your keys are published correctly on a non-production version of the website.
 
 ```bash
 gpg --quick-add-uid ${USER_NAME}@clabs.co "${REAL_NAME} <${USER_NAME}@staging.celo.org>"
 gpg --quick-add-uid ${USER_NAME}@clabs.co "${REAL_NAME} <${USER_NAME}@dev.celo.org>"
 ```
-
-> Note: You do not need an `@celo.org` email address to publish a key with the `@celo.org` domain, but it must not conflict with an existing email or published key.
 
 #### Adding your key to the repository
 
