@@ -25,19 +25,18 @@ export default function AccountNumber({ address, touchDisabled }: Props) {
   // into 'ce10 ce10 ce10 ce10 ce10 ce10 ce10 ce10 ce10 ce10'
   const addressChunks = ['0x', ...getAddressChunks(address)]
 
-  if (touchDisabled) {
-    return (
-      <View style={styles.container}>
-        <Text style={[styles.text, styles.topText]}>{addressChunks.slice(0, 6).join(' ')}</Text>
-        <Text style={[styles.text, styles.bottomText]}>{addressChunks.slice(6).join(' ')}</Text>
-      </View>
-    )
-  }
-
-  return (
-    <TouchableOpacity style={styles.container} onPress={onPressAddress}>
+  const formattedAddress = (
+    <>
       <Text style={[styles.text, styles.topText]}>{addressChunks.slice(0, 6).join(' ')}</Text>
       <Text style={[styles.text, styles.bottomText]}>{addressChunks.slice(6).join(' ')}</Text>
+    </>
+  )
+
+  return touchDisabled ? (
+    <View style={styles.container}>{formattedAddress}</View>
+  ) : (
+    <TouchableOpacity style={styles.container} onPress={onPressAddress}>
+      {formattedAddress}
     </TouchableOpacity>
   )
 }

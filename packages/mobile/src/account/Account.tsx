@@ -209,7 +209,7 @@ export class Account extends React.Component<Props, State> {
 
           <View style={style.devSettingsItem}>
             <TouchableOpacity onPress={this.toggleBackupState}>
-              <Text>Reset backup state</Text>
+              <Text>Toggle backup state</Text>
             </TouchableOpacity>
           </View>
           <View style={style.devSettingsItem}>

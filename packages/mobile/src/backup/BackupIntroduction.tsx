@@ -14,11 +14,10 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { enterBackupFlow, exitBackupFlow } from 'src/app/actions'
 import DelayButton from 'src/backup/DelayButton'
 import { useAccountKey } from 'src/backup/utils'
-import BackButton from 'src/components/BackButton.v2'
 import { Namespaces } from 'src/i18n'
 import Logo from 'src/icons/Logo.v2'
 import DrawerTopBar from 'src/navigator/DrawerTopBar'
-import { emptyHeader } from 'src/navigator/Headers.v2'
+import { emptyHeader, headerWithBackButton } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -45,10 +44,7 @@ const mapStateToProps = (state: RootState): StateProps => {
 
 export const navOptionsForAccount = ({ route }: NavigationProps) => {
   if (route.params?.fromAccountScreen) {
-    return {
-      ...emptyHeader,
-      headerLeft: () => <BackButton />,
-    }
+    return headerWithBackButton
   }
 
   return {

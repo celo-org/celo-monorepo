@@ -41,9 +41,7 @@ import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
 import FeeExchangeEducation from 'src/exchange/FeeExchangeEducation'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
-import PhoneNumberLookupQuotaScreen, {
-  phoneNumberLookupQuotaScreeOptions,
-} from 'src/identity/PhoneNumberLookupQuotaScreen'
+import PhoneNumberLookupQuotaScreen from 'src/identity/PhoneNumberLookupQuotaScreen'
 import ImportWallet from 'src/import/ImportWallet'
 import ImportWalletEmpty from 'src/import/ImportWalletEmpty'
 import ImportWalletSocial from 'src/import/ImportWalletSocial'
@@ -58,6 +56,7 @@ import {
   headerWithBackButton,
   headerWithCancelButton,
   noHeader,
+  noHeaderGestureDisabled,
   nuxNavigationOptions,
   nuxNavigationOptionsNoBackButton,
 } from 'src/navigator/Headers.v2'
@@ -127,7 +126,7 @@ const commonScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen
         name={Screens.PhoneNumberLookupQuota}
         component={PhoneNumberLookupQuotaScreen}
-        options={phoneNumberLookupQuotaScreeOptions}
+        options={noHeaderGestureDisabled}
       />
     </>
   )
@@ -148,7 +147,7 @@ const verificationScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen
         name={Screens.VerificationLoadingScreen}
         component={VerificationLoadingScreen}
-        options={headerWithCancelButton}
+        options={noHeaderGestureDisabled}
       />
       <Navigator.Screen
         name={Screens.VerificationInterstitialScreen}
