@@ -1,7 +1,7 @@
 import { getBuildArtifacts } from '@openzeppelin/upgrades'
 
 /* HACK! truffle test was unable to compile this test (TypeScript would end up
- * claiming that it couldn't find the name `assert`) without the following 5
+ * claiming that it couldn't find the name `assert`) without the following
  * lines.
  */
 import { MigrationsContract } from 'types'
