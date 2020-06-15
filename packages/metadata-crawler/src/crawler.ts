@@ -4,6 +4,8 @@ import {
   verifyAccountClaim,
   verifyDomainRecord,
 } from '@celo/contractkit/lib/identity/claims/verify'
+import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
+import { Validator } from '@celo/contractkit/lib/wrappers/Validators'
 import { normalizeAddressWith0x, trimLeading0x } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import Logger from 'bunyan'
@@ -108,7 +110,7 @@ async function getVerifiedDomains(
   return domains
 }
 
-async function handleItem(item: { url: string; address: string }) {
+async function processDomainClaims(item: { url: string; address: string }) {
   const itemLogger = operationalLogger.child({ url: item.url, address: item.address })
   try {
     itemLogger.debug('fetch_metadata')
@@ -125,11 +127,72 @@ async function handleItem(item: { url: string; address: string }) {
         verfiedAccountClaims: verifiedAccounts.length,
         verifiedDomainClaims: verifiedDomains.length,
       },
-      'handleItem done'
+      'processDomainClaims done'
     )
   } catch (err) {
-    itemLogger.error({ err }, 'handleItem error')
+    itemLogger.error({ err }, 'processDomainClaims error')
   }
+}
+
+async function processAttestationServiceStatusForValidator(
+  electedValidators: Set<Address>,
+  attestationsWrapper: AttestationsWrapper,
+  validator: Validator
+) {
+  const {
+    name,
+    smsProviders,
+    address,
+    affiliation,
+    attestationServiceURL,
+    metadataURL,
+    attestationSigner,
+    blacklistedRegionCodes,
+    rightAccount,
+    error,
+    state,
+  } = await attestationsWrapper.getAttestationServiceStatus(validator)
+  const isElected = electedValidators.has(validator.address)
+  dataLogger.info(
+    {
+      name,
+      isElected,
+      smsProviders,
+      address,
+      group: affiliation,
+      attestationServiceURL,
+      metadataURL,
+      attestationSigner,
+      blacklistedRegionCodes,
+      rightAccount,
+      err: error,
+      state,
+    },
+    'checked_attestation_service_status'
+  )
+}
+
+async function processAttestationServices() {
+  operationalLogger.debug('processAttestationServices start')
+  const validatorsWrapper = await kit.contracts.getValidators()
+  const electionsWrapper = await kit.contracts.getElection()
+  const attestationsWrapper = await kit.contracts.getAttestations()
+  const validators = await validatorsWrapper.getRegisteredValidators()
+
+  const currentEpoch = await kit.getEpochNumberOfBlock(await kit.web3.eth.getBlockNumber())
+  const electedValidators = await electionsWrapper.getElectedValidators(currentEpoch)
+  const electedValidatorsSet: Set<Address> = new Set()
+  electedValidators.forEach((validator) => electedValidatorsSet.add(validator.address))
+
+  await concurrentMap(CONCURRENCY, validators, (validator) =>
+    processAttestationServiceStatusForValidator(
+      electedValidatorsSet,
+      attestationsWrapper,
+      validator
+    )
+  )
+  operationalLogger.debug('processAttestationServices finish')
+  return
 }
 
 async function main() {
@@ -147,7 +210,7 @@ async function main() {
 
   // TODO: Fetch addresses which have
   // not opted in
-  // opted in but not registered an attestation service URL
+  // opted in but not registered a metadata URL
 
   operationalLogger.debug({ length: items.length }, 'fetching all accounts')
 
@@ -158,17 +221,30 @@ async function main() {
     address: normalizeAddressWith0x(a.address.substr(2)),
   }))
 
-  await concurrentMap(CONCURRENCY, items, (item) => handleItem(item))
+  // const itemIndex = new Set()
+  // items.forEach((item) => itemIndex.add(item.address))
+
+  // const validatorsWithoutMetadataURL = validators.filter(
+  //   (validator) => !itemIndex.has(validator.address)
+  // )
+  // const validatorsWithMetadataURL = validators.filter((validator) =>
+  //   itemIndex.has(validator.address)
+  // )
+
+  await concurrentMap(CONCURRENCY, items, (item) => processDomainClaims(item))
     .then(() => {
       operationalLogger.info('Closing DB connecting and finishing')
-      client.end()
-      process.exit(0)
     })
     .catch((err) => {
-      operationalLogger.error({ err }, 'handleItem error')
+      operationalLogger.error({ err }, 'processDomainClaims error')
       client.end()
       process.exit(1)
     })
+
+  await processAttestationServices()
+
+  client.end()
+  process.exit(0)
 }
 
 main().catch((err) => {
