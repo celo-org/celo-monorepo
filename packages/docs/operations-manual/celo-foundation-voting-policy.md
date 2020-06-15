@@ -95,6 +95,6 @@ Before applying be ready to share the following:
 ### Cohort Information
 
 Currently receiving Foundation votes: 
-* **Cohort 1:** The Great Celo Stake Off [leaderboard](https://docs.google.com/spreadsheets/d/1Me56YkCHYmsN23gSMgDb1hZ_ezN0sTjNW4kyGbAO9vc/edit#gid=1970613133) participants at ranking 26-50 - Votes expire Aug 1 2020
-* **Cohort 2:** The Great Celo Stake Off [leaderboard](https://docs.google.com/spreadsheets/d/1Me56YkCHYmsN23gSMgDb1hZ_ezN0sTjNW4kyGbAO9vc/edit#gid=1970613133) participants at ranking 1-25 - Votes expire  Nov 1 2020
+* **Cohort 1:** The Great Celo Stake Off [leaderboard](https://docs.google.com/spreadsheets/d/1Me56YkCHYmsN23gSMgDb1hZ_ezN0sTjNW4kyGbAO9vc/edit#gid=1970613133) participants at ranking 26-50 - Votes will expire on Aug 1, 2020
+* **Cohort 2:** The Great Celo Stake Off [leaderboard](https://docs.google.com/spreadsheets/d/1Me56YkCHYmsN23gSMgDb1hZ_ezN0sTjNW4kyGbAO9vc/edit#gid=1970613133) participants at ranking 1-25 - Votes will expire on Nov 1, 2020
 
