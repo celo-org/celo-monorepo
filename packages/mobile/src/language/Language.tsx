@@ -12,7 +12,7 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { setLanguage } from 'src/app/actions'
 import { AVAILABLE_LANGUAGES } from 'src/config'
 import { Namespaces } from 'src/i18n'
-import { navigate } from 'src/navigator/NavigationService'
+import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 
@@ -24,10 +24,12 @@ export default function Language({ route }: Props) {
 
   function onSelect(language: string, code: string) {
     CeloAnalytics.track(CustomEventNames.language_select, { language, selectedAnswer: code })
+    const nextScreen = route.params?.nextScreen ?? Screens.JoinCelo
     dispatch(setLanguage(code))
-    // If came from Account screen, should navigate back using back button
-    if (!route.params?.fromAccountScreen) {
-      navigate(Screens.JoinCelo)
+    if (nextScreen === 'GO_BACK') {
+      navigateBack()
+    } else {
+      navigate(nextScreen)
     }
   }
 

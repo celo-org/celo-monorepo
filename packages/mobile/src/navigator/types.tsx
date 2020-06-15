@@ -95,7 +95,7 @@ export type StackParamList = {
   [Screens.JoinCelo]: undefined
   [Screens.Language]:
     | {
-        fromAccountScreen?: boolean
+        nextScreen: keyof StackParamList | 'GO_BACK'
       }
     | undefined
   [Screens.Licenses]: undefined
