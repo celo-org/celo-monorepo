@@ -88,7 +88,7 @@ export interface CompatibilityInfo {
   errors: string[]
 }
 
-const generateErrorMessage = (operation: Operation) => {
+const operationToDescription = (operation: Operation) => {
   let message: string
 
   const updated = operation.updated
@@ -110,6 +110,9 @@ const generateErrorMessage = (operation: Operation) => {
     case 'rename':
       message = `variable ${updated.label} was renamed from ${original.label}`
       break
+    case 'append':
+      message = `variable ${updated.label} was appended`
+
     default:
       message = `unknown operation ${operation.action}`
   }
@@ -128,7 +131,7 @@ const generateLayoutCompatibilityReport = (oldLayout: StorageLayoutInfo, newLayo
   } else {
     return {
       compatible: false,
-      errors: incompatibilities.map(generateErrorMessage)
+      errors: incompatibilities.map(operationToDescription)
     }
   }
 }
