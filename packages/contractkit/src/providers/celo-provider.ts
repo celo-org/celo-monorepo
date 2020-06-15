@@ -2,7 +2,7 @@ import debugFactory from 'debug'
 import { provider } from 'web3-core'
 import { Callback, JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
 import { hasProperty, stopProvider } from '../utils/provider-utils'
-import { DefaultRpcCaller, RpcCaller, rpcCallHandler } from '../utils/rpc-caller'
+import { DefaultRpcCaller, RpcCaller, rpcCallHandler, TelemetryHandler } from '../utils/rpc-caller'
 import { TxParamsNormalizer } from '../utils/tx-params-normalizer'
 import { LocalWallet } from '../wallets/local-wallet'
 import { Wallet } from '../wallets/wallet'
@@ -21,7 +21,7 @@ enum InterceptedMethods {
 }
 
 export class CeloProvider {
-  private readonly rpcCaller: RpcCaller
+  private rpcCaller: RpcCaller
   private readonly paramsPopulator: TxParamsNormalizer
   private alreadyStopped: boolean = false
   wallet: Wallet
@@ -40,6 +40,10 @@ export class CeloProvider {
     } else {
       throw new Error("The wallet used, can't add accounts")
     }
+  }
+
+  setTelemetryHandler(handler: TelemetryHandler) {
+    this.rpcCaller = new DefaultRpcCaller(this.existingProvider, handler)
   }
 
   async getAccounts(): Promise<string[]> {

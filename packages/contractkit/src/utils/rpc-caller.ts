@@ -5,6 +5,7 @@ import { Callback, JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
 const debugRpcPayload = debugFactory('rpc:payload')
 const debugRpcResponse = debugFactory('rpc:response')
 const debugRpcCallback = debugFactory('rpc:callback:exception')
+const debugRpcTelemetry = debugFactory('rpc:telemetry')
 
 export function rpcCallHandler(
   payload: JsonRpcPayload,
@@ -66,12 +67,17 @@ export interface RpcCaller {
   send: (payload: JsonRpcPayload, callback: Callback<JsonRpcResponse>) => void
 }
 export class DefaultRpcCaller implements RpcCaller {
-  constructor(readonly defaultProvider: provider, readonly jsonrpcVersion: string = '2.0') {}
+  constructor(
+    readonly defaultProvider: provider,
+    readonly telemetryHandler: TelemetryHandler | null = new DebugTelemetryHandler(),
+    readonly jsonrpcVersion: string = '2.0'
+  ) {}
 
   public async call(method: string, params: any[]): Promise<JsonRpcResponse> {
     return new Promise((resolve, reject) => {
+      const id = getRandomId()
       const payload: JsonRpcPayload = {
-        id: getRandomId(),
+        id,
         jsonrpc: this.jsonrpcVersion,
         method,
         params,
@@ -89,8 +95,20 @@ export class DefaultRpcCaller implements RpcCaller {
   public send(payload: JsonRpcPayload, callback: Callback<JsonRpcResponse>) {
     debugRpcPayload('%O', payload)
 
+    const start = new Date().getTime()
     const decoratedCallback = ((error: Error, result: JsonRpcResponse): void => {
       let err: Error = error
+      const duration = new Date().getTime() - start
+      if (this.telemetryHandler) {
+        const params = payload.params[0]
+        const to = params?.to
+        const from = params?.from
+        this.telemetryHandler.handleEvent(
+          ['contractkit', 'rpc_caller', 'send'],
+          { duration },
+          { method: payload.method, id: payload.id, to, from, params: payload.params }
+        )
+      }
       debugRpcResponse('%O', result)
       // The provider send call will not provide an error to the callback if
       // the result itself specifies an error. Here, we extract the error in the
@@ -108,5 +126,15 @@ export class DefaultRpcCaller implements RpcCaller {
     if (this.defaultProvider && typeof this.defaultProvider !== 'string') {
       this.defaultProvider.send(payload, decoratedCallback)
     }
+  }
+}
+
+export interface TelemetryHandler {
+  handleEvent: (path: string[], measurements: { duration: number }, metadata: any) => void
+}
+
+export class DebugTelemetryHandler implements TelemetryHandler {
+  handleEvent(path: string[], measurements: { duration: number }, metadata: any) {
+    debugRpcTelemetry('Path: %o, Duration: %s, metadata: %o', path, measurements.duration, metadata)
   }
 }
