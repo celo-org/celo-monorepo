@@ -157,7 +157,7 @@ async function helmParameters(celoEnv: string, context: OracleAzureContext, useF
     `--set oracle.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
     `--set oracle.metrics.enabled=true`,
     `--set oracle.metrics.prometheusPort=9090`,
-    `--set oracle.unusedOracleAddresses=${fetchEnvOrFallback(envVar.ORACLE_UNUSED_ORACLE_ADDRESSES, '')}`
+    `--set-string oracle.unusedOracleAddresses='${fetchEnvOrFallback(envVar.ORACLE_UNUSED_ORACLE_ADDRESSES, '').split(',').join('\\\,')}'`
   ].concat(await oracleIdentityHelmParameters(context, oracleConfig))
 }
 
@@ -204,13 +204,16 @@ async function createOracleAzureIdentityIfNotExists(
 ) {
   const clusterConfig = getAzureClusterConfig(context)
   const identity = await createIdentityIfNotExists(clusterConfig, oracleIdentity.azureHsmIdentity!.identityName!)
-
-  // Grant the service principal permission to manage the oracle identity.
+  // Grant the service principal for the cluster permission to manage the oracle identity.
   // See: https://github.com/Azure/aad-pod-identity#6-set-permissions-for-mic
+  const [rawServicePrincipalClientId] = await execCmdWithExitOnFailure(
+    `az aks show -n ${clusterConfig.clusterName} --query servicePrincipalProfile.clientId -g ${clusterConfig.resourceGroup} -o tsv`
+  )
+  const servicePrincipalClientId = rawServicePrincipalClientId.trim()
   await retryCmd(
     () =>
       execCmdWithExitOnFailure(
-        `az role assignment create --role "Managed Identity Operator" --assignee-object-id ${identity.principalId} --scope ${identity.id}`
+        `az role assignment create --role "Managed Identity Operator" --assignee ${servicePrincipalClientId} --scope ${identity.id}`
       ),
     10
   )
