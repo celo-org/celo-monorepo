@@ -2,7 +2,7 @@
 import knex from 'knex'
 import config from '../src/config'
 
-function start() {
+async function start() {
   console.info('Running migrations')
   // Adding a timeout because knex migrations seem to hang even when they succeed
   const timeout = new Promise((resolve) => {
@@ -19,9 +19,9 @@ function start() {
     extension: 'ts',
   })
 
-  return Promise.race([migration, timeout])
+  await Promise.race([migration, timeout])
+  console.info('Migrations complete')
 }
 
+// tslint:disable-next-line: no-floating-promises
 start()
-  .then(() => console.info('Migraitons complete'))
-  .catch(() => console.error('Migrations failed'))
