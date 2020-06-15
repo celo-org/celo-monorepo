@@ -5,7 +5,6 @@ console.info('Running migrations')
 knex({
   client: 'pg',
   connection: config.db,
-  debug: true,
 })
   .migrate.latest({
     directory: './migrations',
