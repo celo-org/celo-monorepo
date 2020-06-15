@@ -64,9 +64,9 @@ Make sure to complete all prerequisites before applying.
 [APPLY FOR FOUNDATION VOTES HERE](https://c-labs.typeform.com/to/Ov9U0S)
 
 ### Timings
-Cohort 3 application deadline: **July 2 2020**
+Cohort 3 application deadline: **July 2, 2020**
 
-Anticipated vote date for selected applicants in Cohort 3: **as of Aug 2 2020**
+Anticipated vote date for selected applicants in Cohort 3: **as of Aug 2, 2020**
 
 
 ### Application Prerequisites
@@ -78,7 +78,7 @@ Before applying all validator group members should have:
 Before applying be ready to share the following:
 * A personal statement telling the Foundation why your group should get votes (max 1,500 characters)
 * Validator Group details: email, name, website, address on Mainnet and Baklava, and geographic location
-* Information about team: full names, link to professional profiles such as LinkedIn or GitHub, and an explanation of the team’s relevant experience
+* Information about your team: full names, link to professional profiles such as LinkedIn or GitHub, and an explanation of the team’s relevant experience
 * Whether your Group 
     * Is validating or has validated in the past 1 month on the Celo Mainnet
     * Is currently receiving Foundation votes
@@ -86,11 +86,11 @@ Before applying be ready to share the following:
     * Members have all completed the online training (see prerequisites)
     * Members have all completed the self-audit (see prerequisites)
     * Is a non-profit organization or donates to such organizations
-    * Is a  Foundation grant recipient
+    * Is a Foundation grant recipient
     * Is running or has run in the past 1 month a Validator on the Baklava testnet
 * Optional: 
     * The list of contributions made to the Celo ecosystem
-    * Date. audit firm name, and report of your last security audit if your Group has been audited by an external firm in the past 12 months
+    * Date, audit firm name, and report of your last security audit if your Group has been audited by an external firm in the past 12 months
 
 ### Cohort Information
 
