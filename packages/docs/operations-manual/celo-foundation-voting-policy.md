@@ -71,7 +71,7 @@ Anticipated vote date for selected applicants in Cohort 3: **as of Aug 2, 2020**
 
 ### Application Prerequisites
 Before applying all validator group members should have: 
-* Completed the [Mastering the Art of Validating course]()
+* Completed the [Mastering the Art of Validating course](https://youtu.be/3UIudzzCb8o)
 * Completed the [Security Self Assessment audit](https://docs.google.com/presentation/d/e/2PACX-1vRdKNpXI2mvqwQF6L5LRrxPW2qRK-5MDce5EhqXqLC1MSYmupZMFnhp6YEP0gLYuRKW-FF0fcAqhEAp/pub?start=true&loop=false&delayms=10000&slide=id.g76d52a0216_0_333), which includes completing this [checklist](https://docs.google.com/spreadsheets/d/1FqmUfleCoyNIUep7PoVu3ujHd-OkHZJ8o6p7Affr93w/edit?usp=sharing)
 
 ### Application Details 
