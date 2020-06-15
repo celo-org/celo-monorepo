@@ -113,5 +113,7 @@
   },
   "transferAddressChanged": "This contact changed their account number since the transaction. This payment was sent to:",
   "addressConfirmed": "Account number confirmed",
-  "sending": "Sending"
+  "sending": "Sending",
+  "feeActual": "Fees",
+  "feeEstimate": "Estimated Fees"
 }

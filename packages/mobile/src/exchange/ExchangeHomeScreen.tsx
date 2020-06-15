@@ -1,6 +1,7 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import ItemSeparator from '@celo/react-components/components/ItemSeparator'
 import SectionHead from '@celo/react-components/components/SectionHeadGold'
+import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
@@ -21,10 +22,12 @@ import { useExchangeRate } from 'src/exchange/hooks'
 import { exchangeHistorySelector } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
+import InfoIcon from 'src/icons/InfoIcon.v2'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
 import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import DrawerTopBar from 'src/navigator/DrawerTopBar'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import useSelector from 'src/redux/useSelector'
@@ -34,6 +37,10 @@ import { goldToDollarAmount } from 'src/utils/currencyExchange'
 import { getLocalCurrencyDisplayValue } from 'src/utils/formatting'
 
 type Props = StackScreenProps<StackParamList, Screens.ExchangeHomeScreen>
+
+function navigateToGuide() {
+  navigate(Screens.GoldEducation)
+}
 
 function ExchangeHomeScreen({ navigation }: Props) {
   function dollarsToLocal(amount: BigNumber.Value) {
@@ -154,8 +161,11 @@ function ExchangeHomeScreen({ navigation }: Props) {
       >
         <DisconnectBanner />
         <View style={styles.goldPrice}>
-          <View>
+          <View style={styles.goldPriceTitleArea}>
             <Text style={styles.goldPriceTitle}>{t('goldPrice')}</Text>
+            <Touchable onPress={navigateToGuide} hitSlop={variables.iconHitslop}>
+              <InfoIcon size={14} />
+            </Touchable>
           </View>
           <View style={styles.goldPriceValues}>
             <Text style={styles.goldPriceCurrentValue}>
@@ -247,9 +257,14 @@ const styles = StyleSheet.create({
   goldPrice: {
     padding: variables.contentPadding,
   },
+  goldPriceTitleArea: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
   goldPriceTitle: {
     ...fontStyles.h2,
-    marginBottom: 8,
+    marginRight: 8,
   },
   goldPriceValues: { flexDirection: 'row', alignItems: 'flex-end' },
   goldPriceCurrentValue: {

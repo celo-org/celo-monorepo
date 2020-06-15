@@ -8,12 +8,14 @@ export const DEV_PRIVATE_KEY = 'AAAAAGq0qzUlgXAYOb7IDBvUiktHC/IaDAdkwnF4TzLRkQAN
 export const DEV_POLYNOMIAL =
   'AQAAAAAAAABPi76MMecGdah75zolDVDjtrSnZIJNstvoNuWdLS2enOR5uA/rdPRHIBphEJGYGwATrjbWPApxVHNXKkKyYgs+kdDowSvKSqhDda4Id3fw9MhFaiiWuZPVaHxnl3DpLoA='
 
+export enum SupportedKeystore {
+  AzureKeyVault = 'AzureKeyVault',
+  GoogleSecretManager = 'GoogleSecretManager',
+}
+
 interface Config {
   server: {
     port: string | number
-  }
-  blockchain: {
-    provider: string
   }
   salt: {
     unverifiedQueryMax: number
@@ -21,21 +23,32 @@ interface Config {
     queryPerTransaction: number
     minDollarBalance: BigNumber
   }
+  attestations: {
+    numberAttestationsRequired: number
+  }
+  blockchain: {
+    provider: string
+  }
   db: {
     user: string
     password: string
     database: string
     host: string
   }
-  keyVault: {
-    azureClientID: string
-    azureClientSecret: string
-    azureTenant: string
-    azureVaultName: string
-    azureSecretName: string
-  }
-  attestations: {
-    numberAttestationsRequired: number
+  keystore: {
+    type: SupportedKeystore
+    azure: {
+      clientID: string
+      clientSecret: string
+      tenant: string
+      vaultName: string
+      secretName: string
+    }
+    google: {
+      projectId: string
+      secretName: string
+      secretVersion: string
+    }
   }
 }
 
@@ -44,16 +57,19 @@ const toNum = (value: BigNumber.Value) => new BigNumber(value).toNumber()
 const env = process.env as any
 const config: Config = {
   server: {
-    port: toNum(env.SERVER_PORT),
+    port: toNum(env.SERVER_PORT) || 8080,
+  },
+  salt: {
+    unverifiedQueryMax: toNum(env.SALT_UNVERIFIED_QUERY_MAX) || 2,
+    additionalVerifiedQueryMax: toNum(env.SALT_ADDITIONAL_VERIFIED_QUERY_MAX) || 30,
+    queryPerTransaction: toNum(env.SALT_QUERY_PER_TRANSACTION) || 2,
+    minDollarBalance: new BigNumber(env.SALT_MIN_DOLLAR_BALANCE || 100000000000000000),
+  },
+  attestations: {
+    numberAttestationsRequired: toNum(env.ATTESTATIONS_NUMBER_ATTESTATIONS_REQUIRED) || 3,
   },
   blockchain: {
     provider: env.BLOCKCHAIN_PROVIDER,
-  },
-  salt: {
-    unverifiedQueryMax: toNum(env.SALT_UNVERIFIED_QUERY_MAX),
-    additionalVerifiedQueryMax: toNum(env.SALT_ADDITIONAL_VERIFIED_QUERY_MAX),
-    queryPerTransaction: toNum(env.SALT_QUERY_PER_TRANSACTION),
-    minDollarBalance: new BigNumber(env.SALT_MIN_DOLLAR_BALANCE),
   },
   db: {
     user: env.DB_USERNAME,
@@ -61,15 +77,20 @@ const config: Config = {
     database: env.DB_DATABASE,
     host: env.DB_HOST,
   },
-  keyVault: {
-    azureClientID: env.KEYVAULT_AZURE_CLIENT_ID,
-    azureClientSecret: env.KEYVAULT_AZURE_CLIENT_SECRET,
-    azureTenant: env.KEYVAULT_AZURE_TENANT,
-    azureVaultName: env.KEYVAULT_AZURE_VAULT_NAME,
-    azureSecretName: env.KEYVAULT_AZURE_SECRET_NAME,
-  },
-  attestations: {
-    numberAttestationsRequired: toNum(env.ATTESTATIONS_NUMBER_ATTESTATIONS_REQUIRED),
+  keystore: {
+    type: env.KEYSTORE_TYPE,
+    azure: {
+      clientID: env.KEYSTORE_AZURE_CLIENT_ID,
+      clientSecret: env.KEYSTORE_AZURE_CLIENT_SECRET,
+      tenant: env.KEYSTORE_AZURE_TENANT,
+      vaultName: env.KEYSTORE_AZURE_VAULT_NAME,
+      secretName: env.KEYSTORE_AZURE_SECRET_NAME,
+    },
+    google: {
+      projectId: env.KEYSTORE_GOOGLE_PROJECT_ID,
+      secretName: env.KEYSTORE_GOOGLE_SECRET_NAME,
+      secretVersion: env.KEYSTORE_GOOGLE_SECRET_VERSION || 'latest',
+    },
   },
 }
 export default config

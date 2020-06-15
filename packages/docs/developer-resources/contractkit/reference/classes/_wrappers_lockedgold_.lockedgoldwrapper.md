@@ -36,6 +36,7 @@ Contract for handling deposits needed for voting.
 * [getAccountSummary](_wrappers_lockedgold_.lockedgoldwrapper.md#getaccountsummary)
 * [getAccountsSlashed](_wrappers_lockedgold_.lockedgoldwrapper.md#getaccountsslashed)
 * [getConfig](_wrappers_lockedgold_.lockedgoldwrapper.md#getconfig)
+* [getPastEvents](_wrappers_lockedgold_.lockedgoldwrapper.md#getpastevents)
 * [getPendingWithdrawals](_wrappers_lockedgold_.lockedgoldwrapper.md#getpendingwithdrawals)
 * [getPendingWithdrawalsTotalValue](_wrappers_lockedgold_.lockedgoldwrapper.md#getpendingwithdrawalstotalvalue)
 * [relock](_wrappers_lockedgold_.lockedgoldwrapper.md#relock)
@@ -351,6 +352,27 @@ ___
 Returns current configuration parameters.
 
 **Returns:** *Promise‹[LockedGoldConfig](../interfaces/_wrappers_lockedgold_.lockedgoldconfig.md)›*
+
+___
+
+###  getPastEvents
+
+▸ **getPastEvents**(`event`: string, `options`: PastEventOptions): *Promise‹EventLog[]›*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L29)*
+
+Contract getPastEvents
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`event` | string |
+`options` | PastEventOptions |
+
+**Returns:** *Promise‹EventLog[]›*
 
 ___
 
