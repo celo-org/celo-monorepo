@@ -79,7 +79,7 @@ Before applying be ready to share the following:
 * A personal statement telling the Foundation why your group should get votes (max 1,500 characters)
 * Validator Group details: email, name, website, address on Mainnet and Baklava, and geographic location
 * Information about your team: full names, link to professional profiles such as LinkedIn or GitHub, and an explanation of the team’s relevant experience
-* Whether your Group 
+* Whether your Group: 
     * Is validating or has validated in the past 1 month on the Celo Mainnet
     * Is currently receiving Foundation votes
     * Has been slashed in the past 6 months and if so why
