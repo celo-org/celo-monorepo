@@ -36,6 +36,7 @@ export enum Screens {
   JoinCelo = 'JoinCelo',
   Language = 'Language',
   Licenses = 'Licenses',
+  Main = 'Main',
   OutgoingPaymentRequestListScreen = 'OutgoingPaymentRequestListScreen',
   PaymentRequestConfirmation = 'PaymentRequestConfirmation',
   PaymentRequestUnavailable = 'PaymentRequestUnavailable',

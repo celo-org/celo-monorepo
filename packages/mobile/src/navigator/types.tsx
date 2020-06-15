@@ -95,6 +95,7 @@ export type StackParamList = {
     nextScreen?: keyof StackParamList
   }
   [Screens.Licenses]: undefined
+  [Screens.Main]: undefined
   [Screens.OutgoingPaymentRequestListScreen]: undefined
   [Screens.PaymentRequestUnavailable]: {
     transactionData: TransactionDataInput

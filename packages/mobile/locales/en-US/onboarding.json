@@ -11,5 +11,7 @@
       "successHeader": "You have {{matches}} friends on Celo",
       "successStatus": "You're all synced"
     }
-  }
+  },
+  "accountInfo": "Account Info",
+  "step": "Step {{step}} of 5"
 }

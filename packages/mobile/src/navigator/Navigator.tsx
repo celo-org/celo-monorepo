@@ -4,6 +4,7 @@ import colors from '@celo/react-components/styles/colors.v2'
 import { RouteProp } from '@react-navigation/core'
 import { createStackNavigator, TransitionPresets } from '@react-navigation/stack'
 import * as React from 'react'
+import { Platform } from 'react-native'
 import SplashScreen from 'react-native-splash-screen'
 import Account from 'src/account/Account'
 import Analytics from 'src/account/Analytics'
@@ -90,6 +91,7 @@ import ValidateRecipientIntro from 'src/send/ValidateRecipientIntro'
 import SetClock from 'src/set-clock/SetClock'
 import TransactionReview from 'src/transactions/TransactionReview'
 import { getDatetimeDisplayString } from 'src/utils/time'
+import { ExtractProps } from 'src/utils/typescript'
 import VerificationEducationScreen from 'src/verify/VerificationEducationScreen'
 import VerificationInputScreen from 'src/verify/VerificationInputScreen'
 import VerificationInterstitialScreen from 'src/verify/VerificationInterstitialScreen'
@@ -97,6 +99,7 @@ import VerificationLearnMoreScreen from 'src/verify/VerificationLearnMoreScreen'
 import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
 
 const Stack = createStackNavigator<StackParamList>()
+const RootStack = createStackNavigator<StackParamList>()
 
 const commonScreens = (Navigator: typeof Stack) => {
   return (
@@ -148,18 +151,17 @@ const verificationScreens = (Navigator: typeof Stack) => {
 
 const nuxScreens = (Navigator: typeof Stack) => (
   <>
-    <Navigator.Screen name={Screens.JoinCelo} component={JoinCelo} options={nuxNavigationOptions} />
     <Navigator.Screen
-      // options={headerWithBackButton}
-      name={Screens.SelectCountry}
-      component={SelectCountry}
+      name={Screens.JoinCelo}
+      component={JoinCelo}
       options={{
-        // ...nuxNavigationOptions,
-        ...headerWithBackButton,
-        headerTitle: undefined,
-        headerTransparent: false,
-        title: i18n.t('accountScreen10:selectCountryCode'),
-        ...TransitionPresets.ModalTransition,
+        ...nuxNavigationOptions,
+        headerTitle: () => (
+          <HeaderTitleWithSubtitle
+            title={i18n.t('onboarding:accountInfo')}
+            subTitle={i18n.t('onboarding:step', { step: '1' })}
+          />
+        ),
       }}
     />
     <Navigator.Screen
@@ -497,7 +499,7 @@ const mapStateToProps = (state: RootState) => {
   }
 }
 
-export function AppNavigatorNew() {
+export function MainStackScreen() {
   const [initialRouteName, setInitialRoute] = React.useState<Screens | undefined>(undefined)
   React.useEffect(() => {
     const {
@@ -556,4 +558,38 @@ export function AppNavigatorNew() {
   )
 }
 
-export default AppNavigatorNew
+type ScreenOptions = ExtractProps<typeof RootStack.Navigator>['screenOptions']
+
+const modalScreenOptions: ScreenOptions = Platform.select({
+  // iOS 13 modal presentation
+  ios: ({ route, navigation }) => ({
+    gestureEnabled: true,
+    cardOverlayEnabled: true,
+    headerStatusBarHeight:
+      navigation.dangerouslyGetState().routes.indexOf(route) > 0 ? 0 : undefined,
+    ...TransitionPresets.ModalPresentationIOS,
+  }),
+})
+
+function RootStackScreen() {
+  return (
+    <RootStack.Navigator mode="modal" screenOptions={modalScreenOptions}>
+      <RootStack.Screen
+        name={Screens.Main}
+        component={MainStackScreen}
+        options={{ headerShown: false }}
+      />
+      <RootStack.Screen
+        name={Screens.SelectCountry}
+        component={SelectCountry}
+        options={{
+          ...headerWithBackButton,
+          headerTitle: i18n.t('accountScreen10:selectCountryCode'),
+          headerTransparent: false,
+        }}
+      />
+    </RootStack.Navigator>
+  )
+}
+
+export default RootStackScreen
