@@ -9,22 +9,10 @@ pull_request_rules:
       - "#approved-reviews-by>=1"
       # Only enable this when the pull request is being merged into master
       - "base=master"
-      # List of all the tests that should pass.
-      # Keep this in sync with the github branch protection settings
-      - "status-success=ci/circleci: install_dependencies"
-      - "status-success=ci/circleci: lint-checks"
-      - "status-success=ci/circleci: general-test"
-      - "status-success=ci/circleci: mobile-test"
-      - "status-success=ci/circleci: mobile-test-build-app"
-      - "status-success=ci/circleci: protocol-test"
-      - "status-success=ci/circleci: contractkit-test"
-      - "status-success=ci/circleci: cli-test"
-      - "status-success=ci/circleci: end-to-end-geth-transfer-test"
-      - "status-success=ci/circleci: end-to-end-geth-sync-test"
-      - "status-success=ci/circleci: end-to-end-geth-slashing-test"
-      - "status-success=ci/circleci: end-to-end-geth-governance-test"
-      - "status-success=ci/circleci: end-to-end-geth-blockchain-parameters-test"
     actions:
       merge:
         method: squash 
         strict: true
+        commit_message: title+body
+      delete_head_branch:
+        force: False

@@ -1,5 +1,5 @@
 import { switchToClusterFromEnv } from 'src/lib/cluster'
-import { upgradeHelmChart } from 'src/lib/prom-to-sd-utils'
+import { upgradePrometheus } from 'src/lib/prometheus'
 import { deploy, taintTestnet, untaintTestnet } from 'src/lib/vm-testnet-utils'
 import yargs from 'yargs'
 import { UpgradeArgv } from '../../deploy/upgrade'
@@ -42,7 +42,5 @@ export const handler = async (argv: VmTestnetArgv) => {
     await taintTestnet(argv.celoEnv)
   }
   await deploy(argv.celoEnv, !argv.skipSecretGeneration, argv.useExistingGenesis, onDeployFailed)
-
-  // upgrade prom to sd statefulset
-  await upgradeHelmChart(argv.celoEnv)
+  await upgradePrometheus()
 }

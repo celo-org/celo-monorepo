@@ -35,7 +35,7 @@ The Celo stack is structured into the following logical layers:
 ![](https://storage.googleapis.com/celo-website/docs/full-stack-diagram.jpg)
 
 - **Celo Blockchain**: An open cryptographic protocol that allows applications to make transactions with and run smart contracts in a secure and decentralized fashion. The Celo Blockchain code has shared ancestry with [Ethereum](https://www.ethereum.org), and maintains full EVM compatibility for smart contracts. However it uses a [Byzantine Fault Tolerant](http://pmg.csail.mit.edu/papers/osdi99.pdf) \(BFT\) consensus mechanism rather than Proof of Work, and has different block format, transaction format, client synchronization protocols, and gas payment and pricing mechanisms. The network’s native asset is Celo Gold, which is also an ERC-20 token.
-- **Celo Core Contracts**: A set of smart contracts running on the Celo Blockchain that comprise much of the logic of the platform features including ERC-20 stable currencies, identity attestations, Proof of Stake and governance. These smart contracts are upgradeable and managed by the decentralized governance process.
+- **Celo Core Contracts**: A set of smart contracts running on the Celo Blockchain that comprise much of the logic of the platform features including ERC-20 stable currencies, identity attestations, proof-of-stake and governance. These smart contracts are upgradeable and managed by the decentralized governance process.
 - **Applications:** Applications for end users built on the Celo platform. The Celo Wallet app, the first of an ecosystem of applications, allows end users to manage accounts and make payments securely and simply by taking advantage of the innovations in the Celo protocol. Applications take the form of external mobile or backend software: they interact with the Celo Blockchain to issue transactions and invoke code that forms the Celo Core Contracts’ API. Third parties can also deploy custom smart contracts that their own applications can invoke, which in turn can leverage Celo Core Contracts. Applications may use centralized cloud services to provide some of their functionality: in the case of the Celo Wallet, push notifications and a transaction activity feed.
 
 The Celo Blockchain and Celo Core Contracts together comprise the **Celo Protocol**.
@@ -46,7 +46,7 @@ The topology of a Celo network consists of machines running the Celo Blockchain 
 
 ![](https://storage.googleapis.com/celo-website/docs/network.png)
 
-- **Validators:** Validators gather transactions received from other nodes and execute any associated smart contracts to form new blocks, then participate in a Byzantine Fault Tolerant \(BFT\) consensus protocol to advance the state of the network. Since BFT protocols can scale only to a few hundred participants, and can tolerate at most a third of the participants acting maliciously, a Proof of Stake mechanism admits only a limited set of nodes to this role.
+- **Validators:** Validators gather transactions received from other nodes and execute any associated smart contracts to form new blocks, then participate in a Byzantine Fault Tolerant \(BFT\) consensus protocol to advance the state of the network. Since BFT protocols can scale only to a few hundred participants, and can tolerate at most a third of the participants acting maliciously, a proof-of-stake mechanism admits only a limited set of nodes to this role.
 - **Full Nodes:** Most machines running the Celo Blockchain software are either not configured to be, or not elected as, validators. Celo nodes do not do "mining" as in Proof of Work networks. Their primary role is to serve requests from light clients and forward their transactions, for which they receive the fees associated with those transactions. These payments create a ‘permissionless onramp’ for individuals in the community to earn currency. Full nodes maintain at least partial history of the blockchain by transferring new blocks between themselves, and can join or leave the network at any time.
 - **Light Clients:** Applications including the Celo Wallet will also run on each user's device an instance of the Celo Blockchain software operating as a ‘light client’. Light clients connect to full nodes to make requests for account and transaction data and to sign and submit new transactions, but they do not receive or retain the full state of the blockchain.
 
@@ -62,16 +62,16 @@ When an end user downloads the Celo Wallet from, for example, the Google Play St
 
 The Celo Blockchain and Celo Core Contracts together comprise the **Celo Protocol**. This term describes both what services the decentralized Celo network provide to applications and the way in which nodes in the network cooperate to achieve this. This section introduces some of these services.
 
-### Consensus and Proof of Stake
+### Consensus and Proof-of-Stake
 
-Celo is a Proof of Stake blockchain. In comparison to Proof of Work systems like Bitcoin and Ethereum, this eliminates the negative environmental impact and means that users can make transactions that are cheaper, faster, and whose outcome cannot be changed once complete.
+Celo is a proof-of-stake blockchain. In comparison to Proof of Work systems like Bitcoin and Ethereum, this eliminates the negative environmental impact and means that users can make transactions that are cheaper, faster, and whose outcome cannot be changed once complete.
 
 The Celo Blockchain implements a Byzantine Fault Tolerant \(BFT\) consensus algorithm in which a well-defined set of validator nodes broadcast signed messages between themselves in a sequence of steps to reach agreement even when up to a third of the total nodes are offline, faulty or malicious. When a quorum of validators have reached agreement, that decision is final.
 
-Celo uses a Proof of Stake mechanism for selecting the validator set for a fixed period termed an epoch. Anyone can earn rewards by locking Celo Gold and by participating in validator elections and governance proposals. Initially, the number of validators will be capped to one hundred nodes elected by Celo Gold holders. Validators earn additional fixed rewards in Celo Dollars to cover their costs plus margin.
+Celo uses a proof-of-stake mechanism for selecting the validator set for a fixed period termed an epoch. Anyone can earn rewards by locking Celo Gold and by participating in validator elections and governance proposals. Initially, the number of validators will be capped to one hundred nodes elected by Celo Gold holders. Validators earn additional fixed rewards in Celo Dollars to cover their costs plus margin.
 
 {% hint style="success" %}
-**Roadmap**: Celo is pioneering a [highly scalable, permissionless BFT consensus algorithm](https://medium.com/celohq/bftree-scaling-hotstuff-to-millions-of-validators-7d6930ee046a) that in the long term will result in substantial changes to the proof of stake mechanism described here.
+**Roadmap**: Celo is pioneering a [highly scalable, permissionless BFT consensus algorithm](https://medium.com/celohq/bftree-scaling-hotstuff-to-millions-of-validators-7d6930ee046a) that in the long term will result in substantial changes to the proof-of-stake mechanism described here.
 {% endhint %}
 
 ### On-Chain Governance
@@ -96,7 +96,7 @@ In Ethereum, there are few incentives to run a full node that is not mining. Few
 
 Celo introduces a scheme that incentivizes users to operate regular nodes. Light clients pay transaction fees to full nodes. Clients include in every transaction the address of a node which, when the transaction is processed, receives the fee. While a full node provides other services for which they receive no specific fee, it is expected that failing to service these requests will cause clients to seek other full nodes that do, who will then receive fees when they next make a transaction.
 
-Since light clients need not trust full nodes, as they can verify their work, this also provides the 'permissionless on-ramp' for users to receive Celo Gold or Celo Dollars without already holding it that is missing in other Proof of Stake networks.
+Since light clients need not trust full nodes, as they can verify their work, this also provides the 'permissionless on-ramp' for users to receive Celo Gold or Celo Dollars without already holding it that is missing in other proof-of-stake networks.
 
 ### Stable Cryptocurrencies
 
@@ -106,7 +106,7 @@ Celo's stability mechanism allows users to create a new Celo Dollar by sending 1
 
 This mechanism relies on a series of Oracles, or information feeds from exchanges external to the network, to report the Celo Gold to US Dollar market rate. To minimize the risk of a run on Celo Gold collateral when these reported values are inaccurate or out-of-date, Celo uses an on-chain constant-product-market-maker model, inspired by the [Uniswap](https://uniswap.io/) system. This mechanism adjusts the redemption price of Celo Gold until either arbitrage occurs (so that the on-chain price dynamically adjusts until the offered rate meets the external rate) or Oracles reset the on-chain price.
 
-The Celo protocol ensures that there is sufficient Celo Gold collateral to redeem the amount of Celo Gold in circulation through several sources. These include a [stability fee](celo-codebase/protocol/stability/stability-fees.md) levied on Celo Dollar balances, a transfer from [epoch rewards](celo-codebase/protocol/proof-of-stake/community-fund.md#bolster-reserve), plus the proceeds from the spread when interacting with the on-chain market-maker mechanism.  
+The Celo protocol ensures that there is sufficient Celo Gold collateral to redeem the amount of Celo Gold in circulation through several sources. These include a [stability fee](celo-codebase/protocol/stability/stability-fees.md) levied on Celo Dollar balances, a transfer from [epoch rewards](celo-codebase/protocol/proof-of-stake/community-fund.md#bolstering-the-reserve), plus the proceeds from the spread when interacting with the on-chain market-maker mechanism.  
 
 In addition, a back-up reserve of cryptocurrencies is held off-chain. This off-chain reserve is managed to preserve value and minimize volatility by maintaining a diversified portfolio of cryptocurrencies through algorithmic rebalancing trading and periodically "topping-up" the Celo Gold collateral available to ensure it exceeds the amount required to redeem Celo Dollars in circulation. The approved cryptocurrencies, distribution ratios, and rebalancing period are all subject to on-chain governance.
 

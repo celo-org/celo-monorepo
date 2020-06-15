@@ -1,4 +1,3 @@
-import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import 'react-native'
 import { Provider } from 'react-redux'
@@ -6,8 +5,8 @@ import * as renderer from 'react-test-renderer'
 import { PaymentRequest } from 'src/account/types'
 import { paymentRequestDouble } from 'src/paymentRequest/__mocks__'
 import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
-import { createMockNavigationProp, createMockStore } from 'test/utils'
-import { mockAccount, mockE164Number, mockRecipient } from 'test/values'
+import { createMockStore } from 'test/utils'
+import { mockAccount, mockE164Number } from 'test/values'
 
 const requests = [
   paymentRequestDouble({
@@ -30,13 +29,6 @@ const requests = [
   }),
 ]
 
-const navigation = createMockNavigationProp({
-  recipient: mockRecipient,
-  recipientAddress: mockAccount,
-  amount: new BigNumber(10),
-  reason: 'My Reason',
-})
-
 function testStore(incomingPaymentRequests: PaymentRequest[]) {
   return createMockStore({
     stableToken: { balance: '120' },
@@ -50,7 +42,7 @@ describe('IncomingPaymentRequestListScreen', () => {
 
     const tree = renderer.create(
       <Provider store={store}>
-        <IncomingPaymentRequestListScreen navigation={navigation} />
+        <IncomingPaymentRequestListScreen />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
@@ -61,7 +53,7 @@ describe('IncomingPaymentRequestListScreen', () => {
 
     const tree = renderer.create(
       <Provider store={store}>
-        <IncomingPaymentRequestListScreen navigation={navigation} />
+        <IncomingPaymentRequestListScreen />
       </Provider>
     )
     expect(tree).toMatchSnapshot()

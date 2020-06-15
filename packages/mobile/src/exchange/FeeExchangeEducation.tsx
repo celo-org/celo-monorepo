@@ -4,7 +4,6 @@ import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { ringsPlusCircle } from 'src/images/Images'
 import { navigateBack } from 'src/navigator/NavigationService'
@@ -57,6 +56,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  withTranslation(Namespaces.exchangeFlow9)(FeeExchangeEducation)
-)
+export default withTranslation(Namespaces.exchangeFlow9)(FeeExchangeEducation)

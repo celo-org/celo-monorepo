@@ -29,6 +29,7 @@ Stores the gas price minimum
 ### Methods
 
 * [getConfig](_wrappers_gaspriceminimum_.gaspriceminimumwrapper.md#getconfig)
+* [getPastEvents](_wrappers_gaspriceminimum_.gaspriceminimumwrapper.md#getpastevents)
 
 ## Constructors
 
@@ -53,9 +54,13 @@ Name | Type |
 
 ###  adjustmentSpeed
 
-• **adjustmentSpeed**: *function* = proxyCall(this.contract.methods.adjustmentSpeed, undefined, valueToBigNumber)
+• **adjustmentSpeed**: *function* = proxyCall(
+    this.contract.methods.adjustmentSpeed,
+    undefined,
+    fixidityValueToBigNumber
+  )
 
-*Defined in [contractkit/src/wrappers/GasPriceMinimum.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GasPriceMinimum.ts#L40)*
+*Defined in [contractkit/src/wrappers/GasPriceMinimum.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GasPriceMinimum.ts#L44)*
 
 Query adjustment speed parameter
 
@@ -133,7 +138,11 @@ ___
 
 ###  targetDensity
 
-• **targetDensity**: *function* = proxyCall(this.contract.methods.targetDensity, undefined, valueToBigNumber)
+• **targetDensity**: *function* = proxyCall(
+    this.contract.methods.targetDensity,
+    undefined,
+    fixidityValueToBigNumber
+  )
 
 *Defined in [contractkit/src/wrappers/GasPriceMinimum.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GasPriceMinimum.ts#L35)*
 
@@ -171,8 +180,29 @@ Contract address
 
 ▸ **getConfig**(): *Promise‹[GasPriceMinimumConfig](../interfaces/_wrappers_gaspriceminimum_.gaspriceminimumconfig.md)›*
 
-*Defined in [contractkit/src/wrappers/GasPriceMinimum.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GasPriceMinimum.ts#L44)*
+*Defined in [contractkit/src/wrappers/GasPriceMinimum.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GasPriceMinimum.ts#L52)*
 
 Returns current configuration parameters.
 
 **Returns:** *Promise‹[GasPriceMinimumConfig](../interfaces/_wrappers_gaspriceminimum_.gaspriceminimumconfig.md)›*
+
+___
+
+###  getPastEvents
+
+▸ **getPastEvents**(`event`: string, `options`: PastEventOptions): *Promise‹EventLog[]›*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L29)*
+
+Contract getPastEvents
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`event` | string |
+`options` | PastEventOptions |
+
+**Returns:** *Promise‹EventLog[]›*

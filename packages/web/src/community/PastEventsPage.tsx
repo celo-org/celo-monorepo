@@ -35,9 +35,7 @@ export default class PastEventsPage extends React.PureComponent<{}, State> {
         <OpenGraph
           path="/past-events"
           title={'Past Celo Events'}
-          description={
-            'Celo is building a monetary system that allows more people to participate, and we invite you to join the conversation and our community. Diverse perspectives and inclusive conversations welcomed.'
-          }
+          description="List of past Celo community events around the world. Join the conversation and our community. Diverse perspectives and inclusive conversations welcomed."
           image={preview}
         />
         <Events pastEvents={this.state.pastEvents} loading={this.state.loading} />

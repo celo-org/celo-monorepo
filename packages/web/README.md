@@ -1,6 +1,6 @@
 # Web
 
-This is the Celo website, which is deployed to https://celo.org/
+This is the Celo Foundation website, which is deployed to https://celo.org/
 
 ## Developing
 

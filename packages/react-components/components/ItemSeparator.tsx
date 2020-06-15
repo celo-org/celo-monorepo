@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
 import variables from '@celo/react-components/styles/variables'
 import React from 'react'
 import { StyleSheet, View } from 'react-native'
@@ -10,7 +10,7 @@ export default function ItemSeparator() {
 const styles = StyleSheet.create({
   container: {
     height: 1,
-    backgroundColor: colors.listBorder,
+    backgroundColor: colors.gray2,
     marginHorizontal: variables.contentPadding,
   },
 })

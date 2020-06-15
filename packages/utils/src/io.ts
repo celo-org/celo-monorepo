@@ -76,6 +76,8 @@ export const PublicKeyType = new t.Type<string, string, unknown>(
 
 export const SignatureType = t.string
 
+export const SaltType = t.string
+
 export const AttestationServiceStatusResponseType = t.type({
   status: t.literal('ok'),
   smsProviders: t.array(t.string),

@@ -1,5 +1,5 @@
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
-import SectionHead from '@celo/react-components/components/SectionHead'
+import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { isValidAddress } from '@celo/utils/src/address'
@@ -29,7 +29,6 @@ import {
 import RecipientItem from 'src/recipients/RecipientItem'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
-import { ContactSyncBanner } from 'src/send/ContactSyncBanner'
 import Logger from 'src/utils/Logger'
 import { assertUnreachable } from 'src/utils/typescript'
 
@@ -42,9 +41,8 @@ interface Props {
   testID?: string
   searchQuery: string
   sections: Section[]
-  defaultCountryCode: string
+  defaultCountryCode: string | null
   listHeaderComponent?: React.ComponentType<any>
-  showContactSyncBanner?: boolean
   onSelectRecipient(recipient: Recipient): void
 }
 
@@ -74,7 +72,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
   )
 
   renderSectionHeader = (info: { section: SectionListData<Recipient> }) => (
-    <SectionHead text={info.section.key as string} />
+    <SectionHeadNew text={info.section.key as string} />
   )
 
   keyExtractor = (item: Recipient, index: number) => {
@@ -96,7 +94,10 @@ export class RecipientPicker extends React.Component<RecipientProps> {
   renderItemSeparator = () => <View style={style.separator} />
 
   renderEmptyView = () => {
-    const parsedNumber = parsePhoneNumber(this.props.searchQuery, this.props.defaultCountryCode)
+    const parsedNumber = parsePhoneNumber(
+      this.props.searchQuery,
+      this.props.defaultCountryCode ? this.props.defaultCountryCode : undefined
+    )
     if (parsedNumber) {
       return this.renderSendToPhoneNumber(parsedNumber.displayNumber, parsedNumber.e164Number)
     }
@@ -176,11 +177,10 @@ export class RecipientPicker extends React.Component<RecipientProps> {
   }
 
   render() {
-    const { sections, listHeaderComponent, showContactSyncBanner } = this.props
+    const { sections, listHeaderComponent } = this.props
 
     return (
       <View style={style.body} testID={this.props.testID}>
-        {showContactSyncBanner && <ContactSyncBanner />}
         <SafeAreaConsumer>
           {(insets) => (
             <SectionList

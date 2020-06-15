@@ -6,7 +6,8 @@ import { ExchangeTradeScreen } from 'src/exchange/ExchangeTradeScreen'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
-import { createMockNavigationProp, createMockStore, getMockI18nProps } from 'test/utils'
+import { Screens } from 'src/navigator/Screens'
+import { createMockStore, getMockI18nProps, getMockStackScreenProps } from 'test/utils'
 
 const exchangeRatePair: ExchangeRatePair = { goldMaker: '0.11', dollarMaker: '10' }
 
@@ -16,20 +17,23 @@ const store = createMockStore({
   },
 })
 
+const mockScreenProps = getMockStackScreenProps(Screens.ExchangeTradeScreen, {
+  makerTokenDisplay: {
+    makerToken: CURRENCY_ENUM.GOLD,
+    makerTokenBalance: '20',
+  },
+})
+
 describe(ExchangeTradeScreen, () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
   it('renders correctly', () => {
-    const navigation = createMockNavigationProp({
-      makerToken: CURRENCY_ENUM.GOLD,
-      makerTokenBalance: '20',
-    })
     const { toJSON } = render(
       <Provider store={store}>
         <ExchangeTradeScreen
-          navigation={navigation}
+          {...mockScreenProps}
           error={null}
           fetchExchangeRate={jest.fn()}
           showError={jest.fn()}
@@ -47,14 +51,11 @@ describe(ExchangeTradeScreen, () => {
   it('validates the amount when selling gold', () => {
     const mockShowError = jest.fn()
     const mockhideAlert = jest.fn()
-    const navigation = createMockNavigationProp({
-      makerToken: CURRENCY_ENUM.GOLD,
-      makerTokenBalance: '20',
-    })
+
     const { getByTestId } = render(
       <Provider store={store}>
         <ExchangeTradeScreen
-          navigation={navigation}
+          {...mockScreenProps}
           error={null}
           fetchExchangeRate={jest.fn()}
           showError={mockShowError}
@@ -85,14 +86,16 @@ describe(ExchangeTradeScreen, () => {
   it('validates the amount when selling dollars', () => {
     const mockShowError = jest.fn()
     const mockhideAlert = jest.fn()
-    const navigation = createMockNavigationProp({
-      makerToken: CURRENCY_ENUM.DOLLAR,
-      makerTokenBalance: '20.02', // equals 400.4 MXN
-    })
+
     const { getByTestId } = render(
       <Provider store={store}>
         <ExchangeTradeScreen
-          navigation={navigation}
+          {...getMockStackScreenProps(Screens.ExchangeTradeScreen, {
+            makerTokenDisplay: {
+              makerToken: CURRENCY_ENUM.DOLLAR,
+              makerTokenBalance: '20.02', // equals 400.4 MXN
+            },
+          })}
           error={null}
           fetchExchangeRate={jest.fn()}
           showError={mockShowError}
@@ -121,14 +124,10 @@ describe(ExchangeTradeScreen, () => {
   })
 
   it('checks the minimum amount when selling gold', () => {
-    const navigation = createMockNavigationProp({
-      makerToken: CURRENCY_ENUM.GOLD,
-      makerTokenBalance: '20',
-    })
     const { getByTestId } = render(
       <Provider store={store}>
         <ExchangeTradeScreen
-          navigation={navigation}
+          {...mockScreenProps}
           error={null}
           fetchExchangeRate={jest.fn()}
           showError={jest.fn()}
@@ -155,14 +154,15 @@ describe(ExchangeTradeScreen, () => {
   })
 
   it('checks the minimum amount when selling dollars', () => {
-    const navigation = createMockNavigationProp({
-      makerToken: CURRENCY_ENUM.DOLLAR,
-      makerTokenBalance: '200',
-    })
     const { getByTestId } = render(
       <Provider store={store}>
         <ExchangeTradeScreen
-          navigation={navigation}
+          {...getMockStackScreenProps(Screens.ExchangeTradeScreen, {
+            makerTokenDisplay: {
+              makerToken: CURRENCY_ENUM.DOLLAR,
+              makerTokenBalance: '200',
+            },
+          })}
           error={null}
           fetchExchangeRate={jest.fn()}
           showError={jest.fn()}

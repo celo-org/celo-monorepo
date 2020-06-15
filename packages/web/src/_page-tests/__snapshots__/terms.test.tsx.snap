@@ -234,6 +234,7 @@ exports[`Terms renders 1`] = `
               href="/user-agreement"
               onClick={[Function]}
               onMouseEnter={[Function]}
+              rel=" noopener noreferrer"
               role="link"
               style={
                 Object {
@@ -247,11 +248,14 @@ exports[`Terms renders 1`] = `
                   "fontSize": "16px",
                   "fontWeight": "500",
                   "lineHeight": "16px",
+                  "marginRight": "30px",
+                  "marginTop": "10px",
                   "msFlexAlign": "center",
                   "textAlign": "center",
                   "textRendering": "geometricPrecision",
                 }
               }
+              target="_blank"
             >
               User Agreement
               <div
@@ -330,6 +334,7 @@ exports[`Terms renders 1`] = `
               href="/faq"
               onClick={[Function]}
               onMouseEnter={[Function]}
+              rel=" noopener noreferrer"
               role="link"
               style={
                 Object {
@@ -343,11 +348,14 @@ exports[`Terms renders 1`] = `
                   "fontSize": "16px",
                   "fontWeight": "500",
                   "lineHeight": "16px",
+                  "marginRight": "30px",
+                  "marginTop": "10px",
                   "msFlexAlign": "center",
                   "textAlign": "center",
                   "textRendering": "geometricPrecision",
                 }
               }
+              target="_blank"
             >
               FAQ
               <div
@@ -426,6 +434,7 @@ exports[`Terms renders 1`] = `
               href="/privacy"
               onClick={[Function]}
               onMouseEnter={[Function]}
+              rel=" noopener noreferrer"
               role="link"
               style={
                 Object {
@@ -439,11 +448,14 @@ exports[`Terms renders 1`] = `
                   "fontSize": "16px",
                   "fontWeight": "500",
                   "lineHeight": "16px",
+                  "marginRight": "30px",
+                  "marginTop": "10px",
                   "msFlexAlign": "center",
                   "textAlign": "center",
                   "textRendering": "geometricPrecision",
                 }
               }
+              target="_blank"
             >
               Privacy Policy
               <div
@@ -522,6 +534,7 @@ exports[`Terms renders 1`] = `
               href="https://docs.celo.org/important-information/alfajores-testnet-disclaimer"
               onClick={[Function]}
               onMouseEnter={[Function]}
+              rel=" noopener noreferrer"
               role="link"
               style={
                 Object {
@@ -535,11 +548,14 @@ exports[`Terms renders 1`] = `
                   "fontSize": "16px",
                   "fontWeight": "500",
                   "lineHeight": "16px",
+                  "marginRight": "30px",
+                  "marginTop": "10px",
                   "msFlexAlign": "center",
                   "textAlign": "center",
                   "textRendering": "geometricPrecision",
                 }
               }
+              target="_blank"
             >
               Disclaimer
               <div
@@ -728,6 +744,7 @@ exports[`Terms renders 1`] = `
             href="https://docs.celo.org/celo-codebase/protocol/privacy"
             onClick={[Function]}
             onMouseEnter={[Function]}
+            rel=" noopener noreferrer"
             role="link"
             style={
               Object {
@@ -741,11 +758,14 @@ exports[`Terms renders 1`] = `
                 "fontSize": "16px",
                 "fontWeight": "500",
                 "lineHeight": "16px",
+                "marginRight": "30px",
+                "marginTop": "10px",
                 "msFlexAlign": "center",
                 "textAlign": "center",
                 "textRendering": "geometricPrecision",
               }
             }
+            target="_blank"
           >
             Privacy Documentation
             <div

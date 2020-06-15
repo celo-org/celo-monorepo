@@ -1,6 +1,5 @@
 import * as React from 'react'
 import Svg, { Path } from 'react-native-svg'
-import componentWithAnalytics from 'src/analytics/wrapper'
 
 interface Props {
   width?: number
@@ -17,4 +16,4 @@ const EditIcon = (props: Props) => (
   </Svg>
 )
 
-export default componentWithAnalytics(EditIcon)
+export default EditIcon

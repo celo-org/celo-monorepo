@@ -87,6 +87,7 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
       'lock',
       '--value',
       '10000000000000000000000',
+      '--yes',
     ])
     await Authorize.run([
       '--contract',
@@ -130,6 +131,7 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
       'lock',
       '--value',
       '10000000000000000000000',
+      '--yes',
     ])
     await Authorize.run([
       '--contract',

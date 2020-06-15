@@ -1,5 +1,5 @@
 {
-  "name": "celo-moonpay-auth",
+  "name": "@celo/moonpay-auth",
   "version": "1.0.0",
   "description": "Signs Moonpay requests with private api key",
   "author": "Celo",

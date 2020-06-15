@@ -3,7 +3,6 @@ import fonts from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native'
-import componentWithAnalytics from 'src/analytics/wrapper'
 
 export interface HomeActionProps {
   title: string
@@ -57,4 +56,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(HomeAction)
+export default HomeAction

@@ -1,8 +1,7 @@
-import Button from '@celo/react-components/components/Button'
 import ReviewFrame from '@celo/react-components/components/ReviewFrame'
-import { shallow } from 'enzyme'
 import * as React from 'react'
 import { Text } from 'react-native'
+import { render } from 'react-native-testing-library'
 import * as renderer from 'react-test-renderer'
 
 const Header = () => <Text>Header</Text>
@@ -15,28 +14,32 @@ describe('ReviewFrame', () => {
   })
   describe('when Header', () => {
     it('renders with Header', () => {
-      const frame = shallow(<ReviewFrame HeaderComponent={Header} navigateBack={jest.fn()} />)
-      expect(frame.find(Header).exists()).toBe(true)
+      const { getByType } = render(
+        <ReviewFrame HeaderComponent={Header} navigateBack={jest.fn()} />
+      )
+      expect(getByType(Header)).toBeTruthy()
     })
   })
   describe('when Footer', () => {
     it('renders with Footer', () => {
-      const frame = shallow(<ReviewFrame FooterComponent={Footer} navigateBack={jest.fn()} />)
-      expect(frame.find(Footer).exists()).toBe(true)
+      const { getByType } = render(
+        <ReviewFrame FooterComponent={Footer} navigateBack={jest.fn()} />
+      )
+      expect(getByType(Footer)).toBeTruthy()
     })
   })
   describe('when has confirmButton', () => {
     it('renders Button with associated props', () => {
       const action = jest.fn()
-      const frame = shallow(<ReviewFrame confirmButton={{ text: 'Confirm', action }} />)
-      expect(frame.find({ text: 'Confirm' }).type()).toEqual(Button)
+      const { getByText } = render(<ReviewFrame confirmButton={{ text: 'Confirm', action }} />)
+      expect(getByText('Confirm')).toBeTruthy()
     })
   })
   describe('when has modifyButton', () => {
     it('renders Button with associated props', () => {
       const action = jest.fn()
-      const frame = shallow(<ReviewFrame modifyButton={{ text: 'Edit', action }} />)
-      expect(frame.find({ text: 'Edit' }).type()).toEqual(Button)
+      const { getByText } = render(<ReviewFrame modifyButton={{ text: 'Edit', action }} />)
+      expect(getByText('Edit')).toBeTruthy()
     })
   })
 })

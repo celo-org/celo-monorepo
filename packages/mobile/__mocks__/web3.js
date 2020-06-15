@@ -58,6 +58,7 @@ export default class {
     },
     sendTransaction: async () => {},
     isSyncing: jest.fn(() => ({ startingBlock: 0, currentBlock: 10, highestBlock: 100 })),
+    sign: jest.fn(() => true),
   }
 
   utils = {

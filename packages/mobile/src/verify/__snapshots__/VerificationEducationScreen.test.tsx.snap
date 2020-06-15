@@ -104,7 +104,6 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
@@ -140,6 +139,35 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
   </RCTScrollView>
   <View
     style={
+      Object {
+        "alignItems": "center",
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "height": 64,
+        }
+      }
+    >
+      <Text
+        style={
+          Object {
+            "color": "#EA6042",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+          }
+        }
+      >
+        insufficientBalance
+         
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
       Array [
         Object {
           "alignItems": "center",
@@ -150,15 +178,14 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
         null,
         undefined,
         Object {
-          "backgroundColor": "#42D689",
+          "backgroundColor": "#A3EBC6",
         },
       ]
     }
   >
     <View
       accessible={true}
-      focusable={true}
-      isTVSelectable={true}
+      focusable={false}
       nativeBackgroundAndroid={
         Object {
           "attribute": "selectableItemBackground",
@@ -180,7 +207,7 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
             "justifyContent": "center",
           },
           Object {
-            "backgroundColor": "#42D689",
+            "backgroundColor": "#A3EBC6",
           },
           Object {
             "height": 50,
@@ -244,7 +271,6 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
     <View
       accessible={true}
       focusable={true}
-      isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
           "attribute": "selectableItemBackground",
@@ -335,6 +361,7 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
     <View
       accessible={true}
       focusable={true}
+      forwardedRef={[Function]}
       onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
@@ -357,6 +384,7 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
       }
     />
     <View
+      forwardedRef={[Function]}
       hideModalContentWhileAnimating={false}
       onModalHide={[Function]}
       onModalWillHide={[Function]}
@@ -451,7 +479,6 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
@@ -465,6 +492,7 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            testID="ModalCancel"
           >
             <Text
               style={
@@ -491,7 +519,6 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
@@ -505,6 +532,7 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            testID="ModalSkip"
           >
             <Text
               style={
@@ -639,7 +667,6 @@ exports[`VerificationEducationScreen renders correctly 2`] = `
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
@@ -675,6 +702,35 @@ exports[`VerificationEducationScreen renders correctly 2`] = `
   </RCTScrollView>
   <View
     style={
+      Object {
+        "alignItems": "center",
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "height": 64,
+        }
+      }
+    >
+      <Text
+        style={
+          Object {
+            "color": "#EA6042",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+          }
+        }
+      >
+        insufficientBalance
+         
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
       Array [
         Object {
           "alignItems": "center",
@@ -685,15 +741,14 @@ exports[`VerificationEducationScreen renders correctly 2`] = `
         null,
         undefined,
         Object {
-          "backgroundColor": "#42D689",
+          "backgroundColor": "#A3EBC6",
         },
       ]
     }
   >
     <View
       accessible={true}
-      focusable={true}
-      isTVSelectable={true}
+      focusable={false}
       nativeBackgroundAndroid={
         Object {
           "attribute": "selectableItemBackground",
@@ -715,7 +770,7 @@ exports[`VerificationEducationScreen renders correctly 2`] = `
             "justifyContent": "center",
           },
           Object {
-            "backgroundColor": "#42D689",
+            "backgroundColor": "#A3EBC6",
           },
           Object {
             "height": 50,
@@ -779,7 +834,6 @@ exports[`VerificationEducationScreen renders correctly 2`] = `
     <View
       accessible={true}
       focusable={true}
-      isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
           "attribute": "selectableItemBackground",
@@ -870,6 +924,7 @@ exports[`VerificationEducationScreen renders correctly 2`] = `
     <View
       accessible={true}
       focusable={true}
+      forwardedRef={[Function]}
       onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
@@ -892,6 +947,7 @@ exports[`VerificationEducationScreen renders correctly 2`] = `
       }
     />
     <View
+      forwardedRef={[Function]}
       hideModalContentWhileAnimating={false}
       onModalHide={[Function]}
       onModalWillHide={[Function]}
@@ -986,7 +1042,6 @@ exports[`VerificationEducationScreen renders correctly 2`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
@@ -1000,6 +1055,7 @@ exports[`VerificationEducationScreen renders correctly 2`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            testID="ModalCancel"
           >
             <Text
               style={
@@ -1026,7 +1082,6 @@ exports[`VerificationEducationScreen renders correctly 2`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
@@ -1040,6 +1095,7 @@ exports[`VerificationEducationScreen renders correctly 2`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            testID="ModalSkip"
           >
             <Text
               style={

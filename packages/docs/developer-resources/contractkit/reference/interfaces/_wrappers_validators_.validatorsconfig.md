@@ -8,6 +8,7 @@
 
 ### Properties
 
+* [commissionUpdateDelay](_wrappers_validators_.validatorsconfig.md#commissionupdatedelay)
 * [groupLockedGoldRequirements](_wrappers_validators_.validatorsconfig.md#grouplockedgoldrequirements)
 * [maxGroupSize](_wrappers_validators_.validatorsconfig.md#maxgroupsize)
 * [membershipHistoryLength](_wrappers_validators_.validatorsconfig.md#membershiphistorylength)
@@ -15,6 +16,14 @@
 * [validatorLockedGoldRequirements](_wrappers_validators_.validatorsconfig.md#validatorlockedgoldrequirements)
 
 ## Properties
+
+###  commissionUpdateDelay
+
+• **commissionUpdateDelay**: *BigNumber*
+
+*Defined in [contractkit/src/wrappers/Validators.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L64)*
+
+___
 
 ###  groupLockedGoldRequirements
 

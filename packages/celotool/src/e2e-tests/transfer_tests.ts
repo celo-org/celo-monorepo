@@ -72,15 +72,15 @@ class InflationManager {
 const freeze = async (validatorUri: string, validatorAddress: string, token: CeloToken) => {
   const kit = newKit(validatorUri)
   const tokenAddress = await kit.registry.addressFor(token)
-  const freezer = await kit._web3Contracts.getFreezer()
-  await freezer.methods.freeze(tokenAddress).send({ from: validatorAddress })
+  const freezer = await kit.contracts.getFreezer()
+  await freezer.freeze(tokenAddress).sendAndWaitForReceipt({ from: validatorAddress })
 }
 
 const unfreeze = async (validatorUri: string, validatorAddress: string, token: CeloToken) => {
   const kit = newKit(validatorUri)
   const tokenAddress = await kit.registry.addressFor(token)
-  const freezer = await kit._web3Contracts.getFreezer()
-  await freezer.methods.unfreeze(tokenAddress).send({ from: validatorAddress })
+  const freezer = await kit.contracts.getFreezer()
+  await freezer.unfreeze(tokenAddress).sendAndWaitForReceipt({ from: validatorAddress })
 }
 
 const whitelistAddress = async (
@@ -922,8 +922,8 @@ describe('Transfer tests', function(this: any) {
           describe('check if frozen', () => {
             it('should be frozen', async () => {
               const goldTokenAddress = await kit.registry.addressFor(CeloContract.GoldToken)
-              const freezer = await kit._web3Contracts.getFreezer()
-              const isFrozen = await freezer.methods.isFrozen(goldTokenAddress).call()
+              const freezer = await kit.contracts.getFreezer()
+              const isFrozen = await freezer.isFrozen(goldTokenAddress)
               assert(isFrozen)
             })
           })

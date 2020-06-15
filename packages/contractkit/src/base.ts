@@ -37,6 +37,7 @@ export const ProxyContracts = [
   'EscrowProxy',
   'ExchangeProxy',
   'FeeCurrencyWhitelistProxy',
+  'FreezerProxy',
   'GasPriceMinimumProxy',
   'GoldTokenProxy',
   'GovernanceApproverMultiSigProxy',

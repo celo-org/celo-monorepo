@@ -91,7 +91,7 @@ contract('Attestations', (accounts: string[]) => {
     issuer: string
   ): Promise<[number, string, string]> {
     const privateKey = getDerivedKey(KeyOffsets.ATTESTING_KEY_OFFSET, issuer)
-    const { v, r, s } = AttestationUtils.attestToIdentifier(phoneNumber, account, privateKey)
+    const { v, r, s } = AttestationUtils.attestToIdentifier(phoneHash, account, privateKey)
     return [v, r, s]
   }
 

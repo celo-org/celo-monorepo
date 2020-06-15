@@ -80,12 +80,12 @@ testWithGanache('Domain claims', (web3) => {
 
     describe('when the metadata URL is set', () => {
       it('indicates that the metadata contain the right claim', async () => {
-        const output = await verifyDomainRecord(claim, address, dnsResolver)
+        const output = await verifyDomainRecord(kit, claim, address, dnsResolver)
         expect(output).toBeUndefined()
       })
 
       it('indicates that the metadata does not contain the proper domain claim', async () => {
-        const error = await verifyDomainRecord(claim, address)
+        const error = await verifyDomainRecord(kit, claim, address)
         expect(error).toContain('Unable to verify domain claim')
       })
     })

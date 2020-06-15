@@ -119,7 +119,7 @@ export class LedgerWallet extends RemoteWallet implements Wallet {
     const appConfiguration = await this.ledger!.getAppConfiguration()
     if (!appConfiguration.arbitraryDataEnabled) {
       console.warn(
-        'Beware, your ledger does not allow the use of contract data. Some features may not work correctly'
+        'Beware, your ledger does not allow the use of contract data. Some features may not work correctly, including token transfers. You can enable it from the ledger app settings.'
       )
     }
     return appConfiguration

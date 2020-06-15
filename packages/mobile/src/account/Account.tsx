@@ -2,6 +2,7 @@ import Link from '@celo/react-components/components/Link'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { isE164Number } from '@celo/utils/src/phoneNumbers'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as Sentry from '@sentry/react-native'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -21,9 +22,11 @@ import { FAQ_LINK, TOS_LINK } from 'src/config'
 import { features } from 'src/flags'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { revokeVerification } from 'src/identity/actions'
+import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { headerWithBackButton } from 'src/navigator/Headers'
-import { navigate, navigateProtected } from 'src/navigator/NavigationService'
+import { navigateProtected } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import { navigateToURI, navigateToVerifierApp } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
@@ -39,14 +42,17 @@ interface DispatchProps {
 
 interface StateProps {
   account: string | null
-  e164PhoneNumber: string
+  e164PhoneNumber: string | null
   devModeActive: boolean
   analyticsEnabled: boolean
   numberVerified: boolean
   pincodeType: PincodeType
+  backupCompleted: boolean
 }
 
-type Props = StateProps & DispatchProps & WithTranslation
+type OwnProps = StackScreenProps<StackParamList, Screens.Account>
+
+type Props = StateProps & DispatchProps & WithTranslation & OwnProps
 
 interface State {
   version: string
@@ -54,6 +60,7 @@ interface State {
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
+    backupCompleted: state.account.backupCompleted,
     account: state.web3.account,
     devModeActive: state.account.devModeActive || false,
     e164PhoneNumber: state.account.e164PhoneNumber,
@@ -76,56 +83,56 @@ export class Account extends React.Component<Props, State> {
   static navigationOptions = headerWithBackButton
 
   state: State = {
-    version: '',
-  }
-
-  async componentDidMount() {
-    this.setState({ version: DeviceInfo.getVersion() })
+    version: DeviceInfo.getVersion(),
   }
 
   goToProfile = () => {
     CeloAnalytics.track(CustomEventNames.edit_profile)
-    navigate(Screens.Profile)
+    this.props.navigation.navigate(Screens.Profile)
   }
 
-  goToBackupScreen() {
-    navigate(Screens.BackupIntroduction)
+  goToBackupScreen = () => {
+    if (this.props.backupCompleted) {
+      navigateProtected(Screens.BackupIntroduction)
+    } else {
+      this.props.navigation.navigate(Screens.BackupIntroduction)
+    }
   }
 
-  goToVerification() {
-    navigate(Screens.VerificationEducationScreen)
+  goToVerification = () => {
+    this.props.navigation.navigate(Screens.VerificationEducationScreen)
   }
 
-  goToInvite() {
-    navigate(Screens.Invite)
+  goToInvite = () => {
+    this.props.navigation.navigate(Screens.Invite)
   }
 
-  goToLanguageSetting() {
-    navigate(Screens.Language, { nextScreen: Screens.Account })
+  goToLanguageSetting = () => {
+    this.props.navigation.navigate(Screens.Language, { nextScreen: Screens.Account })
   }
 
-  goToLocalCurrencySetting() {
-    navigate(Screens.SelectLocalCurrency)
+  goToLocalCurrencySetting = () => {
+    this.props.navigation.navigate(Screens.SelectLocalCurrency)
   }
 
-  goToLicenses() {
-    navigate(Screens.Licenses)
+  goToLicenses = () => {
+    this.props.navigation.navigate(Screens.Licenses)
   }
 
-  goToSupport() {
-    navigate(Screens.Support)
+  goToSupport = () => {
+    this.props.navigation.navigate(Screens.Support)
   }
 
   goToSecurity = () => {
-    navigateProtected(Screens.Security, { nextScreen: Screens.Account })
+    navigateProtected(Screens.Security)
   }
 
-  goToAnalytics() {
-    navigate(Screens.Analytics, { nextScreen: Screens.Account })
+  goToAnalytics = () => {
+    this.props.navigation.navigate(Screens.Analytics)
   }
 
-  goToDataSaver() {
-    navigate(Screens.DataSaver, { nextScreen: Screens.Account })
+  goToDataSaver = () => {
+    this.props.navigation.navigate(Screens.DataSaver, { promptModalVisible: false })
   }
 
   goToFAQ() {
@@ -136,8 +143,8 @@ export class Account extends React.Component<Props, State> {
     navigateToURI(TOS_LINK)
   }
 
-  goToFiatExchange() {
-    navigate(Screens.FiatExchange)
+  goToFiatExchange = () => {
+    this.props.navigation.navigate(Screens.FiatExchange)
   }
 
   resetAppOpenedState = () => {
@@ -150,7 +157,7 @@ export class Account extends React.Component<Props, State> {
   }
 
   revokeNumberVerification = async () => {
-    if (!isE164Number(this.props.e164PhoneNumber)) {
+    if (this.props.e164PhoneNumber && !isE164Number(this.props.e164PhoneNumber)) {
       Logger.showMessage('Cannot revoke verificaton: number invalid')
       return
     }
@@ -162,8 +169,8 @@ export class Account extends React.Component<Props, State> {
     this.props.resetBackupState()
   }
 
-  showDebugScreen = async () => {
-    navigate(Screens.Debug)
+  showDebugScreen = () => {
+    this.props.navigation.navigate(Screens.Debug)
   }
 
   onPressAddress = () => {
@@ -230,6 +237,7 @@ export class Account extends React.Component<Props, State> {
     return (
       <ScrollView style={style.scrollView}>
         <SafeAreaView>
+          <DrawerTopBar />
           <View style={style.accountProfile}>
             {/* TouchableNoFeedback doesn't work here for some reason */}
             <TouchableOpacity onPress={this.onPressAvatar}>
@@ -340,7 +348,7 @@ const style = StyleSheet.create({
   },
 })
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(
   mapStateToProps,
   mapDispatchToProps
 )(withTranslation(Namespaces.accountScreen10)(Account))

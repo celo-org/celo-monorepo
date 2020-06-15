@@ -161,7 +161,7 @@ Array [
                 }
               }
             >
-              Celo Wallet
+              Celo Test Wallet
             </h1>
             <h4
               aria-level="4"
@@ -174,13 +174,13 @@ Array [
                   "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                   "fontSize": "24px",
                   "lineHeight": "32px",
-                  "marginBottom": "20px",
                   "textRendering": "geometricPrecision",
                   "textTransform": "none",
                 }
               }
             >
-              Available for Android and iOS
+              Available for Android and iOS.
+Units in this wallet have no real value.
             </h4>
             <div
               className="css-view-1dbjc4n"
@@ -1625,7 +1625,7 @@ for your Android or Apple mobile phone
                 }
               }
             >
-              Already have an account?
+              Already have an Alfajores testnet account?
             </h2>
             <h4
               aria-level="4"
@@ -1647,7 +1647,7 @@ for your Android or Apple mobile phone
                 }
               }
             >
-              Use your seed phrase to import your account into the Celo wallet.
+              Use your seed phrase to import your account into the Celo Test Wallet.
             </h4>
             <div
               className="css-view-1dbjc4n"

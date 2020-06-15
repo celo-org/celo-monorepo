@@ -42,7 +42,7 @@ const HomeBackers = ({ t }: I18nProps) => {
             kind={BTN.NAKED}
             size={SIZE.normal}
             href={`${menuItems.ABOUT_US.link}#${hashNav.about.backers}`}
-            text={t('hero.backers')}
+            text={t('backers')}
           />
         </View>
       </Cell>

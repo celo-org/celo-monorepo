@@ -27,7 +27,6 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
@@ -126,6 +125,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
             <View
               autoPlay={true}
               enableMergePathsAndroidForKitKatAndAbove={false}
+              forwardedRef={[Function]}
               loop={true}
               onAnimationFinish={[Function]}
               progress={0}
@@ -212,6 +212,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
     <View
       accessible={true}
       focusable={true}
+      forwardedRef={[Function]}
       onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
@@ -234,6 +235,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
       }
     />
     <View
+      forwardedRef={[Function]}
       hideModalContentWhileAnimating={false}
       onModalHide={[Function]}
       onModalWillHide={[Function]}
@@ -276,7 +278,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
         <Text
           style={
             Object {
-              "color": "#FD785B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Bold",
               "fontSize": 18,
               "marginVertical": 15,
@@ -284,7 +286,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
             }
           }
         >
-          failModal.header
+          retryWithFornoModal.header
         </Text>
         <Text
           style={
@@ -296,7 +298,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
             }
           }
         >
-          failModal.body1
+          retryWithFornoModal.body1
         </Text>
         <Text
           style={
@@ -313,7 +315,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
             ]
           }
         >
-          failModal.body2
+          retryWithFornoModal.body2
         </Text>
         <View
           style={
@@ -328,7 +330,6 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
@@ -353,7 +354,46 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                     "lineHeight": 18,
                   },
                   Object {
-                    "color": "#2E3338",
+                    "color": "rgba(0, 0, 0, .4)",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 16,
+                    "lineHeight": 24,
+                    "paddingRight": 40,
+                  },
+                ]
+              }
+            >
+              education.skip
+            </Text>
+          </View>
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#42D689",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  },
+                  Object {
+                    "color": "#42D689",
                     "fontFamily": "Hind-SemiBold",
                     "fontSize": 16,
                     "lineHeight": 24,
@@ -361,7 +401,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                 ]
               }
             >
-              missingCodesModal.skip
+              retryWithFornoModal.retryButton
             </Text>
           </View>
         </View>
@@ -398,7 +438,6 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
@@ -497,6 +536,7 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
             <View
               autoPlay={true}
               enableMergePathsAndroidForKitKatAndAbove={false}
+              forwardedRef={[Function]}
               loop={true}
               onAnimationFinish={[Function]}
               progress={0}
@@ -583,6 +623,7 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
     <View
       accessible={true}
       focusable={true}
+      forwardedRef={[Function]}
       onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
@@ -605,6 +646,7 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
       }
     />
     <View
+      forwardedRef={[Function]}
       hideModalContentWhileAnimating={false}
       onModalHide={[Function]}
       onModalWillHide={[Function]}
@@ -647,7 +689,7 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
         <Text
           style={
             Object {
-              "color": "#FD785B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Bold",
               "fontSize": 18,
               "marginVertical": 15,
@@ -655,7 +697,7 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
             }
           }
         >
-          failModal.header
+          retryWithFornoModal.header
         </Text>
         <Text
           style={
@@ -667,7 +709,7 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
             }
           }
         >
-          failModal.body1
+          retryWithFornoModal.body1
         </Text>
         <Text
           style={
@@ -684,7 +726,7 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
             ]
           }
         >
-          failModal.body2
+          retryWithFornoModal.body2
         </Text>
         <View
           style={
@@ -699,7 +741,6 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
@@ -724,7 +765,46 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
                     "lineHeight": 18,
                   },
                   Object {
-                    "color": "#2E3338",
+                    "color": "rgba(0, 0, 0, .4)",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 16,
+                    "lineHeight": 24,
+                    "paddingRight": 40,
+                  },
+                ]
+              }
+            >
+              education.skip
+            </Text>
+          </View>
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#42D689",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  },
+                  Object {
+                    "color": "#42D689",
                     "fontFamily": "Hind-SemiBold",
                     "fontSize": 16,
                     "lineHeight": 24,
@@ -732,7 +812,7 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
                 ]
               }
             >
-              missingCodesModal.skip
+              retryWithFornoModal.retryButton
             </Text>
           </View>
         </View>

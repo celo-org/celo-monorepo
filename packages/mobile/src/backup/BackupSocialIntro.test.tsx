@@ -3,14 +3,16 @@ import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import BackupSocialIntro from 'src/backup/BackupSocialIntro'
-import { createMockNavigationProp, createMockStore } from 'test/utils'
+import { Screens } from 'src/navigator/Screens'
+import { createMockStore, getMockStackScreenProps } from 'test/utils'
 
 describe('BackupSocialIntro', () => {
   it('renders correctly', () => {
-    const navigation = createMockNavigationProp(false)
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
-        <BackupSocialIntro navigation={navigation} />
+        <BackupSocialIntro
+          {...getMockStackScreenProps(Screens.BackupSocialIntro, { incomingFromBackupFlow: true })}
+        />
       </Provider>
     )
     expect(tree).toMatchSnapshot()

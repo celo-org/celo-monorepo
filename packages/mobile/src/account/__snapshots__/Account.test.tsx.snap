@@ -14,6 +14,118 @@ exports[`Account renders correctly 1`] = `
       <View
         style={
           Object {
+            "alignItems": "flex-end",
+            "backgroundColor": "#FFFFFF",
+            "elevation": 1,
+            "flexDirection": "row",
+            "height": 62,
+            "justifyContent": "space-between",
+            "shadowColor": "black",
+            "shadowOffset": Object {
+              "height": 0.5,
+              "width": 0,
+            },
+            "shadowOpacity": 0.3,
+            "shadowRadius": 0.8,
+          }
+        }
+      >
+        <View
+          accessible={true}
+          focusable={false}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "marginBottom": 0,
+              "marginLeft": 4,
+              "opacity": 1,
+              "padding": 8,
+            }
+          }
+        >
+          <svg
+            fill="none"
+            height="32"
+            viewBox="0 0 32 32"
+            width="32"
+          >
+            <line
+              stroke="#2E3338"
+              strokeLinecap="round"
+              strokeWidth="2.5"
+              x1="7.25"
+              x2="24.75"
+              y1="9.75"
+              y2="9.75"
+            />
+            <line
+              stroke="#2E3338"
+              strokeLinecap="round"
+              strokeWidth="2.5"
+              x1="7.25"
+              x2="24.75"
+              y1="15.75"
+              y2="15.75"
+            />
+            <line
+              stroke="#2E3338"
+              strokeLinecap="round"
+              strokeWidth="2.5"
+              x1="7.25"
+              x2="24.75"
+              y1="21.75"
+              y2="21.75"
+            />
+          </svg>
+        </View>
+        <View
+          style={
+            Object {
+              "marginBottom": 13,
+            }
+          }
+        >
+          <svg
+            fill="none"
+            height={25}
+            style={Object {}}
+            viewBox="0 0 25 25"
+            width={25}
+          >
+            <path
+              d="M9.86842 22.3684C13.8653 22.3684 17.1053 19.1284 17.1053 15.1316C17.1053 11.1348 13.8653 7.89476 9.86842 7.89476C5.87158 7.89476 2.63158 11.1348 2.63158 15.1316C2.63158 19.1284 5.87158 22.3684 9.86842 22.3684ZM9.86842 25C4.41842 25 0 20.5816 0 15.1316C0 9.6816 4.41842 5.26318 9.86842 5.26318C15.3184 5.26318 19.7368 9.6816 19.7368 15.1316C19.7368 20.5816 15.3184 25 9.86842 25Z"
+              fill="#FBCC5C"
+              style={Object {}}
+            />
+            <path
+              d="M15.1316 17.1053C19.1284 17.1053 22.3684 13.8653 22.3684 9.86842C22.3684 5.87158 19.1284 2.63158 15.1316 2.63158C11.1348 2.63158 7.89476 5.87158 7.89476 9.86842C7.89476 13.8653 11.1348 17.1053 15.1316 17.1053ZM15.1316 19.7368C9.6816 19.7368 5.26318 15.3184 5.26318 9.86842C5.26318 4.41842 9.6816 0 15.1316 0C20.5816 0 25 4.41842 25 9.86842C25 15.3184 20.5816 19.7368 15.1316 19.7368Z"
+              fill="#42D689"
+              style={Object {}}
+            />
+            <path
+              d="M15.4577 19.7369C16.1419 18.9077 16.6324 17.9361 16.8932 16.8932C17.9361 16.6324 18.9077 16.1421 19.7369 15.4579C19.699 16.6658 19.439 17.8563 18.9695 18.9698C17.8561 19.439 16.6656 19.6992 15.4577 19.7369ZM8.10687 8.10687C7.06397 8.36766 6.09239 8.85792 5.26318 9.54213C5.30108 8.33424 5.56108 7.14371 6.03055 6.03029C7.14397 5.56108 8.3345 5.30082 9.54239 5.26318C8.85818 6.09239 8.36766 7.06397 8.10687 8.10687Z"
+              fill="#5EA33B"
+              style={Object {}}
+            />
+          </svg>
+        </View>
+        <View
+          style={
+            Object {
+              "width": 45,
+            }
+          }
+        />
+      </View>
+      <View
+        style={
+          Object {
             "alignItems": "center",
             "flexDirection": "column",
             "paddingBottom": 20,
@@ -23,7 +135,6 @@ exports[`Account renders correctly 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
@@ -54,10 +165,7 @@ exports[`Account renders correctly 1`] = `
                     "flexDirection": "row",
                     "justifyContent": "center",
                   },
-                  Object {
-                    "alignSelf": "center",
-                    "margin": "auto",
-                  },
+                  undefined,
                 ]
               }
             >
@@ -77,25 +185,22 @@ exports[`Account renders correctly 1`] = `
                   ]
                 }
               >
-                <Image
-                  source={
-                    Object {
-                      "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                    }
-                  }
+                <Text
                   style={
                     Array [
                       Object {
-                        "alignSelf": "center",
-                        "margin": "auto",
+                        "color": "#FFFFFF",
+                        "fontFamily": "Inter-Medium",
+                        "fontSize": 16,
                       },
                       Object {
-                        "height": 40,
-                        "width": 40,
+                        "fontSize": 20,
                       },
                     ]
                   }
-                />
+                >
+                  J
+                </Text>
               </View>
             </View>
             <Text
@@ -122,10 +227,7 @@ exports[`Account renders correctly 1`] = `
             <View
               style={
                 Object {
-                  "alignItems": "center",
-                  "alignSelf": "center",
                   "flexDirection": "row",
-                  "justifyContent": "center",
                 }
               }
             >
@@ -134,35 +236,36 @@ exports[`Account renders correctly 1`] = `
                   Array [
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Light",
-                      "fontSize": 14,
-                      "textAlignVertical": "center",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     Object {
                       "alignItems": "center",
-                      "backgroundColor": "#EEEEEE",
-                      "borderRadius": 3,
                       "justifyContent": "center",
-                      "marginRight": 5,
-                      "paddingLeft": 6,
-                      "paddingRight": 3,
+                      "marginRight": 4,
                     },
                   ]
                 }
               >
-                🇺🇸 +1
+                🇺🇸
               </Text>
               <Text
                 style={
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Light",
-                    "fontSize": 14,
-                    "textAlignVertical": "center",
-                  }
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    },
+                    Object {
+                      "color": "#9CA4A9",
+                    },
+                  ]
                 }
               >
-                (415) 555-6666
+                +1 (415) 555-6666
               </Text>
             </View>
           </View>
@@ -171,7 +274,6 @@ exports[`Account renders correctly 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -216,7 +318,6 @@ exports[`Account renders correctly 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -293,7 +394,6 @@ exports[`Account renders correctly 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -370,7 +470,6 @@ exports[`Account renders correctly 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -447,7 +546,6 @@ exports[`Account renders correctly 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -524,7 +622,6 @@ exports[`Account renders correctly 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -601,7 +698,82 @@ exports[`Account renders correctly 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
+            }
+          }
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+        >
+          <View
+            style={
+              Object {
+                "borderBottomWidth": 1,
+                "borderColor": "#EEEEEE",
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "marginLeft": 15,
+                "padding": 20,
+              }
+            }
+          >
+            <View
+              style={
+                Array [
+                  Object {
+                    "justifyContent": "center",
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 24,
+                  }
+                }
+              >
+                dataSaver
+              </Text>
+            </View>
+            <View
+              style={
+                Array [
+                  Object {
+                    "justifyContent": "center",
+                  },
+                ]
+              }
+            >
+              <svg
+                height={16}
+                style={Object {}}
+                viewBox="0 0 15 16"
+                width={16}
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8.70376 9.12461L2.12123 15.7071C1.73071 16.0976 1.09755 16.0976 0.707015 15.7071C0.316497 15.3166 0.316497 14.6834 0.707015 14.2929L6.58575 8.41419L0.707091 2.53553C0.316573 2.14501 0.316573 1.51185 0.707091 1.12131C1.09761 0.730797 1.73079 0.730797 2.12131 1.12131L8.70708 7.70708C9.0976 8.09762 9.0976 8.73078 8.70708 9.1213L8.70376 9.12461Z"
+                  fill="#42D689"
+                  style={Object {}}
+                />
+              </svg>
+            </View>
+          </View>
+        </View>
+        <View
+          accessible={true}
+          focusable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -678,7 +850,6 @@ exports[`Account renders correctly 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -755,7 +926,6 @@ exports[`Account renders correctly 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -832,7 +1002,6 @@ exports[`Account renders correctly 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -948,7 +1117,6 @@ exports[`Account renders correctly 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
@@ -992,7 +1160,6 @@ exports[`Account renders correctly 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
@@ -1045,6 +1212,118 @@ exports[`Account renders correctly when dev mode active 1`] = `
       <View
         style={
           Object {
+            "alignItems": "flex-end",
+            "backgroundColor": "#FFFFFF",
+            "elevation": 1,
+            "flexDirection": "row",
+            "height": 62,
+            "justifyContent": "space-between",
+            "shadowColor": "black",
+            "shadowOffset": Object {
+              "height": 0.5,
+              "width": 0,
+            },
+            "shadowOpacity": 0.3,
+            "shadowRadius": 0.8,
+          }
+        }
+      >
+        <View
+          accessible={true}
+          focusable={false}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "marginBottom": 0,
+              "marginLeft": 4,
+              "opacity": 1,
+              "padding": 8,
+            }
+          }
+        >
+          <svg
+            fill="none"
+            height="32"
+            viewBox="0 0 32 32"
+            width="32"
+          >
+            <line
+              stroke="#2E3338"
+              strokeLinecap="round"
+              strokeWidth="2.5"
+              x1="7.25"
+              x2="24.75"
+              y1="9.75"
+              y2="9.75"
+            />
+            <line
+              stroke="#2E3338"
+              strokeLinecap="round"
+              strokeWidth="2.5"
+              x1="7.25"
+              x2="24.75"
+              y1="15.75"
+              y2="15.75"
+            />
+            <line
+              stroke="#2E3338"
+              strokeLinecap="round"
+              strokeWidth="2.5"
+              x1="7.25"
+              x2="24.75"
+              y1="21.75"
+              y2="21.75"
+            />
+          </svg>
+        </View>
+        <View
+          style={
+            Object {
+              "marginBottom": 13,
+            }
+          }
+        >
+          <svg
+            fill="none"
+            height={25}
+            style={Object {}}
+            viewBox="0 0 25 25"
+            width={25}
+          >
+            <path
+              d="M9.86842 22.3684C13.8653 22.3684 17.1053 19.1284 17.1053 15.1316C17.1053 11.1348 13.8653 7.89476 9.86842 7.89476C5.87158 7.89476 2.63158 11.1348 2.63158 15.1316C2.63158 19.1284 5.87158 22.3684 9.86842 22.3684ZM9.86842 25C4.41842 25 0 20.5816 0 15.1316C0 9.6816 4.41842 5.26318 9.86842 5.26318C15.3184 5.26318 19.7368 9.6816 19.7368 15.1316C19.7368 20.5816 15.3184 25 9.86842 25Z"
+              fill="#FBCC5C"
+              style={Object {}}
+            />
+            <path
+              d="M15.1316 17.1053C19.1284 17.1053 22.3684 13.8653 22.3684 9.86842C22.3684 5.87158 19.1284 2.63158 15.1316 2.63158C11.1348 2.63158 7.89476 5.87158 7.89476 9.86842C7.89476 13.8653 11.1348 17.1053 15.1316 17.1053ZM15.1316 19.7368C9.6816 19.7368 5.26318 15.3184 5.26318 9.86842C5.26318 4.41842 9.6816 0 15.1316 0C20.5816 0 25 4.41842 25 9.86842C25 15.3184 20.5816 19.7368 15.1316 19.7368Z"
+              fill="#42D689"
+              style={Object {}}
+            />
+            <path
+              d="M15.4577 19.7369C16.1419 18.9077 16.6324 17.9361 16.8932 16.8932C17.9361 16.6324 18.9077 16.1421 19.7369 15.4579C19.699 16.6658 19.439 17.8563 18.9695 18.9698C17.8561 19.439 16.6656 19.6992 15.4577 19.7369ZM8.10687 8.10687C7.06397 8.36766 6.09239 8.85792 5.26318 9.54213C5.30108 8.33424 5.56108 7.14371 6.03055 6.03029C7.14397 5.56108 8.3345 5.30082 9.54239 5.26318C8.85818 6.09239 8.36766 7.06397 8.10687 8.10687Z"
+              fill="#5EA33B"
+              style={Object {}}
+            />
+          </svg>
+        </View>
+        <View
+          style={
+            Object {
+              "width": 45,
+            }
+          }
+        />
+      </View>
+      <View
+        style={
+          Object {
             "alignItems": "center",
             "flexDirection": "column",
             "paddingBottom": 20,
@@ -1054,7 +1333,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
@@ -1085,10 +1363,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
                     "flexDirection": "row",
                     "justifyContent": "center",
                   },
-                  Object {
-                    "alignSelf": "center",
-                    "margin": "auto",
-                  },
+                  undefined,
                 ]
               }
             >
@@ -1108,25 +1383,22 @@ exports[`Account renders correctly when dev mode active 1`] = `
                   ]
                 }
               >
-                <Image
-                  source={
-                    Object {
-                      "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                    }
-                  }
+                <Text
                   style={
                     Array [
                       Object {
-                        "alignSelf": "center",
-                        "margin": "auto",
+                        "color": "#FFFFFF",
+                        "fontFamily": "Inter-Medium",
+                        "fontSize": 16,
                       },
                       Object {
-                        "height": 40,
-                        "width": 40,
+                        "fontSize": 20,
                       },
                     ]
                   }
-                />
+                >
+                  J
+                </Text>
               </View>
             </View>
             <Text
@@ -1153,10 +1425,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
             <View
               style={
                 Object {
-                  "alignItems": "center",
-                  "alignSelf": "center",
                   "flexDirection": "row",
-                  "justifyContent": "center",
                 }
               }
             >
@@ -1165,35 +1434,36 @@ exports[`Account renders correctly when dev mode active 1`] = `
                   Array [
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Light",
-                      "fontSize": 14,
-                      "textAlignVertical": "center",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     Object {
                       "alignItems": "center",
-                      "backgroundColor": "#EEEEEE",
-                      "borderRadius": 3,
                       "justifyContent": "center",
-                      "marginRight": 5,
-                      "paddingLeft": 6,
-                      "paddingRight": 3,
+                      "marginRight": 4,
                     },
                   ]
                 }
               >
-                🇺🇸 +1
+                🇺🇸
               </Text>
               <Text
                 style={
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Light",
-                    "fontSize": 14,
-                    "textAlignVertical": "center",
-                  }
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    },
+                    Object {
+                      "color": "#9CA4A9",
+                    },
+                  ]
                 }
               >
-                (415) 555-6666
+                +1 (415) 555-6666
               </Text>
             </View>
           </View>
@@ -1202,7 +1472,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -1247,7 +1516,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -1324,7 +1592,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -1401,7 +1668,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -1478,7 +1744,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -1555,7 +1820,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -1632,7 +1896,82 @@ exports[`Account renders correctly when dev mode active 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
+            }
+          }
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+        >
+          <View
+            style={
+              Object {
+                "borderBottomWidth": 1,
+                "borderColor": "#EEEEEE",
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "marginLeft": 15,
+                "padding": 20,
+              }
+            }
+          >
+            <View
+              style={
+                Array [
+                  Object {
+                    "justifyContent": "center",
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 24,
+                  }
+                }
+              >
+                dataSaver
+              </Text>
+            </View>
+            <View
+              style={
+                Array [
+                  Object {
+                    "justifyContent": "center",
+                  },
+                ]
+              }
+            >
+              <svg
+                height={16}
+                style={Object {}}
+                viewBox="0 0 15 16"
+                width={16}
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8.70376 9.12461L2.12123 15.7071C1.73071 16.0976 1.09755 16.0976 0.707015 15.7071C0.316497 15.3166 0.316497 14.6834 0.707015 14.2929L6.58575 8.41419L0.707091 2.53553C0.316573 2.14501 0.316573 1.51185 0.707091 1.12131C1.09761 0.730797 1.73079 0.730797 2.12131 1.12131L8.70708 7.70708C9.0976 8.09762 9.0976 8.73078 8.70708 9.1213L8.70376 9.12461Z"
+                  fill="#42D689"
+                  style={Object {}}
+                />
+              </svg>
+            </View>
+          </View>
+        </View>
+        <View
+          accessible={true}
+          focusable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -1709,7 +2048,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -1786,7 +2124,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -1863,7 +2200,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -1958,7 +2294,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -1988,7 +2323,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -2018,7 +2352,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -2048,7 +2381,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -2078,7 +2410,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
           <View
             accessible={true}
             focusable={false}
-            isTVSelectable={true}
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -2139,7 +2470,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
@@ -2183,7 +2513,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",

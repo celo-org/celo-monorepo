@@ -22,7 +22,7 @@ The flow is as follows:
 
 - An account calls `lock`, transferring an amount of Celo Gold from their balance to the `LockedGold` smart contract. This increments the account's 'non-voting' balance by the same amount.
 
-- Then the account calls `vote`, passing in an amount and the address of the group to vote for. This decrements the account's 'non-voting' balance and increments the 'pending' balance associated with that group by the same amount. This counts immediately towards electing validators. Note that the vote may be rejected if it would mean that the account would be voting for more than 3 distinct groups, or that the [voting cap](validator-elections.md#voting-cap) for the group would be exceeded.
+- Then the account calls `vote`, passing in an amount and the address of the group to vote for. This decrements the account's 'non-voting' balance and increments the 'pending' balance associated with that group by the same amount. This counts immediately towards electing validators. Note that the vote may be rejected if it would mean that the account would be voting for more than 3 distinct groups, or that the [voting cap](validator-elections.md#group-voting-caps) for the group would be exceeded.
 
 - At the end of the current epoch, the protocol will first deliver [epoch rewards](epoch-rewards.md) to validators, groups and voters based on the current epoch (pending votes do not count for these purposes), and then run an [election](validator-elections.md) to select the active validator set for the following epoch.
 

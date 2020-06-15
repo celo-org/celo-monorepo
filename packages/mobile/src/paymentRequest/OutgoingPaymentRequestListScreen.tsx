@@ -1,13 +1,11 @@
 import React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { View } from 'react-native'
-import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { getOutgoingPaymentRequests } from 'src/account/selectors'
 import { PaymentRequest } from 'src/account/types'
 import { cancelPaymentRequest, updatePaymentRequestNotified } from 'src/firebase/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import { fetchPhoneAddresses } from 'src/identity/actions'
 import {
   AddressToE164NumberType,
   e164NumberToAddressSelector,
@@ -32,7 +30,6 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  fetchPhoneAddresses: typeof fetchPhoneAddresses
   cancelPaymentRequest: typeof cancelPaymentRequest
   updatePaymentRequestNotified: typeof updatePaymentRequestNotified
 }
@@ -45,7 +42,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   addressToE164Number: state.identity.addressToE164Number,
 })
 
-type Props = NavigationInjectedProps & WithTranslation & StateProps & DispatchProps
+type Props = WithTranslation & StateProps & DispatchProps
 
 export const listItemRenderer = (params: {
   recipientCache: NumberToRecipient
@@ -87,7 +84,6 @@ OutgoingPaymentRequestListScreen.navigationOptions = titleWithBalanceNavigationO
 )
 
 export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-  fetchPhoneAddresses,
   cancelPaymentRequest,
   updatePaymentRequestNotified,
 })(withTranslation(Namespaces.paymentRequestFlow)(OutgoingPaymentRequestListScreen))

@@ -28,11 +28,13 @@ export default class TopAlert extends React.Component<Props> {
         Animated.timing(this.height, {
           duration: ANIMATION_DURATION,
           toValue: prevProps.height,
+          useNativeDriver: true,
         }),
         Animated.timing(this.opacity, {
           duration: ANIMATION_DURATION / 2,
           toValue: 1.0,
           delay: ANIMATION_DURATION / 2,
+          useNativeDriver: true,
         }),
       ]).start()
     } else if (prevProps.visible && !this.props.visible) {
@@ -40,10 +42,12 @@ export default class TopAlert extends React.Component<Props> {
         Animated.timing(this.height, {
           duration: ANIMATION_DURATION,
           toValue: 0,
+          useNativeDriver: true,
         }),
         Animated.timing(this.opacity, {
           duration: ANIMATION_DURATION / 2,
           toValue: 0,
+          useNativeDriver: true,
         }),
       ]).start()
     }

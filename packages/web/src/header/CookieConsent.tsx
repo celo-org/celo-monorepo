@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import { agree, disagree, showVisitorCookieConsent } from 'src/analytics/analytics'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Link from 'src/shared/Link'
 import Responsive from 'src/shared/Responsive'
 import { CONSENT_HEIGHT } from 'src/shared/Styles'
 import { colors, fonts } from 'src/styles'
 import { initSentry } from 'src/utils/sentry'
-import { agree, disagree, showVisitorCookieConsent } from '../analytics/analytics'
 
 interface State {
   showConsent: boolean

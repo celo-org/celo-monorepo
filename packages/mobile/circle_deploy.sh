@@ -4,6 +4,7 @@ set -euo pipefail
 . ../../scripts/check_if_changed.sh
 
 CHANGED=$(checkIfChangedFolder)
+BUILD=""
 
 while getopts ':n:' flag; do
   case "${flag}" in

@@ -59,12 +59,12 @@ Baklava = 'https://baklava-blockscout.celo-testnet.org'
 Compared to Ethereum transaction, Celo transactions have 3 additional, optional fields:
 
 - `feeCurrency` - Specifies the address of the currency in which fees should be paid. If `null`, the native token `cGLD` is assumed.
-- `gatewayFeeRecipient` - As part of [Full Node Incentives](celo-codebase/protocol/transactions/full-node-incentives), light clients will need to specify the address of their gateway for it to forward the transactions onto the network.
+- `gatewayFeeRecipient` - As part of [Full Node Incentives](../../celo-codebase/protocol/transactions/full-node-incentives.md), light clients will need to specify the address of their gateway for it to forward the transactions onto the network.
 - `gatewayFee` - The value of the gateway fee.
 
-[Read more about Celo Transactions](celo-codebase/protocol/transactions)
+[Read more about Celo Transactions](../../celo-codebase/protocol/transactions)
 
 To sign transactions, you have the following options:
 
 - Use the JSON-RPC [`sendTransaction`](https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_sendtransaction) method to your node which would have the account in question unlocked. (Either manually or via a library such as `web3`)
-- Use [ContractKit's](developer-guide/overview/introduction/contractkit) local signing feature.
+- Use [ContractKit's](../contractkit/README.md) local signing feature.

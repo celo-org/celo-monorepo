@@ -15,3 +15,5 @@ ContractKit supports the following functionality:
 - Utilities
 
 {% page-ref page="setup.md" %}
+
+{% page-ref page="usage.md" %}

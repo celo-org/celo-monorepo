@@ -10,7 +10,6 @@ You can use the following environment variables to configure the attestation ser
 - `CELO_PROVIDER` - The URL under which a celo blockchain node is reachable. This node should also have the `ATTESTATION_SIGNER_ADDRESS` unlocked for signing of the attestations themselves.
 - `CELO_VALIDATOR_ADDRESS` - The address of the validator on the `Accounts` smart contract
 - `ATTESTATION_SIGNER_ADDRESS` - The address of the key with which attestations should be signed.
-- `APP_SIGNATURE` - The hash with which clients can auto-read SMS messages on android
 - `SMS_PROVIDERS` - A comma-separated list of providers you want to configure, we currently support:
 
 `nexmo`

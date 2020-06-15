@@ -5,7 +5,7 @@ import { Flags } from '../../utils/command'
 
 export default class RemoveExpiredReports extends BaseCommand {
   static description =
-    'Remove expired oracle reports for a specified token (currently just Celo Dollar, aka: "StableToken")'
+    'Remove expired oracle reports for a specified token (currently just Celo Dollar, aka "StableToken")'
 
   static args = [
     {

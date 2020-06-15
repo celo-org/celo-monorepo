@@ -7,7 +7,6 @@
     "lib": ["es7", "es2017"],
     "target": "es6",
     "resolveJsonModule": true,
-    "noEmit": true,
     "esModuleInterop": true,
     "paths": {
       "@google-cloud/monitoring": ["types/monitoring"]

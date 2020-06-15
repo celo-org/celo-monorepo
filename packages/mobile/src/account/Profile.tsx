@@ -15,13 +15,12 @@ import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 
 interface StateProps {
-  name: string
+  name: string | null
   userContact: UserContactDetails
 }
 
-interface OwnProps {
-  navigation: any
-}
+// tslint:disable-next-line: no-empty-interface
+interface OwnProps {}
 
 type Props = OwnProps & StateProps & WithTranslation
 const mapStateToProps = (state: RootState) => {
@@ -45,12 +44,7 @@ export class Profile extends React.Component<Props> {
       <ScrollView style={style.scrollView}>
         <View style={style.container}>
           <View style={style.accountProfile}>
-            <ContactCircle
-              thumbnailPath={userContact.thumbnailPath}
-              name={name}
-              preferNameInitial={true}
-              size={55}
-            />
+            <ContactCircle thumbnailPath={userContact.thumbnailPath} name={name} size={55} />
           </View>
         </View>
         <View style={[style.container, style.underlinedBox]}>

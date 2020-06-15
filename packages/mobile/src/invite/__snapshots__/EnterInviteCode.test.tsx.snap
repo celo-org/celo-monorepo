@@ -213,7 +213,6 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
       <View
         accessible={true}
         focusable={false}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -299,7 +298,6 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
       <View
         accessible={true}
         focusable={false}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -331,7 +329,7 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
             },
           ]
         }
-        testID="ContinueInviteButton"
+        testID="RestoreExistingWallet"
       >
         <View
           style={

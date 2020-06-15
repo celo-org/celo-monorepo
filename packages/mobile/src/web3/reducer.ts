@@ -9,6 +9,7 @@ export interface State {
   accountInWeb3Keystore: string | null
   commentKey: string | null
   fornoMode: boolean
+  contractKitReady: boolean
 }
 
 const initialState: State = {
@@ -22,6 +23,7 @@ const initialState: State = {
   accountInWeb3Keystore: null,
   commentKey: null,
   fornoMode: networkConfig.initiallyForno,
+  contractKitReady: false,
 }
 
 export const reducer = (
@@ -40,6 +42,9 @@ export const reducer = (
           highestBlock: 0,
         },
         latestBlockNumber: 0,
+        contractKitReady: false,
+        // False to lock ContractKit upon every app reopen, until
+        // store is persisted and forno mode known
       }
     }
     case Actions.SET_ACCOUNT:
@@ -76,6 +81,11 @@ export const reducer = (
       return {
         ...state,
         syncProgress: action.payload,
+      }
+    case Actions.SET_CONTRACT_KIT_READY:
+      return {
+        ...state,
+        contractKitReady: action.ready,
       }
     default:
       return state

@@ -1,3 +1,3 @@
-import BuildPage from 'src/dev/BuildPage'
+import ValidatorPage from 'src/dev/ValidatorPage'
 
-export default BuildPage
+export default ValidatorPage

@@ -1,9 +1,10 @@
 import fs from 'fs'
 import path from 'path'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { addCeloEnvMiddleware, CeloEnvArgv } from 'src/lib/env-utils'
 import { getEnodesAddresses, writeStaticNodes } from 'src/lib/geth'
-import { addCeloGethMiddleware, execCmdWithExitOnFailure } from 'src/lib/utils'
+import { addCeloGethMiddleware } from 'src/lib/utils'
 import yargs from 'yargs'
 import { GethArgv } from '../geth'
 

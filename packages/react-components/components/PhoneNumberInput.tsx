@@ -213,15 +213,18 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
     )
   }
 
-  renderTextInput = (props: any) => (
-    <TextInput
-      {...props}
-      value={this.state.countryQuery}
-      underlineColorAndroid="transparent"
-      onFocus={this.onCountryFocus}
-      placeholderTextColor={colors.inactive}
-    />
-  )
+  renderTextInput = (props: any) => {
+    return (
+      <TextInput
+        {...props}
+        value={this.state.countryQuery}
+        underlineColorAndroid="transparent"
+        onFocus={this.onCountryFocus}
+        placeholderTextColor={colors.inactive}
+        testID={props.testID + 'TextInput'}
+      />
+    )
+  }
 
   render() {
     const { countryCallingCode, countryQuery } = this.state
@@ -259,7 +262,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
           </View>
         )}
         <View style={[style.phoneNumberContainer, style.borderedBox]}>
-          <Text style={style.phoneCountryCode} testID={'contryCodeText'}>
+          <Text style={style.phoneCountryCode} testID={'countryCodeText'}>
             {countryCallingCode}
           </Text>
           <View style={style.line} />

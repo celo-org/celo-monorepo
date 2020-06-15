@@ -1,5 +1,5 @@
+import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback, isVmBased } from 'src/lib/env-utils'
-import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import { getInternalTxNodeLoadBalancerIP } from 'src/lib/vm-testnet-utils'
 
 export async function installHelmChart(celoEnv: string) {
@@ -43,6 +43,16 @@ async function helmParameters(celoEnv: string) {
     )}"`,
     `--set imageTag="${fetchEnv(envVar.TRANSACTION_METRICS_EXPORTER_DOCKER_IMAGE_TAG)}"`,
     `--set deploymentSuffix=${suffix}`,
+    `--set fromBlock=${fetchEnvOrFallback(envVar.TRANSACTION_METRICS_EXPORTER_FROM_BLOCK, '0')}`,
+    `--set toBlock=${fetchEnvOrFallback(envVar.TRANSACTION_METRICS_EXPORTER_FROM_BLOCK, '')}`,
+    `--set blockInterval=${fetchEnvOrFallback(
+      envVar.TRANSACTION_METRICS_EXPORTER_BLOCK_INTERVAL,
+      '1'
+    )}`,
+    `--set watchAddress=${fetchEnvOrFallback(
+      envVar.TRANSACTION_METRICS_EXPORTER_WATCH_ADDRESS,
+      ''
+    )}`,
   ]
   if (isVmBased()) {
     params.push(`--set web3Provider="ws://${await getInternalTxNodeLoadBalancerIP(celoEnv)}:8546"`)

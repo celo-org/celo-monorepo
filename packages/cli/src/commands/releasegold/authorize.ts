@@ -15,7 +15,7 @@ export default class Authorize extends ReleaseGoldCommand {
       required: true,
       description: 'The signer key that is to be used for voting through the ReleaseGold instance',
     }),
-    signature: flags.string({
+    signature: Flags.proofOfPossession({
       description: 'Signature (a.k.a. proof-of-possession) of the signer key',
       required: true,
     }),

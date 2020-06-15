@@ -13,34 +13,51 @@ export const describe = 'command for lookup of accounts for a given identifier'
 
 interface LookupArgv extends AccountArgv {
   phone: string
+  salt?: string
 }
 
 export const builder = (yargs: Argv) => {
-  return yargs.option('phone', {
-    type: 'string',
-    description: 'Phone number to lookup,',
-    demand: 'Please specify phone number to lookup',
-  })
+  return yargs
+    .option('phone', {
+      type: 'string',
+      description: 'Phone number to lookup,',
+      demandOption: true,
+      demand: 'Please specify phone number to lookup',
+    })
+    .option('salt', {
+      type: 'string',
+      description: 'Salt to hash phone number with',
+      demandOption: false,
+    })
 }
 
 export const handler = async (argv: LookupArgv) => {
   await switchToClusterFromEnv(false)
   console.log(`Looking up addresses attested to ${argv.phone}`)
+  if (!argv.salt) {
+    console.warn(
+      `Warning: you have not specified a salt so this phone number's hash will not be the same as the one used by the wallet app`
+    )
+  }
   const cb = async () => {
     const kit = newKit('http://localhost:8545')
-    const phoneHash = PhoneNumberUtils.getPhoneHash(argv.phone)
+    const phoneHash = PhoneNumberUtils.getPhoneHash(argv.phone, argv.salt)
     const attestations = await kit.contracts.getAttestations()
-    const lookupResult = await attestations.lookupPhoneNumbers([phoneHash])
+    const lookupResult = await attestations.lookupIdentifiers([phoneHash])
 
     const matchingAddresses = lookupResult[phoneHash]
 
-    if (matchingAddresses === undefined) {
+    if (!matchingAddresses) {
       console.info(`No addresses attested to ${argv.phone}`)
       return
     }
 
     Object.keys(matchingAddresses).map((address) => {
       const attestationsStats = matchingAddresses[address]
+      if (!attestationsStats) {
+        console.warn('No attesatation stat for address: ', address)
+        return
+      }
       console.info(
         `${address} is attested to ${argv.phone} with ${attestationsStats.completed} completed attestations out of ${attestationsStats.total} total`
       )

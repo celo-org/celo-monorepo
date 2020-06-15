@@ -6,7 +6,7 @@
 * Distributed [rewards for validators and validator groups](validator-rewards.md)
 * Distribute [rewards to holders of Locked Celo Gold](locked-gold-rewards.md) voting for groups that elected validators
 * Make payments into a [Community Fund](community-fund.md) for protocol infrastructure grants
-* [Bolster the stablecoin reserve](community-fund.md#bolster-reserve) if it is under-collateralized
+* [Bolster the stablecoin reserve](community-fund.md#bolstering-the-reserve) if it is under-collateralized
 * Make payments into a [Carbon Offsetting Fund](carbon-offsetting-fund.md).
 
 A total of 400 million Celo Gold will be released for epoch rewards over time. Celo Gold is a utility and governance asset on Celo, and also the reserve collateral for Celo Dollar (and possibly in the future other whitelisted tokens). It has a fixed total supply and in the long term will exhibit deflationary characteristics like Bitcoin.

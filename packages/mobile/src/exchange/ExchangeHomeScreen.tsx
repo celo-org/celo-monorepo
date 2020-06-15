@@ -1,21 +1,24 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import ItemSeparator from '@celo/react-components/components/ItemSeparator'
 import ScrollContainer from '@celo/react-components/components/ScrollContainer'
-import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
+import SectionHead from '@celo/react-components/components/SectionHeadGold'
+import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
-import componentWithAnalytics from 'src/analytics/wrapper'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import { fetchExchangeRate } from 'src/exchange/actions'
 import CeloGoldHistoryChart from 'src/exchange/CeloGoldHistoryChart'
 import CeloGoldOverview from 'src/exchange/CeloGoldOverview'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { navigate } from 'src/navigator/NavigationService'
-import { Stacks } from 'src/navigator/Screens'
+import DrawerTopBar from 'src/navigator/DrawerTopBar'
+import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import TransactionsList from 'src/transactions/TransactionsList'
@@ -31,7 +34,9 @@ interface DispatchProps {
   fetchExchangeRate: typeof fetchExchangeRate
 }
 
-type Props = StateProps & DispatchProps & WithTranslation
+type OwnProps = StackScreenProps<StackParamList, Screens.ExchangeHomeScreen>
+
+type Props = StateProps & DispatchProps & WithTranslation & OwnProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
   exchangeRate: getRateForMakerToken(state.exchange.exchangeRatePair, CURRENCY_ENUM.DOLLAR),
@@ -45,7 +50,8 @@ export class ExchangeHomeScreen extends React.Component<Props> {
   }
 
   goToBuyGold = () => {
-    navigate(Stacks.ExchangeStack, {
+    CeloAnalytics.track(CustomEventNames.gold_buy_start)
+    this.props.navigation.navigate(Screens.ExchangeTradeScreen, {
       makerTokenDisplay: {
         makerToken: CURRENCY_ENUM.DOLLAR,
         makerTokenBalance: this.props.dollarBalance || '0',
@@ -54,7 +60,8 @@ export class ExchangeHomeScreen extends React.Component<Props> {
   }
 
   goToBuyDollars = () => {
-    navigate(Stacks.ExchangeStack, {
+    CeloAnalytics.track(CustomEventNames.gold_sell_start)
+    this.props.navigation.navigate(Screens.ExchangeTradeScreen, {
       makerTokenDisplay: {
         makerToken: CURRENCY_ENUM.GOLD,
         makerTokenBalance: this.props.goldBalance || '0',
@@ -68,59 +75,44 @@ export class ExchangeHomeScreen extends React.Component<Props> {
 
     return (
       <SafeAreaView style={styles.background}>
-        <ScrollContainer
-          heading={t('global:gold')}
-          testID="ExchangeScrollView"
-          stickyHeaderIndices={[2]}
-        >
+        <DrawerTopBar />
+        <ScrollContainer heading={t('global:gold')} testID="ExchangeScrollView">
           <DisconnectBanner />
-          <View>
-            <CeloGoldOverview testID="ExchangeAccountOverview" />
-            <ItemSeparator />
-            <CeloGoldHistoryChart />
-            <ItemSeparator />
-            <View style={styles.buttonContainer}>
+          <CeloGoldHistoryChart />
+          <View style={styles.buttonContainer}>
+            <Button
+              text={t('buy')}
+              size={BtnSizes.FULL}
+              onPress={this.goToBuyGold}
+              style={styles.button}
+              type={BtnTypes.TERTIARY}
+            />
+            {hasGold && (
               <Button
-                text={t('buy')}
-                onPress={this.goToBuyGold}
+                size={BtnSizes.FULL}
+                text={t('sell')}
+                onPress={this.goToBuyDollars}
                 style={styles.button}
-                standard={true}
-                type={BtnTypes.PRIMARY}
+                type={BtnTypes.TERTIARY}
               />
-              {hasGold && (
-                <>
-                  <View style={styles.buttonDivider} />
-                  <Button
-                    text={t('sell')}
-                    onPress={this.goToBuyDollars}
-                    style={styles.button}
-                    standard={true}
-                    type={BtnTypes.PRIMARY}
-                  />
-                </>
-              )}
-            </View>
+            )}
           </View>
-          <SectionHeadNew text={t('goldActivity')} />
-          <View style={styles.activity}>
-            <TransactionsList currency={CURRENCY_ENUM.GOLD} />
-          </View>
+          <ItemSeparator />
+          <CeloGoldOverview testID="ExchangeAccountOverview" />
+          <ItemSeparator />
+          <SectionHead text={t('global:activity')} />
+          <TransactionsList currency={CURRENCY_ENUM.GOLD} />
         </ScrollContainer>
       </SafeAreaView>
     )
   }
 }
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-    fetchExchangeRate,
-  })(withTranslation(Namespaces.exchangeFlow9)(ExchangeHomeScreen))
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+  fetchExchangeRate,
+})(withTranslation(Namespaces.exchangeFlow9)(ExchangeHomeScreen))
 
 const styles = StyleSheet.create({
-  activity: {
-    flex: 1,
-  },
   exchangeEvent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -131,25 +123,15 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'space-between',
   },
-  pseudoHeader: {
-    height: 40,
-  },
-  lowerTop: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingBottom: 20,
-  },
   buttonContainer: {
     flexDirection: 'row',
-    marginHorizontal: 16,
+    flex: 1,
+    marginTop: 24,
+    marginBottom: 28,
+    marginHorizontal: 12,
   },
   button: {
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    paddingHorizontal: 20,
+    marginHorizontal: 4,
     flex: 1,
-  },
-  buttonDivider: {
-    marginLeft: 16,
   },
 })

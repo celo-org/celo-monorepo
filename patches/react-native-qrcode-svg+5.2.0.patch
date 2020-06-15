@@ -1,9 +1,0 @@
-patch-package
---- a/node_modules/react-native-qrcode-svg/index.d.ts
-+++ b/node_modules/react-native-qrcode-svg/index.d.ts
-@@ -26,4 +26,4 @@ android {
-  logoBorderRadius?: number
-  /* get svg ref for further usage */
--  getRef?: () => any
-+  getRef?: (c: any) => any
-  /* error correction level */

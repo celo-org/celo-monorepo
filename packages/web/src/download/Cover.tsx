@@ -38,13 +38,7 @@ export default withScreenSize(
               <H1 style={[textStyles.invert, isMobile ? styles.titleMobile : styles.title]}>
                 {t('coverTitle')}
               </H1>
-              <H4
-                style={[
-                  textStyles.invert,
-                  standardStyles.elementalMarginBottom,
-                  isMobile && textStyles.center,
-                ]}
-              >
+              <H4 style={[textStyles.invert, isMobile && textStyles.center]}>
                 {t('coverSubTitle')}
               </H4>
               <RequestFunds kind={RequestType.Invite} />

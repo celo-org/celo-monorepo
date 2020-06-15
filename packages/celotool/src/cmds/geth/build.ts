@@ -1,4 +1,4 @@
-import { execCmdWithExitOnFailure } from 'src/lib/utils'
+import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import yargs from 'yargs'
 import { GethArgv } from '../geth'
 

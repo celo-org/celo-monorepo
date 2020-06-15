@@ -72,7 +72,6 @@ export const componentStyles = StyleSheet.create({
     borderWidth: 1,
   },
   screenHeader: {
-    flex: 1,
     textAlign: 'center',
     fontWeight: undefined,
   },

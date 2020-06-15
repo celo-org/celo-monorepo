@@ -82,11 +82,12 @@ export async function generateKeys(
   mnemonic: string,
   password?: string,
   addressIndex: number = 0,
-  bip39ToUse: Bip39 = bip39Wrapper
+  bip39ToUse: Bip39 = bip39Wrapper,
+  derivationPath: string = CELO_DERIVATION_PATH_BASE
 ): Promise<{ privateKey: string; publicKey: string }> {
   const seed = await bip39ToUse.mnemonicToSeed(mnemonic, password)
   const node = bip32.fromSeed(seed)
-  const newNode = node.derivePath(`${CELO_DERIVATION_PATH_BASE}/${addressIndex}`)
+  const newNode = node.derivePath(`${derivationPath}/${addressIndex}`)
   if (!newNode.privateKey) {
     // As we are generating the node from a seed, the node will always have a private key and this would never happened
     throw new Error('utils-accounts@generateKeys: invalid node to derivate')

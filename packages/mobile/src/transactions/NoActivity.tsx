@@ -8,11 +8,11 @@ import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { exchangeIcon, shinyDollar } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
-import { Stacks } from 'src/navigator/Screens'
+import { Screens } from 'src/navigator/Screens'
 import { FeedType } from 'src/transactions/TransactionFeed'
 
 const goToSend = () => {
-  navigate(Stacks.SendStack)
+  navigate(Screens.Send)
 }
 
 interface OwnProps {

@@ -1,0 +1,37 @@
+{{ range $index, $e := until (int .Values.replicaCount ) }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "common.fullname" $ }}-{{ $index }}
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-mixed-protocols: "true"
+  labels:
+{{ include "celo-fullnode.labels" $ | indent 4 }}
+spec:
+  type: {{ $.Values.geth.service_type }}
+{{- if $.Values.geth.use_static_ips }}
+  loadBalancerIP: {{ index $.Values.geth.public_ips $index -}}
+{{- end }}
+  ports:
+    - port: 30303
+      targetPort: ethereum
+      name: ethereum
+{{- if $.Values.geth.expose_rpc_externally }}
+{{ include "celo-fullnode.rpc-ports" . | indent 4 }}
+{{- end }}
+  selector:
+    statefulset.kubernetes.io/pod-name: {{ template "common.fullname" $ }}-{{ $index }}
+---
+{{ end }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "common.fullname" . }}-rpc
+  labels:
+{{ include "celo-fullnode.labels" .  | indent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+{{ include "celo-fullnode.rpc-ports" . | indent 4 }}
+  selector:
+{{ include "celo-fullnode.labels" .  | indent 4 }}

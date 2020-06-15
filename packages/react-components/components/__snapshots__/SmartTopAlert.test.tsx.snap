@@ -12,6 +12,7 @@ exports[`SmartTopAlert renders correctly 1`] = `
   <View
     accessible={true}
     focusable={true}
+    forwardedRef={[Function]}
     onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}

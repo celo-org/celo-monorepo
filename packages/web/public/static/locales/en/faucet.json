@@ -18,7 +18,7 @@
     "You can access an existing account from the Celo Wallet by pressing 'Restore Existing Wallet' on the Invite Code screen and entering your seed phrase.",
   "viewAccountInfo": "View account information. ",
   "checkYourBalance": "Check your balance and transaction history",
-  "celoWallet": "Celo Wallet",
+  "celoWallet": "Celo Test Wallet",
   "blockScout": "BlockScout",
   "interestedInNode": "Interested in running your own node? ",
   "faucetError": "Unable to faucet - check your address and please try again",
@@ -43,5 +43,5 @@
   "countryPlaceholder": "Country or Territory",
   "phonePlaceholder": "Phone Number",
   "chooseMobileOS": "Choose Mobile OS",
-  "downloadDirect": "Available for Android and iOS"
+  "downloadDirect": "Available for Android and iOS. Units in this wallet have no real value."
 }

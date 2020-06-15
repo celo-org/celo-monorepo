@@ -58,10 +58,10 @@ function* produceTxSignature(action: RequestTxSignatureAction) {
   Logger.debug(TAG, 'Producing tx signature')
 
   yield call(getConnectedUnlockedAccount)
+  const contractKit = yield call(getContractKit)
 
   const rawTxs = yield Promise.all(
     action.request.txs.map(async (tx) => {
-      const contractKit = getContractKit()
       // TODO offload this logic to walletkit or contractkit, otherwise they
       // could diverge again and create another bug
       // See https://github.com/celo-org/celo-monorepo/issues/3045
@@ -112,9 +112,11 @@ export function handleDappkitDeepLink(deepLink: string) {
         navigate(Screens.DappKitSignTxScreen, { dappKitRequest })
         break
       default:
+        navigate(Screens.ErrorScreen, { errorMessage: 'Unsupported dapp request type' })
         Logger.warn(TAG, 'Unsupported dapp request type')
     }
   } catch (error) {
+    navigate(Screens.ErrorScreen, { errorMessage: `Deep link not valid for dappkit: ${error}` })
     Logger.debug(TAG, `Deep link not valid for dappkit: ${error}`)
   }
 }

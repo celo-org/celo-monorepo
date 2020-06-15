@@ -1,6 +1,6 @@
 {
-  "coverTitle": "Celo Wallet",
-  "coverSubTitle": "Available for Android and iOS",
+  "coverTitle": "Celo Test Wallet",
+  "coverSubTitle": "Available for Android and iOS.\nUnits in this wallet have no real value.",
   "getStarted": "Get Started",
   "coverAction": {
     "faucet": {
@@ -20,8 +20,8 @@
     }
   },
   "availableOnAndroid": "Available today for Android",
-  "haveAccount": "Already have an account?",
-  "useSeed": "Use your seed phrase to import your account into the Celo wallet.",
+  "haveAccount": "Already have an Alfajores testnet account?",
+  "useSeed": "Use your seed phrase to import your account into the Celo Test Wallet.",
   "learnMore": "Learn More",
   "downloadDirect": "Go straight to download\nfor your Android or Apple mobile phone"
 }

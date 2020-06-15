@@ -1,6 +1,6 @@
 import { eqAddress } from '@celo/utils/lib/address'
 import { AddressType, SignatureType } from '@celo/utils/lib/io'
-import { Signer, verifySignature } from '@celo/utils/lib/signatureUtils'
+import { guessSigner, Signer, verifySignature } from '@celo/utils/lib/signatureUtils'
 import fetch from 'cross-fetch'
 import { isLeft } from 'fp-ts/lib/Either'
 import { readFileSync } from 'fs'
@@ -49,15 +49,24 @@ export class IdentityMetadataWrapper {
   }
 
   static async verifySigner(kit: ContractKit, hash: any, signature: any, metadata: any) {
+    return this.verifySignerForAddress(kit, hash, signature, metadata.address)
+  }
+
+  static async verifySignerForAddress(
+    kit: ContractKit,
+    hash: any,
+    signature: any,
+    address: string
+  ) {
     // First try to verify on account's address
-    if (!verifySignature(hash, signature, metadata.address)) {
+    if (!verifySignature(hash, signature, address)) {
       // If this fails, signature may still be one of `address`' signers
       const accounts = await kit.contracts.getAccounts()
-      if (await accounts.isAccount(metadata.address)) {
+      if (await accounts.isAccount(address)) {
         const signers = await Promise.all([
-          accounts.getVoteSigner(metadata.address),
-          accounts.getValidatorSigner(metadata.address),
-          accounts.getAttestationSigner(metadata.address),
+          accounts.getVoteSigner(address),
+          accounts.getValidatorSigner(address),
+          accounts.getAttestationSigner(address),
         ])
         return signers.some((signer) => verifySignature(hash, signature, signer))
       }
@@ -88,7 +97,12 @@ export class IdentityMetadataWrapper {
         validatedData.right.meta
       ))
     ) {
-      throw new Error('Signature could not be validated')
+      throw new Error(
+        `Signature could not be validated. Guessing signer: ${guessSigner(
+          hash,
+          validatedData.right.meta.signature
+        )}`
+      )
     }
 
     const res = new IdentityMetadataWrapper(validatedData.right)
@@ -130,11 +144,19 @@ export class IdentityMetadataWrapper {
           throw new Error("Can't claim self")
         }
         break
-      case ClaimTypes.DOMAIN:
+      case ClaimTypes.DOMAIN: {
         const existingClaims = this.data.claims.filter((el: any) => el.domain === claim.domain)
         if (existingClaims.length > 0) {
           return existingClaims[0]
         }
+        break
+      }
+      case ClaimTypes.KEYBASE: {
+        const existingClaims = this.data.claims.filter((el: any) => el.username === claim.username)
+        if (existingClaims.length > 0) {
+          return existingClaims[0]
+        }
+      }
       default:
         break
     }

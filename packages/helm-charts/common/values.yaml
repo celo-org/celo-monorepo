@@ -1,1 +1,40 @@
 imagePullPolicy: IfNotPresent
+
+# Full-node variables
+geth:
+  image:
+    repository: us.gcr.io/celo-testnet/geth
+    tag: 1b40b25d315bfcd792138e288ea61351d6c44d09
+    imagePullPolicy: IfNotPresent
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "500m"
+    limits:
+      memory: "512Mi"
+      cpu: "1000m"
+  debug: false
+  ping_ip_from_packet: false
+  in_memory_discovery_table: false
+  syncmode: full
+  gcmode: full
+  verbosity: 2
+  public_ips:
+  - 52.149.51.48
+  - 1.1.1.1
+  service_type: LoadBalancer
+  use_static_ips: true
+  azure_mixed_protocols: true
+
+# Genesis
+genesis:
+  networkId: 31418
+  network: baklavastaging
+  useGenesisFileBase64: true
+  genesisFileBase64: ""
+
+celotool:
+  image:
+    repository: gcr.io/celo-testnet/celo-monorepo
+    tag: celotool-dc5e5dfa07231a4ff4664816a95eae606293eae9
+    imagePullPolicy: IfNotPresent

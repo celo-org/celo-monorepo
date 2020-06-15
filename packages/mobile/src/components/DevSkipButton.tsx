@@ -6,6 +6,7 @@ import { devModeTriggerClicked } from 'src/account/actions'
 import { devModeSelector } from 'src/account/selectors'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 
 interface StateProps {
@@ -16,7 +17,7 @@ interface DispatchProps {
   devModeTriggerClicked: typeof devModeTriggerClicked
 }
 
-type Props = { nextScreen: Screens; onSkip?: () => void } & StateProps & DispatchProps
+type Props = { nextScreen: keyof StackParamList; onSkip?: () => void } & StateProps & DispatchProps
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {

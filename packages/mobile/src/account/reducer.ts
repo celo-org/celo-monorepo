@@ -2,13 +2,14 @@ import { isE164Number } from '@celo/utils/src/phoneNumbers'
 import { Actions, ActionTypes } from 'src/account/actions'
 import { PaymentRequest } from 'src/account/types'
 import { DEV_SETTINGS_ACTIVE_INITIALLY } from 'src/config'
+import { features } from 'src/flags'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { getRemoteTime } from 'src/utils/time'
 
 export interface State {
-  name: string
-  e164PhoneNumber: string
-  defaultCountryCode: string
+  name: string | null
+  e164PhoneNumber: string | null
+  defaultCountryCode: string | null
   contactDetails: UserContactDetails
   devModeActive: boolean
   devModeClickCount: number
@@ -25,6 +26,8 @@ export interface State {
   dismissedInviteFriends: boolean
   dismissedGetVerified: boolean
   promptFornoIfNeeded: boolean
+  retryVerificationWithForno: boolean
+  acceptedTerms: boolean
 }
 
 export enum PincodeType {
@@ -39,9 +42,9 @@ export interface UserContactDetails {
 }
 
 export const initialState = {
-  name: '',
-  e164PhoneNumber: '',
-  defaultCountryCode: '',
+  name: null,
+  e164PhoneNumber: null,
+  defaultCountryCode: null,
   contactDetails: {
     contactId: null,
     thumbnailPath: null,
@@ -61,6 +64,8 @@ export const initialState = {
   dismissedInviteFriends: false,
   dismissedGetVerified: false,
   promptFornoIfNeeded: false,
+  acceptedTerms: false,
+  retryVerificationWithForno: features.VERIFICATION_FORNO_RETRY,
 }
 
 export const reducer = (
@@ -184,6 +189,14 @@ export const reducer = (
         ...state,
         promptFornoIfNeeded: action.promptIfNeeded,
       }
+    case Actions.SET_RETRY_VERIFICATION_WITH_FORNO:
+      return {
+        ...state,
+        retryVerificationWithForno: action.retry,
+      }
+    case Actions.ACCEPT_TERMS: {
+      return { ...state, acceptedTerms: true }
+    }
     default:
       return state
   }

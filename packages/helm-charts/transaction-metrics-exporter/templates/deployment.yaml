@@ -29,6 +29,14 @@ spec:
         env:
           - name: WEB3_PROVIDER
             value: {{ .Values.web3Provider }}
+          - name: FROM_BLOCK
+            value: "{{ .Values.fromBlock }}"
+          - name: TO_BLOCK
+            value: "{{ .Values.toBlock }}"
+          - name: BLOCK_INTERVAL
+            value: "{{ .Values.blockInterval }}"
+          - name: WATCH_ADDRESS
+            value: "{{ .Values.watchAddress }}"
         ports:
           - name: http
             containerPort: 3000

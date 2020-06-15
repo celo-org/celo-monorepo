@@ -31,7 +31,7 @@ ___
 
 Ƭ **CeloToken**: *[GoldToken](../enums/_base_.celocontract.md#goldtoken) | [StableToken](../enums/_base_.celocontract.md#stabletoken)*
 
-*Defined in [contractkit/src/base.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L52)*
+*Defined in [contractkit/src/base.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L53)*
 
 ## Variables
 
@@ -41,7 +41,7 @@ ___
   (k) => (CeloContract as any)[k as any]
 ) as CeloContract[]
 
-*Defined in [contractkit/src/base.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L54)*
+*Defined in [contractkit/src/base.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L55)*
 
 ___
 
@@ -49,7 +49,7 @@ ___
 
 • **NULL_ADDRESS**: *string* = '0x0000000000000000000000000000000000000000' as Address
 
-*Defined in [contractkit/src/base.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L58)*
+*Defined in [contractkit/src/base.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L59)*
 
 ___
 
@@ -66,6 +66,7 @@ ___
   'EscrowProxy',
   'ExchangeProxy',
   'FeeCurrencyWhitelistProxy',
+  'FreezerProxy',
   'GasPriceMinimumProxy',
   'GoldTokenProxy',
   'GovernanceApproverMultiSigProxy',

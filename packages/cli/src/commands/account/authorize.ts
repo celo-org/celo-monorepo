@@ -17,7 +17,7 @@ export default class Authorize extends BaseCommand {
       description: 'Role to delegate',
       required: true,
     }),
-    signature: flags.string({
+    signature: Flags.proofOfPossession({
       description: 'Signature (a.k.a proof-of-possession) of the signer key',
       required: true,
     }),

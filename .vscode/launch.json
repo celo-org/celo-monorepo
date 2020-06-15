@@ -1,0 +1,37 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug PhoneNumberPrivacy Tests",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": [
+        "--inspect-brk",
+        "${workspaceRoot}/node_modules/.bin/jest",
+        "--rootDir",
+        "${workspaceFolder}/packages/phone-number-privacy",
+        "--runInBand",
+        "${workspaceFolder}/packages/phone-number-privacy/test/**",
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "port": 9229
+    },
+    {
+      "name": "Debug ContractKit Tests",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": [
+        "--inspect-brk",
+        "${workspaceRoot}/node_modules/.bin/jest",
+        "--rootDir",
+        "${workspaceFolder}/packages/contractkit",
+        "--runInBand",
+        "${workspaceFolder}/packages/contractkit/src/**/*.test.ts",
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "port": 9229
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { execCmd } from 'src/lib/cmd-utils'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { AccountType, getAddressFromEnv } from 'src/lib/generate_utils'
-import { execCmd } from 'src/lib/utils'
 import { UpgradeArgv } from '../../deploy/upgrade'
 
 export const command = 'blockchain-api'

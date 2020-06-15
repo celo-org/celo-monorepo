@@ -61,7 +61,7 @@ exports[`Analytics renders correctly 1`] = `
           }
         >
           <AndroidSwitch
-            accessibilityRole="button"
+            accessibilityRole="switch"
             enabled={true}
             on={true}
             onChange={[Function]}

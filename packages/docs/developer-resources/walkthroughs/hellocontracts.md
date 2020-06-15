@@ -175,7 +175,7 @@ You can follow the logs with
 docker logs -f celo-ultralight-node
 ```
 
-After a few seconds of syncing (with [Celo's ultralight sync](celo-codebase/protocol/consensus/ultralight-sync)), you should be able to query the balance of your account:
+After a few seconds of syncing (with [Celo's ultralight sync](../../celo-codebase/protocol/consensus/ultralight-sync.md)), you should be able to query the balance of your account:
 
 ```bash
 docker exec celo-ultralight-node geth attach --exec 'eth.getBalance("<YOUR-ACCOUNT-ADDRESS>")'

@@ -2,6 +2,7 @@ import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { BLS_POP_SIZE, BLS_PUBLIC_KEY_SIZE } from '@celo/utils/lib/bls'
 import { URL_REGEX } from '@celo/utils/lib/io'
 import { isE164NumberStrict } from '@celo/utils/lib/phoneNumbers'
+import { POP_SIZE } from '@celo/utils/lib/signatureUtils'
 import { flags } from '@oclif/command'
 import { CLIError } from '@oclif/errors'
 import { IArg, ParseFn } from '@oclif/parser/lib/args'
@@ -33,6 +34,9 @@ const parseBlsPublicKey: ParseFn<string> = (input) => {
 }
 const parseBlsProofOfPossession: ParseFn<string> = (input) => {
   return parseBytes(input, BLS_POP_SIZE, `${input} is not a BLS proof-of-possession`)
+}
+const parseProofOfPossession: ParseFn<string> = (input) => {
+  return parseBytes(input, POP_SIZE, `${input} is not a proof-of-possession`)
 }
 const parseAddress: ParseFn<string> = (input) => {
   if (Web3.utils.isAddress(input)) {
@@ -110,6 +114,11 @@ export const Flags = {
     parse: parsePhoneNumber,
     description: 'Phone Number in E164 Format',
     helpValue: '+14152223333',
+  }),
+  proofOfPossession: flags.build({
+    parse: parseProofOfPossession,
+    description: 'Proof-of-Possession',
+    helpValue: '0x',
   }),
   url: flags.build({
     parse: parseUrl,
