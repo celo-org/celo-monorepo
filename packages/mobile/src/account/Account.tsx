@@ -22,6 +22,7 @@ import { FAQ_LINK, TOS_LINK } from 'src/config'
 import { features } from 'src/flags'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { revokeVerification } from 'src/identity/actions'
+import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigateProtected } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -41,7 +42,7 @@ interface DispatchProps {
 
 interface StateProps {
   account: string | null
-  e164PhoneNumber: string
+  e164PhoneNumber: string | null
   devModeActive: boolean
   analyticsEnabled: boolean
   numberVerified: boolean
@@ -82,11 +83,7 @@ export class Account extends React.Component<Props, State> {
   static navigationOptions = headerWithBackButton
 
   state: State = {
-    version: '',
-  }
-
-  async componentDidMount() {
-    this.setState({ version: DeviceInfo.getVersion() })
+    version: DeviceInfo.getVersion(),
   }
 
   goToProfile = () => {
@@ -127,15 +124,15 @@ export class Account extends React.Component<Props, State> {
   }
 
   goToSecurity = () => {
-    navigateProtected(Screens.Security, { nextScreen: Screens.Account })
+    navigateProtected(Screens.Security)
   }
 
   goToAnalytics = () => {
-    this.props.navigation.navigate(Screens.Analytics, { nextScreen: Screens.Account })
+    this.props.navigation.navigate(Screens.Analytics)
   }
 
   goToDataSaver = () => {
-    this.props.navigation.navigate(Screens.DataSaver)
+    this.props.navigation.navigate(Screens.DataSaver, { promptModalVisible: false })
   }
 
   goToFAQ() {
@@ -160,7 +157,7 @@ export class Account extends React.Component<Props, State> {
   }
 
   revokeNumberVerification = async () => {
-    if (!isE164Number(this.props.e164PhoneNumber)) {
+    if (this.props.e164PhoneNumber && !isE164Number(this.props.e164PhoneNumber)) {
       Logger.showMessage('Cannot revoke verificaton: number invalid')
       return
     }
@@ -240,6 +237,7 @@ export class Account extends React.Component<Props, State> {
     return (
       <ScrollView style={style.scrollView}>
         <SafeAreaView>
+          <DrawerTopBar />
           <View style={style.accountProfile}>
             {/* TouchableNoFeedback doesn't work here for some reason */}
             <TouchableOpacity onPress={this.onPressAvatar}>

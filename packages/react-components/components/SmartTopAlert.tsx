@@ -21,6 +21,7 @@ interface AlertProps {
 }
 
 interface Props extends AlertProps {
+  isVisible: boolean
   timestamp: number
 }
 
@@ -37,8 +38,8 @@ function SmartTopAlert(props: Props) {
   const alertState = useMemo(() => {
     // tslint bug?
     // tslint:disable-next-line: no-shadowed-variable
-    const { type, title, text, buttonMessage, dismissAfter, onPress } = props
-    if (title || text) {
+    const { type, title, text, buttonMessage, dismissAfter, onPress, isVisible } = props
+    if (isVisible) {
       return {
         type,
         title,

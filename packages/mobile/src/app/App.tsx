@@ -2,7 +2,14 @@ import colors from '@celo/react-components/styles/colors'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { ApolloProvider } from 'react-apollo'
-import { DeviceEventEmitter, Linking, StatusBar, YellowBox } from 'react-native'
+import {
+  DeviceEventEmitter,
+  Linking,
+  Platform,
+  StatusBar,
+  UIManager,
+  YellowBox,
+} from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
 import { SafeAreaProvider } from 'react-native-safe-area-view'
 import { enableScreens } from 'react-native-screens'
@@ -38,9 +45,14 @@ BigNumber.config({
   },
 })
 
+// Enables LayoutAnimation on Android. Need to check if method exists before using
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true)
+}
+
 export class App extends React.Component {
   async componentDidMount() {
-    CeloAnalytics.track(DefaultEventNames.appLoaded, this.props, true)
+    CeloAnalytics.track(DefaultEventNames.appLoaded, {}, true)
     const appLoadedAt: Date = new Date()
     const appStartListener = DeviceEventEmitter.addListener(
       'AppStartedLoading',

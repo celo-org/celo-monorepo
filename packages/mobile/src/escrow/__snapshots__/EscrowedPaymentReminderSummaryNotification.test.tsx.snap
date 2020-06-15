@@ -122,13 +122,19 @@ exports[`EscrowedPaymentReminderSummaryNotification renders correctly 1`] = `
         >
           <Text
             style={
-              Object {
-                "color": "#1AB775",
-                "fontFamily": "Inter-SemiBold",
-                "fontSize": 14,
-                "lineHeight": 16,
-                "marginRight": 24,
-              }
+              Array [
+                Object {
+                  "color": "#1AB775",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+                Object {
+                  "fontSize": 14,
+                  "lineHeight": 16,
+                  "marginRight": 24,
+                },
+              ]
             }
           >
             viewAll
@@ -298,13 +304,19 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
         >
           <Text
             style={
-              Object {
-                "color": "#1AB775",
-                "fontFamily": "Inter-SemiBold",
-                "fontSize": 14,
-                "lineHeight": 16,
-                "marginRight": 24,
-              }
+              Array [
+                Object {
+                  "color": "#1AB775",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+                Object {
+                  "fontSize": 14,
+                  "lineHeight": 16,
+                  "marginRight": 24,
+                },
+              ]
             }
           >
             global:remind
@@ -330,13 +342,19 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
         >
           <Text
             style={
-              Object {
-                "color": "#1AB775",
-                "fontFamily": "Inter-SemiBold",
-                "fontSize": 14,
-                "lineHeight": 16,
-                "marginRight": 24,
-              }
+              Array [
+                Object {
+                  "color": "#1AB775",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+                Object {
+                  "fontSize": 14,
+                  "lineHeight": 16,
+                  "marginRight": 24,
+                },
+              ]
             }
           >
             global:reclaim
@@ -470,13 +488,19 @@ exports[`EscrowedPaymentReminderSummaryNotification when more than 2 requests re
         >
           <Text
             style={
-              Object {
-                "color": "#1AB775",
-                "fontFamily": "Inter-SemiBold",
-                "fontSize": 14,
-                "lineHeight": 16,
-                "marginRight": 24,
-              }
+              Array [
+                Object {
+                  "color": "#1AB775",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+                Object {
+                  "fontSize": 14,
+                  "lineHeight": 16,
+                  "marginRight": 24,
+                },
+              ]
             }
           >
             viewAll

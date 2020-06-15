@@ -15,19 +15,9 @@ import {
   valueToInt,
 } from './BaseWrapper'
 
-// TODO (amyslawson) is there a proper config to put this in?
-const DEFAULT_NUM_ATTESTATIONS_REQUIRED = 3
-const DEFAULT_ATTESTATION_THRESHOLD = 0.25
 export interface AttestationStat {
   completed: number
   total: number
-}
-
-export interface AttestationsStatus {
-  isVerified: boolean
-  numAttestationsRemaining: number
-  total: number
-  completed: number
 }
 
 export interface AttestationStateForIssuer {
@@ -223,23 +213,15 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   async getVerifiedStatus(
     identifier: string,
     account: Address,
-    numAttestationsRequired: number = DEFAULT_NUM_ATTESTATIONS_REQUIRED,
-    attestationThreshold: number = DEFAULT_ATTESTATION_THRESHOLD
-  ): Promise<AttestationsStatus> {
+    numAttestationsRequired?: number,
+    attestationThreshold?: number
+  ) {
     const attestationStats = await this.getAttestationStat(identifier, account)
-    const numAttestationsRemaining = numAttestationsRequired - attestationStats.completed
-    const fractionAttestation =
-      attestationStats.total < 1 ? 0 : attestationStats.completed / attestationStats.total
-    // 'verified' is a term of convenience to mean that the attestation stats for a
-    // given identifier are beyond a certain threshold of confidence
-    const isVerified = numAttestationsRemaining <= 0 && fractionAttestation >= attestationThreshold
-
-    return {
-      isVerified,
-      numAttestationsRemaining,
-      total: attestationStats.total,
-      completed: attestationStats.completed,
-    }
+    return AttestationUtils.isAccountConsideredVerified(
+      attestationStats,
+      numAttestationsRequired,
+      attestationThreshold
+    )
   }
 
   /**

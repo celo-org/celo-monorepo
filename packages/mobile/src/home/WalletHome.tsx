@@ -1,8 +1,5 @@
 import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
-import SettingsIcon from '@celo/react-components/icons/Settings'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
 import variables from '@celo/react-components/styles/variables'
 import * as _ from 'lodash'
 import * as React from 'react'
@@ -14,7 +11,6 @@ import {
   SectionList,
   SectionListData,
   StyleSheet,
-  View,
 } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
@@ -23,25 +19,19 @@ import { exitBackupFlow } from 'src/app/actions'
 import { ALERT_BANNER_DURATION, DEFAULT_TESTNET, SHOW_TESTNET_BANNER } from 'src/config'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { refreshAllBalances, setLoading } from 'src/home/actions'
-import CeloDollarsOverview from 'src/home/CeloDollarsOverview'
-import HeaderButton from 'src/home/HeaderButton'
 import NotificationBox from 'src/home/NotificationBox'
 import { callToActNotificationSelector, getActiveNotificationCount } from 'src/home/selectors'
 import SendOrRequestBar from 'src/home/SendOrRequestBar'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
 import { initializeSentryUserContext } from 'src/sentry/actions'
-import DisconnectBanner from 'src/shared/DisconnectBanner'
-import { resetStandbyTransactions } from 'src/transactions/actions'
 import TransactionsList from 'src/transactions/TransactionsList'
 import { currentAccountSelector } from 'src/web3/selectors'
 
-const HEADER_ICON_SIZE = 24
 const HEADER_BUTTON_MARGIN = 12
 
 interface StateProps {
@@ -55,7 +45,6 @@ interface StateProps {
 
 interface DispatchProps {
   refreshAllBalances: typeof refreshAllBalances
-  resetStandbyTransactions: typeof resetStandbyTransactions
   initializeSentryUserContext: typeof initializeSentryUserContext
   exitBackupFlow: typeof exitBackupFlow
   setLoading: typeof setLoading
@@ -66,7 +55,6 @@ type Props = StateProps & DispatchProps & WithTranslation
 
 const mapDispatchToProps = {
   refreshAllBalances,
-  resetStandbyTransactions,
   initializeSentryUserContext,
   exitBackupFlow,
   setLoading,
@@ -113,7 +101,7 @@ export class WalletHome extends React.Component<Props> {
   }
 
   componentDidMount() {
-    this.props.resetStandbyTransactions()
+    // TODO find a better home for this, its unrelated to wallet home
     this.props.initializeSentryUserContext()
     if (SHOW_TESTNET_BANNER) {
       this.showTestnetBanner()
@@ -139,10 +127,6 @@ export class WalletHome extends React.Component<Props> {
       null,
       t('testnetAlert.0', { testnet: _.startCase(DEFAULT_TESTNET) })
     )
-  }
-
-  onPressSettings = () => {
-    navigate(Screens.Account)
   }
 
   render() {
@@ -175,23 +159,7 @@ export class WalletHome extends React.Component<Props> {
 
     return (
       <SafeAreaView style={styles.container}>
-        <View style={[componentStyles.topBar, styles.header]}>
-          {this.props.appConnected ? (
-            <Animated.Text style={[fontStyles.headerTitle, { opacity: this.headerOpacity }]}>
-              {t('wallet')}
-            </Animated.Text>
-          ) : (
-            <View style={styles.banner}>
-              <DisconnectBanner />
-            </View>
-          )}
-          <View style={styles.headerRight}>
-            {/* TODO: remove settings from here once we have the drawer menu */}
-            <HeaderButton style={styles.headerButton} onPress={this.onPressSettings}>
-              <SettingsIcon height={HEADER_ICON_SIZE} color={colors.celoGreen} />
-            </HeaderButton>
-          </View>
-        </View>
+        <DrawerTopBar />
         <AnimatedSectionList
           onScroll={this.onScroll}
           refreshControl={refresh}
@@ -201,8 +169,6 @@ export class WalletHome extends React.Component<Props> {
           sections={sections}
           stickySectionHeadersEnabled={false}
           renderSectionHeader={this.renderSection}
-          // TODO: remove this once we have the drawer menu with the balance
-          ListHeaderComponent={CeloDollarsOverview}
           keyExtractor={this.keyExtractor}
         />
         <SendOrRequestBar />

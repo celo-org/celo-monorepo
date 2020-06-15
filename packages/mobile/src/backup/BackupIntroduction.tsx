@@ -16,8 +16,9 @@ import DelayButton from 'src/backup/DelayButton'
 import { useAccountKey } from 'src/backup/utils'
 import { Namespaces } from 'src/i18n'
 import Logo from 'src/icons/Logo.v2'
+import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { drawerHeader } from 'src/navigator/Headers.v2'
-import { navigateProtected } from 'src/navigator/NavigationService'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 
@@ -54,14 +55,15 @@ class BackupIntroduction extends React.Component<Props> {
   }
 
   onPressBackup = () => {
-    CeloAnalytics.track(CustomEventNames.set_backup_phrase)
-    navigateProtected(Screens.BackupPhrase)
+    CeloAnalytics.track(CustomEventNames.backup_start)
+    navigate(Screens.AccountKeyEducation)
   }
 
   render() {
     const { backupCompleted } = this.props
     return (
       <SafeAreaView style={styles.container}>
+        <DrawerTopBar />
         {backupCompleted ? (
           <AccountKeyPostSetup />
         ) : (
@@ -103,10 +105,14 @@ function AccountKeyPostSetup() {
         <Text style={styles.postSetupBody}>{t('postSetupBody')}</Text>
       </View>
       <View style={styles.postSetupCTA}>
-        <TextButton>{t('postSetupCTA')}</TextButton>
+        <TextButton onPress={goToAccountKeyGuide}>{t('postSetupCTA')}</TextButton>
       </View>
     </ScrollView>
   )
+}
+
+function goToAccountKeyGuide() {
+  navigate(Screens.AccountKeyEducation, { nextScreen: Screens.BackupIntroduction })
 }
 
 const styles = StyleSheet.create({

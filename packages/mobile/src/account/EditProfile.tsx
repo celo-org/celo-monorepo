@@ -16,7 +16,7 @@ import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 
 interface StateProps {
-  name: string
+  name: string | null
 }
 
 interface DispatchProps {
@@ -31,11 +31,15 @@ const mapStateToProps = (state: RootState): StateProps => {
   }
 }
 
-export class EditProfile extends React.Component<Props> {
+interface State {
+  name: string
+}
+
+export class EditProfile extends React.Component<Props, State> {
   static navigationOptions = headerWithBackButton
 
-  state = {
-    name: this.props.name,
+  state: State = {
+    name: this.props.name || '',
   }
 
   nameValueChange = (name: string) => {

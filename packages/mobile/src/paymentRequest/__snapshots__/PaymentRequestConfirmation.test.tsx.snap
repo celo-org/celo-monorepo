@@ -6,7 +6,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
     Object {
       "backgroundColor": "#FFFFFF",
       "flex": 1,
-      "paddingTop": 20,
+      "padding": 8,
     }
   }
 >
@@ -16,7 +16,6 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
         Object {
           "backgroundColor": "#FFFFFF",
           "flex": 1,
-          "justifyContent": "space-between",
         },
         undefined,
       ]
@@ -25,7 +24,6 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
     <RCTScrollView
       contentContainerStyle={
         Object {
-          "justifyContent": "flex-start",
           "paddingVertical": 10,
         }
       }
@@ -34,59 +32,23 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
         <View
           style={
             Object {
-              "alignItems": "center",
-              "flex": 1,
-              "justifyContent": "center",
-              "marginTop": 10,
-            }
-          }
-        >
-          <Text
-            style={
-              Array [
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Light",
-                  "fontSize": 22,
-                  "paddingBottom": 20,
-                  "textAlign": "center",
-                },
-                Object {
-                  "alignSelf": "center",
-                  "color": "#2E3338",
-                  "padding": 10,
-                  "paddingBottom": 10,
-                },
-              ]
-            }
-          >
-            requestPayment
-          </Text>
-        </View>
-        <View
-          style={
-            Object {
               "marginHorizontal": 16,
-              "marginVertical": 20,
             }
           }
         >
           <View
             style={
               Object {
-                "flex": 1,
-                "flexDirection": "column",
-                "justifyContent": "flex-start",
-                "paddingVertical": 25,
+                "alignItems": "flex-start",
+                "paddingBottom": 24,
               }
             }
           >
             <View
               style={
                 Object {
-                  "flexDirection": "column",
-                  "justifyContent": "center",
-                  "marginBottom": 10,
+                  "alignItems": "flex-start",
+                  "flexDirection": "row",
                 }
               }
             >
@@ -98,10 +60,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                       "flexDirection": "row",
                       "justifyContent": "center",
                     },
-                    Object {
-                      "alignSelf": "center",
-                      "margin": "auto",
-                    },
+                    undefined,
                   ]
                 }
               >
@@ -121,357 +80,290 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                     ]
                   }
                 >
-                  <Image
-                    source={
-                      Object {
-                        "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                      }
-                    }
-                    style={
-                      Array [
-                        Object {
-                          "alignSelf": "center",
-                          "margin": "auto",
-                        },
-                        Object {
-                          "height": 40,
-                          "width": 40,
-                        },
-                      ]
-                    }
-                  />
-                </View>
-              </View>
-              <Text
-                ellipsizeMode="tail"
-                numberOfLines={1}
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "marginHorizontal": 20,
-                      "paddingTop": 6,
-                      "textAlign": "center",
-                    },
-                  ]
-                }
-              >
-                Jane Doe
-              </Text>
-              <View
-                style={
-                  Object {
-                    "alignItems": "center",
-                    "alignSelf": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
-                }
-              >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Light",
-                        "fontSize": 14,
-                        "textAlignVertical": "center",
-                      },
-                      Object {
-                        "alignItems": "center",
-                        "backgroundColor": "#EEEEEE",
-                        "borderRadius": 3,
-                        "justifyContent": "center",
-                        "marginRight": 5,
-                        "paddingLeft": 6,
-                        "paddingRight": 3,
-                      },
-                    ]
-                  }
-                >
-                  🇺🇸 +1
-                </Text>
-                <Text
-                  style={
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Light",
-                      "fontSize": 14,
-                      "textAlignVertical": "center",
-                    }
-                  }
-                >
-                  (310) 555-0000
-                </Text>
-              </View>
-            </View>
-            <View
-              style={
-                Array [
-                  Object {
-                    "alignItems": "flex-start",
-                    "alignSelf": "center",
-                    "flexDirection": "row",
-                    "marginTop": 5,
-                  },
-                  Object {
-                    "marginTop": 15,
-                  },
-                ]
-              }
-            >
-              <Text
-                numberOfLines={1}
-                style={
-                  Array [
-                    Object {
-                      "fontFamily": "Hind-Regular",
-                    },
-                    Object {
-                      "color": undefined,
-                      "fontSize": 34,
-                    },
-                  ]
-                }
-              >
-                
-              </Text>
-              <Text
-                numberOfLines={1}
-                style={
-                  Array [
-                    Object {
-                      "fontFamily": "Hind-Regular",
-                    },
-                    Object {
-                      "color": undefined,
-                      "fontSize": 24,
-                    },
-                  ]
-                }
-              >
-                $
-              </Text>
-              <Text
-                numberOfLines={1}
-                style={
-                  Array [
-                    Object {
-                      "fontFamily": "Hind-Regular",
-                      "paddingHorizontal": 3,
-                    },
-                    Object {
-                      "color": undefined,
-                      "fontSize": 48,
-                      "lineHeight": 64,
-                    },
-                  ]
-                }
-              >
-                1.33
-              </Text>
-            </View>
-            <Text
-              style={
-                Object {
-                  "color": "#81868B",
-                  "fontFamily": "Hind-Light",
-                  "fontSize": 14,
-                  "lineHeight": 18,
-                  "paddingTop": 5,
-                  "textAlign": "center",
-                }
-              }
-            >
-              Something
-            </Text>
-            <View
-              style={
-                Object {
-                  "borderStyle": "solid",
-                  "borderTopColor": "#EEEEEE",
-                  "borderTopWidth": 1,
-                  "marginBottom": 15,
-                  "marginTop": 10,
-                  "width": "100%",
-                }
-              }
-            />
-            <View
-              style={
-                Array [
-                  Object {
-                    "flexDirection": "row",
-                    "justifyContent": "space-between",
-                    "marginVertical": 5,
-                  },
-                  undefined,
-                ]
-              }
-            >
-              <View
-                style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "marginRight": 5,
-                  }
-                }
-              >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 15,
-                        "lineHeight": 24,
-                      },
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 16,
-                        "lineHeight": 24,
-                      },
-                    ]
-                  }
-                >
-                  total
-                </Text>
-              </View>
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 15,
-                      "lineHeight": 24,
-                    },
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Bold",
-                      "fontSize": 16,
-                      "lineHeight": 24,
-                    },
-                  ]
-                }
-              >
-                <Text
-                  numberOfLines={1}
-                  style={
-                    Array [
-                      undefined,
-                      Object {
-                        "color": undefined,
-                      },
-                    ]
-                  }
-                >
-                  
-                  $
-                  1.33
-                </Text>
-              </Text>
-            </View>
-            <View
-              style={
-                Array [
-                  Object {
-                    "flexDirection": "row",
-                    "justifyContent": "space-between",
-                    "marginVertical": 5,
-                  },
-                  Object {
-                    "marginVertical": 0,
-                  },
-                ]
-              }
-            >
-              <View
-                style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "marginRight": 5,
-                  }
-                }
-              >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 15,
-                        "lineHeight": 24,
-                      },
-                      Object {
-                        "color": "#81868B",
-                      },
-                    ]
-                  }
-                >
-                  Celo Dollars (@
-                   
                   <Text
-                    numberOfLines={1}
                     style={
                       Array [
-                        undefined,
                         Object {
-                          "color": undefined,
+                          "color": "#FFFFFF",
+                          "fontFamily": "Inter-Medium",
+                          "fontSize": 16,
+                        },
+                        Object {
+                          "fontSize": 20,
                         },
                       ]
                     }
                   >
-                    
-                    $
-                    0.75
+                    J
                   </Text>
-                  )
-                </Text>
+                </View>
               </View>
-              <Text
+              <View
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 15,
-                      "lineHeight": 24,
-                    },
-                    Object {
-                      "color": "#81868B",
-                    },
-                  ]
+                  Object {
+                    "paddingLeft": 8,
+                  }
                 }
               >
                 <Text
-                  numberOfLines={1}
                   style={
-                    Array [
-                      undefined,
-                      Object {
-                        "color": undefined,
-                      },
-                    ]
+                    Object {
+                      "color": "#9CA4A9",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    }
                   }
                 >
-                  
-                  1.00
+                  requesting
                 </Text>
-              </Text>
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Medium",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    }
+                  }
+                >
+                  Jane Doe
+                </Text>
+              </View>
             </View>
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-SemiBold",
+                    "fontSize": 32,
+                    "lineHeight": 40,
+                    "paddingVertical": 8,
+                  },
+                  Object {
+                    "color": "#2E3338",
+                  },
+                ]
+              }
+            >
+              
+              $
+              1.33
+            </Text>
+            <TextInput
+              allowFontScaling={true}
+              autoFocus={true}
+              maxLength={70}
+              multiline={true}
+              numberOfLines={5}
+              onBlur={[Function]}
+              onChangeText={[Function]}
+              onKeyPress={[Function]}
+              placeholder="addDescription"
+              placeholderTextColor="#1AB775"
+              rejectResponderTermination={true}
+              returnKeyType="done"
+              style={
+                Object {
+                  "alignSelf": "stretch",
+                  "color": "#2E3338",
+                  "flex": 1,
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 18,
+                  "height": 200,
+                  "lineHeight": 24,
+                }
+              }
+              testID="commentInput/request"
+              underlineColorAndroid="transparent"
+              value=""
+            />
           </View>
         </View>
       </View>
     </RCTScrollView>
+    <View
+      style={
+        Object {
+          "padding": 16,
+          "paddingBottom": 8,
+        }
+      }
+    >
+      <View
+        style={
+          Array [
+            Object {
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "marginVertical": 5,
+            },
+            undefined,
+          ]
+        }
+      >
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "marginRight": 5,
+            }
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+              ]
+            }
+          >
+            total
+          </Text>
+        </View>
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+              },
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-SemiBold",
+                "fontSize": 16,
+                "lineHeight": 22,
+              },
+            ]
+          }
+        >
+          <Text
+            numberOfLines={1}
+            style={
+              Array [
+                undefined,
+                Object {
+                  "color": undefined,
+                },
+              ]
+            }
+          >
+            
+            $
+            1.33
+          </Text>
+        </Text>
+      </View>
+      <View
+        style={
+          Array [
+            Object {
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "marginVertical": 5,
+            },
+            Object {
+              "marginVertical": 0,
+            },
+          ]
+        }
+      >
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "marginRight": 5,
+            }
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+                Object {
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                },
+              ]
+            }
+          >
+            Celo Dollars @
+             
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  undefined,
+                  Object {
+                    "color": undefined,
+                  },
+                ]
+              }
+            >
+              
+              $
+              0.75
+            </Text>
+          </Text>
+        </View>
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+              },
+              Object {
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
+              },
+            ]
+          }
+        >
+          <Text
+            numberOfLines={1}
+            style={
+              Array [
+                undefined,
+                Object {
+                  "color": undefined,
+                },
+              ]
+            }
+          >
+            
+            1.00
+          </Text>
+        </Text>
+      </View>
+    </View>
     <View
       style={
         Object {
@@ -483,176 +375,61 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
         style={
           Array [
             Object {
-              "alignItems": "center",
-              "borderRadius": 3,
-              "flexDirection": "row",
-            },
-            Object {
-              "marginVertical": 10,
-            },
-            Object {
-              "marginBottom": 10,
+              "flexDirection": "column",
             },
             undefined,
-            Object {
-              "backgroundColor": "#42D689",
-            },
           ]
         }
       >
         <View
-          accessible={true}
-          focusable={true}
-          nativeBackgroundAndroid={
-            Object {
-              "attribute": "selectableItemBackground",
-              "type": "ThemeAttrAndroid",
-            }
-          }
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
           style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-              },
-              Object {
-                "backgroundColor": "#42D689",
-              },
-              Object {
-                "height": 50,
-              },
-              Object {
-                "borderColor": "#42D689",
-                "borderRadius": 3,
-                "borderWidth": 2,
-              },
-            ]
+            Object {
+              "borderRadius": 100,
+              "overflow": "hidden",
+            }
           }
         >
           <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackground",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
             style={
               Object {
                 "alignItems": "center",
-                "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
+                "backgroundColor": "#1AB775",
+                "flexGrow": 1,
+                "height": 48,
+                "justifyContent": "center",
+                "paddingHorizontal": 16,
+                "paddingVertical": 5,
               }
             }
+            testID="ConfirmButton"
           >
             <Text
               accessibilityLabel="request"
               style={
-                Array [
-                  Object {
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 16,
-                  },
-                  Object {
-                    "color": "#FFFFFF",
-                  },
-                  Object {
-                    "paddingLeft": 5,
-                    "paddingRight": 5,
-                  },
-                ]
+                Object {
+                  "color": "#FFFFFF",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                }
               }
             >
               request
-            </Text>
-          </View>
-        </View>
-      </View>
-      <View
-        style={
-          Array [
-            Object {
-              "alignItems": "center",
-              "borderRadius": 3,
-              "flexDirection": "row",
-            },
-            null,
-            null,
-            Object {
-              "marginBottom": 10,
-            },
-            Object {
-              "backgroundColor": "transparent",
-            },
-          ]
-        }
-      >
-        <View
-          accessible={true}
-          focusable={true}
-          nativeBackgroundAndroid={
-            Object {
-              "attribute": "selectableItemBackground",
-              "type": "ThemeAttrAndroid",
-            }
-          }
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-              },
-              Object {
-                "backgroundColor": "transparent",
-              },
-              Object {
-                "height": 50,
-              },
-              Object {
-                "borderWidth": 0,
-              },
-            ]
-          }
-        >
-          <View
-            style={
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-              }
-            }
-          >
-            <Text
-              accessibilityLabel="edit"
-              style={
-                Array [
-                  Object {
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 16,
-                  },
-                  Object {
-                    "color": "#42D689",
-                  },
-                  Object {
-                    "paddingLeft": 5,
-                    "paddingRight": 5,
-                  },
-                ]
-              }
-            >
-              edit
             </Text>
           </View>
         </View>

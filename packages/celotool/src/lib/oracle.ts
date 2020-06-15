@@ -1,18 +1,14 @@
-import {
-  AzureClusterConfig,
-  createIdentityIfNotExists,
-  deleteIdentity,
-  getIdentity,
-  switchToCluster,
-} from 'src/lib/azure'
+import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/src/address'
+import { AzureClusterConfig, createIdentityIfNotExists, deleteIdentity, getIdentity, switchToCluster } from 'src/lib/azure'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
-import { getFornoUrl, getFullNodeRpcInternalUrl } from 'src/lib/endpoints'
-import { addCeloEnvMiddleware, envVar, fetchEnv } from 'src/lib/env-utils'
 import {
-  installGenericHelmChart,
-  removeGenericHelmChart,
-  upgradeGenericHelmChart,
-} from 'src/lib/helm_deploy'
+  getFornoUrl,
+  getFullNodeHttpRpcInternalUrl,
+  getFullNodeWebSocketRpcInternalUrl,
+} from 'src/lib/endpoints'
+import { addCeloEnvMiddleware, envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
+import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
+import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
 import { retryCmd } from 'src/lib/utils'
 import yargs from 'yargs'
 
@@ -28,12 +24,22 @@ export enum OracleAzureContext {
 }
 
 /**
+ * Contains information needed when using Azure HSM signing
+ */
+interface OracleAzureHsmIdentity {
+  identityName: string
+  keyVaultName: string
+}
+
+/**
  * Represents the identity of a single oracle
  */
 interface OracleIdentity {
   address: string
-  keyVaultName: string
-  azureIdentityName: string
+  // Used if generating oracle clients from a mnemonic
+  privateKey?: string,
+  // Used if using Azure HSM signing
+  azureHsmIdentity?: OracleAzureHsmIdentity
 }
 
 /**
@@ -66,14 +72,19 @@ const oracleAzureContextClusterConfigEnvVars: {
 /**
  * Env vars corresponding to each value for the OracleConfig for a particular context
  */
-const oracleAzureContextOracleConfigEnvVars: {
-  [key in keyof typeof OracleAzureContext]: { [k in keyof OracleConfig]: string }
+const oracleAzureContextOracleIdentityEnvVars: {
+  [key in keyof typeof OracleAzureContext]: {
+    addressAzureKeyVaults: string,
+    addressesFromMnemonicCount: string,
+  }
 } = {
   [OracleAzureContext.PRIMARY]: {
-    identities: envVar.ORACLE_PRIMARY_ADDRESS_AZURE_KEY_VAULTS,
+    addressAzureKeyVaults: envVar.ORACLE_PRIMARY_ADDRESS_AZURE_KEY_VAULTS,
+    addressesFromMnemonicCount: envVar.ORACLE_PRIMARY_ADDRESSES_FROM_MNEMONIC_COUNT,
   },
   [OracleAzureContext.SECONDARY]: {
-    identities: envVar.ORACLE_SECONDARY_ADDRESS_AZURE_KEY_VAULTS,
+    addressAzureKeyVaults: envVar.ORACLE_SECONDARY_ADDRESS_AZURE_KEY_VAULTS,
+    addressesFromMnemonicCount: envVar.ORACLE_SECONDARY_ADDRESSES_FROM_MNEMONIC_COUNT,
   },
 }
 
@@ -84,7 +95,7 @@ function releaseName(celoEnv: string) {
 export async function installHelmChart(
   celoEnv: string,
   context: OracleAzureContext,
-  useFullNodes: boolean
+  useForno: boolean
 ) {
   // First install the oracle-rbac helm chart.
   // This must be deployed before so we can use a resulting auth token so that
@@ -95,7 +106,7 @@ export async function installHelmChart(
     celoEnv,
     releaseName(celoEnv),
     helmChartPath,
-    await helmParameters(celoEnv, context, useFullNodes)
+    await helmParameters(celoEnv, context, useForno)
   )
 }
 
@@ -117,16 +128,23 @@ export async function removeHelmRelease(celoEnv: string, context: OracleAzureCon
   await removeOracleRBACHelmRelease(celoEnv)
   const oracleConfig = getOracleConfig(context)
   for (const identity of oracleConfig.identities) {
-    await deleteOracleAzureIdentity(context, identity)
+    // If the identity is using Azure HSM signing, clean it up too
+    if (identity.azureHsmIdentity) {
+      await deleteOracleAzureIdentity(context, identity)
+    }
   }
 }
 
-async function helmParameters(celoEnv: string, context: OracleAzureContext, useFullNodes: boolean) {
+async function helmParameters(celoEnv: string, context: OracleAzureContext, useForno: boolean) {
   const oracleConfig = getOracleConfig(context)
 
   const kubeAuthTokenName = await rbacAuthTokenName(celoEnv)
   const replicas = oracleConfig.identities.length
-  const rpcProviderUrl = useFullNodes ? getFullNodeRpcInternalUrl(celoEnv) : getFornoUrl(celoEnv)
+  const httpRpcProviderUrl = useForno
+    ? getFornoUrl(celoEnv)
+    : getFullNodeHttpRpcInternalUrl(celoEnv)
+  // TODO: let forno support websockets
+  const wsRpcProviderUrl = getFullNodeWebSocketRpcInternalUrl(celoEnv)
   return [
     `--set environment.name=${celoEnv}`,
     `--set image.repository=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_REPOSITORY)}`,
@@ -135,12 +153,18 @@ async function helmParameters(celoEnv: string, context: OracleAzureContext, useF
     `--set oracle.azureHsm.initTryCount=5`,
     `--set oracle.azureHsm.initMaxRetryBackoffMs=30000`,
     `--set oracle.replicas=${replicas}`,
-    `--set oracle.rpcProviderUrl=${rpcProviderUrl}`,
+    `--set oracle.rpcProviderUrls.http=${httpRpcProviderUrl}`,
+    `--set oracle.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
     `--set oracle.metrics.enabled=true`,
     `--set oracle.metrics.prometheusPort=9090`,
+    `--set oracle.unusedOracleAddresses=${fetchEnvOrFallback(envVar.ORACLE_UNUSED_ORACLE_ADDRESSES, '')}`
   ].concat(await oracleIdentityHelmParameters(context, oracleConfig))
 }
 
+/**
+ * Returns an array of helm command line parameters for the oracle identities.
+ * Supports both private key and Azure HSM signing.
+ */
 async function oracleIdentityHelmParameters(
   context: OracleAzureContext,
   oracleConfig: OracleConfig
@@ -149,24 +173,37 @@ async function oracleIdentityHelmParameters(
   let params: string[] = []
   for (let i = 0; i < replicas; i++) {
     const oracleIdentity = oracleConfig.identities[i]
-    const azureIdentity = await createOracleAzureIdentityIfNotExists(context, oracleIdentity)
     const prefix = `--set oracle.identities[${i}]`
-    params = params.concat([
-      `${prefix}.address=${oracleIdentity.address}`,
-      `${prefix}.azure.id=${azureIdentity.id}`,
-      `${prefix}.azure.clientId=${azureIdentity.clientId}`,
-      `${prefix}.azure.keyVaultName=${oracleIdentity.keyVaultName}`,
-    ])
+    params.push(`${prefix}.address=${oracleIdentity.address}`)
+    // An oracle identity can specify either a private key or some information
+    // about an Azure Key Vault that houses an HSM with the address provided.
+    // We provide the appropriate parameters for both of those types of identities.
+    if (oracleIdentity.azureHsmIdentity) {
+      const azureIdentity = await createOracleAzureIdentityIfNotExists(context, oracleIdentity)
+      params = params.concat([
+        `${prefix}.azure.id=${azureIdentity.id}`,
+        `${prefix}.azure.clientId=${azureIdentity.clientId}`,
+        `${prefix}.azure.keyVaultName=${oracleIdentity.azureHsmIdentity.keyVaultName}`,
+      ])
+    } else if (oracleIdentity.privateKey) {
+      params.push(`${prefix}.privateKey=${oracleIdentity.privateKey}`)
+    } else {
+      throw Error(`Incomplete oracle identity: ${oracleIdentity}`)
+    }
   }
   return params
 }
 
+/**
+ * This creates an Azure identity for a specific oracle identity. Should only be
+ * called when an oracle identity is using an Azure Key Vault for HSM signing
+ */
 async function createOracleAzureIdentityIfNotExists(
   context: OracleAzureContext,
   oracleIdentity: OracleIdentity
 ) {
   const clusterConfig = getAzureClusterConfig(context)
-  const identity = await createIdentityIfNotExists(clusterConfig, oracleIdentity.azureIdentityName)
+  const identity = await createIdentityIfNotExists(clusterConfig, oracleIdentity.azureHsmIdentity!.identityName!)
 
   // Grant the service principal permission to manage the oracle identity.
   // See: https://github.com/Azure/aad-pod-identity#6-set-permissions-for-mic
@@ -188,7 +225,7 @@ async function setOracleKeyVaultPolicy(
   azureIdentity: any
 ) {
   return execCmdWithExitOnFailure(
-    `az keyvault set-policy --name ${oracleIdentity.keyVaultName} --key-permissions get list sign --object-id ${azureIdentity.principalId} -g ${clusterConfig.resourceGroup}`
+    `az keyvault set-policy --name ${oracleIdentity.azureHsmIdentity!.keyVaultName} --key-permissions get list sign --object-id ${azureIdentity.principalId} -g ${clusterConfig.resourceGroup}`
   )
 }
 
@@ -201,16 +238,16 @@ async function deleteOracleAzureIdentity(
 ) {
   const clusterConfig = getAzureClusterConfig(context)
   await deleteOracleKeyVaultPolicy(clusterConfig, oracleIdentity)
-  return deleteIdentity(clusterConfig, oracleIdentity.azureIdentityName)
+  return deleteIdentity(clusterConfig, oracleIdentity.azureHsmIdentity!.identityName)
 }
 
 async function deleteOracleKeyVaultPolicy(
   clusterConfig: AzureClusterConfig,
   oracleIdentity: OracleIdentity
 ) {
-  const azureIdentity = await getIdentity(clusterConfig, oracleIdentity.azureIdentityName)
+  const azureIdentity = await getIdentity(clusterConfig, oracleIdentity.azureHsmIdentity!.identityName)
   return execCmdWithExitOnFailure(
-    `az keyvault delete-policy --name ${oracleIdentity.keyVaultName} --object-id ${azureIdentity.principalId} -g ${clusterConfig.resourceGroup}`
+    `az keyvault delete-policy --name ${oracleIdentity.azureHsmIdentity!.keyVaultName} --object-id ${azureIdentity.principalId} -g ${clusterConfig.resourceGroup}`
   )
 }
 
@@ -223,16 +260,35 @@ function getOracleConfig(context: OracleAzureContext): OracleConfig {
   }
 }
 
+
 /**
- * Decodes the identities env variable for a particular context of the form:
- * <address>:<keyVaultName>,<address>:<keyVaultName>
- * eg: 0x0000000000000000000000000000000000000000:keyVault0,0x0000000000000000000000000000000000000001:keyVault1
- * into an array of OracleIdentity in the same order
+ * Returns an array of oracle identities. If the Azure Key Vault env var is specified,
+ * the identities are created from that. Otherwise, the identities are created
+ * with private keys generated by the mnemonic.
  */
 function getOracleIdentities(context: OracleAzureContext): OracleIdentity[] {
-  const identityStrings = fetchEnv(oracleAzureContextOracleConfigEnvVars[context].identities).split(
-    ','
-  )
+  const oracleIdentityEnvVars = oracleAzureContextOracleIdentityEnvVars[context]
+  const addressAzureKeyVaults = fetchEnvOrFallback(oracleIdentityEnvVars.addressAzureKeyVaults, '')
+  const addressesFromMnemonicCount = fetchEnvOrFallback(oracleIdentityEnvVars.addressesFromMnemonicCount, '')
+  // Give priority to key vault
+  if (addressAzureKeyVaults) {
+    return getAzureHsmOracleIdentities(addressAzureKeyVaults)
+  } else if (addressesFromMnemonicCount) {
+    const addressesFromMnemonicCountNum = parseInt(addressesFromMnemonicCount, 10)
+    return getMnemonicBasedOracleIdentities(addressesFromMnemonicCountNum)
+  }
+
+  throw Error(`None of the following env vars are specified: ${Object.keys(oracleIdentityEnvVars)}`)
+}
+
+/**
+ * Given a string addressAzureKeyVaults of the form:
+ * <address>:<keyVaultName>,<address>:<keyVaultName>
+ * eg: 0x0000000000000000000000000000000000000000:keyVault0,0x0000000000000000000000000000000000000001:keyVault1
+ * returns an array of OracleIdentity in the same order
+ */
+function getAzureHsmOracleIdentities(addressAzureKeyVaults: string): OracleIdentity[] {
+  const identityStrings = addressAzureKeyVaults.split(',')
   const identities = []
   for (const identityStr of identityStrings) {
     const [address, keyVaultName] = identityStr.split(':')
@@ -242,12 +298,28 @@ function getOracleIdentities(context: OracleAzureContext): OracleIdentity[] {
       )
     }
     identities.push({
-      azureIdentityName: getOracleAzureIdentityName(keyVaultName, address),
       address,
-      keyVaultName,
+      azureHsmIdentity: {
+        identityName: getOracleAzureIdentityName(keyVaultName, address),
+        keyVaultName,
+      }
     })
   }
   return identities
+}
+
+/**
+ * Returns oracle identities with private keys and addresses generated from the mnemonic
+ */
+function getMnemonicBasedOracleIdentities(count: number): OracleIdentity[] {
+  return getPrivateKeysFor(
+    AccountType.PRICE_ORACLE,
+    fetchEnv(envVar.MNEMONIC),
+    count
+  ).map((pkey) => ({
+    address: privateKeyToAddress(pkey),
+    privateKey: ensureLeading0x(pkey),
+  }))
 }
 
 /**

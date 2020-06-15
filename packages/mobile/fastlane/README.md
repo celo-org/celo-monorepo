@@ -80,6 +80,11 @@ Ship Alfajores to TestFlight
 fastlane ios pilotapp
 ```
 Ship Pilot to TestFlight
+### ios integration
+```
+fastlane ios integration
+```
+Ship Integration to TestFlight
 
 ----
 

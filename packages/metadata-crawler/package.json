@@ -15,14 +15,14 @@
     "bunyan": "1.8.12",
     "bunyan-gke-stackdriver": "0.1.2",
     "debug": "^4.1.1",
-    "dotenv": "8.0.0",
+    "dotenv": "^8.2.0",
     "googleapis": "^39.2.0",
     "pg": "^7.18.0",
     "ts-node": "^8.5.4"
   },
   "devDependencies": {
     "@types/bunyan": "1.8.4",
-    "@types/dotenv": "4.0.3",
+    "@types/dotenv": "^8.2.0",
     "bunyan-debug-stream": "^2.0.0"
   },
   "scripts": {

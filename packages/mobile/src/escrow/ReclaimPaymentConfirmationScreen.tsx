@@ -32,7 +32,7 @@ const TAG = 'escrow/ReclaimPaymentConfirmationScreen'
 
 interface StateProps {
   isReclaiming: boolean
-  e164PhoneNumber: string
+  e164PhoneNumber: string | null
   account: string | null
   dollarBalance: string
   appConnected: boolean

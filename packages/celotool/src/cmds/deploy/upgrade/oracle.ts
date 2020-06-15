@@ -14,7 +14,7 @@ export const describe = 'upgrade the oracle(s) on an AKS cluster'
 
 type OracleUpgradeArgv = UpgradeArgv &
   OracleArgv & {
-    useFullNodes: boolean
+    useForno: boolean
   }
 
 export const builder = (argv: yargs.Argv) => {
@@ -28,5 +28,5 @@ export const builder = (argv: yargs.Argv) => {
 export const handler = async (argv: OracleUpgradeArgv) => {
   const oracleAzureContext = getOracleAzureContext(argv.primary)
   await switchToAzureContextCluster(argv.celoEnv, oracleAzureContext)
-  await upgradeOracleChart(argv.celoEnv, oracleAzureContext, argv.useFullNodes)
+  await upgradeOracleChart(argv.celoEnv, oracleAzureContext, argv.useForno)
 }

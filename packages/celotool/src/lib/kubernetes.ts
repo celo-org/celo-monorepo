@@ -2,7 +2,7 @@ import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv } from './env-utils'
 
 export async function scaleResource(
-  celoEnv: string,
+  namespace: string,
   type: string,
   resourceName: string,
   replicaCount: number,
@@ -11,7 +11,7 @@ export async function scaleResource(
   const execFn = allowFail ? execCmd : execCmdWithExitOnFailure
   const run = () =>
     execFn(
-      `kubectl scale ${type} ${resourceName} --replicas=${replicaCount} --namespace ${celoEnv}`
+      `kubectl scale ${type} ${resourceName} --replicas=${replicaCount} --namespace ${namespace}`
     )
   if (allowFail) {
     try {
@@ -24,30 +24,30 @@ export async function scaleResource(
   return run()
 }
 
-export async function getStatefulSetReplicas(celoEnv: string, resourceName: string) {
+export async function getStatefulSetReplicas(namespace: string, resourceName: string) {
   const [replicas] = await execCmdWithExitOnFailure(
-    `kubectl get statefulset ${resourceName} --namespace ${celoEnv} -o jsonpath={.status.replicas}`
+    `kubectl get statefulset ${resourceName} --namespace ${namespace} -o jsonpath={.status.replicas}`
   )
   return parseInt(replicas, 10)
 }
 
-export async function getRandomTxNodeIP(celoEnv: string) {
+export async function getRandomTxNodeIP(namespace: string) {
   const txNodes = parseInt(fetchEnv(envVar.TX_NODES), 10)
   const randomNumber = Math.floor(Math.random() * txNodes)
   const [address] = await execCmdWithExitOnFailure(
-    `kubectl get service/${celoEnv}-service-${randomNumber} --namespace ${celoEnv} -o jsonpath='{.status.loadBalancer.ingress[0].ip}'`
+    `kubectl get service/${namespace}-service-${randomNumber} --namespace ${namespace} -o jsonpath='{.status.loadBalancer.ingress[0].ip}'`
   )
   return address
 }
 
 export async function deleteResource(
-  celoEnv: string,
+  namespace: string,
   type: string,
   resourceName: string,
   allowFail: boolean = false
 ) {
   const execFn = allowFail ? execCmd : execCmdWithExitOnFailure
-  const run = () => execFn(`kubectl delete ${type} ${resourceName} --namespace ${celoEnv}`)
+  const run = () => execFn(`kubectl delete ${type} ${resourceName} --namespace ${namespace}`)
   if (allowFail) {
     try {
       return run()

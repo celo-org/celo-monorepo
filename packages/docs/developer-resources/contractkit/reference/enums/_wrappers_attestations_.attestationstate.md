@@ -16,7 +16,7 @@ Contract for managing identities
 
 • **Complete**:
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L53)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L43)*
 
 ___
 
@@ -24,7 +24,7 @@ ___
 
 • **Incomplete**:
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L52)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L42)*
 
 ___
 
@@ -32,4 +32,4 @@ ___
 
 • **None**:
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L51)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L41)*

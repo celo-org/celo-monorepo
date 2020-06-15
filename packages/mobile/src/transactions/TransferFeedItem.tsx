@@ -6,17 +6,20 @@ import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
-import { TransactionStatus } from 'src/transactions/reducer'
 import TransactionFeedItem from 'src/transactions/TransactionFeedItem'
 import TransferFeedIcon from 'src/transactions/TransferFeedIcon'
-import { decryptComment, getTransferFeedParams } from 'src/transactions/transferFeedUtils'
+import {
+  getDecryptedTransferFeedComment,
+  getTransferFeedParams,
+} from 'src/transactions/transferFeedUtils'
+import { TransactionStatus } from 'src/transactions/types'
 
 type Props = TransferItemFragment & {
   type: TokenTransactionType
   status: TransactionStatus
   addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient
-  commentKey: Buffer | null
+  commentKey: string | null
 }
 
 function navigateToTransactionReview({
@@ -39,7 +42,7 @@ function navigateToTransactionReview({
 
   navigateToPaymentTransferReview(type, timestamp, {
     address,
-    comment: decryptComment(comment, commentKey, type),
+    comment: getDecryptedTransferFeedComment(comment, commentKey, type),
     amount,
     recipient,
     type,

@@ -21,9 +21,16 @@ export const trimLeading0x = (input: string) => (input.startsWith('0x') ? input.
 
 export const ensureLeading0x = (input: string) => (input.startsWith('0x') ? input : `0x${input}`)
 
+// Turns '0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10'
+// into ['ce10','ce10','ce10','ce10','ce10','ce10','ce10','ce10','ce10','ce10']
+export const getAddressChunks = (input: string): string[] =>
+  trimLeading0x(input).match(/.{1,4}/g) || []
+
 export const isHexString = (input: string) => HEX_REGEX.test(input)
 
 export const hexToBuffer = (input: string) => Buffer.from(trimLeading0x(input), 'hex')
+
+export const bufferToHex = (buf: Buffer) => ensureLeading0x(buf.toString('hex'))
 
 export const privateKeyToAddress = (privateKey: string) =>
   toChecksumAddress(ensureLeading0x(privateToAddress(hexToBuffer(privateKey)).toString('hex')))

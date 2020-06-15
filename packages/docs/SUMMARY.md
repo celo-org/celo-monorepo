@@ -16,6 +16,7 @@
   - [Using the Mobile Wallet](getting-started/using-the-mobile-wallet.md)
   - [Getting an Account and Funds](getting-started/faucet.md)
   - [Running a Full Node](getting-started/running-a-full-node-in-alfajores.md)
+- [Validator Setup FAQ](getting-started/validator-troubleshooting-faq.md)
 - [Glossary](GLOSSARY.md)
 
 ## Celo Gold Holder Guide
@@ -83,6 +84,7 @@
   - [Integrations](developer-resources/integrations/integrations.md)
     - [General](developer-resources/integrations/general.md)
     - [Custody](developer-resources/integrations/custody.md)
+    - [Using a Cloud HSM](developer-resources/integrations/cloud-hsm.md)
   - [Reference](developer-resources/contractkit/reference/SUMMARY.md)
     <!-- contractkit-reference-start -->
     - [Globals](developer-resources/contractkit/reference/globals.md)
@@ -186,7 +188,6 @@
       - [AttestationStat](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationstat.md)
       - [AttestationStateForIssuer](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationstateforissuer.md)
       - [AttestationsConfig](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationsconfig.md)
-      - [AttestationsStatus](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationsstatus.md)
       - [AttestationsToken](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationstoken.md)
       - [UnselectedRequest](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.unselectedrequest.md)
       - [wrappers/BaseWrapper](developer-resources/contractkit/reference/modules/_wrappers_basewrapper_.md)
@@ -350,7 +351,6 @@
       - [AttestationStat](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationstat.md)
       - [AttestationStateForIssuer](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationstateforissuer.md)
       - [AttestationsConfig](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationsconfig.md)
-      - [AttestationsStatus](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationsstatus.md)
       - [AttestationsToken](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationstoken.md)
       - [UnselectedRequest](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.unselectedrequest.md)
       - [Filter](developer-resources/contractkit/reference/interfaces/_wrappers_basewrapper_.filter.md)

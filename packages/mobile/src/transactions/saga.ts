@@ -1,5 +1,7 @@
 import { CeloTransactionObject } from '@celo/contractkit'
-import { call, put, take } from 'redux-saga/effects'
+import '@react-native-firebase/database'
+import '@react-native-firebase/messaging'
+import { call, put, select, spawn, take, takeEvery } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -10,15 +12,37 @@ import { fetchDollarBalance } from 'src/stableToken/actions'
 import {
   Actions,
   addHashToStandbyTransaction,
+  NewTransactionsInFeedAction,
   removeStandbyTransaction,
   transactionConfirmed,
   transactionFailed,
 } from 'src/transactions/actions'
 import { TxPromises } from 'src/transactions/contract-utils'
+import { standbyTransactionsSelector } from 'src/transactions/reducer'
 import { sendTransactionPromises, wrapSendTransactionWithRetry } from 'src/transactions/send'
+import { StandbyTransaction, TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'transactions/saga'
+
+function* watchNewFeedTransactions() {
+  yield takeEvery(Actions.NEW_TRANSACTIONS_IN_FEED, cleanupStandbyTransactions)
+}
+
+// Remove standby txs from redux state when the real ones show up in the feed
+function* cleanupStandbyTransactions({ transactions }: NewTransactionsInFeedAction) {
+  const standbyTxs: StandbyTransaction[] = yield select(standbyTransactionsSelector)
+  const newFeedTxHashes = new Set(transactions.map((tx) => tx?.hash))
+  for (const standbyTx of standbyTxs) {
+    if (
+      standbyTx.hash &&
+      standbyTx.status !== TransactionStatus.Failed &&
+      newFeedTxHashes.has(standbyTx.hash)
+    ) {
+      yield put(removeStandbyTransaction(standbyTx.id))
+    }
+  }
+}
 
 export function* waitForTransactionWithId(txId: string) {
   while (true) {
@@ -72,4 +96,8 @@ export function* sendAndMonitorTransaction<T>(
     yield put(transactionFailed(txId))
     yield put(showError(ErrorMessages.TRANSACTION_FAILED))
   }
+}
+
+export function* transactionSaga() {
+  yield spawn(watchNewFeedTransactions)
 }
