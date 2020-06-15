@@ -45,7 +45,7 @@ export default function PhoneNumberInput({
   onPressCountry,
   onChange,
 }: Props) {
-  const didRequestPhoneNumberRef = useRef(false)
+  const shouldRequestPhoneNumberRef = useRef(nationalPhoneNumber.length === 0)
   const flagEmoji = country?.emoji
   const countryCallingCode = country?.countryCallingCode ?? ''
   const numberPlaceholder = country?.countryPhonePlaceholder.national ?? ''
@@ -61,10 +61,10 @@ export default function PhoneNumberInput({
 
   // Returns true if handled
   async function requestPhoneNumberIfNecessary() {
-    if (didRequestPhoneNumberRef.current) {
+    if (!shouldRequestPhoneNumberRef.current) {
       return false
     }
-    didRequestPhoneNumberRef.current = true
+    shouldRequestPhoneNumberRef.current = false
 
     const parsedPhoneNumber = await requestPhoneNumber()
     if (!parsedPhoneNumber) {
@@ -82,7 +82,11 @@ export default function PhoneNumberInput({
   return (
     <FormField style={[styles.container, style]} label={label}>
       <View style={styles.phoneNumberContainer}>
-        <Touchable onPress={onPressCountryInternal} style={styles.countryCodeContainer}>
+        <Touchable
+          onPress={onPressCountryInternal}
+          style={styles.countryCodeContainer}
+          testID="CountrySelectionButton"
+        >
           <View style={styles.countryCodeContent}>
             <Expandable isExpandable={true} isExpanded={false}>
               <Text style={styles.flag} testID={'countryCodeFlag'}>
