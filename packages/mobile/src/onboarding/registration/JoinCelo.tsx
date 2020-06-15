@@ -219,7 +219,7 @@ export class JoinCelo extends React.Component<Props, State> {
             onPress={this.onPressContinue}
             text={t('global:next')}
             size={BtnSizes.MEDIUM}
-            type={BtnTypes.SECONDARY}
+            type={BtnTypes.ONBOARDING}
             disabled={!this.state.isValidNumber}
             testID={'JoinCeloContinueButton'}
           />

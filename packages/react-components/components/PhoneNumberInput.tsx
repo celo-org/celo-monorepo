@@ -1,9 +1,9 @@
 import Expandable from '@celo/react-components/components/Expandable'
 import FormField from '@celo/react-components/components/FormField'
 import FormTextInput from '@celo/react-components/components/FormTextInput'
-import FormUnderline from '@celo/react-components/components/FormUnderline'
 import Touchable from '@celo/react-components/components/Touchable'
 import ValidatedTextInput from '@celo/react-components/components/ValidatedTextInput.v2'
+import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import SmsRetriever from '@celo/react-native-sms-retriever'
 import { LocalizedCountry } from '@celo/utils/src/countries'
@@ -83,19 +83,16 @@ export default function PhoneNumberInput({
     <FormField style={[styles.container, style]} label={label}>
       <View style={styles.phoneNumberContainer}>
         <Touchable onPress={onPressCountryInternal} style={styles.countryCodeContainer}>
-          <>
-            <View style={{ flex: 1, justifyContent: 'center' }}>
-              <Expandable isExpandable={true} isExpanded={false}>
-                <Text style={styles.flag} testID={'countryCodeFlag'}>
-                  {flagEmoji}
-                </Text>
-                <Text style={styles.phoneCountryCode} testID={'countryCodeText'}>
-                  {countryCallingCode}
-                </Text>
-              </Expandable>
-            </View>
-            <FormUnderline />
-          </>
+          <View style={styles.countryCodeContent}>
+            <Expandable isExpandable={true} isExpanded={false}>
+              <Text style={styles.flag} testID={'countryCodeFlag'}>
+                {flagEmoji}
+              </Text>
+              <Text style={styles.phoneCountryCode} testID={'countryCodeText'}>
+                {countryCallingCode}
+              </Text>
+            </Expandable>
+          </View>
         </Touchable>
         <ValidatedTextInput
           InputComponent={FormTextInput}
@@ -121,12 +118,19 @@ const styles = StyleSheet.create({
     alignItems: 'stretch',
   },
   countryCodeContainer: {
-    width: 90,
+    width: 112,
+    paddingHorizontal: 12,
     alignItems: 'stretch',
+    backgroundColor: colors.light,
+    borderRadius: 8,
+  },
+  countryCodeContent: {
+    flex: 1,
+    justifyContent: 'center',
   },
   flag: {
     fontSize: 20,
-    marginRight: 8,
+    marginRight: 4,
   },
   phoneCountryCode: {
     ...fontStyles.regular,

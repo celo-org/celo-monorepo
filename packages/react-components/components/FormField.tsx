@@ -12,7 +12,7 @@ interface Props {
 export default function FormField({ style, label, children }: Props) {
   return (
     <View style={[styles.container, style]}>
-      <FormLabel>{label}</FormLabel>
+      <FormLabel style={styles.label}>{label}</FormLabel>
       {children}
     </View>
   )
@@ -20,4 +20,5 @@ export default function FormField({ style, label, children }: Props) {
 
 const styles = StyleSheet.create({
   container: {},
+  label: { marginBottom: 8 },
 })
