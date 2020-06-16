@@ -34,5 +34,5 @@ if ! nc -z 127.0.0.1 8545 ; then
 fi
 
 yarn run build && \
-yarn run truffle exec ./scripts/truffle/verify_release_gold_balances.js \
+yarn run truffle exec ./scripts/truffle/verify_release_gold_contracts.js \
   --network $NETWORK --contract_json $CONTRACT_JSON --config_json $CONFIG_JSON --build_directory $PWD/build/$NETWORK \
