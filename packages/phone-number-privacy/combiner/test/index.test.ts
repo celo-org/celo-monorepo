@@ -3,12 +3,10 @@ import { authenticateUser, isVerified } from '../src/common/identity'
 import { getTransaction } from '../src/database/database'
 import {
   getDidMatchmaking,
-  incrementQueryCount,
   setDidMatchmaking,
 } from '../src/database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../src/database/wrappers/number-pairs'
 import { getDistributedBlindedSalt, getContactMatches } from '../src/index'
-import { getRemainingQueryCount } from '../src/salt-generation/query-quota'
 
 const BLS_SIGNATURE = '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A'
 
@@ -17,16 +15,11 @@ const mockAuthenticateUser = authenticateUser as jest.Mock
 mockAuthenticateUser.mockReturnValue(true)
 const mockIsVerified = isVerified as jest.Mock
 
-jest.mock('../src/salt-generation/query-quota')
-const mockGetRemainingQueryCount = getRemainingQueryCount as jest.Mock
-
 jest.mock('../src/bls/bls-cryptography-client')
 const mockComputeBlindedSignature = BLSCryptographyClient.combinePartialBlindedSignatures as jest.Mock
 mockComputeBlindedSignature.mockResolvedValue(BLS_SIGNATURE)
 
 jest.mock('../src/database/wrappers/account')
-const mockIncrementQueryCount = incrementQueryCount as jest.Mock
-mockIncrementQueryCount.mockImplementation()
 const mockGetDidMatchmaking = getDidMatchmaking as jest.Mock
 mockGetDidMatchmaking.mockReturnValue(false)
 const mockSetDidMatchmaking = setDidMatchmaking as jest.Mock
@@ -57,7 +50,6 @@ describe(`POST /getDistributedBlindedSalt endpoint`, () => {
     const req = { body: mockRequestData }
 
     it('provides signature', () => {
-      mockGetRemainingQueryCount.mockReturnValue(10)
       const res = {
         json(body: any) {
           expect(body.success).toEqual(true)
@@ -68,7 +60,6 @@ describe(`POST /getDistributedBlindedSalt endpoint`, () => {
       getDistributedBlindedSalt(req, res)
     })
     it('returns 403 on query count 0', () => {
-      mockGetRemainingQueryCount.mockReturnValue(0)
       const res = {
         json() {
           return {}
@@ -83,7 +74,6 @@ describe(`POST /getDistributedBlindedSalt endpoint`, () => {
       getDistributedBlindedSalt(req, res)
     })
     it('returns 500 on bls error', () => {
-      mockGetRemainingQueryCount.mockReturnValue(10)
       mockComputeBlindedSignature.mockImplementation(() => {
         throw Error()
       })

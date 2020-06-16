@@ -51,7 +51,8 @@ export async function handleGetDistributedBlindedMessageForSalt(
 
 async function requestSigners(request: Request) {
   const signatures: ServicePartialSignature[] = []
-  const requestsForSigners = config.pgpnpServices.map((service) =>
+  const signers = JSON.parse(config.pgpnpServices.signers) as PgpnpServices[]
+  const requestsForSigners = signers.map((service) =>
     requestSigner(service, request)
       .then(async (res) => {
         if (res.ok) {
