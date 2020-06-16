@@ -1,7 +1,10 @@
+import { NumberToRecipient } from 'src/recipients/recipient'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
 import { Actions, ActionTypes } from 'src/transactions/actions'
 import { StandbyTransaction } from 'src/transactions/types'
+
+const RECENT_TX_RECIPIENT_CACHE_LIMIT = 10
 
 export interface State {
   // Tracks transactions that have been initiated by the user
@@ -14,6 +17,7 @@ export interface State {
   // tx feed query watcher. Necessary so we don't re-process
   // txs more than once.
   knownFeedTransactions: KnownFeedTransactionsType
+  recentTxRecipientsCache: NumberToRecipient
 }
 
 export interface KnownFeedTransactionsType {
@@ -23,6 +27,7 @@ export interface KnownFeedTransactionsType {
 const initialState = {
   standbyTransactions: [],
   knownFeedTransactions: {},
+  recentTxRecipientsCache: {},
 }
 
 export const reducer = (
@@ -75,6 +80,22 @@ export const reducer = (
         ...state,
         knownFeedTransactions: newKnownFeedTransactions,
       }
+    case Actions.ADD_TO_RECENT_TX_RECIPIENT_CACHE:
+      const newRecentTxRecipientsCache: NumberToRecipient = {}
+      let existingEntries = Object.entries(state.recentTxRecipientsCache)
+      // Remove the stalest recipeint. Not ideal as objects arent guaranteed
+      // to maintain order but cant store map and not worth storing timestamps
+      if (existingEntries.length >= RECENT_TX_RECIPIENT_CACHE_LIMIT) {
+        existingEntries = existingEntries.slice(1)
+      }
+
+      newRecentTxRecipientsCache[action.e164PhoneNumber] = action.recipient
+      existingEntries.forEach(([key, value]) => (newRecentTxRecipientsCache[key] = value))
+
+      return {
+        ...state,
+        recentTxRecipientsCache: newRecentTxRecipientsCache,
+      }
     default:
       return state
   }
@@ -85,3 +106,6 @@ export const standbyTransactionsSelector = (state: RootState) =>
 
 export const knownFeedTransactionsSelector = (state: RootState) =>
   state.transactions.knownFeedTransactions
+
+export const recentTxRecipientsCacheSelector = (state: RootState) =>
+  state.transactions.recentTxRecipientsCache

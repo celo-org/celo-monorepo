@@ -1,6 +1,11 @@
 import { TFunction } from 'i18next'
 import * as _ from 'lodash'
-import { TokenTransactionType, UserTransactionsQuery } from 'src/apollo/types'
+import {
+  ExchangeItemFragment,
+  TokenTransactionType,
+  TransferItemFragment,
+  UserTransactionsQuery,
+} from 'src/apollo/types'
 import { DEFAULT_TESTNET } from 'src/config'
 import { decryptComment } from 'src/identity/commentEncryption'
 import { AddressToE164NumberType } from 'src/identity/reducer'
@@ -17,17 +22,32 @@ export function getDecryptedTransferFeedComment(
   return decryptedComment
 }
 
+function getRecipient(
+  e164PhoneNumber: string | null,
+  recipientCache: NumberToRecipient,
+  recentTxRecipientsCache: NumberToRecipient
+) {
+  if (!e164PhoneNumber) {
+    return undefined
+  }
+
+  return Object.keys(recipientCache).length
+    ? recipientCache[e164PhoneNumber]
+    : recentTxRecipientsCache[e164PhoneNumber]
+}
+
 export function getTransferFeedParams(
   type: TokenTransactionType,
   t: TFunction,
   recipientCache: NumberToRecipient,
+  recentTxRecipientsCache: NumberToRecipient,
   address: string,
   addressToE164Number: AddressToE164NumberType,
   rawComment: string | null,
   commentKey: string | null
 ) {
   const e164PhoneNumber = addressToE164Number[address]
-  const recipient = e164PhoneNumber ? recipientCache[e164PhoneNumber] : undefined
+  const recipient = getRecipient(e164PhoneNumber, recipientCache, recentTxRecipientsCache)
   const nameOrNumber = recipient ? recipient.displayName : e164PhoneNumber
   const comment = getDecryptedTransferFeedComment(rawComment, commentKey, type)
 
@@ -129,4 +149,10 @@ export function getNewTxsFromUserTxQuery(
 
 export function isTokenTxTypeSent(type: TokenTransactionType) {
   return type === TokenTransactionType.Sent || type === TokenTransactionType.EscrowSent
+}
+
+export function isTransferTransaction(
+  tx: TransferItemFragment | ExchangeItemFragment
+): tx is TransferItemFragment {
+  return (tx as TransferItemFragment).address !== undefined
 }

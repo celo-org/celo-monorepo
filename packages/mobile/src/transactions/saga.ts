@@ -8,10 +8,13 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { fetchGoldBalance } from 'src/goldToken/actions'
+import { addressToE164NumberSelector } from 'src/identity/reducer'
+import { recipientCacheSelector } from 'src/recipients/reducer'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import {
   Actions,
   addHashToStandbyTransaction,
+  addToRecentTxRecipientsCache,
   NewTransactionsInFeedAction,
   removeStandbyTransaction,
   transactionConfirmed,
@@ -20,6 +23,7 @@ import {
 import { TxPromises } from 'src/transactions/contract-utils'
 import { standbyTransactionsSelector } from 'src/transactions/reducer'
 import { sendTransactionPromises, wrapSendTransactionWithRetry } from 'src/transactions/send'
+import { isTransferTransaction } from 'src/transactions/transferFeedUtils'
 import { StandbyTransaction, TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 
@@ -32,7 +36,19 @@ function* watchNewFeedTransactions() {
 // Remove standby txs from redux state when the real ones show up in the feed
 function* cleanupStandbyTransactions({ transactions }: NewTransactionsInFeedAction) {
   const standbyTxs: StandbyTransaction[] = yield select(standbyTransactionsSelector)
-  const newFeedTxHashes = new Set(transactions.map((tx) => tx?.hash))
+  const addressToE164Number = yield select(addressToE164NumberSelector)
+  const recipientCache = yield select(recipientCacheSelector)
+
+  const newFeedTxHashes = new Set()
+  const newFeedTxAddresses: string[] = []
+
+  transactions.forEach((tx) => {
+    newFeedTxHashes.add(tx?.hash)
+    if (isTransferTransaction(tx)) {
+      newFeedTxAddresses.push(tx?.address)
+    }
+  })
+  // const newFeedTxAddresses = new Set(transactions.map((tx) => tx?.hash))
   for (const standbyTx of standbyTxs) {
     if (
       standbyTx.hash &&
@@ -40,6 +56,14 @@ function* cleanupStandbyTransactions({ transactions }: NewTransactionsInFeedActi
       newFeedTxHashes.has(standbyTx.hash)
     ) {
       yield put(removeStandbyTransaction(standbyTx.id))
+    }
+  }
+
+  for (const address of newFeedTxAddresses) {
+    const e164PhoneNumber = addressToE164Number[address]
+    const cachedRecipient = recipientCache[e164PhoneNumber]
+    if (e164PhoneNumber && cachedRecipient) {
+      yield put(addToRecentTxRecipientsCache(e164PhoneNumber, cachedRecipient))
     }
   }
 }

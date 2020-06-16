@@ -1,11 +1,13 @@
 import gql from 'graphql-tag'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import { TokenTransactionType, TransferItemFragment } from 'src/apollo/types'
 import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
+import { recentTxRecipientsCacheSelector } from 'src/transactions/reducer'
 import TransactionFeedItem from 'src/transactions/TransactionFeedItem'
 import TransferFeedIcon from 'src/transactions/TransferFeedIcon'
 import {
@@ -70,10 +72,17 @@ export function TransferFeedItem(props: Props) {
     recipientCache,
   } = props
 
+  if (type === TokenTransactionType.EscrowSent) {
+    console.log(timestamp)
+  }
+
+  const recentTxRecipientsCache = useSelector(recentTxRecipientsCacheSelector)
+
   const { title, info, recipient } = getTransferFeedParams(
     type,
     t,
     recipientCache,
+    recentTxRecipientsCache,
     address,
     addressToE164Number,
     comment,

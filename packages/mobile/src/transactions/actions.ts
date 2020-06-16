@@ -4,6 +4,7 @@ import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { RecipientWithContact } from 'src/recipients/recipient'
 import { TransactionDataInput } from 'src/send/SendAmount'
 import { TransferConfirmationCardProps } from 'src/transactions/TransferConfirmationCard'
 import { StandbyTransaction } from 'src/transactions/types'
@@ -17,6 +18,7 @@ export enum Actions {
   TRANSACTION_CONFIRMED = 'TRANSACTIONS/TRANSACTION_CONFIRMED',
   TRANSACTION_FAILED = 'TRANSACTIONS/TRANSACTION_FAILED',
   NEW_TRANSACTIONS_IN_FEED = 'TRANSACTIONS/NEW_TRANSACTIONS_IN_FEED',
+  ADD_TO_RECENT_TX_RECIPIENT_CACHE = 'TRANSACTIONS/ADD_TO_RECENT_TX_RECIPIENT_CACHE',
 }
 
 export interface AddStandbyTransactionAction {
@@ -54,12 +56,19 @@ export interface NewTransactionsInFeedAction {
   transactions: TransactionFeedFragment[]
 }
 
+export interface AddToRecentTxRecipientsCacheAction {
+  type: Actions.ADD_TO_RECENT_TX_RECIPIENT_CACHE
+  e164PhoneNumber: string
+  recipient: RecipientWithContact
+}
+
 export type ActionTypes =
   | AddStandbyTransactionAction
   | RemoveStandbyTransactionAction
   | ResetStandbyTransactionsAction
   | AddHashToStandbyTransactionAction
   | NewTransactionsInFeedAction
+  | AddToRecentTxRecipientsCacheAction
 
 export const generateStandbyTransactionId = (recipientAddress: string) => {
   return web3ForUtils.utils.sha3(recipientAddress + String(Date.now()))
@@ -75,6 +84,15 @@ export const addStandbyTransaction = (
 export const removeStandbyTransaction = (idx: string): RemoveStandbyTransactionAction => ({
   type: Actions.REMOVE_STANDBY_TRANSACTION,
   idx,
+})
+
+export const addToRecentTxRecipientsCache = (
+  e164PhoneNumber: string,
+  recipient: RecipientWithContact
+): AddToRecentTxRecipientsCacheAction => ({
+  type: Actions.ADD_TO_RECENT_TX_RECIPIENT_CACHE,
+  e164PhoneNumber,
+  recipient,
 })
 
 export const resetStandbyTransactions = (): ResetStandbyTransactionsAction => ({

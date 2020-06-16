@@ -115,6 +115,7 @@ export class WalletHome extends React.Component<Props> {
     await this.tryImportContacts()
   }
 
+  // TODO: cache recent recipients of txs to speed this up
   tryImportContacts = async () => {
     const { numberVerified, recipientCache } = this.props
 
