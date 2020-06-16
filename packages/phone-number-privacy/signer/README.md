@@ -72,7 +72,7 @@ Before the service can work, the db migrations must be run once. So for the firs
 
 For subsequent runs, this simpler command will suffice:
 
-`docker run -d -p 80:8080 {ENV_VARS_HERE} {IMAGE_TAG_HERE}`
+`docker run -d -p 80:8080 --restart always {ENV_VARS_HERE} {IMAGE_TAG_HERE}`
 
 Then check on the service to make sure its running:
 

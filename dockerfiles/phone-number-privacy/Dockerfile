@@ -1,4 +1,10 @@
 FROM node:10
+
+RUN apt-get update \
+	&& apt-get install -y openssl \
+	&& rm -rf /var/lib/apt/lists/* \
+	&& rm -rf /var/cache/apt/*
+
 WORKDIR /celo-phone-number-privacy/
 
 COPY packages/phone-number-privacy/signer signer

@@ -13,7 +13,8 @@
     "lint": "tslint --project .",
     "test": "jest --runInBand --testPathIgnorePatterns test/end-to-end",
     "db:migrate": "NODE_ENV=production ts-node scripts/runMigrations.ts",
-    "keygen": "ts-node scripts/createBlsKeyPair.ts"
+    "keygen": "ts-node scripts/createBlsKeyPair.ts",
+    "ssl:create": "./scripts/create-ssl-cert.sh"
   },
   "dependencies": {
     "@celo/contractkit": "0.4.5",
