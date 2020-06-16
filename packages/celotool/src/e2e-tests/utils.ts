@@ -157,6 +157,9 @@ export async function shutdownOrKill(identifier: string | number) {
     console.warn('shutdownOrKill: clean shutdown failed')
     await signalProcess(identifier, 'KILL')
   }
+
+  // Sleep an additional 3 seconds to give time for the ports to be free.
+  await sleep(3.0)
 }
 
 export function sleep(seconds: number, verbose = false) {
