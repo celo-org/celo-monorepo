@@ -129,8 +129,8 @@ export function* fetchRecentTxRecipients() {
   }
 
   const knownFeedAddresses = Object.values(knownFeedTransactions)
-  let remainingCacheStorage = RECENT_TX_RECIPIENT_CACHE_LIMIT
 
+  let remainingCacheStorage = RECENT_TX_RECIPIENT_CACHE_LIMIT
   const recentTxRecipientsCache: NumberToRecipient = {}
   for (let i = knownFeedAddresses.length - 1; i > 0; i -= 1) {
     if (remainingCacheStorage <= 0) {
@@ -138,13 +138,15 @@ export function* fetchRecentTxRecipients() {
     }
 
     const address = knownFeedAddresses[i]
+    // Address is not a string if transaction was an Exchange
     if (typeof address !== 'string') {
       continue
     }
 
     const e164PhoneNumber = addressToE164Number[address]
     const cachedRecipient = recipientCache[e164PhoneNumber]
-    if (recentTxRecipientsCache[e164PhoneNumber] || !cachedRecipient) {
+    // Skip if there is no recipient to cache or we've already cached them
+    if (!cachedRecipient || recentTxRecipientsCache[e164PhoneNumber]) {
       continue
     }
 

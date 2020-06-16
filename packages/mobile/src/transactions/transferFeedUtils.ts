@@ -28,18 +28,38 @@ function getRecipient(
   e164PhoneNumber: string | null,
   recipientCache: NumberToRecipient,
   recentTxRecipientsCache: NumberToRecipient,
+  txTimestamp: number,
   invitees: InviteDetails[]
 ) {
-  if (!e164PhoneNumber) {
+  // Hacky way to get escrow recipients until blockchain API
+  // returns correct address (currently returns Escrow SC address)
+  let phoneNumber = e164PhoneNumber
+  if (type === TokenTransactionType.EscrowSent) {
+    const possiblePhoneNumbers = new Set()
+    invitees.forEach((inviteDetails) => {
+      const inviteTimestamp = inviteDetails.timestamp
+      // Invite timestamps are logged before tx is confirmed so considering
+      // a match to be any two timestamps within 1 min of each other
+      if (txTimestamp - inviteTimestamp < 1000 * 60) {
+        possiblePhoneNumbers.add(inviteDetails.e164Number)
+      }
+    })
+
+    // Set to null if there isn't a conclusive match
+    if (possiblePhoneNumbers.size !== 1) {
+      phoneNumber = null
+    }
+
+    phoneNumber = possiblePhoneNumbers.values().next().value
+  }
+
+  if (!phoneNumber) {
     return undefined
   }
 
-  if (type === TokenTransactionType.EscrowSent) {
-  }
-
   return Object.keys(recipientCache).length
-    ? recipientCache[e164PhoneNumber]
-    : recentTxRecipientsCache[e164PhoneNumber]
+    ? recipientCache[phoneNumber]
+    : recentTxRecipientsCache[phoneNumber]
 }
 
 export function getTransferFeedParams(
@@ -51,6 +71,7 @@ export function getTransferFeedParams(
   addressToE164Number: AddressToE164NumberType,
   rawComment: string | null,
   commentKey: string | null,
+  timestamp: number,
   invitees: InviteDetails[]
 ) {
   const e164PhoneNumber = addressToE164Number[address]
@@ -59,6 +80,7 @@ export function getTransferFeedParams(
     e164PhoneNumber,
     recipientCache,
     recentTxRecipientsCache,
+    timestamp,
     invitees
   )
   const nameOrNumber = recipient ? recipient.displayName : e164PhoneNumber

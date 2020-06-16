@@ -75,10 +75,6 @@ export function TransferFeedItem(props: Props) {
     invitees,
   } = props
 
-  // if (type === TokenTransactionType.EscrowSent) {
-  //   console.log(timestamp, address, comment)
-  // }
-
   const { title, info, recipient } = getTransferFeedParams(
     type,
     t,
@@ -88,6 +84,7 @@ export function TransferFeedItem(props: Props) {
     addressToE164Number,
     comment,
     commentKey,
+    timestamp,
     invitees
   )
 
