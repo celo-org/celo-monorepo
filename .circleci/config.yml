@@ -271,7 +271,7 @@ jobs:
           command: |
             set -euo pipefail
             cd packages/mobile
-            yarn run test:e2e:android -r
+            yarn run test:e2e:android
       - store_artifacts:
           path: packages/mobile/e2e/artifacts
           destination: mobile/e2e/artifacts
