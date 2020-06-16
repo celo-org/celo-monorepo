@@ -35,6 +35,7 @@ interface StartArgv extends GethArgv {
   withProxy: boolean
   ethstats: string
   mnemonic: string
+  initialAccounts: string
 }
 
 export const builder = (argv: yargs.Argv) => {
@@ -128,6 +129,11 @@ export const builder = (argv: yargs.Argv) => {
       type: 'string',
       description: 'Directory of the mono repo',
     })
+    .option('initial-accounts', {
+      type: 'string',
+      description:
+        'Path to JSON file containing accounts to place in the alloc property of the genesis.json file',
+    })
 }
 
 export const handler = async (argv: StartArgv) => {
@@ -150,6 +156,9 @@ export const handler = async (argv: StartArgv) => {
   const mnemonic = argv.mnemonic
   const migrate = argv.migrate
   const migrateTo = argv.migrateTo
+  const initialAccounts = argv.initialAccounts
+    ? JSON.parse(readFileSync(argv.initialAccounts).toString())
+    : {}
   const migrationOverrides = argv.migrationOverrides
     ? JSON.parse(readFileSync(argv.migrationOverrides).toString())
     : {}
@@ -173,6 +182,8 @@ export const handler = async (argv: StartArgv) => {
     instances: [],
     genesisConfig: {
       blockTime,
+      epoch: 17280,
+      initialAccounts,
     },
   }
 
