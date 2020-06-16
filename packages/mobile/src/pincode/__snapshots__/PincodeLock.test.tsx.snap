@@ -49,7 +49,7 @@ exports[`PincodeLock renders correctly 1`] = `
           Object {
             "alignItems": "center",
             "marginBottom": 24,
-            "paddingHorizontal": "12%",
+            "paddingHorizontal": "15%",
           }
         }
       >
@@ -60,114 +60,156 @@ exports[`PincodeLock renders correctly 1`] = `
             }
           }
         >
-          <Text
+          <View
             style={
-              Array [
-                Object {
-                  "color": "#66541A",
-                  "flex": 1,
-                  "fontFamily": "Inter-Medium",
-                  "fontSize": 24,
-                  "lineHeight": 32,
-                  "opacity": 0.2,
-                  "textAlign": "center",
-                },
-                false,
-              ]
+              Object {
+                "alignItems": "center",
+                "flex": 1,
+                "height": 32,
+                "justifyContent": "center",
+              }
             }
           >
-            •
-          </Text>
-          <Text
+            <View
+              style={
+                Array [
+                  Object {
+                    "borderColor": "#2E3338",
+                    "borderRadius": 4,
+                    "borderWidth": 1,
+                    "height": 8,
+                    "width": 8,
+                  },
+                  false,
+                ]
+              }
+            />
+          </View>
+          <View
             style={
-              Array [
-                Object {
-                  "color": "#66541A",
-                  "flex": 1,
-                  "fontFamily": "Inter-Medium",
-                  "fontSize": 24,
-                  "lineHeight": 32,
-                  "opacity": 0.2,
-                  "textAlign": "center",
-                },
-                false,
-              ]
+              Object {
+                "alignItems": "center",
+                "flex": 1,
+                "height": 32,
+                "justifyContent": "center",
+              }
             }
           >
-            •
-          </Text>
-          <Text
+            <View
+              style={
+                Array [
+                  Object {
+                    "borderColor": "#2E3338",
+                    "borderRadius": 4,
+                    "borderWidth": 1,
+                    "height": 8,
+                    "width": 8,
+                  },
+                  false,
+                ]
+              }
+            />
+          </View>
+          <View
             style={
-              Array [
-                Object {
-                  "color": "#66541A",
-                  "flex": 1,
-                  "fontFamily": "Inter-Medium",
-                  "fontSize": 24,
-                  "lineHeight": 32,
-                  "opacity": 0.2,
-                  "textAlign": "center",
-                },
-                false,
-              ]
+              Object {
+                "alignItems": "center",
+                "flex": 1,
+                "height": 32,
+                "justifyContent": "center",
+              }
             }
           >
-            •
-          </Text>
-          <Text
+            <View
+              style={
+                Array [
+                  Object {
+                    "borderColor": "#2E3338",
+                    "borderRadius": 4,
+                    "borderWidth": 1,
+                    "height": 8,
+                    "width": 8,
+                  },
+                  false,
+                ]
+              }
+            />
+          </View>
+          <View
             style={
-              Array [
-                Object {
-                  "color": "#66541A",
-                  "flex": 1,
-                  "fontFamily": "Inter-Medium",
-                  "fontSize": 24,
-                  "lineHeight": 32,
-                  "opacity": 0.2,
-                  "textAlign": "center",
-                },
-                false,
-              ]
+              Object {
+                "alignItems": "center",
+                "flex": 1,
+                "height": 32,
+                "justifyContent": "center",
+              }
             }
           >
-            •
-          </Text>
-          <Text
+            <View
+              style={
+                Array [
+                  Object {
+                    "borderColor": "#2E3338",
+                    "borderRadius": 4,
+                    "borderWidth": 1,
+                    "height": 8,
+                    "width": 8,
+                  },
+                  false,
+                ]
+              }
+            />
+          </View>
+          <View
             style={
-              Array [
-                Object {
-                  "color": "#66541A",
-                  "flex": 1,
-                  "fontFamily": "Inter-Medium",
-                  "fontSize": 24,
-                  "lineHeight": 32,
-                  "opacity": 0.2,
-                  "textAlign": "center",
-                },
-                false,
-              ]
+              Object {
+                "alignItems": "center",
+                "flex": 1,
+                "height": 32,
+                "justifyContent": "center",
+              }
             }
           >
-            •
-          </Text>
-          <Text
+            <View
+              style={
+                Array [
+                  Object {
+                    "borderColor": "#2E3338",
+                    "borderRadius": 4,
+                    "borderWidth": 1,
+                    "height": 8,
+                    "width": 8,
+                  },
+                  false,
+                ]
+              }
+            />
+          </View>
+          <View
             style={
-              Array [
-                Object {
-                  "color": "#66541A",
-                  "flex": 1,
-                  "fontFamily": "Inter-Medium",
-                  "fontSize": 24,
-                  "lineHeight": 32,
-                  "opacity": 0.2,
-                  "textAlign": "center",
-                },
-                false,
-              ]
+              Object {
+                "alignItems": "center",
+                "flex": 1,
+                "height": 32,
+                "justifyContent": "center",
+              }
             }
           >
-            •
-          </Text>
+            <View
+              style={
+                Array [
+                  Object {
+                    "borderColor": "#2E3338",
+                    "borderRadius": 4,
+                    "borderWidth": 1,
+                    "height": 8,
+                    "width": 8,
+                  },
+                  false,
+                ]
+              }
+            />
+          </View>
         </View>
       </View>
       <View

@@ -7,7 +7,7 @@ import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import React, { useCallback } from 'react'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import PincodeTextbox from 'src/pincode/PincodeTextbox'
+import PincodeDisplay from 'src/pincode/PincodeDisplay'
 import { PIN_LENGTH } from 'src/pincode/utils'
 
 interface Props {
@@ -54,7 +54,7 @@ function Pincode({
       {!errorText && <Text style={styles.title}>{title || ' '}</Text>}
       {!!errorText && <Text style={styles.error}>{errorText || ' '}</Text>}
       <View style={styles.pincodeContainer}>
-        <PincodeTextbox pin={pin} maxLength={maxLength} />
+        <PincodeDisplay pin={pin} maxLength={maxLength} />
       </View>
       <View style={styles.spacer} />
       <NumberKeypad onDigitPress={onDigitPress} onBackspacePress={onBackspacePress} />
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   },
   pincodeContainer: {
     marginBottom: 24,
-    paddingHorizontal: '12%',
+    paddingHorizontal: '15%',
     alignItems: 'center',
   },
 })

@@ -6,12 +6,14 @@ import { LayoutAnimation, StyleSheet, Text, View } from 'react-native'
 // How long the last entered digit is visible
 const LAST_DIGIT_VISIBLE_INTERVAL = 2000 // 2secs
 
+const DOT_SIZE = 8
+
 interface Props {
   pin: string
   maxLength: number
 }
 
-export default function PincodeTextbox({ pin, maxLength }: Props) {
+export default function PincodeDisplay({ pin, maxLength }: Props) {
   const [revealIndex, setRevealIndex] = useState(-1)
   const prevPinRef = useRef(pin)
 
@@ -24,7 +26,7 @@ export default function PincodeTextbox({ pin, maxLength }: Props) {
     if (pin.length < prevPin.length) {
       LayoutAnimation.configureNext({
         ...LayoutAnimation.Presets.easeInEaseOut,
-        duration: 100,
+        duration: 150,
       })
       setRevealIndex(-1)
       return
@@ -44,15 +46,18 @@ export default function PincodeTextbox({ pin, maxLength }: Props) {
   return (
     <View style={styles.container}>
       {Array.from({ length: maxLength }).map((x, index) => {
-        const char = index === revealIndex ? pin[index] : '•'
+        const char = index === revealIndex ? pin[index] : undefined
         const isEntered = index < pin.length
+        const key = `${index}_${isEntered}_${char}`
+
         return (
-          <Text
-            key={`${index}_${char}_${isEntered}`}
-            style={[styles.char, isEntered && styles.charEntered]}
-          >
-            {char}
-          </Text>
+          <View key={key} style={styles.inputContainer}>
+            {char ? (
+              <Text style={styles.char}>{char}</Text>
+            ) : (
+              <View style={[styles.dot, isEntered && styles.dotFilled]} />
+            )}
+          </View>
         )
       })}
     </View>
@@ -63,15 +68,23 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
   },
+  inputContainer: {
+    flex: 1,
+    height: fontStyles.h1.lineHeight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   char: {
     ...fontStyles.h1,
-    textAlign: 'center',
-    flex: 1,
-    color: colors.onboardingBrown,
-    opacity: 0.2,
   },
-  charEntered: {
-    color: colors.dark,
-    opacity: 1,
+  dot: {
+    width: DOT_SIZE,
+    height: DOT_SIZE,
+    borderRadius: DOT_SIZE / 2,
+    borderWidth: 1,
+    borderColor: colors.dark,
+  },
+  dotFilled: {
+    backgroundColor: colors.dark,
   },
 })
