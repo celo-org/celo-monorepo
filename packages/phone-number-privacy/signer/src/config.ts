@@ -55,6 +55,8 @@ interface Config {
 }
 
 const toNum = (value: BigNumber.Value) => new BigNumber(value).toNumber()
+const toBool = (value: string | undefined, fallback: boolean) =>
+  value ? value.toLowerCase() === 'true' : fallback
 
 const env = process.env as any
 const config: Config = {
@@ -78,7 +80,7 @@ const config: Config = {
     password: env.DB_PASSWORD,
     database: env.DB_DATABASE,
     host: env.DB_HOST,
-    ssl: env.DB_USE_SSL ?? true,
+    ssl: toBool(env.DB_USE_SSL, true),
   },
   keystore: {
     type: env.KEYSTORE_TYPE,
