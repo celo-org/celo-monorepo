@@ -27,4 +27,6 @@ exports.logger = bunyan_1.createLogger({
     serializers: bunyan_1.stdSerializers,
     streams: [stream],
 });
+exports.operationalLogger = exports.logger.child({ logger: 'operation' });
+exports.dataLogger = exports.logger.child({ logger: 'data' });
 //# sourceMappingURL=logger.js.map

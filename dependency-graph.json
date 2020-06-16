@@ -65,6 +65,12 @@
       "@celo/utils"
     ]
   },
+  "@celo/leaderboard": {
+    "location": "packages/leaderboard",
+    "dependencies": [
+      "@celo/contractkit"
+    ]
+  },
   "@celo/metadata-crawler": {
     "location": "packages/metadata-crawler",
     "dependencies": [
