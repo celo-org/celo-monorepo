@@ -118,7 +118,7 @@ export type StackParamList = {
     withVerification?: boolean
     onSuccess: (pin: string) => void
   }
-  [Screens.PincodeSet]: undefined
+  [Screens.PincodeSet]: { isVerifying: boolean } | undefined
   [Screens.PhoneNumberLookupQuota]: {
     onBuy: () => void
     onSkip: () => void

@@ -1,40 +1,77 @@
-import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
-import * as React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import colors from '@celo/react-components/styles/colors.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
+import React, { useEffect, useRef, useState } from 'react'
+import { LayoutAnimation, StyleSheet, Text, View } from 'react-native'
+
+// How long the last entered digit is visible
+const LAST_DIGIT_VISIBLE_INTERVAL = 2000 // 2secs
 
 interface Props {
   pin: string
-  placeholder: string
+  maxLength: number
 }
 
-export default function PincodeTextbox({ pin, placeholder }: Props) {
-  const text = pin ? '\u25CF'.repeat(pin.length) : placeholder
-  const fontStyle = pin ? style.dotsText : style.placeHolderText
+export default function PincodeTextbox({ pin, maxLength }: Props) {
+  const [revealIndex, setRevealIndex] = useState(-1)
+  const prevPinRef = useRef(pin)
+
+  useEffect(() => {
+    const prevPin = prevPinRef.current
+    prevPinRef.current = pin
+
+    // Check if pin length is smaller, so as not to reveal previous digits
+    // when deleting
+    if (pin.length < prevPin.length) {
+      LayoutAnimation.configureNext({
+        ...LayoutAnimation.Presets.easeInEaseOut,
+        duration: 100,
+      })
+      setRevealIndex(-1)
+      return
+    }
+
+    setRevealIndex(pin.length - 1)
+    const timeout = setTimeout(() => {
+      LayoutAnimation.easeInEaseOut()
+      setRevealIndex(-1)
+    }, LAST_DIGIT_VISIBLE_INTERVAL)
+
+    return () => {
+      clearTimeout(timeout)
+    }
+  }, [pin])
 
   return (
-    <View style={[componentStyles.roundedBorder, style.container]}>
-      <Text style={fontStyle}>{text}</Text>
+    <View style={styles.container}>
+      {Array.from({ length: maxLength }).map((x, index) => {
+        const char = index === revealIndex ? pin[index] : '•'
+        const isEntered = index < pin.length
+        return (
+          <Text
+            key={`${index}_${char}_${isEntered}`}
+            style={[styles.char, isEntered && styles.charEntered]}
+          >
+            {char}
+          </Text>
+        )
+      })}
     </View>
   )
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
-    width: 180,
-    height: 55,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
+    flexDirection: 'row',
   },
-  dotsText: {
-    ...fontStyles.bodySmall,
-    letterSpacing: 2,
+  char: {
+    ...fontStyles.h1,
+    textAlign: 'center',
+    flex: 1,
+    color: colors.onboardingBrown,
+    opacity: 0.2,
   },
-  placeHolderText: {
-    ...fontStyles.bodySecondary,
-    color: colors.inactive,
+  charEntered: {
+    color: colors.dark,
+    opacity: 1,
   },
 })

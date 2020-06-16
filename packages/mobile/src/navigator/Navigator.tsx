@@ -165,6 +165,23 @@ const verificationScreens = (Navigator: typeof Stack) => {
   )
 }
 
+const pincodeSetScreenOptions = ({
+  route,
+}: {
+  route: RouteProp<StackParamList, Screens.PincodeSet>
+}) => {
+  const isVerifying = route.params?.isVerifying
+  const title = isVerifying
+    ? i18n.t('onboarding:pincodeSet.verify')
+    : i18n.t('onboarding:pincodeSet.create')
+  return {
+    ...nuxNavigationOptions,
+    headerTitle: () => (
+      <HeaderTitleWithSubtitle title={title} subTitle={i18n.t('onboarding:step', { step: '2' })} />
+    ),
+  }
+}
+
 const nuxScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen
@@ -188,7 +205,7 @@ const nuxScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen
       name={Screens.PincodeSet}
       component={PincodeSet}
-      options={nuxNavigationOptions}
+      options={pincodeSetScreenOptions}
     />
     <Navigator.Screen
       name={Screens.EnterInviteCode}
