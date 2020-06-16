@@ -7,7 +7,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@celo/utils": "0.1.16-dev",
-    "@celo/contractkit": "0.4.7-dev",
+    "@celo/contractkit": "0.4.8-dev",
     "@google-cloud/monitoring": "0.7.1",
     "@google-cloud/pubsub": "^0.28.1",
     "@google-cloud/storage": "^2.4.3",
