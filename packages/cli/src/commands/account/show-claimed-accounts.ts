@@ -56,14 +56,10 @@ export default class ShowClaimedAccounts extends BaseCommand {
     const claimedAccounts = await getClaims(this.kit, args.address, metadata)
 
     console.log('All balances expressed in units of 10^-18.')
-    let sum = new BigNumber(0)
     for (const address of claimedAccounts) {
       console.log('\nShowing balances for', address)
       const balance = await this.kit.getTotalBalance(address)
-      sum = sum.plus(balance.total)
       printValueMap(balance)
     }
-
-    console.log('\nSum of total balances:', sum.toString(10))
   }
 }
