@@ -6,6 +6,7 @@ import celoHero from 'src/home/celo-hero.png'
 import HomeBackers from 'src/home/HomeBackers'
 import HomeBenefits from 'src/home/HomeBenefits'
 import ImagePanes from 'src/home/ImagePanes'
+import Involvement from 'src/home/Involvement'
 import Timeline, { MileStone } from 'src/home/roadmap/Timeline'
 import { TwoAssets } from 'src/home/TwoAssets'
 import HomeCover from 'src/home/version3/HomeCover'
@@ -69,6 +70,7 @@ export class Home extends React.Component<I18nProps & Props, State> {
         <HomeBenefits />
         <TwoAssets />
         <Press />
+        <Involvement />
         <Timeline milestones={milestones} />
         <HomeBackers />
       </View>

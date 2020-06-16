@@ -1,5 +1,4 @@
 import BigNumber from 'bignumber.js'
-import { Transaction } from 'knex'
 import {
   ContractRetrieval,
   createMockAttestation,
@@ -20,7 +19,6 @@ const mockPerformedQueryCount = getPerformedQueryCount as jest.Mock
 jest.mock('../../src/common/identity')
 const mockIsVerified = isVerified as jest.Mock
 // tslint:disable-next-line: no-object-literal-type-assertion
-const mockTransaction = {} as Transaction
 
 describe(getRemainingQueryCount, () => {
   it('Calculates remaining query count for verified account', async () => {
@@ -36,7 +34,7 @@ describe(getRemainingQueryCount, () => {
     mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(2)))
     mockIsVerified.mockReturnValue(true)
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
-    expect(await getRemainingQueryCount(mockTransaction, mockAccount, mockPhoneNumber)).toEqual(40)
+    expect(await getRemainingQueryCount(mockAccount, mockPhoneNumber)).toEqual(40)
   })
   it('Calculates remaining query count for unverified account', async () => {
     const contractKitVerifiedNoTx = createMockContractKit(
@@ -51,7 +49,7 @@ describe(getRemainingQueryCount, () => {
     mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(1)))
     mockIsVerified.mockReturnValue(false)
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
-    expect(await getRemainingQueryCount(mockTransaction, mockAccount, mockPhoneNumber)).toEqual(1)
+    expect(await getRemainingQueryCount(mockAccount, mockPhoneNumber)).toEqual(1)
   })
   it('Calculates remaining query count for verified account with many txs', async () => {
     const contractKitVerifiedNoTx = createMockContractKit(
@@ -66,7 +64,7 @@ describe(getRemainingQueryCount, () => {
     mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(10)))
     mockIsVerified.mockReturnValue(true)
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
-    expect(await getRemainingQueryCount(mockTransaction, mockAccount, mockPhoneNumber)).toEqual(222)
+    expect(await getRemainingQueryCount(mockAccount, mockPhoneNumber)).toEqual(222)
   })
   it('Calculates remaining query count for unverified account with many txs', async () => {
     const contractKitVerifiedNoTx = createMockContractKit(
@@ -81,7 +79,7 @@ describe(getRemainingQueryCount, () => {
     mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(0)))
     mockIsVerified.mockReturnValue(false)
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
-    expect(await getRemainingQueryCount(mockTransaction, mockAccount, mockPhoneNumber)).toEqual(202)
+    expect(await getRemainingQueryCount(mockAccount, mockPhoneNumber)).toEqual(202)
   })
   it('Calculates remaining query count for unverified account without any balance', async () => {
     const contractKitVerifiedNoTx = createMockContractKit(
@@ -94,7 +92,7 @@ describe(getRemainingQueryCount, () => {
     mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(0)))
     mockIsVerified.mockReturnValue(false)
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
-    expect(await getRemainingQueryCount(mockTransaction, mockAccount, mockPhoneNumber)).toEqual(0)
+    expect(await getRemainingQueryCount(mockAccount, mockPhoneNumber)).toEqual(0)
   })
   it('No phone number hash when request own phone number', async () => {
     const contractKitVerifiedNoTx = createMockContractKit(
@@ -108,6 +106,6 @@ describe(getRemainingQueryCount, () => {
     )
     mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(0)))
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
-    expect(await getRemainingQueryCount(mockTransaction, mockAccount, undefined)).toEqual(2)
+    expect(await getRemainingQueryCount(mockAccount, undefined)).toEqual(2)
   })
 })
