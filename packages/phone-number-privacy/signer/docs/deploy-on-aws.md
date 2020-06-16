@@ -9,30 +9,30 @@
 
 ### Setting up the network and database
 
-1.- OPTIONAL: [Create new vpc and subnets](https://docs.aws.amazon.com/directoryservice/latest/admin-guide/gsg_create_vpc.html) for the resources (use the CIDR block and AZs that fits with your network setup). The VPC should have at least two subnets, and if it does not have any public subnet (for running the Signer container) the private subnets should have an [Internet Gateway configured](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html)
+1. OPTIONAL: [Create new vpc and subnets](https://docs.aws.amazon.com/directoryservice/latest/admin-guide/gsg_create_vpc.html) for the resources (use the CIDR block and AZs that fits with your network setup). The VPC should have at least two subnets, and if it does not have any public subnet (for running the Signer container) the private subnets should have an [Internet Gateway configured](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html)
 
-1.- Create the security groups for the database and signer:
+1. Create the security groups for the database and signer:
 
 ```bash
 aws ec2 create-security-group --description "pgpnp database" --group-name pgpnp-db --vpc-id <id>
 aws ec2 create-security-group --description "signer" --group-name signer --vpc-id <id>
 ```
 
-1.- Create the security group rules The database should expose 5432 (the port could be specified and change during the database creation), and the signer by default uses port 8080:
+1. Create the security group rules The database should expose 5432 (the port could be specified and change during the database creation), and the signer by default uses port 8080:
 
 ```bash
 aws ec2 authorize-security-group-ingress --group-id <gpnp-db-id> --protocol tcp --port 5432 --source-group sg-0a1064e7d9cba38a9
 aws ec2 authorize-security-group-ingress --group-id <signer-id> --protocol tcp --port 8080 --cidr 0.0.0.0/0
 ```
 
-1.- [Create a RDS PostgreSQL DB](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_CreateDBInstance.html) (from the AWS web console).
+1. [Create a RDS PostgreSQL DB](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_CreateDBInstance.html) (from the AWS web console).
 The database does not require public access and you should assing the VPC and security group previously created (or any other VPC and the security group if it is the case):
 
 **TODO: Add resources recomendation**
 
 ### Saving the Private key on AWS Secrets Manager
 
-1.- We will create a secret in AWS Secret Manager for storing the Signer Private key. The secret is expected inside a key of a json. 
+1. We will create a secret in AWS Secret Manager for storing the Signer Private key. The secret is expected inside a key of a json. 
 The secret name and key values can be customized as desired (and when running the signer app modifying accordly the environment variables)
 To create the secret run the next command on your workstation:
 
@@ -44,13 +44,13 @@ aws secretsmanager create-secret --name signer-secret2 --description "PGPNP Sign
 
 ECS Fargate is a container execution service provided by AWS. It allows to manage containers without managing hosts or virtual machines.
 
-1.- Create the service-linked role. If it is the first time you run ECS on your account you will need to run this command.
+1. Create the service-linked role. If it is the first time you run ECS on your account you will need to run this command.
 
 ```bash
 aws iam create-service-linked-role --aws-service-name ecs.amazonaws.com
 ```
 
-1.- Create a Task Role for signer (https://docs.amazonaws.cn/en_us/AmazonECS/latest/userguide/ecs-cli-tutorial-fargate.html).
+1. Create a Task Role for signer (https://docs.amazonaws.cn/en_us/AmazonECS/latest/userguide/ecs-cli-tutorial-fargate.html).
 First we will create the `assume-role` policy that allows ECS tasks to be assigned to this task role. 
 
 ```bash
@@ -106,17 +106,17 @@ aws iam attach-role-policy --role-name signerTaskExecutionRole --policy-arn arn:
 
 If you want to manage the RDS postgres permissions using IAM, you can add also in this policy the permissions to allow access to the signer task.
 
-1.- Create ECS Fargate cluster
+1. Create ECS Fargate cluster
 
 ```bash
 aws ecs create-cluster --cluster-name pgpnp --capacity-providers FARGATE_SPOT --default-capacity-provider-strategy FARGATE_SPOT
 ```
 
-1.- Create task definition. Using the web interface, create a task definition with the next configuration:
+1. Create task definition. Using the web interface, create a task definition with the next configuration:
 
 - [Task definition detail](./images/fargate-task-definition.png)
 - [Container definition detail](./images/fargate-container-definition.png)
 
-1.- Create the service using the task definition.
+1. Create the service using the task definition.
 
 - [Service definition detail](./images/ffargate-service-definition.png)
