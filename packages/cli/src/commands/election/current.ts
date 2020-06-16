@@ -1,4 +1,4 @@
-import { eqAddress } from '@celo/utils/src/address'
+import { eqAddress } from '@celo/utils/lib/address'
 import { flags } from '@oclif/command'
 import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
