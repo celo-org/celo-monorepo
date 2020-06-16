@@ -450,7 +450,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    * @param epochNumber The epoch to retrieve the elected validator set at.
    */
   async getElectedValidators(epochNumber: number): Promise<Validator[]> {
-    const blockNumber = await this.kit.getLastBlockNumberForEpoch(epochNumber)
+    const blockNumber = await this.kit.getFirstBlockNumberForEpoch(epochNumber)
     const signers = await this.getValidatorSigners(blockNumber)
     const validators = await this.kit.contracts.getValidators()
     return concurrentMap(10, signers, (addr) => validators.getValidatorFromSigner(addr))
