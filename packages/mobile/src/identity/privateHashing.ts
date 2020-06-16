@@ -22,7 +22,7 @@ import { getConnectedUnlockedAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'identity/privateHashing'
-const SIGN_MESSAGE_ENDPOINT = '/getBlindedSalt'
+const SIGN_MESSAGE_ENDPOINT = '/getDistributedBlindedSalt'
 export const SALT_CHAR_LENGTH = 13
 export const LOOKUP_GAS_FEE_ESTIMATE = 0.03
 
@@ -127,6 +127,9 @@ async function getPhoneNumberSalt(
   )
   Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Retrieving unblinded signature')
   const { pgpnpPubKey } = networkConfig
+  console.log('base64BlindedMessage', base64BlindedMessage)
+  console.log('base64BlindSig', base64BlindSig)
+  console.log('pub key', pgpnpPubKey)
   const base64UnblindedSig = await BlindThresholdBls.unblindMessage(base64BlindSig, pgpnpPubKey)
   Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Converting sig to salt')
   return getSaltFromThresholdSignature(base64UnblindedSig)
@@ -140,7 +143,7 @@ interface SignMessageRequest {
 
 interface SignMessageResponse {
   success: boolean
-  signature: string
+  combinedSignature: string
 }
 
 // Send the blinded message off to the phone number privacy service and
@@ -164,7 +167,8 @@ async function postToSignMessage(
       body,
       SIGN_MESSAGE_ENDPOINT
     )
-    return response.signature
+    console.log('response', response)
+    return response.combinedSignature
   } catch (error) {
     if (error.message === ErrorMessages.PGPNP_QUOTA_ERROR) {
       throw new Error(ErrorMessages.SALT_QUOTA_EXCEEDED)

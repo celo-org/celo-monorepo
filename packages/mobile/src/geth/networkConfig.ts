@@ -23,7 +23,7 @@ interface NetworkConfig {
 
 const pgpnpUrlStaging = 'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net'
 const pgpnpPubKeyStaging =
-  'B+gJTCmTrf9t3X7YQ2F4xekSzd5xg5bdzcJ8NPefby3mScelg5172zl1GgIO9boADEwE67j6M55GwouQwaG5jDZ5tHa2eNtfC7oLIsevuUmzrXVDry9cmsalB0BHX0EA'
+  '7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA'
 const pgpnpUrlProd = 'https://us-central1-celo-phone-number-privacy.cloudfunctions.net'
 const pgpnpPubKeyProd =
   '6VFX/ufxvL54NDRlJMe0jlbb9wD3L/Kfm6K2qEKoxrDMS42Q1S7ZOH88tdpOJhcAJPdDTjGE6qHQBiV48n/jctSuOJ8HjsRzp6VJWMHW3imqep7nwyhzNfLcPXJfrngB'
@@ -50,8 +50,8 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     syncMode: DEFAULT_SYNC_MODE,
     initiallyForno: FORNO_ENABLED_INITIALLY,
     blockchainApiUrl: 'https://alfajores-dot-celo-testnet-production.appspot.com/',
-    pgpnpUrl: pgpnpUrlProd,
-    pgpnpPubKey: pgpnpPubKeyProd,
+    pgpnpUrl: pgpnpUrlStaging,
+    pgpnpPubKey: pgpnpPubKeyStaging,
   },
   [Testnets.pilot]: {
     nodeDir: `.${Testnets.pilot}`,
