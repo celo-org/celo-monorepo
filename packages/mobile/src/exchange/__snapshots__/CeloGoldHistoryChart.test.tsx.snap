@@ -16,7 +16,15 @@ exports[`renders properly 1`] = `
       }
     }
   >
-    <View>
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "marginBottom": 8,
+        }
+      }
+    >
       <Text
         style={
           Object {
@@ -24,12 +32,61 @@ exports[`renders properly 1`] = `
             "fontFamily": "Inter-SemiBold",
             "fontSize": 19,
             "lineHeight": 26,
-            "marginBottom": 8,
+            "marginRight": 8,
           }
         }
       >
         goldPrice
       </Text>
+      <View
+        accessible={true}
+        focusable={true}
+        hitSlop={
+          Object {
+            "bottom": 10,
+            "left": 10,
+            "right": 10,
+            "top": 10,
+          }
+        }
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+      >
+        <svg
+          fill="none"
+          height={14}
+          style={Object {}}
+          viewBox="0 0 16 16"
+          width={14}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle
+            cx="8"
+            cy="8"
+            r="7"
+            stroke="#2E3338"
+            stroke-width="1.25"
+            style={Object {}}
+          />
+          <path
+            d="M8 12V7M8 6V5"
+            stroke="#2E3338"
+            stroke-width="1.25"
+            style={Object {}}
+          />
+        </svg>
+      </View>
     </View>
     <View
       style={
@@ -257,7 +314,15 @@ exports[`renders while update is in progress 1`] = `
       }
     }
   >
-    <View>
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "marginBottom": 8,
+        }
+      }
+    >
       <Text
         style={
           Object {
@@ -265,12 +330,61 @@ exports[`renders while update is in progress 1`] = `
             "fontFamily": "Inter-SemiBold",
             "fontSize": 19,
             "lineHeight": 26,
-            "marginBottom": 8,
+            "marginRight": 8,
           }
         }
       >
         goldPrice
       </Text>
+      <View
+        accessible={true}
+        focusable={true}
+        hitSlop={
+          Object {
+            "bottom": 10,
+            "left": 10,
+            "right": 10,
+            "top": 10,
+          }
+        }
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+      >
+        <svg
+          fill="none"
+          height={14}
+          style={Object {}}
+          viewBox="0 0 16 16"
+          width={14}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle
+            cx="8"
+            cy="8"
+            r="7"
+            stroke="#2E3338"
+            stroke-width="1.25"
+            style={Object {}}
+          />
+          <path
+            d="M8 12V7M8 6V5"
+            stroke="#2E3338"
+            stroke-width="1.25"
+            style={Object {}}
+          />
+        </svg>
+      </View>
     </View>
     <View
       style={
