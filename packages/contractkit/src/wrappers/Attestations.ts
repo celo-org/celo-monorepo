@@ -2,6 +2,7 @@ import { AttestationUtils, SignatureUtils } from '@celo/utils'
 import { concurrentMap, sleep } from '@celo/utils/lib/async'
 import { notEmpty, zip3 } from '@celo/utils/lib/collections'
 import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
+import { eqAddress } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import fetch from 'cross-fetch'
 import { Address, CeloContract, NULL_ADDRESS } from '../base'
@@ -14,6 +15,7 @@ import {
   valueToBigNumber,
   valueToInt,
 } from './BaseWrapper'
+import { Validator } from './Validators'
 
 export interface AttestationStat {
   completed: number
@@ -501,4 +503,110 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       .call()
     return result.toLowerCase() !== NULL_ADDRESS
   }
+
+  /**
+   * Gets the relevant attestation service status for a validator
+   * @param validator Validator to get the attestation service status for
+   */
+  async getAttestationServiceStatus(
+    validator: Validator
+  ): Promise<AttestationServiceStatusResponse> {
+    const accounts = await this.kit.contracts.getAccounts()
+    const hasAttestationSigner = await accounts.hasAuthorizedAttestationSigner(validator.address)
+    const attestationSigner = await accounts.getAttestationSigner(validator.address)
+
+    let attestationServiceURL: string
+
+    const ret: AttestationServiceStatusResponse = {
+      ...validator,
+      hasAttestationSigner,
+      attestationSigner,
+      attestationServiceURL: null,
+      okStatus: false,
+      error: null,
+      smsProviders: [],
+      blacklistedRegionCodes: [],
+      rightAccount: false,
+      metadataURL: null,
+      state: AttestationServiceStatusState.NoAttestationSigner,
+    }
+
+    if (!hasAttestationSigner) {
+      return ret
+    }
+
+    const metadataURL = await accounts.getMetadataURL(validator.address)
+    ret.metadataURL = metadataURL
+
+    if (!metadataURL) {
+      ret.state = AttestationServiceStatusState.NoMetadataURL
+    }
+
+    try {
+      const metadata = await IdentityMetadataWrapper.fetchFromURL(this.kit, metadataURL)
+      const attestationServiceURLClaim = metadata.findClaim(ClaimTypes.ATTESTATION_SERVICE_URL)
+
+      if (!attestationServiceURLClaim) {
+        ret.state = AttestationServiceStatusState.NoAttestationServiceURL
+        return ret
+      }
+
+      attestationServiceURL = attestationServiceURLClaim.url
+    } catch (error) {
+      ret.state = AttestationServiceStatusState.InvalidMetadata
+      ret.error = error
+      return ret
+    }
+
+    ret.attestationServiceURL = attestationServiceURL
+
+    try {
+      const statusResponse = await fetch(attestationServiceURL + '/status')
+
+      if (!statusResponse.ok) {
+        ret.state = AttestationServiceStatusState.UnreachableAttestationService
+        return ret
+      }
+
+      ret.okStatus = true
+      const statusResponseBody = await statusResponse.json()
+      ret.smsProviders = statusResponseBody.smsProviders
+      ret.blacklistedRegionCodes = statusResponseBody.blacklistedRegionCodes
+      ret.rightAccount = eqAddress(validator.address, statusResponseBody.accountAddress)
+      ret.state = AttestationServiceStatusState.Valid
+      return ret
+    } catch (error) {
+      ret.state = AttestationServiceStatusState.UnreachableAttestationService
+      ret.error = error
+      return ret
+    }
+  }
+}
+
+enum AttestationServiceStatusState {
+  NoAttestationSigner = 'NoAttestationSigner',
+  NoMetadataURL = 'NoMetadataURL',
+  InvalidMetadata = 'InvalidMetadata',
+  NoAttestationServiceURL = 'NoAttestationServiceURL',
+  UnreachableAttestationService = 'UnreachableAttestationService',
+  Valid = 'Valid',
+}
+interface AttestationServiceStatusResponse {
+  name: string
+  address: Address
+  ecdsaPublicKey: string
+  blsPublicKey: string
+  affiliation: string | null
+  score: BigNumber
+  hasAttestationSigner: boolean
+  attestationSigner: string
+  attestationServiceURL: string | null
+  metadataURL: string | null
+  okStatus: boolean
+  error: null | Error
+  smsProviders: string[]
+  blacklistedRegionCodes: string[]
+  rightAccount: boolean
+  signer: string
+  state: AttestationServiceStatusState
 }
