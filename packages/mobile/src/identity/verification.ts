@@ -487,6 +487,7 @@ function* tryRevealPhoneNumber(
     }
 
     Logger.debug(TAG + '@tryRevealPhoneNumber', `Revealing for issuer ${issuer} successful`)
+    CeloAnalytics.track(CustomEventNames.verification_revealed_attestation, { issuer })
   } catch (error) {
     // This is considered a recoverable error because the user may have received the code in a previous run
     // So instead of propagating the error, we catch it just update status. This will trigger the modal,
