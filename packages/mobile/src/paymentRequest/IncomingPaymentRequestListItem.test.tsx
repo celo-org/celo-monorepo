@@ -49,7 +49,6 @@ describe('IncomingPaymentRequestListItem', () => {
     const props = {
       id: 1,
       amount: new BigNumber(1),
-      comment: 'Something',
       requester: mockInvitableRecipient2,
       addressValidationType: AddressValidationType.FULL,
     }
@@ -61,7 +60,11 @@ describe('IncomingPaymentRequestListItem', () => {
       </Provider>
     )
 
-    fireEvent.press(tree.getByTestId(`IncomingPaymentRequestNotification/${props.id}`))
+    fireEvent.press(
+      tree.getByTestId(
+        `IncomingPaymentRequestNotification/${props.id}/CallToActions/global:send/Button`
+      )
+    )
     expect(navigate).toHaveBeenCalledWith(Screens.ValidateRecipientIntro, {
       transactionData: mockTransactionData2,
       addressValidationType: AddressValidationType.FULL,
@@ -72,7 +75,6 @@ describe('IncomingPaymentRequestListItem', () => {
     const props = {
       id: 1,
       amount: new BigNumber(1),
-      comment: 'Something',
       requester: mockInvitableRecipient2,
       addressValidationType: AddressValidationType.NONE,
     }
@@ -84,7 +86,11 @@ describe('IncomingPaymentRequestListItem', () => {
       </Provider>
     )
 
-    fireEvent.press(tree.getByTestId(`IncomingPaymentRequestNotification/${props.id}`))
+    fireEvent.press(
+      tree.getByTestId(
+        `IncomingPaymentRequestNotification/${props.id}/CallToActions/global:send/Button`
+      )
+    )
     expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
       transactionData: mockTransactionData2,
     })

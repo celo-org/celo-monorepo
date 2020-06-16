@@ -12,6 +12,7 @@ export default class ValidatorGroupMembers extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
     from: Flags.address({ required: true, description: "ValidatorGroup's address" }),
+    yes: flags.boolean({ description: 'Answer yes to prompt' }),
     accept: flags.boolean({
       exclusive: ['remove', 'reorder'],
       description: 'Accept a validator whose affiliation is already set to the group',
@@ -54,16 +55,18 @@ export default class ValidatorGroupMembers extends BaseCommand {
 
     const validatorGroup = await validators.signerToAccount(res.flags.from)
     if (res.flags.accept) {
-      const response = await prompts({
-        type: 'confirm',
-        name: 'confirmation',
-        message:
-          'Are you sure you want to accept this member?\nValidator Group Locked Gold requirements increase per member. Adding an additional member could result in an increase in Locked Gold requirements of up to 10,000 cGLD for 180 days. (y/n)',
-      })
+      if (!res.flags.yes) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'confirmation',
+          message:
+            'Are you sure you want to accept this member?\nValidator Group Locked Gold requirements increase per member. Adding an additional member could result in an increase in Locked Gold requirements of up to 10,000 cGLD for 180 days. (y/n)',
+        })
 
-      if (!response.confirmation) {
-        console.info('Aborting due to user response')
-        process.exit(0)
+        if (!response.confirmation) {
+          console.info('Aborting due to user response')
+          process.exit(0)
+        }
       }
       const tx = await validators.addMember(validatorGroup, res.args.validatorAddress)
       await displaySendTx('addMember', tx)

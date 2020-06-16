@@ -22,6 +22,7 @@
 -keep public class com.horcrux.svg.** {*;}
 -keep class com.rt2zz.reactnativecontacts.** {*;}
 -keepclassmembers class com.rt2zz.reactnativecontacts.** {*;}
+
 # NDK crash handler
 -keep class ru.ivanarh.jndcrash.** { *; }
 
@@ -32,3 +33,6 @@
 -dontwarn java.awt.*
 -keep class com.sun.jna.* { *; }
 -keepclassmembers class * extends com.sun.jna.* { public *; }
+
+# Hermes
+-keep class com.facebook.jni.** { *; }

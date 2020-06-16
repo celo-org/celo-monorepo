@@ -1,6 +1,7 @@
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
+import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
@@ -12,6 +13,7 @@ export default class TransferGold extends BaseCommand {
     from: Flags.address({ required: true, description: 'Address of the sender' }),
     to: Flags.address({ required: true, description: 'Address of the receiver' }),
     value: flags.string({ required: true, description: 'Amount to transfer (in wei)' }),
+    comment: flags.string({ description: 'Transfer comment' }),
   }
 
   static examples = [
@@ -27,6 +29,18 @@ export default class TransferGold extends BaseCommand {
 
     this.kit.defaultAccount = from
     const goldToken = await this.kit.contracts.getGoldToken()
-    await displaySendTx('transfer', goldToken.transfer(to, value.toFixed()))
+
+    await newCheckBuilder(this)
+      .hasEnoughGold(from, value)
+      .runChecks()
+
+    if (res.flags.comment) {
+      await displaySendTx(
+        'transferWithComment',
+        goldToken.transferWithComment(to, value.toFixed(), res.flags.comment)
+      )
+    } else {
+      await displaySendTx('transfer', goldToken.transfer(to, value.toFixed()))
+    }
   }
 }

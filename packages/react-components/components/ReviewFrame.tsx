@@ -1,6 +1,6 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import CircleButton from '@celo/react-components/components/CircleButton'
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
 import * as React from 'react'
 import { ScrollView, StyleSheet, View, ViewProps } from 'react-native'
 
@@ -15,8 +15,9 @@ interface Props extends ViewProps {
   confirmButton?: ButtonProps
   modifyButton?: ButtonProps
   HeaderComponent?: React.ComponentType<any>
-  FooterComponent?: React.ComponentType<any>
+  FooterComponent?: React.FunctionComponent
   shouldReset?: boolean
+  isSending?: boolean
 }
 
 interface State {
@@ -42,7 +43,7 @@ class ReviewFrame extends React.PureComponent<Props, State> {
   }
 
   renderButtons = () => {
-    const { navigateBack, confirmButton, modifyButton, FooterComponent } = this.props
+    const { navigateBack, confirmButton, modifyButton, FooterComponent, isSending } = this.props
 
     if (confirmButton || modifyButton) {
       return (
@@ -51,10 +52,12 @@ class ReviewFrame extends React.PureComponent<Props, State> {
             <Button
               onPress={this.onConfirm}
               text={confirmButton.text}
+              showLoading={isSending}
               accessibilityLabel={confirmButton.text}
-              standard={true}
               type={BtnTypes.PRIMARY}
+              size={BtnSizes.FULL}
               disabled={confirmButton.disabled || this.state.confirmed}
+              testID="ConfirmButton"
             />
           )}
           {modifyButton && (
@@ -62,8 +65,8 @@ class ReviewFrame extends React.PureComponent<Props, State> {
               onPress={modifyButton.action}
               text={modifyButton.text}
               accessibilityLabel={modifyButton.text}
-              standard={false}
               type={BtnTypes.SECONDARY}
+              size={BtnSizes.FULL}
               disabled={modifyButton.disabled}
               style={styles.modifyButton}
             />
@@ -102,15 +105,12 @@ class ReviewFrame extends React.PureComponent<Props, State> {
 const styles = StyleSheet.create({
   body: {
     flex: 1,
-    backgroundColor: colors.background,
-    justifyContent: 'space-between',
+    backgroundColor: colors.light,
   },
   scrollViewContentContainer: {
     paddingVertical: 10,
-    justifyContent: 'flex-start',
   },
   confirmationContainer: {
-    marginVertical: 20,
     marginHorizontal: 16,
   },
   circleButtonContainer: {

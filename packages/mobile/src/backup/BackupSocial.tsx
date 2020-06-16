@@ -10,18 +10,16 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { setSocialBackupCompleted } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
-import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackupPhraseContainer, {
   BackupPhraseContainerMode,
   BackupPhraseType,
 } from 'src/backup/BackupPhraseContainer'
-import { getStoredMnemonic, splitMnemonic } from 'src/backup/utils'
+import { getStoredMnemonic, onGetMnemonicFail, splitMnemonic } from 'src/backup/utils'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
-import Logger from 'src/utils/Logger'
 
 interface State {
   mnemonic: string
@@ -67,16 +65,12 @@ class BackupSocial extends React.Component<Props, State> {
     if (this.state.mnemonic) {
       return
     }
+    const mnemonic = await getStoredMnemonic()
 
-    try {
-      const mnemonic = await getStoredMnemonic()
-      if (!mnemonic) {
-        throw new Error('Mnemonic not stored in key store')
-      }
+    if (mnemonic) {
       this.setState({ mnemonic, mnemonicParts: splitMnemonic(mnemonic, this.props.language) })
-    } catch (e) {
-      Logger.error('BackupSocial/retrieveMnemonic', e)
-      this.props.showError(ErrorMessages.FAILED_FETCH_MNEMONIC)
+    } else {
+      onGetMnemonicFail(this.props.showError, 'BackupSocial')
     }
   }
 

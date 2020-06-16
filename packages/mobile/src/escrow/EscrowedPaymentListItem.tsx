@@ -1,8 +1,7 @@
-import BaseNotification from '@celo/react-components/components/BaseNotification'
-import fontStyles from '@celo/react-components/styles/fonts'
+import RequestMessagingCard from '@celo/react-components/components/RequestMessagingCard'
 import * as React from 'react'
-import { Trans, WithTranslation } from 'react-i18next'
-import { Image, StyleSheet, Text, View } from 'react-native'
+import { WithTranslation } from 'react-i18next'
+import { Image, StyleSheet, View } from 'react-native'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -89,32 +88,22 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
   render() {
     const { t, payment } = this.props
     const mobile = this.getDisplayName() || t('global:unknown').toLowerCase()
+    const amount = {
+      value: divideByWei(payment.amount),
+      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+    }
 
     return (
       <View style={styles.container}>
-        <BaseNotification
-          title={
-            <Trans
-              i18nKey="escrowPaymentNotificationTitl"
-              ns={Namespaces.inviteFlow11}
-              values={{ mobile }}
-            >
-              Invited and paid {{ mobile }} (
-              <CurrencyDisplay
-                amount={{
-                  value: divideByWei(payment.amount),
-                  currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-                }}
-              />
-              )
-            </Trans>
-          }
+        <RequestMessagingCard
+          title={t('escrowPaymentNotificationTitle', { mobile })}
+          amount={<CurrencyDisplay amount={amount} />}
+          details={payment.message}
+          // TODO: use new avatar
           icon={<Image source={inviteFriendsIcon} style={styles.image} resizeMode="contain" />}
-          ctas={this.getCTA()}
+          callToActions={this.getCTA()}
           testID={testID}
-        >
-          <Text style={fontStyles.bodySmall}>{payment.message || t('defaultComment')}</Text>
-        </BaseNotification>
+        />
       </View>
     )
   }

@@ -81,30 +81,58 @@ spec:
             [[ $REPLICA_NAME =~ -([0-9]+)$ ]] || exit 1
             RID=${BASH_REMATCH[1]}
 
-            # Get the correct key vault name
-            AZURE_KEY_VAULT_NAMES={{- range $index, $identity := .Values.oracle.identities -}}{{ $identity.azure.keyVaultName }},{{- end }}
+            # Set the private key path. If Azure HSM signing is specified,
+            # it will take precedence.
+            export PRIVATE_KEY_PATH="/private-keys/private-key-$RID"
+
+            # Get the correct key vault name. If this oracle's identity is not
+            # using Azure HSM signing, the key vault name will be empty and ignored
+            AZURE_KEY_VAULT_NAMES={{- range $index, $identity := .Values.oracle.identities -}}{{- if (hasKey $identity "azure" ) -}}{{ $identity.azure.keyVaultName | default "" }}{{- end }},{{- end }}
             export AZURE_KEY_VAULT_NAME=`echo -n $AZURE_KEY_VAULT_NAMES | cut -d ',' -f $((RID + 1))`
 
             # Get the correct oracle account address
             ADDRESSES={{- range $index, $identity := .Values.oracle.identities -}}{{ $identity.address }},{{- end }}
             export ADDRESS=`echo -n $ADDRESSES | cut -d ',' -f $((RID + 1))`
 
-            yarn start
+            exec yarn start
         env:
         - name: REPLICA_NAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        - name: RPC_PROVIDER_URL
-          value: {{ .Values.oracle.rpcProviderUrl }}
-        - name: METRICS
-          value: "{{ .Values.oracle.metrics.enabled }}"
-        - name: PROMETHEUS_PORT
-          value: "{{ .Values.oracle.metrics.prometheusPort }}"
-        - name: AZURE_HSM_INIT_TRY_COUNT
-          value: "{{ .Values.oracle.azureHsm.initTryCount }}"
-        - name: AZURE_HSM_INIT_MAX_RETRY_BACKOFF_MS
-          value: "{{ .Values.oracle.azureHsm.initMaxRetryBackoffMs }}"
+{{ include "common.env-var" (dict "name" "AGGREGATION_PERIOD" "dict" .Values.oracle.aggregation.trades "value_name" "periodMs" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "AGGREGATION_SCALING_RATE" "dict" .Values.oracle.aggregation.trades "value_name" "scalingRate" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "ALLOW_NOT_CGLD" "dict" .Values.oracle "value_name" "allowNotCGLD") | indent 8 }}
+{{ include "common.env-var" (dict "name" "API_REQUEST_TIMEOUT" "dict" .Values.oracle "value_name" "apiRequestTimeoutMs" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "AZURE_HSM_INIT_TRY_COUNT" "dict" .Values.oracle.azureHsm "value_name" "initTryCount") | indent 8 }}
+{{ include "common.env-var" (dict "name" "AZURE_HSM_INIT_MAX_RETRY_BACKOFF_MS" "dict" .Values.oracle.azureHsm "value_name" "initMaxRetryBackoffMs") | indent 8 }}
+{{ include "common.env-var" (dict "name" "BASE_CURRENCY" "dict" .Values.oracle "value_name" "baseCurrency" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "CIRCUIT_BREAKER_PRICE_CHANGE_THRESHOLD" "dict" .Values.oracle "value_name" "circuitBreakerPriceChangeThreshold") | indent 8 }}
+{{ include "common.env-var" (dict "name" "DATA_FETCH_FREQUENCY" "dict" .Values.oracle.aggregation.trades "value_name" "dataFetchFrequency" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "EXCHANGES" "dict" .Values.oracle "value_name" "exchanges") | indent 8 }}
+{{ include "common.env-var" (dict "name" "HTTP_RPC_PROVIDER_URL" "dict" .Values.oracle.rpcProviderUrls "value_name" "http") | indent 8 }}
+{{ include "common.env-var" (dict "name" "MAX_BLOCK_TIMESTAMP_AGE_MS" "dict" .Values.oracle "value_name" "maxBlockTimestampAgeMs" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "METRICS" "dict" .Values.oracle.metrics "value_name" "enabled") | indent 8 }}
+{{ include "common.env-var" (dict "name" "MID_AGGREGATION_ASK_MAX_PERCENTAGE_DEVIATION" "dict" .Values.oracle.aggregation.mid "value_name" "askMaxPercentageDeviation" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "MID_AGGREGATION_BID_MAX_PERCENTAGE_DEVIATION" "dict" .Values.oracle.aggregation.mid "value_name" "bidMaxPercentageDeviation" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "MID_AGGREGATION_MAX_EXCHANGE_VOLUME_SHARE" "dict" .Values.oracle.aggregation.mid "value_name" "maxExchangeVolumeShare" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "MID_AGGREGATION_MAX_PERCENTAGE_BID_ASK_SPREAD" "dict" .Values.oracle.aggregation.mid "value_name" "maxPercentageBidAskSpread" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "MIN_REPORT_PRICE_CHANGE_THRESHOLD" "dict" .Values.oracle.reporter.blockBased "value_name" "minReportPriceChangeThreshold" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "MINIMUM_DATA" "dict" .Values.oracle.aggregation.trades "value_name" "minimumTrades" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "OVERRIDE_INDEX" "dict" .Values.oracle "value_name" "overrideIndex" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "OVERRIDE_ORACLE_COUNT" "dict" .Values.oracle "value_name" "overrideOracleCount" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "PRIVATE_KEY_PATH" "dict" .Values.oracle "value_name" "privateKeyPath" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "PROMETHEUS_PORT" "dict" .Values.oracle.metrics "value_name" "prometheusPort") | indent 8 }}
+{{ include "common.env-var" (dict "name" "QUOTE_CURRENCY" "dict" .Values.oracle "value_name" "quoteCurrency" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "REMOVE_EXPIRED_FREQUENCY" "dict" .Values.oracle.reporter.timer "value_name" "removeExpiredFrequencyMs" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "REMOVE_EXPIRED_OFFSET_OVERRIDE" "dict" .Values.oracle.reporter.timer "value_name" "removeExpiredOffsetOverride" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "REPORT_FREQUENCY_OVERRIDE" "dict" .Values.oracle.reporter.timer "value_name" "removeFrequencyOverride" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "REPORT_OFFSET_OVERRIDE" "dict" .Values.oracle.reporter.timer "value_name" "reportOffsetOverride" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "REPORT_STRATEGY" "dict" .Values.oracle "value_name" "reportStrategy") | indent 8 }}
+{{ include "common.env-var" (dict "name" "TARGET_MAX_HEARTBEAT_PERIOD_MS" "dict" .Values.oracle.reporter.blockBased "value_name" "targetMaxHeartbeatPeriodMs" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "TOKEN" "dict" .Values.oracle "value_name" "token" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "UNUSED_ORACLE_ADDRESSES" "dict" .Values.oracle "value_name" "unusedOracleAddresses") | indent 8 }}
+{{ include "common.env-var" (dict "name" "WS_RPC_PROVIDER_URL" "dict" .Values.oracle.rpcProviderUrls "value_name" "ws") | indent 8 }}
         readinessProbe:
           exec:
             command:
@@ -112,3 +140,11 @@ spec:
             - "{{ .Values.oracle.metrics.prometheusPort }}"
           initialDelaySeconds: 10
           periodSeconds: 5
+        volumeMounts:
+        - name: private-key-volume
+          readOnly: true
+          mountPath: "/private-keys"
+      volumes:
+        - name: private-key-volume
+          secret:
+            secretName: pkey-secret

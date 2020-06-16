@@ -48,6 +48,10 @@ TheCelo contains a range of valuable information on the Celo project and active 
 
 Celo Whale shows detailed metadata and statistics around Validators but does not presently offer a view centered on Validator Groups.
 
+### [Celovote Scores](https://celovote.com/scores) (WOTrust | celovote.com)
+
+Celovote shows ranking of validator groups based on their estimated annual rate of return (ARR). Estimate is calculated based on past performance.
+
 _Please raise a Pull Request against [this page](https://github.com/celo-org/celo-monorepo/blob/master/packages/docs/celo-gold-holder-guide/voting-validators.md) to add/amend details of any community services!_
 
 ## Choosing a Validator Group

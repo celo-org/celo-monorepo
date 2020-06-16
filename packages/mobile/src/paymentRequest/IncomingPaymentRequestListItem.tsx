@@ -1,17 +1,15 @@
-import BaseNotification from '@celo/react-components/components/BaseNotification'
 import ContactCircle from '@celo/react-components/components/ContactCircle'
-import fontStyles from '@celo/react-components/styles/fonts'
+import RequestMessagingCard from '@celo/react-components/components/RequestMessagingCard'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { Trans, WithTranslation } from 'react-i18next'
-import { Image, StyleSheet, Text, View } from 'react-native'
+import { WithTranslation } from 'react-i18next'
+import { StyleSheet, View } from 'react-native'
 import { TokenTransactionType } from 'src/apollo/types'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { declinePaymentRequest } from 'src/firebase/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { AddressValidationType } from 'src/identity/reducer'
-import { unknownUserIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
@@ -29,8 +27,6 @@ interface OwnProps {
 
 type Props = OwnProps & WithTranslation
 
-const AVATAR_SIZE = 40
-
 export class IncomingPaymentRequestListItem extends React.Component<Props> {
   onPay = () => {
     const { id, amount, comment: reason, requester: recipient, addressValidationType } = this.props
@@ -43,7 +39,7 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
       firebasePendingRequestUid: id,
     }
 
-    if (addressValidationType !== AddressValidationType.NONE) {
+    if (addressValidationType && addressValidationType !== AddressValidationType.NONE) {
       navigate(Screens.ValidateRecipientIntro, { transactionData, addressValidationType })
     } else {
       navigate(Screens.SendConfirmation, { transactionData })
@@ -59,7 +55,7 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
   getCTA = () => {
     return [
       {
-        text: this.props.t('global:pay'),
+        text: this.props.t('global:send'),
         onPress: this.onPay,
       },
       {
@@ -70,43 +66,29 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
   }
 
   render() {
-    const { requester, id, t } = this.props
+    const { requester, id, comment, t } = this.props
     const name = requester.displayName
+    const amount = {
+      value: this.props.amount,
+      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+    }
 
     return (
       <View style={styles.container}>
-        <BaseNotification
+        <RequestMessagingCard
           testID={`IncomingPaymentRequestNotification/${id}`}
+          title={t('incomingPaymentRequestNotificationTitle', { name })}
+          details={comment}
+          amount={<CurrencyDisplay amount={amount} />}
           icon={
             <ContactCircle
-              size={AVATAR_SIZE}
               address={requester.address}
               name={requester.displayName}
               thumbnailPath={getRecipientThumbnail(requester)}
-            >
-              <Image source={unknownUserIcon} style={styles.unknownUser} />
-            </ContactCircle>
+            />
           }
-          title={
-            <Trans
-              i18nKey="incomingPaymentRequestNotificationTitle"
-              ns={Namespaces.paymentRequestFlow}
-              values={{ name }}
-            >
-              {{ name }} requested{' '}
-              <CurrencyDisplay
-                amount={{
-                  value: this.props.amount,
-                  currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-                }}
-              />
-            </Trans>
-          }
-          ctas={this.getCTA()}
-          onPress={this.onPay}
-        >
-          <Text style={fontStyles.bodySmall}>{this.props.comment || t('defaultComment')}</Text>
-        </BaseNotification>
+          callToActions={this.getCTA()}
+        />
       </View>
     )
   }
@@ -115,12 +97,6 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
 const styles = StyleSheet.create({
   container: {
     marginBottom: 16,
-  },
-  unknownUser: {
-    height: AVATAR_SIZE,
-    width: AVATAR_SIZE,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 })
 

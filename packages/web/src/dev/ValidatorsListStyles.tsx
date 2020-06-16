@@ -7,6 +7,11 @@ export const styles = StyleSheet.create({
     position: 'static',
     zIndex: 'initial',
   } as any,
+  pStaticOverflow: {
+    position: 'static',
+    zIndex: 'initial',
+    overflow: 'initial',
+  } as any,
   content: {
     paddingBottom: 10,
   },
@@ -14,6 +19,7 @@ export const styles = StyleSheet.create({
     marginTop: HEADER_HEIGHT,
     backgroundColor: colors.dark,
     minWidth: '100vw',
+    overflow: 'scroll',
     width: '100%',
   },
   defaultText: {
@@ -64,7 +70,7 @@ export const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'space-between',
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'stretch',
     width: '100%',
   },
   tableRowCont: {
@@ -296,6 +302,12 @@ export const styles = StyleSheet.create({
     textDecorationLine: 'underline',
     marginRight: 6,
     marginLeft: 4,
+  },
+  tooltipHeader: {
+    maxWidth: 180,
+    whiteSpace: 'initial',
+    width: 'max-content',
+    top: 'calc(100% - 20px)',
   },
 
   // Pinned

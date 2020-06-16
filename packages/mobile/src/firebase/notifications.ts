@@ -44,7 +44,6 @@ function* handlePaymentRequested(
     recipient: targetRecipient,
     amount: new BigNumber(paymentRequest.amount),
     reason: paymentRequest.comment,
-    recipientAddress: targetRecipient.address,
     type: TokenTransactionType.PayRequest,
   })
 }

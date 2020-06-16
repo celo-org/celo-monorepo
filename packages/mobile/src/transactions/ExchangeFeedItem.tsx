@@ -8,8 +8,8 @@ import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { exchangeGoldGreen, exchangeGreenGold } from 'src/images/Images'
 import { navigateToExchangeReview } from 'src/transactions/actions'
-import { TransactionStatus } from 'src/transactions/reducer'
 import TransactionFeedItem from 'src/transactions/TransactionFeedItem'
+import { TransactionStatus } from 'src/transactions/types'
 
 type Props = ExchangeItemFragment & {
   status: TransactionStatus

@@ -4,10 +4,12 @@ import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import celoHero from 'src/home/celo-hero.png'
 import HomeBackers from 'src/home/HomeBackers'
-import HomeSystems from 'src/home/HomeSystems'
+import HomeBenefits from 'src/home/HomeBenefits'
+import ImagePanes from 'src/home/ImagePanes'
+import Involvement from 'src/home/Involvement'
 import Timeline, { MileStone } from 'src/home/roadmap/Timeline'
+import { TwoAssets } from 'src/home/TwoAssets'
 import HomeCover from 'src/home/version3/HomeCover'
-import HomeHero from 'src/home/version3/HomeHero'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Press from 'src/press/Press'
 
@@ -64,9 +66,11 @@ export class Home extends React.Component<I18nProps & Props, State> {
           <meta name="twitter:card" content="summary_large_image" />
         </Head>
         <HomeCover />
-        <HomeHero />
+        <ImagePanes />
+        <HomeBenefits />
+        <TwoAssets />
         <Press />
-        <HomeSystems />
+        <Involvement />
         <Timeline milestones={milestones} />
         <HomeBackers />
       </View>

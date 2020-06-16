@@ -3,11 +3,8 @@ import { TokenTransactionType } from 'src/apollo/types'
 import { DAILY_PAYMENT_LIMIT_CUSD } from 'src/config'
 import { FeeType } from 'src/fees/actions'
 import { getAddressFromPhoneNumber } from 'src/identity/contactMapping'
-import {
-  E164NumberToAddressType,
-  RecipientVerificationStatus,
-  SecureSendPhoneNumberMapping,
-} from 'src/identity/reducer'
+import { E164NumberToAddressType, SecureSendPhoneNumberMapping } from 'src/identity/reducer'
+import { RecipientVerificationStatus } from 'src/identity/types'
 import { Recipient, RecipientKind } from 'src/recipients/recipient'
 import { PaymentInfo } from 'src/send/reducers'
 import { TransactionDataInput } from 'src/send/SendAmount'
@@ -16,7 +13,7 @@ import { timeDeltaInHours } from 'src/utils/time'
 export interface ConfirmationInput {
   recipient: Recipient
   amount: BigNumber
-  reason: string
+  reason?: string
   recipientAddress: string | null | undefined
   type: TokenTransactionType
   firebasePendingRequestUid?: string | null
