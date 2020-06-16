@@ -80,7 +80,6 @@ import PaymentRequestConfirmation, {
 import PaymentRequestUnavailable, {
   paymentRequestUnavailableScreenNavOptions,
 } from 'src/paymentRequest/PaymentRequestUnavailable'
-import PincodeEducation from 'src/pincode/PincodeEducation'
 import PincodeEnter from 'src/pincode/PincodeEnter'
 import PincodeSet from 'src/pincode/PincodeSet'
 import { RootState } from 'src/redux/reducers'
@@ -184,11 +183,6 @@ const nuxScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen
       name={Screens.RegulatoryTerms}
       component={RegulatoryTerms}
-      options={nuxNavigationOptions}
-    />
-    <Navigator.Screen
-      name={Screens.PincodeEducation}
-      component={PincodeEducation}
       options={nuxNavigationOptions}
     />
     <Navigator.Screen
@@ -480,7 +474,7 @@ export function MainStackScreen() {
     } else if (!acceptedTerms) {
       initialRoute = Screens.RegulatoryTerms
     } else if (pincodeType === PincodeType.Unset) {
-      initialRoute = Screens.PincodeEducation
+      initialRoute = Screens.PincodeSet
     } else if (!redeemComplete && !account) {
       initialRoute = Screens.EnterInviteCode
     } else if (!hasSeenVerificationNux) {

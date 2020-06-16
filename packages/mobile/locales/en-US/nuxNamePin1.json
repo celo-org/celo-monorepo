@@ -41,14 +41,6 @@
   "confirmPin": {
     "title": "Enter PIN"
   },
-  "pincodeEducation": {
-    "title": "Secure Your Wallet",
-    "intro": "To protect your account, the Celo Wallet requires a PIN.",
-    "summary":
-      "You can use your phone’s existing authentication or create a new PIN for this application.",
-    "usePhoneAuth": "Use Phone Authentication",
-    "createNewPin": "Create New PIN"
-  },
   "goToSystemSecuritySettingsActionLabel": "Go to security",
   "enableSystemScreenLockFailedMessage": "Failed to enable screen lock",
   "initKeystoreFailureMessage": "Failed to init keystore",

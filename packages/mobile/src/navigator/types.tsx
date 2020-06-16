@@ -114,7 +114,6 @@ export type StackParamList = {
     transactionData: TransactionDataInput
     addressJustValidated?: boolean
   }
-  [Screens.PincodeEducation]: undefined
   [Screens.PincodeEnter]: {
     withVerification?: boolean
     onSuccess: (pin: string) => void
