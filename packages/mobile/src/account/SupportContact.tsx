@@ -63,7 +63,7 @@ const SupportContact = (props: Props) => {
       address: currentAccount,
       network: DEFAULT_TESTNET,
     }
-    const userId = anonymizedPhone(e164PhoneNumber)
+    const userId = e164PhoneNumber ? anonymizedPhone(e164PhoneNumber) : 'unknown'
     const emailSubject = 'Celo support for ' + (userId || 'unknownUser')
     const email: Email = {
       subject: emailSubject,
