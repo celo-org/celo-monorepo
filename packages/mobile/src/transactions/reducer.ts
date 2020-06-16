@@ -2,9 +2,8 @@ import { NumberToRecipient } from 'src/recipients/recipient'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
 import { Actions, ActionTypes } from 'src/transactions/actions'
+import { isTransferTransaction } from 'src/transactions/transferFeedUtils'
 import { StandbyTransaction } from 'src/transactions/types'
-
-const RECENT_TX_RECIPIENT_CACHE_LIMIT = 10
 
 export interface State {
   // Tracks transactions that have been initiated by the user
@@ -21,7 +20,7 @@ export interface State {
 }
 
 export interface KnownFeedTransactionsType {
-  [txHash: string]: boolean
+  [txHash: string]: string | boolean
 }
 
 const initialState = {
@@ -75,26 +74,19 @@ export const reducer = (
       }
     case Actions.NEW_TRANSACTIONS_IN_FEED:
       const newKnownFeedTransactions = { ...state.knownFeedTransactions }
-      action.transactions.forEach((tx) => (newKnownFeedTransactions[tx.hash] = true))
+      action.transactions.forEach((tx) => {
+        isTransferTransaction(tx)
+          ? (newKnownFeedTransactions[tx.hash] = tx.address)
+          : (newKnownFeedTransactions[tx.hash] = true)
+      })
       return {
         ...state,
         knownFeedTransactions: newKnownFeedTransactions,
       }
-    case Actions.ADD_TO_RECENT_TX_RECIPIENT_CACHE:
-      const newRecentTxRecipientsCache: NumberToRecipient = {}
-      let existingEntries = Object.entries(state.recentTxRecipientsCache)
-      // Remove the stalest recipeint. Not ideal as objects arent guaranteed
-      // to maintain order but cant store map and not worth storing timestamps
-      if (existingEntries.length >= RECENT_TX_RECIPIENT_CACHE_LIMIT) {
-        existingEntries = existingEntries.slice(1)
-      }
-
-      newRecentTxRecipientsCache[action.e164PhoneNumber] = action.recipient
-      existingEntries.forEach(([key, value]) => (newRecentTxRecipientsCache[key] = value))
-
+    case Actions.UPDATE_RECENT_TX_RECIPIENT_CACHE:
       return {
         ...state,
-        recentTxRecipientsCache: newRecentTxRecipientsCache,
+        recentTxRecipientsCache: action.recentTxRecipientsCache,
       }
     default:
       return state

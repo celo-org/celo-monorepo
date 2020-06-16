@@ -9,6 +9,7 @@ import {
 import { DEFAULT_TESTNET } from 'src/config'
 import { decryptComment } from 'src/identity/commentEncryption'
 import { AddressToE164NumberType } from 'src/identity/reducer'
+import { InviteDetails } from 'src/invite/actions'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { KnownFeedTransactionsType } from 'src/transactions/reducer'
 import { isPresent } from 'src/utils/typescript'
@@ -23,12 +24,17 @@ export function getDecryptedTransferFeedComment(
 }
 
 function getRecipient(
+  type: TokenTransactionType,
   e164PhoneNumber: string | null,
   recipientCache: NumberToRecipient,
-  recentTxRecipientsCache: NumberToRecipient
+  recentTxRecipientsCache: NumberToRecipient,
+  invitees: InviteDetails[]
 ) {
   if (!e164PhoneNumber) {
     return undefined
+  }
+
+  if (type === TokenTransactionType.EscrowSent) {
   }
 
   return Object.keys(recipientCache).length
@@ -44,10 +50,17 @@ export function getTransferFeedParams(
   address: string,
   addressToE164Number: AddressToE164NumberType,
   rawComment: string | null,
-  commentKey: string | null
+  commentKey: string | null,
+  invitees: InviteDetails[]
 ) {
   const e164PhoneNumber = addressToE164Number[address]
-  const recipient = getRecipient(e164PhoneNumber, recipientCache, recentTxRecipientsCache)
+  const recipient = getRecipient(
+    type,
+    e164PhoneNumber,
+    recipientCache,
+    recentTxRecipientsCache,
+    invitees
+  )
   const nameOrNumber = recipient ? recipient.displayName : e164PhoneNumber
   const comment = getDecryptedTransferFeedComment(rawComment, commentKey, type)
 

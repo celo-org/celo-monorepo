@@ -4,7 +4,7 @@ import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { RecipientWithContact } from 'src/recipients/recipient'
+import { NumberToRecipient } from 'src/recipients/recipient'
 import { TransactionDataInput } from 'src/send/SendAmount'
 import { TransferConfirmationCardProps } from 'src/transactions/TransferConfirmationCard'
 import { StandbyTransaction } from 'src/transactions/types'
@@ -18,7 +18,8 @@ export enum Actions {
   TRANSACTION_CONFIRMED = 'TRANSACTIONS/TRANSACTION_CONFIRMED',
   TRANSACTION_FAILED = 'TRANSACTIONS/TRANSACTION_FAILED',
   NEW_TRANSACTIONS_IN_FEED = 'TRANSACTIONS/NEW_TRANSACTIONS_IN_FEED',
-  ADD_TO_RECENT_TX_RECIPIENT_CACHE = 'TRANSACTIONS/ADD_TO_RECENT_TX_RECIPIENT_CACHE',
+  FETCH_RECENT_TX_RECIPIENTS = 'TRANSACTIONS/FETCH_RECENT_TX_RECIPIENTS',
+  UPDATE_RECENT_TX_RECIPIENT_CACHE = 'TRANSACTIONS/UPDATE_RECENT_TX_RECIPIENT_CACHE',
 }
 
 export interface AddStandbyTransactionAction {
@@ -56,10 +57,12 @@ export interface NewTransactionsInFeedAction {
   transactions: TransactionFeedFragment[]
 }
 
-export interface AddToRecentTxRecipientsCacheAction {
-  type: Actions.ADD_TO_RECENT_TX_RECIPIENT_CACHE
-  e164PhoneNumber: string
-  recipient: RecipientWithContact
+export interface FetchRecentTxRecipients {
+  type: Actions.FETCH_RECENT_TX_RECIPIENTS
+}
+export interface UpdatedRecentTxRecipientsCacheAction {
+  type: Actions.UPDATE_RECENT_TX_RECIPIENT_CACHE
+  recentTxRecipientsCache: NumberToRecipient
 }
 
 export type ActionTypes =
@@ -68,7 +71,7 @@ export type ActionTypes =
   | ResetStandbyTransactionsAction
   | AddHashToStandbyTransactionAction
   | NewTransactionsInFeedAction
-  | AddToRecentTxRecipientsCacheAction
+  | UpdatedRecentTxRecipientsCacheAction
 
 export const generateStandbyTransactionId = (recipientAddress: string) => {
   return web3ForUtils.utils.sha3(recipientAddress + String(Date.now()))
@@ -86,13 +89,15 @@ export const removeStandbyTransaction = (idx: string): RemoveStandbyTransactionA
   idx,
 })
 
-export const addToRecentTxRecipientsCache = (
-  e164PhoneNumber: string,
-  recipient: RecipientWithContact
-): AddToRecentTxRecipientsCacheAction => ({
-  type: Actions.ADD_TO_RECENT_TX_RECIPIENT_CACHE,
-  e164PhoneNumber,
-  recipient,
+export const fetchRecentTxRecipients = (): FetchRecentTxRecipients => ({
+  type: Actions.FETCH_RECENT_TX_RECIPIENTS,
+})
+
+export const updateRecentTxRecipientsCache = (
+  recentTxRecipientsCache: NumberToRecipient
+): UpdatedRecentTxRecipientsCacheAction => ({
+  type: Actions.UPDATE_RECENT_TX_RECIPIENT_CACHE,
+  recentTxRecipientsCache,
 })
 
 export const resetStandbyTransactions = (): ResetStandbyTransactionsAction => ({

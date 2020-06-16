@@ -1,7 +1,7 @@
 import { CeloTransactionObject } from '@celo/contractkit'
 import '@react-native-firebase/database'
 import '@react-native-firebase/messaging'
-import { call, put, select, spawn, take, takeEvery } from 'redux-saga/effects'
+import { call, put, select, spawn, take, takeEvery, takeLatest } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -9,46 +9,44 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { fetchGoldBalance } from 'src/goldToken/actions'
 import { addressToE164NumberSelector } from 'src/identity/reducer'
+import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import {
   Actions,
   addHashToStandbyTransaction,
-  addToRecentTxRecipientsCache,
   NewTransactionsInFeedAction,
   removeStandbyTransaction,
   transactionConfirmed,
   transactionFailed,
+  updateRecentTxRecipientsCache,
 } from 'src/transactions/actions'
 import { TxPromises } from 'src/transactions/contract-utils'
-import { standbyTransactionsSelector } from 'src/transactions/reducer'
+import {
+  knownFeedTransactionsSelector,
+  KnownFeedTransactionsType,
+  standbyTransactionsSelector,
+} from 'src/transactions/reducer'
 import { sendTransactionPromises, wrapSendTransactionWithRetry } from 'src/transactions/send'
-import { isTransferTransaction } from 'src/transactions/transferFeedUtils'
 import { StandbyTransaction, TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'transactions/saga'
 
+const RECENT_TX_RECIPIENT_CACHE_LIMIT = 10
+
 function* watchNewFeedTransactions() {
   yield takeEvery(Actions.NEW_TRANSACTIONS_IN_FEED, cleanupStandbyTransactions)
+}
+
+function* watchFetchRecentTxRecipients() {
+  yield takeLatest(Actions.FETCH_RECENT_TX_RECIPIENTS, fetchRecentTxRecipients)
 }
 
 // Remove standby txs from redux state when the real ones show up in the feed
 function* cleanupStandbyTransactions({ transactions }: NewTransactionsInFeedAction) {
   const standbyTxs: StandbyTransaction[] = yield select(standbyTransactionsSelector)
-  const addressToE164Number = yield select(addressToE164NumberSelector)
-  const recipientCache = yield select(recipientCacheSelector)
-
-  const newFeedTxHashes = new Set()
-  const newFeedTxAddresses: string[] = []
-
-  transactions.forEach((tx) => {
-    newFeedTxHashes.add(tx?.hash)
-    if (isTransferTransaction(tx)) {
-      newFeedTxAddresses.push(tx?.address)
-    }
-  })
-  // const newFeedTxAddresses = new Set(transactions.map((tx) => tx?.hash))
+  const newFeedTxHashes = new Set(transactions.map((tx) => tx?.hash))
   for (const standbyTx of standbyTxs) {
     if (
       standbyTx.hash &&
@@ -56,14 +54,6 @@ function* cleanupStandbyTransactions({ transactions }: NewTransactionsInFeedActi
       newFeedTxHashes.has(standbyTx.hash)
     ) {
       yield put(removeStandbyTransaction(standbyTx.id))
-    }
-  }
-
-  for (const address of newFeedTxAddresses) {
-    const e164PhoneNumber = addressToE164Number[address]
-    const cachedRecipient = recipientCache[e164PhoneNumber]
-    if (e164PhoneNumber && cachedRecipient) {
-      yield put(addToRecentTxRecipientsCache(e164PhoneNumber, cachedRecipient))
     }
   }
 }
@@ -122,6 +112,50 @@ export function* sendAndMonitorTransaction<T>(
   }
 }
 
+export function* fetchRecentTxRecipients() {
+  const addressToE164Number = yield select(addressToE164NumberSelector)
+  const recipientCache = yield select(recipientCacheSelector)
+  const knownFeedTransactions: KnownFeedTransactionsType = yield select(
+    knownFeedTransactionsSelector
+  )
+
+  // No way to match addresses to recipients without caches
+  if (
+    !Object.keys(recipientCache).length ||
+    !Object.keys(addressToE164Number).length ||
+    !Object.keys(knownFeedTransactions).length
+  ) {
+    return
+  }
+
+  const knownFeedAddresses = Object.values(knownFeedTransactions)
+  let remainingCacheStorage = RECENT_TX_RECIPIENT_CACHE_LIMIT
+
+  const recentTxRecipientsCache: NumberToRecipient = {}
+  for (let i = knownFeedAddresses.length - 1; i > 0; i -= 1) {
+    if (remainingCacheStorage <= 0) {
+      break
+    }
+
+    const address = knownFeedAddresses[i]
+    if (typeof address !== 'string') {
+      continue
+    }
+
+    const e164PhoneNumber = addressToE164Number[address]
+    const cachedRecipient = recipientCache[e164PhoneNumber]
+    if (recentTxRecipientsCache[e164PhoneNumber] || !cachedRecipient) {
+      continue
+    }
+
+    recentTxRecipientsCache[e164PhoneNumber] = cachedRecipient
+    remainingCacheStorage -= 1
+  }
+
+  yield put(updateRecentTxRecipientsCache(recentTxRecipientsCache))
+}
+
 export function* transactionSaga() {
   yield spawn(watchNewFeedTransactions)
+  yield spawn(watchFetchRecentTxRecipients)
 }
