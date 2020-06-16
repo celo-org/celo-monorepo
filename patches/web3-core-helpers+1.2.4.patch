@@ -1,0 +1,13 @@
+patch-package
+--- a/node_modules/web3-core-helpers/types/index.d.ts
++++ b/node_modules/web3-core-helpers/types/index.d.ts
+@@ -180,5 +180,8 @@ export interface JsonRpcResponse {
+     jsonrpc: string;
+     id: number;
+     result?: any;
+-    error?: string;
++    error?: string | {
++      message: string;
++      code: number;
++    };
+ }
