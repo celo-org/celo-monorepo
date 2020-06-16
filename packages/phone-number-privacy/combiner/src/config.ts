@@ -43,7 +43,9 @@ interface Config {
   attestations: {
     numberAttestationsRequired: number
   }
-  pgpnpServices: PgpnpServices[]
+  pgpnpServices: {
+    signers: string
+  }
   thresholdSignature: {
     threshold: number
     polynomial: string
@@ -81,14 +83,9 @@ if (DEV_MODE) {
     attestations: {
       numberAttestationsRequired: 3,
     },
-    pgpnpServices: [
-      // {
-      //   url: 'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net',
-      // },
-      {
-        url: 'http://localhost:3000',
-      },
-    ],
+    pgpnpServices: {
+      signers: '[{"url": "http://localhost:3000"}]'
+    },
     thresholdSignature: {
       threshold: 1,
       polynomial: DEV_POLYNOMIAL,
@@ -123,7 +120,9 @@ if (DEV_MODE) {
     attestations: {
       numberAttestationsRequired: functionConfig.attestations.number_attestations_required,
     },
-    pgpnpServices: [],
+    pgpnpServices: {
+      signers: functionConfig.pgpnpservices.signers
+    },
     thresholdSignature: {
       threshold: functionConfig.threshold_signature.threshold_signature_threshold,
       polynomial: functionConfig.threshold_signature.threshold_polynomial,
