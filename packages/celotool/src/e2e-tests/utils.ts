@@ -120,7 +120,7 @@ export async function signalProcess(identifier: string | number, signal: Signal)
   if (typeof identifier === 'number') {
     await spawnCmd('kill', ['-s', signal, identifier.toString()], { silent: true })
   } else {
-    await spawnCmd('pkill', ['-signal', signal, identifier], { silent: true })
+    await spawnCmd('pkill', [`-SIG${signal}`, identifier], { silent: true })
   }
 }
 
