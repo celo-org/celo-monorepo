@@ -6,7 +6,7 @@ import { KeyProviderBase } from './key-provider-base'
 export class AWSKeyProvider extends KeyProviderBase {
   public async fetchPrivateKeyFromStore() {
     try {
-      // Use credentials from IAM role
+      // Credentials are managed by AWS client as described in https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-credentials-node.html
       const region = process.env.KEYSTORE_AWS_REGION || 'us-east-1'
       const secretName = process.env.KEYSTORE_AWS_SECRET_NAME || 'signer-key'
       const secretKey = process.env.KEYSTORE_AWS_SECRET_KEY || 'key'
