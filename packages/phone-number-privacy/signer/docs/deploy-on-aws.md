@@ -37,7 +37,7 @@ The secret name and key values can be customized as desired (and when running th
 To create the secret run the next command on your workstation:
 
     ```bash
-    aws secretsmanager create-secret --name signer-secret2 --description "PGPNP Signer Secret" --secret-string '{"key":"<Signer private key>"}'`
+    aws secretsmanager create-secret --name signer-secret --description "PGPNP Signer Secret" --secret-string '{"key":"<Signer private key>"}'`
     ```
 
 ### Running the Signer on Fargate
