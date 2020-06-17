@@ -80,7 +80,6 @@ import PaymentRequestConfirmation, {
 import PaymentRequestUnavailable, {
   paymentRequestUnavailableScreenNavOptions,
 } from 'src/paymentRequest/PaymentRequestUnavailable'
-import PincodeEducation from 'src/pincode/PincodeEducation'
 import PincodeEnter from 'src/pincode/PincodeEnter'
 import PincodeSet from 'src/pincode/PincodeSet'
 import { RootState } from 'src/redux/reducers'
@@ -166,6 +165,23 @@ const verificationScreens = (Navigator: typeof Stack) => {
   )
 }
 
+const pincodeSetScreenOptions = ({
+  route,
+}: {
+  route: RouteProp<StackParamList, Screens.PincodeSet>
+}) => {
+  const isVerifying = route.params?.isVerifying
+  const title = isVerifying
+    ? i18n.t('onboarding:pincodeSet.verify')
+    : i18n.t('onboarding:pincodeSet.create')
+  return {
+    ...nuxNavigationOptions,
+    headerTitle: () => (
+      <HeaderTitleWithSubtitle title={title} subTitle={i18n.t('onboarding:step', { step: '2' })} />
+    ),
+  }
+}
+
 const nuxScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen
@@ -187,14 +203,9 @@ const nuxScreens = (Navigator: typeof Stack) => (
       options={nuxNavigationOptions}
     />
     <Navigator.Screen
-      name={Screens.PincodeEducation}
-      component={PincodeEducation}
-      options={nuxNavigationOptions}
-    />
-    <Navigator.Screen
       name={Screens.PincodeSet}
       component={PincodeSet}
-      options={nuxNavigationOptions}
+      options={pincodeSetScreenOptions}
     />
     <Navigator.Screen
       name={Screens.EnterInviteCode}
@@ -480,7 +491,7 @@ export function MainStackScreen() {
     } else if (!acceptedTerms) {
       initialRoute = Screens.RegulatoryTerms
     } else if (pincodeType === PincodeType.Unset) {
-      initialRoute = Screens.PincodeEducation
+      initialRoute = Screens.PincodeSet
     } else if (!redeemComplete && !account) {
       initialRoute = Screens.EnterInviteCode
     } else if (!hasSeenVerificationNux) {

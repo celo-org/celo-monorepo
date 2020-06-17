@@ -124,7 +124,7 @@ export class JoinCelo extends React.Component<Props, State> {
     if (!this.props.acceptedTerms) {
       navigate(Screens.RegulatoryTerms)
     } else if (this.props.pincodeType === PincodeType.Unset) {
-      navigate(Screens.PincodeEducation)
+      navigate(Screens.PincodeSet)
     } else {
       navigate(Screens.EnterInviteCode)
     }
@@ -193,7 +193,7 @@ export class JoinCelo extends React.Component<Props, State> {
 
     return (
       <SafeAreaView style={styles.container}>
-        <DevSkipButton nextScreen={Screens.PincodeEducation} />
+        <DevSkipButton nextScreen={Screens.PincodeSet} />
         <ScrollView
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="always"

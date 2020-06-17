@@ -16,7 +16,7 @@ exports[`NumberKeypad renders correctly with decimal separator 1`] = `
       Object {
         "alignItems": "center",
         "flexDirection": "row",
-        "justifyContent": "space-between",
+        "justifyContent": "space-around",
         "width": "100%",
       }
     }
@@ -135,7 +135,7 @@ exports[`NumberKeypad renders correctly with decimal separator 1`] = `
       Object {
         "alignItems": "center",
         "flexDirection": "row",
-        "justifyContent": "space-between",
+        "justifyContent": "space-around",
         "width": "100%",
       }
     }
@@ -254,7 +254,7 @@ exports[`NumberKeypad renders correctly with decimal separator 1`] = `
       Object {
         "alignItems": "center",
         "flexDirection": "row",
-        "justifyContent": "space-between",
+        "justifyContent": "space-around",
         "width": "100%",
       }
     }
@@ -373,7 +373,7 @@ exports[`NumberKeypad renders correctly with decimal separator 1`] = `
       Object {
         "alignItems": "center",
         "flexDirection": "row",
-        "justifyContent": "space-between",
+        "justifyContent": "space-around",
         "width": "100%",
       }
     }
@@ -525,7 +525,7 @@ exports[`NumberKeypad renders correctly without decimal separator 1`] = `
       Object {
         "alignItems": "center",
         "flexDirection": "row",
-        "justifyContent": "space-between",
+        "justifyContent": "space-around",
         "width": "100%",
       }
     }
@@ -644,7 +644,7 @@ exports[`NumberKeypad renders correctly without decimal separator 1`] = `
       Object {
         "alignItems": "center",
         "flexDirection": "row",
-        "justifyContent": "space-between",
+        "justifyContent": "space-around",
         "width": "100%",
       }
     }
@@ -763,7 +763,7 @@ exports[`NumberKeypad renders correctly without decimal separator 1`] = `
       Object {
         "alignItems": "center",
         "flexDirection": "row",
-        "justifyContent": "space-between",
+        "justifyContent": "space-around",
         "width": "100%",
       }
     }
@@ -882,7 +882,7 @@ exports[`NumberKeypad renders correctly without decimal separator 1`] = `
       Object {
         "alignItems": "center",
         "flexDirection": "row",
-        "justifyContent": "space-between",
+        "justifyContent": "space-around",
         "width": "100%",
       }
     }
