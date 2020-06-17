@@ -144,10 +144,10 @@ export const reducer = (
         ...state,
         socialBackupCompleted: true,
       }
-    case Actions.RESET_BACKUP_STATE:
+    case Actions.TOGGLE_BACKUP_STATE:
       return {
         ...state,
-        backupCompleted: false,
+        backupCompleted: !state.backupCompleted,
         socialBackupCompleted: false,
         backupDelayedTime: 0,
       }

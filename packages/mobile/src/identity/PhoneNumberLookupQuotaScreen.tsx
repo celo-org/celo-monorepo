@@ -18,17 +18,11 @@ import { Namespaces } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
 import { LOOKUP_GAS_FEE_ESTIMATE } from 'src/identity/privateHashing'
 import { isUserBalanceSufficient } from 'src/identity/utils'
-import { emptyHeader } from 'src/navigator/Headers.v2'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 
 type Props = StackScreenProps<StackParamList, Screens.PhoneNumberLookupQuota>
-
-export const phoneNumberLookupQuotaScreeOptions = () => ({
-  ...emptyHeader,
-  gestureEnabled: false,
-})
 
 function PhoneNumberLookupQuotaScreen(props: Props) {
   const [isSending, setIsSending] = useState(false)
