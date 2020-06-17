@@ -5,7 +5,7 @@
   "chooseCountryCode": "Country Code",
   "chooseCountry": "Country",
   "joinText": "The Celo Wallet helps you to send, receive, and save value on the Celo Network.",
-  "phoneNumber": "000 000 0000",
+  "phoneNumber": "Phone Number",
   "terms": {
     "title": "Terms",
     "heading1": "Data and Privacy",
@@ -27,6 +27,7 @@
     "skip": "continue without."
   },
   "fullName": "Full Name",
+  "fullNamePlaceholder": "First Last",
   "importIt": "Restore Existing Wallet",
   "cancel": "Cancel",
   "important": "Important",
@@ -39,14 +40,6 @@
   },
   "confirmPin": {
     "title": "Enter PIN"
-  },
-  "pincodeEducation": {
-    "title": "Secure Your Wallet",
-    "intro": "To protect your account, the Celo Wallet requires a PIN.",
-    "summary":
-      "You can use your phone’s existing authentication or create a new PIN for this application.",
-    "usePhoneAuth": "Use Phone Authentication",
-    "createNewPin": "Create New PIN"
   },
   "goToSystemSecuritySettingsActionLabel": "Go to security",
   "enableSystemScreenLockFailedMessage": "Failed to enable screen lock",

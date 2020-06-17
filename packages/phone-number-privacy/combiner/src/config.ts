@@ -13,9 +13,6 @@ export const DEV_PRIVATE_KEY =
 export const DEV_POLYNOMIAL =
   '01000000000000001f33136ac029a702eb041096bd9ef09dc9c368dde52a972866bdeaff0896f8596b74ab7adfd7318bba38527599768400df44bcab66bcf3843c17a2ce838bcd5a8ba1634c18314ff0565a7c769905b8a8fba27a86bf4c6cb22df89e1badfe2b81'
 
-export interface PgpnpServices {
-  url: string
-}
 interface Config {
   blockchain: {
     provider: string
@@ -43,7 +40,9 @@ interface Config {
   attestations: {
     numberAttestationsRequired: number
   }
-  pgpnpServices: PgpnpServices[]
+  pgpnpServices: {
+    signers: string
+  }
   thresholdSignature: {
     threshold: number
     polynomial: string
@@ -81,14 +80,9 @@ if (DEV_MODE) {
     attestations: {
       numberAttestationsRequired: 3,
     },
-    pgpnpServices: [
-      // {
-      //   url: 'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net',
-      // },
-      {
-        url: 'http://localhost:3000',
-      },
-    ],
+    pgpnpServices: {
+      signers: '[{"url": "http://localhost:3000"}]',
+    },
     thresholdSignature: {
       threshold: 1,
       polynomial: DEV_POLYNOMIAL,
@@ -123,7 +117,9 @@ if (DEV_MODE) {
     attestations: {
       numberAttestationsRequired: functionConfig.attestations.number_attestations_required,
     },
-    pgpnpServices: [],
+    pgpnpServices: {
+      signers: functionConfig.pgpnpservices.signers,
+    },
     thresholdSignature: {
       threshold: functionConfig.threshold_signature.threshold_signature_threshold,
       polynomial: functionConfig.threshold_signature.threshold_polynomial,
