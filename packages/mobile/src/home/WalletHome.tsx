@@ -96,13 +96,16 @@ export class WalletHome extends React.Component<Props> {
     this.props.refreshAllBalances()
   }
 
-  componentDidMount = async () => {
+  componentDidMount = () => {
     // TODO find a better home for this, its unrelated to wallet home
     this.props.initializeSentryUserContext()
     if (SHOW_TESTNET_BANNER) {
       this.showTestnetBanner()
     }
-    await this.tryImportContacts()
+
+    // Waiting 1/2 sec before triggering to allow
+    // rest of feed to load unencumbered
+    setTimeout(this.tryImportContacts, 500)
   }
 
   tryImportContacts = async () => {

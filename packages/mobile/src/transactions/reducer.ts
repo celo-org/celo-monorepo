@@ -20,6 +20,8 @@ export interface State {
 }
 
 export interface KnownFeedTransactionsType {
+  // Value will be an address for transfer transactions
+  // and true for exchange transactions
   [txHash: string]: string | boolean
 }
 
