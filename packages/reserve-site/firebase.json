@@ -1,0 +1,21 @@
+{
+  "hosting": {
+    "public": "public",
+    "rewrites": [
+      {
+        "source": "**/**",
+        "function": "nextjs-server"
+      }
+    ]
+  },
+  "functions": {
+    "source": ".",
+    "ignore": [
+      ".firebase/**",
+      ".firebaserc",
+      "firebase.json",
+      "**/node_modules/**",
+      "**/public/**"
+    ]
+  }
+}
