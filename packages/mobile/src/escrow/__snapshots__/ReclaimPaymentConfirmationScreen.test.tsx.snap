@@ -672,6 +672,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                 "flexGrow": 1,
                 "height": 48,
                 "justifyContent": "center",
+                "opacity": undefined,
                 "paddingHorizontal": 16,
                 "paddingVertical": 5,
               }
@@ -737,6 +738,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                 "flexGrow": 1,
                 "height": 48,
                 "justifyContent": "center",
+                "opacity": undefined,
                 "paddingHorizontal": 16,
                 "paddingVertical": 5,
               }
@@ -1435,6 +1437,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 "flexGrow": 1,
                 "height": 48,
                 "justifyContent": "center",
+                "opacity": undefined,
                 "paddingHorizontal": 16,
                 "paddingVertical": 5,
               }
@@ -1500,6 +1503,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 "flexGrow": 1,
                 "height": 48,
                 "justifyContent": "center",
+                "opacity": undefined,
                 "paddingHorizontal": 16,
                 "paddingVertical": 5,
               }
@@ -2195,6 +2199,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 "flexGrow": 1,
                 "height": 48,
                 "justifyContent": "center",
+                "opacity": undefined,
                 "paddingHorizontal": 16,
                 "paddingVertical": 5,
               }
@@ -2260,6 +2265,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 "flexGrow": 1,
                 "height": 48,
                 "justifyContent": "center",
+                "opacity": undefined,
                 "paddingHorizontal": 16,
                 "paddingVertical": 5,
               }
