@@ -1,5 +1,5 @@
 import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/src/address'
-import { AzureClusterConfig, createIdentityIfNotExists, deleteIdentity, getIdentity, switchToCluster } from 'src/lib/azure'
+import { AzureClusterConfig, assignRoleIfNotAssigned, createIdentityIfNotExists, deleteIdentity, getIdentity, switchToCluster } from 'src/lib/azure'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import {
   getFornoUrl,
@@ -9,7 +9,6 @@ import {
 import { addCeloEnvMiddleware, envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
-import { retryCmd } from 'src/lib/utils'
 import yargs from 'yargs'
 
 const helmChartPath = '../helm-charts/oracle'
@@ -210,13 +209,7 @@ async function createOracleAzureIdentityIfNotExists(
     `az aks show -n ${clusterConfig.clusterName} --query servicePrincipalProfile.clientId -g ${clusterConfig.resourceGroup} -o tsv`
   )
   const servicePrincipalClientId = rawServicePrincipalClientId.trim()
-  await retryCmd(
-    () =>
-      execCmdWithExitOnFailure(
-        `az role assignment create --role "Managed Identity Operator" --assignee ${servicePrincipalClientId} --scope ${identity.id}`
-      ),
-    10
-  )
+  await assignRoleIfNotAssigned(servicePrincipalClientId, 'ServicePrincipal', identity.id, 'Managed Identity Operator')
   // Allow the oracle identity to access the correct key vault
   await setOracleKeyVaultPolicy(clusterConfig, oracleIdentity, identity)
   return identity
