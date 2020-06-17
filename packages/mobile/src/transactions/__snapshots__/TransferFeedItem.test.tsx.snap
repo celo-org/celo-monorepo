@@ -113,6 +113,7 @@ exports[`transfer feed item renders correctly for <0.000001 network fee 1`] = `
             "fontFamily": "Inter-Regular",
             "fontSize": 14,
             "lineHeight": 18,
+            "paddingTop": 2,
           }
         }
       >
@@ -239,6 +240,7 @@ exports[`transfer feed item renders correctly for faucet 1`] = `
             "fontFamily": "Inter-Regular",
             "fontSize": 14,
             "lineHeight": 18,
+            "paddingTop": 2,
           }
         }
       >
@@ -396,6 +398,7 @@ exports[`transfer feed item renders correctly for known received 1`] = `
             "fontFamily": "Inter-Regular",
             "fontSize": 14,
             "lineHeight": 18,
+            "paddingTop": 2,
           }
         }
       >
@@ -550,6 +553,7 @@ exports[`transfer feed item renders correctly for known sent 1`] = `
             "fontFamily": "Inter-Regular",
             "fontSize": 14,
             "lineHeight": 18,
+            "paddingTop": 2,
           }
         }
       >
@@ -673,6 +677,7 @@ exports[`transfer feed item renders correctly for network fee 1`] = `
             "fontFamily": "Inter-Regular",
             "fontSize": 14,
             "lineHeight": 18,
+            "paddingTop": 2,
           }
         }
       >
@@ -833,6 +838,7 @@ exports[`transfer feed item renders correctly for received 1`] = `
             "fontFamily": "Inter-Regular",
             "fontSize": 14,
             "lineHeight": 18,
+            "paddingTop": 2,
           }
         }
       >
@@ -959,6 +965,7 @@ exports[`transfer feed item renders correctly for received invite 1`] = `
             "fontFamily": "Inter-Regular",
             "fontSize": 14,
             "lineHeight": 18,
+            "paddingTop": 2,
           }
         }
       >
@@ -1119,6 +1126,7 @@ exports[`transfer feed item renders correctly for received with encrypted commen
             "fontFamily": "Inter-Regular",
             "fontSize": 14,
             "lineHeight": 18,
+            "paddingTop": 2,
           }
         }
       >
@@ -1276,6 +1284,7 @@ exports[`transfer feed item renders correctly for sent 1`] = `
             "fontFamily": "Inter-Regular",
             "fontSize": 14,
             "lineHeight": 18,
+            "paddingTop": 2,
           }
         }
       >
@@ -1399,6 +1408,7 @@ exports[`transfer feed item renders correctly for sent invite 1`] = `
             "fontFamily": "Inter-Regular",
             "fontSize": 14,
             "lineHeight": 18,
+            "paddingTop": 2,
           }
         }
       >
@@ -1556,6 +1566,7 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
             "fontFamily": "Inter-Regular",
             "fontSize": 14,
             "lineHeight": 18,
+            "paddingTop": 2,
           }
         }
       >
@@ -1713,6 +1724,7 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
             "fontFamily": "Inter-Regular",
             "fontSize": 14,
             "lineHeight": 18,
+            "paddingTop": 2,
           }
         }
       >
@@ -1836,6 +1848,7 @@ exports[`transfer feed item renders correctly for verification fee 1`] = `
             "fontFamily": "Inter-Regular",
             "fontSize": 14,
             "lineHeight": 18,
+            "paddingTop": 2,
           }
         }
       >
@@ -1981,6 +1994,7 @@ exports[`transfer feed item renders correctly for verification reward 1`] = `
             "fontFamily": "Inter-Regular",
             "fontSize": 14,
             "lineHeight": 18,
+            "paddingTop": 2,
           }
         }
       >

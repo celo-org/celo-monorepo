@@ -226,6 +226,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                   "fontFamily": "Inter-Regular",
                   "fontSize": 14,
                   "lineHeight": 18,
+                  "paddingTop": 2,
                 }
               }
             >

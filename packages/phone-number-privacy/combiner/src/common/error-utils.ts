@@ -15,6 +15,7 @@ export enum ErrorMessages {
   VERIFY_PARITAL_SIGNATURE_ERROR = 'CELO_PNP_ERR_11 BLS partial signature verification Failure',
   NOT_ENOUGH_PARTIAL_SIGNATURES = 'CELO_PNP_ERR_12 Not enough partial signatures',
   SIGNER_RETURN_ERROR = 'CELO_PNP_ERR_13 Signer return error',
+  INCONSISTENT_SINGER_RESPONSES = 'CELO_PNP_ERR_14 Inconsistent responses from signers',
 }
 
 export function respondWithError(res: Response, statusCode: number, error: ErrorMessages) {

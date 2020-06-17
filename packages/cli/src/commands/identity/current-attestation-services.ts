@@ -1,4 +1,4 @@
-import { concurrentMap } from '@celo/utils/src/async'
+import { concurrentMap } from '@celo/utils/lib/async'
 import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
 

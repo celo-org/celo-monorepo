@@ -1,4 +1,4 @@
-import { AttestationUtils, SignatureUtils } from '@celo/utils'
+import { AttestationUtils, SignatureUtils } from '@celo/utils/lib'
 import { eqAddress } from '@celo/utils/lib/address'
 import { concurrentMap, sleep } from '@celo/utils/lib/async'
 import { notEmpty, zip3 } from '@celo/utils/lib/collections'
