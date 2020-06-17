@@ -7,7 +7,6 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FlatList, StyleSheet, View } from 'react-native'
 import { useSafeArea } from 'react-native-safe-area-view'
-import { useDispatch } from 'react-redux'
 import { Namespaces } from 'src/i18n'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -18,9 +17,8 @@ const keyExtractor = (item: LocalizedCountry) => item.alpha2
 type Props = StackScreenProps<StackParamList, Screens.SelectCountry>
 
 export default function SelectCountry({ navigation, route }: Props) {
-  const { t } = useTranslation(Namespaces.accountScreen10)
   const { countries, selectedCountryCodeAlpha2 } = route.params
-  const dispatch = useDispatch()
+  const { t } = useTranslation(Namespaces.accountScreen10)
   const [searchText, setSearchText] = useState('')
 
   const filteredCountries = useMemo(() => countries.getFilteredCountries(searchText), [
