@@ -11,5 +11,8 @@
       "successHeader": "Tienes {{matches}} amigos en Celo",
       "successStatus": "Todos estas sincronizados"
     }
-  }
+  },
+  "accountInfo": "Informacion de cuenta",
+  "step": "Paso {{step}} de 5",
+  "selectCountryCode": "Seleccionar código de país"
 }

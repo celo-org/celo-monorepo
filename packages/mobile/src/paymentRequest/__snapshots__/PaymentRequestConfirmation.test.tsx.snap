@@ -412,6 +412,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                 "flexGrow": 1,
                 "height": 48,
                 "justifyContent": "center",
+                "opacity": undefined,
                 "paddingHorizontal": 16,
                 "paddingVertical": 5,
               }

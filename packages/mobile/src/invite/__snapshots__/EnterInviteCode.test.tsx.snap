@@ -23,7 +23,7 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
   >
     <View>
       <View>
-        <View
+        <SafeAreaView
           style={
             Object {
               "height": 35,
@@ -50,7 +50,7 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
           >
                
           </Text>
-        </View>
+        </SafeAreaView>
         <Text
           style={
             Object {
