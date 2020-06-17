@@ -125,7 +125,8 @@ exports[`ImportContactsScreen renders correctly 1`] = `
                 "backgroundColor": "#F5F4F0",
                 "height": 48,
                 "justifyContent": "center",
-                "minWidth": 98,
+                "minWidth": 120,
+                "opacity": undefined,
                 "paddingHorizontal": 16,
                 "paddingVertical": 5,
               }

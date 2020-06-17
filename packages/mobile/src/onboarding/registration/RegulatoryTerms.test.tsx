@@ -8,7 +8,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import RegulatoryTerms, {
   RegulatoryTerms as RegulatoryTermsClass,
-} from 'src/registration/RegulatoryTerms'
+} from 'src/onboarding/registration/RegulatoryTerms'
 import { createMockStore, getMockI18nProps } from 'test/utils'
 
 jest.mock('src/navigator/NavigationService', () => {
@@ -42,7 +42,7 @@ describe('RegulatoryTermsScreen', () => {
       fireEvent.press(wrapper.getByTestId('AcceptTermsButton'))
       expect(acceptTerms).toHaveBeenCalled()
     })
-    it('navigates to PincodeEducation when pin has not been set', () => {
+    it('navigates to PincodeSet when pin has not been set', () => {
       const store = createMockStore({})
       const acceptTerms = jest.fn()
       const wrapper = render(
@@ -55,7 +55,7 @@ describe('RegulatoryTermsScreen', () => {
         </Provider>
       )
       fireEvent.press(wrapper.getByTestId('AcceptTermsButton'))
-      expect(navigate).toHaveBeenCalledWith(Screens.PincodeEducation)
+      expect(navigate).toHaveBeenCalledWith(Screens.PincodeSet)
     })
     it('navigates to EnterInviteCode when pin has been set', () => {
       const store = createMockStore({})

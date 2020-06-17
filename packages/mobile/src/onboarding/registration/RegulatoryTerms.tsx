@@ -1,9 +1,9 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import fontStyles from '@celo/react-components/styles/fonts'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { ScrollView, StyleSheet, Text } from 'react-native'
+import SafeAreaView, { SafeAreaConsumer } from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { acceptTerms } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
@@ -15,6 +15,8 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import { navigateToURI } from 'src/utils/linking'
+
+const MARGIN = 24
 
 interface StateProps {
   pincodeType: PincodeType
@@ -44,7 +46,7 @@ export class RegulatoryTerms extends React.Component<Props> {
 
   goToNextScreen = () => {
     if (this.props.pincodeType === PincodeType.Unset) {
-      navigate(Screens.PincodeEducation)
+      navigate(Screens.PincodeSet)
     } else {
       navigate(Screens.EnterInviteCode)
     }
@@ -59,31 +61,35 @@ export class RegulatoryTerms extends React.Component<Props> {
 
     return (
       <SafeAreaView style={styles.container}>
-        <DevSkipButton nextScreen={Screens.PincodeEducation} />
-        <ScrollView contentContainerStyle={styles.scrollContainer} testID="scrollView">
-          <View style={styles.terms}>
-            <Text style={fontStyles.h1} testID="Terms">
-              {t('terms.title')}
-            </Text>
-            <Text style={styles.header}>{t('terms.heading1')}</Text>
-            <Text style={styles.disclaimer}>
-              <Trans ns={Namespaces.nuxNamePin1} i18nKey={'terms.privacy'}>
-                <Text onPress={this.onPressGoToTerms} style={styles.disclamerLink}>
-                  celo.org/terms
-                </Text>
-              </Trans>
-            </Text>
-            <Text style={styles.header}>{t('terms.heading2')}</Text>
-            <Text style={styles.disclaimer}>{t('terms.goldDisclaimer')}</Text>
-          </View>
+        <DevSkipButton nextScreen={Screens.PincodeSet} />
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          testID="scrollView"
+        >
+          <Text style={styles.header}>{t('terms.heading1')}</Text>
+          <Text style={styles.disclaimer}>
+            <Trans ns={Namespaces.nuxNamePin1} i18nKey={'terms.privacy'}>
+              <Text onPress={this.onPressGoToTerms} style={styles.disclaimerLink}>
+                celo.org/terms
+              </Text>
+            </Trans>
+          </Text>
+          <Text style={styles.header}>{t('terms.heading2')}</Text>
+          <Text style={styles.disclaimer}>{t('terms.goldDisclaimer')}</Text>
         </ScrollView>
-        <Button
-          standard={false}
-          type={BtnTypes.PRIMARY}
-          text={t('global:accept')}
-          onPress={this.onPressAccept}
-          testID={'AcceptTermsButton'}
-        />
+        <SafeAreaConsumer>
+          {(insets) => (
+            <Button
+              style={[styles.button, insets && insets.bottom <= MARGIN && { marginBottom: MARGIN }]}
+              type={BtnTypes.ONBOARDING}
+              size={BtnSizes.FULL}
+              text={t('global:accept')}
+              onPress={this.onPressAccept}
+              testID={'AcceptTermsButton'}
+            />
+          )}
+        </SafeAreaConsumer>
       </SafeAreaView>
     )
   }
@@ -98,9 +104,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  scrollContainer: {
-    minHeight: '100%',
-    justifyContent: 'space-between',
+  scrollView: {
+    marginTop: 40,
+  },
+  scrollContent: {
+    paddingTop: 40,
+    paddingHorizontal: MARGIN,
   },
   terms: {
     flex: 1,
@@ -108,16 +117,18 @@ const styles = StyleSheet.create({
     paddingBottom: 15,
   },
   header: {
-    ...fontStyles.body,
-    ...fontStyles.semiBold,
+    ...fontStyles.h2,
     marginBottom: 10,
   },
   disclaimer: {
-    ...fontStyles.body,
+    ...fontStyles.small,
     marginBottom: 15,
   },
-  disclamerLink: {
-    ...fontStyles.body,
+  disclaimerLink: {
     textDecorationLine: 'underline',
+  },
+  button: {
+    marginTop: MARGIN,
+    marginHorizontal: MARGIN,
   },
 })
