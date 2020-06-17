@@ -14,13 +14,13 @@ interface Props {
 }
 
 export default function CancelButton({ eventName, onCancel, style }: Props) {
-  const onPressCancel = React.useCallback(() => {
+  function onPressCancel() {
     if (onCancel) {
       onCancel()
     } else {
       navigateBack()
     }
-  }, [onCancel])
+  }
 
   const { t } = useTranslation(Namespaces.global)
 

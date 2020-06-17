@@ -21,7 +21,11 @@ export type StackParamList = {
   [Screens.Account]: undefined
   [Screens.Analytics]: undefined
   [Screens.BackupComplete]: undefined
-  [Screens.BackupIntroduction]: undefined
+  [Screens.BackupIntroduction]:
+    | {
+        fromAccountScreen?: boolean
+      }
+    | undefined
   [Screens.AccountKeyEducation]:
     | undefined
     | {
@@ -89,9 +93,11 @@ export type StackParamList = {
     recipient: Recipient
   }
   [Screens.JoinCelo]: undefined
-  [Screens.Language]: {
-    nextScreen?: keyof StackParamList
-  }
+  [Screens.Language]:
+    | {
+        nextScreen: keyof StackParamList | 'GO_BACK'
+      }
+    | undefined
   [Screens.Licenses]: undefined
   [Screens.OutgoingPaymentRequestListScreen]: undefined
   [Screens.PaymentRequestUnavailable]: {

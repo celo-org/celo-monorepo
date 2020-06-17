@@ -2,16 +2,12 @@ import colors from '@celo/react-components/styles/colors.v2'
 import { elevationShadowStyle } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
-import MenuBurger from 'src/icons/MenuBurger'
+import Hamburger from 'src/icons/Hamburger'
 
-interface Props {
-  length: number
-}
-
-function MenuBurgerCard({ length }: Props) {
+function HamburgerCard() {
   return (
-    <View style={[styles.container, { height: length, width: length }]}>
-      <MenuBurger height={length * 1.75} width={length * 1.75} />
+    <View style={styles.container}>
+      <Hamburger />
     </View>
   )
 }
@@ -23,7 +19,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 4,
+    height: 32,
+    width: 32,
   },
 })
 
-export default React.memo(MenuBurgerCard)
+export default React.memo(HamburgerCard)
