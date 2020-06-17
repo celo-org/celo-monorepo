@@ -8,6 +8,7 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { fetchGoldBalance } from 'src/goldToken/actions'
+import { Actions as IdentityActions } from 'src/identity/actions'
 import { addressToE164NumberSelector } from 'src/identity/reducer'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
@@ -34,14 +35,6 @@ import Logger from 'src/utils/Logger'
 const TAG = 'transactions/saga'
 
 const RECENT_TX_RECIPIENT_CACHE_LIMIT = 10
-
-function* watchNewFeedTransactions() {
-  yield takeEvery(Actions.NEW_TRANSACTIONS_IN_FEED, cleanupStandbyTransactions)
-}
-
-function* watchrefreshRecentTxRecipients() {
-  yield takeLatest(Actions.REFRESH_RECENT_TX_RECIPIENTS, refreshRecentTxRecipients)
-}
 
 // Remove standby txs from redux state when the real ones show up in the feed
 function* cleanupStandbyTransactions({ transactions }: NewTransactionsInFeedAction) {
@@ -158,7 +151,16 @@ export function* refreshRecentTxRecipients() {
   yield put(updateRecentTxRecipientsCache(recentTxRecipientsCache))
 }
 
+function* watchNewFeedTransactions() {
+  yield takeEvery(Actions.NEW_TRANSACTIONS_IN_FEED, cleanupStandbyTransactions)
+  yield takeLatest(Actions.NEW_TRANSACTIONS_IN_FEED, refreshRecentTxRecipients)
+}
+
+function* watchAddressToE164PhoneNumberUpdate() {
+  yield takeLatest(IdentityActions.UPDATE_E164_PHONE_NUMBER_ADDRESSES, refreshRecentTxRecipients)
+}
+
 export function* transactionSaga() {
   yield spawn(watchNewFeedTransactions)
-  yield spawn(watchrefreshRecentTxRecipients)
+  yield spawn(watchAddressToE164PhoneNumberUpdate)
 }

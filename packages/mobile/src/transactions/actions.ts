@@ -57,10 +57,6 @@ export interface NewTransactionsInFeedAction {
   transactions: TransactionFeedFragment[]
 }
 
-export interface RefreshRecentTxRecipients {
-  type: Actions.REFRESH_RECENT_TX_RECIPIENTS
-}
-
 export interface UpdatedRecentTxRecipientsCacheAction {
   type: Actions.UPDATE_RECENT_TX_RECIPIENT_CACHE
   recentTxRecipientsCache: NumberToRecipient
@@ -72,7 +68,6 @@ export type ActionTypes =
   | ResetStandbyTransactionsAction
   | AddHashToStandbyTransactionAction
   | NewTransactionsInFeedAction
-  | RefreshRecentTxRecipients
   | UpdatedRecentTxRecipientsCacheAction
 
 export const generateStandbyTransactionId = (recipientAddress: string) => {
@@ -89,10 +84,6 @@ export const addStandbyTransaction = (
 export const removeStandbyTransaction = (idx: string): RemoveStandbyTransactionAction => ({
   type: Actions.REMOVE_STANDBY_TRANSACTION,
   idx,
-})
-
-export const refreshRecentTxRecipients = (): RefreshRecentTxRecipients => ({
-  type: Actions.REFRESH_RECENT_TX_RECIPIENTS,
 })
 
 export const updateRecentTxRecipientsCache = (
