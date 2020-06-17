@@ -108,9 +108,9 @@ export class JoinCelo extends React.Component<Props, State> {
     ),
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps: Props) {
-    const prevCountryCodeAlpha2 = this.state.countryCodeAlpha2
-    const countryCodeAlpha2 = nextProps.route.params?.selectedCountryCodeAlpha2
+  componentDidUpdate(prevProps: Props) {
+    const prevCountryCodeAlpha2 = prevProps.route.params?.selectedCountryCodeAlpha2
+    const countryCodeAlpha2 = this.props.route.params?.selectedCountryCodeAlpha2
     if (prevCountryCodeAlpha2 !== countryCodeAlpha2 && countryCodeAlpha2) {
       const countryCallingCode =
         this.countries.getCountryByCodeAlpha2(countryCodeAlpha2)?.countryCallingCode ?? ''
