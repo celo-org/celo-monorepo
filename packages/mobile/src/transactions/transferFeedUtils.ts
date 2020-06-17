@@ -23,6 +23,27 @@ export function getDecryptedTransferFeedComment(
   return decryptedComment
 }
 
+// Hacky way to get escrow recipients until blockchain API
+// returns correct address (currently returns Escrow SC address)
+function getEscrowSentRecipientPhoneNumber(invitees: InviteDetails[], txTimestamp: number) {
+  const possiblePhoneNumbers = new Set()
+  invitees.forEach((inviteDetails) => {
+    const inviteTimestamp = inviteDetails.timestamp
+    // Invite timestamps are logged before invite tx is confirmed so considering
+    // a match to be when escrow tx timestamps is within 1 min of invite
+    if (Math.abs(txTimestamp - inviteTimestamp) < 1000 * 60) {
+      possiblePhoneNumbers.add(inviteDetails.e164Number)
+    }
+  })
+
+  // Set to null if there isn't a conclusive match
+  if (possiblePhoneNumbers.size !== 1) {
+    return null
+  }
+
+  return possiblePhoneNumbers.values().next().value
+}
+
 function getRecipient(
   type: TokenTransactionType,
   e164PhoneNumber: string | null,
@@ -31,32 +52,17 @@ function getRecipient(
   txTimestamp: number,
   invitees: InviteDetails[]
 ) {
-  // Hacky way to get escrow recipients until blockchain API
-  // returns correct address (currently returns Escrow SC address)
   let phoneNumber = e164PhoneNumber
+
   if (type === TokenTransactionType.EscrowSent) {
-    const possiblePhoneNumbers = new Set()
-    invitees.forEach((inviteDetails) => {
-      const inviteTimestamp = inviteDetails.timestamp
-      // Invite timestamps are logged before tx is confirmed so considering
-      // a match to be any two timestamps within 1 min of each other
-      if (txTimestamp - inviteTimestamp < 1000 * 60) {
-        possiblePhoneNumbers.add(inviteDetails.e164Number)
-      }
-    })
-
-    // Set to null if there isn't a conclusive match
-    if (possiblePhoneNumbers.size !== 1) {
-      phoneNumber = null
-    }
-
-    phoneNumber = possiblePhoneNumbers.values().next().value
+    phoneNumber = getEscrowSentRecipientPhoneNumber(invitees, txTimestamp)
   }
 
   if (!phoneNumber) {
     return undefined
   }
 
+  // Use the recentTxRecipientCache until the full cache is populated
   return Object.keys(recipientCache).length
     ? recipientCache[phoneNumber]
     : recentTxRecipientsCache[phoneNumber]

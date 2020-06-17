@@ -31,8 +31,6 @@ interface StateProps {
   addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient
   recentTxRecipientsCache: NumberToRecipient
-  // Note: Temporary solution until blockchain API can pull
-  // correct escrow information
   invitees: InviteDetails[]
 }
 

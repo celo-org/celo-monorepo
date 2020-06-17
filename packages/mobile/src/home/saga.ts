@@ -42,6 +42,7 @@ export function* refreshBalances() {
   yield put(fetchDollarBalance())
   yield put(fetchGoldBalance())
   yield put(fetchSentEscrowPayments())
+  // TODO: Find a better home for this
   yield put(fetchRecentTxRecipients())
 }
 
