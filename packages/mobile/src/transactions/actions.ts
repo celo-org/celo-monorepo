@@ -60,6 +60,7 @@ export interface NewTransactionsInFeedAction {
 export interface RefreshRecentTxRecipients {
   type: Actions.REFRESH_RECENT_TX_RECIPIENTS
 }
+
 export interface UpdatedRecentTxRecipientsCacheAction {
   type: Actions.UPDATE_RECENT_TX_RECIPIENT_CACHE
   recentTxRecipientsCache: NumberToRecipient
