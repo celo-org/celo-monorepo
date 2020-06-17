@@ -14,7 +14,7 @@ exports[`FiatExchange renders correctly 1`] = `
     style={
       Object {
         "alignItems": "center",
-        "backgroundColor": "#FFFFFF",
+        "backgroundColor": "transparent",
         "borderBottomColor": "#EDEEEF",
         "borderBottomWidth": 0,
         "flexDirection": "row",

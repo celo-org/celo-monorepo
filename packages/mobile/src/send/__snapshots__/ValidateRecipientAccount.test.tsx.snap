@@ -397,71 +397,57 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
             >
               <View
                 style={
-                  Array [
-                    Object {
-                      "alignItems": "center",
-                      "backgroundColor": "#FFFFFF",
-                      "borderRadius": 4,
-                      "elevation": 12,
-                      "justifyContent": "center",
-                      "shadowColor": "black",
-                      "shadowOffset": Object {
-                        "height": 6,
-                        "width": 0,
-                      },
-                      "shadowOpacity": 0.3,
-                      "shadowRadius": 9.600000000000001,
+                  Object {
+                    "alignItems": "center",
+                    "backgroundColor": "#FFFFFF",
+                    "borderRadius": 4,
+                    "elevation": 12,
+                    "height": 32,
+                    "justifyContent": "center",
+                    "shadowColor": "black",
+                    "shadowOffset": Object {
+                      "height": 6,
+                      "width": 0,
                     },
-                    Object {
-                      "height": 30,
-                      "width": 30,
-                    },
-                  ]
+                    "shadowOpacity": 0.3,
+                    "shadowRadius": 9.600000000000001,
+                    "width": 32,
+                  }
                 }
               >
                 <svg
                   fill="none"
-                  height="52.5"
-                  style={Object {}}
-                  viewBox="0 0 64 64"
-                  width="52.5"
-                  xmlns="http://www.w3.org/2000/svg"
+                  height="32"
+                  viewBox="0 0 32 32"
+                  width="32"
                 >
-                  <g
-                    filter="url(#filter0_d)"
-                    style={Object {}}
-                  >
-                    <line
-                      stroke="#2E3338"
-                      strokeLinecap="round"
-                      strokeWidth="2.5"
-                      style={Object {}}
-                      x1="23.5"
-                      x2="41"
-                      y1="26.5"
-                      y2="26.5"
-                    />
-                    <line
-                      stroke="#2E3338"
-                      strokeLinecap="round"
-                      strokeWidth="2.5"
-                      style={Object {}}
-                      x1="23.5"
-                      x2="41"
-                      y1="32.75"
-                      y2="32.75"
-                    />
-                    <line
-                      stroke="#2E3338"
-                      strokeLinecap="round"
-                      strokeWidth="2.5"
-                      style={Object {}}
-                      x1="23.5"
-                      x2="41"
-                      y1="39"
-                      y2="39"
-                    />
-                  </g>
+                  <line
+                    stroke="#2E3338"
+                    strokeLinecap="round"
+                    strokeWidth="2.5"
+                    x1="7.25"
+                    x2="24.75"
+                    y1="9.75"
+                    y2="9.75"
+                  />
+                  <line
+                    stroke="#2E3338"
+                    strokeLinecap="round"
+                    strokeWidth="2.5"
+                    x1="7.25"
+                    x2="24.75"
+                    y1="15.75"
+                    y2="15.75"
+                  />
+                  <line
+                    stroke="#2E3338"
+                    strokeLinecap="round"
+                    strokeWidth="2.5"
+                    x1="7.25"
+                    x2="24.75"
+                    y1="21.75"
+                    y2="21.75"
+                  />
                 </svg>
               </View>
             </View>
@@ -520,50 +506,57 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
                   Object {
                     "borderRadius": 8,
                   },
-                  Object {
-                    "height": 62,
-                    "justifyContent": "center",
-                    "paddingHorizontal": 16,
-                    "width": 235,
-                  },
+                  Array [
+                    Object {
+                      "justifyContent": "center",
+                    },
+                    undefined,
+                  ],
                 ]
               }
             >
-              <Text
+              <View
                 style={
-                  Array [
-                    Object {
-                      "color": "#9CA4A9",
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "textAlign": "left",
-                    },
-                  ]
+                  Object {
+                    "width": 200,
+                  }
                 }
               >
-                0x f1b1 d5a6 e772 8g30 9c4a
-              </Text>
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#9CA4A9",
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "paddingTop": 4,
-                      "textAlign": "right",
-                    },
-                  ]
-                }
-              >
-                025k 122d 71ad 75a6 1976
-              </Text>
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#9CA4A9",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "textAlign": "left",
+                      },
+                    ]
+                  }
+                >
+                  0x f1b1 d5a6 e772 8g30 9c4a
+                </Text>
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#9CA4A9",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "textAlign": "right",
+                      },
+                    ]
+                  }
+                >
+                  025k 122d 71ad 75a6 1976
+                </Text>
+              </View>
             </View>
             <Text
               style={
@@ -1186,71 +1179,57 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
             >
               <View
                 style={
-                  Array [
-                    Object {
-                      "alignItems": "center",
-                      "backgroundColor": "#FFFFFF",
-                      "borderRadius": 4,
-                      "elevation": 12,
-                      "justifyContent": "center",
-                      "shadowColor": "black",
-                      "shadowOffset": Object {
-                        "height": 6,
-                        "width": 0,
-                      },
-                      "shadowOpacity": 0.3,
-                      "shadowRadius": 9.600000000000001,
+                  Object {
+                    "alignItems": "center",
+                    "backgroundColor": "#FFFFFF",
+                    "borderRadius": 4,
+                    "elevation": 12,
+                    "height": 32,
+                    "justifyContent": "center",
+                    "shadowColor": "black",
+                    "shadowOffset": Object {
+                      "height": 6,
+                      "width": 0,
                     },
-                    Object {
-                      "height": 30,
-                      "width": 30,
-                    },
-                  ]
+                    "shadowOpacity": 0.3,
+                    "shadowRadius": 9.600000000000001,
+                    "width": 32,
+                  }
                 }
               >
                 <svg
                   fill="none"
-                  height="52.5"
-                  style={Object {}}
-                  viewBox="0 0 64 64"
-                  width="52.5"
-                  xmlns="http://www.w3.org/2000/svg"
+                  height="32"
+                  viewBox="0 0 32 32"
+                  width="32"
                 >
-                  <g
-                    filter="url(#filter0_d)"
-                    style={Object {}}
-                  >
-                    <line
-                      stroke="#2E3338"
-                      strokeLinecap="round"
-                      strokeWidth="2.5"
-                      style={Object {}}
-                      x1="23.5"
-                      x2="41"
-                      y1="26.5"
-                      y2="26.5"
-                    />
-                    <line
-                      stroke="#2E3338"
-                      strokeLinecap="round"
-                      strokeWidth="2.5"
-                      style={Object {}}
-                      x1="23.5"
-                      x2="41"
-                      y1="32.75"
-                      y2="32.75"
-                    />
-                    <line
-                      stroke="#2E3338"
-                      strokeLinecap="round"
-                      strokeWidth="2.5"
-                      style={Object {}}
-                      x1="23.5"
-                      x2="41"
-                      y1="39"
-                      y2="39"
-                    />
-                  </g>
+                  <line
+                    stroke="#2E3338"
+                    strokeLinecap="round"
+                    strokeWidth="2.5"
+                    x1="7.25"
+                    x2="24.75"
+                    y1="9.75"
+                    y2="9.75"
+                  />
+                  <line
+                    stroke="#2E3338"
+                    strokeLinecap="round"
+                    strokeWidth="2.5"
+                    x1="7.25"
+                    x2="24.75"
+                    y1="15.75"
+                    y2="15.75"
+                  />
+                  <line
+                    stroke="#2E3338"
+                    strokeLinecap="round"
+                    strokeWidth="2.5"
+                    x1="7.25"
+                    x2="24.75"
+                    y1="21.75"
+                    y2="21.75"
+                  />
                 </svg>
               </View>
             </View>
@@ -1309,50 +1288,57 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                   Object {
                     "borderRadius": 8,
                   },
-                  Object {
-                    "height": 62,
-                    "justifyContent": "center",
-                    "paddingHorizontal": 16,
-                    "width": 235,
-                  },
+                  Array [
+                    Object {
+                      "justifyContent": "center",
+                    },
+                    undefined,
+                  ],
                 ]
               }
             >
-              <Text
+              <View
                 style={
-                  Array [
-                    Object {
-                      "color": "#9CA4A9",
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "textAlign": "left",
-                    },
-                  ]
+                  Object {
+                    "width": 200,
+                  }
                 }
               >
-                0x f1b1 d5a6 e772 8g30 9c4a
-              </Text>
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#9CA4A9",
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "paddingTop": 4,
-                      "textAlign": "right",
-                    },
-                  ]
-                }
-              >
-                025k 122d 71ad 75a6 1976
-              </Text>
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#9CA4A9",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "textAlign": "left",
+                      },
+                    ]
+                  }
+                >
+                  0x f1b1 d5a6 e772 8g30 9c4a
+                </Text>
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#9CA4A9",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "textAlign": "right",
+                      },
+                    ]
+                  }
+                >
+                  025k 122d 71ad 75a6 1976
+                </Text>
+              </View>
             </View>
             <Text
               style={
