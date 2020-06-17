@@ -9,15 +9,11 @@ import AccountKeyEducation from 'src/account/AccountKeyEducation'
 import Analytics from 'src/account/Analytics'
 import DataSaver from 'src/account/DataSaver'
 import EditProfile from 'src/account/EditProfile'
-import FiatExchange from 'src/account/FiatExchange'
-import GoldEducation from 'src/account/GoldEducation'
-import Invite from 'src/account/Invite'
 import InviteReview from 'src/account/InviteReview'
 import Licenses from 'src/account/Licenses'
 import Profile from 'src/account/Profile'
 import { PincodeType } from 'src/account/reducer'
 import Security from 'src/account/Security'
-import Support from 'src/account/Support'
 import SupportContact from 'src/account/SupportContact'
 import { CustomEventNames } from 'src/analytics/constants'
 import AppLoading from 'src/app/AppLoading'
@@ -25,7 +21,6 @@ import Debug from 'src/app/Debug'
 import ErrorScreen from 'src/app/ErrorScreen'
 import UpgradeScreen from 'src/app/UpgradeScreen'
 import BackupComplete from 'src/backup/BackupComplete'
-import BackupIntroduction, { navOptionsForAccount } from 'src/backup/BackupIntroduction'
 import BackupPhrase, { navOptionsForBackupPhrase } from 'src/backup/BackupPhrase'
 import BackupQuiz, { navOptionsForQuiz } from 'src/backup/BackupQuiz'
 import BackupSocial from 'src/backup/BackupSocial'
@@ -361,11 +356,6 @@ const exchangeScreens = (Navigator: typeof Stack) => (
 const backupScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen
-      name={Screens.BackupIntroduction}
-      component={BackupIntroduction}
-      options={navOptionsForAccount}
-    />
-    <Navigator.Screen
       name={Screens.AccountKeyEducation}
       component={AccountKeyEducation}
       options={noHeader}
@@ -401,7 +391,6 @@ const settingsScreens = (Navigator: typeof Stack) => (
       component={EditProfile}
     />
     <Navigator.Screen options={headerWithBackButton} name={Screens.Profile} component={Profile} />
-    <Navigator.Screen options={headerWithBackButton} name={Screens.Invite} component={Invite} />
     <Navigator.Screen
       options={headerWithBackButton}
       name={Screens.InviteReview}
@@ -413,16 +402,10 @@ const settingsScreens = (Navigator: typeof Stack) => (
       component={SelectLocalCurrency}
     />
     <Navigator.Screen options={headerWithBackButton} name={Screens.Licenses} component={Licenses} />
-    <Navigator.Screen options={headerWithBackButton} name={Screens.Support} component={Support} />
     <Navigator.Screen
       options={headerWithBackButton}
       name={Screens.SupportContact}
       component={SupportContact}
-    />
-    <Navigator.Screen
-      options={headerWithBackButton}
-      name={Screens.FiatExchange}
-      component={FiatExchange}
     />
   </>
 )
@@ -451,7 +434,6 @@ const generalScreens = (Navigator: typeof Stack) => (
       component={TransactionReview}
       options={transactionReviewOptions}
     />
-    <Navigator.Screen name={Screens.GoldEducation} component={GoldEducation} options={noHeader} />
     <Navigator.Screen name={Screens.FeeEducation} component={FeeEducation} />
   </>
 )

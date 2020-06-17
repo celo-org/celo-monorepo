@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 
+export const VERSION = process.env.npm_package_version
 export const DEV_MODE = process.env.NODE_ENV !== 'production'
 
 export const DEV_PUBLIC_KEY =
