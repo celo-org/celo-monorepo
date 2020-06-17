@@ -26,6 +26,7 @@ import { callToActNotificationSelector, getActiveNotificationCount } from 'src/h
 import SendOrRequestBar from 'src/home/SendOrRequestBar'
 import { Namespaces, withTranslation } from 'src/i18n'
 import Logo from 'src/icons/Logo.v2'
+import { importContacts } from 'src/identity/actions'
 import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
@@ -33,6 +34,7 @@ import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
 import { initializeSentryUserContext } from 'src/sentry/actions'
 import TransactionsList from 'src/transactions/TransactionsList'
+import { checkContactsPermission } from 'src/utils/permissions'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const HEADER_BUTTON_MARGIN = 12
@@ -44,6 +46,7 @@ interface StateProps {
   callToActNotification: boolean
   recipientCache: NumberToRecipient
   appConnected: boolean
+  numberVerified: boolean
 }
 
 interface DispatchProps {
@@ -52,6 +55,7 @@ interface DispatchProps {
   exitBackupFlow: typeof exitBackupFlow
   setLoading: typeof setLoading
   showMessage: typeof showMessage
+  importContacts: typeof importContacts
 }
 
 type Props = StateProps & DispatchProps & WithTranslation
@@ -62,6 +66,7 @@ const mapDispatchToProps = {
   exitBackupFlow,
   setLoading,
   showMessage,
+  importContacts,
 }
 
 const mapStateToProps = (state: RootState): StateProps => ({
@@ -71,6 +76,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   callToActNotification: callToActNotificationSelector(state),
   recipientCache: recipientCacheSelector(state),
   appConnected: isAppConnected(state),
+  numberVerified: state.app.numberVerified,
 })
 
 const AnimatedSectionList = Animated.createAnimatedComponent(SectionList)
@@ -90,11 +96,30 @@ export class WalletHome extends React.Component<Props> {
     this.props.refreshAllBalances()
   }
 
-  componentDidMount() {
+  componentDidMount = () => {
     // TODO find a better home for this, its unrelated to wallet home
     this.props.initializeSentryUserContext()
     if (SHOW_TESTNET_BANNER) {
       this.showTestnetBanner()
+    }
+
+    // Waiting 1/2 sec before triggering to allow
+    // rest of feed to load unencumbered
+    setTimeout(this.tryImportContacts, 500)
+  }
+
+  tryImportContacts = async () => {
+    const { numberVerified, recipientCache } = this.props
+
+    // Only import contacts if number is verified and
+    // recip cache is empty so we haven't already
+    if (!numberVerified || recipientCache.length) {
+      return
+    }
+
+    const hasGivenContactPermission = await checkContactsPermission()
+    if (hasGivenContactPermission) {
+      this.props.importContacts()
     }
   }
 
