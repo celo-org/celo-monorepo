@@ -17,6 +17,7 @@ import { Screens } from 'src/navigator/Screens'
 import { deleteChainDataAndRestartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
 import { setContractKitReady } from 'src/web3/actions'
+import { getContractKit } from 'src/web3/contracts'
 import { fornoSelector } from 'src/web3/selectors'
 
 const gethEmitter = new NativeEventEmitter(NativeModules.RNGeth)
@@ -43,6 +44,19 @@ export function* waitForGethConnectivity() {
     if (action.connected) {
       return
     }
+  }
+}
+
+export function* waitForNextBlock() {
+  const startTime = Date.now()
+  const contractKit = yield call(getContractKit)
+  const initialBlockNumber = yield call(contractKit.web3.eth.getBlockNumber)
+  while (Date.now() - startTime < NEW_BLOCK_TIMEOUT) {
+    const blockNumber = yield call(contractKit.web3.eth.getBlockNumber)
+    if (blockNumber > initialBlockNumber) {
+      return
+    }
+    yield delay(GETH_MONITOR_DELAY)
   }
 }
 

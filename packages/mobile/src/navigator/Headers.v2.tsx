@@ -20,6 +20,11 @@ export const noHeader: StackNavigationOptions = {
   headerShown: false,
 }
 
+export const noHeaderGestureDisabled: StackNavigationOptions = {
+  headerShown: false,
+  gestureEnabled: false,
+}
+
 const styles = StyleSheet.create({
   headerTitle: {
     ...fontStyles.regular500,

@@ -42,9 +42,7 @@ import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
 import FeeExchangeEducation from 'src/exchange/FeeExchangeEducation'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
-import PhoneNumberLookupQuotaScreen, {
-  phoneNumberLookupQuotaScreeOptions,
-} from 'src/identity/PhoneNumberLookupQuotaScreen'
+import PhoneNumberLookupQuotaScreen from 'src/identity/PhoneNumberLookupQuotaScreen'
 import ImportWallet from 'src/import/ImportWallet'
 import ImportWalletEmpty from 'src/import/ImportWalletEmpty'
 import ImportWalletSocial from 'src/import/ImportWalletSocial'
@@ -60,6 +58,7 @@ import {
   headerWithCancelButton,
   headerWithCloseButton,
   noHeader,
+  noHeaderGestureDisabled,
   nuxNavigationOptions,
   nuxNavigationOptionsNoBackButton,
 } from 'src/navigator/Headers.v2'
@@ -112,8 +111,16 @@ const RootStack = createStackNavigator<StackParamList>()
 const commonScreens = (Navigator: typeof Stack) => {
   return (
     <>
-      <Navigator.Screen name={Screens.Language} component={Language} options={noHeader} />
-      <Navigator.Screen name={Screens.PincodeEnter} component={PincodeEnter} options={noHeader} />
+      <Navigator.Screen
+        name={Screens.Language}
+        component={Language}
+        options={headerWithBackButton}
+      />
+      <Navigator.Screen
+        name={Screens.PincodeEnter}
+        component={PincodeEnter}
+        options={headerWithBackButton}
+      />
       <Navigator.Screen name={Screens.ErrorScreen} component={ErrorScreen} options={noHeader} />
       <Navigator.Screen name={Screens.UpgradeScreen} component={UpgradeScreen} />
       <Navigator.Screen name={Screens.DappKitAccountAuth} component={DappKitAccountScreen} />
@@ -124,7 +131,7 @@ const commonScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen
         name={Screens.PhoneNumberLookupQuota}
         component={PhoneNumberLookupQuotaScreen}
-        options={phoneNumberLookupQuotaScreeOptions}
+        options={noHeaderGestureDisabled}
       />
     </>
   )
@@ -145,6 +152,7 @@ const verificationScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen
         name={Screens.VerificationLoadingScreen}
         component={VerificationLoadingScreen}
+        options={noHeaderGestureDisabled}
       />
       <Navigator.Screen
         name={Screens.VerificationInterstitialScreen}
@@ -217,11 +225,6 @@ const nuxScreens = (Navigator: typeof Stack) => (
   </>
 )
 
-const emptyWithBackButtonHeaderOption = () => ({
-  ...emptyHeader,
-  headerLeft: () => <BackButton />,
-})
-
 const sendScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen name={Screens.Send} component={Send} options={sendScreenNavOptions} />
@@ -259,22 +262,22 @@ const sendScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen
       name={Screens.IncomingPaymentRequestListScreen}
       component={IncomingPaymentRequestListScreen}
-      options={emptyWithBackButtonHeaderOption}
+      options={headerWithBackButton}
     />
     <Navigator.Screen
       name={Screens.OutgoingPaymentRequestListScreen}
       component={OutgoingPaymentRequestListScreen}
-      options={emptyWithBackButtonHeaderOption}
+      options={headerWithBackButton}
     />
     <Navigator.Screen
       name={Screens.EscrowedPaymentListScreen}
       component={EscrowedPaymentListScreen}
-      options={emptyWithBackButtonHeaderOption}
+      options={headerWithBackButton}
     />
     <Navigator.Screen
       name={Screens.ReclaimPaymentConfirmationScreen}
       component={ReclaimPaymentConfirmationScreen}
-      options={emptyWithBackButtonHeaderOption}
+      options={headerWithBackButton}
     />
   </>
 )
@@ -374,7 +377,7 @@ const backupScreens = (Navigator: typeof Stack) => (
 
 const settingsScreens = (Navigator: typeof Stack) => (
   <>
-    <Navigator.Screen options={headerWithBackButton} name={Screens.Account} component={Account} />
+    <Navigator.Screen options={noHeader} name={Screens.Account} component={Account} />
     <Navigator.Screen options={headerWithBackButton} name={Screens.Security} component={Security} />
     <Navigator.Screen
       options={headerWithBackButton}

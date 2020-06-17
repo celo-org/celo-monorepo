@@ -9,7 +9,6 @@ import {
   phoneNumberHashIsValidIfExists,
 } from '../common/input-validation'
 import logger from '../common/logger'
-import { getTransaction } from '../database/database'
 import { incrementQueryCount } from '../database/wrappers/account'
 import { getKeyProvider } from '../key-management/key-provider'
 import { getRemainingQueryCount } from './query-quota'
@@ -25,9 +24,7 @@ export async function handleGetBlindedMessageForSalt(
   response: Response
 ) {
   logger.info('Begin getBlindedSalt request')
-  let trx
   try {
-    trx = await getTransaction()
     if (!isValidGetSignatureInput(request.body)) {
       respondWithError(response, 400, ErrorMessages.INVALID_INPUT)
       return
@@ -38,26 +35,20 @@ export async function handleGetBlindedMessageForSalt(
     }
 
     const { account, blindedQueryPhoneNumber, hashedPhoneNumber } = request.body
-    const remainingQueryCount = await getRemainingQueryCount(trx, account, hashedPhoneNumber)
+    const remainingQueryCount = await getRemainingQueryCount(account, hashedPhoneNumber)
     if (remainingQueryCount <= 0) {
-      logger.debug('rolling back db transaction due to no remaining query count')
-      trx.rollback()
+      logger.debug('No remaining query count')
       respondWithError(response, 403, ErrorMessages.EXCEEDED_QUOTA)
       return
     }
     const keyProvider = getKeyProvider()
     const privateKey = keyProvider.getPrivateKey()
     const signature = computeBlindedSignature(blindedQueryPhoneNumber, privateKey)
-    await incrementQueryCount(account, trx)
-    logger.debug('committing db transactions for salt retrieval data')
-    await trx.commit()
+    await incrementQueryCount(account)
+    logger.debug('Salt retrieval success')
     response.json({ success: true, signature })
   } catch (error) {
     logger.error('Failed to getSalt', error)
-    if (trx) {
-      logger.debug('rolling back db transaction')
-      trx.rollback()
-    }
     respondWithError(response, 500, ErrorMessages.UNKNOWN_ERROR)
   }
 }

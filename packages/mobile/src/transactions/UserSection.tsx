@@ -139,8 +139,9 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: colors.gray2,
     flexDirection: 'row',
+    justifyContent: 'space-between',
     paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingVertical: 16,
   },
   accountLabel: {
     ...fontStyles.label,
