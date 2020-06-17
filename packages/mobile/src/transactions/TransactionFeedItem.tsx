@@ -82,6 +82,7 @@ const styles = StyleSheet.create({
   subtitle: {
     ...fontStyles.small,
     color: colors.gray4,
+    paddingTop: 2,
   },
   amount: {
     ...fontStyles.regular500,

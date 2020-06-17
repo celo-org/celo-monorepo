@@ -10,7 +10,7 @@ import { BackHandler, ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { setRetryVerificationWithForno } from 'src/account/actions'
-import CancelButton from 'src/components/CancelButton'
+import CancelButton from 'src/components/CancelButton.v2'
 import Carousel, { CarouselItem } from 'src/components/Carousel'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -28,7 +28,7 @@ import { toggleFornoMode } from 'src/web3/actions'
 const TAG = 'VerificationLoadingScreen'
 
 interface StateProps {
-  e164Number: string
+  e164Number: string | null
   verificationStatus: VerificationStatus
   retryWithForno: boolean
   fornoMode: boolean
@@ -63,8 +63,6 @@ const mapStateToProps = (state: RootState): StateProps => {
 }
 
 class VerificationLoadingScreen extends React.Component<Props> {
-  static navigationOptions = { gestureEnabled: false, header: null }
-
   componentDidMount() {
     BackHandler.addEventListener('hardwareBackPress', this.handleBackButton)
     this.props.startVerification()
@@ -166,6 +164,8 @@ const styles = StyleSheet.create({
   buttonCancelContainer: {
     position: 'absolute',
     left: 5,
+    // Need to set zIndex so custom nav is on top of empty default nav
+    zIndex: 1,
   },
   statusContainer: {
     alignItems: 'center',

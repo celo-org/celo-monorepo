@@ -1,21 +1,18 @@
-import QRCodeBorderlessIcon from '@celo/react-components/icons/QRCodeBorderless'
-import Times from '@celo/react-components/icons/Times'
 import colors from '@celo/react-components/styles/colors.v2'
 import { RouteProp } from '@react-navigation/core'
 import { createStackNavigator } from '@react-navigation/stack'
 import * as React from 'react'
 import SplashScreen from 'react-native-splash-screen'
 import Account from 'src/account/Account'
+import AccountKeyEducation from 'src/account/AccountKeyEducation'
 import Analytics from 'src/account/Analytics'
 import DataSaver from 'src/account/DataSaver'
-import DollarEducation from 'src/account/DollarEducation'
 import EditProfile from 'src/account/EditProfile'
 import FiatExchange from 'src/account/FiatExchange'
 import GoldEducation from 'src/account/GoldEducation'
 import Invite from 'src/account/Invite'
 import InviteReview from 'src/account/InviteReview'
 import Licenses from 'src/account/Licenses'
-import PhotosEducation from 'src/account/PhotosEducation'
 import Profile from 'src/account/Profile'
 import { PincodeType } from 'src/account/reducer'
 import Security from 'src/account/Security'
@@ -59,20 +56,25 @@ import {
   headerWithBackButton,
   headerWithCancelButton,
   noHeader,
+  noHeaderGestureDisabled,
   nuxNavigationOptions,
   nuxNavigationOptionsNoBackButton,
 } from 'src/navigator/Headers.v2'
-import { navigate, navigateBack } from 'src/navigator/NavigationService'
+import { navigateBack, navigateToExchangeHome } from 'src/navigator/NavigationService'
 import QRNavigator from 'src/navigator/QRNavigator'
 import { Screens } from 'src/navigator/Screens'
-import { TopBarIconButton, TopBarTextButton } from 'src/navigator/TopBarButton.v2'
+import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
 import ImportContactsScreen from 'src/onboarding/contacts/ImportContactsScreen'
 import OnboardingSuccessScreen from 'src/onboarding/success/OnboardingSuccessScreen'
 import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import OutgoingPaymentRequestListScreen from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
-import PaymentRequestConfirmation from 'src/paymentRequest/PaymentRequestConfirmation'
-import PaymentRequestUnavailable from 'src/paymentRequest/PaymentRequestUnavailable'
+import PaymentRequestConfirmation, {
+  paymentConfirmationScreenNavOptions,
+} from 'src/paymentRequest/PaymentRequestConfirmation'
+import PaymentRequestUnavailable, {
+  paymentRequestUnavailableScreenNavOptions,
+} from 'src/paymentRequest/PaymentRequestUnavailable'
 import PincodeEducation from 'src/pincode/PincodeEducation'
 import PincodeEnter from 'src/pincode/PincodeEnter'
 import PincodeSet from 'src/pincode/PincodeSet'
@@ -81,11 +83,15 @@ import { store } from 'src/redux/store'
 import JoinCelo from 'src/registration/JoinCelo'
 import RegulatoryTerms from 'src/registration/RegulatoryTerms'
 import FeeEducation from 'src/send/FeeEducation'
-import Send from 'src/send/Send'
-import SendAmount from 'src/send/SendAmount'
-import SendConfirmation from 'src/send/SendConfirmation'
-import ValidateRecipientAccount from 'src/send/ValidateRecipientAccount'
-import ValidateRecipientIntro from 'src/send/ValidateRecipientIntro'
+import Send, { sendScreenNavOptions } from 'src/send/Send'
+import SendAmount, { sendAmountScreenNavOptions } from 'src/send/SendAmount'
+import SendConfirmation, { sendConfirmationScreenNavOptions } from 'src/send/SendConfirmation'
+import ValidateRecipientAccount, {
+  validateRecipientAccountScreenNavOptions,
+} from 'src/send/ValidateRecipientAccount'
+import ValidateRecipientIntro, {
+  validateRecipientIntroScreenNavOptions,
+} from 'src/send/ValidateRecipientIntro'
 import SetClock from 'src/set-clock/SetClock'
 import TransactionReview from 'src/transactions/TransactionReview'
 import { getDatetimeDisplayString } from 'src/utils/time'
@@ -100,8 +106,16 @@ const Stack = createStackNavigator<StackParamList>()
 const commonScreens = (Navigator: typeof Stack) => {
   return (
     <>
-      <Navigator.Screen name={Screens.Language} component={Language} options={noHeader} />
-      <Navigator.Screen name={Screens.PincodeEnter} component={PincodeEnter} options={noHeader} />
+      <Navigator.Screen
+        name={Screens.Language}
+        component={Language}
+        options={headerWithBackButton}
+      />
+      <Navigator.Screen
+        name={Screens.PincodeEnter}
+        component={PincodeEnter}
+        options={headerWithBackButton}
+      />
       <Navigator.Screen name={Screens.ErrorScreen} component={ErrorScreen} options={noHeader} />
       <Navigator.Screen name={Screens.UpgradeScreen} component={UpgradeScreen} />
       <Navigator.Screen name={Screens.DappKitAccountAuth} component={DappKitAccountScreen} />
@@ -112,6 +126,7 @@ const commonScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen
         name={Screens.PhoneNumberLookupQuota}
         component={PhoneNumberLookupQuotaScreen}
+        options={noHeaderGestureDisabled}
       />
     </>
   )
@@ -132,6 +147,7 @@ const verificationScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen
         name={Screens.VerificationLoadingScreen}
         component={VerificationLoadingScreen}
+        options={noHeaderGestureDisabled}
       />
       <Navigator.Screen
         name={Screens.VerificationInterstitialScreen}
@@ -192,121 +208,59 @@ const nuxScreens = (Navigator: typeof Stack) => (
   </>
 )
 
-const sendScreenOptions = ({ route }: { route: RouteProp<StackParamList, Screens.Send> }) => {
-  const goQr = () => navigate(Screens.QRNavigator)
-  return {
-    ...emptyHeader,
-    headerLeft: () => (
-      <TopBarIconButton
-        icon={<Times />}
-        onPress={navigateBack}
-        eventName={
-          route.params?.isRequest ? CustomEventNames.send_cancel : CustomEventNames.request_cancel
-        }
-      />
-    ),
-    headerLeftContainerStyle: { paddingLeft: 20 },
-    headerRight: () => (
-      <TopBarIconButton
-        icon={<QRCodeBorderlessIcon height={32} color={colors.greenUI} />}
-        eventName={
-          route.params?.isRequest ? CustomEventNames.send_scan : CustomEventNames.request_scan
-        }
-        onPress={goQr}
-      />
-    ),
-    headerRightContainerStyle: { paddingRight: 16 },
-    headerTitle: i18n.t(`sendFlow7:${route.params?.isRequest ? 'request' : 'send'}`),
-  }
-}
-
-const sendAmountScreenOptions = ({
-  route,
-}: {
-  route: RouteProp<StackParamList, Screens.SendAmount>
-}) => {
-  return {
-    ...emptyHeader,
-    headerLeft: () => <BackButton eventName={CustomEventNames.send_amount_back} />,
-    headerTitle: () => (
-      <HeaderTitleWithBalance
-        title={i18n.t(`sendFlow7:${route.params?.isRequest ? 'request' : 'send'}`)}
-        token={CURRENCY_ENUM.DOLLAR}
-      />
-    ),
-  }
-}
-
-const emptyWithBackButtonHeaderOption = () => ({
-  ...emptyHeader,
-  headerLeft: () => <BackButton />,
-})
-
-const navigateHome = () => navigate(Screens.WalletHome)
-
-const paymentRequestUnavailableScreenOptions = ({
-  route,
-}: {
-  route: RouteProp<StackParamList, Screens.PaymentRequestUnavailable>
-}) => ({
-  ...emptyHeader,
-  headerLeft: () => <TopBarIconButton icon={<Times />} onPress={navigateHome} />,
-  headerLeftContainerStyle: { paddingLeft: 20 },
-})
-
 const sendScreens = (Navigator: typeof Stack) => (
   <>
-    <Navigator.Screen name={Screens.Send} component={Send} options={sendScreenOptions} />
+    <Navigator.Screen name={Screens.Send} component={Send} options={sendScreenNavOptions} />
     <Navigator.Screen name={Screens.QRNavigator} component={QRNavigator} options={noHeader} />
     <Navigator.Screen
       name={Screens.SendAmount}
       component={SendAmount}
-      options={sendAmountScreenOptions}
+      options={sendAmountScreenNavOptions}
     />
     <Navigator.Screen
       name={Screens.SendConfirmation}
       component={SendConfirmation}
-      options={emptyWithBackButtonHeaderOption}
+      options={sendConfirmationScreenNavOptions}
     />
     <Navigator.Screen
       name={Screens.ValidateRecipientIntro}
       component={ValidateRecipientIntro}
-      options={emptyWithBackButtonHeaderOption}
+      options={validateRecipientIntroScreenNavOptions}
     />
     <Navigator.Screen
       name={Screens.ValidateRecipientAccount}
       component={ValidateRecipientAccount}
-      options={emptyWithBackButtonHeaderOption}
+      options={validateRecipientAccountScreenNavOptions}
     />
     <Navigator.Screen
       name={Screens.PaymentRequestUnavailable}
       component={PaymentRequestUnavailable}
-      options={paymentRequestUnavailableScreenOptions}
+      options={paymentRequestUnavailableScreenNavOptions}
     />
     <Navigator.Screen
       name={Screens.PaymentRequestConfirmation}
       component={PaymentRequestConfirmation}
-      options={emptyWithBackButtonHeaderOption}
+      options={paymentConfirmationScreenNavOptions}
     />
     <Navigator.Screen
       name={Screens.IncomingPaymentRequestListScreen}
       component={IncomingPaymentRequestListScreen}
-      options={emptyWithBackButtonHeaderOption}
+      options={headerWithBackButton}
     />
     <Navigator.Screen
       name={Screens.OutgoingPaymentRequestListScreen}
       component={OutgoingPaymentRequestListScreen}
-      options={emptyWithBackButtonHeaderOption}
+      options={headerWithBackButton}
     />
     <Navigator.Screen
       name={Screens.EscrowedPaymentListScreen}
       component={EscrowedPaymentListScreen}
-      options={emptyWithBackButtonHeaderOption}
+      options={headerWithBackButton}
     />
     <Navigator.Screen
       name={Screens.ReclaimPaymentConfirmationScreen}
       component={ReclaimPaymentConfirmationScreen}
-      options={emptyWithBackButtonHeaderOption}
+      options={headerWithBackButton}
     />
   </>
 )
@@ -336,7 +290,6 @@ const exchangeReviewScreenOptions = ({
 }) => {
   const { makerToken } = route.params?.exchangeInput
   const isDollarToGold = makerToken === CURRENCY_ENUM.DOLLAR
-  const goExchangeHome = () => navigate(Screens.ExchangeHomeScreen)
   const title = isDollarToGold ? i18n.t('exchangeFlow9:buyGold') : i18n.t('exchangeFlow9:sellGold')
   const cancelEventName = isDollarToGold
     ? CustomEventNames.gold_buy_cancel
@@ -346,7 +299,9 @@ const exchangeReviewScreenOptions = ({
     : CustomEventNames.gold_sell_edit
   return {
     ...headerWithCancelButton,
-    headerLeft: () => <CancelButton onCancel={goExchangeHome} eventName={cancelEventName} />,
+    headerLeft: () => (
+      <CancelButton onCancel={navigateToExchangeHome} eventName={cancelEventName} />
+    ),
     headerRight: () => (
       <TopBarTextButton
         title={i18n.t('global:edit')}
@@ -383,6 +338,11 @@ const backupScreens = (Navigator: typeof Stack) => (
       options={navOptionsForAccount}
     />
     <Navigator.Screen
+      name={Screens.AccountKeyEducation}
+      component={AccountKeyEducation}
+      options={noHeader}
+    />
+    <Navigator.Screen
       name={Screens.BackupPhrase}
       component={BackupPhrase}
       options={navOptionsForBackupPhrase}
@@ -400,7 +360,7 @@ const backupScreens = (Navigator: typeof Stack) => (
 
 const settingsScreens = (Navigator: typeof Stack) => (
   <>
-    <Navigator.Screen options={headerWithBackButton} name={Screens.Account} component={Account} />
+    <Navigator.Screen options={noHeader} name={Screens.Account} component={Account} />
     <Navigator.Screen options={headerWithBackButton} name={Screens.Security} component={Security} />
     <Navigator.Screen
       options={headerWithBackButton}
@@ -458,14 +418,12 @@ const transactionReviewOptions = ({
 const generalScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen name={Screens.SetClock} component={SetClock} />
-    <Navigator.Screen name={Screens.DollarEducation} component={DollarEducation} />
     <Navigator.Screen
       name={Screens.TransactionReview}
       component={TransactionReview}
       options={transactionReviewOptions}
     />
-    <Navigator.Screen name={Screens.PhotosEducation} component={PhotosEducation} />
-    <Navigator.Screen name={Screens.GoldEducation} component={GoldEducation} />
+    <Navigator.Screen name={Screens.GoldEducation} component={GoldEducation} options={noHeader} />
     <Navigator.Screen name={Screens.FeeEducation} component={FeeEducation} />
   </>
 )
