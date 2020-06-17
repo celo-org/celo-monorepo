@@ -13,7 +13,7 @@ exports[`Invite renders correctly with no recipients 1`] = `
     style={
       Object {
         "alignItems": "center",
-        "backgroundColor": "#FFFFFF",
+        "backgroundColor": "transparent",
         "borderBottomColor": "#EDEEEF",
         "borderBottomWidth": 0,
         "flexDirection": "row",
@@ -323,7 +323,7 @@ exports[`Invite renders correctly with recipients 1`] = `
     style={
       Object {
         "alignItems": "center",
-        "backgroundColor": "#FFFFFF",
+        "backgroundColor": "transparent",
         "borderBottomColor": "#EDEEEF",
         "borderBottomWidth": 0,
         "flexDirection": "row",

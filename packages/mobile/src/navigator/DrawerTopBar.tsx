@@ -1,9 +1,9 @@
-import HamburgerIcon from '@celo/react-components/icons/Hamburger'
 import colors from '@celo/react-components/styles/colors.v2'
 import { useNavigation } from '@react-navigation/native'
 import * as React from 'react'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
 import Animated, { cond, greaterThan } from 'react-native-reanimated'
+import Hamburger from 'src/icons/Hamburger'
 
 interface Props {
   middleElement?: React.ReactNode
@@ -26,7 +26,7 @@ function DrawerTopBar({ middleElement, scrollPosition }: Props) {
       {/*
       // @ts-ignore Only used in a drawer */}
       <TouchableOpacity style={styles.hamburger} onPress={navigation.toggleDrawer}>
-        <HamburgerIcon />
+        <Hamburger />
       </TouchableOpacity>
       {middleElement}
       <View style={styles.spacer} />
@@ -42,8 +42,8 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     height: 62,
+    backgroundColor: 'transparent',
     alignItems: 'center',
-    backgroundColor: colors.background,
     justifyContent: 'space-between',
   },
   withBorderBottom: {
