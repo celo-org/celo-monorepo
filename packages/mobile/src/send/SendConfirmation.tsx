@@ -16,10 +16,9 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { TokenTransactionType } from 'src/apollo/types'
 import BackButton from 'src/components/BackButton.v2'
 import CommentTextInput from 'src/components/CommentTextInput'
-import CurrencyDisplay, { DisplayType, FormatType } from 'src/components/CurrencyDisplay'
-import FeeIcon from 'src/components/FeeIcon'
+import CurrencyDisplay, { DisplayType } from 'src/components/CurrencyDisplay'
+import FeeDrawer from 'src/components/FeeDrawer'
 import InviteOptionsModal from 'src/components/InviteOptionsModal'
-import LineItemRow from 'src/components/LineItemRow.v2'
 import ShortenedAddress from 'src/components/ShortenedAddress'
 import TotalLineItem from 'src/components/TotalLineItem.v2'
 import { FeeType } from 'src/fees/actions'
@@ -263,13 +262,9 @@ export class SendConfirmation extends React.Component<Props, State> {
 
     const isInvite = type === TokenTransactionType.InviteSent
     const inviteFee = getInvitationVerificationFeeInDollars()
-    const inviteFeeAmount = {
-      value: inviteFee,
-      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-    }
 
-    const subtotalAmount = amount.isGreaterThan(0) && {
-      value: amount,
+    const subtotalAmount = {
+      value: amount || inviteFee,
       currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
     }
 
@@ -293,41 +288,23 @@ export class SendConfirmation extends React.Component<Props, State> {
       // so we adjust it here
       const securityFee = isInvite && fee ? fee.minus(inviteFee) : fee
 
-      const securityFeeAmount = securityFee && {
-        value: securityFee,
-        currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-      }
-
       const totalAmount = {
         value: amountWithFee,
         currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
       }
 
-      // Replace fee lines with a fee drawer
       return (
         <View style={styles.feeContainer}>
-          {subtotalAmount && (
-            <LineItemRow
-              title={t('global:subtotal')}
-              amount={<CurrencyDisplay amount={subtotalAmount} />}
-            />
-          )}
-          {isInvite && (
-            <LineItemRow
-              title={t('inviteFee')}
-              amount={<CurrencyDisplay amount={inviteFeeAmount} />}
-            />
-          )}
-          <LineItemRow
-            title={t('securityFee')}
-            titleIcon={<FeeIcon />}
-            amount={
-              securityFeeAmount && (
-                <CurrencyDisplay amount={securityFeeAmount} formatType={FormatType.Fee} />
-              )
-            }
-            isLoading={asyncFee.loading}
-            hasError={!!asyncFee.error}
+          <FeeDrawer
+            testID={'feeDrawer/SendConfirmation'}
+            isEstimate={true}
+            currency={CURRENCY_ENUM.DOLLAR}
+            inviteFee={inviteFee}
+            isInvite={isInvite}
+            securityFee={securityFee}
+            feeLoading={asyncFee.loading}
+            feeHasError={!!asyncFee.error}
+            totalFee={fee}
           />
           <TotalLineItem amount={totalAmount} />
         </View>
@@ -373,7 +350,7 @@ export class SendConfirmation extends React.Component<Props, State> {
             <CurrencyDisplay
               type={DisplayType.Default}
               style={styles.amount}
-              amount={subtotalAmount || inviteFeeAmount}
+              amount={subtotalAmount}
             />
             <CommentTextInput
               testID={'send'}

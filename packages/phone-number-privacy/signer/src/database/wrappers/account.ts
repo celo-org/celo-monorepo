@@ -1,4 +1,3 @@
-import { Transaction } from 'knex'
 import { ErrorMessages } from '../../common/error-utils'
 import logger from '../../common/logger'
 import { getDatabase } from '../database'
@@ -11,11 +10,10 @@ function accounts() {
 /*
  * Returns how many queries the account has already performed.
  */
-export async function getPerformedQueryCount(account: string, trx: Transaction): Promise<number> {
+export async function getPerformedQueryCount(account: string): Promise<number> {
   logger.debug('Getting performed query count')
   try {
-    const queryCounts = await trx(ACCOUNTS_TABLE)
-      .forUpdate()
+    const queryCounts = await accounts()
       .select(ACCOUNTS_COLUMNS.numLookups)
       .where(ACCOUNTS_COLUMNS.address, account)
       .first()
@@ -36,11 +34,11 @@ async function getAccountExists(account: string): Promise<boolean> {
 /*
  * Increments query count in database.  If record doesn't exist, create one.
  */
-export async function incrementQueryCount(account: string, trx: Transaction) {
+export async function incrementQueryCount(account: string) {
   logger.debug('Incrementing query count')
   try {
     if (await getAccountExists(account)) {
-      await trx(ACCOUNTS_TABLE)
+      await accounts()
         .where(ACCOUNTS_COLUMNS.address, account)
         .increment(ACCOUNTS_COLUMNS.numLookups, 1)
     } else {

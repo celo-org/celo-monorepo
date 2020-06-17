@@ -54,7 +54,7 @@ function toRPCResponse(payload: JsonRpcPayload, result: any, error?: Error): Jso
 
   if (error != null) {
     ;(response as any).error = {
-      message: error.stack || error.message || error,
+      message: error.message || error.stack || error,
       code: -32000,
     }
   }
@@ -90,8 +90,19 @@ export class DefaultRpcCaller implements RpcCaller {
     debugRpcPayload('%O', payload)
 
     const decoratedCallback = ((error: Error, result: JsonRpcResponse): void => {
+      let err: Error = error
       debugRpcResponse('%O', result)
-      callback(error as any, result)
+      // The provider send call will not provide an error to the callback if
+      // the result itself specifies an error. Here, we extract the error in the
+      // result.
+      if (
+        result.error != null &&
+        typeof result.error !== 'string' &&
+        result.error.message != null
+      ) {
+        err = new Error(result.error.message)
+      }
+      callback(err as any, result)
     }) as Callback<JsonRpcResponse>
 
     if (this.defaultProvider && typeof this.defaultProvider !== 'string') {

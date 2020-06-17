@@ -4,6 +4,8 @@ import {
   verifyAccountClaim,
   verifyDomainRecord,
 } from '@celo/contractkit/lib/identity/claims/verify'
+import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
+import { Validator } from '@celo/contractkit/lib/wrappers/Validators'
 import { normalizeAddressWith0x, trimLeading0x } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import Logger from 'bunyan'
@@ -108,7 +110,7 @@ async function getVerifiedDomains(
   return domains
 }
 
-async function handleItem(item: { url: string; address: string }) {
+async function processDomainClaimForValidator(item: { url: string; address: string }) {
   const itemLogger = operationalLogger.child({ url: item.url, address: item.address })
   try {
     itemLogger.debug('fetch_metadata')
@@ -125,11 +127,97 @@ async function handleItem(item: { url: string; address: string }) {
         verfiedAccountClaims: verifiedAccounts.length,
         verifiedDomainClaims: verifiedDomains.length,
       },
-      'handleItem done'
+      'processDomainClaimForValidator done'
     )
   } catch (err) {
-    itemLogger.error({ err }, 'handleItem error')
+    itemLogger.error({ err }, 'processDomainClaimForValidator error')
   }
+}
+
+async function processDomainClaims() {
+  let items: { address: string; url: string }[] = await jsonQuery(
+    `SELECT address, url FROM celo_account WHERE url is NOT NULL `
+  )
+
+  operationalLogger.debug({ length: items.length }, 'fetching all accounts')
+
+  items = items || []
+  items = items.map((a) => ({
+    ...a,
+    // Addresses are stored by blockscout as just the bytes prepended with \x
+    address: normalizeAddressWith0x(a.address.substr(2)),
+  }))
+
+  return concurrentMap(CONCURRENCY, items, (item) => processDomainClaimForValidator(item))
+    .then(() => {
+      operationalLogger.info('Closing DB connecting and finishing')
+    })
+    .catch((err) => {
+      operationalLogger.error({ err }, 'processDomainClaimForValidator error')
+      client.end()
+      process.exit(1)
+    })
+}
+
+async function processAttestationServiceStatusForValidator(
+  electedValidators: Set<Address>,
+  attestationsWrapper: AttestationsWrapper,
+  validator: Validator
+) {
+  const {
+    name,
+    smsProviders,
+    address,
+    affiliation,
+    attestationServiceURL,
+    metadataURL,
+    attestationSigner,
+    blacklistedRegionCodes,
+    rightAccount,
+    error,
+    state,
+  } = await attestationsWrapper.getAttestationServiceStatus(validator)
+  const isElected = electedValidators.has(validator.address)
+  dataLogger.info(
+    {
+      name,
+      isElected,
+      smsProviders,
+      address,
+      group: affiliation,
+      attestationServiceURL,
+      metadataURL,
+      attestationSigner,
+      blacklistedRegionCodes,
+      rightAccount,
+      err: error,
+      state,
+    },
+    'checked_attestation_service_status'
+  )
+}
+
+async function processAttestationServices() {
+  operationalLogger.debug('processAttestationServices start')
+  const validatorsWrapper = await kit.contracts.getValidators()
+  const electionsWrapper = await kit.contracts.getElection()
+  const attestationsWrapper = await kit.contracts.getAttestations()
+  const validators = await validatorsWrapper.getRegisteredValidators()
+
+  const currentEpoch = await kit.getEpochNumberOfBlock(await kit.web3.eth.getBlockNumber())
+  const electedValidators = await electionsWrapper.getElectedValidators(currentEpoch)
+  const electedValidatorsSet: Set<Address> = new Set()
+  electedValidators.forEach((validator) => electedValidatorsSet.add(validator.address))
+
+  await concurrentMap(CONCURRENCY, validators, (validator) =>
+    processAttestationServiceStatusForValidator(
+      electedValidatorsSet,
+      attestationsWrapper,
+      validator
+    )
+  )
+  operationalLogger.debug('processAttestationServices finish')
+  return
 }
 
 async function main() {
@@ -141,34 +229,11 @@ async function main() {
     client.connect()
   })
 
-  let items: { address: string; url: string }[] = await jsonQuery(
-    `SELECT address, url FROM celo_account WHERE url is NOT NULL `
-  )
+  await processDomainClaims()
+  await processAttestationServices()
 
-  // TODO: Fetch addresses which have
-  // not opted in
-  // opted in but not registered an attestation service URL
-
-  operationalLogger.debug({ length: items.length }, 'fetching all accounts')
-
-  items = items || []
-  items = items.map((a) => ({
-    ...a,
-    // Addresses are stored by blockscout as just the bytes prepended with \x
-    address: normalizeAddressWith0x(a.address.substr(2)),
-  }))
-
-  await concurrentMap(CONCURRENCY, items, (item) => handleItem(item))
-    .then(() => {
-      operationalLogger.info('Closing DB connecting and finishing')
-      client.end()
-      process.exit(0)
-    })
-    .catch((err) => {
-      operationalLogger.error({ err }, 'handleItem error')
-      client.end()
-      process.exit(1)
-    })
+  client.end()
+  process.exit(0)
 }
 
 main().catch((err) => {
