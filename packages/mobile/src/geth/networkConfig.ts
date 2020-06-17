@@ -50,8 +50,8 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     syncMode: DEFAULT_SYNC_MODE,
     initiallyForno: FORNO_ENABLED_INITIALLY,
     blockchainApiUrl: 'https://alfajores-dot-celo-testnet-production.appspot.com/',
-    pgpnpUrl: pgpnpUrlStaging,
-    pgpnpPubKey: pgpnpPubKeyStaging,
+    pgpnpUrl: pgpnpUrlProd,
+    pgpnpPubKey: pgpnpPubKeyProd,
   },
   [Testnets.pilot]: {
     nodeDir: `.${Testnets.pilot}`,

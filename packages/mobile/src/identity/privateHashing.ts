@@ -118,7 +118,8 @@ async function getPhoneNumberSalt(
   }
 
   Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Retrieving blinded message')
-  const base64BlindedMessage = (await BlindThresholdBls.blindMessage(e164Number)).trim()
+  const base64PhoneNumber = Buffer.from(e164Number).toString('base64')
+  const base64BlindedMessage = (await BlindThresholdBls.blindMessage(base64PhoneNumber)).trim()
   const base64BlindSig = await postToSignMessage(
     base64BlindedMessage,
     account,
@@ -127,9 +128,6 @@ async function getPhoneNumberSalt(
   )
   Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Retrieving unblinded signature')
   const { pgpnpPubKey } = networkConfig
-  console.log('base64BlindedMessage', base64BlindedMessage)
-  console.log('base64BlindSig', base64BlindSig)
-  console.log('pub key', pgpnpPubKey)
   const base64UnblindedSig = await BlindThresholdBls.unblindMessage(base64BlindSig, pgpnpPubKey)
   Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Converting sig to salt')
   return getSaltFromThresholdSignature(base64UnblindedSig)
@@ -167,7 +165,6 @@ async function postToSignMessage(
       body,
       SIGN_MESSAGE_ENDPOINT
     )
-    console.log('response', response)
     return response.combinedSignature
   } catch (error) {
     if (error.message === ErrorMessages.PGPNP_QUOTA_ERROR) {
