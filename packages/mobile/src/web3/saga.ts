@@ -254,7 +254,7 @@ export function* getAccount() {
 export function* unlockAccount(account: string) {
   Logger.debug(TAG + '@unlockAccount', `Unlocking account: ${account}`)
   const wallet: RpcWallet = yield call(getWallet)
-  if (!wallet.isAccountUnlocked(account)) {
+  if (wallet.isAccountUnlocked(account)) {
     return true
   }
 

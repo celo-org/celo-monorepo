@@ -19,6 +19,7 @@ import { CodeInputType } from 'src/identity/verification'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getCachedPincode } from 'src/pincode/PincodeCache'
+import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { clockInSync } from 'src/utils/time'
 import { parse } from 'url'
@@ -33,6 +34,10 @@ const TAG = 'app/saga'
 const DO_NOT_LOCK_PERIOD = 30000 // 30 sec
 
 export function* waitForRehydrate() {
+  const rehydrated = yield select((state: RootState) => state.networkInfo.rehydrated)
+  if (rehydrated) {
+    return
+  }
   yield take(REHYDRATE)
   return
 }

@@ -126,7 +126,7 @@ async function initGeth(sync: boolean = true) {
     if (!(await ensureGenesisBlockWritten())) {
       throw FailedToFetchGenesisBlockError
     }
-    if (sync && !(await ensureStaticNodesInitialized())) {
+    if (!(await ensureStaticNodesInitialized(sync))) {
       throw FailedToFetchStaticNodesError
     }
     const geth = await createNewGeth(sync)
@@ -161,30 +161,33 @@ export async function getGeth(sync: boolean = true): Promise<typeof gethInstance
   return gethInstance
 }
 
-async function ensureStaticNodesInitialized(): Promise<boolean> {
+async function ensureStaticNodesInitialized(sync: boolean = true): Promise<boolean> {
   const { nodeDir } = networkConfig
-  if (await staticNodesAlreadyInitialized(nodeDir)) {
-    Logger.debug('Geth@maybeInitStaticNodes', 'static nodes already initialized')
-    return true
-  } else {
-    Logger.debug('Geth@maybeInitStaticNodes', 'initializing static nodes')
-    let enodes: string | null = null
-    try {
-      enodes = await StaticNodeUtils.getStaticNodesAsync(DEFAULT_TESTNET)
-    } catch (error) {
-      Logger.error(
-        `Failed to get static nodes for network ${DEFAULT_TESTNET},` +
-          `the node will not be able to sync with the network till restart`,
-        error
-      )
-      return false
-    }
-    if (enodes != null) {
-      await writeStaticNodes(nodeDir, enodes)
-      return true
-    }
+  // if (await staticNodesAlreadyInitialized(nodeDir)) {
+  //   Logger.debug('Geth@maybeInitStaticNodes', 'static nodes already initialized')
+  //   return true
+  // } else {
+  Logger.debug('Geth@maybeInitStaticNodes', 'initializing static nodes')
+  let enodes: string | null = null
+  try {
+    enodes = await StaticNodeUtils.getStaticNodesAsync(DEFAULT_TESTNET)
+  } catch (error) {
+    Logger.error(
+      `Failed to get static nodes for network ${DEFAULT_TESTNET},` +
+        `the node will not be able to sync with the network till restart`,
+      error
+    )
     return false
   }
+  if (!sync) {
+    enodes = '[]'
+  }
+  if (enodes != null) {
+    await writeStaticNodes(nodeDir, enodes)
+    return true
+  }
+  return false
+  // }
 }
 
 export async function stopGethIfInitialized() {
