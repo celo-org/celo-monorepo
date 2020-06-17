@@ -132,7 +132,8 @@ export function* fetchRecentTxRecipients() {
 
   let remainingCacheStorage = RECENT_TX_RECIPIENT_CACHE_LIMIT
   const recentTxRecipientsCache: NumberToRecipient = {}
-  for (let i = knownFeedAddresses.length - 1; i > 0; i -= 1) {
+  // Start from back of the array to get the most recent transactions
+  for (let i = knownFeedAddresses.length - 1; i >= 0; i -= 1) {
     if (remainingCacheStorage <= 0) {
       break
     }

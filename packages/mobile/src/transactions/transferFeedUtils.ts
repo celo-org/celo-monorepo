@@ -29,9 +29,9 @@ function getEscrowSentRecipientPhoneNumber(invitees: InviteDetails[], txTimestam
   const possiblePhoneNumbers = new Set()
   invitees.forEach((inviteDetails) => {
     const inviteTimestamp = inviteDetails.timestamp
-    // Invite timestamps are logged before invite tx is confirmed so considering
-    // a match to be when escrow tx timestamps is within 1 min of invite
-    if (Math.abs(txTimestamp - inviteTimestamp) < 1000 * 60) {
+    // Invites are logged before invite tx is confirmed so considering a match
+    // to be when escrow tx timestamp is within 30 secs of invite timestamp
+    if (Math.abs(txTimestamp - inviteTimestamp) < 1000 * 30) {
       possiblePhoneNumbers.add(inviteDetails.e164Number)
     }
   })
