@@ -5,6 +5,7 @@ import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import { parseInputAmount } from '@celo/utils/src/parsing'
+import { RouteProp } from '@react-navigation/core'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
@@ -13,23 +14,26 @@ import { Platform, StyleSheet, Text, TextInput, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
 import SafeAreaView from 'react-native-safe-area-view'
 import { useDispatch, useSelector } from 'react-redux'
+import { CustomEventNames } from 'src/analytics/constants'
+import BackButton from 'src/components/BackButton.v2'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import LineItemRow from 'src/components/LineItemRow'
 import { DOLLAR_ADD_FUNDS_MIN_AMOUNT, DOLLAR_CASH_OUT_MIN_AMOUNT } from 'src/config'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
-import { Namespaces } from 'src/i18n'
+import i18n, { Namespaces } from 'src/i18n'
 import {
   convertDollarsToMaxSupportedPrecision,
   convertLocalAmountToDollars,
 } from 'src/localCurrency/convert'
 import { useLocalCurrencyCode } from 'src/localCurrency/hooks'
 import { getLocalCurrencyExchangeRate, getLocalCurrencySymbol } from 'src/localCurrency/selectors'
+import { emptyHeader, HeaderTitleWithBalance } from 'src/navigator/Headers.v2'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { getRecentPayments } from 'src/send/selectors'
 import { isPaymentLimitReached, showLimitReachedError } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
-import { dollarBalanceSelector } from 'src/stableToken/selectors'
+import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 
 const { decimalSeparator } = getNumberFormatSettings()
 
@@ -41,6 +45,25 @@ const oneDollarAmount = {
   value: new BigNumber('1'),
   currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
 }
+
+export const fiatExchangesAmountScreenOptions = ({
+  route,
+}: {
+  route: RouteProp<StackParamList, Screens.FiatExchangeAmount>
+}) => {
+  return {
+    ...emptyHeader,
+    headerLeft: () => <BackButton eventName={CustomEventNames.send_amount_back} />,
+    headerTitle: () => (
+      <HeaderTitleWithBalance
+        title={i18n.t(`fiatExchangeFlow:${route.params?.isAddFunds ? 'addFunds' : 'cashOut'}`)}
+        token={CURRENCY_ENUM.DOLLAR}
+      />
+    ),
+  }
+}
+
+const safeAreaInset = { top: 'never' as 'never', bottom: 'always' as 'always' }
 
 export function ExchangeTradeScreen({ navigation, route }: Props) {
   function isNextButtonValid() {
@@ -76,7 +99,7 @@ export function ExchangeTradeScreen({ navigation, route }: Props) {
   const { t } = useTranslation(Namespaces.fiatExchangeFlow)
   const dispatch = useDispatch()
   const [inputAmount, setInputAmount] = React.useState('')
-  const dollarBalance = useSelector(dollarBalanceSelector)
+  const dollarBalance = useSelector(stableTokenBalanceSelector)
   const localExchangeRate = useSelector(getLocalCurrencyExchangeRate)
   const localCurrencySymbol = useSelector(getLocalCurrencySymbol)
   const localCurrencyCode = useLocalCurrencyCode()
@@ -93,7 +116,7 @@ export function ExchangeTradeScreen({ navigation, route }: Props) {
     <SafeAreaView
       // Force inset as this screen uses auto focus and KeyboardSpacer padding is initially
       // incorrect because of that
-      forceInset={{ top: 'never', bottom: 'always' }}
+      forceInset={safeAreaInset}
       style={styles.container}
     >
       <DisconnectBanner />

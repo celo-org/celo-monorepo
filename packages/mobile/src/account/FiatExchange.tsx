@@ -59,11 +59,11 @@ function FiatExchange() {
       </View>
       <View>
         <ListItem onPress={goToAddFunds}>
-          <Text style={styles.optionTitle}>{t('fiatExchangeFlow:add_funds')}</Text>
+          <Text style={styles.optionTitle}>{t('fiatExchangeFlow:addFunds')}</Text>
         </ListItem>
         {SHOW_CASH_OUT && (
           <ListItem onPress={goToCashOut}>
-            <Text style={styles.optionTitle}>{t('fiatExchangeFlow:cash_out')}</Text>
+            <Text style={styles.optionTitle}>{t('fiatExchangeFlow:cashOut')}</Text>
           </ListItem>
         )}
       </View>

@@ -212,7 +212,7 @@ exports[`FiatExchange renders correctly 1`] = `
               }
             }
           >
-            fiatExchangeFlow:add_funds
+            fiatExchangeFlow:addFunds
           </Text>
         </View>
       </View>

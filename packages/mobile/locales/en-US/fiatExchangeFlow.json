@@ -1,6 +1,6 @@
 {
-  "add_funds": "Add funds",
-  "cash_out": "Cash out",
+  "addFunds": "Add funds",
+  "cashOut": "Cash out",
   "celoDollarsAt": "Celo Dollars @ <1></1>",
   "dislamerCeloDollars": "Celo dollar values are estimates.",
   "pleaseSelectProvider": "Please select a provider below. These links connect to a third party service.",
