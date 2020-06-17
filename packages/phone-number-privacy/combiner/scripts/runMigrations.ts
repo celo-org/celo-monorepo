@@ -1,15 +1,27 @@
+// tslint:disable: no-console
 import knex from 'knex'
 import config from '../src/config'
 
-console.info('Running migrations')
-knex({
-  client: 'pg',
-  connection: config.db,
-  debug: true,
-})
-  .migrate.latest({
+async function start() {
+  console.info('Running migrations')
+  // Adding a timeout because knex migrations seem to hang even when they succeed
+  const timeout = new Promise((resolve) => {
+    setTimeout(() => {
+      resolve('')
+    }, 30 * 1000)
+  })
+
+  const migration = knex({
+    client: 'pg',
+    connection: config.db,
+  }).migrate.latest({
     directory: './migrations',
     extension: 'ts',
   })
-  .then((val) => console.info('Migraitons complete', val))
-  .catch((reason) => console.error('Migrations failed', reason))
+
+  await Promise.race([migration, timeout])
+  console.info('Migrations complete')
+}
+
+// tslint:disable-next-line: no-floating-promises
+start()

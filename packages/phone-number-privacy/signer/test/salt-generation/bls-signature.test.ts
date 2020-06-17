@@ -15,12 +15,12 @@ describe(`BLS service computes signature`, () => {
 
     const actual = await computeBlindedSignature(blindedMsg, DEV_PRIVATE_KEY)
     expect(actual).toEqual(
-      'MAAAAAAAAADJpFrx/eDNs1Qm986trWFZpMcJNRM5W/yKoI+cxk0gBul1PNAVzw1uFpEWJx5iK4EAAAAA'
+      'MAAAAAAAAADDilSaA/xvbtE4NV3agMzHIf8PGPQ83Cu8gQy5E2mRWyUIges8bjE4EBe1L7pcY4AAAAAA'
     )
 
     expect(
       threshold_bls.partialVerifyBlindSignature(
-        Buffer.from(DEV_POLYNOMIAL, 'base64'),
+        Buffer.from(DEV_POLYNOMIAL, 'hex'),
         blindedMsgResult.message,
         Buffer.from(actual, 'base64')
       )
@@ -31,7 +31,7 @@ describe(`BLS service computes signature`, () => {
       combinedSignature,
       blindedMsgResult.blindingFactor
     )
-    const publicKey = Buffer.from(DEV_PUBLIC_KEY, 'base64')
+    const publicKey = Buffer.from(DEV_PUBLIC_KEY, 'hex')
     expect(threshold_bls.verify(publicKey, message, unblindedSignedMessage))
   })
 })
