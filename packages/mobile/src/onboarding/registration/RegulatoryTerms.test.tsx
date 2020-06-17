@@ -8,7 +8,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import RegulatoryTerms, {
   RegulatoryTerms as RegulatoryTermsClass,
-} from 'src/registration/RegulatoryTerms'
+} from 'src/onboarding/registration/RegulatoryTerms'
 import { createMockStore, getMockI18nProps } from 'test/utils'
 
 jest.mock('src/navigator/NavigationService', () => {

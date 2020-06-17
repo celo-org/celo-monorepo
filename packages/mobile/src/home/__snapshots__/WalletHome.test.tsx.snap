@@ -258,7 +258,8 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
               "backgroundColor": "#1AB775",
               "height": 40,
               "justifyContent": "center",
-              "minWidth": 98,
+              "minWidth": 120,
+              "opacity": undefined,
               "paddingHorizontal": 16,
               "paddingVertical": 5,
             }
@@ -328,7 +329,8 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
               "backgroundColor": "#1AB775",
               "height": 40,
               "justifyContent": "center",
-              "minWidth": 98,
+              "minWidth": 120,
+              "opacity": undefined,
               "paddingHorizontal": 16,
               "paddingVertical": 5,
             }
@@ -675,7 +677,8 @@ exports[`Testnet banner Renders when disconnected 1`] = `
               "backgroundColor": "#1AB775",
               "height": 40,
               "justifyContent": "center",
-              "minWidth": 98,
+              "minWidth": 120,
+              "opacity": undefined,
               "paddingHorizontal": 16,
               "paddingVertical": 5,
             }
@@ -745,7 +748,8 @@ exports[`Testnet banner Renders when disconnected 1`] = `
               "backgroundColor": "#1AB775",
               "height": 40,
               "justifyContent": "center",
-              "minWidth": 98,
+              "minWidth": 120,
+              "opacity": undefined,
               "paddingHorizontal": 16,
               "paddingVertical": 5,
             }
@@ -1092,7 +1096,8 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
               "backgroundColor": "#1AB775",
               "height": 40,
               "justifyContent": "center",
-              "minWidth": 98,
+              "minWidth": 120,
+              "opacity": undefined,
               "paddingHorizontal": 16,
               "paddingVertical": 5,
             }
@@ -1162,7 +1167,8 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
               "backgroundColor": "#1AB775",
               "height": 40,
               "justifyContent": "center",
-              "minWidth": 98,
+              "minWidth": 120,
+              "opacity": undefined,
               "paddingHorizontal": 16,
               "paddingVertical": 5,
             }

@@ -8,7 +8,7 @@ exports[`RegulatoryTermsScreen renders correctly 1`] = `
     }
   }
 >
-  <View
+  <SafeAreaView
     style={
       Object {
         "height": 35,
@@ -35,7 +35,7 @@ exports[`RegulatoryTermsScreen renders correctly 1`] = `
     >
          
     </Text>
-  </View>
+  </SafeAreaView>
   <RCTScrollView
     contentContainerStyle={
       Object {

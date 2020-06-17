@@ -10,7 +10,7 @@ exports[`Pincode renders correctly 1`] = `
     }
   }
 >
-  <View
+  <SafeAreaView
     style={
       Object {
         "height": 35,
@@ -37,7 +37,7 @@ exports[`Pincode renders correctly 1`] = `
     >
          
     </Text>
-  </View>
+  </SafeAreaView>
   <RCTScrollView
     contentContainerStyle={
       Object {
@@ -695,7 +695,7 @@ exports[`Pincode renders correctly 2`] = `
     }
   }
 >
-  <View
+  <SafeAreaView
     style={
       Object {
         "height": 35,
@@ -722,7 +722,7 @@ exports[`Pincode renders correctly 2`] = `
     >
          
     </Text>
-  </View>
+  </SafeAreaView>
   <RCTScrollView
     contentContainerStyle={
       Object {
