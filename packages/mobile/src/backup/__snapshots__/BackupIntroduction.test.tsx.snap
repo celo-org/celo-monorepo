@@ -13,7 +13,7 @@ exports[`BackupIntroduction renders correctly when backup completed 1`] = `
     style={
       Object {
         "alignItems": "center",
-        "backgroundColor": "#FFFFFF",
+        "backgroundColor": "transparent",
         "borderBottomColor": "#EDEEEF",
         "borderBottomWidth": 0,
         "flexDirection": "row",
@@ -197,7 +197,7 @@ exports[`BackupIntroduction renders correctly when backup not complete 1`] = `
     style={
       Object {
         "alignItems": "center",
-        "backgroundColor": "#FFFFFF",
+        "backgroundColor": "transparent",
         "borderBottomColor": "#EDEEEF",
         "borderBottomWidth": 0,
         "flexDirection": "row",
