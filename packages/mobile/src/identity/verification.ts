@@ -124,7 +124,10 @@ export function* doVerificationFlow() {
       contractKit.contracts.getAccounts,
     ])
 
-    CeloAnalytics.track(CustomEventNames.verification_setup)
+    CeloAnalytics.track(CustomEventNames.verification_setup, {
+      phoneHash,
+      address: account,
+    })
 
     // Get all relevant info about the account's verification status
     yield put(setVerificationStatus(VerificationStatus.GettingStatus))
@@ -136,7 +139,9 @@ export function* doVerificationFlow() {
       phoneHash
     )
 
-    CeloAnalytics.track(CustomEventNames.verification_get_status)
+    CeloAnalytics.track(CustomEventNames.verification_get_status, {
+      ...status,
+    })
 
     if (!status.isVerified) {
       // Mark codes completed in previous attempts
@@ -191,6 +196,7 @@ export function* doVerificationFlow() {
     return true
   } catch (error) {
     Logger.error(TAG, 'Error occured during verification flow', error)
+    CeloAnalytics.track(CustomEventNames.verification_error, { error })
     yield put(showErrorOrFallback(error, ErrorMessages.VERIFICATION_FAILURE))
     yield put(setVerificationStatus(VerificationStatus.Failed))
     return false
@@ -279,7 +285,9 @@ function* requestAttestations(
     Logger.debug(`${TAG}@requestNeededAttestations`, 'No additional attestations requests needed')
     return
   }
-  CeloAnalytics.track(CustomEventNames.verification_request_attestations)
+  CeloAnalytics.track(CustomEventNames.verification_request_attestations, {
+    numAttestationsRequestsNeeded,
+  })
 
   const unselectedRequest: UnselectedRequest = yield call(
     [attestationsWrapper, attestationsWrapper.getUnselectedRequest],
@@ -319,10 +327,12 @@ function* requestAttestations(
   }
 
   Logger.debug(`${TAG}@requestNeededAttestations`, 'Waiting for block to select issuer')
+  CeloAnalytics.track(CustomEventNames.verification_wait_for_select_issuers)
 
   yield call([attestationsWrapper, attestationsWrapper.waitForSelectingIssuers], phoneHash, account)
 
   Logger.debug(`${TAG}@requestNeededAttestations`, 'Selecting issuer')
+  CeloAnalytics.track(CustomEventNames.verification_selecting_issuer)
 
   const selectIssuersTx = attestationsWrapper.selectIssuers(phoneHash)
 
@@ -391,6 +401,7 @@ function attestationCodeReceiver(
       yield put(inputAttestationCode({ code, issuer }))
     } catch (error) {
       Logger.error(TAG + '@attestationCodeReceiver', 'Error processing attestation code', error)
+      CeloAnalytics.track(CustomEventNames.verification_error, { error })
       yield put(showError(ErrorMessages.INVALID_ATTESTATION_CODE))
     }
   }
@@ -505,6 +516,7 @@ function* tryRevealPhoneNumber(
 // Get the code from the store if it's already there, otherwise wait for it
 function* waitForAttestationCode(issuer: string) {
   Logger.debug(TAG + '@waitForAttestationCode', `Waiting for code for issuer ${issuer}`)
+  CeloAnalytics.track(CustomEventNames.verification_wait_for_attestation_code, { issuer })
   const code = yield call(getCodeForIssuer, issuer)
   if (code) {
     return code
@@ -526,7 +538,7 @@ function* setAccount(accountsWrapper: AccountsWrapper, address: string, dataKey:
   }
   const setAccountTx = accountsWrapper.setAccount('', dataKey, address)
   yield call(sendTransaction, setAccountTx.txo, address, TAG, 'Set Wallet Address & DEK')
-  CeloAnalytics.track(CustomEventNames.verification_set_account)
+  CeloAnalytics.track(CustomEventNames.verification_set_account, { address })
 }
 
 async function isAccountUpToDate(

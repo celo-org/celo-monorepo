@@ -1,7 +1,7 @@
 import { TOptions } from 'i18next'
 import { ErrorDisplayType } from 'src/alert/reducer'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { DefaultEventNames } from 'src/analytics/constants'
+import { CustomEventNames, DefaultEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ALERT_BANNER_DURATION } from 'src/config'
 import i18n, { Namespaces } from 'src/i18n'
@@ -66,6 +66,7 @@ export function showErrorOrFallback(error: any, fallback: ErrorMessages) {
   if (error && Object.values(ErrorMessages).includes(error.message)) {
     return showError(error.message)
   } else {
+    CeloAnalytics.track(CustomEventNames.error_fallback, { error })
     return showError(fallback)
   }
 }

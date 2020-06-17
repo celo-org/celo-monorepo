@@ -9,6 +9,8 @@ export enum CustomEventNames {
   blockChainCorruption = 'block_chain_corruption',
   disconnect_banner = 'disconnect_banner',
 
+  error_fallback = 'error_fallback',
+
   // Education
   gold_cancel1 = 'gold_cancel1',
   gold_cancel2 = 'gold_cancel2',
@@ -101,11 +103,14 @@ export enum CustomEventNames {
   verification_setup = 'verification_setup',
   verification_get_status = 'verification_get_status',
   verification_request_attestations = 'verification_request_attestations',
+  verification_wait_for_select_issuers = 'verification_wait_for_select_issuers',
+  verification_selecting_issuer = 'verification_selecting_issuer',
   verification_requested_attestations = 'verification_requested_attestations',
   verification_get_attestations = 'verification_get_attestations',
   verification_set_account = 'verification_set_account',
   verification_reveal_attestation = 'verification_reveal_attestation',
   verification_revealed_attestation = 'verification_revealed_attestation',
+  verification_wait_for_attestation_code = 'verification_wait_for_attestation_code',
   verification_codes_received = 'verification_codes_received',
   verification_complete_attestation = 'verification_complete_attestation',
   verification_completed_attestation = 'verification_completed_attestation',
@@ -114,6 +119,7 @@ export enum CustomEventNames {
   verification_cancelled = 'verification_cancelled',
   verification_success = 'verification_success',
   verification_timed_out = 'verification_timed_out',
+  verification_error = 'verification_error',
 
   verification_actionable_attestation_start = 'verification_actionable_attestation_start',
   verification_actionable_attestation_finish = 'verification_actionable_attestation_finish',
@@ -340,6 +346,14 @@ export enum PropertyPathWhitelist {
   validationType = 'validationType',
   verificationIndex = 'verificationIndex',
   verificationsRemaining = 'verificationsRemaining',
+
+  // Attestations
+  isVerified = 'isVerified',
+  numAttestationsRemaining = 'numAttestationsRemaining',
+  total = 'total',
+  completed = 'completed',
+  phoneHash = 'phoneHash',
+  numAttestationsRequestsNeeded = 'numAttestationsRequestsNeeded',
 }
 
 export { DefaultEventNames }
