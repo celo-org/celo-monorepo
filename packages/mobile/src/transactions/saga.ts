@@ -105,7 +105,7 @@ export function* sendAndMonitorTransaction<T>(
   }
 }
 
-export function* refreshRecentTxRecipients() {
+function* refreshRecentTxRecipients() {
   const addressToE164Number = yield select(addressToE164NumberSelector)
   const recipientCache = yield select(recipientCacheSelector)
   const knownFeedTransactions: KnownFeedTransactionsType = yield select(
