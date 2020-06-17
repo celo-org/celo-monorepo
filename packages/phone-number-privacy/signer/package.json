@@ -12,9 +12,9 @@
     "build": "tsc -b .",
     "lint": "tslint --project .",
     "test": "jest --runInBand --testPathIgnorePatterns test/end-to-end",
-    "db:migrate": "NODE_ENV=production ts-node scripts/runMigrations.ts",
-    "keygen": "ts-node scripts/createBlsKeyPair.ts",
-    "ssl:create": "./scripts/create-ssl-cert.sh"
+    "db:migrate": "NODE_ENV=production ts-node scripts/run-migrations.ts",
+    "bls:keygen": "ts-node scripts/create-bls-keys.ts",
+    "ssl:keygen": "./scripts/create-ssl-cert.sh"
   },
   "dependencies": {
     "@celo/contractkit": "0.4.5",
@@ -25,14 +25,14 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "knex": "^0.21.1",
-    "pg": "^8.2.1",
-    "uuid": "^7.0.3"
+    "morgan": "^1.10.0",
+    "pg": "^8.2.1"
   },
   "devDependencies": {
     "@types/btoa": "^1.2.3",
     "@types/express": "^4.17.6",
+    "@types/morgan": "^1.9.1",
     "@types/supertest": "^2.0.9",
-    "@types/uuid": "^7.0.3",
     "dotenv": "^8.2.0",
     "supertest": "^4.0.2",
     "ts-node": "^8.3.0",

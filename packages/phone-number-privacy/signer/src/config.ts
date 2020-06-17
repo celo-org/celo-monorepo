@@ -19,8 +19,8 @@ export enum SupportedKeystore {
 interface Config {
   server: {
     port: string | number
-    sslKeyPath: string
-    sslCertPath: string
+    sslKeyPath?: string
+    sslCertPath?: string
   }
   salt: {
     unverifiedQueryMax: number
@@ -70,9 +70,9 @@ const toBool = (value: string | undefined, fallback: boolean) =>
 const env = process.env as any
 const config: Config = {
   server: {
-    port: toNum(env.SERVER_PORT) || (DEV_MODE ? 80 : 443),
-    sslKeyPath: env.SERVER_SSL_KEY_PATH || './server.key',
-    sslCertPath: env.SERVER_SSL_KEY_CERT || './server.cert',
+    port: toNum(env.SERVER_PORT) || 8080,
+    sslKeyPath: env.SERVER_SSL_KEY_PATH,
+    sslCertPath: env.SERVER_SSL_CERT_PATH,
   },
   salt: {
     unverifiedQueryMax: toNum(env.SALT_UNVERIFIED_QUERY_MAX) || 2,

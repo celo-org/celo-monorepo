@@ -1,14 +1,20 @@
 import express from 'express'
 import fs from 'fs'
 import https from 'https'
+import morgan from 'morgan'
 import logger from './common/logger'
-import config, { DEV_MODE, VERSION } from './config'
+import config, { VERSION } from './config'
 import { handleGetBlindedMessageForSalt } from './salt-generation/get-salt'
 
 export function createServer() {
   logger.info('Creating express server')
   const app = express()
   app.use(express.json())
+  app.use(
+    morgan(
+      ':date[iso]:: :remote-addr :remote-user :method :url HTTP/:http-version :status :res[content-length] - :response-time ms'
+    )
+  )
 
   app.get('/status', (_req, res) => {
     res.status(200).json({
@@ -28,16 +34,16 @@ export function createServer() {
 }
 
 function getSslOptions() {
-  logger.info('Looking for ssl key')
   const { sslKeyPath, sslCertPath } = config.server
 
+  if (!sslKeyPath || !sslCertPath) {
+    logger.info('No SSL configs specified')
+    return null
+  }
+
   if (!fs.existsSync(sslKeyPath) || !fs.existsSync(sslCertPath)) {
-    if (DEV_MODE) {
-      logger.warn('SSL certs missing, running server as http only')
-      return null
-    } else {
-      throw new Error('SSL Certs required')
-    }
+    logger.error('SSL cert files not found')
+    return null
   }
 
   return {

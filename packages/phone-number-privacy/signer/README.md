@@ -8,6 +8,8 @@ You can use the following environment variables to configure the Phone Number Pr
 
 - `NODE_ENV` - `development` or `production`
 - `SERVER_PORT` - The port on which the express node app runs (8080 by default).
+- `SERVER_SSL_KEY_PATH` - (Optional) Path to SSL .key file.
+- `SERVER_SSL_CERT_PATH` - (Optional) Path to SSL .cert file.
 - `DB_HOST` - The URL under which your database is accessible. Supports Postgres, MSSQL, MySQL, MariaDB, SQLite3, Oracle.
 - `DB_USERNAME` - DB configuration: The DB username (postgres by default).
 - `DB_PASSWORD` - DB configuration: The DB password.

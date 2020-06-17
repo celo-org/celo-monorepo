@@ -1,11 +1,12 @@
 import logger from './common/logger'
 import config, { DEV_MODE } from './config'
-import { initKeyProvider } from './key-management/key-provider'
+// import { initKeyProvider } from './key-management/key-provider'
 import { createServer } from './server'
 
 async function start() {
   logger.info(`Starting. Dev mode: ${DEV_MODE}`)
-  await initKeyProvider()
+  //TODO
+  // await initKeyProvider()
 
   const server = createServer()
   logger.info(`Starting server.`)
