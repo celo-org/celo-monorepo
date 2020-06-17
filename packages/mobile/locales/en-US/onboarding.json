@@ -14,5 +14,10 @@
   },
   "accountInfo": "Account Info",
   "step": "Step {{step}} of 5",
-  "selectCountryCode": "Select Country Code"
+  "selectCountryCode": "Select Country Code",
+  "pincodeSet": {
+    "create": "Create a PIN",
+    "verify": "Enter PIN again",
+    "pinsDontMatch": "The PINs didn't match"
+  }
 }
