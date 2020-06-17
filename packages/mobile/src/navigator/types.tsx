@@ -114,12 +114,11 @@ export type StackParamList = {
     transactionData: TransactionDataInput
     addressJustValidated?: boolean
   }
-  [Screens.PincodeEducation]: undefined
   [Screens.PincodeEnter]: {
     withVerification?: boolean
     onSuccess: (pin: string) => void
   }
-  [Screens.PincodeSet]: undefined
+  [Screens.PincodeSet]: { isVerifying: boolean } | undefined
   [Screens.PhoneNumberLookupQuota]: {
     onBuy: () => void
     onSkip: () => void

@@ -46,7 +46,7 @@ export class RegulatoryTerms extends React.Component<Props> {
 
   goToNextScreen = () => {
     if (this.props.pincodeType === PincodeType.Unset) {
-      navigate(Screens.PincodeEducation)
+      navigate(Screens.PincodeSet)
     } else {
       navigate(Screens.EnterInviteCode)
     }
@@ -61,7 +61,7 @@ export class RegulatoryTerms extends React.Component<Props> {
 
     return (
       <SafeAreaView style={styles.container}>
-        <DevSkipButton nextScreen={Screens.PincodeEducation} />
+        <DevSkipButton nextScreen={Screens.PincodeSet} />
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}

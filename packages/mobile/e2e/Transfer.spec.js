@@ -68,11 +68,6 @@ describe('Transfer Works', () => {
     await element(by.id('AcceptTermsButton')).tap()
   })
 
-  it('PincodeEducation', async () => {
-    await expect(element(by.id('SystemAuthContinue'))).toBeVisible()
-    await element(by.id('SystemAuthContinue')).tap()
-  })
-
   it('Pin', async () => {
     // Set pin
     await enterPinUi()
