@@ -6,7 +6,6 @@ export const app = express()
 app.use(express.json())
 
 app.get('/status', (_req, res) => {
-  console.log(process.env)
   res.status(200).json({
     version: VERSION,
   })
