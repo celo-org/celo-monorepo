@@ -5,7 +5,7 @@
 import NumberKeypad from '@celo/react-components/components/NumberKeypad'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
-import React, { useCallback } from 'react'
+import React from 'react'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import PincodeDisplay from 'src/pincode/PincodeDisplay'
 import { PIN_LENGTH } from 'src/pincode/utils'
@@ -27,26 +27,23 @@ function Pincode({
   onChangePin,
   onCompletePin,
 }: Props) {
-  const onDigitPress = useCallback(
-    (digit) => {
-      if (pin.length >= maxLength) {
-        return
-      }
+  function onDigitPress(digit: number) {
+    if (pin.length >= maxLength) {
+      return
+    }
 
-      const newPin = pin + digit
-      onChangePin(newPin)
-      if (newPin.length === maxLength) {
-        // Wait for next frame so we the user can see the last digit
-        // displayed before acting on it
-        requestAnimationFrame(() => onCompletePin(newPin))
-      }
-    },
-    [pin, onChangePin, maxLength]
-  )
+    const newPin = pin + digit
+    onChangePin(newPin)
+    if (newPin.length === maxLength) {
+      // Wait for next frame so we the user can see the last digit
+      // displayed before acting on it
+      requestAnimationFrame(() => onCompletePin(newPin))
+    }
+  }
 
-  const onBackspacePress = useCallback(() => {
+  function onBackspacePress() {
     onChangePin(pin.substr(0, pin.length - 1))
-  }, [pin, onChangePin])
+  }
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContainer}>
