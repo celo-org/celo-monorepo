@@ -22,10 +22,10 @@ This could be a node with RPC set up. Preferably this would be an node dedicated
 
 ### Keystores
 
-Currently, the service retrieving keys from Azure Key Vault (AKV) or Google Secret Manager.
+Currently, the service retrieving keys from Azure Key Vault (AKV), Google Secret Manager and AWS Secrets Manager.
 You must specify the type, and then the keystore configs for that type.
 
-- `KEYSTORE_TYPE` - `AzureKeyVault` or `GoogleSecretManager`
+- `KEYSTORE_TYPE` - `AzureKeyVault`, `GoogleSecretManager` or `AWSSecretManager`
 
 #### Azure Key Vault
 
@@ -44,6 +44,14 @@ Use the following to configure the Google Secret Manager. To authenticate with G
 - `KEYSTORE_GOOGLE_PROJECT_ID` - The google cloud project id.
 - `KEYSTORE_GOOGLE_SECRET_NAME` - The secret's name.
 - `KEYSTORE_GOOGLE_SECRET_VERSION` - Secret version (latest by default).
+
+#### AWS Secrets Manager
+
+Use the following to configure the AWS Secrets Manager. To authenticate with Amazon Web Services, you can see [Setting Credentials in Node.js](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-credentials-node.html). If you are running the signer inside AWS, we do recommend to authenticate using IAM Roles.
+
+- `KEYSTORE_AWS_REGION` - The AWS Region code where the secret is, for example: `us-east-1`.
+- `KEYSTORE_AWS_SECRET_NAME` - The secret's name.
+- `KEYSTORE_AWS_SECRET_KEY` - The key inside the secret where the private key is save. `key` by default.
 
 ## Operations
 

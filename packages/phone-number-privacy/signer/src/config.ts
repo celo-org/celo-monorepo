@@ -11,6 +11,7 @@ export const DEV_POLYNOMIAL =
 export enum SupportedKeystore {
   AzureKeyVault = 'AzureKeyVault',
   GoogleSecretManager = 'GoogleSecretManager',
+  AWSSecretManager = 'AWSSecretManager',
 }
 
 interface Config {
@@ -48,6 +49,11 @@ interface Config {
       projectId: string
       secretName: string
       secretVersion: string
+    }
+    aws: {
+      region: string
+      secretName: string
+      secretKey: string
     }
   }
 }
@@ -90,6 +96,11 @@ const config: Config = {
       projectId: env.KEYSTORE_GOOGLE_PROJECT_ID,
       secretName: env.KEYSTORE_GOOGLE_SECRET_NAME,
       secretVersion: env.KEYSTORE_GOOGLE_SECRET_VERSION || 'latest',
+    },
+    aws: {
+      region: env.KEYSTORE_AWS_REGION,
+      secretName: env.KEYSTORE_AWS_SECRET_NAME || 'signer-secret',
+      secretKey: env.KEYSTORE_AWS_SECRET_KEY || 'key',
     },
   },
 }
