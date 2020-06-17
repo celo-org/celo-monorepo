@@ -10,9 +10,6 @@ import { setName } from 'src/account/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { headerWithBackButton } from 'src/navigator/Headers'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 
 interface StateProps {
@@ -36,8 +33,6 @@ interface State {
 }
 
 export class EditProfile extends React.Component<Props, State> {
-  static navigationOptions = headerWithBackButton
-
   state: State = {
     name: this.props.name || '',
   }
@@ -53,7 +48,6 @@ export class EditProfile extends React.Component<Props, State> {
   nameSubmitted = () => {
     this.props.setName(this.state.name)
     CeloAnalytics.track(CustomEventNames.edit_name_submit)
-    navigate(Screens.Account)
   }
 
   render() {
