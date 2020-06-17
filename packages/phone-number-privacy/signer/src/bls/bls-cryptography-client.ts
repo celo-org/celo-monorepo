@@ -7,7 +7,7 @@ import logger from '../common/logger'
  */
 export function computeBlindedSignature(base64BlindedMessage: string, privateKey: string) {
   try {
-    const keyBuffer = Buffer.from(privateKey, 'base64')
+    const keyBuffer = Buffer.from(privateKey, 'hex')
     const msgBuffer = Buffer.from(base64BlindedMessage, 'base64')
 
     logger.debug('Calling theshold sign')
