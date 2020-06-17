@@ -12,7 +12,7 @@ export function createServer() {
   app.use(express.json())
   app.use(
     morgan(
-      ':date[iso]:: :remote-addr :remote-user :method :url HTTP/:http-version :status :res[content-length] - :response-time ms'
+      ':date[iso]:: :method :remote-addr :remote-user :url HTTP/:http-version :status :res[content-length] - :response-time ms'
     )
   )
 
