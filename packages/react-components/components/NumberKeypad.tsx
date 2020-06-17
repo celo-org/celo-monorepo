@@ -78,7 +78,7 @@ const style = StyleSheet.create({
   row: {
     width: '100%',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     alignItems: 'center',
   },
   digit: {

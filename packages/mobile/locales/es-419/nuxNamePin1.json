@@ -41,14 +41,6 @@
   "confirmPin": {
     "title": "Ingrese su PIN"
   },
-  "pincodeEducation": {
-    "title": "Asegure su billetera",
-    "intro": "Para proteger su cuenta, Celo billetera requiere un PIN.",
-    "summary":
-      "Puede usar la autenticación existente de su teléfono o crear un nuevo PIN para esta aplicación.",
-    "usePhoneAuth": "Usar Autenticación de Teléfono",
-    "createNewPin": "Crear nuevo PIN"
-  },
   "goToSystemSecuritySettingsActionLabel": "Vaya a seguridad",
   "enableSystemScreenLockFailedMessage": "Error al intentar habilitar el bloqueo de pantalla",
   "initKeystoreFailureMessage": "Error al recuperar la clave",
