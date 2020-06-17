@@ -50,7 +50,7 @@ commands:
           keys:
             # Using a single cache key here as we don't want to fallback on restoring node_modules produced
             # by a different yarn.lock and patches
-            - node_modules-v3-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
+            - node_modules-v4-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
       - run:
           name: Extract cached node_modules (if present)
           command: |
@@ -107,7 +107,7 @@ commands:
             fi
       - save_cache:
           name: Save cached node_modules
-          key: node_modules-v3-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
+          key: node_modules-v4-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
           paths:
             - ~/.tmp/node_modules.tgz
 
@@ -188,7 +188,7 @@ jobs:
             - yarn-v4-
       - restore_cache:
           keys:
-            - android-emulator-image-v4-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
+            - android-emulator-image-v5-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
       - run:
           name: Setup environment variables
           command: |
