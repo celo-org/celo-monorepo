@@ -202,7 +202,6 @@ export class JoinCelo extends React.Component<Props, State> {
             label={t('fullName')}
             onChangeText={this.onChangeNameInput}
             value={name}
-            style={styles.nameInput}
             enablesReturnKeyAutomatically={true}
             placeholder={t('fullNamePlaceholder')}
             testID={'NameEntry'}
@@ -240,7 +239,6 @@ const styles = StyleSheet.create({
     padding: 24,
     paddingTop: 80,
   },
-  nameInput: {},
   phoneNumberInput: {
     marginVertical: 32,
   },

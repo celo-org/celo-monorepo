@@ -48,14 +48,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
     keyboardShouldPersistTaps="always"
   >
     <View>
-      <View
-        style={
-          Array [
-            Object {},
-            Object {},
-          ]
-        }
-      >
+      <View>
         <Text
           style={
             Array [
@@ -131,12 +124,9 @@ exports[`JoinCeloScreen renders correctly 1`] = `
         style={
           Array [
             Object {},
-            Array [
-              Object {},
-              Object {
-                "marginVertical": 32,
-              },
-            ],
+            Object {
+              "marginVertical": 32,
+            },
           ]
         }
       >
@@ -439,14 +429,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
     keyboardShouldPersistTaps="always"
   >
     <View>
-      <View
-        style={
-          Array [
-            Object {},
-            Object {},
-          ]
-        }
-      >
+      <View>
         <Text
           style={
             Array [
@@ -522,12 +505,9 @@ exports[`JoinCeloScreen renders with an error 1`] = `
         style={
           Array [
             Object {},
-            Array [
-              Object {},
-              Object {
-                "marginVertical": 32,
-              },
-            ],
+            Object {
+              "marginVertical": 32,
+            },
           ]
         }
       >

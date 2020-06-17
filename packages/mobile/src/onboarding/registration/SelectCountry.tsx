@@ -28,16 +28,9 @@ export default function SelectCountry({ navigation, route }: Props) {
     searchText,
   ])
 
-  function onChangeText(text: string) {
-    setSearchText(text)
+  function onSelect(country: LocalizedCountry) {
+    navigation.navigate(Screens.JoinCelo, { selectedCountryCodeAlpha2: country.alpha2 })
   }
-
-  const onSelect = useCallback(
-    (country: LocalizedCountry) => {
-      navigation.navigate(Screens.JoinCelo, { selectedCountryCodeAlpha2: country.alpha2 })
-    },
-    [dispatch]
-  )
 
   const renderItem = useCallback(
     ({ item: country }: { item: LocalizedCountry }) => (
@@ -59,7 +52,7 @@ export default function SelectCountry({ navigation, route }: Props) {
         <SearchInput
           placeholder={t('global:search')}
           value={searchText}
-          onChangeText={onChangeText}
+          onChangeText={setSearchText}
         />
       </View>
       <FlatList
