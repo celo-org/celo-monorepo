@@ -5,10 +5,7 @@ exports[`PhoneNumberInput renders and behaves correctly 1`] = `
   style={
     Array [
       Object {},
-      Array [
-        Object {},
-        undefined,
-      ],
+      undefined,
     ]
   }
 >
