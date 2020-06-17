@@ -1,17 +1,19 @@
 import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
 import colors from '@celo/react-components/styles/colors'
 import variables from '@celo/react-components/styles/variables'
-import * as _ from 'lodash'
+import _ from 'lodash'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import {
-  Animated,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   RefreshControl,
   RefreshControlProps,
   SectionList,
   SectionListData,
   StyleSheet,
 } from 'react-native'
+import Animated from 'react-native-reanimated'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { showMessage } from 'src/alert/actions'
@@ -23,6 +25,7 @@ import NotificationBox from 'src/home/NotificationBox'
 import { callToActNotificationSelector, getActiveNotificationCount } from 'src/home/selectors'
 import SendOrRequestBar from 'src/home/SendOrRequestBar'
 import { Namespaces, withTranslation } from 'src/i18n'
+import Logo from 'src/icons/Logo.v2'
 import { importContacts } from 'src/identity/actions'
 import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { NumberToRecipient } from 'src/recipients/recipient'
@@ -78,28 +81,15 @@ const mapStateToProps = (state: RootState): StateProps => ({
 
 const AnimatedSectionList = Animated.createAnimatedComponent(SectionList)
 
-const HEADER_FADE_HEIGHT = 100
-
 export class WalletHome extends React.Component<Props> {
-  animatedValue: Animated.Value
-  headerOpacity: Animated.AnimatedInterpolation
-  onScroll: () => void
+  scrollPosition: Animated.Value<number>
+  onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => void
 
   constructor(props: Props) {
     super(props)
 
-    this.animatedValue = new Animated.Value(0)
-    this.headerOpacity = this.animatedValue.interpolate({
-      inputRange: [0, HEADER_FADE_HEIGHT],
-      outputRange: [0, 1],
-      extrapolate: 'clamp',
-    })
-    this.onScroll = Animated.event(
-      [{ nativeEvent: { contentOffset: { y: this.animatedValue } } }],
-      {
-        useNativeDriver: true,
-      }
-    )
+    this.scrollPosition = new Animated.Value(0)
+    this.onScroll = Animated.event([{ nativeEvent: { contentOffset: { y: this.scrollPosition } } }])
   }
 
   onRefresh = async () => {
@@ -182,8 +172,9 @@ export class WalletHome extends React.Component<Props> {
 
     return (
       <SafeAreaView style={styles.container}>
-        <DrawerTopBar />
+        <DrawerTopBar middleElement={<Logo />} scrollPosition={this.scrollPosition} />
         <AnimatedSectionList
+          scrollEventThrottle={16}
           onScroll={this.onScroll}
           refreshControl={refresh}
           onRefresh={this.onRefresh}

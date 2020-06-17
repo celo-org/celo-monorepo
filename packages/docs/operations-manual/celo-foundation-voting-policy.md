@@ -57,10 +57,44 @@ In addition to meeting the standard criteria, outlined above, the Foundation ant
 
 ## Application
 
-At Celo Mainnet release, the Foundation will vote for the [top 50](https://docs.google.com/spreadsheets/d/e/2PACX-1vQwk10o6YV0uriR8LuYfLqB1irjmOX_-L6Jljn3BtKlmz_R_TsUU8aI-pMqGVlu4HQKIQlQaFkUhsyl/pubhtml?gid=1970613133&single=true) The Great Celo Stake Off (TGCSO) winners divided into the following two cohorts:
-* **Cohort 1:** open to TGCSO leaderboard participants at ranking 26-50, this cohort will receive votes for 3 months period
-* **Cohort 2:** open to TGCSO leaderboard participants at ranking 1-25, this cohort will receive votes for 6 months period
+{% hint style="danger" %}
+Make sure to complete all prerequisites before applying. 
+{% endhint %}
 
-Following Mainnet release, the Foundation will open the application process for a third cohort. This third cohort must meet basic requirements (as stated above) and it is anticipated that this third cohort may  begin to receive votes 3 months after Mainnet release, and will receive votes for the expected 9 month period.
+[APPLY FOR FOUNDATION VOTES HERE](https://c-labs.typeform.com/to/Ov9U0S)
 
-The application process for the third and following cohorts will be shared here in due course. 
+### Timings
+Cohort 3 application deadline: **July 2, 2020**
+
+Anticipated vote date for selected applicants in Cohort 3: **as of Aug 2, 2020**
+
+
+### Application Prerequisites
+Before applying all validator group members should have: 
+* Completed the [Mastering the Art of Validating](https://youtu.be/3UIudzzCb8o) and [Validator Group Marketing](https://www.youtube.com/watch?v=0_veGIugCGQ) courses
+* Completed the [Security Self Assessment Audit](https://docs.google.com/presentation/d/e/2PACX-1vRdKNpXI2mvqwQF6L5LRrxPW2qRK-5MDce5EhqXqLC1MSYmupZMFnhp6YEP0gLYuRKW-FF0fcAqhEAp/pub?start=true&loop=false&delayms=10000&slide=id.g76d52a0216_0_333), which includes completing this [checklist](https://docs.google.com/spreadsheets/d/1FqmUfleCoyNIUep7PoVu3ujHd-OkHZJ8o6p7Affr93w/edit?usp=sharing)
+
+### Application Details 
+Before applying be ready to share the following:
+* A personal statement telling the Foundation why your group should get votes (max 1,500 characters)
+* Validator Group details: email, name, website, address on Mainnet and Baklava, and geographic location
+* Information about your team: full names, link to professional profiles such as LinkedIn or GitHub, and an explanation of the team’s relevant experience
+* Whether your Group: 
+    * Is validating or has validated in the past 1 month on the Celo Mainnet
+    * Is currently receiving Foundation votes
+    * Has been slashed in the past 6 months and if so why
+    * Members have all completed the online training (see prerequisites)
+    * Members have all completed the self-audit (see prerequisites)
+    * Is a non-profit organization or donates to such organizations
+    * Is a Foundation grant recipient
+    * Is running or has run in the past 1 month a Validator on the Baklava testnet
+* Optional: 
+    * The list of contributions made to the Celo ecosystem
+    * Date, audit firm name, and report of your last security audit if your Group has been audited by an external firm in the past 12 months
+
+### Cohort Information
+
+Currently receiving Foundation votes: 
+* **Cohort 1:** The Great Celo Stake Off [leaderboard](https://docs.google.com/spreadsheets/d/1Me56YkCHYmsN23gSMgDb1hZ_ezN0sTjNW4kyGbAO9vc/edit#gid=1970613133) participants at ranking 26-50 - Votes will expire on Aug 1, 2020
+* **Cohort 2:** The Great Celo Stake Off [leaderboard](https://docs.google.com/spreadsheets/d/1Me56YkCHYmsN23gSMgDb1hZ_ezN0sTjNW4kyGbAO9vc/edit#gid=1970613133) participants at ranking 1-25 - Votes will expire on Nov 1, 2020
+
