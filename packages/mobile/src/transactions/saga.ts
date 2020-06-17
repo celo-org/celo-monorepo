@@ -39,8 +39,8 @@ function* watchNewFeedTransactions() {
   yield takeEvery(Actions.NEW_TRANSACTIONS_IN_FEED, cleanupStandbyTransactions)
 }
 
-function* watchFetchRecentTxRecipients() {
-  yield takeLatest(Actions.FETCH_RECENT_TX_RECIPIENTS, fetchRecentTxRecipients)
+function* watchrefreshRecentTxRecipients() {
+  yield takeLatest(Actions.REFRESH_RECENT_TX_RECIPIENTS, refreshRecentTxRecipients)
 }
 
 // Remove standby txs from redux state when the real ones show up in the feed
@@ -112,7 +112,7 @@ export function* sendAndMonitorTransaction<T>(
   }
 }
 
-export function* fetchRecentTxRecipients() {
+export function* refreshRecentTxRecipients() {
   const addressToE164Number = yield select(addressToE164NumberSelector)
   const recipientCache = yield select(recipientCacheSelector)
   const knownFeedTransactions: KnownFeedTransactionsType = yield select(
@@ -160,5 +160,5 @@ export function* fetchRecentTxRecipients() {
 
 export function* transactionSaga() {
   yield spawn(watchNewFeedTransactions)
-  yield spawn(watchFetchRecentTxRecipients)
+  yield spawn(watchrefreshRecentTxRecipients)
 }

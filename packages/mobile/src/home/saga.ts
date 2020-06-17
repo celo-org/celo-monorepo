@@ -17,7 +17,7 @@ import { shouldFetchCurrentRate } from 'src/localCurrency/selectors'
 import { withTimeout } from 'src/redux/sagas-helpers'
 import { shouldUpdateBalance } from 'src/redux/selectors'
 import { fetchDollarBalance } from 'src/stableToken/actions'
-import { Actions as TransactionActions, fetchRecentTxRecipients } from 'src/transactions/actions'
+import { Actions as TransactionActions, refreshRecentTxRecipients } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
 import { getConnectedAccount } from 'src/web3/saga'
 
@@ -43,7 +43,7 @@ export function* refreshBalances() {
   yield put(fetchGoldBalance())
   yield put(fetchSentEscrowPayments())
   // TODO: Find a better home for this
-  yield put(fetchRecentTxRecipients())
+  yield put(refreshRecentTxRecipients())
 }
 
 export function* autoRefreshSaga() {

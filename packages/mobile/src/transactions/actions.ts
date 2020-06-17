@@ -18,7 +18,7 @@ export enum Actions {
   TRANSACTION_CONFIRMED = 'TRANSACTIONS/TRANSACTION_CONFIRMED',
   TRANSACTION_FAILED = 'TRANSACTIONS/TRANSACTION_FAILED',
   NEW_TRANSACTIONS_IN_FEED = 'TRANSACTIONS/NEW_TRANSACTIONS_IN_FEED',
-  FETCH_RECENT_TX_RECIPIENTS = 'TRANSACTIONS/FETCH_RECENT_TX_RECIPIENTS',
+  REFRESH_RECENT_TX_RECIPIENTS = 'TRANSACTIONS/REFRESH_RECENT_TX_RECIPIENTS',
   UPDATE_RECENT_TX_RECIPIENT_CACHE = 'TRANSACTIONS/UPDATE_RECENT_TX_RECIPIENT_CACHE',
 }
 
@@ -57,8 +57,8 @@ export interface NewTransactionsInFeedAction {
   transactions: TransactionFeedFragment[]
 }
 
-export interface FetchRecentTxRecipients {
-  type: Actions.FETCH_RECENT_TX_RECIPIENTS
+export interface RefreshRecentTxRecipients {
+  type: Actions.REFRESH_RECENT_TX_RECIPIENTS
 }
 export interface UpdatedRecentTxRecipientsCacheAction {
   type: Actions.UPDATE_RECENT_TX_RECIPIENT_CACHE
@@ -71,7 +71,7 @@ export type ActionTypes =
   | ResetStandbyTransactionsAction
   | AddHashToStandbyTransactionAction
   | NewTransactionsInFeedAction
-  | FetchRecentTxRecipients
+  | RefreshRecentTxRecipients
   | UpdatedRecentTxRecipientsCacheAction
 
 export const generateStandbyTransactionId = (recipientAddress: string) => {
@@ -90,8 +90,8 @@ export const removeStandbyTransaction = (idx: string): RemoveStandbyTransactionA
   idx,
 })
 
-export const fetchRecentTxRecipients = (): FetchRecentTxRecipients => ({
-  type: Actions.FETCH_RECENT_TX_RECIPIENTS,
+export const refreshRecentTxRecipients = (): RefreshRecentTxRecipients => ({
+  type: Actions.REFRESH_RECENT_TX_RECIPIENTS,
 })
 
 export const updateRecentTxRecipientsCache = (
