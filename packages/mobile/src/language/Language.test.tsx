@@ -22,8 +22,6 @@ describe('Language', () => {
     })
 
     fireEvent.press(getByText('Español (América Latina)'))
-    // Run timers, because Touchable adds some delay
-    jest.runAllTimers()
     expect(navigate).toHaveBeenCalledWith(Screens.JoinCelo)
     expect(store.getActions()).toMatchInlineSnapshot(`
       Array [
