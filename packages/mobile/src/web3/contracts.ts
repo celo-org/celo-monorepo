@@ -3,7 +3,6 @@ import { privateKeyToAddress } from '@celo/utils/src/address'
 import { Platform } from 'react-native'
 import * as net from 'react-native-tcp'
 import { select, take } from 'redux-saga/effects'
-import { waitForRehydrate } from 'src/app/saga'
 import { DEFAULT_FORNO_URL } from 'src/config'
 import { IPC_PATH } from 'src/geth/geth'
 import { store } from 'src/redux/store'
@@ -36,15 +35,11 @@ function getWeb3(fornoMode: boolean): Web3 {
 export const getContractKitOutsideGenerator = () => promisifyGenerator(getContractKit())
 
 export function* getContractKit() {
-  yield waitForRehydrate()
+  // No need to waitForRehydrate as contractKitReady set to false for every app reopen
   while (!(yield select(contractKitReadySelector))) {
     // If contractKit locked, wait until unlocked
     yield take(Actions.SET_CONTRACT_KIT_READY)
   }
-  return getContractKitBasedOnFornoInStore()
-}
-
-export function getContractKitBasedOnFornoInStore() {
   const forno = fornoSelector(store.getState())
   return forno ? contractKitForno : contractKitGeth
 }
