@@ -11,5 +11,13 @@
       "successHeader": "You have {{matches}} friends on Celo",
       "successStatus": "You're all synced"
     }
+  },
+  "accountInfo": "Account Info",
+  "step": "Step {{step}} of 5",
+  "selectCountryCode": "Select Country Code",
+  "pincodeSet": {
+    "create": "Create a PIN",
+    "verify": "Enter PIN again",
+    "pinsDontMatch": "The PINs didn't match"
   }
 }

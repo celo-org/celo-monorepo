@@ -25,7 +25,7 @@ export class BLSCryptographyClient {
       const sigBuffer = Buffer.from(serviceResponse.signature, 'base64')
       try {
         await threshold_bls.partialVerifyBlindSignature(
-          Buffer.from(polynomial, 'base64'),
+          Buffer.from(polynomial, 'hex'),
           Buffer.from(blindedMessage, 'base64'),
           sigBuffer
         )
