@@ -34,11 +34,11 @@ You must specify the type, and then the keystore configs for that type.
 
 Use the following to configure the AKV connection. These values are generated when creating a service principal account (see [Configuring your Key Vault](https://www.npmjs.com/package/@azure/keyvault-keys#configuring-your-key-vault)). Or if the service is being hosted on Azure itself, authentication can be done by granted key access to the VM's managed identity, in which case the client_id, client_secret, and tenant configs can be left blank.
 
-- `KEYSTORE_AZURE_CLIENT_ID` - The clientId of the service principal account that has [Get, List] access to secrets.
-- `KEYSTORE_AZURE_CLIENT_SECRET` - The client Secret of the same service principal account.
-- `KEYSTORE_AZURE_TENANT` - The tenant that the service principal is a member of.
 - `KEYSTORE_AZURE_VAULT_NAME` - The name of your Azure Key Vault.
 - `KEYSTORE_AZURE_SECRET_NAME` - The name of the secret that holds your BLS key.
+- `KEYSTORE_AZURE_CLIENT_ID` - (Optional) The clientId of the service principal account that has [Get, List] access to secrets.
+- `KEYSTORE_AZURE_CLIENT_SECRET` - (Optional) The client secret of the same service principal account.
+- `KEYSTORE_AZURE_TENANT` - (Optional) The tenant that the service principal is a member of.
 
 #### Google Secret Manager
 
