@@ -8,7 +8,7 @@ async function start() {
   await initKeyProvider()
 
   const server = createServer()
-  logger.info(`Starting server.`)
+  logger.info('Starting server')
   const port = config.server.port
   server.listen(port, () => {
     logger.info(`Server is listening on port ${port}`)

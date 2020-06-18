@@ -42,7 +42,7 @@ Use the following to configure the AKV connection. These values are generated wh
 
 #### Google Secret Manager
 
-Use the following to configure the Google Secret Manager. To authenticate with Google Cloud, you can see [Setting Up Authentication](https://cloud.google.com/docs/authentication/production)
+Use the following to configure the Google Secret Manager. To authenticate with Google Cloud, you can see [Setting Up Authentication](https://cloud.google.com/docs/authentication/production). By default, the google lib will use the default app credentials assigned to the host VM. If the service is being run outside of GCP, you can manually set the `GOOGLE_APPLICATION_CREDENTIALS` env var to the path to a service account json file.
 
 - `KEYSTORE_GOOGLE_PROJECT_ID` - The google cloud project id.
 - `KEYSTORE_GOOGLE_SECRET_NAME` - The secret's name.
