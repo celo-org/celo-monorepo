@@ -39,7 +39,7 @@ import Logger from 'src/utils/Logger'
 import {
   addLocalAccount,
   getContractKit,
-  getContractKitOutsideGenerator,
+  getContractKitAsync,
   web3ForUtils,
 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
@@ -187,7 +187,7 @@ function* withdrawFromEscrow() {
 }
 
 async function createReclaimTransaction(paymentID: string) {
-  const contractKit = await getContractKitOutsideGenerator()
+  const contractKit = await getContractKitAsync()
 
   const escrow = await contractKit.contracts.getEscrow()
   return escrow.revoke(paymentID).txo
