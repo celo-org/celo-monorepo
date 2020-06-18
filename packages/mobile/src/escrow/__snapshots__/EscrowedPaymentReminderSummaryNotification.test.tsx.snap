@@ -6,19 +6,12 @@ exports[`EscrowedPaymentReminderSummaryNotification renders correctly 1`] = `
     Array [
       Object {
         "backgroundColor": "#FFFFFF",
-        "elevation": 12,
         "padding": 16,
-        "shadowColor": "black",
-        "shadowOffset": Object {
-          "height": 6,
-          "width": 0,
-        },
-        "shadowOpacity": 0.3,
-        "shadowRadius": 9.600000000000001,
       },
       Object {
         "borderRadius": 8,
       },
+      undefined,
       Array [
         Object {
           "height": 144,
@@ -160,19 +153,12 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
         Array [
           Object {
             "backgroundColor": "#FFFFFF",
-            "elevation": 12,
             "padding": 16,
-            "shadowColor": "black",
-            "shadowOffset": Object {
-              "height": 6,
-              "width": 0,
-            },
-            "shadowOpacity": 0.3,
-            "shadowRadius": 9.600000000000001,
           },
           Object {
             "borderRadius": 8,
           },
+          undefined,
           Array [
             Object {
               "height": 144,
@@ -372,19 +358,12 @@ exports[`EscrowedPaymentReminderSummaryNotification when more than 2 requests re
     Array [
       Object {
         "backgroundColor": "#FFFFFF",
-        "elevation": 12,
         "padding": 16,
-        "shadowColor": "black",
-        "shadowOffset": Object {
-          "height": 6,
-          "width": 0,
-        },
-        "shadowOpacity": 0.3,
-        "shadowRadius": 9.600000000000001,
       },
       Object {
         "borderRadius": 8,
       },
+      undefined,
       Array [
         Object {
           "height": 144,

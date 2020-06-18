@@ -55,7 +55,6 @@ import {
   noHeader,
   noHeaderGestureDisabled,
   nuxNavigationOptions,
-  nuxNavigationOptionsNoBackButton,
 } from 'src/navigator/Headers.v2'
 import { navigateBack, navigateToExchangeHome } from 'src/navigator/NavigationService'
 import QRNavigator from 'src/navigator/QRNavigator'
@@ -205,7 +204,7 @@ const nuxScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen
       name={Screens.EnterInviteCode}
       component={EnterInviteCode}
-      options={nuxNavigationOptionsNoBackButton}
+      options={EnterInviteCode.navigationOptions}
     />
     <Navigator.Screen
       name={Screens.ImportWallet}

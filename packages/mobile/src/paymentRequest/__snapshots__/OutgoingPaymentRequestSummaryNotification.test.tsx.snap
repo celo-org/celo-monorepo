@@ -14,19 +14,12 @@ exports[`OutgoingPaymentRequestSummaryNotification renders a number when the add
         Array [
           Object {
             "backgroundColor": "#FFFFFF",
-            "elevation": 12,
             "padding": 16,
-            "shadowColor": "black",
-            "shadowOffset": Object {
-              "height": 6,
-              "width": 0,
-            },
-            "shadowOpacity": 0.3,
-            "shadowRadius": 9.600000000000001,
           },
           Object {
             "borderRadius": 8,
           },
+          undefined,
           Array [
             Object {
               "height": 144,
@@ -266,19 +259,12 @@ exports[`OutgoingPaymentRequestSummaryNotification renders correctly for just on
         Array [
           Object {
             "backgroundColor": "#FFFFFF",
-            "elevation": 12,
             "padding": 16,
-            "shadowColor": "black",
-            "shadowOffset": Object {
-              "height": 6,
-              "width": 0,
-            },
-            "shadowOpacity": 0.3,
-            "shadowRadius": 9.600000000000001,
           },
           Object {
             "borderRadius": 8,
           },
+          undefined,
           Array [
             Object {
               "height": 144,
@@ -510,19 +496,12 @@ exports[`OutgoingPaymentRequestSummaryNotification renders correctly for multipl
     Array [
       Object {
         "backgroundColor": "#FFFFFF",
-        "elevation": 12,
         "padding": 16,
-        "shadowColor": "black",
-        "shadowOffset": Object {
-          "height": 6,
-          "width": 0,
-        },
-        "shadowOpacity": 0.3,
-        "shadowRadius": 9.600000000000001,
       },
       Object {
         "borderRadius": 8,
       },
+      undefined,
       Array [
         Object {
           "height": 144,
