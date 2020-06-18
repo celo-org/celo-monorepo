@@ -3,10 +3,11 @@ import { privateKeyToAddress } from '@celo/utils/src/address'
 import { Platform } from 'react-native'
 import * as net from 'react-native-tcp'
 import { select, take } from 'redux-saga/effects'
-import sleep from 'sleep-promise'
+import { waitForRehydrate } from 'src/app/saga'
 import { DEFAULT_FORNO_URL } from 'src/config'
 import { IPC_PATH } from 'src/geth/geth'
 import { store } from 'src/redux/store'
+import { promisifyGenerator } from 'src/utils/generators'
 import Logger from 'src/utils/Logger'
 import { Actions } from 'src/web3/actions'
 import { contractKitReadySelector, fornoSelector } from 'src/web3/selectors'
@@ -32,24 +33,10 @@ function getWeb3(fornoMode: boolean): Web3 {
 
 // Workaround as contractKit logic is still used outside generators
 // Moving towards generators to allow us to block contractKit calls, see https://github.com/celo-org/celo-monorepo/issues/3727
-export async function getContractKitOutsideGenerator() {
-  // Poll store until rehydrated
-  while (!store) {
-    Logger.debug(`getContractKitOutsideGenerator`, `Still waiting for store...`)
-    await sleep(250) // Every 0.25 seconds
-  }
-  // Use store to ensure ContractKit is ready
-  while (!contractKitReadySelector(store.getState())) {
-    Logger.debug(`getContractKitOutsideGenerator`, `ContractKit is still locked...`)
-    await sleep(250) // Every 0.25 seconds
-  }
-
-  Logger.debug(`${tag}@getContractKitOutsideGenerator`, 'ContractKit ready, returning')
-  return getContractKitBasedOnFornoInStore()
-}
+export const getContractKitOutsideGenerator = () => promisifyGenerator(getContractKit())
 
 export function* getContractKit() {
-  // No need to waitForRehydrate as contractKitReady set to false for every app reopen
+  yield waitForRehydrate()
   while (!(yield select(contractKitReadySelector))) {
     // If contractKit locked, wait until unlocked
     yield take(Actions.SET_CONTRACT_KIT_READY)
