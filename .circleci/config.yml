@@ -189,7 +189,7 @@ jobs:
             - yarn-v4-
       - restore_cache:
           keys:
-            - android-emulator-image-v6-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
+            - android-emulator-image-v7-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
       - run:
           name: Setup environment variables
           command: |
@@ -211,7 +211,7 @@ jobs:
             yes | sdkmanager --licenses || if [ $? -ne '141' ]; then exit $?; fi;
             ./packages/mobile/scripts/install_android_emulator_image.sh
       - save_cache:
-          key: android-emulator-image-v6-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
+          key: android-emulator-image-v7-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
           paths:
             - /usr/local/Caskroom/android-sdk/*
       - run:
