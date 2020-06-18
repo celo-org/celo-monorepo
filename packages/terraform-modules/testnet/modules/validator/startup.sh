@@ -175,14 +175,35 @@ docker pull $GETH_NODE_DOCKER_IMAGE
 PROXIED_FLAGS=""
 PROXY_ENODE=""
 if [[ ${proxied} == "true" ]]; then
-  # $PROXY_ENODE_ADDRESS is from the secrets pulled from google cloud
-  PROXY_INTERNAL_ENODE="enode://$PROXY_ENODE_ADDRESS@${proxy_internal_ip_address}:30503"
-  PROXY_EXTERNAL_ENODE="enode://$PROXY_ENODE_ADDRESS@${proxy_external_ip_address}:30303"
 
-  echo "Proxy internal enode: $PROXY_INTERNAL_ENODE"
-  echo "Proxy external enode: $PROXY_EXTERNAL_ENODE"
+  PROXY_COUNT=${length(proxy_internal_ip_addresses)}
+  PROXY_INTERNAL_IP_ADDRESSES=${join(",", proxy_internal_ip_addresses)}
+  PROXY_EXTERNAL_IP_ADDRESSES=${join(",", proxy_external_ip_addresses)}
 
-  PROXIED_FLAGS="--proxy.proxied --nodiscover --proxy.proxyenodeurlpair=\"$PROXY_INTERNAL_ENODE;$PROXY_EXTERNAL_ENODE\""
+  PROXY_ENODE_URL_PAIRS=""
+
+  PROXY_INDEX=0
+  while [ $PROXY_INDEX -lt $PROXY_COUNT ]; do
+    PROXY_INTERNAL_IP_ADDRESS=`echo -n $PROXY_INTERNAL_IP_ADDRESSES | cut -d ',' -f $(($PROXY_INDEX + 1))`
+    PROXY_EXTERNAL_IP_ADDRESS=`echo -n $PROXY_EXTERNAL_IP_ADDRESSES | cut -d ',' -f $(($PROXY_INDEX + 1))`
+    # $PROXY_ENODE_ADDRESSES is from the secrets pulled from google cloud
+    PROXY_ENODE_ADDRESS=`echo -n $PROXY_ENODE_ADDRESSES | cut -d ',' -f $(($PROXY_INDEX + 1))`
+
+    PROXY_INTERNAL_ENODE="enode://$PROXY_ENODE_ADDRESS@$PROXY_INTERNAL_IP_ADDRESS:30503"
+    PROXY_EXTERNAL_ENODE="enode://$PROXY_ENODE_ADDRESS@$PROXY_EXTERNAL_IP_ADDRESS:30303"
+
+    echo "Proxy $PROXY_INDEX internal enode: $PROXY_INTERNAL_ENODE"
+    echo "Proxy $PROXY_INDEX external enode: $PROXY_EXTERNAL_ENODE"
+
+    if [ $PROXY_INDEX -gt 0 ]; then
+      PROXY_ENODE_URL_PAIRS="$PROXY_ENODE_URL_PAIRS,"
+    fi
+    PROXY_ENODE_URL_PAIRS="$PROXY_ENODE_URL_PAIRS$PROXY_INTERNAL_ENODE;$PROXY_EXTERNAL_ENODE"
+
+    PROXY_INDEX=$(($PROXY_INDEX + 1))
+  done
+
+  PROXIED_FLAGS="--proxy.proxied --nodiscover --proxy.proxyenodeurlpairs=\"$PROXY_ENODE_URL_PAIRS\""
 
 
   # if this validator is proxied, cut it off from the external internet after
@@ -205,8 +226,11 @@ echo -n "$ACCOUNT_ADDRESS" > $DATA_DIR/address
 echo -n "$BOOTNODE_ENODE_ADDRESS" > $DATA_DIR/bootnodeEnodeAddress
 echo -n "$BOOTNODE_ENODE" > $DATA_DIR/bootnodeEnode
 echo -n "$GETH_ACCOUNT_SECRET" > $DATA_DIR/account/accountSecret
+
+NAT_FLAG=""
 if [ "${ip_address}" ]; then
   echo -n "${ip_address}" > $DATA_DIR/ipAddress
+  NAT_FLAG="--nat=extip:${ip_address}"
 fi
 
 echo "Starting geth..."
@@ -256,6 +280,7 @@ docker run \
     --metrics \
     --pprof \
     --allow-insecure-unlock \
+    $NAT_FLAG \
     $IN_MEMORY_DISCOVERY_TABLE_FLAG \
     $PROXIED_FLAGS"
 

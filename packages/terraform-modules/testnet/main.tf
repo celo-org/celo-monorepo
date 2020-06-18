@@ -165,11 +165,13 @@ module "tx_node" {
   geth_verbosity                        = var.geth_verbosity
   in_memory_discovery_table             = var.in_memory_discovery_table
   instance_tags                         = [local.target_tag_tx_node]
+  max_peers                             = 500
   name                                  = "tx-node"
   network_id                            = var.network_id
   network_name                          = data.google_compute_network.network.name
   gcmode                                = "full"
   node_count                            = var.tx_node_count
+  node_disk_size_gb                     = var.node_disk_size_gb
   rpc_apis                              = "eth,net,web3"
 }
 
@@ -191,12 +193,14 @@ module "tx_node_private" {
   geth_verbosity                        = var.geth_verbosity
   in_memory_discovery_table             = var.in_memory_discovery_table
   instance_tags                         = [local.target_tag_tx_node_private]
+  max_peers                             = 500
   name                                  = "tx-node-private"
   network_id                            = var.network_id
   network_name                          = data.google_compute_network.network.name
   gcmode                                = "archive"
   node_count                            = var.private_tx_node_count
   rpc_apis                              = "eth,net,web3,debug,txpool"
+  node_disk_size_gb                     = var.node_disk_size_gb
 }
 
 # used for access by blockscout
@@ -235,6 +239,8 @@ module "validator" {
   istanbul_request_timeout_ms           = var.istanbul_request_timeout_ms
   network_id                            = var.network_id
   network_name                          = data.google_compute_network.network.name
-  proxied_validator_count               = var.proxied_validator_count
+  node_disk_size_gb                     = var.node_disk_size_gb
+  proxies_per_validator                 = var.proxies_per_validator
+  tx_node_count                         = var.tx_node_count
   validator_count                       = var.validator_count
 }

@@ -240,14 +240,21 @@ data:
     - |
       [[ $REPLICA_NAME =~ -([0-9]+)$ ]] || exit 1
       RID=${BASH_REMATCH[1]}
-      echo "Generating private key for rid=$RID"
-      celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType {{ .mnemonic_account_type }} --index $RID > /root/.celo/pkey
+      {{ if .proxy }}
+      # To allow proxies to scale up easily without conflicting with keys of
+      # proxies associated with other validators
+      KEY_INDEX=$(( ({{ .validator_index }} * 10000) + $RID ))
+      {{ else }}
+      KEY_INDEX=$RID
+      {{ end }}
+      echo "Generating private key with KEY_INDEX=$KEY_INDEX"
+      celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType {{ .mnemonic_account_type }} --index $KEY_INDEX > /root/.celo/pkey
       echo 'Generating address'
       celotooljs.sh generate account-address --private-key $(cat /root/.celo/pkey) > /root/.celo/address
       {{ if .proxy }}
       # Generating the account address of the validator
-      echo "Generating the account address of the validator $RID"
-      celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType validator --index $RID > /root/.celo/validator_pkey
+      echo "Generating the account address of the validator {{ .validator_index }}"
+      celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType validator --index {{ .validator_index }} > /root/.celo/validator_pkey
       celotooljs.sh generate account-address --private-key `cat /root/.celo/validator_pkey` > /root/.celo/validator_address
       rm -f /root/.celo/validator_pkey
       {{ end }}
@@ -267,7 +274,7 @@ data:
         fi
       else
         echo 'Using $IP_ADDRESSES'
-        echo $IP_ADDRESSES | cut -d ',' -f $((RID + 1)) > /root/.celo/ipAddress
+        echo $IP_ADDRESSES | cut -d '/' -f $((RID + 1)) > /root/.celo/ipAddress
       fi
       echo "/root/.celo/ipAddress"
       cat /root/.celo/ipAddress
@@ -288,7 +295,7 @@ data:
         apiVersion: v1
         fieldPath: status.podIP
   - name: BOOTNODE_IP_ADDRESS
-    value: {{ default "none" .Values.geth.bootnodeIpAddress  }}
+    value: {{ default "none" .Values.geth.bootnodeIpAddress }}
   - name: REPLICA_NAME
     valueFrom:
       fieldRef:
@@ -299,7 +306,7 @@ data:
         name: {{ template "common.fullname" . }}-geth-account
         key: mnemonic
   - name: IP_ADDRESSES
-    value:  "{{ join "," .ip_addresses }}"
+    value: {{ .ip_addresses }}
   volumeMounts:
   - name: data
     mountPath: /root/.celo

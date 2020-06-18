@@ -80,9 +80,28 @@ variable instance_tags {
   default     = []
 }
 
+variable max_light_peers {
+  type        = number
+  description = "The maximum number of light client peers"
+  default     = 50
+}
+
+variable max_peers {
+  type        = number
+  description = "The maximum number of peers for the node"
+  default     = 100
+}
+
 variable name {
   type        = string
-  description = "Name of the nodes"
+  description = "Name of the nodes. Should be specified if names is not."
+  default     = ""
+}
+
+variable names {
+  type        = set(string)
+  description = "Name of each node to create. If not specified, the names will be generated using the name variable and an index."
+  default     = []
 }
 
 variable network_id {
@@ -97,7 +116,13 @@ variable network_name {
 
 variable node_count {
   type        = number
-  description = "Number of nodes to create"
+  description = "Number of nodes to create if names is not specified"
+  default     = 0
+}
+
+variable node_disk_size_gb {
+  type        = number
+  description = "The size in GB for each node's disk"
 }
 
 variable gcmode {

@@ -151,7 +151,7 @@ GETH_NODE_DOCKER_IMAGE=${geth_node_docker_image_repository}:${geth_node_docker_i
 # download & apply secrets pulled from Cloud Storage as environment vars
 echo "Downloading secrets from Google Cloud Storage..."
 SECRETS_ENV_PATH=/var/.env.celo.secrets
-gsutil cp gs://${gcloud_secrets_bucket}/${gcloud_secrets_base_path}/.env.${name}-${rid} $SECRETS_ENV_PATH
+gsutil cp gs://${gcloud_secrets_bucket}/${gcloud_secrets_base_path}/.env.${name} $SECRETS_ENV_PATH
 # Apply the .env file
 . $SECRETS_ENV_PATH
 
@@ -184,9 +184,6 @@ echo -n "$ACCOUNT_ADDRESS" > $DATA_DIR/address
 echo -n "$BOOTNODE_ENODE_ADDRESS" > $DATA_DIR/bootnodeEnodeAddress
 echo -n "$BOOTNODE_ENODE" > $DATA_DIR/bootnodeEnode
 echo -n "$GETH_ACCOUNT_SECRET" > $DATA_DIR/account/accountSecret
-if [ ${name} == "proxy" ]; then
-  echo -n "$VALIDATOR_ADDRESS" > $DATA_DIR/validator_address
-fi
 
 echo "Starting geth..."
 # We need to override the entrypoint in the geth image (which is originally `geth`)
@@ -208,7 +205,7 @@ docker run \
     geth \
       --bootnodes=enode://$BOOTNODE_ENODE \
       --light.serve 90 \
-      --light.maxpeers 1000 \
+      --light.maxpeers ${max_light_peers} \
       --maxpeers=${max_peers} \
       --rpc \
       --rpcaddr 0.0.0.0 \
