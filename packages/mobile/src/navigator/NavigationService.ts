@@ -47,6 +47,24 @@ export const replace: SafeNavigate = (...args) => {
     })
 }
 
+// for when a screen should be pushed onto stack even if it already exists in it.
+export const pushToStack: SafeNavigate = (...args) => {
+  const [routeName, params] = args
+  ensureNavigator()
+    .then(() => {
+      Logger.debug(`${TAG}@pushToStack`, `Dispatch ${routeName}`)
+      navigationRef.current?.dispatch(
+        StackActions.push({
+          routeName,
+          params,
+        })
+      )
+    })
+    .catch((reason) => {
+      Logger.error(`${TAG}@pushToStack`, `Navigation failure: ${reason}`)
+    })
+}
+
 export function navigate<RouteName extends keyof StackParamList>(
   ...args: undefined extends StackParamList[RouteName]
     ? [RouteName] | [RouteName, StackParamList[RouteName]]
@@ -97,6 +115,7 @@ async function ensurePincode(): Promise<boolean> {
       return false
     }
   }
+
   return true
 }
 
@@ -104,12 +123,20 @@ export const navigateProtected: SafeNavigate = (...args) => {
   ensurePincode()
     .then((ensured) => {
       if (ensured) {
-        navigate(...args)
+        replace(...args)
       }
     })
     .catch((error) => {
       Logger.error(`${TAG}@navigateProtected`, 'PIN ensure error', error)
     })
+}
+
+export function navigateToExchangeHome() {
+  if (store.getState().goldToken.educationCompleted) {
+    navigate(Screens.ExchangeHomeScreen)
+  } else {
+    navigate(Screens.GoldEducation)
+  }
 }
 
 export function navigateBack(params?: object) {

@@ -1,3 +1,4 @@
+import Expandable from '@celo/react-components/components/Expandable'
 import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
@@ -7,7 +8,6 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LayoutAnimation, StyleSheet, Text, View } from 'react-native'
 import AccountNumber from 'src/components/AccountNumber'
-import Expandable from 'src/components/Expandable'
 import { Namespaces } from 'src/i18n'
 import { Recipient } from 'src/recipients/recipient'
 
@@ -139,8 +139,9 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: colors.gray2,
     flexDirection: 'row',
+    justifyContent: 'space-between',
     paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingVertical: 16,
   },
   accountLabel: {
     ...fontStyles.label,

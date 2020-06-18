@@ -34,29 +34,6 @@ async function getAccountExists(account: string): Promise<boolean> {
 }
 
 /*
- * Increments query count in database.  If record doesn't exist, create one.
- */
-export async function incrementQueryCount(account: string, trx: Transaction) {
-  logger.debug('Incrementing query count')
-  try {
-    if (await getAccountExists(account)) {
-      await trx(ACCOUNTS_TABLE)
-        .where(ACCOUNTS_COLUMNS.address, account)
-        .increment(ACCOUNTS_COLUMNS.numLookups, 1)
-    } else {
-      const newAccount = new Account(account)
-      newAccount[ACCOUNTS_COLUMNS.numLookups] = 1
-      return insertRecord(newAccount)
-    }
-    await trx.commit()
-  } catch (e) {
-    logger.error(ErrorMessages.DATABASE_UPDATE_FAILURE, e)
-    await trx.commit() // don't rollback with DB failure. commit to release lock
-    return true
-  }
-}
-
-/*
  * Returns whether account has already performed matchmaking
  */
 export async function getDidMatchmaking(account: string): Promise<boolean> {
