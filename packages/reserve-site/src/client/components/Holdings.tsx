@@ -1,22 +1,22 @@
 /** @jsx jsx */
-import * as React from 'react'
-import { jsx, css } from '@emotion/core'
+import { css, jsx } from '@emotion/core'
+import { HoldingsData } from 'service/Data'
 import Button from './Button'
 
-export default function Holdings() {
+export default function Holdings(props: Omit<HoldingsData, 'updatedDate'>) {
   return (
     <div css={rootStyle}>
       <Heading title="CELO Native Asset" gridArea="celo" iconSrc="/CELO.png" />
-      <Amount label="Total" units={'120,000,00'} gridArea="total" />
-      <Amount label="CELO on-chain" units={'40,000,00'} gridArea="onChain" />
-      <Amount label="Celo in Custody" units={'80,000,00'} gridArea="custody" />
+      <Amount label="Total" units={props.total} gridArea="total" />
+      <Amount label="CELO on-chain" units={props.onChain} gridArea="onChain" />
+      <Amount label="Celo in Custody" units={props.inCustody} gridArea="custody" />
       <Heading title="Additional Crypto Assets" gridArea="crypto" />
-      <Amount label="BTC" units={'100'} gridArea="btc" />
-      <Amount label="ETH" units={'9,000'} gridArea="eth" />
-      <Amount label="DAI" units={'5,000'} gridArea="dai" />
+      <Amount label="BTC" units={props.BTC} gridArea="btc" />
+      <Amount label="ETH" units={props.ETH} gridArea="eth" />
+      <Amount label="DAI" units={props.DAI} gridArea="dai" />
       <Heading title="cUSD Asset" gridArea="cUSD" iconSrc="/CUSD.png" />
-      <Amount label="cUSD outstanding" units={'5,000,000'} gridArea="outstanding" />
-      <Amount label="Reserve Ratio*" units={'20'} gridArea="ratio" />
+      <Amount label="cUSD outstanding" units={props.cUSD} gridArea="outstanding" />
+      <Amount label="Reserve Ratio*" units={props.ratio} gridArea="ratio" />
       <div css={infoStyle}>
         <div css={finePrintStyle}>
           <small>
@@ -100,7 +100,7 @@ const rootStyle = css({
 
 const headingStyle = css({
   marginTop: 60,
-  marginBottom: 8,
+  marginBottom: 20,
   borderBottom: 1,
   borderBottomColor: 'rgba(46, 51, 56, 0.3)',
   borderBottomStyle: 'solid',
@@ -109,6 +109,7 @@ const headingStyle = css({
 const headingTextStyle = css({
   display: 'inline-flex',
   alignItems: 'center',
+  marginBottom: 16,
 })
 
 const numberStyle = css({

@@ -1,27 +1,28 @@
 /** @jsx jsx */
 
-import * as React from 'react'
-import NavBar from 'components/Navbar'
-import Footer from 'components/Footer'
 import { css, jsx } from '@emotion/core'
-import { flexCol } from 'components/styles'
+import Footer from 'components/Footer'
 import Head from 'components/Head'
-import intro from 'content/home/intro.md'
-import about from 'content/home/about.md'
-import initialTarget from 'content/home/initial-target.md'
-import attestations from 'content/home/attestations.md'
-import matter from 'front-matter'
-import Section from 'components/Section'
-import ReserveAddresses from 'components/ReserveAddresses'
 import Holdings from 'components/Holdings'
+import NavBar from 'components/Navbar'
+import ReserveAddresses from 'components/ReserveAddresses'
+import Section from 'components/Section'
+import { flexCol } from 'components/styles'
 import TargetGraph from 'components/TargetGraph'
+import about from 'content/home/about.md'
+import attestations from 'content/home/attestations.md'
+import initialTarget from 'content/home/initial-target.md'
+import intro from 'content/home/intro.md'
+import matter from 'front-matter'
+import { HoldingsData } from 'service/Data'
+import fetchData from 'service/holdings'
 
 const INTRO = matter<{ title: string }>(intro)
 const INITIAL_TARGET = matter<{ title: string }>(initialTarget)
 const ABOUT = matter<{ title: string }>(about)
 const ATTESTATIONS = matter<{ title: string }>(attestations)
 
-export default function Home() {
+export default function Home(props: HoldingsData) {
   return (
     <>
       <Head />
@@ -30,8 +31,20 @@ export default function Home() {
           <NavBar />
           <main css={mainStyle}>
             <Section title={INTRO.attributes.title} content={INTRO.body} />
-            <Section title={'Current Reserve Holdings'}>
-              <Holdings />
+            <Section
+              title={'Current Reserve Holdings'}
+              subHeading={<Updated date={props.updatedDate} />}
+            >
+              <Holdings
+                total={props.total}
+                inCustody={props.inCustody}
+                onChain={props.onChain}
+                cUSD={props.cUSD}
+                DAI={props.DAI}
+                BTC={props.BTC}
+                ETH={props.ETH}
+                ratio={props.ratio}
+              />
             </Section>
             <Section title={'Reserve Addresses'}>
               <ReserveAddresses />
@@ -50,6 +63,15 @@ export default function Home() {
   )
 }
 
+function Updated({ date }) {
+  return (
+    <small>
+      <strong>Updated </strong>
+      {date}
+    </small>
+  )
+}
+
 const rootStyle = css({
   display: 'flex',
   flexDirection: 'column',
@@ -65,3 +87,15 @@ const mainStyle = css({
 })
 
 const containerStyle = css(flexCol, { flex: 1, width: '100%', alignItems: 'center' })
+
+export async function getStaticProps() {
+  const data = await fetchData()
+  console.log(data)
+  return {
+    props: data,
+    // we will attempt to re-generate the page:
+    // - when a request comes in
+    // - at most once every X seconds
+    unstable_revalidate: 60,
+  }
+}

@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@emotion/core": "^10.0.28",
+    "airtable": "^0.8.1",
     "firebase-admin": "^8.12.1",
     "firebase-functions": "^3.7.0",
     "front-matter": "^4.0.2",

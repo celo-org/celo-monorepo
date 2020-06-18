@@ -1,19 +1,21 @@
 /** @jsx jsx */
-import * as React from 'react'
-import { jsx, css } from '@emotion/core'
+import { css, jsx } from '@emotion/core'
 import Markdown from 'components/Markdown'
+import * as React from 'react'
 
 interface Props {
   title: string
   content?: string
   children?: React.ReactNode
+  subHeading?: React.ReactNode
 }
 
-export default function Section({ title, content, children }: Props) {
+export default function Section({ title, content, children, subHeading }: Props) {
   return (
     <section css={rootStyle}>
       <div css={headingAreaStyle}>
         <h2 css={titleCSS}>{title}</h2>
+        {subHeading}
       </div>
       <div css={contentAreaStyle}>
         {content && <Markdown source={content} />}
