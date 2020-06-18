@@ -8,6 +8,7 @@ import { DEFAULT_FORNO_URL } from 'src/config'
 import { IPC_PATH } from 'src/geth/geth'
 import { waitForGethConnectivity } from 'src/geth/saga'
 import { store } from 'src/redux/store'
+import { promisifyGenerator } from 'src/utils/generators'
 import Logger from 'src/utils/Logger'
 import { Actions } from 'src/web3/actions'
 import { contractKitReadySelector, fornoSelector } from 'src/web3/selectors'
@@ -33,6 +34,8 @@ function getWeb3(fornoMode: boolean): Web3 {
   )
   return fornoMode ? new Web3(getHttpProvider(DEFAULT_FORNO_URL)) : new Web3(ipcProvider)
 }
+
+export const getWalletAsync = async () => promisifyGenerator(getWallet())
 
 export function* getWallet() {
   yield call(waitForGethConnectivity)
