@@ -2,7 +2,12 @@ import dynamicLinks from '@react-native-firebase/dynamic-links'
 import * as React from 'react'
 import { Clipboard } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
-import { fireEvent, flushMicrotasksQueue, render } from 'react-native-testing-library'
+import {
+  fireEvent,
+  flushMicrotasksQueue,
+  render,
+  waitForElement,
+} from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import EnterInviteCode, {
@@ -53,7 +58,7 @@ describe('EnterInviteCode Screen', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  it('works with partial invite text in clipboard', async () => {
+  it('calls redeem invite when pasting partial invite key from clipboard', async () => {
     const redeem = jest.fn()
     clipboardGetStringMock.mockResolvedValue(PARTIAL_INVITE)
     const wrapper = render(
@@ -70,16 +75,16 @@ describe('EnterInviteCode Screen', () => {
       </Provider>
     )
 
-    const input = wrapper.getByPlaceholder('inviteCodeText.codePlaceholder')
-    fireEvent.changeText(input, VALID_INVITE)
+    const pasteButton = await waitForElement(() => wrapper.getByTestId('PasteButton'))
+    fireEvent.press(pasteButton)
     await flushMicrotasksQueue()
     expect(redeem).toHaveBeenCalledWith(PARTIAL_INVITE_KEY)
   })
 
-  it('calls redeem invite with valid invite key in clipboard', async () => {
+  it('calls redeem invite when pasting valid invite key from clipboard', async () => {
     const redeem = jest.fn()
     clipboardGetStringMock.mockResolvedValue(VALID_INVITE)
-    render(
+    const wrapper = render(
       <Provider store={createMockStore()}>
         <EnterInviteCodeClass
           redeemInvite={redeem}
@@ -93,6 +98,8 @@ describe('EnterInviteCode Screen', () => {
       </Provider>
     )
 
+    const pasteButton = await waitForElement(() => wrapper.getByTestId('PasteButton'))
+    fireEvent.press(pasteButton)
     await flushMicrotasksQueue()
     expect(redeem).toHaveBeenCalledWith(VALID_INVITE_KEY)
   })

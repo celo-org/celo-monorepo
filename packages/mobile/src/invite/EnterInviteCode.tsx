@@ -3,10 +3,11 @@ import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import TextButton from '@celo/react-components/components/TextButton.v2'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
+import { HeaderHeightContext } from '@react-navigation/stack'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaConsumer } from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import CodeInput, { CodeInputStatus } from 'src/components/CodeInput'
 import DevSkipButton from 'src/components/DevSkipButton'
@@ -29,6 +30,7 @@ interface StateProps {
 }
 
 interface State {
+  keyboardVisible: boolean
   inputValue: string
 }
 
@@ -65,6 +67,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
   }
 
   state: State = {
+    keyboardVisible: false,
     inputValue: '',
   }
 
@@ -110,6 +113,10 @@ export class EnterInviteCode extends React.Component<Props, State> {
     }
   }
 
+  onToggleKeyboard = (visible: boolean) => {
+    this.setState({ keyboardVisible: visible })
+  }
+
   shouldShowClipboard = (clipboardContent: string): boolean => {
     const inviteCode = extractValidInviteCode(clipboardContent)
     return !!inviteCode && !this.state.inputValue.toLowerCase().startsWith(inviteCode.toLowerCase())
@@ -117,7 +124,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
 
   render() {
     const { t, isRedeemingInvite, isSkippingInvite, redeemComplete, account } = this.props
-    const { inputValue } = this.state
+    const { keyboardVisible, inputValue } = this.state
 
     let codeStatus = CodeInputStatus.INPUTTING
     if (isRedeemingInvite) {
@@ -127,60 +134,71 @@ export class EnterInviteCode extends React.Component<Props, State> {
     }
 
     return (
-      <SafeAreaView style={styles.container}>
-        <DevSkipButton nextScreen={Screens.VerificationEducationScreen} />
-        <KeyboardAwareScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContainer}
-          keyboardShouldPersistTaps={'always'}
-        >
-          <View>
-            <Text style={styles.body}>{t('inviteCode.body')}</Text>
-            <CodeInput
-              label={t('inviteCode.label')}
-              status={codeStatus}
-              inputValue={inputValue}
-              inputPlaceholder={t('inviteCode.codePlaceholder')}
-              onInputChange={this.onInputChange}
-              shouldShowClipboard={this.shouldShowClipboard}
-            />
-          </View>
-          {isSkippingInvite && (
-            <View>
-              <ActivityIndicator size="large" color={colors.celoGreen} />
-            </View>
-          )}
-        </KeyboardAwareScrollView>
-        <View>
-          {!SHOW_GET_INVITE_LINK ? (
-            <Text style={styles.askInviteText}>
-              <Trans i18nKey="inviteCode.nodeCodeInviteLink" ns={Namespaces.onboarding}>
-                <Text onPress={this.onPressGoToFaucet} style={styles.askInviteLink} />
-                <Text onPress={this.onPressSkip} style={styles.askInviteLink} />
-              </Trans>
-            </Text>
-          ) : (
-            <TextButton
-              style={styles.bottomButton}
-              onPress={this.onPressSkip}
-              disabled={isRedeemingInvite || !!account}
-            >
-              {t('inviteCode.noCode')}
-            </TextButton>
-          )}
+      <HeaderHeightContext.Consumer>
+        {(headerHeight) => (
+          <SafeAreaConsumer>
+            {(insets) => (
+              <View style={styles.container}>
+                <DevSkipButton nextScreen={Screens.VerificationEducationScreen} />
+                <KeyboardAwareScrollView
+                  style={headerHeight ? { marginTop: headerHeight } : undefined}
+                  contentContainerStyle={[
+                    styles.scrollContainer,
+                    !keyboardVisible && insets && { marginBottom: insets.bottom },
+                  ]}
+                  keyboardShouldPersistTaps={'always'}
+                >
+                  <View>
+                    <Text style={styles.body}>{t('inviteCode.body')}</Text>
+                    <CodeInput
+                      label={t('inviteCode.label')}
+                      status={codeStatus}
+                      inputValue={inputValue}
+                      inputPlaceholder={t('inviteCode.codePlaceholder')}
+                      onInputChange={this.onInputChange}
+                      shouldShowClipboard={this.shouldShowClipboard}
+                    />
+                  </View>
+                  {isSkippingInvite && (
+                    <View>
+                      <ActivityIndicator size="large" color={colors.celoGreen} />
+                    </View>
+                  )}
+                  <View>
+                    {SHOW_GET_INVITE_LINK ? (
+                      <Text style={styles.askInviteText}>
+                        <Trans i18nKey="inviteCode.nodeCodeInviteLink" ns={Namespaces.onboarding}>
+                          <Text onPress={this.onPressGoToFaucet} style={styles.askInviteLink} />
+                          <Text onPress={this.onPressSkip} style={styles.askInviteLink} />
+                        </Trans>
+                      </Text>
+                    ) : (
+                      <TextButton
+                        style={styles.bottomButton}
+                        onPress={this.onPressSkip}
+                        disabled={isRedeemingInvite || !!account}
+                      >
+                        {t('inviteCode.noCode')}
+                      </TextButton>
+                    )}
 
-          {/* TODO: remove this button once we have the screen asking for import earlier in the onboarding flow */}
-          <TextButton
-            style={styles.bottomButton}
-            onPress={this.onPressImportClick}
-            disabled={isRedeemingInvite || !!account}
-            testID="RestoreExistingWallet"
-          >
-            {t('nuxNamePin1:importIt')}
-          </TextButton>
-        </View>
-        <KeyboardSpacer />
-      </SafeAreaView>
+                    {/* TODO: remove this button once we have the screen asking for import earlier in the onboarding flow */}
+                    <TextButton
+                      style={styles.bottomButton}
+                      onPress={this.onPressImportClick}
+                      disabled={isRedeemingInvite || !!account}
+                      testID="RestoreExistingWallet"
+                    >
+                      {t('nuxNamePin1:importIt')}
+                    </TextButton>
+                  </View>
+                </KeyboardAwareScrollView>
+                <KeyboardSpacer onToggle={this.onToggleKeyboard} />
+              </View>
+            )}
+          </SafeAreaConsumer>
+        )}
+      </HeaderHeightContext.Consumer>
     )
   }
 }
@@ -190,12 +208,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.onboardingBackground,
   },
-  scrollView: {
-    marginTop: 40,
-  },
   scrollContainer: {
     flexGrow: 1,
-    padding: 20,
+    paddingHorizontal: 20,
     paddingTop: 34,
     justifyContent: 'space-between',
   },
@@ -207,7 +222,7 @@ const styles = StyleSheet.create({
     ...fontStyles.small,
     color: colors.onboardingBrownLight,
     textAlign: 'center',
-    margin: 20,
+    marginTop: 20,
     marginBottom: 10,
   },
   askInviteLink: {

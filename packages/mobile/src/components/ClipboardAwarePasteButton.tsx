@@ -68,6 +68,7 @@ export default function ClipboardAwarePasteButton({ shouldShow, onPress }: Props
       size={BtnSizes.FULL}
       onPress={onPressInternal}
       style={styles.container}
+      testID={'PasteButton'}
     />
   )
 }

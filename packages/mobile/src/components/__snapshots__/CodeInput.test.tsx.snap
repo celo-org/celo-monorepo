@@ -56,7 +56,9 @@ exports[`CodeInput renders correctly for all CodeInputStatus states 1`] = `
               "opacity": 0.5,
             }
           }
-        />
+        >
+          label
+        </Text>
         <Text
           numberOfLines={1}
           style={
@@ -137,7 +139,9 @@ exports[`CodeInput renders correctly for all CodeInputStatus states 2`] = `
               "lineHeight": 16,
             }
           }
-        />
+        >
+          label
+        </Text>
         <View
           style={
             Array [
@@ -239,7 +243,9 @@ exports[`CodeInput renders correctly for all CodeInputStatus states 3`] = `
               "opacity": 0.5,
             }
           }
-        />
+        >
+          label
+        </Text>
         <Text
           numberOfLines={1}
           style={
@@ -330,7 +336,9 @@ exports[`CodeInput renders correctly for all CodeInputStatus states 4`] = `
               "opacity": 0.5,
             }
           }
-        />
+        >
+          label
+        </Text>
         <Text
           numberOfLines={1}
           style={
@@ -421,7 +429,9 @@ exports[`CodeInput renders correctly for all CodeInputStatus states 5`] = `
               "opacity": 0.5,
             }
           }
-        />
+        >
+          label
+        </Text>
         <Text
           numberOfLines={1}
           style={
