@@ -1,14 +1,16 @@
 import logger from './common/logger'
 import config, { DEV_MODE } from './config'
 import { initKeyProvider } from './key-management/key-provider'
-import { app } from './server'
+import { createServer } from './server'
 
 async function start() {
+  logger.info(`Starting. Dev mode: ${DEV_MODE}`)
   await initKeyProvider()
 
-  logger.info(`Starting server. Dev mode: ${DEV_MODE}`)
+  const server = createServer()
+  logger.info('Starting server')
   const port = config.server.port
-  app.listen(port, () => {
+  server.listen(port, () => {
     logger.info(`Server is listening on port ${port}`)
   })
 }
