@@ -20,8 +20,8 @@ import ErrorMessageInline from 'src/components/ErrorMessageInline'
 import Modal from 'src/components/Modal'
 import { SingleDigitInput } from 'src/components/SingleDigitInput'
 import { Namespaces, withTranslation } from 'src/i18n'
+import HamburgerCard from 'src/icons/HamburgerCard'
 import InfoIcon from 'src/icons/InfoIcon.v2'
-import MenuBurgerCard from 'src/icons/MenuBurgerCard'
 import { validateRecipientAddress } from 'src/identity/actions'
 import { AddressValidationType } from 'src/identity/reducer'
 import { emptyHeader } from 'src/navigator/Headers.v2'
@@ -230,7 +230,7 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
           <Text style={styles.modalBody}>{t('helpModal.body1')}</Text>
           <View style={styles.menuContainer}>
             <View style={styles.menuCardContainer}>
-              <MenuBurgerCard length={30} />
+              <HamburgerCard />
             </View>
             <Text style={styles.menuText}>Menu</Text>
           </View>

@@ -26,6 +26,7 @@ import {
 } from 'src/account/selectors'
 import Support from 'src/account/Support'
 import BackupIntroduction from 'src/backup/BackupIntroduction'
+import AccountNumber from 'src/components/AccountNumber'
 import ExchangeHomeScreen from 'src/exchange/ExchangeHomeScreen'
 import WalletHome from 'src/home/WalletHome'
 import { Namespaces } from 'src/i18n'
@@ -79,16 +80,8 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
       <View style={styles.drawerBottom}>
         <Text style={fontStyles.label}>Account No.</Text>
         <View style={styles.accountOuterContainer}>
-          <Text style={styles.smallLabel}>0x</Text>
           <View style={styles.accountInnerContainer}>
-            <Text style={styles.smallLabel}>{`${account?.slice(2, 6)} ${account?.slice(
-              6,
-              10
-            )} ${account?.slice(10, 14)} ${account?.slice(14, 18)}`}</Text>
-            <Text style={styles.smallLabel}>{`${account?.slice(18, 22)} ${account?.slice(
-              22,
-              26
-            )} ${account?.slice(26, 30)} ${account?.slice(30, 34)}`}</Text>
+            <AccountNumber address={account || ''} />
           </View>
         </View>
         <Text style={styles.smallLabel}>{`Version ${appVersion}`}</Text>
