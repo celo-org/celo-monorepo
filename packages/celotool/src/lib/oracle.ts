@@ -1,5 +1,5 @@
 import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/src/address'
-import { AzureClusterConfig, assignRoleIfNotAssigned, createIdentityIfNotExists, deleteIdentity, getIdentity, switchToCluster } from 'src/lib/azure'
+import { assignRoleIfNotAssigned, AzureClusterConfig, createIdentityIfNotExists, deleteIdentity, getIdentity, switchToCluster } from 'src/lib/azure'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import {
   getFornoUrl,
