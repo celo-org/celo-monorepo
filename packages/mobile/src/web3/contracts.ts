@@ -32,7 +32,7 @@ function getWeb3(fornoMode: boolean): Web3 {
 
 // Workaround as contractKit logic is still used outside generators
 // Moving towards generators to allow us to block contractKit calls, see https://github.com/celo-org/celo-monorepo/issues/3727
-export const getContractKitOutsideGenerator = () => promisifyGenerator(getContractKit())
+export const getContractKitAsync = () => promisifyGenerator(getContractKit())
 
 export function* getContractKit() {
   // No need to waitForRehydrate as contractKitReady set to false for every app reopen
