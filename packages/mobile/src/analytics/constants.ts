@@ -297,6 +297,9 @@ export enum CustomEventNames {
   unexpected_maker_token = 'unexpected_maker_token',
 
   // Geth
+  geth_init_success = 'geth_init_success',
+  geth_init_failure = 'geth_init_failure',
+  geth_restart_to_fix_init = 'geth_restart_to_fix_init',
 }
 
 export enum CommonValues {
@@ -327,6 +330,7 @@ export enum PropertyPathWhitelist {
   exchangeRate = 'exchangeRate',
   feeType = 'feeType',
   fullName = 'fullName',
+  gethOutcome = 'gethOutcome',
   goldAmount = 'goldAmount',
   goldBalance = 'goldBalance',
   goldPendingBalance = 'goldPendingBalance',
