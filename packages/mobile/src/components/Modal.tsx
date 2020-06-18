@@ -3,7 +3,7 @@ import colors from '@celo/react-components/styles/colors.v2'
 import * as React from 'react'
 import { StyleProp, StyleSheet, ViewStyle } from 'react-native'
 import ReactNativeModal from 'react-native-modal'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import SafeAreaView from 'react-native-safe-area-view'
 
 interface Props {
   children: React.ReactNode

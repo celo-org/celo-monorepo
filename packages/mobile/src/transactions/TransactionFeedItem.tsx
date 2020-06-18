@@ -9,7 +9,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import { MoneyAmount, TokenTransactionType } from 'src/apollo/types'
 import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
 import { Namespaces } from 'src/i18n'
-import { TransactionStatus } from 'src/transactions/reducer'
+import { TransactionStatus } from 'src/transactions/types'
 
 interface Props {
   type: TokenTransactionType
@@ -82,6 +82,7 @@ const styles = StyleSheet.create({
   subtitle: {
     ...fontStyles.small,
     color: colors.gray4,
+    paddingTop: 2,
   },
   amount: {
     ...fontStyles.regular500,

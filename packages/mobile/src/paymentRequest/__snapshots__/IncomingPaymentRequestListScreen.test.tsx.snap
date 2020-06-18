@@ -189,21 +189,22 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                         ]
                       }
                     >
-                      <Image
-                        source={
-                          Object {
-                            "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                          }
-                        }
+                      <Text
                         style={
-                          Object {
-                            "alignItems": "center",
-                            "height": 40,
-                            "justifyContent": "center",
-                            "width": 40,
-                          }
+                          Array [
+                            Object {
+                              "color": "#FFFFFF",
+                              "fontFamily": "Inter-Medium",
+                              "fontSize": 16,
+                            },
+                            Object {
+                              "fontSize": 20,
+                            },
+                          ]
                         }
-                      />
+                      >
+                        +
+                      </Text>
                     </View>
                   </View>
                 </View>
@@ -236,13 +237,19 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                 >
                   <Text
                     style={
-                      Object {
-                        "color": "#1AB775",
-                        "fontFamily": "Inter-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 16,
-                        "marginRight": 24,
-                      }
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "fontSize": 14,
+                          "lineHeight": 16,
+                          "marginRight": 24,
+                        },
+                      ]
                     }
                   >
                     global:send
@@ -268,13 +275,19 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                 >
                   <Text
                     style={
-                      Object {
-                        "color": "#1AB775",
-                        "fontFamily": "Inter-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 16,
-                        "marginRight": 24,
-                      }
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "fontSize": 14,
+                          "lineHeight": 16,
+                          "marginRight": 24,
+                        },
+                      ]
                     }
                   >
                     global:decline
@@ -425,21 +438,22 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                         ]
                       }
                     >
-                      <Image
-                        source={
-                          Object {
-                            "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                          }
-                        }
+                      <Text
                         style={
-                          Object {
-                            "alignItems": "center",
-                            "height": 40,
-                            "justifyContent": "center",
-                            "width": 40,
-                          }
+                          Array [
+                            Object {
+                              "color": "#FFFFFF",
+                              "fontFamily": "Inter-Medium",
+                              "fontSize": 16,
+                            },
+                            Object {
+                              "fontSize": 20,
+                            },
+                          ]
                         }
-                      />
+                      >
+                        +
+                      </Text>
                     </View>
                   </View>
                 </View>
@@ -472,13 +486,19 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                 >
                   <Text
                     style={
-                      Object {
-                        "color": "#1AB775",
-                        "fontFamily": "Inter-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 16,
-                        "marginRight": 24,
-                      }
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "fontSize": 14,
+                          "lineHeight": 16,
+                          "marginRight": 24,
+                        },
+                      ]
                     }
                   >
                     global:send
@@ -504,13 +524,19 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                 >
                   <Text
                     style={
-                      Object {
-                        "color": "#1AB775",
-                        "fontFamily": "Inter-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 16,
-                        "marginRight": 24,
-                      }
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "fontSize": 14,
+                          "lineHeight": 16,
+                          "marginRight": 24,
+                        },
+                      ]
                     }
                   >
                     global:decline
@@ -661,21 +687,22 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                         ]
                       }
                     >
-                      <Image
-                        source={
-                          Object {
-                            "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                          }
-                        }
+                      <Text
                         style={
-                          Object {
-                            "alignItems": "center",
-                            "height": 40,
-                            "justifyContent": "center",
-                            "width": 40,
-                          }
+                          Array [
+                            Object {
+                              "color": "#FFFFFF",
+                              "fontFamily": "Inter-Medium",
+                              "fontSize": 16,
+                            },
+                            Object {
+                              "fontSize": 20,
+                            },
+                          ]
                         }
-                      />
+                      >
+                        +
+                      </Text>
                     </View>
                   </View>
                 </View>
@@ -708,13 +735,19 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                 >
                   <Text
                     style={
-                      Object {
-                        "color": "#1AB775",
-                        "fontFamily": "Inter-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 16,
-                        "marginRight": 24,
-                      }
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "fontSize": 14,
+                          "lineHeight": 16,
+                          "marginRight": 24,
+                        },
+                      ]
                     }
                   >
                     global:send
@@ -740,13 +773,19 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                 >
                   <Text
                     style={
-                      Object {
-                        "color": "#1AB775",
-                        "fontFamily": "Inter-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 16,
-                        "marginRight": 24,
-                      }
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "fontSize": 14,
+                          "lineHeight": 16,
+                          "marginRight": 24,
+                        },
+                      ]
                     }
                   >
                     global:decline

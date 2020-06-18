@@ -1,4 +1,10 @@
-import { AccountAuthRequest, CURRENCY_ENUM, SignTxRequest, TxToSignParam } from '@celo/utils'
+import {
+  AccountAuthRequest,
+  Countries,
+  CURRENCY_ENUM,
+  SignTxRequest,
+  TxToSignParam,
+} from '@celo/utils'
 import BigNumber from 'bignumber.js'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { ExchangeConfirmationCardProps } from 'src/exchange/ExchangeConfirmationCard'
@@ -9,16 +15,30 @@ import { TransactionDataInput } from 'src/send/SendAmount'
 import { ReviewProps } from 'src/transactions/TransactionReview'
 import { TransferConfirmationCardProps } from 'src/transactions/TransferConfirmationCard'
 
-// tslint:disable-next-line
+// Typed nested navigator params
+type NestedNavigatorParams<ParamList> = {
+  [K in keyof ParamList]: undefined extends ParamList[K]
+    ? { screen: K; params?: ParamList[K] }
+    : { screen: K; params: ParamList[K] }
+}[keyof ParamList]
+
+// tslint:disable-next-line: interface-over-type-literal
 export type StackParamList = {
   [Screens.Account]: undefined
   [Screens.Analytics]: undefined
   [Screens.BackupComplete]: undefined
-  [Screens.BackupIntroduction]: undefined
+  [Screens.BackupIntroduction]:
+    | {
+        fromAccountScreen?: boolean
+      }
+    | undefined
+  [Screens.AccountKeyEducation]:
+    | undefined
+    | {
+        nextScreen: keyof StackParamList
+      }
   [Screens.BackupPhrase]: undefined
-  [Screens.BackupQuiz]: {
-    mnemonic: string
-  }
+  [Screens.BackupQuiz]: undefined
   [Screens.BackupSocial]: undefined
   [Screens.BackupSocialIntro]: {
     incomingFromBackupFlow: boolean
@@ -36,7 +56,7 @@ export type StackParamList = {
     promptModalVisible: boolean
   }
   [Screens.Debug]: undefined
-  [Screens.DollarEducation]: undefined
+  [Screens.DrawerNavigator]: undefined
   [Screens.EditProfile]: undefined
   [Screens.EnterInviteCode]: undefined
   [Screens.ErrorScreen]: {
@@ -72,26 +92,33 @@ export type StackParamList = {
     backupPhrase: string
   }
   [Screens.ImportWalletSocial]: undefined
+  [Screens.ImportContacts]: undefined
   [Screens.IncomingPaymentRequestListScreen]: undefined
   [Screens.Invite]: undefined
   [Screens.InviteReview]: {
     recipient: Recipient
   }
-  [Screens.JoinCelo]: undefined
-  [Screens.Language]: {
-    nextScreen?: Screens.Account
-  }
+  [Screens.JoinCelo]: { selectedCountryCodeAlpha2: string } | undefined
+  [Screens.Language]:
+    | {
+        nextScreen: keyof StackParamList | 'GO_BACK'
+      }
+    | undefined
   [Screens.Licenses]: undefined
+  [Screens.Main]: undefined
   [Screens.OutgoingPaymentRequestListScreen]: undefined
-  [Screens.PaymentRequestConfirmation]: {
+  [Screens.PaymentRequestUnavailable]: {
     transactionData: TransactionDataInput
   }
-  [Screens.PincodeEducation]: undefined
+  [Screens.PaymentRequestConfirmation]: {
+    transactionData: TransactionDataInput
+    addressJustValidated?: boolean
+  }
   [Screens.PincodeEnter]: {
     withVerification?: boolean
     onSuccess: (pin: string) => void
   }
-  [Screens.PincodeSet]: undefined
+  [Screens.PincodeSet]: { isVerifying: boolean } | undefined
   [Screens.PhoneNumberLookupQuota]: {
     onBuy: () => void
     onSkip: () => void
@@ -99,18 +126,16 @@ export type StackParamList = {
   [Screens.PhotosEducation]: undefined
   [Screens.PhotosNUX]: undefined
   [Screens.Profile]: undefined
-  [Screens.QRCode]: undefined
-  [Screens.QRScanner]:
-    | {
-        scanIsForSecureSend?: true
-        transactionData?: TransactionDataInput
-      }
-    | undefined
+  [Screens.QRNavigator]: NestedNavigatorParams<QRTabParamList> | undefined
   [Screens.ReclaimPaymentConfirmationScreen]: {
     reclaimPaymentInput: EscrowedPayment
   }
   [Screens.RegulatoryTerms]: undefined
   [Screens.Security]: undefined
+  [Screens.SelectCountry]: {
+    countries: Countries
+    selectedCountryCodeAlpha2: string
+  }
   [Screens.SelectLocalCurrency]: undefined
   [Screens.Send]:
     | {
@@ -120,16 +145,18 @@ export type StackParamList = {
   [Screens.SendAmount]: {
     recipient: Recipient
     isRequest?: boolean
+    isFromScan?: boolean
   }
   [Screens.SendConfirmation]: {
     transactionData: TransactionDataInput
+    addressJustValidated?: boolean
+    isFromScan?: boolean
   }
   [Screens.SetClock]: undefined
   [Screens.Settings]: undefined
   [Screens.Support]: undefined
   [Screens.SupportContact]: undefined
   [Screens.Sync]: undefined
-  [Screens.TabNavigator]: undefined
   [Screens.TransactionReview]: {
     reviewProps: ReviewProps
     confirmationProps: TransferConfirmationCardProps | ExchangeConfirmationCardProps
@@ -139,17 +166,30 @@ export type StackParamList = {
     transactionData: TransactionDataInput
     addressValidationType: AddressValidationType
     isPaymentRequest?: true
+    isFromScan?: boolean
   }
   [Screens.ValidateRecipientAccount]: {
     transactionData: TransactionDataInput
     addressValidationType: AddressValidationType
     isPaymentRequest?: true
+    isFromScan?: boolean
   }
   [Screens.VerificationEducationScreen]: undefined
   [Screens.VerificationInputScreen]: undefined
   [Screens.VerificationInterstitialScreen]: undefined
   [Screens.VerificationLearnMoreScreen]: undefined
   [Screens.VerificationLoadingScreen]: undefined
-  [Screens.VerificationSuccessScreen]: undefined
+  [Screens.OnboardingSuccessScreen]: undefined
   [Screens.WalletHome]: undefined
+}
+
+// tslint:disable-next-line: interface-over-type-literal
+export type QRTabParamList = {
+  [Screens.QRCode]: undefined
+  [Screens.QRScanner]:
+    | {
+        scanIsForSecureSend?: true
+        transactionData?: TransactionDataInput
+      }
+    | undefined
 }

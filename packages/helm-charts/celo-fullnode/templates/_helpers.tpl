@@ -35,3 +35,14 @@ Create chart name and version as used by the chart label.
 {{ include "common.standard.labels" . }}
 component: celo-fullnode
 {{- end -}}
+
+{{- define "celo-fullnode.rpc-ports" -}}
+- port: 8545
+  targetPort: rpc
+  protocol: TCP
+  name: rpc
+- port: 8546
+  targetPort: ws
+  protocol: TCP
+  name: ws
+{{- end -}}

@@ -2,6 +2,7 @@ import * as React from 'react'
 import 'react-native'
 import { render } from 'react-native-testing-library'
 import { AlertBanner } from 'src/alert/AlertBanner'
+import { ErrorDisplayType } from 'src/alert/reducer'
 
 describe('AlertBanner', () => {
   const baseProps = {
@@ -15,6 +16,7 @@ describe('AlertBanner', () => {
           {...baseProps}
           alert={{
             type: 'message',
+            displayMethod: ErrorDisplayType.BANNER,
             message: 'This is your shadow speaking',
             dismissAfter: 0,
           }}
@@ -31,6 +33,7 @@ describe('AlertBanner', () => {
           {...baseProps}
           alert={{
             type: 'message',
+            displayMethod: ErrorDisplayType.BANNER,
             title: 'Declaration',
             message: 'This is your shadow speaking',
             dismissAfter: 0,
@@ -48,6 +51,7 @@ describe('AlertBanner', () => {
           {...baseProps}
           alert={{
             type: 'error',
+            displayMethod: ErrorDisplayType.BANNER,
             message: 'This is an error',
             dismissAfter: 0,
           }}

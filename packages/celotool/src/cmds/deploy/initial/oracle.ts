@@ -14,7 +14,7 @@ export const describe = 'deploy the oracle for the specified network'
 
 type OracleInitialArgv = InitialArgv &
   OracleArgv & {
-    useFullNodes: boolean
+    useForno: boolean
   }
 
 export const builder = (argv: yargs.Argv) => {
@@ -28,5 +28,5 @@ export const builder = (argv: yargs.Argv) => {
 export const handler = async (argv: OracleInitialArgv) => {
   const oracleAzureContext = getOracleAzureContext(argv.primary)
   await switchToAzureContextCluster(argv.celoEnv, oracleAzureContext)
-  await installHelmChart(argv.celoEnv, oracleAzureContext, argv.useFullNodes)
+  await installHelmChart(argv.celoEnv, oracleAzureContext, argv.useForno)
 }

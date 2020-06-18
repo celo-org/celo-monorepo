@@ -1,27 +1,26 @@
 import ContactCircle from '@celo/react-components/components/ContactCircle'
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import Link from '@celo/react-components/components/Link'
-import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
+import { CURRENCY_ENUM } from '@celo/utils/src'
 import BigNumber from 'bignumber.js'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { MoneyAmount, TokenTransactionType } from 'src/apollo/types'
-import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
-import FeeIcon from 'src/components/FeeIcon'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import FeeDrawer from 'src/components/FeeDrawer'
 import LineItemRow from 'src/components/LineItemRow.v2'
 import TotalLineItem from 'src/components/TotalLineItem.v2'
 import { FAQ_LINK } from 'src/config'
 import { Namespaces } from 'src/i18n'
+import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 import BottomText from 'src/transactions/BottomText'
 import CommentSection from 'src/transactions/CommentSection'
 import TransferAvatars from 'src/transactions/TransferAvatars'
 import UserSection from 'src/transactions/UserSection'
 import { navigateToURI } from 'src/utils/linking'
-
-const AVATAR_SIZE = 40
 
 export interface TransferConfirmationCardProps {
   address?: string
@@ -74,6 +73,10 @@ function InviteSentContent({
 }: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
   const totalAmount = amount
+  const inviteFee = getInvitationVerificationFeeInDollars()
+  // TODO: Use real fee
+  const securityFee = new BigNumber(0)
+  const totalFee = inviteFee.plus(securityFee)
 
   return (
     <>
@@ -85,14 +88,20 @@ function InviteSentContent({
         e164PhoneNumber={e164PhoneNumber}
         avatar={
           <ContactCircle
-            name={recipient?.displayName}
+            name={recipient ? recipient.displayName : null}
             address={address}
-            size={AVATAR_SIZE}
             thumbnailPath={getRecipientThumbnail(recipient)}
           />
         }
       />
       <HorizontalLine />
+      <FeeDrawer
+        currency={CURRENCY_ENUM.DOLLAR}
+        inviteFee={inviteFee}
+        isInvite={true}
+        securityFee={securityFee}
+        totalFee={totalFee}
+      />
       <TotalLineItem amount={totalAmount} hideSign={true} />
       <BottomText>{t('inviteFlow11:whySendFees')}</BottomText>
     </>
@@ -119,9 +128,8 @@ function InviteReceivedContent({
         e164PhoneNumber={e164PhoneNumber}
         avatar={
           <ContactCircle
-            name={recipient?.displayName}
+            name={recipient ? recipient.displayName : null}
             address={address}
-            size={AVATAR_SIZE}
             thumbnailPath={getRecipientThumbnail(recipient)}
           />
         }
@@ -158,12 +166,10 @@ function PaymentSentContent({
 }: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
   const sentAmount = amount
-  // TODO: use real fee
-  const securityFeeAmount = {
-    value: 0,
-    currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-  }
+  // TODO: Use real fee
+  const securityFee = new BigNumber(0)
   const totalAmount = amount
+  const totalFee = securityFee
 
   return (
     <>
@@ -181,11 +187,7 @@ function PaymentSentContent({
         title={t('amountSent')}
         amount={<CurrencyDisplay amount={sentAmount} hideSign={true} />}
       />
-      <LineItemRow
-        title={t('securityFee')}
-        titleIcon={<FeeIcon />}
-        amount={<CurrencyDisplay amount={securityFeeAmount} formatType={FormatType.Fee} />}
-      />
+      <FeeDrawer currency={CURRENCY_ENUM.DOLLAR} securityFee={securityFee} totalFee={totalFee} />
       <TotalLineItem amount={totalAmount} hideSign={true} />
     </>
   )

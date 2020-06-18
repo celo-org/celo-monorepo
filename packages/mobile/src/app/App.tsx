@@ -45,14 +45,14 @@ BigNumber.config({
   },
 })
 
-// Enables LayoutAnimation on Android
-if (Platform.OS === 'android') {
+// Enables LayoutAnimation on Android. Need to check if method exists before using
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true)
 }
 
 export class App extends React.Component {
   async componentDidMount() {
-    CeloAnalytics.track(DefaultEventNames.appLoaded, this.props, true)
+    CeloAnalytics.track(DefaultEventNames.appLoaded, {}, true)
     const appLoadedAt: Date = new Date()
     const appStartListener = DeviceEventEmitter.addListener(
       'AppStartedLoading',

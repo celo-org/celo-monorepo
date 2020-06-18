@@ -12,6 +12,81 @@ exports[`Invite renders correctly with no recipients 1`] = `
   <View
     style={
       Object {
+        "alignItems": "center",
+        "backgroundColor": "transparent",
+        "borderBottomColor": "#EDEEEF",
+        "borderBottomWidth": 0,
+        "flexDirection": "row",
+        "height": 62,
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <View
+      accessible={true}
+      focusable={false}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "marginBottom": 0,
+          "marginLeft": 4,
+          "opacity": 1,
+          "padding": 8,
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height="32"
+        viewBox="0 0 32 32"
+        width="32"
+      >
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="9.75"
+          y2="9.75"
+        />
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="15.75"
+          y2="15.75"
+        />
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="21.75"
+          y2="21.75"
+        />
+      </svg>
+    </View>
+    <View
+      style={
+        Object {
+          "width": 45,
+        }
+      }
+    />
+  </View>
+  <View
+    style={
+      Object {
         "borderBottomColor": "rgba(134, 138, 141, 0.15)",
         "borderBottomWidth": 1,
         "paddingBottom": 5,
@@ -244,6 +319,81 @@ exports[`Invite renders correctly with recipients 1`] = `
     }
   }
 >
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "backgroundColor": "transparent",
+        "borderBottomColor": "#EDEEEF",
+        "borderBottomWidth": 0,
+        "flexDirection": "row",
+        "height": 62,
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <View
+      accessible={true}
+      focusable={false}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "marginBottom": 0,
+          "marginLeft": 4,
+          "opacity": 1,
+          "padding": 8,
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height="32"
+        viewBox="0 0 32 32"
+        width="32"
+      >
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="9.75"
+          y2="9.75"
+        />
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="15.75"
+          y2="15.75"
+        />
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="21.75"
+          y2="21.75"
+        />
+      </svg>
+    </View>
+    <View
+      style={
+        Object {
+          "width": 45,
+        }
+      }
+    />
+  </View>
   <View
     style={
       Object {
@@ -514,6 +664,7 @@ exports[`Invite renders correctly with recipients 1`] = `
               onResponderTerminate={[Function]}
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
+              testID="RecipientItem"
             >
               <View
                 style={
@@ -557,21 +708,22 @@ exports[`Invite renders correctly with recipients 1`] = `
                       ]
                     }
                   >
-                    <Image
-                      source={
-                        Object {
-                          "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                        }
-                      }
+                    <Text
                       style={
-                        Object {
-                          "alignItems": "center",
-                          "height": 40,
-                          "justifyContent": "center",
-                          "width": 40,
-                        }
+                        Array [
+                          Object {
+                            "color": "#FFFFFF",
+                            "fontFamily": "Inter-Medium",
+                            "fontSize": 16,
+                          },
+                          Object {
+                            "fontSize": 20,
+                          },
+                        ]
                       }
-                    />
+                    >
+                      G
+                    </Text>
                   </View>
                 </View>
                 <View
@@ -642,6 +794,7 @@ exports[`Invite renders correctly with recipients 1`] = `
               onResponderTerminate={[Function]}
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
+              testID="RecipientItem"
             >
               <View
                 style={
@@ -685,21 +838,22 @@ exports[`Invite renders correctly with recipients 1`] = `
                       ]
                     }
                   >
-                    <Image
-                      source={
-                        Object {
-                          "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                        }
-                      }
+                    <Text
                       style={
-                        Object {
-                          "alignItems": "center",
-                          "height": 40,
-                          "justifyContent": "center",
-                          "width": 40,
-                        }
+                        Array [
+                          Object {
+                            "color": "#FFFFFF",
+                            "fontFamily": "Inter-Medium",
+                            "fontSize": 16,
+                          },
+                          Object {
+                            "fontSize": 20,
+                          },
+                        ]
                       }
-                    />
+                    >
+                      J
+                    </Text>
                   </View>
                 </View>
                 <View
@@ -769,6 +923,7 @@ exports[`Invite renders correctly with recipients 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            testID="RecipientItem"
           >
             <View
               style={
@@ -812,21 +967,22 @@ exports[`Invite renders correctly with recipients 1`] = `
                     ]
                   }
                 >
-                  <Image
-                    source={
-                      Object {
-                        "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                      }
-                    }
+                  <Text
                     style={
-                      Object {
-                        "alignItems": "center",
-                        "height": 40,
-                        "justifyContent": "center",
-                        "width": 40,
-                      }
+                      Array [
+                        Object {
+                          "color": "#FFFFFF",
+                          "fontFamily": "Inter-Medium",
+                          "fontSize": 16,
+                        },
+                        Object {
+                          "fontSize": 20,
+                        },
+                      ]
                     }
-                  />
+                  >
+                    J
+                  </Text>
                 </View>
               </View>
               <View

@@ -10,6 +10,8 @@ import { eventChannel, EventChannel } from 'redux-saga'
 import { call, put, select, spawn, take } from 'redux-saga/effects'
 import { NotificationReceiveState } from 'src/account/types'
 import { showError } from 'src/alert/actions'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { FIREBASE_ENABLED } from 'src/config'
@@ -20,23 +22,26 @@ import Logger from 'src/utils/Logger'
 
 const TAG = 'firebase/firebase'
 
+interface NotificationChannelEvent {
+  message: FirebaseMessagingTypes.RemoteMessage
+  stateType: NotificationReceiveState
+}
+
 // only exported for testing
-export function* watchFirebaseNotificationChannel(
-  channel: EventChannel<{
-    message: FirebaseMessagingTypes.RemoteMessage
-    stateType: NotificationReceiveState
-  }>
-) {
+export function* watchFirebaseNotificationChannel(channel: EventChannel<NotificationChannelEvent>) {
   try {
-    Logger.info(`${TAG}/watchFirebaseNotificationChannel`, 'Started channel watching')
+    Logger.debug(`${TAG}/watchFirebaseNotificationChannel`, 'Started channel watching')
     while (true) {
-      const data = yield take(channel)
-      if (!data) {
-        Logger.info(`${TAG}/watchFirebaseNotificationChannel`, 'Data in channel was empty')
+      const event: NotificationChannelEvent = yield take(channel)
+      if (!event) {
+        Logger.debug(`${TAG}/watchFirebaseNotificationChannel`, 'Data in channel was empty')
         continue
       }
-      Logger.info(`${TAG}/watchFirebaseNotificationChannel`, 'Notification received in the channel')
-      yield call(handleNotification, data.message, data.stateType)
+      Logger.debug(
+        `${TAG}/watchFirebaseNotificationChannel`,
+        'Notification received in the channel'
+      )
+      yield call(handleNotification, event.message, event.stateType)
     }
   } catch (error) {
     Logger.error(
@@ -45,7 +50,7 @@ export function* watchFirebaseNotificationChannel(
       error
     )
   } finally {
-    Logger.info(`${TAG}/watchFirebaseNotificationChannel`, 'Notification channel terminated')
+    Logger.debug(`${TAG}/watchFirebaseNotificationChannel`, 'Notification channel terminated')
   }
 }
 
@@ -101,10 +106,7 @@ export function* initializeCloudMessaging(app: ReactNativeFirebase.Module, addre
   })
 
   // Listen for notification messages while the app is open
-  const channelOnNotification: EventChannel<{
-    message: FirebaseMessagingTypes.RemoteMessage
-    stateType: NotificationReceiveState
-  }> = eventChannel((emitter) => {
+  const channelOnNotification: EventChannel<NotificationChannelEvent> = eventChannel((emitter) => {
     const unsuscribe = () => {
       Logger.info(TAG, 'Notification channel closed, reseting callbacks. This is likely an error.')
       app.messaging().onMessage(() => null)
@@ -173,6 +175,7 @@ export function* paymentRequestWriter({ paymentInfo }: WritePaymentRequest) {
     navigateHome()
   } catch (error) {
     Logger.error(TAG, 'Failed to write payment request to Firebase DB', error)
+    CeloAnalytics.track(CustomEventNames.request_error, { error })
     yield put(showError(ErrorMessages.PAYMENT_REQUEST_FAILED))
   }
 }
@@ -196,7 +199,7 @@ export function isVersionBelowMinimum(version: string, minVersion: string): bool
 
 /*
 Get the Version deprecation information.
-Firebase DB Format: 
+Firebase DB Format:
   (New) Add minVersion child to versions category with a string of the mininum version as string
 */
 export async function isAppVersionDeprecated() {

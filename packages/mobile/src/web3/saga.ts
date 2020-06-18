@@ -1,6 +1,5 @@
 import { generateKeys, generateMnemonic, MnemonicStrength } from '@celo/utils/src/account'
 import { privateKeyToAddress } from '@celo/utils/src/address'
-import { deriveCEK } from '@celo/utils/src/commentEncryption'
 import * as Sentry from '@sentry/react-native'
 import * as bip39 from 'react-native-bip39'
 import { REHYDRATE } from 'redux-persist/es/constants'
@@ -20,6 +19,7 @@ import { UNLOCK_DURATION } from 'src/geth/consts'
 import { deleteChainData, stopGethIfInitialized } from 'src/geth/geth'
 import { gethSaga, waitForGethConnectivity } from 'src/geth/saga'
 import { gethStartedThisSessionSelector } from 'src/geth/selectors'
+import { createCommentKey } from 'src/identity/commentEncryption'
 import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { setCachedPincode } from 'src/pincode/PincodeCache'
@@ -34,7 +34,6 @@ import {
   setContractKitReady,
   setFornoMode,
   SetIsFornoAction,
-  setPrivateCommentKey,
   updateWeb3SyncProgress,
   Web3SyncProgress,
 } from 'src/web3/actions'
@@ -234,17 +233,12 @@ export function* assignAccountFromPrivateKey(privateKey: string) {
     Logger.debug(TAG + '@assignAccountFromPrivateKey', `Added to wallet: ${account}`)
     yield put(setAccount(account))
     yield put(setAccountCreationTime())
-    yield call(assignDataKeyFromPrivateKey, privateKey)
+    yield call(createCommentKey, privateKey)
     return account
   } catch (e) {
     Logger.error(TAG + '@assignAccountFromPrivateKey', 'Error assigning account', e)
     throw e
   }
-}
-
-function* assignDataKeyFromPrivateKey(privateKey: string) {
-  const privateCEK = deriveCEK(privateKey).toString('hex')
-  yield put(setPrivateCommentKey(privateCEK))
 }
 
 // Wait for account to exist and then return it

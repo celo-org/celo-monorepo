@@ -3,13 +3,13 @@ import * as React from 'react'
 import * as RNLocalize from 'react-native-localize'
 import { fireEvent, render, RenderAPI } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
+import { ErrorDisplayType } from 'src/alert/reducer'
 import { TokenTransactionType } from 'src/apollo/types'
 import { AddressValidationType, E164NumberToAddressType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import SendAmount from 'src/send/SendAmount'
 import { createMockStore, getMockStackScreenProps } from 'test/utils'
-
 import {
   mockAccount2Invite,
   mockAccountInvite,
@@ -107,6 +107,7 @@ describe('SendAmount', () => {
           alertType: 'error',
           buttonMessage: null,
           dismissAfter: 5000,
+          displayMethod: ErrorDisplayType.BANNER,
           message: 'needMoreFundsToSend',
           title: null,
           type: 'ALERT/SHOW',
@@ -219,6 +220,28 @@ describe('SendAmount', () => {
         transactionData: mockTransactionData2,
         addressValidationType: AddressValidationType.FULL,
         isPaymentRequest: true,
+      })
+    })
+
+    it('navigates to PaymentRequestUnavailable screen on Request click when address is unverified', () => {
+      const store = createMockStore({
+        identity: {
+          e164NumberToAddress: {},
+          secureSendPhoneNumberMapping: {},
+        },
+        ...storeData,
+      })
+      mockTransactionData2.type = TokenTransactionType.PayRequest
+
+      const tree = render(
+        <Provider store={store}>
+          <SendAmount {...mockScreenProps(true)} />
+        </Provider>
+      )
+      enterAmount(tree, AMOUNT_VALID)
+      fireEvent.press(tree.getByTestId('Review'))
+      expect(navigate).toHaveBeenCalledWith(Screens.PaymentRequestUnavailable, {
+        transactionData: mockTransactionData2,
       })
     })
 

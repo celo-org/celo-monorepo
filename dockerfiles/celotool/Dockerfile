@@ -15,12 +15,12 @@ RUN apt-get update && \
 # ensure yarn.lock is evaluated by kaniko cache diff
 COPY lerna.json package.json yarn.lock ./
 COPY scripts/ scripts/
+COPY patches/ patches/
 COPY packages/utils/package.json packages/utils/
 COPY packages/dev-utils/package.json packages/dev-utils/
 COPY packages/typescript/package.json packages/typescript/
 COPY packages/contractkit/package.json packages/contractkit/
 COPY packages/protocol/package.json packages/protocol/
-COPY packages/verification-pool-api/package.json packages/verification-pool-api/
 COPY packages/celotool/package.json packages/celotool/
 
 RUN yarn install --network-timeout 100000 --frozen-lockfile && yarn cache clean
@@ -30,7 +30,6 @@ COPY packages/dev-utils packages/dev-utils/
 COPY packages/typescript packages/typescript/
 COPY packages/contractkit packages/contractkit/
 COPY packages/protocol packages/protocol/
-COPY packages/verification-pool-api packages/verification-pool-api/
 COPY packages/celotool packages/celotool/
 
 RUN yarn build

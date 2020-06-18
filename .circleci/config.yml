@@ -8,12 +8,12 @@ reference:
   android_config: &android_config
     working_directory: *workspace
     macos:
-      xcode: "10.2.1"
+      xcode: "11.3.1"
     shell: /bin/bash --login -eo pipefail
     environment:
       TERM: dumb
-      _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
-      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true"
+      _JAVA_OPTIONS: '-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap'
+      GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true'
 
 defaults: &defaults
   working_directory: ~/app
@@ -21,15 +21,7 @@ defaults: &defaults
     - image: celohq/node10-gcloud:v2
   environment:
     # To avoid ENOMEM problem when running node
-    NODE_OPTIONS: "--max-old-space-size=4096"
-
-android-defaults: &android-defaults
-  <<: *defaults
-  docker:
-    - image: circleci/android:api-28-node
-  environment:
-    _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
-    GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true"
+    NODE_OPTIONS: '--max-old-space-size=4096'
 
 e2e-defaults: &e2e-defaults
   <<: *defaults
@@ -39,9 +31,9 @@ e2e-defaults: &e2e-defaults
     CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
 general:
   artifacts:
-    - "mobile/coverage"
-    - "web/coverage"
-    - "protocol/coverage"
+    - 'mobile/coverage'
+    - 'web/coverage'
+    - 'protocol/coverage'
 
 commands:
   yarn_install:
@@ -112,7 +104,7 @@ commands:
           name: Create cached node_modules (if necessary)
           command: |
             if [ ! -e ~/.tmp/node_modules.tgz ]; then 
-              tar -c node_modules/ packages/*/node_modules/ | gzip --fast > ~/.tmp/node_modules.tgz
+              tar -c node_modules/ packages/*/node_modules/ packages/phone-number-privacy/*/node_modules/ | gzip --fast > ~/.tmp/node_modules.tgz
             fi
       - save_cache:
           name: Save cached node_modules
@@ -137,7 +129,7 @@ jobs:
       - save_cache:
           key: source-v1-{{ .Branch }}-{{ .Revision }}
           paths:
-            - ".git"
+            - '.git'
 
       - run:
           name: Verify setup for incremental testing
@@ -183,7 +175,7 @@ jobs:
           paths:
             - .
 
-  end-to-end-mobile-test:
+  end-to-end-mobile-test-android:
     <<: *android_config
     resource_class: large
     steps:
@@ -261,8 +253,10 @@ jobs:
             #   echo "Cache found, just run post-script."
             #   yarn postinstall
             # fi
-            yarn || yarn 
-            yarn build || yarn build
+            yarn || yarn
+            yarn build \
+              --scope @celo/mobile \
+              --include-filtered-dependencies
       - save_cache:
           key: yarn-v4-macos-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
@@ -273,57 +267,28 @@ jobs:
           name: Install some extra dependencies the app needs
           command: HOMEBREW_NO_AUTO_UPDATE=1 brew install pidcat watchman
       - restore_cache:
-          key: yarn-v3-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}-{{ checksum "packages/mobile/.env.test" }}
+          key: yarn-v4-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}-{{ checksum "packages/mobile/.env.test" }}
       - run:
           name: Make sure there's only one adb # This is probably a brew bug
           command: cp /usr/local/share/android-sdk/platform-tools/adb /usr/local/bin/adb
       - run:
-          name: Start emulator
-          command: cd ~/src/packages/mobile && bash ./scripts/start_emulator.sh
-          background: true
-      - run:
-          name: Start metro
-          command: cd ~/src/packages/mobile && yarn start
-          background: true
-      - run: cp node_modules/.bin/jest packages/mobile/node_modules/.bin/ # for some reason jest is just not there
-      # TODO - run: lock device
-      - run:
-          name: Build end-to-end test
-          command: cd ~/src/packages/mobile && yarn test:build-e2e
-      - run:
-          name: Sleep until Device connects
-          command: cd ~/src/packages/mobile && bash ./scripts/wait_for_emulator_to_connect.sh
-      # TODO - run: unlock device
-      - run:
-          name: Start pidcat logging
-          command: pidcat -t "GoLog" -t "Go" # React logs are on metro step since RN 61
-          background: true
-      - run:
-          name: Run yarn dev
-          command: cd ~/src/packages/mobile && ENVFILE=".env.test" yarn dev
-      - run:
-          name: Restart adb
-          command: adb kill-server && adb start-server
-      - run:
-          name: Run test itself
-
+          name: Run e2e tests
           command: |
-            cd ~/src/packages/mobile
-            # detox sometimes without releasing the terminal and thus making the CI timout
-            # 480s = 8 minutes
-            timeout 480 yarn test:detox || echo "failed, try again"
-            timeout 480 yarn test:detox || echo "detox failed, return 0 to prevent CI from failing"
-            # TODO errors are currently not reported, until we figure out why detox can't find functions https://github.com/wix/Detox/issues/1723
-      - run: cd ~/src
+            set -euo pipefail
+            cd packages/mobile
+            yarn run test:e2e:android
+      - store_artifacts:
+          path: packages/mobile/e2e/artifacts
+          destination: mobile/e2e/artifacts
       - save_cache:
-          key: yarn-v3-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}-{{ checksum "packages/mobile/.env.test" }}
+          key: yarn-v4-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}-{{ checksum "packages/mobile/.env.test" }}
           paths:
             - ~/src/packages/mobile/android/app/build/outputs/apk/
             - ~/.gradle/
 
   end-to-end-mobile-test-ios:
     macos:
-      xcode: "11.3.1"
+      xcode: '11.3.1'
     working_directory: ~/app_osx
     steps:
       - checkout
@@ -339,7 +304,7 @@ jobs:
           command: ./scripts/ci_check_dependency_graph_changed.sh
       - run:
           name: Check if the test should run
-          command: ./scripts/ci_check_if_test_should_run_v2.sh mobile
+          command: ./scripts/ci_check_if_test_should_run_v2.sh @celo/mobile
 
       - run:
           name: Configure environment variables
@@ -481,7 +446,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh mobile
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/mobile
 
       - run:
           name: Ensure translations are not missing
@@ -514,25 +479,6 @@ jobs:
           name: Upload to CodeCov
           command: yarn codecov -F mobile
 
-  verification-pool-api:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/app
-
-      - run:
-          name: Check if the test should run
-          command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh verification-pool-api
-
-      - run:
-          name: jest tests
-          command: |
-            mkdir -p test-results/jest
-            yarn --cwd packages/verification-pool-api test
-          environment:
-            JEST_JUNIT_OUTPUT: test-results/jest/junit.xml
-
   protocol-test:
     <<: *defaults
     resource_class: large
@@ -542,7 +488,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh protocol
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
       - run:
           name: test
           # Flaky tests - run them twice
@@ -557,7 +503,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh protocol
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
       - run:
           name: test
           # Flaky tests - run them twice
@@ -577,7 +523,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh contractkit
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/contractkit
       - run:
           name: Generate DevChain
           command: |
@@ -603,7 +549,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh cli
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/celocli
       - run:
           name: Generate DevChain
           command: |
@@ -644,7 +590,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh typescript
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/typescript
       - run:
           name: Install and test the npm package
           command: |
@@ -662,7 +608,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh utils
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/utils
       - run:
           name: Install and test the npm package
           command: |
@@ -681,7 +627,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh celotool
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/celotool
       - run:
           name: Run test
           no_output_timeout: 20m
@@ -699,7 +645,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh celotool
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/celotool
       - run:
           name: Run test
           no_output_timeout: 20m
@@ -717,7 +663,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh celotool
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/celotool
       - run:
           name: Run test
           no_output_timeout: 20m
@@ -735,7 +681,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh celotool
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/celotool
       - run:
           name: Run test
           no_output_timeout: 20m
@@ -753,7 +699,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh celotool
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/celotool
       - run:
           name: Run test
           command: |
@@ -770,7 +716,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh celotool
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/celotool
       - run:
           name: Run test
           command: |
@@ -788,7 +734,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh web
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/web
       - run: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       - run: cd packages/web && ./circle_deploy.sh
 
@@ -800,7 +746,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh typescript
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/typescript
       - run:
           name: Installing npm package - @celo/typescript
           command: yarn add @celo/typescript
@@ -813,7 +759,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh utils
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/utils
       - run:
           name: Installing npm package - @celo/utils
           command: yarn add @celo/utils
@@ -826,7 +772,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh contractkit
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/contractkit
       - run:
           name: Installing npm package - @celo/contractkit
           command: |
@@ -842,7 +788,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh cli
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/celocli
       - run:
           name: Installing npm package - @celo/celocli
           command: npm install @celo/celocli
@@ -858,10 +804,13 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh phone-number-privacy
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/phone-number-privacy-signer,@celo/phone-number-privacy-combiner
       - run:
-          name: Run Tests
-          command: yarn --cwd=packages/phone-number-privacy test
+          name: Run Tests for combiner
+          command: yarn --cwd=packages/phone-number-privacy/combiner test
+      - run:
+          name: Run Tests for signer
+          command: yarn --cwd=packages/phone-number-privacy/signer test
 
 workflows:
   version: 2
@@ -883,10 +832,8 @@ workflows:
       - mobile-test:
           requires:
             - lint-checks
+      - end-to-end-mobile-test-android
       - end-to-end-mobile-test-ios
-      - verification-pool-api:
-          requires:
-            - lint-checks
       - protocol-test:
           requires:
             - lint-checks
@@ -928,7 +875,7 @@ workflows:
       - schedule:
           # 7 PM in UTC = noon in PDT.
           # Best for test to fail during SF afternoon, so that, someone can fix it during the day time.
-          cron: "0 19 * * *"
+          cron: '0 19 * * *'
           filters:
             branches:
               only:
@@ -943,7 +890,7 @@ workflows:
       - schedule:
           # 1 PM in UTC = 6 AM in PDT.
           # Best for this slow test (~3 hours) to run during SF early morning.
-          cron: "0 13 * * *"
+          cron: '0 13 * * *'
           filters:
             branches:
               only:

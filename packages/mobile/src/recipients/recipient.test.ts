@@ -1,5 +1,13 @@
-import { contactsToRecipients, RecipientKind } from 'src/recipients/recipient'
-import { mockContactList, mockDisplayNumber, mockE164Number } from 'test/values'
+import { contactsToRecipients, RecipientKind, sortRecipients } from 'src/recipients/recipient'
+import {
+  mockContactList,
+  mockDisplayNumber,
+  mockE164Number,
+  mockRecipient,
+  mockRecipient2,
+  mockRecipient3,
+  mockRecipient4,
+} from 'test/values'
 
 describe('contactsToRecipients', () => {
   it('returns a recipient per phone number', () => {
@@ -38,5 +46,26 @@ describe('contactsToRecipients', () => {
       phoneNumberLabel: 'mobile',
       contactId: '2',
     })
+  })
+})
+
+describe('Recipient sorting', () => {
+  const recipients = [mockRecipient2, mockRecipient, mockRecipient4, mockRecipient3]
+  it('Sorts recipients without any prioritized', () => {
+    expect(sortRecipients(recipients)).toStrictEqual([
+      mockRecipient3,
+      mockRecipient2,
+      mockRecipient,
+      mockRecipient4,
+    ])
+  })
+  it('Sorts recipients with some prioritized', () => {
+    const prioritized = { [mockRecipient.e164PhoneNumber!]: { contactId: 'contactId' } }
+    expect(sortRecipients(recipients, prioritized)).toStrictEqual([
+      mockRecipient,
+      mockRecipient3,
+      mockRecipient2,
+      mockRecipient4,
+    ])
   })
 })

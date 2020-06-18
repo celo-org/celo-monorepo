@@ -1,4 +1,7 @@
-# This file is intended to show the expected value structure with placeholder values
+# This file is intended to show the expected value structure with placeholder values.
+# Many values are optional, and the defaults are left up to the client.
+# These values are commented out in this file, but show the correct structure
+# if they were to be specified.
 
 environment:
   name: test
@@ -14,14 +17,18 @@ kubectl:
 
 oracle:
   replicas: 2
-  web3ProviderUrl: https://alfajoresstaging-forno.celo-testnet.org
+  rpcProviderUrls:
+    ws: wss://alfajoresstaging-forno.celo-testnet.org
+    http: https://alfajoresstaging-forno.celo-testnet.org
   identities:
   - address: 0x0000000000000000000000000000000000000000
+    privateKey: 0x000
     azure:
       id: defaultId
       clientId: defaultClientId
       keyVaultName: defaultKeyVaultName
   - address: 0x0000000000000000000000000000000000000001
+    privateKey: 0x001
     azure:
       id: defaultId1
       clientId: defaultClientId1
@@ -29,6 +36,41 @@ oracle:
   azureHsm:
     initTryCount: 5
     initMaxRetryBackoffMs: 30000
+  aggregation:
+    mid:
+      maxExchangeVolumeShare: 1
+      # askMaxPercentageDeviation
+      # bidMaxPercentageDeviation
+      # maxExchangeVolumeShare
+      # maxPercentageBidAskSpread
+      # minReportPriceChangeThreshold
+    trades:
+      periodMs: 300000
+      # dataFetchFrequency
+      # minimumTrades
+      # scalingRate
+  baseCurrency: GoldToken
+  quoteCurrency: USD
+  token: StableToken
   metrics:
     enabled: true
     prometheusPort: 9090
+  allowNotCGLD: false
+  apiRequestTimeoutMs: 5000
+  circuitBreakerPriceChangeThreshold: 0.25
+  exchanges: BITTREX
+  reportStrategy: BLOCK_BASED
+  reporter:
+    blockBased:
+      minReportPriceChangeThreshold: 0.005 # 0.5%
+      # targetMaxHeartbeatPeriodMs
+    timer:
+      removeExpiredFrequencyMs: 60000
+      # removeExpiredOffsetOverride
+      # removeFrequencyOverride
+      # reportOffsetOverride
+  # privateKeyPath
+  # unusedOracleAddresses
+  # overrideIndex
+  # overrideOracleCount
+  # maxBlockTimestampAgeMs

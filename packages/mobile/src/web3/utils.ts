@@ -32,11 +32,17 @@ export async function getLatestBlock() {
   return contractKit.web3.eth.getBlock('latest')
 }
 
+export async function getLatestBlockNumber() {
+  Logger.debug(TAG, 'Getting latest block number')
+  const contractKit = await getContractKitOutsideGenerator()
+  return contractKit.web3.eth.getBlockNumber()
+}
+
 export function* isAccountLocked(address: string) {
   try {
     // Test account to see if it is unlocked
     const contractKit = yield call(getContractKit)
-    yield call(contractKit.eth.sign, '', address)
+    yield call(contractKit.web3.eth.sign, '', address)
   } catch (e) {
     return true
   }

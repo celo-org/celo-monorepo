@@ -12,6 +12,81 @@ exports[`Support renders correctly 1`] = `
   <View
     style={
       Object {
+        "alignItems": "center",
+        "backgroundColor": "transparent",
+        "borderBottomColor": "#EDEEEF",
+        "borderBottomWidth": 0,
+        "flexDirection": "row",
+        "height": 62,
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <View
+      accessible={true}
+      focusable={false}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "marginBottom": 0,
+          "marginLeft": 4,
+          "opacity": 1,
+          "padding": 8,
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height="32"
+        viewBox="0 0 32 32"
+        width="32"
+      >
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="9.75"
+          y2="9.75"
+        />
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="15.75"
+          y2="15.75"
+        />
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="21.75"
+          y2="21.75"
+        />
+      </svg>
+    </View>
+    <View
+      style={
+        Object {
+          "width": 45,
+        }
+      }
+    />
+  </View>
+  <View
+    style={
+      Object {
         "borderColor": "#EEEEEE",
         "borderTopWidth": 1,
         "paddingLeft": 20,
