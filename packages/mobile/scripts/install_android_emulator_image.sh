@@ -8,3 +8,5 @@ sdkmanager "platform-tools" \
   "extras;intel;Hardware_Accelerated_Execution_Manager" \
   "emulator" \
   --verbose
+
+sdkmanager --update
