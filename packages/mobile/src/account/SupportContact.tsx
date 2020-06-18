@@ -9,6 +9,8 @@ import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
+import { openComposer } from 'react-native-email-link'
+import * as RNFS from 'react-native-fs'
 import Mailer from 'react-native-mail'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect, useSelector } from 'react-redux'
@@ -45,6 +47,27 @@ const mapDispatchToProps = {
   showMessage,
 }
 
+async function sendEmailWithNonNativeApp(
+  emailSubect: string,
+  message: string,
+  deviceInfo: {},
+  combinedLogsPath?: string | false
+) {
+  try {
+    const supportLogsMessage = combinedLogsPath
+      ? `Support logs: ${!combinedLogsPath || (await RNFS.readFile(combinedLogsPath))}`
+      : ''
+    await openComposer({
+      to: CELO_SUPPORT_EMAIL_ADDRESS,
+      subject: emailSubect,
+      body: `${message}<br>${JSON.stringify(deviceInfo)}\n${supportLogsMessage}`,
+    })
+    return { success: true }
+  } catch (error) {
+    return { error }
+  }
+}
+
 const SupportContact = (props: Props) => {
   const { t } = useTranslation(Namespaces.accountScreen10)
   const [message, setMessage] = useState('')
@@ -71,8 +94,9 @@ const SupportContact = (props: Props) => {
       body: `${message}<br/><br/><b>${JSON.stringify(deviceInfo)}</b>`,
       isHTML: true,
     }
+    let combinedLogsPath: string | false
     if (attachLogs) {
-      const combinedLogsPath = await Logger.createCombinedLogs()
+      combinedLogsPath = await Logger.createCombinedLogs()
       if (combinedLogsPath) {
         email.attachment = {
           path: combinedLogsPath, // The absolute path of the file from which to read data.
@@ -83,13 +107,26 @@ const SupportContact = (props: Props) => {
       }
     }
     setInProgress(false)
-    Mailer.mail(email, (error: any, event: string) => {
+
+    // Try to send with native mail app with logs as attachment
+    // if fails user can choose mail app but logs sent in message
+    Mailer.mail(email, async (error: any, event: string) => {
       if (event === 'sent') {
         navigate(Screens.Account)
         props.showMessage(t('contactSuccess'))
-      }
-      if (error) {
-        Logger.showError(error + ' ' + event)
+      } else if (error) {
+        const emailSent = await sendEmailWithNonNativeApp(
+          emailSubject,
+          message,
+          deviceInfo,
+          combinedLogsPath
+        )
+        if (emailSent.success) {
+          navigate(Screens.Account)
+          props.showMessage(t('contactSuccess'))
+        } else {
+          Logger.showError(error + ' ' + emailSent.error)
+        }
       }
     })
   }, [message, attachLogs, e164PhoneNumber])
