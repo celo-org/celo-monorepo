@@ -1,16 +1,24 @@
 /** @jsx jsx */
-import * as React from 'react'
-import { jsx, css } from '@emotion/core'
+import { css, jsx } from '@emotion/core'
 import CopyIcon from 'components/CopyIcon'
+import * as React from 'react'
 
-export default function ReserveAddresses() {
+interface Props {
+  dai: string
+  btc: string
+  celo: string
+  custody: string
+  eth: string
+}
+
+export default function ReserveAddresses({ dai, btc, celo, custody, eth }: Props) {
   return (
     <>
-      <Address label="CELO" hex={'0x9380fA34Fd9e4Fd14c06305fd7B6199089eD4eb9'} />
-      <Address label="CELO in Custody" hex={'0x9380fA34Fd9e4Fd14c06305fd7B6199089eD4eb9'} />
-      <Address label="BTC" hex={'0x9380fA34Fd9e4Fd14c06305fd7B6199089eD4eb9'} />
-      <Address label="ETH" hex={'0x9380fA34Fd9e4Fd14c06305fd7B6199089eD4eb9'} />
-      <Address label="DAI" hex={'0x9380fA34Fd9e4Fd14c06305fd7B6199089eD4eb9'} />
+      <Address label="CELO" hex={celo} />
+      <Address label="CELO in Custody" hex={custody} />
+      <Address label="BTC" hex={btc} />
+      <Address label="ETH" hex={eth} />
+      <Address label="DAI" hex={dai} />
     </>
   )
 }

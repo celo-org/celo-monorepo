@@ -1,12 +1,12 @@
 /** @jsx jsx */
 
+import { css, jsx } from '@emotion/core'
 import Chevron from './Chevron'
-import { jsx, css } from '@emotion/core'
 import colors from './colors'
 
 export default function Button({ children, href }) {
   return (
-    <a css={rootStyle} href={href}>
+    <a css={rootStyle} href={href} target="_blank">
       {children}
       <span>
         <Chevron size={12} />
@@ -19,8 +19,10 @@ const rootStyle = css({
   fontSize: 20,
   color: colors.dark,
   textDecoration: 'none',
-  display: 'inline-block',
+  display: 'block',
   fontWeight: 'bold',
+  marginTop: 8,
+  marginBottom: 12,
   span: {
     display: 'inline-block',
     paddingLeft: 4,

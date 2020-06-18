@@ -2,6 +2,9 @@
 title: The Celo Reserve
 ---
 
-#### A basket of cryptocurrencies enabling the Celo protocol to expand and contract the supply of Celo stable assets in-line with market demand.
+#### A diversified portfolio of cryptocurrencies supporting the ability of the Celo protocol to expand and contract the supply of Celo stable assets, in-line with market demand.
 
-[Learn more about Celo](https://celo.org)
+
+<button href="https://celo.org">
+Learn more about Celo
+</button>

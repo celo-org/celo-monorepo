@@ -9,3 +9,11 @@ export interface HoldingsData {
   cUSD: number
   ratio: number
 }
+
+export interface Addresses {
+  celoAddress: string
+  custodyAddress: string
+  btcAddress: string
+  ethAddress: string
+  daiAddress: string
+}

@@ -31,7 +31,7 @@ const rootStyle = css({
   flex: 1,
   paddingLeft: 16,
   paddingRight: 16,
-  marginBottom: 20,
+  marginBottom: 60,
 })
 
 const headingAreaStyle = css({
@@ -40,7 +40,13 @@ const headingAreaStyle = css({
   minWidth: 220,
 })
 
-const contentAreaStyle = css({ flex: 1, minWidth: 320 })
+const contentAreaStyle = css({
+  flex: 1,
+  minWidth: 320,
+  '@media (max-width: 320px)': {
+    minWidth: '100%',
+  },
+})
 
 const titleCSS = css({
   '@media (max-width: 590px)': {

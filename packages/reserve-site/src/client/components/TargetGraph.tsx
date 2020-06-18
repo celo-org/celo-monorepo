@@ -1,6 +1,5 @@
 /** @jsx jsx */
-import * as React from 'react'
-import { jsx, css } from '@emotion/core'
+import { css, jsx } from '@emotion/core'
 
 export default function TargetGraph() {
   return <img src="/initialTarget.svg" alt={ALT_TEXT} css={rootStyle} />
@@ -11,6 +10,9 @@ const rootStyle = css({
   width: 670,
   height: 363,
   objectFit: 'contain',
+  '@media (max-width: 420px)': {
+    height: 280,
+  },
 })
 
 const ALT_TEXT =

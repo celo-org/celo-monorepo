@@ -19,3 +19,8 @@ export enum TableNames {
   ReserveHoldings = 'Reserve Holdings',
   ReserveAddresses = 'Reserve Addresses',
 }
+
+export interface Record<Fields> {
+  id: string
+  fields: Fields
+}

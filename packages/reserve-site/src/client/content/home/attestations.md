@@ -1,7 +1,5 @@
 ---
 title: Third Party Attestations
 ---
-
-[Anchorage holdings report](https://web.anchorage.com/anchorage-celo/)
-
-[NCC audit summary](/NCCExecutiveSummary.pdf)
+<button href="https://web.anchorage.com/anchorage-celo/">Anchorage holdings report</button>
+<button href="/NCCExecutiveSummary.pdf">NCC audit summary</button>

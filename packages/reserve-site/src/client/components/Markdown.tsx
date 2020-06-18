@@ -1,8 +1,7 @@
 /** @jsx jsx */
-import MarkdownJSX from 'markdown-to-jsx'
-import * as React from 'react'
-import Button from './Button'
 import { css, jsx } from '@emotion/core'
+import MarkdownJSX from 'markdown-to-jsx'
+import Button from './Button'
 
 export interface Attributes {
   title: string
@@ -23,10 +22,10 @@ function H4({ children }) {
 
 const OPTIONS = {
   overrides: {
-    a: Button,
     p: Paragraph,
     h3: H3,
     h4: H4,
+    button: Button,
   },
 }
 
