@@ -106,6 +106,7 @@ export async function getStoredMnemonic(): Promise<string | null> {
 
     return mnemonic
   } catch (error) {
+    CeloAnalytics.track(CustomEventNames.failed_to_retrieve_mnemonic, { error })
     Logger.error(TAG, 'Failed to retrieve mnemonic', error)
     return null
   }

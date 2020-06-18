@@ -48,6 +48,7 @@ export function* getPincode(withVerification = true) {
 
   if (pincodeType === PincodeType.Unset) {
     Logger.error(TAG + '@getPincode', 'Pin has never been set')
+    CeloAnalytics.track(CustomEventNames.pin_never_set, { pincodeType })
     throw Error('Pin has never been set')
   }
 

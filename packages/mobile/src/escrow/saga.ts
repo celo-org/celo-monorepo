@@ -181,7 +181,7 @@ function* withdrawFromEscrow() {
     Logger.showMessage(i18n.t('inviteFlow11:transferDollarsToAccount'))
   } catch (e) {
     Logger.error(TAG + '@withdrawFromEscrow', 'Error withdrawing payment from escrow', e)
-    CeloAnalytics.track(CustomEventNames.escrow_failed_to_withdraw, { error: e.message })
+    CeloAnalytics.track(CustomEventNames.escrow_failed_to_withdraw, { error: e })
     if (e.message === ErrorMessages.INCORRECT_PIN) {
       yield put(showError(ErrorMessages.INCORRECT_PIN))
     } else {
@@ -303,6 +303,7 @@ function* doFetchSentPayments() {
 
     yield put(storeSentEscrowPayments(sentPayments))
   } catch (e) {
+    CeloAnalytics.track(CustomEventNames.escrow_failed_to_fetch_sent, { error: e })
     Logger.error(TAG + '@doFetchSentPayments', 'Error fetching sent escrowed payments', e)
   }
 }

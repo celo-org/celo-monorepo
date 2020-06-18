@@ -76,6 +76,7 @@ export function* doFetchTobinTax({ makerAmount, makerToken }: FetchTobinTaxActio
     Logger.debug(TAG, `Retrieved Tobin tax rate: ${tobinTax}`)
     yield put(setTobinTax(tobinTax.toString()))
   } catch (error) {
+    CeloAnalytics.track(CustomEventNames.fetch_tobin_tax_failed, { error })
     Logger.error(TAG, 'Error fetching Tobin tax', error)
     yield put(showError(ErrorMessages.CALCULATE_FEE_FAILED))
   }
@@ -139,6 +140,7 @@ export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
       })
     )
   } catch (error) {
+    CeloAnalytics.track(CustomEventNames.fetch_exchange_rate_failed, { error })
     Logger.error(TAG, 'Error fetching exchange rate', error)
     yield put(showError(ErrorMessages.EXCHANGE_RATE_FAILED))
   }
@@ -155,10 +157,12 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     const exchangeRatePair: ExchangeRatePair = yield select(exchangeRatePairSelector)
     const exchangeRate = getRateForMakerToken(exchangeRatePair, makerToken)
     if (!exchangeRate) {
+      CeloAnalytics.track(CustomEventNames.invalid_exchange_rate, { exchangeRate })
       Logger.error(TAG, 'Invalid exchange rate from exchange contract')
       return
     }
     if (exchangeRate.isZero()) {
+      CeloAnalytics.track(CustomEventNames.invalid_exchange_rate, { exchangeRate })
       Logger.error(TAG, 'Cannot do exchange with rate of 0. Stopping.')
       throw new Error('Invalid exchange rate')
     }
@@ -213,6 +217,11 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     )
     const updatedTakerAmount = getTakerAmount(makerAmount, updatedExchangeRate)
     if (minimumTakerAmount.isGreaterThan(updatedTakerAmount)) {
+      CeloAnalytics.track(CustomEventNames.exchange_rate_change_failure, {
+        makerToken,
+        takerAmount: updatedTakerAmount,
+        context: `Expected ${minimumTakerAmount}`,
+      })
       Logger.error(
         TAG,
         `Not receiving enough ${makerToken} due to change in exchange rate. Exchange failed.`
@@ -245,6 +254,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
         convertedMakerAmount.toString()
       )
     } else {
+      CeloAnalytics.track(CustomEventNames.unexpected_maker_token, { makerToken })
       Logger.error(TAG, `Unexpected maker token ${makerToken}`)
       return
     }
@@ -260,11 +270,13 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     )
 
     if (!txId) {
+      CeloAnalytics.track(CustomEventNames.missing_tx_id)
       Logger.error(TAG, 'No txId. Did not exchange.')
       return
     }
     yield call(sendAndMonitorTransaction, txId, tx, account)
   } catch (error) {
+    CeloAnalytics.track(CustomEventNames.exchange_failed, { error })
     Logger.error(TAG, 'Error doing exchange', error)
     const isDollarToGold = makerToken === CURRENCY_ENUM.DOLLAR
 

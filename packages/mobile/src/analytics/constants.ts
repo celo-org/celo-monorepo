@@ -10,6 +10,7 @@ export enum CustomEventNames {
   disconnect_banner = 'disconnect_banner',
 
   error_fallback = 'error_fallback',
+  app_state_error = 'app_state_error',
 
   // Education
   gold_cancel1 = 'gold_cancel1',
@@ -146,6 +147,7 @@ export enum CustomEventNames {
   pin_value = 'pin_value',
   pin_create_button = 'pin_create_button',
   pin_failed_to_set = 'pin_failed_to_set',
+  pin_never_set = 'pin_never_set',
 
   // Screen name: Invite_Friends, Invite_Friends_Fee
   friend_invited = 'friend_invited', // to record the name or number of the friend a user is inviting per an invite session
@@ -156,6 +158,8 @@ export enum CustomEventNames {
   invite_edit = 'invite_edit', // to count the # of taps on “Cancel” button at bottom of Invite_Friends_Review
   invite_friends_sms = 'invite_friends_sms', // to count the # of taps on “Invite with SMS" button on Invite_Friends_Review
   invite_friends_whatsapp = 'invite_friends_whatsapp', // to count the # of taps on “Invite with WhatsApp" button on Invite_Friends_Review
+  invite_skip_failed = 'invite_skip_failed',
+  invite_skip_complete = 'invite_skip_complete',
 
   backup_start = 'backup_start', // ‘set up now’ button click
   backup_setup_info = 'backup_setup_info',
@@ -183,6 +187,7 @@ export enum CustomEventNames {
   backup_setup_toggle_disable = 'backup_setup_toggle_disable', // (count # of slides to disagree on "I wrote down account key" Switch in Backup_Phrase)
   social_backup_continue = 'social_backup_continue', // (Count # of taps on "Backup with Friends" in Backup_Phrase)
   backup_error = 'backup_error',
+  failed_to_retrieve_mnemonic = 'failed_to_retrieve_mnemonic',
 
   // Screen name: Backup_Quiz, Question_Incorrect, Backup_Confirmed
   question_select = 'question_select', // (track # of input selections on Backup_Verify screen)
@@ -210,6 +215,12 @@ export enum CustomEventNames {
   gold_sell_cancel = 'gold_sell_cancel', // when ‘cancel’ is clicked
   gold_sell_edit = 'gold_sell_edit', // when ‘edit’ is clicked
   gold_sell_error = 'gold_sell_error', // error in sell flow
+
+  // Exchange errors
+  fetch_exchange_rate_failed = 'fetch_exchange_rate_failed',
+  invalid_exchange_rate = 'invalid_exchange_rate',
+  exchange_rate_change_failure = 'exchange_rate_change_failure',
+  missing_tx_id = 'missing_tx_id',
 
   // Gold Home screen
   gold_info = 'gold_info', // when the (i) next to Celo Gold price is clicked, launching education (not pictured)
@@ -256,6 +267,7 @@ export enum CustomEventNames {
   escrow_failed_to_withdraw = 'escrow_failed_to_withdraw',
   escrow_failed_to_reclaim = 'escrow_failed_to_reclaim',
   escrow_failed_to_transfer = 'escrow_failed_to_transfer',
+  escrow_failed_to_fetch_sent = 'escrow_failed_to_fetch_sent',
   clicked_escrowed_payment_notification = 'clicked_escrowed_payment_notification',
   clicked_escrowed_payment_send_message = 'clicked_escrowed_payment_send_message',
 
@@ -276,15 +288,15 @@ export enum CustomEventNames {
   transaction_send_gas_hash_received = 'transaction_send_gas_hash_received',
   transaction_send_gas_receipt = 'transaction_send_gas_receipt',
 
-  // Fee
+  // Fee errors
   estimate_fee_failed = 'estimate_fee_failed',
+  fetch_tobin_tax_failed = 'fetch_tobin_tax_failed',
 
   // Token
   transfer_token_error = 'transfer_token_error',
+  unexpected_maker_token = 'unexpected_maker_token',
 
-  // Invite flow
-  invite_skip_failed = 'invite_skip_failed',
-  invite_skip_complete = 'invite_skip_complete',
+  // Geth
 }
 
 export enum CommonValues {
