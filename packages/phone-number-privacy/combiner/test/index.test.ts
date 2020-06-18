@@ -37,14 +37,14 @@ const fetchMock: jest.Mock = require('node-fetch')
 const FetchResponse: typeof Response = jest.requireActual('node-fetch').Response
 const defaultResponseJson = JSON.stringify({
   success: true,
-  signature: "string"
+  signature: 'string',
 })
 
 describe(`POST /getDistributedBlindedSalt endpoint`, () => {
   beforeEach(() => {
     fetchMock.mockClear()
     fetchMock.mockImplementation(() => Promise.resolve(new FetchResponse(defaultResponseJson)))
-    })
+  })
 
   describe('with valid input', () => {
     const blindedQueryPhoneNumber = '+5555555555'
@@ -57,18 +57,19 @@ describe(`POST /getDistributedBlindedSalt endpoint`, () => {
       hashedPhoneNumber,
       account,
     }
-    const req = { body: mockRequestData, 
-                  headers: {
-                    authorization: mockHeader
-                  }
-                }
+    const req = {
+      body: mockRequestData,
+      headers: {
+        authorization: mockHeader,
+      },
+    }
 
     it('provides signature', async () => {
       const res = {
         json(body: any) {
           expect(body.success).toEqual(true)
           expect(body.combinedSignature).toEqual(BLS_SIGNATURE)
-        }
+        },
       }
       // @ts-ignore TODO fix req type to make it a mock express req
       await getDistributedBlindedSalt(req, res)
@@ -136,11 +137,12 @@ describe(`POST /getDistributedBlindedSalt endpoint`, () => {
         hashedPhoneNumber,
         account,
       }
-      const req = { body: mockRequestData, 
-                    headers: {
-                      authorization: mockHeader
-                    }
-                  }
+      const req = {
+        body: mockRequestData,
+        headers: {
+          authorization: mockHeader,
+        },
+      }
 
       const res = {
         status: (status: any) => {
@@ -168,13 +170,14 @@ describe(`POST /getContactMatches endpoint`, () => {
       userPhoneNumber,
       contactPhoneNumbers,
       account,
-      hashedPhoneNumber
+      hashedPhoneNumber,
     }
-    const req = { body: mockRequestData,
-                  headers: {
-                    authorization: mockHeader
-                  } 
-                }
+    const req = {
+      body: mockRequestData,
+      headers: {
+        authorization: mockHeader,
+      },
+    }
     it('provides matches', async () => {
       mockGetNumberPairContacts.mockReturnValue(contactPhoneNumbers)
       mockIsVerified.mockReturnValue(true)
@@ -226,8 +229,7 @@ describe(`POST /getContactMatches endpoint`, () => {
       const mockRequestData = {
         contactPhoneNumbers,
         account,
-        hashedPhoneNumber
-
+        hashedPhoneNumber,
       }
       const req = { body: mockRequestData }
 
@@ -254,8 +256,7 @@ describe(`POST /getContactMatches endpoint`, () => {
         contactPhoneNumbers,
         userPhoneNumber,
         account,
-        hashedPhoneNumber
-
+        hashedPhoneNumber,
       }
       const req = { body: mockRequestData }
 
@@ -280,7 +281,7 @@ describe(`POST /getContactMatches endpoint`, () => {
       const mockRequestData = {
         userPhoneNumber,
         account,
-        hashedPhoneNumber
+        hashedPhoneNumber,
       }
       const req = { body: mockRequestData }
 
