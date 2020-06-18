@@ -11,6 +11,8 @@ import { call, delay, put, race, select, take } from 'redux-saga/effects'
 import { setUserContactDetails } from 'src/account/actions'
 import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/selectors'
 import { showErrorOrFallback } from 'src/alert/actions'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { USE_PHONE_NUMBER_PRIVACY } from 'src/config'
 import {
@@ -70,6 +72,7 @@ export function* doImportContactsWrapper({ doMatchmaking }: ImportContactsAction
     yield put(endImportContacts(true))
   } catch (error) {
     Logger.error(TAG, 'Error importing user contacts', error)
+    CeloAnalytics.track(CustomEventNames.import_contact_error, { error })
     yield put(showErrorOrFallback(error, ErrorMessages.IMPORT_CONTACTS_FAILED))
     yield put(endImportContacts(false))
   }

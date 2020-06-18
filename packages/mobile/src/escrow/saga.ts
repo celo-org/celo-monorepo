@@ -4,6 +4,8 @@ import { ensureLeading0x } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import { all, call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ESCROW_PAYMENT_EXPIRY_SECONDS } from 'src/config'
@@ -88,6 +90,7 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
     yield put(fetchSentEscrowPayments())
   } catch (e) {
     Logger.error(TAG + '@transferToEscrow', 'Error transfering to escrow', e)
+    CeloAnalytics.track(CustomEventNames.escrow_failed_to_transfer, { error: e.message })
     if (e.message === ErrorMessages.INCORRECT_PIN) {
       yield put(showError(ErrorMessages.INCORRECT_PIN))
     } else {
@@ -178,6 +181,7 @@ function* withdrawFromEscrow() {
     Logger.showMessage(i18n.t('inviteFlow11:transferDollarsToAccount'))
   } catch (e) {
     Logger.error(TAG + '@withdrawFromEscrow', 'Error withdrawing payment from escrow', e)
+    CeloAnalytics.track(CustomEventNames.escrow_failed_to_withdraw, { error: e.message })
     if (e.message === ErrorMessages.INCORRECT_PIN) {
       yield put(showError(ErrorMessages.INCORRECT_PIN))
     } else {
@@ -226,6 +230,7 @@ function* reclaimFromEscrow({ paymentID }: EscrowReclaimPaymentAction) {
     yield put(reclaimEscrowPaymentSuccess())
   } catch (e) {
     Logger.error(TAG + '@reclaimFromEscrow', 'Error reclaiming payment from escrow', e)
+    CeloAnalytics.track(CustomEventNames.escrow_failed_to_reclaim, { error: e })
     if (e.message === ErrorMessages.INCORRECT_PIN) {
       yield put(showError(ErrorMessages.INCORRECT_PIN))
     } else {

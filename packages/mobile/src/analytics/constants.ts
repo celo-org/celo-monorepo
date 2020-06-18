@@ -43,6 +43,9 @@ export enum CustomEventNames {
   send_input = 'send_input',
   transaction_details = 'transaction_details',
 
+  // Profile
+  inavlid_phone_number = 'inavlid_phone_number',
+
   // Payment send
   send_select_cancel = 'send_select_cancel',
   send_invite_details = 'send_invite_details',
@@ -142,6 +145,7 @@ export enum CustomEventNames {
   pin_wallet_import = 'pin_wallet_import',
   pin_value = 'pin_value',
   pin_create_button = 'pin_create_button',
+  pin_failed_to_set = 'pin_failed_to_set',
 
   // Screen name: Invite_Friends, Invite_Friends_Fee
   friend_invited = 'friend_invited', // to record the name or number of the friend a user is inviting per an invite session
@@ -241,6 +245,7 @@ export enum CustomEventNames {
   import_wallet_submit = 'import_wallet_submit', // to count the # of times that the “Restore Celo Wallet” button is pressed
   import_wallet_cancel = 'import_wallet_cancel', // to count the # of times that the “Cancel” button is pressed
   import_contacts = 'import_contacts',
+  import_contact_error = 'import_contact_error',
   import_contacts_skip = 'import_contacts_skip',
 
   // Escrowed payments
@@ -248,6 +253,9 @@ export enum CustomEventNames {
   escrowed_payment_reclaimed_by_sender = 'escrowed_payment_reclaimed_by_sender',
   escrowed_payment_reclaimEdit_by_sender = 'escrowed_payment_reclaimEdit_by_sender',
   escrowed_payment_withdrawn_by_receiver = 'escrowed_payment_withdrawn_by_receiver',
+  escrow_failed_to_withdraw = 'escrow_failed_to_withdraw',
+  escrow_failed_to_reclaim = 'escrow_failed_to_reclaim',
+  escrow_failed_to_transfer = 'escrow_failed_to_transfer',
   clicked_escrowed_payment_notification = 'clicked_escrowed_payment_notification',
   clicked_escrowed_payment_send_message = 'clicked_escrowed_payment_send_message',
 
@@ -267,6 +275,16 @@ export enum CustomEventNames {
   transaction_send_gas_estimated = 'transaction_send_gas_estimated',
   transaction_send_gas_hash_received = 'transaction_send_gas_hash_received',
   transaction_send_gas_receipt = 'transaction_send_gas_receipt',
+
+  // Fee
+  estimate_fee_failed = 'estimate_fee_failed',
+
+  // Token
+  transfer_token_error = 'transfer_token_error',
+
+  // Invite flow
+  invite_skip_failed = 'invite_skip_failed',
+  invite_skip_complete = 'invite_skip_complete',
 }
 
 export enum CommonValues {
@@ -295,6 +313,7 @@ export enum PropertyPathWhitelist {
   error = 'error',
   exchangeInputAmount = 'exchangeInputAmount',
   exchangeRate = 'exchangeRate',
+  feeType = 'feeType',
   fullName = 'fullName',
   goldAmount = 'goldAmount',
   goldBalance = 'goldBalance',
@@ -320,6 +339,7 @@ export enum PropertyPathWhitelist {
   nextScreen = 'nextScreen',
   note = 'note',
   phoneNumber = 'phoneNumber',
+  pincodeType = 'pincodeType',
   previousScreen = 'previousScreen',
   query = 'query',
   recipientAddress = 'recipientAddress',
