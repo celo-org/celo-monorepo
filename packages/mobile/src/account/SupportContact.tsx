@@ -102,6 +102,7 @@ const SupportContact = (props: Props) => {
           onChangeText={setMessage}
           value={message}
           multiline={true}
+          autoFocus={true}
           style={styles.messageTextInput}
           placeholderTextColor={colors.inactive}
           underlineColorAndroid="transparent"

@@ -71,6 +71,8 @@
 		<string>Inter-Medium.ttf</string>
 		<string>Inter-Regular.ttf</string>
 		<string>Inter-SemiBold.ttf</string>
+    <string>Jost-Book.ttf</string>
+    <string>Jost-Medium.ttf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>
