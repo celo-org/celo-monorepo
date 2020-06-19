@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ExchangeTradeScreen renders correctly 1`] = `
+exports[`FiatExchangeAmount renders correctly 1`] = `
 <SafeAreaView
   forceInset={
     Object {
@@ -30,7 +30,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
             "alignItems": "center",
             "flexDirection": "row",
             "marginBottom": 8,
-            "marginTop": 38,
+            "marginTop": 24,
           }
         }
       >
@@ -46,40 +46,8 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
               }
             }
           >
-            exchangeAmount
+            global:amount
           </Text>
-          <View
-            accessible={true}
-            focusable={true}
-            onClick={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-            style={
-              Object {
-                "opacity": 1,
-              }
-            }
-            testID="ExchangeSwitchInput"
-          >
-            <Text
-              style={
-                Object {
-                  "color": "#9CA4A9",
-                  "fontFamily": "Inter-Regular",
-                  "fontSize": 13,
-                  "lineHeight": 18,
-                  "marginTop": 4,
-                  "textDecorationLine": "underline",
-                }
-              }
-            >
-              switchTo
-            </Text>
-          </View>
         </View>
         <TextInput
           allowFontScaling={true}
@@ -91,17 +59,17 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
           rejectResponderTermination={true}
           style={
             Object {
-              "color": "#9C6E00",
+              "color": "#1AB775",
               "flex": 1,
               "fontFamily": "Inter-Regular",
-              "fontSize": 24,
-              "height": 60,
-              "lineHeight": 39,
+              "fontSize": 19,
+              "height": 48,
+              "lineHeight": 27,
               "marginLeft": 10,
               "textAlign": "right",
             }
           }
-          testID="ExchangeInput"
+          testID="FiatExchangeInput"
           underlineColorAndroid="transparent"
           value=""
         />
@@ -145,8 +113,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
               ]
             }
           >
-            Subtotal @
-             
+            Celo Dollars @ 
             <Text
               numberOfLines={1}
               style={
@@ -160,7 +127,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
             >
               
               $
-              12.09
+              1.33
             </Text>
           </Text>
         </View>
@@ -194,13 +161,25 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
             }
           >
             
-            $
             0.00
           </Text>
         </Text>
       </View>
     </View>
   </RCTScrollView>
+  <Text
+    style={
+      Object {
+        "color": "#9CA4A9",
+        "fontFamily": "Inter-Regular",
+        "fontSize": 14,
+        "lineHeight": 18,
+        "textAlign": "center",
+      }
+    }
+  >
+    dislamerCeloDollars
+  </Text>
   <View
     style={
       Array [
@@ -240,7 +219,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
         style={
           Object {
             "alignItems": "center",
-            "backgroundColor": "#E3C376",
+            "backgroundColor": "#97DFC1",
             "flexGrow": 1,
             "height": 48,
             "justifyContent": "center",
@@ -249,10 +228,10 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
             "paddingVertical": 5,
           }
         }
-        testID="ExchangeReviewButton"
+        testID="FiatExchangeNextButton"
       >
         <Text
-          accessibilityLabel="continue"
+          accessibilityLabel="global:next"
           style={
             Object {
               "color": "#FFFFFF",
@@ -262,7 +241,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
             }
           }
         >
-          global:review
+          global:next
         </Text>
       </View>
     </View>
