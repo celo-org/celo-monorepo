@@ -3,7 +3,7 @@ import TextButton from '@celo/react-components/components/TextButton.v2'
 import { default as colors, default as colorsV2 } from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { Spacing } from '@celo/react-components/styles/styles.v2'
-import { StackNavigationOptions } from '@react-navigation/stack'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
@@ -16,9 +16,11 @@ import DelayButton from 'src/backup/DelayButton'
 import { useAccountKey } from 'src/backup/utils'
 import { Namespaces } from 'src/i18n'
 import Logo from 'src/icons/Logo.v2'
-import { drawerHeader } from 'src/navigator/Headers.v2'
-import { navigateProtected } from 'src/navigator/NavigationService'
+import DrawerTopBar from 'src/navigator/DrawerTopBar'
+import { emptyHeader, headerWithBackButton } from 'src/navigator/Headers.v2'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 
 interface StateProps {
@@ -30,7 +32,9 @@ interface DispatchProps {
   exitBackupFlow: typeof exitBackupFlow
 }
 
-type Props = StateProps & DispatchProps
+type NavigationProps = StackScreenProps<StackParamList, Screens.BackupIntroduction>
+
+type Props = StateProps & DispatchProps & NavigationProps
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -38,10 +42,16 @@ const mapStateToProps = (state: RootState): StateProps => {
   }
 }
 
-export const navOptionsForAccount: StackNavigationOptions = {
-  ...drawerHeader,
-  headerTitle: '',
-  headerRight: () => <DelayButton />,
+export const navOptionsForAccount = ({ route }: NavigationProps) => {
+  if (route.params?.fromAccountScreen) {
+    return headerWithBackButton
+  }
+
+  return {
+    ...emptyHeader,
+    headerTitle: '',
+    headerRight: () => <DelayButton />,
+  }
 }
 
 class BackupIntroduction extends React.Component<Props> {
@@ -55,13 +65,15 @@ class BackupIntroduction extends React.Component<Props> {
 
   onPressBackup = () => {
     CeloAnalytics.track(CustomEventNames.backup_start)
-    navigateProtected(Screens.BackupPhrase)
+    navigate(Screens.AccountKeyEducation)
   }
 
   render() {
-    const { backupCompleted } = this.props
+    const { backupCompleted, route } = this.props
+    const fromAccountScreen = route.params?.fromAccountScreen
     return (
       <SafeAreaView style={styles.container}>
+        {!fromAccountScreen && <DrawerTopBar />}
         {backupCompleted ? (
           <AccountKeyPostSetup />
         ) : (
@@ -103,10 +115,14 @@ function AccountKeyPostSetup() {
         <Text style={styles.postSetupBody}>{t('postSetupBody')}</Text>
       </View>
       <View style={styles.postSetupCTA}>
-        <TextButton>{t('postSetupCTA')}</TextButton>
+        <TextButton onPress={goToAccountKeyGuide}>{t('postSetupCTA')}</TextButton>
       </View>
     </ScrollView>
   )
+}
+
+function goToAccountKeyGuide() {
+  navigate(Screens.AccountKeyEducation, { nextScreen: Screens.BackupIntroduction })
 }
 
 const styles = StyleSheet.create({

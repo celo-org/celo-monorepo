@@ -8,6 +8,7 @@ import { EscrowedPayment } from 'src/escrow/actions'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import { AttestationCode } from 'src/identity/verification'
+import { StackParamList } from 'src/navigator/types'
 import {
   RecipientKind,
   RecipientWithContact,
@@ -26,22 +27,20 @@ export const mockMnemonicShard1 =
 export const mockMnemonicShard2 =
   'celo old unable wash wrong need fluid hammer coach reveal plastic trust lake'
 
-export const mockPrivateDEK = Buffer.from(
-  '41e8e8593108eeedcbded883b8af34d2f028710355c57f4c10a056b72486aa04',
-  'hex'
-)
+export const mockPrivateDEK = '41e8e8593108eeedcbded883b8af34d2f028710355c57f4c10a056b72486aa04'
 export const mockPublicDEK = '02c9cacca8c5c5ebb24dc6080a933f6d52a072136a069083438293d71da36049dc'
-export const mockPrivateDEK2 = Buffer.from(
-  '855c5f9d5fc53962537eaf9a0f3ea40a7bc7e57a119e8473fffef24be20bffff',
-  'hex'
-)
+export const mockPrivateDEK2 = '855c5f9d5fc53962537eaf9a0f3ea40a7bc7e57a119e8473fffef24be20bffff'
 export const mockPublicDEK2 = '024c158e98449d9ca4dddeaa12c2432a5e7d38a48a53299fd22c51daf8d409957a'
 
 export const mockContractAddress = '0x000000000000000000000000000000000000CE10'
 export const mockE164Number = '+14155550000'
+export const mockDisplayNumber = '(415) 555-0000'
 export const mockE164NumberHash =
   '0xefbc804cdddcb76544e1dd2c25e9624edae290d175ccd20538e5cae06c7dbe9e'
-export const mockDisplayNumber = '(415) 555-0000'
+export const mockE164NumberSalt = 'piWqRHHYWtfg9'
+export const mockE164NumberHashWithSalt =
+  '0xf6429456331dedf8bd32b5e3a578e5bc589a28d012724dcd3e0a4b1be67bb454'
+
 export const mockE164Number2 = '+12095559790'
 export const mockDisplayNumber2 = '(209) 555-9790'
 export const mockComment = 'Rent request for June, it is already late!!!'
@@ -116,7 +115,6 @@ export const mockInvitableRecipient2: RecipientWithContact = {
 export const mockTransactionData = {
   recipient: mockInvitableRecipient2,
   amount: new BigNumber(1),
-  reason: 'Something',
   type: TokenTransactionType.Sent,
 }
 
@@ -144,6 +142,12 @@ export const mockRecipient3: RecipientWithContact = {
   address: mockAccount2Invite,
 }
 
+export const mockRecipient4: RecipientWithContact = {
+  kind: RecipientKind.Contact,
+  displayName: 'Zebra Zone',
+  contactId: 'contactId4',
+}
+
 export const mockE164NumberToInvitableRecipient = {
   [mockE164Number]: mockInvitableRecipient,
   [mockE164NumberInvite]: mockInvitableRecipient2,
@@ -164,7 +168,7 @@ export const mockRecipientWithPhoneNumber: RecipientWithMobileNumber = {
   e164PhoneNumber: mockE164Number,
 }
 
-export const mockNavigation: StackNavigationProp<any, any> = ({
+export const mockNavigation: StackNavigationProp<StackParamList, any> = ({
   navigate: jest.fn(),
   reset: jest.fn(),
   goBack: jest.fn(),
@@ -174,7 +178,7 @@ export const mockNavigation: StackNavigationProp<any, any> = ({
   isFocused: jest.fn(),
   addListener: jest.fn(),
   removeListener: jest.fn(),
-} as unknown) as StackNavigationProp<any, any>
+} as unknown) as StackNavigationProp<StackParamList, any>
 
 export const mockAddressToE164Number: AddressToE164NumberType = {
   [mockAccount]: mockE164Number,

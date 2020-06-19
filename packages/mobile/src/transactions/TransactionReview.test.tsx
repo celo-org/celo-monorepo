@@ -5,8 +5,8 @@ import { TokenTransactionType } from 'src/apollo/types'
 import { AddressValidationType } from 'src/identity/reducer'
 import { Screens } from 'src/navigator/Screens'
 import TransactionReview from 'src/transactions/TransactionReview'
-import { createMockStore } from 'test/utils'
-import { mockAccount, mockAccount2, mockE164NumberInvite, mockNavigation } from 'test/values'
+import { createMockStore, getMockStackScreenProps } from 'test/utils'
+import { mockAccount, mockAccount2, mockE164NumberInvite } from 'test/values'
 
 describe('TransactionReview', () => {
   it('to show address changed text when recipient address has changed', () => {
@@ -21,31 +21,27 @@ describe('TransactionReview', () => {
       },
     })
 
-    const mockRoute = {
-      name: Screens.TransactionReview as Screens.TransactionReview,
-      key: '',
-      params: {
-        confirmationProps: {
-          address: mockAccount,
-          comment: 'Pay up!',
-          amount: {
-            value: '1.0',
-            currencyCode: 'cUSD',
-          },
-          type: TokenTransactionType.Sent,
-          e164PhoneNumber: mockE164NumberInvite,
+    const mockScreenProps = getMockStackScreenProps(Screens.TransactionReview, {
+      confirmationProps: {
+        address: mockAccount,
+        comment: 'Pay up!',
+        amount: {
+          value: '1.0',
+          currencyCode: 'cUSD',
         },
-        reviewProps: {
-          timestamp: Date.now(),
-          type: TokenTransactionType.Sent,
-          header: 'Payment Send',
-        },
+        type: TokenTransactionType.Sent,
+        e164PhoneNumber: mockE164NumberInvite,
       },
-    }
+      reviewProps: {
+        timestamp: Date.now(),
+        type: TokenTransactionType.Sent,
+        header: 'Payment Send',
+      },
+    })
 
     const tree = render(
       <Provider store={store}>
-        <TransactionReview navigation={mockNavigation} route={mockRoute} />
+        <TransactionReview {...mockScreenProps} />
       </Provider>
     )
 

@@ -65,7 +65,7 @@ exports[`VerificationInputScreen renders correctly 1`] = `
     keyboardShouldPersistTaps="always"
   >
     <View>
-      <View
+      <SafeAreaView
         style={
           Object {
             "height": 35,
@@ -92,7 +92,7 @@ exports[`VerificationInputScreen renders correctly 1`] = `
         >
              
         </Text>
-      </View>
+      </SafeAreaView>
       <View
         style={
           Object {

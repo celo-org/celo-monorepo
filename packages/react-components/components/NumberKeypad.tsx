@@ -9,6 +9,7 @@ interface Props {
   onBackspacePress: () => void
   onDecimalPress?: () => void
   decimalSeparator?: string
+  testID?: string
 }
 
 function DigitButton({
@@ -20,7 +21,7 @@ function DigitButton({
 }) {
   const onPress = () => onDigitPress(digit)
   return (
-    <Touchable borderless={true} onPress={onPress}>
+    <Touchable borderless={true} onPress={onPress} testID={`digit${digit}`}>
       <Text style={style.digit}>{digit}</Text>
     </Touchable>
   )
@@ -46,7 +47,11 @@ export default function NumberKeypad(props: Props) {
       </View>
       <View style={style.row}>
         {props.decimalSeparator && props.onDecimalPress ? (
-          <Touchable borderless={true} onPress={props.onDecimalPress}>
+          <Touchable
+            borderless={true}
+            onPress={props.onDecimalPress}
+            testID={`digit${props.decimalSeparator}`}
+          >
             <Text style={style.digit}>{props.decimalSeparator}</Text>
           </Touchable>
         ) : (
@@ -73,7 +78,7 @@ const style = StyleSheet.create({
   row: {
     width: '100%',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     alignItems: 'center',
   },
   digit: {

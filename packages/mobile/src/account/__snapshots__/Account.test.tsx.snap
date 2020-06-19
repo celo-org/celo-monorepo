@@ -1,22 +1,97 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Account renders correctly 1`] = `
-<RCTScrollView
+<SafeAreaView
   style={
     Object {
-      "backgroundColor": "white",
+      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
 >
-  <View>
-    <SafeAreaView>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "backgroundColor": "transparent",
+        "borderBottomColor": "#EDEEEF",
+        "borderBottomWidth": 0,
+        "flexDirection": "row",
+        "height": 62,
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <View
+      accessible={true}
+      focusable={false}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "marginBottom": 0,
+          "marginLeft": 4,
+          "opacity": 1,
+          "padding": 8,
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height="32"
+        viewBox="0 0 32 32"
+        width="32"
+      >
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="9.75"
+          y2="9.75"
+        />
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="15.75"
+          y2="15.75"
+        />
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="21.75"
+          y2="21.75"
+        />
+      </svg>
+    </View>
+    <View
+      style={
+        Object {
+          "width": 45,
+        }
+      }
+    />
+  </View>
+  <RCTScrollView>
+    <View>
       <View
         style={
           Object {
             "alignItems": "center",
             "flexDirection": "column",
-            "paddingBottom": 20,
+            "paddingVertical": 8,
           }
         }
       >
@@ -53,10 +128,7 @@ exports[`Account renders correctly 1`] = `
                     "flexDirection": "row",
                     "justifyContent": "center",
                   },
-                  Object {
-                    "alignSelf": "center",
-                    "margin": "auto",
-                  },
+                  undefined,
                 ]
               }
             >
@@ -76,25 +148,22 @@ exports[`Account renders correctly 1`] = `
                   ]
                 }
               >
-                <Image
-                  source={
-                    Object {
-                      "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                    }
-                  }
+                <Text
                   style={
                     Array [
                       Object {
-                        "alignSelf": "center",
-                        "margin": "auto",
+                        "color": "#FFFFFF",
+                        "fontFamily": "Inter-Medium",
+                        "fontSize": 16,
                       },
                       Object {
-                        "height": 40,
-                        "width": 40,
+                        "fontSize": 20,
                       },
                     ]
                   }
-                />
+                >
+                  J
+                </Text>
               </View>
             </View>
             <Text
@@ -121,10 +190,7 @@ exports[`Account renders correctly 1`] = `
             <View
               style={
                 Object {
-                  "alignItems": "center",
-                  "alignSelf": "center",
                   "flexDirection": "row",
-                  "justifyContent": "center",
                 }
               }
             >
@@ -133,35 +199,36 @@ exports[`Account renders correctly 1`] = `
                   Array [
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Light",
-                      "fontSize": 14,
-                      "textAlignVertical": "center",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     Object {
                       "alignItems": "center",
-                      "backgroundColor": "#EEEEEE",
-                      "borderRadius": 3,
                       "justifyContent": "center",
-                      "marginRight": 5,
-                      "paddingLeft": 6,
-                      "paddingRight": 3,
+                      "marginRight": 4,
                     },
                   ]
                 }
               >
-                🇺🇸 +1
+                🇺🇸
               </Text>
               <Text
                 style={
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Light",
-                    "fontSize": 14,
-                    "textAlignVertical": "center",
-                  }
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    },
+                    Object {
+                      "color": "#9CA4A9",
+                    },
+                  ]
                 }
               >
-                (415) 555-6666
+                +1 (415) 555-6666
               </Text>
             </View>
           </View>
@@ -1089,28 +1156,103 @@ exports[`Account renders correctly 1`] = `
           </View>
         </View>
       </View>
-    </SafeAreaView>
-  </View>
-</RCTScrollView>
+    </View>
+  </RCTScrollView>
+</SafeAreaView>
 `;
 
 exports[`Account renders correctly when dev mode active 1`] = `
-<RCTScrollView
+<SafeAreaView
   style={
     Object {
-      "backgroundColor": "white",
+      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
 >
-  <View>
-    <SafeAreaView>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "backgroundColor": "transparent",
+        "borderBottomColor": "#EDEEEF",
+        "borderBottomWidth": 0,
+        "flexDirection": "row",
+        "height": 62,
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <View
+      accessible={true}
+      focusable={false}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "marginBottom": 0,
+          "marginLeft": 4,
+          "opacity": 1,
+          "padding": 8,
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height="32"
+        viewBox="0 0 32 32"
+        width="32"
+      >
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="9.75"
+          y2="9.75"
+        />
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="15.75"
+          y2="15.75"
+        />
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="21.75"
+          y2="21.75"
+        />
+      </svg>
+    </View>
+    <View
+      style={
+        Object {
+          "width": 45,
+        }
+      }
+    />
+  </View>
+  <RCTScrollView>
+    <View>
       <View
         style={
           Object {
             "alignItems": "center",
             "flexDirection": "column",
-            "paddingBottom": 20,
+            "paddingVertical": 8,
           }
         }
       >
@@ -1147,10 +1289,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
                     "flexDirection": "row",
                     "justifyContent": "center",
                   },
-                  Object {
-                    "alignSelf": "center",
-                    "margin": "auto",
-                  },
+                  undefined,
                 ]
               }
             >
@@ -1170,25 +1309,22 @@ exports[`Account renders correctly when dev mode active 1`] = `
                   ]
                 }
               >
-                <Image
-                  source={
-                    Object {
-                      "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                    }
-                  }
+                <Text
                   style={
                     Array [
                       Object {
-                        "alignSelf": "center",
-                        "margin": "auto",
+                        "color": "#FFFFFF",
+                        "fontFamily": "Inter-Medium",
+                        "fontSize": 16,
                       },
                       Object {
-                        "height": 40,
-                        "width": 40,
+                        "fontSize": 20,
                       },
                     ]
                   }
-                />
+                >
+                  J
+                </Text>
               </View>
             </View>
             <Text
@@ -1215,10 +1351,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
             <View
               style={
                 Object {
-                  "alignItems": "center",
-                  "alignSelf": "center",
                   "flexDirection": "row",
-                  "justifyContent": "center",
                 }
               }
             >
@@ -1227,35 +1360,36 @@ exports[`Account renders correctly when dev mode active 1`] = `
                   Array [
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Light",
-                      "fontSize": 14,
-                      "textAlignVertical": "center",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     Object {
                       "alignItems": "center",
-                      "backgroundColor": "#EEEEEE",
-                      "borderRadius": 3,
                       "justifyContent": "center",
-                      "marginRight": 5,
-                      "paddingLeft": 6,
-                      "paddingRight": 3,
+                      "marginRight": 4,
                     },
                   ]
                 }
               >
-                🇺🇸 +1
+                🇺🇸
               </Text>
               <Text
                 style={
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Light",
-                    "fontSize": 14,
-                    "textAlignVertical": "center",
-                  }
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    },
+                    Object {
+                      "color": "#9CA4A9",
+                    },
+                  ]
                 }
               >
-                (415) 555-6666
+                +1 (415) 555-6666
               </Text>
             </View>
           </View>
@@ -2158,7 +2292,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
             }
           >
             <Text>
-              Reset backup state
+              Toggle backup state
             </Text>
           </View>
         </View>
@@ -2338,7 +2472,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
           </View>
         </View>
       </View>
-    </SafeAreaView>
-  </View>
-</RCTScrollView>
+    </View>
+  </RCTScrollView>
+</SafeAreaView>
 `;

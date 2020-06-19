@@ -17,7 +17,7 @@
 
 • **Approval**: = "Approval"
 
-*Defined in [contractkit/src/wrappers/Governance.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L29)*
+*Defined in [contractkit/src/wrappers/Governance.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L33)*
 
 ___
 
@@ -25,7 +25,7 @@ ___
 
 • **Execution**: = "Execution"
 
-*Defined in [contractkit/src/wrappers/Governance.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L31)*
+*Defined in [contractkit/src/wrappers/Governance.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L35)*
 
 ___
 
@@ -33,7 +33,7 @@ ___
 
 • **Expiration**: = "Expiration"
 
-*Defined in [contractkit/src/wrappers/Governance.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L32)*
+*Defined in [contractkit/src/wrappers/Governance.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L36)*
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 • **None**: = "None"
 
-*Defined in [contractkit/src/wrappers/Governance.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L27)*
+*Defined in [contractkit/src/wrappers/Governance.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L31)*
 
 ___
 
@@ -49,7 +49,7 @@ ___
 
 • **Queued**: = "Queued"
 
-*Defined in [contractkit/src/wrappers/Governance.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L28)*
+*Defined in [contractkit/src/wrappers/Governance.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L32)*
 
 ___
 
@@ -57,4 +57,4 @@ ___
 
 • **Referendum**: = "Referendum"
 
-*Defined in [contractkit/src/wrappers/Governance.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L30)*
+*Defined in [contractkit/src/wrappers/Governance.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L34)*

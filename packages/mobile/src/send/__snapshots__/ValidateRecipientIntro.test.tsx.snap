@@ -1,0 +1,206 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ValidateRecipientIntro renders correctly 1`] = `
+<SafeAreaView
+  style={
+    Object {
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+      "justifyContent": "space-between",
+    }
+  }
+>
+  <RCTScrollView
+    contentContainerStyle={
+      Object {
+        "flex": 1,
+        "justifyContent": "flex-start",
+        "paddingBottom": 30,
+        "paddingHorizontal": 24,
+      }
+    }
+  >
+    <View>
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "paddingTop": 20,
+          }
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "justifyContent": "center",
+              },
+              undefined,
+            ]
+          }
+        >
+          <View
+            style={
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "justifyContent": "center",
+                },
+                Object {
+                  "backgroundColor": "#7AD6FE",
+                  "borderRadius": 60,
+                  "height": 120,
+                  "width": 120,
+                },
+              ]
+            }
+          >
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#FFFFFF",
+                    "fontFamily": "Inter-Medium",
+                    "fontSize": 16,
+                  },
+                  Object {
+                    "fontSize": 60,
+                  },
+                ]
+              }
+            >
+              J
+            </Text>
+          </View>
+        </View>
+      </View>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-SemiBold",
+            "fontSize": 19,
+            "lineHeight": 26,
+            "paddingHorizontal": 5,
+            "paddingVertical": 20,
+            "textAlign": "center",
+          }
+        }
+      >
+        confirmAccount.header
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+            "paddingBottom": 20,
+            "textAlign": "center",
+          }
+        }
+      >
+        secureSendExplanation.body1
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+            "paddingBottom": 20,
+            "textAlign": "center",
+          }
+        }
+      >
+        secureSendExplanation.body2
+      </Text>
+    </View>
+  </RCTScrollView>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "paddingBottom": 60,
+      }
+    }
+  >
+    <View
+      accessible={true}
+      focusable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackgroundBorderless",
+          "type": "ThemeAttrAndroid",
+        }
+      }
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      testID="scanQRCode"
+    >
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#1AB775",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 16,
+              "lineHeight": 22,
+            },
+            Object {
+              "paddingVertical": 16,
+            },
+          ]
+        }
+      >
+        scanQRCode
+      </Text>
+    </View>
+    <View
+      accessible={true}
+      focusable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackgroundBorderless",
+          "type": "ThemeAttrAndroid",
+        }
+      }
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      testID="confirmAccountButton"
+    >
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#1AB775",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 16,
+              "lineHeight": 22,
+            },
+            Object {
+              "paddingVertical": 16,
+            },
+          ]
+        }
+      >
+        confirmAccount.button
+      </Text>
+    </View>
+  </View>
+</SafeAreaView>
+`;

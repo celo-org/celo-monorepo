@@ -12,13 +12,13 @@ Base ContractWrapper
 
   ↳ [AccountsWrapper](_wrappers_accounts_.accountswrapper.md)
 
+  ↳ [ValidatorsWrapper](_wrappers_validators_.validatorswrapper.md)
+
   ↳ [AttestationsWrapper](_wrappers_attestations_.attestationswrapper.md)
 
   ↳ [BlockchainParametersWrapper](_wrappers_blockchainparameters_.blockchainparameterswrapper.md)
 
   ↳ [DoubleSigningSlasherWrapper](_wrappers_doublesigningslasher_.doublesigningslasherwrapper.md)
-
-  ↳ [ValidatorsWrapper](_wrappers_validators_.validatorswrapper.md)
 
   ↳ [DowntimeSlasherWrapper](_wrappers_downtimeslasher_.downtimeslasherwrapper.md)
 
@@ -62,6 +62,10 @@ Base ContractWrapper
 
 * [address](_wrappers_basewrapper_.basewrapper.md#address)
 
+### Methods
+
+* [getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)
+
 ## Constructors
 
 ###  constructor
@@ -98,3 +102,22 @@ Name | Type |
 Contract address
 
 **Returns:** *string*
+
+## Methods
+
+###  getPastEvents
+
+▸ **getPastEvents**(`event`: string, `options`: PastEventOptions): *Promise‹EventLog[]›*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L29)*
+
+Contract getPastEvents
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`event` | string |
+`options` | PastEventOptions |
+
+**Returns:** *Promise‹EventLog[]›*

@@ -1,4 +1,5 @@
 /* tslint:disable: no-console */
+import { readFileSync } from 'fs'
 import { addCeloGethMiddleware } from 'src/lib/utils'
 import yargs from 'yargs'
 import {
@@ -28,11 +29,13 @@ interface StartArgv extends GethArgv {
   instances: number
   migrate: boolean
   migrateTo: number
+  migrationOverrides: string
   monorepoDir: string
   purge: boolean
   withProxy: boolean
   ethstats: string
   mnemonic: string
+  initialAccounts: string
 }
 
 export const builder = (argv: yargs.Argv) => {
@@ -117,9 +120,19 @@ export const builder = (argv: yargs.Argv) => {
       description: 'Migrate contracts to level x',
       implies: 'monorepo-dir',
     })
+    .option('migration-overrides', {
+      type: 'string',
+      description: 'Path to JSON file containing migration overrides',
+      implies: 'migrate',
+    })
     .option('monorepo-dir', {
       type: 'string',
       description: 'Directory of the mono repo',
+    })
+    .option('initial-accounts', {
+      type: 'string',
+      description:
+        'Path to JSON file containing accounts to place in the alloc property of the genesis.json file',
     })
 }
 
@@ -143,6 +156,12 @@ export const handler = async (argv: StartArgv) => {
   const mnemonic = argv.mnemonic
   const migrate = argv.migrate
   const migrateTo = argv.migrateTo
+  const initialAccounts = argv.initialAccounts
+    ? JSON.parse(readFileSync(argv.initialAccounts).toString())
+    : {}
+  const migrationOverrides = argv.migrationOverrides
+    ? JSON.parse(readFileSync(argv.migrationOverrides).toString())
+    : {}
   const monorepoDir = argv.monorepoDir
 
   const purge = argv.purge
@@ -158,10 +177,13 @@ export const handler = async (argv: StartArgv) => {
     networkId,
     migrate,
     migrateTo,
+    migrationOverrides,
     network,
     instances: [],
     genesisConfig: {
       blockTime,
+      epoch: 17280,
+      initialAccounts,
     },
   }
 

@@ -3,6 +3,9 @@ import { privateKeyToAddress } from './address'
 import { PhoneNumberUtils } from './phoneNumbers'
 import { Signature, SignatureUtils } from './signatureUtils'
 
+const DEFAULT_NUM_ATTESTATIONS_REQUIRED = 3
+const DEFAULT_ATTESTATION_THRESHOLD = 0.25
+
 // Supported identifer types for attestations
 export enum IdentifierType {
   PHONE_NUMBER = 0,
@@ -92,6 +95,54 @@ export function extractAttestationCodeFromMessage(message: string) {
   return base64ToHex(matches[2])
 }
 
+export interface AttestationsStatus {
+  isVerified: boolean
+  numAttestationsRemaining: number
+  total: number
+  completed: number
+}
+
+interface AttestationStat {
+  completed: number
+  total: number
+}
+
+/**
+ * Returns true if an AttestationStat is considered verified using the given factors,
+ * or defaults if factors are ommited.
+ * @param stats AttestationStat of the account's attestation identitifer, retrievable via lookupIdentitfiers
+ * @param numAttestationsRequired Optional number of attestations required.  Will default to
+ *  hardcoded value if absent.
+ * @param attestationThreshold Optional threshold for fraction attestations completed. Will
+ *  default to hardcoded value if absent.
+ */
+export function isAccountConsideredVerified(
+  stats: AttestationStat | undefined,
+  numAttestationsRequired: number = DEFAULT_NUM_ATTESTATIONS_REQUIRED,
+  attestationThreshold: number = DEFAULT_ATTESTATION_THRESHOLD
+): AttestationsStatus {
+  if (!stats) {
+    return {
+      isVerified: false,
+      numAttestationsRemaining: 0,
+      total: 0,
+      completed: 0,
+    }
+  }
+  const numAttestationsRemaining = numAttestationsRequired - stats.completed
+  const fractionAttestation = stats.total < 1 ? 0 : stats.completed / stats.total
+  // 'verified' is a term of convenience to mean that the attestation stats for a
+  // given identifier are beyond a certain threshold of confidence
+  const isVerified = numAttestationsRemaining <= 0 && fractionAttestation >= attestationThreshold
+
+  return {
+    isVerified,
+    numAttestationsRemaining,
+    total: stats.total,
+    completed: stats.completed,
+  }
+}
+
 export const AttestationUtils = {
   IdentifierType,
   getIdentifierPrefix,
@@ -103,4 +154,5 @@ export const AttestationUtils = {
   sanitizeMessageBase64,
   messageContainsAttestationCode,
   extractAttestationCodeFromMessage,
+  isAccountConsideredVerified,
 }

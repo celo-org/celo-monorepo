@@ -19,7 +19,7 @@
 
 • **attestationServiceURL**: *string*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L59)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L51)*
 
 ___
 
@@ -27,7 +27,7 @@ ___
 
 • **blockNumber**: *number*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L58)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L50)*
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 • **issuer**: *[Address](../modules/_base_.md#address)*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L57)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L49)*
 
 ___
 
@@ -43,4 +43,4 @@ ___
 
 • **name**: *string | undefined*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:60](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L60)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L52)*
