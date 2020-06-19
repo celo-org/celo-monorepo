@@ -1,14 +1,10 @@
 // tslint:disable: no-console
-// TODO de-dupe with combiner script
-import knex from 'knex'
-import config from '../src/config'
+import { initDatabase } from '../src/database/database'
 
 async function start() {
   console.info('Running migrations')
-  await knex({
-    client: 'pg',
-    connection: config.db,
-  }).migrate.latest({
+  const db = await initDatabase(false)
+  await db.migrate.latest({
     directory: './migrations',
     extension: 'ts',
   })
