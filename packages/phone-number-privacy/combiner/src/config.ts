@@ -83,7 +83,7 @@ if (DEV_MODE) {
     },
     pgpnpServices: {
       signers: '[{"url": "http://localhost:3000"}]',
-      timeoutMilliSeconds: 30 * 1000,
+      timeoutMilliSeconds: 5 * 1000,
     },
     thresholdSignature: {
       threshold: 1,

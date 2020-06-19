@@ -1,4 +1,4 @@
-
+import AbortController from 'abort-controller'
 import { Request, Response } from 'firebase-functions'
 import fetch, { Response as FetchResponse } from 'node-fetch'
 import { BLSCryptographyClient, ServicePartialSignature } from '../bls/bls-cryptography-client'
@@ -70,30 +70,36 @@ async function requestSignatures(request: Request) {
   const errorCodes: Map<number, number> = new Map()
 
   const signers = JSON.parse(config.pgpnpServices.signers) as SignerService[]
-  const signerReqs = signers.map((service) =>
-    requestSigatureWithTimeout(service, request)
-      .then(async (res) => {
-        console.log("**HIT2" + JSON.stringify(res as FetchResponse))
-        if (res) {
-          const fetchResponse = res as FetchResponse
-          const status = fetchResponse.status
-          if (fetchResponse.ok) {
-            const signResponse = (await fetchResponse.json()) as SignMessageResponse
-            responses.push({ url: service.url, signature: signResponse.signature, status })
-            successCount += 1
-          } else {
-            responses.push({ url: service.url, status })
-            errorCodes.set(status, (errorCodes.get(status) || 0) + 1)
-          }
+  const signerReqs = signers.map((service) => {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => {
+      controller.abort()
+    }, config.pgpnpServices.timeoutMilliSeconds)
+
+    return requestSigature(service, request, controller)
+      .then(async (res: FetchResponse) => {
+        const status = res.status
+        if (res.ok) {
+          const signResponse = (await res.json()) as SignMessageResponse
+          responses.push({ url: service.url, signature: signResponse.signature, status })
+          successCount += 1
         } else {
-          logger.error(`${ErrorMessages.TIMEOUT_FROM_SIGNER} from signer ${service.url}`)
+          responses.push({ url: service.url, status })
+          errorCodes.set(status, (errorCodes.get(status) || 0) + 1)
         }
       })
       .catch((e) => {
-        logger.error(`${ErrorMessages.SIGNER_RETURN_ERROR} from signer ${service.url}`, e)
-        responses.push({ url: service.url, status: 500 })
+        if (e.name === 'AbortError') {
+          logger.error(`${ErrorMessages.TIMEOUT_FROM_SIGNER} from signer ${service.url}`)
+        } else {
+          logger.error(`${ErrorMessages.SIGNER_RETURN_ERROR} from signer ${service.url}`, e)
+          responses.push({ url: service.url, status: 500 })
+        }
       })
-  )
+      .finally(() => {
+        clearTimeout(timeout)
+      })
+  })
 
   await Promise.all(signerReqs)
 
@@ -111,22 +117,11 @@ async function requestSignatures(request: Request) {
   return { successCount, signatures, majorityErrorCode }
 }
 
-function requestSigatureWithTimeout(
+function requestSigature(
   service: SignerService,
-  request: Request
-): Promise<FetchResponse | boolean> {
-  return Promise.race([requestSigature(service, request), abort()])
-}
-
-async function abort(): Promise<boolean> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(false)
-    }, config.pgpnpServices.timeoutMilliSeconds)
-  })
-}
-
-function requestSigature(service: SignerService, request: Request): Promise<FetchResponse> {
+  request: Request,
+  controller: AbortController
+): Promise<FetchResponse> {
   return fetch(service.url + PARTIAL_SIGN_MESSAGE_ENDPOINT, {
     method: 'POST',
     headers: {
@@ -135,6 +130,7 @@ function requestSigature(service: SignerService, request: Request): Promise<Fetc
       Authorization: request.headers.authorization!,
     },
     body: JSON.stringify(request.body),
+    signal: controller.signal,
   })
 }
 

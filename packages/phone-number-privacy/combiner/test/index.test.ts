@@ -46,7 +46,7 @@ describe(`POST /getDistributedBlindedSalt endpoint`, () => {
     fetchMock.mockImplementation(() => Promise.resolve(new FetchResponse(defaultResponseJson)))
   })
 
-  describe.only('with valid input', () => {
+  describe('with valid input', () => {
     const blindedQueryPhoneNumber = '+5555555555'
     const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
     const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
