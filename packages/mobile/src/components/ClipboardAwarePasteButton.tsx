@@ -1,7 +1,7 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import React, { useLayoutEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { LayoutAnimation, StyleSheet } from 'react-native'
+import { LayoutAnimation } from 'react-native'
 import { Namespaces } from 'src/i18n'
 import { useClipboard } from 'src/utils/useClipboard'
 
@@ -34,14 +34,7 @@ export default function ClipboardAwarePasteButton({ shouldShow, onPress }: Props
       rounded={false}
       size={BtnSizes.FULL}
       onPress={onPressInternal}
-      style={styles.container}
       testID={'PasteButton'}
     />
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    borderRadius: 0,
-  },
-})
