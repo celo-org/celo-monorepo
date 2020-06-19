@@ -117,7 +117,7 @@ function* withdrawFromEscrow() {
       (state: RootState) => state.invite.redeemedInviteCode
     )
 
-    if (!isValidPrivateKey(tmpWalletPrivateKey)) {
+    if (!tmpWalletPrivateKey || !isValidPrivateKey(tmpWalletPrivateKey)) {
       Logger.warn(TAG + '@withdrawFromEscrow', 'Invalid private key, skipping escrow withdrawal')
       return
     }
