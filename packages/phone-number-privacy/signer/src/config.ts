@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 
+export const VERSION = process.env.npm_package_version
 export const DEV_MODE = process.env.NODE_ENV !== 'production'
 
 export const DEV_PUBLIC_KEY =
@@ -18,6 +19,8 @@ export enum SupportedKeystore {
 interface Config {
   server: {
     port: string | number
+    sslKeyPath?: string
+    sslCertPath?: string
   }
   salt: {
     unverifiedQueryMax: number
@@ -68,6 +71,8 @@ const env = process.env as any
 const config: Config = {
   server: {
     port: toNum(env.SERVER_PORT) || 8080,
+    sslKeyPath: env.SERVER_SSL_KEY_PATH,
+    sslCertPath: env.SERVER_SSL_CERT_PATH,
   },
   salt: {
     unverifiedQueryMax: toNum(env.SALT_UNVERIFIED_QUERY_MAX) || 2,

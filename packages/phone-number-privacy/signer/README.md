@@ -8,6 +8,8 @@ You can use the following environment variables to configure the Phone Number Pr
 
 - `NODE_ENV` - `development` or `production`
 - `SERVER_PORT` - The port on which the express node app runs (8080 by default).
+- `SERVER_SSL_KEY_PATH` - (Optional) Path to SSL .key file.
+- `SERVER_SSL_CERT_PATH` - (Optional) Path to SSL .cert file.
 - `DB_HOST` - The URL under which your database is accessible. Supports Postgres, MSSQL, MySQL, MariaDB, SQLite3, Oracle.
 - `DB_USERNAME` - DB configuration: The DB username (postgres by default).
 - `DB_PASSWORD` - DB configuration: The DB password.
@@ -32,15 +34,15 @@ You must specify the type, and then the keystore configs for that type.
 
 Use the following to configure the AKV connection. These values are generated when creating a service principal account (see [Configuring your Key Vault](https://www.npmjs.com/package/@azure/keyvault-keys#configuring-your-key-vault)). Or if the service is being hosted on Azure itself, authentication can be done by granted key access to the VM's managed identity, in which case the client_id, client_secret, and tenant configs can be left blank.
 
-- `KEYSTORE_AZURE_CLIENT_ID` - The clientId of the service principal account that has [Get, List] access to secrets.
-- `KEYSTORE_AZURE_CLIENT_SECRET` - The client Secret of the same service principal account.
-- `KEYSTORE_AZURE_TENANT` - The tenant that the service principal is a member of.
 - `KEYSTORE_AZURE_VAULT_NAME` - The name of your Azure Key Vault.
 - `KEYSTORE_AZURE_SECRET_NAME` - The name of the secret that holds your BLS key.
+- `KEYSTORE_AZURE_CLIENT_ID` - (Optional) The clientId of the service principal account that has [Get, List] access to secrets.
+- `KEYSTORE_AZURE_CLIENT_SECRET` - (Optional) The client secret of the same service principal account.
+- `KEYSTORE_AZURE_TENANT` - (Optional) The tenant that the service principal is a member of.
 
 #### Google Secret Manager
 
-Use the following to configure the Google Secret Manager. To authenticate with Google Cloud, you can see [Setting Up Authentication](https://cloud.google.com/docs/authentication/production)
+Use the following to configure the Google Secret Manager. To authenticate with Google Cloud, you can see [Setting Up Authentication](https://cloud.google.com/docs/authentication/production). By default, the google lib will use the default app credentials assigned to the host VM. If the service is being run outside of GCP, you can manually set the `GOOGLE_APPLICATION_CREDENTIALS` env var to the path to a service account json file.
 
 - `KEYSTORE_GOOGLE_PROJECT_ID` - The google cloud project id.
 - `KEYSTORE_GOOGLE_SECRET_NAME` - The secret's name.
