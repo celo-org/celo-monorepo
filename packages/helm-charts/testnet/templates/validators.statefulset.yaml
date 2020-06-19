@@ -51,29 +51,29 @@ spec:
         imagePullPolicy: Always
         command:
           - bash
-          - "-c"
+          - -c
           - |
             [[ $REPLICA_NAME =~ -([0-9]+)$ ]] || exit 1
             RID=${BASH_REMATCH[1]}
-            echo -n $RID >/root/.celo/replica_id
+            echo -n "$RID" >/root/.celo/replica_id
             echo "Generating private key for rid=$RID"
-            celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType validator --index $RID > /root/.celo/pkey
+            celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType validator --index "$RID" > /root/.celo/pkey
             echo 'Generating address'
             celotooljs.sh generate account-address --private-key `cat /root/.celo/pkey` > /root/.celo/address
 
             # If this is a proxied validator, it will not have an external IP address
             # and EXTERNAL_IP_ADDRESS will be empty
-            EXTERNAL_IP_ADDRESS=`echo -n $IP_ADDRESSES | cut -d '/' -f $((RID + 1))`
-            echo $EXTERNAL_IP_ADDRESS > /root/.celo/externalIpAddress
+            EXTERNAL_IP_ADDRESS=`echo -n "$IP_ADDRESSES" | cut -d '/' -f $((RID + 1))`
+            echo "$EXTERNAL_IP_ADDRESS" > /root/.celo/externalIpAddress
 
             # Put the proxies per validator array into a comma separated string
             # so we can index it at runtime
-            PROXIES_PER_VALIDATOR={{ join "," .Values.geth.proxiesPerValidator }}
+            PROXIES_PER_VALIDATOR="{{ join "," .Values.geth.proxiesPerValidator }}"
             PROXY_COUNT=`echo -n $PROXIES_PER_VALIDATOR | cut -d ',' -f $((RID + 1))`
-            echo -n $PROXY_COUNT > /root/.celo/proxyCount
+            echo -n "$PROXY_COUNT" > /root/.celo/proxyCount
 
-            if [[ -z $EXTERNAL_IP_ADDRESS ]]; then
-              echo $POD_IP > /root/.celo/ipAddress
+            if [[ -z "$EXTERNAL_IP_ADDRESS" ]]; then
+              echo "$POD_IP" > /root/.celo/ipAddress
             else
               cat /root/.celo/externalIpAddress > /root/.celo/ipAddress
             fi
@@ -105,8 +105,8 @@ spec:
               rm -f /root/.celo/proxyEnodeUrlPairs
               # Generate all proxy enode urls and put them into /root/.celo/proxyEnodeUrlPairs
               PROXY_INDEX=0
-              while [ $PROXY_INDEX -lt $PROXY_COUNT ]; do
-                if [ $PROXY_INDEX -gt 0 ]; then
+              while [ "$PROXY_INDEX" -lt "$PROXY_COUNT" ]; do
+                if [ "$PROXY_INDEX" -gt 0 ]; then
                   echo -n "," >> /root/.celo/proxyEnodeUrlPairs
                 fi
 
@@ -158,7 +158,7 @@ spec:
 
           PROXIED_FLAGS=""
           PROXY_COUNT=`cat /root/.celo/proxyCount`
-          [ ! -z $PROXY_COUNT ] && PROXIED_FLAGS="--proxy.proxied --proxy.proxyenodeurlpairs=`cat /root/.celo/proxyEnodeUrlPairs` --nodiscover --proxy.allowprivateip"
+          [ "$PROXY_COUNT" -gt 0 ] && PROXIED_FLAGS="--proxy.proxied --proxy.proxyenodeurlpairs=`cat /root/.celo/proxyEnodeUrlPairs` --nodiscover --proxy.allowprivateip"
 
           PING_IP_FROM_PACKET_FLAG=""
           [[ "$PING_IP_FROM_PACKET" == "true" ]] && PING_IP_FROM_PACKET_FLAG="--ping-ip-from-packet"
