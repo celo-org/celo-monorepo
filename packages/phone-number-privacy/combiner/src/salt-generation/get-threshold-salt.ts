@@ -70,16 +70,20 @@ async function requestSignatures(request: Request) {
 
   const signers = JSON.parse(config.pgpnpServices.signers) as SignerService[]
   const signerReqs = signers.map((service) =>
-    requestSigature(service, request)
+    requestSigatureWithTimeout(service, request)
       .then(async (res) => {
-        const status = res.status
-        if (res.ok) {
-          const signResponse = (await res.json()) as SignMessageResponse
-          responses.push({ url: service.url, signature: signResponse.signature, status })
-          successCount += 1
+        if (res instanceof FetchResponse) {
+          const status = res.status
+          if (res.ok) {
+            const signResponse = (await res.json()) as SignMessageResponse
+            responses.push({ url: service.url, signature: signResponse.signature, status })
+            successCount += 1
+          } else {
+            responses.push({ url: service.url, status })
+            errorCodes.set(status, (errorCodes.get(status) || 0) + 1)
+          }
         } else {
-          responses.push({ url: service.url, status })
-          errorCodes.set(status, (errorCodes.get(status) || 0) + 1)
+          logger.error(`${ErrorMessages.TIMEOUT_FROM_SIGNER} from signer ${service.url}`)
         }
       })
       .catch((e) => {
@@ -102,6 +106,21 @@ async function requestSignatures(request: Request) {
   }
 
   return { successCount, signatures, majorityErrorCode }
+}
+
+function requestSigatureWithTimeout(
+  service: SignerService,
+  request: Request
+): Promise<FetchResponse | boolean> {
+  return Promise.race([requestSigature(service, request), abort()])
+}
+
+async function abort(): Promise<boolean> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(false)
+    }, config.pgpnpServices.timeoutMilliSeconds)
+  })
 }
 
 function requestSigature(service: SignerService, request: Request): Promise<FetchResponse> {

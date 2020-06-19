@@ -42,6 +42,7 @@ interface Config {
   }
   pgpnpServices: {
     signers: string
+    timeoutMilliSeconds: number
   }
   thresholdSignature: {
     threshold: number
@@ -82,6 +83,7 @@ if (DEV_MODE) {
     },
     pgpnpServices: {
       signers: '[{"url": "http://localhost:3000"}]',
+      timeoutMilliSeconds: 30 * 1000,
     },
     thresholdSignature: {
       threshold: 1,
@@ -119,6 +121,7 @@ if (DEV_MODE) {
     },
     pgpnpServices: {
       signers: functionConfig.pgpnpservices.signers,
+      timeoutMilliSeconds: functionConfig.pgpnpservices.timeoutMilliSeconds || 30 * 1000,
     },
     thresholdSignature: {
       threshold: functionConfig.threshold_signature.threshold_signature_threshold,

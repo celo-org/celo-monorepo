@@ -14,6 +14,7 @@ export enum SupportedKeystore {
   AzureKeyVault = 'AzureKeyVault',
   GoogleSecretManager = 'GoogleSecretManager',
   AWSSecretManager = 'AWSSecretManager',
+  MockSecretManager = 'MockSecretManager',
 }
 
 interface Config {
