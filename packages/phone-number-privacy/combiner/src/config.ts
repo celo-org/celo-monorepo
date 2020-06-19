@@ -121,7 +121,7 @@ if (DEV_MODE) {
     },
     pgpnpServices: {
       signers: functionConfig.pgpnpservices.signers,
-      timeoutMilliSeconds: functionConfig.pgpnpservices.timeoutMilliSeconds || 30 * 1000,
+      timeoutMilliSeconds: functionConfig.pgpnpservices.timeoutMilliSeconds || 5 * 1000,
     },
     thresholdSignature: {
       threshold: functionConfig.threshold_signature.threshold_signature_threshold,
