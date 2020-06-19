@@ -10,8 +10,8 @@ export enum Spacing {
 }
 
 export enum Shadow {
-  Soft,
-  SoftLight,
+  Soft = 'Soft',
+  SoftLight = 'SoftLight',
 }
 
 export function getShadowStyle(shadow: Shadow) {

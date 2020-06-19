@@ -66,7 +66,16 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                   Object {
                     "borderRadius": 8,
                   },
-                  undefined,
+                  Object {
+                    "elevation": 12,
+                    "shadowColor": "rgba(156, 164, 169, 0.4)",
+                    "shadowOffset": Object {
+                      "height": 2,
+                      "width": 0,
+                    },
+                    "shadowOpacity": 1,
+                    "shadowRadius": 12,
+                  },
                   Array [
                     Object {
                       "height": 144,
@@ -308,7 +317,16 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                   Object {
                     "borderRadius": 8,
                   },
-                  undefined,
+                  Object {
+                    "elevation": 12,
+                    "shadowColor": "rgba(156, 164, 169, 0.4)",
+                    "shadowOffset": Object {
+                      "height": 2,
+                      "width": 0,
+                    },
+                    "shadowOpacity": 1,
+                    "shadowRadius": 12,
+                  },
                   Array [
                     Object {
                       "height": 144,
@@ -550,7 +568,16 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                   Object {
                     "borderRadius": 8,
                   },
-                  undefined,
+                  Object {
+                    "elevation": 12,
+                    "shadowColor": "rgba(156, 164, 169, 0.4)",
+                    "shadowOffset": Object {
+                      "height": 2,
+                      "width": 0,
+                    },
+                    "shadowOpacity": 1,
+                    "shadowRadius": 12,
+                  },
                   Array [
                     Object {
                       "height": 144,

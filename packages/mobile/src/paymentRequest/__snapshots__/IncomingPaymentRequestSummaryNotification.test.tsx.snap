@@ -19,7 +19,16 @@ exports[`IncomingPaymentRequestSummaryNotification renders a number when the add
           Object {
             "borderRadius": 8,
           },
-          undefined,
+          Object {
+            "elevation": 12,
+            "shadowColor": "rgba(156, 164, 169, 0.4)",
+            "shadowOffset": Object {
+              "height": 2,
+              "width": 0,
+            },
+            "shadowOpacity": 1,
+            "shadowRadius": 12,
+          },
           Array [
             Object {
               "height": 144,
@@ -264,7 +273,16 @@ exports[`IncomingPaymentRequestSummaryNotification renders correctly for just on
           Object {
             "borderRadius": 8,
           },
-          undefined,
+          Object {
+            "elevation": 12,
+            "shadowColor": "rgba(156, 164, 169, 0.4)",
+            "shadowOffset": Object {
+              "height": 2,
+              "width": 0,
+            },
+            "shadowOpacity": 1,
+            "shadowRadius": 12,
+          },
           Array [
             Object {
               "height": 144,
@@ -501,7 +519,16 @@ exports[`IncomingPaymentRequestSummaryNotification renders correctly for more th
       Object {
         "borderRadius": 8,
       },
-      undefined,
+      Object {
+        "elevation": 12,
+        "shadowColor": "rgba(156, 164, 169, 0.4)",
+        "shadowOffset": Object {
+          "height": 2,
+          "width": 0,
+        },
+        "shadowOpacity": 1,
+        "shadowRadius": 12,
+      },
       Array [
         Object {
           "height": 144,

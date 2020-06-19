@@ -270,7 +270,16 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                       Object {
                         "borderRadius": 8,
                       },
-                      undefined,
+                      Object {
+                        "elevation": 12,
+                        "shadowColor": "rgba(156, 164, 169, 0.4)",
+                        "shadowOffset": Object {
+                          "height": 2,
+                          "width": 0,
+                        },
+                        "shadowOpacity": 1,
+                        "shadowRadius": 12,
+                      },
                       Array [
                         Object {
                           "backgroundColor": "#FFFFFF",
@@ -1114,7 +1123,16 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                       Object {
                         "borderRadius": 8,
                       },
-                      undefined,
+                      Object {
+                        "elevation": 12,
+                        "shadowColor": "rgba(156, 164, 169, 0.4)",
+                        "shadowOffset": Object {
+                          "height": 2,
+                          "width": 0,
+                        },
+                        "shadowOpacity": 1,
+                        "shadowRadius": 12,
+                      },
                       Array [
                         Object {
                           "backgroundColor": "#FFFFFF",
@@ -1958,7 +1976,16 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                       Object {
                         "borderRadius": 8,
                       },
-                      undefined,
+                      Object {
+                        "elevation": 12,
+                        "shadowColor": "rgba(156, 164, 169, 0.4)",
+                        "shadowOffset": Object {
+                          "height": 2,
+                          "width": 0,
+                        },
+                        "shadowOpacity": 1,
+                        "shadowRadius": 12,
+                      },
                       Array [
                         Object {
                           "backgroundColor": "#FFFFFF",
@@ -2860,7 +2887,16 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                       Object {
                         "borderRadius": 8,
                       },
-                      undefined,
+                      Object {
+                        "elevation": 12,
+                        "shadowColor": "rgba(156, 164, 169, 0.4)",
+                        "shadowOffset": Object {
+                          "height": 2,
+                          "width": 0,
+                        },
+                        "shadowOpacity": 1,
+                        "shadowRadius": 12,
+                      },
                       Array [
                         Object {
                           "backgroundColor": "#FFFFFF",
