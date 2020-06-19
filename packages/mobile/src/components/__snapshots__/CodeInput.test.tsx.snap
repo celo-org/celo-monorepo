@@ -151,7 +151,7 @@ exports[`CodeInput renders correctly for all CodeInputStatus states 2`] = `
                 "flexDirection": "row",
                 "justifyContent": "center",
               },
-              Object {},
+              undefined,
             ]
           }
         >

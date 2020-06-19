@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { AppState, Clipboard } from 'react-native'
+import Logger from 'src/utils/Logger'
 
 const CLIPBOARD_CHECK_INTERVAL = 1000 // 1sec
 
@@ -18,7 +19,7 @@ export function useClipboard(): string {
 
         setClipboardContent(newClipboardContent)
       } catch (error) {
-        console.error('Error checking clipboard contents', error)
+        Logger.error('Error checking clipboard contents', error)
       }
     }
 

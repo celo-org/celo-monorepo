@@ -66,7 +66,6 @@ export default function CodeInput({
                 value={inputValue}
                 placeholder={inputPlaceholder}
                 onChangeText={onInputChange}
-                style={styles.codeInput}
               />
             ) : (
               <Text style={styles.codeValue} numberOfLines={1}>
@@ -135,7 +134,6 @@ const styles = StyleSheet.create({
     ...fontStyles.regular,
     color: colors.onboardingBrownLight,
   },
-  codeInput: {},
   statusContainer: {
     width: 32,
     marginLeft: 4,

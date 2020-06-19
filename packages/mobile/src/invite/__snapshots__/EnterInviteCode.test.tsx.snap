@@ -140,7 +140,7 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
                         "flexDirection": "row",
                         "justifyContent": "center",
                       },
-                      Object {},
+                      undefined,
                     ]
                   }
                 >
