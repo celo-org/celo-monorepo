@@ -80,7 +80,7 @@ describe('Transfer Works', () => {
 
   // Restore existing wallet
   it('Restore Wallet Backup', async () => {
-    await waitFor(element(by.id('InviteCodeTitle')))
+    await waitFor(element(by.id('RestoreExistingWallet')))
       .toBeVisible()
       .withTimeout(8000)
 
