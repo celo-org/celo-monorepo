@@ -14,6 +14,7 @@ COPY packages/attestation-service/package.json packages/attestation-service/
 RUN yarn install --frozen-lockfile --network-timeout 100000 && yarn cache clean
 
 # Copy the rest
+COPY packages/utils packages/utils/
 COPY packages/typescript packages/typescript/
 COPY packages/dev-utils packages/dev-utils/
 COPY packages/attestation-service packages/attestation-service/
