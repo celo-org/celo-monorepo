@@ -19,8 +19,7 @@ import { showMessage } from 'src/alert/actions'
 import { CELO_SUPPORT_EMAIL_ADDRESS, DEFAULT_TESTNET } from 'src/config'
 import i18n, { Namespaces } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { navigateBack } from 'src/navigator/NavigationService'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -60,7 +59,7 @@ async function sendEmailWithNonNativeApp(
     await openComposer({
       to: CELO_SUPPORT_EMAIL_ADDRESS,
       subject: emailSubect,
-      body: `${message}<br>${JSON.stringify(deviceInfo)}\n${supportLogsMessage}`,
+      body: `${message}\n${JSON.stringify(deviceInfo)}\n${supportLogsMessage}`,
     })
     return { success: true }
   } catch (error) {
@@ -112,7 +111,7 @@ const SupportContact = (props: Props) => {
     // if fails user can choose mail app but logs sent in message
     Mailer.mail(email, async (error: any, event: string) => {
       if (event === 'sent') {
-        navigate(Screens.Account)
+        navigateBack()
         props.showMessage(t('contactSuccess'))
       } else if (error) {
         const emailSent = await sendEmailWithNonNativeApp(
@@ -122,7 +121,7 @@ const SupportContact = (props: Props) => {
           combinedLogsPath
         )
         if (emailSent.success) {
-          navigate(Screens.Account)
+          navigateBack()
           props.showMessage(t('contactSuccess'))
         } else {
           Logger.showError(error + ' ' + emailSent.error)
