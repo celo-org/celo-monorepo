@@ -2,7 +2,6 @@ import request from 'supertest'
 import { computeBlindedSignature } from '../src/bls/bls-cryptography-client'
 import { authenticateUser } from '../src/common/identity'
 import { DEV_PRIVATE_KEY } from '../src/config'
-import { getTransaction } from '../src/database/database'
 import {
   getDidMatchmaking,
   incrementQueryCount,
@@ -36,10 +35,6 @@ const mockGetDidMatchmaking = getDidMatchmaking as jest.Mock
 mockGetDidMatchmaking.mockReturnValue(false)
 const mockSetDidMatchmaking = setDidMatchmaking as jest.Mock
 mockSetDidMatchmaking.mockImplementation()
-
-jest.mock('../src/database/database')
-const mockGetTransaction = getTransaction as jest.Mock
-mockGetTransaction.mockReturnValue({ commit: jest.fn(), rollback: jest.fn() })
 
 describe(`POST /getBlindedMessageSignature endpoint`, () => {
   const app = createServer()
