@@ -163,6 +163,17 @@ export async function getAKSNodeResourceGroup(clusterConfig: AzureClusterConfig)
   return nodeResourceGroup.trim()
 }
 
+export async function getAKSServicePrincipalObjectId(clusterConfig: AzureClusterConfig) {
+  const [rawServicePrincipalClientId] = await execCmdWithExitOnFailure(
+    `az aks show -n ${clusterConfig.clusterName} --query servicePrincipalProfile.clientId -g ${clusterConfig.resourceGroup} -o tsv`
+  )
+  const servicePrincipalClientId = rawServicePrincipalClientId.trim()
+  const [rawObjectId] = await execCmdWithExitOnFailure(
+    `az ad sp show --id ${servicePrincipalClientId} --query objectId -o tsv`
+  )
+  return rawObjectId.trim()
+}
+
 export async function registerStaticIP(name: string, resourceGroupIP: string) {
   console.info(`Registering IP address ${name} on ${resourceGroupIP}`)
   const [address] = await execCmdWithExitOnFailure(

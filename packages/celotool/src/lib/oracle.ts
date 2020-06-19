@@ -1,5 +1,5 @@
 import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/src/address'
-import { assignRoleIfNotAssigned, AzureClusterConfig, createIdentityIfNotExists, deleteIdentity, getIdentity, switchToCluster } from 'src/lib/azure'
+import { assignRoleIfNotAssigned, AzureClusterConfig, createIdentityIfNotExists, deleteIdentity, getAKSServicePrincipalObjectId, getIdentity, switchToCluster } from 'src/lib/azure'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { getFornoUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInternalUrl } from 'src/lib/endpoints'
 import { addCeloEnvMiddleware, envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
@@ -201,11 +201,8 @@ async function createOracleAzureIdentityIfNotExists(
   const identity = await createIdentityIfNotExists(clusterConfig, oracleIdentity.azureHsmIdentity!.identityName!)
   // Grant the service principal for the cluster permission to manage the oracle identity.
   // See: https://github.com/Azure/aad-pod-identity#6-set-permissions-for-mic
-  const [rawServicePrincipalClientId] = await execCmdWithExitOnFailure(
-    `az aks show -n ${clusterConfig.clusterName} --query servicePrincipalProfile.clientId -g ${clusterConfig.resourceGroup} -o tsv`
-  )
-  const servicePrincipalClientId = rawServicePrincipalClientId.trim()
-  await assignRoleIfNotAssigned(servicePrincipalClientId, 'ServicePrincipal', identity.id, 'Managed Identity Operator')
+  const servicePrincipalObjectId = await getAKSServicePrincipalObjectId(clusterConfig)
+  await assignRoleIfNotAssigned(servicePrincipalObjectId, 'ServicePrincipal', identity.id, 'Managed Identity Operator')
   // Allow the oracle identity to access the correct key vault
   await setOracleKeyVaultPolicy(clusterConfig, oracleIdentity, identity)
   return identity
