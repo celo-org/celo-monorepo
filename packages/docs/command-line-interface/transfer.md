@@ -1,5 +1,5 @@
 ---
-description: Transfer Celo Gold and Celo Dollars
+description: Transfer CELO and Celo Dollars
 ---
 
 ## Commands
@@ -41,7 +41,7 @@ _See code: [packages/cli/src/commands/transfer/dollars.ts](https://github.com/ce
 
 ### Gold
 
-Transfer Celo Gold to a specified address.
+Transfer CELO to a specified address.
 
 ```
 USAGE
