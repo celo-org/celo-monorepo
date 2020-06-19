@@ -9,7 +9,6 @@ import {
   waitForElement,
 } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
-import * as renderer from 'react-test-renderer'
 import EnterInviteCode, {
   EnterInviteCode as EnterInviteCodeClass,
 } from 'src/invite/EnterInviteCode'
@@ -50,12 +49,12 @@ describe('EnterInviteCode Screen', () => {
 
   it('renders correctly', () => {
     const store = createMockStore()
-    const tree = renderer.create(
+    const wrapper = render(
       <Provider store={store}>
         <EnterInviteCode />
       </Provider>
     )
-    expect(tree).toMatchSnapshot()
+    expect(wrapper.toJSON()).toMatchSnapshot()
   })
 
   it('calls redeem invite when pasting partial invite key from clipboard', async () => {
