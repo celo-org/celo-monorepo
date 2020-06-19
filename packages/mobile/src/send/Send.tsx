@@ -160,16 +160,16 @@ class Send extends React.Component<Props, State> {
     this.props.estimateFee(FeeType.SEND)
   }
 
-  componentDidUpdate(prevPops: Props) {
+  componentDidUpdate(prevProps: Props) {
     const { recentRecipients, allRecipients } = this.props
 
     if (
-      recentRecipients !== prevPops.recentRecipients ||
-      allRecipients !== prevPops.allRecipients
+      recentRecipients !== prevProps.recentRecipients ||
+      allRecipients !== prevProps.allRecipients
     ) {
       this.createRecipientSearchFilters(
-        recentRecipients !== prevPops.recentRecipients,
-        allRecipients !== prevPops.allRecipients
+        recentRecipients !== prevProps.recentRecipients,
+        allRecipients !== prevProps.allRecipients
       )
       // Clear search when recipients change to avoid tricky states
       this.onSearchQueryChanged('')
