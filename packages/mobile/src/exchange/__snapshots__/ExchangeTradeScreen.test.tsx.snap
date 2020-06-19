@@ -87,7 +87,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
           keyboardType="decimal-pad"
           onChangeText={[Function]}
           placeholder="0"
-          placeholderTextColor="#BDBDBD"
+          placeholderTextColor="#B4B9BD"
           rejectResponderTermination={true}
           style={
             Object {

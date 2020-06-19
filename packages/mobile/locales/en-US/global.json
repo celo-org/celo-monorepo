@@ -172,5 +172,7 @@
   "help": "Help",
   "dismiss": "Dismiss",
   "review": "Review",
-  "insufficientBalance": "Your balance is too low to make this transaction"
+  "insufficientBalance": "Your balance is too low to make this transaction",
+  "amount": "Amount",
+  "currentBalance": "Current Balance"
 }

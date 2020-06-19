@@ -320,7 +320,6 @@ const style = StyleSheet.create({
   },
   containerList: {
     flex: 1,
-    paddingLeft: 20,
     borderTopWidth: 1,
     borderColor: '#EEEEEE',
   },
