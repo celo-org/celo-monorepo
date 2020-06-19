@@ -1,10 +1,10 @@
-import { GenesisBlockUtils, StaticNodeUtils } from '@celo/contractkit'
+import { BootnodeUtils, GenesisBlockUtils, StaticNodeUtils } from '@celo/contractkit'
 import BigNumber from 'bignumber.js'
 import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
 import RNGeth from 'react-native-geth'
-import { DEFAULT_TESTNET } from 'src/config'
+import { DEFAULT_TESTNET, USE_FULL_NODE_DISCOVERY } from 'src/config'
 import networkConfig from 'src/geth/networkConfig'
 import Logger from 'src/utils/Logger'
 import FirebaseLogUploader from 'src/utils/LogUploader'
@@ -88,6 +88,13 @@ async function createNewGeth(): Promise<typeof RNGeth> {
     syncMode,
     useLightweightKDF: true,
     ipcPath: IPC_PATH,
+    noDiscovery: !USE_FULL_NODE_DISCOVERY,
+  }
+
+  if (USE_FULL_NODE_DISCOVERY) {
+    const nodes = (await BootnodeUtils.getBootnodesAsync(DEFAULT_TESTNET)).trim()
+    gethOptions.bootnodeEnodes = nodes.split(';')
+    Logger.debug('Geth@newGeth', 'bootnodes = ' + nodes.split(';'))
   }
 
   // Setup Logging
