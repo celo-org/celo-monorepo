@@ -46,7 +46,7 @@ describe(`POST /getDistributedBlindedSalt endpoint`, () => {
     fetchMock.mockImplementation(() => Promise.resolve(new FetchResponse(defaultResponseJson)))
   })
 
-  describe('with valid input', () => {
+  describe.only('with valid input', () => {
     const blindedQueryPhoneNumber = '+5555555555'
     const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
     const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
@@ -69,20 +69,6 @@ describe(`POST /getDistributedBlindedSalt endpoint`, () => {
         json(body: any) {
           expect(body.success).toEqual(true)
           expect(body.combinedSignature).toEqual(BLS_SIGNATURE)
-        },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      await getDistributedBlindedSalt(req, res)
-    })
-    it('returns 403 on query count 0', async () => {
-      const res = {
-        json() {
-          return {}
-        },
-        status: (status: any) => {
-          expect(status).toEqual(403)
-          // tslint:disable-next-line: no-empty
-          return { json: () => {} }
         },
       }
       // @ts-ignore TODO fix req type to make it a mock express req

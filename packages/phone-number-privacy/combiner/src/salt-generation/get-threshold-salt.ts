@@ -1,3 +1,4 @@
+
 import { Request, Response } from 'firebase-functions'
 import fetch, { Response as FetchResponse } from 'node-fetch'
 import { BLSCryptographyClient, ServicePartialSignature } from '../bls/bls-cryptography-client'
@@ -72,10 +73,12 @@ async function requestSignatures(request: Request) {
   const signerReqs = signers.map((service) =>
     requestSigatureWithTimeout(service, request)
       .then(async (res) => {
-        if (res instanceof FetchResponse) {
-          const status = res.status
-          if (res.ok) {
-            const signResponse = (await res.json()) as SignMessageResponse
+        console.log("**HIT2" + JSON.stringify(res as FetchResponse))
+        if (res) {
+          const fetchResponse = res as FetchResponse
+          const status = fetchResponse.status
+          if (fetchResponse.ok) {
+            const signResponse = (await fetchResponse.json()) as SignMessageResponse
             responses.push({ url: service.url, signature: signResponse.signature, status })
             successCount += 1
           } else {
