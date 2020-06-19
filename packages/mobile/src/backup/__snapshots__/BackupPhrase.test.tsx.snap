@@ -194,10 +194,14 @@ exports[`renders correctly with backup not completed 1`] = `
   >
     <View
       style={
-        Object {
-          "borderRadius": 100,
-          "overflow": "hidden",
-        }
+        Array [
+          Object {
+            "overflow": "hidden",
+          },
+          Object {
+            "borderRadius": 100,
+          },
+        ]
       }
     >
       <View
@@ -223,6 +227,7 @@ exports[`renders correctly with backup not completed 1`] = `
             "flexGrow": 1,
             "height": 48,
             "justifyContent": "center",
+            "opacity": undefined,
             "paddingHorizontal": 16,
             "paddingVertical": 5,
           }

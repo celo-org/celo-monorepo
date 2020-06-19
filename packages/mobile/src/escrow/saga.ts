@@ -19,6 +19,7 @@ import {
 } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { CURRENCY_ENUM, SHORT_CURRENCIES } from 'src/geth/consts'
+import { waitForNextBlock } from 'src/geth/saga'
 import i18n from 'src/i18n'
 import { Actions as IdentityActions, SetVerificationStatusAction } from 'src/identity/actions'
 import { addressToE164NumberSelector } from 'src/identity/reducer'
@@ -38,7 +39,7 @@ import Logger from 'src/utils/Logger'
 import {
   addLocalAccount,
   getContractKit,
-  getContractKitOutsideGenerator,
+  getContractKitAsync,
   web3ForUtils,
 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
@@ -186,7 +187,7 @@ function* withdrawFromEscrow() {
 }
 
 async function createReclaimTransaction(paymentID: string) {
-  const contractKit = await getContractKitOutsideGenerator()
+  const contractKit = await getContractKitAsync()
 
   const escrow = await contractKit.contracts.getEscrow()
   return escrow.revoke(paymentID).txo
@@ -317,6 +318,9 @@ export function* watchVerificationEnd() {
   while (true) {
     const update: SetVerificationStatusAction = yield take(IdentityActions.SET_VERIFICATION_STATUS)
     if (update.status === VerificationStatus.Done) {
+      // We wait for the next block because escrow can not
+      // be redeemed without all the attestations completed
+      yield waitForNextBlock()
       yield call(withdrawFromEscrow)
     }
   }

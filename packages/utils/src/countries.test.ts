@@ -5,7 +5,7 @@ const countries = new Countries('en-us')
 describe('countries', () => {
   describe('getCountryMap', () => {
     test('Valid Country', () => {
-      const country = countries.getCountryByCode('US')
+      const country = countries.getCountryByCodeAlpha2('US')
 
       expect(country).toBeDefined()
 
@@ -17,53 +17,158 @@ describe('countries', () => {
 
     test('Invalid Country', () => {
       // canary islands, no calling code
-      const invalidCountry = countries.getCountryByCode('IC')
+      const invalidCountry = countries.getCountryByCodeAlpha2('IC')
 
-      // should be a LocalizedCountry but all fields empty / default
-      const emptyCountry = {
-        alpha2: '',
-        alpha3: '',
-        countryCallingCodes: [],
-        currencies: [],
-        displayName: '',
-        emoji: '',
-        ioc: '',
-        languages: [],
-        name: '',
-        names: {},
-        status: '',
-      }
-
-      expect(invalidCountry).toMatchObject(emptyCountry)
+      expect(invalidCountry).toBeUndefined()
     })
   })
-  describe('getLocalizedCountries', () => {
+  describe('getCountry', () => {
     test('has all country data', () => {
       const country = countries.getCountry('taiwan')
 
-      const taiwan = {
-        alpha2: 'TW',
-        alpha3: 'TWN',
-        countryCallingCodes: ['+886'],
-        currencies: ['TWD'],
-        emoji: '🇹🇼',
-        ioc: 'TPE',
-        languages: ['zho'],
-        name: 'Taiwan',
-        displayName: 'Taiwan',
-        status: 'assigned',
-        names: { 'en-us': 'Taiwan', 'es-419': 'Taiwán' },
-      }
-
-      expect(country).toMatchObject(taiwan)
+      expect(country).toMatchInlineSnapshot(`
+        Object {
+          "alpha2": "TW",
+          "alpha3": "TWN",
+          "countryCallingCode": "+886",
+          "countryCallingCodes": Array [
+            "+886",
+          ],
+          "countryPhonePlaceholder": Object {
+            "national": "00 0000 0000",
+          },
+          "currencies": Array [
+            "TWD",
+          ],
+          "displayName": "Taiwan",
+          "displayNameNoDiacritics": "taiwan",
+          "emoji": "🇹🇼",
+          "ioc": "TPE",
+          "languages": Array [
+            "zho",
+          ],
+          "name": "Taiwan",
+          "names": Object {
+            "en-us": "Taiwan",
+            "es-419": "Taiwán",
+          },
+          "status": "assigned",
+        }
+      `)
     })
   })
 
   describe('Country Search', () => {
-    test('returns empty array on exact match', () => {
+    test('finds an exact match', () => {
       const results = countries.getFilteredCountries('taiwan')
 
-      expect(results.length).toBe(0)
+      expect(results).toMatchInlineSnapshot(`
+        Array [
+          Object {
+            "alpha2": "TW",
+            "alpha3": "TWN",
+            "countryCallingCode": "+886",
+            "countryCallingCodes": Array [
+              "+886",
+            ],
+            "countryPhonePlaceholder": Object {
+              "national": "00 0000 0000",
+            },
+            "currencies": Array [
+              "TWD",
+            ],
+            "displayName": "Taiwan",
+            "displayNameNoDiacritics": "taiwan",
+            "emoji": "🇹🇼",
+            "ioc": "TPE",
+            "languages": Array [
+              "zho",
+            ],
+            "name": "Taiwan",
+            "names": Object {
+              "en-us": "Taiwan",
+              "es-419": "Taiwán",
+            },
+            "status": "assigned",
+          },
+        ]
+      `)
+    })
+
+    test('finds countries by calling code', () => {
+      const results = countries.getFilteredCountries('49')
+
+      expect(results).toMatchInlineSnapshot(`
+        Array [
+          Object {
+            "alpha2": "DE",
+            "alpha3": "DEU",
+            "countryCallingCode": "+49",
+            "countryCallingCodes": Array [
+              "+49",
+            ],
+            "countryPhonePlaceholder": Object {
+              "national": "000 000000",
+            },
+            "currencies": Array [
+              "EUR",
+            ],
+            "displayName": "Germany",
+            "displayNameNoDiacritics": "germany",
+            "emoji": "🇩🇪",
+            "ioc": "GER",
+            "languages": Array [
+              "deu",
+            ],
+            "name": "Germany",
+            "names": Object {
+              "en-us": "Germany",
+              "es-419": "Alemania",
+            },
+            "status": "assigned",
+          },
+        ]
+      `)
+    })
+
+    test('finds countries by ISO code', () => {
+      const results = countries.getFilteredCountries('gb')
+
+      expect(results).toMatchInlineSnapshot(`
+        Array [
+          Object {
+            "alpha2": "GB",
+            "alpha3": "GBR",
+            "countryCallingCode": "+44",
+            "countryCallingCodes": Array [
+              "+44",
+            ],
+            "countryPhonePlaceholder": Object {
+              "national": "0000 000 0000",
+            },
+            "currencies": Array [
+              "GBP",
+            ],
+            "displayName": "United Kingdom",
+            "displayNameNoDiacritics": "united kingdom",
+            "emoji": "🇬🇧",
+            "ioc": "GBR",
+            "languages": Array [
+              "eng",
+              "cor",
+              "gle",
+              "gla",
+              "cym",
+            ],
+            "name": "United Kingdom",
+            "names": Object {
+              "en-us": "United Kingdom",
+              "es-419": "Reino Unido",
+            },
+            "status": "assigned",
+          },
+        ]
+      `)
     })
   })
 })
