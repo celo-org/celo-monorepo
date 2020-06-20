@@ -202,4 +202,4 @@ const styles = StyleSheet.create({
 export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.nuxVerification2)(VerificationEducationScreen))
+)(withTranslation<Props>(Namespaces.nuxVerification2)(VerificationEducationScreen))

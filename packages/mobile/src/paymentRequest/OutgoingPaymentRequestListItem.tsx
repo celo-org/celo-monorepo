@@ -84,4 +84,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withTranslation(Namespaces.paymentRequestFlow)(OutgoingPaymentRequestListItem)
+export default withTranslation<Props>(Namespaces.paymentRequestFlow)(OutgoingPaymentRequestListItem)
