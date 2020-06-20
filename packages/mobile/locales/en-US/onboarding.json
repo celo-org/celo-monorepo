@@ -27,5 +27,23 @@
     "codePlaceholder": "Enter invite code",
     "noCode": "Don’t have an Invite Code",
     "nodeCodeInviteLink": "Don’t have an invite code? Request one at <0>celo.org/app</0> or <1>continue without</1>"
+  },
+  "verificationEducation": {
+    "title": "Confirm",
+    "header": "Confirm phone number",
+    "body": "To make your number is really yours, we’re going to send you three messages.\n\nConfirming your number takes about three minutes.",
+    "start": "Start",
+    "learnMore": "Learn more"
+  },
+  "verificationSkipDialog": {
+    "title": "Are you sure?",
+    "body": "Confirming allows you to send and receive funds easily to your phone number.\n\nUnconfirmed accounts can only send payments using Celo addresses or QR codes.",
+    "cancel": "Go Back",
+    "confirm": "Skip for now"
+  },
+  "verificationLearnMoreDialog": {
+    "title": "Phone Number Confirmation",
+    "body": "Phone number confirmation works by associating your account with your phone number.\n\n<0>Do I need to complete this?</0>\n\nConfirmation is not required, however, unconfirmed accounts can only send payments using Celo addresses or QR codes.\n\n<1>Security and Privacy</1>\n\nTo protect your privacy, only an obfuscated version of your phone number is stored on the Celo blockchain.",
+    "dismiss": "Dismiss"
   }
 }
