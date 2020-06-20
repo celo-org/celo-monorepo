@@ -31,7 +31,7 @@
   "verificationEducation": {
     "title": "Confirmar",
     "header": "Confirmar número de teléfono",
-    "body": "Para que su número sea realmente suyo, le enviaremos tres mensajes.\n\nConfirmar su número lleva unos tres minutos.",
+    "body": "Para asegurarnos de que su número sea realmente suyo, le enviaremos tres mensajes.\n\nConfirmar su número lleva unos tres minutos.",
     "start": "Comienzo",
     "learnMore": "Aprende más"
   },
