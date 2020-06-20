@@ -11,5 +11,21 @@
       "successHeader": "You have {{matches}} friends on Celo",
       "successStatus": "You're all synced"
     }
+  },
+  "accountInfo": "Account Info",
+  "step": "Step {{step}} of 5",
+  "selectCountryCode": "Select Country Code",
+  "pincodeSet": {
+    "create": "Create a PIN",
+    "verify": "Enter PIN again",
+    "pinsDontMatch": "The PINs didn't match"
+  },
+  "inviteCode": {
+    "title": "Invite Code",
+    "body": "If you were invited or received a payment, please copy and paste the invite code below.",
+    "label": "Invite Code",
+    "codePlaceholder": "Enter invite code",
+    "noCode": "Don’t have an Invite Code",
+    "nodeCodeInviteLink": "Don’t have an invite code? Request one at <0>celo.org/app</0> or <1>continue without</1>"
   }
 }

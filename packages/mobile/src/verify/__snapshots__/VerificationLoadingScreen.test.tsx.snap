@@ -21,12 +21,21 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
         Object {
           "left": 5,
           "position": "absolute",
+          "zIndex": 1,
         }
       }
     >
       <View
         accessible={true}
         focusable={true}
+        hitSlop={
+          Object {
+            "bottom": 10,
+            "left": 10,
+            "right": 10,
+            "top": 10,
+          }
+        }
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
@@ -40,22 +49,22 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
         onResponderTerminate={[Function]}
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
-        style={
-          Object {
-            "paddingHorizontal": 20,
-            "paddingVertical": 10,
-          }
-        }
         testID="CancelButton"
       >
         <Text
           style={
-            Object {
-              "color": "#42D689",
-              "fontFamily": "Hind-SemiBold",
-              "fontSize": 14,
-              "lineHeight": 22,
-            }
+            Array [
+              Object {
+                "color": "#1AB775",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingHorizontal": 16,
+              },
+              Object {
+                "color": "#2E3338",
+              },
+            ]
           }
         >
           cancel
@@ -72,7 +81,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
       }
     >
       <View>
-        <View
+        <SafeAreaView
           style={
             Object {
               "height": 35,
@@ -99,7 +108,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
           >
                
           </Text>
-        </View>
+        </SafeAreaView>
         <View
           style={
             Object {
@@ -432,12 +441,21 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
         Object {
           "left": 5,
           "position": "absolute",
+          "zIndex": 1,
         }
       }
     >
       <View
         accessible={true}
         focusable={true}
+        hitSlop={
+          Object {
+            "bottom": 10,
+            "left": 10,
+            "right": 10,
+            "top": 10,
+          }
+        }
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
@@ -451,22 +469,22 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
         onResponderTerminate={[Function]}
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
-        style={
-          Object {
-            "paddingHorizontal": 20,
-            "paddingVertical": 10,
-          }
-        }
         testID="CancelButton"
       >
         <Text
           style={
-            Object {
-              "color": "#42D689",
-              "fontFamily": "Hind-SemiBold",
-              "fontSize": 14,
-              "lineHeight": 22,
-            }
+            Array [
+              Object {
+                "color": "#1AB775",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingHorizontal": 16,
+              },
+              Object {
+                "color": "#2E3338",
+              },
+            ]
           }
         >
           cancel
@@ -483,7 +501,7 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
       }
     >
       <View>
-        <View
+        <SafeAreaView
           style={
             Object {
               "height": 35,
@@ -510,7 +528,7 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
           >
                
           </Text>
-        </View>
+        </SafeAreaView>
         <View
           style={
             Object {

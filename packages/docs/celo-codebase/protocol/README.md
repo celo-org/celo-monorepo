@@ -10,10 +10,8 @@ A number of substantial changes have been made in service of Celo's product goal
 
 {% page-ref page="governance.md" %}
 
+{% page-ref page="stability/" %}
+
 {% page-ref page="transactions/" %}
 
 {% page-ref page="identity/" %}
-
-{% page-ref page="stability/" %}
-
-{% page-ref page="privacy.md" %}

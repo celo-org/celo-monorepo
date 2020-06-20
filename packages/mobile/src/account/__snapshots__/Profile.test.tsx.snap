@@ -117,8 +117,9 @@ exports[`Profile renders correctly 1`] = `
               "borderColor": "#EEEEEE",
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "marginLeft": 15,
-              "padding": 20,
+              "marginLeft": 16,
+              "paddingRight": 16,
+              "paddingVertical": 16,
             }
           }
         >
