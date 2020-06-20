@@ -138,7 +138,7 @@ export function* initGethSaga() {
     // Suggest switch to forno for network-related errors
     if (yield select(promptFornoIfNeededSelector)) {
       yield put(setPromptForno(false))
-      navigate(Screens.DataSaver, { promptModalVisible: true })
+      navigate(Screens.Settings, { promptFornoModal: true })
     } else {
       navigateToError('networkConnectionFailed')
     }

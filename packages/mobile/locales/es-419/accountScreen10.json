@@ -1,7 +1,7 @@
 {
   "invite": "Invitar",
   "celoRewards": "Recompensas Celo",
-  "languageSettings": "Configuración de idioma",
+  "languageSettings": "Idioma",
   "localCurrencySetting": "Moneda",
   "licenses": "Licencias",
   "security": "Seguridad",
@@ -31,6 +31,7 @@
   "editName": "Editar el nombre",
   "submit": "Enviar",
   "selectLanguage": "Seleccione el idioma",
+  "selectCurrency": "Seleccione el tipo de moneda",
   "continue": "Continuar",
   "yourName": "Tu Nombre",
   "version": "Versión:",

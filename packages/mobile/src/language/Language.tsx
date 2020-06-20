@@ -12,25 +12,31 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { setLanguage } from 'src/app/actions'
 import { AVAILABLE_LANGUAGES } from 'src/config'
 import { Namespaces } from 'src/i18n'
+import { emptyHeader, headerWithBackButton } from 'src/navigator/Headers.v2'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 
-type Props = StackScreenProps<StackParamList, Screens.Language>
+type RouterProps = StackScreenProps<StackParamList, Screens.Language>
+type Props = RouterProps
 
 export default function Language({ route }: Props) {
   const dispatch = useDispatch()
   const { t, i18n } = useTranslation(Namespaces.accountScreen10)
+  const fromSettings = route.params?.fromSettings
 
   function onSelect(language: string, code: string) {
     CeloAnalytics.track(CustomEventNames.language_select, { language, selectedAnswer: code })
-    const nextScreen = route.params?.nextScreen ?? Screens.JoinCelo
     dispatch(setLanguage(code))
-    if (nextScreen === 'GO_BACK') {
-      navigateBack()
-    } else {
-      navigate(nextScreen)
-    }
+    // Wait for next frame before navigating back
+    // so the user can see the changed selection briefly
+    requestAnimationFrame(() => {
+      if (fromSettings) {
+        navigateBack()
+      } else {
+        navigate(Screens.JoinCelo)
+      }
+    })
   }
 
   return (
@@ -41,6 +47,7 @@ export default function Language({ route }: Props) {
         </Text>
         {AVAILABLE_LANGUAGES.map((language) => (
           <SelectionOption
+            hideCheckboxes={!fromSettings}
             text={language.name}
             key={language.code}
             onSelect={onSelect}
@@ -54,6 +61,14 @@ export default function Language({ route }: Props) {
   )
 }
 
+export function languageScreenOptions({ route }: RouterProps) {
+  if (route.params?.fromSettings) {
+    return headerWithBackButton
+  } else {
+    return emptyHeader
+  }
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -61,7 +76,6 @@ const styles = StyleSheet.create({
   },
   title: {
     ...fontStyles.h2,
-    marginHorizontal: 16,
-    marginVertical: 16,
+    margin: 16,
   },
 })

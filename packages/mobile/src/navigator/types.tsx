@@ -25,12 +25,10 @@ type NestedNavigatorParams<ParamList> = {
 
 // tslint:disable-next-line: interface-over-type-literal
 export type StackParamList = {
-  [Screens.Account]: undefined
-  [Screens.Analytics]: undefined
   [Screens.BackupComplete]: undefined
   [Screens.BackupIntroduction]:
     | {
-        fromAccountScreen?: boolean
+        fromSettings?: boolean
       }
     | undefined
   [Screens.AccountKeyEducation]:
@@ -53,12 +51,8 @@ export type StackParamList = {
   [Screens.DappKitTxDataScreen]: {
     dappKitData: TxToSignParam['txData']
   }
-  [Screens.DataSaver]: {
-    promptModalVisible: boolean
-  }
   [Screens.Debug]: undefined
   [Screens.DrawerNavigator]: undefined
-  [Screens.EditProfile]: undefined
   [Screens.EnterInviteCode]: undefined
   [Screens.ErrorScreen]: {
     errorMessage?: string
@@ -112,7 +106,7 @@ export type StackParamList = {
   [Screens.JoinCelo]: { selectedCountryCodeAlpha2: string } | undefined
   [Screens.Language]:
     | {
-        nextScreen: keyof StackParamList | 'GO_BACK'
+        fromSettings?: boolean
       }
     | undefined
   [Screens.Licenses]: undefined
@@ -142,7 +136,6 @@ export type StackParamList = {
     reclaimPaymentInput: EscrowedPayment
   }
   [Screens.RegulatoryTerms]: undefined
-  [Screens.Security]: undefined
   [Screens.SelectCountry]: {
     countries: Countries
     selectedCountryCodeAlpha2: string
@@ -164,7 +157,7 @@ export type StackParamList = {
     isFromScan?: boolean
   }
   [Screens.SetClock]: undefined
-  [Screens.Settings]: undefined
+  [Screens.Settings]: { promptFornoModal: boolean } | undefined
   [Screens.Support]: undefined
   [Screens.SupportContact]: undefined
   [Screens.Sync]: undefined

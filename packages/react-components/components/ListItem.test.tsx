@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Text } from 'react-native'
 import { fireEvent, render } from 'react-native-testing-library'
 import * as renderer from 'react-test-renderer'
-import ListItem from 'src/fiatExchanges/ListItem'
+import ListItem from '@celo/react-components/components/ListItem'
 
 const testID = 'ListItemTestID'
 

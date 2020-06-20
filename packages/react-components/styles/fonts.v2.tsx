@@ -7,6 +7,11 @@ const Inter = {
   SemiBold: 'Inter-SemiBold',
 }
 
+const Jost = {
+  Regular: 'Jost-Regular',
+  Medium: 'Jost-Medium',
+}
+
 export const fontFamily = Inter.Regular
 
 const standards = {
@@ -32,15 +37,15 @@ const standards = {
 // Figma Font Styles
 const fontStyles = StyleSheet.create({
   h1: {
-    fontSize: 24,
+    fontSize: 26,
     lineHeight: 32,
-    fontFamily: Inter.Medium,
+    fontFamily: Jost.Regular,
     color: colors.dark,
   },
   h2: {
-    fontSize: 19,
-    lineHeight: 26,
-    fontFamily: Inter.SemiBold,
+    fontSize: 22,
+    lineHeight: 28,
+    fontFamily: Jost.Medium,
     color: colors.dark,
   },
   sectionHeader: {

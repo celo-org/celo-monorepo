@@ -85,7 +85,7 @@ const SupportContact = (props: Props) => {
     setInProgress(false)
     Mailer.mail(email, (error: any, event: string) => {
       if (event === 'sent') {
-        navigate(Screens.Account)
+        navigate(Screens.Settings)
         props.showMessage(t('contactSuccess'))
       }
       if (error) {
