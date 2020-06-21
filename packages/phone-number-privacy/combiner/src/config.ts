@@ -3,6 +3,7 @@ import * as functions from 'firebase-functions'
 import Web3 from 'web3'
 import logger from './common/logger'
 
+export const VERSION = process.env.npm_package_version
 export const DEV_MODE =
   process.env.NODE_ENV !== 'production' || process.env.FUNCTIONS_EMULATOR === 'true'
 

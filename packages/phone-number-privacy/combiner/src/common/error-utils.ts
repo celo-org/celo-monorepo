@@ -1,5 +1,5 @@
 import { Response } from 'firebase-functions'
-import { VERSION } from './constants'
+import { VERSION } from '../config'
 import logger from './logger'
 
 export enum ErrorMessages {

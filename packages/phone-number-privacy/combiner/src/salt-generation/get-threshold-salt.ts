@@ -2,7 +2,6 @@ import AbortController from 'abort-controller'
 import { Request, Response } from 'firebase-functions'
 import fetch, { Response as FetchResponse } from 'node-fetch'
 import { BLSCryptographyClient, ServicePartialSignature } from '../bls/bls-cryptography-client'
-import { VERSION } from '../common/constants'
 import { ErrorMessages, respondWithError } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
 import {
@@ -12,7 +11,7 @@ import {
   phoneNumberHashIsValidIfExists,
 } from '../common/input-validation'
 import logger from '../common/logger'
-import config from '../config'
+import config, { VERSION } from '../config'
 
 const PARTIAL_SIGN_MESSAGE_ENDPOINT = '/getBlindedSalt'
 

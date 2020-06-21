@@ -69,6 +69,7 @@ describe(`POST /getDistributedBlindedSalt endpoint`, () => {
         json(body: any) {
           expect(body.success).toEqual(true)
           expect(body.combinedSignature).toEqual(BLS_SIGNATURE)
+          expect(body.version).toEqual(VERSION)
         },
       }
       // @ts-ignore TODO fix req type to make it a mock express req

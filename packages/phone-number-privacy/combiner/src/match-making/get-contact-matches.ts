@@ -1,5 +1,4 @@
 import { Request, Response } from 'firebase-functions'
-import { VERSION } from '../common/constants'
 import { ErrorMessages, respondWithError } from '../common/error-utils'
 import { authenticateUser, isVerified } from '../common/identity'
 import {
@@ -9,6 +8,7 @@ import {
   hasValidUserPhoneNumberParam,
 } from '../common/input-validation'
 import logger from '../common/logger'
+import { VERSION } from '../config'
 import { getDidMatchmaking, setDidMatchmaking } from '../database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../database/wrappers/number-pairs'
 
