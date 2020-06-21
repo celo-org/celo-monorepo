@@ -1704,10 +1704,10 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@celo/client@0.0.305":
-  version "0.0.305"
-  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.305.tgz#fe414efcc108f2e3fff0a9ab7521542b278497c7"
-  integrity sha512-kN/VTelleu28TiVir2wKvUGGe2xpt74z2J4ULVmB/0bQ3lU/yJQ0+o0wqaqsBR757oAHDInE/2x0hzbDW6CaNg==
+"@celo/client@0.0.309":
+  version "0.0.309"
+  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.309.tgz#dbfdd4a45fef98950f8122a8a902e52ef20e9238"
+  integrity sha512-D708ud45fdNIltfEqjqmXrVjtNwNFYYIJ+TZzbulu12yl3AzbYlILFtNZ+vFXwzm9Iy/kYBZOm2DpEzAVbPNgg==
 
 "@celo/contractkit@0.3.1":
   version "0.3.1"
