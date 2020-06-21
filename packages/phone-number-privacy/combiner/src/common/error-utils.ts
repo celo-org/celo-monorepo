@@ -1,4 +1,5 @@
 import { Response } from 'firebase-functions'
+import { VERSION } from './constants'
 import logger from './logger'
 
 export enum ErrorMessages {
@@ -21,5 +22,5 @@ export enum ErrorMessages {
 
 export function respondWithError(res: Response, statusCode: number, error: ErrorMessages) {
   logger.error('Responding with error', error)
-  res.status(statusCode).json({ success: false, error })
+  res.status(statusCode).json({ success: false, error, version: VERSION })
 }

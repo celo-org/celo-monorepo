@@ -1,4 +1,5 @@
 import { Request, Response } from 'firebase-functions'
+import { VERSION } from '../common/constants'
 import { ErrorMessages, respondWithError } from '../common/error-utils'
 import { authenticateUser, isVerified } from '../common/identity'
 import {
@@ -52,7 +53,7 @@ export async function handleGetContactMatches(
     ).map((numberPair) => ({ phoneNumber: numberPair }))
     await setNumberPairContacts(userPhoneNumber, contactPhoneNumbers)
     await setDidMatchmaking(account)
-    response.json({ success: true, matchedContacts })
+    response.json({ success: true, matchedContacts, version: VERSION })
   } catch (e) {
     logger.error('Failed to getContactMatches', e)
     respondWithError(response, 500, ErrorMessages.UNKNOWN_ERROR)
