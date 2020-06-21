@@ -2,51 +2,29 @@
 
 exports[`SelectLocalCurrency renders correctly 1`] = `
 <RCTScrollView
-  data={
-    Array [
-      "USD",
-      "CAD",
-      "EUR",
-      "MXN",
-      "COP",
-      "PHP",
-      "LRD",
-      "SLL",
-      "KES",
-      "UGX",
-      "GHS",
-      "NGN",
-    ]
+  style={
+    Object {
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+    }
   }
-  disableVirtualization={false}
-  extraData="MXN"
-  getItem={[Function]}
-  getItemCount={[Function]}
-  horizontal={false}
-  initialNumToRender={10}
-  keyExtractor={[Function]}
-  maxToRenderPerBatch={10}
-  onContentSizeChange={[Function]}
-  onEndReachedThreshold={2}
-  onLayout={[Function]}
-  onMomentumScrollEnd={[Function]}
-  onScroll={[Function]}
-  onScrollBeginDrag={[Function]}
-  onScrollEndDrag={[Function]}
-  removeClippedSubviews={true}
-  renderItem={[Function]}
-  scrollEventThrottle={50}
-  stickyHeaderIndices={Array []}
-  style={Object {}}
-  updateCellsBatchingPeriod={50}
-  viewabilityConfigCallbackPairs={Array []}
-  windowSize={21}
 >
   <View>
-    <View
-      onLayout={[Function]}
-      style={null}
-    >
+    <SafeAreaView>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Jost-Medium",
+            "fontSize": 22,
+            "lineHeight": 28,
+            "margin": 16,
+          }
+        }
+        testID="ChooseLanguageTitle"
+      >
+        selectCurrency
+      </Text>
       <View
         accessible={true}
         focusable={true}
@@ -113,11 +91,6 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
           </Text>
         </View>
       </View>
-    </View>
-    <View
-      onLayout={[Function]}
-      style={null}
-    >
       <View
         accessible={true}
         focusable={true}
@@ -184,11 +157,6 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
           </Text>
         </View>
       </View>
-    </View>
-    <View
-      onLayout={[Function]}
-      style={null}
-    >
       <View
         accessible={true}
         focusable={true}
@@ -255,11 +223,6 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
           </Text>
         </View>
       </View>
-    </View>
-    <View
-      onLayout={[Function]}
-      style={null}
-    >
       <View
         accessible={true}
         focusable={true}
@@ -336,11 +299,6 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
           </Text>
         </View>
       </View>
-    </View>
-    <View
-      onLayout={[Function]}
-      style={null}
-    >
       <View
         accessible={true}
         focusable={true}
@@ -407,11 +365,6 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
           </Text>
         </View>
       </View>
-    </View>
-    <View
-      onLayout={[Function]}
-      style={null}
-    >
       <View
         accessible={true}
         focusable={true}
@@ -478,11 +431,6 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
           </Text>
         </View>
       </View>
-    </View>
-    <View
-      onLayout={[Function]}
-      style={null}
-    >
       <View
         accessible={true}
         focusable={true}
@@ -549,11 +497,6 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
           </Text>
         </View>
       </View>
-    </View>
-    <View
-      onLayout={[Function]}
-      style={null}
-    >
       <View
         accessible={true}
         focusable={true}
@@ -620,11 +563,6 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
           </Text>
         </View>
       </View>
-    </View>
-    <View
-      onLayout={[Function]}
-      style={null}
-    >
       <View
         accessible={true}
         focusable={true}
@@ -691,11 +629,6 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
           </Text>
         </View>
       </View>
-    </View>
-    <View
-      onLayout={[Function]}
-      style={null}
-    >
       <View
         accessible={true}
         focusable={true}
@@ -762,14 +695,139 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
           </Text>
         </View>
       </View>
-    </View>
-    <View
-      style={
-        Object {
-          "height": 0,
+      <View
+        accessible={true}
+        focusable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
         }
-      }
-    />
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+      >
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "borderBottomWidth": 1,
+              "borderColor": "#EDEEEF",
+              "flexDirection": "row",
+              "marginLeft": 16,
+              "paddingVertical": 14,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "marginRight": 16,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "borderColor": "#9CA4A9",
+                  "borderRadius": 12,
+                  "borderWidth": 2,
+                  "height": 24,
+                  "paddingTop": 2,
+                  "width": 24,
+                }
+              }
+            />
+          </View>
+          <Text
+            numberOfLines={1}
+            style={
+              Object {
+                "color": "#2E3338",
+                "flex": 1,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "marginRight": 16,
+              }
+            }
+          >
+            GHS
+          </Text>
+        </View>
+      </View>
+      <View
+        accessible={true}
+        focusable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+      >
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "borderBottomWidth": 1,
+              "borderColor": "#EDEEEF",
+              "flexDirection": "row",
+              "marginLeft": 16,
+              "paddingVertical": 14,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "marginRight": 16,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "borderColor": "#9CA4A9",
+                  "borderRadius": 12,
+                  "borderWidth": 2,
+                  "height": 24,
+                  "paddingTop": 2,
+                  "width": 24,
+                }
+              }
+            />
+          </View>
+          <Text
+            numberOfLines={1}
+            style={
+              Object {
+                "color": "#2E3338",
+                "flex": 1,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "marginRight": 16,
+              }
+            }
+          >
+            NGN
+          </Text>
+        </View>
+      </View>
+    </SafeAreaView>
   </View>
 </RCTScrollView>
 `;

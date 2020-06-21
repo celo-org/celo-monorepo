@@ -44,8 +44,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Inter-Medium",
-                  "fontSize": 24,
+                  "fontFamily": "Jost-Regular",
+                  "fontSize": 26,
                   "lineHeight": 32,
                 },
                 Object {
@@ -817,8 +817,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Inter-Medium",
-                  "fontSize": 24,
+                  "fontFamily": "Jost-Regular",
+                  "fontSize": 26,
                   "lineHeight": 32,
                 },
                 Object {
@@ -1590,8 +1590,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Inter-Medium",
-                  "fontSize": 24,
+                  "fontFamily": "Jost-Regular",
+                  "fontSize": 26,
                   "lineHeight": 32,
                 },
                 Object {

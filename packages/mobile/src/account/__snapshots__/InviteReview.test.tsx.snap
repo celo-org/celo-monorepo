@@ -44,8 +44,8 @@ exports[`InviteReview renders correctly 1`] = `
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Inter-Medium",
-                  "fontSize": 24,
+                  "fontFamily": "Jost-Regular",
+                  "fontSize": 26,
                   "lineHeight": 32,
                 },
                 Object {

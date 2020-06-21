@@ -76,10 +76,10 @@ export function SettingsItemSwitch({
 }: SettingsItemSwitchProps) {
   return (
     <>
-      <Wrapper testID={testID}>
+      <Wrapper>
         <View style={styles.container}>
           <Title value={title} />
-          <Switch value={value} onValueChange={onValueChange} />
+          <Switch testID={testID} value={value} onValueChange={onValueChange} />
         </View>
         {details && (
           <View>
@@ -115,10 +115,11 @@ export function SettingsItemInput({
   const [inputColor, setInputColor] = React.useState(colors.gray4)
   return (
     <>
-      <Wrapper testID={testID}>
+      <Wrapper>
         <View style={styles.container}>
           <Title value={title} />
           <TextInput
+            testID={testID}
             style={styles.input}
             inputStyle={[styles.innerInput, { color: inputColor }]}
             onFocus={onFocus}
@@ -157,6 +158,7 @@ const styles = StyleSheet.create({
     ...fontStyles.small,
     color: colors.gray4,
     paddingTop: 16,
+    paddingRight: 16,
   },
   right: {
     flexDirection: 'row',

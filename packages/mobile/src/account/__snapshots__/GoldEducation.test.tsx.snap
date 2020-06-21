@@ -83,9 +83,9 @@ exports[`renders correctly 1`] = `
           style={
             Object {
               "color": "#2E3338",
-              "fontFamily": "Inter-SemiBold",
-              "fontSize": 19,
-              "lineHeight": 26,
+              "fontFamily": "Jost-Medium",
+              "fontSize": 22,
+              "lineHeight": 28,
               "marginTop": 24,
               "textAlign": "center",
             }
@@ -137,9 +137,9 @@ exports[`renders correctly 1`] = `
           style={
             Object {
               "color": "#2E3338",
-              "fontFamily": "Inter-SemiBold",
-              "fontSize": 19,
-              "lineHeight": 26,
+              "fontFamily": "Jost-Medium",
+              "fontSize": 22,
+              "lineHeight": 28,
               "marginTop": 24,
               "textAlign": "center",
             }
@@ -191,9 +191,9 @@ exports[`renders correctly 1`] = `
           style={
             Object {
               "color": "#2E3338",
-              "fontFamily": "Inter-SemiBold",
-              "fontSize": 19,
-              "lineHeight": 26,
+              "fontFamily": "Jost-Medium",
+              "fontSize": 22,
+              "lineHeight": 28,
               "marginTop": 24,
               "textAlign": "center",
             }
