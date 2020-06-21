@@ -6,12 +6,7 @@ import {
 } from '@celo/react-components/components/SettingsItem'
 import * as React from 'react'
 import 'react-native'
-import {
-  fireEvent,
-  flushMicrotasksQueue,
-  render,
-  waitForElement,
-} from 'react-native-testing-library'
+import { fireEvent, render } from 'react-native-testing-library'
 
 const title = 'title'
 const testID = 'testID'
