@@ -244,13 +244,16 @@ async function getActionableAttestations(
   phoneHash: string,
   account: string
 ) {
+  const start = Date.now()
   CeloAnalytics.track(CustomEventNames.verification_actionable_attestation_start)
   const attestations = await retryAsync(
     attestationsWrapper.getActionableAttestations.bind(attestationsWrapper),
     3,
     [phoneHash, account]
   )
-  CeloAnalytics.track(CustomEventNames.verification_actionable_attestation_finish)
+  CeloAnalytics.track(CustomEventNames.verification_actionable_attestation_finish, {
+    duration: Date.now() - start,
+  })
   return attestations
 }
 
@@ -474,6 +477,7 @@ function* tryRevealPhoneNumber(
   phoneHashDetails: PhoneNumberHashDetails,
   attestation: ActionableAttestation
 ) {
+  const start = Date.now()
   const issuer = attestation.issuer
   Logger.debug(TAG + '@tryRevealPhoneNumber', `Revealing an attestation for issuer: ${issuer}`)
   CeloAnalytics.track(CustomEventNames.verification_reveal_attestation, { issuer })
@@ -496,13 +500,20 @@ function* tryRevealPhoneNumber(
     if (!response.ok) {
       const body = yield response.json()
       Logger.error(TAG + '@tryRevealPhoneNumber', `Reveal response not okay: ${body.error}`)
+      CeloAnalytics.track(CustomEventNames.verification_reveal_error, {
+        issuer,
+        statusCode: response.status,
+      })
       throw new Error(
         `Error revealing to issuer ${attestation.attestationServiceURL}. Status code: ${response.status}`
       )
     }
 
     Logger.debug(TAG + '@tryRevealPhoneNumber', `Revealing for issuer ${issuer} successful`)
-    CeloAnalytics.track(CustomEventNames.verification_revealed_attestation, { issuer })
+    CeloAnalytics.track(CustomEventNames.verification_revealed_attestation, {
+      issuer,
+      duration: Date.now() - start,
+    })
   } catch (error) {
     // This is considered a recoverable error because the user may have received the code in a previous run
     // So instead of propagating the error, we catch it just update status. This will trigger the modal,
