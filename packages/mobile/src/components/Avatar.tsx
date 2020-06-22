@@ -53,7 +53,7 @@ export function Avatar(props: Props) {
   return (
     <BaseAvatar
       {...props}
-      defaultCountryCode={defaultCountryCode}
+      defaultCountryCode={defaultCountryCode ? defaultCountryCode : undefined}
       name={getDisplayName(props)}
       e164Number={getE164Number(e164Number, recipient)}
       iconSize={iconSize}
@@ -62,4 +62,4 @@ export function Avatar(props: Props) {
   )
 }
 
-export default withTranslation(Namespaces.sendFlow7)(Avatar)
+export default withTranslation<Props>(Namespaces.sendFlow7)(Avatar)

@@ -36,7 +36,7 @@ import VerificationCodeRow from 'src/verify/VerificationCodeRow'
 const TAG = 'VerificationInputScreen'
 
 interface StateProps {
-  e164Number: string
+  e164Number: string | null
   attestationCodes: AttestationCode[]
   numCompleteAttestations: number
   verificationStatus: VerificationStatus
@@ -332,4 +332,4 @@ const styles = StyleSheet.create({
 export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.nuxVerification2)(VerificationInputScreen))
+)(withTranslation<Props>(Namespaces.nuxVerification2)(VerificationInputScreen))

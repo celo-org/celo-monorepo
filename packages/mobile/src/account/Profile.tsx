@@ -15,7 +15,7 @@ import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 
 interface StateProps {
-  name: string
+  name: string | null
   userContact: UserContactDetails
 }
 
@@ -83,5 +83,5 @@ const style = StyleSheet.create({
 })
 
 export default connect<StateProps, {}, OwnProps, RootState>(mapStateToProps)(
-  withTranslation(Namespaces.accountScreen10)(Profile)
+  withTranslation<Props>(Namespaces.accountScreen10)(Profile)
 )

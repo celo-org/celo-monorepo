@@ -25,7 +25,7 @@ class RecipientItem extends React.PureComponent<Props> {
     const { recipient } = this.props
 
     return (
-      <Touchable onPress={this.onPress}>
+      <Touchable onPress={this.onPress} testID="RecipientItem">
         <View style={styles.row}>
           <ContactCircle
             style={styles.avatar}

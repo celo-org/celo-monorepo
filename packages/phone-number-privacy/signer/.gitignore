@@ -2,3 +2,7 @@ dist/
 
 # Firebase cache
 .firebase/
+
+gcp-service-account.json
+server.cert
+server.key

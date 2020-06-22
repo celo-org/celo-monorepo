@@ -8,8 +8,12 @@ import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
+import CancelButton from 'src/components/CancelButton.v2'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { AddressValidationType } from 'src/identity/reducer'
+import { emptyHeader } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -40,8 +44,14 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   }
 }
 
+export const validateRecipientIntroScreenNavOptions = () => ({
+  ...emptyHeader,
+  headerLeft: () => <CancelButton eventName={CustomEventNames.send_secure_cancel} />,
+})
+
 class ValidateRecipientIntro extends React.Component<Props> {
   onPressScanCode = () => {
+    CeloAnalytics.track(CustomEventNames.send_secure_start, { method: 'scan' })
     navigate(Screens.QRNavigator, {
       screen: Screens.QRScanner,
       params: {
@@ -54,10 +64,12 @@ class ValidateRecipientIntro extends React.Component<Props> {
   onPressConfirmAccount = () => {
     const { addressValidationType, transactionData, isPaymentRequest } = this.props
 
+    CeloAnalytics.track(CustomEventNames.send_secure_start, { method: 'manual' })
     navigate(Screens.ValidateRecipientAccount, {
       transactionData,
       addressValidationType,
       isPaymentRequest,
+      isFromScan: this.props.route.params?.isFromScan,
     })
   }
 
@@ -141,5 +153,5 @@ const styles = StyleSheet.create({
 })
 
 export default connect<StateProps, {}, OwnProps, RootState>(mapStateToProps)(
-  withTranslation(Namespaces.sendFlow7)(ValidateRecipientIntro)
+  withTranslation<Props>(Namespaces.sendFlow7)(ValidateRecipientIntro)
 )

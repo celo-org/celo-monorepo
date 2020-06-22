@@ -15,7 +15,7 @@ import { Task } from 'redux-saga'
 import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'
 import { setRetryVerificationWithForno } from 'src/account/actions'
 import { e164NumberSelector } from 'src/account/selectors'
-import { showError, showMessage } from 'src/alert/actions'
+import { showError, showErrorOrFallback, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { setNumberVerified } from 'src/app/actions'
@@ -44,7 +44,7 @@ import { privateCommentKeySelector } from 'src/web3/selectors'
 const TAG = 'identity/verification'
 
 export const NUM_ATTESTATIONS_REQUIRED = 3
-export const VERIFICATION_TIMEOUT = 5 * 60 * 1000 // 5 minutes
+export const VERIFICATION_TIMEOUT = 10 * 60 * 1000 // 10 minutes
 
 export enum CodeInputType {
   AUTOMATIC = 'automatic',
@@ -138,48 +138,52 @@ export function* doVerificationFlow() {
 
     CeloAnalytics.track(CustomEventNames.verification_get_status)
 
-    if (status.isVerified) {
-      yield put(setVerificationStatus(VerificationStatus.Done))
-      yield put(setNumberVerified(true))
-      return true
-    }
+    if (!status.isVerified) {
+      // Mark codes completed in previous attempts
+      yield put(
+        completeAttestationCode(NUM_ATTESTATIONS_REQUIRED - status.numAttestationsRemaining)
+      )
 
-    // Mark codes completed in previous attempts
-    yield put(completeAttestationCode(NUM_ATTESTATIONS_REQUIRED - status.numAttestationsRemaining))
+      yield put(setVerificationStatus(VerificationStatus.RequestingAttestations))
+      const attestations: ActionableAttestation[] = yield call(
+        requestAndRetrieveAttestations,
+        attestationsWrapper,
+        phoneHash,
+        account,
+        status.numAttestationsRemaining
+      )
 
-    yield put(setVerificationStatus(VerificationStatus.RequestingAttestations))
-    const attestations: ActionableAttestation[] = yield call(
-      requestAndRetrieveAttestations,
-      attestationsWrapper,
-      phoneHash,
-      account,
-      status.numAttestationsRemaining
-    )
+      const issuers = attestations.map((a) => a.issuer)
 
-    const issuers = attestations.map((a) => a.issuer)
+      // Start listening for manual and/or auto message inputs
+      const receiveMessageTask: Task = yield takeEvery(
+        Actions.RECEIVE_ATTESTATION_MESSAGE,
+        attestationCodeReceiver(attestationsWrapper, phoneHash, account, issuers)
+      )
 
-    // Start listening for manual and/or auto message inputs
-    const receiveMessageTask: Task = yield takeEvery(
-      Actions.RECEIVE_ATTESTATION_MESSAGE,
-      attestationCodeReceiver(attestationsWrapper, phoneHash, account, issuers)
-    )
+      let autoRetrievalTask: Task | undefined
+      if (Platform.OS === 'android') {
+        autoRetrievalTask = yield fork(startAutoSmsRetrieval)
+      }
 
-    let autoRetrievalTask: Task | undefined
-    if (Platform.OS === 'android') {
-      autoRetrievalTask = yield fork(startAutoSmsRetrieval)
-    }
+      yield put(setVerificationStatus(VerificationStatus.RevealingNumber))
+      yield all([
+        // Set acccount and data encryption key in contract
+        call(setAccount, accountsWrapper, account, dataKey),
+        // Request codes for the attestations needed
+        call(
+          revealNeededAttestations,
+          attestationsWrapper,
+          account,
+          phoneHashDetails,
+          attestations
+        ),
+      ])
 
-    yield put(setVerificationStatus(VerificationStatus.RevealingNumber))
-    yield all([
-      // Set acccount and data encryption key in contract
-      call(setAccount, accountsWrapper, account, dataKey),
-      // Request codes for the attestations needed
-      call(revealNeededAttestations, attestationsWrapper, account, phoneHashDetails, attestations),
-    ])
-
-    receiveMessageTask.cancel()
-    if (Platform.OS === 'android' && autoRetrievalTask) {
-      autoRetrievalTask.cancel()
+      receiveMessageTask.cancel()
+      if (Platform.OS === 'android' && autoRetrievalTask) {
+        autoRetrievalTask.cancel()
+      }
     }
 
     yield put(setVerificationStatus(VerificationStatus.Done))
@@ -187,11 +191,7 @@ export function* doVerificationFlow() {
     return true
   } catch (error) {
     Logger.error(TAG, 'Error occured during verification flow', error)
-    if (error.message in ErrorMessages) {
-      yield put(showError(error.message))
-    } else {
-      yield put(showError(ErrorMessages.VERIFICATION_FAILURE))
-    }
+    yield put(showErrorOrFallback(error, ErrorMessages.VERIFICATION_FAILURE))
     yield put(setVerificationStatus(VerificationStatus.Failed))
     return false
   }
@@ -491,6 +491,7 @@ function* tryRevealPhoneNumber(
     }
 
     Logger.debug(TAG + '@tryRevealPhoneNumber', `Revealing for issuer ${issuer} successful`)
+    CeloAnalytics.track(CustomEventNames.verification_revealed_attestation, { issuer })
   } catch (error) {
     // This is considered a recoverable error because the user may have received the code in a previous run
     // So instead of propagating the error, we catch it just update status. This will trigger the modal,

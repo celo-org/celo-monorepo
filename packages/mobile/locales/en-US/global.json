@@ -20,6 +20,7 @@
   "chooseLanguage": "Choose Language",
   "wallet": "Wallet",
   "send": "Send",
+  "search": "Search",
   "payments": "Payments",
   "exchange": "Exchange",
   "learnMore": "Learn More",
@@ -31,6 +32,7 @@
   "transactionFailed": "Transaction failed, please retry",
   "refreshFailedUnexpectedly": "Failed to refresh, please check your connectivity",
   "edit": "Edit",
+  "paste": "Paste",
   "receivedPayment": "Received Payment",
   "readOnlyState": "Read Only Mode Set Backup Key to continue sending and receiving {{CeloDollars}}",
   "getStarted": "Get Started",
@@ -119,6 +121,7 @@
   "addressLookupFailure": "Failed to look up phone number address",
   "saltFetchFailure": "Failed to retrieve phone number secret",
   "saltQuotaExceededError": "Your phone number lookup quota is used up",
+  "matchmakingQuotaExceededError": "Matchmaking can be done only once",
   "paymentLimitReached": "The daily limit is {{dailyLimitcUSD}}CUSD ({{currencySymbol}}{{dailyLimit}})\n{{dailyRemainingcUSD}}CUSD ({{currencySymbol}}{{dailyRemaining}}) remaining",
   "ordinals": [
     "zeroth",
@@ -168,5 +171,8 @@
   "settings": "Settings",
   "help": "Help",
   "dismiss": "Dismiss",
-  "review": "Review"
+  "review": "Review",
+  "insufficientBalance": "Your balance is too low to make this transaction",
+  "amount": "Amount",
+  "currentBalance": "Current Balance"
 }

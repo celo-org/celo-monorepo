@@ -17,7 +17,7 @@ import BackupPhraseContainer, {
 import CancelConfirm from 'src/backup/CancelConfirm'
 import { getStoredMnemonic, onGetMnemonicFail } from 'src/backup/utils'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import { navigate } from 'src/navigator/NavigationService'
+import { navigate, pushToStack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { RootState } from 'src/redux/reducers'
@@ -138,8 +138,8 @@ class BackupPhrase extends React.Component<Props, State> {
 function HeaderRight() {
   const { t } = useTranslation(Namespaces.backupKeyFlow6)
   const onMoreInfoPressed = () => {
-    // TODO: Implement this
     CeloAnalytics.track(CustomEventNames.backup_setup_info)
+    pushToStack(Screens.AccountKeyEducation)
   }
   return <TopBarTextButton onPress={onMoreInfoPressed} title={t('moreInfo')} />
 }
@@ -174,4 +174,4 @@ const styles = StyleSheet.create({
 export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
   showError,
   hideAlert,
-})(withTranslation(Namespaces.backupKeyFlow6)(BackupPhrase))
+})(withTranslation<Props>(Namespaces.backupKeyFlow6)(BackupPhrase))

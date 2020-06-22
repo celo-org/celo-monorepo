@@ -20,6 +20,7 @@
   "chooseLanguage": "Elegir idioma",
   "wallet": "Monedero",
   "send": "Envío",
+  "search": "Buscar",
   "payments": "Pagos",
   "exchange": "Cambio",
   "learnMore": "Saber más",
@@ -31,6 +32,7 @@
   "transactionFailed": "Transacción fallido, por favor vuelva a intentarlo",
   "refreshFailedUnexpectedly": "Error al actualizar, por favor revise tu conectividad",
   "edit": "Editar",
+  "paste": "Pegar",
   "receivedPayment": "Pago recibido",
   "readOnlyState": "Modo de solo lectura: cree la clave de respaldo para seguir enviando y recibiendo {{CeloDollars}}",
   "getStarted": "Primeros pasos",
@@ -119,6 +121,7 @@
   "addressLookupFailure": "Error al buscar la dirección del número de teléfono",
   "saltFetchFailure": "Error al recuperar el secreto del número de teléfono",
   "saltQuotaExceededError": "Su cuota de búsqueda de número de teléfono está agotada",
+  "matchmakingQuotaExceededError": "El emparejamiento solo se puede hacer una vez",
   "paymentLimitReached": "El límite diario es {{dailyLimitcUSD}}CUSD ({{currencySymbol}}{{dailyLimit}})\n{{dailyRemainingcUSD}}CUSD ({{currencySymbol}}{{dailyRemaining}}) restante",
   "ordinals": [
     "cero",
@@ -168,5 +171,8 @@
   "settings": "Configuración",
   "help": "Ayuda",
   "dismiss": "Ocultar",
-  "review": "Revisión"
+  "review": "Revisión",
+  "insufficientBalance": "Su saldo es demasiado bajo para realizar esta transacción.",
+  "amount": "Monto",
+  "currentBalance": "Saldo actual"
 }

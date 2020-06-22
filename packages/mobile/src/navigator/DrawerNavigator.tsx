@@ -16,6 +16,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import deviceInfoModule from 'react-native-device-info'
 import Account from 'src/account/Account'
 import FiatExchange from 'src/account/FiatExchange'
+import GoldEducation from 'src/account/GoldEducation'
 import { default as InviteScreen } from 'src/account/Invite'
 import {
   defaultCountryCodeSelector,
@@ -25,6 +26,7 @@ import {
 } from 'src/account/selectors'
 import Support from 'src/account/Support'
 import BackupIntroduction from 'src/backup/BackupIntroduction'
+import AccountNumber from 'src/components/AccountNumber'
 import ExchangeHomeScreen from 'src/exchange/ExchangeHomeScreen'
 import WalletHome from 'src/home/WalletHome'
 import { Namespaces } from 'src/i18n'
@@ -61,10 +63,12 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
       <View style={styles.drawerTop}>
         <ContactCircle thumbnailPath={contactDetails.thumbnailPath} name={null} size={64} />
         <Text style={styles.nameLabel}>{displayName}</Text>
-        <PhoneNumberWithFlag
-          e164PhoneNumber={e164PhoneNumber}
-          defaultCountryCode={defaultCountryCode}
-        />
+        {e164PhoneNumber && (
+          <PhoneNumberWithFlag
+            e164PhoneNumber={e164PhoneNumber}
+            defaultCountryCode={defaultCountryCode ? defaultCountryCode : undefined}
+          />
+        )}
         <View style={styles.border} />
         <Text style={fontStyles.regular500}>{`${symbol} ${localBalance?.toFixed(2)}`}</Text>
         <Text style={[styles.smallLabel, styles.dollarsLabel]}>{`${bigNumBalance?.toFixed(2)} ${t(
@@ -76,16 +80,8 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
       <View style={styles.drawerBottom}>
         <Text style={fontStyles.label}>Account No.</Text>
         <View style={styles.accountOuterContainer}>
-          <Text style={styles.smallLabel}>0x</Text>
           <View style={styles.accountInnerContainer}>
-            <Text style={styles.smallLabel}>{`${account?.slice(2, 6)} ${account?.slice(
-              6,
-              10
-            )} ${account?.slice(10, 14)} ${account?.slice(14, 18)}`}</Text>
-            <Text style={styles.smallLabel}>{`${account?.slice(18, 22)} ${account?.slice(
-              22,
-              26
-            )} ${account?.slice(26, 30)} ${account?.slice(30, 34)}`}</Text>
+            <AccountNumber address={account || ''} />
           </View>
         </View>
         <Text style={styles.smallLabel}>{`Version ${appVersion}`}</Text>
@@ -96,6 +92,8 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
 
 export default function DrawerNavigator() {
   const { t } = useTranslation(Namespaces.global)
+  const isCeloEducationComplete = useSelector((state) => state.goldToken.educationCompleted)
+
   const drawerContent = (props: DrawerContentComponentProps<DrawerContentOptions>) => (
     <CustomDrawerContent {...props} />
   )
@@ -116,8 +114,8 @@ export default function DrawerNavigator() {
         options={{ title: t('home'), drawerIcon: Home }}
       />
       <Drawer.Screen
-        name={Screens.ExchangeHomeScreen}
-        component={ExchangeHomeScreen}
+        name={isCeloEducationComplete ? Screens.ExchangeHomeScreen : Screens.GoldEducation}
+        component={isCeloEducationComplete ? ExchangeHomeScreen : GoldEducation}
         options={{ title: t('celoGold'), drawerIcon: Gold }}
       />
       <Drawer.Screen

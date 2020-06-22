@@ -17,6 +17,7 @@ import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
 import { CURRENCY_ENUM } from 'src/geth/consts'
+import { refreshAllBalances } from 'src/home/actions'
 import i18n from 'src/i18n'
 import { setHasSeenVerificationNux, updateE164PhoneNumberAddresses } from 'src/identity/actions'
 import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
@@ -47,7 +48,7 @@ import Logger from 'src/utils/Logger'
 import {
   addLocalAccount,
   getContractKit,
-  getContractKitOutsideGenerator,
+  getContractKitAsync,
   web3ForUtils,
 } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
@@ -56,7 +57,7 @@ import { fornoSelector } from 'src/web3/selectors'
 const TAG = 'invite/saga'
 export const TEMP_PW = 'ce10'
 export const REDEEM_INVITE_TIMEOUT = 2 * 60 * 1000 // 2 minutes
-const INVITE_FEE = '0.25'
+export const INVITE_FEE = '0.25'
 
 export async function getInviteTxGas(
   account: string,
@@ -64,13 +65,17 @@ export async function getInviteTxGas(
   amount: BigNumber.Value,
   comment: string
 ) {
-  const contractKit = await getContractKitOutsideGenerator()
-  const escrowContract = await contractKit.contracts.getEscrow()
-  return getSendTxGas(account, currency, {
-    amount,
-    comment,
-    recipientAddress: escrowContract.address,
-  })
+  try {
+    const contractKit = await getContractKitAsync()
+    const escrowContract = await contractKit.contracts.getEscrow()
+    return getSendTxGas(account, currency, {
+      amount,
+      comment,
+      recipientAddress: escrowContract.address,
+    })
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function getInviteFee(
@@ -79,8 +84,12 @@ export async function getInviteFee(
   amount: string,
   comment: string
 ) {
-  const gas = await getInviteTxGas(account, currency, amount, comment)
-  return (await calculateFee(gas)).plus(getInvitationVerificationFeeInWei())
+  try {
+    const gas = await getInviteTxGas(account, currency, amount, comment)
+    return (await calculateFee(gas)).plus(getInvitationVerificationFeeInWei())
+  } catch (error) {
+    throw error
+  }
 }
 
 export function getInvitationVerificationFeeInDollars() {
@@ -334,6 +343,7 @@ export function* skipInvite() {
   Logger.debug(TAG + '@skipInvite', 'Skip invite action taken, creating account')
   try {
     yield call(getOrCreateAccount)
+    yield put(refreshAllBalances())
     yield put(setHasSeenVerificationNux(true))
     Logger.debug(TAG + '@skipInvite', 'Done skipping invite')
     navigateHome()
