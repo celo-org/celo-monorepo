@@ -251,11 +251,10 @@ const DefaultConfig = {
     maxGroupSize: 5,
     slashingPenaltyResetPeriod: 30 * DAY,
 
-    // Register a number of cLabs groups to contain an initial set of validators to run test
-    // networks.
+    // Register cLabs groups to contain an initial set of validators to run test networks.
     validatorKeys: [],
     attestationKeys: [],
-    groupName: 'C-Labs',
+    groupName: 'cLabs',
     commission: 0.1,
     votesRatioOfLastVsFirstGroup: 2.0,
   },
@@ -334,15 +333,20 @@ const NetworkConfigs = {
     },
   },
   baklava: {
-    blockchainParameters: {
-      minimumClientVersion: {
-        major: 0,
-        minor: 10,
-        patch: 0,
-      },
-    },
     election: {
-      minElectableValidators: '25', // About half of the expected genesis set.
+      frozen: false,
+    },
+    epochRewards: {
+      targetVotingYieldParameters: {
+        initial: 1.06,
+      },
+      frozen: false,
+    },
+    exchange: {
+      frozen: false,
+    },
+    goldToken: {
+      frozen: false,
     },
     governance: {
       // Set to be able to complete a proposal in about a day, but give everyone a chance to participate.
@@ -350,9 +354,23 @@ const NetworkConfigs = {
       approvalStageDuration: 4 * HOUR,
       referendumStageDuration: DAY,
       executionStageDuration: WEEK,
+      participationBaseline: 1 / 200, // Very low participation requirement given its a testnet.
+      participationBaselineFloor: 1 / 100,
+      participationBaselineUpdateFactor: 1 / 5,
+      participationBaselineQuorumFactor: 1,
+    },
+    governanceApproverMultiSig: {
+      signatories: [network.from],
+      numRequiredConfirmations: 1,
+      numInternalRequiredConfirmations: 1,
     },
     lockedGold: {
       unlockingPeriod: 6 * HOUR, // 1/12 of the mainnet period.
+    },
+    reserveSpenderMultiSig: {
+      signatories: [network.from],
+      numRequiredConfirmations: 1,
+      numInternalRequiredConfirmations: 1,
     },
     stableToken: {
       oracles: [
@@ -367,6 +385,7 @@ const NetworkConfigs = {
         '0x44740e3eedfD3a2A2e7662de9165a6E20bBcC72C',
         '0x7a2cb0438e7B9801C29B39Ff94439aFf930CDf9F',
       ],
+      frozen: false,
     },
     validators: {
       groupLockedGoldRequirements: {
@@ -376,6 +395,7 @@ const NetworkConfigs = {
         duration: 5 * DAY, // 1/12 of the mainnet duration.
       },
       membershipHistoryLength: 15, // Number of epochs in the group lockup period.
+      votesRatioOfLastVsFirstGroup: 1.0,
     },
   },
   alfajores: {
