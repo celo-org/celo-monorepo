@@ -4,7 +4,7 @@ Templates to facilitate deployment of new signers on Azure.
 
 ## Prequisites
 
-This setup assumes you've got the Azure CLI installed and that you've already created the KeyVault with the secret.
+This setup assumes you've got the Azure CLI installed and that you've already created the Key Vault with the secret.
 
 ## Choose subscription and resource group
 
@@ -32,10 +32,10 @@ az postgres db create \
 az postgres db list --resource-group $RESOURCE_GROUP --server-name $SERVER_NAME
 ```
 
-To enable connection from the container instance, its default Connection Security settings need to be changed to "Allow access to Azure services".
+To enable connection from the container instance, the default Connection Security settings of the database need to be changed to "Allow access to Azure services".
 TODO find a way to do this via the Azure CLI. Use the portal for now.
 
-You'll also need to run the db migrations, either via a special docker command or by temporarily whitelisting your dev box (see parent [Readme](../Readme.md))
+You'll also need to run the db migrations, either via a special docker command or by temporarily whitelisting your dev box (see parent [Readme](../README.md))
 
 ## Deploy the container instance and give it keyvault perms
 
@@ -59,4 +59,15 @@ az keyvault set-policy \
   --resource-group $RESOURCE_GROUP \
   --object-id $SVC_PRINCIPAL_ID \
   --secret-permissions get
+```
+
+## Deploy the front door for TLS Termination
+
+Fill in the params in `frontdoor-parameters.json` and then run the following:
+
+```bash
+az deployment group create \
+  --resource-group $RESOURCE_GROUP \
+  --template-file frontdoor-template.json \
+  --parameters @frontdoor-parameters.json
 ```
