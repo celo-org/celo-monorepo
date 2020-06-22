@@ -12,6 +12,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
   <View
     style={
       Object {
+        "alignItems": "center",
         "flexDirection": "column",
         "justifyContent": "center",
         "marginBottom": 10,
