@@ -86,4 +86,4 @@ const styles = StyleSheet.create({
 
 export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
   exitBackupFlow,
-})(withTranslation(Namespaces.backupKeyFlow6)(BackupComplete))
+})(withTranslation<Props>(Namespaces.backupKeyFlow6)(BackupComplete))
