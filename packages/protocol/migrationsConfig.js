@@ -61,9 +61,9 @@ const DefaultConfig = {
   },
   epochRewards: {
     targetVotingYieldParameters: {
-      initial: 0, // Change to (x + 1) ^ 365 = 1.06 once mainnet activated.
+      initial: 0, // Change to (x + 1) ^ 365 = 1.06 once Mainnet activated.
       max: 0.0005, // (x + 1) ^ 365 = 1.20
-      adjustmentFactor: 0, // Change to 1 / 3650 once mainnet activated.
+      adjustmentFactor: 0, // Change to 1 / 3650 once Mainnet activated.
     },
     rewardsMultiplierParameters: {
       max: 2,
@@ -98,10 +98,10 @@ const DefaultConfig = {
   },
   governance: {
     queueExpiry: 4 * WEEK,
-    dequeueFrequency: DAY, // Change to 1 week once mainnet activated
+    dequeueFrequency: DAY, // Change to 1 week once Mainnet activated
     concurrentProposals: 3,
-    approvalStageDuration: DAY, // Change to 3 days once mainnet activated
-    referendumStageDuration: 2 * DAY, // Change to 1 week once mainnet activated
+    approvalStageDuration: DAY, // Change to 3 days once Mainnet activated
+    referendumStageDuration: 2 * DAY, // Change to 1 week once Mainnet activated
     executionStageDuration: 3 * DAY,
     minDeposit: 100, // 100 cGLD
     participationBaseline: 5 / 100, // Start with low participation requirements, let the protocol adjust
@@ -367,7 +367,7 @@ const NetworkConfigs = {
       numInternalRequiredConfirmations: 1,
     },
     lockedGold: {
-      unlockingPeriod: 6 * HOUR, // 1/12 of the mainnet period.
+      unlockingPeriod: 6 * HOUR, // 1/12 of the Mainnet period.
     },
     reserve: {
       initialBalance: 100000000, // CELO
@@ -396,10 +396,10 @@ const NetworkConfigs = {
     },
     validators: {
       groupLockedGoldRequirements: {
-        duration: 15 * DAY, // 1/12 of the mainnet duration.
+        duration: 15 * DAY, // 1/12 of the Mainnet duration.
       },
       validatorLockedGoldRequirements: {
-        duration: 5 * DAY, // 1/12 of the mainnet duration.
+        duration: 5 * DAY, // 1/12 of the Mainnet duration.
       },
       membershipHistoryLength: 15, // Number of epochs in the group lockup period.
       votesRatioOfLastVsFirstGroup: 1.0,
