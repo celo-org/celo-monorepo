@@ -3,7 +3,7 @@ import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWr
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import { all, call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
-import { showError } from 'src/alert/actions'
+import { showError, showErrorOrFallback } from 'src/alert/actions'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ESCROW_PAYMENT_EXPIRY_SECONDS } from 'src/config'
@@ -19,6 +19,7 @@ import {
 } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { CURRENCY_ENUM, SHORT_CURRENCIES } from 'src/geth/consts'
+import { waitForNextBlock } from 'src/geth/saga'
 import i18n from 'src/i18n'
 import { Actions as IdentityActions, SetVerificationStatusAction } from 'src/identity/actions'
 import { addressToE164NumberSelector } from 'src/identity/reducer'
@@ -34,7 +35,7 @@ import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import { TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
-import { getContractKit, getContractKitOutsideGenerator, web3ForUtils } from 'src/web3/contracts'
+import { getContractKit, getContractKitAsync, web3ForUtils } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { estimateGas } from 'src/web3/utils'
 
@@ -80,11 +81,7 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
     yield put(fetchSentEscrowPayments())
   } catch (e) {
     Logger.error(TAG + '@transferToEscrow', 'Error transfering to escrow', e)
-    if (e.message === ErrorMessages.INCORRECT_PIN) {
-      yield put(showError(ErrorMessages.INCORRECT_PIN))
-    } else {
-      yield put(showError(ErrorMessages.ESCROW_TRANSFER_FAILED))
-    }
+    yield put(showErrorOrFallback(e, ErrorMessages.ESCROW_TRANSFER_FAILED))
   }
 }
 
@@ -164,7 +161,7 @@ function* withdrawFromEscrow() {
 }
 
 async function createReclaimTransaction(paymentID: string) {
-  const contractKit = await getContractKitOutsideGenerator()
+  const contractKit = await getContractKitAsync()
 
   const escrow = await contractKit.contracts.getEscrow()
   return escrow.revoke(paymentID).txo
@@ -295,6 +292,9 @@ export function* watchVerificationEnd() {
   while (true) {
     const update: SetVerificationStatusAction = yield take(IdentityActions.SET_VERIFICATION_STATUS)
     if (update.status === VerificationStatus.Done) {
+      // We wait for the next block because escrow can not
+      // be redeemed without all the attestations completed
+      yield waitForNextBlock()
       yield call(withdrawFromEscrow)
     }
   }

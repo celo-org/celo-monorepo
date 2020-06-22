@@ -115,6 +115,7 @@ async function ensurePincode(): Promise<boolean> {
       return false
     }
   }
+
   return true
 }
 
@@ -122,7 +123,7 @@ export const navigateProtected: SafeNavigate = (...args) => {
   ensurePincode()
     .then((ensured) => {
       if (ensured) {
-        navigate(...args)
+        replace(...args)
       }
     })
     .catch((error) => {

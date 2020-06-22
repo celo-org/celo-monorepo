@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import { call } from 'redux-saga/effects'
 import { GAS_INFLATION_FACTOR } from 'src/config'
 import Logger from 'src/utils/Logger'
-import { getContractKit, getContractKitOutsideGenerator } from 'src/web3/contracts'
+import { getContractKit, getContractKitAsync } from 'src/web3/contracts'
 import { Tx } from 'web3-core'
 import { TransactionObject } from 'web3-eth'
 
@@ -11,7 +11,7 @@ const TAG = 'web3/utils'
 
 // Estimate gas taking into account the configured inflation factor
 export async function estimateGas(txObj: TransactionObject<any>, txParams: Tx) {
-  const web3 = (await getContractKitOutsideGenerator()).web3
+  const web3 = (await getContractKitAsync()).web3
   const gasEstimator = (_tx: Tx) => txObj.estimateGas({ ..._tx })
   const getCallTx = (_tx: Tx) => {
     // @ts-ignore missing _parent property from TransactionObject type.
@@ -27,8 +27,14 @@ export async function estimateGas(txObj: TransactionObject<any>, txParams: Tx) {
 // Note: This returns Promise<Block>
 export async function getLatestBlock() {
   Logger.debug(TAG, 'Getting latest block')
-  const contractKit = await getContractKitOutsideGenerator()
+  const contractKit = await getContractKitAsync()
   return contractKit.web3.eth.getBlock('latest')
+}
+
+export async function getLatestBlockNumber() {
+  Logger.debug(TAG, 'Getting latest block number')
+  const contractKit = await getContractKitAsync()
+  return contractKit.web3.eth.getBlockNumber()
 }
 
 export function* getLatestNonce(address: string) {

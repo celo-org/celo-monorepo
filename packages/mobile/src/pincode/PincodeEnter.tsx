@@ -9,43 +9,37 @@ import { WithTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
-import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import Pincode from 'src/pincode/Pincode'
-import { ensureCorrectPin, isPinValid, PIN_LENGTH } from 'src/pincode/utils'
+import { ensureCorrectPin } from 'src/pincode/utils'
 import { RootState } from 'src/redux/reducers'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 interface State {
   pin: string
+  errorText: string | undefined
 }
 
 interface StateProps {
   currentAccount: string | null
 }
 
-interface DispatchProps {
-  showError: typeof showError
-}
-
-type Props = StateProps &
-  DispatchProps &
-  WithTranslation &
-  StackScreenProps<StackParamList, Screens.PincodeEnter>
+type Props = StateProps & WithTranslation & StackScreenProps<StackParamList, Screens.PincodeEnter>
 
 class PincodeEnter extends React.Component<Props, State> {
   static navigationOptions = { gestureEnabled: false, ...nuxNavigationOptions }
 
   state = {
     pin: '',
+    errorText: undefined,
   }
 
   onChangePin = (pin: string) => {
-    this.setState({ pin })
+    this.setState({ pin, errorText: undefined })
   }
 
   onCorrectPin = (pin: string) => {
@@ -56,8 +50,7 @@ class PincodeEnter extends React.Component<Props, State> {
   }
 
   onWrongPin = () => {
-    this.props.showError(ErrorMessages.INCORRECT_PIN)
-    this.setState({ pin: '' })
+    this.setState({ pin: '', errorText: this.props.t(ErrorMessages.INCORRECT_PIN) })
   }
 
   onPressConfirm = () => {
@@ -75,18 +68,15 @@ class PincodeEnter extends React.Component<Props, State> {
 
   render() {
     const { t } = this.props
-    const { pin } = this.state
+    const { pin, errorText } = this.state
     return (
       <SafeAreaView style={style.container}>
         <Pincode
           title={t('confirmPin.title')}
-          placeholder={t('createPin.yourPin')}
-          buttonText={t('global:submit')}
-          isPinValid={isPinValid}
-          onPress={this.onPressConfirm}
+          errorText={errorText}
           pin={pin}
           onChangePin={this.onChangePin}
-          maxLength={PIN_LENGTH}
+          onCompletePin={this.onPressConfirm}
         />
       </SafeAreaView>
     )
@@ -105,6 +95,6 @@ const mapStateToProps = (state: RootState): StateProps => ({
   currentAccount: currentAccountSelector(state),
 })
 
-export default connect(mapStateToProps, { showError })(
-  withTranslation(Namespaces.nuxNamePin1)(PincodeEnter)
+export default connect(mapStateToProps)(
+  withTranslation<Props>(Namespaces.nuxNamePin1)(PincodeEnter)
 )

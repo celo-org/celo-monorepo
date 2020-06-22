@@ -48,7 +48,7 @@ import Logger from 'src/utils/Logger'
 import {
   getConnectedWallet,
   getContractKit,
-  getContractKitOutsideGenerator,
+  getContractKitAsync,
   web3ForUtils,
 } from 'src/web3/contracts'
 import { getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
@@ -65,7 +65,7 @@ export async function getInviteTxGas(
   comment: string
 ) {
   try {
-    const contractKit = await getContractKitOutsideGenerator()
+    const contractKit = await getContractKitAsync()
     const escrowContract = await contractKit.contracts.getEscrow()
     return getSendTxGas(account, currency, {
       amount,

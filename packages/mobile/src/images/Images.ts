@@ -34,4 +34,5 @@ export const ringsPlusCircle = require('src/images/rings-plus-circle.png')
 export const contactPermission = require('src/images/contact-permission.png')
 export const exchangeGoldGreen = require('src/images/exchangeGoldGreen.png')
 export const exchangeGreenGold = require('src/images/exchangeGreenGold.png')
+export const moonpayLogo = require('src/images/fiat-providers/moonpay.png')
 // it looks like jests tests fail when a sub component references image via this file rather than require direct

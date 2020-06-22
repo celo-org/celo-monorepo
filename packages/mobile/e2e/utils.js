@@ -60,14 +60,12 @@ export function enterPin() {
 }
 
 export async function enterPinUi() {
-  await expect(element(by.id('Pincode-Submit'))).toBeVisible()
+  await expect(element(by.id(`digit1`))).toBeVisible()
 
   for (const digit of DEFAULT_PIN) {
     //await expect(element(by.text(digit))).toBeVisible()
     await element(by.id(`digit${digit}`)).tap()
   }
-
-  await element(by.id('Pincode-Submit')).tap()
 }
 
 export async function inputNumberKeypad(amount) {

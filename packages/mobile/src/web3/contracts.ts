@@ -3,7 +3,6 @@ import { RpcWallet } from '@celo/contractkit/lib/wallets/rpc-wallet'
 import { Platform } from 'react-native'
 import * as net from 'react-native-tcp'
 import { call, select, take } from 'redux-saga/effects'
-import sleep from 'sleep-promise'
 import { DEFAULT_FORNO_URL } from 'src/config'
 import { IPC_PATH } from 'src/geth/geth'
 import { waitForGethConnectivity } from 'src/geth/saga'
@@ -51,21 +50,7 @@ export function* getConnectedWallet() {
 
 // Workaround as contractKit logic is still used outside generators
 // Moving towards generators to allow us to block contractKit calls, see https://github.com/celo-org/celo-monorepo/issues/3727
-export async function getContractKitOutsideGenerator() {
-  // Poll store until rehydrated
-  while (!store) {
-    Logger.debug(`getContractKitOutsideGenerator`, `Still waiting for store...`)
-    await sleep(250) // Every 0.25 seconds
-  }
-  // Use store to ensure ContractKit is ready
-  while (!contractKitReadySelector(store.getState())) {
-    Logger.debug(`getContractKitOutsideGenerator`, `ContractKit is still locked...`)
-    await sleep(250) // Every 0.25 seconds
-  }
-
-  Logger.debug(`${tag}@getContractKitOutsideGenerator`, 'ContractKit ready, returning')
-  return getContractKitBasedOnFornoInStore()
-}
+export const getContractKitAsync = async () => promisifyGenerator(getContractKit())
 
 export function* getContractKit() {
   // No need to waitForRehydrate as contractKitReady set to false for every app reopen
@@ -73,10 +58,6 @@ export function* getContractKit() {
     // If contractKit locked, wait until unlocked
     yield take(Actions.SET_CONTRACT_KIT_READY)
   }
-  return getContractKitBasedOnFornoInStore()
-}
-
-export function getContractKitBasedOnFornoInStore() {
   const forno = fornoSelector(store.getState())
   return forno ? contractKitForno : contractKitGeth
 }

@@ -24,7 +24,7 @@ import {
   startVerification,
   VERIFICATION_TIMEOUT,
 } from 'src/identity/verification'
-import { getContractKitOutsideGenerator } from 'src/web3/contracts'
+import { getContractKitAsync } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { privateCommentKeySelector } from 'src/web3/selectors'
 import { sleep } from 'test/utils'
@@ -197,7 +197,7 @@ describe('Start Verification Saga', () => {
 
 describe('Do Verification Saga', () => {
   it('succeeds for unverified users', async () => {
-    const contractKit = await getContractKitOutsideGenerator()
+    const contractKit = await getContractKitAsync()
     await expectSaga(doVerificationFlow)
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
@@ -230,7 +230,7 @@ describe('Do Verification Saga', () => {
   })
 
   it('succeeds for partly verified users', async () => {
-    const contractKit = await getContractKitOutsideGenerator()
+    const contractKit = await getContractKitAsync()
     // @ts-ignore Jest mock
     contractKit.contracts.getAttestations.mockReturnValue(mockAttestationsWrapperPartlyVerified)
     // @ts-ignore Jest mock
@@ -255,7 +255,7 @@ describe('Do Verification Saga', () => {
   })
 
   it('succeeds for verified users', async () => {
-    const contractKit = await getContractKitOutsideGenerator()
+    const contractKit = await getContractKitAsync()
     await expectSaga(doVerificationFlow)
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
@@ -277,7 +277,7 @@ describe('Do Verification Saga', () => {
   })
 
   it('shows error on unexpected failure', async () => {
-    const contractKit = await getContractKitOutsideGenerator()
+    const contractKit = await getContractKitAsync()
     await expectSaga(doVerificationFlow)
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
@@ -306,7 +306,7 @@ describe('Do Verification Saga', () => {
         throw new Error('Reveal error')
       }),
     }
-    const contractKit = await getContractKitOutsideGenerator()
+    const contractKit = await getContractKitAsync()
 
     await expectSaga(doVerificationFlow)
       .provide([
