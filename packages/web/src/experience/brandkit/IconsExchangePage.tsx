@@ -102,7 +102,7 @@ function Overview() {
           text={t('logo.overviewBtn')}
           style={standardStyles.elementalMarginTop}
           onPress={onPressDownload}
-          href="/assets/CeloMarketplaceIcons.zip"
+          href="/assets/marketplace-icons/CeloMarketplaceIcons.zip"
         />
       </View>
       <CCLicense textI18nKey="exchangeIcons.license" />
