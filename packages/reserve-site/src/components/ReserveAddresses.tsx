@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core'
-import CopyIcon from 'components/CopyIcon'
 import * as React from 'react'
+import CopyIcon from 'src/components/CopyIcon'
 
 interface Props {
   dai: string

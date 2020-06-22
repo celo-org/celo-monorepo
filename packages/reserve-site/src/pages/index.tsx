@@ -1,14 +1,14 @@
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core'
-import Footer from 'components/Footer'
-import Head from 'components/Head'
-import Holdings from 'components/Holdings'
-import NavBar from 'components/Navbar'
-import ReserveAddresses from 'components/ReserveAddresses'
-import Section from 'components/Section'
-import { flexCol } from 'components/styles'
-import TargetGraph from 'components/TargetGraph'
-import { Addresses, HoldingsData } from 'service/Data'
+import Footer from 'src/components/Footer'
+import Head from 'src/components/Head'
+import Holdings from 'src/components/Holdings'
+import NavBar from 'src/components/Navbar'
+import ReserveAddresses from 'src/components/ReserveAddresses'
+import Section from 'src/components/Section'
+import { flexCol } from 'src/components/styles'
+import TargetGraph from 'src/components/TargetGraph'
+import { Addresses, HoldingsData } from 'src/service/Data'
 
 interface Props {
   INTRO: any
@@ -102,10 +102,12 @@ const dateStyle = css({ marginBottom: 36, display: 'block' })
 const containerStyle = css(flexCol, { flex: 1, width: '100%', alignItems: 'center' })
 
 export async function getStaticProps() {
-  const about = await import('content/home/about.md').then((mod) => mod.default)
-  const attestations = await import('content/home/attestations.md').then((mod) => mod.default)
-  const initialTarget = await import('content/home/initial-target.md').then((mod) => mod.default)
-  const intro = await import('content/home/intro.md').then((mod) => mod.default)
+  const about = await import('src/content/home/about.md').then((mod) => mod.default)
+  const attestations = await import('src/content/home/attestations.md').then((mod) => mod.default)
+  const initialTarget = await import('src/content/home/initial-target.md').then(
+    (mod) => mod.default
+  )
+  const intro = await import('src/content/home/intro.md').then((mod) => mod.default)
   const matter = await import('front-matter').then((mod) => mod.default)
 
   const INTRO = matter<{ title: string }>(intro)
@@ -113,8 +115,8 @@ export async function getStaticProps() {
   const ABOUT = matter<{ title: string }>(about)
   const ATTESTATIONS = matter<{ title: string }>(attestations)
 
-  const fetchData = await import('service/holdings').then((mod) => mod.default)
-  const fetchAddresses = await import('service/addresses').then((mod) => mod.default)
+  const fetchData = await import('src/service/holdings').then((mod) => mod.default)
+  const fetchAddresses = await import('src/service/addresses').then((mod) => mod.default)
 
   const [addresses, holdings] = await Promise.all([fetchAddresses(), fetchData()])
   return {

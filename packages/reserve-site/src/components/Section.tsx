@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core'
-import Markdown from 'components/Markdown'
 import * as React from 'react'
+import Markdown from 'src/components/Markdown'
 
 interface Props {
   title: string

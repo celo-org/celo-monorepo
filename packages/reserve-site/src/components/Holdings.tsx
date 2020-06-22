@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core'
-import { HoldingsData } from 'service/Data'
+import { HoldingsData } from 'src/service/Data'
 import Button from './Button'
 
 export default function Holdings(props: Omit<HoldingsData, 'updatedDate'>) {

@@ -1,5 +1,5 @@
-import getAirtable, { Record, TableNames } from 'service/airtable'
-import { Addresses } from 'service/Data'
+import getAirtable, { Record, TableNames } from 'src/service/airtable'
+import { Addresses } from 'src/service/Data'
 const IS_LIVE = 'live=1'
 
 interface Fields {

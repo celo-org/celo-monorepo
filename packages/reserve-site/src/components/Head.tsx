@@ -1,7 +1,7 @@
 import { css, Global } from '@emotion/core'
 import NextHead from 'next/head'
-import colors from 'components/colors'
-import description from 'content/meta-description.md'
+import colors from 'src/components/colors'
+import description from 'src/content/meta-description.md'
 
 const garamond = 'EB Garamond, eb-garamond, Garamond, serif'
 
