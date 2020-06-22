@@ -332,4 +332,4 @@ const styles = StyleSheet.create({
 export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.nuxVerification2)(VerificationInputScreen))
+)(withTranslation<Props>(Namespaces.nuxVerification2)(VerificationInputScreen))

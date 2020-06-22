@@ -62,4 +62,4 @@ export function Avatar(props: Props) {
   )
 }
 
-export default withTranslation(Namespaces.sendFlow7)(Avatar)
+export default withTranslation<Props>(Namespaces.sendFlow7)(Avatar)

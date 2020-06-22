@@ -37,6 +37,10 @@ export const ALERT_BANNER_DURATION = 5000
 export const NUMBER_INPUT_MAX_DECIMALS = 2
 export const MAX_COMMENT_LENGTH = 70
 export const INPUT_DEBOUNCE_TIME = 1000 // milliseconds
+// The minimum allowed value to add funds
+export const DOLLAR_ADD_FUNDS_MIN_AMOUNT = 0.01
+// The minimum allowed value to cash out
+export const DOLLAR_CASH_OUT_MIN_AMOUNT = 0.01
 // The minimum allowed value for a transaction such as a transfer
 export const DOLLAR_TRANSACTION_MIN_AMOUNT = 0.01
 export const GOLD_TRANSACTION_MIN_AMOUNT = 0.001
@@ -71,6 +75,7 @@ export const DEFAULT_SYNC_MODE: GethSyncMode = Config.DEFAULT_SYNC_MODE
   : GethSyncMode.Lightest
 // TODO Remove when feature is stable
 export const USE_PHONE_NUMBER_PRIVACY = true
+export const SHOW_CASH_OUT = stringToBoolean(Config.SHOW_CASH_OUT || 'false')
 
 // SECRETS
 export const SEGMENT_API_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SEGMENT_API_KEY')
