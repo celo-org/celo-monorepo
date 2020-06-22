@@ -1,8 +1,7 @@
 import * as React from 'react'
-import { fireEvent, render } from 'react-native-testing-library'
+import { fireEvent, flushMicrotasksQueue, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { Screens } from 'src/navigator/Screens'
 import PincodeEnter from 'src/pincode/PincodeEnter'
@@ -13,6 +12,8 @@ const mockScreenProps = getMockStackScreenProps(Screens.PincodeEnter, {
   withVerification: true,
   onSuccess: jest.fn(),
 })
+
+const pin = '123456'
 
 describe('PincodeEnter', () => {
   it('renders correctly', () => {
@@ -25,8 +26,7 @@ describe('PincodeEnter', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  it('calls onSuccess when PIN is correct', (done) => {
-    const pin = '123456'
+  it('calls onSuccess when PIN is correct', async () => {
     ;(isPinCorrect as jest.Mock).mockResolvedValueOnce(pin)
     const store = createMockStore()
 
@@ -35,32 +35,26 @@ describe('PincodeEnter', () => {
         <PincodeEnter {...mockScreenProps} />
       </Provider>
     )
-    fireEvent.press(getByTestId('Pincode-Submit'))
 
-    jest.useRealTimers()
-    setTimeout(() => {
-      expect(mockScreenProps.route.params.onSuccess).toBeCalledWith(pin)
-      done()
-    })
-    jest.useFakeTimers()
+    pin.split('').forEach((number) => fireEvent.press(getByTestId(`digit${number}`)))
+    jest.runAllTimers()
+    await flushMicrotasksQueue()
+    expect(mockScreenProps.route.params.onSuccess).toBeCalledWith(pin)
   })
 
-  it('shows wrong PIN notification', (done) => {
+  it('shows wrong PIN notification', async () => {
     ;(isPinCorrect as jest.Mock).mockRejectedValueOnce('')
     const store = createMockStore()
 
-    const { getByTestId } = render(
+    const { getByTestId, getByText } = render(
       <Provider store={store}>
         <PincodeEnter {...mockScreenProps} />
       </Provider>
     )
-    fireEvent.press(getByTestId('Pincode-Submit'))
-
-    jest.useRealTimers()
-    setTimeout(() => {
-      expect(store.getActions()).toEqual([showError(ErrorMessages.INCORRECT_PIN)])
-      done()
-    })
-    jest.useFakeTimers()
+    pin.split('').forEach((number) => fireEvent.press(getByTestId(`digit${number}`)))
+    jest.runAllTimers()
+    await flushMicrotasksQueue()
+    expect(getByText(ErrorMessages.INCORRECT_PIN)).toBeDefined()
+    expect(store.getActions()).toEqual([])
   })
 })

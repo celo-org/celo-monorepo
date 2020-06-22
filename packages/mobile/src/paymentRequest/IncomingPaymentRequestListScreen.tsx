@@ -136,4 +136,4 @@ class IncomingPaymentRequestListScreen extends React.Component<Props> {
 export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.paymentRequestFlow)(IncomingPaymentRequestListScreen))
+)(withTranslation<Props>(Namespaces.paymentRequestFlow)(IncomingPaymentRequestListScreen))

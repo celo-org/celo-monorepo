@@ -16,7 +16,7 @@ export enum Actions {
   SET_BACKUP_COMPLETED_ACTION = 'ACCOUNT/SET_BACKUP_COMPLETED_ACTION',
   SET_BACKUP_DELAYED_ACTION = 'ACCOUNT/SET_BACKUP_DELAYED_ACTION',
   SET_SOCIAL_BACKUP_COMPLETED_ACTION = 'ACCOUNT/SET_SOCIAL_BACKUP_COMPLETED_ACTION',
-  RESET_BACKUP_STATE = 'ACCOUNT/RESET_BACKUP_STATE',
+  TOGGLE_BACKUP_STATE = 'ACCOUNT/TOGGLE_BACKUP_STATE',
   UPDATE_INCOMING_PAYMENT_REQUESTS = 'ACCOUNT/UPDATE_INCOMING_PAYMENT_REQUESTS',
   UPDATE_OUTGOING_PAYMENT_REQUESTS = 'ACCOUNT/UPDATE_OUTGOING_PAYMENT_REQUESTS',
   DISMISS_EARN_REWARDS = 'ACCOUNT/DISMISS_EARN_REWARDS',
@@ -82,8 +82,8 @@ export interface SetSocialBackupCompletedAction {
   type: Actions.SET_SOCIAL_BACKUP_COMPLETED_ACTION
 }
 
-export interface ResetBackupState {
-  type: Actions.RESET_BACKUP_STATE
+export interface ToggleBackupState {
+  type: Actions.TOGGLE_BACKUP_STATE
 }
 
 export interface UpdateIncomingPaymentRequestsAction {
@@ -136,7 +136,7 @@ export type ActionTypes =
   | SetBackupCompletedAction
   | SetBackupDelayedAction
   | SetSocialBackupCompletedAction
-  | ResetBackupState
+  | ToggleBackupState
   | DismissEarnRewardsAction
   | DismissInviteFriendsAction
   | DismissGetVerifiedAction
@@ -207,8 +207,8 @@ export const setSocialBackupCompleted = (): SetSocialBackupCompletedAction => ({
   type: Actions.SET_SOCIAL_BACKUP_COMPLETED_ACTION,
 })
 
-export const resetBackupState = (): ResetBackupState => ({
-  type: Actions.RESET_BACKUP_STATE,
+export const toggleBackupState = (): ToggleBackupState => ({
+  type: Actions.TOGGLE_BACKUP_STATE,
 })
 
 export const updateIncomingPaymentRequests = (

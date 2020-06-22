@@ -4,7 +4,7 @@ import colors from '@celo/react-components/styles/colors'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { StyleSheet, View } from 'react-native'
+import { SafeAreaView, StyleSheet, View } from 'react-native'
 import { connect } from 'react-redux'
 import { defaultCountryCodeSelector } from 'src/account/selectors'
 import { hideAlert, showError } from 'src/alert/actions'
@@ -152,9 +152,7 @@ class Invite extends React.Component<Props, State> {
 
   render() {
     return (
-      // Intentionally not using SafeAreaView here as RecipientPicker
-      // needs fullscreen rendering
-      <View style={style.container}>
+      <SafeAreaView style={style.container}>
         <DrawerTopBar />
         <View style={style.textInputContainer}>
           <InviteSearchInput
@@ -172,7 +170,7 @@ class Invite extends React.Component<Props, State> {
           onSelectRecipient={this.onSelectRecipient}
           listHeaderComponent={this.renderListHeader}
         />
-      </View>
+      </SafeAreaView>
     )
   }
 }
@@ -192,4 +190,4 @@ const style = StyleSheet.create({
 export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.sendFlow7)(Invite))
+)(withTranslation<Props>(Namespaces.sendFlow7)(Invite))

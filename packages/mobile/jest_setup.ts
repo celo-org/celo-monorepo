@@ -17,3 +17,6 @@ global.fetch = require('jest-fetch-mock')
 // Makes sure components are unmounted after each test
 // TODO: remove once https://github.com/callstack/react-native-testing-library/pull/238 is merged and we upgrade
 afterEach(cleanup)
+
+// Mock LayoutAnimation as it's done not automatically
+jest.mock('react-native/Libraries/LayoutAnimation/LayoutAnimation.js')
