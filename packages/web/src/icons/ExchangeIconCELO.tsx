@@ -30,15 +30,3 @@ export default React.memo(function ExchangeIconCELO({ size }: Props) {
     </Svg>
   )
 })
-
-// <?xml version="1.0" encoding="UTF-8"?>
-// <svg enable-background="new 0 0 100 100" version="1.1" viewBox="0 0 100 100" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
-// <style type="text/css">
-// 	.st0{fill:#FBCC5C;}
-// 	.st1{fill:;}
-// 	.st2{fill:;}
-// </style>
-// <desc>Symbol for the Celo native asset</desc>
-// <path class="st0" d="M0,0h100v100H0V0z"/>
-
-// </svg>
