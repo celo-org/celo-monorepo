@@ -73,6 +73,8 @@ const mapStateToProps = (state: RootState): StateProps => ({
   localCurrencyExchangeRate: getLocalCurrencyExchangeRate(state),
 })
 
+const safeAreaInset = { top: 'never' as 'never', bottom: 'always' as 'always' }
+
 export class ExchangeTradeScreen extends React.Component<Props, State> {
   state: State = {
     inputToken: CURRENCY_ENUM.GOLD,
@@ -281,7 +283,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
       <SafeAreaView
         // Force inset as this screen uses auto focus and KeyboardSpacer padding is initially
         // incorrect because of that
-        forceInset={{ top: 'never', bottom: 'always' }}
+        forceInset={safeAreaInset}
         style={styles.container}
       >
         <DisconnectBanner />
@@ -305,7 +307,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
               keyboardType={'decimal-pad'}
               onChangeText={this.onChangeExchangeAmount}
               value={this.getInputValue()}
-              placeholderTextColor={'#BDBDBD'}
+              placeholderTextColor={colors.gray3}
               placeholder={'0'}
               style={styles.currencyInput}
               testID="ExchangeInput"
@@ -351,7 +353,7 @@ export default connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateT
   fetchExchangeRate,
   showError,
   hideAlert,
-})(withTranslation(Namespaces.exchangeFlow9)(ExchangeTradeScreen))
+})(withTranslation<Props>(Namespaces.exchangeFlow9)(ExchangeTradeScreen))
 
 const styles = StyleSheet.create({
   container: {

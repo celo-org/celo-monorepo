@@ -14,18 +14,6 @@
       "By joining this network, you give us permission to collect anonymous information about how you use the app. Additionally, if you verify your phone number, an obfuscated copy of it will be stored on the Celo Network. Learn more at <0>celo.org/terms</0> ",
     "goldDisclaimer": "Please be aware that cGld is a digital asset whose value is not related to the value of physical gold.  Both cUSD and cGld are part of a new asset class and present a risk of financial loss.  Carefully consider your financial circumstances and tolerance for financial risk before purchasing either cGld or cUSD."
   },
-  "inviteCodeText": {
-    "title": "Enter Invite Code",
-    "body":
-      "If you have an invite code, please enter it here. You can copy and paste the entire message.",
-    "codeHeader": "Invite Code",
-    "codePlaceholder": "Celo code: am9hBM3tiA+CuNb...",
-    "noCode": "Don’t have a code? ",
-    "requestCodeNoFaucet": " Request an invite from a friend with a Celo Wallet or ",
-    "requestCodeFromFaucet": "Request an invite at ",
-    "faucetLink": "celo.org/app",
-    "skip": "continue without."
-  },
   "fullName": "Full Name",
   "fullNamePlaceholder": "First Last",
   "importIt": "Restore Existing Wallet",

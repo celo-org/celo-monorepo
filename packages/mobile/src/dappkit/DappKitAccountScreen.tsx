@@ -170,5 +170,5 @@ const styles = StyleSheet.create({
 })
 
 export default connect<StateProps, null, {}, RootState>(mapStateToProps)(
-  withTranslation(Namespaces.dappkit)(DappKitAccountAuthScreen)
+  withTranslation<Props>(Namespaces.dappkit)(DappKitAccountAuthScreen)
 )
