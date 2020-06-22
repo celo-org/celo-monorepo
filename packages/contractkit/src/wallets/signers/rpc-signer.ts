@@ -1,8 +1,7 @@
 import { ensureLeading0x, normalizeAddressWith0x, trimLeading0x } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import BN from 'bn.js'
-import { Tx } from 'web3-core'
-import { JsonRpcResponse } from 'web3-core-helpers'
+import { EncodedTransaction, Tx } from 'web3-core'
 import { RpcCaller } from '../../utils/rpc-caller'
 import { decodeSig } from '../../utils/signing-utils'
 import { Signer } from './signer'
@@ -17,6 +16,30 @@ const toRpcHex = (val: string | number | BigNumber | BN | undefined) => {
   } else {
     return '0x0'
   }
+}
+
+// TODO(yorke): move this into rpc-caller and generate typings from RPC spec
+enum RpcSignerEndpoint {
+  ImportAccount = 'personal_importRawKey',
+  UnlockAccount = 'personal_unlockAccount',
+  SignTransaction = 'eth_signTransaction',
+  SignBytes = 'eth_sign',
+}
+
+// tslint:disable-next-line: interface-over-type-literal
+type RpcSignerEndpointInputs = {
+  personal_importRawKey: [string, string]
+  personal_unlockAccount: [string, string, number]
+  eth_signTransaction: [any] // RpcTx doesn't match Tx because of nonce as string instead of number
+  eth_sign: [string, string]
+}
+
+// tslint:disable-next-line: interface-over-type-literal
+type RpcSignerEndpointResult = {
+  personal_importRawKey: string
+  personal_unlockAccount: boolean
+  eth_signTransaction: EncodedTransaction
+  eth_sign: string
 }
 
 /**
@@ -42,16 +65,13 @@ export class RpcSigner implements Signer {
     protected unlockDuration = -1
   ) {}
 
-  async init(privateKey: string, passphrase: string) {
-    const response = await this.rpc.call('personal_importRawKey', [
+  init = (privateKey: string, passphrase: string) =>
+    this.callAndCheckResponse(RpcSignerEndpoint.ImportAccount, [
       trimLeading0x(privateKey),
       passphrase,
     ])
-    this.checkResponse(response, 'init')
-    return response.result!
-  }
 
-  async signRawTransaction(tx: Tx): Promise<any> {
+  async signRawTransaction(tx: Tx) {
     if (normalizeAddressWith0x(tx.from! as string) !== this.account) {
       throw new Error(`RpcSigner cannot sign tx with 'from' ${tx.from}`)
     }
@@ -65,9 +85,7 @@ export class RpcSigner implements Signer {
       gasPrice: toRpcHex(tx.gasPrice),
       gatewayFee: toRpcHex(tx.gatewayFee),
     }
-    const response = await this.rpc.call('eth_signTransaction', [rpcTx])
-    this.checkResponse(response, 'signRawTransaction')
-    return response.result!
+    return this.callAndCheckResponse(RpcSignerEndpoint.SignTransaction, [rpcTx])
   }
 
   async signTransaction(): Promise<{ v: number; r: Buffer; s: Buffer }> {
@@ -75,31 +93,38 @@ export class RpcSigner implements Signer {
   }
 
   async signPersonalMessage(data: string): Promise<{ v: number; r: Buffer; s: Buffer }> {
-    const response = await this.rpc.call('eth_sign', [this.account, data])
-    this.checkResponse(response, 'signPersonalMessage')
-    return decodeSig(response.result!)
+    const result = await this.callAndCheckResponse(RpcSignerEndpoint.SignBytes, [
+      this.account,
+      data,
+    ])
+    return decodeSig(result)
   }
 
   getNativeKey = () => this.account
 
   async unlock(passphrase: string, duration: number) {
-    const response = await this.rpc.call('personal_unlockAccount', [
+    const unlocked = await this.callAndCheckResponse(RpcSignerEndpoint.UnlockAccount, [
       this.account,
       passphrase,
       duration,
     ])
-    this.checkResponse(response, 'unlock')
     this.unlockTime = currentTimeInSeconds()
     this.unlockDuration = duration
+    return unlocked
   }
 
   isUnlocked() {
     return this.unlockTime + this.unlockDuration - this.unlockBufferSeconds > currentTimeInSeconds()
   }
 
-  checkResponse(response: JsonRpcResponse, tag: string) {
+  private async callAndCheckResponse<T extends RpcSignerEndpoint>(
+    endpoint: T,
+    params: RpcSignerEndpointInputs[T]
+  ): Promise<RpcSignerEndpointResult[T]> {
+    const response = await this.rpc.call(endpoint, params)
     if (response.error) {
-      throw new Error(`RpcSigner@${tag} failed with \n'${(response.error as any).message}'`)
+      throw new Error(`RpcSigner@${endpoint} failed with \n'${(response.error as any).message}'`)
     }
+    return response.result! as RpcSignerEndpointResult[typeof endpoint]
   }
 }

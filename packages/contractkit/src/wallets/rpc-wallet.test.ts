@@ -1,9 +1,9 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
+import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/src/address'
-import { verifySignature } from '@celo/utils/src/signatureUtils'
 import net from 'net'
 import Web3 from 'web3'
-import { EncodedTransaction, Tx } from 'web3-core'
+import { Tx } from 'web3-core'
 import { newKit } from '../kit'
 import { recoverTransaction, verifyEIP712TypedDataSigner } from '../utils/signing-utils'
 import { RpcWallet } from './rpc-wallet'
@@ -50,7 +50,7 @@ export const TYPED_DATA = {
   },
 }
 
-export const PRIVATE_KEY1 = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
+export const PRIVATE_KEY1 = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abbdef'
 export const ACCOUNT_ADDRESS1 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY1))
 export const PRIVATE_KEY2 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890fdeccc'
 export const ACCOUNT_ADDRESS2 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY2))
@@ -58,25 +58,27 @@ export const ACCOUNT_ADDRESS2 = normalizeAddressWith0x(privateKeyToAddress(PRIVA
 const PASSPHRASE = 'ce10'
 const DURATION = 10000
 
-// ./build/bin/geth --alfajores --syncmode=lightest  --rpcapi=net,eth,web3,personal --verbosity 4
+// ./build/bin/geth --datadir=./envs/alfajoresstaging --syncmode=lightest --rpcapi=net,eth,web3,personal --networkid=1101
 describe.skip('rpc-wallet', () => {
   it('should work against local geth ipc', async () => {
-    const ipcUrl = '/Users/yorhodes/Library/Celo/alfajores/geth.ipc'
+    const ipcUrl = '/Users/yorhodes/celo/blockchain/envs/alfajoresstaging/geth.ipc'
     const ipcProvider = new Web3.providers.IpcProvider(ipcUrl, net)
     const wallet = new RpcWallet(ipcProvider)
     await wallet.init()
 
-    // const account = await wallet.addAccount(PRIVATE_KEY1, PASSPHRASE)
+    const account = await wallet.addAccount(PRIVATE_KEY1, PASSPHRASE)
+    await wallet.unlockAccount(account, PASSPHRASE, DURATION)
 
-    await wallet.unlockAccount(ACCOUNT_ADDRESS1, PASSPHRASE, DURATION)
+    const tx = {
+      from: ACCOUNT_ADDRESS1,
+      to: ACCOUNT_ADDRESS2,
+      value: 1000,
+    }
+
+    const result = await wallet.signTransaction(tx)
+    console.log(result)
 
     const kit = newKit(ipcUrl, wallet)
-    const result = await kit.web3.eth.signTransaction({
-      from: ACCOUNT_ADDRESS1,
-      to: '0x588e4b68193001e4d10928660ab4165b813717c0',
-      value: 1000,
-    })
-    console.log(result)
     const txResult = await kit.web3.eth.sendSignedTransaction(result.raw)
     console.log(txResult)
   })
@@ -139,7 +141,7 @@ testWithGanache('rpc-wallet', (web3) => {
           try {
             await rpcWallet.unlockAccount(ACCOUNT_ADDRESS1, 'wrong_passphrase', DURATION)
           } catch (e) {
-            expect(e.message).toContain('RpcSigner@unlock failed')
+            expect(e.message).toContain('Invalid password')
           }
         })
 
@@ -181,7 +183,7 @@ testWithGanache('rpc-wallet', (web3) => {
 
             // TODO(yorke): enable once fixed: https://github.com/celo-org/celo-monorepo/issues/4077
             test.skip('with same signer', async () => {
-              const signedTx: EncodedTransaction = await rpcWallet.signTransaction(celoTransaction)
+              const signedTx = await rpcWallet.signTransaction(celoTransaction)
               const [, recoveredSigner] = recoverTransaction(signedTx.raw)
               expect(normalizeAddressWith0x(recoveredSigner)).toBe(
                 normalizeAddressWith0x(ACCOUNT_ADDRESS1)
@@ -205,9 +207,7 @@ testWithGanache('rpc-wallet', (web3) => {
                 data: '0xabcdef',
               }
 
-              const signedTx: EncodedTransaction = await rpcWallet.signTransaction(
-                celoTransactionZeroPrefix
-              )
+              const signedTx = await rpcWallet.signTransaction(celoTransactionZeroPrefix)
               expect(signedTx.tx.s.startsWith('0x00')).toBeFalsy()
               const [, recoveredSigner] = recoverTransaction(signedTx.raw)
               expect(normalizeAddressWith0x(recoveredSigner)).toBe(

@@ -9,6 +9,11 @@ import { RemoteWallet } from './remote-wallet'
 import { RpcSigner } from './signers/rpc-signer'
 import { Signer } from './signers/signer'
 
+export enum RpcWalletErrors {
+  FetchAccounts = 'RpcWallet: failed to fetch accounts from server',
+  AccountAlreadyExists = 'RpcWallet: account already exists',
+}
+
 /*
  *   WARNING: This class should only be used with well-permissioned providers (ie IPC)
  *   to avoid sensitive user 'privateKey' and 'passphrase' information being exposed
@@ -25,7 +30,7 @@ export class RpcWallet extends RemoteWallet {
     const addressToSigner = new Map<string, Signer>()
     const resp = await this.rpc.call('eth_accounts', [])
     if (resp.error) {
-      throw new Error(`RpcWallet: failed to fetch accounts from server`)
+      throw new Error(RpcWalletErrors.FetchAccounts)
     }
     const accounts: string[] = resp.result!
     accounts.forEach((account) => {
@@ -35,13 +40,12 @@ export class RpcWallet extends RemoteWallet {
   }
 
   async addAccount(privateKey: string, passphrase: string): Promise<string> {
-    const formattedPrivateKey = ensureLeading0x(privateKey)
-    const address = normalizeAddressWith0x(privateKeyToAddress(formattedPrivateKey))
+    const address = normalizeAddressWith0x(privateKeyToAddress(ensureLeading0x(privateKey)))
     if (this.hasAccount(address)) {
-      throw new Error(`RpcWallet: account already exists`)
+      throw new Error(RpcWalletErrors.AccountAlreadyExists)
     }
     const signer = new RpcSigner(this.rpc, address)
-    const resultantAddress = await signer.init(formattedPrivateKey, passphrase)
+    const resultantAddress = await signer.init(privateKey, passphrase)
     this.addSigner(resultantAddress, signer)
     return resultantAddress
   }
@@ -61,7 +65,7 @@ export class RpcWallet extends RemoteWallet {
    * @param txParams Transaction to sign
    * @dev overrides WalletBase.signTransaction
    */
-  async signTransaction(txParams: Tx): Promise<any> {
+  async signTransaction(txParams: Tx) {
     // Get the signer from the 'from' field
     const fromAddress = txParams.from!.toString()
     const signer = this.getSigner(fromAddress) as RpcSigner
