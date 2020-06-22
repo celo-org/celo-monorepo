@@ -196,7 +196,7 @@ export function* doVerificationFlow() {
     return true
   } catch (error) {
     Logger.error(TAG, 'Error occured during verification flow', error)
-    CeloAnalytics.track(CustomEventNames.verification_error, { error })
+    CeloAnalytics.track(CustomEventNames.verification_error, { error: error.message })
     yield put(showErrorOrFallback(error, ErrorMessages.VERIFICATION_FAILURE))
     yield put(setVerificationStatus(VerificationStatus.Failed))
     return false
@@ -401,7 +401,7 @@ function attestationCodeReceiver(
       yield put(inputAttestationCode({ code, issuer }))
     } catch (error) {
       Logger.error(TAG + '@attestationCodeReceiver', 'Error processing attestation code', error)
-      CeloAnalytics.track(CustomEventNames.verification_error, { error })
+      CeloAnalytics.track(CustomEventNames.verification_error, { error: error.message })
       yield put(showError(ErrorMessages.INVALID_ATTESTATION_CODE))
     }
   }

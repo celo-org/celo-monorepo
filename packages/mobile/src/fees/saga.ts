@@ -93,7 +93,7 @@ export function* estimateFeeSaga({ feeType }: EstimateFeeAction) {
     }
   } catch (error) {
     Logger.error(`${TAG}/estimateFeeSaga`, 'Error estimating fee', error)
-    CeloAnalytics.track(CustomEventNames.estimate_fee_failed, { error, feeType })
+    CeloAnalytics.track(CustomEventNames.estimate_fee_failed, { error: error.message, feeType })
     yield put(showError(ErrorMessages.CALCULATE_FEE_FAILED))
   }
 }

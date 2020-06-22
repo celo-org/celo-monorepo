@@ -72,7 +72,7 @@ export function* doImportContactsWrapper({ doMatchmaking }: ImportContactsAction
     yield put(endImportContacts(true))
   } catch (error) {
     Logger.error(TAG, 'Error importing user contacts', error)
-    CeloAnalytics.track(CustomEventNames.import_contact_error, { error })
+    CeloAnalytics.track(CustomEventNames.import_contact_error, { error: error.message })
     yield put(showErrorOrFallback(error, ErrorMessages.IMPORT_CONTACTS_FAILED))
     yield put(endImportContacts(false))
   }

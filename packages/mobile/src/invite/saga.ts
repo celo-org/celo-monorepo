@@ -329,7 +329,7 @@ export function* doRedeemInvite(inviteCode: string) {
     return true
   } catch (e) {
     Logger.error(TAG + '@doRedeemInvite', 'Failed to redeem invite', e)
-    CeloAnalytics.track(CustomEventNames.redeem_invite_failed, { error: e })
+    CeloAnalytics.track(CustomEventNames.redeem_invite_failed, { error: e.message })
     if (e.message in ErrorMessages) {
       yield put(showError(e.message))
     } else {
@@ -351,7 +351,7 @@ export function* skipInvite() {
     navigateHome()
   } catch (e) {
     Logger.error(TAG, 'Failed to skip invite', e)
-    CeloAnalytics.track(CustomEventNames.invite_skip_failed, { error: e })
+    CeloAnalytics.track(CustomEventNames.invite_skip_failed, { error: e.message })
     yield put(showError(ErrorMessages.ACCOUNT_SETUP_FAILED))
   }
 }

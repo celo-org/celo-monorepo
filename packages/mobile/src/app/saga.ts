@@ -109,7 +109,7 @@ function* watchAppState() {
       Logger.debug(`${TAG}@monitorAppState`, `App changed state: ${newState}`)
       yield put(setAppState(newState))
     } catch (error) {
-      CeloAnalytics.track(CustomEventNames.app_state_error, { error })
+      CeloAnalytics.track(CustomEventNames.app_state_error, { error: error.message })
       Logger.error(`${TAG}@monitorAppState`, `App state Error`, error)
     } finally {
       if (yield cancelled()) {

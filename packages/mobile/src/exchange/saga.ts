@@ -76,7 +76,7 @@ export function* doFetchTobinTax({ makerAmount, makerToken }: FetchTobinTaxActio
     Logger.debug(TAG, `Retrieved Tobin tax rate: ${tobinTax}`)
     yield put(setTobinTax(tobinTax.toString()))
   } catch (error) {
-    CeloAnalytics.track(CustomEventNames.fetch_tobin_tax_failed, { error })
+    CeloAnalytics.track(CustomEventNames.fetch_tobin_tax_failed, { error: error.message })
     Logger.error(TAG, 'Error fetching Tobin tax', error)
     yield put(showError(ErrorMessages.CALCULATE_FEE_FAILED))
   }
@@ -140,7 +140,7 @@ export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
       })
     )
   } catch (error) {
-    CeloAnalytics.track(CustomEventNames.fetch_exchange_rate_failed, { error })
+    CeloAnalytics.track(CustomEventNames.fetch_exchange_rate_failed, { error: error.message })
     Logger.error(TAG, 'Error fetching exchange rate', error)
     yield put(showError(ErrorMessages.EXCHANGE_RATE_FAILED))
   }
@@ -276,7 +276,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     }
     yield call(sendAndMonitorTransaction, txId, tx, account)
   } catch (error) {
-    CeloAnalytics.track(CustomEventNames.exchange_failed, { error })
+    CeloAnalytics.track(CustomEventNames.exchange_failed, { error: error.message })
     Logger.error(TAG, 'Error doing exchange', error)
     const isDollarToGold = makerToken === CURRENCY_ENUM.DOLLAR
 
