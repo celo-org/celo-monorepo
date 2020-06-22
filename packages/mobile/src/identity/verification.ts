@@ -355,6 +355,7 @@ function attestationCodeReceiver(
   return function*(action: ReceiveAttestationMessageAction) {
     if (!action || !action.message) {
       Logger.error(TAG + '@attestationCodeReceiver', 'Received empty code. Ignoring.')
+      CeloAnalytics.track(CustomEventNames.verification_code_received, { context: 'Empty code' })
       return
     }
 
@@ -367,6 +368,9 @@ function attestationCodeReceiver(
       const existingCode = yield call(isCodeAlreadyAccepted, code)
       if (existingCode) {
         Logger.warn(TAG + '@attestationCodeReceiver', 'Code already exists in store, skipping.')
+        CeloAnalytics.track(CustomEventNames.verification_code_received, {
+          context: 'Code already exists',
+        })
         if (
           CodeInputType.MANUAL === action.inputType ||
           CodeInputType.DEEP_LINK === action.inputType
@@ -375,7 +379,7 @@ function attestationCodeReceiver(
         }
         return
       }
-
+      CeloAnalytics.track(CustomEventNames.verification_code_received)
       const issuer = yield call(
         [attestationsWrapper, attestationsWrapper.findMatchingIssuer],
         phoneHash,

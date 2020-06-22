@@ -117,7 +117,7 @@ export enum CustomEventNames {
   verification_revealed_attestation = 'verification_revealed_attestation',
   verification_reveal_error = 'verification_reveal_error',
   verification_wait_for_attestation_code = 'verification_wait_for_attestation_code',
-  verification_codes_received = 'verification_codes_received',
+  verification_code_received = 'verification_code_received',
   verification_complete_attestation = 'verification_complete_attestation',
   verification_completed_attestation = 'verification_completed_attestation',
   verification_manual_selected = 'verification_manual_selected',
