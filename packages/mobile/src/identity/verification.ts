@@ -110,6 +110,11 @@ export function* doVerificationFlow() {
         salt: undefined,
       }
     }
+    CeloAnalytics.track(CustomEventNames.verification_hash_retrieved, {
+      phoneHash,
+      address: account,
+    })
+
     const privDataKey = yield select(privateCommentKeySelector)
     const dataKey = compressedPubKey(hexToBuffer(privDataKey))
 
@@ -124,10 +129,7 @@ export function* doVerificationFlow() {
       contractKit.contracts.getAccounts,
     ])
 
-    CeloAnalytics.track(CustomEventNames.verification_setup, {
-      phoneHash,
-      address: account,
-    })
+    CeloAnalytics.track(CustomEventNames.verification_setup)
 
     // Get all relevant info about the account's verification status
     yield put(setVerificationStatus(VerificationStatus.GettingStatus))

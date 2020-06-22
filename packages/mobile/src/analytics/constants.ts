@@ -104,6 +104,7 @@ export enum CustomEventNames {
 
   // Verification event and sub-events
   verification_start = 'verification_start',
+  verification_hash_retrieved = 'verification_hash_retrieved',
   verification_setup = 'verification_setup',
   verification_get_status = 'verification_get_status',
   verification_request_attestations = 'verification_request_attestations',
