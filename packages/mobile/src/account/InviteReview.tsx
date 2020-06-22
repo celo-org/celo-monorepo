@@ -286,4 +286,4 @@ const styles = StyleSheet.create({
 export default connect<StateProps, DispatchProps, OwnProps, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.inviteFlow11)(InviteReview))
+)(withTranslation<Props>(Namespaces.inviteFlow11)(InviteReview))

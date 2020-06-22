@@ -190,4 +190,4 @@ const style = StyleSheet.create({
 export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.sendFlow7)(Invite))
+)(withTranslation<Props>(Namespaces.sendFlow7)(Invite))
