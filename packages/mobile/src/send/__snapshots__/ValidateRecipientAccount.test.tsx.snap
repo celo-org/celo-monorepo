@@ -142,10 +142,14 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
         >
           <View
             style={
-              Object {
-                "borderRadius": 100,
-                "overflow": "hidden",
-              }
+              Array [
+                Object {
+                  "overflow": "hidden",
+                },
+                Object {
+                  "borderRadius": 100,
+                },
+              ]
             }
           >
             <View
@@ -327,18 +331,20 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
             Array [
               Object {
                 "backgroundColor": "#FFFFFF",
-                "elevation": 12,
                 "padding": 16,
-                "shadowColor": "black",
-                "shadowOffset": Object {
-                  "height": 6,
-                  "width": 0,
-                },
-                "shadowOpacity": 0.3,
-                "shadowRadius": 9.600000000000001,
               },
               Object {
                 "borderRadius": 8,
+              },
+              Object {
+                "elevation": 12,
+                "shadowColor": "rgba(156, 164, 169, 0.4)",
+                "shadowOffset": Object {
+                  "height": 2,
+                  "width": 0,
+                },
+                "shadowOpacity": 1,
+                "shadowRadius": 12,
               },
               Array [
                 Object {
@@ -494,18 +500,20 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
                 Array [
                   Object {
                     "backgroundColor": "#FFFFFF",
-                    "elevation": 12,
                     "padding": 16,
-                    "shadowColor": "black",
-                    "shadowOffset": Object {
-                      "height": 6,
-                      "width": 0,
-                    },
-                    "shadowOpacity": 0.3,
-                    "shadowRadius": 9.600000000000001,
                   },
                   Object {
                     "borderRadius": 8,
+                  },
+                  Object {
+                    "elevation": 12,
+                    "shadowColor": "rgba(156, 164, 169, 0.4)",
+                    "shadowOffset": Object {
+                      "height": 2,
+                      "width": 0,
+                    },
+                    "shadowOpacity": 1,
+                    "shadowRadius": 12,
                   },
                   Array [
                     Object {
@@ -925,10 +933,14 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
         >
           <View
             style={
-              Object {
-                "borderRadius": 100,
-                "overflow": "hidden",
-              }
+              Array [
+                Object {
+                  "overflow": "hidden",
+                },
+                Object {
+                  "borderRadius": 100,
+                },
+              ]
             }
           >
             <View
@@ -1110,18 +1122,20 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
             Array [
               Object {
                 "backgroundColor": "#FFFFFF",
-                "elevation": 12,
                 "padding": 16,
-                "shadowColor": "black",
-                "shadowOffset": Object {
-                  "height": 6,
-                  "width": 0,
-                },
-                "shadowOpacity": 0.3,
-                "shadowRadius": 9.600000000000001,
               },
               Object {
                 "borderRadius": 8,
+              },
+              Object {
+                "elevation": 12,
+                "shadowColor": "rgba(156, 164, 169, 0.4)",
+                "shadowOffset": Object {
+                  "height": 2,
+                  "width": 0,
+                },
+                "shadowOpacity": 1,
+                "shadowRadius": 12,
               },
               Array [
                 Object {
@@ -1277,18 +1291,20 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                 Array [
                   Object {
                     "backgroundColor": "#FFFFFF",
-                    "elevation": 12,
                     "padding": 16,
-                    "shadowColor": "black",
-                    "shadowOffset": Object {
-                      "height": 6,
-                      "width": 0,
-                    },
-                    "shadowOpacity": 0.3,
-                    "shadowRadius": 9.600000000000001,
                   },
                   Object {
                     "borderRadius": 8,
+                  },
+                  Object {
+                    "elevation": 12,
+                    "shadowColor": "rgba(156, 164, 169, 0.4)",
+                    "shadowOffset": Object {
+                      "height": 2,
+                      "width": 0,
+                    },
+                    "shadowOpacity": 1,
+                    "shadowRadius": 12,
                   },
                   Array [
                     Object {

@@ -86,4 +86,4 @@ OutgoingPaymentRequestListScreen.navigationOptions = titleWithBalanceNavigationO
 export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
   cancelPaymentRequest,
   updatePaymentRequestNotified,
-})(withTranslation(Namespaces.paymentRequestFlow)(OutgoingPaymentRequestListScreen))
+})(withTranslation<Props>(Namespaces.paymentRequestFlow)(OutgoingPaymentRequestListScreen))

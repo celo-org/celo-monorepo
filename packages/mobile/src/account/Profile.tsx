@@ -83,5 +83,5 @@ const style = StyleSheet.create({
 })
 
 export default connect<StateProps, {}, OwnProps, RootState>(mapStateToProps)(
-  withTranslation(Namespaces.accountScreen10)(Profile)
+  withTranslation<Props>(Namespaces.accountScreen10)(Profile)
 )
