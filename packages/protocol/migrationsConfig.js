@@ -143,6 +143,8 @@ const DefaultConfig = {
     tobinTax: toFixed(0).toFixed(), // Tobin tax turned off to start
     tobinTaxReserveRatio: toFixed(0).toFixed(), // Tobin tax turned off to start
     dailySpendingRatio: toFixed(0.05).toFixed(), // 5%
+    frozenAssetsStartBalance: null,
+    frozenAssetsDays: null,
     spenders: [],
     otherAddresses: [
       '0x246f4599eFD3fA67AC44335Ed5e749E518Ffd8bB',
@@ -233,11 +235,11 @@ const DefaultConfig = {
   },
   validators: {
     groupLockedGoldRequirements: {
-      value: '10000000000000000000000', // 10k gold per validator
+      value: '10000000000000000000000', // 10k CELO per validator
       duration: 180 * DAY,
     },
     validatorLockedGoldRequirements: {
-      value: '10000000000000000000000', // 10k gold
+      value: '10000000000000000000000', // 10k CELO
       // MUST BE KEPT IN SYNC WITH MEMBERSHIP HISTORY LENGTH
       duration: 60 * DAY,
     },
@@ -329,7 +331,7 @@ const NetworkConfigs = {
       frozen: false,
     },
     reserve: {
-      initialBalance: 100000000,
+      initialBalance: 100000000, // CELO
     },
   },
   baklava: {
@@ -366,6 +368,11 @@ const NetworkConfigs = {
     },
     lockedGold: {
       unlockingPeriod: 6 * HOUR, // 1/12 of the mainnet period.
+    },
+    reserve: {
+      initialBalance: 100000000, // CELO
+      frozenAssetsStartBalance: 80000000, // Matches Mainnet after CGP-6
+      frozenAssetsDays: 182, // 3x Mainnet thawing rate
     },
     reserveSpenderMultiSig: {
       signatories: [network.from],
@@ -416,7 +423,7 @@ const NetworkConfigs = {
       frozen: false,
     },
     reserve: {
-      initialBalance: 100000000,
+      initialBalance: 100000000, // CELO
     },
     oracles: {
       reportExpiry: 1000 * DAY,

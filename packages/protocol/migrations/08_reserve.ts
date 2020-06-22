@@ -65,6 +65,13 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
         to: reserve.address,
         value: web3.utils.toWei(config.reserve.initialBalance.toString(), 'ether').toString(),
       })
+
+      if (config.reserve.frozenAssetsStartBalance && config.reserve.frozenAssetsDays) {
+        await reserve.setFrozenGold(
+          config.reserve.frozenAssetsStartBalance,
+          config.reserve.frozenAssetsDays
+        )
+      }
     }
 
     const reserveSpenderMultiSig: ReserveSpenderMultiSigInstance = await getDeployedProxiedContract<
