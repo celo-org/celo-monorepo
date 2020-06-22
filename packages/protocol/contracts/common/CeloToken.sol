@@ -8,7 +8,7 @@ import "./Freezable.sol";
 import "./Initializable.sol";
 import "./interfaces/ICeloToken.sol";
 
-contract GoldToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
+contract CeloToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
   using SafeMath for uint256;
 
   // Address of the TRANSFER precompiled contract.
