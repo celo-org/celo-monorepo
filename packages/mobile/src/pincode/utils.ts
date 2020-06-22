@@ -1,5 +1,5 @@
 import { UNLOCK_DURATION } from 'src/geth/consts'
-import { getWalletAsync } from 'src/web3/contracts'
+import { getConnectedWalletAsync } from 'src/web3/contracts'
 
 export const PIN_LENGTH = 6
 
@@ -8,7 +8,7 @@ export function isPinValid(pin: string) {
 }
 
 export async function ensureCorrectPin(pin: string, currentAccount: string): Promise<typeof pin> {
-  const wallet = await getWalletAsync()
+  const wallet = await getConnectedWalletAsync()
   await wallet.unlockAccount(currentAccount, pin, UNLOCK_DURATION)
   return pin
 }

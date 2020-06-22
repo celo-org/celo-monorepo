@@ -36,7 +36,7 @@ import {
   updateWeb3SyncProgress,
   Web3SyncProgress,
 } from 'src/web3/actions'
-import { getContractKit, getWallet } from 'src/web3/contracts'
+import { getConnectedWallet, getContractKit } from 'src/web3/contracts'
 import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
 import { getLatestBlock } from 'src/web3/utils'
 import { Block } from 'web3-eth'
@@ -184,10 +184,10 @@ export function* getOrCreateAccount() {
 
     return accountAddress
   } catch (error) {
+    // Capturing error in sentry for now as we debug backup key issue
     if (privateKey && !error.message.contains(privateKey)) {
       Sentry.captureException(error)
     }
-    // Capturing error in sentry for now as we debug backup key issue
     Logger.error(TAG + '@getOrCreateAccount', 'Error creating account', error)
     throw new Error(ErrorMessages.ACCOUNT_SETUP_FAILED)
   }
@@ -201,7 +201,7 @@ export function* assignAccountFromPrivateKey(privateKey: string) {
       throw Error('Cannot create account without having the pin set')
     }
     const account = privateKeyToAddress(privateKey)
-    const wallet: RpcWallet = yield call(getWallet)
+    const wallet: RpcWallet = yield call(getConnectedWallet)
     try {
       yield call([wallet, wallet.addAccount], privateKey, pincode)
     } catch (e) {
@@ -253,7 +253,7 @@ export function* getAccount() {
 
 export function* unlockAccount(account: string) {
   Logger.debug(TAG + '@unlockAccount', `Unlocking account: ${account}`)
-  const wallet: RpcWallet = yield call(getWallet)
+  const wallet: RpcWallet = yield call(getConnectedWallet)
   if (wallet.isAccountUnlocked(account)) {
     return true
   }

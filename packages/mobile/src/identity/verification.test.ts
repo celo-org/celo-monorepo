@@ -16,6 +16,7 @@ import {
 } from 'src/identity/actions'
 import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import { attestationCodesSelector } from 'src/identity/reducer'
+import { VerificationStatus } from 'src/identity/types'
 import {
   AttestationCode,
   doVerificationFlow,
@@ -23,7 +24,6 @@ import {
   startVerification,
   VERIFICATION_TIMEOUT,
 } from 'src/identity/verification'
-import { VerificationStatus } from 'src/identity/types'
 import { getContractKitOutsideGenerator } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { privateCommentKeySelector } from 'src/web3/selectors'
@@ -148,7 +148,7 @@ const mockAttestationsWrapperPartlyVerified = {
 }
 
 const mockAccountsWrapper = {
-  getWalletAddress: jest.fn(() => Promise.resolve(mockAccount)),
+  getConnectedWalletAddress: jest.fn(() => Promise.resolve(mockAccount)),
   getDataEncryptionKey: jest.fn(() => Promise.resolve(mockPublicDEK)),
 }
 

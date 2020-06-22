@@ -12,7 +12,7 @@ export async function getContractKitOutsideGenerator() {
 
 export const web3ForUtils = new Web3()
 
-export function* getWallet() {
+export function* getConnectedWallet() {
   const mockGethWallet = {
     addAccount: jest.fn(async (privateKey: string, passphrase: string) =>
       privateKeyToAddress(privateKey)

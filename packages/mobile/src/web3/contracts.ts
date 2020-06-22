@@ -35,13 +35,16 @@ function getWeb3(fornoMode: boolean): Web3 {
   return fornoMode ? new Web3(getHttpProvider(DEFAULT_FORNO_URL)) : new Web3(ipcProvider)
 }
 
-export const getWalletAsync = async () => promisifyGenerator(getWallet())
+export const getConnectedWalletAsync = async () => promisifyGenerator(getConnectedWallet())
 
-export function* getWallet() {
+export function* getConnectedWallet() {
   yield call(waitForGethConnectivity)
   if (!gethWallet.isSetupFinished()) {
     yield call([gethWallet, gethWallet.init])
-    Logger.debug(`getWallet`, `Initialized wallet with accounts: ${gethWallet.getAccounts()}`)
+    Logger.debug(
+      `getConnectedWallet`,
+      `Initialized wallet with accounts: ${gethWallet.getAccounts()}`
+    )
   }
   return gethWallet
 }
