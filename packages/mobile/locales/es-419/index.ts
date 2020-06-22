@@ -1,6 +1,7 @@
 import accountScreen10 from '@celo/mobile/locales/es-419/accountScreen10.json'
 import backupKeyFlow6 from '@celo/mobile/locales/es-419/backupKeyFlow6.json'
 import exchangeFlow9 from '@celo/mobile/locales/es-419/exchangeFlow9.json'
+import fiatExchangeFlow from '@celo/mobile/locales/es-419/fiatExchangeFlow.json'
 import global from '@celo/mobile/locales/es-419/global.json'
 import goldEducation from '@celo/mobile/locales/es-419/goldEducation.json'
 import inviteFlow11 from '@celo/mobile/locales/es-419/inviteFlow11.json'
@@ -28,4 +29,5 @@ export default {
   sendFlow7,
   walletFlow5,
   onboarding,
+  fiatExchangeFlow,
 }

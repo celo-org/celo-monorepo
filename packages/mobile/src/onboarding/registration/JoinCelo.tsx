@@ -250,4 +250,4 @@ const styles = StyleSheet.create({
 export default connect<StateProps, DispatchProps, OwnProps, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.nuxNamePin1)(JoinCelo))
+)(withTranslation<Props>(Namespaces.nuxNamePin1)(JoinCelo))

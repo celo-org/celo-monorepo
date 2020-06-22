@@ -325,10 +325,14 @@ exports[`JoinCeloScreen renders correctly 1`] = `
       >
         <View
           style={
-            Object {
-              "borderRadius": 100,
-              "overflow": "hidden",
-            }
+            Array [
+              Object {
+                "overflow": "hidden",
+              },
+              Object {
+                "borderRadius": 100,
+              },
+            ]
           }
         >
           <View
@@ -706,10 +710,14 @@ exports[`JoinCeloScreen renders with an error 1`] = `
       >
         <View
           style={
-            Object {
-              "borderRadius": 100,
-              "overflow": "hidden",
-            }
+            Array [
+              Object {
+                "overflow": "hidden",
+              },
+              Object {
+                "borderRadius": 100,
+              },
+            ]
           }
         >
           <View

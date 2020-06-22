@@ -5,7 +5,7 @@ export function* getContractKit() {
   return newKitFromWeb3(new Web3())
 }
 
-export async function getContractKitOutsideGenerator() {
+export async function getContractKitAsync() {
   return newKitFromWeb3(new Web3())
 }
 

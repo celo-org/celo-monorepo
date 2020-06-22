@@ -3,7 +3,7 @@ import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWr
 import { ensureLeading0x } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import { all, call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
-import { showError } from 'src/alert/actions'
+import { showError, showErrorOrFallback } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { TokenTransactionType } from 'src/apollo/types'
@@ -41,7 +41,7 @@ import Logger from 'src/utils/Logger'
 import {
   addLocalAccount,
   getContractKit,
-  getContractKitOutsideGenerator,
+  getContractKitAsync,
   web3ForUtils,
 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
@@ -90,12 +90,7 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
     yield put(fetchSentEscrowPayments())
   } catch (e) {
     Logger.error(TAG + '@transferToEscrow', 'Error transfering to escrow', e)
-    CeloAnalytics.track(CustomEventNames.escrow_failed_to_transfer, { error: e.message })
-    if (e.message === ErrorMessages.INCORRECT_PIN) {
-      yield put(showError(ErrorMessages.INCORRECT_PIN))
-    } else {
-      yield put(showError(ErrorMessages.ESCROW_TRANSFER_FAILED))
-    }
+    yield put(showErrorOrFallback(e, ErrorMessages.ESCROW_TRANSFER_FAILED))
   }
 }
 
@@ -191,7 +186,7 @@ function* withdrawFromEscrow() {
 }
 
 async function createReclaimTransaction(paymentID: string) {
-  const contractKit = await getContractKitOutsideGenerator()
+  const contractKit = await getContractKitAsync()
 
   const escrow = await contractKit.contracts.getEscrow()
   return escrow.revoke(paymentID).txo
