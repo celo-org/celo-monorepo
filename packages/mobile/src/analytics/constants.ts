@@ -221,6 +221,7 @@ export enum CustomEventNames {
   invalid_exchange_rate = 'invalid_exchange_rate',
   exchange_rate_change_failure = 'exchange_rate_change_failure',
   missing_tx_id = 'missing_tx_id',
+  exchange_failed = 'exchange_failed',
 
   // Gold Home screen
   gold_info = 'gold_info', // when the (i) next to Celo Gold price is clicked, launching education (not pictured)
