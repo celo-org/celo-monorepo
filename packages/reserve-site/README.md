@@ -14,6 +14,7 @@ next.js with emotion for styles.
 
 ## Deployment
 
-Hosted on firebase
+Hosted on gcp
 
-`yarn serve` 
+`yarn deploy:dev`
+`yarn deploy:prod` 
