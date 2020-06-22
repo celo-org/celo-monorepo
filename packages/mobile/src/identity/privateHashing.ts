@@ -1,5 +1,5 @@
 import { ContractKit } from '@celo/contractkit'
-import { getPhoneHash, isE164Number, PhoneNumberUtils } from '@celo/utils/lib/phoneNumbers'
+import { getPhoneHash, isE164Number, PhoneNumberUtils } from '@celo/utils/src/phoneNumbers'
 import crypto from 'crypto'
 import BlindThresholdBls from 'react-native-blind-threshold-bls'
 import { call, put, select } from 'redux-saga/effects'

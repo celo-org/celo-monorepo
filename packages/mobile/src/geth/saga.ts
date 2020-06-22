@@ -194,4 +194,5 @@ export function* gethSaga() {
   }
 
   yield put(setGethConnected(false))
+  // TODO: consider restarting the app when this is reached
 }

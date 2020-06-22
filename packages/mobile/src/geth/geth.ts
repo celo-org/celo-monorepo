@@ -8,6 +8,7 @@ import { DEFAULT_TESTNET } from 'src/config'
 import networkConfig from 'src/geth/networkConfig'
 import Logger from 'src/utils/Logger'
 import FirebaseLogUploader from 'src/utils/LogUploader'
+import { SYNCING_MAX_PEERS } from './consts'
 
 let gethLock = false
 let gethInstance: typeof RNGeth | null = null
@@ -81,8 +82,7 @@ async function createNewGeth(sync: boolean = true): Promise<typeof RNGeth> {
 
   Logger.debug('Geth@newGeth', `Network ID is ${networkID}, syncMode is ${syncMode}`)
 
-  // 25 is react native geth default
-  const maxPeers = sync ? 25 : 0
+  const maxPeers = sync ? SYNCING_MAX_PEERS : 0
 
   const gethOptions: any = {
     nodeDir,
@@ -163,11 +163,7 @@ export async function getGeth(sync: boolean = true): Promise<typeof gethInstance
 
 async function ensureStaticNodesInitialized(sync: boolean = true): Promise<boolean> {
   const { nodeDir } = networkConfig
-  // if (await staticNodesAlreadyInitialized(nodeDir)) {
-  //   Logger.debug('Geth@maybeInitStaticNodes', 'static nodes already initialized')
-  //   return true
-  // } else {
-  Logger.debug('Geth@maybeInitStaticNodes', 'initializing static nodes')
+  Logger.debug('Geth@ensureStaticNodesInitialized', 'initializing static nodes')
   let enodes: string | null = null
   try {
     enodes = await StaticNodeUtils.getStaticNodesAsync(DEFAULT_TESTNET)
@@ -187,7 +183,6 @@ async function ensureStaticNodesInitialized(sync: boolean = true): Promise<boole
     return true
   }
   return false
-  // }
 }
 
 export async function stopGethIfInitialized() {
@@ -256,19 +251,6 @@ async function writeGenesisBlock(nodeDir: string, genesisBlock: string) {
 
 function getStaticNodesFile(nodeDir: string) {
   return `${getNodeInstancePath(nodeDir)}/static-nodes.json`
-}
-
-/**
- * Returns true if the static nodes files in the Geth data dir has been initialized, false otherwise.
- * @param nodeDir Geth data dir
- */
-async function staticNodesAlreadyInitialized(nodeDir: string): Promise<boolean> {
-  const staticNodesFile = getStaticNodesFile(nodeDir)
-  if (!(await RNFS.exists(staticNodesFile))) {
-    return false
-  }
-  const fileStat: RNFS.StatResult = await RNFS.stat(staticNodesFile)
-  return fileStat.isFile() && new BigNumber(fileStat.size, 10).isGreaterThan(0)
 }
 
 async function writeStaticNodes(nodeDir: string, enodes: string) {
