@@ -353,7 +353,7 @@ export default connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateT
   fetchExchangeRate,
   showError,
   hideAlert,
-})(withTranslation(Namespaces.exchangeFlow9)(ExchangeTradeScreen))
+})(withTranslation<Props>(Namespaces.exchangeFlow9)(ExchangeTradeScreen))
 
 const styles = StyleSheet.create({
   container: {

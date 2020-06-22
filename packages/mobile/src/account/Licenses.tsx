@@ -42,4 +42,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withTranslation(Namespaces.accountScreen10)(Licenses)
+export default withTranslation<Props>(Namespaces.accountScreen10)(Licenses)

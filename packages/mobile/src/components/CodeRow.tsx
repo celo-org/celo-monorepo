@@ -152,4 +152,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withTranslation(Namespaces.global)(CodeRow)
+export default withTranslation<Props>(Namespaces.global)(CodeRow)
