@@ -134,7 +134,6 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
    * @return The corresponding buyToken amount.
    */
   function getBuyTokenAmount(uint256 sellAmount, bool sellGold) external view returns (uint256) {
-    if (sellAmount == 0) return 0;
     uint256 sellTokenBucket;
     uint256 buyTokenBucket;
     (buyTokenBucket, sellTokenBucket) = getBuyAndSellBuckets(sellGold);
@@ -162,7 +161,6 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
    * @return The corresponding sellToken amount.
    */
   function getSellTokenAmount(uint256 buyAmount, bool sellGold) external view returns (uint256) {
-    if (buyAmount == 0) return 0;
     uint256 sellTokenBucket;
     uint256 buyTokenBucket;
     (buyTokenBucket, sellTokenBucket) = getBuyAndSellBuckets(sellGold);

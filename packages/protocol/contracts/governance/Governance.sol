@@ -858,15 +858,11 @@ contract Governance is
    * @notice Returns an accounts vote record on a particular index in `dequeued`.
    * @param account The address of the account to get the record for.
    * @param index The index in `dequeued`.
-   * @return The corresponding proposal ID, vote value, and weight.
+   * @return The corresponding proposal ID and vote value.
    */
-  function getVoteRecord(address account, uint256 index)
-    external
-    view
-    returns (uint256, uint256, uint256)
-  {
+  function getVoteRecord(address account, uint256 index) external view returns (uint256, uint256) {
     VoteRecord storage record = voters[account].referendumVotes[index];
-    return (record.proposalId, uint256(record.value), record.weight);
+    return (record.proposalId, uint256(record.value));
   }
 
   /**

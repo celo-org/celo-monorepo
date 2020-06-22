@@ -198,7 +198,7 @@ contract Validators is
 
   /**
    * @notice Updates the block delay for a ValidatorGroup's commission udpdate
-   * @param delay Number of blocks to delay the update
+   * @param delay Number of block to delay the update
    */
   function setCommissionUpdateDelay(uint256 delay) public onlyOwner {
     require(delay != commissionUpdateDelay, "commission update delay not changed");

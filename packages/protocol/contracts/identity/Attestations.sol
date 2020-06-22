@@ -156,10 +156,6 @@ contract Attestations is
    * @param attestationsRequested The number of requested attestations for this request.
    * @param attestationRequestFeeToken The address of the token with which the attestation fee will
    * be paid.
-   * @dev Note that if an attestion expires before it is completed, the fee is forfeited. This is
-   * to prevent folks from attacking validators by requesting attestations that they do not
-   * complete, and to increase the cost of validators attempting to manipulate the attestations
-   * protocol.
    */
   function request(
     bytes32 identifier,

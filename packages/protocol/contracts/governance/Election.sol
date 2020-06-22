@@ -1052,6 +1052,6 @@ contract Election is
       }
     }
     require(info.remainingValue == 0, "Failure to decrement all votes.");
-    return value;
+    return value.sub(info.remainingValue);
   }
 }

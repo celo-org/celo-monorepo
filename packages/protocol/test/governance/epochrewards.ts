@@ -525,11 +525,7 @@ contract('EpochRewards', (accounts: string[]) => {
       })
 
       it('should return one', async () => {
-        assertAlmostEqualBN(
-          await epochRewards.getRewardsMultiplier(),
-          toFixed(1),
-          toFixed(0.000001)
-        )
+        assertEqualBN(await epochRewards.getRewardsMultiplier(), toFixed(1))
       })
     })
 
