@@ -14,8 +14,8 @@ contract GoldToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
   // Address of the TRANSFER precompiled contract.
   // solhint-disable state-visibility
   address constant TRANSFER = address(0xff - 2);
-  string constant NAME = "Celo Gold";
-  string constant SYMBOL = "cGLD";
+  string constant NAME = "Celo";
+  string constant SYMBOL = "CELO";
   uint8 constant DECIMALS = 18;
   uint256 internal totalSupply_;
   // solhint-enable state-visibility
@@ -39,9 +39,9 @@ contract GoldToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
   }
 
   /**
-   * @notice Transfers Celo Gold from one address to another.
-   * @param to The address to transfer Celo Gold to.
-   * @param value The amount of Celo Gold to transfer.
+   * @notice Transfers Celo from one address to another.
+   * @param to The address to transfer Celo to.
+   * @param value The amount of Celo to transfer.
    * @return True if the transaction succeeds.
    */
   // solhint-disable-next-line no-simple-event-func-name
@@ -50,9 +50,9 @@ contract GoldToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
   }
 
   /**
-   * @notice Transfers Celo Gold from one address to another with a comment.
-   * @param to The address to transfer Celo Gold to.
-   * @param value The amount of Celo Gold to transfer.
+   * @notice Transfers Celo from one address to another with a comment.
+   * @param to The address to transfer Celo to.
+   * @param value The amount of Celo to transfer.
    * @param comment The transfer comment
    * @return True if the transaction succeeds.
    */
@@ -66,9 +66,9 @@ contract GoldToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
   }
 
   /**
-   * @notice Approve a user to transfer Celo Gold on behalf of another user.
-   * @param spender The address which is being approved to spend Celo Gold.
-   * @param value The amount of Celo Gold approved to the spender.
+   * @notice Approve a user to transfer Celo on behalf of another user.
+   * @param spender The address which is being approved to spend Celo.
+   * @param value The amount of Celo approved to the spender.
    * @return True if the transaction succeeds.
    */
   function approve(address spender, uint256 value) external returns (bool) {
@@ -80,8 +80,8 @@ contract GoldToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
 
   /**
    * @notice Increases the allowance of another user.
-   * @param spender The address which is being approved to spend Celo Gold.
-   * @param value The increment of the amount of Celo Gold approved to the spender.
+   * @param spender The address which is being approved to spend Celo.
+   * @param value The increment of the amount of Celo approved to the spender.
    * @return True if the transaction succeeds.
    */
   function increaseAllowance(address spender, uint256 value) external returns (bool) {
@@ -95,8 +95,8 @@ contract GoldToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
 
   /**
    * @notice Decreases the allowance of another user.
-   * @param spender The address which is being approved to spend Celo Gold.
-   * @param value The decrement of the amount of Celo Gold approved to the spender.
+   * @param spender The address which is being approved to spend Celo.
+   * @param value The decrement of the amount of Celo approved to the spender.
    * @return True if the transaction succeeds.
    */
   function decreaseAllowance(address spender, uint256 value) external returns (bool) {
@@ -108,10 +108,10 @@ contract GoldToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
   }
 
   /**
-   * @notice Transfers Celo Gold from one address to another on behalf of a user.
-   * @param from The address to transfer Celo Gold from.
-   * @param to The address to transfer Celo Gold to.
-   * @param value The amount of Celo Gold to transfer.
+   * @notice Transfers Celo from one address to another on behalf of a user.
+   * @param from The address to transfer Celo from.
+   * @param to The address to transfer Celo to.
+   * @param value The amount of Celo to transfer.
    * @return True if the transaction succeeds.
    */
   function transferFrom(address from, address to, uint256 value)
@@ -128,7 +128,7 @@ contract GoldToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
 
     bool success;
     (success, ) = TRANSFER.call.value(0).gas(gasleft())(abi.encode(from, to, value));
-    require(success, "Celo Gold transfer failed");
+    require(success, "Celo transfer failed");
 
     allowed[from][msg.sender] = allowed[from][msg.sender].sub(value);
     emit Transfer(from, to, value);
@@ -136,9 +136,9 @@ contract GoldToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
   }
 
   /**
-   * @notice Mints new cGLD and gives it to 'to'.
+   * @notice Mints new CELO and gives it to 'to'.
    * @param to The account for which to mint tokens.
-   * @param value The amount of cGLD to mint.
+   * @param value The amount of CELO to mint.
    */
   function mint(address to, uint256 value) external onlyVm returns (bool) {
     if (value == 0) {
@@ -149,52 +149,52 @@ contract GoldToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
 
     bool success;
     (success, ) = TRANSFER.call.value(0).gas(gasleft())(abi.encode(address(0), to, value));
-    require(success, "Celo Gold transfer failed");
+    require(success, "Celo transfer failed");
 
     emit Transfer(address(0), to, value);
     return true;
   }
 
   /**
-   * @return The name of the Celo Gold token.
+   * @return The name of the Celo token.
    */
   function name() external view returns (string memory) {
     return NAME;
   }
 
   /**
-   * @return The symbol of the Celo Gold token.
+   * @return The symbol of the Celo token.
    */
   function symbol() external view returns (string memory) {
     return SYMBOL;
   }
 
   /**
-   * @return The number of decimal places to which Celo Gold is divisible.
+   * @return The number of decimal places to which Celo is divisible.
    */
   function decimals() external view returns (uint8) {
     return DECIMALS;
   }
 
   /**
-   * @return The total amount of Celo Gold in existence.
+   * @return The total amount of Celo in existence.
    */
   function totalSupply() external view returns (uint256) {
     return totalSupply_;
   }
 
   /**
-   * @notice Gets the amount of owner's Celo Gold allowed to be spent by spender.
-   * @param owner The owner of the Celo Gold.
-   * @param spender The spender of the Celo Gold.
-   * @return The amount of Celo Gold owner is allowing spender to spend.
+   * @notice Gets the amount of owner's Celo allowed to be spent by spender.
+   * @param owner The owner of the Celo.
+   * @param spender The spender of the Celo.
+   * @return The amount of Celo owner is allowing spender to spend.
    */
   function allowance(address owner, address spender) external view returns (uint256) {
     return allowed[owner][spender];
   }
 
   /**
-   * @notice Increases the variable for total amount of Celo Gold in existence.
+   * @notice Increases the variable for total amount of Celo in existence.
    * @param amount The amount to increase counter by
    */
   function increaseSupply(uint256 amount) external onlyVm {
@@ -211,9 +211,9 @@ contract GoldToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
   }
 
   /**
-   * @notice internal Celo Gold transfer from one address to another.
-   * @param to The address to transfer Celo Gold to.
-   * @param value The amount of Celo Gold to transfer.
+   * @notice internal Celo transfer from one address to another.
+   * @param to The address to transfer Celo to.
+   * @param value The amount of Celo to transfer.
    * @return True if the transaction succeeds.
    */
   function _transfer(address to, uint256 value) internal onlyWhenNotFrozen returns (bool) {
@@ -222,7 +222,7 @@ contract GoldToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
 
     bool success;
     (success, ) = TRANSFER.call.value(0).gas(gasleft())(abi.encode(msg.sender, to, value));
-    require(success, "Celo Gold transfer failed");
+    require(success, "Celo transfer failed");
     emit Transfer(msg.sender, to, value);
     return true;
   }
