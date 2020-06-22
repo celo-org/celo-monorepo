@@ -14,10 +14,10 @@ module.exports = {
     })
     return config
   },
-  target: 'serverless',
-  exportPathMap: function() {
-    return {
-      '/': { page: '/' },
-    }
-  },
+  // target: 'serverless',
+  // exportPathMap: function() {
+  //   return {
+  //     '/': { page: '/' },
+  //   }
+  // },
 }
