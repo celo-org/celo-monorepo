@@ -115,6 +115,7 @@ export enum CustomEventNames {
   verification_set_account = 'verification_set_account',
   verification_reveal_attestation = 'verification_reveal_attestation',
   verification_revealed_attestation = 'verification_revealed_attestation',
+  verification_reveal_error = 'verification_reveal_error',
   verification_wait_for_attestation_code = 'verification_wait_for_attestation_code',
   verification_codes_received = 'verification_codes_received',
   verification_complete_attestation = 'verification_complete_attestation',
@@ -289,6 +290,8 @@ export enum CustomEventNames {
   transaction_send_gas_estimated = 'transaction_send_gas_estimated',
   transaction_send_gas_hash_received = 'transaction_send_gas_hash_received',
   transaction_send_gas_receipt = 'transaction_send_gas_receipt',
+  transaction_error = 'transaction_error',
+  transaction_exception = 'transaction_exception',
 
   // Fee errors
   estimate_fee_failed = 'estimate_fee_failed',
@@ -327,6 +330,7 @@ export enum PropertyPathWhitelist {
   dollarAmount = 'dollarAmount',
   dollarBalance = 'dollarBalance',
   dollarPendingBalance = 'dollarPendingBalance',
+  duration = 'duration',
   error = 'error',
   exchangeInputAmount = 'exchangeInputAmount',
   exchangeRate = 'exchangeRate',
@@ -373,6 +377,7 @@ export enum PropertyPathWhitelist {
   sendAmount = 'sendAmount',
   subtitle = 'subtitle',
   success = 'success',
+  statusCode = 'statusCode',
   syncProgress = 'syncProgress',
   takerAmount = 'takerAmount',
   testnet = 'testnet',
