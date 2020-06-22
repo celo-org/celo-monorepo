@@ -16,7 +16,7 @@ import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import Pincode from 'src/pincode/Pincode'
-import { isPinCorrect, isPinValid, PIN_LENGTH } from 'src/pincode/utils'
+import { ensureCorrectPin, isPinValid, PIN_LENGTH } from 'src/pincode/utils'
 import { RootState } from 'src/redux/reducers'
 import { currentAccountSelector } from 'src/web3/selectors'
 
@@ -65,7 +65,7 @@ class PincodeEnter extends React.Component<Props, State> {
     const { pin } = this.state
     const withVerification = route.params.withVerification
     if (withVerification && currentAccount) {
-      isPinCorrect(pin, currentAccount)
+      ensureCorrectPin(pin, currentAccount)
         .then(this.onCorrectPin)
         .catch(this.onWrongPin)
     } else {

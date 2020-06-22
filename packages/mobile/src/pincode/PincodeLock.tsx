@@ -14,7 +14,7 @@ import { appUnlock } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { Namespaces } from 'src/i18n'
 import Pincode from 'src/pincode/Pincode'
-import { isPinCorrect, isPinValid, PIN_LENGTH } from 'src/pincode/utils'
+import { ensureCorrectPin, isPinValid, PIN_LENGTH } from 'src/pincode/utils'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 function PincodeLock() {
@@ -34,7 +34,7 @@ function PincodeLock() {
 
   const onPress = () => {
     if (currentAccount) {
-      return isPinCorrect(pin, currentAccount)
+      return ensureCorrectPin(pin, currentAccount)
         .then(onCorrectPin)
         .catch(onWrongPin)
     } else {

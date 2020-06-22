@@ -6,7 +6,7 @@ import { showError } from 'src/alert/actions'
 import { appUnlock } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import PincodeLock from 'src/pincode/PincodeLock'
-import { isPinCorrect } from 'src/pincode/utils'
+import { ensureCorrectPin } from 'src/pincode/utils'
 import { createMockStore } from 'test/utils'
 
 describe('PincodeLock', () => {
@@ -22,7 +22,7 @@ describe('PincodeLock', () => {
 
   it('unlocks if PIN is correct', (done) => {
     const pin = '123456'
-    ;(isPinCorrect as jest.Mock).mockResolvedValueOnce(pin)
+    ;(ensureCorrectPin as jest.Mock).mockResolvedValueOnce(pin)
     const store = createMockStore()
 
     const { getByTestId } = render(
@@ -41,7 +41,7 @@ describe('PincodeLock', () => {
   })
 
   it('shows wrong PIN notification', (done) => {
-    ;(isPinCorrect as jest.Mock).mockRejectedValue('')
+    ;(ensureCorrectPin as jest.Mock).mockRejectedValue('')
     const store = createMockStore()
 
     const { getByTestId } = render(

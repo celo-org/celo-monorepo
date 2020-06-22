@@ -7,7 +7,7 @@ export function isPinValid(pin: string) {
   return pin.length === PIN_LENGTH
 }
 
-export async function isPinCorrect(pin: string, currentAccount: string): Promise<typeof pin> {
+export async function ensureCorrectPin(pin: string, currentAccount: string): Promise<typeof pin> {
   const wallet = await getWalletAsync()
   await wallet.unlockAccount(currentAccount, pin, UNLOCK_DURATION)
   return pin

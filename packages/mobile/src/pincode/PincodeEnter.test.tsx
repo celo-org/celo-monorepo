@@ -6,7 +6,7 @@ import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { Screens } from 'src/navigator/Screens'
 import PincodeEnter from 'src/pincode/PincodeEnter'
-import { isPinCorrect } from 'src/pincode/utils'
+import { ensureCorrectPin } from 'src/pincode/utils'
 import { createMockStore, getMockStackScreenProps } from 'test/utils'
 
 const mockScreenProps = getMockStackScreenProps(Screens.PincodeEnter, {
@@ -27,7 +27,7 @@ describe('PincodeEnter', () => {
 
   it('calls onSuccess when PIN is correct', (done) => {
     const pin = '123456'
-    ;(isPinCorrect as jest.Mock).mockResolvedValueOnce(pin)
+    ;(ensureCorrectPin as jest.Mock).mockResolvedValueOnce(pin)
     const store = createMockStore()
 
     const { getByTestId } = render(
@@ -46,7 +46,7 @@ describe('PincodeEnter', () => {
   })
 
   it('shows wrong PIN notification', (done) => {
-    ;(isPinCorrect as jest.Mock).mockRejectedValueOnce('')
+    ;(ensureCorrectPin as jest.Mock).mockRejectedValueOnce('')
     const store = createMockStore()
 
     const { getByTestId } = render(
