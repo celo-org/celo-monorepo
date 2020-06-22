@@ -8,11 +8,12 @@
     "build": "yarn tsc",
     "prepare": "next build",
     "deploy": "yarn run kill-dev; yarn run clean-next-cache; yarn run prepare; gcloud app deploy $MANIFEST && yarn run view",
-    "deploy:dev": "gcloud config set project celo-reserve-site; NODE_ENV=production DEPLOY_ENV=development MANIFEST=development.yaml yarn run deploy",
-    "deploy:prod": "gcloud config set project celo-reserve-site; NODE_ENV=production DEPLOY_ENV=production MANIFEST=production.yaml yarn run deploy",
+    "deploy:dev": "gcloud config set project celo-reserve-site-281118; NODE_ENV=production DEPLOY_ENV=development MANIFEST=development.yaml yarn run deploy",
+    "deploy:prod": "gcloud config set project celo-reserve-site-281118; NODE_ENV=production DEPLOY_ENV=production MANIFEST=production.yaml yarn run deploy",
     "view": "gcloud app browse -s website-$DEPLOY_ENV",
     "kill-dev": "kill -9 $(lsof -ti :3000)",
-    "clean-next-cache": "rm -rf .next"
+    "clean-next-cache": "rm -rf .next",
+    "start": "next start"
   },
   "dependencies": {
     "@emotion/core": "^10.0.28",
