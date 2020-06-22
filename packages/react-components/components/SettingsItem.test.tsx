@@ -71,16 +71,10 @@ describe('SettingsItemSwitch', () => {
 describe('SettingsItemInput', () => {
   const value = 'value'
   const newValue = 'newValue'
-  const details = 'details'
   const onValueChange = jest.fn()
   it('renders correctly', () => {
     const wrapper = render(
-      <SettingsItemInput
-        onValueChange={onValueChange}
-        title={title}
-        value={value}
-        details={details}
-      />
+      <SettingsItemInput onValueChange={onValueChange} title={title} value={value} />
     )
     expect(wrapper.toJSON()).toMatchSnapshot()
   })
