@@ -1,6 +1,7 @@
 import { Response } from 'node-fetch'
 import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
 import { authenticateUser, isVerified } from '../src/common/identity'
+import { VERSION } from '../src/config'
 import { getTransaction } from '../src/database/database'
 import { getDidMatchmaking, setDidMatchmaking } from '../src/database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../src/database/wrappers/number-pairs'
