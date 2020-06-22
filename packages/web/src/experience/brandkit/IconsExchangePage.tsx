@@ -68,7 +68,7 @@ const IconExchangePage: NextPage = React.memo(() => {
   return (
     <Page
       title={info.attributes.title}
-      metaDescription={info.attributes.title}
+      metaDescription={info.attributes.description}
       path={ICONS_PATH}
       sections={[{ id: hashNav.brandIcons.overview, children: <Overview /> }]}
     />
