@@ -71,4 +71,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withTranslation(Namespaces.walletFlow5)(CeloDollarsOverview)
+export default withTranslation<Props>(Namespaces.walletFlow5)(CeloDollarsOverview)

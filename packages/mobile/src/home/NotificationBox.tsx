@@ -324,4 +324,4 @@ const styles = StyleSheet.create({
 export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.walletFlow5)(NotificationBox))
+)(withTranslation<Props>(Namespaces.walletFlow5)(NotificationBox))

@@ -96,4 +96,6 @@ const mapStateToProps = (state: RootState): StateProps => ({
   fornoMode: fornoSelector(state),
 })
 
-export default connect(mapStateToProps)(withTranslation(Namespaces.nuxNamePin1)(PincodeEnter))
+export default connect(mapStateToProps)(
+  withTranslation<Props>(Namespaces.nuxNamePin1)(PincodeEnter)
+)

@@ -4,7 +4,9 @@
   "main": "dist/server/index.js",
   "private": true,
   "scripts": {
-    "dev": "next dev"
+    "dev": "next dev",
+    "build": "yarn tsc",
+    "prepare": "next build"
   },
   "dependencies": {
     "@emotion/core": "^10.0.28",
