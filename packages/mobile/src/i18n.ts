@@ -6,7 +6,6 @@ import {
   initReactI18next,
   WithTranslation,
   withTranslation as withTranslationI18Next,
-  WithTranslationProps,
 } from 'react-i18next'
 import * as RNLocalize from 'react-native-localize'
 import Logger from 'src/utils/Logger'
@@ -20,7 +19,7 @@ export enum Namespaces {
   global = 'global',
   index = 'index',
   inviteFlow11 = 'inviteFlow11',
-  nuxCurrencyPhoto4 = 'nuxCurrencyPhoto4',
+  goldEducation = 'goldEducation',
   nuxNamePin1 = 'nuxNamePin1',
   nuxRestoreWallet3 = 'nuxRestoreWallet3',
   nuxVerification2 = 'nuxVerification2',
@@ -30,6 +29,7 @@ export enum Namespaces {
   walletFlow5 = 'walletFlow5',
   dappkit = 'dappkit',
   onboarding = 'onboarding',
+  fiatExchangeFlow = 'fiatExchangeFlow',
 }
 
 const availableResources = {
@@ -101,10 +101,10 @@ RNLocalize.addEventListener('change', () => {
 
 // Create HOC wrapper that hoists statics
 // https://react.i18next.com/latest/withtranslation-hoc#hoist-non-react-statics
-export const withTranslation = (namespace: Namespaces) => <P extends WithTranslation>(
-  component: React.ComponentType<P>
-): React.ComponentType<Omit<P, keyof WithTranslation> & WithTranslationProps> =>
-  // cast as `any` here otherwise TypeScript complained
-  hoistStatics(withTranslationI18Next(namespace)(component), component as any)
+export const withTranslation = <P extends WithTranslation>(namespace: Namespaces) => <
+  C extends React.ComponentType<P>
+>(
+  component: C
+) => hoistStatics(withTranslationI18Next(namespace)(component), component)
 
 export default i18n

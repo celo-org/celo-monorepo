@@ -11,7 +11,6 @@
   "contacts": "Contactos",
   "invite": "Invitar",
   "sendTo": "Enviar a",
-  "amount": "Monto",
   "celoDollarAmount": "<0></0> {{CeloDollar}}",
   "celoDollarAmount_plural": "<0></0> {{CeloDollars}}",
   "addDescription": "Agregar descripción",
@@ -113,5 +112,7 @@
   },
   "transferAddressChanged": "Este contacto cambió su número de cuenta desde la transacción. Este pago fue enviado a:",
   "addressConfirmed": "Número de cuenta confirmado",
-  "sending": "Enviando"
+  "sending": "Enviando",
+  "feeActual": "Tarifas",
+  "feeEstimate": "Tarifas estimadas"
 }

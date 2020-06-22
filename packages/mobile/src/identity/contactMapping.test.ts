@@ -17,7 +17,7 @@ import {
 import { setRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients } from 'src/recipients/recipient'
 import { getAllContacts } from 'src/utils/contacts'
-import { getContractKitOutsideGenerator } from 'src/web3/contracts'
+import { getContractKitAsync } from 'src/web3/contracts'
 import { getConnectedAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 import {
@@ -69,7 +69,7 @@ describe('Import Contacts Saga', () => {
 
 describe('Fetch Addresses Saga', () => {
   it('fetches and caches addresses correctly', async () => {
-    const contractKit = await getContractKitOutsideGenerator()
+    const contractKit = await getContractKitAsync()
 
     const mockE164NumberToAddress = {
       [mockE164Number]: [mockAccount.toLowerCase()],
@@ -111,7 +111,7 @@ describe('Fetch Addresses Saga', () => {
   })
 
   it('requires SecureSend with partial verification when a new adddress is added and last 4 digits are unique', async () => {
-    const contractKit = await getContractKitOutsideGenerator()
+    const contractKit = await getContractKitAsync()
 
     const mockPhoneNumberLookup: IdentifierLookupResult = {
       [mockE164NumberHash]: {
@@ -154,7 +154,7 @@ describe('Fetch Addresses Saga', () => {
   })
 
   it('requires SecureSend with full verification when a new adddress is added and last 4 digits are not unique', async () => {
-    const contractKit = await getContractKitOutsideGenerator()
+    const contractKit = await getContractKitAsync()
 
     const mockPhoneNumberLookup: IdentifierLookupResult = {
       [mockE164NumberHash]: {
