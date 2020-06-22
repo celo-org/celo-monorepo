@@ -13,10 +13,14 @@ exports[`Button when type is SECONDARY renders 1`] = `
 >
   <View
     style={
-      Object {
-        "borderRadius": 100,
-        "overflow": "hidden",
-      }
+      Array [
+        Object {
+          "overflow": "hidden",
+        },
+        Object {
+          "borderRadius": 100,
+        },
+      ]
     }
   >
     <View
@@ -41,7 +45,8 @@ exports[`Button when type is SECONDARY renders 1`] = `
           "backgroundColor": "#F5F4F0",
           "height": 48,
           "justifyContent": "center",
-          "minWidth": 98,
+          "minWidth": 120,
+          "opacity": undefined,
           "paddingHorizontal": 16,
           "paddingVertical": 5,
         }
@@ -77,10 +82,14 @@ exports[`Button when type is TERTIARY renders 1`] = `
 >
   <View
     style={
-      Object {
-        "borderRadius": 100,
-        "overflow": "hidden",
-      }
+      Array [
+        Object {
+          "overflow": "hidden",
+        },
+        Object {
+          "borderRadius": 100,
+        },
+      ]
     }
   >
     <View
@@ -105,7 +114,8 @@ exports[`Button when type is TERTIARY renders 1`] = `
           "backgroundColor": "#EEB93C",
           "height": 48,
           "justifyContent": "center",
-          "minWidth": 98,
+          "minWidth": 120,
+          "opacity": undefined,
           "paddingHorizontal": 16,
           "paddingVertical": 5,
         }
@@ -141,10 +151,14 @@ exports[`Button when type not given defaults to primary 1`] = `
 >
   <View
     style={
-      Object {
-        "borderRadius": 100,
-        "overflow": "hidden",
-      }
+      Array [
+        Object {
+          "overflow": "hidden",
+        },
+        Object {
+          "borderRadius": 100,
+        },
+      ]
     }
   >
     <View
@@ -169,7 +183,8 @@ exports[`Button when type not given defaults to primary 1`] = `
           "backgroundColor": "#1AB775",
           "height": 48,
           "justifyContent": "center",
-          "minWidth": 98,
+          "minWidth": 120,
+          "opacity": undefined,
           "paddingHorizontal": 16,
           "paddingVertical": 5,
         }

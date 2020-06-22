@@ -278,7 +278,7 @@ export class SendConfirmation extends React.Component<Props, State> {
     } else {
       primaryBtnInfo = {
         action: this.onSendClick,
-        text: t('send'),
+        text: t('global:send'),
         disabled: isPrimaryButtonDisabled,
       }
     }

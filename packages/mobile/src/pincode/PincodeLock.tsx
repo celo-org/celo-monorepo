@@ -3,36 +3,36 @@
  * to lock the app with a PIN code.
  */
 import colors from '@celo/react-components/styles/colors'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BackHandler, StyleSheet } from 'react-native'
 import RNExitApp from 'react-native-exit-app'
 import SafeAreaView from 'react-native-safe-area-view'
 import { useDispatch, useSelector } from 'react-redux'
-import { showError } from 'src/alert/actions'
 import { appUnlock } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { Namespaces } from 'src/i18n'
-import { checkPin, isPinValid, PIN_LENGTH } from 'src/pincode/authentication'
+import { checkPin } from 'src/pincode/authentication'
 import Pincode from 'src/pincode/Pincode'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 function PincodeLock() {
   const [pin, setPin] = useState('')
+  const [errorText, setErrorText] = useState<string | undefined>(undefined)
   const dispatch = useDispatch()
   const { t } = useTranslation(Namespaces.nuxNamePin1)
   const currentAccount = useSelector(currentAccountSelector)
 
-  const onWrongPin = useCallback(() => {
-    dispatch(showError(ErrorMessages.INCORRECT_PIN))
+  function onWrongPin() {
     setPin('')
-  }, [dispatch, showError, setPin])
+    setErrorText(t(ErrorMessages.INCORRECT_PIN))
+  }
 
-  const onCorrectPin = useCallback(() => {
+  function onCorrectPin() {
     dispatch(appUnlock())
-  }, [dispatch, appUnlock])
+  }
 
-  const onPress = () => {
+  function onCompletePin(enteredPin: string) {
     if (currentAccount) {
       return checkPin(pin, currentAccount)
         .then(onCorrectPin)
@@ -57,13 +57,10 @@ function PincodeLock() {
     <SafeAreaView style={style.container}>
       <Pincode
         title={t('confirmPin.title')}
-        placeholder={t('createPin.yourPin')}
-        buttonText={t('global:submit')}
-        isPinValid={isPinValid}
-        onPress={onPress}
+        errorText={errorText}
         pin={pin}
         onChangePin={setPin}
-        maxLength={PIN_LENGTH}
+        onCompletePin={onCompletePin}
       />
     </SafeAreaView>
   )

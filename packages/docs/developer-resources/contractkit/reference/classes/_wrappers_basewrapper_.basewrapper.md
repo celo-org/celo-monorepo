@@ -12,13 +12,13 @@ Base ContractWrapper
 
   ↳ [AccountsWrapper](_wrappers_accounts_.accountswrapper.md)
 
+  ↳ [ValidatorsWrapper](_wrappers_validators_.validatorswrapper.md)
+
   ↳ [AttestationsWrapper](_wrappers_attestations_.attestationswrapper.md)
 
   ↳ [BlockchainParametersWrapper](_wrappers_blockchainparameters_.blockchainparameterswrapper.md)
 
   ↳ [DoubleSigningSlasherWrapper](_wrappers_doublesigningslasher_.doublesigningslasherwrapper.md)
-
-  ↳ [ValidatorsWrapper](_wrappers_validators_.validatorswrapper.md)
 
   ↳ [DowntimeSlasherWrapper](_wrappers_downtimeslasher_.downtimeslasherwrapper.md)
 

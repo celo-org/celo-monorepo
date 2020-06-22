@@ -18,7 +18,6 @@ import {
 const TEST_FEE = new BigNumber(10000000000000000)
 
 jest.mock('src/send/saga')
-jest.mock('react-native/Libraries/LayoutAnimation/LayoutAnimation.js')
 
 const mockedGetSendFee = getSendFee as jest.Mock
 

@@ -29,4 +29,4 @@
 
 Ƭ **IdentifierLookupResult**: *Record‹string, Record‹[Address](_base_.md#address), [AttestationStat](../interfaces/_wrappers_attestations_.attestationstat.md) | undefined› | undefined›*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L72)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L74)*

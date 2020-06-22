@@ -87,7 +87,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
           keyboardType="decimal-pad"
           onChangeText={[Function]}
           placeholder="0"
-          placeholderTextColor="#BDBDBD"
+          placeholderTextColor="#B4B9BD"
           rejectResponderTermination={true}
           style={
             Object {
@@ -215,10 +215,14 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
   >
     <View
       style={
-        Object {
-          "borderRadius": 100,
-          "overflow": "hidden",
-        }
+        Array [
+          Object {
+            "overflow": "hidden",
+          },
+          Object {
+            "borderRadius": 100,
+          },
+        ]
       }
     >
       <View
@@ -244,6 +248,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
             "flexGrow": 1,
             "height": 48,
             "justifyContent": "center",
+            "opacity": undefined,
             "paddingHorizontal": 16,
             "paddingVertical": 5,
           }
