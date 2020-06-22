@@ -141,4 +141,4 @@ const styles = StyleSheet.create({
 export default connect<StateProps, DispatchProps, OwnProps, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.accountScreen10)(DataSaver))
+)(withTranslation<Props>(Namespaces.accountScreen10)(DataSaver))

@@ -11,7 +11,6 @@
   "contacts": "Contactos",
   "invite": "Invitar",
   "sendTo": "Enviar a",
-  "amount": "Monto",
   "celoDollarAmount": "<0></0> {{CeloDollar}}",
   "celoDollarAmount_plural": "<0></0> {{CeloDollars}}",
   "addDescription": "Agregar descripción",

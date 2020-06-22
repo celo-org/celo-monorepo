@@ -244,4 +244,7 @@ const style = StyleSheet.create({
   },
 })
 
-export default connect(mapStateToProps, {})(withTranslation(Namespaces.sendFlow7)(RecipientPicker))
+export default connect(
+  mapStateToProps,
+  {}
+)(withTranslation<RecipientProps>(Namespaces.sendFlow7)(RecipientPicker))

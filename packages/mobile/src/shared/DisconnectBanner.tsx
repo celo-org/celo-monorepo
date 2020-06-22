@@ -90,5 +90,5 @@ const styles = StyleSheet.create({
 })
 
 export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(
-  withTranslation(Namespaces.global)(DisconnectBanner)
+  withTranslation<Props>(Namespaces.global)(DisconnectBanner)
 )

@@ -32,6 +32,7 @@
   "transactionFailed": "Transacción fallido, por favor vuelva a intentarlo",
   "refreshFailedUnexpectedly": "Error al actualizar, por favor revise tu conectividad",
   "edit": "Editar",
+  "paste": "Pegar",
   "receivedPayment": "Pago recibido",
   "readOnlyState": "Modo de solo lectura: cree la clave de respaldo para seguir enviando y recibiendo {{CeloDollars}}",
   "getStarted": "Primeros pasos",
@@ -171,5 +172,7 @@
   "help": "Ayuda",
   "dismiss": "Ocultar",
   "review": "Revisión",
-  "insufficientBalance": "Su saldo es demasiado bajo para realizar esta transacción."
+  "insufficientBalance": "Su saldo es demasiado bajo para realizar esta transacción.",
+  "amount": "Monto",
+  "currentBalance": "Saldo actual"
 }
