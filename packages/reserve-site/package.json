@@ -1,7 +1,6 @@
 {
   "name": "celo-reserve.org",
   "version": "0.1.0",
-  "main": "dist/server/index.js",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -10,7 +9,7 @@
     "deploy": "yarn run kill-dev; yarn run clean-next-cache; yarn run prepare; gcloud app deploy $MANIFEST && yarn run view",
     "deploy:dev": "gcloud config set project celo-reserve-site-281118; NODE_ENV=production DEPLOY_ENV=development MANIFEST=development.yaml yarn run deploy",
     "deploy:prod": "gcloud config set project celo-reserve-site-281118; NODE_ENV=production DEPLOY_ENV=production MANIFEST=production.yaml yarn run deploy",
-    "view": "gcloud app browse -s website-$DEPLOY_ENV",
+    "view": "gcloud app browse -s celo-reserve-site-281118",
     "kill-dev": "kill -9 $(lsof -ti :3000)",
     "clean-next-cache": "rm -rf .next",
     "start": "next start"
