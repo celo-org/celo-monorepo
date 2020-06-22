@@ -1,5 +1,4 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button.v2'
-import Link from '@celo/react-components/components/Link'
 import TextButton from '@celo/react-components/components/TextButton.v2'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
@@ -85,7 +84,6 @@ function VerificationEducationScreen({ route, navigation }: Props) {
           error={balanceIsSufficient ? null : ErrorMessages.INSUFFICIENT_BALANCE}
         />
         <View style={styles.spacer} />
-        <Link onPress={onPressLearnMore}>{}</Link>
         <TextButton style={styles.learnMoreButton} onPress={onPressLearnMore}>
           {t('verificationEducation.learnMore')}
         </TextButton>
