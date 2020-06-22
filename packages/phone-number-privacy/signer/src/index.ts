@@ -1,10 +1,12 @@
 import logger from './common/logger'
 import config, { DEV_MODE } from './config'
+import { initDatabase } from './database/database'
 import { initKeyProvider } from './key-management/key-provider'
 import { createServer } from './server'
 
 async function start() {
   logger.info(`Starting. Dev mode: ${DEV_MODE}`)
+  await initDatabase()
   await initKeyProvider()
 
   const server = createServer()
@@ -17,5 +19,5 @@ async function start() {
 
 start().catch((e) => {
   logger.error('Fatal error occured. Exiting', e)
-  process.exitCode = 1
+  process.exit(1)
 })

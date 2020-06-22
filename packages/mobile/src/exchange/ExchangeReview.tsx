@@ -289,4 +289,4 @@ export default connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateT
   exchangeTokens,
   fetchExchangeRate,
   fetchTobinTax,
-})(withTranslation(Namespaces.exchangeFlow9)(ExchangeReview))
+})(withTranslation<Props>(Namespaces.exchangeFlow9)(ExchangeReview))

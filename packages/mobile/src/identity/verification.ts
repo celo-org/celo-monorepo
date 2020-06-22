@@ -44,7 +44,7 @@ import { privateCommentKeySelector } from 'src/web3/selectors'
 const TAG = 'identity/verification'
 
 export const NUM_ATTESTATIONS_REQUIRED = 3
-export const VERIFICATION_TIMEOUT = 5 * 60 * 1000 // 5 minutes
+export const VERIFICATION_TIMEOUT = 10 * 60 * 1000 // 10 minutes
 
 export enum CodeInputType {
   AUTOMATIC = 'automatic',
