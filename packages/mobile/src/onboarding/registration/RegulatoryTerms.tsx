@@ -98,7 +98,7 @@ export class RegulatoryTerms extends React.Component<Props> {
 export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.nuxNamePin1)(RegulatoryTerms))
+)(withTranslation<Props>(Namespaces.nuxNamePin1)(RegulatoryTerms))
 
 const styles = StyleSheet.create({
   container: {
