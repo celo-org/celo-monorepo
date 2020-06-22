@@ -90,4 +90,4 @@ const styles = StyleSheet.create({
 export default connect<StateProps, {}, OwnProps, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.accountScreen10)(Profile))
+)(withTranslation<Props>(Namespaces.accountScreen10)(Profile))
