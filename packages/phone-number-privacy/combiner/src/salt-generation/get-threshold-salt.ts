@@ -24,6 +24,7 @@ interface GetBlindedMessageForSaltRequest {
 interface SignMessageResponse {
   success: boolean
   signature: string
+  version: string
 }
 
 interface SignerService {
