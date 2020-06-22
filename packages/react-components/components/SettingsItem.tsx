@@ -95,7 +95,6 @@ type SettingsItemInputProps = {
   value: string
   placeholder?: string
   onValueChange: (value: string) => void
-  details?: string
 } & Pick<SettingsItemNoValueProps, 'title' | 'testID'>
 
 export function SettingsItemInput({

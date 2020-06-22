@@ -15,8 +15,6 @@ import { navigateBack } from 'src/navigator/NavigationService'
 
 const DEFAULT_CURRENCY_CODE = LocalCurrencyCode.USD
 
-// const keyExtractor = (item: LocalCurrencyCode) => item
-
 function SelectLocalCurrency() {
   // tslint:disable-next-line: react-hooks-nesting
   const selectedCurrencyCode = useLocalCurrencyCode() || DEFAULT_CURRENCY_CODE
