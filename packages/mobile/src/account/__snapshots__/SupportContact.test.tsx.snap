@@ -57,7 +57,6 @@ exports[`Contact renders correctly 1`] = `
       >
         <TextInput
           allowFontScaling={true}
-          autoFocus={true}
           multiline={true}
           numberOfLines={10}
           onBlur={[Function]}
