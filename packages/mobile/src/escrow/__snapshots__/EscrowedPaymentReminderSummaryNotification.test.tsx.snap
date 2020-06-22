@@ -73,8 +73,8 @@ exports[`EscrowedPaymentReminderSummaryNotification renders correctly 1`] = `
         style={
           Object {
             "color": "#2E3338",
-            "fontFamily": "Inter-Medium",
-            "fontSize": 16,
+            "fontFamily": "Jost-Medium",
+            "fontSize": 18,
             "lineHeight": 22,
             "marginBottom": 4,
           }
@@ -443,8 +443,8 @@ exports[`EscrowedPaymentReminderSummaryNotification when more than 2 requests re
         style={
           Object {
             "color": "#2E3338",
-            "fontFamily": "Inter-Medium",
-            "fontSize": 16,
+            "fontFamily": "Jost-Medium",
+            "fontSize": 18,
             "lineHeight": 22,
             "marginBottom": 4,
           }
