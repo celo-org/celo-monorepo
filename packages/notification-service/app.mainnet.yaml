@@ -1,0 +1,5 @@
+runtime: nodejs10
+service: notification
+instance_class: B4
+manual_scaling:
+  instances: 1
