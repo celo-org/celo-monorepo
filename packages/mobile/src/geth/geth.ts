@@ -166,7 +166,7 @@ async function ensureStaticNodesInitialized(sync: boolean = true): Promise<boole
   Logger.debug('Geth@ensureStaticNodesInitialized', 'initializing static nodes')
   let enodes: string | null = null
   try {
-    enodes = await StaticNodeUtils.getStaticNodesAsync(DEFAULT_TESTNET)
+    enodes = sync ? await StaticNodeUtils.getStaticNodesAsync(DEFAULT_TESTNET) : '[]'
   } catch (error) {
     Logger.error(
       `Failed to get static nodes for network ${DEFAULT_TESTNET},` +
@@ -174,9 +174,6 @@ async function ensureStaticNodesInitialized(sync: boolean = true): Promise<boole
       error
     )
     return false
-  }
-  if (!sync) {
-    enodes = '[]'
   }
   if (enodes != null) {
     await writeStaticNodes(nodeDir, enodes)
