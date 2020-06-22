@@ -5,10 +5,10 @@ import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
 import RNGeth from 'react-native-geth'
 import { DEFAULT_TESTNET } from 'src/config'
+import { SYNCING_MAX_PEERS } from 'src/geth/consts'
 import networkConfig from 'src/geth/networkConfig'
 import Logger from 'src/utils/Logger'
 import FirebaseLogUploader from 'src/utils/LogUploader'
-import { SYNCING_MAX_PEERS } from './consts'
 
 let gethLock = false
 let gethInstance: typeof RNGeth | null = null
