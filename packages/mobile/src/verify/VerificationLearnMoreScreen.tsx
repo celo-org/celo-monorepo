@@ -53,4 +53,6 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withTranslation(Namespaces.nuxVerification2)(VerificationLearnMoreScreen)
+export default withTranslation<WithTranslation>(Namespaces.nuxVerification2)(
+  VerificationLearnMoreScreen
+)

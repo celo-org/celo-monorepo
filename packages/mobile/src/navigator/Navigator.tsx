@@ -35,6 +35,13 @@ import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmat
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
 import FeeExchangeEducation from 'src/exchange/FeeExchangeEducation'
+import FiatExchangeAmount, {
+  fiatExchangesAmountScreenOptions,
+} from 'src/fiatExchanges/FiatExchangeAmount'
+import FiatExchangeOptions, {
+  fiatExchangesOptionsScreenOptions,
+} from 'src/fiatExchanges/FiatExchangeOptions'
+import MoonPay, { moonPayOptions } from 'src/fiatExchanges/MoonPay'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import PhoneNumberLookupQuotaScreen from 'src/identity/PhoneNumberLookupQuotaScreen'
@@ -55,7 +62,6 @@ import {
   noHeader,
   noHeaderGestureDisabled,
   nuxNavigationOptions,
-  nuxNavigationOptionsNoBackButton,
 } from 'src/navigator/Headers.v2'
 import { navigateBack, navigateToExchangeHome } from 'src/navigator/NavigationService'
 import QRNavigator from 'src/navigator/QRNavigator'
@@ -205,7 +211,7 @@ const nuxScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen
       name={Screens.EnterInviteCode}
       component={EnterInviteCode}
-      options={nuxNavigationOptionsNoBackButton}
+      options={EnterInviteCode.navigationOptions}
     />
     <Navigator.Screen
       name={Screens.ImportWallet}
@@ -407,6 +413,17 @@ const settingsScreens = (Navigator: typeof Stack) => (
       name={Screens.SupportContact}
       component={SupportContact}
     />
+    <Navigator.Screen
+      options={fiatExchangesAmountScreenOptions}
+      name={Screens.FiatExchangeAmount}
+      component={FiatExchangeAmount}
+    />
+    <Navigator.Screen
+      options={fiatExchangesOptionsScreenOptions}
+      name={Screens.FiatExchangeOptions}
+      component={FiatExchangeOptions}
+    />
+    <Navigator.Screen options={moonPayOptions} name={Screens.MoonPay} component={MoonPay} />
   </>
 )
 

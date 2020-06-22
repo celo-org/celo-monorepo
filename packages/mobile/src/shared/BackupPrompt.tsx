@@ -51,5 +51,5 @@ export class BackupPrompt extends React.Component<Props> {
 }
 
 export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(
-  withTranslation(Namespaces.backupKeyFlow6)(BackupPrompt)
+  withTranslation<Props>(Namespaces.backupKeyFlow6)(BackupPrompt)
 )

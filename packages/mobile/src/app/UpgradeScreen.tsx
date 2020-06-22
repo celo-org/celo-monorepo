@@ -22,4 +22,4 @@ class UpgradeScreen extends React.Component<Props> {
   }
 }
 
-export default withTranslation(Namespaces.global)(UpgradeScreen)
+export default withTranslation<Props>(Namespaces.global)(UpgradeScreen)
