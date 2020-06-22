@@ -1,6 +1,8 @@
+import { NumberToRecipient } from 'src/recipients/recipient'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
 import { Actions, ActionTypes } from 'src/transactions/actions'
+import { isTransferTransaction } from 'src/transactions/transferFeedUtils'
 import { StandbyTransaction } from 'src/transactions/types'
 
 export interface State {
@@ -14,15 +16,19 @@ export interface State {
   // tx feed query watcher. Necessary so we don't re-process
   // txs more than once.
   knownFeedTransactions: KnownFeedTransactionsType
+  recentTxRecipientsCache: NumberToRecipient
 }
 
 export interface KnownFeedTransactionsType {
-  [txHash: string]: boolean
+  // Value will be an address string for transfer transactions
+  // and true boolean for exchange transactions
+  [txHash: string]: string | boolean
 }
 
 const initialState = {
   standbyTransactions: [],
   knownFeedTransactions: {},
+  recentTxRecipientsCache: {},
 }
 
 export const reducer = (
@@ -70,10 +76,19 @@ export const reducer = (
       }
     case Actions.NEW_TRANSACTIONS_IN_FEED:
       const newKnownFeedTransactions = { ...state.knownFeedTransactions }
-      action.transactions.forEach((tx) => (newKnownFeedTransactions[tx.hash] = true))
+      action.transactions.forEach((tx) => {
+        isTransferTransaction(tx)
+          ? (newKnownFeedTransactions[tx.hash] = tx.address)
+          : (newKnownFeedTransactions[tx.hash] = true)
+      })
       return {
         ...state,
         knownFeedTransactions: newKnownFeedTransactions,
+      }
+    case Actions.UPDATE_RECENT_TX_RECIPIENT_CACHE:
+      return {
+        ...state,
+        recentTxRecipientsCache: action.recentTxRecipientsCache,
       }
     default:
       return state
@@ -85,3 +100,6 @@ export const standbyTransactionsSelector = (state: RootState) =>
 
 export const knownFeedTransactionsSelector = (state: RootState) =>
   state.transactions.knownFeedTransactions
+
+export const recentTxRecipientsCacheSelector = (state: RootState) =>
+  state.transactions.recentTxRecipientsCache
