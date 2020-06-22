@@ -17,8 +17,8 @@ import {
   AccountsInstance,
   FreezerContract,
   FreezerInstance,
-  GoldTokenContract,
-  GoldTokenInstance,
+  CeloTokenContract,
+  CeloTokenInstance,
   LockedGoldContract,
   LockedGoldInstance,
   MockElectionContract,
@@ -36,7 +36,7 @@ import {
 } from 'types'
 import Web3 from 'web3'
 
-const ONE_GOLDTOKEN = new BigNumber('1000000000000000000')
+const ONE_CGLDTOKEN = new BigNumber('1000000000000000000')
 
 const authorizationTests: any = {}
 const authorizationTestDescriptions = {
@@ -72,7 +72,7 @@ interface ReleaseGoldConfig {
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const Freezer: FreezerContract = artifacts.require('Freezer')
-const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
+const CeloToken: CeloTokenContract = artifacts.require('CeloToken')
 const LockedGold: LockedGoldContract = artifacts.require('LockedGold')
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
@@ -89,7 +89,7 @@ ReleaseGold.numberFormat = 'BigNumber'
 // @ts-ignore
 MockStableToken.numberFormat = 'BigNumber'
 // @ts-ignore
-GoldToken.numberFormat = 'BigNumber'
+CeloToken.numberFormat = 'BigNumber'
 
 const MINUTE = 60
 const HOUR = 60 * 60
@@ -107,7 +107,7 @@ contract('ReleaseGold', (accounts: string[]) => {
   const newBeneficiary = accounts[4]
   let accountsInstance: AccountsInstance
   let freezerInstance: FreezerInstance
-  let goldTokenInstance: GoldTokenInstance
+  let celoTokenInstance: CeloTokenInstance
   let lockedGoldInstance: LockedGoldInstance
   let mockElection: MockElectionInstance
   let mockGovernance: MockGovernanceInstance
@@ -116,7 +116,7 @@ contract('ReleaseGold', (accounts: string[]) => {
   let registry: RegistryInstance
   let releaseGoldInstance: ReleaseGoldInstance
   let proofOfWalletOwnership: Signature
-  const TOTAL_AMOUNT = ONE_GOLDTOKEN.times(10)
+  const TOTAL_AMOUNT = ONE_CGLDTOKEN.times(10)
 
   const releaseGoldDefaultSchedule: ReleaseGoldConfig = {
     releaseStartTime: null, // To be adjusted on every run
@@ -140,7 +140,7 @@ contract('ReleaseGold', (accounts: string[]) => {
   ) => {
     releaseGoldSchedule.releaseStartTime = (await getCurrentBlockchainTimestamp(web3)) + 5 * MINUTE
     releaseGoldInstance = await ReleaseGold.new()
-    await goldTokenInstance.transfer(
+    await celoTokenInstance.transfer(
       releaseGoldInstance.address,
       releaseGoldSchedule.amountReleasedPerPeriod.multipliedBy(
         releaseGoldSchedule.numReleasePeriods
@@ -174,7 +174,7 @@ contract('ReleaseGold', (accounts: string[]) => {
   beforeEach(async () => {
     accountsInstance = await Accounts.new()
     freezerInstance = await Freezer.new()
-    goldTokenInstance = await GoldToken.new()
+    celoTokenInstance = await CeloToken.new()
     lockedGoldInstance = await LockedGold.new()
     mockElection = await MockElection.new()
     mockGovernance = await MockGovernance.new()
@@ -185,13 +185,13 @@ contract('ReleaseGold', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await registry.setAddressFor(CeloContractName.Freezer, freezerInstance.address)
-    await registry.setAddressFor(CeloContractName.GoldToken, goldTokenInstance.address)
+    await registry.setAddressFor(CeloContractName.CeloToken, celoTokenInstance.address)
     await registry.setAddressFor(CeloContractName.Governance, mockGovernance.address)
     await registry.setAddressFor(CeloContractName.LockedGold, lockedGoldInstance.address)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     await registry.setAddressFor(CeloContractName.StableToken, mockStableToken.address)
     await lockedGoldInstance.initialize(registry.address, UNLOCKING_PERIOD)
-    await goldTokenInstance.initialize(registry.address)
+    await celoTokenInstance.initialize(registry.address)
     await accountsInstance.initialize(registry.address)
     await accountsInstance.createAccount({ from: beneficiary })
   })
@@ -199,7 +199,7 @@ contract('ReleaseGold', (accounts: string[]) => {
   describe('#payable', () => {
     it('should accept gold transfer by default from anyone', async () => {
       await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
-      await goldTokenInstance.transfer(releaseGoldInstance.address, ONE_GOLDTOKEN.times(2), {
+      await celoTokenInstance.transfer(releaseGoldInstance.address, ONE_CGLDTOKEN.times(2), {
         from: accounts[8],
       })
     })
@@ -232,7 +232,7 @@ contract('ReleaseGold', (accounts: string[]) => {
       })
 
       it('should have associated funds with a schedule upon creation', async () => {
-        const allocatedFunds = await goldTokenInstance.balanceOf(releaseGoldInstance.address)
+        const allocatedFunds = await celoTokenInstance.balanceOf(releaseGoldInstance.address)
         assertEqualBN(
           allocatedFunds,
           new BigNumber(releaseGoldDefaultSchedule.numReleasePeriods).multipliedBy(
@@ -1129,9 +1129,9 @@ contract('ReleaseGold', (accounts: string[]) => {
               })
 
               it('should allow refund of all remaining gold', async () => {
-                const refundAddressBalanceBefore = await goldTokenInstance.balanceOf(refundAddress)
+                const refundAddressBalanceBefore = await celoTokenInstance.balanceOf(refundAddress)
                 await releaseGoldInstance.refundAndFinalize({ from: releaseOwner })
-                const refundAddressBalanceAfter = await goldTokenInstance.balanceOf(refundAddress)
+                const refundAddressBalanceAfter = await celoTokenInstance.balanceOf(refundAddress)
                 assertEqualBN(
                   refundAddressBalanceAfter.minus(refundAddressBalanceBefore),
                   TOTAL_AMOUNT
@@ -1157,9 +1157,9 @@ contract('ReleaseGold', (accounts: string[]) => {
               })
 
               it('should allow refund of all remaining gold', async () => {
-                const refundAddressBalanceBefore = await goldTokenInstance.balanceOf(refundAddress)
+                const refundAddressBalanceBefore = await celoTokenInstance.balanceOf(refundAddress)
                 await releaseGoldInstance.refundAndFinalize({ from: releaseOwner })
-                const refundAddressBalanceAfter = await goldTokenInstance.balanceOf(refundAddress)
+                const refundAddressBalanceAfter = await celoTokenInstance.balanceOf(refundAddress)
                 assertEqualBN(
                   refundAddressBalanceAfter.minus(refundAddressBalanceBefore),
                   TOTAL_AMOUNT.div(2)
@@ -1218,21 +1218,21 @@ contract('ReleaseGold', (accounts: string[]) => {
       })
 
       it('should transfer gold proportions to both beneficiary and refundAddress when no gold locked', async () => {
-        const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
-        const refundAddressBalanceBefore = await goldTokenInstance.balanceOf(refundAddress)
+        const beneficiaryBalanceBefore = await celoTokenInstance.balanceOf(beneficiary)
+        const refundAddressBalanceBefore = await celoTokenInstance.balanceOf(refundAddress)
         const [, , releasedBalanceAtRevoke] = await releaseGoldInstance.revocationInfo()
         const beneficiaryRefundAmount = new BigNumber(releasedBalanceAtRevoke).minus(
           await releaseGoldInstance.totalWithdrawn()
         )
         const refundAddressRefundAmount = new BigNumber(
-          await goldTokenInstance.balanceOf(releaseGoldInstance.address)
+          await celoTokenInstance.balanceOf(releaseGoldInstance.address)
         ).minus(beneficiaryRefundAmount)
         await releaseGoldInstance.refundAndFinalize({ from: releaseOwner })
-        const contractBalanceAfterFinalize = await goldTokenInstance.balanceOf(
+        const contractBalanceAfterFinalize = await celoTokenInstance.balanceOf(
           releaseGoldInstance.address
         )
-        const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
-        const refundAddressBalanceAfter = await goldTokenInstance.balanceOf(refundAddress)
+        const beneficiaryBalanceAfter = await celoTokenInstance.balanceOf(beneficiary)
+        const refundAddressBalanceAfter = await celoTokenInstance.balanceOf(refundAddress)
 
         assertEqualBN(
           new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),
@@ -1577,11 +1577,11 @@ contract('ReleaseGold', (accounts: string[]) => {
           await releaseGoldInstance.setMaxDistribution(1000, { from: releaseOwner })
         })
         it('should revert since beneficiary should not be able to withdraw anything within the first quarter', async () => {
-          const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
+          const beneficiaryBalanceBefore = await celoTokenInstance.balanceOf(beneficiary)
           const timeToTravel = 2.9 * MONTH
           await timeTravel(timeToTravel, web3)
           const expectedWithdrawalAmount = await releaseGoldInstance.getCurrentReleasedTotalAmount()
-          const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
+          const beneficiaryBalanceAfter = await celoTokenInstance.balanceOf(beneficiary)
           assertEqualBN(expectedWithdrawalAmount, 0)
           await assertRevert(
             releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
@@ -1593,13 +1593,13 @@ contract('ReleaseGold', (accounts: string[]) => {
         })
 
         it('should allow the beneficiary to withdraw 25% of the released amount of gold right after the beginning of the first quarter', async () => {
-          const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
+          const beneficiaryBalanceBefore = await celoTokenInstance.balanceOf(beneficiary)
           const timeToTravel = 3 * MONTH + 1 * DAY
           await timeTravel(timeToTravel, web3)
           const expectedWithdrawalAmount = initialreleaseGoldAmount.div(4)
           await releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
           const totalWithdrawn = await releaseGoldInstance.totalWithdrawn()
-          const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
+          const beneficiaryBalanceAfter = await celoTokenInstance.balanceOf(beneficiary)
           assertEqualBN(new BigNumber(totalWithdrawn), expectedWithdrawalAmount)
           assertEqualBN(
             new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),
@@ -1608,13 +1608,13 @@ contract('ReleaseGold', (accounts: string[]) => {
         })
 
         it('should allow the beneficiary to withdraw 50% the released amount of gold when half of the release periods have passed', async () => {
-          const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
+          const beneficiaryBalanceBefore = await celoTokenInstance.balanceOf(beneficiary)
           const timeToTravel = 6 * MONTH + 1 * DAY
           await timeTravel(timeToTravel, web3)
           const expectedWithdrawalAmount = initialreleaseGoldAmount.div(2)
           await releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
           const totalWithdrawn = await releaseGoldInstance.totalWithdrawn()
-          const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
+          const beneficiaryBalanceAfter = await celoTokenInstance.balanceOf(beneficiary)
           assertEqualBN(new BigNumber(totalWithdrawn), expectedWithdrawalAmount)
           assertEqualBN(
             new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),
@@ -1623,12 +1623,12 @@ contract('ReleaseGold', (accounts: string[]) => {
         })
 
         it('should allow the beneficiary to withdraw 75% of the released amount of gold right after the beginning of the third quarter', async () => {
-          const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
+          const beneficiaryBalanceBefore = await celoTokenInstance.balanceOf(beneficiary)
           const timeToTravel = 9 * MONTH + 1 * DAY
           await timeTravel(timeToTravel, web3)
           const expectedWithdrawalAmount = initialreleaseGoldAmount.multipliedBy(3).div(4)
           await releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
-          const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
+          const beneficiaryBalanceAfter = await celoTokenInstance.balanceOf(beneficiary)
           const totalWithdrawn = await releaseGoldInstance.totalWithdrawn()
           assertEqualBN(new BigNumber(totalWithdrawn), expectedWithdrawalAmount)
           assertEqualBN(
@@ -1638,12 +1638,12 @@ contract('ReleaseGold', (accounts: string[]) => {
         })
 
         it('should allow the beneficiary to withdraw 100% of the amount right after the end of the release period', async () => {
-          const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
+          const beneficiaryBalanceBefore = await celoTokenInstance.balanceOf(beneficiary)
           const timeToTravel = 12 * MONTH + 1 * DAY
           await timeTravel(timeToTravel, web3)
           const expectedWithdrawalAmount = initialreleaseGoldAmount
           await releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
-          const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
+          const beneficiaryBalanceAfter = await celoTokenInstance.balanceOf(beneficiary)
 
           assertEqualBN(
             new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),
@@ -1668,7 +1668,7 @@ contract('ReleaseGold', (accounts: string[]) => {
         describe('when rewards are simulated', () => {
           beforeEach(async () => {
             // Simulate rewards of 0.5 Gold
-            await goldTokenInstance.transfer(releaseGoldInstance.address, ONE_GOLDTOKEN.div(2), {
+            await celoTokenInstance.transfer(releaseGoldInstance.address, ONE_CGLDTOKEN.div(2), {
               from: owner,
             })
             // Default distribution is 100%
@@ -1681,7 +1681,7 @@ contract('ReleaseGold', (accounts: string[]) => {
             })
 
             it('should allow distribution of initial balance and rewards', async () => {
-              const expectedWithdrawalAmount = TOTAL_AMOUNT.plus(ONE_GOLDTOKEN.div(2))
+              const expectedWithdrawalAmount = TOTAL_AMOUNT.plus(ONE_CGLDTOKEN.div(2))
               await releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
             })
           })
@@ -1693,12 +1693,12 @@ contract('ReleaseGold', (accounts: string[]) => {
             })
 
             it('should scale released amount to 50% of initial balance plus rewards', async () => {
-              const expectedWithdrawalAmount = TOTAL_AMOUNT.plus(ONE_GOLDTOKEN.div(2)).div(2)
+              const expectedWithdrawalAmount = TOTAL_AMOUNT.plus(ONE_CGLDTOKEN.div(2)).div(2)
               await releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
             })
 
             it('should not allow withdrawal of more than 50% gold', async () => {
-              const unexpectedWithdrawalAmount = TOTAL_AMOUNT.plus(ONE_GOLDTOKEN)
+              const unexpectedWithdrawalAmount = TOTAL_AMOUNT.plus(ONE_CGLDTOKEN)
                 .div(2)
                 .plus(1)
               await assertRevert(
@@ -1716,7 +1716,7 @@ contract('ReleaseGold', (accounts: string[]) => {
           await releaseGoldInstance.setMaxDistribution(500, { from: releaseOwner })
           // Simulate rewards of 0.5 Gold
           // Have to send after setting max distribution as mentioned above
-          await goldTokenInstance.transfer(releaseGoldInstance.address, ONE_GOLDTOKEN.div(2), {
+          await celoTokenInstance.transfer(releaseGoldInstance.address, ONE_CGLDTOKEN.div(2), {
             from: owner,
           })
           const timeToTravel = 12 * MONTH + 1 * DAY
@@ -1740,14 +1740,14 @@ contract('ReleaseGold', (accounts: string[]) => {
           await releaseGoldInstance.setMaxDistribution(1000, { from: releaseOwner })
         })
         it('should allow the beneficiary to withdraw up to the releasedBalanceAtRevoke', async () => {
-          const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
+          const beneficiaryBalanceBefore = await celoTokenInstance.balanceOf(beneficiary)
           const timeToTravel = 6 * MONTH + 1 * DAY
           await timeTravel(timeToTravel, web3)
           await releaseGoldInstance.revoke({ from: releaseOwner })
           const [, , expectedWithdrawalAmount] = await releaseGoldInstance.revocationInfo()
           await releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
           const totalWithdrawn = await releaseGoldInstance.totalWithdrawn()
-          const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
+          const beneficiaryBalanceAfter = await celoTokenInstance.balanceOf(beneficiary)
           assertEqualBN(new BigNumber(totalWithdrawn), expectedWithdrawalAmount)
           assertEqualBN(
             new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),
@@ -1771,13 +1771,13 @@ contract('ReleaseGold', (accounts: string[]) => {
         })
 
         it('should selfdestruct if beneficiary withdraws the entire amount', async () => {
-          const beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
+          const beneficiaryBalanceBefore = await celoTokenInstance.balanceOf(beneficiary)
           const timeToTravel = 12 * MONTH + 1 * DAY
           await timeTravel(timeToTravel, web3)
           await releaseGoldInstance.revoke({ from: releaseOwner })
           const [, , expectedWithdrawalAmount] = await releaseGoldInstance.revocationInfo()
           await releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
-          const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
+          const beneficiaryBalanceAfter = await celoTokenInstance.balanceOf(beneficiary)
 
           assertEqualBN(
             new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),
@@ -1797,7 +1797,7 @@ contract('ReleaseGold', (accounts: string[]) => {
     describe('when max distribution is set lower', () => {
       let beneficiaryBalanceBefore: any
       beforeEach(async () => {
-        beneficiaryBalanceBefore = await goldTokenInstance.balanceOf(beneficiary)
+        beneficiaryBalanceBefore = await celoTokenInstance.balanceOf(beneficiary)
         const timeToTravel = 12 * MONTH + 1 * DAY
         await timeTravel(timeToTravel, web3)
       })
@@ -1810,7 +1810,7 @@ contract('ReleaseGold', (accounts: string[]) => {
         it('should allow withdrawal of 50%', async () => {
           const expectedWithdrawalAmount = initialreleaseGoldAmount.multipliedBy(0.5)
           await releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
-          const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
+          const beneficiaryBalanceAfter = await celoTokenInstance.balanceOf(beneficiary)
 
           assertEqualBN(
             new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),
@@ -1833,7 +1833,7 @@ contract('ReleaseGold', (accounts: string[]) => {
         it('should allow withdrawal of all gold', async () => {
           const expectedWithdrawalAmount = initialreleaseGoldAmount
           await releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
-          const beneficiaryBalanceAfter = await goldTokenInstance.balanceOf(beneficiary)
+          const beneficiaryBalanceAfter = await celoTokenInstance.balanceOf(beneficiary)
 
           assertEqualBN(
             new BigNumber(beneficiaryBalanceAfter).minus(new BigNumber(beneficiaryBalanceBefore)),

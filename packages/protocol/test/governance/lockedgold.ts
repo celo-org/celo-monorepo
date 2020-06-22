@@ -18,8 +18,8 @@ import {
   LockedGoldInstance,
   MockElectionContract,
   MockElectionInstance,
-  MockGoldTokenContract,
-  MockGoldTokenInstance,
+  MockCeloTokenContract,
+  MockCeloTokenInstance,
   MockGovernanceContract,
   MockGovernanceInstance,
   MockValidatorsContract,
@@ -32,7 +32,7 @@ const Accounts: AccountsContract = artifacts.require('Accounts')
 const LockedGold: LockedGoldContract = artifacts.require('LockedGold')
 const ElectionTest: ElectionTestContract = artifacts.require('Election')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
-const MockGoldToken: MockGoldTokenContract = artifacts.require('MockGoldToken')
+const MockCeloToken: MockCeloTokenContract = artifacts.require('MockCeloToken')
 const MockGovernance: MockGovernanceContract = artifacts.require('MockGovernance')
 const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
 const Registry: RegistryContract = artifacts.require('Registry')
@@ -58,10 +58,10 @@ contract('LockedGold', (accounts: string[]) => {
   let mockGovernance: MockGovernanceInstance
   let mockValidators: MockValidatorsInstance
   let registry: RegistryInstance
-  let mockGoldToken: MockGoldTokenInstance
+  let mockCeloToken: MockCeloTokenInstance
 
   beforeEach(async () => {
-    mockGoldToken = await MockGoldToken.new()
+    mockCeloToken = await MockCeloToken.new()
     accountsInstance = await Accounts.new()
     lockedGold = await LockedGold.new()
     mockElection = await MockElection.new()
@@ -70,7 +70,7 @@ contract('LockedGold', (accounts: string[]) => {
     registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
-    await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
+    await registry.setAddressFor(CeloContractName.CeloToken, mockCeloToken.address)
     await registry.setAddressFor(CeloContractName.Governance, mockGovernance.address)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     await registry.setAddressFor(CeloContractName.LockedGold, lockedGold.address)

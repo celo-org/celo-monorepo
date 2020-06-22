@@ -13,7 +13,7 @@ import "../common/UsingRegistry.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
 /**
- * @title Contract that allows to exchange StableToken for GoldToken and vice versa
+ * @title Contract that allows to exchange StableToken for CeloToken and vice versa
  * using a Constant Product Market Maker Model
  */
 contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, ReentrancyGuard, Freezable {
@@ -107,7 +107,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
       goldBucket = goldBucket.add(sellAmount);
       stableBucket = stableBucket.sub(buyAmount);
       require(
-        getGoldToken().transferFrom(msg.sender, address(reserve), sellAmount),
+        getCeloToken().transferFrom(msg.sender, address(reserve), sellAmount),
         "Transfer of sell token failed"
       );
       require(IStableToken(stable).mint(msg.sender, buyAmount), "Mint of stable token failed");

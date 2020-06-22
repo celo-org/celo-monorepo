@@ -93,7 +93,7 @@ const DefaultConfig = {
     targetDensity: 1 / 2,
     adjustmentSpeed: 1 / 2,
   },
-  goldToken: {
+  celoToken: {
     frozen: true,
   },
   governance: {
@@ -277,7 +277,7 @@ const NetworkConfigs = {
       frozen: false,
       minimumReports: 1,
     },
-    goldToken: {
+    celoToken: {
       frozen: false,
     },
     governanceApproverMultiSig: {
@@ -319,7 +319,7 @@ const NetworkConfigs = {
     exchange: {
       frozen: false,
     },
-    goldToken: {
+    celoToken: {
       frozen: false,
     },
     governance: {
@@ -389,7 +389,7 @@ const NetworkConfigs = {
       frozen: false,
       minimumReports: 1,
     },
-    goldToken: {
+    celoToken: {
       frozen: false,
     },
     stableToken: {

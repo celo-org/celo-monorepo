@@ -96,7 +96,7 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
 
   let totalValue = weiAmountReleasedPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods)
   if (totalValue.lt(startGold)) {
-    console.info('Total value of grant less than cGLD for beneficiary addreess')
+    console.info('Total value of grant less than CGLD for beneficiary addreess')
     process.exit(0)
   }
   const adjustedAmountPerPeriod = totalValue
@@ -209,10 +209,10 @@ async function checkBalance(releaseGoldConfig: any) {
       )
       continue
     }
-    // Must be enough to handle 1cGLD test transfer and 1cGLD for transaction fees
+    // Must be enough to handle 1CGLD test transfer and 1CGLD for transaction fees
     if (fromBalance.gt(TWO_CGLD)) {
       console.info(
-        '\nSending 1 cGLD as a test from ' +
+        '\nSending 1 CGLD as a test from ' +
           fromAddress +
           ' to ' +
           addressResponse.newFromAddress +
@@ -229,7 +229,7 @@ async function checkBalance(releaseGoldConfig: any) {
         type: 'confirm',
         name: 'confirmation',
         message:
-          'Please check the balance of your provided address. You should see the 1cGLD transfer and an initial genesis balance if this is a shard from the genesis block.\nCan you confirm this (y/n)?',
+          'Please check the balance of your provided address. You should see the 1CGLD transfer and an initial genesis balance if this is a shard from the genesis block.\nCan you confirm this (y/n)?',
       })
       if (!confirmResponse.confirmation) {
         console.info(chalk.red('Setting new address failed.\nRetrying.'))

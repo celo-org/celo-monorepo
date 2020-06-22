@@ -2,9 +2,9 @@ pragma solidity ^0.5.3;
 // solhint-disable no-unused-vars
 
 /**
- * @title A mock GoldToken for testing.
+ * @title A mock CeloToken for testing.
  */
-contract MockGoldToken {
+contract MockCeloToken {
   uint8 public constant decimals = 18;
   uint256 public totalSupply;
   mapping(address => uint256) balances;

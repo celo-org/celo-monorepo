@@ -10,146 +10,146 @@ import * as _ from 'lodash'
 import {
   FreezerContract,
   FreezerInstance,
-  GoldTokenContract,
-  GoldTokenInstance,
+  CeloTokenContract,
+  CeloTokenInstance,
   RegistryContract,
   RegistryInstance,
 } from 'types'
 
 const Freezer: FreezerContract = artifacts.require('Freezer')
-const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
+const CeloToken: CeloTokenContract = artifacts.require('CeloToken')
 const Registry: RegistryContract = artifacts.require('Registry')
 
 // @ts-ignore
 // TODO(mcortesi): Use BN
-GoldToken.numberFormat = 'BigNumber'
+CeloToken.numberFormat = 'BigNumber'
 
-contract('GoldToken', (accounts: string[]) => {
+contract('CeloToken', (accounts: string[]) => {
   let freezer: FreezerInstance
-  let goldToken: GoldTokenInstance
+  let celoToken: CeloTokenInstance
   let registry: RegistryInstance
-  const ONE_GOLDTOKEN = new BigNumber('1000000000000000000')
-  const TWO_GOLDTOKEN = new BigNumber('2000000000000000000')
+  const ONE_CGLDTOKEN = new BigNumber('1000000000000000000')
+  const TWO_CGLDTOKEN = new BigNumber('2000000000000000000')
   const sender = accounts[0]
   const receiver = accounts[1]
 
   beforeEach(async () => {
     freezer = await Freezer.new()
-    goldToken = await GoldToken.new()
+    celoToken = await CeloToken.new()
     registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
-    await goldToken.initialize(registry.address)
+    await celoToken.initialize(registry.address)
   })
 
   describe('#name()', () => {
     it('should have a name', async () => {
-      const name: string = await goldToken.name()
+      const name: string = await celoToken.name()
       assert.equal(name, 'Celo Gold')
     })
   })
 
   describe('#symbol()', () => {
     it('should have a symbol', async () => {
-      const name: string = await goldToken.symbol()
-      assert.equal(name, 'cGLD')
+      const name: string = await celoToken.symbol()
+      assert.equal(name, 'CGLD')
     })
   })
 
   describe('#decimals()', () => {
     it('should have decimals', async () => {
-      const decimals: BigNumber = await goldToken.decimals()
+      const decimals: BigNumber = await celoToken.decimals()
       assert.equal(decimals.toNumber(), 18)
     })
   })
 
   describe('#balanceOf()', () => {
     it('should match the balance returned by web3', async () => {
-      assertEqualBN(await goldToken.balanceOf(receiver), await web3.eth.getBalance(receiver))
+      assertEqualBN(await celoToken.balanceOf(receiver), await web3.eth.getBalance(receiver))
     })
   })
 
   describe('#approve()', () => {
     it('should set "allowed"', async () => {
-      await goldToken.approve(receiver, ONE_GOLDTOKEN)
-      assert.equal((await goldToken.allowance(sender, receiver)).valueOf(), ONE_GOLDTOKEN.valueOf())
+      await celoToken.approve(receiver, ONE_CGLDTOKEN)
+      assert.equal((await celoToken.allowance(sender, receiver)).valueOf(), ONE_CGLDTOKEN.valueOf())
     })
   })
 
   describe('#increaseAllowance()', () => {
     it('should increase "allowed"', async () => {
-      await goldToken.increaseAllowance(receiver, ONE_GOLDTOKEN)
-      await goldToken.increaseAllowance(receiver, ONE_GOLDTOKEN)
-      assert.equal((await goldToken.allowance(sender, receiver)).valueOf(), TWO_GOLDTOKEN.valueOf())
+      await celoToken.increaseAllowance(receiver, ONE_CGLDTOKEN)
+      await celoToken.increaseAllowance(receiver, ONE_CGLDTOKEN)
+      assert.equal((await celoToken.allowance(sender, receiver)).valueOf(), TWO_CGLDTOKEN.valueOf())
     })
   })
 
   describe('#decreaseAllowance()', () => {
     it('should decrease "allowed"', async () => {
-      await goldToken.approve(receiver, TWO_GOLDTOKEN)
-      await goldToken.decreaseAllowance(receiver, ONE_GOLDTOKEN)
-      assert.equal((await goldToken.allowance(sender, receiver)).valueOf(), ONE_GOLDTOKEN.valueOf())
+      await celoToken.approve(receiver, TWO_CGLDTOKEN)
+      await celoToken.decreaseAllowance(receiver, ONE_CGLDTOKEN)
+      assert.equal((await celoToken.allowance(sender, receiver)).valueOf(), ONE_CGLDTOKEN.valueOf())
     })
   })
 
   describe('#allowance()', () => {
     it('should return the allowance', async () => {
-      await goldToken.approve(receiver, ONE_GOLDTOKEN)
-      assert.equal((await goldToken.allowance(sender, receiver)).valueOf(), ONE_GOLDTOKEN.valueOf())
+      await celoToken.approve(receiver, ONE_CGLDTOKEN)
+      assert.equal((await celoToken.allowance(sender, receiver)).valueOf(), ONE_CGLDTOKEN.valueOf())
     })
   })
 
   describe('#transfer()', () => {
     it('should transfer balance from one user to another', async () => {
-      const startBalanceFrom = await goldToken.balanceOf(sender)
-      const startBalanceTo = await goldToken.balanceOf(receiver)
-      await goldToken.transfer(receiver, ONE_GOLDTOKEN)
-      await assertBalance(sender, startBalanceFrom.minus(ONE_GOLDTOKEN))
-      await assertBalance(receiver, startBalanceTo.plus(ONE_GOLDTOKEN))
+      const startBalanceFrom = await celoToken.balanceOf(sender)
+      const startBalanceTo = await celoToken.balanceOf(receiver)
+      await celoToken.transfer(receiver, ONE_CGLDTOKEN)
+      await assertBalance(sender, startBalanceFrom.minus(ONE_CGLDTOKEN))
+      await assertBalance(receiver, startBalanceTo.plus(ONE_CGLDTOKEN))
     })
 
     it('should transfer balance with a comment', async () => {
       const comment = 'tacos at lunch'
-      const startBalanceFrom = await goldToken.balanceOf(sender)
-      const startBalanceTo = await goldToken.balanceOf(receiver)
-      const res = await goldToken.transferWithComment(receiver, ONE_GOLDTOKEN, comment)
+      const startBalanceFrom = await celoToken.balanceOf(sender)
+      const startBalanceTo = await celoToken.balanceOf(receiver)
+      const res = await celoToken.transferWithComment(receiver, ONE_CGLDTOKEN, comment)
       const transferEvent = _.find(res.logs, { event: 'Transfer' })
       const transferCommentEvent = _.find(res.logs, { event: 'TransferComment' })
       assert.exists(transferEvent)
       assert.equal(transferCommentEvent.args.comment, comment)
-      await assertBalance(sender, startBalanceFrom.minus(ONE_GOLDTOKEN))
-      await assertBalance(receiver, startBalanceTo.plus(ONE_GOLDTOKEN))
+      await assertBalance(sender, startBalanceFrom.minus(ONE_CGLDTOKEN))
+      await assertBalance(receiver, startBalanceTo.plus(ONE_CGLDTOKEN))
     })
 
     it('should not allow transferring to the null address', async () => {
-      await assertRevert(goldToken.transfer(NULL_ADDRESS, ONE_GOLDTOKEN))
+      await assertRevert(celoToken.transfer(NULL_ADDRESS, ONE_CGLDTOKEN))
     })
 
     it('should not allow transferring more than the sender has', async () => {
       // We try to send four more gold tokens than the sender has, in case they happen to mine the
       // block with this transaction, which will reward them with 3 gold tokens.
       const value = web3.utils.toBN(
-        (await goldToken.balanceOf(sender)).plus(ONE_GOLDTOKEN.times(4))
+        (await celoToken.balanceOf(sender)).plus(ONE_CGLDTOKEN.times(4))
       )
-      await assertRevert(goldToken.transfer(receiver, value))
+      await assertRevert(celoToken.transfer(receiver, value))
     })
   })
 
   describe('#transferFrom()', () => {
     beforeEach(async () => {
-      await goldToken.approve(receiver, ONE_GOLDTOKEN)
+      await celoToken.approve(receiver, ONE_CGLDTOKEN)
     })
 
     it('should transfer balance from one user to another', async () => {
-      const startBalanceFrom = await goldToken.balanceOf(sender)
-      const startBalanceTo = await goldToken.balanceOf(receiver)
-      await goldToken.transferFrom(sender, receiver, ONE_GOLDTOKEN, { from: receiver })
-      await assertBalance(sender, startBalanceFrom.minus(ONE_GOLDTOKEN))
-      await assertBalance(receiver, startBalanceTo.plus(ONE_GOLDTOKEN))
+      const startBalanceFrom = await celoToken.balanceOf(sender)
+      const startBalanceTo = await celoToken.balanceOf(receiver)
+      await celoToken.transferFrom(sender, receiver, ONE_CGLDTOKEN, { from: receiver })
+      await assertBalance(sender, startBalanceFrom.minus(ONE_CGLDTOKEN))
+      await assertBalance(receiver, startBalanceTo.plus(ONE_CGLDTOKEN))
     })
 
     it('should not allow transferring to the null address', async () => {
       await assertRevert(
-        goldToken.transferFrom(sender, NULL_ADDRESS, ONE_GOLDTOKEN, { from: receiver })
+        celoToken.transferFrom(sender, NULL_ADDRESS, ONE_CGLDTOKEN, { from: receiver })
       )
     })
 
@@ -157,15 +157,15 @@ contract('GoldToken', (accounts: string[]) => {
       // We try to send four more gold tokens than the sender has, in case they happen to mine the
       // block with this transaction, which will reward them with 3 gold tokens.
       const value = web3.utils.toBN(
-        (await goldToken.balanceOf(sender)).plus(ONE_GOLDTOKEN.times(4))
+        (await celoToken.balanceOf(sender)).plus(ONE_CGLDTOKEN.times(4))
       )
-      await goldToken.approve(receiver, value)
-      await assertRevert(goldToken.transferFrom(sender, receiver, value, { from: receiver }))
+      await celoToken.approve(receiver, value)
+      await assertRevert(celoToken.transferFrom(sender, receiver, value, { from: receiver }))
     })
 
     it('should not allow transferring more than the spender is allowed', async () => {
       await assertRevert(
-        goldToken.transferFrom(sender, receiver, ONE_GOLDTOKEN.plus(1), {
+        celoToken.transferFrom(sender, receiver, ONE_CGLDTOKEN.plus(1), {
           from: receiver,
         })
       )

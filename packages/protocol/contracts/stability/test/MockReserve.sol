@@ -9,22 +9,22 @@ import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 contract MockReserve {
   mapping(address => bool) public tokens;
 
-  IERC20 public goldToken;
+  IERC20 public celoToken;
 
   // solhint-disable-next-line no-empty-blocks
   function() external payable {}
 
-  function setGoldToken(address goldTokenAddress) external {
-    goldToken = IERC20(goldTokenAddress);
+  function setCeloToken(address celoTokenAddress) external {
+    celoToken = IERC20(celoTokenAddress);
   }
 
   function transferGold(address to, uint256 value) external returns (bool) {
-    require(goldToken.transfer(to, value), "gold token transfer failed");
+    require(celoToken.transfer(to, value), "gold token transfer failed");
     return true;
   }
 
   function transferExchangeGold(address to, uint256 value) external returns (bool) {
-    require(goldToken.transfer(to, value), "gold token transfer failed");
+    require(celoToken.transfer(to, value), "gold token transfer failed");
     return true;
   }
 

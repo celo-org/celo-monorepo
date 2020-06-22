@@ -9,7 +9,7 @@ set -euo pipefail
 # -f: Filepath to csv of (timestamp, stableValue, goldValue) tuples
 # -n: name of the network defined in truffle-config.js to set the exchange rate on
 # -s: StableToken component of exchange rate
-# -g: GoldToken component of exchange rate
+# -g: CeloToken component of exchange rate
 # -c: Override for truffle config
 
 NETWORK=""
