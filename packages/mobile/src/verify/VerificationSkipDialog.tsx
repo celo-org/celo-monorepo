@@ -23,6 +23,7 @@ export default function VerificationSkipDialog({
       actionPress={onPressConfirm}
       secondaryActionPress={onPressCancel}
       secondaryActionText={t('verificationSkipDialog.cancel')}
+      testID="VerificationSkipDialog"
     >
       {t('verificationSkipDialog.body')}
     </Dialog>
