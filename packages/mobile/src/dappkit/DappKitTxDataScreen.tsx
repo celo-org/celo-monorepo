@@ -53,4 +53,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withTranslation(Namespaces.dappkit)(DappKitTxDataScreen)
+export default withTranslation<Props>(Namespaces.dappkit)(DappKitTxDataScreen)

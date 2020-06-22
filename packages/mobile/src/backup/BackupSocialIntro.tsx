@@ -108,4 +108,4 @@ const styles = StyleSheet.create({
 
 export default connect<{}, DispatchProps, OwnProps, RootState>(null, {
   exitBackupFlow,
-})(withTranslation(Namespaces.backupKeyFlow6)(BackupSocialIntro))
+})(withTranslation<Props>(Namespaces.backupKeyFlow6)(BackupSocialIntro))
