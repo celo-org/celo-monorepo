@@ -7,6 +7,7 @@ COPY scripts/ scripts/
 COPY patches/ patches/
 
 # Copy only pkg.json
+COPY packages/utils/package.json packages/utils/
 COPY packages/typescript/package.json packages/typescript/
 COPY packages/dev-utils/package.json packages/dev-utils/
 COPY packages/attestation-service/package.json packages/attestation-service/
