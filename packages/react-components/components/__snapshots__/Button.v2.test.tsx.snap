@@ -38,7 +38,7 @@ exports[`Button when type is SECONDARY renders 1`] = `
       style={
         Object {
           "alignItems": "center",
-          "backgroundColor": "#F5F4F0",
+          "backgroundColor": "#F1F0EB",
           "height": 48,
           "justifyContent": "center",
           "minWidth": 120,

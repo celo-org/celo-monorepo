@@ -114,6 +114,7 @@ exports[`Account renders correctly 1`] = `
           <View
             style={
               Object {
+                "alignItems": "center",
                 "flexDirection": "column",
                 "justifyContent": "center",
                 "marginBottom": 10,
@@ -1275,6 +1276,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
           <View
             style={
               Object {
+                "alignItems": "center",
                 "flexDirection": "column",
                 "justifyContent": "center",
                 "marginBottom": 10,

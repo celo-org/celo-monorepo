@@ -26,9 +26,9 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
           style={
             Object {
               "color": "#2E3338",
-              "fontFamily": "Inter-SemiBold",
-              "fontSize": 19,
-              "lineHeight": 26,
+              "fontFamily": "Jost-Medium",
+              "fontSize": 22,
+              "lineHeight": 28,
               "paddingVertical": 16,
             }
           }
@@ -355,9 +355,9 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
             style={
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Inter-SemiBold",
-                "fontSize": 19,
-                "lineHeight": 26,
+                "fontFamily": "Jost-Medium",
+                "fontSize": 22,
+                "lineHeight": 28,
                 "paddingBottom": 4,
                 "textAlign": "center",
               }

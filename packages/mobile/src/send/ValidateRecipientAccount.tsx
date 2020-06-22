@@ -7,7 +7,7 @@ import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, TextInput as RNTextInput, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -18,7 +18,7 @@ import BackButton from 'src/components/BackButton.v2'
 import CodeRow, { CodeRowStatus } from 'src/components/CodeRow'
 import ErrorMessageInline from 'src/components/ErrorMessageInline'
 import Modal from 'src/components/Modal'
-import { SingleDigitInput } from 'src/components/SingleDigitInput'
+import SingleDigitInput from 'src/components/SingleDigitInput'
 import { Namespaces, withTranslation } from 'src/i18n'
 import HamburgerCard from 'src/icons/HamburgerCard'
 import InfoIcon from 'src/icons/InfoIcon.v2'
@@ -88,6 +88,13 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
     isModalVisible: false,
   }
 
+  inputFieldRefs = [
+    React.createRef<RNTextInput>(),
+    React.createRef<RNTextInput>(),
+    React.createRef<RNTextInput>(),
+    React.createRef<RNTextInput>(),
+  ]
+
   componentDidUpdate = (prevProps: Props) => {
     const { isValidRecipient, isPaymentRequest, transactionData } = this.props
     if (isValidRecipient && !prevProps.isValidRecipient) {
@@ -127,6 +134,12 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
     const { singleDigitInputValueArr } = this.state
     singleDigitInputValueArr[index] = value
     this.setState({ singleDigitInputValueArr })
+
+    if (index < PARTIAL_ADDRESS_PLACEHOLDER.length - 1) {
+      this.inputFieldRefs[index + 1].current!.focus()
+    } else {
+      this.inputFieldRefs[index].current!.blur()
+    }
   }
 
   toggleModal = () => {
@@ -177,6 +190,7 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
             inputPlaceholder={placeholderValue}
             // tslint:disable-next-line:jsx-no-lambda
             onInputChange={(value) => this.onSingleDigitInputChange(value, index)}
+            ref={this.inputFieldRefs[index]}
           />
         </View>
       )

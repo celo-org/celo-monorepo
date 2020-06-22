@@ -66,6 +66,12 @@ const fontStyles = StyleSheet.create({
     fontFamily: Jost.Medium,
     color: colors.dark,
   },
+  displayName: {
+    fontSize: 18,
+    lineHeight: 24,
+    fontFamily: Jost.Medium,
+    color: colors.dark,
+  },
   label: {
     fontSize: 13,
     lineHeight: 16,
