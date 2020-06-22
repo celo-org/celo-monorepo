@@ -14,4 +14,11 @@ module.exports = {
     })
     return config
   },
+  target: 'serverless',
+  distDir: '../../dist/client',
+  exportPathMap: function() {
+    return {
+      '/': { page: '/' },
+    }
+  },
 }

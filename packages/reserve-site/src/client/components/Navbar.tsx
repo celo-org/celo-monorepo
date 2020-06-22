@@ -1,6 +1,5 @@
 /** @jsx jsx */
-import { jsx, css } from '@emotion/core'
-
+import { css, jsx } from '@emotion/core'
 import colors from 'components/colors'
 
 export default function NavBar() {
@@ -33,13 +32,18 @@ const navStyle = css({
   paddingRight: 20,
   paddingTop: 10,
   paddingBottom: 10,
+  '@media (max-width: 500px)': {
+    paddingLeft: 0,
+  },
 })
 
 const linkStyle = {
   marginLeft: 10,
   marginRight: 10,
   padding: 10,
+  paddingLeft: 5,
   fontSize: 24,
+  letterSpacing: '-0.02em',
   fontWeight: 500,
   color: colors.dark,
   cursor: 'pointer',

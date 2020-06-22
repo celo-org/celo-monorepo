@@ -8,21 +8,16 @@ import ReserveAddresses from 'components/ReserveAddresses'
 import Section from 'components/Section'
 import { flexCol } from 'components/styles'
 import TargetGraph from 'components/TargetGraph'
-import about from 'content/home/about.md'
-import attestations from 'content/home/attestations.md'
-import initialTarget from 'content/home/initial-target.md'
-import intro from 'content/home/intro.md'
-import matter from 'front-matter'
-import fetchAddresses from 'service/addresses'
 import { Addresses, HoldingsData } from 'service/Data'
-import fetchData from 'service/holdings'
 
-const INTRO = matter<{ title: string }>(intro)
-const INITIAL_TARGET = matter<{ title: string }>(initialTarget)
-const ABOUT = matter<{ title: string }>(about)
-const ATTESTATIONS = matter<{ title: string }>(attestations)
+interface Props {
+  INTRO: any
+  INITIAL_TARGET: any
+  ABOUT: any
+  ATTESTATIONS: any
+}
 
-export default function Home(props: HoldingsData & Addresses) {
+export default function Home(props: HoldingsData & Addresses & Props) {
   return (
     <>
       <Head />
@@ -30,7 +25,7 @@ export default function Home(props: HoldingsData & Addresses) {
         <div css={containerStyle}>
           <NavBar />
           <main css={mainStyle}>
-            <Section title={INTRO.attributes.title} content={INTRO.body} />
+            <Section title={props.INTRO.attributes.title} content={props.INTRO.body} />
             <Section
               title={'Current Reserve Holdings'}
               subHeading={<Updated date={props.updatedDate} />}
@@ -55,12 +50,18 @@ export default function Home(props: HoldingsData & Addresses) {
                 custody={props.custodyAddress}
               />
             </Section>
-            <Section title={INITIAL_TARGET.attributes.title} content={INITIAL_TARGET.body}>
+            <Section
+              title={props.INITIAL_TARGET.attributes.title}
+              content={props.INITIAL_TARGET.body}
+            >
               <TargetGraph />
             </Section>
 
-            <Section title={ABOUT.attributes.title} content={ABOUT.body} />
-            <Section title={ATTESTATIONS.attributes.title} content={ATTESTATIONS.body} />
+            <Section title={props.ABOUT.attributes.title} content={props.ABOUT.body} />
+            <Section
+              title={props.ATTESTATIONS.attributes.title}
+              content={props.ATTESTATIONS.body}
+            />
           </main>
         </div>
         <Footer />
@@ -96,17 +97,31 @@ const mainStyle = css({
   maxWidth: 960,
 })
 
+const dateStyle = css({ marginBottom: 36, display: 'block' })
+
 const containerStyle = css(flexCol, { flex: 1, width: '100%', alignItems: 'center' })
 
 export async function getStaticProps() {
+  const about = await import('content/home/about.md').then((mod) => mod.default)
+  const attestations = await import('content/home/attestations.md').then((mod) => mod.default)
+  const initialTarget = await import('content/home/initial-target.md').then((mod) => mod.default)
+  const intro = await import('content/home/intro.md').then((mod) => mod.default)
+  const matter = await import('front-matter').then((mod) => mod.default)
+
+  const INTRO = matter<{ title: string }>(intro)
+  const INITIAL_TARGET = matter<{ title: string }>(initialTarget)
+  const ABOUT = matter<{ title: string }>(about)
+  const ATTESTATIONS = matter<{ title: string }>(attestations)
+
+  const fetchData = await import('service/holdings').then((mod) => mod.default)
+  const fetchAddresses = await import('service/addresses').then((mod) => mod.default)
+
   const [addresses, holdings] = await Promise.all([fetchAddresses(), fetchData()])
   return {
-    props: { ...addresses, ...holdings },
+    props: { ...addresses, ...holdings, INTRO, INITIAL_TARGET, ABOUT, ATTESTATIONS },
     // we will attempt to re-generate the page:
     // - when a request comes in
     // - at most once every X seconds
     unstable_revalidate: 60,
   }
 }
-
-const dateStyle = css({ marginBottom: 36, display: 'block' })

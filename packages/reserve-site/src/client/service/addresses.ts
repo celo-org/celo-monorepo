@@ -19,7 +19,6 @@ export default async function fetchRecords() {
       sort: [{ field: 'order', direction: 'desc' }],
     })
     .firstPage()) as Record<Fields>[]
-  console.log(records)
   return records.map((record) => convert(record.fields))[0]
 }
 
