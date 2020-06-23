@@ -13,8 +13,8 @@ handlers:
   - url: /static
     static_dir: public/static
 
-  - url: /public
-    static_dir: public
+  - url: /assets
+    static_dir: public/assets
 
   - url: /.*
     script: auto

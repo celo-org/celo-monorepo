@@ -120,7 +120,7 @@ The repository has the following packages (sub projects):
 - [notification-service](packages/notification-service) - service for managing push notifications for Celo Wallet
 - [protocol](packages/protocol) - identity, stability and other smart contracts for the Celo protocol ([docs](https://docs.celo.org/celo-codebase/protocol))
 - [react-components](packages/react-components) - generalized react native components
-- [reserve-site](packages/reserve-site) - website for Celo Reserve
+- [reserve-site](packages/reserve-site) - website for ([Celo Reserve.org](https://celoreserve.org/))
 - [terraform-modules](packages/terraform-modules) - templatized deployments of entire VM-based testnets for Google Cloud Platform
 - [typescript](packages/typescript) - no README available (improve?)
 - [utils](packages/utils) - no README available (improve?)

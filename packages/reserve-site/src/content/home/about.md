@@ -12,7 +12,7 @@ The Celo protocol provides a platform upon which the Celo community can create s
 Celo allows for multiple stable-value assets where each asset tracks a measurable value, such as the Dollar, Euro, basket of goods in Greece, the price of a barrel of oil, and more. The protocol is designed to maintain a stable value for each of these assets by adjusting its supply to match demand. The reserve is a mechanism by which the protocol can contract supply.  
 
 
-![Stable-value Assets <=> CELO & additional cryptoassets](/stability-mech-illo.svg)
+![Stable-value Assets <=> CELO & additional cryptoassets](/assets/stability-mech-illo.svg)
 
 <button href="https://celo.org/papers/stability">Read the Celo Stability Whitepaper</button>
 

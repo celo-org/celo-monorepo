@@ -6,7 +6,7 @@ import Button from './Button'
 export default function Holdings(props: Omit<HoldingsData, 'updatedDate'>) {
   return (
     <div css={rootStyle}>
-      <Heading title="CELO Native Asset" gridArea="celo" iconSrc="/CELO.png" />
+      <Heading title="CELO Native Asset" gridArea="celo" iconSrc="/assets/CELO.png" />
       <Amount label="Total" units={props.total} gridArea="total" />
       <Amount label="Celo on-chain" units={props.onChain} gridArea="onChain" />
       <Amount label="Celo in Custody" units={props.inCustody} gridArea="custody" />
@@ -14,7 +14,7 @@ export default function Holdings(props: Omit<HoldingsData, 'updatedDate'>) {
       <Amount label="BTC" units={props.BTC} gridArea="btc" />
       <Amount label="ETH" units={props.ETH} gridArea="eth" />
       <Amount label="DAI" units={props.DAI} gridArea="dai" />
-      <Heading title="cUSD Asset" gridArea="cUSD" iconSrc="/CUSD.png" marginTop={30} />
+      <Heading title="cUSD Asset" gridArea="cUSD" iconSrc="/assets/CUSD.png" marginTop={30} />
       <Amount label="cUSD outstanding" units={props.cUSD} gridArea="outstanding" />
       <Amount label="Reserve Ratio*" units={props.ratio} gridArea="ratio" />
       <div css={infoStyle}>

@@ -90,7 +90,7 @@ const globalStyles = css`x
 
 export default function Head() {
   const title = 'CeloReserve.org'
-  const metaImage = '/open-graph.png'
+  const metaImage = '/assets/open-graph.png'
   return (
     <>
       <Global styles={globalStyles} />

@@ -24,6 +24,7 @@
 /packages/phone-number-privacy/ @jmrossy
 /packages/protocol/ @asaj @nategraf
 /packages/react-components/ @jmrossy @aaronmgdr
+/packages/reserve-site/ @aaronmgdr
 /packages/terraform-modules-public/ @tkporter
 /packages/terraform-modules/ @tkporter
 /packages/typescript/ @cmcewen
