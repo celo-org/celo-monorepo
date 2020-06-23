@@ -7,4 +7,3 @@ sdkmanager "platform-tools" \
   "system-images;android-29;google_apis;x86_64" \
   "emulator" \
   --verbose
-

@@ -181,40 +181,31 @@ jobs:
     steps:
       - checkout
       - run: cd ~/app/
+
+      - run:
+          name: set ANDROID_SDK_ROOT
+          command: |
+            echo 'export ANDROID_SDK_ROOT=$HOME/android-tools'  >> $BASH_ENV
+
       - restore_cache:
-          keys:
-            - android-emulator-image-v8-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
+          key: android=tools-v1-{{ checksum "packages/mobile/scripts/install-android-tools.sh" }}-{{ arch }}
+
       - run:
-          name: Setup environment variables
+          name: install android tools
           command: |
-            echo 'export PATH="$PATH:/usr/local/opt/node@8/bin:${HOME}/.yarn/bin:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin:/usr/local/share/android-sdk/tools/bin"' >> $BASH_ENV
-            echo 'export ANDROID_HOME="/usr/local/share/android-sdk"' >> $BASH_ENV
-            echo 'export ANDROID_SDK_HOME="/usr/local/share/android-sdk"' >> $BASH_ENV
-            echo 'export ANDROID_SDK_ROOT="/usr/local/share/android-sdk"' >> $BASH_ENV
-            echo 'export QEMU_AUDIO_DRV=none' >> $BASH_ENV
-            export PATH=$PATH:/usr/local/share/android-sdk/platform-tools/
-      - run:
-          name: Install Android sdk
-          command: |
-            HOMEBREW_NO_AUTO_UPDATE=1 brew tap homebrew/cask
-            HOMEBREW_NO_AUTO_UPDATE=1 brew cask install android-sdk
-      - run:
-          name: Install emulator dependencies
-          command: |
-            # Captures SIGPIPE 141 error but still allow repeating "y" to accept all licenses
-            yes | sdkmanager --licenses || if [ $? -ne '141' ]; then exit $?; fi;
-            ./packages/mobile/scripts/install_android_emulator_image.sh
+            sh packages/mobile/scripts/install-android-tools.sh
+            echo 'export PATH=$ANDROID_SDK_ROOT/tools/bin:$PATH'  >> $BASH_ENV
+            echo 'export PATH=$ANDROID_SDK_ROOT/tools:$PATH'  >> $BASH_ENV
+            echo 'export PATH=$ANDROID_SDK_ROOT/platform-tools:$PATH'  >> $BASH_ENV
+            echo 'export PATH=$ANDROID_SDK_ROOT/emulator:$PATH'  >> $BASH_ENV
+            source $BASH_ENV
+            sdkmanager --list
+
       - save_cache:
-          key: android-emulator-image-v8-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
+          key: android=tools-v1-{{ checksum "packages/mobile/scripts/install-android-tools.sh" }}-{{ arch }}
           paths:
-            - /usr/local/Caskroom/android-sdk/*
-      - run:
-          name: Install Android dependencies
-          command: |
-            HOMEBREW_NO_AUTO_UPDATE=1 brew install cask
-            HOMEBREW_NO_AUTO_UPDATE=1 brew cask install android-platform-tools
-            HOMEBREW_NO_AUTO_UPDATE=1 brew tap homebrew/cask-versions
-            HOMEBREW_NO_AUTO_UPDATE=1 brew cask install homebrew/cask-versions/adoptopenjdk8
+            - /Users/distiller/android-tools
+
       - run:
           name: Create Android Virtual Device (AVD)
           command: |
@@ -223,6 +214,7 @@ jobs:
               --device "Nexus 5"
             # Copy device configuarion, adv for some reason doesn't
             # mkdir -p ~/.android/avd/Nexus_5X_API_28_x86.avd/ && cp packages/mobile/e2e/conf/avd_conf.ini ~/.android/avd/Nexus_5X_API_28_x86.avd/config.ini
+
       - run:
           name: Set up nodejs
           command: |
@@ -238,9 +230,9 @@ jobs:
           name: install miscellaneous
           command: |
             HOMEBREW_NO_AUTO_UPDATE=1 brew install tree coreutils
-      # Currently not used
-      # - run: npm install --global react-native-kill-packager
+
       - yarn_install
+
       - run:
           name: Build mobile dependencies
           command: |
@@ -248,30 +240,30 @@ jobs:
             yarn build \
               --scope @celo/mobile \
               --include-filtered-dependencies
-      - run:
-          name: Install some extra dependencies the app needs
-          command: HOMEBREW_NO_AUTO_UPDATE=1 brew install pidcat watchman
+
       - restore_cache:
           key: yarn-v4-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}-{{ checksum "packages/mobile/.env.test" }}
-      - run:
-          name: Make sure there's only one adb # This is probably a brew bug
-          command: cp /usr/local/share/android-sdk/platform-tools/adb /usr/local/bin/adb
+
       # hack alert! the emulator complains about disk space and not sure how to increase it
       - run:
           name: Delete Simulators
           command: sudo rm -rf /Library/Developer/CoreSimulator/Profiles/Runtimes/
+
       - run:
           name: Check for emulator acceleration
           command: emulator -accel-check
+
       - run:
           name: Run e2e tests
           command: |
             set -eo pipefail
             cd packages/mobile
             yarn run test:e2e:android
+
       - store_artifacts:
           path: packages/mobile/e2e/artifacts
           destination: mobile/e2e/artifacts
+
       - save_cache:
           key: yarn-v4-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}-{{ checksum "packages/mobile/.env.test" }}
           paths:
