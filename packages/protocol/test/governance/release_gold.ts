@@ -36,7 +36,7 @@ import {
 } from 'types'
 import Web3 from 'web3'
 
-const ONE_CGLDTOKEN = new BigNumber('1000000000000000000')
+const ONE_CELOTOKEN = new BigNumber('1000000000000000000')
 
 const authorizationTests: any = {}
 const authorizationTestDescriptions = {
@@ -116,7 +116,7 @@ contract('ReleaseGold', (accounts: string[]) => {
   let registry: RegistryInstance
   let releaseGoldInstance: ReleaseGoldInstance
   let proofOfWalletOwnership: Signature
-  const TOTAL_AMOUNT = ONE_CGLDTOKEN.times(10)
+  const TOTAL_AMOUNT = ONE_CELOTOKEN.times(10)
 
   const releaseGoldDefaultSchedule: ReleaseGoldConfig = {
     releaseStartTime: null, // To be adjusted on every run
@@ -199,7 +199,7 @@ contract('ReleaseGold', (accounts: string[]) => {
   describe('#payable', () => {
     it('should accept gold transfer by default from anyone', async () => {
       await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
-      await celoTokenInstance.transfer(releaseGoldInstance.address, ONE_CGLDTOKEN.times(2), {
+      await celoTokenInstance.transfer(releaseGoldInstance.address, ONE_CELOTOKEN.times(2), {
         from: accounts[8],
       })
     })
@@ -859,14 +859,14 @@ contract('ReleaseGold', (accounts: string[]) => {
 
         // The attestations signer does not send txs.
         if (authorizationTestDescriptions[key].subject !== 'attestationSigner') {
-          it(`should transfer 1 cGLD to the ${authorizationTestDescriptions[key].me}`, async () => {
+          it(`should transfer 1 CELO to the ${authorizationTestDescriptions[key].me}`, async () => {
             const balance1 = await web3.eth.getBalance(authorized)
             await authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary })
             const balance2 = await web3.eth.getBalance(authorized)
             assertEqualBN(new BigNumber(balance2).minus(balance1), web3.utils.toWei('1'))
           })
         } else {
-          it(`should not transfer 1 cGLD to the ${authorizationTestDescriptions[key].me}`, async () => {
+          it(`should not transfer 1 CELO to the ${authorizationTestDescriptions[key].me}`, async () => {
             const balance1 = await web3.eth.getBalance(authorized)
             await authorizationTest.fn(authorized, sig.v, sig.r, sig.s, { from: beneficiary })
             const balance2 = await web3.eth.getBalance(authorized)
@@ -942,7 +942,7 @@ contract('ReleaseGold', (accounts: string[]) => {
             )
           })
 
-          it(`should not transfer 1 cGLD to the ${authorizationTestDescriptions[key].me}`, async () => {
+          it(`should not transfer 1 CELO to the ${authorizationTestDescriptions[key].me}`, async () => {
             const balance2 = await web3.eth.getBalance(newAuthorized)
             assertEqualBN(new BigNumber(balance2).minus(balance1), 0)
           })
@@ -1668,7 +1668,7 @@ contract('ReleaseGold', (accounts: string[]) => {
         describe('when rewards are simulated', () => {
           beforeEach(async () => {
             // Simulate rewards of 0.5 Gold
-            await celoTokenInstance.transfer(releaseGoldInstance.address, ONE_CGLDTOKEN.div(2), {
+            await celoTokenInstance.transfer(releaseGoldInstance.address, ONE_CELOTOKEN.div(2), {
               from: owner,
             })
             // Default distribution is 100%
@@ -1681,7 +1681,7 @@ contract('ReleaseGold', (accounts: string[]) => {
             })
 
             it('should allow distribution of initial balance and rewards', async () => {
-              const expectedWithdrawalAmount = TOTAL_AMOUNT.plus(ONE_CGLDTOKEN.div(2))
+              const expectedWithdrawalAmount = TOTAL_AMOUNT.plus(ONE_CELOTOKEN.div(2))
               await releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
             })
           })
@@ -1693,12 +1693,12 @@ contract('ReleaseGold', (accounts: string[]) => {
             })
 
             it('should scale released amount to 50% of initial balance plus rewards', async () => {
-              const expectedWithdrawalAmount = TOTAL_AMOUNT.plus(ONE_CGLDTOKEN.div(2)).div(2)
+              const expectedWithdrawalAmount = TOTAL_AMOUNT.plus(ONE_CELOTOKEN.div(2)).div(2)
               await releaseGoldInstance.withdraw(expectedWithdrawalAmount, { from: beneficiary })
             })
 
             it('should not allow withdrawal of more than 50% gold', async () => {
-              const unexpectedWithdrawalAmount = TOTAL_AMOUNT.plus(ONE_CGLDTOKEN)
+              const unexpectedWithdrawalAmount = TOTAL_AMOUNT.plus(ONE_CELOTOKEN)
                 .div(2)
                 .plus(1)
               await assertRevert(
@@ -1716,7 +1716,7 @@ contract('ReleaseGold', (accounts: string[]) => {
           await releaseGoldInstance.setMaxDistribution(500, { from: releaseOwner })
           // Simulate rewards of 0.5 Gold
           // Have to send after setting max distribution as mentioned above
-          await celoTokenInstance.transfer(releaseGoldInstance.address, ONE_CGLDTOKEN.div(2), {
+          await celoTokenInstance.transfer(releaseGoldInstance.address, ONE_CELOTOKEN.div(2), {
             from: owner,
           })
           const timeToTravel = 12 * MONTH + 1 * DAY

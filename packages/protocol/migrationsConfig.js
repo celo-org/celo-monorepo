@@ -44,12 +44,12 @@ const DefaultConfig = {
     blockGasLimit: 10000000,
   },
   doubleSigningSlasher: {
-    reward: '1000000000000000000000', // 1000 cGLD
-    penalty: '9000000000000000000000', // 9000 cGLD
+    reward: '1000000000000000000000', // 1000 CELO
+    penalty: '9000000000000000000000', // 9000 CELO
   },
   downtimeSlasher: {
-    reward: '10000000000000000000', // 10 cGLD
-    penalty: '100000000000000000000', // 100 cGLD
+    reward: '10000000000000000000', // 10 CELO
+    penalty: '100000000000000000000', // 100 CELO
     slashableDowntime: (8 * HOUR) / 5, // ~8 hours
   },
   election: {
@@ -73,7 +73,7 @@ const DefaultConfig = {
       },
     },
     // Intentionally set lower than the expected value at steady state to account for the fact that
-    // users may take some time to start voting with their cGLD.
+    // users may take some time to start voting with their CELO.
     targetVotingGoldFraction: 1 / 2,
     maxValidatorEpochPayment: '205479452054794520547', // (75,000 / 365) * 10 ^ 18
     communityRewardFraction: 1 / 4,
@@ -103,7 +103,7 @@ const DefaultConfig = {
     approvalStageDuration: DAY, // Change to 3 days once mainnet activated
     referendumStageDuration: 2 * DAY, // Change to 1 week once mainnet activated
     executionStageDuration: 3 * DAY,
-    minDeposit: 100, // 100 cGLD
+    minDeposit: 100, // 100 CELO
     participationBaseline: 5 / 100, // Start with low participation requirements, let the protocol adjust
     participationBaselineFloor: 5 / 100,
     participationBaselineUpdateFactor: 1 / 5,
@@ -148,7 +148,7 @@ const DefaultConfig = {
       '0x246f4599eFD3fA67AC44335Ed5e749E518Ffd8bB',
       '0x298FbD6dad2Fc2cB56d7E37d8aCad8Bf07324f67',
     ],
-    assetAllocationSymbols: ['cGLD', 'BTC', 'ETH', 'DAI'],
+    assetAllocationSymbols: ['CELO', 'BTC', 'ETH', 'DAI'],
     assetAllocationWeights: [0.5, 0.3, 0.15, 0.05],
   },
   reserveSpenderMultiSig: {

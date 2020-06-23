@@ -147,8 +147,8 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
 
   /**
    * @notice Sets the balance of reserve gold frozen from transfer.
-   * @param frozenGold The amount of cGLD frozen.
-   * @param frozenDays The number of days the frozen cGLD thaws over.
+   * @param frozenGold The amount of CELO frozen.
+   * @param frozenDays The number of days the frozen CELO thaws over.
    */
   function setFrozenGold(uint256 frozenGold, uint256 frozenDays) public onlyOwner {
     require(frozenGold <= address(this).balance, "Cannot freeze more than balance");
@@ -180,7 +180,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
       require(assetAllocationWeights[symbols[i]] == 0, "Cannot set weight twice");
       assetAllocationWeights[symbols[i]] = weights[i];
     }
-    require(assetAllocationWeights["cGLD"] != 0, "Must set cGLD asset weight");
+    require(assetAllocationWeights["CELO"] != 0, "Must set CELO asset weight");
     emit AssetAllocationSet(symbols, weights);
   }
 
@@ -445,7 +445,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     ISortedOracles sortedOracles = ISortedOracles(sortedOraclesAddress);
     uint256 reserveGoldBalance = getUnfrozenReserveGoldBalance();
     uint256 stableTokensValueInGold = 0;
-    FixidityLib.Fraction memory cgldWeight = FixidityLib.wrap(assetAllocationWeights["cGLD"]);
+    FixidityLib.Fraction memory celoWeight = FixidityLib.wrap(assetAllocationWeights["CELO"]);
 
     for (uint256 i = 0; i < _tokens.length; i = i.add(1)) {
       uint256 stableAmount;
@@ -458,7 +458,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     return
       FixidityLib
         .newFixed(reserveGoldBalance)
-        .divide(cgldWeight)
+        .divide(celoWeight)
         .divide(FixidityLib.newFixed(stableTokensValueInGold))
         .unwrap();
   }

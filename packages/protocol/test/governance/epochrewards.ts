@@ -91,7 +91,7 @@ contract('EpochRewards', (accounts: string[]) => {
     const delta: number = desiredTime.minus(currentTime).toNumber()
     await timeTravel(delta, web3)
   }
-  const initialAssetAllocationSymbols = [web3.utils.padRight(web3.utils.utf8ToHex('cGLD'), 64)]
+  const initialAssetAllocationSymbols = [web3.utils.padRight(web3.utils.utf8ToHex('CELO'), 64)]
   const initialAssetAllocationWeights = [toFixed(1)]
 
   beforeEach(async () => {
@@ -776,7 +776,7 @@ contract('EpochRewards', (accounts: string[]) => {
       await reserve.addToken(mockStableToken.address)
       await mockCeloToken.setTotalSupply(totalSupply)
       const assetAllocationSymbols = [
-        web3.utils.padRight(web3.utils.utf8ToHex('cGLD'), 64),
+        web3.utils.padRight(web3.utils.utf8ToHex('CELO'), 64),
         web3.utils.padRight(web3.utils.utf8ToHex('empty'), 64),
       ]
       const assetAllocationWeights = [

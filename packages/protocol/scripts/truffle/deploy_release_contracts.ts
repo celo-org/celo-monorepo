@@ -21,8 +21,8 @@ let ReleaseGoldMultiSig: ReleaseGoldMultiSigContract
 let ReleaseGoldMultiSigProxy: ReleaseGoldMultiSigProxyContract
 let ReleaseGold: ReleaseGoldContract
 let ReleaseGoldProxy: ReleaseGoldProxyContract
-const ONE_CGLD = web3.utils.toWei('1', 'ether')
-const TWO_CGLD = web3.utils.toWei('2', 'ether')
+const ONE_CELO = web3.utils.toWei('1', 'ether')
+const TWO_CELO = web3.utils.toWei('2', 'ether')
 const MAINNET_START_TIME = new Date('22 April 2020 16:00:00 UTC').getTime() / 1000
 
 async function handleGrant(releaseGoldConfig: any, currGrant: number) {
@@ -96,7 +96,7 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
 
   let totalValue = weiAmountReleasedPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods)
   if (totalValue.lt(startGold)) {
-    console.info('Total value of grant less than CGLD for beneficiary addreess')
+    console.info('Total value of grant less than CELO for beneficiary addreess')
     process.exit(0)
   }
   const adjustedAmountPerPeriod = totalValue
@@ -175,7 +175,7 @@ async function checkBalance(releaseGoldConfig: any) {
   )
   const grantDeploymentCost = weiAmountReleasedPerPeriod
     .multipliedBy(releaseGoldConfig.numReleasePeriods)
-    .plus(ONE_CGLD) // Tx Fees
+    .plus(ONE_CELO) // Tx Fees
     .toFixed()
   while (true) {
     const fromBalance = new BigNumber(await web3.eth.getBalance(fromAddress))
@@ -209,10 +209,10 @@ async function checkBalance(releaseGoldConfig: any) {
       )
       continue
     }
-    // Must be enough to handle 1CGLD test transfer and 1CGLD for transaction fees
-    if (fromBalance.gt(TWO_CGLD)) {
+    // Must be enough to handle 1CELO test transfer and 1CELO for transaction fees
+    if (fromBalance.gt(TWO_CELO)) {
       console.info(
-        '\nSending 1 CGLD as a test from ' +
+        '\nSending 1 CELO as a test from ' +
           fromAddress +
           ' to ' +
           addressResponse.newFromAddress +
@@ -222,14 +222,14 @@ async function checkBalance(releaseGoldConfig: any) {
         {
           from: fromAddress,
           to: addressResponse.newFromAddress,
-          value: ONE_CGLD,
+          value: ONE_CELO,
         },
       ])
       const confirmResponse = await prompts({
         type: 'confirm',
         name: 'confirmation',
         message:
-          'Please check the balance of your provided address. You should see the 1CGLD transfer and an initial genesis balance if this is a shard from the genesis block.\nCan you confirm this (y/n)?',
+          'Please check the balance of your provided address. You should see the 1CELO transfer and an initial genesis balance if this is a shard from the genesis block.\nCan you confirm this (y/n)?',
       })
       if (!confirmResponse.confirmation) {
         console.info(chalk.red('Setting new address failed.\nRetrying.'))
@@ -241,7 +241,7 @@ async function checkBalance(releaseGoldConfig: any) {
         {
           from: fromAddress,
           to: addressResponse.newFromAddress,
-          value: fromBalancePostTransfer.minus(ONE_CGLD).toFixed(), // minus Tx Fees
+          value: fromBalancePostTransfer.minus(ONE_CELO).toFixed(), // minus Tx Fees
         },
       ])
     }
@@ -341,7 +341,7 @@ async function handleJSONFile(err, data) {
       type: 'confirm',
       name: 'confirmation',
       message:
-        'Grants in provided json would send ' + totalValue.toString() + 'cGld.\nIs this OK (y/n)?',
+        'Grants in provided json would send ' + totalValue.toString() + 'celo.\nIs this OK (y/n)?',
     })
 
     if (!response.confirmation) {
