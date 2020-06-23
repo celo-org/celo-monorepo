@@ -4,14 +4,14 @@ import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class ExchangeGold extends BaseCommand {
-  static description = 'Exchange Celo Gold for Celo Dollars via the stability mechanism'
+  static description = 'Exchange CELO for Celo Dollars via the stability mechanism'
 
   static flags = {
     ...BaseCommand.flags,
-    from: Flags.address({ required: true, description: 'The address with Celo Gold to exchange' }),
+    from: Flags.address({ required: true, description: 'The address with CELO to exchange' }),
     value: Flags.wei({
       required: true,
-      description: 'The value of Celo Gold to exchange for Celo Dollars',
+      description: 'The value of CELO to exchange for Celo Dollars',
     }),
     forAtLeast: Flags.wei({
       description: 'Optional, the minimum value of Celo Dollars to receive in return',
