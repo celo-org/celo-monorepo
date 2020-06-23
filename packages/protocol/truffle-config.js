@@ -4,6 +4,8 @@ const ProviderEngine = require('web3-provider-engine')
 const WebsocketSubprovider = require('web3-provider-engine/subproviders/websocket.js')
 const { TruffleArtifactAdapter } = require('@0x/sol-trace')
 const { CoverageSubprovider } = require('@0x/sol-coverage')
+var Web3 = require('web3')
+var net = require('net')
 
 const argv = require('minimist')(process.argv.slice(2), {
   string: ['truffle_override', 'network'],
@@ -14,6 +16,12 @@ const SOLC_VERSION = '0.5.8'
 const ALFAJORES_NETWORKID = 44786
 const BAKLAVA_NETWORKID = 40120
 const BAKLAVASTAGING_NETWORKID = 31420
+
+// ipcProvider returns a function to create an IPC provider when called.
+// Use by adding `provider: ipcProvider(...)` to any of the configs below.
+function ipcProvider(path) {
+  return () => new Web3.providers.IpcProvider(path, net)
+}
 
 const OG_FROM = '0xfeE1a22F43BeeCB912B5a4912ba87527682ef0fC'
 const DEVELOPMENT_FROM = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
