@@ -531,15 +531,15 @@ jobs:
       - run:
           name: Run Tests
           command: yarn --cwd=packages/contractkit test
-      - run:
-          name: Fail if someone forgot to commit contractkit docs
-          command: |
-            yarn --cwd=packages/contractkit docs
-            if [[ $(git status packages/docs/developer-resources/contractkit --porcelain) ]]; then
-              git --no-pager diff packages/docs/developer-resources/contractkit
-              echo "There are git differences after generating contractkit docs"
-              exit 1
-            fi
+      # - run:
+      #     name: Fail if someone forgot to commit contractkit docs
+      #     command: |
+      #       yarn --cwd=packages/contractkit docs
+      #       if [[ $(git status packages/docs/developer-resources/contractkit --porcelain) ]]; then
+      #         git --no-pager diff packages/docs/developer-resources/contractkit
+      #         echo "There are git differences after generating contractkit docs"
+      #         exit 1
+      #       fi
 
   cli-test:
     <<: *defaults
@@ -557,15 +557,15 @@ jobs:
       - run:
           name: Run Tests
           command: yarn --cwd=packages/cli test
-      - run:
-          name: Fail if someone forgot to commit CLI docs
-          command: |
-            yarn --cwd=packages/cli docs
-            if [[ $(git status packages/docs/command-line-interface --porcelain) ]]; then
-              git --no-pager diff packages/docs/command-line-interface
-              echo "There are git differences after generating CLI docs"
-              exit 1
-            fi
+      # - run:
+      #     name: Fail if someone forgot to commit CLI docs
+      #     command: |
+      #       yarn --cwd=packages/cli docs
+      #       if [[ $(git status packages/docs/command-line-interface --porcelain) ]]; then
+      #         git --no-pager diff packages/docs/command-line-interface
+      #         echo "There are git differences after generating CLI docs"
+      #         exit 1
+      #       fi
       - run:
           name: Verify that a new account can be created
           command: |
