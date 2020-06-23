@@ -8,7 +8,7 @@ reference:
   android_config: &android_config
     working_directory: *workspace
     macos:
-      xcode: "11.5.0"
+      xcode: "11.2.0"
     shell: /bin/bash --login -eo pipefail
     environment:
       TERM: dumb
@@ -183,13 +183,7 @@ jobs:
       - run: cd ~/src/
       - restore_cache:
           keys:
-            - yarn-v4-macos-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - yarn-v4-macos-{{ .Branch }}-
-            - yarn-v4-macos-
-            - yarn-v4-
-      - restore_cache:
-          keys:
-            - android-emulator-image-v7-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
+            - android-emulator-image-v8-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
       - run:
           name: Setup environment variables
           command: |
@@ -211,7 +205,7 @@ jobs:
             yes | sdkmanager --licenses || if [ $? -ne '141' ]; then exit $?; fi;
             ./packages/mobile/scripts/install_android_emulator_image.sh
       - save_cache:
-          key: android-emulator-image-v7-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
+          key: android-emulator-image-v8-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
           paths:
             - /usr/local/Caskroom/android-sdk/*
       - run:
@@ -266,6 +260,9 @@ jobs:
       - run:
           name: Delete Simulators
           command: sudo rm -rf /Library/Developer/CoreSimulator/Profiles/Runtimes/
+      - run:
+          name: Check for emulator acceleration
+          command: emulator -accel-check
       - run:
           name: Run e2e tests
           command: |
