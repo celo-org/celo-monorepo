@@ -20,7 +20,7 @@ This guide assumes:
 
 ## Support
 
-If you have any questions or need assistance with these instructions, please contact cLabs or ask in the `#celo-gold-holders` channel on [Celo's Discord server](https://chat.celo.org). Remember that Discord is a public channel: never disclose recovery phrases (also known as backup keys, or mnemonics), private keys, unsantized log output, or personal information.
+If you have any questions or need assistance with these instructions, please contact cLabs or ask in the `#celo-holders` channel on [Celo's Discord server](https://chat.celo.org). Remember that Discord is a public channel: never disclose recovery phrases (also known as backup keys, or mnemonics), private keys, unsantized log output, or personal information.
 
 Please refer to the [Ledger Troubleshooting](ledger.md#Troubleshooting) for issues using Ledgers with the Celo CLI.
 
