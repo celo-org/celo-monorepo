@@ -1,7 +1,8 @@
 import colors from '@celo/react-components/styles/colors.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import React, { useMemo } from 'react'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { shallowEqual, useSelector } from 'react-redux'
 import { AvatarSelf } from 'src/components/AvatarSelf'
@@ -36,8 +37,10 @@ export default function QRCodeDisplay({ qrSvgRef }: Props) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <AvatarSelf />
-      <QRCode value={qrContent} size={variables.width / 2} svgRef={qrSvgRef} />
+      <AvatarSelf iconSize={64} displayNameStyle={fontStyles.h2} />
+      <View style={styles.qrContainer}>
+        <QRCode value={qrContent} size={variables.width / 2} svgRef={qrSvgRef} />
+      </View>
     </SafeAreaView>
   )
 }
@@ -48,5 +51,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.background,
+  },
+  qrContainer: {
+    paddingTop: 16,
   },
 })

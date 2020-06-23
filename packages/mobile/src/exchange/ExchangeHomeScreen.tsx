@@ -266,7 +266,11 @@ const styles = StyleSheet.create({
     ...fontStyles.h2,
     marginRight: 8,
   },
-  goldPriceValues: { flexDirection: 'row', alignItems: 'flex-end' },
+  goldPriceValues: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
   goldPriceCurrentValue: {
     height: 27,
     ...fontStyles.mediumNumber,

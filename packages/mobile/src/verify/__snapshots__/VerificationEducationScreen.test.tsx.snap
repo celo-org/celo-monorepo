@@ -28,9 +28,9 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
         style={
           Object {
             "color": "#2E3338",
-            "fontFamily": "Inter-SemiBold",
-            "fontSize": 19,
-            "lineHeight": 26,
+            "fontFamily": "Jost-Medium",
+            "fontSize": 22,
+            "lineHeight": 28,
             "marginBottom": 16,
           }
         }
@@ -148,38 +148,6 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
           }
         }
       />
-      <View
-        accessible={true}
-        focusable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackgroundBorderless",
-            "type": "ThemeAttrAndroid",
-          }
-        }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 13,
-                "lineHeight": 18,
-                "textDecorationLine": "underline",
-              },
-              undefined,
-            ]
-          }
-        />
-      </View>
       <View
         accessible={true}
         focusable={true}
@@ -341,9 +309,9 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
                 style={
                   Object {
                     "color": "#2E3338",
-                    "fontFamily": "Inter-SemiBold",
-                    "fontSize": 19,
-                    "lineHeight": 26,
+                    "fontFamily": "Jost-Medium",
+                    "fontSize": 22,
+                    "lineHeight": 28,
                     "marginBottom": 12,
                     "textAlign": "center",
                   }
@@ -393,6 +361,7 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
               onResponderTerminate={[Function]}
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
+              testID="VerificationSkipDialog/SecondaryAction"
             >
               <Text
                 style={
@@ -429,6 +398,7 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
               onResponderTerminate={[Function]}
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
+              testID="VerificationSkipDialog/PrimaryAction"
             >
               <Text
                 style={
@@ -575,9 +545,9 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
                 style={
                   Object {
                     "color": "#2E3338",
-                    "fontFamily": "Inter-SemiBold",
-                    "fontSize": 19,
-                    "lineHeight": 26,
+                    "fontFamily": "Jost-Medium",
+                    "fontSize": 22,
+                    "lineHeight": 28,
                     "marginBottom": 12,
                     "textAlign": "center",
                   }
