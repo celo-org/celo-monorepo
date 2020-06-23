@@ -27,7 +27,7 @@ export enum ErrorMessages {
   PGPNP_QUOTA_ERROR = 'pgpnpQuotaError',
   SALT_FETCH_FAILURE = 'saltFetchFailure',
   SALT_QUOTA_EXCEEDED = 'saltQuotaExceededError',
-  MATHMAKING_QUOTA_EXCEEDED = 'matchmakingQuotaExceededError',
+  MATCHMAKING_QUOTA_EXCEEDED = 'matchmakingQuotaExceededError',
   INVALID_ACCOUNT = 'invalidAccount',
   CANT_SELECT_INVALID_PHONE = 'cantSelectInvalidPhone',
   CAN_NOT_REQUEST_FROM_UNVERIFIED = 'canNotRequestFromUnverified',

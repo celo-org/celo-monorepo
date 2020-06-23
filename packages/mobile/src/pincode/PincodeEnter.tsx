@@ -15,9 +15,9 @@ import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import Pincode from 'src/pincode/Pincode'
-import { isPinCorrect } from 'src/pincode/utils'
+import { ensureCorrectPin } from 'src/pincode/utils'
 import { RootState } from 'src/redux/reducers'
-import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 interface State {
   pin: string
@@ -26,7 +26,6 @@ interface State {
 
 interface StateProps {
   currentAccount: string | null
-  fornoMode: boolean
 }
 
 type Props = StateProps & WithTranslation & StackScreenProps<StackParamList, Screens.PincodeEnter>
@@ -54,11 +53,12 @@ class PincodeEnter extends React.Component<Props, State> {
     this.setState({ pin: '', errorText: this.props.t(ErrorMessages.INCORRECT_PIN) })
   }
 
-  onCompletePin = (pin: string) => {
-    const { fornoMode, route, currentAccount } = this.props
+  onPressConfirm = () => {
+    const { route, currentAccount } = this.props
+    const { pin } = this.state
     const withVerification = route.params.withVerification
     if (withVerification && currentAccount) {
-      isPinCorrect(pin, fornoMode, currentAccount)
+      ensureCorrectPin(pin, currentAccount)
         .then(this.onCorrectPin)
         .catch(this.onWrongPin)
     } else {
@@ -76,7 +76,7 @@ class PincodeEnter extends React.Component<Props, State> {
           errorText={errorText}
           pin={pin}
           onChangePin={this.onChangePin}
-          onCompletePin={this.onCompletePin}
+          onCompletePin={this.onPressConfirm}
         />
       </SafeAreaView>
     )
@@ -93,7 +93,6 @@ const style = StyleSheet.create({
 
 const mapStateToProps = (state: RootState): StateProps => ({
   currentAccount: currentAccountSelector(state),
-  fornoMode: fornoSelector(state),
 })
 
 export default connect(mapStateToProps)(

@@ -1,10 +1,11 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
-import { privateKeyToAddress } from '@celo/utils/src/address'
+import { RpcWallet } from '@celo/contractkit/lib/wallets/rpc-wallet'
 import { Platform } from 'react-native'
 import * as net from 'react-native-tcp'
-import { select, take } from 'redux-saga/effects'
+import { call, select, take } from 'redux-saga/effects'
 import { DEFAULT_FORNO_URL } from 'src/config'
 import { IPC_PATH } from 'src/geth/geth'
+import { waitForGethConnectivity } from 'src/geth/saga'
 import { store } from 'src/redux/store'
 import { promisifyGenerator } from 'src/utils/generators'
 import Logger from 'src/utils/Logger'
@@ -15,8 +16,11 @@ import { provider } from 'web3-core'
 
 const tag = 'web3/contracts'
 
-const contractKitForno = newKitFromWeb3(getWeb3(true))
-const contractKitGeth = newKitFromWeb3(getWeb3(false))
+// TODO(yorke): merge instances of contractkit and refactor retrieval of providers
+const ipcProvider = getIpcProvider()
+const gethWallet = new RpcWallet(ipcProvider)
+const contractKitForno = newKitFromWeb3(getWeb3(true), gethWallet)
+const contractKitGeth = newKitFromWeb3(getWeb3(false), gethWallet)
 // Web3 for utils does not require a provider, using geth web3 to avoid creating another web3 instance
 export const web3ForUtils = contractKitGeth.web3
 
@@ -27,7 +31,21 @@ function getWeb3(fornoMode: boolean): Web3 {
       fornoMode ? DEFAULT_FORNO_URL : 'geth'
     }`
   )
-  return fornoMode ? new Web3(getHttpProvider(DEFAULT_FORNO_URL)) : new Web3(getIpcProvider())
+  return fornoMode ? new Web3(getHttpProvider(DEFAULT_FORNO_URL)) : new Web3(ipcProvider)
+}
+
+export const getConnectedWalletAsync = async () => promisifyGenerator(getConnectedWallet())
+
+export function* getConnectedWallet() {
+  yield call(waitForGethConnectivity)
+  if (!gethWallet.isSetupFinished()) {
+    yield call([gethWallet, gethWallet.init])
+    Logger.debug(
+      `getConnectedWallet`,
+      `Initialized wallet with accounts: ${gethWallet.getAccounts()}`
+    )
+  }
+  return gethWallet
 }
 
 // Workaround as contractKit logic is still used outside generators
@@ -44,17 +62,17 @@ export function* getContractKit() {
   return forno ? contractKitForno : contractKitGeth
 }
 
-function getIpcProvider() {
+export function getIpcProvider() {
   Logger.debug(tag, 'creating IPCProvider...')
 
-  const ipcProvider = new Web3.providers.IpcProvider(IPC_PATH, net)
+  const _ipcProvider = new Web3.providers.IpcProvider(IPC_PATH, net)
   Logger.debug(tag, 'created IPCProvider')
 
   // More details on the IPC objects can be seen via this
   // console.debug("Ipc connection object is " + Object.keys(ipcProvider.connection));
   // console.debug("Ipc data handle is " + ipcProvider.connection._events['data']);
   // @ts-ignore
-  const ipcProviderConnection: any = ipcProvider.connection
+  const ipcProviderConnection: any = _ipcProvider.connection
   const dataResponseHandlerKey: string = 'data'
   const oldDataHandler = ipcProviderConnection._events[dataResponseHandlerKey]
   // Since we are modifying internal properties of IpcProvider, it is best to add this check to ensure that
@@ -78,7 +96,7 @@ function getIpcProvider() {
   // ipcProvider.on("error", () => {
   //   Logger.showError("Error occurred");
   // })
-  return ipcProvider
+  return _ipcProvider
 }
 
 function getHttpProvider(url: string): provider {
@@ -90,14 +108,4 @@ function getHttpProvider(url: string): provider {
   //   Logger.showError('Error occurred')
   // })
   return httpProvider
-}
-
-export function addLocalAccount(privateKey: string, isDefault: boolean = false) {
-  if (!privateKey) {
-    throw new Error(`privateKey is ${privateKey}`)
-  }
-  contractKitForno.addAccount(privateKey)
-  if (isDefault) {
-    contractKitForno.defaultAccount = privateKeyToAddress(privateKey)
-  }
 }
