@@ -3,7 +3,7 @@
 
 version: 2.1
 reference:
-  workspace: &workspace ~/src
+  workspace: &workspace ~/app
   ## Configurations
   android_config: &android_config
     working_directory: *workspace
@@ -180,7 +180,7 @@ jobs:
     resource_class: large
     steps:
       - checkout
-      - run: cd ~/src/
+      - run: cd ~/app/
       - restore_cache:
           keys:
             - android-emulator-image-v8-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
@@ -275,7 +275,7 @@ jobs:
       - save_cache:
           key: yarn-v4-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}-{{ checksum "packages/mobile/.env.test" }}
           paths:
-            - ~/src/packages/mobile/android/app/build/outputs/apk/
+            - ~/app/packages/mobile/android/app/build/outputs/apk/
             - ~/.gradle/
 
   end-to-end-mobile-test-ios:
