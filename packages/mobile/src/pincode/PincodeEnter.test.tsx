@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { fireEvent, flushMicrotasksQueue, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
-import * as renderer from 'react-test-renderer'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { Screens } from 'src/navigator/Screens'
 import PincodeEnter from 'src/pincode/PincodeEnter'
@@ -18,7 +17,7 @@ const pin = '123456'
 describe('PincodeEnter', () => {
   it('renders correctly', () => {
     const store = createMockStore()
-    const tree = renderer.create(
+    const tree = render(
       <Provider store={store}>
         <PincodeEnter {...mockScreenProps} />
       </Provider>
