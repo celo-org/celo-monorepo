@@ -93,7 +93,7 @@ export function* initGethSaga() {
   })
 
   let restartAppAutomatically: boolean = false
-  let errorContext = 'No error'
+  let errorContext: string
   switch (result) {
     case GethInitOutcomes.SUCCESS: {
       Logger.debug(TAG, 'Geth initialized')
