@@ -31,6 +31,7 @@ export interface ButtonProps {
   showLoading?: boolean
   accessibilityLabel?: string
   type?: BtnTypes
+  rounded?: boolean
   disabled?: boolean
   size?: BtnSizes
   testID?: string
@@ -44,6 +45,7 @@ export default React.memo(function Button(props: ButtonProps) {
     testID,
     text,
     type = BtnTypes.PRIMARY,
+    rounded = true,
     style,
     showLoading,
   } = props
@@ -60,7 +62,7 @@ export default React.memo(function Button(props: ButtonProps) {
   return (
     <View style={getStyleForWrapper(size, style)}>
       {/* these Views cannot be combined as it will cause ripple to not respect the border radius */}
-      <View style={styles.containRipple}>
+      <View style={[styles.containRipple, rounded && styles.rounded]}>
         <Touchable
           onPress={debouncedOnPress}
           disabled={disabled}
@@ -86,8 +88,10 @@ export default React.memo(function Button(props: ButtonProps) {
 const styles = StyleSheet.create({
   // on android Touchable Provides a ripple effect, by itself it does not respect the border radius on Touchable
   containRipple: {
-    borderRadius: 100,
     overflow: 'hidden',
+  },
+  rounded: {
+    borderRadius: 100,
   },
   button: {
     alignItems: 'center',

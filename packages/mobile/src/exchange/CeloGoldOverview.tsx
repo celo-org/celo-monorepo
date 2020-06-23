@@ -67,4 +67,4 @@ const styles = StyleSheet.create({
   code: {},
 })
 
-export default withTranslation(Namespaces.exchangeFlow9)(CeloGoldOverview)
+export default withTranslation<Props>(Namespaces.exchangeFlow9)(CeloGoldOverview)

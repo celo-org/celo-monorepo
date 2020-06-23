@@ -62,7 +62,6 @@ import {
   noHeader,
   noHeaderGestureDisabled,
   nuxNavigationOptions,
-  nuxNavigationOptionsNoBackButton,
 } from 'src/navigator/Headers.v2'
 import { navigateBack, navigateToExchangeHome } from 'src/navigator/NavigationService'
 import QRNavigator from 'src/navigator/QRNavigator'
@@ -103,7 +102,6 @@ import { ExtractProps } from 'src/utils/typescript'
 import VerificationEducationScreen from 'src/verify/VerificationEducationScreen'
 import VerificationInputScreen from 'src/verify/VerificationInputScreen'
 import VerificationInterstitialScreen from 'src/verify/VerificationInterstitialScreen'
-import VerificationLearnMoreScreen from 'src/verify/VerificationLearnMoreScreen'
 import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
 
 const Stack = createStackNavigator<StackParamList>()
@@ -144,11 +142,7 @@ const verificationScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen
         name={Screens.VerificationEducationScreen}
         component={VerificationEducationScreen}
-        options={nuxNavigationOptions}
-      />
-      <Navigator.Screen
-        name={Screens.VerificationLearnMoreScreen}
-        component={VerificationLearnMoreScreen}
+        options={VerificationEducationScreen.navigationOptions}
       />
       <Navigator.Screen
         name={Screens.VerificationLoadingScreen}
@@ -162,6 +156,7 @@ const verificationScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen
         name={Screens.VerificationInputScreen}
         component={VerificationInputScreen}
+        options={VerificationInputScreen.navigationOptions}
       />
     </>
   )
@@ -212,7 +207,7 @@ const nuxScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen
       name={Screens.EnterInviteCode}
       component={EnterInviteCode}
-      options={nuxNavigationOptionsNoBackButton}
+      options={EnterInviteCode.navigationOptions}
     />
     <Navigator.Screen
       name={Screens.ImportWallet}

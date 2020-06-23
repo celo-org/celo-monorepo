@@ -6,11 +6,20 @@ A service run by distributed partners that generates unique partial signatures f
 
 You can use the following environment variables to configure the Phone Number Privacy - Signer service:
 
+### Server
+
 - `NODE_ENV` - `development` or `production`
 - `SERVER_PORT` - The port on which the express node app runs (8080 by default).
 - `SERVER_SSL_KEY_PATH` - (Optional) Path to SSL .key file.
 - `SERVER_SSL_CERT_PATH` - (Optional) Path to SSL .cert file.
-- `DB_HOST` - The URL under which your database is accessible. Supports Postgres, MSSQL, MySQL, MariaDB, SQLite3, Oracle.
+
+### Database
+
+The service currently supports Postgres, MSSQL, and MySQL.
+
+- `DB_TYPE` - `postgres`, `mysql`, or `mssql` (postgres by default).
+- `DB_HOST` - The URL under which your database is accessible.
+- `DB_PORT` - The port on the database host (uses default for chosen DB type).
 - `DB_USERNAME` - DB configuration: The DB username (postgres by default).
 - `DB_PASSWORD` - DB configuration: The DB password.
 - `DB_DATABASE` - DB configuration: The DB database name (phoneNumberPrivacy by default).
@@ -60,7 +69,7 @@ Use the following to configure the AWS Secrets Manager. To authenticate with Ama
 
 ### Setup
 
-The service requires a connection to a secret store and to a SQL database. The SQL connection parameters should be configured with the `DB_*` configs stated above.
+The service requires a connection to a secret store and to a SQL database. The SQL connection parameters should be configured with the `DB_*` configs stated above. Before performing the migration below, be sure to create a database and set the name as the value in the `DB_DATABASE` environment variable.
 
 #### Running locally or without docker
 
@@ -78,7 +87,7 @@ Docker images for the signer service are published to Celo's [container registry
 
 Before the service can work, the db migrations must be run once. So for the first run, use a run command like this:
 
-`sudo docker run -d -p 80:8080 {ENV_VARS_HERE} --entrypoint /bin/bash {IMAGE_TAG_HERE} -c " cd /celo-phone-number-privacy/signer && yarn run db:migrate && yarn start "`
+`docker run -d -p 80:8080 {ENV_VARS_HERE} --entrypoint /bin/bash {IMAGE_TAG_HERE} -c " cd /celo-phone-number-privacy/signer && yarn run db:migrate && yarn start "`
 
 For subsequent runs, this simpler command will suffice:
 
