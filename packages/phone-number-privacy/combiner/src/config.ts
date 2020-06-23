@@ -3,6 +3,7 @@ import * as functions from 'firebase-functions'
 import Web3 from 'web3'
 import logger from './common/logger'
 
+export const VERSION = process.env.npm_package_version
 export const DEV_MODE =
   process.env.NODE_ENV !== 'production' || process.env.FUNCTIONS_EMULATOR === 'true'
 
@@ -42,6 +43,7 @@ interface Config {
   }
   pgpnpServices: {
     signers: string
+    timeoutMilliSeconds: number
   }
   thresholdSignature: {
     threshold: number
@@ -82,6 +84,7 @@ if (DEV_MODE) {
     },
     pgpnpServices: {
       signers: '[{"url": "http://localhost:3000"}]',
+      timeoutMilliSeconds: 5 * 1000,
     },
     thresholdSignature: {
       threshold: 1,
@@ -119,6 +122,7 @@ if (DEV_MODE) {
     },
     pgpnpServices: {
       signers: functionConfig.pgpnpservices.signers,
+      timeoutMilliSeconds: functionConfig.pgpnpservices.timeoutMilliSeconds || 5 * 1000,
     },
     thresholdSignature: {
       threshold: functionConfig.threshold_signature.threshold_signature_threshold,
