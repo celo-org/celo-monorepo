@@ -12,12 +12,13 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { setLanguage } from 'src/app/actions'
 import { AVAILABLE_LANGUAGES } from 'src/config'
 import { Namespaces } from 'src/i18n'
+import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 
 type Props = StackScreenProps<StackParamList, Screens.Language>
 
-export default function Language({ navigation, route }: Props) {
+export default function Language({ route }: Props) {
   const dispatch = useDispatch()
   const { t, i18n } = useTranslation(Namespaces.accountScreen10)
 
@@ -25,7 +26,11 @@ export default function Language({ navigation, route }: Props) {
     CeloAnalytics.track(CustomEventNames.language_select, { language, selectedAnswer: code })
     const nextScreen = route.params?.nextScreen ?? Screens.JoinCelo
     dispatch(setLanguage(code))
-    navigation.navigate(nextScreen)
+    if (nextScreen === 'GO_BACK') {
+      navigateBack()
+    } else {
+      navigate(nextScreen)
+    }
   }
 
   return (
@@ -57,7 +62,6 @@ const styles = StyleSheet.create({
   title: {
     ...fontStyles.h2,
     marginHorizontal: 16,
-    marginTop: 80,
-    marginBottom: 16,
+    marginVertical: 16,
   },
 })

@@ -1,3 +1,4 @@
+import Times from '@celo/react-components/icons/Times'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { componentStyles } from '@celo/react-components/styles/styles'
@@ -10,6 +11,8 @@ import CancelButton from 'src/components/CancelButton.v2'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
+import { navigateBack } from 'src/navigator/NavigationService'
+import { TopBarIconButton } from 'src/navigator/TopBarButton.v2'
 import useSelector from 'src/redux/useSelector'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 
@@ -17,9 +20,14 @@ export const noHeader: StackNavigationOptions = {
   headerShown: false,
 }
 
+export const noHeaderGestureDisabled: StackNavigationOptions = {
+  headerShown: false,
+  gestureEnabled: false,
+}
+
 const styles = StyleSheet.create({
   headerTitle: {
-    ...fontStyles.regular500,
+    ...fontStyles.navigationHeader,
   },
   headerSubTitle: {
     ...fontStyles.small,
@@ -95,6 +103,12 @@ export const headerWithBackButton: StackNavigationOptions = {
 export const headerWithCancelButton: StackNavigationOptions = {
   ...emptyHeader,
   headerLeft: () => <CancelButton />,
+}
+
+export const headerWithCloseButton: StackNavigationOptions = {
+  ...emptyHeader,
+  headerLeft: () => <TopBarIconButton icon={<Times />} onPress={navigateBack} />,
+  headerLeftContainerStyle: { paddingLeft: 20 },
 }
 
 interface Props {

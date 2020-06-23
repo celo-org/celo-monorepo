@@ -57,4 +57,4 @@ const style = StyleSheet.create({
 
 export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
   setAnalyticsEnabled,
-})(withTranslation(Namespaces.accountScreen10)(Analytics))
+})(withTranslation<Props>(Namespaces.accountScreen10)(Analytics))

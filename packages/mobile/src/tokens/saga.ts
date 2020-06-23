@@ -12,7 +12,7 @@ import { addStandbyTransaction, removeStandbyTransaction } from 'src/transaction
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
-import { getContractKitOutsideGenerator } from 'src/web3/contracts'
+import { getContractKitAsync } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import * as utf8 from 'utf8'
 
@@ -47,7 +47,7 @@ export function* convertToContractDecimals(value: BigNumber, token: CURRENCY_ENU
 
 export async function getTokenContract(token: CURRENCY_ENUM) {
   Logger.debug(TAG + '@getTokenContract', `Fetching contract for ${token}`)
-  const contractKit = await getContractKitOutsideGenerator()
+  const contractKit = await getContractKitAsync()
   switch (token) {
     case CURRENCY_ENUM.GOLD:
       return contractKit.contracts.getGoldToken()
@@ -181,6 +181,7 @@ export function tokenTransferFactory({
         yield call(sendAndMonitorTransaction, txId, tx, account, currency)
       } catch (error) {
         Logger.error(tag, 'Error transfering token', error)
+        CeloAnalytics.track(CustomEventNames.transfer_token_error, { error: error.message })
         yield put(removeStandbyTransaction(txId))
         if (error.message === ErrorMessages.INCORRECT_PIN) {
           yield put(showError(ErrorMessages.INCORRECT_PIN))
@@ -193,7 +194,7 @@ export function tokenTransferFactory({
 }
 
 export async function getCurrencyAddress(currency: CURRENCY_ENUM) {
-  const contractKit = await getContractKitOutsideGenerator()
+  const contractKit = await getContractKitAsync()
   switch (currency) {
     case CURRENCY_ENUM.GOLD:
       return contractKit.registry.addressFor(CeloContract.GoldToken)
