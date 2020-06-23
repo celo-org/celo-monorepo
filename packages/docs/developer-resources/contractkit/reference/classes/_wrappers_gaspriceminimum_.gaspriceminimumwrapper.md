@@ -96,7 +96,7 @@ ___
 
 Query current gas price minimum in gGLD.
 
-**`returns`** current gas price minimum in cGLD
+**`returns`** current gas price minimum in CELO
 
 #### Type declaration:
 
