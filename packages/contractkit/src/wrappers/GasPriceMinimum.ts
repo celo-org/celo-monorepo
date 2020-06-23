@@ -13,7 +13,7 @@ export interface GasPriceMinimumConfig {
  */
 export class GasPriceMinimumWrapper extends BaseWrapper<GasPriceMinimum> {
   /**
-   * Query current gas price minimum in gGLD.
+   * Query current gas price minimum in CELO.
    * @returns current gas price minimum in CELO
    */
   gasPriceMinimum = proxyCall(this.contract.methods.gasPriceMinimum, undefined, valueToBigNumber)

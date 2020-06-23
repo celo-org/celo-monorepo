@@ -4,7 +4,7 @@ To participate in validator elections, users must first make a transfer of CELO 
 
 ## Concurrent Use of Locked Gold
 
-Locking up CELO guarantees that the same asset is not used more than once in the same vote. However every unit of Locked Gold can be deployed in several ways at once. Using an amount for voting for a validator does not preclude that same amount also being used to vote for a governance proposal, or as a stake at the same time. Users do not need to choose whether to have to move funds from validator elections in order to vote on a governance proposal.
+Locking up CELO guarantees that the same asset is not used more than once in the same vote. However every unit of Locked CELO can be deployed in several ways at once. Using an amount for voting for a validator does not preclude that same amount also being used to vote for a governance proposal, or as a stake at the same time. Users do not need to choose whether to have to move funds from validator elections in order to vote on a governance proposal.
 
 ## Unlocking Period
 
