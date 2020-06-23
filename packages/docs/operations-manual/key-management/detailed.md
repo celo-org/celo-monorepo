@@ -10,7 +10,7 @@ Celo Accounts can be designated as Locked Gold Accounts or authorized as signer 
 
 ## Locked Gold Accounts
 
-[Locked Gold](../../celo-codebase/protocol/proof-of-stake/locked-gold.md) Account keys have the highest level of privilege in the Celo protocol. These keys can be used to lock and unlock cGLD in order to be used in proof-of-stake. Furthermore, Locked Gold Account keys can be used to authorize other keys to sign transactions and messages on behalf of the Locked Gold Account.
+[Locked Gold](../../celo-codebase/protocol/proof-of-stake/locked-gold.md) Account keys have the highest level of privilege in the Celo protocol. These keys can be used to lock and unlock CELO in order to be used in proof-of-stake. Furthermore, Locked Gold Account keys can be used to authorize other keys to sign transactions and messages on behalf of the Locked Gold Account.
 
 In *most* cases, the Locked Gold Account key has all the privileges as any authorized signers. For example, if a voter signer is authorized, a user can place votes on behalf of the Locked Gold Account with both the authorized vote signer *and* the Locked Gold Account.
 

@@ -2,7 +2,7 @@
 
 ## Account
 
-Identifies an account on Celo. There are two types of account. **Externally owned accounts** have an associated Celo Gold balance and are controlled by a user holding the associated public-private keypair. **Contract accounts** contain the code and data of a single smart contract which can be called and manipulate its own stored data.
+Identifies an account on Celo. There are two types of account. **Externally owned accounts** have an associated CELO balance and are controlled by a user holding the associated public-private keypair. **Contract accounts** contain the code and data of a single smart contract which can be called and manipulate its own stored data.
 
 ## Address
 
@@ -90,7 +90,7 @@ Funds disbursed by the protocol at the end of every epoch as incentives for vali
 
 ## ERC-20
 
-A standard interface for implementing tokens as smart contracts. Balances associated with addresses are typically maintained inside the contract's storage. Both Celo Gold and Celo Dollars implement the ERC-20 interface.
+A standard interface for implementing tokens as smart contracts. Balances associated with addresses are typically maintained inside the contract's storage. Both CELO and Celo Dollars implement the ERC-20 interface.
 
 ## Ethereum
 
@@ -158,7 +158,7 @@ A device or computer running the Celo Blockchain software that keeps typically o
 
 ## [Locked Gold](celo-codebase/protocol/proof-of-stake/locked-gold.md)
 
-Celo Gold balances held in escrow at the Locked Gold contract for the account that deposited it there. This permits that balance to be used for voting in validator elections, governance proposals, and to meet staking requirements for registering a validator or validator group.
+CELO balances held in escrow at the Locked Gold contract for the account that deposited it there. This permits that balance to be used for voting in validator elections, governance proposals, and to meet staking requirements for registering a validator or validator group.
 
 ## Mainnet
 
@@ -174,11 +174,11 @@ An interaction that takes place solely through a transaction being executed on t
 
 ## Proof-of-Stake
 
-The system that determines the participants in a Byzantine Fault Tolerant consensus mechanism. [Celo's Proof-of-Stake mechanism](celo-codebase/protocol/proof-of-stake/README.md) permits accounts to convert units of Celo Gold into Locked Gold then vote for Validator Groups, such that an election held at the end of every epoch selects a new set of validators for the following epoch.
+The system that determines the participants in a Byzantine Fault Tolerant consensus mechanism. [Celo's Proof-of-Stake mechanism](celo-codebase/protocol/proof-of-stake/README.md) permits accounts to convert units of CELO into Locked Gold then vote for Validator Groups, such that an election held at the end of every epoch selects a new set of validators for the following epoch.
 
 ## RC1
 
-RC1, which stands for Release Candidate 1, was the first network that had the potential to become the Celo mainnet. It was promoted to Mainnet after the Celo community voted to enable Celo Gold transfers on the network on May 18, 2020.
+RC1, which stands for Release Candidate 1, was the first network that had the potential to become the Celo mainnet. It was promoted to Mainnet after the Celo community voted to enable CELO transfers on the network on May 18, 2020.
 
 ## Savings Circle
 

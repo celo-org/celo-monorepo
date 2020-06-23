@@ -19,7 +19,7 @@
 - [Validator Setup FAQ](getting-started/validator-troubleshooting-faq.md)
 - [Glossary](GLOSSARY.md)
 
-## Celo Gold Holder Guide
+## CELO Holder Guide
 - [Quick Start](celo-gold-holder-guide/quick-start.md)
 - [Using a Ledger Wallet](celo-gold-holder-guide/ledger.md)
 - [Understanding ReleaseGold](celo-gold-holder-guide/release-gold.md)

@@ -1,19 +1,19 @@
 ---
-description: Exchange Celo Dollars and Celo Gold via the stability mechanism
+description: Exchange Celo Dollars and CELO via the stability mechanism
 ---
 
 ## Commands
 
 ### Dollars
 
-Exchange Celo Dollars for Celo Gold via the stability mechanism
+Exchange Celo Dollars for CELO via the stability mechanism
 
 ```
 USAGE
   $ celocli exchange:dollars
 
 OPTIONS
-  --forAtLeast=10000000000000000000000               [default: 0] Optional, the minimum value of Celo Gold to receive in
+  --forAtLeast=10000000000000000000000               [default: 0] Optional, the minimum value of CELO to receive in
                                                      return
 
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address with Celo Dollars to exchange
@@ -30,7 +30,7 @@ OPTIONS
 
   --useLedger                                        Set it to use a ledger wallet
 
-  --value=10000000000000000000000                    (required) The value of Celo Dollars to exchange for Celo Gold
+  --value=10000000000000000000000                    (required) The value of Celo Dollars to exchange for CELO
 
 EXAMPLES
   dollars --value 10000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
@@ -41,7 +41,7 @@ _See code: [packages/cli/src/commands/exchange/dollars.ts](https://github.com/ce
 
 ### Gold
 
-Exchange Celo Gold for Celo Dollars via the stability mechanism
+Exchange CELO for Celo Dollars via the stability mechanism
 
 ```
 USAGE
@@ -51,7 +51,7 @@ OPTIONS
   --forAtLeast=10000000000000000000000               [default: 0] Optional, the minimum value of Celo Dollars to receive
                                                      in return
 
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address with Celo Gold to exchange
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address with CELO to exchange
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -65,7 +65,7 @@ OPTIONS
 
   --useLedger                                        Set it to use a ledger wallet
 
-  --value=10000000000000000000000                    (required) The value of Celo Gold to exchange for Celo Dollars
+  --value=10000000000000000000000                    (required) The value of CELO to exchange for Celo Dollars
 
 EXAMPLES
   gold --value 5000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
