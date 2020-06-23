@@ -208,7 +208,7 @@ exports[`PhoneNumberLookupQuotaScreen renders correctly 1`] = `
             }
           }
         >
-          INSUFFICIENT_BALANCE
+          insufficientBalance
            
         </Text>
       </View>
