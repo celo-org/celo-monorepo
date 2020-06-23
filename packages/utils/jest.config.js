@@ -1,5 +1,5 @@
 module.exports = {
   preset: 'ts-jest',
-  testEnvironment: 'node',
+  testEnvironment: '../../flakey-test-tracking/JestFlakeTrackingEnvironment.js',
   testMatch: ['<rootDir>/src/**/?(*.)+(spec|test).ts?(x)'],
 }

@@ -1,5 +1,5 @@
 module.exports = {
   preset: 'ts-jest',
   setupFiles: ['dotenv/config'],
-  testEnvironment: 'node',
+  testEnvironment: '../../../flakey-test-tracking/JestFlakeTrackingEnvironment.js',
 }
