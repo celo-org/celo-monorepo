@@ -62,7 +62,7 @@ contract DowntimeSlasherIntervals is SlasherUtil {
    * @notice Calculates and returns the signature bitmap for the specified interval.
    * @param startBlock First block of the downtime interval.
    * @param endBlock Last block of the downtime interval.
-   * @return The signature bitmap for the specified interval.
+   * @return The signature uptime bitmap for the specified interval.
    * @dev startBlock and endBlock must be in the same epoch.
    * @dev The getParentSealBitmap precompile requires that startBlock must be within 4 epochs of 
    * the current block.

@@ -29,12 +29,12 @@ export interface DowntimeWindow {
 }
 
 /**
- * Contract handling slashing for Validator downtime using Intervals
+ * Contract handling slashing for Validator downtime using intervals.
  */
 export class DowntimeSlasherIntervalsWrapper extends BaseWrapper<DowntimeSlasherIntervals> {
   /**
    * Returns slashing incentives.
-   * @return Rewards and penaltys for slashing.
+   * @return Rewards and penalties for slashing.
    */
   slashingIncentives = proxyCall(this.contract.methods.slashingIncentives, undefined, (res): {
     reward: BigNumber
@@ -66,7 +66,7 @@ export class DowntimeSlasherIntervalsWrapper extends BaseWrapper<DowntimeSlasher
 
   /**
    * Check if a validator appears down in the bitmap for the interval of blocks.
-   * Both startBlock and endBlock should be part of the same epoch
+   * Both startBlock and endBlock should be part of the same epoch.
    * @param startBlock First block of the interval.
    * @param endBlock Last block of the interval.
    * @param signerIndex Index of the signer within the validator set.
@@ -75,10 +75,10 @@ export class DowntimeSlasherIntervalsWrapper extends BaseWrapper<DowntimeSlasher
   wasDownForInterval = proxyCall(this.contract.methods.wasDownForInterval)
 
   /**
-   * @notice Calculates and returns the signature bitmap for the specified interval.
+   * Calculates and returns the signature bitmap for the specified interval.
    * @param startBlock First block of the downtime interval.
    * @param endBlock Last block of the downtime interval.
-   * @return (string) The signature bitmap for the specified interval.
+   * @return (string) The signature uptime bitmap for the specified interval.
    * @dev startBlock and endBlock must be in the same epoch.
    * @dev The getParentSealBitmap precompile requires that startBlock must be within 4 epochs of
    * the current block.
@@ -90,7 +90,7 @@ export class DowntimeSlasherIntervalsWrapper extends BaseWrapper<DowntimeSlasher
   )
 
   /**
-   * @notice Calculates and sets the signature bitmap for the specified interval.
+   * Calculates and sets the signature bitmap for the specified interval.
    * @param startBlock First block of the downtime interval.
    * @param endBlock Last block of the downtime interval.
    * @return The signature bitmap for the specified interval.
@@ -99,20 +99,20 @@ export class DowntimeSlasherIntervalsWrapper extends BaseWrapper<DowntimeSlasher
   setBitmapForInterval = proxySend(this.kit, this.contract.methods.setBitmapForInterval)
 
   /**
-   * @notice Shows if the user already called the setBitmapForInterval for
-   * the specific interval
+   * Shows if the user already called the `setBitmapForInterval` for
+   * the specific interval.
    * @param startBlock First block of a calculated downtime interval.
    * @param endBlock Last block of the calculated downtime interval.
-   * @return True if the user already called the setBitmapForInterval for
-   * the specific interval
+   * @return True if the user already called the `setBitmapForInterval` for
+   * the specific interval.
    */
   isBitmapSetForInterval = proxyCall(this.contract.methods.isBitmapSetForInterval)
 
   /**
-   * Tests if the given validator or signer has been down in the Interval.
+   * Tests if the given validator or signer has been down in the interval.
    * @param validatorOrSignerAddress Address of the validator account or signer.
-   * @param startBlock First block of the Interval.
-   * @param endBlock Last block of the Interval.
+   * @param startBlock First block of the interval.
+   * @param endBlock Last block of the interval.
    */
   async wasValidatorDownForInterval(
     validatorOrSignerAddress: Address,
@@ -150,18 +150,20 @@ export class DowntimeSlasherIntervalsWrapper extends BaseWrapper<DowntimeSlasher
     endBlocks: number[]
   ) {
     if (startBlocks.length === 0 || startBlocks.length !== endBlocks.length) {
-      throw new Error('Interval arrays should have at least one element and have the same length')
+      throw new Error(
+        'StartBlocks and endBlocks arrays should have at least one element and have the same length'
+      )
     }
     const window = await this.getSlashableDowntimeWindow(startBlocks[0], undefined)
 
-    const signerIndeces = []
-    signerIndeces.push(await this.getValidatorSignerIndex(validatorOrSignerAddress, window.start))
+    const signerIndices = []
+    signerIndices.push(await this.getValidatorSignerIndex(validatorOrSignerAddress, window.start))
     const startEpoch = await this.kit.getEpochNumberOfBlock(window.start)
     const endEpoch = await this.kit.getEpochNumberOfBlock(window.end)
     if (startEpoch < endEpoch) {
-      signerIndeces.push(await this.getValidatorSignerIndex(validatorOrSignerAddress, window.end))
+      signerIndices.push(await this.getValidatorSignerIndex(validatorOrSignerAddress, window.end))
     }
-    return this.wasDownForIntervals(startBlocks, endBlocks, signerIndeces)
+    return this.wasDownForIntervals(startBlocks, endBlocks, signerIndices)
   }
 
   /**
@@ -200,7 +202,9 @@ export class DowntimeSlasherIntervalsWrapper extends BaseWrapper<DowntimeSlasher
     endBlocks: number[]
   ): Promise<CeloTransactionObject<void>> {
     if (startBlocks.length === 0 || startBlocks.length !== endBlocks.length) {
-      throw new Error('Interval arrays should have at least one element and have the same length')
+      throw new Error(
+        'StartBlocks and endBlocks arrays should have at least one element and have the same length'
+      )
     }
     const window = await this.getSlashableDowntimeWindow(startBlocks[0], undefined)
     return this.slashStartSignerIndex(
@@ -223,7 +227,9 @@ export class DowntimeSlasherIntervalsWrapper extends BaseWrapper<DowntimeSlasher
     endBlocks: number[]
   ): Promise<CeloTransactionObject<void>> {
     if (startBlocks.length === 0 || startBlocks.length !== endBlocks.length) {
-      throw new Error('Interval arrays should have at least one element and have the same length')
+      throw new Error(
+        'StartBlocks and endBlocks arrays should have at least one element and have the same length'
+      )
     }
     const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
@@ -254,7 +260,7 @@ export class DowntimeSlasherIntervalsWrapper extends BaseWrapper<DowntimeSlasher
     slashableWindow: DowntimeWindow,
     startBlocks: number[],
     endBlocks: number[],
-    signerIndeces: number[]
+    signerIndices: number[]
   ): Promise<CeloTransactionObject<void>> {
     const incentives = await this.slashingIncentives()
     const validators = await this.kit.contracts.getValidators()
@@ -278,7 +284,7 @@ export class DowntimeSlasherIntervalsWrapper extends BaseWrapper<DowntimeSlasher
       this.contract.methods.slash(
         startBlocks,
         endBlocks,
-        signerIndeces,
+        signerIndices,
         membership.historyIndex,
         slashValidator.lessers,
         slashValidator.greaters,
@@ -305,7 +311,7 @@ export class DowntimeSlasherIntervalsWrapper extends BaseWrapper<DowntimeSlasher
 
   /**
    * Calculate the downtime window with respect to a length and a provided start or end block number.
-   * @param length Window length
+   * @param length Window length.
    * @param startBlock First block of the Downtime window. Determined from endBlock if not provided.
    * @param endBlock Last block of the Downtime window. Determined from startBlock or grandparent of latest block if not provided.
    */
