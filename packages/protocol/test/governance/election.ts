@@ -833,7 +833,7 @@ contract('Election', (accounts: string[]) => {
       })
 
       describe('when the revoked value is equal to the active votes', () => {
-        describe.only('#revokeAllActive', () => {
+        describe('#revokeAllActive', () => {
           const index = 0
           beforeEach(async () => {
             await election.revokeAllActive(group, NULL_ADDRESS, NULL_ADDRESS, index)
