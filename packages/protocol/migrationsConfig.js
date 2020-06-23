@@ -340,7 +340,7 @@ const NetworkConfigs = {
     },
     epochRewards: {
       targetVotingYieldParameters: {
-        initial: 1.06,
+        initial: 0.00016,
       },
       frozen: false,
     },
@@ -362,9 +362,15 @@ const NetworkConfigs = {
       participationBaselineQuorumFactor: 1,
     },
     governanceApproverMultiSig: {
-      signatories: [network.from],
+      // 1/4 multsig
+      signatories: [
+        '0x32830A3f65DF98aFCFA18bAd35009Aa51163D606',
+        '0x7c593219ad21e172c1fdc6bfdc359699fa428adb',
+        '0x31af68f73fb93815b3eB9a6FA76e63113De5f733',
+        '0x47fE4b9fFDB9712fC5793B1b5E86d96a4664cf02',
+      ],
       numRequiredConfirmations: 1,
-      numInternalRequiredConfirmations: 1,
+      numInternalRequiredConfirmations: 2,
     },
     lockedGold: {
       unlockingPeriod: 6 * HOUR, // 1/12 of the Mainnet period.
@@ -375,9 +381,13 @@ const NetworkConfigs = {
       frozenAssetsDays: 182, // 3x Mainnet thawing rate
     },
     reserveSpenderMultiSig: {
-      signatories: [network.from],
+      // 2/2 multsig
+      signatories: [
+        '0x49eFFA2ceF5FccA5540f421d6b28e76184cc0fDF',
+        '0x4550F1576fAC966Ac8b9F42e1D5D66D3A14dD8D3',
+      ],
       numRequiredConfirmations: 1,
-      numInternalRequiredConfirmations: 1,
+      numInternalRequiredConfirmations: 2,
     },
     stableToken: {
       oracles: [

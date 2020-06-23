@@ -13,7 +13,7 @@ const argv = require('minimist')(process.argv.slice(2), {
 const SOLC_VERSION = '0.5.8'
 const ALFAJORES_NETWORKID = 44786
 const BAKLAVA_NETWORKID = 40120
-const BAKLAVASTAGING_NETWORKID = 31416
+const BAKLAVASTAGING_NETWORKID = 31420
 
 const OG_FROM = '0xfeE1a22F43BeeCB912B5a4912ba87527682ef0fC'
 const DEVELOPMENT_FROM = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
@@ -24,6 +24,7 @@ const ALFAJORES_FROM = '0x456f41406B32c45D59E539e4BBA3D7898c3584dA'
 const PILOT_FROM = '0x387bCb16Bfcd37AccEcF5c9eB2938E30d3aB8BF2'
 const PILOTSTAGING_FROM = '0x545DEBe3030B570731EDab192640804AC8Cf65CA'
 const RC0_FROM = '0x469be98FE71AFf8F6e7f64F9b732e28A03596B5C'
+const BAKLAVASTAGING_FROM = '0x4588ABb84e1BBEFc2BcF4b2296F785fB7AD9F285'
 
 // Gas limit is doubled for initial contract deployment.
 const gasLimit = argv.reset ? 20000000 : 10000000
@@ -156,6 +157,7 @@ const networks = {
   },
   baklavastaging: {
     ...defaultConfig,
+    from: BAKLAVASTAGING_FROM,
     network_id: BAKLAVASTAGING_NETWORKID,
   },
 }

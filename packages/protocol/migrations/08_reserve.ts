@@ -49,7 +49,7 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
   initializeArgs,
   async (reserve: ReserveInstance, web3: Web3, networkName: string) => {
     config.reserve.spenders.forEach(async (spender) => {
-      console.info(`Marking ${spender} as a reserve spender`)
+      console.info(`Marking ${spender} as a Reserve spender`)
       await reserve.addSpender(spender)
     })
     config.reserve.otherAddresses.forEach(async (otherAddress) => {
@@ -58,7 +58,7 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
     })
 
     if (config.reserve.initialBalance) {
-      console.info('Sending the reserve an initial gold balance')
+      console.info('Sending the Reserve an initial gold balance')
       const network: any = truffle.networks[networkName]
       await web3.eth.sendTransaction({
         from: network.from,
@@ -67,6 +67,7 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
       })
 
       if (config.reserve.frozenAssetsStartBalance && config.reserve.frozenAssetsDays) {
+        console.info('Setting frozen asset parameters on the Reserve')
         await reserve.setFrozenGold(
           config.reserve.frozenAssetsStartBalance,
           config.reserve.frozenAssetsDays
