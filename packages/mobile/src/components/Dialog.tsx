@@ -12,6 +12,7 @@ interface Props {
   actionText: string
   actionPress: () => void
   secondaryActionText?: string
+  secondaryActionDisabled?: boolean
   secondaryActionPress?: () => void
   isVisible: boolean
   testID?: string
@@ -23,6 +24,7 @@ export default function Dialog({
   actionPress,
   actionText,
   secondaryActionText,
+  secondaryActionDisabled,
   secondaryActionPress,
   image,
   isVisible,
@@ -39,6 +41,7 @@ export default function Dialog({
         {secondaryActionText && (
           <TextButton
             style={styles.secondary}
+            disabled={secondaryActionDisabled}
             onPress={secondaryActionPress}
             testID={testID && `${testID}/SecondaryAction`}
           >

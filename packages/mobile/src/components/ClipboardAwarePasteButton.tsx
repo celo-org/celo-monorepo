@@ -3,16 +3,19 @@ import React, { useLayoutEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LayoutAnimation } from 'react-native'
 import { Namespaces } from 'src/i18n'
-import { useClipboard } from 'src/utils/useClipboard'
 
 interface Props {
+  clipboardContent: string
   shouldShow: (clipboardContent: string) => boolean
   onPress: (clipboardContent: string) => void
 }
 
-export default function ClipboardAwarePasteButton({ shouldShow, onPress }: Props) {
+export default function ClipboardAwarePasteButton({
+  clipboardContent,
+  shouldShow,
+  onPress,
+}: Props) {
   const { t } = useTranslation(Namespaces.global)
-  const clipboardContent = useClipboard()
   const isVisible = shouldShow(clipboardContent)
 
   useLayoutEffect(() => {
