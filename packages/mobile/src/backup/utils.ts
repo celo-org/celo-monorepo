@@ -80,7 +80,7 @@ export function splitMnemonic(mnemonic: string, language: string | null): string
 export function joinMnemonic(mnemonicShards: string[]) {
   if (
     !mnemonicShards ||
-    !(mnemonicShards.length === 2) ||
+    mnemonicShards.length !== 2 ||
     !mnemonicShards[0].includes(MNEMONIC_SPLITTER) ||
     !mnemonicShards[1].includes(MNEMONIC_SPLITTER)
   ) {
