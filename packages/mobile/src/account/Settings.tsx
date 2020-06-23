@@ -1,6 +1,5 @@
 import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
 import {
-  SettingsItemNoValue,
   SettingsItemSwitch,
   SettingsItemTextValue,
 } from '@celo/react-components/components/SettingsItem'
@@ -250,7 +249,7 @@ export class Account extends React.Component<Props, State> {
             {t('global:settings')}
           </Text>
           <View style={styles.containerList}>
-            <SettingsItemNoValue title={t('editProfile')} onPress={this.goToProfile} />
+            <SettingsItemTextValue title={t('editProfile')} onPress={this.goToProfile} />
             <SettingsItemTextValue
               title={t('languageSettings')}
               value={currentLanguage?.name ?? t('global:unknown')}
@@ -280,8 +279,8 @@ export class Account extends React.Component<Props, State> {
               details={t('shareAnalytics_detail')}
             />
             <SectionHeadNew text={t('legal')} style={styles.sectionTitle} />
-            <SettingsItemNoValue title={t('licenses')} onPress={this.goToLicenses} />
-            <SettingsItemNoValue title={t('termsOfServiceLink')} onPress={this.goToTerms} />
+            <SettingsItemTextValue title={t('licenses')} onPress={this.goToLicenses} />
+            <SettingsItemTextValue title={t('termsOfServiceLink')} onPress={this.goToTerms} />
           </View>
           {this.getDevSettingsComp()}
           <WarningModal

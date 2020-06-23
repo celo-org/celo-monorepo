@@ -24,23 +24,13 @@ function Title({ value }: { value: string }) {
   return <View style={[styles.left]}>{<Text style={styles.title}>{value}</Text>}</View>
 }
 
-type SettingsItemNoValueProps = {
+type BaseProps = {
   title: string
 } & Omit<WrapperProps, 'children'>
 
-export function SettingsItemNoValue({ testID, title, onPress }: SettingsItemNoValueProps) {
-  return (
-    <Wrapper testID={testID} onPress={onPress}>
-      <View style={styles.container}>
-        <Title value={title} />
-      </View>
-    </Wrapper>
-  )
-}
-
 type SettingsItemTextValueProps = {
-  value: string
-} & SettingsItemNoValueProps
+  value?: string
+} & BaseProps
 
 export function SettingsItemTextValue({
   testID,
@@ -52,10 +42,12 @@ export function SettingsItemTextValue({
     <Wrapper testID={testID} onPress={onPress}>
       <View style={styles.container}>
         <Title value={title} />
-        <View style={styles.right}>
-          <Text style={styles.value}>{value}</Text>
-          <ForwardChevron />
-        </View>
+        {value && (
+          <View style={styles.right}>
+            <Text style={styles.value}>{value}</Text>
+            <ForwardChevron />
+          </View>
+        )}
       </View>
     </Wrapper>
   )
@@ -65,7 +57,7 @@ type SettingsItemSwitchProps = {
   value: boolean
   onValueChange: (value: boolean) => void
   details?: string
-} & Pick<SettingsItemNoValueProps, 'title' | 'testID'>
+} & Omit<BaseProps, 'onPress'>
 
 export function SettingsItemSwitch({
   testID,
@@ -95,7 +87,7 @@ type SettingsItemInputProps = {
   value: string
   placeholder?: string
   onValueChange: (value: string) => void
-} & Pick<SettingsItemNoValueProps, 'title' | 'testID'>
+} & Omit<BaseProps, 'onPress'>
 
 export function SettingsItemInput({
   testID,

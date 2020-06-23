@@ -1,5 +1,5 @@
 import Link from '@celo/react-components/components/Link'
-import { SettingsItemNoValue } from '@celo/react-components/components/SettingsItem'
+import { SettingsItemTextValue } from '@celo/react-components/components/SettingsItem'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
@@ -27,12 +27,12 @@ const Support = () => {
     <SafeAreaView style={styles.container}>
       <DrawerTopBar />
       <View style={styles.containerList}>
-        <SettingsItemNoValue
+        <SettingsItemTextValue
           testID="WebFAQLink"
           title={t('webFaq')}
           onPress={openExternalLink(FAQ_LINK)}
         />
-        <SettingsItemNoValue
+        <SettingsItemTextValue
           testID="ForumLink"
           title={t('forum')}
           onPress={openExternalLink(FORUM_LINK)}
