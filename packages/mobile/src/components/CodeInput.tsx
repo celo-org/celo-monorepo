@@ -5,8 +5,17 @@ import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { Shadow, Spacing } from '@celo/react-components/styles/styles.v2'
 import React, { useLayoutEffect } from 'react'
-import { ActivityIndicator, LayoutAnimation, StyleSheet, Text, View } from 'react-native'
+import {
+  ActivityIndicator,
+  LayoutAnimation,
+  StyleProp,
+  StyleSheet,
+  Text,
+  View,
+  ViewStyle,
+} from 'react-native'
 import ClipboardAwarePasteButton from 'src/components/ClipboardAwarePasteButton'
+import { useClipboard } from 'src/utils/useClipboard'
 
 export enum CodeInputStatus {
   DISABLED, // input disabled
@@ -21,8 +30,10 @@ export interface Props {
   status: CodeInputStatus
   inputValue: string
   inputPlaceholder: string
+  inputPlaceholderWithClipboardContent?: string
   onInputChange: (value: string) => void
   shouldShowClipboard: (value: string) => boolean
+  style?: StyleProp<ViewStyle>
 }
 
 export default function CodeInput({
@@ -30,9 +41,13 @@ export default function CodeInput({
   status,
   inputValue,
   inputPlaceholder,
+  inputPlaceholderWithClipboardContent,
   onInputChange,
   shouldShowClipboard,
+  style,
 }: Props) {
+  const clipboardContent = useClipboard()
+
   // LayoutAnimation when switching to/from input
   useLayoutEffect(() => {
     LayoutAnimation.easeInEaseOut()
@@ -54,7 +69,7 @@ export default function CodeInput({
     <Card
       rounded={true}
       shadow={showInput ? Shadow.SoftLight : null}
-      style={showInput ? styles.containerActive : styles.container}
+      style={[showInput ? styles.containerActive : styles.container, style]}
     >
       {/* These views cannot be combined as it will cause the shadow to be clipped on iOS */}
       <View style={styles.containRadius}>
@@ -64,7 +79,12 @@ export default function CodeInput({
             {showInput ? (
               <TextInput
                 value={inputValue}
-                placeholder={inputPlaceholder}
+                placeholder={
+                  inputPlaceholderWithClipboardContent &&
+                  shouldShowClipboardInternal(clipboardContent)
+                    ? inputPlaceholderWithClipboardContent
+                    : inputPlaceholder
+                }
                 onChangeText={onInputChange}
               />
             ) : (
@@ -82,6 +102,7 @@ export default function CodeInput({
         </View>
         {showInput && (
           <ClipboardAwarePasteButton
+            clipboardContent={clipboardContent}
             shouldShow={shouldShowClipboardInternal}
             onPress={onInputChange}
           />
