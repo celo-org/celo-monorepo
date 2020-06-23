@@ -193,6 +193,8 @@ contract('DowntimeSlasherIntervals', (accounts: string[]) => {
     const bitmapVI1 = '0x0000000000000000000000000000000000000000000000000000000000000002'
     // Signed by validator 0
     const bitmapVI0 = '0x0000000000000000000000000000000000000000000000000000000000000001'
+    // Signed by validator 99
+    const bitmapVI99 = '0x0000000000000000000000000000000000000008000000000000000000000000'
     const validatorIndexInEpoch: number = 0
     const bitmapWithoutValidator: string[] = [bitmapVI1, bitmapVI0]
 
@@ -340,6 +342,31 @@ contract('DowntimeSlasherIntervals', (accounts: string[]) => {
             slotArrays.startSlots,
             slotArrays.endSlots,
             [validatorIndexInEpoch],
+            0,
+            [],
+            [],
+            [],
+            [],
+            [],
+            []
+          ),
+          'not down'
+        )
+      })
+      it('fails if the first block was signed using a big index', async () => {
+        await slasher.setNumberValidators(100)
+        await slasher.setEpochSigner(epoch, 99, validatorList[2])
+        const startBlock = (epoch - 1) * epochBlockSize + 1
+        // All the other block are good
+        await presetParentSealForBlocks(startBlock + 1, slashableDowntime - 1, [bitmapVI0])
+        // first block with everything signed
+        await presetParentSealForBlocks(startBlock, 1, [bitmapVI99])
+        const slotArrays = await calculateEverySlot(startBlock)
+        await assertRevert(
+          slasher.slash(
+            slotArrays.startSlots,
+            slotArrays.endSlots,
+            [99],
             0,
             [],
             [],
