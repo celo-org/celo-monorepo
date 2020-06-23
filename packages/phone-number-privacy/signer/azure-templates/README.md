@@ -15,10 +15,11 @@ RESOURCE_GROUP={YOUR_RG}
 
 ## Deploy the database (postgres)
 
-Fill in the params in `db-parameters.json` and then run the following:
+Fill in the `TODO` placeholder params in `db-parameters.json` and then run the following:
 
 ```bash
 SERVER_NAME={YOUR_SERVER_NAME}
+
 az deployment group create \
   --resource-group $RESOURCE_GROUP \
   --template-file db-template.json \
@@ -33,17 +34,19 @@ az postgres db list --resource-group $RESOURCE_GROUP --server-name $SERVER_NAME
 ```
 
 To enable connection from the container instance, the default Connection Security settings of the database need to be changed to "Allow access to Azure services".
-TODO find a way to do this via the Azure CLI. Use the portal for now.
+_TODO find a way to do this via the Azure CLI. Use the portal for now._
 
 You'll also need to run the db migrations, either via a special docker command or by temporarily whitelisting your dev box (see parent [Readme](../README.md))
 
 ## Deploy the container instance and give it keyvault perms
 
-Fill in the params in `container-parameters.json` and then run the following:
+Fill in the `TODO` placeholder params in `container-parameters.json` and then run the following:
 
 ```bash
 CONTAINER_NAME={YOUR_CONTAINER_NAME}
+
 KEYVAULT_NAME={YOUR_VAULT_NAME}
+
 az deployment group create \
   --resource-group $RESOURCE_GROUP \
   --template-file container-template.json \
@@ -66,8 +69,16 @@ az keyvault set-policy \
 Fill in the params in `frontdoor-parameters.json` and then run the following:
 
 ```bash
+CONTAINER_FQDN=$(az container show \
+  --resource-group $RESOURCE_GROUP \
+  --name $CONTAINER_NAME \
+  --query ipAddress.fqdn --out tsv)
+
+FRONTDOOR_NAME={YOUR_FRONTDOOR_NAME}
+
 az deployment group create \
   --resource-group $RESOURCE_GROUP \
   --template-file frontdoor-template.json \
-  --parameters @frontdoor-parameters.json
+  --parameters frontdoors_name=$FRONTDOOR_NAME \
+  --parameters backend_url=$CONTAINER_FQDN
 ```
