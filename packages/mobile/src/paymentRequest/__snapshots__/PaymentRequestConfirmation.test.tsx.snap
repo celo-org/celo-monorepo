@@ -383,10 +383,14 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
       >
         <View
           style={
-            Object {
-              "borderRadius": 100,
-              "overflow": "hidden",
-            }
+            Array [
+              Object {
+                "overflow": "hidden",
+              },
+              Object {
+                "borderRadius": 100,
+              },
+            ]
           }
         >
           <View

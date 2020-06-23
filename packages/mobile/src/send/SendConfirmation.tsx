@@ -278,7 +278,7 @@ export class SendConfirmation extends React.Component<Props, State> {
     } else {
       primaryBtnInfo = {
         action: this.onSendClick,
-        text: t('send'),
+        text: t('global:send'),
         disabled: isPrimaryButtonDisabled,
       }
     }
@@ -445,4 +445,4 @@ const styles = StyleSheet.create({
 export default connect<StateProps, DispatchProps, OwnProps, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.sendFlow7)(SendConfirmation))
+)(withTranslation<Props>(Namespaces.sendFlow7)(SendConfirmation))

@@ -33,8 +33,9 @@ class SettingsItem extends React.Component<SettingsItemProps> {
 
 const style = StyleSheet.create({
   settingsItemContainer: {
-    marginLeft: 15,
-    padding: 20,
+    paddingVertical: 16,
+    paddingRight: 16,
+    marginLeft: 16,
     borderBottomWidth: 1,
     borderColor: colors.darkLightest,
     flexDirection: 'row',

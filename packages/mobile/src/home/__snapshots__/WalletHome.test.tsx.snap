@@ -230,10 +230,14 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
     >
       <View
         style={
-          Object {
-            "borderRadius": 100,
-            "overflow": "hidden",
-          }
+          Array [
+            Object {
+              "overflow": "hidden",
+            },
+            Object {
+              "borderRadius": 100,
+            },
+          ]
         }
       >
         <View
@@ -301,10 +305,14 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
     >
       <View
         style={
-          Object {
-            "borderRadius": 100,
-            "overflow": "hidden",
-          }
+          Array [
+            Object {
+              "overflow": "hidden",
+            },
+            Object {
+              "borderRadius": 100,
+            },
+          ]
         }
       >
         <View
@@ -649,10 +657,14 @@ exports[`Testnet banner Renders when disconnected 1`] = `
     >
       <View
         style={
-          Object {
-            "borderRadius": 100,
-            "overflow": "hidden",
-          }
+          Array [
+            Object {
+              "overflow": "hidden",
+            },
+            Object {
+              "borderRadius": 100,
+            },
+          ]
         }
       >
         <View
@@ -720,10 +732,14 @@ exports[`Testnet banner Renders when disconnected 1`] = `
     >
       <View
         style={
-          Object {
-            "borderRadius": 100,
-            "overflow": "hidden",
-          }
+          Array [
+            Object {
+              "overflow": "hidden",
+            },
+            Object {
+              "borderRadius": 100,
+            },
+          ]
         }
       >
         <View
@@ -1068,10 +1084,14 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
     >
       <View
         style={
-          Object {
-            "borderRadius": 100,
-            "overflow": "hidden",
-          }
+          Array [
+            Object {
+              "overflow": "hidden",
+            },
+            Object {
+              "borderRadius": 100,
+            },
+          ]
         }
       >
         <View
@@ -1139,10 +1159,14 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
     >
       <View
         style={
-          Object {
-            "borderRadius": 100,
-            "overflow": "hidden",
-          }
+          Array [
+            Object {
+              "overflow": "hidden",
+            },
+            Object {
+              "borderRadius": 100,
+            },
+          ]
         }
       >
         <View

@@ -316,6 +316,7 @@ export const v1Schema = {
   transactions: {
     ...v0Schema.transactions,
     knownFeedTransactions: {},
+    recentTxRecipientsCache: {},
   },
   account: {
     ...v0Schema.account,

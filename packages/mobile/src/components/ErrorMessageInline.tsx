@@ -75,4 +75,4 @@ const styles = StyleSheet.create({
 export default connect<StateProps, DispatchProps, OwnProps, RootState>(
   (state: RootState) => mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.global)(ErrorMessageInline))
+)(withTranslation<Props>(Namespaces.global)(ErrorMessageInline))
