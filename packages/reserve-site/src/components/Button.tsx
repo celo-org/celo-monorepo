@@ -6,7 +6,7 @@ import colors from './colors'
 
 export default function Button({ children, href }) {
   return (
-    <a css={rootStyle} href={href} target="_blank">
+    <a css={rootStyle} href={href} target="_blank" rel="noopener">
       {children}
       <span>
         <Chevron size={12} />

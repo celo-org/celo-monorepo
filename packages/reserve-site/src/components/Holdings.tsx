@@ -64,7 +64,7 @@ function Heading({ title, gridArea, iconSrc, marginTop }: HeadingProps) {
   return (
     <div css={css(headingStyle, { gridArea, marginTop })}>
       <h4 css={headingTextStyle}>
-        {iconSrc && <img src={iconSrc} css={iconStyle} />}
+        {iconSrc && <img src={iconSrc} css={iconStyle} alt={`${title} token icon`} />}
         {title}
       </h4>
     </div>
