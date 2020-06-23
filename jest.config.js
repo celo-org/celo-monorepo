@@ -6,4 +6,6 @@ module.exports = {
     '\\.(ts|tsx)$': 'ts-jest',
     '^.+\\.jsx?$': 'babel-jest',
   },
+  testRunner: 'jest-circus/runner',
+  retryTimes: 5, //TODO(Alec): Make this only when CI is true
 }

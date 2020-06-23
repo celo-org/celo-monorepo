@@ -19,5 +19,5 @@ module.exports = {
   preset: 'react-native-web',
   setupFiles: ['./jestSetup.js', 'jest-canvas-mock'],
   setupFilesAfterEnv: ['./jestSetupAfter.ts'],
-  testEnvironment: 'jsdom',
+  testEnvironment: 'jsdom', //TODO(Alec)
 }

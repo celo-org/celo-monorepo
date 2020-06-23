@@ -1,0 +1,9 @@
+{
+  "name": "@celo/flakey-test-tracking",
+  "version": "1.0.0",
+  "description": "Exports custom test environments for discovering and reporting flakey tests.",
+  "main": "index.ts",
+  "author": "Celo",
+  "license": "MIT",
+  "private": true
+}

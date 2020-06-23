@@ -1,0 +1,6 @@
+{
+  "extends": ["@celo/typescript/tslint.json"],
+  "rules": {
+    "no-console": false
+  }
+}

@@ -1,6 +1,6 @@
 module.exports = {
   preset: 'ts-jest',
-  testEnvironment: 'node',
+  testEnvironment: '../flakey-test-tracking/lib/JestFlakeTrackingEnvironment.js',
   testMatch: ['<rootDir>/src/**/?(*.)+(spec|test).ts?(x)'],
   setupFilesAfterEnv: ['@celo/dev-utils/lib/matchers'],
   globalSetup: '<rootDir>/src/test-utils/ganache.setup.ts',
