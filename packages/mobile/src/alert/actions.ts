@@ -66,7 +66,9 @@ export function showErrorOrFallback(error: any, fallback: ErrorMessages) {
   if (error && Object.values(ErrorMessages).includes(error.message)) {
     return showError(error.message)
   } else {
-    CeloAnalytics.track(CustomEventNames.error_fallback, { error: error.message })
+    CeloAnalytics.track(CustomEventNames.error_fallback, {
+      error: error ? error.message : 'Fallback missing error message',
+    })
     return showError(fallback)
   }
 }
