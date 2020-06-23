@@ -25,7 +25,7 @@ describe('PincodeEnter', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  it('calls onSuccess when PIN is correct', async (done) => {
+  it('calls onSuccess when PIN is correct', async () => {
     ;(ensureCorrectPin as jest.Mock).mockResolvedValueOnce(pin)
     const store = createMockStore()
 
@@ -41,7 +41,7 @@ describe('PincodeEnter', () => {
     expect(mockScreenProps.route.params.onSuccess).toBeCalledWith(pin)
   })
 
-  it('shows wrong PIN notification', async (done) => {
+  it('shows wrong PIN notification', async () => {
     ;(ensureCorrectPin as jest.Mock).mockRejectedValueOnce('')
     const store = createMockStore()
 

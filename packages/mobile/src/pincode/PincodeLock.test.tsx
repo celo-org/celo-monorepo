@@ -21,7 +21,7 @@ describe('PincodeLock', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  it('unlocks if PIN is correct', async (done) => {
+  it('unlocks if PIN is correct', async () => {
     ;(ensureCorrectPin as jest.Mock).mockResolvedValueOnce(pin)
     const store = createMockStore()
 
@@ -36,7 +36,7 @@ describe('PincodeLock', () => {
     expect(store.getActions()).toEqual([appUnlock()])
   })
 
-  it('shows wrong PIN notification', async (done) => {
+  it('shows wrong PIN notification', async () => {
     ;(ensureCorrectPin as jest.Mock).mockRejectedValue('')
     const store = createMockStore()
 

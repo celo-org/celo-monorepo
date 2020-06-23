@@ -148,7 +148,7 @@ const mockAttestationsWrapperPartlyVerified = {
 }
 
 const mockAccountsWrapper = {
-  getConnectedWalletAddress: jest.fn(() => Promise.resolve(mockAccount)),
+  getWalletAddress: jest.fn(() => Promise.resolve(mockAccount)),
   getDataEncryptionKey: jest.fn(() => Promise.resolve(mockPublicDEK)),
 }
 
