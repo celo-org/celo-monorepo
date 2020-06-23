@@ -363,12 +363,13 @@ const NetworkConfigs = {
       participationBaselineQuorumFactor: 1,
     },
     governanceApproverMultiSig: {
-      // 1/4 multsig
+      // 1/5 multsig
       signatories: [
-        '0x32830A3f65DF98aFCFA18bAd35009Aa51163D606',
-        '0x7c593219ad21e172c1fdc6bfdc359699fa428adb',
-        '0x31af68f73fb93815b3eB9a6FA76e63113De5f733',
-        '0x47fE4b9fFDB9712fC5793B1b5E86d96a4664cf02',
+        '0xb04778c00A8e30F59bFc91DD74853C4f32F34E54', // Google Cloud IAM managed account
+        '0x32830A3f65DF98aFCFA18bAd35009Aa51163D606', // Individual signer
+        '0x7c593219ad21e172c1fdc6bfdc359699fa428adb', // Individual signer
+        '0x31af68f73fb93815b3eB9a6FA76e63113De5f733', // Individual signer
+        '0x47fE4b9fFDB9712fC5793B1b5E86d96a4664cf02', // Individual signer
       ],
       numRequiredConfirmations: 1,
       numInternalRequiredConfirmations: 2,
@@ -382,10 +383,11 @@ const NetworkConfigs = {
       frozenAssetsDays: 182, // 3x Mainnet thawing rate
     },
     reserveSpenderMultiSig: {
-      // 2/2 multsig
+      // 1/3 multsig
       signatories: [
-        '0x49eFFA2ceF5FccA5540f421d6b28e76184cc0fDF',
-        '0x4550F1576fAC966Ac8b9F42e1D5D66D3A14dD8D3',
+        '0x62C6a0446BbD7f6260108dD538d88E8b53128a90', // Google Cloud IAM managed account
+        '0x49eFFA2ceF5FccA5540f421d6b28e76184cc0fDF', // Individual signer
+        '0x4550F1576fAC966Ac8b9F42e1D5D66D3A14dD8D3', // Individual signer
       ],
       numRequiredConfirmations: 1,
       numInternalRequiredConfirmations: 2,
