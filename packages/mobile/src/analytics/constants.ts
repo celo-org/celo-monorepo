@@ -305,6 +305,7 @@ export enum CustomEventNames {
   geth_init_success = 'geth_init_success',
   geth_init_failure = 'geth_init_failure',
   geth_restart_to_fix_init = 'geth_restart_to_fix_init',
+  prompt_forno = 'prompt_forno',
 }
 
 export enum CommonValues {
