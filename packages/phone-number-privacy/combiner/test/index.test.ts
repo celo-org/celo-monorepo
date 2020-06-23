@@ -1,6 +1,7 @@
 import { Response } from 'node-fetch'
 import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
 import { authenticateUser, isVerified } from '../src/common/identity'
+import { VERSION } from '../src/config'
 import { getTransaction } from '../src/database/database'
 import { getDidMatchmaking, setDidMatchmaking } from '../src/database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../src/database/wrappers/number-pairs'
@@ -69,20 +70,7 @@ describe(`POST /getDistributedBlindedSalt endpoint`, () => {
         json(body: any) {
           expect(body.success).toEqual(true)
           expect(body.combinedSignature).toEqual(BLS_SIGNATURE)
-        },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      await getDistributedBlindedSalt(req, res)
-    })
-    it('returns 403 on query count 0', async () => {
-      const res = {
-        json() {
-          return {}
-        },
-        status: (status: any) => {
-          expect(status).toEqual(403)
-          // tslint:disable-next-line: no-empty
-          return { json: () => {} }
+          expect(body.version).toEqual(VERSION)
         },
       }
       // @ts-ignore TODO fix req type to make it a mock express req
