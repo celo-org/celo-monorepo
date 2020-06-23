@@ -14,18 +14,6 @@
     "goldDisclaimer": "Por favor ten en cuenta que cGld es un activo digital cuyo valor no está relacionado con el valor del oro físico. Tanto cUSD como cGld son parte de una nueva clase de activos y presentan riesgos de pérdidas finacieras. Considera cuidadosamente tu situación financiera y tu tolerancia a riesgos antes de comprar cGld o cUSD."
     },
   "phoneNumber": "Número de teléfono",
-  "inviteCodeText": {
-    "title": "Ingresa el Código de Invitación",
-    "body":
-      "Si tiene un código de invitación, ingréselo aquí. Puede copiar y pegar todo el mensaje.",
-    "codeHeader": "Código de Invitación",
-    "codePlaceholder": "Celo código: am9hBM3tiA+CuNb...",
-    "noCode": "¿No tienen un código? ",
-    "requestCodeNoFaucet": " Solicite una invitación de un amigo con una billetera Celo o ",
-    "requestCodeFromFaucet": "Solicite una invitación en ",
-    "faucetLink": "celo.org/app",
-    "skip": "continuar sin."
-  },
   "fullName": "Nombre completo",
   "fullNamePlaceholder": "Nombre Apellido",
   "importIt": "Restaurar tu monedero existente",

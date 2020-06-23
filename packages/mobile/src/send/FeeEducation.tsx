@@ -55,4 +55,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withTranslation(Namespaces.sendFlow7)(FeeEducation)
+export default withTranslation<Props>(Namespaces.sendFlow7)(FeeEducation)
