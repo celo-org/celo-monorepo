@@ -56,7 +56,6 @@ export interface GovernanceConfig {
   queueExpiry: BigNumber
   stageDurations: ProposalStageDurations
   participationParameters: ParticipationParameters
-  approver: Address
 }
 
 export interface ProposalMetadata {
@@ -238,7 +237,6 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       this.queueExpiry(),
       this.stageDurations(),
       this.getParticipationParameters(),
-      this.getApprover(),
     ])
     return {
       concurrentProposals: res[0],
@@ -247,7 +245,6 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       queueExpiry: res[3],
       stageDurations: res[4],
       participationParameters: res[5],
-      approver: res[6],
     }
   }
 
