@@ -22,10 +22,10 @@ Note:
 
 ## How to Claim Your Validator Badge
 
-1. If you are awarded with validator badge(s), check if your Validator Group address is present in the corresponding markdown files. If so, proceed to the next section; if not, proceed to step 2.
+1. If you were awarded with validator badge(s), check if your Validator Group address is present in the corresponding markdown files. If you were awarded with badge(s) and don't find your group address or the address is incorrect, proceed to step 2.
 2. Append your Valdiator Group address (starting with `0x`) as a new line to the corresponding markdown files in this current folder.
-3. Make a single pull request (PR) that contains all of your changes and is named `[Validator Badge] <your-validator-group-name>`.
-4. Validator badge PRs are reviewed once a week and once approved, your badges will be shown on the [Celo Validators Explorer](https://celo.org/validators/explore).
+3. Make a single pull request (PR) that contains all of your changes and is named `[Validator Badge] <your-validator-group-name> <your-validator-group-address>`.
+4. Validator badge PRs are reviewed once a week and once approved, your badges will be shown on the [Celo Validators Explorer](https://celo.org/validators/explore) and potentially elsewhere.
 
 ## How to Use Your Validator Badge
 
