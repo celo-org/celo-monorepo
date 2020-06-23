@@ -106,6 +106,10 @@
       "@celo/utils"
     ]
   },
+  "celoreserve.org": {
+    "location": "packages/reserve-site",
+    "dependencies": []
+  },
   "@celo/typescript": {
     "location": "packages/typescript",
     "dependencies": []
