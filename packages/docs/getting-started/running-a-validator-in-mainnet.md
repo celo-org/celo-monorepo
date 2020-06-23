@@ -24,7 +24,7 @@ If you do not have the required CELO to lock up, you can try out of the process 
 
 We will not discuss obtaining CELO here, but it is a prerequisite that you obtain the required CELO, and it is assumed in this guide that your gold is held in two `ReleaseGold` contracts, one for the Validator and one for the Validator Group. If that is not the case, the provided commands will need to be adjusted, but the guide will still provide the required steps.
 
-At a high level, `ReleaseGold` holds a balance for scheduled release, while allowing the held balance to be used for certain actions such as validating and voting, depending on the configuration of the contract. [Read more about `ReleaseGold`](../celo-gold-holder-guide/release-gold.md).
+At a high level, `ReleaseGold` holds a balance for scheduled release, while allowing the held balance to be used for certain actions such as validating and voting, depending on the configuration of the contract. [Read more about `ReleaseGold`](../celo-holder-guide/release-gold.md).
 
 ### Hardware requirements
 
@@ -346,7 +346,7 @@ At this point your Validator and Proxy machines should be configured, and both s
 
 In order to operate as a Validator, you must register on-chain and be elected. Elections will run on each epoch boundary, approximatly every 24 hours, after elections have been unfrozen by on-chain governance. Eligible validator groups will be considered in an Election mechanism that will select Validator based on the [D'Hondt method](https://en.wikipedia.org/wiki/D%27Hondt_method).
 
-In the following steps, this guide will assume your CELO is held in a `ReleaseGold` contract, if this is not the case, the commands will need to be adjusted. At a high level, `ReleaseGold` holds a balance for scheduled release, while allowing the held balance to be used for certain actions such as validating and voting, depending on the configuration of the contract. [Read more about `ReleaseGold`.](../celo-gold-holder-guide/release-gold.md)
+In the following steps, this guide will assume your CELO is held in a `ReleaseGold` contract, if this is not the case, the commands will need to be adjusted. At a high level, `ReleaseGold` holds a balance for scheduled release, while allowing the held balance to be used for certain actions such as validating and voting, depending on the configuration of the contract. [Read more about `ReleaseGold`.](../celo-holder-guide/release-gold.md)
 
 **Once elections are running, the genesis validators will be replaced by the elected validators, so it is important to register and vote even if you are in the genesis set.**
 

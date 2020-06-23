@@ -47,7 +47,7 @@ See documentation on the [config](./config.md) module for information about how 
 
 ### Using a Ledger Wallet
 
-The Celo CLI supports using a [Ledger hardware wallet](../celo-gold-holder-guide/ledger.md) to sign transactions.
+The Celo CLI supports using a [Ledger hardware wallet](../celo-holder-guide/ledger.md) to sign transactions.
 
 ### Plugins
 
