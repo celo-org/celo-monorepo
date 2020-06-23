@@ -1,5 +1,8 @@
 FROM node:10-alpine
 
+RUN apk update && apk upgrade && \
+    apk add --no-cache bash git openssh
+
 WORKDIR /celo-phone-number-privacy/
 
 COPY packages/phone-number-privacy/signer signer
