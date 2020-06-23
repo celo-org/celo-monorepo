@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     marginLeft: 16,
   },
   title: {
-    ...fonts.regular500,
+    ...fonts.notificationHeadline,
     marginBottom: 4,
   },
   details: {
