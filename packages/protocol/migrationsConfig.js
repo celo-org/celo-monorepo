@@ -336,6 +336,7 @@ const NetworkConfigs = {
   },
   baklava: {
     election: {
+      minElectableValidators: 20,
       frozen: false,
     },
     epochRewards: {
@@ -390,6 +391,8 @@ const NetworkConfigs = {
       numInternalRequiredConfirmations: 2,
     },
     stableToken: {
+      // Don't set an initial gold price before oracles start to report.
+      goldPrice: null,
       oracles: [
         '0x0d473f73AAf1C2bf7EBd2be7196C71dBa6C1724b',
         '0x8F7ca85A9E4A18B551b765706bd0B6f26927D86F',

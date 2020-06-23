@@ -1,3 +1,4 @@
+import yargs from 'yargs'
 import { downloadArtifacts, uploadArtifacts } from 'src/lib/artifacts'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { execCmd } from 'src/lib/cmd-utils'
@@ -9,9 +10,19 @@ export const command = 'contracts'
 
 export const describe = 'upgrade the celo smart contracts'
 
-export const builder = {}
+type ContractsArgv = UpgradeArgv & {
+  skipFaucetting: boolean
+}
 
-export const handler = async (argv: UpgradeArgv) => {
+export const builder = (argv: yargs.Argv) => {
+  return argv.option('skipFaucetting', {
+    describe: 'skips allocation of cUSD to any oracle or bot accounts',
+    default: false,
+    type: 'boolean',
+  })
+}
+
+export const handler = async (argv: ContractsArgv) => {
   await switchToClusterFromEnv()
 
   console.info(`Upgrading smart contracts on ${argv.celoEnv}`)
@@ -19,7 +30,7 @@ export const handler = async (argv: UpgradeArgv) => {
     await execCmd(
       `yarn --cwd ../protocol run migrate -n ${argv.celoEnv} -c '${JSON.stringify(
         truffleOverrides()
-      )}' -m '${JSON.stringify(migrationOverrides())}'`
+      )}' -m '${JSON.stringify(migrationOverrides(!argv.skipFaucetting))}'`
     )
   }
 
