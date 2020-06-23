@@ -241,3 +241,6 @@ export const addressToE164NumberSelector = (state: RootState) => state.identity.
 export const e164NumberToSaltSelector = (state: RootState) => state.identity.e164NumberToSalt
 export const secureSendPhoneNumberMappingSelector = (state: RootState) =>
   state.identity.secureSendPhoneNumberMapping
+export const importContactsProgressSelector = (state: RootState) =>
+  state.identity.importContactsProgress
+export const matchedContactsSelector = (state: RootState) => state.identity.matchedContacts
