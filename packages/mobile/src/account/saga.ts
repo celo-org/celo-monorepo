@@ -9,6 +9,8 @@ import {
 import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -35,6 +37,7 @@ export function* setPincode({ pincodeType, pin }: SetPincodeAction) {
     Logger.info(TAG + '@setPincode', 'Pincode set successfully')
   } catch (error) {
     Logger.error(TAG + '@setPincode', 'Failed to set pincode', error)
+    CeloAnalytics.track(CustomEventNames.pin_failed_to_set, { error, pincodeType })
     yield put(showError(ErrorMessages.SET_PIN_FAILED))
     yield put(setPincodeFailure())
   }
@@ -45,6 +48,7 @@ export function* getPincode(withVerification = true) {
 
   if (pincodeType === PincodeType.Unset) {
     Logger.error(TAG + '@getPincode', 'Pin has never been set')
+    CeloAnalytics.track(CustomEventNames.pin_never_set, { pincodeType })
     throw Error('Pin has never been set')
   }
 

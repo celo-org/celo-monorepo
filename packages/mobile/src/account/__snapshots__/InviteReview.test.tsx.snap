@@ -44,8 +44,8 @@ exports[`InviteReview renders correctly 1`] = `
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Inter-Medium",
-                  "fontSize": 24,
+                  "fontFamily": "Jost-Book",
+                  "fontSize": 26,
                   "lineHeight": 32,
                 },
                 Object {
@@ -71,6 +71,7 @@ exports[`InviteReview renders correctly 1`] = `
             <View
               style={
                 Object {
+                  "alignItems": "center",
                   "flexDirection": "column",
                   "justifyContent": "center",
                   "marginBottom": 10,
