@@ -19,7 +19,7 @@ function createNetworkStatusChannel() {
 }
 
 const isConnected = (connectionInfo: NetInfoState) => {
-  return !(connectionInfo.type === 'none')
+  return connectionInfo.type !== 'none'
 }
 
 function* subscribeToNetworkStatus() {
