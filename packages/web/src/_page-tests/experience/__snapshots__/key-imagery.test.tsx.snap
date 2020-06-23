@@ -1509,6 +1509,43 @@ exports[`Experience/KeyImagery renders 1`] = `
                   Code of Conduct
                 </a>
               </div>
+              <div
+                className="css-view-1dbjc4n"
+                onClick={[Function]}
+                onMouseDown={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onResponderGrant={[Function]}
+                onResponderRelease={[Function]}
+                style={
+                  Object {
+                    "display": "inline",
+                  }
+                }
+              >
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
+                  data-focusable={true}
+                  dir="auto"
+                  href="/brand-policy"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
+                  role="link"
+                  style={
+                    Object {
+                      "WebkitTextDecorationStyle": "solid",
+                      "cursor": "pointer",
+                      "display": "inline",
+                      "opacity": 1,
+                      "textDecoration": "underline",
+                      "textDecorationStyle": "solid",
+                    }
+                  }
+                >
+                  Brand Policy
+                </a>
+              </div>
             </div>
           </div>
         </div>
