@@ -59,7 +59,9 @@ exports[`VerificationCodeRow renders correctly for accepted code 1`] = `
               "opacity": 0.5,
             }
           }
-        />
+        >
+          Test label
+        </Text>
         <Text
           numberOfLines={1}
           style={
@@ -160,7 +162,9 @@ exports[`VerificationCodeRow renders correctly for input 1`] = `
               "opacity": 0.5,
             }
           }
-        />
+        >
+          Test label
+        </Text>
         <Text
           numberOfLines={1}
           style={
