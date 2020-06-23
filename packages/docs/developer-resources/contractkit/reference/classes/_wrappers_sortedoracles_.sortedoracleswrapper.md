@@ -284,12 +284,12 @@ Returns the median rate for the given token
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`token` | [CeloToken](../modules/_base_.md#celotoken) | The CeloToken token for which the CELO exchange rate is being reported. |
+`token` | [CeloToken](../modules/_base_.md#celotoken) | The CeloToken token for which the Celo Gold exchange rate is being reported. |
 
 **Returns:** *Promise‹[MedianRate](../interfaces/_wrappers_sortedoracles_.medianrate.md)›*
 
 The median exchange rate for `token`, expressed as:
-  amount of that token / equivalent amount in CELO
+  amount of that token / equivalent amount in Celo Gold
 
 ___
 
@@ -305,7 +305,7 @@ Gets the number of rates that have been reported for the given token
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`token` | [CeloToken](../modules/_base_.md#celotoken) | The CeloToken token for which the CELO exchange rate is being reported. |
+`token` | [CeloToken](../modules/_base_.md#celotoken) | The CeloToken token for which the Celo Gold exchange rate is being reported. |
 
 **Returns:** *Promise‹number›*
 
@@ -344,8 +344,8 @@ Updates an oracle value and the median.
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`token` | [CeloToken](../modules/_base_.md#celotoken) | The token for which the CELO exchange rate is being reported. |
-`value` | BigNumber.Value | The amount of `token` equal to one CELO.  |
+`token` | [CeloToken](../modules/_base_.md#celotoken) | The token for which the Celo Gold exchange rate is being reported. |
+`value` | BigNumber.Value | The amount of `token` equal to one Celo Gold.  |
 `oracleAddress` | [Address](../modules/_base_.md#address) | - |
 
 **Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
@@ -364,7 +364,7 @@ Updates an oracle value and the median.
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`value` | BigNumber.Value | The amount of US Dollars equal to one CELO.  |
+`value` | BigNumber.Value | The amount of US Dollars equal to one Celo Gold.  |
 `oracleAddress` | [Address](../modules/_base_.md#address) | - |
 
 **Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
