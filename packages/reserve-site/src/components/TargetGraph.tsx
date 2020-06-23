@@ -2,7 +2,7 @@
 import { css, jsx } from '@emotion/core'
 
 export default function TargetGraph() {
-  return <img src="/initialTarget.svg" alt={ALT_TEXT} css={rootStyle} />
+  return <img src="/initial-target.svg" alt={ALT_TEXT} css={rootStyle} />
 }
 
 const rootStyle = css({

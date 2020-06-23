@@ -4,13 +4,14 @@ import { jsx, css } from '@emotion/core'
 export default function ChangeStory() {
   return (
     <div css={rootStyle}>
-      {' '}
       <img src="/world-spin.gif" alt="globe" css={imageStyle} />
-      <span css={css({ marginLeft: 8, marginRight: 8 })}>|</span>
+      <span css={pipeStyle}>|</span>
       <span css={textStyle}>Change the Story</span>
     </div>
   )
 }
+
+const pipeStyle = css({ marginLeft: 8, marginRight: 8 })
 
 const rootStyle = {
   display: 'flex',
