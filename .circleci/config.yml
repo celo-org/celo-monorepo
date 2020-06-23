@@ -213,7 +213,7 @@ jobs:
               --package "system-images;android-29;google_apis;x86_64" \
               --device "Nexus 5"
             # Copy device configuarion, adv for some reason doesn't
-            # mkdir -p ~/.android/avd/Nexus_5X_API_28_x86.avd/ && cp packages/mobile/e2e/conf/avd_conf.ini ~/.android/avd/Nexus_5X_API_28_x86.avd/config.ini
+            mkdir -p ~/.android/avd/Nexus_5X_API_28_x86.avd/ && cp packages/mobile/e2e/conf/avd_conf.ini ~/.android/avd/Nexus_5X_API_28_x86.avd/config.ini
 
       - run:
           name: Set up nodejs
