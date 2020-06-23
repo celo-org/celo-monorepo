@@ -103,9 +103,7 @@ export type StackParamList = {
     backupPhrase: string
   }
   [Screens.ImportWalletSocial]: undefined
-  [Screens.ImportContacts]: {
-    showSkipDialog?: boolean
-  }
+  [Screens.ImportContacts]: { showSkipDialog: boolean } | undefined
   [Screens.IncomingPaymentRequestListScreen]: undefined
   [Screens.Invite]: undefined
   [Screens.InviteReview]: {
@@ -187,9 +185,7 @@ export type StackParamList = {
     isPaymentRequest?: true
     isFromScan?: boolean
   }
-  [Screens.VerificationEducationScreen]: {
-    showSkipDialog?: boolean
-  }
+  [Screens.VerificationEducationScreen]: { showSkipDialog: boolean } | undefined
   [Screens.VerificationInputScreen]: undefined
   [Screens.VerificationInterstitialScreen]: undefined
   [Screens.VerificationLoadingScreen]: undefined

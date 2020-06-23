@@ -5,7 +5,7 @@
     "findSwitch": "Permita que los contactos lo encuentren",
     "syncing": {
       "loading": "Sincronizando contactos...",
-      "successWithMatches": "{{matches}} amigos en Celo",
+      "successWithMatches": "{{matches}} amigos en Valora",
       "successWithoutMatches": "Sincronización completa"
     }
   },
