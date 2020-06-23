@@ -110,6 +110,8 @@ export async function upgradeOracleChart(
   context: OracleAzureContext,
   useFullNodes: boolean
 ) {
+  await upgradeOracleRBACHelmChart(celoEnv)
+  return
   return upgradeGenericHelmChart(
     celoEnv,
     releaseName(celoEnv),
@@ -403,6 +405,15 @@ export function addOracleMiddleware(argv: yargs.Argv) {
 
 async function installOracleRBACHelmChart(celoEnv: string) {
   return installGenericHelmChart(
+    celoEnv,
+    rbacReleaseName(celoEnv),
+    rbacHelmChartPath,
+    rbacHelmParameters(celoEnv)
+  )
+}
+
+async function upgradeOracleRBACHelmChart(celoEnv: string) {
+  return upgradeGenericHelmChart(
     celoEnv,
     rbacReleaseName(celoEnv),
     rbacHelmChartPath,

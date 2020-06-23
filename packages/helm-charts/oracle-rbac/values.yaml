@@ -1,2 +1,4 @@
 environment:
   name: default
+
+oracleCount: 3
