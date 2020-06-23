@@ -32,7 +32,8 @@ async function retrieveOrGeneratePepper() {
   }
   const storedPepper = await retrieveStoredItem(STORAGE_KEYS.PEPPER)
   if (!storedPepper) {
-    const pepper = await asyncRandomBytes(PEPPER_LENGTH)
+    const randomBytes = await asyncRandomBytes(PEPPER_LENGTH)
+    const pepper = randomBytes.toString()
     await storeItem({ key: STORAGE_KEYS.PEPPER, value: pepper })
     cachedPepper = pepper
     return cachedPepper

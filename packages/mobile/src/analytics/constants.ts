@@ -136,6 +136,7 @@ export enum CustomEventNames {
   pin_wallet_import = 'pin_wallet_import',
   pin_value = 'pin_value',
   pin_create_button = 'pin_create_button',
+  pin_store_error = 'pin_store_error',
 
   // Screen name: Invite_Friends, Invite_Friends_Fee
   friend_invited = 'friend_invited', // to record the name or number of the friend a user is inviting per an invite session

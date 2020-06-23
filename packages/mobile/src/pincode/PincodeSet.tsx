@@ -15,10 +15,9 @@ import { CustomEventNames } from 'src/analytics/constants'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
-import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
-import { isPinValid } from 'src/pincode/authentication'
+import { isPinValid, storePasswordHash } from 'src/pincode/authentication'
 import { setPinCache } from 'src/pincode/PasswordCache'
 import Pincode from 'src/pincode/Pincode'
 
@@ -70,13 +69,18 @@ export class PincodeSet extends React.Component<Props, State> {
     this.props.navigation.setParams({ isVerifying: true })
   }
 
-  onCompletePin2 = (pin2: string) => {
+  onCompletePin2 = async (pin2: string) => {
     CeloAnalytics.track(CustomEventNames.pin_create_button)
     const { pin1 } = this.state
     if (this.isPin1Valid(pin1) && this.isPin2Valid(pin2)) {
-      this.props.setPincode(PincodeType.CustomPin)
-      setPinCache(this.state.pin1)
-      navigate(Screens.EnterInviteCode)
+      try {
+        await storePasswordHash(this.state.pin1, '')
+        setPinCache(this.state.pin1)
+        this.props.setPincode(PincodeType.CustomPin)
+        this.props.navigation.navigate(Screens.EnterInviteCode)
+      } catch (err) {
+        CeloAnalytics.track(CustomEventNames.pin_store_error, { error: err.message })
+      }
     } else {
       this.props.navigation.setParams({ isVerifying: false })
       this.setState({
