@@ -1,15 +1,18 @@
 import * as React from 'react'
 import 'react-native'
 import { render } from 'react-native-testing-library'
-import VerificationCodeRow from 'src/verify/VerificationCodeRow'
+import VerificationCodeInput from 'src/verify/VerificationCodeInput'
 import { mockAttestationMessage } from 'test/values'
 
 describe('VerificationCodeRow', () => {
   it('renders correctly for input', () => {
     const { toJSON } = render(
-      <VerificationCodeRow
+      <VerificationCodeInput
+        label="Test label"
         index={0}
         inputValue={mockAttestationMessage.code}
+        inputPlaceholder="Test placeholder"
+        inputPlaceholderWithClipboardContent="Test clipboard"
         onInputChange={jest.fn()}
         isCodeSubmitting={true}
         attestationCodes={[]}
@@ -20,9 +23,12 @@ describe('VerificationCodeRow', () => {
   })
   it('renders correctly for accepted code', () => {
     const { toJSON } = render(
-      <VerificationCodeRow
+      <VerificationCodeInput
+        label="Test label"
         index={0}
         inputValue={mockAttestationMessage.code}
+        inputPlaceholder="Test placeholder"
+        inputPlaceholderWithClipboardContent="Test clipboard"
         onInputChange={jest.fn()}
         isCodeSubmitting={true}
         attestationCodes={[mockAttestationMessage]}

@@ -156,6 +156,7 @@ const verificationScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen
         name={Screens.VerificationInputScreen}
         component={VerificationInputScreen}
+        options={VerificationInputScreen.navigationOptions}
       />
     </>
   )
