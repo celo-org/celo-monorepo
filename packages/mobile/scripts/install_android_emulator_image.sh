@@ -9,4 +9,3 @@ sdkmanager "platform-tools" \
   "emulator" \
   --verbose
 
-sdkmanager --update
