@@ -10,6 +10,12 @@ export const DEV_PRIVATE_KEY =
 export const DEV_POLYNOMIAL =
   '01000000000000001f33136ac029a702eb041096bd9ef09dc9c368dde52a972866bdeaff0896f8596b74ab7adfd7318bba38527599768400df44bcab66bcf3843c17a2ce838bcd5a8ba1634c18314ff0565a7c769905b8a8fba27a86bf4c6cb22df89e1badfe2b81'
 
+export enum SupportedDatabase {
+  Postgres = 'postgres', // PostgresSQL
+  MySql = 'mysql', // MySQL
+  MsSql = 'mssql', // Microsoft SQL Server
+}
+
 export enum SupportedKeystore {
   AzureKeyVault = 'AzureKeyVault',
   GoogleSecretManager = 'GoogleSecretManager',
@@ -35,10 +41,12 @@ interface Config {
     provider: string
   }
   db: {
+    type: SupportedDatabase
     user: string
     password: string
     database: string
     host: string
+    port?: number
     ssl: boolean
   }
   keystore: {
@@ -87,10 +95,12 @@ const config: Config = {
     provider: env.BLOCKCHAIN_PROVIDER,
   },
   db: {
+    type: env.DB_TYPE ? env.DB_TYPE.toLowerCase() : SupportedDatabase.Postgres,
     user: env.DB_USERNAME,
     password: env.DB_PASSWORD,
     database: env.DB_DATABASE,
     host: env.DB_HOST,
+    port: env.DB_PORT ? toNum(env.DB_PORT) : undefined,
     ssl: toBool(env.DB_USE_SSL, true),
   },
   keystore: {

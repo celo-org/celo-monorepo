@@ -227,4 +227,4 @@ const styles = StyleSheet.create({
 export default connect<StateProps, DispatchProps, OwnProps, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.paymentRequestFlow)(PaymentRequestConfirmation))
+)(withTranslation<Props>(Namespaces.paymentRequestFlow)(PaymentRequestConfirmation))

@@ -174,4 +174,4 @@ const styles = StyleSheet.create({
 export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
   setSocialBackupCompleted,
   showError,
-})(withTranslation(Namespaces.backupKeyFlow6)(BackupSocial))
+})(withTranslation<Props>(Namespaces.backupKeyFlow6)(BackupSocial))
