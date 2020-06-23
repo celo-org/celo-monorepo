@@ -7,7 +7,7 @@ import { Flags } from '../../utils/command'
 
 export default class ReportPrice extends BaseCommand {
   static description =
-    'Report the price of Celo Gold in a specified token (currently just Celo Dollar, aka "StableToken")'
+    'Report the price of CELO in a specified token (currently just Celo Dollar, aka "StableToken")'
 
   static args = [
     {
@@ -23,7 +23,7 @@ export default class ReportPrice extends BaseCommand {
     from: Flags.address({ required: true, description: 'Address of the oracle account' }),
     value: flags.string({
       required: true,
-      description: 'Amount of the specified token equal to 1 cGLD',
+      description: 'Amount of the specified token equal to 1 CELO',
     }),
   }
 
@@ -40,6 +40,6 @@ export default class ReportPrice extends BaseCommand {
       'sortedOracles.report',
       await sortedOracles.report(res.args.token, value, res.flags.from)
     )
-    this.log(`Reported oracle value: ${value.toString} ${res.args.token} == 1 cGLD`)
+    this.log(`Reported oracle value: ${value.toString} ${res.args.token} == 1 CELO`)
   }
 }

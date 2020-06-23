@@ -41,7 +41,7 @@ export default class ValidatorAffiliate extends BaseCommand {
         type: 'confirm',
         name: 'confirmation',
         message:
-          'Are you sure you want to affiliate with this group?\nAffiliating with a Validator Group could result in Locked Gold requirements of up to 10,000 cGLD for 60 days. (y/n)',
+          'Are you sure you want to affiliate with this group?\nAffiliating with a Validator Group could result in Locked Gold requirements of up to 10,000 CELO for 60 days. (y/n)',
       })
 
       if (!response.confirmation) {
