@@ -1,5 +1,6 @@
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core'
+import { FrontMatterResult } from 'front-matter'
 import Footer from 'src/components/Footer'
 import Head from 'src/components/Head'
 import Holdings from 'src/components/Holdings'
@@ -10,11 +11,15 @@ import { flexCol } from 'src/components/styles'
 import TargetGraph from 'src/components/TargetGraph'
 import { Addresses, HoldingsData } from 'src/service/Data'
 
+interface ContentShape {
+  title: string
+}
+
 interface Props {
-  INTRO: any
-  INITIAL_TARGET: any
-  ABOUT: any
-  ATTESTATIONS: any
+  INTRO: FrontMatterResult<ContentShape>
+  INITIAL_TARGET: FrontMatterResult<ContentShape>
+  ABOUT: FrontMatterResult<ContentShape>
+  ATTESTATIONS: FrontMatterResult<ContentShape>
 }
 
 export default function Home(props: HoldingsData & Addresses & Props) {
@@ -110,17 +115,25 @@ export async function getStaticProps() {
   const intro = await import('src/content/home/intro.md').then((mod) => mod.default)
   const matter = await import('front-matter').then((mod) => mod.default)
 
-  const INTRO = matter<{ title: string }>(intro)
-  const INITIAL_TARGET = matter<{ title: string }>(initialTarget)
-  const ABOUT = matter<{ title: string }>(about)
-  const ATTESTATIONS = matter<{ title: string }>(attestations)
+  const INTRO = matter<ContentShape>(intro)
+  const INITIAL_TARGET = matter<ContentShape>(initialTarget)
+  const ABOUT = matter<ContentShape>(about)
+  const ATTESTATIONS = matter<ContentShape>(attestations)
 
   const fetchData = await import('src/service/holdings').then((mod) => mod.default)
   const fetchAddresses = await import('src/service/addresses').then((mod) => mod.default)
 
   const [addresses, holdings] = await Promise.all([fetchAddresses(), fetchData()])
   return {
-    props: { ...addresses, ...holdings, INTRO, INITIAL_TARGET, ABOUT, ATTESTATIONS },
+    props: {
+      ...addresses,
+      ...holdings,
+      INTRO,
+      INITIAL_TARGET,
+      ABOUT,
+      ATTESTATIONS,
+      time: Date.now(),
+    },
     // we will attempt to re-generate the page:
     // - when a request comes in
     // - at most once every X seconds
