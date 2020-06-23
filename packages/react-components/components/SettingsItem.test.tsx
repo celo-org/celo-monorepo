@@ -1,6 +1,5 @@
 import {
   SettingsItemInput,
-  SettingsItemNoValue,
   SettingsItemSwitch,
   SettingsItemTextValue,
 } from '@celo/react-components/components/SettingsItem'
@@ -11,24 +10,13 @@ import { fireEvent, render } from 'react-native-testing-library'
 const title = 'title'
 const testID = 'testID'
 
-describe('SettingsItemNoValue', () => {
-  it('renders correctly', () => {
-    const wrapper = render(<SettingsItemNoValue title={title} />)
+describe('SettingsItemTextValue', () => {
+  const value = 'value'
+  it('renders correctly without value', () => {
+    const wrapper = render(<SettingsItemTextValue title={title} />)
     expect(wrapper.toJSON()).toMatchSnapshot()
   })
 
-  it('reacts on press', () => {
-    const onPress = jest.fn()
-    const { getByTestId } = render(
-      <SettingsItemNoValue testID={testID} title={title} onPress={onPress} />
-    )
-    fireEvent.press(getByTestId(testID))
-    expect(onPress).toHaveBeenCalled()
-  })
-})
-
-describe('SettingsItemTextValue', () => {
-  const value = 'value'
   it('renders correctly', () => {
     const wrapper = render(<SettingsItemTextValue title={title} value={value} />)
     expect(wrapper.toJSON()).toMatchSnapshot()
