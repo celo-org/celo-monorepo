@@ -292,10 +292,8 @@ export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
   if (result === true) {
     Logger.debug(TAG, 'Redeem Invite completed successfully')
     yield put(redeemInviteSuccess())
-    CeloAnalytics.track(CustomEventNames.redeem_invite_success)
   } else if (result === false) {
     Logger.debug(TAG, 'Redeem Invite failed')
-    CeloAnalytics.track(CustomEventNames.redeem_invite_failed)
     yield put(redeemInviteFailure())
   } else if (timeout) {
     Logger.debug(TAG, 'Redeem Invite timed out')
@@ -316,6 +314,7 @@ export function* doRedeemInvite(inviteCode: string) {
       tempAccount
     )
     if (tempAccountBalanceWei.isLessThanOrEqualTo(0)) {
+      CeloAnalytics.track(CustomEventNames.redeem_invite_failed, { context: 'Empty invite' })
       yield put(showError(ErrorMessages.EMPTY_INVITE_CODE))
       return false
     }
@@ -324,9 +323,11 @@ export function* doRedeemInvite(inviteCode: string) {
     yield call(addTempAccountToWallet, inviteCode)
     yield call(withdrawFundsFromTempAccount, tempAccount, tempAccountBalanceWei, newAccount)
     yield put(fetchDollarBalance())
+    CeloAnalytics.track(CustomEventNames.redeem_invite_success)
     return true
   } catch (e) {
     Logger.error(TAG + '@doRedeemInvite', 'Failed to redeem invite', e)
+    CeloAnalytics.track(CustomEventNames.redeem_invite_failed, { error: e.message })
     if (e.message in ErrorMessages) {
       yield put(showError(e.message))
     } else {
@@ -344,9 +345,11 @@ export function* skipInvite() {
     yield put(refreshAllBalances())
     yield put(setHasSeenVerificationNux(true))
     Logger.debug(TAG + '@skipInvite', 'Done skipping invite')
+    CeloAnalytics.track(CustomEventNames.invite_skip_complete)
     navigateHome()
   } catch (e) {
     Logger.error(TAG, 'Failed to skip invite', e)
+    CeloAnalytics.track(CustomEventNames.invite_skip_failed, { error: e.message })
     yield put(showError(ErrorMessages.ACCOUNT_SETUP_FAILED))
   }
 }
