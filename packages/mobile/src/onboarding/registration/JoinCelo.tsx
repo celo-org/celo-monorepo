@@ -15,6 +15,8 @@ import { connect } from 'react-redux'
 import { setName, setPhoneNumber, setPromptForno } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
 import { hideAlert, showError } from 'src/alert/actions'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -167,6 +169,7 @@ export class JoinCelo extends React.Component<Props, State> {
     }
 
     if (!e164Number || !isValidNumber || !countryCallingCode) {
+      CeloAnalytics.track(CustomEventNames.inavlid_phone_number, { phoneNumber: e164Number })
       this.props.showError(ErrorMessages.INVALID_PHONE_NUMBER)
       return
     }
