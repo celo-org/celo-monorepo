@@ -420,7 +420,8 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       return {
         proposalID: valueToBigNumber(res[0]),
         value: Object.keys(VoteValue)[valueToInt(res[1])] as VoteValue,
-        votes: valueToBigNumber(res[2]),
+        // @ts-ignore required for backwards-compatibility with ABI that did not return votes.
+        votes: res[2] ? valueToBigNumber(res[2]) : undefined,
       }
     } catch (_) {
       // The proposal ID may not be present in the dequeued list, or the voter may not have a vote
