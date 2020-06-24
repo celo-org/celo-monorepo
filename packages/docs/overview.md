@@ -135,7 +135,7 @@ Celo provides a number of enhancements to regular transactions as familiar to Et
 The Celo native asset has a duality as both the native currency and is also an ERC-20 token, simplifying the work of application developers.
 
 {% hint style="warning" %}
-Celo assets exist on an independent blockchain, and cannot be accessed through wallets that connect to the Ethereum network. Only use wallets disigned to work with the Celo network.
+Celo assets exist on an independent blockchain, and cannot be accessed through wallets that connect to the Ethereum network. Only use wallets designed to work with the Celo network.
 {% endhint %}
 
 In Celo, transaction fees can be paid in stable cryptocurrencies. A user sending Celo Dollars will be able to pay their transaction fee out of their Celo Dollar balance, so they do not need to hold a separate balance of CELO in order to make transactions. The protocol maintains a list of currencies which can be used to pay for transaction fees. These smart contracts implement an extension of the ERC-20 interface, with additional functions that allow the protocol to debit and credit transaction fees.
