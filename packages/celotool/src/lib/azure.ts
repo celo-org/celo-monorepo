@@ -27,7 +27,7 @@ export async function switchToCluster(
   // Azure subscription switch
   let currentTenantId = null
   try {
-    ;[currentTenantId] = await execCmd('az account show --query tenantId -o tsv')
+    ;[currentTenantId] = await execCmd('az account list --query id -o tsv')
   } catch (error) {
     console.info('No azure account subscription currently set')
   }
@@ -43,12 +43,20 @@ export async function switchToCluster(
   }
 
   if (currentCluster === null || currentCluster.trim() !== clusterConfig.clusterName) {
-    // If a context is edited for some reason (eg switching default namespace),
-    // a warning and prompt is shown asking if the existing context should be
-    // overwritten. To avoid this, --overwrite-existing force overwrites.
-    await execCmdWithExitOnFailure(
-      `az aks get-credentials --resource-group ${clusterConfig.resourceGroup} --name ${clusterConfig.clusterName} --subscription ${clusterConfig.subscriptionId} --overwrite-existing`
-    )
+    const [existingContextsStr] = await execCmdWithExitOnFailure('kubectl config get-contexts -o name')
+    const existingContexts = existingContextsStr.split('\n')
+    if (existingContexts.includes(clusterConfig.clusterName)) {
+      await execCmdWithExitOnFailure(`kubectl config use-context ${clusterConfig.clusterName}`)
+    } else {
+      // We expect the context to be the cluster name. If the context isn't known,
+      // we get the context from Azure.
+      // If a context is edited for some reason (eg switching default namespace),
+      // a warning and prompt is shown asking if the existing context should be
+      // overwritten. To avoid this, --overwrite-existing force overwrites.
+      await execCmdWithExitOnFailure(
+        `az aks get-credentials --resource-group ${clusterConfig.resourceGroup} --name ${clusterConfig.clusterName} --subscription ${clusterConfig.subscriptionId} --overwrite-existing`
+      )
+    }
   }
   await setupCluster(celoEnv, clusterConfig)
 }
@@ -172,8 +180,6 @@ export async function getAKSServicePrincipalObjectId(clusterConfig: AzureCluster
   const [rawServicePrincipalClientId] = await execCmdWithExitOnFailure(
     `az aks show -n ${clusterConfig.clusterName} --query servicePrincipalProfile.clientId -g ${clusterConfig.resourceGroup} -o tsv`
   )
-  console.info(`az aks show -n ${clusterConfig.clusterName} --query servicePrincipalProfile.clientId -g ${clusterConfig.resourceGroup} -o tsv`)
-  console.info(rawServicePrincipalClientId)
   const servicePrincipalClientId = rawServicePrincipalClientId.trim()
   // This will be the value of the service principal client ID if a managed service identity
   // is being used instead of a service principal.
