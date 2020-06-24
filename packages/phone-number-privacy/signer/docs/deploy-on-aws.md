@@ -1,4 +1,4 @@
-# Run Phone Number Privacy - Signer Service on AWS
+# Deploying to AWS
 
 ## Prerequisites
 
