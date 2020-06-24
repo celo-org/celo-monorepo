@@ -18,16 +18,10 @@ jobs:
             - uses: actions/checkout@v2
             - uses: gradle/wrapper-validation-action@v1
             - uses: actions/setup-java@v1
-              with:
-                  java-version: 11
-            - uses: borales/actions-yarn@v2.0.0
-              with:
-                cmd: install
-            - uses: borales/actions-yarn@v2.0.0
-              with:
-                cmd: build --scope @celo/mobile --include-filtered-dependencies
-            - name: Instrumentation tests
-              uses: reactivecircus/android-emulator-runner@v2
+            - uses: actions/setup-node@v1
+            - run: yarn
+            - run: yarn build --scope @celo/mobile --include-filtered-dependencies
+            - uses: reactivecircus/android-emulator-runner@v2
               with:
                   api-level: ${{ matrix.api-level }}
                   arch: x86
