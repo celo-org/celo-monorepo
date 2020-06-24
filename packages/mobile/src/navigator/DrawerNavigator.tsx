@@ -17,7 +17,6 @@ import deviceInfoModule from 'react-native-device-info'
 import Account from 'src/account/Account'
 import FiatExchange from 'src/account/FiatExchange'
 import GoldEducation from 'src/account/GoldEducation'
-import { default as InviteScreen } from 'src/account/Invite'
 import {
   defaultCountryCodeSelector,
   e164NumberSelector,
@@ -35,7 +34,6 @@ import { AddWithdraw } from 'src/icons/navigator/AddWithdraw'
 import { Gold } from 'src/icons/navigator/Gold'
 import { Help } from 'src/icons/navigator/Help'
 import { Home } from 'src/icons/navigator/Home'
-import { Invite } from 'src/icons/navigator/Invite'
 import { Settings } from 'src/icons/navigator/Settings'
 import { useDollarsToLocalAmount, useLocalCurrencySymbol } from 'src/localCurrency/hooks'
 import { Screens } from 'src/navigator/Screens'
@@ -127,11 +125,6 @@ export default function DrawerNavigator() {
         name={Screens.FiatExchange}
         component={FiatExchange}
         options={{ title: t('addAndWithdraw'), drawerIcon: AddWithdraw }}
-      />
-      <Drawer.Screen
-        name={Screens.Invite}
-        component={InviteScreen}
-        options={{ title: t('invite'), drawerIcon: Invite }}
       />
       <Drawer.Screen
         name={Screens.Settings}
