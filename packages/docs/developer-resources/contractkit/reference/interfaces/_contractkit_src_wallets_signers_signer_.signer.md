@@ -9,6 +9,7 @@
 * [AzureHSMSigner](../classes/_contractkit_src_wallets_signers_azure_hsm_signer_.azurehsmsigner.md)
 * [LedgerSigner](../classes/_contractkit_src_wallets_signers_ledger_signer_.ledgersigner.md)
 * [LocalSigner](../classes/_contractkit_src_wallets_signers_local_signer_.localsigner.md)
+* [RpcSigner](../classes/_contractkit_src_wallets_signers_rpc_signer_.rpcsigner.md)
 
 ## Index
 

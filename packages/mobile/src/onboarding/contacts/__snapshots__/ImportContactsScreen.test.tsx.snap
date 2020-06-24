@@ -97,10 +97,14 @@ exports[`ImportContactsScreen renders correctly 1`] = `
       >
         <View
           style={
-            Object {
-              "borderRadius": 100,
-              "overflow": "hidden",
-            }
+            Array [
+              Object {
+                "overflow": "hidden",
+              },
+              Object {
+                "borderRadius": 100,
+              },
+            ]
           }
         >
           <View
@@ -122,10 +126,11 @@ exports[`ImportContactsScreen renders correctly 1`] = `
             style={
               Object {
                 "alignItems": "center",
-                "backgroundColor": "#F5F4F0",
+                "backgroundColor": "#F1F0EB",
                 "height": 48,
                 "justifyContent": "center",
-                "minWidth": 98,
+                "minWidth": 120,
+                "opacity": undefined,
                 "paddingHorizontal": 16,
                 "paddingVertical": 5,
               }

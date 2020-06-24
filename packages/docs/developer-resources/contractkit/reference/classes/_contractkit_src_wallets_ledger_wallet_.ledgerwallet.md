@@ -30,6 +30,7 @@
 * [getAccounts](_contractkit_src_wallets_ledger_wallet_.ledgerwallet.md#getaccounts)
 * [hasAccount](_contractkit_src_wallets_ledger_wallet_.ledgerwallet.md#hasaccount)
 * [init](_contractkit_src_wallets_ledger_wallet_.ledgerwallet.md#init)
+* [isSetupFinished](_contractkit_src_wallets_ledger_wallet_.ledgerwallet.md#issetupfinished)
 * [signPersonalMessage](_contractkit_src_wallets_ledger_wallet_.ledgerwallet.md#signpersonalmessage)
 * [signTransaction](_contractkit_src_wallets_ledger_wallet_.ledgerwallet.md#signtransaction)
 * [signTypedData](_contractkit_src_wallets_ledger_wallet_.ledgerwallet.md#signtypeddata)
@@ -146,6 +147,18 @@ Discovers wallet accounts and caches results in memory
 Idempotent to ensure multiple calls are benign
 
 **Returns:** *Promise‹void›*
+
+___
+
+###  isSetupFinished
+
+▸ **isSetupFinished**(): *boolean*
+
+*Inherited from [RemoteWallet](_contractkit_src_wallets_remote_wallet_.remotewallet.md).[isSetupFinished](_contractkit_src_wallets_remote_wallet_.remotewallet.md#issetupfinished)*
+
+*Defined in [contractkit/src/wallets/remote-wallet.ts:110](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/remote-wallet.ts#L110)*
+
+**Returns:** *boolean*
 
 ___
 

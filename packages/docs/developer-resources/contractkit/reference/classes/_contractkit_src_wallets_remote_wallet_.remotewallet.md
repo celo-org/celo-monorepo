@@ -12,6 +12,8 @@ Abstract class representing a remote wallet that requires async initialization
 
   ↳ [LedgerWallet](_contractkit_src_wallets_ledger_wallet_.ledgerwallet.md)
 
+  ↳ [RpcWallet](_contractkit_src_wallets_rpc_wallet_.rpcwallet.md)
+
 ## Implements
 
 * [Wallet](../interfaces/_contractkit_src_wallets_wallet_.wallet.md)
@@ -24,6 +26,7 @@ Abstract class representing a remote wallet that requires async initialization
 * [getAccounts](_contractkit_src_wallets_remote_wallet_.remotewallet.md#getaccounts)
 * [hasAccount](_contractkit_src_wallets_remote_wallet_.remotewallet.md#hasaccount)
 * [init](_contractkit_src_wallets_remote_wallet_.remotewallet.md#init)
+* [isSetupFinished](_contractkit_src_wallets_remote_wallet_.remotewallet.md#issetupfinished)
 * [signPersonalMessage](_contractkit_src_wallets_remote_wallet_.remotewallet.md#signpersonalmessage)
 * [signTransaction](_contractkit_src_wallets_remote_wallet_.remotewallet.md#signtransaction)
 * [signTypedData](_contractkit_src_wallets_remote_wallet_.remotewallet.md#signtypeddata)
@@ -74,6 +77,16 @@ Discovers wallet accounts and caches results in memory
 Idempotent to ensure multiple calls are benign
 
 **Returns:** *Promise‹void›*
+
+___
+
+###  isSetupFinished
+
+▸ **isSetupFinished**(): *boolean*
+
+*Defined in [contractkit/src/wallets/remote-wallet.ts:110](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/remote-wallet.ts#L110)*
+
+**Returns:** *boolean*
 
 ___
 

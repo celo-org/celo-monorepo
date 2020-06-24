@@ -24,6 +24,7 @@
 * [getAddressFromKeyName](_contractkit_src_wallets_azure_hsm_wallet_.azurehsmwallet.md#getaddressfromkeyname)
 * [hasAccount](_contractkit_src_wallets_azure_hsm_wallet_.azurehsmwallet.md#hasaccount)
 * [init](_contractkit_src_wallets_azure_hsm_wallet_.azurehsmwallet.md#init)
+* [isSetupFinished](_contractkit_src_wallets_azure_hsm_wallet_.azurehsmwallet.md#issetupfinished)
 * [signPersonalMessage](_contractkit_src_wallets_azure_hsm_wallet_.azurehsmwallet.md#signpersonalmessage)
 * [signTransaction](_contractkit_src_wallets_azure_hsm_wallet_.azurehsmwallet.md#signtransaction)
 * [signTypedData](_contractkit_src_wallets_azure_hsm_wallet_.azurehsmwallet.md#signtypeddata)
@@ -115,6 +116,18 @@ Discovers wallet accounts and caches results in memory
 Idempotent to ensure multiple calls are benign
 
 **Returns:** *Promise‹void›*
+
+___
+
+###  isSetupFinished
+
+▸ **isSetupFinished**(): *boolean*
+
+*Inherited from [RemoteWallet](_contractkit_src_wallets_remote_wallet_.remotewallet.md).[isSetupFinished](_contractkit_src_wallets_remote_wallet_.remotewallet.md#issetupfinished)*
+
+*Defined in [contractkit/src/wallets/remote-wallet.ts:110](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/remote-wallet.ts#L110)*
+
+**Returns:** *boolean*
 
 ___
 

@@ -31,6 +31,7 @@ const ALWAYS_FAILING_ERROR = 'always failing transaction'
 const KNOWN_TX_ERROR = 'known transaction'
 
 const getLogger = (tag: string, txId: string) => {
+  let startTime = Date.now()
   return (event: SendTransactionLogEvent) => {
     switch (event.type) {
       case SendTransactionLogEventType.Confirmed:
@@ -41,27 +42,48 @@ const getLogger = (tag: string, txId: string) => {
         break
       case SendTransactionLogEventType.EstimatedGas:
         Logger.debug(tag, `Transaction with id ${txId} estimated gas: ${event.gas}`)
-        CeloAnalytics.track(CustomEventNames.transaction_send_gas_estimated, { txId })
+        CeloAnalytics.track(CustomEventNames.transaction_send_gas_estimated, {
+          txId,
+          duration: Date.now() - startTime,
+        })
         break
       case SendTransactionLogEventType.ReceiptReceived:
         Logger.debug(
           tag,
           `Transaction id ${txId} received receipt: ${JSON.stringify(event.receipt)}`
         )
-        CeloAnalytics.track(CustomEventNames.transaction_send_gas_receipt, { txId })
+        CeloAnalytics.track(CustomEventNames.transaction_send_gas_receipt, {
+          txId,
+          duration: Date.now() - startTime,
+        })
         break
       case SendTransactionLogEventType.TransactionHashReceived:
         Logger.debug(tag, `Transaction id ${txId} hash received: ${event.hash}`)
+        CeloAnalytics.track(CustomEventNames.transaction_send_gas_hash_received, {
+          txId,
+          duration: Date.now() - startTime,
+        })
         break
       case SendTransactionLogEventType.Started:
+        startTime = Date.now()
         Logger.debug(tag, `Sending transaction with id ${txId}`)
         CeloAnalytics.track(CustomEventNames.transaction_send_start, { txId })
         break
       case SendTransactionLogEventType.Failed:
         Logger.error(tag, `Transaction failed: ${txId}`, event.error)
+        CeloAnalytics.track(CustomEventNames.transaction_error, {
+          txId,
+          error: event.error.message,
+          duration: Date.now() - startTime,
+        })
         break
       case SendTransactionLogEventType.Exception:
         Logger.error(tag, `Transaction Exception caught ${txId}: `, event.error)
+        CeloAnalytics.track(CustomEventNames.transaction_exception, {
+          txId,
+          error: event.error.message,
+          duration: Date.now() - startTime,
+        })
         break
       default:
         assertNever(event)

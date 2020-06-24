@@ -9,6 +9,7 @@ import {
   phoneNumberHashIsValidIfExists,
 } from '../common/input-validation'
 import logger from '../common/logger'
+import { VERSION } from '../config'
 import { incrementQueryCount } from '../database/wrappers/account'
 import { getKeyProvider } from '../key-management/key-provider'
 import { getRemainingQueryCount } from './query-quota'
@@ -37,7 +38,7 @@ export async function handleGetBlindedMessageForSalt(
     const { account, blindedQueryPhoneNumber, hashedPhoneNumber } = request.body
     const remainingQueryCount = await getRemainingQueryCount(account, hashedPhoneNumber)
     if (remainingQueryCount <= 0) {
-      logger.debug('rolling back db transaction due to no remaining query count')
+      logger.debug('No remaining query count')
       respondWithError(response, 403, ErrorMessages.EXCEEDED_QUOTA)
       return
     }
@@ -45,8 +46,8 @@ export async function handleGetBlindedMessageForSalt(
     const privateKey = keyProvider.getPrivateKey()
     const signature = computeBlindedSignature(blindedQueryPhoneNumber, privateKey)
     await incrementQueryCount(account)
-    logger.debug('committing db transactions for salt retrieval data')
-    response.json({ success: true, signature })
+    logger.debug('Salt retrieval success')
+    response.json({ success: true, signature, version: VERSION })
   } catch (error) {
     logger.error('Failed to getSalt', error)
     respondWithError(response, 500, ErrorMessages.UNKNOWN_ERROR)
