@@ -6,28 +6,24 @@ env:
   GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.daemon=false -Dkotlin.incremental=false"
 
 jobs:
-  jvm:
-    runs-on: ubuntu-latest
+    instrumentation-tests:
+        name: Instrumentation tests
+        runs-on: macos-latest
+        timeout-minutes: 60
+        strategy:
+            fail-fast: true
+            matrix:
+                api-level: [29]
+        steps:
+            - uses: actions/checkout@v2
+            - uses: gradle/wrapper-validation-action@v1
+            - uses: actions/setup-java@v1
+              with:
+                  java-version: 11
 
-    strategy:
-      fail-fast: false
-      matrix:
-        java-version:
-          - 1.8
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Validate Gradle Wrapper
-        uses: gradle/wrapper-validation-action@v1
-
-      - name: Configure JDK
-        uses: actions/setup-java@v1
-        with:
-          java-version: ${{ matrix.java-version }}
-
-      - name: Test
-        working-directory: ./packages/mobile
-        run: yarn build
-
+            - name: Instrumentation tests
+              uses: reactivecircus/android-emulator-runner@v2
+              with:
+                  api-level: ${{ matrix.api-level }}
+                  arch: x86
+                  script: ./gradlew connectedDebugAndroidTest
