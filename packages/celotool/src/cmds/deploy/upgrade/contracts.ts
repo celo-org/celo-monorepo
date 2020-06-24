@@ -1,9 +1,9 @@
-import yargs from 'yargs'
 import { downloadArtifacts, uploadArtifacts } from 'src/lib/artifacts'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { execCmd } from 'src/lib/cmd-utils'
 import { migrationOverrides, truffleOverrides } from 'src/lib/migration-utils'
 import { portForwardAnd } from 'src/lib/port_forward'
+import yargs from 'yargs'
 import { UpgradeArgv } from '../../deploy/upgrade'
 
 export const command = 'contracts'
