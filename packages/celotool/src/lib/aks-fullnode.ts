@@ -83,6 +83,7 @@ async function helmParameters(
   kubeNamespace: string,
   clusterConfig: AzureClusterConfig
 ) {
+  const rpcApis = 'eth,net,rpc,web3'
   const staticIps = (await allocateStaticIPs(celoEnv, clusterConfig)).join(',')
   const replicaCount = getReplicaCount()
   return [
@@ -93,6 +94,7 @@ async function helmParameters(
     `--set geth.image.repository=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY)}`,
     `--set geth.image.tag=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_TAG)}`,
     `--set geth.public_ips='{${staticIps}}'`,
+    `--set-string geth.rpc_apis='${rpcApis.split(',').join('\\\,')}'`,
     `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
     `--set genesis.network=${celoEnv}`,
   ]
