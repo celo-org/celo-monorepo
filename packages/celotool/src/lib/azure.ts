@@ -163,6 +163,40 @@ export async function getAKSNodeResourceGroup(clusterConfig: AzureClusterConfig)
   return nodeResourceGroup.trim()
 }
 
+/**
+ * Gets the AKS Service Principal Object ID if one exists. Otherwise, an empty string is given.
+ */
+export async function getAKSServicePrincipalObjectId(clusterConfig: AzureClusterConfig) {
+  // Get the correct object ID depending on the cluster configuration
+  // See https://github.com/Azure/aad-pod-identity/blob/b547ba86ab9b16d238db8a714aaec59a046afdc5/docs/readmes/README.role-assignment.md#obtaining-the-id-of-the-managed-identity--service-principal
+  const [rawServicePrincipalClientId] = await execCmdWithExitOnFailure(
+    `az aks show -n ${clusterConfig.clusterName} --query servicePrincipalProfile.clientId -g ${clusterConfig.resourceGroup} -o tsv`
+  )
+  console.info(`az aks show -n ${clusterConfig.clusterName} --query servicePrincipalProfile.clientId -g ${clusterConfig.resourceGroup} -o tsv`)
+  console.info(rawServicePrincipalClientId)
+  const servicePrincipalClientId = rawServicePrincipalClientId.trim()
+  // This will be the value of the service principal client ID if a managed service identity
+  // is being used instead of a service principal.
+  if (servicePrincipalClientId === 'msi') {
+    return ''
+  }
+  const [rawObjectId] = await execCmdWithExitOnFailure(
+    `az ad sp show --id ${servicePrincipalClientId} --query objectId -o tsv`
+  )
+  return rawObjectId.trim()
+}
+
+/**
+ * If an AKS cluster is using a managed service identity, the objectId is returned.
+ * Otherwise, an empty string is given.
+ */
+export async function getAKSManagedServiceIdentityObjectId(clusterConfig: AzureClusterConfig) {
+  const [managedIdentityObjectId] = await execCmdWithExitOnFailure(
+    `az aks show -n ${clusterConfig.clusterName} --query identityProfile.kubeletidentity.objectId -g ${clusterConfig.resourceGroup} -o tsv`
+  )
+  return managedIdentityObjectId.trim()
+}
+
 export async function registerStaticIP(name: string, resourceGroupIP: string) {
   console.info(`Registering IP address ${name} on ${resourceGroupIP}`)
   const [address] = await execCmdWithExitOnFailure(
