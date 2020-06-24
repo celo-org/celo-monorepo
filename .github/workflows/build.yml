@@ -20,7 +20,12 @@ jobs:
             - uses: actions/setup-java@v1
               with:
                   java-version: 11
-
+            - uses: borales/actions-yarn@v2.0.0
+              with:
+                cmd: install
+            - uses: borales/actions-yarn@v2.0.0
+              with:
+                cmd: build --scope @celo/mobile --include-filtered-dependencies
             - name: Instrumentation tests
               uses: reactivecircus/android-emulator-runner@v2
               with:
