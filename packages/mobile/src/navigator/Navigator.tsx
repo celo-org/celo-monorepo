@@ -211,7 +211,7 @@ const nuxScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen
       name={Screens.ImportWallet}
       component={ImportWallet}
-      options={nuxNavigationOptions}
+      options={ImportWallet.navigationOptions}
     />
     <Navigator.Screen
       name={Screens.ImportWalletSocial}

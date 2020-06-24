@@ -23,6 +23,8 @@ export interface Props {
   inputPlaceholder: string
   onInputChange: (value: string) => void
   shouldShowClipboard: (value: string) => boolean
+  multiline?: boolean
+  testID?: string
 }
 
 export default function CodeInput({
@@ -32,6 +34,8 @@ export default function CodeInput({
   inputPlaceholder,
   onInputChange,
   shouldShowClipboard,
+  multiline,
+  testID,
 }: Props) {
   // LayoutAnimation when switching to/from input
   useLayoutEffect(() => {
@@ -66,6 +70,8 @@ export default function CodeInput({
                 value={inputValue}
                 placeholder={inputPlaceholder}
                 onChangeText={onInputChange}
+                multiline={multiline}
+                testID={testID}
               />
             ) : (
               <Text style={styles.codeValue} numberOfLines={1}>
