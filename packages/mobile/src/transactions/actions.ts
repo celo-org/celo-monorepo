@@ -71,7 +71,7 @@ export type ActionTypes =
   | UpdatedRecentTxRecipientsCacheAction
 
 export const generateStandbyTransactionId = (recipientAddress: string) => {
-  return sha256(recipientAddress + String(Date.now())).toString()
+  return sha256(recipientAddress + String(Date.now())).toString('hex')
 }
 
 export const addStandbyTransaction = (
