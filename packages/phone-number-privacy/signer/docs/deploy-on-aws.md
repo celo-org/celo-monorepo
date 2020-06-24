@@ -53,7 +53,7 @@ Alternatively the signer service can be run using any other service that allows 
     aws iam create-service-linked-role --aws-service-name ecs.amazonaws.com
     ```
 
-1. Create a Task Role for signer ([documentation](https://docs.amazonaws.cn/en_us/AmazonECS/latest/userguide/ecs-cli-tutorial-fargate.html)).
+1. Create a Task Role for the signer ([documentation](https://docs.amazonaws.cn/en_us/AmazonECS/latest/userguide/ecs-cli-tutorial-fargate.html)).
 First we will create the `assume-role` policy that allows ECS tasks to be assigned to this task role. 
 
     ```bash
