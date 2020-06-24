@@ -10,7 +10,7 @@ interface SendSearchInputProps {
 
 // Input field for Send screen
 export function SendSearchInput(props: SendSearchInputProps) {
-  function handleChangeText(value: string) {
+  const handleChangeText = (value: string) => {
     setInput(value)
     onChangeText(value)
   }

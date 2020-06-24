@@ -11,15 +11,15 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 
 export default function SendOrRequestBar() {
-  function onPressSend() {
+  const onPressSend = () => {
     navigate(Screens.Send, { isRequest: false })
   }
 
-  function onPressRequest() {
+  const onPressRequest = () => {
     navigate(Screens.Send, { isRequest: true })
   }
 
-  function onPressQrCode() {
+  const onPressQrCode = () => {
     navigate(Screens.QRNavigator)
   }
 
