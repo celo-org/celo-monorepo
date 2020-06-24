@@ -10,6 +10,12 @@ The Baklava testnet is the best place to get started running a validator, or tes
 
 {% hint style="info" %}
 If you are transitioning from the Baklava network prior to the June 24 reset, you will need to start with a fresh chain database. You can create new nodes from fresh machines, as described in this guide, or you may delete your chaindata folder, which is named `celo` in the node data directory, and start over by running the provided `init` commands for each node described below. All on-chain registration steps, the commands completed with `celocli`, will need to be run on the new network.
+
+Key differences are:
+* New network ID is `62320`
+* A new image has been pushed to `us.gcr.io/celo-testnet/celo-node:baklava`, matching Celo client v1.0.0
+* A new genesis block and bootnode enode are included in the Docker image
+* `ReleaseGold` contracts are available for all previously faucetted addresses [here](https://gist.github.com/nategraf/245232883a34cbb162eb599e34afd7c0)
 {% endhint %}
 
 ## Prerequisites
