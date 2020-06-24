@@ -132,7 +132,6 @@ export async function getStaticProps() {
       INITIAL_TARGET,
       ABOUT,
       ATTESTATIONS,
-      time: Date.now(),
     },
     // we will attempt to re-generate the page:
     // - when a request comes in

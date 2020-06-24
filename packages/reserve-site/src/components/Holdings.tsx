@@ -6,10 +6,10 @@ import Button from './Button'
 export default function Holdings(props: Omit<HoldingsData, 'updatedDate'>) {
   return (
     <div css={rootStyle}>
-      <Heading title="CELO Native Asset" gridArea="celo" iconSrc="/assets/CELO.png" />
+      <Heading title="CELO" gridArea="celo" iconSrc="/assets/CELO.png" />
       <Amount label="Total" units={props.total} gridArea="total" />
-      <Amount label="Celo on-chain" units={props.onChain} gridArea="onChain" />
-      <Amount label="Celo in Custody" units={props.inCustody} gridArea="custody" />
+      <Amount label="CELO on-chain" units={props.onChain} gridArea="onChain" />
+      <Amount label="CELO in Custody" units={props.inCustody} gridArea="custody" />
       <Heading title="Additional Crypto Assets" gridArea="crypto" marginTop={30} />
       <Amount label="BTC" units={props.BTC} gridArea="btc" />
       <Amount label="ETH" units={props.ETH} gridArea="eth" />
@@ -42,11 +42,18 @@ const amountStyle = css({
   },
 })
 
-function Amount({ label, units, gridArea }) {
+interface AmountProps {
+  label: string
+  units: number
+  gridArea: string
+  context?: string
+}
+
+function Amount({ label, units, gridArea, context }: AmountProps) {
   const display = new Intl.NumberFormat('default').format(units)
 
   return (
-    <div css={css(amountStyle, { gridArea })}>
+    <div title={context} css={css(amountStyle, { gridArea })}>
       <p>{label}</p>
       <span css={numberStyle}>{display}</span>
     </div>
