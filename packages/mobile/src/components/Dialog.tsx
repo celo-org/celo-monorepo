@@ -12,8 +12,10 @@ interface Props {
   actionText: string
   actionPress: () => void
   secondaryActionText?: string
+  secondaryActionDisabled?: boolean
   secondaryActionPress?: () => void
   isVisible: boolean
+  testID?: string
 }
 
 export default function Dialog({
@@ -22,9 +24,11 @@ export default function Dialog({
   actionPress,
   actionText,
   secondaryActionText,
+  secondaryActionDisabled,
   secondaryActionPress,
   image,
   isVisible,
+  testID,
 }: Props) {
   return (
     <Modal isVisible={isVisible}>
@@ -35,11 +39,20 @@ export default function Dialog({
       </ScrollView>
       <View style={styles.actions}>
         {secondaryActionText && (
-          <TextButton style={styles.secondary} onPress={secondaryActionPress}>
+          <TextButton
+            style={styles.secondary}
+            disabled={secondaryActionDisabled}
+            onPress={secondaryActionPress}
+            testID={testID && `${testID}/SecondaryAction`}
+          >
             {secondaryActionText}
           </TextButton>
         )}
-        <TextButton style={styles.primary} onPress={actionPress}>
+        <TextButton
+          style={styles.primary}
+          onPress={actionPress}
+          testID={testID && `${testID}/PrimaryAction`}
+        >
           {actionText}
         </TextButton>
       </View>

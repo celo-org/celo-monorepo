@@ -7,7 +7,7 @@ export enum Colors {
   goldBrand = '#FBCC5C',
   goldUI = '#EEB93C',
   goldDark = '#9C6E00',
-  beige = '#F5F4F0',
+  beige = '#F1F0EB',
   brownFaint = '#FFF9EE',
   warning = '#EA6042',
   dark = '#2E3338',

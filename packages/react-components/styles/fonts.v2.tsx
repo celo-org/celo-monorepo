@@ -8,7 +8,7 @@ const Inter = {
 }
 
 const Jost = {
-  Regular: 'Jost-Regular',
+  Book: 'Jost-Book',
   Medium: 'Jost-Medium',
 }
 
@@ -39,7 +39,7 @@ const fontStyles = StyleSheet.create({
   h1: {
     fontSize: 26,
     lineHeight: 32,
-    fontFamily: Jost.Regular,
+    fontFamily: Jost.Book,
     color: colors.dark,
   },
   h2: {
@@ -52,6 +52,24 @@ const fontStyles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 16,
     fontFamily: Inter.Medium,
+    color: colors.dark,
+  },
+  navigationHeader: {
+    fontSize: 16,
+    lineHeight: 20,
+    fontFamily: Jost.Medium,
+    color: colors.dark,
+  },
+  notificationHeadline: {
+    fontSize: 18,
+    lineHeight: 22,
+    fontFamily: Jost.Medium,
+    color: colors.dark,
+  },
+  displayName: {
+    fontSize: 18,
+    lineHeight: 24,
+    fontFamily: Jost.Medium,
     color: colors.dark,
   },
   label: {

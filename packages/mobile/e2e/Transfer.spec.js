@@ -105,10 +105,6 @@ describe('Transfer Works', () => {
   })
 
   it('VerifyEducation', async () => {
-    await waitFor(element(by.id('VerificationEducationHeader')))
-      .toBeVisible()
-      .withTimeout(10000)
-
     await waitFor(element(by.id('VerificationEducationContinue')))
       .toBeVisible()
       .withTimeout(10000)
@@ -116,7 +112,7 @@ describe('Transfer Works', () => {
     // skip
     await element(by.id('VerificationEducationSkip')).tap()
     // confirmation popup skip
-    await element(by.id('ModalSkip')).tap()
+    await element(by.id('VerificationSkipDialog/PrimaryAction')).tap()
   })
 
   it.skip('Verify', async () => {

@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* celoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* celoTests.m */; };
 		0317E786245B696200AAAC2E /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0317E783245B696200AAAC2E /* Inter-Regular.ttf */; };
@@ -29,8 +28,8 @@
 		67911AC6D310414DAAC1498E /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = F3F5FA21E7EC46BBB744FE54 /* libz.tbd */; };
 		85E8054E767BF68843B24D43 /* Pods_celo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 691B91F2E7383B2AF94AAA8B /* Pods_celo.framework */; };
 		F2B1AD5485D68063EC09183F /* Pods_celoTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3250C8E518DC2C848EA62404 /* Pods_celoTests.framework */; };
-		F64BB444249E031200DEA44F /* Jost-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F64BB442249E031200DEA44F /* Jost-Medium.ttf */; };
-		F64BB445249E031200DEA44F /* Jost-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F64BB443249E031200DEA44F /* Jost-Regular.ttf */; };
+		EB3CF5B346854570A1EC69B3 /* Jost-Book.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F19E0D1442F8460181626D12 /* Jost-Book.ttf */; };
+		2E6B8DA1BF6440D89CB45CCA /* Jost-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A86AF23416DE47E0B4068AE7 /* Jost-Medium.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -85,8 +84,8 @@
 		C5952C9D168E4172BB52364C /* Hind-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Hind-SemiBold.ttf"; path = "../fonts/Hind-SemiBold.ttf"; sourceTree = "<group>"; };
 		CCB1F49C3DAE62A0F72F43DF /* Pods-celo-celoTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-celo-celoTests.release.xcconfig"; path = "Target Support Files/Pods-celo-celoTests/Pods-celo-celoTests.release.xcconfig"; sourceTree = "<group>"; };
 		F3F5FA21E7EC46BBB744FE54 /* libz.tbd */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
-		F64BB442249E031200DEA44F /* Jost-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Jost-Medium.ttf"; path = "../fonts/Jost-Medium.ttf"; sourceTree = "<group>"; };
-		F64BB443249E031200DEA44F /* Jost-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Jost-Regular.ttf"; path = "../fonts/Jost-Regular.ttf"; sourceTree = "<group>"; };
+		F19E0D1442F8460181626D12 /* Jost-Book.ttf */ = {isa = PBXFileReference; name = "Jost-Book.ttf"; path = "../fonts/Jost-Book.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		A86AF23416DE47E0B4068AE7 /* Jost-Medium.ttf */ = {isa = PBXFileReference; name = "Jost-Medium.ttf"; path = "../fonts/Jost-Medium.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -229,6 +228,8 @@
 				AAE92820119F4CC5B23C6636 /* Hind-Medium.ttf */,
 				A100BC162FF5410CB4627D3C /* Hind-Regular.ttf */,
 				C5952C9D168E4172BB52364C /* Hind-SemiBold.ttf */,
+				F19E0D1442F8460181626D12 /* Jost-Book.ttf */,
+				A86AF23416DE47E0B4068AE7 /* Jost-Medium.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -399,6 +400,8 @@
 				2CE54C7D16D44C5380C53609 /* Hind-Regular.ttf in Resources */,
 				0317E788245B696200AAAC2E /* Inter-Medium.ttf in Resources */,
 				5575263ED1EA4F568D328DE9 /* Hind-SemiBold.ttf in Resources */,
+				EB3CF5B346854570A1EC69B3 /* Jost-Book.ttf in Resources */,
+				2E6B8DA1BF6440D89CB45CCA /* Jost-Medium.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

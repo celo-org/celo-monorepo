@@ -1,7 +1,7 @@
 import request from 'supertest'
 import { computeBlindedSignature } from '../src/bls/bls-cryptography-client'
 import { authenticateUser } from '../src/common/identity'
-import { DEV_PRIVATE_KEY } from '../src/config'
+import { DEV_PRIVATE_KEY, VERSION } from '../src/config'
 import {
   getDidMatchmaking,
   incrementQueryCount,
@@ -61,6 +61,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
           {
             success: true,
             signature: BLS_SIGNATURE,
+            version: VERSION,
           },
           done
         )

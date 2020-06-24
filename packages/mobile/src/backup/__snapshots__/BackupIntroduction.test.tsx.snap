@@ -305,7 +305,7 @@ exports[`BackupIntroduction renders correctly when backup not complete 1`] = `
         style={
           Object {
             "color": "#2E3338",
-            "fontFamily": "Jost-Regular",
+            "fontFamily": "Jost-Book",
             "fontSize": 26,
             "lineHeight": 32,
             "paddingBottom": 16,

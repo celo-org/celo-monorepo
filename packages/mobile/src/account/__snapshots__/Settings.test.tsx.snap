@@ -90,7 +90,7 @@ exports[`Account renders correctly 1`] = `
         style={
           Object {
             "color": "#2E3338",
-            "fontFamily": "Jost-Regular",
+            "fontFamily": "Jost-Book",
             "fontSize": 26,
             "lineHeight": 32,
             "margin": 16,
@@ -1311,7 +1311,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
         style={
           Object {
             "color": "#2E3338",
-            "fontFamily": "Jost-Regular",
+            "fontFamily": "Jost-Book",
             "fontSize": 26,
             "lineHeight": 32,
             "margin": 16,

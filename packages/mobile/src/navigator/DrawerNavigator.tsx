@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   nameLabel: {
-    ...fontStyles.large600,
+    ...fontStyles.displayName,
     marginTop: 8,
   },
   border: {

@@ -178,10 +178,9 @@ export type StackParamList = {
     isPaymentRequest?: true
     isFromScan?: boolean
   }
-  [Screens.VerificationEducationScreen]: undefined
-  [Screens.VerificationInputScreen]: undefined
+  [Screens.VerificationEducationScreen]: { showSkipDialog: boolean } | undefined
+  [Screens.VerificationInputScreen]: { showHelpDialog: boolean } | undefined
   [Screens.VerificationInterstitialScreen]: undefined
-  [Screens.VerificationLearnMoreScreen]: undefined
   [Screens.VerificationLoadingScreen]: undefined
   [Screens.OnboardingSuccessScreen]: undefined
   [Screens.WalletHome]: undefined
