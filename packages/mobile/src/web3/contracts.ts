@@ -1,5 +1,6 @@
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { RpcWallet } from '@celo/contractkit/lib/wallets/rpc-wallet'
+import { Platform } from 'react-native'
 import * as net from 'react-native-tcp'
 import { call, select, take } from 'redux-saga/effects'
 import { DEFAULT_FORNO_URL } from 'src/config'
@@ -20,17 +21,15 @@ let contractKit: ContractKit | undefined
 
 export function openIpcProvider() {
   if (!ipcProvider) {
+    Logger.debug(`${tag}@openIpcProvider`, `Initializing IPC connection`)
     ipcProvider = getIpcProvider()
   }
   return ipcProvider
 }
 
-export function closeIpcProvider() {
-  ipcProvider = undefined
-}
-
 export function openWallet() {
   if (!gethWallet) {
+    Logger.debug(`${tag}@openWallet`, `Initializing wallet`)
     gethWallet = new RpcWallet(openIpcProvider())
   }
   return gethWallet
@@ -38,13 +37,22 @@ export function openWallet() {
 
 export function openContractKit(fornoMode: boolean) {
   if (!contractKit) {
+    Logger.info(
+      `${tag}@openContractKit`,
+      `Initializing contractkit, platform: ${Platform.OS}, forno mode: ${fornoMode}`
+    )
+    const web3 = new Web3(fornoMode ? getHttpProvider(DEFAULT_FORNO_URL) : openIpcProvider())
     const wallet = openWallet()
-    const web3 = fornoMode
-      ? new Web3(getHttpProvider(DEFAULT_FORNO_URL))
-      : new Web3(openIpcProvider())
     contractKit = newKitFromWeb3(web3, wallet)
   }
   return contractKit
+}
+
+export function closeContractKit() {
+  Logger.debug(`closeContractKit`)
+  contractKit = undefined
+  gethWallet = undefined
+  ipcProvider = undefined
 }
 
 export const getConnectedWalletAsync = async () => promisifyGenerator(getConnectedWallet())
