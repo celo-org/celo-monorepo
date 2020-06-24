@@ -96,7 +96,7 @@ First we will create the `assume-role` policy that allows ECS tasks to be assign
                     "secretsmanager:ListSecretVersionIds"
                 ],
                 "Resource": [
-                    "arn:aws:secretsmanager:us-east-2:<account_id>:secret:<secret_id>"
+                    "arn:aws:secretsmanager:us-east-2:{YOUR_ACCOUNT_ID}:secret:{YOUR_SECRET_ID}"
                 ]
             }
         ]
