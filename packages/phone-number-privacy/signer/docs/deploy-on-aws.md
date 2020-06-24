@@ -9,7 +9,7 @@
 
 ### Setting up the network and database
 
-The next steps will explain how to create a new VPC and a RDS Postgres database needed to run the signer. If desired it is possible to use an existing VPC and a database deployed in some any other way. Take it as a reference for the port/security group configuration.
+The next steps will explain how to create a new VPC and a RDS Postgres database needed to run the signer. If desired, it is possible to use an existing VPC and a database deployed in some any other way. Treat it as a reference for the port/security group configuration.
 
 1. OPTIONAL: [Create new vpc and subnets](https://docs.aws.amazon.com/directoryservice/latest/admin-guide/gsg_create_vpc.html) for the resources (use the CIDR block and AZs that fits with your network setup). The VPC should have at least two subnets, and if it does not have any public subnet (for running the Signer container) the private subnets should have an [Internet Gateway configured](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html)
 
