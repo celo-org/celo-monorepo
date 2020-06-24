@@ -55,20 +55,6 @@ platform :android do
     fastlane_supply(env, 'internal')
   end
 
-  desc 'Ship Staging to Playstore Internal'
-  lane :staging do
-    env = 'staging'
-    build(environment: env)
-    fastlane_supply(env, 'internal')
-  end
-
-  desc 'Ship Production to Playstore Alpha.'
-  lane :production do
-    env = 'release'
-    build(environment: env)
-    fastlane_supply(env, 'alpha')
-  end
-
   desc 'Ship Alfajores to Playstore Internal'
   lane :alfajores do
     env = 'alfajores'

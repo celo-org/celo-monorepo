@@ -77,8 +77,6 @@ project.ext.react = [
         enableHermes: false,  // clean and rebuild if changing
         bundleInIntegration: true,
         devDisabledInIntegration: true,
-        bundleInStaging: true,
-        devDisabledInStaging: true,
         bundleInAlfajores: true,
         devDisabledInAlfajores: true,
         bundleInPilot: true,
@@ -92,8 +90,6 @@ project.ext.react = [
 project.ext.envConfigFiles = [
     debug: ".env",
     integration: ".env.integration",
-    staging: ".env.staging",
-    release: ".env.production",
     alfajores: ".env.alfajores",
     pilot: ".env.pilot",
     mainnet: ".env.mainnet",
@@ -200,13 +196,6 @@ android {
         }
 
         integration {
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            signingConfig signingConfigs.release
-            matchingFallbacks = ['release']
-        }
-
-        staging {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             signingConfig signingConfigs.release
