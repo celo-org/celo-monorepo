@@ -97,19 +97,9 @@ const mapDispatchToProps = {
 
 interface State {
   fornoSwitchOffWarning: boolean
-  promptFornoModal: boolean
 }
 
 export class Account extends React.Component<Props, State> {
-  componentDidMount() {
-    const promptFornoModal = this.props.route.params?.promptFornoModal
-    if (promptFornoModal) {
-      this.setState({
-        promptFornoModal,
-      })
-    }
-  }
-
   goToProfile = () => {
     CeloAnalytics.track(CustomEventNames.edit_profile)
     this.props.navigation.navigate(Screens.Profile)
@@ -165,7 +155,9 @@ export class Account extends React.Component<Props, State> {
     } else {
       return (
         <View style={styles.devSettings}>
-          {/* <View style={style.devSettingsItem}>
+          {/* 
+          // TODO: It's commented because it broke a while back but this is something we'd like to re-enable
+          <View style={style.devSettingsItem}>
             <TouchableOpacity onPress={this.revokeNumberVerification}>
               <Text>Revoke Number Verification</Text>
             </TouchableOpacity>
@@ -233,13 +225,13 @@ export class Account extends React.Component<Props, State> {
     navigateBack()
   }
 
-  goToTerms() {
+  onTermsPress() {
     navigateToURI(TOS_LINK)
   }
 
   render() {
     const { t, i18n } = this.props
-
+    const promptFornoModal = this.props.route.params?.promptFornoModal ?? false
     const currentLanguage = AVAILABLE_LANGUAGES.find((l) => l.code === i18n.language)
     return (
       <SafeAreaView style={styles.container}>
@@ -280,7 +272,7 @@ export class Account extends React.Component<Props, State> {
             />
             <SectionHeadNew text={t('legal')} style={styles.sectionTitle} />
             <SettingsItemTextValue title={t('licenses')} onPress={this.goToLicenses} />
-            <SettingsItemTextValue title={t('termsOfServiceLink')} onPress={this.goToTerms} />
+            <SettingsItemTextValue title={t('termsOfServiceLink')} onPress={this.onTermsPress} />
           </View>
           {this.getDevSettingsComp()}
           <WarningModal
@@ -293,7 +285,7 @@ export class Account extends React.Component<Props, State> {
             onContinue={this.disableFornoMode}
           />
           <WarningModal
-            isVisible={this.state?.promptFornoModal}
+            isVisible={promptFornoModal}
             header={t('promptFornoModal.header')}
             body1={t('promptFornoModal.body')}
             continueTitle={t('promptFornoModal.switchToDataSaver')}

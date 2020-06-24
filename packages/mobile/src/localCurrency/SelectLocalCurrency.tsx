@@ -3,7 +3,7 @@ import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, Text } from 'react-native'
+import { FlatList, ListRenderItemInfo, ScrollView, StyleSheet, Text } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { useDispatch } from 'react-redux'
 import i18n, { Namespaces } from 'src/i18n'
@@ -15,13 +15,17 @@ import { navigateBack } from 'src/navigator/NavigationService'
 
 const DEFAULT_CURRENCY_CODE = LocalCurrencyCode.USD
 
+function keyExtractor(item: LocalCurrencyCode) {
+  return item
+}
+
 function SelectLocalCurrency() {
   // tslint:disable-next-line: react-hooks-nesting
   const selectedCurrencyCode = useLocalCurrencyCode() || DEFAULT_CURRENCY_CODE
   const dispatch = useDispatch()
   const { t } = useTranslation(Namespaces.accountScreen10)
 
-  function onSelect(code: string) {
+  const onSelect = (code: string) => {
     dispatch(selectPreferredCurrency(code as LocalCurrencyCode))
 
     // Wait for next frame before navigating back
@@ -30,21 +34,32 @@ function SelectLocalCurrency() {
       navigateBack()
     })
   }
+
+  const renderItem = ({ item: code }: ListRenderItemInfo<LocalCurrencyCode>) => {
+    return (
+      <SelectionOption
+        key={code}
+        text={code}
+        onSelect={onSelect}
+        isSelected={code === selectedCurrencyCode}
+        data={code}
+      />
+    )
+  }
+
   return (
     <ScrollView style={styles.container}>
       <SafeAreaView>
         <Text style={styles.title} testID={'ChooseLanguageTitle'}>
           {t('selectCurrency')}
         </Text>
-        {LOCAL_CURRENCY_CODES.map((code) => (
-          <SelectionOption
-            key={code}
-            text={code}
-            onSelect={onSelect}
-            isSelected={code === selectedCurrencyCode}
-            data={code}
-          />
-        ))}
+        <FlatList
+          style={styles.container}
+          data={LOCAL_CURRENCY_CODES}
+          extraData={selectedCurrencyCode}
+          renderItem={renderItem}
+          keyExtractor={keyExtractor}
+        />
       </SafeAreaView>
     </ScrollView>
   )

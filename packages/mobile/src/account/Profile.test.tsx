@@ -9,8 +9,8 @@ import { RootState } from 'src/redux/reducers'
 import { createMockStore, getMockStackScreenProps } from 'test/utils'
 
 describe('Profile', () => {
+  const store = createMockStore({})
   it('renders correctly', () => {
-    const store = createMockStore({})
     const { toJSON } = render(
       <Provider store={store}>
         <Profile setName={jest.fn()} {...getMockStackScreenProps(Screens.Profile)} />
@@ -20,7 +20,6 @@ describe('Profile', () => {
   })
 
   describe('when SettingsItem pressed', () => {
-    const store = createMockStore({})
     const name = 'New Name'
     it('edits name', () => {
       const { getByDisplayValue } = render(

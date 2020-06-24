@@ -44,7 +44,7 @@ import ImportWallet from 'src/import/ImportWallet'
 import ImportWalletEmpty from 'src/import/ImportWalletEmpty'
 import ImportWalletSocial from 'src/import/ImportWalletSocial'
 import EnterInviteCode from 'src/invite/EnterInviteCode'
-import Language, { languageScreenOptions } from 'src/language/Language'
+import Language from 'src/language/Language'
 import SelectLocalCurrency from 'src/localCurrency/SelectLocalCurrency'
 import DrawerNavigator from 'src/navigator/DrawerNavigator'
 import {
@@ -108,7 +108,7 @@ const commonScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen
         name={Screens.Language}
         component={Language}
-        options={languageScreenOptions}
+        options={Language.navigationOptions}
       />
       <Navigator.Screen
         name={Screens.PincodeEnter}

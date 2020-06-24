@@ -67,19 +67,17 @@ export function SettingsItemSwitch({
   details,
 }: SettingsItemSwitchProps) {
   return (
-    <>
-      <Wrapper>
-        <View style={styles.container}>
-          <Title value={title} />
-          <Switch testID={testID} value={value} onValueChange={onValueChange} />
+    <Wrapper>
+      <View style={styles.container}>
+        <Title value={title} />
+        <Switch testID={testID} value={value} onValueChange={onValueChange} />
+      </View>
+      {details && (
+        <View>
+          <Text style={styles.details}>{details}</Text>
         </View>
-        {details && (
-          <View>
-            <Text style={styles.details}>{details}</Text>
-          </View>
-        )}
-      </Wrapper>
-    </>
+      )}
+    </Wrapper>
   )
 }
 
@@ -96,33 +94,31 @@ export function SettingsItemInput({
   value,
   placeholder,
 }: SettingsItemInputProps) {
-  function onFocus() {
+  const onFocus = () => {
     setInputColor(colors.dark)
   }
-  function onBlur() {
+  const onBlur = () => {
     setInputColor(colors.gray4)
   }
 
   const [inputColor, setInputColor] = React.useState(colors.gray4)
   return (
-    <>
-      <Wrapper>
-        <View style={styles.container}>
-          <Title value={title} />
-          <TextInput
-            testID={testID}
-            style={styles.input}
-            inputStyle={[styles.innerInput, { color: inputColor }]}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            value={value}
-            placeholder={placeholder}
-            onChangeText={onValueChange}
-            showClearButton={false}
-          />
-        </View>
-      </Wrapper>
-    </>
+    <Wrapper>
+      <View style={styles.container}>
+        <Title value={title} />
+        <TextInput
+          testID={testID}
+          style={styles.input}
+          inputStyle={[styles.innerInput, { color: inputColor }]}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          value={value}
+          placeholder={placeholder}
+          onChangeText={onValueChange}
+          showClearButton={false}
+        />
+      </View>
+    </Wrapper>
   )
 }
 
