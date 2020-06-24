@@ -34,7 +34,7 @@ import {
   updateWeb3SyncProgress,
   Web3SyncProgress,
 } from 'src/web3/actions'
-import { getConnectedWallet, getContractKit } from 'src/web3/contracts'
+import { closeIpcProvider, getConnectedWallet, getContractKit } from 'src/web3/contracts'
 import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
 import { getLatestBlock } from 'src/web3/utils'
 import { Block } from 'web3-eth'
@@ -292,6 +292,7 @@ export function* toggleFornoMode(action: SetIsFornoAction) {
       yield put(setFornoMode(action.fornoMode))
       yield put(cancelGethSaga())
       yield call(stopGethIfInitialized)
+      closeIpcProvider()
       yield spawn(gethSaga)
       yield call(waitForGethConnectivity)
     } catch (e) {

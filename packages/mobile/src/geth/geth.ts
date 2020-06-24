@@ -134,7 +134,9 @@ async function initGeth(sync: boolean = true) {
     try {
       await geth.start()
       gethInstance = geth
-      geth.subscribeNewHead()
+      if (sync) {
+        geth.subscribeNewHead()
+      }
     } catch (e) {
       const errorType = getGethErrorType(e)
       if (errorType === ErrorType.GethAlreadyRunning) {
