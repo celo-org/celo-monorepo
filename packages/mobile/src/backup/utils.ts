@@ -80,7 +80,7 @@ export function splitMnemonic(mnemonic: string, language: string | null): string
 export function joinMnemonic(mnemonicShards: string[]) {
   if (
     !mnemonicShards ||
-    !(mnemonicShards.length === 2) ||
+    mnemonicShards.length !== 2 ||
     !mnemonicShards[0].includes(MNEMONIC_SPLITTER) ||
     !mnemonicShards[1].includes(MNEMONIC_SPLITTER)
   ) {
@@ -106,6 +106,7 @@ export async function getStoredMnemonic(): Promise<string | null> {
 
     return mnemonic
   } catch (error) {
+    CeloAnalytics.track(CustomEventNames.failed_to_retrieve_mnemonic, { error: error.message })
     Logger.error(TAG, 'Failed to retrieve mnemonic', error)
     return null
   }

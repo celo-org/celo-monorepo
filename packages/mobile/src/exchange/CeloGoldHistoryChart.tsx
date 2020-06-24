@@ -287,4 +287,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withTranslation(Namespaces.exchangeFlow9)(CeloGoldHistoryChart)
+export default withTranslation<Props>(Namespaces.exchangeFlow9)(CeloGoldHistoryChart)

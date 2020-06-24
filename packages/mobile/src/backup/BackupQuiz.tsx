@@ -309,7 +309,7 @@ function getShuffledWordSet(mnemonic: string) {
 export default connect<{}, DispatchProps, OwnProps, RootState>(null, {
   setBackupCompleted,
   showError,
-})(withTranslation(Namespaces.backupKeyFlow6)(BackupQuiz))
+})(withTranslation<Props>(Namespaces.backupKeyFlow6)(BackupQuiz))
 
 const styles = StyleSheet.create({
   container: {

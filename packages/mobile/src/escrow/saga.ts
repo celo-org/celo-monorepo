@@ -1,9 +1,11 @@
 import { EscrowWrapper } from '@celo/contractkit/lib/wrappers/Escrow'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
-import { ensureLeading0x } from '@celo/utils/src/address'
+import { ensureLeading0x, trimLeading0x } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import { all, call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
-import { showError } from 'src/alert/actions'
+import { showError, showErrorOrFallback } from 'src/alert/actions'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ESCROW_PAYMENT_EXPIRY_SECONDS } from 'src/config'
@@ -25,7 +27,6 @@ import { Actions as IdentityActions, SetVerificationStatusAction } from 'src/ide
 import { addressToE164NumberSelector } from 'src/identity/reducer'
 import { VerificationStatus } from 'src/identity/types'
 import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
-import { TEMP_PW } from 'src/invite/saga'
 import { isValidPrivateKey } from 'src/invite/utils'
 import { navigateHome } from 'src/navigator/NavigationService'
 import { RootState } from 'src/redux/reducers'
@@ -36,14 +37,8 @@ import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import { TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
-import {
-  addLocalAccount,
-  getContractKit,
-  getContractKitAsync,
-  web3ForUtils,
-} from 'src/web3/contracts'
+import { getContractKit, getContractKitAsync, web3ForUtils } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
-import { fornoSelector } from 'src/web3/selectors'
 import { estimateGas } from 'src/web3/utils'
 
 const TAG = 'escrow/saga'
@@ -88,11 +83,7 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
     yield put(fetchSentEscrowPayments())
   } catch (e) {
     Logger.error(TAG + '@transferToEscrow', 'Error transfering to escrow', e)
-    if (e.message === ErrorMessages.INCORRECT_PIN) {
-      yield put(showError(ErrorMessages.INCORRECT_PIN))
-    } else {
-      yield put(showError(ErrorMessages.ESCROW_TRANSFER_FAILED))
-    }
+    yield put(showErrorOrFallback(e, ErrorMessages.ESCROW_TRANSFER_FAILED))
   }
 }
 
@@ -133,11 +124,6 @@ function* withdrawFromEscrow() {
 
     const tempWalletAddress = contractKit.web3.eth.accounts.privateKeyToAccount(tmpWalletPrivateKey)
       .address
-    const fornoMode = yield select(fornoSelector)
-    if (fornoMode) {
-      addLocalAccount(tmpWalletPrivateKey)
-    }
-    Logger.debug(TAG + '@withdrawFromEscrow', 'Added temp account to wallet: ' + tempWalletAddress)
 
     // Check if there is a payment associated with this invite code
     const receivedPayment = yield call(getEscrowedPayment, escrow, tempWalletAddress)
@@ -147,24 +133,14 @@ function* withdrawFromEscrow() {
       return
     }
 
-    if (fornoMode) {
-      Logger.info(
-        TAG + '@withdrawFromEscrow',
-        'Forno mode is on, no need to unlock the temporary account'
-      )
-    } else {
-      // Unlock temporary account
-      yield call(contractKit.web3.eth.personal.unlockAccount, tempWalletAddress, TEMP_PW, 600)
-    }
-
     const msgHash = contractKit.web3.utils.soliditySha3({ type: 'address', value: account })
 
     Logger.debug(TAG + '@withdrawFromEscrow', `Signing message hash ${msgHash}`)
-    // using the temporary wallet account to sign a message. The message is the current account.
+    // use the temporary key to sign a message. The message is the current account.
     let signature: string = (yield contractKit.web3.eth.accounts.sign(msgHash, tmpWalletPrivateKey))
       .signature
     Logger.debug(TAG + '@withdrawFromEscrow', `Signed message hash signature is ${signature}`)
-    signature = signature.slice(2)
+    signature = trimLeading0x(signature)
     const r = `0x${signature.slice(0, 64)}`
     const s = `0x${signature.slice(64, 128)}`
     const v = contractKit.web3.utils.hexToNumber(ensureLeading0x(signature.slice(128, 130)))
@@ -178,6 +154,7 @@ function* withdrawFromEscrow() {
     Logger.showMessage(i18n.t('inviteFlow11:transferDollarsToAccount'))
   } catch (e) {
     Logger.error(TAG + '@withdrawFromEscrow', 'Error withdrawing payment from escrow', e)
+    CeloAnalytics.track(CustomEventNames.escrow_failed_to_withdraw, { error: e.message })
     if (e.message === ErrorMessages.INCORRECT_PIN) {
       yield put(showError(ErrorMessages.INCORRECT_PIN))
     } else {
@@ -226,6 +203,7 @@ function* reclaimFromEscrow({ paymentID }: EscrowReclaimPaymentAction) {
     yield put(reclaimEscrowPaymentSuccess())
   } catch (e) {
     Logger.error(TAG + '@reclaimFromEscrow', 'Error reclaiming payment from escrow', e)
+    CeloAnalytics.track(CustomEventNames.escrow_failed_to_reclaim, { error: e.message })
     if (e.message === ErrorMessages.INCORRECT_PIN) {
       yield put(showError(ErrorMessages.INCORRECT_PIN))
     } else {
@@ -298,6 +276,7 @@ function* doFetchSentPayments() {
 
     yield put(storeSentEscrowPayments(sentPayments))
   } catch (e) {
+    CeloAnalytics.track(CustomEventNames.escrow_failed_to_fetch_sent, { error: e.message })
     Logger.error(TAG + '@doFetchSentPayments', 'Error fetching sent escrowed payments', e)
   }
 }

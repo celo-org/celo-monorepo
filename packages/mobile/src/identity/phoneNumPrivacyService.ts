@@ -18,14 +18,7 @@ export async function postToPhoneNumPrivacyService<ResponseType>(
   // Sign payload using account privkey
   const bodyString = JSON.stringify(body)
   const authHeader = await contractKit.web3.eth.sign(bodyString, account)
-  let { pgpnpUrl } = networkConfig
-
-  // TODO(Rossy) Remove when PGPNP prod is updated
-  // Hacking this in like this to minimize the changes + risk when its removed
-  if (endpoint === '/getContactMatches') {
-    pgpnpUrl = 'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net'
-  }
-
+  const { pgpnpUrl } = networkConfig
   const res = await fetch(pgpnpUrl + endpoint, {
     method: 'POST',
     headers: {

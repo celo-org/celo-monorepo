@@ -14,8 +14,10 @@ exports[`FiatExchange renders correctly 1`] = `
       Object {
         "alignItems": "center",
         "backgroundColor": "transparent",
-        "borderBottomColor": "#EDEEEF",
-        "borderBottomWidth": 0,
+        "borderBottomColor": AnimatedValue {
+          " __value": NaN,
+        },
+        "borderBottomWidth": 1,
         "flexDirection": "row",
         "height": 62,
         "justifyContent": "space-between",
@@ -109,9 +111,9 @@ exports[`FiatExchange renders correctly 1`] = `
       style={
         Object {
           "color": "#2E3338",
-          "fontFamily": "Inter-SemiBold",
-          "fontSize": 19,
-          "lineHeight": 26,
+          "fontFamily": "Jost-Medium",
+          "fontSize": 22,
+          "lineHeight": 28,
           "marginBottom": 4,
         }
       }
