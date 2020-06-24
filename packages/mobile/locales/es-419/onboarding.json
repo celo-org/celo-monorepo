@@ -4,7 +4,11 @@
     "body": "Agregar sus contactos hace que sea fácil enviar y solicitar pagos con sus amigos. La conexión no envía invitaciones a sus contactos.",
     "findSwitch": "Permita que los contactos lo encuentren",
     "syncing": {
-      "loading": "Sincronizando contactos...",
+      "loadingHeader": "Sincronizando...",
+      "loadingStatus0": "Importando contactos",
+      "loadingStatus1": "Procesando {{total}} contactos",
+      "loadingStatus2": "Encontrar amigos",
+      "successHeader": "Terminado",
       "successWithMatches": "{{matches}} amigos en Valora",
       "successWithoutMatches": "Sincronización completa"
     }

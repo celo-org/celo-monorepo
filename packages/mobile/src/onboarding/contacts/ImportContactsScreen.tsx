@@ -3,17 +3,17 @@ import Switch from '@celo/react-components/components/Switch.v2'
 import Checkmark from '@celo/react-components/icons/Checkmark'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
-import { StackScreenProps } from '@react-navigation/stack'
+import { StackScreenProps, useHeaderHeight } from '@react-navigation/stack'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { useSafeArea } from 'react-native-safe-area-view'
 import { useDispatch, useSelector } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import i18n, { Namespaces } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
-import { importContacts } from 'src/identity/actions'
+import { cancelImportContacts, denyImportContacts, importContacts } from 'src/identity/actions'
 import { importContactsProgressSelector, matchedContactsSelector } from 'src/identity/reducer'
 import { ImportContactsStatus } from 'src/identity/types'
 import { HeaderTitleWithSubtitle, nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers.v2'
@@ -31,12 +31,60 @@ function ImportContactsScreen({ route, navigation }: Props) {
   const { t } = useTranslation(Namespaces.onboarding)
   const importContactsProgress = useSelector(importContactsProgressSelector)
   const importStatus = importContactsProgress.status
+  const totalContacts = importContactsProgress.total
   const prevImportContactProgressRef = React.useRef(importContactsProgress)
   const matchedContacts = useSelector(matchedContactsSelector)
   const matchedContactsCount = Object.keys(matchedContacts).length
   const dispatch = useDispatch()
+  const insets = useSafeArea()
+  const headerHeight = useHeaderHeight()
 
-  async function onPressConnect() {
+  function renderStatusContainer() {
+    if (importStatus === ImportContactsStatus.Done) {
+      return (
+        <View style={styles.statusContainer}>
+          <Checkmark />
+          <View style={styles.statusTextContainer}>
+            <Text style={styles.statusText}>{t('contacts.syncing.successHeader')}</Text>
+            {matchedContactsCount > 0 ? (
+              <Text style={styles.subStatusText}>
+                {t('contacts.syncing.successWithMatches', { matches: matchedContactsCount })}
+              </Text>
+            ) : (
+              <Text style={styles.subStatusText}>
+                {t('contacts.syncing.successWithoutMatches')}
+              </Text>
+            )}
+          </View>
+        </View>
+      )
+    }
+
+    let subHeaderText
+    if (importStatus === ImportContactsStatus.Processing) {
+      subHeaderText = t('contacts.syncing.loadingStatus1', { total: totalContacts })
+    } else if (importStatus === ImportContactsStatus.Matchmaking) {
+      subHeaderText = t('contacts.syncing.loadingStatus2')
+    } else {
+      subHeaderText = t('contacts.syncing.loadingStatus0')
+    }
+
+    return (
+      <View style={styles.statusContainer}>
+        <LoadingSpinner />
+        <View style={styles.statusTextContainer}>
+          <Text style={styles.statusText}>{t('contacts.syncing.loadingHeader')}</Text>
+          <Text style={styles.subStatusText}>{subHeaderText}</Text>
+        </View>
+      </View>
+    )
+  }
+
+  function onFinish() {
+    navigate(Screens.OnboardingSuccessScreen)
+  }
+
+  const onPressConnect = async () => {
     CeloAnalytics.track(CustomEventNames.import_contacts)
     const hasGivenContactPermission = await requestContactsPermission()
     if (hasGivenContactPermission) {
@@ -44,23 +92,18 @@ function ImportContactsScreen({ route, navigation }: Props) {
     }
   }
 
-  function onFinish() {
-    navigate(Screens.OnboardingSuccessScreen)
-  }
-
-  function onToggleFindMeSwitch(value: boolean) {
+  const onToggleFindMeSwitch = (value: boolean) => {
     setFindMeSwitch(value)
   }
 
-  // If import has already been done, move user forward
-  // Eventually we will want to somehow allow users to prompt matchmaking
+  const onPressSkip = () => {
+    dispatch(denyImportContacts())
+    dispatch(cancelImportContacts())
+    navigate(Screens.OnboardingSuccessScreen)
+  }
+
   React.useEffect(() => {
-    if (importStatus === ImportContactsStatus.Done) {
-      const onFinishTimeout = setTimeout(onFinish, 2000)
-      return () => {
-        clearTimeout(onFinishTimeout)
-      }
-    }
+    navigation.setParams({ onPressSkip, importStatus })
   }, [])
 
   React.useEffect(() => {
@@ -79,32 +122,12 @@ function ImportContactsScreen({ route, navigation }: Props) {
     }
   }, [importContactsProgress])
 
-  let statusComponents
-  if (importStatus === ImportContactsStatus.Done) {
-    statusComponents = (
-      <>
-        <Checkmark />
-        {matchedContactsCount > 0 ? (
-          <Text style={styles.statusText}>
-            {t('contacts.syncing.successWithMatches', { matches: matchedContactsCount })}
-          </Text>
-        ) : (
-          <Text style={styles.statusText}>{t('contacts.syncing.successWithoutMatches')}</Text>
-        )}
-      </>
-    )
-  } else {
-    statusComponents = (
-      <>
-        <LoadingSpinner />
-        <Text style={styles.statusText}>{t('contacts.syncing.loading')}</Text>
-      </>
-    )
-  }
-
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+    <View style={styles.container}>
+      <ScrollView
+        style={headerHeight ? { marginTop: headerHeight } : undefined}
+        contentContainerStyle={[styles.scrollContainer, insets && { marginBottom: insets.bottom }]}
+      >
         <View>
           <Text style={styles.contactHeader} testID="ImportContactsScreenHeader">
             {t('contacts.header')}
@@ -125,32 +148,35 @@ function ImportContactsScreen({ route, navigation }: Props) {
             </>
           )}
         </View>
-        {importStatus > ImportContactsStatus.Stopped && (
-          <View style={styles.statusContainer}>{statusComponents}</View>
-        )}
+        {importStatus > ImportContactsStatus.Stopped && renderStatusContainer()}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   )
 }
 
-ImportContactsScreen.navigationOptions = ({ navigation }: ScreenProps) => ({
-  ...nuxNavigationOptionsNoBackButton,
-  headerTitle: () => (
-    <HeaderTitleWithSubtitle
-      title={i18n.t('onboarding:verificationEducation.title')}
-      subTitle={i18n.t('onboarding:step', { step: '5' })}
-    />
-  ),
-  headerRight: () => (
-    <TopBarTextButton
-      title={i18n.t('global:skip')}
-      testID="VerificationEducationSkip"
-      // tslint:disable-next-line: jsx-no-lambda
-      onPress={() => navigate(Screens.OnboardingSuccessScreen)}
-      titleStyle={{ color: colors.goldDark }}
-    />
-  ),
-})
+ImportContactsScreen.navigationOptions = ({ route }: ScreenProps) => {
+  const onPressSkip = route.params?.onPressSkip ? route.params.onPressSkip : () => null
+  const importDone = route.params?.importStatus === ImportContactsStatus.Done
+  return {
+    ...nuxNavigationOptionsNoBackButton,
+    headerTitle: () => (
+      <HeaderTitleWithSubtitle
+        title={i18n.t('onboarding:verificationEducation.title')}
+        subTitle={i18n.t('onboarding:step', { step: '5' })}
+      />
+    ),
+    headerRight: !importDone
+      ? () => (
+          <TopBarTextButton
+            title={i18n.t('global:skip')}
+            testID="ImportContactsSkip"
+            onPress={onPressSkip}
+            titleStyle={styles.skipButtonStyle}
+          />
+        )
+      : () => null,
+  }
+}
 
 export default ImportContactsScreen
 
@@ -167,7 +193,7 @@ const styles = StyleSheet.create({
   contactHeader: {
     ...fontStyles.h2,
     textAlign: 'left',
-    paddingTop: 48,
+    paddingTop: 8,
     paddingBottom: 16,
   },
   statusContainer: {
@@ -175,10 +201,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingVertical: 32,
   },
+  statusTextContainer: {
+    flex: 1,
+    paddingLeft: 16,
+  },
   statusText: {
-    ...fontStyles.regular500,
+    ...fontStyles.regular600,
     color: colors.onboardingBrownLight,
-    paddingLeft: 24,
+  },
+  subStatusText: {
+    ...fontStyles.small,
+    paddingTop: 2,
+    color: colors.onboardingBrownLight,
   },
   body: {
     ...fontStyles.regular500,
@@ -192,5 +226,8 @@ const styles = StyleSheet.create({
   switchText: {
     ...fontStyles.regular500,
     paddingLeft: 8,
+  },
+  skipButtonStyle: {
+    color: colors.goldDark,
   },
 })
