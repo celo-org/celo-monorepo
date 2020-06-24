@@ -28,7 +28,7 @@ The next steps will explain how to create a new VPC and a RDS Postgres database 
     ```
 
 1. [Create a RDS PostgreSQL DB](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_CreateDBInstance.html) (from the AWS web console).
-The database does not require public access and you should assing the VPC and security group previously created (or any other VPC and the security group if it is the case).
+The database does not require public access and you should accessing the VPC and security group previously created (or any other VPC and the security group if it is the case).
 
 For the DB Instance size, `Free tier` should be enough.
 
