@@ -96,6 +96,7 @@ export class DefaultRpcCaller implements RpcCaller {
       // the result itself specifies an error. Here, we extract the error in the
       // result.
       if (
+        result &&
         result.error != null &&
         typeof result.error !== 'string' &&
         result.error.message != null

@@ -22,6 +22,7 @@ export const vNeg1Schema = {
   },
   networkInfo: {
     connected: true,
+    rehydrated: true,
   },
   send: {
     isSending: false,
@@ -166,6 +167,7 @@ export const v0Schema = {
   },
   networkInfo: {
     connected: true,
+    rehydrated: true,
   },
   send: {
     isSending: false,
@@ -316,6 +318,7 @@ export const v1Schema = {
   transactions: {
     ...v0Schema.transactions,
     knownFeedTransactions: {},
+    recentTxRecipientsCache: {},
   },
   account: {
     ...v0Schema.account,

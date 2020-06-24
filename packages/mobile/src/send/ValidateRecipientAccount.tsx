@@ -336,4 +336,4 @@ const styles = StyleSheet.create({
 export default connect<StateProps, DispatchProps, OwnProps, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.sendFlow7)(ValidateRecipientAccount))
+)(withTranslation<Props>(Namespaces.sendFlow7)(ValidateRecipientAccount))

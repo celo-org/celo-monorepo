@@ -45,7 +45,11 @@ async function helmParameters(celoEnv: string) {
   ]
   if (isVmBased()) {
     params.push(
-      `--set web3Provider="http://${await getInternalTxNodeLoadBalancerIP(celoEnv)}:8545"`
+      `--set web3Provider="ws://${await getInternalTxNodeLoadBalancerIP(celoEnv)}:8546"`
+    )
+  } else {
+    params.push(
+      `--set web3Provider="ws://tx-nodes:8546"`
     )
   }
   return params

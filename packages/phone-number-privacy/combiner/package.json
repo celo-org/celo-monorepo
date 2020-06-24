@@ -17,9 +17,7 @@
     "build": "tsc -b .",
     "lint": "tslint --project .",
     "test": "jest --runInBand --testPathIgnorePatterns test/end-to-end",
-    "db:migrate": "NODE_ENV=production ts-node scripts/runMigrations.ts",
-    "keygen:single": "ts-node scripts/createBlsKeyPair.ts",
-    "keygen:threshold": "ts-node scripts/createThresholdBlsKeys.ts"
+    "db:migrate": "NODE_ENV=production ts-node scripts/run-migrations.ts"
   },
   "dependencies": {
     "@celo/contractkit": "0.4.5",

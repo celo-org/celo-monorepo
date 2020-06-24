@@ -320,7 +320,6 @@ const style = StyleSheet.create({
   },
   containerList: {
     flex: 1,
-    paddingLeft: 20,
     borderTopWidth: 1,
     borderColor: '#EEEEEE',
   },
@@ -348,4 +347,4 @@ const style = StyleSheet.create({
 export default connect<StateProps, DispatchProps, OwnProps, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.accountScreen10)(Account))
+)(withTranslation<Props>(Namespaces.accountScreen10)(Account))

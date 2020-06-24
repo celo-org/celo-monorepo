@@ -77,4 +77,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withTranslation(Namespaces.global)(AppLoading)
+export default withTranslation<Props>(Namespaces.global)(AppLoading)

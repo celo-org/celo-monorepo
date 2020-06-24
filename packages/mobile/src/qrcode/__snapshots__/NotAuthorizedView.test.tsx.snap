@@ -15,9 +15,9 @@ exports[`NotAuthorizedView renders correctly 1`] = `
     style={
       Object {
         "color": "#FFFFFF",
-        "fontFamily": "Inter-SemiBold",
-        "fontSize": 19,
-        "lineHeight": 26,
+        "fontFamily": "Jost-Medium",
+        "fontSize": 22,
+        "lineHeight": 28,
         "marginBottom": 8,
       }
     }

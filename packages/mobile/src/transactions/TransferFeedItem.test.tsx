@@ -41,6 +41,8 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -62,6 +64,8 @@ describe('transfer feed item renders correctly', () => {
           commentKey={mockPrivateDEK}
           addressToE164Number={{}}
           recipientCache={{}}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -83,6 +87,8 @@ describe('transfer feed item renders correctly', () => {
           commentKey={mockPrivateDEK2}
           addressToE164Number={{}}
           recipientCache={{}}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -104,6 +110,8 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -125,6 +133,8 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -146,6 +156,8 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -167,6 +179,8 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -188,6 +202,8 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -209,6 +225,40 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
+          {...getMockI18nProps()}
+        />
+      </Provider>
+    )
+    expect(tree).toMatchSnapshot()
+  })
+  it('for known sent invite', () => {
+    const mockStoredInviteDetails = {
+      timestamp: 10,
+      e164Number: mockInviteDetails.e164Number,
+      tempWalletAddress: '0x',
+      tempWalletPrivateKey: 'secretkey',
+      tempWalletRedeemed: false,
+      inviteCode: 'join me!',
+      inviteLink: 'joinme.com',
+    }
+    const tree = renderer.create(
+      <Provider store={mockStore}>
+        <TransferFeedItem
+          __typename="TokenTransfer"
+          status={TransactionStatus.Complete}
+          comment={''}
+          type={TokenTransactionType.InviteSent}
+          hash={'0x'}
+          amount={{ value: '-1', currencyCode: 'cUSD', localAmount: null }}
+          address={mockInviteDetails.e164Number}
+          timestamp={1}
+          commentKey={null}
+          addressToE164Number={mockAddressToE164Number}
+          recipientCache={{}}
+          recentTxRecipientsCache={{}}
+          invitees={[mockStoredInviteDetails]}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -230,6 +280,8 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -251,6 +303,8 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -272,6 +326,8 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={mockAddressToE164Number}
           recipientCache={mockRecipientCache}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -293,6 +349,8 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -314,6 +372,31 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={mockAddressToE164Number}
           recipientCache={mockRecipientCache}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
+          {...getMockI18nProps()}
+        />
+      </Provider>
+    )
+    expect(tree).toMatchSnapshot()
+  })
+  it('for known sent without recipient cache populated', () => {
+    const tree = renderer.create(
+      <Provider store={mockStore}>
+        <TransferFeedItem
+          __typename="TokenTransfer"
+          status={TransactionStatus.Complete}
+          comment={''}
+          type={TokenTransactionType.Sent}
+          hash={'0x'}
+          amount={{ value: '-100', currencyCode: 'cUSD', localAmount: null }}
+          address={mockAccount}
+          timestamp={1}
+          commentKey={null}
+          addressToE164Number={mockAddressToE164Number}
+          recipientCache={{}}
+          recentTxRecipientsCache={mockRecipientCache}
+          invitees={[]}
           {...getMockI18nProps()}
         />
       </Provider>

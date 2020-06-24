@@ -166,4 +166,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withTranslation(Namespaces.backupKeyFlow6)(BackupPhraseContainer)
+export default withTranslation<Props>(Namespaces.backupKeyFlow6)(BackupPhraseContainer)

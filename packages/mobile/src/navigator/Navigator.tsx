@@ -9,15 +9,11 @@ import AccountKeyEducation from 'src/account/AccountKeyEducation'
 import Analytics from 'src/account/Analytics'
 import DataSaver from 'src/account/DataSaver'
 import EditProfile from 'src/account/EditProfile'
-import FiatExchange from 'src/account/FiatExchange'
-import GoldEducation from 'src/account/GoldEducation'
-import Invite from 'src/account/Invite'
 import InviteReview from 'src/account/InviteReview'
 import Licenses from 'src/account/Licenses'
 import Profile from 'src/account/Profile'
 import { PincodeType } from 'src/account/reducer'
 import Security from 'src/account/Security'
-import Support from 'src/account/Support'
 import SupportContact from 'src/account/SupportContact'
 import { CustomEventNames } from 'src/analytics/constants'
 import AppLoading from 'src/app/AppLoading'
@@ -25,7 +21,6 @@ import Debug from 'src/app/Debug'
 import ErrorScreen from 'src/app/ErrorScreen'
 import UpgradeScreen from 'src/app/UpgradeScreen'
 import BackupComplete from 'src/backup/BackupComplete'
-import BackupIntroduction, { navOptionsForAccount } from 'src/backup/BackupIntroduction'
 import BackupPhrase, { navOptionsForBackupPhrase } from 'src/backup/BackupPhrase'
 import BackupQuiz, { navOptionsForQuiz } from 'src/backup/BackupQuiz'
 import BackupSocial from 'src/backup/BackupSocial'
@@ -40,6 +35,13 @@ import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmat
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
 import FeeExchangeEducation from 'src/exchange/FeeExchangeEducation'
+import FiatExchangeAmount, {
+  fiatExchangesAmountScreenOptions,
+} from 'src/fiatExchanges/FiatExchangeAmount'
+import FiatExchangeOptions, {
+  fiatExchangesOptionsScreenOptions,
+} from 'src/fiatExchanges/FiatExchangeOptions'
+import MoonPay, { moonPayOptions } from 'src/fiatExchanges/MoonPay'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import PhoneNumberLookupQuotaScreen from 'src/identity/PhoneNumberLookupQuotaScreen'
@@ -60,7 +62,6 @@ import {
   noHeader,
   noHeaderGestureDisabled,
   nuxNavigationOptions,
-  nuxNavigationOptionsNoBackButton,
 } from 'src/navigator/Headers.v2'
 import { navigateBack, navigateToExchangeHome } from 'src/navigator/NavigationService'
 import QRNavigator from 'src/navigator/QRNavigator'
@@ -101,7 +102,6 @@ import { ExtractProps } from 'src/utils/typescript'
 import VerificationEducationScreen from 'src/verify/VerificationEducationScreen'
 import VerificationInputScreen from 'src/verify/VerificationInputScreen'
 import VerificationInterstitialScreen from 'src/verify/VerificationInterstitialScreen'
-import VerificationLearnMoreScreen from 'src/verify/VerificationLearnMoreScreen'
 import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
 
 const Stack = createStackNavigator<StackParamList>()
@@ -142,11 +142,7 @@ const verificationScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen
         name={Screens.VerificationEducationScreen}
         component={VerificationEducationScreen}
-        options={nuxNavigationOptions}
-      />
-      <Navigator.Screen
-        name={Screens.VerificationLearnMoreScreen}
-        component={VerificationLearnMoreScreen}
+        options={VerificationEducationScreen.navigationOptions}
       />
       <Navigator.Screen
         name={Screens.VerificationLoadingScreen}
@@ -160,6 +156,7 @@ const verificationScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen
         name={Screens.VerificationInputScreen}
         component={VerificationInputScreen}
+        options={VerificationInputScreen.navigationOptions}
       />
     </>
   )
@@ -210,7 +207,7 @@ const nuxScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen
       name={Screens.EnterInviteCode}
       component={EnterInviteCode}
-      options={nuxNavigationOptionsNoBackButton}
+      options={EnterInviteCode.navigationOptions}
     />
     <Navigator.Screen
       name={Screens.ImportWallet}
@@ -361,11 +358,6 @@ const exchangeScreens = (Navigator: typeof Stack) => (
 const backupScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen
-      name={Screens.BackupIntroduction}
-      component={BackupIntroduction}
-      options={navOptionsForAccount}
-    />
-    <Navigator.Screen
       name={Screens.AccountKeyEducation}
       component={AccountKeyEducation}
       options={noHeader}
@@ -401,7 +393,6 @@ const settingsScreens = (Navigator: typeof Stack) => (
       component={EditProfile}
     />
     <Navigator.Screen options={headerWithBackButton} name={Screens.Profile} component={Profile} />
-    <Navigator.Screen options={headerWithBackButton} name={Screens.Invite} component={Invite} />
     <Navigator.Screen
       options={headerWithBackButton}
       name={Screens.InviteReview}
@@ -413,17 +404,22 @@ const settingsScreens = (Navigator: typeof Stack) => (
       component={SelectLocalCurrency}
     />
     <Navigator.Screen options={headerWithBackButton} name={Screens.Licenses} component={Licenses} />
-    <Navigator.Screen options={headerWithBackButton} name={Screens.Support} component={Support} />
     <Navigator.Screen
       options={headerWithBackButton}
       name={Screens.SupportContact}
       component={SupportContact}
     />
     <Navigator.Screen
-      options={headerWithBackButton}
-      name={Screens.FiatExchange}
-      component={FiatExchange}
+      options={fiatExchangesAmountScreenOptions}
+      name={Screens.FiatExchangeAmount}
+      component={FiatExchangeAmount}
     />
+    <Navigator.Screen
+      options={fiatExchangesOptionsScreenOptions}
+      name={Screens.FiatExchangeOptions}
+      component={FiatExchangeOptions}
+    />
+    <Navigator.Screen options={moonPayOptions} name={Screens.MoonPay} component={MoonPay} />
   </>
 )
 
@@ -451,7 +447,6 @@ const generalScreens = (Navigator: typeof Stack) => (
       component={TransactionReview}
       options={transactionReviewOptions}
     />
-    <Navigator.Screen name={Screens.GoldEducation} component={GoldEducation} options={noHeader} />
     <Navigator.Screen name={Screens.FeeEducation} component={FeeEducation} />
   </>
 )
