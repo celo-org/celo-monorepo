@@ -80,7 +80,7 @@ First we will create the `assume-role` policy that allows ECS tasks to be assign
     aws iam --region us-east-2 create-role --role-name signerTaskExecutionRole --assume-role-policy-document file:///tmp/task-execution-assume-role.json
     ```
 
-    Finally we create the policy assigned to this task-role that allows to get secrets from AWS Secret Manager, an attach that policy to the task role. Please take attention to replace the correct secret arn in the policy.
+    Finally we create the policy assigned to this task-role that allows retrieval of secrets from AWS Secret Manager. Then we attach that policy to the task role. 
 
     ```bash
     cat <<'EOF' > /tmp/secret-manager-signer-policy.json
