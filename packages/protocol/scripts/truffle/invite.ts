@@ -7,7 +7,7 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import BigNumber from 'bignumber.js'
 import * as twilio from 'twilio'
-import { AttestationsInstance, EscrowInstance, GoldTokenInstance, StableTokenInstance } from 'types'
+import { AttestationsInstance, EscrowInstance, CeloTokenInstance, StableTokenInstance } from 'types'
 import Web3 from 'web3'
 
 const truffle = require('@celo/protocol/truffle-config.js')
@@ -47,7 +47,7 @@ module.exports = async (callback: (error?: any) => number) => {
     )
 
     logTime('Getting Gold token...')
-    const goldTokenPromise = getDeployedProxiedContract<GoldTokenInstance>('GoldToken', artifacts)
+    const celoTokenPromise = getDeployedProxiedContract<CeloTokenInstance>('CeloToken', artifacts)
     logTime('Getting stable token...')
     const stableTokenPromise = getDeployedProxiedContract<StableTokenInstance>(
       'StableToken',
@@ -58,7 +58,7 @@ module.exports = async (callback: (error?: any) => number) => {
 
     logTime('Waiting for contracts...')
     const attestations = await attestationPromise
-    const goldToken = await goldTokenPromise
+    const celoToken = await celoTokenPromise
     const stableToken = await stableTokenPromise
     const escrow = await escrowPromise
     logTime('Contracts received')
@@ -71,7 +71,7 @@ module.exports = async (callback: (error?: any) => number) => {
 
     logTime('Creating invite code...')
     const inviteCodeReturn = await createInviteCode(
-      goldToken,
+      celoToken,
       stableToken,
       invitationStableTokenAmount,
       network.gasPrice,

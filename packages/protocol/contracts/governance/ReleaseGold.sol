@@ -209,7 +209,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     releaseSchedule.releaseStartTime = releaseStartTime;
     // Expiry is opt-in for folks who can validate, opt-out for folks who cannot.
     // This is because folks who are running Validators or Groups are likely to want to keep
-    // cGLD in the ReleaseGold contract even after it becomes withdrawable.
+    // CELO in the ReleaseGold contract even after it becomes withdrawable.
     revocationInfo.canExpire = !canValidate;
     require(releaseSchedule.numReleasePeriods >= 1, "There must be at least one releasing period");
     require(
@@ -504,12 +504,12 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   /**
    * @notice Funds a signer address so that transaction fees can be paid.
    * @param signer The signer address to fund.
-   * @dev Note that this effectively decreases the total balance by 1 cGLD.
+   * @dev Note that this effectively decreases the total balance by 1 CELO.
    */
   function fundSigner(address payable signer) private {
-    // Fund signer account with 1 cGLD.
+    // Fund signer account with 1 CELO.
     uint256 value = 1 ether;
-    require(address(this).balance >= value, "no available cGLD to fund signer");
+    require(address(this).balance >= value, "no available CELO to fund signer");
     signer.transfer(value);
     require(getRemainingTotalBalance() > 0, "no remaining balance");
   }

@@ -70,7 +70,7 @@ const getLesserAndGreater = (
  * csv: Filepath to csv of (timestamp, stableValue, goldValue) tuples
  * network: name of the network defined in truffle-config.js to set the exchange rate on
  * stableValue: StableToken component of exchange rate
- * goldValue: GoldToken component of exchange rate
+ * goldValue: CeloToken component of exchange rate
  *
  * Run using truffle exec, e.g.:
  * truffle exec scripts/truffle/set_exchange_rate.js --network development \

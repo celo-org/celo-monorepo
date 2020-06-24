@@ -1,5 +1,5 @@
 import { getDeployedProxiedContract, getERC20TokenBalance } from '@celo/protocol/lib/web3-utils'
-import { GoldTokenInstance, StableTokenInstance } from 'types'
+import { CeloTokenInstance, StableTokenInstance } from 'types'
 
 /*
  * A simple script to check token balances on a testnet.
@@ -18,7 +18,7 @@ module.exports = async (callback: (error?: any) => number) => {
       string: ['account'],
     })
 
-    const goldToken = await getDeployedProxiedContract<GoldTokenInstance>('GoldToken', artifacts)
+    const celoToken = await getDeployedProxiedContract<CeloTokenInstance>('CeloToken', artifacts)
     const stableToken = await getDeployedProxiedContract<StableTokenInstance>(
       'StableToken',
       artifacts
@@ -26,7 +26,7 @@ module.exports = async (callback: (error?: any) => number) => {
 
     // tslint:disable
     console.log('StableToken balance:', await getERC20TokenBalance(argv.account, stableToken))
-    console.log('GoldToken balance:', await getERC20TokenBalance(argv.account, goldToken))
+    console.log('CeloToken balance:', await getERC20TokenBalance(argv.account, celoToken))
     // tslint:enable
     callback()
   } catch (error) {

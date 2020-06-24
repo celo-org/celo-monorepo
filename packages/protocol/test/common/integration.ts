@@ -16,7 +16,7 @@ import BigNumber from 'bignumber.js'
 import {
   ElectionInstance,
   ExchangeInstance,
-  GoldTokenInstance,
+  CeloTokenInstance,
   GovernanceApproverMultiSigInstance,
   GovernanceInstance,
   GovernanceSlasherInstance,
@@ -389,7 +389,7 @@ contract('Integration: Exchange', (accounts: string[]) => {
   let exchange: ExchangeInstance
   let multiSig: ReserveSpenderMultiSigInstance
   let reserve: ReserveInstance
-  let goldToken: GoldTokenInstance
+  let celoToken: CeloTokenInstance
   let stableToken: StableTokenInstance
   let originalStable
   let originalGold
@@ -404,20 +404,20 @@ contract('Integration: Exchange', (accounts: string[]) => {
     exchange = await getDeployedProxiedContract('Exchange', artifacts)
     multiSig = await getDeployedProxiedContract('ReserveSpenderMultiSig', artifacts)
     reserve = await getDeployedProxiedContract('Reserve', artifacts)
-    goldToken = await getDeployedProxiedContract('GoldToken', artifacts)
+    celoToken = await getDeployedProxiedContract('CeloToken', artifacts)
     stableToken = await getDeployedProxiedContract('StableToken', artifacts)
   })
 
   describe('When selling gold', () => {
     before(async () => {
       originalStable = await stableToken.balanceOf(accounts[0])
-      originalGold = await goldToken.balanceOf(accounts[0])
-      originalReserve = await goldToken.balanceOf(reserve.address)
-      await goldToken.approve(exchange.address, sellAmount)
+      originalGold = await celoToken.balanceOf(accounts[0])
+      originalReserve = await celoToken.balanceOf(reserve.address)
+      await celoToken.approve(exchange.address, sellAmount)
       await exchange.exchange(sellAmount, minBuyAmount, true)
       finalStable = await stableToken.balanceOf(accounts[0])
-      finalGold = await goldToken.balanceOf(accounts[0])
-      finalReserve = await goldToken.balanceOf(reserve.address)
+      finalGold = await celoToken.balanceOf(accounts[0])
+      finalReserve = await celoToken.balanceOf(reserve.address)
     })
 
     it(`should increase user's stable`, async () => {
@@ -443,14 +443,14 @@ contract('Integration: Exchange', (accounts: string[]) => {
   describe('When selling stable token', () => {
     before(async () => {
       originalStable = await stableToken.balanceOf(accounts[0])
-      originalGold = await goldToken.balanceOf(accounts[0])
-      originalReserve = await goldToken.balanceOf(reserve.address)
+      originalGold = await celoToken.balanceOf(accounts[0])
+      originalReserve = await celoToken.balanceOf(reserve.address)
       await stableToken.approve(exchange.address, sellAmount)
       // Cannot sell more than was purchased in the previous test.
       await exchange.exchange(sellAmount.div(20), minBuyAmount, false)
       finalStable = await stableToken.balanceOf(accounts[0])
-      finalGold = await goldToken.balanceOf(accounts[0])
-      finalReserve = await goldToken.balanceOf(reserve.address)
+      finalGold = await celoToken.balanceOf(accounts[0])
+      finalReserve = await celoToken.balanceOf(reserve.address)
     })
 
     it(`should reduce user's stable`, async () => {
@@ -470,8 +470,8 @@ contract('Integration: Exchange', (accounts: string[]) => {
     const otherReserveAddress = '0x7457d5E02197480Db681D3fdF256c7acA21bDc12'
     let originalOtherAccount
     beforeEach(async () => {
-      originalReserve = await goldToken.balanceOf(reserve.address)
-      originalOtherAccount = await goldToken.balanceOf(otherReserveAddress)
+      originalReserve = await celoToken.balanceOf(reserve.address)
+      originalOtherAccount = await celoToken.balanceOf(otherReserveAddress)
     })
 
     it(`should transfer gold`, async () => {
@@ -483,12 +483,12 @@ contract('Integration: Exchange', (accounts: string[]) => {
         from: accounts[0],
       })
       assert.isTrue(
-        (await goldToken.balanceOf(reserve.address)).isEqualTo(
+        (await celoToken.balanceOf(reserve.address)).isEqualTo(
           originalReserve.minus(transferAmount)
         )
       )
       assert.isTrue(
-        (await goldToken.balanceOf(otherReserveAddress)).isEqualTo(
+        (await celoToken.balanceOf(otherReserveAddress)).isEqualTo(
           originalOtherAccount.plus(transferAmount)
         )
       )

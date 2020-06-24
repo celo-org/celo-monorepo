@@ -40,7 +40,7 @@ contract('Reserve', (accounts: string[]) => {
   const aTobinTaxReserveRatio = toFixed(2)
   const aDailySpendingRatio: string = '1000000000000000000000000'
   const sortedOraclesDenominator = new BigNumber('0x10000000000000000')
-  const initialAssetAllocationSymbols = [web3.utils.padRight(web3.utils.utf8ToHex('cGLD'), 64)]
+  const initialAssetAllocationSymbols = [web3.utils.padRight(web3.utils.utf8ToHex('CELO'), 64)]
   const initialAssetAllocationWeights = [toFixed(1)]
   beforeEach(async () => {
     reserve = await Reserve.new()
@@ -333,7 +333,7 @@ contract('Reserve', (accounts: string[]) => {
 
   describe('#getOrComputeTobinTax()', () => {
     const newAssetAllocationSymbols = [
-      web3.utils.padRight(web3.utils.utf8ToHex('cGLD'), 64),
+      web3.utils.padRight(web3.utils.utf8ToHex('CELO'), 64),
       web3.utils.padRight(web3.utils.utf8ToHex('empty'), 64),
     ]
     const newAssetAllocationWeights = [
@@ -586,7 +586,7 @@ contract('Reserve', (accounts: string[]) => {
 
   describe('#setAssetAllocations', () => {
     const newAssetAllocationSymbols = [
-      web3.utils.padRight(web3.utils.utf8ToHex('cGLD'), 64),
+      web3.utils.padRight(web3.utils.utf8ToHex('CELO'), 64),
       web3.utils.padRight(web3.utils.utf8ToHex('BTC'), 64),
       web3.utils.padRight(web3.utils.utf8ToHex('ETH'), 64),
     ]
@@ -612,7 +612,7 @@ contract('Reserve', (accounts: string[]) => {
       const assetAllocationWeights = await reserve.getAssetAllocationWeights()
       assert.equal(assetAllocationSymbols.length, newAssetAllocationSymbols.length)
       assert.equal(assetAllocationWeights.length, newAssetAllocationWeights.length)
-      assert.equal(web3.utils.hexToUtf8(assetAllocationSymbols[0]), 'cGLD')
+      assert.equal(web3.utils.hexToUtf8(assetAllocationSymbols[0]), 'CELO')
       assert.equal(web3.utils.hexToUtf8(assetAllocationSymbols[1]), 'BTC')
       assert.equal(web3.utils.hexToUtf8(assetAllocationSymbols[2]), 'ETH')
       assert.equal(newAssetAllocationWeights[0].isEqualTo(assetAllocationWeights[0]), true)
@@ -638,7 +638,7 @@ contract('Reserve', (accounts: string[]) => {
       assert.equal(events[0].event, 'AssetAllocationSet')
       assert.equal(events[0].args.symbols.length, 3)
       assert.equal(events[0].args.weights.length, 3)
-      assert.equal(web3.utils.hexToUtf8(events[0].args.symbols[0]), 'cGLD')
+      assert.equal(web3.utils.hexToUtf8(events[0].args.symbols[0]), 'CELO')
       assert.equal(web3.utils.hexToUtf8(events[0].args.symbols[1]), 'BTC')
       assert.equal(web3.utils.hexToUtf8(events[0].args.symbols[2]), 'ETH')
       assert.equal(newAssetAllocationWeights[0].isEqualTo(events[0].args.weights[0]), true)
@@ -658,7 +658,7 @@ contract('Reserve', (accounts: string[]) => {
 
     it('should fail if the asset allocation includes multiple weights for one symbol', async () => {
       const badAssetAllocationSymbols = newAssetAllocationSymbols
-      badAssetAllocationSymbols[1] = web3.utils.padRight(web3.utils.utf8ToHex('cGLD'), 64)
+      badAssetAllocationSymbols[1] = web3.utils.padRight(web3.utils.utf8ToHex('CELO'), 64)
       await assertRevert(
         reserve.setAssetAllocations(badAssetAllocationSymbols, newAssetAllocationWeights)
       )
@@ -666,7 +666,7 @@ contract('Reserve', (accounts: string[]) => {
       assert.equal(assetAllocationWeights.length, initialAssetAllocationWeights.length)
     })
 
-    it("should fail if the asset allocation doesn't include cGLD", async () => {
+    it("should fail if the asset allocation doesn't include CELO", async () => {
       const badAssetAllocationSymbols = newAssetAllocationSymbols
       badAssetAllocationSymbols[0] = web3.utils.padRight(web3.utils.utf8ToHex('empty'), 64)
       await assertRevert(
@@ -681,7 +681,7 @@ contract('Reserve', (accounts: string[]) => {
     let mockStableToken: MockStableTokenInstance
     let reserveGoldBalance: BigNumber
     const exchangeRate = 10
-    const newAssetAllocationSymbols = [web3.utils.padRight(web3.utils.utf8ToHex('cGLD'), 64)]
+    const newAssetAllocationSymbols = [web3.utils.padRight(web3.utils.utf8ToHex('CELO'), 64)]
     const newAssetAllocationWeights = [new BigNumber(10).pow(24)]
 
     beforeEach(async () => {

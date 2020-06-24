@@ -13,8 +13,8 @@ import {
   ExchangeInstance,
   FreezerContract,
   FreezerInstance,
-  GoldTokenContract,
-  GoldTokenInstance,
+  CeloTokenContract,
+  CeloTokenInstance,
   MockReserveContract,
   MockReserveInstance,
   MockSortedOraclesContract,
@@ -27,7 +27,7 @@ import {
 
 const Exchange: ExchangeContract = artifacts.require('Exchange')
 const Freezer: FreezerContract = artifacts.require('Freezer')
-const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
+const CeloToken: CeloTokenContract = artifacts.require('CeloToken')
 const MockSortedOracles: MockSortedOraclesContract = artifacts.require('MockSortedOracles')
 const MockReserve: MockReserveContract = artifacts.require('MockReserve')
 const Registry: RegistryContract = artifacts.require('Registry')
@@ -41,14 +41,14 @@ Exchange.numberFormat = 'BigNumber'
 // @ts-ignore
 MockReserve.numberFormat = 'BigNumber'
 // @ts-ignore
-GoldToken.numberFormat = 'BigNumber'
+CeloToken.numberFormat = 'BigNumber'
 
 contract('Exchange', (accounts: string[]) => {
   let exchange: ExchangeInstance
   let freezer: FreezerInstance
   let registry: RegistryInstance
   let stableToken: StableTokenInstance
-  let goldToken: GoldTokenInstance
+  let celoToken: CeloTokenInstance
   let mockSortedOracles: MockSortedOraclesInstance
   let mockReserve: MockReserveInstance
 
@@ -84,7 +84,7 @@ contract('Exchange', (accounts: string[]) => {
   }
 
   async function fundReserve() {
-    // Would have used goldToken here, but ran into issues of inability to transfer
+    // Would have used celoToken here, but ran into issues of inability to transfer
     // TODO: Remove in https://github.com/celo-org/celo-monorepo/issues/2000
     await web3.eth.sendTransaction({
       from: accounts[0],
@@ -95,16 +95,16 @@ contract('Exchange', (accounts: string[]) => {
 
   beforeEach(async () => {
     freezer = await Freezer.new()
-    goldToken = await GoldToken.new()
+    celoToken = await CeloToken.new()
     mockReserve = await MockReserve.new()
     stableToken = await StableToken.new()
     registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
-    await registry.setAddressFor(CeloContractName.GoldToken, goldToken.address)
+    await registry.setAddressFor(CeloContractName.CeloToken, celoToken.address)
     await registry.setAddressFor(CeloContractName.Reserve, mockReserve.address)
-    await mockReserve.setGoldToken(goldToken.address)
+    await mockReserve.setCeloToken(celoToken.address)
 
-    await goldToken.initialize(registry.address)
+    await celoToken.initialize(registry.address)
     // TODO: use MockStableToken for this
     await stableToken.initialize(
       'Celo Dollar',
@@ -380,9 +380,9 @@ contract('Exchange', (accounts: string[]) => {
     const user = accounts[1]
 
     describe('when exchanging gold for stable', () => {
-      const goldTokenAmount = unit.div(500).integerValue(BigNumber.ROUND_FLOOR)
+      const celoTokenAmount = unit.div(500).integerValue(BigNumber.ROUND_FLOOR)
       const expectedStableBalance = getBuyTokenAmount(
-        goldTokenAmount,
+        celoTokenAmount,
         initialGoldBucket,
         initialStableBucket
       )
@@ -391,14 +391,14 @@ contract('Exchange', (accounts: string[]) => {
       let oldTotalSupply: BigNumber
       beforeEach(async () => {
         oldTotalSupply = await stableToken.totalSupply()
-        oldReserveGoldBalance = await goldToken.balanceOf(mockReserve.address)
-        await goldToken.approve(exchange.address, goldTokenAmount, { from: user })
-        oldGoldBalance = await goldToken.balanceOf(user)
+        oldReserveGoldBalance = await celoToken.balanceOf(mockReserve.address)
+        await celoToken.approve(exchange.address, celoTokenAmount, { from: user })
+        oldGoldBalance = await celoToken.balanceOf(user)
       })
 
       it(`should increase the user's stable balance`, async () => {
         await exchange.exchange(
-          goldTokenAmount,
+          celoTokenAmount,
           expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
           true,
           {
@@ -411,15 +411,15 @@ contract('Exchange', (accounts: string[]) => {
 
       it(`should decrease the user's gold balance`, async () => {
         await exchange.exchange(
-          goldTokenAmount,
+          celoTokenAmount,
           expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
           true,
           {
             from: user,
           }
         )
-        const actualGoldBalance = await goldToken.balanceOf(user)
-        let expectedGoldBalance = oldGoldBalance.minus(goldTokenAmount)
+        const actualGoldBalance = await celoToken.balanceOf(user)
+        let expectedGoldBalance = oldGoldBalance.minus(celoTokenAmount)
         const block = await web3.eth.getBlock('latest')
         if (isSameAddress(block.miner, user)) {
           const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
@@ -430,33 +430,33 @@ contract('Exchange', (accounts: string[]) => {
 
       it(`should remove the user's allowance`, async () => {
         await exchange.exchange(
-          goldTokenAmount,
+          celoTokenAmount,
           expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
           true,
           {
             from: user,
           }
         )
-        const allowance = await goldToken.allowance(user, exchange.address)
+        const allowance = await celoToken.allowance(user, exchange.address)
         assert.isTrue(allowance.isZero())
       })
 
       it(`should increase the Reserve's balance`, async () => {
         await exchange.exchange(
-          goldTokenAmount,
+          celoTokenAmount,
           expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
           true,
           {
             from: user,
           }
         )
-        const newReserveGoldBalance = await goldToken.balanceOf(mockReserve.address)
-        assert.isTrue(newReserveGoldBalance.eq(oldReserveGoldBalance.plus(goldTokenAmount)))
+        const newReserveGoldBalance = await celoToken.balanceOf(mockReserve.address)
+        assert.isTrue(newReserveGoldBalance.eq(oldReserveGoldBalance.plus(celoTokenAmount)))
       })
 
       it('should increase the total StableToken supply', async () => {
         await exchange.exchange(
-          goldTokenAmount,
+          celoTokenAmount,
           expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
           true,
           {
@@ -469,7 +469,7 @@ contract('Exchange', (accounts: string[]) => {
 
       it('should affect token supplies', async () => {
         await exchange.exchange(
-          goldTokenAmount,
+          celoTokenAmount,
           expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
           true,
           {
@@ -477,7 +477,7 @@ contract('Exchange', (accounts: string[]) => {
           }
         )
         const [mintableStable, tradeableGold] = await exchange.getBuyAndSellBuckets(true)
-        const expectedTradeableGold = initialGoldBucket.plus(goldTokenAmount)
+        const expectedTradeableGold = initialGoldBucket.plus(celoTokenAmount)
         const expectedMintableStable = initialStableBucket.minus(expectedStableBalance)
         assertEqualBN(tradeableGold, expectedTradeableGold)
         assertEqualBN(mintableStable, expectedMintableStable)
@@ -485,7 +485,7 @@ contract('Exchange', (accounts: string[]) => {
 
       it('should emit an Exchanged event', async () => {
         const exchangeTx = await exchange.exchange(
-          goldTokenAmount,
+          celoTokenAmount,
           expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
           true,
           {
@@ -500,7 +500,7 @@ contract('Exchange', (accounts: string[]) => {
           event: 'Exchanged',
           args: {
             exchanger: user,
-            sellAmount: goldTokenAmount,
+            sellAmount: celoTokenAmount,
             buyAmount: expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
             soldGold: true,
           },
@@ -510,7 +510,7 @@ contract('Exchange', (accounts: string[]) => {
       it('should revert without sufficient approvals', async () => {
         await assertRevert(
           exchange.exchange(
-            goldTokenAmount.plus(1),
+            celoTokenAmount.plus(1),
             expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
             true,
             {
@@ -523,7 +523,7 @@ contract('Exchange', (accounts: string[]) => {
       it('should revert if the minBuyAmount could not be satisfied', async () => {
         await assertRevert(
           exchange.exchange(
-            goldTokenAmount,
+            celoTokenAmount,
             expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR).plus(1),
             true,
             {
@@ -549,14 +549,14 @@ contract('Exchange', (accounts: string[]) => {
 
         describe('when the oldest oracle report is not expired', () => {
           const expectedStableAmount = getBuyTokenAmount(
-            goldTokenAmount,
+            celoTokenAmount,
             updatedGoldBucket,
             updatedStableBucket
           )
 
           it('the exchange should succeed', async () => {
             await exchange.exchange(
-              goldTokenAmount,
+              celoTokenAmount,
               expectedStableAmount.integerValue(BigNumber.ROUND_FLOOR),
               true,
               {
@@ -569,7 +569,7 @@ contract('Exchange', (accounts: string[]) => {
 
           it('should update the buckets', async () => {
             await exchange.exchange(
-              goldTokenAmount,
+              celoTokenAmount,
               expectedStableAmount.integerValue(BigNumber.ROUND_FLOOR),
               true,
               {
@@ -582,7 +582,7 @@ contract('Exchange', (accounts: string[]) => {
             // The new value should be the updatedGoldBucket value, which is 2x the
             // initial amount after fundReserve() is called, plus the amount of gold
             // that was paid in the exchange.
-            assertEqualBN(newGoldBucket, updatedGoldBucket.plus(goldTokenAmount))
+            assertEqualBN(newGoldBucket, updatedGoldBucket.plus(celoTokenAmount))
 
             // The new value should be the updatedStableBucket (derived from the new
             // Gold Bucket value), minus the amount purchased during the exchange
@@ -592,7 +592,7 @@ contract('Exchange', (accounts: string[]) => {
 
         describe('when the oldest oracle report is expired', () => {
           const expectedStableAmount = getBuyTokenAmount(
-            goldTokenAmount,
+            celoTokenAmount,
             initialGoldBucket,
             initialStableBucket
           )
@@ -603,7 +603,7 @@ contract('Exchange', (accounts: string[]) => {
 
           it('the exchange should succeed', async () => {
             await exchange.exchange(
-              goldTokenAmount,
+              celoTokenAmount,
               expectedStableAmount.integerValue(BigNumber.ROUND_FLOOR),
               true,
               {
@@ -616,7 +616,7 @@ contract('Exchange', (accounts: string[]) => {
 
           it('should not update the buckets', async () => {
             await exchange.exchange(
-              goldTokenAmount,
+              celoTokenAmount,
               expectedStableAmount.integerValue(BigNumber.ROUND_FLOOR),
               true,
               {
@@ -626,8 +626,8 @@ contract('Exchange', (accounts: string[]) => {
             const newGoldBucket = await exchange.goldBucket()
             const newStableBucket = await exchange.stableBucket()
 
-            // The new value should be the initialGoldBucket value plus the goldTokenAmount.
-            assertEqualBN(newGoldBucket, initialGoldBucket.plus(goldTokenAmount))
+            // The new value should be the initialGoldBucket value plus the celoTokenAmount.
+            assertEqualBN(newGoldBucket, initialGoldBucket.plus(celoTokenAmount))
 
             // The new value should be the initialStableBucket minus the amount purchased during the exchange
             assertEqualBN(newStableBucket, initialStableBucket.minus(expectedStableAmount))
@@ -650,9 +650,9 @@ contract('Exchange', (accounts: string[]) => {
         await stableToken.mint(user, stableTokenBalance)
         await registry.setAddressFor(CeloContractName.Exchange, exchange.address)
 
-        oldReserveGoldBalance = await goldToken.balanceOf(mockReserve.address)
+        oldReserveGoldBalance = await celoToken.balanceOf(mockReserve.address)
         await stableToken.approve(exchange.address, stableTokenBalance, { from: user })
-        oldGoldBalance = await goldToken.balanceOf(user)
+        oldGoldBalance = await celoToken.balanceOf(user)
       })
 
       it(`should decrease the user's stable balance`, async () => {
@@ -677,7 +677,7 @@ contract('Exchange', (accounts: string[]) => {
             from: user,
           }
         )
-        const actualGoldBalance = await goldToken.balanceOf(user)
+        const actualGoldBalance = await celoToken.balanceOf(user)
         let expectedGoldBalance = oldGoldBalance.plus(expectedGoldBalanceIncrease)
         const block = await web3.eth.getBlock('latest')
         if (isSameAddress(block.miner, user)) {
@@ -696,7 +696,7 @@ contract('Exchange', (accounts: string[]) => {
             from: user,
           }
         )
-        const allowance = await goldToken.allowance(user, exchange.address)
+        const allowance = await celoToken.allowance(user, exchange.address)
         assert.isTrue(allowance.isZero())
       })
 
@@ -709,7 +709,7 @@ contract('Exchange', (accounts: string[]) => {
             from: user,
           }
         )
-        const newReserveGoldBalance = await goldToken.balanceOf(mockReserve.address)
+        const newReserveGoldBalance = await celoToken.balanceOf(mockReserve.address)
         assert.isTrue(
           newReserveGoldBalance.eq(oldReserveGoldBalance.minus(expectedGoldBalanceIncrease))
         )
@@ -823,7 +823,7 @@ contract('Exchange', (accounts: string[]) => {
               from: user,
             }
           )
-          const newGoldBalance = await goldToken.balanceOf(user)
+          const newGoldBalance = await celoToken.balanceOf(user)
           assertEqualBN(newGoldBalance, oldGoldBalance.plus(expectedGoldAmount))
         })
 
@@ -880,7 +880,7 @@ contract('Exchange', (accounts: string[]) => {
       })
 
       it('should revert', async () => {
-        await goldToken.approve(exchange.address, 1000)
+        await celoToken.approve(exchange.address, 1000)
         await assertRevert(exchange.exchange(1000, 1, true))
       })
     })

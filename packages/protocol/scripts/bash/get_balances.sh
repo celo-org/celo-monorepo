@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Prints Gold, StableToken, and GoldToken balances for an account
+# Prints Gold, StableToken, and CeloToken balances for an account
 #
 # Flags:
 # -a: Address of the account whose balance should be printed

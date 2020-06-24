@@ -42,7 +42,7 @@ contract UsingRegistry is Ownable {
     abi.encodePacked("FeeCurrencyWhitelist")
   );
   bytes32 constant FREEZER_REGISTRY_ID = keccak256(abi.encodePacked("Freezer"));
-  bytes32 constant GOLD_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("GoldToken"));
+  bytes32 constant GOLD_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("CeloToken"));
   bytes32 constant GOVERNANCE_REGISTRY_ID = keccak256(abi.encodePacked("Governance"));
   bytes32 constant GOVERNANCE_SLASHER_REGISTRY_ID = keccak256(
     abi.encodePacked("GovernanceSlasher")
@@ -101,7 +101,7 @@ contract UsingRegistry is Ownable {
     return IFreezer(registry.getAddressForOrDie(FREEZER_REGISTRY_ID));
   }
 
-  function getGoldToken() internal view returns (IERC20) {
+  function getCeloToken() internal view returns (IERC20) {
     return IERC20(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
   }
 

@@ -32,7 +32,7 @@ contract Election is
 
   // 1e20 ensures that units can be represented as precisely as possible to avoid rounding errors
   // when translating to votes, without risking integer overflow.
-  // A maximum of 1,000,000,000 cGLD (1e27) yields a maximum of 1e47 units, whose product is at
+  // A maximum of 1,000,000,000 CELO (1e27) yields a maximum of 1e47 units, whose product is at
   // most 1e74, which is less than 2^256.
   uint256 private constant UNIT_PRECISION_FACTOR = 100000000000000000000;
 

@@ -5,7 +5,7 @@ import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { signTransaction } from '@celo/protocol/lib/signing-utils'
 import { Address, privateKeyToAddress } from '@celo/utils/lib/address'
 import { BigNumber } from 'bignumber.js'
-import { EscrowInstance, GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance, StableTokenInstance } from 'types'
+import { EscrowInstance, CeloTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance, StableTokenInstance } from 'types'
 import Web3 from 'web3'
 import { TransactionObject } from 'web3-eth'
 
@@ -49,7 +49,7 @@ export async function sendTransactionWithPrivateKey<T>(
 
 export async function convertFromContractDecimals(
   value: BigNumber | number,
-  contract: GoldTokenInstance | StableTokenInstance
+  contract: CeloTokenInstance | StableTokenInstance
 ) {
   const decimals = (await contract.decimals()).toNumber()
   const one = new BigNumber(10).pow(decimals)
@@ -82,7 +82,7 @@ export async function convertToContractDecimals(
 
 export async function getERC20TokenBalance(
   account: string,
-  contract: GoldTokenInstance | StableTokenInstance
+  contract: CeloTokenInstance | StableTokenInstance
 ) {
   return convertFromContractDecimals(await contract.balanceOf(account), contract)
 }
@@ -315,7 +315,7 @@ export async function transferOwnershipOfProxyAndImplementation<
 
 // TODO(asa): Share this code with mobile.
 export async function createInviteCode(
-  goldToken: GoldTokenInstance,
+  celoToken: CeloTokenInstance,
   stableToken: StableTokenInstance,
   invitationStableTokenAmount: BigNumber,
   gasPrice: number,
@@ -332,7 +332,7 @@ export async function createInviteCode(
   // Buffer.from doesn't expect a 0x for hex input
   const privateKeyHex = temporaryWalletAccount.privateKey.substring(2)
   const inviteCode = Buffer.from(privateKeyHex, 'hex').toString('base64')
-  await goldToken.transfer(temporaryAddress, verificationGasAmount.times(gasPrice).toString())
+  await celoToken.transfer(temporaryAddress, verificationGasAmount.times(gasPrice).toString())
   await stableToken.transfer(temporaryAddress, invitationStableTokenAmount.toString())
   return [temporaryAddress, inviteCode]
 }
