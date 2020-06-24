@@ -1,6 +1,6 @@
 # Validator Badges
 
-To help Celo Gold holders vote for secure, mission-aligned validator groups, the [Celo Validators Explorer](https://celo.org/validators/explore) will feature The Great Celo Stake Off, genesis, and Celo Foundation badges.
+To help CELO holders vote for secure, mission-aligned validator groups, the [Celo Validators Explorer](https://celo.org/validators/explore) will feature The Great Celo Stake Off, genesis, and Celo Foundation badges.
 
 ## Current Validator Badge Types
 
