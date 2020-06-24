@@ -116,6 +116,12 @@ if [ $PLATFORM = "android" ]; then
 
   startPackager
 
+  echo "Waiting for device to connect to Wifi, this is a good proxy the device is ready"
+  until [ `adb shell dumpsys wifi | grep "mNetworkInfo" | grep "state: CONNECTED" | wc -l` -gt 0 ]
+  do		
+    sleep 3		
+  done
+
   runTest
 
 elif [ $PLATFORM = "ios" ]; then
