@@ -25,7 +25,7 @@ import { fornoSelector } from 'src/web3/selectors'
 const gethEmitter = new NativeEventEmitter(NativeModules.RNGeth)
 
 const TAG = 'geth/saga'
-const INIT_GETH_TIMEOUT = 30000
+const INIT_GETH_TIMEOUT = 15000
 const NEW_BLOCK_TIMEOUT = 30000
 const GETH_MONITOR_DELAY = 5000
 
