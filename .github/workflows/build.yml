@@ -25,7 +25,11 @@ jobs:
             - run: yarn build --scope @celo/mobile --include-filtered-dependencies
             - uses: reactivecircus/android-emulator-runner@v2
               with:
-                  api-level: ${{ matrix.api-level }}
-                  arch: x86
-                  working-directory: ./packages/mobile
-                  script: yarn run test:e2e:android
+                api-level: ${{ matrix.api-level }}
+                arch: x86
+                avd-name: Nexus_5X_API_28_x86
+                emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+                working-directory: ./packages/mobile
+                script: |
+                  ./gradlew connectedCheck
+                  yarn run test:e2e:android
