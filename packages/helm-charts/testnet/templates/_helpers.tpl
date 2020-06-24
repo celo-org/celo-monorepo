@@ -118,6 +118,10 @@ spec:
       labels:
 {{ include "common.standard.labels" .  | indent 8 }}
         component: {{ .component_label }}
+{{ if .proxy | default false }}
+{{ $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+        validator-proxied: "{{ $validatorProxied }}"
+{{- end }}
     spec:
       initContainers:
 {{ include "common.init-genesis-container" .  | indent 6 }}
@@ -127,8 +131,6 @@ spec:
 {{ end }}
       containers:
 {{ include "common.full-node-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "proxy" .proxy "proxy_allow_private_ip_flag" .proxy_allow_private_ip_flag "unlock" .unlock "expose" .expose "syncmode" .syncmode "gcmode" .gcmode "public_ips" .public_ips "ethstats" (printf "%s-ethstats.%s" (include "common.fullname" .) .Release.Namespace))  | indent 6 }}
-{{ include "common.geth-exporter-container" .  | indent 6 }}
-{{ include "celo.prom-to-sd-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "component" "geth" "metricsPort" "9200" "metricsPath" "filteredmetrics" "containerNameLabel" .name )  | indent 6 }}
       volumes:
       - name: data
         emptyDir: {}
