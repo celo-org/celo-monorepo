@@ -34,7 +34,7 @@ The `Accounts` contract also allows for the authorization of various signer keys
 
 ### LockedGold
 
-[LockedGold.sol](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/LockedGold.sol) is used as part of Celo's [proof-of-stake](/../../celo-codebase/protocol/proof-of-stake/README.md) mechanism. Users can lock CELO by sending it to the `LockedGold` contract after creating an account via the `Accounts` contract as described above. This allows users to vote in validator elections, receive epoch rewards, and participate in on-chain governance.
+[LockedGold.sol](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/LockedGold.sol), which references Celo Gold, the deprecated name for the native token, is used as part of Celo's [proof-of-stake](/../../celo-codebase/protocol/proof-of-stake/README.md) mechanism. Users can lock CELO by sending it to the `LockedGold` contract after creating an account via the `Accounts` contract as described above. This allows users to vote in validator elections, receive epoch rewards, and participate in on-chain governance.
 
 There are two ways in which users can vote:
 
