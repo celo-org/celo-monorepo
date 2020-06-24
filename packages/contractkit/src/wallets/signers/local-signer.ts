@@ -2,7 +2,7 @@ import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 // @ts-ignore-next-line
 import { account as Account } from 'eth-lib'
 import * as ethUtil from 'ethereumjs-util'
-import { getHashFromEncoded, RLPEncodedTx } from '../../utils/signing-utils'
+import { decodeSig, getHashFromEncoded, RLPEncodedTx } from '../../utils/signing-utils'
 import { Signer } from './signer'
 
 /**
@@ -25,12 +25,7 @@ export class LocalSigner implements Signer {
   ): Promise<{ v: number; r: Buffer; s: Buffer }> {
     const hash = getHashFromEncoded(encodedTx.rlpEncode)
     const signature = Account.makeSigner(addToV)(hash, this.privateKey)
-    const [v, r, s] = Account.decodeSignature(signature)
-    return {
-      v: parseInt(v, 16),
-      r: ethUtil.toBuffer(r) as Buffer,
-      s: ethUtil.toBuffer(s) as Buffer,
-    }
+    return decodeSig(signature)
   }
 
   async signPersonalMessage(data: string): Promise<{ v: number; r: Buffer; s: Buffer }> {

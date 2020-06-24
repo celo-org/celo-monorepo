@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import threshold from 'blind-threshold-bls'
+import * as threshold from 'blind-threshold-bls'
 import btoa from 'btoa'
 import Web3 from 'web3'
 
