@@ -107,7 +107,7 @@ First we will create the `assume-role` policy that allows ECS tasks to be assign
     aws iam attach-role-policy --role-name signerTaskExecutionRole --policy-arn arn:aws:iam::{YOUR_ACCOUNT_ID}:policy/signerTaskAllowSecretManager
     ```
 
-    If you want to manage the RDS postgres permissions using IAM, you can add also in this policy the permissions to allow access to the signer task.
+    If you want to manage the RDS postgres permissions using IAM, you can also add permissions for signer access to this policy.
 
 1. Create ECS Fargate cluster
 
