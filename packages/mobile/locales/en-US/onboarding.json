@@ -49,5 +49,38 @@
   "importExistingKey": {
     "explanation": "Your Account Key is a 24-word phrase that you wrote down and saved when you set up your account. Please enter it here to restore your account.",
     "keyPlaceholder": "horse leopard dog monkey ..."
+  },
+  "verificationInput": {
+    "title": "Confirm",
+    "body": "We sent you three messages (SMS). Please copy and paste them below.",
+    "body_ios": "We sent you three messages (SMS). Please tap the link in each message to fill the codes below or copy and paste them manually.",
+    "codeLabel1": "First Code",
+    "codeLabel2": "Second Code",
+    "codeLabel3": "Third Code",
+    "codePlaceholder1": "Copy the first message",
+    "codePlaceholder1_ios": "Tap or copy the first message",
+    "codePlaceholder2": "Copy the second message",
+    "codePlaceholder2_ios": "Tap or copy the second message",
+    "codePlaceholder3": "Copy the third message",
+    "codePlaceholder3_ios": "Tap or copy the third message",
+    "codePlaceholderWithCodeInClipboard": "Great! Paste it here",
+    "typingTip": "Typing? Try copying and pasting"
+  },
+  "verificationInputHelpDialog": {
+    "title": "Help",
+    "bodySection1": {
+      "title": "Received all three messages?",
+      "content": "If your messages contain a link, simply tap the links to confirm.\n\nIf there are no links, please copy and paste the messages into the fields. You’re welcome to paste the entire message."
+    },
+    "bodySection2": {
+      "title": "Missing some or all messages?",
+      "defaultContent": "If you’re having trouble receiving messages, you can skip this step for now and try again later. Sometimes it can take a few minutes for messages to arrive.",
+      "content": "$t(verificationInputHelpDialog.bodySection2.defaultContent)",
+      "content_countdown": "$t(verificationInputHelpDialog.bodySection2.defaultContent) The skip option below will be available in {{count}} second.",
+      "content_countdown_plural": "$t(verificationInputHelpDialog.bodySection2.defaultContent) The skip option below will be available in {{count}} seconds."
+    },
+    "body": "<0>$t(verificationInputHelpDialog.bodySection1.title)</0>\n\n$t(verificationInputHelpDialog.bodySection1.content)\n\n<1>$t(verificationInputHelpDialog.bodySection2.title)</1>\n\n$t(verificationInputHelpDialog.bodySection2.content)",
+    "skip": "Skip for now",
+    "back": "Go Back"
   }
 }

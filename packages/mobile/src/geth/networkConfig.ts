@@ -44,7 +44,7 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     nodeDir: `.${Testnets.alfajoresstaging}`,
     syncMode: DEFAULT_SYNC_MODE,
     initiallyForno: FORNO_ENABLED_INITIALLY,
-    blockchainApiUrl: 'https://alfajoresstaging-dot-celo-testnet.appspot.com/',
+    blockchainApiUrl: 'https://alfajoresstaging-dot-celo-testnet.wl.r.appspot.com/',
     pgpnpUrl: pgpnpUrlStaging,
     pgpnpPubKey: pgpnpPubKeyStaging,
     signMoonpayUrl: signMoonpayUrlStaging,
