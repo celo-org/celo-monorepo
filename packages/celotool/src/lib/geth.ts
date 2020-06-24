@@ -944,7 +944,7 @@ export async function startGeth(
   }
 
   if (validator) {
-    gethArgs.push('--validator', validator)
+    gethArgs.push('--miner.validator', validator)
   }
 
   if (txFeeRecipient) {
