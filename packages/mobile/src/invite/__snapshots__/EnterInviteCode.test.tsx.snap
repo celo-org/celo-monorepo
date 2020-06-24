@@ -88,9 +88,12 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
                 "shadowOpacity": 1,
                 "shadowRadius": 8,
               },
-              Object {
-                "padding": 0,
-              },
+              Array [
+                Object {
+                  "padding": 0,
+                },
+                undefined,
+              ],
             ]
           }
         >
