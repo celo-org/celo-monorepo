@@ -14,7 +14,6 @@ jobs:
       matrix:
         java-version:
           - 1.8
-          - 9
 
     steps:
       - name: Checkout
@@ -29,4 +28,6 @@ jobs:
           java-version: ${{ matrix.java-version }}
 
       - name: Test
-        run: ./gradlew build
+        working-directory: ./packages/mobile
+        run: yarn build
+
