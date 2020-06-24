@@ -107,8 +107,8 @@ export type StackParamList = {
   [Screens.ImportContacts]:
     | undefined
     | {
-        onPressSkip: () => void
-        importStatus: ImportContactsStatus
+        onPressSkip?: () => void
+        importStatus?: ImportContactsStatus
       }
   [Screens.IncomingPaymentRequestListScreen]: undefined
   [Screens.Invite]: undefined

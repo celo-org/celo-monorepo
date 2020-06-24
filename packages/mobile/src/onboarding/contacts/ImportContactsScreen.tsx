@@ -103,10 +103,11 @@ function ImportContactsScreen({ route, navigation }: Props) {
   }
 
   React.useEffect(() => {
-    navigation.setParams({ onPressSkip, importStatus })
+    navigation.setParams({ onPressSkip })
   }, [])
 
   React.useEffect(() => {
+    navigation.setParams({ importStatus })
     const prevImportContactProgress = prevImportContactProgressRef.current
     const prevImportStatus = prevImportContactProgress.status
     prevImportContactProgressRef.current = importContactsProgress
