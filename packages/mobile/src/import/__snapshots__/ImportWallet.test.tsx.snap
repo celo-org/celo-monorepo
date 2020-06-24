@@ -43,9 +43,12 @@ exports[`ImportWallet renders correctly and is disabled with no text 1`] = `
               "shadowOpacity": 1,
               "shadowRadius": 8,
             },
-            Object {
-              "padding": 0,
-            },
+            Array [
+              Object {
+                "padding": 0,
+              },
+              undefined,
+            ],
           ]
         }
       >
