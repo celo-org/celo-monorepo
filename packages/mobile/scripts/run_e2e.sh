@@ -100,17 +100,6 @@ yarn react-native-kill-packager || echo "Failed to kill package manager, proceed
 if [ $PLATFORM = "android" ]; then
   echo "Using platform android"
 
-  if [ -z $ANDROID_HOME ]; then
-    echo "No Android SDK root set"
-    exit 1
-  fi
-
-  if [[ ! $($ANDROID_HOME/emulator/emulator -list-avds | grep ^$VD_NAME$) ]]; then
-    echo "AVD $VD_NAME not installed. Please install it or change the detox configuration in package.json"
-    echo "You can see the list of available installed devices with $ANDROID_HOME/emulator/emulator -list-avds"
-    exit 1
-  fi
-
   if [ "$RELEASE" = false ]; then
     CONFIG_NAME="android.emu.debug"
   else
@@ -127,25 +116,7 @@ if [ $PLATFORM = "android" ]; then
 
   startPackager
 
-  NUM_DEVICES=`adb devices -l | wc -l`
-  if [ $NUM_DEVICES -gt 2 ]; then
-    echo "Emulator already running or device attached. Please shutdown / remove first"
-    exit 1
-  fi
-
-  # echo "Starting the emulator"
-  # $ANDROID_HOME/emulator/emulator -avd $VD_NAME -no-boot-anim -netdelay $NET_DELAY &
-
-  echo "Waiting for device to connect to Wifi, this is a good proxy the device is ready"
-  until [ `adb shell dumpsys wifi | grep "mNetworkInfo" | grep "state: CONNECTED" | wc -l` -gt 0 ]
-  do
-    sleep 3
-  done
-
   runTest
-
-  echo "Closing emulator (if active)"
-  adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done
 
 elif [ $PLATFORM = "ios" ]; then
   echo "Using platform ios"
