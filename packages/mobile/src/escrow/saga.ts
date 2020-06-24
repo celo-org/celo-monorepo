@@ -113,7 +113,7 @@ function* withdrawFromEscrow() {
       contractKit.contracts.getEscrow,
     ])
     const account: string = yield call(getConnectedUnlockedAccount)
-    const tmpWalletPrivateKey: string = yield select(
+    const tmpWalletPrivateKey: string | null = yield select(
       (state: RootState) => state.invite.redeemedInviteCode
     )
 

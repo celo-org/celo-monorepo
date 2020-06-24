@@ -113,7 +113,7 @@ const commonScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen
         name={Screens.Language}
         component={Language}
-        options={headerWithBackButton}
+        options={Language.navigationOptions}
       />
       <Navigator.Screen
         name={Screens.PincodeEnter}
