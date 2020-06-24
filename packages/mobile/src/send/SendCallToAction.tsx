@@ -1,5 +1,4 @@
 import TextButton from '@celo/react-components/components/TextButton'
-import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
@@ -29,8 +28,6 @@ export function SendCallToAction(props: SendCTAProps) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    borderBottomColor: colors.listBorder,
-    borderBottomWidth: 1,
     paddingVertical: 15,
     paddingHorizontal: 20,
   },
