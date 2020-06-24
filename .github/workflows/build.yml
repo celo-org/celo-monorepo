@@ -26,4 +26,5 @@ jobs:
               with:
                   api-level: ${{ matrix.api-level }}
                   arch: x86
-                  script: ./gradlew connectedDebugAndroidTest
+                  working-directory: ./packages/mobile
+                  script: yarn run test:e2e:android
