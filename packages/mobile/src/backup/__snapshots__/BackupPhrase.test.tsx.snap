@@ -223,7 +223,7 @@ exports[`renders correctly with backup not completed 1`] = `
         style={
           Object {
             "alignItems": "center",
-            "backgroundColor": "#F5F4F0",
+            "backgroundColor": "#F1F0EB",
             "flexGrow": 1,
             "height": 48,
             "justifyContent": "center",

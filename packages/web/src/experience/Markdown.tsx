@@ -14,6 +14,11 @@ import InlineAnchor from 'src/shared/InlineAnchor'
 import { fonts, standardStyles } from 'src/styles'
 import { trackOpen, Types } from './eventkit/tracking'
 
+export interface Attributes {
+  title: string
+  description: string
+}
+
 function P({ children }) {
   return <Text style={[fonts.p, standardStyles.halfElement, styles.block]}>{children}</Text>
 }

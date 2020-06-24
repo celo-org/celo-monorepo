@@ -3,6 +3,8 @@ import { eventChannel } from 'redux-saga'
 import { call, cancel, cancelled, delay, fork, put, race, select, take } from 'redux-saga/effects'
 import { setPromptForno } from 'src/account/actions'
 import { promptFornoIfNeededSelector } from 'src/account/selectors'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import { waitForRehydrate } from 'src/app/saga'
 import { Actions, setGethConnected, setInitState } from 'src/geth/actions'
 import {
@@ -62,7 +64,9 @@ export function* waitForNextBlock() {
 
 function* waitForGethInstance() {
   try {
-    const gethInstance = yield call(getGeth)
+    const fornoMode = yield select(fornoSelector)
+    // get geth without syncing if fornoMode
+    const gethInstance = yield call(getGeth, !fornoMode)
     if (gethInstance == null) {
       throw new Error('geth instance is null')
     }
@@ -91,32 +95,33 @@ export function* initGethSaga() {
   })
 
   let restartAppAutomatically: boolean = false
+  let errorContext: string
   switch (result) {
     case GethInitOutcomes.SUCCESS: {
       Logger.debug(TAG, 'Geth initialized')
+      CeloAnalytics.track(CustomEventNames.geth_init_success)
       yield put(setInitState(InitializationState.INITIALIZED))
       return
     }
     case GethInitOutcomes.NETWORK_ERROR_FETCHING_STATIC_NODES: {
-      Logger.error(
-        TAG,
+      errorContext =
         'Could not fetch static nodes from the network. Tell user to check data connection.'
-      )
+      Logger.error(TAG, errorContext)
       yield put(setInitState(InitializationState.DATA_CONNECTION_MISSING_ERROR))
       restartAppAutomatically = false
       break
     }
     case GethInitOutcomes.NETWORK_ERROR_FETCHING_GENESIS_BLOCK: {
-      Logger.error(
-        TAG,
+      errorContext =
         'Could not fetch genesis block from the network. Tell user to check data connection.'
-      )
+      Logger.error(TAG, errorContext)
       yield put(setInitState(InitializationState.DATA_CONNECTION_MISSING_ERROR))
       restartAppAutomatically = false
       break
     }
     case GethInitOutcomes.IRRECOVERABLE_FAILURE: {
-      Logger.error(TAG, 'Could not initialize geth. Will retry.')
+      errorContext = 'Could not initialize geth. Will retry.'
+      Logger.error(TAG, errorContext)
       yield put(setInitState(InitializationState.INITIALIZE_ERROR))
       restartAppAutomatically = true
       break
@@ -125,18 +130,26 @@ export function* initGethSaga() {
     // a new enum value is added to GethInitOutcomes and doesn't have a case added
     // for it, the error will be misleading.
     default: {
-      Logger.error(TAG, 'Geth initializtion timed out. Will retry.')
+      errorContext = 'Geth initializtion timed out. Will retry.'
+      Logger.error(TAG, errorContext)
       yield put(setInitState(InitializationState.INITIALIZE_ERROR))
       restartAppAutomatically = true
     }
   }
 
+  CeloAnalytics.track(CustomEventNames.geth_init_failure, {
+    error: result,
+    context: errorContext,
+  })
+
   if (restartAppAutomatically) {
     Logger.error(TAG, 'Geth initialization failed, restarting the app.')
+    CeloAnalytics.track(CustomEventNames.geth_restart_to_fix_init)
     deleteChainDataAndRestartApp()
   } else {
     // Suggest switch to forno for network-related errors
     if (yield select(promptFornoIfNeededSelector)) {
+      CeloAnalytics.track(CustomEventNames.prompt_forno, { context: `Geth init error ${result}` })
       yield put(setPromptForno(false))
       navigate(Screens.DataSaver, { promptModalVisible: true })
     } else {
@@ -191,18 +204,20 @@ function* monitorGeth() {
 }
 
 export function* gethSaga() {
-  yield call(initGethSaga)
-  const gethRelatedSagas = yield fork(monitorGeth)
-  yield take(Actions.CANCEL_GETH_SAGA)
-  yield cancel(gethRelatedSagas)
-  yield put(setGethConnected(true))
-}
-
-export function* gethSagaIfNecessary() {
   yield call(waitForRehydrate) // Wait for rehydrate to know if geth or forno mode
-  yield put(setContractKitReady(true)) // ContractKit is blocked (not ready) before rehydrate
-  if (!(yield select(fornoSelector))) {
-    Logger.debug(`${TAG}@gethSagaIfNecessary`, `Starting geth saga...`)
-    yield call(gethSaga)
+  yield put(setContractKitReady(true)) // TODO(yorke): consider moving elsewhere
+  const fornoMode = yield select(fornoSelector)
+  yield call(initGethSaga)
+  if (!fornoMode) {
+    const gethRelatedSagas = yield fork(monitorGeth)
+    yield take(Actions.CANCEL_GETH_SAGA)
+    yield cancel(gethRelatedSagas)
+  } else {
+    // TODO(yorke): monitor to make sure RPC is still available
+    yield put(setGethConnected(true))
+    yield take(Actions.CANCEL_GETH_SAGA)
   }
+
+  yield put(setGethConnected(false))
+  // TODO: consider restarting the app when this is reached
 }
