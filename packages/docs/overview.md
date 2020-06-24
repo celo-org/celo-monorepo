@@ -14,7 +14,7 @@ The code of the Celo Blockchain has shared ancestry with [Ethereum](https://www.
 
 Ethereum applications are built using **smart contracts**. Smart contracts are programs written in languages like [Solidity](https://solidity.readthedocs.io/en/v0.5.10/) that produce bytecode for the **Ethereum Virtual Machine** or **EVM**, a runtime environment. Programs encoded in smart contracts receive messages and manipulate the blockchain ledger and are termed **on-chain**.
 
-Celo has a native unit of accounting, the cryptocurrency **CELO**, equivalent to Ether in Ethereum. Celo's ledger consists of **accounts**, identified by an **address**. There are two types of account. **Externally owned accounts** have an associated CELO balance and are controlled by a user holding the associated public-private keypair. **Contract accounts** contain the code and data of a single smart contract which can be called and manipulate its own stored data.
+Celo has a native unit of accounting, the cryptocurrency **CELO**, comparable to Ether on Ethereum. Celo's ledger consists of **accounts**, identified by an **address**. There are two types of account. **Externally owned accounts** have an associated CELO balance and are controlled by a user holding the associated public-private keypair. **Contract accounts** contain the code and data of a single smart contract which can be called and manipulate its own stored data.
 
 **ERC-20** is a standard interface for implementing cryptocurrencies or **tokens** as contracts, rather than via account balances. In Celo, CELO has a duality as both the native currency and is also an ERC-20 token on the Celo blockchain.
 
