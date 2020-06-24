@@ -23,11 +23,6 @@
     "body": "Hemos notado que tienes problemas para conectarte. Recomendamos habilitar el modo de ahorro de datos para que pueda seguir usando Celo Wallet con una conexión intermitente.",
     "switchToDataSaver": "Habilitar Ahorro de Datos"
   },
-  "promptZeroSyncModal": {
-    "header": "Cambiar modo de conexión?",
-    "body": "Hemos notado que tienes problemas para conectarte. Recomendamos habilitar el modo de ahorro de datos para que pueda seguir usando Celo Wallet con una conexión intermitente.",
-    "switchToDataSaver": "Habilitar Ahorro de Datos"
-  },
   "testFaqLink": "Las Preguntas Frecuentes del Monedero Celo",
   "termsOfServiceLink": "Las Condiciones de Servicio",
   "editProfile": "Editar perfil",
