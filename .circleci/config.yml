@@ -236,7 +236,7 @@ jobs:
       - run:
           name: Build mobile dependencies
           command: |
-            set -eo pipefail
+            set -euo pipefail
             yarn build \
               --scope @celo/mobile \
               --include-filtered-dependencies
@@ -256,7 +256,7 @@ jobs:
       - run:
           name: Run e2e tests
           command: |
-            set -eo pipefail
+            set -euo pipefail
             cd packages/mobile
             yarn run test:e2e:android
 
