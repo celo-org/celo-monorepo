@@ -253,7 +253,7 @@ export class SendConfirmation extends React.Component<Props, State> {
       confirmationInput,
       validatedRecipientAddress,
     } = this.props
-    const { amount, recipient, recipientAddress, type } = confirmationInput
+    const { amount, recipient, recipientAddress, type, reason } = confirmationInput
 
     const fee = getFeeDollars(asyncFee.result)
     const amountWithFee = amount.plus(fee || 0)
@@ -282,6 +282,8 @@ export class SendConfirmation extends React.Component<Props, State> {
         disabled: isPrimaryButtonDisabled,
       }
     }
+
+    const paymentRequestComment = reason || ''
 
     const renderFeeContainer = () => {
       // 'fee' already contains the invitation fee for invites
@@ -355,7 +357,11 @@ export class SendConfirmation extends React.Component<Props, State> {
             <CommentTextInput
               testID={'send'}
               onCommentChange={this.onCommentChange}
-              comment={this.state.comment}
+              comment={
+                type === TokenTransactionType.PayRequest
+                  ? paymentRequestComment
+                  : this.state.comment
+              }
               onBlur={this.onBlur}
             />
           </View>
