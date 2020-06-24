@@ -16,7 +16,7 @@ import LoadingSpinner from 'src/icons/LoadingSpinner'
 import { importContacts } from 'src/identity/actions'
 import { importContactsProgressSelector, matchedContactsSelector } from 'src/identity/reducer'
 import { ImportContactsStatus } from 'src/identity/types'
-import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers.v2'
+import { HeaderTitleWithSubtitle, nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
@@ -134,7 +134,7 @@ function ImportContactsScreen({ route, navigation }: Props) {
 }
 
 ImportContactsScreen.navigationOptions = ({ navigation }: ScreenProps) => ({
-  ...nuxNavigationOptions,
+  ...nuxNavigationOptionsNoBackButton,
   headerTitle: () => (
     <HeaderTitleWithSubtitle
       title={i18n.t('onboarding:verificationEducation.title')}
