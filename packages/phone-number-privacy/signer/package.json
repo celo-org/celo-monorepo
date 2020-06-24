@@ -1,6 +1,6 @@
 {
   "name": "@celo/phone-number-privacy-signer",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Signing participator of a the PGPNP threshold signature scheme",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -12,7 +12,7 @@
     "build": "tsc -b .",
     "lint": "tslint --project .",
     "test": "jest --runInBand --testPathIgnorePatterns test/end-to-end",
-    "db:migrate": "ts-node scripts/run-migrations.ts",
+    "db:migrate": "ts-node -r scripts/run-migrations.ts",
     "bls:keygen": "ts-node scripts/create-bls-keys.ts",
     "ssl:keygen": "./scripts/create-ssl-cert.sh"
   },

@@ -1,7 +1,7 @@
 import { Request, Response } from 'firebase-functions'
 import fetch, { Response as FetchResponse } from 'node-fetch'
 import { BLSCryptographyClient, ServicePartialSignature } from '../bls/bls-cryptography-client'
-import { ErrorMessages, respondWithError } from '../common/error-utils'
+import { ErrorMessage, respondWithError, WarningMessage } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
 import {
   hasValidAccountParam,
@@ -41,11 +41,11 @@ export async function handleGetDistributedBlindedMessageForSalt(
 ) {
   try {
     if (!isValidGetSignatureInput(request.body)) {
-      respondWithError(response, 400, ErrorMessages.INVALID_INPUT)
+      respondWithError(response, 400, WarningMessage.INVALID_INPUT)
       return
     }
     if (!authenticateUser(request)) {
-      respondWithError(response, 401, ErrorMessages.UNAUTHENTICATED_USER)
+      respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER)
       return
     }
     const { successCount, signatures, majorityErrorCode } = await requestSignatures(request)
@@ -59,7 +59,7 @@ export async function handleGetDistributedBlindedMessageForSalt(
       handleMissingSignatures(majorityErrorCode, response)
     }
   } catch (e) {
-    respondWithError(response, 500, ErrorMessages.UNKNOWN_ERROR)
+    respondWithError(response, 500, ErrorMessage.UNKNOWN_ERROR)
   }
 }
 
@@ -83,7 +83,7 @@ async function requestSignatures(request: Request) {
         }
       })
       .catch((e) => {
-        logger.error(`${ErrorMessages.SIGNER_RETURN_ERROR} from signer ${service.url}`, e)
+        logger.error(`${ErrorMessage.ERROR_REQUESTING_SIGNATURE} from signer ${service.url}`, e)
         responses.push({ url: service.url, status: 500 })
       })
   )
@@ -118,7 +118,7 @@ function requestSigature(service: SignerService, request: Request): Promise<Fetc
 
 function getMajorityErrorCode(errorCodes: Map<number, number>, responses: SignMsgRespWithStatus[]) {
   if (errorCodes.size > 1) {
-    logger.error(ErrorMessages.INCONSISTENT_SINGER_RESPONSES)
+    logger.error(ErrorMessage.INCONSISTENT_SINGER_RESPONSES)
     responses.forEach((resp) => {
       logger.error(`${resp.url} returned ${resp.status}`)
     })
@@ -148,12 +148,8 @@ function isValidGetSignatureInput(requestBody: GetBlindedMessageForSaltRequest):
 
 function handleMissingSignatures(majorityErrorCode: number | null, response: Response) {
   if (majorityErrorCode === 403) {
-    respondWithError(response, 403, ErrorMessages.EXCEEDED_QUOTA)
+    respondWithError(response, 403, WarningMessage.EXCEEDED_QUOTA)
   } else {
-    respondWithError(
-      response,
-      majorityErrorCode || 500,
-      ErrorMessages.NOT_ENOUGH_PARTIAL_SIGNATURES
-    )
+    respondWithError(response, majorityErrorCode || 500, ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES)
   }
 }

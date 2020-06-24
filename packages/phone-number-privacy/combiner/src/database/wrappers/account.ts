@@ -1,5 +1,5 @@
 import { Transaction } from 'knex'
-import { ErrorMessages } from '../../common/error-utils'
+import { ErrorMessage } from '../../common/error-utils'
 import logger from '../../common/logger'
 import { getDatabase } from '../database'
 import { Account, ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from '../models/account'
@@ -21,7 +21,7 @@ export async function getPerformedQueryCount(account: string, trx: Transaction):
       .first()
     return queryCounts === undefined ? 0 : queryCounts[ACCOUNTS_COLUMNS.numLookups]
   } catch (e) {
-    logger.error(ErrorMessages.DATABASE_GET_FAILURE, e)
+    logger.error(ErrorMessage.DATABASE_GET_FAILURE, e)
     return 0
   }
 }
@@ -47,7 +47,7 @@ export async function getDidMatchmaking(account: string): Promise<boolean> {
     }
     return !!didMatchmaking[ACCOUNTS_COLUMNS.didMatchmaking]
   } catch (e) {
-    logger.error(ErrorMessages.DATABASE_GET_FAILURE, e)
+    logger.error(ErrorMessage.DATABASE_GET_FAILURE, e)
     return false
   }
 }
@@ -68,7 +68,7 @@ export async function setDidMatchmaking(account: string) {
       return insertRecord(newAccount)
     }
   } catch (e) {
-    logger.error(ErrorMessages.DATABASE_UPDATE_FAILURE, e)
+    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE, e)
     return true
   }
 }
@@ -79,7 +79,7 @@ async function insertRecord(data: Account) {
       .insert(data)
       .timeout(10000)
   } catch (e) {
-    logger.error(ErrorMessages.DATABASE_INSERT_FAILURE, e)
+    logger.error(ErrorMessage.DATABASE_INSERT_FAILURE, e)
   }
   return true
 }
