@@ -103,7 +103,7 @@ export type StackParamList = {
     backupPhrase: string
   }
   [Screens.ImportWalletSocial]: undefined
-  [Screens.ImportContacts]: { showSkipDialog: boolean } | undefined
+  [Screens.ImportContacts]: undefined
   [Screens.IncomingPaymentRequestListScreen]: undefined
   [Screens.Invite]: undefined
   [Screens.InviteReview]: {

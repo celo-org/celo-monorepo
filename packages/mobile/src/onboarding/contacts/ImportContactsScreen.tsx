@@ -13,12 +13,7 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import i18n, { Namespaces } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
-import {
-  cancelImportContacts,
-  denyImportContacts,
-  importContacts,
-  setHasSeenVerificationNux,
-} from 'src/identity/actions'
+import { importContacts } from 'src/identity/actions'
 import { importContactsProgressSelector, matchedContactsSelector } from 'src/identity/reducer'
 import { ImportContactsStatus } from 'src/identity/types'
 import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers.v2'
@@ -27,7 +22,6 @@ import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
 import { requestContactsPermission } from 'src/utils/permissions'
-import VerificationSkipDialog from 'src/verify/VerificationSkipDialog'
 
 type ScreenProps = StackScreenProps<StackParamList, Screens.ImportContacts>
 type Props = ScreenProps
@@ -41,9 +35,6 @@ function ImportContactsScreen({ route, navigation }: Props) {
   const matchedContacts = useSelector(matchedContactsSelector)
   const matchedContactsCount = Object.keys(matchedContacts).length
   const dispatch = useDispatch()
-  const showSkipDialog =
-    (route.params?.showSkipDialog || false) &&
-    (importStatus === ImportContactsStatus.Failed || importStatus === ImportContactsStatus.Stopped)
 
   async function onPressConnect() {
     CeloAnalytics.track(CustomEventNames.import_contacts)
@@ -53,18 +44,6 @@ function ImportContactsScreen({ route, navigation }: Props) {
     }
   }
 
-  function onPressSkipCancel() {
-    navigation.setParams({ showSkipDialog: false })
-  }
-
-  function onPressSkipConfirm() {
-    CeloAnalytics.track(CustomEventNames.import_contacts_skip)
-    dispatch(cancelImportContacts())
-    dispatch(denyImportContacts())
-    dispatch(setHasSeenVerificationNux(true))
-    onFinish()
-  }
-
   function onFinish() {
     navigate(Screens.OnboardingSuccessScreen)
   }
@@ -72,26 +51,6 @@ function ImportContactsScreen({ route, navigation }: Props) {
   function onToggleFindMeSwitch(value: boolean) {
     setFindMeSwitch(value)
   }
-
-  const statusIndicator =
-    importStatus === ImportContactsStatus.Done ? <Checkmark /> : <LoadingSpinner />
-  const statusText =
-    importStatus !== ImportContactsStatus.Done ? (
-      <Text style={styles.statusText}>{t('contacts.syncing.loading')}</Text>
-    ) : matchedContactsCount > 0 ? (
-      <Text style={styles.statusText}>
-        {t('contacts.syncing.successWithMatches', { matches: matchedContactsCount })}
-      </Text>
-    ) : (
-      <Text style={styles.statusText}>{t('contacts.syncing.successWithoutMatches')}</Text>
-    )
-
-  const statusComponents = (
-    <View style={styles.statusContainer}>
-      {statusIndicator}
-      {statusText}
-    </View>
-  )
 
   // If import has already been done, move user forward
   // Eventually we will want to somehow allow users to prompt matchmaking
@@ -106,7 +65,7 @@ function ImportContactsScreen({ route, navigation }: Props) {
 
   React.useEffect(() => {
     const prevImportContactProgress = prevImportContactProgressRef.current
-    const prevImportStatus = prevImportContactProgress?.status
+    const prevImportStatus = prevImportContactProgress.status
     prevImportContactProgressRef.current = importContactsProgress
 
     if (
@@ -119,6 +78,29 @@ function ImportContactsScreen({ route, navigation }: Props) {
       }
     }
   }, [importContactsProgress])
+
+  let statusComponents
+  if (importStatus === ImportContactsStatus.Done) {
+    statusComponents = (
+      <>
+        <Checkmark />
+        {matchedContactsCount > 0 ? (
+          <Text style={styles.statusText}>
+            {t('contacts.syncing.successWithMatches', { matches: matchedContactsCount })}
+          </Text>
+        ) : (
+          <Text style={styles.statusText}>{t('contacts.syncing.successWithoutMatches')}</Text>
+        )}
+      </>
+    )
+  } else {
+    statusComponents = (
+      <>
+        <LoadingSpinner />
+        <Text style={styles.statusText}>{t('contacts.syncing.loading')}</Text>
+      </>
+    )
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -143,13 +125,10 @@ function ImportContactsScreen({ route, navigation }: Props) {
             </>
           )}
         </View>
-        {importStatus > ImportContactsStatus.Stopped && statusComponents}
+        {importStatus > ImportContactsStatus.Stopped && (
+          <View style={styles.statusContainer}>{statusComponents}</View>
+        )}
       </ScrollView>
-      <VerificationSkipDialog
-        isVisible={showSkipDialog}
-        onPressCancel={onPressSkipCancel}
-        onPressConfirm={onPressSkipConfirm}
-      />
     </SafeAreaView>
   )
 }
@@ -167,7 +146,7 @@ ImportContactsScreen.navigationOptions = ({ navigation }: ScreenProps) => ({
       title={i18n.t('global:skip')}
       testID="VerificationEducationSkip"
       // tslint:disable-next-line: jsx-no-lambda
-      onPress={() => navigation.setParams({ showSkipDialog: true })}
+      onPress={() => navigate(Screens.OnboardingSuccessScreen)}
       titleStyle={{ color: colors.goldDark }}
     />
   ),
