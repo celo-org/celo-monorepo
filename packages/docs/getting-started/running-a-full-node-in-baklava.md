@@ -28,8 +28,12 @@ First we are going to setup the environment variables required for `Baklava` net
 
 ```bash
 export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
-export NETWORK_ID=40120
+export NETWORK_ID=62320
 ```
+
+{% hint style="info" %}
+If you are transitioning from the Baklava network prior to the June 24 reset, you will need to start with a fresh chain database. You can either shut down your existing node, delete the `celo` folder, and continue by following the guide below, starting with [configuring your node](#configure-the-node), or create a new node following these directions.
+{% endhint %}
 
 ## Pull the Celo Docker image
 
