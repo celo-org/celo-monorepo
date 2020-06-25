@@ -44,7 +44,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
   const headerHeight = useHeaderHeight()
   const insets = useSafeArea()
 
-  function onPressStart() {
+  const onPressStart = () => {
     setHasPressedStart(true)
     if (!balanceIsSufficient) {
       return
@@ -53,20 +53,20 @@ function VerificationEducationScreen({ route, navigation }: Props) {
     navigation.navigate(Screens.VerificationLoadingScreen)
   }
 
-  function onPressSkipCancel() {
+  const onPressSkipCancel = () => {
     navigation.setParams({ showSkipDialog: false })
   }
 
-  function onPressSkipConfirm() {
+  const onPressSkipConfirm = () => {
     dispatch(setHasSeenVerificationNux(true))
     navigateHome()
   }
 
-  function onPressLearnMore() {
+  const onPressLearnMore = () => {
     setShowLearnMoreDialog(true)
   }
 
-  function onPressLearnMoreDismiss() {
+  const onPressLearnMoreDismiss = () => {
     setShowLearnMoreDialog(false)
   }
 

@@ -72,34 +72,6 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
         </Text>
       </View>
     </View>
-    <SafeAreaView
-      style={
-        Object {
-          "height": 35,
-          "paddingRight": 10,
-          "paddingTop": 10,
-          "position": "absolute",
-          "right": 0,
-          "top": 0,
-          "width": 70,
-          "zIndex": 100,
-        }
-      }
-    >
-      <Text
-        accessible={true}
-        focusable={true}
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-      >
-           
-      </Text>
-    </SafeAreaView>
     <RCTScrollView
       contentContainerStyle={
         Object {
@@ -493,34 +465,6 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
         </Text>
       </View>
     </View>
-    <SafeAreaView
-      style={
-        Object {
-          "height": 35,
-          "paddingRight": 10,
-          "paddingTop": 10,
-          "position": "absolute",
-          "right": 0,
-          "top": 0,
-          "width": 70,
-          "zIndex": 100,
-        }
-      }
-    >
-      <Text
-        accessible={true}
-        focusable={true}
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-      >
-           
-      </Text>
-    </SafeAreaView>
     <RCTScrollView
       contentContainerStyle={
         Object {

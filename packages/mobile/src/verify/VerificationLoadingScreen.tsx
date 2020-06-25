@@ -12,7 +12,6 @@ import { connect } from 'react-redux'
 import { setRetryVerificationWithForno } from 'src/account/actions'
 import CancelButton from 'src/components/CancelButton.v2'
 import Carousel, { CarouselItem } from 'src/components/Carousel'
-import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
 import { cancelVerification, startVerification } from 'src/identity/actions'
@@ -126,7 +125,6 @@ class VerificationLoadingScreen extends React.Component<Props> {
           <View style={styles.buttonCancelContainer}>
             <CancelButton onCancel={this.onCancel} />
           </View>
-          <DevSkipButton nextScreen={Screens.VerificationInterstitialScreen} />
           <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.statusContainer}>
               <LoadingSpinner />
