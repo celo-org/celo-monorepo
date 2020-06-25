@@ -1,7 +1,14 @@
 {
-  "setupFilesAfterEnv": ["./init.js"],
+  "setupFilesAfterEnv": ["./init.js", "../../../flakey-test-tracking/jest/jest.setup.js"],
   "testEnvironment": "../../../flakey-test-tracking/jest/JestFlakeTrackingEnvironment.js",
   "reporters": ["detox/runners/jest/streamlineReporter"],
   "verbose": true,
-  "testMatch": ["**/*.spec.js"]
+  "testMatch": ["**/*.spec.js"],
+  "globals": {
+    "FLAKES": "Map",
+    "RETRY_TIMES": 5
+  },
+  "testRunner": "jest-circus/runner"
 }
+
+//TODO(Alec): clean this up

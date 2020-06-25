@@ -1,5 +1,7 @@
+const flakeTrackingConfig = require('../../../flakey-test-tracking/jest/jest.config.base.js')
+
 module.exports = {
   preset: 'ts-jest',
+  ...flakeTrackingConfig,
   setupFiles: ['dotenv/config'],
-  testEnvironment: '../../../flakey-test-tracking/jest/JestFlakeTrackingEnvironment.js',
 }

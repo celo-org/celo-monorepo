@@ -1,12 +1,15 @@
 const defaultConfig = require('../../jest.config.js')
+const flakeTrackingConfig = require('../../flakey-test-tracking/jest/jest.config.base.js')
 
 module.exports = {
   ...defaultConfig,
+  ...flakeTrackingConfig,
   globals: {
     'ts-jest': {
       isolatedModules: true,
       tsConfig: 'tsconfig.jest.json',
     },
+    ...flakeTrackingConfig.globals,
   },
   moduleNameMapper: {
     '\\.(png|jpg|jpeg|gif)$': '<rootDir>/__mocks__/ImageStub.ts',
@@ -18,6 +21,6 @@ module.exports = {
   },
   preset: 'react-native-web',
   setupFiles: ['./jestSetup.js', 'jest-canvas-mock'],
-  setupFilesAfterEnv: ['./jestSetupAfter.ts'],
+  setupFilesAfterEnv: ['./jestSetupAfter.ts', ...flakeTrackingConfig.setupFilesAfterEnv],
   testEnvironment: 'jsdom', //TODO(Alec)
 }

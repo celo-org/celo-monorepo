@@ -1,8 +1,10 @@
+const flakeTrackingConfig = require('../../flakey-test-tracking/jest/jest.config.base.js')
+
 module.exports = {
   preset: 'ts-jest',
-  testEnvironment: '../../flakey-test-tracking/jest/jest/JestFlakeTrackingEnvironment.js',
+  ...flakeTrackingConfig,
   testMatch: ['<rootDir>/src/**/?(*.)+(spec|test).ts?(x)'],
-  setupFilesAfterEnv: ['@celo/dev-utils/lib/matchers'],
+  setupFilesAfterEnv: ['@celo/dev-utils/lib/matchers', ...flakeTrackingConfig.setupFilesAfterEnv],
   globalSetup: '<rootDir>/src/test-utils/ganache.setup.ts',
   globalTeardown: '<rootDir>/src/test-utils/ganache.teardown.ts',
   testSequencer: '<rootDir>/src/test-utils/AlphabeticSequencer.js',

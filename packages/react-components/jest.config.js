@@ -1,8 +1,10 @@
 const reactNativeJestPreset = require('react-native/jest-preset')
 const { defaults: tsjPreset } = require('ts-jest/presets')
+const flakeTrackingConfig = require('../../flakey-test-tracking/jest/jest.config.base.js')
 
 module.exports = {
   ...tsjPreset,
+  ...flakeTrackingConfig,
   globals: {
     navigator: true,
     'ts-jest': {
@@ -12,6 +14,7 @@ module.exports = {
       isolatedModules: true,
     },
     window: true,
+    ...flakeTrackingConfig.globals,
   },
   // Override default platform to android for now
   haste: {
@@ -20,7 +23,7 @@ module.exports = {
   },
   modulePathIgnorePatterns: ['<rootDir>/node_modules/(.*)/node_modules/react-native'],
   preset: 'react-native',
-  setupFilesAfterEnv: ['<rootDir>/jest_setup'],
+  setupFilesAfterEnv: ['<rootDir>/jest_setup', ...flakeTrackingConfig.setupFilesAfterEnv],
   testPathIgnorePatterns: ['/node_modules/', '<rootDir>/e2e'],
   transform: {
     ...tsjPreset.transform,
