@@ -33,6 +33,41 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     ? MAINNET_START_TIME
     : new Date(releaseGoldConfig.releaseStartTime).getTime() / 1000
 
+  const weiAmountReleasedPerPeriod = new BigNumber(
+    web3.utils.toWei(releaseGoldConfig.amountReleasedPerPeriod.toString())
+  )
+
+  let totalValue = weiAmountReleasedPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods)
+  if (totalValue.lt(startGold)) {
+    console.info('Total value of grant less than cGLD for beneficiary addreess')
+    return
+  }
+
+  const adjustedAmountPerPeriod = totalValue
+    .minus(startGold)
+    .div(releaseGoldConfig.numReleasePeriods)
+    .dp(0)
+
+  // Reflect any rounding changes from the division above
+  totalValue = adjustedAmountPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods)
+
+  const contractInitializationArgs = [
+    Math.round(releaseStartTime),
+    releaseGoldConfig.releaseCliffTime,
+    releaseGoldConfig.numReleasePeriods,
+    releaseGoldConfig.releasePeriod,
+    adjustedAmountPerPeriod.toFixed(),
+    releaseGoldConfig.revocable,
+    releaseGoldConfig.beneficiary,
+    releaseGoldConfig.releaseOwner,
+    releaseGoldConfig.refundAddress,
+    releaseGoldConfig.subjectToLiquidityProvision,
+    releaseGoldConfig.initialDistributionRatio,
+    releaseGoldConfig.canValidate,
+    releaseGoldConfig.canVote,
+    '0x000000000000000000000000000000000000ce10',
+  ]
+
   const message =
     'Please review this grant before you deploy:\n\tTotal Grant Value: ' +
     Number(releaseGoldConfig.numReleasePeriods) *
@@ -49,6 +84,9 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     releaseGoldConfig.numReleasePeriods +
     '\n\tRelease Period length: ' +
     releaseGoldConfig.releasePeriod +
+    (argv.debug
+      ? '\n\tDebug: Contract init args: ' + JSON.stringify(contractInitializationArgs)
+      : '') +
     '\n\tDeploy this grant? (y/n)'
   if (!argv.yesreally) {
     const response = await prompts({
@@ -62,9 +100,11 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
       return
     }
   }
+  console.info('  Deploying ReleaseGoldMultiSigProxy...')
   const releaseGoldMultiSigProxy = await retryTx(ReleaseGoldMultiSigProxy.new, [
     { from: fromAddress },
   ])
+  console.info('  Deploying ReleaseGoldMultiSig...')
   const releaseGoldMultiSigInstance = await retryTx(ReleaseGoldMultiSig.new, [
     { from: fromAddress },
   ])
@@ -87,25 +127,10 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
       from: fromAddress,
     },
   ])
+  console.info('  Deploying ReleaseGoldProxy...')
   const releaseGoldProxy = await retryTx(ReleaseGoldProxy.new, [{ from: fromAddress }])
+  console.info('  Deploying ReleaseGold...')
   const releaseGoldInstance = await retryTx(ReleaseGold.new, [{ from: fromAddress }])
-
-  const weiAmountReleasedPerPeriod = new BigNumber(
-    web3.utils.toWei(releaseGoldConfig.amountReleasedPerPeriod.toString())
-  )
-
-  let totalValue = weiAmountReleasedPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods)
-  if (totalValue.lt(startGold)) {
-    console.info('Total value of grant less than cGLD for beneficiary addreess')
-    process.exit(0)
-  }
-  const adjustedAmountPerPeriod = totalValue
-    .minus(startGold)
-    .div(releaseGoldConfig.numReleasePeriods)
-    .dp(0)
-
-  // Reflect any rounding changes from the division above
-  totalValue = adjustedAmountPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods)
 
   const releaseGoldTxHash = await _setInitialProxyImplementation(
     web3,
@@ -116,20 +141,7 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
       from: fromAddress,
       value: totalValue.toFixed(),
     },
-    Math.round(releaseStartTime),
-    releaseGoldConfig.releaseCliffTime,
-    releaseGoldConfig.numReleasePeriods,
-    releaseGoldConfig.releasePeriod,
-    adjustedAmountPerPeriod.toFixed(),
-    releaseGoldConfig.revocable,
-    releaseGoldConfig.beneficiary,
-    releaseGoldConfig.releaseOwner,
-    releaseGoldConfig.refundAddress,
-    releaseGoldConfig.subjectToLiquidityProvision,
-    releaseGoldConfig.initialDistributionRatio,
-    releaseGoldConfig.canValidate,
-    releaseGoldConfig.canVote,
-    '0x000000000000000000000000000000000000ce10'
+    ...contractInitializationArgs
   )
   const proxiedReleaseGold = await ReleaseGold.at(releaseGoldProxy.address)
   await retryTx(proxiedReleaseGold.transferOwnership, [
@@ -142,7 +154,9 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     releaseGoldMultiSigProxy.address,
     { from: fromAddress },
   ])
+
   // Send starting gold amount to the beneficiary so they can perform transactions.
+  console.info('  Sending beneficiary starting gold...')
   await retryTx(web3.eth.sendTransaction, [
     {
       from: fromAddress,
@@ -397,6 +411,7 @@ module.exports = async (callback: (error?: any) => number) => {
         'deployed_grants',
         'output_file',
         'really',
+        'debug',
       ],
     })
     ReleaseGoldMultiSig = artifacts.require('ReleaseGoldMultiSig')

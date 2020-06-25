@@ -126,4 +126,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withTranslation(Namespaces.inviteFlow11)(EscrowedPaymentListItem)
+export default withTranslation<Props>(Namespaces.inviteFlow11)(EscrowedPaymentListItem)

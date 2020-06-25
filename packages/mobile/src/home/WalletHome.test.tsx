@@ -43,6 +43,8 @@ describe('Testnet banner', () => {
           recipientCache={{}}
           activeNotificationCount={0}
           callToActNotification={false}
+          numberVerified={true}
+          importContacts={jest.fn()}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -67,6 +69,8 @@ describe('Testnet banner', () => {
           recipientCache={{}}
           activeNotificationCount={0}
           callToActNotification={false}
+          numberVerified={true}
+          importContacts={jest.fn()}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -89,6 +93,8 @@ describe('Testnet banner', () => {
           recipientCache={{}}
           activeNotificationCount={0}
           callToActNotification={false}
+          numberVerified={true}
+          importContacts={jest.fn()}
           {...getMockI18nProps()}
         />
       </Provider>
