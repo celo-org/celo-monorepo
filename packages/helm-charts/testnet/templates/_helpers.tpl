@@ -76,6 +76,10 @@ kind: Service
 metadata:
   name: {{ .name }}
   labels:
+{{ if .proxy | default false }}
+{{ $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+    validator-proxied: "{{ $validatorProxied }}"
+{{- end }}
     component: {{ .component_label }}
 spec:
   sessionAffinity: ClientIP
@@ -85,6 +89,10 @@ spec:
   - port: 8546
     name: ws
   selector:
+{{ if .proxy | default false }}
+{{ $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+    validator-proxied: "{{ $validatorProxied }}"
+{{- end }}
     component: {{ .component_label }}
 ---
 apiVersion: apps/v1beta2
@@ -94,6 +102,10 @@ metadata:
   labels:
 {{ include "common.standard.labels" .  | indent 4 }}
     component: {{ .component_label }}
+{{ if .proxy | default false }}
+{{ $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+    validator-proxied: "{{ $validatorProxied }}"
+{{- end }}
 spec:
   {{ if .Values.geth.ssd_disks }}
   volumeClaimTemplates:
@@ -113,6 +125,10 @@ spec:
     matchLabels:
 {{ include "common.standard.labels" .  | indent 6 }}
       component: {{ .component_label }}
+{{ if .proxy | default false }}
+{{ $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+      validator-proxied: "{{ $validatorProxied }}"
+{{- end }}
   template:
     metadata:
       labels:
