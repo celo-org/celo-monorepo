@@ -212,7 +212,7 @@ const nuxScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen
       name={Screens.ImportWallet}
       component={ImportWallet}
-      options={nuxNavigationOptions}
+      options={ImportWallet.navigationOptions}
     />
     <Navigator.Screen
       name={Screens.ImportWalletSocial}
@@ -227,7 +227,7 @@ const nuxScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen
       name={Screens.ImportContacts}
       component={ImportContactsScreen}
-      options={nuxNavigationOptions}
+      options={ImportContactsScreen.navigationOptions}
     />
     <Navigator.Screen name={Screens.OnboardingSuccessScreen} component={OnboardingSuccessScreen} />
   </>

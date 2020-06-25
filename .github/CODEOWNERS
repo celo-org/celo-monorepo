@@ -29,3 +29,4 @@
 /packages/typescript/ @cmcewen
 /packages/utils/ @jmrossy
 /packages/web/ @cmcewen @aaronmgdr
+/packages/web/validator-badges @cla-bel @bohan-zhang @pranaymohan
