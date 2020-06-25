@@ -47,6 +47,10 @@
     "body": "Phone number confirmation works by associating your account with your phone number.\n\n<0>Do I need to complete this?</0>\n\nConfirmation is not required, however, unconfirmed accounts can only send payments using Celo addresses or QR codes.\n\n<1>Security and Privacy</1>\n\nTo protect your privacy, only an obfuscated version of your phone number is stored on the Celo blockchain.",
     "dismiss": "Dismiss"
   },
+  "importExistingKey": {
+    "explanation": "Your Account Key is a 24-word phrase that you wrote down and saved when you set up your account. Please enter it here to restore your account.",
+    "keyPlaceholder": "horse leopard dog monkey ..."
+  },
   "verificationInput": {
     "title": "Confirm",
     "body": "We sent you three messages (SMS). Please copy and paste them below.",
