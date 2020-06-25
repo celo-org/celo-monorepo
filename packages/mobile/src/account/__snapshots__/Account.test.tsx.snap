@@ -14,8 +14,10 @@ exports[`Account renders correctly 1`] = `
       Object {
         "alignItems": "center",
         "backgroundColor": "transparent",
-        "borderBottomColor": "#EDEEEF",
-        "borderBottomWidth": 0,
+        "borderBottomColor": AnimatedValue {
+          " __value": NaN,
+        },
+        "borderBottomWidth": 1,
         "flexDirection": "row",
         "height": 62,
         "justifyContent": "space-between",
@@ -1262,8 +1264,10 @@ exports[`Account renders correctly when dev mode active 1`] = `
       Object {
         "alignItems": "center",
         "backgroundColor": "transparent",
-        "borderBottomColor": "#EDEEEF",
-        "borderBottomWidth": 0,
+        "borderBottomColor": AnimatedValue {
+          " __value": NaN,
+        },
+        "borderBottomWidth": 1,
         "flexDirection": "row",
         "height": 62,
         "justifyContent": "space-between",

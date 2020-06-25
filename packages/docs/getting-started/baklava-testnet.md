@@ -2,9 +2,9 @@
 
 The Baklava Testnet is a non-production Testnet for the Validator community. It serves several purposes:
 
-- **Operational excellence**: It helps you get familiarized with the processes that will be used to create RC1, and verify the security and stability of your infrastructure with the new software.
-- **Detecting vulnerabilities**: It helps the Celo community discover any remaining bugs before RC1.
-- **Future testnet**: If all goes well, it will continue to function as a testnet, serving as a testing ground for changes after mainnet is launched.
+- **Operational excellence**: Build familiarity with the processes used on Mainnet, and to verify the security and stability of your infrastructure with the new software.
+- **Detecting vulnerabilities**: Discover bugs in new software releases before they reach Mainnet.
+- **Testing ground**: Experiment with new infrastructure configurations in a low-risk environment.
 
 {% hint style="warning" %}
 The Baklava Testnet is designed for testing and experimentation by developers. Its tokens hold no real world economic value. The testnet software will be upgraded and the entirety of its data reset on a regular basis. This will erase your accounts, their balance and your transaction history. The testnet software will be upgraded on a regular basis. You may encounter bugs and limitations with the software and documentation.
