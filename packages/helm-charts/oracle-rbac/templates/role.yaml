@@ -6,6 +6,7 @@ metadata:
 rules:
 - apiGroups: [""]
   resources: ["pods"]
+  resourceNames: ["{{ template "oracle-pod-name" (dict "Values" $.Values "index" $index) }}"]
   verbs: ["get", "update", "patch"]
 ---
 {{ end }}
