@@ -1,8 +1,8 @@
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core'
 import * as React from 'react'
+import Button from 'src/components/Button'
 import CopyIcon from 'src/components/CopyIcon'
-
 interface Props {
   dai: string
   btc: string
@@ -19,6 +19,9 @@ export default function ReserveAddresses({ dai, btc, celo, custody, eth }: Props
       <Address label="BTC" hex={btc} />
       <Address label="ETH" hex={eth} />
       <Address label="DAI" hex={dai} />
+      <Button href="https://docs.celo.org/command-line-interface/reserve">
+        Query Reserve Holdings
+      </Button>
     </>
   )
 }

@@ -1,32 +1,44 @@
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core'
 import { HoldingsData } from 'src/service/Data'
-import Button from './Button'
 
 export default function Holdings(props: Omit<HoldingsData, 'updatedDate'>) {
   return (
     <div css={rootStyle}>
       <Heading title="CELO" gridArea="celo" iconSrc="/assets/CELO.png" />
       <Amount label="Total" units={props.total} gridArea="total" />
-      <Amount label="CELO on-chain" units={props.onChain} gridArea="onChain" />
-      <Amount label="CELO in Custody" units={props.inCustody} gridArea="custody" />
+      <Amount label="In Reserve Contract" units={props.onChain} gridArea="onChain" />
+      <Amount label="In Custody" units={props.inCustody} gridArea="custody" />
       <Heading title="Additional Crypto Assets" gridArea="crypto" marginTop={30} />
       <Amount label="BTC" units={props.BTC} gridArea="btc" />
       <Amount label="ETH" units={props.ETH} gridArea="eth" />
       <Amount label="DAI" units={props.DAI} gridArea="dai" />
-      <Heading title="cUSD Asset" gridArea="cUSD" iconSrc="/assets/CUSD.png" marginTop={30} />
-      <Amount label="cUSD outstanding" units={props.cUSD} gridArea="outstanding" />
-      <Amount label="Reserve Ratio*" units={props.ratio} gridArea="ratio" />
+    </div>
+  )
+}
+
+export function StableTokens(props) {
+  return (
+    <div css={stableTokenStyle}>
+      <Heading title="cUSD" gridArea="cUSD" iconSrc="/assets/CUSD.png" />
+      <Amount label="Outstanding" units={props.cUSD} gridArea="outstanding" />
+    </div>
+  )
+}
+
+export function Info(props) {
+  return (
+    <div css={infoThingsStyle}>
+      <div css={css({ gridArea: 'ratio' })}>
+        <span css={numberStyle}>{props.ratio}</span>
+      </div>
       <div css={infoStyle}>
         <div css={finePrintStyle}>
           <small>
-            *ratio between the size of the reserve and the total value of all outstanding cUSD (and
+            ratio between the size of the reserve and the total value of all outstanding cUSD (and
             other future stabilized tokens supported by the reserve)
           </small>
         </div>
-        <Button href="https://docs.celo.org/command-line-interface/reserve">
-          Query Reserve Holdings
-        </Button>
       </div>
     </div>
   )
@@ -88,10 +100,7 @@ const rootStyle = css({
                      "total onChain custody"
                      "crypto crypto crypto"
                      "btc eth dai"
-                     "cUSD cUSD cUSD"
-                     "outstanding ratio ."
-                     "info info ."
-                     `,
+                    `,
   [BREAK_POINT]: {
     gridTemplateAreas: `"celo"
                         "onChain" 
@@ -100,10 +109,30 @@ const rootStyle = css({
                         "crypto"
                         "btc"
                         "eth" 
-                        "dai"
-                        "cUSD"
-                        "outstanding" 
-                        "ratio"
+                        "dai"`,
+  },
+})
+
+const stableTokenStyle = css(rootStyle, {
+  gridTemplateAreas: `"cUSD cUSD cUSD"
+                     "outstanding . ."`,
+  [BREAK_POINT]: {
+    gridTemplateAreas: `"cUSD"
+                        "outstanding"`,
+  },
+})
+
+const infoThingsStyle = css({
+  display: 'grid',
+  gridAutoColumns: '1fr',
+  gridColumnGap: 20,
+  gridRowGap: 12,
+  gridTemplateAreas: `
+                     "ratio . ."
+                     "info info ."
+                     `,
+  [BREAK_POINT]: {
+    gridTemplateAreas: `"ratio"
                         "info"`,
   },
 })
@@ -134,5 +163,4 @@ const finePrintStyle = css({
 
 const infoStyle = css({
   gridArea: 'info',
-  marginTop: 36,
 })
