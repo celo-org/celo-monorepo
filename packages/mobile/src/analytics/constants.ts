@@ -261,7 +261,7 @@ export enum CustomEventNames {
   import_contacts = 'import_contacts',
   import_contact_error = 'import_contact_error',
   import_contacts_skip = 'import_contacts_skip',
-  fetched_raw_contacts = 'fetched_raw_contacts',
+  fetched_contacts = 'fetched_contacts',
   add_contact_match = 'add_contact_match',
 
   // Escrowed payments
