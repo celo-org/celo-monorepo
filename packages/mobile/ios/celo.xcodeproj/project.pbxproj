@@ -5,11 +5,12 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* celoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* celoTests.m */; };
-		0317E786245B696200AAAC2E /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0317E783245B696200AAAC2E /* Inter-Regular.ttf */; };
-		0317E788245B696200AAAC2E /* Inter-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0317E784245B696200AAAC2E /* Inter-Medium.ttf */; };
-		0317E78A245B696200AAAC2E /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0317E785245B696200AAAC2E /* Inter-SemiBold.ttf */; };
+		0317E786245B696200AAAC2E /* ../fonts/Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0317E783245B696200AAAC2E /* ../fonts/Inter-Regular.ttf */; };
+		0317E788245B696200AAAC2E /* ../fonts/Inter-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0317E784245B696200AAAC2E /* ../fonts/Inter-Medium.ttf */; };
+		0317E78A245B696200AAAC2E /* ../fonts/Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0317E785245B696200AAAC2E /* ../fonts/Inter-SemiBold.ttf */; };
 		0350D7F2EBD64D0585FEF0AF /* Hind-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 95E01263B685485BA7D5CEB0 /* Hind-Light.ttf */; };
 		0445977E03C74B20A93158B5 /* Hind-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B59F6FDB7D084157A12E7A52 /* Hind-Bold.ttf */; };
 		0581BC2D3AEB42D086D403E3 /* Hind-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AAE92820119F4CC5B23C6636 /* Hind-Medium.ttf */; };
@@ -24,12 +25,12 @@
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* celoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* celoTests.m */; };
+		2E6B8DA1BF6440D89CB45CCA /* Jost-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A86AF23416DE47E0B4068AE7 /* Jost-Medium.ttf */; };
 		5575263ED1EA4F568D328DE9 /* Hind-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C5952C9D168E4172BB52364C /* Hind-SemiBold.ttf */; };
 		67911AC6D310414DAAC1498E /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = F3F5FA21E7EC46BBB744FE54 /* libz.tbd */; };
 		85E8054E767BF68843B24D43 /* Pods_celo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 691B91F2E7383B2AF94AAA8B /* Pods_celo.framework */; };
-		F2B1AD5485D68063EC09183F /* Pods_celoTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3250C8E518DC2C848EA62404 /* Pods_celoTests.framework */; };
 		EB3CF5B346854570A1EC69B3 /* Jost-Book.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F19E0D1442F8460181626D12 /* Jost-Book.ttf */; };
-		2E6B8DA1BF6440D89CB45CCA /* Jost-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A86AF23416DE47E0B4068AE7 /* Jost-Medium.ttf */; };
+		F2B1AD5485D68063EC09183F /* Pods_celoTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3250C8E518DC2C848EA62404 /* Pods_celoTests.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,9 +55,9 @@
 		00E356EE1AD99517003FC87E /* celoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = celoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* celoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = celoTests.m; sourceTree = "<group>"; };
-		0317E783245B696200AAAC2E /* Inter-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "../fonts/Inter-Regular.ttf"; sourceTree = "<group>"; };
-		0317E784245B696200AAAC2E /* Inter-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "../fonts/Inter-Medium.ttf"; sourceTree = "<group>"; };
-		0317E785245B696200AAAC2E /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "../fonts/Inter-SemiBold.ttf"; sourceTree = "<group>"; };
+		0317E783245B696200AAAC2E /* ../fonts/Inter-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "../fonts/Inter-Regular.ttf"; sourceTree = "<group>"; };
+		0317E784245B696200AAAC2E /* ../fonts/Inter-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "../fonts/Inter-Medium.ttf"; sourceTree = "<group>"; };
+		0317E785245B696200AAAC2E /* ../fonts/Inter-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "../fonts/Inter-SemiBold.ttf"; sourceTree = "<group>"; };
 		0602B5AFC2AE93CFF1316467 /* Pods-celo-celoTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-celo-celoTests.debug.xcconfig"; path = "Target Support Files/Pods-celo-celoTests/Pods-celo-celoTests.debug.xcconfig"; sourceTree = "<group>"; };
 		0F1E1EB32346439C00274556 /* rings@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "rings@2x.png"; sourceTree = "<group>"; };
 		0F1E1EB42346439C00274556 /* rings@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "rings@3x.png"; sourceTree = "<group>"; };
@@ -78,14 +79,14 @@
 		A100BC162FF5410CB4627D3C /* Hind-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Hind-Regular.ttf"; path = "../fonts/Hind-Regular.ttf"; sourceTree = "<group>"; };
 		A11A894B3E86661FA132FC18 /* Pods-celo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-celo.release.xcconfig"; path = "Target Support Files/Pods-celo/Pods-celo.release.xcconfig"; sourceTree = "<group>"; };
 		A3642B9B22B607BE0071CBC5 /* celo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "celo-Bridging-Header.h"; sourceTree = "<group>"; };
+		A86AF23416DE47E0B4068AE7 /* Jost-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Jost-Medium.ttf"; path = "../fonts/Jost-Medium.ttf"; sourceTree = "<group>"; };
 		AAE92820119F4CC5B23C6636 /* Hind-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Hind-Medium.ttf"; path = "../fonts/Hind-Medium.ttf"; sourceTree = "<group>"; };
 		B59F6FDB7D084157A12E7A52 /* Hind-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Hind-Bold.ttf"; path = "../fonts/Hind-Bold.ttf"; sourceTree = "<group>"; };
 		BF61F27C85F8E9CE335BA142 /* Pods-celoTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-celoTests.release.xcconfig"; path = "Target Support Files/Pods-celoTests/Pods-celoTests.release.xcconfig"; sourceTree = "<group>"; };
 		C5952C9D168E4172BB52364C /* Hind-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Hind-SemiBold.ttf"; path = "../fonts/Hind-SemiBold.ttf"; sourceTree = "<group>"; };
 		CCB1F49C3DAE62A0F72F43DF /* Pods-celo-celoTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-celo-celoTests.release.xcconfig"; path = "Target Support Files/Pods-celo-celoTests/Pods-celo-celoTests.release.xcconfig"; sourceTree = "<group>"; };
+		F19E0D1442F8460181626D12 /* Jost-Book.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Jost-Book.ttf"; path = "../fonts/Jost-Book.ttf"; sourceTree = "<group>"; };
 		F3F5FA21E7EC46BBB744FE54 /* libz.tbd */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
-		F19E0D1442F8460181626D12 /* Jost-Book.ttf */ = {isa = PBXFileReference; name = "Jost-Book.ttf"; path = "../fonts/Jost-Book.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		A86AF23416DE47E0B4068AE7 /* Jost-Medium.ttf */ = {isa = PBXFileReference; name = "Jost-Medium.ttf"; path = "../fonts/Jost-Medium.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -218,9 +219,9 @@
 		E3041EF3155B4320B4CF8300 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				0317E784245B696200AAAC2E /* Inter-Medium.ttf */,
-				0317E783245B696200AAAC2E /* Inter-Regular.ttf */,
-				0317E785245B696200AAAC2E /* Inter-SemiBold.ttf */,
+				0317E784245B696200AAAC2E /* ../fonts/Inter-Medium.ttf */,
+				0317E783245B696200AAAC2E /* ../fonts/Inter-Regular.ttf */,
+				0317E785245B696200AAAC2E /* ../fonts/Inter-SemiBold.ttf */,
 				B59F6FDB7D084157A12E7A52 /* Hind-Bold.ttf */,
 				95E01263B685485BA7D5CEB0 /* Hind-Light.ttf */,
 				AAE92820119F4CC5B23C6636 /* Hind-Medium.ttf */,
@@ -384,17 +385,17 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0317E78A245B696200AAAC2E /* Inter-SemiBold.ttf in Resources */,
+				0317E78A245B696200AAAC2E /* ../fonts/Inter-SemiBold.ttf in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
 				0445977E03C74B20A93158B5 /* Hind-Bold.ttf in Resources */,
 				0350D7F2EBD64D0585FEF0AF /* Hind-Light.ttf in Resources */,
 				0F1E1EB62346439C00274556 /* rings@3x.png in Resources */,
 				0F1E1EB52346439C00274556 /* rings@2x.png in Resources */,
-				0317E786245B696200AAAC2E /* Inter-Regular.ttf in Resources */,
+				0317E786245B696200AAAC2E /* ../fonts/Inter-Regular.ttf in Resources */,
 				0581BC2D3AEB42D086D403E3 /* Hind-Medium.ttf in Resources */,
 				2CE54C7D16D44C5380C53609 /* Hind-Regular.ttf in Resources */,
-				0317E788245B696200AAAC2E /* Inter-Medium.ttf in Resources */,
+				0317E788245B696200AAAC2E /* ../fonts/Inter-Medium.ttf in Resources */,
 				5575263ED1EA4F568D328DE9 /* Hind-SemiBold.ttf in Resources */,
 				EB3CF5B346854570A1EC69B3 /* Jost-Book.ttf in Resources */,
 				2E6B8DA1BF6440D89CB45CCA /* Jost-Medium.ttf in Resources */,
@@ -869,7 +870,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.celo.mobile$(IOS_BUNDLE_ID_SUFFIX)";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_ID)";
 				PRODUCT_NAME = celo;
 				SWIFT_OBJC_BRIDGING_HEADER = "celo-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -901,7 +902,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.celo.mobile$(IOS_BUNDLE_ID_SUFFIX)";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_ID)";
 				PRODUCT_NAME = celo;
 				SWIFT_OBJC_BRIDGING_HEADER = "celo-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
