@@ -2,8 +2,8 @@
  * A custom style carousel based on react-native-snap-carousel
  */
 
-import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts'
+import colors from '@celo/react-components/styles/colors.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { Platform, StyleSheet, Text, View, ViewStyle } from 'react-native'
@@ -69,10 +69,10 @@ function Carousel(props: OwnProps) {
         dotsLength={props.items.length}
         activeDotIndex={activeItem}
         containerStyle={styles.paginationContainer}
-        dotColor={colors.dark}
-        inactiveDotColor={colors.lightGray}
-        inactiveDotOpacity={1}
-        inactiveDotScale={0.8}
+        dotColor={colors.onboardingAccent}
+        inactiveDotColor={colors.onboardingBrownLight}
+        inactiveDotOpacity={0.5}
+        inactiveDotScale={1}
         carouselRef={ref as any}
         tappableDots={false}
       />
@@ -122,8 +122,8 @@ const styles = StyleSheet.create({
     overflow: 'visible',
   },
   itemText: {
-    ...fontStyles.bodyLarge,
-    ...fontStyles.center,
+    ...fontStyles.regular,
+    textAlign: 'center',
     marginTop: 20,
   },
   carouselContainer: {
