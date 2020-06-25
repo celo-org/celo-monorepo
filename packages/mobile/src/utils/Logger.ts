@@ -49,12 +49,12 @@ class Logger extends ReactNativeLogger {
       // one time file access permissions which we cannot use here since the library we are using it
       // does not understand that.
       const combinedLogsPath = this.getCombinedLogsFilePath()
+      await RNFS.writeFile(combinedLogsPath, '========React Native Logs========\n')
       if (await RNFS.exists(rnLogsSrc)) {
-        await RNFS.writeFile(combinedLogsPath, '========React Native Logs========\n')
         await RNFS.appendFile(combinedLogsPath, await RNFS.readFile(rnLogsSrc))
       }
+      await RNFS.appendFile(combinedLogsPath, '\n\n========Geth Logs========\n')      
       if (await RNFS.exists(gethLogsSrc)) {
-        await RNFS.appendFile(combinedLogsPath, '\n\n========Geth Logs========\n')
         await RNFS.appendFile(combinedLogsPath, await RNFS.readFile(gethLogsSrc))
       }
       return combinedLogsPath
