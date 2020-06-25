@@ -203,7 +203,18 @@ export async function getAKSManagedServiceIdentityObjectId(clusterConfig: AzureC
   return managedIdentityObjectId.trim()
 }
 
-export async function registerStaticIP(name: string, resourceGroupIP: string) {
+export async function registerStaticIPIfNotRegistered(name: string, resourceGroupIP: string) {
+  // This returns an array of matching IP addresses. If there is no matching IP
+  // address, an empty array is returned. We expect at most 1 matching IP
+  const [existingIpsStr] = await execCmdWithExitOnFailure(
+    `az network public-ip list --resource-group ${resourceGroupIP} --query "[?name == '${name}' && sku.name == 'Standard'].ipAddress" -o json`
+  )
+  const existingIps = JSON.parse(existingIpsStr)
+  if (existingIps.length) {
+    console.log(`Skipping IP address registration, ${name} on ${resourceGroupIP} exists`)
+    // We expect only 1 matching IP
+    return existingIps[0]
+  }
   console.info(`Registering IP address ${name} on ${resourceGroupIP}`)
   const [address] = await execCmdWithExitOnFailure(
     `az network public-ip create --resource-group ${resourceGroupIP} --name ${name} --allocation-method Static --sku Standard --query publicIp.ipAddress -o tsv`
