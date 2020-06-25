@@ -114,35 +114,41 @@ const dateStyle = css({ marginBottom: 36, display: 'block' })
 const containerStyle = css(flexCol, { flex: 1, width: '100%', alignItems: 'center' })
 
 export async function getStaticProps() {
-  const about = await import('src/content/home/about.md').then((mod) => mod.default)
-  const attestations = await import('src/content/home/attestations.md').then((mod) => mod.default)
-  const initialTarget = await import('src/content/home/initial-target.md').then(
-    (mod) => mod.default
-  )
-  const intro = await import('src/content/home/intro.md').then((mod) => mod.default)
-  const matter = await import('front-matter').then((mod) => mod.default)
+  try {
+    const about = await import('src/content/home/about.md').then((mod) => mod.default)
+    const attestations = await import('src/content/home/attestations.md').then((mod) => mod.default)
+    const initialTarget = await import('src/content/home/initial-target.md').then(
+      (mod) => mod.default
+    )
+    const intro = await import('src/content/home/intro.md').then((mod) => mod.default)
+    const matter = await import('front-matter').then((mod) => mod.default)
 
-  const INTRO = matter<ContentShape>(intro)
-  const INITIAL_TARGET = matter<ContentShape>(initialTarget)
-  const ABOUT = matter<ContentShape>(about)
-  const ATTESTATIONS = matter<ContentShape>(attestations)
+    const INTRO = matter<ContentShape>(intro)
+    const INITIAL_TARGET = matter<ContentShape>(initialTarget)
+    const ABOUT = matter<ContentShape>(about)
+    const ATTESTATIONS = matter<ContentShape>(attestations)
 
-  const fetchData = await import('src/service/holdings').then((mod) => mod.default)
-  const fetchAddresses = await import('src/service/addresses').then((mod) => mod.default)
+    const fetchData = await import('src/service/holdings').then((mod) => mod.default)
+    const fetchAddresses = await import('src/service/addresses').then((mod) => mod.default)
 
-  const [addresses, holdings] = await Promise.all([fetchAddresses(), fetchData()])
-  return {
-    props: {
-      ...addresses,
-      ...holdings,
-      INTRO,
-      INITIAL_TARGET,
-      ABOUT,
-      ATTESTATIONS,
-    },
-    // we will attempt to re-generate the page:
-    // - when a request comes in
-    // - at most once every X seconds
-    unstable_revalidate: 60,
+    const [addresses, holdings] = await Promise.all([fetchAddresses(), fetchData()])
+    return {
+      props: {
+        ...addresses,
+        ...holdings,
+        INTRO,
+        INITIAL_TARGET,
+        ABOUT,
+        ATTESTATIONS,
+      },
+      // we will attempt to re-generate the page:
+      // - when a request comes in
+      // - at most once every X seconds
+      unstable_revalidate: 60,
+    }
+  } catch {
+    return {
+      unstable_revalidate: 1,
+    }
   }
 }
