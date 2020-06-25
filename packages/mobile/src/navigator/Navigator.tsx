@@ -230,7 +230,11 @@ const nuxScreens = (Navigator: typeof Stack) => (
       component={ImportContactsScreen}
       options={ImportContactsScreen.navigationOptions}
     />
-    <Navigator.Screen name={Screens.OnboardingSuccessScreen} component={OnboardingSuccessScreen} />
+    <Navigator.Screen
+      name={Screens.OnboardingSuccessScreen}
+      component={OnboardingSuccessScreen}
+      options={OnboardingSuccessScreen.navigationOptions}
+    />
   </>
 )
 
