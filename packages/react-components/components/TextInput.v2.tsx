@@ -8,6 +8,7 @@ import fontStyles from '@celo/react-components/styles/fonts.v2'
 import * as React from 'react'
 import {
   NativeSyntheticEvent,
+  Platform,
   StyleProp,
   StyleSheet,
   TextInput as RNTextInput,
@@ -115,6 +116,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     paddingHorizontal: 0,
+    lineHeight: Platform.select({ android: 22, ios: 20 }), // vertical align = center
   },
   icon: {
     marginLeft: 8,
