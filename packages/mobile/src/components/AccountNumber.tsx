@@ -27,12 +27,8 @@ export default function AccountNumber({ address, touchDisabled }: Props) {
 
   const formattedAddress = (
     <>
-      <Text adjustsFontSizeToFit={true} style={[styles.text, styles.topText]}>
-        {addressChunks.slice(0, 6).join(' ')}
-      </Text>
-      <Text adjustsFontSizeToFit={true} style={[styles.text, styles.bottomText]}>
-        {addressChunks.slice(6).join(' ')}
-      </Text>
+      <Text style={[styles.text, styles.topText]}>{addressChunks.slice(0, 6).join(' ')}</Text>
+      <Text style={[styles.text, styles.bottomText]}>{addressChunks.slice(6).join(' ')}</Text>
     </>
   )
 
@@ -47,7 +43,7 @@ export default function AccountNumber({ address, touchDisabled }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    width: 200,
+    width: 215,
   },
   text: {
     ...fontStyles.small,
