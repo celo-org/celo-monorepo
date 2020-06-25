@@ -42,14 +42,15 @@ export async function switchToCluster(
     console.info('No cluster currently set')
   }
 
+  // We expect the context to be the cluster name. If the context isn't known,
+  // we get the context from Azure.
   if (currentCluster === null || currentCluster.trim() !== clusterConfig.clusterName) {
     const [existingContextsStr] = await execCmdWithExitOnFailure('kubectl config get-contexts -o name')
-    const existingContexts = existingContextsStr.split('\n')
+    const existingContexts = existingContextsStr.trim().split('\n')
     if (existingContexts.includes(clusterConfig.clusterName)) {
       await execCmdWithExitOnFailure(`kubectl config use-context ${clusterConfig.clusterName}`)
     } else {
-      // We expect the context to be the cluster name. If the context isn't known,
-      // we get the context from Azure.
+      // If we don't already have the context, get it.
       // If a context is edited for some reason (eg switching default namespace),
       // a warning and prompt is shown asking if the existing context should be
       // overwritten. To avoid this, --overwrite-existing force overwrites.
