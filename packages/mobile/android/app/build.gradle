@@ -77,12 +77,12 @@ project.ext.react = [
         enableHermes: false,  // clean and rebuild if changing
         bundleInIntegration: true,
         devDisabledInIntegration: true,
-        bundleInStaging: true,
-        devDisabledInStaging: true,
         bundleInAlfajores: true,
         devDisabledInAlfajores: true,
         bundleInPilot: true,
         devDisabledInPilot: true,
+        bundleInMainnet: true,
+        devDisabledInMainnet: true,
         cliPath: "../../node_modules/react-native/cli.js",
         entryFile: "index.js",
 ]
@@ -90,10 +90,9 @@ project.ext.react = [
 project.ext.envConfigFiles = [
     debug: ".env",
     integration: ".env.integration",
-    staging: ".env.staging",
-    release: ".env.production",
     alfajores: ".env.alfajores",
     pilot: ".env.pilot",
+    mainnet: ".env.mainnet",
 ]
 
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
@@ -154,13 +153,14 @@ android {
     }
 
     defaultConfig {
-        applicationId "org.celo.mobile"
+        applicationId project.env.get("APP_BUNDLE_ID")
         minSdkVersion isDetoxTestBuild ? 18 : rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode appVersionCode
         versionName "1.8.2"
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        resValue "string", "app_name", project.env.get("APP_DISPLAY_NAME")
         resValue "string", "build_config_package", "org.celo.mobile"
         missingDimensionStrategy 'react-native-camera', 'general'
     }
@@ -191,21 +191,11 @@ android {
     }
     buildTypes {
         debug {
-            applicationIdSuffix ".debug"
             multiDexEnabled true
             signingConfig signingConfigs.debug
         }
 
         integration {
-            applicationIdSuffix ".integration"
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            signingConfig signingConfigs.release
-            matchingFallbacks = ['release']
-        }
-
-        staging {
-            applicationIdSuffix ".staging"
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             signingConfig signingConfigs.release
@@ -213,14 +203,12 @@ android {
         }
 
         release {
-            applicationIdSuffix ".production"
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             signingConfig signingConfigs.release
         }
 
         alfajores {
-            applicationIdSuffix ".alfajores"
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             signingConfig signingConfigs.release
@@ -228,7 +216,13 @@ android {
         }
 
         pilot {
-            applicationIdSuffix ".pilot"
+            minifyEnabled enableProguardInReleaseBuilds
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            signingConfig signingConfigs.release
+            matchingFallbacks = ['release']
+        }
+
+        mainnet {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             signingConfig signingConfigs.release
@@ -294,6 +288,7 @@ dependencies {
         stagingImplementation files(hermesPath + "hermes-release.aar")
         alfajoresImplementation files(hermesPath + "hermes-release.aar")
         pilotImplementation files(hermesPath + "hermes-release.aar")
+        mainnetImplementation files(hermesPath + "hermes-release.aar")
         releaseImplementation files(hermesPath + "hermes-release.aar")
     } else {
         implementation jscFlavor
