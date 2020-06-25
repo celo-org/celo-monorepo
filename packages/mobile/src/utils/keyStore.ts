@@ -8,7 +8,7 @@ export async function setKey(key: string, value: string) {
   try {
     Logger.debug(TAG, `Setting key ${key} in keystore`)
     // TODO(Rossy + Jean): Revisit this accessible setting
-    await Keychain.setGenericPassword('', value, {
+    await Keychain.setGenericPassword('CELO', value, {
       service: key,
       accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
     })

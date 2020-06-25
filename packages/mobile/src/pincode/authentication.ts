@@ -1,8 +1,9 @@
+import { sha256 } from 'ethereumjs-util'
 import { asyncRandomBytes } from 'react-native-secure-randombytes'
+import { ensureCorrectPin } from 'src/pincode/utils'
 import { store } from 'src/redux/store'
 import { retrieveStoredItem, storeItem } from 'src/storage/keychain'
 import Logger from 'src/utils/Logger'
-import { getContractKitOutsideGenerator, web3ForUtils } from 'src/web3/contracts'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'pincode/authentication'
@@ -33,7 +34,7 @@ async function retrieveOrGeneratePepper() {
   const storedPepper = await retrieveStoredItem(STORAGE_KEYS.PEPPER)
   if (!storedPepper) {
     const randomBytes = await asyncRandomBytes(PEPPER_LENGTH)
-    const pepper = randomBytes.toString()
+    const pepper = randomBytes.toString('hex')
     await storeItem({ key: STORAGE_KEYS.PEPPER, value: pepper })
     cachedPepper = pepper
     return cachedPepper
@@ -42,24 +43,25 @@ async function retrieveOrGeneratePepper() {
   return cachedPepper
 }
 
+async function hashForPin(pin: string) {
+  return sha256(new Buffer(await passwordForPin(pin), 'hex')).toString('hex')
+}
+
 export async function storePasswordHash(pin: string, account: string) {
-  const pepper = await retrieveOrGeneratePepper()
-  const hash = web3ForUtils.utils.sha3(pin + pepper)
+  const hash = await hashForPin(pin)
   await storeItem({ key: pinStorageKey(account), value: hash })
 }
 
 export async function checkPin(pin: string, account: string) {
-  const pepper = await retrieveOrGeneratePepper()
-  const hash = web3ForUtils.utils.sha3(pin + pepper)
+  const hash = await hashForPin(pin)
   const passwordHash = await retrievePasswordHash(account)
   if (!passwordHash) {
     Logger.error(`${TAG}@checkPin`, 'No password hash stored')
-    const contractKit = await getContractKitOutsideGenerator()
     const currentAccount = currentAccountSelector(store.getState())
     if (!currentAccount) {
       throw new Error('No account to unlock')
     }
-    const unlocked = await contractKit.web3.eth.personal.unlockAccount(currentAccount, pin, 1)
+    const unlocked = await ensureCorrectPin(await passwordForPin(pin), currentAccount)
     if (unlocked) {
       await storePasswordHash(pin, account)
       return true
@@ -74,7 +76,8 @@ export async function checkPin(pin: string, account: string) {
 
 export async function passwordForPin(pin: string) {
   const pepper = await retrieveOrGeneratePepper()
-  return `${pepper}${pin}`
+  const password = `${pepper}${pin}`
+  return password
 }
 
 async function retrievePasswordHash(account: string) {
