@@ -8,6 +8,7 @@ import {
   hasValidUserPhoneNumberParam,
 } from '../common/input-validation'
 import logger from '../common/logger'
+import { VERSION } from '../config'
 import { getDidMatchmaking, setDidMatchmaking } from '../database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../database/wrappers/number-pairs'
 
@@ -52,7 +53,7 @@ export async function handleGetContactMatches(
     ).map((numberPair) => ({ phoneNumber: numberPair }))
     await setNumberPairContacts(userPhoneNumber, contactPhoneNumbers)
     await setDidMatchmaking(account)
-    response.json({ success: true, matchedContacts })
+    response.json({ success: true, matchedContacts, version: VERSION })
   } catch (e) {
     logger.error('Failed to getContactMatches', e)
     respondWithError(response, 500, ErrorMessages.UNKNOWN_ERROR)

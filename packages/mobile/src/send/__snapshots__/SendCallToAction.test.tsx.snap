@@ -4,8 +4,6 @@ exports[`SendCallToAction renders correctly 1`] = `
 <View
   style={
     Object {
-      "borderBottomColor": "rgba(134, 138, 141, 0.15)",
-      "borderBottomWidth": 1,
       "flexDirection": "row",
       "paddingHorizontal": 20,
       "paddingVertical": 15,

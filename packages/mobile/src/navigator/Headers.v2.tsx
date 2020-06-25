@@ -27,7 +27,7 @@ export const noHeaderGestureDisabled: StackNavigationOptions = {
 
 const styles = StyleSheet.create({
   headerTitle: {
-    ...fontStyles.regular500,
+    ...fontStyles.navigationHeader,
   },
   headerSubTitle: {
     ...fontStyles.small,

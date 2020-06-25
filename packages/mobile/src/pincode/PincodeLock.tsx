@@ -13,20 +13,19 @@ import { appUnlock } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { Namespaces } from 'src/i18n'
 import Pincode from 'src/pincode/Pincode'
-import { isPinCorrect } from 'src/pincode/utils'
-import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
+import { ensureCorrectPin } from 'src/pincode/utils'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 function PincodeLock() {
   const [pin, setPin] = useState('')
   const [errorText, setErrorText] = useState<string | undefined>(undefined)
   const dispatch = useDispatch()
   const { t } = useTranslation(Namespaces.nuxNamePin1)
-  const fornoMode = useSelector(fornoSelector)
   const currentAccount = useSelector(currentAccountSelector)
 
   function onWrongPin() {
     setPin('')
-    setErrorText(t(ErrorMessages.INCORRECT_PIN))
+    setErrorText(t(`${Namespaces.global}:${ErrorMessages.INCORRECT_PIN}`))
   }
 
   function onCorrectPin() {
@@ -35,7 +34,7 @@ function PincodeLock() {
 
   function onCompletePin(enteredPin: string) {
     if (currentAccount) {
-      return isPinCorrect(enteredPin, fornoMode, currentAccount)
+      return ensureCorrectPin(pin, currentAccount)
         .then(onCorrectPin)
         .catch(onWrongPin)
     } else {

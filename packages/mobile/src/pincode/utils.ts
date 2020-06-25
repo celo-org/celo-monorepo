@@ -1,5 +1,5 @@
-import { getContractKitAsync } from 'src/web3/contracts'
-import { readPrivateKeyFromLocalDisk } from 'src/web3/privateKey'
+import { UNLOCK_DURATION } from 'src/geth/consts'
+import { getConnectedWalletAsync } from 'src/web3/contracts'
 
 export const PIN_LENGTH = 6
 
@@ -7,24 +7,8 @@ export function isPinValid(pin: string) {
   return pin.length === PIN_LENGTH
 }
 
-export function isPinCorrect(
-  pin: string,
-  fornoMode: boolean,
-  currentAccount: string
-): Promise<typeof pin> {
-  return new Promise((resolve, reject) => {
-    if (fornoMode) {
-      readPrivateKeyFromLocalDisk(currentAccount, pin)
-        .then(() => resolve(pin))
-        .catch(reject)
-    } else {
-      getContractKitAsync()
-        .then((contractKit: any) =>
-          contractKit.web3.eth.personal
-            .unlockAccount(currentAccount, pin, 1)
-            .then((result: boolean) => (result ? resolve(pin) : reject()))
-        )
-        .catch(reject)
-    }
-  })
+export async function ensureCorrectPin(pin: string, currentAccount: string): Promise<typeof pin> {
+  const wallet = await getConnectedWalletAsync()
+  await wallet.unlockAccount(currentAccount, pin, UNLOCK_DURATION)
+  return pin
 }

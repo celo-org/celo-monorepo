@@ -3,7 +3,6 @@
     "location": "packages/attestation-service",
     "dependencies": [
       "@celo/contractkit",
-      "@celo/protocol",
       "@celo/utils"
     ]
   },
