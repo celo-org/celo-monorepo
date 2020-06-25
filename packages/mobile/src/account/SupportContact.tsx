@@ -13,14 +13,13 @@ import { openComposer } from 'react-native-email-link'
 import * as RNFS from 'react-native-fs'
 import Mailer from 'react-native-mail'
 import SafeAreaView from 'react-native-safe-area-view'
-import { connect, useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { e164NumberSelector } from 'src/account/selectors'
 import { showMessage } from 'src/alert/actions'
 import { CELO_SUPPORT_EMAIL_ADDRESS, DEFAULT_TESTNET } from 'src/config'
 import i18n, { Namespaces } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigateBack } from 'src/navigator/NavigationService'
-import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
 
@@ -34,16 +33,6 @@ interface Email {
     type: string
     name: string
   }
-}
-
-interface DispatchProps {
-  showMessage: typeof showMessage
-}
-
-type Props = DispatchProps
-
-const mapDispatchToProps = {
-  showMessage,
 }
 
 async function sendEmailWithNonNativeApp(
@@ -67,13 +56,19 @@ async function sendEmailWithNonNativeApp(
   }
 }
 
-const SupportContact = (props: Props) => {
+function SupportContact() {
   const { t } = useTranslation(Namespaces.accountScreen10)
   const [message, setMessage] = useState('')
   const [attachLogs, setAttachLogs] = useState(true)
   const [inProgress, setInProgress] = useState(false)
   const e164PhoneNumber = useSelector(e164NumberSelector)
   const currentAccount = useSelector(currentAccountSelector)
+  const dispatch = useDispatch()
+
+  const navigateBackAndToast = () => {
+    navigateBack()
+    dispatch(showMessage(t('contactSuccess')))
+  }
 
   const sendEmail = useCallback(async () => {
     setInProgress(true)
@@ -111,8 +106,7 @@ const SupportContact = (props: Props) => {
     // if fails user can choose mail app but logs sent in message
     Mailer.mail(email, async (error: any, event: string) => {
       if (event === 'sent') {
-        navigateBack()
-        props.showMessage(t('contactSuccess'))
+        navigateBackAndToast()
       } else if (error) {
         const emailSent = await sendEmailWithNonNativeApp(
           emailSubject,
@@ -121,8 +115,7 @@ const SupportContact = (props: Props) => {
           combinedLogsPath
         )
         if (emailSent.success) {
-          navigateBack()
-          props.showMessage(t('contactSuccess'))
+          navigateBackAndToast()
         } else {
           Logger.showError(error + ' ' + emailSent.error)
         }
@@ -245,4 +238,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<{}, DispatchProps, {}, RootState>(null, mapDispatchToProps)(SupportContact)
+export default SupportContact
