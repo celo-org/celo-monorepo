@@ -4,7 +4,7 @@ set -euo pipefail
 # Deploys the blockchain api to App Engine
 #
 # Flags:
-# -n: Name of the network, maps to App Engine 'service' (integration, production, etc.)
+# -n: Name of the network, maps to App Engine 'service' (alfajores, mainnet, etc.)
 
 NETWORK=""
 
