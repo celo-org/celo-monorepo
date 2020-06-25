@@ -147,15 +147,17 @@ const verificationScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen
         name={Screens.VerificationLoadingScreen}
         component={VerificationLoadingScreen}
-        options={noHeaderGestureDisabled}
+        options={VerificationLoadingScreen.navigationOptions}
       />
       <Navigator.Screen
         name={Screens.VerificationInterstitialScreen}
         component={VerificationInterstitialScreen}
+        options={VerificationInterstitialScreen.navigationOptions}
       />
       <Navigator.Screen
         name={Screens.VerificationInputScreen}
         component={VerificationInputScreen}
+        options={VerificationInputScreen.navigationOptions}
       />
     </>
   )
@@ -211,7 +213,7 @@ const nuxScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen
       name={Screens.ImportWallet}
       component={ImportWallet}
-      options={nuxNavigationOptions}
+      options={ImportWallet.navigationOptions}
     />
     <Navigator.Screen
       name={Screens.ImportWalletSocial}
@@ -226,9 +228,13 @@ const nuxScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen
       name={Screens.ImportContacts}
       component={ImportContactsScreen}
-      options={nuxNavigationOptions}
+      options={ImportContactsScreen.navigationOptions}
     />
-    <Navigator.Screen name={Screens.OnboardingSuccessScreen} component={OnboardingSuccessScreen} />
+    <Navigator.Screen
+      name={Screens.OnboardingSuccessScreen}
+      component={OnboardingSuccessScreen}
+      options={OnboardingSuccessScreen.navigationOptions}
+    />
   </>
 )
 

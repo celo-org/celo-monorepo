@@ -9,6 +9,7 @@ import {
   phoneNumberHashIsValidIfExists,
 } from '../common/input-validation'
 import logger from '../common/logger'
+import { VERSION } from '../config'
 import { incrementQueryCount } from '../database/wrappers/account'
 import { getKeyProvider } from '../key-management/key-provider'
 import { getRemainingQueryCount } from './query-quota'
@@ -46,7 +47,7 @@ export async function handleGetBlindedMessageForSalt(
     const signature = computeBlindedSignature(blindedQueryPhoneNumber, privateKey)
     await incrementQueryCount(account)
     logger.debug('Salt retrieval success')
-    response.json({ success: true, signature })
+    response.json({ success: true, signature, version: VERSION })
   } catch (error) {
     logger.error('Failed to getSalt', error)
     respondWithError(response, 500, ErrorMessage.UNKNOWN_ERROR)

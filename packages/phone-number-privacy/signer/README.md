@@ -69,7 +69,7 @@ Use the following to configure the AWS Secrets Manager. To authenticate with Ama
 
 ### Setup
 
-The service requires a connection to a secret store and to a SQL database. The SQL connection parameters should be configured with the `DB_*` configs stated above.
+The service requires a connection to a secret store and to a SQL database. The SQL connection parameters should be configured with the `DB_*` configs stated above. Before performing the migration below, be sure to create a database and set the name as the value in the `DB_DATABASE` environment variable.
 
 #### Running locally or without docker
 

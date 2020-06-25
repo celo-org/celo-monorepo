@@ -4,7 +4,7 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
 <View
   style={
     Object {
-      "backgroundColor": "#F9F5ED",
+      "backgroundColor": "#F9F6F0",
       "flex": 1,
     }
   }
@@ -77,7 +77,7 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
         >
           <View
             accessible={true}
-            focusable={false}
+            focusable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackground",
@@ -94,11 +94,11 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
             style={
               Object {
                 "alignItems": "center",
-                "backgroundColor": "#D6E7EF",
+                "backgroundColor": "#D6EAF3",
                 "height": 48,
                 "justifyContent": "center",
                 "minWidth": 120,
-                "opacity": 0.5,
+                "opacity": 1,
                 "paddingHorizontal": 16,
                 "paddingVertical": 5,
               }
@@ -108,7 +108,7 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
             <Text
               style={
                 Object {
-                  "color": "#0C689C",
+                  "color": "#0768AE",
                   "fontFamily": "Inter-SemiBold",
                   "fontSize": 16,
                   "lineHeight": 22,
@@ -119,27 +119,6 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
             </Text>
           </View>
         </View>
-      </View>
-      <View
-        style={
-          Object {
-            "height": 64,
-          }
-        }
-      >
-        <Text
-          style={
-            Object {
-              "color": "#EA6042",
-              "fontFamily": "Inter-Regular",
-              "fontSize": 14,
-              "lineHeight": 18,
-            }
-          }
-        >
-          insufficientBalance
-           
-        </Text>
       </View>
       <View
         style={

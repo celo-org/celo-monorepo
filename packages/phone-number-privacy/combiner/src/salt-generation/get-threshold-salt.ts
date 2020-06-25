@@ -1,3 +1,4 @@
+import AbortController from 'abort-controller'
 import { Request, Response } from 'firebase-functions'
 import fetch, { Response as FetchResponse } from 'node-fetch'
 import { BLSCryptographyClient, ServicePartialSignature } from '../bls/bls-cryptography-client'
@@ -10,7 +11,7 @@ import {
   phoneNumberHashIsValidIfExists,
 } from '../common/input-validation'
 import logger from '../common/logger'
-import config from '../config'
+import config, { VERSION } from '../config'
 
 const PARTIAL_SIGN_MESSAGE_ENDPOINT = '/getBlindedSalt'
 
@@ -23,6 +24,7 @@ interface GetBlindedMessageForSaltRequest {
 interface SignMessageResponse {
   success: boolean
   signature: string
+  version: string
 }
 
 interface SignerService {
@@ -48,14 +50,8 @@ export async function handleGetDistributedBlindedMessageForSalt(
       respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER)
       return
     }
-    const { successCount, signatures, majorityErrorCode } = await requestSignatures(request)
-    if (successCount >= config.thresholdSignature.threshold) {
-      const combinedSignature = await BLSCryptographyClient.combinePartialBlindedSignatures(
-        signatures,
-        request.body.blindedQueryPhoneNumber
-      )
-      response.json({ success: true, combinedSignature })
-    } else {
+    const { successCount, majorityErrorCode } = await requestSignatures(request, response)
+    if (successCount < config.thresholdSignature.threshold) {
       handleMissingSignatures(majorityErrorCode, response)
     }
   } catch (e) {
@@ -63,48 +59,67 @@ export async function handleGetDistributedBlindedMessageForSalt(
   }
 }
 
-async function requestSignatures(request: Request) {
+async function requestSignatures(request: Request, response: Response) {
   let successCount = 0
   const responses: SignMsgRespWithStatus[] = []
+  const signatures: ServicePartialSignature[] = []
   const errorCodes: Map<number, number> = new Map()
 
   const signers = JSON.parse(config.pgpnpServices.signers) as SignerService[]
-  const signerReqs = signers.map((service) =>
-    requestSigature(service, request)
-      .then(async (res) => {
+  const signerReqs = signers.map((service) => {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => {
+      controller.abort()
+    }, config.pgpnpServices.timeoutMilliSeconds)
+    let sentResult: boolean = false
+
+    return requestSignature(service, request, controller)
+      .then(async (res: FetchResponse) => {
         const status = res.status
         if (res.ok) {
           const signResponse = (await res.json()) as SignMessageResponse
           responses.push({ url: service.url, signature: signResponse.signature, status })
+          signatures.push({ url: service.url, signature: signResponse.signature })
           successCount += 1
+          // Send response immediately once we cross threshold
+          if (!sentResult && successCount >= config.thresholdSignature.threshold) {
+            sentResult = true
+            const combinedSignature = await BLSCryptographyClient.combinePartialBlindedSignatures(
+              signatures,
+              request.body.blindedQueryPhoneNumber
+            )
+            response.json({ success: true, combinedSignature, version: VERSION })
+          }
         } else {
           responses.push({ url: service.url, status })
           errorCodes.set(status, (errorCodes.get(status) || 0) + 1)
         }
       })
       .catch((e) => {
-        logger.error(`${ErrorMessage.ERROR_REQUESTING_SIGNATURE} from signer ${service.url}`, e)
-        responses.push({ url: service.url, status: 500 })
+        if (e.name === 'AbortError') {
+          logger.error(`${ErrorMessages.TIMEOUT_FROM_SIGNER} from signer ${service.url}`)
+        } else {
+          logger.error(`${ErrorMessages.ERROR_REQUESTING_SIGNATURE} from signer ${service.url}`, e)
+          responses.push({ url: service.url, status: 500 })
+        }
       })
-  )
+      .finally(() => {
+        clearTimeout(timeout)
+      })
+  })
 
   await Promise.all(signerReqs)
 
   const majorityErrorCode = getMajorityErrorCode(errorCodes, responses)
 
-  const signatures: ServicePartialSignature[] = []
-  // Using a for loop to make TS happy, it doesn't interpret map or filter well
-  for (const resp of responses) {
-    const { url, signature } = resp
-    if (signature) {
-      signatures.push({ url, signature })
-    }
-  }
-
-  return { successCount, signatures, majorityErrorCode }
+  return { successCount, majorityErrorCode }
 }
 
-function requestSigature(service: SignerService, request: Request): Promise<FetchResponse> {
+function requestSignature(
+  service: SignerService,
+  request: Request,
+  controller: AbortController
+): Promise<FetchResponse> {
   return fetch(service.url + PARTIAL_SIGN_MESSAGE_ENDPOINT, {
     method: 'POST',
     headers: {
@@ -113,6 +128,7 @@ function requestSigature(service: SignerService, request: Request): Promise<Fetc
       Authorization: request.headers.authorization!,
     },
     body: JSON.stringify(request.body),
+    signal: controller.signal,
   })
 }
 

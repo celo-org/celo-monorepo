@@ -1,4 +1,5 @@
 import { Response } from 'firebase-functions'
+import { VERSION } from '../config'
 import logger from './logger'
 
 export enum ErrorMessage {
@@ -12,6 +13,7 @@ export enum ErrorMessage {
   NOT_ENOUGH_PARTIAL_SIGNATURES = 'CELO_PNP_ERR_07 SIG_ERR Not enough partial signatures',
   INCONSISTENT_SINGER_RESPONSES = 'CELO_PNP_ERR_08 SIG_ERR Inconsistent responses from signers',
   ERROR_REQUESTING_SIGNATURE = 'CELO_PNP_ERR_09 SIG_ERR Failed to request signature from signer',
+  TIMEOUT_FROM_SIGNER = 'CELO_PNP_ERR_10 SIG_ERR Timeout from signer',
 }
 
 export enum WarningMessage {
@@ -26,5 +28,5 @@ export type ErrorType = ErrorMessage | WarningMessage
 
 export function respondWithError(res: Response, statusCode: number, error: ErrorType) {
   logger.error('Responding with error', error)
-  res.status(statusCode).json({ success: false, error })
+  res.status(statusCode).json({ success: false, error, version: VERSION })
 }
