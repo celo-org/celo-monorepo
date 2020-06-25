@@ -21,12 +21,7 @@ export function SendSearchInput(props: SendSearchInputProps) {
 
   return (
     <View style={styles.textInputContainer}>
-      <SearchInput
-        placeholder={t('global:search')}
-        value={input}
-        onChangeText={handleChangeText}
-        testID={'RecipientSearchInput'}
-      />
+      <SearchInput placeholder={t('global:search')} value={input} onChangeText={handleChangeText} />
     </View>
   )
 }
