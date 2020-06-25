@@ -32,16 +32,6 @@ The database does not require public access and you should accessing the VPC and
 
 For the DB Instance size, `Free tier` should be enough.
 
-### Saving the Private key on AWS Secrets Manager
-
-1. We will create a secret in AWS Secret Manager for storing the Signer Private key. The secret is expected inside a key of a json. 
-The secret name and key values can be customized as desired (and when running the signer app modifying accordly the environment variables)
-To create the secret run the next command on your workstation:
-
-    ```bash
-    aws secretsmanager create-secret --name signer-secret --description "PGPNP Signer Secret" --secret-string '{"key":"<Signer private key>"}'`
-    ```
-
 ### Running the Signer on Fargate
 
 ECS Fargate is a container execution service provided by AWS. It runs containers without requiring explicit management of hosts or virtual machines.
