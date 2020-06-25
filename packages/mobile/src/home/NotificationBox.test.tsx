@@ -80,7 +80,8 @@ describe('NotificationBox', () => {
       </Provider>
     )
     expect(getByText('exchangeFlow9:whatIsGold')).toBeTruthy()
-    expect(getByText('inviteFlow11:inviteAnyone')).toBeTruthy()
+    // Functionality disabled for now
+    // expect(getByText('inviteFlow11:inviteAnyone')).toBeTruthy()
   })
 
   it('renders incoming payment request when they exist', () => {
