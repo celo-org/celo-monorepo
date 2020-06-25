@@ -54,7 +54,7 @@ The ticker symbol for the [Celo native asset](#celo-native-asset), often written
 
 ## Celo Gold
 
-The deprecated name for the Celo native asset, which now is referred to simply as "Celo" or "CELO" when it might be ambiguous whether the reference is to the asset or the protocol.
+The deprecated name for the Celo native asset, which now is referred to simply as "Celo" or preferably "CELO".
 
 ## Celo Native Asset
 
