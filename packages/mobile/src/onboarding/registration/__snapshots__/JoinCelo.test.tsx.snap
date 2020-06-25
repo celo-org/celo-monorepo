@@ -4,7 +4,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
 <SafeAreaView
   style={
     Object {
-      "backgroundColor": "#F9F5ED",
+      "backgroundColor": "#F9F6F0",
       "flex": 1,
       "justifyContent": "space-between",
     }
@@ -354,7 +354,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
             style={
               Object {
                 "alignItems": "center",
-                "backgroundColor": "#D6E7EF",
+                "backgroundColor": "#D6EAF3",
                 "height": 48,
                 "justifyContent": "center",
                 "minWidth": 120,
@@ -368,7 +368,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
             <Text
               style={
                 Object {
-                  "color": "#0C689C",
+                  "color": "#0768AE",
                   "fontFamily": "Inter-SemiBold",
                   "fontSize": 16,
                   "lineHeight": 22,
@@ -389,7 +389,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
 <SafeAreaView
   style={
     Object {
-      "backgroundColor": "#F9F5ED",
+      "backgroundColor": "#F9F6F0",
       "flex": 1,
       "justifyContent": "space-between",
     }
@@ -739,7 +739,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
             style={
               Object {
                 "alignItems": "center",
-                "backgroundColor": "#D6E7EF",
+                "backgroundColor": "#D6EAF3",
                 "height": 48,
                 "justifyContent": "center",
                 "minWidth": 120,
@@ -753,7 +753,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
             <Text
               style={
                 Object {
-                  "color": "#0C689C",
+                  "color": "#0768AE",
                   "fontFamily": "Inter-SemiBold",
                   "fontSize": 16,
                   "lineHeight": 22,

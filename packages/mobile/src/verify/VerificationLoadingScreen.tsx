@@ -1,8 +1,8 @@
 import PhoneAndUsers from '@celo/react-components/icons/PhoneAndUsers'
 import SearchUser from '@celo/react-components/icons/SearchUser'
 import VerificationTexts from '@celo/react-components/icons/VerificationTexts'
-import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import colors from '@celo/react-components/styles/colors.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -12,11 +12,11 @@ import { connect } from 'react-redux'
 import { setRetryVerificationWithForno } from 'src/account/actions'
 import CancelButton from 'src/components/CancelButton.v2'
 import Carousel, { CarouselItem } from 'src/components/Carousel'
-import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
 import { cancelVerification, startVerification } from 'src/identity/actions'
 import { VerificationStatus } from 'src/identity/types'
+import { noHeaderGestureDisabled } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -63,6 +63,8 @@ const mapStateToProps = (state: RootState): StateProps => {
 }
 
 class VerificationLoadingScreen extends React.Component<Props> {
+  static navigationOptions = noHeaderGestureDisabled
+
   componentDidMount() {
     BackHandler.addEventListener('hardwareBackPress', this.handleBackButton)
     this.props.startVerification()
@@ -124,7 +126,6 @@ class VerificationLoadingScreen extends React.Component<Props> {
             <CancelButton onCancel={this.onCancel} />
           </View>
           <ScrollView contentContainerStyle={styles.scrollContainer}>
-            <DevSkipButton nextScreen={Screens.VerificationInterstitialScreen} />
             <View style={styles.statusContainer}>
               <LoadingSpinner />
               <Text style={styles.textPhoneNumber}>
@@ -151,7 +152,7 @@ class VerificationLoadingScreen extends React.Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.backgroundDarker,
+    backgroundColor: colors.onboardingBackground,
   },
   innerContainer: {
     flex: 1,
@@ -163,6 +164,7 @@ const styles = StyleSheet.create({
   },
   buttonCancelContainer: {
     position: 'absolute',
+    top: 10,
     left: 5,
     // Need to set zIndex so custom nav is on top of empty default nav
     zIndex: 1,
@@ -173,13 +175,12 @@ const styles = StyleSheet.create({
     marginTop: 46,
   },
   textPhoneNumber: {
-    ...fontStyles.body,
-    ...fontStyles.semiBold,
+    ...fontStyles.regular600,
     marginTop: 20,
   },
   textOpenTip: {
-    ...fontStyles.body,
-    marginTop: 5,
+    ...fontStyles.regular,
+    marginTop: 10,
   },
   carouselContainer: {
     paddingVertical: 20,
