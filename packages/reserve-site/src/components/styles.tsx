@@ -11,9 +11,9 @@ export const fineStyle = css({
 })
 
 export enum BreakPoints {
-  smallPhone = '@media (max-width: 320)',
-  mediumPhone = '@media (max-width: 420)',
-  phablet = '@media (max-width: 500)',
-  smallTablet = '@media (max-width: 590)',
-  tablet = '@media (max-width: 777)',
+  smallPhone = '@media (max-width: 320px)',
+  mediumPhone = '@media (max-width: 420px)',
+  phablet = '@media (max-width: 500px)',
+  smallTablet = '@media (max-width: 590px)',
+  tablet = '@media (max-width: 890px)',
 }

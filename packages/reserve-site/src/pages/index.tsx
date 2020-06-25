@@ -36,6 +36,7 @@ export default function Home(props: HoldingsData & Addresses & Props) {
               subHeading={<Updated date={props.updatedDate} />}
             >
               <Holdings
+                unFrozenRatio={props.unFrozenRatio}
                 total={props.total}
                 inCustody={props.inCustody}
                 onChain={props.onChain}

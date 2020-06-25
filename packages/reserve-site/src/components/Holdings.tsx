@@ -63,10 +63,11 @@ const ratiosSectionStyle = css({
                      "info info ."
                      `,
   [BreakPoints.tablet]: {
-    gridTemplateAreas: `"ratio"
-                        "unfrozen"
-                        "info"
-                        `,
+    gridTemplateAreas: `
+    "unfrozen"
+    "ratio"
+    "info"
+    `,
   },
 })
 
