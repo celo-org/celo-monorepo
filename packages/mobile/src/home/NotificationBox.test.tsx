@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
-import * as renderer from 'react-test-renderer'
 import { DAYS_TO_BACKUP } from 'src/backup/utils'
 import NotificationBox from 'src/home/NotificationBox'
 import { createMockStore, getElementText } from 'test/utils'
@@ -40,7 +39,7 @@ describe('NotificationBox', () => {
     const store = createMockStore({
       ...storeDataNotificationsEnabled,
     })
-    const tree = renderer.create(
+    const tree = render(
       <Provider store={store}>
         <NotificationBox />
       </Provider>
