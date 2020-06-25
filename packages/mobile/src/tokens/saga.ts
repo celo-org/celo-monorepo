@@ -73,7 +73,14 @@ export function tokenFetchFactory({ actionName, token, actionCreator, tag }: Tok
       const tokenContract = yield call(getTokenContract, token)
       const balanceInWei: BigNumber = yield call([tokenContract, tokenContract.balanceOf], account)
       const balance: BigNumber = yield call(convertFromContractDecimals, balanceInWei, token)
-      CeloAnalytics.track(CustomEventNames.fetch_balance)
+      CeloAnalytics.track(
+        CustomEventNames.fetch_balance,
+        token === CURRENCY_ENUM.DOLLAR
+          ? {
+              dollarBalance: balance,
+            }
+          : { goldBalance: balance }
+      )
       yield put(actionCreator(balance.toString()))
     } catch (error) {
       Logger.error(tag, 'Error fetching balance', error)

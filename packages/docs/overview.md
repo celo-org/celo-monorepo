@@ -14,9 +14,13 @@ The code of the Celo Blockchain has shared ancestry with [Ethereum](https://www.
 
 Ethereum applications are built using **smart contracts**. Smart contracts are programs written in languages like [Solidity](https://solidity.readthedocs.io/en/v0.5.10/) that produce bytecode for the **Ethereum Virtual Machine** or **EVM**, a runtime environment. Programs encoded in smart contracts receive messages and manipulate the blockchain ledger and are termed **on-chain**.
 
-Celo has a native unit of accounting, the cryptocurrency **CELO**, equivalent to Ether in Ethereum. Celo's ledger consists of **accounts**, identified by an **address**. There are two types of account. **Externally owned accounts** have an associated CELO balance and are controlled by a user holding the associated public-private keypair. **Contract accounts** contain the code and data of a single smart contract which can be called and manipulate its own stored data.
+Celo has a native unit of accounting, the cryptocurrency **CELO**, comparable to Ether on Ethereum. Celo's ledger consists of **accounts**, identified by an **address**. There are two types of account. **Externally owned accounts** have an associated CELO balance and are controlled by a user holding the associated public-private keypair. **Contract accounts** contain the code and data of a single smart contract which can be called and manipulate its own stored data.
 
-**ERC-20** is a standard interface for implementing cryptocurrencies or **tokens** as contracts, rather than via account balances. \(In Celo, CELO has a duality as both the native currency and is also an ERC-20 token\).
+**ERC-20** is a standard interface for implementing cryptocurrencies or **tokens** as contracts, rather than via account balances. In Celo, CELO has a duality as both the native currency and is also an ERC-20 token on the Celo blockchain.
+
+{% hint style="warning" %}
+Celo assets exist on an independent blockchain, and cannot be accessed through wallets that connect to the Ethereum network. Only use wallets disigned to work with the Celo network.
+{% endhint %}
 
 Users interact with the blockchain by creating signed **transactions.** These are requests to make a change to the ledger. They can: transfer value between accounts; execute a function in a smart contract and pass in arguments \(perhaps causing other smart contracts to be called, update their storage, or transfer value\); or create a new smart contract.
 
@@ -34,7 +38,7 @@ The Celo stack is structured into the following logical layers:
 
 ![](https://storage.googleapis.com/celo-website/docs/full-stack-diagram.jpg)
 
-- **Celo Blockchain**: An open cryptographic protocol that allows applications to make transactions with and run smart contracts in a secure and decentralized fashion. The Celo Blockchain code has shared ancestry with [Ethereum](https://www.ethereum.org), and maintains full EVM compatibility for smart contracts. However it uses a [Byzantine Fault Tolerant](http://pmg.csail.mit.edu/papers/osdi99.pdf) \(BFT\) consensus mechanism rather than Proof of Work, and has different block format, transaction format, client synchronization protocols, and gas payment and pricing mechanisms. The network’s native asset is CELO, which is also an ERC-20 token.
+- **Celo Blockchain**: An open cryptographic protocol that allows applications to make transactions with and run smart contracts in a secure and decentralized fashion. The Celo Blockchain code has shared ancestry with [Ethereum](https://www.ethereum.org), and maintains full EVM compatibility for smart contracts. However it uses a [Byzantine Fault Tolerant](http://pmg.csail.mit.edu/papers/osdi99.pdf) \(BFT\) consensus mechanism rather than Proof of Work, and has different block format, transaction format, client synchronization protocols, and gas payment and pricing mechanisms.
 - **Celo Core Contracts**: A set of smart contracts running on the Celo Blockchain that comprise much of the logic of the platform features including ERC-20 stable currencies, identity attestations, proof-of-stake and governance. These smart contracts are upgradeable and managed by the decentralized governance process.
 - **Applications:** Applications for end users built on the Celo platform. The Celo Wallet app, the first of an ecosystem of applications, allows end users to manage accounts and make payments securely and simply by taking advantage of the innovations in the Celo protocol. Applications take the form of external mobile or backend software: they interact with the Celo Blockchain to issue transactions and invoke code that forms the Celo Core Contracts’ API. Third parties can also deploy custom smart contracts that their own applications can invoke, which in turn can leverage Celo Core Contracts. Applications may use centralized cloud services to provide some of their functionality: in the case of the Celo Wallet, push notifications and a transaction activity feed.
 
@@ -78,7 +82,7 @@ Celo uses a proof-of-stake mechanism for selecting the validator set for a fixed
 
 Celo uses an on-chain governance mechanism to manage and upgrade aspects of the protocol that reside in the Celo Core Contracts, and for a number of parameters used by the Celo Blockchain. This includes operations like upgrading smart contracts, adding new stable currencies, modifying the reserve target asset allocation, and changing how validator elections are decided.
 
-The Governance contract is set as “owner” for all of the Celo Core Contracts. This allows the protocol to carry out agreed governance proposals by executing code in the context of the Governance contract. Proposals are selected for consideration and voted on by CELO holders using a weighted vote based on the same Locked Gold commitment used to vote to elect validators.
+The Governance contract is set as “owner” for all of the Celo Core Contracts. This allows the protocol to carry out agreed governance proposals by executing code in the context of the Governance contract. Proposals are selected for consideration and voted on by CELO holders using a weighted vote based on the same Locked CELO commitment used to vote to elect validators.
 
 ### Ultralight Synchronization
 
@@ -128,7 +132,11 @@ The Attestations contract allows a user to request attestations to their phone n
 
 Celo provides a number of enhancements to regular transactions as familiar to Ethereum developers.
 
-CELO has a duality as both the native currency and is also an ERC-20 token, simplifying the work of application developers.
+The Celo native asset has a duality as both the native currency and is also an ERC-20 token, simplifying the work of application developers.
+
+{% hint style="warning" %}
+Celo assets exist on an independent blockchain, and cannot be accessed through wallets that connect to the Ethereum network. Only use wallets designed to work with the Celo network.
+{% endhint %}
 
 In Celo, transaction fees can be paid in stable cryptocurrencies. A user sending Celo Dollars will be able to pay their transaction fee out of their Celo Dollar balance, so they do not need to hold a separate balance of CELO in order to make transactions. The protocol maintains a list of currencies which can be used to pay for transaction fees. These smart contracts implement an extension of the ERC-20 interface, with additional functions that allow the protocol to debit and credit transaction fees.
 

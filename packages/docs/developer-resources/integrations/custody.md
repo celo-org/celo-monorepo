@@ -4,7 +4,11 @@ This section is intended for Custodians, Exchanges, and other services that inte
 
 ## Balance Model
 
-As a fork of Ethereum, Celo retains the account model to keep track of users' balances. Celo Dollar and CELO are [ERC20](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md) contracts. As mentioned previously, it is common for smart contracts to hold balances on behalf of other addresses. One example is the [`LockedGold`](../../celo-codebase/protocol/proof-of-stake/locked-gold.md) smart contract that holds the "locked portion of a user's `CELO` balance". Another one is the [`ReleaseGold`](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/ReleaseGold.sol) smart contract that holds `CELO` that is being released to a beneficiary address over time according to some schedule.
+As a fork of Ethereum, Celo retains the account model to keep track of users' balances. Celo Dollar and CELO implement the [ERC20](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md) interface. As mentioned previously, it is common for smart contracts to hold balances on behalf of other addresses. One example is the [`LockedGold`](../../celo-codebase/protocol/proof-of-stake/locked-gold.md) smart contract that holds the "locked portion of a user's `CELO` balance". Another one is the [`ReleaseGold`](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/ReleaseGold.sol) smart contract that holds `CELO` that is being released to a beneficiary address over time according to some schedule.
+
+{% hint style="warning" %}
+Celo assets assets exist on an independent blockchain, and although they implement the ERC20 interface, they cannot be accessed through wallets that connect to the Ethereum network. Wallets and other integrations must connect to the Celo network to transfer tokens on Celo.
+{% endhint %}
 
 Applications that display balances may need to be written to be aware of this possibility.
 
@@ -14,7 +18,7 @@ CELO and Celo Dollars implement the ERC20 interface, as will any future core sta
 
 ## CELO State Machine
 
-CELO as described previously can also exist in various states that represent a specific user behavior. For example, if a user wants to lock gold to either participate in consensus directly or vote, that CELO will be sent to the `LockedGold` smart contract. To understand the high level flow, please read [this description of the various states CELO can exist in](../../celo-codebase/protocol/proof-of-stake/locked-gold.md#locking-and-voting-flow).
+CELO as described previously can also exist in various states that represent a specific user behavior. For example, if a user wants to lock CELO to either participate in consensus directly or vote, that CELO will be sent to the `LockedGold` smart contract. To understand the high level flow, please read [this description of the various states CELO can exist in](../../celo-codebase/protocol/proof-of-stake/locked-gold.md#locking-and-voting-flow).
 
 ## Smart Contracts
 
@@ -30,7 +34,7 @@ The `Accounts` contract also allows for the authorization of various signer keys
 
 ### LockedGold
 
-[LockedGold.sol](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/LockedGold.sol) is used as part of Celo's [proof-of-stake](/../../celo-codebase/protocol/proof-of-stake/README.md) mechanism. Users can lock CELO by sending it to the `LockedGold` contract after creating an account via the `Accounts` contract as described above. This allows users to vote in validator elections, receive epoch rewards, and participate in on-chain governance.
+[LockedGold.sol](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/LockedGold.sol), which references Celo Gold, the deprecated name for the native token, is used as part of Celo's [proof-of-stake](/../../celo-codebase/protocol/proof-of-stake/README.md) mechanism. Users can lock CELO by sending it to the `LockedGold` contract after creating an account via the `Accounts` contract as described above. This allows users to vote in validator elections, receive epoch rewards, and participate in on-chain governance.
 
 There are two ways in which users can vote:
 
@@ -51,7 +55,7 @@ The [`activate` function](https://github.com/celo-org/celo-monorepo/blob/master/
 
 ### ReleaseGold
 
-A common problem in other proof-of-stake protocols is the tension between wanting early token holders' balances to release over time to ensure long-term alignment, while also wanting them to be able to participate in consensus to increase the security of the network. To bridge both goals, many early token balances in the Celo network are released via the [`ReleaseGold`](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/ReleaseGold.sol) contract. Beneficiaries of these contracts can then participate in the proof-of-stake system by staking and voting with CELO that has not yet been "released" for transfers. Please find more high level information about the `ReleaseGold` contract [here](../../celo-holder-guide/release-gold.md).
+A common problem in other proof-of-stake protocols is the tension between wanting early token holders' balances to release over time to ensure long-term alignment, while also wanting them to be able to participate in consensus to increase the security of the network. To bridge both goals, many early token balances in the Celo network are released via the [`ReleaseGold`](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/ReleaseGold.sol) contract. Beneficiaries of these contracts can then participate in the proof-of-stake system by staking and voting with CELO that has not yet been "released" for transfers. Please find more high level information about the `ReleaseGold` contract [here](../../celo-gold-holder-guide/release-gold.md).
 
 From a technical perspective, `ReleaseGold` can be thought of as a "puppet" account controlled by the "puppeteer", or the beneficiary private key corresponding to the `beneficiary` address in the contract. This beneficiary key can then authorize validator signer and vote signer keys that can then call respective functions associated with validating or voting. Most of the required function calls described above can be made by the signer keys directly to the `LockedGold` or `Election` contracts associated with the `ReleaseGold` account. However, some functions in the `ReleaseGold` contract are proxied to the underlying `LockedGold` or `Election` contracts, and have a separate function signature that can be called by the `beneficiary` address. Notably:
 

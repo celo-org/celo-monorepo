@@ -106,4 +106,6 @@ export abstract class RemoteWallet extends WalletBase implements Wallet {
       throw new Error('wallet needs to be initialized first')
     }
   }
+
+  public isSetupFinished = () => this.setupFinished
 }
