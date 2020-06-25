@@ -192,7 +192,7 @@ export type StackParamList = {
     isFromScan?: boolean
   }
   [Screens.VerificationEducationScreen]: { showSkipDialog: boolean } | undefined
-  [Screens.VerificationInputScreen]: undefined
+  [Screens.VerificationInputScreen]: { showHelpDialog: boolean } | undefined
   [Screens.VerificationInterstitialScreen]: undefined
   [Screens.VerificationLoadingScreen]: undefined
   [Screens.OnboardingSuccessScreen]: undefined

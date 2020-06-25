@@ -112,7 +112,7 @@ async function postToMatchmaking(
     return response.matchedContacts.map((match) => match.phoneNumber)
   } catch (error) {
     if (error.message === ErrorMessages.PGPNP_QUOTA_ERROR) {
-      throw new Error(ErrorMessages.MATHMAKING_QUOTA_EXCEEDED)
+      throw new Error(ErrorMessages.MATCHMAKING_QUOTA_EXCEEDED)
     }
     throw error
   }
