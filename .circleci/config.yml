@@ -795,7 +795,7 @@ jobs:
       - run:
           name: Run Tests for signer
           command: yarn --cwd=packages/phone-number-privacy/signer test
-  
+
   certora-test:
     working_directory: ~/app
     docker:
@@ -804,9 +804,16 @@ jobs:
       - attach_workspace:
           at: ~/app
       - run:
+          name: Install node 10 and dependencies
+          command: |
+            brew uninstall --ignore-dependencies node icu4c
+            brew install node@10
+            brew link --overwrite --force node@10
+            yarn
+      - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol  
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
       - run:
           name: Certora dependencies
           command: |
@@ -828,7 +835,7 @@ jobs:
           command: |
             cd packages/protocol
             certoraRun specs/harnesses/AccountsHarness.sol --verify AccountsHarness:specs/accounts.spec --settings -assumeUnwindCond
-    
+
 workflows:
   version: 2
   celo-monorepo-build:
