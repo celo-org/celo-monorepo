@@ -88,6 +88,7 @@ function* doImportContacts(doMatchmaking: boolean) {
   yield put(updateImportContactsProgress(ImportContactsStatus.Importing))
 
   const contacts: MinimalContact[] = yield call(getAllContacts)
+  CeloAnalytics.track(CustomEventNames.fetched_contacts, { contacts: contacts.length })
   if (!contacts || !contacts.length) {
     Logger.warn(TAG, 'Empty contacts list. Skipping import.')
     return true
