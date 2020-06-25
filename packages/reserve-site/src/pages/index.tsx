@@ -113,12 +113,12 @@ export async function getStaticProps() {
         INITIAL_TARGET,
         ABOUT,
         ATTESTATIONS,
+        year: new Date().getFullYear(),
       },
       // we will attempt to re-generate the page:
       // - when a request comes in
       // - at most once every X seconds
       unstable_revalidate: 60,
-      year: new Date().getFullYear(),
     }
   } catch {
     return {

@@ -2,7 +2,7 @@
 import { css, jsx } from '@emotion/core'
 
 interface Props {
-  date?: number
+  date?: string
   humanDate?: string
 }
 

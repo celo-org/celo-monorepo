@@ -47,3 +47,12 @@ const imageStyle = css({
 const titleStyle = css({ textAlign: 'center', marginTop: 30 })
 
 const containerStyle = css(flexCol, { flex: 1, width: '100%', alignItems: 'center' })
+
+export async function getStaticProps() {
+  return {
+    props: {
+      year: new Date().getFullYear(),
+    },
+    unstable_revalidate: 86400, // day
+  }
+}
