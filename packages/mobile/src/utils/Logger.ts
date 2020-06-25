@@ -53,7 +53,7 @@ class Logger extends ReactNativeLogger {
       if (await RNFS.exists(rnLogsSrc)) {
         await RNFS.appendFile(combinedLogsPath, await RNFS.readFile(rnLogsSrc))
       }
-      await RNFS.appendFile(combinedLogsPath, '\n\n========Geth Logs========\n')      
+      await RNFS.appendFile(combinedLogsPath, '\n\n========Geth Logs========\n')
       if (await RNFS.exists(gethLogsSrc)) {
         await RNFS.appendFile(combinedLogsPath, await RNFS.readFile(gethLogsSrc))
       }
