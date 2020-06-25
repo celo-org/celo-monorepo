@@ -39,7 +39,7 @@ function ImportContactsScreen({ route, navigation }: Props) {
   const insets = useSafeArea()
   const headerHeight = useHeaderHeight()
 
-  function renderStatusContainer() {
+  const renderStatusContainer = () => {
     if (importStatus === ImportContactsStatus.Done) {
       return (
         <View style={styles.statusContainer}>
@@ -80,7 +80,7 @@ function ImportContactsScreen({ route, navigation }: Props) {
     )
   }
 
-  function onFinish() {
+  const onFinish = () => {
     navigate(Screens.OnboardingSuccessScreen)
   }
 
