@@ -7,8 +7,18 @@ import {
   DrawerContentComponentProps,
   DrawerContentOptions,
   DrawerContentScrollView,
-  DrawerItemList,
+  DrawerItem,
 } from '@react-navigation/drawer'
+import {
+  DrawerDescriptorMap,
+  DrawerNavigationHelpers,
+} from '@react-navigation/drawer/lib/typescript/src/types'
+import {
+  CommonActions,
+  DrawerActions,
+  DrawerNavigationState,
+  useLinkBuilder,
+} from '@react-navigation/native'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
@@ -36,12 +46,78 @@ import { Help } from 'src/icons/navigator/Help'
 import { Home } from 'src/icons/navigator/Home'
 import { Settings } from 'src/icons/navigator/Settings'
 import { useDollarsToLocalAmount, useLocalCurrencySymbol } from 'src/localCurrency/hooks'
+import { ensurePincode } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import useSelector from 'src/redux/useSelector'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
+import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
 
+const TAG = 'NavigationService'
+
 const Drawer = createDrawerNavigator()
+
+type CustomDrawerItemListProps = Omit<DrawerContentOptions, 'contentContainerStyle' | 'style'> & {
+  state: DrawerNavigationState
+  navigation: DrawerNavigationHelpers
+  descriptors: DrawerDescriptorMap
+  protectedRoutes: string[]
+}
+
+function CustomDrawerItemList({
+  state,
+  navigation,
+  descriptors,
+  activeTintColor,
+  inactiveTintColor,
+  activeBackgroundColor,
+  inactiveBackgroundColor,
+  itemStyle,
+  labelStyle,
+  protectedRoutes,
+}: CustomDrawerItemListProps) {
+  const buildLink = useLinkBuilder()
+
+  return (state.routes.map((route, i) => {
+    const focused = i === state.index
+    const { title, drawerLabel, drawerIcon } = descriptors[route.key].options
+    const navigateToItem = () => {
+      navigation.dispatch({
+        ...(focused ? DrawerActions.closeDrawer() : CommonActions.navigate(route.name)),
+        target: state.key,
+      })
+    }
+    const onPress = () => {
+      if (protectedRoutes.indexOf(route.name) !== -1) {
+        // Route should be protected by PIN code
+        ensurePincode()
+          .then(navigateToItem)
+          .catch((error) => {
+            Logger.error(`${TAG}@onPress`, 'PIN ensure error', error)
+          })
+      } else {
+        navigateToItem()
+      }
+    }
+
+    return (
+      <DrawerItem
+        key={route.key}
+        label={drawerLabel !== undefined ? drawerLabel : title !== undefined ? title : route.name}
+        icon={drawerIcon}
+        focused={focused}
+        activeTintColor={activeTintColor}
+        inactiveTintColor={inactiveTintColor}
+        activeBackgroundColor={activeBackgroundColor}
+        inactiveBackgroundColor={inactiveBackgroundColor}
+        labelStyle={labelStyle}
+        style={itemStyle}
+        to={buildLink(route.name, route.params)}
+        onPress={onPress}
+      />
+    )
+  }) as React.ReactNode) as React.ReactElement
+}
 
 function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOptions>) {
   const displayName = useSelector(nameSelector)
@@ -74,7 +150,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
         )}`}</Text>
         <View style={styles.borderBottom} />
       </View>
-      <DrawerItemList {...props} />
+      <CustomDrawerItemList {...props} protectedRoutes={[Screens.BackupIntroduction]} />
       <View style={styles.drawerBottom}>
         <Text style={fontStyles.label}>Account No.</Text>
         <View style={styles.accountOuterContainer}>
