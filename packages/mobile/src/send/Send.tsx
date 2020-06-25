@@ -116,7 +116,7 @@ export const sendScreenNavOptions = ({
         }
       />
     ),
-    headerLeftContainerStyle: styles.headerContainer,
+    headerLeftContainerStyle: styles.headerLeftContainer,
     headerRight: () => (
       <TopBarIconButton
         icon={<QRCodeBorderlessIcon height={32} color={colors.greenUI} />}
@@ -126,7 +126,7 @@ export const sendScreenNavOptions = ({
         onPress={goQr}
       />
     ),
-    headerRightContainerStyle: styles.headerContainer,
+    headerRightContainerStyle: styles.headerRightContainer,
     headerTitle: title,
   }
 }
@@ -300,7 +300,7 @@ class Send extends React.Component<Props, State> {
   }
 
   render() {
-    const { defaultCountryCode, numberVerified } = this.props
+    const { defaultCountryCode } = this.props
     const { searchQuery } = this.state
 
     return (
@@ -308,7 +308,7 @@ class Send extends React.Component<Props, State> {
       // needs fullscreen rendering
       <View style={styles.body}>
         <DisconnectBanner />
-        <SendSearchInput isPhoneEnabled={numberVerified} onChangeText={this.onSearchQueryChanged} />
+        <SendSearchInput onChangeText={this.onSearchQueryChanged} />
         <RecipientPicker
           testID={'RecipientPicker'}
           sections={this.buildSections()}
@@ -327,8 +327,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  headerContainer: {
+  headerLeftContainer: {
     paddingLeft: 16,
+  },
+  headerRightContainer: {
+    paddingRight: 16,
   },
 })
 
