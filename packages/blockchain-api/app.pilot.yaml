@@ -1,12 +1,12 @@
 runtime: nodejs10
-service: pilot
+service: blockchain-api
 env_variables:
-  NODE_ENV: "production"
-  DEPLOY_ENV: "pilot"
-  EXCHANGE_RATES_API: "https://apilayer.net/api"
-  BLOCKSCOUT_API: "https://pilot-blockscout.celo-testnet.org/graphql"
-  FIREBASE_DB: "https://celo-org-mobile-pilot.firebaseio.com"
+  NODE_ENV: 'production'
+  DEPLOY_ENV: 'pilot'
+  EXCHANGE_RATES_API: 'https://apilayer.net/api'
+  BLOCKSCOUT_API: 'https://pilot-blockscout.celo-testnet.org/graphql'
+  FIREBASE_DB: 'https://celo-org-mobile-pilot.firebaseio.com'
   # TODO Pull addresses from the build artifacts of the network in protocol/build
-  FAUCET_ADDRESS: "0x387bCb16Bfcd37AccEcF5c9eB2938E30d3aB8BF2"
-  VERIFICATION_REWARDS_ADDRESS: "0xb4fdaf5f3cd313654aa357299ada901b1d2dd3b5"
-  WEB3_PROVIDER_URL: "https://pilot-forno.celo-testnet.org"
+  FAUCET_ADDRESS: '0x387bCb16Bfcd37AccEcF5c9eB2938E30d3aB8BF2'
+  VERIFICATION_REWARDS_ADDRESS: '0xb4fdaf5f3cd313654aa357299ada901b1d2dd3b5'
+  WEB3_PROVIDER_URL: 'https://pilot-forno.celo-testnet.org'

@@ -3,6 +3,7 @@ import * as admin from 'firebase-admin'
 import {
   ENVIRONMENT,
   FIREBASE_DB,
+  FIREBASE_PROJECT_ID,
   getFirebaseAdminCreds,
   PORT,
   VERSION,
@@ -56,7 +57,7 @@ console.info('Initializing Firebase')
 admin.initializeApp({
   credential: getFirebaseAdminCreds(admin),
   databaseURL: FIREBASE_DB,
-  projectId: 'celo-org-mobile',
+  projectId: FIREBASE_PROJECT_ID,
 })
 initializeFirebaseDb()
 
