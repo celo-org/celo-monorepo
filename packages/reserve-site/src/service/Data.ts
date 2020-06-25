@@ -8,6 +8,7 @@ export interface HoldingsData {
   DAI: number
   cUSD: number
   ratio: number
+  unFrozenRatio: number
 }
 
 export interface Addresses {

@@ -3,7 +3,7 @@ import { css, jsx } from '@emotion/core'
 import { FrontMatterResult } from 'front-matter'
 import Footer from 'src/components/Footer'
 import Head from 'src/components/Head'
-import Holdings, { Info, StableTokens } from 'src/components/Holdings'
+import Holdings, { Ratios, StableTokens } from 'src/components/Holdings'
 import NavBar from 'src/components/Navbar'
 import ReserveAddresses from 'src/components/ReserveAddresses'
 import Section from 'src/components/Section'
@@ -50,7 +50,7 @@ export default function Home(props: HoldingsData & Addresses & Props) {
               <StableTokens cUSD={props.cUSD} />
             </Section>
             <Section title="Reserve Ratio">
-              <Info ratio={props.ratio} />
+              <Ratios total={props.ratio} unfrozen={props.unFrozenRatio} />
             </Section>
             <Section title={'Reserve Addresses'}>
               <ReserveAddresses

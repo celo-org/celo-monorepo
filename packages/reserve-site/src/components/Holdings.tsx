@@ -1,5 +1,8 @@
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core'
+import Amount from 'src/components/Amount'
+import Heading from 'src/components/Heading'
+import { BreakPoints } from 'src/components/styles'
 import { HoldingsData } from 'src/service/Data'
 
 export default function Holdings(props: Omit<HoldingsData, 'updatedDate'>) {
@@ -26,17 +29,23 @@ export function StableTokens(props) {
   )
 }
 
-export function Info(props) {
+interface RatioProps {
+  total: number
+  unfrozen: number
+}
+
+export function Ratios(props: RatioProps) {
   return (
-    <div css={infoThingsStyle}>
-      <div css={css({ gridArea: 'ratio' })}>
-        <span css={numberStyle}>{props.ratio}</span>
-      </div>
+    <div css={ratiosSectionStyle}>
+      <Amount label="Total" units={props.total} gridArea="ratio" />
+      <Amount label="Unfrozen" units={props.unfrozen} gridArea="unfrozen" />
+
       <div css={infoStyle}>
         <div css={finePrintStyle}>
           <small>
-            ratio between the size of the reserve and the total value of all outstanding cUSD (and
-            other future stabilized tokens supported by the reserve)
+            Ratios of the value of the reserve in USD (for total and for unfrozen) to the value of
+            all outstanding cUSD (as well as other future stabilized tokens supported by the
+            reserve)
           </small>
         </div>
       </div>
@@ -44,53 +53,22 @@ export function Info(props) {
   )
 }
 
-const BREAK_POINT = '@media (max-width: 777px)'
-
-const amountStyle = css({
-  [BREAK_POINT]: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
+const ratiosSectionStyle = css({
+  display: 'grid',
+  gridAutoColumns: '1fr',
+  gridColumnGap: 20,
+  gridRowGap: 12,
+  gridTemplateAreas: `
+                     "ratio unfrozen ."
+                     "info info ."
+                     `,
+  [BreakPoints.tablet]: {
+    gridTemplateAreas: `"ratio"
+                        "unfrozen"
+                        "info"
+                        `,
   },
 })
-
-interface AmountProps {
-  label: string
-  units: number
-  gridArea: string
-  context?: string
-}
-
-function Amount({ label, units, gridArea, context }: AmountProps) {
-  const display = new Intl.NumberFormat('default').format(units)
-
-  return (
-    <div title={context} css={css(amountStyle, { gridArea })}>
-      <p>{label}</p>
-      <span css={numberStyle}>{display}</span>
-    </div>
-  )
-}
-
-interface HeadingProps {
-  title: string
-  gridArea: string
-  iconSrc?: string
-  marginTop?: number
-}
-
-function Heading({ title, gridArea, iconSrc, marginTop }: HeadingProps) {
-  return (
-    <div css={css(headingStyle, { gridArea, marginTop })}>
-      <h4 css={headingTextStyle}>
-        {iconSrc && <img src={iconSrc} css={iconStyle} alt={`${title} token icon`} />}
-        {title}
-      </h4>
-    </div>
-  )
-}
-
-const iconStyle = css({ height: 29, width: 29, marginRight: 8 })
 
 const rootStyle = css({
   display: 'grid',
@@ -101,7 +79,7 @@ const rootStyle = css({
                      "crypto crypto crypto"
                      "btc eth dai"
                     `,
-  [BREAK_POINT]: {
+  [BreakPoints.tablet]: {
     gridTemplateAreas: `"celo"
                         "onChain" 
                         "custody"
@@ -116,44 +94,9 @@ const rootStyle = css({
 const stableTokenStyle = css(rootStyle, {
   gridTemplateAreas: `"cUSD cUSD cUSD"
                      "outstanding . ."`,
-  [BREAK_POINT]: {
+  [BreakPoints.tablet]: {
     gridTemplateAreas: `"cUSD"
                         "outstanding"`,
-  },
-})
-
-const infoThingsStyle = css({
-  display: 'grid',
-  gridAutoColumns: '1fr',
-  gridColumnGap: 20,
-  gridRowGap: 12,
-  gridTemplateAreas: `
-                     "ratio . ."
-                     "info info ."
-                     `,
-  [BREAK_POINT]: {
-    gridTemplateAreas: `"ratio"
-                        "info"`,
-  },
-})
-
-const headingStyle = css({
-  borderBottom: 1,
-  borderBottomColor: 'rgba(46, 51, 56, 0.3)',
-  borderBottomStyle: 'solid',
-})
-
-const headingTextStyle = css({
-  display: 'inline-flex',
-  alignItems: 'center',
-  marginBottom: 16,
-})
-
-const numberStyle = css({
-  fontSize: 36,
-  [BREAK_POINT]: {
-    fontSize: 28,
-    marginBottom: 8,
   },
 })
 

@@ -12,6 +12,7 @@ interface Fields {
   DAI: number
   cUSD: number
   'Reserve Ratio': number
+  UnfrozenReserveRatio: number
 }
 
 export default async function fetchRecords() {
@@ -32,6 +33,7 @@ function convert(fields: Fields): HoldingsData {
     onChain: fields['CELO on-chain'],
     inCustody: fields['CELO in custody'],
     ratio: fields['Reserve Ratio'],
+    unFrozenRatio: fields.UnfrozenReserveRatio,
     BTC: fields.BTC,
     ETH: fields.ETH,
     DAI: fields.DAI,
