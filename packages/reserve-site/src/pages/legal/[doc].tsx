@@ -39,11 +39,9 @@ export default function Page(props: Props) {
 const containerStyle = css(flexCol, { flex: 1, width: '100%', alignItems: 'center' })
 
 export async function getStaticProps({ params }) {
-  console.log(params)
   const doc = await import(`src/content/legal/${params.doc}.md`).then((mod) => mod.default)
   const matter = await import('front-matter').then((mod) => mod.default)
   const document = matter<{ title: string; updated: string }>(doc)
-  console.log(document)
   return {
     props: {
       year: new Date().getFullYear(),
