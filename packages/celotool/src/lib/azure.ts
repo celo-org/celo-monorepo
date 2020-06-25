@@ -212,7 +212,7 @@ export async function registerStaticIPIfNotRegistered(name: string, resourceGrou
   )
   const existingIps = JSON.parse(existingIpsStr)
   if (existingIps.length) {
-    console.log(`Skipping IP address registration, ${name} on ${resourceGroupIP} exists`)
+    console.info(`Skipping IP address registration, ${name} on ${resourceGroupIP} exists`)
     // We expect only 1 matching IP
     return existingIps[0]
   }
