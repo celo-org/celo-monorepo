@@ -288,6 +288,7 @@ export class SendConfirmation extends React.Component<Props, State> {
       // so we adjust it here
       const securityFee = isInvite && fee ? fee.minus(inviteFee) : fee
 
+      CeloAnalytics.track(CustomEventNames.fee_rendered, { feeType: 'Security', fee: securityFee })
       const totalAmount = {
         value: amountWithFee,
         currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
