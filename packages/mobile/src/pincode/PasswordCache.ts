@@ -9,7 +9,7 @@ interface PasswordCache {
   }
 }
 
-export function setPinCache(pin: string) {
+export function setPinCache(pin: string | null) {
   pinCache = pin
 }
 

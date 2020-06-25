@@ -238,4 +238,4 @@ const styles = StyleSheet.create({
 export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.onboarding)(EnterInviteCode))
+)(withTranslation<Props>(Namespaces.onboarding)(EnterInviteCode))

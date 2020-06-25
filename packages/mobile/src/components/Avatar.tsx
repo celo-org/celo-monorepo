@@ -7,6 +7,7 @@
 import { Avatar as BaseAvatar } from '@celo/react-components/components/Avatar'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
+import { TextStyle } from 'react-native'
 import { useSelector } from 'react-redux'
 import { defaultCountryCodeSelector } from 'src/account/selectors'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -20,6 +21,7 @@ interface OwnProps {
   name?: string
   address?: string
   iconSize?: number
+  displayNameStyle?: TextStyle
 }
 
 type Props = OwnProps & WithTranslation
@@ -48,7 +50,7 @@ export function getE164Number(e164Number?: string, recipient?: Recipient) {
 
 export function Avatar(props: Props) {
   const defaultCountryCode = useSelector(defaultCountryCodeSelector)
-  const { recipient, e164Number, iconSize = DEFAULT_ICON_SIZE } = props
+  const { recipient, e164Number, iconSize = DEFAULT_ICON_SIZE, displayNameStyle } = props
 
   return (
     <BaseAvatar
@@ -58,8 +60,9 @@ export function Avatar(props: Props) {
       e164Number={getE164Number(e164Number, recipient)}
       iconSize={iconSize}
       thumbnailPath={getRecipientThumbnail(recipient)}
+      displayNameStyle={displayNameStyle}
     />
   )
 }
 
-export default withTranslation(Namespaces.sendFlow7)(Avatar)
+export default withTranslation<Props>(Namespaces.sendFlow7)(Avatar)

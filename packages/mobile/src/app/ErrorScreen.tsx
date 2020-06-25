@@ -43,4 +43,4 @@ class ErrorScreen extends React.Component<Props> {
   }
 }
 
-export default withTranslation(Namespaces.global)(ErrorScreen)
+export default withTranslation<Props>(Namespaces.global)(ErrorScreen)

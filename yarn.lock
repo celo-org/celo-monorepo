@@ -1838,9 +1838,9 @@
     web3 "1.2.4"
     web3-core-helpers "1.2.4"
 
-"@celo/ganache-cli@git+https://github.com/celo-org/ganache-cli.git#25ff8dd":
+"@celo/ganache-cli@git+https://github.com/celo-org/ganache-cli.git#2fcd376":
   version "6.6.1"
-  resolved "git+https://github.com/celo-org/ganache-cli.git#25ff8dd8a532ffbff001f9b08d38f74e1fca3ffd"
+  resolved "git+https://github.com/celo-org/ganache-cli.git#2fcd376819c88fb9db32a7dc61e8d288e216298e"
   dependencies:
     ethereumjs-util "6.1.0"
     source-map-support "0.5.12"
@@ -12465,16 +12465,17 @@ detect-node@^2.0.4:
   resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.0.4.tgz#014ee8f8f669c5c58023da64b8179c083a28c46c"
   integrity sha512-ZIzRpLJrOj7jjP2miAtgqIfmzbxa4ZOr5jJc601zklsfEx9oTzmmj2nVpIPRpNlRTIh8lc1kyViIY7BWSGNmKw==
 
-detox@^16.3.1:
-  version "16.3.1"
-  resolved "https://registry.yarnpkg.com/detox/-/detox-16.3.1.tgz#eeb29c655b71e88df8888cacd7996917cbf15540"
-  integrity sha512-blJRqXUc877xocP4bhO9d+7Ekqy/tOi9WwP9fjK6cQAH/wT1nysFC26bsakhcUaKKyTWJwaEFg6T+BEsmdch4Q==
+detox@^16.7.2:
+  version "16.7.2"
+  resolved "https://registry.yarnpkg.com/detox/-/detox-16.7.2.tgz#531c98416adf52d4ba95601b669969acadafb970"
+  integrity sha512-+837eRgk4xOewXmeF5H6vOTn0RbKUFIyCi5UsTXEhvplsMk+KrrqfKik2j8fvubJkByry7HqIN/JF9jKe+meIQ==
   dependencies:
     "@babel/core" "^7.4.5"
     bunyan "^1.8.12"
     bunyan-debug-stream "^1.1.0"
     chalk "^2.4.2"
     child-process-promise "^2.2.0"
+    find-up "^4.1.0"
     fs-extra "^4.0.2"
     funpermaproxy "^1.0.1"
     get-port "^2.1.0"

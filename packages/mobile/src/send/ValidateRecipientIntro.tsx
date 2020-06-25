@@ -153,5 +153,5 @@ const styles = StyleSheet.create({
 })
 
 export default connect<StateProps, {}, OwnProps, RootState>(mapStateToProps)(
-  withTranslation(Namespaces.sendFlow7)(ValidateRecipientIntro)
+  withTranslation<Props>(Namespaces.sendFlow7)(ValidateRecipientIntro)
 )

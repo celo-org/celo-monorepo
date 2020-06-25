@@ -38,4 +38,4 @@ class ErrorBoundary extends React.Component<Props, State> {
   }
 }
 
-export default withTranslation(Namespaces.global)(ErrorBoundary)
+export default withTranslation<Props>(Namespaces.global)(ErrorBoundary)

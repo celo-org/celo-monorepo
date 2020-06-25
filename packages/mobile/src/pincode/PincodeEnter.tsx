@@ -17,7 +17,7 @@ import { StackParamList } from 'src/navigator/types'
 import { checkPin } from 'src/pincode/authentication'
 import Pincode from 'src/pincode/Pincode'
 import { RootState } from 'src/redux/reducers'
-import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 interface State {
   pin: string
@@ -26,7 +26,6 @@ interface State {
 
 interface StateProps {
   currentAccount: string | null
-  fornoMode: boolean
 }
 
 type Props = StateProps & WithTranslation & StackScreenProps<StackParamList, Screens.PincodeEnter>
@@ -51,11 +50,15 @@ class PincodeEnter extends React.Component<Props, State> {
   }
 
   onWrongPin = () => {
-    this.setState({ pin: '', errorText: this.props.t(ErrorMessages.INCORRECT_PIN) })
+    this.setState({
+      pin: '',
+      errorText: this.props.t(`${Namespaces.global}:${ErrorMessages.INCORRECT_PIN}`),
+    })
   }
 
-  onCompletePin = async (pin: string) => {
+  onPressConfirm = async () => {
     const { route, currentAccount } = this.props
+    const { pin } = this.state
     const withVerification = route.params.withVerification
     if (withVerification && currentAccount) {
       if (await checkPin(pin, currentAccount)) {
@@ -78,7 +81,7 @@ class PincodeEnter extends React.Component<Props, State> {
           errorText={errorText}
           pin={pin}
           onChangePin={this.onChangePin}
-          onCompletePin={this.onCompletePin}
+          onCompletePin={this.onPressConfirm}
         />
       </SafeAreaView>
     )
@@ -95,7 +98,8 @@ const style = StyleSheet.create({
 
 const mapStateToProps = (state: RootState): StateProps => ({
   currentAccount: currentAccountSelector(state),
-  fornoMode: fornoSelector(state),
 })
 
-export default connect(mapStateToProps)(withTranslation(Namespaces.nuxNamePin1)(PincodeEnter))
+export default connect(mapStateToProps)(
+  withTranslation<Props>(Namespaces.nuxNamePin1)(PincodeEnter)
+)

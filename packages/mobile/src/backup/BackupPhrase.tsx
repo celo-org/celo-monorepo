@@ -174,4 +174,4 @@ const styles = StyleSheet.create({
 export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
   showError,
   hideAlert,
-})(withTranslation(Namespaces.backupKeyFlow6)(BackupPhrase))
+})(withTranslation<Props>(Namespaces.backupKeyFlow6)(BackupPhrase))

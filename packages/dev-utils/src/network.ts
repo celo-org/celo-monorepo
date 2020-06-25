@@ -10,7 +10,7 @@ export async function waitForPortOpen(host: string, port: number, seconds: numbe
   return false
 }
 
-async function isPortOpen(host: string, port: number) {
+export async function isPortOpen(host: string, port: number) {
   return (await execCmd('nc', ['-z', host, port.toString()], { silent: true })) === 0
 }
 

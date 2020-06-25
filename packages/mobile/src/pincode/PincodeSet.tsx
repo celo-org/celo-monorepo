@@ -132,4 +132,4 @@ const style = StyleSheet.create({
 export default connect<{}, DispatchProps>(
   null,
   mapDispatchToProps
-)(withTranslation(Namespaces.onboarding)(PincodeSet))
+)(withTranslation<Props>(Namespaces.onboarding)(PincodeSet))

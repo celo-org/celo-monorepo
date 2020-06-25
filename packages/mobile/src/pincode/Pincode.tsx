@@ -49,7 +49,7 @@ function Pincode({
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContainer}>
       <View style={styles.spacer} />
       {!errorText && <Text style={styles.title}>{title || ' '}</Text>}
-      {!!errorText && <Text style={styles.error}>{errorText || ' '}</Text>}
+      {!!errorText && <Text style={styles.error}>{errorText}</Text>}
       <View style={styles.pincodeContainer}>
         <PincodeDisplay pin={pin} maxLength={maxLength} />
       </View>

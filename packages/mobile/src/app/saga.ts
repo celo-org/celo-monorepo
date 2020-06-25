@@ -2,6 +2,8 @@ import { AppState, Linking } from 'react-native'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { eventChannel } from 'redux-saga'
 import { call, cancelled, put, select, spawn, take, takeLatest } from 'redux-saga/effects'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import {
   Actions,
   appLock,
@@ -18,7 +20,8 @@ import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { getCachedPincode } from 'src/pincode/PasswordCache'
+import { getPinCache } from 'src/pincode/PasswordCache'
+import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { clockInSync } from 'src/utils/time'
 import { parse } from 'url'
@@ -33,6 +36,10 @@ const TAG = 'app/saga'
 const DO_NOT_LOCK_PERIOD = 30000 // 30 sec
 
 export function* waitForRehydrate() {
+  const rehydrated = yield select((state: RootState) => state.networkInfo.rehydrated)
+  if (rehydrated) {
+    return
+  }
   yield take(REHYDRATE)
   return
 }
@@ -107,6 +114,7 @@ function* watchAppState() {
       Logger.debug(`${TAG}@monitorAppState`, `App changed state: ${newState}`)
       yield put(setAppState(newState))
     } catch (error) {
+      CeloAnalytics.track(CustomEventNames.app_state_error, { error: error.message })
       Logger.error(`${TAG}@monitorAppState`, `App state Error`, error)
     } finally {
       if (yield cancelled()) {
@@ -120,7 +128,7 @@ export function* handleSetAppState(action: SetAppState) {
   const appLocked = yield select(getAppLocked)
   const lastTimeBackgrounded = yield select(getLastTimeBackgrounded)
   const now = Date.now()
-  const cachedPin = getCachedPincode()
+  const cachedPin = getPinCache()
   const lockWithPinEnabled = yield select(getLockWithPinEnabled)
   if (
     !cachedPin &&
