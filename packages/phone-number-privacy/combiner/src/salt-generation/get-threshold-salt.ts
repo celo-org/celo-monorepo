@@ -97,9 +97,9 @@ async function requestSignatures(request: Request, response: Response) {
       })
       .catch((e) => {
         if (e.name === 'AbortError') {
-          logger.error(`${ErrorMessages.TIMEOUT_FROM_SIGNER} from signer ${service.url}`)
+          logger.error(`${ErrorMessage.TIMEOUT_FROM_SIGNER} from signer ${service.url}`)
         } else {
-          logger.error(`${ErrorMessages.ERROR_REQUESTING_SIGNATURE} from signer ${service.url}`, e)
+          logger.error(`${ErrorMessage.ERROR_REQUESTING_SIGNATURE} from signer ${service.url}`, e)
           responses.push({ url: service.url, status: 500 })
         }
       })
