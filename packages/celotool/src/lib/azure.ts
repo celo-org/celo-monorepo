@@ -27,7 +27,7 @@ export async function switchToCluster(
   // Azure subscription switch
   let currentTenantId = null
   try {
-    ;[currentTenantId] = await execCmd('az account list --query id -o tsv')
+    ;[currentTenantId] = await execCmd('az account show --query id -o tsv')
   } catch (error) {
     console.info('No azure account subscription currently set')
   }
