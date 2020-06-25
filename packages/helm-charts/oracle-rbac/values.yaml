@@ -1,4 +1,5 @@
 environment:
   name: default
 
-oracleCount: 2
+oracle:
+  replicas: 2
