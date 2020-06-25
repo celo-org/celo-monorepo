@@ -9,8 +9,8 @@ export default function Holdings(props: Omit<HoldingsData, 'updatedDate'>) {
   return (
     <div css={rootStyle}>
       <Heading title="CELO" gridArea="celo" iconSrc="/assets/CELO.png" />
-      <Amount label="Total" units={props.total} gridArea="total" />
-      <Amount label="In Reserve Contract" units={props.onChain} gridArea="onChain" />
+      <Amount label="Frozen" units={props.frozen} gridArea="total" />
+      <Amount label="Unfrozen" units={props.unfrozen} gridArea="onChain" />
       <Amount label="In Custody" units={props.inCustody} gridArea="custody" />
       <Heading title="Additional Crypto Assets" gridArea="crypto" marginTop={30} />
       <Amount label="BTC" units={props.BTC} gridArea="btc" />

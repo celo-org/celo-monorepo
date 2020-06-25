@@ -1,7 +1,7 @@
 export interface HoldingsData {
   updatedDate: string
-  total: number
-  onChain: number
+  unfrozen: number
+  frozen: number
   inCustody: number
   BTC: number
   ETH: number

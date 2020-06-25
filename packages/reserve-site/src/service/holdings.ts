@@ -5,8 +5,9 @@ const IS_LIVE = 'live=1'
 interface Fields {
   live?: boolean
   'Updated Date': string
-  'CELO on-chain': number
-  'CELO in custody': number
+  Unfrozen: number
+  Frozen: number
+  Custody: number
   BTC: number
   ETH: number
   DAI: number
@@ -29,9 +30,9 @@ export default async function fetchRecords() {
 function convert(fields: Fields): HoldingsData {
   return {
     updatedDate: fields['Update Date'],
-    total: fields['CELO on-chain'] + fields['CELO in custody'],
-    onChain: fields['CELO on-chain'],
-    inCustody: fields['CELO in custody'],
+    unfrozen: fields.Unfrozen,
+    frozen: fields.Frozen,
+    inCustody: fields.Custody,
     ratio: fields['Reserve Ratio'],
     unFrozenRatio: fields.UnfrozenReserveRatio,
     BTC: fields.BTC,

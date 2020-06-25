@@ -37,9 +37,9 @@ export default function Home(props: HoldingsData & Addresses & Props) {
             >
               <Holdings
                 unFrozenRatio={props.unFrozenRatio}
-                total={props.total}
+                frozen={props.frozen}
                 inCustody={props.inCustody}
-                onChain={props.onChain}
+                unfrozen={props.unfrozen}
                 cUSD={props.cUSD}
                 DAI={props.DAI}
                 BTC={props.BTC}
