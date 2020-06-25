@@ -100,14 +100,14 @@ yarn react-native-kill-packager || echo "Failed to kill package manager, proceed
 if [ $PLATFORM = "android" ]; then
   echo "Using platform android"
 
-  if [ -z $ANDROID_HOME ]; then
+  if [ -z $ANDROID_SDK_ROOT ]; then
     echo "No Android SDK root set"
     exit 1
   fi
 
-  if [[ ! $($ANDROID_HOME/emulator/emulator -list-avds | grep ^$VD_NAME$) ]]; then
+  if [[ ! $($ANDROID_SDK_ROOT/emulator/emulator -list-avds | grep ^$VD_NAME$) ]]; then
     echo "AVD $VD_NAME not installed. Please install it or change the detox configuration in package.json"
-    echo "You can see the list of available installed devices with $ANDROID_HOME/emulator/emulator -list-avds"
+    echo "You can see the list of available installed devices with $ANDROID_SDK_ROOT/emulator/emulator -list-avds"
     exit 1
   fi
 
@@ -134,7 +134,7 @@ if [ $PLATFORM = "android" ]; then
   fi
 
   echo "Starting the emulator"
-  $ANDROID_HOME/emulator/emulator -avd $VD_NAME -no-boot-anim -netdelay $NET_DELAY &
+  $ANDROID_SDK_ROOT/emulator/emulator -avd $VD_NAME -no-boot-anim -noaudio -gpu swiftshader_indirect -no-snapshot -no-window -netdelay $NET_DELAY &
 
   echo "Waiting for device to connect to Wifi, this is a good proxy the device is ready"
   until [ `adb shell dumpsys wifi | grep "mNetworkInfo" | grep "state: CONNECTED" | wc -l` -gt 0 ]
