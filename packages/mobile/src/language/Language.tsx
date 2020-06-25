@@ -60,8 +60,6 @@ Language.navigationOptions = ({ navigation }: ScreenProps) => {
   return navigation.canGoBack() ? headerWithBackButton : emptyHeader
 }
 
-export default Language
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -73,3 +71,5 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
 })
+
+export default Language

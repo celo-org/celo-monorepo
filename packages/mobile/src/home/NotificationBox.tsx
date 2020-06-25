@@ -14,6 +14,7 @@ import { PROMOTE_REWARDS_APP } from 'src/config'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentReminderSummaryNotification from 'src/escrow/EscrowedPaymentReminderSummaryNotification'
 import { getReclaimableEscrowPayments } from 'src/escrow/reducer'
+import { features } from 'src/flags'
 import { Namespaces, withTranslation } from 'src/i18n'
 import BackupKeyIcon from 'src/icons/BackupKeyIcon'
 import { getVerifiedIcon, homeIcon, inviteFriendsIcon, rewardsAppIcon } from 'src/images/Images'
@@ -26,8 +27,6 @@ import OutgoingPaymentRequestSummaryNotification from 'src/paymentRequest/Outgoi
 import { RootState } from 'src/redux/reducers'
 import { isBackupTooLate } from 'src/redux/selectors'
 import { navigateToVerifierApp } from 'src/utils/linking'
-
-const INVITE_NOTIFICATION_DISABLED = true
 
 interface StateProps {
   backupCompleted: boolean
@@ -213,7 +212,7 @@ export class NotificationBox extends React.Component<Props, State> {
       })
     }
 
-    if (!dismissedInviteFriends && !INVITE_NOTIFICATION_DISABLED) {
+    if (!dismissedInviteFriends && !features.INVITE_NOTIFICATION_DISABLED) {
       actions.push({
         title: t('inviteFlow11:inviteFriendsToCelo'),
         text: t('inviteFlow11:inviteAnyone'),
