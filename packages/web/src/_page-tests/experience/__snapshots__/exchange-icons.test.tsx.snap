@@ -1467,7 +1467,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                   data-focusable={true}
                   dir="auto"
-                  href="/assets/CeloMarketplaceIcons.zip"
+                  href="/assets/marketplace-icons/CeloMarketplaceIcons.zip"
                   onClick={[Function]}
                   onMouseEnter={[Function]}
                   role="link"
@@ -1593,6 +1593,43 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                   }
                 >
                   Code of Conduct
+                </a>
+              </div>
+              <div
+                className="css-view-1dbjc4n"
+                onClick={[Function]}
+                onMouseDown={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onResponderGrant={[Function]}
+                onResponderRelease={[Function]}
+                style={
+                  Object {
+                    "display": "inline",
+                  }
+                }
+              >
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
+                  data-focusable={true}
+                  dir="auto"
+                  href="/brand-policy"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
+                  role="link"
+                  style={
+                    Object {
+                      "WebkitTextDecorationStyle": "solid",
+                      "cursor": "pointer",
+                      "display": "inline",
+                      "opacity": 1,
+                      "textDecoration": "underline",
+                      "textDecorationStyle": "solid",
+                    }
+                  }
+                >
+                  Brand Policy
                 </a>
               </div>
             </div>
@@ -1821,7 +1858,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                           data-focusable={true}
                           dir="auto"
-                          href="/assets/marketplace-icons/icon-celo-dollar-color.zip"
+                          href="/assets/marketplace-icons/icon-celo-dollar-full-color.zip"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                           role="link"
@@ -2107,7 +2144,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                           data-focusable={true}
                           dir="auto"
-                          href="/assets/marketplace-icons/icon-celo-CELO-color.zip"
+                          href="/assets/marketplace-icons/icon-CELO-color.zip"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                           role="link"
@@ -2403,7 +2440,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                           data-focusable={true}
                           dir="auto"
-                          href="/assets/marketplace-icons/icon-celo-dollar-mono.zip"
+                          href="/assets/marketplace-icons/icon-celo-dollar-monochrome.zip"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                           role="link"
@@ -2690,7 +2727,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                           data-focusable={true}
                           dir="auto"
-                          href="/assets/marketplace-icons/icon-celo-CELO-mono.zip"
+                          href="/assets/marketplace-icons/icon-CELO-monochrome.zip"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                           role="link"
@@ -2977,7 +3014,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                           data-focusable={true}
                           dir="auto"
-                          href="/assets/marketplace-icons/icon-celo-dollar-reverse.zip"
+                          href="/assets/marketplace-icons/icon-celo-dollar-reverse-monochrome.zip"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                           role="link"
@@ -3264,7 +3301,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                           data-focusable={true}
                           dir="auto"
-                          href="/assets/marketplace-icons/icon-celo-CELO-reverse.zip"
+                          href="/assets/marketplace-icons/icon-CELO-reverse-monochrome.zip"
                           onClick={[Function]}
                           onMouseEnter={[Function]}
                           role="link"

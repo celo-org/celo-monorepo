@@ -164,7 +164,7 @@ export async function getAKSNodeResourceGroup(clusterConfig: AzureClusterConfig)
 }
 
 /**
- * Gets the AKS Service Principal Object ID if one exists. Otherwise, an empty string
+ * Gets the AKS Service Principal Object ID if one exists. Otherwise, an empty string is given.
  */
 export async function getAKSServicePrincipalObjectId(clusterConfig: AzureClusterConfig) {
   // Get the correct object ID depending on the cluster configuration
@@ -175,8 +175,8 @@ export async function getAKSServicePrincipalObjectId(clusterConfig: AzureCluster
   console.info(`az aks show -n ${clusterConfig.clusterName} --query servicePrincipalProfile.clientId -g ${clusterConfig.resourceGroup} -o tsv`)
   console.info(rawServicePrincipalClientId)
   const servicePrincipalClientId = rawServicePrincipalClientId.trim()
-  // this will be the value of the service principal client ID if instead a managed identity
-  // is being used. Just return undefined
+  // This will be the value of the service principal client ID if a managed service identity
+  // is being used instead of a service principal.
   if (servicePrincipalClientId === 'msi') {
     return ''
   }
@@ -186,6 +186,10 @@ export async function getAKSServicePrincipalObjectId(clusterConfig: AzureCluster
   return rawObjectId.trim()
 }
 
+/**
+ * If an AKS cluster is using a managed service identity, the objectId is returned.
+ * Otherwise, an empty string is given.
+ */
 export async function getAKSManagedServiceIdentityObjectId(clusterConfig: AzureClusterConfig) {
   const [managedIdentityObjectId] = await execCmdWithExitOnFailure(
     `az aks show -n ${clusterConfig.clusterName} --query identityProfile.kubeletidentity.objectId -g ${clusterConfig.resourceGroup} -o tsv`

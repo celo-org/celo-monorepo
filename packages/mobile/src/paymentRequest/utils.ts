@@ -22,7 +22,7 @@ export function getRecipientFromPaymentRequest(
     return {
       kind: RecipientKind.MobileNumber,
       address: paymentRequest.requesterAddress,
-      displayName: paymentRequest.requesterE164Number || paymentRequest.requesterAddress,
+      displayName: paymentRequest.requesterE164Number,
       e164PhoneNumber: paymentRequest.requesterE164Number,
     }
   } else {

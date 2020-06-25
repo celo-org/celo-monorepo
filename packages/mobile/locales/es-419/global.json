@@ -174,5 +174,6 @@
   "review": "Revisión",
   "insufficientBalance": "Su saldo es demasiado bajo para realizar esta transacción.",
   "amount": "Monto",
-  "currentBalance": "Saldo actual"
+  "currentBalance": "Saldo actual",
+  "restore": "Restaurar"
 }
