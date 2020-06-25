@@ -5,5 +5,8 @@ export const features = {
   DATA_SAVER: true,
   PHONE_NUM_METADATA_IN_TRANSFERS: true,
   VERIFICATION_FORNO_RETRY: true,
-  INVITE_NOTIFICATION_DISABLED: true,
+}
+
+export const pausedFeatures = {
+  INVITE: true,
 }

@@ -14,7 +14,7 @@ import { PROMOTE_REWARDS_APP } from 'src/config'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentReminderSummaryNotification from 'src/escrow/EscrowedPaymentReminderSummaryNotification'
 import { getReclaimableEscrowPayments } from 'src/escrow/reducer'
-import { features } from 'src/flags'
+import { pausedFeatures } from 'src/flags'
 import { Namespaces, withTranslation } from 'src/i18n'
 import BackupKeyIcon from 'src/icons/BackupKeyIcon'
 import { getVerifiedIcon, homeIcon, inviteFriendsIcon, rewardsAppIcon } from 'src/images/Images'
@@ -212,7 +212,7 @@ export class NotificationBox extends React.Component<Props, State> {
       })
     }
 
-    if (!dismissedInviteFriends && !features.INVITE_NOTIFICATION_DISABLED) {
+    if (!dismissedInviteFriends && !pausedFeatures.INVITE) {
       actions.push({
         title: t('inviteFlow11:inviteFriendsToCelo'),
         text: t('inviteFlow11:inviteAnyone'),
