@@ -295,7 +295,8 @@ export enum CustomEventNames {
   transaction_error = 'transaction_error',
   transaction_exception = 'transaction_exception',
 
-  // Fee errors
+  // Fee
+  fee_rendered = 'fee_rendered',
   estimate_fee_failed = 'estimate_fee_failed',
   fetch_tobin_tax_failed = 'fetch_tobin_tax_failed',
 
@@ -339,6 +340,7 @@ export enum PropertyPathWhitelist {
   error = 'error',
   exchangeInputAmount = 'exchangeInputAmount',
   exchangeRate = 'exchangeRate',
+  fee = 'fee',
   feeType = 'feeType',
   fullName = 'fullName',
   gethOutcome = 'gethOutcome',
