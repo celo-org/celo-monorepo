@@ -4,7 +4,7 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
 <View
   style={
     Object {
-      "backgroundColor": "#F9F5ED",
+      "backgroundColor": "#F9F6F0",
       "flex": 1,
     }
   }
