@@ -1,4 +1,5 @@
-import { css } from '@emotion/core'
+/** @jsx jsx */
+import { css, jsx } from '@emotion/core'
 
 interface Props {
   date?: number
