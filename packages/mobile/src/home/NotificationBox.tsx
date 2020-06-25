@@ -28,6 +28,8 @@ import { RootState } from 'src/redux/reducers'
 import { isBackupTooLate } from 'src/redux/selectors'
 import { navigateToVerifierApp } from 'src/utils/linking'
 
+const INVITE_NOTIFICATION_DISABLED = true
+
 interface StateProps {
   backupCompleted: boolean
   numberVerified: boolean
@@ -214,7 +216,7 @@ export class NotificationBox extends React.Component<Props, State> {
       })
     }
 
-    if (!dismissedInviteFriends) {
+    if (!dismissedInviteFriends && !INVITE_NOTIFICATION_DISABLED) {
       actions.push({
         title: t('inviteFlow11:inviteFriendsToCelo'),
         text: t('inviteFlow11:inviteAnyone'),
