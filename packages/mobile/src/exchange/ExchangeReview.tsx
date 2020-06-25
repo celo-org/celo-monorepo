@@ -1,8 +1,7 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
-import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
+import variables from '@celo/react-components/styles/variables'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
@@ -14,12 +13,14 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
 import FeeIcon from 'src/components/FeeIcon'
-import LineItemRow from 'src/components/LineItemRow'
+import LineItemRow from 'src/components/LineItemRow.v2'
 import TotalLineItem from 'src/components/TotalLineItem'
 import { exchangeTokens, fetchExchangeRate, fetchTobinTax } from 'src/exchange/actions'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
+import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
+import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
@@ -32,6 +33,7 @@ interface StateProps {
   tobinTax: string
   fee: string
   appConnected: boolean
+  localCurrencyExchangeRate: string | null | undefined
 }
 
 interface DispatchProps {
@@ -56,6 +58,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   tobinTax: state.exchange.tobinTax || '0',
   fee: '0',
   appConnected: isAppConnected(state),
+  localCurrencyExchangeRate: getLocalCurrencyExchangeRate(state),
 })
 
 export class ExchangeReview extends React.Component<Props, State> {
@@ -67,13 +70,32 @@ export class ExchangeReview extends React.Component<Props, State> {
   }
 
   onPressConfirm = () => {
-    const makerToken = this.state.makerToken
+    const { makerToken, inputToken, inputAmount } = this.state
     const makerAmount = this.getMakerAmount()
+    // BEGIN: Analytics
+    const isDollarToGold = inputToken === CURRENCY_ENUM.DOLLAR
+    const goldToDollarExchangeRate = getRateForMakerToken(
+      this.props.exchangeRatePair,
+      this.state.makerToken,
+      CURRENCY_ENUM.DOLLAR
+    )
+    const goldAmount = isDollarToGold ? makerAmount : inputAmount
+    const dollarsAmount = isDollarToGold ? inputAmount : makerAmount
+    const localCurrencyAmount = convertDollarsToLocalAmount(
+      dollarsAmount,
+      this.props.localCurrencyExchangeRate
+    )
+    CeloAnalytics.track(
+      isDollarToGold ? CustomEventNames.gold_buy_confirm : CustomEventNames.gold_sell_confirm,
+      {
+        localCurrencyAmount,
+        goldAmount,
+        inputToken,
+        goldToDollarExchangeRate,
+      }
+    )
+    // END: Analytics
     this.props.exchangeTokens(makerToken, makerAmount)
-    CeloAnalytics.track(CustomEventNames.exchange_confirm, {
-      makerToken,
-      makerAmount,
-    })
   }
 
   getExchangePropertiesFromNavProps() {
@@ -212,27 +234,23 @@ export class ExchangeReview extends React.Component<Props, State> {
             </View>
           </ScrollView>
         </View>
-
-        <View style={componentStyles.bottomContainer}>
-          <Button
-            onPress={this.onPressConfirm}
-            text={
-              <Trans
-                i18nKey={
-                  this.state.makerToken === CURRENCY_ENUM.DOLLAR
-                    ? 'buyGoldAmount'
-                    : 'sellGoldAmount'
-                }
-                ns={Namespaces.exchangeFlow9}
-              >
-                Buy or sell <CurrencyDisplay amount={goldAmount} /> Gold
-              </Trans>
-            }
-            standard={false}
-            disabled={!appConnected || exchangeRate.isZero()}
-            type={BtnTypes.PRIMARY}
-          />
-        </View>
+        <Button
+          onPress={this.onPressConfirm}
+          size={BtnSizes.FULL}
+          text={
+            <Trans
+              i18nKey={
+                this.state.makerToken === CURRENCY_ENUM.DOLLAR ? 'buyGoldAmount' : 'sellGoldAmount'
+              }
+              ns={Namespaces.exchangeFlow9}
+            >
+              Buy or sell <CurrencyDisplay amount={goldAmount} /> Gold
+            </Trans>
+          }
+          style={styles.buyBtn}
+          disabled={!appConnected || exchangeRate.isZero()}
+          type={BtnTypes.TERTIARY}
+        />
       </SafeAreaView>
     )
   }
@@ -245,19 +263,16 @@ const styles = StyleSheet.create({
   },
   paddedContainer: {
     paddingHorizontal: 16,
+    flex: 1,
   },
   flexStart: {
     justifyContent: 'flex-start',
   },
   exchangeBodyText: {
-    ...fontStyles.body,
-    fontSize: 15,
+    ...fontStyles.regular,
   },
   currencyAmountText: {
-    ...fontStyles.body,
-    fontSize: 24,
-    lineHeight: 39,
-    color: colors.celoGreen,
+    ...fontStyles.regular,
   },
   amountRow: {
     flexDirection: 'row',
@@ -265,10 +280,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 30,
   },
+  buyBtn: {
+    padding: variables.contentPadding,
+  },
 })
 
 export default connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
   exchangeTokens,
   fetchExchangeRate,
   fetchTobinTax,
-})(withTranslation(Namespaces.exchangeFlow9)(ExchangeReview))
+})(withTranslation<Props>(Namespaces.exchangeFlow9)(ExchangeReview))

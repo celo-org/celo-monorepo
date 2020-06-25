@@ -7,6 +7,11 @@ const Inter = {
   SemiBold: 'Inter-SemiBold',
 }
 
+const Jost = {
+  Book: 'Jost-Book',
+  Medium: 'Jost-Medium',
+}
+
 export const fontFamily = Inter.Regular
 
 const standards = {
@@ -32,15 +37,15 @@ const standards = {
 // Figma Font Styles
 const fontStyles = StyleSheet.create({
   h1: {
-    fontSize: 24,
+    fontSize: 26,
     lineHeight: 32,
-    fontFamily: Inter.Medium,
+    fontFamily: Jost.Book,
     color: colors.dark,
   },
   h2: {
-    fontSize: 19,
-    lineHeight: 26,
-    fontFamily: Inter.SemiBold,
+    fontSize: 22,
+    lineHeight: 28,
+    fontFamily: Jost.Medium,
     color: colors.dark,
   },
   sectionHeader: {
@@ -49,10 +54,28 @@ const fontStyles = StyleSheet.create({
     fontFamily: Inter.Medium,
     color: colors.dark,
   },
+  navigationHeader: {
+    fontSize: 16,
+    lineHeight: 20,
+    fontFamily: Jost.Medium,
+    color: colors.dark,
+  },
+  notificationHeadline: {
+    fontSize: 18,
+    lineHeight: 22,
+    fontFamily: Jost.Medium,
+    color: colors.dark,
+  },
+  displayName: {
+    fontSize: 18,
+    lineHeight: 24,
+    fontFamily: Jost.Medium,
+    color: colors.dark,
+  },
   label: {
     fontSize: 13,
     lineHeight: 16,
-    fontFamily: Inter.Regular,
+    fontFamily: Inter.SemiBold,
     color: colors.dark,
   },
   large: standards.large,
@@ -66,6 +89,23 @@ const fontStyles = StyleSheet.create({
   small500: { ...standards.small, fontFamily: Inter.Medium },
   center: {
     textAlign: 'center',
+  },
+  mediumNumber: {
+    lineHeight: 27,
+    fontSize: 24,
+    fontFamily: Inter.Regular,
+    color: colors.dark,
+  },
+  largeNumber: {
+    lineHeight: 40,
+    fontSize: 32,
+    fontFamily: Inter.SemiBold,
+    color: colors.dark,
+  },
+  iconText: {
+    fontSize: 16,
+    fontFamily: Inter.Medium,
+    color: colors.white,
   },
 })
 

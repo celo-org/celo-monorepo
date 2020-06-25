@@ -59,7 +59,7 @@ export class OutgoingPaymentRequestSummaryNotification extends React.Component<P
       <PaymentRequestNotificationInner
         key={item.uid}
         amount={item.amount}
-        requesterRecipient={getSenderFromPaymentRequest(
+        recipient={getSenderFromPaymentRequest(
           item,
           this.props.addressToE164Number,
           this.props.recipientCache
@@ -81,7 +81,8 @@ export class OutgoingPaymentRequestSummaryNotification extends React.Component<P
     ) : (
       <SummaryNotification<PaymentRequest>
         items={requests}
-        title={t('outgoingPaymentRequests')}
+        title={t('outgoingPaymentRequestsSummaryTitle', { count: requests.length })}
+        detailsI18nKey="walletFlow5:outgoingPaymentRequestsSummaryDetails"
         icon={<Image source={sendDollar} style={styles.image} resizeMode="contain" />}
         onReview={this.onReview}
         itemRenderer={this.itemRenderer}
@@ -100,4 +101,4 @@ const styles = StyleSheet.create({
 export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
   cancelPaymentRequest,
   updatePaymentRequestNotified,
-})(withTranslation(Namespaces.walletFlow5)(OutgoingPaymentRequestSummaryNotification))
+})(withTranslation<Props>(Namespaces.walletFlow5)(OutgoingPaymentRequestSummaryNotification))

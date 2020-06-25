@@ -89,7 +89,7 @@ spec:
 
           ACCOUNT_ADDRESS=`cat /root/.celo/address`
 
-          geth \
+          exec geth \
           --rpc \
           --rpcapi=eth,web3,debug,admin,personal,net \
           --rpcvhosts=* \
@@ -136,7 +136,7 @@ spec:
             # Send the txs to the next load test client
             RECIPIENT_INDEX=$(( ($RID + 1) % {{ .Values.replicas }} ))
 
-            celotooljs.sh geth simulate-client \
+            exec celotooljs.sh geth simulate-client \
               --index $RID \
               --recipient-index $RECIPIENT_INDEX \
               --delay {{ .Values.delay }} \

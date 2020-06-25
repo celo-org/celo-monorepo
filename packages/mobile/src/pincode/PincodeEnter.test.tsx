@@ -1,71 +1,60 @@
 import * as React from 'react'
-import { fireEvent, render } from 'react-native-testing-library'
+import { fireEvent, flushMicrotasksQueue, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
-import * as renderer from 'react-test-renderer'
-import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { Namespaces } from 'src/i18n'
 import { Screens } from 'src/navigator/Screens'
 import PincodeEnter from 'src/pincode/PincodeEnter'
-import { isPinCorrect } from 'src/pincode/utils'
-import { createMockStore } from 'test/utils'
-import { mockNavigation } from 'test/values'
+import { ensureCorrectPin } from 'src/pincode/utils'
+import { createMockStore, getMockStackScreenProps } from 'test/utils'
 
-const mockRoute = {
-  name: Screens.PincodeEnter as Screens.PincodeEnter,
-  key: '1',
-  params: {
-    withVerification: true,
-    onSuccess: jest.fn(),
-  },
-}
+const mockScreenProps = getMockStackScreenProps(Screens.PincodeEnter, {
+  withVerification: true,
+  onSuccess: jest.fn(),
+})
+
+const pin = '123456'
 
 describe('PincodeEnter', () => {
   it('renders correctly', () => {
     const store = createMockStore()
-    const tree = renderer.create(
+    const tree = render(
       <Provider store={store}>
-        <PincodeEnter navigation={mockNavigation} route={mockRoute} />
+        <PincodeEnter {...mockScreenProps} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
   })
 
-  it('calls onSuccess when PIN is correct', (done) => {
-    const pin = '123456'
-    ;(isPinCorrect as jest.Mock).mockResolvedValueOnce(pin)
+  it('calls onSuccess when PIN is correct', async () => {
+    ;(ensureCorrectPin as jest.Mock).mockResolvedValueOnce(pin)
     const store = createMockStore()
 
     const { getByTestId } = render(
       <Provider store={store}>
-        <PincodeEnter navigation={mockNavigation} route={mockRoute} />
+        <PincodeEnter {...mockScreenProps} />
       </Provider>
     )
-    fireEvent.press(getByTestId('Pincode-Submit'))
 
-    jest.useRealTimers()
-    setTimeout(() => {
-      expect(mockRoute.params.onSuccess).toBeCalledWith(pin)
-      done()
-    })
-    jest.useFakeTimers()
+    pin.split('').forEach((number) => fireEvent.press(getByTestId(`digit${number}`)))
+    jest.runAllTimers()
+    await flushMicrotasksQueue()
+    expect(mockScreenProps.route.params.onSuccess).toBeCalledWith(pin)
   })
 
-  it('shows wrong PIN notification', (done) => {
-    ;(isPinCorrect as jest.Mock).mockRejectedValueOnce('')
+  it('shows wrong PIN notification', async () => {
+    ;(ensureCorrectPin as jest.Mock).mockRejectedValueOnce('')
     const store = createMockStore()
 
-    const { getByTestId } = render(
+    const { getByTestId, getByText } = render(
       <Provider store={store}>
-        <PincodeEnter navigation={mockNavigation} route={mockRoute} />
+        <PincodeEnter {...mockScreenProps} />
       </Provider>
     )
-    fireEvent.press(getByTestId('Pincode-Submit'))
-
-    jest.useRealTimers()
-    setTimeout(() => {
-      expect(store.getActions()).toEqual([showError(ErrorMessages.INCORRECT_PIN)])
-      done()
-    })
-    jest.useFakeTimers()
+    pin.split('').forEach((number) => fireEvent.press(getByTestId(`digit${number}`)))
+    jest.runAllTimers()
+    await flushMicrotasksQueue()
+    expect(getByText(`${Namespaces.global}:${ErrorMessages.INCORRECT_PIN}`)).toBeDefined()
+    expect(store.getActions()).toEqual([])
   })
 })

@@ -32,7 +32,7 @@ const TAG = 'escrow/ReclaimPaymentConfirmationScreen'
 
 interface StateProps {
   isReclaiming: boolean
-  e164PhoneNumber: string
+  e164PhoneNumber: string | null
   account: string | null
   dollarBalance: string
   appConnected: boolean
@@ -182,4 +182,4 @@ const styles = StyleSheet.create({
 export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.sendFlow7)(ReclaimPaymentConfirmationScreen))
+)(withTranslation<Props>(Namespaces.sendFlow7)(ReclaimPaymentConfirmationScreen))

@@ -33,7 +33,6 @@ describe('Testnet banner', () => {
       <Provider store={store}>
         <WalletHome
           refreshAllBalances={jest.fn()}
-          resetStandbyTransactions={jest.fn()}
           initializeSentryUserContext={jest.fn()}
           exitBackupFlow={jest.fn()}
           setLoading={jest.fn()}
@@ -44,6 +43,8 @@ describe('Testnet banner', () => {
           recipientCache={{}}
           activeNotificationCount={0}
           callToActNotification={false}
+          numberVerified={true}
+          importContacts={jest.fn()}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -58,7 +59,6 @@ describe('Testnet banner', () => {
       <Provider store={store}>
         <WalletHome
           refreshAllBalances={jest.fn()}
-          resetStandbyTransactions={jest.fn()}
           initializeSentryUserContext={jest.fn()}
           exitBackupFlow={jest.fn()}
           setLoading={jest.fn()}
@@ -69,6 +69,8 @@ describe('Testnet banner', () => {
           recipientCache={{}}
           activeNotificationCount={0}
           callToActNotification={false}
+          numberVerified={true}
+          importContacts={jest.fn()}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -81,7 +83,6 @@ describe('Testnet banner', () => {
       <Provider store={store}>
         <WalletHome
           refreshAllBalances={jest.fn()}
-          resetStandbyTransactions={jest.fn()}
           initializeSentryUserContext={jest.fn()}
           exitBackupFlow={jest.fn()}
           setLoading={jest.fn()}
@@ -92,6 +93,8 @@ describe('Testnet banner', () => {
           recipientCache={{}}
           activeNotificationCount={0}
           callToActNotification={false}
+          numberVerified={true}
+          importContacts={jest.fn()}
           {...getMockI18nProps()}
         />
       </Provider>

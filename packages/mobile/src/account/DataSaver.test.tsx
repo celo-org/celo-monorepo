@@ -4,33 +4,22 @@ import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import DataSaver from 'src/account/DataSaver'
 import { Screens } from 'src/navigator/Screens'
-import { createMockStore } from 'test/utils'
-import { mockNavigation } from 'test/values'
-
-const mockRoute = {
-  name: Screens.DataSaver as Screens.DataSaver,
-  key: '1',
-  params: {
-    promptModalVisible: true,
-  },
-}
+import { createMockStore, getMockStackScreenProps } from 'test/utils'
 
 describe('DataSaver', () => {
   it('renders correctly with prompt', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
-        <DataSaver navigation={mockNavigation} route={mockRoute} />
+        <DataSaver {...getMockStackScreenProps(Screens.DataSaver, { promptModalVisible: true })} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
   })
 
   it('renders correctly no prompt', () => {
-    mockRoute.params.promptModalVisible = false
-
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
-        <DataSaver navigation={mockNavigation} route={mockRoute} />
+        <DataSaver {...getMockStackScreenProps(Screens.DataSaver, { promptModalVisible: false })} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()

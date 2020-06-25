@@ -17,7 +17,6 @@ export function useDollarsToLocalAmount(amount: BigNumber.Value | null) {
   if (!convertedAmount) {
     return null
   }
-
   return convertedAmount
 }
 

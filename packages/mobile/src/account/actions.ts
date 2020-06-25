@@ -16,14 +16,15 @@ export enum Actions {
   SET_BACKUP_COMPLETED_ACTION = 'ACCOUNT/SET_BACKUP_COMPLETED_ACTION',
   SET_BACKUP_DELAYED_ACTION = 'ACCOUNT/SET_BACKUP_DELAYED_ACTION',
   SET_SOCIAL_BACKUP_COMPLETED_ACTION = 'ACCOUNT/SET_SOCIAL_BACKUP_COMPLETED_ACTION',
-  RESET_BACKUP_STATE = 'ACCOUNT/RESET_BACKUP_STATE',
+  TOGGLE_BACKUP_STATE = 'ACCOUNT/TOGGLE_BACKUP_STATE',
   UPDATE_INCOMING_PAYMENT_REQUESTS = 'ACCOUNT/UPDATE_INCOMING_PAYMENT_REQUESTS',
   UPDATE_OUTGOING_PAYMENT_REQUESTS = 'ACCOUNT/UPDATE_OUTGOING_PAYMENT_REQUESTS',
   DISMISS_EARN_REWARDS = 'ACCOUNT/DISMISS_EARN_REWARDS',
   DISMISS_INVITE_FRIENDS = 'ACCOUNT/DISMISS_INVITE_FRIENDS',
   DISMISS_GET_VERIFIED = 'ACCOUNT/DISMISS_GET_VERIFIED',
   SET_USER_CONTACT_DETAILS = 'ACCOUNT/SET_USER_CONTACT_DETAILS',
-  SET_PROMPT_FORNO = 'GETH/SET_PROMPT_FORNO',
+  SET_PROMPT_FORNO = 'ACCOUNT/SET_PROMPT_FORNO',
+  SET_RETRY_VERIFICATION_WITH_FORNO = 'ACCOUNT/SET_RETRY_VERIFICATION_WITH_FORNO',
   ACCEPT_TERMS = 'ACCOUNT/ACCEPT_TERMS',
 }
 
@@ -81,8 +82,8 @@ export interface SetSocialBackupCompletedAction {
   type: Actions.SET_SOCIAL_BACKUP_COMPLETED_ACTION
 }
 
-export interface ResetBackupState {
-  type: Actions.RESET_BACKUP_STATE
+export interface ToggleBackupState {
+  type: Actions.TOGGLE_BACKUP_STATE
 }
 
 export interface UpdateIncomingPaymentRequestsAction {
@@ -118,6 +119,11 @@ interface SetPromptFornoAction {
   promptIfNeeded: boolean
 }
 
+export interface SetRetryVerificationWithFornoAction {
+  type: Actions.SET_RETRY_VERIFICATION_WITH_FORNO
+  retry: boolean
+}
+
 export type ActionTypes =
   | SetNameAction
   | SetPhoneNumberAction
@@ -130,7 +136,7 @@ export type ActionTypes =
   | SetBackupCompletedAction
   | SetBackupDelayedAction
   | SetSocialBackupCompletedAction
-  | ResetBackupState
+  | ToggleBackupState
   | DismissEarnRewardsAction
   | DismissInviteFriendsAction
   | DismissGetVerifiedAction
@@ -138,6 +144,7 @@ export type ActionTypes =
   | UpdateOutgoingPaymentRequestsAction
   | SetContactDetailsAction
   | SetPromptFornoAction
+  | SetRetryVerificationWithFornoAction
   | AcceptTermsAction
 
 export function setName(name: string): SetNameAction {
@@ -200,8 +207,8 @@ export const setSocialBackupCompleted = (): SetSocialBackupCompletedAction => ({
   type: Actions.SET_SOCIAL_BACKUP_COMPLETED_ACTION,
 })
 
-export const resetBackupState = (): ResetBackupState => ({
-  type: Actions.RESET_BACKUP_STATE,
+export const toggleBackupState = (): ToggleBackupState => ({
+  type: Actions.TOGGLE_BACKUP_STATE,
 })
 
 export const updateIncomingPaymentRequests = (
@@ -233,6 +240,13 @@ export const dismissGetVerified = (): DismissGetVerifiedAction => ({
 export const setPromptForno = (promptIfNeeded: boolean): SetPromptFornoAction => ({
   type: Actions.SET_PROMPT_FORNO,
   promptIfNeeded,
+})
+
+export const setRetryVerificationWithForno = (
+  retry: boolean
+): SetRetryVerificationWithFornoAction => ({
+  type: Actions.SET_RETRY_VERIFICATION_WITH_FORNO,
+  retry,
 })
 
 export const setUserContactDetails = (

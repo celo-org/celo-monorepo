@@ -32,4 +32,13 @@ export const migrations = {
       },
     }
   },
+  2: (state: any) => {
+    return {
+      ...state,
+      app: {
+        ...state.app,
+        numberVerified: false,
+      },
+    }
+  },
 }

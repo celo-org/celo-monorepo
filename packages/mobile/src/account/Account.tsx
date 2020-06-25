@@ -1,5 +1,5 @@
 import Link from '@celo/react-components/components/Link'
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { isE164Number } from '@celo/utils/src/phoneNumbers'
 import { StackScreenProps } from '@react-navigation/stack'
@@ -10,7 +10,7 @@ import { Clipboard, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 
 import DeviceInfo from 'react-native-device-info'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
-import { devModeTriggerClicked, resetBackupState } from 'src/account/actions'
+import { devModeTriggerClicked, toggleBackupState } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
 import SettingsItem from 'src/account/SettingsItem'
@@ -22,7 +22,7 @@ import { FAQ_LINK, TOS_LINK } from 'src/config'
 import { features } from 'src/flags'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { revokeVerification } from 'src/identity/actions'
-import { headerWithBackButton } from 'src/navigator/Headers'
+import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { navigateProtected } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -35,13 +35,13 @@ interface DispatchProps {
   setNumberVerified: typeof setNumberVerified
   resetAppOpenedState: typeof resetAppOpenedState
   setAnalyticsEnabled: typeof setAnalyticsEnabled
-  resetBackupState: typeof resetBackupState
+  toggleBackupState: typeof toggleBackupState
   devModeTriggerClicked: typeof devModeTriggerClicked
 }
 
 interface StateProps {
   account: string | null
-  e164PhoneNumber: string
+  e164PhoneNumber: string | null
   devModeActive: boolean
   analyticsEnabled: boolean
   numberVerified: boolean
@@ -74,19 +74,13 @@ const mapDispatchToProps = {
   setNumberVerified,
   resetAppOpenedState,
   setAnalyticsEnabled,
-  resetBackupState,
+  toggleBackupState,
   devModeTriggerClicked,
 }
 
 export class Account extends React.Component<Props, State> {
-  static navigationOptions = headerWithBackButton
-
   state: State = {
-    version: '',
-  }
-
-  async componentDidMount() {
-    this.setState({ version: DeviceInfo.getVersion() })
+    version: DeviceInfo.getVersion(),
   }
 
   goToProfile = () => {
@@ -96,7 +90,7 @@ export class Account extends React.Component<Props, State> {
 
   goToBackupScreen = () => {
     if (this.props.backupCompleted) {
-      navigateProtected(Screens.BackupIntroduction)
+      navigateProtected(Screens.BackupIntroduction, { fromAccountScreen: true })
     } else {
       this.props.navigation.navigate(Screens.BackupIntroduction)
     }
@@ -111,7 +105,7 @@ export class Account extends React.Component<Props, State> {
   }
 
   goToLanguageSetting = () => {
-    this.props.navigation.navigate(Screens.Language, { nextScreen: Screens.Account })
+    this.props.navigation.navigate(Screens.Language, { nextScreen: 'GO_BACK' })
   }
 
   goToLocalCurrencySetting = () => {
@@ -127,15 +121,15 @@ export class Account extends React.Component<Props, State> {
   }
 
   goToSecurity = () => {
-    navigateProtected(Screens.Security, { nextScreen: Screens.Account })
+    navigateProtected(Screens.Security)
   }
 
   goToAnalytics = () => {
-    this.props.navigation.navigate(Screens.Analytics, { nextScreen: Screens.Account })
+    this.props.navigation.navigate(Screens.Analytics)
   }
 
   goToDataSaver = () => {
-    this.props.navigation.navigate(Screens.DataSaver)
+    this.props.navigation.navigate(Screens.DataSaver, { promptModalVisible: false })
   }
 
   goToFAQ() {
@@ -160,7 +154,7 @@ export class Account extends React.Component<Props, State> {
   }
 
   revokeNumberVerification = async () => {
-    if (!isE164Number(this.props.e164PhoneNumber)) {
+    if (this.props.e164PhoneNumber && !isE164Number(this.props.e164PhoneNumber)) {
       Logger.showMessage('Cannot revoke verificaton: number invalid')
       return
     }
@@ -168,8 +162,8 @@ export class Account extends React.Component<Props, State> {
     this.props.revokeVerification()
   }
 
-  resetBackupState = () => {
-    this.props.resetBackupState()
+  toggleBackupState = () => {
+    this.props.toggleBackupState()
   }
 
   showDebugScreen = () => {
@@ -214,8 +208,8 @@ export class Account extends React.Component<Props, State> {
           </View>
 
           <View style={style.devSettingsItem}>
-            <TouchableOpacity onPress={this.resetBackupState}>
-              <Text>Reset backup state</Text>
+            <TouchableOpacity onPress={this.toggleBackupState}>
+              <Text>Toggle backup state</Text>
             </TouchableOpacity>
           </View>
           <View style={style.devSettingsItem}>
@@ -238,8 +232,9 @@ export class Account extends React.Component<Props, State> {
     const showSecurity = pincodeType === PincodeType.CustomPin
 
     return (
-      <ScrollView style={style.scrollView}>
-        <SafeAreaView>
+      <SafeAreaView style={style.container}>
+        <DrawerTopBar />
+        <ScrollView>
           <View style={style.accountProfile}>
             {/* TouchableNoFeedback doesn't work here for some reason */}
             <TouchableOpacity onPress={this.onPressAvatar}>
@@ -298,15 +293,19 @@ export class Account extends React.Component<Props, State> {
               <Link onPress={this.goToTerms}>{t('termsOfServiceLink')}</Link>
             </View>
           </View>
-        </SafeAreaView>
-      </ScrollView>
+        </ScrollView>
+      </SafeAreaView>
     )
   }
 }
 
 const style = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.light,
+  },
   accountProfile: {
-    paddingBottom: 20,
+    paddingVertical: 8,
     flexDirection: 'column',
     alignItems: 'center',
   },
@@ -319,13 +318,8 @@ const style = StyleSheet.create({
     flexDirection: 'row',
     paddingBottom: 10,
   },
-  scrollView: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
   containerList: {
     flex: 1,
-    paddingLeft: 20,
     borderTopWidth: 1,
     borderColor: '#EEEEEE',
   },
@@ -353,4 +347,4 @@ const style = StyleSheet.create({
 export default connect<StateProps, DispatchProps, OwnProps, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.accountScreen10)(Account))
+)(withTranslation<Props>(Namespaces.accountScreen10)(Account))

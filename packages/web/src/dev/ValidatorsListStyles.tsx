@@ -7,6 +7,11 @@ export const styles = StyleSheet.create({
     position: 'static',
     zIndex: 'initial',
   } as any,
+  pStaticOverflow: {
+    position: 'static',
+    zIndex: 'initial',
+    overflow: 'initial',
+  } as any,
   content: {
     paddingBottom: 10,
   },
@@ -14,6 +19,7 @@ export const styles = StyleSheet.create({
     marginTop: HEADER_HEIGHT,
     backgroundColor: colors.dark,
     minWidth: '100vw',
+    overflow: 'scroll',
     width: '100%',
   },
   defaultText: {
@@ -55,7 +61,7 @@ export const styles = StyleSheet.create({
 
   // Table
   table: {
-    width: 1020,
+    width: 1292,
     margin: 'auto',
     marginBottom: 100,
     backgroundColor: colors.dark,
@@ -64,7 +70,7 @@ export const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'space-between',
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'stretch',
     width: '100%',
   },
   tableRowCont: {
@@ -193,6 +199,7 @@ export const styles = StyleSheet.create({
   },
 
   // Column sizes
+  sizeXXS: { minWidth: 30, maxWidth: 30 },
   sizeXS: { minWidth: 64 + 6, maxWidth: 64 + 6 },
   sizeS: { minWidth: 74 + 6, maxWidth: 74 + 6 },
   sizeM: { minWidth: 110 + 6, maxWidth: 110 + 6 },
@@ -222,11 +229,10 @@ export const styles = StyleSheet.create({
   numberBlock: {
     borderTopWidth: 0,
     borderBottomWidth: 0,
-    borderRightWidth: 0,
     paddingHorizontal: 10,
     borderLeftWidth: 1,
     borderLeftColor: colors.grayHeavy,
-    border: 'solid',
+    borderRightWidth: 0,
   },
   numberBlockFirst: {
     borderLeftWidth: 0,
@@ -296,5 +302,31 @@ export const styles = StyleSheet.create({
     textDecorationLine: 'underline',
     marginRight: 6,
     marginLeft: 4,
+  },
+  tooltipHeader: {
+    maxWidth: 180,
+    whiteSpace: 'initial',
+    width: 'max-content',
+    top: 'calc(100% - 20px)',
+  },
+
+  // Pinned
+  pinContainer: {
+    alignSelf: 'flex-start',
+    paddingTop: 16,
+    cursor: 'pointer',
+  },
+  pin: {
+    height: 10,
+    width: 10,
+    margin: 'auto',
+    borderRadius: 5,
+    borderColor: colors.grayHeavy,
+    borderWidth: 2,
+    borderStyle: 'solid',
+  },
+  pinned: {
+    backgroundColor: colors.white,
+    borderColor: colors.white,
   },
 })

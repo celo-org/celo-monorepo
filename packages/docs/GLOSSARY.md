@@ -162,7 +162,7 @@ Celo Gold balances held in escrow at the Locked Gold contract for the account th
 
 ## Mainnet
 
-The Celo production network. At some point in the future, the Celo community may declare a network to be the mainnet.
+The Celo production network.
 
 ## Node
 
@@ -178,7 +178,7 @@ The system that determines the participants in a Byzantine Fault Tolerant consen
 
 ## RC1
 
-RC1, which stands for release candidate 1, is the first network which has the potential of the Celo mainnet. Should the community decide it is required, RC1 may be replaced by subsequent release candidate until it is the decided that the final version is ready to be declared the mainnet.
+RC1, which stands for Release Candidate 1, was the first network that had the potential to become the Celo mainnet. It was promoted to Mainnet after the Celo community voted to enable Celo Gold transfers on the network on May 18, 2020.
 
 ## Savings Circle
 

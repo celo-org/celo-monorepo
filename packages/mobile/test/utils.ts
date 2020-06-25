@@ -1,12 +1,19 @@
 /* Utilities to facilitate testing */
+import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import { ReactTestInstance } from 'react-test-renderer'
 import configureMockStore from 'redux-mock-store'
 import { InitializationState } from 'src/geth/reducer'
 import i18n from 'src/i18n'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import { getLatestSchema } from 'test/schemas'
-import { mockAddressToE164Number, mockContractAddress, mockE164NumberToAddress } from 'test/values'
+import {
+  mockAddressToE164Number,
+  mockContractAddress,
+  mockE164NumberToAddress,
+  mockNavigation,
+} from 'test/values'
 
 // Sleep for a number of ms
 export const sleep = (time: number) =>
@@ -112,6 +119,23 @@ export function getMockI18nProps() {
     i18n,
     t: i18n.t,
     tReady: true,
+  }
+}
+
+export function getMockStackScreenProps<RouteName extends keyof StackParamList>(
+  ...args: undefined extends StackParamList[RouteName]
+    ? [RouteName] | [RouteName, StackParamList[RouteName]]
+    : [RouteName, StackParamList[RouteName]]
+): StackScreenProps<StackParamList, RouteName> {
+  const [name, params] = args
+  return {
+    navigation: mockNavigation,
+    // @ts-ignore
+    route: {
+      key: '1',
+      name,
+      params,
+    },
   }
 }
 

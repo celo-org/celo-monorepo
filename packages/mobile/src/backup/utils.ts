@@ -2,6 +2,11 @@ import { generateMnemonic, MnemonicLanguages, MnemonicStrength } from '@celo/uti
 import * as _ from 'lodash'
 import { useAsync } from 'react-async-hook'
 import * as bip39 from 'react-native-bip39'
+import { useDispatch } from 'react-redux'
+import { showError } from 'src/alert/actions'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
+import { ErrorMessages } from 'src/app/ErrorMessages'
 import { getKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
 
@@ -75,7 +80,7 @@ export function splitMnemonic(mnemonic: string, language: string | null): string
 export function joinMnemonic(mnemonicShards: string[]) {
   if (
     !mnemonicShards ||
-    !(mnemonicShards.length === 2) ||
+    mnemonicShards.length !== 2 ||
     !mnemonicShards[0].includes(MNEMONIC_SPLITTER) ||
     !mnemonicShards[1].includes(MNEMONIC_SPLITTER)
   ) {
@@ -101,13 +106,28 @@ export async function getStoredMnemonic(): Promise<string | null> {
 
     return mnemonic
   } catch (error) {
+    CeloAnalytics.track(CustomEventNames.failed_to_retrieve_mnemonic, { error: error.message })
     Logger.error(TAG, 'Failed to retrieve mnemonic', error)
     return null
   }
 }
 
+export function onGetMnemonicFail(viewError: (error: ErrorMessages) => void, context?: string) {
+  viewError(ErrorMessages.FAILED_FETCH_MNEMONIC)
+  CeloAnalytics.track(CustomEventNames.backup_error, {
+    title: 'Failed to retrieve Account Key',
+    context,
+  })
+}
+
 export function useAccountKey() {
+  const dispatch = useDispatch()
   const asyncAccountKey = useAsync(getStoredMnemonic, [])
+
+  if (asyncAccountKey.error) {
+    onGetMnemonicFail((error) => dispatch(showError(error)), 'useAccountKey')
+  }
+
   return asyncAccountKey.result
 }
 

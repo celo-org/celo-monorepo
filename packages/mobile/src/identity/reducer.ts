@@ -1,15 +1,16 @@
+import dotProp from 'dot-prop-immutable'
 import { RehydrateAction } from 'redux-persist'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import { Actions, ActionTypes } from 'src/identity/actions'
-import { AttestationCode, VerificationStatus } from 'src/identity/verification'
+import { ContactMatches, ImportContactsStatus, VerificationStatus } from 'src/identity/types'
+import { AttestationCode } from 'src/identity/verification'
 import { getRehydratePayload, REHYDRATE } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
 
 export const ATTESTATION_CODE_PLACEHOLDER = 'ATTESTATION_CODE_PLACEHOLDER'
 export const ATTESTATION_ISSUER_PLACEHOLDER = 'ATTESTATION_ISSUER_PLACEHOLDER'
 
-// TODO currently treating addresses to e164Number as 1:1 but
-// there are rare cases where an address could have two numbers mapped to it.
-// E.g. user imported backup phrase onto second phone and then verified again with a new number
 export interface AddressToE164NumberType {
   [address: string]: string | null
 }
@@ -22,9 +23,23 @@ export interface E164NumberToSaltType {
   [e164PhoneNumber: string]: string | null // null means unverified
 }
 
-export interface ContactMappingProgress {
+export interface ImportContactProgress {
+  status: ImportContactsStatus
   current: number
   total: number
+}
+
+export enum AddressValidationType {
+  FULL = 'full',
+  PARTIAL = 'partial',
+  NONE = 'none',
+}
+
+export interface SecureSendPhoneNumberMapping {
+  [e164Number: string]: {
+    address: string | undefined
+    addressValidationType: AddressValidationType
+  }
 }
 
 export interface State {
@@ -39,26 +54,33 @@ export interface State {
   // Note: Do not access values in this directly, use the `getAddressFromPhoneNumber` helper in contactMapping
   e164NumberToAddress: E164NumberToAddressType
   e164NumberToSalt: E164NumberToSaltType
+  // Has the user already been asked for contacts permission
   askedContactsPermission: boolean
-  isLoadingImportContacts: boolean
-  contactMappingProgress: ContactMappingProgress
+  importContactsProgress: ImportContactProgress
+  // Contacts found during the matchmaking process
+  matchedContacts: ContactMatches
+  isValidRecipient: boolean
+  secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
 }
 
 const initialState: State = {
   attestationCodes: [],
   acceptedAttestationCodes: [],
   numCompleteAttestations: 0,
-  verificationStatus: 0,
+  verificationStatus: VerificationStatus.Stopped,
   hasSeenVerificationNux: false,
   addressToE164Number: {},
   e164NumberToAddress: {},
   e164NumberToSalt: {},
   askedContactsPermission: false,
-  isLoadingImportContacts: false,
-  contactMappingProgress: {
+  importContactsProgress: {
+    status: ImportContactsStatus.Stopped,
     current: 0,
     total: 0,
   },
+  matchedContacts: {},
+  isValidRecipient: false,
+  secureSendPhoneNumberMapping: {},
 }
 
 export const reducer = (
@@ -72,8 +94,8 @@ export const reducer = (
         ...state,
         ...getRehydratePayload(action, 'identity'),
         verificationStatus: VerificationStatus.Stopped,
-        isLoadingImportContacts: false,
-        contactMappingProgress: {
+        importContactsProgress: {
+          status: ImportContactsStatus.Stopped,
           current: 0,
           total: 0,
         },
@@ -128,38 +150,74 @@ export const reducer = (
     case Actions.IMPORT_CONTACTS:
       return {
         ...state,
-        isLoadingImportContacts: true,
         askedContactsPermission: true,
-        contactMappingProgress: { current: 0, total: 0 },
+        importContactsProgress: { status: ImportContactsStatus.Prepping, current: 0, total: 0 },
       }
-    case Actions.UPDATE_IMPORT_SYNC_PROGRESS:
+    case Actions.UPDATE_IMPORT_CONTACT_PROGRESS:
+      const curProgress = state.importContactsProgress
       return {
         ...state,
-        contactMappingProgress: { current: action.current, total: action.total },
-      }
-    case Actions.INCREMENT_IMPORT_SYNC_PROGRESS:
-      return {
-        ...state,
-        contactMappingProgress: {
-          current: state.contactMappingProgress.current + action.increment,
-          total: state.contactMappingProgress.total,
+        importContactsProgress: {
+          current: action.current ?? curProgress.current,
+          total: action.total ?? curProgress.total,
+          status: action.status ?? curProgress.status,
         },
       }
     case Actions.END_IMPORT_CONTACTS:
+      const { success } = action
       return {
         ...state,
-        isLoadingImportContacts: false,
-        contactMappingProgress: action.success
-          ? {
-              current: state.contactMappingProgress.total,
-              total: state.contactMappingProgress.total,
-            }
-          : state.contactMappingProgress,
+        importContactsProgress: {
+          ...state.importContactsProgress,
+          status: success ? ImportContactsStatus.Done : ImportContactsStatus.Failed,
+        },
       }
     case Actions.DENY_IMPORT_CONTACTS:
       return {
         ...state,
         askedContactsPermission: true,
+      }
+    case Actions.ADD_CONTACT_MATCHES:
+      const matchedContacts = { ...state.matchedContacts, ...action.matches }
+      CeloAnalytics.track(CustomEventNames.add_contact_match, {
+        contactsMatched: Object.keys(matchedContacts).length,
+      })
+      return {
+        ...state,
+        matchedContacts,
+      }
+    case Actions.VALIDATE_RECIPIENT_ADDRESS:
+      return {
+        ...state,
+        isValidRecipient: false,
+      }
+    case Actions.VALIDATE_RECIPIENT_ADDRESS_SUCCESS:
+      return {
+        ...state,
+        isValidRecipient: true,
+        // Overwrite the previous mapping when a new address is validated
+        secureSendPhoneNumberMapping: dotProp.set(
+          state.secureSendPhoneNumberMapping,
+          `${action.e164Number}`,
+          {
+            address: action.validatedAddress,
+            addressValidationType: AddressValidationType.NONE,
+          }
+        ),
+      }
+    case Actions.REQUIRE_SECURE_SEND:
+      return {
+        ...state,
+        isValidRecipient: false,
+        // Erase the previous mapping when new validation is required
+        secureSendPhoneNumberMapping: dotProp.set(
+          state.secureSendPhoneNumberMapping,
+          `${action.e164Number}`,
+          {
+            address: undefined,
+            addressValidationType: action.addressValidationType,
+          }
+        ),
       }
     default:
       return state
@@ -187,7 +245,8 @@ export const acceptedAttestationCodesSelector = (state: RootState) =>
 export const e164NumberToAddressSelector = (state: RootState) => state.identity.e164NumberToAddress
 export const addressToE164NumberSelector = (state: RootState) => state.identity.addressToE164Number
 export const e164NumberToSaltSelector = (state: RootState) => state.identity.e164NumberToSalt
-export const contactMappingProgressSelector = (state: RootState) =>
-  state.identity.contactMappingProgress
-export const isLoadingImportContactsSelector = (state: RootState) =>
-  state.identity.isLoadingImportContacts
+export const secureSendPhoneNumberMappingSelector = (state: RootState) =>
+  state.identity.secureSendPhoneNumberMapping
+export const importContactsProgressSelector = (state: RootState) =>
+  state.identity.importContactsProgress
+export const matchedContactsSelector = (state: RootState) => state.identity.matchedContacts

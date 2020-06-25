@@ -32,11 +32,15 @@ export const DEV_SETTINGS_ACTIVE_INITIALLY = stringToBoolean(
 // VALUES
 export const GAS_INFLATION_FACTOR = 1.5 // Used when estimating gas for txs
 export const GAS_PRICE_INFLATION_FACTOR = 5 // Used when getting gas price, must match what Geth does
-export const BALANCE_OUT_OF_SYNC_THRESHOLD = 5 * 60 // 5 minutes
+export const BALANCE_OUT_OF_SYNC_THRESHOLD = 1 * 60 // 1 minute
 export const ALERT_BANNER_DURATION = 5000
 export const NUMBER_INPUT_MAX_DECIMALS = 2
 export const MAX_COMMENT_LENGTH = 70
 export const INPUT_DEBOUNCE_TIME = 1000 // milliseconds
+// The minimum allowed value to add funds
+export const DOLLAR_ADD_FUNDS_MIN_AMOUNT = 0.01
+// The minimum allowed value to cash out
+export const DOLLAR_CASH_OUT_MIN_AMOUNT = 0.01
 // The minimum allowed value for a transaction such as a transfer
 export const DOLLAR_TRANSACTION_MIN_AMOUNT = 0.01
 export const GOLD_TRANSACTION_MIN_AMOUNT = 0.001
@@ -57,11 +61,6 @@ export const FAQ_LINK = 'https://celo.org/faq'
 export const FORUM_LINK = 'https://forum.celo.org/c/support'
 export const CELO_SUPPORT_EMAIL_ADDRESS = 'support@celo.org'
 export const DEFAULT_FORNO_URL = `https://${DEFAULT_TESTNET}-forno.celo-testnet.org`
-// TODO configure per environment
-export const PHONE_NUM_PRIVACY_SERVICE =
-  'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net'
-export const PHONE_NUM_PRIVACY_PUBLIC_KEY =
-  'B+gJTCmTrf9t3X7YQ2F4xekSzd5xg5bdzcJ8NPefby3mScelg5172zl1GgIO9boADEwE67j6M55GwouQwaG5jDZ5tHa2eNtfC7oLIsevuUmzrXVDry9cmsalB0BHX0EA'
 
 // FEATURE FLAGS
 export const FIREBASE_ENABLED = stringToBoolean(Config.FIREBASE_ENABLED || 'true')
@@ -75,7 +74,8 @@ export const DEFAULT_SYNC_MODE: GethSyncMode = Config.DEFAULT_SYNC_MODE
   ? new BigNumber(Config.DEFAULT_SYNC_MODE).toNumber()
   : GethSyncMode.Lightest
 // TODO Remove when feature is stable
-export const USE_PHONE_NUMBER_PRIVACY = false
+export const USE_PHONE_NUMBER_PRIVACY = true
+export const SHOW_CASH_OUT = stringToBoolean(Config.SHOW_CASH_OUT || 'false')
 
 // SECRETS
 export const SEGMENT_API_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SEGMENT_API_KEY')

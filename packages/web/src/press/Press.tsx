@@ -5,47 +5,49 @@ import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import Responsive from 'src/shared/Responsive'
 import { standardStyles } from 'src/styles'
-const forbes = require('./forbes-logo.png')
-const fortune = require('./fortune@2x.png')
-const coindesk = require('./coindesk-logo@2x.png')
-const techcrunch = require('./techcrunch-logo@2x.png')
-const wsj = require('./wsj-logo@2x.png')
+const forbes = require('./forbes-logo-white.png')
+const fortune = require('./fortune-white.png')
+const coindesk = require('./coindesk-logo-white.png')
+const techcrunch = require('./techcrunch-logo-white.png')
+const wsj = require('./wsj-logo-white.png')
 
 class Press extends React.PureComponent<I18nProps> {
   render() {
     const { t } = this.props
     return (
-      <GridRow
-        mobileStyle={standardStyles.sectionMarginBottomMobile}
-        tabletStyle={standardStyles.sectionMarginBottomTablet}
-        desktopStyle={standardStyles.sectionMarginBottom}
-      >
-        <Cell span={Spans.full} style={standardStyles.centered}>
-          <View style={styles.logoContainer}>
-            {logos.map((logo) => (
-              <a key={logo.source} href={logo.url} target={'_blank'} rel="noopener">
-                <Responsive key={logo.source} medium={[styles.logo, styles.largeLogo, logo.size]}>
-                  <Image
-                    resizeMode={'contain'}
-                    source={logo.source}
-                    style={[styles.logo, logo.size]}
-                  />
-                </Responsive>
-              </a>
-            ))}
-          </View>
-          <View style={[styles.linkContainer, standardStyles.elementalMarginTop]}>
-            <Button
-              text={t('recentNews')}
-              kind={BTN.NAKED}
-              size={SIZE.normal}
-              href={
-                'https://www.coindesk.com/libra-minus-facebook-why-celo-is-2020s-buzzy-token-project'
-              }
-            />
-          </View>
-        </Cell>
-      </GridRow>
+      <View style={standardStyles.darkBackground}>
+        <GridRow
+          mobileStyle={standardStyles.sectionMarginBottomMobile}
+          tabletStyle={standardStyles.sectionMarginBottomTablet}
+          desktopStyle={standardStyles.sectionMarginBottom}
+        >
+          <Cell span={Spans.full} style={standardStyles.centered}>
+            <View style={styles.logoContainer}>
+              {logos.map((logo) => (
+                <a key={logo.source} href={logo.url} target={'_blank'} rel="noopener">
+                  <Responsive key={logo.source} medium={[styles.logo, styles.largeLogo, logo.size]}>
+                    <Image
+                      resizeMode={'contain'}
+                      source={logo.source}
+                      style={[styles.logo, logo.size]}
+                    />
+                  </Responsive>
+                </a>
+              ))}
+            </View>
+            <View style={[styles.linkContainer, standardStyles.elementalMarginTop]}>
+              <Button
+                text={t('recentNews')}
+                kind={BTN.NAKED}
+                size={SIZE.normal}
+                href={
+                  'https://www.coindesk.com/libra-minus-facebook-why-celo-is-2020s-buzzy-token-project'
+                }
+              />
+            </View>
+          </Cell>
+        </GridRow>
+      </View>
     )
   }
 }
@@ -65,7 +67,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
+    alignContent: 'center',
     justifyContent: 'center',
+    opacity: 0.7,
   },
   linkContainer: {
     alignItems: 'center',

@@ -184,17 +184,24 @@ exports[`renders correctly with backup not completed 1`] = `
   </View>
   <View
     style={
-      Object {
-        "flexDirection": "row",
-      }
+      Array [
+        Object {
+          "flexDirection": "column",
+        },
+        undefined,
+      ]
     }
   >
     <View
       style={
-        Object {
-          "borderRadius": 100,
-          "overflow": "hidden",
-        }
+        Array [
+          Object {
+            "overflow": "hidden",
+          },
+          Object {
+            "borderRadius": 100,
+          },
+        ]
       }
     >
       <View
@@ -216,10 +223,11 @@ exports[`renders correctly with backup not completed 1`] = `
         style={
           Object {
             "alignItems": "center",
-            "backgroundColor": "#F5F4F0",
-            "flex": 1,
+            "backgroundColor": "#F1F0EB",
+            "flexGrow": 1,
             "height": 48,
             "justifyContent": "center",
+            "opacity": undefined,
             "paddingHorizontal": 16,
             "paddingVertical": 5,
           }
@@ -240,5 +248,79 @@ exports[`renders correctly with backup not completed 1`] = `
       </View>
     </View>
   </View>
+</SafeAreaView>
+`;
+
+exports[`still renders when mneumonic doesnt show up 1`] = `
+<SafeAreaView
+  style={
+    Object {
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+      "justifyContent": "space-between",
+      "padding": 16,
+    }
+  }
+>
+  <RCTScrollView
+    contentContainerStyle={
+      Object {
+        "flexGrow": 1,
+        "paddingBottom": 16,
+      }
+    }
+  >
+    <View>
+      <View>
+        <View
+          style={
+            Object {
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "paddingHorizontal": 2,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Medium",
+                "fontSize": 16,
+                "lineHeight": 22,
+              }
+            }
+          >
+            backupKey
+          </Text>
+        </View>
+        <View
+          style={
+            Object {
+              "alignContent": "center",
+              "backgroundColor": "#FFF9EE",
+              "borderRadius": 4,
+              "justifyContent": "center",
+              "marginTop": 16,
+              "padding": 16,
+            }
+          }
+        />
+      </View>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 16,
+            "lineHeight": 22,
+            "marginTop": 16,
+          }
+        }
+      >
+        backupKeySummary
+      </Text>
+    </View>
+  </RCTScrollView>
 </SafeAreaView>
 `;

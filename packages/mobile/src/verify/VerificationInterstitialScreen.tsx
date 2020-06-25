@@ -19,7 +19,7 @@ const AnimatedCircle = () => (
 )
 
 class VerificationInterstitialScreen extends React.Component<WithTranslation> {
-  static navigationOptions = { header: null }
+  static navigationOptions = { gestureEnabled: false, header: null }
 
   timeout: number | undefined
 

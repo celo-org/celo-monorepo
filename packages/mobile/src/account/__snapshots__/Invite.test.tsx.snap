@@ -12,6 +12,83 @@ exports[`Invite renders correctly with no recipients 1`] = `
   <View
     style={
       Object {
+        "alignItems": "center",
+        "backgroundColor": "transparent",
+        "borderBottomColor": AnimatedValue {
+          " __value": NaN,
+        },
+        "borderBottomWidth": 1,
+        "flexDirection": "row",
+        "height": 62,
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <View
+      accessible={true}
+      focusable={false}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "marginBottom": 0,
+          "marginLeft": 4,
+          "opacity": 1,
+          "padding": 8,
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height="32"
+        viewBox="0 0 32 32"
+        width="32"
+      >
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="9.75"
+          y2="9.75"
+        />
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="15.75"
+          y2="15.75"
+        />
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="21.75"
+          y2="21.75"
+        />
+      </svg>
+    </View>
+    <View
+      style={
+        Object {
+          "width": 45,
+        }
+      }
+    />
+  </View>
+  <View
+    style={
+      Object {
         "borderBottomColor": "rgba(134, 138, 141, 0.15)",
         "borderBottomWidth": 1,
         "paddingBottom": 5,
@@ -23,60 +100,41 @@ exports[`Invite renders correctly with no recipients 1`] = `
         Array [
           Object {
             "alignItems": "center",
-            "borderColor": "#EEEEEE",
-            "borderRadius": 3,
-            "borderWidth": 1,
+            "borderColor": "#EDEEEF",
+            "borderRadius": 18,
+            "borderWidth": 1.5,
             "flexDirection": "row",
-            "height": 50,
-            "marginHorizontal": 10,
-            "marginVertical": 5,
+            "height": 36,
+            "paddingRight": 8,
           },
-          Object {
-            "borderColor": "#EEEEEE",
-          },
+          undefined,
         ]
       }
     >
       <View
         style={
           Object {
-            "alignItems": "center",
-            "flexDirection": "column",
-            "justifyContent": "center",
-            "minWidth": 45,
+            "marginLeft": 17,
+            "marginRight": 13,
           }
         }
       >
         <svg
           fill="none"
-          height={18}
+          height={15}
           style={Object {}}
-          viewBox="0 0 18 18"
-          width={18}
-          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 14 15"
+          width={14}
         >
           <path
             clipRule="evenodd"
-            d="M2.65971 7.31402C2.65971 9.88456 4.74354 11.9684 7.31408 11.9684C9.88462 11.9684 11.9685 9.88456 11.9685 7.31402C11.9685 4.74348 9.88462 2.65964 7.31408 2.65964C4.74354 2.65964 2.65971 4.74348 2.65971 7.31402ZM6.10352e-05 7.31402C6.10352e-05 11.3534 3.27466 14.628 7.31408 14.628C8.65119 14.628 9.9045 14.2692 10.983 13.6427L14.9508 17.6105C15.4701 18.1298 16.3121 18.1298 16.8315 17.6105C17.3508 17.0912 17.3508 16.2492 16.8315 15.7298L13.0074 11.9058C14.0211 10.6505 14.6281 9.05315 14.6281 7.31402C14.6281 3.2746 11.3535 0 7.31408 0C3.27466 0 6.10352e-05 3.2746 6.10352e-05 7.31402Z"
-            fill="#81868B"
+            d="M2.162 5.946a3.784 3.784 0 107.568 0 3.784 3.784 0 00-7.568 0zM0 5.946a5.946 5.946 0 008.929 5.145l3.225 3.226a1.081 1.081 0 001.53-1.53l-3.11-3.108A5.946 5.946 0 100 5.946z"
+            fill="#B4B9BD"
             fillRule="evenodd"
             style={Object {}}
           />
         </svg>
       </View>
-      <View
-        style={
-          Array [
-            Object {
-              "height": 35,
-              "width": 1,
-            },
-            Object {
-              "backgroundColor": "#EEEEEE",
-            },
-          ]
-        }
-      />
       <View
         style={
           Array [
@@ -92,29 +150,29 @@ exports[`Invite renders correctly with no recipients 1`] = `
       >
         <TextInput
           allowFontScaling={true}
-          icon={
-            <Search
-              color="#81868B"
-              height={18}
-              width={18}
-            />
-          }
           onBlur={[Function]}
           onChangeText={[Function]}
           onFocus={[Function]}
-          placeholder="nameOrPhoneNumber"
-          placeholderTextColor="rgba(0, 0, 0, .4)"
+          placeholder="global:search"
           rejectResponderTermination={true}
           style={
-            Object {
-              "backgroundColor": "#FFFFFF",
-              "borderColor": "#D1D5D8",
-              "borderRadius": 3,
-              "flex": 1,
-              "fontFamily": "Hind-Regular",
-              "padding": 8,
-            }
+            Array [
+              Object {
+                "color": "#2E3338",
+                "flex": 1,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingHorizontal": 0,
+                "paddingVertical": 12,
+              },
+              undefined,
+              Object {
+                "paddingVertical": 6,
+              },
+            ]
           }
+          testID="SearchInput"
           underlineColorAndroid="transparent"
           value=""
         />
@@ -247,6 +305,83 @@ exports[`Invite renders correctly with recipients 1`] = `
   <View
     style={
       Object {
+        "alignItems": "center",
+        "backgroundColor": "transparent",
+        "borderBottomColor": AnimatedValue {
+          " __value": NaN,
+        },
+        "borderBottomWidth": 1,
+        "flexDirection": "row",
+        "height": 62,
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <View
+      accessible={true}
+      focusable={false}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "marginBottom": 0,
+          "marginLeft": 4,
+          "opacity": 1,
+          "padding": 8,
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height="32"
+        viewBox="0 0 32 32"
+        width="32"
+      >
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="9.75"
+          y2="9.75"
+        />
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="15.75"
+          y2="15.75"
+        />
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="21.75"
+          y2="21.75"
+        />
+      </svg>
+    </View>
+    <View
+      style={
+        Object {
+          "width": 45,
+        }
+      }
+    />
+  </View>
+  <View
+    style={
+      Object {
         "borderBottomColor": "rgba(134, 138, 141, 0.15)",
         "borderBottomWidth": 1,
         "paddingBottom": 5,
@@ -258,60 +393,41 @@ exports[`Invite renders correctly with recipients 1`] = `
         Array [
           Object {
             "alignItems": "center",
-            "borderColor": "#EEEEEE",
-            "borderRadius": 3,
-            "borderWidth": 1,
+            "borderColor": "#EDEEEF",
+            "borderRadius": 18,
+            "borderWidth": 1.5,
             "flexDirection": "row",
-            "height": 50,
-            "marginHorizontal": 10,
-            "marginVertical": 5,
+            "height": 36,
+            "paddingRight": 8,
           },
-          Object {
-            "borderColor": "#EEEEEE",
-          },
+          undefined,
         ]
       }
     >
       <View
         style={
           Object {
-            "alignItems": "center",
-            "flexDirection": "column",
-            "justifyContent": "center",
-            "minWidth": 45,
+            "marginLeft": 17,
+            "marginRight": 13,
           }
         }
       >
         <svg
           fill="none"
-          height={18}
+          height={15}
           style={Object {}}
-          viewBox="0 0 18 18"
-          width={18}
-          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 14 15"
+          width={14}
         >
           <path
             clipRule="evenodd"
-            d="M2.65971 7.31402C2.65971 9.88456 4.74354 11.9684 7.31408 11.9684C9.88462 11.9684 11.9685 9.88456 11.9685 7.31402C11.9685 4.74348 9.88462 2.65964 7.31408 2.65964C4.74354 2.65964 2.65971 4.74348 2.65971 7.31402ZM6.10352e-05 7.31402C6.10352e-05 11.3534 3.27466 14.628 7.31408 14.628C8.65119 14.628 9.9045 14.2692 10.983 13.6427L14.9508 17.6105C15.4701 18.1298 16.3121 18.1298 16.8315 17.6105C17.3508 17.0912 17.3508 16.2492 16.8315 15.7298L13.0074 11.9058C14.0211 10.6505 14.6281 9.05315 14.6281 7.31402C14.6281 3.2746 11.3535 0 7.31408 0C3.27466 0 6.10352e-05 3.2746 6.10352e-05 7.31402Z"
-            fill="#81868B"
+            d="M2.162 5.946a3.784 3.784 0 107.568 0 3.784 3.784 0 00-7.568 0zM0 5.946a5.946 5.946 0 008.929 5.145l3.225 3.226a1.081 1.081 0 001.53-1.53l-3.11-3.108A5.946 5.946 0 100 5.946z"
+            fill="#B4B9BD"
             fillRule="evenodd"
             style={Object {}}
           />
         </svg>
       </View>
-      <View
-        style={
-          Array [
-            Object {
-              "height": 35,
-              "width": 1,
-            },
-            Object {
-              "backgroundColor": "#EEEEEE",
-            },
-          ]
-        }
-      />
       <View
         style={
           Array [
@@ -327,29 +443,29 @@ exports[`Invite renders correctly with recipients 1`] = `
       >
         <TextInput
           allowFontScaling={true}
-          icon={
-            <Search
-              color="#81868B"
-              height={18}
-              width={18}
-            />
-          }
           onBlur={[Function]}
           onChangeText={[Function]}
           onFocus={[Function]}
-          placeholder="nameOrPhoneNumber"
-          placeholderTextColor="rgba(0, 0, 0, .4)"
+          placeholder="global:search"
           rejectResponderTermination={true}
           style={
-            Object {
-              "backgroundColor": "#FFFFFF",
-              "borderColor": "#D1D5D8",
-              "borderRadius": 3,
-              "flex": 1,
-              "fontFamily": "Hind-Regular",
-              "padding": 8,
-            }
+            Array [
+              Object {
+                "color": "#2E3338",
+                "flex": 1,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingHorizontal": 0,
+                "paddingVertical": 12,
+              },
+              undefined,
+              Object {
+                "paddingVertical": 6,
+              },
+            ]
           }
+          testID="SearchInput"
           underlineColorAndroid="transparent"
           value=""
         />
@@ -471,21 +587,21 @@ exports[`Invite renders correctly with recipients 1`] = `
             style={
               Object {
                 "alignItems": "center",
-                "backgroundColor": "#F8F8F8",
-                "display": "flex",
+                "backgroundColor": "#FFFFFF",
                 "flexDirection": "row",
-                "height": 36,
                 "justifyContent": "space-between",
-                "paddingHorizontal": 10,
+                "paddingHorizontal": 16,
+                "paddingVertical": 8,
               }
             }
           >
             <Text
               style={
                 Object {
-                  "color": "#81868B",
-                  "fontFamily": "Hind-Medium",
-                  "fontSize": 12,
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 13,
+                  "lineHeight": 16,
                 }
               }
             >
@@ -501,6 +617,12 @@ exports[`Invite renders correctly with recipients 1`] = `
             <View
               accessible={true}
               focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackground",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
               onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
@@ -508,6 +630,7 @@ exports[`Invite renders correctly with recipients 1`] = `
               onResponderTerminate={[Function]}
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
+              testID="RecipientItem"
             >
               <View
                 style={
@@ -515,9 +638,9 @@ exports[`Invite renders correctly with recipients 1`] = `
                     "alignItems": "center",
                     "flex": 1,
                     "flexDirection": "row",
-                    "height": 50,
+                    "height": 80,
                     "justifyContent": "space-between",
-                    "paddingHorizontal": 10,
+                    "paddingHorizontal": 16,
                   }
                 }
               >
@@ -530,7 +653,7 @@ exports[`Invite renders correctly with recipients 1`] = `
                         "justifyContent": "center",
                       },
                       Object {
-                        "marginRight": 10,
+                        "marginRight": 12,
                       },
                     ]
                   }
@@ -551,29 +674,28 @@ exports[`Invite renders correctly with recipients 1`] = `
                       ]
                     }
                   >
-                    <Image
-                      source={
-                        Object {
-                          "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                        }
-                      }
+                    <Text
                       style={
-                        Object {
-                          "alignItems": "center",
-                          "height": 40,
-                          "justifyContent": "center",
-                          "width": 40,
-                        }
+                        Array [
+                          Object {
+                            "color": "#FFFFFF",
+                            "fontFamily": "Inter-Medium",
+                            "fontSize": 16,
+                          },
+                          Object {
+                            "fontSize": 20,
+                          },
+                        ]
                       }
-                    />
+                    >
+                      G
+                    </Text>
                   </View>
                 </View>
                 <View
                   style={
                     Object {
                       "flex": 1,
-                      "flexDirection": "row",
-                      "paddingRight": 5,
                     }
                   }
                 >
@@ -581,43 +703,29 @@ exports[`Invite renders correctly with recipients 1`] = `
                     ellipsizeMode="tail"
                     numberOfLines={1}
                     style={
-                      Array [
-                        Object {
-                          "color": "#2E3338",
-                          "fontFamily": "Hind-SemiBold",
-                          "fontSize": 14,
-                          "lineHeight": 18,
-                        },
-                        Object {
-                          "lineHeight": 41,
-                        },
-                      ]
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Medium",
+                        "fontSize": 16,
+                        "lineHeight": 22,
+                      }
                     }
                   >
                     George Bogart
                   </Text>
-                </View>
-                <Text
-                  style={
-                    Array [
+                  <Text
+                    style={
                       Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-SemiBold",
+                        "color": "#9CA4A9",
+                        "fontFamily": "Inter-Regular",
                         "fontSize": 14,
                         "lineHeight": 18,
-                      },
-                      Object {
-                        "fontFamily": "Hind-Light",
-                      },
-                      Object {
-                        "lineHeight": 41,
-                        "textAlign": "right",
-                      },
-                    ]
-                  }
-                >
-                  21255550000
-                </Text>
+                      }
+                    }
+                  >
+                    21255550000
+                  </Text>
+                </View>
               </View>
             </View>
             <View
@@ -639,6 +747,12 @@ exports[`Invite renders correctly with recipients 1`] = `
             <View
               accessible={true}
               focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackground",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
               onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
@@ -646,6 +760,7 @@ exports[`Invite renders correctly with recipients 1`] = `
               onResponderTerminate={[Function]}
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
+              testID="RecipientItem"
             >
               <View
                 style={
@@ -653,9 +768,9 @@ exports[`Invite renders correctly with recipients 1`] = `
                     "alignItems": "center",
                     "flex": 1,
                     "flexDirection": "row",
-                    "height": 50,
+                    "height": 80,
                     "justifyContent": "space-between",
-                    "paddingHorizontal": 10,
+                    "paddingHorizontal": 16,
                   }
                 }
               >
@@ -668,7 +783,7 @@ exports[`Invite renders correctly with recipients 1`] = `
                         "justifyContent": "center",
                       },
                       Object {
-                        "marginRight": 10,
+                        "marginRight": 12,
                       },
                     ]
                   }
@@ -689,29 +804,28 @@ exports[`Invite renders correctly with recipients 1`] = `
                       ]
                     }
                   >
-                    <Image
-                      source={
-                        Object {
-                          "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                        }
-                      }
+                    <Text
                       style={
-                        Object {
-                          "alignItems": "center",
-                          "height": 40,
-                          "justifyContent": "center",
-                          "width": 40,
-                        }
+                        Array [
+                          Object {
+                            "color": "#FFFFFF",
+                            "fontFamily": "Inter-Medium",
+                            "fontSize": 16,
+                          },
+                          Object {
+                            "fontSize": 20,
+                          },
+                        ]
                       }
-                    />
+                    >
+                      J
+                    </Text>
                   </View>
                 </View>
                 <View
                   style={
                     Object {
                       "flex": 1,
-                      "flexDirection": "row",
-                      "paddingRight": 5,
                     }
                   }
                 >
@@ -719,43 +833,29 @@ exports[`Invite renders correctly with recipients 1`] = `
                     ellipsizeMode="tail"
                     numberOfLines={1}
                     style={
-                      Array [
-                        Object {
-                          "color": "#2E3338",
-                          "fontFamily": "Hind-SemiBold",
-                          "fontSize": 14,
-                          "lineHeight": 18,
-                        },
-                        Object {
-                          "lineHeight": 41,
-                        },
-                      ]
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Medium",
+                        "fontSize": 16,
+                        "lineHeight": 22,
+                      }
                     }
                   >
                     Jane Doe
                   </Text>
-                </View>
-                <Text
-                  style={
-                    Array [
+                  <Text
+                    style={
                       Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-SemiBold",
+                        "color": "#9CA4A9",
+                        "fontFamily": "Inter-Regular",
                         "fontSize": 14,
                         "lineHeight": 18,
-                      },
-                      Object {
-                        "fontFamily": "Hind-Light",
-                      },
-                      Object {
-                        "lineHeight": 41,
-                        "textAlign": "right",
-                      },
-                    ]
-                  }
-                >
-                  13105550000
-                </Text>
+                      }
+                    }
+                  >
+                    13105550000
+                  </Text>
+                </View>
               </View>
             </View>
             <View
@@ -776,6 +876,12 @@ exports[`Invite renders correctly with recipients 1`] = `
           <View
             accessible={true}
             focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackground",
+                "type": "ThemeAttrAndroid",
+              }
+            }
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -783,6 +889,7 @@ exports[`Invite renders correctly with recipients 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            testID="RecipientItem"
           >
             <View
               style={
@@ -790,9 +897,9 @@ exports[`Invite renders correctly with recipients 1`] = `
                   "alignItems": "center",
                   "flex": 1,
                   "flexDirection": "row",
-                  "height": 50,
+                  "height": 80,
                   "justifyContent": "space-between",
-                  "paddingHorizontal": 10,
+                  "paddingHorizontal": 16,
                 }
               }
             >
@@ -805,7 +912,7 @@ exports[`Invite renders correctly with recipients 1`] = `
                       "justifyContent": "center",
                     },
                     Object {
-                      "marginRight": 10,
+                      "marginRight": 12,
                     },
                   ]
                 }
@@ -826,29 +933,28 @@ exports[`Invite renders correctly with recipients 1`] = `
                     ]
                   }
                 >
-                  <Image
-                    source={
-                      Object {
-                        "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                      }
-                    }
+                  <Text
                     style={
-                      Object {
-                        "alignItems": "center",
-                        "height": 40,
-                        "justifyContent": "center",
-                        "width": 40,
-                      }
+                      Array [
+                        Object {
+                          "color": "#FFFFFF",
+                          "fontFamily": "Inter-Medium",
+                          "fontSize": 16,
+                        },
+                        Object {
+                          "fontSize": 20,
+                        },
+                      ]
                     }
-                  />
+                  >
+                    J
+                  </Text>
                 </View>
               </View>
               <View
                 style={
                   Object {
                     "flex": 1,
-                    "flexDirection": "row",
-                    "paddingRight": 5,
                   }
                 }
               >
@@ -856,43 +962,29 @@ exports[`Invite renders correctly with recipients 1`] = `
                   ellipsizeMode="tail"
                   numberOfLines={1}
                   style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "lineHeight": 41,
-                      },
-                    ]
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Medium",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    }
                   }
                 >
                   John Doe
                 </Text>
-              </View>
-              <Text
-                style={
-                  Array [
+                <Text
+                  style={
                     Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
+                      "color": "#9CA4A9",
+                      "fontFamily": "Inter-Regular",
                       "fontSize": 14,
                       "lineHeight": 18,
-                    },
-                    Object {
-                      "fontFamily": "Hind-Light",
-                    },
-                    Object {
-                      "lineHeight": 41,
-                      "textAlign": "right",
-                    },
-                  ]
-                }
-              >
-                14155550000
-              </Text>
+                    }
+                  }
+                >
+                  14155550000
+                </Text>
+              </View>
             </View>
           </View>
         </View>

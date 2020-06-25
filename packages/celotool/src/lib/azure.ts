@@ -1,9 +1,8 @@
-import { installPrometheusIfNotExists } from 'src/lib/aks-prometheus'
 import { createNamespaceIfNotExists } from 'src/lib/cluster'
 import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { doCheckOrPromptIfStagingOrProduction } from 'src/lib/env-utils'
 import { installAndEnableMetricsDeps, redeployTiller } from 'src/lib/helm_deploy'
-import { outputIncludes } from 'src/lib/utils'
+import { outputIncludes, retryCmd } from 'src/lib/utils'
 
 /**
  * Basic info for an AKS cluster
@@ -33,7 +32,7 @@ export async function switchToCluster(
     console.info('No azure account subscription currently set')
   }
   if (currentTenantId === null || currentTenantId.trim() !== clusterConfig.tenantId) {
-    await execCmdWithExitOnFailure(`az account set --subscription ${clusterConfig.tenantId}`)
+    await execCmdWithExitOnFailure(`az account set --subscription ${clusterConfig.subscriptionId}`)
   }
 
   let currentCluster = null
@@ -62,8 +61,7 @@ async function setupCluster(celoEnv: string, clusterConfig: AzureClusterConfig) 
   console.info('Performing any cluster setup that needs to be done...')
 
   await redeployTiller()
-  await installPrometheusIfNotExists(clusterConfig)
-  await installAndEnableMetricsDeps(false)
+  await installAndEnableMetricsDeps(true, clusterConfig)
   await installAADPodIdentity()
 }
 
@@ -85,12 +83,37 @@ async function installAADPodIdentity() {
   }
 }
 
+/**
+ * getIdentity gets basic info on an existing identity. If the identity doesn't
+ * exist, undefined is returned
+ */
+export async function getIdentity(
+  clusterConfig: AzureClusterConfig,
+  identityName: string
+) {
+  const [matchingIdentitiesStr] = await execCmdWithExitOnFailure(
+    `az identity list -g ${clusterConfig.resourceGroup} --query "[?name == '${identityName}']" -o json`
+  )
+  const matchingIdentities = JSON.parse(matchingIdentitiesStr)
+  if (!matchingIdentities.length) {
+    return
+  }
+  // There should only be one exact match by name
+  return matchingIdentities[0]
+}
+
 // createIdentityIfNotExists creates an identity if it doesn't already exist.
 // Returns an object including basic info on the identity.
 export async function createIdentityIfNotExists(
   clusterConfig: AzureClusterConfig,
   identityName: string
 ) {
+  const identity = await getIdentity(clusterConfig, identityName)
+  if (identity) {
+    console.info(`Skipping identity creation, ${identityName} in resource group ${clusterConfig.resourceGroup} already exists`)
+    return identity
+  }
+  console.info(`Creating identity ${identityName} in resource group ${clusterConfig.resourceGroup}`)
   // This command is idempotent-- if the identity exists, the existing one is given
   const [results] = await execCmdWithExitOnFailure(
     `az identity create -n ${identityName} -g ${clusterConfig.resourceGroup} -o json`
@@ -107,14 +130,30 @@ export function deleteIdentity(clusterConfig: AzureClusterConfig, identityName: 
   )
 }
 
-/**
- * getIdentity gets basic info on an existing identity
- */
-export async function getIdentity(clusterConfig: AzureClusterConfig, identityName: string) {
-  const [results] = await execCmdWithExitOnFailure(
-    `az identity show -n ${identityName} -g ${clusterConfig.resourceGroup} -o json`
+async function roleIsAssigned(assignee: string, scope: string, role: string) {
+  const [matchingAssignedRoles] = await retryCmd(
+    () =>
+      execCmdWithExitOnFailure(
+        `az role assignment list --assignee ${assignee} --scope ${scope} --query "length([?roleDefinitionName == '${role}'])" -o tsv`
+      ),
+    10
   )
-  return JSON.parse(results)
+  return parseInt(matchingAssignedRoles.trim(), 10) > 0
+}
+
+export async function assignRoleIfNotAssigned(assigneeObjectId: string, assigneePrincipalType: string, scope: string, role: string) {
+  if (await roleIsAssigned(assigneeObjectId, scope, role)) {
+    console.info(`Skipping role assignment, role ${role} already assigned to ${assigneeObjectId} for scope ${scope}`)
+    return
+  }
+  console.info(`Assigning role ${role} to ${assigneeObjectId} type ${assigneePrincipalType} for scope ${scope}`)
+  await retryCmd(
+    () =>
+      execCmdWithExitOnFailure(
+        `az role assignment create --role "${role}" --assignee-object-id ${assigneeObjectId} --assignee-principal-type ${assigneePrincipalType} --scope ${scope}`
+      ),
+    10
+  )
 }
 
 export async function getAKSNodeResourceGroup(clusterConfig: AzureClusterConfig) {
@@ -122,6 +161,40 @@ export async function getAKSNodeResourceGroup(clusterConfig: AzureClusterConfig)
     `az aks show --name ${clusterConfig.clusterName} --resource-group ${clusterConfig.resourceGroup} --query nodeResourceGroup -o tsv`
   )
   return nodeResourceGroup.trim()
+}
+
+/**
+ * Gets the AKS Service Principal Object ID if one exists. Otherwise, an empty string is given.
+ */
+export async function getAKSServicePrincipalObjectId(clusterConfig: AzureClusterConfig) {
+  // Get the correct object ID depending on the cluster configuration
+  // See https://github.com/Azure/aad-pod-identity/blob/b547ba86ab9b16d238db8a714aaec59a046afdc5/docs/readmes/README.role-assignment.md#obtaining-the-id-of-the-managed-identity--service-principal
+  const [rawServicePrincipalClientId] = await execCmdWithExitOnFailure(
+    `az aks show -n ${clusterConfig.clusterName} --query servicePrincipalProfile.clientId -g ${clusterConfig.resourceGroup} -o tsv`
+  )
+  console.info(`az aks show -n ${clusterConfig.clusterName} --query servicePrincipalProfile.clientId -g ${clusterConfig.resourceGroup} -o tsv`)
+  console.info(rawServicePrincipalClientId)
+  const servicePrincipalClientId = rawServicePrincipalClientId.trim()
+  // This will be the value of the service principal client ID if a managed service identity
+  // is being used instead of a service principal.
+  if (servicePrincipalClientId === 'msi') {
+    return ''
+  }
+  const [rawObjectId] = await execCmdWithExitOnFailure(
+    `az ad sp show --id ${servicePrincipalClientId} --query objectId -o tsv`
+  )
+  return rawObjectId.trim()
+}
+
+/**
+ * If an AKS cluster is using a managed service identity, the objectId is returned.
+ * Otherwise, an empty string is given.
+ */
+export async function getAKSManagedServiceIdentityObjectId(clusterConfig: AzureClusterConfig) {
+  const [managedIdentityObjectId] = await execCmdWithExitOnFailure(
+    `az aks show -n ${clusterConfig.clusterName} --query identityProfile.kubeletidentity.objectId -g ${clusterConfig.resourceGroup} -o tsv`
+  )
+  return managedIdentityObjectId.trim()
 }
 
 export async function registerStaticIP(name: string, resourceGroupIP: string) {

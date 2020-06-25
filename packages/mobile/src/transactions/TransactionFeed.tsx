@@ -5,13 +5,17 @@ import { FlatList } from 'react-native'
 import { connect } from 'react-redux'
 import { TransactionFeedFragment } from 'src/apollo/types'
 import { AddressToE164NumberType } from 'src/identity/reducer'
+import { InviteDetails } from 'src/invite/actions'
+import { inviteesSelector } from 'src/invite/reducer'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 import ExchangeFeedItem from 'src/transactions/ExchangeFeedItem'
+import GoldTransactionFeedItem from 'src/transactions/GoldTransactionFeedItem'
 import NoActivity from 'src/transactions/NoActivity'
-import { TransactionStatus } from 'src/transactions/reducer'
+import { recentTxRecipientsCacheSelector } from 'src/transactions/reducer'
 import TransferFeedItem from 'src/transactions/TransferFeedItem'
+import { TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { privateCommentKeySelector } from 'src/web3/selectors'
 
@@ -23,9 +27,11 @@ export enum FeedType {
 }
 
 interface StateProps {
-  commentKey: string | null | undefined
+  commentKey: string | null
   addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient
+  recentTxRecipientsCache: NumberToRecipient
+  invitees: InviteDetails[]
 }
 
 export type FeedItem = TransactionFeedFragment & {
@@ -43,6 +49,8 @@ const mapStateToProps = (state: RootState): StateProps => ({
   commentKey: privateCommentKeySelector(state),
   addressToE164Number: state.identity.addressToE164Number,
   recipientCache: recipientCacheSelector(state),
+  recentTxRecipientsCache: recentTxRecipientsCacheSelector(state),
+  invitees: inviteesSelector(state),
 })
 
 export class TransactionFeed extends React.PureComponent<Props> {
@@ -58,13 +66,15 @@ export class TransactionFeed extends React.PureComponent<Props> {
     `,
   }
 
-  renderItem = (commentKeyBuffer: Buffer | null) => ({
-    item: tx,
-  }: {
-    item: FeedItem
-    index: number
-  }) => {
-    const { addressToE164Number, recipientCache } = this.props
+  renderItem = ({ item: tx }: { item: FeedItem; index: number }) => {
+    const {
+      addressToE164Number,
+      recipientCache,
+      recentTxRecipientsCache,
+      invitees,
+      commentKey,
+      kind,
+    } = this.props
 
     switch (tx.__typename) {
       case 'TokenTransfer':
@@ -72,15 +82,19 @@ export class TransactionFeed extends React.PureComponent<Props> {
           <TransferFeedItem
             addressToE164Number={addressToE164Number}
             recipientCache={recipientCache}
-            commentKey={commentKeyBuffer}
+            recentTxRecipientsCache={recentTxRecipientsCache}
+            invitees={invitees}
+            commentKey={commentKey}
             {...tx}
           />
         )
       case 'TokenExchange':
-        return <ExchangeFeedItem {...tx} />
+        if (kind === FeedType.HOME) {
+          return <ExchangeFeedItem {...tx} />
+        } else {
+          return <GoldTransactionFeedItem {...tx} />
+        }
     }
-
-    return <React.Fragment />
   }
 
   keyExtractor = (item: TransactionFeedFragment) => {
@@ -88,23 +102,15 @@ export class TransactionFeed extends React.PureComponent<Props> {
   }
 
   render() {
-    const { kind, loading, error, data, commentKey } = this.props
+    const { kind, loading, error, data } = this.props
 
     if (error) {
       Logger.error(TAG, 'Failure while loading transaction feed', error)
       return <NoActivity kind={kind} loading={loading} error={error} />
     }
 
-    const commentKeyBuffer = commentKey ? Buffer.from(commentKey, 'hex') : null
-
     if (data && data.length > 0) {
-      return (
-        <FlatList
-          data={data}
-          keyExtractor={this.keyExtractor}
-          renderItem={this.renderItem(commentKeyBuffer)}
-        />
-      )
+      return <FlatList data={data} keyExtractor={this.keyExtractor} renderItem={this.renderItem} />
     } else {
       return <NoActivity kind={kind} loading={loading} error={error} />
     }

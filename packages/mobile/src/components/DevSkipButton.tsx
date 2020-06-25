@@ -1,11 +1,13 @@
 import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
 import { StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { devModeTriggerClicked } from 'src/account/actions'
 import { devModeSelector } from 'src/account/selectors'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 
 interface StateProps {
@@ -16,7 +18,7 @@ interface DispatchProps {
   devModeTriggerClicked: typeof devModeTriggerClicked
 }
 
-type Props = { nextScreen: Screens; onSkip?: () => void } & StateProps & DispatchProps
+type Props = { nextScreen: keyof StackParamList; onSkip?: () => void } & StateProps & DispatchProps
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -42,7 +44,7 @@ class DevSkipButton extends React.Component<Props> {
 
   render() {
     return (
-      <View style={styles.devButtonContainer}>
+      <SafeAreaView style={styles.devButtonContainer}>
         {this.props.devModeActive && (
           <View style={styles.devButtonContent}>
             <TouchableOpacity
@@ -62,7 +64,7 @@ class DevSkipButton extends React.Component<Props> {
             <Text>{'   '}</Text>
           </TouchableWithoutFeedback>
         )}
-      </View>
+      </SafeAreaView>
     )
   }
 }

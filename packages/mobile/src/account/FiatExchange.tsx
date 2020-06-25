@@ -1,97 +1,117 @@
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
+import variables from '@celo/react-components/styles/variables'
+import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
+import { useNavigation } from '@react-navigation/native'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
-import { ActivityIndicator, StyleSheet } from 'react-native'
-import { WebView } from 'react-native-webview'
-import { connect } from 'react-redux'
-import { showError } from 'src/alert/actions'
-import { ErrorMessages } from 'src/app/ErrorMessages'
-import i18n, { Namespaces, withTranslation } from 'src/i18n'
+import { Trans, useTranslation } from 'react-i18next'
+import { StyleSheet, Text, View } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
+import { useSelector } from 'react-redux'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import { SHOW_CASH_OUT } from 'src/config'
+import ListItem from 'src/fiatExchanges/ListItem'
+import { Namespaces } from 'src/i18n'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
-import { getLocalCurrencyCode } from 'src/localCurrency/selectors'
-import { headerWithBackButton } from 'src/navigator/Headers'
-import { RootState } from 'src/redux/reducers'
+import { useLocalCurrencyCode } from 'src/localCurrency/hooks'
+import DrawerTopBar from 'src/navigator/DrawerTopBar'
+import { Screens } from 'src/navigator/Screens'
+import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 
-interface State {
-  signedUrl: string
-}
-
-interface StateProps {
-  localCurrency: LocalCurrencyCode
-  account: string | null
-}
-
-const mapStateToProps = (state: RootState): StateProps => {
-  return {
-    localCurrency: getLocalCurrencyCode(state),
-    account: state.web3.account,
-  }
-}
-
-type Props = StateProps & WithTranslation
-
-const celoCurrencyCode = 'CUSD'
-const signMoonpayFirebaseUrl = 'https://us-central1-celo-org-mobile.cloudfunctions.net/signMoonpay'
-
-async function signMoonpayUrl(account: string, localCurrencyCode: LocalCurrencyCode) {
-  const response = await fetch(signMoonpayFirebaseUrl, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      currency: celoCurrencyCode,
-      address: account,
-      fiatCurrency: localCurrencyCode,
-    }),
-  })
-  const json = await response.json()
-  return json.url
-}
-
-class FiatExchange extends React.Component<Props, State> {
-  static navigationOptions = () => ({
-    ...headerWithBackButton,
-    headerTitle: i18n.t('accountScreen10:addFunds'),
-  })
-
-  state: State = {
-    signedUrl: '',
+function FiatExchange() {
+  function goToAddFunds() {
+    navigation.navigate(Screens.FiatExchangeAmount, { isAddFunds: true })
   }
 
-  updateMoonpayUrl = async () => {
-    if (this.props.account) {
-      try {
-        const signedUrl = await signMoonpayUrl(this.props.account, this.props.localCurrency)
-        this.setState({ signedUrl })
-      } catch {
-        this.handleError()
-      }
-    }
+  function goToCashOut() {
+    navigation.navigate(Screens.FiatExchangeAmount, { isAddFunds: false })
   }
 
-  async componentDidMount() {
-    await this.updateMoonpayUrl()
+  const { t } = useTranslation()
+  const navigation = useNavigation()
+  const localCurrencyCode = useLocalCurrencyCode()
+  const isUsdLocalCurrency = localCurrencyCode === LocalCurrencyCode.USD
+  const dollarBalance = useSelector(stableTokenBalanceSelector)
+  const dollarAmount = {
+    value: dollarBalance ?? '0',
+    currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
   }
 
-  handleError = () => {
-    showError(ErrorMessages.FIREBASE_FAILED)
-  }
-
-  render() {
-    return this.state.signedUrl === '' ? (
-      <ActivityIndicator size="large" color={colors.celoGreen} />
-    ) : (
-      <WebView style={styles.exchangeWebView} source={{ uri: this.state.signedUrl }} />
-    )
-  }
+  return (
+    <SafeAreaView style={styles.container}>
+      <DrawerTopBar />
+      <View style={styles.image} />
+      <View style={styles.balanceSheet}>
+        <Text style={styles.currentBalance}>{t('global:currentBalance')}</Text>
+        <CurrencyDisplay
+          style={styles.localBalance}
+          amount={dollarAmount}
+          showLocalAmount={!isUsdLocalCurrency}
+        />
+        {!isUsdLocalCurrency && (
+          <Text style={styles.dollarBalance}>
+            <Trans i18nKey="dollarBalance" ns={Namespaces.walletFlow5}>
+              <CurrencyDisplay showLocalAmount={false} hideSymbol={true} amount={dollarAmount} />{' '}
+              Celo Dollars
+            </Trans>
+          </Text>
+        )}
+      </View>
+      <View>
+        <ListItem onPress={goToAddFunds}>
+          <Text style={styles.optionTitle}>{t('fiatExchangeFlow:addFunds')}</Text>
+        </ListItem>
+        {SHOW_CASH_OUT && (
+          <ListItem onPress={goToCashOut}>
+            <Text style={styles.optionTitle}>{t('fiatExchangeFlow:cashOut')}</Text>
+          </ListItem>
+        )}
+      </View>
+    </SafeAreaView>
+  )
 }
 
 const styles = StyleSheet.create({
-  exchangeWebView: {},
+  container: {
+    backgroundColor: colors.background,
+    flex: 1,
+  },
+  image: { height: 200 },
+  balanceSheet: {
+    paddingVertical: variables.contentPadding,
+    paddingRight: variables.contentPadding,
+    marginLeft: variables.contentPadding,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.gray2,
+    height: 112,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  currentBalance: {
+    ...fontStyles.h2,
+    marginBottom: 4,
+  },
+  localBalance: {
+    ...fontStyles.large,
+    marginBottom: 2,
+  },
+  dollarBalance: {
+    ...fontStyles.small,
+    color: colors.gray4,
+  },
+  option: {
+    backgroundColor: colors.background,
+  },
+
+  optionTitle: {
+    ...fontStyles.regular,
+    // marginLeft: variables.contentPadding,
+  },
+  optionTitleComingSoon: {
+    ...fontStyles.regular,
+    color: colors.gray3,
+    paddingLeft: variables.contentPadding,
+  },
 })
 
-export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(
-  withTranslation(Namespaces.accountScreen10)(FiatExchange)
-)
+export default FiatExchange

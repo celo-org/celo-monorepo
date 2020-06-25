@@ -2,11 +2,6 @@
 
 If an authorized signer key is lost or compromised, the Locked Gold Account can authorize a new signer to replace the old one. This prevents losing an authorized signer key from becoming a catastrophic event. It is recommended to regularly rotate keys to limit the impact of keys being silently compromised.
 
-<!-- TODO: Remove this warning after cGLD transfers are enabled -->
-{% hint style="warning" %}
-On RC1 before cGLD transfers are enabled, there will be no way for a new signer address to be funded to make transactions. It is advised not to attempt key rotation on RC1 before cGLD transfers are enabled.
-{% endhint %}
-
 ### Validator Signer Rotation
 
 Because the Validator signer key is constantly in use to sign consensus messages, special care must be taken when authorizing a new Validator signer. The following steps detail the recommended procedure for rotating the validator signer of an active and elected validator:
