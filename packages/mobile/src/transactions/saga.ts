@@ -60,7 +60,7 @@ export function* sendAndMonitorTransaction<T>(
   account: string,
   currency?: CURRENCY_ENUM
 ) {
-  let millisecs = Date.now()
+  const transactionStartTime = Date.now()
   try {
     Logger.debug(TAG + '@sendAndMonitorTransaction', `Sending transaction with id: ${txId}`)
 
@@ -81,24 +81,28 @@ export function* sendAndMonitorTransaction<T>(
     yield call(wrapSendTransactionWithRetry, txId, sendTxMethod)
     yield put(transactionConfirmed(txId))
 
-    millisecs = Date.now() - millisecs
-    let ccyTicker = ''
+    CeloAnalytics.track(CustomEventNames.send_transaction_confirmed, {
+      transactionDuration: Date.now() - transactionStartTime,
+      currencyCode: currency ? CURRENCIES[currency].code : null,
+    })
+
     if (currency === CURRENCY_ENUM.GOLD) {
-      ccyTicker = CURRENCIES[currency].code
       yield put(fetchGoldBalance())
     } else if (currency === CURRENCY_ENUM.DOLLAR) {
-      ccyTicker = CURRENCIES[currency].code
       yield put(fetchDollarBalance())
     } else {
       // Fetch both balances for exchange
       yield put(fetchGoldBalance())
       yield put(fetchDollarBalance())
     }
-    CeloAnalytics.track(CustomEventNames.send_transaction_confirmed, { millisecs, ccyTicker })
   } catch (error) {
     Logger.error(TAG + '@sendAndMonitorTransaction', `Error sending tx ${txId}`, error)
-    millisecs = Date.now() - millisecs
-    CeloAnalytics.track(CustomEventNames.send_transaction_failed, { millisecs })
+
+    CeloAnalytics.track(CustomEventNames.send_transaction_failed, {
+      transactionDuration: Date.now() - transactionStartTime,
+      currencyCode: currency ? CURRENCIES[currency].code : null,
+    })
+
     yield put(removeStandbyTransaction(txId))
     yield put(transactionFailed(txId))
     yield put(showError(ErrorMessages.TRANSACTION_FAILED))

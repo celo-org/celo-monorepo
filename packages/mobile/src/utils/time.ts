@@ -6,8 +6,6 @@ import { enUS, es } from 'date-fns/locale'
 import { i18n as i18nType } from 'i18next'
 import _ from 'lodash'
 import clockSync from 'react-native-clock-sync'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
 import i18n from 'src/i18n'
 import Logger from 'src/utils/Logger'
 
@@ -323,30 +321,4 @@ function quickFormat(timestamp: number, i18next: i18nType, formatRule: string) {
   return format(millisecondsSinceEpoch, formatRule, {
     locale: i18next.language.includes('es') ? es : enUS,
   })
-}
-
-// update moving average for time ellapsed
-export function updateMeanMillisecs(meanMillisecs: number, millisecs: number, onceEvery: number) {
-  const multiplier = meanMillisecs > 0.0 ? meanMillisecs / onceEvery : 1.0
-  meanMillisecs = meanMillisecs * (1.0 - multiplier) + multiplier * millisecs
-  return meanMillisecs
-}
-
-// warning: this function has side-effects on module
-//          vars meanMillisecs and trackCount.
-export const trackMeanMillisecs = (
-  initTime: number,
-  meanMillisecs: number,
-  trackCount: number,
-  onceEvery: number,
-  eventName: CustomEventNames,
-  attachDeviceInfo: boolean = false
-): [number, number] => {
-  const millisecs = Date.now() - initTime
-  meanMillisecs = updateMeanMillisecs(meanMillisecs, millisecs, onceEvery)
-  if (trackCount % onceEvery === 0) {
-    CeloAnalytics.track(eventName, { meanMillisecs, millisecs }, attachDeviceInfo)
-  }
-  trackCount += 1
-  return [meanMillisecs, trackCount]
 }
