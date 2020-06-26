@@ -10,7 +10,6 @@ import { CURRENCY_ENUM } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
 import {
   Actions,
-  backupPhraseEmpty,
   ImportBackupPhraseAction,
   importBackupPhraseFailure,
   importBackupPhraseSuccess,
@@ -56,11 +55,15 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
         backupAccount
       )
 
-      // TODO(Rossy) Check gold here too once verificiation is made optional
+      const goldBalance: BigNumber = yield call(
+        fetchTokenBalanceInWeiWithRetry,
+        CURRENCY_ENUM.GOLD,
+        backupAccount
+      )
 
-      if (dollarBalance.isLessThanOrEqualTo(0)) {
-        yield put(backupPhraseEmpty())
-        navigate(Screens.ImportWalletEmpty, { backupPhrase: phrase })
+      if (dollarBalance.isLessThanOrEqualTo(0) && goldBalance.isLessThanOrEqualTo(0)) {
+        yield put(importBackupPhraseSuccess())
+        navigate(Screens.ImportWallet, { clean: false, showZeroBalanceModal: true })
         return
       }
     }
@@ -78,7 +81,11 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
     yield put(redeemInviteSuccess())
     yield put(refreshAllBalances())
 
-    navigate(Screens.VerificationEducationScreen)
+    if (useEmptyWallet) {
+      navigate(Screens.WalletHome)
+    } else {
+      navigate(Screens.VerificationEducationScreen)
+    }
 
     yield put(importBackupPhraseSuccess())
   } catch (error) {

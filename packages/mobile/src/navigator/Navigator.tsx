@@ -42,7 +42,6 @@ import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import PhoneNumberLookupQuotaScreen from 'src/identity/PhoneNumberLookupQuotaScreen'
 import ImportWallet from 'src/import/ImportWallet'
-import ImportWalletEmpty from 'src/import/ImportWalletEmpty'
 import ImportWalletSocial from 'src/import/ImportWalletSocial'
 import EnterInviteCode from 'src/invite/EnterInviteCode'
 import Language from 'src/language/Language'
@@ -213,11 +212,6 @@ const nuxScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen
       name={Screens.ImportWalletSocial}
       component={ImportWalletSocial}
-      options={nuxNavigationOptions}
-    />
-    <Navigator.Screen
-      name={Screens.ImportWalletEmpty}
-      component={ImportWalletEmpty}
       options={nuxNavigationOptions}
     />
     <Navigator.Screen

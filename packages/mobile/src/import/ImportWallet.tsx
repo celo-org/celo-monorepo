@@ -18,6 +18,7 @@ import {
   isValidBackupPhrase,
 } from 'src/backup/utils'
 import CodeInput, { CodeInputStatus } from 'src/components/CodeInput'
+import Dialog from 'src/components/Dialog'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { importBackupPhrase } from 'src/import/actions'
 import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers.v2'
@@ -97,6 +98,8 @@ export class ImportWallet extends React.Component<Props, State> {
   }
 
   onPressRestore = () => {
+    const { route, navigation } = this.props
+    const useEmptyWallet = !!route.params?.showZeroBalanceModal
     Keyboard.dismiss()
     this.props.hideAlert()
     CeloAnalytics.track(CustomEventNames.import_wallet_submit)
@@ -105,17 +108,26 @@ export class ImportWallet extends React.Component<Props, State> {
     this.setState({
       backupPhrase: formattedPhrase,
     })
+    navigation.setParams({ showZeroBalanceModal: false })
 
-    this.props.importBackupPhrase(formattedPhrase, false)
+    this.props.importBackupPhrase(formattedPhrase, useEmptyWallet)
   }
 
   shouldShowClipboard = (clipboardContent: string): boolean => {
     return isValidBackupPhrase(clipboardContent)
   }
 
+  onPressTryAnotherKey = () => {
+    const { navigation } = this.props
+    this.setState({
+      backupPhrase: '',
+    })
+    navigation.setParams({ clean: false, showZeroBalanceModal: false })
+  }
+
   render() {
     const { backupPhrase, keyboardVisible } = this.state
-    const { t, isImportingWallet, connected } = this.props
+    const { t, isImportingWallet, connected, route } = this.props
 
     let codeStatus = CodeInputStatus.INPUTTING
     if (isImportingWallet) {
@@ -158,6 +170,16 @@ export class ImportWallet extends React.Component<Props, State> {
                   <KeyboardSpacer />
                 </KeyboardAwareScrollView>
                 <KeyboardSpacer onToggle={this.onToggleKeyboard} />
+                <Dialog
+                  title={t('emptyAccount.title')}
+                  isVisible={!!route.params?.showZeroBalanceModal}
+                  actionText={t('emptyAccount.useAccount')}
+                  actionPress={this.onPressRestore}
+                  secondaryActionPress={this.onPressTryAnotherKey}
+                  secondaryActionText={t('global:goBack')}
+                >
+                  {t('emptyAccount.description')}
+                </Dialog>
               </View>
             )}
           </SafeAreaConsumer>
