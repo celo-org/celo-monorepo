@@ -211,17 +211,27 @@ async function createOracleAzureIdentityIfNotExists(
   }
   await assignRoleIfNotAssigned(assigneeObjectId, assigneePrincipalType, identity.id, 'Managed Identity Operator')
   // Allow the oracle identity to access the correct key vault
-  await setOracleKeyVaultPolicy(clusterConfig, oracleIdentity, identity)
+  await setOracleKeyVaultPolicyIfNotSet(clusterConfig, oracleIdentity, identity)
   return identity
 }
 
-async function setOracleKeyVaultPolicy(
+async function setOracleKeyVaultPolicyIfNotSet(
   clusterConfig: AzureClusterConfig,
   oracleIdentity: OracleIdentity,
   azureIdentity: any
 ) {
+  const keyPermissions = ['get', 'list', 'sign']
+  const [keyVaultPoliciesStr] = await execCmdWithExitOnFailure(
+    `az keyvault show --name ${oracleIdentity.azureHsmIdentity!.keyVaultName} -g ${clusterConfig.resourceGroup} --query "properties.accessPolicies[?objectId == '${azureIdentity.principalId}' && sort(permissions.keys) == [${keyPermissions.map(perm => `'${perm}'`).join(', ')}]]"`
+  )
+  const keyVaultPolicies = JSON.parse(keyVaultPoliciesStr)
+  if (keyVaultPolicies.length) {
+    console.info(`Skipping setting key permissions, ${keyPermissions.join(' ')} already set for vault ${oracleIdentity.azureHsmIdentity!.keyVaultName} and identity objectId ${azureIdentity.principalId}`)
+    return
+  }
+  console.info(`Setting key permissions ${keyPermissions.join(' ')} for vault ${oracleIdentity.azureHsmIdentity!.keyVaultName} and identity objectId ${azureIdentity.principalId}`)
   return execCmdWithExitOnFailure(
-    `az keyvault set-policy --name ${oracleIdentity.azureHsmIdentity!.keyVaultName} --key-permissions get list sign --object-id ${azureIdentity.principalId} -g ${clusterConfig.resourceGroup}`
+    `az keyvault set-policy --name ${oracleIdentity.azureHsmIdentity!.keyVaultName} --key-permissions ${keyPermissions.join(' ')} --object-id ${azureIdentity.principalId} -g ${clusterConfig.resourceGroup}`
   )
 }
 

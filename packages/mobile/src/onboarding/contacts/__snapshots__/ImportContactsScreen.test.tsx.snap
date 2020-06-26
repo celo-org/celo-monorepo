@@ -1,205 +1,162 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ImportContactsScreen renders correctly 1`] = `
-<SafeAreaView
+<View
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
+      "backgroundColor": "#F9F6F0",
       "flex": 1,
-      "justifyContent": "space-between",
     }
   }
 >
   <RCTScrollView
     contentContainerStyle={
-      Object {
-        "flex": 1,
-        "justifyContent": "center",
-        "padding": 30,
-        "paddingTop": 0,
-      }
+      Array [
+        Object {
+          "flex": 1,
+          "justifyContent": "space-between",
+          "padding": 24,
+        },
+        Object {
+          "marginBottom": 0,
+        },
+      ]
     }
   >
     <View>
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Light",
-            "fontSize": 22,
-            "marginTop": 20,
-            "paddingBottom": 20,
-            "textAlign": "left",
-          }
-        }
-        testID="ImportContactsScreenHeader"
-      >
-        contacts.header
-      </Text>
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 17,
-            "lineHeight": 26,
-          }
-        }
-      >
-        contacts.body
-      </Text>
-      <View
-        style={
-          Object {
-            "alignItems": "center",
-            "flexDirection": "row",
-            "flexWrap": "nowrap",
-            "marginVertical": 20,
-          }
-        }
-      >
-        <AndroidSwitch
-          accessibilityRole="switch"
-          enabled={true}
-          on={true}
-          onChange={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          thumbTintColor="#EDEEEF"
-          trackColorForFalse="#B4B9BD"
-          trackColorForTrue="#1AB775"
-          trackTintColor="#1AB775"
-        />
+      <View>
         <Text
           style={
             Object {
               "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 17,
-              "lineHeight": 26,
-              "paddingLeft": 8,
-              "paddingTop": 2,
+              "fontFamily": "Jost-Medium",
+              "fontSize": 22,
+              "lineHeight": 28,
+              "paddingBottom": 16,
+              "paddingTop": 8,
+              "textAlign": "left",
+            }
+          }
+          testID="ImportContactsScreenHeader"
+        >
+          contacts.header
+        </Text>
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-Medium",
+              "fontSize": 16,
+              "lineHeight": 22,
             }
           }
         >
-          contacts.findSwitch
+          contacts.body
         </Text>
-      </View>
-      <View
-        style={
-          Array [
+        <View
+          style={
             Object {
+              "alignItems": "center",
               "flexDirection": "row",
-            },
-            undefined,
-          ]
-        }
-      >
+              "flexWrap": "nowrap",
+              "marginVertical": 20,
+            }
+          }
+        >
+          <AndroidSwitch
+            accessibilityRole="switch"
+            enabled={true}
+            on={true}
+            onChange={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            thumbTintColor="#EDEEEF"
+            trackColorForFalse="#B4B9BD"
+            trackColorForTrue="#1AB775"
+            trackTintColor="#1AB775"
+          />
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Medium",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingLeft": 8,
+              }
+            }
+          >
+            contacts.findSwitch
+          </Text>
+        </View>
         <View
           style={
             Array [
               Object {
-                "overflow": "hidden",
+                "flexDirection": "row",
               },
-              Object {
-                "borderRadius": 100,
-              },
+              undefined,
             ]
           }
         >
           <View
-            accessible={true}
-            focusable={true}
-            nativeBackgroundAndroid={
-              Object {
-                "attribute": "selectableItemBackground",
-                "type": "ThemeAttrAndroid",
-              }
-            }
-            onClick={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
             style={
-              Object {
-                "alignItems": "center",
-                "backgroundColor": "#F1F0EB",
-                "height": 48,
-                "justifyContent": "center",
-                "minWidth": 120,
-                "opacity": undefined,
-                "paddingHorizontal": 16,
-                "paddingVertical": 5,
-              }
+              Array [
+                Object {
+                  "overflow": "hidden",
+                },
+                Object {
+                  "borderRadius": 100,
+                },
+              ]
             }
           >
-            <Text
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackground",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
               style={
                 Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Inter-SemiBold",
-                  "fontSize": 16,
-                  "lineHeight": 22,
+                  "alignItems": "center",
+                  "backgroundColor": "#D6EAF3",
+                  "height": 48,
+                  "justifyContent": "center",
+                  "minWidth": 120,
+                  "opacity": 1,
+                  "paddingHorizontal": 16,
+                  "paddingVertical": 5,
                 }
               }
             >
-              global:connect
-            </Text>
+              <Text
+                style={
+                  Object {
+                    "color": "#0768AE",
+                    "fontFamily": "Inter-SemiBold",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  }
+                }
+              >
+                global:connect
+              </Text>
+            </View>
           </View>
         </View>
       </View>
     </View>
   </RCTScrollView>
-  <View
-    style={
-      Array [
-        Object {
-          "alignItems": "center",
-          "margin": 30,
-        },
-        false,
-      ]
-    }
-  >
-    <View
-      accessible={true}
-      focusable={true}
-      nativeBackgroundAndroid={
-        Object {
-          "attribute": "selectableItemBackgroundBorderless",
-          "type": "ThemeAttrAndroid",
-        }
-      }
-      onClick={[Function]}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
-      testID="ImportContactsScreenSkipButton"
-    >
-      <Text
-        style={
-          Array [
-            Object {
-              "color": "#1AB775",
-              "fontFamily": "Inter-SemiBold",
-              "fontSize": 16,
-              "lineHeight": 22,
-            },
-            Object {
-              "color": "#81868B",
-            },
-          ]
-        }
-      >
-        global:skip
-      </Text>
-    </View>
-  </View>
-</SafeAreaView>
+</View>
 `;

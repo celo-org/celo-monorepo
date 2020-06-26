@@ -262,6 +262,8 @@ export enum CustomEventNames {
   import_contacts = 'import_contacts',
   import_contact_error = 'import_contact_error',
   import_contacts_skip = 'import_contacts_skip',
+  fetched_contacts = 'fetched_contacts',
+  add_contact_match = 'add_contact_match',
 
   // Escrowed payments
   escrowed_payment_review = 'escrowed_payment_review',
@@ -294,7 +296,8 @@ export enum CustomEventNames {
   transaction_error = 'transaction_error',
   transaction_exception = 'transaction_exception',
 
-  // Fee errors
+  // Fee
+  fee_rendered = 'fee_rendered',
   estimate_fee_failed = 'estimate_fee_failed',
   fetch_tobin_tax_failed = 'fetch_tobin_tax_failed',
 
@@ -324,6 +327,8 @@ export type EventPropertyType = {
 export enum PropertyPathWhitelist {
   address = 'address',
   component = 'component',
+  contacts = 'contacts',
+  contactsMatched = 'contactsMatched',
   context = 'context',
   countryCode = 'countryCode',
   cta = 'cta',
@@ -336,6 +341,7 @@ export enum PropertyPathWhitelist {
   error = 'error',
   exchangeInputAmount = 'exchangeInputAmount',
   exchangeRate = 'exchangeRate',
+  fee = 'fee',
   feeType = 'feeType',
   fullName = 'fullName',
   gethOutcome = 'gethOutcome',

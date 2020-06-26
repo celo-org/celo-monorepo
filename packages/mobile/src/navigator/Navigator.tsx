@@ -9,6 +9,7 @@ import AccountKeyEducation from 'src/account/AccountKeyEducation'
 import Analytics from 'src/account/Analytics'
 import DataSaver from 'src/account/DataSaver'
 import EditProfile from 'src/account/EditProfile'
+import GoldEducation from 'src/account/GoldEducation'
 import InviteReview from 'src/account/InviteReview'
 import Licenses from 'src/account/Licenses'
 import Profile from 'src/account/Profile'
@@ -113,7 +114,7 @@ const commonScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen
         name={Screens.Language}
         component={Language}
-        options={headerWithBackButton}
+        options={Language.navigationOptions}
       />
       <Navigator.Screen
         name={Screens.PincodeEnter}
@@ -147,11 +148,12 @@ const verificationScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen
         name={Screens.VerificationLoadingScreen}
         component={VerificationLoadingScreen}
-        options={noHeaderGestureDisabled}
+        options={VerificationLoadingScreen.navigationOptions}
       />
       <Navigator.Screen
         name={Screens.VerificationInterstitialScreen}
         component={VerificationInterstitialScreen}
+        options={VerificationInterstitialScreen.navigationOptions}
       />
       <Navigator.Screen
         name={Screens.VerificationInputScreen}
@@ -212,7 +214,7 @@ const nuxScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen
       name={Screens.ImportWallet}
       component={ImportWallet}
-      options={nuxNavigationOptions}
+      options={ImportWallet.navigationOptions}
     />
     <Navigator.Screen
       name={Screens.ImportWalletSocial}
@@ -227,9 +229,13 @@ const nuxScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen
       name={Screens.ImportContacts}
       component={ImportContactsScreen}
-      options={nuxNavigationOptions}
+      options={ImportContactsScreen.navigationOptions}
     />
-    <Navigator.Screen name={Screens.OnboardingSuccessScreen} component={OnboardingSuccessScreen} />
+    <Navigator.Screen
+      name={Screens.OnboardingSuccessScreen}
+      component={OnboardingSuccessScreen}
+      options={OnboardingSuccessScreen.navigationOptions}
+    />
   </>
 )
 
@@ -447,6 +453,7 @@ const generalScreens = (Navigator: typeof Stack) => (
       component={TransactionReview}
       options={transactionReviewOptions}
     />
+    <Navigator.Screen name={Screens.GoldEducation} component={GoldEducation} options={noHeader} />
     <Navigator.Screen name={Screens.FeeEducation} component={FeeEducation} />
   </>
 )
