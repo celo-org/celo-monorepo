@@ -24,7 +24,6 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import deviceInfoModule from 'react-native-device-info'
-import Account from 'src/account/Account'
 import FiatExchange from 'src/account/FiatExchange'
 import GoldEducation from 'src/account/GoldEducation'
 import {
@@ -33,6 +32,7 @@ import {
   nameSelector,
   userContactDetailsSelector,
 } from 'src/account/selectors'
+import SettingsScreen from 'src/account/Settings'
 import Support from 'src/account/Support'
 import BackupIntroduction from 'src/backup/BackupIntroduction'
 import AccountNumber from 'src/components/AccountNumber'
@@ -198,7 +198,7 @@ export default function DrawerNavigator() {
       />
       <Drawer.Screen
         name={Screens.Settings}
-        component={Account}
+        component={SettingsScreen}
         options={{ title: t('settings'), drawerIcon: Settings }}
       />
       <Drawer.Screen

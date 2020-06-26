@@ -2,7 +2,7 @@ import * as React from 'react'
 import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import Account from 'src/account/Account'
+import Settings from 'src/account/Settings'
 import { Screens } from 'src/navigator/Screens'
 import { createMockStore, getMockStackScreenProps } from 'test/utils'
 
@@ -18,7 +18,7 @@ describe('Account', () => {
   it('renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
-        <Account {...getMockStackScreenProps(Screens.Account)} />
+        <Settings {...getMockStackScreenProps(Screens.Settings)} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
@@ -33,7 +33,7 @@ describe('Account', () => {
           },
         })}
       >
-        <Account {...getMockStackScreenProps(Screens.Account)} />
+        <Settings {...getMockStackScreenProps(Screens.Settings)} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
