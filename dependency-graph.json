@@ -3,7 +3,6 @@
     "location": "packages/attestation-service",
     "dependencies": [
       "@celo/contractkit",
-      "@celo/protocol",
       "@celo/utils"
     ]
   },
@@ -65,12 +64,6 @@
       "@celo/utils"
     ]
   },
-  "@celo/leaderboard": {
-    "location": "packages/leaderboard",
-    "dependencies": [
-      "@celo/contractkit"
-    ]
-  },
   "@celo/metadata-crawler": {
     "location": "packages/metadata-crawler",
     "dependencies": [
@@ -112,12 +105,9 @@
       "@celo/utils"
     ]
   },
-  "@celo/transaction-metrics-exporter": {
-    "location": "packages/transaction-metrics-exporter",
-    "dependencies": [
-      "@celo/contractkit",
-      "@celo/utils"
-    ]
+  "@celo/reserve-web": {
+    "location": "packages/reserve-site",
+    "dependencies": []
   },
   "@celo/typescript": {
     "location": "packages/typescript",

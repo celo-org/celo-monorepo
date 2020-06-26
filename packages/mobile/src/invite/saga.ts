@@ -1,5 +1,5 @@
 import { CeloTransactionObject } from '@celo/contractkit'
-import { trimLeading0x } from '@celo/utils/src/address'
+import { RpcWallet } from '@celo/contractkit/lib/wallets/rpc-wallet'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { Clipboard, Linking, Platform } from 'react-native'
@@ -7,7 +7,7 @@ import DeviceInfo from 'react-native-device-info'
 import { asyncRandomBytes } from 'react-native-secure-randombytes'
 import SendIntentAndroid from 'react-native-send-intent'
 import SendSMS from 'react-native-sms'
-import { call, delay, put, race, select, spawn, take, takeLeading } from 'redux-saga/effects'
+import { call, delay, put, race, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -17,9 +17,10 @@ import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
 import { CURRENCY_ENUM } from 'src/geth/consts'
+import { refreshAllBalances } from 'src/home/actions'
 import i18n from 'src/i18n'
 import { setHasSeenVerificationNux, updateE164PhoneNumberAddresses } from 'src/identity/actions'
-import { fetchPhoneHashPrivate } from 'src/identity/privacy'
+import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import {
   Actions,
   InviteBy,
@@ -45,18 +46,17 @@ import { getAppStoreId } from 'src/utils/appstore'
 import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 import {
-  addLocalAccount,
+  getConnectedWallet,
   getContractKit,
-  getContractKitOutsideGenerator,
+  getContractKitAsync,
   web3ForUtils,
 } from 'src/web3/contracts'
-import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
-import { fornoSelector } from 'src/web3/selectors'
+import { getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 
 const TAG = 'invite/saga'
 export const TEMP_PW = 'ce10'
 export const REDEEM_INVITE_TIMEOUT = 2 * 60 * 1000 // 2 minutes
-const INVITE_FEE = '0.25'
+export const INVITE_FEE = '0.25'
 
 export async function getInviteTxGas(
   account: string,
@@ -64,13 +64,17 @@ export async function getInviteTxGas(
   amount: BigNumber.Value,
   comment: string
 ) {
-  const contractKit = await getContractKitOutsideGenerator()
-  const escrowContract = await contractKit.contracts.getEscrow()
-  return getSendTxGas(account, currency, {
-    amount,
-    comment,
-    recipientAddress: escrowContract.address,
-  })
+  try {
+    const contractKit = await getContractKitAsync()
+    const escrowContract = await contractKit.contracts.getEscrow()
+    return getSendTxGas(account, currency, {
+      amount,
+      comment,
+      recipientAddress: escrowContract.address,
+    })
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function getInviteFee(
@@ -79,8 +83,12 @@ export async function getInviteFee(
   amount: string,
   comment: string
 ) {
-  const gas = await getInviteTxGas(account, currency, amount, comment)
-  return (await calculateFee(gas)).plus(getInvitationVerificationFeeInWei())
+  try {
+    const gas = await getInviteTxGas(account, currency, amount, comment)
+    return (await calculateFee(gas)).plus(getInvitationVerificationFeeInWei())
+  } catch (error) {
+    throw error
+  }
 }
 
 export function getInvitationVerificationFeeInDollars() {
@@ -148,7 +156,6 @@ export function* sendInvite(
   amount?: BigNumber,
   currency?: CURRENCY_ENUM
 ) {
-  yield call(getConnectedUnlockedAccount)
   try {
     const contractKit = yield call(getContractKit)
     const randomness = yield call(asyncRandomBytes, 64)
@@ -285,10 +292,8 @@ export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
   if (result === true) {
     Logger.debug(TAG, 'Redeem Invite completed successfully')
     yield put(redeemInviteSuccess())
-    CeloAnalytics.track(CustomEventNames.redeem_invite_success)
   } else if (result === false) {
     Logger.debug(TAG, 'Redeem Invite failed')
-    CeloAnalytics.track(CustomEventNames.redeem_invite_failed)
     yield put(redeemInviteFailure())
   } else if (timeout) {
     Logger.debug(TAG, 'Redeem Invite timed out')
@@ -309,6 +314,7 @@ export function* doRedeemInvite(inviteCode: string) {
       tempAccount
     )
     if (tempAccountBalanceWei.isLessThanOrEqualTo(0)) {
+      CeloAnalytics.track(CustomEventNames.redeem_invite_failed, { context: 'Empty invite' })
       yield put(showError(ErrorMessages.EMPTY_INVITE_CODE))
       return false
     }
@@ -317,9 +323,11 @@ export function* doRedeemInvite(inviteCode: string) {
     yield call(addTempAccountToWallet, inviteCode)
     yield call(withdrawFundsFromTempAccount, tempAccount, tempAccountBalanceWei, newAccount)
     yield put(fetchDollarBalance())
+    CeloAnalytics.track(CustomEventNames.redeem_invite_success)
     return true
   } catch (e) {
     Logger.error(TAG + '@doRedeemInvite', 'Failed to redeem invite', e)
+    CeloAnalytics.track(CustomEventNames.redeem_invite_failed, { error: e.message })
     if (e.message in ErrorMessages) {
       yield put(showError(e.message))
     } else {
@@ -334,11 +342,14 @@ export function* skipInvite() {
   Logger.debug(TAG + '@skipInvite', 'Skip invite action taken, creating account')
   try {
     yield call(getOrCreateAccount)
+    yield put(refreshAllBalances())
     yield put(setHasSeenVerificationNux(true))
     Logger.debug(TAG + '@skipInvite', 'Done skipping invite')
+    CeloAnalytics.track(CustomEventNames.invite_skip_complete)
     navigateHome()
   } catch (e) {
     Logger.error(TAG, 'Failed to skip invite', e)
+    CeloAnalytics.track(CustomEventNames.invite_skip_failed, { error: e.message })
     yield put(showError(ErrorMessages.ACCOUNT_SETUP_FAILED))
   }
 }
@@ -346,26 +357,10 @@ export function* skipInvite() {
 function* addTempAccountToWallet(inviteCode: string) {
   Logger.debug(TAG + '@addTempAccountToWallet', 'Attempting to add temp wallet')
   try {
-    const contractKit = yield call(getContractKit)
-    let tempAccount: string | null = null
-    const fornoMode = yield select(fornoSelector)
-    if (fornoMode) {
-      tempAccount = contractKit.web3.eth.accounts.privateKeyToAccount(inviteCode).address
-      Logger.debug(
-        TAG + '@redeemInviteCode',
-        'web3 is connected:',
-        String(yield call(contractKit.web3.eth.net.isListening))
-      )
-      addLocalAccount(inviteCode)
-    } else {
-      // Import account into the local geth node
-      tempAccount = yield call(
-        contractKit.web3.eth.personal.importRawKey,
-        trimLeading0x(inviteCode),
-        TEMP_PW
-      )
-    }
-    Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount!)
+    // Import account into the local geth node
+    const wallet: RpcWallet = yield call(getConnectedWallet)
+    const tempAccount = yield call([wallet, wallet.addAccount], inviteCode, TEMP_PW)
+    Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount)
   } catch (e) {
     if (e.toString().includes('account already exists')) {
       Logger.warn(TAG + '@addTempAccountToWallet', 'Account already exists, using it')
@@ -382,11 +377,8 @@ export function* withdrawFundsFromTempAccount(
   newAccount: string
 ) {
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Unlocking temporary account')
-  const fornoMode = yield select(fornoSelector)
-  const contractKit = yield call(getContractKit)
-  if (!fornoMode) {
-    yield call(contractKit.web3.eth.personal.unlockAccount, tempAccount, TEMP_PW, 600)
-  }
+  const wallet: RpcWallet = yield call(getConnectedWallet)
+  yield call([wallet, wallet.unlockAccount], tempAccount, TEMP_PW, 600)
 
   Logger.debug(
     TAG + '@withdrawFundsFromTempAccount',

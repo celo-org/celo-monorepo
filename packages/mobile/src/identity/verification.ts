@@ -15,7 +15,7 @@ import { Task } from 'redux-saga'
 import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'
 import { setRetryVerificationWithForno } from 'src/account/actions'
 import { e164NumberSelector } from 'src/account/selectors'
-import { showError, showMessage } from 'src/alert/actions'
+import { showError, showErrorOrFallback, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { setNumberVerified } from 'src/app/actions'
@@ -31,9 +31,10 @@ import {
   resetVerification,
   setVerificationStatus,
 } from 'src/identity/actions'
-import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privacy'
+import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privateHashing'
 import { acceptedAttestationCodesSelector, attestationCodesSelector } from 'src/identity/reducer'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
+import { VerificationStatus } from 'src/identity/types'
 import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
@@ -43,18 +44,7 @@ import { privateCommentKeySelector } from 'src/web3/selectors'
 const TAG = 'identity/verification'
 
 export const NUM_ATTESTATIONS_REQUIRED = 3
-export const VERIFICATION_TIMEOUT = 5 * 60 * 1000 // 5 minutes
-
-export enum VerificationStatus {
-  Failed = -1,
-  Stopped = 0,
-  Prepping = 1,
-  GettingStatus = 2,
-  RequestingAttestations = 3,
-  RevealingNumber = 4,
-  RevealAttemptFailed = 5,
-  Done = 6,
-}
+export const VERIFICATION_TIMEOUT = 10 * 60 * 1000 // 10 minutes
 
 export enum CodeInputType {
   AUTOMATIC = 'automatic',
@@ -101,6 +91,7 @@ export function* startVerification() {
 
 export function* doVerificationFlow() {
   try {
+    CeloAnalytics.track(CustomEventNames.verification_start)
     yield put(setVerificationStatus(VerificationStatus.Prepping))
     const account: string = yield call(getConnectedUnlockedAccount)
     const e164Number: string = yield select(e164NumberSelector)
@@ -119,6 +110,11 @@ export function* doVerificationFlow() {
         salt: undefined,
       }
     }
+    CeloAnalytics.track(CustomEventNames.verification_hash_retrieved, {
+      phoneHash,
+      address: account,
+    })
+
     const privDataKey = yield select(privateCommentKeySelector)
     const dataKey = compressedPubKey(hexToBuffer(privDataKey))
 
@@ -145,50 +141,56 @@ export function* doVerificationFlow() {
       phoneHash
     )
 
-    CeloAnalytics.track(CustomEventNames.verification_get_status)
+    CeloAnalytics.track(CustomEventNames.verification_get_status, {
+      ...status,
+    })
 
-    if (status.isVerified) {
-      yield put(setVerificationStatus(VerificationStatus.Done))
-      yield put(setNumberVerified(true))
-      return true
-    }
+    if (!status.isVerified) {
+      // Mark codes completed in previous attempts
+      yield put(
+        completeAttestationCode(NUM_ATTESTATIONS_REQUIRED - status.numAttestationsRemaining)
+      )
 
-    // Mark codes completed in previous attempts
-    yield put(completeAttestationCode(NUM_ATTESTATIONS_REQUIRED - status.numAttestationsRemaining))
+      yield put(setVerificationStatus(VerificationStatus.RequestingAttestations))
+      const attestations: ActionableAttestation[] = yield call(
+        requestAndRetrieveAttestations,
+        attestationsWrapper,
+        phoneHash,
+        account,
+        status.numAttestationsRemaining
+      )
 
-    yield put(setVerificationStatus(VerificationStatus.RequestingAttestations))
-    const attestations: ActionableAttestation[] = yield call(
-      requestAndRetrieveAttestations,
-      attestationsWrapper,
-      phoneHash,
-      account,
-      status.numAttestationsRemaining
-    )
+      const issuers = attestations.map((a) => a.issuer)
 
-    const issuers = attestations.map((a) => a.issuer)
+      // Start listening for manual and/or auto message inputs
+      const receiveMessageTask: Task = yield takeEvery(
+        Actions.RECEIVE_ATTESTATION_MESSAGE,
+        attestationCodeReceiver(attestationsWrapper, phoneHash, account, issuers)
+      )
 
-    // Start listening for manual and/or auto message inputs
-    const receiveMessageTask: Task = yield takeEvery(
-      Actions.RECEIVE_ATTESTATION_MESSAGE,
-      attestationCodeReceiver(attestationsWrapper, phoneHash, account, issuers)
-    )
+      let autoRetrievalTask: Task | undefined
+      if (Platform.OS === 'android') {
+        autoRetrievalTask = yield fork(startAutoSmsRetrieval)
+      }
 
-    let autoRetrievalTask: Task | undefined
-    if (Platform.OS === 'android') {
-      autoRetrievalTask = yield fork(startAutoSmsRetrieval)
-    }
+      yield put(setVerificationStatus(VerificationStatus.RevealingNumber))
+      yield all([
+        // Set acccount and data encryption key in contract
+        call(setAccount, accountsWrapper, account, dataKey),
+        // Request codes for the attestations needed
+        call(
+          revealNeededAttestations,
+          attestationsWrapper,
+          account,
+          phoneHashDetails,
+          attestations
+        ),
+      ])
 
-    yield put(setVerificationStatus(VerificationStatus.RevealingNumber))
-    yield all([
-      // Set acccount and data encryption key in contract
-      call(setAccount, accountsWrapper, account, dataKey),
-      // Request codes for the attestations needed
-      call(revealNeededAttestations, attestationsWrapper, account, phoneHashDetails, attestations),
-    ])
-
-    receiveMessageTask.cancel()
-    if (Platform.OS === 'android' && autoRetrievalTask) {
-      autoRetrievalTask.cancel()
+      receiveMessageTask.cancel()
+      if (Platform.OS === 'android' && autoRetrievalTask) {
+        autoRetrievalTask.cancel()
+      }
     }
 
     yield put(setVerificationStatus(VerificationStatus.Done))
@@ -196,11 +198,8 @@ export function* doVerificationFlow() {
     return true
   } catch (error) {
     Logger.error(TAG, 'Error occured during verification flow', error)
-    if (error.message in ErrorMessages) {
-      yield put(showError(error.message))
-    } else {
-      yield put(showError(ErrorMessages.VERIFICATION_FAILURE))
-    }
+    CeloAnalytics.track(CustomEventNames.verification_error, { error: error.message })
+    yield put(showErrorOrFallback(error, ErrorMessages.VERIFICATION_FAILURE))
     yield put(setVerificationStatus(VerificationStatus.Failed))
     return false
   }
@@ -247,13 +246,16 @@ async function getActionableAttestations(
   phoneHash: string,
   account: string
 ) {
+  const start = Date.now()
   CeloAnalytics.track(CustomEventNames.verification_actionable_attestation_start)
   const attestations = await retryAsync(
     attestationsWrapper.getActionableAttestations.bind(attestationsWrapper),
     3,
     [phoneHash, account]
   )
-  CeloAnalytics.track(CustomEventNames.verification_actionable_attestation_finish)
+  CeloAnalytics.track(CustomEventNames.verification_actionable_attestation_finish, {
+    duration: Date.now() - start,
+  })
   return attestations
 }
 
@@ -288,7 +290,9 @@ function* requestAttestations(
     Logger.debug(`${TAG}@requestNeededAttestations`, 'No additional attestations requests needed')
     return
   }
-  CeloAnalytics.track(CustomEventNames.verification_request_attestations)
+  CeloAnalytics.track(CustomEventNames.verification_request_attestations, {
+    numAttestationsRequestsNeeded,
+  })
 
   const unselectedRequest: UnselectedRequest = yield call(
     [attestationsWrapper, attestationsWrapper.getUnselectedRequest],
@@ -328,10 +332,12 @@ function* requestAttestations(
   }
 
   Logger.debug(`${TAG}@requestNeededAttestations`, 'Waiting for block to select issuer')
+  CeloAnalytics.track(CustomEventNames.verification_wait_for_select_issuers)
 
   yield call([attestationsWrapper, attestationsWrapper.waitForSelectingIssuers], phoneHash, account)
 
   Logger.debug(`${TAG}@requestNeededAttestations`, 'Selecting issuer')
+  CeloAnalytics.track(CustomEventNames.verification_selecting_issuer)
 
   const selectIssuersTx = attestationsWrapper.selectIssuers(phoneHash)
 
@@ -349,6 +355,7 @@ function attestationCodeReceiver(
   return function*(action: ReceiveAttestationMessageAction) {
     if (!action || !action.message) {
       Logger.error(TAG + '@attestationCodeReceiver', 'Received empty code. Ignoring.')
+      CeloAnalytics.track(CustomEventNames.verification_code_received, { context: 'Empty code' })
       return
     }
 
@@ -361,6 +368,9 @@ function attestationCodeReceiver(
       const existingCode = yield call(isCodeAlreadyAccepted, code)
       if (existingCode) {
         Logger.warn(TAG + '@attestationCodeReceiver', 'Code already exists in store, skipping.')
+        CeloAnalytics.track(CustomEventNames.verification_code_received, {
+          context: 'Code already exists',
+        })
         if (
           CodeInputType.MANUAL === action.inputType ||
           CodeInputType.DEEP_LINK === action.inputType
@@ -369,7 +379,7 @@ function attestationCodeReceiver(
         }
         return
       }
-
+      CeloAnalytics.track(CustomEventNames.verification_code_received)
       const issuer = yield call(
         [attestationsWrapper, attestationsWrapper.findMatchingIssuer],
         phoneHash,
@@ -400,6 +410,7 @@ function attestationCodeReceiver(
       yield put(inputAttestationCode({ code, issuer }))
     } catch (error) {
       Logger.error(TAG + '@attestationCodeReceiver', 'Error processing attestation code', error)
+      CeloAnalytics.track(CustomEventNames.verification_error, { error: error.message })
       yield put(showError(ErrorMessages.INVALID_ATTESTATION_CODE))
     }
   }
@@ -472,6 +483,7 @@ function* tryRevealPhoneNumber(
   phoneHashDetails: PhoneNumberHashDetails,
   attestation: ActionableAttestation
 ) {
+  const start = Date.now()
   const issuer = attestation.issuer
   Logger.debug(TAG + '@tryRevealPhoneNumber', `Revealing an attestation for issuer: ${issuer}`)
   CeloAnalytics.track(CustomEventNames.verification_reveal_attestation, { issuer })
@@ -494,12 +506,20 @@ function* tryRevealPhoneNumber(
     if (!response.ok) {
       const body = yield response.json()
       Logger.error(TAG + '@tryRevealPhoneNumber', `Reveal response not okay: ${body.error}`)
+      CeloAnalytics.track(CustomEventNames.verification_reveal_error, {
+        issuer,
+        statusCode: response.status,
+      })
       throw new Error(
         `Error revealing to issuer ${attestation.attestationServiceURL}. Status code: ${response.status}`
       )
     }
 
     Logger.debug(TAG + '@tryRevealPhoneNumber', `Revealing for issuer ${issuer} successful`)
+    CeloAnalytics.track(CustomEventNames.verification_revealed_attestation, {
+      issuer,
+      duration: Date.now() - start,
+    })
   } catch (error) {
     // This is considered a recoverable error because the user may have received the code in a previous run
     // So instead of propagating the error, we catch it just update status. This will trigger the modal,
@@ -513,6 +533,7 @@ function* tryRevealPhoneNumber(
 // Get the code from the store if it's already there, otherwise wait for it
 function* waitForAttestationCode(issuer: string) {
   Logger.debug(TAG + '@waitForAttestationCode', `Waiting for code for issuer ${issuer}`)
+  CeloAnalytics.track(CustomEventNames.verification_wait_for_attestation_code, { issuer })
   const code = yield call(getCodeForIssuer, issuer)
   if (code) {
     return code
@@ -534,7 +555,7 @@ function* setAccount(accountsWrapper: AccountsWrapper, address: string, dataKey:
   }
   const setAccountTx = accountsWrapper.setAccount('', dataKey, address)
   yield call(sendTransaction, setAccountTx.txo, address, TAG, 'Set Wallet Address & DEK')
-  CeloAnalytics.track(CustomEventNames.verification_set_account)
+  CeloAnalytics.track(CustomEventNames.verification_set_account, { address })
 }
 
 async function isAccountUpToDate(

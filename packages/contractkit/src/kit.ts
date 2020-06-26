@@ -82,7 +82,6 @@ export interface KitOptions {
 interface AccountBalance {
   gold: BigNumber
   usd: BigNumber
-  total: BigNumber
   lockedGold: BigNumber
   pending: BigNumber
 }
@@ -117,11 +116,9 @@ export class ContractKit {
     const goldToken = await this.contracts.getGoldToken()
     const stableToken = await this.contracts.getStableToken()
     const lockedGold = await this.contracts.getLockedGold()
-    const exchange = await this.contracts.getExchange()
     const goldBalance = await goldToken.balanceOf(address)
     const lockedBalance = await lockedGold.getAccountTotalLockedGold(address)
     const dollarBalance = await stableToken.balanceOf(address)
-    const converted = await exchange.quoteUsdSell(dollarBalance)
     let pending = new BigNumber(0)
     try {
       pending = await lockedGold.getPendingWithdrawalsTotalValue(address)
@@ -132,10 +129,6 @@ export class ContractKit {
       gold: goldBalance,
       lockedGold: lockedBalance,
       usd: dollarBalance,
-      total: goldBalance
-        .plus(lockedBalance)
-        .plus(converted)
-        .plus(pending),
       pending,
     }
   }
@@ -339,6 +332,10 @@ export class ContractKit {
       from: this.config.from,
       feeCurrency: this.config.feeCurrency,
       gasPrice: this.config.gasPrice,
+    }
+
+    if (this.config.feeCurrency) {
+      defaultTx.feeCurrency = this.config.feeCurrency
     }
 
     return {

@@ -1,7 +1,8 @@
 /**
  * This is a reactnavigation SCREEN, which we use to set a PIN.
  */
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
@@ -9,33 +10,32 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { setPincode } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
-import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import Pincode from 'src/pincode/Pincode'
-import { isPinValid, PIN_LENGTH } from 'src/pincode/utils'
+import { isPinValid } from 'src/pincode/utils'
 
 interface DispatchProps {
-  showError: typeof showError
   setPincode: typeof setPincode
 }
 
 interface State {
-  isPin1Inputted: boolean
   pin1: string
   pin2: string
+  errorText: string | undefined
 }
 
-type Props = DispatchProps & WithTranslation
+type ScreenProps = StackScreenProps<StackParamList, Screens.PincodeSet>
+
+type Props = ScreenProps & DispatchProps & WithTranslation
 
 const mapDispatchToProps = {
-  showError,
   setPincode,
 }
 
@@ -43,13 +43,13 @@ export class PincodeSet extends React.Component<Props, State> {
   static navigationOptions = nuxNavigationOptions
 
   state = {
-    isPin1Inputted: false,
     pin1: '',
     pin2: '',
+    errorText: undefined,
   }
 
   onChangePin1 = (pin1: string) => {
-    this.setState({ pin1 })
+    this.setState({ pin1, errorText: undefined })
   }
 
   onChangePin2 = (pin2: string) => {
@@ -64,54 +64,50 @@ export class PincodeSet extends React.Component<Props, State> {
     return this.state.pin1 === pin
   }
 
-  onPressPin1Continue = () => {
+  onCompletePin1 = () => {
     CeloAnalytics.track(CustomEventNames.pin_value)
-    this.setState({
-      isPin1Inputted: true,
-    })
+    this.props.navigation.setParams({ isVerifying: true })
   }
 
-  onPressPin2Continue = () => {
+  onCompletePin2 = (pin2: string) => {
     CeloAnalytics.track(CustomEventNames.pin_create_button)
-    const { pin1, pin2 } = this.state
+    const { pin1 } = this.state
     if (this.isPin1Valid(pin1) && this.isPin2Valid(pin2)) {
       this.props.setPincode(PincodeType.CustomPin, this.state.pin1)
       navigate(Screens.EnterInviteCode)
     } else {
-      this.props.showError(ErrorMessages.INCORRECT_PIN)
+      this.props.navigation.setParams({ isVerifying: false })
+      this.setState({
+        pin1: '',
+        pin2: '',
+        errorText: this.props.t('pincodeSet.pinsDontMatch'),
+      })
     }
   }
 
   render() {
-    const { t } = this.props
-    const { isPin1Inputted, pin1, pin2 } = this.state
+    const { route } = this.props
+    const isVerifying = route.params?.isVerifying
+    const { pin1, pin2, errorText } = this.state
 
     return (
       <SafeAreaView style={style.container}>
         <DevSkipButton nextScreen={Screens.EnterInviteCode} />
-        {isPin1Inputted ? (
+        {isVerifying ? (
           // Verify
           <Pincode
-            title={t('verifyPin.title')}
-            placeholder={t('createPin.yourPin')}
-            buttonText={t('global:save')}
-            isPinValid={this.isPin2Valid}
-            onPress={this.onPressPin2Continue}
+            errorText={errorText}
             pin={pin2}
             onChangePin={this.onChangePin2}
-            maxLength={PIN_LENGTH}
+            onCompletePin={this.onCompletePin2}
           />
         ) : (
           // Create
           <Pincode
-            title={t('createPin.title')}
-            placeholder={t('createPin.yourPin')}
-            buttonText={t('global:continue')}
-            isPinValid={this.isPin1Valid}
-            onPress={this.onPressPin1Continue}
+            errorText={errorText}
             pin={pin1}
             onChangePin={this.onChangePin1}
-            maxLength={PIN_LENGTH}
+            onCompletePin={this.onCompletePin1}
           />
         )}
       </SafeAreaView>
@@ -122,7 +118,7 @@ export class PincodeSet extends React.Component<Props, State> {
 const style = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.onboardingBackground,
     justifyContent: 'space-between',
   },
 })
@@ -130,4 +126,4 @@ const style = StyleSheet.create({
 export default connect<{}, DispatchProps>(
   null,
   mapDispatchToProps
-)(withTranslation(Namespaces.nuxNamePin1)(PincodeSet))
+)(withTranslation<Props>(Namespaces.onboarding)(PincodeSet))

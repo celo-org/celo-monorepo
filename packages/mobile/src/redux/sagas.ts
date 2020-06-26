@@ -8,7 +8,7 @@ import { escrowSaga } from 'src/escrow/saga'
 import { exchangeSaga } from 'src/exchange/saga'
 import { feesSaga } from 'src/fees/saga'
 import { firebaseSaga } from 'src/firebase/saga'
-import { gethSagaIfNecessary } from 'src/geth/saga'
+import { gethSaga } from 'src/geth/saga'
 import { goldTokenSaga } from 'src/goldToken/saga'
 import { homeSaga } from 'src/home/saga'
 import { identitySaga } from 'src/identity/saga'
@@ -35,6 +35,7 @@ const loggerBlacklist = [
   'IDENTITY/UPDATE_E164_PHONE_NUMBER_ADDRESSES',
   'IDENTITY/UPDATE_E164_PHONE_NUMBER_SALT',
   'IDENTITY/FETCH_PHONE_ADDRESSES',
+  'IDENTITY/ADD_CONTACT_MATCHES',
   'INVITE/REDEEM_INVITE',
   'INVITE/STORE_INVITEE_DATA',
   'EXCHANGE/UPDATE_CELO_GOLD_EXCHANGE_RATE_HISTORY', // Not private, just noisy
@@ -67,7 +68,7 @@ export function* rootSaga() {
   yield spawn(loggerSaga)
   yield spawn(appSaga)
   yield spawn(networkInfoSaga)
-  yield spawn(gethSagaIfNecessary)
+  yield spawn(gethSaga)
   yield spawn(accountSaga)
   yield spawn(identitySaga)
   yield spawn(goldTokenSaga)

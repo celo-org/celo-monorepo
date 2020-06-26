@@ -1,13 +1,14 @@
 import BigNumber from 'bignumber.js'
+import { showError } from 'src/alert/actions'
 import { TokenTransactionType } from 'src/apollo/types'
+import { ErrorMessages } from 'src/app/ErrorMessages'
 import { DAILY_PAYMENT_LIMIT_CUSD } from 'src/config'
 import { FeeType } from 'src/fees/actions'
 import { getAddressFromPhoneNumber } from 'src/identity/contactMapping'
-import {
-  E164NumberToAddressType,
-  RecipientVerificationStatus,
-  SecureSendPhoneNumberMapping,
-} from 'src/identity/reducer'
+import { E164NumberToAddressType, SecureSendPhoneNumberMapping } from 'src/identity/reducer'
+import { RecipientVerificationStatus } from 'src/identity/types'
+import { LocalCurrencySymbol } from 'src/localCurrency/consts'
+import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
 import { Recipient, RecipientKind } from 'src/recipients/recipient'
 import { PaymentInfo } from 'src/send/reducers'
 import { TransactionDataInput } from 'src/send/SendAmount'
@@ -56,15 +57,7 @@ export const getFeeType = (
   }
 }
 
-export function isPaymentLimitReached(
-  now: number,
-  recentPayments: PaymentInfo[],
-  initial: number
-): boolean {
-  const amount = dailySpent(now, recentPayments) + initial
-  return amount > DAILY_PAYMENT_LIMIT_CUSD
-}
-
+// exported for tests
 export function dailyAmountRemaining(now: number, recentPayments: PaymentInfo[]) {
   return DAILY_PAYMENT_LIMIT_CUSD - dailySpent(now, recentPayments)
 }
@@ -77,4 +70,36 @@ function dailySpent(now: number, recentPayments: PaymentInfo[]) {
 
   const amount: number = paymentsLast24Hours.reduce((sum, p: PaymentInfo) => sum + p.amount, 0)
   return amount
+}
+
+export function isPaymentLimitReached(
+  now: number,
+  recentPayments: PaymentInfo[],
+  initial: number
+): boolean {
+  const amount = dailySpent(now, recentPayments) + initial
+  return amount > DAILY_PAYMENT_LIMIT_CUSD
+}
+
+export function showLimitReachedError(
+  now: number,
+  recentPayments: PaymentInfo[],
+  localCurrencyExchangeRate: string | null | undefined,
+  localCurrencySymbol: LocalCurrencySymbol | null
+) {
+  const dailyRemainingcUSD = dailyAmountRemaining(now, recentPayments)
+  const dailyRemaining = convertDollarsToLocalAmount(dailyRemainingcUSD, localCurrencyExchangeRate)
+  const dailyLimit = convertDollarsToLocalAmount(
+    DAILY_PAYMENT_LIMIT_CUSD,
+    localCurrencyExchangeRate
+  )
+
+  const translationParams = {
+    currencySymbol: localCurrencySymbol,
+    dailyRemaining,
+    dailyLimit,
+    dailyRemainingcUSD,
+    dailyLimitcUSD: DAILY_PAYMENT_LIMIT_CUSD,
+  }
+  return showError(ErrorMessages.PAYMENT_LIMIT_REACHED, null, translationParams)
 }

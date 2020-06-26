@@ -33,7 +33,7 @@ export class TxParamsNormalizer {
       txParams.gas = await this.getEstimateGas(txParams)
     }
 
-    if (!txParams.gasPrice || isEmpty(txParams.gas.toString())) {
+    if (!txParams.gasPrice || isEmpty(txParams.gasPrice.toString())) {
       txParams.gasPrice = await this.getGasPrice(txParams.feeCurrency)
     }
 
@@ -88,10 +88,8 @@ export class TxParamsNormalizer {
 
   private async getGasPrice(feeCurrency: string | undefined): Promise<string | undefined> {
     // Reference: https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_gasprice
-    const result = feeCurrency
-      ? await this.rpcCaller.call('eth_gasPriceInCurrency', [feeCurrency])
-      : await this.rpcCaller.call('eth_gasPrice', [])
-    const gasPriceInHex = result.result.toString()
+    const response = await this.rpcCaller.call('eth_gasPrice', [feeCurrency])
+    const gasPriceInHex = response.result.toString()
     return gasPriceInHex
   }
 }

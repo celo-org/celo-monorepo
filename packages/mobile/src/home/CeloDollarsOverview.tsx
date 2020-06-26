@@ -27,12 +27,12 @@ function CeloDollarsOverview({ t }: Props) {
   return (
     <View style={styles.container}>
       {dollarBalanceAmount && (
-        <Text style={styles.balance}>
+        <Text style={styles.balance} testID="DollarBalance">
           <CurrencyDisplay style={fontStyles.semiBold} amount={dollarBalanceAmount} />
         </Text>
       )}
       {!isUsdLocalCurrency && dollarBalanceAmount && (
-        <Text style={styles.dollarBalance}>
+        <Text style={styles.dollarBalance} testID="GoldBalance">
           <Trans i18nKey="dollarBalance" ns={Namespaces.walletFlow5}>
             <CurrencyDisplay
               amount={dollarBalanceAmount}
@@ -71,4 +71,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withTranslation(Namespaces.walletFlow5)(CeloDollarsOverview)
+export default withTranslation<Props>(Namespaces.walletFlow5)(CeloDollarsOverview)

@@ -74,10 +74,10 @@ describe('kit.sendTransactionObject()', () => {
     const txo = txoStub()
     await kit.sendTransactionObject(txo, { gas: 555, feeCurrency: 'XXX', from: '0xAAFFF' })
     expect(txo.send).toBeCalledWith({
+      gasPrice: '0',
       gas: 555,
       feeCurrency: 'XXX',
       from: '0xAAFFF',
-      gasPrice: '0',
     })
   })
 })

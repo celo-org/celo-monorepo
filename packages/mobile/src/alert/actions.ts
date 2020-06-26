@@ -1,7 +1,7 @@
 import { TOptions } from 'i18next'
 import { ErrorDisplayType } from 'src/alert/reducer'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { DefaultEventNames } from 'src/analytics/constants'
+import { CustomEventNames, DefaultEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ALERT_BANNER_DURATION } from 'src/config'
 import i18n, { Namespaces } from 'src/i18n'
@@ -59,6 +59,19 @@ export const showErrorInline = (error: ErrorMessages, i18nOptions?: TOptions): S
   message: i18n.t(error, { ns: Namespaces.global, ...(i18nOptions || {}) }),
   underlyingError: error,
 })
+
+// Useful for showing a more specific error if its a documented one, with
+// a fallback to something more generic
+export function showErrorOrFallback(error: any, fallback: ErrorMessages) {
+  if (error && Object.values(ErrorMessages).includes(error.message)) {
+    return showError(error.message)
+  } else {
+    CeloAnalytics.track(CustomEventNames.error_fallback, {
+      error: error ? error.message : 'Fallback missing error message',
+    })
+    return showError(fallback)
+  }
+}
 
 const showAlert = (
   alertType: AlertTypes,

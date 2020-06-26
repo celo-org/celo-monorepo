@@ -52,4 +52,15 @@ declare module 'web3-eth' {
 
 declare module 'web3-core-helpers' {
   export type Callback<T> = (error: Error | null, result?: T) => void
+  export interface JsonRpcResponse {
+    jsonrpc: string
+    id: number
+    result?: any
+    error?:
+      | string
+      | {
+          message: string
+          code: number
+        }
+  }
 }

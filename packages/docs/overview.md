@@ -14,9 +14,13 @@ The code of the Celo Blockchain has shared ancestry with [Ethereum](https://www.
 
 Ethereum applications are built using **smart contracts**. Smart contracts are programs written in languages like [Solidity](https://solidity.readthedocs.io/en/v0.5.10/) that produce bytecode for the **Ethereum Virtual Machine** or **EVM**, a runtime environment. Programs encoded in smart contracts receive messages and manipulate the blockchain ledger and are termed **on-chain**.
 
-Celo has a native unit of accounting, the cryptocurrency **Celo Gold**, equivalent to Ether in Ethereum. Celo's ledger consists of **accounts**, identified by an **address**. There are two types of account. **Externally owned accounts** have an associated Celo Gold balance and are controlled by a user holding the associated public-private keypair. **Contract accounts** contain the code and data of a single smart contract which can be called and manipulate its own stored data.
+Celo has a native unit of accounting, the cryptocurrency **CELO**, comparable to Ether on Ethereum. Celo's ledger consists of **accounts**, identified by an **address**. There are two types of account. **Externally owned accounts** have an associated CELO balance and are controlled by a user holding the associated public-private keypair. **Contract accounts** contain the code and data of a single smart contract which can be called and manipulate its own stored data.
 
-**ERC-20** is a standard interface for implementing cryptocurrencies or **tokens** as contracts, rather than via account balances. \(In Celo, Celo Gold has a duality as both the native currency and is also an ERC-20 token\).
+**ERC-20** is a standard interface for implementing cryptocurrencies or **tokens** as contracts, rather than via account balances. In Celo, CELO has a duality as both the native currency and is also an ERC-20 token on the Celo blockchain.
+
+{% hint style="warning" %}
+Celo assets exist on an independent blockchain, and cannot be accessed through wallets that connect to the Ethereum network. Only use wallets disigned to work with the Celo network.
+{% endhint %}
 
 Users interact with the blockchain by creating signed **transactions.** These are requests to make a change to the ledger. They can: transfer value between accounts; execute a function in a smart contract and pass in arguments \(perhaps causing other smart contracts to be called, update their storage, or transfer value\); or create a new smart contract.
 
@@ -34,7 +38,7 @@ The Celo stack is structured into the following logical layers:
 
 ![](https://storage.googleapis.com/celo-website/docs/full-stack-diagram.jpg)
 
-- **Celo Blockchain**: An open cryptographic protocol that allows applications to make transactions with and run smart contracts in a secure and decentralized fashion. The Celo Blockchain code has shared ancestry with [Ethereum](https://www.ethereum.org), and maintains full EVM compatibility for smart contracts. However it uses a [Byzantine Fault Tolerant](http://pmg.csail.mit.edu/papers/osdi99.pdf) \(BFT\) consensus mechanism rather than Proof of Work, and has different block format, transaction format, client synchronization protocols, and gas payment and pricing mechanisms. The network’s native asset is Celo Gold, which is also an ERC-20 token.
+- **Celo Blockchain**: An open cryptographic protocol that allows applications to make transactions with and run smart contracts in a secure and decentralized fashion. The Celo Blockchain code has shared ancestry with [Ethereum](https://www.ethereum.org), and maintains full EVM compatibility for smart contracts. However it uses a [Byzantine Fault Tolerant](http://pmg.csail.mit.edu/papers/osdi99.pdf) \(BFT\) consensus mechanism rather than Proof of Work, and has different block format, transaction format, client synchronization protocols, and gas payment and pricing mechanisms.
 - **Celo Core Contracts**: A set of smart contracts running on the Celo Blockchain that comprise much of the logic of the platform features including ERC-20 stable currencies, identity attestations, proof-of-stake and governance. These smart contracts are upgradeable and managed by the decentralized governance process.
 - **Applications:** Applications for end users built on the Celo platform. The Celo Wallet app, the first of an ecosystem of applications, allows end users to manage accounts and make payments securely and simply by taking advantage of the innovations in the Celo protocol. Applications take the form of external mobile or backend software: they interact with the Celo Blockchain to issue transactions and invoke code that forms the Celo Core Contracts’ API. Third parties can also deploy custom smart contracts that their own applications can invoke, which in turn can leverage Celo Core Contracts. Applications may use centralized cloud services to provide some of their functionality: in the case of the Celo Wallet, push notifications and a transaction activity feed.
 
@@ -68,7 +72,7 @@ Celo is a proof-of-stake blockchain. In comparison to Proof of Work systems like
 
 The Celo Blockchain implements a Byzantine Fault Tolerant \(BFT\) consensus algorithm in which a well-defined set of validator nodes broadcast signed messages between themselves in a sequence of steps to reach agreement even when up to a third of the total nodes are offline, faulty or malicious. When a quorum of validators have reached agreement, that decision is final.
 
-Celo uses a proof-of-stake mechanism for selecting the validator set for a fixed period termed an epoch. Anyone can earn rewards by locking Celo Gold and by participating in validator elections and governance proposals. Initially, the number of validators will be capped to one hundred nodes elected by Celo Gold holders. Validators earn additional fixed rewards in Celo Dollars to cover their costs plus margin.
+Celo uses a proof-of-stake mechanism for selecting the validator set for a fixed period termed an epoch. Anyone can earn rewards by locking CELO and by participating in validator elections and governance proposals. Initially, the number of validators will be capped to one hundred nodes elected by CELO holders. Validators earn additional fixed rewards in Celo Dollars to cover their costs plus margin.
 
 {% hint style="success" %}
 **Roadmap**: Celo is pioneering a [highly scalable, permissionless BFT consensus algorithm](https://medium.com/celohq/bftree-scaling-hotstuff-to-millions-of-validators-7d6930ee046a) that in the long term will result in substantial changes to the proof-of-stake mechanism described here.
@@ -78,7 +82,7 @@ Celo uses a proof-of-stake mechanism for selecting the validator set for a fixed
 
 Celo uses an on-chain governance mechanism to manage and upgrade aspects of the protocol that reside in the Celo Core Contracts, and for a number of parameters used by the Celo Blockchain. This includes operations like upgrading smart contracts, adding new stable currencies, modifying the reserve target asset allocation, and changing how validator elections are decided.
 
-The Governance contract is set as “owner” for all of the Celo Core Contracts. This allows the protocol to carry out agreed governance proposals by executing code in the context of the Governance contract. Proposals are selected for consideration and voted on by Celo Gold holders using a weighted vote based on the same Locked Gold commitment used to vote to elect validators.
+The Governance contract is set as “owner” for all of the Celo Core Contracts. This allows the protocol to carry out agreed governance proposals by executing code in the context of the Governance contract. Proposals are selected for consideration and voted on by CELO holders using a weighted vote based on the same Locked CELO commitment used to vote to elect validators.
 
 ### Ultralight Synchronization
 
@@ -96,21 +100,21 @@ In Ethereum, there are few incentives to run a full node that is not mining. Few
 
 Celo introduces a scheme that incentivizes users to operate regular nodes. Light clients pay transaction fees to full nodes. Clients include in every transaction the address of a node which, when the transaction is processed, receives the fee. While a full node provides other services for which they receive no specific fee, it is expected that failing to service these requests will cause clients to seek other full nodes that do, who will then receive fees when they next make a transaction.
 
-Since light clients need not trust full nodes, as they can verify their work, this also provides the 'permissionless on-ramp' for users to receive Celo Gold or Celo Dollars without already holding it that is missing in other proof-of-stake networks.
+Since light clients need not trust full nodes, as they can verify their work, this also provides the 'permissionless on-ramp' for users to receive CELO or Celo Dollars without already holding it that is missing in other proof-of-stake networks.
 
 ### Stable Cryptocurrencies
 
-Celo enables a family of stable-value ERC-20 tokens whose values can track the value of any asset, including fiat currencies, commodities, and even natural resources.  The first stablecoin that will be supported is the Celo Dollar, which tracks the value of the U.S. Dollar.  Celo Gold serves as the collateral for Celo Dollar, which is redeemable for 1 US Dollar worth of Celo Gold, ensuring that transactions can occur quickly, cheaply and reliably on-chain.
+Celo enables a family of stable-value ERC-20 tokens whose values can track the value of any asset, including fiat currencies, commodities, and even natural resources.  The first stablecoin that will be supported is the Celo Dollar, which tracks the value of the U.S. Dollar.  CELO serves as the collateral for Celo Dollar, which is redeemable for 1 US Dollar worth of CELO, ensuring that transactions can occur quickly, cheaply and reliably on-chain.
 
-Celo's stability mechanism allows users to create a new Celo Dollar by sending 1 US Dollar worth of Celo Gold to the reserve, or burn a Celo Dollar by redeeming it for 1 US Dollar worth of Celo Gold.
+Celo's stability mechanism allows users to create a new Celo Dollar by sending 1 US Dollar worth of CELO to the reserve, or burn a Celo Dollar by redeeming it for 1 US Dollar worth of CELO.
 
-This mechanism relies on a series of Oracles, or information feeds from exchanges external to the network, to report the Celo Gold to US Dollar market rate. To minimize the risk of a run on Celo Gold collateral when these reported values are inaccurate or out-of-date, Celo uses an on-chain constant-product-market-maker model, inspired by the [Uniswap](https://uniswap.io/) system. This mechanism adjusts the redemption price of Celo Gold until either arbitrage occurs (so that the on-chain price dynamically adjusts until the offered rate meets the external rate) or Oracles reset the on-chain price.
+This mechanism relies on a series of Oracles, or information feeds from exchanges external to the network, to report the CELO to US Dollar market rate. To minimize the risk of a run on CELO collateral when these reported values are inaccurate or out-of-date, Celo uses an on-chain constant-product-market-maker model, inspired by the [Uniswap](https://uniswap.io/) system. This mechanism adjusts the redemption price of CELO until either arbitrage occurs (so that the on-chain price dynamically adjusts until the offered rate meets the external rate) or Oracles reset the on-chain price.
 
-The Celo protocol ensures that there is sufficient Celo Gold collateral to redeem the amount of Celo Gold in circulation through several sources. These include a [stability fee](celo-codebase/protocol/stability/stability-fees.md) levied on Celo Dollar balances, a transfer from [epoch rewards](celo-codebase/protocol/proof-of-stake/community-fund.md#bolstering-the-reserve), plus the proceeds from the spread when interacting with the on-chain market-maker mechanism.  
+The Celo protocol ensures that there is sufficient CELO collateral to redeem the amount of CELO in circulation through several sources. These include a [stability fee](celo-codebase/protocol/stability/stability-fees.md) levied on Celo Dollar balances, a transfer from [epoch rewards](celo-codebase/protocol/proof-of-stake/community-fund.md#bolstering-the-reserve), plus the proceeds from the spread when interacting with the on-chain market-maker mechanism.  
 
-In addition, a back-up reserve of cryptocurrencies is held off-chain. This off-chain reserve is managed to preserve value and minimize volatility by maintaining a diversified portfolio of cryptocurrencies through algorithmic rebalancing trading and periodically "topping-up" the Celo Gold collateral available to ensure it exceeds the amount required to redeem Celo Dollars in circulation. The approved cryptocurrencies, distribution ratios, and rebalancing period are all subject to on-chain governance.
+In addition, a back-up reserve of cryptocurrencies is held off-chain. This off-chain reserve is managed to preserve value and minimize volatility by maintaining a diversified portfolio of cryptocurrencies through algorithmic rebalancing trading and periodically "topping-up" the CELO collateral available to ensure it exceeds the amount required to redeem Celo Dollars in circulation. The approved cryptocurrencies, distribution ratios, and rebalancing period are all subject to on-chain governance.
 
-This scheme relies on a series of Oracles, external to the network, reporting the value of the Celo Gold to US Dollar market rate. To minimize depletion of the reserve when these reported values are inaccurate or out-of-date, Celo uses a constant-product-market-maker model, inspired by the [Uniswap](https://uniswap.io/) system. As arbitrage occurs, the on-chain price dynamically adjusts until the offered rate meets the external rate.
+This scheme relies on a series of Oracles, external to the network, reporting the value of the CELO to US Dollar market rate. To minimize depletion of the reserve when these reported values are inaccurate or out-of-date, Celo uses a constant-product-market-maker model, inspired by the [Uniswap](https://uniswap.io/) system. As arbitrage occurs, the on-chain price dynamically adjusts until the offered rate meets the external rate.
 
 Celo maintains the size of its reserve through several sources, including a stability fee levied on Celo Dollar balances and a transfer from epoch rewards.
 
@@ -128,9 +132,13 @@ The Attestations contract allows a user to request attestations to their phone n
 
 Celo provides a number of enhancements to regular transactions as familiar to Ethereum developers.
 
-Celo Gold has a duality as both the native currency and is also an ERC-20 token, simplifying the work of application developers.
+The Celo native asset has a duality as both the native currency and is also an ERC-20 token, simplifying the work of application developers.
 
-In Celo, transaction fees can be paid in stable cryptocurrencies. A user sending Celo Dollars will be able to pay their transaction fee out of their Celo Dollar balance, so they do not need to hold a separate balance of Celo Gold in order to make transactions. The protocol maintains a list of currencies which can be used to pay for transaction fees. These smart contracts implement an extension of the ERC-20 interface, with additional functions that allow the protocol to debit and credit transaction fees.
+{% hint style="warning" %}
+Celo assets exist on an independent blockchain, and cannot be accessed through wallets that connect to the Ethereum network. Only use wallets designed to work with the Celo network.
+{% endhint %}
+
+In Celo, transaction fees can be paid in stable cryptocurrencies. A user sending Celo Dollars will be able to pay their transaction fee out of their Celo Dollar balance, so they do not need to hold a separate balance of CELO in order to make transactions. The protocol maintains a list of currencies which can be used to pay for transaction fees. These smart contracts implement an extension of the ERC-20 interface, with additional functions that allow the protocol to debit and credit transaction fees.
 
 The Escrow contract allows users to send payments to other users who can be identified by a phone number but don’t yet have an account. These payments are stored in this contract itself and can be either withdrawn by the intended recipient after creating an account and attesting their identity, or reclaimed by the sender.
 

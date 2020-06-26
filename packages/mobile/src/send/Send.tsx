@@ -1,5 +1,8 @@
+import QRCodeBorderlessIcon from '@celo/react-components/icons/QRCodeBorderless'
+import Times from '@celo/react-components/icons/Times'
 import VerifyPhone from '@celo/react-components/icons/VerifyPhone'
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
+import { RouteProp } from '@react-navigation/native'
 import { StackScreenProps } from '@react-navigation/stack'
 import { throttle } from 'lodash'
 import * as React from 'react'
@@ -11,18 +14,20 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { estimateFee, FeeType } from 'src/fees/actions'
-import { Namespaces, withTranslation } from 'src/i18n'
+import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import ContactPermission from 'src/icons/ContactPermission'
 import { importContacts } from 'src/identity/actions'
-import { navigate } from 'src/navigator/NavigationService'
+import { ContactMatches } from 'src/identity/types'
+import { emptyHeader } from 'src/navigator/Headers.v2'
+import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { TopBarIconButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
 import {
   filterRecipientFactory,
-  filterRecipients,
+  NumberToRecipient,
   Recipient,
-  RecipientKind,
-  RecipientWithQrCode,
+  sortRecipients,
 } from 'src/recipients/recipient'
 import RecipientPicker from 'src/recipients/RecipientPicker'
 import { recipientCacheSelector } from 'src/recipients/reducer'
@@ -34,23 +39,14 @@ import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { navigateToPhoneSettings } from 'src/utils/linking'
 import { requestContactsPermission } from 'src/utils/permissions'
 
-const SEARCH_THROTTLE_TIME = 50
-const defaultRecipientPhoneNumber = '+10000000000'
-const defaultRecipientAddress = `0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10`
-
-// For alfajores-net users to be able to send a small transaction to a sample address (remove post-alfajores)
-export const CeloDefaultRecipient: RecipientWithQrCode = {
-  address: defaultRecipientAddress,
-  displayName: 'Celo Default Recipient',
-  displayId: defaultRecipientPhoneNumber,
-  kind: RecipientKind.QrCode,
-  e164PhoneNumber: defaultRecipientPhoneNumber,
-}
+const SEARCH_THROTTLE_TIME = 100
 
 interface Section {
   key: string
   data: Recipient[]
 }
+
+type FilterType = (searchQuery: string) => Recipient[]
 
 interface State {
   searchQuery: string
@@ -60,12 +56,13 @@ interface State {
 }
 
 interface StateProps {
-  defaultCountryCode: string
-  e164PhoneNumber: string
+  defaultCountryCode: string | null
+  e164PhoneNumber: string | null
   numberVerified: boolean
   devModeActive: boolean
   recentRecipients: Recipient[]
-  allRecipients: Recipient[]
+  allRecipients: NumberToRecipient
+  matchedContacts: ContactMatches
 }
 
 interface DispatchProps {
@@ -84,11 +81,10 @@ const mapStateToProps = (state: RootState): StateProps => ({
   defaultCountryCode: state.account.defaultCountryCode,
   e164PhoneNumber: state.account.e164PhoneNumber,
   numberVerified: state.app.numberVerified,
-  devModeActive: state.account.devModeActive || false,
-  recentRecipients: state.account.devModeActive
-    ? [CeloDefaultRecipient, ...state.send.recentRecipients]
-    : state.send.recentRecipients,
-  allRecipients: Object.values(recipientCacheSelector(state)),
+  devModeActive: state.account.devModeActive,
+  recentRecipients: state.send.recentRecipients,
+  allRecipients: recipientCacheSelector(state),
+  matchedContacts: state.identity.matchedContacts,
 })
 
 const mapDispatchToProps = {
@@ -99,42 +95,64 @@ const mapDispatchToProps = {
   estimateFee,
 }
 
-type FilterType = (searchQuery: string) => Recipient[]
+export const sendScreenNavOptions = ({
+  route,
+}: {
+  route: RouteProp<StackParamList, Screens.Send>
+}) => {
+  const goQr = () => navigate(Screens.QRNavigator)
+  const title = route.params?.isRequest
+    ? i18n.t('paymentRequestFlow:request')
+    : i18n.t('sendFlow7:send')
+
+  return {
+    ...emptyHeader,
+    headerLeft: () => (
+      <TopBarIconButton
+        icon={<Times />}
+        onPress={navigateBack}
+        eventName={
+          route.params?.isRequest ? CustomEventNames.send_cancel : CustomEventNames.request_cancel
+        }
+      />
+    ),
+    headerLeftContainerStyle: styles.headerLeftContainer,
+    headerRight: () => (
+      <TopBarIconButton
+        icon={<QRCodeBorderlessIcon height={32} color={colors.greenUI} />}
+        eventName={
+          route.params?.isRequest ? CustomEventNames.send_scan : CustomEventNames.request_scan
+        }
+        onPress={goQr}
+      />
+    ),
+    headerRightContainerStyle: styles.headerRightContainer,
+    headerTitle: title,
+  }
+}
 
 class Send extends React.Component<Props, State> {
-  throttledSearch: (searchQuery: string) => void
-  allRecipientsFilter: FilterType
-  recentRecipientsFilter: FilterType
+  throttledSearch!: (searchQuery: string) => void
+  allRecipientsFilter!: FilterType
+  recentRecipientsFilter!: FilterType
 
   constructor(props: Props) {
     super(props)
 
     this.state = {
       searchQuery: '',
-      allFiltered: [],
-      recentFiltered: [],
+      allFiltered: sortRecipients(
+        Object.values(this.props.allRecipients),
+        this.props.matchedContacts
+      ),
+      recentFiltered: this.props.recentRecipients,
       hasGivenContactPermission: true,
     }
 
-    this.allRecipientsFilter = filterRecipientFactory(this.props.allRecipients)
-    this.recentRecipientsFilter = filterRecipientFactory(this.props.recentRecipients)
-
-    this.throttledSearch = throttle((searchQuery: string) => {
-      this.setState({
-        recentFiltered: this.recentRecipientsFilter(searchQuery),
-        allFiltered: this.allRecipientsFilter(searchQuery),
-      })
-    }, SEARCH_THROTTLE_TIME)
+    this.createRecipientSearchFilters(true, true)
   }
 
   async componentDidMount() {
-    const { recentRecipients, allRecipients } = this.props
-
-    this.setState({
-      recentFiltered: filterRecipients(recentRecipients, this.state.searchQuery, false),
-      allFiltered: filterRecipients(allRecipients, this.state.searchQuery, true),
-    })
-
     await this.tryImportContacts()
 
     // Trigger a fee estimation so it'll likely be finished and cached
@@ -142,18 +160,43 @@ class Send extends React.Component<Props, State> {
     this.props.estimateFee(FeeType.SEND)
   }
 
-  componentDidUpdate(prevPops: Props) {
+  componentDidUpdate(prevProps: Props) {
     const { recentRecipients, allRecipients } = this.props
 
     if (
-      recentRecipients !== prevPops.recentRecipients ||
-      allRecipients !== prevPops.allRecipients
+      recentRecipients !== prevProps.recentRecipients ||
+      allRecipients !== prevProps.allRecipients
     ) {
-      this.setState({
-        recentFiltered: filterRecipients(recentRecipients, this.state.searchQuery, false),
-        allFiltered: filterRecipients(allRecipients, this.state.searchQuery, true),
-      })
+      this.createRecipientSearchFilters(
+        recentRecipients !== prevProps.recentRecipients,
+        allRecipients !== prevProps.allRecipients
+      )
+      // Clear search when recipients change to avoid tricky states
+      this.onSearchQueryChanged('')
     }
+  }
+
+  createRecipientSearchFilters = (updateRecentFilter: boolean, updateAllFilter: boolean) => {
+    // To improve search performance, we use these filter factories which pre-process the
+    // recipient lists to improve search performance
+    if (updateRecentFilter) {
+      this.recentRecipientsFilter = filterRecipientFactory(this.props.recentRecipients, false)
+    }
+    if (updateAllFilter) {
+      this.allRecipientsFilter = filterRecipientFactory(
+        Object.values(this.props.allRecipients),
+        true,
+        this.props.matchedContacts
+      )
+    }
+
+    this.throttledSearch = throttle((searchQuery: string) => {
+      this.setState({
+        searchQuery,
+        recentFiltered: this.recentRecipientsFilter(searchQuery),
+        allFiltered: this.allRecipientsFilter(searchQuery),
+      })
+    }, SEARCH_THROTTLE_TIME)
   }
 
   tryImportContacts = async () => {
@@ -174,46 +217,27 @@ class Send extends React.Component<Props, State> {
   }
 
   onSearchQueryChanged = (searchQuery: string) => {
-    this.props.hideAlert()
-    this.setState({
-      searchQuery,
-    })
-    CeloAnalytics.track(
-      this.props.route.params?.isRequest
-        ? CustomEventNames.request_search
-        : CustomEventNames.send_search,
-      {
-        query: searchQuery,
-      }
-    )
     this.throttledSearch(searchQuery)
   }
 
   onSelectRecipient = (recipient: Recipient) => {
     this.props.hideAlert()
     const isRequest = this.props.route.params?.isRequest ?? false
-    CeloAnalytics.track(CustomEventNames.send_input, {
-      selectedRecipientAddress: recipient.address,
-    })
 
     if (!recipient.e164PhoneNumber && !recipient.address) {
       this.props.showError(ErrorMessages.CANT_SELECT_INVALID_PHONE)
       return
     }
 
-    if (
-      (recipient.e164PhoneNumber && recipient.e164PhoneNumber !== defaultRecipientPhoneNumber) ||
-      (recipient.address && recipient.address !== defaultRecipientAddress)
-    ) {
-      this.props.storeLatestInRecents(recipient)
-    }
+    this.props.storeLatestInRecents(recipient)
 
     CeloAnalytics.track(
-      this.props.route.params?.isRequest
+      isRequest
         ? CustomEventNames.request_select_recipient
         : CustomEventNames.send_select_recipient,
       {
-        query: this.state.searchQuery,
+        recipientKind: recipient.kind,
+        didQuery: this.state.searchQuery.length > 0,
       }
     )
 
@@ -276,15 +300,15 @@ class Send extends React.Component<Props, State> {
   }
 
   render() {
-    const { defaultCountryCode, numberVerified } = this.props
+    const { defaultCountryCode } = this.props
     const { searchQuery } = this.state
 
     return (
       // Intentionally not using SafeAreaView here as RecipientPicker
       // needs fullscreen rendering
-      <View style={style.body}>
+      <View style={styles.body}>
         <DisconnectBanner />
-        <SendSearchInput isPhoneEnabled={numberVerified} onChangeText={this.onSearchQueryChanged} />
+        <SendSearchInput onChangeText={this.onSearchQueryChanged} />
         <RecipientPicker
           testID={'RecipientPicker'}
           sections={this.buildSections()}
@@ -298,25 +322,20 @@ class Send extends React.Component<Props, State> {
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   body: {
     flex: 1,
     backgroundColor: colors.background,
   },
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
+  headerLeftContainer: {
+    paddingLeft: 16,
   },
-  icon: {
-    marginBottom: 20,
-    height: 60,
-    width: 60,
+  headerRightContainer: {
+    paddingRight: 16,
   },
 })
 
 export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.sendFlow7)(Send))
+)(withTranslation<Props>(Namespaces.sendFlow7)(Send))

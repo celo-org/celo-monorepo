@@ -61,18 +61,20 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                 Array [
                   Object {
                     "backgroundColor": "#FFFFFF",
-                    "elevation": 12,
                     "padding": 16,
-                    "shadowColor": "black",
-                    "shadowOffset": Object {
-                      "height": 6,
-                      "width": 0,
-                    },
-                    "shadowOpacity": 0.3,
-                    "shadowRadius": 9.600000000000001,
                   },
                   Object {
                     "borderRadius": 8,
+                  },
+                  Object {
+                    "elevation": 12,
+                    "shadowColor": "rgba(156, 164, 169, 0.4)",
+                    "shadowOffset": Object {
+                      "height": 2,
+                      "width": 0,
+                    },
+                    "shadowOpacity": 1,
+                    "shadowRadius": 12,
                   },
                   Array [
                     Object {
@@ -237,13 +239,19 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                 >
                   <Text
                     style={
-                      Object {
-                        "color": "#1AB775",
-                        "fontFamily": "Inter-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 16,
-                        "marginRight": 24,
-                      }
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "fontSize": 14,
+                          "lineHeight": 16,
+                          "marginRight": 24,
+                        },
+                      ]
                     }
                   >
                     global:send
@@ -269,13 +277,19 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                 >
                   <Text
                     style={
-                      Object {
-                        "color": "#1AB775",
-                        "fontFamily": "Inter-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 16,
-                        "marginRight": 24,
-                      }
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "fontSize": 14,
+                          "lineHeight": 16,
+                          "marginRight": 24,
+                        },
+                      ]
                     }
                   >
                     global:decline
@@ -298,18 +312,20 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                 Array [
                   Object {
                     "backgroundColor": "#FFFFFF",
-                    "elevation": 12,
                     "padding": 16,
-                    "shadowColor": "black",
-                    "shadowOffset": Object {
-                      "height": 6,
-                      "width": 0,
-                    },
-                    "shadowOpacity": 0.3,
-                    "shadowRadius": 9.600000000000001,
                   },
                   Object {
                     "borderRadius": 8,
+                  },
+                  Object {
+                    "elevation": 12,
+                    "shadowColor": "rgba(156, 164, 169, 0.4)",
+                    "shadowOffset": Object {
+                      "height": 2,
+                      "width": 0,
+                    },
+                    "shadowOpacity": 1,
+                    "shadowRadius": 12,
                   },
                   Array [
                     Object {
@@ -474,13 +490,19 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                 >
                   <Text
                     style={
-                      Object {
-                        "color": "#1AB775",
-                        "fontFamily": "Inter-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 16,
-                        "marginRight": 24,
-                      }
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "fontSize": 14,
+                          "lineHeight": 16,
+                          "marginRight": 24,
+                        },
+                      ]
                     }
                   >
                     global:send
@@ -506,13 +528,19 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                 >
                   <Text
                     style={
-                      Object {
-                        "color": "#1AB775",
-                        "fontFamily": "Inter-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 16,
-                        "marginRight": 24,
-                      }
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "fontSize": 14,
+                          "lineHeight": 16,
+                          "marginRight": 24,
+                        },
+                      ]
                     }
                   >
                     global:decline
@@ -535,18 +563,20 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                 Array [
                   Object {
                     "backgroundColor": "#FFFFFF",
-                    "elevation": 12,
                     "padding": 16,
-                    "shadowColor": "black",
-                    "shadowOffset": Object {
-                      "height": 6,
-                      "width": 0,
-                    },
-                    "shadowOpacity": 0.3,
-                    "shadowRadius": 9.600000000000001,
                   },
                   Object {
                     "borderRadius": 8,
+                  },
+                  Object {
+                    "elevation": 12,
+                    "shadowColor": "rgba(156, 164, 169, 0.4)",
+                    "shadowOffset": Object {
+                      "height": 2,
+                      "width": 0,
+                    },
+                    "shadowOpacity": 1,
+                    "shadowRadius": 12,
                   },
                   Array [
                     Object {
@@ -711,13 +741,19 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                 >
                   <Text
                     style={
-                      Object {
-                        "color": "#1AB775",
-                        "fontFamily": "Inter-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 16,
-                        "marginRight": 24,
-                      }
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "fontSize": 14,
+                          "lineHeight": 16,
+                          "marginRight": 24,
+                        },
+                      ]
                     }
                   >
                     global:send
@@ -743,13 +779,19 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                 >
                   <Text
                     style={
-                      Object {
-                        "color": "#1AB775",
-                        "fontFamily": "Inter-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 16,
-                        "marginRight": 24,
-                      }
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "fontSize": 14,
+                          "lineHeight": 16,
+                          "marginRight": 24,
+                        },
+                      ]
                     }
                   >
                     global:decline
