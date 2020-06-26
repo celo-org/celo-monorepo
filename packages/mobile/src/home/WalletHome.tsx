@@ -47,7 +47,6 @@ interface StateProps {
   recipientCache: NumberToRecipient
   appConnected: boolean
   numberVerified: boolean
-  address: string
 }
 
 interface DispatchProps {
@@ -78,7 +77,6 @@ const mapStateToProps = (state: RootState): StateProps => ({
   recipientCache: recipientCacheSelector(state),
   appConnected: isAppConnected(state),
   numberVerified: state.app.numberVerified,
-  address: currentAccountSelector(state),
 })
 
 const AnimatedSectionList = Animated.createAnimatedComponent(SectionList)
@@ -111,7 +109,7 @@ export class WalletHome extends React.Component<Props> {
   }
 
   tryImportContacts = async () => {
-    const { numberVerified, recipientCache, address } = this.props
+    const { numberVerified, recipientCache } = this.props
 
     // Only import contacts if number is verified and
     // recip cache is empty so we haven't already
@@ -123,7 +121,6 @@ export class WalletHome extends React.Component<Props> {
     if (hasGivenContactPermission) {
       this.props.importContacts()
     }
-    CeloAnalytics.stopTracking(CustonEventNames.app_launched, { address }, true)
   }
 
   renderSection = ({ section: { title } }: { section: SectionListData<any> }) => {

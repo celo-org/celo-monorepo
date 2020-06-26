@@ -16,7 +16,7 @@ import { enableScreens } from 'react-native-screens'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { DefaultEventNames } from 'src/analytics/constants'
+import { CustomEventNames } from 'src/analytics/constants'
 import { apolloClient } from 'src/apollo/index'
 import { openDeepLink } from 'src/app/actions'
 import AppLoading from 'src/app/AppLoading'
@@ -52,7 +52,17 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 
 export class App extends React.Component {
   async componentDidMount() {
-    CeloAnalytics.startTracking(CustonEventNames.app_launched)
+    const appLoadedAt: Date = new Date()
+    const appStartListener = DeviceEventEmitter.addListener(
+      'AppStartedLoading',
+      (appInitializedAtString: string) => {
+        const appInitializedAt = new Date(appInitializedAtString)
+        const timeElapsed = appLoadedAt.getTime() - appInitializedAt.getTime()
+        CeloAnalytics.track(CustomEventNames.app_launched, { timeElapsed }, true)
+        appStartListener.remove()
+      }
+    )
+
     Linking.addEventListener('url', this.handleOpenURL)
   }
 

@@ -169,7 +169,11 @@ export class JoinCelo extends React.Component<Props, State> {
     }
 
     if (!e164Number || !isValidNumber || !countryCallingCode) {
-      CeloAnalytics.track(CustomEventNames.inavlid_phone_number, { phoneNumber: e164Number })
+      // Replacing all integers except 0 with and “X” before logging so
+      // we can see if unnecessary symbols or leading 0s were added
+      CeloAnalytics.track(CustomEventNames.invalid_phone_number, {
+        obfuscatedPhoneNumber: e164Number.replace(/[1-9]/g, 'X'),
+      })
       this.props.showError(ErrorMessages.INVALID_PHONE_NUMBER)
       return
     }
@@ -180,6 +184,7 @@ export class JoinCelo extends React.Component<Props, State> {
     }
 
     this.props.setPromptForno(true) // Allow forno prompt after Welcome screen
+    CeloAnalytics.track(CustomEventNames.phone_number_set, { countryCode: countryCallingCode })
     this.props.setPhoneNumber(e164Number, countryCallingCode)
     this.props.setName(name)
     this.goToNextScreen()

@@ -1,15 +1,10 @@
 import CeloAnalytics, { AnalyzedApps } from '@celo/react-components/analytics/CeloAnalytics'
-import {
-  CustomEventNames,
-  DefaultEventNames,
-  EventPropertyType,
-  PropertyPathWhitelist,
-} from 'src/analytics/constants'
+import { CustomEventNames, EventPropertyType, PropertyPathWhitelist } from 'src/analytics/constants'
 import { DEFAULT_TESTNET, SEGMENT_API_KEY } from 'src/config'
 import { store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
 
-type EventNames = CustomEventNames | DefaultEventNames
+type EventNames = CustomEventNames
 
 class WalletAnalytics extends CeloAnalytics {
   sessionId: string

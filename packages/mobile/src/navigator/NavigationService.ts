@@ -7,7 +7,7 @@ import sleep from 'sleep-promise'
 import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { DefaultEventNames } from 'src/analytics/constants'
+import { CustomEventNames } from 'src/analytics/constants'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { store } from 'src/redux/store'
@@ -160,6 +160,6 @@ export function navigateHome(params?: object) {
 
 export function navigateToError(errorMessage: string, error?: Error) {
   Logger.error(`${TAG}@navigateToError`, `Navigating to error screen: ${errorMessage}`, error)
-  CeloAnalytics.track(DefaultEventNames.errorDisplayed, { error }, true)
+  CeloAnalytics.track(CustomEventNames.error_displayed, { error }, true)
   navigate(Screens.ErrorScreen, { errorMessage })
 }

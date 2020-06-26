@@ -1,5 +1,3 @@
-import { DefaultEventNames } from '@celo/react-components/analytics/constants'
-
 export enum CustomEventNames {
   language_select = 'language_select',
   nux_continue = 'nux_continue',
@@ -10,9 +8,14 @@ export enum CustomEventNames {
   disconnect_banner = 'disconnect_banner',
 
   // App
-  app_launched = 'app_launched', // measures length of time between App mounting and WalletHome rendering
+  app_launched = 'app_launched',
   app_state_error = 'app_state_error',
+  error_displayed = 'error_displayed',
   error_fallback = 'error_fallback',
+
+  // Onboarding
+  phone_number_set = 'phone_number_set',
+  invalid_phone_number = 'invalid_phone_number',
 
   // Education
   gold_cancel1 = 'gold_cancel1',
@@ -45,9 +48,6 @@ export enum CustomEventNames {
   wallet_dollar_nux = 'wallet_dollar_nux',
   send_input = 'send_input',
   transaction_details = 'transaction_details',
-
-  // Profile
-  inavlid_phone_number = 'inavlid_phone_number',
 
   // Payment send
   send_select_cancel = 'send_select_cancel',
@@ -369,7 +369,7 @@ export enum PropertyPathWhitelist {
   'navigation.state.routeName' = 'navigation.state.routeName',
   nextScreen = 'nextScreen',
   note = 'note',
-  phoneNumber = 'phoneNumber',
+  obfuscatedPhoneNumber = 'obfuscatedPhoneNumber',
   pincodeType = 'pincodeType',
   previousScreen = 'previousScreen',
   query = 'query',
@@ -408,5 +408,3 @@ export enum PropertyPathWhitelist {
   phoneHash = 'phoneHash',
   numAttestationsRequestsNeeded = 'numAttestationsRequestsNeeded',
 }
-
-export { DefaultEventNames }
