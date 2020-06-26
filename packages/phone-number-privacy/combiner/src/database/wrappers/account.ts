@@ -1,3 +1,4 @@
+import { DB_TIMEOUT } from '../../common/constants'
 import { ErrorMessage } from '../../common/error-utils'
 import logger from '../../common/logger'
 import { getDatabase } from '../database'
@@ -57,6 +58,6 @@ export async function setDidMatchmaking(account: string) {
 async function insertRecord(data: Account) {
   await accounts()
     .insert(data)
-    .timeout(10000)
+    .timeout(DB_TIMEOUT)
   return true
 }
