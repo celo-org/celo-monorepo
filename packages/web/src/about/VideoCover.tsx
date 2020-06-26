@@ -64,7 +64,6 @@ class VideoCover extends React.PureComponent<I18nProps & ScreenProps, State> {
                 type="video/mp4"
               />
             )}
-            }
             <Image
               resizeMode="cover"
               source={{ uri: '/images/AboutPreview.jpg' }}

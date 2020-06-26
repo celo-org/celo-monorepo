@@ -1,11 +1,12 @@
 import Link from '@celo/react-components/components/Link'
+import { SettingsItemTextValue } from '@celo/react-components/components/SettingsItem'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
-import SettingsItem from 'src/account/SettingsItem'
+
 import { FAQ_LINK, FORUM_LINK } from 'src/config'
 import i18n, { Namespaces } from 'src/i18n'
 import DrawerTopBar from 'src/navigator/DrawerTopBar'
@@ -26,12 +27,12 @@ const Support = () => {
     <SafeAreaView style={styles.container}>
       <DrawerTopBar />
       <View style={styles.containerList}>
-        <SettingsItem
+        <SettingsItemTextValue
           testID="WebFAQLink"
           title={t('webFaq')}
           onPress={openExternalLink(FAQ_LINK)}
         />
-        <SettingsItem
+        <SettingsItemTextValue
           testID="ForumLink"
           title={t('forum')}
           onPress={openExternalLink(FORUM_LINK)}
