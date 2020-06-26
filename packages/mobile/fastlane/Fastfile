@@ -4,22 +4,21 @@ default_platform(:android)
 
 $mapping_path = 'android/app/build/outputs/mapping/'
 $mapping_file = '/mapping.txt'
-$bundle_name = 'org.celo.mobile.'
 
 def get_mapping_path(env)
   return $mapping_path + env + $mapping_file
 end
 
-def get_bundle(env)
-  return $bundle_name + env
+def get_app_bundle_id(env)
+  Dotenv.parse("../.env.#{env}")['APP_BUNDLE_ID']
 end
 
-def fastlane_supply(env, track, bundle_suffix)
+def fastlane_supply(env, track)
   return supply(
     json_key: 'fastlane/google-play-service-account.json',
     track: track,
     track_promote_to: track,
-    package_name: get_bundle(bundle_suffix),
+    package_name: get_app_bundle_id(env),
     mapping: get_mapping_path(env),
     skip_upload_apk: true
   )
@@ -53,35 +52,28 @@ platform :android do
   lane :integration do
     env = 'integration'
     build(environment: env)
-    fastlane_supply(env, 'internal', env)
-  end
-
-  desc 'Ship Staging to Playstore Internal'
-  lane :staging do
-    env = 'staging'
-    build(environment: env)
-    fastlane_supply(env, 'internal', env)
-  end
-
-  desc 'Ship Production to Playstore Alpha.'
-  lane :production do
-    env = 'release'
-    build(environment: env)
-    fastlane_supply(env, 'alpha', 'production')
+    fastlane_supply(env, 'internal')
   end
 
   desc 'Ship Alfajores to Playstore Internal'
   lane :alfajores do
     env = 'alfajores'
     build(environment: env)
-    fastlane_supply(env, 'internal', env)
+    fastlane_supply(env, 'internal')
   end
 
   desc 'Ship Pilot to Playstore Internal'
   lane :pilotapp do
     env = 'pilot'
     build(environment: env)
-    fastlane_supply(env, 'internal', env)
+    fastlane_supply(env, 'internal')
+  end
+
+  desc 'Ship Mainnet to Playstore Internal'
+  lane :mainnet do
+    env = 'mainnet'
+    build(environment: env)
+    fastlane_supply(env, 'internal')
   end
 
   desc 'Build an Android apk'
@@ -132,6 +124,15 @@ platform :ios do
   desc 'Ship Integration to TestFlight'
   lane :integration do
     env = 'integration'
+    build(environment: env)
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+    )
+  end
+
+  desc 'Ship Mainnet to TestFlight'
+  lane :mainnet do
+    env = 'mainnet'
     build(environment: env)
     upload_to_testflight(
       skip_waiting_for_build_processing: true,
