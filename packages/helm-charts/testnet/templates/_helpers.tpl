@@ -22,36 +22,6 @@
     mountPath: /root/.celo
 {{- end -}}
 
-{{- define "celo.prom-to-sd-container" -}}
-- name: prom-to-sd
-  image: "{{ .Values.promtosd.image.repository }}:{{ .Values.promtosd.image.tag }}"
-  imagePullPolicy: {{ .Values.imagePullPolicy }}
-  ports:
-    - name: profiler
-      containerPort: {{ .Values.promtosd.port }}
-  command:
-    - /monitor
-    - --stackdriver-prefix=custom.googleapis.com
-    - --source={{ .component }}:http://localhost:{{ .metricsPort }}/{{ .metricsPath | default "metrics" }}?containerNameLabel={{ .containerNameLabel }}
-    - --pod-id=$(POD_NAME)
-    - --namespace-id=$(POD_NAMESPACE)
-    - --scrape-interval={{ .Values.promtosd.scrape_interval }}
-    - --export-interval={{ .Values.promtosd.export_interval }}
-  resources:
-    requests:
-      memory: 50M
-      cpu: 50m
-  env:
-    - name: POD_NAME
-      valueFrom:
-        fieldRef:
-          fieldPath: metadata.name
-    - name: POD_NAMESPACE
-      valueFrom:
-        fieldRef:
-          fieldPath: metadata.namespace
-{{- end -}}
-
 {{- /* This template does not define ports that will be exposed */ -}}
 {{- define "celo.node-service" -}}
 kind: Service
@@ -138,6 +108,12 @@ spec:
 {{ $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
         validator-proxied: "{{ $validatorProxied }}"
 {{- end }}
+{{ if .Values.geth.enable_metrics }}
+      annotations:
+        prometheus.io/path: /debug/metrics/prometheus
+        prometheus.io/port: "6060"
+        prometheus.io/scrape: "true"
+{{ end }}
     spec:
       initContainers:
 {{ include "common.init-genesis-container" .  | indent 6 }}

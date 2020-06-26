@@ -667,6 +667,7 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     `--set promtosd.export_interval=${fetchEnv('PROMTOSD_EXPORT_INTERVAL')}`,
     `--set geth.blocktime=${fetchEnv('BLOCK_TIME')}`,
     `--set geth.validators="${fetchEnv('VALIDATORS')}"`,
+    `--set geth.enable_metrics="${fetchEnvOrFallback('GETH_ENABLE_METRICS', 'false')}"`,
     `--set geth.istanbulrequesttimeout=${fetchEnvOrFallback(
       'ISTANBUL_REQUEST_TIMEOUT_MS',
       '3000'

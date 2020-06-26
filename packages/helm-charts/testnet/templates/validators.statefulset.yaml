@@ -43,6 +43,12 @@ spec:
       labels:
 {{ include "common.standard.labels" .  | indent 8 }}
         component: validators
+{{ if .Values.geth.enable_metrics }}
+      annotations:
+        prometheus.io/path: /debug/metrics/prometheus
+        prometheus.io/port: "6060"
+        prometheus.io/scrape: "true"
+{{ end }}
     spec:
       initContainers:
 {{ include "common.init-genesis-container" .  | indent 6 }}
@@ -151,22 +157,24 @@ spec:
         - |-
           set -euo pipefail
           rm /root/.celo/pkey || true
+          ADDITIONAL_FLAGS=''
 
-          ACCOUNT_ADDRESS=`cat /root/.celo/address`
-          RID=`cat /root/.celo/replica_id`
+          ACCOUNT_ADDRESS=$(cat /root/.celo/address)
+          RID=$(cat /root/.celo/replica_id)
 
-          FAULTY_NODE_FLAGS=`if [ "$RID" -lt "$FAULTY_NODES" ]; then echo -n "--istanbul.faultymode $FAULTY_NODE_TYPE"; fi`
+          if [ "$RID" -lt "$FAULTY_NODES" ]; then 
+            ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --istanbul.faultymode $FAULTY_NODE_TYPE"
+          fi
 
-          PROXIED_FLAGS=""
-          PROXY_COUNT=`cat /root/.celo/proxyCount`
-          [ "$PROXY_COUNT" -gt 0 ] && PROXIED_FLAGS="--proxy.proxied --proxy.proxyenodeurlpairs=`cat /root/.celo/proxyEnodeUrlPairs` --nodiscover --proxy.allowprivateip"
+          PROXY_COUNT=$(cat /root/.celo/proxyCount)
+          [ "$PROXY_COUNT" -gt 0 ] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxied --proxy.proxyenodeurlpairs=$(cat /root/.celo/proxyEnodeUrlPairs) --nodiscover --proxy.allowprivateip"
 
-          PING_IP_FROM_PACKET_FLAG=""
-          [[ "$PING_IP_FROM_PACKET" == "true" ]] && PING_IP_FROM_PACKET_FLAG="--ping-ip-from-packet"
+          [[ "$PING_IP_FROM_PACKET" == "true" ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ping-ip-from-packet"
 
-          IN_MEMORY_DISCOVERY_TABLE_FLAG=""
-          [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
-
+          [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --use-in-memory-discovery-table"
+          {{- if .Values.geth.enable_metrics | default false }}
+          ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics --pprof --pprofaddr=0.0.0.0 --pprofport=6060"
+          {{- end }}
           exec geth \
             --bootnodes=enode://`cat /root/.celo/bootnodeEnode` \
             --nousb \
@@ -190,16 +198,12 @@ spec:
             --consoleoutput=stdout \
             --verbosity={{ .Values.geth.verbosity }} \
             --vmodule={{ .Values.geth.vmodule }} \
-            ${FAULTY_NODE_FLAGS} \
             --istanbul.blockperiod={{ .Values.geth.blocktime }} \
             --istanbul.requesttimeout={{ .Values.geth.istanbulrequesttimeout }} \
             --maxpeers=125 \
             --nat=extip:`cat /root/.celo/ipAddress` \
-            --metrics \
             --allow-insecure-unlock \
-            ${PING_IP_FROM_PACKET_FLAG} \
-            ${IN_MEMORY_DISCOVERY_TABLE_FLAG} \
-            ${PROXIED_FLAGS}
+            ${ADDITIONAL_FLAGS}
         env:
         - name: POD_IP
           valueFrom:
@@ -233,6 +237,10 @@ spec:
           containerPort: 8545
         - name: ws
           containerPort: 8546
+        {{- if .Values.geth.enable_metrics | default false }}
+        - name: metrics
+          containerPort: 6060
+        {{- end }}
         resources:
 {{ toYaml .Values.geth.resources | indent 10 }}
         volumeMounts:

@@ -28,6 +28,12 @@ spec:
     metadata:
       labels:
 {{ include "celo-fullnode.labels" .  | indent 8 }}
+{{ if .Values.geth.enable_metrics }}
+      annotations:
+        prometheus.io/path: /debug/metrics/prometheus
+        prometheus.io/port: "6060"
+        prometheus.io/scrape: "true"
+{{ end }}
     spec:
       initContainers:
 {{ include "common.init-genesis-container" .  | indent 6 }}
