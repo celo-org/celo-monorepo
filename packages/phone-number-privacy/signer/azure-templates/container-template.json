@@ -50,6 +50,12 @@
         },
         "dnsNameLabel": {
             "type": "string"
+        },
+        "logAnalyticsWorkspaceId": {
+            "type": "string"
+        },
+        "logAnalyticsWorkspaceKey": {
+            "type": "string"
         }
     },
     "resources": [
@@ -81,6 +87,12 @@
                     "type": "[parameters('ipAddressType')]",
                     "ports": "[parameters('ports')]",
                     "dnsNameLabel": "[parameters('dnsNameLabel')]"
+                },
+                "diagnostics": {
+                  "logAnalytics": {
+                    "workspaceId": "[parameters('logAnalyticsWorkspaceId')]",
+                    "workspaceKey": "[parameters('logAnalyticsWorkspaceKey')]"
+                  }
                 }
             },
             "identity": {

@@ -1,5 +1,5 @@
 import { Request, Response } from 'firebase-functions'
-import { ErrorMessages, respondWithError } from '../common/error-utils'
+import { ErrorMessage, respondWithError, WarningMessage } from '../common/error-utils'
 import { authenticateUser, isVerified } from '../common/identity'
 import {
   hasValidAccountParam,
@@ -30,22 +30,22 @@ export async function handleGetContactMatches(
 ) {
   try {
     if (!isValidGetContactMatchesInput(request.body)) {
-      respondWithError(response, 400, ErrorMessages.INVALID_INPUT)
+      respondWithError(response, 400, WarningMessage.INVALID_INPUT)
       return
     }
     if (!authenticateUser(request)) {
-      respondWithError(response, 401, ErrorMessages.UNAUTHENTICATED_USER)
+      respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER)
       return
     }
 
     const { account, userPhoneNumber, contactPhoneNumbers, hashedPhoneNumber } = request.body
 
     if (!(await isVerified(account, hashedPhoneNumber))) {
-      respondWithError(response, 403, ErrorMessages.UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE)
+      respondWithError(response, 403, WarningMessage.UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE)
       return
     }
     if (await getDidMatchmaking(account)) {
-      respondWithError(response, 403, ErrorMessages.DUPLICATE_REQUEST_TO_MATCHMAKE)
+      respondWithError(response, 403, WarningMessage.DUPLICATE_REQUEST_TO_MATCHMAKE)
       return
     }
     const matchedContacts: ContactMatch[] = (
@@ -56,7 +56,7 @@ export async function handleGetContactMatches(
     response.json({ success: true, matchedContacts, version: VERSION })
   } catch (e) {
     logger.error('Failed to getContactMatches', e)
-    respondWithError(response, 500, ErrorMessages.UNKNOWN_ERROR)
+    respondWithError(response, 500, ErrorMessage.UNKNOWN_ERROR)
   }
 }
 
