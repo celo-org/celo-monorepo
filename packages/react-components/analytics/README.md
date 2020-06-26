@@ -9,10 +9,6 @@ The analytics module currently supports two primary use cases:
 
 Only whitelisted properties (as declared [here](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/src/analytics/constants.ts)) will be sent out to Segment. Any new properties that need to be tracked therefore need to be added to this list.
 
-## Component Wrapping
-
-To add tracking at the component level, the component export with the `componentWithAnalytics()` function.
-
 ## Custom Event Tracking
 
 Make a call to CeloAnalytics.track() with the event name and any associated properties that should be tracked as part of this event.
