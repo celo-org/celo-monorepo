@@ -29,8 +29,8 @@ export async function getDidMatchmaking(account: string): Promise<boolean> {
     }
     return !!didMatchmaking[ACCOUNTS_COLUMNS.didMatchmaking]
   } catch (e) {
-    logger.error('Error getting matchmaking status', e)
-    throw new Error(ErrorMessage.DATABASE_GET_FAILURE)
+    logger.error(ErrorMessage.DATABASE_GET_FAILURE, e)
+    return false
   }
 }
 
@@ -50,8 +50,8 @@ export async function setDidMatchmaking(account: string) {
       return insertRecord(newAccount)
     }
   } catch (e) {
-    logger.error('Error setting matchmaking status', e)
-    throw new Error(ErrorMessage.DATABASE_UPDATE_FAILURE)
+    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE, e)
+    return null
   }
 }
 
