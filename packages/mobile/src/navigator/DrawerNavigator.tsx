@@ -64,17 +64,15 @@ type CustomDrawerItemListProps = Omit<DrawerContentOptions, 'contentContainerSty
   protectedRoutes: string[]
 }
 
+// This component has been taken from here:
+// https://github.com/react-navigation/react-navigation/blob/1aadc79fb89177a2fff2dcd791d67a3c880009d0/packages/drawer/src/views/DrawerItemList.tsx
 function CustomDrawerItemList({
   state,
   navigation,
   descriptors,
-  activeTintColor,
-  inactiveTintColor,
-  activeBackgroundColor,
-  inactiveBackgroundColor,
   itemStyle,
-  labelStyle,
   protectedRoutes,
+  ...passThroughProps
 }: CustomDrawerItemListProps) {
   const buildLink = useLinkBuilder()
 
@@ -88,7 +86,7 @@ function CustomDrawerItemList({
       })
     }
     const onPress = () => {
-      if (protectedRoutes.indexOf(route.name) !== -1) {
+      if (protectedRoutes.includes(route.name)) {
         // Route should be protected by PIN code
         ensurePincode()
           .then(navigateToItem)
@@ -102,15 +100,11 @@ function CustomDrawerItemList({
 
     return (
       <DrawerItem
+        {...passThroughProps}
         key={route.key}
         label={drawerLabel !== undefined ? drawerLabel : title !== undefined ? title : route.name}
         icon={drawerIcon}
         focused={focused}
-        activeTintColor={activeTintColor}
-        inactiveTintColor={inactiveTintColor}
-        activeBackgroundColor={activeBackgroundColor}
-        inactiveBackgroundColor={inactiveBackgroundColor}
-        labelStyle={labelStyle}
         style={itemStyle}
         to={buildLink(route.name, route.params)}
         onPress={onPress}
