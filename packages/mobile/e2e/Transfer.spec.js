@@ -107,7 +107,7 @@ describe('Transfer Works', () => {
   it('VerifyEducation', async () => {
     await waitFor(element(by.id('VerificationEducationContinue')))
       .toBeVisible()
-      .withTimeout(10000)
+      .withTimeout(30000)
 
     // skip
     await element(by.id('VerificationEducationSkip')).tap()
