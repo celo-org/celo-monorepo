@@ -3,13 +3,9 @@ import { css, jsx } from '@emotion/core'
 import Footer from 'src/components/Footer'
 import Head from 'src/components/Head'
 import NavBar from 'src/components/Navbar'
-import Section from 'src/components/Section'
 import { flexCol, mainStyle, rootStyle } from 'src/components/styles'
-Section
+
 interface Props {
-  body: string
-  title: string
-  updated: string
   year: string
 }
 

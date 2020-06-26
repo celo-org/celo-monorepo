@@ -7,7 +7,7 @@ import NavBar from 'src/components/Navbar'
 import Section from 'src/components/Section'
 import { flexCol, mainStyle, rootStyle } from 'src/components/styles'
 import { Updated } from 'src/components/Updated'
-Section
+
 interface Props {
   body: string
   title: string
