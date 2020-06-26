@@ -74,9 +74,13 @@ export const sendAmountScreenNavOptions = ({
     ? i18n.t('paymentRequestFlow:request')
     : i18n.t('sendFlow7:send')
 
+  const eventName = route.params?.isRequest
+    ? CustomEventNames.request_amount_back
+    : CustomEventNames.send_amount_back
+
   return {
     ...emptyHeader,
-    headerLeft: () => <BackButton eventName={CustomEventNames.send_amount_back} />,
+    headerLeft: () => <BackButton eventName={eventName} />,
     headerTitle: () => <HeaderTitleWithBalance title={title} token={CURRENCY_ENUM.DOLLAR} />,
   }
 }
@@ -191,6 +195,8 @@ function SendAmount(props: Props) {
   const continueAnalyticsParams = React.useMemo(() => {
     return {
       method: props.route.params?.isFromScan ? 'scan' : 'search',
+      transactionType:
+        recipientVerificationStatus === RecipientVerificationStatus.VERIFIED ? 'send' : 'invite',
       localCurrencyExchangeRate,
       localCurrency: localCurrencyCode,
       dollarAmount,
@@ -213,15 +219,10 @@ function SendAmount(props: Props) {
       return
     }
 
-    let transactionData: TransactionDataInput
-
-    if (recipientVerificationStatus === RecipientVerificationStatus.VERIFIED) {
-      transactionData = getTransactionData(TokenTransactionType.Sent)
-      CeloAnalytics.track(CustomEventNames.transaction_details)
-    } else {
-      transactionData = getTransactionData(TokenTransactionType.InviteSent)
-      CeloAnalytics.track(CustomEventNames.send_invite_details)
-    }
+    const transactionData =
+      recipientVerificationStatus === RecipientVerificationStatus.VERIFIED
+        ? getTransactionData(TokenTransactionType.Sent)
+        : getTransactionData(TokenTransactionType.InviteSent)
 
     dispatch(hideAlert())
 

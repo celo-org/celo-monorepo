@@ -29,22 +29,10 @@ export enum CustomEventNames {
   backup_educate_3_cancel = 'backup_educate_3_cancel', // cancel button on 3rd edu screen
   backup_educate_4_cancel = 'backup_educate_4_cancel', // cancel button on 4th edu screen
 
-  // Called by might not need to be
-  transaction_details = 'transaction_details', // called in SendAmount
-  send_invite_details = 'send_invite_details', // called in SendAmount
-  request_amount_back = 'request_amount_back', // back button pressed on amount screen
-
-  // Not called anywhere
-  send_search = 'send_search', // when text is input into search bar
-  request_search = 'request_search', // when text is input into search bar
-
   // Payment send
-
   send_cancel = 'send_cancel', // when cancel is clicked after launching send flow
-
   send_scan = 'send_scan', // when scan QR icon is selected from the send screen
   send_select_recipient = 'send_select_recipient', // when recipient was selected
-  // Incorrectly called in some places
   send_amount_back = 'send_amount_back', // back button pressed on amount screen
   send_continue = 'send_continue', // when next button pressed on amount enter page
   send_confirm_back = 'send_confirm_back', // when back button pressed on send confirmation screen
@@ -65,6 +53,7 @@ export enum CustomEventNames {
   invite_error = 'invite_error', // when there is an error sending an invite
 
   // Payment request
+  request_amount_back = 'request_amount_back', // back button pressed on amount screen
   request_cancel = 'request_cancel', // when cancel is clicked after launching request flow
   request_scan = 'request_scan', // when scan QR icon is selected from the request screen
   request_select_recipient = 'request_select_recipient', // when recipient was selected
@@ -144,9 +133,7 @@ export enum CustomEventNames {
 
   backup_start = 'backup_start', // ‘set up now’ button click
   backup_setup_info = 'backup_setup_info',
-
   backup_quiz_backspace = 'backup_quiz_backspace', // whenever the backspace is pressed
-
   backup_quiz_submit = 'backup_quiz_submit', // (Count # of taps on "Submit" button in Backup_Quiz)
   backup_quiz_success = 'backup_quiz_success', // (Count # of successful Account Key confirmations Backup_Quiz)
   backup_quiz_incorrect = 'backup_quiz_incorrect', // (Count # of failed Account Key confirmations Backup_Quiz)
@@ -330,6 +317,7 @@ export enum PropertyPathWhitelist {
   timeElapsed = 'timeElapsed',
   title = 'title',
   to = 'to',
+  transactionType = 'transactionType',
   tti = 'tti',
   txId = 'txId',
   validationType = 'validationType',
