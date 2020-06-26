@@ -2,9 +2,12 @@ import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
+import { checkNotDangerousExchange } from '../../utils/exchange'
 
+const largeOrderPercentage = 1
+const deppegedPricePercentage = 20
 export default class ExchangeDollars extends BaseCommand {
-  static description = 'Exchange Celo Dollars for Celo Gold via the stability mechanism'
+  static description = 'Exchange Celo Dollars for CELO via the stability mechanism'
 
   static flags = {
     ...BaseCommand.flags,
@@ -14,10 +17,10 @@ export default class ExchangeDollars extends BaseCommand {
     }),
     value: Flags.wei({
       required: true,
-      description: 'The value of Celo Dollars to exchange for Celo Gold',
+      description: 'The value of Celo Dollars to exchange for CELO',
     }),
     forAtLeast: Flags.wei({
-      description: 'Optional, the minimum value of Celo Gold to receive in return',
+      description: 'Optional, the minimum value of CELO to receive in return',
       default: new BigNumber(0),
     }),
   }
@@ -34,6 +37,20 @@ export default class ExchangeDollars extends BaseCommand {
     const sellAmount = res.flags.value
     const minBuyAmount = res.flags.forAtLeast
 
+    if (minBuyAmount.toNumber() === 0) {
+      const check = await checkNotDangerousExchange(
+        this.kit,
+        sellAmount,
+        largeOrderPercentage,
+        deppegedPricePercentage,
+        false
+      )
+
+      if (!check) {
+        console.log('Cancelled')
+        return
+      }
+    }
     this.kit.defaultAccount = res.flags.from
     const stableToken = await this.kit.contracts.getStableToken()
     const exchange = await this.kit.contracts.getExchange()

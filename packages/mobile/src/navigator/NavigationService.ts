@@ -87,7 +87,7 @@ export function navigate<RouteName extends keyof StackParamList>(
     })
 }
 
-async function ensurePincode(): Promise<boolean> {
+export async function ensurePincode(): Promise<boolean> {
   const pincodeType = pincodeTypeSelector(store.getState())
 
   if (pincodeType === PincodeType.Unset) {
