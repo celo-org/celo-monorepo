@@ -65,15 +65,14 @@ export class PincodeSet extends React.Component<Props, State> {
   }
 
   onCompletePin1 = () => {
-    CeloAnalytics.track(CustomEventNames.pin_value)
     this.props.navigation.setParams({ isVerifying: true })
   }
 
   onCompletePin2 = (pin2: string) => {
-    CeloAnalytics.track(CustomEventNames.pin_create_button)
     const { pin1 } = this.state
     if (this.isPin1Valid(pin1) && this.isPin2Valid(pin2)) {
       this.props.setPincode(PincodeType.CustomPin, this.state.pin1)
+      CeloAnalytics.track(CustomEventNames.pin_created)
       navigate(Screens.EnterInviteCode)
     } else {
       this.props.navigation.setParams({ isVerifying: false })

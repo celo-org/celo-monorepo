@@ -81,7 +81,9 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
     // TODO check types
     yield call(sendAndMonitorTransaction, action.txId, transferTx, account)
     yield put(fetchSentEscrowPayments())
+    CeloAnalytics.track(CustomEventNames.escrow_transfer)
   } catch (e) {
+    CeloAnalytics.track(CustomEventNames.escrow_failed_to_transfer, { error: e.message })
     Logger.error(TAG + '@transferToEscrow', 'Error transfering to escrow', e)
     yield put(showErrorOrFallback(e, ErrorMessages.ESCROW_TRANSFER_FAILED))
   }
@@ -152,6 +154,7 @@ function* withdrawFromEscrow() {
 
     yield put(fetchDollarBalance())
     Logger.showMessage(i18n.t('inviteFlow11:transferDollarsToAccount'))
+    CeloAnalytics.track(CustomEventNames.escrowed_payment_withdrawn_by_receiver)
   } catch (e) {
     Logger.error(TAG + '@withdrawFromEscrow', 'Error withdrawing payment from escrow', e)
     CeloAnalytics.track(CustomEventNames.escrow_failed_to_withdraw, { error: e.message })

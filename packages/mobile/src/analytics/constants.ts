@@ -1,33 +1,23 @@
 export enum CustomEventNames {
-  language_select = 'language_select',
-  nux_continue = 'nux_continue',
-  full_name_input = 'full_name_input',
-  invitation_code = 'invitation_code',
-  signup_submit = 'signup_submit',
-  blockChainCorruption = 'block_chain_corruption',
-  disconnect_banner = 'disconnect_banner',
-
   // App
   app_launched = 'app_launched',
   app_state_error = 'app_state_error',
   error_displayed = 'error_displayed',
   error_fallback = 'error_fallback',
+  language_select = 'language_select',
 
   // Onboarding
   phone_number_set = 'phone_number_set',
   invalid_phone_number = 'invalid_phone_number',
 
   // Education
-  gold_cancel1 = 'gold_cancel1',
-  gold_cancel2 = 'gold_cancel2',
-  gold_cancel3 = 'gold_cancel3',
   gold_educate_1_next = 'gold_educate_1_next', // next button on 1st edu screen
   gold_educate_2_next = 'gold_educate_2_next', // next button on 2nd edu screen
   gold_educate_3_next = 'gold_educate_3_next', // next button on 3rd edu screen
 
-  photo_education_cancel1 = 'photo_education_cancel1',
-  photo_education_cancel2 = 'photo_education_cancel2',
-  photo_education_cancel3 = 'photo_education_cancel3',
+  gold_cancel1 = 'gold_cancel1', // cancel button on 1st edu screen
+  gold_cancel2 = 'gold_cancel2', // cancel button on 2nd edu screen
+  gold_cancel3 = 'gold_cancel3', // cancel button on 3rd edu screen
 
   backup_educate_1_next = 'backup_educate_1_next', // next button on 1st edu screen
   backup_educate_2_next = 'backup_educate_2_next', // next button on 2nd edu screen
@@ -39,26 +29,22 @@ export enum CustomEventNames {
   backup_educate_3_cancel = 'backup_educate_3_cancel', // cancel button on 3rd edu screen
   backup_educate_4_cancel = 'backup_educate_4_cancel', // cancel button on 4th edu screen
 
-  exchange_gold_nux = 'exchange_gold_nux',
-  wallet_gold_nux = 'wallet_gold_nux',
-  dollar_cancel1 = 'dollar_cancel1',
-  dollar_cancel2 = 'dollar_cancel2',
-  dollar_cancel3 = 'dollar_cancel3',
-  send_dollar_nux = 'send_dollar_nux',
-  wallet_dollar_nux = 'wallet_dollar_nux',
-  send_input = 'send_input',
-  transaction_details = 'transaction_details',
+  // Called by might not need to be
+  transaction_details = 'transaction_details', // called in SendAmount
+  send_invite_details = 'send_invite_details', // called in SendAmount
+  request_amount_back = 'request_amount_back', // back button pressed on amount screen
+
+  // Not called anywhere
+  send_search = 'send_search', // when text is input into search bar
+  request_search = 'request_search', // when text is input into search bar
 
   // Payment send
-  send_select_cancel = 'send_select_cancel',
-  send_invite_details = 'send_invite_details',
-  send_invite = 'send_invite',
-  edit_send_invite = 'edit_send_invite',
 
   send_cancel = 'send_cancel', // when cancel is clicked after launching send flow
-  send_search = 'send_search', // when text is input into search bar
+
   send_scan = 'send_scan', // when scan QR icon is selected from the send screen
   send_select_recipient = 'send_select_recipient', // when recipient was selected
+  // Incorrectly called in some places
   send_amount_back = 'send_amount_back', // back button pressed on amount screen
   send_continue = 'send_continue', // when next button pressed on amount enter page
   send_confirm_back = 'send_confirm_back', // when back button pressed on send confirmation screen
@@ -80,10 +66,8 @@ export enum CustomEventNames {
 
   // Payment request
   request_cancel = 'request_cancel', // when cancel is clicked after launching request flow
-  request_search = 'request_search', // when text is input into search bar
   request_scan = 'request_scan', // when scan QR icon is selected from the request screen
   request_select_recipient = 'request_select_recipient', // when recipient was selected
-  request_amount_back = 'request_amount_back', // back button pressed on amount screen
   request_continue = 'request_continue', // when next button pressed on amount enter page
   request_unavailable = 'request_unavailable', // when request attempted to unverified user
   request_confirm_back = 'request_confirm_back', // when back button pressed on request confirmation screen
@@ -122,7 +106,6 @@ export enum CustomEventNames {
   verification_code_received = 'verification_code_received',
   verification_complete_attestation = 'verification_complete_attestation',
   verification_completed_attestation = 'verification_completed_attestation',
-  verification_manual_selected = 'verification_manual_selected',
   verification_failed = 'verification_failed',
   verification_cancelled = 'verification_cancelled',
   verification_success = 'verification_success',
@@ -142,21 +125,15 @@ export enum CustomEventNames {
   redeem_invite_timed_out = 'redeem_invite_timed_out',
   redeem_invite_failed = 'redeem_invite_failed',
 
-  photos_education = 'photos_education',
   get_backup_key = 'get_backup_key',
-  earn_celo_gold = 'earn_celo_gold',
   user_restart = 'user_restart',
-  pin_continue = 'pin_continue',
-  pin_wallet_import = 'pin_wallet_import',
-  pin_value = 'pin_value',
-  pin_create_button = 'pin_create_button',
+  pin_created = 'pin_created',
   pin_failed_to_set = 'pin_failed_to_set',
   pin_never_set = 'pin_never_set',
 
   // Screen name: Invite_Friends, Invite_Friends_Fee
   friend_invited = 'friend_invited', // to record the name or number of the friend a user is inviting per an invite session
   // TODO: this event is tracked, but isn't showing up on screen, so it is untested
-  invite_cancel = 'invite_cancel', // to count the # of taps on the “Cancel” element in the upper left corner
   // TODO: Add this metric later. There doens't appear to be a Cancel button in the upper left of Invite_Friends_Review
   // invite_fee_cancel = 'invite_fee_cancel', // to count the # of taps on “Cancel” in upper left of Invite_Friends_Review
   invite_edit = 'invite_edit', // to count the # of taps on “Cancel” button at bottom of Invite_Friends_Review
@@ -175,37 +152,14 @@ export enum CustomEventNames {
   backup_quiz_incorrect = 'backup_quiz_incorrect', // (Count # of failed Account Key confirmations Backup_Quiz)
 
   // Screen name: Backup_Phrase, Backup_Insist, Backup_Share, Backup_Set
-  set_social_backup = 'set_social_backup', // (count # of taps on "Set up Social Backup")
   delay_backup = 'delay_backup', // (Count # of taps on "Delay" button in Backup_Phrase)
-  skip_backup = 'skip_backup', // (count # of taps on “Skip” button in Backup_Phrase)
-  view_backup_phrase = 'view_backup_phrase', // (count # of taps on "View Backup Phrase" after already backed up)
-  view_social_backup = 'view_social_backup', // (count # of taps on "View Social Backup" after already set up)
-  skip_social_backup = 'skip_social_backup', // (count # of taps on "Skip Social Backup" )
   backup_cancel = 'backup_cancel', // (count # of taps on "Cancel" button in Backup_Phrase/BackupQuiz)
-  backup_cancel_complete = 'backup_cancel_complete', // when choising to abort the cancel and continue the setup
   backup_cancel_procrastinate = 'backup_cancel_procrastinate', // when choosing to continue cancel and delay setup
-  insist_backup_phrase = 'insist_backup_phrase', // (count # of taps on “Set Backup Phrase” in Backup_Insist)
-  insist_skip_backup = 'insist_skip_backup', // (count # of taps on “Do Later” in Backup_Insist)
   backup_continue = 'backup_continue', // (count # of taps on “Continue” button in Backup_Phrase)
   backup_setup_toggle_enable = 'backup_setup_toggle_enable', // (count # of slides to agree on "I wrote down account key" Switch in Backup_Phrase)
   backup_setup_toggle_disable = 'backup_setup_toggle_disable', // (count # of slides to disagree on "I wrote down account key" Switch in Backup_Phrase)
-  social_backup_continue = 'social_backup_continue', // (Count # of taps on "Backup with Friends" in Backup_Phrase)
   backup_error = 'backup_error',
   failed_to_retrieve_mnemonic = 'failed_to_retrieve_mnemonic',
-
-  // Screen name: Backup_Quiz, Question_Incorrect, Backup_Confirmed
-  question_select = 'question_select', // (track # of input selections on Backup_Verify screen)
-  question_submit = 'question_submit', // (track # of taps on “Submit” button for Backup_Quiz screen)
-  question_cancel = 'questions_cancel', // (track # of taps on "Cancel" button on the Backup_Quiz Screens)
-  question_incorrect = 'question_incorrect', // (track # of taps on “See Backup Phrase” in Backup_Quiz)
-  question_done = 'question_done', // (track # of taps on “Done” button on the Backup_Confirmed screen)
-
-  // Screen name: Backup_Verify
-  backup_paste = 'backup_paste', // (track # of pastes in input field for Backup_Verify screen)
-  backup_paste_submit = 'backup_paste_submit', // (track # of taps on "Submit" button for Backup_Verify screen)
-  backup_paste_cancel = 'backup_paste_cancel', // (track # of taps on "Cancel" button on the Backup_Verify screen)
-  backup_paste_incorrect = 'backup_paste_incorrect', // (track # of taps on "See Backup Phrase" in Backup_Verify screen)
-  backup_paste_done = 'backup_paste_done', // (track # of taps on "Done" button on the Backup_Verify screen)
 
   // Gold Buy and Sell screens
   gold_switch_input_currency = 'gold_switch_input_currency', // when ‘switch to gold’ button pressed
@@ -231,18 +185,8 @@ export enum CustomEventNames {
   gold_info = 'gold_info', // when the (i) next to Celo Gold price is clicked, launching education (not pictured)
   gold_buy_start = 'gold_buy_start', // when the “Buy” button is clicked
   gold_sell_start = 'gold_sell_start', // when the “Sell” button is clicked
-  gold_chart_switch = 'gold_chart_switch', // when another timescale is selected
   gold_activity_select = 'gold_activity_select', // when an activity item is clicked
   gold_activity_back = 'gold_activity_back', // when back caret is clicked from drilldown
-
-  // Screens: Exchange_Tutorial, Exchange_Home, Exchange_Currency
-  exchange_button = 'exchange_button', // count # of taps on the exchange button in Exchange_Home
-  exchange_dollar_input = 'exchange_dollar_input', // record the input of Celo$ form field in Exchange_Currency
-  // triggered when focus is moved away from text editing
-  exchange_gold_input = 'exchange_gold_input', // record the input of Gold form field in Exchange_Currency,
-  // triggered when focus is moved away from text editing
-  exchange_continue = 'exchange_continue', // record # of taps on “Continue” button on Exchange_Currency
-  currency_swap = 'currency_swap', // record # of taps on the double arrow button in Exchange_Currency
 
   // Screen: Exchange_Review
   exchange_edit = 'exchange_edit', // to count # of times users click the edit button, change transaction)
@@ -251,23 +195,17 @@ export enum CustomEventNames {
   // Screen name: Account_Home, Account_Edit, Account_Edit_Name
   edit_profile = 'edit_profile', // to count the # of taps on the edit profile button in Account_Home
   edit_name = 'edit_name', // to count the # of taps on the “Edit Name” nav element in Account_Edit
-  edit_name_input = 'edit_name_input', // to record the input of the form input field on Account_Edit_Name page
-  edit_name_submit = 'edit_name_submit', // to count the # of taps on the "Done" button on Account_Edit_Name page
-  edit_account_cancel = 'edit_account_cancel', // to count the # of taps on “Cancel” in upper left of Account_Edit
-  edit_name_cancel = 'edit_name_cancel', // to count the # of taps on “Cancel” in upper left of Account_Edit_Name
 
   // Screen names: Wallet_Recover, Wallet_Import
-  import_phrase_input = 'import_phrase_input', // to record the # of times a value is inputted here [we should not track the actual value of this field, just whether the user filled it out]
   import_wallet_submit = 'import_wallet_submit', // to count the # of times that the “Restore Celo Wallet” button is pressed
-  import_wallet_cancel = 'import_wallet_cancel', // to count the # of times that the “Cancel” button is pressed
   import_contacts = 'import_contacts',
   import_contact_error = 'import_contact_error',
-  import_contacts_skip = 'import_contacts_skip',
   fetched_contacts = 'fetched_contacts',
   add_contact_match = 'add_contact_match',
 
   // Escrowed payments
   escrowed_payment_review = 'escrowed_payment_review',
+  escrow_transfer = 'escrow_transfer',
   escrowed_payment_reclaimed_by_sender = 'escrowed_payment_reclaimed_by_sender',
   escrowed_payment_reclaimEdit_by_sender = 'escrowed_payment_reclaimEdit_by_sender',
   escrowed_payment_withdrawn_by_receiver = 'escrowed_payment_withdrawn_by_receiver',
@@ -285,9 +223,6 @@ export enum CustomEventNames {
   celorewards_notification_dismiss = 'celorewards_notification_dismiss',
   invitefriends_notification_confirm = 'invitefriends_notification_confirm',
   invitefriends_notification_dismiss = 'invitefriends_notification_dismiss',
-
-  // QR Code
-  qrcode_main_screen_visit = 'qrcode_main_screen_visit',
 
   // Performance
   transaction_send_start = 'transaction_send_start',
@@ -307,6 +242,7 @@ export enum CustomEventNames {
   unexpected_maker_token = 'unexpected_maker_token',
 
   // Geth
+  blockchain_corruption = 'blockchain_corruption',
   geth_init_success = 'geth_init_success',
   geth_init_failure = 'geth_init_failure',
   geth_restart_to_fix_init = 'geth_restart_to_fix_init',

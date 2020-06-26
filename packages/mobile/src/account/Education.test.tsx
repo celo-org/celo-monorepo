@@ -17,7 +17,7 @@ const educationProps: Props = {
       image: null,
       title: 'Step 1',
       text: 'The Journey Begins',
-      cancelEvent: CustomEventNames.photo_education_cancel1,
+      cancelEvent: CustomEventNames.gold_cancel1,
       progressEvent: CustomEventNames.gold_educate_1_next,
       screenName: Screens.Debug,
     },

@@ -41,13 +41,9 @@ export class EditProfile extends React.Component<Props, State> {
     this.setState({ name })
   }
 
-  onEndEditing = () => {
-    CeloAnalytics.track(CustomEventNames.edit_name_input)
-  }
-
   nameSubmitted = () => {
     this.props.setName(this.state.name)
-    CeloAnalytics.track(CustomEventNames.edit_name_submit)
+    CeloAnalytics.track(CustomEventNames.edit_name)
   }
 
   render() {
@@ -63,7 +59,6 @@ export class EditProfile extends React.Component<Props, State> {
           value={this.state.name}
           onSubmitEditing={this.nameSubmitted}
           onChangeText={this.nameValueChange}
-          onEndEditing={this.onEndEditing}
         />
       </ScrollView>
     )

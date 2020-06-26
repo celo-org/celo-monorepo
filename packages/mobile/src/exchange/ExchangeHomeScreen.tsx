@@ -39,6 +39,7 @@ import { getLocalCurrencyDisplayValue } from 'src/utils/formatting'
 type Props = StackScreenProps<StackParamList, Screens.ExchangeHomeScreen>
 
 function navigateToGuide() {
+  CeloAnalytics.track(CustomEventNames.gold_info)
   navigate(Screens.GoldEducation)
 }
 
