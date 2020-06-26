@@ -6,21 +6,19 @@ import { checkNotDangerousExchange } from '../../utils/exchange'
 
 const largeOrderPercentage = 1
 const deppegedPricePercentage = 20
-export default class ExchangeDollars extends BaseCommand {
-  static description = 'Exchange Celo Dollars for CELO via the stability mechanism'
+
+export default class ExchangeCelo extends BaseCommand {
+  static description = 'Exchange CELO for Celo Dollars via the stability mechanism'
 
   static flags = {
     ...BaseCommand.flags,
-    from: Flags.address({
-      required: true,
-      description: 'The address with Celo Dollars to exchange',
-    }),
+    from: Flags.address({ required: true, description: 'The address with CELO to exchange' }),
     value: Flags.wei({
       required: true,
-      description: 'The value of Celo Dollars to exchange for CELO',
+      description: 'The value of CELO to exchange for Celo Dollars',
     }),
     forAtLeast: Flags.wei({
-      description: 'Optional, the minimum value of CELO to receive in return',
+      description: 'Optional, the minimum value of Celo Dollars to receive in return',
       default: new BigNumber(0),
     }),
   }
@@ -28,12 +26,12 @@ export default class ExchangeDollars extends BaseCommand {
   static args = []
 
   static examples = [
-    'dollars --value 10000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d',
-    'dollars --value 10000000000000 --forAtLeast 50000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d',
+    'celo --value 5000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d',
+    'celo --value 5000000000000 --forAtLeast 100000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d',
   ]
 
   async run() {
-    const res = this.parse(ExchangeDollars)
+    const res = this.parse(ExchangeCelo)
     const sellAmount = res.flags.value
     const minBuyAmount = res.flags.forAtLeast
 
@@ -43,7 +41,7 @@ export default class ExchangeDollars extends BaseCommand {
         sellAmount,
         largeOrderPercentage,
         deppegedPricePercentage,
-        false
+        true
       )
 
       if (!check) {
@@ -51,16 +49,17 @@ export default class ExchangeDollars extends BaseCommand {
         return
       }
     }
+
     this.kit.defaultAccount = res.flags.from
-    const stableToken = await this.kit.contracts.getStableToken()
+    const celoToken = await this.kit.contracts.getGoldToken()
     const exchange = await this.kit.contracts.getExchange()
 
     await displaySendTx(
       'increaseAllowance',
-      stableToken.increaseAllowance(exchange.address, sellAmount.toFixed())
+      celoToken.increaseAllowance(exchange.address, sellAmount.toFixed())
     )
 
-    const exchangeTx = exchange.exchange(sellAmount.toFixed(), minBuyAmount!.toFixed(), false)
+    const exchangeTx = exchange.exchange(sellAmount.toFixed(), minBuyAmount!.toFixed(), true)
     // Set explicit gas based on github.com/celo-org/celo-monorepo/issues/2541
     await displaySendTx('exchange', exchangeTx, { gas: 300000 })
   }
