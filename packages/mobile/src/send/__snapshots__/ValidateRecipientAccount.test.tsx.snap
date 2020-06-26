@@ -527,7 +527,7 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
               <View
                 style={
                   Object {
-                    "width": 200,
+                    "width": 215,
                   }
                 }
               >
@@ -1318,7 +1318,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
               <View
                 style={
                   Object {
-                    "width": 200,
+                    "width": 215,
                   }
                 }
               >
