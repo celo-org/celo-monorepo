@@ -50,6 +50,7 @@ export async function handleGetDistributedBlindedMessageForSalt(
       respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER)
       return
     }
+    logger.debug('Requesting signatures')
     const { successCount, majorityErrorCode } = await requestSignatures(request, response)
     if (successCount < config.thresholdSignature.threshold) {
       handleMissingSignatures(majorityErrorCode, response)
