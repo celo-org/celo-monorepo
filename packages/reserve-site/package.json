@@ -1,5 +1,5 @@
 {
-  "name": "celoreserve.org",
+  "name": "@celo/reserve-web",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -28,7 +28,8 @@
     "@babel/cli": "^7.10.1",
     "@babel/core": "^7.10.2",
     "@babel/preset-env": "^7.10.2",
-    "@types/react": "^16.9.36"
+    "@types/react": "^16.9.36",
+    "@types/node": "^10.12.18"
   },
   "engines": {
     "node": "10"

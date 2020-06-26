@@ -3,7 +3,6 @@
     "location": "packages/attestation-service",
     "dependencies": [
       "@celo/contractkit",
-      "@celo/protocol",
       "@celo/utils"
     ]
   },
@@ -106,7 +105,7 @@
       "@celo/utils"
     ]
   },
-  "celoreserve.org": {
+  "@celo/reserve-web": {
     "location": "packages/reserve-site",
     "dependencies": []
   },

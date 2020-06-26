@@ -32,22 +32,33 @@ export default function TargetGraph() {
           *Crypto Assets with low volatility. Candidates are decentralised stablecoins e.g. DAI
         </small>
       </div>
-      <div css={css({ display: 'flex', flex: 3, minWidth: 250 })}>
-        <svg viewBox="-20 -20 40 40" transform="rotate(-90)" width="100%" height="100%">
+      <div css={pieStyle}>
+        <svg viewBox="-25 -25 50 50" transform="rotate(-90)" width="100%" height="100%">
           {DATA_WITH_OFFSETS.map(({ color, percent, offset }) => {
             return (
-              <circle
-                cx="0"
-                cy="0"
-                opacity={0.8}
-                r={radius}
-                fill="transparent"
-                stroke={color}
-                stroke-width="9"
-                stroke-dasharray={`${circumfrance * (percent / 100)} ${circumfrance *
-                  (1 - percent / 100)}`}
-                transform={`rotate(${(offset * 360) / 100})`}
-              />
+              <>
+                <circle
+                  cx="0"
+                  cy="0"
+                  opacity={0.8}
+                  r={radius}
+                  fill="transparent"
+                  stroke={color}
+                  strokeWidth="9"
+                  strokeDasharray={`${circumfrance * (percent / 100)} ${circumfrance *
+                    (1 - percent / 100)}`}
+                  transform={`rotate(${(offset * 360) / 100})`}
+                />
+                <line
+                  x1="0"
+                  x2="11"
+                  y1="0"
+                  y2="11"
+                  stroke="white"
+                  strokeWidth="0.25"
+                  transform={`rotate(${((offset - 12.5) * 360) / 100})`}
+                />
+              </>
             )
           })}
         </svg>
@@ -60,6 +71,8 @@ const legendStyle = css({
   minWidth: 200,
   flex: 2,
 })
+
+const pieStyle = css({ display: 'flex', flex: 3, minWidth: 250 })
 
 const rootStyle = css({
   display: 'flex',

@@ -7,10 +7,10 @@ import Holdings, { Ratios, StableTokens } from 'src/components/Holdings'
 import NavBar from 'src/components/Navbar'
 import ReserveAddresses from 'src/components/ReserveAddresses'
 import Section from 'src/components/Section'
-import { flexCol, mainStyle, rootStyle } from 'src/components/styles'
+import { flexCol } from 'src/components/styles'
 import TargetGraph from 'src/components/TargetGraph'
+import { Updated } from 'src/components/Updated'
 import { Addresses, HoldingsData } from 'src/service/Data'
-import { Updated } from '../components/Updated'
 
 interface ContentShape {
   title: string
@@ -83,6 +83,20 @@ export default function Home(props: HoldingsData & Addresses & Props) {
     </>
   )
 }
+
+const rootStyle = css({
+  display: 'flex',
+  flexDirection: 'column',
+  minHeight: '100vh',
+  flex: 1,
+  alignItems: 'center',
+  justifyContent: ' space-between',
+})
+
+const mainStyle = css({
+  width: '100%',
+  maxWidth: 960,
+})
 
 const containerStyle = css(flexCol, { flex: 1, width: '100%', alignItems: 'center' })
 
