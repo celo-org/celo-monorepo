@@ -100,7 +100,7 @@ describe('Transfer Works', () => {
 
     await element(by.id('ImportWalletBackupKeyInputField')).tap()
     await element(by.id('ImportWalletBackupKeyInputField')).typeText(SAMPLE_BACKUP_KEY)
-    await element(by.id('scrollView')).scrollTo('bottom')
+
     await element(by.id('ImportWalletButton')).tap()
   })
 
