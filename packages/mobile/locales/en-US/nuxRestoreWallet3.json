@@ -2,11 +2,8 @@
   "title": "Restore your Celo Wallet",
   "userYourBackupKey":
     "Already have a Celo Wallet? Enter your Backup Key to restore it to this phone.",
-  "backupKeyPrompt":
-    "horse leopard dog monkey shark tiger lemur whale squid wolf squirrel mouse lion elephant cat shrimp bear penguin deer turtle fox zebra goat giraffe",
   "tip": "Tip: ",
   "backupKeyTip": "Backup Keys are 24 words long, separated by a space.",
-  "restoreWallet": "Restore",
   "emptyWalletWarning": "This wallet is empty.",
   "useEmptyAnyway": "Would you like to use it anyway?",
   "useEmptyWallet": "Use Empty Wallet",

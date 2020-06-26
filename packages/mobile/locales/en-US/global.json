@@ -17,7 +17,6 @@
   "tip": "Tip: ",
   "warning": "Warning ",
   "downloadRewards": "Download Celo Rewards",
-  "chooseLanguage": "Choose Language",
   "wallet": "Wallet",
   "send": "Send",
   "search": "Search",
@@ -174,5 +173,6 @@
   "review": "Review",
   "insufficientBalance": "Your balance is too low to make this transaction",
   "amount": "Amount",
-  "currentBalance": "Current Balance"
+  "currentBalance": "Current Balance",
+  "restore": "Restore"
 }

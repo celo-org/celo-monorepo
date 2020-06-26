@@ -42,9 +42,7 @@ const styles = StyleSheet.create({
 export const nuxNavigationOptions: StackNavigationOptions = {
   headerShown: true,
   headerTransparent: true,
-  headerLeftContainerStyle: { paddingHorizontal: 10 },
-  headerLeft: () => <BackButton />,
-  headerRightContainerStyle: { paddingHorizontal: 10 },
+  headerLeft: ({ canGoBack }) => (canGoBack ? <BackButton /> : <View />),
   headerRight: () => <View />,
   headerTitle: () => <DisconnectBanner />,
   headerTitleContainerStyle: {
@@ -97,7 +95,7 @@ export const drawerHeader: StackNavigationOptions = {
 
 export const headerWithBackButton: StackNavigationOptions = {
   ...emptyHeader,
-  headerLeft: () => <BackButton />,
+  headerLeft: ({ canGoBack }) => (canGoBack ? <BackButton /> : null),
 }
 
 export const headerWithCancelButton: StackNavigationOptions = {
