@@ -1,7 +1,5 @@
 export enum DefaultEventNames {
   accountSet = 'ACCOUNT_SET',
-  appLoaded = 'APP_LOADED',
-  appLoadTTIInMilliseconds = 'APP_LOAD_TTI_IN_MILLISECONDS',
   buttonPress = 'BUTTON_PRESS',
   componentMount = 'COMPONENT_MOUNT',
   componentUnmount = 'COMPONENT_UNMOUNT',

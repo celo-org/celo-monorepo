@@ -3,6 +3,7 @@ import Analytics, { Analytics as analytics } from '@segment/analytics-react-nati
 import Firebase from '@segment/analytics-react-native-firebase'
 import * as _ from 'lodash'
 import DeviceInfo from 'react-native-device-info'
+import * as Web3Utils from 'web3-utils'
 
 const TAG = 'CeloAnalytics'
 
@@ -73,6 +74,7 @@ class CeloAnalytics {
   readonly Logger: ReactNativeLogger
   readonly activeEvents: ActiveEvents = new Map()
   deviceInfo: any
+  sessionId: string
 
   constructor(
     appName: AnalyzedApps,
@@ -86,6 +88,7 @@ class CeloAnalytics {
     this.propertyPathWhiteList = propertyPathWhiteList
     this.apiKey = apiKey
     this.defaultTestnet = defaultTestnet
+    this.sessionId = ''
 
     if (!apiKey) {
       Logger.debug(TAG, 'Segment API Key not present, likely due to environment. Skipping enabling')
@@ -96,7 +99,13 @@ class CeloAnalytics {
     Logger.debug(TAG, 'Segment Analytics Integration initialized!')
 
     getDeviceInfo()
-      .then((res) => (this.deviceInfo = res))
+      .then((res) => {
+        this.deviceInfo = res
+        this.sessionId = Web3Utils.soliditySha3({
+          type: 'string',
+          value: res.SerialNumber || res.DeviceId,
+        })
+      })
       .catch((err) => Logger.error(TAG, 'getDeviceInfo error', err))
   }
 
@@ -117,6 +126,7 @@ class CeloAnalytics {
     }
 
     const props = this.getProps(eventProperties)
+    _.set(props, 'sessionId', this.sessionId)
     if (attachDeviceInfo) {
       _.set(props, 'device', this.deviceInfo)
     }

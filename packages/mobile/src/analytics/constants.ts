@@ -9,8 +9,10 @@ export enum CustomEventNames {
   blockChainCorruption = 'block_chain_corruption',
   disconnect_banner = 'disconnect_banner',
 
-  error_fallback = 'error_fallback',
+  // App
+  app_launched = 'app_launched', // measures length of time between App mounting and WalletHome rendering
   app_state_error = 'app_state_error',
+  error_fallback = 'error_fallback',
 
   // Education
   gold_cancel1 = 'gold_cancel1',
@@ -382,6 +384,7 @@ export enum PropertyPathWhitelist {
   selectedRecipientAddress = 'selectedRecipientAddress',
   selectedRecipientPhoneNumber = 'selectedRecipientPhoneNumber',
   sendAmount = 'sendAmount',
+  sessionId = 'sessionId',
   subtitle = 'subtitle',
   success = 'success',
   statusCode = 'statusCode',

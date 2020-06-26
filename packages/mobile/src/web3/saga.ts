@@ -216,6 +216,7 @@ export function* assignAccountFromPrivateKey(privateKey: string) {
     }
 
     Logger.debug(TAG + '@assignAccountFromPrivateKey', `Added to wallet: ${account}`)
+    CeloAnalytics.track(DefaultEventNames.accountSet)
     yield put(setAccount(account))
     yield put(setAccountCreationTime())
     yield call(assignDataKeyFromPrivateKey, privateKey)

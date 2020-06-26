@@ -52,18 +52,7 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 
 export class App extends React.Component {
   async componentDidMount() {
-    CeloAnalytics.track(DefaultEventNames.appLoaded, {}, true)
-    const appLoadedAt: Date = new Date()
-    const appStartListener = DeviceEventEmitter.addListener(
-      'AppStartedLoading',
-      (appInitializedAtString: string) => {
-        const appInitializedAt = new Date(appInitializedAtString)
-        const tti = appLoadedAt.getTime() - appInitializedAt.getTime()
-        CeloAnalytics.track(DefaultEventNames.appLoadTTIInMilliseconds, { tti }, true)
-        appStartListener.remove()
-      }
-    )
-
+    CeloAnalytics.startTracking(CustonEventNames.app_launched)
     Linking.addEventListener('url', this.handleOpenURL)
   }
 

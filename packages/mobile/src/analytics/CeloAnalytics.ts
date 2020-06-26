@@ -12,8 +12,11 @@ import Logger from 'src/utils/Logger'
 type EventNames = CustomEventNames | DefaultEventNames
 
 class WalletAnalytics extends CeloAnalytics {
+  sessionId: string
+
   constructor() {
     super(AnalyzedApps.Wallet, PropertyPathWhitelist, Logger, SEGMENT_API_KEY, DEFAULT_TESTNET)
+    this.sessionId = ''
   }
 
   isEnabled() {
