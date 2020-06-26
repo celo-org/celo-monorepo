@@ -112,4 +112,4 @@ First we will create the `assume-role` policy that allows ECS tasks to be assign
 
 1. Create the service using the task definition.
 
-    - [Service definition detail](./images/ffargate-service-definition.png)
+    - [Service definition detail](./images/fargate-service-definition.png)
