@@ -2,4 +2,4 @@ environment:
   name: default
 
 oracle:
-  replicas: 2
+  replicas: 1
