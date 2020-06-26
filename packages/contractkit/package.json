@@ -1,6 +1,6 @@
 {
   "name": "@celo/contractkit",
-  "version": "0.4.8-dev",
+  "version": "0.4.9-dev",
   "description": "Celo's ContractKit to interact with Celo network",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -30,7 +30,7 @@
     "@azure/identity": "^1.0.2",
     "@azure/keyvault-keys": "^4.0.2",
     "@azure/keyvault-secrets": "^4.0.2",
-    "@celo/utils": "0.1.16-dev",
+    "@celo/utils": "0.1.17-dev",
     "@ledgerhq/hw-app-eth": "^5.11.0",
     "@ledgerhq/hw-transport": "^5.11.0",
     "bignumber.js": "^9.0.0",
