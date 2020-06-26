@@ -1,5 +1,5 @@
 import threshold_bls from 'blind-threshold-bls'
-import { ErrorMessages } from '../common/error-utils'
+import { ErrorMessage } from '../common/error-utils'
 import logger from '../common/logger'
 import config from '../config'
 
@@ -32,7 +32,7 @@ export class BLSCryptographyClient {
         sigs.push(sigBuffer)
       } catch (e) {
         logger.error(
-          `${ErrorMessages.VERIFY_PARITAL_SIGNATURE_ERROR} 
+          `${ErrorMessage.VERIFY_PARITAL_SIGNATURE_ERROR} 
           Failed to verify signature for ${serviceResponse.url}`,
           e
         )
@@ -40,8 +40,8 @@ export class BLSCryptographyClient {
     }
     const threshold = config.thresholdSignature.threshold
     if (sigs.length < threshold) {
-      logger.error(`${ErrorMessages.NOT_ENOUGH_PARTIAL_SIGNATURES} ${sigs.length}/${threshold}`)
-      throw new Error(`${ErrorMessages.NOT_ENOUGH_PARTIAL_SIGNATURES} ${sigs.length}/${threshold}`)
+      logger.error(`${ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES} ${sigs.length}/${threshold}`)
+      throw new Error(`${ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES} ${sigs.length}/${threshold}`)
     }
     const result = threshold_bls.combine(threshold, flattenSigsArray(sigs))
     return Buffer.from(result).toString('base64')

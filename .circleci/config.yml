@@ -3,17 +3,17 @@
 
 version: 2.1
 reference:
-  workspace: &workspace ~/src
+  workspace: &workspace ~/app
   ## Configurations
   android_config: &android_config
     working_directory: *workspace
     macos:
-      xcode: "11.3.1"
+      xcode: "11.5.0"
     shell: /bin/bash --login -eo pipefail
     environment:
       TERM: dumb
       _JAVA_OPTIONS: '-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap'
-      GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true'
+      GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
 
 defaults: &defaults
   working_directory: ~/app
@@ -51,7 +51,7 @@ commands:
           keys:
             # Using a single cache key here as we don't want to fallback on restoring node_modules produced
             # by a different yarn.lock and patches
-            - node_modules-v3-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
+            - node_modules-v4-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
       - run:
           name: Extract cached node_modules (if present)
           command: |
@@ -108,7 +108,7 @@ commands:
             fi
       - save_cache:
           name: Save cached node_modules
-          key: node_modules-v3-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
+          key: node_modules-v4-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
           paths:
             - ~/.tmp/node_modules.tgz
 
@@ -180,50 +180,41 @@ jobs:
     resource_class: large
     steps:
       - checkout
-      - run: cd ~/src/
-      - restore_cache:
-          keys:
-            - yarn-v4-macos-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - yarn-v4-macos-{{ .Branch }}-
-            - yarn-v4-macos-
-            - yarn-v4-
-      - restore_cache:
-          keys:
-            - android-emulator-image-v3-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
+      - run: cd ~/app/
+
       - run:
-          name: Setup environment variables
+          name: set ANDROID_SDK_ROOT
           command: |
-            echo 'export PATH="$PATH:/usr/local/opt/node@8/bin:${HOME}/.yarn/bin:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin:/usr/local/share/android-sdk/tools/bin"' >> $BASH_ENV
-            echo 'export ANDROID_HOME="/usr/local/share/android-sdk"' >> $BASH_ENV
-            echo 'export ANDROID_SDK_HOME="/usr/local/share/android-sdk"' >> $BASH_ENV
-            echo 'export ANDROID_SDK_ROOT="/usr/local/share/android-sdk"' >> $BASH_ENV
-            echo 'export QEMU_AUDIO_DRV=none' >> $BASH_ENV
-            export PATH=$PATH:/usr/local/share/android-sdk/platform-tools/
+            echo 'export ANDROID_SDK_ROOT=$HOME/android-tools'  >> $BASH_ENV
+
+      - restore_cache:
+          key: android=tools-v1-{{ checksum "packages/mobile/scripts/install-android-tools.sh" }}-{{ arch }}
+
       - run:
-          name: Install Android sdk
+          name: install android tools
           command: |
-            HOMEBREW_NO_AUTO_UPDATE=1 brew tap homebrew/cask
-            HOMEBREW_NO_AUTO_UPDATE=1 brew cask install android-sdk
-      - run:
-          name: Install emulator dependencies
-          command: (yes | bash ./packages/mobile/scripts/install_android_emulator_image.sh > /dev/null) || true
+            sh packages/mobile/scripts/install-android-tools.sh
+            echo 'export PATH=$ANDROID_SDK_ROOT/tools/bin:$PATH'  >> $BASH_ENV
+            echo 'export PATH=$ANDROID_SDK_ROOT/tools:$PATH'  >> $BASH_ENV
+            echo 'export PATH=$ANDROID_SDK_ROOT/platform-tools:$PATH'  >> $BASH_ENV
+            echo 'export PATH=$ANDROID_SDK_ROOT/emulator:$PATH'  >> $BASH_ENV
+            source $BASH_ENV
+            sdkmanager --list
+
       - save_cache:
-          key: android-emulator-image-v3-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
+          key: android=tools-v1-{{ checksum "packages/mobile/scripts/install-android-tools.sh" }}-{{ arch }}
           paths:
-            - /usr/local/Caskroom/android-sdk/*
-      - run:
-          name: Install Android dependencies
-          command: |
-            HOMEBREW_NO_AUTO_UPDATE=1 brew install cask
-            HOMEBREW_NO_AUTO_UPDATE=1 brew cask install android-platform-tools
-            HOMEBREW_NO_AUTO_UPDATE=1 brew tap homebrew/cask-versions
-            HOMEBREW_NO_AUTO_UPDATE=1 brew cask install homebrew/cask-versions/adoptopenjdk8
+            - /Users/distiller/android-tools
+
       - run:
           name: Create Android Virtual Device (AVD)
           command: |
-            avdmanager create avd -n Nexus_5X_API_28_x86 -k "system-images;android-26;google_apis;x86" -g google_apis -d "Nexus 5"
+            avdmanager create avd --force --name Nexus_5X_API_28_x86 \
+              --package "system-images;android-29;google_apis;x86" \
+              --device "Nexus 5"
             # Copy device configuarion, adv for some reason doesn't
             mkdir -p ~/.android/avd/Nexus_5X_API_28_x86.avd/ && cp packages/mobile/e2e/conf/avd_conf.ini ~/.android/avd/Nexus_5X_API_28_x86.avd/config.ini
+
       - run:
           name: Set up nodejs
           command: |
@@ -239,51 +230,44 @@ jobs:
           name: install miscellaneous
           command: |
             HOMEBREW_NO_AUTO_UPDATE=1 brew install tree coreutils
-      # Currently not used
-      # - run: npm install --global react-native-kill-packager
+
+      - yarn_install
+
       - run:
-          # need to run this because it's another OS than install_dependencies job
-          name: yarn
+          name: Build mobile dependencies
           command: |
-            # TODO, Make cache work and figure out why this doesn't work
-            # if [ ! -d node_modules ]; then
-            #     echo "No cache found, install yarn. Hold tight."
-            #     yarn
-            # else
-            #   echo "Cache found, just run post-script."
-            #   yarn postinstall
-            # fi
-            yarn || yarn
+            set -euo pipefail
             yarn build \
               --scope @celo/mobile \
               --include-filtered-dependencies
-      - save_cache:
-          key: yarn-v4-macos-{{ .Branch }}-{{ checksum "yarn.lock" }}
-          paths:
-            - ~/src/node_modules
-            - ~/src/packages/*/node_modules
-            - ~/.cache/yarn
-      - run:
-          name: Install some extra dependencies the app needs
-          command: HOMEBREW_NO_AUTO_UPDATE=1 brew install pidcat watchman
+
       - restore_cache:
           key: yarn-v4-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}-{{ checksum "packages/mobile/.env.test" }}
+
+      # hack alert! the emulator complains about disk space and not sure how to increase it
       - run:
-          name: Make sure there's only one adb # This is probably a brew bug
-          command: cp /usr/local/share/android-sdk/platform-tools/adb /usr/local/bin/adb
+          name: Delete Simulators
+          command: sudo rm -rf /Library/Developer/CoreSimulator/Profiles/Runtimes/
+
+      - run:
+          name: Check for emulator acceleration
+          command: emulator -accel-check
+
       - run:
           name: Run e2e tests
           command: |
             set -euo pipefail
             cd packages/mobile
             yarn run test:e2e:android
+
       - store_artifacts:
           path: packages/mobile/e2e/artifacts
           destination: mobile/e2e/artifacts
+
       - save_cache:
           key: yarn-v4-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}-{{ checksum "packages/mobile/.env.test" }}
           paths:
-            - ~/src/packages/mobile/android/app/build/outputs/apk/
+            - ~/app/packages/mobile/android/app/build/outputs/apk/
             - ~/.gradle/
 
   end-to-end-mobile-test-ios:

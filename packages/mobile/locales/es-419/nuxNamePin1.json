@@ -1,5 +1,4 @@
 {
-  "chooseLanguage": "Elegir idioma",
   "continue": "Continuar",
   "welcomeCelo": "Te damos la bienvenida a Celo",
   "chooseCountryCode": "Código de país",
@@ -9,10 +8,9 @@
     "title": "Términos",
     "heading1": "Datos y Privacidad",
     "heading2": "Acerca de los Activos de Celo",
-    "privacy":
-      "Al unirte a esta red, nos das permiso para recopilar información anónima sobre cómo utilizas la aplicación. Además, si verificas tu número de teléfono, se almacenará una copia ofuscada en la Red de Celo. Más información en <0>celo.org/terms</0>",
+    "privacy": "Al unirte a esta red, nos das permiso para recopilar información anónima sobre cómo utilizas la aplicación. Además, si verificas tu número de teléfono, se almacenará una copia ofuscada en la Red de Celo. Más información en <0>celo.org/terms</0>",
     "goldDisclaimer": "Por favor ten en cuenta que cGld es un activo digital cuyo valor no está relacionado con el valor del oro físico. Tanto cUSD como cGld son parte de una nueva clase de activos y presentan riesgos de pérdidas finacieras. Considera cuidadosamente tu situación financiera y tu tolerancia a riesgos antes de comprar cGld o cUSD."
-    },
+  },
   "phoneNumber": "Número de teléfono",
   "fullName": "Nombre completo",
   "fullNamePlaceholder": "Nombre Apellido",
@@ -33,12 +31,10 @@
   "enableSystemScreenLockFailedMessage": "Error al intentar habilitar el bloqueo de pantalla",
   "initKeystoreFailureMessage": "Error al recuperar la clave",
   "pinLostForeverMessage": "Eliminaste el bloqueo de pantalla, el PIN se perdió",
-  "enableScreenLockMessage":
-    "Por favor habilitá el bloqueo de pantalla para usar Celo. Si deshabilitás el bloqueo de pantalla en el futuro, vas a necesitar tu clave de respaldo para acceder a tu cuenta",
+  "enableScreenLockMessage": "Por favor habilitá el bloqueo de pantalla para usar Celo. Si deshabilitás el bloqueo de pantalla en el futuro, vas a necesitar tu clave de respaldo para acceder a tu cuenta",
   "importContactsPermission": {
     "title": "Importar contactos",
-    "0":
-      "Conectar tu lista de contactos facilita el envío y la solicitud de pagos con tus amigos. De lo contrario, deberás ingresar tu información individualmente.",
+    "0": "Conectar tu lista de contactos facilita el envío y la solicitud de pagos con tus amigos. De lo contrario, deberás ingresar tu información individualmente.",
     "1": "No se preocupe: la conexión no envía invitaciones a sus contactos.",
     "enable": "Habilitar acceso a contactos",
     "loading": "Encontrar amigos usando Celo..."
