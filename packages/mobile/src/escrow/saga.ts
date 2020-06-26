@@ -1,6 +1,6 @@
 import { EscrowWrapper } from '@celo/contractkit/lib/wrappers/Escrow'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
-import { ensureLeading0x } from '@celo/utils/src/address'
+import { ensureLeading0x, trimLeading0x } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import { all, call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError, showErrorOrFallback } from 'src/alert/actions'
@@ -27,7 +27,6 @@ import { Actions as IdentityActions, SetVerificationStatusAction } from 'src/ide
 import { addressToE164NumberSelector } from 'src/identity/reducer'
 import { VerificationStatus } from 'src/identity/types'
 import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
-import { TEMP_PW } from 'src/invite/saga'
 import { isValidPrivateKey } from 'src/invite/utils'
 import { navigateHome } from 'src/navigator/NavigationService'
 import { RootState } from 'src/redux/reducers'
@@ -38,14 +37,8 @@ import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import { TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
-import {
-  addLocalAccount,
-  getContractKit,
-  getContractKitAsync,
-  web3ForUtils,
-} from 'src/web3/contracts'
+import { getContractKit, getContractKitAsync, web3ForUtils } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
-import { fornoSelector } from 'src/web3/selectors'
 import { estimateGas } from 'src/web3/utils'
 
 const TAG = 'escrow/saga'
@@ -120,22 +113,17 @@ function* withdrawFromEscrow() {
       contractKit.contracts.getEscrow,
     ])
     const account: string = yield call(getConnectedUnlockedAccount)
-    const tmpWalletPrivateKey: string = yield select(
+    const tmpWalletPrivateKey: string | null = yield select(
       (state: RootState) => state.invite.redeemedInviteCode
     )
 
-    if (!isValidPrivateKey(tmpWalletPrivateKey)) {
+    if (!tmpWalletPrivateKey || !isValidPrivateKey(tmpWalletPrivateKey)) {
       Logger.warn(TAG + '@withdrawFromEscrow', 'Invalid private key, skipping escrow withdrawal')
       return
     }
 
     const tempWalletAddress = contractKit.web3.eth.accounts.privateKeyToAccount(tmpWalletPrivateKey)
       .address
-    const fornoMode = yield select(fornoSelector)
-    if (fornoMode) {
-      addLocalAccount(tmpWalletPrivateKey)
-    }
-    Logger.debug(TAG + '@withdrawFromEscrow', 'Added temp account to wallet: ' + tempWalletAddress)
 
     // Check if there is a payment associated with this invite code
     const receivedPayment = yield call(getEscrowedPayment, escrow, tempWalletAddress)
@@ -145,24 +133,14 @@ function* withdrawFromEscrow() {
       return
     }
 
-    if (fornoMode) {
-      Logger.info(
-        TAG + '@withdrawFromEscrow',
-        'Forno mode is on, no need to unlock the temporary account'
-      )
-    } else {
-      // Unlock temporary account
-      yield call(contractKit.web3.eth.personal.unlockAccount, tempWalletAddress, TEMP_PW, 600)
-    }
-
     const msgHash = contractKit.web3.utils.soliditySha3({ type: 'address', value: account })
 
     Logger.debug(TAG + '@withdrawFromEscrow', `Signing message hash ${msgHash}`)
-    // using the temporary wallet account to sign a message. The message is the current account.
+    // use the temporary key to sign a message. The message is the current account.
     let signature: string = (yield contractKit.web3.eth.accounts.sign(msgHash, tmpWalletPrivateKey))
       .signature
     Logger.debug(TAG + '@withdrawFromEscrow', `Signed message hash signature is ${signature}`)
-    signature = signature.slice(2)
+    signature = trimLeading0x(signature)
     const r = `0x${signature.slice(0, 64)}`
     const s = `0x${signature.slice(64, 128)}`
     const v = contractKit.web3.utils.hexToNumber(ensureLeading0x(signature.slice(128, 130)))
