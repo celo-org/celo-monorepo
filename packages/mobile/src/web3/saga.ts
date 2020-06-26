@@ -84,7 +84,7 @@ export function* checkWeb3SyncProgress() {
       if (syncLoops * WEB3_MONITOR_DELAY > SWITCH_TO_FORNO_TIMEOUT) {
         if (yield select(promptFornoIfNeededSelector) && features.DATA_SAVER) {
           yield put(setPromptForno(false))
-          navigate(Screens.DataSaver, { promptModalVisible: true })
+          navigate(Screens.Settings, { promptFornoModal: true })
           return true
         }
       }

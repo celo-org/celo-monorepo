@@ -6,7 +6,7 @@ import { StyleSheet, View } from 'react-native'
 
 interface Props {
   children: React.ReactNode
-  onPress: () => void
+  onPress?: () => void
   disabled?: boolean
   testID?: string
 }
@@ -14,9 +14,13 @@ interface Props {
 export default function ListItem({ children, onPress, disabled, testID }: Props) {
   return (
     <View style={styles.container}>
-      <Touchable onPress={onPress} borderless={true} disabled={disabled} testID={testID}>
+      {onPress ? (
+        <Touchable onPress={onPress} borderless={true} disabled={disabled} testID={testID}>
+          <View style={styles.innerView}>{children}</View>
+        </Touchable>
+      ) : (
         <View style={styles.innerView}>{children}</View>
-      </Touchable>
+      )}
     </View>
   )
 }
