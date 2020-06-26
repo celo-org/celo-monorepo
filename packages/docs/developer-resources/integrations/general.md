@@ -41,6 +41,8 @@ Forno networks:
 Alfajores = 'https://alfajores-forno.celo-testnet.org'
 
 Baklava = 'https://baklava-forno.celo-testnet.org'
+
+Mainnet = 'https://rc1-forno.celo-testnet.org'
 ```
 
 ### Blockscout
@@ -51,6 +53,8 @@ We also expose data on the cLabs run blockscout instance. Blockscout itself expo
 Alfajores = 'https://alfajores-blockscout.celo-testnet.org'
 
 Baklava = 'https://baklava-blockscout.celo-testnet.org'
+
+Mainnet = 'https://explorer.celo.org/'
 ```
 
 
