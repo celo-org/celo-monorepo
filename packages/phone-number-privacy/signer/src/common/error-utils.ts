@@ -21,6 +21,7 @@ export enum WarningMessage {
 export type ErrorType = ErrorMessage | WarningMessage
 
 export function respondWithError(res: Response, statusCode: number, error: ErrorType) {
-  logger.error('Responding with error', error)
+  const loggerMethod = error in WarningMessage ? logger.warn : logger.error
+  loggerMethod('Responding with error', error)
   res.status(statusCode).json({ success: false, error })
 }
