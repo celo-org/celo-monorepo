@@ -54,6 +54,9 @@ export function getCachedPassword(account: string) {
 }
 
 export function setCachedPassword(account: string, password: string | null) {
+  if (!passwordCache[account]) {
+    passwordCache[account] = { timestamp: null, password: null }
+  }
   passwordCache[account].timestamp = Date.now()
   passwordCache[account].password = password
 }

@@ -9,7 +9,7 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { retrieveOrGeneratePepper } from 'src/pincode/authentication'
-import { retrieveStoredItem } from 'src/storage/keychain'
+import { retrieveStoredItem, storeItem } from 'src/storage/keychain'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'Backup/utils'
@@ -99,11 +99,15 @@ export function joinMnemonic(mnemonicShards: string[]) {
   return [...firstHalf.slice(0, firstHalf.length - 1), ...secondHalf.slice(1)].join(' ')
 }
 
+export async function storeMnemonic(mnemonic: string) {
+  const encryptedMnemonic = await encryptMnemonic(mnemonic)
+  return storeItem({ key: MNEMONIC_STORAGE_KEY, value: encryptedMnemonic })
+}
+
 export async function getStoredMnemonic(): Promise<string | null> {
   try {
     Logger.debug(TAG, 'Checking keystore for mnemonic')
     const encryptedMnemonic = await retrieveStoredItem(MNEMONIC_STORAGE_KEY)
-
     if (!encryptedMnemonic) {
       throw new Error('No mnemonic found in storage')
     }

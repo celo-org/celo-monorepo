@@ -13,7 +13,7 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
-import { getWordlist, MNEMONIC_STORAGE_KEY } from 'src/backup/utils'
+import { getWordlist, storeMnemonic } from 'src/backup/utils'
 import { features } from 'src/flags'
 import { cancelGethSaga } from 'src/geth/actions'
 import { UNLOCK_DURATION } from 'src/geth/consts'
@@ -28,7 +28,6 @@ import {
   storePasswordHash,
 } from 'src/pincode/authentication'
 import { setCachedPassword } from 'src/pincode/PasswordCache'
-import { storeItem } from 'src/storage/keychain'
 import Logger from 'src/utils/Logger'
 import {
   Actions,
@@ -185,7 +184,7 @@ export function* getOrCreateAccount() {
       throw new Error('Failed to assign account from private key')
     }
 
-    yield call(storeItem, { key: MNEMONIC_STORAGE_KEY, value: mnemonic })
+    yield storeMnemonic(mnemonic)
 
     return accountAddress
   } catch (error) {

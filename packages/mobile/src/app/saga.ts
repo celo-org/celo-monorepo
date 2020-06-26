@@ -20,10 +20,11 @@ import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { getPinCache } from 'src/pincode/PasswordCache'
+import { getCachedPassword } from 'src/pincode/PasswordCache'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { clockInSync } from 'src/utils/time'
+import { currentAccountSelector } from 'src/web3/selectors'
 import { parse } from 'url'
 
 const TAG = 'app/saga'
@@ -128,7 +129,8 @@ export function* handleSetAppState(action: SetAppState) {
   const appLocked = yield select(getAppLocked)
   const lastTimeBackgrounded = yield select(getLastTimeBackgrounded)
   const now = Date.now()
-  const cachedPin = getPinCache()
+  const account = yield select(currentAccountSelector)
+  const cachedPin = getCachedPassword(account)
   const lockWithPinEnabled = yield select(getLockWithPinEnabled)
   if (
     !cachedPin &&

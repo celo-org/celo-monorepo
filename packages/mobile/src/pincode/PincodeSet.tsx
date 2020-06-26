@@ -18,7 +18,7 @@ import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { isPinValid, storePasswordHash } from 'src/pincode/authentication'
-import { setPinCache } from 'src/pincode/PasswordCache'
+import { setCachedPin } from 'src/pincode/PasswordCache'
 import Pincode from 'src/pincode/Pincode'
 
 interface DispatchProps {
@@ -75,7 +75,7 @@ export class PincodeSet extends React.Component<Props, State> {
     if (this.isPin1Valid(pin1) && this.isPin2Valid(pin2)) {
       try {
         await storePasswordHash(this.state.pin1, '')
-        setPinCache(this.state.pin1)
+        setCachedPin(this.state.pin1)
         this.props.setPincode(PincodeType.CustomPin)
         this.props.navigation.navigate(Screens.EnterInviteCode)
       } catch (err) {

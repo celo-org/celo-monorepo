@@ -34,7 +34,7 @@ function PincodeLock() {
 
   function onCompletePin(enteredPin: string) {
     if (currentAccount) {
-      return checkPin(pin, currentAccount)
+      return checkPin(enteredPin, currentAccount)
         .then(onCorrectPin)
         .catch(onWrongPin)
     } else {
