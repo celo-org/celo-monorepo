@@ -123,23 +123,17 @@ async function initGeth() {
     }
 
     if (!(await ensureGenesisBlockWritten())) {
-      const transactionDuration = Date.now() - transactionStartTime
-      CeloAnalytics.track(CustomEventNames.geth_failed_genesis_block, { transactionDuration })
-      Logger.debug(
-        'Geth@newGeth',
-        'DEBUG ' + CustomEventNames.geth_failed_genesis_block,
-        transactionDuration.toString()
-      )
+      CeloAnalytics.track(CustomEventNames.geth_failed_genesis_block, {
+        transactionDuration: Date.now() - transactionStartTime,
+      })
+      Logger.debug('Geth@newGeth', 'DEBUG ' + CustomEventNames.geth_failed_genesis_block)
       throw FailedToFetchGenesisBlockError
     }
     if (!(await ensureStaticNodesInitialized())) {
-      const transactionDuration = Date.now() - transactionStartTime
-      CeloAnalytics.track(CustomEventNames.geth_failed_static_nodes, { transactionDuration })
-      Logger.debug(
-        'Geth@newGeth',
-        'DEBUG ' + CustomEventNames.geth_failed_static_nodes,
-        transactionDuration.toString()
-      )
+      CeloAnalytics.track(CustomEventNames.geth_failed_static_nodes, {
+        transactionDuration: Date.now() - transactionStartTime,
+      })
+      Logger.debug('Geth@newGeth', 'DEBUG ' + CustomEventNames.geth_failed_static_nodes)
       throw FailedToFetchStaticNodesError
     }
     const geth = await createNewGeth()
@@ -153,11 +147,7 @@ async function initGeth() {
       const transactionDuration = Date.now() - transactionStartTime
       if (errorType === ErrorType.GethAlreadyRunning) {
         CeloAnalytics.track(CustomEventNames.geth_error_already_running, { transactionDuration })
-        Logger.debug(
-          'Geth@newGeth',
-          'DEBUG ' + CustomEventNames.geth_error_already_running,
-          transactionDuration.toString()
-        )
+        Logger.debug('Geth@newGeth', 'DEBUG ' + CustomEventNames.geth_error_already_running)
         Logger.error('Geth@init/startInstance', 'Geth start reported geth already running')
         throw new Error('Geth already running, need to restart app')
       } else if (errorType === ErrorType.CorruptChainData) {
@@ -166,20 +156,12 @@ async function initGeth() {
           { transactionDuration },
           true
         )
-        Logger.debug(
-          'Geth@newGeth',
-          'DEBUG ' + CustomEventNames.geth_error_corrupt_chain,
-          transactionDuration.toString()
-        )
+        Logger.debug('Geth@newGeth', 'DEBUG ' + CustomEventNames.geth_error_corrupt_chain)
         Logger.warn('Geth@init/startInstance', 'Geth start reported chain data error')
         await attemptGethCorruptionFix(geth)
       } else {
-        CeloAnalytics.track(CustomEventNames.geth_error_unexpected, { transactionDuration }, true)
-        Logger.debug(
-          'Geth@newGeth',
-          'DEBUG ' + CustomEventNames.geth_error_unexpected,
-          transactionDuration.toString()
-        )
+        CeloAnalytics.track(CustomEventNames.geth_error_unexpected, { transactionDuration })
+        Logger.debug('Geth@newGeth', 'DEBUG ' + CustomEventNames.geth_error_unexpected)
         Logger.error('Geth@init/startInstance', 'Unexpected error starting geth', e)
         throw e
       }
