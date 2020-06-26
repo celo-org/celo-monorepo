@@ -1,4 +1,3 @@
-import { Transaction } from 'knex'
 import { ErrorMessage } from '../../common/error-utils'
 import logger from '../../common/logger'
 import { getDatabase } from '../database'
@@ -6,24 +5,6 @@ import { Account, ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from '../models/account'
 
 function accounts() {
   return getDatabase()<Account>(ACCOUNTS_TABLE)
-}
-
-/*
- * Returns how many queries the account has already performed.
- */
-export async function getPerformedQueryCount(account: string, trx: Transaction): Promise<number> {
-  logger.debug('Getting performed query count')
-  try {
-    const queryCounts = await trx(ACCOUNTS_TABLE)
-      .forUpdate()
-      .select(ACCOUNTS_COLUMNS.numLookups)
-      .where(ACCOUNTS_COLUMNS.address, account)
-      .first()
-    return queryCounts === undefined ? 0 : queryCounts[ACCOUNTS_COLUMNS.numLookups]
-  } catch (e) {
-    logger.error(ErrorMessage.DATABASE_GET_FAILURE, e)
-    return 0
-  }
 }
 
 async function getAccountExists(account: string): Promise<boolean> {
@@ -47,8 +28,8 @@ export async function getDidMatchmaking(account: string): Promise<boolean> {
     }
     return !!didMatchmaking[ACCOUNTS_COLUMNS.didMatchmaking]
   } catch (e) {
-    logger.error(ErrorMessage.DATABASE_GET_FAILURE, e)
-    return false
+    logger.error('Error getting matchmaking status', e)
+    throw new Error(ErrorMessage.DATABASE_GET_FAILURE)
   }
 }
 
@@ -68,18 +49,14 @@ export async function setDidMatchmaking(account: string) {
       return insertRecord(newAccount)
     }
   } catch (e) {
-    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE, e)
-    return true
+    logger.error('Error setting matchmaking status', e)
+    throw new Error(ErrorMessage.DATABASE_UPDATE_FAILURE)
   }
 }
 
 async function insertRecord(data: Account) {
-  try {
-    await accounts()
-      .insert(data)
-      .timeout(10000)
-  } catch (e) {
-    logger.error(ErrorMessage.DATABASE_INSERT_FAILURE, e)
-  }
+  await accounts()
+    .insert(data)
+    .timeout(10000)
   return true
 }

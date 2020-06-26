@@ -19,8 +19,8 @@ export async function getPerformedQueryCount(account: string): Promise<number> {
       .first()
     return queryCounts === undefined ? 0 : queryCounts[ACCOUNTS_COLUMNS.numLookups]
   } catch (e) {
-    logger.error(ErrorMessage.DATABASE_GET_FAILURE, e)
-    return 0
+    logger.error('Error fetching performed query count', e)
+    throw new Error(ErrorMessage.DATABASE_GET_FAILURE)
   }
 }
 
@@ -47,8 +47,8 @@ export async function incrementQueryCount(account: string) {
       return insertRecord(newAccount)
     }
   } catch (e) {
-    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE, e)
-    return true
+    logger.error('Error incrementing query count', e)
+    throw new Error(ErrorMessage.DATABASE_UPDATE_FAILURE)
   }
 }
 
@@ -66,8 +66,8 @@ export async function getDidMatchmaking(account: string): Promise<boolean> {
     }
     return !!didMatchmaking[ACCOUNTS_COLUMNS.didMatchmaking]
   } catch (e) {
-    logger.error(ErrorMessage.DATABASE_GET_FAILURE, e)
-    return false
+    logger.error('Error getting matchmaking status', e)
+    throw new Error(ErrorMessage.DATABASE_GET_FAILURE)
   }
 }
 
@@ -87,18 +87,14 @@ export async function setDidMatchmaking(account: string) {
       return insertRecord(newAccount)
     }
   } catch (e) {
-    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE, e)
-    return true
+    logger.error('Error setting matchmaking status', e)
+    throw new Error(ErrorMessage.DATABASE_UPDATE_FAILURE)
   }
 }
 
 async function insertRecord(data: Account) {
-  try {
-    await accounts()
-      .insert(data)
-      .timeout(10000)
-  } catch (e) {
-    logger.error(ErrorMessage.DATABASE_INSERT_FAILURE, e)
-  }
+  await accounts()
+    .insert(data)
+    .timeout(10000)
   return true
 }
