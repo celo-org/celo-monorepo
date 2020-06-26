@@ -7,14 +7,23 @@ import {
   DrawerContentComponentProps,
   DrawerContentOptions,
   DrawerContentScrollView,
-  DrawerItemList,
+  DrawerItem,
 } from '@react-navigation/drawer'
+import {
+  DrawerDescriptorMap,
+  DrawerNavigationHelpers,
+} from '@react-navigation/drawer/lib/typescript/src/types'
+import {
+  CommonActions,
+  DrawerActions,
+  DrawerNavigationState,
+  useLinkBuilder,
+} from '@react-navigation/native'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import deviceInfoModule from 'react-native-device-info'
-import Account from 'src/account/Account'
 import FiatExchange from 'src/account/FiatExchange'
 import GoldEducation from 'src/account/GoldEducation'
 import {
@@ -23,6 +32,7 @@ import {
   nameSelector,
   userContactDetailsSelector,
 } from 'src/account/selectors'
+import SettingsScreen from 'src/account/Settings'
 import Support from 'src/account/Support'
 import BackupIntroduction from 'src/backup/BackupIntroduction'
 import AccountNumber from 'src/components/AccountNumber'
@@ -36,12 +46,72 @@ import { Help } from 'src/icons/navigator/Help'
 import { Home } from 'src/icons/navigator/Home'
 import { Settings } from 'src/icons/navigator/Settings'
 import { useDollarsToLocalAmount, useLocalCurrencySymbol } from 'src/localCurrency/hooks'
+import { ensurePincode } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import useSelector from 'src/redux/useSelector'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
+import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
 
+const TAG = 'NavigationService'
+
 const Drawer = createDrawerNavigator()
+
+type CustomDrawerItemListProps = Omit<DrawerContentOptions, 'contentContainerStyle' | 'style'> & {
+  state: DrawerNavigationState
+  navigation: DrawerNavigationHelpers
+  descriptors: DrawerDescriptorMap
+  protectedRoutes: string[]
+}
+
+// This component has been taken from here:
+// https://github.com/react-navigation/react-navigation/blob/1aadc79fb89177a2fff2dcd791d67a3c880009d0/packages/drawer/src/views/DrawerItemList.tsx
+function CustomDrawerItemList({
+  state,
+  navigation,
+  descriptors,
+  itemStyle,
+  protectedRoutes,
+  ...passThroughProps
+}: CustomDrawerItemListProps) {
+  const buildLink = useLinkBuilder()
+
+  return (state.routes.map((route, i) => {
+    const focused = i === state.index
+    const { title, drawerLabel, drawerIcon } = descriptors[route.key].options
+    const navigateToItem = () => {
+      navigation.dispatch({
+        ...(focused ? DrawerActions.closeDrawer() : CommonActions.navigate(route.name)),
+        target: state.key,
+      })
+    }
+    const onPress = () => {
+      if (protectedRoutes.includes(route.name)) {
+        // Route should be protected by PIN code
+        ensurePincode()
+          .then(navigateToItem)
+          .catch((error) => {
+            Logger.error(`${TAG}@onPress`, 'PIN ensure error', error)
+          })
+      } else {
+        navigateToItem()
+      }
+    }
+
+    return (
+      <DrawerItem
+        {...passThroughProps}
+        key={route.key}
+        label={drawerLabel !== undefined ? drawerLabel : title !== undefined ? title : route.name}
+        icon={drawerIcon}
+        focused={focused}
+        style={itemStyle}
+        to={buildLink(route.name, route.params)}
+        onPress={onPress}
+      />
+    )
+  }) as React.ReactNode) as React.ReactElement
+}
 
 function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOptions>) {
   const displayName = useSelector(nameSelector)
@@ -74,7 +144,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
         )}`}</Text>
         <View style={styles.borderBottom} />
       </View>
-      <DrawerItemList {...props} />
+      <CustomDrawerItemList {...props} protectedRoutes={[Screens.BackupIntroduction]} />
       <View style={styles.drawerBottom}>
         <Text style={fontStyles.label}>Account No.</Text>
         <View style={styles.accountOuterContainer}>
@@ -128,7 +198,7 @@ export default function DrawerNavigator() {
       />
       <Drawer.Screen
         name={Screens.Settings}
-        component={Account}
+        component={SettingsScreen}
         options={{ title: t('settings'), drawerIcon: Settings }}
       />
       <Drawer.Screen

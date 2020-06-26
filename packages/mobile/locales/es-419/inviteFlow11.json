@@ -22,7 +22,7 @@
   "withdrawDollarsFromEscrow": "Retirando los {{dollars}} de tu cuenta...",
   "transferDollarsToAccount": "{{Dollars}} transferidos a tu cuenta!",
   "inviteFriendsToCelo": "Invitar amigos a Celo",
-  "inviteAnyone": "Invite a cualquiera en tu lista de contactos para enviar y recibir valor",
+  "inviteAnyone": "Invite a cualquier persona en su libreta de direcciones a enviar y recibir fondos",
   "inviteComplete": "Invitación completa",
   "inviteReceived": "Invitación recibida",
   "escrowPaymentNotificationTitle": "Invitado y pagado {{mobile}} (<3></3>)"

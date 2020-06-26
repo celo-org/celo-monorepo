@@ -4,16 +4,12 @@ import { createStackNavigator, TransitionPresets } from '@react-navigation/stack
 import * as React from 'react'
 import { Platform } from 'react-native'
 import SplashScreen from 'react-native-splash-screen'
-import Account from 'src/account/Account'
 import AccountKeyEducation from 'src/account/AccountKeyEducation'
-import Analytics from 'src/account/Analytics'
-import DataSaver from 'src/account/DataSaver'
-import EditProfile from 'src/account/EditProfile'
+import GoldEducation from 'src/account/GoldEducation'
 import InviteReview from 'src/account/InviteReview'
 import Licenses from 'src/account/Licenses'
 import Profile from 'src/account/Profile'
 import { PincodeType } from 'src/account/reducer'
-import Security from 'src/account/Security'
 import SupportContact from 'src/account/SupportContact'
 import { CustomEventNames } from 'src/analytics/constants'
 import AppLoading from 'src/app/AppLoading'
@@ -113,7 +109,7 @@ const commonScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen
         name={Screens.Language}
         component={Language}
-        options={headerWithBackButton}
+        options={Language.navigationOptions}
       />
       <Navigator.Screen
         name={Screens.PincodeEnter}
@@ -126,7 +122,6 @@ const commonScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen name={Screens.DappKitSignTxScreen} component={DappKitSignTxScreen} />
       <Navigator.Screen name={Screens.DappKitTxDataScreen} component={DappKitTxDataScreen} />
       <Navigator.Screen name={Screens.Debug} component={Debug} />
-      <Navigator.Screen name={Screens.DataSaver} component={DataSaver} />
       <Navigator.Screen
         name={Screens.PhoneNumberLookupQuota}
         component={PhoneNumberLookupQuotaScreen}
@@ -385,18 +380,6 @@ const backupScreens = (Navigator: typeof Stack) => (
 
 const settingsScreens = (Navigator: typeof Stack) => (
   <>
-    <Navigator.Screen options={noHeader} name={Screens.Account} component={Account} />
-    <Navigator.Screen options={headerWithBackButton} name={Screens.Security} component={Security} />
-    <Navigator.Screen
-      options={headerWithBackButton}
-      name={Screens.Analytics}
-      component={Analytics}
-    />
-    <Navigator.Screen
-      options={headerWithBackButton}
-      name={Screens.EditProfile}
-      component={EditProfile}
-    />
     <Navigator.Screen options={headerWithBackButton} name={Screens.Profile} component={Profile} />
     <Navigator.Screen
       options={headerWithBackButton}
@@ -452,6 +435,7 @@ const generalScreens = (Navigator: typeof Stack) => (
       component={TransactionReview}
       options={transactionReviewOptions}
     />
+    <Navigator.Screen name={Screens.GoldEducation} component={GoldEducation} options={noHeader} />
     <Navigator.Screen name={Screens.FeeEducation} component={FeeEducation} />
   </>
 )
