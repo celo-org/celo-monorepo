@@ -149,6 +149,7 @@
     "@graphql-codegen/typescript": "1.10.0",
     "@graphql-codegen/typescript-operations": "1.10.0",
     "@react-native-community/eslint-config": "^1.1.0",
+    "@types/crypto-js": "^3.1.47",
     "@types/ethereumjs-util": "^5.2.0",
     "@types/graphql": "^14.0.7",
     "@types/isomorphic-fetch": "^0.0.35",

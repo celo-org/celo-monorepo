@@ -6,6 +6,7 @@ import { call, put, spawn, takeLeading } from 'redux-saga/effects'
 import { setBackupCompleted } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { encryptMnemonic, MNEMONIC_STORAGE_KEY } from 'src/backup/utils'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
 import {
@@ -18,8 +19,8 @@ import {
 import { redeemInviteSuccess } from 'src/invite/actions'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { storeItem } from 'src/storage/keychain'
 import { fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
-import { setKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
 import { assignAccountFromPrivateKey, waitWeb3LastBlock } from 'src/web3/saga'
@@ -71,7 +72,8 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
     }
 
     // Set key in phone's secure store
-    yield call(setKey, 'mnemonic', phrase)
+    const encryptedMnemonic = yield call(encryptMnemonic, phrase)
+    yield call(storeItem, { key: MNEMONIC_STORAGE_KEY, value: encryptedMnemonic })
     // Set backup complete so user isn't prompted to do backup flow
     yield put(setBackupCompleted())
     // Set redeem invite complete so user isn't brought back into nux flow

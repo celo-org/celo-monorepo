@@ -7,14 +7,13 @@ import * as bip39 from 'react-native-bip39'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { setAccountCreationTime, setPromptForno } from 'src/account/actions'
-import { getPincode } from 'src/account/saga'
 import { promptFornoIfNeededSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
-import { getWordlist } from 'src/backup/utils'
+import { getWordlist, MNEMONIC_STORAGE_KEY } from 'src/backup/utils'
 import { features } from 'src/flags'
 import { cancelGethSaga } from 'src/geth/actions'
 import { UNLOCK_DURATION } from 'src/geth/consts'
@@ -22,9 +21,14 @@ import { deleteChainData, stopGethIfInitialized } from 'src/geth/geth'
 import { gethSaga, waitForGethConnectivity } from 'src/geth/saga'
 import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { passwordForPin, storePasswordHash } from 'src/pincode/authentication'
-import { setPinCache } from 'src/pincode/PasswordCache'
-import { setKey } from 'src/utils/keyStore'
+import {
+  getPassword,
+  getPincode,
+  passwordForPin,
+  storePasswordHash,
+} from 'src/pincode/authentication'
+import { setCachedPassword } from 'src/pincode/PasswordCache'
+import { storeItem } from 'src/storage/keychain'
 import Logger from 'src/utils/Logger'
 import {
   Actions,
@@ -181,7 +185,7 @@ export function* getOrCreateAccount() {
       throw new Error('Failed to assign account from private key')
     }
 
-    yield call(setKey, 'mnemonic', mnemonic)
+    yield call(storeItem, { key: MNEMONIC_STORAGE_KEY, value: mnemonic })
 
     return accountAddress
   } catch (error) {
@@ -208,6 +212,7 @@ export function* assignAccountFromPrivateKey(privateKey: string) {
     try {
       yield call([wallet, wallet.addAccount], privateKey, password)
       yield call(storePasswordHash, pin, account)
+      setCachedPassword(account, password)
     } catch (e) {
       if (e === RpcWalletErrors.AccountAlreadyExists) {
         Logger.warn(TAG + '@assignAccountFromPrivateKey', 'Attempted to import same account')
@@ -263,14 +268,13 @@ export function* unlockAccount(account: string) {
   }
 
   try {
-    const pin = yield call(getPincode, true)
-    const password: string = yield call(passwordForPin, pin)
+    const password: string = yield call(getPassword, account, true)
     yield call([wallet, wallet.unlockAccount], account, password, UNLOCK_DURATION)
-    setPinCache(pin)
+    setCachedPassword(account, password)
     Logger.debug(TAG + '@unlockAccount', `Account unlocked: ${account}`)
     return true
   } catch (error) {
-    setPinCache(null)
+    setCachedPassword(account, null)
     Logger.error(TAG + '@unlockAccount', 'account unlock failed', error)
     return false
   }

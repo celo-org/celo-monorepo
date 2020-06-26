@@ -7,4 +7,4 @@ const keychainMock = {
   resetGenericPassword: jest.fn(),
 }
 
-export default keychainMocka
+export default keychainMock

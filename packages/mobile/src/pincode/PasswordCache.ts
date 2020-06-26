@@ -1,37 +1,59 @@
 const PIN_TIMEOUT = 300000 // 5 minutes
 
-let pinCache: string | null = null
-
 interface PasswordCache {
   [account: string]: {
     timestamp: number | null
     password: string | null
   }
 }
+let pinCache: string | null = null
+let cachedPepper: string | null = null
 
-export function setPinCache(pin: string | null) {
-  pinCache = pin
-}
+const cachedPasswordHashes: {
+  [account: string]: string
+} = {}
 
-export function getPinCache() {
+const passwordCache: PasswordCache = {}
+
+export function getCachedPin() {
   return pinCache
 }
 
-const passwordCache: PasswordCache = {}
+export function setCachedPin(pin: string | null) {
+  pinCache = pin
+}
+
+export function getCachedPepper() {
+  return cachedPepper
+}
+
+export function setCachedPepper(pepper: string | null) {
+  cachedPepper = pepper
+}
+
+export function getCachedPasswordHash(account: string) {
+  return cachedPasswordHashes[account]
+}
+
+export function setCachedPasswordHash(account: string, passwordHash: string) {
+  cachedPasswordHashes[account] = passwordHash
+}
 
 export function getCachedPassword(account: string) {
   // TODO(Rossy) use a monotonic clock here
   if (
-    passwordCache.password &&
-    passwordCache.timestamp &&
-    Date.now() - passwordCache.timestamp < PIN_TIMEOUT
+    passwordCache[account] &&
+    passwordCache[account].password &&
+    passwordCache[account].timestamp
   ) {
-    return passwordCache.password
+    if (Date.now() - (passwordCache[account].timestamp as number) < PIN_TIMEOUT) {
+      return passwordCache[account].password
+    }
   }
   return null
 }
 
-export function setCachedPassword(password: string | null, account: string) {
-  passwordCache.timestamp = Date.now()
-  passwordCache.password = password
+export function setCachedPassword(account: string, password: string | null) {
+  passwordCache[account].timestamp = Date.now()
+  passwordCache[account].password = password
 }

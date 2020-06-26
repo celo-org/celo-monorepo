@@ -1,4 +1,5 @@
 import { generateMnemonic, MnemonicLanguages, MnemonicStrength } from '@celo/utils/src/account'
+import CryptoJS from 'crypto-js'
 import * as _ from 'lodash'
 import { useAsync } from 'react-async-hook'
 import * as bip39 from 'react-native-bip39'
@@ -7,7 +8,8 @@ import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { getKey } from 'src/utils/keyStore'
+import { retrieveOrGeneratePepper } from 'src/pincode/authentication'
+import { retrieveStoredItem } from 'src/storage/keychain'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'Backup/utils'
@@ -15,6 +17,8 @@ const TAG = 'Backup/utils'
 export const DAYS_TO_BACKUP = 1
 export const DAYS_TO_DELAY = 1 / 24 // 1 hour delay
 export const MNEMONIC_SPLITTER = 'celo'
+
+export const MNEMONIC_STORAGE_KEY = 'mnemonic'
 
 export async function createQuizWordList(mnemonic: string, language: string | null) {
   const disallowedWordSet = new Set(mnemonic.split(' '))
@@ -98,13 +102,13 @@ export function joinMnemonic(mnemonicShards: string[]) {
 export async function getStoredMnemonic(): Promise<string | null> {
   try {
     Logger.debug(TAG, 'Checking keystore for mnemonic')
-    const mnemonic = await getKey('mnemonic')
+    const encryptedMnemonic = await retrieveStoredItem(MNEMONIC_STORAGE_KEY)
 
-    if (!mnemonic) {
+    if (!encryptedMnemonic) {
       throw new Error('No mnemonic found in storage')
     }
 
-    return mnemonic
+    return decryptMnemonic(encryptedMnemonic)
   } catch (error) {
     CeloAnalytics.track(CustomEventNames.failed_to_retrieve_mnemonic, { error: error.message })
     Logger.error(TAG, 'Failed to retrieve mnemonic', error)
@@ -161,4 +165,15 @@ export function isValidBackupPhrase(phrase: string) {
 
 export function isValidSocialBackupPhrase(phrase: string) {
   return isValidMnemonic(phrase, 13)
+}
+
+export async function encryptMnemonic(phrase: string) {
+  const pepper = await retrieveOrGeneratePepper()
+  return CryptoJS.AES.encrypt(phrase, pepper).toString()
+}
+
+export async function decryptMnemonic(encryptedMnemonic: string) {
+  const pepper = await retrieveOrGeneratePepper()
+  const bytes = CryptoJS.AES.decrypt(encryptedMnemonic, pepper)
+  return bytes.toString(CryptoJS.enc.Utf8)
 }
