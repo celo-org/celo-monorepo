@@ -1,5 +1,7 @@
 import dotProp from 'dot-prop-immutable'
 import { RehydrateAction } from 'redux-persist'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import { Actions, ActionTypes } from 'src/identity/actions'
 import { ContactMatches, ImportContactsStatus, VerificationStatus } from 'src/identity/types'
 import { AttestationCode } from 'src/identity/verification'
@@ -176,9 +178,13 @@ export const reducer = (
         askedContactsPermission: true,
       }
     case Actions.ADD_CONTACT_MATCHES:
+      const matchedContacts = { ...state.matchedContacts, ...action.matches }
+      CeloAnalytics.track(CustomEventNames.add_contact_match, {
+        contactsMatched: Object.keys(matchedContacts).length,
+      })
       return {
         ...state,
-        matchedContacts: { ...state.matchedContacts, ...action.matches },
+        matchedContacts,
       }
     case Actions.VALIDATE_RECIPIENT_ADDRESS:
       return {
@@ -241,3 +247,6 @@ export const addressToE164NumberSelector = (state: RootState) => state.identity.
 export const e164NumberToSaltSelector = (state: RootState) => state.identity.e164NumberToSalt
 export const secureSendPhoneNumberMappingSelector = (state: RootState) =>
   state.identity.secureSendPhoneNumberMapping
+export const importContactsProgressSelector = (state: RootState) =>
+  state.identity.importContactsProgress
+export const matchedContactsSelector = (state: RootState) => state.identity.matchedContacts

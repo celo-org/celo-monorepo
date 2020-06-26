@@ -253,7 +253,7 @@ export class SendConfirmation extends React.Component<Props, State> {
       confirmationInput,
       validatedRecipientAddress,
     } = this.props
-    const { amount, recipient, recipientAddress, type } = confirmationInput
+    const { amount, recipient, recipientAddress, type, reason } = confirmationInput
 
     const fee = getFeeDollars(asyncFee.result)
     const amountWithFee = amount.plus(fee || 0)
@@ -278,16 +278,19 @@ export class SendConfirmation extends React.Component<Props, State> {
     } else {
       primaryBtnInfo = {
         action: this.onSendClick,
-        text: t('send'),
+        text: t('global:send'),
         disabled: isPrimaryButtonDisabled,
       }
     }
+
+    const paymentRequestComment = reason || ''
 
     const renderFeeContainer = () => {
       // 'fee' already contains the invitation fee for invites
       // so we adjust it here
       const securityFee = isInvite && fee ? fee.minus(inviteFee) : fee
 
+      CeloAnalytics.track(CustomEventNames.fee_rendered, { feeType: 'Security', fee: securityFee })
       const totalAmount = {
         value: amountWithFee,
         currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
@@ -352,12 +355,18 @@ export class SendConfirmation extends React.Component<Props, State> {
               style={styles.amount}
               amount={subtotalAmount}
             />
-            <CommentTextInput
-              testID={'send'}
-              onCommentChange={this.onCommentChange}
-              comment={this.state.comment}
-              onBlur={this.onBlur}
-            />
+            {type === TokenTransactionType.PayRequest ? (
+              <View>
+                <Text style={styles.paymentRequestComment}>{paymentRequestComment}</Text>
+              </View>
+            ) : (
+              <CommentTextInput
+                testID={'send'}
+                onCommentChange={this.onCommentChange}
+                comment={this.state.comment}
+                onBlur={this.onBlur}
+              />
+            )}
           </View>
           <InviteOptionsModal
             isVisible={this.state.modalVisible}
@@ -440,9 +449,13 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     ...fontStyles.largeNumber,
   },
+  paymentRequestComment: {
+    ...fontStyles.large,
+    color: colors.gray5,
+  },
 })
 
 export default connect<StateProps, DispatchProps, OwnProps, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.sendFlow7)(SendConfirmation))
+)(withTranslation<Props>(Namespaces.sendFlow7)(SendConfirmation))

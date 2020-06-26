@@ -95,4 +95,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withTranslation(Namespaces.walletFlow5)(NoActivity)
+export default withTranslation<Props>(Namespaces.walletFlow5)(NoActivity)

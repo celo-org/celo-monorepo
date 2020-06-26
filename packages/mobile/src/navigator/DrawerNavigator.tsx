@@ -17,7 +17,6 @@ import deviceInfoModule from 'react-native-device-info'
 import Account from 'src/account/Account'
 import FiatExchange from 'src/account/FiatExchange'
 import GoldEducation from 'src/account/GoldEducation'
-import { default as InviteScreen } from 'src/account/Invite'
 import {
   defaultCountryCodeSelector,
   e164NumberSelector,
@@ -26,6 +25,7 @@ import {
 } from 'src/account/selectors'
 import Support from 'src/account/Support'
 import BackupIntroduction from 'src/backup/BackupIntroduction'
+import AccountNumber from 'src/components/AccountNumber'
 import ExchangeHomeScreen from 'src/exchange/ExchangeHomeScreen'
 import WalletHome from 'src/home/WalletHome'
 import { Namespaces } from 'src/i18n'
@@ -34,7 +34,6 @@ import { AddWithdraw } from 'src/icons/navigator/AddWithdraw'
 import { Gold } from 'src/icons/navigator/Gold'
 import { Help } from 'src/icons/navigator/Help'
 import { Home } from 'src/icons/navigator/Home'
-import { Invite } from 'src/icons/navigator/Invite'
 import { Settings } from 'src/icons/navigator/Settings'
 import { useDollarsToLocalAmount, useLocalCurrencySymbol } from 'src/localCurrency/hooks'
 import { Screens } from 'src/navigator/Screens'
@@ -79,16 +78,8 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
       <View style={styles.drawerBottom}>
         <Text style={fontStyles.label}>Account No.</Text>
         <View style={styles.accountOuterContainer}>
-          <Text style={styles.smallLabel}>0x</Text>
           <View style={styles.accountInnerContainer}>
-            <Text style={styles.smallLabel}>{`${account?.slice(2, 6)} ${account?.slice(
-              6,
-              10
-            )} ${account?.slice(10, 14)} ${account?.slice(14, 18)}`}</Text>
-            <Text style={styles.smallLabel}>{`${account?.slice(18, 22)} ${account?.slice(
-              22,
-              26
-            )} ${account?.slice(26, 30)} ${account?.slice(30, 34)}`}</Text>
+            <AccountNumber address={account || ''} />
           </View>
         </View>
         <Text style={styles.smallLabel}>{`Version ${appVersion}`}</Text>
@@ -136,11 +127,6 @@ export default function DrawerNavigator() {
         options={{ title: t('addAndWithdraw'), drawerIcon: AddWithdraw }}
       />
       <Drawer.Screen
-        name={Screens.Invite}
-        component={InviteScreen}
-        options={{ title: t('invite'), drawerIcon: Invite }}
-      />
-      <Drawer.Screen
         name={Screens.Settings}
         component={Account}
         options={{ title: t('settings'), drawerIcon: Settings }}
@@ -162,7 +148,7 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   nameLabel: {
-    ...fontStyles.large600,
+    ...fontStyles.displayName,
     marginTop: 8,
   },
   border: {

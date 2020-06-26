@@ -1,8 +1,16 @@
-import { AccountAuthRequest, CURRENCY_ENUM, SignTxRequest, TxToSignParam } from '@celo/utils'
+import {
+  AccountAuthRequest,
+  Countries,
+  CURRENCY_ENUM,
+  SignTxRequest,
+  TxToSignParam,
+} from '@celo/utils'
 import BigNumber from 'bignumber.js'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { ExchangeConfirmationCardProps } from 'src/exchange/ExchangeConfirmationCard'
 import { AddressValidationType } from 'src/identity/reducer'
+import { ImportContactsStatus } from 'src/identity/types'
+import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { Screens } from 'src/navigator/Screens'
 import { Recipient } from 'src/recipients/recipient'
 import { TransactionDataInput } from 'src/send/SendAmount'
@@ -21,7 +29,11 @@ export type StackParamList = {
   [Screens.Account]: undefined
   [Screens.Analytics]: undefined
   [Screens.BackupComplete]: undefined
-  [Screens.BackupIntroduction]: undefined
+  [Screens.BackupIntroduction]:
+    | {
+        fromAccountScreen?: boolean
+      }
+    | undefined
   [Screens.AccountKeyEducation]:
     | undefined
     | {
@@ -72,6 +84,16 @@ export type StackParamList = {
   [Screens.FeeEducation]: undefined
   [Screens.FeeExchangeEducation]: undefined
   [Screens.FiatExchange]: undefined
+  [Screens.FiatExchangeAmount]: {
+    isAddFunds: boolean
+  }
+  [Screens.FiatExchangeOptions]: {
+    isAddFunds: boolean
+    amount: BigNumber
+    currencyCode: LocalCurrencyCode
+    isExplanationOpen?: boolean
+  }
+  [Screens.MoonPay]: undefined
   [Screens.GoldEducation]: undefined
   [Screens.ImportWallet]:
     | {
@@ -82,17 +104,25 @@ export type StackParamList = {
     backupPhrase: string
   }
   [Screens.ImportWalletSocial]: undefined
-  [Screens.ImportContacts]: undefined
+  [Screens.ImportContacts]:
+    | undefined
+    | {
+        onPressSkip?: () => void
+        importStatus?: ImportContactsStatus
+      }
   [Screens.IncomingPaymentRequestListScreen]: undefined
   [Screens.Invite]: undefined
   [Screens.InviteReview]: {
     recipient: Recipient
   }
-  [Screens.JoinCelo]: undefined
-  [Screens.Language]: {
-    nextScreen?: keyof StackParamList
-  }
+  [Screens.JoinCelo]: { selectedCountryCodeAlpha2: string } | undefined
+  [Screens.Language]:
+    | {
+        nextScreen: keyof StackParamList | 'GO_BACK'
+      }
+    | undefined
   [Screens.Licenses]: undefined
+  [Screens.Main]: undefined
   [Screens.OutgoingPaymentRequestListScreen]: undefined
   [Screens.PaymentRequestUnavailable]: {
     transactionData: TransactionDataInput
@@ -101,12 +131,11 @@ export type StackParamList = {
     transactionData: TransactionDataInput
     addressJustValidated?: boolean
   }
-  [Screens.PincodeEducation]: undefined
   [Screens.PincodeEnter]: {
     withVerification?: boolean
     onSuccess: (pin: string) => void
   }
-  [Screens.PincodeSet]: undefined
+  [Screens.PincodeSet]: { isVerifying: boolean } | undefined
   [Screens.PhoneNumberLookupQuota]: {
     onBuy: () => void
     onSkip: () => void
@@ -120,6 +149,10 @@ export type StackParamList = {
   }
   [Screens.RegulatoryTerms]: undefined
   [Screens.Security]: undefined
+  [Screens.SelectCountry]: {
+    countries: Countries
+    selectedCountryCodeAlpha2: string
+  }
   [Screens.SelectLocalCurrency]: undefined
   [Screens.Send]:
     | {
@@ -158,10 +191,9 @@ export type StackParamList = {
     isPaymentRequest?: true
     isFromScan?: boolean
   }
-  [Screens.VerificationEducationScreen]: undefined
-  [Screens.VerificationInputScreen]: undefined
+  [Screens.VerificationEducationScreen]: { showSkipDialog: boolean } | undefined
+  [Screens.VerificationInputScreen]: { showHelpDialog: boolean } | undefined
   [Screens.VerificationInterstitialScreen]: undefined
-  [Screens.VerificationLearnMoreScreen]: undefined
   [Screens.VerificationLoadingScreen]: undefined
   [Screens.OnboardingSuccessScreen]: undefined
   [Screens.WalletHome]: undefined

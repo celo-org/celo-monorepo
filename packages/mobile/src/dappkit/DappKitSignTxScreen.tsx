@@ -177,4 +177,4 @@ const styles = StyleSheet.create({
 export default connect<null, DispatchProps>(
   null,
   mapDispatchToProps
-)(withTranslation(Namespaces.dappkit)(DappKitSignTxScreen))
+)(withTranslation<Props>(Namespaces.dappkit)(DappKitSignTxScreen))

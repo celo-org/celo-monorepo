@@ -7,6 +7,7 @@ import RNGeth from 'react-native-geth'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { DEFAULT_TESTNET } from 'src/config'
+import { SYNCING_MAX_PEERS } from 'src/geth/consts'
 import networkConfig from 'src/geth/networkConfig'
 import Logger from 'src/utils/Logger'
 import FirebaseLogUploader from 'src/utils/LogUploader'
@@ -75,7 +76,7 @@ function getFolder(filePath: string) {
   return filePath.substr(0, filePath.lastIndexOf('/'))
 }
 
-async function createNewGeth(): Promise<typeof RNGeth> {
+async function createNewGeth(sync: boolean = true): Promise<typeof RNGeth> {
   Logger.debug('Geth@newGeth', 'Configure and create new Geth')
   const { nodeDir, syncMode } = networkConfig
   const genesis: string = await readGenesisBlockFile(nodeDir)
@@ -83,11 +84,14 @@ async function createNewGeth(): Promise<typeof RNGeth> {
 
   Logger.debug('Geth@newGeth', `Network ID is ${networkID}, syncMode is ${syncMode}`)
 
+  const maxPeers = sync ? SYNCING_MAX_PEERS : 0
+
   const gethOptions: any = {
     nodeDir,
     networkID,
     genesis,
     syncMode,
+    maxPeers,
     useLightweightKDF: true,
     ipcPath: IPC_PATH,
   }
@@ -106,8 +110,8 @@ async function createNewGeth(): Promise<typeof RNGeth> {
   return new RNGeth(gethOptions)
 }
 
-async function initGeth() {
-  Logger.info('Geth@init', 'Create a new Geth instance')
+async function initGeth(sync: boolean = true) {
+  Logger.info('Geth@init', `Create a new Geth instance with sync=${sync}`)
 
   if (gethLock) {
     Logger.warn('Geth@init', 'Geth create already in progress.')
@@ -129,15 +133,16 @@ async function initGeth() {
       Logger.debug('Geth@newGeth', 'DEBUG ' + CustomEventNames.geth_failed_genesis_block)
       throw FailedToFetchGenesisBlockError
     }
-    if (!(await ensureStaticNodesInitialized())) {
+
+    if (!(await ensureStaticNodesInitialized(sync))) {
       CeloAnalytics.track(CustomEventNames.geth_failed_static_nodes, {
         transactionDuration: Date.now() - transactionStartTime,
       })
       Logger.debug('Geth@newGeth', 'DEBUG ' + CustomEventNames.geth_failed_static_nodes)
       throw FailedToFetchStaticNodesError
     }
-    const geth = await createNewGeth()
 
+    const geth = await createNewGeth(sync)
     try {
       await geth.start()
       gethInstance = geth
@@ -171,38 +176,33 @@ async function initGeth() {
   }
 }
 
-export async function getGeth(): Promise<typeof gethInstance> {
+export async function getGeth(sync: boolean = true): Promise<typeof gethInstance> {
   Logger.debug('Geth@getGeth', 'Getting Geth Instance')
   if (!gethInstance) {
-    await initGeth()
+    await initGeth(sync)
   }
   return gethInstance
 }
 
-async function ensureStaticNodesInitialized(): Promise<boolean> {
+async function ensureStaticNodesInitialized(sync: boolean = true): Promise<boolean> {
   const { nodeDir } = networkConfig
-  if (await staticNodesAlreadyInitialized(nodeDir)) {
-    Logger.debug('Geth@maybeInitStaticNodes', 'static nodes already initialized')
-    return true
-  } else {
-    Logger.debug('Geth@maybeInitStaticNodes', 'initializing static nodes')
-    let enodes: string | null = null
-    try {
-      enodes = await StaticNodeUtils.getStaticNodesAsync(DEFAULT_TESTNET)
-    } catch (error) {
-      Logger.error(
-        `Failed to get static nodes for network ${DEFAULT_TESTNET},` +
-          `the node will not be able to sync with the network till restart`,
-        error
-      )
-      return false
-    }
-    if (enodes != null) {
-      await writeStaticNodes(nodeDir, enodes)
-      return true
-    }
+  Logger.debug('Geth@ensureStaticNodesInitialized', 'initializing static nodes')
+  let enodes: string | null = null
+  try {
+    enodes = sync ? await StaticNodeUtils.getStaticNodesAsync(DEFAULT_TESTNET) : '[]'
+  } catch (error) {
+    Logger.error(
+      `Failed to get static nodes for network ${DEFAULT_TESTNET},` +
+        `the node will not be able to sync with the network till restart`,
+      error
+    )
     return false
   }
+  if (enodes != null) {
+    await writeStaticNodes(nodeDir, enodes)
+    return true
+  }
+  return false
 }
 
 export async function stopGethIfInitialized() {
@@ -271,19 +271,6 @@ async function writeGenesisBlock(nodeDir: string, genesisBlock: string) {
 
 function getStaticNodesFile(nodeDir: string) {
   return `${getNodeInstancePath(nodeDir)}/static-nodes.json`
-}
-
-/**
- * Returns true if the static nodes files in the Geth data dir has been initialized, false otherwise.
- * @param nodeDir Geth data dir
- */
-async function staticNodesAlreadyInitialized(nodeDir: string): Promise<boolean> {
-  const staticNodesFile = getStaticNodesFile(nodeDir)
-  if (!(await RNFS.exists(staticNodesFile))) {
-    return false
-  }
-  const fileStat: RNFS.StatResult = await RNFS.stat(staticNodesFile)
-  return fileStat.isFile() && new BigNumber(fileStat.size, 10).isGreaterThan(0)
 }
 
 async function writeStaticNodes(nodeDir: string, enodes: string) {

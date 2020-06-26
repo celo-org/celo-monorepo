@@ -47,4 +47,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withTranslation(Namespaces.global)(CancelButton)
+export default withTranslation<Props>(Namespaces.global)(CancelButton)

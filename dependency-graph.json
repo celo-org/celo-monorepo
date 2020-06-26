@@ -3,7 +3,6 @@
     "location": "packages/attestation-service",
     "dependencies": [
       "@celo/contractkit",
-      "@celo/protocol",
       "@celo/utils"
     ]
   },
@@ -63,12 +62,6 @@
     "dependencies": [
       "@celo/contractkit",
       "@celo/utils"
-    ]
-  },
-  "@celo/leaderboard": {
-    "location": "packages/leaderboard",
-    "dependencies": [
-      "@celo/contractkit"
     ]
   },
   "@celo/metadata-crawler": {

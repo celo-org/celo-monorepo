@@ -1,4 +1,5 @@
 FROM node:10
+
 WORKDIR /celo-phone-number-privacy/
 
 COPY packages/phone-number-privacy/signer signer

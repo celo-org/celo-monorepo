@@ -92,10 +92,10 @@ if [ $PLATFORM = "android" ]; then
     echo "FULLCMD: $OSASCRIPT_CMD"
     osascript -e "$OSASCRIPT_CMD"
     # Run android without packager because RN cli doesn't work with yarn workspaces
-    yarn react-native run-android --appIdSuffix "debug" --no-packager
+    yarn react-native run-android --appId $APP_BUNDLE_ID --no-packager
   else 
     # Run android without packager because RN cli doesn't work with yarn workspaces
-    yarn react-native run-android --appIdSuffix "debug" --no-packager
+    yarn react-native run-android --appId $APP_BUNDLE_ID --no-packager
     yarn react-native start 
   fi
 

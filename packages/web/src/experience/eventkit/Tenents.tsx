@@ -11,15 +11,10 @@ import embodyHumilityImg from 'src/experience/eventkit/content/tenents/embodying
 import innovatingOnMoneyImg from 'src/experience/eventkit/content/tenents/innovating-on-money.png'
 import strivingForBeautyImg from 'src/experience/eventkit/content/tenents/striving-for-beauty.png'
 
+import Markdown, { Attributes } from 'src/experience/Markdown'
 import { H3 } from 'src/fonts/Fonts'
 import AspectRatio from 'src/shared/AspectRatio'
 import { fonts, standardStyles } from 'src/styles'
-import Markdown from '../Markdown'
-
-interface Attributes {
-  title: string
-  description: string
-}
 
 const DESIGN_FOR_ALL = frontMatter<Attributes>(designForAll)
 const HUMILITY = frontMatter<Attributes>(embodyHumility)

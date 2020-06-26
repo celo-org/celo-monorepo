@@ -103,7 +103,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
 
   server.get('/papers/whitepaper', (_, res) => {
     res.redirect(
-      '/papers/Celo_A_Multi_Asset_Cryptographic_Protocol_for_Decentralized_Social_Payments.pdf'
+      '/papers/Celo__A_Multi_Asset_Cryptographic_Protocol_for_Decentralized_Social_Payments.pdf'
     )
   })
 

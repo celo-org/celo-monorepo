@@ -22,6 +22,7 @@ export default withNamespaces(NameSpaces.brand)(function CCLicense({
       <Text style={[fonts.p, brandStyles.gap, standardStyles.elementalMargin]}>
         <Trans ns={NameSpaces.brand} i18nKey={textI18nKey}>
           <InlineAnchor href={pagePaths.CODE_OF_CONDUCT.link}>Code of Conduct</InlineAnchor>
+          <InlineAnchor href={pagePaths.BRAND_POLICY.link}>Brand Policy</InlineAnchor>
         </Trans>
       </Text>
     </>
