@@ -1,8 +1,9 @@
+import interpolateColors from '@celo/react-components/components/interpolateColors'
 import colors from '@celo/react-components/styles/colors.v2'
 import { useNavigation } from '@react-navigation/native'
 import * as React from 'react'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
-import Animated, { cond, greaterThan } from 'react-native-reanimated'
+import Animated from 'react-native-reanimated'
 import Hamburger from 'src/icons/Hamburger'
 
 interface Props {
@@ -15,8 +16,11 @@ function DrawerTopBar({ middleElement, scrollPosition }: Props) {
   const viewStyle = React.useMemo(
     () => ({
       ...styles.container,
-      borderBottomColor: colors.gray2,
-      borderBottomWidth: cond(greaterThan(scrollPosition ?? new Animated.Value(0), 0), 1, 0),
+      borderBottomWidth: 1,
+      borderBottomColor: interpolateColors(scrollPosition ?? new Animated.Value(0), {
+        inputRange: [0, 1],
+        outputColorRange: [colors.light, colors.gray2],
+      }),
     }),
     [scrollPosition]
   )
@@ -45,10 +49,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'space-between',
-  },
-  withBorderBottom: {
-    borderBottomColor: colors.gray2,
-    borderBottomWidth: 1,
   },
   hamburger: {
     padding: 8,

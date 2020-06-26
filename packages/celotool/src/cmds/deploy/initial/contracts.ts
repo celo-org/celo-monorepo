@@ -14,13 +14,24 @@ import { privateKeyToAddress } from 'src/lib/generate_utils'
 import { migrationOverrides, truffleOverrides, validatorKeys } from 'src/lib/migration-utils'
 import { portForwardAnd } from 'src/lib/port_forward'
 import { uploadFileToGoogleStorage } from 'src/lib/testnet-utils'
+import yargs from 'yargs'
 import { InitialArgv } from '../../deploy/initial'
 
 export const command = 'contracts'
 
 export const describe = 'deploy the celo smart contracts'
 
-export const builder = {}
+type ContractsArgv = InitialArgv & {
+  skipFaucetting: boolean
+}
+
+export const builder = (argv: yargs.Argv) => {
+  return argv.option('skipFaucetting', {
+    describe: 'skips allocation of cUSD to any oracle or bot accounts',
+    default: false,
+    type: 'boolean',
+  })
+}
 
 export const CLABS_VALIDATOR_METADATA_BUCKET = 'clabs_validator_metadata'
 
@@ -72,7 +83,7 @@ export async function registerMetadata(testnet: string, privateKey: string, inde
     .sendAndWaitForReceipt()
 }
 
-export const handler = async (argv: InitialArgv) => {
+export const handler = async (argv: ContractsArgv) => {
   await switchToClusterFromEnv()
 
   console.log(`Deploying smart contracts to ${argv.celoEnv}`)
@@ -80,7 +91,7 @@ export const handler = async (argv: InitialArgv) => {
     await execCmd(
       `yarn --cwd ../protocol run init-network -n ${argv.celoEnv} -c '${JSON.stringify(
         truffleOverrides()
-      )}' -m '${JSON.stringify(migrationOverrides())}'`
+      )}' -m '${JSON.stringify(migrationOverrides(!argv.skipFaucetting))}'`
     )
 
     console.info('Register Metadata for Clabs validators')

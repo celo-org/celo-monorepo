@@ -17,7 +17,6 @@
   "tip": "Punta: ",
   "warning": "Advertencia ",
   "downloadRewards": "Descargar Recompensas Celo",
-  "chooseLanguage": "Elegir idioma",
   "wallet": "Monedero",
   "send": "Envío",
   "search": "Buscar",
@@ -174,5 +173,6 @@
   "review": "Revisión",
   "insufficientBalance": "Su saldo es demasiado bajo para realizar esta transacción.",
   "amount": "Monto",
-  "currentBalance": "Saldo actual"
+  "currentBalance": "Saldo actual",
+  "restore": "Restaurar"
 }

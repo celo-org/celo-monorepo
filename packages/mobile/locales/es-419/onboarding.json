@@ -4,12 +4,13 @@
     "body": "Agregar sus contactos hace que sea fácil enviar y solicitar pagos con sus amigos. La conexión no envía invitaciones a sus contactos.",
     "findSwitch": "Permita que los contactos lo encuentren",
     "syncing": {
-      "loadingHeader": "Sincronizando contactos...",
-      "loadingStatus0": "Importando",
+      "loadingHeader": "Sincronizando...",
+      "loadingStatus0": "Importando contactos",
       "loadingStatus1": "Procesando {{total}} contactos",
-      "loadingStatus2": "Encontrar coincidencias",
-      "successHeader": "Tienes {{matches}} amigos en Celo",
-      "successStatus": "Todos estas sincronizados"
+      "loadingStatus2": "Encontrar amigos",
+      "successHeader": "Terminado",
+      "successWithMatches": "{{matches}} amigos en Valora",
+      "successWithoutMatches": "Sincronización completa"
     }
   },
   "accountInfo": "Informacion de cuenta",
@@ -45,6 +46,10 @@
     "title": "Confirmación de número de teléfono",
     "body": "La confirmación del número de teléfono funciona asociando su cuenta con su número de teléfono.\n\n<0>¿Necesito completar esto?</0>\n\nNo se requiere confirmación, sin embargo, las cuentas no confirmadas solo pueden enviar pagos utilizando direcciones Celo o códigos QR.\n\n<1>Seguridad y privacidad</1>\n\nPara proteger su privacidad, solo una versión ofuscada de su número de teléfono se almacena en la cadena de bloques de Celo.",
     "dismiss": "Descartar"
+  },
+  "importExistingKey": {
+    "explanation": "La clave de su cuenta es una frase de 24 palabras que escribió y guardó cuando configuró su cuenta. Por favor ingréselo aquí para restaurar su cuenta.",
+    "keyPlaceholder": "horse leopard dog monkey ..."
   },
   "verificationInput": {
     "title": "Confirmar",

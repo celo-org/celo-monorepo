@@ -1,0 +1,1 @@
+A basket of cryptocurrencies enabling the Celo protocol to expand and contract the supply of Celo stable assets in-line with market demand.

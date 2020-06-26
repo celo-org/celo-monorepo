@@ -1,12 +1,12 @@
 runtime: nodejs10
-service: integration
+service: blockchain-api
 env_variables:
-  NODE_ENV: "development"
-  DEPLOY_ENV: "integration"
-  EXCHANGE_RATES_API: "https://apilayer.net/api"
-  BLOCKSCOUT_API: "https://integration-blockscout.celo-testnet.org/graphql"
-  FIREBASE_DB: "https://celo-org-mobile-integration.firebaseio.com"
+  NODE_ENV: 'development'
+  DEPLOY_ENV: 'integration'
+  EXCHANGE_RATES_API: 'https://apilayer.net/api'
+  BLOCKSCOUT_API: 'https://integration-blockscout.celo-testnet.org/graphql'
+  FIREBASE_DB: 'https://celo-org-mobile-integration.firebaseio.com'
   # TODO Pull addresses from the build artifacts of the network in protocol/build
-  FAUCET_ADDRESS: "0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95"
-  VERIFICATION_REWARDS_ADDRESS: "0xb4fdaf5f3cd313654aa357299ada901b1d2dd3b5"
-  WEB3_PROVIDER_URL: "https://integration-forno.celo-testnet.org"
+  FAUCET_ADDRESS: '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
+  VERIFICATION_REWARDS_ADDRESS: '0xb4fdaf5f3cd313654aa357299ada901b1d2dd3b5'
+  WEB3_PROVIDER_URL: 'https://integration-forno.celo-testnet.org'
