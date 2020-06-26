@@ -128,6 +128,7 @@ export class ImportWallet extends React.Component<Props, State> {
             {(insets) => (
               <View style={styles.container}>
                 <KeyboardAwareScrollView
+                  testID="scrollView"
                   style={headerHeight ? { marginTop: headerHeight } : undefined}
                   contentContainerStyle={[
                     styles.scrollContainer,

@@ -21,6 +21,7 @@ exports[`ImportWallet renders correctly and is disabled with no text 1`] = `
       ]
     }
     keyboardShouldPersistTaps="always"
+    testID="scrollView"
   >
     <View>
       <View
