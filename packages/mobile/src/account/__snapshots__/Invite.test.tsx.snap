@@ -585,14 +585,17 @@ exports[`Invite renders correctly with recipients 1`] = `
         >
           <View
             style={
-              Object {
-                "alignItems": "center",
-                "backgroundColor": "#FFFFFF",
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "paddingHorizontal": 16,
-                "paddingVertical": 8,
-              }
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "backgroundColor": "#FFFFFF",
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "paddingHorizontal": 16,
+                  "paddingVertical": 8,
+                },
+                undefined,
+              ]
             }
           >
             <Text
