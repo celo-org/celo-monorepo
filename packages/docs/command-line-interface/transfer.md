@@ -6,7 +6,7 @@ description: Transfer Celo Gold and Celo Dollars
 
 ### Celo
 
-Transfer CELO to a specified address.
+Transfer CELO to a specified address. (Note: this is the equivalent of the old transfer:gold)
 
 ```
 USAGE

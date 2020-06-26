@@ -6,7 +6,8 @@ import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class TransferCelo extends BaseCommand {
-  static description = 'Transfer CELO to a specified address.'
+  static description =
+    'Transfer CELO to a specified address. (Note: this is the equivalent of the old transfer:gold)'
 
   static flags = {
     ...BaseCommand.flags,

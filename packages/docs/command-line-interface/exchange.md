@@ -6,7 +6,7 @@ description: Exchange Celo Dollars and Celo Gold via the stability mechanism
 
 ### Celo
 
-Exchange CELO for Celo Dollars via the stability mechanism
+Exchange CELO for Celo Dollars via the stability mechanism. (Note: this is the equivalent of the old exchange:gold)
 
 ```
 USAGE

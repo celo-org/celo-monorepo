@@ -8,7 +8,8 @@ const largeOrderPercentage = 1
 const deppegedPricePercentage = 20
 
 export default class ExchangeCelo extends BaseCommand {
-  static description = 'Exchange CELO for Celo Dollars via the stability mechanism'
+  static description =
+    'Exchange CELO for Celo Dollars via the stability mechanism. (Note: this is the equivalent of the old exchange:gold)'
 
   static flags = {
     ...BaseCommand.flags,
