@@ -42,7 +42,6 @@ exports[`About renders 1`] = `
           }
         }
       >
-        }
         <div
           className="css-view-1dbjc4n"
           style={
