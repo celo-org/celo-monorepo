@@ -1,12 +1,12 @@
 runtime: nodejs10
-service: alfajoresstaging
+service: blockchain-api
 env_variables:
-  NODE_ENV: "development"
-  DEPLOY_ENV: "alfajoresstaging"
-  EXCHANGE_RATES_API: "https://apilayer.net/api"
-  BLOCKSCOUT_API: "https://alfajoresstaging-blockscout.celo-testnet.org/graphql"
-  FIREBASE_DB: "https://celo-org-mobile-alfajoresstaging.firebaseio.com"
+  NODE_ENV: 'development'
+  DEPLOY_ENV: 'alfajoresstaging'
+  EXCHANGE_RATES_API: 'https://apilayer.net/api'
+  BLOCKSCOUT_API: 'https://alfajoresstaging-blockscout.celo-testnet.org/graphql'
+  FIREBASE_DB: 'https://celo-org-mobile-alfajoresstaging.firebaseio.com'
   # TODO Pull addresses from the build artifacts of the network in protocol/build
-  FAUCET_ADDRESS: "0xF4314cb9046bECe6AA54bb9533155434d0c76909"
-  VERIFICATION_REWARDS_ADDRESS: "0xb4fdaf5f3cd313654aa357299ada901b1d2dd3b5"
-  WEB3_PROVIDER_URL: "https://alfajoresstaging-forno.celo-testnet.org"
+  FAUCET_ADDRESS: '0xF4314cb9046bECe6AA54bb9533155434d0c76909'
+  VERIFICATION_REWARDS_ADDRESS: '0xb4fdaf5f3cd313654aa357299ada901b1d2dd3b5'
+  WEB3_PROVIDER_URL: 'https://alfajoresstaging-forno.celo-testnet.org'

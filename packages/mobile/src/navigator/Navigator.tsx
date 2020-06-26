@@ -5,6 +5,7 @@ import * as React from 'react'
 import { Platform } from 'react-native'
 import SplashScreen from 'react-native-splash-screen'
 import AccountKeyEducation from 'src/account/AccountKeyEducation'
+import GoldEducation from 'src/account/GoldEducation'
 import InviteReview from 'src/account/InviteReview'
 import Licenses from 'src/account/Licenses'
 import Profile from 'src/account/Profile'
@@ -141,11 +142,12 @@ const verificationScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen
         name={Screens.VerificationLoadingScreen}
         component={VerificationLoadingScreen}
-        options={noHeaderGestureDisabled}
+        options={VerificationLoadingScreen.navigationOptions}
       />
       <Navigator.Screen
         name={Screens.VerificationInterstitialScreen}
         component={VerificationInterstitialScreen}
+        options={VerificationInterstitialScreen.navigationOptions}
       />
       <Navigator.Screen
         name={Screens.VerificationInputScreen}
@@ -206,7 +208,7 @@ const nuxScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen
       name={Screens.ImportWallet}
       component={ImportWallet}
-      options={nuxNavigationOptions}
+      options={ImportWallet.navigationOptions}
     />
     <Navigator.Screen
       name={Screens.ImportWalletSocial}
@@ -221,9 +223,13 @@ const nuxScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen
       name={Screens.ImportContacts}
       component={ImportContactsScreen}
-      options={nuxNavigationOptions}
+      options={ImportContactsScreen.navigationOptions}
     />
-    <Navigator.Screen name={Screens.OnboardingSuccessScreen} component={OnboardingSuccessScreen} />
+    <Navigator.Screen
+      name={Screens.OnboardingSuccessScreen}
+      component={OnboardingSuccessScreen}
+      options={OnboardingSuccessScreen.navigationOptions}
+    />
   </>
 )
 
@@ -429,6 +435,7 @@ const generalScreens = (Navigator: typeof Stack) => (
       component={TransactionReview}
       options={transactionReviewOptions}
     />
+    <Navigator.Screen name={Screens.GoldEducation} component={GoldEducation} options={noHeader} />
     <Navigator.Screen name={Screens.FeeEducation} component={FeeEducation} />
   </>
 )

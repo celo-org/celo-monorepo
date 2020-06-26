@@ -17,8 +17,8 @@ import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 
-type RouterProps = StackScreenProps<StackParamList, Screens.Language>
-type Props = RouterProps
+type ScreenProps = StackScreenProps<StackParamList, Screens.Language>
+type Props = ScreenProps
 
 interface Language {
   code: string
@@ -79,12 +79,8 @@ function LanguageScreen({ route }: Props) {
   )
 }
 
-LanguageScreen.navigationOptions = ({ route }: RouterProps) => {
-  if (route.params?.fromSettings) {
-    return headerWithBackButton
-  } else {
-    return emptyHeader
-  }
+LanguageScreen.navigationOptions = ({ navigation }: ScreenProps) => {
+  return navigation.canGoBack() ? headerWithBackButton : emptyHeader
 }
 
 const styles = StyleSheet.create({

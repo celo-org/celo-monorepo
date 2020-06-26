@@ -6,3 +6,7 @@ export const features = {
   PHONE_NUM_METADATA_IN_TRANSFERS: true,
   VERIFICATION_FORNO_RETRY: true,
 }
+
+export const pausedFeatures = {
+  INVITE: true,
+}
