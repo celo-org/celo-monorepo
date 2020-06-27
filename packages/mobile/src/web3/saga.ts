@@ -2,7 +2,6 @@ import { RpcWallet, RpcWalletErrors } from '@celo/contractkit/lib/wallets/rpc-wa
 import { generateKeys, generateMnemonic, MnemonicStrength } from '@celo/utils/src/account'
 import { privateKeyToAddress } from '@celo/utils/src/address'
 import { deriveCEK } from '@celo/utils/src/commentEncryption'
-import * as Sentry from '@sentry/react-native'
 import * as bip39 from 'react-native-bip39'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-saga/effects'
@@ -21,13 +20,8 @@ import { deleteChainData, stopGethIfInitialized } from 'src/geth/geth'
 import { gethSaga, waitForGethConnectivity } from 'src/geth/saga'
 import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import {
-  getPassword,
-  getPincode,
-  passwordForPin,
-  storePasswordHash,
-} from 'src/pincode/authentication'
-import { setCachedPassword } from 'src/pincode/PasswordCache'
+import { getPasswordSaga } from 'src/pincode/authentication'
+import { clearPasswordCaches } from 'src/pincode/PasswordCache'
 import Logger from 'src/utils/Logger'
 import {
   Actions,
@@ -142,7 +136,7 @@ export function* waitWeb3LastBlock() {
 }
 
 export function* getOrCreateAccount() {
-  const account = yield select(currentAccountSelector)
+  const account: string = yield select(currentAccountSelector)
   if (account) {
     Logger.debug(
       TAG + '@getOrCreateAccount',
@@ -179,39 +173,29 @@ export function* getOrCreateAccount() {
       throw new Error('Failed to convert mnemonic to hex')
     }
 
-    const accountAddress = yield call(assignAccountFromPrivateKey, privateKey)
+    const accountAddress: string = yield call(assignAccountFromPrivateKey, privateKey)
     if (!accountAddress) {
       throw new Error('Failed to assign account from private key')
     }
 
-    yield storeMnemonic(mnemonic)
+    yield call(storeMnemonic, mnemonic)
 
     return accountAddress
   } catch (error) {
-    // Capturing error in sentry for now as we debug backup key issue
-    if (privateKey && !error.message.contains(privateKey)) {
-      Sentry.captureException(error)
-    }
-    Logger.error(TAG + '@getOrCreateAccount', 'Error creating account', error)
+    const sanitizedError = Logger.sanitizeError(error, privateKey)
+    Logger.error(TAG + '@getOrCreateAccount', 'Error creating account', sanitizedError)
     throw new Error(ErrorMessages.ACCOUNT_SETUP_FAILED)
   }
 }
 
 export function* assignAccountFromPrivateKey(privateKey: string) {
   try {
-    const pin = yield call(getPincode, false)
-    if (!pin) {
-      Logger.error(TAG + '@assignAccountFromPrivateKey', 'Got falsy pin')
-      throw Error('Cannot create account without having the pin set')
-    }
     const account = privateKeyToAddress(privateKey)
     const wallet: RpcWallet = yield call(getConnectedWallet)
-    const password: string = yield call(passwordForPin, pin)
+    const password: string = yield call(getPasswordSaga, account, false, true)
 
     try {
       yield call([wallet, wallet.addAccount], privateKey, password)
-      yield call(storePasswordHash, pin, account)
-      setCachedPassword(account, password)
     } catch (e) {
       if (e === RpcWalletErrors.AccountAlreadyExists) {
         Logger.warn(TAG + '@assignAccountFromPrivateKey', 'Attempted to import same account')
@@ -267,14 +251,17 @@ export function* unlockAccount(account: string) {
   }
 
   try {
-    const password: string = yield call(getPassword, account, true)
-    yield call([wallet, wallet.unlockAccount], account, password, UNLOCK_DURATION)
-    setCachedPassword(account, password)
+    const password: string = yield call(getPasswordSaga, account)
+    const result = yield call([wallet, wallet.unlockAccount], account, password, UNLOCK_DURATION)
+    if (!result) {
+      throw new Error('Unlock account result false')
+    }
+
     Logger.debug(TAG + '@unlockAccount', `Account unlocked: ${account}`)
     return true
   } catch (error) {
-    setCachedPassword(account, null)
-    Logger.error(TAG + '@unlockAccount', 'account unlock failed', error)
+    Logger.error(TAG + '@unlockAccount', 'Account unlock failed, clearing password caches', error)
+    clearPasswordCaches()
     return false
   }
 }

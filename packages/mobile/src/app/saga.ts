@@ -13,18 +13,16 @@ import {
   setLanguage,
 } from 'src/app/actions'
 import { currentLanguageSelector } from 'src/app/reducers'
-import { getAppLocked, getLastTimeBackgrounded, getLockWithPinEnabled } from 'src/app/selectors'
+import { getLastTimeBackgrounded, getRequirePinOnAppOpen } from 'src/app/selectors'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
 import { isAppVersionDeprecated } from 'src/firebase/firebase'
 import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { getCachedPassword } from 'src/pincode/PasswordCache'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { clockInSync } from 'src/utils/time'
-import { currentAccountSelector } from 'src/web3/selectors'
 import { parse } from 'url'
 
 const TAG = 'app/saga'
@@ -126,19 +124,12 @@ function* watchAppState() {
 }
 
 export function* handleSetAppState(action: SetAppState) {
-  const appLocked = yield select(getAppLocked)
+  const requirePinOnAppOpen = yield select(getRequirePinOnAppOpen)
   const lastTimeBackgrounded = yield select(getLastTimeBackgrounded)
-  const now = Date.now()
-  const account = yield select(currentAccountSelector)
-  const cachedPin = getCachedPassword(account)
-  const lockWithPinEnabled = yield select(getLockWithPinEnabled)
-  if (
-    !cachedPin &&
-    lockWithPinEnabled &&
-    now - lastTimeBackgrounded > DO_NOT_LOCK_PERIOD &&
-    action.state === 'active' &&
-    !appLocked
-  ) {
+  const isPassedDoNotLockPeriod = Date.now() - lastTimeBackgrounded > DO_NOT_LOCK_PERIOD
+  const isAppActive = action.state === 'active'
+
+  if (requirePinOnAppOpen && isPassedDoNotLockPeriod && isAppActive) {
     yield put(appLock())
   }
 }

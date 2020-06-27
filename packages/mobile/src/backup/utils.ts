@@ -172,11 +172,13 @@ export function isValidSocialBackupPhrase(phrase: string) {
 }
 
 export async function encryptMnemonic(phrase: string) {
+  // TODO use pin for this instead?
   const pepper = await retrieveOrGeneratePepper()
   return CryptoJS.AES.encrypt(phrase, pepper).toString()
 }
 
 export async function decryptMnemonic(encryptedMnemonic: string) {
+  // TODO use pin for this instead?
   const pepper = await retrieveOrGeneratePepper()
   const bytes = CryptoJS.AES.decrypt(encryptedMnemonic, pepper)
   return bytes.toString(CryptoJS.enc.Utf8)

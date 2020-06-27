@@ -17,9 +17,10 @@ import { Namespaces, withTranslation } from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
-import { isPinValid, storePasswordHash } from 'src/pincode/authentication'
+import { DEFAULT_CACHE_ACCOUNT, isPinValid } from 'src/pincode/authentication'
 import { setCachedPin } from 'src/pincode/PasswordCache'
 import Pincode from 'src/pincode/Pincode'
+import Logger from 'src/utils/Logger'
 
 interface DispatchProps {
   setPincode: typeof setPincode
@@ -65,8 +66,16 @@ export class PincodeSet extends React.Component<Props, State> {
   }
 
   onCompletePin1 = () => {
-    CeloAnalytics.track(CustomEventNames.pin_value)
-    this.props.navigation.setParams({ isVerifying: true })
+    if (this.isPin1Valid(this.state.pin1)) {
+      CeloAnalytics.track(CustomEventNames.pin_value)
+      this.props.navigation.setParams({ isVerifying: true })
+    } else {
+      this.setState({
+        pin1: '',
+        pin2: '',
+        errorText: this.props.t('pincodeSet.invalidPin'),
+      })
+    }
   }
 
   onCompletePin2 = async (pin2: string) => {
@@ -74,12 +83,12 @@ export class PincodeSet extends React.Component<Props, State> {
     const { pin1 } = this.state
     if (this.isPin1Valid(pin1) && this.isPin2Valid(pin2)) {
       try {
-        await storePasswordHash(this.state.pin1, '')
-        setCachedPin(this.state.pin1)
+        setCachedPin(DEFAULT_CACHE_ACCOUNT, pin1)
         this.props.setPincode(PincodeType.CustomPin)
         this.props.navigation.navigate(Screens.EnterInviteCode)
       } catch (err) {
-        CeloAnalytics.track(CustomEventNames.pin_store_error, { error: err.message })
+        const sanitizedError = Logger.sanitizeError(err)
+        CeloAnalytics.track(CustomEventNames.pin_store_error, { error: sanitizedError.message })
       }
     } else {
       this.props.navigation.setParams({ isVerifying: false })

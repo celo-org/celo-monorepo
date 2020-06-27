@@ -15,6 +15,8 @@ const TAG = 'account/saga'
 
 export function* setPincode({ pincodeType }: SetPincodeAction) {
   try {
+    // TODO hooks into biometrics will likely go here
+    // But for now this saga does not to much, most cut during the auth refactor
     yield put(setPincodeSuccess(pincodeType))
     Logger.info(TAG + '@setPincode', 'Pincode set successfully')
   } catch (error) {

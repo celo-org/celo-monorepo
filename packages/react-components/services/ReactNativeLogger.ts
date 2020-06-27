@@ -58,6 +58,20 @@ export default class ReactNativeLogger {
     return errorMsg
   }
 
+  sanitizeError = (error: Error, valueToPurge?: string) => {
+    const message = this.getErrorMessage(error)
+
+    if (message.toLowerCase().includes('password') || message.toLowerCase().includes('key')) {
+      return new Error('Error message hidden for privacy')
+    }
+
+    if (valueToPurge) {
+      return new Error(message.replace(new RegExp(valueToPurge, 'g'), ''))
+    }
+
+    return error
+  }
+
   getReactNativeLogsFilePath = () => {
     return RNFS.CachesDirectoryPath + '/rn_logs.txt'
   }

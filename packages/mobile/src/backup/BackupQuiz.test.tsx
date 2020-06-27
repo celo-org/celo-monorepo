@@ -11,13 +11,10 @@ jest.mock('lodash', () => ({
   shuffle: jest.fn((array) => array),
 }))
 
-jest.mock('react-native-secure-key-store', () => {
-  return {
-    get: async () => {
-      return mockMnemonic
-    },
-  }
-})
+jest.mock('src/backup/utils', () => ({
+  ...jest.requireActual('src/backup/utils'),
+  getStoredMnemonic: jest.fn(() => mockMnemonic),
+}))
 
 const mockScreenProps = getMockStackScreenProps(Screens.BackupQuiz)
 
