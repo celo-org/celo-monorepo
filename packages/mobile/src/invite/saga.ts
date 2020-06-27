@@ -211,7 +211,9 @@ export function* sendInvite(
     const addressToE164Number = { [temporaryAddress.toLowerCase()]: e164Number }
     yield put(updateE164PhoneNumberAddresses({}, addressToE164Number))
     yield call(navigateToInviteMessageApp, e164Number, inviteMode, message)
+    CeloAnalytics.track(CustomEventNames.invite_success)
   } catch (e) {
+    CeloAnalytics.track(CustomEventNames.invite_error)
     Logger.error(TAG, 'Send invite error: ', e)
     throw e
   }

@@ -50,6 +50,7 @@ export enum CustomEventNames {
   send_secure_info_dismissed = 'send_secure_info_dismissed', // when "help" button is dismissed
   send_secure_edit = 'send_secure_edit', // when "edit" address button is pressed to manually initate secure send flow
 
+  invite_success = 'invite_success', // when there is an error sending an invite
   invite_error = 'invite_error', // when there is an error sending an invite
 
   // Payment request
