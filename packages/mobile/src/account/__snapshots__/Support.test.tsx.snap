@@ -96,158 +96,144 @@ exports[`Support renders correctly 1`] = `
     }
   >
     <View
-      accessible={true}
-      focusable={true}
-      nativeBackgroundAndroid={
+      style={
         Object {
-          "attribute": "selectableItemBackground",
-          "type": "ThemeAttrAndroid",
+          "backgroundColor": "#FFFFFF",
         }
       }
-      onClick={[Function]}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
-      testID="WebFAQLink"
     >
       <View
-        style={
+        accessible={true}
+        focusable={true}
+        nativeBackgroundAndroid={
           Object {
-            "borderBottomWidth": 1,
-            "borderColor": "#EEEEEE",
-            "flexDirection": "row",
-            "justifyContent": "space-between",
-            "marginLeft": 16,
-            "paddingRight": 16,
-            "paddingVertical": 16,
+            "attribute": "selectableItemBackgroundBorderless",
+            "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        testID="WebFAQLink"
       >
         <View
           style={
-            Array [
-              Object {
-                "justifyContent": "center",
-              },
-            ]
+            Object {
+              "borderBottomColor": "#EDEEEF",
+              "borderBottomWidth": 1,
+              "marginLeft": 16,
+              "paddingVertical": 16,
+            }
           }
         >
-          <Text
+          <View
             style={
               Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 16,
-                "lineHeight": 24,
+                "alignItems": "center",
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "paddingRight": 16,
               }
             }
           >
-            webFaq
-          </Text>
-        </View>
-        <View
-          style={
-            Array [
-              Object {
-                "justifyContent": "center",
-              },
-            ]
-          }
-        >
-          <svg
-            height={16}
-            style={Object {}}
-            viewBox="0 0 15 16"
-            width={16}
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M8.70376 9.12461L2.12123 15.7071C1.73071 16.0976 1.09755 16.0976 0.707015 15.7071C0.316497 15.3166 0.316497 14.6834 0.707015 14.2929L6.58575 8.41419L0.707091 2.53553C0.316573 2.14501 0.316573 1.51185 0.707091 1.12131C1.09761 0.730797 1.73079 0.730797 2.12131 1.12131L8.70708 7.70708C9.0976 8.09762 9.0976 8.73078 8.70708 9.1213L8.70376 9.12461Z"
-              fill="#42D689"
-              style={Object {}}
-            />
-          </svg>
+            <View
+              style={
+                Array [
+                  Object {
+                    "justifyContent": "center",
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  }
+                }
+              >
+                webFaq
+              </Text>
+            </View>
+          </View>
         </View>
       </View>
     </View>
     <View
-      accessible={true}
-      focusable={true}
-      nativeBackgroundAndroid={
+      style={
         Object {
-          "attribute": "selectableItemBackground",
-          "type": "ThemeAttrAndroid",
+          "backgroundColor": "#FFFFFF",
         }
       }
-      onClick={[Function]}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
-      testID="ForumLink"
     >
       <View
-        style={
+        accessible={true}
+        focusable={true}
+        nativeBackgroundAndroid={
           Object {
-            "borderBottomWidth": 1,
-            "borderColor": "#EEEEEE",
-            "flexDirection": "row",
-            "justifyContent": "space-between",
-            "marginLeft": 16,
-            "paddingRight": 16,
-            "paddingVertical": 16,
+            "attribute": "selectableItemBackgroundBorderless",
+            "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        testID="ForumLink"
       >
         <View
           style={
-            Array [
-              Object {
-                "justifyContent": "center",
-              },
-            ]
+            Object {
+              "borderBottomColor": "#EDEEEF",
+              "borderBottomWidth": 1,
+              "marginLeft": 16,
+              "paddingVertical": 16,
+            }
           }
         >
-          <Text
+          <View
             style={
               Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 16,
-                "lineHeight": 24,
+                "alignItems": "center",
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "paddingRight": 16,
               }
             }
           >
-            forum
-          </Text>
-        </View>
-        <View
-          style={
-            Array [
-              Object {
-                "justifyContent": "center",
-              },
-            ]
-          }
-        >
-          <svg
-            height={16}
-            style={Object {}}
-            viewBox="0 0 15 16"
-            width={16}
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M8.70376 9.12461L2.12123 15.7071C1.73071 16.0976 1.09755 16.0976 0.707015 15.7071C0.316497 15.3166 0.316497 14.6834 0.707015 14.2929L6.58575 8.41419L0.707091 2.53553C0.316573 2.14501 0.316573 1.51185 0.707091 1.12131C1.09761 0.730797 1.73079 0.730797 2.12131 1.12131L8.70708 7.70708C9.0976 8.09762 9.0976 8.73078 8.70708 9.1213L8.70376 9.12461Z"
-              fill="#42D689"
-              style={Object {}}
-            />
-          </svg>
+            <View
+              style={
+                Array [
+                  Object {
+                    "justifyContent": "center",
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  }
+                }
+              >
+                forum
+              </Text>
+            </View>
+          </View>
         </View>
       </View>
     </View>
