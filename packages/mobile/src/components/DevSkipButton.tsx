@@ -77,8 +77,6 @@ const styles = StyleSheet.create({
     width: 60,
     height: 35,
     zIndex: 100,
-    // paddingRight: 10,
-    // paddingTop: 10,
   },
   devButtonContent: {
     flex: 1,

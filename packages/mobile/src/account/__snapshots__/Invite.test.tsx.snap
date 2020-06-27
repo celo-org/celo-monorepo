@@ -223,11 +223,7 @@ exports[`Invite renders correctly with no recipients 1`] = `
         </View>
       }
       ListHeaderComponent={[Function]}
-      contentContainerStyle={
-        Object {
-          "paddingBottom": 0,
-        }
-      }
+      contentContainerStyle={null}
       data={Array []}
       disableVirtualization={false}
       getItem={[Function]}
@@ -289,6 +285,22 @@ exports[`Invite renders correctly with no recipients 1`] = `
         </View>
       </View>
     </RCTScrollView>
+    <View
+      collapsable={false}
+      style={
+        Array [
+          Object {
+            "bottom": 0,
+            "left": 0,
+            "right": 0,
+          },
+          Object {
+            "height": 0,
+          },
+          undefined,
+        ]
+      }
+    />
   </View>
 </View>
 `;
@@ -516,11 +528,7 @@ exports[`Invite renders correctly with recipients 1`] = `
         </View>
       }
       ListHeaderComponent={[Function]}
-      contentContainerStyle={
-        Object {
-          "paddingBottom": 0,
-        }
-      }
+      contentContainerStyle={null}
       data={
         Array [
           Object {
@@ -997,6 +1005,22 @@ exports[`Invite renders correctly with recipients 1`] = `
         />
       </View>
     </RCTScrollView>
+    <View
+      collapsable={false}
+      style={
+        Array [
+          Object {
+            "bottom": 0,
+            "left": 0,
+            "right": 0,
+          },
+          Object {
+            "height": 0,
+          },
+          undefined,
+        ]
+      }
+    />
   </View>
 </View>
 `;
