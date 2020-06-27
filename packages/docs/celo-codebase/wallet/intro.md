@@ -90,7 +90,7 @@ Next, the VM snapshot settings should be modified:
 3.  Power it back on and go to emulator settings \(... button\) -&gt; Snapshots -&gt; Settings
 4.  Set Auto-Save to No
 
-## Throubleshooting
+## Troubleshooting
 
 1.  Make sure to have watchman installed: `brew install watchman`
 2.  It's a known [detox issue](https://github.com/wix/Detox/issues/1255) that test will fail if a emulator is renamed.
