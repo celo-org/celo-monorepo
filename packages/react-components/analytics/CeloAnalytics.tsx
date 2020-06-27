@@ -104,7 +104,7 @@ class CeloAnalytics {
         this.sessionId = Web3Utils.soliditySha3({
           type: 'string',
           value: res.SerialNumber || res.DeviceId,
-        })
+        }).slice(2)
       })
       .catch((err) => Logger.error(TAG, 'getDeviceInfo error', err))
   }

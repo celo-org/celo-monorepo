@@ -17,6 +17,7 @@ class WalletAnalytics extends CeloAnalytics {
   isEnabled() {
     // Remove __DEV__ here to test analytics in dev builds
     return !__DEV__ && store.getState().app.analyticsEnabled
+    // return store.getState().app.analyticsEnabled
   }
 
   track(

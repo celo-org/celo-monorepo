@@ -237,13 +237,6 @@ export enum CustomEventNames {
   prompt_forno = 'prompt_forno',
 }
 
-export enum CommonValues {
-  success = 'success',
-  failure = 'failure',
-  cancel = 'cancel',
-  timeout = 'timeout',
-}
-
 export type EventPropertyType = {
   [key in PropertyPathWhitelist]?: any
 }
