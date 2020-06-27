@@ -1,34 +1,61 @@
-//const octokit = require('@octokit/rest')
+const { formatIssueBody, parseTestFile } = require('./jest/utils')
+const { Octokit } = require('@octokit/rest')
+const { retry } = require('@octokit/plugin-retry')
+const GitHubClient = Octokit.plugin(retry)
 
-class FlakeNotifier {
-  // github = new Octokit({
-  //   //TODO(Alec)
-  // })
+const client = new GitHubClient({
+  //log: console,
+})
 
-  processFlakes(flakes) {
-    console.log('PROCESS FLAKES')
-    console.log(flakes)
+function processFlakeyTestResults(flakeyTestResults) {
+  // console.log('PROCESS FLAKEY TEST RESULTS \n')
+  // console.log(flakeyTestResults)
 
-    //return Promise.all(flakes.map((f) => this.processFlake(f)))
-  }
+  const flakes = flakeyTestResults.map((tr) => {
+    tr.testPath.shift() // Remove ROOT_DESCRIBE_BLOCK
+    return {
+      header: tr.testPath.join(' -> '),
+      body: formatIssueBody(tr.errors),
+    }
+  })
 
-  processFlake(flake) {
-    return Promise.all([this.createFlakeIssue(flake), this.leavePrComment(flake)])
-  }
+  return Promise.all(flakes.map(processFlake))
+}
 
-  async createFlakeIssue(flake) {
-    //TODO(Alec)
-    console.log('FLAKE ISSUE TRIGGERED: ' + flake.testPath + ' ' + flake.errors)
-    // this.github.issues.create({
-    //   'FlakeReporter',
-    //   'ce'
-    // })
-  }
+function processFlake(flake) {
+  return Promise.all([createFlakeIssue(flake), leavePrComment(flake)])
+}
 
-  async leavePrComment(flake) {
-    //TODO(Alec)
-    console.log('PR COMMENT TRIGGERED: ' + flake.testPath + ' ' + flake.errors)
+async function createFlakeIssue(flake) {
+  console.log('FLAKE ISSUE TRIGGERED \n')
+
+  console.log(parseTestFile(flake.body))
+
+  try {
+    await client.issues.create({
+      owner: 'celo-org',
+      repo: 'celo-monorepo',
+      title: '[FLAKEY TEST] ' + flake.header + ', at ' + parseTestFile(flake.body),
+      body: flake.body,
+      labels: ['FLAKEY :snowflake:'],
+    })
+  } catch (error) {
+    console.error(
+      '\nFailed to create issue for flakey test. ' +
+        'Header: "' +
+        flake.header +
+        '", Client Error: ' +
+        error
+    )
   }
 }
 
-module.exports = FlakeNotifier
+async function leavePrComment(flake) {
+  //TODO(Alec)
+  // console.log('PR COMMENT TRIGGERED \n')
+  // console.log(flake)
+}
+
+module.exports = {
+  processFlakeyTestResults: processFlakeyTestResults,
+}
