@@ -21,7 +21,7 @@
     "react-native-autocomplete-input": "^4.1.0",
     "react-native-contacts": "https://github.com/celo-org/react-native-contacts#e473717",
     "react-native-platform-touchable": "^1.1.1",
-    "react-native-safe-area-view": "^1.1.1",
+    "react-native-safe-area-context": "^3.0.6",
     "svgs": "^4.1.0"
   },
   "devDependencies": {

@@ -1,6 +1,9 @@
 package org.celo.mobile;
 
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.view.WindowManager;
 import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.ReactFragmentActivity;
@@ -28,6 +31,20 @@ public class MainActivity
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+    getWindow()
+      .getDecorView()
+      .setSystemUiVisibility(
+        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+        View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+        View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+      );
+
+    // Since SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR is only available on Android O (API 26) and above
+    // we need to draw our own dark navigation bar for older devices
+    // otherwise the buttons (Back, Home, Tasks) are quite unreadable
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+      getWindow().setNavigationBarColor(Color.parseColor("#000000"));
+    }
     appStartTimestamp = new Date();
     SplashScreen.show(this);
     super.onCreate(null);

@@ -102,7 +102,9 @@ export default class KeyboardSpacer extends React.Component<Props> {
     // when toggling the keyboard visibility on iOS (command + K on simulator)
     const measureToken = (this._currentMeasureToken = {})
 
-    this._viewRef.current.measureInWindow((x, y, width, height) => {
+    // Use measure and NOT measureInWindow because it's incorrect with a transparent status bar on Android
+    // see https://github.com/facebook/react-native/issues/19497
+    this._viewRef.current.measure((_x, _y, width, height, x, y) => {
       if (this._currentMeasureToken !== measureToken) {
         // Skip action as token is different (i.e. cancelled)
         return
@@ -119,7 +121,10 @@ export default class KeyboardSpacer extends React.Component<Props> {
 
       const viewFrame = { x, y, width, height }
       const keyboardFrame = event.endCoordinates
+      console.log('==viewframe', viewFrame)
+      console.log('==keyboardFrame', keyboardFrame)
       const keyboardSpace = this.relativeKeyboardHeight(viewFrame, keyboardFrame)
+      console.log('==keyboardSpace', keyboardSpace)
 
       this.setState({ keyboardSpace })
       this.props.onToggle(true, keyboardSpace)
@@ -147,13 +152,15 @@ export default class KeyboardSpacer extends React.Component<Props> {
   render() {
     if (Platform.OS === 'android') {
       // On Android with windowSoftInputMode set to adjustResize we don't need the spacer
-      return null
+      // unless it's using fullscreen layout (which is the case with a transparent status bar)
+      // return null
     }
 
     return (
       <View
         ref={this._viewRef}
         style={[styles.container, { height: this.state.keyboardSpace }, this.props.style]}
+        collapsable={false}
       />
     )
   }

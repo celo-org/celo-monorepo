@@ -7,7 +7,7 @@ import { HeaderHeightContext, StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Keyboard, StyleSheet, Text, View } from 'react-native'
-import { SafeAreaConsumer } from 'react-native-safe-area-view'
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { hideAlert } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -124,7 +124,7 @@ export class ImportWallet extends React.Component<Props, State> {
     return (
       <HeaderHeightContext.Consumer>
         {(headerHeight) => (
-          <SafeAreaConsumer>
+          <SafeAreaInsetsContext.Consumer>
             {(insets) => (
               <View style={styles.container}>
                 <KeyboardAwareScrollView
@@ -160,7 +160,7 @@ export class ImportWallet extends React.Component<Props, State> {
                 <KeyboardSpacer onToggle={this.onToggleKeyboard} />
               </View>
             )}
-          </SafeAreaConsumer>
+          </SafeAreaInsetsContext.Consumer>
         )}
       </HeaderHeightContext.Consumer>
     )

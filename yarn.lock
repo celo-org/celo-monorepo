@@ -26983,17 +26983,10 @@ react-native-restart-android@^0.0.7:
   resolved "https://registry.yarnpkg.com/react-native-restart-android/-/react-native-restart-android-0.0.7.tgz#60bc42530ad8e54c4bfb14d462ba0c779229368d"
   integrity sha512-FxTVAgYDeS+R/PSA8vdwOg0HR5NaLo/FQTOqq0kB+KGKR3APty5Qmcz0xXGBn+Ju09ueyklsRGzPR9YmcewZgg==
 
-react-native-safe-area-context@^0.7.3:
-  version "0.7.3"
-  resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-0.7.3.tgz#ad6bd4abbabe195332c53810e4ce5851eb21aa2a"
-  integrity sha512-9Uqu1vlXPi+2cKW/CW6OnHxA76mWC4kF3wvlqzq4DY8hn37AeiXtLFs2WkxH4yXQRrnJdP6ivc65Lz+MqwRZAA==
-
-react-native-safe-area-view@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/react-native-safe-area-view/-/react-native-safe-area-view-1.1.1.tgz#9833e34c384d0513f4831afcd1e54946f13897b2"
-  integrity sha512-bbLCtF+tqECyPWlgkWbIwx4vDPb0GEufx/ZGcSS4UljMcrpwluachDXoW9DBxhbMCc6k1V0ccqHWN7ntbRdERQ==
-  dependencies:
-    hoist-non-react-statics "^2.3.1"
+react-native-safe-area-context@^3.0.6:
+  version "3.0.6"
+  resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-3.0.6.tgz#ee180f53f9f40f8302923b9c09d821cf8ada01eb"
+  integrity sha512-/McWHgRG3CjXo/1ctlxH3mjW2psjf/QYAt9kWUTEtHu4b6z1y4hfUIGuYEJ02asaS1ixPsYrkqVqwzTv4olUMQ==
 
 react-native-safe-modules@^1.0.0:
   version "1.0.0"
@@ -34236,7 +34229,6 @@ websocket@1.0.29, websocket@^1.0.28:
   dependencies:
     debug "^2.2.0"
     es5-ext "^0.10.50"
-    gulp "^4.0.2"
     nan "^2.14.0"
     typedarray-to-buffer "^3.1.5"
     yaeti "^0.0.6"
