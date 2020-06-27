@@ -121,10 +121,7 @@ export default class KeyboardSpacer extends React.Component<Props> {
 
       const viewFrame = { x, y, width, height }
       const keyboardFrame = event.endCoordinates
-      console.log('==viewframe', viewFrame)
-      console.log('==keyboardFrame', keyboardFrame)
       const keyboardSpace = this.relativeKeyboardHeight(viewFrame, keyboardFrame)
-      console.log('==keyboardSpace', keyboardSpace)
 
       this.setState({ keyboardSpace })
       this.props.onToggle(true, keyboardSpace)
