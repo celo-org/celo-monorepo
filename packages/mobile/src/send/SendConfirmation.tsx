@@ -13,6 +13,8 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import BackButton from 'src/components/BackButton.v2'
 import CommentTextInput from 'src/components/CommentTextInput'
@@ -173,6 +175,20 @@ export class SendConfirmation extends React.Component<Props, State> {
         this.props.localCurrencyExchangeRate
       ),
       isInvite: !recipientAddress,
+    })
+
+    ValoraAnalytics.track(AnalyticsEvents.send_confirm, {
+      properties: {
+        method: this.props.route.params?.isFromScan ? 'scan' : 'search',
+        localCurrencyExchangeRate: this.props.localCurrencyExchangeRate,
+        localCurrency: this.props.localCurrencyCode,
+        dollarAmount: amount,
+        localCurrencyAmount: convertDollarsToLocalAmount(
+          amount,
+          this.props.localCurrencyExchangeRate
+        ),
+        isInvite: !recipientAddress,
+      },
     })
 
     this.props.sendPaymentOrInvite(
