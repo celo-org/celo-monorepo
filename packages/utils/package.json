@@ -1,6 +1,6 @@
 {
   "name": "@celo/utils",
-  "version": "0.1.16-dev",
+  "version": "0.1.17-dev",
   "description": "Celo common utils",
   "author": "Celo",
   "license": "Apache-2.0",
