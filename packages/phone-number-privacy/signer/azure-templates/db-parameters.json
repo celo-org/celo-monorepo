@@ -9,13 +9,13 @@
             "value": "TODO"
         },
         "skuName": {
-            "value": "B_Gen5_1"
+            "value": "GP_Gen5_4"
         },
         "skuTier": {
-            "value": "Basic"
+            "value": "GeneralPurpose"
         },
         "skuCapacity": {
-            "value": 1
+            "value": 4
         },
         "skuFamily": {
             "value": "Gen5"
@@ -27,7 +27,7 @@
             "value": 35
         },
         "geoRedundantBackup": {
-            "value": "Disabled"
+            "value": "Enabled"
         },
         "storageAutoGrow": {
             "value": "Enabled"
