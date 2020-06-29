@@ -44,23 +44,6 @@
     "body1": "¡Estamos enviando sus mensajes de texto! Ingrese los tres códigos a medida que los reciba.",
     "body2": "Esto puede tardar un poco."
   },
-  "input": {
-    "header": "Enviar códigos",
-    "body1": "Copiar y pegar ",
-    "body2": "los códigos de verificación de su aplicación de mensajes de texto (SMS).",
-    "codeHeader1": "Primer código",
-    "codeHeader2": "Segundo código",
-    "codeHeader3": "Tercer código",
-    "codesMissing": "No recibí tres códigos",
-    "tip": "¿Está escribiendo el código? ¿Por qué no lo copia y pega?",
-    "sendingCodes": "Envío de códigos de verificación..."
-  },
-  "missingCodesModal": {
-    "header": "¿Falta algún código?",
-    "body": "Si no recibe todos los códigos después de 60 segundos, puede saltar la verificación y volver a intentarlo más tarde.",
-    "wait": "Esperar los códigos.",
-    "skip": "Omitir por ahora"
-  },
   "failModal": {
     "header": "Error de verificación",
     "body1": "Se produjo un problema al verificar su número de teléfono.",
@@ -77,7 +60,7 @@
   "congratsVerified": "¡Felicitaciones se ha verificado tu usuario!",
   "notification": {
     "title": "Verificar el Teléfono",
-    "body": "La verificación le permite enviar y recibir con sus contactos telefónicos.",
+    "body": "La verificación le permite enviar y recibir fondos fácilmente con sus contactos telefónicos",
     "cta": "Verifícate"
   },
   "quotaLookup": {

@@ -73,7 +73,14 @@ export function tokenFetchFactory({ actionName, token, actionCreator, tag }: Tok
       const tokenContract = yield call(getTokenContract, token)
       const balanceInWei: BigNumber = yield call([tokenContract, tokenContract.balanceOf], account)
       const balance: BigNumber = yield call(convertFromContractDecimals, balanceInWei, token)
-      CeloAnalytics.track(CustomEventNames.fetch_balance)
+      CeloAnalytics.track(
+        CustomEventNames.fetch_balance,
+        token === CURRENCY_ENUM.DOLLAR
+          ? {
+              dollarBalance: balance,
+            }
+          : { goldBalance: balance }
+      )
       yield put(actionCreator(balance.toString()))
     } catch (error) {
       Logger.error(tag, 'Error fetching balance', error)
@@ -181,6 +188,7 @@ export function tokenTransferFactory({
         yield call(sendAndMonitorTransaction, txId, tx, account, currency)
       } catch (error) {
         Logger.error(tag, 'Error transfering token', error)
+        CeloAnalytics.track(CustomEventNames.transfer_token_error, { error: error.message })
         yield put(removeStandbyTransaction(txId))
         if (error.message === ErrorMessages.INCORRECT_PIN) {
           yield put(showError(ErrorMessages.INCORRECT_PIN))
