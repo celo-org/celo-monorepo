@@ -136,7 +136,9 @@ export function* waitForWeb3Sync() {
 export function* waitWeb3LastBlock() {
   yield call(waitForGethConnectivity)
   yield put(setContractKitReady(true))
-  yield call(waitForWeb3Sync)
+  if (!(yield select(fornoSelector))) {
+    yield call(waitForWeb3Sync)
+  }
 }
 
 export function* getOrCreateAccount() {

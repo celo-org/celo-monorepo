@@ -131,6 +131,12 @@ async function initGeth(sync: boolean = true) {
     }
     const geth = await createNewGeth(sync)
 
+    if (!sync) {
+      // TODO: cache somewhere
+      await deleteChainData()
+      // await deleteNodeDbIfExists()
+    }
+
     try {
       await geth.start()
       gethInstance = geth
@@ -144,7 +150,7 @@ async function initGeth(sync: boolean = true) {
         throw new Error('Geth already running, need to restart app')
       } else if (errorType === ErrorType.CorruptChainData) {
         Logger.warn('Geth@init/startInstance', 'Geth start reported chain data error')
-        await attemptGethCorruptionFix(geth)
+        await attemptGethCorruptionFix(geth, sync)
       } else {
         Logger.error('Geth@init/startInstance', 'Unexpected error starting geth', e)
         throw e
@@ -157,9 +163,7 @@ async function initGeth(sync: boolean = true) {
 
 export async function getGeth(sync: boolean = true): Promise<typeof gethInstance> {
   Logger.debug('Geth@getGeth', 'Getting Geth Instance')
-  if (!gethInstance) {
-    await initGeth(sync)
-  }
+  await initGeth(sync)
   return gethInstance
 }
 
@@ -256,16 +260,24 @@ async function writeStaticNodes(nodeDir: string, enodes: string) {
   console.info(`writeStaticNodes enodes are "${enodes}"`)
   const staticNodesFile = getStaticNodesFile(nodeDir)
   await RNFS.mkdir(getFolder(staticNodesFile))
+  await deleteFileIfExists(staticNodesFile)
   await RNFS.writeFile(staticNodesFile, enodes, 'utf8')
 }
 
-async function attemptGethCorruptionFix(geth: any) {
+// async function deleteNodeDbIfExists() {
+//   const { nodeDir } = networkConfig
+//   return deleteFileIfExists(`${getNodeInstancePath(nodeDir)}/nodes`)
+// }
+
+async function attemptGethCorruptionFix(geth: any, sync: boolean = true) {
   const deleteChainDataResult = await deleteChainData()
   const deleteGethLockResult = await deleteGethLockFile()
   if (deleteChainDataResult && deleteGethLockResult) {
     await geth.start()
     gethInstance = geth
-    geth.subscribeNewHead()
+    if (sync) {
+      geth.subscribeNewHead()
+    }
   } else {
     throw new Error('Failed to fix Geth and restart')
   }
