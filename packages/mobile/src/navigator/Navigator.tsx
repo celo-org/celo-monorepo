@@ -488,7 +488,7 @@ export function MainStackScreen() {
 
     // Wait for next frame to avoid slight gap when hiding the splash
     requestAnimationFrame(() => SplashScreen.hide())
-  })
+  }, [])
 
   if (!initialRouteName) {
     return <AppLoading />
