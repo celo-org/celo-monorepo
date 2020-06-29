@@ -1,0 +1,37 @@
+{
+  "name": "@celo/reserve-web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "yarn tsc",
+    "prepare": "next build",
+    "deploy": "yarn run kill-dev; yarn run clean-next-cache; yarn run prepare; gcloud app deploy $MANIFEST",
+    "deploy:dev": "gcloud config set project celo-reserve-site-281118; NODE_ENV=production DEPLOY_ENV=development MANIFEST=development.yaml yarn run deploy && yarn view",
+    "deploy:prod": "gcloud config set project celo-reserve-site-281118; NODE_ENV=production DEPLOY_ENV=production MANIFEST=production.yaml yarn run deploy && yarn view -s production",
+    "view": "gcloud app browse",
+    "kill-dev": "kill -9 $(lsof -ti :3000)",
+    "clean-next-cache": "rm -rf .next",
+    "start": "next start -p $PORT"
+  },
+  "dependencies": {
+    "@emotion/core": "^10.0.28",
+    "airtable": "^0.8.1",
+    "front-matter": "^4.0.2",
+    "markdown-to-jsx": "^6.11.4",
+    "next": "9.4.4",
+    "raw-loader": "^4.0.1",
+    "react": "^16.11.0",
+    "react-dom": "^16.11.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.10.1",
+    "@babel/core": "^7.10.2",
+    "@babel/preset-env": "^7.10.2",
+    "@types/react": "^16.9.36",
+    "@types/node": "^10.12.18"
+  },
+  "engines": {
+    "node": "10"
+  }
+}
