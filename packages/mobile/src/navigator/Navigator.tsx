@@ -453,8 +453,10 @@ const mapStateToProps = (state: RootState) => {
   }
 }
 
+type InitialRouteName = ExtractProps<typeof Stack.Navigator>['initialRouteName']
+
 export function MainStackScreen() {
-  const [initialRouteName, setInitialRoute] = React.useState<Screens | undefined>(undefined)
+  const [initialRouteName, setInitialRoute] = React.useState<InitialRouteName>(undefined)
   React.useEffect(() => {
     const {
       language,
@@ -466,7 +468,7 @@ export function MainStackScreen() {
       hasSeenVerificationNux,
     } = mapStateToProps(store.getState())
 
-    let initialRoute: Screens | undefined
+    let initialRoute: InitialRouteName
 
     if (!language) {
       initialRoute = Screens.Language
@@ -495,11 +497,7 @@ export function MainStackScreen() {
   }
 
   return (
-    <Stack.Navigator
-      // @ts-ignore
-      initialRouteName={initialRouteName}
-      screenOptions={emptyHeader}
-    >
+    <Stack.Navigator initialRouteName={initialRouteName} screenOptions={emptyHeader}>
       <Stack.Screen name={Screens.DrawerNavigator} component={DrawerNavigator} options={noHeader} />
       {commonScreens(Stack)}
       {sendScreens(Stack)}
