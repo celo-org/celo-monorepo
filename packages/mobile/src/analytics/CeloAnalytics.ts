@@ -1,5 +1,6 @@
 import CeloAnalytics, { AnalyzedApps } from '@celo/react-components/analytics/CeloAnalytics'
 import { CustomEventNames, EventPropertyType, PropertyPathWhitelist } from 'src/analytics/constants'
+import { AnalyticsPropertiesList } from 'src/analytics/Properties'
 import { DEFAULT_TESTNET, SEGMENT_API_KEY } from 'src/config'
 import { store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
@@ -20,11 +21,11 @@ class WalletAnalytics extends CeloAnalytics {
     // return store.getState().app.analyticsEnabled
   }
 
-  track(
-    eventName: EventNames,
-    eventProperties: EventPropertyType = {},
-    attachDeviceInfo: boolean = false
+  track<EventName extends keyof AnalyticsPropertiesList>(
+    ...args: [EventName] | [EventName, AnalyticsPropertiesList[EventName]]
   ) {
+    const [eventName, eventProperties] = args
+    const attachDeviceInfo = false
     super.track(eventName, eventProperties, attachDeviceInfo)
   }
 

@@ -16,7 +16,7 @@ import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import { MoneyAmount } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
@@ -144,8 +144,8 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     )
     CeloAnalytics.track(
       this.isDollarToGold()
-        ? CustomEventNames.gold_buy_continue
-        : CustomEventNames.gold_sell_continue,
+        ? AnalyticsEvents.gold_buy_continue
+        : AnalyticsEvents.gold_sell_continue,
       {
         localCurrencyAmount,
         goldAmount,
@@ -255,7 +255,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
 
   switchInputToken = () => {
     const inputToken = this.getOppositeInputToken()
-    CeloAnalytics.track(CustomEventNames.gold_switch_input_currency, {
+    CeloAnalytics.track(AnalyticsEvents.gold_switch_input_currency, {
       to: inputToken,
     })
     this.setState({ inputToken }, () => {

@@ -21,7 +21,7 @@ import {
 import { PaymentRequest, PaymentRequestStatus } from 'src/account/types'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import { Actions as AppActions, SetLanguage } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { FIREBASE_ENABLED } from 'src/config'
@@ -172,13 +172,13 @@ function* updatePaymentRequestStatus({
 }: (DeclinePaymentRequestAction | CompletePaymentRequestAction) | CancelPaymentRequestAction) {
   switch (status) {
     case PaymentRequestStatus.DECLINED:
-      CeloAnalytics.track(CustomEventNames.incoming_request_payment_decline)
+      CeloAnalytics.track(AnalyticsEvents.incoming_request_payment_decline)
       break
     case PaymentRequestStatus.COMPLETED:
-      CeloAnalytics.track(CustomEventNames.incoming_request_payment_pay)
+      CeloAnalytics.track(AnalyticsEvents.incoming_request_payment_pay)
       break
     case PaymentRequestStatus.CANCELLED:
-      CeloAnalytics.track(CustomEventNames.outgoing_request_payment_cancel)
+      CeloAnalytics.track(AnalyticsEvents.outgoing_request_payment_cancel)
       break
   }
   try {

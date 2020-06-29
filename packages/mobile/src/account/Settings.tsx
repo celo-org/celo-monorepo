@@ -17,7 +17,7 @@ import { devModeTriggerClicked, toggleBackupState } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import {
   resetAppOpenedState,
   setAnalyticsEnabled,
@@ -101,7 +101,7 @@ interface State {
 
 export class Account extends React.Component<Props, State> {
   goToProfile = () => {
-    CeloAnalytics.track(CustomEventNames.edit_profile)
+    CeloAnalytics.track(AnalyticsEvents.edit_profile)
     this.props.navigation.navigate(Screens.Profile)
   }
 
@@ -155,7 +155,7 @@ export class Account extends React.Component<Props, State> {
     } else {
       return (
         <View style={styles.devSettings}>
-          {/* 
+          {/*
           // TODO: It's commented because it broke a while back but this is something we'd like to re-enable
           <View style={style.devSettingsItem}>
             <TouchableOpacity onPress={this.revokeNumberVerification}>

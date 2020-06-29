@@ -4,7 +4,7 @@ import { Image, StyleSheet } from 'react-native'
 import { connect } from 'react-redux'
 import { PaymentRequest } from 'src/account/types'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import { cancelPaymentRequest, updatePaymentRequestNotified } from 'src/firebase/actions'
 import { Namespaces, withTranslation } from 'src/i18n'
 import {
@@ -50,7 +50,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
 // Payment Request notification for the notification center on home screen
 export class OutgoingPaymentRequestSummaryNotification extends React.Component<Props> {
   onReview = () => {
-    CeloAnalytics.track(CustomEventNames.outgoing_request_payment_review)
+    CeloAnalytics.track(AnalyticsEvents.outgoing_request_payment_review)
     navigate(Screens.OutgoingPaymentRequestListScreen)
   }
 

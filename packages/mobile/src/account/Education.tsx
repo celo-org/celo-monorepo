@@ -9,7 +9,7 @@ import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native
 import SafeAreaView from 'react-native-safe-area-view'
 import Swiper from 'react-native-swiper'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEventType } from 'src/analytics/Events'
 import { placeholder } from 'src/images/Images'
 import { navigateBack } from 'src/navigator/NavigationService'
 import { TopBarIconButton } from 'src/navigator/TopBarButton.v2'
@@ -22,8 +22,8 @@ interface EducationStep {
   image: ImageSourcePropType | null
   title: string
   text: string
-  cancelEvent: CustomEventNames
-  progressEvent: CustomEventNames
+  cancelEvent: AnalyticsEventType
+  progressEvent: AnalyticsEventType
   screenName: string
 }
 

@@ -11,7 +11,7 @@ import { StyleSheet, View } from 'react-native'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { estimateFee, FeeType } from 'src/fees/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
@@ -112,7 +112,7 @@ export const sendScreenNavOptions = ({
         icon={<Times />}
         onPress={navigateBack}
         eventName={
-          route.params?.isRequest ? CustomEventNames.send_cancel : CustomEventNames.request_cancel
+          route.params?.isRequest ? AnalyticsEvents.send_cancel : AnalyticsEvents.request_cancel
         }
       />
     ),
@@ -121,7 +121,7 @@ export const sendScreenNavOptions = ({
       <TopBarIconButton
         icon={<QRCodeBorderlessIcon height={32} color={colors.greenUI} />}
         eventName={
-          route.params?.isRequest ? CustomEventNames.send_scan : CustomEventNames.request_scan
+          route.params?.isRequest ? AnalyticsEvents.send_scan : AnalyticsEvents.request_scan
         }
         onPress={goQr}
       />
@@ -232,12 +232,10 @@ class Send extends React.Component<Props, State> {
     this.props.storeLatestInRecents(recipient)
 
     CeloAnalytics.track(
-      isRequest
-        ? CustomEventNames.request_select_recipient
-        : CustomEventNames.send_select_recipient,
+      isRequest ? AnalyticsEvents.request_select_recipient : AnalyticsEvents.send_select_recipient,
       {
         recipientKind: recipient.kind,
-        didQuery: this.state.searchQuery.length > 0,
+        method: this.state.searchQuery.length > 0 ? 'used search bar' : 'selected from list',
       }
     )
 

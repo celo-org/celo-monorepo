@@ -15,7 +15,7 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { useDispatch } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackButton from 'src/components/BackButton.v2'
@@ -75,8 +75,8 @@ export const sendAmountScreenNavOptions = ({
     : i18n.t('sendFlow7:send')
 
   const eventName = route.params?.isRequest
-    ? CustomEventNames.request_amount_back
-    : CustomEventNames.send_amount_back
+    ? AnalyticsEvents.request_amount_back
+    : AnalyticsEvents.send_amount_back
 
   return {
     ...emptyHeader,
@@ -233,7 +233,7 @@ function SendAmount(props: Props) {
         isFromScan: props.route.params?.isFromScan,
       })
     } else {
-      CeloAnalytics.track(CustomEventNames.send_continue, continueAnalyticsParams)
+      CeloAnalytics.track(AnalyticsEvents.send_continue, continueAnalyticsParams)
       navigate(Screens.SendConfirmation, {
         transactionData,
         isFromScan: props.route.params?.isFromScan,
@@ -257,10 +257,10 @@ function SendAmount(props: Props) {
         isPaymentRequest: true,
       })
     } else if (recipientVerificationStatus !== RecipientVerificationStatus.VERIFIED) {
-      CeloAnalytics.track(CustomEventNames.request_unavailable, continueAnalyticsParams)
+      CeloAnalytics.track(AnalyticsEvents.request_unavailable, continueAnalyticsParams)
       navigate(Screens.PaymentRequestUnavailable, { transactionData })
     } else {
-      CeloAnalytics.track(CustomEventNames.request_continue, continueAnalyticsParams)
+      CeloAnalytics.track(AnalyticsEvents.request_continue, continueAnalyticsParams)
       navigate(Screens.PaymentRequestConfirmation, { transactionData })
     }
   }, [addressValidationType, getTransactionData])

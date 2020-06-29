@@ -4,7 +4,7 @@ import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { cancelPaymentRequest, updatePaymentRequestNotified } from 'src/firebase/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
@@ -27,7 +27,7 @@ export class OutgoingPaymentRequestListItem extends React.Component<Props> {
   onRemind = () => {
     const { id, t } = this.props
     this.props.updatePaymentRequestNotified(id, false)
-    CeloAnalytics.track(CustomEventNames.outgoing_request_payment_remind)
+    CeloAnalytics.track(AnalyticsEvents.outgoing_request_payment_remind)
     Logger.showMessage(t('sendFlow7:reminderSent'))
   }
 

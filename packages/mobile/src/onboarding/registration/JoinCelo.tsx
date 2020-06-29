@@ -16,7 +16,7 @@ import { setName, setPhoneNumber, setPromptForno } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
 import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -171,7 +171,7 @@ export class JoinCelo extends React.Component<Props, State> {
     if (!e164Number || !isValidNumber || !countryCallingCode) {
       // Replacing all integers except 0 with and “X” before logging so
       // we can see if unnecessary symbols or leading 0s were added
-      CeloAnalytics.track(CustomEventNames.invalid_phone_number, {
+      CeloAnalytics.track(AnalyticsEvents.invalid_phone_number, {
         obfuscatedPhoneNumber: e164Number.replace(/[1-9]/g, 'X'),
       })
       this.props.showError(ErrorMessages.INVALID_PHONE_NUMBER)
@@ -184,7 +184,7 @@ export class JoinCelo extends React.Component<Props, State> {
     }
 
     this.props.setPromptForno(true) // Allow forno prompt after Welcome screen
-    CeloAnalytics.track(CustomEventNames.phone_number_set, { countryCode: countryCallingCode })
+    CeloAnalytics.track(AnalyticsEvents.phone_number_set, { countryCode: countryCallingCode })
     this.props.setPhoneNumber(e164Number, countryCallingCode)
     this.props.setName(name)
     this.goToNextScreen()

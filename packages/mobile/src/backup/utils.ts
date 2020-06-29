@@ -5,7 +5,7 @@ import * as bip39 from 'react-native-bip39'
 import { useDispatch } from 'react-redux'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { getKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
@@ -113,7 +113,7 @@ export async function getStoredMnemonic(): Promise<string | null> {
 
 export function onGetMnemonicFail(viewError: (error: ErrorMessages) => void, context?: string) {
   viewError(ErrorMessages.FAILED_FETCH_MNEMONIC)
-  CeloAnalytics.track(CustomEventNames.backup_error, {
+  CeloAnalytics.track(AnalyticsEvents.backup_error, {
     title: 'Failed to retrieve Account Key',
     context,
   })

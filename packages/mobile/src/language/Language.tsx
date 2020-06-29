@@ -8,7 +8,7 @@ import { FlatList, ListRenderItemInfo, ScrollView, StyleSheet, Text } from 'reac
 import SafeAreaView from 'react-native-safe-area-view'
 import { useDispatch } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import { setLanguage } from 'src/app/actions'
 import { AVAILABLE_LANGUAGES } from 'src/config'
 import { Namespaces } from 'src/i18n'
@@ -35,7 +35,7 @@ function LanguageScreen({ route }: Props) {
   const fromSettings = route.params?.fromSettings
 
   const onSelect = (language: string, code: string) => {
-    CeloAnalytics.track(CustomEventNames.language_select, { language: code })
+    CeloAnalytics.track(AnalyticsEvents.language_select, { language: code })
     dispatch(setLanguage(code))
     // Wait for next frame before navigating back
     // so the user can see the changed selection briefly

@@ -9,7 +9,7 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import BackupPhraseContainer, {
   BackupPhraseContainerMode,
   BackupPhraseType,
@@ -86,8 +86,8 @@ class BackupPhrase extends React.Component<Props, State> {
 
     CeloAnalytics.track(
       value
-        ? CustomEventNames.backup_setup_toggle_enable
-        : CustomEventNames.backup_setup_toggle_disable
+        ? AnalyticsEvents.backup_setup_toggle_enable
+        : AnalyticsEvents.backup_setup_toggle_disable
     )
   }
 
@@ -96,7 +96,7 @@ class BackupPhrase extends React.Component<Props, State> {
   }
 
   onPressContinue = () => {
-    CeloAnalytics.track(CustomEventNames.backup_continue)
+    CeloAnalytics.track(AnalyticsEvents.backup_continue)
     navigate(Screens.BackupQuiz)
   }
 
@@ -138,7 +138,7 @@ class BackupPhrase extends React.Component<Props, State> {
 function HeaderRight() {
   const { t } = useTranslation(Namespaces.backupKeyFlow6)
   const onMoreInfoPressed = () => {
-    CeloAnalytics.track(CustomEventNames.backup_setup_info)
+    CeloAnalytics.track(AnalyticsEvents.backup_setup_info)
     pushToStack(Screens.AccountKeyEducation)
   }
   return <TopBarTextButton onPress={onMoreInfoPressed} title={t('moreInfo')} />

@@ -2,7 +2,7 @@ import { CURRENCY_ENUM } from '@celo/utils/src'
 import { BigNumber } from 'bignumber.js'
 import { call, delay, race, select, take } from 'redux-saga/effects'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { DEFAULT_FORNO_URL } from 'src/config'
 import { getCurrencyAddress } from 'src/tokens/saga'
@@ -42,7 +42,7 @@ const getLogger = (tag: string, txId: string) => {
         break
       case SendTransactionLogEventType.EstimatedGas:
         Logger.debug(tag, `Transaction with id ${txId} estimated gas: ${event.gas}`)
-        CeloAnalytics.track(CustomEventNames.transaction_send_gas_estimated, {
+        CeloAnalytics.track(AnalyticsEvents.transaction_send_gas_estimated, {
           txId,
           duration: Date.now() - startTime,
         })
@@ -52,14 +52,14 @@ const getLogger = (tag: string, txId: string) => {
           tag,
           `Transaction id ${txId} received receipt: ${JSON.stringify(event.receipt)}`
         )
-        CeloAnalytics.track(CustomEventNames.transaction_send_gas_receipt, {
+        CeloAnalytics.track(AnalyticsEvents.transaction_send_gas_receipt, {
           txId,
           duration: Date.now() - startTime,
         })
         break
       case SendTransactionLogEventType.TransactionHashReceived:
         Logger.debug(tag, `Transaction id ${txId} hash received: ${event.hash}`)
-        CeloAnalytics.track(CustomEventNames.transaction_send_gas_hash_received, {
+        CeloAnalytics.track(AnalyticsEvents.transaction_send_gas_hash_received, {
           txId,
           duration: Date.now() - startTime,
         })
@@ -67,11 +67,11 @@ const getLogger = (tag: string, txId: string) => {
       case SendTransactionLogEventType.Started:
         startTime = Date.now()
         Logger.debug(tag, `Sending transaction with id ${txId}`)
-        CeloAnalytics.track(CustomEventNames.transaction_send_start, { txId })
+        CeloAnalytics.track(AnalyticsEvents.transaction_send_start, { txId })
         break
       case SendTransactionLogEventType.Failed:
         Logger.error(tag, `Transaction failed: ${txId}`, event.error)
-        CeloAnalytics.track(CustomEventNames.transaction_error, {
+        CeloAnalytics.track(AnalyticsEvents.transaction_error, {
           txId,
           error: event.error.message,
           duration: Date.now() - startTime,
@@ -79,7 +79,7 @@ const getLogger = (tag: string, txId: string) => {
         break
       case SendTransactionLogEventType.Exception:
         Logger.error(tag, `Transaction Exception caught ${txId}: `, event.error)
-        CeloAnalytics.track(CustomEventNames.transaction_exception, {
+        CeloAnalytics.track(AnalyticsEvents.transaction_exception, {
           txId,
           error: event.error.message,
           duration: Date.now() - startTime,

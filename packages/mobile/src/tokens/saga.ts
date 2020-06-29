@@ -4,7 +4,7 @@ import BigNumber from 'bignumber.js'
 import { call, put, take, takeEvery } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { CURRENCY_ENUM } from 'src/geth/consts'
@@ -74,7 +74,7 @@ export function tokenFetchFactory({ actionName, token, actionCreator, tag }: Tok
       const balanceInWei: BigNumber = yield call([tokenContract, tokenContract.balanceOf], account)
       const balance: BigNumber = yield call(convertFromContractDecimals, balanceInWei, token)
       CeloAnalytics.track(
-        CustomEventNames.fetch_balance,
+        AnalyticsEvents.fetch_balance,
         token === CURRENCY_ENUM.DOLLAR
           ? {
               dollarBalance: balance,
@@ -188,7 +188,7 @@ export function tokenTransferFactory({
         yield call(sendAndMonitorTransaction, txId, tx, account, currency)
       } catch (error) {
         Logger.error(tag, 'Error transfering token', error)
-        CeloAnalytics.track(CustomEventNames.transfer_token_error, { error: error.message })
+        CeloAnalytics.track(AnalyticsEvents.transfer_token_error, { error: error.message })
         yield put(removeStandbyTransaction(txId))
         if (error.message === ErrorMessages.INCORRECT_PIN) {
           yield put(showError(ErrorMessages.INCORRECT_PIN))

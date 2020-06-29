@@ -9,7 +9,7 @@ import { dismissEarnRewards, dismissGetVerified, dismissInviteFriends } from 'sr
 import { getIncomingPaymentRequests, getOutgoingPaymentRequests } from 'src/account/selectors'
 import { PaymentRequest } from 'src/account/types'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import { PROMOTE_REWARDS_APP } from 'src/config'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentReminderSummaryNotification from 'src/escrow/EscrowedPaymentReminderSummaryNotification'
@@ -134,7 +134,7 @@ export class NotificationBox extends React.Component<Props, State> {
           {
             text: t('backupKeyFlow6:getBackupKey'),
             onPress: () => {
-              CeloAnalytics.track(CustomEventNames.get_backup_key)
+              CeloAnalytics.track(AnalyticsEvents.get_backup_key)
               navigate(Screens.BackupIntroduction)
             },
           },
@@ -174,7 +174,7 @@ export class NotificationBox extends React.Component<Props, State> {
             text: t('walletFlow5:startEarning'),
             onPress: () => {
               this.props.dismissEarnRewards()
-              CeloAnalytics.track(CustomEventNames.celorewards_notification_confirm)
+              CeloAnalytics.track(AnalyticsEvents.celorewards_notification_confirm)
               navigateToVerifierApp()
             },
           },
@@ -182,7 +182,7 @@ export class NotificationBox extends React.Component<Props, State> {
             text: t('maybeLater'),
             onPress: () => {
               this.props.dismissEarnRewards()
-              CeloAnalytics.track(CustomEventNames.celorewards_notification_dismiss)
+              CeloAnalytics.track(AnalyticsEvents.celorewards_notification_dismiss)
             },
           },
         ],
@@ -198,14 +198,14 @@ export class NotificationBox extends React.Component<Props, State> {
           {
             text: t('exchange'),
             onPress: () => {
-              CeloAnalytics.track(CustomEventNames.celogold_notification_confirm)
+              CeloAnalytics.track(AnalyticsEvents.celogold_notification_confirm)
               navigate(Screens.GoldEducation)
             },
           },
           {
             text: t('maybeLater'),
             onPress: () => {
-              CeloAnalytics.track(CustomEventNames.celogold_notification_dismiss)
+              CeloAnalytics.track(AnalyticsEvents.celogold_notification_dismiss)
             },
           },
         ],
@@ -222,7 +222,7 @@ export class NotificationBox extends React.Component<Props, State> {
             text: t('global:inviteFriends'),
             onPress: () => {
               this.props.dismissInviteFriends()
-              CeloAnalytics.track(CustomEventNames.invitefriends_notification_confirm)
+              CeloAnalytics.track(AnalyticsEvents.invitefriends_notification_confirm)
               navigate(Screens.Invite)
             },
           },
@@ -230,7 +230,7 @@ export class NotificationBox extends React.Component<Props, State> {
             text: t('maybeLater'),
             onPress: () => {
               this.props.dismissInviteFriends()
-              CeloAnalytics.track(CustomEventNames.invitefriends_notification_dismiss)
+              CeloAnalytics.track(AnalyticsEvents.invitefriends_notification_dismiss)
             },
           },
         ],

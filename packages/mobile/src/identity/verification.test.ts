@@ -6,7 +6,7 @@ import { call, delay, select } from 'redux-saga/effects'
 import { e164NumberSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
@@ -166,7 +166,7 @@ describe('Start Verification Saga', () => {
       ])
       .run()
     expect(MockedAnalytics.track.mock.calls.length).toBe(1)
-    expect(MockedAnalytics.track.mock.calls[0][0]).toBe(CustomEventNames.verification_failed)
+    expect(MockedAnalytics.track.mock.calls[0][0]).toBe(AnalyticsEvents.verification_failed)
   })
 
   it('times out when verification takes too long', async () => {
@@ -178,8 +178,8 @@ describe('Start Verification Saga', () => {
       ])
       .run(2000)
     expect(MockedAnalytics.track.mock.calls.length).toBe(2)
-    expect(MockedAnalytics.track.mock.calls[0][0]).toBe(CustomEventNames.verification_timed_out)
-    expect(MockedAnalytics.track.mock.calls[1][0]).toBe(CustomEventNames.error_displayed)
+    expect(MockedAnalytics.track.mock.calls[0][0]).toBe(AnalyticsEvents.verification_timed_out)
+    expect(MockedAnalytics.track.mock.calls[1][0]).toBe(AnalyticsEvents.error_displayed)
   })
 
   it('stops when the user cancels', async () => {
@@ -191,7 +191,7 @@ describe('Start Verification Saga', () => {
       .dispatch(cancelVerification())
       .run(2000)
     expect(MockedAnalytics.track.mock.calls.length).toBe(1)
-    expect(MockedAnalytics.track.mock.calls[0][0]).toBe(CustomEventNames.verification_cancelled)
+    expect(MockedAnalytics.track.mock.calls[0][0]).toBe(AnalyticsEvents.verification_cancelled)
   })
 })
 

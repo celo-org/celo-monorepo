@@ -12,7 +12,7 @@ import { connect } from 'react-redux'
 import { PaymentRequestStatus } from 'src/account/types'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import BackButton from 'src/components/BackButton.v2'
 import CommentTextInput from 'src/components/CommentTextInput'
 import CurrencyDisplay, { DisplayType } from 'src/components/CurrencyDisplay'
@@ -71,7 +71,7 @@ type Props = DispatchProps & StateProps & WithTranslation & OwnProps
 
 export const paymentConfirmationScreenNavOptions = () => ({
   ...emptyHeader,
-  headerLeft: () => <BackButton eventName={CustomEventNames.request_confirm_back} />,
+  headerLeft: () => <BackButton eventName={AnalyticsEvents.request_confirm_back} />,
 })
 
 class PaymentRequestConfirmation extends React.Component<Props> {
@@ -125,7 +125,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
       notified: false,
     }
 
-    CeloAnalytics.track(CustomEventNames.request_confirm, { requesteeAddress })
+    CeloAnalytics.track(AnalyticsEvents.request_confirm, { requesteeAddress })
     this.props.writePaymentRequest(paymentInfo)
     Logger.showMessage(t('requestSent'))
   }

@@ -5,7 +5,7 @@ import BlindThresholdBls from 'react-native-blind-threshold-bls'
 import { call, put, select } from 'redux-saga/effects'
 import { e164NumberSelector } from 'src/account/selectors'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import networkConfig from 'src/geth/networkConfig'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
@@ -249,16 +249,16 @@ function* navigateToQuotaPurchaseScreen() {
       throw new Error('Purchase tx failed')
     }
 
-    CeloAnalytics.track(CustomEventNames.phone_number_quota_purchase_success)
+    CeloAnalytics.track(AnalyticsEvents.phone_number_quota_purchase_success)
     Logger.debug(`${TAG}@navigateToQuotaPurchaseScreen`, `Quota purchase successful`)
     navigateBack()
     return true
   } catch (error) {
     // CC Rossy
     if (error.message === 'skipped') {
-      CeloAnalytics.track(CustomEventNames.phone_number_quota_purchase_skip)
+      CeloAnalytics.track(AnalyticsEvents.phone_number_quota_purchase_skip)
     } else {
-      CeloAnalytics.track(CustomEventNames.phone_number_quota_purchase_failure, {
+      CeloAnalytics.track(AnalyticsEvents.phone_number_quota_purchase_failure, {
         error: error.message,
       })
     }

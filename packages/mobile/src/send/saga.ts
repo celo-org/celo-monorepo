@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import { call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { calculateFee } from 'src/fees/saga'
 import { completePaymentRequest } from 'src/firebase/actions'
@@ -169,7 +169,7 @@ function* sendPaymentOrInviteSaga({
         true
       )
       yield call(sendPayment, recipientAddress, amount, encryptedComment, CURRENCY_ENUM.DOLLAR)
-      CeloAnalytics.track(CustomEventNames.send_dollar_transaction)
+      CeloAnalytics.track(AnalyticsEvents.send_dollar_transaction)
     } else if (recipient.e164PhoneNumber) {
       yield call(
         sendInvite,
@@ -184,11 +184,11 @@ function* sendPaymentOrInviteSaga({
       yield put(completePaymentRequest(firebasePendingRequestUid))
     }
 
-    CeloAnalytics.track(CustomEventNames.send_complete, { isInvite })
+    CeloAnalytics.track(AnalyticsEvents.send_complete, { isInvite })
     navigateHome()
     yield put(sendPaymentOrInviteSuccess())
   } catch (e) {
-    CeloAnalytics.track(CustomEventNames.send_error, { isInvite, error: e.message })
+    CeloAnalytics.track(AnalyticsEvents.send_error, { isInvite, error: e.message })
     yield put(showError(ErrorMessages.SEND_PAYMENT_FAILED))
     yield put(sendPaymentOrInviteFailure())
   }

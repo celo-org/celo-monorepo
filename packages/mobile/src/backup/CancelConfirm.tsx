@@ -3,7 +3,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import CancelButton from 'src/components/CancelButton.v2'
 import Dialog from 'src/components/Dialog'
 import { Namespaces } from 'src/i18n'
@@ -22,18 +22,18 @@ export default function CancelConfirm({ screen }: Props) {
 
   const onCancel = React.useCallback(() => {
     setOpenState(true)
-    CeloAnalytics.track(CustomEventNames.backup_cancel, { screen })
+    CeloAnalytics.track(AnalyticsEvents.backup_cancel, { screen })
   }, [screen])
 
   const onComplete = React.useCallback(() => {
     setOpenState(false)
-    CeloAnalytics.track(CustomEventNames.backup_cancel_procrastinate, { screen, title: actionText })
+    CeloAnalytics.track(AnalyticsEvents.backup_cancel_procrastinate, { screen, title: actionText })
   }, [screen, actionText])
 
   const onProcrastinate = React.useCallback(() => {
     setOpenState(false)
     navigateHome()
-    CeloAnalytics.track(CustomEventNames.backup_cancel_procrastinate, {
+    CeloAnalytics.track(AnalyticsEvents.backup_cancel_procrastinate, {
       screen,
       title: secondaryText,
     })

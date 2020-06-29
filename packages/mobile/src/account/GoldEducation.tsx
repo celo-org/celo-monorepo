@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import Education from 'src/account/Education'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import { setEducationCompleted } from 'src/goldToken/actions'
 import { Namespaces } from 'src/i18n'
 import { exchangeIcon, goldValue, shinyGold } from 'src/images/Images'
@@ -20,7 +20,7 @@ export default function GoldEducation() {
   const isCeloEducationComplete = useSelector((state) => state.goldToken.educationCompleted)
 
   const onFinish = () => {
-    CeloAnalytics.track(CustomEventNames.exchange_gold_nux)
+    CeloAnalytics.track(AnalyticsEvents.exchange_gold_nux)
 
     if (isCeloEducationComplete) {
       navigateBack()
@@ -51,20 +51,20 @@ function useStep() {
     return [
       {
         image: shinyGold,
-        cancelEvent: CustomEventNames.gold_cancel1,
-        progressEvent: CustomEventNames.gold_educate_1_next,
+        cancelEvent: AnalyticsEvents.gold_cancel1,
+        progressEvent: AnalyticsEvents.gold_educate_1_next,
         screenName: 'Gold_Nux_1',
       },
       {
         image: goldValue,
-        cancelEvent: CustomEventNames.gold_cancel2,
-        progressEvent: CustomEventNames.gold_educate_2_next,
+        cancelEvent: AnalyticsEvents.gold_cancel2,
+        progressEvent: AnalyticsEvents.gold_educate_2_next,
         screenName: 'Gold_Nux_2',
       },
       {
         image: exchangeIcon,
-        cancelEvent: CustomEventNames.gold_cancel3,
-        progressEvent: CustomEventNames.gold_educate_3_next,
+        cancelEvent: AnalyticsEvents.gold_cancel3,
+        progressEvent: AnalyticsEvents.gold_educate_3_next,
         screenName: 'Gold_Nux_3',
       },
     ].map((step, index) => {

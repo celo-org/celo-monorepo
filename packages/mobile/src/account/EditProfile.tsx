@@ -8,7 +8,7 @@ import { ScrollView, StyleSheet } from 'react-native'
 import { connect } from 'react-redux'
 import { setName } from 'src/account/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { RootState } from 'src/redux/reducers'
 
@@ -43,7 +43,7 @@ export class EditProfile extends React.Component<Props, State> {
 
   nameSubmitted = () => {
     this.props.setName(this.state.name)
-    CeloAnalytics.track(CustomEventNames.edit_name)
+    CeloAnalytics.track(AnalyticsEvents.edit_name)
   }
 
   render() {

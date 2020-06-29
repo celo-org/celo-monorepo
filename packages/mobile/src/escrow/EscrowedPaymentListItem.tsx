@@ -3,7 +3,7 @@ import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, View } from 'react-native'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { EscrowedPayment } from 'src/escrow/actions'
@@ -32,7 +32,7 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
   onRemind = async () => {
     const { payment, t, invitees } = this.props
     const recipientPhoneNumber = payment.recipientPhone
-    CeloAnalytics.track(CustomEventNames.clicked_escrowed_payment_send_message)
+    CeloAnalytics.track(AnalyticsEvents.clicked_escrowed_payment_send_message)
 
     try {
       const inviteDetails = invitees.find(
@@ -60,7 +60,7 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
   onReclaimPayment = () => {
     const { payment } = this.props
     const reclaimPaymentInput = payment
-    CeloAnalytics.track(CustomEventNames.clicked_escrowed_payment_notification)
+    CeloAnalytics.track(AnalyticsEvents.clicked_escrowed_payment_notification)
     navigate(Screens.ReclaimPaymentConfirmationScreen, { reclaimPaymentInput })
   }
   getCTA = () => {

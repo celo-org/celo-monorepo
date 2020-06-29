@@ -10,7 +10,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useSafeArea } from 'react-native-safe-area-view'
 import { useDispatch, useSelector } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import i18n, { Namespaces } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
 import { cancelImportContacts, denyImportContacts, importContacts } from 'src/identity/actions'
@@ -85,7 +85,7 @@ function ImportContactsScreen({ route, navigation }: Props) {
   }
 
   const onPressConnect = async () => {
-    CeloAnalytics.track(CustomEventNames.import_contacts)
+    CeloAnalytics.track(AnalyticsEvents.import_contacts)
     const hasGivenContactPermission = await requestContactsPermission()
     if (hasGivenContactPermission) {
       dispatch(importContacts(isFindMeSwitchChecked))

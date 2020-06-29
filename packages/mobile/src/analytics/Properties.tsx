@@ -18,11 +18,7 @@ import {
   VerificationEvents,
 } from 'src/analytics/Events'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
-
-export declare type AnalyticsEventProperties<
-  AnalyticsPropsList,
-  EventName extends keyof AnalyticsPropsList
-> = AnalyticsPropsList[EventName] extends undefined ? {} : AnalyticsPropsList[EventName]
+import { RecipientKind } from 'src/recipients/recipient'
 
 export interface AnalyticsPropertiesList {
   [AppEvents.app_launched]: {
@@ -67,10 +63,18 @@ export interface AnalyticsPropertiesList {
   [OnboardingEvents.backup_educate_3_next]: undefined
   [OnboardingEvents.backup_educate_4_next]: undefined
 
-  [OnboardingEvents.backup_educate_1_cancel]: undefined
-  [OnboardingEvents.backup_educate_2_cancel]: undefined
-  [OnboardingEvents.backup_educate_3_cancel]: undefined
-  [OnboardingEvents.backup_educate_4_cancel]: undefined
+  [OnboardingEvents.backup_educate_1_cancel]: {
+    screen: string
+  }
+  [OnboardingEvents.backup_educate_2_cancel]: {
+    screen: string
+  }
+  [OnboardingEvents.backup_educate_3_cancel]: {
+    screen: string
+  }
+  [OnboardingEvents.backup_educate_4_cancel]: {
+    screen: string
+  }
 
   [OnboardingEvents.backup_start]: undefined
   [OnboardingEvents.backup_setup_info]: undefined
@@ -94,9 +98,17 @@ export interface AnalyticsPropertiesList {
   [OnboardingEvents.gold_educate_2_next]: undefined
   [OnboardingEvents.gold_educate_3_next]: undefined
 
-  [OnboardingEvents.gold_cancel1]: undefined
-  [OnboardingEvents.gold_cancel2]: undefined
-  [OnboardingEvents.gold_cancel3]: undefined
+  [OnboardingEvents.exchange_gold_nux]: undefined
+
+  [OnboardingEvents.gold_cancel1]: {
+    screen: string
+  }
+  [OnboardingEvents.gold_cancel2]: {
+    screen: string
+  }
+  [OnboardingEvents.gold_cancel3]: {
+    screen: string
+  }
 
   [OnboardingEvents.phone_number_set]: {
     countryCode: string
@@ -214,27 +226,33 @@ export interface AnalyticsPropertiesList {
     error: string
   }
   [InviteEvents.invite_skip_complete]: undefined
+  [InviteEvents.redeem_invite_success]: undefined
+  [InviteEvents.redeem_invite_timed_out]: undefined
+  [InviteEvents.redeem_invite_failed]: undefined
 
   [SendEvents.send_cancel]: undefined
   [SendEvents.send_scan]: undefined
-  [SendEvents.send_select_recipient]: undefined
+  [SendEvents.send_select_recipient]: {
+    recipeientKind: RecipientKind
+    method: 'used search bar' | 'selected from list'
+  }
   [SendEvents.send_amount_back]: undefined
   [SendEvents.send_continue]: {
     method: 'scan' | 'search'
     transactionType: 'send' | 'invite'
-    localCurrencyExchangeRate: string
+    localCurrencyExchangeRate: string | null
     localCurrency: LocalCurrencyCode
-    dollarAmount: BigNumber
-    localCurrencyAmount: BigNumber
+    dollarAmount: BigNumber | null
+    localCurrencyAmount: BigNumber | null
   }
   [SendEvents.send_confirm_back]: undefined
   [SendEvents.send_confirm]: {
     method: 'scan' | 'search'
-    localCurrencyExchangeRate: string
+    transactionType: 'send' | 'invite'
+    localCurrencyExchangeRate: string | null
     localCurrency: LocalCurrencyCode
-    dollarAmount: BigNumber
-    localCurrencyAmount: BigNumber
-    isInvite: boolean
+    dollarAmount: BigNumber | null
+    localCurrencyAmount: BigNumber | null
   }
   [SendEvents.send_error]: {
     isInvite: boolean
@@ -257,14 +275,19 @@ export interface AnalyticsPropertiesList {
   }
   [SendEvents.send_secure_success]: {
     method: 'scan' | 'manual'
+    validationType?: 'full' | 'partial'
   }
   [SendEvents.send_secure_incorrect]: {
     method: 'scan' | 'manual'
     validationType?: 'full' | 'partial'
     error: string
   }
-  [SendEvents.send_secure_info]: undefined
-  [SendEvents.send_secure_info_dismissed]: undefined
+  [SendEvents.send_secure_info]: {
+    validationType: 'full' | 'partial'
+  }
+  [SendEvents.send_secure_info_dismissed]: {
+    validationType: 'full' | 'partial'
+  }
   [SendEvents.send_secure_edit]: undefined
 
   [EscrowEvents.escrowed_payment_review]: undefined
@@ -288,22 +311,25 @@ export interface AnalyticsPropertiesList {
   [RequestEvents.request_amount_back]: undefined
   [RequestEvents.request_cancel]: undefined
   [RequestEvents.request_scan]: undefined
-  [RequestEvents.request_select_recipient]: undefined
+  [RequestEvents.request_select_recipient]: {
+    recipeientKind: RecipientKind
+    method: 'used search bar' | 'selected from list'
+  }
   [RequestEvents.request_continue]: {
     method: 'scan' | 'search'
     transactionType: 'send' | 'invite'
-    localCurrencyExchangeRate: string
+    localCurrencyExchangeRate: string | null
     localCurrency: LocalCurrencyCode
-    dollarAmount: BigNumber
-    localCurrencyAmount: BigNumber
+    dollarAmount: BigNumber | null
+    localCurrencyAmount: BigNumber | null
   }
   [RequestEvents.request_unavailable]: {
     method: 'scan' | 'search'
     transactionType: 'send' | 'invite'
-    localCurrencyExchangeRate: string
+    localCurrencyExchangeRate: string | null
     localCurrency: LocalCurrencyCode
-    dollarAmount: BigNumber
-    localCurrencyAmount: BigNumber
+    dollarAmount: BigNumber | null
+    localCurrencyAmount: BigNumber | null
   }
   [RequestEvents.request_confirm_back]: undefined
   [RequestEvents.request_confirm]: {
@@ -349,6 +375,12 @@ export interface AnalyticsPropertiesList {
     txId: string
     duration: number
     error: string
+  }
+  [TransactionEvents.transfer_token_error]: {
+    error: string
+  }
+  [TransactionEvents.unexpected_maker_token]: {
+    makerToken: CURRENCY_ENUM
   }
 
   [CeloExchangeEvents.gold_switch_input_currency]: {

@@ -4,7 +4,7 @@ import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import Education, { Props } from 'src/account/Education'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import { navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { createMockStore } from 'test/utils'
@@ -17,8 +17,8 @@ const educationProps: Props = {
       image: null,
       title: 'Step 1',
       text: 'The Journey Begins',
-      cancelEvent: CustomEventNames.gold_cancel1,
-      progressEvent: CustomEventNames.gold_educate_1_next,
+      cancelEvent: AnalyticsEvents.gold_cancel1,
+      progressEvent: AnalyticsEvents.gold_educate_1_next,
       screenName: Screens.Debug,
     },
   ],

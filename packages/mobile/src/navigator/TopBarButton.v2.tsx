@@ -5,13 +5,13 @@ import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { StyleProp, StyleSheet, Text, TextStyle } from 'react-native'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEventType } from 'src/analytics/Events'
 
 interface CommonProps {
   disabled?: boolean
   testID?: string
   onPress: () => void
-  eventName?: CustomEventNames
+  eventName?: AnalyticsEventType
 }
 
 type WrapperProps = CommonProps & {

@@ -4,7 +4,7 @@ import { call, cancel, cancelled, delay, fork, put, race, select, take } from 'r
 import { setPromptForno } from 'src/account/actions'
 import { promptFornoIfNeededSelector } from 'src/account/selectors'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import { waitForRehydrate } from 'src/app/saga'
 import { Actions, setGethConnected, setInitState } from 'src/geth/actions'
 import {
@@ -99,7 +99,7 @@ export function* initGethSaga() {
   switch (result) {
     case GethInitOutcomes.SUCCESS: {
       Logger.debug(TAG, 'Geth initialized')
-      CeloAnalytics.track(CustomEventNames.geth_init_success)
+      CeloAnalytics.track(AnalyticsEvents.geth_init_success)
       yield put(setInitState(InitializationState.INITIALIZED))
       return
     }
@@ -137,19 +137,19 @@ export function* initGethSaga() {
     }
   }
 
-  CeloAnalytics.track(CustomEventNames.geth_init_failure, {
+  CeloAnalytics.track(AnalyticsEvents.geth_init_failure, {
     error: result.message,
     context: errorContext,
   })
 
   if (restartAppAutomatically) {
     Logger.error(TAG, 'Geth initialization failed, restarting the app.')
-    CeloAnalytics.track(CustomEventNames.geth_restart_to_fix_init)
+    CeloAnalytics.track(AnalyticsEvents.geth_restart_to_fix_init)
     deleteChainDataAndRestartApp()
   } else {
     // Suggest switch to forno for network-related errors
     if (yield select(promptFornoIfNeededSelector)) {
-      CeloAnalytics.track(CustomEventNames.prompt_forno, {
+      CeloAnalytics.track(AnalyticsEvents.prompt_forno, {
         error: result.message,
         context: 'Geth init error',
       })

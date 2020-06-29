@@ -8,7 +8,7 @@ import { connect } from 'react-redux'
 import { defaultCountryCodeSelector } from 'src/account/selectors'
 import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import ContactPermission from 'src/icons/ContactPermission'
@@ -98,7 +98,7 @@ class Invite extends React.Component<Props, State> {
   onSelectRecipient = (recipient: Recipient) => {
     this.props.hideAlert()
     if (recipient.e164PhoneNumber) {
-      CeloAnalytics.track(CustomEventNames.friend_invited)
+      CeloAnalytics.track(AnalyticsEvents.friend_invited)
       navigate(Screens.InviteReview, { recipient })
     } else {
       this.props.showError(ErrorMessages.CANT_SELECT_INVALID_PHONE)

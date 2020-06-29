@@ -4,12 +4,12 @@ import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text } from 'react-native'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEventType } from 'src/analytics/Events'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { navigateBack } from 'src/navigator/NavigationService'
 
 type Props = {
-  eventName?: CustomEventNames
+  eventName?: AnalyticsEventType
   onCancel?: () => void
 } & WithTranslation
 

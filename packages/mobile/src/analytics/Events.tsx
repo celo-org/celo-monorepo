@@ -71,6 +71,8 @@ export enum OnboardingEvents {
   gold_cancel2 = 'gold_cancel2', // cancel button on 2nd edu screen
   gold_cancel3 = 'gold_cancel3', // cancel button on 3rd edu screen
 
+  exchange_gold_nux = 'exchange_gold_nux',
+
   phone_number_set = 'phone_number_set',
   invalid_phone_number = 'invalid_phone_number',
   pin_created = 'pin_created',
@@ -128,6 +130,10 @@ export enum InviteEvents {
   invite_friends_whatsapp = 'invite_friends_whatsapp', // to count the # of taps on “Invite with WhatsApp" button on Invite_Friends_Review
   invite_skip_failed = 'invite_skip_failed',
   invite_skip_complete = 'invite_skip_complete',
+
+  redeem_invite_success = 'redeem_invite_success',
+  redeem_invite_timed_out = 'redeem_invite_timed_out',
+  redeem_invite_failed = 'redeem_invite_failed',
 }
 
 export enum SendEvents {
@@ -192,6 +198,8 @@ export enum TransactionEvents {
   transaction_send_gas_receipt = 'transaction_send_gas_receipt',
   transaction_error = 'transaction_error',
   transaction_exception = 'transaction_exception',
+  transfer_token_error = 'transfer_token_error',
+  unexpected_maker_token = 'unexpected_maker_token',
 }
 
 export enum CeloExchangeEvents {

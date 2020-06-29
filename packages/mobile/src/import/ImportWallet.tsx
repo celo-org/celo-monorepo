@@ -11,7 +11,7 @@ import { SafeAreaConsumer } from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { hideAlert } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import {
   formatBackupPhraseOnEdit,
   formatBackupPhraseOnSubmit,
@@ -99,7 +99,7 @@ export class ImportWallet extends React.Component<Props, State> {
   onPressRestore = () => {
     Keyboard.dismiss()
     this.props.hideAlert()
-    CeloAnalytics.track(CustomEventNames.import_wallet_submit)
+    CeloAnalytics.track(AnalyticsEvents.import_wallet_submit)
 
     const formattedPhrase = formatBackupPhraseOnSubmit(this.state.backupPhrase)
     this.setState({

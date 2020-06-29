@@ -3,7 +3,7 @@ import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet } from 'react-native'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentLineItem from 'src/escrow/EscrowedPaymentLineItem'
 import { listItemRenderer } from 'src/escrow/EscrowedPaymentListScreen'
@@ -23,7 +23,7 @@ type Props = OwnProps & WithTranslation
 
 export class EscrowedPaymentReminderSummaryNotification extends React.Component<Props> {
   onReview = () => {
-    CeloAnalytics.track(CustomEventNames.escrowed_payment_review)
+    CeloAnalytics.track(AnalyticsEvents.escrowed_payment_review)
     navigate(Screens.EscrowedPaymentListScreen)
   }
 

@@ -16,7 +16,7 @@ import { enableScreens } from 'react-native-screens'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import { apolloClient } from 'src/apollo/index'
 import { openDeepLink } from 'src/app/actions'
 import AppLoading from 'src/app/AppLoading'
@@ -58,7 +58,7 @@ export class App extends React.Component {
       (appInitializedAtString: string) => {
         const appInitializedAt = new Date(appInitializedAtString)
         const timeElapsed = appLoadedAt.getTime() - appInitializedAt.getTime()
-        CeloAnalytics.track(CustomEventNames.app_launched, { timeElapsed }, true)
+        CeloAnalytics.track(AnalyticsEvents.app_launched, { timeElapsed })
         appStartListener.remove()
       }
     )
