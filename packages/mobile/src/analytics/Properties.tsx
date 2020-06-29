@@ -30,6 +30,9 @@ export interface AnalyticsPropertiesList {
   [AppEvents.error_displayed]: {
     error: string
   }
+  [AppEvents.error_boundary]: {
+    error: string
+  }
   [AppEvents.user_restart]: undefined
   [AppEvents.fetch_balance]: {
     dollarBalance?: BigNumber

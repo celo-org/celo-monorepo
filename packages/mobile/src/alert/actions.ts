@@ -1,5 +1,7 @@
 import { TOptions } from 'i18next'
 import { ErrorDisplayType } from 'src/alert/reducer'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ALERT_BANNER_DURATION } from 'src/config'
 import i18n, { Namespaces } from 'src/i18n'
@@ -39,6 +41,7 @@ export const showError = (
   dismissAfter?: number | null,
   i18nOptions?: object
 ): ShowAlertAction => {
+  CeloAnalytics.track(AnalyticsEvents.error_displayed, { error })
   return showAlert(
     AlertTypes.ERROR,
     i18n.t(error, { ns: 'global', ...(i18nOptions || {}) }),
