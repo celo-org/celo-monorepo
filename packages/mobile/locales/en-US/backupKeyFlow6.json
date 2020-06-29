@@ -15,7 +15,7 @@
   "completeEducation": "I Understand",
   "backupKey": "Account Key",
   "yourBackupKey": "Your Backup Key",
-  "backupKeyNotification": "Without a Backup Key, you may lose access to your wallet.",
+  "backupKeyNotification": "Without a Backup Key, you may lose access to your wallet",
   "backupKeySummary":
     "Find a private place and write down your Account Key. Please store it somewhere safe. Do not save it in your phone.",
   "backupPrompt":

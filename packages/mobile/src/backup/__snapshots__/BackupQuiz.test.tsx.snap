@@ -12,7 +12,7 @@ exports[`BackupQuiz renders correctly 1`] = `
     }
   }
 >
-  <View
+  <SafeAreaView
     style={
       Object {
         "height": 35,
@@ -39,7 +39,7 @@ exports[`BackupQuiz renders correctly 1`] = `
     >
          
     </Text>
-  </View>
+  </SafeAreaView>
   <RCTScrollView
     contentContainerStyle={
       Object {

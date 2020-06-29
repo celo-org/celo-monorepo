@@ -2,7 +2,7 @@
 
 ## Account
 
-Identifies an account on Celo. There are two types of account. **Externally owned accounts** have an associated Celo Gold balance and are controlled by a user holding the associated public-private keypair. **Contract accounts** contain the code and data of a single smart contract which can be called and manipulate its own stored data.
+Identifies an account on Celo. There are two types of account. **Externally owned accounts** have an associated [CELO](#celo-native-asset) balance and are controlled by a user holding the associated public-private keypair. **Contract accounts** contain the code and data of a single smart contract which can be called and manipulate its own stored data.
 
 ## Address
 
@@ -48,6 +48,18 @@ An account that receives a transfer as part of epoch rewards to cover the cost o
 
 An open platform that makes financial tools accessible to anyone with a mobile phone.
 
+## CELO
+
+The ticker symbol for the [Celo native asset](#celo-native-asset), often written in capital letters to avoid confusion with references to the Celo protocol.
+
+## Celo Gold
+
+The deprecated name for the Celo native asset, which now is referred to simply as "Celo" or preferably "CELO".
+
+## Celo Native Asset
+
+The Celo native asset which may be used to take actions on-chain, such as participating in [Governance](#governance).
+
 ## Claim
 
 Part of the metadata that Celo can associate with an address, a claim is used by an account to assert it has control over a particular off-chain entity (for example, a DNS domain name, an account on a third party service, etc). Claims can only be verified off-chain.
@@ -86,11 +98,11 @@ A fixed number of blocks, configured in the network's genesis block, during whic
 
 ## Epoch Rewards
 
-Funds disbursed by the protocol at the end of every epoch as incentives for validators, validator groups, holders of Locked Gold that voted for validator groups that elected one or more validators, the Reserve, the Community Fund, and the Carbon Offsetting Fund.
+Funds disbursed by the protocol at the end of every epoch as incentives for validators, validator groups, holders of [Locked Gold](#locked-gold) that voted for validator groups that elected one or more validators, the Reserve, the Community Fund, and the Carbon Offsetting Fund.
 
 ## ERC-20
 
-A standard interface for implementing tokens as smart contracts. Balances associated with addresses are typically maintained inside the contract's storage. Both Celo Gold and Celo Dollars implement the ERC-20 interface.
+A standard interface for implementing tokens as smart contracts. Balances associated with addresses are typically maintained inside the contract's storage. Both [CELO](#celo-native-asset) and Celo Dollars implement the ERC-20 interface.
 
 ## Ethereum
 
@@ -123,6 +135,10 @@ The very first block in the blockchain, provided as configuration to Celo Blockc
 ## Geth
 
 [go-ethereum](https://github.com/ethereum/go-ethereum), a Golang implementation of the Ethereum protocol from which the Celo Blockchain software is forked.
+
+## [Governance](celo-codebase/protocol/governance.md)
+
+A part of Celo that allow the protocol to be upgraded, and other actions to be taken on behalf of the network, by holding a referendum process in which [CELO](#celo-native-asset) holders vote for proposals submitted by the community.
 
 ## Governable
 
@@ -158,7 +174,9 @@ A device or computer running the Celo Blockchain software that keeps typically o
 
 ## [Locked Gold](celo-codebase/protocol/proof-of-stake/locked-gold.md)
 
-Celo Gold balances held in escrow at the Locked Gold contract for the account that deposited it there. This permits that balance to be used for voting in validator elections, governance proposals, and to meet staking requirements for registering a validator or validator group.
+[CELO](#celo-native-asset) balances held in escrow at the Locked Gold contract for the account that deposited it there. This permits that balance to be used for voting in validator elections, governance proposals, and to meet staking requirements for registering a validator or validator group.
+
+> Locked Gold is in the process of being renamed along with other references to [Celo Gold](#celo-gold).
 
 ## Mainnet
 
@@ -174,11 +192,11 @@ An interaction that takes place solely through a transaction being executed on t
 
 ## Proof-of-Stake
 
-The system that determines the participants in a Byzantine Fault Tolerant consensus mechanism. [Celo's Proof-of-Stake mechanism](celo-codebase/protocol/proof-of-stake/README.md) permits accounts to convert units of Celo Gold into Locked Gold then vote for Validator Groups, such that an election held at the end of every epoch selects a new set of validators for the following epoch.
+The system that determines the participants in a Byzantine Fault Tolerant consensus mechanism. [Celo's Proof-of-Stake mechanism](celo-codebase/protocol/proof-of-stake/README.md) permits accounts to convert units of [CELO](#celo-native-asset) into [Locked Gold](#locked-gold) then vote for Validator Groups, such that an election held at the end of every epoch selects a new set of validators for the following epoch.
 
 ## RC1
 
-RC1, which stands for Release Candidate 1, was the first network that had the potential to become the Celo mainnet. It was promoted to Mainnet after the Celo community voted to enable Celo Gold transfers on the network on May 18, 2020.
+RC1, which stands for Release Candidate 1, was the first network that had the potential to become the Celo mainnet. It was promoted to Mainnet after the Celo community voted to enable [CELO](#celo-native-asset) transfers on the network on May 18, 2020.
 
 ## Savings Circle
 
@@ -222,7 +240,7 @@ A stablecoin is a type of cryptocurrency whose price tracks an external currency
 
 ## Stake
 
-Locked Gold that a validator or validator group puts at risk at the point of registration. A portion of a stake can be slashed for particular actions not conducive to the health of the network.
+[Locked Gold](#locked-gold) that a validator or validator group puts at risk at the point of registration. A portion of a stake can be slashed for particular actions not conducive to the health of the network.
 
 ## Testnet
 
@@ -234,7 +252,7 @@ Requests to make a change to the state of the blockchain. They can: transfer val
 
 ## Unlocking Period
 
-The elapsed time between an account requesting an amount of Locked Gold be unlocked and the first point it can be withdrawn.
+The elapsed time between an account requesting an amount of [Locked Gold](#locked-gold) be unlocked and the first point it can be withdrawn.
 
 ## Uptime Score
 
@@ -246,7 +264,7 @@ Both: the entity in the proof-of-stake mechanism that can be associated with a v
 
 ## Validator Group
 
-The entity in the proof-of-stake mechanism that can associate validators, receive votes from holders of Locked Gold and cause those validators to be elected.
+The entity in the proof-of-stake mechanism that can associate validators, receive votes from holders of [Locked Gold](#locked-gold) and cause those validators to be elected.
 
 ## Validator Set
 

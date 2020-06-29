@@ -5,51 +5,37 @@ import {
 } from '../../src/bls/bls-cryptography-client'
 import config from '../../src/config'
 
-const USING_MOCK = config.keyVault.azureClientSecret === 'useMock'
-
 config.thresholdSignature = {
   threshold: 3,
   polynomial:
-    'AwAAAAAAAADxVnRkE8GN5FofacT6K00qIv/AqXfx+grvgyeIIIjG+kD/0B8TVTLupsYZHKIqPwAB6IWlJozOLsWV979OP+oJYzwsyBAZH55O+3vKJizIohWkYwlhXLNyES0/AVnJHIDs7PsOzVcRbkTHWAtX/nw/D1ZtZfeJ8EG5/r2D00l+TEMK8lDPisE19HgtKD891QCc9ujeI6Nb4cwhqFBO4uN1ejb2yYExN9D2uKp1/rxe53Q1z9QoDegGR2cKYGg+lIHwkQiKmUAUKzHULtOYHdVIkQ+kE2T1ick8h79iclRod5oUQnhWAMCO++/zkfhOMgBWDc2V0FWZj074A6ggNW71t1bMdamChr0htWdc/i25usC87mTclMQ12Sql+/oRhoA=',
+    '0300000000000000813a7deecc0f058cc804358efbcd83f84dfeddcaec0a0b601e73b74d7dead680b8b1d7b65769026512b8c7438c95a401c3ce218d454222948e782656ef5b37aabbe78ace335731afe5213cb07d26eebb093741ebde38296206893a2c217e4601951925ca9e2ce2938accdad680cdd77e6b533433c6b37dd0d63f67088468a8924d0b138a2a3457067bb0395658cb1001998aa2e4f954b7895ff15ea7c2b46bf582a0d1e3bdc971f3c294e1aebd4064194cf2efa01650f0066e1d49d57c330101c0e3923a3d394a4b3a6084d18e6bf404d3a9373aac5376cc9548634a368e9a6bc0f8669546873a079ce38a03541c9201b6308ac34b704cb14c306c90f692ede068e130295f789f5a1ca08223d7c7ff0b9edff0e2b5e36918087f8059d018a100',
 }
 
 const PUBLIC_KEY =
-  '8VZ0ZBPBjeRaH2nE+itNKiL/wKl38foK74MniCCIxvpA/9AfE1Uy7qbGGRyiKj8AAeiFpSaMzi7Flfe/Tj/qCWM8LMgQGR+eTvt7yiYsyKIVpGMJYVyzchEtPwFZyRyA'
+  '813a7deecc0f058cc804358efbcd83f84dfeddcaec0a0b601e73b74d7dead680b8b1d7b65769026512b8c7438c95a401c3ce218d454222948e782656ef5b37aabbe78ace335731afe5213cb07d26eebb093741ebde38296206893a2c217e4601'
 
 describe(`BLS service computes signature`, () => {
-  beforeEach(() => {
-    // Use mock client if env vars not specified
-    if (!USING_MOCK) {
-      // Ensure all env vars are specified
-      expect(config.keyVault.azureClientID).not.toBe('useMock')
-      expect(config.keyVault.azureClientSecret).not.toBe('useMock')
-      expect(config.keyVault.azureTenant).not.toBe('useMock')
-      expect(config.keyVault.azureVaultName).not.toBe('useMock')
-      expect(config.keyVault.azureSecretName).not.toBe('useMock')
-    }
-  })
-
   it('provides blinded signature', async () => {
     const signatures: ServicePartialSignature[] = [
       {
         url: 'url1',
         signature:
-          'MAAAAAAAAADkHsKIX91BuKRjNgsJR81otwGGln4HuguYe4QkZoInFwNIiU9QglFZeLpJmNEysIAAAAAA',
+          'MAAAAAAAAABMnIduYMm1JmaOWWgybOTc6rB7+eunT9h21RL2oTId3KSOH1OjAglgOpI6cjizLQEAAAAA',
       },
       {
         url: 'url2',
         signature:
-          'MAAAAAAAAABqscf+GUMQD5I8SJW+zzZKuo83gyRZs/RUR7zePSDx4ZtewOGEc/VThpUpqgM5mAEBAAAA',
+          'MAAAAAAAAAAl0tkxryWcl83IV1I7DoMIoI/oSz2ogIy7LW5G3tg0ksifa5rdgxFfv4Y9GbQsBoEBAAAA',
       },
       {
         url: 'url3',
         signature:
-          'MAAAAAAAAABH006sJMay5D4OtOHDdQh3W8gX7yafeyMSGJzba7RhBAWatCEztthuQ6gSEOYTYQECAAAA',
+          'MAAAAAAAAAD60iBC0rpJd9A+FjDzVix/xjdD5Rq8+euqX/pTJuwzooTXu/9+KBztQruAAAYWtAACAAAA',
       },
       {
         url: 'url4',
         signature:
-          'MAAAAAAAAAAhzTl/S+mldhE+5F5rt+2XKJQsNtELZeo+aoHjhsVVdw8Ofk1ZRr9EUZbvVKetNYADAAAA',
+          'MAAAAAAAAADNYzSf29At1wxuqPXcvNYsYObrxZTmPXgg0KBH+BZm1lLczhv8NpedtgkPjX+GvwADAAAA',
       },
     ]
 
@@ -66,13 +52,13 @@ describe(`BLS service computes signature`, () => {
       signatures,
       blindedMsg
     )
-    expect(actual).toEqual('16RcENpbLgq5pIkcPWdgnMofeLqSyuUVin9h4jof9/I8GRsmt5iRxjWAkpftKPWA')
+    expect(actual).toEqual('vy4TFsSNeyNsQK/xjGoH2TwLRI9ZCOiyvfMU7aRLJYw/oOIF/xCrBiwpK9gwLTQA')
 
     const unblindedSignedMessage = threshold_bls.unblind(
       Buffer.from(actual, 'base64'),
       blindedMsgResult.blindingFactor
     )
-    const publicKey = Buffer.from(PUBLIC_KEY, 'base64')
+    const publicKey = Buffer.from(PUBLIC_KEY, 'hex')
     expect(threshold_bls.verify(publicKey, message, unblindedSignedMessage))
   })
   it('provides blinded signature if one failure if still above threshold', async () => {
@@ -80,18 +66,21 @@ describe(`BLS service computes signature`, () => {
       {
         url: 'url1',
         signature:
-          'MAAAAAAAAADkHsKIX91BuKRjNgsJR81otwGGln4HuguYe4QkZoInFwNIiU9QglFZeLpJmNEysIAAAAAA',
+          'MAAAAAAAAABMnIduYMm1JmaOWWgybOTc6rB7+eunT9h21RL2oTId3KSOH1OjAglgOpI6cjizLQEAAAAA',
       },
-      { url: 'url2', signature: 'X' },
+      {
+        url: 'url2',
+        signature: 'X',
+      },
       {
         url: 'url3',
         signature:
-          'MAAAAAAAAABH006sJMay5D4OtOHDdQh3W8gX7yafeyMSGJzba7RhBAWatCEztthuQ6gSEOYTYQECAAAA',
+          'MAAAAAAAAAD60iBC0rpJd9A+FjDzVix/xjdD5Rq8+euqX/pTJuwzooTXu/9+KBztQruAAAYWtAACAAAA',
       },
       {
         url: 'url4',
         signature:
-          'MAAAAAAAAAAhzTl/S+mldhE+5F5rt+2XKJQsNtELZeo+aoHjhsVVdw8Ofk1ZRr9EUZbvVKetNYADAAAA',
+          'MAAAAAAAAADNYzSf29At1wxuqPXcvNYsYObrxZTmPXgg0KBH+BZm1lLczhv8NpedtgkPjX+GvwADAAAA',
       },
     ]
 
@@ -108,13 +97,13 @@ describe(`BLS service computes signature`, () => {
       signatures,
       blindedMsg
     )
-    expect(actual).toEqual('16RcENpbLgq5pIkcPWdgnMofeLqSyuUVin9h4jof9/I8GRsmt5iRxjWAkpftKPWA')
+    expect(actual).toEqual('vy4TFsSNeyNsQK/xjGoH2TwLRI9ZCOiyvfMU7aRLJYw/oOIF/xCrBiwpK9gwLTQA')
 
     const unblindedSignedMessage = threshold_bls.unblind(
       Buffer.from(actual, 'base64'),
       blindedMsgResult.blindingFactor
     )
-    const publicKey = Buffer.from(PUBLIC_KEY, 'base64')
+    const publicKey = Buffer.from(PUBLIC_KEY, 'hex')
     expect(threshold_bls.verify(publicKey, message, unblindedSignedMessage))
   })
   it('throws error if does not meet threshold signatures', async () => {
@@ -122,14 +111,20 @@ describe(`BLS service computes signature`, () => {
       {
         url: 'url1',
         signature:
-          'MAAAAAAAAADkHsKIX91BuKRjNgsJR81otwGGln4HuguYe4QkZoInFwNIiU9QglFZeLpJmNEysIAAAAAA',
+          'MAAAAAAAAABMnIduYMm1JmaOWWgybOTc6rB7+eunT9h21RL2oTId3KSOH1OjAglgOpI6cjizLQEAAAAA',
       },
-      { url: 'url2', signature: 'X' },
-      { url: 'url3', signature: 'X' },
+      {
+        url: 'url2',
+        signature: 'X',
+      },
+      {
+        url: 'url3',
+        signature: 'X',
+      },
       {
         url: 'url4',
         signature:
-          'MAAAAAAAAAAhzTl/S+mldhE+5F5rt+2XKJQsNtELZeo+aoHjhsVVdw8Ofk1ZRr9EUZbvVKetNYADAAAA',
+          'MAAAAAAAAADNYzSf29At1wxuqPXcvNYsYObrxZTmPXgg0KBH+BZm1lLczhv8NpedtgkPjX+GvwADAAAA',
       },
     ]
 

@@ -86,3 +86,6 @@ tsconfig.tsbuildinfo
 *.orig
 
 packages/docs/_book/
+
+*/.next/*
+.env.local

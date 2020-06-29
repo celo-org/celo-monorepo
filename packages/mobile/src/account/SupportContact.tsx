@@ -9,17 +9,17 @@ import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
+import { openComposer } from 'react-native-email-link'
+import * as RNFS from 'react-native-fs'
 import Mailer from 'react-native-mail'
 import SafeAreaView from 'react-native-safe-area-view'
-import { connect, useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { e164NumberSelector } from 'src/account/selectors'
 import { showMessage } from 'src/alert/actions'
 import { CELO_SUPPORT_EMAIL_ADDRESS, DEFAULT_TESTNET } from 'src/config'
 import i18n, { Namespaces } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
-import { RootState } from 'src/redux/reducers'
+import { navigateBack } from 'src/navigator/NavigationService'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
 
@@ -35,23 +35,40 @@ interface Email {
   }
 }
 
-interface DispatchProps {
-  showMessage: typeof showMessage
+async function sendEmailWithNonNativeApp(
+  emailSubect: string,
+  message: string,
+  deviceInfo: {},
+  combinedLogsPath?: string | false
+) {
+  try {
+    const supportLogsMessage = combinedLogsPath
+      ? `Support logs: ${!combinedLogsPath || (await RNFS.readFile(combinedLogsPath))}`
+      : ''
+    await openComposer({
+      to: CELO_SUPPORT_EMAIL_ADDRESS,
+      subject: emailSubect,
+      body: `${message}\n${JSON.stringify(deviceInfo)}\n${supportLogsMessage}`,
+    })
+    return { success: true }
+  } catch (error) {
+    return { error }
+  }
 }
 
-type Props = DispatchProps
-
-const mapDispatchToProps = {
-  showMessage,
-}
-
-const SupportContact = (props: Props) => {
+function SupportContact() {
   const { t } = useTranslation(Namespaces.accountScreen10)
   const [message, setMessage] = useState('')
   const [attachLogs, setAttachLogs] = useState(true)
   const [inProgress, setInProgress] = useState(false)
   const e164PhoneNumber = useSelector(e164NumberSelector)
   const currentAccount = useSelector(currentAccountSelector)
+  const dispatch = useDispatch()
+
+  const navigateBackAndToast = () => {
+    navigateBack()
+    dispatch(showMessage(t('contactSuccess')))
+  }
 
   const sendEmail = useCallback(async () => {
     setInProgress(true)
@@ -71,8 +88,9 @@ const SupportContact = (props: Props) => {
       body: `${message}<br/><br/><b>${JSON.stringify(deviceInfo)}</b>`,
       isHTML: true,
     }
+    let combinedLogsPath: string | false
     if (attachLogs) {
-      const combinedLogsPath = await Logger.createCombinedLogs()
+      combinedLogsPath = await Logger.createCombinedLogs()
       if (combinedLogsPath) {
         email.attachment = {
           path: combinedLogsPath, // The absolute path of the file from which to read data.
@@ -83,13 +101,24 @@ const SupportContact = (props: Props) => {
       }
     }
     setInProgress(false)
-    Mailer.mail(email, (error: any, event: string) => {
+
+    // Try to send with native mail app with logs as attachment
+    // if fails user can choose mail app but logs sent in message
+    Mailer.mail(email, async (error: any, event: string) => {
       if (event === 'sent') {
-        navigate(Screens.Account)
-        props.showMessage(t('contactSuccess'))
-      }
-      if (error) {
-        Logger.showError(error + ' ' + event)
+        navigateBackAndToast()
+      } else if (error) {
+        const emailSent = await sendEmailWithNonNativeApp(
+          emailSubject,
+          message,
+          deviceInfo,
+          combinedLogsPath
+        )
+        if (emailSent.success) {
+          navigateBackAndToast()
+        } else {
+          Logger.showError(error + ' ' + emailSent.error)
+        }
       }
     })
   }, [message, attachLogs, e164PhoneNumber])
@@ -209,4 +238,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<{}, DispatchProps, {}, RootState>(null, mapDispatchToProps)(SupportContact)
+export default SupportContact

@@ -1,8 +1,10 @@
 import logger from '../common/logger'
 import config, { SupportedKeystore } from '../config'
+import { AWSKeyProvider } from './aws-key-provider'
 import { AzureKeyProvider } from './azure-key-provider'
 import { GoogleKeyProvider } from './google-key-provider'
 import { KeyProvider } from './key-provider-base'
+import { MockKeyProvider } from './mock-key-provider'
 
 let keyProvider: KeyProvider
 
@@ -15,6 +17,12 @@ export async function initKeyProvider() {
   } else if (type === SupportedKeystore.GoogleSecretManager) {
     logger.info('Using Google Secret Manager')
     keyProvider = new GoogleKeyProvider()
+  } else if (type === SupportedKeystore.AWSSecretManager) {
+    logger.info('Using AWS Secret Manager')
+    keyProvider = new AWSKeyProvider()
+  } else if (type === SupportedKeystore.MockSecretManager) {
+    logger.info('Using Mock Secret Manager')
+    keyProvider = new MockKeyProvider()
   } else {
     throw new Error('Valid keystore type must be provided')
   }

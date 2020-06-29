@@ -1,4 +1,4 @@
-import { skipTo, sleep, enterPinUi, inputNumberKeypad } from './utils'
+import { enterPinUi, inputNumberKeypad, sleep } from './utils'
 
 const ENABLE_CONTACT_IMPORT = false
 
@@ -52,7 +52,9 @@ describe('Transfer Works', () => {
 
     await element(by.id('NameEntry')).replaceText(EXAMPLE_NAME)
 
-    await element(by.id('CountryNameFieldTextInput')).replaceText(VERIFICATION_COUNTRY)
+    await element(by.id('CountrySelectionButton')).tap()
+    await element(by.id('SearchInput')).replaceText(VERIFICATION_COUNTRY)
+    await element(by.id('Country_DE')).tap()
 
     await expect(element(by.id('PhoneNumberField'))).toBeVisible()
     await element(by.id('PhoneNumberField')).replaceText(VERIFICATION_PHONE_NUMBER)
@@ -64,11 +66,6 @@ describe('Transfer Works', () => {
     await element(by.id('scrollView')).scrollTo('bottom')
     expect(element(by.id('AcceptTermsButton'))).toBeVisible()
     await element(by.id('AcceptTermsButton')).tap()
-  })
-
-  it('PincodeEducation', async () => {
-    await expect(element(by.id('SystemAuthContinue'))).toBeVisible()
-    await element(by.id('SystemAuthContinue')).tap()
   })
 
   it('Pin', async () => {
@@ -83,7 +80,7 @@ describe('Transfer Works', () => {
 
   // Restore existing wallet
   it('Restore Wallet Backup', async () => {
-    await waitFor(element(by.id('InviteCodeTitle')))
+    await waitFor(element(by.id('RestoreExistingWallet')))
       .toBeVisible()
       .withTimeout(8000)
 
@@ -108,10 +105,6 @@ describe('Transfer Works', () => {
   })
 
   it('VerifyEducation', async () => {
-    await waitFor(element(by.id('VerificationEducationHeader')))
-      .toBeVisible()
-      .withTimeout(10000)
-
     await waitFor(element(by.id('VerificationEducationContinue')))
       .toBeVisible()
       .withTimeout(10000)
@@ -119,7 +112,7 @@ describe('Transfer Works', () => {
     // skip
     await element(by.id('VerificationEducationSkip')).tap()
     // confirmation popup skip
-    await element(by.id('ModalSkip')).tap()
+    await element(by.id('VerificationSkipDialog/PrimaryAction')).tap()
   })
 
   it.skip('Verify', async () => {
@@ -136,9 +129,9 @@ describe('Transfer Works', () => {
   it('Wallet Home->Send', async () => {
     await element(by.id('SendOrRequestBar/SendButton')).tap()
 
-    await element(by.id('RecipientSearchInput')).tap()
-    await element(by.id('RecipientSearchInput')).replaceText(DEFAULT_RECIPIENT_ADDRESS)
-    await element(by.id('RecipientSearchInput')).tapReturnKey()
+    await element(by.id('SearchInput')).tap()
+    await element(by.id('SearchInput')).replaceText(DEFAULT_RECIPIENT_ADDRESS)
+    await element(by.id('SearchInput')).tapReturnKey()
 
     await waitFor(element(by.id('RecipientPicker')))
       .toBeVisible()

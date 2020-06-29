@@ -383,10 +383,14 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
       >
         <View
           style={
-            Object {
-              "borderRadius": 100,
-              "overflow": "hidden",
-            }
+            Array [
+              Object {
+                "overflow": "hidden",
+              },
+              Object {
+                "borderRadius": 100,
+              },
+            ]
           }
         >
           <View
@@ -412,6 +416,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                 "flexGrow": 1,
                 "height": 48,
                 "justifyContent": "center",
+                "opacity": undefined,
                 "paddingHorizontal": 16,
                 "paddingVertical": 5,
               }
