@@ -100,6 +100,9 @@ describe('Transfer Works', () => {
 
     await element(by.id('ImportWalletBackupKeyInputField')).tap()
     await element(by.id('ImportWalletBackupKeyInputField')).replaceText(SAMPLE_BACKUP_KEY)
+    // Type one more space to workaround onChangeText not being triggered with replaceText above
+    // and leaving the restore button disabled
+    await element(by.id('ImportWalletBackupKeyInputField')).typeText(' ')
 
     await element(by.id('ImportWalletButton')).tap()
   })
