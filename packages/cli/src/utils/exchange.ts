@@ -42,7 +42,7 @@ export async function checkNotDangerousExchange(
 
   // X% of the bucket
   const bucket = buyBucket ? buckets[1] : buckets[0]
-  if (bucket.dividedBy(100 / largeOrderPercentage) <= amount) {
+  if (bucket.dividedBy(100 / largeOrderPercentage).isLessThanOrEqualTo(amount)) {
     const warningLargeOrder =
       'Warning you are executing a large order, risk of price slippage i.e. getting an unfavorable exchange rate.'
     warningMessage = warningMessage ? `${warningMessage} ${warningLargeOrder}` : warningLargeOrder
