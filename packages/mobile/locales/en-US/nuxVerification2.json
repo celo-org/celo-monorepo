@@ -44,23 +44,6 @@
     "body1": "Your text messages are on the way! Please enter your three codes as you receive them.",
     "body2": "This may take a minute."
   },
-  "input": {
-    "header": "Submit Codes",
-    "body1": "Copy and Paste ",
-    "body2": "the verification codes from your Messages (SMS) app.",
-    "codeHeader1": "First Code",
-    "codeHeader2": "Second Code",
-    "codeHeader3": "Third Code",
-    "codesMissing": "I didn’t receive three codes",
-    "tip": "Typing? Try copying and pasting the code.",
-    "sendingCodes": "Sending verification codes..."
-  },
-  "missingCodesModal": {
-    "header": "Missing Codes?",
-    "body": "If you haven’t received all your codes yet after 60 seconds, you can skip verification and try again later.",
-    "wait": "Wait for codes",
-    "skip": "Skip for now"
-  },
   "failModal": {
     "header": "Verification Error",
     "body1": "An issue has occurred while verifying your phone number.",
@@ -77,7 +60,7 @@
   "congratsVerified": "Congratulations you are now verified!",
   "notification": {
     "title": "Verify Your Phone",
-    "body": "Verifying allows you to send and receive with your phone contacts.",
+    "body": "Verifying allows you to easily send and receive funds with your phone contacts",
     "cta": "Get Verified"
   },
   "quotaLookup": {

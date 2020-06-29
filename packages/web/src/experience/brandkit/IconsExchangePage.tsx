@@ -1,8 +1,9 @@
+import frontMatter from 'front-matter'
 import { NextPage } from 'next'
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import Page, { ICONS_PATH } from 'src/experience/brandkit/common/Page'
-import content from 'src/experience/brandkit/content/exchange-icons.md'
+import data from 'src/experience/brandkit/content/exchange-icons.md'
 import {
   AssetTypes,
   EXCHANGE_ICONS_PKG_TRACKING,
@@ -11,7 +12,7 @@ import {
 import CCLicense from 'src/experience/common/CCLicense'
 import { brandStyles, GAP } from 'src/experience/common/constants'
 import IconShowcase from 'src/experience/common/Showcase'
-import Markdown from 'src/experience/Markdown'
+import Markdown, { Attributes } from 'src/experience/Markdown'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import Button, { BTN } from 'src/shared/Button.3'
 import { hashNav } from 'src/shared/menu-items'
@@ -22,51 +23,52 @@ const icons = [
     name: 'cUSD Exchange Icon',
     description: 'Full Color\n',
     preview: '/images/marketplace-icons/icon-celo-dollar-color-f.svg',
-    uri: '/assets/marketplace-icons/icon-celo-dollar-color.zip',
+    uri: '/assets/marketplace-icons/icon-celo-dollar-full-color.zip',
   },
   {
     name: 'CELO Exchange Icon',
     description: 'Full Color\n',
     preview: '/images/marketplace-icons/icon-celo-CELO-color-f.svg',
-    uri: '/assets/marketplace-icons/icon-celo-CELO-color.zip',
+    uri: '/assets/marketplace-icons/icon-CELO-color.zip',
   },
   null,
   {
     name: 'cUSD Exchange Icon',
     description: 'Monochrome\n',
     preview: '/images/marketplace-icons/icon-celo-dollar-mono-f.svg',
-    uri: '/assets/marketplace-icons/icon-celo-dollar-mono.zip',
+    uri: '/assets/marketplace-icons/icon-celo-dollar-monochrome.zip',
     variant: 'circle-white',
   },
   {
     name: 'CELO Exchange Icon',
     description: 'Monochrome\n',
     preview: '/images/marketplace-icons/icon-celo-CELO-mono-f.svg',
-    uri: '/assets/marketplace-icons/icon-celo-CELO-mono.zip',
+    uri: '/assets/marketplace-icons/icon-CELO-monochrome.zip',
     variant: 'circle-white',
   },
   {
     name: 'cUSD Exchange Icon',
     description: 'Reverse Monochrome\n',
     preview: '/images/marketplace-icons/icon-celo-dollar-reverse-f.svg',
-    uri: '/assets/marketplace-icons/icon-celo-dollar-reverse.zip',
+    uri: '/assets/marketplace-icons/icon-celo-dollar-reverse-monochrome.zip',
     variant: 'circle-black',
   },
   {
     name: 'CELO Exchange Icon',
     description: 'Reverse Monochrome\n',
     preview: '/images/marketplace-icons/icon-celo-CELO-reverse-f.svg',
-    uri: '/assets/marketplace-icons/icon-celo-CELO-reverse.zip',
+    uri: '/assets/marketplace-icons/icon-CELO-reverse-monochrome.zip',
     variant: 'circle-black',
   },
 ]
 
+const info = frontMatter<Attributes>(data)
+
 const IconExchangePage: NextPage = React.memo(() => {
-  const { t } = useTranslation(NameSpaces.brand)
   return (
     <Page
-      title={t('exchangeIcons.title')}
-      metaDescription={t('exchangeIcons.headline')}
+      title={info.attributes.title}
+      metaDescription={info.attributes.description}
       path={ICONS_PATH}
       sections={[{ id: hashNav.brandIcons.overview, children: <Overview /> }]}
     />
@@ -94,13 +96,13 @@ function Overview() {
   return (
     <View style={styles.container}>
       <View style={brandStyles.gap}>
-        <Markdown source={content} />
+        <Markdown source={info.body} />
         <Button
           kind={BTN.PRIMARY}
           text={t('logo.overviewBtn')}
           style={standardStyles.elementalMarginTop}
           onPress={onPressDownload}
-          href="/assets/CeloMarketplaceIcons.zip"
+          href="/assets/marketplace-icons/CeloMarketplaceIcons.zip"
         />
       </View>
       <CCLicense textI18nKey="exchangeIcons.license" />

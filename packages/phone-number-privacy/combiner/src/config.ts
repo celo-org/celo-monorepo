@@ -1,8 +1,7 @@
-import BigNumber from 'bignumber.js'
 import * as functions from 'firebase-functions'
-import Web3 from 'web3'
 import logger from './common/logger'
 
+export const VERSION = process.env.npm_package_version
 export const DEV_MODE =
   process.env.NODE_ENV !== 'production' || process.env.FUNCTIONS_EMULATOR === 'true'
 
@@ -17,12 +16,6 @@ interface Config {
   blockchain: {
     provider: string
   }
-  salt: {
-    unverifiedQueryMax: number
-    additionalVerifiedQueryMax: number
-    queryPerTransaction: number
-    minDollarBalance: BigNumber
-  }
   db: {
     user: string
     password: string
@@ -30,18 +23,9 @@ interface Config {
     host: string
     ssl: boolean
   }
-  keyVault: {
-    azureClientID: string
-    azureClientSecret: string
-    azureTenant: string
-    azureVaultName: string
-    azureSecretName: string
-  }
-  attestations: {
-    numberAttestationsRequired: number
-  }
   pgpnpServices: {
     signers: string
+    timeoutMilliSeconds: number
   }
   thresholdSignature: {
     threshold: number
@@ -57,12 +41,6 @@ if (DEV_MODE) {
     blockchain: {
       provider: 'https://alfajores-forno.celo-testnet.org',
     },
-    salt: {
-      unverifiedQueryMax: 2,
-      additionalVerifiedQueryMax: 30,
-      queryPerTransaction: 2,
-      minDollarBalance: new BigNumber(Web3.utils.toWei('0.1')),
-    },
     db: {
       user: 'postgres',
       password: 'fakePass',
@@ -70,18 +48,9 @@ if (DEV_MODE) {
       host: 'fakeHost',
       ssl: !DEV_MODE,
     },
-    keyVault: {
-      azureClientID: 'useMock',
-      azureClientSecret: 'useMock',
-      azureTenant: 'useMock',
-      azureVaultName: 'useMock',
-      azureSecretName: 'useMock',
-    },
-    attestations: {
-      numberAttestationsRequired: 3,
-    },
     pgpnpServices: {
       signers: '[{"url": "http://localhost:3000"}]',
+      timeoutMilliSeconds: 5 * 1000,
     },
     thresholdSignature: {
       threshold: 1,
@@ -94,12 +63,6 @@ if (DEV_MODE) {
     blockchain: {
       provider: functionConfig.blockchain.provider,
     },
-    salt: {
-      unverifiedQueryMax: functionConfig.salt.unverified_query_max,
-      additionalVerifiedQueryMax: functionConfig.salt.additional_verified_query_max,
-      queryPerTransaction: functionConfig.salt.query_per_transaction,
-      minDollarBalance: new BigNumber(functionConfig.salt.min_dollar_balance),
-    },
     db: {
       user: functionConfig.db.username,
       password: functionConfig.db.pass,
@@ -107,18 +70,9 @@ if (DEV_MODE) {
       host: `/cloudsql/${functionConfig.db.host}`,
       ssl: !DEV_MODE,
     },
-    keyVault: {
-      azureClientID: functionConfig.keyvault.azure_client_id,
-      azureClientSecret: functionConfig.keyvault.azure_client_secret,
-      azureTenant: functionConfig.keyvault.azure_tenant,
-      azureVaultName: functionConfig.keyvault.azure_vault_name,
-      azureSecretName: functionConfig.keyvault.azure_secret_name,
-    },
-    attestations: {
-      numberAttestationsRequired: functionConfig.attestations.number_attestations_required,
-    },
     pgpnpServices: {
       signers: functionConfig.pgpnpservices.signers,
+      timeoutMilliSeconds: functionConfig.pgpnpservices.timeoutMilliSeconds || 5 * 1000,
     },
     thresholdSignature: {
       threshold: functionConfig.threshold_signature.threshold_signature_threshold,

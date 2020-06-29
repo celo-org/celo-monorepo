@@ -7,7 +7,7 @@ export enum Colors {
   goldBrand = '#FBCC5C',
   goldUI = '#EEB93C',
   goldDark = '#9C6E00',
-  beige = '#F5F4F0',
+  beige = '#F1F0EB',
   brownFaint = '#FFF9EE',
   warning = '#EA6042',
   dark = '#2E3338',
@@ -23,11 +23,11 @@ export enum Colors {
   onboardingGreen = '#1E845F',
   onboardingBrown = '#66541A',
   onboardingBrownLight = '#A49B80',
-  onboardingAccent = '#0C689C',
-  onboardingLightBlue = '#D6E7EF',
+  onboardingAccent = '#0768AE',
+  onboardingLightBlue = '#D6EAF3',
   onboardingSecondaryButton = '#EBEBE1',
-  onboardingDark = '#EBEBE1',
-  onboardingBackground = '#F9F5ED',
+  onboardingDark = '#676356',
+  onboardingBackground = '#F9F6F0',
 }
 
 export default {
