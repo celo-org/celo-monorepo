@@ -69,7 +69,7 @@ export interface RpcCaller {
 export class DefaultRpcCaller implements RpcCaller {
   constructor(
     readonly defaultProvider: provider,
-    readonly telemetryHandler: TelemetryHandler | null = new DebugTelemetryHandler(),
+    readonly telemetryHandler: TelemetryHandler | null = new DefaultTelemetryHandler(),
     readonly jsonrpcVersion: string = '2.0'
   ) {}
 
@@ -100,13 +100,21 @@ export class DefaultRpcCaller implements RpcCaller {
       let err: Error = error
       const duration = new Date().getTime() - start
       if (this.telemetryHandler) {
+        // Assume method parameters are the first element
         const params = payload.params[0]
         const to = params?.to
         const from = params?.from
+
         this.telemetryHandler.handleEvent(
           ['contractkit', 'rpc_caller', 'send'],
           { duration },
-          { method: payload.method, id: payload.id, to, from, params: payload.params }
+          {
+            method: payload.method,
+            id: payload.id?.toString(),
+            to,
+            from,
+            params: payload.params,
+          }
         )
       }
       debugRpcResponse('%O', result)
@@ -130,11 +138,15 @@ export class DefaultRpcCaller implements RpcCaller {
   }
 }
 
-export interface TelemetryHandler {
-  handleEvent: (path: string[], measurements: { duration: number }, metadata: any) => void
+interface TelemetryMeasurements {
+  duration: number
 }
 
-export class DebugTelemetryHandler implements TelemetryHandler {
+export interface TelemetryHandler {
+  handleEvent: (path: string[], measurements: TelemetryMeasurements, metadata: any) => void
+}
+
+export class DefaultTelemetryHandler implements TelemetryHandler {
   handleEvent(path: string[], measurements: { duration: number }, metadata: any) {
     debugRpcTelemetry('Path: %o, Duration: %s, metadata: %o', path, measurements.duration, metadata)
   }
