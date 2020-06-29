@@ -24,7 +24,7 @@
   },
   "inviteCode": {
     "title": "Invite Code",
-    "body": "If you were invited or received a payment, please copy and paste the invite code below.",
+    "body": "Did you receive a payment or invite? If so, please copy and paste the Invite Code below.",
     "label": "Invite Code",
     "codePlaceholder": "Enter invite code",
     "noCode": "Don’t have an Invite Code",
