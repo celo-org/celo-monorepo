@@ -50,6 +50,7 @@ export enum OnboardingEvents {
   backup_start = 'backup_start', // ‘set up now’ button click
   backup_setup_info = 'backup_setup_info',
   backup_quiz_backspace = 'backup_quiz_backspace', // whenever the backspace is pressed
+  backup_quiz_start = 'backup_quiz_start', // when user starts the backup quiz
   backup_quiz_submit = 'backup_quiz_submit', // (Count # of taps on "Submit" button in Backup_Quiz)
   backup_quiz_success = 'backup_quiz_success', // (Count # of successful Account Key confirmations Backup_Quiz)
   backup_quiz_incorrect = 'backup_quiz_incorrect', // (Count # of failed Account Key confirmations Backup_Quiz)

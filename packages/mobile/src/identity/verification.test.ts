@@ -154,8 +154,6 @@ const mockAccountsWrapper = {
 
 describe('Start Verification Saga', () => {
   beforeEach(() => {
-    MockedAnalytics.startTracking.mockReset()
-    MockedAnalytics.stopTracking.mockReset()
     MockedAnalytics.track.mockReset()
   })
   it('tracks failure', async () => {

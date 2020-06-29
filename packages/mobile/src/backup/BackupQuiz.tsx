@@ -119,7 +119,7 @@ export class BackupQuiz extends React.Component<Props, State> {
     })
 
     if (newUserChosenWords.length === 1) {
-      CeloAnalytics.startTracking(AnalyticsEvents.backup_quiz_submit)
+      CeloAnalytics.track(AnalyticsEvents.backup_quiz_start)
     }
   }
 
@@ -139,10 +139,7 @@ export class BackupQuiz extends React.Component<Props, State> {
       mnemonicWords: mnemonicWordsUpdated,
       userChosenWords: userChosenWordsUpdated,
     })
-    CeloAnalytics.trackSubEvent(
-      AnalyticsEvents.backup_quiz_submit,
-      AnalyticsEvents.backup_quiz_backspace
-    )
+    CeloAnalytics.track(AnalyticsEvents.backup_quiz_backspace)
   }
 
   onPressReset = async () => {
@@ -175,7 +172,7 @@ export class BackupQuiz extends React.Component<Props, State> {
     this.setState({ mode: Mode.Checking })
     setTimeout(this.afterCheck, CHECKING_DURATION)
 
-    CeloAnalytics.stopTracking(AnalyticsEvents.backup_quiz_submit)
+    CeloAnalytics.track(AnalyticsEvents.backup_quiz_submit)
   }
 
   onScreenSkip = () => {

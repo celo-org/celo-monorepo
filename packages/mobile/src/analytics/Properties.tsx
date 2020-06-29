@@ -79,6 +79,7 @@ export interface AnalyticsPropertiesList {
   [OnboardingEvents.backup_start]: undefined
   [OnboardingEvents.backup_setup_info]: undefined
   [OnboardingEvents.backup_quiz_backspace]: undefined
+  [OnboardingEvents.backup_quiz_start]: undefined
   [OnboardingEvents.backup_quiz_submit]: undefined
   [OnboardingEvents.backup_quiz_success]: undefined
   [OnboardingEvents.backup_quiz_incorrect]: undefined

@@ -1,11 +1,9 @@
 import CeloAnalytics, { AnalyzedApps } from '@celo/react-components/analytics/CeloAnalytics'
-import { CustomEventNames, EventPropertyType, PropertyPathWhitelist } from 'src/analytics/constants'
+import { PropertyPathWhitelist } from 'src/analytics/constants'
 import { AnalyticsPropertiesList } from 'src/analytics/Properties'
 import { DEFAULT_TESTNET, SEGMENT_API_KEY } from 'src/config'
 import { store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
-
-type EventNames = CustomEventNames
 
 class WalletAnalytics extends CeloAnalytics {
   sessionId: string
@@ -22,31 +20,13 @@ class WalletAnalytics extends CeloAnalytics {
   }
 
   track<EventName extends keyof AnalyticsPropertiesList>(
-    ...args: [EventName] | [EventName, AnalyticsPropertiesList[EventName]]
+    ...args: undefined extends AnalyticsPropertiesList[EventName]
+      ? [EventName] | [EventName, AnalyticsPropertiesList[EventName]]
+      : [EventName, AnalyticsPropertiesList[EventName]]
   ) {
     const [eventName, eventProperties] = args
     const attachDeviceInfo = false
     super.track(eventName, eventProperties, attachDeviceInfo)
-  }
-
-  startTracking(eventName: EventNames, eventProperties: EventPropertyType = {}) {
-    super.startTracking(eventName, eventProperties)
-  }
-
-  trackSubEvent(
-    eventName: EventNames,
-    subEventName: EventNames,
-    eventProperties: EventPropertyType = {}
-  ) {
-    super.trackSubEvent(eventName, subEventName, eventProperties)
-  }
-
-  stopTracking(
-    eventName: EventNames,
-    eventProperties: EventPropertyType = {},
-    attachDeviceInfo: boolean = false
-  ) {
-    super.stopTracking(eventName, eventProperties, attachDeviceInfo)
   }
 }
 
