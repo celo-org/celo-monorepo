@@ -12,19 +12,15 @@ exports[`Invite renders correctly with no recipients 1`] = `
   <View
     style={
       Object {
-        "alignItems": "flex-end",
-        "backgroundColor": "#FFFFFF",
-        "elevation": 1,
+        "alignItems": "center",
+        "backgroundColor": "transparent",
+        "borderBottomColor": AnimatedValue {
+          " __value": NaN,
+        },
+        "borderBottomWidth": 1,
         "flexDirection": "row",
         "height": 62,
         "justifyContent": "space-between",
-        "shadowColor": "black",
-        "shadowOffset": Object {
-          "height": 0.5,
-          "width": 0,
-        },
-        "shadowOpacity": 0.3,
-        "shadowRadius": 0.8,
       }
     }
   >
@@ -85,37 +81,6 @@ exports[`Invite renders correctly with no recipients 1`] = `
     <View
       style={
         Object {
-          "marginBottom": 13,
-        }
-      }
-    >
-      <svg
-        fill="none"
-        height={25}
-        style={Object {}}
-        viewBox="0 0 25 25"
-        width={25}
-      >
-        <path
-          d="M9.86842 22.3684C13.8653 22.3684 17.1053 19.1284 17.1053 15.1316C17.1053 11.1348 13.8653 7.89476 9.86842 7.89476C5.87158 7.89476 2.63158 11.1348 2.63158 15.1316C2.63158 19.1284 5.87158 22.3684 9.86842 22.3684ZM9.86842 25C4.41842 25 0 20.5816 0 15.1316C0 9.6816 4.41842 5.26318 9.86842 5.26318C15.3184 5.26318 19.7368 9.6816 19.7368 15.1316C19.7368 20.5816 15.3184 25 9.86842 25Z"
-          fill="#FBCC5C"
-          style={Object {}}
-        />
-        <path
-          d="M15.1316 17.1053C19.1284 17.1053 22.3684 13.8653 22.3684 9.86842C22.3684 5.87158 19.1284 2.63158 15.1316 2.63158C11.1348 2.63158 7.89476 5.87158 7.89476 9.86842C7.89476 13.8653 11.1348 17.1053 15.1316 17.1053ZM15.1316 19.7368C9.6816 19.7368 5.26318 15.3184 5.26318 9.86842C5.26318 4.41842 9.6816 0 15.1316 0C20.5816 0 25 4.41842 25 9.86842C25 15.3184 20.5816 19.7368 15.1316 19.7368Z"
-          fill="#42D689"
-          style={Object {}}
-        />
-        <path
-          d="M15.4577 19.7369C16.1419 18.9077 16.6324 17.9361 16.8932 16.8932C17.9361 16.6324 18.9077 16.1421 19.7369 15.4579C19.699 16.6658 19.439 17.8563 18.9695 18.9698C17.8561 19.439 16.6656 19.6992 15.4577 19.7369ZM8.10687 8.10687C7.06397 8.36766 6.09239 8.85792 5.26318 9.54213C5.30108 8.33424 5.56108 7.14371 6.03055 6.03029C7.14397 5.56108 8.3345 5.30082 9.54239 5.26318C8.85818 6.09239 8.36766 7.06397 8.10687 8.10687Z"
-          fill="#5EA33B"
-          style={Object {}}
-        />
-      </svg>
-    </View>
-    <View
-      style={
-        Object {
           "width": 45,
         }
       }
@@ -135,60 +100,41 @@ exports[`Invite renders correctly with no recipients 1`] = `
         Array [
           Object {
             "alignItems": "center",
-            "borderColor": "#EEEEEE",
-            "borderRadius": 3,
-            "borderWidth": 1,
+            "borderColor": "#EDEEEF",
+            "borderRadius": 18,
+            "borderWidth": 1.5,
             "flexDirection": "row",
-            "height": 50,
-            "marginHorizontal": 10,
-            "marginVertical": 5,
+            "height": 36,
+            "paddingRight": 8,
           },
-          Object {
-            "borderColor": "#EEEEEE",
-          },
+          undefined,
         ]
       }
     >
       <View
         style={
           Object {
-            "alignItems": "center",
-            "flexDirection": "column",
-            "justifyContent": "center",
-            "minWidth": 45,
+            "marginLeft": 17,
+            "marginRight": 13,
           }
         }
       >
         <svg
           fill="none"
-          height={18}
+          height={15}
           style={Object {}}
-          viewBox="0 0 18 18"
-          width={18}
-          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 14 15"
+          width={14}
         >
           <path
             clipRule="evenodd"
-            d="M2.65971 7.31402C2.65971 9.88456 4.74354 11.9684 7.31408 11.9684C9.88462 11.9684 11.9685 9.88456 11.9685 7.31402C11.9685 4.74348 9.88462 2.65964 7.31408 2.65964C4.74354 2.65964 2.65971 4.74348 2.65971 7.31402ZM6.10352e-05 7.31402C6.10352e-05 11.3534 3.27466 14.628 7.31408 14.628C8.65119 14.628 9.9045 14.2692 10.983 13.6427L14.9508 17.6105C15.4701 18.1298 16.3121 18.1298 16.8315 17.6105C17.3508 17.0912 17.3508 16.2492 16.8315 15.7298L13.0074 11.9058C14.0211 10.6505 14.6281 9.05315 14.6281 7.31402C14.6281 3.2746 11.3535 0 7.31408 0C3.27466 0 6.10352e-05 3.2746 6.10352e-05 7.31402Z"
-            fill="#81868B"
+            d="M2.162 5.946a3.784 3.784 0 107.568 0 3.784 3.784 0 00-7.568 0zM0 5.946a5.946 5.946 0 008.929 5.145l3.225 3.226a1.081 1.081 0 001.53-1.53l-3.11-3.108A5.946 5.946 0 100 5.946z"
+            fill="#B4B9BD"
             fillRule="evenodd"
             style={Object {}}
           />
         </svg>
       </View>
-      <View
-        style={
-          Array [
-            Object {
-              "height": 35,
-              "width": 1,
-            },
-            Object {
-              "backgroundColor": "#EEEEEE",
-            },
-          ]
-        }
-      />
       <View
         style={
           Array [
@@ -204,29 +150,29 @@ exports[`Invite renders correctly with no recipients 1`] = `
       >
         <TextInput
           allowFontScaling={true}
-          icon={
-            <Search
-              color="#81868B"
-              height={18}
-              width={18}
-            />
-          }
           onBlur={[Function]}
           onChangeText={[Function]}
           onFocus={[Function]}
-          placeholder="nameOrPhoneNumber"
-          placeholderTextColor="rgba(0, 0, 0, .4)"
+          placeholder="global:search"
           rejectResponderTermination={true}
           style={
-            Object {
-              "backgroundColor": "#FFFFFF",
-              "borderColor": "#D1D5D8",
-              "borderRadius": 3,
-              "flex": 1,
-              "fontFamily": "Hind-Regular",
-              "padding": 8,
-            }
+            Array [
+              Object {
+                "color": "#2E3338",
+                "flex": 1,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingHorizontal": 0,
+                "paddingVertical": 12,
+              },
+              undefined,
+              Object {
+                "paddingVertical": 6,
+              },
+            ]
           }
+          testID="SearchInput"
           underlineColorAndroid="transparent"
           value=""
         />
@@ -359,19 +305,15 @@ exports[`Invite renders correctly with recipients 1`] = `
   <View
     style={
       Object {
-        "alignItems": "flex-end",
-        "backgroundColor": "#FFFFFF",
-        "elevation": 1,
+        "alignItems": "center",
+        "backgroundColor": "transparent",
+        "borderBottomColor": AnimatedValue {
+          " __value": NaN,
+        },
+        "borderBottomWidth": 1,
         "flexDirection": "row",
         "height": 62,
         "justifyContent": "space-between",
-        "shadowColor": "black",
-        "shadowOffset": Object {
-          "height": 0.5,
-          "width": 0,
-        },
-        "shadowOpacity": 0.3,
-        "shadowRadius": 0.8,
       }
     }
   >
@@ -432,37 +374,6 @@ exports[`Invite renders correctly with recipients 1`] = `
     <View
       style={
         Object {
-          "marginBottom": 13,
-        }
-      }
-    >
-      <svg
-        fill="none"
-        height={25}
-        style={Object {}}
-        viewBox="0 0 25 25"
-        width={25}
-      >
-        <path
-          d="M9.86842 22.3684C13.8653 22.3684 17.1053 19.1284 17.1053 15.1316C17.1053 11.1348 13.8653 7.89476 9.86842 7.89476C5.87158 7.89476 2.63158 11.1348 2.63158 15.1316C2.63158 19.1284 5.87158 22.3684 9.86842 22.3684ZM9.86842 25C4.41842 25 0 20.5816 0 15.1316C0 9.6816 4.41842 5.26318 9.86842 5.26318C15.3184 5.26318 19.7368 9.6816 19.7368 15.1316C19.7368 20.5816 15.3184 25 9.86842 25Z"
-          fill="#FBCC5C"
-          style={Object {}}
-        />
-        <path
-          d="M15.1316 17.1053C19.1284 17.1053 22.3684 13.8653 22.3684 9.86842C22.3684 5.87158 19.1284 2.63158 15.1316 2.63158C11.1348 2.63158 7.89476 5.87158 7.89476 9.86842C7.89476 13.8653 11.1348 17.1053 15.1316 17.1053ZM15.1316 19.7368C9.6816 19.7368 5.26318 15.3184 5.26318 9.86842C5.26318 4.41842 9.6816 0 15.1316 0C20.5816 0 25 4.41842 25 9.86842C25 15.3184 20.5816 19.7368 15.1316 19.7368Z"
-          fill="#42D689"
-          style={Object {}}
-        />
-        <path
-          d="M15.4577 19.7369C16.1419 18.9077 16.6324 17.9361 16.8932 16.8932C17.9361 16.6324 18.9077 16.1421 19.7369 15.4579C19.699 16.6658 19.439 17.8563 18.9695 18.9698C17.8561 19.439 16.6656 19.6992 15.4577 19.7369ZM8.10687 8.10687C7.06397 8.36766 6.09239 8.85792 5.26318 9.54213C5.30108 8.33424 5.56108 7.14371 6.03055 6.03029C7.14397 5.56108 8.3345 5.30082 9.54239 5.26318C8.85818 6.09239 8.36766 7.06397 8.10687 8.10687Z"
-          fill="#5EA33B"
-          style={Object {}}
-        />
-      </svg>
-    </View>
-    <View
-      style={
-        Object {
           "width": 45,
         }
       }
@@ -482,60 +393,41 @@ exports[`Invite renders correctly with recipients 1`] = `
         Array [
           Object {
             "alignItems": "center",
-            "borderColor": "#EEEEEE",
-            "borderRadius": 3,
-            "borderWidth": 1,
+            "borderColor": "#EDEEEF",
+            "borderRadius": 18,
+            "borderWidth": 1.5,
             "flexDirection": "row",
-            "height": 50,
-            "marginHorizontal": 10,
-            "marginVertical": 5,
+            "height": 36,
+            "paddingRight": 8,
           },
-          Object {
-            "borderColor": "#EEEEEE",
-          },
+          undefined,
         ]
       }
     >
       <View
         style={
           Object {
-            "alignItems": "center",
-            "flexDirection": "column",
-            "justifyContent": "center",
-            "minWidth": 45,
+            "marginLeft": 17,
+            "marginRight": 13,
           }
         }
       >
         <svg
           fill="none"
-          height={18}
+          height={15}
           style={Object {}}
-          viewBox="0 0 18 18"
-          width={18}
-          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 14 15"
+          width={14}
         >
           <path
             clipRule="evenodd"
-            d="M2.65971 7.31402C2.65971 9.88456 4.74354 11.9684 7.31408 11.9684C9.88462 11.9684 11.9685 9.88456 11.9685 7.31402C11.9685 4.74348 9.88462 2.65964 7.31408 2.65964C4.74354 2.65964 2.65971 4.74348 2.65971 7.31402ZM6.10352e-05 7.31402C6.10352e-05 11.3534 3.27466 14.628 7.31408 14.628C8.65119 14.628 9.9045 14.2692 10.983 13.6427L14.9508 17.6105C15.4701 18.1298 16.3121 18.1298 16.8315 17.6105C17.3508 17.0912 17.3508 16.2492 16.8315 15.7298L13.0074 11.9058C14.0211 10.6505 14.6281 9.05315 14.6281 7.31402C14.6281 3.2746 11.3535 0 7.31408 0C3.27466 0 6.10352e-05 3.2746 6.10352e-05 7.31402Z"
-            fill="#81868B"
+            d="M2.162 5.946a3.784 3.784 0 107.568 0 3.784 3.784 0 00-7.568 0zM0 5.946a5.946 5.946 0 008.929 5.145l3.225 3.226a1.081 1.081 0 001.53-1.53l-3.11-3.108A5.946 5.946 0 100 5.946z"
+            fill="#B4B9BD"
             fillRule="evenodd"
             style={Object {}}
           />
         </svg>
       </View>
-      <View
-        style={
-          Array [
-            Object {
-              "height": 35,
-              "width": 1,
-            },
-            Object {
-              "backgroundColor": "#EEEEEE",
-            },
-          ]
-        }
-      />
       <View
         style={
           Array [
@@ -551,29 +443,29 @@ exports[`Invite renders correctly with recipients 1`] = `
       >
         <TextInput
           allowFontScaling={true}
-          icon={
-            <Search
-              color="#81868B"
-              height={18}
-              width={18}
-            />
-          }
           onBlur={[Function]}
           onChangeText={[Function]}
           onFocus={[Function]}
-          placeholder="nameOrPhoneNumber"
-          placeholderTextColor="rgba(0, 0, 0, .4)"
+          placeholder="global:search"
           rejectResponderTermination={true}
           style={
-            Object {
-              "backgroundColor": "#FFFFFF",
-              "borderColor": "#D1D5D8",
-              "borderRadius": 3,
-              "flex": 1,
-              "fontFamily": "Hind-Regular",
-              "padding": 8,
-            }
+            Array [
+              Object {
+                "color": "#2E3338",
+                "flex": 1,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingHorizontal": 0,
+                "paddingVertical": 12,
+              },
+              undefined,
+              Object {
+                "paddingVertical": 6,
+              },
+            ]
           }
+          testID="SearchInput"
           underlineColorAndroid="transparent"
           value=""
         />
@@ -693,14 +585,17 @@ exports[`Invite renders correctly with recipients 1`] = `
         >
           <View
             style={
-              Object {
-                "alignItems": "center",
-                "backgroundColor": "#FFFFFF",
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "paddingHorizontal": 16,
-                "paddingVertical": 8,
-              }
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "backgroundColor": "#FFFFFF",
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "paddingHorizontal": 16,
+                  "paddingVertical": 8,
+                },
+                undefined,
+              ]
             }
           >
             <Text

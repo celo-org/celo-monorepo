@@ -25,11 +25,15 @@ export function authenticateUser(request: Request): boolean {
 export async function isVerified(account: string, hashedPhoneNumber: string): Promise<boolean> {
   // TODO (amyslawson) wrap forno request in retry
   const attestationsWrapper: AttestationsWrapper = await getContractKit().contracts.getAttestations()
-  const attestationStatus = await attestationsWrapper.getVerifiedStatus(hashedPhoneNumber, account)
+  const {
+    isVerified: _isVerified,
+    completed,
+    numAttestationsRemaining,
+    total,
+  } = await attestationsWrapper.getVerifiedStatus(hashedPhoneNumber, account)
 
   logger.debug(
-    `CELO_PNP_DEBUG user is verified=${attestationStatus.isVerified} with ${attestationStatus.completed} completed attestations and
-      ${attestationStatus.numAttestationsRemaining} verifications remaining. Total of ${attestationStatus.total} requested.`
+    `Account ${account} is verified=${_isVerified} with ${completed} completed attestations, ${numAttestationsRemaining} remaining, total of ${total} requested.`
   )
-  return attestationStatus.isVerified
+  return _isVerified
 }
