@@ -40,7 +40,7 @@ public class MainActivity
       );
 
     appStartTimestamp = new Date();
-    SplashScreen.show(this);
+    SplashScreen.show(this, R.style.SplashTheme);
     super.onCreate(null);
   }
 
