@@ -3,9 +3,9 @@ import { eqAddress } from '@celo/utils/lib/address'
 import { concurrentMap, sleep } from '@celo/utils/lib/async'
 import { notEmpty, zip3 } from '@celo/utils/lib/collections'
 import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
-import { appendPath } from '@celo/utils/lib/string'
 import BigNumber from 'bignumber.js'
 import fetch from 'cross-fetch'
+import path from 'path'
 import { Address, CeloContract, NULL_ADDRESS } from '../base'
 import { Attestations } from '../generated/Attestations'
 import { ClaimTypes, IdentityMetadataWrapper } from '../identity'
@@ -466,7 +466,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       salt,
       smsRetrieverAppSig,
     }
-    return fetch(appendPath(serviceURL, 'attestations'), {
+    return fetch(path.join(serviceURL, 'attestations'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -564,7 +564,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     ret.attestationServiceURL = attestationServiceURL
 
     try {
-      const statusResponse = await fetch(appendPath(attestationServiceURL, 'status'))
+      const statusResponse = await fetch(path.join(attestationServiceURL, 'status'))
 
       if (!statusResponse.ok) {
         ret.state = AttestationServiceStatusState.UnreachableAttestationService

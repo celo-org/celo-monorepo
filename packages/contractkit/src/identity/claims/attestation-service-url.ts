@@ -4,6 +4,7 @@ import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import fetch from 'cross-fetch'
 import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
+import path from 'path'
 import { Address } from '../../base'
 import { ContractKit } from '../../kit'
 import { ClaimTypes, now, TimestampType } from './types'
@@ -32,7 +33,7 @@ export async function validateAttestationServiceUrl(
   try {
     const randomMessage = kit.web3.utils.randomHex(32)
 
-    const url = claim.url + '/status?messageToSign=' + randomMessage
+    const url = path.join(claim.url, '/status?messageToSign=' + randomMessage)
 
     const resp = await fetch(url)
 
