@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { computeBlindedSignature } from '../bls/bls-cryptography-client'
-import { ErrorMessages, respondWithError } from '../common/error-utils'
+import { ErrorMessage, respondWithError, WarningMessage } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
 import {
   hasValidAccountParam,
@@ -27,11 +27,11 @@ export async function handleGetBlindedMessageForSalt(
   logger.info('Begin getBlindedSalt request')
   try {
     if (!isValidGetSignatureInput(request.body)) {
-      respondWithError(response, 400, ErrorMessages.INVALID_INPUT)
+      respondWithError(response, 400, WarningMessage.INVALID_INPUT)
       return
     }
     if (!authenticateUser(request)) {
-      respondWithError(response, 401, ErrorMessages.UNAUTHENTICATED_USER)
+      respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER)
       return
     }
 
@@ -39,7 +39,7 @@ export async function handleGetBlindedMessageForSalt(
     const remainingQueryCount = await getRemainingQueryCount(account, hashedPhoneNumber)
     if (remainingQueryCount <= 0) {
       logger.debug('No remaining query count')
-      respondWithError(response, 403, ErrorMessages.EXCEEDED_QUOTA)
+      respondWithError(response, 403, WarningMessage.EXCEEDED_QUOTA)
       return
     }
     const keyProvider = getKeyProvider()
@@ -50,7 +50,7 @@ export async function handleGetBlindedMessageForSalt(
     response.json({ success: true, signature, version: VERSION })
   } catch (error) {
     logger.error('Failed to getSalt', error)
-    respondWithError(response, 500, ErrorMessages.UNKNOWN_ERROR)
+    respondWithError(response, 500, ErrorMessage.UNKNOWN_ERROR)
   }
 }
 

@@ -16,7 +16,7 @@
   "backupKey": "Clave de la cuenta",
   "yourBackupKey": "Su clave de respaldo",
   "moreInfo": "Más Información",
-  "backupKeyNotification": "Sin una clave de respaldo, puede perder el acceso a la billetera.",
+  "backupKeyNotification": "Sin una clave de respaldo, puede perder el acceso a la billetera",
   "backupKeySummary":  "Encuentra un lugar privado y anota tu Clave de Cuenta. Por favor, guárdela en un lugar seguro. No la guardes en tu teléfono.",
   "backupPrompt":
     "Para seguridad de sus fondos, su cuenta está bloqueada hasta que obtenga su clave de respaldo.",

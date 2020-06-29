@@ -9,11 +9,19 @@ interface Props {
   text: string
   isSelected: boolean
   onSelect: (word: string, data: any) => void
+  hideCheckboxes?: boolean
   data?: any
   testID?: string
 }
 
-export default function SelectionOption({ text, isSelected, data, onSelect, testID }: Props) {
+export default function SelectionOption({
+  text,
+  isSelected,
+  data,
+  onSelect,
+  testID,
+  hideCheckboxes,
+}: Props) {
   function onPress() {
     onSelect(text, data)
   }
@@ -21,11 +29,13 @@ export default function SelectionOption({ text, isSelected, data, onSelect, test
   return (
     <Touchable onPress={onPress} testID={testID}>
       <View style={styles.contentContainer}>
-        <View style={styles.iconContainer}>
-          {/* TODO: make proper checkbox */}
-          {!isSelected && <View style={styles.circle} />}
-          {isSelected && <CheckCircle />}
-        </View>
+        {!hideCheckboxes && (
+          <View style={styles.iconContainer}>
+            {/* TODO: make proper checkbox */}
+            {!isSelected && <View style={styles.circle} />}
+            {isSelected && <CheckCircle />}
+          </View>
+        )}
         <Text style={styles.text} numberOfLines={1}>
           {text}
         </Text>
