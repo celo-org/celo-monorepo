@@ -5,8 +5,9 @@
       <!-- API 26 specific attributes -->
       <!-- 
         Since SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR is only available on Android O (API 26) and above
-        we use a white nav bar only starting from this!
+        we use a white nav bar only starting from this version!
        -->
+      <item name="android:windowLightNavigationBar">true</item>
       <item name="android:navigationBarColor">@android:color/white</item>
   </style>
 </resources>
