@@ -486,7 +486,8 @@ export function MainStackScreen() {
 
     setInitialRoute(initialRoute)
 
-    SplashScreen.hide()
+    // Wait for next frame to avoid slight gap when hiding the splash
+    requestAnimationFrame(() => SplashScreen.hide())
   })
 
   if (!initialRouteName) {
