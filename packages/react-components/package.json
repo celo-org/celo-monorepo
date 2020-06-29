@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@celo/react-native-sms-retriever": "git+https://github.com/celo-org/react-native-sms-retriever#b88e502",
-    "@celo/utils": "0.1.16-dev",
+    "@celo/utils": "0.1.17-dev",
     "hoist-non-react-statics": "^3.3.0",
     "lodash": "^4.17.14",
     "react-native-autocomplete-input": "^4.1.0",

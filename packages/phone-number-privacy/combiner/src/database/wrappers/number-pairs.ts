@@ -1,4 +1,4 @@
-import { ErrorMessages } from '../../common/error-utils'
+import { ErrorMessage } from '../../common/error-utils'
 import logger from '../../common/logger'
 import { getDatabase } from '../database'
 import { NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE, NumberPair } from '../models/numberPair'
@@ -24,7 +24,7 @@ export async function getNumberPairContacts(
       .map((contactPair) => contactPair[NUMBER_PAIRS_COLUMN.userPhoneHash])
       .filter((number) => contactPhonesSet.has(number))
   } catch (e) {
-    logger.error(ErrorMessages.DATABASE_GET_FAILURE, e)
+    logger.error(ErrorMessage.DATABASE_GET_FAILURE, e)
     return []
   }
 }
@@ -46,7 +46,7 @@ export async function setNumberPairContacts(
   } catch (e) {
     // ignore duplicate insertion error (23505)
     if (e.code !== '23505') {
-      logger.error(ErrorMessages.DATABASE_INSERT_FAILURE, e)
+      logger.error(ErrorMessage.DATABASE_INSERT_FAILURE, e)
     }
   }
 }
