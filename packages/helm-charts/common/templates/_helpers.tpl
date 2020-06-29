@@ -131,6 +131,9 @@ release: {{ .Release.Name }}
     ACCOUNT_ADDRESS=$(cat /root/.celo/address)
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }} --etherbase=${ACCOUNT_ADDRESS}"
     {{- end }}
+    {{- if .pprof | default false }}
+    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .pprof_port }}"
+    {{- end }}
 
     exec geth \
       --bootnodes=$(cat /root/.celo/bootnodeEnode) \
@@ -205,6 +208,10 @@ release: {{ .Release.Name }}
     containerPort: 8545
   - name: ws
     containerPort: 8546
+{{ end }}
+{{- if .pprof }}
+  - name: pprof
+    containerPort: 6060
 {{ end }}
   resources:
 {{ toYaml .Values.geth.resources | indent 4 }}
