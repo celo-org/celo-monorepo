@@ -147,11 +147,8 @@ export default class KeyboardSpacer extends React.Component<Props> {
   }
 
   render() {
-    if (Platform.OS === 'android') {
-      // On Android with windowSoftInputMode set to adjustResize we don't need the spacer
-      // unless it's using fullscreen layout (which is the case with a transparent status bar)
-      // return null
-    }
+    // On Android with windowSoftInputMode set to adjustResize we don't need the spacer
+    // unless it's using fullscreen layout (which is the case with a transparent status bar)
 
     return (
       <View
