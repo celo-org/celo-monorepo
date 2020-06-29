@@ -75,7 +75,13 @@ export default class KeyboardSpacer extends React.Component<Props> {
   }
 
   relativeKeyboardHeight(viewFrame: LayoutRectangle, keyboardFrame: ScreenRect): number {
-    if (!viewFrame || !keyboardFrame) {
+    if (
+      !viewFrame ||
+      // On Android these can be undefined for unfocused screens
+      viewFrame.y === undefined ||
+      viewFrame.height === undefined ||
+      !keyboardFrame
+    ) {
       return 0
     }
 
