@@ -21,24 +21,26 @@ function PincodeLock() {
   const [errorText, setErrorText] = useState<string | undefined>(undefined)
   const dispatch = useDispatch()
   const { t } = useTranslation(Namespaces.nuxNamePin1)
-  const currentAccount = useSelector(currentAccountSelector)
+  const account = useSelector(currentAccountSelector)
 
-  function onWrongPin() {
+  const onWrongPin = () => {
     setPin('')
     setErrorText(t(`${Namespaces.global}:${ErrorMessages.INCORRECT_PIN}`))
   }
 
-  function onCorrectPin() {
+  const onCorrectPin = () => {
     dispatch(appUnlock())
   }
 
-  function onCompletePin(enteredPin: string) {
-    if (currentAccount) {
-      return checkPin(enteredPin, currentAccount)
-        .then(onCorrectPin)
-        .catch(onWrongPin)
-    } else {
+  const onCompletePin = async (enteredPin: string) => {
+    if (!account) {
+      throw new Error('Attempting to unlock pin before account initialized')
+    }
+
+    if (await checkPin(enteredPin, account)) {
       onCorrectPin()
+    } else {
+      onWrongPin()
     }
   }
 

@@ -21,8 +21,7 @@ export async function storeItem({ key, value }: SecureStorage) {
     }
     return result
   } catch (error) {
-    const sanitizedError = Logger.sanitizeError(error, value)
-    Logger.error(TAG, 'Error storing item', sanitizedError)
+    Logger.error(TAG, 'Error storing item', error, true, value)
     throw new Error(ErrorMessages.KEYCHAIN_STORAGE_ERROR)
   }
 }
@@ -37,8 +36,7 @@ export async function retrieveStoredItem(key: string) {
     }
     return item.password
   } catch (error) {
-    const sanitizedError = Logger.sanitizeError(error)
-    Logger.error(TAG, 'Error retrieving stored item', sanitizedError)
+    Logger.error(TAG, 'Error retrieving stored item', error, true)
     throw new Error(ErrorMessages.KEYCHAIN_STORAGE_ERROR)
   }
 }

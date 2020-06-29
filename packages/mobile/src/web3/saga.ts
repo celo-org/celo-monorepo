@@ -178,7 +178,7 @@ export function* getOrCreateAccount() {
       throw new Error('Failed to assign account from private key')
     }
 
-    yield call(storeMnemonic, mnemonic)
+    yield call(storeMnemonic, mnemonic, accountAddress)
 
     return accountAddress
   } catch (error) {

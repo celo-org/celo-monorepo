@@ -20,7 +20,6 @@ import { StackParamList } from 'src/navigator/types'
 import { DEFAULT_CACHE_ACCOUNT, isPinValid } from 'src/pincode/authentication'
 import { setCachedPin } from 'src/pincode/PasswordCache'
 import Pincode from 'src/pincode/Pincode'
-import Logger from 'src/utils/Logger'
 
 interface DispatchProps {
   setPincode: typeof setPincode
@@ -82,14 +81,9 @@ export class PincodeSet extends React.Component<Props, State> {
     CeloAnalytics.track(CustomEventNames.pin_create_button)
     const { pin1 } = this.state
     if (this.isPin1Valid(pin1) && this.isPin2Valid(pin2)) {
-      try {
-        setCachedPin(DEFAULT_CACHE_ACCOUNT, pin1)
-        this.props.setPincode(PincodeType.CustomPin)
-        this.props.navigation.navigate(Screens.EnterInviteCode)
-      } catch (err) {
-        const sanitizedError = Logger.sanitizeError(err)
-        CeloAnalytics.track(CustomEventNames.pin_store_error, { error: sanitizedError.message })
-      }
+      setCachedPin(DEFAULT_CACHE_ACCOUNT, pin1)
+      this.props.setPincode(PincodeType.CustomPin)
+      this.props.navigation.navigate(Screens.EnterInviteCode)
     } else {
       this.props.navigation.setParams({ isVerifying: false })
       this.setState({

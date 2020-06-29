@@ -21,6 +21,7 @@ import { navigate, pushToStack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { RootState } from 'src/redux/reducers'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'backup/BackupPhrase'
 
@@ -30,6 +31,7 @@ interface State {
 }
 
 interface StateProps {
+  account: string | null
   backupCompleted: boolean
 }
 
@@ -42,6 +44,7 @@ type Props = StateProps & DispatchProps & WithTranslation
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
+    account: currentAccountSelector(state),
     backupCompleted: state.account.backupCompleted,
   }
 }
@@ -70,7 +73,7 @@ class BackupPhrase extends React.Component<Props, State> {
     if (this.state.mnemonic) {
       return
     }
-    const mnemonic = await getStoredMnemonic()
+    const mnemonic = await getStoredMnemonic(this.props.account)
 
     if (mnemonic) {
       this.setState({ mnemonic })

@@ -31,7 +31,7 @@ describe('Import wallet saga', () => {
         [call(waitWeb3LastBlock), true],
         [matchers.call.fn(fetchTokenBalanceInWeiWithRetry), new BigNumber(10)],
         [matchers.call.fn(assignAccountFromPrivateKey), mockAccount],
-        [call(storeMnemonic, mockPhraseValid), true],
+        [call(storeMnemonic, mockPhraseValid, mockAccount), true],
       ])
       .put(setBackupCompleted())
       .put(redeemInviteSuccess())

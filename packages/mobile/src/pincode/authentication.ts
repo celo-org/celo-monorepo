@@ -156,12 +156,20 @@ export function* getPasswordSaga(account: string, withVerification?: boolean, st
 
 type PinCallback = (pin: string) => void
 
+// Retrieve the pincode value
+// May trigger the pincode enter screen
 export async function getPincode(withVerification = true) {
   const cachedPin = getCachedPin(DEFAULT_CACHE_ACCOUNT)
   if (cachedPin) {
     return cachedPin
   }
 
+  const pin = await requestPincodeInput(withVerification, true)
+  return pin
+}
+
+// Navigate to the pincode enter screen and check pin
+export async function requestPincodeInput(withVerification = true, shouldNavigateBack = true) {
   const pin = await new Promise((resolve: PinCallback) => {
     navigate(Screens.PincodeEnter, {
       onSuccess: resolve,
@@ -169,7 +177,9 @@ export async function getPincode(withVerification = true) {
     })
   })
 
-  navigateBack()
+  if (shouldNavigateBack) {
+    navigateBack()
+  }
 
   if (!pin) {
     throw new Error('Pincode confirmation returned empty pin')

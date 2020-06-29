@@ -38,7 +38,7 @@ describe('PincodeLock', () => {
   })
 
   it('shows wrong PIN notification', async () => {
-    ;(checkPin as jest.Mock).mockRejectedValue(false)
+    ;(checkPin as jest.Mock).mockResolvedValue(false)
     const store = createMockStore()
 
     const { getByTestId, getByText } = render(

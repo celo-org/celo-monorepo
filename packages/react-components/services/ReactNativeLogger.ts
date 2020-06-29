@@ -21,9 +21,17 @@ export default class ReactNativeLogger {
     console.info(`${tag}/${messages.join(', ')}`)
   }
 
-  error = (tag: string, message: string, error?: Error) => {
+  error = (
+    tag: string,
+    message: string,
+    error?: Error,
+    shouldSanitizeError = false,
+    valueToPurge?: string
+  ) => {
     // console.error would display red box, therefore, we will log to console.info instead.
-    const errorMsg = this.getErrorMessage(error)
+    const sanitizedError =
+      error && shouldSanitizeError ? this.sanitizeError(error, valueToPurge) : error
+    const errorMsg = this.getErrorMessage(sanitizedError)
     console.info(`${tag}/${message}:${errorMsg}`)
     if (__DEV__) {
       console.info(console.trace())
@@ -59,14 +67,14 @@ export default class ReactNativeLogger {
   }
 
   sanitizeError = (error: Error, valueToPurge?: string) => {
-    const message = this.getErrorMessage(error)
+    const message = this.getErrorMessage(error).toLowerCase()
 
-    if (message.toLowerCase().includes('password') || message.toLowerCase().includes('key')) {
+    if (message.includes('password') || message.includes('key') || message.includes('pin')) {
       return new Error('Error message hidden for privacy')
     }
 
     if (valueToPurge) {
-      return new Error(message.replace(new RegExp(valueToPurge, 'g'), ''))
+      return new Error(message.replace(new RegExp(valueToPurge, 'g'), '<purged>'))
     }
 
     return error

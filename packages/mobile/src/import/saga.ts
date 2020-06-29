@@ -71,7 +71,7 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
     }
 
     // Set key in phone's secure store
-    yield call(storeMnemonic, phrase)
+    yield call(storeMnemonic, phrase, account)
     // Set backup complete so user isn't prompted to do backup flow
     yield put(setBackupCompleted())
     // Set redeem invite complete so user isn't brought back into nux flow
