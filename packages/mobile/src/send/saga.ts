@@ -188,7 +188,7 @@ function* sendPaymentOrInviteSaga({
     navigateHome()
     yield put(sendPaymentOrInviteSuccess())
   } catch (e) {
-    CeloAnalytics.track(CustomEventNames.send_error, { isInvite, error: e })
+    CeloAnalytics.track(CustomEventNames.send_error, { isInvite, error: e.message })
     yield put(showError(ErrorMessages.SEND_PAYMENT_FAILED))
     yield put(sendPaymentOrInviteFailure())
   }

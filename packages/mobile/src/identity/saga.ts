@@ -65,7 +65,7 @@ export function* validateRecipientAddressSaga({
     CeloAnalytics.track(CustomEventNames.send_secure_incorrect, {
       method: 'manual',
       validationType: addressValidationType === AddressValidationType.FULL ? 'full' : 'partial',
-      error,
+      error: error.message,
     })
 
     Logger.error(TAG, 'validateRecipientAddressSaga/Address validation error: ', error)

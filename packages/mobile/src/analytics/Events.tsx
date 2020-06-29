@@ -88,7 +88,6 @@ export enum VerificationEvents {
   verification_wait_for_select_issuers = 'verification_wait_for_select_issuers',
   verification_selecting_issuer = 'verification_selecting_issuer',
   verification_requested_attestations = 'verification_requested_attestations',
-  verification_get_attestations = 'verification_get_attestations',
   verification_set_account = 'verification_set_account',
   verification_reveal_attestation = 'verification_reveal_attestation',
   verification_revealed_attestation = 'verification_revealed_attestation',
@@ -222,10 +221,6 @@ export enum CeloExchangeEvents {
   gold_sell_start = 'gold_sell_start', // when the “Sell” button is clicked
   gold_activity_select = 'gold_activity_select', // when an activity item is clicked
   gold_activity_back = 'gold_activity_back', // when back caret is clicked from drilldown
-
-  // Screen: Exchange_Review
-  exchange_edit = 'exchange_edit', // to count # of times users click the edit button, change transaction)
-  exchange_cancel = 'exchange_cancel', // to count # of taps on the “Cancel” in the upper left corner)
 }
 
 export enum GethEvents {

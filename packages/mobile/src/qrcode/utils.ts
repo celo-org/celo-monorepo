@@ -72,7 +72,10 @@ function* handleSecureSend(
   )
   if (!possibleRecievingAddressesFormatted.includes(userScannedAddress)) {
     const error = ErrorMessages.QR_FAILED_INVALID_RECIPIENT
-    CeloAnalytics.track(CustomEventNames.send_secure_incorrect, { method: 'scan', error })
+    CeloAnalytics.track(CustomEventNames.send_secure_incorrect, {
+      method: 'scan',
+      error,
+    })
     yield put(showMessage(error))
     return false
   }

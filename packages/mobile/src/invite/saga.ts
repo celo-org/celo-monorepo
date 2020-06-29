@@ -213,7 +213,7 @@ export function* sendInvite(
     yield call(navigateToInviteMessageApp, e164Number, inviteMode, message)
     CeloAnalytics.track(CustomEventNames.invite_success)
   } catch (e) {
-    CeloAnalytics.track(CustomEventNames.invite_error)
+    CeloAnalytics.track(CustomEventNames.invite_error, { error: e.message })
     Logger.error(TAG, 'Send invite error: ', e)
     throw e
   }

@@ -175,7 +175,7 @@ export function* paymentRequestWriter({ paymentInfo }: WritePaymentRequest) {
     navigateHome()
   } catch (error) {
     Logger.error(TAG, 'Failed to write payment request to Firebase DB', error)
-    CeloAnalytics.track(CustomEventNames.request_error, { error })
+    CeloAnalytics.track(CustomEventNames.request_error, { error: error.message })
     yield put(showError(ErrorMessages.PAYMENT_REQUEST_FAILED))
   }
 }

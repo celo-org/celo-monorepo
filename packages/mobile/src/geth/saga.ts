@@ -138,7 +138,7 @@ export function* initGethSaga() {
   }
 
   CeloAnalytics.track(CustomEventNames.geth_init_failure, {
-    error: result,
+    error: result.message,
     context: errorContext,
   })
 
@@ -149,7 +149,10 @@ export function* initGethSaga() {
   } else {
     // Suggest switch to forno for network-related errors
     if (yield select(promptFornoIfNeededSelector)) {
-      CeloAnalytics.track(CustomEventNames.prompt_forno, { context: `Geth init error ${result}` })
+      CeloAnalytics.track(CustomEventNames.prompt_forno, {
+        error: result.message,
+        context: 'Geth init error',
+      })
       yield put(setPromptForno(false))
       navigate(Screens.Settings, { promptFornoModal: true })
     } else {

@@ -1,11 +1,21 @@
+import { CURRENCY_ENUM } from '@celo/utils'
 import BigNumber from 'bignumber.js'
 import { PincodeType } from 'src/account/reducer'
 import {
   AppEvents,
+  CeloExchangeEvents,
+  ContactImportEvents,
+  EscrowEvents,
+  FeeEvents,
+  GethEvents,
+  InviteEvents,
   NotificationEvents,
   OnboardingEvents,
+  RequestEvents,
   SendEvents,
   SettingsEvents,
+  TransactionEvents,
+  VerificationEvents,
 } from 'src/analytics/Events'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 
@@ -104,6 +114,120 @@ export interface AnalyticsPropertiesList {
   }
   [OnboardingEvents.import_wallet_submit]: undefined
 
+  [VerificationEvents.verification_start]: undefined
+  [VerificationEvents.verification_hash_retrieved]: {
+    phoneHash: string
+    address: string
+  }
+  [VerificationEvents.verification_setup]: undefined
+  [VerificationEvents.verification_get_status]: {
+    isVerified: boolean
+    numAttestationsRemaining: number
+    total: number
+    completed: number
+  }
+  [VerificationEvents.verification_request_attestations]: {
+    numAttestationsRequestsNeeded: number
+  }
+  [VerificationEvents.verification_wait_for_select_issuers]: undefined
+  [VerificationEvents.verification_selecting_issuer]: undefined
+  [VerificationEvents.verification_requested_attestations]: undefined
+  [VerificationEvents.verification_set_account]: {
+    address: string
+  }
+  [VerificationEvents.verification_reveal_attestation]: {
+    issuer: any
+  }
+  [VerificationEvents.verification_revealed_attestation]: {
+    issuer: any
+    duration: number
+  }
+  [VerificationEvents.verification_reveal_error]: {
+    issuer: any
+    statusCode: any
+  }
+  [VerificationEvents.verification_wait_for_attestation_code]: {
+    issuer: any
+  }
+  [VerificationEvents.verification_code_received]:
+    | undefined
+    | {
+        context: string
+      }
+  [VerificationEvents.verification_complete_attestation]: {
+    issuer: any
+  }
+  [VerificationEvents.verification_completed_attestation]: {
+    issuer: any
+  }
+  [VerificationEvents.verification_failed]: {
+    duration: number
+  }
+  [VerificationEvents.verification_cancelled]: {
+    duration: number
+  }
+  [VerificationEvents.verification_success]: {
+    duration: number
+  }
+  [VerificationEvents.verification_timed_out]: {
+    duration: number
+  }
+  [VerificationEvents.verification_error]: {
+    error: string
+  }
+  [VerificationEvents.verification_actionable_attestation_start]: undefined
+  [VerificationEvents.verification_actionable_attestation_finish]: {
+    duration: number
+  }
+  [VerificationEvents.verification_validate_code_start]: {
+    issuer: any
+  }
+  [VerificationEvents.verification_validate_code_finish]: {
+    issuer: any
+  }
+  [VerificationEvents.phone_number_quota_purchase_success]: undefined
+  [VerificationEvents.phone_number_quota_purchase_failure]: {
+    error: string
+  }
+  [VerificationEvents.phone_number_quota_purchase_skip]: undefined
+
+  [ContactImportEvents.import_contacts]: undefined
+  [ContactImportEvents.import_contact_error]: {
+    error: string
+  }
+  [ContactImportEvents.fetched_contacts]: {
+    contacts: number
+  }
+  [ContactImportEvents.add_contact_match]: {
+    contactsMatched: number
+  }
+
+  [InviteEvents.invite_success]: undefined
+  [InviteEvents.invite_error]: {
+    error: string
+  }
+  [InviteEvents.friend_invited]: undefined
+  [InviteEvents.invite_edit]: undefined
+  [InviteEvents.invite_friends_sms]: undefined
+  [InviteEvents.invite_friends_whatsapp]: undefined
+  [InviteEvents.invite_skip_failed]: {
+    error: string
+  }
+  [InviteEvents.invite_skip_complete]: undefined
+
+  [SendEvents.send_cancel]: undefined
+  [SendEvents.send_scan]: undefined
+  [SendEvents.send_select_recipient]: undefined
+  [SendEvents.send_amount_back]: undefined
+  [SendEvents.send_continue]: {
+    method: 'scan' | 'search'
+    transactionType: 'send' | 'invite'
+    localCurrencyExchangeRate: string
+    localCurrency: LocalCurrencyCode
+    dollarAmount: BigNumber
+    localCurrencyAmount: BigNumber
+  }
+  [SendEvents.send_confirm_back]: undefined
   [SendEvents.send_confirm]: {
     method: 'scan' | 'search'
     localCurrencyExchangeRate: string
@@ -112,5 +236,180 @@ export interface AnalyticsPropertiesList {
     localCurrencyAmount: BigNumber
     isInvite: boolean
   }
-  [SendEvents.send_scan]: undefined
+  [SendEvents.send_error]: {
+    isInvite: boolean
+    error: string
+  }
+  [SendEvents.send_complete]: {
+    isInvite: boolean
+  }
+  [SendEvents.send_dollar_transaction]: undefined
+  [SendEvents.send_dollar_transaction_confirmed]: undefined
+
+  [SendEvents.send_secure_start]: {
+    method: 'scan' | 'manual'
+  }
+  [SendEvents.send_secure_cancel]: undefined
+  [SendEvents.send_secure_back]: undefined
+  [SendEvents.send_secure_submit]: {
+    validationType: 'full' | 'partial'
+    address: string
+  }
+  [SendEvents.send_secure_success]: {
+    method: 'scan' | 'manual'
+  }
+  [SendEvents.send_secure_incorrect]: {
+    method: 'scan' | 'manual'
+    validationType?: 'full' | 'partial'
+    error: string
+  }
+  [SendEvents.send_secure_info]: undefined
+  [SendEvents.send_secure_info_dismissed]: undefined
+  [SendEvents.send_secure_edit]: undefined
+
+  [EscrowEvents.escrowed_payment_review]: undefined
+  [EscrowEvents.escrow_transfer]: undefined
+  [EscrowEvents.escrowed_payment_reclaimed_by_sender]: undefined
+  [EscrowEvents.escrowed_payment_reclaimEdit_by_sender]: undefined
+  [EscrowEvents.escrowed_payment_withdrawn_by_receiver]: undefined
+  [EscrowEvents.escrow_failed_to_withdraw]: {
+    error: string
+  }
+  [EscrowEvents.escrow_failed_to_reclaim]: {
+    error: string
+  }
+  [EscrowEvents.escrow_failed_to_transfer]: {
+    error: string
+  }
+  [EscrowEvents.escrow_failed_to_fetch_sent]: {
+    error: string
+  }
+
+  [RequestEvents.request_amount_back]: undefined
+  [RequestEvents.request_cancel]: undefined
+  [RequestEvents.request_scan]: undefined
+  [RequestEvents.request_select_recipient]: undefined
+  [RequestEvents.request_continue]: {
+    method: 'scan' | 'search'
+    transactionType: 'send' | 'invite'
+    localCurrencyExchangeRate: string
+    localCurrency: LocalCurrencyCode
+    dollarAmount: BigNumber
+    localCurrencyAmount: BigNumber
+  }
+  [RequestEvents.request_unavailable]: {
+    method: 'scan' | 'search'
+    transactionType: 'send' | 'invite'
+    localCurrencyExchangeRate: string
+    localCurrency: LocalCurrencyCode
+    dollarAmount: BigNumber
+    localCurrencyAmount: BigNumber
+  }
+  [RequestEvents.request_confirm_back]: undefined
+  [RequestEvents.request_confirm]: {
+    requesteeAddress: string
+  }
+  [RequestEvents.request_error]: {
+    error: string
+  }
+
+  [FeeEvents.fee_rendered]: {
+    feeType: string
+    fee?: BigNumber
+  }
+  [FeeEvents.estimate_fee_failed]: {
+    feeType: string
+    error: string
+  }
+  [FeeEvents.fetch_tobin_tax_failed]: {
+    error: string
+  }
+
+  [TransactionEvents.transaction_send_start]: {
+    txId: string
+  }
+  [TransactionEvents.transaction_send_gas_estimated]: {
+    txId: string
+    duration: number
+  }
+  [TransactionEvents.transaction_send_gas_hash_received]: {
+    txId: string
+    duration: number
+  }
+  [TransactionEvents.transaction_send_gas_receipt]: {
+    txId: string
+    duration: number
+  }
+  [TransactionEvents.transaction_error]: {
+    txId: string
+    duration: number
+    error: string
+  }
+  [TransactionEvents.transaction_exception]: {
+    txId: string
+    duration: number
+    error: string
+  }
+
+  [CeloExchangeEvents.gold_switch_input_currency]: {
+    to: CURRENCY_ENUM
+  }
+  [CeloExchangeEvents.gold_buy_continue]: undefined
+  [CeloExchangeEvents.gold_buy_confirm]: {
+    localCurrencyAmount: BigNumber | null
+    goldAmount: BigNumber
+    inputToken: CURRENCY_ENUM
+    goldToDollarExchangeRate: BigNumber
+  }
+  [CeloExchangeEvents.gold_buy_cancel]: undefined
+  [CeloExchangeEvents.gold_buy_edit]: undefined
+  [CeloExchangeEvents.gold_buy_error]: {
+    error: string
+  }
+  [CeloExchangeEvents.gold_sell_continue]: undefined
+  [CeloExchangeEvents.gold_sell_confirm]: {
+    localCurrencyAmount: BigNumber | null
+    goldAmount: BigNumber
+    inputToken: CURRENCY_ENUM
+    goldToDollarExchangeRate: BigNumber
+  }
+  [CeloExchangeEvents.gold_sell_cancel]: undefined
+  [CeloExchangeEvents.gold_sell_edit]: undefined
+  [CeloExchangeEvents.gold_sell_error]: {
+    error: string
+  }
+
+  [CeloExchangeEvents.fetch_exchange_rate_failed]: {
+    error: string
+  }
+  [CeloExchangeEvents.invalid_exchange_rate]: {
+    exchangeRate: BigNumber
+  }
+  [CeloExchangeEvents.exchange_rate_change_failure]: {
+    makerToken: CURRENCY_ENUM
+    takerAmount: BigNumber
+    context: string
+  }
+  [CeloExchangeEvents.missing_tx_id]: undefined
+  [CeloExchangeEvents.exchange_failed]: {
+    error: string
+    context: string
+  }
+  [CeloExchangeEvents.gold_info]: undefined
+  [CeloExchangeEvents.gold_buy_start]: undefined
+  [CeloExchangeEvents.gold_sell_start]: undefined
+  [CeloExchangeEvents.gold_activity_select]: undefined
+  [CeloExchangeEvents.gold_activity_back]: undefined
+
+  [GethEvents.blockchain_corruption]: undefined
+  [GethEvents.geth_init_success]: undefined
+  [GethEvents.geth_init_failure]: {
+    error: string
+    context: string
+  }
+  [GethEvents.geth_restart_to_fix_init]: undefined
+  [GethEvents.prompt_forno]: {
+    error: string
+    context: string
+  }
 }

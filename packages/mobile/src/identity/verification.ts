@@ -63,6 +63,8 @@ export function* startVerification() {
 
   Logger.debug(TAG, 'Starting verification')
 
+  const startTime = Date.now()
+
   const { result, cancel, timeout } = yield race({
     result: call(doVerificationFlow),
     cancel: take(Actions.CANCEL_VERIFICATION),
@@ -70,16 +72,20 @@ export function* startVerification() {
   })
 
   if (result === true) {
-    CeloAnalytics.track(CustomEventNames.verification_success)
+    CeloAnalytics.track(CustomEventNames.verification_success, { duration: Date.now() - startTime })
     Logger.debug(TAG, 'Verification completed successfully')
   } else if (result === false) {
-    CeloAnalytics.track(CustomEventNames.verification_failed)
+    CeloAnalytics.track(CustomEventNames.verification_failed, { duration: Date.now() - startTime })
     Logger.debug(TAG, 'Verification failed')
   } else if (cancel) {
-    CeloAnalytics.track(CustomEventNames.verification_cancelled)
+    CeloAnalytics.track(CustomEventNames.verification_cancelled, {
+      duration: Date.now() - startTime,
+    })
     Logger.debug(TAG, 'Verification cancelled')
   } else if (timeout) {
-    CeloAnalytics.track(CustomEventNames.verification_timed_out)
+    CeloAnalytics.track(CustomEventNames.verification_timed_out, {
+      duration: Date.now() - startTime,
+    })
     Logger.debug(TAG, 'Verification timed out')
     yield put(showError(ErrorMessages.VERIFICATION_TIMEOUT))
     yield put(setVerificationStatus(VerificationStatus.Failed))
@@ -410,7 +416,6 @@ function attestationCodeReceiver(
       yield put(inputAttestationCode({ code, issuer }))
     } catch (error) {
       Logger.error(TAG + '@attestationCodeReceiver', 'Error processing attestation code', error)
-      CeloAnalytics.track(CustomEventNames.verification_error, { error: error.message })
       yield put(showError(ErrorMessages.INVALID_ATTESTATION_CODE))
     }
   }
@@ -483,7 +488,7 @@ function* tryRevealPhoneNumber(
   phoneHashDetails: PhoneNumberHashDetails,
   attestation: ActionableAttestation
 ) {
-  const start = Date.now()
+  const startTime = Date.now()
   const issuer = attestation.issuer
   Logger.debug(TAG + '@tryRevealPhoneNumber', `Revealing an attestation for issuer: ${issuer}`)
   CeloAnalytics.track(CustomEventNames.verification_reveal_attestation, { issuer })
@@ -518,7 +523,7 @@ function* tryRevealPhoneNumber(
     Logger.debug(TAG + '@tryRevealPhoneNumber', `Revealing for issuer ${issuer} successful`)
     CeloAnalytics.track(CustomEventNames.verification_revealed_attestation, {
       issuer,
-      duration: Date.now() - start,
+      duration: Date.now() - startTime,
     })
   } catch (error) {
     // This is considered a recoverable error because the user may have received the code in a previous run
