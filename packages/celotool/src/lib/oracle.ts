@@ -146,7 +146,7 @@ async function helmParameters(celoEnv: string, context: OracleAzureContext, useF
     `--set environment.name=${celoEnv}`,
     `--set image.repository=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_REPOSITORY)}`,
     `--set image.tag=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_TAG)}`,
-    `--set kube.serviceAccountSecretNames='{${kubeServiceAccountSecretNames.join(",")}}'`,
+    `--set kube.serviceAccountSecretNames='{${kubeServiceAccountSecretNames.join(',')}}'`,
     `--set oracle.azureHsm.initTryCount=5`,
     `--set oracle.azureHsm.initMaxRetryBackoffMs=30000`,
     `--set oracle.replicas=${replicas}`,
