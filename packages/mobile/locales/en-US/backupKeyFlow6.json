@@ -5,7 +5,7 @@
   "introPrimaryAction": "Set Up Now",
   "delayBackup": "Wait One Hour",
   "postSetupTitle": "Your Account Key is Set Up",
-  "postSetupBody": "If you lose your Account Key, you will lose access to all of your Celo Dollars and Gold. Nobody, not even Celo, will be able to help you recover your account without your key. Store it in a safe place and do not share it.",
+  "postSetupBody": "If you lose your Account Key, you will lose access to all of your Celo Dollars and CELO. Nobody, not even Celo, will be able to help you recover your account without your key. Store it in a safe place and do not share it.",
   "postSetupCTA": "Learn about Account Keys",
   "getBackupKey": "Get Backup Key",
   "setUpSocialBackup": "Set Up Safeguards",
