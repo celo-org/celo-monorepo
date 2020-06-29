@@ -130,6 +130,8 @@ release: {{ .Release.Name }}
     {{- if .ethstats | default false }}
     ACCOUNT_ADDRESS=$(cat /root/.celo/address)
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }} --etherbase=${ACCOUNT_ADDRESS}"
+    {{- if .pprof | default false }}
+    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport .pprofport"
     {{- end }}
 
     exec geth \
@@ -205,6 +207,10 @@ release: {{ .Release.Name }}
     containerPort: 8545
   - name: ws
     containerPort: 8546
+{{ end }}
+{{- if .pprof }}
+  - name: pprof
+    containerPort: 6060
 {{ end }}
   resources:
 {{ toYaml .Values.geth.resources | indent 4 }}

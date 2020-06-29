@@ -44,6 +44,16 @@ storage:
   accessModes: ReadWriteOnce
   size: 20Gi
 
+# If prometheus is TRUE, metrics and pprof will be treated as TRUE
+prometheus: true
+
+metrics: true
+
+pprof:
+  enabled: true
+  url: /debug/metrics/prometheus
+  port: 6060
+
 geth:
   image:
     repository: us.gcr.io/celo-testnet/geth

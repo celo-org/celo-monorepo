@@ -46,3 +46,19 @@ component: celo-fullnode
   protocol: TCP
   name: ws
 {{- end -}}
+
+{{- define "celo-fullnode.pprof-port" -}}
+- port: 6060
+  targetPort: ws !!!TOCHANGE!!!
+  protocol: TCP
+  name: pprof-port
+{{- end -}}
+
+{{/*
+Annotations to indicate to the prometheus server that this node should be scraped for metrics
+*/}}
+{{- define "prometheus-annotations" -}}
+prometheus.io/scrape: "true"
+prometheus.io/url:  {{ .Values.pprof.url }} 
+prometheus.io/port: {{ .Values.pprof.pprofPort }}
+{{- end -}}
