@@ -8,16 +8,19 @@
   "scripts": {
     "dev": "yarn build && firebase serve --only functions",
     "deploy:staging": "yarn build && firebase deploy --only functions --project celo-phone-number-privacy-stg",
-    "deploy:prod": "yarn build && firebase deploy --only functions --project celo-phone-number-privacy",
+    "deploy:alfajores": "yarn build && firebase deploy --only functions --project celo-phone-number-privacy",
+    "deploy:prod": "yarn build && firebase deploy --only functions --project celo-pgpnp-mainnet",
     "config:get:staging": "firebase functions:config:get --project celo-phone-number-privacy-stg",
-    "config:get:prod": "firebase functions:config:get --project celo-phone-number-privacy",
+    "config:get:alfajores": "firebase functions:config:get --project celo-phone-number-privacy",
+    "config:get:prod": "firebase functions:config:get --project celo-pgpnp-mainnet",
     "config:set:staging": "firebase functions:config:set --project celo-phone-number-privacy-stg",
-    "config:set:prod": "firebase functions:config:set --project celo-phone-number-privacy",
+    "config:set:alfajores": "firebase functions:config:set --project celo-phone-number-privacy",
+    "config:set:prod": "firebase functions:config:set --project celo-pgpnp-mainnet",
     "clean": "tsc -b . --clean",
     "build": "tsc -b .",
     "lint": "tslint --project .",
     "test": "jest --runInBand --testPathIgnorePatterns test/end-to-end",
-    "db:migrate": "NODE_ENV=production ts-node scripts/run-migrations.ts"
+    "db:migrate": "NODE_ENV=dev ts-node scripts/run-migrations.ts"
   },
   "dependencies": {
     "@celo/contractkit": "0.4.5",

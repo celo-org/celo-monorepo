@@ -14,8 +14,10 @@ exports[`BackupIntroduction renders correctly when backup completed 1`] = `
       Object {
         "alignItems": "center",
         "backgroundColor": "transparent",
-        "borderBottomColor": "#EDEEEF",
-        "borderBottomWidth": 0,
+        "borderBottomColor": AnimatedValue {
+          " __value": NaN,
+        },
+        "borderBottomWidth": 1,
         "flexDirection": "row",
         "height": 62,
         "justifyContent": "space-between",
@@ -98,9 +100,9 @@ exports[`BackupIntroduction renders correctly when backup completed 1`] = `
           style={
             Object {
               "color": "#2E3338",
-              "fontFamily": "Inter-SemiBold",
-              "fontSize": 19,
-              "lineHeight": 26,
+              "fontFamily": "Jost-Medium",
+              "fontSize": 22,
+              "lineHeight": 28,
             }
           }
         >
@@ -198,8 +200,10 @@ exports[`BackupIntroduction renders correctly when backup not complete 1`] = `
       Object {
         "alignItems": "center",
         "backgroundColor": "transparent",
-        "borderBottomColor": "#EDEEEF",
-        "borderBottomWidth": 0,
+        "borderBottomColor": AnimatedValue {
+          " __value": NaN,
+        },
+        "borderBottomWidth": 1,
         "flexDirection": "row",
         "height": 62,
         "justifyContent": "space-between",
@@ -305,8 +309,8 @@ exports[`BackupIntroduction renders correctly when backup not complete 1`] = `
         style={
           Object {
             "color": "#2E3338",
-            "fontFamily": "Inter-Medium",
-            "fontSize": 24,
+            "fontFamily": "Jost-Book",
+            "fontSize": 26,
             "lineHeight": 32,
             "paddingBottom": 16,
             "paddingTop": 16,

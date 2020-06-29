@@ -1,4 +1,4 @@
 module.exports = {
   ...jest.requireActual('src/pincode/utils'),
-  isPinCorrect: jest.fn(),
+  ensureCorrectPin: jest.fn(() => '123456'),
 }
