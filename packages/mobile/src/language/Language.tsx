@@ -35,7 +35,7 @@ function LanguageScreen({ route }: Props) {
   const fromSettings = route.params?.fromSettings
 
   const onSelect = (language: string, code: string) => {
-    CeloAnalytics.track(CustomEventNames.language_select, { language, selectedAnswer: code })
+    CeloAnalytics.track(CustomEventNames.language_select, { language: code })
     dispatch(setLanguage(code))
     // Wait for next frame before navigating back
     // so the user can see the changed selection briefly

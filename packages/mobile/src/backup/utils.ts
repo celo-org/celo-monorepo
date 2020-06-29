@@ -106,7 +106,6 @@ export async function getStoredMnemonic(): Promise<string | null> {
 
     return mnemonic
   } catch (error) {
-    CeloAnalytics.track(CustomEventNames.failed_to_retrieve_mnemonic, { error: error.message })
     Logger.error(TAG, 'Failed to retrieve mnemonic', error)
     return null
   }
@@ -124,7 +123,7 @@ export function useAccountKey() {
   const dispatch = useDispatch()
   const asyncAccountKey = useAsync(getStoredMnemonic, [])
 
-  if (asyncAccountKey.error) {
+  if (!asyncAccountKey || asyncAccountKey.error) {
     onGetMnemonicFail((error) => dispatch(showError(error)), 'useAccountKey')
   }
 

@@ -1,10 +1,7 @@
 import CeloAnalytics, { AnalyzedApps } from '@celo/react-components/analytics/CeloAnalytics'
 import { CustomEventNames, EventPropertyType, PropertyPathWhitelist } from 'src/analytics/constants'
-import {
-  AnalyticsEventProperties,
-  AnalyticsEventType,
-  AnalyticsPropertiesList,
-} from 'src/analytics/Events'
+import { AnalyticsEventType } from 'src/analytics/Events'
+import { AnalyticsEventProperties, AnalyticsPropertiesList } from 'src/analytics/Properties'
 import { DEFAULT_TESTNET, SEGMENT_API_KEY } from 'src/config'
 import { store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'

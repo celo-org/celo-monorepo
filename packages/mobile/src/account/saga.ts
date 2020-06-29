@@ -37,7 +37,7 @@ export function* setPincode({ pincodeType, pin }: SetPincodeAction) {
     Logger.info(TAG + '@setPincode', 'Pincode set successfully')
   } catch (error) {
     Logger.error(TAG + '@setPincode', 'Failed to set pincode', error)
-    CeloAnalytics.track(CustomEventNames.pin_failed_to_set, { error, pincodeType })
+    CeloAnalytics.track(CustomEventNames.pin_failed_to_set, { error: error.message, pincodeType })
     yield put(showError(ErrorMessages.SET_PIN_FAILED))
     yield put(setPincodeFailure())
   }
