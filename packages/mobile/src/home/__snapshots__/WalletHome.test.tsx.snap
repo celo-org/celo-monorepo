@@ -15,8 +15,10 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
       Object {
         "alignItems": "center",
         "backgroundColor": "transparent",
-        "borderBottomColor": "#EDEEEF",
-        "borderBottomWidth": 0,
+        "borderBottomColor": AnimatedValue {
+          " __value": NaN,
+        },
+        "borderBottomWidth": 1,
         "flexDirection": "row",
         "height": 62,
         "justifyContent": "space-between",
@@ -168,14 +170,17 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
       >
         <View
           style={
-            Object {
-              "alignItems": "center",
-              "backgroundColor": "#FFFFFF",
-              "flexDirection": "row",
-              "justifyContent": "space-between",
-              "paddingHorizontal": 16,
-              "paddingVertical": 8,
-            }
+            Array [
+              Object {
+                "alignItems": "center",
+                "backgroundColor": "#FFFFFF",
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "paddingHorizontal": 16,
+                "paddingVertical": 8,
+              },
+              undefined,
+            ]
           }
         >
           <Text
@@ -442,8 +447,10 @@ exports[`Testnet banner Renders when disconnected 1`] = `
       Object {
         "alignItems": "center",
         "backgroundColor": "transparent",
-        "borderBottomColor": "#EDEEEF",
-        "borderBottomWidth": 0,
+        "borderBottomColor": AnimatedValue {
+          " __value": NaN,
+        },
+        "borderBottomWidth": 1,
         "flexDirection": "row",
         "height": 62,
         "justifyContent": "space-between",
@@ -595,14 +602,17 @@ exports[`Testnet banner Renders when disconnected 1`] = `
       >
         <View
           style={
-            Object {
-              "alignItems": "center",
-              "backgroundColor": "#FFFFFF",
-              "flexDirection": "row",
-              "justifyContent": "space-between",
-              "paddingHorizontal": 16,
-              "paddingVertical": 8,
-            }
+            Array [
+              Object {
+                "alignItems": "center",
+                "backgroundColor": "#FFFFFF",
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "paddingHorizontal": 16,
+                "paddingVertical": 8,
+              },
+              undefined,
+            ]
           }
         >
           <Text
@@ -869,8 +879,10 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
       Object {
         "alignItems": "center",
         "backgroundColor": "transparent",
-        "borderBottomColor": "#EDEEEF",
-        "borderBottomWidth": 0,
+        "borderBottomColor": AnimatedValue {
+          " __value": NaN,
+        },
+        "borderBottomWidth": 1,
         "flexDirection": "row",
         "height": 62,
         "justifyContent": "space-between",
@@ -1022,14 +1034,17 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
       >
         <View
           style={
-            Object {
-              "alignItems": "center",
-              "backgroundColor": "#FFFFFF",
-              "flexDirection": "row",
-              "justifyContent": "space-between",
-              "paddingHorizontal": 16,
-              "paddingVertical": 8,
-            }
+            Array [
+              Object {
+                "alignItems": "center",
+                "backgroundColor": "#FFFFFF",
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "paddingHorizontal": 16,
+                "paddingVertical": 8,
+              },
+              undefined,
+            ]
           }
         >
           <Text

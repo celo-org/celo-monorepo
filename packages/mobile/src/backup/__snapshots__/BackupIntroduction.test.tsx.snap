@@ -14,8 +14,10 @@ exports[`BackupIntroduction renders correctly when backup completed 1`] = `
       Object {
         "alignItems": "center",
         "backgroundColor": "transparent",
-        "borderBottomColor": "#EDEEEF",
-        "borderBottomWidth": 0,
+        "borderBottomColor": AnimatedValue {
+          " __value": NaN,
+        },
+        "borderBottomWidth": 1,
         "flexDirection": "row",
         "height": 62,
         "justifyContent": "space-between",
@@ -198,8 +200,10 @@ exports[`BackupIntroduction renders correctly when backup not complete 1`] = `
       Object {
         "alignItems": "center",
         "backgroundColor": "transparent",
-        "borderBottomColor": "#EDEEEF",
-        "borderBottomWidth": 0,
+        "borderBottomColor": AnimatedValue {
+          " __value": NaN,
+        },
+        "borderBottomWidth": 1,
         "flexDirection": "row",
         "height": 62,
         "justifyContent": "space-between",

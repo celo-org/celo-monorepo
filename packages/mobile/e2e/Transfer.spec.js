@@ -107,7 +107,7 @@ describe('Transfer Works', () => {
   it('VerifyEducation', async () => {
     await waitFor(element(by.id('VerificationEducationContinue')))
       .toBeVisible()
-      .withTimeout(10000)
+      .withTimeout(30000)
 
     // skip
     await element(by.id('VerificationEducationSkip')).tap()
@@ -129,9 +129,9 @@ describe('Transfer Works', () => {
   it('Wallet Home->Send', async () => {
     await element(by.id('SendOrRequestBar/SendButton')).tap()
 
-    await element(by.id('RecipientSearchInput')).tap()
-    await element(by.id('RecipientSearchInput')).replaceText(DEFAULT_RECIPIENT_ADDRESS)
-    await element(by.id('RecipientSearchInput')).tapReturnKey()
+    await element(by.id('SearchInput')).tap()
+    await element(by.id('SearchInput')).replaceText(DEFAULT_RECIPIENT_ADDRESS)
+    await element(by.id('SearchInput')).tapReturnKey()
 
     await waitFor(element(by.id('RecipientPicker')))
       .toBeVisible()

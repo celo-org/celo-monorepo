@@ -1,10 +1,5 @@
 # keys
-app/google-services.json
-app/src/staging/google-services.json
-app/src/integration/google-services.json
-app/src/alfajores/google-services.json
-app/src/debug/google-services.json
-app/src/pilot/google-services.json
+**/google-services*.json
 sentry.properties
 
 *.hprof

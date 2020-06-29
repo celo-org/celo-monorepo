@@ -60,7 +60,10 @@ export const TOS_LINK = 'https://celo.org/user-agreement'
 export const FAQ_LINK = 'https://celo.org/faq'
 export const FORUM_LINK = 'https://forum.celo.org/c/support'
 export const CELO_SUPPORT_EMAIL_ADDRESS = 'support@celo.org'
-export const DEFAULT_FORNO_URL = `https://${DEFAULT_TESTNET}-forno.celo-testnet.org`
+// TODO: remove special case for mainnet
+export const DEFAULT_FORNO_URL = `https://${
+  DEFAULT_TESTNET === 'mainnet' ? 'rc1' : DEFAULT_TESTNET
+}-forno.celo-testnet.org`
 
 // FEATURE FLAGS
 export const FIREBASE_ENABLED = stringToBoolean(Config.FIREBASE_ENABLED || 'true')

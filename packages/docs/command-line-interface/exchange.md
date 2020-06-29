@@ -4,16 +4,51 @@ description: Exchange Celo Dollars and Celo Gold via the stability mechanism
 
 ## Commands
 
+### Celo
+
+Exchange CELO for Celo Dollars via the stability mechanism. (Note: this is the equivalent of the old exchange:gold)
+
+```
+USAGE
+  $ celocli exchange:celo
+
+OPTIONS
+  --forAtLeast=10000000000000000000000               [default: 0] Optional, the minimum value of Celo Dollars to receive
+                                                     in return
+
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address with CELO to exchange
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
+  --useLedger                                        Set it to use a ledger wallet
+
+  --value=10000000000000000000000                    (required) The value of CELO to exchange for Celo Dollars
+
+EXAMPLES
+  celo --value 5000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
+  celo --value 5000000000000 --forAtLeast 100000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
+```
+
+_See code: [packages/cli/src/commands/exchange/celo.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/celo.ts)_
+
 ### Dollars
 
-Exchange Celo Dollars for Celo Gold via the stability mechanism
+Exchange Celo Dollars for CELO via the stability mechanism
 
 ```
 USAGE
   $ celocli exchange:dollars
 
 OPTIONS
-  --forAtLeast=10000000000000000000000               [default: 0] Optional, the minimum value of Celo Gold to receive in
+  --forAtLeast=10000000000000000000000               [default: 0] Optional, the minimum value of CELO to receive in
                                                      return
 
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address with Celo Dollars to exchange
@@ -30,7 +65,7 @@ OPTIONS
 
   --useLedger                                        Set it to use a ledger wallet
 
-  --value=10000000000000000000000                    (required) The value of Celo Dollars to exchange for Celo Gold
+  --value=10000000000000000000000                    (required) The value of Celo Dollars to exchange for CELO
 
 EXAMPLES
   dollars --value 10000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
@@ -41,7 +76,7 @@ _See code: [packages/cli/src/commands/exchange/dollars.ts](https://github.com/ce
 
 ### Gold
 
-Exchange Celo Gold for Celo Dollars via the stability mechanism
+Exchange CELO for Celo Dollars via the stability mechanism. _DEPRECATION WARNING_ Use the "exchange:celo" command instead
 
 ```
 USAGE
@@ -51,7 +86,7 @@ OPTIONS
   --forAtLeast=10000000000000000000000               [default: 0] Optional, the minimum value of Celo Dollars to receive
                                                      in return
 
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address with Celo Gold to exchange
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address with CELO to exchange
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -65,7 +100,7 @@ OPTIONS
 
   --useLedger                                        Set it to use a ledger wallet
 
-  --value=10000000000000000000000                    (required) The value of Celo Gold to exchange for Celo Dollars
+  --value=10000000000000000000000                    (required) The value of CELO to exchange for Celo Dollars
 
 EXAMPLES
   gold --value 5000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d

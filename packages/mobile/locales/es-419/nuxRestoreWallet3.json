@@ -2,11 +2,8 @@
   "title": "Restaurar el Monedero Celo",
   "userYourBackupKey":
     "¿Ya tiene un Monedero Celo? Ingrese su Clave de Respaldo para restaurarla en este teléfono.",
-  "backupKeyPrompt":
-    "caballo leopardo perro mono tiburón tigre lémur ballena calamar lobo ardilla ratón león elefante gato langostino oso pingüino ciervo tortuga zorro cebra cabra jirafa",
   "tip": "Sugerencia: ",
   "backupKeyTip": "Las Claves de Respaldo tienen 24 palabras, separadas por un espacio.",
-  "restoreWallet": "Restaurar",
   "emptyWalletWarning": "Esta billetera está vacía.",
   "useEmptyAnyway": "¿Le gustaría usarla de todas maneras?",
   "useEmptyWallet": "Usar la billetera vacía",

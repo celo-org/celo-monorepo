@@ -1,0 +1,20 @@
+runtime: nodejs10
+env: standard
+service: production
+instance_class: F4
+env_variables:
+  NODE_ENV: 'production'
+  DEPLOY_ENV: 'production'
+
+handlers:
+  - url: /_next/static
+    static_dir: .next/static
+
+  - url: /static
+    static_dir: public/static
+
+  - url: /assets
+    static_dir: public/assets
+
+  - url: /.*
+    script: auto
