@@ -88,10 +88,12 @@ export class ExchangeReview extends React.Component<Props, State> {
     ValoraAnalytics.track(
       isDollarToGold ? AnalyticsEvents.gold_buy_confirm : AnalyticsEvents.gold_sell_confirm,
       {
-        localCurrencyAmount,
-        goldAmount,
+        localCurrencyAmount: localCurrencyAmount
+          ? localCurrencyAmount.toString()
+          : localCurrencyAmount,
+        goldAmount: goldAmount.toString(),
         inputToken,
-        goldToDollarExchangeRate,
+        goldToDollarExchangeRate: goldToDollarExchangeRate.toString(),
       }
     )
     // END: Analytics

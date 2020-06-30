@@ -1,5 +1,4 @@
 import { CURRENCY_ENUM } from '@celo/utils'
-import BigNumber from 'bignumber.js'
 import { PincodeType } from 'src/account/reducer'
 import {
   AppEvents,
@@ -36,8 +35,8 @@ interface AppEventsProperties {
   }
   [AppEvents.user_restart]: undefined
   [AppEvents.fetch_balance]: {
-    dollarBalance?: BigNumber
-    goldBalance?: BigNumber
+    dollarBalance?: string
+    goldBalance?: string
   }
 }
 
@@ -258,25 +257,25 @@ interface SendEventsProperties {
   [SendEvents.send_scan]: undefined
   [SendEvents.send_select_recipient]: {
     recipientKind: RecipientKind
-    method: 'used search bar' | 'selected from list'
+    usedSearchBar: boolean
   }
   [SendEvents.send_amount_back]: undefined
   [SendEvents.send_continue]: {
-    method: 'scan' | 'search'
-    transactionType: 'send' | 'invite'
+    isScan: boolean
+    isInvite: boolean
     localCurrencyExchangeRate?: string | null
     localCurrency: LocalCurrencyCode
-    dollarAmount: BigNumber | null
-    localCurrencyAmount: BigNumber | null
+    dollarAmount: string | null
+    localCurrencyAmount: string | null
   }
   [SendEvents.send_confirm_back]: undefined
   [SendEvents.send_confirm]: {
-    method: 'scan' | 'search'
-    transactionType: 'send' | 'invite'
+    isScan: boolean
+    isInvite: boolean
     localCurrencyExchangeRate?: string | null
     localCurrency: LocalCurrencyCode
-    dollarAmount: BigNumber | null
-    localCurrencyAmount: BigNumber | null
+    dollarAmount: string | null
+    localCurrencyAmount: string | null
   }
   [SendEvents.send_error]: {
     isInvite: boolean
@@ -289,28 +288,28 @@ interface SendEventsProperties {
   [SendEvents.send_dollar_transaction_confirmed]: undefined
 
   [SendEvents.send_secure_start]: {
-    method: 'scan' | 'manual'
+    confirmByScan: boolean
   }
   [SendEvents.send_secure_cancel]: undefined
   [SendEvents.send_secure_back]: undefined
   [SendEvents.send_secure_submit]: {
-    validationType: 'full' | 'partial'
+    partialAddressValidation: boolean
     address: string
   }
   [SendEvents.send_secure_success]: {
-    method: 'scan' | 'manual'
-    validationType?: 'full' | 'partial'
+    confirmByScan: boolean
+    partialAddressValidation?: boolean
   }
   [SendEvents.send_secure_incorrect]: {
-    method: 'scan' | 'manual'
-    validationType?: 'full' | 'partial'
+    confirmByScan: boolean
+    partialAddressValidation?: boolean
     error: string
   }
   [SendEvents.send_secure_info]: {
-    validationType: 'full' | 'partial'
+    partialAddressValidation: boolean
   }
   [SendEvents.send_secure_info_dismissed]: {
-    validationType: 'full' | 'partial'
+    partialAddressValidation: boolean
   }
   [SendEvents.send_secure_edit]: undefined
 }
@@ -341,23 +340,23 @@ interface RequestEventsProperties {
   [RequestEvents.request_scan]: undefined
   [RequestEvents.request_select_recipient]: {
     recipientKind: RecipientKind
-    method: 'used search bar' | 'selected from list'
+    usedSearchBar: boolean
   }
   [RequestEvents.request_continue]: {
-    method: 'scan' | 'search'
-    transactionType: 'send' | 'invite'
-    localCurrencyExchangeRate: string | null
+    isScan: boolean
+    isInvite: boolean
+    localCurrencyExchangeRate?: string | null
     localCurrency: LocalCurrencyCode
-    dollarAmount: BigNumber | null
-    localCurrencyAmount: BigNumber | null
+    dollarAmount: string | null
+    localCurrencyAmount: string | null
   }
   [RequestEvents.request_unavailable]: {
-    method: 'scan' | 'search'
-    transactionType: 'send' | 'invite'
-    localCurrencyExchangeRate: string | null
+    isScan: boolean
+    isInvite: boolean
+    localCurrencyExchangeRate?: string | null
     localCurrency: LocalCurrencyCode
-    dollarAmount: BigNumber | null
-    localCurrencyAmount: BigNumber | null
+    dollarAmount: string | null
+    localCurrencyAmount: string | null
   }
   [RequestEvents.request_confirm_back]: undefined
   [RequestEvents.request_confirm]: {
@@ -371,7 +370,7 @@ interface RequestEventsProperties {
 interface FeeEventsProperties {
   [FeeEvents.fee_rendered]: {
     feeType: string
-    fee?: BigNumber
+    fee?: string
   }
   [FeeEvents.estimate_fee_failed]: {
     feeType: string
@@ -421,16 +420,16 @@ interface CeloExchangeEventsProperties {
     to: CURRENCY_ENUM
   }
   [CeloExchangeEvents.gold_buy_continue]: {
-    localCurrencyAmount: BigNumber | null
-    goldAmount: BigNumber
+    localCurrencyAmount: string | null
+    goldAmount: string
     inputToken: CURRENCY_ENUM
-    goldToDollarExchangeRate: BigNumber
+    goldToDollarExchangeRate: string
   }
   [CeloExchangeEvents.gold_buy_confirm]: {
-    localCurrencyAmount: BigNumber | null
-    goldAmount: BigNumber
+    localCurrencyAmount: string | null
+    goldAmount: string
     inputToken: CURRENCY_ENUM
-    goldToDollarExchangeRate: BigNumber
+    goldToDollarExchangeRate: string
   }
   [CeloExchangeEvents.gold_buy_cancel]: undefined
   [CeloExchangeEvents.gold_buy_edit]: undefined
@@ -438,16 +437,16 @@ interface CeloExchangeEventsProperties {
     error: string
   }
   [CeloExchangeEvents.gold_sell_continue]: {
-    localCurrencyAmount: BigNumber | null
-    goldAmount: BigNumber
+    localCurrencyAmount: string | null
+    goldAmount: string
     inputToken: CURRENCY_ENUM
-    goldToDollarExchangeRate: BigNumber
+    goldToDollarExchangeRate: string
   }
   [CeloExchangeEvents.gold_sell_confirm]: {
-    localCurrencyAmount: BigNumber | null
-    goldAmount: BigNumber
+    localCurrencyAmount: string | null
+    goldAmount: string
     inputToken: CURRENCY_ENUM
-    goldToDollarExchangeRate: BigNumber
+    goldToDollarExchangeRate: string
   }
   [CeloExchangeEvents.gold_sell_cancel]: undefined
   [CeloExchangeEvents.gold_sell_edit]: undefined
@@ -459,11 +458,11 @@ interface CeloExchangeEventsProperties {
     error: string
   }
   [CeloExchangeEvents.invalid_exchange_rate]: {
-    exchangeRate: BigNumber
+    context: string
   }
   [CeloExchangeEvents.exchange_rate_change_failure]: {
     makerToken: CURRENCY_ENUM
-    takerAmount: BigNumber
+    takerAmount: string
     context: string
   }
   [CeloExchangeEvents.missing_tx_id]: undefined

@@ -56,15 +56,15 @@ export function* validateRecipientAddressSaga({
     )
 
     ValoraAnalytics.track(AnalyticsEvents.send_secure_success, {
-      method: 'manual',
-      validationType: addressValidationType === AddressValidationType.FULL ? 'full' : 'partial',
+      confirmByScan: false,
+      partialAddressValidation: addressValidationType === AddressValidationType.PARTIAL,
     })
 
     yield put(validateRecipientAddressSuccess(e164PhoneNumber, validatedAddress))
   } catch (error) {
     ValoraAnalytics.track(AnalyticsEvents.send_secure_incorrect, {
-      method: 'manual',
-      validationType: addressValidationType === AddressValidationType.FULL ? 'full' : 'partial',
+      confirmByScan: false,
+      partialAddressValidation: addressValidationType === AddressValidationType.PARTIAL,
       error: error.message,
     })
 

@@ -77,9 +77,9 @@ export function tokenFetchFactory({ actionName, token, actionCreator, tag }: Tok
         AnalyticsEvents.fetch_balance,
         token === CURRENCY_ENUM.DOLLAR
           ? {
-              dollarBalance: balance,
+              dollarBalance: balance.toString(),
             }
-          : { goldBalance: balance }
+          : { goldBalance: balance.toString() }
       )
       yield put(actionCreator(balance.toString()))
     } catch (error) {

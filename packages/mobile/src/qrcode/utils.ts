@@ -73,14 +73,14 @@ function* handleSecureSend(
   if (!possibleRecievingAddressesFormatted.includes(userScannedAddress)) {
     const error = ErrorMessages.QR_FAILED_INVALID_RECIPIENT
     ValoraAnalytics.track(AnalyticsEvents.send_secure_incorrect, {
-      method: 'scan',
+      confirmByScan: true,
       error,
     })
     yield put(showMessage(error))
     return false
   }
 
-  ValoraAnalytics.track(AnalyticsEvents.send_secure_success, { method: 'scan' })
+  ValoraAnalytics.track(AnalyticsEvents.send_secure_success, { confirmByScan: true })
   yield put(validateRecipientAddressSuccess(e164PhoneNumber, userScannedAddress))
   return true
 }

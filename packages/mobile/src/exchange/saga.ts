@@ -157,12 +157,16 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     const exchangeRatePair: ExchangeRatePair = yield select(exchangeRatePairSelector)
     const exchangeRate = getRateForMakerToken(exchangeRatePair, makerToken)
     if (!exchangeRate) {
-      ValoraAnalytics.track(AnalyticsEvents.invalid_exchange_rate, { exchangeRate })
+      ValoraAnalytics.track(AnalyticsEvents.invalid_exchange_rate, {
+        context: 'Invalid exchange rate from exchange contract',
+      })
       Logger.error(TAG, 'Invalid exchange rate from exchange contract')
       return
     }
     if (exchangeRate.isZero()) {
-      ValoraAnalytics.track(AnalyticsEvents.invalid_exchange_rate, { exchangeRate })
+      ValoraAnalytics.track(AnalyticsEvents.invalid_exchange_rate, {
+        context: 'Cannot do exchange with rate of 0',
+      })
       Logger.error(TAG, 'Cannot do exchange with rate of 0. Stopping.')
       throw new Error('Invalid exchange rate')
     }
@@ -219,7 +223,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     if (minimumTakerAmount.isGreaterThan(updatedTakerAmount)) {
       ValoraAnalytics.track(AnalyticsEvents.exchange_rate_change_failure, {
         makerToken,
-        takerAmount: updatedTakerAmount,
+        takerAmount: updatedTakerAmount.toString(),
         context: `Expected ${minimumTakerAmount}`,
       })
       Logger.error(

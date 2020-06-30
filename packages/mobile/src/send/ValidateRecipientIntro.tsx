@@ -51,7 +51,7 @@ export const validateRecipientIntroScreenNavOptions = () => ({
 
 class ValidateRecipientIntro extends React.Component<Props> {
   onPressScanCode = () => {
-    ValoraAnalytics.track(AnalyticsEvents.send_secure_start, { method: 'scan' })
+    ValoraAnalytics.track(AnalyticsEvents.send_secure_start, { confirmByScan: true })
     navigate(Screens.QRNavigator, {
       screen: Screens.QRScanner,
       params: {
@@ -64,7 +64,7 @@ class ValidateRecipientIntro extends React.Component<Props> {
   onPressConfirmAccount = () => {
     const { addressValidationType, transactionData, isPaymentRequest } = this.props
 
-    ValoraAnalytics.track(AnalyticsEvents.send_secure_start, { method: 'manual' })
+    ValoraAnalytics.track(AnalyticsEvents.send_secure_start, { confirmByScan: false })
     navigate(Screens.ValidateRecipientAccount, {
       transactionData,
       addressValidationType,

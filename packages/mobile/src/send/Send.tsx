@@ -235,7 +235,7 @@ class Send extends React.Component<Props, State> {
       isRequest ? AnalyticsEvents.request_select_recipient : AnalyticsEvents.send_select_recipient,
       {
         recipientKind: recipient.kind,
-        method: this.state.searchQuery.length > 0 ? 'used search bar' : 'selected from list',
+        usedSearchBar: this.state.searchQuery.length > 0,
       }
     )
 

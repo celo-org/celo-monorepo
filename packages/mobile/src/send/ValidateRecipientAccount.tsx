@@ -112,7 +112,7 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
         : singleDigitInputValueArr.join('')
 
     ValoraAnalytics.track(AnalyticsEvents.send_secure_submit, {
-      validationType: addressValidationType === AddressValidationType.FULL ? 'full' : 'partial',
+      partialAddressValidation: addressValidationType === AddressValidationType.PARTIAL,
       address: inputToValidate,
     })
 
@@ -130,12 +130,16 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
   }
 
   toggleModal = () => {
-    const validationType =
-      this.props.addressValidationType === AddressValidationType.FULL ? 'full' : 'partial'
+    const { addressValidationType } = this.props
+
     if (this.state.isModalVisible) {
-      ValoraAnalytics.track(AnalyticsEvents.send_secure_info, { validationType })
+      ValoraAnalytics.track(AnalyticsEvents.send_secure_info, {
+        partialAddressValidation: addressValidationType === AddressValidationType.PARTIAL,
+      })
     } else {
-      ValoraAnalytics.track(AnalyticsEvents.send_secure_info_dismissed, { validationType })
+      ValoraAnalytics.track(AnalyticsEvents.send_secure_info_dismissed, {
+        partialAddressValidation: addressValidationType === AddressValidationType.PARTIAL,
+      })
     }
 
     this.setState({ isModalVisible: !this.state.isModalVisible })

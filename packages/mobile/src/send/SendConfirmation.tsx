@@ -162,17 +162,18 @@ export class SendConfirmation extends React.Component<Props, State> {
     const { comment } = this.state
 
     const timestamp = Date.now()
+    const localCurrencyAmount = convertDollarsToLocalAmount(
+      amount,
+      this.props.localCurrencyExchangeRate
+    )
 
     ValoraAnalytics.track(AnalyticsEvents.send_confirm, {
-      method: this.props.route.params?.isFromScan ? 'scan' : 'search',
-      transactionType: !recipientAddress ? 'invite' : 'send',
+      isScan: !!this.props.route.params?.isFromScan,
+      isInvite: !recipientAddress,
       localCurrencyExchangeRate: this.props.localCurrencyExchangeRate,
       localCurrency: this.props.localCurrencyCode,
-      dollarAmount: amount,
-      localCurrencyAmount: convertDollarsToLocalAmount(
-        amount,
-        this.props.localCurrencyExchangeRate
-      ),
+      dollarAmount: amount.toString(),
+      localCurrencyAmount: localCurrencyAmount ? localCurrencyAmount.toString() : null,
     })
 
     this.props.sendPaymentOrInvite(
@@ -290,7 +291,10 @@ export class SendConfirmation extends React.Component<Props, State> {
       // so we adjust it here
       const securityFee = isInvite && fee ? fee.minus(inviteFee) : fee
 
-      ValoraAnalytics.track(AnalyticsEvents.fee_rendered, { feeType: 'Security', fee: securityFee })
+      ValoraAnalytics.track(AnalyticsEvents.fee_rendered, {
+        feeType: 'Security',
+        fee: securityFee ? securityFee.toString() : securityFee,
+      })
       const totalAmount = {
         value: amountWithFee,
         currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,

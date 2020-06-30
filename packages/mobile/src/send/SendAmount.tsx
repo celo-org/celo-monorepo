@@ -191,16 +191,18 @@ function SendAmount(props: Props) {
     [recipient, dollarAmount]
   )
   const recentPayments = useSelector(getRecentPayments)
+  const localCurrencyAmount = convertDollarsToLocalAmount(dollarAmount, localCurrencyExchangeRate)
 
   const continueAnalyticsParams = React.useMemo(() => {
     return {
-      method: props.route.params?.isFromScan ? 'scan' : 'search',
-      transactionType:
-        recipientVerificationStatus === RecipientVerificationStatus.VERIFIED ? 'send' : 'invite',
+      isScan: !!props.route.params?.isFromScan,
+      isInvite: recipientVerificationStatus !== RecipientVerificationStatus.VERIFIED,
       localCurrencyExchangeRate,
       localCurrency: localCurrencyCode,
-      dollarAmount,
-      localCurrencyAmount: convertDollarsToLocalAmount(dollarAmount, localCurrencyExchangeRate),
+      dollarAmount: dollarAmount.toString(),
+      localCurrencyAmount: localCurrencyAmount
+        ? localCurrencyAmount.toString()
+        : localCurrencyAmount,
     }
   }, [props.route, localCurrencyCode, localCurrencyExchangeRate, dollarAmount])
 
