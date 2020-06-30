@@ -28,5 +28,5 @@ export const builder = (argv: yargs.Argv) => {
 export const handler = async (argv: OracleInitialArgv) => {
   const oracleAzureContext = getOracleAzureContext(argv)
   await switchToAzureContextCluster(argv.celoEnv, oracleAzureContext)
-  await installHelmChart(argv.celoEnv, oracleAzureContext, argv.useForno)
+  if (false) await installHelmChart(argv.celoEnv, oracleAzureContext, argv.useForno)
 }

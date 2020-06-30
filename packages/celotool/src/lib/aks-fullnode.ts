@@ -40,10 +40,6 @@ function getStaticIPNamePrefix(celoEnv: string) {
   return `${celoEnv}-nodes`
 }
 
-// export function getReplicaCount() {
-//   return parseInt(fetchEnv(envVar.AZURE_TX_NODES_COUNT), 10)
-// }
-
 export async function installFullNodeChart(celoEnv: string, deploymentConfig: AKSFullNodeDeploymentConfig) {
   const kubeNamespace = getKubeNamespace(celoEnv)
   const releaseName = getReleaseName(celoEnv)

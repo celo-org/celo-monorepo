@@ -2,7 +2,7 @@ import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/src/address'
 import { assignRoleIfNotAssigned, AzureClusterConfig, createIdentityIfNotExists, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity, switchToCluster } from 'src/lib/azure'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { getFornoUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInternalUrl } from 'src/lib/endpoints'
-import { addCeloEnvMiddleware, envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
+import { addCeloEnvMiddleware, envVar, DynamicEnvVar, fetchEnv, fetchEnvOrFallback, getDynamicEnvVarName } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
 import yargs from 'yargs'
@@ -16,7 +16,7 @@ const rbacHelmChartPath = '../helm-charts/oracle-rbac'
 export enum OracleAzureContext {
   PRIMARY = 'PRIMARY',
   SECONDARY = 'SECONDARY',
-  TERTIARY = 'TERTIARY',
+  TERTIARY = 'AZURE_EASTUS2',
 }
 
 /**
@@ -48,50 +48,36 @@ interface OracleConfig {
 /**
  * Env vars corresponding to each value for the AzureClusterConfig for a particular context
  */
-const oracleAzureContextClusterConfigEnvVars: {
-  [key in keyof typeof OracleAzureContext]: { [k in keyof AzureClusterConfig]: string }
-} = {
-  [OracleAzureContext.PRIMARY]: {
-    subscriptionId: envVar.ORACLE_PRIMARY_AZURE_SUBSCRIPTION_ID,
-    tenantId: envVar.ORACLE_PRIMARY_AZURE_TENANT_ID,
-    resourceGroup: envVar.ORACLE_PRIMARY_AZURE_KUBERNETES_RESOURCE_GROUP,
-    clusterName: envVar.ORACLE_PRIMARY_AZURE_KUBERNETES_CLUSTER_NAME,
-  },
-  [OracleAzureContext.SECONDARY]: {
-    subscriptionId: envVar.ORACLE_SECONDARY_AZURE_SUBSCRIPTION_ID,
-    tenantId: envVar.ORACLE_SECONDARY_AZURE_TENANT_ID,
-    resourceGroup: envVar.ORACLE_SECONDARY_AZURE_KUBERNETES_RESOURCE_GROUP,
-    clusterName: envVar.ORACLE_SECONDARY_AZURE_KUBERNETES_CLUSTER_NAME,
-  },
-  [OracleAzureContext.TERTIARY]: {
-    subscriptionId: envVar.ORACLE_TERTIARY_AZURE_SUBSCRIPTION_ID,
-    tenantId: envVar.ORACLE_TERTIARY_AZURE_TENANT_ID,
-    resourceGroup: envVar.ORACLE_TERTIARY_AZURE_KUBERNETES_RESOURCE_GROUP,
-    clusterName: envVar.ORACLE_TERTIARY_AZURE_KUBERNETES_CLUSTER_NAME,
-  },
+const oracleAzureContextClusterConfigDynamicEnvVars: { [k in keyof AzureClusterConfig]: DynamicEnvVar } = {
+  subscriptionId: DynamicEnvVar.ORACLE_AZURE_SUBSCRIPTION_ID,
+  tenantId: DynamicEnvVar.ORACLE_AZURE_TENANT_ID,
+  resourceGroup: DynamicEnvVar.ORACLE_AZURE_KUBERNETES_RESOURCE_GROUP,
+  clusterName: DynamicEnvVar.ORACLE_AZURE_KUBERNETES_CLUSTER_NAME,
+}
+
+interface OracleIdentityConfig {
+  addressAzureKeyVaults: string
+  addressesFromMnemonicCount: string
 }
 
 /**
  * Env vars corresponding to each value for the OracleConfig for a particular context
  */
-const oracleAzureContextOracleIdentityEnvVars: {
-  [key in keyof typeof OracleAzureContext]: {
-    addressAzureKeyVaults: string,
-    addressesFromMnemonicCount: string,
-  }
-} = {
-  [OracleAzureContext.PRIMARY]: {
-    addressAzureKeyVaults: envVar.ORACLE_PRIMARY_ADDRESS_AZURE_KEY_VAULTS,
-    addressesFromMnemonicCount: envVar.ORACLE_PRIMARY_ADDRESSES_FROM_MNEMONIC_COUNT,
-  },
-  [OracleAzureContext.SECONDARY]: {
-    addressAzureKeyVaults: envVar.ORACLE_SECONDARY_ADDRESS_AZURE_KEY_VAULTS,
-    addressesFromMnemonicCount: envVar.ORACLE_SECONDARY_ADDRESSES_FROM_MNEMONIC_COUNT,
-  },
-  [OracleAzureContext.TERTIARY]: {
-    addressAzureKeyVaults: envVar.ORACLE_TERTIARY_ADDRESS_AZURE_KEY_VAULTS,
-    addressesFromMnemonicCount: envVar.ORACLE_TERTIARY_ADDRESSES_FROM_MNEMONIC_COUNT,
-  },
+const oracleAzureContextOracleIdentityConfigDynamicEnvVars: { [k in keyof OracleIdentityConfig]: DynamicEnvVar } = {
+  addressAzureKeyVaults: DynamicEnvVar.ORACLE_ADDRESS_AZURE_KEY_VAULTS,
+  addressesFromMnemonicCount: DynamicEnvVar.ORACLE_ADDRESSES_FROM_MNEMONIC_COUNT,
+  // [OracleAzureContext.PRIMARY]: {
+  //   addressAzureKeyVaults: envVar.ORACLE_PRIMARY_ADDRESS_AZURE_KEY_VAULTS,
+  //   addressesFromMnemonicCount: envVar.ORACLE_PRIMARY_ADDRESSES_FROM_MNEMONIC_COUNT,
+  // },
+  // [OracleAzureContext.SECONDARY]: {
+  //   addressAzureKeyVaults: envVar.ORACLE_SECONDARY_ADDRESS_AZURE_KEY_VAULTS,
+  //   addressesFromMnemonicCount: envVar.ORACLE_SECONDARY_ADDRESSES_FROM_MNEMONIC_COUNT,
+  // },
+  // [OracleAzureContext.TERTIARY]: {
+  //   addressAzureKeyVaults: envVar.ORACLE_TERTIARY_ADDRESS_AZURE_KEY_VAULTS,
+  //   addressesFromMnemonicCount: envVar.ORACLE_TERTIARY_ADDRESSES_FROM_MNEMONIC_COUNT,
+  // },
 }
 
 function releaseName(celoEnv: string) {
@@ -277,6 +263,32 @@ function getOracleConfig(context: OracleAzureContext): OracleConfig {
   }
 }
 
+// function getOracleIdentityConfig(context: OracleAzureContext): OracleIdentityConfig {
+//   // const dynamicEnvVars = oracleAzureContextOracleIdentityDynamicEnvVars
+//   // clusterConfig[key] = fetchEnv(getDynamicEnvVarName(dynamicEnvVar, {
+//   //   context
+//   // }))
+//
+//   const identityConfig = {
+//     addressAzureKeyVaults: '',
+//     addressesFromMnemonicCount: ''
+//   }
+//
+//   const clusterConfig = {
+//     keyVaultName: '',
+//     addre: '',
+//     resourceGroup: '',
+//     clusterName: '',
+//   }
+//   for (const k of Object.keys(oracleAzureContextOracleIdentityDynamicEnvVars)) {
+//     const key = k as keyof AzureClusterConfig
+//     const dynamicEnvVar = oracleAzureContextClusterConfigDynamicEnvVars[key]
+//     identityConfig[key] = fetchEnv(getDynamicEnvVarName(dynamicEnvVar, {
+//       context
+//     }))
+//   }
+//   return clusterConfig
+// }
 
 /**
  * Returns an array of oracle identities. If the Azure Key Vault env var is specified,
@@ -284,9 +296,31 @@ function getOracleConfig(context: OracleAzureContext): OracleConfig {
  * with private keys generated by the mnemonic.
  */
 function getOracleIdentities(context: OracleAzureContext): OracleIdentity[] {
-  const oracleIdentityEnvVars = oracleAzureContextOracleIdentityEnvVars[context]
-  const addressAzureKeyVaults = fetchEnvOrFallback(oracleIdentityEnvVars.addressAzureKeyVaults, '')
-  const addressesFromMnemonicCount = fetchEnvOrFallback(oracleIdentityEnvVars.addressesFromMnemonicCount, '')
+  // const oracleIdentityEnvVars = oracleAzureContextOracleIdentityEnvVars[context]
+  // const addressAzureKeyVaults = fetchEnvOrFallback(oracleIdentityEnvVars.addressAzureKeyVaults, '')
+  const {
+    addressAzureKeyVaults,
+    addressesFromMnemonicCount,
+  } = getOracleAzureContextDynamicEnvVarValues(
+    oracleAzureContextOracleIdentityConfigDynamicEnvVars,
+    context,
+    {
+      addressAzureKeyVaults: '',
+      addressesFromMnemonicCount: '',
+    }
+  )
+  // const addressAzureKeyVaults = fetchEnvOrFallback(
+  //   getDynamicEnvVarName(oracleAzureContextOracleIdentityDynamicEnvVars.addressAzureKeyVaults, {
+  //     context
+  //   }),
+  //   ''
+  // )
+  // const addressesFromMnemonicCount = fetchEnvOrFallback(
+  //   getDynamicEnvVarName(oracleAzureContextOracleIdentityDynamicEnvVars.addressesFromMnemonicCount, {
+  //     context
+  //   }),
+  //   ''
+  // )
   // Give priority to key vault
   if (addressAzureKeyVaults) {
     return getAzureHsmOracleIdentities(addressAzureKeyVaults)
@@ -295,7 +329,7 @@ function getOracleIdentities(context: OracleAzureContext): OracleIdentity[] {
     return getMnemonicBasedOracleIdentities(addressesFromMnemonicCountNum)
   }
 
-  throw Error(`None of the following env vars are specified: ${Object.keys(oracleIdentityEnvVars)}`)
+  throw Error('No oracle identity env vars specified')
 }
 
 /**
@@ -354,18 +388,47 @@ function getOracleAzureIdentityName(keyVaultName: string, address: string) {
  * @return an AzureClusterConfig for the context
  */
 export function getAzureClusterConfig(context: OracleAzureContext): AzureClusterConfig {
-  const configEnvVars = oracleAzureContextClusterConfigEnvVars[context]
-  const clusterConfig: AzureClusterConfig = {
-    subscriptionId: '',
-    tenantId: '',
-    resourceGroup: '',
-    clusterName: '',
-  }
-  for (const k of Object.keys(configEnvVars)) {
-    const key = k as keyof AzureClusterConfig
-    clusterConfig[key] = fetchEnv(configEnvVars[key])
-  }
-  return clusterConfig
+  return getOracleAzureContextDynamicEnvVarValues(oracleAzureContextClusterConfigDynamicEnvVars, context)
+  // const clusterConfig: AzureClusterConfig = {
+  //   subscriptionId: '',
+  //   tenantId: '',
+  //   resourceGroup: '',
+  //   clusterName: '',
+  // }
+  // for (const k of Object.keys(oracleAzureContextClusterConfigDynamicEnvVars)) {
+  //   const key = k as keyof AzureClusterConfig
+  //   const dynamicEnvVar = oracleAzureContextClusterConfigDynamicEnvVars[key]
+  //   clusterConfig[key] = fetchEnv(getDynamicEnvVarName(dynamicEnvVar, {
+  //     context
+  //   }))
+  // }
+  // return clusterConfig
+}
+
+function getOracleAzureContextDynamicEnvVarValues<T>(
+  dynamicEnvVars: { [k in keyof T]: DynamicEnvVar },
+  context: OracleAzureContext,
+  defaultValues?: { [k in keyof T]: string }
+): {
+  [k in keyof T]: string
+} {
+  return Object.keys(dynamicEnvVars).reduce(
+    (values: any, k: string) => {
+      const key = k as keyof T
+      const dynamicEnvVar = dynamicEnvVars[key]
+      const dynamicEnvVarName = getDynamicEnvVarName(dynamicEnvVar, {
+        context
+      })
+      const defaultValue = defaultValues ? defaultValues[key] : undefined
+      const value = defaultValue !== undefined ?
+        fetchEnvOrFallback(dynamicEnvVarName, defaultValue) :
+        fetchEnv(dynamicEnvVarName)
+      return {
+        ...values,
+        [key]: value,
+      }
+    },
+  {})
 }
 
 /**
@@ -388,6 +451,7 @@ export function getOracleAzureContext(argv: OracleArgv): OracleAzureContext {
  */
 export function switchToAzureContextCluster(celoEnv: string, context: OracleAzureContext) {
   const azureClusterConfig = getAzureClusterConfig(context)
+  console.log('azureClusterConfig', azureClusterConfig)
   return switchToCluster(celoEnv, azureClusterConfig)
 }
 

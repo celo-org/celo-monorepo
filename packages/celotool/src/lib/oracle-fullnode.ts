@@ -16,7 +16,7 @@ const oracleAzureContextFullNodeDeploymentEnvVars: {
     diskSizeGb: envVar.ORACLE_SECONDARY_TX_NODES_DISK_SIZE,
     replicas: envVar.ORACLE_SECONDARY_TX_NODES_COUNT,
   },
-  [OracleAzureContext.TERTIARY]: {
+  TERTIARY: {
     diskSizeGb: envVar.ORACLE_TERTIARY_TX_NODES_DISK_SIZE,
     replicas: envVar.ORACLE_TERTIARY_TX_NODES_COUNT,
   },
@@ -38,6 +38,7 @@ export async function removeOracleFullNodeChart(celoEnv: string, context: Oracle
  * For a given OracleAzureContext, returns the appropriate AKSFullNodeDeploymentConfig
  */
 function getAKSFullNodeDeploymentConfig(context: OracleAzureContext): AKSFullNodeDeploymentConfig {
+  // @ts-ignore
   const fullNodeDeploymentEnvVars = oracleAzureContextFullNodeDeploymentEnvVars[context]
   const fullNodeDeploymentConfig: FullNodeDeploymentConfig = {
     diskSizeGb: parseInt(fetchEnv(fullNodeDeploymentEnvVars.diskSizeGb), 10),
