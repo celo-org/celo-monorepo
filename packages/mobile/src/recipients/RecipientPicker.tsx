@@ -14,7 +14,7 @@ import {
   Text,
   View,
 } from 'react-native'
-import { SafeAreaConsumer } from 'react-native-safe-area-view'
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
@@ -181,7 +181,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
 
     return (
       <View style={style.body} testID={this.props.testID}>
-        <SafeAreaConsumer>
+        <SafeAreaInsetsContext.Consumer>
           {(insets) => (
             <SectionList
               // Note: contentInsetAdjustmentBehavior="always" would be simpler
@@ -204,7 +204,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
               keyboardShouldPersistTaps="always"
             />
           )}
-        </SafeAreaConsumer>
+        </SafeAreaInsetsContext.Consumer>
         <KeyboardSpacer onToggle={this.onToggleKeyboard} />
       </View>
     )
