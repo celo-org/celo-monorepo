@@ -60,10 +60,11 @@ export const fiatExchangesOptionsScreenOptions = ({
 }
 
 function FiatExchangeOptions({ route, navigation }: Props) {
-  function goToProvider(screen: keyof StackParamList) {
-    return () => navigation.navigate(screen)
+  const { amount } = route.params
+  const goToProvider = (screen: keyof StackParamList) => {
+    return () => navigation.navigate(screen, { amount })
   }
-  function onDismiss() {
+  const onDismiss = () => {
     navigation.setParams({ isExplanationOpen: false })
   }
 
