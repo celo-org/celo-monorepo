@@ -20,7 +20,7 @@ import {
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { RecipientKind } from 'src/recipients/recipient'
 
-export interface AnalyticsPropertiesList {
+interface AppEventsProperties {
   [AppEvents.app_launched]: {
     loadingDuration: number
     deviceInfo?: object
@@ -39,13 +39,17 @@ export interface AnalyticsPropertiesList {
     dollarBalance?: BigNumber
     goldBalance?: BigNumber
   }
+}
 
+interface SettingsEventsProperties {
   [SettingsEvents.edit_profile]: undefined
   [SettingsEvents.edit_name]: undefined
   [SettingsEvents.language_select]: {
     language: string
   }
+}
 
+interface NotificationEventsProperties {
   [NotificationEvents.celogold_notification_confirm]: undefined
   [NotificationEvents.celogold_notification_dismiss]: undefined
   [NotificationEvents.celorewards_notification_confirm]: undefined
@@ -61,7 +65,9 @@ export interface AnalyticsPropertiesList {
   [NotificationEvents.clicked_escrowed_payment_notification]: undefined
   [NotificationEvents.clicked_escrowed_payment_send_message]: undefined
   [NotificationEvents.get_backup_key]: undefined
+}
 
+interface OnboardingEventsProperties {
   [OnboardingEvents.backup_educate_1_next]: undefined
   [OnboardingEvents.backup_educate_2_next]: undefined
   [OnboardingEvents.backup_educate_3_next]: undefined
@@ -130,7 +136,9 @@ export interface AnalyticsPropertiesList {
     pincodeType: PincodeType
   }
   [OnboardingEvents.import_wallet_submit]: undefined
+}
 
+interface VerificationEventsProperties {
   [VerificationEvents.verification_start]: undefined
   [VerificationEvents.verification_hash_retrieved]: {
     phoneHash: string
@@ -207,7 +215,9 @@ export interface AnalyticsPropertiesList {
     error: string
   }
   [VerificationEvents.phone_number_quota_purchase_skip]: undefined
+}
 
+interface ContactImportEventsProperties {
   [ContactImportEvents.import_contacts]: undefined
   [ContactImportEvents.import_contact_error]: {
     error: string
@@ -218,7 +228,9 @@ export interface AnalyticsPropertiesList {
   [ContactImportEvents.add_contact_match]: {
     contactsMatched: number
   }
+}
 
+interface InviteEventsProperties {
   [InviteEvents.invite_success]: undefined
   [InviteEvents.invite_error]: {
     error: string
@@ -234,7 +246,9 @@ export interface AnalyticsPropertiesList {
   [InviteEvents.redeem_invite_success]: undefined
   [InviteEvents.redeem_invite_timed_out]: undefined
   [InviteEvents.redeem_invite_failed]: undefined
+}
 
+interface SendEventsProperties {
   [SendEvents.send_cancel]: undefined
   [SendEvents.send_scan]: undefined
   [SendEvents.send_select_recipient]: {
@@ -294,7 +308,9 @@ export interface AnalyticsPropertiesList {
     validationType: 'full' | 'partial'
   }
   [SendEvents.send_secure_edit]: undefined
+}
 
+interface EscrowEventsProperties {
   [EscrowEvents.escrowed_payment_review]: undefined
   [EscrowEvents.escrow_transfer]: undefined
   [EscrowEvents.escrowed_payment_reclaimed_by_sender]: undefined
@@ -312,7 +328,9 @@ export interface AnalyticsPropertiesList {
   [EscrowEvents.escrow_failed_to_fetch_sent]: {
     error: string
   }
+}
 
+interface RequestEventsProperties {
   [RequestEvents.request_amount_back]: undefined
   [RequestEvents.request_cancel]: undefined
   [RequestEvents.request_scan]: undefined
@@ -343,7 +361,9 @@ export interface AnalyticsPropertiesList {
   [RequestEvents.request_error]: {
     error: string
   }
+}
 
+interface FeeEventsProperties {
   [FeeEvents.fee_rendered]: {
     feeType: string
     fee?: BigNumber
@@ -355,7 +375,9 @@ export interface AnalyticsPropertiesList {
   [FeeEvents.fetch_tobin_tax_failed]: {
     error: string
   }
+}
 
+interface TransactionEventsProperties {
   [TransactionEvents.transaction_send_start]: {
     txId: string
   }
@@ -387,7 +409,9 @@ export interface AnalyticsPropertiesList {
   [TransactionEvents.unexpected_maker_token]: {
     makerToken: CURRENCY_ENUM
   }
+}
 
+interface CeloExchangeEventsProperties {
   [CeloExchangeEvents.gold_switch_input_currency]: {
     to: CURRENCY_ENUM
   }
@@ -437,7 +461,9 @@ export interface AnalyticsPropertiesList {
   [CeloExchangeEvents.gold_sell_start]: undefined
   [CeloExchangeEvents.gold_activity_select]: undefined
   [CeloExchangeEvents.gold_activity_back]: undefined
+}
 
+interface GethEventsProperties {
   [GethEvents.blockchain_corruption]: undefined
   [GethEvents.geth_init_success]: undefined
   [GethEvents.geth_init_failure]: {
@@ -450,3 +476,18 @@ export interface AnalyticsPropertiesList {
     context: string
   }
 }
+
+export type AnalyticsPropertiesList = AppEventsProperties &
+  SettingsEventsProperties &
+  NotificationEventsProperties &
+  OnboardingEventsProperties &
+  VerificationEventsProperties &
+  ContactImportEventsProperties &
+  InviteEventsProperties &
+  SendEventsProperties &
+  EscrowEventsProperties &
+  RequestEventsProperties &
+  FeeEventsProperties &
+  TransactionEventsProperties &
+  CeloExchangeEventsProperties &
+  GethEventsProperties
