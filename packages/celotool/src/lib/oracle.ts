@@ -10,12 +10,6 @@ import yargs from 'yargs'
 const helmChartPath = '../helm-charts/oracle'
 const rbacHelmChartPath = '../helm-charts/oracle-rbac'
 
-export enum OracleAzureContext {
-  PRIMARY = 'PRIMARY',
-  SECONDARY = 'SECONDARY',
-  TERTIARY = 'TERTIARY'
-}
-
 /**
  * Contains information needed when using Azure HSM signing
  */
@@ -402,16 +396,6 @@ export function getOracleContextDynamicEnvVarValues<T>(
   {})
 }
 
-function coerceOracleContext(rawContextStr: string): string {
-  const context = rawContextStr
-    .toUpperCase()
-    .replace(/-/g, '_')
-  if (!RegExp('^[A-Z0-9][A-Z0-9_]*[A-Z0-9]$').test(context)) {
-    throw Error(`Invalid oracle context. Raw ${rawContextStr}, implied ${context}`)
-  }
-  return context
-}
-
 /**
  * Switches to the AKS cluster associated with the given context
  */
@@ -439,7 +423,20 @@ export function addOracleMiddleware(argv: yargs.Argv) {
       description: 'Oracle context to perform the deployment in',
       type: 'string',
     })
-    .coerce('context', coerceOracleContext)
+    // coerces the value of context to be all upper-case and
+    // underscore-separated rather than dash-separated.
+    // If the resulting context does not match a regex requiring all caps,
+    // alphanumeric, and dash-only characters (must start with letter and not end
+    // with an underscore), it will throw.
+    .coerce('context', (rawContextStr: string) => {
+      const context = rawContextStr
+        .toUpperCase()
+        .replace(/-/g, '_')
+      if (!RegExp('^[A-Z][A-Z0-9_]*[A-Z0-9]$').test(context)) {
+        throw Error(`Invalid oracle context. Raw ${rawContextStr}, implied ${context}`)
+      }
+      return context
+    })
 }
 
 // Oracle RBAC------
