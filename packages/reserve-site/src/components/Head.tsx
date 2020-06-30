@@ -86,6 +86,11 @@ const globalStyles = css`x
     object-fit: contain;
     width: 100%;
   }
+
+  table {
+    border-spacing: 12px
+  }
+
 `
 
 export default function Head() {
