@@ -95,8 +95,13 @@ interface OnboardingEventsProperties {
   [OnboardingEvents.backup_quiz_incorrect]: undefined
 
   [OnboardingEvents.delay_backup]: undefined
-  [OnboardingEvents.backup_cancel]: undefined
-  [OnboardingEvents.backup_cancel_procrastinate]: undefined
+  [OnboardingEvents.backup_cancel]: {
+    screen: string
+  }
+  [OnboardingEvents.backup_cancel_procrastinate]: {
+    screen: string
+    title: string
+  }
   [OnboardingEvents.backup_continue]: undefined
   [OnboardingEvents.backup_setup_toggle_enable]: undefined
   [OnboardingEvents.backup_setup_toggle_disable]: undefined
@@ -245,21 +250,23 @@ interface InviteEventsProperties {
   [InviteEvents.invite_skip_complete]: undefined
   [InviteEvents.redeem_invite_success]: undefined
   [InviteEvents.redeem_invite_timed_out]: undefined
-  [InviteEvents.redeem_invite_failed]: undefined
+  [InviteEvents.redeem_invite_failed]: {
+    error: string
+  }
 }
 
 interface SendEventsProperties {
   [SendEvents.send_cancel]: undefined
   [SendEvents.send_scan]: undefined
   [SendEvents.send_select_recipient]: {
-    recipeientKind: RecipientKind
+    recipientKind: RecipientKind
     method: 'used search bar' | 'selected from list'
   }
   [SendEvents.send_amount_back]: undefined
   [SendEvents.send_continue]: {
     method: 'scan' | 'search'
     transactionType: 'send' | 'invite'
-    localCurrencyExchangeRate: string | null
+    localCurrencyExchangeRate?: string | null
     localCurrency: LocalCurrencyCode
     dollarAmount: BigNumber | null
     localCurrencyAmount: BigNumber | null
@@ -268,7 +275,7 @@ interface SendEventsProperties {
   [SendEvents.send_confirm]: {
     method: 'scan' | 'search'
     transactionType: 'send' | 'invite'
-    localCurrencyExchangeRate: string | null
+    localCurrencyExchangeRate?: string | null
     localCurrency: LocalCurrencyCode
     dollarAmount: BigNumber | null
     localCurrencyAmount: BigNumber | null
@@ -335,7 +342,7 @@ interface RequestEventsProperties {
   [RequestEvents.request_cancel]: undefined
   [RequestEvents.request_scan]: undefined
   [RequestEvents.request_select_recipient]: {
-    recipeientKind: RecipientKind
+    recipientKind: RecipientKind
     method: 'used search bar' | 'selected from list'
   }
   [RequestEvents.request_continue]: {
@@ -415,7 +422,12 @@ interface CeloExchangeEventsProperties {
   [CeloExchangeEvents.gold_switch_input_currency]: {
     to: CURRENCY_ENUM
   }
-  [CeloExchangeEvents.gold_buy_continue]: undefined
+  [CeloExchangeEvents.gold_buy_continue]: {
+    localCurrencyAmount: BigNumber | null
+    goldAmount: BigNumber
+    inputToken: CURRENCY_ENUM
+    goldToDollarExchangeRate: BigNumber
+  }
   [CeloExchangeEvents.gold_buy_confirm]: {
     localCurrencyAmount: BigNumber | null
     goldAmount: BigNumber
@@ -427,7 +439,12 @@ interface CeloExchangeEventsProperties {
   [CeloExchangeEvents.gold_buy_error]: {
     error: string
   }
-  [CeloExchangeEvents.gold_sell_continue]: undefined
+  [CeloExchangeEvents.gold_sell_continue]: {
+    localCurrencyAmount: BigNumber | null
+    goldAmount: BigNumber
+    inputToken: CURRENCY_ENUM
+    goldToDollarExchangeRate: BigNumber
+  }
   [CeloExchangeEvents.gold_sell_confirm]: {
     localCurrencyAmount: BigNumber | null
     goldAmount: BigNumber
@@ -454,7 +471,6 @@ interface CeloExchangeEventsProperties {
   [CeloExchangeEvents.missing_tx_id]: undefined
   [CeloExchangeEvents.exchange_failed]: {
     error: string
-    context: string
   }
   [CeloExchangeEvents.gold_info]: undefined
   [CeloExchangeEvents.gold_buy_start]: undefined
