@@ -114,6 +114,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                       "lineHeight": 22,
                     }
                   }
+                  testID="HeaderText"
                 >
                   sending
                 </Text>
@@ -969,6 +970,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                       "lineHeight": 22,
                     }
                   }
+                  testID="HeaderText"
                 >
                   sending
                 </Text>
@@ -1824,6 +1826,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                       "lineHeight": 22,
                     }
                   }
+                  testID="HeaderText"
                 >
                   sending
                 </Text>
@@ -2676,6 +2679,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                       "lineHeight": 22,
                     }
                   }
+                  testID="HeaderText"
                 >
                   sending
                 </Text>
