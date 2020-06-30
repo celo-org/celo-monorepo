@@ -150,6 +150,7 @@ export enum CustomEventNames {
   pin_wallet_import = 'pin_wallet_import',
   pin_value = 'pin_value',
   pin_create_button = 'pin_create_button',
+  pin_store_error = 'pin_store_error',
   pin_failed_to_set = 'pin_failed_to_set',
   pin_never_set = 'pin_never_set',
 
