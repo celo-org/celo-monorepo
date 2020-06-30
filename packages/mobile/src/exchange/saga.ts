@@ -101,11 +101,11 @@ export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
     // If makerAmount and makerToken are given, use them to estimate the exchange rate,
     // as exchange rate depends on amount sold. Else default to preset large sell amount.
     const goldMakerAmount =
-      makerAmountInWei && makerToken === CURRENCY_ENUM.GOLD
+      makerAmountInWei && !makerAmountInWei.isZero() && makerToken === CURRENCY_ENUM.GOLD
         ? makerAmountInWei
         : LARGE_GOLD_SELL_AMOUNT_IN_WEI
     const dollarMakerAmount =
-      makerAmountInWei && makerToken === CURRENCY_ENUM.DOLLAR
+      makerAmountInWei && !makerAmountInWei.isZero() && makerToken === CURRENCY_ENUM.DOLLAR
         ? makerAmountInWei
         : LARGE_DOLLARS_SELL_AMOUNT_IN_WEI
 
