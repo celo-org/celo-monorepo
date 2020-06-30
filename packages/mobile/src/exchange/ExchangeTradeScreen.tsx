@@ -147,10 +147,10 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
         ? AnalyticsEvents.gold_buy_continue
         : AnalyticsEvents.gold_sell_continue,
       {
-        localCurrencyAmount,
-        goldAmount,
+        localCurrencyAmount: localCurrencyAmount ? localCurrencyAmount.toString() : null,
+        goldAmount: goldAmount.toString(),
         inputToken,
-        goldToDollarExchangeRate,
+        goldToDollarExchangeRate: goldToDollarExchangeRate.toString(),
       }
     )
     // END: Analytics
