@@ -11,13 +11,13 @@ import * as lTransaction from 'validator-badges/006-genesis-1st-transaction.md'
 import * as lVote from 'validator-badges/007-celo-foundation-vote-recipient.md'
 
 const allBadges = [
-  { src: '/images/badges/1st-proposer.svg', list: lProposer },
-  { src: '/images/badges/1st-transaction.svg', list: lTransaction },
-  { src: '/images/badges/attestation.svg', list: lAttestation },
-  { src: '/images/badges/founder-validator.svg', list: lFounder },
-  { src: '/images/badges/genesis-validator.svg', list: lGenesis },
-  { src: '/images/badges/master-validator.svg', list: lMaster },
-  { src: '/images/badges/vote-recipient.svg', list: lVote },
+  { src: '/images/badges/1st-proposer.svg', list: lProposer, title: '1st Proposer' },
+  { src: '/images/badges/1st-transaction.svg', list: lTransaction, title: '1st Transaction' },
+  { src: '/images/badges/attestation.svg', list: lAttestation, title: 'Genesis Validator' },
+  { src: '/images/badges/founder-validator.svg', list: lFounder, title: 'Master Validator' },
+  { src: '/images/badges/genesis-validator.svg', list: lGenesis, title: 'Founder Validator' },
+  { src: '/images/badges/master-validator.svg', list: lMaster, title: 'Attestation Maven' },
+  { src: '/images/badges/vote-recipient.svg', list: lVote, title: 'Vote Recipient' },
 ].map((_) => ({ ..._, list: (_.list as any).toLowerCase() as string }))
 
 interface Props {
@@ -36,8 +36,8 @@ class ValidatorsListBadges extends React.PureComponent<Props & I18nProps> {
 
     return (
       <View style={styles.container}>
-        {badges.map(({ src }) => (
-          <img key={src} src={src} />
+        {badges.map(({ src, title }) => (
+          <img key={src} src={src} title={title} />
         ))}
       </View>
     )
