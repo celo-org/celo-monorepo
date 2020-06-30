@@ -112,6 +112,7 @@ interface OnboardingEventsProperties {
   [OnboardingEvents.gold_educate_1_next]: undefined
   [OnboardingEvents.gold_educate_2_next]: undefined
   [OnboardingEvents.gold_educate_3_next]: undefined
+  [OnboardingEvents.gold_educate_4_next]: undefined
 
   [OnboardingEvents.exchange_gold_nux]: undefined
 
@@ -124,7 +125,9 @@ interface OnboardingEventsProperties {
   [OnboardingEvents.gold_cancel3]: {
     screen: string
   }
-
+  [OnboardingEvents.gold_cancel4]: {
+    screen: string
+  }
   [OnboardingEvents.phone_number_set]: {
     countryCode: string
   }
