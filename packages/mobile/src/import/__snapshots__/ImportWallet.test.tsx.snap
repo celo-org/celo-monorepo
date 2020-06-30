@@ -15,9 +15,7 @@ exports[`ImportWallet renders correctly and is disabled with no text 1`] = `
         Object {
           "padding": 16,
         },
-        Object {
-          "marginBottom": 0,
-        },
+        null,
       ]
     }
     keyboardShouldPersistTaps="always"
@@ -219,7 +217,39 @@ exports[`ImportWallet renders correctly and is disabled with no text 1`] = `
           </View>
         </View>
       </View>
+      <View
+        collapsable={false}
+        style={
+          Array [
+            Object {
+              "bottom": 0,
+              "left": 0,
+              "right": 0,
+            },
+            Object {
+              "height": 0,
+            },
+            undefined,
+          ]
+        }
+      />
     </View>
   </RCTScrollView>
+  <View
+    collapsable={false}
+    style={
+      Array [
+        Object {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+        },
+        Object {
+          "height": 0,
+        },
+        undefined,
+      ]
+    }
+  />
 </View>
 `;
