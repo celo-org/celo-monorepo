@@ -75,12 +75,6 @@ export class EnterInviteCode extends React.Component<Props, State> {
     await this.checkForInviteCode()
   }
 
-  componentDidUpdate(prevProps: Props) {
-    if (prevProps.redeemComplete !== this.props.redeemComplete && this.props.redeemComplete) {
-      navigate(Screens.VerificationEducationScreen)
-    }
-  }
-
   checkForInviteCode = async () => {
     // Check deeplink
     const validCode = await getValidInviteCodeFromReferrerData()

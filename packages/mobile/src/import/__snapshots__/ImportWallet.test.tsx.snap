@@ -351,7 +351,21 @@ exports[`ImportWallet renders correctly and is disabled with no text 1`] = `
                   }
                 }
               >
-                emptyAccount.title
+                <Text
+                  numberOfLines={1}
+                  style={
+                    Array [
+                      undefined,
+                      Object {
+                        "color": undefined,
+                      },
+                    ]
+                  }
+                >
+                  
+                  $
+                  0.00
+                </Text>
               </Text>
               <Text
                 style={

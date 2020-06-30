@@ -3,9 +3,11 @@ import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardA
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
+import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
 import { HeaderHeightContext, StackScreenProps } from '@react-navigation/stack'
+import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
+import { Trans, WithTranslation } from 'react-i18next'
 import { Keyboard, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaConsumer } from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
@@ -18,6 +20,7 @@ import {
   isValidBackupPhrase,
 } from 'src/backup/utils'
 import CodeInput, { CodeInputStatus } from 'src/components/CodeInput'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import Dialog from 'src/components/Dialog'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { importBackupPhrase } from 'src/import/actions'
@@ -171,7 +174,16 @@ export class ImportWallet extends React.Component<Props, State> {
                 </KeyboardAwareScrollView>
                 <KeyboardSpacer onToggle={this.onToggleKeyboard} />
                 <Dialog
-                  title={t('emptyAccount.title')}
+                  title={
+                    <Trans i18nKey="emptyAccount.title" ns={Namespaces.onboarding}>
+                      <CurrencyDisplay
+                        amount={{
+                          value: new BigNumber(0),
+                          currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+                        }}
+                      />
+                    </Trans>
+                  }
                   isVisible={!!route.params?.showZeroBalanceModal}
                   actionText={t('emptyAccount.useAccount')}
                   actionPress={this.onPressRestore}
