@@ -57,8 +57,8 @@ export class App extends React.Component {
       'AppStartedLoading',
       (appInitializedAtString: string) => {
         const appInitializedAt = new Date(appInitializedAtString)
-        const timeElapsed = appLoadedAt.getTime() - appInitializedAt.getTime()
-        CeloAnalytics.startSession(AnalyticsEvents.app_launched, { timeElapsed })
+        const loadingDuration = appLoadedAt.getTime() - appInitializedAt.getTime()
+        CeloAnalytics.startSession(AnalyticsEvents.app_launched, { loadingDuration })
         appStartListener.remove()
       }
     )

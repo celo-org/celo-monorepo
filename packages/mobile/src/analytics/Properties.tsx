@@ -22,7 +22,8 @@ import { RecipientKind } from 'src/recipients/recipient'
 
 export interface AnalyticsPropertiesList {
   [AppEvents.app_launched]: {
-    timeElapsed: number
+    loadingDuration: number
+    deviceInfo?: object
   }
   [AppEvents.app_state_error]: {
     error: string

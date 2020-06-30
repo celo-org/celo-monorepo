@@ -1,6 +1,5 @@
 import Analytics, { Analytics as analytics } from '@segment/analytics-react-native'
 import Firebase from '@segment/analytics-react-native-firebase'
-import * as _ from 'lodash'
 import DeviceInfo from 'react-native-device-info'
 import { AppEvents } from 'src/analytics/Events'
 import { AnalyticsPropertiesList } from 'src/analytics/Properties'
@@ -96,11 +95,9 @@ class CeloAnalytics {
     eventName: typeof AppEvents.app_launched,
     eventProperties: AnalyticsPropertiesList[AppEvents.app_launched]
   ) {
-    const props = this.getProps(eventProperties)
-    _.set(props, 'device', this.deviceInfo)
-
-    Analytics.track(eventName, props).catch((err) => {
-      Logger.error(TAG, `Failed to track event ${eventName}`, err)
+    this.track(eventName, {
+      deviceInfo: this.deviceInfo,
+      ...eventProperties,
     })
   }
 
@@ -122,7 +119,12 @@ class CeloAnalytics {
       return
     }
 
-    const props = this.getProps(eventProperties)
+    const props: {} = {
+      timestamp: Date.now(),
+      sessionId: this.sessionId,
+      address: this.address,
+      ...eventProperties,
+    }
 
     Analytics.track(eventName, props).catch((err) => {
       Logger.error(TAG, `Failed to track event ${eventName}`, err)
@@ -137,21 +139,6 @@ class CeloAnalytics {
     Analytics.screen(page, eventProperties).catch((err) => {
       Logger.error(TAG, 'Error tracking page', err)
     })
-  }
-
-  private getProps(eventProperties = {}): {} {
-    const baseProps = {
-      timestamp: Date.now(),
-      sessionId: this.sessionId,
-      address: this.address,
-    }
-
-    return Object.keys(eventProperties).length
-      ? {
-          ...eventProperties,
-          ...baseProps,
-        }
-      : baseProps
   }
 }
 
