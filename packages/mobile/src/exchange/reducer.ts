@@ -49,6 +49,9 @@ function aggregateExchangeRates(
   granularity: number,
   range: number
 ): ExchangeRate[] {
+  if (!celoGoldExchangeRates.length) {
+    return []
+  }
   function calculateGroup(exchangeRate: ExchangeRate) {
     return Math.floor(exchangeRate.timestamp / (range / granularity))
   }

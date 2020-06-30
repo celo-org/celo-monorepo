@@ -119,18 +119,6 @@ export async function ensurePincode(): Promise<boolean> {
   return true
 }
 
-export const navigateProtected: SafeNavigate = (...args) => {
-  ensurePincode()
-    .then((ensured) => {
-      if (ensured) {
-        replace(...args)
-      }
-    })
-    .catch((error) => {
-      Logger.error(`${TAG}@navigateProtected`, 'PIN ensure error', error)
-    })
-}
-
 export function navigateToExchangeHome() {
   if (store.getState().goldToken.educationCompleted) {
     navigate(Screens.ExchangeHomeScreen)

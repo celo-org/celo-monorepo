@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import Education from 'src/account/Education'
 import { CustomEventNames } from 'src/analytics/constants'
 import { Namespaces } from 'src/i18n'
-import { navigate, navigateProtected } from 'src/navigator/NavigationService'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 
@@ -16,7 +16,7 @@ export default function AccountKeyEducation(props: Props) {
     if (props.route.params?.nextScreen) {
       navigate(props.route.params?.nextScreen)
     } else {
-      navigateProtected(Screens.BackupPhrase)
+      navigate(Screens.BackupPhrase)
     }
   }
 
