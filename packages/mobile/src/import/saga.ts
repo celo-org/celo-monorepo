@@ -8,15 +8,15 @@ import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
+import { setHasSeenVerificationNux } from 'src/identity/actions'
 import {
   Actions,
-  backupPhraseEmpty,
   ImportBackupPhraseAction,
   importBackupPhraseFailure,
   importBackupPhraseSuccess,
 } from 'src/import/actions'
 import { redeemInviteSuccess } from 'src/invite/actions'
-import { navigate } from 'src/navigator/NavigationService'
+import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
 import { setKey } from 'src/utils/keyStore'
@@ -56,11 +56,15 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
         backupAccount
       )
 
-      // TODO(Rossy) Check gold here too once verificiation is made optional
+      const goldBalance: BigNumber = yield call(
+        fetchTokenBalanceInWeiWithRetry,
+        CURRENCY_ENUM.GOLD,
+        backupAccount
+      )
 
-      if (dollarBalance.isLessThanOrEqualTo(0)) {
-        yield put(backupPhraseEmpty())
-        navigate(Screens.ImportWalletEmpty, { backupPhrase: phrase })
+      if (dollarBalance.isLessThanOrEqualTo(0) && goldBalance.isLessThanOrEqualTo(0)) {
+        yield put(importBackupPhraseSuccess())
+        navigate(Screens.ImportWallet, { clean: false, showZeroBalanceModal: true })
         return
       }
     }
@@ -78,7 +82,12 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
     yield put(redeemInviteSuccess())
     yield put(refreshAllBalances())
 
-    navigate(Screens.VerificationEducationScreen)
+    if (useEmptyWallet) {
+      yield put(setHasSeenVerificationNux(true))
+      navigateHome()
+    } else {
+      navigate(Screens.VerificationEducationScreen)
+    }
 
     yield put(importBackupPhraseSuccess())
   } catch (error) {

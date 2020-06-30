@@ -35,7 +35,8 @@ import {
   storeInviteeData,
 } from 'src/invite/actions'
 import { createInviteCode } from 'src/invite/utils'
-import { navigateHome } from 'src/navigator/NavigationService'
+import { navigate, navigateHome } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import { getSendFee, getSendTxGas } from 'src/send/saga'
 import { fetchDollarBalance, transferStableToken } from 'src/stableToken/actions'
 import { createTokenTransferTransaction, fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
@@ -292,6 +293,7 @@ export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
   if (result === true) {
     Logger.debug(TAG, 'Redeem Invite completed successfully')
     yield put(redeemInviteSuccess())
+    navigate(Screens.VerificationEducationScreen)
   } else if (result === false) {
     Logger.debug(TAG, 'Redeem Invite failed')
     yield put(redeemInviteFailure())

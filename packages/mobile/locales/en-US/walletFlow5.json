@@ -53,7 +53,7 @@
     "0": "Unable to load your feed",
     "1": "Please try again later"
   },
-  "noTransactionActivity": "You will see your sent and received payments here",
+  "noTransactionActivity": "Your transactions will appear here",
   "noExchangeActivity": "You will see completed exchanges here",
   "maybeLater": "Maybe Later",
   "balanceNeedUpdating": "Balance needs updating",
