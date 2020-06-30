@@ -94,11 +94,9 @@ export type StackParamList = {
   [Screens.ImportWallet]:
     | {
         clean: boolean
+        showZeroBalanceModal?: boolean
       }
     | undefined
-  [Screens.ImportWalletEmpty]: {
-    backupPhrase: string
-  }
   [Screens.ImportWalletSocial]: undefined
   [Screens.ImportContacts]:
     | undefined
