@@ -65,4 +65,5 @@ export enum ErrorMessages {
   ADDRESS_VALIDATION_PARTIAL_POORLY_FORMATTED = 'addressValidationPartialPoorlyFormatted',
   ADDRESS_VALIDATION_FULL_OWN_ADDRESS = 'addressValidationFullOwnAddress',
   ADDRESS_VALIDATION_PARTIAL_OWN_ADDRESS = 'addressValidationPartialOwnAddress',
+  KEYCHAIN_STORAGE_ERROR = 'keychainStorageError',
 }
