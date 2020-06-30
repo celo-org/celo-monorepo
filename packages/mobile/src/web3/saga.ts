@@ -2,19 +2,17 @@ import { RpcWallet, RpcWalletErrors } from '@celo/contractkit/lib/wallets/rpc-wa
 import { generateKeys, generateMnemonic, MnemonicStrength } from '@celo/utils/src/account'
 import { privateKeyToAddress } from '@celo/utils/src/address'
 import { deriveCEK } from '@celo/utils/src/commentEncryption'
-import * as Sentry from '@sentry/react-native'
 import * as bip39 from 'react-native-bip39'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { setAccountCreationTime, setPromptForno } from 'src/account/actions'
-import { getPincode } from 'src/account/saga'
 import { promptFornoIfNeededSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
-import { getWordlist } from 'src/backup/utils'
+import { getWordlist, storeMnemonic } from 'src/backup/utils'
 import { features } from 'src/flags'
 import { cancelGethSaga } from 'src/geth/actions'
 import { UNLOCK_DURATION } from 'src/geth/consts'
@@ -22,8 +20,8 @@ import { deleteChainData, stopGethIfInitialized } from 'src/geth/geth'
 import { gethSaga, waitForGethConnectivity } from 'src/geth/saga'
 import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { setCachedPincode } from 'src/pincode/PincodeCache'
-import { setKey } from 'src/utils/keyStore'
+import { getPasswordSaga } from 'src/pincode/authentication'
+import { clearPasswordCaches } from 'src/pincode/PasswordCache'
 import Logger from 'src/utils/Logger'
 import {
   Actions,
@@ -138,7 +136,7 @@ export function* waitWeb3LastBlock() {
 }
 
 export function* getOrCreateAccount() {
-  const account = yield select(currentAccountSelector)
+  const account: string = yield select(currentAccountSelector)
   if (account) {
     Logger.debug(
       TAG + '@getOrCreateAccount',
@@ -175,35 +173,29 @@ export function* getOrCreateAccount() {
       throw new Error('Failed to convert mnemonic to hex')
     }
 
-    const accountAddress = yield call(assignAccountFromPrivateKey, privateKey)
+    const accountAddress: string = yield call(assignAccountFromPrivateKey, privateKey)
     if (!accountAddress) {
       throw new Error('Failed to assign account from private key')
     }
 
-    yield call(setKey, 'mnemonic', mnemonic)
+    yield call(storeMnemonic, mnemonic, accountAddress)
 
     return accountAddress
   } catch (error) {
-    // Capturing error in sentry for now as we debug backup key issue
-    if (privateKey && !error.message.contains(privateKey)) {
-      Sentry.captureException(error)
-    }
-    Logger.error(TAG + '@getOrCreateAccount', 'Error creating account', error)
+    const sanitizedError = Logger.sanitizeError(error, privateKey)
+    Logger.error(TAG + '@getOrCreateAccount', 'Error creating account', sanitizedError)
     throw new Error(ErrorMessages.ACCOUNT_SETUP_FAILED)
   }
 }
 
 export function* assignAccountFromPrivateKey(privateKey: string) {
   try {
-    const pincode = yield call(getPincode, false)
-    if (!pincode) {
-      Logger.error(TAG + '@assignAccountFromPrivateKey', 'Got falsy pin')
-      throw Error('Cannot create account without having the pin set')
-    }
     const account = privateKeyToAddress(privateKey)
     const wallet: RpcWallet = yield call(getConnectedWallet)
+    const password: string = yield call(getPasswordSaga, account, false, true)
+
     try {
-      yield call([wallet, wallet.addAccount], privateKey, pincode)
+      yield call([wallet, wallet.addAccount], privateKey, password)
     } catch (e) {
       if (e === RpcWalletErrors.AccountAlreadyExists) {
         Logger.warn(TAG + '@assignAccountFromPrivateKey', 'Attempted to import same account')
@@ -212,7 +204,7 @@ export function* assignAccountFromPrivateKey(privateKey: string) {
         throw e
       }
 
-      yield call([wallet, wallet.unlockAccount], account, pincode, UNLOCK_DURATION)
+      yield call([wallet, wallet.unlockAccount], account, password, UNLOCK_DURATION)
     }
 
     Logger.debug(TAG + '@assignAccountFromPrivateKey', `Added to wallet: ${account}`)
@@ -259,13 +251,17 @@ export function* unlockAccount(account: string) {
   }
 
   try {
-    const pincode = yield call(getPincode, true)
-    yield call([wallet, wallet.unlockAccount], account, pincode, UNLOCK_DURATION)
+    const password: string = yield call(getPasswordSaga, account)
+    const result = yield call([wallet, wallet.unlockAccount], account, password, UNLOCK_DURATION)
+    if (!result) {
+      throw new Error('Unlock account result false')
+    }
+
     Logger.debug(TAG + '@unlockAccount', `Account unlocked: ${account}`)
     return true
   } catch (error) {
-    setCachedPincode(null)
-    Logger.error(TAG + '@unlockAccount', 'account unlock failed', error)
+    Logger.error(TAG + '@unlockAccount', 'Account unlock failed, clearing password caches', error)
+    clearPasswordCaches()
     return false
   }
 }

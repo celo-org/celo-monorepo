@@ -1,7 +1,7 @@
 import { RootState } from 'src/redux/reducers'
 
-export const getLockWithPinEnabled = (state: RootState) => {
-  return state.app.lockWithPinEnabled
+export const getRequirePinOnAppOpen = (state: RootState) => {
+  return state.app.requirePinOnAppOpen
 }
 
 export const getAppState = (state: RootState) => {
