@@ -269,7 +269,6 @@ const styles = StyleSheet.create({
   goldPriceValues: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    justifyContent: 'center',
   },
   goldPriceCurrentValue: {
     height: 27,
@@ -284,7 +283,6 @@ const styles = StyleSheet.create({
   },
   goldPriceWentDown: {
     ...fontStyles.regular,
-    marginBottom: 2, // vertically align with the current price
     marginLeft: 4,
     color: colors.warning,
   },

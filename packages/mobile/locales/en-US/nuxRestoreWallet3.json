@@ -1,15 +1,9 @@
 {
   "title": "Restore your Celo Wallet",
-  "userYourBackupKey":
-    "Already have a Celo Wallet? Enter your Backup Key to restore it to this phone.",
+  "userYourBackupKey": "Already have a Celo Wallet? Enter your Backup Key to restore it to this phone.",
   "tip": "Tip: ",
   "backupKeyTip": "Backup Keys are 24 words long, separated by a space.",
-  "emptyWalletWarning": "This wallet is empty.",
-  "useEmptyAnyway": "Would you like to use it anyway?",
-  "useEmptyWallet": "Use Empty Wallet",
-  "tryAnotherKey": "Try Another Backup Key",
   "restoreSocial": "Restore with Safeguards",
-  "socialImportInfo":
-    "If you enabled Safeguards, you sent Safeguard Phrases to two friends. Please retrieve these phrases and enter them here (in any order) to regain access to your funds.",
+  "socialImportInfo": "If you enabled Safeguards, you sent Safeguard Phrases to two friends. Please retrieve these phrases and enter them here (in any order) to regain access to your funds.",
   "socialTip": "Phrases are lists of 13 words separated by spaces."
 }
