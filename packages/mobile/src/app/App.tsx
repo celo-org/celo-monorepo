@@ -1,4 +1,3 @@
-import colors from '@celo/react-components/styles/colors'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { ApolloProvider } from 'react-apollo'
@@ -11,7 +10,7 @@ import {
   YellowBox,
 } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
-import { SafeAreaProvider } from 'react-native-safe-area-view'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { enableScreens } from 'react-native-screens'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
@@ -81,7 +80,7 @@ export class App extends React.Component {
         <ApolloProvider client={apolloClient}>
           <Provider store={store}>
             <PersistGate loading={<AppLoading />} persistor={persistor}>
-              <StatusBar backgroundColor={colors.white} barStyle="dark-content" />
+              <StatusBar backgroundColor="transparent" barStyle="dark-content" />
               <ErrorBoundary>
                 <NavigatorWrapper />
               </ErrorBoundary>

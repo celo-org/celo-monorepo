@@ -1,0 +1,26 @@
+patch-package
+--- a/node_modules/react-native-splash-screen/android/src/main/java/org/devio/rn/splashscreen/SplashScreen.java
++++ b/node_modules/react-native-splash-screen/android/src/main/java/org/devio/rn/splashscreen/SplashScreen.java
+@@ -3,6 +3,7 @@ package org.devio.rn.splashscreen;
+ import android.app.Activity;
+ import android.app.Dialog;
+ import android.os.Build;
++import android.view.View;
+ 
+ import java.lang.ref.WeakReference;
+ 
+@@ -29,6 +30,14 @@ public class SplashScreen {
+             public void run() {
+                 if (!activity.isFinishing()) {
+                     mSplashDialog = new Dialog(activity, themeResId);
++                    mSplashDialog.getWindow()
++                      .getDecorView()
++                      .setSystemUiVisibility(
++                        // These match with our MainActivity setup so we can draw under the status bar / notch area
++                        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
++                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
++                        View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
++                      );
+                     mSplashDialog.setContentView(R.layout.launch_screen);
+                     mSplashDialog.setCancelable(false);
+ 

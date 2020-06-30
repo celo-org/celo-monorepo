@@ -9,7 +9,7 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
   }
 >
   <View>
-    <SafeAreaView
+    <RNCSafeAreaView
       style={
         Object {
           "flexGrow": 1,
@@ -202,7 +202,7 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
       >
         receiveFlow8:receivedAmountFromCelo
       </Text>
-    </SafeAreaView>
+    </RNCSafeAreaView>
   </View>
 </RCTScrollView>
 `;
@@ -216,7 +216,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
   }
 >
   <View>
-    <SafeAreaView
+    <RNCSafeAreaView
       style={
         Object {
           "flexGrow": 1,
@@ -669,7 +669,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
           </Text>
         </Text>
       </View>
-    </SafeAreaView>
+    </RNCSafeAreaView>
   </View>
 </RCTScrollView>
 `;
@@ -683,7 +683,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
   }
 >
   <View>
-    <SafeAreaView
+    <RNCSafeAreaView
       style={
         Object {
           "flexGrow": 1,
@@ -1136,7 +1136,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
           </Text>
         </Text>
       </View>
-    </SafeAreaView>
+    </RNCSafeAreaView>
   </View>
 </RCTScrollView>
 `;
@@ -1150,7 +1150,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
   }
 >
   <View>
-    <SafeAreaView
+    <RNCSafeAreaView
       style={
         Object {
           "flexGrow": 1,
@@ -1848,7 +1848,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
           </Text>
         </Text>
       </View>
-    </SafeAreaView>
+    </RNCSafeAreaView>
   </View>
 </RCTScrollView>
 `;
@@ -1862,7 +1862,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
   }
 >
   <View>
-    <SafeAreaView
+    <RNCSafeAreaView
       style={
         Object {
           "flexGrow": 1,
@@ -2560,7 +2560,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
           </Text>
         </Text>
       </View>
-    </SafeAreaView>
+    </RNCSafeAreaView>
   </View>
 </RCTScrollView>
 `;
@@ -2574,7 +2574,7 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
   }
 >
   <View>
-    <SafeAreaView
+    <RNCSafeAreaView
       style={
         Object {
           "flexGrow": 1,
@@ -2765,7 +2765,7 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
       >
         receiveFlow8:verificationMessage
       </Text>
-    </SafeAreaView>
+    </RNCSafeAreaView>
   </View>
 </RCTScrollView>
 `;

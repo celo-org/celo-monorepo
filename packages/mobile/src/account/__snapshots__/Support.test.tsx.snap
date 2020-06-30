@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Support renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -300,5 +300,5 @@ exports[`Support renders correctly 1`] = `
       </Text>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
