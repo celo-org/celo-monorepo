@@ -255,7 +255,7 @@ function celoGoldExchangeRateHistoryChannel(latestExchangeRate: ExchangeRate) {
       emit(result)
     }
 
-    // timestamp + 1 cause .startAt is inclusive
+    // timestamp + 1 is used because .startAt is inclusive
     const startAt = latestExchangeRate
       ? latestExchangeRate.timestamp + 1
       : now - MAX_HISTORY_RETENTION

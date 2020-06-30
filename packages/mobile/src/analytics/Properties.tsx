@@ -143,9 +143,7 @@ interface OnboardingEventsProperties {
     pincodeType: PincodeType
     error: string
   }
-  [OnboardingEvents.pin_never_set]: {
-    pincodeType: PincodeType
-  }
+  [OnboardingEvents.pin_never_set]: undefined
   [OnboardingEvents.import_wallet_submit]: undefined
 }
 

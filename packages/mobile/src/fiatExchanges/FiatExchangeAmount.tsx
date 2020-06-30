@@ -12,7 +12,7 @@ import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { Platform, StyleSheet, Text, TextInput, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
 import BackButton from 'src/components/BackButton.v2'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
@@ -62,8 +62,6 @@ export const fiatExchangesAmountScreenOptions = ({
   }
 }
 
-const safeAreaInset = { top: 'never' as 'never', bottom: 'always' as 'always' }
-
 export function ExchangeTradeScreen({ navigation, route }: Props) {
   function isNextButtonValid() {
     const passMinAmount = dollarAmount.isGreaterThanOrEqualTo(
@@ -112,12 +110,7 @@ export function ExchangeTradeScreen({ navigation, route }: Props) {
   )
 
   return (
-    <SafeAreaView
-      // Force inset as this screen uses auto focus and KeyboardSpacer padding is initially
-      // incorrect because of that
-      forceInset={safeAreaInset}
-      style={styles.container}
-    >
+    <SafeAreaView style={styles.container}>
       <DisconnectBanner />
       <KeyboardAwareScrollView
         keyboardShouldPersistTaps={'always'}

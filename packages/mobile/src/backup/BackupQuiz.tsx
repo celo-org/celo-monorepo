@@ -8,7 +8,7 @@ import { chunk, flatMap, shuffle, times } from 'lodash'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { setBackupCompleted } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
@@ -25,6 +25,7 @@ import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'backup/BackupQuiz'
 
@@ -50,6 +51,10 @@ interface State {
   }>
 }
 
+interface StateProps {
+  account: string | null
+}
+
 interface DispatchProps {
   setBackupCompleted: typeof setBackupCompleted
   showError: typeof showError
@@ -57,7 +62,13 @@ interface DispatchProps {
 
 type OwnProps = StackScreenProps<StackParamList, Screens.BackupQuiz>
 
-type Props = WithTranslation & DispatchProps & OwnProps
+type Props = WithTranslation & StateProps & DispatchProps & OwnProps
+
+const mapStateToProps = (state: RootState): StateProps => {
+  return {
+    account: currentAccountSelector(state),
+  }
+}
 
 export const navOptionsForQuiz: StackNavigationOptions = {
   ...emptyHeader,
@@ -92,7 +103,7 @@ export class BackupQuiz extends React.Component<Props, State> {
   }
 
   retrieveMnemonic = async () => {
-    const mnemonic = await getStoredMnemonic()
+    const mnemonic = await getStoredMnemonic(this.props.account)
     if (mnemonic) {
       const shuffledMnemonic = getShuffledWordSet(mnemonic)
 
@@ -303,11 +314,6 @@ function getShuffledWordSet(mnemonic: string) {
   )
 }
 
-export default connect<{}, DispatchProps, OwnProps, RootState>(null, {
-  setBackupCompleted,
-  showError,
-})(withTranslation<Props>(Namespaces.backupKeyFlow6)(BackupQuiz))
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -400,3 +406,8 @@ const styles = StyleSheet.create({
   },
   resetButton: { alignItems: 'center', padding: 24, marginTop: 8 },
 })
+
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
+  setBackupCompleted,
+  showError,
+})(withTranslation<Props>(Namespaces.backupKeyFlow6)(BackupQuiz))

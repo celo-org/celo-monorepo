@@ -11,7 +11,7 @@ import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
 import { Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
@@ -72,8 +72,6 @@ const mapStateToProps = (state: RootState): StateProps => ({
   localCurrencyCode: getLocalCurrencyCode(state),
   localCurrencyExchangeRate: getLocalCurrencyExchangeRate(state),
 })
-
-const safeAreaInset = { top: 'never' as 'never', bottom: 'always' as 'always' }
 
 export class ExchangeTradeScreen extends React.Component<Props, State> {
   state: State = {
@@ -280,12 +278,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     )
 
     return (
-      <SafeAreaView
-        // Force inset as this screen uses auto focus and KeyboardSpacer padding is initially
-        // incorrect because of that
-        forceInset={safeAreaInset}
-        style={styles.container}
-      >
+      <SafeAreaView style={styles.container}>
         <DisconnectBanner />
         <KeyboardAwareScrollView
           keyboardShouldPersistTaps={'always'}

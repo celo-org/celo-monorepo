@@ -7,7 +7,7 @@ import { StackScreenProps, useHeaderHeight } from '@react-navigation/stack'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import { useSafeArea } from 'react-native-safe-area-view'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
 import { AnalyticsEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
@@ -36,7 +36,7 @@ function ImportContactsScreen({ route, navigation }: Props) {
   const matchedContacts = useSelector(matchedContactsSelector)
   const matchedContactsCount = Object.keys(matchedContacts).length
   const dispatch = useDispatch()
-  const insets = useSafeArea()
+  const insets = useSafeAreaInsets()
   const headerHeight = useHeaderHeight()
 
   const renderStatusContainer = () => {
