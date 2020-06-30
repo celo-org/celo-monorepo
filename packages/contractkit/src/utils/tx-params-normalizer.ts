@@ -87,8 +87,11 @@ export class TxParamsNormalizer {
   }
 
   private async getGasPrice(feeCurrency: string | undefined): Promise<string | undefined> {
+    // Required otherwise is not backward compatible
+    const parameter = feeCurrency ? [feeCurrency] : []
+
     // Reference: https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_gasprice
-    const response = await this.rpcCaller.call('eth_gasPrice', [feeCurrency])
+    const response = await this.rpcCaller.call('eth_gasPrice', parameter)
     const gasPriceInHex = response.result.toString()
     return gasPriceInHex
   }

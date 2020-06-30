@@ -4,16 +4,12 @@ import { createStackNavigator, TransitionPresets } from '@react-navigation/stack
 import * as React from 'react'
 import { Platform } from 'react-native'
 import SplashScreen from 'react-native-splash-screen'
-import Account from 'src/account/Account'
 import AccountKeyEducation from 'src/account/AccountKeyEducation'
-import Analytics from 'src/account/Analytics'
-import DataSaver from 'src/account/DataSaver'
-import EditProfile from 'src/account/EditProfile'
+import GoldEducation from 'src/account/GoldEducation'
 import InviteReview from 'src/account/InviteReview'
 import Licenses from 'src/account/Licenses'
 import Profile from 'src/account/Profile'
 import { PincodeType } from 'src/account/reducer'
-import Security from 'src/account/Security'
 import SupportContact from 'src/account/SupportContact'
 import { CustomEventNames } from 'src/analytics/constants'
 import AppLoading from 'src/app/AppLoading'
@@ -46,7 +42,6 @@ import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import PhoneNumberLookupQuotaScreen from 'src/identity/PhoneNumberLookupQuotaScreen'
 import ImportWallet from 'src/import/ImportWallet'
-import ImportWalletEmpty from 'src/import/ImportWalletEmpty'
 import ImportWalletSocial from 'src/import/ImportWalletSocial'
 import EnterInviteCode from 'src/invite/EnterInviteCode'
 import Language from 'src/language/Language'
@@ -113,7 +108,7 @@ const commonScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen
         name={Screens.Language}
         component={Language}
-        options={headerWithBackButton}
+        options={Language.navigationOptions}
       />
       <Navigator.Screen
         name={Screens.PincodeEnter}
@@ -125,8 +120,7 @@ const commonScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen name={Screens.DappKitAccountAuth} component={DappKitAccountScreen} />
       <Navigator.Screen name={Screens.DappKitSignTxScreen} component={DappKitSignTxScreen} />
       <Navigator.Screen name={Screens.DappKitTxDataScreen} component={DappKitTxDataScreen} />
-      <Navigator.Screen name={Screens.Debug} component={Debug} />
-      <Navigator.Screen name={Screens.DataSaver} component={DataSaver} />
+      <Navigator.Screen name={Screens.Debug} component={Debug} options={Debug.navigationOptions} />
       <Navigator.Screen
         name={Screens.PhoneNumberLookupQuota}
         component={PhoneNumberLookupQuotaScreen}
@@ -218,11 +212,6 @@ const nuxScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen
       name={Screens.ImportWalletSocial}
       component={ImportWalletSocial}
-      options={nuxNavigationOptions}
-    />
-    <Navigator.Screen
-      name={Screens.ImportWalletEmpty}
-      component={ImportWalletEmpty}
       options={nuxNavigationOptions}
     />
     <Navigator.Screen
@@ -385,18 +374,6 @@ const backupScreens = (Navigator: typeof Stack) => (
 
 const settingsScreens = (Navigator: typeof Stack) => (
   <>
-    <Navigator.Screen options={noHeader} name={Screens.Account} component={Account} />
-    <Navigator.Screen options={headerWithBackButton} name={Screens.Security} component={Security} />
-    <Navigator.Screen
-      options={headerWithBackButton}
-      name={Screens.Analytics}
-      component={Analytics}
-    />
-    <Navigator.Screen
-      options={headerWithBackButton}
-      name={Screens.EditProfile}
-      component={EditProfile}
-    />
     <Navigator.Screen options={headerWithBackButton} name={Screens.Profile} component={Profile} />
     <Navigator.Screen
       options={headerWithBackButton}
@@ -452,6 +429,7 @@ const generalScreens = (Navigator: typeof Stack) => (
       component={TransactionReview}
       options={transactionReviewOptions}
     />
+    <Navigator.Screen name={Screens.GoldEducation} component={GoldEducation} options={noHeader} />
     <Navigator.Screen name={Screens.FeeEducation} component={FeeEducation} />
   </>
 )
@@ -469,8 +447,10 @@ const mapStateToProps = (state: RootState) => {
   }
 }
 
+type InitialRouteName = ExtractProps<typeof Stack.Navigator>['initialRouteName']
+
 export function MainStackScreen() {
-  const [initialRouteName, setInitialRoute] = React.useState<Screens | undefined>(undefined)
+  const [initialRouteName, setInitialRoute] = React.useState<InitialRouteName>(undefined)
   React.useEffect(() => {
     const {
       language,
@@ -482,7 +462,7 @@ export function MainStackScreen() {
       hasSeenVerificationNux,
     } = mapStateToProps(store.getState())
 
-    let initialRoute: Screens | undefined
+    let initialRoute: InitialRouteName
 
     if (!language) {
       initialRoute = Screens.Language
@@ -502,19 +482,16 @@ export function MainStackScreen() {
 
     setInitialRoute(initialRoute)
 
-    SplashScreen.hide()
-  })
+    // Wait for next frame to avoid slight gap when hiding the splash
+    requestAnimationFrame(() => SplashScreen.hide())
+  }, [])
 
   if (!initialRouteName) {
     return <AppLoading />
   }
 
   return (
-    <Stack.Navigator
-      // @ts-ignore
-      initialRouteName={initialRouteName}
-      screenOptions={emptyHeader}
-    >
+    <Stack.Navigator initialRouteName={initialRouteName} screenOptions={emptyHeader}>
       <Stack.Screen name={Screens.DrawerNavigator} component={DrawerNavigator} options={noHeader} />
       {commonScreens(Stack)}
       {sendScreens(Stack)}

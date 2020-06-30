@@ -4,20 +4,26 @@ exports[`Profile renders correctly 1`] = `
 <RCTScrollView
   style={
     Object {
-      "backgroundColor": "white",
+      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
 >
   <View>
-    <View
-      style={
-        Object {
-          "flex": 1,
-          "paddingLeft": 20,
+    <RNCSafeAreaView>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Jost-Medium",
+            "fontSize": 22,
+            "lineHeight": 28,
+            "margin": 16,
+          }
         }
-      }
-    >
+      >
+        editProfile
+      </Text>
       <View
         style={
           Object {
@@ -51,9 +57,9 @@ exports[`Profile renders correctly 1`] = `
                 },
                 Object {
                   "backgroundColor": "#7AD6FE",
-                  "borderRadius": 27.5,
-                  "height": 55,
-                  "width": 55,
+                  "borderRadius": 40,
+                  "height": 80,
+                  "width": 80,
                 },
               ]
             }
@@ -67,7 +73,7 @@ exports[`Profile renders correctly 1`] = `
                     "fontSize": 16,
                   },
                   Object {
-                    "fontSize": 27.5,
+                    "fontSize": 40,
                   },
                 ]
               }
@@ -77,100 +83,114 @@ exports[`Profile renders correctly 1`] = `
           </View>
         </View>
       </View>
-    </View>
-    <View
-      style={
-        Array [
-          Object {
-            "flex": 1,
-            "paddingLeft": 20,
-          },
-          Object {
-            "borderColor": "#EEEEEE",
-            "borderTopWidth": 1,
-          },
-        ]
-      }
-    >
       <View
-        accessible={true}
-        focusable={true}
-        nativeBackgroundAndroid={
+        style={
           Object {
-            "attribute": "selectableItemBackground",
-            "type": "ThemeAttrAndroid",
+            "backgroundColor": "#FFFFFF",
           }
         }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        testID="ProfileEditName"
       >
         <View
           style={
             Object {
+              "borderBottomColor": "#EDEEEF",
               "borderBottomWidth": 1,
-              "borderColor": "#EEEEEE",
-              "flexDirection": "row",
-              "justifyContent": "space-between",
               "marginLeft": 16,
-              "paddingRight": 16,
               "paddingVertical": 16,
             }
           }
         >
           <View
             style={
-              Array [
-                Object {
-                  "justifyContent": "center",
-                },
-              ]
+              Object {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "paddingRight": 16,
+              }
             }
           >
-            <Text
+            <View
               style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 16,
-                  "lineHeight": 24,
-                }
+                Array [
+                  Object {
+                    "justifyContent": "center",
+                  },
+                ]
               }
             >
-              editName
-            </Text>
-          </View>
-          <View
-            style={
-              Array [
-                Object {
-                  "justifyContent": "center",
-                },
-              ]
-            }
-          >
-            <svg
-              height={16}
-              style={Object {}}
-              viewBox="0 0 15 16"
-              width={16}
-              xmlns="http://www.w3.org/2000/svg"
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  }
+                }
+              >
+                name
+              </Text>
+            </View>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  },
+                  Object {
+                    "flex": 0,
+                    "justifyContent": "flex-end",
+                    "paddingLeft": 16,
+                  },
+                ]
+              }
             >
-              <path
-                d="M8.70376 9.12461L2.12123 15.7071C1.73071 16.0976 1.09755 16.0976 0.707015 15.7071C0.316497 15.3166 0.316497 14.6834 0.707015 14.2929L6.58575 8.41419L0.707091 2.53553C0.316573 2.14501 0.316573 1.51185 0.707091 1.12131C1.09761 0.730797 1.73079 0.730797 2.12131 1.12131L8.70708 7.70708C9.0976 8.09762 9.0976 8.73078 8.70708 9.1213L8.70376 9.12461Z"
-                fill="#42D689"
-                style={Object {}}
+              <TextInput
+                allowFontScaling={true}
+                onBlur={[Function]}
+                onChangeText={[Function]}
+                onFocus={[Function]}
+                placeholder="yourName"
+                rejectResponderTermination={true}
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "flex": 1,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                      "paddingHorizontal": 0,
+                      "paddingVertical": 12,
+                    },
+                    undefined,
+                    Array [
+                      Object {
+                        "color": "#9CA4A9",
+                        "flex": 0,
+                        "minWidth": 160,
+                        "paddingVertical": 0,
+                        "textAlign": "right",
+                      },
+                      Object {
+                        "color": "#9CA4A9",
+                      },
+                    ],
+                  ]
+                }
+                testID="ProfileEditName"
+                underlineColorAndroid="transparent"
+                value="John Doe"
               />
-            </svg>
+            </View>
           </View>
         </View>
       </View>
-    </View>
+    </RNCSafeAreaView>
   </View>
 </RCTScrollView>
 `;

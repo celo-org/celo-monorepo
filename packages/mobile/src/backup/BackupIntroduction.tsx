@@ -7,7 +7,7 @@ import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -43,7 +43,7 @@ const mapStateToProps = (state: RootState): StateProps => {
 }
 
 export const navOptionsForAccount = ({ route }: NavigationProps) => {
-  if (route.params?.fromAccountScreen) {
+  if (route.params?.fromSettings) {
     return headerWithBackButton
   }
 
@@ -70,10 +70,10 @@ class BackupIntroduction extends React.Component<Props> {
 
   render() {
     const { backupCompleted, route } = this.props
-    const fromAccountScreen = route.params?.fromAccountScreen
+    const fromSettings = route.params?.fromSettings
     return (
       <SafeAreaView style={styles.container}>
-        {!fromAccountScreen && <DrawerTopBar />}
+        {!fromSettings && <DrawerTopBar />}
         {backupCompleted ? (
           <AccountKeyPostSetup />
         ) : (

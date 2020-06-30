@@ -14,7 +14,7 @@ import {
   StyleSheet,
 } from 'react-native'
 import Animated from 'react-native-reanimated'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { showMessage } from 'src/alert/actions'
 import { exitBackupFlow } from 'src/app/actions'

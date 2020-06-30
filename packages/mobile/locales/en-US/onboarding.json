@@ -23,7 +23,7 @@
   },
   "inviteCode": {
     "title": "Invite Code",
-    "body": "If you were invited or received a payment, please copy and paste the invite code below.",
+    "body": "Did you receive a payment or invite? If so, please copy and paste the Invite Code below.",
     "label": "Invite Code",
     "codePlaceholder": "Enter invite code",
     "noCode": "Don’t have an Invite Code",
@@ -83,5 +83,10 @@
     "body": "<0>$t(verificationInputHelpDialog.bodySection1.title)</0>\n\n$t(verificationInputHelpDialog.bodySection1.content)\n\n<1>$t(verificationInputHelpDialog.bodySection2.title)</1>\n\n$t(verificationInputHelpDialog.bodySection2.content)",
     "skip": "Skip for now",
     "back": "Go Back"
+  },
+  "emptyAccount": {
+    "description": "This account doesn’t have any funds. Would you still like to use it?",
+    "useAccount": "Use Account",
+    "title": "Balance <0></0>"
   }
 }

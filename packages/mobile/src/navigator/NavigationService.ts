@@ -87,7 +87,7 @@ export function navigate<RouteName extends keyof StackParamList>(
     })
 }
 
-async function ensurePincode(): Promise<boolean> {
+export async function ensurePincode(): Promise<boolean> {
   const pincodeType = pincodeTypeSelector(store.getState())
 
   if (pincodeType === PincodeType.Unset) {
@@ -117,18 +117,6 @@ async function ensurePincode(): Promise<boolean> {
   }
 
   return true
-}
-
-export const navigateProtected: SafeNavigate = (...args) => {
-  ensurePincode()
-    .then((ensured) => {
-      if (ensured) {
-        replace(...args)
-      }
-    })
-    .catch((error) => {
-      Logger.error(`${TAG}@navigateProtected`, 'PIN ensure error', error)
-    })
 }
 
 export function navigateToExchangeHome() {

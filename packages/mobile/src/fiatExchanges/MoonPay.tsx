@@ -10,9 +10,12 @@ import i18n from 'src/i18n'
 import { emptyHeader } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 
-import { getLocalCurrencyCode } from 'src/localCurrency/selectors'
+import { StackScreenProps } from '@react-navigation/stack'
+import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
+import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
+import { StackParamList } from 'src/navigator/types'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const celoCurrencyCode = 'CUSD'
@@ -27,10 +30,16 @@ export const moonPayOptions = () => {
   }
 }
 
-function FiatExchangeWeb() {
+type RouteProps = StackScreenProps<StackParamList, Screens.MoonPay>
+type Props = RouteProps
+
+function FiatExchangeWeb({ route }: Props) {
   const [uri, setUri] = React.useState('')
+  const { amount } = route.params
   const account = useSelector(currentAccountSelector)
   const localCurrencyCode = useSelector(getLocalCurrencyCode)
+  const localCurrencyExchangeRate = useSelector(getLocalCurrencyExchangeRate)
+  const localAmount = convertDollarsToLocalAmount(amount, localCurrencyExchangeRate)
   React.useEffect(() => {
     const getSignedUrl = async () => {
       const response = await fetch(config.signMoonpayUrl, {
@@ -39,11 +48,11 @@ function FiatExchangeWeb() {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
-        // TODO: Add amount here
         body: JSON.stringify({
           currency: celoCurrencyCode,
           address: account,
           fiatCurrency: localCurrencyCode,
+          fiatAmount: localAmount?.toString(),
         }),
       })
       const json = await response.json()
