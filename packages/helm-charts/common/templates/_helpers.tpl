@@ -211,7 +211,7 @@ release: {{ .Release.Name }}
 {{ end }}
 {{- if .pprof }}
   - name: pprof
-    containerPort: 6060
+    containerPort: {{ .pprof_port }}
 {{ end }}
   resources:
 {{ toYaml .Values.geth.resources | indent 4 }}

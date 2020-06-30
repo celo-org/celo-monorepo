@@ -24,14 +24,14 @@ spec:
   selector:
     matchLabels:
 {{ include "celo-fullnode.labels" .  | indent 6 }}
-  annotations:
-{{ if .Values.prometheus }} 
-{{ include "prometheus-annotations" . | indent 8 }} 
-{{ end }}
   template:
     metadata:
       labels:
 {{ include "celo-fullnode.labels" .  | indent 8 }}
+    annotations:
+{{ if .Values.prometheus }} 
+{{ include "prometheus-annotations" . | indent 10 }} 
+{{ end }}
     spec:
       initContainers:
 {{ include "common.init-genesis-container" .  | indent 6 }}
