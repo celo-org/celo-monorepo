@@ -63,27 +63,31 @@ class ValoraAnalytics {
     this.sessionId = ''
     this.userAddress = ''
     this.deviceInfo = {}
-
-    if (!SEGMENT_API_KEY) {
-      Logger.debug(TAG, 'Segment API Key not present, likely due to environment. Skipping enabling')
-    }
   }
 
-  init() {
-    Analytics.setup(SEGMENT_API_KEY, SEGMENT_OPTIONS).catch((error) =>
-      Logger.debug(TAG, `Segment setup error: ${error.message}\n`, error)
-    )
-    Logger.debug(TAG, 'Segment Analytics Integration initialized!')
+  async init() {
+    try {
+      if (!SEGMENT_API_KEY) {
+        throw Error('API Key not present, likely due to environment. Skipping enabling')
+      }
 
-    getDeviceInfo()
-      .then((res) => {
-        this.deviceInfo = res
+      await Analytics.setup(SEGMENT_API_KEY, SEGMENT_OPTIONS)
+
+      try {
+        const deviceInfo = await getDeviceInfo()
+        this.deviceInfo = deviceInfo
         this.sessionId = Web3Utils.soliditySha3({
           type: 'string',
-          value: res.SerialNumber || res.DeviceId,
+          value: deviceInfo.SerialNumber || deviceInfo.DeviceId,
         }).slice(2)
-      })
-      .catch((err) => Logger.error(TAG, 'getDeviceInfo error', err))
+      } catch (error) {
+        Logger.error(TAG, 'getDeviceInfo error', error)
+      }
+
+      Logger.debug(TAG, 'Segment Analytics Integration initialized!')
+    } catch (error) {
+      Logger.error(TAG, `Segment setup error: ${error.message}\n`, error)
+    }
   }
 
   isEnabled() {
@@ -146,7 +150,4 @@ class ValoraAnalytics {
   }
 }
 
-const ValoraAnalyticsInstance = new ValoraAnalytics()
-ValoraAnalyticsInstance.init()
-
-export default ValoraAnalyticsInstance
+export default new ValoraAnalytics()

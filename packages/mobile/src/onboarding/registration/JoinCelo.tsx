@@ -169,8 +169,8 @@ export class JoinCelo extends React.Component<Props, State> {
     }
 
     if (!e164Number || !isValidNumber || !countryCallingCode) {
-      // Replacing all integers except 0 with and “X” before logging so
-      // we can see if unnecessary symbols or leading 0s were added
+      // Replacing all integers except 0 with a “X” to obfuscate the number
+      // but still allow us to see if symbols or leading 0s were added
       ValoraAnalytics.track(AnalyticsEvents.invalid_phone_number, {
         obfuscatedPhoneNumber: e164Number.replace(/[1-9]/g, 'X'),
       })

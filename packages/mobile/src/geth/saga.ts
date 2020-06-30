@@ -138,7 +138,7 @@ export function* initGethSaga() {
   }
 
   ValoraAnalytics.track(AnalyticsEvents.geth_init_failure, {
-    error: result.message,
+    error: result,
     context: errorContext,
   })
 

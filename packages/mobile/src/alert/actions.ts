@@ -67,6 +67,10 @@ export function showErrorOrFallback(error: any, fallback: ErrorMessages) {
     return showError(error.message)
   }
 
+  ValoraAnalytics.track(AnalyticsEvents.error_fallback, {
+    error: fallback,
+  })
+
   return showError(fallback)
 }
 

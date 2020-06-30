@@ -16,6 +16,7 @@ import {
   TransactionEvents,
   VerificationEvents,
 } from 'src/analytics/Events'
+import { ErrorMessages } from 'src/app/ErrorMessages'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { RecipientKind } from 'src/recipients/recipient'
 
@@ -29,6 +30,9 @@ interface AppEventsProperties {
   }
   [AppEvents.error_displayed]: {
     error: string
+  }
+  [AppEvents.error_fallback]: {
+    error: ErrorMessages
   }
   [AppEvents.error_boundary]: {
     error: string

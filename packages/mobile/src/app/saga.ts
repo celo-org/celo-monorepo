@@ -113,7 +113,6 @@ function* watchAppState() {
       const newState = yield take(appStateChannel)
       Logger.debug(`${TAG}@monitorAppState`, `App changed state: ${newState}`)
       yield put(setAppState(newState))
-      // place event here
     } catch (error) {
       ValoraAnalytics.track(AnalyticsEvents.app_state_error, { error: error.message })
       Logger.error(`${TAG}@monitorAppState`, `App state Error`, error)

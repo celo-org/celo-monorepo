@@ -55,7 +55,8 @@ export class App extends React.Component {
     const appLoadedAt: Date = new Date()
     const appStartListener = DeviceEventEmitter.addListener(
       'AppStartedLoading',
-      (appInitializedAtString: string) => {
+      async (appInitializedAtString: string) => {
+        await ValoraAnalytics.init()
         const appInitializedAt = new Date(appInitializedAtString)
         const loadingDuration = appLoadedAt.getTime() - appInitializedAt.getTime()
         ValoraAnalytics.startSession(AnalyticsEvents.app_launched, { loadingDuration })

@@ -2,6 +2,7 @@ export enum AppEvents {
   app_launched = 'app_launched',
   app_state_error = 'app_state_error',
   error_displayed = 'error_displayed',
+  error_fallback = 'error_fallback',
   error_boundary = 'error_boundary',
   user_restart = 'user_restart',
   fetch_balance = 'fetch_balance',

@@ -317,7 +317,7 @@ export function* doRedeemInvite(inviteCode: string) {
     )
     if (tempAccountBalanceWei.isLessThanOrEqualTo(0)) {
       ValoraAnalytics.track(AnalyticsEvents.redeem_invite_failed, {
-        error: 'Escrow account has no balance',
+        error: 'Empty invite',
       })
       yield put(showError(ErrorMessages.EMPTY_INVITE_CODE))
       return false
