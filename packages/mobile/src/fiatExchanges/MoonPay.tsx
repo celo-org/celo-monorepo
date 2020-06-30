@@ -52,7 +52,7 @@ function FiatExchangeWeb({ route }: Props) {
           currency: celoCurrencyCode,
           address: account,
           fiatCurrency: localCurrencyCode,
-          ...(localAmount && { fiatAmount: localAmount.toString() }),
+          fiatAmount: localAmount?.toString(),
         }),
       })
       const json = await response.json()
