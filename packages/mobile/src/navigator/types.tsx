@@ -87,7 +87,9 @@ export type StackParamList = {
     currencyCode: LocalCurrencyCode
     isExplanationOpen?: boolean
   }
-  [Screens.MoonPay]: undefined
+  [Screens.MoonPay]: {
+    amount: BigNumber
+  }
   [Screens.GoldEducation]: undefined
   [Screens.ImportWallet]:
     | {

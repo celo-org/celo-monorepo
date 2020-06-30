@@ -121,7 +121,7 @@ const commonScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen name={Screens.DappKitAccountAuth} component={DappKitAccountScreen} />
       <Navigator.Screen name={Screens.DappKitSignTxScreen} component={DappKitSignTxScreen} />
       <Navigator.Screen name={Screens.DappKitTxDataScreen} component={DappKitTxDataScreen} />
-      <Navigator.Screen name={Screens.Debug} component={Debug} />
+      <Navigator.Screen name={Screens.Debug} component={Debug} options={Debug.navigationOptions} />
       <Navigator.Screen
         name={Screens.PhoneNumberLookupQuota}
         component={PhoneNumberLookupQuotaScreen}
@@ -453,8 +453,10 @@ const mapStateToProps = (state: RootState) => {
   }
 }
 
+type InitialRouteName = ExtractProps<typeof Stack.Navigator>['initialRouteName']
+
 export function MainStackScreen() {
-  const [initialRouteName, setInitialRoute] = React.useState<Screens | undefined>(undefined)
+  const [initialRouteName, setInitialRoute] = React.useState<InitialRouteName>(undefined)
   React.useEffect(() => {
     const {
       language,
@@ -466,7 +468,7 @@ export function MainStackScreen() {
       hasSeenVerificationNux,
     } = mapStateToProps(store.getState())
 
-    let initialRoute: Screens | undefined
+    let initialRoute: InitialRouteName
 
     if (!language) {
       initialRoute = Screens.Language
@@ -486,19 +488,16 @@ export function MainStackScreen() {
 
     setInitialRoute(initialRoute)
 
-    SplashScreen.hide()
-  })
+    // Wait for next frame to avoid slight gap when hiding the splash
+    requestAnimationFrame(() => SplashScreen.hide())
+  }, [])
 
   if (!initialRouteName) {
     return <AppLoading />
   }
 
   return (
-    <Stack.Navigator
-      // @ts-ignore
-      initialRouteName={initialRouteName}
-      screenOptions={emptyHeader}
-    >
+    <Stack.Navigator initialRouteName={initialRouteName} screenOptions={emptyHeader}>
       <Stack.Screen name={Screens.DrawerNavigator} component={DrawerNavigator} options={noHeader} />
       {commonScreens(Stack)}
       {sendScreens(Stack)}

@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ErrorScreen with errorMessage renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "alignItems": "center",
@@ -161,11 +161,11 @@ exports[`ErrorScreen with errorMessage renders correctly 1`] = `
       </View>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
 
 exports[`ErrorScreen without errorMessage renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "alignItems": "center",
@@ -325,5 +325,5 @@ exports[`ErrorScreen without errorMessage renders correctly 1`] = `
       </View>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
