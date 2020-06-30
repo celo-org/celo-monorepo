@@ -16,6 +16,7 @@ const rbacHelmChartPath = '../helm-charts/oracle-rbac'
 export enum OracleAzureContext {
   PRIMARY = 'PRIMARY',
   SECONDARY = 'SECONDARY',
+  TERTIARY = 'TERTIARY',
 }
 
 /**
@@ -62,6 +63,12 @@ const oracleAzureContextClusterConfigEnvVars: {
     resourceGroup: envVar.ORACLE_SECONDARY_AZURE_KUBERNETES_RESOURCE_GROUP,
     clusterName: envVar.ORACLE_SECONDARY_AZURE_KUBERNETES_CLUSTER_NAME,
   },
+  [OracleAzureContext.TERTIARY]: {
+    subscriptionId: envVar.ORACLE_TERTIARY_AZURE_SUBSCRIPTION_ID,
+    tenantId: envVar.ORACLE_TERTIARY_AZURE_TENANT_ID,
+    resourceGroup: envVar.ORACLE_TERTIARY_AZURE_KUBERNETES_RESOURCE_GROUP,
+    clusterName: envVar.ORACLE_TERTIARY_AZURE_KUBERNETES_CLUSTER_NAME,
+  },
 }
 
 /**
@@ -80,6 +87,10 @@ const oracleAzureContextOracleIdentityEnvVars: {
   [OracleAzureContext.SECONDARY]: {
     addressAzureKeyVaults: envVar.ORACLE_SECONDARY_ADDRESS_AZURE_KEY_VAULTS,
     addressesFromMnemonicCount: envVar.ORACLE_SECONDARY_ADDRESSES_FROM_MNEMONIC_COUNT,
+  },
+  [OracleAzureContext.TERTIARY]: {
+    addressAzureKeyVaults: envVar.ORACLE_TERTIARY_ADDRESS_AZURE_KEY_VAULTS,
+    addressesFromMnemonicCount: envVar.ORACLE_TERTIARY_ADDRESSES_FROM_MNEMONIC_COUNT,
   },
 }
 
@@ -358,10 +369,18 @@ export function getAzureClusterConfig(context: OracleAzureContext): AzureCluster
 }
 
 /**
- * Given if the desired context is primary, gives the appropriate OracleAzureContext
+ * Gives the appropriate OracleAzureContext. Assumes that only one of
+ * primary, secondary, and tertiary are true.
  */
-export function getOracleAzureContext(primary: boolean): OracleAzureContext {
-  return primary ? OracleAzureContext.PRIMARY : OracleAzureContext.SECONDARY
+export function getOracleAzureContext(argv: OracleArgv): OracleAzureContext {
+  if (argv.primary) {
+    return OracleAzureContext.PRIMARY
+  } else if (argv.secondary) {
+    return OracleAzureContext.SECONDARY
+  } else if (argv.tertiary) {
+    return OracleAzureContext.TERTIARY
+  }
+  throw Error('No valid context provided')
 }
 
 /**
@@ -378,6 +397,7 @@ export function switchToAzureContextCluster(celoEnv: string, context: OracleAzur
 export interface OracleArgv {
   primary: boolean
   secondary: boolean
+  tertiary: boolean
 }
 
 /**
@@ -398,11 +418,28 @@ export function addOracleMiddleware(argv: yargs.Argv) {
       default: false,
       type: 'boolean',
     })
+    .option('tertiary', {
+      description: 'Targets the tertiary oracle k8s cluster',
+      default: false,
+      type: 'boolean',
+    })
     .check((oracleArgv: OracleArgv) => {
-      if (oracleArgv.primary === oracleArgv.secondary) {
-        throw Error('Exactly one of `primary` and `secondary` must be true')
+      // Ensure that only one of these is true
+      const exclusiveBools: boolean[] = [
+        oracleArgv.primary,
+        oracleArgv.secondary,
+        oracleArgv.tertiary,
+      ]
+      let foundTrue = false
+      for (const exclusiveBool of exclusiveBools) {
+        if (exclusiveBool) {
+          if (foundTrue) {
+            throw Error('Exactly one of `primary`, `secondary`, or `tertiary` must be true')
+          }
+          foundTrue = true
+        }
       }
-      return true
+      return foundTrue
     })
 }
 
