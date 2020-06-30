@@ -326,7 +326,7 @@ PODS:
     - React
   - react-native-netinfo (5.8.0):
     - React
-  - react-native-safe-area-context (0.7.3):
+  - react-native-safe-area-context (3.0.6):
     - React
   - react-native-secure-randombytes (3.0.2):
     - React
@@ -776,7 +776,7 @@ SPEC CHECKSUMS:
   react-native-keep-awake: afad8a51dfef9fe9655a6344771be32c8596d774
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
   react-native-netinfo: b9650ab1b8b4362b3c455b1274e4bc48223cc957
-  react-native-safe-area-context: e200d4433aba6b7e60b52da5f37af11f7a0b0392
+  react-native-safe-area-context: e22a8ca00f758273d2408953965cb8db67da7925
   react-native-secure-randombytes: 2d98715ff6b15bdc519cf7d4475dad9d3e96a2c0
   react-native-simple-toast: 58b71ef003f01d2c0bf5dcd2fdccc75861dabade
   react-native-sms: 31fbb9d6ebb565ad32e409eaf9dc70329936a129
