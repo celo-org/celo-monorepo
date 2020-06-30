@@ -68,10 +68,12 @@ export enum OnboardingEvents {
   gold_educate_1_next = 'gold_educate_1_next', // next button on 1st edu screen
   gold_educate_2_next = 'gold_educate_2_next', // next button on 2nd edu screen
   gold_educate_3_next = 'gold_educate_3_next', // next button on 3rd edu screen
+  gold_educate_4_next = 'gold_educate_4_next', // next button on 4th edu screen
 
   gold_cancel1 = 'gold_cancel1', // cancel button on 1st edu screen
   gold_cancel2 = 'gold_cancel2', // cancel button on 2nd edu screen
   gold_cancel3 = 'gold_cancel3', // cancel button on 3rd edu screen
+  gold_cancel4 = 'gold_cancel4', // cancel button on 4th edu screen
 
   exchange_gold_nux = 'exchange_gold_nux',
 

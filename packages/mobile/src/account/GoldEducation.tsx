@@ -69,8 +69,8 @@ function useStep() {
       },
       {
         image: exchangeIcon, // Placeholder Image
-        cancelEvent: CustomEventNames.gold_cancel4,
-        progressEvent: CustomEventNames.gold_educate_4_next,
+        cancelEvent: AnalyticsEvents.gold_cancel4,
+        progressEvent: AnalyticsEvents.gold_educate_4_next,
         screenName: 'Gold_Nux_4',
       },
     ].map((step, index) => {
