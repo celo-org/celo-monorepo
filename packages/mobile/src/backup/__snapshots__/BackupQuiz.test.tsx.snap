@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`BackupQuiz renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -12,16 +12,14 @@ exports[`BackupQuiz renders correctly 1`] = `
     }
   }
 >
-  <SafeAreaView
+  <RNCSafeAreaView
     style={
       Object {
         "height": 35,
-        "paddingRight": 10,
-        "paddingTop": 10,
         "position": "absolute",
-        "right": 0,
-        "top": 0,
-        "width": 70,
+        "right": 10,
+        "top": 10,
+        "width": 60,
         "zIndex": 100,
       }
     }
@@ -39,7 +37,7 @@ exports[`BackupQuiz renders correctly 1`] = `
     >
          
     </Text>
-  </SafeAreaView>
+  </RNCSafeAreaView>
   <RCTScrollView
     contentContainerStyle={
       Object {
@@ -1172,5 +1170,5 @@ exports[`BackupQuiz renders correctly 1`] = `
       </View>
     </View>
   </RCTScrollView>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
