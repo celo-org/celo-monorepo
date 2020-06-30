@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -771,11 +771,11 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
       </View>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
 
 exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation fails 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -1545,11 +1545,11 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
       </View>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
 
 exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation fails 2`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -2316,5 +2316,5 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
       </View>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

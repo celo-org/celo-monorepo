@@ -5,7 +5,7 @@ import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -13,7 +13,7 @@ import { exitBackupFlow } from 'src/app/actions'
 import { Namespaces, withTranslation } from 'src/i18n'
 import SafeguardsPeopleIcon from 'src/icons/SafeguardsPeopleIcon'
 import { headerWithBackButton } from 'src/navigator/Headers'
-import { navigate, navigateHome, navigateProtected } from 'src/navigator/NavigationService'
+import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
@@ -36,8 +36,7 @@ class BackupSocialIntro extends React.Component<Props> {
   }
 
   onPressContinue = () => {
-    const navigateMethod = this.isIncomingFromBackupFlow() ? navigate : navigateProtected
-    navigateMethod(Screens.BackupSocial)
+    navigate(Screens.BackupSocial)
   }
 
   onPressSkip = () => {

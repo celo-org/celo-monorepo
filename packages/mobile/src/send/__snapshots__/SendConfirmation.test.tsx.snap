@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`SendConfirmation renders correctly for send payment confirmation 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -114,6 +114,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                       "lineHeight": 22,
                     }
                   }
+                  testID="HeaderText"
                 >
                   sending
                 </Text>
@@ -193,6 +194,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
             scrollOffset={0}
             scrollOffsetMax={0}
             scrollTo={null}
+            statusBarTranslucent={true}
             supportedOrientations={
               Array [
                 "portrait",
@@ -239,6 +241,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
               scrollOffset={0}
               scrollOffsetMax={0}
               scrollTo={null}
+              statusBarTranslucent={true}
               style={
                 Object {
                   "flex": 1,
@@ -259,7 +262,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
               }
               swipeThreshold={100}
             >
-              <SafeAreaView>
+              <RNCSafeAreaView>
                 <View
                   style={
                     Array [
@@ -457,7 +460,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                     </View>
                   </View>
                 </View>
-              </SafeAreaView>
+              </RNCSafeAreaView>
             </View>
           </Modal>
         </View>
@@ -850,11 +853,11 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
       </View>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
 
 exports[`SendConfirmation renders correctly for send payment confirmation when fee calculation fails 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -967,6 +970,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                       "lineHeight": 22,
                     }
                   }
+                  testID="HeaderText"
                 >
                   sending
                 </Text>
@@ -1046,6 +1050,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             scrollOffset={0}
             scrollOffsetMax={0}
             scrollTo={null}
+            statusBarTranslucent={true}
             supportedOrientations={
               Array [
                 "portrait",
@@ -1092,6 +1097,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               scrollOffset={0}
               scrollOffsetMax={0}
               scrollTo={null}
+              statusBarTranslucent={true}
               style={
                 Object {
                   "flex": 1,
@@ -1112,7 +1118,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               }
               swipeThreshold={100}
             >
-              <SafeAreaView>
+              <RNCSafeAreaView>
                 <View
                   style={
                     Array [
@@ -1310,7 +1316,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     </View>
                   </View>
                 </View>
-              </SafeAreaView>
+              </RNCSafeAreaView>
             </View>
           </Modal>
         </View>
@@ -1703,11 +1709,11 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
       </View>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
 
 exports[`SendConfirmation renders correctly for send payment confirmation when fee calculation fails 2`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -1820,6 +1826,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                       "lineHeight": 22,
                     }
                   }
+                  testID="HeaderText"
                 >
                   sending
                 </Text>
@@ -1899,6 +1906,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             scrollOffset={0}
             scrollOffsetMax={0}
             scrollTo={null}
+            statusBarTranslucent={true}
             supportedOrientations={
               Array [
                 "portrait",
@@ -1945,6 +1953,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               scrollOffset={0}
               scrollOffsetMax={0}
               scrollTo={null}
+              statusBarTranslucent={true}
               style={
                 Object {
                   "flex": 1,
@@ -1965,7 +1974,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               }
               swipeThreshold={100}
             >
-              <SafeAreaView>
+              <RNCSafeAreaView>
                 <View
                   style={
                     Array [
@@ -2163,7 +2172,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     </View>
                   </View>
                 </View>
-              </SafeAreaView>
+              </RNCSafeAreaView>
             </View>
           </Modal>
         </View>
@@ -2553,11 +2562,11 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
       </View>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
 
 exports[`SendConfirmation renders correctly when there are multiple user addresses (should show edit button) 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -2670,6 +2679,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                       "lineHeight": 22,
                     }
                   }
+                  testID="HeaderText"
                 >
                   sending
                 </Text>
@@ -2810,6 +2820,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
             scrollOffset={0}
             scrollOffsetMax={0}
             scrollTo={null}
+            statusBarTranslucent={true}
             supportedOrientations={
               Array [
                 "portrait",
@@ -2856,6 +2867,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
               scrollOffset={0}
               scrollOffsetMax={0}
               scrollTo={null}
+              statusBarTranslucent={true}
               style={
                 Object {
                   "flex": 1,
@@ -2876,7 +2888,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
               }
               swipeThreshold={100}
             >
-              <SafeAreaView>
+              <RNCSafeAreaView>
                 <View
                   style={
                     Array [
@@ -3074,7 +3086,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                     </View>
                   </View>
                 </View>
-              </SafeAreaView>
+              </RNCSafeAreaView>
             </View>
           </Modal>
         </View>
@@ -3467,5 +3479,5 @@ exports[`SendConfirmation renders correctly when there are multiple user address
       </View>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

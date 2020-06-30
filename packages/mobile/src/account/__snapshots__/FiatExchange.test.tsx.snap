@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`FiatExchange renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -14,8 +14,10 @@ exports[`FiatExchange renders correctly 1`] = `
       Object {
         "alignItems": "center",
         "backgroundColor": "transparent",
-        "borderBottomColor": "#EDEEEF",
-        "borderBottomWidth": 0,
+        "borderBottomColor": AnimatedValue {
+          " __value": NaN,
+        },
+        "borderBottomWidth": 1,
         "flexDirection": "row",
         "height": 62,
         "justifyContent": "space-between",
@@ -218,5 +220,5 @@ exports[`FiatExchange renders correctly 1`] = `
       </View>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

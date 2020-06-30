@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BackHandler, StyleSheet } from 'react-native'
 import RNExitApp from 'react-native-exit-app'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
 import { appUnlock } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -25,7 +25,7 @@ function PincodeLock() {
 
   function onWrongPin() {
     setPin('')
-    setErrorText(t(ErrorMessages.INCORRECT_PIN))
+    setErrorText(t(`${Namespaces.global}:${ErrorMessages.INCORRECT_PIN}`))
   }
 
   function onCorrectPin() {

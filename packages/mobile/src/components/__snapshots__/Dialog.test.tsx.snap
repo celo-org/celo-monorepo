@@ -13,6 +13,7 @@ exports[`renders correctly 1`] = `
   scrollOffset={0}
   scrollOffsetMax={0}
   scrollTo={null}
+  statusBarTranslucent={true}
   supportedOrientations={
     Array [
       "portrait",
@@ -59,6 +60,7 @@ exports[`renders correctly 1`] = `
     scrollOffset={0}
     scrollOffsetMax={0}
     scrollTo={null}
+    statusBarTranslucent={true}
     style={
       Object {
         "flex": 1,
@@ -79,7 +81,7 @@ exports[`renders correctly 1`] = `
     }
     swipeThreshold={100}
   >
-    <SafeAreaView>
+    <RNCSafeAreaView>
       <View
         style={
           Array [
@@ -196,7 +198,7 @@ exports[`renders correctly 1`] = `
           </View>
         </View>
       </View>
-    </SafeAreaView>
+    </RNCSafeAreaView>
   </View>
 </Modal>
 `;

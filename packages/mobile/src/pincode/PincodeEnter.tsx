@@ -7,7 +7,7 @@ import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -50,7 +50,10 @@ class PincodeEnter extends React.Component<Props, State> {
   }
 
   onWrongPin = () => {
-    this.setState({ pin: '', errorText: this.props.t(ErrorMessages.INCORRECT_PIN) })
+    this.setState({
+      pin: '',
+      errorText: this.props.t(`${Namespaces.global}:${ErrorMessages.INCORRECT_PIN}`),
+    })
   }
 
   onPressConfirm = () => {
