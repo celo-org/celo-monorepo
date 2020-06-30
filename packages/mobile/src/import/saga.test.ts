@@ -6,11 +6,7 @@ import { setBackupCompleted } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { refreshAllBalances } from 'src/home/actions'
-import {
-  backupPhraseEmpty,
-  importBackupPhraseFailure,
-  importBackupPhraseSuccess,
-} from 'src/import/actions'
+import { importBackupPhraseFailure, importBackupPhraseSuccess } from 'src/import/actions'
 import { importBackupPhraseSaga } from 'src/import/saga'
 import { redeemInviteSuccess } from 'src/invite/actions'
 import { fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
@@ -55,8 +51,8 @@ describe('Import wallet saga', () => {
       .provide([
         [call(waitWeb3LastBlock), true],
         [matchers.call.fn(fetchTokenBalanceInWeiWithRetry), new BigNumber(0)],
+        [matchers.call.fn(fetchTokenBalanceInWeiWithRetry), new BigNumber(0)],
       ])
-      .put(backupPhraseEmpty())
       .run()
   })
 })

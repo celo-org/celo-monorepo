@@ -10,7 +10,7 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
   }
 >
   <View>
-    <SafeAreaView>
+    <RNCSafeAreaView>
       <Text
         style={
           Object {
@@ -801,7 +801,7 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
           />
         </View>
       </RCTScrollView>
-    </SafeAreaView>
+    </RNCSafeAreaView>
   </View>
 </RCTScrollView>
 `;

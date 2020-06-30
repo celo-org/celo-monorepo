@@ -9,16 +9,14 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
     }
   }
 >
-  <SafeAreaView
+  <RNCSafeAreaView
     style={
       Object {
         "height": 35,
-        "paddingRight": 10,
-        "paddingTop": 10,
         "position": "absolute",
-        "right": 0,
-        "top": 0,
-        "width": 70,
+        "right": 10,
+        "top": 10,
+        "width": 60,
         "zIndex": 100,
       }
     }
@@ -36,7 +34,7 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
     >
          
     </Text>
-  </SafeAreaView>
+  </RNCSafeAreaView>
   <RCTScrollView
     contentContainerStyle={
       Array [
@@ -46,9 +44,7 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
           "paddingHorizontal": 20,
           "paddingTop": 34,
         },
-        Object {
-          "marginBottom": 0,
-        },
+        null,
       ]
     }
     keyboardShouldPersistTaps="always"
@@ -250,5 +246,21 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
       </View>
     </View>
   </RCTScrollView>
+  <View
+    collapsable={false}
+    style={
+      Array [
+        Object {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+        },
+        Object {
+          "height": 0,
+        },
+        undefined,
+      ]
+    }
+  />
 </View>
 `;

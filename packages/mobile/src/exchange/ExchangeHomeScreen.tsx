@@ -11,7 +11,7 @@ import React, { useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import Animated from 'react-native-reanimated'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -269,7 +269,6 @@ const styles = StyleSheet.create({
   goldPriceValues: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    justifyContent: 'center',
   },
   goldPriceCurrentValue: {
     height: 27,
@@ -284,7 +283,6 @@ const styles = StyleSheet.create({
   },
   goldPriceWentDown: {
     ...fontStyles.regular,
-    marginBottom: 2, // vertically align with the current price
     marginLeft: 4,
     color: colors.warning,
   },
