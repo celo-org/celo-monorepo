@@ -7,7 +7,7 @@ import { HeaderHeightContext } from '@react-navigation/stack'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
-import { SafeAreaConsumer } from 'react-native-safe-area-view'
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import CodeInput, { CodeInputStatus } from 'src/components/CodeInput'
 import DevSkipButton from 'src/components/DevSkipButton'
@@ -136,7 +136,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
     return (
       <HeaderHeightContext.Consumer>
         {(headerHeight) => (
-          <SafeAreaConsumer>
+          <SafeAreaInsetsContext.Consumer>
             {(insets) => (
               <View style={styles.container}>
                 <DevSkipButton nextScreen={Screens.VerificationEducationScreen} />
@@ -196,7 +196,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
                 <KeyboardSpacer onToggle={this.onToggleKeyboard} />
               </View>
             )}
-          </SafeAreaConsumer>
+          </SafeAreaInsetsContext.Consumer>
         )}
       </HeaderHeightContext.Consumer>
     )

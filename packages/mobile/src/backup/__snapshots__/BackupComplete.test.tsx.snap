@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`BackupComplete renders correctly when social backup is complete 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -34,11 +34,11 @@ exports[`BackupComplete renders correctly when social backup is complete 1`] = `
       backupComplete.2
     </Text>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
 
 exports[`BackupComplete renders correctly when social backup is not complete 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -69,5 +69,5 @@ exports[`BackupComplete renders correctly when social backup is not complete 1`]
       />
     </svg>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
