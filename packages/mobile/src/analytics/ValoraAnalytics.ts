@@ -18,7 +18,6 @@ async function getDeviceInfo() {
     BundleId: DeviceInfo.getBundleId(),
     Carrier: await DeviceInfo.getCarrier(),
     DeviceId: DeviceInfo.getDeviceId(),
-    DeviceName: await DeviceInfo.getDeviceName(), // NOTE(nitya) this might contain PII, monitor
     FirstInstallTime: await DeviceInfo.getFirstInstallTime(),
     FontScale: await DeviceInfo.getFontScale(),
     FreeDiskStorage: await DeviceInfo.getFreeDiskStorage(),
@@ -62,14 +61,15 @@ class ValoraAnalytics {
 
   constructor() {
     this.sessionId = ''
+    this.userAddress = ''
     this.deviceInfo = {}
-    this.userAddress = 'not yet set'
 
     if (!SEGMENT_API_KEY) {
       Logger.debug(TAG, 'Segment API Key not present, likely due to environment. Skipping enabling')
-      return
     }
+  }
 
+  init() {
     Analytics.setup(SEGMENT_API_KEY, SEGMENT_OPTIONS).catch((error) =>
       Logger.debug(TAG, `Segment setup error: ${error.message}\n`, error)
     )
@@ -89,7 +89,6 @@ class ValoraAnalytics {
   isEnabled() {
     // Remove __DEV__ here to test analytics in dev builds
     return !__DEV__ && store.getState().app.analyticsEnabled
-    // return store.getState().app.analyticsEnabled
   }
 
   startSession(
@@ -147,4 +146,7 @@ class ValoraAnalytics {
   }
 }
 
-export default new ValoraAnalytics()
+const ValoraAnalyticsInstance = new ValoraAnalytics()
+ValoraAnalyticsInstance.init()
+
+export default ValoraAnalyticsInstance

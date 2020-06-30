@@ -222,7 +222,7 @@ function* navigateToQuotaPurchaseScreen() {
     yield new Promise((resolve, reject) => {
       navigate(Screens.PhoneNumberLookupQuota, {
         onBuy: resolve,
-        onSkip: () => reject(new Error('skipped')),
+        onSkip: () => reject('skipped'),
       })
     })
 
@@ -254,8 +254,7 @@ function* navigateToQuotaPurchaseScreen() {
     navigateBack()
     return true
   } catch (error) {
-    // CC Rossy
-    if (error.message === 'skipped') {
+    if (error === 'skipped') {
       ValoraAnalytics.track(AnalyticsEvents.phone_number_quota_purchase_skip)
     } else {
       ValoraAnalytics.track(AnalyticsEvents.phone_number_quota_purchase_failure, {
