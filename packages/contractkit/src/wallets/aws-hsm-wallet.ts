@@ -20,7 +20,6 @@ function toArrayBuffer(buffer: Buffer): ArrayBuffer {
 export class AwsHsmWallet extends RemoteWallet implements Wallet {
   constructor() {
     super()
-    console.log('new aws wallet')
   }
 
   protected async loadAccountSigners(): Promise<Map<Address, Signer>> {
