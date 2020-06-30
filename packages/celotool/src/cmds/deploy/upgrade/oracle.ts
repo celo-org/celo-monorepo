@@ -1,7 +1,6 @@
 import { UpgradeArgv } from 'src/cmds/deploy/upgrade'
 import {
   addOracleMiddleware,
-  getOracleAzureContext,
   OracleArgv,
   switchToAzureContextCluster,
   upgradeOracleChart,
@@ -26,7 +25,6 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: OracleUpgradeArgv) => {
-  const oracleAzureContext = getOracleAzureContext(argv)
-  await switchToAzureContextCluster(argv.celoEnv, oracleAzureContext)
-  await upgradeOracleChart(argv.celoEnv, oracleAzureContext, argv.useForno)
+  await switchToAzureContextCluster(argv.celoEnv, argv.context)
+  await upgradeOracleChart(argv.celoEnv, argv.context, argv.useForno)
 }

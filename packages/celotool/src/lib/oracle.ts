@@ -10,13 +10,10 @@ import yargs from 'yargs'
 const helmChartPath = '../helm-charts/oracle'
 const rbacHelmChartPath = '../helm-charts/oracle-rbac'
 
-/**
- * Each context is a separate AKS cluster
- */
 export enum OracleAzureContext {
   PRIMARY = 'PRIMARY',
   SECONDARY = 'SECONDARY',
-  TERTIARY = 'AZURE_EASTUS2',
+  TERTIARY = 'TERTIARY'
 }
 
 /**
@@ -48,7 +45,7 @@ interface OracleConfig {
 /**
  * Env vars corresponding to each value for the AzureClusterConfig for a particular context
  */
-const oracleAzureContextClusterConfigDynamicEnvVars: { [k in keyof AzureClusterConfig]: DynamicEnvVar } = {
+const oracleContextAzureClusterConfigDynamicEnvVars: { [k in keyof AzureClusterConfig]: DynamicEnvVar } = {
   subscriptionId: DynamicEnvVar.ORACLE_AZURE_SUBSCRIPTION_ID,
   tenantId: DynamicEnvVar.ORACLE_AZURE_TENANT_ID,
   resourceGroup: DynamicEnvVar.ORACLE_AZURE_KUBERNETES_RESOURCE_GROUP,
@@ -63,21 +60,9 @@ interface OracleIdentityConfig {
 /**
  * Env vars corresponding to each value for the OracleConfig for a particular context
  */
-const oracleAzureContextOracleIdentityConfigDynamicEnvVars: { [k in keyof OracleIdentityConfig]: DynamicEnvVar } = {
+const oracleContextOracleIdentityConfigDynamicEnvVars: { [k in keyof OracleIdentityConfig]: DynamicEnvVar } = {
   addressAzureKeyVaults: DynamicEnvVar.ORACLE_ADDRESS_AZURE_KEY_VAULTS,
   addressesFromMnemonicCount: DynamicEnvVar.ORACLE_ADDRESSES_FROM_MNEMONIC_COUNT,
-  // [OracleAzureContext.PRIMARY]: {
-  //   addressAzureKeyVaults: envVar.ORACLE_PRIMARY_ADDRESS_AZURE_KEY_VAULTS,
-  //   addressesFromMnemonicCount: envVar.ORACLE_PRIMARY_ADDRESSES_FROM_MNEMONIC_COUNT,
-  // },
-  // [OracleAzureContext.SECONDARY]: {
-  //   addressAzureKeyVaults: envVar.ORACLE_SECONDARY_ADDRESS_AZURE_KEY_VAULTS,
-  //   addressesFromMnemonicCount: envVar.ORACLE_SECONDARY_ADDRESSES_FROM_MNEMONIC_COUNT,
-  // },
-  // [OracleAzureContext.TERTIARY]: {
-  //   addressAzureKeyVaults: envVar.ORACLE_TERTIARY_ADDRESS_AZURE_KEY_VAULTS,
-  //   addressesFromMnemonicCount: envVar.ORACLE_TERTIARY_ADDRESSES_FROM_MNEMONIC_COUNT,
-  // },
 }
 
 function releaseName(celoEnv: string) {
@@ -86,7 +71,7 @@ function releaseName(celoEnv: string) {
 
 export async function installHelmChart(
   celoEnv: string,
-  context: OracleAzureContext,
+  oracleContext: string,
   useForno: boolean
 ) {
   // First install the oracle-rbac helm chart.
@@ -98,37 +83,37 @@ export async function installHelmChart(
     celoEnv,
     releaseName(celoEnv),
     helmChartPath,
-    await helmParameters(celoEnv, context, useForno)
+    await helmParameters(celoEnv, oracleContext, useForno)
   )
 }
 
 export async function upgradeOracleChart(
   celoEnv: string,
-  context: OracleAzureContext,
+  oracleContext: string,
   useFullNodes: boolean
 ) {
   return upgradeGenericHelmChart(
     celoEnv,
     releaseName(celoEnv),
     helmChartPath,
-    await helmParameters(celoEnv, context, useFullNodes)
+    await helmParameters(celoEnv, oracleContext, useFullNodes)
   )
 }
 
-export async function removeHelmRelease(celoEnv: string, context: OracleAzureContext) {
+export async function removeHelmRelease(celoEnv: string, oracleContext: string) {
   await removeGenericHelmChart(releaseName(celoEnv))
   await removeOracleRBACHelmRelease(celoEnv)
-  const oracleConfig = getOracleConfig(context)
+  const oracleConfig = getOracleConfig(oracleContext)
   for (const identity of oracleConfig.identities) {
     // If the identity is using Azure HSM signing, clean it up too
     if (identity.azureHsmIdentity) {
-      await deleteOracleAzureIdentity(context, identity)
+      await deleteOracleAzureIdentity(oracleContext, identity)
     }
   }
 }
 
-async function helmParameters(celoEnv: string, context: OracleAzureContext, useForno: boolean) {
-  const oracleConfig = getOracleConfig(context)
+async function helmParameters(celoEnv: string, oracleContext: string, useForno: boolean) {
+  const oracleConfig = getOracleConfig(oracleContext)
 
   const kubeAuthTokenName = await rbacAuthTokenName(celoEnv)
   const replicas = oracleConfig.identities.length
@@ -150,7 +135,7 @@ async function helmParameters(celoEnv: string, context: OracleAzureContext, useF
     `--set oracle.metrics.enabled=true`,
     `--set oracle.metrics.prometheusPort=9090`,
     `--set-string oracle.unusedOracleAddresses='${fetchEnvOrFallback(envVar.ORACLE_UNUSED_ORACLE_ADDRESSES, '').split(',').join('\\\,')}'`
-  ].concat(await oracleIdentityHelmParameters(context, oracleConfig))
+  ].concat(await oracleIdentityHelmParameters(oracleContext, oracleConfig))
 }
 
 /**
@@ -158,7 +143,7 @@ async function helmParameters(celoEnv: string, context: OracleAzureContext, useF
  * Supports both private key and Azure HSM signing.
  */
 async function oracleIdentityHelmParameters(
-  context: OracleAzureContext,
+  oracleContext: string,
   oracleConfig: OracleConfig
 ) {
   const replicas = oracleConfig.identities.length
@@ -171,7 +156,7 @@ async function oracleIdentityHelmParameters(
     // about an Azure Key Vault that houses an HSM with the address provided.
     // We provide the appropriate parameters for both of those types of identities.
     if (oracleIdentity.azureHsmIdentity) {
-      const azureIdentity = await createOracleAzureIdentityIfNotExists(context, oracleIdentity)
+      const azureIdentity = await createOracleAzureIdentityIfNotExists(oracleContext, oracleIdentity)
       params = params.concat([
         `${prefix}.azure.id=${azureIdentity.id}`,
         `${prefix}.azure.clientId=${azureIdentity.clientId}`,
@@ -191,10 +176,10 @@ async function oracleIdentityHelmParameters(
  * called when an oracle identity is using an Azure Key Vault for HSM signing
  */
 async function createOracleAzureIdentityIfNotExists(
-  context: OracleAzureContext,
+  oracleContext: string,
   oracleIdentity: OracleIdentity
 ) {
-  const clusterConfig = getAzureClusterConfig(context)
+  const clusterConfig = getAzureClusterConfig(oracleContext)
   const identity = await createIdentityIfNotExists(clusterConfig, oracleIdentity.azureHsmIdentity!.identityName!)
   // We want to grant the identity for the cluster permission to manage the oracle identity.
   // Get the correct object ID depending on the cluster configuration, either
@@ -236,10 +221,10 @@ async function setOracleKeyVaultPolicyIfNotSet(
  * deleteOracleAzureIdentity deletes the key vault policy and the oracle's managed identity
  */
 async function deleteOracleAzureIdentity(
-  context: OracleAzureContext,
+  oracleContext: string,
   oracleIdentity: OracleIdentity
 ) {
-  const clusterConfig = getAzureClusterConfig(context)
+  const clusterConfig = getAzureClusterConfig(oracleContext)
   await deleteOracleKeyVaultPolicy(clusterConfig, oracleIdentity)
   return deleteIdentity(clusterConfig, oracleIdentity.azureHsmIdentity!.identityName)
 }
@@ -257,9 +242,9 @@ async function deleteOracleKeyVaultPolicy(
 /**
  * Gives a config for all oracles for a particular context
  */
-function getOracleConfig(context: OracleAzureContext): OracleConfig {
+function getOracleConfig(oracleContext: string): OracleConfig {
   return {
-    identities: getOracleIdentities(context),
+    identities: getOracleIdentities(oracleContext),
   }
 }
 
@@ -295,15 +280,15 @@ function getOracleConfig(context: OracleAzureContext): OracleConfig {
  * the identities are created from that. Otherwise, the identities are created
  * with private keys generated by the mnemonic.
  */
-function getOracleIdentities(context: OracleAzureContext): OracleIdentity[] {
+function getOracleIdentities(oracleContext: string): OracleIdentity[] {
   // const oracleIdentityEnvVars = oracleAzureContextOracleIdentityEnvVars[context]
   // const addressAzureKeyVaults = fetchEnvOrFallback(oracleIdentityEnvVars.addressAzureKeyVaults, '')
   const {
     addressAzureKeyVaults,
     addressesFromMnemonicCount,
-  } = getOracleAzureContextDynamicEnvVarValues(
-    oracleAzureContextOracleIdentityConfigDynamicEnvVars,
-    context,
+  } = getOracleContextDynamicEnvVarValues(
+    oracleContextOracleIdentityConfigDynamicEnvVars,
+    oracleContext,
     {
       addressAzureKeyVaults: '',
       addressesFromMnemonicCount: '',
@@ -384,30 +369,16 @@ function getOracleAzureIdentityName(keyVaultName: string, address: string) {
 
 /**
  * Fetches the env vars for a particular context
- * @param context the OracleAzureContext to use
+ * @param oracleContext the oracle context to use
  * @return an AzureClusterConfig for the context
  */
-export function getAzureClusterConfig(context: OracleAzureContext): AzureClusterConfig {
-  return getOracleAzureContextDynamicEnvVarValues(oracleAzureContextClusterConfigDynamicEnvVars, context)
-  // const clusterConfig: AzureClusterConfig = {
-  //   subscriptionId: '',
-  //   tenantId: '',
-  //   resourceGroup: '',
-  //   clusterName: '',
-  // }
-  // for (const k of Object.keys(oracleAzureContextClusterConfigDynamicEnvVars)) {
-  //   const key = k as keyof AzureClusterConfig
-  //   const dynamicEnvVar = oracleAzureContextClusterConfigDynamicEnvVars[key]
-  //   clusterConfig[key] = fetchEnv(getDynamicEnvVarName(dynamicEnvVar, {
-  //     context
-  //   }))
-  // }
-  // return clusterConfig
+export function getAzureClusterConfig(oracleContext: string): AzureClusterConfig {
+  return getOracleContextDynamicEnvVarValues(oracleContextAzureClusterConfigDynamicEnvVars, oracleContext)
 }
 
-function getOracleAzureContextDynamicEnvVarValues<T>(
+export function getOracleContextDynamicEnvVarValues<T>(
   dynamicEnvVars: { [k in keyof T]: DynamicEnvVar },
-  context: OracleAzureContext,
+  oracleContext: string,
   defaultValues?: { [k in keyof T]: string }
 ): {
   [k in keyof T]: string
@@ -417,7 +388,7 @@ function getOracleAzureContextDynamicEnvVarValues<T>(
       const key = k as keyof T
       const dynamicEnvVar = dynamicEnvVars[key]
       const dynamicEnvVarName = getDynamicEnvVarName(dynamicEnvVar, {
-        context
+        oracleContext
       })
       const defaultValue = defaultValues ? defaultValues[key] : undefined
       const value = defaultValue !== undefined ?
@@ -431,27 +402,21 @@ function getOracleAzureContextDynamicEnvVarValues<T>(
   {})
 }
 
-/**
- * Gives the appropriate OracleAzureContext. Assumes that only one of
- * primary, secondary, and tertiary are true.
- */
-export function getOracleAzureContext(argv: OracleArgv): OracleAzureContext {
-  if (argv.primary) {
-    return OracleAzureContext.PRIMARY
-  } else if (argv.secondary) {
-    return OracleAzureContext.SECONDARY
-  } else if (argv.tertiary) {
-    return OracleAzureContext.TERTIARY
+function coerceOracleContext(rawContextStr: string): string {
+  const context = rawContextStr
+    .toUpperCase()
+    .replace(/-/g, '_')
+  if (!RegExp('^[A-Z0-9][A-Z0-9_]*[A-Z0-9]$').test(context)) {
+    throw Error(`Invalid oracle context. Raw ${rawContextStr}, implied ${context}`)
   }
-  throw Error('No valid context provided')
+  return context
 }
 
 /**
  * Switches to the AKS cluster associated with the given context
  */
-export function switchToAzureContextCluster(celoEnv: string, context: OracleAzureContext) {
-  const azureClusterConfig = getAzureClusterConfig(context)
-  console.log('azureClusterConfig', azureClusterConfig)
+export function switchToAzureContextCluster(celoEnv: string, oracleContext: string) {
+  const azureClusterConfig = getAzureClusterConfig(oracleContext)
   return switchToCluster(celoEnv, azureClusterConfig)
 }
 
@@ -459,9 +424,7 @@ export function switchToAzureContextCluster(celoEnv: string, context: OracleAzur
  * yargs argv type for an oracle related command.
  */
 export interface OracleArgv {
-  primary: boolean
-  secondary: boolean
-  tertiary: boolean
+  context: string
 }
 
 /**
@@ -472,39 +435,11 @@ export interface OracleArgv {
  */
 export function addOracleMiddleware(argv: yargs.Argv) {
   return addCeloEnvMiddleware(argv)
-    .option('primary', {
-      description: 'Targets the primary oracle k8s cluster',
-      default: false,
-      type: 'boolean',
+    .option('context', {
+      description: 'Oracle context to perform the deployment in',
+      type: 'string',
     })
-    .option('secondary', {
-      description: 'Targets the secondary oracle k8s cluster',
-      default: false,
-      type: 'boolean',
-    })
-    .option('tertiary', {
-      description: 'Targets the tertiary oracle k8s cluster',
-      default: false,
-      type: 'boolean',
-    })
-    .check((oracleArgv: OracleArgv) => {
-      // Ensure that only one of these is true
-      const exclusiveBools: boolean[] = [
-        oracleArgv.primary,
-        oracleArgv.secondary,
-        oracleArgv.tertiary,
-      ]
-      let foundTrue = false
-      for (const exclusiveBool of exclusiveBools) {
-        if (exclusiveBool) {
-          if (foundTrue) {
-            throw Error('Exactly one of `primary`, `secondary`, or `tertiary` must be true')
-          }
-          foundTrue = true
-        }
-      }
-      return foundTrue
-    })
+    .coerce('context', coerceOracleContext)
 }
 
 // Oracle RBAC------

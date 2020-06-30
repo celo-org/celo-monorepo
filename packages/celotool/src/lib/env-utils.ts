@@ -157,15 +157,19 @@ export enum envVar {
   VOTING_BOT_WAKE_PROBABILITY = 'VOTING_BOT_WAKE_PROBABILITY',
 }
 
+/**
+ * Dynamic env vars are env var names that can be dynamically constructed
+ * using templates.
+ */
 export enum DynamicEnvVar {
-  ORACLE_AZURE_SUBSCRIPTION_ID = 'ORACLE_{{context}}_AZURE_SUBSCRIPTION_ID',
-  ORACLE_AZURE_TENANT_ID = 'ORACLE_{{context}}_AZURE_TENANT_ID',
-  ORACLE_AZURE_KUBERNETES_CLUSTER_NAME = 'ORACLE_{{context}}_KUBERNETES_CLUSTER_NAME',
-  ORACLE_AZURE_KUBERNETES_RESOURCE_GROUP = 'ORACLE_{{context}}_AZURE_KUBERNETES_RESOURCE_GROUP',
-  ORACLE_ADDRESS_AZURE_KEY_VAULTS = 'ORACLE_{{context}}_ADDRESS_AZURE_KEY_VAULTS',
-  ORACLE_ADDRESSES_FROM_MNEMONIC_COUNT = 'ORACLE_{{context}}_ADDRESSES_FROM_MNEMONIC_COUNT',
-  ORACLE_TX_NODES_COUNT = 'ORACLE_{{context}}_TX_NODES_COUNT',
-  ORACLE_TX_NODES_DISK_SIZE = 'ORACLE_{{context}}_TX_NODES_DISK_SIZE',
+  ORACLE_AZURE_SUBSCRIPTION_ID = 'ORACLE_{{ oracleContext }}_AZURE_SUBSCRIPTION_ID',
+  ORACLE_AZURE_TENANT_ID = 'ORACLE_{{ oracleContext }}_AZURE_TENANT_ID',
+  ORACLE_AZURE_KUBERNETES_CLUSTER_NAME = 'ORACLE_{{ oracleContext }}_KUBERNETES_CLUSTER_NAME',
+  ORACLE_AZURE_KUBERNETES_RESOURCE_GROUP = 'ORACLE_{{ oracleContext }}_AZURE_KUBERNETES_RESOURCE_GROUP',
+  ORACLE_ADDRESS_AZURE_KEY_VAULTS = 'ORACLE_{{ oracleContext }}_ADDRESS_AZURE_KEY_VAULTS',
+  ORACLE_ADDRESSES_FROM_MNEMONIC_COUNT = 'ORACLE_{{ oracleContext }}_ADDRESSES_FROM_MNEMONIC_COUNT',
+  ORACLE_TX_NODES_COUNT = 'ORACLE_{{ oracleContext }}_TX_NODES_COUNT',
+  ORACLE_TX_NODES_DISK_SIZE = 'ORACLE_{{ oracleContext }}_TX_NODES_DISK_SIZE',
 }
 
 export enum EnvTypes {
@@ -239,6 +243,10 @@ export function isValidCeloEnv(celoEnv: string) {
   return new RegExp('^[a-z][a-z0-9]*$').test(celoEnv)
 }
 
+/**
+ * Replaces a dynamic env var's template strings with values from an object.
+ * Returns the name of the env var.
+ */
 export function getDynamicEnvVarName(envVar: DynamicEnvVar, templateValues: any) {
   return Object.keys(templateValues).reduce((agg: string, templateKey: string) => {
     return agg.replace(new RegExp(`{{ *${templateKey} *}}`, 'g'), templateValues[templateKey])
