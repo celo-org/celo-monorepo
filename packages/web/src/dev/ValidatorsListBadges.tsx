@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { View, StyleSheet } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { I18nProps, withNamespaces } from 'src/i18n'
 
 import * as lFounder from 'validator-badges/001-stake-off-founder-validator.md'
@@ -18,21 +18,17 @@ const allBadges = [
   { src: '/images/badges/genesis-validator.svg', list: lGenesis, title: 'Founder Validator' },
   { src: '/images/badges/master-validator.svg', list: lMaster, title: 'Attestation Maven' },
   { src: '/images/badges/vote-recipient.svg', list: lVote, title: 'Vote Recipient' },
-].map((_) => ({ ..._, list: (_.list as any).toLowerCase() as string }))
+].map((badge) => ({ ...badge, list: new Set(String(badge.list).split('/n')) }))
 
 interface Props {
   address: string
 }
 
 class ValidatorsListBadges extends React.PureComponent<Props & I18nProps> {
-  state = {
-    address: undefined,
-  }
-
   render() {
     const { address } = this.props
 
-    const badges = allBadges.filter(({ list }) => list.includes(address.toLowerCase()))
+    const badges = allBadges.filter(({ list }) => list.has(address.toLowerCase()))
 
     return (
       <View style={styles.container}>
