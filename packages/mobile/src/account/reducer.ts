@@ -32,7 +32,6 @@ export interface State {
 
 export enum PincodeType {
   Unset = 'Unset',
-  PhoneAuth = 'PhoneAuth',
   CustomPin = 'CustomPin',
 }
 

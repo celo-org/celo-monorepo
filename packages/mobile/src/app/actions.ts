@@ -68,7 +68,7 @@ interface SetAnalyticsEnabled {
   enabled: boolean
 }
 
-interface SetLockWithPinEnabled {
+interface SetRequirePinOnAppOpen {
   type: Actions.SET_LOCK_WITH_PIN_ENABLED
   enabled: boolean
 }
@@ -91,7 +91,7 @@ export type ActionTypes =
   | EnterBackupFlow
   | ExitBackupFlow
   | SetAnalyticsEnabled
-  | SetLockWithPinEnabled
+  | SetRequirePinOnAppOpen
   | Lock
   | Unlock
 
@@ -145,7 +145,7 @@ export const setAnalyticsEnabled = (enabled: boolean): SetAnalyticsEnabled => ({
   enabled,
 })
 
-export const setLockWithPinEnabled = (enabled: boolean): SetLockWithPinEnabled => ({
+export const setRequirePinOnAppOpen = (enabled: boolean): SetRequirePinOnAppOpen => ({
   type: Actions.SET_LOCK_WITH_PIN_ENABLED,
   enabled,
 })

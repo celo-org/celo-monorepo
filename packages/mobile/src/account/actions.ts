@@ -54,7 +54,6 @@ export interface PhotosNUXClickedAction {
 export interface SetPincodeAction {
   type: Actions.SET_PINCODE
   pincodeType: PincodeType
-  pin?: string
 }
 
 export interface SetPincodeSuccessAction {
@@ -176,10 +175,9 @@ export const photosNUXCompleted = (): PhotosNUXClickedAction => ({
   type: Actions.PHOTOSNUX_CLICKED,
 })
 
-export const setPincode = (pincodeType: PincodeType, pin?: string): SetPincodeAction => ({
+export const setPincode = (pincodeType: PincodeType): SetPincodeAction => ({
   type: Actions.SET_PINCODE,
   pincodeType,
-  pin,
 })
 
 export const setPincodeSuccess = (pincodeType: PincodeType): SetPincodeSuccessAction => ({

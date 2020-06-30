@@ -95,7 +95,7 @@ export async function installHelmChart(
   // First install the oracle-rbac helm chart.
   // This must be deployed before so we can use a resulting auth token so that
   // oracle pods can reach the K8s API server to change their aad labels
-  await installOracleRBACHelmChart(celoEnv)
+  await installOracleRBACHelmChart(celoEnv, context)
   // Then install the oracle helm chart
   return installGenericHelmChart(
     celoEnv,
@@ -110,6 +110,7 @@ export async function upgradeOracleChart(
   context: OracleAzureContext,
   useFullNodes: boolean
 ) {
+  await upgradeOracleRBACHelmChart(celoEnv, context)
   return upgradeGenericHelmChart(
     celoEnv,
     releaseName(celoEnv),
@@ -133,8 +134,9 @@ export async function removeHelmRelease(celoEnv: string, context: OracleAzureCon
 async function helmParameters(celoEnv: string, context: OracleAzureContext, useForno: boolean) {
   const oracleConfig = getOracleConfig(context)
 
-  const kubeAuthTokenName = await rbacAuthTokenName(celoEnv)
   const replicas = oracleConfig.identities.length
+  const kubeServiceAccountSecretNames = await rbacServiceAccountSecretNames(celoEnv, replicas)
+
   const httpRpcProviderUrl = useForno
     ? getFornoUrl(celoEnv)
     : getFullNodeHttpRpcInternalUrl(celoEnv)
@@ -144,7 +146,7 @@ async function helmParameters(celoEnv: string, context: OracleAzureContext, useF
     `--set environment.name=${celoEnv}`,
     `--set image.repository=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_REPOSITORY)}`,
     `--set image.tag=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_TAG)}`,
-    `--set kube.authTokenName=${kubeAuthTokenName}`,
+    `--set kube.serviceAccountSecretNames='{${kubeServiceAccountSecretNames.join(',')}}'`,
     `--set oracle.azureHsm.initTryCount=5`,
     `--set oracle.azureHsm.initMaxRetryBackoffMs=30000`,
     `--set oracle.replicas=${replicas}`,
@@ -411,12 +413,21 @@ export function addOracleMiddleware(argv: yargs.Argv) {
 // limitations in aad-pod-identity & statefulsets (see https://github.com/Azure/aad-pod-identity/issues/237#issuecomment-611672987)
 // To do this, we use an auth token that we get using the resources in the `oracle-rbac` chart
 
-async function installOracleRBACHelmChart(celoEnv: string) {
+async function installOracleRBACHelmChart(celoEnv: string, context: OracleAzureContext) {
   return installGenericHelmChart(
     celoEnv,
     rbacReleaseName(celoEnv),
     rbacHelmChartPath,
-    rbacHelmParameters(celoEnv)
+    rbacHelmParameters(celoEnv, context)
+  )
+}
+
+async function upgradeOracleRBACHelmChart(celoEnv: string, context: OracleAzureContext) {
+  return upgradeGenericHelmChart(
+    celoEnv,
+    rbacReleaseName(celoEnv),
+    rbacHelmChartPath,
+    rbacHelmParameters(celoEnv, context)
   )
 }
 
@@ -424,19 +435,21 @@ function removeOracleRBACHelmRelease(celoEnv: string) {
   return removeGenericHelmChart(rbacReleaseName(celoEnv))
 }
 
-function rbacHelmParameters(celoEnv: string) {
-  return [`--set environment.name=${celoEnv}`]
+function rbacHelmParameters(celoEnv: string,  context: OracleAzureContext) {
+  const oracleConfig = getOracleConfig(context)
+  const replicas = oracleConfig.identities.length
+  return [`--set environment.name=${celoEnv}`,  `--set oracle.replicas=${replicas}`,]
 }
 
 function rbacReleaseName(celoEnv: string) {
   return `${celoEnv}-oracle-rbac`
 }
 
-async function rbacAuthTokenName(celoEnv: string) {
+async function rbacServiceAccountSecretNames(celoEnv: string, replicas: number) {
+  const names = [...Array(replicas).keys()].map(i => `${rbacReleaseName(celoEnv)}-${i}`)
   const [tokenName] = await execCmdWithExitOnFailure(
-    `kubectl get serviceaccount --namespace=${celoEnv} ${rbacReleaseName(
-      celoEnv
-    )} -o=jsonpath="{.secrets[0]['name']}"`
+    `kubectl get serviceaccount --namespace=${celoEnv} ${names.join(' ')} -o=jsonpath="{.items[*].secrets[0]['name']}"`
   )
-  return tokenName.trim()
+  const tokenNames = tokenName.trim().split(' ')
+  return tokenNames
 }
