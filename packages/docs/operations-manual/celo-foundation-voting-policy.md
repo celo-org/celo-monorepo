@@ -64,7 +64,7 @@ Make sure to complete all prerequisites before applying.
 [APPLY FOR FOUNDATION VOTES HERE](https://c-labs.typeform.com/to/Ov9U0S)
 
 ### Timings
-Cohort 3 application deadline: **July 2, 2020**
+Cohort 3 application deadline: **July 1, 2020 at 23:59 UTC**
 
 Anticipated vote date for selected applicants in Cohort 3: **as of Aug 2, 2020**
 
