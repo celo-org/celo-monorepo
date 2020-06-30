@@ -7,9 +7,10 @@ import sleep from 'sleep-promise'
 import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { DefaultEventNames } from 'src/analytics/constants'
+import { CustomEventNames, DefaultEventNames } from 'src/analytics/constants'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
+import { requestPincodeInput } from 'src/pincode/authentication'
 import { store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
 
@@ -92,43 +93,22 @@ export async function ensurePincode(): Promise<boolean> {
 
   if (pincodeType === PincodeType.Unset) {
     Logger.error(TAG + '@ensurePincode', 'Pin has never been set')
+    CeloAnalytics.track(CustomEventNames.pin_never_set)
     return false
   }
 
-  if (pincodeType === PincodeType.CustomPin) {
-    Logger.debug(TAG + '@ensurePincode', 'Getting custom pin')
-    let pin
-    try {
-      pin = await new Promise((resolve) => {
-        navigate(Screens.PincodeEnter, {
-          onSuccess: resolve,
-          withVerification: true,
-        })
-      })
-    } catch (error) {
-      Logger.error(`${TAG}@ensurePincode`, `PIN entering error`, error)
-      return false
-    }
-
-    if (!pin) {
-      Logger.error(`${TAG}@ensurePincode`, `Empty PIN`)
-      return false
-    }
+  if (pincodeType !== PincodeType.CustomPin) {
+    Logger.error(TAG + '@ensurePincode', `Unsupported Pincode Type ${pincodeType}`)
+    return false
   }
 
-  return true
-}
-
-export const navigateProtected: SafeNavigate = (...args) => {
-  ensurePincode()
-    .then((ensured) => {
-      if (ensured) {
-        replace(...args)
-      }
-    })
-    .catch((error) => {
-      Logger.error(`${TAG}@navigateProtected`, 'PIN ensure error', error)
-    })
+  try {
+    await requestPincodeInput(true, false)
+    return true
+  } catch (error) {
+    Logger.error(`${TAG}@ensurePincode`, `PIN entering error`, error, true)
+    return false
+  }
 }
 
 export function navigateToExchangeHome() {

@@ -16,9 +16,11 @@ export enum CustomEventNames {
   gold_cancel1 = 'gold_cancel1',
   gold_cancel2 = 'gold_cancel2',
   gold_cancel3 = 'gold_cancel3',
+  gold_cancel4 = 'gold_cancel4',
   gold_educate_1_next = 'gold_educate_1_next', // next button on 1st edu screen
   gold_educate_2_next = 'gold_educate_2_next', // next button on 2nd edu screen
   gold_educate_3_next = 'gold_educate_3_next', // next button on 3rd edu screen
+  gold_educate_4_next = 'gold_educate_4_next', // next button on 4th edu screen
 
   photo_education_cancel1 = 'photo_education_cancel1',
   photo_education_cancel2 = 'photo_education_cancel2',
@@ -148,6 +150,7 @@ export enum CustomEventNames {
   pin_wallet_import = 'pin_wallet_import',
   pin_value = 'pin_value',
   pin_create_button = 'pin_create_button',
+  pin_store_error = 'pin_store_error',
   pin_failed_to_set = 'pin_failed_to_set',
   pin_never_set = 'pin_never_set',
 

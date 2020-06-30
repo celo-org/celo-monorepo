@@ -9,7 +9,7 @@ import dotProp from 'dot-prop-immutable'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { LayoutAnimation, Platform, StyleSheet, Text, View } from 'react-native'
-import { SafeAreaConsumer } from 'react-native-safe-area-view'
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 import { connect, useDispatch } from 'react-redux'
 import { hideAlert } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
@@ -222,7 +222,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
     return (
       <HeaderHeightContext.Consumer>
         {(headerHeight) => (
-          <SafeAreaConsumer>
+          <SafeAreaInsetsContext.Consumer>
             {(insets) => (
               <View style={styles.container}>
                 <View style={styles.innerContainer}>
@@ -277,7 +277,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
                 <KeyboardSpacer onToggle={this.onKeyboardToggle} />
               </View>
             )}
-          </SafeAreaConsumer>
+          </SafeAreaInsetsContext.Consumer>
         )}
       </HeaderHeightContext.Consumer>
     )

@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "flex": 1,
@@ -216,6 +216,60 @@ exports[`renders correctly 1`] = `
           steps.2.text
         </Text>
       </View>
+      <View
+        style={
+          Object {
+            "flex": 1,
+            "justifyContent": "center",
+            "marginBottom": 24,
+            "paddingHorizontal": 24,
+          }
+        }
+      >
+        <Image
+          resizeMode="contain"
+          source={
+            Object {
+              "testUri": "../../../packages/mobile/src/images/exchange.png",
+            }
+          }
+          style={
+            Object {
+              "alignSelf": "center",
+              "height": 200,
+              "width": 200,
+            }
+          }
+        />
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Jost-Medium",
+              "fontSize": 22,
+              "lineHeight": 28,
+              "marginTop": 24,
+              "textAlign": "center",
+            }
+          }
+        >
+          steps.3.title
+        </Text>
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-Regular",
+              "fontSize": 16,
+              "lineHeight": 22,
+              "paddingTop": 16,
+              "textAlign": "center",
+            }
+          }
+        >
+          steps.3.text
+        </Text>
+      </View>
     </Swiper>
     <View
       style={
@@ -285,5 +339,5 @@ exports[`renders correctly 1`] = `
       </View>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
