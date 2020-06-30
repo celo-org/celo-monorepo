@@ -17,7 +17,7 @@ function toArrayBuffer(buffer: Buffer): ArrayBuffer {
   return ab
 }
 
-export class AwsHsmWallet extends RemoteWallet implements Wallet {
+export default class AwsHsmWallet extends RemoteWallet implements Wallet {
   constructor() {
     super()
   }
@@ -34,10 +34,8 @@ export class AwsHsmWallet extends RemoteWallet implements Wallet {
         const address = await this.getAddressFromKeyId(KeyId!)
         addressToSigner.set(address, new AwsHsmSigner(KeyId!))
       } catch (e) {
-        // Safely ignore non-secp256k1 keys
-        if (!e.message.includes('Invalid secp256k1')) {
-          throw e
-        }
+        // todo: what does the error look like here
+        throw e
       }
     }
     return addressToSigner
