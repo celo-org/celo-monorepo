@@ -107,6 +107,11 @@ describe('Transfer Works', () => {
     }
 
     await element(by.id('ImportWalletButton')).tap()
+
+    // Wait a little more as import can take some time
+    // and triggers the firebase error banner
+    // otherwise next step will tap the banner instead of the button
+    await sleep(5000)
   })
 
   it('VerifyEducation', async () => {
@@ -163,6 +168,12 @@ describe('Transfer Works', () => {
 
     await element(by.id('commentInput/send')).replaceText(RANDOM_COMMENT)
     await element(by.id('commentInput/send')).tapReturnKey()
+
+    if (device.getPlatform() === 'android') {
+      // Workaround keyboard remaining open on Android (tapReturnKey doesn't work there and just adds a new line)
+      // so we tap something else in the scrollview to hide the soft keyboard
+      await element(by.id('HeaderText')).tap()
+    }
 
     await element(by.id('ConfirmButton')).tap()
   })

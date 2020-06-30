@@ -332,7 +332,9 @@ export class SendConfirmation extends React.Component<Props, State> {
                 address={recipientAddress || ''}
               />
               <View style={styles.recipientInfoContainer}>
-                <Text style={styles.headerText}>{t('sending')}</Text>
+                <Text style={styles.headerText} testID="HeaderText">
+                  {t('sending')}
+                </Text>
                 <Text style={styles.displayName}>
                   {getDisplayName({ recipient, recipientAddress, t })}
                 </Text>
