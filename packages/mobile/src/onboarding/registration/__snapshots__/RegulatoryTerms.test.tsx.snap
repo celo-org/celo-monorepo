@@ -1,23 +1,21 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`RegulatoryTermsScreen renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "flex": 1,
     }
   }
 >
-  <SafeAreaView
+  <RNCSafeAreaView
     style={
       Object {
         "height": 35,
-        "paddingRight": 10,
-        "paddingTop": 10,
         "position": "absolute",
-        "right": 0,
-        "top": 0,
-        "width": 70,
+        "right": 10,
+        "top": 10,
+        "width": 60,
         "zIndex": 100,
       }
     }
@@ -35,7 +33,7 @@ exports[`RegulatoryTermsScreen renders correctly 1`] = `
     >
          
     </Text>
-  </SafeAreaView>
+  </RNCSafeAreaView>
   <RCTScrollView
     contentContainerStyle={
       Object {
@@ -125,9 +123,7 @@ exports[`RegulatoryTermsScreen renders correctly 1`] = `
             "marginHorizontal": 24,
             "marginTop": 24,
           },
-          Object {
-            "marginBottom": 24,
-          },
+          null,
         ],
       ]
     }
@@ -189,5 +185,5 @@ exports[`RegulatoryTermsScreen renders correctly 1`] = `
       </View>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
