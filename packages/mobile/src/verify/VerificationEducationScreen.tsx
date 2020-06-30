@@ -7,7 +7,7 @@ import { StackScreenProps, useHeaderHeight } from '@react-navigation/stack'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import { useSafeArea } from 'react-native-safe-area-view'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import ErrorMessageInline from 'src/components/ErrorMessageInline'
@@ -42,7 +42,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
   const showError = hasPressedStart && !balanceIsSufficient
   const dispatch = useDispatch()
   const headerHeight = useHeaderHeight()
-  const insets = useSafeArea()
+  const insets = useSafeAreaInsets()
 
   const onPressStart = () => {
     setHasPressedStart(true)
