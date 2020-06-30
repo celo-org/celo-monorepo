@@ -19,7 +19,8 @@
   "pincodeSet": {
     "create": "Create a PIN",
     "verify": "Enter PIN again",
-    "pinsDontMatch": "The PINs didn't match"
+    "pinsDontMatch": "The PINs didn't match",
+    "invalidPin": "Invalid PIN"
   },
   "inviteCode": {
     "title": "Invite Code",

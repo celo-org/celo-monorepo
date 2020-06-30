@@ -14,7 +14,7 @@ function exec(command, options = { cwd: process.cwd() }) {
     })
   })
 }
-export const DEFAULT_PIN = '123456'
+export const DEFAULT_PIN = '112233'
 
 export function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -55,7 +55,7 @@ export async function skipTo(nextScreen) {
 
 export function enterPin() {
   setTimeout(() => {
-    exec('adb shell input text 123456 && sleep 1 && adb shell input keyevent 66')
+    exec('adb shell input text 112233 && sleep 1 && adb shell input keyevent 66')
   }, 3000)
 }
 
