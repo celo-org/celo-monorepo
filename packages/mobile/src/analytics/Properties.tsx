@@ -139,6 +139,9 @@ interface OnboardingEventsProperties {
     obfuscatedPhoneNumber: string
   }
   [OnboardingEvents.pin_created]: undefined
+  [OnboardingEvents.pin_invalid]: {
+    error: string
+  }
   [OnboardingEvents.pin_failed_to_set]: {
     pincodeType: PincodeType
     error: string

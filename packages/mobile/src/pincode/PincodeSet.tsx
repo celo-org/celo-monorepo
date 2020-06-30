@@ -68,6 +68,7 @@ export class PincodeSet extends React.Component<Props, State> {
     if (this.isPin1Valid(this.state.pin1)) {
       this.props.navigation.setParams({ isVerifying: true })
     } else {
+      ValoraAnalytics.track(AnalyticsEvents.pin_invalid, { error: 'Pin is invalid' })
       this.setState({
         pin1: '',
         pin2: '',
@@ -85,6 +86,7 @@ export class PincodeSet extends React.Component<Props, State> {
       this.props.navigation.navigate(Screens.EnterInviteCode)
     } else {
       this.props.navigation.setParams({ isVerifying: false })
+      ValoraAnalytics.track(AnalyticsEvents.pin_invalid, { error: 'Pins do not match' })
       this.setState({
         pin1: '',
         pin2: '',

@@ -81,6 +81,7 @@ export enum OnboardingEvents {
   phone_number_set = 'phone_number_set',
   invalid_phone_number = 'invalid_phone_number',
   pin_created = 'pin_created',
+  pin_invalid = 'pin_invalid',
   pin_failed_to_set = 'pin_failed_to_set',
   pin_never_set = 'pin_never_set',
   import_wallet_submit = 'import_wallet_submit', // to count the # of times that the “Restore Celo Wallet” button is pressed
