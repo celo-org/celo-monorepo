@@ -6,8 +6,8 @@ import { createRef } from 'react'
 import sleep from 'sleep-promise'
 import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { store } from 'src/redux/store'
@@ -160,6 +160,6 @@ export function navigateHome(params?: object) {
 
 export function navigateToError(errorMessage: string, error?: Error) {
   Logger.error(`${TAG}@navigateToError`, `Navigating to error screen: ${errorMessage}`, error)
-  CeloAnalytics.track(AnalyticsEvents.error_displayed, { error: errorMessage }, true)
+  ValoraAnalytics.track(AnalyticsEvents.error_displayed, { error: errorMessage }, true)
   navigate(Screens.ErrorScreen, { errorMessage })
 }

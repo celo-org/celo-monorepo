@@ -2,8 +2,8 @@ import { AppState, Linking } from 'react-native'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { eventChannel } from 'redux-saga'
 import { call, cancelled, put, select, spawn, take, takeLatest } from 'redux-saga/effects'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import {
   Actions,
   appLock,
@@ -115,7 +115,7 @@ function* watchAppState() {
       yield put(setAppState(newState))
       // place event here
     } catch (error) {
-      CeloAnalytics.track(AnalyticsEvents.app_state_error, { error: error.message })
+      ValoraAnalytics.track(AnalyticsEvents.app_state_error, { error: error.message })
       Logger.error(`${TAG}@monitorAppState`, `App state Error`, error)
     } finally {
       if (yield cancelled()) {

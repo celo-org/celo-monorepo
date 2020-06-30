@@ -11,8 +11,8 @@ import { call, delay, put, race, select, take } from 'redux-saga/effects'
 import { setUserContactDetails } from 'src/account/actions'
 import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/selectors'
 import { showErrorOrFallback } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { USE_PHONE_NUMBER_PRIVACY } from 'src/config'
 import {
@@ -72,7 +72,7 @@ export function* doImportContactsWrapper({ doMatchmaking }: ImportContactsAction
     yield put(endImportContacts(true))
   } catch (error) {
     Logger.error(TAG, 'Error importing user contacts', error)
-    CeloAnalytics.track(AnalyticsEvents.import_contact_error, { error: error.message })
+    ValoraAnalytics.track(AnalyticsEvents.import_contact_error, { error: error.message })
     yield put(showErrorOrFallback(error, ErrorMessages.IMPORT_CONTACTS_FAILED))
     yield put(endImportContacts(false))
   }
@@ -88,7 +88,7 @@ function* doImportContacts(doMatchmaking: boolean) {
   yield put(updateImportContactsProgress(ImportContactsStatus.Importing))
 
   const contacts: MinimalContact[] = yield call(getAllContacts)
-  CeloAnalytics.track(AnalyticsEvents.fetched_contacts, { contacts: contacts.length })
+  ValoraAnalytics.track(AnalyticsEvents.fetched_contacts, { contacts: contacts.length })
   if (!contacts || !contacts.length) {
     Logger.warn(TAG, 'Empty contacts list. Skipping import.')
     return true

@@ -10,8 +10,8 @@ import { setAccountCreationTime, setPromptForno } from 'src/account/actions'
 import { getPincode } from 'src/account/saga'
 import { promptFornoIfNeededSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { getWordlist } from 'src/backup/utils'
@@ -90,7 +90,7 @@ export function* checkWeb3SyncProgress() {
       }
     } catch (error) {
       if (error.toString().toLowerCase() === BLOCK_CHAIN_CORRUPTION_ERROR.toLowerCase()) {
-        CeloAnalytics.track(AnalyticsEvents.blockchain_corruption)
+        ValoraAnalytics.track(AnalyticsEvents.blockchain_corruption)
         const deleted = yield call(deleteChainData)
         if (deleted) {
           navigateToError('corruptedChainDeleted')

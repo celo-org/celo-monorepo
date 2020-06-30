@@ -9,8 +9,8 @@ import { Trans, WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
 import FeeIcon from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow.v2'
@@ -85,7 +85,7 @@ export class ExchangeReview extends React.Component<Props, State> {
       dollarsAmount,
       this.props.localCurrencyExchangeRate
     )
-    CeloAnalytics.track(
+    ValoraAnalytics.track(
       isDollarToGold ? AnalyticsEvents.gold_buy_confirm : AnalyticsEvents.gold_sell_confirm,
       {
         localCurrencyAmount,

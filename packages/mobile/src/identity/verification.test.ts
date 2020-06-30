@@ -5,8 +5,8 @@ import { throwError } from 'redux-saga-test-plan/providers'
 import { call, delay, select } from 'redux-saga/effects'
 import { e164NumberSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
@@ -36,7 +36,7 @@ import {
   mockPublicDEK,
 } from 'test/values'
 
-const MockedAnalytics = CeloAnalytics as any
+const MockedAnalytics = ValoraAnalytics as any
 
 jest.mock('src/transactions/send', () => ({
   sendTransaction: jest.fn(),

@@ -10,8 +10,8 @@ import { WithTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { estimateFee, FeeType } from 'src/fees/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
@@ -231,7 +231,7 @@ class Send extends React.Component<Props, State> {
 
     this.props.storeLatestInRecents(recipient)
 
-    CeloAnalytics.track(
+    ValoraAnalytics.track(
       isRequest ? AnalyticsEvents.request_select_recipient : AnalyticsEvents.send_select_recipient,
       {
         recipientKind: recipient.kind,

@@ -3,8 +3,8 @@ import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet } from 'react-native'
 import { connect } from 'react-redux'
 import { PaymentRequest } from 'src/account/types'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { cancelPaymentRequest, updatePaymentRequestNotified } from 'src/firebase/actions'
 import { Namespaces, withTranslation } from 'src/i18n'
 import {
@@ -50,7 +50,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
 // Payment Request notification for the notification center on home screen
 export class OutgoingPaymentRequestSummaryNotification extends React.Component<Props> {
   onReview = () => {
-    CeloAnalytics.track(AnalyticsEvents.outgoing_request_payment_review)
+    ValoraAnalytics.track(AnalyticsEvents.outgoing_request_payment_review)
     navigate(Screens.OutgoingPaymentRequestListScreen)
   }
 

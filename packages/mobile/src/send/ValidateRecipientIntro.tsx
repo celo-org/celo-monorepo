@@ -8,8 +8,8 @@ import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import CancelButton from 'src/components/CancelButton.v2'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { AddressValidationType } from 'src/identity/reducer'
@@ -51,7 +51,7 @@ export const validateRecipientIntroScreenNavOptions = () => ({
 
 class ValidateRecipientIntro extends React.Component<Props> {
   onPressScanCode = () => {
-    CeloAnalytics.track(AnalyticsEvents.send_secure_start, { method: 'scan' })
+    ValoraAnalytics.track(AnalyticsEvents.send_secure_start, { method: 'scan' })
     navigate(Screens.QRNavigator, {
       screen: Screens.QRScanner,
       params: {
@@ -64,7 +64,7 @@ class ValidateRecipientIntro extends React.Component<Props> {
   onPressConfirmAccount = () => {
     const { addressValidationType, transactionData, isPaymentRequest } = this.props
 
-    CeloAnalytics.track(AnalyticsEvents.send_secure_start, { method: 'manual' })
+    ValoraAnalytics.track(AnalyticsEvents.send_secure_start, { method: 'manual' })
     navigate(Screens.ValidateRecipientAccount, {
       transactionData,
       addressValidationType,

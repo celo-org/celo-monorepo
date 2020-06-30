@@ -10,8 +10,8 @@ import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import AccountNumberCard from 'src/components/AccountNumberCard'
 import BackButton from 'src/components/BackButton.v2'
@@ -111,7 +111,7 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
         ? inputValue
         : singleDigitInputValueArr.join('')
 
-    CeloAnalytics.track(AnalyticsEvents.send_secure_submit, {
+    ValoraAnalytics.track(AnalyticsEvents.send_secure_submit, {
       validationType: addressValidationType === AddressValidationType.FULL ? 'full' : 'partial',
       address: inputToValidate,
     })
@@ -133,9 +133,9 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
     const validationType =
       this.props.addressValidationType === AddressValidationType.FULL ? 'full' : 'partial'
     if (this.state.isModalVisible) {
-      CeloAnalytics.track(AnalyticsEvents.send_secure_info, { validationType })
+      ValoraAnalytics.track(AnalyticsEvents.send_secure_info, { validationType })
     } else {
-      CeloAnalytics.track(AnalyticsEvents.send_secure_info_dismissed, { validationType })
+      ValoraAnalytics.track(AnalyticsEvents.send_secure_info_dismissed, { validationType })
     }
 
     this.setState({ isModalVisible: !this.state.isModalVisible })

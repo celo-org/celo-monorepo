@@ -11,8 +11,8 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { PaymentRequestStatus } from 'src/account/types'
 import { showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import BackButton from 'src/components/BackButton.v2'
 import CommentTextInput from 'src/components/CommentTextInput'
 import CurrencyDisplay, { DisplayType } from 'src/components/CurrencyDisplay'
@@ -125,7 +125,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
       notified: false,
     }
 
-    CeloAnalytics.track(AnalyticsEvents.request_confirm, { requesteeAddress })
+    ValoraAnalytics.track(AnalyticsEvents.request_confirm, { requesteeAddress })
     this.props.writePaymentRequest(paymentInfo)
     Logger.showMessage(t('requestSent'))
   }

@@ -8,8 +8,8 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import BackupPhraseContainer, {
   BackupPhraseContainerMode,
   BackupPhraseType,
@@ -84,7 +84,7 @@ class BackupPhrase extends React.Component<Props, State> {
       isConfirmChecked: value,
     })
 
-    CeloAnalytics.track(
+    ValoraAnalytics.track(
       value
         ? AnalyticsEvents.backup_setup_toggle_enable
         : AnalyticsEvents.backup_setup_toggle_disable
@@ -96,7 +96,7 @@ class BackupPhrase extends React.Component<Props, State> {
   }
 
   onPressContinue = () => {
-    CeloAnalytics.track(AnalyticsEvents.backup_continue)
+    ValoraAnalytics.track(AnalyticsEvents.backup_continue)
     navigate(Screens.BackupQuiz)
   }
 
@@ -138,7 +138,7 @@ class BackupPhrase extends React.Component<Props, State> {
 function HeaderRight() {
   const { t } = useTranslation(Namespaces.backupKeyFlow6)
   const onMoreInfoPressed = () => {
-    CeloAnalytics.track(AnalyticsEvents.backup_setup_info)
+    ValoraAnalytics.track(AnalyticsEvents.backup_setup_info)
     pushToStack(Screens.AccountKeyEducation)
   }
   return <TopBarTextButton onPress={onMoreInfoPressed} title={t('moreInfo')} />

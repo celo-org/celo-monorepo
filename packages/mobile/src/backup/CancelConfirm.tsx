@@ -2,8 +2,8 @@ import colorsV2 from '@celo/react-components/styles/colors.v2'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import CancelButton from 'src/components/CancelButton.v2'
 import Dialog from 'src/components/Dialog'
 import { Namespaces } from 'src/i18n'
@@ -22,18 +22,21 @@ export default function CancelConfirm({ screen }: Props) {
 
   const onCancel = React.useCallback(() => {
     setOpenState(true)
-    CeloAnalytics.track(AnalyticsEvents.backup_cancel, { screen })
+    ValoraAnalytics.track(AnalyticsEvents.backup_cancel, { screen })
   }, [screen])
 
   const onComplete = React.useCallback(() => {
     setOpenState(false)
-    CeloAnalytics.track(AnalyticsEvents.backup_cancel_procrastinate, { screen, title: actionText })
+    ValoraAnalytics.track(AnalyticsEvents.backup_cancel_procrastinate, {
+      screen,
+      title: actionText,
+    })
   }, [screen, actionText])
 
   const onProcrastinate = React.useCallback(() => {
     setOpenState(false)
     navigateHome()
-    CeloAnalytics.track(AnalyticsEvents.backup_cancel_procrastinate, {
+    ValoraAnalytics.track(AnalyticsEvents.backup_cancel_procrastinate, {
       screen,
       title: secondaryText,
     })

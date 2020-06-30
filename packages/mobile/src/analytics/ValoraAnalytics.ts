@@ -8,7 +8,7 @@ import { store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
 import * as Web3Utils from 'web3-utils'
 
-const TAG = 'CeloAnalytics'
+const TAG = 'ValoraAnalytics'
 
 async function getDeviceInfo() {
   return {
@@ -55,7 +55,7 @@ const SEGMENT_OPTIONS: analytics.Configuration = {
   },
 }
 
-class CeloAnalytics {
+class ValoraAnalytics {
   sessionId: string
   address: string | null | undefined
   deviceInfo: object
@@ -142,4 +142,4 @@ class CeloAnalytics {
   }
 }
 
-export default new CeloAnalytics()
+export default new ValoraAnalytics()

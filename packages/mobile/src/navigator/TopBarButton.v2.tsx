@@ -4,8 +4,8 @@ import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { StyleProp, StyleSheet, Text, TextStyle } from 'react-native'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { AnalyticsEventType } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 
 interface CommonProps {
   disabled?: boolean
@@ -21,7 +21,7 @@ type WrapperProps = CommonProps & {
 function Wrapper({ eventName, onPress, disabled, testID, children }: WrapperProps) {
   const onPressLocal = React.useCallback(() => {
     if (eventName) {
-      CeloAnalytics.track(eventName)
+      ValoraAnalytics.track(eventName)
     }
     onPress()
   }, [onPress, eventName])

@@ -10,8 +10,8 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { setPincode } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
@@ -72,7 +72,7 @@ export class PincodeSet extends React.Component<Props, State> {
     const { pin1 } = this.state
     if (this.isPin1Valid(pin1) && this.isPin2Valid(pin2)) {
       this.props.setPincode(PincodeType.CustomPin, this.state.pin1)
-      CeloAnalytics.track(AnalyticsEvents.pin_created)
+      ValoraAnalytics.track(AnalyticsEvents.pin_created)
       navigate(Screens.EnterInviteCode)
     } else {
       this.props.navigation.setParams({ isVerifying: false })

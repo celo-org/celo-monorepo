@@ -15,8 +15,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-view'
 import { enableScreens } from 'react-native-screens'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { apolloClient } from 'src/apollo/index'
 import { openDeepLink } from 'src/app/actions'
 import AppLoading from 'src/app/AppLoading'
@@ -58,7 +58,7 @@ export class App extends React.Component {
       (appInitializedAtString: string) => {
         const appInitializedAt = new Date(appInitializedAtString)
         const loadingDuration = appLoadedAt.getTime() - appInitializedAt.getTime()
-        CeloAnalytics.startSession(AnalyticsEvents.app_launched, { loadingDuration })
+        ValoraAnalytics.startSession(AnalyticsEvents.app_launched, { loadingDuration })
         appStartListener.remove()
       }
     )

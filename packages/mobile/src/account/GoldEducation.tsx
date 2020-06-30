@@ -3,8 +3,8 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import Education from 'src/account/Education'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setEducationCompleted } from 'src/goldToken/actions'
 import { Namespaces } from 'src/i18n'
 import { exchangeIcon, goldValue, shinyGold } from 'src/images/Images'
@@ -20,7 +20,7 @@ export default function GoldEducation() {
   const isCeloEducationComplete = useSelector((state) => state.goldToken.educationCompleted)
 
   const onFinish = () => {
-    CeloAnalytics.track(AnalyticsEvents.exchange_gold_nux)
+    ValoraAnalytics.track(AnalyticsEvents.exchange_gold_nux)
 
     if (isCeloEducationComplete) {
       navigateBack()

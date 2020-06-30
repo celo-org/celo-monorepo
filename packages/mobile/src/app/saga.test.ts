@@ -1,7 +1,7 @@
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { expectSaga } from 'redux-saga-test-plan'
 import { call, select } from 'redux-saga/effects'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { appLock, openDeepLink, setAppState } from 'src/app/actions'
 import { handleDeepLink, handleSetAppState, watchRehydrate } from 'src/app/saga'
 import { getAppLocked, getLastTimeBackgrounded, getLockWithPinEnabled } from 'src/app/selectors'
@@ -19,7 +19,7 @@ jest.mock('src/utils/time', () => ({
 
 jest.mock('src/dappkit/dappkit')
 
-const MockedAnalytics = CeloAnalytics as any
+const MockedAnalytics = ValoraAnalytics as any
 
 describe('App saga', () => {
   beforeEach(() => {

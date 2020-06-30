@@ -13,8 +13,8 @@ import { StyleSheet, Text, View } from 'react-native'
 import Animated from 'react-native-reanimated'
 import SafeAreaView from 'react-native-safe-area-view'
 import { useDispatch } from 'react-redux'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { fetchExchangeRate } from 'src/exchange/actions'
 import CeloGoldHistoryChart from 'src/exchange/CeloGoldHistoryChart'
 import CeloGoldOverview from 'src/exchange/CeloGoldOverview'
@@ -39,7 +39,7 @@ import { getLocalCurrencyDisplayValue } from 'src/utils/formatting'
 type Props = StackScreenProps<StackParamList, Screens.ExchangeHomeScreen>
 
 function navigateToGuide() {
-  CeloAnalytics.track(AnalyticsEvents.gold_info)
+  ValoraAnalytics.track(AnalyticsEvents.gold_info)
   navigate(Screens.GoldEducation)
 }
 
@@ -53,7 +53,7 @@ function ExchangeHomeScreen({ navigation }: Props) {
   }
 
   function goToBuyGold() {
-    CeloAnalytics.track(AnalyticsEvents.gold_buy_start)
+    ValoraAnalytics.track(AnalyticsEvents.gold_buy_start)
     navigation.navigate(Screens.ExchangeTradeScreen, {
       makerTokenDisplay: {
         makerToken: CURRENCY_ENUM.DOLLAR,
@@ -63,7 +63,7 @@ function ExchangeHomeScreen({ navigation }: Props) {
   }
 
   function goToBuyDollars() {
-    CeloAnalytics.track(AnalyticsEvents.gold_sell_start)
+    ValoraAnalytics.track(AnalyticsEvents.gold_sell_start)
     navigation.navigate(Screens.ExchangeTradeScreen, {
       makerTokenDisplay: {
         makerToken: CURRENCY_ENUM.GOLD,

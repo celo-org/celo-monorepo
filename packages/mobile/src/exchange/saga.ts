@@ -6,8 +6,8 @@ import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWr
 import BigNumber from 'bignumber.js'
 import { all, call, put, select, spawn, takeEvery, takeLatest } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
@@ -76,7 +76,7 @@ export function* doFetchTobinTax({ makerAmount, makerToken }: FetchTobinTaxActio
     Logger.debug(TAG, `Retrieved Tobin tax rate: ${tobinTax}`)
     yield put(setTobinTax(tobinTax.toString()))
   } catch (error) {
-    CeloAnalytics.track(AnalyticsEvents.fetch_tobin_tax_failed, { error: error.message })
+    ValoraAnalytics.track(AnalyticsEvents.fetch_tobin_tax_failed, { error: error.message })
     Logger.error(TAG, 'Error fetching Tobin tax', error)
     yield put(showError(ErrorMessages.CALCULATE_FEE_FAILED))
   }
@@ -140,7 +140,7 @@ export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
       })
     )
   } catch (error) {
-    CeloAnalytics.track(AnalyticsEvents.fetch_exchange_rate_failed, { error: error.message })
+    ValoraAnalytics.track(AnalyticsEvents.fetch_exchange_rate_failed, { error: error.message })
     Logger.error(TAG, 'Error fetching exchange rate', error)
     yield put(showError(ErrorMessages.EXCHANGE_RATE_FAILED))
   }
@@ -157,12 +157,12 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     const exchangeRatePair: ExchangeRatePair = yield select(exchangeRatePairSelector)
     const exchangeRate = getRateForMakerToken(exchangeRatePair, makerToken)
     if (!exchangeRate) {
-      CeloAnalytics.track(AnalyticsEvents.invalid_exchange_rate, { exchangeRate })
+      ValoraAnalytics.track(AnalyticsEvents.invalid_exchange_rate, { exchangeRate })
       Logger.error(TAG, 'Invalid exchange rate from exchange contract')
       return
     }
     if (exchangeRate.isZero()) {
-      CeloAnalytics.track(AnalyticsEvents.invalid_exchange_rate, { exchangeRate })
+      ValoraAnalytics.track(AnalyticsEvents.invalid_exchange_rate, { exchangeRate })
       Logger.error(TAG, 'Cannot do exchange with rate of 0. Stopping.')
       throw new Error('Invalid exchange rate')
     }
@@ -217,7 +217,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     )
     const updatedTakerAmount = getTakerAmount(makerAmount, updatedExchangeRate)
     if (minimumTakerAmount.isGreaterThan(updatedTakerAmount)) {
-      CeloAnalytics.track(AnalyticsEvents.exchange_rate_change_failure, {
+      ValoraAnalytics.track(AnalyticsEvents.exchange_rate_change_failure, {
         makerToken,
         takerAmount: updatedTakerAmount,
         context: `Expected ${minimumTakerAmount}`,
@@ -254,7 +254,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
         convertedMakerAmount.toString()
       )
     } else {
-      CeloAnalytics.track(AnalyticsEvents.unexpected_maker_token, { makerToken })
+      ValoraAnalytics.track(AnalyticsEvents.unexpected_maker_token, { makerToken })
       Logger.error(TAG, `Unexpected maker token ${makerToken}`)
       return
     }
@@ -270,17 +270,17 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     )
 
     if (!txId) {
-      CeloAnalytics.track(AnalyticsEvents.missing_tx_id)
+      ValoraAnalytics.track(AnalyticsEvents.missing_tx_id)
       Logger.error(TAG, 'No txId. Did not exchange.')
       return
     }
     yield call(sendAndMonitorTransaction, txId, tx, account)
   } catch (error) {
-    CeloAnalytics.track(AnalyticsEvents.exchange_failed, { error: error.message })
+    ValoraAnalytics.track(AnalyticsEvents.exchange_failed, { error: error.message })
     Logger.error(TAG, 'Error doing exchange', error)
     const isDollarToGold = makerToken === CURRENCY_ENUM.DOLLAR
 
-    CeloAnalytics.track(
+    ValoraAnalytics.track(
       isDollarToGold ? AnalyticsEvents.gold_buy_error : AnalyticsEvents.gold_sell_error,
       {
         error,

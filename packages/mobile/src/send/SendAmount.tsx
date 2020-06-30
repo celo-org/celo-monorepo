@@ -14,8 +14,8 @@ import { getNumberFormatSettings } from 'react-native-localize'
 import SafeAreaView from 'react-native-safe-area-view'
 import { useDispatch } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackButton from 'src/components/BackButton.v2'
@@ -233,7 +233,7 @@ function SendAmount(props: Props) {
         isFromScan: props.route.params?.isFromScan,
       })
     } else {
-      CeloAnalytics.track(AnalyticsEvents.send_continue, continueAnalyticsParams)
+      ValoraAnalytics.track(AnalyticsEvents.send_continue, continueAnalyticsParams)
       navigate(Screens.SendConfirmation, {
         transactionData,
         isFromScan: props.route.params?.isFromScan,
@@ -257,10 +257,10 @@ function SendAmount(props: Props) {
         isPaymentRequest: true,
       })
     } else if (recipientVerificationStatus !== RecipientVerificationStatus.VERIFIED) {
-      CeloAnalytics.track(AnalyticsEvents.request_unavailable, continueAnalyticsParams)
+      ValoraAnalytics.track(AnalyticsEvents.request_unavailable, continueAnalyticsParams)
       navigate(Screens.PaymentRequestUnavailable, { transactionData })
     } else {
-      CeloAnalytics.track(AnalyticsEvents.request_continue, continueAnalyticsParams)
+      ValoraAnalytics.track(AnalyticsEvents.request_continue, continueAnalyticsParams)
       navigate(Screens.PaymentRequestConfirmation, { transactionData })
     }
   }, [addressValidationType, getTransactionData])

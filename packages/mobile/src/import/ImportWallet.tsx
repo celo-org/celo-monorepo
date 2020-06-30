@@ -10,8 +10,8 @@ import { Keyboard, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaConsumer } from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { hideAlert } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import {
   formatBackupPhraseOnEdit,
   formatBackupPhraseOnSubmit,
@@ -99,7 +99,7 @@ export class ImportWallet extends React.Component<Props, State> {
   onPressRestore = () => {
     Keyboard.dismiss()
     this.props.hideAlert()
-    CeloAnalytics.track(AnalyticsEvents.import_wallet_submit)
+    ValoraAnalytics.track(AnalyticsEvents.import_wallet_submit)
 
     const formattedPhrase = formatBackupPhraseOnSubmit(this.state.backupPhrase)
     this.setState({

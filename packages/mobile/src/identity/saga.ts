@@ -8,8 +8,8 @@ import {
   takeLeading,
 } from 'redux-saga/effects'
 import { showErrorInline } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
   Actions,
@@ -55,14 +55,14 @@ export function* validateRecipientAddressSaga({
       addressValidationType
     )
 
-    CeloAnalytics.track(AnalyticsEvents.send_secure_success, {
+    ValoraAnalytics.track(AnalyticsEvents.send_secure_success, {
       method: 'manual',
       validationType: addressValidationType === AddressValidationType.FULL ? 'full' : 'partial',
     })
 
     yield put(validateRecipientAddressSuccess(e164PhoneNumber, validatedAddress))
   } catch (error) {
-    CeloAnalytics.track(AnalyticsEvents.send_secure_incorrect, {
+    ValoraAnalytics.track(AnalyticsEvents.send_secure_incorrect, {
       method: 'manual',
       validationType: addressValidationType === AddressValidationType.FULL ? 'full' : 'partial',
       error: error.message,

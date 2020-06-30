@@ -11,8 +11,8 @@ import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import BackButton from 'src/components/BackButton.v2'
 import CommentTextInput from 'src/components/CommentTextInput'
@@ -163,8 +163,9 @@ export class SendConfirmation extends React.Component<Props, State> {
 
     const timestamp = Date.now()
 
-    CeloAnalytics.track(AnalyticsEvents.send_confirm, {
+    ValoraAnalytics.track(AnalyticsEvents.send_confirm, {
       method: this.props.route.params?.isFromScan ? 'scan' : 'search',
+      transactionType: !recipientAddress ? 'invite' : 'send',
       localCurrencyExchangeRate: this.props.localCurrencyExchangeRate,
       localCurrency: this.props.localCurrencyCode,
       dollarAmount: amount,
@@ -172,7 +173,6 @@ export class SendConfirmation extends React.Component<Props, State> {
         amount,
         this.props.localCurrencyExchangeRate
       ),
-      isInvite: !recipientAddress,
     })
 
     this.props.sendPaymentOrInvite(
@@ -188,7 +188,7 @@ export class SendConfirmation extends React.Component<Props, State> {
 
   onEditAddressClick = () => {
     const { transactionData, addressValidationType } = this.props
-    CeloAnalytics.track(AnalyticsEvents.send_secure_edit)
+    ValoraAnalytics.track(AnalyticsEvents.send_secure_edit)
     navigate(Screens.ValidateRecipientIntro, {
       transactionData,
       addressValidationType,
@@ -290,7 +290,7 @@ export class SendConfirmation extends React.Component<Props, State> {
       // so we adjust it here
       const securityFee = isInvite && fee ? fee.minus(inviteFee) : fee
 
-      CeloAnalytics.track(AnalyticsEvents.fee_rendered, { feeType: 'Security', fee: securityFee })
+      ValoraAnalytics.track(AnalyticsEvents.fee_rendered, { feeType: 'Security', fee: securityFee })
       const totalAmount = {
         value: amountWithFee,
         currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
