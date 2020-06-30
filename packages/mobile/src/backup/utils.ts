@@ -1,20 +1,25 @@
 import { generateMnemonic, MnemonicLanguages, MnemonicStrength } from '@celo/utils/src/account'
+import CryptoJS from 'crypto-js'
 import * as _ from 'lodash'
 import { useAsync } from 'react-async-hook'
 import * as bip39 from 'react-native-bip39'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { getKey } from 'src/utils/keyStore'
+import { getPassword } from 'src/pincode/authentication'
+import { retrieveStoredItem, storeItem } from 'src/storage/keychain'
 import Logger from 'src/utils/Logger'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'Backup/utils'
 
 export const DAYS_TO_BACKUP = 1
 export const DAYS_TO_DELAY = 1 / 24 // 1 hour delay
 export const MNEMONIC_SPLITTER = 'celo'
+
+export const MNEMONIC_STORAGE_KEY = 'mnemonic'
 
 export async function createQuizWordList(mnemonic: string, language: string | null) {
   const disallowedWordSet = new Set(mnemonic.split(' '))
@@ -95,19 +100,30 @@ export function joinMnemonic(mnemonicShards: string[]) {
   return [...firstHalf.slice(0, firstHalf.length - 1), ...secondHalf.slice(1)].join(' ')
 }
 
-export async function getStoredMnemonic(): Promise<string | null> {
-  try {
-    Logger.debug(TAG, 'Checking keystore for mnemonic')
-    const mnemonic = await getKey('mnemonic')
+export async function storeMnemonic(mnemonic: string, account: string | null) {
+  if (!account) {
+    throw new Error('Account not yet initialized')
+  }
+  const encryptedMnemonic = await encryptMnemonic(mnemonic, account)
+  return storeItem({ key: MNEMONIC_STORAGE_KEY, value: encryptedMnemonic })
+}
 
-    if (!mnemonic) {
+export async function getStoredMnemonic(account: string | null): Promise<string | null> {
+  try {
+    if (!account) {
+      throw new Error('Account not yet initialized')
+    }
+
+    Logger.debug(TAG, 'Checking keystore for mnemonic')
+    const encryptedMnemonic = await retrieveStoredItem(MNEMONIC_STORAGE_KEY)
+    if (!encryptedMnemonic) {
       throw new Error('No mnemonic found in storage')
     }
 
-    return mnemonic
+    return decryptMnemonic(encryptedMnemonic, account)
   } catch (error) {
     CeloAnalytics.track(CustomEventNames.failed_to_retrieve_mnemonic, { error: error.message })
-    Logger.error(TAG, 'Failed to retrieve mnemonic', error)
+    Logger.error(TAG, 'Failed to retrieve mnemonic', error, true)
     return null
   }
 }
@@ -122,7 +138,8 @@ export function onGetMnemonicFail(viewError: (error: ErrorMessages) => void, con
 
 export function useAccountKey() {
   const dispatch = useDispatch()
-  const asyncAccountKey = useAsync(getStoredMnemonic, [])
+  const account = useSelector(currentAccountSelector)
+  const asyncAccountKey = useAsync(getStoredMnemonic, [account])
 
   if (asyncAccountKey.error) {
     onGetMnemonicFail((error) => dispatch(showError(error)), 'useAccountKey')
@@ -161,4 +178,15 @@ export function isValidBackupPhrase(phrase: string) {
 
 export function isValidSocialBackupPhrase(phrase: string) {
   return isValidMnemonic(phrase, 13)
+}
+
+export async function encryptMnemonic(phrase: string, account: string) {
+  const password = await getPassword(account)
+  return CryptoJS.AES.encrypt(phrase, password).toString()
+}
+
+export async function decryptMnemonic(encryptedMnemonic: string, account: string) {
+  const password = await getPassword(account)
+  const bytes = CryptoJS.AES.decrypt(encryptedMnemonic, password)
+  return bytes.toString(CryptoJS.enc.Utf8)
 }

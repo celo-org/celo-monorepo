@@ -4,14 +4,13 @@ import { call, select } from 'redux-saga/effects'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { appLock, openDeepLink, setAppState } from 'src/app/actions'
 import { handleDeepLink, handleSetAppState, watchRehydrate } from 'src/app/saga'
-import { getAppLocked, getLastTimeBackgrounded, getLockWithPinEnabled } from 'src/app/selectors'
+import { getAppLocked, getLastTimeBackgrounded, getRequirePinOnAppOpen } from 'src/app/selectors'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
 import { isAppVersionDeprecated } from 'src/firebase/firebase'
 import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { getCachedPincode } from 'src/pincode/PincodeCache'
 
 jest.mock('src/utils/time', () => ({
   clockInSync: () => true,
@@ -50,13 +49,11 @@ describe('App saga', () => {
   })
 
   it('Handles set app state', async () => {
-    const mockedGetCachedPincode = getCachedPincode as jest.Mock
-    mockedGetCachedPincode.mockReturnValue(null)
     await expectSaga(handleSetAppState, setAppState('active'))
       .provide([
         [select(getAppLocked), false],
         [select(getLastTimeBackgrounded), 0],
-        [select(getLockWithPinEnabled), true],
+        [select(getRequirePinOnAppOpen), true],
       ])
       .put(appLock())
       .run()
@@ -65,7 +62,7 @@ describe('App saga', () => {
       .provide([
         [select(getAppLocked), true],
         [select(getLastTimeBackgrounded), 0],
-        [select(getLockWithPinEnabled), true],
+        [select(getRequirePinOnAppOpen), true],
       ])
       .run()
 
@@ -73,7 +70,7 @@ describe('App saga', () => {
       .provide([
         [select(getAppLocked), false],
         [select(getLastTimeBackgrounded), Date.now()],
-        [select(getLockWithPinEnabled), true],
+        [select(getRequirePinOnAppOpen), true],
       ])
       .run()
 
@@ -81,16 +78,15 @@ describe('App saga', () => {
       .provide([
         [select(getAppLocked), false],
         [select(getLastTimeBackgrounded), 0],
-        [select(getLockWithPinEnabled), false],
+        [select(getRequirePinOnAppOpen), false],
       ])
       .run()
 
-    mockedGetCachedPincode.mockReturnValue('123456')
     await expectSaga(handleSetAppState, setAppState('active'))
       .provide([
         [select(getAppLocked), false],
         [select(getLastTimeBackgrounded), 0],
-        [select(getLockWithPinEnabled), true],
+        [select(getRequirePinOnAppOpen), true],
       ])
       .run()
   })
