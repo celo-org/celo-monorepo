@@ -57,12 +57,13 @@ const SEGMENT_OPTIONS: analytics.Configuration = {
 
 class ValoraAnalytics {
   sessionId: string
-  address: string | null | undefined
+  userAddress: string | null | undefined
   deviceInfo: object
 
   constructor() {
     this.sessionId = ''
     this.deviceInfo = {}
+    this.userAddress = 'not yet set'
 
     if (!SEGMENT_API_KEY) {
       Logger.debug(TAG, 'Segment API Key not present, likely due to environment. Skipping enabling')
@@ -101,6 +102,10 @@ class ValoraAnalytics {
     })
   }
 
+  setUserAddress(address?: string | null) {
+    this.userAddress = address
+  }
+
   track<EventName extends keyof AnalyticsPropertiesList>(
     ...args: undefined extends AnalyticsPropertiesList[EventName]
       ? [EventName] | [EventName, AnalyticsPropertiesList[EventName]]
@@ -122,7 +127,7 @@ class ValoraAnalytics {
     const props: {} = {
       timestamp: Date.now(),
       sessionId: this.sessionId,
-      address: this.address,
+      userAddress: this.userAddress,
       ...eventProperties,
     }
 

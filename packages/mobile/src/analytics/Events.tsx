@@ -92,7 +92,7 @@ export enum VerificationEvents {
   verification_wait_for_select_issuers = 'verification_wait_for_select_issuers',
   verification_selecting_issuer = 'verification_selecting_issuer',
   verification_requested_attestations = 'verification_requested_attestations',
-  verification_set_account = 'verification_set_account',
+  verification_account_set = 'verification_account_set',
   verification_reveal_attestation = 'verification_reveal_attestation',
   verification_revealed_attestation = 'verification_revealed_attestation',
   verification_reveal_error = 'verification_reveal_error',

@@ -162,9 +162,7 @@ interface VerificationEventsProperties {
   [VerificationEvents.verification_wait_for_select_issuers]: undefined
   [VerificationEvents.verification_selecting_issuer]: undefined
   [VerificationEvents.verification_requested_attestations]: undefined
-  [VerificationEvents.verification_set_account]: {
-    address: string
-  }
+  [VerificationEvents.verification_account_set]: undefined
   [VerificationEvents.verification_reveal_attestation]: {
     issuer: any
   }

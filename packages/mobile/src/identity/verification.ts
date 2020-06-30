@@ -562,7 +562,8 @@ function* setAccount(accountsWrapper: AccountsWrapper, address: string, dataKey:
   }
   const setAccountTx = accountsWrapper.setAccount('', dataKey, address)
   yield call(sendTransaction, setAccountTx.txo, address, TAG, 'Set Wallet Address & DEK')
-  ValoraAnalytics.track(AnalyticsEvents.verification_set_account, { address })
+  ValoraAnalytics.setUserAddress(address)
+  ValoraAnalytics.track(AnalyticsEvents.verification_account_set)
 }
 
 async function isAccountUpToDate(
