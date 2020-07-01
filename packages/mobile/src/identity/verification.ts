@@ -503,7 +503,7 @@ function* tryRevealPhoneNumber(
         ? SMS_RETRIEVER_APP_SIGNATURE
         : undefined
 
-    const useProxy = DEFAULT_TESTNET === 'mainnet'
+    const useProxy = DEFAULT_TESTNET === 'mainnet' // Proxy required for any network where attestation service domains are not static
 
     const revealRequestBody: AttesationServiceRevealRequest = {
       account,
