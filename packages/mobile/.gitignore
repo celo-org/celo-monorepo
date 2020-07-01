@@ -66,6 +66,8 @@ coverage/
 
 android/keystore.properties
 android/app/celo-release-key.keystore
+android/app/.settings
+android/.settings
 
 .vscode/
 

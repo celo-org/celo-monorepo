@@ -26,7 +26,6 @@ export enum Screens {
   MoonPay = 'MoonPay',
   GoldEducation = 'GoldEducation',
   ImportWallet = 'ImportWallet',
-  ImportWalletEmpty = 'ImportWalletEmpty',
   ImportWalletSocial = 'ImportWalletSocial',
   ImportContacts = 'ImportContactsScreen',
   IncomingPaymentRequestListScreen = 'IncomingPaymentRequestListScreen',

@@ -19,7 +19,8 @@
   "pincodeSet": {
     "create": "Create a PIN",
     "verify": "Enter PIN again",
-    "pinsDontMatch": "The PINs didn't match"
+    "pinsDontMatch": "The PINs didn't match",
+    "invalidPin": "Invalid PIN"
   },
   "inviteCode": {
     "title": "Invite Code",
@@ -83,5 +84,10 @@
     "body": "<0>$t(verificationInputHelpDialog.bodySection1.title)</0>\n\n$t(verificationInputHelpDialog.bodySection1.content)\n\n<1>$t(verificationInputHelpDialog.bodySection2.title)</1>\n\n$t(verificationInputHelpDialog.bodySection2.content)",
     "skip": "Skip for now",
     "back": "Go Back"
+  },
+  "emptyAccount": {
+    "description": "This account doesn’t have any funds. Would you still like to use it?",
+    "useAccount": "Use Account",
+    "title": "Balance <0></0>"
   }
 }
