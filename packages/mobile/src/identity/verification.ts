@@ -512,18 +512,43 @@ function* tryRevealPhoneNumber(
     )
     if (!response.ok) {
       const body = yield response.json()
-      Logger.error(TAG + '@tryRevealPhoneNumber', `Reveal response not okay: ${body.error}`)
-      ValoraAnalytics.track(AnalyticsEvents.verification_reveal_error, {
-        issuer,
-        statusCode: response.status,
-      })
-      throw new Error(
-        `Error revealing to issuer ${attestation.attestationServiceURL}. Status code: ${response.status}`
-      )
+
+      if (body.error.includes('No incomplete attestation found')) {
+        // Retry as attestation service might not yet have received the block where it was made responsible for an attestation
+        yield call(
+          [attestationsWrapper, attestationsWrapper.revealPhoneNumberToIssuer],
+          phoneHashDetails.e164Number,
+          account,
+          attestation.issuer,
+          attestation.attestationServiceURL,
+          phoneHashDetails.salt,
+          smsAppSig
+        )
+        Logger.debug(
+          TAG + '@tryRevealPhoneNumber',
+          `Revealing for issuer ${issuer} successful with retry`
+        )
+        ValoraAnalytics.track(AnalyticsEvents.verification_revealed_attestation, {
+          retryRequired: true,
+          issuer,
+          duration: Date.now() - startTime,
+        })
+      } else {
+        Logger.error(TAG + '@tryRevealPhoneNumber', `Reveal response not okay: ${body.error}`)
+        ValoraAnalytics.track(AnalyticsEvents.verification_reveal_error, {
+          issuer,
+          statusCode: response.status,
+          error: body.error,
+        })
+        throw new Error(
+          `Error revealing to issuer ${attestation.attestationServiceURL}. Status code: ${response.status}`
+        )
+      }
     }
 
     Logger.debug(TAG + '@tryRevealPhoneNumber', `Revealing for issuer ${issuer} successful`)
     ValoraAnalytics.track(AnalyticsEvents.verification_revealed_attestation, {
+      retryRequired: false,
       issuer,
       duration: Date.now() - startTime,
     })

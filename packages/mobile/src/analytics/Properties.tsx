@@ -174,12 +174,14 @@ interface VerificationEventsProperties {
     issuer: any
   }
   [VerificationEvents.verification_revealed_attestation]: {
+    retryRequired: boolean
     issuer: any
     duration: number
   }
   [VerificationEvents.verification_reveal_error]: {
     issuer: any
     statusCode: any
+    error: any
   }
   [VerificationEvents.verification_wait_for_attestation_code]: {
     issuer: any
