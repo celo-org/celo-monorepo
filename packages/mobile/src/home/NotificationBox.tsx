@@ -132,7 +132,7 @@ export class NotificationBox extends React.Component<Props, State> {
         icon: <BackupKeyIcon height={40} width={40} />,
         callToActions: [
           {
-            text: t('backupKeyFlow6:getBackupKey'),
+            text: t('backupKeyFlow6:introPrimaryAction'),
             onPress: () => {
               ValoraAnalytics.track(AnalyticsEvents.get_backup_key)
               navigate(Screens.BackupIntroduction)
@@ -155,7 +155,7 @@ export class NotificationBox extends React.Component<Props, State> {
             },
           },
           {
-            text: t('maybeLater'),
+            text: t('global:remind'),
             onPress: () => {
               this.props.dismissGetVerified()
             },
@@ -196,14 +196,14 @@ export class NotificationBox extends React.Component<Props, State> {
         icon: homeIcon,
         callToActions: [
           {
-            text: t('exchange'),
+            text: t('learnMore'),
             onPress: () => {
               ValoraAnalytics.track(AnalyticsEvents.celogold_notification_confirm)
               navigate(Screens.GoldEducation)
             },
           },
           {
-            text: t('maybeLater'),
+            text: t('global:dismiss'),
             onPress: () => {
               ValoraAnalytics.track(AnalyticsEvents.celogold_notification_dismiss)
             },
@@ -219,7 +219,7 @@ export class NotificationBox extends React.Component<Props, State> {
         icon: inviteFriendsIcon,
         callToActions: [
           {
-            text: t('global:inviteFriends'),
+            text: t('global:connect'),
             onPress: () => {
               this.props.dismissInviteFriends()
               ValoraAnalytics.track(AnalyticsEvents.invitefriends_notification_confirm)
@@ -227,7 +227,7 @@ export class NotificationBox extends React.Component<Props, State> {
             },
           },
           {
-            text: t('maybeLater'),
+            text: t('global:remind'),
             onPress: () => {
               this.props.dismissInviteFriends()
               ValoraAnalytics.track(AnalyticsEvents.invitefriends_notification_dismiss)
