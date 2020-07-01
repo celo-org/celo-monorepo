@@ -127,9 +127,10 @@ async function initGeth(sync: boolean = true) {
     const geth = await createNewGeth(sync)
 
     if (!sync) {
-      // TODO: cache somewhere
+      // chain data must be deleted to prevent geth from syncing with data saver on
+      // TODO: consider only deleting the geth p2p nodes database
+      // TODO: save chain data s.t. when data saver goes off syncing resumes from data
       await deleteChainData()
-      // await deleteNodeDbIfExists()
     }
 
     try {
@@ -258,11 +259,6 @@ async function writeStaticNodes(nodeDir: string, enodes: string) {
   await deleteFileIfExists(staticNodesFile)
   await RNFS.writeFile(staticNodesFile, enodes, 'utf8')
 }
-
-// async function deleteNodeDbIfExists() {
-//   const { nodeDir } = networkConfig
-//   return deleteFileIfExists(`${getNodeInstancePath(nodeDir)}/nodes`)
-// }
 
 async function attemptGethCorruptionFix(geth: any, sync: boolean = true) {
   const deleteChainDataResult = await deleteChainData()
