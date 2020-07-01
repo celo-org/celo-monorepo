@@ -7,8 +7,6 @@ import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
 import { exitBackupFlow } from 'src/app/actions'
 import { Namespaces, withTranslation } from 'src/i18n'
 import SafeguardsPeopleIcon from 'src/icons/SafeguardsPeopleIcon'
@@ -40,7 +38,6 @@ class BackupSocialIntro extends React.Component<Props> {
   }
 
   onPressSkip = () => {
-    CeloAnalytics.track(CustomEventNames.skip_social_backup)
     this.props.exitBackupFlow()
     navigateHome()
   }

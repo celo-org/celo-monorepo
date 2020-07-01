@@ -1,9 +1,9 @@
 import { BtnTypes } from '@celo/react-components/components/Button.v2'
 import { StackScreenProps } from '@react-navigation/stack'
-import * as React from 'react'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
 import Education from 'src/account/Education'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import { Namespaces } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -43,26 +43,26 @@ function useSteps() {
       [
         {
           image: null,
-          cancelEvent: CustomEventNames.backup_educate_1_cancel,
-          progressEvent: CustomEventNames.backup_educate_1_next,
+          cancelEvent: AnalyticsEvents.backup_educate_1_cancel,
+          progressEvent: AnalyticsEvents.backup_educate_1_next,
           screenName: 'AccountKeyEducation',
         },
         {
           image: null,
-          cancelEvent: CustomEventNames.backup_educate_2_cancel,
-          progressEvent: CustomEventNames.backup_educate_2_next,
+          cancelEvent: AnalyticsEvents.backup_educate_2_cancel,
+          progressEvent: AnalyticsEvents.backup_educate_2_next,
           screenName: 'AccountKeyEducation',
         },
         {
           image: null,
-          cancelEvent: CustomEventNames.backup_educate_3_cancel,
-          progressEvent: CustomEventNames.backup_educate_3_next,
+          cancelEvent: AnalyticsEvents.backup_educate_3_cancel,
+          progressEvent: AnalyticsEvents.backup_educate_3_next,
           screenName: 'AccountKeyEducation',
         },
         {
           image: null,
-          cancelEvent: CustomEventNames.backup_educate_4_cancel,
-          progressEvent: CustomEventNames.backup_educate_4_next,
+          cancelEvent: AnalyticsEvents.backup_educate_4_cancel,
+          progressEvent: AnalyticsEvents.backup_educate_4_next,
           screenName: 'AccountKeyEducation',
         },
       ].map((step, index) => {
