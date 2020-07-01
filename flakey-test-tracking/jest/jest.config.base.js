@@ -2,7 +2,7 @@ const flakeTrackingConfig = {
   globals: {
     FLAKES: Map,
     RETRY_TIMES: 10,
-    SKIP_KNOWN_FLAKES: false,
+    SKIP_KNOWN_FLAKES: true && process.env.CI,
   },
   globalSetup: require.resolve('./jest.global.setup.js'),
   setupFilesAfterEnv: [require.resolve('./jest.setup.js')],

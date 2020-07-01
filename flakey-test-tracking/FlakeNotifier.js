@@ -9,6 +9,8 @@ const FlakeLabel = 'FLAKEY :snowflake:'
 
 //TODO(Alec, next): Add ssh key to circleci
 
+//TODO(Alec): disable new PRs with WIP flag
+
 function processFlakeyTestResults(flakeyTestResults) {
   console.log('PROCESS FLAKEY TEST RESULTS \n')
   if (process.env.CI) {
@@ -83,6 +85,8 @@ async function leavePrComment(flake) {
 
 //TODO(Alec): Rename file
 async function fetchKnownFlakes() {
+  if (!process.env.CI) return
+
   try {
     return (
       await client.paginate(client.issues.listForRepo, {
