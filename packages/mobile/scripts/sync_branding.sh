@@ -1,13 +1,27 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# ========================================
+# Setup branding used in the project
+# ========================================
+
+# Flags:
+# -b (Optional): Name of the branding to use: celo or valora (default)
+
+branding=valora
+while getopts 'b:' flag; do
+  case "${flag}" in
+    b) branding="$OPTARG" ;;
+    *) error "Unexpected option ${flag}" ;;
+  esac
+done
+
 mobile_root="$(dirname "$(dirname "$0")")"
 echo $mobile_root
 cd "$mobile_root"
 
-branding=valora
-# Please update the sha when branding updates are needed
-branding_sha=eefeea1
+# Please update the sha when valora branding updates are needed
+valora_branding_sha=eefeea1
 
 if [[ "$branding" == "valora" ]]; then
   # prevents git from asking credentials
@@ -17,7 +31,7 @@ if [[ "$branding" == "valora" ]]; then
     branding=celo
   else 
     pushd "branding/$branding"
-    git checkout "$branding_sha"
+    git checkout "$valora_branding_sha"
     popd
   fi
 fi
