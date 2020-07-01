@@ -118,11 +118,6 @@ async function initGeth(sync: boolean = true) {
   gethLock = true
 
   try {
-    if (gethInstance) {
-      Logger.debug('Geth@init', 'Geth already exists, trying to stop it.')
-      await stop()
-    }
-
     if (!(await ensureGenesisBlockWritten())) {
       throw FailedToFetchGenesisBlockError
     }
