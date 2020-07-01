@@ -8,7 +8,8 @@ import * as React from 'react'
 import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Swiper from 'react-native-swiper'
-import { AnalyticsEventType } from 'src/analytics/Events'
+import { OnboardingEvents } from 'src/analytics/Events'
+import { ScrollDirection } from 'src/analytics/types'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { placeholder } from 'src/images/Images'
 import { navigateBack } from 'src/navigator/NavigationService'
@@ -18,13 +19,16 @@ interface State {
   step: number
 }
 
+export enum EducationTopic {
+  backup = 'backup',
+  celo = 'celo',
+}
+
 interface EducationStep {
   image: ImageSourcePropType | null
+  topic: EducationTopic
   title: string
   text: string
-  cancelEvent: AnalyticsEventType
-  progressEvent: AnalyticsEventType
-  screenName: string
 }
 
 export interface Props {
@@ -44,15 +48,26 @@ export default class Education extends React.Component<Props, State> {
   swiper = React.createRef<Swiper>()
 
   goBack = () => {
-    const currentStepInfo = this.props.stepInfo[this.state.step]
-    if (currentStepInfo.cancelEvent && currentStepInfo.screenName) {
-      ValoraAnalytics.track(currentStepInfo.cancelEvent, {
-        screen: currentStepInfo.screenName,
-      })
-    }
-    if (this.state.step === 0) {
+    const { step } = this.state
+    const { topic } = this.props.stepInfo[this.state.step]
+    if (step === 0) {
+      const analyticsEvent =
+        topic === EducationTopic.backup
+          ? OnboardingEvents.backup_education_cancel
+          : OnboardingEvents.celo_education_cancel
+
+      ValoraAnalytics.track(analyticsEvent)
       navigateBack()
     } else {
+      const analyticsEvent =
+        topic === EducationTopic.backup
+          ? OnboardingEvents.backup_education_scroll
+          : OnboardingEvents.celo_education_scroll
+
+      ValoraAnalytics.track(analyticsEvent, {
+        currentStep: step,
+        direction: ScrollDirection.previous,
+      })
       this.swiper?.current?.scrollBy(-1, true)
     }
   }
@@ -62,14 +77,23 @@ export default class Education extends React.Component<Props, State> {
   }
 
   nextStep = () => {
-    const isLastStep = this.state.step === this.props.stepInfo.length - 1
-    const currentStepInfo = this.props.stepInfo[this.state.step]
-    ValoraAnalytics.track(currentStepInfo.progressEvent)
+    const { step } = this.state
+    const { topic } = this.props.stepInfo[this.state.step]
+    const isLastStep = step === this.props.stepInfo.length - 1
 
     if (isLastStep) {
       this.props.onFinish()
       this.swiper?.current?.scrollTo(0)
     } else {
+      const analyticsEvent =
+        topic === EducationTopic.backup
+          ? OnboardingEvents.backup_education_scroll
+          : OnboardingEvents.celo_education_scroll
+
+      ValoraAnalytics.track(analyticsEvent, {
+        currentStep: step,
+        direction: ScrollDirection.next,
+      })
       this.swiper?.current?.scrollBy(1, true)
     }
   }

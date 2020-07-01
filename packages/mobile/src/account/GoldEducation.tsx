@@ -1,9 +1,9 @@
 import { BtnTypes } from '@celo/react-components/components/Button.v2'
-import * as React from 'react'
+import React, { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import Education from 'src/account/Education'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import Education, { EducationTopic } from 'src/account/Education'
+import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setEducationCompleted } from 'src/goldToken/actions'
 import { Namespaces } from 'src/i18n'
@@ -20,7 +20,7 @@ export default function GoldEducation() {
   const isCeloEducationComplete = useSelector((state) => state.goldToken.educationCompleted)
 
   const onFinish = () => {
-    ValoraAnalytics.track(AnalyticsEvents.exchange_gold_nux)
+    ValoraAnalytics.track(OnboardingEvents.celo_education_complete)
 
     if (isCeloEducationComplete) {
       navigateBack()
@@ -31,6 +31,10 @@ export default function GoldEducation() {
   }
 
   const stepInfo = useStep()
+
+  useEffect(() => {
+    ValoraAnalytics.track(OnboardingEvents.celo_education_start)
+  }, [])
 
   return (
     <Education
@@ -51,27 +55,19 @@ function useStep() {
     return [
       {
         image: shinyGold,
-        cancelEvent: AnalyticsEvents.gold_cancel1,
-        progressEvent: AnalyticsEvents.gold_educate_1_next,
-        screenName: 'Gold_Nux_1',
+        topic: EducationTopic.celo,
       },
       {
         image: goldValue,
-        cancelEvent: AnalyticsEvents.gold_cancel2,
-        progressEvent: AnalyticsEvents.gold_educate_2_next,
-        screenName: 'Gold_Nux_2',
+        topic: EducationTopic.celo,
       },
       {
         image: exchangeIcon,
-        cancelEvent: AnalyticsEvents.gold_cancel3,
-        progressEvent: AnalyticsEvents.gold_educate_3_next,
-        screenName: 'Gold_Nux_3',
+        topic: EducationTopic.celo,
       },
       {
         image: exchangeIcon, // Placeholder Image
-        cancelEvent: AnalyticsEvents.gold_cancel4,
-        progressEvent: AnalyticsEvents.gold_educate_4_next,
-        screenName: 'Gold_Nux_4',
+        topic: EducationTopic.celo,
       },
     ].map((step, index) => {
       return {

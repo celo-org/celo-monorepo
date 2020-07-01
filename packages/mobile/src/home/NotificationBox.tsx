@@ -9,6 +9,7 @@ import { dismissEarnRewards, dismissGetVerified, dismissInviteFriends } from 'sr
 import { getIncomingPaymentRequests, getOutgoingPaymentRequests } from 'src/account/selectors'
 import { PaymentRequest } from 'src/account/types'
 import { NotificationEvents } from 'src/analytics/Events'
+import { ScrollDirection } from 'src/analytics/types'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { PROMOTE_REWARDS_APP } from 'src/config'
 import { EscrowedPayment } from 'src/escrow/actions'
@@ -46,11 +47,6 @@ export enum NotificationBannerCTATypes {
   reclaim = 'reclaim',
   remind = 'remind',
   pay = 'pay',
-}
-
-export enum NotificationScrollDirection {
-  next = 'next',
-  previous = 'previous',
 }
 
 interface StateProps {
@@ -324,10 +320,7 @@ export class NotificationBox extends React.Component<Props, State> {
       return
     }
 
-    const direction =
-      nextIndex > currentIndex
-        ? NotificationScrollDirection.next
-        : NotificationScrollDirection.previous
+    const direction = nextIndex > currentIndex ? ScrollDirection.next : ScrollDirection.previous
     ValoraAnalytics.track(NotificationEvents.notification_scroll, { direction })
 
     this.setState({

@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { FlatList, ListRenderItemInfo, ScrollView, StyleSheet, Text } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { SettingsEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setLanguage } from 'src/app/actions'
 import { AVAILABLE_LANGUAGES } from 'src/config'
@@ -35,7 +35,7 @@ function LanguageScreen({ route }: Props) {
   const fromSettings = route.params?.fromSettings
 
   const onSelect = (language: string, code: string) => {
-    ValoraAnalytics.track(AnalyticsEvents.language_select, { language: code })
+    ValoraAnalytics.track(SettingsEvents.language_select, { language: code })
     dispatch(setLanguage(code))
     // Wait for next frame before navigating back
     // so the user can see the changed selection briefly

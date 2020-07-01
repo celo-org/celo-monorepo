@@ -20,15 +20,10 @@ export enum NotificationEvents {
 }
 
 export enum OnboardingEvents {
-  backup_educate_1_next = 'backup_educate_1_next', // next button on 1st edu screen
-  backup_educate_2_next = 'backup_educate_2_next', // next button on 2nd edu screen
-  backup_educate_3_next = 'backup_educate_3_next', // next button on 3rd edu screen
-  backup_educate_4_next = 'backup_educate_4_next', // next button on 4th edu screen
-
-  backup_educate_1_cancel = 'backup_educate_1_cancel', // cancel button on 1st edu screen
-  backup_educate_2_cancel = 'backup_educate_2_cancel', // cancel button on 2nd edu screen
-  backup_educate_3_cancel = 'backup_educate_3_cancel', // cancel button on 3rd edu screen
-  backup_educate_4_cancel = 'backup_educate_4_cancel', // cancel button on 4th edu screen
+  backup_education_start = 'backup_education_start',
+  backup_education_scroll = 'backup_education_scroll',
+  backup_education_complete = 'backup_education_complete',
+  backup_education_cancel = 'backup_education_cancel',
 
   backup_start = 'backup_start', // ‘set up now’ button click
   backup_setup_info = 'backup_setup_info',
@@ -47,17 +42,10 @@ export enum OnboardingEvents {
   backup_setup_toggle_disable = 'backup_setup_toggle_disable', // (count # of slides to disagree on "I wrote down account key" Switch in Backup_Phrase)
   backup_error = 'backup_error',
 
-  gold_educate_1_next = 'gold_educate_1_next', // next button on 1st edu screen
-  gold_educate_2_next = 'gold_educate_2_next', // next button on 2nd edu screen
-  gold_educate_3_next = 'gold_educate_3_next', // next button on 3rd edu screen
-  gold_educate_4_next = 'gold_educate_4_next', // next button on 4th edu screen
-
-  gold_cancel1 = 'gold_cancel1', // cancel button on 1st edu screen
-  gold_cancel2 = 'gold_cancel2', // cancel button on 2nd edu screen
-  gold_cancel3 = 'gold_cancel3', // cancel button on 3rd edu screen
-  gold_cancel4 = 'gold_cancel4', // cancel button on 4th edu screen
-
-  exchange_gold_nux = 'exchange_gold_nux',
+  celo_education_start = 'celo_education_start',
+  celo_education_scroll = 'celo_education_scroll',
+  celo_education_complete = 'celo_education_complete',
+  celo_education_cancel = 'celo_education_cancel',
 
   phone_number_set = 'phone_number_set',
   invalid_phone_number = 'invalid_phone_number',

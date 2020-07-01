@@ -16,7 +16,7 @@ import { connect } from 'react-redux'
 import { devModeTriggerClicked, toggleBackupState } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { SettingsEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import {
   resetAppOpenedState,
@@ -101,7 +101,7 @@ interface State {
 
 export class Account extends React.Component<Props, State> {
   goToProfile = () => {
-    ValoraAnalytics.track(AnalyticsEvents.edit_profile)
+    ValoraAnalytics.track(SettingsEvents.edit_profile)
     this.props.navigation.navigate(Screens.Profile)
   }
 

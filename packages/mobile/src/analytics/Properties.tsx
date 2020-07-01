@@ -16,12 +16,9 @@ import {
   TransactionEvents,
   VerificationEvents,
 } from 'src/analytics/Events'
+import { ScrollDirection } from 'src/analytics/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import {
-  NotificationBannerCTATypes,
-  NotificationBannerTypes,
-  NotificationScrollDirection,
-} from 'src/home/NotificationBox'
+import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { RecipientKind } from 'src/recipients/recipient'
 
@@ -62,7 +59,7 @@ interface NotificationEventsProperties {
   [NotificationEvents.notification_scroll]: {
     // TODO: Pass in notificationType and make param required
     notificationType?: NotificationBannerTypes
-    direction: NotificationScrollDirection
+    direction: ScrollDirection
   }
   [NotificationEvents.notification_select]: {
     notificationType: NotificationBannerTypes
@@ -71,23 +68,13 @@ interface NotificationEventsProperties {
 }
 
 interface OnboardingEventsProperties {
-  [OnboardingEvents.backup_educate_1_next]: undefined
-  [OnboardingEvents.backup_educate_2_next]: undefined
-  [OnboardingEvents.backup_educate_3_next]: undefined
-  [OnboardingEvents.backup_educate_4_next]: undefined
-
-  [OnboardingEvents.backup_educate_1_cancel]: {
-    screen: string
+  [OnboardingEvents.backup_education_start]: undefined
+  [OnboardingEvents.backup_education_scroll]: {
+    currentStep: number
+    direction: ScrollDirection
   }
-  [OnboardingEvents.backup_educate_2_cancel]: {
-    screen: string
-  }
-  [OnboardingEvents.backup_educate_3_cancel]: {
-    screen: string
-  }
-  [OnboardingEvents.backup_educate_4_cancel]: {
-    screen: string
-  }
+  [OnboardingEvents.backup_education_complete]: undefined
+  [OnboardingEvents.backup_education_cancel]: undefined
 
   [OnboardingEvents.backup_start]: undefined
   [OnboardingEvents.backup_setup_info]: undefined
@@ -113,25 +100,14 @@ interface OnboardingEventsProperties {
     context?: string
   }
 
-  [OnboardingEvents.gold_educate_1_next]: undefined
-  [OnboardingEvents.gold_educate_2_next]: undefined
-  [OnboardingEvents.gold_educate_3_next]: undefined
-  [OnboardingEvents.gold_educate_4_next]: undefined
+  [OnboardingEvents.celo_education_start]: undefined
+  [OnboardingEvents.celo_education_scroll]: {
+    currentStep: number
+    direction: ScrollDirection
+  }
+  [OnboardingEvents.celo_education_complete]: undefined
+  [OnboardingEvents.celo_education_cancel]: undefined
 
-  [OnboardingEvents.exchange_gold_nux]: undefined
-
-  [OnboardingEvents.gold_cancel1]: {
-    screen: string
-  }
-  [OnboardingEvents.gold_cancel2]: {
-    screen: string
-  }
-  [OnboardingEvents.gold_cancel3]: {
-    screen: string
-  }
-  [OnboardingEvents.gold_cancel4]: {
-    screen: string
-  }
   [OnboardingEvents.phone_number_set]: {
     countryCode: string
   }
