@@ -94,7 +94,7 @@ ___
 
 *Defined in [contractkit/src/wrappers/GasPriceMinimum.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GasPriceMinimum.ts#L19)*
 
-Query current gas price minimum in gGLD.
+Query current gas price minimum in CELO.
 
 **`returns`** current gas price minimum in CELO
 

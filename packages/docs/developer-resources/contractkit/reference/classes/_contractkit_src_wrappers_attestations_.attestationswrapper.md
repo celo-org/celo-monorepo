@@ -456,7 +456,7 @@ ___
 
 ###  getVerifiedStatus
 
-▸ **getVerifiedStatus**(`identifier`: string, `account`: [Address](../modules/_contractkit_src_base_.md#address), `numAttestationsRequired?`: undefined | number, `attestationThreshold?`: undefined | number): *Promise‹AttestationsStatus›*
+▸ **getVerifiedStatus**(`identifier`: string, `account`: [Address](../modules/_contractkit_src_base_.md#address), `numAttestationsRequired?`: undefined | number, `attestationThreshold?`: undefined | number): *Promise‹any›*
 
 *Defined in [contractkit/src/wrappers/Attestations.ts:215](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L215)*
 
