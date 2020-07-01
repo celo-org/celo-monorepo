@@ -31,6 +31,7 @@ if [[ "$branding" == "valora" ]]; then
     branding=celo
   else 
     pushd "branding/$branding"
+    git fetch
     git checkout "$valora_branding_sha"
     popd
   fi
