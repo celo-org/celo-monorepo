@@ -7,7 +7,7 @@ cd "$mobile_root"
 
 branding=valora
 # Please update the sha when branding updates are needed
-branding_sha=6d643e3
+branding_sha=eefeea1
 
 if [[ "$branding" == "valora" ]]; then
   # prevents git from asking credentials

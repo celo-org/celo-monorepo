@@ -1,6 +1,7 @@
 {
-  "title": "Restore your Celo Wallet",
-  "userYourBackupKey": "Already have a Celo Wallet? Enter your Backup Key to restore it to this phone.",
+  "title": "Restore your {{appName}} account",
+  "userYourBackupKey":
+    "Already have a {{appName}} account? Enter your Account Key to restore it to this phone.",
   "tip": "Tip: ",
   "backupKeyTip": "Backup Keys are 24 words long, separated by a space.",
   "restoreSocial": "Restore with Safeguards",

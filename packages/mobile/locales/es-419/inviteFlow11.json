@@ -21,7 +21,7 @@
   "transferGoldToAccount": "CELO transferido a tu cuenta!",
   "withdrawDollarsFromEscrow": "Retirando los {{dollars}} de tu cuenta...",
   "transferDollarsToAccount": "{{Dollars}} transferidos a tu cuenta!",
-  "inviteFriendsToCelo": "Invitar amigos a Celo",
+  "inviteFriendsToCelo": "Invitar amigos a {{appName}}",
   "inviteAnyone": "Invite a cualquier persona en su libreta de direcciones a enviar y recibir fondos",
   "inviteComplete": "Invitación completa",
   "inviteReceived": "Invitación recibida",
