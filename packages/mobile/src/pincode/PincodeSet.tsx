@@ -10,8 +10,8 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { setPincode } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
@@ -66,9 +66,9 @@ export class PincodeSet extends React.Component<Props, State> {
 
   onCompletePin1 = () => {
     if (this.isPin1Valid(this.state.pin1)) {
-      CeloAnalytics.track(CustomEventNames.pin_value)
       this.props.navigation.setParams({ isVerifying: true })
     } else {
+      ValoraAnalytics.track(AnalyticsEvents.pin_invalid, { error: 'Pin is invalid' })
       this.setState({
         pin1: '',
         pin2: '',
@@ -78,14 +78,15 @@ export class PincodeSet extends React.Component<Props, State> {
   }
 
   onCompletePin2 = async (pin2: string) => {
-    CeloAnalytics.track(CustomEventNames.pin_create_button)
     const { pin1 } = this.state
     if (this.isPin1Valid(pin1) && this.isPin2Valid(pin2)) {
       setCachedPin(DEFAULT_CACHE_ACCOUNT, pin1)
       this.props.setPincode(PincodeType.CustomPin)
+      ValoraAnalytics.track(AnalyticsEvents.pin_created)
       this.props.navigation.navigate(Screens.EnterInviteCode)
     } else {
       this.props.navigation.setParams({ isVerifying: false })
+      ValoraAnalytics.track(AnalyticsEvents.pin_invalid, { error: 'Pins do not match' })
       this.setState({
         pin1: '',
         pin2: '',

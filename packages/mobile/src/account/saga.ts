@@ -6,8 +6,8 @@ import {
   setPincodeSuccess,
 } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import Logger from 'src/utils/Logger'
 
@@ -21,7 +21,7 @@ export function* setPincode({ pincodeType }: SetPincodeAction) {
     Logger.info(TAG + '@setPincode', 'Pincode set successfully')
   } catch (error) {
     Logger.error(TAG + '@setPincode', 'Failed to set pincode', error)
-    CeloAnalytics.track(CustomEventNames.pin_failed_to_set, { error, pincodeType })
+    ValoraAnalytics.track(AnalyticsEvents.pin_failed_to_set, { error: error.message, pincodeType })
     yield put(showError(ErrorMessages.SET_PIN_FAILED))
     yield put(setPincodeFailure())
   }
