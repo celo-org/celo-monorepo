@@ -6,8 +6,8 @@ import { createRef } from 'react'
 import sleep from 'sleep-promise'
 import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames, DefaultEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { requestPincodeInput } from 'src/pincode/authentication'
@@ -93,7 +93,7 @@ export async function ensurePincode(): Promise<boolean> {
 
   if (pincodeType === PincodeType.Unset) {
     Logger.error(TAG + '@ensurePincode', 'Pin has never been set')
-    CeloAnalytics.track(CustomEventNames.pin_never_set)
+    ValoraAnalytics.track(AnalyticsEvents.pin_never_set)
     return false
   }
 
@@ -140,6 +140,5 @@ export function navigateHome(params?: object) {
 
 export function navigateToError(errorMessage: string, error?: Error) {
   Logger.error(`${TAG}@navigateToError`, `Navigating to error screen: ${errorMessage}`, error)
-  CeloAnalytics.track(DefaultEventNames.errorDisplayed, { error }, true)
   navigate(Screens.ErrorScreen, { errorMessage })
 }

@@ -9,8 +9,8 @@ import SendIntentAndroid from 'react-native-send-intent'
 import SendSMS from 'react-native-sms'
 import { call, delay, put, race, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError, showMessage } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ALERT_BANNER_DURATION, USE_PHONE_NUMBER_PRIVACY } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
@@ -212,7 +212,9 @@ export function* sendInvite(
     const addressToE164Number = { [temporaryAddress.toLowerCase()]: e164Number }
     yield put(updateE164PhoneNumberAddresses({}, addressToE164Number))
     yield call(navigateToInviteMessageApp, e164Number, inviteMode, message)
+    ValoraAnalytics.track(AnalyticsEvents.invite_success)
   } catch (e) {
+    ValoraAnalytics.track(AnalyticsEvents.invite_error, { error: e.message })
     Logger.error(TAG, 'Send invite error: ', e)
     throw e
   }
@@ -299,7 +301,7 @@ export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
     yield put(redeemInviteFailure())
   } else if (timeout) {
     Logger.debug(TAG, 'Redeem Invite timed out')
-    CeloAnalytics.track(CustomEventNames.redeem_invite_timed_out)
+    ValoraAnalytics.track(AnalyticsEvents.redeem_invite_timed_out)
     yield put(redeemInviteFailure())
     yield put(showError(ErrorMessages.REDEEM_INVITE_TIMEOUT))
   }
@@ -316,7 +318,9 @@ export function* doRedeemInvite(inviteCode: string) {
       tempAccount
     )
     if (tempAccountBalanceWei.isLessThanOrEqualTo(0)) {
-      CeloAnalytics.track(CustomEventNames.redeem_invite_failed, { context: 'Empty invite' })
+      ValoraAnalytics.track(AnalyticsEvents.redeem_invite_failed, {
+        error: 'Empty invite',
+      })
       yield put(showError(ErrorMessages.EMPTY_INVITE_CODE))
       return false
     }
@@ -325,11 +329,11 @@ export function* doRedeemInvite(inviteCode: string) {
     yield call(addTempAccountToWallet, inviteCode)
     yield call(withdrawFundsFromTempAccount, tempAccount, tempAccountBalanceWei, newAccount)
     yield put(fetchDollarBalance())
-    CeloAnalytics.track(CustomEventNames.redeem_invite_success)
+    ValoraAnalytics.track(AnalyticsEvents.redeem_invite_success)
     return true
   } catch (e) {
     Logger.error(TAG + '@doRedeemInvite', 'Failed to redeem invite', e)
-    CeloAnalytics.track(CustomEventNames.redeem_invite_failed, { error: e.message })
+    ValoraAnalytics.track(AnalyticsEvents.redeem_invite_failed, { error: e.message })
     if (e.message in ErrorMessages) {
       yield put(showError(e.message))
     } else {
@@ -347,11 +351,11 @@ export function* skipInvite() {
     yield put(refreshAllBalances())
     yield put(setHasSeenVerificationNux(true))
     Logger.debug(TAG + '@skipInvite', 'Done skipping invite')
-    CeloAnalytics.track(CustomEventNames.invite_skip_complete)
+    ValoraAnalytics.track(AnalyticsEvents.invite_skip_complete)
     navigateHome()
   } catch (e) {
     Logger.error(TAG, 'Failed to skip invite', e)
-    CeloAnalytics.track(CustomEventNames.invite_skip_failed, { error: e.message })
+    ValoraAnalytics.track(AnalyticsEvents.invite_skip_failed, { error: e.message })
     yield put(showError(ErrorMessages.ACCOUNT_SETUP_FAILED))
   }
 }

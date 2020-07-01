@@ -5,8 +5,8 @@ import { useAsync } from 'react-async-hook'
 import * as bip39 from 'react-native-bip39'
 import { useDispatch, useSelector } from 'react-redux'
 import { showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { getPassword } from 'src/pincode/authentication'
 import { retrieveStoredItem, storeItem } from 'src/storage/keychain'
@@ -122,15 +122,14 @@ export async function getStoredMnemonic(account: string | null): Promise<string 
 
     return decryptMnemonic(encryptedMnemonic, account)
   } catch (error) {
-    CeloAnalytics.track(CustomEventNames.failed_to_retrieve_mnemonic, { error: error.message })
-    Logger.error(TAG, 'Failed to retrieve mnemonic', error, true)
+    Logger.error(TAG, 'Failed to retrieve mnemonic', error)
     return null
   }
 }
 
 export function onGetMnemonicFail(viewError: (error: ErrorMessages) => void, context?: string) {
   viewError(ErrorMessages.FAILED_FETCH_MNEMONIC)
-  CeloAnalytics.track(CustomEventNames.backup_error, {
+  ValoraAnalytics.track(AnalyticsEvents.backup_error, {
     title: 'Failed to retrieve Account Key',
     context,
   })
@@ -141,7 +140,7 @@ export function useAccountKey() {
   const account = useSelector(currentAccountSelector)
   const asyncAccountKey = useAsync(getStoredMnemonic, [account])
 
-  if (asyncAccountKey.error) {
+  if (!asyncAccountKey || asyncAccountKey.error) {
     onGetMnemonicFail((error) => dispatch(showError(error)), 'useAccountKey')
   }
 
