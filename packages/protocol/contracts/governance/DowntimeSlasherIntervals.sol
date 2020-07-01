@@ -12,7 +12,7 @@ contract DowntimeSlasherIntervals is SlasherUtil {
   // validator has been slashed.
   mapping(address => mapping(uint256 => uint256[2])) slashedIntervals;
 
-  // Maps startBlock -> endBlock -> signature bitmap for that interval.
+  // Maps validator -> startBlock -> endBlock -> signature bitmap for that interval.
   // Note that startBlock and endBlock must always be in the same epoch.
   mapping(address => mapping(uint256 => mapping(uint256 => bytes32))) private bitmaps;
 
@@ -20,12 +20,7 @@ contract DowntimeSlasherIntervals is SlasherUtil {
 
   event SlashableDowntimeSet(uint256 interval);
   event DowntimeSlashPerformed(address indexed validator, uint256 indexed startBlock);
-  event BitmapSetForInterval(
-    address indexed user,
-    uint256 indexed startBlock,
-    uint256 indexed endblock,
-    bytes32 bitmap
-  );
+  event BitmapSetForInterval(uint256 indexed startBlock, uint256 indexed endblock, bytes32 bitmap);
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
