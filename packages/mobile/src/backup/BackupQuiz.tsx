@@ -12,8 +12,8 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { setBackupCompleted } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import CancelConfirm from 'src/backup/CancelConfirm'
 import { QuizzBottom } from 'src/backup/QuizzBottom'
 import { getStoredMnemonic, onGetMnemonicFail } from 'src/backup/utils'
@@ -130,7 +130,7 @@ export class BackupQuiz extends React.Component<Props, State> {
     })
 
     if (newUserChosenWords.length === 1) {
-      CeloAnalytics.startTracking(CustomEventNames.backup_quiz_submit)
+      ValoraAnalytics.track(AnalyticsEvents.backup_quiz_start)
     }
   }
 
@@ -150,10 +150,7 @@ export class BackupQuiz extends React.Component<Props, State> {
       mnemonicWords: mnemonicWordsUpdated,
       userChosenWords: userChosenWordsUpdated,
     })
-    CeloAnalytics.trackSubEvent(
-      CustomEventNames.backup_quiz_submit,
-      CustomEventNames.backup_quiz_backspace
-    )
+    ValoraAnalytics.track(AnalyticsEvents.backup_quiz_backspace)
   }
 
   onPressReset = async () => {
@@ -174,11 +171,11 @@ export class BackupQuiz extends React.Component<Props, State> {
       Logger.debug(TAG, 'Backup quiz passed')
       this.props.setBackupCompleted()
       navigate(Screens.BackupComplete)
-      CeloAnalytics.track(CustomEventNames.backup_quiz_success)
+      ValoraAnalytics.track(AnalyticsEvents.backup_quiz_success)
     } else {
       Logger.debug(TAG, 'Backup quiz failed, reseting words')
       this.setState({ mode: Mode.Failed })
-      CeloAnalytics.track(CustomEventNames.backup_quiz_incorrect)
+      ValoraAnalytics.track(AnalyticsEvents.backup_quiz_incorrect)
     }
   }
 
@@ -186,7 +183,7 @@ export class BackupQuiz extends React.Component<Props, State> {
     this.setState({ mode: Mode.Checking })
     setTimeout(this.afterCheck, CHECKING_DURATION)
 
-    CeloAnalytics.stopTracking(CustomEventNames.backup_quiz_submit)
+    ValoraAnalytics.track(AnalyticsEvents.backup_quiz_submit)
   }
 
   onScreenSkip = () => {
