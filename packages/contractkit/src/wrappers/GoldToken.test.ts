@@ -18,8 +18,8 @@ testWithGanache('GoldToken Wrapper', (web3) => {
   test('SBAT check balance', () =>
     expect(goldToken.balanceOf(accounts[0])).resolves.toBeBigNumber())
   test('SBAT check decimals', () => expect(goldToken.decimals()).resolves.toBe(18))
-  test('SBAT check name', () => expect(goldToken.name()).resolves.toBe('CELO'))
-  test('SBAT check symbol', () => expect(goldToken.symbol()).resolves.toBe('CELO'))
+  test('SBAT check name', () => expect(goldToken.name()).resolves.toBe('Celo Gold'))
+  test('SBAT check symbol', () => expect(goldToken.symbol()).resolves.toBe('cGLD'))
   test('SBAT check totalSupply', () => expect(goldToken.totalSupply()).resolves.toBeBigNumber())
 
   test('SBAT transfer', async () => {
