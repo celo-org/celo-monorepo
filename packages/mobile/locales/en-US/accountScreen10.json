@@ -40,11 +40,10 @@
   "addressCopied": "Address copied to clipboard",
   "support": "Support",
   "contact": "Contact",
-  "webFaq": "Web FAQ",
+  "faq": "Frequently Asked Questions",
   "forum": "Forum",
   "contactText": "Can’t find what you’re looking for?",
-  "contactUs": "Contact Us",
-  "tellUsMore": "Tell us more",
+  "contactMessagePlaceholder": "Please type your message here...",
   "attachLogs": "Attach logs",
   "supportLegalCheckbox": "By submitting, I agree to share the above information and any attached application log data with Celo Support.",
   "contactSuccess": "Your issue has been successfully reported! Expect an email response soon!"
