@@ -5,16 +5,12 @@ import { call } from 'redux-saga/effects'
 import { setBackupCompleted } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { storeMnemonic } from 'src/backup/utils'
 import { refreshAllBalances } from 'src/home/actions'
-import {
-  backupPhraseEmpty,
-  importBackupPhraseFailure,
-  importBackupPhraseSuccess,
-} from 'src/import/actions'
+import { importBackupPhraseFailure, importBackupPhraseSuccess } from 'src/import/actions'
 import { importBackupPhraseSaga } from 'src/import/saga'
 import { redeemInviteSuccess } from 'src/invite/actions'
 import { fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
-import { setKey } from 'src/utils/keyStore'
 import { assignAccountFromPrivateKey, waitWeb3LastBlock } from 'src/web3/saga'
 import { mockAccount } from 'test/values'
 
@@ -31,7 +27,7 @@ describe('Import wallet saga', () => {
         [call(waitWeb3LastBlock), true],
         [matchers.call.fn(fetchTokenBalanceInWeiWithRetry), new BigNumber(10)],
         [matchers.call.fn(assignAccountFromPrivateKey), mockAccount],
-        [call(setKey, 'mnemonic', mockPhraseValid), true],
+        [call(storeMnemonic, mockPhraseValid, mockAccount), true],
       ])
       .put(setBackupCompleted())
       .put(redeemInviteSuccess())
@@ -55,8 +51,8 @@ describe('Import wallet saga', () => {
       .provide([
         [call(waitWeb3LastBlock), true],
         [matchers.call.fn(fetchTokenBalanceInWeiWithRetry), new BigNumber(0)],
+        [matchers.call.fn(fetchTokenBalanceInWeiWithRetry), new BigNumber(0)],
       ])
-      .put(backupPhraseEmpty())
       .run()
   })
 })
