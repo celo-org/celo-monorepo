@@ -180,7 +180,7 @@ interface VerificationEventsProperties {
   }
   [VerificationEvents.verification_reveal_error]: {
     issuer: any
-    statusCode: any
+    status: number
     error: any
   }
   [VerificationEvents.verification_wait_for_attestation_code]: {
