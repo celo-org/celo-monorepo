@@ -2,7 +2,7 @@ import colors from '@celo/react-components/styles/colors.v2'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleProp, StyleSheet, TextStyle } from 'react-native'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEventType } from 'src/analytics/Events'
 import { Namespaces } from 'src/i18n'
 import { navigateBack } from 'src/navigator/NavigationService'
 import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
@@ -10,7 +10,7 @@ import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 interface Props {
   onCancel?: () => void
   style?: StyleProp<TextStyle>
-  eventName?: CustomEventNames
+  eventName?: AnalyticsEventType
 }
 
 export default function CancelButton({ eventName, onCancel, style }: Props) {

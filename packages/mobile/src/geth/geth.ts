@@ -317,13 +317,10 @@ async function uploadLogs(gethLogFilePath: string, reactNativeLogFilePath: strin
     const bundleId = DeviceInfo.getBundleId()
     const uploadPath = `${bundleId}/${DEFAULT_TESTNET}`
 
-    // Phone number might not be verified here but that does not matter for logging.
-    const phoneNumber = (await DeviceInfo.getPhoneNumber()) || 'unknown'
     const timestamp = new Date().getTime()
     const deviceId = DeviceInfo.getUniqueId()
-    const uploadId = `${timestamp}_${deviceId}`
-    const gethUploadFileName = `${phoneNumber}_${uploadId}_geth.txt`
-    const reactNativeUploadFileName = `${phoneNumber}_${uploadId}_rn.txt`
+    const gethUploadFileName = `${deviceId}_${timestamp}_geth.txt`
+    const reactNativeUploadFileName = `${deviceId}_${timestamp}_rn.txt`
     // Upload one if the other one is uploaded.
 
     const [shouldUploadGeth, shouldUploadRN] = await Promise.all([
