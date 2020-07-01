@@ -17,6 +17,7 @@
     "build": "tsc -b .",
     "lint": "tslint --project .",
     "test": "jest --runInBand --testPathIgnorePatterns test/end-to-end",
+    "test:flakey": "FLAKEY=true yarn test",
     "db:migrate": "NODE_ENV=production ts-node scripts/run-migrations.ts"
   },
   "dependencies": {

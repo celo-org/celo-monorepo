@@ -1,5 +1,5 @@
 const NodeEnvironment = require('jest-environment-node')
-const { processFlakeyTestResults } = require('../FlakeNotifier')
+const { processFlakeyTestResults, fetchKnownFlakes } = require('../FlakeNotifier')
 const { getTestID, addFlakeErrorsToDescribeBlock } = require('./utils')
 const clone = require('clone')
 
@@ -10,6 +10,10 @@ class JestFlakeTrackingEnvironment extends NodeEnvironment {
   async setup() {
     await super.setup()
     this.global.FLAKES = new Map() //TODO(Alec): keeping this global for now in case we want to use it in a custom reporter.
+    if (this.global.SKIP_KNOWN_FLAKES) {
+      this.skip = await fetchKnownFlakes()
+    }
+    //TODO(Alec): Make githubclient interactions less frequent
   }
 
   async handleTestEvent(event, state) {
@@ -28,7 +32,9 @@ class JestFlakeTrackingEnvironment extends NodeEnvironment {
         state.unhandledErrors
       ).testResults.filter((tr) => tr.status === 'flakey')
 
-      await processFlakeyTestResults(flakeyTestResults)
+      if (flakeyTestResults.length > 0) {
+        await processFlakeyTestResults(flakeyTestResults)
+      }
     }
 
     if (event.name === 'test_done') {
@@ -51,6 +57,17 @@ class JestFlakeTrackingEnvironment extends NodeEnvironment {
           this.global.FLAKES.set(testID, errors)
         }
       }
+    }
+
+    if (this.global.SKIP_KNOWN_FLAKES && event.name === 'test_start') {
+      const testID = getTestID(event.test)
+      for (const knownFlake of this.skip) {
+        if (knownFlake.includes(testID)) {
+          event.test.mode = 'skip'
+          break
+        }
+      }
+      return
     }
   }
 }

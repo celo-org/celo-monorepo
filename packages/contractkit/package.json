@@ -24,6 +24,7 @@
     "test:reset": "yarn --cwd ../protocol devchain generate-tar .tmp/devchain.tar.gz --migration_override ../dev-utils/src/migration-override.json --upto 24",
     "test:livechain": "yarn --cwd ../protocol devchain run-tar .tmp/devchain.tar.gz",
     "test": "jest --runInBand",
+    "test:flakey": "FLAKEY=true yarn test",
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {

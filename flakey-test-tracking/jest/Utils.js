@@ -1,7 +1,9 @@
 const AnsiToHtml = require('ansi-to-html')
 const convert = new AnsiToHtml()
 
-const getTestID = (test) => {
+//TODO(Alec): translate everything to typescript
+
+const getTestTitles = (test) => {
   const titles = []
   let parent = test
 
@@ -9,9 +11,20 @@ const getTestID = (test) => {
     titles.unshift(parent.name)
   } while ((parent = parent.parent))
 
-  titles.shift() // remove TOP_DESCRIBE_BLOCK_NAME
+  return titles
+}
 
+function formatTestTitles(titles) {
+  if (process.env.CIRCLECI) {
+    titles[0] = process.env.CIRCLE_JOB
+  } else {
+    titles.shift()
+  }
   return titles.join(' -> ')
+}
+
+const getTestID = (test) => {
+  return formatTestTitles(getTestTitles(test))
 }
 
 const addFlakeErrorsToDescribeBlock = (describeBlock, flakeMap) => {
@@ -34,20 +47,28 @@ const addFlakeErrorsToDescribeBlock = (describeBlock, flakeMap) => {
   return describeBlock
 }
 
-const parseTestFile = (stack) => {
-  const start = stack.indexOf('/packages')
+function parseFlake(tr) {
+  const testID = removeRootDescribeBlock(tr.testPath)
+  const body = formatIssueBody(tr.errors)
+  return {
+    title:
+      '[FLAKEY TEST] ' + tr.testPath.join(' -> ') + ', at ' + parseTestLocation(body, '/packages'),
+    body: body,
+  }
+}
+
+const parseTestLocation = (stack, rootDir) => {
+  const start = stack.indexOf(rootDir)
   const end = start + stack.slice(start).indexOf(' at ')
   return stack.slice(start, end)
 }
 
 const formatIssueBody = (errors) => {
+  errors.push('Test Passed!')
   let body = ''
-  let i = 1
-  for (const e of errors) {
-    body = body.concat('Attempt No. ' + i + ':\n\n' + e + '\n\n')
-    i++
+  for (let i = 1; i <= errors.length; i++) {
+    body += 'Attempt No. ' + i + ':\n\n' + errors[i] + '\n\n'
   }
-  body = body.concat('Attempt No. ' + i + ':\n\n' + 'Test Passed!')
   return convert.toHtml(body)
 }
 
@@ -55,5 +76,6 @@ module.exports = {
   getTestID: getTestID,
   formatIssueBody: formatIssueBody,
   addFlakeErrorsToDescribeBlock: addFlakeErrorsToDescribeBlock,
-  parseTestFile: parseTestFile,
+  parseTestLocation: parseTestLocation,
+  parseFlake: parseFlake,
 }

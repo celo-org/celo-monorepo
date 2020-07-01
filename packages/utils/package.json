@@ -11,6 +11,7 @@
     "build": "tsc -b .",
     "clean": "tsc -b . --clean",
     "test": "jest --runInBand --ci",
+    "test:flakey": "FLAKEY=true yarn test:verbose",
     "test:verbose": "jest --verbose",
     "lint": "tslint -c tslint.json --project ."
   },

@@ -15,6 +15,7 @@
     "reset-rn": "watchman watch-del-all; rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/haste-map-*; rm -rf $TMPDIR/metro-symbolicate*",
     "reset-yarn": "yarn cache clean",
     "test": "yarn run lerna run test",
+    "test:flakey": "yarn run lerna run test:flakey",
     "build": "yarn run lerna run build",
     "check-licenses": "yarn licenses list --prod | grep '\\(─ GPL\\|─ (GPL-[1-9]\\.[0-9]\\+ OR GPL-[1-9]\\.[0-9]\\+)\\)' && echo 'Found GPL license(s). Use 'yarn licenses list --prod' to look up the offending package' || echo 'No GPL licenses found'",
     "report-coverage": "yarn run lerna run test-coverage",

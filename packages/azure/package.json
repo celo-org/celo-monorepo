@@ -8,7 +8,8 @@
     "build-json": "npm run build-sh && node build-json.js components/ > mainTemplate.json",
     "build-docs": "node build-docs.js > README.md",
     "build-app": "zip app.zip createUiDefinition.json mainTemplate.json",
-    "test": "exit 0"
+    "test": "exit 0",
+    "test:flakey": "FLAKEY=true yarn test"
   },
   "keywords": [],
   "author": "",

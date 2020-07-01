@@ -12,6 +12,7 @@
     "clean": "rm -rf ./types/typechain && rm -rf build/* && rm -rf .0x-artifacts/* && rm -rf migrations/*.js* && rm -rf test/**/*.js* && rm -f lib/*.js*",
     "pretest": "yarn run build",
     "test": "rm test/**/*.js ; node runTests.js",
+    "test:flakey": "FLAKEY=true yarn test",
     "test:coverage": "yarn run test --coverage",
     "gas": "yarn run test --gas",
     "build:ts": "rm -f migrations/*.js* && tsc -b",

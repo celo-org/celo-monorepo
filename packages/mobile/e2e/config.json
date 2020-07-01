@@ -11,4 +11,4 @@
   "testRunner": "jest-circus/runner"
 }
 
-//TODO(Alec): clean this up
+//TODO(Alec): connect this to global config
