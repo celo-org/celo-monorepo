@@ -263,7 +263,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
-                  testID="undefined/CallToActions/backupKeyFlow6:getBackupKey/Button"
+                  testID="undefined/CallToActions/backupKeyFlow6:introPrimaryAction/Button"
                 >
                   <Text
                     style={
@@ -282,7 +282,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                       ]
                     }
                   >
-                    backupKeyFlow6:getBackupKey
+                    backupKeyFlow6:introPrimaryAction
                   </Text>
                 </View>
               </View>
@@ -451,7 +451,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
-                  testID="undefined/CallToActions/maybeLater/Button"
+                  testID="undefined/CallToActions/global:remind/Button"
                 >
                   <Text
                     style={
@@ -470,7 +470,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                       ]
                     }
                   >
-                    maybeLater
+                    global:remind
                   </Text>
                 </View>
               </View>
@@ -594,7 +594,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
-                  testID="undefined/CallToActions/exchange/Button"
+                  testID="undefined/CallToActions/learnMore/Button"
                 >
                   <Text
                     style={
@@ -613,7 +613,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                       ]
                     }
                   >
-                    exchange
+                    learnMore
                   </Text>
                 </View>
                 <View
@@ -632,7 +632,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
-                  testID="undefined/CallToActions/maybeLater/Button"
+                  testID="undefined/CallToActions/global:dismiss/Button"
                 >
                   <Text
                     style={
@@ -651,7 +651,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                       ]
                     }
                   >
-                    maybeLater
+                    global:dismiss
                   </Text>
                 </View>
               </View>

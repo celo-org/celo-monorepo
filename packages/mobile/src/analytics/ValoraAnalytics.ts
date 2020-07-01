@@ -86,8 +86,7 @@ class ValoraAnalytics {
 
   isEnabled() {
     // Remove __DEV__ here to test analytics in dev builds
-    return store.getState().app.analyticsEnabled
-    // return !__DEV__ && store.getState().app.analyticsEnabled
+    return !__DEV__ && store.getState().app.analyticsEnabled
   }
 
   startSession(
