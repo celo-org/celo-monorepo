@@ -55,15 +55,9 @@ const SEGMENT_OPTIONS: analytics.Configuration = {
 }
 
 class ValoraAnalytics {
-  sessionId: string
-  userAddress: string | null | undefined
-  deviceInfo: object
-
-  constructor() {
-    this.sessionId = ''
-    this.userAddress = ''
-    this.deviceInfo = {}
-  }
+  sessionId: string = ''
+  userAddress: string = ''
+  deviceInfo: object = {}
 
   async init() {
     try {
@@ -84,7 +78,7 @@ class ValoraAnalytics {
         Logger.error(TAG, 'getDeviceInfo error', error)
       }
 
-      Logger.debug(TAG, 'Segment Analytics Integration initialized!')
+      Logger.info(TAG, 'Segment Analytics Integration initialized!')
     } catch (error) {
       Logger.error(TAG, `Segment setup error: ${error.message}\n`, error)
     }
@@ -92,7 +86,8 @@ class ValoraAnalytics {
 
   isEnabled() {
     // Remove __DEV__ here to test analytics in dev builds
-    return !__DEV__ && store.getState().app.analyticsEnabled
+    return store.getState().app.analyticsEnabled
+    // return !__DEV__ && store.getState().app.analyticsEnabled
   }
 
   startSession(
@@ -106,7 +101,13 @@ class ValoraAnalytics {
   }
 
   setUserAddress(address?: string | null) {
-    this.userAddress = address
+    if (address) {
+      this.userAddress = address
+    } else if (address === null) {
+      this.userAddress = 'unverified'
+    } else {
+      this.userAddress = 'unknown'
+    }
   }
 
   track<EventName extends keyof AnalyticsPropertiesList>(
@@ -121,9 +122,8 @@ class ValoraAnalytics {
       return
     }
 
-    Logger.info(TAG, `Tracking event ${eventName}`, JSON.stringify(eventProperties))
-
     if (!SEGMENT_API_KEY) {
+      Logger.info(TAG, `No API key, not tracking event ${eventName}`)
       return
     }
 
@@ -133,6 +133,8 @@ class ValoraAnalytics {
       userAddress: this.userAddress,
       ...eventProperties,
     }
+
+    Logger.info(TAG, `Tracking event ${eventName} with properties: ${JSON.stringify(props)}`)
 
     Analytics.track(eventName, props).catch((err) => {
       Logger.error(TAG, `Failed to track event ${eventName}`, err)

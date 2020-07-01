@@ -51,17 +51,22 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 
 export class App extends React.Component {
   async componentDidMount() {
+    await ValoraAnalytics.init()
     const appLoadedAt: Date = new Date()
-    const appStartListener = DeviceEventEmitter.addListener(
-      'AppStartedLoading',
-      async (appInitializedAtString: string) => {
-        await ValoraAnalytics.init()
-        const appInitializedAt = new Date(appInitializedAtString)
-        const loadingDuration = appLoadedAt.getTime() - appInitializedAt.getTime()
-        ValoraAnalytics.startSession(AnalyticsEvents.app_launched, { loadingDuration })
-        appStartListener.remove()
-      }
-    )
+
+    if (Platform.OS === 'android') {
+      const appStartListener = DeviceEventEmitter.addListener(
+        'AppStartedLoading',
+        (appInitializedAtString: string) => {
+          const appInitializedAt = new Date(appInitializedAtString)
+          const loadingDuration = appLoadedAt.getTime() - appInitializedAt.getTime()
+          ValoraAnalytics.startSession(AnalyticsEvents.app_launched, { loadingDuration })
+          appStartListener.remove()
+        }
+      )
+    } else {
+      ValoraAnalytics.startSession(AnalyticsEvents.app_launched, { loadingDuration: null })
+    }
 
     Linking.addEventListener('url', this.handleOpenURL)
   }

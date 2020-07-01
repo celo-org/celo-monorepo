@@ -22,7 +22,7 @@ import { RecipientKind } from 'src/recipients/recipient'
 
 interface AppEventsProperties {
   [AppEvents.app_launched]: {
-    loadingDuration: number
+    loadingDuration: number | null
     deviceInfo?: object
   }
   [AppEvents.app_state_error]: {
