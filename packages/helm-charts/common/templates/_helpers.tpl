@@ -135,7 +135,7 @@ release: {{ .Release.Name }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
     {{- end }}
     {{- if .pprof | default false }}
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .pprof_port }}"
+    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .pprof_port }} --pprofaddr 0.0.0.0"
     {{- end }}
 
     exec geth \

@@ -88,5 +88,5 @@ prometheus: true
 metrics: true
 pprof:
   enabled: true
-  url: /debug/metrics/prometheus
+  path: /debug/metrics/prometheus
   port: 6060

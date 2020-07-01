@@ -28,9 +28,9 @@ spec:
     metadata:
       labels:
 {{ include "celo-fullnode.labels" .  | indent 8 }}
-    annotations:
+      annotations:      
 {{ if .Values.prometheus }} 
-{{ include "prometheus-annotations" . | indent 10 }} 
+{{ include "prometheus-annotations" . | indent 8 }} 
 {{ end }}
     spec:
       initContainers:
