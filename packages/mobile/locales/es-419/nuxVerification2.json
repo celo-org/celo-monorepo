@@ -59,9 +59,9 @@
   },
   "congratsVerified": "¡Felicitaciones se ha verificado tu usuario!",
   "notification": {
-    "title": "Verificar el Teléfono",
-    "body": "La verificación le permite enviar y recibir fondos fácilmente con sus contactos telefónicos",
-    "cta": "Verifícate"
+    "title": "Confirma el Teléfono",
+    "body": "Reciba pagos directamente a su número de teléfono",
+    "cta": "Confirma Ahora"
   },
   "quotaLookup": {
     "title": "Cuota de búsqueda excedida",
