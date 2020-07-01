@@ -17,12 +17,18 @@ import {
   VerificationEvents,
 } from 'src/analytics/Events'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import {
+  NotificationBannerCTATypes,
+  NotificationBannerTypes,
+  NotificationScrollDirection,
+} from 'src/home/NotificationBox'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { RecipientKind } from 'src/recipients/recipient'
 
 interface AppEventsProperties {
   [AppEvents.app_launched]: {
-    loadingDuration: number | null
+    // TODO: Figure out how to measure loadingDuration iOS and make param required
+    loadingDuration?: number
     deviceInfo?: object
   }
   [AppEvents.app_state_error]: {
@@ -53,21 +59,15 @@ interface SettingsEventsProperties {
 }
 
 interface NotificationEventsProperties {
-  [NotificationEvents.celogold_notification_confirm]: undefined
-  [NotificationEvents.celogold_notification_dismiss]: undefined
-  [NotificationEvents.celorewards_notification_confirm]: undefined
-  [NotificationEvents.celorewards_notification_dismiss]: undefined
-  [NotificationEvents.invitefriends_notification_confirm]: undefined
-  [NotificationEvents.invitefriends_notification_dismiss]: undefined
-  [NotificationEvents.incoming_request_payment_decline]: undefined
-  [NotificationEvents.incoming_request_payment_pay]: undefined
-  [NotificationEvents.incoming_request_payment_review]: undefined
-  [NotificationEvents.outgoing_request_payment_review]: undefined
-  [NotificationEvents.outgoing_request_payment_remind]: undefined
-  [NotificationEvents.outgoing_request_payment_cancel]: undefined
-  [NotificationEvents.clicked_escrowed_payment_notification]: undefined
-  [NotificationEvents.clicked_escrowed_payment_send_message]: undefined
-  [NotificationEvents.get_backup_key]: undefined
+  [NotificationEvents.notification_scroll]: {
+    // TODO: Pass in notificationType and make param required
+    notificationType?: NotificationBannerTypes
+    direction: NotificationScrollDirection
+  }
+  [NotificationEvents.notification_select]: {
+    notificationType: NotificationBannerTypes
+    selectedAction: NotificationBannerCTATypes
+  }
 }
 
 interface OnboardingEventsProperties {

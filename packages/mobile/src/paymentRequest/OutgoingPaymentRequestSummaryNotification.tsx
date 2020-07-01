@@ -3,9 +3,10 @@ import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet } from 'react-native'
 import { connect } from 'react-redux'
 import { PaymentRequest } from 'src/account/types'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { NotificationEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { cancelPaymentRequest, updatePaymentRequestNotified } from 'src/firebase/actions'
+import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
 import { Namespaces, withTranslation } from 'src/i18n'
 import {
   addressToE164NumberSelector,
@@ -50,7 +51,10 @@ const mapStateToProps = (state: RootState): StateProps => ({
 // Payment Request notification for the notification center on home screen
 export class OutgoingPaymentRequestSummaryNotification extends React.Component<Props> {
   onReview = () => {
-    ValoraAnalytics.track(AnalyticsEvents.outgoing_request_payment_review)
+    ValoraAnalytics.track(NotificationEvents.notification_select, {
+      notificationType: NotificationBannerTypes.outgoing_tx_request,
+      selectedAction: NotificationBannerCTATypes.review,
+    })
     navigate(Screens.OutgoingPaymentRequestListScreen)
   }
 

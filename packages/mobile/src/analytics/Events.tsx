@@ -15,27 +15,8 @@ export enum SettingsEvents {
 }
 
 export enum NotificationEvents {
-  celogold_notification_confirm = 'celogold_notification_confirm',
-  celogold_notification_dismiss = 'celogold_notification_dismiss',
-
-  celorewards_notification_confirm = 'celorewards_notification_confirm',
-  celorewards_notification_dismiss = 'celorewards_notification_dismiss',
-
-  invitefriends_notification_confirm = 'invitefriends_notification_confirm',
-  invitefriends_notification_dismiss = 'invitefriends_notification_dismiss',
-
-  incoming_request_payment_decline = 'incoming_request_payment_decline',
-  incoming_request_payment_pay = 'incoming_request_payment_pay',
-  incoming_request_payment_review = 'incoming_request_payment_review',
-
-  outgoing_request_payment_review = 'outgoing_request_payment_review',
-  outgoing_request_payment_remind = 'outgoing_request_payment_remind',
-  outgoing_request_payment_cancel = 'outgoing_request_payment_cancel',
-
-  clicked_escrowed_payment_notification = 'clicked_escrowed_payment_notification',
-  clicked_escrowed_payment_send_message = 'clicked_escrowed_payment_send_message',
-
-  get_backup_key = 'get_backup_key',
+  notification_scroll = 'notification_scroll',
+  notification_select = 'notification_select',
 }
 
 export enum OnboardingEvents {

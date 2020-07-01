@@ -117,12 +117,12 @@ class ValoraAnalytics {
     const [eventName, eventProperties] = args
 
     if (!this.isEnabled()) {
-      Logger.info(TAG, `Analytics is disabled, not tracking event ${eventName}`)
+      Logger.debug(TAG, `Analytics is disabled, not tracking event ${eventName}`)
       return
     }
 
     if (!SEGMENT_API_KEY) {
-      Logger.info(TAG, `No API key, not tracking event ${eventName}`)
+      Logger.debug(TAG, `No API key, not tracking event ${eventName}`)
       return
     }
 

@@ -2,12 +2,13 @@ import RequestMessagingCard from '@celo/react-components/components/RequestMessa
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, View } from 'react-native'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { NotificationEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
+import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { inviteFriendsIcon } from 'src/images/Images'
 import { InviteDetails } from 'src/invite/actions'
@@ -32,7 +33,10 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
   onRemind = async () => {
     const { payment, t, invitees } = this.props
     const recipientPhoneNumber = payment.recipientPhone
-    ValoraAnalytics.track(AnalyticsEvents.clicked_escrowed_payment_send_message)
+    ValoraAnalytics.track(NotificationEvents.notification_select, {
+      notificationType: NotificationBannerTypes.escrow_tx_pending,
+      selectedAction: NotificationBannerCTATypes.remind,
+    })
 
     try {
       const inviteDetails = invitees.find(
@@ -60,7 +64,10 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
   onReclaimPayment = () => {
     const { payment } = this.props
     const reclaimPaymentInput = payment
-    ValoraAnalytics.track(AnalyticsEvents.clicked_escrowed_payment_notification)
+    ValoraAnalytics.track(NotificationEvents.notification_select, {
+      notificationType: NotificationBannerTypes.escrow_tx_pending,
+      selectedAction: NotificationBannerCTATypes.reclaim,
+    })
     navigate(Screens.ReclaimPaymentConfirmationScreen, { reclaimPaymentInput })
   }
   getCTA = () => {

@@ -65,7 +65,7 @@ export class App extends React.Component {
         }
       )
     } else {
-      ValoraAnalytics.startSession(AnalyticsEvents.app_launched, { loadingDuration: null })
+      ValoraAnalytics.startSession(AnalyticsEvents.app_launched, {})
     }
 
     Linking.addEventListener('url', this.handleOpenURL)
