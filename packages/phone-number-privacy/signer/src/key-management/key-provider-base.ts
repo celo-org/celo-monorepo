@@ -3,6 +3,8 @@ export interface KeyProvider {
   getPrivateKey: () => string
 }
 
+const PRIVATE_KEY_SIZE = 72
+
 export abstract class KeyProviderBase implements KeyProvider {
   protected privateKey: string | null = null
 
@@ -17,7 +19,7 @@ export abstract class KeyProviderBase implements KeyProvider {
   public abstract async fetchPrivateKeyFromStore(): Promise<void>
 
   protected setPrivateKey(key: string) {
-    if (!key || key.length < 40) {
+    if (!key || key.length !== PRIVATE_KEY_SIZE) {
       throw new Error('Invalid private key')
     }
     this.privateKey = key

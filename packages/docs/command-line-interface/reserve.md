@@ -45,7 +45,7 @@ OPTIONS
 
   --useMultiSig                                      True means the request will be sent through multisig.
 
-  --value=value                                      (required) The unit amount of Celo Gold (cGLD)
+  --value=value                                      (required) The unit amount of CELO
 
 EXAMPLES
   transfergold --value 9000 --to 0x91c987bf62D25945dB517BDAa840A6c661374402 --from

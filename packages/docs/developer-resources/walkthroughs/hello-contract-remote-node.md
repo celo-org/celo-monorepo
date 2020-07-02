@@ -120,7 +120,7 @@ $ node celo_deploy.js
 
 The provided code will import the contract kit and connect to the remote node. It will look for a private key in the `./.secret` file, and if it doesn't find one, it will generate a new one. Once it gets the key, it will print the associated account. This is the account that we will fund with the faucet.
 
-If you go to the [Alfajores Faucet Page](https://celo.org/build/faucet), you can faucet your account some Celo Gold and see your balance increase.
+If you go to the [Alfajores Faucet Page](https://celo.org/build/faucet), you can faucet your account some CELO and see your balance increase.
 
 Then add your account to the `kit` with the private key:
 
@@ -195,7 +195,7 @@ We are finally ready to deploy the contract. Use the `kit`to create a custom tra
 ```
 
 {% hint style="info" %}
-To deploy a contract on Celo, use the `kit.sendTransaction()` function with no `to:` field and the contract bytecode in the `data` field. The account that you are sending the transaction from must have enough cGLD to pay the transaction fee, unless you specify another currency as the `feeCurrency`, then you need enough of that currency to pay the transaction fee.
+To deploy a contract on Celo, use the `kit.sendTransaction()` function with no `to:` field and the contract bytecode in the `data` field. The account that you are sending the transaction from must have enough CELO to pay the transaction fee, unless you specify another currency as the `feeCurrency`, then you need enough of that currency to pay the transaction fee.
 {% endhint %}
 
 The entire deployment script is less than 20 lines of code.
@@ -210,7 +210,7 @@ const getAccount = require('./getAccount').getAccount
 
 async function awaitWrapper(){
     let account = await getAccount()
-    kit.addAccount(account.privateKey) // this account must have a cGLD balance to pay transaction fees
+    kit.addAccount(account.privateKey) // this account must have a CELO balance to pay transaction fees
 
     let tx = await kit.sendTransaction({
         from: account.address,

@@ -14,9 +14,10 @@ import {
   StyleSheet,
 } from 'react-native'
 import Animated from 'react-native-reanimated'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { showMessage } from 'src/alert/actions'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { exitBackupFlow } from 'src/app/actions'
 import { ALERT_BANNER_DURATION, DEFAULT_TESTNET, SHOW_TESTNET_BANNER } from 'src/config'
 import { CURRENCY_ENUM } from 'src/geth/consts'
@@ -102,6 +103,8 @@ export class WalletHome extends React.Component<Props> {
     if (SHOW_TESTNET_BANNER) {
       this.showTestnetBanner()
     }
+
+    ValoraAnalytics.setUserAddress(this.props.address)
 
     // Waiting 1/2 sec before triggering to allow
     // rest of feed to load unencumbered

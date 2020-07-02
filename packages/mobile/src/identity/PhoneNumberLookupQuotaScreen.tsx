@@ -8,10 +8,8 @@ import { StackScreenProps } from '@react-navigation/stack'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BackHandler, StyleSheet, Text, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useSelector } from 'react-redux'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import ErrorMessageInline from 'src/components/ErrorMessageInline'
 import { Namespaces } from 'src/i18n'
@@ -32,20 +30,17 @@ function PhoneNumberLookupQuotaScreen(props: Props) {
   const userBalanceIsSufficient = isUserBalanceSufficient(userBalance, LOOKUP_GAS_FEE_ESTIMATE)
 
   const onSkip = () => {
-    CeloAnalytics.track(CustomEventNames.phone_number_quota_purchase_skip)
     props.route.params.onSkip()
     return true
   }
 
   const onBuy = () => {
     setIsSending(true)
-    CeloAnalytics.track(CustomEventNames.phone_number_quota_purchase_success)
     props.route.params.onBuy()
   }
 
   useEffect(() => {
     BackHandler.addEventListener('hardwareBackPress', onSkip)
-
     return () => BackHandler.removeEventListener('hardwareBackPress', onSkip)
   }, [])
 
