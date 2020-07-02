@@ -35,7 +35,7 @@
   "groceryRun": "Supermercado",
   "transactionsAreLoading": "Las transacciones están cargando!",
   "pleaseHoldOn": "Por favor esperá un momento",
-  "welcomeToCeloPayments": "Bienvenido a Pagos Celo",
+  "welcomeToCeloPayments": "Bienvenido a {{appName}}",
   "letsGetStartedByFirstTransaction": "Empezemos enviando tu primera transacción",
   "sendMoney": "Enviar Dinero",
   "verificationFee": "Tasa de Verificación",
@@ -63,8 +63,8 @@
   "escrowedPaymentReminderSummaryDetails_exactly2Items": "<0></0> e <1></1> aún no han aceptado sus invitaciones",
   "escrowedPaymentReminderSummaryDetails_exactly3Items": "<0></0>, <1></1> y otro aún no han aceptado sus invitaciones",
   "escrowedPaymentReminderSummaryDetails_moreThan3Items": "<0></0>, <1></1> y otros aún no han aceptado sus invitaciones",
-  "escrowedPaymentReminderSms": "¡Un recordatorio amistoso de que aún no has canjeado tus Celo dólares! Dirígite a {{link}} e ingresa tu código para comenzar: {{code}}",
-  "escrowedPaymentReminderSmsNoData": "¡Un recordatorio amistoso de que aún no has canjeado tus Celo dólares! ¡Descarga la aplicación móvil para comenzar!",
+  "escrowedPaymentReminderSms": "¡Un recordatorio amistoso de que aún no has canjeado tus Celo dólares con {{appName}}! Dirígite a {{link}} e ingresa tu código para comenzar: {{code}}",
+  "escrowedPaymentReminderSmsNoData": "¡Un recordatorio amistoso de que aún no has canjeado tus Celo dólares con {{appName}}! ¡Descarga la aplicación móvil para comenzar!",
   "testnetAlert": {
     "0": "{{testnet}}",
     "1": "Un recordatorio amistoso de que está utilizando la compilación de red {{testnet}} - los saldos aquí no son reales."
