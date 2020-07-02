@@ -302,6 +302,15 @@ contract Attestations is
     emit Withdrawal(msg.sender, token, value);
   }
 
+  function withdrawToSigner(address token) external {
+    address issuer = getAccounts().attestationSignerToAccount(msg.sender);
+    uint256 value = pendingWithdrawals[token][issuer];
+    require(value > 0, "value was negative/zero");
+    pendingWithdrawals[token][issuer] = 0;
+    require(IERC20(token).transfer(msg.sender, value), "token transfer failed");
+    emit Withdrawal(msg.sender, token, value);
+  }
+
   /**
    * @notice Returns the unselected attestation request for an identifier/account pair, if any.
    * @param identifier Hash of the identifier.
