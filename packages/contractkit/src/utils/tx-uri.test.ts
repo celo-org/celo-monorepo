@@ -43,7 +43,7 @@ describe('URI utils', () => {
   })
 
   describe('#parseUri', () => {
-    it('should match simple cGLD transfer tx', () => {
+    it('should match simple CELO transfer tx', () => {
       const resultTx = parseUri(simpleTransferUri)
       expect(resultTx).toEqual(simpleTransferTx)
     })
@@ -60,7 +60,7 @@ describe('URI utils', () => {
   })
 
   describe('#buildUri', () => {
-    it('should match simple cGLD transfer URI', () => {
+    it('should match simple CELO transfer URI', () => {
       const resultUri = buildUri(simpleTransferTx)
       expect(resultUri).toEqual(simpleTransferUri)
     })
