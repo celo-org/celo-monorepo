@@ -222,10 +222,10 @@ export function isValidCeloEnv(celoEnv: string) {
  * Replaces a dynamic env var's template strings with values from an object.
  * Returns the name of the env var.
  */
-export function getDynamicEnvVarName(envVar: DynamicEnvVar, templateValues: any) {
+export function getDynamicEnvVarName(dynamicEnvVar: DynamicEnvVar, templateValues: any) {
   return Object.keys(templateValues).reduce((agg: string, templateKey: string) => {
     return agg.replace(new RegExp(`{{ *${templateKey} *}}`, 'g'), templateValues[templateKey])
-  }, envVar)
+  }, dynamicEnvVar)
 }
 
 function celoEnvMiddleware(argv: CeloEnvArgv) {

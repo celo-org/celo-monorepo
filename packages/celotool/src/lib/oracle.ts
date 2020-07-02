@@ -2,7 +2,7 @@ import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/src/address'
 import { assignRoleIfNotAssigned, AzureClusterConfig, createIdentityIfNotExists, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity, switchToCluster } from 'src/lib/azure'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { getFornoUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInternalUrl } from 'src/lib/endpoints'
-import { addCeloEnvMiddleware, envVar, DynamicEnvVar, fetchEnv, fetchEnvOrFallback, getDynamicEnvVarName } from 'src/lib/env-utils'
+import { addCeloEnvMiddleware, DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback, getDynamicEnvVarName } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
 import yargs from 'yargs'
@@ -16,6 +16,9 @@ const rbacHelmChartPath = '../helm-charts/oracle-rbac'
 interface OracleAzureHsmIdentity {
   identityName: string
   keyVaultName: string
+  // If a resource group is not specified, it is assumed to be the same
+  // as the kubernetes cluster resource group specified in the AzureClusterConfig
+  resourceGroup?: string
 }
 
 /**
@@ -197,8 +200,11 @@ async function setOracleKeyVaultPolicyIfNotSet(
   azureIdentity: any
 ) {
   const keyPermissions = ['get', 'list', 'sign']
+  const keyVaultResourceGroup = oracleIdentity.azureHsmIdentity!.resourceGroup ?
+    oracleIdentity.azureHsmIdentity!.resourceGroup :
+    clusterConfig.resourceGroup
   const [keyVaultPoliciesStr] = await execCmdWithExitOnFailure(
-    `az keyvault show --name ${oracleIdentity.azureHsmIdentity!.keyVaultName} -g ${clusterConfig.resourceGroup} --query "properties.accessPolicies[?objectId == '${azureIdentity.principalId}' && sort(permissions.keys) == [${keyPermissions.map(perm => `'${perm}'`).join(', ')}]]"`
+    `az keyvault show --name ${oracleIdentity.azureHsmIdentity!.keyVaultName} -g ${keyVaultResourceGroup} --query "properties.accessPolicies[?objectId == '${azureIdentity.principalId}' && sort(permissions.keys) == [${keyPermissions.map(perm => `'${perm}'`).join(', ')}]]"`
   )
   const keyVaultPolicies = JSON.parse(keyVaultPoliciesStr)
   if (keyVaultPolicies.length) {
@@ -207,7 +213,7 @@ async function setOracleKeyVaultPolicyIfNotSet(
   }
   console.info(`Setting key permissions ${keyPermissions.join(' ')} for vault ${oracleIdentity.azureHsmIdentity!.keyVaultName} and identity objectId ${azureIdentity.principalId}`)
   return execCmdWithExitOnFailure(
-    `az keyvault set-policy --name ${oracleIdentity.azureHsmIdentity!.keyVaultName} --key-permissions ${keyPermissions.join(' ')} --object-id ${azureIdentity.principalId} -g ${clusterConfig.resourceGroup}`
+    `az keyvault set-policy --name ${oracleIdentity.azureHsmIdentity!.keyVaultName} --key-permissions ${keyPermissions.join(' ')} --object-id ${azureIdentity.principalId} -g ${keyVaultResourceGroup}`
   )
 }
 
@@ -280,7 +286,8 @@ function getAzureHsmOracleIdentities(addressAzureKeyVaults: string): OracleIdent
   const identityStrings = addressAzureKeyVaults.split(',')
   const identities = []
   for (const identityStr of identityStrings) {
-    const [address, keyVaultName] = identityStr.split(':')
+    const [address, keyVaultName, resourceGroup] = identityStr.split(':')
+    // resourceGroup can be undefined
     if (!address || !keyVaultName) {
       throw Error(
         `Address or key vault name is invalid. Address: ${address} Key Vault Name: ${keyVaultName}`
@@ -291,6 +298,7 @@ function getAzureHsmOracleIdentities(addressAzureKeyVaults: string): OracleIdent
       azureHsmIdentity: {
         identityName: getOracleAzureIdentityName(keyVaultName, address),
         keyVaultName,
+        resourceGroup
       }
     })
   }
