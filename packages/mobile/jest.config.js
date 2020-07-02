@@ -20,7 +20,7 @@ module.exports = {
   },
   moduleNameMapper: {
     '@celo/mobile': '<rootDir>',
-    '^crypto-js$': '<rootDir>/node_modules/crypto-js',
+    '^crypto-js$': '<rootDir>/../../node_modules/crypto-js',
     'react-native-svg': '<rootDir>/../../node_modules/react-native-svg-mock',
   },
   modulePathIgnorePatterns: ['<rootDir>/node_modules/(.*)/node_modules/react-native'],

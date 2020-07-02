@@ -28,7 +28,8 @@
     "test:e2e:ios": "./scripts/run_e2e.sh -p ios",
     "test:verify-locales": "./scripts/verify_locales.sh",
     "pre-deploy": "./scripts/pre-deploy.sh",
-    "deploy:update-disclaimer": "yarn licenses generate-disclaimer > android/app/src/main/assets/custom/LicenseDisclaimer.txt"
+    "deploy:update-disclaimer": "yarn licenses generate-disclaimer > android/app/src/main/assets/custom/LicenseDisclaimer.txt",
+    "postinstall": "./scripts/sync_branding.sh"
   },
   "rnpm": {
     "assets": [
@@ -90,7 +91,6 @@
     "react-native-camera": "^3.23.1",
     "react-native-clock-sync": "^1.0.0",
     "react-native-config": "https://github.com/luggit/react-native-config#89a602b",
-    "react-native-confirm-device-credentials": "git://github.com/celo-org/react-native-confirm-device-credentials#436afa9",
     "react-native-contacts": "https://github.com/celo-org/react-native-contacts#e473717",
     "react-native-device-info": "^5.5.6",
     "react-native-email-link": "^1.9.1",
@@ -102,6 +102,7 @@
     "react-native-geth": "https://github.com/celo-org/react-native-geth#8583b07",
     "react-native-keep-awake": "^4.0.0",
     "react-native-keyboard-aware-scroll-view": "^0.9.1",
+    "react-native-keychain": "6.0.0",
     "react-native-localize": "^1.4.0",
     "react-native-mail": "^4.1.0",
     "react-native-modal": "^11.5.6",
@@ -112,7 +113,6 @@
     "react-native-restart-android": "^0.0.7",
     "react-native-safe-area-context": "^3.0.6",
     "react-native-screens": "^2.7.0",
-    "react-native-secure-key-store": "^2.0.5",
     "react-native-secure-randombytes": "^3.0.2",
     "react-native-send-intent": "git+https://github.com/celo-org/react-native-send-intent#a0f4b00",
     "react-native-shadow": "^1.2.2",
@@ -149,6 +149,7 @@
     "@graphql-codegen/typescript": "1.10.0",
     "@graphql-codegen/typescript-operations": "1.10.0",
     "@react-native-community/eslint-config": "^1.1.0",
+    "@types/crypto-js": "^3.1.47",
     "@types/ethereumjs-util": "^5.2.0",
     "@types/graphql": "^14.0.7",
     "@types/isomorphic-fetch": "^0.0.35",

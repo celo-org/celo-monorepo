@@ -251,7 +251,7 @@ exports[`renders correctly with backup not completed 1`] = `
 </RNCSafeAreaView>
 `;
 
-exports[`still renders when mneumonic doesnt show up 1`] = `
+exports[`still renders when mnemonic doesnt show up 1`] = `
 <RNCSafeAreaView
   style={
     Object {
