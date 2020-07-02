@@ -30,7 +30,7 @@ export default function DelayButton() {
 
   const onPressDelay = React.useCallback(() => {
     dispatch(setBackupDelayed())
-    ValoraAnalytics.track(AnalyticsEvents.delay_backup)
+    ValoraAnalytics.track(AnalyticsEvents.backup_delay)
     navigateBack()
   }, [dispatch])
 

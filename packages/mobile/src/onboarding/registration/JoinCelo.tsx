@@ -15,7 +15,7 @@ import { connect } from 'react-redux'
 import { setName, setPhoneNumber, setPromptForno } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
 import { hideAlert, showError } from 'src/alert/actions'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
@@ -171,7 +171,7 @@ export class JoinCelo extends React.Component<Props, State> {
     if (!e164Number || !isValidNumber || !countryCallingCode) {
       // Replacing all integers except 0 with a “X” to obfuscate the number
       // but still allow us to see if symbols or leading 0s were added
-      ValoraAnalytics.track(AnalyticsEvents.invalid_phone_number, {
+      ValoraAnalytics.track(OnboardingEvents.phone_number_invalid, {
         obfuscatedPhoneNumber: e164Number.replace(/[1-9]/g, 'X'),
       })
       this.props.showError(ErrorMessages.INVALID_PHONE_NUMBER)
@@ -184,7 +184,7 @@ export class JoinCelo extends React.Component<Props, State> {
     }
 
     this.props.setPromptForno(true) // Allow forno prompt after Welcome screen
-    ValoraAnalytics.track(AnalyticsEvents.phone_number_set, { countryCode: countryCallingCode })
+    ValoraAnalytics.track(OnboardingEvents.phone_number_set, { countryCode: countryCallingCode })
     this.props.setPhoneNumber(e164Number, countryCallingCode)
     this.props.setName(name)
     this.goToNextScreen()

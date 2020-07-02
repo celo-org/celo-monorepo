@@ -25,22 +25,20 @@ export enum OnboardingEvents {
   backup_education_complete = 'backup_education_complete',
   backup_education_cancel = 'backup_education_cancel',
 
-  backup_start = 'backup_start', // ‘set up now’ button click
-  backup_setup_info = 'backup_setup_info',
-  backup_quiz_backspace = 'backup_quiz_backspace', // whenever the backspace is pressed
-  backup_quiz_start = 'backup_quiz_start', // when user starts the backup quiz
-  backup_quiz_submit = 'backup_quiz_submit', // (Count # of taps on "Submit" button in Backup_Quiz)
-  backup_quiz_success = 'backup_quiz_success', // (Count # of successful Account Key confirmations Backup_Quiz)
-  backup_quiz_incorrect = 'backup_quiz_incorrect', // (Count # of failed Account Key confirmations Backup_Quiz)
-
-  // Screen name: Backup_Phrase, Backup_Insist, Backup_Share, Backup_Set
-  delay_backup = 'delay_backup', // (Count # of taps on "Delay" button in Backup_Phrase)
-  backup_cancel = 'backup_cancel', // (count # of taps on "Cancel" button in Backup_Phrase/BackupQuiz)
-  backup_cancel_procrastinate = 'backup_cancel_procrastinate', // when choosing to continue cancel and delay setup
+  backup_start = 'backup_start',
   backup_continue = 'backup_continue', // (count # of taps on “Continue” button in Backup_Phrase)
-  backup_setup_toggle_enable = 'backup_setup_toggle_enable', // (count # of slides to agree on "I wrote down account key" Switch in Backup_Phrase)
-  backup_setup_toggle_disable = 'backup_setup_toggle_disable', // (count # of slides to disagree on "I wrote down account key" Switch in Backup_Phrase)
+  backup_complete = 'backup_complete', // (count # of taps on "Cancel" button in Backup_Phrase/BackupQuiz)
+  backup_more_info = 'backup_more_info',
+  backup_delay = 'backup_delay', // when a user delays backup seed phrase completion
+  backup_delay_confirm = 'backup_delay_confirm', // when a user confirms they want to delay backup
+  backup_delay_cancel = 'backup_delay_cancel', // when a user decides to return to backup flow
+  backup_cancel = 'backup_cancel', // (count # of taps on "Cancel" button in Backup_Phrase/BackupQuiz)
   backup_error = 'backup_error',
+
+  backup_quiz_start = 'backup_quiz_start',
+  backup_quiz_progress = 'backup_quiz_progress', // whenever the backspace is pressed or word is chosen
+  backup_quiz_complete = 'backup_quiz_complete', // (Count # of successful Account Key confirmations Backup_Quiz)
+  backup_quiz_incorrect = 'backup_quiz_incorrect', // (Count # of failed Account Key confirmations Backup_Quiz)
 
   celo_education_start = 'celo_education_start',
   celo_education_scroll = 'celo_education_scroll',
@@ -48,12 +46,12 @@ export enum OnboardingEvents {
   celo_education_cancel = 'celo_education_cancel',
 
   phone_number_set = 'phone_number_set',
-  invalid_phone_number = 'invalid_phone_number',
-  pin_created = 'pin_created',
+  phone_number_invalid = 'phone_number_invalid',
+  pin_set = 'pin_set',
   pin_invalid = 'pin_invalid',
   pin_failed_to_set = 'pin_failed_to_set',
   pin_never_set = 'pin_never_set',
-  import_wallet_submit = 'import_wallet_submit', // to count the # of times that the “Restore Celo Wallet” button is pressed
+  wallet_import = 'wallet_import', // when a user attempts to import an existing wallet
 }
 
 export enum VerificationEvents {

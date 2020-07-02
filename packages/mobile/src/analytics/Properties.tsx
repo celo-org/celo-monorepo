@@ -16,7 +16,7 @@ import {
   TransactionEvents,
   VerificationEvents,
 } from 'src/analytics/Events'
-import { ScrollDirection } from 'src/analytics/types'
+import { BackQuizProgress, ScrollDirection } from 'src/analytics/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
@@ -77,28 +77,24 @@ interface OnboardingEventsProperties {
   [OnboardingEvents.backup_education_cancel]: undefined
 
   [OnboardingEvents.backup_start]: undefined
-  [OnboardingEvents.backup_setup_info]: undefined
-  [OnboardingEvents.backup_quiz_backspace]: undefined
-  [OnboardingEvents.backup_quiz_start]: undefined
-  [OnboardingEvents.backup_quiz_submit]: undefined
-  [OnboardingEvents.backup_quiz_success]: undefined
-  [OnboardingEvents.backup_quiz_incorrect]: undefined
-
-  [OnboardingEvents.delay_backup]: undefined
-  [OnboardingEvents.backup_cancel]: {
-    screen: string
-  }
-  [OnboardingEvents.backup_cancel_procrastinate]: {
-    screen: string
-    title: string
-  }
   [OnboardingEvents.backup_continue]: undefined
-  [OnboardingEvents.backup_setup_toggle_enable]: undefined
-  [OnboardingEvents.backup_setup_toggle_disable]: undefined
+  [OnboardingEvents.backup_complete]: undefined
+  [OnboardingEvents.backup_more_info]: undefined
+  [OnboardingEvents.backup_delay]: undefined
+  [OnboardingEvents.backup_delay_confirm]: undefined
+  [OnboardingEvents.backup_delay_cancel]: undefined
+  [OnboardingEvents.backup_cancel]: undefined
   [OnboardingEvents.backup_error]: {
-    title: string
+    error: string
     context?: string
   }
+
+  [OnboardingEvents.backup_quiz_start]: undefined
+  [OnboardingEvents.backup_quiz_progress]: {
+    action: BackQuizProgress
+  }
+  [OnboardingEvents.backup_quiz_complete]: undefined
+  [OnboardingEvents.backup_quiz_incorrect]: undefined
 
   [OnboardingEvents.celo_education_start]: undefined
   [OnboardingEvents.celo_education_scroll]: {
@@ -111,10 +107,10 @@ interface OnboardingEventsProperties {
   [OnboardingEvents.phone_number_set]: {
     countryCode: string
   }
-  [OnboardingEvents.invalid_phone_number]: {
+  [OnboardingEvents.phone_number_invalid]: {
     obfuscatedPhoneNumber: string
   }
-  [OnboardingEvents.pin_created]: undefined
+  [OnboardingEvents.pin_set]: undefined
   [OnboardingEvents.pin_invalid]: {
     error: string
   }
@@ -123,7 +119,7 @@ interface OnboardingEventsProperties {
     error: string
   }
   [OnboardingEvents.pin_never_set]: undefined
-  [OnboardingEvents.import_wallet_submit]: undefined
+  [OnboardingEvents.wallet_import]: undefined
 }
 
 interface VerificationEventsProperties {

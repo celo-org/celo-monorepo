@@ -77,7 +77,7 @@ export class ImportWalletSocial extends React.Component<Props, State> {
     const { phrase1, phrase2 } = this.state
     Keyboard.dismiss()
     this.props.hideAlert()
-    ValoraAnalytics.track(AnalyticsEvents.import_wallet_submit)
+    ValoraAnalytics.track(AnalyticsEvents.wallet_import)
 
     const formattedPhrase1 = formatBackupPhraseOnSubmit(phrase1)
     const formattedPhrase2 = formatBackupPhraseOnSubmit(phrase2)

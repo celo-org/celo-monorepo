@@ -105,7 +105,7 @@ export class ImportWallet extends React.Component<Props, State> {
     const useEmptyWallet = !!route.params?.showZeroBalanceModal
     Keyboard.dismiss()
     this.props.hideAlert()
-    ValoraAnalytics.track(AnalyticsEvents.import_wallet_submit)
+    ValoraAnalytics.track(AnalyticsEvents.wallet_import)
 
     const formattedPhrase = formatBackupPhraseOnSubmit(this.state.backupPhrase)
     this.setState({
