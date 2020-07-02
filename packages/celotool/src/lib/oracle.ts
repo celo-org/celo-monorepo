@@ -74,7 +74,7 @@ export async function installHelmChart(
   // First install the oracle-rbac helm chart.
   // This must be deployed before so we can use a resulting auth token so that
   // oracle pods can reach the K8s API server to change their aad labels
-  await installOracleRBACHelmChart(celoEnv, context)
+  await installOracleRBACHelmChart(celoEnv, oracleContext)
   // Then install the oracle helm chart
   return installGenericHelmChart(
     celoEnv,
@@ -89,7 +89,7 @@ export async function upgradeOracleChart(
   oracleContext: string,
   useFullNodes: boolean
 ) {
-  await upgradeOracleRBACHelmChart(celoEnv, context)
+  await upgradeOracleRBACHelmChart(celoEnv, oracleContext)
   return upgradeGenericHelmChart(
     celoEnv,
     releaseName(celoEnv),
@@ -431,21 +431,21 @@ export function addOracleMiddleware(argv: yargs.Argv) {
 // limitations in aad-pod-identity & statefulsets (see https://github.com/Azure/aad-pod-identity/issues/237#issuecomment-611672987)
 // To do this, we use an auth token that we get using the resources in the `oracle-rbac` chart
 
-async function installOracleRBACHelmChart(celoEnv: string, context: OracleAzureContext) {
+async function installOracleRBACHelmChart(celoEnv: string, oracleContext: string) {
   return installGenericHelmChart(
     celoEnv,
     rbacReleaseName(celoEnv),
     rbacHelmChartPath,
-    rbacHelmParameters(celoEnv, context)
+    rbacHelmParameters(celoEnv, oracleContext)
   )
 }
 
-async function upgradeOracleRBACHelmChart(celoEnv: string, context: OracleAzureContext) {
+async function upgradeOracleRBACHelmChart(celoEnv: string, oracleContext: string) {
   return upgradeGenericHelmChart(
     celoEnv,
     rbacReleaseName(celoEnv),
     rbacHelmChartPath,
-    rbacHelmParameters(celoEnv, context)
+    rbacHelmParameters(celoEnv, oracleContext)
   )
 }
 
@@ -453,8 +453,8 @@ function removeOracleRBACHelmRelease(celoEnv: string) {
   return removeGenericHelmChart(rbacReleaseName(celoEnv))
 }
 
-function rbacHelmParameters(celoEnv: string,  context: OracleAzureContext) {
-  const oracleConfig = getOracleConfig(context)
+function rbacHelmParameters(celoEnv: string,  oracleContext: string) {
+  const oracleConfig = getOracleConfig(oracleContext)
   const replicas = oracleConfig.identities.length
   return [`--set environment.name=${celoEnv}`,  `--set oracle.replicas=${replicas}`,]
 }
