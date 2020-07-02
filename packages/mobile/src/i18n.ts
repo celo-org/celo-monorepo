@@ -8,6 +8,7 @@ import {
   withTranslation as withTranslationI18Next,
 } from 'react-i18next'
 import * as RNLocalize from 'react-native-localize'
+import { APP_NAME } from 'src/config'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'i18n'
@@ -88,6 +89,7 @@ i18n
     debug: true,
     interpolation: {
       escapeValue: false,
+      defaultVariables: { appName: APP_NAME },
     },
     missingInterpolationHandler: currencyInterpolator,
   })

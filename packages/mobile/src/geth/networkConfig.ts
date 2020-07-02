@@ -26,9 +26,7 @@ interface NetworkConfig {
 const pgpnpUrlStaging = 'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net'
 const pgpnpPubKeyStaging =
   '7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA'
-const pgpnpUrlProd = 'https://us-central1-celo-phone-number-privacy.cloudfunctions.net'
-const pgpnpPubKeyProd =
-  '6VFX/ufxvL54NDRlJMe0jlbb9wD3L/Kfm6K2qEKoxrDMS42Q1S7ZOH88tdpOJhcAJPdDTjGE6qHQBiV48n/jctSuOJ8HjsRzp6VJWMHW3imqep7nwyhzNfLcPXJfrngB'
+
 const signMoonpayUrlStaging = 'https://us-central1-celo-org-mobile.cloudfunctions.net/signMoonpay'
 
 const networkConfigs: { [testnet: string]: NetworkConfig } = {
@@ -55,8 +53,10 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     syncMode: DEFAULT_SYNC_MODE,
     initiallyForno: FORNO_ENABLED_INITIALLY,
     blockchainApiUrl: 'https://blockchain-api-dot-celo-mobile-alfajores.appspot.com/',
-    pgpnpUrl: pgpnpUrlProd,
-    pgpnpPubKey: pgpnpPubKeyProd,
+    // TODO update PGPNP values when the network is reset
+    pgpnpUrl: 'https://us-central1-celo-phone-number-privacy.cloudfunctions.net',
+    pgpnpPubKey:
+      '6VFX/ufxvL54NDRlJMe0jlbb9wD3L/Kfm6K2qEKoxrDMS42Q1S7ZOH88tdpOJhcAJPdDTjGE6qHQBiV48n/jctSuOJ8HjsRzp6VJWMHW3imqep7nwyhzNfLcPXJfrngB',
     signMoonpayUrl: signMoonpayUrlStaging,
   },
   [Testnets.pilot]: {
@@ -100,8 +100,9 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     syncMode: DEFAULT_SYNC_MODE,
     initiallyForno: FORNO_ENABLED_INITIALLY,
     blockchainApiUrl: 'https://blockchain-api-dot-celo-mobile-mainnet.appspot.com/',
-    pgpnpUrl: pgpnpUrlProd,
-    pgpnpPubKey: pgpnpPubKeyProd,
+    pgpnpUrl: 'https://us-central1-celo-pgpnp-mainnet.cloudfunctions.net',
+    pgpnpPubKey:
+      'FvreHfLmhBjwxHxsxeyrcOLtSonC9j7K3WrS4QapYsQH6LdaDTaNGmnlQMfFY04Bp/K4wAvqQwO9/bqPVCKf8Ze8OZo8Frmog4JY4xAiwrsqOXxug11+htjEe1pj4uMA',
     signMoonpayUrl: signMoonpayUrlStaging, // TODO
   },
 }

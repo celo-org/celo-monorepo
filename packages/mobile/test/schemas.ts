@@ -324,6 +324,10 @@ export const v1Schema = {
     ...v0Schema.account,
     retryVerificationWithForno: true,
   },
+  app: {
+    ...v0Schema.app,
+    requirePinOnAppOpen: false,
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {

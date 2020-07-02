@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`VerificationInterstitialScreen renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#F9F6F0",
@@ -246,5 +246,5 @@ exports[`VerificationInterstitialScreen renders correctly 1`] = `
       </Text>
     </View>
   </RCTScrollView>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

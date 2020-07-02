@@ -8,7 +8,7 @@ import { Flags } from '../../utils/command'
 import { LockedGoldArgs } from '../../utils/lockedgold'
 
 export default class Lock extends BaseCommand {
-  static description = 'Locks Celo Gold to be used in governance and validator elections.'
+  static description = 'Locks CELO to be used in governance and validator elections.'
 
   static flags = {
     ...BaseCommand.flags,

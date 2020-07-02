@@ -1,5 +1,5 @@
 ---
-description: Transfer Celo Gold and Celo Dollars
+description: Transfer CELO and Celo Dollars
 ---
 
 ## Commands
