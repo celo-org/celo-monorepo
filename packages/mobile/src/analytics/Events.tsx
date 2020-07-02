@@ -56,35 +56,49 @@ export enum OnboardingEvents {
 
 export enum VerificationEvents {
   verification_start = 'verification_start',
-  verification_hash_retrieved = 'verification_hash_retrieved',
-  verification_setup = 'verification_setup',
-  verification_get_status = 'verification_get_status',
-  verification_request_attestations = 'verification_request_attestations',
-  verification_wait_for_select_issuers = 'verification_wait_for_select_issuers',
-  verification_selecting_issuer = 'verification_selecting_issuer',
-  verification_requested_attestations = 'verification_requested_attestations',
-  verification_account_set = 'verification_account_set',
-  verification_reveal_attestation = 'verification_reveal_attestation',
-  verification_revealed_attestation = 'verification_revealed_attestation',
-  verification_reveal_error = 'verification_reveal_error',
-  verification_wait_for_attestation_code = 'verification_wait_for_attestation_code',
-  verification_code_received = 'verification_code_received',
-  verification_complete_attestation = 'verification_complete_attestation',
-  verification_completed_attestation = 'verification_completed_attestation',
-  verification_failed = 'verification_failed',
-  verification_cancelled = 'verification_cancelled',
-  verification_success = 'verification_success',
-  verification_timed_out = 'verification_timed_out',
+  verification_complete = 'verification_complete',
   verification_error = 'verification_error',
+  verification_cancel = 'verification_cancel',
+  verification_timeout = 'verification_timeout',
 
-  verification_actionable_attestation_start = 'verification_actionable_attestation_start',
-  verification_actionable_attestation_finish = 'verification_actionable_attestation_finish',
-  verification_validate_code_start = 'verification_validate_code_start',
-  verification_validate_code_finish = 'verification_validate_code_finish',
+  verification_hash_retrieved = 'verification_hash_retrieved',
+  verification_fetch_status_start = 'verification_fetch_status_start',
+  verification_fetch_status_complete = 'verification_fetch_status_complete',
 
-  phone_number_quota_purchase_success = 'phone_number_quota_purchase_success',
-  phone_number_quota_purchase_failure = 'phone_number_quota_purchase_failure',
-  phone_number_quota_purchase_skip = 'phone_number_quota_purchase_skip',
+  verification_request_all_attestations_start = 'verification_request_all_attestations_start',
+  verification_request_all_attestations_refresh_progress = 'verification_request_all_attestations_refresh_progress',
+  verification_request_all_attestations_complete = 'verification_request_all_attestations_complete',
+
+  // Events for an individual attestation
+  verification_request_attestation_start = 'verification_request_attestation_start',
+  verification_request_attestation_approve_tx_sent = 'verification_request_attestation_approve_tx_sent',
+  verification_request_attestation_request_tx_sent = 'verification_request_attestation_request_tx_sent',
+  verification_request_attestation_await_issuer_selection = 'verification_request_attestation_await_issuer_selection',
+  verification_request_attestation_select_issuer = 'verification_request_attestation_select_issuer',
+  verification_request_attestation_issuer_tx_sent = 'verification_request_attestation_issuer_tx_sent',
+  verification_request_attestation_complete = 'verification_request_attestation_complete',
+
+  verification_code_received = 'verification_code_received',
+  verification_code_validate_start = 'verification_code_validate_start',
+  verification_code_validate_complete = 'verification_code_validate_complete',
+  verification_account_set = 'verification_account_set',
+
+  verification_reveal_all_attestations_start = 'verification_reveal_all_attestations_start',
+  verification_reveal_all_attestations_complete = 'verification_reveal_all_attestations_complete',
+
+  // Events for an individual attestation reveal
+  verification_reveal_attestation_start = 'verification_reveal_attestation_start',
+  verification_reveal_attestation_revealed = 'verification_reveal_attestation_revealed',
+  verification_reveal_attestation_await_code_start = 'verification_reveal_attestation_await_code_start',
+  verification_reveal_attestation_await_code_complete = 'verification_reveal_attestation_await_code_complete',
+  verification_reveal_attestation_complete = 'verification_reveal_attestation_complete',
+  verification_reveal_attestation_error = 'verification_reveal_attestation_error',
+}
+
+export enum IdentityEvents {
+  phone_number_lookup_purchase_complete = 'phone_number_lookup_purchase_complete',
+  phone_number_lookup_purchase_error = 'phone_number_lookup_purchase_error',
+  phone_number_lookup_purchase_skip = 'phone_number_lookup_purchase_skip',
 }
 
 export enum ContactImportEvents {
@@ -221,6 +235,7 @@ export const AnalyticsEvents = {
   ...NotificationEvents,
   ...OnboardingEvents,
   ...VerificationEvents,
+  ...IdentityEvents,
   ...ContactImportEvents,
   ...InviteEvents,
   ...SendEvents,
@@ -238,6 +253,7 @@ export type AnalyticsEventType =
   | NotificationEvents
   | OnboardingEvents
   | VerificationEvents
+  | IdentityEvents
   | ContactImportEvents
   | InviteEvents
   | SendEvents

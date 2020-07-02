@@ -7,6 +7,7 @@ import {
   EscrowEvents,
   FeeEvents,
   GethEvents,
+  IdentityEvents,
   InviteEvents,
   NotificationEvents,
   OnboardingEvents,
@@ -124,79 +125,88 @@ interface OnboardingEventsProperties {
 
 interface VerificationEventsProperties {
   [VerificationEvents.verification_start]: undefined
+  [VerificationEvents.verification_complete]: undefined
+  [VerificationEvents.verification_error]: {
+    error: string
+  }
+  [VerificationEvents.verification_cancel]: undefined
+  [VerificationEvents.verification_timeout]: undefined
+
   [VerificationEvents.verification_hash_retrieved]: {
     phoneHash: string
     address: string
   }
-  [VerificationEvents.verification_setup]: undefined
-  [VerificationEvents.verification_get_status]: {
+  [VerificationEvents.verification_fetch_status_start]: undefined
+  [VerificationEvents.verification_fetch_status_complete]: {
     isVerified: boolean
     numAttestationsRemaining: number
     total: number
     completed: number
   }
-  [VerificationEvents.verification_request_attestations]: {
-    numAttestationsRequestsNeeded: number
+
+  [VerificationEvents.verification_request_all_attestations_start]: {
+    attestationsToRequest: number
   }
-  [VerificationEvents.verification_wait_for_select_issuers]: undefined
-  [VerificationEvents.verification_selecting_issuer]: undefined
-  [VerificationEvents.verification_requested_attestations]: undefined
-  [VerificationEvents.verification_account_set]: undefined
-  [VerificationEvents.verification_reveal_attestation]: {
-    issuer: any
+  [VerificationEvents.verification_request_all_attestations_refresh_progress]: {
+    attestationsRemaining: number
   }
-  [VerificationEvents.verification_revealed_attestation]: {
-    issuer: any
-    duration: number
+  [VerificationEvents.verification_request_all_attestations_complete]: {
+    issuers: string[]
   }
-  [VerificationEvents.verification_reveal_error]: {
-    issuer: any
-    statusCode: any
+
+  [VerificationEvents.verification_request_attestation_start]: {
+    currentAttestation: number
   }
-  [VerificationEvents.verification_wait_for_attestation_code]: {
-    issuer: any
-  }
+  [VerificationEvents.verification_request_attestation_approve_tx_sent]: undefined
+  [VerificationEvents.verification_request_attestation_request_tx_sent]: undefined
+  [VerificationEvents.verification_request_attestation_await_issuer_selection]: undefined
+  [VerificationEvents.verification_request_attestation_select_issuer]: undefined
+  [VerificationEvents.verification_request_attestation_issuer_tx_sent]: undefined
+  [VerificationEvents.verification_request_attestation_complete]: undefined
+
   [VerificationEvents.verification_code_received]:
     | undefined
     | {
         context: string
       }
-  [VerificationEvents.verification_complete_attestation]: {
+  [VerificationEvents.verification_code_validate_start]: {
     issuer: any
   }
-  [VerificationEvents.verification_completed_attestation]: {
+  [VerificationEvents.verification_code_validate_complete]: {
     issuer: any
   }
-  [VerificationEvents.verification_failed]: {
-    duration: number
+  [VerificationEvents.verification_account_set]: undefined
+
+  [VerificationEvents.verification_reveal_all_attestations_start]: undefined
+  [VerificationEvents.verification_reveal_attestation_revealed]: {
+    issuer: any
   }
-  [VerificationEvents.verification_cancelled]: {
-    duration: number
+  [VerificationEvents.verification_reveal_attestation_await_code_start]: {
+    issuer: any
   }
-  [VerificationEvents.verification_success]: {
-    duration: number
+  [VerificationEvents.verification_reveal_all_attestations_complete]: undefined
+
+  [VerificationEvents.verification_reveal_attestation_start]: {
+    issuer: any
   }
-  [VerificationEvents.verification_timed_out]: {
-    duration: number
+  [VerificationEvents.verification_reveal_attestation_await_code_complete]: {
+    issuer: any
   }
-  [VerificationEvents.verification_error]: {
+  [VerificationEvents.verification_reveal_attestation_complete]: {
+    issuer: any
+  }
+  [VerificationEvents.verification_reveal_attestation_error]: {
+    issuer: any
     error: string
   }
-  [VerificationEvents.verification_actionable_attestation_start]: undefined
-  [VerificationEvents.verification_actionable_attestation_finish]: {
-    duration: number
-  }
-  [VerificationEvents.verification_validate_code_start]: {
-    issuer: any
-  }
-  [VerificationEvents.verification_validate_code_finish]: {
-    issuer: any
-  }
-  [VerificationEvents.phone_number_quota_purchase_success]: undefined
-  [VerificationEvents.phone_number_quota_purchase_failure]: {
+}
+
+interface IdentityEventsProperties {
+  [IdentityEvents.phone_number_lookup_purchase_complete]: undefined
+  [IdentityEvents.phone_number_lookup_purchase_error]: {
     error: string
   }
-  [VerificationEvents.phone_number_quota_purchase_skip]: undefined
+  [IdentityEvents.phone_number_lookup_purchase_skip]: undefined
 }
 
 interface ContactImportEventsProperties {
@@ -480,6 +490,7 @@ export type AnalyticsPropertiesList = AppEventsProperties &
   NotificationEventsProperties &
   OnboardingEventsProperties &
   VerificationEventsProperties &
+  IdentityEventsProperties &
   ContactImportEventsProperties &
   InviteEventsProperties &
   SendEventsProperties &
