@@ -40,14 +40,14 @@ The `celocli` tool assumes that users are running a node which they have access 
 See documentation on the [config](./config.md) module for information about how set which node commands are sent to.
 
 {% hint style="info" %}
-**All balances of Celo Gold or Celo Dollars are expressed in units of 10<sup>-18</sup>**
+**All balances of CELO or Celo Dollars are expressed in units of 10<sup>-18</sup>**
 {% endhint %}
 
 {% embed url="https://www.npmjs.com/package/@celo/celocli" %}
 
 ### Using a Ledger Wallet
 
-The Celo CLI supports using a [Ledger hardware wallet](../celo-gold-holder-guide/ledger.md) to sign transactions.
+The Celo CLI supports using a [Ledger hardware wallet](../celo-holder-guide/ledger.md) to sign transactions.
 
 ### Plugins
 
