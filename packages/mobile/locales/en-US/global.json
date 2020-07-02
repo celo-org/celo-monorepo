@@ -86,7 +86,7 @@
   "escrowTransferFailed": "Transfer to escrow failed",
   "escrowWithdrawalFailed": "Withdrawal from escrow failed",
   "reclaimingEscrowedPaymentFailed": "Payment could not be reclaimed",
-  "connectingToCelo": "Connecting to Celo…",
+  "connectingToCelo": "Connecting…",
   "poorConnection": {
     "0": "Bad Connection",
     "1": "some features disabled"
