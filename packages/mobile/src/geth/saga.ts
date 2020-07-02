@@ -3,8 +3,8 @@ import { eventChannel } from 'redux-saga'
 import { call, cancel, cancelled, delay, fork, put, race, select, take } from 'redux-saga/effects'
 import { setPromptForno } from 'src/account/actions'
 import { promptFornoIfNeededSelector } from 'src/account/selectors'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { waitForRehydrate } from 'src/app/saga'
 import { Actions, setGethConnected, setInitState } from 'src/geth/actions'
 import {
@@ -18,7 +18,6 @@ import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { deleteChainDataAndRestartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
-import { setContractKitReady } from 'src/web3/actions'
 import { getContractKit } from 'src/web3/contracts'
 import { fornoSelector } from 'src/web3/selectors'
 
@@ -99,7 +98,7 @@ export function* initGethSaga() {
   switch (result) {
     case GethInitOutcomes.SUCCESS: {
       Logger.debug(TAG, 'Geth initialized')
-      CeloAnalytics.track(CustomEventNames.geth_init_success)
+      ValoraAnalytics.track(AnalyticsEvents.geth_init_success)
       yield put(setInitState(InitializationState.INITIALIZED))
       return
     }
@@ -137,19 +136,22 @@ export function* initGethSaga() {
     }
   }
 
-  CeloAnalytics.track(CustomEventNames.geth_init_failure, {
+  ValoraAnalytics.track(AnalyticsEvents.geth_init_failure, {
     error: result,
     context: errorContext,
   })
 
   if (restartAppAutomatically) {
     Logger.error(TAG, 'Geth initialization failed, restarting the app.')
-    CeloAnalytics.track(CustomEventNames.geth_restart_to_fix_init)
+    ValoraAnalytics.track(AnalyticsEvents.geth_restart_to_fix_init)
     deleteChainDataAndRestartApp()
   } else {
     // Suggest switch to forno for network-related errors
     if (yield select(promptFornoIfNeededSelector)) {
-      CeloAnalytics.track(CustomEventNames.prompt_forno, { context: `Geth init error ${result}` })
+      ValoraAnalytics.track(AnalyticsEvents.prompt_forno, {
+        error: result.message,
+        context: 'Geth init error',
+      })
       yield put(setPromptForno(false))
       navigate(Screens.Settings, { promptFornoModal: true })
     } else {
@@ -166,58 +168,54 @@ function createNewBlockChannel() {
 }
 
 function* monitorGeth() {
-  const newBlockChannel = yield createNewBlockChannel()
+  yield call(waitForRehydrate) // Wait for rehydrate to know if geth or forno mode
+  const fornoMode = yield select(fornoSelector)
 
-  while (true) {
-    try {
-      const { newBlock } = yield race({
-        newBlock: take(newBlockChannel),
-        timeout: delay(NEW_BLOCK_TIMEOUT),
-      })
-      if (newBlock) {
-        Logger.debug(`${TAG}@monitorGeth`, 'Received new blocks')
-        yield put(setGethConnected(true))
-        yield delay(GETH_MONITOR_DELAY)
-      } else {
-        Logger.error(
-          `${TAG}@monitorGeth`,
-          `Did not receive a block in ${NEW_BLOCK_TIMEOUT} milliseconds`
-        )
-        yield put(setGethConnected(false))
-      }
-    } catch (error) {
-      Logger.error(`${TAG}@monitorGeth`, error)
-    } finally {
-      if (yield cancelled()) {
-        try {
-          newBlockChannel.close()
-        } catch (error) {
-          Logger.debug(
+  if (!fornoMode) {
+    const newBlockChannel = yield createNewBlockChannel()
+
+    while (true) {
+      try {
+        const { newBlock } = yield race({
+          newBlock: take(newBlockChannel),
+          timeout: delay(NEW_BLOCK_TIMEOUT),
+        })
+        if (newBlock) {
+          Logger.debug(`${TAG}@monitorGeth`, 'Received new blocks')
+          yield put(setGethConnected(true))
+          yield delay(GETH_MONITOR_DELAY)
+        } else {
+          Logger.error(
             `${TAG}@monitorGeth`,
-            'Could not close newBlockChannel. May already be closed.',
-            error
+            `Did not receive a block in ${NEW_BLOCK_TIMEOUT} milliseconds`
           )
+          yield put(setGethConnected(false))
+        }
+      } catch (error) {
+        Logger.error(`${TAG}@monitorGeth`, error)
+      } finally {
+        if (yield cancelled()) {
+          try {
+            newBlockChannel.close()
+          } catch (error) {
+            Logger.debug(
+              `${TAG}@monitorGeth`,
+              'Could not close newBlockChannel. May already be closed.',
+              error
+            )
+          }
         }
       }
     }
+  } else {
+    yield put(setGethConnected(true))
+    // TODO: monitor RPC connection when not syncing
   }
 }
 
 export function* gethSaga() {
-  yield call(waitForRehydrate) // Wait for rehydrate to know if geth or forno mode
-  yield put(setContractKitReady(true)) // TODO(yorke): consider moving elsewhere
-  const fornoMode = yield select(fornoSelector)
   yield call(initGethSaga)
-  if (!fornoMode) {
-    const gethRelatedSagas = yield fork(monitorGeth)
-    yield take(Actions.CANCEL_GETH_SAGA)
-    yield cancel(gethRelatedSagas)
-  } else {
-    // TODO(yorke): monitor to make sure RPC is still available
-    yield put(setGethConnected(true))
-    yield take(Actions.CANCEL_GETH_SAGA)
-  }
-
-  yield put(setGethConnected(false))
-  // TODO: consider restarting the app when this is reached
+  const gethRelatedSagas = yield fork(monitorGeth)
+  yield take(Actions.CANCEL_GETH_SAGA)
+  yield cancel(gethRelatedSagas)
 }

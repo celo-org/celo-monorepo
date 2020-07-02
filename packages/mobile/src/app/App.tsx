@@ -14,8 +14,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { enableScreens } from 'react-native-screens'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { DefaultEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { apolloClient } from 'src/apollo/index'
 import { openDeepLink } from 'src/app/actions'
 import AppLoading from 'src/app/AppLoading'
@@ -51,17 +51,22 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 
 export class App extends React.Component {
   async componentDidMount() {
-    CeloAnalytics.track(DefaultEventNames.appLoaded, {}, true)
+    await ValoraAnalytics.init()
     const appLoadedAt: Date = new Date()
-    const appStartListener = DeviceEventEmitter.addListener(
-      'AppStartedLoading',
-      (appInitializedAtString: string) => {
-        const appInitializedAt = new Date(appInitializedAtString)
-        const tti = appLoadedAt.getTime() - appInitializedAt.getTime()
-        CeloAnalytics.track(DefaultEventNames.appLoadTTIInMilliseconds, { tti }, true)
-        appStartListener.remove()
-      }
-    )
+
+    if (Platform.OS === 'android') {
+      const appStartListener = DeviceEventEmitter.addListener(
+        'AppStartedLoading',
+        (appInitializedAtString: string) => {
+          const appInitializedAt = new Date(appInitializedAtString)
+          const loadingDuration = appLoadedAt.getTime() - appInitializedAt.getTime()
+          ValoraAnalytics.startSession(AnalyticsEvents.app_launched, { loadingDuration })
+          appStartListener.remove()
+        }
+      )
+    } else {
+      ValoraAnalytics.startSession(AnalyticsEvents.app_launched, { loadingDuration: null })
+    }
 
     Linking.addEventListener('url', this.handleOpenURL)
   }
