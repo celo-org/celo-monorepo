@@ -1,3 +1,4 @@
+import { ContractKit } from '@celo/contractkit'
 import { EscrowWrapper } from '@celo/contractkit/lib/wrappers/Escrow'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/src/address'
@@ -37,7 +38,7 @@ import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import { TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
-import { getContractKit, getContractKitAsync, web3ForUtils } from 'src/web3/contracts'
+import { getContractKit, getContractKitAsync } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { estimateGas } from 'src/web3/utils'
 
@@ -49,7 +50,7 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
     const { phoneHash, amount, tempWalletAddress } = action
     const account: string = yield call(getConnectedUnlockedAccount)
 
-    const contractKit = yield call(getContractKit)
+    const contractKit: ContractKit = yield call(getContractKit)
 
     const stableToken: StableTokenWrapper = yield call([
       contractKit.contracts,
@@ -61,7 +62,7 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
     ])
 
     Logger.debug(TAG + '@transferToEscrow', 'Approving escrow transfer')
-    const convertedAmount = web3ForUtils.utils.toWei(amount.toString())
+    const convertedAmount = contractKit.web3.utils.toWei(amount.toString())
     const approvalTx = stableToken.approve(escrow.address, convertedAmount)
 
     yield call(sendTransaction, approvalTx.txo, account, TAG, 'approval')
