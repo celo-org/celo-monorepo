@@ -1,6 +1,6 @@
 {
   "setupFilesAfterEnv": ["./init.js", "../../../flakey-test-tracking/jest/jest.setup.js"],
-  "testEnvironment": "../../../flakey-test-tracking/jest/JestFlakeTrackingEnvironment.js",
+  "testEnvironment": "../../../flakey-test-tracking/jest/environment.js",
   "reporters": ["detox/runners/jest/streamlineReporter"],
   "verbose": true,
   "testMatch": ["**/*.spec.js"],
@@ -10,5 +10,3 @@
   },
   "testRunner": "jest-circus/runner"
 }
-
-//TODO(Alec): connect this to global config

@@ -27,11 +27,11 @@ const getTestID = (test) => {
   return formatTestTitles(getTestTitles(test))
 }
 
-const addFlakeErrorsToDescribeBlock = (describeBlock, flakeMap) => {
+const buildFlakeyDescribe = (describeBlock, flakeMap) => {
   for (const child of describeBlock.children) {
     switch (child.type) {
       case 'describeBlock': {
-        addFlakeErrorsToDescribeBlock(child, flakeMap)
+        buildFlakeyDescribe(child, flakeMap)
         break
       }
       case 'test': {
@@ -41,18 +41,20 @@ const addFlakeErrorsToDescribeBlock = (describeBlock, flakeMap) => {
           child.errors = flakeErrors
           child.status = 'flakey'
         }
+        break
       }
+      default:
+        break
     }
   }
   return describeBlock
 }
 
 function parseFlake(tr) {
-  const testID = removeRootDescribeBlock(tr.testPath)
+  const testID = formatTestTitles(tr.testPath)
   const body = formatIssueBody(tr.errors)
   return {
-    title:
-      '[FLAKEY TEST] ' + tr.testPath.join(' -> ') + ', at ' + parseTestLocation(body, '/packages'),
+    title: '[FLAKEY TEST] ' + testID + ', at ' + parseTestLocation(body, '/packages'),
     body: body,
   }
 }
@@ -66,8 +68,8 @@ const parseTestLocation = (stack, rootDir) => {
 const formatIssueBody = (errors) => {
   errors.push('Test Passed!')
   let body = ''
-  for (let i = 1; i <= errors.length; i++) {
-    body += 'Attempt No. ' + i + ':\n\n' + errors[i] + '\n\n'
+  for (let i = 0; i < errors.length; i++) {
+    body += 'Attempt No. ' + (i + 1) + ':\n\n' + errors[i] + '\n\n'
   }
   return convert.toHtml(body)
 }
@@ -75,7 +77,7 @@ const formatIssueBody = (errors) => {
 module.exports = {
   getTestID: getTestID,
   formatIssueBody: formatIssueBody,
-  addFlakeErrorsToDescribeBlock: addFlakeErrorsToDescribeBlock,
+  buildFlakeyDescribe: buildFlakeyDescribe,
   parseTestLocation: parseTestLocation,
   parseFlake: parseFlake,
 }

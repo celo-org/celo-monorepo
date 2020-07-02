@@ -1,19 +1,23 @@
 const NodeEnvironment = require('jest-environment-node')
-const { processFlakeyTestResults, fetchKnownFlakes } = require('../FlakeNotifier')
-const { getTestID, addFlakeErrorsToDescribeBlock } = require('./utils')
-const clone = require('clone')
-
 const Circus = require('jest-circus')
 const { makeRunResult } = require('jest-circus/build/utils')
+const { processFlakes } = require('../processor')
+const GitHub = require('../github')
+const { getTestID, buildFlakeyDescribe, parseFlake } = require('./utils')
+const clone = require('clone')
 
-class JestFlakeTrackingEnvironment extends NodeEnvironment {
+class FlakeTrackingEnvironment extends NodeEnvironment {
   async setup() {
     await super.setup()
-    this.global.FLAKES = new Map() //TODO(Alec): keeping this global for now in case we want to use it in a custom reporter.
-    if (this.global.SKIP_KNOWN_FLAKES) {
-      this.skip = await fetchKnownFlakes()
+    this.global.FLAKES = new Map() //TODO(Alec, nth): keeping this global for now in case we want to use it in a custom reporter.
+    if (process.env.CI) {
+      this.github = await GitHub.build()
+      await this.github.renew()
+      if (this.global.SKIP_KNOWN_FLAKES) {
+        this.skip = await this.github.fetchKnownFlakes()
+      }
     }
-    //TODO(Alec): Make githubclient interactions less frequent
+    //TODO(Alec, nth): Make githubclient interactions less frequent
   }
 
   async handleTestEvent(event, state) {
@@ -22,18 +26,14 @@ class JestFlakeTrackingEnvironment extends NodeEnvironment {
     }
 
     if (event.name === 'run_finish') {
-      const describeBlock = addFlakeErrorsToDescribeBlock(
-        clone(state.rootDescribeBlock),
-        this.global.FLAKES
-      )
+      const describeBlock = buildFlakeyDescribe(clone(state.rootDescribeBlock), this.global.FLAKES)
 
-      const flakeyTestResults = makeRunResult(
-        describeBlock,
-        state.unhandledErrors
-      ).testResults.filter((tr) => tr.status === 'flakey')
+      const flakes = makeRunResult(describeBlock, state.unhandledErrors)
+        .testResults.filter((tr) => tr.status === 'flakey')
+        .map(parseFlake)
 
-      if (flakeyTestResults.length > 0) {
-        await processFlakeyTestResults(flakeyTestResults)
+      if (flakes.length) {
+        await processFlakes(flakes, this.github)
       }
     }
 
@@ -51,25 +51,24 @@ class JestFlakeTrackingEnvironment extends NodeEnvironment {
           let errors = []
           let prevErrors = this.global.FLAKES.get(testID)
           if (prevErrors !== undefined) {
-            errors.push(...prevErrors)
+            errors.push(prevErrors)
           }
-          errors.push(...event.test.errors)
+          errors.push(event.test.errors)
           this.global.FLAKES.set(testID, errors)
         }
       }
     }
 
-    if (this.global.SKIP_KNOWN_FLAKES && event.name === 'test_start') {
+    if (process.env.CI && this.global.SKIP_KNOWN_FLAKES && event.name === 'test_start') {
       const testID = getTestID(event.test)
       for (const knownFlake of this.skip) {
         if (knownFlake.includes(testID)) {
           event.test.mode = 'skip'
-          break
+          return
         }
       }
-      return
     }
   }
 }
 
-module.exports = JestFlakeTrackingEnvironment
+module.exports = FlakeTrackingEnvironment

@@ -46,6 +46,7 @@
   "devDependencies": {
     "@babel/core": "^7.6.2",
     "@babel/runtime": "^7.6.2",
+    "@octokit/app": "^4.2.0",
     "@octokit/plugin-retry": "^3.0.3",
     "@octokit/rest": "^18.0.0",
     "@types/jest": "^25.1.4",
