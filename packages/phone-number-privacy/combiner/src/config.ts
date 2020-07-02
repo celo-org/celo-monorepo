@@ -68,7 +68,8 @@ if (DEV_MODE) {
       password: functionConfig.db.pass,
       database: functionConfig.db.name,
       host: `/cloudsql/${functionConfig.db.host}`,
-      ssl: functionConfig.db.ssl,
+      // Cody TODO: replace with combined lib version once it's published
+      ssl: functionConfig.db.ssl ? functionConfig.db.ssl.toLowerCase() === 'true' : true,
     },
     pgpnpServices: {
       signers: functionConfig.pgpnpservices.signers,
