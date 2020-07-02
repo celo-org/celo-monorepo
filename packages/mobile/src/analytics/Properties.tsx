@@ -111,6 +111,7 @@ interface OnboardingEventsProperties {
   [OnboardingEvents.phone_number_invalid]: {
     obfuscatedPhoneNumber: string
   }
+
   [OnboardingEvents.pin_set]: undefined
   [OnboardingEvents.pin_invalid]: {
     error: string
@@ -120,7 +121,13 @@ interface OnboardingEventsProperties {
     error: string
   }
   [OnboardingEvents.pin_never_set]: undefined
-  [OnboardingEvents.wallet_import]: undefined
+
+  [OnboardingEvents.wallet_import_start]: undefined
+  [OnboardingEvents.wallet_import_complete]: undefined
+  [OnboardingEvents.wallet_import_cancel]: undefined
+
+  [OnboardingEvents.wallet_invite_redeem]: undefined
+  [OnboardingEvents.wallet_invite_skip]: undefined
 }
 
 interface VerificationEventsProperties {

@@ -9,6 +9,8 @@ import { Trans, WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
+import { OnboardingEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import CodeInput, { CodeInputStatus } from 'src/components/CodeInput'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { CELO_FAUCET_LINK, SHOW_GET_INVITE_LINK } from 'src/config'
@@ -94,6 +96,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
   }
 
   onPressSkip = () => {
+    ValoraAnalytics.track(OnboardingEvents.wallet_invite_skip)
     this.props.skipInvite()
   }
 

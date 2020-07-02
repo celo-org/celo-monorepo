@@ -47,11 +47,17 @@ export enum OnboardingEvents {
 
   phone_number_set = 'phone_number_set',
   phone_number_invalid = 'phone_number_invalid',
+
   pin_set = 'pin_set',
   pin_invalid = 'pin_invalid',
   pin_failed_to_set = 'pin_failed_to_set',
   pin_never_set = 'pin_never_set',
-  wallet_import = 'wallet_import', // when a user attempts to import an existing wallet
+
+  wallet_import_start = 'wallet_import_start',
+  wallet_import_complete = 'wallet_import_complete',
+  wallet_import_cancel = 'wallet_import_cancel', // when a user cancels import of 0 balance wallet
+
+  wallet_invite_skip = 'wallet_invite_skip',
 }
 
 export enum VerificationEvents {
