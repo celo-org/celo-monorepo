@@ -2,9 +2,9 @@
   "receivedPayment": "Pago recibido",
   "receivedEscrowPayment": "Pago de fideicomiso recibido",
   "from": "de",
-  "celoWallet": "Monedero de Celo",
+  "celoWallet": "{{appName}}",
   "at": "a las",
   "receivedDollars": "{{CeloDollars}} Recibidos",
-  "verificationMessage": "La tasa de verificación fue pagada. ¡Bienvenido a Celo!",
+  "verificationMessage": "La tasa de verificación fue pagada. ¡Bienvenido a {{appName}}!",
   "receivedAmountFromCelo": "¡Recibiste esta cantidad de Faucet!"
 }
