@@ -93,8 +93,6 @@ async function getPrometheusGcloudServiceAccountKeyBase64forAKS(kubeClusterName:
   await switchToGCPProjectFromEnv()
 
   const serviceAccountName = getServiceAccountNameforAKS(kubeClusterName)
-  console.log('kubeClusterName', kubeClusterName)
-  console.log('serviceAccountName', serviceAccountName)
   await createPrometheusGcloudServiceAccountforAKS(serviceAccountName)
 
   const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)

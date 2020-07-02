@@ -43,7 +43,7 @@ const oracleContextAzureClusterConfigDynamicEnvVars: { [k in keyof AzureClusterC
   subscriptionId: DynamicEnvVar.ORACLE_AZURE_SUBSCRIPTION_ID,
   tenantId: DynamicEnvVar.ORACLE_AZURE_TENANT_ID,
   resourceGroup: DynamicEnvVar.ORACLE_AZURE_KUBERNETES_RESOURCE_GROUP,
-  clusterName: DynamicEnvVar.ORACLE_AZURE_KUBERNETES_CLUSTER_NAME,
+  clusterName: DynamicEnvVar.ORACLE_KUBERNETES_CLUSTER_NAME,
 }
 
 interface OracleIdentityConfig {
@@ -329,6 +329,15 @@ export function getAzureClusterConfig(oracleContext: string): AzureClusterConfig
   return getOracleContextDynamicEnvVarValues(oracleContextAzureClusterConfigDynamicEnvVars, oracleContext)
 }
 
+/**
+ * Gives an object with the values of dynamic environment variables for an oracle context.
+ * @param dynamicEnvVars an object whose values correspond to the desired
+ *   dynamic env vars to fetch.
+ * @param oracleContext The oracle context
+ * @param defaultValues Optional default values if the dynamic env vars are not found
+ * @return an object with the same keys as dynamicEnvVars, but the values are
+ *   the values of the dynamic env vars for the particular oracleContext
+ */
 export function getOracleContextDynamicEnvVarValues<T>(
   dynamicEnvVars: { [k in keyof T]: DynamicEnvVar },
   oracleContext: string,
@@ -359,7 +368,6 @@ export function getOracleContextDynamicEnvVarValues<T>(
  * Switches to the AKS cluster associated with the given context
  */
 export function switchToAzureContextCluster(celoEnv: string, oracleContext: string) {
-  // TODO: move this check when AWS support is added
   const validOracleContexts = fetchEnv(envVar.ORACLE_CONTEXTS)
     .split(',')
   const validOracleContextsCoerced = validOracleContexts.map(coerceOracleContext)
@@ -377,6 +385,12 @@ export interface OracleArgv {
   context: string
 }
 
+/**
+ * Coerces the value of context to be all upper-case and underscore-separated
+ * rather than dash-separated. If the resulting context does not match a regex
+ * requiring all caps, alphanumeric, and dash-only characters
+ * (must start with letter and not end with an underscore), it will throw.
+ */
 function coerceOracleContext(rawContextStr: string) {
   const context = rawContextStr
     .toUpperCase()
@@ -399,11 +413,6 @@ export function addOracleMiddleware(argv: yargs.Argv) {
       description: 'Oracle context to perform the deployment in',
       type: 'string',
     })
-    // coerces the value of context to be all upper-case and
-    // underscore-separated rather than dash-separated.
-    // If the resulting context does not match a regex requiring all caps,
-    // alphanumeric, and dash-only characters (must start with letter and not end
-    // with an underscore), it will throw.
     .coerce('context', coerceOracleContext)
 }
 
