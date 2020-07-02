@@ -1,4 +1,8 @@
 {
+  "@celo/attestation-proxy": {
+    "location": "packages/attestation-proxy",
+    "dependencies": []
+  },
   "@celo/attestation-service": {
     "location": "packages/attestation-service",
     "dependencies": [
