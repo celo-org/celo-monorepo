@@ -65,6 +65,10 @@ export enum OnboardingEvents {
   invite_redeem_skip_start = 'invite_redeem_skip_start',
   invite_redeem_skip_complete = 'invite_redeem_skip_complete',
   invite_redeem_skip_error = 'invite_redeem_skip_error',
+
+  escrow_redeem_start = 'escrow_redeem_start', // when escrow redemption starts (only happens on user invite redeemption)
+  escrow_redeem_complete = 'escrow_redeem_complete',
+  escrow_redeem_error = 'escrow_redeem_error',
 }
 
 export enum VerificationEvents {
@@ -136,15 +140,21 @@ export enum InviteEvents {
 }
 
 export enum EscrowEvents {
-  escrowed_payment_review = 'escrowed_payment_review',
-  escrow_transfer = 'escrow_transfer',
-  escrowed_payment_reclaimed_by_sender = 'escrowed_payment_reclaimed_by_sender',
-  escrowed_payment_reclaimEdit_by_sender = 'escrowed_payment_reclaimEdit_by_sender',
-  escrowed_payment_withdrawn_by_receiver = 'escrowed_payment_withdrawn_by_receiver',
-  escrow_failed_to_withdraw = 'escrow_failed_to_withdraw',
-  escrow_failed_to_reclaim = 'escrow_failed_to_reclaim',
-  escrow_failed_to_transfer = 'escrow_failed_to_transfer',
-  escrow_failed_to_fetch_sent = 'escrow_failed_to_fetch_sent',
+  escrow_transfer_start = 'escrow_transfer_start',
+  escrow_transfer_approve_tx_sent = 'escrow_transfer_approve_tx_sent',
+  escrow_transfer_transfer_tx_sent = 'escrow_transfer_transfer_tx_sent',
+  escrow_transfer_complete = 'escrow_transfer_complete',
+  escrow_transfer_error = 'escrow_transfer_error',
+
+  escrow_fetch_start = 'escrow_fetch_start',
+  escrow_fetch_complete = 'escrow_fetch_complete',
+  escrow_fetch_error = 'escrow_fetch_error',
+
+  escrow_reclaim_confirm = 'escrow_reclaim_confirm', // user confirms they want to reclaim escrowed payment
+  escrow_reclaim_cancel = 'escrow_reclaim_cancel', // user decides not to initiate a reclaim of escrowed payment
+  escrow_reclaim_start = 'escrow_reclaim_start', // when reclaim transaction starts
+  escrow_reclaim_complete = 'escrow_reclaim_complete', // when reclaim transaction complete
+  escrow_reclaim_error = 'escrow_reclaim_error',
 }
 
 export enum SendEvents {

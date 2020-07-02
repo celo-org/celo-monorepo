@@ -32,6 +32,7 @@ import { navigateToVerifierApp } from 'src/utils/linking'
 export enum NotificationBannerTypes {
   incoming_tx_request = 'incoming_tx_request',
   outgoing_tx_request = 'outgoing_tx_request',
+  escrow_tx_summary = 'escrow_tx_summary',
   escrow_tx_pending = 'escrow_tx_pending',
   celo_asset_education = 'celo_asset_education',
   celo_rewards_education = 'celo_rewards_education',

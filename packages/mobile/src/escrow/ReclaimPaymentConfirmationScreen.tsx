@@ -76,7 +76,7 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
 
   onConfirm = async () => {
     const escrowedPayment = this.getReclaimPaymentInput()
-    ValoraAnalytics.track(AnalyticsEvents.escrowed_payment_reclaimed_by_sender)
+    ValoraAnalytics.track(AnalyticsEvents.escrow_reclaim_confirm)
     const address = this.props.account
     if (!address) {
       throw new Error("Can't reclaim funds without a valid account")
@@ -91,8 +91,8 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
     }
   }
 
-  onPressEdit = () => {
-    ValoraAnalytics.track(AnalyticsEvents.escrowed_payment_reclaimEdit_by_sender)
+  onPressCancel = () => {
+    ValoraAnalytics.track(AnalyticsEvents.escrow_reclaim_cancel)
     navigateBack()
   }
 
@@ -131,7 +131,7 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
               asyncFee.loading ||
               !!asyncFee.error,
           }}
-          modifyButton={{ action: this.onPressEdit, text: t('cancel'), disabled: isReclaiming }}
+          modifyButton={{ action: this.onPressCancel, text: t('cancel'), disabled: isReclaiming }}
         >
           <ReclaimPaymentConfirmationCard
             recipientPhone={payment.recipientPhone}

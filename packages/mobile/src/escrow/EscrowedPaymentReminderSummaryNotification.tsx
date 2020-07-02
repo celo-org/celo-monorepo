@@ -2,11 +2,12 @@ import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet } from 'react-native'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { NotificationEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentLineItem from 'src/escrow/EscrowedPaymentLineItem'
 import { listItemRenderer } from 'src/escrow/EscrowedPaymentListScreen'
+import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { inviteFriendsIcon } from 'src/images/Images'
 import { InviteDetails } from 'src/invite/actions'
@@ -23,7 +24,10 @@ type Props = OwnProps & WithTranslation
 
 export class EscrowedPaymentReminderSummaryNotification extends React.Component<Props> {
   onReview = () => {
-    ValoraAnalytics.track(AnalyticsEvents.escrowed_payment_review)
+    ValoraAnalytics.track(NotificationEvents.notification_select, {
+      notificationType: NotificationBannerTypes.escrow_tx_summary,
+      selectedAction: NotificationBannerCTATypes.review,
+    })
     navigate(Screens.EscrowedPaymentListScreen)
   }
 

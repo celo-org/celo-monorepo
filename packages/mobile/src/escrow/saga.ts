@@ -4,7 +4,7 @@ import { ensureLeading0x, trimLeading0x } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import { all, call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError, showErrorOrFallback } from 'src/alert/actions'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { EscrowEvents, OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -46,6 +46,7 @@ const TAG = 'escrow/saga'
 function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
   Logger.debug(TAG + '@transferToEscrow', 'Begin transfer to escrow')
   try {
+    ValoraAnalytics.track(EscrowEvents.escrow_transfer_start)
     const { phoneHash, amount, tempWalletAddress } = action
     const account: string = yield call(getConnectedUnlockedAccount)
 
@@ -66,6 +67,7 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
 
     yield call(sendTransaction, approvalTx.txo, account, TAG, 'approval')
 
+    ValoraAnalytics.track(EscrowEvents.escrow_transfer_transfer_tx_sent)
     Logger.debug(TAG + '@transferToEscrow', 'Transfering to escrow')
 
     yield call(registerStandbyTransaction, action.txId, amount.toString(), escrow.address)
@@ -78,12 +80,13 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
       tempWalletAddress,
       NUM_ATTESTATIONS_REQUIRED
     )
+    ValoraAnalytics.track(EscrowEvents.escrow_transfer_transfer_tx_sent)
     // TODO check types
     yield call(sendAndMonitorTransaction, action.txId, transferTx, account)
     yield put(fetchSentEscrowPayments())
-    ValoraAnalytics.track(AnalyticsEvents.escrow_transfer)
+    ValoraAnalytics.track(EscrowEvents.escrow_transfer_complete)
   } catch (e) {
-    ValoraAnalytics.track(AnalyticsEvents.escrow_failed_to_transfer, { error: e.message })
+    ValoraAnalytics.track(EscrowEvents.escrow_transfer_error, { error: e.message })
     Logger.error(TAG + '@transferToEscrow', 'Error transfering to escrow', e)
     yield put(showErrorOrFallback(e, ErrorMessages.ESCROW_TRANSFER_FAILED))
   }
@@ -106,6 +109,7 @@ function* registerStandbyTransaction(id: string, value: string, address: string)
 
 function* withdrawFromEscrow() {
   try {
+    ValoraAnalytics.track(OnboardingEvents.escrow_redeem_start)
     Logger.debug(TAG + '@withdrawFromEscrow', 'Withdrawing escrowed payment')
 
     const contractKit = yield call(getContractKit)
@@ -154,10 +158,10 @@ function* withdrawFromEscrow() {
 
     yield put(fetchDollarBalance())
     Logger.showMessage(i18n.t('inviteFlow11:transferDollarsToAccount'))
-    ValoraAnalytics.track(AnalyticsEvents.escrowed_payment_withdrawn_by_receiver)
+    ValoraAnalytics.track(OnboardingEvents.escrow_redeem_complete)
   } catch (e) {
     Logger.error(TAG + '@withdrawFromEscrow', 'Error withdrawing payment from escrow', e)
-    ValoraAnalytics.track(AnalyticsEvents.escrow_failed_to_withdraw, { error: e.message })
+    ValoraAnalytics.track(OnboardingEvents.escrow_redeem_error, { error: e.message })
     if (e.message === ErrorMessages.INCORRECT_PIN) {
       yield put(showError(ErrorMessages.INCORRECT_PIN))
     } else {
@@ -194,6 +198,7 @@ function* reclaimFromEscrow({ paymentID }: EscrowReclaimPaymentAction) {
   Logger.debug(TAG + '@reclaimFromEscrow', 'Reclaiming escrowed payment')
 
   try {
+    ValoraAnalytics.track(EscrowEvents.escrow_reclaim_start)
     const account = yield call(getConnectedUnlockedAccount)
 
     const reclaimTx = yield call(createReclaimTransaction, paymentID)
@@ -204,9 +209,10 @@ function* reclaimFromEscrow({ paymentID }: EscrowReclaimPaymentAction) {
 
     yield call(navigateHome)
     yield put(reclaimEscrowPaymentSuccess())
+    ValoraAnalytics.track(EscrowEvents.escrow_reclaim_complete)
   } catch (e) {
     Logger.error(TAG + '@reclaimFromEscrow', 'Error reclaiming payment from escrow', e)
-    ValoraAnalytics.track(AnalyticsEvents.escrow_failed_to_reclaim, { error: e.message })
+    ValoraAnalytics.track(EscrowEvents.escrow_reclaim_error, { error: e.message })
     if (e.message === ErrorMessages.INCORRECT_PIN) {
       yield put(showError(ErrorMessages.INCORRECT_PIN))
     } else {
@@ -233,6 +239,7 @@ function* doFetchSentPayments() {
   Logger.debug(TAG + '@doFetchSentPayments', 'Fetching valid sent escrowed payments')
 
   try {
+    ValoraAnalytics.track(EscrowEvents.escrow_fetch_start)
     const contractKit = yield call(getContractKit)
 
     const escrow: EscrowWrapper = yield call([
@@ -278,8 +285,9 @@ function* doFetchSentPayments() {
     }
 
     yield put(storeSentEscrowPayments(sentPayments))
+    ValoraAnalytics.track(EscrowEvents.escrow_fetch_complete)
   } catch (e) {
-    ValoraAnalytics.track(AnalyticsEvents.escrow_failed_to_fetch_sent, { error: e.message })
+    ValoraAnalytics.track(EscrowEvents.escrow_fetch_error, { error: e.message })
     Logger.error(TAG + '@doFetchSentPayments', 'Error fetching sent escrowed payments', e)
   }
 }

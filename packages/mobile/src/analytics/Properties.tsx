@@ -137,6 +137,12 @@ interface OnboardingEventsProperties {
   [OnboardingEvents.invite_redeem_skip_error]: {
     error: string
   }
+
+  [OnboardingEvents.escrow_redeem_start]: undefined
+  [OnboardingEvents.escrow_redeem_complete]: undefined
+  [OnboardingEvents.escrow_redeem_error]: {
+    error: string
+  }
 }
 
 interface VerificationEventsProperties {
@@ -261,21 +267,25 @@ interface InviteEventsProperties {
 }
 
 interface EscrowEventsProperties {
-  [EscrowEvents.escrowed_payment_review]: undefined
-  [EscrowEvents.escrow_transfer]: undefined
-  [EscrowEvents.escrowed_payment_reclaimed_by_sender]: undefined
-  [EscrowEvents.escrowed_payment_reclaimEdit_by_sender]: undefined
-  [EscrowEvents.escrowed_payment_withdrawn_by_receiver]: undefined
-  [EscrowEvents.escrow_failed_to_withdraw]: {
+  [EscrowEvents.escrow_transfer_start]: undefined
+  [EscrowEvents.escrow_transfer_approve_tx_sent]: undefined
+  [EscrowEvents.escrow_transfer_transfer_tx_sent]: undefined
+  [EscrowEvents.escrow_transfer_complete]: undefined
+  [EscrowEvents.escrow_transfer_error]: {
     error: string
   }
-  [EscrowEvents.escrow_failed_to_reclaim]: {
+
+  [EscrowEvents.escrow_fetch_start]: undefined
+  [EscrowEvents.escrow_fetch_complete]: undefined
+  [EscrowEvents.escrow_fetch_error]: {
     error: string
   }
-  [EscrowEvents.escrow_failed_to_transfer]: {
-    error: string
-  }
-  [EscrowEvents.escrow_failed_to_fetch_sent]: {
+
+  [EscrowEvents.escrow_reclaim_confirm]: undefined
+  [EscrowEvents.escrow_reclaim_cancel]: undefined
+  [EscrowEvents.escrow_reclaim_start]: undefined
+  [EscrowEvents.escrow_reclaim_complete]: undefined
+  [EscrowEvents.escrow_reclaim_error]: {
     error: string
   }
 }

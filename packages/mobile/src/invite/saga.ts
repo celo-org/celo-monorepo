@@ -199,9 +199,9 @@ export function* sendInvite(
         txId,
       })
     )
-    ValoraAnalytics.track(InviteEvents.invite_tx_complete)
 
     yield call(waitForTransactionWithId, txId)
+    ValoraAnalytics.track(InviteEvents.invite_tx_complete)
     Logger.debug(TAG + '@sendInviteSaga', 'Sent money to new wallet')
 
     // If this invitation has a payment attached to it, send the payment to the escrow.
