@@ -24,7 +24,7 @@
   "inviteFee": "Invitation Fee",
   "feeEducation": "Sending payments and making exchanges include a small fee for service security and maintenance.",
   "learnMore": "Learn More",
-  "inviteMoneyEscrow": "We’ll invite this contact and keep their funds safe until they verifiy their account.",
+  "inviteMoneyEscrow": "We’ll invite this contact and keep their funds safe until they verify their account.",
   "reviewPayment": "Review Payment",
   "requestPayment": "Request Payment",
   "continue": "Continue",
@@ -32,7 +32,7 @@
   "activity": "Activity",
   "exchange": "Exchange",
   "inviteSendTo": "Invite & send to",
-  "keepMoneySafe": "We'll keep this money safe until your friend creates a Celo account",
+  "keepMoneySafe": "We'll keep this money safe until your friend creates a {{appName}} account",
   "searchFriends": "Try entering a phone number if you are unable to find who you're looking for",
   "inviteVerifyPayment": "Invite & Verify Payment",
   "inviteFriends": "Invite Friends",
@@ -44,8 +44,8 @@
   "sentEscrowPayment": "Sent Escrow Payment",
   "mobileNumber": "Mobile #",
   "walletAddress": "Wallet Address",
-  "inviteSMS": "Welcome to Celo! Get Celo at {{link}} and enter your code to get started: {{code}}",
-  "inviteSMSWithEscrowedPayment": "Welcome to Celo! I've sent you Celo Dollars. Go to {{link}} and enter your code to get started: {{code}}",
+  "inviteSMS": "Welcome to {{appName}}! Get {{appName}} at {{link}} and enter your code to get started: {{code}}",
+  "inviteSMSWithEscrowedPayment": "Welcome to {{appName}}! I've sent you Celo Dollars. Go to {{link}} and enter your code to get started: {{code}}",
   "inviteSent": "Invite code sent!",
   "inviteFailed": "Failure sending invite",
   "loadingContacts": "Finding your contacts",
@@ -87,8 +87,8 @@
     "button": "Confirm Account Number"
   },
   "secureSendExplanation": {
-    "body1": "{{e164PhoneNumber}} has multiple accounts associated with it. {{displayName}} could have created a new Celo account, or may have lost their phone or had their account compromised.",
-    "body1NoDisplayName": "Your contact has multiple accounts associated with it. Your contact could have created a new Celo account, or may have lost their phone or had their account compromised.",
+    "body1": "{{e164PhoneNumber}} has multiple accounts associated with it. {{displayName}} could have created a new {{appName}} account, or may have lost their phone or had their account compromised.",
+    "body1NoDisplayName": "Your contact has multiple accounts associated with it. Your contact could have created a new {{appName}} account, or may have lost their phone or had their account compromised.",
     "body2": "You must scan their QR code or confirm their account number before transacting."
   },
   "confirmAccountNumber": {
