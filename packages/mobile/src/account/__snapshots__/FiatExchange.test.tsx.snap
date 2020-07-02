@@ -142,31 +142,24 @@ exports[`FiatExchange renders correctly 1`] = `
       0.00
     </Text>
     <Text
+      numberOfLines={1}
       style={
-        Object {
-          "color": "#9CA4A9",
-          "fontFamily": "Inter-Regular",
-          "fontSize": 14,
-          "lineHeight": 18,
-        }
+        Array [
+          Object {
+            "color": "#9CA4A9",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+          },
+          Object {
+            "color": "#9CA4A9",
+          },
+        ]
       }
     >
-      <Text
-        numberOfLines={1}
-        style={
-          Array [
-            undefined,
-            Object {
-              "color": undefined,
-            },
-          ]
-        }
-      >
-        
-        0.00
-      </Text>
-       
-      Celo Dollars
+      
+      0.00
+       global:celoDollars
     </Text>
   </View>
   <View>
