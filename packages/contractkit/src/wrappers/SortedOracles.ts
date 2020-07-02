@@ -52,7 +52,7 @@ export interface MedianRate {
 export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   /**
    * Gets the number of rates that have been reported for the given token
-   * @param token The CeloToken token for which the Celo Gold exchange rate is being reported.
+   * @param token The CeloToken token for which the CELO exchange rate is being reported.
    * @return The number of reported oracle rates for `token`.
    */
   async numRates(token: CeloToken): Promise<number> {
@@ -63,9 +63,9 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
 
   /**
    * Returns the median rate for the given token
-   * @param token The CeloToken token for which the Celo Gold exchange rate is being reported.
+   * @param token The CeloToken token for which the CELO exchange rate is being reported.
    * @return The median exchange rate for `token`, expressed as:
-   *   amount of that token / equivalent amount in Celo Gold
+   *   amount of that token / equivalent amount in CELO
    */
   async medianRate(token: CeloToken): Promise<MedianRate> {
     const tokenAddress = await this.kit.registry.addressFor(token)
@@ -138,8 +138,8 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
 
   /**
    * Updates an oracle value and the median.
-   * @param token The token for which the Celo Gold exchange rate is being reported.
-   * @param value The amount of `token` equal to one Celo Gold.
+   * @param token The token for which the CELO exchange rate is being reported.
+   * @param value The amount of `token` equal to one CELO.
    */
   async report(
     token: CeloToken,
@@ -164,7 +164,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
 
   /**
    * Updates an oracle value and the median.
-   * @param value The amount of US Dollars equal to one Celo Gold.
+   * @param value The amount of US Dollars equal to one CELO.
    */
   async reportStableToken(
     value: BigNumber.Value,
