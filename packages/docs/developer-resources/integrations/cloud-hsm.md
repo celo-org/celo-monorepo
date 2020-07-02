@@ -82,7 +82,7 @@ Now that your environment variables are set, we just need to let `celocli` know 
 celocli account:list --useAKV --azureVaultName $AZURE_VAULT_NAME
 ```
 
-Your Key Vault address will show up under "Local Addresses". If you'd like to use this key as your vote signer key, you can follow [this guide](../../celo-gold-holder-guide/quick-start.md#authorize-vote-signer-keys) and replace `--useLedger` with `--useAKV --azureVaultName $AZURE_VAULT_NAME`.
+Your Key Vault address will show up under "Local Addresses". If you'd like to use this key as your vote signer key, you can follow [this guide](../../celo-holder-guide/quick-start.md#authorize-vote-signer-keys) and replace `--useLedger` with `--useAKV --azureVaultName $AZURE_VAULT_NAME`.
 
 ## Connecting ContractKit to KeyVault
 

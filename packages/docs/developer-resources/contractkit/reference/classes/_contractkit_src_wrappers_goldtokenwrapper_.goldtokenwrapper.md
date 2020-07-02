@@ -91,11 +91,11 @@ ___
 
 *Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L59)*
 
-Approve a user to transfer Celo Gold on behalf of another user.
+Approve a user to transfer CELO on behalf of another user.
 
-**`param`** The address which is being approved to spend Celo Gold.
+**`param`** The address which is being approved to spend CELO.
 
-**`param`** The amount of Celo Gold approved to the spender.
+**`param`** The amount of CELO approved to the spender.
 
 **`returns`** True if the transaction succeeds.
 
@@ -141,9 +141,9 @@ ___
 
 Decreases the allowance of another user.
 
-**`param`** The address which is being approved to spend Celo Gold.
+**`param`** The address which is being approved to spend CELO.
 
-**`param`** The decrement of the amount of Celo Gold approved to the spender.
+**`param`** The decrement of the amount of CELO approved to the spender.
 
 **`returns`** true if success.
 
@@ -181,9 +181,9 @@ ___
 
 Increases the allowance of another user.
 
-**`param`** The address which is being approved to spend Celo Gold.
+**`param`** The address which is being approved to spend CELO.
 
-**`param`** The increment of the amount of Celo Gold approved to the spender.
+**`param`** The increment of the amount of CELO approved to the spender.
 
 **`returns`** true if success.
 
@@ -271,11 +271,11 @@ ___
 
 *Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:94](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L94)*
 
-Transfers Celo Gold from one address to another.
+Transfers CELO from one address to another.
 
-**`param`** The address to transfer Celo Gold to.
+**`param`** The address to transfer CELO to.
 
-**`param`** The amount of Celo Gold to transfer.
+**`param`** The amount of CELO to transfer.
 
 **`returns`** True if the transaction succeeds.
 
@@ -297,13 +297,13 @@ ___
 
 *Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:103](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L103)*
 
-Transfers Celo Gold from one address to another on behalf of a user.
+Transfers CELO from one address to another on behalf of a user.
 
-**`param`** The address to transfer Celo Gold from.
+**`param`** The address to transfer CELO from.
 
-**`param`** The address to transfer Celo Gold to.
+**`param`** The address to transfer CELO to.
 
-**`param`** The amount of Celo Gold to transfer.
+**`param`** The amount of CELO to transfer.
 
 **`returns`** True if the transaction succeeds.
 
@@ -325,11 +325,11 @@ ___
 
 *Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:86](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L86)*
 
-Transfers Celo Gold from one address to another with a comment.
+Transfers CELO from one address to another with a comment.
 
-**`param`** The address to transfer Celo Gold to.
+**`param`** The address to transfer CELO to.
 
-**`param`** The amount of Celo Gold to transfer.
+**`param`** The amount of CELO to transfer.
 
 **`param`** The transfer comment
 
