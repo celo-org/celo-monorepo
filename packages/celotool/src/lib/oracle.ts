@@ -359,6 +359,13 @@ export function getOracleContextDynamicEnvVarValues<T>(
  * Switches to the AKS cluster associated with the given context
  */
 export function switchToAzureContextCluster(celoEnv: string, oracleContext: string) {
+  // TODO: move this check when AWS support is added
+  const validOracleContexts = fetchEnv(envVar.ORACLE_CONTEXTS)
+    .split(',')
+  const validOracleContextsCoerced = validOracleContexts.map(coerceOracleContext)
+  if (!validOracleContextsCoerced.includes(oracleContext)) {
+    throw Error(`Invalid oracle context, must be one of ${validOracleContexts}`)
+  }
   const azureClusterConfig = getAzureClusterConfig(oracleContext)
   return switchToCluster(celoEnv, azureClusterConfig)
 }
@@ -368,6 +375,16 @@ export function switchToAzureContextCluster(celoEnv: string, oracleContext: stri
  */
 export interface OracleArgv {
   context: string
+}
+
+function coerceOracleContext(rawContextStr: string) {
+  const context = rawContextStr
+    .toUpperCase()
+    .replace(/-/g, '_')
+  if (!RegExp('^[A-Z][A-Z0-9_]*[A-Z0-9]$').test(context)) {
+    throw Error(`Invalid oracle context. Raw ${rawContextStr}, implied ${context}`)
+  }
+  return context
 }
 
 /**
@@ -387,15 +404,7 @@ export function addOracleMiddleware(argv: yargs.Argv) {
     // If the resulting context does not match a regex requiring all caps,
     // alphanumeric, and dash-only characters (must start with letter and not end
     // with an underscore), it will throw.
-    .coerce('context', (rawContextStr: string) => {
-      const context = rawContextStr
-        .toUpperCase()
-        .replace(/-/g, '_')
-      if (!RegExp('^[A-Z][A-Z0-9_]*[A-Z0-9]$').test(context)) {
-        throw Error(`Invalid oracle context. Raw ${rawContextStr}, implied ${context}`)
-      }
-      return context
-    })
+    .coerce('context', coerceOracleContext)
 }
 
 // Oracle RBAC------

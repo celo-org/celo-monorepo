@@ -47,8 +47,6 @@ export async function switchToCluster(
   if (currentCluster === null || currentCluster.trim() !== clusterConfig.clusterName) {
     const [existingContextsStr] = await execCmdWithExitOnFailure('kubectl config get-contexts -o name')
     const existingContexts = existingContextsStr.trim().split('\n')
-    console.log(existingContexts)
-    console.log(clusterConfig.clusterName)
     if (existingContexts.includes(clusterConfig.clusterName)) {
       await execCmdWithExitOnFailure(`kubectl config use-context ${clusterConfig.clusterName}`)
     } else {
