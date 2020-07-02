@@ -9,9 +9,10 @@ import Hamburger from 'src/icons/Hamburger'
 interface Props {
   middleElement?: React.ReactNode
   scrollPosition?: Animated.Value<number>
+  testID?: string
 }
 
-function DrawerTopBar({ middleElement, scrollPosition }: Props) {
+function DrawerTopBar({ middleElement, scrollPosition, testID }: Props) {
   const navigation = useNavigation()
   const viewStyle = React.useMemo(
     () => ({
@@ -26,7 +27,7 @@ function DrawerTopBar({ middleElement, scrollPosition }: Props) {
   )
 
   return (
-    <Animated.View style={viewStyle}>
+    <Animated.View testID={testID} style={viewStyle}>
       {/*
       // @ts-ignore Only used in a drawer */}
       <TouchableOpacity style={styles.hamburger} onPress={navigation.toggleDrawer}>
