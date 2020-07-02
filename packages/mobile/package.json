@@ -28,7 +28,8 @@
     "test:e2e:ios": "./scripts/run_e2e.sh -p ios",
     "test:verify-locales": "./scripts/verify_locales.sh",
     "pre-deploy": "./scripts/pre-deploy.sh",
-    "deploy:update-disclaimer": "yarn licenses generate-disclaimer > android/app/src/main/assets/custom/LicenseDisclaimer.txt"
+    "deploy:update-disclaimer": "yarn licenses generate-disclaimer > android/app/src/main/assets/custom/LicenseDisclaimer.txt",
+    "postinstall": "./scripts/sync_branding.sh"
   },
   "rnpm": {
     "assets": [
