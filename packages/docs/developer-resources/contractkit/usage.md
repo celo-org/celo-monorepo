@@ -17,7 +17,7 @@ await kit.setFeeCurrency(CeloContract.StableToken)
 
 ## Getting the Total Balance
 
-This method from the `kit` will return the cGLD, locked cGLD, cUSD and total balance of the address
+This method from the `kit` will return the CELO, locked CELO, cUSD and total balance of the address
 
 ```ts
 let totalBalance = await kit.getTotalBalance(myAddress)
@@ -40,10 +40,10 @@ let receipt = tx.waitReceipt()
 console.log(receipt)
 ```
 
-## Selling cGLD only if the rate is favorable
+## Selling CELO only if the rate is favorable
 
 ```ts
-// This is at lower price I will accept in cUSD for every cGLD
+// This is at lower price I will accept in cUSD for every CELO
 const favorableAmout = 100
 const amountToExchange = kit.web3.utils.toWei('10', 'ether')
 const oneGold = kit.web3.utils.toWei('1', 'ether')
@@ -62,7 +62,7 @@ if (amountOfcUsd > favorableAmount) {
 }
 ```
 
-## Buying all the cGLD I can, with the cUSD in my account
+## Buying all the CELO I can, with the cUSD in my account
 
 ```ts
 const stableToken = await this.contracts.getStableToken()
