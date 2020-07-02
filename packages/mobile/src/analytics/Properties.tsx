@@ -3,7 +3,6 @@ import { PincodeType } from 'src/account/reducer'
 import {
   AppEvents,
   CeloExchangeEvents,
-  ContactImportEvents,
   EscrowEvents,
   FeeEvents,
   GethEvents,
@@ -126,8 +125,18 @@ interface OnboardingEventsProperties {
   [OnboardingEvents.wallet_import_complete]: undefined
   [OnboardingEvents.wallet_import_cancel]: undefined
 
-  [OnboardingEvents.wallet_invite_redeem]: undefined
-  [OnboardingEvents.wallet_invite_skip]: undefined
+  [OnboardingEvents.invite_redeem_start]: undefined
+  [OnboardingEvents.invite_redeem_complete]: undefined
+  [OnboardingEvents.invite_redeem_timeout]: undefined
+  [OnboardingEvents.invite_redeem_error]: {
+    error: string
+  }
+
+  [OnboardingEvents.invite_redeem_skip_start]: undefined
+  [OnboardingEvents.invite_redeem_skip_complete]: undefined
+  [OnboardingEvents.invite_redeem_skip_error]: {
+    error: string
+  }
 }
 
 interface VerificationEventsProperties {
@@ -209,6 +218,28 @@ interface VerificationEventsProperties {
 }
 
 interface IdentityEventsProperties {
+  [IdentityEvents.contacts_connect]: {
+    matchMakingEnabled: boolean
+  }
+  [IdentityEvents.contacts_import_permission_denied]: undefined
+  [IdentityEvents.contacts_import_start]: undefined
+  [IdentityEvents.contacts_import_complete]: {
+    contactImportCount: number
+  }
+  [IdentityEvents.contacts_processing_complete]: undefined
+  [IdentityEvents.contacts_matchmaking_complete]: {
+    matchCount: number
+  }
+  [IdentityEvents.contacts_import_error]: {
+    error: string
+  }
+
+  [IdentityEvents.phone_number_lookup_start]: undefined
+  [IdentityEvents.phone_number_lookup_complete]: undefined
+  [IdentityEvents.phone_number_lookup_error]: {
+    error: string
+  }
+
   [IdentityEvents.phone_number_lookup_purchase_complete]: undefined
   [IdentityEvents.phone_number_lookup_purchase_error]: {
     error: string
@@ -216,40 +247,35 @@ interface IdentityEventsProperties {
   [IdentityEvents.phone_number_lookup_purchase_skip]: undefined
 }
 
-interface ContactImportEventsProperties {
-  [ContactImportEvents.contacts_connect]: {
-    matchMakingEnabled: boolean
+interface InviteEventsProperties {
+  [InviteEvents.invite_tx_start]: undefined
+  [InviteEvents.invite_tx_complete]: undefined
+  [InviteEvents.invite_tx_error]: {
+    error: string
   }
-  [ContactImportEvents.contacts_import_permission_denied]: undefined
-  [ContactImportEvents.contacts_import_start]: undefined
-  [ContactImportEvents.contacts_import_complete]: {
-    contactImportCount: number
-  }
-  [ContactImportEvents.contacts_processing_complete]: undefined
-  [ContactImportEvents.contacts_matchmaking_complete]: {
-    matchCount: number
-  }
-  [ContactImportEvents.contacts_import_error]: {
+  [InviteEvents.invite_method_sms]: undefined
+  [InviteEvents.invite_method_whatsapp]: undefined
+  [InviteEvents.invite_method_error]: {
     error: string
   }
 }
 
-interface InviteEventsProperties {
-  [InviteEvents.invite_success]: undefined
-  [InviteEvents.invite_error]: {
+interface EscrowEventsProperties {
+  [EscrowEvents.escrowed_payment_review]: undefined
+  [EscrowEvents.escrow_transfer]: undefined
+  [EscrowEvents.escrowed_payment_reclaimed_by_sender]: undefined
+  [EscrowEvents.escrowed_payment_reclaimEdit_by_sender]: undefined
+  [EscrowEvents.escrowed_payment_withdrawn_by_receiver]: undefined
+  [EscrowEvents.escrow_failed_to_withdraw]: {
     error: string
   }
-  [InviteEvents.friend_invited]: undefined
-  [InviteEvents.invite_edit]: undefined
-  [InviteEvents.invite_friends_sms]: undefined
-  [InviteEvents.invite_friends_whatsapp]: undefined
-  [InviteEvents.invite_skip_failed]: {
+  [EscrowEvents.escrow_failed_to_reclaim]: {
     error: string
   }
-  [InviteEvents.invite_skip_complete]: undefined
-  [InviteEvents.redeem_invite_success]: undefined
-  [InviteEvents.redeem_invite_timed_out]: undefined
-  [InviteEvents.redeem_invite_failed]: {
+  [EscrowEvents.escrow_failed_to_transfer]: {
+    error: string
+  }
+  [EscrowEvents.escrow_failed_to_fetch_sent]: {
     error: string
   }
 }
@@ -314,26 +340,6 @@ interface SendEventsProperties {
     partialAddressValidation: boolean
   }
   [SendEvents.send_secure_edit]: undefined
-}
-
-interface EscrowEventsProperties {
-  [EscrowEvents.escrowed_payment_review]: undefined
-  [EscrowEvents.escrow_transfer]: undefined
-  [EscrowEvents.escrowed_payment_reclaimed_by_sender]: undefined
-  [EscrowEvents.escrowed_payment_reclaimEdit_by_sender]: undefined
-  [EscrowEvents.escrowed_payment_withdrawn_by_receiver]: undefined
-  [EscrowEvents.escrow_failed_to_withdraw]: {
-    error: string
-  }
-  [EscrowEvents.escrow_failed_to_reclaim]: {
-    error: string
-  }
-  [EscrowEvents.escrow_failed_to_transfer]: {
-    error: string
-  }
-  [EscrowEvents.escrow_failed_to_fetch_sent]: {
-    error: string
-  }
 }
 
 interface RequestEventsProperties {
@@ -498,7 +504,7 @@ export type AnalyticsPropertiesList = AppEventsProperties &
   OnboardingEventsProperties &
   VerificationEventsProperties &
   IdentityEventsProperties &
-  ContactImportEventsProperties &
+  IdentityEventsProperties &
   InviteEventsProperties &
   SendEventsProperties &
   EscrowEventsProperties &

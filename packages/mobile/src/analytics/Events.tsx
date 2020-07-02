@@ -57,8 +57,14 @@ export enum OnboardingEvents {
   wallet_import_complete = 'wallet_import_complete',
   wallet_import_cancel = 'wallet_import_cancel', // when a user cancels import of 0 balance wallet
 
-  wallet_invite_redeem = 'wallet_invite_redeem',
-  wallet_invite_skip = 'wallet_invite_skip',
+  invite_redeem_start = 'invite_redeem_start',
+  invite_redeem_complete = 'invite_redeem_complete',
+  invite_redeem_timeout = 'invite_redeem_timeout',
+  invite_redeem_error = 'invite_redeem_error',
+
+  invite_redeem_skip_start = 'invite_redeem_skip_start',
+  invite_redeem_skip_complete = 'invite_redeem_skip_complete',
+  invite_redeem_skip_error = 'invite_redeem_skip_error',
 }
 
 export enum VerificationEvents {
@@ -103,12 +109,6 @@ export enum VerificationEvents {
 }
 
 export enum IdentityEvents {
-  phone_number_lookup_purchase_complete = 'phone_number_lookup_purchase_complete',
-  phone_number_lookup_purchase_error = 'phone_number_lookup_purchase_error',
-  phone_number_lookup_purchase_skip = 'phone_number_lookup_purchase_skip',
-}
-
-export enum ContactImportEvents {
   contacts_connect = 'contacts_connect', // when connect button is pressed
   contacts_import_permission_denied = 'contacts_import_permission_denied',
   contacts_import_start = 'contacts_import_start',
@@ -116,21 +116,35 @@ export enum ContactImportEvents {
   contacts_processing_complete = 'contacts_processing_complete',
   contacts_matchmaking_complete = 'contacts_matchmaking_complete',
   contacts_import_error = 'contacts_import_error',
+
+  phone_number_lookup_start = 'phone_number_lookup_start',
+  phone_number_lookup_complete = 'phone_number_lookup_complete',
+  phone_number_lookup_error = 'phone_number_lookup_error',
+
+  phone_number_lookup_purchase_complete = 'phone_number_lookup_purchase_complete',
+  phone_number_lookup_purchase_error = 'phone_number_lookup_purchase_error',
+  phone_number_lookup_purchase_skip = 'phone_number_lookup_purchase_skip',
 }
 
 export enum InviteEvents {
-  invite_success = 'invite_success', // when there is an error sending an invite
-  invite_error = 'invite_error', // when there is an error sending an invite
-  friend_invited = 'friend_invited', // to record the name or number of the friend a user is inviting per an invite session
-  invite_edit = 'invite_edit', // to count the # of taps on “Cancel” button at bottom of Invite_Friends_Review
-  invite_friends_sms = 'invite_friends_sms', // to count the # of taps on “Invite with SMS" button on Invite_Friends_Review
-  invite_friends_whatsapp = 'invite_friends_whatsapp', // to count the # of taps on “Invite with WhatsApp" button on Invite_Friends_Review
-  invite_skip_failed = 'invite_skip_failed',
-  invite_skip_complete = 'invite_skip_complete',
+  invite_tx_start = 'invite_tx_start',
+  invite_tx_complete = 'invite_tx_complete',
+  invite_tx_error = 'invite_tx_error',
+  invite_method_sms = 'invite_method_sms',
+  invite_method_whatsapp = 'invite_method_whatsapp',
+  invite_method_error = 'invite_method_error',
+}
 
-  redeem_invite_success = 'redeem_invite_success',
-  redeem_invite_timed_out = 'redeem_invite_timed_out',
-  redeem_invite_failed = 'redeem_invite_failed',
+export enum EscrowEvents {
+  escrowed_payment_review = 'escrowed_payment_review',
+  escrow_transfer = 'escrow_transfer',
+  escrowed_payment_reclaimed_by_sender = 'escrowed_payment_reclaimed_by_sender',
+  escrowed_payment_reclaimEdit_by_sender = 'escrowed_payment_reclaimEdit_by_sender',
+  escrowed_payment_withdrawn_by_receiver = 'escrowed_payment_withdrawn_by_receiver',
+  escrow_failed_to_withdraw = 'escrow_failed_to_withdraw',
+  escrow_failed_to_reclaim = 'escrow_failed_to_reclaim',
+  escrow_failed_to_transfer = 'escrow_failed_to_transfer',
+  escrow_failed_to_fetch_sent = 'escrow_failed_to_fetch_sent',
 }
 
 export enum SendEvents {
@@ -156,18 +170,6 @@ export enum SendEvents {
 
   send_dollar_transaction = 'send_dollar_transaction',
   send_dollar_transaction_confirmed = 'send_dollar_transaction_confirmed',
-}
-
-export enum EscrowEvents {
-  escrowed_payment_review = 'escrowed_payment_review',
-  escrow_transfer = 'escrow_transfer',
-  escrowed_payment_reclaimed_by_sender = 'escrowed_payment_reclaimed_by_sender',
-  escrowed_payment_reclaimEdit_by_sender = 'escrowed_payment_reclaimEdit_by_sender',
-  escrowed_payment_withdrawn_by_receiver = 'escrowed_payment_withdrawn_by_receiver',
-  escrow_failed_to_withdraw = 'escrow_failed_to_withdraw',
-  escrow_failed_to_reclaim = 'escrow_failed_to_reclaim',
-  escrow_failed_to_transfer = 'escrow_failed_to_transfer',
-  escrow_failed_to_fetch_sent = 'escrow_failed_to_fetch_sent',
 }
 
 export enum RequestEvents {
@@ -243,10 +245,9 @@ export const AnalyticsEvents = {
   ...OnboardingEvents,
   ...VerificationEvents,
   ...IdentityEvents,
-  ...ContactImportEvents,
   ...InviteEvents,
-  ...SendEvents,
   ...EscrowEvents,
+  ...SendEvents,
   ...RequestEvents,
   ...FeeEvents,
   ...TransactionEvents,
@@ -261,10 +262,9 @@ export type AnalyticsEventType =
   | OnboardingEvents
   | VerificationEvents
   | IdentityEvents
-  | ContactImportEvents
   | InviteEvents
-  | SendEvents
   | EscrowEvents
+  | SendEvents
   | RequestEvents
   | FeeEvents
   | TransactionEvents
