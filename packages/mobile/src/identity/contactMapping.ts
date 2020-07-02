@@ -11,7 +11,7 @@ import { call, delay, put, race, select, take } from 'redux-saga/effects'
 import { setUserContactDetails } from 'src/account/actions'
 import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/selectors'
 import { showErrorOrFallback } from 'src/alert/actions'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { AnalyticsEvents, ContactImportEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { USE_PHONE_NUMBER_PRIVACY } from 'src/config'
@@ -31,6 +31,7 @@ import {
   AddressValidationType,
   e164NumberToAddressSelector,
   E164NumberToAddressType,
+  matchedContactsSelector,
   SecureSendPhoneNumberMapping,
   secureSendPhoneNumberMappingSelector,
 } from 'src/identity/reducer'
@@ -72,7 +73,7 @@ export function* doImportContactsWrapper({ doMatchmaking }: ImportContactsAction
     yield put(endImportContacts(true))
   } catch (error) {
     Logger.error(TAG, 'Error importing user contacts', error)
-    ValoraAnalytics.track(AnalyticsEvents.import_contact_error, { error: error.message })
+    ValoraAnalytics.track(AnalyticsEvents.contacts_import_error, { error: error.message })
     yield put(showErrorOrFallback(error, ErrorMessages.IMPORT_CONTACTS_FAILED))
     yield put(endImportContacts(false))
   }
@@ -82,13 +83,18 @@ function* doImportContacts(doMatchmaking: boolean) {
   const hasGivenContactPermission: boolean = yield call(checkContactsPermission)
   if (!hasGivenContactPermission) {
     Logger.warn(TAG, 'Contact permissions denied. Skipping import.')
+    ValoraAnalytics.track(ContactImportEvents.contacts_import_permission_denied)
     return true
   }
+
+  ValoraAnalytics.track(ContactImportEvents.contacts_import_start)
 
   yield put(updateImportContactsProgress(ImportContactsStatus.Importing))
 
   const contacts: MinimalContact[] = yield call(getAllContacts)
-  ValoraAnalytics.track(AnalyticsEvents.fetched_contacts, { contacts: contacts.length })
+  ValoraAnalytics.track(ContactImportEvents.contacts_import_complete, {
+    contactImportCount: contacts.length,
+  })
   if (!contacts || !contacts.length) {
     Logger.warn(TAG, 'Empty contacts list. Skipping import.')
     return true
@@ -107,12 +113,17 @@ function* doImportContacts(doMatchmaking: boolean) {
   yield call(updateUserContact, e164NumberToRecipients)
   yield call(updateRecipientsCache, e164NumberToRecipients, otherRecipients)
 
+  ValoraAnalytics.track(ContactImportEvents.contacts_processing_complete)
+
   if (!doMatchmaking) {
     return true
   }
-
   yield put(updateImportContactsProgress(ImportContactsStatus.Matchmaking))
   yield call(fetchContactMatches, e164NumberToRecipients)
+  const matchContacts = yield select(matchedContactsSelector)
+  ValoraAnalytics.track(ContactImportEvents.contacts_matchmaking_complete, {
+    matchCount: Object.keys(matchContacts).length,
+  })
   return true
 }
 

@@ -200,15 +200,20 @@ interface VerificationEventsProperties {
 }
 
 interface ContactImportEventsProperties {
-  [ContactImportEvents.import_contacts]: undefined
-  [ContactImportEvents.import_contact_error]: {
+  [ContactImportEvents.contacts_connect]: {
+    matchMakingEnabled: boolean
+  }
+  [ContactImportEvents.contacts_import_permission_denied]: undefined
+  [ContactImportEvents.contacts_import_start]: undefined
+  [ContactImportEvents.contacts_import_complete]: {
+    contactImportCount: number
+  }
+  [ContactImportEvents.contacts_processing_complete]: undefined
+  [ContactImportEvents.contacts_matchmaking_complete]: {
+    matchCount: number
+  }
+  [ContactImportEvents.contacts_import_error]: {
     error: string
-  }
-  [ContactImportEvents.fetched_contacts]: {
-    contacts: number
-  }
-  [ContactImportEvents.add_contact_match]: {
-    contactsMatched: number
   }
 }
 

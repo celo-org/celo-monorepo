@@ -85,11 +85,11 @@ function ImportContactsScreen({ route, navigation }: Props) {
   }
 
   const onPressConnect = async () => {
-    ValoraAnalytics.track(AnalyticsEvents.import_contacts)
-    const hasGivenContactPermission = await requestContactsPermission()
-    if (hasGivenContactPermission) {
-      dispatch(importContacts(isFindMeSwitchChecked))
-    }
+    ValoraAnalytics.track(AnalyticsEvents.contacts_connect, {
+      matchMakingEnabled: isFindMeSwitchChecked,
+    })
+    await requestContactsPermission()
+    dispatch(importContacts(isFindMeSwitchChecked))
   }
 
   const onToggleFindMeSwitch = (value: boolean) => {

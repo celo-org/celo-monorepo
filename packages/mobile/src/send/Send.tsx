@@ -210,10 +210,7 @@ class Send extends React.Component<Props, State> {
 
     const hasGivenContactPermission = await requestContactsPermission()
     this.setState({ hasGivenContactPermission })
-
-    if (hasGivenContactPermission) {
-      this.props.importContacts()
-    }
+    this.props.importContacts()
   }
 
   onSearchQueryChanged = (searchQuery: string) => {
@@ -240,14 +237,6 @@ class Send extends React.Component<Props, State> {
     )
 
     navigate(Screens.SendAmount, { recipient, isRequest })
-  }
-
-  onPermissionsAccepted = async () => {
-    this.props.importContacts()
-    this.setState({
-      searchQuery: '',
-      hasGivenContactPermission: true,
-    })
   }
 
   onPressStartVerification = () => {

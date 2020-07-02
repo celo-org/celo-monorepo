@@ -88,10 +88,13 @@ export enum VerificationEvents {
 }
 
 export enum ContactImportEvents {
-  import_contacts = 'import_contacts',
-  import_contact_error = 'import_contact_error',
-  fetched_contacts = 'fetched_contacts',
-  add_contact_match = 'add_contact_match',
+  contacts_connect = 'contacts_connect', // when connect button is pressed
+  contacts_import_permission_denied = 'contacts_import_permission_denied',
+  contacts_import_start = 'contacts_import_start',
+  contacts_import_complete = 'contacts_import_complete',
+  contacts_processing_complete = 'contacts_processing_complete',
+  contacts_matchmaking_complete = 'contacts_matchmaking_complete',
+  contacts_import_error = 'contacts_import_error',
 }
 
 export enum InviteEvents {
