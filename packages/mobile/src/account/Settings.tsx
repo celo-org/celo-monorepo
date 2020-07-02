@@ -35,6 +35,7 @@ import { navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
+import { restartApp } from 'src/utils/AppRestart'
 import { navigateToURI } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
 import { toggleFornoMode } from 'src/web3/actions'
@@ -196,6 +197,7 @@ export class Account extends React.Component<Props, State> {
   disableFornoMode = () => {
     this.props.toggleFornoMode(false)
     this.hideFornoSwitchOffWarning()
+    setTimeout(() => restartApp(), 2000)
   }
 
   handleFornoToggle = (fornoMode: boolean) => {
