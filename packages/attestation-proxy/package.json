@@ -1,0 +1,25 @@
+{
+  "name": "@celo/attestation-proxy",
+  "version": "1.0.0",
+  "description": "Basic attestation proxy for revealing",
+  "author": "Celo",
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "serve": "firebase serve --only functions",
+    "deploy": "firebase deploy --only functions",
+    "clean": "tsc -b . --clean",
+    "build": "tsc -b .",
+    "lint": "tslint --project ."
+  },
+  "dependencies": {
+    "firebase-functions": "^3.6.0",
+    "node-fetch": "^2.6.0"
+  },
+  "devDependencies": {
+    "firebase-functions-test": "^0.2.0"
+  },
+  "engines": {
+    "node": "10"
+  }
+}
