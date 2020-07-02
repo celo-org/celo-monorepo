@@ -59,9 +59,9 @@
   },
   "congratsVerified": "Congratulations you are now verified!",
   "notification": {
-    "title": "Verify Your Phone",
-    "body": "Verifying allows you to easily send and receive funds with your phone contacts",
-    "cta": "Get Verified"
+    "title": "Confirm Your Phone",
+    "body": "Receive payments directly to your phone number",
+    "cta": "Confirm Now"
   },
   "quotaLookup": {
     "title": "Lookup quota exceeded",

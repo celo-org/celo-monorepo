@@ -22,7 +22,7 @@
   "withdrawDollarsFromEscrow": "Withdrawing {{dollars}} from escrow...",
   "transferDollarsToAccount": "{{Dollars}} transferred to your account!",
   "inviteFriendsToCelo": "Invite Friends to {{appName}}",
-  "inviteAnyone": "Invite Anyone in your address book to send and receive funds",
+  "inviteAnyone": "Send easily to your friends by adding your contacts",
   "inviteComplete": "Invite Complete",
   "inviteReceived": "Invite Received",
   "escrowPaymentNotificationTitle": "Invited {{mobile}}"
