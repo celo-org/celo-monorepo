@@ -9,7 +9,7 @@
       "loadingStatus1": "Procesando {{total}} contactos",
       "loadingStatus2": "Encontrar amigos",
       "successHeader": "Terminado",
-      "successWithMatches": "{{matches}} amigos en Valora",
+      "successWithMatches": "{{matches}} amigos en {{appName}}",
       "successWithoutMatches": "Sincronización completa"
     }
   },
