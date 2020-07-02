@@ -183,7 +183,7 @@ _See code: [packages/cli/src/commands/validator/register.ts](https://github.com/
 
 ### Requirements
 
-List the Locked Gold requirements for registering a Validator. This consists of a value, which is the amount of Celo Gold that needs to be locked in order to register, and a duration, which is the amount of time that Gold must stay locked following the deregistration of the Validator.
+List the Locked Gold requirements for registering a Validator. This consists of a value, which is the amount of CELO that needs to be locked in order to register, and a duration, which is the amount of time that CELO must stay locked following the deregistration of the Validator.
 
 ```
 USAGE

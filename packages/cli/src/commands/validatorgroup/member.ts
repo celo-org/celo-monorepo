@@ -60,7 +60,7 @@ export default class ValidatorGroupMembers extends BaseCommand {
           type: 'confirm',
           name: 'confirmation',
           message:
-            'Are you sure you want to accept this member?\nValidator Group Locked Gold requirements increase per member. Adding an additional member could result in an increase in Locked Gold requirements of up to 10,000 cGLD for 180 days. (y/n)',
+            'Are you sure you want to accept this member?\nValidator Group Locked Gold requirements increase per member. Adding an additional member could result in an increase in Locked Gold requirements of up to 10,000 CELO for 180 days. (y/n)',
         })
 
         if (!response.confirmation) {
