@@ -56,7 +56,7 @@ type AttestationServiceRunningCheckResult =
   | { isValid: true; result: ActionableAttestation }
   | { isValid: false; issuer: Address }
 
-interface AttesationServiceRevealRequest {
+export interface AttesationServiceRevealRequest {
   account: Address
   phoneNumber: string
   issuer: string
