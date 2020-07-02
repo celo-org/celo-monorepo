@@ -57,6 +57,7 @@ export enum OnboardingEvents {
   wallet_import_complete = 'wallet_import_complete',
   wallet_import_cancel = 'wallet_import_cancel', // when a user cancels import of 0 balance wallet
 
+  wallet_invite_redeem = 'wallet_invite_redeem',
   wallet_invite_skip = 'wallet_invite_skip',
 }
 

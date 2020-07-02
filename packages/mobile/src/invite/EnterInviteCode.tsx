@@ -81,6 +81,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
     // Check deeplink
     const validCode = await getValidInviteCodeFromReferrerData()
     if (validCode) {
+      ValoraAnalytics.track(OnboardingEvents.wallet_invite_redeem)
       this.setState({ inputValue: validCode })
       this.props.redeemInvite(validCode)
       return
