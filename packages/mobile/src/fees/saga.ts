@@ -12,7 +12,6 @@ import { getSendTxGas } from 'src/send/saga'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { BasicTokenTransfer } from 'src/tokens/saga'
 import Logger from 'src/utils/Logger'
-import { web3ForUtils } from 'src/web3/contracts'
 import { getGasPrice } from 'src/web3/gas'
 import { getConnectedAccount } from 'src/web3/saga'
 
@@ -25,7 +24,7 @@ const feeGasCache = new Map<FeeType, BigNumber>()
 const placeHolderAddress = `0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10`
 const placeholderSendTx: BasicTokenTransfer = {
   recipientAddress: placeHolderAddress,
-  amount: web3ForUtils.utils.fromWei('1'),
+  amount: 1e-18, // 1 wei
   comment: 'Coffee or Tea?',
 }
 
