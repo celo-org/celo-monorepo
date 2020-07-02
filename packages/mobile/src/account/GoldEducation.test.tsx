@@ -23,7 +23,7 @@ describe('when first time (!goldToken.educationCompleted)', () => {
       </Provider>
     )
 
-    expect(getByTestId('Education/top').props.children).toEqual(false)
+    expect(getByTestId('DrawerTopBar')).toBeTruthy()
   })
 })
 
