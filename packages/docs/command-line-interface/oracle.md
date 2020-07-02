@@ -57,7 +57,7 @@ _See code: [packages/cli/src/commands/oracle/remove-expired-reports.ts](https://
 
 ### Report
 
-Report the price of Celo Gold in a specified token (currently just Celo Dollar, aka "StableToken")
+Report the price of CELO in a specified token (currently just Celo Dollar, aka "StableToken")
 
 ```
 USAGE
@@ -81,7 +81,7 @@ OPTIONS
 
   --useLedger                                        Set it to use a ledger wallet
 
-  --value=value                                      (required) Amount of the specified token equal to 1 cGLD
+  --value=value                                      (required) Amount of the specified token equal to 1 CELO
 
 EXAMPLES
   report StableToken --value 1.02 --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1
