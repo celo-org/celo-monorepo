@@ -294,7 +294,7 @@ class CheckBuilder {
 
   hasEnoughGold = (account: Address, value: BigNumber) => {
     const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
-    return this.addCheck(`Account has at least ${valueInEth} cGLD`, () =>
+    return this.addCheck(`Account has at least ${valueInEth} CELO`, () =>
       this.kit.contracts
         .getGoldToken()
         .then((goldToken) => goldToken.balanceOf(account))

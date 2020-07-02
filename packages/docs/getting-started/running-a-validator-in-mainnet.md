@@ -18,13 +18,13 @@ Additionally, Validators are expected to run an [Attestation Service](https://gi
 
 ### Staking Requirements
 
-Celo uses a [proof-of-stake](../celo-codebase/protocol/proof-of-stake) consensus mechanism, which requires Validators to have locked Celo Gold to participate in block production. The current requirement is 10,000 cGLD to register a Validator, and 10,000 cGLD _per member validator_ to register a Validator Group.
+Celo uses a [proof-of-stake](../celo-codebase/protocol/proof-of-stake) consensus mechanism, which requires Validators to have locked CELO to participate in block production. The current requirement is 10,000 CELO to register a Validator, and 10,000 CELO _per member validator_ to register a Validator Group.
 
-If you do not have the required Celo Gold to lock up, you can try out of the process of creating a validator on the Baklava network by following the [Running a Validator in Baklava guide](running-a-validator-in-baklava.md)
+If you do not have the required CELO to lock up, you can try out of the process of creating a validator on the Baklava network by following the [Running a Validator in Baklava guide](running-a-validator-in-baklava.md)
 
-We will not discuss obtaining Celo Gold here, but it is a prerequisite that you obtain the required Celo Gold, and it is assumed in this guide that your gold is held in two `ReleaseGold` contracts, one for the Validator and one for the Validator Group. If that is not the case, the provided commands will need to be adjusted, but the guide will still provide the required steps.
+We will not discuss obtaining CELO here, but it is a prerequisite that you obtain the required CELO, and it is assumed in this guide that your gold is held in two `ReleaseGold` contracts, one for the Validator and one for the Validator Group. If that is not the case, the provided commands will need to be adjusted, but the guide will still provide the required steps.
 
-At a high level, `ReleaseGold` holds a balance for scheduled release, while allowing the held balance to be used for certain actions such as validating and voting, depending on the configuration of the contract. [Read more about `ReleaseGold`](../celo-gold-holder-guide/release-gold.md).
+At a high level, `ReleaseGold` holds a balance for scheduled release, while allowing the held balance to be used for certain actions such as validating and voting, depending on the configuration of the contract. [Read more about `ReleaseGold`](../celo-holder-guide/release-gold.md).
 
 ### Hardware requirements
 
@@ -155,11 +155,11 @@ Done:
 * 4/22: Celo Core Contracts and `ReleaseGold` contracts are deployed
 * 4/27: Governance proposals submitted to unfreeze validator elections and validator epoch rewards
 * 5/1: Elections and validator rewards enabled if governance proposals pass; validators have been registered and affiliated with a Validator Group for first election
-* 5/14: Governance proposals submitted to enable voter rewards and enable Celo Gold (cGLD) transfers
-* 5/18: RC1 is declared Mainnet and cGLD transfers are enabled, if governance proposals pass
+* 5/14: Governance proposals submitted to enable voter rewards and enable CELO transfers
+* 5/18: RC1 is declared Mainnet and CELO transfers are enabled, if governance proposals pass
 
 Upcoming:
-* ~5/25: Deployment of cGLD/USD Oracles
+* ~5/25: Deployment of CELO/USD Oracles
 * ~5/31: Governance proposal submitted to unfreeze stability protocol
 * ~6/3: Stability protocol goes live if governance proposal passes
 
@@ -192,7 +192,7 @@ The `us.gcr.io/celo-testnet/celo-node:rc1` image contains the [genesis block](ht
 
 ### Start your Accounts node
 
-Next, we'll run a node on your local machine so that we can use these accounts to lock Celo Gold and authorize the keys needed to run your validator. To do this, we need to run the following commands, which fetch the genesis block and a list of other nodes in the network to connect to.
+Next, we'll run a node on your local machine so that we can use these accounts to lock CELO and authorize the keys needed to run your validator. To do this, we need to run the following commands, which fetch the genesis block and a list of other nodes in the network to connect to.
 
 ```bash
 # On your local machine
@@ -346,7 +346,7 @@ At this point your Validator and Proxy machines should be configured, and both s
 
 In order to operate as a Validator, you must register on-chain and be elected. Elections will run on each epoch boundary, approximatly every 24 hours, after elections have been unfrozen by on-chain governance. Eligible validator groups will be considered in an Election mechanism that will select Validator based on the [D'Hondt method](https://en.wikipedia.org/wiki/D%27Hondt_method).
 
-In the following steps, this guide will assume your Celo Gold is held in a `ReleaseGold` contract, if this is not the case, the commands will need to be adjusted. At a high level, `ReleaseGold` holds a balance for scheduled release, while allowing the held balance to be used for certain actions such as validating and voting, depending on the configuration of the contract. [Read more about `ReleaseGold`.](../celo-gold-holder-guide/release-gold.md)
+In the following steps, this guide will assume your CELO is held in a `ReleaseGold` contract, if this is not the case, the commands will need to be adjusted. At a high level, `ReleaseGold` holds a balance for scheduled release, while allowing the held balance to be used for certain actions such as validating and voting, depending on the configuration of the contract. [Read more about `ReleaseGold`.](../celo-holder-guide/release-gold.md)
 
 **Once elections are running, the genesis validators will be replaced by the elected validators, so it is important to register and vote even if you are in the genesis set.**
 
@@ -396,14 +396,14 @@ celocli account:show $CELO_VALIDATOR_GROUP_RG_ADDRESS
 celocli account:show $CELO_VALIDATOR_RG_ADDRESS
 ```
 
-Lock cGLD from your `ReleaseGold` contracts to fulfill the lock-up requirements to register a Validator and Validator Group. The current requirement is any value strictly greater than 10,000 cGLD to register a Validator, and any value strictly greater than 10,000 cGLD _per member validator_ to register a Validator Group. Here we lock up 10000.1 cGLD for each.
+Lock CELO from your `ReleaseGold` contracts to fulfill the lock-up requirements to register a Validator and Validator Group. The current requirement is any value strictly greater than 10,000 CELO to register a Validator, and any value strictly greater than 10,000 CELO _per member validator_ to register a Validator Group. Here we lock up 10000.1 CELO for each.
 
 ```bash
 celocli releasegold:locked-gold --contract $CELO_VALIDATOR_GROUP_RG_ADDRESS --action lock --value 100001e17
 celocli releasegold:locked-gold --contract $CELO_VALIDATOR_RG_ADDRESS --action lock --value 100001e17
 ```
 
-Check that your cGLD was successfully locked with the following commands:
+Check that your CELO was successfully locked with the following commands:
 
 ```bash
 # On your local machine
@@ -455,7 +455,7 @@ In order to validate we need to authorize the Validator signer:
 celocli releasegold:authorize --contract $CELO_VALIDATOR_RG_ADDRESS --role validator --signature 0x$CELO_VALIDATOR_SIGNER_SIGNATURE --signer $CELO_VALIDATOR_SIGNER_ADDRESS
 ```
 
-{% hint style="info" %} The first time you authorize a validator signer for a ReleaseGold account the signer address is funded 1 cGLD to cover tx fees. Any subsequent validator signers you authorize will not be funded. {% endhint %}
+{% hint style="info" %} The first time you authorize a validator signer for a ReleaseGold account the signer address is funded 1 CELO to cover tx fees. Any subsequent validator signers you authorize will not be funded. {% endhint %}
 
 Using the newly authorized Validator signer, register a validator on behalf of the registered Account:
 

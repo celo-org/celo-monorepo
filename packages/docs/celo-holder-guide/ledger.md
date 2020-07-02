@@ -127,7 +127,7 @@ celocli account:list --useLedger --ledgerCustomAddresses "[M, N]"
 
 Before using your address on the Celo Mainnet, you may want to test it on the Celo Alfajores Testnet with the following instructions.
 
-Visit the Alfajores Faucet and send yourself some testnet Celo Gold at the following URL:
+Visit the Alfajores Faucet and send yourself some testnet CELO at the following URL:
 
 https://celo.org/developers/faucet
 
@@ -137,7 +137,7 @@ Check that you received the funds with the following command:
 celocli account:balance <your-address> --node https://alfajores-forno.celo-testnet.org/
 ```
 
-Next, you'll need to enable "Contract Data" in the ledger app. Open the Celo App on your ledger device and go to Settings, then enable "Contract Data" to "Allowed". This setting is required because the celocli uses the ERC20 "pre-wrapped" version of Celo Gold and so sending transactions requires sending data to a smart contract.
+Next, you'll need to enable "Contract Data" in the ledger app. Open the Celo App on your ledger device and go to Settings, then enable "Contract Data" to "Allowed". This setting is required because the celocli uses the ERC20 "pre-wrapped" version of CELO and so sending transactions requires sending data to a smart contract.
 
 Perform a test transaction by running the following command:
 
