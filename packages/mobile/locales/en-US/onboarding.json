@@ -9,7 +9,7 @@
       "loadingStatus1": "Processing {{total}} contacts",
       "loadingStatus2": "Finding friends",
       "successHeader": "Completed",
-      "successWithMatches": "{{matches}} friends on Valora",
+      "successWithMatches": "{{matches}} friends on {{appName}}",
       "successWithoutMatches": "Syncing complete"
     }
   },
