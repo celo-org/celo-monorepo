@@ -128,8 +128,8 @@ spec:
           --rpcport {{ add 8545 $index }}
         resources:
           requests:
-            memory: 100Mi
-            cpu: 25m
+            memory: 200Mi
+            cpu: 50m
         volumeMounts:
         - name: data
           mountPath: /root/.celo_share
@@ -143,6 +143,8 @@ spec:
       - name: simulate-client
         image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
+        securityContext:
+          runAsUser: 0
         command:
           - bash
           - "-c"
@@ -159,11 +161,11 @@ spec:
               --mnemonic "$MNEMONIC" \
               --blockscout-url {{ .Values.blockscout.url }} \
               --blockscoutMeasurePercent {{ .Values.blockscout.measurePercent }} \
-              --client-count {{ .Values.threads | default "1" }}
+              --client-count {{ .Values.threads | default "1" }} > /dev/null
         resources:
           requests:
             memory: 256Mi
-            cpu: 5m
+            cpu: 25m
         env:
         - name: MNEMONIC
           valueFrom:
