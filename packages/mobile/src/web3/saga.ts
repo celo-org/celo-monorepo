@@ -34,7 +34,12 @@ import {
   updateWeb3SyncProgress,
   Web3SyncProgress,
 } from 'src/web3/actions'
-import { getConnectedWallet, getContractKit } from 'src/web3/contracts'
+import {
+  closeContractKit,
+  getConnectedWallet,
+  getContractKit,
+  openContractKit,
+} from 'src/web3/contracts'
 import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
 import { getLatestBlock } from 'src/web3/utils'
 import { Block } from 'web3-eth'
@@ -129,8 +134,9 @@ export function* waitForWeb3Sync() {
 }
 
 export function* waitWeb3LastBlock() {
+  yield call(waitForGethConnectivity)
+  yield put(setContractKitReady(true))
   if (!(yield select(fornoSelector))) {
-    yield call(waitForGethConnectivity)
     yield call(waitForWeb3Sync)
   }
 }
@@ -288,6 +294,7 @@ export function* toggleFornoMode(action: SetIsFornoAction) {
   Logger.debug(TAG + '@toggleFornoMode', ` to: ${action.fornoMode}`)
   if ((yield select(fornoSelector)) !== action.fornoMode) {
     yield put(setContractKitReady(false)) // Lock contractKit during provider switch
+    closeContractKit()
     try {
       yield put(setFornoMode(action.fornoMode))
       yield put(cancelGethSaga())
@@ -295,9 +302,10 @@ export function* toggleFornoMode(action: SetIsFornoAction) {
       yield spawn(gethSaga)
       yield call(waitForGethConnectivity)
     } catch (e) {
-      Logger.error(TAG + '@switchToFornoFromGeth', 'Error switching to forno from geth')
+      Logger.error(TAG + '@toggleFornoMode', 'Error toggling forno mode')
       yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
     }
+    openContractKit(action.fornoMode)
     yield put(setContractKitReady(true))
   } else {
     Logger.debug(TAG + '@toggleFornoMode', ` already in desired state: ${action.fornoMode}`)
