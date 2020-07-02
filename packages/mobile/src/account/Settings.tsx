@@ -11,18 +11,18 @@ import * as Sentry from '@sentry/react-native'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { devModeTriggerClicked, toggleBackupState } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import {
   resetAppOpenedState,
   setAnalyticsEnabled,
-  setLockWithPinEnabled,
   setNumberVerified,
+  setRequirePinOnAppOpen,
 } from 'src/app/actions'
 import { WarningModal } from 'src/components/WarningModal'
 import { AVAILABLE_LANGUAGES, TOS_LINK } from 'src/config'
@@ -35,6 +35,7 @@ import { navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
+import { restartApp } from 'src/utils/AppRestart'
 import { navigateToURI } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
 import { toggleFornoMode } from 'src/web3/actions'
@@ -46,7 +47,7 @@ interface DispatchProps {
   setAnalyticsEnabled: typeof setAnalyticsEnabled
   toggleBackupState: typeof toggleBackupState
   devModeTriggerClicked: typeof devModeTriggerClicked
-  setLockWithPinEnabled: typeof setLockWithPinEnabled
+  setRequirePinOnAppOpen: typeof setRequirePinOnAppOpen
   toggleFornoMode: typeof toggleFornoMode
 }
 
@@ -58,7 +59,7 @@ interface StateProps {
   numberVerified: boolean
   pincodeType: PincodeType
   backupCompleted: boolean
-  lockWithPinEnabled: boolean
+  requirePinOnAppOpen: boolean
   fornoEnabled: boolean
   gethStartedThisSession: boolean
   preferredCurrencyCode: LocalCurrencyCode
@@ -77,7 +78,7 @@ const mapStateToProps = (state: RootState): StateProps => {
     analyticsEnabled: state.app.analyticsEnabled,
     numberVerified: state.app.numberVerified,
     pincodeType: pincodeTypeSelector(state),
-    lockWithPinEnabled: state.app.lockWithPinEnabled,
+    requirePinOnAppOpen: state.app.requirePinOnAppOpen,
     fornoEnabled: state.web3.fornoMode,
     gethStartedThisSession: state.geth.gethStartedThisSession,
     preferredCurrencyCode: getLocalCurrencyCode(state),
@@ -91,7 +92,7 @@ const mapDispatchToProps = {
   setAnalyticsEnabled,
   toggleBackupState,
   devModeTriggerClicked,
-  setLockWithPinEnabled,
+  setRequirePinOnAppOpen,
   toggleFornoMode,
 }
 
@@ -101,7 +102,7 @@ interface State {
 
 export class Account extends React.Component<Props, State> {
   goToProfile = () => {
-    CeloAnalytics.track(CustomEventNames.edit_profile)
+    ValoraAnalytics.track(AnalyticsEvents.edit_profile)
     this.props.navigation.navigate(Screens.Profile)
   }
 
@@ -155,7 +156,7 @@ export class Account extends React.Component<Props, State> {
     } else {
       return (
         <View style={styles.devSettings}>
-          {/* 
+          {/*
           // TODO: It's commented because it broke a while back but this is something we'd like to re-enable
           <View style={style.devSettingsItem}>
             <TouchableOpacity onPress={this.revokeNumberVerification}>
@@ -196,6 +197,7 @@ export class Account extends React.Component<Props, State> {
   disableFornoMode = () => {
     this.props.toggleFornoMode(false)
     this.hideFornoSwitchOffWarning()
+    setTimeout(() => restartApp(), 2000)
   }
 
   handleFornoToggle = (fornoMode: boolean) => {
@@ -255,8 +257,8 @@ export class Account extends React.Component<Props, State> {
             <SectionHeadNew text={t('securityAndData')} style={styles.sectionTitle} />
             <SettingsItemSwitch
               title={t('requirePinOnAppOpen')}
-              value={this.props.lockWithPinEnabled}
-              onValueChange={this.props.setLockWithPinEnabled}
+              value={this.props.requirePinOnAppOpen}
+              onValueChange={this.props.setRequirePinOnAppOpen}
             />
             <SettingsItemSwitch
               title={t('enableDataSaver')}

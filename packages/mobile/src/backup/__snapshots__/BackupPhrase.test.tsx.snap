@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders correctly with backup completed 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -71,11 +71,11 @@ exports[`renders correctly with backup completed 1`] = `
       </Text>
     </View>
   </RCTScrollView>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
 
 exports[`renders correctly with backup not completed 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -248,11 +248,11 @@ exports[`renders correctly with backup not completed 1`] = `
       </View>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
 
-exports[`still renders when mneumonic doesnt show up 1`] = `
-<SafeAreaView
+exports[`still renders when mnemonic doesnt show up 1`] = `
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -322,5 +322,5 @@ exports[`still renders when mneumonic doesnt show up 1`] = `
       </Text>
     </View>
   </RCTScrollView>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Text as RNText, View } from 'react-native'
 import CopyToClipboard from 'src/dev/CopyToClipboard'
 import ProgressCutBar from 'src/dev/ProgressCutBar'
+import ValidatorsListBadges from 'src/dev/ValidatorsListBadges'
 import { styles } from 'src/dev/ValidatorsListStyles'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Checkmark from 'src/icons/Checkmark'
@@ -198,6 +199,7 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
                   </Text>
                 )}
               </Text>
+              <ValidatorsListBadges address={group.address} />
               <Text style={[styles.tableCellTitleSecRow]}>
                 <Text style={[styles.address]}>{cutAddress(group.address)}</Text>
                 <CopyToClipboard content={group.address} />

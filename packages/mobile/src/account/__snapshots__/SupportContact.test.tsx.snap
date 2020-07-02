@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Contact renders correctly 1`] = `
-<SafeAreaView
+<View
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -12,10 +12,8 @@ exports[`Contact renders correctly 1`] = `
   <RCTScrollView
     contentContainerStyle={
       Object {
-        "borderColor": "#EEEEEE",
-        "borderTopWidth": 1,
         "flexGrow": 1,
-        "padding": 20,
+        "padding": 16,
       }
     }
   >
@@ -24,9 +22,23 @@ exports[`Contact renders correctly 1`] = `
         style={
           Object {
             "color": "#2E3338",
-            "fontFamily": "Hind-SemiBold",
-            "fontSize": 16,
-            "lineHeight": 24,
+            "fontFamily": "Jost-Book",
+            "fontSize": 26,
+            "lineHeight": 32,
+            "marginVertical": 16,
+          }
+        }
+        testID="ContactTitle"
+      >
+        contact
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-SemiBold",
+            "fontSize": 14,
+            "lineHeight": 18,
           }
         }
       >
@@ -43,14 +55,19 @@ exports[`Contact renders correctly 1`] = `
             },
             Object {
               "alignItems": "flex-start",
-              "borderColor": "#D1D5D8",
-              "borderRadius": 3,
-              "borderWidth": 1,
-              "color": "#D1D5D8",
+              "borderColor": "#EDEEEF",
+              "borderRadius": 4,
+              "borderWidth": 1.5,
+              "color": "#2E3338",
+              "fontFamily": "Inter-Regular",
+              "fontSize": 16,
               "height": 80,
-              "marginBottom": 6,
-              "marginTop": 10,
+              "lineHeight": 22,
+              "marginBottom": 4,
+              "marginTop": 8,
               "maxHeight": 150,
+              "paddingHorizontal": 12,
+              "paddingVertical": 4,
             },
           ]
         }
@@ -62,19 +79,25 @@ exports[`Contact renders correctly 1`] = `
           onBlur={[Function]}
           onChangeText={[Function]}
           onFocus={[Function]}
-          placeholder="tellUsMore"
-          placeholderTextColor="#D1D5D8"
+          placeholder="contactMessagePlaceholder"
+          placeholderTextColor="#9CA4A9"
           rejectResponderTermination={true}
           style={
-            Object {
-              "backgroundColor": "#FFFFFF",
-              "borderColor": "#D1D5D8",
-              "borderRadius": 3,
-              "flex": 1,
-              "fontFamily": "Hind-Regular",
-              "padding": 8,
-              "textAlignVertical": "top",
-            }
+            Array [
+              Object {
+                "color": "#2E3338",
+                "flex": 1,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingHorizontal": 0,
+                "paddingVertical": 12,
+              },
+              Object {
+                "textAlignVertical": "top",
+              },
+              undefined,
+            ]
           }
           testID="MessageEntry"
           underlineColorAndroid="transparent"
@@ -84,155 +107,150 @@ exports[`Contact renders correctly 1`] = `
       <View
         style={
           Object {
-            "flex": 1,
+            "alignItems": "center",
+            "flexDirection": "row",
+            "flexShrink": 0,
+            "height": 40,
+            "marginTop": 4,
           }
         }
       >
-        <View
+        <AndroidSwitch
+          accessibilityRole="switch"
+          enabled={true}
+          on={true}
+          onChange={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             Object {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "flexShrink": 0,
-              "height": 40,
-              "marginBottom": 20,
-              "marginTop": 5,
+              "marginBottom": 3,
+              "marginRight": 10,
             }
           }
-        >
-          <AndroidSwitch
-            accessibilityRole="switch"
-            enabled={true}
-            on={true}
-            onChange={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-            style={
-              Object {
-                "marginBottom": 3,
-                "marginRight": 10,
-              }
-            }
-            testID="SwitchLogs"
-            thumbTintColor="#FFFFFF"
-            trackColorForFalse="#D1D5D8"
-            trackColorForTrue="#42D689"
-            trackTintColor="#42D689"
-          />
-          <Text
-            style={
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 16,
-                "lineHeight": 24,
-              }
-            }
-          >
-            attachLogs
-          </Text>
-        </View>
-      </View>
-      <View>
+          testID="SwitchLogs"
+          thumbTintColor="#FFFFFF"
+          trackColorForFalse="#D1D5D8"
+          trackColorForTrue="#42D689"
+          trackTintColor="#42D689"
+        />
         <Text
           style={
             Object {
               "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
+              "fontFamily": "Inter-Regular",
               "fontSize": 16,
-              "lineHeight": 24,
+              "lineHeight": 22,
+            }
+          }
+        >
+          attachLogs
+        </Text>
+      </View>
+      <View
+        style={
+          Object {
+            "marginBottom": 24,
+          }
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#9CA4A9",
+              "fontFamily": "Inter-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
             }
           }
         >
           supportLegalCheckbox
         </Text>
       </View>
-    </View>
-  </RCTScrollView>
-  <View
-    style={
-      Array [
-        Object {
-          "alignItems": "center",
-          "borderRadius": 3,
-          "flexDirection": "row",
-        },
-        null,
-        null,
-        undefined,
-        Object {
-          "backgroundColor": "#A3EBC6",
-        },
-      ]
-    }
-  >
-    <View
-      accessible={true}
-      focusable={false}
-      nativeBackgroundAndroid={
-        Object {
-          "attribute": "selectableItemBackground",
-          "type": "ThemeAttrAndroid",
-        }
-      }
-      onClick={[Function]}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
-      style={
-        Array [
-          Object {
-            "alignItems": "center",
-            "flex": 1,
-            "justifyContent": "center",
-          },
-          Object {
-            "backgroundColor": "#A3EBC6",
-          },
-          Object {
-            "height": 50,
-          },
-          Object {
-            "borderWidth": 0,
-          },
-        ]
-      }
-      testID="SubmitContactForm"
-    >
       <View
         style={
-          Object {
-            "alignItems": "center",
-            "flex": 1,
-            "flexDirection": "row",
-            "justifyContent": "space-between",
-          }
+          Array [
+            Object {
+              "flexDirection": "row",
+            },
+            undefined,
+          ]
         }
       >
-        <Text
+        <View
           style={
             Array [
               Object {
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 16,
+                "overflow": "hidden",
               },
               Object {
-                "color": "#FFFFFF",
-              },
-              Object {
-                "paddingLeft": 5,
-                "paddingRight": 5,
+                "borderRadius": 100,
               },
             ]
           }
         >
-          global:submit
-        </Text>
+          <View
+            accessible={true}
+            focusable={false}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackground",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "alignItems": "center",
+                "backgroundColor": "#97DFC1",
+                "height": 48,
+                "justifyContent": "center",
+                "minWidth": 120,
+                "opacity": undefined,
+                "paddingHorizontal": 16,
+                "paddingVertical": 5,
+              }
+            }
+            testID="SubmitContactForm"
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#FFFFFF",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                }
+              }
+            >
+              global:submit
+            </Text>
+          </View>
+        </View>
       </View>
     </View>
-  </View>
-</SafeAreaView>
+  </RCTScrollView>
+  <View
+    collapsable={false}
+    style={
+      Array [
+        Object {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+        },
+        Object {
+          "height": 0,
+        },
+        undefined,
+      ]
+    }
+  />
+</View>
 `;

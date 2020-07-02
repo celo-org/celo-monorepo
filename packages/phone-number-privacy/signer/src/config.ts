@@ -67,6 +67,7 @@ interface Config {
     aws: {
       region: string
       secretName: string
+      secretKey: string
     }
   }
 }
@@ -119,7 +120,8 @@ const config: Config = {
     },
     aws: {
       region: env.KEYSTORE_AWS_REGION,
-      secretName: env.KEYSTORE_AWS_SECRET_NAME || 'signer-secret',
+      secretName: env.KEYSTORE_AWS_SECRET_NAME,
+      secretKey: env.KEYSTORE_AWS_SECRET_KEY,
     },
   },
 }

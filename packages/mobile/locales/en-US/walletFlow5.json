@@ -35,7 +35,7 @@
   "groceryRun": "Grocery run",
   "transactionsAreLoading": "Transactions are loading!",
   "pleaseHoldOn": "Please hold on",
-  "welcomeToCeloPayments": "Welcome to Celo Payments",
+  "welcomeToCeloPayments": "Welcome to {{appName}}",
   "letsGetStartedByFirstTransaction": "Let’s get started by sending your first transaction",
   "sendMoney": "Send Money",
   "verificationFee": "Verification Fee",
@@ -53,7 +53,7 @@
     "0": "Unable to load your feed",
     "1": "Please try again later"
   },
-  "noTransactionActivity": "You will see your sent and received payments here",
+  "noTransactionActivity": "Your transactions will appear here",
   "noExchangeActivity": "You will see completed exchanges here",
   "maybeLater": "Maybe Later",
   "balanceNeedUpdating": "Balance needs updating",
@@ -63,8 +63,8 @@
   "escrowedPaymentReminderSummaryDetails_exactly2Items": "<0></0> and <1></1> haven't accepted their invitations yet",
   "escrowedPaymentReminderSummaryDetails_exactly3Items": "<0></0>, <1></1> and one other haven't accepted their invitations yet",
   "escrowedPaymentReminderSummaryDetails_moreThan3Items": "<0></0>, <1></1> and others haven't accepted their invitations yet",
-  "escrowedPaymentReminderSms": "A friendly reminder that you haven't yet redeemed your Celo Dollars! Go to {{link}} and enter your code to get started: {{code}}",
-  "escrowedPaymentReminderSmsNoData": "A friendly reminder that you haven't yet redeemed your Celo Dollars! Download the mobile app to get started!",
+  "escrowedPaymentReminderSms": "A friendly reminder that you haven't yet redeemed your Celo Dollars with {{appName}}! Go to {{link}} and enter your code to get started: {{code}}",
+  "escrowedPaymentReminderSmsNoData": "A friendly reminder that you haven't yet redeemed your Celo Dollars with {{appName}}! Download the mobile app to get started!",
   "testnetAlert": {
     "0": "{{testnet}}",
     "1": "A friendly reminder you're using the {{testnet}} network build - the balances are not real"
