@@ -305,10 +305,6 @@ const NetworkConfigs = {
     downtimeSlasher: {
       slashableDowntime: 6,
     },
-    DowntimeSlasherIntervals: {
-      slashableDowntime: 6,
-      slotSize: 3,
-    },
     election: {
       minElectableValidators: '1',
       frozen: false,
