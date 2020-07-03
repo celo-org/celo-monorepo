@@ -1,7 +1,7 @@
 import { ContractKit, newKit } from '@celo/contractkit'
 import { FindOptions, Sequelize } from 'sequelize'
 import { Block } from 'web3-eth'
-import { fetchEnv } from './env'
+import { fetchEnv, getAttestationSignerAddress } from './env'
 import { rootLogger } from './logger'
 import Attestation, { AttestationModel, AttestationStatic } from './models/attestation'
 
@@ -18,7 +18,39 @@ export function initializeDB() {
   return Promise.resolve()
 }
 
+export function isDBOnline() {
+  if (sequelize === undefined) {
+    return initializeDB()
+  } else {
+    return sequelize.authenticate() as Promise<void>
+  }
+}
+
 export let kit: ContractKit
+
+export async function isNodeSyncing() {
+  const syncProgress = await kit.web3.eth.isSyncing()
+  return typeof syncProgress === 'boolean' && syncProgress
+}
+
+export async function getAgeOfLatestBlock() {
+  const latestBlock = await kit.web3.eth.getBlock('latest')
+  const ageOfLatestBlock = Date.now() / 1000 - Number(latestBlock.timestamp)
+  return {
+    ageOfLatestBlock,
+    number: latestBlock.number,
+  }
+}
+
+export async function isAttestationSignerUnlocked() {
+  // The only way to see if a key is unlocked is to try to sign something
+  try {
+    await kit.web3.eth.sign('DO_NOT_USE', getAttestationSignerAddress())
+    return true
+  } catch {
+    return false
+  }
+}
 
 export async function initializeKit() {
   if (kit === undefined) {
