@@ -65,6 +65,7 @@ interface HomeEventsProperties {
     notificationType: NotificationBannerTypes
     selectedAction: NotificationBannerCTATypes
   }
+  [HomeEvents.transaction_feed_item_select]: undefined
 }
 
 interface SettingsEventsProperties {

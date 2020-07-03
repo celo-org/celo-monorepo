@@ -174,7 +174,6 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
           <>
             <Text style={fontStyles.label}>Session ID</Text>
             <View style={styles.accountOuterContainer}>
-              {/* TODO: Create a copyable sessionID container */}
               <View style={styles.accountInnerContainer}>
                 <SessionId sessionId={storedSessionId || ''} />
               </View>

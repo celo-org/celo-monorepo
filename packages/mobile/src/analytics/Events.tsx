@@ -1,4 +1,4 @@
-// TODO: TX feed + QR scanner + Geth + more detailed transaction logs
+// TODO: TX feed + QR scanner + Geth
 
 export enum AppEvents {
   app_launched = 'app_launched',
@@ -18,6 +18,7 @@ export enum HomeEvents {
   drawer_address_copy = 'drawer_address_copy',
   notification_scroll = 'notification_scroll',
   notification_select = 'notification_select',
+  transaction_feed_item_select = 'transaction_feed_item_select',
 }
 
 export enum SettingsEvents {
