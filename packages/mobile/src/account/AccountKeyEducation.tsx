@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import Education from 'src/account/Education'
 import { AnalyticsEvents } from 'src/analytics/Events'
 import { Namespaces } from 'src/i18n'
+import { accountKey1, accountKey2, accountKey3, accountKey4 } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -42,25 +43,25 @@ function useSteps() {
     () =>
       [
         {
-          image: null,
+          image: accountKey1,
           cancelEvent: AnalyticsEvents.backup_educate_1_cancel,
           progressEvent: AnalyticsEvents.backup_educate_1_next,
           screenName: 'AccountKeyEducation',
         },
         {
-          image: null,
+          image: accountKey2,
           cancelEvent: AnalyticsEvents.backup_educate_2_cancel,
           progressEvent: AnalyticsEvents.backup_educate_2_next,
           screenName: 'AccountKeyEducation',
         },
         {
-          image: null,
+          image: accountKey3,
           cancelEvent: AnalyticsEvents.backup_educate_3_cancel,
           progressEvent: AnalyticsEvents.backup_educate_3_next,
           screenName: 'AccountKeyEducation',
         },
         {
-          image: null,
+          image: accountKey4,
           cancelEvent: AnalyticsEvents.backup_educate_4_cancel,
           progressEvent: AnalyticsEvents.backup_educate_4_next,
           screenName: 'AccountKeyEducation',
