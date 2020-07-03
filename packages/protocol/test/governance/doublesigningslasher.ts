@@ -17,7 +17,7 @@ import {
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
 const DoubleSigningSlasher: DoubleSigningSlasherTestContract = artifacts.require(
-  'TestDoubleSigningSlasher'
+  'DoubleSigningSlasherTest'
 )
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const Registry: RegistryContract = artifacts.require('Registry')
