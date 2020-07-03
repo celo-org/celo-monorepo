@@ -4,7 +4,7 @@ import { AccountsWrapper } from './wrappers/Accounts'
 import { AttestationsWrapper } from './wrappers/Attestations'
 import { BlockchainParametersWrapper } from './wrappers/BlockchainParameters'
 import { DoubleSigningSlasherWrapper } from './wrappers/DoubleSigningSlasher'
-import { DowntimeSlasherIntervalsWrapper } from './wrappers/DowntimeSlasherIntervals'
+import { DowntimeSlasherWrapper } from './wrappers/DowntimeSlasher'
 import { ElectionWrapper } from './wrappers/Election'
 // import { EpochRewardsWrapper } from './wrappers/EpochRewards'
 import { EscrowWrapper } from './wrappers/Escrow'
@@ -25,7 +25,7 @@ const WrapperFactories = {
   [CeloContract.Attestations]: AttestationsWrapper,
   [CeloContract.BlockchainParameters]: BlockchainParametersWrapper,
   [CeloContract.DoubleSigningSlasher]: DoubleSigningSlasherWrapper,
-  [CeloContract.DowntimeSlasher]: DowntimeSlasherIntervalsWrapper,
+  [CeloContract.DowntimeSlasher]: DowntimeSlasherWrapper,
   [CeloContract.Election]: ElectionWrapper,
   // [CeloContract.EpochRewards]?: EpochRewardsWrapper,
   [CeloContract.Escrow]: EscrowWrapper,
@@ -53,7 +53,7 @@ interface WrapperCacheMap {
   [CeloContract.Attestations]?: AttestationsWrapper
   [CeloContract.BlockchainParameters]?: BlockchainParametersWrapper
   [CeloContract.DoubleSigningSlasher]?: DoubleSigningSlasherWrapper
-  [CeloContract.DowntimeSlasher]?: DowntimeSlasherIntervalsWrapper
+  [CeloContract.DowntimeSlasher]?: DowntimeSlasherWrapper
   [CeloContract.Election]?: ElectionWrapper
   // [CeloContract.EpochRewards]?: EpochRewardsWrapper
   [CeloContract.Escrow]?: EscrowWrapper

@@ -1,40 +1,41 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertContainSubset, assertRevert, jsonRpc } from '@celo/protocol/lib/test-utils'
+import {
+  assertContainSubset,
+  assertRevert,
+  getEpochNumberOfBlock,
+  getFirstBlockNumberForEpoch,
+  jsonRpc,
+} from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
   AccountsInstance,
+  DowntimeSlasherTestContract,
+  DowntimeSlasherTestInstance,
   MockLockedGoldContract,
   MockLockedGoldInstance,
   MockValidatorsContract,
   MockValidatorsInstance,
   RegistryContract,
   RegistryInstance,
-  TestDowntimeSlasherIntervalsContract,
-  TestDowntimeSlasherIntervalsInstance,
 } from 'types'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
-const DowntimeSlasherIntervals: TestDowntimeSlasherIntervalsContract = artifacts.require(
-  'TestDowntimeSlasherIntervals'
-)
+const DowntimeSlasher: DowntimeSlasherTestContract = artifacts.require('DowntimeSlasherTest')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const Registry: RegistryContract = artifacts.require('Registry')
 
 // @ts-ignore
 // TODO(mcortesi): Use BN
-DowntimeSlasherIntervals.numberFormat = 'BigNumber'
+DowntimeSlasher.numberFormat = 'BigNumber'
 
-// Epoch 1 starts in block 1
-const firstBlockFromEpoch = (epoch: number, epochSize: number) => (epoch - 1) * epochSize + 1
-
-contract('DowntimeSlasherIntervals', (accounts: string[]) => {
+contract('DowntimeSlasher', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
   let validators: MockValidatorsInstance
   let registry: RegistryInstance
   let mockLockedGold: MockLockedGoldInstance
-  let slasher: TestDowntimeSlasherIntervalsInstance
+  let slasher: DowntimeSlasherTestInstance
   let epochSize: number
 
   const nonOwner = accounts[1]
@@ -51,8 +52,8 @@ contract('DowntimeSlasherIntervals', (accounts: string[]) => {
     numberOfBlocks: number,
     bitmaps: string[]
   ) {
-    const startEpoch = (await slasher.getEpochNumberOfBlock(fromBlock)).toNumber()
-    const nextEpochStart = firstBlockFromEpoch(startEpoch + 1, epochSize)
+    const startEpoch = getEpochNumberOfBlock(fromBlock, epochSize)
+    const nextEpochStart = getFirstBlockNumberForEpoch(startEpoch + 1, epochSize)
     for (let i = fromBlock; i < fromBlock + numberOfBlocks; i++) {
       await slasher.setParentSealBitmap(i + 1, i < nextEpochStart ? bitmaps[0] : bitmaps[1])
     }
@@ -65,8 +66,8 @@ contract('DowntimeSlasherIntervals', (accounts: string[]) => {
     const endBlocks: number[] = []
     const actualSlashableDowntime = (await slasher.slashableDowntime()).toNumber()
 
-    const startEpoch = (await slasher.getEpochNumberOfBlock(startBlock)).toNumber()
-    const nextEpochStart = firstBlockFromEpoch(startEpoch, epochSize)
+    const startEpoch = getEpochNumberOfBlock(startBlock, epochSize)
+    const nextEpochStart = getFirstBlockNumberForEpoch(startEpoch, epochSize)
     const endBlock = startBlock + actualSlashableDowntime - 1
     for (let i = startBlock; i <= endBlock; ) {
       let endBlockForSlot = i + intervalSize - 1
@@ -98,7 +99,7 @@ contract('DowntimeSlasherIntervals', (accounts: string[]) => {
     mockLockedGold = await MockLockedGold.new()
     registry = await Registry.new()
     validators = await MockValidators.new()
-    slasher = await DowntimeSlasherIntervals.new()
+    slasher = await DowntimeSlasher.new()
     epochSize = (await slasher.getEpochSize()).toNumber()
     await accountsInstance.initialize(registry.address)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
@@ -228,7 +229,7 @@ contract('DowntimeSlasherIntervals', (accounts: string[]) => {
     // down for a possible slash.
     async function waitUntilSafeBlocks(safeEpoch: number) {
       let blockNumber: number = 0
-      const blockStableBetweenTests = firstBlockFromEpoch(safeEpoch, epochSize) - 1
+      const blockStableBetweenTests = getFirstBlockNumberForEpoch(safeEpoch, epochSize) - 1
       do {
         blockNumber = await web3.eth.getBlockNumber()
         await jsonRpc(web3, 'evm_mine', [])
@@ -240,7 +241,8 @@ contract('DowntimeSlasherIntervals', (accounts: string[]) => {
     }
 
     before(async () => {
-      epoch = (await slasher.getEpochNumberOfBlock(await web3.eth.getBlockNumber())).toNumber()
+      const blockNumber: number = await web3.eth.getBlockNumber()
+      epoch = getEpochNumberOfBlock(blockNumber, epochSize)
     })
 
     beforeEach(async () => {
@@ -249,9 +251,8 @@ contract('DowntimeSlasherIntervals', (accounts: string[]) => {
     })
 
     afterEach(async () => {
-      const newEpoch = (
-        await slasher.getEpochNumberOfBlock(await web3.eth.getBlockNumber())
-      ).toNumber()
+      const blockNumber: number = await web3.eth.getBlockNumber()
+      const newEpoch = getEpochNumberOfBlock(blockNumber, epochSize)
 
       // Optimization to make the testing batch run faster.
       // This "recovers" a gap of more that 1 epoch, and avoids waiting more than an epoch
@@ -290,7 +291,7 @@ contract('DowntimeSlasherIntervals', (accounts: string[]) => {
 
       // Test boundaries
       it('fails if the first block was signed', async () => {
-        const startBlock = firstBlockFromEpoch(epoch, epochSize)
+        const startBlock = getFirstBlockNumberForEpoch(epoch, epochSize)
 
         // Set the parentSeal bitmaps for every block without the validator's signature
         await presetParentSealForBlocks(startBlock + 1, slashableDowntime - 1, [
@@ -318,7 +319,7 @@ contract('DowntimeSlasherIntervals', (accounts: string[]) => {
       })
 
       it('fails if the last block was signed', async () => {
-        const startBlock = firstBlockFromEpoch(epoch, epochSize)
+        const startBlock = getFirstBlockNumberForEpoch(epoch, epochSize)
 
         // Set the parentSeal bitmaps for every block without the validator's signature
         await presetParentSealForBlocks(startBlock, slashableDowntime - 1, [
@@ -346,7 +347,7 @@ contract('DowntimeSlasherIntervals', (accounts: string[]) => {
       })
 
       it('fails if one block in the middle was signed', async () => {
-        const startBlock = firstBlockFromEpoch(epoch, epochSize)
+        const startBlock = getFirstBlockNumberForEpoch(epoch, epochSize)
 
         // Set the parentSeal bitmaps for every block without the validator's signature
         await presetParentSealForBlocks(startBlock, slashableDowntime, [
@@ -376,7 +377,7 @@ contract('DowntimeSlasherIntervals', (accounts: string[]) => {
       it('fails if the first block was signed using a big index', async () => {
         await slasher.setNumberValidators(100)
         await slasher.setEpochSigner(epoch, 99, validatorList[2])
-        const startBlock = firstBlockFromEpoch(epoch, epochSize)
+        const startBlock = getFirstBlockNumberForEpoch(epoch, epochSize)
 
         // Set the parentSeal bitmaps for every block without the validator's signature
         await presetParentSealForBlocks(startBlock + 1, slashableDowntime - 1, [bitmapVI0])
@@ -405,7 +406,7 @@ contract('DowntimeSlasherIntervals', (accounts: string[]) => {
         let startBlock: number
 
         beforeEach(async () => {
-          startBlock = firstBlockFromEpoch(epoch, epochSize)
+          startBlock = getFirstBlockNumberForEpoch(epoch, epochSize)
           await presetParentSealForBlocks(startBlock, slashableDowntime, [
             bitmapWithoutValidator[validatorIndexInEpoch],
           ])
@@ -535,7 +536,7 @@ contract('DowntimeSlasherIntervals', (accounts: string[]) => {
         let startBlock: number
 
         beforeEach(async () => {
-          startBlock = firstBlockFromEpoch(epoch, epochSize)
+          startBlock = getFirstBlockNumberForEpoch(epoch, epochSize)
           const slotArrays = await ensureValidatorIsSlashable(startBlock, [validatorIndexInEpoch])
           resp = await slasher.slash(
             slotArrays.startBlocks,
@@ -608,7 +609,7 @@ contract('DowntimeSlasherIntervals', (accounts: string[]) => {
         epoch = epoch + 1
         await waitUntilSafeBlocks(epoch)
         await slasher.setEpochSigner(epoch, validatorIndexInEpoch, validatorList[0])
-        startBlock = firstBlockFromEpoch(epoch, epochSize) - intervalSize
+        startBlock = getFirstBlockNumberForEpoch(epoch, epochSize) - intervalSize
         await slasher.setEpochSigner(epoch, validatorIndexInEpoch, validatorList[0])
       })
 
@@ -764,7 +765,7 @@ contract('DowntimeSlasherIntervals', (accounts: string[]) => {
 
         it('cannot be slashed twice if the slash shares at least a block with a previous slash of another epoch', async () => {
           // Beginning of epoch + 1 to avoid trying to generate the same intervals
-          const newStartBlock = firstBlockFromEpoch(epoch, epochSize) + 1
+          const newStartBlock = getFirstBlockNumberForEpoch(epoch, epochSize) + 1
 
           // Just to make sure that it was slashed
           const balance = await mockLockedGold.accountTotalLockedGold(validatorList[0])

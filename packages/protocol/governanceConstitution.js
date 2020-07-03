@@ -19,7 +19,7 @@ const DefaultConstitution = {
     default: 0.7,
     setSlashingIncentives: 0.7,
   },
-  DowntimeSlasherIntervals: {
+  DowntimeSlasher: {
     default: 0.7,
     setSlashingIncentives: 0.7,
     setSlashableDowntime: 0.7,

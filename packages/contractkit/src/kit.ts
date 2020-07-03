@@ -13,7 +13,7 @@ import { estimateGas } from './utils/web3-utils'
 import { Wallet } from './wallets/wallet'
 import { Web3ContractCache } from './web3-contract-cache'
 import { AttestationsConfig } from './wrappers/Attestations'
-import { DowntimeSlasherIntervalsConfig } from './wrappers/DowntimeSlasherIntervals'
+import { DowntimeSlasherConfig } from './wrappers/DowntimeSlasher'
 import { ElectionConfig } from './wrappers/Election'
 import { ExchangeConfig } from './wrappers/Exchange'
 import { GasPriceMinimumConfig } from './wrappers/GasPriceMinimum'
@@ -69,7 +69,7 @@ export interface NetworkConfig {
   reserve: ReserveConfig
   stableToken: StableTokenConfig
   validators: ValidatorsConfig
-  downtimeSlasher: DowntimeSlasherIntervalsConfig
+  downtimeSlasher: DowntimeSlasherConfig
 }
 
 export interface KitOptions {
@@ -342,6 +342,12 @@ export class ContractKit {
       ...defaultTx,
       ...tx,
     }
+  }
+
+  async getEpochSize(): Promise<number> {
+    const validators = await this.contracts.getValidators()
+    const epochSize = await validators.getEpochSize()
+    return epochSize.toNumber()
   }
 
   async getFirstBlockNumberForEpoch(epochNumber: number): Promise<number> {

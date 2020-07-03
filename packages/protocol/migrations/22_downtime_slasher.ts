@@ -1,24 +1,23 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
-  deploymentForContractWithCustomRegistryId,
+  deploymentForCoreContract,
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { DowntimeSlasherIntervalsInstance, LockedGoldInstance } from 'types'
+import { DowntimeSlasherInstance, LockedGoldInstance } from 'types'
 
 const initializeArgs = async (_: string): Promise<any[]> => {
   return [
     config.registry.predeployedProxyAddress,
-    config.DowntimeSlasherIntervals.penalty,
-    config.DowntimeSlasherIntervals.reward,
-    config.DowntimeSlasherIntervals.slashableDowntime,
+    config.downtimeSlasher.penalty,
+    config.downtimeSlasher.reward,
+    config.downtimeSlasher.slashableDowntime,
   ]
 }
 
-module.exports = deploymentForContractWithCustomRegistryId<DowntimeSlasherIntervalsInstance>(
+module.exports = deploymentForCoreContract<DowntimeSlasherInstance>(
   web3,
   artifacts,
-  CeloContractName.DowntimeSlasherIntervals,
   CeloContractName.DowntimeSlasher,
   initializeArgs,
   async () => {

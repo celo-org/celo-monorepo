@@ -62,20 +62,20 @@ async function findDoubleSignerIndex(
   return signerIdx
 }
 
-function generateValidIntervalArrays(
+async function generateValidIntervalArrays(
   startBlock: number,
   endBlock: number,
   startEpoch: number,
-  epochSize: number,
-  slotSize: number
-): {
+  slotSize: number,
+  kit: ContractKit
+): Promise<{
   startBlocks: number[]
   endBlocks: number[]
-} {
+}> {
   const startBlocks: number[] = []
   const endBlocks: number[] = []
 
-  const nextEpochStart = startEpoch * epochSize + 1
+  const nextEpochStart = await kit.getFirstBlockNumberForEpoch(startEpoch + 1)
   for (let currentSlotStart = startBlock; currentSlotStart <= endBlock; ) {
     let currentSlotEnd = currentSlotStart + slotSize - 1
     currentSlotEnd = currentSlotEnd > endBlock ? endBlock : currentSlotEnd
@@ -250,17 +250,14 @@ describe('slashing tests', function(this: any) {
 
       const startBlock = blockNumber + safeMarginBlocks
       const endBlock = startBlock + slashableDowntime.toNumber() - 1
-      const startEpoch = new BigNumber(
-        await slasher.methods.getEpochNumberOfBlock(startBlock).call()
-      ).toNumber()
-      const epochSize = new BigNumber(await slasher.methods.getEpochSize().call()).toNumber()
+      const startEpoch = await kit.getEpochNumberOfBlock(startBlock)
 
-      const intervalArrays = generateValidIntervalArrays(
+      const intervalArrays = await generateValidIntervalArrays(
         startBlock,
         endBlock,
         startEpoch,
-        epochSize,
-        slotSize
+        slotSize,
+        kit
       )
 
       for (let i = 0; i < intervalArrays.startBlocks.length; i += 1) {
@@ -311,15 +308,14 @@ describe('slashing tests', function(this: any) {
 
       const startBlock = blockNumber + safeMarginBlocks
       const endBlock = startBlock + slashableDowntime - 1
-      const epochSize = (await slasher.getEpochSize()).toNumber()
-      const startEpoch = new BigNumber(startBlock - 1).dividedToIntegerBy(epochSize).toNumber() + 1
+      const startEpoch = await kit.getEpochNumberOfBlock(startBlock)
 
-      const intervalArrays = generateValidIntervalArrays(
+      const intervalArrays = await generateValidIntervalArrays(
         startBlock,
         endBlock,
         startEpoch,
-        epochSize,
-        slotSize
+        slotSize,
+        kit
       )
 
       for (let i = 0; i < intervalArrays.startBlocks.length; i += 1) {

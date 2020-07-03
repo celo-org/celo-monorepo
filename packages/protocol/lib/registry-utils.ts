@@ -4,7 +4,6 @@ export enum CeloContractName {
   BlockchainParameters = 'BlockchainParameters',
   DoubleSigningSlasher = 'DoubleSigningSlasher',
   DowntimeSlasher = 'DowntimeSlasher',
-  DowntimeSlasherIntervals = 'DowntimeSlasherIntervals',
   Election = 'Election',
   EpochRewards = 'EpochRewards',
   Escrow = 'Escrow',

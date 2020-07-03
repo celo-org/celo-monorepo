@@ -4,19 +4,19 @@ import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
   AccountsInstance,
+  DoubleSigningSlasherTestContract,
+  DoubleSigningSlasherTestInstance,
   MockLockedGoldContract,
   MockLockedGoldInstance,
   MockValidatorsContract,
   MockValidatorsInstance,
   RegistryContract,
   RegistryInstance,
-  TestDoubleSigningSlasherContract,
-  TestDoubleSigningSlasherInstance,
 } from 'types'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
-const DoubleSigningSlasher: TestDoubleSigningSlasherContract = artifacts.require(
+const DoubleSigningSlasher: DoubleSigningSlasherTestContract = artifacts.require(
   'TestDoubleSigningSlasher'
 )
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
@@ -31,7 +31,7 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
   let validators: MockValidatorsInstance
   let registry: RegistryInstance
   let mockLockedGold: MockLockedGoldInstance
-  let slasher: TestDoubleSigningSlasherInstance
+  let slasher: DoubleSigningSlasherTestInstance
 
   const nonOwner = accounts[1]
   const validator = accounts[1]

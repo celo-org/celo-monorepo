@@ -32,7 +32,6 @@ export const ProxyContracts = [
   'BlockchainParametersProxy',
   'DoubleSigningSlasherProxy',
   'DowntimeSlasherProxy',
-  'DowntimeSlasherIntervalsProxy',
   'ElectionProxy',
   'EpochRewardsProxy',
   'EscrowProxy',

@@ -5,22 +5,32 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "./SlasherUtil.sol";
 
+/**
+ * Version: 2.0.0.0
+ */
 contract DowntimeSlasher is SlasherUtil {
   using SafeMath for uint256;
 
-  // For each address, associate each epoch with the last block that was slashed on that epoch
-  mapping(address => mapping(uint256 => uint256)) lastSlashedBlock;
+  // Maps validator address -> epoch number -> a block interval for which the
+  // validator has been slashed.
+  mapping(address => mapping(uint256 => uint256[2])) slashedIntervals;
+
+  // Maps validator -> startBlock -> endBlock -> signature bitmap for that interval.
+  // Note that startBlock and endBlock must always be in the same epoch.
+  mapping(address => mapping(uint256 => mapping(uint256 => bytes32))) private bitmaps;
+
   uint256 public slashableDowntime;
 
   event SlashableDowntimeSet(uint256 interval);
   event DowntimeSlashPerformed(address indexed validator, uint256 indexed startBlock);
+  event BitmapSetForInterval(uint256 indexed startBlock, uint256 indexed endblock, bytes32 bitmap);
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
-   * @param _penalty Penalty for the slashed signer.
+   * @param _penalty Penalty for the slashed validator.
    * @param _reward Reward that the observer gets.
-   * @param  _slashableDowntime Slashable downtime in blocks.
+   * @param _slashableDowntime Slashable downtime in blocks.
    */
   function initialize(
     address registryAddress,
@@ -35,88 +45,219 @@ contract DowntimeSlasher is SlasherUtil {
   }
 
   /**
-   * @notice Sets the slashable downtime
+   * @notice Sets the slashable downtime.
    * @param interval Slashable downtime in blocks.
    */
   function setSlashableDowntime(uint256 interval) public onlyOwner {
-    require(interval != 0, "Slashable downtime cannot be zero");
-    require(interval < getEpochSize(), "Slashable downtime must be smaller than epoch size");
+    require(interval != 0, "slashable downtime cannot be zero");
+    require(interval < getEpochSize(), "slashable downtime must be smaller than epoch size");
     slashableDowntime = interval;
     emit SlashableDowntimeSet(interval);
   }
 
   /**
-   * @notice Test if a validator has been down.
-   * @param startBlock First block of the downtime. Last block will be computed from this.
-   * @param startSignerIndex Index of the signer within the validator set as of the start block.
-   * @param endSignerIndex Index of the signer within the validator set as of the end block.
-   * @return True if the validator signature does not appear in any block within the window.
-   * @dev Due to getParentSealBitmap, startBlock must be within 4 epochs of the current head.
+   * @notice Calculates and returns the signature bitmap for the specified interval.
+   * @param startBlock First block of the downtime interval.
+   * @param endBlock Last block of the downtime interval.
+   * @return The signature uptime bitmap for the specified interval.
+   * @dev startBlock and endBlock must be in the same epoch.
+   * @dev The getParentSealBitmap precompile requires that startBlock must be within 4 epochs of 
+   * the current block.
    */
-  function isDown(uint256 startBlock, uint256 startSignerIndex, uint256 endSignerIndex)
+  function getBitmapForInterval(uint256 startBlock, uint256 endBlock)
+    public
+    view
+    returns (bytes32)
+  {
+    require(endBlock >= startBlock, "endBlock must be greater or equal than startBlock");
+    // The sealBitmap for the block N is stored in the block N+1
+    // (block.number - 1) is the currentBlock, and because we don't have the sealBitmap for
+    // the currentBlock, we should check against (currentBlock - 1).
+    uint256 lastBlockWithParentSealBitmap = block.number.sub(2);
+    require(
+      endBlock <= lastBlockWithParentSealBitmap,
+      "endBlock's parentSealBitmap is not yet available"
+    );
+    uint256 epochSize = getEpochSize();
+    require(
+      lastBlockWithParentSealBitmap.sub(startBlock) <= epochSize.mul(4),
+      "startBlock must be within 4 epochs of the current head"
+    );
+    require(
+      epochNumberOfBlock(startBlock, epochSize) == epochNumberOfBlock(endBlock, epochSize),
+      "startBlock and endBlock must be in the same epoch"
+    );
+
+    bytes32 bitmap;
+    for (uint256 n = startBlock; n <= endBlock; n++) {
+      // The canonical signatures for block N are stored in the parent seal bitmap for block N+1.
+      bitmap |= getParentSealBitmap(n.add(1));
+    }
+
+    return bitmap;
+  }
+
+  /**
+   * @notice Calculates and sets the signature bitmap for the specified interval.
+   * @param startBlock First block of the downtime interval.
+   * @param endBlock Last block of the downtime interval.
+   * @return The signature bitmap for the specified interval.
+   * @dev startBlock and endBlock must be in the same epoch.
+   */
+  function setBitmapForInterval(uint256 startBlock, uint256 endBlock) public returns (bytes32) {
+    require(!isBitmapSetForInterval(startBlock, endBlock), "bitmap already set");
+
+    bytes32 bitmap = getBitmapForInterval(startBlock, endBlock);
+    bitmaps[msg.sender][startBlock][endBlock] = bitmap;
+
+    emit BitmapSetForInterval(startBlock, endBlock, bitmap);
+
+    return bitmap;
+  }
+
+  /**
+   * @notice Check if a validator appears down in the bitmap for the interval of blocks.
+   * Both startBlock and endBlock should be part of the same epoch.
+   * @param startBlock First block of the interval.
+   * @param endBlock Last block of the interval.
+   * @param signerIndex Index of the signer within the validator set.
+   * @return True if the validator does not appear in the bitmap of the interval.
+   */
+  function wasDownForInterval(uint256 startBlock, uint256 endBlock, uint256 signerIndex)
     public
     view
     returns (bool)
   {
-    uint256 endBlock = getEndBlock(startBlock);
-    require(endBlock < block.number.sub(1), "end block must be smaller than current block");
+    require(signerIndex < numberValidatorsInSet(startBlock), "bad validator index at start block");
     require(
-      startSignerIndex < numberValidatorsInSet(startBlock),
-      "Bad validator index at start block"
+      isBitmapSetForInterval(startBlock, endBlock),
+      "bitmap for specified interval not yet set"
     );
-    require(endSignerIndex < numberValidatorsInSet(endBlock), "Bad validator index at end block");
-    address startSigner = validatorSignerAddressFromSet(startSignerIndex, startBlock);
-    address endSigner = validatorSignerAddressFromSet(endSignerIndex, endBlock);
-    IAccounts accounts = getAccounts();
+
+    return (bitmaps[msg.sender][startBlock][endBlock] & bytes32(1 << signerIndex)) == 0;
+  }
+
+  /**
+   * @notice Shows if the user already called setBitmapForInterval for
+   * the specific interval.
+   * @param startBlock First block of a calculated downtime interval.
+   * @param endBlock Last block of the calculated downtime interval.
+   * @return True if the user already called setBitmapForInterval for
+   * the specific interval.
+   */
+  function isBitmapSetForInterval(uint256 startBlock, uint256 endBlock) public view returns (bool) {
+    // It's impossible to have all the validators down in a interval.
+    return bitmaps[msg.sender][startBlock][endBlock] != 0;
+  }
+
+  /**
+   * @notice Returns true if a validator has been down for the specified overlapping or adjacent
+   * intervals.
+   * @param startBlocks startBlocks of the specified intervals.
+   * @param endBlocks endBlocks of the specified intervals.
+   * @param signerIndices Indices of the signers within the validator set for every epoch change.
+   * @return True if the validator signature does not appear in any block within the window.
+   */
+  function wasDownForIntervals(
+    uint256[] memory startBlocks,
+    uint256[] memory endBlocks,
+    uint256[] memory signerIndices
+  ) public view returns (bool) {
+    require(startBlocks.length > 0, "requires at least one interval");
     require(
-      accounts.signerToAccount(startSigner) == accounts.signerToAccount(endSigner),
-      "Signers do not match"
+      startBlocks.length == endBlocks.length,
+      "startBlocks and endBlocks must have the same length"
     );
-    uint256 sz = getEpochSize();
-    uint256 startEpoch = epochNumberOfBlock(startBlock, sz);
-    for (uint256 n = startBlock; n <= endBlock; n = n.add(1)) {
-      uint256 signerIndex = epochNumberOfBlock(n, sz) == startEpoch
-        ? startSignerIndex
-        : endSignerIndex;
-      // We want to check signers for block n,
-      // so we get the parent seal bitmap for the next block
-      if (uint256(getParentSealBitmap(n.add(1))) & (1 << signerIndex) != 0) return false;
+    require(signerIndices.length > 0, "requires at least one signerIndex");
+
+    uint256 epochSize = getEpochSize();
+    uint256 signerIndicesIndex = 0;
+    for (uint256 i = 0; i < startBlocks.length; i = i.add(1)) {
+      if (i > 0) {
+        require(
+          startBlocks[i.sub(1)] < startBlocks[i],
+          "each interval must start after the previous interval's start"
+        );
+        require(
+          startBlocks[i] <= endBlocks[i.sub(1)].add(1),
+          "each interval must start at least one block after previous interval's end"
+        );
+        require(
+          endBlocks[i.sub(1)] < endBlocks[i],
+          "each interval must end after the previous interval"
+        );
+        // The signer index of a particular validator may change from epoch to epoch.
+        // Because the intervals for which bitmaps are calculated in this contract do not span
+        // epochs, and because intervals processed by this function are guaranteed to be
+        // overlapping or contiguous, whenever we cross epoch boundaries we are guaranteed to
+        // process an interval that starts with the first block of that epoch.
+        if (startBlocks[i].sub(1).mod(epochSize) == 0) {
+          require(
+            getValidatorAccountFromSignerIndex(
+              signerIndices[signerIndicesIndex],
+              startBlocks[i].sub(1)
+            ) ==
+              getValidatorAccountFromSignerIndex(
+                signerIndices[signerIndicesIndex.add(1)],
+                startBlocks[i]
+              ),
+            "indices do not point to the same validator"
+          );
+          signerIndicesIndex = signerIndicesIndex.add(1);
+        }
+      }
+      if (!wasDownForInterval(startBlocks[i], endBlocks[i], signerIndices[signerIndicesIndex])) {
+        return false;
+      }
     }
+
     return true;
   }
 
   /**
-   * @notice Returns the end block for the interval.
+   * @notice Add to the validator a new slashedInterval if the validator was not already
+   * slashed in the same epoch of the startBlock or by a previous interval that contains at 
+   * least a block of the new interval.
    */
-  function getEndBlock(uint256 startBlock) internal view returns (uint256) {
-    return startBlock.add(slashableDowntime).sub(1);
-  }
-
-  function checkIfAlreadySlashed(address validator, uint256 startBlock) internal {
-    uint256 endBlock = getEndBlock(startBlock);
+  function addSlashedInterval(address validator, uint256 startBlock, uint256 endBlock) internal {
     uint256 startEpoch = getEpochNumberOfBlock(startBlock);
     uint256 endEpoch = getEpochNumberOfBlock(endBlock);
-    require(lastSlashedBlock[validator][startEpoch] < startBlock, "Already slashed");
-    require(lastSlashedBlock[validator][endEpoch] < startBlock, "Already slashed");
-    lastSlashedBlock[validator][startEpoch] = endBlock;
-    lastSlashedBlock[validator][endEpoch] = endBlock;
+
+    uint256[2] memory blockInterval = slashedIntervals[validator][startEpoch];
+    require(blockInterval[0] == 0 && blockInterval[1] == 0, "already slashed in that epoch");
+
+    // Check possible crossing epoch slash from the last epoch.
+    blockInterval = slashedIntervals[validator][startEpoch.sub(1)];
+    require(blockInterval[1] < startBlock, "slash shares blocks with another slash");
+
+    // Check possible crossing epoch slash from the epoch of the endEpoch.
+    if (startEpoch != endEpoch) {
+      blockInterval = slashedIntervals[validator][endEpoch];
+      require(
+        blockInterval[0] == 0 || endBlock < blockInterval[0],
+        "slash shares blocks with another slash"
+      );
+    }
+
+    slashedIntervals[validator][startEpoch] = [startBlock, endBlock];
   }
 
   /**
-   * @notice Requires that `isDown` returns true and that the account corresponding to
-   * `signer` has not already been slashed for downtime for the epoch
-   * corresponding to `startBlock`.
+   * @notice Requires that `wasDownForIntervals` returns true and that the account corresponding
+   * to `signer` has not already been slashed for the same startBlocks[0] epoch, or share blocks
+   * with slashes of other epochs.
    * If so, fetches the `account` associated with `signer` and the group that
    * `signer` was a member of during the corresponding epoch.
    * Then, calls `LockedGold.slash` on both the validator and group accounts.
    * Calls `Validators.removeSlashedMember` to remove the validator from its
    * current group if it is a member of one.
    * Finally, stores that (account, epochNumber) has been slashed.
-   * @param startBlock First block of the downtime.
-   * @param startSignerIndex Validator index at the first block.
-   * @param endSignerIndex Validator index at the last block.
+   * @param startBlocks List of blocks that starts a previously validated interval.
+   * StartBlocks[0] will be use as the startBlock of the slashableDowntime.
+   * @param endBlocks List of blocks that ends a previously validated interval.
+   * @param signerIndices Validator indices for every epoch revised.
    * @param groupMembershipHistoryIndex Group membership index from where
-   * the group should be found. (For start block)
+   * the group should be found (For start block).
    * @param validatorElectionLessers Lesser pointers for validator slashing.
    * @param validatorElectionGreaters Greater pointers for validator slashing.
    * @param validatorElectionIndices Vote indices for validator slashing.
@@ -125,9 +266,9 @@ contract DowntimeSlasher is SlasherUtil {
    * @param groupElectionIndices Vote indices for group slashing.
    */
   function slash(
-    uint256 startBlock,
-    uint256 startSignerIndex,
-    uint256 endSignerIndex,
+    uint256[] memory startBlocks,
+    uint256[] memory endBlocks,
+    uint256[] memory signerIndices,
     uint256 groupMembershipHistoryIndex,
     address[] memory validatorElectionLessers,
     address[] memory validatorElectionGreaters,
@@ -136,15 +277,20 @@ contract DowntimeSlasher is SlasherUtil {
     address[] memory groupElectionGreaters,
     uint256[] memory groupElectionIndices
   ) public {
-    address validator = getAccounts().signerToAccount(
-      validatorSignerAddressFromSet(startSignerIndex, startBlock)
+    require(startBlocks.length > 0, "requires at least one interval");
+    require(signerIndices.length > 0, "requires at least one signerIndex");
+    address validator = getValidatorAccountFromSignerIndex(signerIndices[0], startBlocks[0]);
+    uint256 endBlock = startBlocks[0].add(slashableDowntime).sub(1);
+    addSlashedInterval(validator, startBlocks[0], endBlock);
+    require(
+      endBlock <= endBlocks[endBlocks.length.sub(1)],
+      "the intervals are not covering the slashableDowntime window"
     );
-    checkIfAlreadySlashed(validator, startBlock);
-    require(isDown(startBlock, startSignerIndex, endSignerIndex), "Not down");
+    require(wasDownForIntervals(startBlocks, endBlocks, signerIndices), "not down");
     performSlashing(
       validator,
       msg.sender,
-      startBlock,
+      startBlocks[0],
       groupMembershipHistoryIndex,
       validatorElectionLessers,
       validatorElectionGreaters,
@@ -153,6 +299,14 @@ contract DowntimeSlasher is SlasherUtil {
       groupElectionGreaters,
       groupElectionIndices
     );
-    emit DowntimeSlashPerformed(validator, startBlock);
+    emit DowntimeSlashPerformed(validator, startBlocks[0]);
+  }
+
+  function getValidatorAccountFromSignerIndex(uint256 signerIndex, uint256 blockNumber)
+    internal
+    view
+    returns (address)
+  {
+    return getAccounts().signerToAccount(validatorSignerAddressFromSet(signerIndex, blockNumber));
   }
 }
