@@ -95,6 +95,27 @@
     "yargs-parser": "^13.1.2",
     "npm": "^5.10.0",
     "npmi": "^4.0.0",
-    "websocket-extensions": "^0.1.4"
+    "websocket-extensions": "^0.1.4",
+    "web3": "1.2.4",
+    "web3-bzz": "1.2.4",
+    "web3-core": "1.2.4",
+    "web3-core-helpers": "1.2.4",
+    "web3-core-method": "1.2.4",
+    "web3-core-promievent": "1.2.4",
+    "web3-core-requestmanager": "1.2.4",
+    "web3-core-subscriptions": "1.2.4",
+    "web3-eth": "1.2.4",
+    "web3-eth-abi": "1.2.4",
+    "web3-eth-accounts": "1.2.4",
+    "web3-eth-contract": "1.2.4",
+    "web3-eth-ens": "1.2.4",
+    "web3-eth-iban": "1.2.4",
+    "web3-eth-personal": "1.2.4",
+    "web3-net": "1.2.4",
+    "web3-providers-http": "1.2.4",
+    "web3-providers-ipc": "1.2.4",
+    "web3-providers-ws": "1.2.4",
+    "web3-shh": "1.2.4",
+    "web3-utils": "1.2.4"
   }
 }
