@@ -3,7 +3,7 @@ import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet } from 'react-native'
 import { connect } from 'react-redux'
 import { PaymentRequest } from 'src/account/types'
-import { NotificationEvents } from 'src/analytics/Events'
+import { HomeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { declinePaymentRequest } from 'src/firebase/actions'
 import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
@@ -56,7 +56,7 @@ const mapDispatchToProps = {
 // Payment Request notification for the notification center on home screen
 export class IncomingPaymentRequestSummaryNotification extends React.Component<Props> {
   onReview = () => {
-    ValoraAnalytics.track(NotificationEvents.notification_select, {
+    ValoraAnalytics.track(HomeEvents.notification_select, {
       notificationType: NotificationBannerTypes.incoming_tx_request,
       selectedAction: NotificationBannerCTATypes.review,
     })

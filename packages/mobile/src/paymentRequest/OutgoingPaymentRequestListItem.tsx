@@ -3,7 +3,7 @@ import RequestMessagingCard from '@celo/react-components/components/RequestMessa
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
-import { NotificationEvents } from 'src/analytics/Events'
+import { HomeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { cancelPaymentRequest, updatePaymentRequestNotified } from 'src/firebase/actions'
@@ -28,7 +28,7 @@ export class OutgoingPaymentRequestListItem extends React.Component<Props> {
   onRemind = () => {
     const { id, t } = this.props
     this.props.updatePaymentRequestNotified(id, false)
-    ValoraAnalytics.track(NotificationEvents.notification_select, {
+    ValoraAnalytics.track(HomeEvents.notification_select, {
       notificationType: NotificationBannerTypes.outgoing_tx_request,
       selectedAction: NotificationBannerCTATypes.remind,
     })
@@ -37,7 +37,7 @@ export class OutgoingPaymentRequestListItem extends React.Component<Props> {
 
   onCancel = () => {
     const { id } = this.props
-    ValoraAnalytics.track(NotificationEvents.notification_select, {
+    ValoraAnalytics.track(HomeEvents.notification_select, {
       notificationType: NotificationBannerTypes.outgoing_tx_request,
       selectedAction: NotificationBannerCTATypes.decline,
     })

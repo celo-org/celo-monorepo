@@ -6,9 +6,9 @@ import {
   EscrowEvents,
   FeeEvents,
   GethEvents,
+  HomeEvents,
   IdentityEvents,
   InviteEvents,
-  NotificationEvents,
   OnboardingEvents,
   RequestEvents,
   SendEvents,
@@ -47,23 +47,31 @@ interface AppEventsProperties {
   }
 }
 
+interface HomeEventsProperties {
+  [HomeEvents.home_send]: undefined
+  [HomeEvents.home_request]: undefined
+  [HomeEvents.home_qr]: undefined
+  [HomeEvents.drawer_navigation]: {
+    navigateTo: string
+  }
+  [HomeEvents.drawer_address_copy]: undefined
+
+  [HomeEvents.notification_scroll]: {
+    // TODO: Pass in notificationType and make param required
+    notificationType?: NotificationBannerTypes
+    direction: ScrollDirection
+  }
+  [HomeEvents.notification_select]: {
+    notificationType: NotificationBannerTypes
+    selectedAction: NotificationBannerCTATypes
+  }
+}
+
 interface SettingsEventsProperties {
   [SettingsEvents.edit_profile]: undefined
   [SettingsEvents.edit_name]: undefined
   [SettingsEvents.language_select]: {
     language: string
-  }
-}
-
-interface NotificationEventsProperties {
-  [NotificationEvents.notification_scroll]: {
-    // TODO: Pass in notificationType and make param required
-    notificationType?: NotificationBannerTypes
-    direction: ScrollDirection
-  }
-  [NotificationEvents.notification_select]: {
-    notificationType: NotificationBannerTypes
-    selectedAction: NotificationBannerCTATypes
   }
 }
 
@@ -509,8 +517,8 @@ interface GethEventsProperties {
 }
 
 export type AnalyticsPropertiesList = AppEventsProperties &
+  HomeEventsProperties &
   SettingsEventsProperties &
-  NotificationEventsProperties &
   OnboardingEventsProperties &
   VerificationEventsProperties &
   IdentityEventsProperties &

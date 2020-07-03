@@ -4,7 +4,7 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
-import { NotificationEvents } from 'src/analytics/Events'
+import { HomeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
@@ -42,7 +42,7 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
       firebasePendingRequestUid: id,
     }
 
-    ValoraAnalytics.track(NotificationEvents.notification_select, {
+    ValoraAnalytics.track(HomeEvents.notification_select, {
       notificationType: NotificationBannerTypes.incoming_tx_request,
       selectedAction: NotificationBannerCTATypes.pay,
     })
@@ -56,7 +56,7 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
 
   onPaymentDecline = () => {
     const { id } = this.props
-    ValoraAnalytics.track(NotificationEvents.notification_select, {
+    ValoraAnalytics.track(HomeEvents.notification_select, {
       notificationType: NotificationBannerTypes.incoming_tx_request,
       selectedAction: NotificationBannerCTATypes.decline,
     })

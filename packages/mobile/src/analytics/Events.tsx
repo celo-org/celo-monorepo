@@ -8,16 +8,29 @@ export enum AppEvents {
   fetch_balance = 'fetch_balance',
 }
 
+export enum HomeEvents {
+  home_send = 'home_send',
+  home_request = 'home_request',
+  home_qr = 'home_qr',
+  drawer_navigation = 'drawer_navigation',
+  drawer_address_copy = 'drawer_address_copy',
+  notification_scroll = 'notification_scroll',
+  notification_select = 'notification_select',
+}
+
 export enum SettingsEvents {
   edit_profile = 'edit_profile', // to count the # of taps on the edit profile button in Account_Home
   edit_name = 'edit_name', // to count the # of taps on the “Edit Name” nav element in Account_Edit
   language_select = 'language_select',
+
+  // require pin on app open
+  // enable data saver
+  // licenses
+  // ToS
 }
 
-export enum NotificationEvents {
-  notification_scroll = 'notification_scroll',
-  notification_select = 'notification_select',
-}
+// TODO: TX feed interactions
+// TODO: QR scanner
 
 export enum OnboardingEvents {
   backup_education_start = 'backup_education_start',
@@ -165,7 +178,6 @@ export enum SendEvents {
   send_continue = 'send_continue', // when next button pressed on amount enter page
   send_confirm_back = 'send_confirm_back', // when back button pressed on send confirmation screen
   send_confirm = 'send_confirm', // when send button pressed on send confirmation screen
-  send_error = 'send_error', // when there is an error sending a transaction
   send_complete = 'send_complete', // when a send or invite transaction has successfully completed
 
   send_secure_start = 'send_secure_start', // when either secure send scan or manual confirm button pressed
@@ -178,6 +190,7 @@ export enum SendEvents {
   send_secure_info_dismissed = 'send_secure_info_dismissed', // when "help" button is dismissed
   send_secure_edit = 'send_secure_edit', // when "edit" address button is pressed to manually initate secure send flow
 
+  send_error = 'send_error', // when there is an error sending a transaction
   send_dollar_transaction = 'send_dollar_transaction',
   send_dollar_transaction_confirmed = 'send_dollar_transaction_confirmed',
 }
@@ -250,8 +263,8 @@ export enum GethEvents {
 
 export const AnalyticsEvents = {
   ...AppEvents,
+  ...HomeEvents,
   ...SettingsEvents,
-  ...NotificationEvents,
   ...OnboardingEvents,
   ...VerificationEvents,
   ...IdentityEvents,
@@ -267,8 +280,8 @@ export const AnalyticsEvents = {
 
 export type AnalyticsEventType =
   | AppEvents
+  | HomeEvents
   | SettingsEvents
-  | NotificationEvents
   | OnboardingEvents
   | VerificationEvents
   | IdentityEvents

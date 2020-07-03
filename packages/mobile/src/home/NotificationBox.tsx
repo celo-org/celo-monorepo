@@ -8,7 +8,7 @@ import { connect } from 'react-redux'
 import { dismissEarnRewards, dismissGetVerified, dismissInviteFriends } from 'src/account/actions'
 import { getIncomingPaymentRequests, getOutgoingPaymentRequests } from 'src/account/selectors'
 import { PaymentRequest } from 'src/account/types'
-import { NotificationEvents } from 'src/analytics/Events'
+import { HomeEvents } from 'src/analytics/Events'
 import { ScrollDirection } from 'src/analytics/types'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { PROMOTE_REWARDS_APP } from 'src/config'
@@ -156,7 +156,7 @@ export class NotificationBox extends React.Component<Props, State> {
           {
             text: t('backupKeyFlow6:getBackupKey'),
             onPress: () => {
-              ValoraAnalytics.track(NotificationEvents.notification_select, {
+              ValoraAnalytics.track(HomeEvents.notification_select, {
                 notificationType: NotificationBannerTypes.backup_prompt,
                 selectedAction: NotificationBannerCTATypes.accept,
               })
@@ -176,7 +176,7 @@ export class NotificationBox extends React.Component<Props, State> {
           {
             text: t('nuxVerification2:notification.cta'),
             onPress: () => {
-              ValoraAnalytics.track(NotificationEvents.notification_select, {
+              ValoraAnalytics.track(HomeEvents.notification_select, {
                 notificationType: NotificationBannerTypes.verification_prompt,
                 selectedAction: NotificationBannerCTATypes.accept,
               })
@@ -186,7 +186,7 @@ export class NotificationBox extends React.Component<Props, State> {
           {
             text: t('maybeLater'),
             onPress: () => {
-              ValoraAnalytics.track(NotificationEvents.notification_select, {
+              ValoraAnalytics.track(HomeEvents.notification_select, {
                 notificationType: NotificationBannerTypes.verification_prompt,
                 selectedAction: NotificationBannerCTATypes.decline,
               })
@@ -207,7 +207,7 @@ export class NotificationBox extends React.Component<Props, State> {
             text: t('walletFlow5:startEarning'),
             onPress: () => {
               this.props.dismissEarnRewards()
-              ValoraAnalytics.track(NotificationEvents.notification_select, {
+              ValoraAnalytics.track(HomeEvents.notification_select, {
                 notificationType: NotificationBannerTypes.celo_rewards_education,
                 selectedAction: NotificationBannerCTATypes.accept,
               })
@@ -218,7 +218,7 @@ export class NotificationBox extends React.Component<Props, State> {
             text: t('maybeLater'),
             onPress: () => {
               this.props.dismissEarnRewards()
-              ValoraAnalytics.track(NotificationEvents.notification_select, {
+              ValoraAnalytics.track(HomeEvents.notification_select, {
                 notificationType: NotificationBannerTypes.celo_rewards_education,
                 selectedAction: NotificationBannerCTATypes.decline,
               })
@@ -237,7 +237,7 @@ export class NotificationBox extends React.Component<Props, State> {
           {
             text: t('exchange'),
             onPress: () => {
-              ValoraAnalytics.track(NotificationEvents.notification_select, {
+              ValoraAnalytics.track(HomeEvents.notification_select, {
                 notificationType: NotificationBannerTypes.celo_asset_education,
                 selectedAction: NotificationBannerCTATypes.accept,
               })
@@ -247,7 +247,7 @@ export class NotificationBox extends React.Component<Props, State> {
           {
             text: t('maybeLater'),
             onPress: () => {
-              ValoraAnalytics.track(NotificationEvents.notification_select, {
+              ValoraAnalytics.track(HomeEvents.notification_select, {
                 notificationType: NotificationBannerTypes.celo_asset_education,
                 selectedAction: NotificationBannerCTATypes.decline,
               })
@@ -267,7 +267,7 @@ export class NotificationBox extends React.Component<Props, State> {
             text: t('global:inviteFriends'),
             onPress: () => {
               this.props.dismissInviteFriends()
-              ValoraAnalytics.track(NotificationEvents.notification_select, {
+              ValoraAnalytics.track(HomeEvents.notification_select, {
                 notificationType: NotificationBannerTypes.invite_prompt,
                 selectedAction: NotificationBannerCTATypes.accept,
               })
@@ -278,7 +278,7 @@ export class NotificationBox extends React.Component<Props, State> {
             text: t('maybeLater'),
             onPress: () => {
               this.props.dismissInviteFriends()
-              ValoraAnalytics.track(NotificationEvents.notification_select, {
+              ValoraAnalytics.track(HomeEvents.notification_select, {
                 notificationType: NotificationBannerTypes.invite_prompt,
                 selectedAction: NotificationBannerCTATypes.decline,
               })
@@ -322,7 +322,7 @@ export class NotificationBox extends React.Component<Props, State> {
     }
 
     const direction = nextIndex > currentIndex ? ScrollDirection.next : ScrollDirection.previous
-    ValoraAnalytics.track(NotificationEvents.notification_scroll, { direction })
+    ValoraAnalytics.track(HomeEvents.notification_scroll, { direction })
 
     this.setState({
       currentIndex: Math.round(event.nativeEvent.contentOffset.x / variables.width),

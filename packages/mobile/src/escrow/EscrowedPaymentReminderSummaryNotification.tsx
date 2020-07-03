@@ -2,7 +2,7 @@ import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet } from 'react-native'
-import { NotificationEvents } from 'src/analytics/Events'
+import { HomeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentLineItem from 'src/escrow/EscrowedPaymentLineItem'
@@ -24,7 +24,7 @@ type Props = OwnProps & WithTranslation
 
 export class EscrowedPaymentReminderSummaryNotification extends React.Component<Props> {
   onReview = () => {
-    ValoraAnalytics.track(NotificationEvents.notification_select, {
+    ValoraAnalytics.track(HomeEvents.notification_select, {
       notificationType: NotificationBannerTypes.escrow_tx_summary,
       selectedAction: NotificationBannerCTATypes.review,
     })
