@@ -13,7 +13,6 @@ import {
   RequestEvents,
   SendEvents,
   SettingsEvents,
-  TransactionEvents,
   VerificationEvents,
 } from 'src/analytics/Events'
 import { BackQuizProgress, ScrollDirection } from 'src/analytics/types'
@@ -413,40 +412,6 @@ interface FeeEventsProperties {
   }
 }
 
-interface TransactionEventsProperties {
-  [TransactionEvents.transaction_send_start]: {
-    txId: string
-  }
-  [TransactionEvents.transaction_send_gas_estimated]: {
-    txId: string
-    duration: number
-  }
-  [TransactionEvents.transaction_send_gas_hash_received]: {
-    txId: string
-    duration: number
-  }
-  [TransactionEvents.transaction_send_gas_receipt]: {
-    txId: string
-    duration: number
-  }
-  [TransactionEvents.transaction_error]: {
-    txId: string
-    duration: number
-    error: string
-  }
-  [TransactionEvents.transaction_exception]: {
-    txId: string
-    duration: number
-    error: string
-  }
-  [TransactionEvents.transfer_token_error]: {
-    error: string
-  }
-  [TransactionEvents.unexpected_maker_token]: {
-    makerToken: CURRENCY_ENUM
-  }
-}
-
 interface CeloExchangeEventsProperties {
   [CeloExchangeEvents.gold_switch_input_currency]: {
     to: CURRENCY_ENUM
@@ -501,6 +466,10 @@ interface CeloExchangeEventsProperties {
   [CeloExchangeEvents.exchange_failed]: {
     error: string
   }
+
+  [CeloExchangeEvents.unexpected_maker_token]: {
+    makerToken: CURRENCY_ENUM
+  }
   [CeloExchangeEvents.gold_info]: undefined
   [CeloExchangeEvents.gold_buy_start]: undefined
   [CeloExchangeEvents.gold_sell_start]: undefined
@@ -534,6 +503,5 @@ export type AnalyticsPropertiesList = AppEventsProperties &
   EscrowEventsProperties &
   RequestEventsProperties &
   FeeEventsProperties &
-  TransactionEventsProperties &
   CeloExchangeEventsProperties &
   GethEventsProperties

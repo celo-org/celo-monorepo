@@ -188,7 +188,6 @@ export function tokenTransferFactory({
         yield call(sendAndMonitorTransaction, txId, tx, account, currency)
       } catch (error) {
         Logger.error(tag, 'Error transfering token', error)
-        ValoraAnalytics.track(AnalyticsEvents.transfer_token_error, { error: error.message })
         yield put(removeStandbyTransaction(txId))
         if (error.message === ErrorMessages.INCORRECT_PIN) {
           yield put(showError(ErrorMessages.INCORRECT_PIN))

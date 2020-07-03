@@ -1,4 +1,4 @@
-// TODO: TX feed + QR scanner
+// TODO: TX feed + QR scanner + Geth + more detailed transaction logs
 
 export enum AppEvents {
   app_launched = 'app_launched',
@@ -214,17 +214,6 @@ export enum FeeEvents {
   fetch_tobin_tax_failed = 'fetch_tobin_tax_failed',
 }
 
-export enum TransactionEvents {
-  transaction_send_start = 'transaction_send_start',
-  transaction_send_gas_estimated = 'transaction_send_gas_estimated',
-  transaction_send_gas_hash_received = 'transaction_send_gas_hash_received',
-  transaction_send_gas_receipt = 'transaction_send_gas_receipt',
-  transaction_error = 'transaction_error',
-  transaction_exception = 'transaction_exception',
-  transfer_token_error = 'transfer_token_error',
-  unexpected_maker_token = 'unexpected_maker_token',
-}
-
 export enum CeloExchangeEvents {
   // Gold Buy and Sell screens
   gold_switch_input_currency = 'gold_switch_input_currency', // when ‘switch to gold’ button pressed
@@ -245,6 +234,7 @@ export enum CeloExchangeEvents {
   exchange_rate_change_failure = 'exchange_rate_change_failure',
   missing_tx_id = 'missing_tx_id',
   exchange_failed = 'exchange_failed',
+  unexpected_maker_token = 'unexpected_maker_token',
 
   // Gold Home screen
   gold_info = 'gold_info', // when the (i) next to Celo Gold price is clicked, launching education (not pictured)
@@ -274,7 +264,6 @@ export const AnalyticsEvents = {
   ...SendEvents,
   ...RequestEvents,
   ...FeeEvents,
-  ...TransactionEvents,
   ...CeloExchangeEvents,
   ...GethEvents,
 }
@@ -291,6 +280,5 @@ export type AnalyticsEventType =
   | SendEvents
   | RequestEvents
   | FeeEvents
-  | TransactionEvents
   | CeloExchangeEvents
   | GethEvents
