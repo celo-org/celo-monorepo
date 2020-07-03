@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { Image, StyleSheet } from 'react-native'
+import { Image } from 'react-native'
 import { connect } from 'react-redux'
 import { PaymentRequest } from 'src/account/types'
 import { AnalyticsEvents } from 'src/analytics/Events'
@@ -13,7 +13,7 @@ import {
   e164NumberToAddressSelector,
   E164NumberToAddressType,
 } from 'src/identity/reducer'
-import { sendDollar } from 'src/images/Images'
+import { notificationOutgoingRequest } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import SummaryNotification from 'src/notifications/SummaryNotification'
@@ -83,20 +83,13 @@ export class OutgoingPaymentRequestSummaryNotification extends React.Component<P
         items={requests}
         title={t('outgoingPaymentRequestsSummaryTitle', { count: requests.length })}
         detailsI18nKey="walletFlow5:outgoingPaymentRequestsSummaryDetails"
-        icon={<Image source={sendDollar} style={styles.image} resizeMode="contain" />}
+        icon={<Image source={notificationOutgoingRequest} resizeMode="contain" />}
         onReview={this.onReview}
         itemRenderer={this.itemRenderer}
       />
     )
   }
 }
-
-const styles = StyleSheet.create({
-  image: {
-    width: 40,
-    height: 40,
-  },
-})
 
 export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
   cancelPaymentRequest,
