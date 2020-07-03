@@ -116,21 +116,6 @@ exports[`Education renders correctly 1`] = `
           }
         }
       >
-        <Image
-          resizeMode="contain"
-          source={
-            Object {
-              "testUri": "../../../packages/mobile/src/images/placeholder.png",
-            }
-          }
-          style={
-            Object {
-              "alignSelf": "center",
-              "height": 200,
-              "width": 200,
-            }
-          }
-        />
         <Text
           style={
             Object {

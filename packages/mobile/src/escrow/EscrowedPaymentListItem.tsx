@@ -1,7 +1,8 @@
+import ContactCircle from '@celo/react-components/components/ContactCircle'
 import RequestMessagingCard from '@celo/react-components/components/RequestMessagingCard'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { Image, StyleSheet, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { AnalyticsEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -9,7 +10,6 @@ import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { inviteFriendsIcon } from 'src/images/Images'
 import { InviteDetails } from 'src/invite/actions'
 import { sendSms } from 'src/invite/saga'
 import { navigate } from 'src/navigator/NavigationService'
@@ -99,8 +99,12 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
           title={t('escrowPaymentNotificationTitle', { mobile })}
           amount={<CurrencyDisplay amount={amount} />}
           details={payment.message}
-          // TODO: use new avatar
-          icon={<Image source={inviteFriendsIcon} style={styles.image} resizeMode="contain" />}
+          icon={
+            <ContactCircle
+              name={mobile}
+              // TODO: Add thumbnailPath={}
+            />
+          }
           callToActions={this.getCTA()}
           testID={testID}
         />
