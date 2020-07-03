@@ -226,33 +226,31 @@ export enum TransactionEvents {
 }
 
 export enum CeloExchangeEvents {
-  // Gold Buy and Sell screens
-  gold_switch_input_currency = 'gold_switch_input_currency', // when ‘switch to gold’ button pressed
-  gold_buy_continue = 'gold_buy_continue', // when ‘review’ button clicked
-  gold_buy_confirm = 'gold_buy_confirm', // when ‘buy’ button clicked
-  gold_buy_cancel = 'gold_buy_cancel', // when ‘cancel’ is clicked
-  gold_buy_edit = 'gold_buy_edit', // when ‘edit’ is clicked
-  gold_buy_error = 'gold_buy_error', // error in send flow
-  gold_sell_continue = 'gold_sell_continue', // when ‘review’ button clicked
-  gold_sell_confirm = 'gold_sell_confirm', // when ‘sell’ button clicked
-  gold_sell_cancel = 'gold_sell_cancel', // when ‘cancel’ is clicked
-  gold_sell_edit = 'gold_sell_edit', // when ‘edit’ is clicked
-  gold_sell_error = 'gold_sell_error', // error in sell flow
+  celo_home_info = 'celo_home_info', // when the (i) next to Celo Gold price is clicked, launching education (not pictured)
+  celo_home_buy = 'celo_home_buy', // when the “Buy” button is clicked
+  celo_home_sell = 'celo_home_sell', // when the “Sell” button is clicked
+  celo_transaction_select = 'celo_transaction_select', // when an transaction item is clicked
+  celo_transaction_back = 'celo_transaction_back', // when back caret is clicked from drilldown
 
-  // Exchange errors
-  fetch_exchange_rate_failed = 'fetch_exchange_rate_failed',
-  invalid_exchange_rate = 'invalid_exchange_rate',
-  exchange_rate_change_failure = 'exchange_rate_change_failure',
-  missing_tx_id = 'missing_tx_id',
-  exchange_failed = 'exchange_failed',
-  unexpected_maker_token = 'unexpected_maker_token',
+  celo_toggle_input_currency = 'celo_toggle_input_currency', // when ‘switch to gold’ button pressed
+  celo_buy_continue = 'celo_buy_continue', // when ‘review’ button clicked
+  celo_buy_confirm = 'celo_buy_confirm', // when ‘buy’ button clicked
+  celo_buy_cancel = 'celo_buy_cancel', // when ‘cancel’ is clicked
+  celo_buy_edit = 'celo_buy_edit', // when ‘edit’ is clicked
+  celo_buy_error = 'celo_buy_error', // error in send flow
+  celo_sell_continue = 'celo_sell_continue', // when ‘review’ button clicked
+  celo_sell_confirm = 'celo_sell_confirm', // when ‘sell’ button clicked
+  celo_sell_cancel = 'celo_sell_cancel', // when ‘cancel’ is clicked
+  celo_sell_edit = 'celo_sell_edit', // when ‘edit’ is clicked
+  celo_sell_error = 'celo_sell_error', // error in sell flow
 
-  // Gold Home screen
-  gold_info = 'gold_info', // when the (i) next to Celo Gold price is clicked, launching education (not pictured)
-  gold_buy_start = 'gold_buy_start', // when the “Buy” button is clicked
-  gold_sell_start = 'gold_sell_start', // when the “Sell” button is clicked
-  gold_activity_select = 'gold_activity_select', // when an activity item is clicked
-  gold_activity_back = 'gold_activity_back', // when back caret is clicked from drilldown
+  celo_exchange_start = 'celo_exchange_start',
+  celo_exchange_complete = 'celo_exchange_complete',
+  celo_exchange_error = 'celo_exchange_error',
+
+  celo_fetch_exchange_rate_start = 'celo_fetch_exchange_rate_start',
+  celo_fetch_exchange_rate_complete = 'celo_fetch_exchange_rate_complete',
+  celo_fetch_exchange_rate_error = 'celo_fetch_exchange_rate_error',
 }
 
 export enum GethEvents {

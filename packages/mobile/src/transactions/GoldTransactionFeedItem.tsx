@@ -24,7 +24,7 @@ export function ExchangeFeedItem(props: Props) {
   const { t, i18n } = useTranslation(Namespaces.walletFlow5)
   const { amount, makerAmount, takerAmount, status, timestamp } = props
   const onPress = () => {
-    ValoraAnalytics.track(AnalyticsEvents.gold_activity_select)
+    ValoraAnalytics.track(AnalyticsEvents.celo_transaction_select)
     navigateToExchangeReview(timestamp, {
       makerAmount,
       takerAmount,

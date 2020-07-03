@@ -142,8 +142,8 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     )
     ValoraAnalytics.track(
       this.isDollarToGold()
-        ? AnalyticsEvents.gold_buy_continue
-        : AnalyticsEvents.gold_sell_continue,
+        ? AnalyticsEvents.celo_buy_continue
+        : AnalyticsEvents.celo_sell_continue,
       {
         localCurrencyAmount: localCurrencyAmount ? localCurrencyAmount.toString() : null,
         goldAmount: goldAmount.toString(),
@@ -253,7 +253,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
 
   switchInputToken = () => {
     const inputToken = this.getOppositeInputToken()
-    ValoraAnalytics.track(AnalyticsEvents.gold_switch_input_currency, {
+    ValoraAnalytics.track(AnalyticsEvents.celo_toggle_input_currency, {
       to: inputToken,
     })
     this.setState({ inputToken }, () => {

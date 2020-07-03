@@ -293,8 +293,8 @@ const exchangeTradeScreenOptions = ({
   const isDollarToGold = makerToken === CURRENCY_ENUM.DOLLAR
   const title = isDollarToGold ? i18n.t('exchangeFlow9:buyGold') : i18n.t('exchangeFlow9:sellGold')
   const cancelEventName = isDollarToGold
-    ? AnalyticsEvents.gold_buy_cancel
-    : AnalyticsEvents.gold_sell_cancel
+    ? AnalyticsEvents.celo_buy_cancel
+    : AnalyticsEvents.celo_sell_cancel
   return {
     ...headerWithCancelButton,
     headerLeft: () => <CancelButton eventName={cancelEventName} />,
@@ -311,11 +311,11 @@ const exchangeReviewScreenOptions = ({
   const isDollarToGold = makerToken === CURRENCY_ENUM.DOLLAR
   const title = isDollarToGold ? i18n.t('exchangeFlow9:buyGold') : i18n.t('exchangeFlow9:sellGold')
   const cancelEventName = isDollarToGold
-    ? AnalyticsEvents.gold_buy_cancel
-    : AnalyticsEvents.gold_sell_cancel
+    ? AnalyticsEvents.celo_buy_cancel
+    : AnalyticsEvents.celo_sell_cancel
   const editEventName = isDollarToGold
-    ? AnalyticsEvents.gold_buy_edit
-    : AnalyticsEvents.gold_sell_edit
+    ? AnalyticsEvents.celo_buy_edit
+    : AnalyticsEvents.celo_sell_edit
   return {
     ...headerWithCancelButton,
     headerLeft: () => (
@@ -415,7 +415,7 @@ const transactionReviewOptions = ({
   return {
     ...emptyHeader,
     headerLeft: () => (
-      <BackButton color={colors.dark} eventName={AnalyticsEvents.gold_activity_back} />
+      <BackButton color={colors.dark} eventName={AnalyticsEvents.celo_transaction_back} />
     ),
     headerTitle: () => <HeaderTitleWithSubtitle title={header} subTitle={dateTimeStatus} />,
   }

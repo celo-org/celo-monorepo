@@ -39,7 +39,7 @@ import { getLocalCurrencyDisplayValue } from 'src/utils/formatting'
 type Props = StackScreenProps<StackParamList, Screens.ExchangeHomeScreen>
 
 function navigateToGuide() {
-  ValoraAnalytics.track(AnalyticsEvents.gold_info)
+  ValoraAnalytics.track(AnalyticsEvents.celo_home_info)
   navigate(Screens.GoldEducation)
 }
 
@@ -53,7 +53,7 @@ function ExchangeHomeScreen({ navigation }: Props) {
   }
 
   function goToBuyGold() {
-    ValoraAnalytics.track(AnalyticsEvents.gold_buy_start)
+    ValoraAnalytics.track(AnalyticsEvents.celo_home_buy)
     navigation.navigate(Screens.ExchangeTradeScreen, {
       makerTokenDisplay: {
         makerToken: CURRENCY_ENUM.DOLLAR,
@@ -63,7 +63,7 @@ function ExchangeHomeScreen({ navigation }: Props) {
   }
 
   function goToBuyDollars() {
-    ValoraAnalytics.track(AnalyticsEvents.gold_sell_start)
+    ValoraAnalytics.track(AnalyticsEvents.celo_home_sell)
     navigation.navigate(Screens.ExchangeTradeScreen, {
       makerTokenDisplay: {
         makerToken: CURRENCY_ENUM.GOLD,

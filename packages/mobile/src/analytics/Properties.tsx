@@ -438,68 +438,61 @@ interface TransactionEventsProperties {
 }
 
 interface CeloExchangeEventsProperties {
-  [CeloExchangeEvents.gold_switch_input_currency]: {
+  [CeloExchangeEvents.celo_home_info]: undefined
+  [CeloExchangeEvents.celo_home_buy]: undefined
+  [CeloExchangeEvents.celo_home_sell]: undefined
+  [CeloExchangeEvents.celo_transaction_select]: undefined
+  [CeloExchangeEvents.celo_transaction_back]: undefined
+
+  [CeloExchangeEvents.celo_toggle_input_currency]: {
     to: CURRENCY_ENUM
   }
-  [CeloExchangeEvents.gold_buy_continue]: {
+  [CeloExchangeEvents.celo_buy_continue]: {
     localCurrencyAmount: string | null
     goldAmount: string
     inputToken: CURRENCY_ENUM
     goldToDollarExchangeRate: string
   }
-  [CeloExchangeEvents.gold_buy_confirm]: {
+  [CeloExchangeEvents.celo_buy_confirm]: {
     localCurrencyAmount: string | null
     goldAmount: string
     inputToken: CURRENCY_ENUM
     goldToDollarExchangeRate: string
   }
-  [CeloExchangeEvents.gold_buy_cancel]: undefined
-  [CeloExchangeEvents.gold_buy_edit]: undefined
-  [CeloExchangeEvents.gold_buy_error]: {
+  [CeloExchangeEvents.celo_buy_cancel]: undefined
+  [CeloExchangeEvents.celo_buy_edit]: undefined
+  [CeloExchangeEvents.celo_buy_error]: {
     error: string
   }
-  [CeloExchangeEvents.gold_sell_continue]: {
+  [CeloExchangeEvents.celo_sell_continue]: {
     localCurrencyAmount: string | null
     goldAmount: string
     inputToken: CURRENCY_ENUM
     goldToDollarExchangeRate: string
   }
-  [CeloExchangeEvents.gold_sell_confirm]: {
+  [CeloExchangeEvents.celo_sell_confirm]: {
     localCurrencyAmount: string | null
     goldAmount: string
     inputToken: CURRENCY_ENUM
     goldToDollarExchangeRate: string
   }
-  [CeloExchangeEvents.gold_sell_cancel]: undefined
-  [CeloExchangeEvents.gold_sell_edit]: undefined
-  [CeloExchangeEvents.gold_sell_error]: {
-    error: string
-  }
-
-  [CeloExchangeEvents.fetch_exchange_rate_failed]: {
-    error: string
-  }
-  [CeloExchangeEvents.invalid_exchange_rate]: {
-    context: string
-  }
-  [CeloExchangeEvents.exchange_rate_change_failure]: {
-    makerToken: CURRENCY_ENUM
-    takerAmount: string
-    context: string
-  }
-  [CeloExchangeEvents.missing_tx_id]: undefined
-  [CeloExchangeEvents.exchange_failed]: {
+  [CeloExchangeEvents.celo_sell_cancel]: undefined
+  [CeloExchangeEvents.celo_sell_edit]: undefined
+  [CeloExchangeEvents.celo_sell_error]: {
     error: string
   }
 
-  [CeloExchangeEvents.unexpected_maker_token]: {
-    makerToken: CURRENCY_ENUM
+  [CeloExchangeEvents.celo_exchange_start]: undefined
+  [CeloExchangeEvents.celo_exchange_complete]: undefined
+  [CeloExchangeEvents.celo_exchange_error]: {
+    error: string
   }
-  [CeloExchangeEvents.gold_info]: undefined
-  [CeloExchangeEvents.gold_buy_start]: undefined
-  [CeloExchangeEvents.gold_sell_start]: undefined
-  [CeloExchangeEvents.gold_activity_select]: undefined
-  [CeloExchangeEvents.gold_activity_back]: undefined
+
+  [CeloExchangeEvents.celo_fetch_exchange_rate_start]: undefined
+  [CeloExchangeEvents.celo_fetch_exchange_rate_complete]: undefined
+  [CeloExchangeEvents.celo_fetch_exchange_rate_error]: {
+    error: string
+  }
 }
 
 interface GethEventsProperties {
