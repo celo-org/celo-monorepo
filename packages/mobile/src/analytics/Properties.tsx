@@ -13,6 +13,7 @@ import {
   RequestEvents,
   SendEvents,
   SettingsEvents,
+  TransactionEvents,
   VerificationEvents,
 } from 'src/analytics/Events'
 import { BackQuizProgress, ScrollDirection } from 'src/analytics/types'
@@ -413,6 +414,29 @@ interface FeeEventsProperties {
   }
 }
 
+interface TransactionEventsProperties {
+  [TransactionEvents.transaction_start]: {
+    txId: string
+  }
+  [TransactionEvents.transaction_gas_estimated]: {
+    txId: string
+  }
+  [TransactionEvents.transaction_hash_received]: {
+    txId: string
+  }
+  [TransactionEvents.transaction_receipt_received]: {
+    txId: string
+  }
+  [TransactionEvents.transaction_error]: {
+    txId: string
+    error: string
+  }
+  [TransactionEvents.transaction_exception]: {
+    txId: string
+    error: string
+  }
+}
+
 interface CeloExchangeEventsProperties {
   [CeloExchangeEvents.gold_switch_input_currency]: {
     to: CURRENCY_ENUM
@@ -504,5 +528,6 @@ export type AnalyticsPropertiesList = AppEventsProperties &
   EscrowEventsProperties &
   RequestEventsProperties &
   FeeEventsProperties &
+  TransactionEventsProperties &
   CeloExchangeEventsProperties &
   GethEventsProperties

@@ -215,6 +215,16 @@ export enum FeeEvents {
   fetch_tobin_tax_failed = 'fetch_tobin_tax_failed',
 }
 
+// Generic transaction logging to grab tx hashs
+export enum TransactionEvents {
+  transaction_start = 'transaction_start',
+  transaction_gas_estimated = 'transaction_gas_estimated',
+  transaction_hash_received = 'transaction_hash_received',
+  transaction_receipt_received = 'transaction_receipt_received',
+  transaction_error = 'transaction_error',
+  transaction_exception = 'transaction_exception',
+}
+
 export enum CeloExchangeEvents {
   // Gold Buy and Sell screens
   gold_switch_input_currency = 'gold_switch_input_currency', // when ‘switch to gold’ button pressed
@@ -265,6 +275,7 @@ export const AnalyticsEvents = {
   ...SendEvents,
   ...RequestEvents,
   ...FeeEvents,
+  ...TransactionEvents,
   ...CeloExchangeEvents,
   ...GethEvents,
 }
@@ -281,5 +292,6 @@ export type AnalyticsEventType =
   | SendEvents
   | RequestEvents
   | FeeEvents
+  | TransactionEvents
   | CeloExchangeEvents
   | GethEvents
