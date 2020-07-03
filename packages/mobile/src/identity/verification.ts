@@ -74,7 +74,8 @@ export function* startVerification() {
   if (result === true) {
     ValoraAnalytics.track(VerificationEvents.verification_complete)
     Logger.debug(TAG, 'Verification completed successfully')
-  } else if (result === false) {
+  } else if (result) {
+    ValoraAnalytics.track(VerificationEvents.verification_error, { error: result.message })
     Logger.debug(TAG, 'Verification failed')
   } else if (cancel) {
     ValoraAnalytics.track(VerificationEvents.verification_cancel)
@@ -207,10 +208,9 @@ export function* doVerificationFlow() {
     return true
   } catch (error) {
     Logger.error(TAG, 'Error occured during verification flow', error)
-    ValoraAnalytics.track(VerificationEvents.verification_error, { error: error.message })
     yield put(showErrorOrFallback(error, ErrorMessages.VERIFICATION_FAILURE))
     yield put(setVerificationStatus(VerificationStatus.Failed))
-    return false
+    return error.message
   }
 }
 

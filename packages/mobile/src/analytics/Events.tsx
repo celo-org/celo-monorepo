@@ -261,23 +261,6 @@ export enum GethEvents {
   prompt_forno = 'prompt_forno',
 }
 
-export const AnalyticsEvents = {
-  ...AppEvents,
-  ...HomeEvents,
-  ...SettingsEvents,
-  ...OnboardingEvents,
-  ...VerificationEvents,
-  ...IdentityEvents,
-  ...InviteEvents,
-  ...EscrowEvents,
-  ...SendEvents,
-  ...RequestEvents,
-  ...FeeEvents,
-  ...TransactionEvents,
-  ...CeloExchangeEvents,
-  ...GethEvents,
-}
-
 export type AnalyticsEventType =
   | AppEvents
   | HomeEvents

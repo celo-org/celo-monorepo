@@ -9,7 +9,7 @@ import { ActivityIndicator, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { showError } from 'src/alert/actions'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { EscrowEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { reclaimEscrowPayment } from 'src/escrow/actions'
@@ -76,7 +76,7 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
 
   onConfirm = async () => {
     const escrowedPayment = this.getReclaimPaymentInput()
-    ValoraAnalytics.track(AnalyticsEvents.escrow_reclaim_confirm)
+    ValoraAnalytics.track(EscrowEvents.escrow_reclaim_confirm)
     const address = this.props.account
     if (!address) {
       throw new Error("Can't reclaim funds without a valid account")
@@ -92,7 +92,7 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
   }
 
   onPressCancel = () => {
-    ValoraAnalytics.track(AnalyticsEvents.escrow_reclaim_cancel)
+    ValoraAnalytics.track(EscrowEvents.escrow_reclaim_cancel)
     navigateBack()
   }
 

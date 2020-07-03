@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { IdentityEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import i18n, { Namespaces } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
@@ -85,7 +85,7 @@ function ImportContactsScreen({ route, navigation }: Props) {
   }
 
   const onPressConnect = async () => {
-    ValoraAnalytics.track(AnalyticsEvents.contacts_connect, {
+    ValoraAnalytics.track(IdentityEvents.contacts_connect, {
       matchMakingEnabled: isFindMeSwitchChecked,
     })
     await requestContactsPermission()

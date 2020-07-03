@@ -3,7 +3,7 @@ import { retryAsync } from '@celo/utils/src/async'
 import BigNumber from 'bignumber.js'
 import { call, put, take, takeEvery } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { AppEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -74,7 +74,7 @@ export function tokenFetchFactory({ actionName, token, actionCreator, tag }: Tok
       const balanceInWei: BigNumber = yield call([tokenContract, tokenContract.balanceOf], account)
       const balance: BigNumber = yield call(convertFromContractDecimals, balanceInWei, token)
       ValoraAnalytics.track(
-        AnalyticsEvents.fetch_balance,
+        AppEvents.fetch_balance,
         token === CURRENCY_ENUM.DOLLAR
           ? {
               dollarBalance: balance.toString(),

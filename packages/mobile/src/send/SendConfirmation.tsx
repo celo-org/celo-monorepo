@@ -11,7 +11,7 @@ import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
-import { AnalyticsEvents, SendEvents } from 'src/analytics/Events'
+import { FeeEvents, SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import BackButton from 'src/components/BackButton.v2'
@@ -294,7 +294,7 @@ export class SendConfirmation extends React.Component<Props, State> {
       // so we adjust it here
       const securityFee = isInvite && fee ? fee.minus(inviteFee) : fee
 
-      ValoraAnalytics.track(AnalyticsEvents.fee_rendered, {
+      ValoraAnalytics.track(FeeEvents.fee_rendered, {
         feeType: 'Security',
         fee: securityFee ? securityFee.toString() : securityFee,
       })
