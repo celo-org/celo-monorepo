@@ -8,9 +8,10 @@ import * as React from 'react'
 import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Swiper from 'react-native-swiper'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEventType } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { placeholder } from 'src/images/Images'
+import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { navigateBack } from 'src/navigator/NavigationService'
 import { TopBarIconButton } from 'src/navigator/TopBarButton.v2'
 
@@ -22,8 +23,8 @@ interface EducationStep {
   image: ImageSourcePropType | null
   title: string
   text: string
-  cancelEvent: CustomEventNames
-  progressEvent: CustomEventNames
+  cancelEvent: AnalyticsEventType
+  progressEvent: AnalyticsEventType
   screenName: string
 }
 
@@ -46,7 +47,7 @@ export default class Education extends React.Component<Props, State> {
   goBack = () => {
     const currentStepInfo = this.props.stepInfo[this.state.step]
     if (currentStepInfo.cancelEvent && currentStepInfo.screenName) {
-      CeloAnalytics.track(currentStepInfo.cancelEvent, {
+      ValoraAnalytics.track(currentStepInfo.cancelEvent, {
         screen: currentStepInfo.screenName,
       })
     }
@@ -64,7 +65,7 @@ export default class Education extends React.Component<Props, State> {
   nextStep = () => {
     const isLastStep = this.state.step === this.props.stepInfo.length - 1
     const currentStepInfo = this.props.stepInfo[this.state.step]
-    CeloAnalytics.track(currentStepInfo.progressEvent)
+    ValoraAnalytics.track(currentStepInfo.progressEvent)
 
     if (isLastStep) {
       this.props.onFinish()
@@ -80,15 +81,15 @@ export default class Education extends React.Component<Props, State> {
     const isLastStep = this.state.step === stepInfo.length - 1
     return (
       <SafeAreaView style={styles.root}>
-        <View style={styles.top} testID="Education/top">
-          {isClosable && (
+        {(isClosable && (
+          <View style={styles.top} testID="Education/top">
             <TopBarIconButton
               testID="Education/CloseIcon"
               onPress={this.goBack}
               icon={this.state.step === 0 ? <Times /> : <BackChevron color={colors.dark} />}
             />
-          )}
-        </View>
+          </View>
+        )) || <DrawerTopBar testID="DrawerTopBar" />}
         <View style={styles.container}>
           <Swiper
             ref={this.swiper}
@@ -123,12 +124,12 @@ export default class Education extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
+    backgroundColor: colors.background,
   },
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'white',
     paddingBottom: 24,
   },
   heading: {

@@ -16,7 +16,7 @@ import {
   GETH_CONFIG_OLD,
   ISTANBUL_MIX_HASH,
   REGISTRY_ADDRESS,
-  TEMPLATE,
+  TEMPLATE
 } from './genesis_constants'
 import { GenesisConfig } from './interfaces/genesis-config'
 import { ensure0x, strip0x } from './utils'
@@ -34,6 +34,7 @@ export enum AccountType {
   PROXY = 7,
   ATTESTATION_BOT = 8,
   VOTING_BOT = 9,
+  TX_NODE_PRIVATE = 10,
 }
 
 export enum ConsensusType {
@@ -63,6 +64,7 @@ export const MNEMONIC_ACCOUNT_TYPE_CHOICES = [
   'proxy',
   'attestation_bot',
   'voting_bot',
+  'tx_node_private',
 ]
 
 export const add0x = (str: string) => {

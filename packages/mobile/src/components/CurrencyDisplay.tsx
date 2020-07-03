@@ -6,6 +6,7 @@ import { StyleProp, StyleSheet, Text, TextStyle, View } from 'react-native'
 import { MoneyAmount } from 'src/apollo/types'
 import { useExchangeRate as useGoldToDollarRate } from 'src/exchange/hooks'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
+import i18n from 'src/i18n'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
 import {
@@ -46,6 +47,7 @@ interface Props {
   showLocalAmount?: boolean
   showExplicitPositiveSign: boolean // shows '+' for a positive amount when true (default is false)
   formatType: FormatType
+  hideFullCurrencyName: boolean
   style?: StyleProp<TextStyle>
 }
 
@@ -127,6 +129,7 @@ export default function CurrencyDisplay({
   showExplicitPositiveSign,
   amount,
   formatType,
+  hideFullCurrencyName,
   style,
 }: Props) {
   const localCurrencyCode = useLocalCurrencyCode()
@@ -208,6 +211,9 @@ export default function CurrencyDisplay({
       {!hideSymbol && currencySymbol}
       {formattedValue}
       {!hideCode && !!code && ` ${code}`}
+      {!hideFullCurrencyName &&
+        code === CURRENCIES[CURRENCY_ENUM.DOLLAR].code &&
+        ` ${i18n.t('global:celoDollars')}`}
     </Text>
   )
 }
@@ -221,6 +227,7 @@ CurrencyDisplay.defaultProps = {
   hideCode: true,
   showExplicitPositiveSign: false,
   formatType: FormatType.Default,
+  hideFullCurrencyName: true,
 }
 
 const styles = StyleSheet.create({

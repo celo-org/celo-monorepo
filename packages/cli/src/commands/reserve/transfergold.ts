@@ -9,7 +9,7 @@ export default class TransferGold extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    value: flags.string({ required: true, description: 'The unit amount of Celo Gold (cGLD)' }),
+    value: flags.string({ required: true, description: 'The unit amount of CELO' }),
     to: Flags.address({ required: true, description: 'Receiving address' }),
     from: Flags.address({ required: true, description: "Spender's address" }),
     useMultiSig: flags.boolean({

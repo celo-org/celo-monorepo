@@ -9,7 +9,7 @@
       "loadingStatus1": "Processing {{total}} contacts",
       "loadingStatus2": "Finding friends",
       "successHeader": "Completed",
-      "successWithMatches": "{{matches}} friends on Valora",
+      "successWithMatches": "{{matches}} friends on {{appName}}",
       "successWithoutMatches": "Syncing complete"
     }
   },
@@ -19,7 +19,8 @@
   "pincodeSet": {
     "create": "Create a PIN",
     "verify": "Enter PIN again",
-    "pinsDontMatch": "The PINs didn't match"
+    "pinsDontMatch": "The PINs didn't match",
+    "invalidPin": "Invalid PIN"
   },
   "inviteCode": {
     "title": "Invite Code",

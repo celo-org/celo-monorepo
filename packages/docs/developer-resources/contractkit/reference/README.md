@@ -9,7 +9,7 @@ ContractKit supports the following functionality:
 - Connect to a node
 - Access web3 object to interact with node's Json RPC API
 - Send Transaction with celo's extra fields: (feeCurrency)
-- Simple interface to interact with cGLD and cUSD
+- Simple interface to interact with CELO and cUSD
 - Simple interface to interact with Celo Core contracts
 - Utilities
 
@@ -59,9 +59,9 @@ async function getKit(myAddress: string) {
 }
 ```
 
-### Interacting with cGLD & cUSD
+### Interacting with CELO & cUSD
 
-celo-blockchain has two initial coins: cGLD and cUSD (stableToken).
+celo-blockchain has two initial coins: CELO and cUSD (stableToken).
 Both implement the ERC20 standard, and to interact with them is as simple as:
 
 ```ts
