@@ -1,3 +1,5 @@
+// TODO: TX feed + QR scanner
+
 export enum AppEvents {
   app_launched = 'app_launched',
   app_state_error = 'app_state_error',
@@ -29,9 +31,6 @@ export enum SettingsEvents {
   // intentially not tracking analytics opt in/out
   // to avoid tracking through omission
 }
-
-// TODO: TX feed interactions
-// TODO: QR scanner
 
 export enum OnboardingEvents {
   backup_education_start = 'backup_education_start',
@@ -172,28 +171,29 @@ export enum EscrowEvents {
 }
 
 export enum SendEvents {
-  send_cancel = 'send_cancel', // when cancel is clicked after launching send flow
   send_scan = 'send_scan', // when scan QR icon is selected from the send screen
   send_select_recipient = 'send_select_recipient', // when recipient was selected
+  send_cancel = 'send_cancel', // when user x's out of Send screen
   send_amount_back = 'send_amount_back', // back button pressed on amount screen
-  send_continue = 'send_continue', // when next button pressed on amount enter page
+  send_amount_continue = 'send_amount_continue', // when next button pressed on amount enter page
   send_confirm_back = 'send_confirm_back', // when back button pressed on send confirmation screen
-  send_confirm = 'send_confirm', // when send button pressed on send confirmation screen
-  send_complete = 'send_complete', // when a send or invite transaction has successfully completed
+  send_confim_send = 'send_confim_send', // when send button pressed on send confirmation screen
 
   send_secure_start = 'send_secure_start', // when either secure send scan or manual confirm button pressed
-  send_secure_cancel = 'send_secure_cancel', // when secure send flow is canceled
   send_secure_back = 'send_secure_back', // when back button is pressed during secure send
-  send_secure_submit = 'send_secure_submit', // when an account is submitted for validation
-  send_secure_success = 'send_secure_success', // when an account has been validated
-  send_secure_incorrect = 'send_secure_incorrect', // when there's been an error validating the account
+  send_secure_cancel = 'send_secure_cancel', // when secure send flow is canceled
+
   send_secure_info = 'send_secure_info', // when "help" button is pressed
   send_secure_info_dismissed = 'send_secure_info_dismissed', // when "help" button is dismissed
+  send_secure_submit = 'send_secure_submit', // when an account is submitted for validation
+  send_secure_incorrect = 'send_secure_incorrect', // when there's been an error validating the account
+  send_secure_complete = 'send_secure_complete', // when an account has been validated
+
   send_secure_edit = 'send_secure_edit', // when "edit" address button is pressed to manually initate secure send flow
 
-  send_error = 'send_error', // when there is an error sending a transaction
-  send_dollar_transaction = 'send_dollar_transaction',
-  send_dollar_transaction_confirmed = 'send_dollar_transaction_confirmed',
+  send_tx_start = 'send_tx_start',
+  send_tx_complete = 'send_tx_complete', // when a send or invite transaction has successfully completed
+  send_tx_error = 'send_tx_error', // when there is an error sending a transaction
 }
 
 export enum RequestEvents {

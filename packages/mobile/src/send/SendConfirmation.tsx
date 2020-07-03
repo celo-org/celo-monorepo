@@ -11,7 +11,7 @@ import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { AnalyticsEvents, SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import BackButton from 'src/components/BackButton.v2'
@@ -124,7 +124,7 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
 
 export const sendConfirmationScreenNavOptions = () => ({
   ...emptyHeader,
-  headerLeft: () => <BackButton eventName={AnalyticsEvents.send_confirm_back} />,
+  headerLeft: () => <BackButton eventName={SendEvents.send_confirm_back} />,
 })
 
 export class SendConfirmation extends React.Component<Props, State> {
@@ -167,13 +167,14 @@ export class SendConfirmation extends React.Component<Props, State> {
       this.props.localCurrencyExchangeRate
     )
 
-    ValoraAnalytics.track(AnalyticsEvents.send_confirm, {
+    ValoraAnalytics.track(SendEvents.send_confim_send, {
       isScan: !!this.props.route.params?.isFromScan,
       isInvite: !recipientAddress,
       localCurrencyExchangeRate: this.props.localCurrencyExchangeRate,
       localCurrency: this.props.localCurrencyCode,
       dollarAmount: amount.toString(),
       localCurrencyAmount: localCurrencyAmount ? localCurrencyAmount.toString() : null,
+      commentLength: this.state.comment.length,
     })
 
     this.props.sendPaymentOrInvite(
@@ -189,7 +190,7 @@ export class SendConfirmation extends React.Component<Props, State> {
 
   onEditAddressClick = () => {
     const { transactionData, addressValidationType } = this.props
-    ValoraAnalytics.track(AnalyticsEvents.send_secure_edit)
+    ValoraAnalytics.track(SendEvents.send_secure_edit)
     navigate(Screens.ValidateRecipientIntro, {
       transactionData,
       addressValidationType,

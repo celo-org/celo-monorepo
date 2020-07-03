@@ -10,7 +10,7 @@ import { WithTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { RequestEvents, SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { estimateFee, FeeType } from 'src/fees/actions'
@@ -111,18 +111,14 @@ export const sendScreenNavOptions = ({
       <TopBarIconButton
         icon={<Times />}
         onPress={navigateBack}
-        eventName={
-          route.params?.isRequest ? AnalyticsEvents.send_cancel : AnalyticsEvents.request_cancel
-        }
+        eventName={route.params?.isRequest ? RequestEvents.request_cancel : SendEvents.send_cancel}
       />
     ),
     headerLeftContainerStyle: styles.headerLeftContainer,
     headerRight: () => (
       <TopBarIconButton
         icon={<QRCodeBorderlessIcon height={32} color={colors.greenUI} />}
-        eventName={
-          route.params?.isRequest ? AnalyticsEvents.send_scan : AnalyticsEvents.request_scan
-        }
+        eventName={route.params?.isRequest ? RequestEvents.request_scan : SendEvents.send_scan}
         onPress={goQr}
       />
     ),
@@ -229,7 +225,7 @@ class Send extends React.Component<Props, State> {
     this.props.storeLatestInRecents(recipient)
 
     ValoraAnalytics.track(
-      isRequest ? AnalyticsEvents.request_select_recipient : AnalyticsEvents.send_select_recipient,
+      isRequest ? RequestEvents.request_select_recipient : SendEvents.send_select_recipient,
       {
         recipientKind: recipient.kind,
         usedSearchBar: this.state.searchQuery.length > 0,

@@ -55,7 +55,7 @@ export function* validateRecipientAddressSaga({
       addressValidationType
     )
 
-    ValoraAnalytics.track(AnalyticsEvents.send_secure_success, {
+    ValoraAnalytics.track(AnalyticsEvents.send_secure_complete, {
       confirmByScan: false,
       partialAddressValidation: addressValidationType === AddressValidationType.PARTIAL,
     })

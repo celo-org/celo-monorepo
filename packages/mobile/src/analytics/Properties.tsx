@@ -307,14 +307,14 @@ interface EscrowEventsProperties {
 }
 
 interface SendEventsProperties {
-  [SendEvents.send_cancel]: undefined
   [SendEvents.send_scan]: undefined
   [SendEvents.send_select_recipient]: {
     recipientKind: RecipientKind
     usedSearchBar: boolean
   }
+  [SendEvents.send_cancel]: undefined
   [SendEvents.send_amount_back]: undefined
-  [SendEvents.send_continue]: {
+  [SendEvents.send_amount_continue]: {
     isScan: boolean
     isInvite: boolean
     localCurrencyExchangeRate?: string | null
@@ -323,34 +323,26 @@ interface SendEventsProperties {
     localCurrencyAmount: string | null
   }
   [SendEvents.send_confirm_back]: undefined
-  [SendEvents.send_confirm]: {
+  [SendEvents.send_confim_send]: {
     isScan: boolean
     isInvite: boolean
     localCurrencyExchangeRate?: string | null
     localCurrency: LocalCurrencyCode
     dollarAmount: string | null
     localCurrencyAmount: string | null
+    commentLength: number
   }
-  [SendEvents.send_error]: {
-    isInvite: boolean
-    error: string
-  }
-  [SendEvents.send_complete]: {
-    isInvite: boolean
-  }
-  [SendEvents.send_dollar_transaction]: undefined
-  [SendEvents.send_dollar_transaction_confirmed]: undefined
 
   [SendEvents.send_secure_start]: {
     confirmByScan: boolean
   }
-  [SendEvents.send_secure_cancel]: undefined
   [SendEvents.send_secure_back]: undefined
+  [SendEvents.send_secure_cancel]: undefined
   [SendEvents.send_secure_submit]: {
     partialAddressValidation: boolean
     address: string
   }
-  [SendEvents.send_secure_success]: {
+  [SendEvents.send_secure_complete]: {
     confirmByScan: boolean
     partialAddressValidation?: boolean
   }
@@ -366,6 +358,12 @@ interface SendEventsProperties {
     partialAddressValidation: boolean
   }
   [SendEvents.send_secure_edit]: undefined
+
+  [SendEvents.send_tx_start]: undefined
+  [SendEvents.send_tx_complete]: undefined
+  [SendEvents.send_tx_error]: {
+    error: string
+  }
 }
 
 interface RequestEventsProperties {

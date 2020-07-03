@@ -80,7 +80,7 @@ function* handleSecureSend(
     return false
   }
 
-  ValoraAnalytics.track(AnalyticsEvents.send_secure_success, { confirmByScan: true })
+  ValoraAnalytics.track(AnalyticsEvents.send_secure_complete, { confirmByScan: true })
   yield put(validateRecipientAddressSuccess(e164PhoneNumber, userScannedAddress))
   return true
 }
