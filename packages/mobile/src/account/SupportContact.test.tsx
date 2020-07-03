@@ -35,7 +35,7 @@ describe('Contact', () => {
           isHTML: true,
           body:
             '<br/><br/><b>{"version":"appVersion","address":"0x0000000000000000000000000000000000007e57","network":"integration"}</b><br/><br/><b>Support logs are attached...</b>',
-          recipients: ['support@valoraapp.com'],
+          recipients: ['support@celo.org'],
           subject: 'Celo support for +1415555XXXX',
           attachment: {
             path: combinedLogsPath,
