@@ -47,6 +47,7 @@ const TAG = 'identity/verification'
 
 export const NUM_ATTESTATIONS_REQUIRED = 3
 export const VERIFICATION_TIMEOUT = 10 * 60 * 1000 // 10 minutes
+const REVEAL_RETRY_DELAY = 10 * 1000 // 10 seconds
 
 export enum CodeInputType {
   AUTOMATIC = 'automatic',
@@ -535,9 +536,9 @@ function* tryRevealPhoneNumber(
       // Retry as attestation service might not yet have received the block where it was made responsible for an attestation
       Logger.debug(TAG + '@tryRevealPhoneNumber', `Retrying revealing for issuer: ${issuer}`)
 
-      yield delay(5000)
+      yield delay(REVEAL_RETRY_DELAY)
 
-      const { ok: retryOk } = yield call(
+      const { ok: retryOk, status: retryStatus } = yield call(
         postToAttestationService,
         attestationsWrapper,
         attestation.attestationServiceURL,
@@ -554,6 +555,11 @@ function* tryRevealPhoneNumber(
         })
         return
       }
+
+      Logger.error(
+        `${TAG}@tryRevealPhoneNumber`,
+        `Reveal retry for issuer ${issuer} failed with status ${retryStatus}`
+      )
     }
 
     Logger.error(TAG + '@tryRevealPhoneNumber', `Reveal response not okay. Status code: ${status}`)
