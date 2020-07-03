@@ -1,7 +1,6 @@
-import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { Image, StyleSheet } from 'react-native'
+import { Image } from 'react-native'
 import { AnalyticsEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { EscrowedPayment } from 'src/escrow/actions'
@@ -47,20 +46,6 @@ export class EscrowedPaymentReminderSummaryNotification extends React.Component<
     )
   }
 }
-
-const styles = StyleSheet.create({
-  body: {
-    marginTop: 5,
-    flexDirection: 'row',
-  },
-  requests: {
-    flex: 1,
-  },
-  counter: {
-    paddingLeft: variables.contentPadding,
-    justifyContent: 'flex-end',
-  },
-})
 
 export default withTranslation<Props>(Namespaces.walletFlow5)(
   EscrowedPaymentReminderSummaryNotification
