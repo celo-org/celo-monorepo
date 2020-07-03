@@ -1,5 +1,4 @@
 // TODO: TX feed + QR scanner + Geth + more detailed transaction logs
-// We should probably attach tx hashs somewhere
 
 export enum AppEvents {
   app_launched = 'app_launched',

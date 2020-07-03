@@ -99,6 +99,10 @@ class ValoraAnalytics {
     })
   }
 
+  getSessionId() {
+    return this.sessionId
+  }
+
   setUserAddress(address?: string | null) {
     if (address) {
       this.userAddress = address
