@@ -68,11 +68,19 @@ interface HomeEventsProperties {
 }
 
 interface SettingsEventsProperties {
-  [SettingsEvents.edit_profile]: undefined
-  [SettingsEvents.edit_name]: undefined
+  [SettingsEvents.settings_profile_edit]: undefined
+  [SettingsEvents.settings_profile_name_edit]: undefined
   [SettingsEvents.language_select]: {
     language: string
   }
+  [SettingsEvents.pin_require_on_load]: {
+    enabled: boolean
+  }
+  [SettingsEvents.forno_toggle]: {
+    enabled: boolean
+  }
+  [SettingsEvents.licenses_view]: undefined
+  [SettingsEvents.tos_view]: undefined
 }
 
 interface OnboardingEventsProperties {

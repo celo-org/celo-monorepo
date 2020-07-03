@@ -19,14 +19,15 @@ export enum HomeEvents {
 }
 
 export enum SettingsEvents {
-  edit_profile = 'edit_profile', // to count the # of taps on the edit profile button in Account_Home
-  edit_name = 'edit_name', // to count the # of taps on the “Edit Name” nav element in Account_Edit
+  settings_profile_edit = 'settings_profile_edit',
+  settings_profile_name_edit = 'settings_profile_name_edit',
   language_select = 'language_select',
-
-  // require pin on app open
-  // enable data saver
-  // licenses
-  // ToS
+  pin_require_on_load = 'pin_require_on_load',
+  forno_toggle = 'forno_toggle',
+  licenses_view = 'licenses_view',
+  tos_view = 'tos_view',
+  // intentially not tracking analytics opt in/out
+  // to avoid tracking through omission
 }
 
 // TODO: TX feed interactions

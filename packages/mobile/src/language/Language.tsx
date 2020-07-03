@@ -35,7 +35,6 @@ function LanguageScreen({ route }: Props) {
   const fromSettings = route.params?.fromSettings
 
   const onSelect = (language: string, code: string) => {
-    ValoraAnalytics.track(SettingsEvents.language_select, { language: code })
     dispatch(setLanguage(code))
     // Wait for next frame before navigating back
     // so the user can see the changed selection briefly
@@ -46,6 +45,8 @@ function LanguageScreen({ route }: Props) {
         navigate(Screens.JoinCelo)
       }
     })
+
+    ValoraAnalytics.track(SettingsEvents.language_select, { language: code })
   }
 
   const renderItem = ({ item: language }: ListRenderItemInfo<Language>) => {

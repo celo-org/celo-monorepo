@@ -43,7 +43,7 @@ export class EditProfile extends React.Component<Props, State> {
 
   nameSubmitted = () => {
     this.props.setName(this.state.name)
-    ValoraAnalytics.track(SettingsEvents.edit_name)
+    ValoraAnalytics.track(SettingsEvents.settings_profile_name_edit)
   }
 
   render() {

@@ -101,7 +101,7 @@ interface State {
 
 export class Account extends React.Component<Props, State> {
   goToProfile = () => {
-    ValoraAnalytics.track(SettingsEvents.edit_profile)
+    ValoraAnalytics.track(SettingsEvents.settings_profile_edit)
     this.props.navigation.navigate(Screens.Profile)
   }
 
@@ -115,6 +115,7 @@ export class Account extends React.Component<Props, State> {
 
   goToLicenses = () => {
     this.props.navigation.navigate(Screens.Licenses)
+    ValoraAnalytics.track(SettingsEvents.licenses_view)
   }
 
   goToSupport = () => {
@@ -193,6 +194,13 @@ export class Account extends React.Component<Props, State> {
     }
   }
 
+  handleRequirePinToggle = (value: boolean) => {
+    this.props.setRequirePinOnAppOpen(value)
+    ValoraAnalytics.track(SettingsEvents.pin_require_on_load, {
+      enabled: value,
+    })
+  }
+
   disableFornoMode = () => {
     this.props.toggleFornoMode(false)
     this.hideFornoSwitchOffWarning()
@@ -227,6 +235,7 @@ export class Account extends React.Component<Props, State> {
 
   onTermsPress() {
     navigateToURI(TOS_LINK)
+    ValoraAnalytics.track(SettingsEvents.tos_view)
   }
 
   render() {
@@ -256,7 +265,7 @@ export class Account extends React.Component<Props, State> {
             <SettingsItemSwitch
               title={t('requirePinOnAppOpen')}
               value={this.props.requirePinOnAppOpen}
-              onValueChange={this.props.setRequirePinOnAppOpen}
+              onValueChange={this.handleRequirePinToggle}
             />
             <SettingsItemSwitch
               title={t('enableDataSaver')}

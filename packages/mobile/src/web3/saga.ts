@@ -8,7 +8,7 @@ import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-s
 import { setAccountCreationTime, setPromptForno } from 'src/account/actions'
 import { promptFornoIfNeededSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { AnalyticsEvents, SettingsEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
@@ -299,6 +299,7 @@ export function* toggleFornoMode(action: SetIsFornoAction) {
       yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
     }
     yield put(setContractKitReady(true))
+    ValoraAnalytics.track(SettingsEvents.forno_toggle, { enabled: action.fornoMode })
   } else {
     Logger.debug(TAG + '@toggleFornoMode', ` already in desired state: ${action.fornoMode}`)
   }
