@@ -424,7 +424,7 @@ $ adb kill-server && adb start-server
 [detox]: https://github.com/wix/Detox
 [e2e readme]: ./e2e/README.md
 [graphql code generator]: https://github.com/dotansimha/graphql-code-generator
-[light node]: https://github.com/ethereum/wiki/wiki/Light-client-protocol
+[light node]: https://eth.wiki/en/concepts/light-client-protocol
 [protocol readme]: ../protocol/README.md
 [react native]: https://facebook.github.io/react-native/
 [rn debugger]: https://github.com/jhen0409/react-native-debugger
