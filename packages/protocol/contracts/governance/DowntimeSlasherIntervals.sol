@@ -107,7 +107,7 @@ contract DowntimeSlasherIntervals is SlasherUtil {
     bytes32 bitmap = getBitmapForInterval(startBlock, endBlock);
     bitmaps[msg.sender][startBlock][endBlock] = bitmap;
 
-    emit BitmapSetForInterval(msg.sender, startBlock, endBlock, bitmap);
+    emit BitmapSetForInterval(startBlock, endBlock, bitmap);
 
     return bitmap;
   }
