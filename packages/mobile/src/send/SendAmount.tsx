@@ -262,7 +262,7 @@ function SendAmount(props: Props) {
       ValoraAnalytics.track(RequestEvents.request_unavailable, continueAnalyticsParams)
       navigate(Screens.PaymentRequestUnavailable, { transactionData })
     } else {
-      ValoraAnalytics.track(RequestEvents.request_continue, continueAnalyticsParams)
+      ValoraAnalytics.track(RequestEvents.request_amount_continue, continueAnalyticsParams)
       navigate(Screens.PaymentRequestConfirmation, { transactionData })
     }
   }, [addressValidationType, getTransactionData])

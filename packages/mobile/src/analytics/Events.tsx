@@ -1,4 +1,5 @@
 // TODO: TX feed + QR scanner + Geth + more detailed transaction logs
+// We should probably attach tx hashs somewhere
 
 export enum AppEvents {
   app_launched = 'app_launched',
@@ -197,14 +198,14 @@ export enum SendEvents {
 }
 
 export enum RequestEvents {
-  request_amount_back = 'request_amount_back', // back button pressed on amount screen
-  request_cancel = 'request_cancel', // when cancel is clicked after launching request flow
   request_scan = 'request_scan', // when scan QR icon is selected from the request screen
   request_select_recipient = 'request_select_recipient', // when recipient was selected
-  request_continue = 'request_continue', // when next button pressed on amount enter page
-  request_unavailable = 'request_unavailable', // when request attempted to unverified user
+  request_cancel = 'request_cancel', // when cancel is clicked after launching request flow
+  request_amount_back = 'request_amount_back', // back button pressed on amount screen
+  request_amount_continue = 'request_amount_continue', // when next button pressed on amount enter page
+  request_unavailable = 'request_unavailable', // when request sender is unverified
   request_confirm_back = 'request_confirm_back', // when back button pressed on request confirmation screen
-  request_confirm = 'request_confirm', // when request button pressed on request confirmation screen
+  request_confirm_request = 'request_confirm_request', // when request button pressed on request confirmation screen
   request_error = 'request_error', // when there is an error requesting a transaction
 }
 

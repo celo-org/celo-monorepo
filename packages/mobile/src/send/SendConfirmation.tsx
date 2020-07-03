@@ -154,6 +154,7 @@ export class SendConfirmation extends React.Component<Props, State> {
 
   sendOrInvite = (inviteMethod?: InviteBy) => {
     const {
+      type,
       amount,
       recipient,
       recipientAddress,
@@ -170,6 +171,7 @@ export class SendConfirmation extends React.Component<Props, State> {
     ValoraAnalytics.track(SendEvents.send_confim_send, {
       isScan: !!this.props.route.params?.isFromScan,
       isInvite: !recipientAddress,
+      isRequest: type === TokenTransactionType.PayRequest,
       localCurrencyExchangeRate: this.props.localCurrencyExchangeRate,
       localCurrency: this.props.localCurrencyCode,
       dollarAmount: amount.toString(),

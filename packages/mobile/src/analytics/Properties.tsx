@@ -325,6 +325,7 @@ interface SendEventsProperties {
   [SendEvents.send_confim_send]: {
     isScan: boolean
     isInvite: boolean
+    isRequest: boolean
     localCurrencyExchangeRate?: string | null
     localCurrency: LocalCurrencyCode
     dollarAmount: string | null
@@ -373,7 +374,7 @@ interface RequestEventsProperties {
     recipientKind: RecipientKind
     usedSearchBar: boolean
   }
-  [RequestEvents.request_continue]: {
+  [RequestEvents.request_amount_continue]: {
     isScan: boolean
     isInvite: boolean
     localCurrencyExchangeRate?: string | null
@@ -390,7 +391,7 @@ interface RequestEventsProperties {
     localCurrencyAmount: string | null
   }
   [RequestEvents.request_confirm_back]: undefined
-  [RequestEvents.request_confirm]: {
+  [RequestEvents.request_confirm_request]: {
     requesteeAddress: string
   }
   [RequestEvents.request_error]: {
