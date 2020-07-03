@@ -120,7 +120,6 @@ export enum VerificationEvents {
   // Events for an individual attestation reveal
   verification_reveal_attestation_start = 'verification_reveal_attestation_start',
   verification_reveal_attestation_revealed = 'verification_reveal_attestation_revealed',
-  verification_reveal_attestation_retry = 'verification_reveal_attestation_retry',
   verification_reveal_attestation_await_code_start = 'verification_reveal_attestation_await_code_start',
   verification_reveal_attestation_await_code_complete = 'verification_reveal_attestation_await_code_complete',
   verification_reveal_attestation_complete = 'verification_reveal_attestation_complete',

@@ -533,7 +533,7 @@ function* tryRevealPhoneNumber(
     if (ok) {
       Logger.debug(TAG + '@tryRevealPhoneNumber', `Revealing for issuer ${issuer} successful`)
       ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_revealed, {
-        retryRequired: false,
+        neededRetry: false,
         issuer,
       })
       return
@@ -556,7 +556,7 @@ function* tryRevealPhoneNumber(
       if (retryOk) {
         Logger.debug(`${TAG}@tryRevealPhoneNumber`, `Reveal retry for issuer ${issuer} successful`)
         ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_revealed, {
-          retryRequired: true,
+          neededRetry: true,
           issuer,
         })
         return
