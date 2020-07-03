@@ -12,6 +12,7 @@ export function initializeDB() {
       logging: (msg: string, sequelizeLogArgs: any) =>
         rootLogger.debug({ sequelizeLogArgs, component: 'sequelize' }, msg),
     })
+    rootLogger.info('Initializing Database')
     return sequelize.authenticate() as Promise<void>
   }
   return Promise.resolve()

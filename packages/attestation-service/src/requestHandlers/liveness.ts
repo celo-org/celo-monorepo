@@ -21,5 +21,4 @@ export async function handleLivenessRequest(_req: express.Request, res: express.
     console.error(error)
     respondWithError(res, 500, ErrorMessages.UNKNOWN_ERROR)
   }
-  return
 }
