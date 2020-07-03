@@ -154,7 +154,7 @@ export class NotificationBox extends React.Component<Props, State> {
         icon: <BackupKeyIcon height={40} width={40} />,
         callToActions: [
           {
-            text: t('backupKeyFlow6:getBackupKey'),
+            text: t('backupKeyFlow6:introPrimaryAction'),
             onPress: () => {
               ValoraAnalytics.track(HomeEvents.notification_select, {
                 notificationType: NotificationBannerTypes.backup_prompt,
@@ -184,7 +184,7 @@ export class NotificationBox extends React.Component<Props, State> {
             },
           },
           {
-            text: t('maybeLater'),
+            text: t('global:remind'),
             onPress: () => {
               ValoraAnalytics.track(HomeEvents.notification_select, {
                 notificationType: NotificationBannerTypes.verification_prompt,
@@ -235,7 +235,7 @@ export class NotificationBox extends React.Component<Props, State> {
         icon: homeIcon,
         callToActions: [
           {
-            text: t('exchange'),
+            text: t('learnMore'),
             onPress: () => {
               ValoraAnalytics.track(HomeEvents.notification_select, {
                 notificationType: NotificationBannerTypes.celo_asset_education,
@@ -245,7 +245,7 @@ export class NotificationBox extends React.Component<Props, State> {
             },
           },
           {
-            text: t('maybeLater'),
+            text: t('global:dismiss'),
             onPress: () => {
               ValoraAnalytics.track(HomeEvents.notification_select, {
                 notificationType: NotificationBannerTypes.celo_asset_education,
@@ -264,7 +264,7 @@ export class NotificationBox extends React.Component<Props, State> {
         icon: inviteFriendsIcon,
         callToActions: [
           {
-            text: t('global:inviteFriends'),
+            text: t('global:connect'),
             onPress: () => {
               this.props.dismissInviteFriends()
               ValoraAnalytics.track(HomeEvents.notification_select, {
@@ -275,7 +275,7 @@ export class NotificationBox extends React.Component<Props, State> {
             },
           },
           {
-            text: t('maybeLater'),
+            text: t('global:remind'),
             onPress: () => {
               this.props.dismissInviteFriends()
               ValoraAnalytics.track(HomeEvents.notification_select, {

@@ -2,6 +2,7 @@ import { CeloTransactionObject } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import {
   ActionableAttestation,
+  AttesationServiceRevealRequest,
   AttestationsWrapper,
   UnselectedRequest,
 } from '@celo/contractkit/lib/wrappers/Attestations'
@@ -10,6 +11,7 @@ import { retryAsync } from '@celo/utils/src/async'
 import { AttestationsStatus, extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
 import { compressedPubKey } from '@celo/utils/src/commentEncryption'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
+import functions from '@react-native-firebase/functions'
 import { Platform } from 'react-native'
 import { Task } from 'redux-saga'
 import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'
@@ -20,7 +22,7 @@ import { VerificationEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { SMS_RETRIEVER_APP_SIGNATURE, USE_PHONE_NUMBER_PRIVACY } from 'src/config'
+import { DEFAULT_TESTNET, SMS_RETRIEVER_APP_SIGNATURE, USE_PHONE_NUMBER_PRIVACY } from 'src/config'
 import { refreshAllBalances } from 'src/home/actions'
 import {
   Actions,
@@ -505,32 +507,66 @@ function* tryRevealPhoneNumber(
   Logger.debug(TAG + '@tryRevealPhoneNumber', `Revealing an attestation for issuer: ${issuer}`)
 
   try {
-    const smsAppSig =
+    const smsRetrieverAppSig =
       Platform.OS === 'android' && USE_PHONE_NUMBER_PRIVACY
         ? SMS_RETRIEVER_APP_SIGNATURE
         : undefined
 
-    const response = yield call(
-      [attestationsWrapper, attestationsWrapper.revealPhoneNumberToIssuer],
-      phoneHashDetails.e164Number,
+    const useProxy = DEFAULT_TESTNET === 'mainnet' // Proxy required for any network where attestation service domains are not static
+
+    const revealRequestBody: AttesationServiceRevealRequest = {
       account,
-      attestation.issuer,
-      attestation.attestationServiceURL,
-      phoneHashDetails.salt,
-      smsAppSig
-    )
-    if (!response.ok) {
-      const body = yield response.json()
-      Logger.error(TAG + '@tryRevealPhoneNumber', `Reveal response not okay: ${body.error}`)
-      throw new Error(
-        `Error revealing to issuer ${attestation.attestationServiceURL}. Status code: ${response.status}`
-      )
+      issuer,
+      phoneNumber: phoneHashDetails.e164Number,
+      salt: phoneHashDetails.salt,
+      smsRetrieverAppSig,
     }
 
-    Logger.debug(TAG + '@tryRevealPhoneNumber', `Revealing for issuer ${issuer} successful`)
-    ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_revealed, {
-      issuer,
-    })
+    const { ok, status, body } = yield call(
+      postToAttestationService,
+      attestationsWrapper,
+      attestation.attestationServiceURL,
+      revealRequestBody,
+      useProxy
+    )
+
+    if (ok) {
+      Logger.debug(TAG + '@tryRevealPhoneNumber', `Revealing for issuer ${issuer} successful`)
+      ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_revealed, {
+        retryRequired: false,
+        issuer,
+      })
+      return
+    }
+
+    if (body.error && body.error.includes('No incomplete attestation found')) {
+      // Retry as attestation service might not yet have received the block where it was made responsible for an attestation
+      Logger.debug(TAG + '@tryRevealPhoneNumber', `Retrying revealing for issuer: ${issuer}`)
+
+      yield delay(5000)
+
+      const { ok: retryOk } = yield call(
+        postToAttestationService,
+        attestationsWrapper,
+        attestation.attestationServiceURL,
+        revealRequestBody,
+        useProxy
+      )
+
+      if (retryOk) {
+        Logger.debug(`${TAG}@tryRevealPhoneNumber`, `Reveal retry for issuer ${issuer} successful`)
+        ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_revealed, {
+          retryRequired: true,
+          issuer,
+        })
+        return
+      }
+    }
+
+    Logger.error(TAG + '@tryRevealPhoneNumber', `Reveal response not okay. Status code: ${status}`)
+    throw new Error(
+      `Error revealing to issuer ${attestation.attestationServiceURL}. Status code: ${status}`
+    )
   } catch (error) {
     // This is considered a recoverable error because the user may have received the code in a previous run
     // So instead of propagating the error, we catch it just update status. This will trigger the modal,
@@ -542,6 +578,52 @@ function* tryRevealPhoneNumber(
     })
     yield put(showError(ErrorMessages.REVEAL_ATTESTATION_FAILURE))
     yield put(setVerificationStatus(VerificationStatus.RevealAttemptFailed))
+  }
+}
+
+async function postToAttestationService(
+  attestationsWrapper: AttestationsWrapper,
+  attestationServiceUrl: string,
+  revealRequestBody: AttesationServiceRevealRequest,
+  useProxy: boolean
+): Promise<{ ok: boolean; status: number; body: any }> {
+  if (useProxy) {
+    Logger.debug(
+      `${TAG}@postToAttestationService`,
+      `Posting to proxy for service url ${attestationServiceUrl}`
+    )
+    const fullUrl = attestationServiceUrl + '/attestations'
+    const body = {
+      ...revealRequestBody,
+      attestationServiceUrl: fullUrl,
+    }
+    try {
+      const proxyReveal = functions().httpsCallable('proxyReveal')
+      const response = await proxyReveal(body)
+      const { status, data } = response.data
+      const ok = status >= 200 && status < 300
+      return { ok, status, body: JSON.parse(data) }
+    } catch (error) {
+      Logger.error(`${TAG}@postToAttestationService`, 'Error calling proxyReveal', error)
+      // The httpsCallable throws on any HTTP error code instead of
+      // setting response.ok like fetch does, so catching errors here
+      return { ok: false, status: 500, body: error }
+    }
+  } else {
+    Logger.debug(
+      `${TAG}@postToAttestationService`,
+      `Revealing with contract kit for service url ${attestationServiceUrl}`
+    )
+    const response = await attestationsWrapper.revealPhoneNumberToIssuer(
+      revealRequestBody.phoneNumber,
+      revealRequestBody.account,
+      revealRequestBody.issuer,
+      attestationServiceUrl,
+      revealRequestBody.salt,
+      revealRequestBody.smsRetrieverAppSig
+    )
+    const body = await response.json()
+    return { ok: response.ok, status: response.status, body }
   }
 }
 

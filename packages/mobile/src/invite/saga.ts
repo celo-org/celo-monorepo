@@ -46,12 +46,7 @@ import { sendTransaction } from 'src/transactions/send'
 import { getAppStoreId } from 'src/utils/appstore'
 import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
-import {
-  getConnectedWallet,
-  getContractKit,
-  getContractKitAsync,
-  web3ForUtils,
-} from 'src/web3/contracts'
+import { getConnectedWallet, getContractKit, getContractKitAsync } from 'src/web3/contracts'
 import { getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 
 const TAG = 'invite/saga'
@@ -97,7 +92,7 @@ export function getInvitationVerificationFeeInDollars() {
 }
 
 export function getInvitationVerificationFeeInWei() {
-  return new BigNumber(web3ForUtils.utils.toWei(INVITE_FEE))
+  return new BigNumber(INVITE_FEE).multipliedBy(1e18)
 }
 
 export async function generateInviteLink(inviteCode: string) {

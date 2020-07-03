@@ -219,6 +219,7 @@ interface VerificationEventsProperties {
   [VerificationEvents.verification_reveal_all_attestations_start]: undefined
   [VerificationEvents.verification_reveal_attestation_revealed]: {
     issuer: any
+    retryRequired: boolean
   }
   [VerificationEvents.verification_reveal_attestation_await_code_start]: {
     issuer: any

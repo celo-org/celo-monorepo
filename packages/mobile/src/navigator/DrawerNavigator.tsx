@@ -2,6 +2,7 @@ import ContactCircle from '@celo/react-components/components/ContactCircle'
 import PhoneNumberWithFlag from '@celo/react-components/components/PhoneNumberWithFlag'
 import colorsV2 from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
+import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
 import {
   createDrawerNavigator,
   DrawerContentComponentProps,
@@ -19,7 +20,6 @@ import {
   DrawerNavigationState,
   useLinkBuilder,
 } from '@react-navigation/native'
-import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
@@ -42,6 +42,7 @@ import { setSessionId } from 'src/app/actions'
 import { sessionIdSelector } from 'src/app/selectors'
 import BackupIntroduction from 'src/backup/BackupIntroduction'
 import AccountNumber from 'src/components/AccountNumber'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import SessionId from 'src/components/SessionId'
 import ExchangeHomeScreen from 'src/exchange/ExchangeHomeScreen'
 import WalletHome from 'src/home/WalletHome'
@@ -52,7 +53,6 @@ import { Gold } from 'src/icons/navigator/Gold'
 import { Help } from 'src/icons/navigator/Help'
 import { Home } from 'src/icons/navigator/Home'
 import { Settings } from 'src/icons/navigator/Settings'
-import { useDollarsToLocalAmount, useLocalCurrencySymbol } from 'src/localCurrency/hooks'
 import { ensurePincode } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import useSelector from 'src/redux/useSelector'
@@ -128,11 +128,11 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
   const e164PhoneNumber = useSelector(e164NumberSelector)
   const contactDetails = useSelector(userContactDetailsSelector)
   const defaultCountryCode = useSelector(defaultCountryCodeSelector)
-  const balance = useSelector(stableTokenBalanceSelector)
-  const bigNumBalance = balance ? new BigNumber(balance) : undefined
-  const localBalance = useDollarsToLocalAmount(balance)
-  const symbol = useLocalCurrencySymbol()
-  const { t } = useTranslation(Namespaces.global)
+  const dollarBalance = useSelector(stableTokenBalanceSelector)
+  const dollarAmount = {
+    value: dollarBalance ?? '0',
+    currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+  }
   const account = useSelector(currentAccountSelector)
   const appVersion = deviceInfoModule.getVersion()
   const storedSessionId = useSelector(sessionIdSelector)
@@ -156,10 +156,18 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
           />
         )}
         <View style={styles.border} />
-        <Text style={fontStyles.regular500}>{`${symbol} ${localBalance?.toFixed(2)}`}</Text>
-        <Text style={[styles.smallLabel, styles.dollarsLabel]}>{`${bigNumBalance?.toFixed(2)} ${t(
-          'celoDollars'
-        )}`}</Text>
+        <CurrencyDisplay
+          style={fontStyles.regular500}
+          amount={dollarAmount}
+          showLocalAmount={true}
+        />
+        <CurrencyDisplay
+          style={styles.dollarsLabel}
+          amount={dollarAmount}
+          showLocalAmount={false}
+          hideFullCurrencyName={false}
+          hideSymbol={true}
+        />
         <View style={styles.borderBottom} />
       </View>
       <CustomDrawerItemList {...props} protectedRoutes={[Screens.BackupIntroduction]} />
@@ -209,11 +217,19 @@ export default function DrawerNavigator() {
         component={WalletHome}
         options={{ title: t('home'), drawerIcon: Home }}
       />
-      <Drawer.Screen
-        name={isCeloEducationComplete ? Screens.ExchangeHomeScreen : Screens.GoldEducation}
-        component={isCeloEducationComplete ? ExchangeHomeScreen : GoldEducation}
-        options={{ title: t('celoGold'), drawerIcon: Gold }}
-      />
+      {(isCeloEducationComplete && (
+        <Drawer.Screen
+          name={Screens.ExchangeHomeScreen}
+          component={ExchangeHomeScreen}
+          options={{ title: t('celoGold'), drawerIcon: Gold }}
+        />
+      )) || (
+        <Drawer.Screen
+          name={Screens.GoldEducation}
+          component={GoldEducation}
+          options={{ title: t('celoGold'), drawerIcon: Gold }}
+        />
+      )}
       <Drawer.Screen
         name={Screens.BackupIntroduction}
         component={BackupIntroduction}
@@ -257,6 +273,8 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
   },
   dollarsLabel: {
+    ...fontStyles.small,
+    color: colorsV2.gray4,
     marginTop: 2,
   },
   borderBottom: {

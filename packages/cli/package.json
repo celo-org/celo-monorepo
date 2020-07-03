@@ -93,19 +93,19 @@
         "description": "Participate in and view the state of Validator Elections"
       },
       "exchange": {
-        "description": "Exchange Celo Dollars and Celo Gold via the stability mechanism"
+        "description": "Exchange Celo Dollars and CELO via the stability mechanism"
       },
       "governance": {
         "description": "Interact with on-chain governance proposals and hotfixes"
       },
       "lockedgold": {
-        "description": "View and manage locked Celo Gold"
+        "description": "View and manage locked CELO"
       },
       "node": {
         "description": "Manage your Celo node"
       },
       "transfer": {
-        "description": "Transfer Celo Gold and Celo Dollars"
+        "description": "Transfer CELO and Celo Dollars"
       },
       "validator": {
         "description": "View and manage Validators"

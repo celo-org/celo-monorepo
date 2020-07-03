@@ -176,7 +176,7 @@ A device or computer running the Celo Blockchain software that keeps typically o
 
 [CELO](#celo-native-asset) balances held in escrow at the Locked Gold contract for the account that deposited it there. This permits that balance to be used for voting in validator elections, governance proposals, and to meet staking requirements for registering a validator or validator group.
 
-> Locked Gold is in the process of being renamed along with other references to [Celo Gold](#celo-gold).
+Locked Gold is in the process of being renamed along with other references to [Celo Gold](#celo-gold) (cGLD), which is now referred as [CELO](#celo-native-asset).
 
 ## Mainnet
 
