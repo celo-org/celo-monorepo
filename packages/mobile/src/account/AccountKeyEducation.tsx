@@ -6,6 +6,7 @@ import Education, { EducationTopic } from 'src/account/Education'
 import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { Namespaces } from 'src/i18n'
+import { accountKey1, accountKey2, accountKey3, accountKey4 } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -47,10 +48,10 @@ function useSteps() {
   return React.useMemo(
     () =>
       [
-        { image: null, topic: EducationTopic.backup },
-        { image: null, topic: EducationTopic.backup },
-        { image: null, topic: EducationTopic.backup },
-        { image: null, topic: EducationTopic.backup },
+        { image: accountKey1, topic: EducationTopic.backup },
+        { image: accountKey2, topic: EducationTopic.backup },
+        { image: accountKey3, topic: EducationTopic.backup },
+        { image: accountKey4, topic: EducationTopic.backup },
       ].map((step, index) => {
         return {
           ...step,

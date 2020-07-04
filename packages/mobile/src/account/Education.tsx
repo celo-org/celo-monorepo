@@ -11,7 +11,6 @@ import Swiper from 'react-native-swiper'
 import { OnboardingEvents } from 'src/analytics/Events'
 import { ScrollDirection } from 'src/analytics/types'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { placeholder } from 'src/images/Images'
 import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { navigateBack } from 'src/navigator/NavigationService'
 import { TopBarIconButton } from 'src/navigator/TopBarButton.v2'
@@ -123,10 +122,11 @@ export default class Education extends React.Component<Props, State> {
             activeDotStyle={progressDots.circleActive}
           >
             {stepInfo.map((step: EducationStep, i: number) => {
-              const imgSrc = step.image ? step.image : placeholder
               return (
                 <View style={styles.swipedContent} key={i}>
-                  <Image source={imgSrc} style={styles.bodyImage} resizeMode="contain" />
+                  {step.image && (
+                    <Image source={step.image} style={styles.bodyImage} resizeMode="contain" />
+                  )}
                   <Text style={styles.heading}>{step.title}</Text>
                   <Text style={styles.bodyText}>{step.text}</Text>
                 </View>
@@ -168,8 +168,6 @@ const styles = StyleSheet.create({
   },
   bodyImage: {
     alignSelf: 'center',
-    width: 200,
-    height: 200,
   },
   swipedContent: {
     flex: 1,

@@ -322,7 +322,7 @@ export class SendConfirmation extends React.Component<Props, State> {
     }
 
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['bottom']}>
         <DisconnectBanner />
         <ReviewFrame
           FooterComponent={renderFeeContainer}
@@ -412,7 +412,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.light,
-    padding: 8,
+    paddingHorizontal: 8,
   },
   feeContainer: {
     padding: 16,

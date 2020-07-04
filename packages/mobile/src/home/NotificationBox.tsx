@@ -17,8 +17,7 @@ import EscrowedPaymentReminderSummaryNotification from 'src/escrow/EscrowedPayme
 import { getReclaimableEscrowPayments } from 'src/escrow/reducer'
 import { pausedFeatures } from 'src/flags'
 import { Namespaces, withTranslation } from 'src/i18n'
-import BackupKeyIcon from 'src/icons/BackupKeyIcon'
-import { getVerifiedIcon, homeIcon, inviteFriendsIcon, rewardsAppIcon } from 'src/images/Images'
+import { backupKey, getVerified, inviteFriends, learnCelo } from 'src/images/Images'
 import { InviteDetails } from 'src/invite/actions'
 import { inviteesSelector } from 'src/invite/reducer'
 import { navigate } from 'src/navigator/NavigationService'
@@ -151,7 +150,7 @@ export class NotificationBox extends React.Component<Props, State> {
       actions.push({
         title: t('backupKeyFlow6:yourBackupKey'),
         text: t('backupKeyFlow6:backupKeyNotification'),
-        icon: <BackupKeyIcon height={40} width={40} />,
+        icon: backupKey,
         callToActions: [
           {
             text: t('backupKeyFlow6:introPrimaryAction'),
@@ -171,7 +170,7 @@ export class NotificationBox extends React.Component<Props, State> {
       actions.push({
         title: t('nuxVerification2:notification.title'),
         text: t('nuxVerification2:notification.body'),
-        icon: getVerifiedIcon,
+        icon: getVerified,
         callToActions: [
           {
             text: t('nuxVerification2:notification.cta'),
@@ -201,7 +200,7 @@ export class NotificationBox extends React.Component<Props, State> {
       actions.push({
         title: t('walletFlow5:earnCeloRewards'),
         text: t('walletFlow5:earnCeloGold'),
-        icon: rewardsAppIcon,
+        icon: null,
         callToActions: [
           {
             text: t('walletFlow5:startEarning'),
@@ -232,7 +231,7 @@ export class NotificationBox extends React.Component<Props, State> {
       actions.push({
         title: t('global:celoGold'),
         text: t('exchangeFlow9:whatIsGold'),
-        icon: homeIcon,
+        icon: learnCelo,
         callToActions: [
           {
             text: t('learnMore'),
@@ -261,7 +260,7 @@ export class NotificationBox extends React.Component<Props, State> {
       actions.push({
         title: t('inviteFlow11:inviteFriendsToCelo'),
         text: t('inviteFlow11:inviteAnyone'),
-        icon: inviteFriendsIcon,
+        icon: inviteFriends,
         callToActions: [
           {
             text: t('global:connect'),

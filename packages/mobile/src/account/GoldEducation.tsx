@@ -7,7 +7,7 @@ import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setEducationCompleted } from 'src/goldToken/actions'
 import { Namespaces } from 'src/i18n'
-import { exchangeIcon, goldValue, shinyGold } from 'src/images/Images'
+import { celoEducation1, celoEducation2, celoEducation3, celoEducation4 } from 'src/images/Images'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import useSelector from 'src/redux/useSelector'
@@ -54,19 +54,19 @@ function useStep() {
   return React.useMemo(() => {
     return [
       {
-        image: shinyGold,
+        image: celoEducation1,
         topic: EducationTopic.celo,
       },
       {
-        image: goldValue,
+        image: celoEducation2,
         topic: EducationTopic.celo,
       },
       {
-        image: exchangeIcon,
+        image: celoEducation3,
         topic: EducationTopic.celo,
       },
       {
-        image: exchangeIcon, // Placeholder Image
+        image: celoEducation4, // Placeholder Image
         topic: EducationTopic.celo,
       },
     ].map((step, index) => {

@@ -1,14 +1,7 @@
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { ApolloProvider } from 'react-apollo'
-import {
-  DeviceEventEmitter,
-  Linking,
-  Platform,
-  StatusBar,
-  UIManager,
-  YellowBox,
-} from 'react-native'
+import { DeviceEventEmitter, Linking, Platform, StatusBar, YellowBox } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { enableScreens } from 'react-native-screens'
@@ -44,10 +37,12 @@ BigNumber.config({
   },
 })
 
-// Enables LayoutAnimation on Android. Need to check if method exists before using
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
-  UIManager.setLayoutAnimationEnabledExperimental(true)
-}
+// Enables LayoutAnimation on Android. It makes transitions between states smoother.
+// https://reactnative.dev/docs/layoutanimation
+// Disabling it for now as it seems to cause blank white screens on certain android devices
+// if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+//   UIManager.setLayoutAnimationEnabledExperimental(true)
+// }
 
 export class App extends React.Component {
   async componentDidMount() {
