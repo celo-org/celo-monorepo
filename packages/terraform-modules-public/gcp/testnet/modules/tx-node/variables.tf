@@ -82,7 +82,7 @@ variable bootnodes_base64 {
 variable reset_geth_data {
   type        = bool
   description = "Specifies if the existing chain data should be removed while creating the instance"
-  default     = false
+  default     = true
 }
 
 variable txnode_max_peers {
@@ -106,7 +106,7 @@ variable attestation_signer_private_keys {
   description = "Array with the attestation_signer private keys"
 }
 
-variable "service_account_scopes" {
-  description = "Scopes to apply to the service account which all nodes in the cluster will inherit"
+variable service_account_scopes {
   type        = list(string)
+  description = "Scopes to apply to the service account which all nodes in the cluster will inherit"
 }

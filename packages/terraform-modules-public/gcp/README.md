@@ -1,4 +1,4 @@
-# Terraform Celo Validator Stack
+# Terraform Celo Validator Stack for GCP
 
 ## Overview
 
@@ -8,10 +8,10 @@ Inside the [testnet](./testnet) folder you will find a module (and submodules) t
 
 - `proxy` module for creating a Geth Proxy which peers with other Celo nodes over the public Internet
 - `validator` module for deploying a Validator which peers *only* with the proxy
-- `tx-node` for deploying a transaction node (also known as full-node) which is used to support the attestation service, which connects to the RPC via the VPC.
+- `tx-node` for deploying a transaction node (also known as full-node) which is used to support the attestation service, which connects to the RPC via the VPC
 - `attestation-service` for deploying the Attestation Service (https://docs.celo.org/getting-started/baklava-testnet/running-a-validator#running-the-attestation-service)
 
-The proxy, validator and tx-node services includes the [geth-exporter](https://github.com/status-im/geth_exporter) service to export geth metrics for Prometheus. Serving at port 9200, you can configure your Prometheus server to collect the metrics at endpoint http://<instance>:9200/metrics
+The proxy, validator and tx-node services expose metrics for collection via Prometheus or similar.  See [example/metrics.md](./example/metrics.md) for more info.
 
 ## Stackdriver Logging, Monitoring and Alerting
 Support for GCP's Stackdriver platform has been added, which makes it easy to get visibility into how your Celo validator stack is performing.

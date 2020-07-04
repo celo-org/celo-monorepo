@@ -102,7 +102,7 @@ variable bootnodes_base64 {
 variable reset_geth_data {
   type        = bool
   description = "Specifies if the existing chain data should be removed while creating the instance"
-  default     = false
+  default     = true
 }
 
 variable proxy_name {
@@ -118,7 +118,7 @@ variable proxy_addresses {
 variable proxy_max_peers {
   type        = number
   description = "Max number of peers to connect with"
-  default     = 120
+  default     = 250
   #note this does not behave as expected.  120 means we get 20 (unelected).
 }
 

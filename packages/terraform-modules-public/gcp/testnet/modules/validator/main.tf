@@ -17,6 +17,7 @@ resource "google_compute_instance" "validator" {
   machine_type = var.instance_type
 
   deletion_protection = true
+  #deletion_protection = false
 
   count = var.validator_count
 
@@ -26,7 +27,8 @@ resource "google_compute_instance" "validator" {
 
   boot_disk {
     initialize_params {
-      image = "debian-cloud/debian-9"
+      #image = "debian-cloud/debian-9"
+      image = "debian-cloud/debian-10"
     }
   }
 
@@ -81,6 +83,6 @@ resource "google_compute_disk" "validator" {
   #type = "pd-ssd"
   type = "pd-standard"      #disk I/O doesn't yet warrant SSD backed validators/proxies
   # in GB
-  size                      = 25
+  size                      = 50
   physical_block_size_bytes = 4096
 }

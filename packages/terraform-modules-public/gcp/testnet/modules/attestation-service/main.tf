@@ -1,5 +1,4 @@
 locals {
-  #name_prefix = "${var.celo_env}-attestation-service"
   name_prefix = "${var.gcloud_project}-attestation-service"
 }
 
@@ -36,18 +35,18 @@ resource "google_compute_address" "attestation_service_internal" {
 
 resource "google_compute_instance" "attestation_service" {
   count        = var.attestation_service_count > 0 ? var.attestation_service_count : 0
-  #name         = "${local.name_prefix}-instance"
   name         = "${local.name_prefix}-${count.index}"
   machine_type = var.instance_type
+  
+  deletion_protection = true
 
   tags = ["${var.celo_env}-attestation-service"]
 
-  #allow_stopping_for_update = true
   allow_stopping_for_update = false   # cannot update in place w/o a persistent disk
 
   boot_disk {
     initialize_params {
-      image = "debian-cloud/debian-9"
+      image = "debian-cloud/debian-10"
     }
   }
 

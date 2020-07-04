@@ -117,7 +117,7 @@ variable proxy_external_ips {
 variable reset_geth_data {
   type        = bool
   description = "Specifies if the existing chain data should be removed while creating the instance"
-  default     = false
+  default     = true
 }
 
 variable validator_name {

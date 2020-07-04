@@ -1,6 +1,5 @@
 locals {
   attached_disk_name = "celo-data"
-  #name_prefix        = "${var.celo_env}-proxy"
   name_prefix = "${var.gcloud_project}-proxy"
 }
 
@@ -23,6 +22,7 @@ resource "google_compute_instance" "proxy" {
   name         = "${local.name_prefix}-${count.index}"
   machine_type = var.instance_type
 
+  #deletion_protection = false
   deletion_protection = true
 
   count = var.validator_count
@@ -33,7 +33,7 @@ resource "google_compute_instance" "proxy" {
 
   boot_disk {
     initialize_params {
-      image = "debian-cloud/debian-9"
+      image = "debian-cloud/debian-10"
     }
   }
 
@@ -91,6 +91,6 @@ resource "google_compute_disk" "proxy" {
   #type = "pd-ssd"
   type = "pd-standard"      #disk I/O doesn't yet warrant SSD backed validators/proxies
   # in GB
-  size                      = 25
+  size                      = 50
   physical_block_size_bytes = 4096
 }

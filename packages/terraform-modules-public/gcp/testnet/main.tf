@@ -104,7 +104,7 @@ resource "google_compute_firewall" "geth_metrics_firewall" {
 
   allow {
     protocol = "tcp"
-    ports    = ["9200"]
+    ports    = ["6060"]
   }
 }
 

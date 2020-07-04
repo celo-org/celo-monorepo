@@ -5,11 +5,11 @@ echo "Configuring logrotate" | logger
 cat <<'EOF' > '/etc/logrotate.d/rsyslog'
 /var/log/syslog
 {
-        rotate 7
+        rotate 3
         daily
         missingok
         notifempty
-        delaycompress
+        #delaycompress
         compress
         postrotate
                 invoke-rc.d rsyslog rotate > /dev/null
@@ -22,11 +22,11 @@ cat <<'EOF' > '/etc/logrotate.d/rsyslog'
 /var/log/mail.log
 /var/log/daemon.log
 {
-        rotate 7
+        rotate 3
         daily
         missingok
         notifempty
-        delaycompress
+        #delaycompress
         compress
         postrotate
                 invoke-rc.d rsyslog rotate > /dev/null
@@ -41,12 +41,12 @@ cat <<'EOF' > '/etc/logrotate.d/rsyslog'
 /var/log/debug
 /var/log/messages
 {
-        rotate 4
+        rotate 3
         weekly
         missingok
         notifempty
         compress
-        delaycompress
+        #delaycompress
         sharedscripts
         postrotate
                 invoke-rc.d rsyslog rotate > /dev/null
@@ -54,21 +54,105 @@ cat <<'EOF' > '/etc/logrotate.d/rsyslog'
 }
 EOF
 
-# ---- Config /etc/screenrc ----
-echo "Configuring /etc/screenrc" | logger
-cat <<'EOF' > '/etc/screenrc'
-bindkey -k k1 select 1  #  F1 = screen 1
-bindkey -k k2 select 2  #  F2 = screen 2
-bindkey -k k3 select 3  #  F3 = screen 3
-bindkey -k k4 select 4  #  F4 = screen 4
-bindkey -k k5 select 5  #  F5 = screen 5
-bindkey -k k6 select 6  #  F6 = screen 6
-bindkey -k k7 select 7  #  F7 = screen 7
-bindkey -k k8 select 8  #  F8 = screen 8
-bindkey -k k9 select 9  #  F9 = screen 9
-bindkey -k F1 prev      # F11 = prev
-bindkey -k F2 next      # F12 = next
+# ---- Tune rsyslog to avoid redundantly logging docker output
+echo "Updating rsyslog.conf to avoid redundantly logging docker output"
+cat <<'EOF' > /etc/rsyslog.conf
+# /etc/rsyslog.conf configuration file for rsyslog
+#
+# For more information install rsyslog-doc and see
+# /usr/share/doc/rsyslog-doc/html/configuration/index.html
+
+
+#################
+#### MODULES ####
+#################
+
+module(load="imuxsock") # provides support for local system logging
+module(load="imklog")   # provides kernel logging support
+#module(load="immark")  # provides --MARK-- message capability
+
+# provides UDP syslog reception
+#module(load="imudp")
+#input(type="imudp" port="514")
+
+# provides TCP syslog reception
+#module(load="imtcp")
+#input(type="imtcp" port="514")
+
+
+###########################
+#### GLOBAL DIRECTIVES ####
+###########################
+
+#
+# Use traditional timestamp format.
+# To enable high precision timestamps, comment out the following line.
+#
+$ActionFileDefaultTemplate RSYSLOG_TraditionalFileFormat
+
+#
+# Set the default permissions for all log files.
+#
+$FileOwner root
+$FileGroup adm
+$FileCreateMode 0640
+$DirCreateMode 0755
+$Umask 0022
+
+#
+# Where to place spool and state files
+#
+$WorkDirectory /var/spool/rsyslog
+
+#
+# Include all config files in /etc/rsyslog.d/
+#
+$IncludeConfig /etc/rsyslog.d/*.conf
+
+
+###############
+#### RULES ####
+###############
+
+#
+# First some standard log files.  Log by facility.
+#
+auth,authpriv.*                 /var/log/auth.log
+*.*;auth,authpriv.none          -/var/log/syslog
+#cron.*                         /var/log/cron.log
+#daemon.*                        -/var/log/daemon.log
+kern.*                          -/var/log/kern.log
+lpr.*                           -/var/log/lpr.log
+mail.*                          -/var/log/mail.log
+user.*                          -/var/log/user.log
+
+#
+# Logging for the mail system.  Split it up so that
+# it is easy to write scripts to parse these files.
+#
+mail.info                       -/var/log/mail.info
+mail.warn                       -/var/log/mail.warn
+mail.err                        /var/log/mail.err
+
+#
+# Some "catch-all" log files.
+#
+*.=debug;\
+        auth,authpriv.none;\
+        news.none;mail.none     -/var/log/debug
+*.=info;*.=notice;*.=warn;\
+        auth,authpriv.none;\
+        cron,daemon.none;\
+        mail,news.none          -/var/log/messages
+
+#
+# Emergencies are sent to everybody logged in.
+#
+*.emerg                         :omusrmsg:*
 EOF
+# ---- Restart rsyslogd
+echo "Restarting rsyslogd"
+systemctl restart rsyslog
 
 # ---- Create backup script
 echo "Creating chaindata backup script" | logger
@@ -104,10 +188,33 @@ then
   sleep 3
   systemctl start geth.service
   else
-    echo "No chaindata.tgz found in bucket gs://${gcloud_project}-chaindata, aborting restore"
+    echo "No chaindata.tgz found in bucket gs://${gcloud_project}-chaindata, aborting warp restore"
   fi
 EOF
 chmod u+x /root/restore.sh
+
+# ---- Create rsync restore script
+echo "Creating rsync chaindata restore script" | logger
+cat <<'EOF' > /root/restore_rsync.sh
+#!/bin/bash
+set -x
+gsutil -q stat gs://${gcloud_project}-chaindata-rsync/chaindata/CURRENT
+if [ $? -eq 0 ]
+then
+  #chaindata exists in bucket
+  echo "stopping geth"
+  systemctl stop geth.service
+  echo "downloading chaindata via rsync from gs://${gcloud_project}-chaindata-rsync"
+  mkdir -p /root/.celo/celo
+  gsutil -m rsync -d -r gs://${gcloud_project}-chaindata-rsync /root/.celo/celo
+  echo "restart geth"
+  sleep 3
+  systemctl start geth.service
+  else
+    echo "No chaindata found in bucket gs://${gcloud_project}-chaindata-rsync, aborting warp restore"
+  fi
+EOF
+chmod u+x /root/restore_rsync.sh
 
 # ---- Useful aliases ----
 echo "Configuring aliases" | logger
@@ -177,12 +284,29 @@ mkdir -p $DATA_DIR/account
 
 echo "Installing Docker..." | logger
 apt update -y && apt upgrade -y
-apt install -y apt-transport-https ca-certificates curl software-properties-common gnupg2 htop
+apt install -y apt-transport-https ca-certificates curl software-properties-common gnupg2 htop screen
 curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
 apt update -y && apt upgrade -y
 apt install -y docker-ce
+apt upgrade -y
 systemctl start docker
+
+# ---- Config /etc/screenrc ----
+echo "Configuring /etc/screenrc" | logger
+cat <<'EOF' >> '/etc/screenrc'
+bindkey -k k1 select 1  #  F1 = screen 1
+bindkey -k k2 select 2  #  F2 = screen 2
+bindkey -k k3 select 3  #  F3 = screen 3
+bindkey -k k4 select 4  #  F4 = screen 4
+bindkey -k k5 select 5  #  F5 = screen 5
+bindkey -k k6 select 6  #  F6 = screen 6
+bindkey -k k7 select 7  #  F7 = screen 7
+bindkey -k k8 select 8  #  F8 = screen 8
+bindkey -k k9 select 9  #  F9 = screen 9
+bindkey -k F1 prev      # F11 = prev
+bindkey -k F2 next      # F12 = next
+EOF
 
 echo "Configuring Docker..." | logger
 cat <<'EOF' > '/etc/docker/daemon.json'
@@ -190,11 +314,13 @@ cat <<'EOF' > '/etc/docker/daemon.json'
   "log-driver": "json-file",
   "log-opts": {
     "max-size": "10m",
-    "max-file": "3" 
+    "max-file": "3",
+    "mode": "non-blocking"  
   }
 }
 EOF
 
+echo "Restarting docker" | logger
 systemctl restart docker
 
 # ---- Set Up and Run Geth ----
@@ -215,7 +341,7 @@ PROXY_EXTERNAL_ENODE="enode://${proxy_enode}@${proxy_external_ip}:30303"
 PROXY_URL="$PROXY_INTERNAL_ENODE;$PROXY_EXTERNAL_ENODE"
 echo "Proxy URL: $PROXY_URL"
 
-echo "Pulling geth..."
+echo "Pulling geth..." | logger
 docker pull $GETH_NODE_DOCKER_IMAGE
 
 IN_MEMORY_DISCOVERY_TABLE_FLAG=""
@@ -288,6 +414,7 @@ ExecStart=/usr/bin/docker run \\
       --maxpeers=${max_peers} \\
       --nat=extip:${ip_address} \\
       --metrics \\
+      --pprof \\
       $IN_MEMORY_DISCOVERY_TABLE_FLAG \\
       --nodiscover \\
       --proxy.proxied \\
@@ -302,46 +429,19 @@ EOF
 echo "Starting Geth" | logger
 systemctl daemon-reload
 systemctl enable geth.service
-#systemctl restart geth.service
-
-# ---- Set Up and Run Geth Exporter ----
-echo "Configuring Geth Exporter" | logger
-GETH_EXPORTER_DOCKER_IMAGE=${geth_exporter_docker_image_repository}:${geth_exporter_docker_image_tag}
-
-echo "Pulling geth exporter..."
-docker pull $GETH_EXPORTER_DOCKER_IMAGE
-
-cat <<EOF >/etc/systemd/system/geth-exporter.service
-[Unit]
-Description=Docker Container %N
-Requires=docker.service
-After=docker.service
-
-[Service]
-Restart=always
-ExecStart=/usr/bin/docker run \\
-  --rm \\
-  --name geth-exporter \\
-  -v $DATA_DIR:$DATA_DIR \\
-  --net=host \\
-  $GETH_EXPORTER_DOCKER_IMAGE \\
-  /usr/local/bin/geth_exporter \\
-    -ipc $DATA_DIR/geth.ipc \\
-    -filter "(.*overall|percentiles_95)"
-ExecStop=/usr/bin/docker stop -t 30 %N
-
-[Install]
-WantedBy=default.target
-EOF
-
-echo "Starting Geth Exporter" | logger
-systemctl daemon-reload
-systemctl enable geth-exporter.service
-systemctl restart geth-exporter.service
 
 echo "Adding DC to docker group" | logger
 usermod -aG docker dc
 
 #--- run restore script
-echo "Restoring chaindata from backup" | logger
-bash /root/restore.sh
+#echo "Restoring chaindata from backup tarball" | logger
+#bash /root/restore.sh
+
+#--- run rsync restore script
+echo "Restoring chaindata from backup via rsync" | logger
+bash /root/restore_rsync.sh
+
+#--- remove compilers
+echo "Removing compilers" | logger
+sudo apt remove -y build-essential gcc make linux-compiler-gcc-8-x86 cpp
+sudo apt -y autoremove
