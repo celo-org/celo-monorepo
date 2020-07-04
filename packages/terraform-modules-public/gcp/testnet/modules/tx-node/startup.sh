@@ -218,6 +218,8 @@ then
   systemctl start geth.service
   else
     echo "No chaindata.tgz found in bucket gs://${gcloud_project}-chaindata, aborting warp restore"
+    echo "Starting geth"
+    systemctl start geth.service
   fi
 EOF
 chmod u+x /root/restore.sh
