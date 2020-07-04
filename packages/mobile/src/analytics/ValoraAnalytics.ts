@@ -72,7 +72,7 @@ class ValoraAnalytics {
         this.deviceInfo = deviceInfo
         this.sessionId = Web3Utils.soliditySha3({
           type: 'string',
-          value: deviceInfo.SerialNumber || deviceInfo.DeviceId,
+          value: Math.random().toString(),
         }).slice(2)
       } catch (error) {
         Logger.error(TAG, 'getDeviceInfo error', error)

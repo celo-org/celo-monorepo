@@ -23,7 +23,10 @@ import {
   setAnalyticsEnabled,
   setNumberVerified,
   setRequirePinOnAppOpen,
+  setSessionId,
 } from 'src/app/actions'
+import { sessionIdSelector } from 'src/app/selectors'
+import SessionId from 'src/components/SessionId'
 import { WarningModal } from 'src/components/WarningModal'
 import { AVAILABLE_LANGUAGES, TOS_LINK } from 'src/config'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -49,6 +52,7 @@ interface DispatchProps {
   devModeTriggerClicked: typeof devModeTriggerClicked
   setRequirePinOnAppOpen: typeof setRequirePinOnAppOpen
   toggleFornoMode: typeof toggleFornoMode
+  setSessionId: typeof setSessionId
 }
 
 interface StateProps {
@@ -63,6 +67,7 @@ interface StateProps {
   fornoEnabled: boolean
   gethStartedThisSession: boolean
   preferredCurrencyCode: LocalCurrencyCode
+  sessionId: string
 }
 
 type OwnProps = StackScreenProps<StackParamList, Screens.Settings>
@@ -82,6 +87,7 @@ const mapStateToProps = (state: RootState): StateProps => {
     fornoEnabled: state.web3.fornoMode,
     gethStartedThisSession: state.geth.gethStartedThisSession,
     preferredCurrencyCode: getLocalCurrencyCode(state),
+    sessionId: sessionIdSelector(state),
   }
 }
 
@@ -94,6 +100,7 @@ const mapDispatchToProps = {
   devModeTriggerClicked,
   setRequirePinOnAppOpen,
   toggleFornoMode,
+  setSessionId,
 }
 
 interface State {
@@ -101,6 +108,13 @@ interface State {
 }
 
 export class Account extends React.Component<Props, State> {
+  componentDidMount = () => {
+    const sessionId = ValoraAnalytics.getSessionId()
+    if (sessionId !== this.props.sessionId) {
+      this.props.setSessionId(sessionId)
+    }
+  }
+
   goToProfile = () => {
     ValoraAnalytics.track(SettingsEvents.settings_profile_edit)
     this.props.navigation.navigate(Screens.Profile)
@@ -164,6 +178,10 @@ export class Account extends React.Component<Props, State> {
               <Text>Revoke Number Verification</Text>
             </TouchableOpacity>
           </View> */}
+          <View style={styles.devSettingsItem}>
+            <Text style={fontStyles.label}>Session ID</Text>
+            <SessionId sessionId={this.props.sessionId || ''} />
+          </View>
           <View style={styles.devSettingsItem}>
             <TouchableOpacity onPress={this.toggleNumberVerified}>
               <Text>Toggle verification done</Text>

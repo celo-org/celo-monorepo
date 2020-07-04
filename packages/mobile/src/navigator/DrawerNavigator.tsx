@@ -24,12 +24,10 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import deviceInfoModule from 'react-native-device-info'
-import { useDispatch } from 'react-redux'
 import FiatExchange from 'src/account/FiatExchange'
 import GoldEducation from 'src/account/GoldEducation'
 import {
   defaultCountryCodeSelector,
-  devModeSelector,
   e164NumberSelector,
   nameSelector,
   userContactDetailsSelector,
@@ -38,12 +36,9 @@ import SettingsScreen from 'src/account/Settings'
 import Support from 'src/account/Support'
 import { HomeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { setSessionId } from 'src/app/actions'
-import { sessionIdSelector } from 'src/app/selectors'
 import BackupIntroduction from 'src/backup/BackupIntroduction'
 import AccountNumber from 'src/components/AccountNumber'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
-import SessionId from 'src/components/SessionId'
 import ExchangeHomeScreen from 'src/exchange/ExchangeHomeScreen'
 import WalletHome from 'src/home/WalletHome'
 import { Namespaces } from 'src/i18n'
@@ -135,14 +130,6 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
   }
   const account = useSelector(currentAccountSelector)
   const appVersion = deviceInfoModule.getVersion()
-  const storedSessionId = useSelector(sessionIdSelector)
-  const devModeActive = useSelector(devModeSelector)
-  const dispatch = useDispatch()
-
-  const sessionId = ValoraAnalytics.getSessionId()
-  if (sessionId !== storedSessionId) {
-    dispatch(setSessionId(sessionId))
-  }
 
   return (
     <DrawerContentScrollView {...props}>
@@ -178,16 +165,6 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
             <AccountNumber address={account || ''} location={Screens.DrawerNavigator} />
           </View>
         </View>
-        {devModeActive && (
-          <>
-            <Text style={fontStyles.label}>Session ID</Text>
-            <View style={styles.accountOuterContainer}>
-              <View style={styles.accountInnerContainer}>
-                <SessionId sessionId={storedSessionId || ''} />
-              </View>
-            </View>
-          </>
-        )}
         <Text style={styles.smallLabel}>{`Version ${appVersion}`}</Text>
       </View>
     </DrawerContentScrollView>
