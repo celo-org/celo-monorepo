@@ -70,20 +70,59 @@ echo "export TF_VAR_GCP_DEFAULT_SERVICE_ACCOUNT=\"$GCP_DEFAULT_SERVICE_ACCOUNT\"
 #plan is to use this from within TF to grant explicit access to a logs bucket rather than use a broad storage.rw scope
 
 echo "Creating a bucket for storing remote TFSTATE"
+echo "Note that this bucket is created but is not enabled for Terraform state by default due to security concerns"
 #note namespace on gcp cloud storage buckets is global, so this must be unique
 TF_STATE_BUCKET=${TF_VAR_project}-tfstate
 gsutil mb -p ${TF_VAR_project} gs://${TF_STATE_BUCKET}
 #gsutil iam ch serviceAccount:terraform@${TF_VAR_project}.iam.gserviceaccount.com:objectCreator,objectViewer gs://${TF_STATE_BUCKET}
 #above is redundant, given that tf svc acct has storage.admin role, but granting it explictly here anyway.
-
-cat > backend.tf << EOF
-terraform {
- backend "gcs" {
-   bucket  = "${TF_STATE_BUCKET}"
-   prefix  = "terraform/state"
- }
+# this works, but results in 'no change'. default svc account can still hit the TF_STATE_BUCKET
+#gsutil iam ch -d serviceAccount:${TF_VAR_GCP_DEFAULT_SERVICE_ACCOUNT} gs://${TF_STATE_BUCKET}
+cat > iam.txt << EOF
+{
+  "bindings": [
+    {
+      "members": [
+        "projectOwner:${TF_VAR_project}"
+      ],
+      "role": "roles/storage.legacyBucketOwner"
+    },
+    {
+      "members": [
+        "projectViewer:${TF_VAR_project}"
+      ],
+      "role": "roles/storage.legacyBucketReader"
+    },
+    {
+      "members": [
+        "serviceAccount:terraform@${TF_VAR_project}.iam.gserviceaccount.com"
+      ],
+      "role": "roles/storage.objectCreator"
+    },
+    {
+      "members": [
+        "serviceAccount:terraform@${TF_VAR_project}.iam.gserviceaccount.com"
+      ],
+      "role": "roles/storage.objectViewer"
+    }
+  ]
 }
 EOF
+
+#### enable this if you want to use the GCS bucket for Terraform state.
+# This is helpful if multiple people will be using terraform to manage the infrastructure
+# Note that if this is enabled, you will need to manually restrict permissions to the TF_STATE_BUCKET to ensure that
+# Unprivileged nodes (eg proxy, txnode, attestation) cannot use their default service account to read the Terraform state
+# this is important because the Terraform state includes your private keys, etc.
+
+#cat > backend.tf << EOF
+#terraform {
+# backend "gcs" {
+#   bucket  = "${TF_STATE_BUCKET}"
+#   prefix  = "terraform/state"
+# }
+#}
+#EOF
 
 echo "Initializing terraform"
 terraform init

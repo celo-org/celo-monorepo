@@ -199,31 +199,49 @@ resource "google_storage_bucket_iam_binding" "chaindata_binding_read" {
   ]
 }
 
-# ---- Celo validators are required to host publicly accessible metadata
-#      This resource configures a GCS bucket to serve static content 
-#      and also configures it for public access
-
-resource "google_storage_bucket" "public_www_bucket" {
-  name = var.public_www_fqdn
+resource "google_storage_bucket" "chaindata_rsync_bucket" {
+  name = "${var.google["project"]}-chaindata-rsync"
   location = "US"
-  force_destroy = true
 
-  website {
-    main_page_suffix = "index.html"
-    not_found_page   = "404.html"
-  }
-  cors {
-    origin          = ["https://${var.public_www_fqdn}"]
-    method          = ["GET", "HEAD"]
-    response_header = ["*"]
-    max_age_seconds = 3600
-  }
 }
 
-resource "google_storage_bucket_iam_binding" "public_www_binding_read" {
-  bucket = var.public_www_fqdn
-  role = "roles/storage.objectViewer"
+resource "google_storage_bucket_iam_binding" "chaindata_rsync_binding_write" {
+  bucket = "${var.google["project"]}-chaindata-rsync"
+  role = "roles/storage.objectCreator"
   members = [
-    "allUsers"
+    "serviceAccount:${var.GCP_DEFAULT_SERVICE_ACCOUNT}",
   ]
 }
+
+resource "google_storage_bucket_iam_binding" "chaindata_rsync_binding_read" {
+  bucket = "${var.google["project"]}-chaindata-rsync"
+  role = "roles/storage.objectViewer"
+  members = [
+    "serviceAccount:${var.GCP_DEFAULT_SERVICE_ACCOUNT}",
+  ]
+}
+
+#resource "google_storage_bucket" "public_www_bucket" {
+#  name = var.public_www_fqdn
+#  location = "US"
+#  force_destroy = true
+#
+#  website {
+#    main_page_suffix = "index.html"
+#    not_found_page   = "404.html"
+#  }
+#  cors {
+#    origin          = ["https://${var.public_www_fqdn}"]
+#    method          = ["GET", "HEAD"]
+#    response_header = ["*"]
+#    max_age_seconds = 3600
+#  }
+#}
+
+#resource "google_storage_bucket_iam_binding" "public_www_binding_read" {
+#  bucket = var.public_www_fqdn
+#  role = "roles/storage.objectViewer"
+#  members = [
+#    "allUsers"
+#  ]
+#}

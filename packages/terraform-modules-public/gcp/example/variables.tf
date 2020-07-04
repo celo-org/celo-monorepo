@@ -16,7 +16,7 @@ variable replicas {
   type        = map(number)
 
   default = {
-    validator           = 0 # Also used for proxy
+    validator           = 1 # Also used for proxy
     txnode              = 1
     attestation_service = 1
   }
@@ -27,8 +27,8 @@ variable instance_types {
   type        = map(string)
 
   default = {
-    validator           = "n1-standard-1"   #use n1-standard-2 or better for production
-    proxy               = "n1-standard-1"   #use n1-standard-2 or better for production
+    validator           = "n1-standard-2"   #use n1-standard-2 or better for production
+    proxy               = "n1-standard-2"   #use n1-standard-2 or better for production
     txnode              = "n1-standard-1"
     attestation_service = "n1-standard-1"
   }
@@ -307,6 +307,12 @@ variable "stackdriver_logging_metrics" {
       description = "Committed seal on old block"
       filter = "resource.type=gce_instance AND \"Would have sent a commit message for an old block\""
     }
+
+    tf_validator_not_elected = {
+      description = "Validator failed to be elected"
+      filter = "resource.type=gce_instance \"Validator Election Results\" AND \"\\\"elected\\\":\\\"false\\\"\" AND NOT \"tx-node\""
+    }
+
   }
 }
 
