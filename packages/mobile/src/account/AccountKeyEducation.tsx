@@ -1,11 +1,12 @@
 import { BtnTypes } from '@celo/react-components/components/Button.v2'
 import { StackScreenProps } from '@react-navigation/stack'
-import * as React from 'react'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
 import Education from 'src/account/Education'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import { Namespaces } from 'src/i18n'
-import { navigate, navigateProtected } from 'src/navigator/NavigationService'
+import { accountKey1, accountKey2, accountKey3, accountKey4 } from 'src/images/Images'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 
@@ -16,7 +17,7 @@ export default function AccountKeyEducation(props: Props) {
     if (props.route.params?.nextScreen) {
       navigate(props.route.params?.nextScreen)
     } else {
-      navigateProtected(Screens.BackupPhrase)
+      navigate(Screens.BackupPhrase)
     }
   }
 
@@ -42,27 +43,27 @@ function useSteps() {
     () =>
       [
         {
-          image: null,
-          cancelEvent: CustomEventNames.backup_educate_1_cancel,
-          progressEvent: CustomEventNames.backup_educate_1_next,
+          image: accountKey1,
+          cancelEvent: AnalyticsEvents.backup_educate_1_cancel,
+          progressEvent: AnalyticsEvents.backup_educate_1_next,
           screenName: 'AccountKeyEducation',
         },
         {
-          image: null,
-          cancelEvent: CustomEventNames.backup_educate_2_cancel,
-          progressEvent: CustomEventNames.backup_educate_2_next,
+          image: accountKey2,
+          cancelEvent: AnalyticsEvents.backup_educate_2_cancel,
+          progressEvent: AnalyticsEvents.backup_educate_2_next,
           screenName: 'AccountKeyEducation',
         },
         {
-          image: null,
-          cancelEvent: CustomEventNames.backup_educate_3_cancel,
-          progressEvent: CustomEventNames.backup_educate_3_next,
+          image: accountKey3,
+          cancelEvent: AnalyticsEvents.backup_educate_3_cancel,
+          progressEvent: AnalyticsEvents.backup_educate_3_next,
           screenName: 'AccountKeyEducation',
         },
         {
-          image: null,
-          cancelEvent: CustomEventNames.backup_educate_4_cancel,
-          progressEvent: CustomEventNames.backup_educate_4_next,
+          image: accountKey4,
+          cancelEvent: AnalyticsEvents.backup_educate_4_cancel,
+          progressEvent: AnalyticsEvents.backup_educate_4_next,
           screenName: 'AccountKeyEducation',
         },
       ].map((step, index) => {

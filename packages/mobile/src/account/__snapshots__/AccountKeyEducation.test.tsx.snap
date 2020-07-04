@@ -1,9 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`AccountKeyEducation renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
+      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
@@ -75,7 +76,6 @@ exports[`AccountKeyEducation renders correctly 1`] = `
     style={
       Object {
         "alignItems": "center",
-        "backgroundColor": "white",
         "flex": 1,
         "justifyContent": "center",
         "paddingBottom": 24,
@@ -120,14 +120,12 @@ exports[`AccountKeyEducation renders correctly 1`] = `
           resizeMode="contain"
           source={
             Object {
-              "testUri": "../../../packages/mobile/src/images/placeholder.png",
+              "testUri": "../../../packages/mobile/src/images/account-key-1.png",
             }
           }
           style={
             Object {
               "alignSelf": "center",
-              "height": 200,
-              "width": 200,
             }
           }
         />
@@ -174,14 +172,12 @@ exports[`AccountKeyEducation renders correctly 1`] = `
           resizeMode="contain"
           source={
             Object {
-              "testUri": "../../../packages/mobile/src/images/placeholder.png",
+              "testUri": "../../../packages/mobile/src/images/account-key-2.png",
             }
           }
           style={
             Object {
               "alignSelf": "center",
-              "height": 200,
-              "width": 200,
             }
           }
         />
@@ -228,14 +224,12 @@ exports[`AccountKeyEducation renders correctly 1`] = `
           resizeMode="contain"
           source={
             Object {
-              "testUri": "../../../packages/mobile/src/images/placeholder.png",
+              "testUri": "../../../packages/mobile/src/images/account-key-3.png",
             }
           }
           style={
             Object {
               "alignSelf": "center",
-              "height": 200,
-              "width": 200,
             }
           }
         />
@@ -282,14 +276,12 @@ exports[`AccountKeyEducation renders correctly 1`] = `
           resizeMode="contain"
           source={
             Object {
-              "testUri": "../../../packages/mobile/src/images/placeholder.png",
+              "testUri": "../../../packages/mobile/src/images/account-key-4.png",
             }
           }
           style={
             Object {
               "alignSelf": "center",
-              "height": 200,
-              "width": 200,
             }
           }
         />
@@ -391,5 +383,5 @@ exports[`AccountKeyEducation renders correctly 1`] = `
       </View>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

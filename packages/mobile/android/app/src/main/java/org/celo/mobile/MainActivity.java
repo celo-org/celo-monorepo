@@ -1,6 +1,9 @@
 package org.celo.mobile;
 
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.view.WindowManager;
 import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.ReactFragmentActivity;
@@ -28,8 +31,17 @@ public class MainActivity
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+    getWindow()
+      .getDecorView()
+      .setSystemUiVisibility(
+        // fullscreen layout so we can draw under the status bar / notch area
+        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+        View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+        View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+      );
+
     appStartTimestamp = new Date();
-    SplashScreen.show(this);
+    SplashScreen.show(this, R.style.SplashTheme);
     super.onCreate(null);
   }
 

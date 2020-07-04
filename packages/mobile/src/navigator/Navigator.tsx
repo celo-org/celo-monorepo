@@ -11,7 +11,7 @@ import Licenses from 'src/account/Licenses'
 import Profile from 'src/account/Profile'
 import { PincodeType } from 'src/account/reducer'
 import SupportContact from 'src/account/SupportContact'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
 import AppLoading from 'src/app/AppLoading'
 import Debug from 'src/app/Debug'
 import ErrorScreen from 'src/app/ErrorScreen'
@@ -42,7 +42,6 @@ import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import PhoneNumberLookupQuotaScreen from 'src/identity/PhoneNumberLookupQuotaScreen'
 import ImportWallet from 'src/import/ImportWallet'
-import ImportWalletEmpty from 'src/import/ImportWalletEmpty'
 import ImportWalletSocial from 'src/import/ImportWalletSocial'
 import EnterInviteCode from 'src/invite/EnterInviteCode'
 import Language from 'src/language/Language'
@@ -121,7 +120,7 @@ const commonScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen name={Screens.DappKitAccountAuth} component={DappKitAccountScreen} />
       <Navigator.Screen name={Screens.DappKitSignTxScreen} component={DappKitSignTxScreen} />
       <Navigator.Screen name={Screens.DappKitTxDataScreen} component={DappKitTxDataScreen} />
-      <Navigator.Screen name={Screens.Debug} component={Debug} />
+      <Navigator.Screen name={Screens.Debug} component={Debug} options={Debug.navigationOptions} />
       <Navigator.Screen
         name={Screens.PhoneNumberLookupQuota}
         component={PhoneNumberLookupQuotaScreen}
@@ -216,11 +215,6 @@ const nuxScreens = (Navigator: typeof Stack) => (
       options={nuxNavigationOptions}
     />
     <Navigator.Screen
-      name={Screens.ImportWalletEmpty}
-      component={ImportWalletEmpty}
-      options={nuxNavigationOptions}
-    />
-    <Navigator.Screen
       name={Screens.ImportContacts}
       component={ImportContactsScreen}
       options={ImportContactsScreen.navigationOptions}
@@ -299,8 +293,8 @@ const exchangeTradeScreenOptions = ({
   const isDollarToGold = makerToken === CURRENCY_ENUM.DOLLAR
   const title = isDollarToGold ? i18n.t('exchangeFlow9:buyGold') : i18n.t('exchangeFlow9:sellGold')
   const cancelEventName = isDollarToGold
-    ? CustomEventNames.gold_buy_cancel
-    : CustomEventNames.gold_sell_cancel
+    ? AnalyticsEvents.gold_buy_cancel
+    : AnalyticsEvents.gold_sell_cancel
   return {
     ...headerWithCancelButton,
     headerLeft: () => <CancelButton eventName={cancelEventName} />,
@@ -317,11 +311,11 @@ const exchangeReviewScreenOptions = ({
   const isDollarToGold = makerToken === CURRENCY_ENUM.DOLLAR
   const title = isDollarToGold ? i18n.t('exchangeFlow9:buyGold') : i18n.t('exchangeFlow9:sellGold')
   const cancelEventName = isDollarToGold
-    ? CustomEventNames.gold_buy_cancel
-    : CustomEventNames.gold_sell_cancel
+    ? AnalyticsEvents.gold_buy_cancel
+    : AnalyticsEvents.gold_sell_cancel
   const editEventName = isDollarToGold
-    ? CustomEventNames.gold_buy_edit
-    : CustomEventNames.gold_sell_edit
+    ? AnalyticsEvents.gold_buy_edit
+    : AnalyticsEvents.gold_sell_edit
   return {
     ...headerWithCancelButton,
     headerLeft: () => (
@@ -421,7 +415,7 @@ const transactionReviewOptions = ({
   return {
     ...emptyHeader,
     headerLeft: () => (
-      <BackButton color={colors.dark} eventName={CustomEventNames.gold_activity_back} />
+      <BackButton color={colors.dark} eventName={AnalyticsEvents.gold_activity_back} />
     ),
     headerTitle: () => <HeaderTitleWithSubtitle title={header} subTitle={dateTimeStatus} />,
   }
@@ -453,8 +447,10 @@ const mapStateToProps = (state: RootState) => {
   }
 }
 
+type InitialRouteName = ExtractProps<typeof Stack.Navigator>['initialRouteName']
+
 export function MainStackScreen() {
-  const [initialRouteName, setInitialRoute] = React.useState<Screens | undefined>(undefined)
+  const [initialRouteName, setInitialRoute] = React.useState<InitialRouteName>(undefined)
   React.useEffect(() => {
     const {
       language,
@@ -466,7 +462,7 @@ export function MainStackScreen() {
       hasSeenVerificationNux,
     } = mapStateToProps(store.getState())
 
-    let initialRoute: Screens | undefined
+    let initialRoute: InitialRouteName
 
     if (!language) {
       initialRoute = Screens.Language
@@ -486,19 +482,16 @@ export function MainStackScreen() {
 
     setInitialRoute(initialRoute)
 
-    SplashScreen.hide()
-  })
+    // Wait for next frame to avoid slight gap when hiding the splash
+    requestAnimationFrame(() => SplashScreen.hide())
+  }, [])
 
   if (!initialRouteName) {
     return <AppLoading />
   }
 
   return (
-    <Stack.Navigator
-      // @ts-ignore
-      initialRouteName={initialRouteName}
-      screenOptions={emptyHeader}
-    >
+    <Stack.Navigator initialRouteName={initialRouteName} screenOptions={emptyHeader}>
       <Stack.Screen name={Screens.DrawerNavigator} component={DrawerNavigator} options={noHeader} />
       {commonScreens(Stack)}
       {sendScreens(Stack)}

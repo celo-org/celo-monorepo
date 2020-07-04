@@ -8,12 +8,12 @@ import { chunk, flatMap, shuffle, times } from 'lodash'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { setBackupCompleted } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import CancelConfirm from 'src/backup/CancelConfirm'
 import { QuizzBottom } from 'src/backup/QuizzBottom'
 import { getStoredMnemonic, onGetMnemonicFail } from 'src/backup/utils'
@@ -25,6 +25,7 @@ import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'backup/BackupQuiz'
 
@@ -50,6 +51,10 @@ interface State {
   }>
 }
 
+interface StateProps {
+  account: string | null
+}
+
 interface DispatchProps {
   setBackupCompleted: typeof setBackupCompleted
   showError: typeof showError
@@ -57,7 +62,13 @@ interface DispatchProps {
 
 type OwnProps = StackScreenProps<StackParamList, Screens.BackupQuiz>
 
-type Props = WithTranslation & DispatchProps & OwnProps
+type Props = WithTranslation & StateProps & DispatchProps & OwnProps
+
+const mapStateToProps = (state: RootState): StateProps => {
+  return {
+    account: currentAccountSelector(state),
+  }
+}
 
 export const navOptionsForQuiz: StackNavigationOptions = {
   ...emptyHeader,
@@ -92,7 +103,7 @@ export class BackupQuiz extends React.Component<Props, State> {
   }
 
   retrieveMnemonic = async () => {
-    const mnemonic = await getStoredMnemonic()
+    const mnemonic = await getStoredMnemonic(this.props.account)
     if (mnemonic) {
       const shuffledMnemonic = getShuffledWordSet(mnemonic)
 
@@ -119,7 +130,7 @@ export class BackupQuiz extends React.Component<Props, State> {
     })
 
     if (newUserChosenWords.length === 1) {
-      CeloAnalytics.startTracking(CustomEventNames.backup_quiz_submit)
+      ValoraAnalytics.track(AnalyticsEvents.backup_quiz_start)
     }
   }
 
@@ -139,10 +150,7 @@ export class BackupQuiz extends React.Component<Props, State> {
       mnemonicWords: mnemonicWordsUpdated,
       userChosenWords: userChosenWordsUpdated,
     })
-    CeloAnalytics.trackSubEvent(
-      CustomEventNames.backup_quiz_submit,
-      CustomEventNames.backup_quiz_backspace
-    )
+    ValoraAnalytics.track(AnalyticsEvents.backup_quiz_backspace)
   }
 
   onPressReset = async () => {
@@ -163,11 +171,11 @@ export class BackupQuiz extends React.Component<Props, State> {
       Logger.debug(TAG, 'Backup quiz passed')
       this.props.setBackupCompleted()
       navigate(Screens.BackupComplete)
-      CeloAnalytics.track(CustomEventNames.backup_quiz_success)
+      ValoraAnalytics.track(AnalyticsEvents.backup_quiz_success)
     } else {
       Logger.debug(TAG, 'Backup quiz failed, reseting words')
       this.setState({ mode: Mode.Failed })
-      CeloAnalytics.track(CustomEventNames.backup_quiz_incorrect)
+      ValoraAnalytics.track(AnalyticsEvents.backup_quiz_incorrect)
     }
   }
 
@@ -175,7 +183,7 @@ export class BackupQuiz extends React.Component<Props, State> {
     this.setState({ mode: Mode.Checking })
     setTimeout(this.afterCheck, CHECKING_DURATION)
 
-    CeloAnalytics.stopTracking(CustomEventNames.backup_quiz_submit)
+    ValoraAnalytics.track(AnalyticsEvents.backup_quiz_submit)
   }
 
   onScreenSkip = () => {
@@ -306,11 +314,6 @@ function getShuffledWordSet(mnemonic: string) {
   )
 }
 
-export default connect<{}, DispatchProps, OwnProps, RootState>(null, {
-  setBackupCompleted,
-  showError,
-})(withTranslation<Props>(Namespaces.backupKeyFlow6)(BackupQuiz))
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -403,3 +406,8 @@ const styles = StyleSheet.create({
   },
   resetButton: { alignItems: 'center', padding: 24, marginTop: 8 },
 })
+
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
+  setBackupCompleted,
+  showError,
+})(withTranslation<Props>(Namespaces.backupKeyFlow6)(BackupQuiz))

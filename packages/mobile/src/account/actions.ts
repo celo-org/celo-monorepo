@@ -1,7 +1,5 @@
 import { PincodeType } from 'src/account/reducer'
 import { PaymentRequest } from 'src/account/types'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { DefaultEventNames } from 'src/analytics/constants'
 
 // TODO(Rossy): Remove the _ACTION suffix from these actions for consistency with other other names
 export enum Actions {
@@ -54,7 +52,6 @@ export interface PhotosNUXClickedAction {
 export interface SetPincodeAction {
   type: Actions.SET_PINCODE
   pincodeType: PincodeType
-  pin?: string
 }
 
 export interface SetPincodeSuccessAction {
@@ -160,7 +157,6 @@ export function acceptTerms(): AcceptTermsAction {
 }
 
 export function setPhoneNumber(e164PhoneNumber: string, countryCode: string): SetPhoneNumberAction {
-  CeloAnalytics.track(DefaultEventNames.phoneNumberSet, { countryCode })
   return {
     type: Actions.SET_PHONE_NUMBER,
     e164PhoneNumber,
@@ -176,10 +172,9 @@ export const photosNUXCompleted = (): PhotosNUXClickedAction => ({
   type: Actions.PHOTOSNUX_CLICKED,
 })
 
-export const setPincode = (pincodeType: PincodeType, pin?: string): SetPincodeAction => ({
+export const setPincode = (pincodeType: PincodeType): SetPincodeAction => ({
   type: Actions.SET_PINCODE,
   pincodeType,
-  pin,
 })
 
 export const setPincodeSuccess = (pincodeType: PincodeType): SetPincodeSuccessAction => ({

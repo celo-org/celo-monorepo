@@ -32,7 +32,7 @@
   "activity": "Actividad",
   "exchange": "Cambio",
   "inviteSendTo": "Invitar y enviar a",
-  "keepMoneySafe": "Mantendremos este dinero seguro hasta que tu amigo cree una cuenta de Celo",
+  "keepMoneySafe": "Mantendremos este dinero seguro hasta que tu amigo cree una cuenta de {{appName}}",
   "searchFriends": "Ingrese un número de teléfono si no encuentra a la persona que busca",
   "inviteVerifyPayment": "Invitar y verificar el pago",
   "inviteFriends": "Invitar a amigos",
@@ -44,8 +44,8 @@
   "sentEscrowPayment": "Pago de depósito enviado",
   "mobileNumber": "Número de teléfono",
   "walletAddress": "Dirección del Monedero",
-  "inviteSMS": "¡Bienvenido a Celo! Obtén Celo en {{link}} e ingresa tu código para comenzar: {{code}}",
-  "inviteSMSWithEscrowedPayment": "¡Bienvenido a Celo! Te he enviado Dólares Celo. Obtenga en {{link}} e ingrese su código para comenzar: {{code}}",
+  "inviteSMS": "¡Bienvenido a {{appName}}! Obtén {{appName}} en {{link}} e ingresa tu código para comenzar: {{code}}",
+  "inviteSMSWithEscrowedPayment": "¡Bienvenido a {{appName}}! Te he enviado Dólares Celo. Obtenga en {{link}} e ingrese su código para comenzar: {{code}}",
   "inviteSent": "Código de invitación enviado!",
   "inviteFailed": "Falló el envío de la invitación",
   "loadingContacts": "Encontrando tus contactos",
@@ -87,8 +87,8 @@
     "button": "Confirma el número de cuenta"
   },
   "secureSendExplanation": {
-    "body1": "{{e164PhoneNumber}} tiene multipes cuentas asociadas. {{displayName}} puede haber creado una nueva cuenta de Celo, perdido su teléfono o su cuenta puede haber sido interceptada o comprometida.",
-    "body1NoDisplayName": "Su contacto tiene varias cuentas asociadas. Su contacto podría haber creado una nueva cuenta de Celo, o podría haber perdido su teléfono o haber comprometido su cuenta.",
+    "body1": "{{e164PhoneNumber}} tiene multipes cuentas asociadas. {{displayName}} puede haber creado una nueva cuenta de {{appName}}, perdido su teléfono o su cuenta puede haber sido interceptada o comprometida.",
+    "body1NoDisplayName": "Su contacto tiene varias cuentas asociadas. Su contacto podría haber creado una nueva cuenta de {{appName}}, o podría haber perdido su teléfono o haber comprometido su cuenta.",
     "body2": "Puedes realizar esto escaneando el código QR o confirmado su número de cuenta directamente antes de realizar transacciones"
   },
   "confirmAccountNumber": {

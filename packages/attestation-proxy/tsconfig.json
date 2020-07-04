@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "plugins": [
+      {
+        "name": "typescript-tslint-plugin"
+      }
+    ],
+    "lib": ["es2017"],
+    "module": "commonjs",
+    "strict": true,
+    "allowJs": false,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "declaration": true,
+    "target": "es2017",
+    "rootDir": "src",
+    "outDir": "./dist",
+    "skipLibCheck": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "preserveConstEnums": true,
+    "composite": true
+  },
+  "include": ["src", "index.d.ts"],
+  "compileOnSave": true
+}
