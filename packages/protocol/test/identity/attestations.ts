@@ -112,6 +112,7 @@ contract('Attestations', (accounts: string[]) => {
     VALIDATING_KEY_OFFSET,
     ATTESTING_KEY_OFFSET,
     NEW_VALIDATING_KEY_OFFSET,
+    VOTING_KEY_OFFSET,
   }
 
   const getDerivedKey = (offset: number, address: string) => {
@@ -745,7 +746,7 @@ contract('Attestations', (accounts: string[]) => {
       await mockStableToken.mint(attestations.address, attestationFee)
     })
 
-    it('should remove the balance of available rewards for the issuer', async () => {
+    it('should remove the balance of available rewards for the issuer from issuer', async () => {
       await attestations.withdraw(mockStableToken.address, {
         from: issuer,
       })
@@ -754,6 +755,28 @@ contract('Attestations', (accounts: string[]) => {
         issuer
       )
       assert.equal(pendingWithdrawals, 0)
+    })
+
+    it('should remove the balance of available rewards for the issuer from attestation signer', async () => {
+      const signer = await accountsInstance.getAttestationSigner(issuer)
+      await attestations.withdraw(mockStableToken.address, {
+        from: signer,
+      })
+      const pendingWithdrawals: number = await attestations.pendingWithdrawals.call(
+        mockStableToken.address,
+        issuer
+      )
+      assert.equal(pendingWithdrawals, 0)
+    })
+
+    it('should revert from non-attestation signer or issuer account', async () => {
+      await unlockAndAuthorizeKey(
+        KeyOffsets.VOTING_KEY_OFFSET,
+        accountsInstance.authorizeVoteSigner,
+        issuer
+      )
+      const signer = await accountsInstance.getVoteSigner(issuer)
+      await assertRevert(attestations.withdraw(mockStableToken.address, { from: signer }))
     })
 
     it('should emit the Withdrawal event', async () => {

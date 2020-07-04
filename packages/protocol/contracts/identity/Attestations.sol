@@ -295,20 +295,12 @@ contract Attestations is
    * @dev Throws if msg.sender does not have any rewards to withdraw.
    */
   function withdraw(address token) external {
-    uint256 value = pendingWithdrawals[token][msg.sender];
-    require(value > 0, "value was negative/zero");
-    pendingWithdrawals[token][msg.sender] = 0;
-    require(IERC20(token).transfer(msg.sender, value), "token transfer failed");
-    emit Withdrawal(msg.sender, token, value);
-  }
-
-  function withdrawToSigner(address token) external {
     address issuer = getAccounts().attestationSignerToAccount(msg.sender);
     uint256 value = pendingWithdrawals[token][issuer];
     require(value > 0, "value was negative/zero");
     pendingWithdrawals[token][issuer] = 0;
-    require(IERC20(token).transfer(msg.sender, value), "token transfer failed");
-    emit Withdrawal(msg.sender, token, value);
+    require(IERC20(token).transfer(issuer, value), "token transfer failed");
+    emit Withdrawal(issuer, token, value);
   }
 
   /**
