@@ -49,7 +49,8 @@ const styles = StyleSheet.create({
     flex: 1,
     // Fixed height to increase surface area for input
     // to focus on press
-    height: 200,
+    height: 100,
+    textAlignVertical: 'top',
     alignSelf: 'stretch',
     ...fontStyles.large,
   },
