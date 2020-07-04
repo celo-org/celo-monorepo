@@ -27,7 +27,7 @@ function Pincode({
   onChangePin,
   onCompletePin,
 }: Props) {
-  function onDigitPress(digit: number) {
+  const onDigitPress = (digit: number) => {
     if (pin.length >= maxLength) {
       return
     }
@@ -41,7 +41,7 @@ function Pincode({
     }
   }
 
-  function onBackspacePress() {
+  const onBackspacePress = () => {
     onChangePin(pin.substr(0, pin.length - 1))
   }
 
