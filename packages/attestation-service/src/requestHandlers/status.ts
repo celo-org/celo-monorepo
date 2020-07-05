@@ -1,12 +1,12 @@
 import { AttestationServiceStatusResponseType, SignatureType } from '@celo/utils/lib/io'
 import express from 'express'
 import * as t from 'io-ts'
-import { version as VERSION } from '../../package.json'
 import { getAgeOfLatestBlock, isNodeSyncing, kit } from '../db'
 import { fetchEnv, getAccountAddress, getAttestationSignerAddress } from '../env'
 import { ErrorMessages, respondWithError } from '../request'
 import { blacklistRegionCodes, configuredSmsProviders } from '../sms'
 
+export const VERSION = process.env.npm_package_version as string
 export const SIGNATURE_PREFIX = 'attestation-service-status-signature:'
 export const StatusRequestType = t.type({
   messageToSign: t.union([SignatureType, t.undefined]),
