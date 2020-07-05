@@ -8,16 +8,15 @@ import { connect } from 'react-redux'
 import { dismissEarnRewards, dismissGetVerified, dismissInviteFriends } from 'src/account/actions'
 import { getIncomingPaymentRequests, getOutgoingPaymentRequests } from 'src/account/selectors'
 import { PaymentRequest } from 'src/account/types'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { PROMOTE_REWARDS_APP } from 'src/config'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentReminderSummaryNotification from 'src/escrow/EscrowedPaymentReminderSummaryNotification'
 import { getReclaimableEscrowPayments } from 'src/escrow/reducer'
 import { pausedFeatures } from 'src/flags'
 import { Namespaces, withTranslation } from 'src/i18n'
-import BackupKeyIcon from 'src/icons/BackupKeyIcon'
-import { getVerifiedIcon, homeIcon, inviteFriendsIcon, rewardsAppIcon } from 'src/images/Images'
+import { backupKey, getVerified, inviteFriends, learnCelo } from 'src/images/Images'
 import { InviteDetails } from 'src/invite/actions'
 import { inviteesSelector } from 'src/invite/reducer'
 import { navigate } from 'src/navigator/NavigationService'
@@ -129,12 +128,12 @@ export class NotificationBox extends React.Component<Props, State> {
       actions.push({
         title: t('backupKeyFlow6:yourBackupKey'),
         text: t('backupKeyFlow6:backupKeyNotification'),
-        icon: <BackupKeyIcon height={40} width={40} />,
+        icon: backupKey,
         callToActions: [
           {
-            text: t('backupKeyFlow6:getBackupKey'),
+            text: t('backupKeyFlow6:introPrimaryAction'),
             onPress: () => {
-              CeloAnalytics.track(CustomEventNames.get_backup_key)
+              ValoraAnalytics.track(AnalyticsEvents.get_backup_key)
               navigate(Screens.BackupIntroduction)
             },
           },
@@ -146,7 +145,7 @@ export class NotificationBox extends React.Component<Props, State> {
       actions.push({
         title: t('nuxVerification2:notification.title'),
         text: t('nuxVerification2:notification.body'),
-        icon: getVerifiedIcon,
+        icon: getVerified,
         callToActions: [
           {
             text: t('nuxVerification2:notification.cta'),
@@ -155,7 +154,7 @@ export class NotificationBox extends React.Component<Props, State> {
             },
           },
           {
-            text: t('maybeLater'),
+            text: t('global:remind'),
             onPress: () => {
               this.props.dismissGetVerified()
             },
@@ -168,13 +167,13 @@ export class NotificationBox extends React.Component<Props, State> {
       actions.push({
         title: t('walletFlow5:earnCeloRewards'),
         text: t('walletFlow5:earnCeloGold'),
-        icon: rewardsAppIcon,
+        icon: null,
         callToActions: [
           {
             text: t('walletFlow5:startEarning'),
             onPress: () => {
               this.props.dismissEarnRewards()
-              CeloAnalytics.track(CustomEventNames.celorewards_notification_confirm)
+              ValoraAnalytics.track(AnalyticsEvents.celorewards_notification_confirm)
               navigateToVerifierApp()
             },
           },
@@ -182,7 +181,7 @@ export class NotificationBox extends React.Component<Props, State> {
             text: t('maybeLater'),
             onPress: () => {
               this.props.dismissEarnRewards()
-              CeloAnalytics.track(CustomEventNames.celorewards_notification_dismiss)
+              ValoraAnalytics.track(AnalyticsEvents.celorewards_notification_dismiss)
             },
           },
         ],
@@ -193,19 +192,19 @@ export class NotificationBox extends React.Component<Props, State> {
       actions.push({
         title: t('global:celoGold'),
         text: t('exchangeFlow9:whatIsGold'),
-        icon: homeIcon,
+        icon: learnCelo,
         callToActions: [
           {
-            text: t('exchange'),
+            text: t('learnMore'),
             onPress: () => {
-              CeloAnalytics.track(CustomEventNames.celogold_notification_confirm)
+              ValoraAnalytics.track(AnalyticsEvents.celogold_notification_confirm)
               navigate(Screens.GoldEducation)
             },
           },
           {
-            text: t('maybeLater'),
+            text: t('global:dismiss'),
             onPress: () => {
-              CeloAnalytics.track(CustomEventNames.celogold_notification_dismiss)
+              ValoraAnalytics.track(AnalyticsEvents.celogold_notification_dismiss)
             },
           },
         ],
@@ -216,21 +215,21 @@ export class NotificationBox extends React.Component<Props, State> {
       actions.push({
         title: t('inviteFlow11:inviteFriendsToCelo'),
         text: t('inviteFlow11:inviteAnyone'),
-        icon: inviteFriendsIcon,
+        icon: inviteFriends,
         callToActions: [
           {
-            text: t('global:inviteFriends'),
+            text: t('global:connect'),
             onPress: () => {
               this.props.dismissInviteFriends()
-              CeloAnalytics.track(CustomEventNames.invitefriends_notification_confirm)
+              ValoraAnalytics.track(AnalyticsEvents.invitefriends_notification_confirm)
               navigate(Screens.Invite)
             },
           },
           {
-            text: t('maybeLater'),
+            text: t('global:remind'),
             onPress: () => {
               this.props.dismissInviteFriends()
-              CeloAnalytics.track(CustomEventNames.invitefriends_notification_dismiss)
+              ValoraAnalytics.track(AnalyticsEvents.invitefriends_notification_dismiss)
             },
           },
         ],

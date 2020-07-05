@@ -20,8 +20,8 @@ import {
 } from 'src/account/actions'
 import { PaymentRequest, PaymentRequestStatus } from 'src/account/types'
 import { showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { Actions as AppActions, SetLanguage } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { FIREBASE_ENABLED } from 'src/config'
@@ -172,13 +172,13 @@ function* updatePaymentRequestStatus({
 }: (DeclinePaymentRequestAction | CompletePaymentRequestAction) | CancelPaymentRequestAction) {
   switch (status) {
     case PaymentRequestStatus.DECLINED:
-      CeloAnalytics.track(CustomEventNames.incoming_request_payment_decline)
+      ValoraAnalytics.track(AnalyticsEvents.incoming_request_payment_decline)
       break
     case PaymentRequestStatus.COMPLETED:
-      CeloAnalytics.track(CustomEventNames.incoming_request_payment_pay)
+      ValoraAnalytics.track(AnalyticsEvents.incoming_request_payment_pay)
       break
     case PaymentRequestStatus.CANCELLED:
-      CeloAnalytics.track(CustomEventNames.outgoing_request_payment_cancel)
+      ValoraAnalytics.track(AnalyticsEvents.outgoing_request_payment_cancel)
       break
   }
   try {
@@ -255,7 +255,7 @@ function celoGoldExchangeRateHistoryChannel(latestExchangeRate: ExchangeRate) {
       emit(result)
     }
 
-    // timestamp + 1 cause .startAt is inclusive
+    // timestamp + 1 is used because .startAt is inclusive
     const startAt = latestExchangeRate
       ? latestExchangeRate.timestamp + 1
       : now - MAX_HISTORY_RETENTION

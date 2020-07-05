@@ -3,11 +3,11 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import Education from 'src/account/Education'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AnalyticsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setEducationCompleted } from 'src/goldToken/actions'
 import { Namespaces } from 'src/i18n'
-import { exchangeIcon, goldValue, shinyGold } from 'src/images/Images'
+import { celoEducation1, celoEducation2, celoEducation3, celoEducation4 } from 'src/images/Images'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import useSelector from 'src/redux/useSelector'
@@ -20,7 +20,7 @@ export default function GoldEducation() {
   const isCeloEducationComplete = useSelector((state) => state.goldToken.educationCompleted)
 
   const onFinish = () => {
-    CeloAnalytics.track(CustomEventNames.exchange_gold_nux)
+    ValoraAnalytics.track(AnalyticsEvents.exchange_gold_nux)
 
     if (isCeloEducationComplete) {
       navigateBack()
@@ -50,22 +50,28 @@ function useStep() {
   return React.useMemo(() => {
     return [
       {
-        image: shinyGold,
-        cancelEvent: CustomEventNames.gold_cancel1,
-        progressEvent: CustomEventNames.gold_educate_1_next,
+        image: celoEducation1,
+        cancelEvent: AnalyticsEvents.gold_cancel1,
+        progressEvent: AnalyticsEvents.gold_educate_1_next,
         screenName: 'Gold_Nux_1',
       },
       {
-        image: goldValue,
-        cancelEvent: CustomEventNames.gold_cancel2,
-        progressEvent: CustomEventNames.gold_educate_2_next,
+        image: celoEducation2,
+        cancelEvent: AnalyticsEvents.gold_cancel2,
+        progressEvent: AnalyticsEvents.gold_educate_2_next,
         screenName: 'Gold_Nux_2',
       },
       {
-        image: exchangeIcon,
-        cancelEvent: CustomEventNames.gold_cancel3,
-        progressEvent: CustomEventNames.gold_educate_3_next,
+        image: celoEducation3,
+        cancelEvent: AnalyticsEvents.gold_cancel3,
+        progressEvent: AnalyticsEvents.gold_educate_3_next,
         screenName: 'Gold_Nux_3',
+      },
+      {
+        image: celoEducation4, // Placeholder Image
+        cancelEvent: AnalyticsEvents.gold_cancel4,
+        progressEvent: AnalyticsEvents.gold_educate_4_next,
+        screenName: 'Gold_Nux_4',
       },
     ].map((step, index) => {
       return {

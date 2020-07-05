@@ -25,6 +25,9 @@ PODS:
   - Firebase/DynamicLinks (6.13.0):
     - Firebase/CoreOnly
     - FirebaseDynamicLinks (~> 4.0.5)
+  - Firebase/Functions (6.13.0):
+    - Firebase/CoreOnly
+    - FirebaseFunctions (~> 2.5.1)
   - Firebase/Messaging (6.13.0):
     - Firebase/CoreOnly
     - FirebaseMessaging (~> 4.1.9)
@@ -67,6 +70,10 @@ PODS:
   - FirebaseDynamicLinks (4.0.8):
     - FirebaseAnalyticsInterop (~> 1.3)
     - FirebaseCore (~> 6.2)
+  - FirebaseFunctions (2.5.1):
+    - FirebaseAuthInterop (~> 1.0)
+    - FirebaseCore (~> 6.0)
+    - GTMSessionFetcher/Core (~> 1.1)
   - FirebaseInstanceID (4.2.7):
     - FirebaseCore (~> 6.0)
     - GoogleUtilities/Environment (~> 6.0)
@@ -326,7 +333,7 @@ PODS:
     - React
   - react-native-netinfo (5.8.0):
     - React
-  - react-native-safe-area-context (0.7.3):
+  - react-native-safe-area-context (3.0.6):
     - React
   - react-native-secure-randombytes (3.0.2):
     - React
@@ -436,6 +443,11 @@ PODS:
     - Firebase/DynamicLinks (~> 6.13.0)
     - React
     - RNFBApp
+  - RNFBFunctions (6.8.1):
+    - Firebase/Core (~> 6.13.0)
+    - Firebase/Functions (~> 6.13.0)
+    - React
+    - RNFBApp
   - RNFBMessaging (6.7.1):
     - Firebase/Core (~> 6.13.0)
     - Firebase/Messaging (~> 6.13.0)
@@ -450,6 +462,8 @@ PODS:
     - React
   - RNGestureHandler (1.6.1):
     - React
+  - RNKeychain (6.0.0):
+    - React
   - RNLocalize (1.4.0):
     - React
   - RNPermissions (2.1.5):
@@ -457,8 +471,6 @@ PODS:
   - RNReanimated (1.9.0):
     - React
   - RNScreens (2.7.0):
-    - React
-  - RNSecureKeyStore (1.0.0):
     - React
   - RNSentry (1.3.7):
     - React
@@ -541,15 +553,16 @@ DEPENDENCIES:
   - "RNFBAuth (from `../../../node_modules/@react-native-firebase/auth`)"
   - "RNFBDatabase (from `../../../node_modules/@react-native-firebase/database`)"
   - "RNFBDynamicLinks (from `../../../node_modules/@react-native-firebase/dynamic-links`)"
+  - "RNFBFunctions (from `../../../node_modules/@react-native-firebase/functions`)"
   - "RNFBMessaging (from `../../../node_modules/@react-native-firebase/messaging`)"
   - "RNFBStorage (from `../../../node_modules/@react-native-firebase/storage`)"
   - RNFS (from `../../../node_modules/react-native-fs`)
   - RNGestureHandler (from `../../../node_modules/react-native-gesture-handler`)
+  - RNKeychain (from `../../../node_modules/react-native-keychain`)
   - RNLocalize (from `../../../node_modules/react-native-localize`)
   - RNPermissions (from `../../../node_modules/react-native-permissions`)
   - RNReanimated (from `../../../node_modules/react-native-reanimated`)
   - RNScreens (from `../../../node_modules/react-native-screens`)
-  - RNSecureKeyStore (from `../../../node_modules/react-native-secure-key-store/ios`)
   - "RNSentry (from `../../../node_modules/@sentry/react-native`)"
   - RNShare (from `../../../node_modules/react-native-share`)
   - RNSVG (from `../../../node_modules/react-native-svg`)
@@ -570,6 +583,7 @@ SPEC REPOS:
     - FirebaseCoreDiagnosticsInterop
     - FirebaseDatabase
     - FirebaseDynamicLinks
+    - FirebaseFunctions
     - FirebaseInstanceID
     - FirebaseMessaging
     - FirebaseStorage
@@ -697,6 +711,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/@react-native-firebase/database"
   RNFBDynamicLinks:
     :path: "../../../node_modules/@react-native-firebase/dynamic-links"
+  RNFBFunctions:
+    :path: "../../../node_modules/@react-native-firebase/functions"
   RNFBMessaging:
     :path: "../../../node_modules/@react-native-firebase/messaging"
   RNFBStorage:
@@ -705,6 +721,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-fs"
   RNGestureHandler:
     :path: "../../../node_modules/react-native-gesture-handler"
+  RNKeychain:
+    :path: "../../../node_modules/react-native-keychain"
   RNLocalize:
     :path: "../../../node_modules/react-native-localize"
   RNPermissions:
@@ -713,8 +731,6 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-reanimated"
   RNScreens:
     :path: "../../../node_modules/react-native-screens"
-  RNSecureKeyStore:
-    :path: "../../../node_modules/react-native-secure-key-store/ios"
   RNSentry:
     :path: "../../../node_modules/@sentry/react-native"
   RNShare:
@@ -741,6 +757,7 @@ SPEC CHECKSUMS:
   FirebaseCoreDiagnosticsInterop: 296e2c5f5314500a850ad0b83e9e7c10b011a850
   FirebaseDatabase: 0144e0706a4761f1b0e8679572eba8095ddb59be
   FirebaseDynamicLinks: 417dc6dbb6013233c77558290d73296f429656a6
+  FirebaseFunctions: 5af7c35d1c5e41608fecbb667eb6c4e672e318d0
   FirebaseInstanceID: ebd2ea79ee38db0cb5f5167b17a0d387e1cc7b6e
   FirebaseMessaging: 089b7a4991425783384acc8bcefcd78c0af913bd
   FirebaseStorage: 93fe2f8190a01bfb2b2c4932df7d679744c4ef1d
@@ -776,7 +793,7 @@ SPEC CHECKSUMS:
   react-native-keep-awake: afad8a51dfef9fe9655a6344771be32c8596d774
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
   react-native-netinfo: b9650ab1b8b4362b3c455b1274e4bc48223cc957
-  react-native-safe-area-context: e200d4433aba6b7e60b52da5f37af11f7a0b0392
+  react-native-safe-area-context: e22a8ca00f758273d2408953965cb8db67da7925
   react-native-secure-randombytes: 2d98715ff6b15bdc519cf7d4475dad9d3e96a2c0
   react-native-simple-toast: 58b71ef003f01d2c0bf5dcd2fdccc75861dabade
   react-native-sms: 31fbb9d6ebb565ad32e409eaf9dc70329936a129
@@ -804,15 +821,16 @@ SPEC CHECKSUMS:
   RNFBAuth: 3d3491cf27037c65a7f68bd77a990c15fd97ccec
   RNFBDatabase: 5cfc5a090c66c46dd325e0842378be69a1780d6f
   RNFBDynamicLinks: 87346f14c8f12a16eb3ad56ae279c8ce0fdc9c03
+  RNFBFunctions: 88272875225ebb9736369410e0062b51a4fa50dc
   RNFBMessaging: 67f7f6c799e1ea2a8f19b4717a5e5d9515902533
   RNFBStorage: 08c6831d19190f68f0985ff7bd773262f11a1c4a
   RNFS: 2bd9eb49dc82fa9676382f0585b992c424cd59df
   RNGestureHandler: 8f09cd560f8d533eb36da5a6c5a843af9f056b38
+  RNKeychain: bf2d7e9a0ae7a073c07770dd2aa6d11c67581733
   RNLocalize: b6df30cc25ae736d37874f9bce13351db2f56796
   RNPermissions: ad71dd4f767ec254f2cd57592fbee02afee75467
   RNReanimated: b5ccb50650ba06f6e749c7c329a1bc3ae0c88b43
   RNScreens: cf198f915f8a2bf163de94ca9f5bfc8d326c3706
-  RNSecureKeyStore: f1ad870e53806453039f650720d2845c678d89c8
   RNSentry: 370623102247ebea20191b5fb549ecc7a275b324
   RNShare: fea1801315aa8875d6db73a4010b14afcd568765
   RNSVG: ce9d996113475209013317e48b05c21ee988d42e

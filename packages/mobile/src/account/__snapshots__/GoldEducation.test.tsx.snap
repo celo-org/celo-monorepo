@@ -1,9 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
+      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
@@ -11,19 +12,85 @@ exports[`renders correctly 1`] = `
   <View
     style={
       Object {
+        "alignItems": "center",
+        "backgroundColor": "transparent",
+        "borderBottomColor": AnimatedValue {
+          " __value": NaN,
+        },
+        "borderBottomWidth": 1,
         "flexDirection": "row",
-        "paddingLeft": 24,
-        "paddingVertical": 16,
-        "width": "100%",
+        "height": 62,
+        "justifyContent": "space-between",
       }
     }
-    testID="Education/top"
-  />
+    testID="DrawerTopBar"
+  >
+    <View
+      accessible={true}
+      focusable={false}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "marginBottom": 0,
+          "marginLeft": 4,
+          "opacity": 1,
+          "padding": 8,
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height="32"
+        viewBox="0 0 32 32"
+        width="32"
+      >
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="9.75"
+          y2="9.75"
+        />
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="15.75"
+          y2="15.75"
+        />
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="21.75"
+          y2="21.75"
+        />
+      </svg>
+    </View>
+    <View
+      style={
+        Object {
+          "width": 45,
+        }
+      }
+    />
+  </View>
   <View
     style={
       Object {
         "alignItems": "center",
-        "backgroundColor": "white",
         "flex": 1,
         "justifyContent": "center",
         "paddingBottom": 24,
@@ -68,14 +135,12 @@ exports[`renders correctly 1`] = `
           resizeMode="contain"
           source={
             Object {
-              "testUri": "../../../packages/mobile/src/images/shiny-gold.png",
+              "testUri": "../../../packages/mobile/src/images/celo-education-1.png",
             }
           }
           style={
             Object {
               "alignSelf": "center",
-              "height": 200,
-              "width": 200,
             }
           }
         />
@@ -122,14 +187,12 @@ exports[`renders correctly 1`] = `
           resizeMode="contain"
           source={
             Object {
-              "testUri": "../../../packages/mobile/src/images/gold-value.png",
+              "testUri": "../../../packages/mobile/src/images/celo-education-2.png",
             }
           }
           style={
             Object {
               "alignSelf": "center",
-              "height": 200,
-              "width": 200,
             }
           }
         />
@@ -176,14 +239,12 @@ exports[`renders correctly 1`] = `
           resizeMode="contain"
           source={
             Object {
-              "testUri": "../../../packages/mobile/src/images/exchange.png",
+              "testUri": "../../../packages/mobile/src/images/celo-education-3.png",
             }
           }
           style={
             Object {
               "alignSelf": "center",
-              "height": 200,
-              "width": 200,
             }
           }
         />
@@ -214,6 +275,58 @@ exports[`renders correctly 1`] = `
           }
         >
           steps.2.text
+        </Text>
+      </View>
+      <View
+        style={
+          Object {
+            "flex": 1,
+            "justifyContent": "center",
+            "marginBottom": 24,
+            "paddingHorizontal": 24,
+          }
+        }
+      >
+        <Image
+          resizeMode="contain"
+          source={
+            Object {
+              "testUri": "../../../packages/mobile/src/images/celo-education-4.png",
+            }
+          }
+          style={
+            Object {
+              "alignSelf": "center",
+            }
+          }
+        />
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Jost-Medium",
+              "fontSize": 22,
+              "lineHeight": 28,
+              "marginTop": 24,
+              "textAlign": "center",
+            }
+          }
+        >
+          steps.3.title
+        </Text>
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-Regular",
+              "fontSize": 16,
+              "lineHeight": 22,
+              "paddingTop": 16,
+              "textAlign": "center",
+            }
+          }
+        >
+          steps.3.text
         </Text>
       </View>
     </Swiper>
@@ -285,5 +398,5 @@ exports[`renders correctly 1`] = `
       </View>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

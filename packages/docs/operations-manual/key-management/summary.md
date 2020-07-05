@@ -19,7 +19,7 @@ For more details on a specific key type, please see the more detailed sections b
 | Role                                | Description                                                                                      | Ledger compatible |
 | ----------------------------------- |--------------------------------------------------------------------------------------------------|-----|
 | Celo Account                        | An account used to send transactions in the Celo protocol                                        | Yes |
-| Locked Gold Account                 | Used to lock and unlock cGLD and authorize signers                                               | Yes |
+| Locked Gold Account                 | Used to lock and unlock CELO and authorize signers                                               | Yes |
 | Authorized vote signer              | Can vote on behalf of a Locked Gold Account                                                      | Yes |
 | Authorized validator (group) signer | Can register and manage a validator group on behalf of a Locked Gold Account                     | Yes |
 | Authorized validator signer         | Can register, manage a validator, and sign consensus messages on behalf of a Locked Gold Account | No  |
