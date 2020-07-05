@@ -20,7 +20,7 @@
 
 • **account**: *[Address](../modules/_contractkit_src_base_.md#address)*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:60](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L60)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L61)*
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **issuer**: *string*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L62)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L63)*
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **phoneNumber**: *string*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L61)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L62)*
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • **salt**? : *undefined | string*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L63)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L64)*
 
 ___
 
@@ -52,4 +52,4 @@ ___
 
 • **smsRetrieverAppSig**? : *undefined | string*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L64)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L65)*
