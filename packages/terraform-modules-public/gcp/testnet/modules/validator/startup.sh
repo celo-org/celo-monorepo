@@ -214,6 +214,8 @@ then
   systemctl start geth.service
   else
     echo "No chaindata found in bucket gs://${gcloud_project}-chaindata-rsync, aborting warp restore"
+    echo "Starting geth"
+    systemctl start geth.service
   fi
 EOF
 chmod u+x /root/restore_rsync.sh
