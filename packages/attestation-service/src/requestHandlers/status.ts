@@ -2,7 +2,7 @@ import { AttestationServiceStatusResponseType, SignatureType } from '@celo/utils
 import express from 'express'
 import * as t from 'io-ts'
 import { getAgeOfLatestBlock, isNodeSyncing, kit } from '../db'
-import { fetchEnv, getAccountAddress, getAttestationSignerAddress } from '../env'
+import { fetchEnvOrDefault, getAccountAddress, getAttestationSignerAddress } from '../env'
 import { ErrorMessages, respondWithError } from '../request'
 import { blacklistRegionCodes, configuredSmsProviders } from '../sms'
 
@@ -41,7 +41,7 @@ export async function handleStatusRequest(
           latestBlock,
           ageOfLatestBlock,
           isNodeSyncing: await isNodeSyncing(),
-          appSignature: fetchEnv('APP_SIGNATURE'),
+          appSignature: fetchEnvOrDefault('APP_SIGNATURE', 'unknown'),
         })
       )
       .status(200)
