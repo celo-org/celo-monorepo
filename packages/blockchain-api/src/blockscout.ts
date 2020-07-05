@@ -1,6 +1,7 @@
 import { RESTDataSource } from 'apollo-datasource-rest'
 import BigNumber from 'bignumber.js'
 import { BLOCKSCOUT_API, FAUCET_ADDRESS, VERIFICATION_REWARDS_ADDRESS } from './config'
+import { CGLD, CUSD } from './currencyConversion/consts'
 import { EventArgs, EventTypes, TokenTransactionArgs, TransferEvent } from './schema'
 import { formatCommentString, getContractAddresses } from './utils'
 
@@ -25,6 +26,18 @@ export interface BlockscoutCeloTransfer {
   toAddressHash: string
   token: string
   value: string
+}
+
+// Calculate cGLD to cUSD rate based on the actual transfers
+function getKnownExchangeRates(
+  current: BlockscoutCeloTransfer,
+  comparable: BlockscoutCeloTransfer
+) {
+  return current.token === CGLD && comparable.token === CUSD
+    ? {
+        [`${CGLD}/${CUSD}`]: new BigNumber(comparable.value).dividedBy(current.value).toString(),
+      }
+    : undefined
 }
 
 export class BlockscoutAPI extends RESTDataSource {
@@ -296,11 +309,13 @@ export class BlockscoutAPI extends RESTDataSource {
       makerAmount: {
         value: new BigNumber(inTransfer.value).dividedBy(WEI_PER_GOLD).toString(),
         currencyCode: inTransfer.token,
+        knownExchangeRates: getKnownExchangeRates(inTransfer, outTransfer),
         timestamp,
       },
       takerAmount: {
         value: new BigNumber(outTransfer.value).dividedBy(WEI_PER_GOLD).toString(),
         currencyCode: outTransfer.token,
+        knownExchangeRates: getKnownExchangeRates(outTransfer, inTransfer),
         timestamp,
       },
       hash,

@@ -40,8 +40,11 @@ import * as util from 'util'
 
 const TAG = 'exchange/saga'
 
-const LARGE_DOLLARS_SELL_AMOUNT_IN_WEI = new BigNumber(1000 * 1000000000000000000) // To estimate exchange rate from exchange contract
-const LARGE_GOLD_SELL_AMOUNT_IN_WEI = new BigNumber(100 * 1000000000000000000)
+// Amounts to estimate the exchange rate, as the rate varies based on transaction size
+// These values needs to be in-sync with the ones here:
+// https://github.com/celo-org/celo-monorepo/blob/master/packages/notification-service/src/exchange/exchangeQuery.ts#L9-L10
+const LARGE_DOLLARS_SELL_AMOUNT_IN_WEI = new BigNumber(10000 * 1000000000000000000) //  100 dollars
+const LARGE_GOLD_SELL_AMOUNT_IN_WEI = new BigNumber(10 * 1000000000000000000) // 10 gold
 const EXCHANGE_DIFFERENCE_TOLERATED = 0.01 // Maximum difference between actual and displayed takerAmount
 
 export function* doFetchTobinTax({ makerAmount, makerToken }: FetchTobinTaxAction) {

@@ -22,6 +22,7 @@ export default class CurrencyConversionAPI<TContext = any> extends DataSource {
     sourceCurrencyCode,
     currencyCode,
     timestamp,
+    knownExchangeRates,
   }: CurrencyConversionArgs): Promise<BigNumber> {
     const fromCode = sourceCurrencyCode || USD
     const toCode = currencyCode
@@ -32,7 +33,9 @@ export default class CurrencyConversionAPI<TContext = any> extends DataSource {
     for (let i = 1; i < steps.length; i++) {
       const prevCode = steps[i - 1]
       const code = steps[i]
-      ratesPromises.push(this.getSupportedExchangeRate(prevCode, code, timestamp))
+      ratesPromises.push(
+        this.getSupportedExchangeRate(prevCode, code, timestamp, knownExchangeRates)
+      )
     }
 
     const rates = await Promise.all(ratesPromises)
@@ -74,7 +77,8 @@ export default class CurrencyConversionAPI<TContext = any> extends DataSource {
   private getSupportedExchangeRate(
     fromCode: string,
     toCode: string,
-    timestamp?: number
+    timestamp?: number,
+    knownExchangeRates?: { [pair: string]: string }
   ): Promise<BigNumber> {
     const pair = `${fromCode}/${toCode}`
 
@@ -82,6 +86,9 @@ export default class CurrencyConversionAPI<TContext = any> extends DataSource {
       // TODO: use real rates once we have the data
       return Promise.resolve(new BigNumber(1))
     } else if (pair === 'cGLD/cUSD' || pair === 'cUSD/cGLD') {
+      if (knownExchangeRates && knownExchangeRates[pair]) {
+        return Promise.resolve(new BigNumber(knownExchangeRates[pair]))
+      }
       return this.goldExchangeRateAPI.getExchangeRate({
         sourceCurrencyCode: fromCode,
         currencyCode: toCode,

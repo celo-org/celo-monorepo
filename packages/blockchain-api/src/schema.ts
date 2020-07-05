@@ -61,11 +61,14 @@ export interface CurrencyConversionArgs {
   sourceCurrencyCode?: string
   currencyCode: string
   timestamp?: number
+  knownExchangeRates?: { [pair: string]: string }
 }
 
 export interface MoneyAmount {
   value: BigNumber.Value
   currencyCode: string
+  // to override exchange rates from the APIs
+  knownExchangeRates?: { [pair: string]: string }
   timestamp: number
 }
 
@@ -310,6 +313,7 @@ export const resolvers = {
         sourceCurrencyCode: moneyAmount.currencyCode,
         currencyCode: localCurrencyCode || 'USD',
         timestamp: moneyAmount.timestamp,
+        knownExchangeRates: moneyAmount.knownExchangeRates,
       })
       return {
         value: new BigNumber(moneyAmount.value).multipliedBy(rate).toString(),
