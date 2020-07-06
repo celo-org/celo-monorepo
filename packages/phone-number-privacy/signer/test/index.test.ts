@@ -51,7 +51,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
     }
 
     it('provides signature', (done) => {
-      mockGetRemainingQueryCount.mockReturnValue(10)
+      mockGetRemainingQueryCount.mockReturnValue([0, 10])
       request(app)
         .post('/getBlindedSalt')
         .send(mockRequestData)
@@ -62,12 +62,14 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
             success: true,
             signature: BLS_SIGNATURE,
             version: VERSION,
+            performedQueryCount: 0,
+            totalQuota: 10,
           },
           done
         )
     })
     it('returns 403 on query count 0', (done) => {
-      mockGetRemainingQueryCount.mockReturnValue(0)
+      mockGetRemainingQueryCount.mockReturnValue([10, 10])
       request(app)
         .post('/getBlindedSalt')
         .send(mockRequestData)

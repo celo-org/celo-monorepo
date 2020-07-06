@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@celo/contractkit": "0.4.5",
+    "@celo/phone-number-privacy-common": "^1.0.0",
     "@celo/utils": "0.1.13",
     "@google-cloud/secret-manager": "3.0.0",
     "aws-sdk": "^2.696.0",
@@ -26,8 +27,8 @@
     "express": "^4.17.1",
     "knex": "^0.21.1",
     "morgan": "^1.10.0",
-    "mysql2": "^2.1.0",
     "mssql": "^6.2.0",
+    "mysql2": "^2.1.0",
     "pg": "^8.2.1"
   },
   "devDependencies": {

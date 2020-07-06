@@ -15,8 +15,12 @@ mockAuthenticateUser.mockReturnValue(true)
 const mockIsVerified = isVerified as jest.Mock
 
 jest.mock('../src/bls/bls-cryptography-client')
-const mockComputeBlindedSignature = BLSCryptographyClient.combinePartialBlindedSignatures as jest.Mock
+const mockComputeBlindedSignature = jest.fn()
+BLSCryptographyClient.prototype.combinePartialBlindedSignatures = mockComputeBlindedSignature
 mockComputeBlindedSignature.mockResolvedValue(BLS_SIGNATURE)
+const mockSufficientVerifiedSigs = jest.fn()
+BLSCryptographyClient.prototype.sufficientVerifiedSignatures = mockSufficientVerifiedSigs
+mockSufficientVerifiedSigs.mockResolvedValue(true)
 
 jest.mock('../src/database/wrappers/account')
 const mockGetDidMatchmaking = getDidMatchmaking as jest.Mock

@@ -7,14 +7,13 @@ import { getPerformedQueryCount } from '../database/wrappers/account'
 import { getContractKit } from '../web3/contracts'
 
 /*
- * Returns how many queries the account can make based on the
- * calculated query quota and the number of queries already performed.
+ * Returns the number of queries already performed and the calculated query quota.
  */
 export async function getRemainingQueryCount(account: string, hashedPhoneNumber?: string) {
   logger.debug('Retrieving remaining query count')
-  const queryQuota = await getQueryQuota(account, hashedPhoneNumber)
+  const totalQuota = await getQueryQuota(account, hashedPhoneNumber)
   const performedQueryCount = await getPerformedQueryCount(account)
-  return queryQuota - performedQueryCount
+  return [performedQueryCount, totalQuota]
 }
 
 /*
