@@ -6,7 +6,7 @@ import gql from 'graphql-tag'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { CeloExchangeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ExchangeItemFragment } from 'src/apollo/types'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
@@ -24,7 +24,7 @@ export function ExchangeFeedItem(props: Props) {
   const { t, i18n } = useTranslation(Namespaces.walletFlow5)
   const { amount, makerAmount, takerAmount, status, timestamp } = props
   const onPress = () => {
-    ValoraAnalytics.track(AnalyticsEvents.gold_activity_select)
+    ValoraAnalytics.track(CeloExchangeEvents.celo_transaction_select)
     navigateToExchangeReview(timestamp, {
       makerAmount,
       takerAmount,
