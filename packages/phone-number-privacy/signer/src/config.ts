@@ -1,3 +1,4 @@
+import { toBool, toNum } from '@celo/phone-number-privacy-common/lib/utils/config-utils'
 import BigNumber from 'bignumber.js'
 
 export const VERSION = process.env.npm_package_version
@@ -71,10 +72,6 @@ interface Config {
     }
   }
 }
-
-const toNum = (value: BigNumber.Value) => new BigNumber(value).toNumber()
-const toBool = (value: string | undefined, fallback: boolean) =>
-  value ? value.toLowerCase() === 'true' : fallback
 
 const env = process.env as any
 const config: Config = {
