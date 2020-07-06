@@ -2,7 +2,7 @@ import { CURRENCY_ENUM } from '@celo/utils/src'
 import BigNumber from 'bignumber.js'
 import { call, CallEffect, put, select, takeLatest } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { FeeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { getReclaimEscrowGas } from 'src/escrow/saga'
@@ -92,7 +92,7 @@ export function* estimateFeeSaga({ feeType }: EstimateFeeAction) {
     }
   } catch (error) {
     Logger.error(`${TAG}/estimateFeeSaga`, 'Error estimating fee', error)
-    ValoraAnalytics.track(AnalyticsEvents.estimate_fee_failed, { error: error.message, feeType })
+    ValoraAnalytics.track(FeeEvents.estimate_fee_failed, { error: error.message, feeType })
     yield put(showError(ErrorMessages.CALCULATE_FEE_FAILED))
   }
 }

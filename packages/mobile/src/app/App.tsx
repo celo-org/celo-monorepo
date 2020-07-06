@@ -7,7 +7,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { enableScreens } from 'react-native-screens'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { AppEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { apolloClient } from 'src/apollo/index'
 import { openDeepLink } from 'src/app/actions'
@@ -55,12 +55,12 @@ export class App extends React.Component {
         (appInitializedAtString: string) => {
           const appInitializedAt = new Date(appInitializedAtString)
           const loadingDuration = appLoadedAt.getTime() - appInitializedAt.getTime()
-          ValoraAnalytics.startSession(AnalyticsEvents.app_launched, { loadingDuration })
+          ValoraAnalytics.startSession(AppEvents.app_launched, { loadingDuration })
           appStartListener.remove()
         }
       )
     } else {
-      ValoraAnalytics.startSession(AnalyticsEvents.app_launched, { loadingDuration: null })
+      ValoraAnalytics.startSession(AppEvents.app_launched, {})
     }
 
     Linking.addEventListener('url', this.handleOpenURL)
