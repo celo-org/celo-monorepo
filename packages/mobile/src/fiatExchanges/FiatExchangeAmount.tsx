@@ -110,7 +110,7 @@ export function ExchangeTradeScreen({ navigation, route }: Props) {
   )
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <DisconnectBanner />
       <KeyboardAwareScrollView
         keyboardShouldPersistTaps={'always'}
