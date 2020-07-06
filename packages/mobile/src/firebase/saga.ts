@@ -20,8 +20,6 @@ import {
 } from 'src/account/actions'
 import { PaymentRequest, PaymentRequestStatus } from 'src/account/types'
 import { showError } from 'src/alert/actions'
-import { AnalyticsEvents } from 'src/analytics/Events'
-import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { Actions as AppActions, SetLanguage } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { FIREBASE_ENABLED } from 'src/config'
@@ -170,17 +168,6 @@ function* updatePaymentRequestStatus({
   id,
   status,
 }: (DeclinePaymentRequestAction | CompletePaymentRequestAction) | CancelPaymentRequestAction) {
-  switch (status) {
-    case PaymentRequestStatus.DECLINED:
-      ValoraAnalytics.track(AnalyticsEvents.incoming_request_payment_decline)
-      break
-    case PaymentRequestStatus.COMPLETED:
-      ValoraAnalytics.track(AnalyticsEvents.incoming_request_payment_pay)
-      break
-    case PaymentRequestStatus.CANCELLED:
-      ValoraAnalytics.track(AnalyticsEvents.outgoing_request_payment_cancel)
-      break
-  }
   try {
     Logger.debug(TAG, 'Updating payment request', id, `status: ${status}`)
     yield call(() =>

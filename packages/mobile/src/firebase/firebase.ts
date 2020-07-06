@@ -10,7 +10,7 @@ import { eventChannel, EventChannel } from 'redux-saga'
 import { call, put, select, spawn, take } from 'redux-saga/effects'
 import { NotificationReceiveState } from 'src/account/types'
 import { showError } from 'src/alert/actions'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { RequestEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
@@ -175,7 +175,7 @@ export function* paymentRequestWriter({ paymentInfo }: WritePaymentRequest) {
     navigateHome()
   } catch (error) {
     Logger.error(TAG, 'Failed to write payment request to Firebase DB', error)
-    ValoraAnalytics.track(AnalyticsEvents.request_error, { error: error.message })
+    ValoraAnalytics.track(RequestEvents.request_error, { error: error.message })
     yield put(showError(ErrorMessages.PAYMENT_REQUEST_FAILED))
   }
 }
