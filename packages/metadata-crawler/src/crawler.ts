@@ -176,6 +176,9 @@ async function processAttestationServiceStatusForValidator(
     rightAccount,
     error,
     state,
+    version,
+    ageOfLatestBlock,
+    appSignature,
   } = await attestationsWrapper.getAttestationServiceStatus(validator)
   const isElected = electedValidators.has(validator.address)
   dataLogger.info(
@@ -192,6 +195,9 @@ async function processAttestationServiceStatusForValidator(
       rightAccount,
       err: error,
       state,
+      version,
+      ageOfLatestBlock,
+      appSignature,
     },
     'checked_attestation_service_status'
   )

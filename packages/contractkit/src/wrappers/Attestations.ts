@@ -530,6 +530,9 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       rightAccount: false,
       metadataURL: null,
       state: AttestationServiceStatusState.NoAttestationSigner,
+      version: null,
+      ageOfLatestBlock: null,
+      appSignature: null,
     }
 
     if (!hasAttestationSigner) {
@@ -575,6 +578,9 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       ret.blacklistedRegionCodes = statusResponseBody.blacklistedRegionCodes
       ret.rightAccount = eqAddress(validator.address, statusResponseBody.accountAddress)
       ret.state = AttestationServiceStatusState.Valid
+      ret.version = statusResponseBody.version
+      ret.ageOfLatestBlock = statusResponseBody.ageOfLatestBlock
+      ret.appSignature = statusResponseBody.appSignature
       return ret
     } catch (error) {
       ret.state = AttestationServiceStatusState.UnreachableAttestationService
@@ -610,4 +616,7 @@ interface AttestationServiceStatusResponse {
   rightAccount: boolean
   signer: string
   state: AttestationServiceStatusState
+  version: string | null
+  ageOfLatestBlock: number | null
+  appSignature: string | null
 }
