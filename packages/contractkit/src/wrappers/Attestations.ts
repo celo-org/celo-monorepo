@@ -532,7 +532,6 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       state: AttestationServiceStatusState.NoAttestationSigner,
       version: null,
       ageOfLatestBlock: null,
-      appSignature: null,
     }
 
     if (!hasAttestationSigner) {
@@ -580,7 +579,6 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       ret.state = AttestationServiceStatusState.Valid
       ret.version = statusResponseBody.version
       ret.ageOfLatestBlock = statusResponseBody.ageOfLatestBlock
-      ret.appSignature = statusResponseBody.appSignature
       return ret
     } catch (error) {
       ret.state = AttestationServiceStatusState.UnreachableAttestationService
@@ -618,5 +616,4 @@ interface AttestationServiceStatusResponse {
   state: AttestationServiceStatusState
   version: string | null
   ageOfLatestBlock: number | null
-  appSignature: string | null
 }
