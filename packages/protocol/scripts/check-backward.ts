@@ -1,3 +1,4 @@
+import { DefaultCategorizer } from '@celo/protocol/lib/backward/categorizer'
 import {
   ASTBackwardReport,
   createReport,
@@ -104,6 +105,7 @@ try {
     oldArtifactsFolder,
     newArtifactsFolder,
     exclude,
+    new DefaultCategorizer(),
     out
   )
   out(`Writing report to ${outFile} ...`)
