@@ -1,10 +1,14 @@
 import {
   ASTCodeCompatibilityReport,
-  CategorizerChangeVisitor,
-  Change, ChangeType,
-  createIndexByChangeType, reportASTIncompatibilities
+
+
+
+  Change, ChangeType, ChangeVisitor,
+
+  reportASTIncompatibilities
 } from '@celo/protocol/lib/backward/ast-code'
 import { ASTStorageCompatibilityReport, reportLayoutIncompatibilities } from '@celo/protocol/lib/backward/ast-layout'
+import { Categorizer } from '@celo/protocol/lib/backward/categorizer'
 import { BuildArtifacts, Contracts, getBuildArtifacts } from '@openzeppelin/upgrades'
 import { readJsonSync } from 'fs-extra'
 
@@ -44,6 +48,15 @@ export class ASTBackwardReport {
     this.codeReport.changes = this.codeReport.changes.filter(r => included(r.getContract()))
     this.storageReports = this.storageReports.filter(r => included(r.contract))
   }
+}
+
+export const categorize = (changes: Change[], categorizer: ChangeVisitor<ChangeType>): Change[][] => {
+  const byCategory = []
+  for (const ct of Object.values(ChangeType)) {
+    byCategory[ct] = []
+  }
+  changes.map(c => byCategory[c.accept(categorizer)].push(c))
+  return byCategory
 }
 
 export const isValidVersion = (version: string): boolean => {
@@ -122,7 +135,12 @@ const createSemanticVersionDelta = (report: ASTBackwardReport) => {
   return `${V_STORAGE}.${V_MAJOR}.${V_MINOR}.${V_PATCH}`
 }
 
-export const createReport = (oldArtifactsFolder: string, newArtifactsFolder: string, exclude: string, logFunction: (msg: string) => void): ASTBackwardReport => {
+export const createReport = (
+  oldArtifactsFolder: string, 
+  newArtifactsFolder: string, 
+  exclude: string,
+  categorizer: Categorizer,
+  logFunction: (msg: string) => void): ASTBackwardReport => {
   logFunction("Instantiating old artifacts...")
   const artifacts1 = instantiateArtifacts(oldArtifactsFolder)
   logFunction("Done\n")
@@ -147,9 +165,9 @@ export const createReport = (oldArtifactsFolder: string, newArtifactsFolder: str
   report.storage = report.storageReports
     .filter(r => !r.compatible)
 
-  const byChangeType = createIndexByChangeType(
+  const byChangeType = categorize(
     report.codeReport.changes, 
-     new CategorizerChangeVisitor()
+     categorizer
   )
   report.major = byChangeType[ChangeType.Major]
   report.minor = byChangeType[ChangeType.Minor]

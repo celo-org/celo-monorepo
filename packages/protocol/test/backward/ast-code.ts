@@ -3,8 +3,8 @@ import {
   DeployedBytecodeChange,
   MethodAddedChange,
   MethodMutabilityChange,
-  MethodParametersChange,
   MethodRemovedChange,
+  MethodReturnChange,
   MethodVisibilityChange,
   NewContractChange,
   reportASTIncompatibilities,
@@ -114,7 +114,7 @@ describe('#reportASTIncompatibilities()', () => {
           'payable',
           'nonpayable'
         ),
-        new MethodParametersChange(
+        new MethodReturnChange(
           'MethodsModifiedContract',
           'someMethod3(uint256,string)',
           'uint256, memory string',
