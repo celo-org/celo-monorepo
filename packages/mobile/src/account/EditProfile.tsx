@@ -7,7 +7,7 @@ import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet } from 'react-native'
 import { connect } from 'react-redux'
 import { setName } from 'src/account/actions'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { SettingsEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { RootState } from 'src/redux/reducers'
@@ -43,7 +43,7 @@ export class EditProfile extends React.Component<Props, State> {
 
   nameSubmitted = () => {
     this.props.setName(this.state.name)
-    ValoraAnalytics.track(AnalyticsEvents.edit_name)
+    ValoraAnalytics.track(SettingsEvents.settings_profile_name_edit)
   }
 
   render() {
