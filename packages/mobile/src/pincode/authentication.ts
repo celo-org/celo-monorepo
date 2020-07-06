@@ -12,7 +12,9 @@ import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
 import { AnalyticsEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
+import { ErrorMessages } from 'src/app/ErrorMessages'
 import { UNLOCK_DURATION } from 'src/geth/consts'
+import i18n from 'src/i18n'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import {
@@ -27,7 +29,7 @@ import {
 } from 'src/pincode/PasswordCache'
 import { retrieveStoredItem, storeItem } from 'src/storage/keychain'
 import Logger from 'src/utils/Logger'
-import { getConnectedWalletAsync } from 'src/web3/contracts'
+import { getWalletAsync } from 'src/web3/contracts'
 
 const TAG = 'pincode/authentication'
 
@@ -105,10 +107,11 @@ async function retrievePasswordHash(account: string) {
     try {
       hash = await retrieveStoredItem(passwordHashStorageKey(account))
     } catch (err) {
-      Logger.error(`${TAG}@retrievePasswordHash`, err)
+      Logger.error(`${TAG}@retrievePasswordHash`, 'Error retrieving hash', err, true)
       return null
     }
     if (!hash) {
+      Logger.warn(`${TAG}@retrievePasswordHash`, 'No password hash found in store')
       return null
     }
     setCachedPasswordHash(account, hash)
@@ -214,11 +217,12 @@ export async function ensureCorrectPassword(
   currentAccount: string
 ): Promise<boolean> {
   try {
-    const wallet = await getConnectedWalletAsync()
+    const wallet = await getWalletAsync()
     const result = await wallet.unlockAccount(currentAccount, password, UNLOCK_DURATION)
     return result
   } catch (error) {
-    Logger.error(TAG, 'Error attempting to unlock wallet')
+    Logger.error(TAG, 'Error attempting to unlock wallet', error, true)
+    Logger.showError(i18n.t(ErrorMessages.ACCOUNT_UNLOCK_FAILED))
     return false
   }
 }

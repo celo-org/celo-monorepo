@@ -108,12 +108,12 @@ async function createNewGeth(sync: boolean = true): Promise<typeof RNGeth> {
   return new RNGeth(gethOptions)
 }
 
-async function initGeth(sync: boolean = true) {
+export async function initGeth(sync: boolean = true): Promise<typeof gethInstance> {
   Logger.info('Geth@init', `Create a new Geth instance with sync=${sync}`)
 
   if (gethLock) {
     Logger.warn('Geth@init', 'Geth create already in progress.')
-    return
+    return null
   }
   gethLock = true
 
@@ -152,15 +152,11 @@ async function initGeth(sync: boolean = true) {
         throw e
       }
     }
+
+    return gethInstance
   } finally {
     gethLock = false
   }
-}
-
-export async function getGeth(sync: boolean = true): Promise<typeof gethInstance> {
-  Logger.debug('Geth@getGeth', 'Getting Geth Instance')
-  await initGeth(sync)
-  return gethInstance
 }
 
 async function ensureStaticNodesInitialized(sync: boolean = true): Promise<boolean> {

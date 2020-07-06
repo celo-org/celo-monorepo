@@ -104,6 +104,7 @@
   "corruptedChainDeleted": "Corrupted chain data has been deleted, please restart the app",
   "web3FailedToSync": "Failing to sync, check your network connection",
   "errorDuringSync": "Error occurred during sync, please try again later",
+  "accountUnlockFailed": "Unable to unlock your account",
   "calculateFeeFailed": "Could not calculate fee",
   "failedToSwitchSyncModes": "Failed to switch sync modes",
   "gold": "CELO",

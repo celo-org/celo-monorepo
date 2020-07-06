@@ -29,6 +29,7 @@ export enum ErrorMessages {
   SALT_QUOTA_EXCEEDED = 'saltQuotaExceededError',
   MATCHMAKING_QUOTA_EXCEEDED = 'matchmakingQuotaExceededError',
   INVALID_ACCOUNT = 'invalidAccount',
+  ACCOUNT_UNLOCK_FAILED = 'accountUnlockFailed',
   CANT_SELECT_INVALID_PHONE = 'cantSelectInvalidPhone',
   CAN_NOT_REQUEST_FROM_UNVERIFIED = 'canNotRequestFromUnverified',
   REFRESH_FAILED = 'refreshFailedUnexpectedly',

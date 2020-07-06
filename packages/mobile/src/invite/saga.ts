@@ -46,7 +46,7 @@ import { sendTransaction } from 'src/transactions/send'
 import { getAppStoreId } from 'src/utils/appstore'
 import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
-import { getConnectedWallet, getContractKit, getContractKitAsync } from 'src/web3/contracts'
+import { getContractKit, getContractKitAsync, getWallet, getWeb3 } from 'src/web3/contracts'
 import { getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 
 const TAG = 'invite/saga'
@@ -153,11 +153,9 @@ export function* sendInvite(
   currency?: CURRENCY_ENUM
 ) {
   try {
-    const contractKit = yield call(getContractKit)
+    const web3 = yield call(getWeb3)
     const randomness = yield call(asyncRandomBytes, 64)
-    const temporaryWalletAccount = contractKit.web3.eth.accounts.create(
-      randomness.toString('ascii')
-    )
+    const temporaryWalletAccount = web3.eth.accounts.create(randomness.toString('ascii'))
     const temporaryAddress = temporaryWalletAccount.address
     const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
 
@@ -359,7 +357,7 @@ function* addTempAccountToWallet(inviteCode: string) {
   Logger.debug(TAG + '@addTempAccountToWallet', 'Attempting to add temp wallet')
   try {
     // Import account into the local geth node
-    const wallet: RpcWallet = yield call(getConnectedWallet)
+    const wallet: RpcWallet = yield call(getWallet)
     const tempAccount = yield call([wallet, wallet.addAccount], inviteCode, TEMP_PW)
     Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount)
   } catch (e) {
@@ -378,7 +376,7 @@ export function* withdrawFundsFromTempAccount(
   newAccount: string
 ) {
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Unlocking temporary account')
-  const wallet: RpcWallet = yield call(getConnectedWallet)
+  const wallet: RpcWallet = yield call(getWallet)
   yield call([wallet, wallet.unlockAccount], tempAccount, TEMP_PW, 600)
 
   Logger.debug(
