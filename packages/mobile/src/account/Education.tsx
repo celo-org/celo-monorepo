@@ -51,23 +51,24 @@ export default class Education extends React.Component<Props, State> {
     const { step } = this.state
     const { topic } = this.props.stepInfo[this.state.step]
     if (step === 0) {
-      const analyticsEvent =
-        topic === EducationTopic.backup
-          ? OnboardingEvents.backup_education_cancel
-          : OnboardingEvents.celo_education_cancel
-
-      ValoraAnalytics.track(analyticsEvent)
+      if (topic === EducationTopic.backup) {
+        ValoraAnalytics.track(OnboardingEvents.backup_education_cancel)
+      } else if (topic === EducationTopic.celo) {
+        ValoraAnalytics.track(OnboardingEvents.celo_education_cancel)
+      }
       navigateBack()
     } else {
-      const analyticsEvent =
-        topic === EducationTopic.backup
-          ? OnboardingEvents.backup_education_scroll
-          : OnboardingEvents.celo_education_scroll
-
-      ValoraAnalytics.track(analyticsEvent, {
-        currentStep: step,
-        direction: ScrollDirection.previous,
-      })
+      if (topic === EducationTopic.backup) {
+        ValoraAnalytics.track(OnboardingEvents.backup_education_scroll, {
+          currentStep: step,
+          direction: ScrollDirection.previous,
+        })
+      } else if (topic === EducationTopic.celo) {
+        ValoraAnalytics.track(OnboardingEvents.celo_education_scroll, {
+          currentStep: step,
+          direction: ScrollDirection.previous,
+        })
+      }
       this.swiper?.current?.scrollBy(-1, true)
     }
   }
@@ -85,15 +86,17 @@ export default class Education extends React.Component<Props, State> {
       this.props.onFinish()
       this.swiper?.current?.scrollTo(0)
     } else {
-      const analyticsEvent =
-        topic === EducationTopic.backup
-          ? OnboardingEvents.backup_education_scroll
-          : OnboardingEvents.celo_education_scroll
-
-      ValoraAnalytics.track(analyticsEvent, {
-        currentStep: step,
-        direction: ScrollDirection.next,
-      })
+      if (topic === EducationTopic.backup) {
+        ValoraAnalytics.track(OnboardingEvents.backup_education_scroll, {
+          currentStep: step,
+          direction: ScrollDirection.next,
+        })
+      } else if (topic === EducationTopic.celo) {
+        ValoraAnalytics.track(OnboardingEvents.celo_education_scroll, {
+          currentStep: step,
+          direction: ScrollDirection.next,
+        })
+      }
       this.swiper?.current?.scrollBy(1, true)
     }
   }

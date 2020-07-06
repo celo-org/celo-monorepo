@@ -66,6 +66,7 @@ interface HomeEventsProperties {
     selectedAction: NotificationBannerCTATypes
   }
   [HomeEvents.transaction_feed_item_select]: undefined
+  [HomeEvents.transaction_feed_address_copy]: undefined
 }
 
 interface SettingsEventsProperties {
@@ -491,7 +492,10 @@ interface CeloExchangeEventsProperties {
   }
 
   [CeloExchangeEvents.celo_fetch_exchange_rate_start]: undefined
-  [CeloExchangeEvents.celo_fetch_exchange_rate_complete]: undefined
+  [CeloExchangeEvents.celo_fetch_exchange_rate_complete]: {
+    makerAmount: number
+    exchangeRate: number
+  }
   [CeloExchangeEvents.celo_fetch_exchange_rate_error]: {
     error: string
   }

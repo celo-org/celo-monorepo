@@ -140,7 +140,11 @@ export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
         dollarMaker: dollarMakerExchangeRate.toString(),
       })
     )
-    ValoraAnalytics.track(CeloExchangeEvents.celo_fetch_exchange_rate_complete)
+    // Always tracking in dollars for consistancy
+    ValoraAnalytics.track(CeloExchangeEvents.celo_fetch_exchange_rate_complete, {
+      makerAmount: dollarMakerAmount,
+      exchangeRate: dollarMakerExchangeRate.toNumber(),
+    })
   } catch (error) {
     ValoraAnalytics.track(CeloExchangeEvents.celo_fetch_exchange_rate_error, {
       error: error.message,
