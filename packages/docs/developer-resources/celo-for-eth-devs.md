@@ -1,6 +1,6 @@
 # Celo for Ethereum Developers
 
-For a general overview of the Celo network and architecture, see [the Celo Overview page](overview.md).
+For a general overview of the Celo network and architecture, see [the Celo Overview page](../overview.md).
 
 ## What is Celo's Relationship to Ethereum?
 
@@ -76,8 +76,8 @@ You can [view the implementation here.](https://explorer.celo.org/address/0xaa93
  2. Celo transaction objects are slightly different from transaction objects on Ethereum. 
  Ethereum transaction objects include fields to, value, gas, gasPrice, data, nonce, signature (v,r,s). 
  Celo transaction objects include the same fields as Ethereum transaction objects, plus feeCurrency, gatewayFee and gatewayFeeRecipient. 
- These additional fields are included to provide [full node incentives](overview.md#incentives-for-operating-full-nodes) 
- and to allow users to [pay transaction fees in different currencies.](overview.md#richer-transactions) 
+ These additional fields are included to provide [full node incentives](../overview.md#incentives-for-operating-full-nodes) 
+ and to allow users to [pay transaction fees in different currencies.](../overview.md#richer-transactions) 
 
  3. You can’t use Ethereum wallets with Celo.
     1. Celo accounts are derived differently from Ethereum accounts. The Celo key derivation path is `m/44'/52752'/0'/0` whereas Ethereum’s is `m/44'/60'/0'/0`.
