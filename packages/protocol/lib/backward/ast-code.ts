@@ -1,10 +1,10 @@
 // tslint:disable: max-classes-per-file
-import { makeZContract } from '@celo/protocol/lib/backward/internal';
+import { makeZContract } from '@celo/protocol/lib/backward/internal'
 import {
   BuildArtifacts,
   Contract as ZContract
-} from '@openzeppelin/upgrades';
-import ContractAST from '@openzeppelin/upgrades/lib/utils/ContractAST';
+} from '@openzeppelin/upgrades'
+import ContractAST from '@openzeppelin/upgrades/lib/utils/ContractAST'
 
 const VISIBILITY_PUBLIC = 'public'
 const VISIBILITY_EXTERNAL = 'external'
@@ -14,9 +14,9 @@ const STORAGE_DEFAULT = 'default'
 const OUT_VOID_PARAMETER_STRING = 'void'
 
 export class ASTCodeCompatibilityReport {
-  changes: Change[];
+  changes: Change[]
   constructor(changes: Change[]) {
-    this.changes = changes;
+    this.changes = changes
   }
   public push(...changes: Change[]) {
     this.changes.push(...changes)
@@ -27,188 +27,188 @@ export class ASTCodeCompatibilityReport {
 }
 
 export interface Change {
-  getContract(): string;
-  accept<T>(visitor: ChangeVisitor<T>): T;
+  getContract(): string
+  accept<T>(visitor: ChangeVisitor<T>): T
 }
 
-export enum ChangeType { Patch, Minor, Major };
+export enum ChangeType { Patch, Minor, Major }
 
 export interface ChangeVisitor<T> {
-  visitMethodMutability(change: MethodMutabilityChange): T;
-  visitMethodParameters(change: MethodParametersChange): T;
-  visitMethodReturn(change: MethodReturnChange): T;
-  visitMethodVisibility(change: MethodVisibilityChange): T;
-  visitMethodAdded(change: MethodAddedChange): T;
-  visitMethodRemoved(change: MethodRemovedChange): T;
-  visitContractType(change: ContractTypeChange): T;
-  visitNewContract(change: NewContractChange): T;
-  visitDeployedBytecode(change: DeployedBytecodeChange): T;
+  visitMethodMutability(change: MethodMutabilityChange): T
+  visitMethodParameters(change: MethodParametersChange): T
+  visitMethodReturn(change: MethodReturnChange): T
+  visitMethodVisibility(change: MethodVisibilityChange): T
+  visitMethodAdded(change: MethodAddedChange): T
+  visitMethodRemoved(change: MethodRemovedChange): T
+  visitContractType(change: ContractTypeChange): T
+  visitNewContract(change: NewContractChange): T
+  visitDeployedBytecode(change: DeployedBytecodeChange): T
 }
 
 export abstract class DefaultChangeVisitor<T> implements ChangeVisitor<T> {
-  abstract visitDefault(change: Change): T;
-  visitMethodMutability = (change: MethodMutabilityChange): T => this.visitDefault(change);
-  visitMethodParameters = (change: MethodParametersChange): T => this.visitDefault(change);
-  visitMethodReturn = (change: MethodReturnChange): T => this.visitDefault(change);
-  visitMethodVisibility = (change: MethodVisibilityChange): T => this.visitDefault(change);
-  visitMethodAdded = (change: MethodAddedChange): T => this.visitDefault(change);
-  visitMethodRemoved = (change: MethodRemovedChange): T => this.visitDefault(change);
-  visitContractType = (change: ContractTypeChange): T => this.visitDefault(change);
-  visitNewContract = (change: NewContractChange): T => this.visitDefault(change);
-  visitDeployedBytecode = (change: DeployedBytecodeChange): T => this.visitDefault(change);
+  abstract visitDefault(change: Change): T
+  visitMethodMutability = (change: MethodMutabilityChange): T => this.visitDefault(change)
+  visitMethodParameters = (change: MethodParametersChange): T => this.visitDefault(change)
+  visitMethodReturn = (change: MethodReturnChange): T => this.visitDefault(change)
+  visitMethodVisibility = (change: MethodVisibilityChange): T => this.visitDefault(change)
+  visitMethodAdded = (change: MethodAddedChange): T => this.visitDefault(change)
+  visitMethodRemoved = (change: MethodRemovedChange): T => this.visitDefault(change)
+  visitContractType = (change: ContractTypeChange): T => this.visitDefault(change)
+  visitNewContract = (change: NewContractChange): T => this.visitDefault(change)
+  visitDeployedBytecode = (change: DeployedBytecodeChange): T => this.visitDefault(change)
 }
 
 export class CategorizerChangeVisitor extends DefaultChangeVisitor<ChangeType> {
-  constructor() { super(); }
+  constructor() { super() }
   // By default assume all are major changes
-  visitDefault = (_change: Change): ChangeType => ChangeType.Major;
+  visitDefault = (_change: Change): ChangeType => ChangeType.Major
 
-  visitMethodAdded = (_change: MethodAddedChange): ChangeType => ChangeType.Minor;
-  visitNewContract = (_change: NewContractChange): ChangeType => ChangeType.Minor;
+  visitMethodAdded = (_change: MethodAddedChange): ChangeType => ChangeType.Minor
+  visitNewContract = (_change: NewContractChange): ChangeType => ChangeType.Minor
   visitMethodVisibility = (change: MethodVisibilityChange): ChangeType => {
     if (change.oldValue === VISIBILITY_PUBLIC && change.newValue === VISIBILITY_EXTERNAL) {
       // Broader visibility, minor change
-      return ChangeType.Minor;
+      return ChangeType.Minor
     }
-    return ChangeType.Major;
+    return ChangeType.Major
   }
-  visitDeployedBytecode = (_change: DeployedBytecodeChange): ChangeType => ChangeType.Patch;
+  visitDeployedBytecode = (_change: DeployedBytecodeChange): ChangeType => ChangeType.Patch
 }
 
 export class EnglishToStringVisitor implements ChangeVisitor<string> {
   visitMethodMutability(change: MethodMutabilityChange): string {
-    return `Mutability of method ${change.contract}.${change.signature} changed from '${change.oldValue}' to '${change.newValue}'`;
+    return `Mutability of method ${change.contract}.${change.signature} changed from '${change.oldValue}' to '${change.newValue}'`
   }
   visitMethodParameters(change: MethodParametersChange): string {
-    return `Parameters of method ${change.contract}.${change.signature} changed from '${change.oldValue}' to '${change.newValue}'`;
+    return `Parameters of method ${change.contract}.${change.signature} changed from '${change.oldValue}' to '${change.newValue}'`
   }
   visitMethodReturn(change: MethodReturnChange): string {
-    return `Return parameters of method ${change.contract}.${change.signature} changed from '${change.oldValue}' to '${change.newValue}'`;
+    return `Return parameters of method ${change.contract}.${change.signature} changed from '${change.oldValue}' to '${change.newValue}'`
   }
   visitMethodVisibility(change: MethodVisibilityChange): string {
-    return `Visibility of method ${change.contract}.${change.signature} changed from '${change.oldValue}' to '${change.newValue}'`;
+    return `Visibility of method ${change.contract}.${change.signature} changed from '${change.oldValue}' to '${change.newValue}'`
   }
   visitMethodAdded(change: MethodAddedChange): string {
-    return `Contract '${change.contract}' has a new method: '${change.signature}'`;
+    return `Contract '${change.contract}' has a new method: '${change.signature}'`
   }
   visitMethodRemoved(change: MethodRemovedChange): string {
-    return `Contract '${change.contract}' deleted a method: '${change.signature}'`;
+    return `Contract '${change.contract}' deleted a method: '${change.signature}'`
   }
   visitContractType(change: ContractTypeChange): string {
-    return `Contract '${change.contract}' changed its type from '${change.oldValue}' to '${change.newValue}'`;
+    return `Contract '${change.contract}' changed its type from '${change.oldValue}' to '${change.newValue}'`
   }
   visitNewContract(change: NewContractChange): string {
-    return `Contract '${change.contract}' was created`;
+    return `Contract '${change.contract}' was created`
   }
   visitDeployedBytecode(change: DeployedBytecodeChange): string {
-    return `Contract '${change.contract}' has a modified 'deployedBytecode' binary property`;
+    return `Contract '${change.contract}' has a modified 'deployedBytecode' binary property`
   }
 }
 
 abstract class ContractChange implements Change {
-  type: string;
-  contract: string;
+  type: string
+  contract: string
   constructor(contract: string) {
-    this.contract = contract;
+    this.contract = contract
   }
   getContract() {
-    return this.contract;
+    return this.contract
   }
 
-  abstract accept<T>(visitor: ChangeVisitor<T>): T;
+  abstract accept<T>(visitor: ChangeVisitor<T>): T
 }
 
 export class NewContractChange extends ContractChange {
-  type = "NewContract";
+  type = "NewContract"
   accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.visitNewContract(this);
+    return visitor.visitNewContract(this)
   }
 }
 
 abstract class ContractValueChange extends ContractChange {
-  oldValue: string;
-  newValue: string;
+  oldValue: string
+  newValue: string
   constructor(contract: string, oldValue: string, newValue: string) {
-    super(contract);
-    this.oldValue = oldValue;
-    this.newValue = newValue;
+    super(contract)
+    this.oldValue = oldValue
+    this.newValue = newValue
   }
 }
 
 export class DeployedBytecodeChange extends ContractChange {
-  type = "DeployedBytecode";
+  type = "DeployedBytecode"
   accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.visitDeployedBytecode(this);
+    return visitor.visitDeployedBytecode(this)
   }
 }
 
 export class ContractTypeChange extends ContractValueChange {
-  type = "ContractType";
+  type = "ContractType"
   accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.visitContractType(this);
+    return visitor.visitContractType(this)
   }
 }
 
 abstract class MethodChange extends ContractChange {
-  signature: string;
+  signature: string
   constructor(contract: string, signature: string) {
-    super(contract);
-    this.signature = signature;
+    super(contract)
+    this.signature = signature
   }
   getSignature() {
-    return this.signature;
+    return this.signature
   }
 }
 
 export class MethodAddedChange extends MethodChange {
-  type = "MethodAdded";
+  type = "MethodAdded"
   accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.visitMethodAdded(this);
+    return visitor.visitMethodAdded(this)
   }
 }
 
 export class MethodRemovedChange extends MethodChange {
-  type = "MethodRemoved";
+  type = "MethodRemoved"
   accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.visitMethodRemoved(this);
+    return visitor.visitMethodRemoved(this)
   }
 }
 
 abstract class MethodValueChange extends MethodChange {
-  oldValue: string;
-  newValue: string;
+  oldValue: string
+  newValue: string
   constructor(contract: string, signature: string, oldValue: string, newValue: string) {
-    super(contract, signature);
-    this.oldValue = oldValue;
-    this.newValue = newValue;
+    super(contract, signature)
+    this.oldValue = oldValue
+    this.newValue = newValue
   }
 }
 
 export class MethodVisibilityChange extends MethodValueChange {
-  type = "MethodVisibility";
+  type = "MethodVisibility"
   accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.visitMethodVisibility(this);
+    return visitor.visitMethodVisibility(this)
   }
 }
 
 export class MethodMutabilityChange extends MethodValueChange {
-  type = "MethodMutability";
+  type = "MethodMutability"
   accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.visitMethodMutability(this);
+    return visitor.visitMethodMutability(this)
   }
 }
 
 export class MethodParametersChange extends MethodValueChange {
-  type = "MethodParameters";
+  type = "MethodParameters"
   accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.visitMethodParameters(this);
+    return visitor.visitMethodParameters(this)
   }
 }
 
 export class MethodReturnChange extends MethodValueChange {
-  type = "MethodReturn";
+  type = "MethodReturn"
   accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.visitMethodReturn(this);
+    return visitor.visitMethodReturn(this)
   }
 }
 
@@ -222,8 +222,8 @@ export const createIndexByChangeType = (changes: Change[], categorizer: ChangeVi
   for (const ct of Object.values(ChangeType)) {
     byCategory[ct] = []
   }
-  changes.map(c => byCategory[c.accept(categorizer)].push(c));
-  return byCategory;
+  changes.map(c => byCategory[c.accept(categorizer)].push(c))
+  return byCategory
 }
 
 const getSignature = (method: any): string => {
