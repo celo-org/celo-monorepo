@@ -3,10 +3,10 @@ import {
   CategorizerChangeVisitor,
   Change, ChangeType,
   createIndexByChangeType, reportASTIncompatibilities
-} from '@celo/protocol/lib/backward/ast-code';
-import { ASTStorageCompatibilityReport, reportLayoutIncompatibilities } from '@celo/protocol/lib/backward/ast-layout';
-import { BuildArtifacts, Contracts, getBuildArtifacts } from '@openzeppelin/upgrades';
-import { readJsonSync } from 'fs-extra';
+} from '@celo/protocol/lib/backward/ast-code'
+import { ASTStorageCompatibilityReport, reportLayoutIncompatibilities } from '@celo/protocol/lib/backward/ast-layout'
+import { BuildArtifacts, Contracts, getBuildArtifacts } from '@openzeppelin/upgrades'
+import { readJsonSync } from 'fs-extra'
 
 const V_STORAGE = 's'
 const V_MAJOR = 'x'

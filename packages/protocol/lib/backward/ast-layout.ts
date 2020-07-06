@@ -5,8 +5,8 @@ import {
   getStorageLayout,
   Operation,
   StorageLayoutInfo
-} from '@openzeppelin/upgrades';
-import { Contract as Web3Contract } from 'web3-eth-contract';
+} from '@openzeppelin/upgrades'
+import { Contract as Web3Contract } from 'web3-eth-contract'
 const Web3 = require('web3')
 
 const web3 = new Web3(null)
@@ -32,23 +32,23 @@ interface Artifact {
 
 // Inlined from OpenZeppelin SDK since its not exported.
 interface TypeInfo {
-  id: string;
-  kind: string;
-  label: string;
-  valueType?: string;
-  length?: number;
-  members?: StorageInfo[];
-  src?: any;
+  id: string
+  kind: string
+  label: string
+  valueType?: string
+  length?: number
+  members?: StorageInfo[]
+  src?: any
 }
 
 // Inlined from OpenZeppelin SDK since its not exported.
 interface StorageInfo {
-  label: string;
-  astId: number;
-  type: any;
-  src: string;
-  path?: string;
-  contract?: string;
+  label: string
+  astId: number
+  type: any
+  src: string
+  path?: string
+  contract?: string
 }
 
 // getStorageLayout needs an oz-sdk Contract class instance. This class is a
