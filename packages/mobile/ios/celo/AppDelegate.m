@@ -9,8 +9,6 @@
 
 #import "AppDelegate.h"
 
-#import <signal.h>
-
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
@@ -79,8 +77,6 @@ static NSString * const kHasRunBeforeKey = @"RnSksIsAppInstalled";
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
-
-  signal(SIGPIPE, SIG_IGN);
 
   return YES;
 }
