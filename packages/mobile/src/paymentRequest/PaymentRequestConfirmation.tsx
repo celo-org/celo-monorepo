@@ -11,7 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { PaymentRequestStatus } from 'src/account/types'
 import { showError } from 'src/alert/actions'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { RequestEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import BackButton from 'src/components/BackButton.v2'
 import CommentTextInput from 'src/components/CommentTextInput'
@@ -71,7 +71,7 @@ type Props = DispatchProps & StateProps & WithTranslation & OwnProps
 
 export const paymentConfirmationScreenNavOptions = () => ({
   ...emptyHeader,
-  headerLeft: () => <BackButton eventName={AnalyticsEvents.request_confirm_back} />,
+  headerLeft: () => <BackButton eventName={RequestEvents.request_confirm_back} />,
 })
 
 class PaymentRequestConfirmation extends React.Component<Props> {
@@ -125,7 +125,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
       notified: false,
     }
 
-    ValoraAnalytics.track(AnalyticsEvents.request_confirm, { requesteeAddress })
+    ValoraAnalytics.track(RequestEvents.request_confirm_request, { requesteeAddress })
     this.props.writePaymentRequest(paymentInfo)
     Logger.showMessage(t('requestSent'))
   }
