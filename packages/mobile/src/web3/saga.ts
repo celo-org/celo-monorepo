@@ -7,7 +7,7 @@ import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-s
 import { setAccountCreationTime, setPromptForno } from 'src/account/actions'
 import { promptFornoIfNeededSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { GethEvents, SettingsEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
@@ -86,7 +86,7 @@ export function* checkWeb3SyncProgress() {
       }
     } catch (error) {
       if (error.toString().toLowerCase() === BLOCK_CHAIN_CORRUPTION_ERROR.toLowerCase()) {
-        ValoraAnalytics.track(AnalyticsEvents.blockchain_corruption)
+        ValoraAnalytics.track(GethEvents.blockchain_corruption)
         const deleted = yield call(deleteChainData)
         if (deleted) {
           navigateToError('corruptedChainDeleted')
@@ -292,6 +292,7 @@ export function* toggleFornoMode({ fornoMode }: SetIsFornoAction) {
     yield put(cancelGethSaga())
     yield spawn(gethSaga)
     yield call(initContractKit)
+    ValoraAnalytics.track(SettingsEvents.forno_toggle, { enabled: action.fornoMode })
   } catch (e) {
     Logger.error(TAG + '@toggleFornoMode', 'Error toggling forno mode')
     yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))

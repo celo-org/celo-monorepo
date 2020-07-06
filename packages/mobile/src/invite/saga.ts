@@ -9,7 +9,7 @@ import SendIntentAndroid from 'react-native-send-intent'
 import SendSMS from 'react-native-sms'
 import { call, delay, put, race, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError, showMessage } from 'src/alert/actions'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { InviteEvents, OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ALERT_BANNER_DURATION, USE_PHONE_NUMBER_PRIVACY } from 'src/config'
@@ -153,6 +153,7 @@ export function* sendInvite(
   currency?: CURRENCY_ENUM
 ) {
   try {
+    ValoraAnalytics.track(InviteEvents.invite_tx_start)
     const web3 = yield call(getWeb3)
     const randomness = yield call(asyncRandomBytes, 64)
     const temporaryWalletAccount = web3.eth.accounts.create(randomness.toString('ascii'))
@@ -193,6 +194,7 @@ export function* sendInvite(
     )
 
     yield call(waitForTransactionWithId, txId)
+    ValoraAnalytics.track(InviteEvents.invite_tx_complete)
     Logger.debug(TAG + '@sendInviteSaga', 'Sent money to new wallet')
 
     // If this invitation has a payment attached to it, send the payment to the escrow.
@@ -205,9 +207,8 @@ export function* sendInvite(
     const addressToE164Number = { [temporaryAddress.toLowerCase()]: e164Number }
     yield put(updateE164PhoneNumberAddresses({}, addressToE164Number))
     yield call(navigateToInviteMessageApp, e164Number, inviteMode, message)
-    ValoraAnalytics.track(AnalyticsEvents.invite_success)
   } catch (e) {
-    ValoraAnalytics.track(AnalyticsEvents.invite_error, { error: e.message })
+    ValoraAnalytics.track(InviteEvents.invite_tx_error, { error: e.message })
     Logger.error(TAG, 'Send invite error: ', e)
     throw e
   }
@@ -236,10 +237,12 @@ function* navigateToInviteMessageApp(e164Number: string, inviteMode: InviteBy, m
   try {
     switch (inviteMode) {
       case InviteBy.SMS: {
+        ValoraAnalytics.track(InviteEvents.invite_method_sms)
         yield call(sendSms, e164Number, message)
         break
       }
       case InviteBy.WhatsApp: {
+        ValoraAnalytics.track(InviteEvents.invite_method_whatsapp)
         yield Linking.openURL(`https://wa.me/${e164Number}?text=${encodeURIComponent(message)}`)
         break
       }
@@ -252,6 +255,7 @@ function* navigateToInviteMessageApp(e164Number: string, inviteMode: InviteBy, m
   } catch (error) {
     // Not a critical error, allow saga to proceed
     Logger.error(TAG + '@navigateToInviteMessageApp', `Failed to launch message app ${inviteMode}`)
+    ValoraAnalytics.track(InviteEvents.invite_method_error, { error: error.message })
     yield put(showError(ErrorMessages.INVITE_OPEN_APP_FAILED, ALERT_BANNER_DURATION * 1.5))
     // TODO(Rossy): We need a UI for users to review their sent invite codes and
     // redeem them in case they are unused or unsent like this case, see #2639
@@ -294,7 +298,7 @@ export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
     yield put(redeemInviteFailure())
   } else if (timeout) {
     Logger.debug(TAG, 'Redeem Invite timed out')
-    ValoraAnalytics.track(AnalyticsEvents.redeem_invite_timed_out)
+    ValoraAnalytics.track(OnboardingEvents.invite_redeem_timeout)
     yield put(redeemInviteFailure())
     yield put(showError(ErrorMessages.REDEEM_INVITE_TIMEOUT))
   }
@@ -302,6 +306,7 @@ export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
 
 export function* doRedeemInvite(inviteCode: string) {
   try {
+    ValoraAnalytics.track(OnboardingEvents.invite_redeem_start)
     const contractKit = yield call(getContractKit)
     const tempAccount = contractKit.web3.eth.accounts.privateKeyToAccount(inviteCode).address
     Logger.debug(TAG + '@doRedeemInvite', 'Invite code contains temp account', tempAccount)
@@ -311,7 +316,7 @@ export function* doRedeemInvite(inviteCode: string) {
       tempAccount
     )
     if (tempAccountBalanceWei.isLessThanOrEqualTo(0)) {
-      ValoraAnalytics.track(AnalyticsEvents.redeem_invite_failed, {
+      ValoraAnalytics.track(OnboardingEvents.invite_redeem_error, {
         error: 'Empty invite',
       })
       yield put(showError(ErrorMessages.EMPTY_INVITE_CODE))
@@ -322,11 +327,11 @@ export function* doRedeemInvite(inviteCode: string) {
     yield call(addTempAccountToWallet, inviteCode)
     yield call(withdrawFundsFromTempAccount, tempAccount, tempAccountBalanceWei, newAccount)
     yield put(fetchDollarBalance())
-    ValoraAnalytics.track(AnalyticsEvents.redeem_invite_success)
+    ValoraAnalytics.track(OnboardingEvents.invite_redeem_complete)
     return true
   } catch (e) {
     Logger.error(TAG + '@doRedeemInvite', 'Failed to redeem invite', e)
-    ValoraAnalytics.track(AnalyticsEvents.redeem_invite_failed, { error: e.message })
+    ValoraAnalytics.track(OnboardingEvents.invite_redeem_error, { error: e.message })
     if (e.message in ErrorMessages) {
       yield put(showError(e.message))
     } else {
@@ -340,15 +345,16 @@ export function* skipInvite() {
   yield take(Actions.SKIP_INVITE)
   Logger.debug(TAG + '@skipInvite', 'Skip invite action taken, creating account')
   try {
+    ValoraAnalytics.track(OnboardingEvents.invite_redeem_skip_start)
     yield call(getOrCreateAccount)
     yield put(refreshAllBalances())
     yield put(setHasSeenVerificationNux(true))
     Logger.debug(TAG + '@skipInvite', 'Done skipping invite')
-    ValoraAnalytics.track(AnalyticsEvents.invite_skip_complete)
+    ValoraAnalytics.track(OnboardingEvents.invite_redeem_skip_complete)
     navigateHome()
   } catch (e) {
     Logger.error(TAG, 'Failed to skip invite', e)
-    ValoraAnalytics.track(AnalyticsEvents.invite_skip_failed, { error: e.message })
+    ValoraAnalytics.track(OnboardingEvents.invite_redeem_skip_error, { error: e.message })
     yield put(showError(ErrorMessages.ACCOUNT_SETUP_FAILED))
   }
 }

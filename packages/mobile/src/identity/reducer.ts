@@ -1,7 +1,5 @@
 import dotProp from 'dot-prop-immutable'
 import { RehydrateAction } from 'redux-persist'
-import { AnalyticsEvents } from 'src/analytics/Events'
-import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { Actions, ActionTypes } from 'src/identity/actions'
 import { ContactMatches, ImportContactsStatus, VerificationStatus } from 'src/identity/types'
 import { AttestationCode } from 'src/identity/verification'
@@ -179,9 +177,6 @@ export const reducer = (
       }
     case Actions.ADD_CONTACT_MATCHES:
       const matchedContacts = { ...state.matchedContacts, ...action.matches }
-      ValoraAnalytics.track(AnalyticsEvents.add_contact_match, {
-        contactsMatched: Object.keys(matchedContacts).length,
-      })
       return {
         ...state,
         matchedContacts,

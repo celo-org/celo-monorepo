@@ -1,7 +1,7 @@
 import { Platform } from 'react-native'
 import RNExitApp from 'react-native-exit-app'
 import { RestartAndroid } from 'react-native-restart-android'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { AppEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { deleteChainData } from 'src/geth/geth'
 import Logger from 'src/utils/Logger'
@@ -25,7 +25,7 @@ export function deleteChainDataAndRestartApp() {
 }
 
 export function restartApp() {
-  ValoraAnalytics.track(AnalyticsEvents.user_restart)
+  ValoraAnalytics.track(AppEvents.user_restart)
   Logger.info('utils/AppRestart/deleteChainDataAndRestartApp', 'Restarting app')
   if (Platform.OS === 'android') {
     RestartAndroid.restart()

@@ -3,7 +3,7 @@ import { eventChannel } from 'redux-saga'
 import { call, cancel, cancelled, delay, fork, put, race, select, take } from 'redux-saga/effects'
 import { setPromptForno } from 'src/account/actions'
 import { promptFornoIfNeededSelector } from 'src/account/selectors'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { GethEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { Actions, setGethConnected, setInitState } from 'src/geth/actions'
 import {
@@ -111,7 +111,7 @@ export function* initGethSaga() {
   switch (result) {
     case GethInitOutcomes.SUCCESS: {
       Logger.debug(TAG, 'Geth initialized')
-      ValoraAnalytics.track(AnalyticsEvents.geth_init_success)
+      ValoraAnalytics.track(GethEvents.geth_init_success)
       yield put(setInitState(InitializationState.INITIALIZED))
       return
     }
@@ -149,19 +149,19 @@ export function* initGethSaga() {
     }
   }
 
-  ValoraAnalytics.track(AnalyticsEvents.geth_init_failure, {
+  ValoraAnalytics.track(GethEvents.geth_init_failure, {
     error: result,
     context: errorContext,
   })
 
   if (restartAppAutomatically) {
     Logger.error(TAG, 'Geth initialization failed, restarting the app.')
-    ValoraAnalytics.track(AnalyticsEvents.geth_restart_to_fix_init)
+    ValoraAnalytics.track(GethEvents.geth_restart_to_fix_init)
     deleteChainDataAndRestartApp()
   } else {
     // Suggest switch to forno for network-related errors
     if (yield select(promptFornoIfNeededSelector)) {
-      ValoraAnalytics.track(AnalyticsEvents.prompt_forno, {
+      ValoraAnalytics.track(GethEvents.prompt_forno, {
         error: result.message,
         context: 'Geth init error',
       })

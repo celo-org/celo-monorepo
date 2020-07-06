@@ -10,7 +10,7 @@ import { asyncRandomBytes } from 'react-native-secure-randombytes'
 import { call, select } from 'redux-saga/effects'
 import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { UNLOCK_DURATION } from 'src/geth/consts'
@@ -146,7 +146,7 @@ export function* getPasswordSaga(account: string, withVerification?: boolean, st
 
   if (pincodeType === PincodeType.Unset) {
     Logger.error(TAG + '@getPincode', 'Pin has never been set')
-    ValoraAnalytics.track(AnalyticsEvents.pin_never_set)
+    ValoraAnalytics.track(OnboardingEvents.pin_never_set)
     throw Error('Pin has never been set')
   }
 

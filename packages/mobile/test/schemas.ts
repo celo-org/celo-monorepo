@@ -330,6 +330,14 @@ export const v1Schema = {
   },
 }
 
+export const v2Schema = {
+  ...v1Schema,
+  app: {
+    ...v1Schema.app,
+    sessionId: '',
+  },
+}
+
 export function getLatestSchema(): Partial<RootState> {
-  return v1Schema as Partial<RootState>
+  return v2Schema as Partial<RootState>
 }
