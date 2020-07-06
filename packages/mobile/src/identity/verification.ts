@@ -574,6 +574,11 @@ function* tryRevealPhoneNumber(
     // So instead of propagating the error, we catch it just update status. This will trigger the modal,
     // allowing the user to enter codes manually or skip verification.
     Logger.error(TAG + '@tryRevealPhoneNumber', `Reveal for issuer ${issuer} failed`, error)
+    // This might lead to a duplicated log here, but it's the only way to catch lower-level errors
+    ValoraAnalytics.track(AnalyticsEvents.verification_reveal_error, {
+      issuer,
+      error: JSON.stringify(error),
+    })
     yield put(showError(ErrorMessages.REVEAL_ATTESTATION_FAILURE))
     yield put(setVerificationStatus(VerificationStatus.RevealAttemptFailed))
   }
