@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { enterBackupFlow, exitBackupFlow } from 'src/app/actions'
 import DelayButton from 'src/backup/DelayButton'
@@ -64,7 +64,7 @@ class BackupIntroduction extends React.Component<Props> {
   }
 
   onPressBackup = () => {
-    ValoraAnalytics.track(AnalyticsEvents.backup_start)
+    ValoraAnalytics.track(OnboardingEvents.backup_start)
     navigate(Screens.AccountKeyEducation)
   }
 
