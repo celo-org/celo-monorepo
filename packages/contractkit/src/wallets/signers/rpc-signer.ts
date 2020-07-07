@@ -6,7 +6,7 @@ import { RpcCaller } from '../../utils/rpc-caller'
 import { decodeSig } from '../../utils/signing-utils'
 import { Signer } from './signer'
 
-const UNLOCK_ACCOUNT_EXPECTED_ERROR = 'could not decrypt key with given password'
+const INCORRECT_PASSWORD_ERROR = 'could not decrypt key with given password'
 
 const currentTimeInSeconds = () => Math.round(Date.now() / 1000)
 
@@ -113,7 +113,7 @@ export class RpcSigner implements Signer {
       ])
     } catch (error) {
       // The callAndCheckResponse will throw an error if the passphrase is incorrect
-      if (error?.message?.toLowerCase()?.includes(UNLOCK_ACCOUNT_EXPECTED_ERROR)) {
+      if (error?.message?.toLowerCase()?.includes(INCORRECT_PASSWORD_ERROR)) {
         return false
       }
 
