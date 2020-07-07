@@ -8,7 +8,7 @@ import { RpcWallet } from '@celo/contractkit/lib/wallets/rpc-wallet'
 import { sleep } from '@celo/utils/src/async'
 import { call, select } from 'redux-saga/effects'
 import { DEFAULT_FORNO_URL } from 'src/config'
-import { waitForGethConnectivity, waitForGethInitialized } from 'src/geth/saga'
+import { waitForGethInitialized } from 'src/geth/saga'
 import Logger from 'src/utils/Logger'
 import { getHttpProvider, getIpcProvider } from 'src/web3/providers'
 import { fornoSelector } from 'src/web3/selectors'
@@ -58,12 +58,6 @@ export function* getContractKit() {
     yield call(initContractKit)
   }
   return contractKit
-}
-
-export function* getConnectedContractKit() {
-  const kit = yield call(getContractKit)
-  yield call(waitForGethConnectivity)
-  return kit
 }
 
 // Used for cases where CK must be access outside of a saga

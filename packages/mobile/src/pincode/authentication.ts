@@ -5,6 +5,7 @@
  * The password is a combination of the two. It is used for unlocking the account in geth
  */
 
+import { isValidAddress, normalizeAddress } from '@celo/utils/src/address'
 import { sha256 } from 'ethereumjs-util'
 import { asyncRandomBytes } from 'react-native-secure-randombytes'
 import { call, select } from 'redux-saga/effects'
@@ -93,7 +94,10 @@ function getPasswordHash(password: string) {
 }
 
 function passwordHashStorageKey(account: string) {
-  return `${STORAGE_KEYS.PASSWORD_HASH}-${account}`
+  if (!isValidAddress(account)) {
+    throw new Error('Expecting valid address for computing storage key')
+  }
+  return `${STORAGE_KEYS.PASSWORD_HASH}-${normalizeAddress(account)}`
 }
 
 function storePasswordHash(hash: string, account: string) {
@@ -198,7 +202,7 @@ export async function checkPin(pin: string, account: string) {
   const correctHash = await retrievePasswordHash(account)
 
   if (!correctHash) {
-    Logger.error(`${TAG}@checkPin`, 'No password hash stored. Creating and storing it.')
+    Logger.warn(`${TAG}@checkPin`, 'No password hash stored. Checking with rpcWallet instead.')
     const password = await getPasswordForPin(pin)
     const unlocked = await ensureCorrectPassword(password, account)
     if (unlocked) {

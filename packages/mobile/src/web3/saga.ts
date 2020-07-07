@@ -292,9 +292,9 @@ export function* toggleFornoMode({ fornoMode }: SetIsFornoAction) {
     yield put(cancelGethSaga())
     yield spawn(gethSaga)
     yield call(initContractKit)
-    ValoraAnalytics.track(SettingsEvents.forno_toggle, { enabled: action.fornoMode })
-  } catch (e) {
-    Logger.error(TAG + '@toggleFornoMode', 'Error toggling forno mode')
+    ValoraAnalytics.track(SettingsEvents.forno_toggle, { enabled: fornoMode })
+  } catch (error) {
+    Logger.error(TAG + '@toggleFornoMode', 'Error toggling forno mode', error)
     yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
   }
 }
