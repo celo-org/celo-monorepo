@@ -81,7 +81,7 @@ ___
 
 ▸ **isUnlocked**(): *boolean*
 
-*Defined in [contractkit/src/wallets/signers/rpc-signer.ts:127](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/rpc-signer.ts#L127)*
+*Defined in [contractkit/src/wallets/signers/rpc-signer.ts:129](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/rpc-signer.ts#L129)*
 
 **Returns:** *boolean*
 

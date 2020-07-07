@@ -104,24 +104,26 @@ export class RpcSigner implements Signer {
 
   getNativeKey = () => this.account
 
-  async unlock(passphrase: string, duration: number) {
-    let unlocked = false
+  async unlock(passphrase: string, duration: number): Promise<boolean> {
     try {
-      unlocked = await this.callAndCheckResponse(RpcSignerEndpoint.UnlockAccount, [
+      await this.callAndCheckResponse(RpcSignerEndpoint.UnlockAccount, [
         this.account,
         passphrase,
         duration,
       ])
     } catch (error) {
-      // Only throw errors other than expected unlock error
-      if (!error?.message?.toLowerCase().includes(UNLOCK_ACCOUNT_EXPECTED_ERROR)) {
-        throw error
+      // The callAndCheckResponse will throw an error if the passphrase is incorrect
+      if (error?.message?.toLowerCase()?.includes(UNLOCK_ACCOUNT_EXPECTED_ERROR)) {
+        return false
       }
+
+      // Re-throw otherwise
+      throw error
     }
 
     this.unlockTime = currentTimeInSeconds()
     this.unlockDuration = duration
-    return unlocked
+    return true
   }
 
   isUnlocked() {
