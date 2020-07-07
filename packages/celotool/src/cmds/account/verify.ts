@@ -15,6 +15,7 @@ import {
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import yargs from 'yargs'
 
+export const SALT = 'hard_coded_salt'
 export const command = 'verify'
 export const describe = 'command for requesting attestations for a phone number'
 
@@ -90,7 +91,8 @@ async function verifyCmd(argv: VerifyArgv) {
     attestationsToComplete,
     attestations,
     argv.phone,
-    account
+    account,
+    SALT
   )
   printAndIgnoreRequestErrors(possibleErrors)
   await promptForCodeAndVerify(attestations, argv.phone, account)
