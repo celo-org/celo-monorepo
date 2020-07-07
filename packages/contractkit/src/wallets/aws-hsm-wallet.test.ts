@@ -1,8 +1,10 @@
-import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
+import { ensureLeading0x, normalizeAddressWith0x, trimLeading0x } from '@celo/utils/lib/address'
+import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import * as ethUtil from 'ethereumjs-util'
 import Web3 from 'web3'
-import { Tx } from 'web3-core'
+import { EncodedTransaction, Tx } from 'web3-core'
+import { recoverTransaction, verifyEIP712TypedDataSigner } from '../utils/signing-utils'
 import AwsHsmWallet from './aws-hsm-wallet'
 import {
   ACCOUNT_ADDRESS1,
@@ -120,12 +122,6 @@ describe('AwsHsmWallet class', () => {
     }
 
     await wallet.init()
-    if (USING_MOCK) {
-      knownAddress = ACCOUNT_ADDRESS1
-      otherAddress = ACCOUNT_ADDRESS_NEVER
-    } else {
-      ;[knownAddress, otherAddress] = wallet.getAccounts()
-    }
   })
 
   test('hasAccount should return false for keys that are not present', async () => {
@@ -209,79 +205,78 @@ describe('AwsHsmWallet class', () => {
       })
     })
 
-    //   describe('using a known key', () => {
-    //     let celoTransaction: Tx
-    //     const knownKey: string = AZURE_KEY_NAME!
-    //     let knownAddress: Address
-    //     const otherAddress: string = ACCOUNT_ADDRESS2
-    //     beforeEach(async () => {
-    //       knownAddress = await wallet.getAddressFromKeyName(knownKey)
-    //       celoTransaction = {
-    //         from: knownAddress,
-    //         to: otherAddress,
-    //         chainId: CHAIN_ID,
-    //         value: Web3.utils.toWei('1', 'ether'),
-    //         nonce: 0,
-    //         gas: '10',
-    //         gasPrice: '99',
-    //         feeCurrency: '0x',
-    //         gatewayFeeRecipient: '0x1234',
-    //         gatewayFee: '0x5678',
-    //         data: '0xabcdef',
-    //       }
-    //     })
+    describe('using a known key', () => {
+      const knownKey: string = AWS_HSM_KEY_ID!
+      beforeEach(async () => {
+        knownAddress = await wallet.getAddressFromKeyId(knownKey)
+        celoTransaction = {
+          from: knownAddress,
+          to: otherAddress,
+          chainId: CHAIN_ID,
+          value: Web3.utils.toWei('1', 'ether'),
+          nonce: 0,
+          gas: '10',
+          gasPrice: '99',
+          feeCurrency: '0x',
+          gatewayFeeRecipient: '0x1234',
+          gatewayFee: '0x5678',
+          data: '0xabcdef',
+        }
+      })
 
-    //     describe('when calling signTransaction', () => {
-    //       test('succeeds', async () => {
-    //         const signedTx: EncodedTransaction = await wallet.signTransaction(celoTransaction)
-    //         expect(signedTx).not.toBeUndefined()
-    //       })
-    //       test('with same signer', async () => {
-    //         const signedTx: EncodedTransaction = await wallet.signTransaction(celoTransaction)
-    //         const [, recoveredSigner] = recoverTransaction(signedTx.raw)
-    //         expect(normalizeAddressWith0x(recoveredSigner)).toBe(normalizeAddressWith0x(knownAddress))
-    //       })
-    //       // https://github.com/ethereum/go-ethereum/blob/38aab0aa831594f31d02c9f02bfacc0bef48405d/rlp/decode.go#L664
-    //       test('signature with 0x00 prefix is canonicalized', async () => {
-    //         // This tx is carefully constructed to produce an S value with the first byte as 0x00
-    //         const celoTransactionZeroPrefix = {
-    //           from: await wallet.getAddressFromKeyId(knownKey),
-    //           to: ACCOUNT_ADDRESS2,
-    //           chainId: CHAIN_ID,
-    //           value: Web3.utils.toWei('1', 'ether'),
-    //           nonce: 65,
-    //           gas: '10',
-    //           gasPrice: '99',
-    //           feeCurrency: '0x',
-    //           gatewayFeeRecipient: '0x1234',
-    //           gatewayFee: '0x5678',
-    //           data: '0xabcdef',
-    //         }
-    //         const signedTx: EncodedTransaction = await wallet.signTransaction(
-    //           celoTransactionZeroPrefix
-    //         )
-    //         expect(signedTx.tx.s.startsWith('0x00')).toBeFalsy()
-    //         const [, recoveredSigner] = recoverTransaction(signedTx.raw)
-    //         expect(normalizeAddressWith0x(recoveredSigner)).toBe(normalizeAddressWith0x(knownAddress))
-    //       })
-    //     })
-    //     describe('when calling signPersonalMessage', () => {
-    //       test('succeeds', async () => {
-    //         const hexStr: string = ACCOUNT_ADDRESS1
-    //         const signedMessage = await wallet.signPersonalMessage(knownAddress, hexStr)
-    //         expect(signedMessage).not.toBeUndefined()
-    //         const valid = verifySignature(hexStr, signedMessage, knownAddress)
-    //         expect(valid).toBeTruthy()
-    //       })
-    //     })
-    //     describe('when calling signTypedData', () => {
-    //       test('succeeds', async () => {
-    //         const signedMessage = await wallet.signTypedData(knownAddress, TYPED_DATA)
-    //         expect(signedMessage).not.toBeUndefined()
-    //         const valid = verifyEIP712TypedDataSigner(TYPED_DATA, signedMessage, knownAddress)
-    //         expect(valid).toBeTruthy()
-    //       })
-    //     })
-    //   })
+      describe('when calling signTransaction', () => {
+        test('succeeds', async () => {
+          const signedTx: EncodedTransaction = await wallet.signTransaction(celoTransaction)
+          expect(signedTx).not.toBeUndefined()
+        })
+        test('with same signer', async () => {
+          const signedTx: EncodedTransaction = await wallet.signTransaction(celoTransaction)
+          const [, recoveredSigner] = recoverTransaction(signedTx.raw)
+          expect(normalizeAddressWith0x(recoveredSigner)).toBe(normalizeAddressWith0x(knownAddress))
+        })
+        // https://github.com/ethereum/go-ethereum/blob/38aab0aa831594f31d02c9f02bfacc0bef48405d/rlp/decode.go#L664
+        test.skip('signature with 0x00 prefix is canonicalized', async () => {
+          // This tx is carefully constructed to produce an S value with the first byte as 0x00
+          const celoTransactionZeroPrefix = {
+            from: await wallet.getAddressFromKeyId(knownKey),
+            to: ACCOUNT_ADDRESS2,
+            chainId: CHAIN_ID,
+            value: Web3.utils.toWei('1', 'ether'),
+            nonce: 65,
+            gas: '10',
+            gasPrice: '99',
+            feeCurrency: '0x',
+            gatewayFeeRecipient: '0x1234',
+            gatewayFee: '0x5678',
+            data: '0xabcdef',
+          }
+          const signedTx: EncodedTransaction = await wallet.signTransaction(
+            celoTransactionZeroPrefix
+          )
+          expect(signedTx.tx.s.startsWith('0x00')).toBeFalsy()
+          const [, recoveredSigner] = recoverTransaction(signedTx.raw)
+          expect(normalizeAddressWith0x(recoveredSigner)).toBe(normalizeAddressWith0x(knownAddress))
+        })
+      })
+
+      describe('when calling signPersonalMessage', () => {
+        test('succeeds', async () => {
+          const hexStr: string = ACCOUNT_ADDRESS1
+          const signedMessage = await wallet.signPersonalMessage(knownAddress, hexStr)
+          expect(signedMessage).not.toBeUndefined()
+          const valid = verifySignature(hexStr, signedMessage, knownAddress)
+          expect(valid).toBeTruthy()
+        })
+      })
+
+      describe('when calling signTypedData', () => {
+        test('succeeds', async () => {
+          const signedMessage = await wallet.signTypedData(knownAddress, TYPED_DATA)
+          expect(signedMessage).not.toBeUndefined()
+          const valid = verifyEIP712TypedDataSigner(TYPED_DATA, signedMessage, knownAddress)
+          expect(valid).toBeTruthy()
+        })
+      })
+    })
   })
 })

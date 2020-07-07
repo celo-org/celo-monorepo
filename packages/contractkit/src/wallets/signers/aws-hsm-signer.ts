@@ -1,4 +1,4 @@
-import { publicKeyToAddress, trimLeading0x } from '@celo/utils/lib/address'
+import { ensureLeading0x, publicKeyToAddress, trimLeading0x } from '@celo/utils/lib/address'
 import { KMS } from 'aws-sdk'
 import { ec as EC } from 'elliptic'
 import * as ethUtil from 'ethereumjs-util'
@@ -41,7 +41,7 @@ export default class AwsHsmSigner implements Signer {
   ): Promise<{ v: number; r: Buffer; s: Buffer }> {
     const hash = getHashFromEncoded(encodedTx.rlpEncode)
     const bufferedMessage = Buffer.from(trimLeading0x(hash), 'hex')
-    const a = await this.kms
+    const { Signature: signature } = await this.kms
       .sign({
         KeyId: this.keyId,
         MessageType: 'DIGEST',
@@ -49,9 +49,6 @@ export default class AwsHsmSigner implements Signer {
         SigningAlgorithm,
       })
       .promise()
-    console.log('sig', a)
-    const { Signature: signature } = a
-    console.log(signature?.toString('base64'))
     const { r, s } = parseBERSignature(signature as Buffer)
     const R = bufferToBigNumber(r)
     let S = bufferToBigNumber(s)
@@ -73,11 +70,33 @@ export default class AwsHsmSigner implements Signer {
   }
 
   async signPersonalMessage(data: string): Promise<{ v: number; r: Buffer; s: Buffer }> {
-    console.log('> signPersonalMessage', data)
+    const dataBuff = ethUtil.toBuffer(ensureLeading0x(data))
+    const msgHashBuff = ethUtil.hashPersonalMessage(dataBuff) as Buffer
+    const { Signature: signature } = await this.kms
+      .sign({
+        KeyId: this.keyId,
+        MessageType: 'DIGEST',
+        Message: msgHashBuff,
+        SigningAlgorithm,
+      })
+      .promise()
+    const { r, s } = parseBERSignature(signature as Buffer)
+    const R = bufferToBigNumber(r)
+    let S = bufferToBigNumber(s)
+
+    const N = bufferToBigNumber(secp256k1Curve.curve.n)
+    if (!isCanonical(S, N)) {
+      S = N.minus(S)
+    }
+
+    const rBuff = bigNumberToBuffer(R, 32)
+    const sBuff = bigNumberToBuffer(S, 32)
+    const recoveryParam = getRecoveryParam(msgHashBuff, this.address, r, s)
+
     return {
-      v: 10,
-      r: Buffer.from([]),
-      s: Buffer.from([]),
+      v: recoveryParam + 27,
+      r: rBuff,
+      s: sBuff,
     }
   }
 
