@@ -42,18 +42,11 @@ export const migrations = {
     }
   },
   3: (state: any) => {
-    const recentPayments = state.send.recentPayments.map(
-      (paymentDetails: { timestamp: number; amount: string }) => ({
-        amount: Number(paymentDetails.amount),
-        timestamp: paymentDetails.timestamp,
-      })
-    )
-
     return {
       ...state,
       send: {
         ...state.send,
-        recentPayments,
+        recentPayments: [],
       },
     }
   },
