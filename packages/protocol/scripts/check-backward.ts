@@ -1,6 +1,6 @@
 import { DefaultCategorizer } from '@celo/protocol/lib/backward/categorizer'
 import { ASTBackwardReport, createReport } from '@celo/protocol/lib/backward/utils'
-import { isValidVersion, versionfromString } from '@celo/protocol/lib/backward/version'
+import { ContractVersion } from '@celo/protocol/lib/backward/version'
 import { writeJsonSync } from 'fs-extra'
 import * as path from 'path'
 import * as tmp from 'tmp'
@@ -12,7 +12,7 @@ const COMMAND_SEM_INFER = 'sem_infer'
 const COMMAND_SEM_DELTA = 'sem_delta'
 
 const verCheck = (ver): boolean => {
-  if (ver === undefined || isValidVersion(ver)) {
+  if (ver === undefined || ContractVersion.isValid(ver)) {
     return true
   }
   throw new Error(`Invalid version format: '${ver}'. Expeting 's.x.y.z' instead`)
@@ -113,14 +113,12 @@ try {
   } else if (argv._.includes(COMMAND_SEM_INFER)) {
     out(`Inferred version: `)
     out(
-      versionfromString(argv.old_version)
-        .with(report.versionDelta)
-        .toString(),
+      report.versionDelta.appliedTo(ContractVersion.fromString(argv.old_version)).toString(),
       true
     )
     out(`\n`)
   } else if (argv._.includes(COMMAND_SEM_CHECK)) {
-    const expected = versionfromString(argv.old_version).with(report.versionDelta)
+    const expected = report.versionDelta.appliedTo(ContractVersion.fromString(argv.old_version))
     if (expected.toString() !== argv.new_version) {
       out(`${argv.old_version} + ${report.versionDelta} != ${argv.new_version}`, true)
       out(`\n`)
