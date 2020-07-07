@@ -1,6 +1,6 @@
 import {
   Change,
-  ChangeType, ChangeVisitor,
+  ChangeVisitor,
   ContractTypeChange, DeployedBytecodeChange, MethodAddedChange,
   MethodMutabilityChange, MethodParametersChange, MethodRemovedChange,
   MethodReturnChange, MethodVisibilityChange, NewContractChange,
@@ -8,10 +8,18 @@ import {
 } from '@celo/protocol/lib/backward/ast-code'
 
 /**
+ * Change type categories according to semantic versioning standards
+ */
+export enum ChangeType { Patch, Minor, Major }
+
+/**
  * @returns the assigned {@link ChangeType} for each {@link Change}
  */
 export interface Categorizer extends ChangeVisitor<ChangeType> {}
 
+/**
+ * @returns a mapping of {ChangeType => Change[]} according to the {@link categorizer} used
+ */
 export const categorize = (changes: Change[], categorizer: Categorizer): Change[][] => {
   const byCategory = []
   for (const ct of Object.values(ChangeType)) {

@@ -13,6 +13,10 @@ const STORAGE_DEFAULT = 'default'
 
 const OUT_VOID_PARAMETER_STRING = 'void'
 
+/**
+ * A compatibility report with all the detected changes from two compiled
+ * contract folders.
+ */
 export class ASTCodeCompatibilityReport {
   changes: Change[]
   constructor(changes: Change[]) {
@@ -26,13 +30,17 @@ export class ASTCodeCompatibilityReport {
   }
 }
 
+/**
+ * A code change detected from an old to a new version of a contract.
+ */
 export interface Change {
   getContract(): string
   accept<T>(visitor: ChangeVisitor<T>): T
 }
 
-export enum ChangeType { Patch, Minor, Major }
-
+/**
+ * Visitor pattern implementation for the {@link Change} hierarchy.
+ */
 export interface ChangeVisitor<T> {
   onMethodMutability(change: MethodMutabilityChange): T
   onMethodParameters(change: MethodParametersChange): T
@@ -45,6 +53,9 @@ export interface ChangeVisitor<T> {
   onDeployedBytecode(change: DeployedBytecodeChange): T
 }
 
+/**
+ * Abstract implementation for the {@link Change} interface.
+ */
 abstract class ContractChange implements Change {
   type: string
   contract: string
@@ -58,6 +69,13 @@ abstract class ContractChange implements Change {
   abstract accept<T>(visitor: ChangeVisitor<T>): T
 }
 
+/**
+ * A 'New Contract' change detected during the compatibility report. A
+ * contract was found in the new folder that was not present in the old
+ * folder. The id which is used to do this comparison is the name of the
+ * contract, therefore not only adding a contract, but a name change
+ * would produce this change.
+ */
 export class NewContractChange extends ContractChange {
   type = "NewContract"
   accept<T>(visitor: ChangeVisitor<T>): T {
@@ -65,6 +83,10 @@ export class NewContractChange extends ContractChange {
   }
 }
 
+/**
+ * Abstract class providing standard 'old value => new value' functionality
+ * for {@link ContractChange}
+ */
 abstract class ContractValueChange extends ContractChange {
   oldValue: string
   newValue: string
@@ -75,6 +97,15 @@ abstract class ContractValueChange extends ContractChange {
   }
 }
 
+/**
+ * The deployedBytecode field in the built json artifact has changed
+ * from the old folder to the new one. This is, barring metadata
+ * differences (e.ge source folder full path), due to an implementation
+ * change.
+ *
+ * To avoid false positives, compile both old and new folders in the same
+ * full path.
+ */
 export class DeployedBytecodeChange extends ContractChange {
   type = "DeployedBytecode"
   accept<T>(visitor: ChangeVisitor<T>): T {
@@ -82,6 +113,10 @@ export class DeployedBytecodeChange extends ContractChange {
   }
 }
 
+/**
+ * The Kind / type of a contract changed. Kind / type examples are
+ * 'contract' or 'library'.
+ */
 export class ContractTypeChange extends ContractValueChange {
   type = "ContractType"
   accept<T>(visitor: ChangeVisitor<T>): T {
@@ -89,6 +124,10 @@ export class ContractTypeChange extends ContractValueChange {
   }
 }
 
+/**
+ * Abstract implementation for the {@link Change} interface for
+ * method changes.
+ */
 abstract class MethodChange extends ContractChange {
   signature: string
   constructor(contract: string, signature: string) {
@@ -100,6 +139,9 @@ abstract class MethodChange extends ContractChange {
   }
 }
 
+/**
+ * A new method was found in the new version of the contract.
+ */
 export class MethodAddedChange extends MethodChange {
   type = "MethodAdded"
   accept<T>(visitor: ChangeVisitor<T>): T {
@@ -107,6 +149,9 @@ export class MethodAddedChange extends MethodChange {
   }
 }
 
+/**
+ * A method from the old version is not present in the new version.
+ */
 export class MethodRemovedChange extends MethodChange {
   type = "MethodRemoved"
   accept<T>(visitor: ChangeVisitor<T>): T {
@@ -114,6 +159,10 @@ export class MethodRemovedChange extends MethodChange {
   }
 }
 
+/**
+ * Abstract class providing standard 'old value => new value' functionality
+ * for {@link MethodChange}
+ */
 abstract class MethodValueChange extends MethodChange {
   oldValue: string
   newValue: string
@@ -124,6 +173,9 @@ abstract class MethodValueChange extends MethodChange {
   }
 }
 
+/**
+ * The visibility (public/external) of a method changed.
+ */
 export class MethodVisibilityChange extends MethodValueChange {
   type = "MethodVisibility"
   accept<T>(visitor: ChangeVisitor<T>): T {
@@ -131,6 +183,9 @@ export class MethodVisibilityChange extends MethodValueChange {
   }
 }
 
+/**
+ * The mutability (payable/pure/view...) of a method changed.
+ */
 export class MethodMutabilityChange extends MethodValueChange {
   type = "MethodMutability"
   accept<T>(visitor: ChangeVisitor<T>): T {
@@ -138,6 +193,10 @@ export class MethodMutabilityChange extends MethodValueChange {
   }
 }
 
+/**
+ * The input parameters of a method changed. Since the input parameters
+ * are used as the id of a method, this should probably never appear.
+ */
 export class MethodParametersChange extends MethodValueChange {
   type = "MethodParameters"
   accept<T>(visitor: ChangeVisitor<T>): T {
@@ -145,16 +204,14 @@ export class MethodParametersChange extends MethodValueChange {
   }
 }
 
+/**
+ * The return parameters of a method changed.
+ */
 export class MethodReturnChange extends MethodValueChange {
   type = "MethodReturn"
   accept<T>(visitor: ChangeVisitor<T>): T {
     return visitor.onMethodReturn(this)
   }
-}
-
-export interface ASTError {
-  message: string,
-  wrapped: Error
 }
 
 const getSignature = (method: any): string => {
@@ -312,6 +369,12 @@ const generateASTCompatibilityReport = (oldContract: ZContract, oldArtifacts: Bu
   return report
 }
 
+/**
+ * Runs an ast code comparison and returns the spotted changes from the built artifacts given.
+ *
+ * @param oldArtifacts
+ * @param newArtifacts
+ */
 export const reportASTIncompatibilities = (oldArtifacts: BuildArtifacts, newArtifacts: BuildArtifacts): ASTCodeCompatibilityReport => {
   const reports = newArtifacts.listArtifacts()
   .map((newArtifact) => {
