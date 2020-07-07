@@ -71,7 +71,7 @@ You can [view the implementation here.](https://explorer.celo.org/address/0xaa93
 
 ### Things to watch out for
 
- 1. As previously mentioned, CELO transfers are not required to happen via the ERC20 interface. A users CELO balance may change without any interaction with the CELO contract.
+ 1. As previously mentioned, CELO transfers are not required to happen via the ERC20 interface. A user's CELO balance may change without any interaction with the CELO contract, as they may transfer CELO natively.
 
  2. Celo transaction objects are slightly different from transaction objects on Ethereum. 
  Ethereum transaction objects include fields to, value, gas, gasPrice, data, nonce, signature (v,r,s). 
