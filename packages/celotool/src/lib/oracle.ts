@@ -426,11 +426,6 @@ export function addOracleMiddleware(argv: yargs.Argv) {
       default: false,
       type: 'boolean',
     })
-    .option('tertiary', {
-      description: 'hi',
-      default: false,
-      type: 'boolean'
-    })
     .check((oracleArgv: OracleArgv) => {
       if (oracleArgv.primary === oracleArgv.secondary) {
         throw Error('Exactly one of `primary` and `secondary` must be true')
