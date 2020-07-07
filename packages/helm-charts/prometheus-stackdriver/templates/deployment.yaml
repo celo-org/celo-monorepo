@@ -33,6 +33,10 @@ spec:
       containers:
         - name: prometheus
           image: prom/prometheus:{{ .Values.prometheus.imageTag }}
+          resources:
+            requests:
+              memory: 1Gi
+              cpu: 500m
           args:
             - "--config.file=/etc/prometheus/prometheus.yml"
             - "--storage.tsdb.path=/prometheus/"
