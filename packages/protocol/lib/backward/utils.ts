@@ -9,7 +9,7 @@ import {
 } from '@celo/protocol/lib/backward/ast-code'
 import { ASTStorageCompatibilityReport, reportLayoutIncompatibilities } from '@celo/protocol/lib/backward/ast-layout'
 import { Categorizer } from '@celo/protocol/lib/backward/categorizer'
-import { ContractVersionDelta, deltaFromChanges } from '@celo/protocol/lib/backward/version'
+import { ContractVersionDelta } from '@celo/protocol/lib/backward/version'
 import { BuildArtifacts, Contracts, getBuildArtifacts } from '@openzeppelin/upgrades'
 import { readJsonSync } from 'fs-extra'
 
@@ -119,7 +119,7 @@ export const createReport = (
   report.major = byChangeType[ChangeType.Major]
   report.minor = byChangeType[ChangeType.Minor]
   report.patch = byChangeType[ChangeType.Patch]
-  report.versionDelta = deltaFromChanges(
+  report.versionDelta = ContractVersionDelta.fromChanges(
     report.storage.length > 0,
     report.major.length > 0,
     report.minor.length > 0,
