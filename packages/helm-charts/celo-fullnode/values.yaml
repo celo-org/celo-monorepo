@@ -82,3 +82,11 @@ genesis:
   network: baklavastaging
   useGenesisFileBase64: false
   genesisFileBase64: ""
+
+# If Prometheus is true, metrics and pprof set to true
+prometheus: true
+metrics: true
+pprof:
+  enabled: true
+  path: /debug/metrics/prometheus
+  port: 6060
