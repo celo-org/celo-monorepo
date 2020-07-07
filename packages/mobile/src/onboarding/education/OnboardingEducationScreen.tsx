@@ -66,7 +66,7 @@ export default function OnboardingEducationScreen() {
       embeddedNavBar={null}
       stepInfo={stepInfo}
       finalButtonType={BtnTypes.ONBOARDING}
-      finalButtonText={t('global:done')}
+      finalButtonText={t('global:getStarted')}
       buttonType={BtnTypes.ONBOARDING_SECONDARY}
       buttonText={t('global:next')}
       dotStyle={progressDots.circlePassiveOnboarding}
