@@ -18,7 +18,8 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { showMessage } from 'src/alert/actions'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { exitBackupFlow } from 'src/app/actions'
+import { exitBackupFlow, migrateAccount } from 'src/app/actions'
+import Dialog from 'src/components/Dialog'
 import { ALERT_BANNER_DURATION, DEFAULT_TESTNET, SHOW_TESTNET_BANNER } from 'src/config'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { refreshAllBalances, setLoading } from 'src/home/actions'
@@ -57,6 +58,7 @@ interface DispatchProps {
   setLoading: typeof setLoading
   showMessage: typeof showMessage
   importContacts: typeof importContacts
+  migrateAccount: typeof migrateAccount
 }
 
 type Props = StateProps & DispatchProps & WithTranslation
@@ -68,6 +70,7 @@ const mapDispatchToProps = {
   setLoading,
   showMessage,
   importContacts,
+  migrateAccount,
 }
 
 const mapStateToProps = (state: RootState): StateProps => ({
@@ -82,7 +85,11 @@ const mapStateToProps = (state: RootState): StateProps => ({
 
 const AnimatedSectionList = Animated.createAnimatedComponent(SectionList)
 
-export class WalletHome extends React.Component<Props> {
+interface State {
+  showMigration: boolean
+}
+
+export class WalletHome extends React.Component<Props, State> {
   scrollPosition: Animated.Value<number>
   onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => void
 
@@ -91,6 +98,7 @@ export class WalletHome extends React.Component<Props> {
 
     this.scrollPosition = new Animated.Value(0)
     this.onScroll = Animated.event([{ nativeEvent: { contentOffset: { y: this.scrollPosition } } }])
+    this.state = { showMigration: false }
   }
 
   onRefresh = async () => {
@@ -109,6 +117,12 @@ export class WalletHome extends React.Component<Props> {
     // Waiting 1/2 sec before triggering to allow
     // rest of feed to load unencumbered
     setTimeout(this.tryImportContacts, 500)
+
+    this.checkMigration()
+  }
+
+  async checkMigration() {
+    this.setState({ showMigration: true })
   }
 
   tryImportContacts = async () => {
@@ -191,6 +205,15 @@ export class WalletHome extends React.Component<Props> {
           keyExtractor={this.keyExtractor}
         />
         <SendOrRequestBar />
+        <Dialog
+          title={'Migrate to new Address'}
+          children={
+            'Due to a developer configuration error, you will need to migrate your account to a new address, which will include verifying again. You can keep your seed phrase. Please post on slack if you have questions.'
+          }
+          actionText={'Migrate'}
+          actionPress={this.props.migrateAccount}
+          isVisible={this.state.showMigration}
+        />
       </SafeAreaView>
     )
   }

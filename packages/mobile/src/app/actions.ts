@@ -25,6 +25,7 @@ export enum Actions {
   LOCK = 'APP/LOCK',
   UNLOCK = 'APP/UNLOCK',
   SET_SESSION_ID = 'SET_SESSION_ID',
+  MIGRATE_ACCOUNT_BIP39 = 'MIGRATE_ACCOUNT_BIP39',
 }
 
 export interface SetAppState {
@@ -87,6 +88,10 @@ export interface SetSessionId {
   sessionId: string
 }
 
+export interface MigrateAccount {
+  type: Actions.MIGRATE_ACCOUNT_BIP39
+}
+
 export type ActionTypes =
   | SetAppState
   | SetLoggedIn
@@ -101,6 +106,7 @@ export type ActionTypes =
   | Lock
   | Unlock
   | SetSessionId
+  | MigrateAccount
 
 export const setAppState = (state: string) => ({
   type: Actions.SET_APP_STATE,
@@ -168,4 +174,8 @@ export const appUnlock = (): Unlock => ({
 export const setSessionId = (sessionId: string) => ({
   type: Actions.SET_SESSION_ID,
   sessionId,
+})
+
+export const migrateAccount = (): MigrateAccount => ({
+  type: Actions.MIGRATE_ACCOUNT_BIP39,
 })

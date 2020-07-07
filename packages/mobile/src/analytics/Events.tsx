@@ -125,6 +125,10 @@ export enum VerificationEvents {
   verification_reveal_attestation_await_code_complete = 'verification_reveal_attestation_await_code_complete',
   verification_reveal_attestation_complete = 'verification_reveal_attestation_complete',
   verification_reveal_attestation_error = 'verification_reveal_attestation_error',
+
+  verification_revoke_start = 'verification_revoke_start',
+  verification_revoke_finish = 'verification_revoke_finish',
+  verification_revoke_error = 'verification_revoke_error',
 }
 
 export enum IdentityEvents {

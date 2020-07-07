@@ -1,7 +1,13 @@
+import { ContractKit } from '@celo/contractkit'
+import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
+import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
+import { CURRENCY_ENUM } from '@celo/utils'
+import BigNumber from 'bignumber.js'
 import { AppState, Linking } from 'react-native'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { eventChannel } from 'redux-saga'
 import { call, cancelled, put, select, spawn, take, takeLatest } from 'redux-saga/effects'
+import { e164NumberSelector } from 'src/account/selectors'
 import { AppEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import {
@@ -14,15 +20,23 @@ import {
 } from 'src/app/actions'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { getLastTimeBackgrounded, getRequirePinOnAppOpen } from 'src/app/selectors'
+import { getStoredMnemonic } from 'src/backup/utils'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
 import { isAppVersionDeprecated } from 'src/firebase/firebase'
 import { receiveAttestationMessage } from 'src/identity/actions'
+import { revokePhoneMapping } from 'src/identity/revoke'
 import { CodeInputType } from 'src/identity/verification'
+import { Actions as ImportActions } from 'src/import/actions'
+import { importBackupPhraseSaga } from 'src/import/saga'
+import { withdrawFundsFromTempAccount } from 'src/invite/saga'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { clockInSync } from 'src/utils/time'
+import { getContractKit } from 'src/web3/contracts'
+import { getConnectedUnlockedAccount } from 'src/web3/saga'
+import { currentAccountSelector } from 'src/web3/selectors'
 import { parse } from 'url'
 
 const TAG = 'app/saga'
@@ -134,9 +148,66 @@ export function* handleSetAppState(action: SetAppState) {
   }
 }
 
+function* migrateAccountToProperBip39() {
+  const account: string | null = yield select(currentAccountSelector)
+  const e164Number: string | null = yield select(e164NumberSelector)
+  if (!account) {
+    throw new Error('account not set')
+  }
+  if (!e164Number) {
+    throw new Error('e164 numbrer not sset')
+  }
+
+  yield call(getConnectedUnlockedAccount)
+  yield call(revokePhoneMapping, e164Number, account)
+
+  const mnemonic = yield call(getStoredMnemonic, account)
+  yield call(importBackupPhraseSaga, {
+    type: ImportActions.IMPORT_BACKUP_PHRASE,
+    phrase: mnemonic,
+    useEmptyWallet: true,
+  })
+
+  const newAccount = yield select(currentAccountSelector)
+  const contractKit: ContractKit = yield call(getContractKit)
+  const goldToken: GoldTokenWrapper = yield call([
+    contractKit.contracts,
+    contractKit.contracts.getGoldToken,
+  ])
+  const stableToken: StableTokenWrapper = yield call([
+    contractKit.contracts,
+    contractKit.contracts.getStableToken,
+  ])
+  const goldTokenBalance: BigNumber = yield call([goldToken, goldToken.balanceOf], account)
+  if (goldTokenBalance.isGreaterThan(0)) {
+    yield call(
+      withdrawFundsFromTempAccount,
+      account,
+      goldTokenBalance,
+      newAccount,
+      CURRENCY_ENUM.GOLD
+    )
+  }
+  const stableTokenBalance: BigNumber = yield call([stableToken, stableToken.balanceOf], account)
+  if (stableTokenBalance.isGreaterThan(0)) {
+    yield call(
+      withdrawFundsFromTempAccount,
+      account,
+      stableTokenBalance,
+      newAccount,
+      CURRENCY_ENUM.DOLLAR
+    )
+  }
+}
+
+export function* watchMigrateAccountToProperBip39() {
+  yield takeLatest(Actions.MIGRATE_ACCOUNT_BIP39, migrateAccountToProperBip39)
+}
+
 export function* appSaga() {
   yield spawn(watchRehydrate)
   yield spawn(watchDeepLinks)
   yield spawn(watchAppState)
+  yield spawn(watchMigrateAccountToProperBip39)
   yield takeLatest(Actions.SET_APP_STATE, handleSetAppState)
 }

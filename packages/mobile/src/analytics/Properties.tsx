@@ -240,6 +240,11 @@ interface VerificationEventsProperties {
     issuer: any
     error: string
   }
+  [VerificationEvents.verification_revoke_start]: undefined
+  [VerificationEvents.verification_revoke_finish]: undefined
+  [VerificationEvents.verification_revoke_error]: {
+    error: string
+  }
 }
 
 interface IdentityEventsProperties {

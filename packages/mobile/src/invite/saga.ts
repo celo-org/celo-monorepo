@@ -1,5 +1,6 @@
 import { CeloTransactionObject } from '@celo/contractkit'
 import { RpcWallet } from '@celo/contractkit/lib/wallets/rpc-wallet'
+import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { Clipboard, Linking, Platform } from 'react-native'
@@ -37,6 +38,7 @@ import {
 import { createInviteCode } from 'src/invite/utils'
 import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { getPasswordSaga } from 'src/pincode/authentication'
 import { getSendFee, getSendTxGas } from 'src/send/saga'
 import { fetchDollarBalance, transferStableToken } from 'src/stableToken/actions'
 import { createTokenTransferTransaction, fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
@@ -50,7 +52,6 @@ import { getConnectedWallet, getContractKit, getContractKitAsync } from 'src/web
 import { getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 
 const TAG = 'invite/saga'
-export const TEMP_PW = 'ce10'
 export const REDEEM_INVITE_TIMEOUT = 2 * 60 * 1000 // 2 minutes
 export const INVITE_FEE = '0.25'
 
@@ -366,7 +367,9 @@ function* addTempAccountToWallet(inviteCode: string) {
   try {
     // Import account into the local geth node
     const wallet: RpcWallet = yield call(getConnectedWallet)
-    const tempAccount = yield call([wallet, wallet.addAccount], inviteCode, TEMP_PW)
+    const account = privateKeyToAddress(inviteCode)
+    const password: string = yield call(getPasswordSaga, account, false, true)
+    const tempAccount = yield call([wallet, wallet.addAccount], inviteCode, password)
     Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount)
   } catch (e) {
     if (e.toString().includes('account already exists')) {
@@ -381,11 +384,13 @@ function* addTempAccountToWallet(inviteCode: string) {
 export function* withdrawFundsFromTempAccount(
   tempAccount: string,
   tempAccountBalanceWei: BigNumber,
-  newAccount: string
+  newAccount: string,
+  currency?: CURRENCY_ENUM
 ) {
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Unlocking temporary account')
   const wallet: RpcWallet = yield call(getConnectedWallet)
-  yield call([wallet, wallet.unlockAccount], tempAccount, TEMP_PW, 600)
+  const password: string = yield call(getPasswordSaga, tempAccount, false, true)
+  yield call([wallet, wallet.unlockAccount], tempAccount, password, 600)
 
   Logger.debug(
     TAG + '@withdrawFundsFromTempAccount',
@@ -412,7 +417,7 @@ export function* withdrawFundsFromTempAccount(
 
   const tx: CeloTransactionObject<boolean> = yield call(
     createTokenTransferTransaction,
-    CURRENCY_ENUM.DOLLAR,
+    currency ? currency : CURRENCY_ENUM.DOLLAR,
     {
       recipientAddress: newAccount,
       amount: netSendAmount,

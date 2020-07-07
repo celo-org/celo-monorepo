@@ -17,7 +17,7 @@ import { Task } from 'redux-saga'
 import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'
 import { setRetryVerificationWithForno } from 'src/account/actions'
 import { e164NumberSelector } from 'src/account/selectors'
-import { showError, showErrorOrFallback, showMessage } from 'src/alert/actions'
+import { showError, showErrorOrFallback } from 'src/alert/actions'
 import { VerificationEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setNumberVerified } from 'src/app/actions'
@@ -276,7 +276,7 @@ async function getActionableAttestations(
   return attestations
 }
 
-async function getAttestationsStatus(
+export async function getAttestationsStatus(
   attestationsWrapper: AttestationsWrapper,
   account: string,
   phoneHash: string
@@ -674,44 +674,4 @@ async function isAccountUpToDate(
   return (
     eqAddress(currentWalletAddress, address) && currentDEK && eqAddress(currentDEK.join(), dataKey)
   )
-}
-
-export function* revokeVerification() {
-  try {
-    Logger.debug(TAG + '@revokeVerification', 'Revoking previous verification')
-
-    // TODO: https://github.com/celo-org/celo-monorepo/issues/1830
-    yield put(
-      showMessage('Revocation not currently supported. Just resetting local verification state')
-    )
-    yield put(resetVerification())
-    yield put(setNumberVerified(false))
-
-    // const account = yield call(getConnectedUnlockedAccount)
-    // const [, e164NumberHash]: string[] = yield call(getE164NumberHash)
-    // const attestationsWrapper: AttestationsWrapper = yield getattestationsWrapper(web3)
-    // const currentAccounts:
-    //   | string[]
-    //   | undefined = yield attestationsWrapper.methods
-    //   .lookupAccountsForIdentifier(e164NumberHash)
-    //   .call()
-    // if (!currentAccounts) {
-    //   Logger.warn(TAG + '@revokeVerification', 'No accounts found for phone number')
-    //   return
-    // }
-
-    // const index = currentAccounts.map((a) => a.toLowerCase()).indexOf(account)
-    // if (index < 0) {
-    //   Logger.warn(TAG + '@revokeVerification', 'Account not found')
-    //   return
-    // }
-
-    // const revokeTx = attestationsWrapper.methods.revoke(e164NumberHash, index)
-    // yield call(sendTransaction, revokeTx, account, TAG, 'Revoke attestation')
-
-    // Logger.debug(TAG + '@revokeVerification', 'Done revoking previous verification')
-    // Logger.showMessage('Done revoking phone verification')
-  } catch (error) {
-    Logger.error(TAG + '@revokeVerification', 'Error revoking verification', error)
-  }
 }
