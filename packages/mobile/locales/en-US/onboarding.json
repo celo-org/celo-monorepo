@@ -2,7 +2,7 @@
   "education": {
     "step1": "Send and receive money instantly",
     "step2": "Pay anyone, anywhere with very low fees",
-    "step3": "Confidently and safely use Valora",
+    "step3": "Confidently and safely use {{appName}}",
   },
   "contacts": {
     "header": "Connect Contacts",
