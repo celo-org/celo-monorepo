@@ -7,6 +7,7 @@ import AbortController from 'abort-controller'
 import { Request, Response } from 'firebase-functions'
 import fetch, { Response as FetchResponse } from 'node-fetch'
 import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
+import { MAX_BLOCK_DISCREPANCY_THRESHOLD } from '../common/constants'
 import { respondWithError } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
 import {
@@ -108,33 +109,39 @@ async function requestSignatures(request: Request, response: Response) {
 
   await Promise.all(signerReqs)
 
-  logQuotaDiscrepancies(responses)
+  logResponseDiscrepancies(responses)
   const majorityErrorCode = getMajorityErrorCode(errorCodes)
   if (!blsCryptoClient.sufficientVerifiedSignatures()) {
     handleMissingSignatures(majorityErrorCode, response)
   }
 }
 
-function logQuotaDiscrepancies(responses: SignMsgRespWithStatus[]) {
+function logResponseDiscrepancies(responses: SignMsgRespWithStatus[]) {
   // Only compare responses which have values for the quota fields
   const successfulResponses = responses.filter(
     (response) =>
       response.status === 200 &&
       response.signMessageResponse &&
       response.signMessageResponse.performedQueryCount &&
-      response.signMessageResponse.totalQuota
+      response.signMessageResponse.totalQuota &&
+      response.signMessageResponse.blockNumber
   )
 
   if (successfulResponses.length === 0) {
     return
   }
   // Compare the first response to the rest of the responses
-  const expectedQueryCount = successfulResponses[0].signMessageResponse?.performedQueryCount
-  const expectedTotalQuota = successfulResponses[0].signMessageResponse?.totalQuota
+  const expectedQueryCount = successfulResponses[0].signMessageResponse!.performedQueryCount!
+  const expectedTotalQuota = successfulResponses[0].signMessageResponse!.totalQuota!
+  const expectedBlockNumber = successfulResponses[0].signMessageResponse!.blockNumber!
+  let discrepancyFound = false
   successfulResponses.forEach((resp) => {
+    // Performed query count should never diverge; however the totalQuota may
+    // diverge if the queried block number is different
     if (
-      resp.signMessageResponse?.performedQueryCount !== expectedQueryCount ||
-      resp.signMessageResponse?.totalQuota !== expectedTotalQuota
+      resp.signMessageResponse!.performedQueryCount !== expectedQueryCount ||
+      (resp.signMessageResponse!.totalQuota !== expectedTotalQuota &&
+        resp.signMessageResponse!.blockNumber === expectedBlockNumber)
     ) {
       const values = successfulResponses.map((response) => {
         return {
@@ -143,7 +150,25 @@ function logQuotaDiscrepancies(responses: SignMsgRespWithStatus[]) {
           totalQuota: response.signMessageResponse?.totalQuota,
         }
       })
-      logger.error(`Discepancy found in signers' measured quotas ${values}`)
+      logger.error(`Discepancy found in signers' measured quota values ${values}`)
+      discrepancyFound = true
+    }
+    if (
+      Math.abs(resp.signMessageResponse?.blockNumber! - expectedBlockNumber) >
+      MAX_BLOCK_DISCREPANCY_THRESHOLD
+    ) {
+      const values = successfulResponses.map((response) => {
+        return {
+          signer: response.url,
+          blockNumber: response.signMessageResponse?.blockNumber,
+        }
+      })
+      logger.error(
+        `Discepancy found in signers' latest block number that exceeds threshold ${values}`
+      )
+      discrepancyFound = true
+    }
+    if (discrepancyFound) {
       return
     }
   })

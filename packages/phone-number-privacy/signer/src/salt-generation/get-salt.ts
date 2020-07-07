@@ -17,6 +17,7 @@ import logger from '../common/logger'
 import { VERSION } from '../config'
 import { incrementQueryCount } from '../database/wrappers/account'
 import { getKeyProvider } from '../key-management/key-provider'
+import { getBlockNumber } from '../web3/contracts'
 import { getRemainingQueryCount } from './query-quota'
 
 interface GetBlindedMessageForSaltRequest {
@@ -62,12 +63,21 @@ export async function handleGetBlindedMessageForSalt(
     await incrementQueryCount(account)
     logger.debug('Salt retrieval success')
 
+    let blockNumber = -1
+    try {
+      blockNumber = await getBlockNumber()
+    } catch (error) {
+      // Continue to respond on lookup failure
+      logger.error('Failed to get latest block number', error)
+    }
+
     const signMessageResponse: SignMessageResponse = {
       success: true,
       signature,
       version: VERSION,
       performedQueryCount,
       totalQuota,
+      blockNumber,
     }
     response.json(signMessageResponse)
   } catch (error) {

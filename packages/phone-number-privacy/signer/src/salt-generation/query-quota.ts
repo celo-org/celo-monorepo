@@ -4,7 +4,7 @@ import { isVerified } from '../common/identity'
 import logger from '../common/logger'
 import config from '../config'
 import { getPerformedQueryCount } from '../database/wrappers/account'
-import { getContractKit } from '../web3/contracts'
+import { getDollarBalance, getTransactionCountFromAccount } from '../web3/contracts'
 
 /*
  * Returns the number of queries already performed and the calculated query quota.
@@ -42,14 +42,4 @@ async function getQueryQuota(account: string, hashedPhoneNumber?: string) {
 
   logger.debug('Account does not meet query quota criteria')
   return 0
-}
-
-async function getTransactionCountFromAccount(account: string): Promise<number> {
-  // TODO (amyslawson) wrap forno request in retry
-  return getContractKit().web3.eth.getTransactionCount(account)
-}
-
-async function getDollarBalance(account: string): Promise<BigNumber> {
-  const stableTokenWrapper: StableTokenWrapper = await getContractKit().contracts.getStableToken()
-  return stableTokenWrapper.balanceOf(account)
 }
