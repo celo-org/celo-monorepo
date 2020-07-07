@@ -181,7 +181,7 @@ After a few seconds of syncing (with [Celo's ultralight sync](../../celo-codebas
 docker exec celo-ultralight-node geth attach --exec 'eth.getBalance("<YOUR-ACCOUNT-ADDRESS>")'
 ```
 
-If you go to our [Alfajores Faucet Page](https://celo.org/build/faucet), you should be able to faucet your account some Celo Gold and see your balance increase with the above command.
+If you go to our [Alfajores Faucet Page](https://celo.org/build/faucet), you should be able to faucet your account some CELO and see your balance increase with the above command.
 
 ### Deploy the contract
 

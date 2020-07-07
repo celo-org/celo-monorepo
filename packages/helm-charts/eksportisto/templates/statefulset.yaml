@@ -70,5 +70,5 @@ spec:
         emptyDir: {}
       - name: config
         configMap:
-          name: config
+          name: eksportisto-{{ .Values.deploymentSuffix }}-config
 

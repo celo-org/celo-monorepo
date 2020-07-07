@@ -11,11 +11,11 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { RequestEvents, SendEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackButton from 'src/components/BackButton.v2'
@@ -74,9 +74,13 @@ export const sendAmountScreenNavOptions = ({
     ? i18n.t('paymentRequestFlow:request')
     : i18n.t('sendFlow7:send')
 
+  const eventName = route.params?.isRequest
+    ? RequestEvents.request_amount_back
+    : SendEvents.send_amount_back
+
   return {
     ...emptyHeader,
-    headerLeft: () => <BackButton eventName={CustomEventNames.send_amount_back} />,
+    headerLeft: () => <BackButton eventName={eventName} />,
     headerTitle: () => <HeaderTitleWithBalance title={title} token={CURRENCY_ENUM.DOLLAR} />,
   }
 }
@@ -187,14 +191,18 @@ function SendAmount(props: Props) {
     [recipient, dollarAmount]
   )
   const recentPayments = useSelector(getRecentPayments)
+  const localCurrencyAmount = convertDollarsToLocalAmount(dollarAmount, localCurrencyExchangeRate)
 
   const continueAnalyticsParams = React.useMemo(() => {
     return {
-      method: props.route.params?.isFromScan ? 'scan' : 'search',
+      isScan: !!props.route.params?.isFromScan,
+      isInvite: recipientVerificationStatus !== RecipientVerificationStatus.VERIFIED,
       localCurrencyExchangeRate,
       localCurrency: localCurrencyCode,
-      dollarAmount,
-      localCurrencyAmount: convertDollarsToLocalAmount(dollarAmount, localCurrencyExchangeRate),
+      dollarAmount: dollarAmount.toString(),
+      localCurrencyAmount: localCurrencyAmount
+        ? localCurrencyAmount.toString()
+        : localCurrencyAmount,
     }
   }, [props.route, localCurrencyCode, localCurrencyExchangeRate, dollarAmount])
 
@@ -213,15 +221,10 @@ function SendAmount(props: Props) {
       return
     }
 
-    let transactionData: TransactionDataInput
-
-    if (recipientVerificationStatus === RecipientVerificationStatus.VERIFIED) {
-      transactionData = getTransactionData(TokenTransactionType.Sent)
-      CeloAnalytics.track(CustomEventNames.transaction_details)
-    } else {
-      transactionData = getTransactionData(TokenTransactionType.InviteSent)
-      CeloAnalytics.track(CustomEventNames.send_invite_details)
-    }
+    const transactionData =
+      recipientVerificationStatus === RecipientVerificationStatus.VERIFIED
+        ? getTransactionData(TokenTransactionType.Sent)
+        : getTransactionData(TokenTransactionType.InviteSent)
 
     dispatch(hideAlert())
 
@@ -232,7 +235,7 @@ function SendAmount(props: Props) {
         isFromScan: props.route.params?.isFromScan,
       })
     } else {
-      CeloAnalytics.track(CustomEventNames.send_continue, continueAnalyticsParams)
+      ValoraAnalytics.track(SendEvents.send_amount_continue, continueAnalyticsParams)
       navigate(Screens.SendConfirmation, {
         transactionData,
         isFromScan: props.route.params?.isFromScan,
@@ -256,10 +259,10 @@ function SendAmount(props: Props) {
         isPaymentRequest: true,
       })
     } else if (recipientVerificationStatus !== RecipientVerificationStatus.VERIFIED) {
-      CeloAnalytics.track(CustomEventNames.request_unavailable, continueAnalyticsParams)
+      ValoraAnalytics.track(RequestEvents.request_unavailable, continueAnalyticsParams)
       navigate(Screens.PaymentRequestUnavailable, { transactionData })
     } else {
-      CeloAnalytics.track(CustomEventNames.request_continue, continueAnalyticsParams)
+      ValoraAnalytics.track(RequestEvents.request_amount_continue, continueAnalyticsParams)
       navigate(Screens.PaymentRequestConfirmation, { transactionData })
     }
   }, [addressValidationType, getTransactionData])

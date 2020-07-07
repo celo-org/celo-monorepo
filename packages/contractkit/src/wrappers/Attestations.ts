@@ -3,6 +3,7 @@ import { eqAddress } from '@celo/utils/lib/address'
 import { concurrentMap, sleep } from '@celo/utils/lib/async'
 import { notEmpty, zip3 } from '@celo/utils/lib/collections'
 import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
+import { appendPath } from '@celo/utils/lib/string'
 import BigNumber from 'bignumber.js'
 import fetch from 'cross-fetch'
 import { Address, CeloContract, NULL_ADDRESS } from '../base'
@@ -56,7 +57,7 @@ type AttestationServiceRunningCheckResult =
   | { isValid: true; result: ActionableAttestation }
   | { isValid: false; issuer: Address }
 
-interface AttesationServiceRevealRequest {
+export interface AttesationServiceRevealRequest {
   account: Address
   phoneNumber: string
   issuer: string
@@ -465,7 +466,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       salt,
       smsRetrieverAppSig,
     }
-    return fetch(serviceURL + '/attestations', {
+    return fetch(appendPath(serviceURL, '/attestations'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -529,6 +530,8 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       rightAccount: false,
       metadataURL: null,
       state: AttestationServiceStatusState.NoAttestationSigner,
+      version: null,
+      ageOfLatestBlock: null,
     }
 
     if (!hasAttestationSigner) {
@@ -561,7 +564,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     ret.attestationServiceURL = attestationServiceURL
 
     try {
-      const statusResponse = await fetch(attestationServiceURL + '/status')
+      const statusResponse = await fetch(appendPath(attestationServiceURL, 'status'))
 
       if (!statusResponse.ok) {
         ret.state = AttestationServiceStatusState.UnreachableAttestationService
@@ -574,6 +577,8 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       ret.blacklistedRegionCodes = statusResponseBody.blacklistedRegionCodes
       ret.rightAccount = eqAddress(validator.address, statusResponseBody.accountAddress)
       ret.state = AttestationServiceStatusState.Valid
+      ret.version = statusResponseBody.version
+      ret.ageOfLatestBlock = statusResponseBody.ageOfLatestBlock
       return ret
     } catch (error) {
       ret.state = AttestationServiceStatusState.UnreachableAttestationService
@@ -609,4 +614,6 @@ interface AttestationServiceStatusResponse {
   rightAccount: boolean
   signer: string
   state: AttestationServiceStatusState
+  version: string | null
+  ageOfLatestBlock: number | null
 }

@@ -5,8 +5,8 @@ import { throwError } from 'redux-saga-test-plan/providers'
 import { call, delay, select } from 'redux-saga/effects'
 import { e164NumberSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames, DefaultEventNames } from 'src/analytics/constants'
+import { AppEvents, VerificationEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
@@ -36,7 +36,7 @@ import {
   mockPublicDEK,
 } from 'test/values'
 
-const MockedAnalytics = CeloAnalytics as any
+const MockedAnalytics = ValoraAnalytics as any
 
 jest.mock('src/transactions/send', () => ({
   sendTransaction: jest.fn(),
@@ -154,19 +154,18 @@ const mockAccountsWrapper = {
 
 describe('Start Verification Saga', () => {
   beforeEach(() => {
-    MockedAnalytics.startTracking.mockReset()
-    MockedAnalytics.stopTracking.mockReset()
     MockedAnalytics.track.mockReset()
   })
   it('tracks failure', async () => {
     await expectSaga(startVerification)
       .provide([
         [call(getConnectedAccount), null],
-        [call(doVerificationFlow), false],
+        [call(doVerificationFlow), 'This is an error message'],
       ])
       .run()
-    expect(MockedAnalytics.track.mock.calls.length).toBe(1)
-    expect(MockedAnalytics.track.mock.calls[0][0]).toBe(CustomEventNames.verification_failed)
+    expect(MockedAnalytics.track.mock.calls.length).toBe(2)
+    expect(MockedAnalytics.track.mock.calls[0][0]).toBe(VerificationEvents.verification_start)
+    expect(MockedAnalytics.track.mock.calls[1][0]).toBe(VerificationEvents.verification_error)
   })
 
   it('times out when verification takes too long', async () => {
@@ -177,9 +176,10 @@ describe('Start Verification Saga', () => {
         [delay(VERIFICATION_TIMEOUT), 1000],
       ])
       .run(2000)
-    expect(MockedAnalytics.track.mock.calls.length).toBe(2)
-    expect(MockedAnalytics.track.mock.calls[0][0]).toBe(CustomEventNames.verification_timed_out)
-    expect(MockedAnalytics.track.mock.calls[1][0]).toBe(DefaultEventNames.errorDisplayed)
+    expect(MockedAnalytics.track.mock.calls.length).toBe(3)
+    expect(MockedAnalytics.track.mock.calls[0][0]).toBe(VerificationEvents.verification_start)
+    expect(MockedAnalytics.track.mock.calls[1][0]).toBe(VerificationEvents.verification_timeout)
+    expect(MockedAnalytics.track.mock.calls[2][0]).toBe(AppEvents.error_displayed)
   })
 
   it('stops when the user cancels', async () => {
@@ -190,8 +190,9 @@ describe('Start Verification Saga', () => {
       ])
       .dispatch(cancelVerification())
       .run(2000)
-    expect(MockedAnalytics.track.mock.calls.length).toBe(1)
-    expect(MockedAnalytics.track.mock.calls[0][0]).toBe(CustomEventNames.verification_cancelled)
+    expect(MockedAnalytics.track.mock.calls.length).toBe(2)
+    expect(MockedAnalytics.track.mock.calls[0][0]).toBe(VerificationEvents.verification_start)
+    expect(MockedAnalytics.track.mock.calls[1][0]).toBe(VerificationEvents.verification_cancel)
   })
 })
 
@@ -295,7 +296,7 @@ describe('Do Verification Saga', () => {
       ])
       .put(showError(ErrorMessages.VERIFICATION_FAILURE))
       .put(setVerificationStatus(VerificationStatus.Failed))
-      .returns(false)
+      .returns('fake error')
       .run()
   })
 

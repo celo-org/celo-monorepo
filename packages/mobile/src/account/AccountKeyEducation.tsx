@@ -1,11 +1,13 @@
 import { BtnTypes } from '@celo/react-components/components/Button.v2'
 import { StackScreenProps } from '@react-navigation/stack'
-import * as React from 'react'
+import React, { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import Education from 'src/account/Education'
-import { CustomEventNames } from 'src/analytics/constants'
+import Education, { EducationTopic } from 'src/account/Education'
+import { OnboardingEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { Namespaces } from 'src/i18n'
-import { navigate, navigateProtected } from 'src/navigator/NavigationService'
+import { accountKey1, accountKey2, accountKey3, accountKey4 } from 'src/images/Images'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 
@@ -13,16 +15,21 @@ type Props = StackScreenProps<StackParamList, Screens.AccountKeyEducation>
 
 export default function AccountKeyEducation(props: Props) {
   function onComplete() {
+    ValoraAnalytics.track(OnboardingEvents.backup_education_complete)
     if (props.route.params?.nextScreen) {
       navigate(props.route.params?.nextScreen)
     } else {
-      navigateProtected(Screens.BackupPhrase)
+      navigate(Screens.BackupPhrase)
     }
   }
 
   const { t } = useTranslation(Namespaces.backupKeyFlow6)
 
   const steps = useSteps()
+
+  useEffect(() => {
+    ValoraAnalytics.track(OnboardingEvents.backup_education_start)
+  }, [])
 
   return (
     <Education
@@ -41,30 +48,10 @@ function useSteps() {
   return React.useMemo(
     () =>
       [
-        {
-          image: null,
-          cancelEvent: CustomEventNames.backup_educate_1_cancel,
-          progressEvent: CustomEventNames.backup_educate_1_next,
-          screenName: 'AccountKeyEducation',
-        },
-        {
-          image: null,
-          cancelEvent: CustomEventNames.backup_educate_2_cancel,
-          progressEvent: CustomEventNames.backup_educate_2_next,
-          screenName: 'AccountKeyEducation',
-        },
-        {
-          image: null,
-          cancelEvent: CustomEventNames.backup_educate_3_cancel,
-          progressEvent: CustomEventNames.backup_educate_3_next,
-          screenName: 'AccountKeyEducation',
-        },
-        {
-          image: null,
-          cancelEvent: CustomEventNames.backup_educate_4_cancel,
-          progressEvent: CustomEventNames.backup_educate_4_next,
-          screenName: 'AccountKeyEducation',
-        },
+        { image: accountKey1, topic: EducationTopic.backup },
+        { image: accountKey2, topic: EducationTopic.backup },
+        { image: accountKey3, topic: EducationTopic.backup },
+        { image: accountKey4, topic: EducationTopic.backup },
       ].map((step, index) => {
         return {
           ...step,

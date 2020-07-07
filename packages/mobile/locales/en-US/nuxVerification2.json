@@ -21,7 +21,7 @@
   },
   "learnMore": {
     "header": "Phone Number Verification",
-    "intro": "Celo Phone number verification works by associating your Celo Wallet with your phone number.",
+    "intro": "Phone number verification works by associating your {{appName}} account with your phone number.",
     "section1Header": "Do I need to complete this?",
     "section1Body": "Verification is not required. However, without verifying, it is only possible to send and receive value using QR codes or addresses.",
     "section2Header": "Security and Privacy",
@@ -30,14 +30,14 @@
   "loading": {
     "verifyingNumber": "Verifying {{number}}",
     "keepOpen": "Please keep the app open",
-    "card1": "Verifying your account allows you to see which of your friends uses Celo Wallet.",
-    "card2": "On Celo, you can send money to anyone using just their phone number.",
-    "card3": "Celo is now requesting three text messages to confirm you own your phone number."
+    "card1": "Verifying your account allows you to see which of your friends uses {{appName}}.",
+    "card2": "With {{appName}}, you can send money to anyone using just their phone number.",
+    "card3": "{{appName}} is now requesting three text messages to confirm you own your phone number."
   },
   "skipModal": {
     "header": "Skip Verification?",
     "body1": "Verifying allows others to send value to your phone number.",
-    "body2": "Without verification, you can still send payments, but only using Celo addresses or QR codes."
+    "body2": "Without verification, you can still send payments, but only using account numbers or QR codes."
   },
   "interstitial": {
     "header": "Almost Done",
@@ -59,13 +59,13 @@
   },
   "congratsVerified": "Congratulations you are now verified!",
   "notification": {
-    "title": "Verify Your Phone",
-    "body": "Verifying allows you to send and receive with your phone contacts.",
-    "cta": "Get Verified"
+    "title": "Confirm Your Phone",
+    "body": "Receive payments directly to your phone number",
+    "cta": "Confirm Now"
   },
   "quotaLookup": {
     "title": "Lookup quota exceeded",
-    "body1": "To keep your phone number safe and private, Celo limits how many phone numbers users can lookup.",
+    "body1": "To keep your phone number safe and private, {{appName}} limits how many phone numbers users can lookup.",
     "body2": "You can purchase more lookups for a small fee.",
     "cta": "Purchase lookups (2)"
   }

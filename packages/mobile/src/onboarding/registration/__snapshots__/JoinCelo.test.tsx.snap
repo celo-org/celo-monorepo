@@ -1,25 +1,23 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`JoinCeloScreen renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#F9F5ED",
+      "backgroundColor": "#F9F6F0",
       "flex": 1,
       "justifyContent": "space-between",
     }
   }
 >
-  <SafeAreaView
+  <RNCSafeAreaView
     style={
       Object {
         "height": 35,
-        "paddingRight": 10,
-        "paddingTop": 10,
         "position": "absolute",
-        "right": 0,
-        "top": 0,
-        "width": 70,
+        "right": 10,
+        "top": 10,
+        "width": 60,
         "zIndex": 100,
       }
     }
@@ -37,7 +35,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
     >
          
     </Text>
-  </SafeAreaView>
+  </RNCSafeAreaView>
   <RCTScrollView
     contentContainerStyle={
       Object {
@@ -354,7 +352,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
             style={
               Object {
                 "alignItems": "center",
-                "backgroundColor": "#D6E7EF",
+                "backgroundColor": "#D6EAF3",
                 "height": 48,
                 "justifyContent": "center",
                 "minWidth": 120,
@@ -368,7 +366,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
             <Text
               style={
                 Object {
-                  "color": "#0C689C",
+                  "color": "#0768AE",
                   "fontFamily": "Inter-SemiBold",
                   "fontSize": 16,
                   "lineHeight": 22,
@@ -382,29 +380,43 @@ exports[`JoinCeloScreen renders correctly 1`] = `
       </View>
     </View>
   </RCTScrollView>
-</SafeAreaView>
+  <View
+    collapsable={false}
+    style={
+      Array [
+        Object {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+        },
+        Object {
+          "height": 0,
+        },
+        undefined,
+      ]
+    }
+  />
+</RNCSafeAreaView>
 `;
 
 exports[`JoinCeloScreen renders with an error 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#F9F5ED",
+      "backgroundColor": "#F9F6F0",
       "flex": 1,
       "justifyContent": "space-between",
     }
   }
 >
-  <SafeAreaView
+  <RNCSafeAreaView
     style={
       Object {
         "height": 35,
-        "paddingRight": 10,
-        "paddingTop": 10,
         "position": "absolute",
-        "right": 0,
-        "top": 0,
-        "width": 70,
+        "right": 10,
+        "top": 10,
+        "width": 60,
         "zIndex": 100,
       }
     }
@@ -422,7 +434,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
     >
          
     </Text>
-  </SafeAreaView>
+  </RNCSafeAreaView>
   <RCTScrollView
     contentContainerStyle={
       Object {
@@ -739,7 +751,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
             style={
               Object {
                 "alignItems": "center",
-                "backgroundColor": "#D6E7EF",
+                "backgroundColor": "#D6EAF3",
                 "height": 48,
                 "justifyContent": "center",
                 "minWidth": 120,
@@ -753,7 +765,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
             <Text
               style={
                 Object {
-                  "color": "#0C689C",
+                  "color": "#0768AE",
                   "fontFamily": "Inter-SemiBold",
                   "fontSize": 16,
                   "lineHeight": 22,
@@ -767,5 +779,21 @@ exports[`JoinCeloScreen renders with an error 1`] = `
       </View>
     </View>
   </RCTScrollView>
-</SafeAreaView>
+  <View
+    collapsable={false}
+    style={
+      Array [
+        Object {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+        },
+        Object {
+          "height": 0,
+        },
+        undefined,
+      ]
+    }
+  />
+</RNCSafeAreaView>
 `;

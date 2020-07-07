@@ -1,4 +1,4 @@
-import { newKitFromWeb3 } from '@celo/contractkit'
+import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { RpcWallet } from '@celo/contractkit/lib/wallets/rpc-wallet'
 import { Platform } from 'react-native'
 import * as net from 'react-native-tcp'
@@ -6,50 +6,67 @@ import { call, select, take } from 'redux-saga/effects'
 import { DEFAULT_FORNO_URL } from 'src/config'
 import { IPC_PATH } from 'src/geth/geth'
 import { waitForGethConnectivity } from 'src/geth/saga'
-import { store } from 'src/redux/store'
 import { promisifyGenerator } from 'src/utils/generators'
 import Logger from 'src/utils/Logger'
 import { Actions } from 'src/web3/actions'
 import { contractKitReadySelector, fornoSelector } from 'src/web3/selectors'
 import Web3 from 'web3'
-import { provider } from 'web3-core'
+import { IpcProvider, provider } from 'web3-core'
 
 const tag = 'web3/contracts'
 
-// TODO(yorke): merge instances of contractkit and refactor retrieval of providers
-const ipcProvider = getIpcProvider()
-const gethWallet = new RpcWallet(ipcProvider)
-const contractKitForno = newKitFromWeb3(getWeb3(true), gethWallet)
-const contractKitGeth = newKitFromWeb3(getWeb3(false), gethWallet)
-// Web3 for utils does not require a provider, using geth web3 to avoid creating another web3 instance
-export const web3ForUtils = contractKitGeth.web3
+let ipcProvider: IpcProvider | undefined
+let gethWallet: RpcWallet | undefined
+let contractKit: ContractKit | undefined
 
-function getWeb3(fornoMode: boolean): Web3 {
-  Logger.info(
-    `${tag}@getWeb3`,
-    `Initializing web3, platform: ${Platform.OS}, forno mode: ${fornoMode}, provider: ${
-      fornoMode ? DEFAULT_FORNO_URL : 'geth'
-    }`
-  )
-  return fornoMode ? new Web3(getHttpProvider(DEFAULT_FORNO_URL)) : new Web3(ipcProvider)
+export function openIpcProvider() {
+  if (!ipcProvider) {
+    Logger.debug(`${tag}@openIpcProvider`, `Initializing IPC connection`)
+    ipcProvider = getIpcProvider()
+  }
+  return ipcProvider
+}
+
+export function openWallet() {
+  if (!gethWallet) {
+    Logger.debug(`${tag}@openWallet`, `Initializing wallet`)
+    gethWallet = new RpcWallet(openIpcProvider())
+  }
+  return gethWallet
+}
+
+export function openContractKit(fornoMode: boolean) {
+  if (!contractKit) {
+    Logger.info(
+      `${tag}@openContractKit`,
+      `Initializing contractkit, platform: ${Platform.OS}, forno mode: ${fornoMode}`
+    )
+    const web3 = new Web3(fornoMode ? getHttpProvider(DEFAULT_FORNO_URL) : openIpcProvider())
+    const wallet = openWallet()
+    contractKit = newKitFromWeb3(web3, wallet)
+  }
+  return contractKit
+}
+
+export function closeContractKit() {
+  Logger.debug(`closeContractKit`)
+  contractKit = undefined
+  gethWallet = undefined
+  ipcProvider = undefined
 }
 
 export const getConnectedWalletAsync = async () => promisifyGenerator(getConnectedWallet())
 
 export function* getConnectedWallet() {
   yield call(waitForGethConnectivity)
-  if (!gethWallet.isSetupFinished()) {
-    yield call([gethWallet, gethWallet.init])
-    Logger.debug(
-      `getConnectedWallet`,
-      `Initialized wallet with accounts: ${gethWallet.getAccounts()}`
-    )
+  const wallet = openWallet()
+  if (!wallet.isSetupFinished()) {
+    yield call([wallet, wallet.init])
+    Logger.debug(`getConnectedWallet`, `Initialized wallet with accounts: ${wallet.getAccounts()}`)
   }
-  return gethWallet
+  return wallet
 }
 
-// Workaround as contractKit logic is still used outside generators
-// Moving towards generators to allow us to block contractKit calls, see https://github.com/celo-org/celo-monorepo/issues/3727
 export const getContractKitAsync = async () => promisifyGenerator(getContractKit())
 
 export function* getContractKit() {
@@ -58,8 +75,8 @@ export function* getContractKit() {
     // If contractKit locked, wait until unlocked
     yield take(Actions.SET_CONTRACT_KIT_READY)
   }
-  const forno = fornoSelector(store.getState())
-  return forno ? contractKitForno : contractKitGeth
+  const fornoMode = yield select(fornoSelector)
+  return openContractKit(fornoMode)
 }
 
 export function getIpcProvider() {

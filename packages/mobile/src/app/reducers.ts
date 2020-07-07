@@ -9,10 +9,11 @@ export interface State {
   language: string | null
   doingBackupFlow: boolean
   analyticsEnabled: boolean
-  lockWithPinEnabled: boolean
+  requirePinOnAppOpen: boolean
   appState: AppState
   locked: boolean
   lastTimeBackgrounded: number
+  sessionId: string
 }
 
 const initialState = {
@@ -22,10 +23,11 @@ const initialState = {
   language: null,
   doingBackupFlow: false,
   analyticsEnabled: true,
-  lockWithPinEnabled: false,
+  requirePinOnAppOpen: false,
   appState: AppState.Active,
   locked: false,
   lastTimeBackgrounded: 0,
+  sessionId: '',
 }
 
 export const currentLanguageSelector = (state: RootState) => state.app.language
@@ -42,7 +44,8 @@ export const appReducer = (
         ...state,
         ...rehydratePayload,
         appState: initialState.appState,
-        locked: rehydratePayload.lockWithPinEnabled ?? initialState.locked,
+        locked: rehydratePayload.requirePinOnAppOpen ?? initialState.locked,
+        sessionId: '',
       }
     }
     case Actions.SET_APP_STATE:
@@ -107,7 +110,7 @@ export const appReducer = (
     case Actions.SET_LOCK_WITH_PIN_ENABLED:
       return {
         ...state,
-        lockWithPinEnabled: action.enabled,
+        requirePinOnAppOpen: action.enabled,
       }
     case Actions.LOCK:
       return {
@@ -118,6 +121,11 @@ export const appReducer = (
       return {
         ...state,
         locked: false,
+      }
+    case Actions.SET_SESSION_ID:
+      return {
+        ...state,
+        sessionId: action.sessionId,
       }
     default:
       return state

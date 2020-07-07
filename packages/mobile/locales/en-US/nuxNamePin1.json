@@ -1,18 +1,16 @@
 {
-  "chooseLanguage": "Choose Language",
   "continue": "Continue",
-  "welcomeCelo": "Welcome to Celo Wallet",
+  "welcomeCelo": "Welcome to {{appName}}",
   "chooseCountryCode": "Country Code",
   "chooseCountry": "Country",
-  "joinText": "The Celo Wallet helps you to send, receive, and save value on the Celo Network.",
+  "joinText": "{{appName}} helps you to send, receive, and save value on the Celo Network.",
   "phoneNumber": "Phone Number",
   "terms": {
     "title": "Terms",
     "heading1": "Data and Privacy",
     "heading2": "About Celo Assets",
-    "privacy":
-      "By joining this network, you give us permission to collect anonymous information about how you use the app. Additionally, if you verify your phone number, an obfuscated copy of it will be stored on the Celo Network. Learn more at <0>celo.org/terms</0> ",
-    "goldDisclaimer": "Please be aware that cGld is a digital asset whose value is not related to the value of physical gold.  Both cUSD and cGld are part of a new asset class and present a risk of financial loss.  Carefully consider your financial circumstances and tolerance for financial risk before purchasing either cGld or cUSD."
+    "privacy": "By joining this network, you give us permission to collect anonymous information about how you use the app. Additionally, if you verify your phone number, an obfuscated copy of it will be stored on the Celo Network. Learn more at <0>celo.org/terms</0> ",
+    "goldDisclaimer": "Please be aware that both cUSD and CELO are part of a new asset class and present a risk of financial loss.  Carefully consider your financial circumstances and tolerance for financial risk before purchasing either CELO or cUSD."
   },
   "fullName": "Full Name",
   "fullNamePlaceholder": "First Last",
@@ -34,13 +32,12 @@
   "initKeystoreFailureMessage": "Failed to init keystore",
   "pinLostForeverMessage": "You removed the screen lock, the PIN is lost",
   "enableScreenLockMessage":
-    "Please enable lockscreen to use Celo. If you disable lock-screen in the future, you will need your backup key to access your account.",
+    "Please enable lockscreen to use {{appName}}. If you disable lock-screen in the future, you will need your backup key to access your account.",
   "importContactsPermission": {
     "title": "Import Contacts",
-    "0":
-      "Connecting your address book makes it easy to send and request payments with your friends. Otherwise, you’ll have to enter their info individually.",
+    "0": "Connecting your address book makes it easy to send and request payments with your friends. Otherwise, you’ll have to enter their info individually.",
     "1": "Don’t worry—connecting does not send invites to your contacts.",
     "enable": "Enable Contact Access",
-    "loading": "Finding friends on Celo..."
+    "loading": "Finding friends on {{appName}}..."
   }
 }

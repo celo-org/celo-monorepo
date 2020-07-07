@@ -7,7 +7,7 @@ import Modal from 'src/components/Modal'
 
 interface Props {
   image?: ImageSourcePropType
-  title: string
+  title: string | React.ReactNode
   children: React.ReactNode
   actionText: string
   actionPress: () => void

@@ -2,8 +2,8 @@ import { getErrorMessage } from '@celo/utils/src/displayFormatting'
 import * as Sentry from '@sentry/react-native'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { DefaultEventNames } from 'src/analytics/constants'
+import { AppEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import ErrorScreen from 'src/app/ErrorScreen'
 import { Namespaces, withTranslation } from 'src/i18n'
 
@@ -24,7 +24,7 @@ class ErrorBoundary extends React.Component<Props, State> {
 
   componentDidCatch(error: Error, info: any) {
     this.setState({ childError: error })
-    CeloAnalytics.track(DefaultEventNames.errorDisplayed, { error }, true)
+    ValoraAnalytics.track(AppEvents.error_displayed, { error: error.message })
     Sentry.captureException(error)
   }
 

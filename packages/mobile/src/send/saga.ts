@@ -2,8 +2,8 @@ import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import BigNumber from 'bignumber.js'
 import { call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { SendEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { calculateFee } from 'src/fees/saga'
 import { completePaymentRequest } from 'src/firebase/actions'
@@ -110,6 +110,7 @@ function* sendPayment(
   currency: CURRENCY_ENUM
 ) {
   try {
+    ValoraAnalytics.track(SendEvents.send_tx_start)
     const txId = generateStandbyTransactionId(recipientAddress)
 
     switch (currency) {
@@ -139,8 +140,10 @@ function* sendPayment(
         Logger.showError(`Sending currency ${currency} not yet supported`)
       }
     }
+    ValoraAnalytics.track(SendEvents.send_tx_complete)
   } catch (error) {
     Logger.error(`${TAG}/sendPayment`, 'Could not send payment', error)
+    ValoraAnalytics.track(SendEvents.send_tx_error, { error: error.message })
     throw error
   }
 }
@@ -153,7 +156,6 @@ function* sendPaymentOrInviteSaga({
   inviteMethod,
   firebasePendingRequestUid,
 }: SendPaymentOrInviteAction) {
-  const isInvite = !recipientAddress
   try {
     if (!recipient?.e164PhoneNumber && !recipient?.address) {
       throw new Error("Can't send to recipient without valid e164PhoneNumber or address")
@@ -169,7 +171,6 @@ function* sendPaymentOrInviteSaga({
         true
       )
       yield call(sendPayment, recipientAddress, amount, encryptedComment, CURRENCY_ENUM.DOLLAR)
-      CeloAnalytics.track(CustomEventNames.send_dollar_transaction)
     } else if (recipient.e164PhoneNumber) {
       yield call(
         sendInvite,
@@ -184,11 +185,9 @@ function* sendPaymentOrInviteSaga({
       yield put(completePaymentRequest(firebasePendingRequestUid))
     }
 
-    CeloAnalytics.track(CustomEventNames.send_complete, { isInvite })
     navigateHome()
     yield put(sendPaymentOrInviteSuccess())
   } catch (e) {
-    CeloAnalytics.track(CustomEventNames.send_error, { isInvite, error: e })
     yield put(showError(ErrorMessages.SEND_PAYMENT_FAILED))
     yield put(sendPaymentOrInviteFailure())
   }

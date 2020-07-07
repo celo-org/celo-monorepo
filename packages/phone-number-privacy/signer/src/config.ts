@@ -120,8 +120,8 @@ const config: Config = {
     },
     aws: {
       region: env.KEYSTORE_AWS_REGION,
-      secretName: env.KEYSTORE_AWS_SECRET_NAME || 'signer-secret',
-      secretKey: env.KEYSTORE_AWS_SECRET_KEY || 'key',
+      secretName: env.KEYSTORE_AWS_SECRET_NAME,
+      secretKey: env.KEYSTORE_AWS_SECRET_KEY,
     },
   },
 }
