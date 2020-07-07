@@ -41,7 +41,7 @@ function useStep() {
         topic: EducationTopic.onboarding,
       },
     ]
-  }, [])
+  }, [t])
 }
 
 export default function OnboardingEducationScreen() {
