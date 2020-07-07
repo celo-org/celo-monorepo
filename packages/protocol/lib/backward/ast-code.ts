@@ -34,15 +34,15 @@ export interface Change {
 export enum ChangeType { Patch, Minor, Major }
 
 export interface ChangeVisitor<T> {
-  visitMethodMutability(change: MethodMutabilityChange): T
-  visitMethodParameters(change: MethodParametersChange): T
-  visitMethodReturn(change: MethodReturnChange): T
-  visitMethodVisibility(change: MethodVisibilityChange): T
-  visitMethodAdded(change: MethodAddedChange): T
-  visitMethodRemoved(change: MethodRemovedChange): T
-  visitContractType(change: ContractTypeChange): T
-  visitNewContract(change: NewContractChange): T
-  visitDeployedBytecode(change: DeployedBytecodeChange): T
+  onMethodMutability(change: MethodMutabilityChange): T
+  onMethodParameters(change: MethodParametersChange): T
+  onMethodReturn(change: MethodReturnChange): T
+  onMethodVisibility(change: MethodVisibilityChange): T
+  onMethodAdded(change: MethodAddedChange): T
+  onMethodRemoved(change: MethodRemovedChange): T
+  onContractType(change: ContractTypeChange): T
+  onNewContract(change: NewContractChange): T
+  onDeployedBytecode(change: DeployedBytecodeChange): T
 }
 
 abstract class ContractChange implements Change {
@@ -61,7 +61,7 @@ abstract class ContractChange implements Change {
 export class NewContractChange extends ContractChange {
   type = "NewContract"
   accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.visitNewContract(this)
+    return visitor.onNewContract(this)
   }
 }
 
@@ -78,14 +78,14 @@ abstract class ContractValueChange extends ContractChange {
 export class DeployedBytecodeChange extends ContractChange {
   type = "DeployedBytecode"
   accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.visitDeployedBytecode(this)
+    return visitor.onDeployedBytecode(this)
   }
 }
 
 export class ContractTypeChange extends ContractValueChange {
   type = "ContractType"
   accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.visitContractType(this)
+    return visitor.onContractType(this)
   }
 }
 
@@ -103,14 +103,14 @@ abstract class MethodChange extends ContractChange {
 export class MethodAddedChange extends MethodChange {
   type = "MethodAdded"
   accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.visitMethodAdded(this)
+    return visitor.onMethodAdded(this)
   }
 }
 
 export class MethodRemovedChange extends MethodChange {
   type = "MethodRemoved"
   accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.visitMethodRemoved(this)
+    return visitor.onMethodRemoved(this)
   }
 }
 
@@ -127,28 +127,28 @@ abstract class MethodValueChange extends MethodChange {
 export class MethodVisibilityChange extends MethodValueChange {
   type = "MethodVisibility"
   accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.visitMethodVisibility(this)
+    return visitor.onMethodVisibility(this)
   }
 }
 
 export class MethodMutabilityChange extends MethodValueChange {
   type = "MethodMutability"
   accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.visitMethodMutability(this)
+    return visitor.onMethodMutability(this)
   }
 }
 
 export class MethodParametersChange extends MethodValueChange {
   type = "MethodParameters"
   accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.visitMethodParameters(this)
+    return visitor.onMethodParameters(this)
   }
 }
 
 export class MethodReturnChange extends MethodValueChange {
   type = "MethodReturn"
   accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.visitMethodReturn(this)
+    return visitor.onMethodReturn(this)
   }
 }
 

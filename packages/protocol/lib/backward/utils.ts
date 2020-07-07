@@ -9,14 +9,14 @@ import {
 } from '@celo/protocol/lib/backward/ast-code'
 import { ASTStorageCompatibilityReport, reportLayoutIncompatibilities } from '@celo/protocol/lib/backward/ast-layout'
 import { Categorizer } from '@celo/protocol/lib/backward/categorizer'
+import { ContractVersionDelta, deltaFromChanges } from '@celo/protocol/lib/backward/version'
 import { BuildArtifacts, Contracts, getBuildArtifacts } from '@openzeppelin/upgrades'
 import { readJsonSync } from 'fs-extra'
 
-const V_STORAGE = 's'
-const V_MAJOR = 'x'
-const V_MINOR = 'y'
-const V_PATCH = 'z'
-
+/**
+ * Backward compatibility report, based on both the abstract syntax tree analysis of
+ * both the storage layout, and code API.
+ */
 export class ASTBackwardReport {
   // Artifacts comparison folders
   oldArtifactsFolder: string
@@ -36,7 +36,7 @@ export class ASTBackwardReport {
   exclude: string
 
   // Delta suggested
-  versionDelta: string
+  versionDelta: ContractVersionDelta
 
   excludeContracts = (contractNameRegexp: RegExp): void => {
     const included = (contract: string): boolean => {
@@ -57,43 +57,6 @@ export const categorize = (changes: Change[], categorizer: ChangeVisitor<ChangeT
   }
   changes.map(c => byCategory[c.accept(categorizer)].push(c))
   return byCategory
-}
-
-export const isValidVersion = (version: string): boolean => {
-  const v = version.split(".")
-  if (v.length !== 4) {
-    return false
-  }
-  return !isNaN(Number(v[0])) && !isNaN(Number(v[1])) && !isNaN(Number(v[2])) && !isNaN(Number(v[3]))
-}
-
-const applyDelta = (n: number, d: string, c: string): number => {
-  if (d === "0") {
-    return 0
-  }
-  if (d === (c + "+1")) {
-    return (n + 1)
-  }
-  if (d === (c)) {
-    return n
-  }
-  throw new Error(`Invalid delta singular format: ${d} for character ${c}`)
-}
-
-export const versionAddDelta = (version: string, delta: string) => {
-  if (!isValidVersion(version)) {
-    throw new Error(`Invalid version format: ${version}`)
-  }
-  const v = version.split(".")
-  const storage = Number(v[0])
-  const major = Number(v[1])
-  const minor = Number(v[2])
-  const patch = Number(v[3])
-  const d = delta.split(".")
-  return applyDelta(storage, d[0], V_STORAGE) 
-  + "." + applyDelta(major, d[1], V_MAJOR)
-  + "." + applyDelta(minor, d[2], V_MINOR)
-  + "." + applyDelta(patch, d[3], V_PATCH)
 }
 
 const ensureValidArtifacts = (artifactsPaths: string[]): void => {
@@ -117,22 +80,6 @@ export const instantiateArtifacts = (buildDirectory: string): BuildArtifacts => 
     console.error(`ERROR: could not create BuildArtifacts on directory '${buildDirectory}`)
     process.exit(10002)
   }
-}
-
-const createSemanticVersionDelta = (report: ASTBackwardReport) => {
-  if (report.storage.length > 0) {
-    return `${V_STORAGE}+1.0.0.0`
-  }
-  if (report.major.length > 0) {
-    return `${V_STORAGE}.${V_MAJOR}+1.0.0`
-  }
-  if (report.minor.length > 0) {
-    return `${V_STORAGE}.${V_MAJOR}.${V_MINOR}+1.0`
-  }
-  if (report.minor.length > 0) {
-    return `${V_STORAGE}.${V_MAJOR}.${V_MINOR}.${V_PATCH}+1`
-  }
-  return `${V_STORAGE}.${V_MAJOR}.${V_MINOR}.${V_PATCH}`
 }
 
 export const createReport = (
@@ -172,7 +119,12 @@ export const createReport = (
   report.major = byChangeType[ChangeType.Major]
   report.minor = byChangeType[ChangeType.Minor]
   report.patch = byChangeType[ChangeType.Patch]
-  report.versionDelta = createSemanticVersionDelta(report)
+  report.versionDelta = deltaFromChanges(
+    report.storage.length > 0,
+    report.major.length > 0,
+    report.minor.length > 0,
+    report.patch.length > 0
+  )
   logFunction("Done\n")
   return report
 }

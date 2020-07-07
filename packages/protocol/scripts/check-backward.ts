@@ -1,10 +1,6 @@
 import { DefaultCategorizer } from '@celo/protocol/lib/backward/categorizer'
-import {
-  ASTBackwardReport,
-  createReport,
-  isValidVersion,
-  versionAddDelta,
-} from '@celo/protocol/lib/backward/utils'
+import { ASTBackwardReport, createReport } from '@celo/protocol/lib/backward/utils'
+import { isValidVersion, versionfromString } from '@celo/protocol/lib/backward/version'
 import { writeJsonSync } from 'fs-extra'
 import * as path from 'path'
 import * as tmp from 'tmp'
@@ -116,11 +112,16 @@ try {
     // Placebo command
   } else if (argv._.includes(COMMAND_SEM_INFER)) {
     out(`Inferred version: `)
-    out(versionAddDelta(argv.old_version, report.versionDelta), true)
+    out(
+      versionfromString(argv.old_version)
+        .with(report.versionDelta)
+        .toString(),
+      true
+    )
     out(`\n`)
   } else if (argv._.includes(COMMAND_SEM_CHECK)) {
-    const expected = versionAddDelta(argv.old_version, report.versionDelta)
-    if (expected !== argv.new_version) {
+    const expected = versionfromString(argv.old_version).with(report.versionDelta)
+    if (expected.toString() !== argv.new_version) {
       out(`${argv.old_version} + ${report.versionDelta} != ${argv.new_version}`, true)
       out(`\n`)
       process.exit(1)
