@@ -157,7 +157,7 @@ export function* doVerificationFlow() {
         status.numAttestationsRemaining
       )
       if (!balanceIsSufficient) {
-        throw Error(ErrorMessages.INSUFFICIENT_BALANCE)
+        throw new Error(ErrorMessages.INSUFFICIENT_BALANCE)
       }
 
       // Mark codes completed in previous attempts
@@ -225,7 +225,6 @@ export function* doVerificationFlow() {
       ? yield put(setVerificationStatus(VerificationStatus.InsufficientBalance))
       : yield put(setVerificationStatus(VerificationStatus.Failed))
 
-    // Note: Do we need this given we have a VerificationFailureModal?
     yield put(showErrorOrFallback(error, ErrorMessages.VERIFICATION_FAILURE))
     return error.message
   }
@@ -233,7 +232,7 @@ export function* doVerificationFlow() {
 
 export function* balanceSufficientForAttestations(attestationsRemaining: number) {
   const userBalance = yield select(stableTokenBalanceSelector)
-  return userBalance > attestationsRemaining * ESTIMATED_COST_PER_ATTESTATION
+  return Number(userBalance) > attestationsRemaining * ESTIMATED_COST_PER_ATTESTATION
 }
 
 // Requests if necessary additional attestations and returns all revealable attestationsq
