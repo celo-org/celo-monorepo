@@ -63,15 +63,12 @@ export function dailyAmountRemaining(now: number, recentPayments: PaymentInfo[])
 }
 
 function dailySpent(now: number, recentPayments: PaymentInfo[]) {
-  // we are only interested in the last 24 hours
+  // We are only interested in the last 24 hours
   const paymentsLast24Hours = recentPayments.filter(
     (p: PaymentInfo) => timeDeltaInHours(now, p.timestamp) < 24
   )
 
-  const amount: number = paymentsLast24Hours.reduce(
-    (sum, p: PaymentInfo) => sum + p.amount.toNumber(),
-    0
-  )
+  const amount: number = paymentsLast24Hours.reduce((sum, p: PaymentInfo) => sum + p.amount, 0)
   return amount
 }
 
@@ -104,5 +101,6 @@ export function showLimitReachedError(
     dailyRemainingcUSD,
     dailyLimitcUSD: DAILY_PAYMENT_LIMIT_CUSD,
   }
-  return showError(ErrorMessages.PAYMENT_LIMIT_REACHED, null, translationParams)
+  const dismissAfterInMilliSecs = 5000
+  return showError(ErrorMessages.PAYMENT_LIMIT_REACHED, dismissAfterInMilliSecs, translationParams)
 }
