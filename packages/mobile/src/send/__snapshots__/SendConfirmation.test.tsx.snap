@@ -2,11 +2,16 @@
 
 exports[`SendConfirmation renders correctly for send payment confirmation 1`] = `
 <RNCSafeAreaView
+  edges={
+    Array [
+      "bottom",
+    ]
+  }
   style={
     Object {
       "backgroundColor": "#FFFFFF",
       "flex": 1,
-      "padding": 8,
+      "paddingHorizontal": 8,
     }
   }
 >
@@ -27,6 +32,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
           "paddingVertical": 10,
         }
       }
+      keyboardShouldPersistTaps="handled"
     >
       <View>
         <View
@@ -173,8 +179,9 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                   "flex": 1,
                   "fontFamily": "Inter-Regular",
                   "fontSize": 18,
-                  "height": 200,
+                  "height": 100,
                   "lineHeight": 24,
+                  "textAlignVertical": "top",
                 }
               }
               testID="commentInput/send"
@@ -779,7 +786,8 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
     <View
       style={
         Object {
-          "marginHorizontal": 20,
+          "marginHorizontal": 16,
+          "paddingVertical": 16,
         }
       }
     >
@@ -852,17 +860,38 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
         </View>
       </View>
     </View>
+    <View
+      collapsable={false}
+      style={
+        Array [
+          Object {
+            "bottom": 0,
+            "left": 0,
+            "right": 0,
+          },
+          Object {
+            "height": 0,
+          },
+          undefined,
+        ]
+      }
+    />
   </View>
 </RNCSafeAreaView>
 `;
 
 exports[`SendConfirmation renders correctly for send payment confirmation when fee calculation fails 1`] = `
 <RNCSafeAreaView
+  edges={
+    Array [
+      "bottom",
+    ]
+  }
   style={
     Object {
       "backgroundColor": "#FFFFFF",
       "flex": 1,
-      "padding": 8,
+      "paddingHorizontal": 8,
     }
   }
 >
@@ -883,6 +912,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
           "paddingVertical": 10,
         }
       }
+      keyboardShouldPersistTaps="handled"
     >
       <View>
         <View
@@ -1029,8 +1059,9 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                   "flex": 1,
                   "fontFamily": "Inter-Regular",
                   "fontSize": 18,
-                  "height": 200,
+                  "height": 100,
                   "lineHeight": 24,
+                  "textAlignVertical": "top",
                 }
               }
               testID="commentInput/send"
@@ -1635,7 +1666,8 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
     <View
       style={
         Object {
-          "marginHorizontal": 20,
+          "marginHorizontal": 16,
+          "paddingVertical": 16,
         }
       }
     >
@@ -1708,17 +1740,38 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
         </View>
       </View>
     </View>
+    <View
+      collapsable={false}
+      style={
+        Array [
+          Object {
+            "bottom": 0,
+            "left": 0,
+            "right": 0,
+          },
+          Object {
+            "height": 0,
+          },
+          undefined,
+        ]
+      }
+    />
   </View>
 </RNCSafeAreaView>
 `;
 
 exports[`SendConfirmation renders correctly for send payment confirmation when fee calculation fails 2`] = `
 <RNCSafeAreaView
+  edges={
+    Array [
+      "bottom",
+    ]
+  }
   style={
     Object {
       "backgroundColor": "#FFFFFF",
       "flex": 1,
-      "padding": 8,
+      "paddingHorizontal": 8,
     }
   }
 >
@@ -1739,6 +1792,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
           "paddingVertical": 10,
         }
       }
+      keyboardShouldPersistTaps="handled"
     >
       <View>
         <View
@@ -1885,8 +1939,9 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                   "flex": 1,
                   "fontFamily": "Inter-Regular",
                   "fontSize": 18,
-                  "height": 200,
+                  "height": 100,
                   "lineHeight": 24,
+                  "textAlignVertical": "top",
                 }
               }
               testID="commentInput/send"
@@ -2488,7 +2543,8 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
     <View
       style={
         Object {
-          "marginHorizontal": 20,
+          "marginHorizontal": 16,
+          "paddingVertical": 16,
         }
       }
     >
@@ -2561,17 +2617,38 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
         </View>
       </View>
     </View>
+    <View
+      collapsable={false}
+      style={
+        Array [
+          Object {
+            "bottom": 0,
+            "left": 0,
+            "right": 0,
+          },
+          Object {
+            "height": 0,
+          },
+          undefined,
+        ]
+      }
+    />
   </View>
 </RNCSafeAreaView>
 `;
 
 exports[`SendConfirmation renders correctly when there are multiple user addresses (should show edit button) 1`] = `
 <RNCSafeAreaView
+  edges={
+    Array [
+      "bottom",
+    ]
+  }
   style={
     Object {
       "backgroundColor": "#FFFFFF",
       "flex": 1,
-      "padding": 8,
+      "paddingHorizontal": 8,
     }
   }
 >
@@ -2592,6 +2669,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
           "paddingVertical": 10,
         }
       }
+      keyboardShouldPersistTaps="handled"
     >
       <View>
         <View
@@ -2799,8 +2877,9 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                   "flex": 1,
                   "fontFamily": "Inter-Regular",
                   "fontSize": 18,
-                  "height": 200,
+                  "height": 100,
                   "lineHeight": 24,
+                  "textAlignVertical": "top",
                 }
               }
               testID="commentInput/send"
@@ -3405,7 +3484,8 @@ exports[`SendConfirmation renders correctly when there are multiple user address
     <View
       style={
         Object {
-          "marginHorizontal": 20,
+          "marginHorizontal": 16,
+          "paddingVertical": 16,
         }
       }
     >
@@ -3478,6 +3558,22 @@ exports[`SendConfirmation renders correctly when there are multiple user address
         </View>
       </View>
     </View>
+    <View
+      collapsable={false}
+      style={
+        Array [
+          Object {
+            "bottom": 0,
+            "left": 0,
+            "right": 0,
+          },
+          Object {
+            "height": 0,
+          },
+          undefined,
+        ]
+      }
+    />
   </View>
 </RNCSafeAreaView>
 `;
