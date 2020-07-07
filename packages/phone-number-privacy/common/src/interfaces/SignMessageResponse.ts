@@ -5,4 +5,5 @@ export interface SignMessageResponse {
   error?: string
   performedQueryCount?: number
   totalQuota?: number
+  blockNumber?: number
 }
