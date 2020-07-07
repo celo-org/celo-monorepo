@@ -151,15 +151,15 @@ export function* doVerificationFlow() {
       ...status,
     })
 
-    const balanceIsSufficient = yield call(
-      balanceSufficientForAttestations,
-      status.numAttestationsRemaining
-    )
-    if (!balanceIsSufficient) {
-      throw Error(ErrorMessages.INSUFFICIENT_BALANCE)
-    }
-
     if (!status.isVerified) {
+      const balanceIsSufficient = yield call(
+        balanceSufficientForAttestations,
+        status.numAttestationsRemaining
+      )
+      if (!balanceIsSufficient) {
+        throw Error(ErrorMessages.INSUFFICIENT_BALANCE)
+      }
+
       // Mark codes completed in previous attempts
       yield put(
         completeAttestationCode(NUM_ATTESTATIONS_REQUIRED - status.numAttestationsRemaining)
@@ -231,12 +231,12 @@ export function* doVerificationFlow() {
   }
 }
 
-function* balanceSufficientForAttestations(attestationsRemaining: number) {
+export function* balanceSufficientForAttestations(attestationsRemaining: number) {
   const userBalance = yield select(stableTokenBalanceSelector)
   return userBalance > attestationsRemaining * ESTIMATED_COST_PER_ATTESTATION
 }
 
-// Requests if necessary additional attestations and returns all revealable attestations
+// Requests if necessary additional attestations and returns all revealable attestationsq
 export function* requestAndRetrieveAttestations(
   attestationsWrapper: AttestationsWrapper,
   phoneHash: string,
