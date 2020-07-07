@@ -12,7 +12,7 @@ This means that all programming languages, developer tooling and standards that 
 Developers building on Celo can write smart contracts in [Solidity](https://solidity.readthedocs.io/en/latest/), use [Truffle](https://www.trufflesuite.com/) for smart contract management and 
 take advantage of smart contract standards that have already been developed for Ethereum.
 
-## The ERC20 Token Standard
+## The ERC-20 Token Standard
 
 The [ERC20 token standard](https://eips.ethereum.org/EIPS/eip-20) is a standard API for tokens within smart contracts. 
 This standard interface allows any tokens to be re-used by different applications. 
