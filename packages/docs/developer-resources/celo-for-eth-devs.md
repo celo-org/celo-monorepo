@@ -5,7 +5,7 @@ For a general overview of the Celo network and architecture, see [the Celo Overv
 ## What is Celo's Relationship to Ethereum?
 
 Celo is a layer 1 protocol and blockchain platform, and the Celo Mainnet is entirely separate from the Ethereum network.
-The client software that runs the Celo network is a fork of Ethereum client software called [go-ethereum](https://github.com/ethereum/go-ethereum) (aka geth) written in the Go language. 
+While the Celo client originated as a fork of Ethereum Go langauge client, [go-ethereum](https://github.com/ethereum/go-ethereum) (or geth), it has several significant differences, including a proof-of-stake based PBFT consensus mechanism. All the cryptoassets on Celo have ERC-20 compliant interfaces, meaning that while they are not ERC-20 tokens on the Ethereum Mainnet, all familiar tooling and code that support ERC-20 tokens can be easily adapted for Celo assets, including the Celo Native Asset (CELO) and the Celo Dollar (cUSD). 
 
 In terms of programmability, Celo is similar to Ethereum. Both networks run the Ethereum Virtual Machine (EVM) to support smart contract functionality. 
 This means that all programming languages, developer tooling and standards that target the EVM are relevant for both Celo and Ethereum. 
@@ -82,4 +82,3 @@ You can [view the implementation here.](https://explorer.celo.org/address/0xaa93
  3. You can’t use Ethereum wallets with Celo.
     1. Celo accounts are derived differently from Ethereum accounts. The Celo key derivation path is `m/44'/52752'/0'/0` whereas Ethereum’s is `m/44'/60'/0'/0`.
     2. Wallets are used to sign transactions. Ethereum transaction signing tools, like those found in wallets, are designed for signing Ethereum transactions, which are different from Celo transactions. 
-
