@@ -47,7 +47,7 @@ event Approval(address indexed _owner, address indexed _spender, uint256 _value)
 An ERC20 compliant contract must include the required functions and events at *minimum*. 
 It can include additional functions and events and still be ERC20 compliant.
 
-## The Celo native asset and the Celo Dollar
+## The Celo Native Asset and the Celo Dollar
 
 This interface is relevant for two important assets on the Celo network, the Celo native asset (CELO) and the Celo Dollar (cUSD).
 
