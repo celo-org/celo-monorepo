@@ -53,9 +53,9 @@ export const sendReducer = (
       const latestPayment: PaymentInfo = { amount: action.amount.toNumber(), timestamp: now }
       return {
         ...state,
+        isSending: false,
         recentPayments: [...paymentsLast24Hours, latestPayment],
       }
-
     case Actions.SEND_PAYMENT_OR_INVITE_FAILURE:
       return {
         ...state,

@@ -14,6 +14,8 @@ import { PaymentInfo } from 'src/send/reducers'
 import { TransactionDataInput } from 'src/send/SendAmount'
 import { timeDeltaInHours } from 'src/utils/time'
 
+const DISMISS_SPEND_LIMIT_BANNER_TIMER = 5000
+
 export interface ConfirmationInput {
   recipient: Recipient
   amount: BigNumber
@@ -101,6 +103,10 @@ export function showLimitReachedError(
     dailyRemainingcUSD,
     dailyLimitcUSD: DAILY_PAYMENT_LIMIT_CUSD,
   }
-  const dismissAfterInMilliSecs = 5000
-  return showError(ErrorMessages.PAYMENT_LIMIT_REACHED, dismissAfterInMilliSecs, translationParams)
+
+  return showError(
+    ErrorMessages.PAYMENT_LIMIT_REACHED,
+    DISMISS_SPEND_LIMIT_BANNER_TIMER,
+    translationParams
+  )
 }
