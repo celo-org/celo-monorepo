@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 import { showError } from 'src/alert/actions'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { DAILY_PAYMENT_LIMIT_CUSD } from 'src/config'
+import { ALERT_BANNER_DURATION, DAILY_PAYMENT_LIMIT_CUSD } from 'src/config'
 import { FeeType } from 'src/fees/actions'
 import { getAddressFromPhoneNumber } from 'src/identity/contactMapping'
 import { E164NumberToAddressType, SecureSendPhoneNumberMapping } from 'src/identity/reducer'
@@ -13,8 +13,6 @@ import { Recipient, RecipientKind } from 'src/recipients/recipient'
 import { PaymentInfo } from 'src/send/reducers'
 import { TransactionDataInput } from 'src/send/SendAmount'
 import { timeDeltaInHours } from 'src/utils/time'
-
-const DISMISS_SPEND_LIMIT_BANNER_TIMER = 5000
 
 export interface ConfirmationInput {
   recipient: Recipient
@@ -104,9 +102,5 @@ export function showLimitReachedError(
     dailyLimitcUSD: DAILY_PAYMENT_LIMIT_CUSD,
   }
 
-  return showError(
-    ErrorMessages.PAYMENT_LIMIT_REACHED,
-    DISMISS_SPEND_LIMIT_BANNER_TIMER,
-    translationParams
-  )
+  return showError(ErrorMessages.PAYMENT_LIMIT_REACHED, ALERT_BANNER_DURATION, translationParams)
 }
