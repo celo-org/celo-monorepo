@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 import { showError } from 'src/alert/actions'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { DAILY_PAYMENT_LIMIT_CUSD } from 'src/config'
+import { ALERT_BANNER_DURATION, DAILY_PAYMENT_LIMIT_CUSD } from 'src/config'
 import { FeeType } from 'src/fees/actions'
 import { getAddressFromPhoneNumber } from 'src/identity/contactMapping'
 import { E164NumberToAddressType, SecureSendPhoneNumberMapping } from 'src/identity/reducer'
@@ -63,7 +63,7 @@ export function dailyAmountRemaining(now: number, recentPayments: PaymentInfo[])
 }
 
 function dailySpent(now: number, recentPayments: PaymentInfo[]) {
-  // we are only interested in the last 24 hours
+  // We are only interested in the last 24 hours
   const paymentsLast24Hours = recentPayments.filter(
     (p: PaymentInfo) => timeDeltaInHours(now, p.timestamp) < 24
   )
@@ -101,5 +101,6 @@ export function showLimitReachedError(
     dailyRemainingcUSD,
     dailyLimitcUSD: DAILY_PAYMENT_LIMIT_CUSD,
   }
-  return showError(ErrorMessages.PAYMENT_LIMIT_REACHED, null, translationParams)
+
+  return showError(ErrorMessages.PAYMENT_LIMIT_REACHED, ALERT_BANNER_DURATION, translationParams)
 }
