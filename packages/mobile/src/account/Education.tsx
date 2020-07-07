@@ -8,9 +8,9 @@ import * as React from 'react'
 import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Swiper from 'react-native-swiper'
-import { AnalyticsEventType } from 'src/analytics/Events'
+import { OnboardingEvents } from 'src/analytics/Events'
+import { ScrollDirection } from 'src/analytics/types'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { placeholder } from 'src/images/Images'
 import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { navigateBack } from 'src/navigator/NavigationService'
 import { TopBarIconButton } from 'src/navigator/TopBarButton.v2'
@@ -19,13 +19,16 @@ interface State {
   step: number
 }
 
+export enum EducationTopic {
+  backup = 'backup',
+  celo = 'celo',
+}
+
 interface EducationStep {
   image: ImageSourcePropType | null
+  topic: EducationTopic
   title: string
   text: string
-  cancelEvent: AnalyticsEventType
-  progressEvent: AnalyticsEventType
-  screenName: string
 }
 
 export interface Props {
@@ -45,15 +48,27 @@ export default class Education extends React.Component<Props, State> {
   swiper = React.createRef<Swiper>()
 
   goBack = () => {
-    const currentStepInfo = this.props.stepInfo[this.state.step]
-    if (currentStepInfo.cancelEvent && currentStepInfo.screenName) {
-      ValoraAnalytics.track(currentStepInfo.cancelEvent, {
-        screen: currentStepInfo.screenName,
-      })
-    }
-    if (this.state.step === 0) {
+    const { step } = this.state
+    const { topic } = this.props.stepInfo[this.state.step]
+    if (step === 0) {
+      if (topic === EducationTopic.backup) {
+        ValoraAnalytics.track(OnboardingEvents.backup_education_cancel)
+      } else if (topic === EducationTopic.celo) {
+        ValoraAnalytics.track(OnboardingEvents.celo_education_cancel)
+      }
       navigateBack()
     } else {
+      if (topic === EducationTopic.backup) {
+        ValoraAnalytics.track(OnboardingEvents.backup_education_scroll, {
+          currentStep: step,
+          direction: ScrollDirection.previous,
+        })
+      } else if (topic === EducationTopic.celo) {
+        ValoraAnalytics.track(OnboardingEvents.celo_education_scroll, {
+          currentStep: step,
+          direction: ScrollDirection.previous,
+        })
+      }
       this.swiper?.current?.scrollBy(-1, true)
     }
   }
@@ -63,14 +78,25 @@ export default class Education extends React.Component<Props, State> {
   }
 
   nextStep = () => {
-    const isLastStep = this.state.step === this.props.stepInfo.length - 1
-    const currentStepInfo = this.props.stepInfo[this.state.step]
-    ValoraAnalytics.track(currentStepInfo.progressEvent)
+    const { step } = this.state
+    const { topic } = this.props.stepInfo[this.state.step]
+    const isLastStep = step === this.props.stepInfo.length - 1
 
     if (isLastStep) {
       this.props.onFinish()
       this.swiper?.current?.scrollTo(0)
     } else {
+      if (topic === EducationTopic.backup) {
+        ValoraAnalytics.track(OnboardingEvents.backup_education_scroll, {
+          currentStep: step,
+          direction: ScrollDirection.next,
+        })
+      } else if (topic === EducationTopic.celo) {
+        ValoraAnalytics.track(OnboardingEvents.celo_education_scroll, {
+          currentStep: step,
+          direction: ScrollDirection.next,
+        })
+      }
       this.swiper?.current?.scrollBy(1, true)
     }
   }
@@ -99,10 +125,11 @@ export default class Education extends React.Component<Props, State> {
             activeDotStyle={progressDots.circleActive}
           >
             {stepInfo.map((step: EducationStep, i: number) => {
-              const imgSrc = step.image ? step.image : placeholder
               return (
                 <View style={styles.swipedContent} key={i}>
-                  <Image source={imgSrc} style={styles.bodyImage} resizeMode="contain" />
+                  {step.image && (
+                    <Image source={step.image} style={styles.bodyImage} resizeMode="contain" />
+                  )}
                   <Text style={styles.heading}>{step.title}</Text>
                   <Text style={styles.bodyText}>{step.text}</Text>
                 </View>
@@ -144,8 +171,6 @@ const styles = StyleSheet.create({
   },
   bodyImage: {
     alignSelf: 'center',
-    width: 200,
-    height: 200,
   },
   swipedContent: {
     flex: 1,

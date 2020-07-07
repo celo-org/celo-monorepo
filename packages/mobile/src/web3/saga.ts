@@ -8,7 +8,7 @@ import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-s
 import { setAccountCreationTime, setPromptForno } from 'src/account/actions'
 import { promptFornoIfNeededSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { GethEvents, SettingsEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
@@ -93,7 +93,7 @@ export function* checkWeb3SyncProgress() {
       }
     } catch (error) {
       if (error.toString().toLowerCase() === BLOCK_CHAIN_CORRUPTION_ERROR.toLowerCase()) {
-        ValoraAnalytics.track(AnalyticsEvents.blockchain_corruption)
+        ValoraAnalytics.track(GethEvents.blockchain_corruption)
         const deleted = yield call(deleteChainData)
         if (deleted) {
           navigateToError('corruptedChainDeleted')
@@ -307,6 +307,7 @@ export function* toggleFornoMode(action: SetIsFornoAction) {
     }
     openContractKit(action.fornoMode)
     yield put(setContractKitReady(true))
+    ValoraAnalytics.track(SettingsEvents.forno_toggle, { enabled: action.fornoMode })
   } else {
     Logger.debug(TAG + '@toggleFornoMode', ` already in desired state: ${action.fornoMode}`)
   }

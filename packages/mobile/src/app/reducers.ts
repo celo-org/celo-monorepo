@@ -13,6 +13,7 @@ export interface State {
   appState: AppState
   locked: boolean
   lastTimeBackgrounded: number
+  sessionId: string
 }
 
 const initialState = {
@@ -26,6 +27,7 @@ const initialState = {
   appState: AppState.Active,
   locked: false,
   lastTimeBackgrounded: 0,
+  sessionId: '',
 }
 
 export const currentLanguageSelector = (state: RootState) => state.app.language
@@ -43,6 +45,7 @@ export const appReducer = (
         ...rehydratePayload,
         appState: initialState.appState,
         locked: rehydratePayload.requirePinOnAppOpen ?? initialState.locked,
+        sessionId: '',
       }
     }
     case Actions.SET_APP_STATE:
@@ -118,6 +121,11 @@ export const appReducer = (
       return {
         ...state,
         locked: false,
+      }
+    case Actions.SET_SESSION_ID:
+      return {
+        ...state,
+        sessionId: action.sessionId,
       }
     default:
       return state

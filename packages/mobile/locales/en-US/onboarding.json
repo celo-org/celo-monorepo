@@ -20,7 +20,7 @@
     "create": "Create a PIN",
     "verify": "Enter PIN again",
     "pinsDontMatch": "The PINs didn't match",
-    "invalidPin": "Invalid PIN"
+    "invalidPin": "Please use a stronger PIN"
   },
   "inviteCode": {
     "title": "Invite Code",
