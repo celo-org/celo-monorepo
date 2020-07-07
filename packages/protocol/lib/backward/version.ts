@@ -111,6 +111,6 @@ export class ContractVersionDelta {
 
   public toString = () : string => {
     const deltas = [this.storage, this.major, this.minor, this.patch]
-    return deltas.map(d => d.toString).join('.')
+    return deltas.map(d => d.toString()).join('.')
   }
 }

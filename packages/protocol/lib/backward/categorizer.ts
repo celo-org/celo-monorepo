@@ -1,4 +1,5 @@
 import {
+  Change,
   ChangeType, ChangeVisitor,
   ContractTypeChange, DeployedBytecodeChange, MethodAddedChange,
   MethodMutabilityChange, MethodParametersChange, MethodRemovedChange,
@@ -10,6 +11,15 @@ import {
  * @returns the assigned {@link ChangeType} for each {@link Change}
  */
 export interface Categorizer extends ChangeVisitor<ChangeType> {}
+
+export const categorize = (changes: Change[], categorizer: Categorizer): Change[][] => {
+  const byCategory = []
+  for (const ct of Object.values(ChangeType)) {
+    byCategory[ct] = []
+  }
+  changes.map(c => byCategory[c.accept(categorizer)].push(c))
+  return byCategory
+}
 
 /**
  * Default implementation of {@link Categorizer}, where:
