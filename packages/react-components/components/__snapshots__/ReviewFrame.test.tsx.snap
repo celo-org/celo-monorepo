@@ -18,6 +18,7 @@ exports[`ReviewFrame renders correctly 1`] = `
         "paddingVertical": 10,
       }
     }
+    keyboardShouldPersistTaps="handled"
   >
     <View>
       <View
@@ -101,5 +102,21 @@ exports[`ReviewFrame renders correctly 1`] = `
       </View>
     </View>
   </View>
+  <View
+    collapsable={false}
+    style={
+      Array [
+        Object {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+        },
+        Object {
+          "height": 0,
+        },
+        undefined,
+      ]
+    }
+  />
 </View>
 `;

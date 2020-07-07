@@ -9,7 +9,7 @@
       "loadingStatus1": "Procesando {{total}} contactos",
       "loadingStatus2": "Encontrar amigos",
       "successHeader": "Terminado",
-      "successWithMatches": "{{matches}} amigos en Valora",
+      "successWithMatches": "{{matches}} amigos en {{appName}}",
       "successWithoutMatches": "Sincronización completa"
     }
   },
@@ -19,7 +19,8 @@
   "pincodeSet": {
     "create": "Crea un PIN",
     "verify": "Ingrese el PIN nuevamente",
-    "pinsDontMatch": "Los PIN no coinciden"
+    "pinsDontMatch": "Los PIN no coinciden",
+    "invalidPin": "Por favor use un PIN más fuerte"
   },
   "inviteCode": {
     "title": "Codigo de invitacion",

@@ -5673,6 +5673,11 @@
   resolved "https://registry.yarnpkg.com/@react-native-firebase/dynamic-links/-/dynamic-links-6.7.1.tgz#1de460a2014818a9b1ed8706eb635d8fea59556d"
   integrity sha512-y4xh1zznBLcBy7Gl1rlyPDhTyXcOss8jT1/2fa/e9cmlhCC13WJ3qz/oh61q5K6L61bFtR25DIZggW1MfMjThA==
 
+"@react-native-firebase/functions@^6.7.1":
+  version "6.8.1"
+  resolved "https://registry.yarnpkg.com/@react-native-firebase/functions/-/functions-6.8.1.tgz#0098f1609418f76556e903fc7c96ae9ae9338558"
+  integrity sha512-F775T2Ef05UcophtCBpBm8o0U+76Zcv9x3jsqaQiG5gl3K7+0MhDp3CUUwWDI3+ldP9SKi3SMY6qogWpE7k40g==
+
 "@react-native-firebase/messaging@^6.7.1":
   version "6.7.1"
   resolved "https://registry.yarnpkg.com/@react-native-firebase/messaging/-/messaging-6.7.1.tgz#d53b73791567366d95fb423f094e2057027cc9fa"
@@ -6463,6 +6468,11 @@
   version "0.0.0"
   resolved "https://registry.yarnpkg.com/@types/country-data/-/country-data-0.0.0.tgz#6f5563cae3d148780c5b6539803a29bd93f8f1a1"
   integrity sha512-lIxCk6G7AwmUagQ4gIQGxUBnvAq664prFD9nSAz6dgd1XmBXBtZABV/op+QsJsIyaP1GZsf/iXhYKHX3azSRCw==
+
+"@types/crypto-js@^3.1.47":
+  version "3.1.47"
+  resolved "https://registry.yarnpkg.com/@types/crypto-js/-/crypto-js-3.1.47.tgz#36e549dd3f1322742a3a738e7c113ebe48221860"
+  integrity sha512-eI6gvpcGHLk3dAuHYnRCAjX+41gMv1nz/VP55wAe5HtmAKDOoPSfr3f6vkMc08ov1S0NsjvUBxDtHHxqQY1LGA==
 
 "@types/debounce@1.2.0":
   version "1.2.0"
@@ -28227,9 +28237,9 @@ react-native-autocomplete-input@^4.1.0:
   resolved "https://registry.yarnpkg.com/react-native-autocomplete-input/-/react-native-autocomplete-input-4.1.0.tgz#979ece28d891b245ecb967b6d31f1f924445b8ab"
   integrity sha512-Yn4GulZ9F6tde74UUGZHdVFeYWVuL7+EbUZy6kt+QHrzMc5B4OuRop1FT4RyWLpvbySW/vvqYgj9LAmlzkuEqA==
 
-"react-native-bip39@https://github.com/celo-org/react-native-bip39#a5dd436":
+"react-native-bip39@https://github.com/celo-org/react-native-bip39#765876f":
   version "2.2.0"
-  resolved "https://github.com/celo-org/react-native-bip39#a5dd4367717f2193dfdaad8ddd70087d6bcf8b5f"
+  resolved "https://github.com/celo-org/react-native-bip39#765876f5946ecdeca34ea9cdf697931a7a9bb8fb"
   dependencies:
     create-hash "^1.1.0"
     react-native-crypto "^2.0.1"
@@ -28258,10 +28268,6 @@ react-native-clock-sync@^1.0.0:
 "react-native-config@https://github.com/luggit/react-native-config#89a602b":
   version "0.11.7"
   resolved "https://github.com/luggit/react-native-config#89a602bf8be3808838403a97afaf915caeec76c2"
-
-"react-native-confirm-device-credentials@git://github.com/celo-org/react-native-confirm-device-credentials#436afa9":
-  version "2.0.0"
-  resolved "git://github.com/celo-org/react-native-confirm-device-credentials#436afa981889b51178f959f0c8cd137cc46386f1"
 
 "react-native-contacts@https://github.com/celo-org/react-native-contacts#e473717":
   version "5.0.0"
@@ -28336,9 +28342,9 @@ react-native-gesture-handler@^1.6.1:
     invariant "^2.2.4"
     prop-types "^15.7.2"
 
-"react-native-geth@https://github.com/celo-org/react-native-geth#8583b07":
+"react-native-geth@https://github.com/celo-org/react-native-geth#2352feb":
   version "0.1.0-development"
-  resolved "https://github.com/celo-org/react-native-geth#8583b070005266ec544b58e5b7a476248292d89e"
+  resolved "https://github.com/celo-org/react-native-geth#2352feb8fb866181dc545ccd3bf9dc60edaec0ce"
 
 react-native-iphone-x-helper@^1.0.3, react-native-iphone-x-helper@^1.2.1:
   version "1.2.1"
@@ -28357,6 +28363,11 @@ react-native-keyboard-aware-scroll-view@^0.9.1:
   dependencies:
     prop-types "^15.6.2"
     react-native-iphone-x-helper "^1.0.3"
+
+react-native-keychain@6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/react-native-keychain/-/react-native-keychain-6.0.0.tgz#687379dd8468e8c37caa3c4d1c91393c6e04cb1d"
+  integrity sha512-5jt2oS9WNBT/GXBRdb+9KHTQokI1eMRDa50aQFR1koXqUpkULhvxItgQ2CKTd+ZchZQK/hn85qHQOs/gWgUGYA==
 
 react-native-kill-packager@^1.0.0:
   version "1.0.0"
@@ -28450,11 +28461,6 @@ react-native-screens@^2.7.0:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-2.7.0.tgz#2d3cf3c39a665e9ca1c774264fccdb90e7944047"
   integrity sha512-n/23IBOkrTKCfuUd6tFeRkn3lB2QZ3cmvoubRscR0JU/Zl4/ZyKmwnFmUv1/Fr+2GH/H8UTX59kEKDYYg3dMgA==
-
-react-native-secure-key-store@^2.0.5:
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/react-native-secure-key-store/-/react-native-secure-key-store-2.0.5.tgz#bebc17847b57ce1ff68a96bce812962269946f02"
-  integrity sha512-m0dzG+cYPMsA07dXfUMpeIwI4erb4khcni1FayC6N+cnPGjAqgF1mscdNnN8FvhSydoDxDK+avKl8TjlTSPgRw==
 
 react-native-secure-randombytes@^2.2.3:
   version "2.2.3"

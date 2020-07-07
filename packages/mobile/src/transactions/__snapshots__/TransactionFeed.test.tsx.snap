@@ -145,7 +145,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../packages/mobile/src/images/exchangeGreenGold.png",
+                  "testUri": "../../../packages/mobile/src/images/transaction-exchange.png",
                 }
               }
               style={

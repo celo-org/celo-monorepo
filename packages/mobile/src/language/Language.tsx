@@ -7,8 +7,8 @@ import { useTranslation } from 'react-i18next'
 import { FlatList, ListRenderItemInfo, ScrollView, StyleSheet, Text } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { SettingsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setLanguage } from 'src/app/actions'
 import { AVAILABLE_LANGUAGES } from 'src/config'
 import { Namespaces } from 'src/i18n'
@@ -35,7 +35,6 @@ function LanguageScreen({ route }: Props) {
   const fromSettings = route.params?.fromSettings
 
   const onSelect = (language: string, code: string) => {
-    CeloAnalytics.track(CustomEventNames.language_select, { language, selectedAnswer: code })
     dispatch(setLanguage(code))
     // Wait for next frame before navigating back
     // so the user can see the changed selection briefly
@@ -46,6 +45,8 @@ function LanguageScreen({ route }: Props) {
         navigate(Screens.JoinCelo)
       }
     })
+
+    ValoraAnalytics.track(SettingsEvents.language_select, { language: code })
   }
 
   const renderItem = ({ item: language }: ListRenderItemInfo<Language>) => {

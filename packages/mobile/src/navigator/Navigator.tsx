@@ -11,7 +11,7 @@ import Licenses from 'src/account/Licenses'
 import Profile from 'src/account/Profile'
 import { PincodeType } from 'src/account/reducer'
 import SupportContact from 'src/account/SupportContact'
-import { CustomEventNames } from 'src/analytics/constants'
+import { CeloExchangeEvents } from 'src/analytics/Events'
 import AppLoading from 'src/app/AppLoading'
 import Debug from 'src/app/Debug'
 import ErrorScreen from 'src/app/ErrorScreen'
@@ -293,8 +293,8 @@ const exchangeTradeScreenOptions = ({
   const isDollarToGold = makerToken === CURRENCY_ENUM.DOLLAR
   const title = isDollarToGold ? i18n.t('exchangeFlow9:buyGold') : i18n.t('exchangeFlow9:sellGold')
   const cancelEventName = isDollarToGold
-    ? CustomEventNames.gold_buy_cancel
-    : CustomEventNames.gold_sell_cancel
+    ? CeloExchangeEvents.celo_buy_cancel
+    : CeloExchangeEvents.celo_sell_cancel
   return {
     ...headerWithCancelButton,
     headerLeft: () => <CancelButton eventName={cancelEventName} />,
@@ -311,11 +311,11 @@ const exchangeReviewScreenOptions = ({
   const isDollarToGold = makerToken === CURRENCY_ENUM.DOLLAR
   const title = isDollarToGold ? i18n.t('exchangeFlow9:buyGold') : i18n.t('exchangeFlow9:sellGold')
   const cancelEventName = isDollarToGold
-    ? CustomEventNames.gold_buy_cancel
-    : CustomEventNames.gold_sell_cancel
+    ? CeloExchangeEvents.celo_buy_cancel
+    : CeloExchangeEvents.celo_sell_cancel
   const editEventName = isDollarToGold
-    ? CustomEventNames.gold_buy_edit
-    : CustomEventNames.gold_sell_edit
+    ? CeloExchangeEvents.celo_buy_edit
+    : CeloExchangeEvents.celo_sell_edit
   return {
     ...headerWithCancelButton,
     headerLeft: () => (
@@ -415,7 +415,7 @@ const transactionReviewOptions = ({
   return {
     ...emptyHeader,
     headerLeft: () => (
-      <BackButton color={colors.dark} eventName={CustomEventNames.gold_activity_back} />
+      <BackButton color={colors.dark} eventName={CeloExchangeEvents.celo_transaction_back} />
     ),
     headerTitle: () => <HeaderTitleWithSubtitle title={header} subTitle={dateTimeStatus} />,
   }

@@ -12,8 +12,8 @@ import { Keyboard, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { hideAlert } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { OnboardingEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import {
   formatBackupPhraseOnEdit,
   formatBackupPhraseOnSubmit,
@@ -72,6 +72,7 @@ export class ImportWallet extends React.Component<Props, State> {
     keyboardVisible: false,
   }
   componentDidMount() {
+    ValoraAnalytics.track(OnboardingEvents.wallet_import_start)
     this.props.navigation.addListener('focus', this.checkCleanBackupPhrase)
   }
 
@@ -105,7 +106,7 @@ export class ImportWallet extends React.Component<Props, State> {
     const useEmptyWallet = !!route.params?.showZeroBalanceModal
     Keyboard.dismiss()
     this.props.hideAlert()
-    CeloAnalytics.track(CustomEventNames.import_wallet_submit)
+    ValoraAnalytics.track(OnboardingEvents.wallet_import_complete)
 
     const formattedPhrase = formatBackupPhraseOnSubmit(this.state.backupPhrase)
     this.setState({
@@ -125,6 +126,7 @@ export class ImportWallet extends React.Component<Props, State> {
     this.setState({
       backupPhrase: '',
     })
+    ValoraAnalytics.track(OnboardingEvents.wallet_import_cancel)
     navigation.setParams({ clean: false, showZeroBalanceModal: false })
   }
 

@@ -10,8 +10,6 @@ import { ActivityIndicator, Keyboard, StyleSheet, Text, View } from 'react-nativ
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { hideAlert } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
 import BackupPhraseContainer, {
   BackupPhraseContainerMode,
   BackupPhraseType,
@@ -77,7 +75,6 @@ export class ImportWalletSocial extends React.Component<Props, State> {
     const { phrase1, phrase2 } = this.state
     Keyboard.dismiss()
     this.props.hideAlert()
-    CeloAnalytics.track(CustomEventNames.import_wallet_submit)
 
     const formattedPhrase1 = formatBackupPhraseOnSubmit(phrase1)
     const formattedPhrase2 = formatBackupPhraseOnSubmit(phrase2)

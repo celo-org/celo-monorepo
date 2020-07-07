@@ -8,7 +8,7 @@ reference:
   android_config: &android_config
     working_directory: *workspace
     macos:
-      xcode: "11.5.0"
+      xcode: '11.5.0'
     shell: /bin/bash --login -eo pipefail
     environment:
       TERM: dumb
@@ -18,7 +18,7 @@ reference:
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: celohq/node10-gcloud:v2
+    - image: celohq/node10-gcloud:v3
   environment:
     # To avoid ENOMEM problem when running node
     NODE_OPTIONS: '--max-old-space-size=4096'

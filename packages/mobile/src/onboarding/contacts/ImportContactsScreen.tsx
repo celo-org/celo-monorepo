@@ -9,8 +9,8 @@ import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { IdentityEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import i18n, { Namespaces } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
 import { cancelImportContacts, denyImportContacts, importContacts } from 'src/identity/actions'
@@ -85,11 +85,11 @@ function ImportContactsScreen({ route, navigation }: Props) {
   }
 
   const onPressConnect = async () => {
-    CeloAnalytics.track(CustomEventNames.import_contacts)
-    const hasGivenContactPermission = await requestContactsPermission()
-    if (hasGivenContactPermission) {
-      dispatch(importContacts(isFindMeSwitchChecked))
-    }
+    ValoraAnalytics.track(IdentityEvents.contacts_connect, {
+      matchMakingEnabled: isFindMeSwitchChecked,
+    })
+    await requestContactsPermission()
+    dispatch(importContacts(isFindMeSwitchChecked))
   }
 
   const onToggleFindMeSwitch = (value: boolean) => {

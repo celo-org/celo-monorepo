@@ -11,8 +11,8 @@ import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { FeeEvents, SendEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import BackButton from 'src/components/BackButton.v2'
 import CommentTextInput from 'src/components/CommentTextInput'
@@ -124,7 +124,7 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
 
 export const sendConfirmationScreenNavOptions = () => ({
   ...emptyHeader,
-  headerLeft: () => <BackButton eventName={CustomEventNames.send_confirm_back} />,
+  headerLeft: () => <BackButton eventName={SendEvents.send_confirm_back} />,
 })
 
 export class SendConfirmation extends React.Component<Props, State> {
@@ -154,6 +154,7 @@ export class SendConfirmation extends React.Component<Props, State> {
 
   sendOrInvite = (inviteMethod?: InviteBy) => {
     const {
+      type,
       amount,
       recipient,
       recipientAddress,
@@ -162,17 +163,20 @@ export class SendConfirmation extends React.Component<Props, State> {
     const { comment } = this.state
 
     const timestamp = Date.now()
+    const localCurrencyAmount = convertDollarsToLocalAmount(
+      amount,
+      this.props.localCurrencyExchangeRate
+    )
 
-    CeloAnalytics.track(CustomEventNames.send_confirm, {
-      method: this.props.route.params?.isFromScan ? 'scan' : 'search',
+    ValoraAnalytics.track(SendEvents.send_confim_send, {
+      isScan: !!this.props.route.params?.isFromScan,
+      isInvite: !recipientAddress,
+      isRequest: type === TokenTransactionType.PayRequest,
       localCurrencyExchangeRate: this.props.localCurrencyExchangeRate,
       localCurrency: this.props.localCurrencyCode,
-      dollarAmount: amount,
-      localCurrencyAmount: convertDollarsToLocalAmount(
-        amount,
-        this.props.localCurrencyExchangeRate
-      ),
-      isInvite: !recipientAddress,
+      dollarAmount: amount.toString(),
+      localCurrencyAmount: localCurrencyAmount ? localCurrencyAmount.toString() : null,
+      commentLength: this.state.comment.length,
     })
 
     this.props.sendPaymentOrInvite(
@@ -188,7 +192,7 @@ export class SendConfirmation extends React.Component<Props, State> {
 
   onEditAddressClick = () => {
     const { transactionData, addressValidationType } = this.props
-    CeloAnalytics.track(CustomEventNames.send_secure_edit)
+    ValoraAnalytics.track(SendEvents.send_secure_edit)
     navigate(Screens.ValidateRecipientIntro, {
       transactionData,
       addressValidationType,
@@ -290,7 +294,10 @@ export class SendConfirmation extends React.Component<Props, State> {
       // so we adjust it here
       const securityFee = isInvite && fee ? fee.minus(inviteFee) : fee
 
-      CeloAnalytics.track(CustomEventNames.fee_rendered, { feeType: 'Security', fee: securityFee })
+      ValoraAnalytics.track(FeeEvents.fee_rendered, {
+        feeType: 'Security',
+        fee: securityFee ? securityFee.toString() : securityFee,
+      })
       const totalAmount = {
         value: amountWithFee,
         currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
@@ -315,7 +322,7 @@ export class SendConfirmation extends React.Component<Props, State> {
     }
 
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['bottom']}>
         <DisconnectBanner />
         <ReviewFrame
           FooterComponent={renderFeeContainer}
@@ -405,7 +412,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.light,
-    padding: 8,
+    paddingHorizontal: 8,
   },
   feeContainer: {
     padding: 16,

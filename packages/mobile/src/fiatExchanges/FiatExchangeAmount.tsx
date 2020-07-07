@@ -14,7 +14,6 @@ import { Platform, StyleSheet, Text, TextInput, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
-import { CustomEventNames } from 'src/analytics/constants'
 import BackButton from 'src/components/BackButton.v2'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import LineItemRow from 'src/components/LineItemRow'
@@ -53,7 +52,7 @@ export const fiatExchangesAmountScreenOptions = ({
 }) => {
   return {
     ...emptyHeader,
-    headerLeft: () => <BackButton eventName={CustomEventNames.send_amount_back} />,
+    headerLeft: () => <BackButton />,
     headerTitle: () => (
       <HeaderTitleWithBalance
         title={i18n.t(`fiatExchangeFlow:${route.params?.isAddFunds ? 'addFunds' : 'cashOut'}`)}
@@ -111,7 +110,7 @@ export function ExchangeTradeScreen({ navigation, route }: Props) {
   )
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <DisconnectBanner />
       <KeyboardAwareScrollView
         keyboardShouldPersistTaps={'always'}

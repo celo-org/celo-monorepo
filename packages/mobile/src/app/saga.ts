@@ -2,8 +2,8 @@ import { AppState, Linking } from 'react-native'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { eventChannel } from 'redux-saga'
 import { call, cancelled, put, select, spawn, take, takeLatest } from 'redux-saga/effects'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AppEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import {
   Actions,
   appLock,
@@ -13,14 +13,13 @@ import {
   setLanguage,
 } from 'src/app/actions'
 import { currentLanguageSelector } from 'src/app/reducers'
-import { getAppLocked, getLastTimeBackgrounded, getLockWithPinEnabled } from 'src/app/selectors'
+import { getLastTimeBackgrounded, getRequirePinOnAppOpen } from 'src/app/selectors'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
 import { isAppVersionDeprecated } from 'src/firebase/firebase'
 import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { getCachedPincode } from 'src/pincode/PincodeCache'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { clockInSync } from 'src/utils/time'
@@ -114,7 +113,7 @@ function* watchAppState() {
       Logger.debug(`${TAG}@monitorAppState`, `App changed state: ${newState}`)
       yield put(setAppState(newState))
     } catch (error) {
-      CeloAnalytics.track(CustomEventNames.app_state_error, { error: error.message })
+      ValoraAnalytics.track(AppEvents.app_state_error, { error: error.message })
       Logger.error(`${TAG}@monitorAppState`, `App state Error`, error)
     } finally {
       if (yield cancelled()) {
@@ -125,18 +124,12 @@ function* watchAppState() {
 }
 
 export function* handleSetAppState(action: SetAppState) {
-  const appLocked = yield select(getAppLocked)
+  const requirePinOnAppOpen = yield select(getRequirePinOnAppOpen)
   const lastTimeBackgrounded = yield select(getLastTimeBackgrounded)
-  const now = Date.now()
-  const cachedPin = getCachedPincode()
-  const lockWithPinEnabled = yield select(getLockWithPinEnabled)
-  if (
-    !cachedPin &&
-    lockWithPinEnabled &&
-    now - lastTimeBackgrounded > DO_NOT_LOCK_PERIOD &&
-    action.state === 'active' &&
-    !appLocked
-  ) {
+  const isPassedDoNotLockPeriod = Date.now() - lastTimeBackgrounded > DO_NOT_LOCK_PERIOD
+  const isAppActive = action.state === 'active'
+
+  if (requirePinOnAppOpen && isPassedDoNotLockPeriod && isAppActive) {
     yield put(appLock())
   }
 }

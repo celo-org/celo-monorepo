@@ -1,10 +1,10 @@
 # Governance
 
-Celo uses a formal on-chain governance mechanism to manage and upgrade the protocol such as for upgrading smart contracts, adding new stable currencies, or modifying the reserve target asset allocation. All changes must be agreed upon by Celo Gold holders. A quorum threshold model is used to determine the number of votes needed for a proposal to pass.
+Celo uses a formal on-chain governance mechanism to manage and upgrade the protocol such as for upgrading smart contracts, adding new stable currencies, or modifying the reserve target asset allocation. All changes must be agreed upon by CELO holders. A quorum threshold model is used to determine the number of votes needed for a proposal to pass.
 
 ## How it works
 
-Changes are managed via the Celo `Governance` smart contract. This contract acts as an "owner" for making modifications to other protocol smart contracts. Such smart contracts are termed **governable**. The `Governance` contract will at first be owned by a multi-signature wallet. In the future, when the community's experience of DAOs \(Distributed Autonomous Organizations\) has evolved and when the platform has proven to be stable and secure, it will be owned by Celo Gold holders effectively acting as a DAO.
+Changes are managed via the Celo `Governance` smart contract. This contract acts as an "owner" for making modifications to other protocol smart contracts. Such smart contracts are termed **governable**. The `Governance` contract will at first be owned by a multi-signature wallet. In the future, when the community's experience of DAOs \(Distributed Autonomous Organizations\) has evolved and when the platform has proven to be stable and secure, it will be owned by CELO holders effectively acting as a DAO.
 
 The change procedure happens in the following phases:
 
@@ -19,9 +19,9 @@ The change procedure happens in the following phases:
 
 ## Proposal
 
-Any user may submit a “Proposal” to the `Governance` smart contract, along with a small deposit of Celo Gold. This deposit is required to avoid spam proposals, and is refunded to the proposer if the community decides the proposal is worthy of voting on. A “Proposal” consists of a timestamp and the information needed to the “call” the operation code that will run if the proposal is accepted. This information includes an address, data, and value. Submitted proposals are added to the queue of proposals and expire from this list after one week.
+Any user may submit a “Proposal” to the `Governance` smart contract, along with a small deposit of CELO. This deposit is required to avoid spam proposals, and is refunded to the proposer if the community decides the proposal is worthy of voting on. A “Proposal” consists of a timestamp and the information needed to the “call” the operation code that will run if the proposal is accepted. This information includes an address, data, and value. Submitted proposals are added to the queue of proposals and expire from this list after one week.
 
-Once added to the queue, a proposal needs to get voted on by Celo Gold holders to pass to the next “Approval” phase. Every Celo Gold holder with a Locked Gold account may vote for at most one proposal and in order to be eligible to do so, the account must put up a commitment, which involves sending Celo Gold to a smart contract and specifying a notice period to wait once the withdrawal is requested. This Locked Gold commitment can be the same as the funds used for validator elections and earning epoch rewards. The list of proposals is sorted by the weight of the votes they have received.
+Once added to the queue, a proposal needs to get voted on by CELO holders to pass to the next “Approval” phase. Every CELO holder with a Locked Gold account may vote for at most one proposal and in order to be eligible to do so, the account must put up a commitment, which involves sending CELO to a smart contract and specifying a notice period to wait once the withdrawal is requested. This Locked Gold commitment can be the same as the funds used for validator elections and earning epoch rewards. The list of proposals is sorted by the weight of the votes they have received.
 
 ## Approval
 
