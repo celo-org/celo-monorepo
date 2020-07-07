@@ -1,10 +1,10 @@
 // tslint:disable: max-classes-per-file
 import {
   ASTCodeCompatibilityReport,
-  Change, ChangeType
+  Change
 } from '@celo/protocol/lib/backward/ast-code'
 import { ASTStorageCompatibilityReport } from '@celo/protocol/lib/backward/ast-layout'
-import { categorize, Categorizer } from '@celo/protocol/lib/backward/categorizer'
+import { categorize, Categorizer, ChangeType } from '@celo/protocol/lib/backward/categorizer'
 import { ContractVersionDelta } from '@celo/protocol/lib/backward/version'
 
 
