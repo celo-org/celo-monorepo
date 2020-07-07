@@ -131,6 +131,12 @@ release: {{ .Release.Name }}
     ACCOUNT_ADDRESS=$(cat /root/.celo/address)
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }} --etherbase=${ACCOUNT_ADDRESS}"
     {{- end }}
+    {{- if .metrics | default true }}
+    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
+    {{- end }}
+    {{- if .pprof | default false }}
+    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .pprof_port }} --pprofaddr 0.0.0.0"
+    {{- end }}
 
     exec geth \
       --bootnodes=$(cat /root/.celo/bootnodeEnode) \
@@ -146,7 +152,6 @@ release: {{ .Release.Name }}
       --consoleoutput=stdout \
       --verbosity={{ .Values.geth.verbosity }} \
       --vmodule={{ .Values.geth.vmodule }} \
-      --metrics \
       ${ADDITIONAL_FLAGS}
   env:
   - name: GETH_DEBUG
@@ -205,6 +210,10 @@ release: {{ .Release.Name }}
     containerPort: 8545
   - name: ws
     containerPort: 8546
+{{ end }}
+{{- if .pprof }}
+  - name: pprof
+    containerPort: {{ .pprof_port }}
 {{ end }}
   resources:
 {{ toYaml .Values.geth.resources | indent 4 }}
