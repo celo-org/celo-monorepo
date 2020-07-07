@@ -41,7 +41,7 @@ export default class AwsHsmSigner implements Signer {
   ): Promise<{ v: number; r: Buffer; s: Buffer }> {
     const hash = getHashFromEncoded(encodedTx.rlpEncode)
     const bufferedMessage = Buffer.from(trimLeading0x(hash), 'hex')
-    const { Signature: signature } = await this.kms
+    const a = await this.kms
       .sign({
         KeyId: this.keyId,
         MessageType: 'DIGEST',
@@ -49,6 +49,9 @@ export default class AwsHsmSigner implements Signer {
         SigningAlgorithm,
       })
       .promise()
+    console.log('sig', a)
+    const { Signature: signature } = a
+    console.log(signature?.toString('base64'))
     const { r, s } = parseBERSignature(signature as Buffer)
     const R = bufferToBigNumber(r)
     let S = bufferToBigNumber(s)

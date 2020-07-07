@@ -28,6 +28,7 @@ export abstract class RemoteWallet extends WalletBase implements Wallet {
       accountSigners.forEach((signer, address) => {
         this.addSigner(address, signer)
       })
+      console.log('>>> all set up')
       this.setupFinished = true
     } finally {
       this.setupLocked = false

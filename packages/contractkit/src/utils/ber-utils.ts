@@ -26,6 +26,8 @@ export function parseBERSignature(sig: Buffer): { r: Buffer; s: Buffer } {
   const part1 = (result as asn1.Sequence).valueBlock.value[0] as asn1.BitString
   const part2 = (result as asn1.Sequence).valueBlock.value[1] as asn1.BitString
 
+  console.log('>>', part1, part2)
+
   return {
     r: Buffer.from(part1.valueBlock.valueHex),
     s: Buffer.from(part2.valueBlock.valueHex),

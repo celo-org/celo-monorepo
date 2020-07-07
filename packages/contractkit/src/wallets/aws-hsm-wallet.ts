@@ -7,13 +7,12 @@ import { Signer } from './signers/signer'
 import { Wallet } from './wallet'
 
 export default class AwsHsmWallet extends RemoteWallet implements Wallet {
-  private kms: KMS
-  constructor() {
-    super()
-    this.kms = new KMS({ region: 'eu-central-1', apiVersion: '2014-11-01' })
-  }
+  private kms: KMS | undefined
 
   protected async loadAccountSigners(): Promise<Map<Address, Signer>> {
+    if (!this.kms) {
+      this.kms = this.generateKmsClient()
+    }
     const { Keys } = await this.kms.listKeys().promise()
     const addressToSigner = new Map<Address, Signer>()
     for (const { KeyId } of Keys!) {
@@ -33,7 +32,14 @@ export default class AwsHsmWallet extends RemoteWallet implements Wallet {
     return addressToSigner
   }
 
+  private generateKmsClient() {
+    return new KMS({ region: 'eu-central-1', apiVersion: '2014-11-01' })
+  }
+
   public async getAddressFromKeyId(keyId: string): Promise<string> {
+    if (!this.kms) {
+      throw new Error('AwsHsmWallet needs to be initialised first')
+    }
     const { PublicKey } = await this.kms.getPublicKey({ KeyId: keyId }).promise()
     return addressFromAsn1(PublicKey as Buffer)
   }
