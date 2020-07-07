@@ -1,5 +1,5 @@
 export const APP_NAME = 'Celo Wallet'
-export const CELO_FAUCET_LINK = 'https://celo.org/app'
+export const CELO_FAUCET_LINK = 'https://celo.org/developers/wallet'
 export const CELO_TERMS_LINK = 'https://celo.org/terms'
 export const TOS_LINK = 'https://celo.org/user-agreement'
 export const FAQ_LINK = 'https://celo.org/faq'
