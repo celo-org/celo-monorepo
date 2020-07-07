@@ -1,4 +1,5 @@
 import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/src/address'
+import { AwsClusterConfig, switchToAwsCluster } from 'src/lib/aws'
 import { assignRoleIfNotAssigned, AzureClusterConfig, createIdentityIfNotExists, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity, switchToCluster } from 'src/lib/azure'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { getFornoUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInternalUrl } from 'src/lib/endpoints'
@@ -16,6 +17,11 @@ const rbacHelmChartPath = '../helm-charts/oracle-rbac'
 export enum OracleAzureContext {
   PRIMARY = 'PRIMARY',
   SECONDARY = 'SECONDARY',
+}
+
+// TODO update to be in line with Trevor's changes
+export enum OracleAwsContext {
+  PRIMARY = 'PRIMARY',
 }
 
 /**
@@ -360,6 +366,20 @@ export function getAzureClusterConfig(context: OracleAzureContext): AzureCluster
 }
 
 /**
+ * Fetches the env vars for a particular context
+ * @param context the OracleAzureContext to use
+ * @return an AzureClusterConfig for the context
+ */
+export function getAwsClusterConfig(context: OracleAwsContext): AwsClusterConfig {
+  // TODO update to be in line with Trevor's changes
+  const clusterConfig: AwsClusterConfig = {
+    clusterRegion: "us-west-2",
+    clusterName: "aws-jason2" 
+  }
+  return clusterConfig || context 
+}
+
+/**
  * Given if the desired context is primary, gives the appropriate OracleAzureContext
  */
 export function getOracleAzureContext(primary: boolean): OracleAzureContext {
@@ -372,6 +392,12 @@ export function getOracleAzureContext(primary: boolean): OracleAzureContext {
 export function switchToAzureContextCluster(celoEnv: string, context: OracleAzureContext) {
   const azureClusterConfig = getAzureClusterConfig(context)
   return switchToCluster(celoEnv, azureClusterConfig)
+}
+
+export function switchToAwsContextCluster(celoEnv: string, context: OracleAwsContext) {
+  // Incorporate into env vars
+  const awsClusterConfig = getAwsClusterConfig(context)
+  return switchToAwsCluster(celoEnv, awsClusterConfig)
 }
 
 /**

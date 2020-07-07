@@ -1,6 +1,5 @@
 import { entries, range } from 'lodash'
 import sleep from 'sleep-promise'
-import { AzureClusterConfig } from './azure'
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
 import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
 import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './env-utils'
@@ -215,7 +214,7 @@ export async function installCertManager() {
 
 export async function installAndEnableMetricsDeps(
   installPrometheus: boolean,
-  clusterConfig?: AzureClusterConfig
+  configClusterName?: string
 ) {
   const kubeStateMetricsReleaseExists = await outputIncludes(
     `helm list`,
@@ -228,7 +227,7 @@ export async function installAndEnableMetricsDeps(
     )
   }
   if (installPrometheus) {
-    await installPrometheusIfNotExists(clusterConfig)
+    await installPrometheusIfNotExists(configClusterName)
   }
 }
 

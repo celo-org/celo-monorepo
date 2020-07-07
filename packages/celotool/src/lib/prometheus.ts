@@ -1,17 +1,16 @@
 import fs from 'fs'
-import { AzureClusterConfig } from './azure'
 import { createNamespaceIfNotExists } from './cluster'
 import { execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv } from './env-utils'
 import {
   installGenericHelmChart,
   removeGenericHelmChart,
-  upgradeGenericHelmChart,
+  upgradeGenericHelmChart
 } from './helm_deploy'
 import {
   createServiceAccountIfNotExists,
   getServiceAccountEmail,
-  getServiceAccountKey,
+  getServiceAccountKey
 } from './service-account-utils'
 import { outputIncludes, switchToProjectFromEnv as switchToGCPProjectFromEnv } from './utils'
 
@@ -25,7 +24,7 @@ const sidecarImageTag = '0.7.3'
 // Prometheus container registry with latest tags: https://hub.docker.com/r/prom/prometheus/tags
 const prometheusImageTag = 'v2.17.0'
 
-export async function installPrometheusIfNotExists(clusterConfig?: AzureClusterConfig) {
+export async function installPrometheusIfNotExists(configClusterName?: string) {
   const prometheusExists = await outputIncludes(
     `helm list`,
     `prometheus-stackdriver`,
@@ -33,17 +32,17 @@ export async function installPrometheusIfNotExists(clusterConfig?: AzureClusterC
   )
   if (!prometheusExists) {
     console.info('Installing prometheus-stackdriver')
-    await installPrometheus(clusterConfig)
+    await installPrometheus(configClusterName)
   }
 }
 
-async function installPrometheus(clusterConfig?: AzureClusterConfig) {
+async function installPrometheus(configClusterName?: string) {
   await createNamespaceIfNotExists('prometheus')
   return installGenericHelmChart(
     kubeNamespace,
     releaseName,
     helmChartPath,
-    await helmParameters(clusterConfig)
+    await helmParameters(configClusterName)
   )
 }
 
@@ -56,7 +55,8 @@ export async function upgradePrometheus() {
   return upgradeGenericHelmChart(kubeNamespace, releaseName, helmChartPath, await helmParameters())
 }
 
-async function helmParameters(clusterConfig?: AzureClusterConfig) {
+// async function helmParameters(clusterConfig?: AzureClusterConfig) {
+async function helmParameters(configClusterName?: string) {
   const params = [
     `--set namespace=${kubeNamespace}`,
     `--set gcloud.project=${fetchEnv(envVar.TESTNET_PROJECT_NAME)}`,
@@ -71,12 +71,12 @@ async function helmParameters(clusterConfig?: AzureClusterConfig) {
     // this results in a bunch of errors when the sidecar tries to send metrics to Stackdriver.
     `--set-string includeFilter='\\{job=~".+"\\,__name__!~"kube_.+_labels"\\,__name__!~"phoenix_.+"\\}'`,
   ]
-  if (clusterConfig) {
+  if (configClusterName) {
     params.push(
-      `--set cluster=${clusterConfig.clusterName}`,
-      `--set stackdriver_metrics_prefix=external.googleapis.com/prometheus/${clusterConfig.clusterName}`,
+      `--set cluster=${configClusterName}`,
+      `--set stackdriver_metrics_prefix=external.googleapis.com/prometheus/${configClusterName}`,
       `--set gcloudServiceAccountKeyBase64=${await getPrometheusGcloudServiceAccountKeyBase64forAKS(
-        clusterConfig.clusterName
+        configClusterName
       )}`
     )
   } else {
@@ -92,6 +92,7 @@ async function helmParameters(clusterConfig?: AzureClusterConfig) {
 async function getPrometheusGcloudServiceAccountKeyBase64forAKS(kubeClusterName: string) {
   await switchToGCPProjectFromEnv()
 
+  // TODO detect which cloud provider (Azure or AWS) to call correct getServiceAccountName
   const serviceAccountName = getServiceAccountNameforAKS(kubeClusterName)
   await createPrometheusGcloudServiceAccountforAKS(serviceAccountName)
 

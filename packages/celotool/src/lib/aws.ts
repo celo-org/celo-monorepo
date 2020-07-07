@@ -1,22 +1,19 @@
 import { createNamespaceIfNotExists } from 'src/lib/cluster'
 import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { doCheckOrPromptIfStagingOrProduction } from 'src/lib/env-utils'
-import { redeployTiller } from 'src/lib/helm_deploy'
+import { installAndEnableMetricsDeps, redeployTiller } from 'src/lib/helm_deploy'
 
 /**
  * Basic info for an EKS cluster
  */
 export interface AwsClusterConfig {
-  // These are env variables
-  // tenantId: string
-  // resourceGroup: string
   clusterRegion: string
   clusterName: string 
   // subscriptionId: string
 }
 
 // switchToCluster configures kubectl to connect to the EKS cluster
-export async function switchToCluster(
+export async function switchToAwsCluster(
   celoEnv: string,
   clusterConfig: AwsClusterConfig,
   checkOrPromptIfStagingOrProduction = true
@@ -25,8 +22,7 @@ export async function switchToCluster(
     await doCheckOrPromptIfStagingOrProduction()
   }
 
-  // Set AWS config profile 
-
+  // TODO Look into switching subscription between testing and production
   // // Azure subscription switch
   // let currentTenantId = null
   // try {
@@ -46,14 +42,13 @@ export async function switchToCluster(
   }
 
   // We expect the context to be the cluster name. If the context isn't known,
-  // we get the context from Azure.
+  // we get the context from AWS.
   if (currentCluster === null || currentCluster.trim() !== clusterConfig.clusterName) {
     const [existingContextsStr] = await execCmdWithExitOnFailure('kubectl config get-contexts -o name')
     const existingContexts = existingContextsStr.trim().split('\n')
     if (existingContexts.includes(clusterConfig.clusterName)) {
       await execCmdWithExitOnFailure(`kubectl config use-context ${clusterConfig.clusterName}`)
     } else {
-      
       await execCmdWithExitOnFailure(
         `aws eks --region ${clusterConfig.clusterRegion} update-kubeconfig --name ${clusterConfig.clusterName} --alias ${clusterConfig.clusterName}`
         ) 
@@ -70,7 +65,7 @@ async function setupCluster(celoEnv: string, clusterConfig: AwsClusterConfig) {
   console.info('Performing any cluster setup that needs to be done...')
 
   await redeployTiller()
-  // await installAndEnableMetricsDeps(true, clusterConfig)
+  await installAndEnableMetricsDeps(true, clusterConfig.clusterName)
   // Should not execute AADPodIdentityif on AWS
   // await installAADPodIdentity()
 }
