@@ -79,8 +79,8 @@ function* waitForGethInstance() {
     const fornoMode = yield select(fornoSelector)
     // get geth without syncing if fornoMode
     const gethInstance = yield call(initGeth, !fornoMode)
-    if (gethInstance == null) {
-      throw new Error('geth instance is null')
+    if (!gethInstance) {
+      throw new Error('Geth instance is null')
     }
     return GethInitOutcomes.SUCCESS
   } catch (error) {

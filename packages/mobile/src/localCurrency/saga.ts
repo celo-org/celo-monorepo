@@ -57,6 +57,7 @@ export function* watchFetchCurrentRate() {
 }
 
 export function* watchSelectPreferredCurrency() {
+  yield put(fetchCurrentRate())
   while (true) {
     yield take([Actions.SELECT_PREFERRED_CURRENCY, AccountActions.SET_PHONE_NUMBER])
     yield put(fetchCurrentRate())

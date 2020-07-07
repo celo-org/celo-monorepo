@@ -33,7 +33,7 @@ const TAG = 'app/saga'
 const DO_NOT_LOCK_PERIOD = 30000 // 30 sec
 
 // Work that's done before other sagas are initalized
-// Be mindful to not but long blocking tasks here
+// Be mindful to not put long blocking tasks here
 export function* appInit() {
   const isDeprecated: boolean = yield call(isAppVersionDeprecated)
 
