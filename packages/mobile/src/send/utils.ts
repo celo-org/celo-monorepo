@@ -68,7 +68,10 @@ function dailySpent(now: number, recentPayments: PaymentInfo[]) {
     (p: PaymentInfo) => timeDeltaInHours(now, p.timestamp) < 24
   )
 
-  const amount: number = paymentsLast24Hours.reduce((sum, p: PaymentInfo) => sum + p.amount, 0)
+  const amount: number = paymentsLast24Hours.reduce(
+    (sum, p: PaymentInfo) => sum + p.amount.toNumber(),
+    0
+  )
   return amount
 }
 

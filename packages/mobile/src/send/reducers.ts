@@ -10,14 +10,13 @@ const RECENT_RECIPIENTS_TO_STORE = 8
 // We need to know the last 24 hours of payments (for compliance reasons)
 export interface PaymentInfo {
   timestamp: number
-  amount: number
+  amount: BigNumber
 }
 
 export interface State {
   isSending: boolean
   recentRecipients: Recipient[]
-  // keep a list of recent (last 24 hours) payments
-  // TODO(erdal) when do we clean this up?
+  // Keep a list of recent (last 24 hours) payments
   recentPayments: PaymentInfo[]
 }
 
@@ -59,17 +58,15 @@ export const sendReducer = (
 const sendPaymentOrInvite = (state: State, amount: BigNumber, timestamp: number) => {
   const latestPayment = { timestamp, amount }
 
-  // keep only the last 24 hours
+  // Keep only the last 24 hours
   const paymentsLast24Hours = state.recentPayments.filter(
     (p: PaymentInfo) => timeDeltaInHours(timestamp, p.timestamp) < 24
   )
 
-  const recentPayments = [...paymentsLast24Hours, latestPayment]
-
   return {
     ...state,
     isSending: true,
-    recentPayments,
+    recentPayments: [...paymentsLast24Hours, latestPayment],
   }
 }
 
