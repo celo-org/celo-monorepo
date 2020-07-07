@@ -176,7 +176,7 @@ cat <<'EOF' > /root/backup_rsync.sh
 set -x
 systemctl stop geth.service
 sleep 5
-gsutil -m rsync -d -r /root/.celo/celo gs://zanshin-celo-rc1-red-chaindata-rsync
+gsutil -m rsync -d -r /root/.celo/celo gs://${gcloud_project}-chaindata-rsync
 sleep 3
 systemctl start geth.service
 EOF
