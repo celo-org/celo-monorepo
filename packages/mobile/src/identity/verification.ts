@@ -37,6 +37,7 @@ import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/priv
 import { acceptedAttestationCodesSelector, attestationCodesSelector } from 'src/identity/reducer'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
 import { VerificationStatus } from 'src/identity/types'
+import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
@@ -46,6 +47,7 @@ import { privateCommentKeySelector } from 'src/web3/selectors'
 const TAG = 'identity/verification'
 
 export const NUM_ATTESTATIONS_REQUIRED = 3
+export const ESTIMATED_COST_PER_ATTESTATION = 0.07
 export const VERIFICATION_TIMEOUT = 10 * 60 * 1000 // 10 minutes
 const REVEAL_RETRY_DELAY = 10 * 1000 // 10 seconds
 
@@ -149,6 +151,14 @@ export function* doVerificationFlow() {
       ...status,
     })
 
+    const balanceIsSufficient = yield call(
+      balanceSufficientForAttestations,
+      status.numAttestationsRemaining
+    )
+    if (!balanceIsSufficient) {
+      throw Error(ErrorMessages.INSUFFICIENT_BALANCE)
+    }
+
     if (!status.isVerified) {
       // Mark codes completed in previous attempts
       yield put(
@@ -211,13 +221,22 @@ export function* doVerificationFlow() {
     return true
   } catch (error) {
     Logger.error(TAG, 'Error occured during verification flow', error)
+    error.message === ErrorMessages.INSUFFICIENT_BALANCE
+      ? yield put(setVerificationStatus(VerificationStatus.InsufficientBalance))
+      : yield put(setVerificationStatus(VerificationStatus.Failed))
+
+    // Note: Do we need this given we have a VerificationFailureModal?
     yield put(showErrorOrFallback(error, ErrorMessages.VERIFICATION_FAILURE))
-    yield put(setVerificationStatus(VerificationStatus.Failed))
     return error.message
   }
 }
 
-// Requests if necessary additional attestations and returns all revealable attetations
+function* balanceSufficientForAttestations(attestationsRemaining: number) {
+  const userBalance = yield select(stableTokenBalanceSelector)
+  return userBalance > attestationsRemaining * ESTIMATED_COST_PER_ATTESTATION
+}
+
+// Requests if necessary additional attestations and returns all revealable attestations
 export function* requestAndRetrieveAttestations(
   attestationsWrapper: AttestationsWrapper,
   phoneHash: string,
@@ -304,7 +323,7 @@ function* requestAttestations(
   account: string
 ) {
   if (numAttestationsRequestsNeeded <= 0) {
-    Logger.debug(`${TAG}@requestNeededAttestations`, 'No additional attestations requests needed')
+    Logger.debug(`${TAG}@requestAttestations`, 'No additional attestations requests needed')
     return
   }
 
@@ -316,7 +335,7 @@ function* requestAttestations(
 
   if (unselectedRequest.blockNumber === 0) {
     Logger.debug(
-      `${TAG}@requestNeededAttestations`,
+      `${TAG}@requestAttestations`,
       `Approving ${numAttestationsRequestsNeeded} new attestations`
     )
     const approveTx: CeloTransactionObject<boolean> = yield call(
@@ -328,7 +347,7 @@ function* requestAttestations(
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_approve_tx_sent)
 
     Logger.debug(
-      `${TAG}@requestNeededAttestations`,
+      `${TAG}@requestAttestations`,
       `Requesting ${numAttestationsRequestsNeeded} new attestations`
     )
 
@@ -342,17 +361,17 @@ function* requestAttestations(
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_request_tx_sent)
   } else {
     Logger.debug(
-      `${TAG}@requestNeededAttestations`,
+      `${TAG}@requestAttestations`,
       `Unselected request found, skipping approval/request`
     )
   }
 
-  Logger.debug(`${TAG}@requestNeededAttestations`, 'Waiting for block to select issuer')
+  Logger.debug(`${TAG}@requestAttestations`, 'Waiting for block to select issuer')
   ValoraAnalytics.track(VerificationEvents.verification_request_attestation_await_issuer_selection)
 
   yield call([attestationsWrapper, attestationsWrapper.waitForSelectingIssuers], phoneHash, account)
 
-  Logger.debug(`${TAG}@requestNeededAttestations`, 'Selecting issuer')
+  Logger.debug(`${TAG}@requestAttestations`, 'Selecting issuer')
   ValoraAnalytics.track(VerificationEvents.verification_request_attestation_select_issuer)
 
   const selectIssuersTx = attestationsWrapper.selectIssuers(phoneHash)

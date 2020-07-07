@@ -48,6 +48,8 @@
     "header": "Error de verificación",
     "body1": "Se produjo un problema al verificar su número de teléfono.",
     "body2": "Puede saltar la verificación y volver a intentarlo más tarde.",
+    "body1InsufficientBalance": "Su saldo actual no es lo suficientemente alto como para completar el proceso de verificación.",
+    "body2InsufficientBalance": "Intente nuevamente cuando haya agregado fondos a su billetera.",
     "enterCodesBody": " Si ya recibió tres códigos por SMS, aún puede ingresarlos.",
     "enterCodesButton": "Ingresar códigos"
   },
