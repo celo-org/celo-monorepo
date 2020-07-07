@@ -1,5 +1,5 @@
 import { DefaultCategorizer } from '@celo/protocol/lib/backward/categorizer'
-import { ASTBackwardReport, createReport } from '@celo/protocol/lib/backward/utils'
+import { ASTBackwardReport } from '@celo/protocol/lib/backward/utils'
 import { ContractVersion } from '@celo/protocol/lib/backward/version'
 import { writeJsonSync } from 'fs-extra'
 import * as path from 'path'
@@ -97,7 +97,7 @@ const outFile = argv.output_file ? argv.output_file : tmp.tmpNameSync({})
 const exclude = argv.exclude ? argv.exclude : ''
 
 try {
-  const report: ASTBackwardReport = createReport(
+  const backward = ASTBackwardReport.create(
     oldArtifactsFolder,
     newArtifactsFolder,
     exclude,
@@ -105,7 +105,7 @@ try {
     out
   )
   out(`Writing report to ${outFile} ...`)
-  writeJsonSync(outFile, report, { spaces: 2 })
+  writeJsonSync(outFile, backward, { spaces: 2 })
   out('Done\n')
   if (argv._.includes(COMMAND_REPORT)) {
     // Report always generated
@@ -113,24 +113,28 @@ try {
   } else if (argv._.includes(COMMAND_SEM_INFER)) {
     out(`Inferred version: `)
     out(
-      report.versionDelta.appliedTo(ContractVersion.fromString(argv.old_version)).toString(),
+      backward.report.versionDelta
+        .appliedTo(ContractVersion.fromString(argv.old_version))
+        .toString(),
       true
     )
     out(`\n`)
   } else if (argv._.includes(COMMAND_SEM_CHECK)) {
-    const expected = report.versionDelta.appliedTo(ContractVersion.fromString(argv.old_version))
+    const expected = backward.report.versionDelta.appliedTo(
+      ContractVersion.fromString(argv.old_version)
+    )
     if (expected.toString() !== argv.new_version) {
-      out(`${argv.old_version} + ${report.versionDelta} != ${argv.new_version}`, true)
+      out(`${argv.old_version} + ${backward.report.versionDelta} != ${argv.new_version}`, true)
       out(`\n`)
       process.exit(1)
     } else {
-      out(`${argv.old_version} + ${report.versionDelta} == ${argv.new_version}`, true)
+      out(`${argv.old_version} + ${backward.report.versionDelta} == ${argv.new_version}`, true)
       out(`\n`)
       process.exit(0)
     }
   } else if (argv._.includes(COMMAND_SEM_DELTA)) {
     out(`Version delta: `)
-    out(`${report.versionDelta}`, true)
+    out(`${backward.report.versionDelta}`, true)
     out(`\n`)
   } else {
     // Should never happen
