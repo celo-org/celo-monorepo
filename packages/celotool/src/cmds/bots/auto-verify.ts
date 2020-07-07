@@ -5,6 +5,7 @@ import {
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { notEmpty } from '@celo/utils/lib/collections'
+import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import Logger, { createLogger, stdSerializers } from 'bunyan'
 import { createStream } from 'bunyan-gke-stackdriver'
@@ -25,6 +26,7 @@ import twilio, { Twilio } from 'twilio'
 import { Argv } from 'yargs'
 import { BotsArgv } from '../bots'
 
+export const SALT = 'hard_coded_salt'
 export const command = 'auto-verify'
 
 export const describe = 'command for verifying an arbitrary twilio phone number'
@@ -109,12 +111,14 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
       argv.attestationMax
     )
 
+    const phoneHash = getPhoneHash(phoneNumber, SALT)
+
     const nonCompliantIssuersAlreadyLogged: string[] = []
 
-    logger = logger.child({ phoneNumber })
+    logger = logger.child({ phoneNumber, phoneHash })
     logger.info('Initialized phone number')
 
-    let stat = await attestations.getAttestationStat(phoneNumber, clientAddress)
+    let stat = await attestations.getAttestationStat(phoneHash, clientAddress)
 
     while (stat.total < argv.attestationMax) {
       logger.info({ ...stat }, 'Start Attestation')
@@ -129,15 +133,15 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
       }
 
       logger.info('Request Attestation')
-      await requestMoreAttestations(attestations, phoneNumber, 1, clientAddress, txParams)
+      await requestMoreAttestations(attestations, phoneHash, 1, clientAddress, txParams)
 
       const attestationsToComplete = await attestations.getActionableAttestations(
-        phoneNumber,
+        phoneHash,
         clientAddress
       )
 
       const nonCompliantIssuers = await attestations.getNonCompliantIssuers(
-        phoneNumber,
+        phoneHash,
         clientAddress
       )
       nonCompliantIssuers
@@ -153,7 +157,8 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
         attestationsToComplete,
         attestations,
         phoneNumber,
-        clientAddress
+        clientAddress,
+        SALT
       )
 
       logger.info(
@@ -210,6 +215,7 @@ async function pollForMessagesAndCompleteAttestations(
   logger: Logger,
   timeToPollForTextMessages: number
 ) {
+  const phoneHash = getPhoneHash(phoneNumber, SALT)
   const startDate = moment()
   logger.info({ pollingWait: POLLING_WAIT }, 'Poll for the attestation code')
   while (
@@ -221,7 +227,7 @@ async function pollForMessagesAndCompleteAttestations(
     const res = await findValidCode(
       attestations,
       messages.map((_) => _.body),
-      phoneNumber,
+      phoneHash,
       attestationsToComplete,
       account
     )
@@ -238,11 +244,11 @@ async function pollForMessagesAndCompleteAttestations(
       'Received valid code'
     )
 
-    const completeTx = await attestations.complete(phoneNumber, account, res.issuer, res.code)
+    const completeTx = await attestations.complete(phoneHash, account, res.issuer, res.code)
 
     await completeTx.sendAndWaitForReceipt(txParams)
 
     logger.info({ issuer: res.issuer }, 'Completed attestation')
-    attestationsToComplete = await attestations.getActionableAttestations(phoneNumber, account)
+    attestationsToComplete = await attestations.getActionableAttestations(phoneHash, account)
   }
 }

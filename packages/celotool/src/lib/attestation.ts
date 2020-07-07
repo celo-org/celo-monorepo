@@ -1,7 +1,7 @@
 import { Address, CeloTransactionParams } from '@celo/contractkit'
 import {
   ActionableAttestation,
-  AttestationsWrapper,
+  AttestationsWrapper
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { AttestationUtils, PhoneNumberUtils } from '@celo/utils'
 import { concurrentMap } from '@celo/utils/lib/async'
@@ -39,7 +39,8 @@ export async function requestAttestationsFromIssuers(
   attestationsToReveal: ActionableAttestation[],
   attestations: AttestationsWrapper,
   phoneNumber: string,
-  account: string
+  account: string,
+  salt: string
 ): Promise<RequestAttestationError[]> {
   return concurrentMap(5, attestationsToReveal, async (attestation) => {
     try {
@@ -47,7 +48,8 @@ export async function requestAttestationsFromIssuers(
         phoneNumber,
         account,
         attestation.issuer,
-        attestation.attestationServiceURL
+        attestation.attestationServiceURL,
+        salt
       )
       if (!response.ok) {
         return {
@@ -93,7 +95,7 @@ export function printAndIgnoreRequestErrors(possibleErrors: RequestAttestationEr
 export async function findValidCode(
   attestations: AttestationsWrapper,
   messages: string[],
-  phoneNumber: string,
+  phoneHash: string,
   attestationsToComplete: ActionableAttestation[],
   account: string
 ) {
@@ -105,7 +107,7 @@ export async function findValidCode(
       }
 
       const issuer = await attestations.findMatchingIssuer(
-        phoneNumber,
+        phoneHash,
         account,
         code,
         attestationsToComplete.map((_) => _.issuer)
@@ -115,7 +117,7 @@ export async function findValidCode(
         continue
       }
 
-      const isValid = await attestations.validateAttestationCode(phoneNumber, account, issuer, code)
+      const isValid = await attestations.validateAttestationCode(phoneHash, account, issuer, code)
 
       if (!isValid) {
         continue
