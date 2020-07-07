@@ -64,15 +64,15 @@ export class CategorizedChanges {
  */
 export class ASTVersionedReport {
   
-  static create = (reports: ASTReports, categorizer: Categorizer): ASTVersionedReport => {
-    const changes = CategorizedChanges.fromReports(reports, categorizer)
+  static create = (fullReports: ASTReports, categorizer: Categorizer): ASTVersionedReport => {
+    const changes = CategorizedChanges.fromReports(fullReports, categorizer)
     const versionDelta = ContractVersionDelta.fromChanges(
-      reports.storage.length > 0,
+      changes.storage.length > 0,
       changes.major.length > 0,
       changes.minor.length > 0,
       changes.patch.length > 0
     )
-    return new ASTVersionedReport(reports, changes, versionDelta)
+    return new ASTVersionedReport(fullReports, changes, versionDelta)
   }
   
   fullReports: ASTReports
@@ -81,8 +81,8 @@ export class ASTVersionedReport {
   // Delta suggested
   versionDelta: ContractVersionDelta
 
-  constructor(reports: ASTReports, changes: CategorizedChanges, versionDelta: ContractVersionDelta) {
-    this.fullReports = reports
+  constructor(fullReports: ASTReports, changes: CategorizedChanges, versionDelta: ContractVersionDelta) {
+    this.fullReports = fullReports
     this.changes = changes
     this.versionDelta = versionDelta
   }
