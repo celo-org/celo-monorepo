@@ -15,7 +15,7 @@ import { getWordlist, storeMnemonic } from 'src/backup/utils'
 import { features } from 'src/flags'
 import { cancelGethSaga } from 'src/geth/actions'
 import { UNLOCK_DURATION } from 'src/geth/consts'
-import { deleteChainData } from 'src/geth/geth'
+import { deleteChainData, isProviderConnectionError } from 'src/geth/geth'
 import { gethSaga, waitForGethConnectivity } from 'src/geth/saga'
 import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -42,7 +42,6 @@ const TAG = 'web3/saga'
 const MNEMONIC_BIT_LENGTH = MnemonicStrength.s256_24words
 // The timeout for web3 to complete syncing and the latestBlock to be > 0
 export const SYNC_TIMEOUT = 2 * 60 * 1000 // 2 minutes
-const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect to node on IPC."
 const SWITCH_TO_FORNO_TIMEOUT = 15000 // if syncing takes >15 secs, suggest switch to forno
 const WEB3_MONITOR_DELAY = 100
 
@@ -85,11 +84,11 @@ export function* checkWeb3SyncProgress() {
         }
       }
     } catch (error) {
-      if (error.toString().toLowerCase() === BLOCK_CHAIN_CORRUPTION_ERROR.toLowerCase()) {
+      if (isProviderConnectionError(error)) {
         ValoraAnalytics.track(GethEvents.blockchain_corruption)
         const deleted = yield call(deleteChainData)
         if (deleted) {
-          navigateToError('corruptedChainDeleted')
+          navigateToError(ErrorMessages.CORRUPTED_CHAIN_DELETED)
         }
       } else {
         Logger.error(TAG, 'Unexpected sync error', error)

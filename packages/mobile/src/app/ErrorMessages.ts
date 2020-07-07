@@ -56,6 +56,7 @@ export enum ErrorMessages {
   QR_FAILED_INVALID_RECIPIENT = 'qrFailedInvalidRecipient',
   QR_FAILED_NO_PHONE_NUMBER = 'qrFailedNoPhoneNumber',
   CORRUPTED_CHAIN_DELETED = 'corruptedChainDeleted',
+  CONTRACT_KIT_INIT_FAILED = 'contractKitInitFailed',
   CALCULATE_FEE_FAILED = 'calculateFeeFailed',
   FAILED_TO_SWITCH_SYNC_MODES = 'failedToSwitchSyncModes',
   SMS_ERROR = 'walletFlow5:SMSError',

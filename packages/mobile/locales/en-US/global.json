@@ -102,6 +102,7 @@
   "qrFailedInvalidRecipient": "QR code does not belong to the selected recipient",
   "qrFailedNoPhoneNumber": "QR code is not associated with your contact's phone number",
   "corruptedChainDeleted": "Corrupted chain data has been deleted, please restart the app",
+  "contractKitInitFailed": "Failed to initialize the contract kit, please try restarting the app or emailing support.",
   "web3FailedToSync": "Failing to sync, check your network connection",
   "errorDuringSync": "Error occurred during sync, please try again later",
   "accountUnlockFailed": "Unable to unlock your account",

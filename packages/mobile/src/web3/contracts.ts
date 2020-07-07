@@ -6,9 +6,12 @@
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { RpcWallet } from '@celo/contractkit/lib/wallets/rpc-wallet'
 import { sleep } from '@celo/utils/src/async'
-import { call, select } from 'redux-saga/effects'
+import { call, delay, select } from 'redux-saga/effects'
+import { ErrorMessages } from 'src/app/ErrorMessages'
 import { DEFAULT_FORNO_URL } from 'src/config'
+import { isProviderConnectionError } from 'src/geth/geth'
 import { waitForGethInitialized } from 'src/geth/saga'
+import { navigateToError } from 'src/navigator/NavigationService'
 import Logger from 'src/utils/Logger'
 import { getHttpProvider, getIpcProvider } from 'src/web3/providers'
 import { fornoSelector } from 'src/web3/selectors'
@@ -16,34 +19,66 @@ import Web3 from 'web3'
 import { IpcProvider } from 'web3-core'
 
 const TAG = 'web3/contracts'
+const KIT_INIT_RETRY_DELAY = 2000
 
 let ipcProvider: IpcProvider | undefined
 let gethWallet: RpcWallet | undefined
 let contractKit: ContractKit | undefined
 
 export function* initContractKit() {
-  // The kit must wait for Geth to be initialized because
-  // Geth is required for the RpcWallet
-  yield call(waitForGethInitialized)
+  let retries = 3
+  // Wrap init in retries to handle cases where Geth is initialized but the
+  // IPC is not ready yet. Without changing Geth + RN-Geth, we have no way to
+  // listen for this readiness
+  while (retries > 0) {
+    try {
+      // The kit must wait for Geth to be initialized because
+      // Geth is required for the RpcWallet
+      yield call(waitForGethInitialized)
 
-  if (contractKit || ipcProvider || gethWallet) {
-    throw new Error('Kit not properly destroyed')
+      if (contractKit || ipcProvider || gethWallet) {
+        throw new Error('Kit not properly destroyed')
+      }
+
+      const fornoMode = yield select(fornoSelector)
+      Logger.info(`${TAG}@initContractKit`, `Initializing contractkit, forno mode: ${fornoMode}`)
+
+      ipcProvider = getIpcProvider()
+      const web3 = new Web3(fornoMode ? getHttpProvider(DEFAULT_FORNO_URL) : ipcProvider)
+
+      Logger.info(`${TAG}@initContractKit`, 'Initializing wallet')
+      gethWallet = new RpcWallet(ipcProvider)
+      yield call([gethWallet, gethWallet.init])
+      Logger.info(
+        `${TAG}@initContractKit`,
+        `Initialized wallet with accounts: ${gethWallet.getAccounts()}`
+      )
+      contractKit = newKitFromWeb3(web3, gethWallet)
+      Logger.info(`${TAG}@initContractKit`, 'Initialized kit')
+      return
+    } catch (error) {
+      if (isProviderConnectionError(error)) {
+        retries -= 1
+        Logger.error(
+          `${TAG}@initContractKit`,
+          `Error initializing kit, could not connect to IPC. Retries remaining: ${retries}`,
+          error
+        )
+        if (retries <= 0) {
+          break
+        }
+
+        destroyContractKit()
+        yield delay(KIT_INIT_RETRY_DELAY)
+      } else {
+        Logger.error(`${TAG}@initContractKit`, 'Unexpected error initializing kit', error)
+        break
+      }
+    }
   }
 
-  const fornoMode = yield select(fornoSelector)
-  Logger.info(`${TAG}@initContractKit`, `Initializing contractkit, forno mode: ${fornoMode}`)
-
-  ipcProvider = getIpcProvider()
-  const web3 = new Web3(fornoMode ? getHttpProvider(DEFAULT_FORNO_URL) : ipcProvider)
-
-  Logger.debug(`${TAG}@initContractKit`, `Initializing wallet`)
-  gethWallet = new RpcWallet(ipcProvider)
-  yield call([gethWallet, gethWallet.init])
-  Logger.debug(
-    `${TAG}@initContractKit`,
-    `Initialized wallet with accounts: ${gethWallet.getAccounts()}`
-  )
-  contractKit = newKitFromWeb3(web3, gethWallet)
+  Logger.error(`${TAG}@initContractKit`, 'Kit init unsuccessful, navigating to error screen')
+  navigateToError(ErrorMessages.CONTRACT_KIT_INIT_FAILED)
 }
 
 export function destroyContractKit() {
