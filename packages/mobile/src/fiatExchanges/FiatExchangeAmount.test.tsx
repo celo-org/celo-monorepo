@@ -42,7 +42,7 @@ describe('FiatExchangeAmount', () => {
     fireEvent.changeText(getByTestId('FiatExchangeInput'), '750')
     expect(getByTestId('FiatExchangeNextButton').props.disabled).toBe(false)
     fireEvent.press(getByTestId('FiatExchangeNextButton'))
-    expect(store.getActions()).toContainEqual(showError(ErrorMessages.PAYMENT_LIMIT_REACHED, null))
+    expect(store.getActions()).toContainEqual(showError(ErrorMessages.PAYMENT_LIMIT_REACHED, 5000))
   })
 
   it('validates the amount when adding funds', () => {
@@ -59,6 +59,6 @@ describe('FiatExchangeAmount', () => {
     fireEvent.changeText(getByTestId('FiatExchangeInput'), '750')
     expect(getByTestId('FiatExchangeNextButton').props.disabled).toBe(false)
     fireEvent.press(getByTestId('FiatExchangeNextButton'))
-    expect(store.getActions()).toContainEqual(showError(ErrorMessages.PAYMENT_LIMIT_REACHED, null))
+    expect(store.getActions()).toContainEqual(showError(ErrorMessages.PAYMENT_LIMIT_REACHED, 5000))
   })
 })
