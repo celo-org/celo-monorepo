@@ -1,4 +1,4 @@
-import { toBool, toNum } from '@celo/phone-number-privacy-common/lib/utils/config-utils'
+import { toBool, toNum } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
 
 export function getVersion(): string {

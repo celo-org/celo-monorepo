@@ -1,4 +1,4 @@
-import { toBool } from '@celo/phone-number-privacy-common/lib/utils/config-utils'
+import { toBool } from '@celo/phone-number-privacy-common'
 import * as functions from 'firebase-functions'
 import logger from './common/logger'
 
