@@ -99,10 +99,14 @@ function* migrateAccountToProperBip39() {
 
 export function* watchMigrateAccountToProperBip39() {
   yield take(Actions.MIGRATE_ACCOUNT_BIP39)
-  call(migrateAccountToProperBip39)
+  yield call(migrateAccountToProperBip39)
+}
+
+export function* watchSetPincode() {
+  yield takeLeading(Actions.SET_PINCODE, setPincode)
 }
 
 export function* accountSaga() {
-  yield takeLeading(Actions.SET_PINCODE, setPincode)
   yield spawn(watchMigrateAccountToProperBip39)
+  yield spawn(watchSetPincode)
 }
