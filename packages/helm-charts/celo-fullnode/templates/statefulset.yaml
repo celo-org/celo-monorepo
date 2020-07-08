@@ -28,11 +28,15 @@ spec:
     metadata:
       labels:
 {{ include "celo-fullnode.labels" .  | indent 8 }}
+      annotations:      
+{{ if .Values.prometheus }} 
+{{ include "prometheus-annotations" . | indent 8 }} 
+{{ end }}
     spec:
       initContainers:
 {{ include "common.init-genesis-container" .  | indent 6 }}
       containers:
-{{ include "common.full-node-container" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "expose" true "ip_addresses" .Values.geth.public_ips "syncmode" .Values.geth.syncmode "gcmode" .Values.geth.syncmodex "max_latest_block_age_seconds" .Values.geth.readiness_probe_max_block_age_seconds) | indent 6 }}
+{{ include "common.full-node-container" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "expose" true "ip_addresses" .Values.geth.public_ips "syncmode" .Values.geth.syncmode "gcmode" .Values.geth.syncmodex "max_latest_block_age_seconds" .Values.geth.readiness_probe_max_block_age_seconds "pprof" (or (.Values.prometheus) (.Values.pprof.enabled)) "pprof_port" (.Values.pprof.port) "metrics" (or (.Values.prometheus) (.Values.metrics))) | indent 6 }}
       volumes:
       - name: data
         emptyDir: {}

@@ -2,7 +2,7 @@ import { BtnTypes } from '@celo/react-components/components/Button.v2'
 import { StackScreenProps } from '@react-navigation/stack'
 import React, { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import Education, { EducationTopic } from 'src/account/Education'
+import Education, { EducationTopic, EmbeddedNavBar } from 'src/account/Education'
 import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { Namespaces } from 'src/i18n'
@@ -33,7 +33,7 @@ export default function AccountKeyEducation(props: Props) {
 
   return (
     <Education
-      isClosable={true}
+      embeddedNavBar={EmbeddedNavBar.Close}
       stepInfo={steps}
       onFinish={onComplete}
       finalButtonText={t('completeEducation')}
