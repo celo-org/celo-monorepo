@@ -206,9 +206,8 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
         'StartBlocks and endBlocks arrays should have at least one element and have the same length'
       )
     }
-    const window = await this.getSlashableDowntimeWindow(startBlocks[0], undefined)
     return this.slashStartSignerIndex(
-      await this.getValidatorSignerIndex(validatorOrSignerAddress, window.start),
+      await this.getValidatorSignerIndex(validatorOrSignerAddress, startBlocks[0]),
       startBlocks,
       endBlocks
     )

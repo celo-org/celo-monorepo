@@ -301,14 +301,16 @@ describe('slashing tests', function(this: any) {
 
       await waitForBlock(web3, blockNumber + slashableDowntime + 2 * safeMarginBlocks)
 
-      const validator = (await kit.web3.eth.getAccounts())[0]
-      await kit.web3.eth.personal.unlockAccount(validator, '', 1000000)
-
-      const slotSize = Math.floor(slashableDowntime / 2)
+      const user = (await kit.web3.eth.getAccounts())[0]
+      await kit.web3.eth.personal.unlockAccount(user, '', 1000000)
 
       const startBlock = blockNumber + safeMarginBlocks
       const endBlock = startBlock + slashableDowntime - 1
       const startEpoch = await kit.getEpochNumberOfBlock(startBlock)
+      const slotSize = Math.floor(slashableDowntime / 2)
+
+      const election = await kit.contracts.getElection()
+      const signer = await election.validatorSignerAddressFromSet(4, startBlock)
 
       const intervalArrays = await generateValidIntervalArrays(
         startBlock,
@@ -321,20 +323,18 @@ describe('slashing tests', function(this: any) {
       for (let i = 0; i < intervalArrays.startBlocks.length; i += 1) {
         await slasher
           .setBitmapForInterval(intervalArrays.startBlocks[i], intervalArrays.endBlocks[i])
-          .send({ from: validator, gas: 5000000 })
+          .send({ from: user, gas: 5000000 })
       }
 
       const tx = await slasher.slashValidator(
-        validator,
+        signer,
         intervalArrays.startBlocks,
         intervalArrays.endBlocks
       )
-      const txResult = await tx.send({ from: validator, gas: 5000000 })
+      const txResult = await tx.send({ from: user, gas: 5000000 })
       const txRcpt = await txResult.waitReceipt()
       assert.equal(txRcpt.status, true)
 
-      const election = await kit.contracts.getElection()
-      const signer = await election.validatorSignerAddressFromSet(4, startBlock)
       const lockedGold = await kit.contracts.getLockedGold()
       const balance = await lockedGold.getAccountTotalLockedGold(signer)
       // Penalty is defined to be 100 cGLD in migrations, locked gold is 10000 cGLD for a validator
