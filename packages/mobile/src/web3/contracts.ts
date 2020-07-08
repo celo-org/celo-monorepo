@@ -1,128 +1,147 @@
+/**
+ * This file is called 'contracts' but it's responsibilies have changed over time.
+ * It now manages contractKit and gethWallet initialization.
+ * Leaving the name for recognizability to current devs
+ */
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { RpcWallet } from '@celo/contractkit/lib/wallets/rpc-wallet'
-import { Platform } from 'react-native'
-import * as net from 'react-native-tcp'
-import { call, select, take } from 'redux-saga/effects'
+import { sleep } from '@celo/utils/src/async'
+import { call, delay, select } from 'redux-saga/effects'
+import { ErrorMessages } from 'src/app/ErrorMessages'
 import { DEFAULT_FORNO_URL } from 'src/config'
-import { IPC_PATH } from 'src/geth/geth'
-import { waitForGethConnectivity } from 'src/geth/saga'
-import { promisifyGenerator } from 'src/utils/generators'
+import { isProviderConnectionError } from 'src/geth/geth'
+import { waitForGethInitialized } from 'src/geth/saga'
+import { navigateToError } from 'src/navigator/NavigationService'
 import Logger from 'src/utils/Logger'
-import { Actions } from 'src/web3/actions'
-import { contractKitReadySelector, fornoSelector } from 'src/web3/selectors'
+import { getHttpProvider, getIpcProvider } from 'src/web3/providers'
+import { fornoSelector } from 'src/web3/selectors'
 import Web3 from 'web3'
-import { IpcProvider, provider } from 'web3-core'
+import { IpcProvider } from 'web3-core'
 
-const tag = 'web3/contracts'
+const TAG = 'web3/contracts'
+const KIT_INIT_RETRY_DELAY = 2000
 
 let ipcProvider: IpcProvider | undefined
 let gethWallet: RpcWallet | undefined
 let contractKit: ContractKit | undefined
 
-export function openIpcProvider() {
-  if (!ipcProvider) {
-    Logger.debug(`${tag}@openIpcProvider`, `Initializing IPC connection`)
-    ipcProvider = getIpcProvider()
+export function* initContractKit() {
+  let retries = 3
+  // Wrap init in retries to handle cases where Geth is initialized but the
+  // IPC is not ready yet. Without changing Geth + RN-Geth, we have no way to
+  // listen for this readiness
+  while (retries > 0) {
+    try {
+      // The kit must wait for Geth to be initialized because
+      // Geth is required for the RpcWallet
+      yield call(waitForGethInitialized)
+
+      if (contractKit || ipcProvider || gethWallet) {
+        throw new Error('Kit not properly destroyed')
+      }
+
+      const fornoMode = yield select(fornoSelector)
+      Logger.info(`${TAG}@initContractKit`, `Initializing contractkit, forno mode: ${fornoMode}`)
+
+      ipcProvider = getIpcProvider()
+      const web3 = new Web3(fornoMode ? getHttpProvider(DEFAULT_FORNO_URL) : ipcProvider)
+
+      Logger.info(`${TAG}@initContractKit`, 'Initializing wallet')
+      gethWallet = new RpcWallet(ipcProvider)
+      yield call([gethWallet, gethWallet.init])
+      Logger.info(
+        `${TAG}@initContractKit`,
+        `Initialized wallet with accounts: ${gethWallet.getAccounts()}`
+      )
+      contractKit = newKitFromWeb3(web3, gethWallet)
+      Logger.info(`${TAG}@initContractKit`, 'Initialized kit')
+      return
+    } catch (error) {
+      if (isProviderConnectionError(error)) {
+        retries -= 1
+        Logger.error(
+          `${TAG}@initContractKit`,
+          `Error initializing kit, could not connect to IPC. Retries remaining: ${retries}`,
+          error
+        )
+        if (retries <= 0) {
+          break
+        }
+
+        destroyContractKit()
+        yield delay(KIT_INIT_RETRY_DELAY)
+      } else {
+        Logger.error(`${TAG}@initContractKit`, 'Unexpected error initializing kit', error)
+        break
+      }
+    }
   }
-  return ipcProvider
+
+  Logger.error(`${TAG}@initContractKit`, 'Kit init unsuccessful, navigating to error screen')
+  navigateToError(ErrorMessages.CONTRACT_KIT_INIT_FAILED)
 }
 
-export function openWallet() {
-  if (!gethWallet) {
-    Logger.debug(`${tag}@openWallet`, `Initializing wallet`)
-    gethWallet = new RpcWallet(openIpcProvider())
-  }
-  return gethWallet
-}
-
-export function openContractKit(fornoMode: boolean) {
-  if (!contractKit) {
-    Logger.info(
-      `${tag}@openContractKit`,
-      `Initializing contractkit, platform: ${Platform.OS}, forno mode: ${fornoMode}`
-    )
-    const web3 = new Web3(fornoMode ? getHttpProvider(DEFAULT_FORNO_URL) : openIpcProvider())
-    const wallet = openWallet()
-    contractKit = newKitFromWeb3(web3, wallet)
-  }
-  return contractKit
-}
-
-export function closeContractKit() {
-  Logger.debug(`closeContractKit`)
+export function destroyContractKit() {
+  Logger.debug(`${TAG}@closeContractKit`)
   contractKit = undefined
   gethWallet = undefined
   ipcProvider = undefined
 }
 
-export const getConnectedWalletAsync = async () => promisifyGenerator(getConnectedWallet())
-
-export function* getConnectedWallet() {
-  yield call(waitForGethConnectivity)
-  const wallet = openWallet()
-  if (!wallet.isSetupFinished()) {
-    yield call([wallet, wallet.init])
-    Logger.debug(`getConnectedWallet`, `Initialized wallet with accounts: ${wallet.getAccounts()}`)
-  }
-  return wallet
-}
-
-export const getContractKitAsync = async () => promisifyGenerator(getContractKit())
-
 export function* getContractKit() {
-  // No need to waitForRehydrate as contractKitReady set to false for every app reopen
-  while (!(yield select(contractKitReadySelector))) {
-    // If contractKit locked, wait until unlocked
-    yield take(Actions.SET_CONTRACT_KIT_READY)
+  if (!contractKit) {
+    yield call(initContractKit)
   }
-  const fornoMode = yield select(fornoSelector)
-  return openContractKit(fornoMode)
+  return contractKit
 }
 
-export function getIpcProvider() {
-  Logger.debug(tag, 'creating IPCProvider...')
-
-  const _ipcProvider = new Web3.providers.IpcProvider(IPC_PATH, net)
-  Logger.debug(tag, 'created IPCProvider')
-
-  // More details on the IPC objects can be seen via this
-  // console.debug("Ipc connection object is " + Object.keys(ipcProvider.connection));
-  // console.debug("Ipc data handle is " + ipcProvider.connection._events['data']);
-  // @ts-ignore
-  const ipcProviderConnection: any = _ipcProvider.connection
-  const dataResponseHandlerKey: string = 'data'
-  const oldDataHandler = ipcProviderConnection._events[dataResponseHandlerKey]
-  // Since we are modifying internal properties of IpcProvider, it is best to add this check to ensure that
-  // any future changes to IpcProvider internals will cause an error instead of a silent failure.
-  if (oldDataHandler === 'undefined') {
-    throw new Error('Data handler is not defined')
-  }
-  ipcProviderConnection._events[dataResponseHandlerKey] = (data: any) => {
-    if (data.toString().indexOf('"message":"no suitable peers available"') !== -1) {
-      // This is Crude check which can be improved. What we are trying to match is
-      // {"jsonrpc":"2.0","id":2,"error":{"code":-32000,"message":"no suitable peers available"}}
-      Logger.debug(tag, `Error suppressed: ${data}`)
-      return true
+// Used for cases where CK must be access outside of a saga
+export async function getContractKitAsync() {
+  let retries = 10
+  while (!contractKit) {
+    Logger.warn(`${TAG}@getContractKitAsync`, 'Contract Kit not yet initalized')
+    if (retries > 0) {
+      Logger.warn(`${TAG}@getContractKitAsync`, 'Sleeping then retrying')
+      retries -= 1
+      await sleep(1000)
     } else {
-      // Logger.debug(tag, `Received data over IPC: ${data}`)
-      oldDataHandler(data)
+      throw new Error('Contract kit intialization timeout')
     }
   }
 
-  // In the future, we might decide to over-ride the error handler via the following code.
-  // ipcProvider.on("error", () => {
-  //   Logger.showError("Error occurred");
-  // })
-  return _ipcProvider
+  return contractKit
 }
 
-function getHttpProvider(url: string): provider {
-  Logger.debug(tag, 'creating HttpProvider...')
-  const httpProvider = new Web3.providers.HttpProvider(url)
-  Logger.debug(tag, 'created HttpProvider')
-  // In the future, we might decide to over-ride the error handler via the following code.
-  // provider.on('error', () => {
-  //   Logger.showError('Error occurred')
-  // })
-  return httpProvider
+export function* getWallet() {
+  if (!gethWallet) {
+    yield call(initContractKit)
+  }
+  return gethWallet
+}
+
+// Used for cases where the wallet must be access outside of a saga
+export async function getWalletAsync() {
+  if (!gethWallet) {
+    await getContractKitAsync()
+  }
+
+  if (!gethWallet) {
+    throw new Error(
+      'Geth wallet still undefined even after contract kit init. Should never happen.'
+    )
+  }
+
+  return gethWallet
+}
+
+// Convinience util for getting the kit's web3 instance
+export function* getWeb3() {
+  const kit: ContractKit = yield call(getContractKit)
+  return kit.web3
+}
+
+// Used for cases where the kit's web3 must be accessed outside a saga
+export async function getWeb3Async() {
+  const kit = await getContractKitAsync()
+  return kit.web3
 }

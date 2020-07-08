@@ -162,7 +162,6 @@ export class SendConfirmation extends React.Component<Props, State> {
     } = this.props.confirmationInput
     const { comment } = this.state
 
-    const timestamp = Date.now()
     const localCurrencyAmount = convertDollarsToLocalAmount(
       amount,
       this.props.localCurrencyExchangeRate
@@ -181,7 +180,6 @@ export class SendConfirmation extends React.Component<Props, State> {
 
     this.props.sendPaymentOrInvite(
       amount,
-      timestamp,
       comment,
       recipient,
       recipientAddress,

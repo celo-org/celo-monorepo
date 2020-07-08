@@ -466,7 +466,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       salt,
       smsRetrieverAppSig,
     }
-    return fetch(appendPath(serviceURL, '/attestations'), {
+    return fetch(appendPath(serviceURL, 'attestations'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

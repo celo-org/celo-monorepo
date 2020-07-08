@@ -19,8 +19,8 @@ import { ImportContactsStatus } from 'src/identity/types'
 import { HeaderTitleWithSubtitle, nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
+import TopBarTextButtonOnboarding from 'src/onboarding/TopBarTextButtonOnboarding'
 import { requestContactsPermission } from 'src/utils/permissions'
 
 type ScreenProps = StackScreenProps<StackParamList, Screens.ImportContacts>
@@ -168,11 +168,10 @@ ImportContactsScreen.navigationOptions = ({ route }: ScreenProps) => {
     ),
     headerRight: !importDone
       ? () => (
-          <TopBarTextButton
+          <TopBarTextButtonOnboarding
             title={i18n.t('global:skip')}
             testID="ImportContactsSkip"
             onPress={onPressSkip}
-            titleStyle={styles.skipButtonStyle}
           />
         )
       : () => null,
@@ -227,8 +226,5 @@ const styles = StyleSheet.create({
   switchText: {
     ...fontStyles.regular500,
     paddingLeft: 8,
-  },
-  skipButtonStyle: {
-    color: colors.goldDark,
   },
 })

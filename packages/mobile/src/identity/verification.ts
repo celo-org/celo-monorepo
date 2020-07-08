@@ -12,6 +12,7 @@ import { AttestationsStatus, extractAttestationCodeFromMessage } from '@celo/uti
 import { compressedPubKey } from '@celo/utils/src/commentEncryption'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import functions from '@react-native-firebase/functions'
+import BigNumber from 'bignumber.js'
 import { Platform } from 'react-native'
 import { Task } from 'redux-saga'
 import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'
@@ -37,6 +38,7 @@ import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/priv
 import { acceptedAttestationCodesSelector, attestationCodesSelector } from 'src/identity/reducer'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
 import { VerificationStatus } from 'src/identity/types'
+import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
@@ -46,6 +48,7 @@ import { privateCommentKeySelector } from 'src/web3/selectors'
 const TAG = 'identity/verification'
 
 export const NUM_ATTESTATIONS_REQUIRED = 3
+export const ESTIMATED_COST_PER_ATTESTATION = 0.07
 export const VERIFICATION_TIMEOUT = 10 * 60 * 1000 // 10 minutes
 const REVEAL_RETRY_DELAY = 10 * 1000 // 10 seconds
 
@@ -78,7 +81,7 @@ export function* startVerification() {
     ValoraAnalytics.track(VerificationEvents.verification_complete)
     Logger.debug(TAG, 'Verification completed successfully')
   } else if (result) {
-    ValoraAnalytics.track(VerificationEvents.verification_error, { error: result.message })
+    ValoraAnalytics.track(VerificationEvents.verification_error, { error: result })
     Logger.debug(TAG, 'Verification failed')
   } else if (cancel) {
     ValoraAnalytics.track(VerificationEvents.verification_cancel)
@@ -150,6 +153,16 @@ export function* doVerificationFlow() {
     })
 
     if (!status.isVerified) {
+      const balanceIsSufficient = yield call(
+        balanceSufficientForAttestations,
+        status.numAttestationsRemaining
+      )
+      if (!balanceIsSufficient) {
+        yield put(setVerificationStatus(VerificationStatus.InsufficientBalance))
+        // Return error message for logging purposes
+        return ErrorMessages.INSUFFICIENT_BALANCE
+      }
+
       // Mark codes completed in previous attempts
       yield put(
         completeAttestationCode(NUM_ATTESTATIONS_REQUIRED - status.numAttestationsRemaining)
@@ -211,13 +224,20 @@ export function* doVerificationFlow() {
     return true
   } catch (error) {
     Logger.error(TAG, 'Error occured during verification flow', error)
-    yield put(showErrorOrFallback(error, ErrorMessages.VERIFICATION_FAILURE))
     yield put(setVerificationStatus(VerificationStatus.Failed))
+    yield put(showErrorOrFallback(error, ErrorMessages.VERIFICATION_FAILURE))
     return error.message
   }
 }
 
-// Requests if necessary additional attestations and returns all revealable attetations
+export function* balanceSufficientForAttestations(attestationsRemaining: number) {
+  const userBalance = yield select(stableTokenBalanceSelector)
+  return new BigNumber(userBalance).isGreaterThan(
+    attestationsRemaining * ESTIMATED_COST_PER_ATTESTATION
+  )
+}
+
+// Requests if necessary additional attestations and returns all revealable attestationsq
 export function* requestAndRetrieveAttestations(
   attestationsWrapper: AttestationsWrapper,
   phoneHash: string,
@@ -304,7 +324,7 @@ function* requestAttestations(
   account: string
 ) {
   if (numAttestationsRequestsNeeded <= 0) {
-    Logger.debug(`${TAG}@requestNeededAttestations`, 'No additional attestations requests needed')
+    Logger.debug(`${TAG}@requestAttestations`, 'No additional attestations requests needed')
     return
   }
 
@@ -316,7 +336,7 @@ function* requestAttestations(
 
   if (unselectedRequest.blockNumber === 0) {
     Logger.debug(
-      `${TAG}@requestNeededAttestations`,
+      `${TAG}@requestAttestations`,
       `Approving ${numAttestationsRequestsNeeded} new attestations`
     )
     const approveTx: CeloTransactionObject<boolean> = yield call(
@@ -328,7 +348,7 @@ function* requestAttestations(
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_approve_tx_sent)
 
     Logger.debug(
-      `${TAG}@requestNeededAttestations`,
+      `${TAG}@requestAttestations`,
       `Requesting ${numAttestationsRequestsNeeded} new attestations`
     )
 
@@ -342,17 +362,17 @@ function* requestAttestations(
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_request_tx_sent)
   } else {
     Logger.debug(
-      `${TAG}@requestNeededAttestations`,
+      `${TAG}@requestAttestations`,
       `Unselected request found, skipping approval/request`
     )
   }
 
-  Logger.debug(`${TAG}@requestNeededAttestations`, 'Waiting for block to select issuer')
+  Logger.debug(`${TAG}@requestAttestations`, 'Waiting for block to select issuer')
   ValoraAnalytics.track(VerificationEvents.verification_request_attestation_await_issuer_selection)
 
   yield call([attestationsWrapper, attestationsWrapper.waitForSelectingIssuers], phoneHash, account)
 
-  Logger.debug(`${TAG}@requestNeededAttestations`, 'Selecting issuer')
+  Logger.debug(`${TAG}@requestAttestations`, 'Selecting issuer')
   ValoraAnalytics.track(VerificationEvents.verification_request_attestation_select_issuer)
 
   const selectIssuersTx = attestationsWrapper.selectIssuers(phoneHash)

@@ -48,7 +48,7 @@ import { sendTransaction } from 'src/transactions/send'
 import { getAppStoreId } from 'src/utils/appstore'
 import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
-import { getConnectedWallet, getContractKit, getContractKitAsync } from 'src/web3/contracts'
+import { getContractKitAsync, getWallet, getWeb3 } from 'src/web3/contracts'
 import { getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 
 const TAG = 'invite/saga'
@@ -155,11 +155,9 @@ export function* sendInvite(
 ) {
   try {
     ValoraAnalytics.track(InviteEvents.invite_tx_start)
-    const contractKit = yield call(getContractKit)
+    const web3 = yield call(getWeb3)
     const randomness = yield call(asyncRandomBytes, 64)
-    const temporaryWalletAccount = contractKit.web3.eth.accounts.create(
-      randomness.toString('ascii')
-    )
+    const temporaryWalletAccount = web3.eth.accounts.create(randomness.toString('ascii'))
     const temporaryAddress = temporaryWalletAccount.address
     const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
 
@@ -218,7 +216,7 @@ export function* sendInvite(
 }
 
 function* initiateEscrowTransfer(temporaryAddress: string, e164Number: string, amount: BigNumber) {
-  const escrowTxId = generateStandbyTransactionId(temporaryAddress + '-escrow')
+  const escrowTxId = generateStandbyTransactionId(temporaryAddress)
   try {
     let phoneHash: string
     if (USE_PHONE_NUMBER_PRIVACY) {
@@ -310,8 +308,7 @@ export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
 export function* doRedeemInvite(inviteCode: string) {
   try {
     ValoraAnalytics.track(OnboardingEvents.invite_redeem_start)
-    const contractKit = yield call(getContractKit)
-    const tempAccount = contractKit.web3.eth.accounts.privateKeyToAccount(inviteCode).address
+    const tempAccount = privateKeyToAddress(inviteCode)
     Logger.debug(TAG + '@doRedeemInvite', 'Invite code contains temp account', tempAccount)
     const tempAccountBalanceWei: BigNumber = yield call(
       fetchTokenBalanceInWeiWithRetry,
@@ -373,7 +370,7 @@ function* addTempAccountToWallet(inviteCode: string) {
   Logger.debug(TAG + '@addTempAccountToWallet', 'Attempting to add temp wallet')
   try {
     // Import account into the local geth node
-    const wallet: RpcWallet = yield call(getConnectedWallet)
+    const wallet: RpcWallet = yield call(getWallet)
     const account = privateKeyToAddress(inviteCode)
     const password: string = yield call(getPasswordSaga, account, false, true)
     const tempAccount = yield call([wallet, wallet.addAccount], inviteCode, password)
@@ -396,7 +393,7 @@ export function* moveAllFundsFromAccount(
   comment: string
 ) {
   Logger.debug(TAG + '@moveAllFundsFromAccount', 'Unlocking account')
-  const wallet: RpcWallet = yield call(getConnectedWallet)
+  const wallet: RpcWallet = yield call(getWallet)
   const password: string = yield call(getPasswordSaga, account, false, true)
   yield call([wallet, wallet.unlockAccount], account, password, UNLOCK_DURATION)
 
