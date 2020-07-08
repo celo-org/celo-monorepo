@@ -81,7 +81,7 @@ export function* startVerification() {
     ValoraAnalytics.track(VerificationEvents.verification_complete)
     Logger.debug(TAG, 'Verification completed successfully')
   } else if (result) {
-    ValoraAnalytics.track(VerificationEvents.verification_error, { error: result.message })
+    ValoraAnalytics.track(VerificationEvents.verification_error, { error: result })
     Logger.debug(TAG, 'Verification failed')
   } else if (cancel) {
     ValoraAnalytics.track(VerificationEvents.verification_cancel)
@@ -158,7 +158,9 @@ export function* doVerificationFlow() {
         status.numAttestationsRemaining
       )
       if (!balanceIsSufficient) {
-        throw new Error(ErrorMessages.INSUFFICIENT_BALANCE)
+        yield put(setVerificationStatus(VerificationStatus.InsufficientBalance))
+        // Return error message for logging purposes
+        return ErrorMessages.INSUFFICIENT_BALANCE
       }
 
       // Mark codes completed in previous attempts
@@ -222,10 +224,7 @@ export function* doVerificationFlow() {
     return true
   } catch (error) {
     Logger.error(TAG, 'Error occured during verification flow', error)
-    error.message === ErrorMessages.INSUFFICIENT_BALANCE
-      ? yield put(setVerificationStatus(VerificationStatus.InsufficientBalance))
-      : yield put(setVerificationStatus(VerificationStatus.Failed))
-
+    yield put(setVerificationStatus(VerificationStatus.Failed))
     yield put(showErrorOrFallback(error, ErrorMessages.VERIFICATION_FAILURE))
     return error.message
   }

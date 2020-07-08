@@ -301,7 +301,6 @@ describe('Do Verification Saga', () => {
         ],
         [call(balanceSufficientForAttestations, mockAttestationsRemainingForUnverified), false],
       ])
-      .put(showError(ErrorMessages.INSUFFICIENT_BALANCE))
       .put(setVerificationStatus(VerificationStatus.InsufficientBalance))
       .run()
   })
