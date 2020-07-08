@@ -21,7 +21,7 @@ export class ASTReports {
       }
       return true
     }
-    const codeReport = new ASTCodeCompatibilityReport(this.code.changes.filter(r => included(r.getContract())))
+    const codeReport = new ASTCodeCompatibilityReport(this.code.getChanges().filter(r => included(r.getContract())))
     const storageReports = this.storage.filter(r => included(r.contract))
     return new ASTReports(codeReport, storageReports)
   }
@@ -33,7 +33,7 @@ export class CategorizedChanges {
     reports: ASTReports,
     categorizer: Categorizer): CategorizedChanges {
     const storage = reports.storage.filter(r => !r.compatible)
-    const c = categorize(reports.code.changes, categorizer)
+    const c = categorize(reports.code.getChanges(), categorizer)
     const major = c[ChangeType.Major]
     const minor = c[ChangeType.Minor]
     const patch = c[ChangeType.Patch]
