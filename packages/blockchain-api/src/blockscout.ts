@@ -28,19 +28,6 @@ export interface BlockscoutCeloTransfer {
   value: string
 }
 
-// Calculate cGLD to cUSD rate based on the actual transfers
-function getImpliedCeloToCUSDExchangeRate(
-  current: BlockscoutCeloTransfer,
-  comparable: BlockscoutCeloTransfer
-): Pick<MoneyAmount, 'impliedCeloToCUSDExchangeRate'> {
-  return {
-    ...(current.token === CGLD &&
-      comparable.token === CUSD && {
-        impliedCeloToCUSDExchangeRate: new BigNumber(comparable.value).dividedBy(current.value),
-      }),
-  }
-}
-
 export class BlockscoutAPI extends RESTDataSource {
   attestationsAddress: string | undefined
   escrowAddress: string | undefined
@@ -294,6 +281,18 @@ export class BlockscoutAPI extends RESTDataSource {
       return undefined
     }
 
+    const impliedExchangeRates: MoneyAmount['impliedExchangeRates'] = {}
+    if (inTransfer.token === CGLD && outTransfer.token === CUSD) {
+      impliedExchangeRates['cGLD/cUSD'] = new BigNumber(outTransfer.value).dividedBy(
+        inTransfer.value
+      )
+    }
+    if (outTransfer.token === CGLD && inTransfer.token === CUSD) {
+      impliedExchangeRates['cGLD/cUSD'] = new BigNumber(inTransfer.value).dividedBy(
+        outTransfer.value
+      )
+    }
+
     return {
       type: EventTypes.EXCHANGE,
       timestamp,
@@ -306,22 +305,19 @@ export class BlockscoutAPI extends RESTDataSource {
           .toString(),
         currencyCode: tokenTransfer.token,
         timestamp,
-        ...getImpliedCeloToCUSDExchangeRate(
-          tokenTransfer,
-          tokenTransfer === inTransfer ? outTransfer : inTransfer
-        ),
+        impliedExchangeRates,
       },
       makerAmount: {
         value: new BigNumber(inTransfer.value).dividedBy(WEI_PER_GOLD).toString(),
         currencyCode: inTransfer.token,
         timestamp,
-        ...getImpliedCeloToCUSDExchangeRate(inTransfer, outTransfer),
+        impliedExchangeRates,
       },
       takerAmount: {
         value: new BigNumber(outTransfer.value).dividedBy(WEI_PER_GOLD).toString(),
         currencyCode: outTransfer.token,
         timestamp,
-        ...getImpliedCeloToCUSDExchangeRate(outTransfer, inTransfer),
+        impliedExchangeRates,
       },
       hash,
     }

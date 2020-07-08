@@ -63,6 +63,9 @@ describe('Blockscout', () => {
         Object {
           "amount": Object {
             "currencyCode": "cUSD",
+            "impliedExchangeRates": Object {
+              "cGLD/cUSD": "10",
+            },
             "timestamp": 1566345797000,
             "value": "-10",
           },
@@ -70,12 +73,17 @@ describe('Blockscout', () => {
           "hash": "0xba620de2d812f299d987155eb5dca7abcfeaf154f5cfd99cb1773452a7df3d7a",
           "makerAmount": Object {
             "currencyCode": "cUSD",
+            "impliedExchangeRates": Object {
+              "cGLD/cUSD": "10",
+            },
             "timestamp": 1566345797000,
             "value": "10",
           },
           "takerAmount": Object {
             "currencyCode": "cGLD",
-            "impliedCeloToCUSDExchangeRate": "10",
+            "impliedExchangeRates": Object {
+              "cGLD/cUSD": "10",
+            },
             "timestamp": 1566345797000,
             "value": "1",
           },
@@ -85,6 +93,9 @@ describe('Blockscout', () => {
         Object {
           "amount": Object {
             "currencyCode": "cUSD",
+            "impliedExchangeRates": Object {
+              "cGLD/cUSD": "10",
+            },
             "timestamp": 1566345866000,
             "value": "10",
           },
@@ -92,12 +103,17 @@ describe('Blockscout', () => {
           "hash": "0x961403536006f9c120c23900f94da59dbf43edf10eb3569b448665483bab77b2",
           "makerAmount": Object {
             "currencyCode": "cGLD",
-            "impliedCeloToCUSDExchangeRate": "10",
+            "impliedExchangeRates": Object {
+              "cGLD/cUSD": "10",
+            },
             "timestamp": 1566345866000,
             "value": "1",
           },
           "takerAmount": Object {
             "currencyCode": "cUSD",
+            "impliedExchangeRates": Object {
+              "cGLD/cUSD": "10",
+            },
             "timestamp": 1566345866000,
             "value": "10",
           },
@@ -162,7 +178,9 @@ describe('Blockscout', () => {
         Object {
           "amount": Object {
             "currencyCode": "cGLD",
-            "impliedCeloToCUSDExchangeRate": "10",
+            "impliedExchangeRates": Object {
+              "cGLD/cUSD": "10",
+            },
             "timestamp": 1566345797000,
             "value": "1",
           },
@@ -170,12 +188,17 @@ describe('Blockscout', () => {
           "hash": "0xba620de2d812f299d987155eb5dca7abcfeaf154f5cfd99cb1773452a7df3d7a",
           "makerAmount": Object {
             "currencyCode": "cUSD",
+            "impliedExchangeRates": Object {
+              "cGLD/cUSD": "10",
+            },
             "timestamp": 1566345797000,
             "value": "10",
           },
           "takerAmount": Object {
             "currencyCode": "cGLD",
-            "impliedCeloToCUSDExchangeRate": "10",
+            "impliedExchangeRates": Object {
+              "cGLD/cUSD": "10",
+            },
             "timestamp": 1566345797000,
             "value": "1",
           },
@@ -185,7 +208,9 @@ describe('Blockscout', () => {
         Object {
           "amount": Object {
             "currencyCode": "cGLD",
-            "impliedCeloToCUSDExchangeRate": "10",
+            "impliedExchangeRates": Object {
+              "cGLD/cUSD": "10",
+            },
             "timestamp": 1566345866000,
             "value": "-1",
           },
@@ -193,12 +218,17 @@ describe('Blockscout', () => {
           "hash": "0x961403536006f9c120c23900f94da59dbf43edf10eb3569b448665483bab77b2",
           "makerAmount": Object {
             "currencyCode": "cGLD",
-            "impliedCeloToCUSDExchangeRate": "10",
+            "impliedExchangeRates": Object {
+              "cGLD/cUSD": "10",
+            },
             "timestamp": 1566345866000,
             "value": "1",
           },
           "takerAmount": Object {
             "currencyCode": "cUSD",
+            "impliedExchangeRates": Object {
+              "cGLD/cUSD": "10",
+            },
             "timestamp": 1566345866000,
             "value": "10",
           },

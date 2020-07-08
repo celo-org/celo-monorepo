@@ -1,6 +1,6 @@
 import { DataSource, DataSourceConfig } from 'apollo-datasource'
 import BigNumber from 'bignumber.js'
-import { CurrencyConversionArgs } from '../schema'
+import { CurrencyConversionArgs, MoneyAmount } from '../schema'
 import { CGLD, CUSD, USD } from './consts'
 import ExchangeRateAPI from './ExchangeRateAPI'
 import GoldExchangeRateAPI from './GoldExchangeRateAPI'
@@ -22,7 +22,7 @@ export default class CurrencyConversionAPI<TContext = any> extends DataSource {
     sourceCurrencyCode,
     currencyCode,
     timestamp,
-    impliedCeloToCUSDExchangeRate,
+    impliedExchangeRates,
   }: CurrencyConversionArgs): Promise<BigNumber> {
     const fromCode = sourceCurrencyCode || USD
     const toCode = currencyCode
@@ -34,7 +34,7 @@ export default class CurrencyConversionAPI<TContext = any> extends DataSource {
       const prevCode = steps[i - 1]
       const code = steps[i]
       ratesPromises.push(
-        this.getSupportedExchangeRate(prevCode, code, timestamp, impliedCeloToCUSDExchangeRate)
+        this.getSupportedExchangeRate(prevCode, code, timestamp, impliedExchangeRates)
       )
     }
 
@@ -78,24 +78,18 @@ export default class CurrencyConversionAPI<TContext = any> extends DataSource {
     fromCode: string,
     toCode: string,
     timestamp?: number,
-    impliedCeloToCUSDExchangeRate?: BigNumber.Value
+    impliedExchangeRates?: MoneyAmount['impliedExchangeRates']
   ): BigNumber | Promise<BigNumber> {
     const pair = `${fromCode}/${toCode}`
+
+    if (impliedExchangeRates && impliedExchangeRates[pair]) {
+      return new BigNumber(impliedExchangeRates[pair])
+    }
 
     if (pair === 'cUSD/USD' || pair === 'USD/cUSD') {
       // TODO: use real rates once we have the data
       return new BigNumber(1)
-    } else if (pair === 'cGLD/cUSD') {
-      // If this is an exchange
-      if (impliedCeloToCUSDExchangeRate) {
-        return new BigNumber(impliedCeloToCUSDExchangeRate)
-      }
-      return this.goldExchangeRateAPI.getExchangeRate({
-        sourceCurrencyCode: fromCode,
-        currencyCode: toCode,
-        timestamp,
-      })
-    } else if (pair === 'cUSD/cGLD') {
+    } else if (pair === 'cGLD/cUSD' || pair === 'cUSD/cGLD') {
       return this.goldExchangeRateAPI.getExchangeRate({
         sourceCurrencyCode: fromCode,
         currencyCode: toCode,

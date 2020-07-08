@@ -23,13 +23,13 @@ describe('CurrencyConversionAPI', () => {
   })
 
   it('should retrieve rate for cGLD/cUSD', async () => {
-    const impliedCeloToCUSDExchangeRate = new BigNumber(10)
+    const impliedExchangeRates = { 'cGLD/cUSD': new BigNumber(10) }
     const result = await currencyConversionAPI.getExchangeRate({
       sourceCurrencyCode: 'cGLD',
       currencyCode: 'cUSD',
-      impliedCeloToCUSDExchangeRate,
+      impliedExchangeRates,
     })
-    expect(result).toEqual(impliedCeloToCUSDExchangeRate)
+    expect(result).toEqual(new BigNumber(10))
     expect(mockDefaultGetExchangeRate).toHaveBeenCalledTimes(0)
     expect(mockGoldGetExchangeRate).toHaveBeenCalledTimes(0)
   })
@@ -45,13 +45,13 @@ describe('CurrencyConversionAPI', () => {
   })
 
   it('should retrieve rate for cGLD/USD', async () => {
-    const impliedCeloToCUSDExchangeRate = new BigNumber(10)
+    const impliedExchangeRates = { 'cGLD/cUSD': new BigNumber(10) }
     const result = await currencyConversionAPI.getExchangeRate({
       sourceCurrencyCode: 'cGLD',
       currencyCode: 'USD',
-      impliedCeloToCUSDExchangeRate,
+      impliedExchangeRates,
     })
-    expect(result).toEqual(impliedCeloToCUSDExchangeRate)
+    expect(result).toEqual(new BigNumber(10))
 
     expect(mockDefaultGetExchangeRate).toHaveBeenCalledTimes(0)
     expect(mockGoldGetExchangeRate).toHaveBeenCalledTimes(0)
@@ -68,12 +68,11 @@ describe('CurrencyConversionAPI', () => {
   })
 
   it('should retrieve rate for cGLD/MXN', async () => {
-    const impliedCeloToCUSDExchangeRate = new BigNumber(10)
-
+    const impliedExchangeRates = { 'cGLD/cUSD': new BigNumber(10) }
     const result = await currencyConversionAPI.getExchangeRate({
       sourceCurrencyCode: 'cGLD',
       currencyCode: 'MXN',
-      impliedCeloToCUSDExchangeRate,
+      impliedExchangeRates,
     })
     expect(result).toEqual(new BigNumber(200))
     expect(mockDefaultGetExchangeRate).toHaveBeenCalledTimes(1)
