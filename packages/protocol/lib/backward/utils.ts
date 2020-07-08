@@ -24,7 +24,6 @@ export class ASTBackwardReport {
     logFunction("Instantiating new artifacts...")
     const artifacts2 = instantiateArtifacts(newArtifactsFolder)
     logFunction("Done\n")
-    const report = new ASTBackwardReport()
     // Run reports
     logFunction("Running storage report...")
     const storage = reportLayoutIncompatibilities(artifacts1, artifacts2)
@@ -33,24 +32,22 @@ export class ASTBackwardReport {
     const code = reportASTIncompatibilities(artifacts1, artifacts2)
     logFunction("Done\n")
   
-    report.exclude = exclude
     const excludeRegexp: RegExp = exclude? new RegExp(exclude) : null
     const fullReports = new ASTReports(code, storage).excluding(excludeRegexp)
     
     logFunction("Generating backward report...")
-    report.report = ASTVersionedReport.create(fullReports, categorizer)
-  
+    const versionedReport = ASTVersionedReport.create(fullReports, categorizer)
     logFunction("Done\n")
-    return report
+    
+    return new ASTBackwardReport(oldArtifactsFolder, newArtifactsFolder, exclude, versionedReport)
   }
 
-  // Artifacts comparison folders
-  oldArtifactsFolder: string
-  newArtifactsFolder: string
-
-  exclude: string
-
-  report: ASTVersionedReport
+  constructor(
+    public readonly oldArtifactsFolder: string,
+    public readonly newArtifactsFolder: string,
+    public readonly exclude: string,
+    public readonly report: ASTVersionedReport
+  ) {}
 }
 
 const ensureValidArtifacts = (artifactsPaths: string[]): void => {
