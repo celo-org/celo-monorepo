@@ -86,6 +86,14 @@ interface SettingsEventsProperties {
 }
 
 interface OnboardingEventsProperties {
+  [OnboardingEvents.onboarding_education_start]: undefined
+  [OnboardingEvents.onboarding_education_scroll]: {
+    currentStep: number
+    direction: ScrollDirection
+  }
+  [OnboardingEvents.onboarding_education_complete]: undefined
+  [OnboardingEvents.onboarding_education_cancel]: undefined
+
   [OnboardingEvents.backup_education_start]: undefined
   [OnboardingEvents.backup_education_scroll]: {
     currentStep: number
@@ -238,6 +246,11 @@ interface VerificationEventsProperties {
   }
   [VerificationEvents.verification_reveal_attestation_error]: {
     issuer: any
+    error: string
+  }
+  [VerificationEvents.verification_revoke_start]: undefined
+  [VerificationEvents.verification_revoke_finish]: undefined
+  [VerificationEvents.verification_revoke_error]: {
     error: string
   }
 }

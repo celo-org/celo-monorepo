@@ -67,6 +67,7 @@ export enum Screens {
   VerificationInputScreen = 'VerificationInputScreen',
   VerificationInterstitialScreen = 'VerificationInterstitialScreen',
   VerificationLoadingScreen = 'VerificationLoadingScreen',
+  OnboardingEducationScreen = 'OnboardingEducationScreen',
   OnboardingSuccessScreen = 'OnboardingSuccessScreen',
   WalletHome = 'WalletHome',
 }
