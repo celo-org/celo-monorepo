@@ -1,53 +1,43 @@
 import { newKit } from '@celo/contractkit'
-import config from '../config'
+import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { retryAsyncWithBackOff } from '@celo/utils/lib/async'
+import { RETRY_COUNT, RETRY_DELAY_IN_MS } from '../common/constants'
+import logger from '../common/logger'
+import config from '../config'
 
 const contractKit = newKit(config.blockchain.provider)
-const retryCount: number = 5
-const retryDelayInMs: number = 100
 
-function getContractKit() {
+export function getContractKit() {
   return contractKit
 }
 
-export async function getTransactionCountFromAccount(account: string): Promise<number> {
-  return await retryAsyncWithBackOff(
-    () => getContractKit().web3.eth.getTransactionCount(account),
-    retryCount,
-    [],
-    retryDelayInMs
-  )
-}
-
 export async function getBlockNumber(): Promise<number> {
-  return await retryAsyncWithBackOff(
-    () => getContractKit().web3.eth.getBlockNumber(account),
-    retryCount,
+  return retryAsyncWithBackOff(
+    () => getContractKit().web3.eth.getBlockNumber(),
+    RETRY_COUNT,
     [],
-    retryDelayInMs
+    RETRY_DELAY_IN_MS
   )
 }
 
-export async function getDollarBalance(account: string): Promise<BigNumber> {
-  await retryAsyncWithBackOff(
-    () =>
-      getContractKit()
-        .contracts.getStableToken()
-        .balanceOf(account),
-    retryCount,
-    [],
-    retryDelayInMs
-  )
-}
+export async function isVerified(account: string, hashedPhoneNumber: string): Promise<boolean> {
+  return retryAsyncWithBackOff(
+    async () => {
+      const attestationsWrapper: AttestationsWrapper = await getContractKit().contracts.getAttestations()
+      const {
+        isVerified: _isVerified,
+        completed,
+        numAttestationsRemaining,
+        total,
+      } = await attestationsWrapper.getVerifiedStatus(hashedPhoneNumber, account)
 
-export async function getDollarBalance(account: string): Promise<BigNumber> {
-  await retryAsyncWithBackOff(
-    () =>
-      getContractKit()
-        .contracts.getStableToken()
-        .balanceOf(account),
-    retryCount,
+      logger.debug(
+        `Account ${account} is verified=${_isVerified} with ${completed} completed attestations, ${numAttestationsRemaining} remaining, total of ${total} requested.`
+      )
+      return _isVerified
+    },
+    RETRY_COUNT,
     [],
-    retryDelayInMs
+    RETRY_DELAY_IN_MS
   )
 }

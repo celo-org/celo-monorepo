@@ -1,6 +1,7 @@
 import {
   ErrorMessage,
   SignMessageResponse,
+  SignMessageResponseFailure,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
@@ -14,7 +15,7 @@ import {
   phoneNumberHashIsValidIfExists,
 } from '../common/input-validation'
 import logger from '../common/logger'
-import { VERSION } from '../config'
+import { getVersion } from '../config'
 import { incrementQueryCount } from '../database/wrappers/account'
 import { getKeyProvider } from '../key-management/key-provider'
 import { getBlockNumber } from '../web3/contracts'
@@ -42,18 +43,37 @@ export async function handleGetBlindedMessageForSalt(
     }
 
     const { account, blindedQueryPhoneNumber, hashedPhoneNumber } = request.body
-    const [performedQueryCount, totalQuota] = await getRemainingQueryCount(
-      account,
-      hashedPhoneNumber
-    )
-    if (performedQueryCount >= totalQuota) {
+
+    // Set default values in the case of an error
+    let performedQueryCount = -1
+    let totalQuota = -1
+    let blockNumber = -1
+    let errorMsg
+    // In the case of a DB or blockchain connection failure, don't block user
+    // but set the error status accordingly
+    try {
+      ;[performedQueryCount, totalQuota] = await getRemainingQueryCount(account, hashedPhoneNumber)
+    } catch (error) {
+      logger.error('Failed to get user quota', error)
+      errorMsg = ErrorMessage.DATABASE_GET_FAILURE
+    }
+    try {
+      blockNumber = await getBlockNumber()
+    } catch (error) {
+      logger.error('Failed to get latest block number', error)
+      // Cody todo: Add as error code in common lib
+      errorMsg = 'CELO_PNP_ERR_11 SIG_ERR Failed to read contract state'
+    }
+
+    if (errorMsg !== ErrorMessage.DATABASE_GET_FAILURE && performedQueryCount >= totalQuota) {
       logger.debug('No remaining query count')
       respondWithError(
         response,
         403,
         WarningMessage.EXCEEDED_QUOTA,
         performedQueryCount,
-        totalQuota
+        totalQuota,
+        blockNumber
       )
       return
     }
@@ -63,21 +83,21 @@ export async function handleGetBlindedMessageForSalt(
     await incrementQueryCount(account)
     logger.debug('Salt retrieval success')
 
-    let blockNumber = -1
-    try {
-      blockNumber = await getBlockNumber()
-    } catch (error) {
-      // Continue to respond on lookup failure
-      logger.error('Failed to get latest block number', error)
-    }
-
-    const signMessageResponse: SignMessageResponse = {
-      success: true,
+    let signMessageResponse: SignMessageResponse
+    const signMessageResponseSuccess: SignMessageResponse = {
+      success: !errorMsg,
       signature,
-      version: VERSION,
+      version: getVersion(),
       performedQueryCount,
       totalQuota,
       blockNumber,
+    }
+    if (errorMsg) {
+      const signMessageResponseFailure = signMessageResponseSuccess as SignMessageResponseFailure
+      signMessageResponseFailure.error = errorMsg
+      signMessageResponse = signMessageResponseFailure
+    } else {
+      signMessageResponse = signMessageResponseSuccess
     }
     response.json(signMessageResponse)
   } catch (error) {

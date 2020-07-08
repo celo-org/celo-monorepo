@@ -1,7 +1,7 @@
 import request from 'supertest'
 import { computeBlindedSignature } from '../src/bls/bls-cryptography-client'
 import { authenticateUser } from '../src/common/identity'
-import { DEV_PRIVATE_KEY, VERSION } from '../src/config'
+import { DEV_PRIVATE_KEY, getVersion } from '../src/config'
 import {
   getDidMatchmaking,
   incrementQueryCount,
@@ -10,6 +10,7 @@ import {
 import { getKeyProvider } from '../src/key-management/key-provider'
 import { getRemainingQueryCount } from '../src/salt-generation/query-quota'
 import { createServer } from '../src/server'
+import { getBlockNumber } from '../src/web3/contracts'
 
 const BLS_SIGNATURE = '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A'
 
@@ -36,6 +37,9 @@ mockGetDidMatchmaking.mockReturnValue(false)
 const mockSetDidMatchmaking = setDidMatchmaking as jest.Mock
 mockSetDidMatchmaking.mockImplementation()
 
+jest.mock('../src/web3/contracts')
+const mockGetBlockNumber = getBlockNumber as jest.Mock
+
 describe(`POST /getBlindedMessageSignature endpoint`, () => {
   const app = createServer()
 
@@ -52,6 +56,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
 
     it('provides signature', (done) => {
       mockGetRemainingQueryCount.mockReturnValue([0, 10])
+      mockGetBlockNumber.mockReturnValue(10000)
       request(app)
         .post('/getBlindedSalt')
         .send(mockRequestData)
@@ -61,9 +66,10 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
           {
             success: true,
             signature: BLS_SIGNATURE,
-            version: VERSION,
+            version: getVersion(),
             performedQueryCount: 0,
             totalQuota: 10,
+            blockNumber: 10000,
           },
           done
         )

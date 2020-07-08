@@ -7,10 +7,9 @@ import {
   createMockWeb3,
 } from '../../../common/test/utils'
 import { mockAccount, mockPhoneNumber } from '../../../common/test/values'
-import { isVerified } from '../../src/common/identity'
 import { getPerformedQueryCount } from '../../src/database/wrappers/account'
 import { getRemainingQueryCount } from '../../src/salt-generation/query-quota'
-import { getContractKit } from '../../src/web3/contracts'
+import { getContractKit, isVerified } from '../../src/web3/contracts'
 
 jest.mock('../../src/web3/contracts')
 const mockGetContractKit = getContractKit as jest.Mock

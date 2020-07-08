@@ -1,6 +1,7 @@
 import {
   ErrorMessage,
   SignMessageResponse,
+  SignMessageResponseFailure,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import AbortController from 'abort-controller'
@@ -77,8 +78,13 @@ async function requestSignatures(request: Request, response: Response) {
         logger.info(`Service ${url} returned status ${status}`)
         if (res.ok) {
           const signResponse = (await res.json()) as SignMessageResponse
+          if (!signResponse.success) {
+            // Continue on failure if signature is present to unblock user
+            const signResponseFailure = signResponse as SignMessageResponseFailure
+            logger.error(`${signResponseFailure.error} from signer ${service.url}`)
+          }
           if (!signResponse.signature) {
-            throw new Error('Response successful, but signature is missing')
+            throw new Error(`Signature is missing from signer ${service.url}`)
           }
           responses.push({ url: service.url, signMessageResponse: signResponse, status })
           const partialSig = { url: service.url, signature: signResponse.signature }
@@ -146,21 +152,21 @@ function logResponseDiscrepancies(responses: SignMsgRespWithStatus[]) {
       const values = successfulResponses.map((response) => {
         return {
           signer: response.url,
-          performedQueryCount: response.signMessageResponse?.performedQueryCount,
-          totalQuota: response.signMessageResponse?.totalQuota,
+          performedQueryCount: response.signMessageResponse!.performedQueryCount,
+          totalQuota: response.signMessageResponse!.totalQuota,
         }
       })
       logger.error(`Discepancy found in signers' measured quota values ${values}`)
       discrepancyFound = true
     }
     if (
-      Math.abs(resp.signMessageResponse?.blockNumber! - expectedBlockNumber) >
+      Math.abs(resp.signMessageResponse!.blockNumber! - expectedBlockNumber) >
       MAX_BLOCK_DISCREPANCY_THRESHOLD
     ) {
       const values = successfulResponses.map((response) => {
         return {
           signer: response.url,
-          blockNumber: response.signMessageResponse?.blockNumber,
+          blockNumber: response.signMessageResponse!.blockNumber,
         }
       })
       logger.error(

@@ -1,10 +1,10 @@
-import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
-import BigNumber from 'bignumber.js'
-import { isVerified } from '../common/identity'
+import { retryAsyncWithBackOff } from '@celo/utils/lib/async'
+import { BigNumber } from 'bignumber.js'
+import { RETRY_COUNT, RETRY_DELAY_IN_MS } from '../common/constants'
 import logger from '../common/logger'
 import config from '../config'
 import { getPerformedQueryCount } from '../database/wrappers/account'
-import { getDollarBalance, getTransactionCountFromAccount } from '../web3/contracts'
+import { getContractKit, isVerified } from '../web3/contracts'
 
 /*
  * Returns the number of queries already performed and the calculated query quota.
@@ -42,4 +42,22 @@ async function getQueryQuota(account: string, hashedPhoneNumber?: string) {
 
   logger.debug('Account does not meet query quota criteria')
   return 0
+}
+
+export async function getTransactionCountFromAccount(account: string): Promise<number> {
+  return retryAsyncWithBackOff(
+    () => getContractKit().web3.eth.getTransactionCount(account),
+    RETRY_COUNT,
+    [],
+    RETRY_DELAY_IN_MS
+  )
+}
+
+export async function getDollarBalance(account: string): Promise<BigNumber> {
+  return retryAsyncWithBackOff(
+    async () => (await getContractKit().contracts.getStableToken()).balanceOf(account),
+    RETRY_COUNT,
+    [],
+    RETRY_DELAY_IN_MS
+  )
 }
