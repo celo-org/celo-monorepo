@@ -1,6 +1,6 @@
 import { CeloTransactionObject } from '@celo/contractkit'
 import { RpcWallet } from '@celo/contractkit/lib/wallets/rpc-wallet'
-import { privateKeyToAddress } from '@celo/utils/lib/address'
+import { privateKeyToAddress } from '@celo/utils/src/address'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { Clipboard, Linking, Platform } from 'react-native'
