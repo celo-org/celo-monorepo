@@ -1,50 +1,52 @@
-import { PaymentRequest } from 'src/account/types'
 import { AddressToE164NumberType, SecureSendPhoneNumberMapping } from 'src/identity/reducer'
 import { getAddressValidationType } from 'src/identity/secureSend'
 import { AddressValidationCheckCache } from 'src/paymentRequest/IncomingPaymentRequestListScreen'
+import { PaymentRequest } from 'src/paymentRequest/types'
 import { NumberToRecipient, Recipient, RecipientKind } from 'src/recipients/recipient'
 
-export function getRecipientFromPaymentRequest(
-  paymentRequest: PaymentRequest,
-  recipientCache: NumberToRecipient
-): Recipient {
-  const cachedRecipient = paymentRequest.requesterE164Number
-    ? recipientCache[paymentRequest.requesterE164Number]
-    : null
-
-  if (cachedRecipient) {
-    return {
-      ...cachedRecipient,
-      kind: RecipientKind.Contact,
-      address: paymentRequest.requesterAddress,
-    }
-  } else if (paymentRequest.requesterE164Number) {
-    return {
-      kind: RecipientKind.MobileNumber,
-      address: paymentRequest.requesterAddress,
-      displayName: paymentRequest.requesterE164Number,
-      e164PhoneNumber: paymentRequest.requesterE164Number,
-    }
-  } else {
-    return {
-      kind: RecipientKind.Address,
-      address: paymentRequest.requesterAddress,
-      displayName: paymentRequest.requesterAddress,
-    }
-  }
-}
-
-export function getSenderFromPaymentRequest(
+// Returns a recipient for the SENDER of a payment request
+// i.e. this account when outgoing, another when incoming
+export function getRequesterFromPaymentRequest(
   paymentRequest: PaymentRequest,
   addressToE164Number: AddressToE164NumberType,
   recipientCache: NumberToRecipient
 ): Recipient {
-  const e164PhoneNumber = addressToE164Number[paymentRequest.requesteeAddress]
+  return getRecipientObjectFromPaymentRequest(
+    paymentRequest,
+    addressToE164Number,
+    recipientCache,
+    false
+  )
+}
+
+// Returns a recipient for the TARGET of a payment request
+// i.e. this account when incoming, another when outgoing
+export function getRequesteeFromPaymentRequest(
+  paymentRequest: PaymentRequest,
+  addressToE164Number: AddressToE164NumberType,
+  recipientCache: NumberToRecipient
+): Recipient {
+  return getRecipientObjectFromPaymentRequest(
+    paymentRequest,
+    addressToE164Number,
+    recipientCache,
+    true
+  )
+}
+
+function getRecipientObjectFromPaymentRequest(
+  paymentRequest: PaymentRequest,
+  addressToE164Number: AddressToE164NumberType,
+  recipientCache: NumberToRecipient,
+  isRequestee: boolean
+): Recipient {
+  const address = isRequestee ? paymentRequest.requesteeAddress : paymentRequest.requesterAddress
+  const e164PhoneNumber = addressToE164Number[address]
   if (!e164PhoneNumber) {
     return {
       kind: RecipientKind.Address,
-      address: paymentRequest.requesteeAddress,
-      displayName: paymentRequest.requesteeAddress,
+      address,
+      displayName: address,
     }
   }
 
@@ -53,12 +55,12 @@ export function getSenderFromPaymentRequest(
     return {
       ...cachedRecipient,
       kind: RecipientKind.Address,
-      address: paymentRequest.requesteeAddress,
+      address,
     }
   } else {
     return {
       kind: RecipientKind.MobileNumber,
-      address: paymentRequest.requesteeAddress,
+      address,
       e164PhoneNumber,
       displayName: e164PhoneNumber,
     }
@@ -67,13 +69,14 @@ export function getSenderFromPaymentRequest(
 
 export const getAddressValidationCheckCache = (
   paymentRequests: PaymentRequest[],
+  addressToE164Number: AddressToE164NumberType,
   recipientCache: NumberToRecipient,
   secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
 ): AddressValidationCheckCache => {
   const addressValidationCheckCache: AddressValidationCheckCache = {}
 
   paymentRequests.forEach((payment) => {
-    const recipient = getRecipientFromPaymentRequest(payment, recipientCache)
+    const recipient = getRequesterFromPaymentRequest(payment, addressToE164Number, recipientCache)
     const addressValidationType = getAddressValidationType(recipient, secureSendPhoneNumberMapping)
 
     const { e164PhoneNumber } = recipient

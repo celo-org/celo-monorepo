@@ -2,7 +2,6 @@ import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Image } from 'react-native'
 import { connect } from 'react-redux'
-import { PaymentRequest } from 'src/account/types'
 import { HomeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { declinePaymentRequest } from 'src/firebase/actions'
@@ -20,7 +19,8 @@ import { Screens } from 'src/navigator/Screens'
 import SummaryNotification from 'src/notifications/SummaryNotification'
 import { listItemRenderer } from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import PaymentRequestNotificationInner from 'src/paymentRequest/PaymentRequestNotificationInner'
-import { getRecipientFromPaymentRequest } from 'src/paymentRequest/utils'
+import { PaymentRequest } from 'src/paymentRequest/types'
+import { getRequesterFromPaymentRequest } from 'src/paymentRequest/utils'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
@@ -68,18 +68,23 @@ export class IncomingPaymentRequestSummaryNotification extends React.Component<P
       <PaymentRequestNotificationInner
         key={item.uid}
         amount={item.amount}
-        recipient={getRecipientFromPaymentRequest(item, this.props.recipientCache)}
+        recipient={getRequesterFromPaymentRequest(
+          item,
+          this.props.addressToE164Number,
+          this.props.recipientCache
+        )}
       />
     )
   }
 
   render() {
-    const { recipientCache, requests, t } = this.props
+    const { addressToE164Number, recipientCache, requests, t } = this.props
 
     return requests.length === 1 ? (
       listItemRenderer({
         // accessing via this.props.<...> to avoid shadowing
         declinePaymentRequest: this.props.declinePaymentRequest,
+        addressToE164Number,
         recipientCache,
       })(requests[0])
     ) : (

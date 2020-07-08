@@ -1,5 +1,5 @@
 import { PincodeType } from 'src/account/reducer'
-import { PaymentRequest } from 'src/account/types'
+import { PaymentRequest } from 'src/paymentRequest/types'
 
 // TODO(Rossy): Remove the _ACTION suffix from these actions for consistency with other other names
 export enum Actions {

@@ -3,7 +3,6 @@ import { WithTranslation } from 'react-i18next'
 import { View } from 'react-native'
 import { connect } from 'react-redux'
 import { getOutgoingPaymentRequests } from 'src/account/selectors'
-import { PaymentRequest } from 'src/account/types'
 import { cancelPaymentRequest, updatePaymentRequestNotified } from 'src/firebase/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import {
@@ -16,7 +15,8 @@ import {
   titleWithBalanceNavigationOptions,
 } from 'src/notifications/NotificationList'
 import OutgoingPaymentRequestListItem from 'src/paymentRequest/OutgoingPaymentRequestListItem'
-import { getSenderFromPaymentRequest } from 'src/paymentRequest/utils'
+import { PaymentRequest } from 'src/paymentRequest/types'
+import { getRequesteeFromPaymentRequest } from 'src/paymentRequest/utils'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
@@ -50,7 +50,7 @@ export const listItemRenderer = (params: {
   cancelPaymentRequest: typeof cancelPaymentRequest
   updatePaymentRequestNotified: typeof updatePaymentRequestNotified
 }) => (request: PaymentRequest, key: number | undefined = undefined) => {
-  const requestee = getSenderFromPaymentRequest(
+  const requestee = getRequesteeFromPaymentRequest(
     request,
     params.addressToE164Number,
     params.recipientCache

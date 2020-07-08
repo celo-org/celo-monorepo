@@ -16,6 +16,7 @@ import { importSaga } from 'src/import/saga'
 import { inviteSaga } from 'src/invite/saga'
 import { localCurrencySaga } from 'src/localCurrency/saga'
 import { networkInfoSaga } from 'src/networkInfo/saga'
+import { paymentRequestSaga } from 'src/paymentRequest/saga'
 import { waitForRehydrate } from 'src/redux/persist-helper'
 import { sendSaga } from 'src/send/saga'
 import { sentrySaga } from 'src/sentry/saga'
@@ -67,18 +68,28 @@ function* loggerSaga() {
 export function* rootSaga() {
   // Delay all sagas until rehydrate is done
   // This prevents them from running with missing state
+  console.log('===1')
   yield call(waitForRehydrate)
+  console.log('===rehydrated')
   yield call(appInit)
+  console.log('===2')
 
   // Note, the order of these does matter in certain cases
   yield spawn(loggerSaga)
+  console.log('===3')
   yield spawn(appSaga)
+  console.log('===4')
   yield spawn(sentrySaga)
+  console.log('===5')
   yield spawn(networkInfoSaga)
+  console.log('===6')
   yield spawn(gethSaga)
+  console.log('===7')
   yield spawn(web3Saga)
+  console.log('===8')
   yield spawn(accountSaga)
   yield spawn(firebaseSaga)
+  yield spawn(transactionSaga)
   yield spawn(homeSaga)
   yield spawn(identitySaga)
   yield spawn(localCurrencySaga)
@@ -87,7 +98,7 @@ export function* rootSaga() {
   yield spawn(goldTokenSaga)
   yield spawn(sendSaga)
   yield spawn(exchangeSaga)
-  yield spawn(transactionSaga)
+  yield spawn(paymentRequestSaga)
   yield spawn(escrowSaga)
   yield spawn(inviteSaga)
   yield spawn(importSaga)

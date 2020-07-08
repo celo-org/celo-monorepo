@@ -1,5 +1,5 @@
 import { getIncomingPaymentRequests, getOutgoingPaymentRequests } from 'src/account/selectors'
-import { PaymentRequestStatus } from 'src/account/types'
+import { PaymentRequestStatus } from 'src/paymentRequest/types'
 import { paymentRequestDouble } from 'src/paymentRequest/__mocks__'
 
 describe('selectors', () => {

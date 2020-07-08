@@ -1,4 +1,4 @@
-import { PaymentRequestStatus } from 'src/account/types'
+import { PaymentRequestStatus } from 'src/paymentRequest/types'
 import { RootState } from 'src/redux/reducers'
 
 export const getIncomingPaymentRequests = (state: RootState) => {

@@ -4,11 +4,12 @@ import { WithTranslation } from 'react-i18next'
 import { View } from 'react-native'
 import { connect } from 'react-redux'
 import { getIncomingPaymentRequests } from 'src/account/selectors'
-import { PaymentRequest } from 'src/account/types'
 import { declinePaymentRequest } from 'src/firebase/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { fetchAddressesAndValidate } from 'src/identity/actions'
 import {
+  addressToE164NumberSelector,
+  AddressToE164NumberType,
   AddressValidationType,
   e164NumberToAddressSelector,
   E164NumberToAddressType,
@@ -16,17 +17,20 @@ import {
 import { HeaderTitleWithBalance } from 'src/navigator/Headers'
 import { NotificationList } from 'src/notifications/NotificationList'
 import IncomingPaymentRequestListItem from 'src/paymentRequest/IncomingPaymentRequestListItem'
+import { PaymentRequest } from 'src/paymentRequest/types'
 import {
   getAddressValidationCheckCache,
-  getRecipientFromPaymentRequest,
+  getRequesterFromPaymentRequest,
 } from 'src/paymentRequest/utils'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
+
 interface StateProps {
   dollarBalance: string | null
   paymentRequests: PaymentRequest[]
   e164PhoneNumberAddressMapping: E164NumberToAddressType
+  addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient
   addressValidationCheckCache: AddressValidationCheckCache
 }
@@ -42,11 +46,15 @@ export interface AddressValidationCheckCache {
 
 const mapStateToProps = (state: RootState): StateProps => {
   const paymentRequests = getIncomingPaymentRequests(state)
+  const addressToE164Number = addressToE164NumberSelector(state)
   const e164PhoneNumberAddressMapping = e164NumberToAddressSelector(state)
   const recipientCache = recipientCacheSelector(state)
   const { secureSendPhoneNumberMapping } = state.identity
+  // TODO use Reselect for this to avoid recomputing it on each redux
+  // action dispatch (which will trigger this mapStateToProps)
   const addressValidationCheckCache = getAddressValidationCheckCache(
     paymentRequests,
+    addressToE164Number,
     recipientCache,
     secureSendPhoneNumberMapping
   )
@@ -54,6 +62,7 @@ const mapStateToProps = (state: RootState): StateProps => {
   return {
     dollarBalance: state.stableToken.balance,
     paymentRequests,
+    addressToE164Number,
     e164PhoneNumberAddressMapping,
     recipientCache,
     addressValidationCheckCache,
@@ -68,12 +77,13 @@ const mapDispatchToProps = {
 type Props = WithTranslation & StateProps & DispatchProps
 
 export const listItemRenderer = (props: {
+  addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient
   declinePaymentRequest: typeof declinePaymentRequest
   addressValidationCheckCache?: AddressValidationCheckCache
 }) => (request: PaymentRequest, key: number | undefined = undefined) => {
-  const requester = getRecipientFromPaymentRequest(request, props.recipientCache)
-  const { addressValidationCheckCache } = props
+  const { addressValidationCheckCache, addressToE164Number, recipientCache } = props
+  const requester = getRequesterFromPaymentRequest(request, addressToE164Number, recipientCache)
   let addressValidationType
 
   if (addressValidationCheckCache && requester.e164PhoneNumber) {
@@ -110,11 +120,15 @@ class IncomingPaymentRequestListScreen extends React.Component<Props> {
   }
 
   fetchLatestAddressesAndValidate = () => {
-    const { paymentRequests } = this.props
+    const { paymentRequests, addressToE164Number, recipientCache } = this.props
 
     // TODO: Look into creating a batch lookup function so we dont rerender on each lookup
     paymentRequests.forEach((paymentRequest) => {
-      const recipient = getRecipientFromPaymentRequest(paymentRequest, this.props.recipientCache)
+      const recipient = getRequesterFromPaymentRequest(
+        paymentRequest,
+        addressToE164Number,
+        recipientCache
+      )
       const { e164PhoneNumber } = recipient
       if (e164PhoneNumber) {
         this.props.fetchAddressesAndValidate(e164PhoneNumber)
