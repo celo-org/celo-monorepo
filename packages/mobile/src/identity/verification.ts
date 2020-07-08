@@ -12,6 +12,7 @@ import { AttestationsStatus, extractAttestationCodeFromMessage } from '@celo/uti
 import { compressedPubKey } from '@celo/utils/src/commentEncryption'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import functions from '@react-native-firebase/functions'
+import BigNumber from 'bignumber.js'
 import { Platform } from 'react-native'
 import { Task } from 'redux-saga'
 import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'
@@ -232,7 +233,9 @@ export function* doVerificationFlow() {
 
 export function* balanceSufficientForAttestations(attestationsRemaining: number) {
   const userBalance = yield select(stableTokenBalanceSelector)
-  return Number(userBalance) > attestationsRemaining * ESTIMATED_COST_PER_ATTESTATION
+  return new BigNumber(userBalance).isGreaterThan(
+    attestationsRemaining * ESTIMATED_COST_PER_ATTESTATION
+  )
 }
 
 // Requests if necessary additional attestations and returns all revealable attestationsq
