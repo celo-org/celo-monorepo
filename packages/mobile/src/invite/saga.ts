@@ -1,5 +1,6 @@
 import { CeloTransactionObject } from '@celo/contractkit'
 import { RpcWallet } from '@celo/contractkit/lib/wallets/rpc-wallet'
+import { privateKeyToAddress } from '@celo/utils/src/address'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { Clipboard, Linking, Platform } from 'react-native'
@@ -46,7 +47,7 @@ import { sendTransaction } from 'src/transactions/send'
 import { getAppStoreId } from 'src/utils/appstore'
 import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
-import { getConnectedWallet, getContractKit, getContractKitAsync } from 'src/web3/contracts'
+import { getContractKitAsync, getWallet, getWeb3 } from 'src/web3/contracts'
 import { getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 
 const TAG = 'invite/saga'
@@ -154,11 +155,9 @@ export function* sendInvite(
 ) {
   try {
     ValoraAnalytics.track(InviteEvents.invite_tx_start)
-    const contractKit = yield call(getContractKit)
+    const web3 = yield call(getWeb3)
     const randomness = yield call(asyncRandomBytes, 64)
-    const temporaryWalletAccount = contractKit.web3.eth.accounts.create(
-      randomness.toString('ascii')
-    )
+    const temporaryWalletAccount = web3.eth.accounts.create(randomness.toString('ascii'))
     const temporaryAddress = temporaryWalletAccount.address
     const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
 
@@ -217,7 +216,7 @@ export function* sendInvite(
 }
 
 function* initiateEscrowTransfer(temporaryAddress: string, e164Number: string, amount: BigNumber) {
-  const escrowTxId = generateStandbyTransactionId(temporaryAddress + '-escrow')
+  const escrowTxId = generateStandbyTransactionId(temporaryAddress)
   try {
     let phoneHash: string
     if (USE_PHONE_NUMBER_PRIVACY) {
@@ -309,8 +308,7 @@ export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
 export function* doRedeemInvite(inviteCode: string) {
   try {
     ValoraAnalytics.track(OnboardingEvents.invite_redeem_start)
-    const contractKit = yield call(getContractKit)
-    const tempAccount = contractKit.web3.eth.accounts.privateKeyToAccount(inviteCode).address
+    const tempAccount = privateKeyToAddress(inviteCode)
     Logger.debug(TAG + '@doRedeemInvite', 'Invite code contains temp account', tempAccount)
     const tempAccountBalanceWei: BigNumber = yield call(
       fetchTokenBalanceInWeiWithRetry,
@@ -365,7 +363,7 @@ function* addTempAccountToWallet(inviteCode: string) {
   Logger.debug(TAG + '@addTempAccountToWallet', 'Attempting to add temp wallet')
   try {
     // Import account into the local geth node
-    const wallet: RpcWallet = yield call(getConnectedWallet)
+    const wallet: RpcWallet = yield call(getWallet)
     const tempAccount = yield call([wallet, wallet.addAccount], inviteCode, TEMP_PW)
     Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount)
   } catch (e) {
@@ -384,7 +382,7 @@ export function* withdrawFundsFromTempAccount(
   newAccount: string
 ) {
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Unlocking temporary account')
-  const wallet: RpcWallet = yield call(getConnectedWallet)
+  const wallet: RpcWallet = yield call(getWallet)
   yield call([wallet, wallet.unlockAccount], tempAccount, TEMP_PW, 600)
 
   Logger.debug(

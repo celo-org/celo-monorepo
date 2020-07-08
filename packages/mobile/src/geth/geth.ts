@@ -20,6 +20,8 @@ export const FailedToFetchGenesisBlockError = new Error(
   'Failed to fetch genesis block from Google storage'
 )
 
+export const PROVIDER_CONNECTION_ERROR = "connection error: couldn't connect to node"
+
 // We are never going to run mobile node in full or fast mode.
 enum SyncMode {
   LIGHT = 'light',
@@ -108,12 +110,12 @@ async function createNewGeth(sync: boolean = true): Promise<typeof RNGeth> {
   return new RNGeth(gethOptions)
 }
 
-async function initGeth(sync: boolean = true) {
+export async function initGeth(sync: boolean = true): Promise<typeof gethInstance> {
   Logger.info('Geth@init', `Create a new Geth instance with sync=${sync}`)
 
   if (gethLock) {
     Logger.warn('Geth@init', 'Geth create already in progress.')
-    return
+    return null
   }
   gethLock = true
 
@@ -152,15 +154,18 @@ async function initGeth(sync: boolean = true) {
         throw e
       }
     }
+
+    return gethInstance
   } finally {
     gethLock = false
   }
 }
 
-export async function getGeth(sync: boolean = true): Promise<typeof gethInstance> {
-  Logger.debug('Geth@getGeth', 'Getting Geth Instance')
-  await initGeth(sync)
-  return gethInstance
+export function isProviderConnectionError(error: any) {
+  return error
+    ?.toString()
+    ?.toLowerCase()
+    .includes(PROVIDER_CONNECTION_ERROR)
 }
 
 async function ensureStaticNodesInitialized(sync: boolean = true): Promise<boolean> {
