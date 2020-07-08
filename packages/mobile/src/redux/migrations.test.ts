@@ -51,6 +51,10 @@ describe('Redux persist migrations', () => {
         ...v2Schema.send,
         recentPayments: [{ timestamp: Date.now(), amount: '100' }],
       },
+      account: {
+        ...v2Schema.account,
+        hasMigratedToNewBip39: false,
+      },
     }
     const migratedSchema = migrations[3](v2Stub)
     expect(migratedSchema.send.recentPayments.length).toEqual(0)

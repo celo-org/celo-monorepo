@@ -48,6 +48,10 @@ export const migrations = {
         ...state.send,
         recentPayments: [],
       },
+      account: {
+        ...state.account,
+        hasMigratedToNewBip39: false,
+      },
     }
   },
 }
