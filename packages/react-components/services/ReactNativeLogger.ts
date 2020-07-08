@@ -32,7 +32,7 @@ export default class ReactNativeLogger {
     const sanitizedError =
       error && shouldSanitizeError ? this.sanitizeError(error, valueToPurge) : error
     const errorMsg = this.getErrorMessage(sanitizedError)
-    console.info(`${tag}/${message}:${errorMsg}`)
+    console.info(`${tag} :: ${message} :: ${errorMsg}`)
     if (__DEV__) {
       console.info(console.trace())
     }

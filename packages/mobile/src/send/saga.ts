@@ -186,7 +186,7 @@ function* sendPaymentOrInviteSaga({
     }
 
     navigateHome()
-    yield put(sendPaymentOrInviteSuccess())
+    yield put(sendPaymentOrInviteSuccess(amount))
   } catch (e) {
     yield put(showError(ErrorMessages.SEND_PAYMENT_FAILED))
     yield put(sendPaymentOrInviteFailure())

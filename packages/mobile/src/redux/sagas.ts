@@ -2,7 +2,7 @@ import { AnyAction } from 'redux'
 import { call, select, spawn, takeEvery } from 'redux-saga/effects'
 import { accountSaga } from 'src/account/saga'
 import { devModeSelector } from 'src/account/selectors'
-import { appSaga, waitForRehydrate } from 'src/app/saga'
+import { appInit, appSaga } from 'src/app/saga'
 import { dappKitSaga } from 'src/dappkit/dappkit'
 import { escrowSaga } from 'src/escrow/saga'
 import { exchangeSaga } from 'src/exchange/saga'
@@ -16,6 +16,7 @@ import { importSaga } from 'src/import/saga'
 import { inviteSaga } from 'src/invite/saga'
 import { localCurrencySaga } from 'src/localCurrency/saga'
 import { networkInfoSaga } from 'src/networkInfo/saga'
+import { waitForRehydrate } from 'src/redux/persist-helper'
 import { sendSaga } from 'src/send/saga'
 import { sentrySaga } from 'src/sentry/saga'
 import { stableTokenSaga } from 'src/stableToken/saga'
@@ -43,7 +44,6 @@ const loggerBlacklist = [
 ]
 
 function* loggerSaga() {
-  yield call(waitForRehydrate)
   const devModeActive = yield select(devModeSelector)
   if (!devModeActive) {
     return
@@ -65,25 +65,31 @@ function* loggerSaga() {
 }
 
 export function* rootSaga() {
+  // Delay all sagas until rehydrate is done
+  // This prevents them from running with missing state
+  yield call(waitForRehydrate)
+  yield call(appInit)
+
+  // Note, the order of these does matter in certain cases
   yield spawn(loggerSaga)
   yield spawn(appSaga)
+  yield spawn(sentrySaga)
   yield spawn(networkInfoSaga)
   yield spawn(gethSaga)
+  yield spawn(web3Saga)
   yield spawn(accountSaga)
+  yield spawn(firebaseSaga)
+  yield spawn(homeSaga)
   yield spawn(identitySaga)
-  yield spawn(goldTokenSaga)
+  yield spawn(localCurrencySaga)
+  yield spawn(feesSaga)
   yield spawn(stableTokenSaga)
+  yield spawn(goldTokenSaga)
   yield spawn(sendSaga)
   yield spawn(exchangeSaga)
   yield spawn(transactionSaga)
-  yield spawn(homeSaga)
   yield spawn(escrowSaga)
-  yield spawn(firebaseSaga)
   yield spawn(inviteSaga)
   yield spawn(importSaga)
   yield spawn(dappKitSaga)
-  yield spawn(feesSaga)
-  yield spawn(localCurrencySaga)
-  yield spawn(sentrySaga)
-  yield spawn(web3Saga)
 }

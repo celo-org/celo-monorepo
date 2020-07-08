@@ -17,7 +17,7 @@ export async function storeItem({ key, value }: SecureStorage) {
       rules: Keychain.SECURITY_RULES.NONE,
     })
     if (result === false) {
-      throw new Error('Result false')
+      throw new Error('Store result false')
     }
     return result
   } catch (error) {
