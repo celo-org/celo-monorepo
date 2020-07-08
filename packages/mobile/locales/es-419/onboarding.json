@@ -35,6 +35,7 @@
     "header": "Confirmar número de teléfono",
     "body": "Para asegurarnos de que su número sea realmente suyo, le enviaremos tres mensajes.\n\nConfirmar su número lleva unos tres minutos.",
     "start": "Comienzo",
+    "resume": "Reanudar",
     "learnMore": "Aprende más"
   },
   "verificationSkipDialog": {

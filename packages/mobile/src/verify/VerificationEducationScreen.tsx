@@ -8,9 +8,10 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import i18n, { Namespaces } from 'src/i18n'
 import { setHasSeenVerificationNux } from 'src/identity/actions'
+import { attestationCodesSelector } from 'src/identity/reducer'
 import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers.v2'
 import { navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -30,6 +31,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
   const dispatch = useDispatch()
   const headerHeight = useHeaderHeight()
   const insets = useSafeAreaInsets()
+  const attestationCodes = useSelector(attestationCodesSelector)
 
   const onPressStart = () => {
     dispatch(setHasSeenVerificationNux(true))
@@ -64,7 +66,11 @@ function VerificationEducationScreen({ route, navigation }: Props) {
         </Text>
         <Text style={styles.body}>{t('verificationEducation.body')}</Text>
         <Button
-          text={t('verificationEducation.start')}
+          text={
+            attestationCodes.length
+              ? t('verificationEducation.resume')
+              : t('verificationEducation.start')
+          }
           onPress={onPressStart}
           type={BtnTypes.ONBOARDING}
           style={styles.startButton}
