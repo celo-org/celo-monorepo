@@ -89,7 +89,11 @@ const mapStateToProps = (state: RootState): StateProps => ({
 
 const AnimatedSectionList = Animated.createAnimatedComponent(SectionList)
 
-export class WalletHome extends React.Component<Props> {
+interface State {
+  isMigrating: boolean
+}
+
+export class WalletHome extends React.Component<Props, State> {
   scrollPosition: Animated.Value<number>
   onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => void
 
@@ -98,6 +102,7 @@ export class WalletHome extends React.Component<Props> {
 
     this.scrollPosition = new Animated.Value(0)
     this.onScroll = Animated.event([{ nativeEvent: { contentOffset: { y: this.scrollPosition } } }])
+    this.state = { isMigrating: false }
   }
 
   onRefresh = async () => {
@@ -154,6 +159,11 @@ export class WalletHome extends React.Component<Props> {
     )
   }
 
+  migrateAccount = () => {
+    this.setState({ isMigrating: true })
+    this.props.migrateAccount()
+  }
+
   render() {
     const { t, activeNotificationCount, callToActNotification } = this.props
 
@@ -201,11 +211,11 @@ export class WalletHome extends React.Component<Props> {
         <Dialog
           title={'Migrate to new Address'}
           children={
-            'Due to a developer configuration error, you will need to migrate your account to a new address, which will include verifying again. You can keep your seed phrase. Please post on slack if you have questions.'
+            'Due to a developer configuration error, you will need to migrate your account to a new address, which will include verifying again. You can keep your seed phrase. Do not close the app during migration. Please post on slack if you have questions.'
           }
           actionText={'Migrate'}
-          actionPress={this.props.migrateAccount}
-          isVisible={this.props.needsToMigrateToNewBip39}
+          actionPress={this.migrateAccount}
+          isVisible={this.props.needsToMigrateToNewBip39 && !this.state.isMigrating}
         />
       </SafeAreaView>
     )

@@ -5,7 +5,7 @@ import { DEV_SETTINGS_ACTIVE_INITIALLY } from 'src/config'
 import { features } from 'src/flags'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { getRemoteTime } from 'src/utils/time'
-import { ActionTypes as Web3ActionTypes } from 'src/web3/actions'
+import { Actions as Web3Actions, ActionTypes as Web3ActionTypes } from 'src/web3/actions'
 
 export interface State {
   name: string | null
@@ -199,12 +199,12 @@ export const reducer = (
     case Actions.ACCEPT_TERMS: {
       return { ...state, acceptedTerms: true }
     }
-    // case Web3Actions.SET_ACCOUNT: {
-    //   return {
-    //     ...state,
-    //     hasMigratedToNewBip39: true,
-    //   }
-    // }
+    case Web3Actions.SET_ACCOUNT: {
+      return {
+        ...state,
+        hasMigratedToNewBip39: true,
+      }
+    }
     default:
       return state
   }
