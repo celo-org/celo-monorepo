@@ -120,6 +120,7 @@ export function* sendTransactionPromises(
     // Use stableToken to pay fee, unless its balance is Zero
     // then use Celo (goldToken) to pay fee (pass undefined)
     // TODO: make it transparent for a user
+    // TODO: check for balance should be more than fee instead of zero
     stableTokenBalance.isGreaterThan(0)
       ? yield call(getCurrencyAddress, CURRENCY_ENUM.DOLLAR)
       : undefined,
