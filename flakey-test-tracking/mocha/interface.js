@@ -70,26 +70,27 @@ module.exports = function errTrackingBDDInterface(suite) {
       })
     }
     /**
+     * The following block is the only custom part of this interface.
+     *
      * Describe a specification or test-case
      * with the given `title` and callback `fn`
      * acting as a thunk.
      */
     context.it = context.specify = function(title, fn) {
       var suite = suites[0]
-      if (suite.isPending()) {
-        fn = null
+      var _fn
+      if (!suite.isPending()) {
+        _fn = async function() {
+          try {
+            await fn()
+          } catch (err) {
+            saveError(getTestIDFromSuite(suite, title), JSON.stringify(err))
+            throw err
+          }
+        }
       }
 
-      // The following block is the only custom part of this interface.
-      // Was originally `var test = new Test(title, fn)`.
-      var test = new Test(title, async function() {
-        try {
-          await fn()
-        } catch (err) {
-          saveError(getTestIDFromSuite(suite, title), JSON.stringify(err))
-          throw err
-        }
-      })
+      var test = new Test(title, _fn)
 
       test.file = file
       suite.addTest(test)

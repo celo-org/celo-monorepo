@@ -24,9 +24,7 @@ function FlakeReporter(runner) {
     if (flakes.length) {
       console.log('Flakey tests found. Sending to GitHub...')
       await processFlakes(
-        flakes.map((f) => {
-          fmtFlakeIssue(f, db.getErrors(f))
-        }),
+        flakes.map((f) => fmtFlakeIssue(f, db.getErrors(f))),
         github
       )
     } else {

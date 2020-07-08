@@ -1,5 +1,5 @@
 const NodeEnvironment = require('jest-environment-node')
-const FlakeTracker = require('./tracker')
+const FlakeTracker = require('../tracker')
 
 class FlakeTrackingNodeEnv extends NodeEnvironment {
   constructor(config) {
@@ -17,4 +17,4 @@ class FlakeTrackingNodeEnv extends NodeEnvironment {
   }
 }
 
-module.exports = FlakeTrackingEnvironment
+module.exports = FlakeTrackingNodeEnv
