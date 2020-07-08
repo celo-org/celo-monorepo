@@ -52,7 +52,9 @@ export async function handleGetBlindedMessageForSalt(
     // In the case of a DB or blockchain connection failure, don't block user
     // but set the error status accordingly
     try {
-      ;[performedQueryCount, totalQuota] = await getRemainingQueryCount(account, hashedPhoneNumber)
+      const queryCount = await getRemainingQueryCount(account, hashedPhoneNumber)
+      performedQueryCount = queryCount.performedQueryCount
+      totalQuota = queryCount.totalQuota
     } catch (error) {
       logger.error('Failed to get user quota', error)
       errorMsg = ErrorMessage.DATABASE_GET_FAILURE

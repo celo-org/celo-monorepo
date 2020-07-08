@@ -40,7 +40,7 @@ export class BLSCryptographyClient {
   /**
    * Returns true if the number of valid signatures is enough to perform a combination
    */
-  public sufficientVerifiedSignatures(): boolean {
+  public hasSufficientVerifiedSignatures(): boolean {
     const threshold = config.thresholdSignature.threshold
     return this.verifiedSignatures.length >= threshold
   }
@@ -50,7 +50,7 @@ export class BLSCryptographyClient {
    */
   public async combinePartialBlindedSignatures(): Promise<string> {
     const threshold = config.thresholdSignature.threshold
-    if (!this.sufficientVerifiedSignatures()) {
+    if (!this.hasSufficientVerifiedSignatures()) {
       logger.error(
         `${ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES} ${this.verifiedSignatures.length}/${threshold}`
       )

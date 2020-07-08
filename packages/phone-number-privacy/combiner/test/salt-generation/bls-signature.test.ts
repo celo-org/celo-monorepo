@@ -52,9 +52,9 @@ describe(`BLS service computes signature`, () => {
     for (let i = 0; i < signatures.length; i++) {
       await blsCryptoClient.addSignature(signatures[i], blindedMsg)
       if (i >= 2) {
-        expect(blsCryptoClient.sufficientVerifiedSignatures()).toBeTruthy()
+        expect(blsCryptoClient.hasSufficientVerifiedSignatures()).toBeTruthy()
       } else {
-        expect(blsCryptoClient.sufficientVerifiedSignatures()).toBeFalsy()
+        expect(blsCryptoClient.hasSufficientVerifiedSignatures()).toBeFalsy()
       }
     }
 

@@ -9,11 +9,14 @@ import { getContractKit, isVerified } from '../web3/contracts'
 /*
  * Returns the number of queries already performed and the calculated query quota.
  */
-export async function getRemainingQueryCount(account: string, hashedPhoneNumber?: string) {
+export async function getRemainingQueryCount(
+  account: string,
+  hashedPhoneNumber?: string
+): Promise<{ performedQueryCount: number; totalQuota: number }> {
   logger.debug('Retrieving remaining query count')
   const totalQuota = await getQueryQuota(account, hashedPhoneNumber)
   const performedQueryCount = await getPerformedQueryCount(account)
-  return [performedQueryCount, totalQuota]
+  return { performedQueryCount, totalQuota }
 }
 
 /*

@@ -60,6 +60,7 @@ export async function handleGetDistributedBlindedMessageForSalt(
 
 async function requestSignatures(request: Request, response: Response) {
   const responses: SignMsgRespWithStatus[] = []
+  const sentResult = { sent: false }
   const errorCodes: Map<number, number> = new Map()
   const blsCryptoClient = new BLSCryptographyClient()
 
@@ -69,7 +70,6 @@ async function requestSignatures(request: Request, response: Response) {
     const timeout = setTimeout(() => {
       controller.abort()
     }, config.pgpnpServices.timeoutMilliSeconds)
-    let sentResult: boolean = false
 
     return requestSignature(service, request, controller)
       .then(async (res: FetchResponse) => {
@@ -77,26 +77,16 @@ async function requestSignatures(request: Request, response: Response) {
         const url = service.url
         logger.info(`Service ${url} returned status ${status}`)
         if (res.ok) {
-          const signResponse = (await res.json()) as SignMessageResponse
-          if (!signResponse.success) {
-            // Continue on failure if signature is present to unblock user
-            const signResponseFailure = signResponse as SignMessageResponseFailure
-            logger.error(`${signResponseFailure.error} from signer ${service.url}`)
-          }
-          if (!signResponse.signature) {
-            throw new Error(`Signature is missing from signer ${service.url}`)
-          }
-          responses.push({ url: service.url, signMessageResponse: signResponse, status })
-          const partialSig = { url: service.url, signature: signResponse.signature }
-          await blsCryptoClient.addSignature(partialSig, request.body.blindedQueryPhoneNumber)
-          // Send response immediately once we cross threshold
-          if (!sentResult && blsCryptoClient.sufficientVerifiedSignatures()) {
-            const combinedSignature = await blsCryptoClient.combinePartialBlindedSignatures()
-            if (!sentResult) {
-              response.json({ success: true, combinedSignature, version: VERSION })
-              sentResult = true
-            }
-          }
+          await handleSuccessResponse(
+            res,
+            res.status,
+            response,
+            sentResult,
+            responses,
+            service.url,
+            blsCryptoClient,
+            request.body.blindedQueryPhoneNumber
+          )
         } else {
           errorCodes.set(status, (errorCodes.get(status) || 0) + 1)
         }
@@ -117,8 +107,40 @@ async function requestSignatures(request: Request, response: Response) {
 
   logResponseDiscrepancies(responses)
   const majorityErrorCode = getMajorityErrorCode(errorCodes)
-  if (!blsCryptoClient.sufficientVerifiedSignatures()) {
+  if (!blsCryptoClient.hasSufficientVerifiedSignatures()) {
     handleMissingSignatures(majorityErrorCode, response)
+  }
+}
+
+async function handleSuccessResponse(
+  res: FetchResponse,
+  status: number,
+  response: Response,
+  sentResult: { sent: boolean },
+  responses: SignMsgRespWithStatus[],
+  serviceUrl: string,
+  blsCryptoClient: BLSCryptographyClient,
+  blindedQueryPhoneNumber: string
+) {
+  const signResponse = (await res.json()) as SignMessageResponse
+  if (!signResponse.success) {
+    // Continue on failure as long as signature is present to unblock user
+    const signResponseFailure = signResponse as SignMessageResponseFailure
+    logger.error(`${signResponseFailure.error} from signer ${serviceUrl}`)
+  }
+  if (!signResponse.signature) {
+    throw new Error(`Signature is missing from signer ${serviceUrl}`)
+  }
+  responses.push({ url: serviceUrl, signMessageResponse: signResponse, status })
+  const partialSig = { url: serviceUrl, signature: signResponse.signature }
+  await blsCryptoClient.addSignature(partialSig, blindedQueryPhoneNumber)
+  // Send response immediately once we cross threshold
+  if (!sentResult.sent && blsCryptoClient.hasSufficientVerifiedSignatures()) {
+    const combinedSignature = await blsCryptoClient.combinePartialBlindedSignatures()
+    if (!sentResult.sent) {
+      response.json({ success: true, combinedSignature, version: VERSION })
+      sentResult.sent = true
+    }
   }
 }
 
@@ -126,7 +148,6 @@ function logResponseDiscrepancies(responses: SignMsgRespWithStatus[]) {
   // Only compare responses which have values for the quota fields
   const successfulResponses = responses.filter(
     (response) =>
-      response.status === 200 &&
       response.signMessageResponse &&
       response.signMessageResponse.performedQueryCount &&
       response.signMessageResponse.totalQuota &&
