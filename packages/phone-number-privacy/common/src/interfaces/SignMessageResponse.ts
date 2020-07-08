@@ -1,8 +1,13 @@
 export interface SignMessageResponse {
   success: boolean
-  signature?: string
   version?: string
-  error?: string
+  signature?: string
   performedQueryCount?: number
   totalQuota?: number
+  blockNumber?: number
+}
+
+export interface SignMessageResponseFailure extends SignMessageResponse {
+  success: false
+  error: string
 }
