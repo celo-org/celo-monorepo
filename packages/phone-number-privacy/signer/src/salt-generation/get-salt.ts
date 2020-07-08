@@ -63,8 +63,7 @@ export async function handleGetBlindedMessageForSalt(
       blockNumber = await getBlockNumber()
     } catch (error) {
       logger.error('Failed to get latest block number', error)
-      // Cody todo: Add as error code in common lib
-      errorMsg = 'CELO_PNP_ERR_11 SIG_ERR Failed to read contract state'
+      errorMsg = ErrorMessage.CONTRACT_GET_FAILURE
     }
 
     if (errorMsg !== ErrorMessage.DATABASE_GET_FAILURE && performedQueryCount >= totalQuota) {

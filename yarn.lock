@@ -2894,10 +2894,10 @@
     source-map-support "0.5.12"
     yargs "13.2.4"
 
-"@celo/phone-number-privacy-common@1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.3.tgz#7cdd4087a5a5598ccfb88ed69e6fa02cbdf5a6ce"
-  integrity sha512-xIebF/nuO/soimrLeFjAOD7J4cyzMR/NhYVoFP2rC4iS6VG0TGRa3OclukGDvJx0i4mmK9AitjvJAUsa2FUiOg==
+"@celo/phone-number-privacy-common@1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.4.tgz#80b0300bfd04096b627975f6846c173f5787ef4e"
+  integrity sha512-5cL14PQ3Ss8wyoOogGMbGmTLGOfeEkNkGgb6bABm0UVy/OwT5XHYx89pVUQtaI55dNxerZIx29syrbQnRZVLFA==
   dependencies:
     bignumber.js "^9.0.0"
 
