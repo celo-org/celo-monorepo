@@ -17,7 +17,7 @@ import { ALERT_BANNER_DURATION, USE_PHONE_NUMBER_PRIVACY } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
-import { CURRENCY_ENUM } from 'src/geth/consts'
+import { CURRENCY_ENUM, UNLOCK_DURATION } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
 import i18n from 'src/i18n'
 import { setHasSeenVerificationNux, updateE164PhoneNumberAddresses } from 'src/identity/actions'
@@ -328,7 +328,14 @@ export function* doRedeemInvite(inviteCode: string) {
 
     const newAccount = yield call(getOrCreateAccount)
     yield call(addTempAccountToWallet, inviteCode)
-    yield call(withdrawFundsFromTempAccount, tempAccount, tempAccountBalanceWei, newAccount)
+    yield call(
+      moveAllFundsFromAccount,
+      tempAccount,
+      tempAccountBalanceWei,
+      newAccount,
+      CURRENCY_ENUM.DOLLAR,
+      SENTINEL_INVITE_COMMENT
+    )
     yield put(fetchDollarBalance())
     ValoraAnalytics.track(OnboardingEvents.invite_redeem_complete)
     return true
@@ -381,26 +388,27 @@ function* addTempAccountToWallet(inviteCode: string) {
   }
 }
 
-export function* withdrawFundsFromTempAccount(
-  tempAccount: string,
-  tempAccountBalanceWei: BigNumber,
-  newAccount: string,
-  currency?: CURRENCY_ENUM
+export function* moveAllFundsFromAccount(
+  account: string,
+  accountBalanceWei: BigNumber,
+  toAccount: string,
+  currency: CURRENCY_ENUM,
+  comment: string
 ) {
-  Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Unlocking temporary account')
+  Logger.debug(TAG + '@moveAllFundsFromAccount', 'Unlocking account')
   const wallet: RpcWallet = yield call(getConnectedWallet)
-  const password: string = yield call(getPasswordSaga, tempAccount, false, true)
-  yield call([wallet, wallet.unlockAccount], tempAccount, password, 600)
+  const password: string = yield call(getPasswordSaga, account, false, true)
+  yield call([wallet, wallet.unlockAccount], account, password, UNLOCK_DURATION)
 
   Logger.debug(
-    TAG + '@withdrawFundsFromTempAccount',
-    `Temp account balance is ${tempAccountBalanceWei.toString()}. Calculating withdrawal fee`
+    TAG + '@moveAllFundsFromAccount',
+    `Temp account balance is ${accountBalanceWei.toString()}. Calculating withdrawal fee`
   )
-  const tempAccountBalance = divideByWei(tempAccountBalanceWei)
-  const sendTokenFeeInWei: BigNumber = yield call(getSendFee, tempAccount, CURRENCY_ENUM.DOLLAR, {
-    recipientAddress: newAccount,
+  const tempAccountBalance = divideByWei(accountBalanceWei)
+  const sendTokenFeeInWei: BigNumber = yield call(getSendFee, account, currency, {
+    recipientAddress: toAccount,
     amount: tempAccountBalance,
-    comment: SENTINEL_INVITE_COMMENT,
+    comment,
   })
   // Inflate fee by 10% to harden against minor gas changes
   const sendTokenFee = divideByWei(sendTokenFeeInWei).times(1.1)
@@ -411,22 +419,18 @@ export function* withdrawFundsFromTempAccount(
 
   const netSendAmount = tempAccountBalance.minus(sendTokenFee)
   Logger.debug(
-    TAG + '@withdrawFundsFromTempAccount',
+    TAG + '@moveAllFundsFromAccount',
     `Withdrawing net amount of ${netSendAmount.toString()}`
   )
 
-  const tx: CeloTransactionObject<boolean> = yield call(
-    createTokenTransferTransaction,
-    currency ? currency : CURRENCY_ENUM.DOLLAR,
-    {
-      recipientAddress: newAccount,
-      amount: netSendAmount,
-      comment: SENTINEL_INVITE_COMMENT,
-    }
-  )
+  const tx: CeloTransactionObject<boolean> = yield call(createTokenTransferTransaction, currency, {
+    recipientAddress: toAccount,
+    amount: netSendAmount,
+    comment,
+  })
 
-  yield call(sendTransaction, tx.txo, tempAccount, TAG, 'Transfer from temp wallet')
-  Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Done withdrawal')
+  yield call(sendTransaction, tx.txo, account, TAG, 'Transfer from temp wallet')
+  Logger.debug(TAG + '@moveAllFundsFromAccount', 'Done withdrawal')
 }
 
 export function* watchSendInvite() {

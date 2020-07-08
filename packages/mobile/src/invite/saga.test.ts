@@ -21,9 +21,9 @@ import {
 } from 'src/invite/actions'
 import {
   generateInviteLink,
+  moveAllFundsFromAccount,
   watchRedeemInvite,
   watchSendInvite,
-  withdrawFundsFromTempAccount,
 } from 'src/invite/saga'
 import { getSendFee } from 'src/send/saga'
 import { fetchDollarBalance, transferStableToken } from 'src/stableToken/actions'
@@ -210,7 +210,7 @@ describe(watchRedeemInvite, () => {
       .provide([
         [call(waitWeb3LastBlock), true],
         [call(getOrCreateAccount), mockAccount],
-        [matchers.call.fn(withdrawFundsFromTempAccount), throwError(new Error('fake error'))],
+        [matchers.call.fn(moveAllFundsFromAccount), throwError(new Error('fake error'))],
       ])
       .withState(state)
       .dispatch(redeemInvite(mockKey))

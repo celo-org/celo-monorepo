@@ -69,7 +69,10 @@ export const initializeAuth = async (app: ReactNativeFirebase.Module, address: s
     } else if (userData.address !== undefined && userData.address !== address) {
       // This shouldn't happen! If this is thrown it means the firebase user is reused
       // with different addresses (which we don't want) or the db was incorrectly changed remotely!
-      // throw new Error("User address in the db doesn't match persisted address")
+      Logger.debug("User address in the db doesn't match persisted address - updating address")
+      return {
+        address,
+      }
     }
   })
   Logger.info(TAG, 'Firebase Auth initialized successfully')

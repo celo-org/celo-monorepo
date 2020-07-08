@@ -16,9 +16,11 @@ import {
 import Animated from 'react-native-reanimated'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
+import { migrateAccount } from 'src/account/actions'
+import { needsToMigrateToNewBip39 } from 'src/account/selectors'
 import { showMessage } from 'src/alert/actions'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { exitBackupFlow, migrateAccount } from 'src/app/actions'
+import { exitBackupFlow } from 'src/app/actions'
 import Dialog from 'src/components/Dialog'
 import { ALERT_BANNER_DURATION, DEFAULT_TESTNET, SHOW_TESTNET_BANNER } from 'src/config'
 import { CURRENCY_ENUM } from 'src/geth/consts'
@@ -49,6 +51,7 @@ interface StateProps {
   recipientCache: NumberToRecipient
   appConnected: boolean
   numberVerified: boolean
+  needsToMigrateToNewBip39: boolean
 }
 
 interface DispatchProps {
@@ -81,6 +84,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   recipientCache: recipientCacheSelector(state),
   appConnected: isAppConnected(state),
   numberVerified: state.app.numberVerified,
+  needsToMigrateToNewBip39: needsToMigrateToNewBip39(state),
 })
 
 const AnimatedSectionList = Animated.createAnimatedComponent(SectionList)
@@ -117,12 +121,6 @@ export class WalletHome extends React.Component<Props, State> {
     // Waiting 1/2 sec before triggering to allow
     // rest of feed to load unencumbered
     setTimeout(this.tryImportContacts, 500)
-
-    this.checkMigration()
-  }
-
-  async checkMigration() {
-    this.setState({ showMigration: true })
   }
 
   tryImportContacts = async () => {
@@ -212,7 +210,7 @@ export class WalletHome extends React.Component<Props, State> {
           }
           actionText={'Migrate'}
           actionPress={this.props.migrateAccount}
-          isVisible={this.state.showMigration}
+          isVisible={this.props.needsToMigrateToNewBip39}
         />
       </SafeAreaView>
     )
