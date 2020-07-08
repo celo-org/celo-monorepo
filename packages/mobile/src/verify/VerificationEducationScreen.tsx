@@ -8,23 +8,17 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useDispatch } from 'react-redux'
-import { ErrorMessages } from 'src/app/ErrorMessages'
-import ErrorMessageInline from 'src/components/ErrorMessageInline'
+import { useDispatch, useSelector } from 'react-redux'
 import i18n, { Namespaces } from 'src/i18n'
 import { setHasSeenVerificationNux } from 'src/identity/actions'
-import { isUserBalanceSufficient } from 'src/identity/utils'
-import { INVITE_FEE } from 'src/invite/saga'
+import { attestationCodesSelector } from 'src/identity/reducer'
 import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers.v2'
 import { navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
-import useSelector from 'src/redux/useSelector'
 import VerificationLearnMoreDialog from 'src/verify/VerificationLearnMoreDialog'
 import VerificationSkipDialog from 'src/verify/VerificationSkipDialog'
-
-const VERIFICATION_FEE_ESTIMATE = Number(INVITE_FEE) * 0.9
 
 type ScreenProps = StackScreenProps<StackParamList, Screens.VerificationEducationScreen>
 
@@ -33,22 +27,13 @@ type Props = ScreenProps
 function VerificationEducationScreen({ route, navigation }: Props) {
   const showSkipDialog = route.params?.showSkipDialog || false
   const [showLearnMoreDialog, setShowLearnMoreDialog] = useState(false)
-  const [hasPressedStart, setHasPressedStart] = useState(false)
   const { t } = useTranslation(Namespaces.onboarding)
-  const userBalance = useSelector((state) => state.stableToken.balance)
-  const balanceIsSufficient = isUserBalanceSufficient(userBalance, VERIFICATION_FEE_ESTIMATE)
-  // For now only show error if user has pressed start
-  // with the idea being that by the time the user is done reading the screen the balance will already be known
-  const showError = hasPressedStart && !balanceIsSufficient
   const dispatch = useDispatch()
   const headerHeight = useHeaderHeight()
   const insets = useSafeAreaInsets()
+  const attestationCodes = useSelector(attestationCodesSelector)
 
   const onPressStart = () => {
-    setHasPressedStart(true)
-    if (!balanceIsSufficient) {
-      return
-    }
     dispatch(setHasSeenVerificationNux(true))
     navigation.navigate(Screens.VerificationLoadingScreen)
   }
@@ -81,18 +66,16 @@ function VerificationEducationScreen({ route, navigation }: Props) {
         </Text>
         <Text style={styles.body}>{t('verificationEducation.body')}</Text>
         <Button
-          text={t('verificationEducation.start')}
-          disabled={showError}
+          text={
+            attestationCodes.length
+              ? t('verificationEducation.resume')
+              : t('verificationEducation.start')
+          }
           onPress={onPressStart}
           type={BtnTypes.ONBOARDING}
           style={styles.startButton}
           testID="VerificationEducationContinue"
         />
-        {showError && (
-          <ErrorMessageInline
-            error={balanceIsSufficient ? null : ErrorMessages.INSUFFICIENT_BALANCE}
-          />
-        )}
         <View style={styles.spacer} />
         <TextButton style={styles.learnMoreButton} onPress={onPressLearnMore}>
           {t('verificationEducation.learnMore')}
