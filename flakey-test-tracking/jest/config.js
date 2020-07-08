@@ -47,7 +47,7 @@ const detoxFlakeTracking = shouldTrackFlakes
     }
 
 module.exports = {
-  nodeFlakeTracking: nodeFlakeTracking,
-  jsdomFlakeTracking: jsdomFlakeTracking,
   detoxFlakeTracking: detoxFlakeTracking,
+  jsdomFlakeTracking: jsdomFlakeTracking,
+  nodeFlakeTracking: nodeFlakeTracking,
 }
