@@ -235,7 +235,7 @@ describe('AwsHsmWallet class', () => {
           expect(normalizeAddressWith0x(recoveredSigner)).toBe(normalizeAddressWith0x(knownAddress))
         })
         // https://github.com/ethereum/go-ethereum/blob/38aab0aa831594f31d02c9f02bfacc0bef48405d/rlp/decode.go#L664
-        test.skip('signature with 0x00 prefix is canonicalized', async () => {
+        test('signature with 0x00 prefix is canonicalized', async () => {
           // This tx is carefully constructed to produce an S value with the first byte as 0x00
           const celoTransactionZeroPrefix = {
             from: await wallet.getAddressFromKeyId(knownKey),
