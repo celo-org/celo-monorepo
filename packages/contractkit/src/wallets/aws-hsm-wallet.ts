@@ -1,6 +1,6 @@
-import { Address } from '@celo/utils/lib/address'
+import { Address, publicKeyToAddress } from '@celo/utils/lib/address'
 import { KMS } from 'aws-sdk'
-import { addressFromAsn1 } from '../utils/ber-utils'
+import { publicKeyFromAsn1 } from '../utils/ber-utils'
 import { RemoteWallet } from './remote-wallet'
 import AwsHsmSigner from './signers/aws-hsm-signer'
 import { Signer } from './signers/signer'
@@ -22,8 +22,10 @@ export default class AwsHsmWallet extends RemoteWallet implements Wallet {
           continue
         }
 
+        const { PublicKey } = await this.kms.getPublicKey({ KeyId: KeyId! }).promise()
+        const publicKey = publicKeyFromAsn1(Buffer.from(PublicKey as Uint8Array))
         const address = await this.getAddressFromKeyId(KeyId!)
-        addressToSigner.set(address, new AwsHsmSigner(this.kms, KeyId!, address))
+        addressToSigner.set(address, new AwsHsmSigner(this.kms, KeyId!, publicKey))
       } catch (e) {
         // todo: what does the error look like here
         throw e
@@ -41,6 +43,6 @@ export default class AwsHsmWallet extends RemoteWallet implements Wallet {
       throw new Error('AwsHsmWallet needs to be initialised first')
     }
     const { PublicKey } = await this.kms.getPublicKey({ KeyId: keyId }).promise()
-    return addressFromAsn1(PublicKey as Buffer)
+    return publicKeyToAddress(publicKeyFromAsn1(Buffer.from(PublicKey as Uint8Array)))
   }
 }

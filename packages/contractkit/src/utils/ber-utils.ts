@@ -1,4 +1,4 @@
-import { publicKeyToAddress } from '@celo/utils/lib/address'
+import { ensureLeading0x } from '@celo/utils/lib/address'
 import * as asn1 from 'asn1js'
 
 export const toArrayBuffer = (buffer: Buffer): ArrayBuffer => {
@@ -10,11 +10,11 @@ export const toArrayBuffer = (buffer: Buffer): ArrayBuffer => {
   return ab
 }
 
-export function addressFromAsn1(buf: Buffer): string {
+export function publicKeyFromAsn1(buf: Buffer): string {
   const { result } = asn1.fromBER(toArrayBuffer(buf))
   const values = (result as asn1.Sequence).valueBlock.value
   const value = values[1] as asn1.BitString
-  return publicKeyToAddress(Buffer.from(value.valueBlock.valueHex.slice(1)).toString('hex'))
+  return ensureLeading0x(Buffer.from(value.valueBlock.valueHex.slice(1)).toString('hex'))
 }
 
 /**

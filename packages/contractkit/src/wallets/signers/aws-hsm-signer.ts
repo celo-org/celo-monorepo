@@ -1,24 +1,25 @@
 import { ensureLeading0x, publicKeyToAddress, trimLeading0x } from '@celo/utils/lib/address'
 import { KMS } from 'aws-sdk'
-import { ec as EC } from 'elliptic'
+// import { ec as EC } from 'elliptic'
 import * as ethUtil from 'ethereumjs-util'
 import { parseBERSignature } from '../../utils/ber-utils'
-import { bigNumberToBuffer, bufferToBigNumber, isCanonical } from '../../utils/signature-utils'
+import { bigNumberToBuffer, bufferToBigNumber } from '../../utils/signature-utils'
 import { getHashFromEncoded, RLPEncodedTx } from '../../utils/signing-utils'
 import { Signer } from './signer'
 
 const SigningAlgorithm = 'ECDSA_SHA_256'
-const secp256k1Curve = new EC('secp256k1')
+// const secp256k1Curve = new EC('secp256k1')
 
+// @ts-ignore
 function getRecoveryParam(message: Buffer, expectedAddress: string, r: Buffer, s: Buffer): number {
-  for (let i = 0; i < 2; i++) {
-    try {
-      const recoveredPublicKey = ethUtil.ecrecover(message, i + 27, r, s) as Buffer
-      if (publicKeyToAddress(recoveredPublicKey.toString('hex')) !== expectedAddress) {
-        throw new Error('invalid public key recovered')
-      }
+  for (let i = 0; i < 4; i++) {
+    const recoveredPublicKeyByteArray = ethUtil.ecrecover(message, i + 27, r, s)
+    const publicKeyBuff = Buffer.from(recoveredPublicKeyByteArray)
+
+    const pub = bigNumberToBuffer(bufferToBigNumber(publicKeyBuff), 64)
+    if (publicKeyToAddress(ensureLeading0x(pub.toString('hex'))) === expectedAddress) {
       return i
-    } catch (e) {}
+    }
   }
 
   throw new Error('unable to recover public key from signature')
@@ -27,12 +28,45 @@ function getRecoveryParam(message: Buffer, expectedAddress: string, r: Buffer, s
 export default class AwsHsmSigner implements Signer {
   private kms: KMS
   private keyId: string
+  // @ts-ignore
+  private publicKey: string
   private address: string
 
-  constructor(kms: KMS, keyId: string, address: string) {
+  constructor(kms: KMS, keyId: string, publicKey: string) {
     this.kms = kms
     this.keyId = keyId
-    this.address = address
+    this.publicKey = publicKey
+    this.address = publicKeyToAddress(publicKey)
+  }
+
+  private async sign(buffer: Buffer): Promise<{ v: number; r: Buffer; s: Buffer }> {
+    const { Signature: signature } = await this.kms
+      .sign({
+        KeyId: this.keyId,
+        MessageType: 'DIGEST',
+        Message: buffer,
+        SigningAlgorithm,
+      })
+      .promise()
+    const { r, s } = parseBERSignature(signature as Buffer)
+    const R = bufferToBigNumber(r)
+    let S = bufferToBigNumber(s)
+
+    // const N = bufferToBigNumber(secp256k1Curve.curve.n)
+    // if (!isCanonical(S, N)) {
+    //   console.log('is not canonical!')
+    //   S = N.minus(S)
+    // }
+
+    const rBuff = bigNumberToBuffer(R, 32)
+    const sBuff = bigNumberToBuffer(S, 32)
+    const recoveryParam = getRecoveryParam(buffer, this.address, r, s)
+
+    return {
+      r: rBuff,
+      s: sBuff,
+      v: recoveryParam,
+    }
   }
 
   async signTransaction(
@@ -41,62 +75,24 @@ export default class AwsHsmSigner implements Signer {
   ): Promise<{ v: number; r: Buffer; s: Buffer }> {
     const hash = getHashFromEncoded(encodedTx.rlpEncode)
     const bufferedMessage = Buffer.from(trimLeading0x(hash), 'hex')
-    const { Signature: signature } = await this.kms
-      .sign({
-        KeyId: this.keyId,
-        MessageType: 'DIGEST',
-        Message: bufferedMessage,
-        SigningAlgorithm,
-      })
-      .promise()
-    const { r, s } = parseBERSignature(signature as Buffer)
-    const R = bufferToBigNumber(r)
-    let S = bufferToBigNumber(s)
-
-    const N = bufferToBigNumber(secp256k1Curve.curve.n)
-    if (!isCanonical(S, N)) {
-      S = N.minus(S)
-    }
-
-    const rBuff = bigNumberToBuffer(R, 32)
-    const sBuff = bigNumberToBuffer(S, 32)
-    const recoveryParam = getRecoveryParam(bufferedMessage, this.address, r, s)
+    const { v, r, s } = await this.sign(bufferedMessage)
 
     return {
-      v: recoveryParam + addToV,
-      r: rBuff,
-      s: sBuff,
+      v: v + addToV,
+      r,
+      s,
     }
   }
 
   async signPersonalMessage(data: string): Promise<{ v: number; r: Buffer; s: Buffer }> {
     const dataBuff = ethUtil.toBuffer(ensureLeading0x(data))
     const msgHashBuff = ethUtil.hashPersonalMessage(dataBuff) as Buffer
-    const { Signature: signature } = await this.kms
-      .sign({
-        KeyId: this.keyId,
-        MessageType: 'DIGEST',
-        Message: msgHashBuff,
-        SigningAlgorithm,
-      })
-      .promise()
-    const { r, s } = parseBERSignature(signature as Buffer)
-    const R = bufferToBigNumber(r)
-    let S = bufferToBigNumber(s)
-
-    const N = bufferToBigNumber(secp256k1Curve.curve.n)
-    if (!isCanonical(S, N)) {
-      S = N.minus(S)
-    }
-
-    const rBuff = bigNumberToBuffer(R, 32)
-    const sBuff = bigNumberToBuffer(S, 32)
-    const recoveryParam = getRecoveryParam(msgHashBuff, this.address, r, s)
+    const { v, r, s } = await this.sign(msgHashBuff)
 
     return {
-      v: recoveryParam + 27,
-      r: rBuff,
-      s: sBuff,
+      v: v + 27,
+      r,
+      s,
     }
   }
 
