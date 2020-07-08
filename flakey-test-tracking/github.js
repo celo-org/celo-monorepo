@@ -64,7 +64,7 @@ class GitHub {
   }
 
   async issue(flake) {
-    const callback = () => {
+    const fn = () => {
       return this.rest.issues.create({
         ...defaults,
         title: flake.title,
@@ -75,11 +75,11 @@ class GitHub {
 
     const errMsg = 'Failed to create issue for flakey test. ' + 'Title: "' + flake.title + '",'
 
-    await this.execute(callback, errMsg)
+    await this.safeExec(fn, errMsg)
   }
 
   async check(flake) {
-    const callback = () => {
+    const fn = () => {
       return this.rest.checks.create({
         ...defaults,
         name: 'Flake Tracking',
@@ -89,7 +89,7 @@ class GitHub {
 
     const errMsg = 'Failed to create check run.'
 
-    await this.execute(callback, errMsg)
+    await this.safeExec(fn, errMsg)
 
     // TODO(Alec, next): add checks
     // console.log('PR COMMENT TRIGGERED \n')
@@ -118,7 +118,7 @@ class GitHub {
   }
 
   async fetchKnownFlakes() {
-    const callback = () => {
+    const fn = () => {
       return this.rest.paginate(this.rest.issues.listForRepo, {
         ...defaults,
         state: 'open',
@@ -128,16 +128,16 @@ class GitHub {
 
     const errMsg = 'Failed to fetch existing flakey test issues from GitHub.'
 
-    const flakeIssues = (await this.execute(callback, errMsg)) || []
+    const flakeIssues = (await this.safeExec(fn, errMsg)) || []
 
     return flakeIssues.map((i) => i.title.replace('[FLAKEY TEST]', '').trim())
   }
 
-  // Retries callback with fresh token if expired
-  async execute(callback, errMsg) {
+  // Retries fn with fresh token if expired
+  async safeExec(fn, errMsg) {
     for (let i = 0; i < 2; i++) {
       try {
-        return await callback()
+        return await fn()
       } catch (error) {
         if (i > 0 || error !== 'HttpError: Bad credentials') {
           console.error('\n' + errMsg + ' ' + error)
