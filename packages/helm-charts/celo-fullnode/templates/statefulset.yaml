@@ -29,6 +29,8 @@ spec:
       labels:
 {{ include "celo-fullnode.labels" .  | indent 8 }}
     spec:
+      serviceAccountName: {{ template "common.fullname" . }}
+      automountServiceAccountToken: false
       initContainers:
 {{ include "common.init-genesis-container" .  | indent 6 }}
       containers:

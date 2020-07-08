@@ -1,0 +1,6 @@
+dependencies:
+- name: pod-security-policies
+  repository: file://../pod-security-policies
+  version: 1.0.0
+digest: sha256:8ece416e163570927b7153cd2b926278df85a30f564b75ba30dbf230f7e9bdad
+generated: 2020-07-08T12:40:11.109676091-07:00

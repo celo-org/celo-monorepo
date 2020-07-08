@@ -1,0 +1,11 @@
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: psp-{{ template "name" . }}
+roleRef:
+  kind: ClusterRole
+  name: psp-restricted-cluster-role # References the ClusterRole created in pod-security-policies
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- kind: ServiceAccount
+  name: {{ template "name" . }}

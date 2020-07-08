@@ -22,6 +22,7 @@ spec:
         prometheus.io/port: "{{ .Values.nmi.prometheusPort }}"
     spec:
       serviceAccountName: aad-pod-id-mic-service-account
+      automountServiceAccountToken: false
       containers:
       - name: mic
         image: {{ .Values.mic.image.repo }}:{{ .Values.mic.image.tag }}

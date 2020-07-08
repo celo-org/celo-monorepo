@@ -1,0 +1,13 @@
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: psp-restricted-allow-root-cluster-role
+rules:
+- apiGroups:
+  - policy
+  resources:
+  - podsecuritypolicies
+  resourceNames:
+  - restricted-allow-root-psp
+  verbs:
+  - use

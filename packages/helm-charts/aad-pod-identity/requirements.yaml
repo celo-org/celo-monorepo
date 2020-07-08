@@ -1,7 +1,4 @@
 dependencies:
-  - name: common
-    repository: file://../common
-    version: 0.1.0
   - name: pod-security-policies
     version: 1.0.0
     repository: file://../pod-security-policies

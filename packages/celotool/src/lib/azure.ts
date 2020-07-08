@@ -1,7 +1,7 @@
 import { createNamespaceIfNotExists } from 'src/lib/cluster'
 import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { doCheckOrPromptIfStagingOrProduction } from 'src/lib/env-utils'
-import { installAndEnableMetricsDeps, redeployTiller } from 'src/lib/helm_deploy'
+import { installAndEnableMetricsDeps, upgradeGenericHelmChart, redeployTiller } from 'src/lib/helm_deploy'
 import { outputIncludes, retryCmd } from 'src/lib/utils'
 
 /**
@@ -84,11 +84,17 @@ async function installAADPodIdentity() {
     `aad-pod-identity`,
     `aad-pod-identity exists, skipping install`
   )
-  if (!aadPodIdentityExists) {
+  if (true || !aadPodIdentityExists) {
     console.info('Installing aad-pod-identity')
-    await execCmdWithExitOnFailure(
-      `helm install --name aad-pod-identity ../helm-charts/aad-pod-identity`
+    await upgradeGenericHelmChart(
+      'default',
+      'aad-pod-identity',
+      '../helm-charts/aad-pod-identity',
+      []
     )
+    // await execCmdWithExitOnFailure(
+    //   `helm install --name aad-pod-identity ../helm-charts/aad-pod-identity`
+    // )
   }
 }
 

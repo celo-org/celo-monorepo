@@ -37,6 +37,8 @@ spec:
 {{ include "metric-annotations" . | indent 8 }}
 {{ end }}
     spec:
+      serviceAccountName: {{ template "name" . }}
+      automountServiceAccountToken: false
       initContainers:
       - name: set-label
         image: {{ .Values.kubectl.image.repository }}:{{ .Values.kubectl.image.tag }}
@@ -47,11 +49,12 @@ spec:
         - |
           RID=${POD_NAME##*-}
           TOKEN_ENV_VAR_NAME="TOKEN_$RID"
+          echo "$CERTIFICATE_AUTHORITY" > /tmp/ca.crt
           kubectl \
           --namespace "$POD_NAMESPACE" \
           --server="https://kubernetes.default.svc" \
           --token="${!TOKEN_ENV_VAR_NAME}" \
-          --certificate-authority="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt" \
+          --certificate-authority="/tmp/ca.crt" \
           label pod "$POD_NAME" \
           --overwrite \
           "aadpodidbinding=$POD_NAME-identity-binding"
@@ -71,6 +74,11 @@ spec:
               key: token
               name: {{ $e }}
         {{ end }}
+        - name: CERTIFICATE_AUTHORITY
+          valueFrom:
+            secretKeyRef:
+              key: ca.crt
+              name: {{ (index .Values.kube.serviceAccountSecretNames 0) }}
       containers:
       - name: oracle-client
         image: {{ .Values.image.repository }}:{{ .Values.image.tag }}

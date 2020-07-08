@@ -24,6 +24,7 @@ spec:
         prometheus.io/port: "{{ .Values.nmi.prometheusPort }}"
     spec:
       serviceAccountName: aad-pod-id-nmi-service-account
+      automountServiceAccountToken: false
       hostNetwork: true
       volumes:
       - hostPath:

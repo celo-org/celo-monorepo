@@ -1,0 +1,14 @@
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: aad-pod-id-nmi-psp-binding
+  labels:
+    k8s-app: aad-pod-id-nmi-psp-binding
+subjects:
+- kind: ServiceAccount
+  name: aad-pod-id-nmi-service-account
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: psp-privileged-cluster-role # nmi needs privileged access
+  apiGroup: rbac.authorization.k8s.io
