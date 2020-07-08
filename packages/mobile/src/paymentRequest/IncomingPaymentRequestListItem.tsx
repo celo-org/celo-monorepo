@@ -4,10 +4,13 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
+import { HomeEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { declinePaymentRequest } from 'src/firebase/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
+import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { AddressValidationType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
@@ -39,6 +42,11 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
       firebasePendingRequestUid: id,
     }
 
+    ValoraAnalytics.track(HomeEvents.notification_select, {
+      notificationType: NotificationBannerTypes.incoming_tx_request,
+      selectedAction: NotificationBannerCTATypes.pay,
+    })
+
     if (addressValidationType && addressValidationType !== AddressValidationType.NONE) {
       navigate(Screens.ValidateRecipientIntro, { transactionData, addressValidationType })
     } else {
@@ -48,6 +56,10 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
 
   onPaymentDecline = () => {
     const { id } = this.props
+    ValoraAnalytics.track(HomeEvents.notification_select, {
+      notificationType: NotificationBannerTypes.incoming_tx_request,
+      selectedAction: NotificationBannerCTATypes.decline,
+    })
     this.props.declinePaymentRequest(id)
     Logger.showMessage(this.props.t('requestDeclined'))
   }

@@ -24,6 +24,7 @@ export enum Actions {
   SET_PROMPT_FORNO = 'ACCOUNT/SET_PROMPT_FORNO',
   SET_RETRY_VERIFICATION_WITH_FORNO = 'ACCOUNT/SET_RETRY_VERIFICATION_WITH_FORNO',
   ACCEPT_TERMS = 'ACCOUNT/ACCEPT_TERMS',
+  MIGRATE_ACCOUNT_BIP39 = 'MIGRATE_ACCOUNT_BIP39',
 }
 
 export interface SetNameAction {
@@ -121,6 +122,10 @@ export interface SetRetryVerificationWithFornoAction {
   retry: boolean
 }
 
+export interface MigrateAccount {
+  type: Actions.MIGRATE_ACCOUNT_BIP39
+}
+
 export type ActionTypes =
   | SetNameAction
   | SetPhoneNumberAction
@@ -143,6 +148,7 @@ export type ActionTypes =
   | SetPromptFornoAction
   | SetRetryVerificationWithFornoAction
   | AcceptTermsAction
+  | MigrateAccount
 
 export function setName(name: string): SetNameAction {
   return {
@@ -251,4 +257,8 @@ export const setUserContactDetails = (
   type: Actions.SET_USER_CONTACT_DETAILS,
   contactId,
   thumbnailPath,
+})
+
+export const migrateAccount = (): MigrateAccount => ({
+  type: Actions.MIGRATE_ACCOUNT_BIP39,
 })

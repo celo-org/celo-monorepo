@@ -3,27 +3,23 @@ import 'react-native'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import Education, { Props } from 'src/account/Education'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import Education, { EducationTopic, EmbeddedNavBar } from 'src/account/Education'
 import { navigateBack } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
 import { createMockStore } from 'test/utils'
 
 const BUTTON_TEXT = 'Done'
 
-const educationProps: Props = {
+const educationProps = {
   stepInfo: [
     {
       image: null,
+      topic: EducationTopic.celo,
       title: 'Step 1',
       text: 'The Journey Begins',
-      cancelEvent: AnalyticsEvents.gold_cancel1,
-      progressEvent: AnalyticsEvents.gold_educate_1_next,
-      screenName: Screens.Debug,
     },
   ],
   buttonText: 'next',
-  isClosable: true,
+  embeddedNavBar: EmbeddedNavBar.Close,
   finalButtonText: BUTTON_TEXT,
   onFinish: jest.fn(),
 }
