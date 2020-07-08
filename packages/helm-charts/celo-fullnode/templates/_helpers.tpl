@@ -46,3 +46,12 @@ component: celo-fullnode
   protocol: TCP
   name: ws
 {{- end -}}
+
+{{/*
+Annotations to indicate to the prometheus server that this node should be scraped for metrics
+*/}}
+{{- define "prometheus-annotations" -}}
+prometheus.io/scrape: "true"
+prometheus.io/path:  "{{ .Values.pprof.path }}"
+prometheus.io/port: "{{ .Values.pprof.port }}"
+{{- end -}}

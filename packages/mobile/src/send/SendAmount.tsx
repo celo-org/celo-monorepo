@@ -152,15 +152,12 @@ function SendAmount(props: Props) {
     }
   }, [amount, setAmount])
 
-  const getDollarAmount = React.useCallback(
-    (localAmount: BigNumber.Value) => {
-      const dollarsAmount =
-        convertLocalAmountToDollars(localAmount, localCurrencyExchangeRate) || new BigNumber('')
+  const getDollarAmount = (localAmount: BigNumber.Value) => {
+    const dollarsAmount =
+      convertLocalAmountToDollars(localAmount, localCurrencyExchangeRate) || new BigNumber('')
 
-      return convertDollarsToMaxSupportedPrecision(dollarsAmount)
-    },
-    [localCurrencyExchangeRate]
-  )
+    return convertDollarsToMaxSupportedPrecision(dollarsAmount)
+  }
 
   const parsedLocalAmount = parseInputAmount(amount, decimalSeparator)
   const dollarAmount = getDollarAmount(parsedLocalAmount)
