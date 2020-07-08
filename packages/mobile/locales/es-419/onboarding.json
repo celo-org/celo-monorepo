@@ -1,4 +1,9 @@
 {
+  "education": {
+    "step1": "Envía y recibe dinero al instante",
+    "step2": "Pague a cualquiera, en cualquier lugar con tarifas muy bajass",
+    "step3": "Use {{appName}} con seguridad y seguridad",
+  },
   "contacts": {
     "header": "Conectar Contactos",
     "body": "Agregar sus contactos hace que sea fácil enviar y solicitar pagos con sus amigos. La conexión no envía invitaciones a sus contactos.",
