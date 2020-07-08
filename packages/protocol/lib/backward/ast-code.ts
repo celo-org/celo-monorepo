@@ -18,15 +18,15 @@ const OUT_VOID_PARAMETER_STRING = 'void'
  * contract folders.
  */
 export class ASTCodeCompatibilityReport {
-  changes: Change[]
-  constructor(changes: Change[]) {
-    this.changes = changes
-  }
-  public push(...changes: Change[]) {
+  constructor(private readonly changes: Change[]) {}
+  push(...changes: Change[]) {
     this.changes.push(...changes)
   }
-  public include(other: ASTCodeCompatibilityReport) {
+  include(other: ASTCodeCompatibilityReport) {
     this.push(...other.changes)
+  }
+  getChanges = (): Change[] => {
+    return this.changes
   }
 }
 
