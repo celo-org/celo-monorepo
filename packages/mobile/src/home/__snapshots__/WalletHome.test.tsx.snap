@@ -15,9 +15,7 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
       Object {
         "alignItems": "center",
         "backgroundColor": "transparent",
-        "borderBottomColor": AnimatedValue {
-          " __value": NaN,
-        },
+        "borderBottomColor": 0,
         "borderBottomWidth": 1,
         "flexDirection": "row",
         "height": 62,
@@ -647,9 +645,7 @@ exports[`Testnet banner Renders when disconnected 1`] = `
       Object {
         "alignItems": "center",
         "backgroundColor": "transparent",
-        "borderBottomColor": AnimatedValue {
-          " __value": NaN,
-        },
+        "borderBottomColor": 0,
         "borderBottomWidth": 1,
         "flexDirection": "row",
         "height": 62,
@@ -1279,9 +1275,7 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
       Object {
         "alignItems": "center",
         "backgroundColor": "transparent",
-        "borderBottomColor": AnimatedValue {
-          " __value": NaN,
-        },
+        "borderBottomColor": 0,
         "borderBottomWidth": 1,
         "flexDirection": "row",
         "height": 62,
