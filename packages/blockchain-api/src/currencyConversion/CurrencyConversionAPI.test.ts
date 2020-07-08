@@ -23,13 +23,15 @@ describe('CurrencyConversionAPI', () => {
   })
 
   it('should retrieve rate for cGLD/cUSD', async () => {
+    const impliedCeloToCUSDExchangeRate = new BigNumber(10)
     const result = await currencyConversionAPI.getExchangeRate({
       sourceCurrencyCode: 'cGLD',
       currencyCode: 'cUSD',
+      impliedCeloToCUSDExchangeRate,
     })
-    expect(result).toEqual(new BigNumber(10))
+    expect(result).toEqual(impliedCeloToCUSDExchangeRate)
     expect(mockDefaultGetExchangeRate).toHaveBeenCalledTimes(0)
-    expect(mockGoldGetExchangeRate).toHaveBeenCalledTimes(1)
+    expect(mockGoldGetExchangeRate).toHaveBeenCalledTimes(0)
   })
 
   it('should retrieve rate for cUSD/cGLD', async () => {
@@ -43,13 +45,16 @@ describe('CurrencyConversionAPI', () => {
   })
 
   it('should retrieve rate for cGLD/USD', async () => {
+    const impliedCeloToCUSDExchangeRate = new BigNumber(10)
     const result = await currencyConversionAPI.getExchangeRate({
       sourceCurrencyCode: 'cGLD',
       currencyCode: 'USD',
+      impliedCeloToCUSDExchangeRate,
     })
-    expect(result).toEqual(new BigNumber(10))
+    expect(result).toEqual(impliedCeloToCUSDExchangeRate)
+
     expect(mockDefaultGetExchangeRate).toHaveBeenCalledTimes(0)
-    expect(mockGoldGetExchangeRate).toHaveBeenCalledTimes(1)
+    expect(mockGoldGetExchangeRate).toHaveBeenCalledTimes(0)
   })
 
   it('should retrieve rate for USD/cGLD', async () => {
@@ -63,13 +68,16 @@ describe('CurrencyConversionAPI', () => {
   })
 
   it('should retrieve rate for cGLD/MXN', async () => {
+    const impliedCeloToCUSDExchangeRate = new BigNumber(10)
+
     const result = await currencyConversionAPI.getExchangeRate({
       sourceCurrencyCode: 'cGLD',
       currencyCode: 'MXN',
+      impliedCeloToCUSDExchangeRate,
     })
     expect(result).toEqual(new BigNumber(200))
     expect(mockDefaultGetExchangeRate).toHaveBeenCalledTimes(1)
-    expect(mockGoldGetExchangeRate).toHaveBeenCalledTimes(1)
+    expect(mockGoldGetExchangeRate).toHaveBeenCalledTimes(0)
   })
 
   it('should retrieve rate for MXN/cGLD', async () => {

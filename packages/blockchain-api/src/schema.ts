@@ -61,14 +61,15 @@ export interface CurrencyConversionArgs {
   sourceCurrencyCode?: string
   currencyCode: string
   timestamp?: number
-  knownExchangeRates?: { [pair: string]: string }
+  impliedCeloToCUSDExchangeRate?: BigNumber.Value
 }
 
 export interface MoneyAmount {
   value: BigNumber.Value
   currencyCode: string
-  // to override exchange rates from the APIs
-  knownExchangeRates?: { [pair: string]: string }
+  // to override exchange rate from firebase, cause
+  // it can not be used with varying exchange value
+  impliedCeloToCUSDExchangeRate?: BigNumber.Value
   timestamp: number
 }
 
@@ -313,7 +314,7 @@ export const resolvers = {
         sourceCurrencyCode: moneyAmount.currencyCode,
         currencyCode: localCurrencyCode || 'USD',
         timestamp: moneyAmount.timestamp,
-        knownExchangeRates: moneyAmount.knownExchangeRates,
+        impliedCeloToCUSDExchangeRate: moneyAmount.impliedCeloToCUSDExchangeRate,
       })
       return {
         value: new BigNumber(moneyAmount.value).multipliedBy(rate).toString(),

@@ -22,7 +22,7 @@ export default class CurrencyConversionAPI<TContext = any> extends DataSource {
     sourceCurrencyCode,
     currencyCode,
     timestamp,
-    knownExchangeRates,
+    impliedCeloToCUSDExchangeRate,
   }: CurrencyConversionArgs): Promise<BigNumber> {
     const fromCode = sourceCurrencyCode || USD
     const toCode = currencyCode
@@ -34,7 +34,7 @@ export default class CurrencyConversionAPI<TContext = any> extends DataSource {
       const prevCode = steps[i - 1]
       const code = steps[i]
       ratesPromises.push(
-        this.getSupportedExchangeRate(prevCode, code, timestamp, knownExchangeRates)
+        this.getSupportedExchangeRate(prevCode, code, timestamp, impliedCeloToCUSDExchangeRate)
       )
     }
 
@@ -78,17 +78,24 @@ export default class CurrencyConversionAPI<TContext = any> extends DataSource {
     fromCode: string,
     toCode: string,
     timestamp?: number,
-    knownExchangeRates?: { [pair: string]: string }
-  ): Promise<BigNumber> {
+    impliedCeloToCUSDExchangeRate?: BigNumber.Value
+  ): BigNumber | Promise<BigNumber> {
     const pair = `${fromCode}/${toCode}`
 
     if (pair === 'cUSD/USD' || pair === 'USD/cUSD') {
       // TODO: use real rates once we have the data
-      return Promise.resolve(new BigNumber(1))
-    } else if (pair === 'cGLD/cUSD' || pair === 'cUSD/cGLD') {
-      if (knownExchangeRates && knownExchangeRates[pair]) {
-        return Promise.resolve(new BigNumber(knownExchangeRates[pair]))
+      return new BigNumber(1)
+    } else if (pair === 'cGLD/cUSD') {
+      // If this is an exchange
+      if (impliedCeloToCUSDExchangeRate) {
+        return new BigNumber(impliedCeloToCUSDExchangeRate)
       }
+      return this.goldExchangeRateAPI.getExchangeRate({
+        sourceCurrencyCode: fromCode,
+        currencyCode: toCode,
+        timestamp,
+      })
+    } else if (pair === 'cUSD/cGLD') {
       return this.goldExchangeRateAPI.getExchangeRate({
         sourceCurrencyCode: fromCode,
         currencyCode: toCode,
