@@ -89,11 +89,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
 
 const AnimatedSectionList = Animated.createAnimatedComponent(SectionList)
 
-interface State {
-  showMigration: boolean
-}
-
-export class WalletHome extends React.Component<Props, State> {
+export class WalletHome extends React.Component<Props> {
   scrollPosition: Animated.Value<number>
   onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => void
 
@@ -102,7 +98,6 @@ export class WalletHome extends React.Component<Props, State> {
 
     this.scrollPosition = new Animated.Value(0)
     this.onScroll = Animated.event([{ nativeEvent: { contentOffset: { y: this.scrollPosition } } }])
-    this.state = { showMigration: false }
   }
 
   onRefresh = async () => {
