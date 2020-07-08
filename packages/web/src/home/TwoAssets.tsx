@@ -53,6 +53,12 @@ export function TwoAssets() {
         <AssetToken ticker="CELO" info={t('CELOinfo')} icon={<ExchangeCELO size={ICON_SIZE} />}>
           <Button
             kind={BTN.NAKED}
+            text={t('viewReserve')}
+            href={'https://celoreserve.org'}
+            size={SIZE.normal}
+          />
+          <Button
+            kind={BTN.NAKED}
             text={t('learnGovernance')}
             href={
               'https://medium.com/celoorg/celo-gold-holders-make-your-voice-heard-through-on-chain-governance-96cb5a1e8b90'
@@ -103,7 +109,7 @@ function AssetToken({ ticker, info, icon, children }: Props) {
             {info}
           </Text>
         </View>
-        {children}
+        <View style={styles.governanceLinks}>{children}</View>
       </View>
     </Cell>
   )
@@ -112,6 +118,10 @@ function AssetToken({ ticker, info, icon, children }: Props) {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
+  },
+  governanceLinks: {
+    minHeight: 50,
+    justifyContent: 'space-between',
   },
   root: {
     maxWidth: 330,
