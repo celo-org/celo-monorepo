@@ -42,6 +42,7 @@
 * [lookupIdentifiers](_contractkit_src_wrappers_attestations_.attestationswrapper.md#lookupidentifiers)
 * [request](_contractkit_src_wrappers_attestations_.attestationswrapper.md#request)
 * [revealPhoneNumberToIssuer](_contractkit_src_wrappers_attestations_.attestationswrapper.md#revealphonenumbertoissuer)
+* [revoke](_contractkit_src_wrappers_attestations_.attestationswrapper.md#revoke)
 * [selectIssuers](_contractkit_src_wrappers_attestations_.attestationswrapper.md#selectissuers)
 * [validateAttestationCode](_contractkit_src_wrappers_attestations_.attestationswrapper.md#validateattestationcode)
 * [waitForSelectingIssuers](_contractkit_src_wrappers_attestations_.attestationswrapper.md#waitforselectingissuers)
@@ -531,6 +532,23 @@ Name | Type |
 `smsRetrieverAppSig?` | undefined &#124; string |
 
 **Returns:** *Promise‹Response›*
+
+___
+
+###  revoke
+
+▸ **revoke**(`identifer`: string, `account`: [Address](../modules/_contractkit_src_base_.md#address)): *Promise‹[CeloTransactionObject](_contractkit_src_wrappers_basewrapper_.celotransactionobject.md)‹void››*
+
+*Defined in [contractkit/src/wrappers/Attestations.ts:590](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L590)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`identifer` | string |
+`account` | [Address](../modules/_contractkit_src_base_.md#address) |
+
+**Returns:** *Promise‹[CeloTransactionObject](_contractkit_src_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
 ___
 
