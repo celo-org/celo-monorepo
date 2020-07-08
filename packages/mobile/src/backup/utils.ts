@@ -5,7 +5,7 @@ import { useAsync } from 'react-async-hook'
 import * as bip39 from 'react-native-bip39'
 import { useDispatch, useSelector } from 'react-redux'
 import { showError } from 'src/alert/actions'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { getPassword } from 'src/pincode/authentication'
@@ -129,8 +129,8 @@ export async function getStoredMnemonic(account: string | null): Promise<string 
 
 export function onGetMnemonicFail(viewError: (error: ErrorMessages) => void, context?: string) {
   viewError(ErrorMessages.FAILED_FETCH_MNEMONIC)
-  ValoraAnalytics.track(AnalyticsEvents.backup_error, {
-    title: 'Failed to retrieve Account Key',
+  ValoraAnalytics.track(OnboardingEvents.backup_error, {
+    error: 'Failed to retrieve Account Key',
     context,
   })
 }

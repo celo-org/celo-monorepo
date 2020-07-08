@@ -2,7 +2,7 @@ import colorsV2 from '@celo/react-components/styles/colors.v2'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import CancelButton from 'src/components/CancelButton.v2'
 import Dialog from 'src/components/Dialog'
@@ -22,24 +22,18 @@ export default function CancelConfirm({ screen }: Props) {
 
   const onCancel = React.useCallback(() => {
     setOpenState(true)
-    ValoraAnalytics.track(AnalyticsEvents.backup_cancel, { screen })
+    ValoraAnalytics.track(OnboardingEvents.backup_cancel)
   }, [screen])
 
   const onComplete = React.useCallback(() => {
     setOpenState(false)
-    ValoraAnalytics.track(AnalyticsEvents.backup_cancel_procrastinate, {
-      screen,
-      title: actionText,
-    })
+    ValoraAnalytics.track(OnboardingEvents.backup_delay_cancel)
   }, [screen, actionText])
 
   const onProcrastinate = React.useCallback(() => {
     setOpenState(false)
     navigateHome()
-    ValoraAnalytics.track(AnalyticsEvents.backup_cancel_procrastinate, {
-      screen,
-      title: secondaryText,
-    })
+    ValoraAnalytics.track(OnboardingEvents.backup_delay_confirm)
   }, [screen, secondaryText])
 
   return (

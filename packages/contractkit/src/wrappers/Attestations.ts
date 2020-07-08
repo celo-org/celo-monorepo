@@ -466,7 +466,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       salt,
       smsRetrieverAppSig,
     }
-    return fetch(appendPath(serviceURL, '/attestations'), {
+    return fetch(appendPath(serviceURL, 'attestations'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -530,6 +530,8 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       rightAccount: false,
       metadataURL: null,
       state: AttestationServiceStatusState.NoAttestationSigner,
+      version: null,
+      ageOfLatestBlock: null,
     }
 
     if (!hasAttestationSigner) {
@@ -575,6 +577,8 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       ret.blacklistedRegionCodes = statusResponseBody.blacklistedRegionCodes
       ret.rightAccount = eqAddress(validator.address, statusResponseBody.accountAddress)
       ret.state = AttestationServiceStatusState.Valid
+      ret.version = statusResponseBody.version
+      ret.ageOfLatestBlock = statusResponseBody.ageOfLatestBlock
       return ret
     } catch (error) {
       ret.state = AttestationServiceStatusState.UnreachableAttestationService
@@ -610,4 +614,6 @@ interface AttestationServiceStatusResponse {
   rightAccount: boolean
   signer: string
   state: AttestationServiceStatusState
+  version: string | null
+  ageOfLatestBlock: number | null
 }
