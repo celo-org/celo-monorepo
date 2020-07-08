@@ -9,7 +9,7 @@ cat <<'EOF' > '/etc/logrotate.d/rsyslog'
         daily
         missingok
         notifempty
-        #delaycompress
+        delaycompress
         compress
         postrotate
                 invoke-rc.d rsyslog rotate > /dev/null
@@ -26,7 +26,7 @@ cat <<'EOF' > '/etc/logrotate.d/rsyslog'
         daily
         missingok
         notifempty
-        #delaycompress
+        delaycompress
         compress
         postrotate
                 invoke-rc.d rsyslog rotate > /dev/null
@@ -46,7 +46,7 @@ cat <<'EOF' > '/etc/logrotate.d/rsyslog'
         missingok
         notifempty
         compress
-        #delaycompress
+        delaycompress
         sharedscripts
         postrotate
                 invoke-rc.d rsyslog rotate > /dev/null
@@ -184,16 +184,18 @@ chmod u+x /root/backup_rsync.sh
 
 # ---- Add backup to cron
 # note that this will make the txnode unavailable during the backup, so do not run on prod systems
-#cat <<'EOF' > /root/backup.crontab
+cat <<'EOF' > /root/backup.crontab
 # m h  dom mon dow   command
-#17 0 * * * /root/backup.sh > /dev/null 2>&1
-#EOF
-#/usr/bin/crontab /root/backup.crontab
+# backup full tarball once a week
+17 0 * * 0 /root/backup.sh > /dev/null 2>&1
+EOF
+/usr/bin/crontab /root/backup.crontab
 
 # ---- Add rsync backup to cron
 # note that this will make the txnode unavailable during the backup, so do not run on prod systems
 cat <<'EOF' > /root/backup_rsync.crontab
 # m h  dom mon dow   command
+# run every day at 00:17
 17 0 * * * /root/backup_rsync.sh > /dev/null 2>&1
 EOF
 /usr/bin/crontab /root/backup_rsync.crontab
@@ -448,11 +450,18 @@ systemctl enable geth.service
 echo "Adding DC to docker group" | logger
 usermod -aG docker dc
 
-#--- run restore script
-#echo "Restoring chaindata from backup tarball" | logger
-#bash /root/restore.sh
+# --- run restore script
+# this script tries to restore chaindata from a GCS hosted tarball.
+# if the chaindata doesn't exist on GCS, geth will start normal (slow) p2p sync
+echo "Restoring chaindata from backup tarball" | logger
+bash /root/restore.sh
 
-#--- run rsync restore script
+# todo: add some logic to look at the chaindata tarball bucket versus the rsync bucket and pick the best one.
+# for now we try both, with rsync taking precedence b/c it runs last.
+
+# --- run rsync restore script
+# this script tries to restore chaindata from a GCS hosted bucket via rsync.
+# if the chaindata doesn't exist on GCS, geth will start normal (slow) p2p sync, perhaps boosted by what the tarball provided
 echo "Restoring chaindata from backup via rsync" | logger
 bash /root/restore_rsync.sh
 

@@ -65,8 +65,9 @@ variable geth_node_docker_image {
   type        = map(string)
 
   default = {
-    repository = "us.gcr.io/celo-testnet/celo-node"
-    tag        = "rc1"
+    repository = "us.gcr.io/celo-org/celo-node"
+    tag        = "f4bda6d027f0af6c68ae4d146abe791739ae6cba
+    # critical security fix in v1.0.1 on this tag"
   }
 }
 
