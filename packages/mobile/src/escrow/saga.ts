@@ -1,7 +1,7 @@
 import { ContractKit } from '@celo/contractkit'
 import { EscrowWrapper } from '@celo/contractkit/lib/wrappers/Escrow'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
-import { ensureLeading0x, trimLeading0x } from '@celo/utils/src/address'
+import { ensureLeading0x, privateKeyToAddress, trimLeading0x } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import { all, call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError, showErrorOrFallback } from 'src/alert/actions'
@@ -129,8 +129,7 @@ function* withdrawFromEscrow() {
       return
     }
 
-    const tempWalletAddress = contractKit.web3.eth.accounts.privateKeyToAccount(tmpWalletPrivateKey)
-      .address
+    const tempWalletAddress = privateKeyToAddress(tmpWalletPrivateKey)
 
     // Check if there is a payment associated with this invite code
     const receivedPayment = yield call(getEscrowedPayment, escrow, tempWalletAddress)
