@@ -14,9 +14,7 @@ exports[`Support renders correctly 1`] = `
       Object {
         "alignItems": "center",
         "backgroundColor": "transparent",
-        "borderBottomColor": AnimatedValue {
-          " __value": NaN,
-        },
+        "borderBottomColor": 0,
         "borderBottomWidth": 1,
         "flexDirection": "row",
         "height": 62,
