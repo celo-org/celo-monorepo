@@ -1,5 +1,8 @@
 export const WEI_PER_CELO = 1000000000000000000.0
-export const UNLOCK_DURATION = 600
+export const UNLOCK_DURATION = 300
+
+// 25 is react native geth default
+export const SYNCING_MAX_PEERS = 25
 
 export enum GethSyncMode {
   // Valid sync mode values can be seen at https://github.com/celo-org/celo-blockchain/blob/3caca596d1ff23a9faf5339f108c993f38bfa743/mobile/geth.go#L43-L51

@@ -8,10 +8,10 @@ import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { SendEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import AccountNumberCard from 'src/components/AccountNumberCard'
 import BackButton from 'src/components/BackButton.v2'
@@ -78,7 +78,7 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
 
 export const validateRecipientAccountScreenNavOptions = () => ({
   ...emptyHeader,
-  headerLeft: () => <BackButton eventName={CustomEventNames.send_secure_back} />,
+  headerLeft: () => <BackButton eventName={SendEvents.send_secure_back} />,
 })
 
 export class ValidateRecipientAccount extends React.Component<Props, State> {
@@ -111,8 +111,8 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
         ? inputValue
         : singleDigitInputValueArr.join('')
 
-    CeloAnalytics.track(CustomEventNames.send_secure_submit, {
-      validationType: addressValidationType === AddressValidationType.FULL ? 'full' : 'partial',
+    ValoraAnalytics.track(SendEvents.send_secure_submit, {
+      partialAddressValidation: addressValidationType === AddressValidationType.PARTIAL,
       address: inputToValidate,
     })
 
@@ -130,12 +130,16 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
   }
 
   toggleModal = () => {
-    const validationType =
-      this.props.addressValidationType === AddressValidationType.FULL ? 'full' : 'partial'
+    const { addressValidationType } = this.props
+
     if (this.state.isModalVisible) {
-      CeloAnalytics.track(CustomEventNames.send_secure_info, { validationType })
+      ValoraAnalytics.track(SendEvents.send_secure_info, {
+        partialAddressValidation: addressValidationType === AddressValidationType.PARTIAL,
+      })
     } else {
-      CeloAnalytics.track(CustomEventNames.send_secure_info_dismissed, { validationType })
+      ValoraAnalytics.track(SendEvents.send_secure_info_dismissed, {
+        partialAddressValidation: addressValidationType === AddressValidationType.PARTIAL,
+      })
     }
 
     this.setState({ isModalVisible: !this.state.isModalVisible })

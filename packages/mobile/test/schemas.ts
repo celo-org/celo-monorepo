@@ -22,6 +22,7 @@ export const vNeg1Schema = {
   },
   networkInfo: {
     connected: true,
+    rehydrated: true,
   },
   send: {
     isSending: false,
@@ -166,6 +167,7 @@ export const v0Schema = {
   },
   networkInfo: {
     connected: true,
+    rehydrated: true,
   },
   send: {
     isSending: false,
@@ -322,8 +324,24 @@ export const v1Schema = {
     ...v0Schema.account,
     retryVerificationWithForno: true,
   },
+  app: {
+    ...v0Schema.app,
+    requirePinOnAppOpen: false,
+  },
+}
+
+export const v2Schema = {
+  ...v1Schema,
+  app: {
+    ...v1Schema.app,
+    sessionId: '',
+  },
+  account: {
+    ...v1Schema.account,
+    hasMigratedToNewBip39: false,
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {
-  return v1Schema as Partial<RootState>
+  return v2Schema as Partial<RootState>
 }

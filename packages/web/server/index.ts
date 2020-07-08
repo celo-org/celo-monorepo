@@ -87,7 +87,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
   server.get('/build/*', (req, res) => {
     res.redirect(`/developers/${req.params[0]}`)
   })
-  ;['/app', '/test-wallet', '/mobile-app', 'build/download'].forEach((route) => {
+  ;['/test-wallet', 'build/download'].forEach((route) => {
     server.get(route, (_, res) => {
       res.redirect('/developers/wallet')
     })
@@ -103,7 +103,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
 
   server.get('/papers/whitepaper', (_, res) => {
     res.redirect(
-      '/papers/Celo_A_Multi_Asset_Cryptographic_Protocol_for_Decentralized_Social_Payments.pdf'
+      '/papers/Celo__A_Multi_Asset_Cryptographic_Protocol_for_Decentralized_Social_Payments.pdf'
     )
   })
 
@@ -196,8 +196,8 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
 
   server.post('/ecosystem/:table', rateLimit, async (req, res) => {
     try {
-      const record = await ecoFundSubmission(req.body, req.params.table as Tables)
-      res.status(CREATED).json({ id: record.id })
+      await ecoFundSubmission(req.body, req.params.table as Tables)
+      res.sendStatus(CREATED)
     } catch (e) {
       Sentry.withScope((scope) => {
         scope.setTag('Service', 'Airtable')

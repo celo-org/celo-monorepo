@@ -1,6 +1,6 @@
 {
   "name": "@celo/phone-number-privacy-signer",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Signing participator of a the PGPNP threshold signature scheme",
   "author": "Celo",
   "license": "Apache-2.0",

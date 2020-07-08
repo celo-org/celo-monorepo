@@ -6,7 +6,7 @@ import { StackScreenProps } from '@react-navigation/stack'
 import React, { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FlatList, StyleSheet, View } from 'react-native'
-import { useSafeArea } from 'react-native-safe-area-view'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Namespaces } from 'src/i18n'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -42,7 +42,7 @@ export default function SelectCountry({ navigation, route }: Props) {
     [selectedCountryCodeAlpha2]
   )
 
-  const inset = useSafeArea()
+  const inset = useSafeAreaInsets()
 
   return (
     <View style={styles.container}>

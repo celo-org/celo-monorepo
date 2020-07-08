@@ -63,13 +63,13 @@ Use the following to configure the AWS Secrets Manager. To authenticate with Ama
 
 - `KEYSTORE_AWS_REGION` - The AWS Region code where the secret is, for example: `us-east-1`.
 - `KEYSTORE_AWS_SECRET_NAME` - The secret's name.
-- `KEYSTORE_AWS_SECRET_KEY` - The key inside the secret where the private key is save. `key` by default.
+- `KEYSTORE_AWS_SECRET_KEY` - The key for the secret key/value pair.
 
 ## Operations
 
 ### Setup
 
-The service requires a connection to a secret store and to a SQL database. The SQL connection parameters should be configured with the `DB_*` configs stated above.
+The service requires a connection to a secret store and to a SQL database. The SQL connection parameters should be configured with the `DB_*` configs stated above. Before performing the migration below, be sure to create a database and set the name as the value in the `DB_DATABASE` environment variable.
 
 #### Running locally or without docker
 

@@ -1,7 +1,7 @@
 import { RootState } from 'src/redux/reducers'
 
-export const getLockWithPinEnabled = (state: RootState) => {
-  return state.app.lockWithPinEnabled
+export const getRequirePinOnAppOpen = (state: RootState) => {
+  return state.app.requirePinOnAppOpen
 }
 
 export const getAppState = (state: RootState) => {
@@ -14,4 +14,8 @@ export const getAppLocked = (state: RootState) => {
 
 export const getLastTimeBackgrounded = (state: RootState) => {
   return state.app.lastTimeBackgrounded
+}
+
+export const sessionIdSelector = (state: RootState) => {
+  return state.app.sessionId
 }

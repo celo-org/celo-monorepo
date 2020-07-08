@@ -25,6 +25,8 @@ class Logger {
     console.log(message)
   }
 
+  sanitizeError = jest.fn((error) => error)
+
   overrideConsoleLogs = () => {}
 
   showError = (message: string) => {
