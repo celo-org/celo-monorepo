@@ -1,6 +1,5 @@
 import { ensureLeading0x, publicKeyToAddress, trimLeading0x } from '@celo/utils/lib/address'
 import { KMS } from 'aws-sdk'
-// import { ec as EC } from 'elliptic'
 import * as ethUtil from 'ethereumjs-util'
 import { parseBERSignature } from '../../utils/ber-utils'
 import { bigNumberToBuffer, bufferToBigNumber } from '../../utils/signature-utils'
