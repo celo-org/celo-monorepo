@@ -1,7 +1,7 @@
-const flakeTrackingConfig = require('../../flakey-test-tracking/jest/config.js')
+const { nodeFlakeTracking } = require('../../flakey-test-tracking/jest/config.js')
 
 module.exports = {
   preset: 'ts-jest',
   testMatch: ['<rootDir>/src/**/?(*.)+(spec|test).ts?(x)'],
-  ...flakeTrackingConfig,
+  ...nodeFlakeTracking,
 }

@@ -1,10 +1,10 @@
 const reactNativeJestPreset = require('react-native/jest-preset')
 const { defaults: tsjPreset } = require('ts-jest/presets')
-const flakeTrackingConfig = require('../../flakey-test-tracking/jest/config.js')
+const { nodeFlakeTracking } = require('../../flakey-test-tracking/jest/config.js')
 
 module.exports = {
   ...tsjPreset,
-  ...flakeTrackingConfig,
+  ...nodeFlakeTracking,
   globals: {
     navigator: true,
     'ts-jest': {
@@ -15,7 +15,7 @@ module.exports = {
       tsConfig: 'tsconfig.test.json',
     },
     window: true,
-    ...flakeTrackingConfig.globals,
+    ...nodeFlakeTracking.globals,
   },
   haste: {
     ...reactNativeJestPreset.haste,
@@ -31,7 +31,7 @@ module.exports = {
   setupFilesAfterEnv: [
     '<rootDir>/jest_setup.ts',
     '<rootDir>/../../node_modules/react-native-gesture-handler/jestSetup.js',
-    ...flakeTrackingConfig.setupFilesAfterEnv,
+    ...nodeFlakeTracking.setupFilesAfterEnv,
   ],
   testPathIgnorePatterns: ['/node_modules/', '<rootDir>/e2e'],
   transform: {

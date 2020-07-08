@@ -1,9 +1,9 @@
-const flakeTrackingConfig = require('../../flakey-test-tracking/jest/config.js')
+const { nodeFlakeTracking } = require('../../flakey-test-tracking/jest/config.js')
 
 module.exports = {
-  ...flakeTrackingConfig,
+  ...nodeFlakeTracking,
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts', ...flakeTrackingConfig.setupFilesAfterEnv],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts', ...nodeFlakeTracking.setupFilesAfterEnv],
   testMatch: ['**/?(*.)(spec|test).ts?(x)'],
   testResultsProcessor: 'jest-junit',
   transform: {

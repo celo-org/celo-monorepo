@@ -1,6 +1,6 @@
 {
   "setupFilesAfterEnv": ["./init.js", "../../../flakey-test-tracking/jest/setup.js"],
-  "testEnvironment": "../../../flakey-test-tracking/jest/detox/environment.detox.js",
+  "testEnvironment": "../../../flakey-test-tracking/jest/environments/detox.js",
   "reporters": ["detox/runners/jest/streamlineReporter"],
   "verbose": true,
   "testMatch": ["**/*.spec.js"],
