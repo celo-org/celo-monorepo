@@ -9,13 +9,10 @@ import { ContractVersionDelta } from '@celo/protocol/lib/backward/version'
 
 
 export class ASTReports {
-  code: ASTCodeCompatibilityReport
-  storage: ASTStorageCompatibilityReport[]
   
-  constructor(code: ASTCodeCompatibilityReport, storage: ASTStorageCompatibilityReport[]) {
-    this.code = code
-    this.storage = storage
-  }
+  constructor(
+    public readonly code: ASTCodeCompatibilityReport,
+    public readonly storage: ASTStorageCompatibilityReport[]) {}
 
   excluding = (exclude: RegExp): ASTReports => {
     const included = (contract: string): boolean => {
@@ -43,18 +40,11 @@ export class CategorizedChanges {
     return new CategorizedChanges(storage, major, minor, patch)
   }
 
-  // Conflict reports/changes
-  storage: ASTStorageCompatibilityReport[]
-  major: Change[]
-  minor: Change[]
-  patch: Change[]
-
-  constructor(storage: ASTStorageCompatibilityReport[], major: Change[], minor: Change[], patch: Change[]) {
-    this.storage = storage
-    this.major = major
-    this.minor = minor
-    this.patch = patch
-  }
+  constructor(
+    public readonly storage: ASTStorageCompatibilityReport[],
+    public readonly major: Change[],
+    public readonly minor: Change[],
+    public readonly patch: Change[]) {}
 
 }
 
@@ -74,16 +64,8 @@ export class ASTVersionedReport {
     )
     return new ASTVersionedReport(fullReports, changes, versionDelta)
   }
-  
-  fullReports: ASTReports
-  changes: CategorizedChanges
-
-  // Delta suggested
-  versionDelta: ContractVersionDelta
-
-  constructor(fullReports: ASTReports, changes: CategorizedChanges, versionDelta: ContractVersionDelta) {
-    this.fullReports = fullReports
-    this.changes = changes
-    this.versionDelta = versionDelta
-  }
+  constructor(
+    public readonly fullReports: ASTReports, 
+    public readonly changes: CategorizedChanges,
+    public readonly versionDelta: ContractVersionDelta) {}
 }

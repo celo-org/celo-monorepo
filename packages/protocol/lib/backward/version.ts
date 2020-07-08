@@ -23,18 +23,12 @@ export class ContractVersion {
       Number(v[3])
     )
   }
-
-  storage: number
-  major: number
-  minor: number
-  patch: number
   
-  constructor(storage: number, major: number, minor: number, patch: number) {
-    this.storage = storage
-    this.major = major
-    this.minor = minor
-    this.patch = patch
-  }
+  constructor(
+    public readonly storage: number,
+    public readonly major: number,
+    public readonly minor: number,
+    public readonly patch: number) {}
 
   public toString = () : string => {
     const deltas = [this.storage, this.major, this.minor, this.patch]
@@ -87,18 +81,12 @@ export class ContractVersionDelta {
     }
     return new ContractVersionDelta(n, n, n, n)
   }
-
-  storage: Delta
-  major: Delta
-  minor: Delta
-  patch: Delta
-  
-  constructor(storage: Delta, major: Delta, minor: Delta, patch: Delta) {
-    this.storage = storage
-    this.major = major
-    this.minor = minor
-    this.patch = patch
-  }
+ 
+  constructor(
+    public readonly storage: Delta,
+    public readonly major: Delta,
+    public readonly minor: Delta,
+    public readonly patch: Delta) {}
 
   appliedTo = (version: ContractVersion): ContractVersion => {
     return new ContractVersion(

@@ -58,8 +58,7 @@ export interface ChangeVisitor<T> {
  */
 abstract class ContractChange implements Change {
   type: string
-  contract: string
-  constructor(contract: string) {
+  constructor(private readonly contract: string) {
     this.contract = contract
   }
   getContract() {
@@ -88,12 +87,11 @@ export class NewContractChange extends ContractChange {
  * for {@link ContractChange}
  */
 abstract class ContractValueChange extends ContractChange {
-  oldValue: string
-  newValue: string
-  constructor(contract: string, oldValue: string, newValue: string) {
+  constructor(
+    contract: string, 
+    public readonly oldValue: string, 
+    public readonly newValue: string) {
     super(contract)
-    this.oldValue = oldValue
-    this.newValue = newValue
   }
 }
 
@@ -129,10 +127,8 @@ export class ContractTypeChange extends ContractValueChange {
  * method changes.
  */
 abstract class MethodChange extends ContractChange {
-  signature: string
-  constructor(contract: string, signature: string) {
+  constructor(contract: string, private readonly signature: string) {
     super(contract)
-    this.signature = signature
   }
   getSignature() {
     return this.signature
@@ -164,12 +160,10 @@ export class MethodRemovedChange extends MethodChange {
  * for {@link MethodChange}
  */
 abstract class MethodValueChange extends MethodChange {
-  oldValue: string
-  newValue: string
-  constructor(contract: string, signature: string, oldValue: string, newValue: string) {
+  constructor(contract: string, signature: string,
+    public readonly oldValue: string,
+    public readonly newValue: string) {
     super(contract, signature)
-    this.oldValue = oldValue
-    this.newValue = newValue
   }
 }
 
