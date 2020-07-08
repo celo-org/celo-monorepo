@@ -93,7 +93,6 @@ export function* sendTransactionPromises(
 ) {
   Logger.debug(`${TAG}@sendTransactionPromises`, `Going to send a transaction with id ${txId}`)
 
-  const stableTokenAddress: string = yield call(getCurrencyAddress, CURRENCY_ENUM.DOLLAR)
   const stableToken = yield getTokenContract(CURRENCY_ENUM.DOLLAR)
   const stableTokenBalance = yield call([stableToken, stableToken.balanceOf], account)
 
@@ -121,7 +120,9 @@ export function* sendTransactionPromises(
     // Use stableToken to pay fee, unless its balance is Zero
     // then use Celo (goldToken) to pay fee (pass undefined)
     // TODO: make it transparent for a user
-    stableTokenBalance.isGreaterThan(0) ? stableTokenAddress : undefined,
+    stableTokenBalance.isGreaterThan(0)
+      ? yield call(getCurrencyAddress, CURRENCY_ENUM.DOLLAR)
+      : undefined,
     getLogger(tag, txId),
     staticGas,
     gasPrice ? gasPrice.toString() : gasPrice,
