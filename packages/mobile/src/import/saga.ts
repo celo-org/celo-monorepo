@@ -1,5 +1,5 @@
 import { generateKeys, validateMnemonic } from '@celo/utils/src/account'
-import { ensureLeading0x } from '@celo/utils/src/address'
+import { privateKeyToAddress } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import * as bip39 from 'react-native-bip39'
 import { call, put, spawn, takeLeading } from 'redux-saga/effects'
@@ -21,7 +21,6 @@ import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
 import Logger from 'src/utils/Logger'
-import { getContractKit } from 'src/web3/contracts'
 import { assignAccountFromPrivateKey, waitWeb3LastBlock } from 'src/web3/saga'
 
 const TAG = 'import/saga'
@@ -45,10 +44,7 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
 
     if (!useEmptyWallet) {
       Logger.debug(TAG + '@importBackupPhraseSaga', 'Checking account balance')
-      const contractKit = yield call(getContractKit)
-      const backupAccount = contractKit.web3.eth.accounts.privateKeyToAccount(
-        ensureLeading0x(privateKey)
-      ).address
+      const backupAccount = privateKeyToAddress(privateKey)
 
       const dollarBalance: BigNumber = yield call(
         fetchTokenBalanceInWeiWithRetry,
