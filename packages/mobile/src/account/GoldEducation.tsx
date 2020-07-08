@@ -2,7 +2,7 @@ import { BtnTypes } from '@celo/react-components/components/Button.v2'
 import React, { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import Education, { EducationTopic } from 'src/account/Education'
+import Education, { EducationTopic, EmbeddedNavBar } from 'src/account/Education'
 import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setEducationCompleted } from 'src/goldToken/actions'
@@ -38,7 +38,7 @@ export default function GoldEducation() {
 
   return (
     <Education
-      isClosable={isCeloEducationComplete}
+      embeddedNavBar={isCeloEducationComplete ? EmbeddedNavBar.Close : EmbeddedNavBar.Drawer}
       stepInfo={stepInfo}
       onFinish={onFinish}
       finalButtonType={BtnTypes.TERTIARY}

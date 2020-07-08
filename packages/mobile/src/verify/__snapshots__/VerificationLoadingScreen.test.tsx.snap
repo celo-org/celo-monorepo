@@ -60,7 +60,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                 "fontFamily": "Inter-Regular",
                 "fontSize": 16,
                 "lineHeight": 22,
-                "paddingHorizontal": 16,
+                "paddingHorizontal": 24,
               },
               Object {
                 "color": "#2E3338",
@@ -453,7 +453,7 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
                 "fontFamily": "Inter-Regular",
                 "fontSize": 16,
                 "lineHeight": 22,
-                "paddingHorizontal": 16,
+                "paddingHorizontal": 24,
               },
               Object {
                 "color": "#2E3338",
