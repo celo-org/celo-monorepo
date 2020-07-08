@@ -125,6 +125,11 @@ export const Flags = {
     description: 'URL',
     helpValue: 'https://www.celo.org',
   }),
+  path: flags.build({
+    parse: parsePath,
+    description: 'Path',
+    helpValue: 'celo/genesis.json',
+  }),
   wei: flags.build({
     parse: parseWei,
     description: 'Token value without decimals',
