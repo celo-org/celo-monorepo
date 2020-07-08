@@ -15,6 +15,7 @@ import { CeloExchangeEvents } from 'src/analytics/Events'
 import AppLoading from 'src/app/AppLoading'
 import Debug from 'src/app/Debug'
 import ErrorScreen from 'src/app/ErrorScreen'
+import { currentLanguageSelector } from 'src/app/reducers'
 import UpgradeScreen from 'src/app/UpgradeScreen'
 import BackupComplete from 'src/backup/BackupComplete'
 import BackupPhrase, { navOptionsForBackupPhrase } from 'src/backup/BackupPhrase'
@@ -64,6 +65,7 @@ import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
 import ImportContactsScreen from 'src/onboarding/contacts/ImportContactsScreen'
+import OnboardingEducationScreen from 'src/onboarding/education/OnboardingEducationScreen'
 import JoinCelo from 'src/onboarding/registration/JoinCelo'
 import RegulatoryTerms from 'src/onboarding/registration/RegulatoryTerms'
 import SelectCountry from 'src/onboarding/registration/SelectCountry'
@@ -176,6 +178,11 @@ const pincodeSetScreenOptions = ({
 
 const nuxScreens = (Navigator: typeof Stack) => (
   <>
+    <Navigator.Screen
+      name={Screens.OnboardingEducationScreen}
+      component={OnboardingEducationScreen}
+      options={OnboardingEducationScreen.navigationOptions}
+    />
     <Navigator.Screen
       name={Screens.JoinCelo}
       component={JoinCelo}
@@ -436,7 +443,7 @@ const generalScreens = (Navigator: typeof Stack) => (
 
 const mapStateToProps = (state: RootState) => {
   return {
-    language: state.app.language,
+    language: currentLanguageSelector(state),
     e164Number: state.account.e164PhoneNumber,
     acceptedTerms: state.account.acceptedTerms,
     pincodeType: state.account.pincodeType,
@@ -467,7 +474,7 @@ export function MainStackScreen() {
     if (!language) {
       initialRoute = Screens.Language
     } else if (!e164Number) {
-      initialRoute = Screens.JoinCelo
+      initialRoute = Screens.OnboardingEducationScreen
     } else if (!acceptedTerms) {
       initialRoute = Screens.RegulatoryTerms
     } else if (pincodeType === PincodeType.Unset) {

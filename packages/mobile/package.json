@@ -173,7 +173,6 @@
     "metro-react-native-babel-preset": "^0.58.0",
     "patch-package": "^5.1.1",
     "postinstall-prepare": "^1.0.1",
-    "react-devtools": "^3.6.0",
     "react-dom": "16.11.0",
     "react-native-debugger-open": "^0.3.17",
     "react-native-kill-packager": "^1.0.0",

@@ -5,6 +5,7 @@ export enum RecipientVerificationStatus {
 }
 
 export enum VerificationStatus {
+  InsufficientBalance = -2,
   Failed = -1,
   Stopped = 0,
   Prepping = 1,
