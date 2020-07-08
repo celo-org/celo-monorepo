@@ -4,6 +4,7 @@ const ProviderEngine = require('web3-provider-engine')
 const WebsocketSubprovider = require('web3-provider-engine/subproviders/websocket.js')
 const { TruffleArtifactAdapter } = require('@0x/sol-trace')
 const { CoverageSubprovider } = require('@0x/sol-coverage')
+const { truffleFlakeTrackingConfig } = require('../../flakey-test-tracking/mocha/config')
 
 const argv = require('minimist')(process.argv.slice(2), {
   string: ['truffle_override', 'network'],
@@ -178,6 +179,7 @@ module.exports = {
     },
   },
   networks,
+  mocha: truffleFlakeTrackingConfig,
 }
 
 if (process.argv.includes('--gas')) {

@@ -1,8 +1,6 @@
 const AnsiToHtml = require('ansi-to-html')
 const convert = new AnsiToHtml()
 
-//TODO(Alec): translate everything to typescript
-
 const getTestTitles = (test) => {
   const titles = []
   let parent = test
@@ -14,17 +12,17 @@ const getTestTitles = (test) => {
   return titles
 }
 
-function formatTestTitles(titles) {
+function fmtTestTitles(titles) {
   if (process.env.CIRCLECI) {
     titles[0] = process.env.CIRCLE_JOB
   } else {
     titles.shift()
   }
-  return titles.join(' -> ')
+  return titles.join(' -> ').trim()
 }
 
 const getTestID = (test) => {
-  return formatTestTitles(getTestTitles(test))
+  return fmtTestTitles(getTestTitles(test))
 }
 
 const buildFlakeyDescribe = (describeBlock, flakeMap) => {
@@ -43,16 +41,14 @@ const buildFlakeyDescribe = (describeBlock, flakeMap) => {
         }
         break
       }
-      default:
-        break
     }
   }
   return describeBlock
 }
 
 function parseFlake(tr) {
-  const testID = formatTestTitles(tr.testPath)
-  const body = formatIssueBody(tr.errors)
+  const testID = fmtTestTitles(tr.testPath)
+  const body = fmtIssueBody(tr.errors)
   return {
     title: '[FLAKEY TEST] ' + testID + ', at ' + parseTestLocation(body, '/packages'),
     body: body,
@@ -65,7 +61,7 @@ const parseTestLocation = (stack, rootDir) => {
   return stack.slice(start, end)
 }
 
-const formatIssueBody = (errors) => {
+const fmtIssueBody = (errors) => {
   errors.push('Test Passed!')
   let body = ''
   for (let i = 0; i < errors.length; i++) {
@@ -76,7 +72,7 @@ const formatIssueBody = (errors) => {
 
 module.exports = {
   getTestID: getTestID,
-  formatIssueBody: formatIssueBody,
+  fmtIssueBody: fmtIssueBody,
   buildFlakeyDescribe: buildFlakeyDescribe,
   parseTestLocation: parseTestLocation,
   parseFlake: parseFlake,

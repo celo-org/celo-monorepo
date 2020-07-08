@@ -1,5 +1,5 @@
 const defaultConfig = require('../../jest.config.js')
-const flakeTrackingConfig = require('../../flakey-test-tracking/jest/config.preset.js')
+const flakeTrackingConfig = require('../../flakey-test-tracking/jest/config.js')
 
 module.exports = {
   ...defaultConfig,
@@ -22,5 +22,5 @@ module.exports = {
   preset: 'react-native-web',
   setupFiles: ['./jestSetup.js', 'jest-canvas-mock'],
   setupFilesAfterEnv: ['./jestSetupAfter.ts', ...flakeTrackingConfig.setupFilesAfterEnv],
-  testEnvironment: 'jsdom', //TODO(Alec): Bring all test suites into the fold
+  testEnvironment: 'jsdom', //TODO(Alec, next): Bring all test suites into the fold
 }

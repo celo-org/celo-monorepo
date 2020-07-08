@@ -240,9 +240,9 @@ describe('tryObtainValueWithRetries()', () => {
     expect(task.isRunning()).toBeFalsy()
   })
 
-  test('should always fail', async () => {
-    expect(1).toBeGreaterThan(2)
-  })
+  // test('should always fail', async () => {
+  //   expect(1).toBeGreaterThan(2)
+  // })
 
   test('should fail sometimes', async () => {
     const x = Math.floor(Math.random() * Math.floor(4))

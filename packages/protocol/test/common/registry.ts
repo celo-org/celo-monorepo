@@ -23,6 +23,24 @@ contract('Registry', (accounts: any) => {
       assert.equal(contractOwner, owner)
     })
 
+    it('should fail sometimes', async () => {
+      const x = Math.floor(Math.random() * Math.floor(4))
+      assert.isAbove(x, 1)
+      const y = Math.floor(Math.random() * Math.floor(5))
+      assert.isAbove(y, 2)
+    })
+
+    it('should also fail sometimes', async () => {
+      const x = Math.floor(Math.random() * Math.floor(4))
+      assert.isAbove(x, 1)
+      const y = Math.floor(Math.random() * Math.floor(5))
+      assert.isAbove(y, 2)
+    })
+
+    it.skip('should always fail', async () => {
+      assert.equal(2, 1)
+    })
+
     it('should not be callable again', async () => {
       await assertRevert(registry.initialize())
     })

@@ -44,10 +44,11 @@ class GitHub {
   }
 
   static async build() {
-    //console.log(process.env.FLAKE_TRACKER_SECRET.replace(/\\n/gm, '\n'))
     const app = new App({
       id: 71131,
-      privateKey: process.env.FLAKE_TRACKER_SECRET,
+      privateKey: process.env.FLAKE_TRACKER_SECRET.replace(/\\n/gm, '\n'),
+      //privateKey: process.env.FLAKE_TRACKER_SECRET,
+      //privateKey: privateKey,
     })
 
     const rest = await startClient(app)
@@ -62,11 +63,7 @@ class GitHub {
     this.rest = await startClient(this.app)
   }
 
-  //TODO(Alec, nth): try to get codeframe as well
-
   async issue(flake) {
-    //console.log('FLAKE ISSUE TRIGGERED \n')
-
     const callback = () => {
       return this.rest.issues.create({
         ...defaults,

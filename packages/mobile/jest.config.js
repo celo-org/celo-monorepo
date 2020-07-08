@@ -1,6 +1,6 @@
 const reactNativeJestPreset = require('react-native/jest-preset')
 const { defaults: tsjPreset } = require('ts-jest/presets')
-const flakeTrackingConfig = require('../../flakey-test-tracking/jest/config.preset.js')
+const flakeTrackingConfig = require('../../flakey-test-tracking/jest/config.js')
 
 module.exports = {
   ...tsjPreset,

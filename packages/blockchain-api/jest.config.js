@@ -1,3 +1,5 @@
+const flakeTrackingConfig = require('../../flakey-test-tracking/jest/config.js')
+
 module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   setupFiles: ['./setupJest.ts'],
@@ -6,4 +8,5 @@ module.exports = {
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },
+  ...flakeTrackingConfig,
 }

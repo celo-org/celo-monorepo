@@ -1,12 +1,14 @@
 {
-  "setupFilesAfterEnv": ["./init.js", "../../../flakey-test-tracking/jest/jest.setup.js"],
-  "testEnvironment": "../../../flakey-test-tracking/jest/environment.js",
+  "setupFilesAfterEnv": ["./init.js", "../../../flakey-test-tracking/jest/setup.js"],
+  "testEnvironment": "../../../flakey-test-tracking/jest/detox/environment.detox.js",
   "reporters": ["detox/runners/jest/streamlineReporter"],
   "verbose": true,
   "testMatch": ["**/*.spec.js"],
+  "testTimeout": 120000,
   "globals": {
     "FLAKES": "Map",
-    "RETRY_TIMES": 5
+    "RETRY_TIMES": 10,
+    "SKIP_FLAKES": true
   },
   "testRunner": "jest-circus/runner"
 }
