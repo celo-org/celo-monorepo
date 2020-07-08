@@ -19,7 +19,9 @@ import { attestationCodesSelector } from 'src/identity/reducer'
 import { VerificationStatus } from 'src/identity/types'
 import {
   AttestationCode,
+  balanceSufficientForAttestations,
   doVerificationFlow,
+  NUM_ATTESTATIONS_REQUIRED,
   requestAndRetrieveAttestations,
   startVerification,
   VERIFICATION_TIMEOUT,
@@ -136,11 +138,14 @@ const mockAttestationsWrapperUnverified = {
   complete: jest.fn(() => mockContractKitTxObject),
 }
 
+const mockAttestationsRemainingForUnverified = NUM_ATTESTATIONS_REQUIRED
+const mockAttestationsRemainingForPartialVerified = 1
+
 const mockAttestationsWrapperPartlyVerified = {
   ...mockAttestationsWrapperUnverified,
   getVerifiedStatus: jest.fn(() => ({
     isVerified: false,
-    numAttestationsRemaining: 1,
+    numAttestationsRemaining: mockAttestationsRemainingForPartialVerified,
     total: 3,
     completed: 2,
   })),
@@ -213,6 +218,7 @@ describe('Do Verification Saga', () => {
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
           mockAttestationsWrapperUnverified,
         ],
+        [call(balanceSufficientForAttestations, mockAttestationsRemainingForUnverified), true],
         [select(attestationCodesSelector), attestationCodes],
         [select(attestationCodesSelector), attestationCodes],
         [select(attestationCodesSelector), attestationCodes],
@@ -246,6 +252,7 @@ describe('Do Verification Saga', () => {
           { phoneHash: mockE164NumberHash, e164Number: mockE164Number },
         ],
         [select(privateCommentKeySelector), mockPrivateDEK],
+        [call(balanceSufficientForAttestations, mockAttestationsRemainingForPartialVerified), true],
         [select(attestationCodesSelector), attestationCodes],
       ])
       .put(completeAttestationCode())
@@ -277,6 +284,27 @@ describe('Do Verification Saga', () => {
       .run()
   })
 
+  it('shows error for insufficient balance', async () => {
+    const contractKit = await getContractKitAsync()
+    await expectSaga(doVerificationFlow)
+      .provide([
+        [call(getConnectedUnlockedAccount), mockAccount],
+        [select(e164NumberSelector), mockE164Number],
+        [
+          call(fetchPhoneHashPrivate, mockE164Number),
+          { phoneHash: mockE164NumberHash, e164Number: mockE164Number },
+        ],
+        [select(privateCommentKeySelector), mockPrivateDEK],
+        [
+          call([contractKit.contracts, contractKit.contracts.getAttestations]),
+          mockAttestationsWrapperUnverified,
+        ],
+        [call(balanceSufficientForAttestations, mockAttestationsRemainingForUnverified), false],
+      ])
+      .put(setVerificationStatus(VerificationStatus.InsufficientBalance))
+      .run()
+  })
+
   it('shows error on unexpected failure', async () => {
     const contractKit = await getContractKitAsync()
     await expectSaga(doVerificationFlow)
@@ -292,6 +320,7 @@ describe('Do Verification Saga', () => {
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
           mockAttestationsWrapperUnverified,
         ],
+        [call(balanceSufficientForAttestations, mockAttestationsRemainingForUnverified), true],
         [matchers.call.fn(requestAndRetrieveAttestations), throwError(new Error('fake error'))],
       ])
       .put(showError(ErrorMessages.VERIFICATION_FAILURE))
@@ -323,6 +352,7 @@ describe('Do Verification Saga', () => {
           mockAttestationsWrapperRevealFailure,
         ],
         [call([contractKit.contracts, contractKit.contracts.getAccounts]), mockAccountsWrapper],
+        [call(balanceSufficientForAttestations, mockAttestationsRemainingForPartialVerified), true],
         [select(attestationCodesSelector), attestationCodes],
       ])
       .put(showError(ErrorMessages.REVEAL_ATTESTATION_FAILURE))
