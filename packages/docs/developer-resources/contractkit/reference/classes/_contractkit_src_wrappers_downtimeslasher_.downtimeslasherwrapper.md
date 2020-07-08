@@ -359,7 +359,7 @@ ___
 
 ▸ **slashStartSignerIndex**(`startSignerIndex`: number, `startBlocks`: number[], `endBlocks`: number[]): *Promise‹[CeloTransactionObject](_contractkit_src_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
-*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:224](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L224)*
+*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:223](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L223)*
 
 Returns true if a validator has been down for the specified overlapping or adjacent
 intervals.
