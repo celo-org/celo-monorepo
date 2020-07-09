@@ -200,7 +200,6 @@ async function createOracleAzureIdentityIfNotExists(
     // NOTE: in the past, Azure has required 'MSI' to be the principal type provided
     // when MSI is used, but recently this error has occurred:
     //   ERROR: The PrincipalType property 'MSI' is not valid. It must be 'User', 'Group' or 'ServicePrincipal'.
-    // assigneePrincipalType = 'MSI'
   }
   await assignRoleIfNotAssigned(assigneeObjectId, assigneePrincipalType, identity.id, 'Managed Identity Operator')
   // Allow the oracle identity to access the correct key vault
