@@ -1,4 +1,0 @@
-dependencies:
-  - name: pod-security-policies
-    version: 1.0.0
-    repository: file://../pod-security-policies

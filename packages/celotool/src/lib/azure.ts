@@ -1,8 +1,8 @@
 import { createNamespaceIfNotExists } from 'src/lib/cluster'
 import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { doCheckOrPromptIfStagingOrProduction } from 'src/lib/env-utils'
-import { installAndEnableMetricsDeps, upgradeGenericHelmChart, redeployTiller } from 'src/lib/helm_deploy'
-import { outputIncludes, retryCmd } from 'src/lib/utils'
+import { installAndEnableMetricsDeps, installOrUpgradeGenericHelmChart, redeployTiller } from 'src/lib/helm_deploy'
+import { retryCmd } from 'src/lib/utils'
 
 /**
  * Basic info for an AKS cluster
@@ -70,32 +70,33 @@ async function setupCluster(celoEnv: string, clusterConfig: AzureClusterConfig) 
   console.info('Performing any cluster setup that needs to be done...')
 
   await redeployTiller()
+  await installPodSecurityPolicies()
   await installAndEnableMetricsDeps(true, clusterConfig)
   await installAADPodIdentity()
 }
 
 // installAADPodIdentity installs the resources necessary for AAD pod level identities
-async function installAADPodIdentity() {
+function installAADPodIdentity() {
   // The helm chart maintained directly by AAD Pod Identity is not compatible with helm v2.
   // Until we upgrade to helm v3, we rely on our own helm chart adapted from:
   // https://raw.githubusercontent.com/Azure/aad-pod-identity/8a5f2ed5941496345592c42e1d6cbd12c32aeebf/deploy/infra/deployment-rbac.yaml
-  const aadPodIdentityExists = await outputIncludes(
-    `helm list`,
-    `aad-pod-identity`,
-    `aad-pod-identity exists, skipping install`
+  console.info('Installing or upgrading aad-pod-identity')
+  return installOrUpgradeGenericHelmChart(
+    'default',
+    'aad-pod-identity',
+    '../helm-charts/aad-pod-identity',
+    []
   )
-  if (true || !aadPodIdentityExists) {
-    console.info('Installing aad-pod-identity')
-    await upgradeGenericHelmChart(
-      'default',
-      'aad-pod-identity',
-      '../helm-charts/aad-pod-identity',
-      []
-    )
-    // await execCmdWithExitOnFailure(
-    //   `helm install --name aad-pod-identity ../helm-charts/aad-pod-identity`
-    // )
-  }
+}
+
+function installPodSecurityPolicies() {
+  console.info('Installing or upgrading pod-security-policies')
+  return installOrUpgradeGenericHelmChart(
+    'default',
+    'pod-security-policies',
+    '../helm-charts/pod-security-policies',
+    []
+  )
 }
 
 /**

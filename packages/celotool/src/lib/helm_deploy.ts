@@ -629,7 +629,7 @@ function buildHelmChartDependencies(chartDir: string) {
 }
 
 export async function installGenericHelmChart(
-  celoEnv: string,
+  namespace: string,
   releaseName: string,
   chartDir: string,
   parameters: string[]
@@ -638,12 +638,12 @@ export async function installGenericHelmChart(
 
   console.info(`Installing helm release ${releaseName}`)
   await helmCommand(
-    `helm install ${chartDir} --name ${releaseName} --namespace ${celoEnv} ${parameters.join(' ')}`
+    `helm install ${chartDir} --name ${releaseName} --namespace ${namespace} ${parameters.join(' ')}`
   )
 }
 
 export async function upgradeGenericHelmChart(
-  celoEnv: string,
+  namespace: string,
   releaseName: string,
   chartDir: string,
   parameters: string[]
@@ -652,9 +652,23 @@ export async function upgradeGenericHelmChart(
 
   console.info(`Upgrading helm release ${releaseName}`)
   await helmCommand(
-    `helm upgrade ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(' ')}`
+    `helm upgrade ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(' ')}`
   )
   console.info(`Upgraded helm release ${releaseName}`)
+}
+
+export async function installOrUpgradeGenericHelmChart(
+  namespace: string,
+  releaseName: string,
+  chartDir: string,
+  parameters: string[]
+) {
+  const releaseExists = await outputIncludes(
+    `helm list`,
+    releaseName,
+  )
+  const fn = releaseExists ? upgradeGenericHelmChart : installGenericHelmChart
+  return fn(namespace, releaseName, chartDir, parameters)
 }
 
 export function isCelotoolVerbose() {

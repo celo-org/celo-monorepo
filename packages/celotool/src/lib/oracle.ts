@@ -206,10 +206,13 @@ async function createOracleAzureIdentityIfNotExists(
   // the service principal or the managed service identity.
   // See https://github.com/Azure/aad-pod-identity/blob/b547ba86ab9b16d238db8a714aaec59a046afdc5/docs/readmes/README.role-assignment.md#obtaining-the-id-of-the-managed-identity--service-principal
   let assigneeObjectId = await getAKSServicePrincipalObjectId(clusterConfig)
-  let assigneePrincipalType = 'ServicePrincipal'
+  const assigneePrincipalType = 'ServicePrincipal'
   if (!assigneeObjectId) {
     assigneeObjectId = await getAKSManagedServiceIdentityObjectId(clusterConfig)
-    assigneePrincipalType = 'MSI'
+    // NOTE: in the past, Azure has required 'MSI' to be the principal type provided
+    // when MSI is used, but recently this error has occurred:
+    //   ERROR: The PrincipalType property 'MSI' is not valid. It must be 'User', 'Group' or 'ServicePrincipal'.
+    // assigneePrincipalType = 'MSI'
   }
   await assignRoleIfNotAssigned(assigneeObjectId, assigneePrincipalType, identity.id, 'Managed Identity Operator')
   // Allow the oracle identity to access the correct key vault
