@@ -466,7 +466,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       salt,
       smsRetrieverAppSig,
     }
-    return fetch(appendPath(serviceURL, '/attestations'), {
+    return fetch(appendPath(serviceURL, 'attestations'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -585,6 +585,15 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       ret.error = error
       return ret
     }
+  }
+
+  async revoke(identifer: string, account: Address) {
+    const accounts = await this.contract.methods.lookupAccountsForIdentifier(identifer).call()
+    const idx = accounts.findIndex((acc) => eqAddress(acc, account))
+    if (idx < 0) {
+      throw new Error("Account not found in identifier's accounts")
+    }
+    return toTransactionObject(this.kit, this.contract.methods.revoke(identifer, idx))
   }
 }
 

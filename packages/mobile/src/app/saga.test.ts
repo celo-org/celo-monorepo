@@ -1,16 +1,12 @@
-import { REHYDRATE } from 'redux-persist/es/constants'
 import { expectSaga } from 'redux-saga-test-plan'
-import { call, select } from 'redux-saga/effects'
+import { select } from 'redux-saga/effects'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { appLock, openDeepLink, setAppState } from 'src/app/actions'
-import { handleDeepLink, handleSetAppState, watchRehydrate } from 'src/app/saga'
+import { handleDeepLink, handleSetAppState } from 'src/app/saga'
 import { getAppLocked, getLastTimeBackgrounded, getRequirePinOnAppOpen } from 'src/app/selectors'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
-import { isAppVersionDeprecated } from 'src/firebase/firebase'
 import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
 
 jest.mock('src/utils/time', () => ({
   clockInSync: () => true,
@@ -26,14 +22,6 @@ describe('App saga', () => {
   })
   afterEach(() => {
     jest.clearAllMocks()
-  })
-
-  it('Version Deprecated', async () => {
-    await expectSaga(watchRehydrate)
-      .dispatch({ type: REHYDRATE })
-      .provide([[call(isAppVersionDeprecated), true]])
-      .run()
-    expect(navigate).toHaveBeenCalledWith(Screens.UpgradeScreen)
   })
 
   it('Handles Dappkit deep link', async () => {

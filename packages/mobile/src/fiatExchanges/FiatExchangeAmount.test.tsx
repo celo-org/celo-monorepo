@@ -3,6 +3,7 @@ import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import FiatExchangeAmount from 'src/fiatExchanges/FiatExchangeAmount'
 import { Screens } from 'src/navigator/Screens'
 import { createMockStore, getMockStackScreenProps } from 'test/utils'
@@ -42,7 +43,9 @@ describe('FiatExchangeAmount', () => {
     fireEvent.changeText(getByTestId('FiatExchangeInput'), '750')
     expect(getByTestId('FiatExchangeNextButton').props.disabled).toBe(false)
     fireEvent.press(getByTestId('FiatExchangeNextButton'))
-    expect(store.getActions()).toContainEqual(showError(ErrorMessages.PAYMENT_LIMIT_REACHED, null))
+    expect(store.getActions()).toContainEqual(
+      showError(ErrorMessages.PAYMENT_LIMIT_REACHED, ALERT_BANNER_DURATION)
+    )
   })
 
   it('validates the amount when adding funds', () => {
@@ -59,6 +62,8 @@ describe('FiatExchangeAmount', () => {
     fireEvent.changeText(getByTestId('FiatExchangeInput'), '750')
     expect(getByTestId('FiatExchangeNextButton').props.disabled).toBe(false)
     fireEvent.press(getByTestId('FiatExchangeNextButton'))
-    expect(store.getActions()).toContainEqual(showError(ErrorMessages.PAYMENT_LIMIT_REACHED, null))
+    expect(store.getActions()).toContainEqual(
+      showError(ErrorMessages.PAYMENT_LIMIT_REACHED, ALERT_BANNER_DURATION)
+    )
   })
 })

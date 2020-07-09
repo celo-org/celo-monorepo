@@ -112,7 +112,7 @@ export type StackParamList = {
   [Screens.JoinCelo]: { selectedCountryCodeAlpha2: string } | undefined
   [Screens.Language]:
     | {
-        fromSettings?: boolean
+        nextScreen: keyof StackParamList
       }
     | undefined
   [Screens.Licenses]: undefined
@@ -188,6 +188,7 @@ export type StackParamList = {
   [Screens.VerificationInputScreen]: { showHelpDialog: boolean } | undefined
   [Screens.VerificationInterstitialScreen]: undefined
   [Screens.VerificationLoadingScreen]: undefined
+  [Screens.OnboardingEducationScreen]: undefined
   [Screens.OnboardingSuccessScreen]: undefined
   [Screens.WalletHome]: undefined
 }
