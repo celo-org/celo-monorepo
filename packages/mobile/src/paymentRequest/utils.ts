@@ -1,8 +1,15 @@
 import { PaymentRequest } from 'src/account/types'
-import { AddressToE164NumberType, SecureSendPhoneNumberMapping } from 'src/identity/reducer'
+import {
+  AddressToE164NumberType,
+  AddressValidationType,
+  SecureSendPhoneNumberMapping,
+} from 'src/identity/reducer'
 import { getAddressValidationType } from 'src/identity/secureSend'
-import { AddressValidationCheckCache } from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import { NumberToRecipient, Recipient, RecipientKind } from 'src/recipients/recipient'
+
+export interface AddressValidationCheckCache {
+  [e164Number: string]: AddressValidationType
+}
 
 export function getRecipientFromPaymentRequest(
   paymentRequest: PaymentRequest,

@@ -118,7 +118,10 @@ export class NotificationBox extends React.Component<Props, State> {
     const { incomingPaymentRequests } = this.props
     if (incomingPaymentRequests && incomingPaymentRequests.length) {
       return [
-        <IncomingPaymentRequestSummaryNotification key={1} requests={incomingPaymentRequests} />,
+        <IncomingPaymentRequestSummaryNotification
+          key={1}
+          paymentRequests={incomingPaymentRequests}
+        />,
       ]
     }
     return []

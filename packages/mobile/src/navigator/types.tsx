@@ -12,6 +12,7 @@ import { AddressValidationType } from 'src/identity/reducer'
 import { ImportContactsStatus } from 'src/identity/types'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { Screens } from 'src/navigator/Screens'
+import { AddressValidationCheckCache } from 'src/paymentRequest/utils'
 import { Recipient } from 'src/recipients/recipient'
 import { TransactionDataInput } from 'src/send/SendAmount'
 import { ReviewProps } from 'src/transactions/TransactionReview'
@@ -104,7 +105,9 @@ export type StackParamList = {
         onPressSkip?: () => void
         importStatus?: ImportContactsStatus
       }
-  [Screens.IncomingPaymentRequestListScreen]: undefined
+  [Screens.IncomingPaymentRequestListScreen]: {
+    addressValidationCheckCache: AddressValidationCheckCache
+  }
   [Screens.Invite]: undefined
   [Screens.InviteReview]: {
     recipient: Recipient
