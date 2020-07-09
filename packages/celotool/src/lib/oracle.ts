@@ -55,8 +55,8 @@ const oracleContextAzureClusterConfigDynamicEnvVars: { [k in keyof AzureClusterC
  */
 const oracleContextAwsClusterConfigDynamicEnvVars: { [k in keyof AwsClusterConfig]: DynamicEnvVar } = {
   clusterName: DynamicEnvVar.ORACLE_KUBERNETES_CLUSTER_NAME,
-  // Given that the context has region, it is possible to not inclue this and extract via parsing
-  // Downside is that parsing can be finicky. 
+  // Given that the context has region, it is possible to not include this environment variable
+  // Could instead extract via parsing but downside is that it can be finicky
   clusterRegion: DynamicEnvVar.ORACLE_AWS_CLUSTER_REGION, 
 }
 
