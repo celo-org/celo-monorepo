@@ -2,7 +2,8 @@ import {
   ErrorMessage,
   SignMessageResponse,
   SignMessageResponseFailure,
-  WarningMessage,
+  SignMessageResponseSuccess,
+  WarningMessage
 } from '@celo/phone-number-privacy-common'
 import AbortController from 'abort-controller'
 import { Request, Response } from 'firebase-functions'
@@ -15,12 +16,14 @@ import {
   hasValidAccountParam,
   hasValidQueryPhoneNumberParam,
   isBodyReasonablySized,
-  phoneNumberHashIsValidIfExists,
+  phoneNumberHashIsValidIfExists
 } from '../common/input-validation'
 import logger from '../common/logger'
 import config, { VERSION } from '../config'
 
 const PARTIAL_SIGN_MESSAGE_ENDPOINT = '/getBlindedSalt'
+
+type SignerResponse = SignMessageResponseSuccess | SignMessageResponseFailure
 
 interface GetBlindedMessageForSaltRequest {
   account: string
@@ -122,11 +125,10 @@ async function handleSuccessResponse(
   blsCryptoClient: BLSCryptographyClient,
   blindedQueryPhoneNumber: string
 ) {
-  const signResponse = (await res.json()) as SignMessageResponse
+  const signResponse = (await res.json()) as SignerResponse
   if (!signResponse.success) {
     // Continue on failure as long as signature is present to unblock user
-    const signResponseFailure = signResponse as SignMessageResponseFailure
-    logger.error(`${signResponseFailure.error} from signer ${serviceUrl}`)
+    logger.error(`${signResponse.error} from signer ${serviceUrl}`)
   }
   if (!signResponse.signature) {
     throw new Error(`Signature is missing from signer ${serviceUrl}`)
@@ -162,7 +164,7 @@ function logResponseDiscrepancies(responses: SignMsgRespWithStatus[]) {
   const expectedTotalQuota = successfulResponses[0].signMessageResponse!.totalQuota!
   const expectedBlockNumber = successfulResponses[0].signMessageResponse!.blockNumber!
   let discrepancyFound = false
-  successfulResponses.forEach((resp) => {
+  for (const resp of successfulResponses) {
     // Performed query count should never diverge; however the totalQuota may
     // diverge if the queried block number is different
     if (
@@ -222,7 +224,7 @@ function requestSignature(
 
 function getMajorityErrorCode(errorCodes: Map<number, number>) {
   if (errorCodes.size > 1) {
-    logger.error(ErrorMessage.INCONSISTENT_SINGER_RESPONSES)
+    logger.error(ErrorMessage.INCONSISTENT_SIGNER_RESPONSES)
   }
 
   let maxErrorCode = -1
