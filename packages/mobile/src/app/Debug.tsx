@@ -2,9 +2,10 @@ import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import * as React from 'react'
 import { Clipboard, StyleSheet, Text } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import LogView from 'src/app/LogView'
+import { noHeader } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -19,7 +20,7 @@ interface State {
 }
 
 export class Debug extends React.Component<RootState, State> {
-  static navigationOptions = { header: null }
+  static navigationOptions = noHeader
 
   state = {
     reactNativeLogs: '',

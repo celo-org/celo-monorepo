@@ -1,3 +1,4 @@
+import { sha256 } from 'ethereumjs-util'
 import { TokenTransactionType, TransactionFeedFragment } from 'src/apollo/types'
 import { ExchangeConfirmationCardProps } from 'src/exchange/ExchangeConfirmationCard'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
@@ -8,7 +9,6 @@ import { NumberToRecipient } from 'src/recipients/recipient'
 import { TransactionDataInput } from 'src/send/SendAmount'
 import { TransferConfirmationCardProps } from 'src/transactions/TransferConfirmationCard'
 import { StandbyTransaction } from 'src/transactions/types'
-import { web3ForUtils } from 'src/web3/contracts'
 
 export enum Actions {
   ADD_STANDBY_TRANSACTION = 'TRANSACTIONS/ADD_STANDBY_TRANSACTION',
@@ -71,7 +71,7 @@ export type ActionTypes =
   | UpdatedRecentTxRecipientsCacheAction
 
 export const generateStandbyTransactionId = (recipientAddress: string) => {
-  return web3ForUtils.utils.sha3(recipientAddress + String(Date.now()))
+  return sha256(recipientAddress + String(Date.now())).toString('hex')
 }
 
 export const addStandbyTransaction = (

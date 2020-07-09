@@ -11,10 +11,10 @@ import React, { useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import Animated from 'react-native-reanimated'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { CeloExchangeEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { fetchExchangeRate } from 'src/exchange/actions'
 import CeloGoldHistoryChart from 'src/exchange/CeloGoldHistoryChart'
 import CeloGoldOverview from 'src/exchange/CeloGoldOverview'
@@ -39,6 +39,7 @@ import { getLocalCurrencyDisplayValue } from 'src/utils/formatting'
 type Props = StackScreenProps<StackParamList, Screens.ExchangeHomeScreen>
 
 function navigateToGuide() {
+  ValoraAnalytics.track(CeloExchangeEvents.celo_home_info)
   navigate(Screens.GoldEducation)
 }
 
@@ -52,7 +53,7 @@ function ExchangeHomeScreen({ navigation }: Props) {
   }
 
   function goToBuyGold() {
-    CeloAnalytics.track(CustomEventNames.gold_buy_start)
+    ValoraAnalytics.track(CeloExchangeEvents.celo_home_buy)
     navigation.navigate(Screens.ExchangeTradeScreen, {
       makerTokenDisplay: {
         makerToken: CURRENCY_ENUM.DOLLAR,
@@ -62,7 +63,7 @@ function ExchangeHomeScreen({ navigation }: Props) {
   }
 
   function goToBuyDollars() {
-    CeloAnalytics.track(CustomEventNames.gold_sell_start)
+    ValoraAnalytics.track(CeloExchangeEvents.celo_home_sell)
     navigation.navigate(Screens.ExchangeTradeScreen, {
       makerTokenDisplay: {
         makerToken: CURRENCY_ENUM.GOLD,
@@ -269,7 +270,6 @@ const styles = StyleSheet.create({
   goldPriceValues: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    justifyContent: 'center',
   },
   goldPriceCurrentValue: {
     height: 27,
@@ -284,7 +284,6 @@ const styles = StyleSheet.create({
   },
   goldPriceWentDown: {
     ...fontStyles.regular,
-    marginBottom: 2, // vertically align with the current price
     marginLeft: 4,
     color: colors.warning,
   },

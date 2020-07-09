@@ -12,9 +12,8 @@ import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { Platform, StyleSheet, Text, TextInput, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
-import { CustomEventNames } from 'src/analytics/constants'
 import BackButton from 'src/components/BackButton.v2'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import LineItemRow from 'src/components/LineItemRow'
@@ -53,7 +52,7 @@ export const fiatExchangesAmountScreenOptions = ({
 }) => {
   return {
     ...emptyHeader,
-    headerLeft: () => <BackButton eventName={CustomEventNames.send_amount_back} />,
+    headerLeft: () => <BackButton />,
     headerTitle: () => (
       <HeaderTitleWithBalance
         title={i18n.t(`fiatExchangeFlow:${route.params?.isAddFunds ? 'addFunds' : 'cashOut'}`)}
@@ -62,8 +61,6 @@ export const fiatExchangesAmountScreenOptions = ({
     ),
   }
 }
-
-const safeAreaInset = { top: 'never' as 'never', bottom: 'always' as 'always' }
 
 export function ExchangeTradeScreen({ navigation, route }: Props) {
   function isNextButtonValid() {
@@ -113,12 +110,7 @@ export function ExchangeTradeScreen({ navigation, route }: Props) {
   )
 
   return (
-    <SafeAreaView
-      // Force inset as this screen uses auto focus and KeyboardSpacer padding is initially
-      // incorrect because of that
-      forceInset={safeAreaInset}
-      style={styles.container}
-    >
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <DisconnectBanner />
       <KeyboardAwareScrollView
         keyboardShouldPersistTaps={'always'}

@@ -24,6 +24,7 @@ export enum Actions {
   SET_LOCK_WITH_PIN_ENABLED = 'APP/SET_LOCK_WITH_PIN_ENABLED',
   LOCK = 'APP/LOCK',
   UNLOCK = 'APP/UNLOCK',
+  SET_SESSION_ID = 'SET_SESSION_ID',
 }
 
 export interface SetAppState {
@@ -68,7 +69,7 @@ interface SetAnalyticsEnabled {
   enabled: boolean
 }
 
-interface SetLockWithPinEnabled {
+interface SetRequirePinOnAppOpen {
   type: Actions.SET_LOCK_WITH_PIN_ENABLED
   enabled: boolean
 }
@@ -81,6 +82,11 @@ export interface Unlock {
   type: Actions.UNLOCK
 }
 
+export interface SetSessionId {
+  type: Actions.SET_SESSION_ID
+  sessionId: string
+}
+
 export type ActionTypes =
   | SetAppState
   | SetLoggedIn
@@ -91,9 +97,10 @@ export type ActionTypes =
   | EnterBackupFlow
   | ExitBackupFlow
   | SetAnalyticsEnabled
-  | SetLockWithPinEnabled
+  | SetRequirePinOnAppOpen
   | Lock
   | Unlock
+  | SetSessionId
 
 export const setAppState = (state: string) => ({
   type: Actions.SET_APP_STATE,
@@ -145,7 +152,7 @@ export const setAnalyticsEnabled = (enabled: boolean): SetAnalyticsEnabled => ({
   enabled,
 })
 
-export const setLockWithPinEnabled = (enabled: boolean): SetLockWithPinEnabled => ({
+export const setRequirePinOnAppOpen = (enabled: boolean): SetRequirePinOnAppOpen => ({
   type: Actions.SET_LOCK_WITH_PIN_ENABLED,
   enabled,
 })
@@ -156,4 +163,9 @@ export const appLock = (): Lock => ({
 
 export const appUnlock = (): Unlock => ({
   type: Actions.UNLOCK,
+})
+
+export const setSessionId = (sessionId: string) => ({
+  type: Actions.SET_SESSION_ID,
+  sessionId,
 })

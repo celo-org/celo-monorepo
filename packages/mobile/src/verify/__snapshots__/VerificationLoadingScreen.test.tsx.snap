@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`VerificationLoadingScreen renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#F9F6F0",
@@ -60,7 +60,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                 "fontFamily": "Inter-Regular",
                 "fontSize": 16,
                 "lineHeight": 22,
-                "paddingHorizontal": 16,
+                "paddingHorizontal": 24,
               },
               Object {
                 "color": "#2E3338",
@@ -390,11 +390,11 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
       </View>
     </View>
   </Modal>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
 
 exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#F9F6F0",
@@ -453,7 +453,7 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
                 "fontFamily": "Inter-Regular",
                 "fontSize": 16,
                 "lineHeight": 22,
-                "paddingHorizontal": 16,
+                "paddingHorizontal": 24,
               },
               Object {
                 "color": "#2E3338",
@@ -783,5 +783,5 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
       </View>
     </View>
   </Modal>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
