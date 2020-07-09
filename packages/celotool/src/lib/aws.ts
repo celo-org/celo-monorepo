@@ -9,6 +9,7 @@ import { installAndEnableMetricsDeps, redeployTiller } from 'src/lib/helm_deploy
 export interface AwsClusterConfig {
   clusterRegion: string
   clusterName: string 
+  tag: string
   // subscriptionId: string
 }
 
@@ -68,4 +69,37 @@ async function setupCluster(celoEnv: string, clusterConfig: AwsClusterConfig) {
   await installAndEnableMetricsDeps(true, clusterConfig.clusterName)
   // Should not execute AADPodIdentityif on AWS
   // await installAADPodIdentity()
+}
+
+// IP ADDRESS RELATED
+
+export async function registerStaticIPIfNotRegistered(name: string, resourceGroupIP: string) {
+
+
+
+  // This returns an array of matching IP addresses. If there is no matching IP
+  // address, an empty array is returned. We expect at most 1 matching IP
+  const [existingIpsStr] = await execCmdWithExitOnFailure(
+    `az network public-ip list --resource-group ${resourceGroupIP} --query "[?name == '${name}' && sku.name == 'Standard'].ipAddress" -o json`
+  )
+  const existingIps = JSON.parse(existingIpsStr)
+  if (existingIps.length) {
+    console.info(`Skipping IP address registration, ${name} on ${resourceGroupIP} exists`)
+    // We expect only 1 matching IP
+    return existingIps[0]
+  }
+  console.info(`Registering IP address ${name} on ${resourceGroupIP}`)
+  const [address] = await execCmdWithExitOnFailure(
+    `az network public-ip create --resource-group ${resourceGroupIP} --name ${name} --allocation-method Static --sku Standard --query publicIp.ipAddress -o tsv`
+  )
+  return address.trim()
+}
+
+export async function deallocateStaticIP(name: string, allocationID: string) {
+  console.info(`Deallocating IP address ${name} on ${allocationID}`)
+
+  //aws ec2 release-address --allocation id (IP's allocationID)
+  return execCmdWithExitOnFailure(
+    `az network public-ip delete --resource-group ${allocationID} --name ${name}`
+  )
 }
