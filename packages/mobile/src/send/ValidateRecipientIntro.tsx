@@ -21,7 +21,7 @@ import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { TransactionDataInput } from 'src/send/SendAmount'
 
-const AVATAR_SIZE = 120
+const AVATAR_SIZE = 64
 
 interface StateProps {
   recipient: Recipient
