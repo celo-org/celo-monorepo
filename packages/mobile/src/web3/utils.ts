@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import { call } from 'redux-saga/effects'
 import { GAS_INFLATION_FACTOR } from 'src/config'
 import Logger from 'src/utils/Logger'
-import { getContractKit, getContractKitAsync } from 'src/web3/contracts'
+import { getWeb3, getWeb3Async } from 'src/web3/contracts'
 import { Tx } from 'web3-core'
 import { TransactionObject } from 'web3-eth'
 
@@ -11,7 +11,7 @@ const TAG = 'web3/utils'
 
 // Estimate gas taking into account the configured inflation factor
 export async function estimateGas(txObj: TransactionObject<any>, txParams: Tx) {
-  const web3 = (await getContractKitAsync()).web3
+  const web3 = await getWeb3Async()
   const gasEstimator = (_tx: Tx) => txObj.estimateGas({ ..._tx })
   const getCallTx = (_tx: Tx) => {
     // @ts-ignore missing _parent property from TransactionObject type.
@@ -27,21 +27,23 @@ export async function estimateGas(txObj: TransactionObject<any>, txParams: Tx) {
 // Note: This returns Promise<Block>
 export async function getLatestBlock() {
   Logger.debug(TAG, 'Getting latest block')
-  const contractKit = await getContractKitAsync()
-  return contractKit.web3.eth.getBlock('latest')
+  const web3 = await getWeb3Async()
+  return web3.eth.getBlock('latest')
 }
 
 export async function getLatestBlockNumber() {
   Logger.debug(TAG, 'Getting latest block number')
-  const contractKit = await getContractKitAsync()
-  return contractKit.web3.eth.getBlockNumber()
+  const web3 = await getWeb3Async()
+  return web3.eth.getBlockNumber()
 }
 
+// TODO Warning: this approach causes problems in certain cases where
+// parallel txs are being sent
 export function* getLatestNonce(address: string) {
   Logger.debug(TAG, 'Fetching latest nonce (incl. pending)')
-  const contractKit = yield call(getContractKit)
+  const web3 = yield call(getWeb3)
   // Note tx count is 1-indexed but nonces are 0-indexed
-  const nonce = (yield call(contractKit.web3.eth.getTransactionCount, address, 'pending')) - 1
+  const nonce = (yield call(web3.eth.getTransactionCount, address, 'pending')) - 1
   Logger.debug(TAG, `Latest nonce found: ${nonce}`)
   return nonce
 }
