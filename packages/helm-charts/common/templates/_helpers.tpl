@@ -149,6 +149,7 @@ release: {{ .Release.Name }}
       --consoleoutput=stdout \
       --verbosity={{ .Values.geth.verbosity }} \
       --vmodule={{ .Values.geth.vmodule }} \
+      --istanbul.blockperiod={{ .Values.geth.blocktime | default 5 }} \
       ${ADDITIONAL_FLAGS}
   env:
   - name: GETH_DEBUG

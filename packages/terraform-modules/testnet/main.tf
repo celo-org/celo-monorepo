@@ -241,6 +241,5 @@ module "validator" {
   network_name                          = data.google_compute_network.network.name
   node_disk_size_gb                     = var.node_disk_size_gb
   proxies_per_validator                 = var.proxies_per_validator
-  tx_node_count                         = var.tx_node_count
   validator_count                       = var.validator_count
 }

@@ -80,6 +80,7 @@ resource "google_compute_instance" "validator" {
       max_peers : 125,
       network_id : var.network_id,
       proxied : count.index < length(var.proxies_per_validator),
+      # proxied : var.proxies_per_validator[count.index] > 0 ? true : false,
       rid : count.index,
       # Searches for all proxies whose map key corresponds to this specific validator
       # by finding keys starting with "validator-${this validator index}"
