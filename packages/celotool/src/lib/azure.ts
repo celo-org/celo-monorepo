@@ -71,7 +71,7 @@ async function setupCluster(celoEnv: string, clusterConfig: AzureClusterConfig) 
 
   await redeployTiller()
   await installPodSecurityPolicies()
-  await installAndEnableMetricsDeps(true, clusterConfig)
+  await installAndEnableMetricsDeps(clusterConfig, true)
   await installAADPodIdentity()
 }
 

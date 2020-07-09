@@ -214,8 +214,8 @@ export async function installCertManager() {
 }
 
 export async function installAndEnableMetricsDeps(
-  installPrometheus: boolean,
-  clusterConfig?: AzureClusterConfig
+  clusterConfig?: AzureClusterConfig,
+  usePodSecurityPolicy: boolean = false,
 ) {
   const kubeStateMetricsReleaseExists = await outputIncludes(
     `helm list`,
@@ -227,9 +227,7 @@ export async function installAndEnableMetricsDeps(
       `helm install --name kube-state-metrics stable/kube-state-metrics --set rbac.create=true`
     )
   }
-  if (installPrometheus) {
-    await installPrometheusIfNotExists(clusterConfig)
-  }
+  return installPrometheusIfNotExists(clusterConfig, usePodSecurityPolicy)
 }
 
 export async function grantRoles(serviceAccountName: string, role: string) {
