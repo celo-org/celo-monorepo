@@ -14,9 +14,7 @@ exports[`Invite renders correctly with no recipients 1`] = `
       Object {
         "alignItems": "center",
         "backgroundColor": "transparent",
-        "borderBottomColor": AnimatedValue {
-          " __value": NaN,
-        },
+        "borderBottomColor": 0,
         "borderBottomWidth": 1,
         "flexDirection": "row",
         "height": 62,
@@ -223,11 +221,7 @@ exports[`Invite renders correctly with no recipients 1`] = `
         </View>
       }
       ListHeaderComponent={[Function]}
-      contentContainerStyle={
-        Object {
-          "paddingBottom": 0,
-        }
-      }
+      contentContainerStyle={null}
       data={Array []}
       disableVirtualization={false}
       getItem={[Function]}
@@ -289,6 +283,22 @@ exports[`Invite renders correctly with no recipients 1`] = `
         </View>
       </View>
     </RCTScrollView>
+    <View
+      collapsable={false}
+      style={
+        Array [
+          Object {
+            "bottom": 0,
+            "left": 0,
+            "right": 0,
+          },
+          Object {
+            "height": 0,
+          },
+          undefined,
+        ]
+      }
+    />
   </View>
 </View>
 `;
@@ -307,9 +317,7 @@ exports[`Invite renders correctly with recipients 1`] = `
       Object {
         "alignItems": "center",
         "backgroundColor": "transparent",
-        "borderBottomColor": AnimatedValue {
-          " __value": NaN,
-        },
+        "borderBottomColor": 0,
         "borderBottomWidth": 1,
         "flexDirection": "row",
         "height": 62,
@@ -516,11 +524,7 @@ exports[`Invite renders correctly with recipients 1`] = `
         </View>
       }
       ListHeaderComponent={[Function]}
-      contentContainerStyle={
-        Object {
-          "paddingBottom": 0,
-        }
-      }
+      contentContainerStyle={null}
       data={
         Array [
           Object {
@@ -585,14 +589,17 @@ exports[`Invite renders correctly with recipients 1`] = `
         >
           <View
             style={
-              Object {
-                "alignItems": "center",
-                "backgroundColor": "#FFFFFF",
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "paddingHorizontal": 16,
-                "paddingVertical": 8,
-              }
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "backgroundColor": "#FFFFFF",
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "paddingHorizontal": 16,
+                  "paddingVertical": 8,
+                },
+                undefined,
+              ]
             }
           >
             <Text
@@ -994,6 +1001,22 @@ exports[`Invite renders correctly with recipients 1`] = `
         />
       </View>
     </RCTScrollView>
+    <View
+      collapsable={false}
+      style={
+        Array [
+          Object {
+            "bottom": 0,
+            "left": 0,
+            "right": 0,
+          },
+          Object {
+            "height": 0,
+          },
+          undefined,
+        ]
+      }
+    />
   </View>
 </View>
 `;

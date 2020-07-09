@@ -1,14 +1,14 @@
-import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { Image, StyleSheet } from 'react-native'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { Image } from 'react-native'
+import { HomeEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentLineItem from 'src/escrow/EscrowedPaymentLineItem'
 import { listItemRenderer } from 'src/escrow/EscrowedPaymentListScreen'
+import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { inviteFriendsIcon } from 'src/images/Images'
+import { notificationInvite } from 'src/images/Images'
 import { InviteDetails } from 'src/invite/actions'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -23,7 +23,10 @@ type Props = OwnProps & WithTranslation
 
 export class EscrowedPaymentReminderSummaryNotification extends React.Component<Props> {
   onReview = () => {
-    CeloAnalytics.track(CustomEventNames.escrowed_payment_review)
+    ValoraAnalytics.track(HomeEvents.notification_select, {
+      notificationType: NotificationBannerTypes.escrow_tx_summary,
+      selectedAction: NotificationBannerCTATypes.review,
+    })
     navigate(Screens.EscrowedPaymentListScreen)
   }
 
@@ -40,31 +43,13 @@ export class EscrowedPaymentReminderSummaryNotification extends React.Component<
         items={payments}
         title={t('escrowedPaymentReminderSummaryTitle', { count: payments.length })}
         detailsI18nKey="walletFlow5:escrowedPaymentReminderSummaryDetails"
-        icon={<Image source={inviteFriendsIcon} style={styles.image} resizeMode="contain" />}
+        icon={<Image source={notificationInvite} resizeMode="contain" />}
         onReview={this.onReview}
         itemRenderer={this.itemRenderer}
       />
     )
   }
 }
-
-const styles = StyleSheet.create({
-  body: {
-    marginTop: 5,
-    flexDirection: 'row',
-  },
-  image: {
-    width: 30,
-    height: 30,
-  },
-  requests: {
-    flex: 1,
-  },
-  counter: {
-    paddingLeft: variables.contentPadding,
-    justifyContent: 'flex-end',
-  },
-})
 
 export default withTranslation<Props>(Namespaces.walletFlow5)(
   EscrowedPaymentReminderSummaryNotification

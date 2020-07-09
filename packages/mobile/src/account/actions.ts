@@ -1,7 +1,5 @@
 import { PincodeType } from 'src/account/reducer'
 import { PaymentRequest } from 'src/account/types'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { DefaultEventNames } from 'src/analytics/constants'
 
 // TODO(Rossy): Remove the _ACTION suffix from these actions for consistency with other other names
 export enum Actions {
@@ -26,6 +24,7 @@ export enum Actions {
   SET_PROMPT_FORNO = 'ACCOUNT/SET_PROMPT_FORNO',
   SET_RETRY_VERIFICATION_WITH_FORNO = 'ACCOUNT/SET_RETRY_VERIFICATION_WITH_FORNO',
   ACCEPT_TERMS = 'ACCOUNT/ACCEPT_TERMS',
+  MIGRATE_ACCOUNT_BIP39 = 'MIGRATE_ACCOUNT_BIP39',
 }
 
 export interface SetNameAction {
@@ -54,7 +53,6 @@ export interface PhotosNUXClickedAction {
 export interface SetPincodeAction {
   type: Actions.SET_PINCODE
   pincodeType: PincodeType
-  pin?: string
 }
 
 export interface SetPincodeSuccessAction {
@@ -124,6 +122,10 @@ export interface SetRetryVerificationWithFornoAction {
   retry: boolean
 }
 
+export interface MigrateAccount {
+  type: Actions.MIGRATE_ACCOUNT_BIP39
+}
+
 export type ActionTypes =
   | SetNameAction
   | SetPhoneNumberAction
@@ -146,6 +148,7 @@ export type ActionTypes =
   | SetPromptFornoAction
   | SetRetryVerificationWithFornoAction
   | AcceptTermsAction
+  | MigrateAccount
 
 export function setName(name: string): SetNameAction {
   return {
@@ -160,7 +163,6 @@ export function acceptTerms(): AcceptTermsAction {
 }
 
 export function setPhoneNumber(e164PhoneNumber: string, countryCode: string): SetPhoneNumberAction {
-  CeloAnalytics.track(DefaultEventNames.phoneNumberSet, { countryCode })
   return {
     type: Actions.SET_PHONE_NUMBER,
     e164PhoneNumber,
@@ -176,10 +178,9 @@ export const photosNUXCompleted = (): PhotosNUXClickedAction => ({
   type: Actions.PHOTOSNUX_CLICKED,
 })
 
-export const setPincode = (pincodeType: PincodeType, pin?: string): SetPincodeAction => ({
+export const setPincode = (pincodeType: PincodeType): SetPincodeAction => ({
   type: Actions.SET_PINCODE,
   pincodeType,
-  pin,
 })
 
 export const setPincodeSuccess = (pincodeType: PincodeType): SetPincodeSuccessAction => ({
@@ -256,4 +257,8 @@ export const setUserContactDetails = (
   type: Actions.SET_USER_CONTACT_DETAILS,
   contactId,
   thumbnailPath,
+})
+
+export const migrateAccount = (): MigrateAccount => ({
+  type: Actions.MIGRATE_ACCOUNT_BIP39,
 })

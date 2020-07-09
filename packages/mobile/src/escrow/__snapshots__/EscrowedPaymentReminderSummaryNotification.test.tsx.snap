@@ -49,13 +49,7 @@ exports[`EscrowedPaymentReminderSummaryNotification renders correctly 1`] = `
         resizeMode="contain"
         source={
           Object {
-            "testUri": "../../../packages/mobile/src/images/Invite-Friends.png",
-          }
-        }
-        style={
-          Object {
-            "height": 30,
-            "width": 30,
+            "testUri": "../../../packages/mobile/src/images/notification-invite.png",
           }
         }
       />
@@ -264,20 +258,52 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
         <View
           style={Object {}}
         >
-          <Image
-            resizeMode="contain"
-            source={
-              Object {
-                "testUri": "../../../packages/mobile/src/images/Invite-Friends.png",
-              }
-            }
+          <View
             style={
-              Object {
-                "height": 30,
-                "width": 30,
-              }
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "justifyContent": "center",
+                },
+                undefined,
+              ]
             }
-          />
+          >
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "justifyContent": "center",
+                  },
+                  Object {
+                    "backgroundColor": "#7AD6FE",
+                    "borderRadius": 20,
+                    "height": 40,
+                    "width": 40,
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#FFFFFF",
+                      "fontFamily": "Inter-Medium",
+                      "fontSize": 16,
+                    },
+                    Object {
+                      "fontSize": 20,
+                    },
+                  ]
+                }
+              >
+                +
+              </Text>
+            </View>
+          </View>
         </View>
       </View>
       <View
@@ -419,13 +445,7 @@ exports[`EscrowedPaymentReminderSummaryNotification when more than 2 requests re
         resizeMode="contain"
         source={
           Object {
-            "testUri": "../../../packages/mobile/src/images/Invite-Friends.png",
-          }
-        }
-        style={
-          Object {
-            "height": 30,
-            "width": 30,
+            "testUri": "../../../packages/mobile/src/images/notification-invite.png",
           }
         }
       />

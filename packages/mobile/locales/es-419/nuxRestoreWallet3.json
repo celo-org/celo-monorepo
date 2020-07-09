@@ -1,18 +1,10 @@
 {
-  "title": "Restaurar el Monedero Celo",
+  "title": "Restaurar tu cuenta {{appName}}",
   "userYourBackupKey":
-    "¿Ya tiene un Monedero Celo? Ingrese su Clave de Respaldo para restaurarla en este teléfono.",
-  "backupKeyPrompt":
-    "caballo leopardo perro mono tiburón tigre lémur ballena calamar lobo ardilla ratón león elefante gato langostino oso pingüino ciervo tortuga zorro cebra cabra jirafa",
+    "¿Ya tiene una cuenta {{appName}}? Ingrese su Clave de Respaldo para restaurarla en este teléfono.",
   "tip": "Sugerencia: ",
   "backupKeyTip": "Las Claves de Respaldo tienen 24 palabras, separadas por un espacio.",
-  "restoreWallet": "Restaurar",
-  "emptyWalletWarning": "Esta billetera está vacía.",
-  "useEmptyAnyway": "¿Le gustaría usarla de todas maneras?",
-  "useEmptyWallet": "Usar la billetera vacía",
-  "tryAnotherKey": "Pruebe otra Clave de Respaldo",
   "restoreSocial": "Restaurar con Salvaguardas",
-  "socialImportInfo":
-    "Si activó las Salvaguardas, envió frases de protección a dos amigos. Recupere estas frases e ingréselas aquí (en cualquier orden) para volver a tener acceso a sus fondos.",
+  "socialImportInfo": "Si activó las Salvaguardas, envió frases de protección a dos amigos. Recupere estas frases e ingréselas aquí (en cualquier orden) para volver a tener acceso a sus fondos.",
   "socialTip": "Las frases son listas de 13 palabras separadas por espacios."
 }

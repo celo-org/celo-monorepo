@@ -23,7 +23,7 @@ Validator groups who will be selected for a cohort (and will thus receive a port
 
 1. The number of elected validators in earlier cohorts;
 2. Network stability;
-3. Celo Gold governance participation (e.g., how many Celo Gold holders are actively participating in voting); and
+3. CELO governance participation (e.g., how many CELO holders are actively participating in voting); and
 4. The quality of validator group applicants
 
 Each validator group selected in the cohort will receive a portion of the Foundation votes for a period of 9 months. During this period, so long as a validator in the group is not slashed or otherwise engages in misbehavior, the validator group will continue to receive these votes. If the validator group is slashed or engages in misbehavior, however, the votes for that validator group will be withdrawn for the remainder of the period. If the validator group is slashed, it may reapply to the Foundation after a 6 month period. In addition, the Foundation may also withdraw its votes if the validator group or the validators in the group fail to meet other standards, including running an attestation service.
@@ -64,7 +64,7 @@ Make sure to complete all prerequisites before applying.
 [APPLY FOR FOUNDATION VOTES HERE](https://c-labs.typeform.com/to/Ov9U0S)
 
 ### Timings
-Cohort 3 application deadline: **July 2, 2020**
+Cohort 3 application deadline: **July 1, 2020 at 23:59 UTC**
 
 Anticipated vote date for selected applicants in Cohort 3: **as of Aug 2, 2020**
 

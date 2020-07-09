@@ -10,13 +10,13 @@ import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet } from 'react-native'
 import * as RNLocalize from 'react-native-localize'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { setName, setPhoneNumber, setPromptForno } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
 import { hideAlert, showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { OnboardingEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -169,7 +169,11 @@ export class JoinCelo extends React.Component<Props, State> {
     }
 
     if (!e164Number || !isValidNumber || !countryCallingCode) {
-      CeloAnalytics.track(CustomEventNames.inavlid_phone_number, { phoneNumber: e164Number })
+      // Replacing all integers except 0 with a “X” to obfuscate the number
+      // but still allow us to see if symbols or leading 0s were added
+      ValoraAnalytics.track(OnboardingEvents.phone_number_invalid, {
+        obfuscatedPhoneNumber: e164Number.replace(/[1-9]/g, 'X'),
+      })
       this.props.showError(ErrorMessages.INVALID_PHONE_NUMBER)
       return
     }
@@ -180,6 +184,7 @@ export class JoinCelo extends React.Component<Props, State> {
     }
 
     this.props.setPromptForno(true) // Allow forno prompt after Welcome screen
+    ValoraAnalytics.track(OnboardingEvents.phone_number_set, { countryCode: countryCallingCode })
     this.props.setPhoneNumber(e164Number, countryCallingCode)
     this.props.setName(name)
     this.goToNextScreen()

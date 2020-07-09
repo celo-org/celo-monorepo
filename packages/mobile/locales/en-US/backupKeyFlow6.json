@@ -5,7 +5,7 @@
   "introPrimaryAction": "Set Up Now",
   "delayBackup": "Wait One Hour",
   "postSetupTitle": "Your Account Key is Set Up",
-  "postSetupBody": "If you lose your Account Key, you will lose access to all of your Celo Dollars and Gold. Nobody, not even Celo, will be able to help you recover your account without your key. Store it in a safe place and do not share it.",
+  "postSetupBody": "If you lose your Account Key, you will lose access to all of your Celo Dollars and CELO. Nobody, not even {{appName}}, will be able to help you recover your account without your key. Store it in a safe place and do not share it.",
   "postSetupCTA": "Learn about Account Keys",
   "getBackupKey": "Get Backup Key",
   "setUpSocialBackup": "Set Up Safeguards",
@@ -15,7 +15,7 @@
   "completeEducation": "I Understand",
   "backupKey": "Account Key",
   "yourBackupKey": "Your Backup Key",
-  "backupKeyNotification": "Without a Backup Key, you may lose access to your wallet.",
+  "backupKeyNotification": "Your Account Key is the most important part of your account",
   "backupKeySummary":
     "Find a private place and write down your Account Key. Please store it somewhere safe. Do not save it in your phone.",
   "backupPrompt":
@@ -62,7 +62,7 @@
     },
     {
       "title": "Without your key, you can lose access forever",
-      "text": "If you lose your phone, you must have your key to get your account back. Nobody, not even Celo, will be able to recover your funds without it."
+      "text": "If you lose your phone, you must have your key to get your account back. Nobody, not even {{appName}}, will be able to recover your funds without it."
     },
     {
       "title": "Write it down",

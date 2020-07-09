@@ -7,13 +7,13 @@ import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BackHandler, StyleSheet } from 'react-native'
 import RNExitApp from 'react-native-exit-app'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
 import { appUnlock } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { Namespaces } from 'src/i18n'
+import { checkPin } from 'src/pincode/authentication'
 import Pincode from 'src/pincode/Pincode'
-import { ensureCorrectPin } from 'src/pincode/utils'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 function PincodeLock() {
@@ -21,24 +21,26 @@ function PincodeLock() {
   const [errorText, setErrorText] = useState<string | undefined>(undefined)
   const dispatch = useDispatch()
   const { t } = useTranslation(Namespaces.nuxNamePin1)
-  const currentAccount = useSelector(currentAccountSelector)
+  const account = useSelector(currentAccountSelector)
 
-  function onWrongPin() {
+  const onWrongPin = () => {
     setPin('')
     setErrorText(t(`${Namespaces.global}:${ErrorMessages.INCORRECT_PIN}`))
   }
 
-  function onCorrectPin() {
+  const onCorrectPin = () => {
     dispatch(appUnlock())
   }
 
-  function onCompletePin(enteredPin: string) {
-    if (currentAccount) {
-      return ensureCorrectPin(pin, currentAccount)
-        .then(onCorrectPin)
-        .catch(onWrongPin)
-    } else {
+  const onCompletePin = async (enteredPin: string) => {
+    if (!account) {
+      throw new Error('Attempting to unlock pin before account initialized')
+    }
+
+    if (await checkPin(enteredPin, account)) {
       onCorrectPin()
+    } else {
+      onWrongPin()
     }
   }
 

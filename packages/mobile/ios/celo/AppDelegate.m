@@ -77,6 +77,7 @@ static NSString * const kHasRunBeforeKey = @"RnSksIsAppInstalled";
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
+
   return YES;
 }
 

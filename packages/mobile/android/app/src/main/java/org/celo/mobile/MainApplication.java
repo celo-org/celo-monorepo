@@ -16,7 +16,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.celo.devicecredentials.RNConfirmDeviceCredentialsPackage;
 import ru.ivanarh.jndcrash.NDCrash;
 import ru.ivanarh.jndcrash.NDCrashError;
 import ru.ivanarh.jndcrash.NDCrashUnwinder;
@@ -35,12 +34,6 @@ public class MainApplication
     protected List<ReactPackage> getPackages() {
       @SuppressWarnings("UnnecessaryLocalVariable")
       List<ReactPackage> packages = new PackageList(this).getPackages();
-      if (android.os.Build.VERSION.SDK_INT >= 23) {
-        // Don't add this package below API 23, since it leads to
-        // ClassDefNotFoundError due to classes which are only available
-        // above API 23.
-        packages.add(new RNConfirmDeviceCredentialsPackage());
-      }
       return packages;
     }
 

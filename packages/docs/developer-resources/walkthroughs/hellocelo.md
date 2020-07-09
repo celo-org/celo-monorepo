@@ -17,7 +17,7 @@ We assume you already have Node.js and NPM installed on your computer.
 At the end of this guide, you will be able to:
 
 * Connect to the Celo test network, called Alfajores
-* Get test cGLD and cUSDs from the faucet
+* Get test CELO and cUSDs from the faucet
 * Read account and contract information from the test network
 * Send transactions to the network
 
@@ -62,7 +62,7 @@ At any point in the file you can `console.log()` variables to print their output
 ContractKit contains a `contracts` property that we can use to access certain information about deployed Celo contracts.
 
 {% hint style="info" %}
-The Celo blockchain has two native assets, Celo Gold \(cGLD\) and the Celo Dollar \(cUSD\). Both of these assets implement the [ERC20 token standard](https://eips.ethereum.org/EIPS/eip-20) from Ethereum. The cGLD asset is managed by the Celo Gold smart contract. We can access the gold contract with the SDK with `kit.contracts.getGoldToken()`. This function returns a promise, so we have to wait for it to resolve before we can interact with the gold token contract. If you are unfamiliar with Promises in Javascript, [check out this documentation.](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) Promises are a common tool in blockchain development. In this guide, we use the [async/await syntax for promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await).
+The Celo blockchain has two native assets, CELO \(CELO\) and the Celo Dollar \(cUSD\). Both of these assets implement the [ERC20 token standard](https://eips.ethereum.org/EIPS/eip-20) from Ethereum. The CELO asset is managed by the CELO smart contract. We can access the gold contract with the SDK with `kit.contracts.getGoldToken()`. This function returns a promise, so we have to wait for it to resolve before we can interact with the gold token contract. If you are unfamiliar with Promises in Javascript, [check out this documentation.](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) Promises are a common tool in blockchain development. In this guide, we use the [async/await syntax for promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await).
 {% endhint %}
 
 Let's read some token balances from the blockchain. Add the following line in the `readAccount()` function. 
@@ -72,7 +72,7 @@ Let's read some token balances from the blockchain. Add the following line in th
 let goldtoken = await kit.contracts.getGoldToken()
 ```
 
-We can get the cGLD balance of an account using the gold token wrapper with `goldtoken.balanceOf(address)`. Let's check the balance of this address `'0xD86518b29BB52a5DAC5991eACf09481CE4B0710d'`
+We can get the CELO balance of an account using the gold token wrapper with `goldtoken.balanceOf(address)`. Let's check the balance of this address `'0xD86518b29BB52a5DAC5991eACf09481CE4B0710d'`
 
 ```javascript
 // 4. Address to look up
@@ -88,7 +88,7 @@ console.log(`${anAddress} balance: ${balance.toString()}`)
 The `balanceOf(address)` function also returns a Promise, so we wait for the promise to resolve then we print the result.
 
 {% hint style="info" %}
-You may notice that we convert the balance to a string before we print it. This is because the `balanceOf()` function returns a [BigNumber](https://github.com/MikeMcl/bignumber.js/). Javascript does not have floating point numbers, so it is common to convert integers to large numbers before doing arithmetic. So 1 cGLD = 10\*\*18 base units of cGLD. The `balanceOf()` function returns the account balance in these base units. Converting the BigNumber to a string converts the BigNumber object into a more legible string.
+You may notice that we convert the balance to a string before we print it. This is because the `balanceOf()` function returns a [BigNumber](https://github.com/MikeMcl/bignumber.js/). Javascript does not have floating point numbers, so it is common to convert integers to large numbers before doing arithmetic. So 1 CELO = 10\*\*18 base units of CELO. The `balanceOf()` function returns the account balance in these base units. Converting the BigNumber to a string converts the BigNumber object into a more legible string.
 {% endhint %}
 
 Reading all account balances is a powerful feature of blockchains. Next, let's see how we can send value to each other on the test net.
@@ -96,7 +96,7 @@ Reading all account balances is a powerful feature of blockchains. Next, let's s
 In order to do transfers (aka [transactions](https://docs.celo.org/getting-started/glossary#transaction)), we need to:
 
 1. Create an [account](https://docs.celo.org/getting-started/glossary#account) \(by creating a private key\)
-2. Fund it with test cGLD and cUSDs
+2. Fund it with test CELO and cUSDs
 3. Sign and send transactions to the network
 
 ## Accounts
@@ -107,7 +107,7 @@ We are accessing the Celo network via a remote [node](https://docs.celo.org/gett
 Don't worry about what this means right now, just understand that it is easier to get started using Celo by accessing remote nodes, rather than running them locally on your machine. You can [read more about the details of the Celo network here.](https://github.com/critesjosh/celo-monorepo/tree/8542c1bc3ad32bc48eed33073f4d34a36fd91fae/packages/docs/celo-sdk/walkthroughs/overview.md#topology-of-a-celo-network)
 {% endhint %}
 
-Because we are accessing the network remotely, we need to generate an account to sign transactions and fund that account with test cGLD.
+Because we are accessing the network remotely, we need to generate an account to sign transactions and fund that account with test CELO.
 
 There is a short script in `getAccount.js` to either get a Celo account from a mnemonic in the `.secret` file, or create a random account if the file is empty. In the script, we use`web3.js` to create a new private key/account pair. [Web3.js](https://web3js.readthedocs.io/en/v1.2.6/) is a popular javascript library for handling Ethereum related functionality. Celo is a cousin of Ethereum, so this library works well for generating Celo accounts.
 
@@ -132,7 +132,7 @@ async function createAccount(){
     // 8. Get the Gold Token contract wrapper
     let goldtoken = await kit.contracts.getGoldToken()
     
-    // 9. Get your Celo Gold balance
+    // 9. Get your CELO balance
     let balance = await goldtoken.balanceOf(account.address)
 
     // Print your account info
@@ -145,7 +145,7 @@ This will print `0`, as we have not funded the associated account yet.
 
 ## Using the faucet
 
-We can get free test cGLD and cUSDs on the test network for development via [the Celo Alfajores faucet](https://celo.org/build/faucet).
+We can get free test CELO and cUSDs on the test network for development via [the Celo Alfajores faucet](https://celo.org/build/faucet).
 
 Copy your randomly generated account address from the console output mentioned above, and paste it into the faucet.
 
@@ -153,7 +153,7 @@ Once your account has been funded, run `$ node helloCelo.js` again to see your u
 
 ## Sending Value
 
-We have an account with cGLD in it, now how do we send it to another account. Remember the Gold Token wrapper we used to read account balances earlier? We can use the same wrapper to send tokens, you just need to add the private key associated with your account to ContractKit \(see line 10\).
+We have an account with CELO in it, now how do we send it to another account. Remember the Gold Token wrapper we used to read account balances earlier? We can use the same wrapper to send tokens, you just need to add the private key associated with your account to ContractKit \(see line 10\).
 
 The Gold Token wrapper has a method called `transfer(address, amount)` that allows you to send value to the specified address \(line 14\).
 
@@ -271,9 +271,9 @@ We covered:
 
 * Installing and setting up ContractKit 
 * Connecting to the Celo Alfajores network
-* Getting the cGLD contract wrapper
-* Reading account balances using the cGLD wrapper
+* Getting the CELO contract wrapper
+* Reading account balances using the CELO wrapper
 * Generating a new account in Celo
 * Funding an account using the Celo Alfajores Faucet
-* Sending cGLD
+* Sending CELO
 

@@ -1,12 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`FiatExchangeAmount renders correctly 1`] = `
-<SafeAreaView
-  forceInset={
-    Object {
-      "bottom": "always",
-      "top": "never",
-    }
+<RNCSafeAreaView
+  edges={
+    Array [
+      "bottom",
+    ]
   }
   style={
     Object {
@@ -250,5 +249,21 @@ exports[`FiatExchangeAmount renders correctly 1`] = `
       </View>
     </View>
   </View>
-</SafeAreaView>
+  <View
+    collapsable={false}
+    style={
+      Array [
+        Object {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+        },
+        Object {
+          "height": 0,
+        },
+        undefined,
+      ]
+    }
+  />
+</RNCSafeAreaView>
 `;
