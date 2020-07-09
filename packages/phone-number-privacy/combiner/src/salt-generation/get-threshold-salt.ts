@@ -179,7 +179,7 @@ function logResponseDiscrepancies(responses: SignMsgRespWithStatus[]) {
           totalQuota: response.signMessageResponse!.totalQuota,
         }
       })
-      logger.error(`Discepancy found in signers' measured quota values ${values}`)
+      logger.error(`Discrepancy found in signers' measured quota values ${values}`)
       discrepancyFound = true
     }
     if (
@@ -193,7 +193,7 @@ function logResponseDiscrepancies(responses: SignMsgRespWithStatus[]) {
         }
       })
       logger.error(
-        `Discepancy found in signers' latest block number that exceeds threshold ${values}`
+        `Discrepancy found in signers' latest block number that exceeds threshold ${values}`
       )
       discrepancyFound = true
     }
