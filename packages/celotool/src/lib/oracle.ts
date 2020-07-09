@@ -50,6 +50,16 @@ const oracleContextAzureClusterConfigDynamicEnvVars: { [k in keyof AzureClusterC
   clusterName: DynamicEnvVar.ORACLE_KUBERNETES_CLUSTER_NAME,
 }
 
+/**
+ * Env vars corresponding to each value for the AwslusterConfig for a particular context
+ */
+const oracleContextAwsClusterConfigDynamicEnvVars: { [k in keyof AwsClusterConfig]: DynamicEnvVar } = {
+  clusterName: DynamicEnvVar.ORACLE_KUBERNETES_CLUSTER_NAME,
+  // Given that the context has region, it is possible to not inclue this and extract via parsing
+  // Downside is that parsing can be finicky. 
+  clusterRegion: DynamicEnvVar.ORACLE_AWS_CLUSTER_REGION, 
+}
+
 interface OracleKeyVaultIdentityConfig {
   addressAzureKeyVaults: string
 }
@@ -357,16 +367,15 @@ export function getAzureClusterConfig(oracleContext: string): AzureClusterConfig
 
 /**
  * Fetches the env vars for a particular context
- * @param context the OracleAzureContext to use
- * @return an AzureClusterConfig for the context
+ * @param oracleContext the oracle context to use
+ * @return an AwsClusterConfig for the context
  */
-export function getAwsClusterConfig(context: string): AwsClusterConfig {
-  // TODO update to be in line with Trevor's changes
-  const clusterConfig: AwsClusterConfig = {
-    clusterRegion: "us-west-2",
-    clusterName: "aws-jason2" 
-  }
-  return clusterConfig || context 
+export function getAwsClusterConfig(oracleContext: string): AwsClusterConfig {
+  // const clusterConfig: AwsClusterConfig = {
+  //   clusterRegion: "us-west-2",
+  //   clusterName: "aws-jason4" 
+  // }
+  return getOracleContextDynamicEnvVarValues(oracleContextAwsClusterConfigDynamicEnvVars, oracleContext)
 }
 
 /**
@@ -406,18 +415,33 @@ export function getOracleContextDynamicEnvVarValues<T>(
 }
 
 /**
+ * Reads the context and swithces to the appropriate Azure or AWS Cluster
  * Switches to the AKS cluster associated with the given context
  */
-export function switchToAzureContextCluster(celoEnv: string, oracleContext: string) {
+export function switchToContextCluster(celoEnv: string, oracleContext: string) {
   if (!isValidOracleContext(oracleContext)) {
     throw Error(`Invalid oracle context, must be one of ${fetchEnv(envVar.ORACLE_CONTEXTS)}`)
   }
+  const isAwsContext = oracleContext.startsWith("AWS")
+  if (isAwsContext) {
+    return switchToAwsContextCluster(celoEnv, oracleContext)
+  } else {
+    return switchToAzureContextCluster(celoEnv, oracleContext)
+  }
+}
+
+/**
+ * Switches to the AKS cluster associated with the given context
+ */
+export function switchToAzureContextCluster(celoEnv: string, oracleContext: string) {
   const azureClusterConfig = getAzureClusterConfig(oracleContext)
   return switchToCluster(celoEnv, azureClusterConfig)
 }
 
+/**
+ * Switches to the AWS cluster associated with the given context
+ */
 export function switchToAwsContextCluster(celoEnv: string, context: string) {
-  // Incorporate into env vars
   const awsClusterConfig = getAwsClusterConfig(context)
   return switchToAwsCluster(celoEnv, awsClusterConfig)
 }
@@ -454,9 +478,8 @@ function isValidOracleContext(oracleContext: string) {
 
 /**
  * Middleware for an oracle related command.
- * One of primary or secondary must be true, but not both.
- * Instead of relying on one boolean, the two booleans are used to give the commands
- * a more explicit cleaner interface.
+ * Must be one of the contexts specified in the environment 
+ * variable ORACLE_CONTEXTS.
  */
 export function addOracleMiddleware(argv: yargs.Argv) {
   return addCeloEnvMiddleware(argv)

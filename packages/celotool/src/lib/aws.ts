@@ -23,16 +23,6 @@ export async function switchToAwsCluster(
   }
 
   // TODO Look into switching subscription between testing and production
-  // // Azure subscription switch
-  // let currentTenantId = null
-  // try {
-  //   ;[currentTenantId] = await execCmd('az account show --query id -o tsv')
-  // } catch (error) {
-  //   console.info('No azure account subscription currently set')
-  // }
-  // if (currentTenantId === null || currentTenantId.trim() !== clusterConfig.tenantId) {
-  //   await execCmdWithExitOnFailure(`az account set --subscription ${clusterConfig.subscriptionId}`)
-  // }
 
   let currentCluster = null
   try {

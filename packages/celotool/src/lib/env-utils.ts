@@ -137,6 +137,7 @@ export enum envVar {
  * using templates.
  */
 export enum DynamicEnvVar {
+  ORACLE_AWS_CLUSTER_REGION = 'ORACLE_{{ oracleContext }}_AWS_KUBERNETES_CLUSTER_REGION',
   ORACLE_AZURE_SUBSCRIPTION_ID = 'ORACLE_{{ oracleContext }}_AZURE_SUBSCRIPTION_ID',
   ORACLE_AZURE_TENANT_ID = 'ORACLE_{{ oracleContext }}_AZURE_TENANT_ID',
   ORACLE_KUBERNETES_CLUSTER_NAME = 'ORACLE_{{ oracleContext }}_KUBERNETES_CLUSTER_NAME',
