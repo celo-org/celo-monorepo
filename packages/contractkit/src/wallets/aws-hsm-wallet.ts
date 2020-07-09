@@ -22,10 +22,8 @@ export default class AwsHsmWallet extends RemoteWallet implements Wallet {
           continue
         }
 
-        const { PublicKey } = await this.kms.getPublicKey({ KeyId: KeyId! }).promise()
-        const publicKey = publicKeyFromAsn1(Buffer.from(PublicKey as Uint8Array))
         const address = await this.getAddressFromKeyId(KeyId!)
-        addressToSigner.set(address, new AwsHsmSigner(this.kms, KeyId!, publicKey))
+        addressToSigner.set(address, new AwsHsmSigner(this.kms, KeyId!, address))
       } catch (e) {
         // todo: what does the error look like here
         throw e

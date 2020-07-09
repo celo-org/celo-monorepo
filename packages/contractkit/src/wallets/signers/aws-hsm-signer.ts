@@ -12,7 +12,7 @@ const SigningAlgorithm = 'ECDSA_SHA_256'
 const secp256k1Curve = new EC('secp256k1')
 
 function getRecoveryParam(message: Buffer, expectedAddress: string, r: Buffer, s: Buffer): number {
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 2; i++) {
     const recoveredPublicKeyByteArray = ethUtil.ecrecover(message, i + 27, r, s)
     const publicKeyBuff = Buffer.from(recoveredPublicKeyByteArray)
 
@@ -28,15 +28,12 @@ function getRecoveryParam(message: Buffer, expectedAddress: string, r: Buffer, s
 export default class AwsHsmSigner implements Signer {
   private kms: KMS
   private keyId: string
-  // @ts-ignore
-  private publicKey: string
   private address: string
 
-  constructor(kms: KMS, keyId: string, publicKey: string) {
+  constructor(kms: KMS, keyId: string, address: string) {
     this.kms = kms
     this.keyId = keyId
-    this.publicKey = publicKey
-    this.address = publicKeyToAddress(publicKey)
+    this.address = address
   }
 
   private async findCanonicalSignature(buffer: Buffer): Promise<{ S: BigNumber; R: BigNumber }> {
@@ -107,6 +104,6 @@ export default class AwsHsmSigner implements Signer {
   }
 
   getNativeKey(): string {
-    return ''
+    return this.keyId
   }
 }
