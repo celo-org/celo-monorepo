@@ -220,6 +220,14 @@ export function isValidCeloEnv(celoEnv: string) {
 
 /**
  * Replaces a dynamic env var's template strings with values from an object.
+ * For each template value that was given, it replaces the corresponding template
+ * string.
+ * For example, if the DynamicEnvVar is:
+ *   '{{ thing }}-is-{{noun}}!!!'
+ * and templateValues is the object:
+ *   { thing: 'celo', noun: 'cool' }
+ * then we can expect this function to return the string:
+ *   'celo-is-cool!!!'
  * Returns the name of the env var.
  */
 export function getDynamicEnvVarName(dynamicEnvVar: DynamicEnvVar, templateValues: any) {
