@@ -21,6 +21,7 @@ export interface State {
   backupCompleted: boolean
   backupDelayedTime: number
   socialBackupCompleted: boolean
+  // TODO move these to a new paymentRequest/reducer.ts
   incomingPaymentRequests: PaymentRequest[]
   outgoingPaymentRequests: PaymentRequest[]
   dismissedEarnRewards: boolean

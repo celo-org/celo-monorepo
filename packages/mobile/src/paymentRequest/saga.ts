@@ -1,9 +1,17 @@
 import firebase from '@react-native-firebase/app'
 import { FirebaseDatabaseTypes } from '@react-native-firebase/database'
-import { take } from 'lodash'
 import { eventChannel } from 'redux-saga'
-import { select } from 'redux-saga-test-plan/matchers'
-import { all, call, cancelled, put, spawn, takeEvery, takeLeading } from 'redux-saga/effects'
+import {
+  all,
+  call,
+  cancelled,
+  put,
+  select,
+  spawn,
+  take,
+  takeEvery,
+  takeLeading,
+} from 'redux-saga/effects'
 import {
   updateIncomingPaymentRequests,
   UpdateIncomingPaymentRequestsAction,
@@ -14,6 +22,8 @@ import { showError } from 'src/alert/actions'
 import { RequestEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { waitForFirebaseAuth } from 'src/firebase/saga'
+import { navigateHome } from 'src/navigator/NavigationService'
 import {
   Actions,
   CancelPaymentRequestAction,
@@ -21,15 +31,13 @@ import {
   DeclinePaymentRequestAction,
   UpdatePaymentRequestNotifiedAction,
   WritePaymentRequest,
-} from 'src/firebase/actions'
-import { waitForFirebaseAuth } from 'src/firebase/saga'
-import { navigateHome } from 'src/navigator/NavigationService'
+} from 'src/paymentRequest/actions'
 import { PaymentRequest, PaymentRequestStatus } from 'src/paymentRequest/types'
 import Logger from 'src/utils/Logger'
 import { getAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 
-const TAG = 'firebase/paymentRequests'
+const TAG = 'paymentRequests/saga'
 const VALUE_CHANGE_HOOK = 'value'
 const REQUEST_DB = 'pendingRequests'
 const REQUESTEE_ADDRESS = 'requesteeAddress'
@@ -38,7 +46,7 @@ type ADDRESS_KEY_FIELD = typeof REQUESTEE_ADDRESS | typeof REQUESTER_ADDRESS
 
 function createPaymentRequestChannel(address: string, addressKeyField: ADDRESS_KEY_FIELD) {
   const errorCallback = (error: Error) => {
-    Logger.warn(TAG, error.toString())
+    Logger.error(TAG, 'Error getting payment requests from firebase', error)
   }
 
   return eventChannel((emit: any) => {
@@ -63,6 +71,7 @@ function createPaymentRequestChannel(address: string, addressKeyField: ADDRESS_K
       .orderByChild(addressKeyField)
       .equalTo(address)
       .on(VALUE_CHANGE_HOOK, emitter, errorCallback)
+
     return cancel
   })
 }
@@ -85,6 +94,7 @@ function* subscribeToPaymentRequests(
   while (true) {
     try {
       const paymentRequestsObject = yield take(paymentRequestChannel)
+      Logger.debug(`${TAG}@subscribeToPaymentRequests`, 'New payment request object from channel')
       const paymentRequests = Object.keys(paymentRequestsObject)
         .map((key) => ({
           uid: key,
@@ -103,7 +113,7 @@ function* subscribeToPaymentRequests(
   }
 }
 
-export function* paymentRequestWriter({ paymentInfo }: WritePaymentRequest) {
+function* paymentRequestWriter({ paymentInfo }: WritePaymentRequest) {
   try {
     Logger.info(TAG, `Writing pending request to database`)
     const pendingRequestRef = firebase.database().ref(`pendingRequests`)
@@ -117,10 +127,7 @@ export function* paymentRequestWriter({ paymentInfo }: WritePaymentRequest) {
   }
 }
 
-export function* updatePaymentRequestNotified({
-  id,
-  notified,
-}: UpdatePaymentRequestNotifiedAction) {
+function* updatePaymentRequestNotified({ id, notified }: UpdatePaymentRequestNotifiedAction) {
   try {
     Logger.debug(TAG, 'Updating payment request', id, `notified: ${notified}`)
     yield call(() =>
@@ -136,7 +143,7 @@ export function* updatePaymentRequestNotified({
   }
 }
 
-export function* updatePaymentRequestStatus({
+function* updatePaymentRequestStatus({
   id,
   status,
 }: (DeclinePaymentRequestAction | CompletePaymentRequestAction) | CancelPaymentRequestAction) {
@@ -155,23 +162,23 @@ export function* updatePaymentRequestStatus({
   }
 }
 
-export function* subscribeToIncomingPaymentRequests() {
-  yield subscribeToPaymentRequests(REQUESTEE_ADDRESS, updateIncomingPaymentRequests)
+function* subscribeToIncomingPaymentRequests() {
+  yield call(subscribeToPaymentRequests, REQUESTEE_ADDRESS, updateIncomingPaymentRequests)
 }
 
-export function* subscribeToOutgoingPaymentRequests() {
-  yield subscribeToPaymentRequests(REQUESTER_ADDRESS, updateOutgoingPaymentRequests)
+function* subscribeToOutgoingPaymentRequests() {
+  yield call(subscribeToPaymentRequests, REQUESTER_ADDRESS, updateOutgoingPaymentRequests)
 }
 
-export function* watchPaymentRequestStatusUpdates() {
+function* watchPaymentRequestStatusUpdates() {
   yield takeLeading(Actions.PAYMENT_REQUEST_UPDATE_STATUS, updatePaymentRequestStatus)
 }
 
-export function* watchPaymentRequestNotifiedUpdates() {
+function* watchPaymentRequestNotifiedUpdates() {
   yield takeLeading(Actions.PAYMENT_REQUEST_UPDATE_NOTIFIED, updatePaymentRequestNotified)
 }
 
-export function* watchWritePaymentRequest() {
+function* watchWritePaymentRequest() {
   yield takeEvery(Actions.PAYMENT_REQUEST_WRITE, paymentRequestWriter)
 }
 

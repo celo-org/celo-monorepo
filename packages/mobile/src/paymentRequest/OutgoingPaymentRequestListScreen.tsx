@@ -3,7 +3,6 @@ import { WithTranslation } from 'react-i18next'
 import { View } from 'react-native'
 import { connect } from 'react-redux'
 import { getOutgoingPaymentRequests } from 'src/account/selectors'
-import { cancelPaymentRequest, updatePaymentRequestNotified } from 'src/firebase/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import {
   AddressToE164NumberType,
@@ -14,6 +13,7 @@ import {
   NotificationList,
   titleWithBalanceNavigationOptions,
 } from 'src/notifications/NotificationList'
+import { cancelPaymentRequest, updatePaymentRequestNotified } from 'src/paymentRequest/actions'
 import OutgoingPaymentRequestListItem from 'src/paymentRequest/OutgoingPaymentRequestListItem'
 import { PaymentRequest } from 'src/paymentRequest/types'
 import { getRequesteeFromPaymentRequest } from 'src/paymentRequest/utils'
