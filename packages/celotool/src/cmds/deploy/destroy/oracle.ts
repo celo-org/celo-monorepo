@@ -1,6 +1,5 @@
 import {
   addOracleMiddleware,
-  getOracleAzureContext,
   OracleArgv,
   removeHelmRelease,
   switchToAzureContextCluster,
@@ -16,7 +15,6 @@ type OracleDestroyArgv = DestroyArgv & OracleArgv
 export const builder = addOracleMiddleware
 
 export const handler = async (argv: OracleDestroyArgv) => {
-  const oracleAzureContext = getOracleAzureContext(argv.primary)
-  await switchToAzureContextCluster(argv.celoEnv, oracleAzureContext)
-  await removeHelmRelease(argv.celoEnv, oracleAzureContext)
+  await switchToAzureContextCluster(argv.celoEnv, argv.context)
+  await removeHelmRelease(argv.celoEnv, argv.context)
 }
