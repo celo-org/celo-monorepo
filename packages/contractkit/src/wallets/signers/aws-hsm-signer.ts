@@ -1,15 +1,16 @@
 import { ensureLeading0x, publicKeyToAddress, trimLeading0x } from '@celo/utils/lib/address'
 import { KMS } from 'aws-sdk'
+import BigNumber from 'bignumber.js'
+import { ec as EC } from 'elliptic'
 import * as ethUtil from 'ethereumjs-util'
 import { parseBERSignature } from '../../utils/ber-utils'
-import { bigNumberToBuffer, bufferToBigNumber } from '../../utils/signature-utils'
+import { bigNumberToBuffer, bufferToBigNumber, isCanonical } from '../../utils/signature-utils'
 import { getHashFromEncoded, RLPEncodedTx } from '../../utils/signing-utils'
 import { Signer } from './signer'
 
 const SigningAlgorithm = 'ECDSA_SHA_256'
-// const secp256k1Curve = new EC('secp256k1')
+const secp256k1Curve = new EC('secp256k1')
 
-// @ts-ignore
 function getRecoveryParam(message: Buffer, expectedAddress: string, r: Buffer, s: Buffer): number {
   for (let i = 0; i < 4; i++) {
     const recoveredPublicKeyByteArray = ethUtil.ecrecover(message, i + 27, r, s)
@@ -38,28 +39,38 @@ export default class AwsHsmSigner implements Signer {
     this.address = publicKeyToAddress(publicKey)
   }
 
+  private async findCanonicalSignature(buffer: Buffer): Promise<{ S: BigNumber; R: BigNumber }> {
+    let S: BigNumber
+    let R: BigNumber
+
+    let flag = true
+    while (flag) {
+      const { Signature: signature } = await this.kms
+        .sign({
+          KeyId: this.keyId,
+          MessageType: 'DIGEST',
+          Message: buffer,
+          SigningAlgorithm,
+        })
+        .promise()
+      const { r, s } = parseBERSignature(signature as Buffer)
+      R = bufferToBigNumber(r)
+      S = bufferToBigNumber(s)
+
+      const N = bufferToBigNumber(secp256k1Curve.curve.n)
+      if (isCanonical(S, N)) {
+        flag = false
+      }
+    }
+
+    return { S: S!, R: R! }
+  }
+
   private async sign(buffer: Buffer): Promise<{ v: number; r: Buffer; s: Buffer }> {
-    const { Signature: signature } = await this.kms
-      .sign({
-        KeyId: this.keyId,
-        MessageType: 'DIGEST',
-        Message: buffer,
-        SigningAlgorithm,
-      })
-      .promise()
-    const { r, s } = parseBERSignature(signature as Buffer)
-    const R = bufferToBigNumber(r)
-    let S = bufferToBigNumber(s)
-
-    // const N = bufferToBigNumber(secp256k1Curve.curve.n)
-    // if (!isCanonical(S, N)) {
-    //   console.log('is not canonical!')
-    //   S = N.minus(S)
-    // }
-
+    const { R, S } = await this.findCanonicalSignature(buffer)
     const rBuff = bigNumberToBuffer(R, 32)
     const sBuff = bigNumberToBuffer(S, 32)
-    const recoveryParam = getRecoveryParam(buffer, this.address, r, s)
+    const recoveryParam = getRecoveryParam(buffer, this.address, rBuff, sBuff)
 
     return {
       r: rBuff,
