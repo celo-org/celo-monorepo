@@ -11,3 +11,7 @@ export interface SignMessageResponseFailure extends SignMessageResponse {
   success: false
   error: string
 }
+
+export interface SignMessageResponseSuccess extends SignMessageResponse {
+  success: true
+}
