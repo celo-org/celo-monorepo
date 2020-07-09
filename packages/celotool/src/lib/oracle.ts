@@ -1,6 +1,6 @@
 import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/src/address'
 import { AwsClusterConfig, switchToAwsCluster } from 'src/lib/aws'
-import { assignRoleIfNotAssigned, AzureClusterConfig, createIdentityIfNotExists, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity, switchToCluster } from 'src/lib/azure'
+import { assignRoleIfNotAssigned, AzureClusterConfig, createIdentityIfNotExists, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity, switchToAzureCluster } from 'src/lib/azure'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { getFornoUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInternalUrl } from 'src/lib/endpoints'
 import { addCeloEnvMiddleware, DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback, getDynamicEnvVarName } from 'src/lib/env-utils'
@@ -371,10 +371,6 @@ export function getAzureClusterConfig(oracleContext: string): AzureClusterConfig
  * @return an AwsClusterConfig for the context
  */
 export function getAwsClusterConfig(oracleContext: string): AwsClusterConfig {
-  // const clusterConfig: AwsClusterConfig = {
-  //   clusterRegion: "us-west-2",
-  //   clusterName: "aws-jason4" 
-  // }
   return getOracleContextDynamicEnvVarValues(oracleContextAwsClusterConfigDynamicEnvVars, oracleContext)
 }
 
@@ -435,7 +431,7 @@ export function switchToContextCluster(celoEnv: string, oracleContext: string) {
  */
 export function switchToAzureContextCluster(celoEnv: string, oracleContext: string) {
   const azureClusterConfig = getAzureClusterConfig(oracleContext)
-  return switchToCluster(celoEnv, azureClusterConfig)
+  return switchToAzureCluster(celoEnv, azureClusterConfig)
 }
 
 /**

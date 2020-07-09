@@ -9,10 +9,10 @@ import { installAndEnableMetricsDeps, redeployTiller } from 'src/lib/helm_deploy
 export interface AwsClusterConfig {
   clusterRegion: string
   clusterName: string 
-  // subscriptionId: string
+
 }
 
-// switchToCluster configures kubectl to connect to the EKS cluster
+// switchToAwsCluster configures kubectl to connect to the EKS cluster
 export async function switchToAwsCluster(
   celoEnv: string,
   clusterConfig: AwsClusterConfig,
@@ -39,6 +39,7 @@ export async function switchToAwsCluster(
     if (existingContexts.includes(clusterConfig.clusterName)) {
       await execCmdWithExitOnFailure(`kubectl config use-context ${clusterConfig.clusterName}`)
     } else {
+      // If we don't already have the context, get it from AWS.
       await execCmdWithExitOnFailure(
         `aws eks --region ${clusterConfig.clusterRegion} update-kubeconfig --name ${clusterConfig.clusterName} --alias ${clusterConfig.clusterName}`
         ) 
@@ -56,6 +57,7 @@ async function setupCluster(celoEnv: string, clusterConfig: AwsClusterConfig) {
 
   await redeployTiller()
   await installAndEnableMetricsDeps(true, clusterConfig.clusterName)
-  // Should not execute AADPodIdentityif on AWS
+  // TODO Find a substitute for AADPodIdentity on AWS
+  // Should not execute AADPodIdentity if on AWS
   // await installAADPodIdentity()
 }
