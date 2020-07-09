@@ -1,7 +1,7 @@
 import { SHORT_CURRENCIES } from 'src/geth/consts'
 import { PaymentRequest, PaymentRequestStatus } from 'src/paymentRequest/types'
 
-export function paymentRequestDouble(partial: object): PaymentRequest {
+export function createMockPaymentRequest(partial: object): PaymentRequest {
   return {
     uid: '7363bvby2ba8270273',
     amount: '20',

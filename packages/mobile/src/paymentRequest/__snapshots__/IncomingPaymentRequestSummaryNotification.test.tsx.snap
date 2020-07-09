@@ -158,7 +158,7 @@ exports[`IncomingPaymentRequestSummaryNotification renders a number when the add
                   ]
                 }
               >
-                +
+                0
               </Text>
             </View>
           </View>
@@ -412,7 +412,7 @@ exports[`IncomingPaymentRequestSummaryNotification renders correctly for just on
                   ]
                 }
               >
-                +
+                0
               </Text>
             </View>
           </View>

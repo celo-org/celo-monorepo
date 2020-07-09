@@ -1,6 +1,6 @@
 import { getIncomingPaymentRequests, getOutgoingPaymentRequests } from 'src/account/selectors'
+import { createMockPaymentRequest } from 'src/paymentRequest/__mocks__'
 import { PaymentRequestStatus } from 'src/paymentRequest/types'
-import { paymentRequestDouble } from 'src/paymentRequest/__mocks__'
 
 describe('selectors', () => {
   describe(getIncomingPaymentRequests, () => {
@@ -8,8 +8,8 @@ describe('selectors', () => {
       const state: any = {
         account: {
           incomingPaymentRequests: [
-            paymentRequestDouble({ status: PaymentRequestStatus.DECLINED }),
-            paymentRequestDouble({ status: PaymentRequestStatus.COMPLETED }),
+            createMockPaymentRequest({ status: PaymentRequestStatus.DECLINED }),
+            createMockPaymentRequest({ status: PaymentRequestStatus.COMPLETED }),
           ],
         },
       }
@@ -17,12 +17,12 @@ describe('selectors', () => {
     })
 
     it('returns requested payments', () => {
-      const goodRequest = paymentRequestDouble({ status: PaymentRequestStatus.REQUESTED })
+      const goodRequest = createMockPaymentRequest({ status: PaymentRequestStatus.REQUESTED })
 
       const state: any = {
         account: {
           incomingPaymentRequests: [
-            paymentRequestDouble({
+            createMockPaymentRequest({
               status: PaymentRequestStatus.COMPLETED,
             }),
             goodRequest,
@@ -39,8 +39,8 @@ describe('selectors', () => {
       const state: any = {
         account: {
           outgoingPaymentRequests: [
-            paymentRequestDouble({ status: PaymentRequestStatus.DECLINED }),
-            paymentRequestDouble({ status: PaymentRequestStatus.COMPLETED }),
+            createMockPaymentRequest({ status: PaymentRequestStatus.DECLINED }),
+            createMockPaymentRequest({ status: PaymentRequestStatus.COMPLETED }),
           ],
         },
       }
@@ -48,12 +48,12 @@ describe('selectors', () => {
     })
 
     it('returns requested payments', () => {
-      const goodRequest = paymentRequestDouble({ status: PaymentRequestStatus.REQUESTED })
+      const goodRequest = createMockPaymentRequest({ status: PaymentRequestStatus.REQUESTED })
 
       const state: any = {
         account: {
           outgoingPaymentRequests: [
-            paymentRequestDouble({
+            createMockPaymentRequest({
               status: PaymentRequestStatus.COMPLETED,
             }),
             goodRequest,

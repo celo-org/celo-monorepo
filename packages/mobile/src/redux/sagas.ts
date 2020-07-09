@@ -68,25 +68,16 @@ function* loggerSaga() {
 export function* rootSaga() {
   // Delay all sagas until rehydrate is done
   // This prevents them from running with missing state
-  console.log('===1')
   yield call(waitForRehydrate)
-  console.log('===rehydrated')
   yield call(appInit)
-  console.log('===2')
 
   // Note, the order of these does matter in certain cases
   yield spawn(loggerSaga)
-  console.log('===3')
   yield spawn(appSaga)
-  console.log('===4')
   yield spawn(sentrySaga)
-  console.log('===5')
   yield spawn(networkInfoSaga)
-  console.log('===6')
   yield spawn(gethSaga)
-  console.log('===7')
   yield spawn(web3Saga)
-  console.log('===8')
   yield spawn(accountSaga)
   yield spawn(firebaseSaga)
   yield spawn(transactionSaga)
