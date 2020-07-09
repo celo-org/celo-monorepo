@@ -37,6 +37,15 @@ const testCases = {
   inserted_in_struct: getTestArtifacts('inserted_in_struct'),
   inserted_in_library_struct: getTestArtifacts('inserted_in_library_struct'),
   removed_from_library_struct: getTestArtifacts('removed_from_library_struct'),
+
+  original_complex: getTestArtifacts('original_complex'),
+  shorter_fixed_array: getTestArtifacts('shorter_fixed_array'),
+  longer_fixed_array: getTestArtifacts('longer_fixed_array'),
+  fixed_to_dynamic_array: getTestArtifacts('fixed_to_dynamic_array'),
+  dynamic_to_fixed_array: getTestArtifacts('dynamic_to_fixed_array'),
+  mapping_source_changed: getTestArtifacts('mapping_source_changed'),
+  internal_mapping_source_changed: getTestArtifacts('internal_mapping_source_changed'),
+  mapping_target_changed: getTestArtifacts('mapping_target_changed'),
 }
 
 const assertCompatible = (report) => {
@@ -202,6 +211,87 @@ describe('#reportLayoutIncompatibilities()', () => {
       )
       assertNotCompatible(report)
       assertContractErrorsMatch(report, 'TestContract', [/struct.*changed/])
+    })
+  })
+
+  describe('when a fixed array has length increased', () => {
+    it('reports a typechanged variable', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_complex,
+        testCases.longer_fixed_array
+      )
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/had type/])
+    })
+  })
+
+  describe('when a fixed array has length decreased', () => {
+    it('reports a typechanged variable', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_complex,
+        testCases.shorter_fixed_array
+      )
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/had type/])
+    })
+  })
+
+  describe('when a fixed array becomes dynamic', () => {
+    it('reports a typechanged variable', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_complex,
+        testCases.fixed_to_dynamic_array
+      )
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/had type/])
+    })
+  })
+
+  describe('when a dynamic array becomes fixed', () => {
+    it('reports a typechanged variable', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_complex,
+        testCases.dynamic_to_fixed_array
+      )
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/had type/])
+    })
+  })
+
+  // TODO(m-chrzan): @openzeppelin/upgrades erases information about mapping key
+  // types before generating a layout diff. We might want to patch this behavior
+  // so that this sort of type change is identified as a backwards
+  // incompatibility.
+  describe.skip('when the source of a mapping changes', () => {
+    it('reports a typechanged variable', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_complex,
+        testCases.mapping_source_changed
+      )
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/had type/])
+    })
+  })
+
+  describe.skip('when the source of a nested mapping changes', () => {
+    it('reports a typechanged variable', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_complex,
+        testCases.internal_mapping_source_changed
+      )
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/had type/])
+    })
+  })
+
+  describe('when the target of a mapping changes', () => {
+    it('reports a typechanged variable', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_complex,
+        testCases.mapping_target_changed
+      )
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/had type/])
     })
   })
 })
