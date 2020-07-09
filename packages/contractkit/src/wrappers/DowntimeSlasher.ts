@@ -76,6 +76,9 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
 
   /**
    * Calculates and returns the signature bitmap for the specified interval.
+   * Similar to the parentSealBitmap of every block (where you have which validators were
+   * able to sign the previous block), this bitmap shows for that specific interval which
+   * validators signed at least one block
    * @param startBlock First block of the downtime interval.
    * @param endBlock Last block of the downtime interval.
    * @return (string) The signature uptime bitmap for the specified interval.
