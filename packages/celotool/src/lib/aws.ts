@@ -9,7 +9,6 @@ import { installAndEnableMetricsDeps, redeployTiller } from 'src/lib/helm_deploy
 export interface AwsClusterConfig {
   clusterRegion: string
   clusterName: string 
-
 }
 
 // switchToAwsCluster configures kubectl to connect to the EKS cluster

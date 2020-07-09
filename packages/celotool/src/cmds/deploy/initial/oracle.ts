@@ -3,7 +3,7 @@ import {
   addOracleMiddleware,
   installHelmChart,
   OracleArgv,
-  switchToAzureContextCluster,
+  switchToContextCluster,
 } from 'src/lib/oracle'
 import yargs from 'yargs'
 
@@ -25,6 +25,6 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: OracleInitialArgv) => {
-  await switchToAzureContextCluster(argv.celoEnv, argv.context)
+  await switchToContextCluster(argv.celoEnv, argv.context)
   await installHelmChart(argv.celoEnv, argv.context, argv.useForno)
 }
