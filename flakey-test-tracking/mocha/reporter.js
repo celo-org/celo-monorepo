@@ -2,7 +2,7 @@ const Mocha = require('mocha')
 const GitHub = require('../github')
 const { processFlakes } = require('../processor')
 const { getTestID, fmtFlakeIssue } = require('./utils')
-const db = require('../db')
+const cache = require('../cache')
 const { skipKnownFlakes } = require('../config')
 
 function FlakeReporter(runner) {
@@ -13,18 +13,18 @@ function FlakeReporter(runner) {
   let skip
 
   before('Fetch Flakey Tests', async function() {
-    db.mkFlakeDir()
+    cache.init()
     console.log('Fetching known flakey tests...\n')
     github = await GitHub.build()
-    // db.saveKnownFlakes(await github.fetchKnownFlakes())
-    // skip = db.getKnownFlakes() //TODO(Alec)
+    // cache.saveKnownFlakes(await github.fetchKnownFlakes())
+    // skip = cache.getKnownFlakes() //TODO(Alec)
   })
 
   after('Process Flakey Tests', async function() {
     if (flakes.length) {
       console.log('Flakey tests found. Sending to GitHub...')
       await processFlakes(
-        flakes.map((f) => fmtFlakeIssue(f, db.getErrors(f))),
+        flakes.map((f) => fmtFlakeIssue(f, cache.getErrors(f))),
         github
       )
     } else {
@@ -35,7 +35,7 @@ function FlakeReporter(runner) {
   // The `retry` event is only emmited by Mocha >= v6.0.0.
   // See `interface.js` for details.
   runner.on('retry', function(test, err) {
-    db.saveError(getTestID(test), JSON.stringify(err))
+    cache.saveError(getTestID(test), JSON.stringify(err))
   })
 
   // if (skipKnownFlakes) {

@@ -36,7 +36,7 @@ const readFileInFlakeDir = (file) => {
   return buf.toString().split(delim)
 }
 
-const mkFlakeDir = () => {
+const init = () => {
   mkTmpDir(flakeDir)
   mkDir(join(tmpdir(), flakeDir, errDir))
 }
@@ -58,7 +58,7 @@ const mkTmpDir = (name) => {
 }
 
 module.exports = {
-  mkFlakeDir: mkFlakeDir,
+  init: init,
   saveError: saveError,
   getErrors: getErrors,
   saveKnownFlakes: saveKnownFlakes,

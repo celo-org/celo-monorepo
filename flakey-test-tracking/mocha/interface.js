@@ -1,12 +1,12 @@
 const { Test } = require('mocha')
 const commonInterface = require('mocha/lib/interfaces/common')
-const { saveError } = require('../db')
+const { saveError } = require('../cache')
 const { getTestIDFromSuite } = require('./utils')
 
 /**
  * This interface is adapted from the original bdd interface (default for Mocha),
  * it differs from the original only in that the `it` function is modified to store
- * errors in tmp db before returning. This change is necessary for flake-tracking
+ * errors in tmp cache before returning. This change is necessary for flake-tracking
  * because Mocha v5.2.0 (currently used by Truffle) does not emit an event when tests
  * are retried, thereby hiding errors generated during flakey test runs. This solution
  * can be replaced by adding a simple `runner.on('retry', ...)` hook to the reporter
