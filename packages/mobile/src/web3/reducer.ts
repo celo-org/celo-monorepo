@@ -9,7 +9,6 @@ export interface State {
   accountInWeb3Keystore: string | null
   commentKey: string | null
   fornoMode: boolean
-  contractKitReady: boolean
 }
 
 const initialState: State = {
@@ -23,7 +22,6 @@ const initialState: State = {
   accountInWeb3Keystore: null,
   commentKey: null,
   fornoMode: networkConfig.initiallyForno,
-  contractKitReady: false,
 }
 
 export const reducer = (
@@ -81,11 +79,6 @@ export const reducer = (
       return {
         ...state,
         syncProgress: action.payload,
-      }
-    case Actions.SET_CONTRACT_KIT_READY:
-      return {
-        ...state,
-        contractKitReady: action.ready,
       }
     default:
       return state

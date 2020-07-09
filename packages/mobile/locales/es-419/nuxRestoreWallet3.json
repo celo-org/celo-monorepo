@@ -1,6 +1,7 @@
 {
-  "title": "Restaurar el Monedero Celo",
-  "userYourBackupKey": "¿Ya tiene un Monedero Celo? Ingrese su Clave de Respaldo para restaurarla en este teléfono.",
+  "title": "Restaurar tu cuenta {{appName}}",
+  "userYourBackupKey":
+    "¿Ya tiene una cuenta {{appName}}? Ingrese su Clave de Respaldo para restaurarla en este teléfono.",
   "tip": "Sugerencia: ",
   "backupKeyTip": "Las Claves de Respaldo tienen 24 palabras, separadas por un espacio.",
   "restoreSocial": "Restaurar con Salvaguardas",

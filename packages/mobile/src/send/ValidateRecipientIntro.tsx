@@ -8,7 +8,7 @@ import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import CancelButton from 'src/components/CancelButton.v2'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -46,12 +46,11 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
 
 export const validateRecipientIntroScreenNavOptions = () => ({
   ...emptyHeader,
-  headerLeft: () => <CancelButton eventName={AnalyticsEvents.send_secure_cancel} />,
+  headerLeft: () => <CancelButton eventName={SendEvents.send_secure_cancel} />,
 })
 
 class ValidateRecipientIntro extends React.Component<Props> {
   onPressScanCode = () => {
-    ValoraAnalytics.track(AnalyticsEvents.send_secure_start, { confirmByScan: true })
     navigate(Screens.QRNavigator, {
       screen: Screens.QRScanner,
       params: {
@@ -59,18 +58,20 @@ class ValidateRecipientIntro extends React.Component<Props> {
         scanIsForSecureSend: true,
       },
     })
+
+    ValoraAnalytics.track(SendEvents.send_secure_start, { confirmByScan: true })
   }
 
   onPressConfirmAccount = () => {
     const { addressValidationType, transactionData, isPaymentRequest } = this.props
-
-    ValoraAnalytics.track(AnalyticsEvents.send_secure_start, { confirmByScan: false })
     navigate(Screens.ValidateRecipientAccount, {
       transactionData,
       addressValidationType,
       isPaymentRequest,
       isFromScan: this.props.route.params?.isFromScan,
     })
+
+    ValoraAnalytics.track(SendEvents.send_secure_start, { confirmByScan: false })
   }
 
   render() {

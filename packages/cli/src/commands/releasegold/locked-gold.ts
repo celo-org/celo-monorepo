@@ -8,7 +8,7 @@ import { ReleaseGoldCommand } from './release-gold'
 
 export default class LockedGold extends ReleaseGoldCommand {
   static description =
-    'Perform actions [lock, unlock, withdraw] on Celo Gold that has been locked via the provided ReleaseGold contract.'
+    'Perform actions [lock, unlock, withdraw] on CELO that has been locked via the provided ReleaseGold contract.'
 
   static flags = {
     ...ReleaseGoldCommand.flags,
@@ -68,7 +68,7 @@ export default class LockedGold extends ReleaseGoldCommand {
           const check = await binaryPrompt(
             `Only ${remaining.shiftedBy(
               -18
-            )} cGLD would be left unlocked, you might not be able to fund your signers. Unlock anyway?`,
+            )} CELO would be left unlocked, you might not be able to fund your signers. Unlock anyway?`,
             true
           )
           if (!check) {

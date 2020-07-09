@@ -41,8 +41,16 @@ describe('Transfer Works', () => {
     await bannerDismiss(by.id('SmartTopAlertButton'))
   })
 
-  it('Language', async () => {
-    await element(by.id('ChooseLanguage/en-US')).tap()
+  // Language is auto selected if it matches one of the available locale
+  // it('Language', async () => {
+  //   await element(by.id('ChooseLanguage/en-US')).tap()
+  // })
+
+  it('Onboarding Education', async () => {
+    // Onboading education has 3 steps
+    for (let i = 0; i < 3; i++) {
+      await element(by.id('Education/progressButton')).tap()
+    }
   })
 
   it('Join', async () => {

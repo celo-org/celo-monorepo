@@ -8,7 +8,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import BackupPhraseContainer, {
   BackupPhraseContainerMode,
@@ -86,12 +86,6 @@ class BackupPhrase extends React.Component<Props, State> {
     this.setState({
       isConfirmChecked: value,
     })
-
-    ValoraAnalytics.track(
-      value
-        ? AnalyticsEvents.backup_setup_toggle_enable
-        : AnalyticsEvents.backup_setup_toggle_disable
-    )
   }
 
   onPressConfirmArea = () => {
@@ -99,7 +93,7 @@ class BackupPhrase extends React.Component<Props, State> {
   }
 
   onPressContinue = () => {
-    ValoraAnalytics.track(AnalyticsEvents.backup_continue)
+    ValoraAnalytics.track(OnboardingEvents.backup_continue)
     navigate(Screens.BackupQuiz)
   }
 
@@ -141,7 +135,7 @@ class BackupPhrase extends React.Component<Props, State> {
 function HeaderRight() {
   const { t } = useTranslation(Namespaces.backupKeyFlow6)
   const onMoreInfoPressed = () => {
-    ValoraAnalytics.track(AnalyticsEvents.backup_setup_info)
+    ValoraAnalytics.track(OnboardingEvents.backup_more_info)
     pushToStack(Screens.AccountKeyEducation)
   }
   return <TopBarTextButton onPress={onMoreInfoPressed} title={t('moreInfo')} />

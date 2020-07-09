@@ -15,6 +15,7 @@ import Mailer from 'react-native-mail'
 import { useDispatch, useSelector } from 'react-redux'
 import { e164NumberSelector } from 'src/account/selectors'
 import { showMessage } from 'src/alert/actions'
+import { sessionIdSelector } from 'src/app/selectors'
 import { CELO_SUPPORT_EMAIL_ADDRESS, DEFAULT_TESTNET } from 'src/config'
 import { Namespaces } from 'src/i18n'
 import { navigateBack } from 'src/navigator/NavigationService'
@@ -61,6 +62,7 @@ function SupportContact() {
   const [inProgress, setInProgress] = useState(false)
   const e164PhoneNumber = useSelector(e164NumberSelector)
   const currentAccount = useSelector(currentAccountSelector)
+  const sessionId = useSelector(sessionIdSelector)
   const dispatch = useDispatch()
 
   const navigateBackAndToast = () => {
@@ -76,6 +78,7 @@ function SupportContact() {
       apiLevel: DeviceInfo.getApiLevelSync(),
       deviceId: DeviceInfo.getDeviceId(),
       address: currentAccount,
+      sessionId,
       network: DEFAULT_TESTNET,
     }
     const userId = e164PhoneNumber ? anonymizedPhone(e164PhoneNumber) : 'unknown'

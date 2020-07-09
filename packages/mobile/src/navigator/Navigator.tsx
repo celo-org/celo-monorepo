@@ -11,10 +11,11 @@ import Licenses from 'src/account/Licenses'
 import Profile from 'src/account/Profile'
 import { PincodeType } from 'src/account/reducer'
 import SupportContact from 'src/account/SupportContact'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { CeloExchangeEvents } from 'src/analytics/Events'
 import AppLoading from 'src/app/AppLoading'
 import Debug from 'src/app/Debug'
 import ErrorScreen from 'src/app/ErrorScreen'
+import { currentLanguageSelector } from 'src/app/reducers'
 import UpgradeScreen from 'src/app/UpgradeScreen'
 import BackupComplete from 'src/backup/BackupComplete'
 import BackupPhrase, { navOptionsForBackupPhrase } from 'src/backup/BackupPhrase'
@@ -64,6 +65,7 @@ import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
 import ImportContactsScreen from 'src/onboarding/contacts/ImportContactsScreen'
+import OnboardingEducationScreen from 'src/onboarding/education/OnboardingEducationScreen'
 import JoinCelo from 'src/onboarding/registration/JoinCelo'
 import RegulatoryTerms from 'src/onboarding/registration/RegulatoryTerms'
 import SelectCountry from 'src/onboarding/registration/SelectCountry'
@@ -176,6 +178,11 @@ const pincodeSetScreenOptions = ({
 
 const nuxScreens = (Navigator: typeof Stack) => (
   <>
+    <Navigator.Screen
+      name={Screens.OnboardingEducationScreen}
+      component={OnboardingEducationScreen}
+      options={OnboardingEducationScreen.navigationOptions}
+    />
     <Navigator.Screen
       name={Screens.JoinCelo}
       component={JoinCelo}
@@ -293,8 +300,8 @@ const exchangeTradeScreenOptions = ({
   const isDollarToGold = makerToken === CURRENCY_ENUM.DOLLAR
   const title = isDollarToGold ? i18n.t('exchangeFlow9:buyGold') : i18n.t('exchangeFlow9:sellGold')
   const cancelEventName = isDollarToGold
-    ? AnalyticsEvents.gold_buy_cancel
-    : AnalyticsEvents.gold_sell_cancel
+    ? CeloExchangeEvents.celo_buy_cancel
+    : CeloExchangeEvents.celo_sell_cancel
   return {
     ...headerWithCancelButton,
     headerLeft: () => <CancelButton eventName={cancelEventName} />,
@@ -311,11 +318,11 @@ const exchangeReviewScreenOptions = ({
   const isDollarToGold = makerToken === CURRENCY_ENUM.DOLLAR
   const title = isDollarToGold ? i18n.t('exchangeFlow9:buyGold') : i18n.t('exchangeFlow9:sellGold')
   const cancelEventName = isDollarToGold
-    ? AnalyticsEvents.gold_buy_cancel
-    : AnalyticsEvents.gold_sell_cancel
+    ? CeloExchangeEvents.celo_buy_cancel
+    : CeloExchangeEvents.celo_sell_cancel
   const editEventName = isDollarToGold
-    ? AnalyticsEvents.gold_buy_edit
-    : AnalyticsEvents.gold_sell_edit
+    ? CeloExchangeEvents.celo_buy_edit
+    : CeloExchangeEvents.celo_sell_edit
   return {
     ...headerWithCancelButton,
     headerLeft: () => (
@@ -415,7 +422,7 @@ const transactionReviewOptions = ({
   return {
     ...emptyHeader,
     headerLeft: () => (
-      <BackButton color={colors.dark} eventName={AnalyticsEvents.gold_activity_back} />
+      <BackButton color={colors.dark} eventName={CeloExchangeEvents.celo_transaction_back} />
     ),
     headerTitle: () => <HeaderTitleWithSubtitle title={header} subTitle={dateTimeStatus} />,
   }
@@ -436,7 +443,7 @@ const generalScreens = (Navigator: typeof Stack) => (
 
 const mapStateToProps = (state: RootState) => {
   return {
-    language: state.app.language,
+    language: currentLanguageSelector(state),
     e164Number: state.account.e164PhoneNumber,
     acceptedTerms: state.account.acceptedTerms,
     pincodeType: state.account.pincodeType,
@@ -467,7 +474,7 @@ export function MainStackScreen() {
     if (!language) {
       initialRoute = Screens.Language
     } else if (!e164Number) {
-      initialRoute = Screens.JoinCelo
+      initialRoute = Screens.OnboardingEducationScreen
     } else if (!acceptedTerms) {
       initialRoute = Screens.RegulatoryTerms
     } else if (pincodeType === PincodeType.Unset) {

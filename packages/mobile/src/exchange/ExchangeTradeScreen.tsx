@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { CeloExchangeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { MoneyAmount } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -142,8 +142,8 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     )
     ValoraAnalytics.track(
       this.isDollarToGold()
-        ? AnalyticsEvents.gold_buy_continue
-        : AnalyticsEvents.gold_sell_continue,
+        ? CeloExchangeEvents.celo_buy_continue
+        : CeloExchangeEvents.celo_sell_continue,
       {
         localCurrencyAmount: localCurrencyAmount ? localCurrencyAmount.toString() : null,
         goldAmount: goldAmount.toString(),
@@ -253,7 +253,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
 
   switchInputToken = () => {
     const inputToken = this.getOppositeInputToken()
-    ValoraAnalytics.track(AnalyticsEvents.gold_switch_input_currency, {
+    ValoraAnalytics.track(CeloExchangeEvents.celo_toggle_input_currency, {
       to: inputToken,
     })
     this.setState({ inputToken }, () => {

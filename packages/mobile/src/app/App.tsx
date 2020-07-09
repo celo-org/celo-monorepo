@@ -1,20 +1,13 @@
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { ApolloProvider } from 'react-apollo'
-import {
-  DeviceEventEmitter,
-  Linking,
-  Platform,
-  StatusBar,
-  UIManager,
-  YellowBox,
-} from 'react-native'
+import { DeviceEventEmitter, Linking, Platform, StatusBar, YellowBox } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { enableScreens } from 'react-native-screens'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { AppEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { apolloClient } from 'src/apollo/index'
 import { openDeepLink } from 'src/app/actions'
@@ -44,10 +37,12 @@ BigNumber.config({
   },
 })
 
-// Enables LayoutAnimation on Android. Need to check if method exists before using
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
-  UIManager.setLayoutAnimationEnabledExperimental(true)
-}
+// Enables LayoutAnimation on Android. It makes transitions between states smoother.
+// https://reactnative.dev/docs/layoutanimation
+// Disabling it for now as it seems to cause blank white screens on certain android devices
+// if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+//   UIManager.setLayoutAnimationEnabledExperimental(true)
+// }
 
 export class App extends React.Component {
   async componentDidMount() {
@@ -60,12 +55,12 @@ export class App extends React.Component {
         (appInitializedAtString: string) => {
           const appInitializedAt = new Date(appInitializedAtString)
           const loadingDuration = appLoadedAt.getTime() - appInitializedAt.getTime()
-          ValoraAnalytics.startSession(AnalyticsEvents.app_launched, { loadingDuration })
+          ValoraAnalytics.startSession(AppEvents.app_launched, { loadingDuration })
           appStartListener.remove()
         }
       )
     } else {
-      ValoraAnalytics.startSession(AnalyticsEvents.app_launched, { loadingDuration: null })
+      ValoraAnalytics.startSession(AppEvents.app_launched, {})
     }
 
     Linking.addEventListener('url', this.handleOpenURL)
