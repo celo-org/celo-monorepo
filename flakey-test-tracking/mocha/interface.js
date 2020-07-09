@@ -78,19 +78,23 @@ module.exports = function errTrackingBDDInterface(suite) {
      */
     context.it = context.specify = function(title, fn) {
       var suite = suites[0]
-      var _fn
-      if (!suite.isPending()) {
-        _fn = async function() {
+      if (suite.isPending()) {
+        fn = null
+      }
+
+      var test
+      if (fn instanceof Function) {
+        test = new Test(title, async function() {
           try {
             await fn()
           } catch (err) {
             saveError(getTestIDFromSuite(suite, title), JSON.stringify(err))
             throw err
           }
-        }
+        })
+      } else {
+        test = new Test(title, fn)
       }
-
-      var test = new Test(title, _fn)
 
       test.file = file
       suite.addTest(test)

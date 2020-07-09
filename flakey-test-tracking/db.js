@@ -20,7 +20,7 @@ const getErrors = (testID) => {
 
 const fmtTestKey = (testID) => {
   // Remove special characters, whitespace and `Contract` prefix from file name.
-  return testID.replace(/\w/g, '_').replace('Contract', '')
+  return testID.replace(/\W/g, '_').replace('Contract', '')
 }
 
 const saveKnownFlakes = (flakes) => {

@@ -33,7 +33,7 @@ module.exports = {
     '<rootDir>/../../node_modules/react-native-gesture-handler/jestSetup.js',
     ...nodeFlakeTracking.setupFilesAfterEnv,
   ],
-  testPathIgnorePatterns: ['/node_modules/', '<rootDir>/e2e'],
+  testPathIgnorePatterns: ['/node_modules/', '<rootDir>/e2e', '/dist/'],
   transform: {
     ...tsjPreset.transform,
     '\\.js$': '<rootDir>/../../node_modules/react-native/jest/preprocessor.js',
