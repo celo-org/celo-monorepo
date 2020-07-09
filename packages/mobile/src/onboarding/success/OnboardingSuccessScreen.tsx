@@ -2,7 +2,9 @@ import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { Spacing } from '@celo/react-components/styles/styles.v2'
 import React, { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
+import { Namespaces } from 'src/i18n'
 import Logo, { LogoTypes } from 'src/icons/Logo.v2'
 import { background } from 'src/images/Images'
 import { nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers.v2'
@@ -15,11 +17,13 @@ function OnboardingSuccessScreen() {
     return () => clearTimeout(timeout)
   }, [])
 
+  const { t } = useTranslation(Namespaces.onboarding)
+
   return (
     <View style={styles.container}>
       <Image source={background} style={styles.backgroundImage} />
       <Logo type={LogoTypes.LIGHT} height={70} />
-      <Text style={styles.text}>You're all set!</Text>
+      <Text style={styles.text}>{t('success.message')}</Text>
     </View>
   )
 }
