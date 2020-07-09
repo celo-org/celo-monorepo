@@ -95,5 +95,8 @@
     "description": "Esta cuenta no tiene fondos. ¿Todavía te gustaría usarlo?",
     "useAccount": "Usar cuenta",
     "title": "Saldo <0></0>"
+  },
+  "success": {
+    "message": "Estás listo!"
   }
 }

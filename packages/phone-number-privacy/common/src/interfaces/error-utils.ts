@@ -10,6 +10,7 @@ export enum ErrorMessage {
   INCONSISTENT_SINGER_RESPONSES = 'CELO_PNP_ERR_08 SIG_ERR Inconsistent responses from signers',
   ERROR_REQUESTING_SIGNATURE = 'CELO_PNP_ERR_09 SIG_ERR Failed to request signature from signer',
   TIMEOUT_FROM_SIGNER = 'CELO_PNP_ERR_10 SIG_ERR Timeout from signer',
+  CONTRACT_GET_FAILURE = 'CELO_PNP_ERR_11 SIG_ERR Failed to read contract state',
 }
 
 export enum WarningMessage {
