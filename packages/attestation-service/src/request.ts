@@ -8,6 +8,8 @@ export enum ErrorMessages {
   INVALID_SIGNATURE = 'Invalid signature provided',
   NO_PROVIDER_SETUP = 'No provider was setup for this phone number',
   UNKNOWN_ERROR = 'Something went wrong',
+  ATTESTATION_SIGNER_CANNOT_SIGN = 'Attestation signer could not sign',
+  DATABASE_IS_OFFLONE = 'Database is offline',
 }
 
 export function asyncHandler<T>(handler: (req: express.Request, res: Response) => Promise<T>) {

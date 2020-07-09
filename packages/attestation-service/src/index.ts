@@ -6,8 +6,9 @@ import * as PromClient from 'prom-client'
 import { initializeDB, initializeKit } from './db'
 import { getAccountAddress, getAttestationSignerAddress } from './env'
 import { rootLogger } from './logger'
-import { createValidatedHandler, loggerMiddleware } from './request'
+import { asyncHandler, createValidatedHandler, loggerMiddleware } from './request'
 import { AttestationRequestType, handleAttestationRequest } from './requestHandlers/attestation'
+import { handleLivenessRequest } from './requestHandlers/liveness'
 import { handleStatusRequest, StatusRequestType } from './requestHandlers/status'
 import { handleTestAttestationRequest } from './requestHandlers/test_attestation'
 import { initializeSmsProviders } from './sms'
@@ -33,6 +34,10 @@ async function init() {
     res.send(PromClient.register.metrics())
   })
   app.get('/status', rateLimiter, createValidatedHandler(StatusRequestType, handleStatusRequest))
+  app.get('/ready', rateLimiter, (_req, res) => {
+    res.send('Ready').status(200)
+  })
+  app.get('/healthz', rateLimiter, asyncHandler(handleLivenessRequest))
   app.post(
     '/attestations',
     createValidatedHandler(AttestationRequestType, handleAttestationRequest)
@@ -44,6 +49,6 @@ async function init() {
 }
 
 init().catch((err) => {
-  rootLogger.error({ err })
+  rootLogger.error({ err }, 'Unexpected error during intialization')
   process.exit(1)
 })

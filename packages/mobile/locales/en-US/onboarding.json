@@ -1,4 +1,9 @@
 {
+  "education": {
+    "step1": "Send and receive money instantly",
+    "step2": "Pay anyone, anywhere with very low fees",
+    "step3": "Confidently and safely use {{appName}}",
+  },
   "contacts": {
     "header": "Connect Contacts",
     "body": "Adding your contacts makes it easy to send and request payments with your friends. Connecting does not send invites to your contacts.",
@@ -20,7 +25,7 @@
     "create": "Create a PIN",
     "verify": "Enter PIN again",
     "pinsDontMatch": "The PINs didn't match",
-    "invalidPin": "Invalid PIN"
+    "invalidPin": "Please use a stronger PIN"
   },
   "inviteCode": {
     "title": "Invite Code",
@@ -28,13 +33,14 @@
     "label": "Invite Code",
     "codePlaceholder": "Enter invite code",
     "noCode": "Don’t have an Invite Code",
-    "nodeCodeInviteLink": "Don’t have an invite code? Request one at <0>celo.org/app</0> or <1>continue without</1>"
+    "nodeCodeInviteLink": "Don’t have an invite code? Request one at <0>celo.org/developers/wallet</0> or <1>continue without</1>"
   },
   "verificationEducation": {
     "title": "Confirm",
     "header": "Confirm phone number",
-    "body": "To make sure your number is really yours, we’re going to send you three messages.\n\nConfirming your number takes about three minutes.",
+    "body": "To make sure your number is really yours, we’re going to send you three messages that will cost about 0.07 cUSD each.\n\nConfirming your number takes about three minutes.",
     "start": "Start",
+    "resume": "Resume",
     "learnMore": "Learn more"
   },
   "verificationSkipDialog": {

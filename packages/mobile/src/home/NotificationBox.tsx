@@ -8,7 +8,8 @@ import { connect } from 'react-redux'
 import { dismissEarnRewards, dismissGetVerified, dismissInviteFriends } from 'src/account/actions'
 import { getIncomingPaymentRequests, getOutgoingPaymentRequests } from 'src/account/selectors'
 import { PaymentRequest } from 'src/account/types'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { HomeEvents } from 'src/analytics/Events'
+import { ScrollDirection } from 'src/analytics/types'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { PROMOTE_REWARDS_APP } from 'src/config'
 import { EscrowedPayment } from 'src/escrow/actions'
@@ -16,8 +17,7 @@ import EscrowedPaymentReminderSummaryNotification from 'src/escrow/EscrowedPayme
 import { getReclaimableEscrowPayments } from 'src/escrow/reducer'
 import { pausedFeatures } from 'src/flags'
 import { Namespaces, withTranslation } from 'src/i18n'
-import BackupKeyIcon from 'src/icons/BackupKeyIcon'
-import { getVerifiedIcon, homeIcon, inviteFriendsIcon, rewardsAppIcon } from 'src/images/Images'
+import { backupKey, getVerified, inviteFriends, learnCelo } from 'src/images/Images'
 import { InviteDetails } from 'src/invite/actions'
 import { inviteesSelector } from 'src/invite/reducer'
 import { navigate } from 'src/navigator/NavigationService'
@@ -27,6 +27,27 @@ import OutgoingPaymentRequestSummaryNotification from 'src/paymentRequest/Outgoi
 import { RootState } from 'src/redux/reducers'
 import { isBackupTooLate } from 'src/redux/selectors'
 import { navigateToVerifierApp } from 'src/utils/linking'
+
+export enum NotificationBannerTypes {
+  incoming_tx_request = 'incoming_tx_request',
+  outgoing_tx_request = 'outgoing_tx_request',
+  escrow_tx_summary = 'escrow_tx_summary',
+  escrow_tx_pending = 'escrow_tx_pending',
+  celo_asset_education = 'celo_asset_education',
+  celo_rewards_education = 'celo_rewards_education',
+  invite_prompt = 'invite_prompt',
+  verification_prompt = 'verification_prompt',
+  backup_prompt = 'backup_prompt',
+}
+
+export enum NotificationBannerCTATypes {
+  accept = 'accept',
+  decline = 'decline',
+  review = 'review',
+  reclaim = 'reclaim',
+  remind = 'remind',
+  pay = 'pay',
+}
 
 interface StateProps {
   backupCompleted: boolean
@@ -129,12 +150,15 @@ export class NotificationBox extends React.Component<Props, State> {
       actions.push({
         title: t('backupKeyFlow6:yourBackupKey'),
         text: t('backupKeyFlow6:backupKeyNotification'),
-        icon: <BackupKeyIcon height={40} width={40} />,
+        icon: backupKey,
         callToActions: [
           {
             text: t('backupKeyFlow6:introPrimaryAction'),
             onPress: () => {
-              ValoraAnalytics.track(AnalyticsEvents.get_backup_key)
+              ValoraAnalytics.track(HomeEvents.notification_select, {
+                notificationType: NotificationBannerTypes.backup_prompt,
+                selectedAction: NotificationBannerCTATypes.accept,
+              })
               navigate(Screens.BackupIntroduction)
             },
           },
@@ -146,17 +170,25 @@ export class NotificationBox extends React.Component<Props, State> {
       actions.push({
         title: t('nuxVerification2:notification.title'),
         text: t('nuxVerification2:notification.body'),
-        icon: getVerifiedIcon,
+        icon: getVerified,
         callToActions: [
           {
             text: t('nuxVerification2:notification.cta'),
             onPress: () => {
+              ValoraAnalytics.track(HomeEvents.notification_select, {
+                notificationType: NotificationBannerTypes.verification_prompt,
+                selectedAction: NotificationBannerCTATypes.accept,
+              })
               navigate(Screens.VerificationEducationScreen)
             },
           },
           {
             text: t('global:remind'),
             onPress: () => {
+              ValoraAnalytics.track(HomeEvents.notification_select, {
+                notificationType: NotificationBannerTypes.verification_prompt,
+                selectedAction: NotificationBannerCTATypes.decline,
+              })
               this.props.dismissGetVerified()
             },
           },
@@ -168,13 +200,16 @@ export class NotificationBox extends React.Component<Props, State> {
       actions.push({
         title: t('walletFlow5:earnCeloRewards'),
         text: t('walletFlow5:earnCeloGold'),
-        icon: rewardsAppIcon,
+        icon: null,
         callToActions: [
           {
             text: t('walletFlow5:startEarning'),
             onPress: () => {
               this.props.dismissEarnRewards()
-              ValoraAnalytics.track(AnalyticsEvents.celorewards_notification_confirm)
+              ValoraAnalytics.track(HomeEvents.notification_select, {
+                notificationType: NotificationBannerTypes.celo_rewards_education,
+                selectedAction: NotificationBannerCTATypes.accept,
+              })
               navigateToVerifierApp()
             },
           },
@@ -182,7 +217,10 @@ export class NotificationBox extends React.Component<Props, State> {
             text: t('maybeLater'),
             onPress: () => {
               this.props.dismissEarnRewards()
-              ValoraAnalytics.track(AnalyticsEvents.celorewards_notification_dismiss)
+              ValoraAnalytics.track(HomeEvents.notification_select, {
+                notificationType: NotificationBannerTypes.celo_rewards_education,
+                selectedAction: NotificationBannerCTATypes.decline,
+              })
             },
           },
         ],
@@ -193,19 +231,25 @@ export class NotificationBox extends React.Component<Props, State> {
       actions.push({
         title: t('global:celoGold'),
         text: t('exchangeFlow9:whatIsGold'),
-        icon: homeIcon,
+        icon: learnCelo,
         callToActions: [
           {
             text: t('learnMore'),
             onPress: () => {
-              ValoraAnalytics.track(AnalyticsEvents.celogold_notification_confirm)
+              ValoraAnalytics.track(HomeEvents.notification_select, {
+                notificationType: NotificationBannerTypes.celo_asset_education,
+                selectedAction: NotificationBannerCTATypes.accept,
+              })
               navigate(Screens.GoldEducation)
             },
           },
           {
             text: t('global:dismiss'),
             onPress: () => {
-              ValoraAnalytics.track(AnalyticsEvents.celogold_notification_dismiss)
+              ValoraAnalytics.track(HomeEvents.notification_select, {
+                notificationType: NotificationBannerTypes.celo_asset_education,
+                selectedAction: NotificationBannerCTATypes.decline,
+              })
             },
           },
         ],
@@ -216,13 +260,16 @@ export class NotificationBox extends React.Component<Props, State> {
       actions.push({
         title: t('inviteFlow11:inviteFriendsToCelo'),
         text: t('inviteFlow11:inviteAnyone'),
-        icon: inviteFriendsIcon,
+        icon: inviteFriends,
         callToActions: [
           {
             text: t('global:connect'),
             onPress: () => {
               this.props.dismissInviteFriends()
-              ValoraAnalytics.track(AnalyticsEvents.invitefriends_notification_confirm)
+              ValoraAnalytics.track(HomeEvents.notification_select, {
+                notificationType: NotificationBannerTypes.invite_prompt,
+                selectedAction: NotificationBannerCTATypes.accept,
+              })
               navigate(Screens.Invite)
             },
           },
@@ -230,7 +277,10 @@ export class NotificationBox extends React.Component<Props, State> {
             text: t('global:remind'),
             onPress: () => {
               this.props.dismissInviteFriends()
-              ValoraAnalytics.track(AnalyticsEvents.invitefriends_notification_dismiss)
+              ValoraAnalytics.track(HomeEvents.notification_select, {
+                notificationType: NotificationBannerTypes.invite_prompt,
+                selectedAction: NotificationBannerCTATypes.decline,
+              })
             },
           },
         ],
@@ -263,6 +313,16 @@ export class NotificationBox extends React.Component<Props, State> {
   }
 
   handleScroll = (event: { nativeEvent: NativeScrollEvent }) => {
+    const { currentIndex } = this.state
+    const nextIndex = Math.round(event.nativeEvent.contentOffset.x / variables.width)
+
+    if (nextIndex === currentIndex) {
+      return
+    }
+
+    const direction = nextIndex > currentIndex ? ScrollDirection.next : ScrollDirection.previous
+    ValoraAnalytics.track(HomeEvents.notification_scroll, { direction })
+
     this.setState({
       currentIndex: Math.round(event.nativeEvent.contentOffset.x / variables.width),
     })
@@ -276,7 +336,7 @@ export class NotificationBox extends React.Component<Props, State> {
       ...this.generalNotifications(),
     ]
 
-    if (!notifications || !notifications.length) {
+    if (!notifications.length) {
       // No notifications, no slider
       return null
     }

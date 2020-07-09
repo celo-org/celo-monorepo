@@ -3,12 +3,12 @@ import { PincodeType } from 'src/account/reducer'
 import {
   AppEvents,
   CeloExchangeEvents,
-  ContactImportEvents,
   EscrowEvents,
   FeeEvents,
   GethEvents,
+  HomeEvents,
+  IdentityEvents,
   InviteEvents,
-  NotificationEvents,
   OnboardingEvents,
   RequestEvents,
   SendEvents,
@@ -16,13 +16,16 @@ import {
   TransactionEvents,
   VerificationEvents,
 } from 'src/analytics/Events'
+import { BackQuizProgress, ScrollDirection } from 'src/analytics/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { RecipientKind } from 'src/recipients/recipient'
 
 interface AppEventsProperties {
   [AppEvents.app_launched]: {
-    loadingDuration: number | null
+    // TODO: Figure out how to measure loadingDuration iOS and make param required
+    loadingDuration?: number
     deviceInfo?: object
   }
   [AppEvents.app_state_error]: {
@@ -44,101 +47,97 @@ interface AppEventsProperties {
   }
 }
 
+interface HomeEventsProperties {
+  [HomeEvents.home_send]: undefined
+  [HomeEvents.home_request]: undefined
+  [HomeEvents.home_qr]: undefined
+  [HomeEvents.drawer_navigation]: {
+    navigateTo: string
+  }
+  [HomeEvents.drawer_address_copy]: undefined
+
+  [HomeEvents.notification_scroll]: {
+    // TODO: Pass in notificationType and make param required
+    notificationType?: NotificationBannerTypes
+    direction: ScrollDirection
+  }
+  [HomeEvents.notification_select]: {
+    notificationType: NotificationBannerTypes
+    selectedAction: NotificationBannerCTATypes
+  }
+  [HomeEvents.transaction_feed_item_select]: undefined
+  [HomeEvents.transaction_feed_address_copy]: undefined
+}
+
 interface SettingsEventsProperties {
-  [SettingsEvents.edit_profile]: undefined
-  [SettingsEvents.edit_name]: undefined
+  [SettingsEvents.settings_profile_edit]: undefined
+  [SettingsEvents.settings_profile_name_edit]: undefined
   [SettingsEvents.language_select]: {
     language: string
   }
-}
-
-interface NotificationEventsProperties {
-  [NotificationEvents.celogold_notification_confirm]: undefined
-  [NotificationEvents.celogold_notification_dismiss]: undefined
-  [NotificationEvents.celorewards_notification_confirm]: undefined
-  [NotificationEvents.celorewards_notification_dismiss]: undefined
-  [NotificationEvents.invitefriends_notification_confirm]: undefined
-  [NotificationEvents.invitefriends_notification_dismiss]: undefined
-  [NotificationEvents.incoming_request_payment_decline]: undefined
-  [NotificationEvents.incoming_request_payment_pay]: undefined
-  [NotificationEvents.incoming_request_payment_review]: undefined
-  [NotificationEvents.outgoing_request_payment_review]: undefined
-  [NotificationEvents.outgoing_request_payment_remind]: undefined
-  [NotificationEvents.outgoing_request_payment_cancel]: undefined
-  [NotificationEvents.clicked_escrowed_payment_notification]: undefined
-  [NotificationEvents.clicked_escrowed_payment_send_message]: undefined
-  [NotificationEvents.get_backup_key]: undefined
+  [SettingsEvents.pin_require_on_load]: {
+    enabled: boolean
+  }
+  [SettingsEvents.forno_toggle]: {
+    enabled: boolean
+  }
+  [SettingsEvents.licenses_view]: undefined
+  [SettingsEvents.tos_view]: undefined
 }
 
 interface OnboardingEventsProperties {
-  [OnboardingEvents.backup_educate_1_next]: undefined
-  [OnboardingEvents.backup_educate_2_next]: undefined
-  [OnboardingEvents.backup_educate_3_next]: undefined
-  [OnboardingEvents.backup_educate_4_next]: undefined
+  [OnboardingEvents.onboarding_education_start]: undefined
+  [OnboardingEvents.onboarding_education_scroll]: {
+    currentStep: number
+    direction: ScrollDirection
+  }
+  [OnboardingEvents.onboarding_education_complete]: undefined
+  [OnboardingEvents.onboarding_education_cancel]: undefined
 
-  [OnboardingEvents.backup_educate_1_cancel]: {
-    screen: string
+  [OnboardingEvents.backup_education_start]: undefined
+  [OnboardingEvents.backup_education_scroll]: {
+    currentStep: number
+    direction: ScrollDirection
   }
-  [OnboardingEvents.backup_educate_2_cancel]: {
-    screen: string
-  }
-  [OnboardingEvents.backup_educate_3_cancel]: {
-    screen: string
-  }
-  [OnboardingEvents.backup_educate_4_cancel]: {
-    screen: string
-  }
+  [OnboardingEvents.backup_education_complete]: undefined
+  [OnboardingEvents.backup_education_cancel]: undefined
 
   [OnboardingEvents.backup_start]: undefined
-  [OnboardingEvents.backup_setup_info]: undefined
-  [OnboardingEvents.backup_quiz_backspace]: undefined
-  [OnboardingEvents.backup_quiz_start]: undefined
-  [OnboardingEvents.backup_quiz_submit]: undefined
-  [OnboardingEvents.backup_quiz_success]: undefined
-  [OnboardingEvents.backup_quiz_incorrect]: undefined
-
-  [OnboardingEvents.delay_backup]: undefined
-  [OnboardingEvents.backup_cancel]: {
-    screen: string
-  }
-  [OnboardingEvents.backup_cancel_procrastinate]: {
-    screen: string
-    title: string
-  }
   [OnboardingEvents.backup_continue]: undefined
-  [OnboardingEvents.backup_setup_toggle_enable]: undefined
-  [OnboardingEvents.backup_setup_toggle_disable]: undefined
+  [OnboardingEvents.backup_complete]: undefined
+  [OnboardingEvents.backup_more_info]: undefined
+  [OnboardingEvents.backup_delay]: undefined
+  [OnboardingEvents.backup_delay_confirm]: undefined
+  [OnboardingEvents.backup_delay_cancel]: undefined
+  [OnboardingEvents.backup_cancel]: undefined
   [OnboardingEvents.backup_error]: {
-    title: string
+    error: string
     context?: string
   }
 
-  [OnboardingEvents.gold_educate_1_next]: undefined
-  [OnboardingEvents.gold_educate_2_next]: undefined
-  [OnboardingEvents.gold_educate_3_next]: undefined
-  [OnboardingEvents.gold_educate_4_next]: undefined
+  [OnboardingEvents.backup_quiz_start]: undefined
+  [OnboardingEvents.backup_quiz_progress]: {
+    action: BackQuizProgress
+  }
+  [OnboardingEvents.backup_quiz_complete]: undefined
+  [OnboardingEvents.backup_quiz_incorrect]: undefined
 
-  [OnboardingEvents.exchange_gold_nux]: undefined
+  [OnboardingEvents.celo_education_start]: undefined
+  [OnboardingEvents.celo_education_scroll]: {
+    currentStep: number
+    direction: ScrollDirection
+  }
+  [OnboardingEvents.celo_education_complete]: undefined
+  [OnboardingEvents.celo_education_cancel]: undefined
 
-  [OnboardingEvents.gold_cancel1]: {
-    screen: string
-  }
-  [OnboardingEvents.gold_cancel2]: {
-    screen: string
-  }
-  [OnboardingEvents.gold_cancel3]: {
-    screen: string
-  }
-  [OnboardingEvents.gold_cancel4]: {
-    screen: string
-  }
   [OnboardingEvents.phone_number_set]: {
     countryCode: string
   }
-  [OnboardingEvents.invalid_phone_number]: {
+  [OnboardingEvents.phone_number_invalid]: {
     obfuscatedPhoneNumber: string
   }
-  [OnboardingEvents.pin_created]: undefined
+
+  [OnboardingEvents.pin_set]: undefined
   [OnboardingEvents.pin_invalid]: {
     error: string
   }
@@ -147,130 +146,191 @@ interface OnboardingEventsProperties {
     error: string
   }
   [OnboardingEvents.pin_never_set]: undefined
-  [OnboardingEvents.import_wallet_submit]: undefined
+
+  [OnboardingEvents.wallet_import_start]: undefined
+  [OnboardingEvents.wallet_import_complete]: undefined
+  [OnboardingEvents.wallet_import_cancel]: undefined
+
+  [OnboardingEvents.invite_redeem_start]: undefined
+  [OnboardingEvents.invite_redeem_complete]: undefined
+  [OnboardingEvents.invite_redeem_timeout]: undefined
+  [OnboardingEvents.invite_redeem_error]: {
+    error: string
+  }
+
+  [OnboardingEvents.invite_redeem_skip_start]: undefined
+  [OnboardingEvents.invite_redeem_skip_complete]: undefined
+  [OnboardingEvents.invite_redeem_skip_error]: {
+    error: string
+  }
+
+  [OnboardingEvents.escrow_redeem_start]: undefined
+  [OnboardingEvents.escrow_redeem_complete]: undefined
+  [OnboardingEvents.escrow_redeem_error]: {
+    error: string
+  }
 }
 
 interface VerificationEventsProperties {
   [VerificationEvents.verification_start]: undefined
+  [VerificationEvents.verification_complete]: undefined
+  [VerificationEvents.verification_error]: {
+    error: string
+  }
+  [VerificationEvents.verification_cancel]: undefined
+  [VerificationEvents.verification_timeout]: undefined
+
   [VerificationEvents.verification_hash_retrieved]: {
     phoneHash: string
     address: string
   }
-  [VerificationEvents.verification_setup]: undefined
-  [VerificationEvents.verification_get_status]: {
+  [VerificationEvents.verification_fetch_status_start]: undefined
+  [VerificationEvents.verification_fetch_status_complete]: {
     isVerified: boolean
     numAttestationsRemaining: number
     total: number
     completed: number
   }
-  [VerificationEvents.verification_request_attestations]: {
-    numAttestationsRequestsNeeded: number
+
+  [VerificationEvents.verification_request_all_attestations_start]: {
+    attestationsToRequest: number
   }
-  [VerificationEvents.verification_wait_for_select_issuers]: undefined
-  [VerificationEvents.verification_selecting_issuer]: undefined
-  [VerificationEvents.verification_requested_attestations]: undefined
-  [VerificationEvents.verification_account_set]: undefined
-  [VerificationEvents.verification_reveal_attestation]: {
-    issuer: any
+  [VerificationEvents.verification_request_all_attestations_refresh_progress]: {
+    attestationsRemaining: number
   }
-  [VerificationEvents.verification_revealed_attestation]: {
-    retryRequired: boolean
-    issuer: any
-    duration: number
+  [VerificationEvents.verification_request_all_attestations_complete]: {
+    issuers: string[]
   }
-  [VerificationEvents.verification_reveal_error]: {
-    issuer: any
-    status: number
-    error: any
+
+  [VerificationEvents.verification_request_attestation_start]: {
+    currentAttestation: number
   }
-  [VerificationEvents.verification_wait_for_attestation_code]: {
-    issuer: any
-  }
+  [VerificationEvents.verification_request_attestation_approve_tx_sent]: undefined
+  [VerificationEvents.verification_request_attestation_request_tx_sent]: undefined
+  [VerificationEvents.verification_request_attestation_await_issuer_selection]: undefined
+  [VerificationEvents.verification_request_attestation_select_issuer]: undefined
+  [VerificationEvents.verification_request_attestation_issuer_tx_sent]: undefined
+  [VerificationEvents.verification_request_attestation_complete]: undefined
+
   [VerificationEvents.verification_code_received]:
     | undefined
     | {
         context: string
       }
-  [VerificationEvents.verification_complete_attestation]: {
+  [VerificationEvents.verification_code_validate_start]: {
     issuer: any
   }
-  [VerificationEvents.verification_completed_attestation]: {
+  [VerificationEvents.verification_code_validate_complete]: {
     issuer: any
   }
-  [VerificationEvents.verification_failed]: {
-    duration: number
+  [VerificationEvents.verification_account_set]: undefined
+
+  [VerificationEvents.verification_reveal_all_attestations_start]: undefined
+  [VerificationEvents.verification_reveal_attestation_revealed]: {
+    issuer: any
+    neededRetry: boolean
   }
-  [VerificationEvents.verification_cancelled]: {
-    duration: number
+  [VerificationEvents.verification_reveal_attestation_await_code_start]: {
+    issuer: any
   }
-  [VerificationEvents.verification_success]: {
-    duration: number
+  [VerificationEvents.verification_reveal_all_attestations_complete]: undefined
+
+  [VerificationEvents.verification_reveal_attestation_start]: {
+    issuer: any
   }
-  [VerificationEvents.verification_timed_out]: {
-    duration: number
+  [VerificationEvents.verification_reveal_attestation_await_code_complete]: {
+    issuer: any
   }
-  [VerificationEvents.verification_error]: {
+  [VerificationEvents.verification_reveal_attestation_complete]: {
+    issuer: any
+  }
+  [VerificationEvents.verification_reveal_attestation_error]: {
+    issuer: any
     error: string
   }
-  [VerificationEvents.verification_actionable_attestation_start]: undefined
-  [VerificationEvents.verification_actionable_attestation_finish]: {
-    duration: number
-  }
-  [VerificationEvents.verification_validate_code_start]: {
-    issuer: any
-  }
-  [VerificationEvents.verification_validate_code_finish]: {
-    issuer: any
-  }
-  [VerificationEvents.phone_number_quota_purchase_success]: undefined
-  [VerificationEvents.phone_number_quota_purchase_failure]: {
+  [VerificationEvents.verification_revoke_start]: undefined
+  [VerificationEvents.verification_revoke_finish]: undefined
+  [VerificationEvents.verification_revoke_error]: {
     error: string
   }
-  [VerificationEvents.phone_number_quota_purchase_skip]: undefined
 }
 
-interface ContactImportEventsProperties {
-  [ContactImportEvents.import_contacts]: undefined
-  [ContactImportEvents.import_contact_error]: {
+interface IdentityEventsProperties {
+  [IdentityEvents.contacts_connect]: {
+    matchMakingEnabled: boolean
+  }
+  [IdentityEvents.contacts_import_permission_denied]: undefined
+  [IdentityEvents.contacts_import_start]: undefined
+  [IdentityEvents.contacts_import_complete]: {
+    contactImportCount: number
+  }
+  [IdentityEvents.contacts_processing_complete]: undefined
+  [IdentityEvents.contacts_matchmaking_complete]: {
+    matchCount: number
+  }
+  [IdentityEvents.contacts_import_error]: {
     error: string
   }
-  [ContactImportEvents.fetched_contacts]: {
-    contacts: number
+
+  [IdentityEvents.phone_number_lookup_start]: undefined
+  [IdentityEvents.phone_number_lookup_complete]: undefined
+  [IdentityEvents.phone_number_lookup_error]: {
+    error: string
   }
-  [ContactImportEvents.add_contact_match]: {
-    contactsMatched: number
+
+  [IdentityEvents.phone_number_lookup_purchase_complete]: undefined
+  [IdentityEvents.phone_number_lookup_purchase_error]: {
+    error: string
   }
+  [IdentityEvents.phone_number_lookup_purchase_skip]: undefined
 }
 
 interface InviteEventsProperties {
-  [InviteEvents.invite_success]: undefined
-  [InviteEvents.invite_error]: {
+  [InviteEvents.invite_tx_start]: undefined
+  [InviteEvents.invite_tx_complete]: undefined
+  [InviteEvents.invite_tx_error]: {
     error: string
   }
-  [InviteEvents.friend_invited]: undefined
-  [InviteEvents.invite_edit]: undefined
-  [InviteEvents.invite_friends_sms]: undefined
-  [InviteEvents.invite_friends_whatsapp]: undefined
-  [InviteEvents.invite_skip_failed]: {
+  [InviteEvents.invite_method_sms]: undefined
+  [InviteEvents.invite_method_whatsapp]: undefined
+  [InviteEvents.invite_method_error]: {
     error: string
   }
-  [InviteEvents.invite_skip_complete]: undefined
-  [InviteEvents.redeem_invite_success]: undefined
-  [InviteEvents.redeem_invite_timed_out]: undefined
-  [InviteEvents.redeem_invite_failed]: {
+}
+
+interface EscrowEventsProperties {
+  [EscrowEvents.escrow_transfer_start]: undefined
+  [EscrowEvents.escrow_transfer_approve_tx_sent]: undefined
+  [EscrowEvents.escrow_transfer_transfer_tx_sent]: undefined
+  [EscrowEvents.escrow_transfer_complete]: undefined
+  [EscrowEvents.escrow_transfer_error]: {
+    error: string
+  }
+
+  [EscrowEvents.escrow_fetch_start]: undefined
+  [EscrowEvents.escrow_fetch_complete]: undefined
+  [EscrowEvents.escrow_fetch_error]: {
+    error: string
+  }
+
+  [EscrowEvents.escrow_reclaim_confirm]: undefined
+  [EscrowEvents.escrow_reclaim_cancel]: undefined
+  [EscrowEvents.escrow_reclaim_start]: undefined
+  [EscrowEvents.escrow_reclaim_complete]: undefined
+  [EscrowEvents.escrow_reclaim_error]: {
     error: string
   }
 }
 
 interface SendEventsProperties {
-  [SendEvents.send_cancel]: undefined
   [SendEvents.send_scan]: undefined
   [SendEvents.send_select_recipient]: {
     recipientKind: RecipientKind
     usedSearchBar: boolean
   }
+  [SendEvents.send_cancel]: undefined
   [SendEvents.send_amount_back]: undefined
-  [SendEvents.send_continue]: {
+  [SendEvents.send_amount_continue]: {
     isScan: boolean
     isInvite: boolean
     localCurrencyExchangeRate?: string | null
@@ -279,34 +339,27 @@ interface SendEventsProperties {
     localCurrencyAmount: string | null
   }
   [SendEvents.send_confirm_back]: undefined
-  [SendEvents.send_confirm]: {
+  [SendEvents.send_confim_send]: {
     isScan: boolean
     isInvite: boolean
+    isRequest: boolean
     localCurrencyExchangeRate?: string | null
     localCurrency: LocalCurrencyCode
     dollarAmount: string | null
     localCurrencyAmount: string | null
+    commentLength: number
   }
-  [SendEvents.send_error]: {
-    isInvite: boolean
-    error: string
-  }
-  [SendEvents.send_complete]: {
-    isInvite: boolean
-  }
-  [SendEvents.send_dollar_transaction]: undefined
-  [SendEvents.send_dollar_transaction_confirmed]: undefined
 
   [SendEvents.send_secure_start]: {
     confirmByScan: boolean
   }
-  [SendEvents.send_secure_cancel]: undefined
   [SendEvents.send_secure_back]: undefined
+  [SendEvents.send_secure_cancel]: undefined
   [SendEvents.send_secure_submit]: {
     partialAddressValidation: boolean
     address: string
   }
-  [SendEvents.send_secure_success]: {
+  [SendEvents.send_secure_complete]: {
     confirmByScan: boolean
     partialAddressValidation?: boolean
   }
@@ -322,24 +375,10 @@ interface SendEventsProperties {
     partialAddressValidation: boolean
   }
   [SendEvents.send_secure_edit]: undefined
-}
 
-interface EscrowEventsProperties {
-  [EscrowEvents.escrowed_payment_review]: undefined
-  [EscrowEvents.escrow_transfer]: undefined
-  [EscrowEvents.escrowed_payment_reclaimed_by_sender]: undefined
-  [EscrowEvents.escrowed_payment_reclaimEdit_by_sender]: undefined
-  [EscrowEvents.escrowed_payment_withdrawn_by_receiver]: undefined
-  [EscrowEvents.escrow_failed_to_withdraw]: {
-    error: string
-  }
-  [EscrowEvents.escrow_failed_to_reclaim]: {
-    error: string
-  }
-  [EscrowEvents.escrow_failed_to_transfer]: {
-    error: string
-  }
-  [EscrowEvents.escrow_failed_to_fetch_sent]: {
+  [SendEvents.send_tx_start]: undefined
+  [SendEvents.send_tx_complete]: undefined
+  [SendEvents.send_tx_error]: {
     error: string
   }
 }
@@ -352,7 +391,7 @@ interface RequestEventsProperties {
     recipientKind: RecipientKind
     usedSearchBar: boolean
   }
-  [RequestEvents.request_continue]: {
+  [RequestEvents.request_amount_continue]: {
     isScan: boolean
     isInvite: boolean
     localCurrencyExchangeRate?: string | null
@@ -369,7 +408,7 @@ interface RequestEventsProperties {
     localCurrencyAmount: string | null
   }
   [RequestEvents.request_confirm_back]: undefined
-  [RequestEvents.request_confirm]: {
+  [RequestEvents.request_confirm_request]: {
     requesteeAddress: string
   }
   [RequestEvents.request_error]: {
@@ -392,98 +431,87 @@ interface FeeEventsProperties {
 }
 
 interface TransactionEventsProperties {
-  [TransactionEvents.transaction_send_start]: {
+  [TransactionEvents.transaction_start]: {
     txId: string
   }
-  [TransactionEvents.transaction_send_gas_estimated]: {
+  [TransactionEvents.transaction_gas_estimated]: {
     txId: string
-    duration: number
   }
-  [TransactionEvents.transaction_send_gas_hash_received]: {
+  [TransactionEvents.transaction_hash_received]: {
     txId: string
-    duration: number
   }
-  [TransactionEvents.transaction_send_gas_receipt]: {
+  [TransactionEvents.transaction_receipt_received]: {
     txId: string
-    duration: number
   }
   [TransactionEvents.transaction_error]: {
     txId: string
-    duration: number
     error: string
   }
   [TransactionEvents.transaction_exception]: {
     txId: string
-    duration: number
     error: string
-  }
-  [TransactionEvents.transfer_token_error]: {
-    error: string
-  }
-  [TransactionEvents.unexpected_maker_token]: {
-    makerToken: CURRENCY_ENUM
   }
 }
 
 interface CeloExchangeEventsProperties {
-  [CeloExchangeEvents.gold_switch_input_currency]: {
+  [CeloExchangeEvents.celo_home_info]: undefined
+  [CeloExchangeEvents.celo_home_buy]: undefined
+  [CeloExchangeEvents.celo_home_sell]: undefined
+  [CeloExchangeEvents.celo_transaction_select]: undefined
+  [CeloExchangeEvents.celo_transaction_back]: undefined
+
+  [CeloExchangeEvents.celo_toggle_input_currency]: {
     to: CURRENCY_ENUM
   }
-  [CeloExchangeEvents.gold_buy_continue]: {
+  [CeloExchangeEvents.celo_buy_continue]: {
     localCurrencyAmount: string | null
     goldAmount: string
     inputToken: CURRENCY_ENUM
     goldToDollarExchangeRate: string
   }
-  [CeloExchangeEvents.gold_buy_confirm]: {
+  [CeloExchangeEvents.celo_buy_confirm]: {
     localCurrencyAmount: string | null
     goldAmount: string
     inputToken: CURRENCY_ENUM
     goldToDollarExchangeRate: string
   }
-  [CeloExchangeEvents.gold_buy_cancel]: undefined
-  [CeloExchangeEvents.gold_buy_edit]: undefined
-  [CeloExchangeEvents.gold_buy_error]: {
+  [CeloExchangeEvents.celo_buy_cancel]: undefined
+  [CeloExchangeEvents.celo_buy_edit]: undefined
+  [CeloExchangeEvents.celo_buy_error]: {
     error: string
   }
-  [CeloExchangeEvents.gold_sell_continue]: {
+  [CeloExchangeEvents.celo_sell_continue]: {
     localCurrencyAmount: string | null
     goldAmount: string
     inputToken: CURRENCY_ENUM
     goldToDollarExchangeRate: string
   }
-  [CeloExchangeEvents.gold_sell_confirm]: {
+  [CeloExchangeEvents.celo_sell_confirm]: {
     localCurrencyAmount: string | null
     goldAmount: string
     inputToken: CURRENCY_ENUM
     goldToDollarExchangeRate: string
   }
-  [CeloExchangeEvents.gold_sell_cancel]: undefined
-  [CeloExchangeEvents.gold_sell_edit]: undefined
-  [CeloExchangeEvents.gold_sell_error]: {
+  [CeloExchangeEvents.celo_sell_cancel]: undefined
+  [CeloExchangeEvents.celo_sell_edit]: undefined
+  [CeloExchangeEvents.celo_sell_error]: {
     error: string
   }
 
-  [CeloExchangeEvents.fetch_exchange_rate_failed]: {
+  [CeloExchangeEvents.celo_exchange_start]: undefined
+  [CeloExchangeEvents.celo_exchange_complete]: undefined
+  [CeloExchangeEvents.celo_exchange_error]: {
     error: string
   }
-  [CeloExchangeEvents.invalid_exchange_rate]: {
-    context: string
+
+  [CeloExchangeEvents.celo_fetch_exchange_rate_start]: undefined
+  [CeloExchangeEvents.celo_fetch_exchange_rate_complete]: {
+    makerAmount: number
+    exchangeRate: number
   }
-  [CeloExchangeEvents.exchange_rate_change_failure]: {
-    makerToken: CURRENCY_ENUM
-    takerAmount: string
-    context: string
-  }
-  [CeloExchangeEvents.missing_tx_id]: undefined
-  [CeloExchangeEvents.exchange_failed]: {
+  [CeloExchangeEvents.celo_fetch_exchange_rate_error]: {
     error: string
   }
-  [CeloExchangeEvents.gold_info]: undefined
-  [CeloExchangeEvents.gold_buy_start]: undefined
-  [CeloExchangeEvents.gold_sell_start]: undefined
-  [CeloExchangeEvents.gold_activity_select]: undefined
-  [CeloExchangeEvents.gold_activity_back]: undefined
 }
 
 interface GethEventsProperties {
@@ -501,11 +529,12 @@ interface GethEventsProperties {
 }
 
 export type AnalyticsPropertiesList = AppEventsProperties &
+  HomeEventsProperties &
   SettingsEventsProperties &
-  NotificationEventsProperties &
   OnboardingEventsProperties &
   VerificationEventsProperties &
-  ContactImportEventsProperties &
+  IdentityEventsProperties &
+  IdentityEventsProperties &
   InviteEventsProperties &
   SendEventsProperties &
   EscrowEventsProperties &

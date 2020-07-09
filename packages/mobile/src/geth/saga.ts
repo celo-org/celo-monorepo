@@ -3,22 +3,22 @@ import { eventChannel } from 'redux-saga'
 import { call, cancel, cancelled, delay, fork, put, race, select, take } from 'redux-saga/effects'
 import { setPromptForno } from 'src/account/actions'
 import { promptFornoIfNeededSelector } from 'src/account/selectors'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { GethEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { waitForRehydrate } from 'src/app/saga'
 import { Actions, setGethConnected, setInitState } from 'src/geth/actions'
 import {
   FailedToFetchGenesisBlockError,
   FailedToFetchStaticNodesError,
-  getGeth,
+  initGeth,
+  stopGethIfInitialized,
 } from 'src/geth/geth'
 import { InitializationState } from 'src/geth/reducer'
-import { isGethConnectedSelector } from 'src/geth/selectors'
+import { gethInitializedSelector, isGethConnectedSelector } from 'src/geth/selectors'
 import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { deleteChainDataAndRestartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
-import { getContractKit } from 'src/web3/contracts'
+import { getWeb3 } from 'src/web3/contracts'
 import { fornoSelector } from 'src/web3/selectors'
 
 const gethEmitter = new NativeEventEmitter(NativeModules.RNGeth)
@@ -33,6 +33,19 @@ enum GethInitOutcomes {
   NETWORK_ERROR_FETCHING_STATIC_NODES = 'NETWORK_ERROR_FETCHING_STATIC_NODES',
   IRRECOVERABLE_FAILURE = 'IRRECOVERABLE_FAILURE',
   NETWORK_ERROR_FETCHING_GENESIS_BLOCK = 'NETWORK_ERROR_FETCHING_GENESIS_BLOCK',
+}
+
+export function* waitForGethInitialized() {
+  const gethState = yield select(gethInitializedSelector)
+  if (gethState === InitializationState.INITIALIZED) {
+    return
+  }
+  while (true) {
+    const action = yield take(Actions.SET_INIT_STATE)
+    if (action.state === InitializationState.INITIALIZED) {
+      return
+    }
+  }
 }
 
 export function* waitForGethConnectivity() {
@@ -50,10 +63,10 @@ export function* waitForGethConnectivity() {
 
 export function* waitForNextBlock() {
   const startTime = Date.now()
-  const contractKit = yield call(getContractKit)
-  const initialBlockNumber = yield call(contractKit.web3.eth.getBlockNumber)
+  const web3 = yield call(getWeb3)
+  const initialBlockNumber = yield call(web3.eth.getBlockNumber)
   while (Date.now() - startTime < NEW_BLOCK_TIMEOUT) {
-    const blockNumber = yield call(contractKit.web3.eth.getBlockNumber)
+    const blockNumber = yield call(web3.eth.getBlockNumber)
     if (blockNumber > initialBlockNumber) {
       return
     }
@@ -65,9 +78,9 @@ function* waitForGethInstance() {
   try {
     const fornoMode = yield select(fornoSelector)
     // get geth without syncing if fornoMode
-    const gethInstance = yield call(getGeth, !fornoMode)
-    if (gethInstance == null) {
-      throw new Error('geth instance is null')
+    const gethInstance = yield call(initGeth, !fornoMode)
+    if (!gethInstance) {
+      throw new Error('Geth instance is null')
     }
     return GethInitOutcomes.SUCCESS
   } catch (error) {
@@ -98,7 +111,7 @@ export function* initGethSaga() {
   switch (result) {
     case GethInitOutcomes.SUCCESS: {
       Logger.debug(TAG, 'Geth initialized')
-      ValoraAnalytics.track(AnalyticsEvents.geth_init_success)
+      ValoraAnalytics.track(GethEvents.geth_init_success)
       yield put(setInitState(InitializationState.INITIALIZED))
       return
     }
@@ -136,19 +149,19 @@ export function* initGethSaga() {
     }
   }
 
-  ValoraAnalytics.track(AnalyticsEvents.geth_init_failure, {
+  ValoraAnalytics.track(GethEvents.geth_init_failure, {
     error: result,
     context: errorContext,
   })
 
   if (restartAppAutomatically) {
     Logger.error(TAG, 'Geth initialization failed, restarting the app.')
-    ValoraAnalytics.track(AnalyticsEvents.geth_restart_to_fix_init)
+    ValoraAnalytics.track(GethEvents.geth_restart_to_fix_init)
     deleteChainDataAndRestartApp()
   } else {
     // Suggest switch to forno for network-related errors
     if (yield select(promptFornoIfNeededSelector)) {
-      ValoraAnalytics.track(AnalyticsEvents.prompt_forno, {
+      ValoraAnalytics.track(GethEvents.prompt_forno, {
         error: result.message,
         context: 'Geth init error',
       })
@@ -168,7 +181,6 @@ function createNewBlockChannel() {
 }
 
 function* monitorGeth() {
-  yield call(waitForRehydrate) // Wait for rehydrate to know if geth or forno mode
   const fornoMode = yield select(fornoSelector)
 
   if (!fornoMode) {
@@ -215,7 +227,10 @@ function* monitorGeth() {
 
 export function* gethSaga() {
   yield call(initGethSaga)
-  const gethRelatedSagas = yield fork(monitorGeth)
+  const gethMonitor = yield fork(monitorGeth)
+
   yield take(Actions.CANCEL_GETH_SAGA)
-  yield cancel(gethRelatedSagas)
+  yield put(setInitState(InitializationState.NOT_YET_INITIALIZED))
+  yield call(stopGethIfInitialized)
+  yield cancel(gethMonitor)
 }

@@ -136,6 +136,10 @@
       "@celo/utils"
     ]
   },
+  "@celo/phone-number-privacy-common": {
+    "location": "packages/phone-number-privacy/common",
+    "dependencies": []
+  },
   "@celo/phone-number-privacy-signer": {
     "location": "packages/phone-number-privacy/signer",
     "dependencies": [

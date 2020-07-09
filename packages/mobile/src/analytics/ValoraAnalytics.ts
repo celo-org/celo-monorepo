@@ -1,12 +1,12 @@
 import Analytics, { Analytics as analytics } from '@segment/analytics-react-native'
 import Firebase from '@segment/analytics-react-native-firebase'
+import { sha256 } from 'ethereumjs-util'
 import DeviceInfo from 'react-native-device-info'
 import { AppEvents } from 'src/analytics/Events'
 import { AnalyticsPropertiesList } from 'src/analytics/Properties'
 import { SEGMENT_API_KEY } from 'src/config'
 import { store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
-import * as Web3Utils from 'web3-utils'
 
 const TAG = 'ValoraAnalytics'
 
@@ -70,10 +70,9 @@ class ValoraAnalytics {
       try {
         const deviceInfo = await getDeviceInfo()
         this.deviceInfo = deviceInfo
-        this.sessionId = Web3Utils.soliditySha3({
-          type: 'string',
-          value: deviceInfo.SerialNumber || deviceInfo.DeviceId,
-        }).slice(2)
+        this.sessionId = sha256('0x' + deviceInfo.UniqueID.split('-').join('') + String(Date.now()))
+          .toString('hex')
+          .slice(2)
       } catch (error) {
         Logger.error(TAG, 'getDeviceInfo error', error)
       }
@@ -99,6 +98,10 @@ class ValoraAnalytics {
     })
   }
 
+  getSessionId() {
+    return this.sessionId
+  }
+
   setUserAddress(address?: string | null) {
     if (address) {
       this.userAddress = address
@@ -117,12 +120,12 @@ class ValoraAnalytics {
     const [eventName, eventProperties] = args
 
     if (!this.isEnabled()) {
-      Logger.info(TAG, `Analytics is disabled, not tracking event ${eventName}`)
+      Logger.debug(TAG, `Analytics is disabled, not tracking event ${eventName}`)
       return
     }
 
     if (!SEGMENT_API_KEY) {
-      Logger.info(TAG, `No API key, not tracking event ${eventName}`)
+      Logger.debug(TAG, `No API key, not tracking event ${eventName}`)
       return
     }
 

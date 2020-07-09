@@ -3,7 +3,7 @@ import RewardIcon from '@celo/react-components/icons/RewardIcon'
 import * as React from 'react'
 import { Image, StyleSheet, View } from 'react-native'
 import { TokenTransactionType } from 'src/apollo/types'
-import { coinsIcon } from 'src/images/Images'
+import { transactionNetwork } from 'src/images/Images'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 
 const AVATAR_SIZE = 40
@@ -23,7 +23,7 @@ export default function TransferFeedIcon(props: Props) {
     case TokenTransactionType.InviteSent: // fallthrough
     case TokenTransactionType.NetworkFee: // fallthrough
     case TokenTransactionType.InviteReceived: {
-      return <Image source={coinsIcon} style={styles.image} />
+      return <Image source={transactionNetwork} style={styles.image} />
     }
     case TokenTransactionType.VerificationReward: {
       return (

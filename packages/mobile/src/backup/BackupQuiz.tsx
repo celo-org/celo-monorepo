@@ -12,7 +12,8 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { setBackupCompleted } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { OnboardingEvents } from 'src/analytics/Events'
+import { BackQuizProgress } from 'src/analytics/types'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import CancelConfirm from 'src/backup/CancelConfirm'
 import { QuizzBottom } from 'src/backup/QuizzBottom'
@@ -100,6 +101,7 @@ export class BackupQuiz extends React.Component<Props, State> {
 
   componentDidMount = async () => {
     await this.retrieveMnemonic()
+    ValoraAnalytics.track(OnboardingEvents.backup_quiz_start)
   }
 
   retrieveMnemonic = async () => {
@@ -129,9 +131,9 @@ export class BackupQuiz extends React.Component<Props, State> {
       userChosenWords: newUserChosenWords,
     })
 
-    if (newUserChosenWords.length === 1) {
-      ValoraAnalytics.track(AnalyticsEvents.backup_quiz_start)
-    }
+    ValoraAnalytics.track(OnboardingEvents.backup_quiz_progress, {
+      action: BackQuizProgress.word_chosen,
+    })
   }
 
   onPressBackspace = () => {
@@ -150,7 +152,10 @@ export class BackupQuiz extends React.Component<Props, State> {
       mnemonicWords: mnemonicWordsUpdated,
       userChosenWords: userChosenWordsUpdated,
     })
-    ValoraAnalytics.track(AnalyticsEvents.backup_quiz_backspace)
+
+    ValoraAnalytics.track(OnboardingEvents.backup_quiz_progress, {
+      action: BackQuizProgress.backspace,
+    })
   }
 
   onPressReset = async () => {
@@ -171,19 +176,17 @@ export class BackupQuiz extends React.Component<Props, State> {
       Logger.debug(TAG, 'Backup quiz passed')
       this.props.setBackupCompleted()
       navigate(Screens.BackupComplete)
-      ValoraAnalytics.track(AnalyticsEvents.backup_quiz_success)
+      ValoraAnalytics.track(OnboardingEvents.backup_quiz_complete)
     } else {
       Logger.debug(TAG, 'Backup quiz failed, reseting words')
       this.setState({ mode: Mode.Failed })
-      ValoraAnalytics.track(AnalyticsEvents.backup_quiz_incorrect)
+      ValoraAnalytics.track(OnboardingEvents.backup_quiz_incorrect)
     }
   }
 
   onPressSubmit = () => {
     this.setState({ mode: Mode.Checking })
     setTimeout(this.afterCheck, CHECKING_DURATION)
-
-    ValoraAnalytics.track(AnalyticsEvents.backup_quiz_submit)
   }
 
   onScreenSkip = () => {
