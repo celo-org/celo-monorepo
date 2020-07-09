@@ -12,6 +12,7 @@ import { fetchAddressesAndValidate } from 'src/identity/actions'
 import {
   addressToE164NumberSelector,
   AddressToE164NumberType,
+  AddressValidationType,
   e164NumberToAddressSelector,
   E164NumberToAddressType,
   SecureSendPhoneNumberMapping,
@@ -79,19 +80,30 @@ const mapDispatchToProps = {
 // Payment Request notification for the notification center on home screen
 export class IncomingPaymentRequestSummaryNotification extends React.Component<Props> {
   componentDidMount() {
-    // Need to check latest mapping to prevent user from accepting fradulent requests
+    // Need to check latest address mappings to prevent user from accepting fradulent requests
     this.fetchLatestAddressesAndValidate()
   }
 
   fetchLatestAddressesAndValidate = () => {
-    const { paymentRequests } = this.props
+    const { paymentRequests, secureSendPhoneNumberMapping } = this.props
 
     paymentRequests.forEach((paymentRequest) => {
       const recipient = getRecipientFromPaymentRequest(paymentRequest, this.props.recipientCache)
       const { e164PhoneNumber } = recipient
-      if (e164PhoneNumber) {
-        this.props.fetchAddressesAndValidate(e164PhoneNumber)
+      if (!e164PhoneNumber) {
+        return
       }
+
+      // Skip the fetch if we already know we need to do Secure Send for a number
+      if (
+        secureSendPhoneNumberMapping[e164PhoneNumber] &&
+        secureSendPhoneNumberMapping[e164PhoneNumber].addressValidationType !==
+          AddressValidationType.NONE
+      ) {
+        return
+      }
+
+      this.props.fetchAddressesAndValidate(e164PhoneNumber)
     })
   }
 
