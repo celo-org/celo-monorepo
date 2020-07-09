@@ -3,7 +3,7 @@ import {
   SignMessageResponse,
   SignMessageResponseFailure,
   SignMessageResponseSuccess,
-  WarningMessage
+  WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import AbortController from 'abort-controller'
 import { Request, Response } from 'firebase-functions'
@@ -16,7 +16,7 @@ import {
   hasValidAccountParam,
   hasValidQueryPhoneNumberParam,
   isBodyReasonablySized,
-  phoneNumberHashIsValidIfExists
+  phoneNumberHashIsValidIfExists,
 } from '../common/input-validation'
 import logger from '../common/logger'
 import config, { VERSION } from '../config'
@@ -200,7 +200,7 @@ function logResponseDiscrepancies(responses: SignMsgRespWithStatus[]) {
     if (discrepancyFound) {
       return
     }
-  })
+  }
 }
 
 function requestSignature(
