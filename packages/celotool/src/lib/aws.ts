@@ -56,7 +56,7 @@ async function setupCluster(celoEnv: string, clusterConfig: AwsClusterConfig) {
   console.info('Performing any cluster setup that needs to be done...')
 
   await redeployTiller()
-  await installAndEnableMetricsDeps(true, clusterConfig.clusterName)
+  await installAndEnableMetricsDeps(true, clusterConfig)
   // TODO Find a substitute for AADPodIdentity on AWS
   // Should not execute AADPodIdentity if on AWS
   // await installAADPodIdentity()

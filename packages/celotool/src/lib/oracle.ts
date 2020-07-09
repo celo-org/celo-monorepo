@@ -418,7 +418,7 @@ export function switchToContextCluster(celoEnv: string, oracleContext: string) {
   if (!isValidOracleContext(oracleContext)) {
     throw Error(`Invalid oracle context, must be one of ${fetchEnv(envVar.ORACLE_CONTEXTS)}`)
   }
-  const isAwsContext = oracleContext.startsWith("AWS")
+  const isAwsContext = oracleContext.startsWith('AWS')
   if (isAwsContext) {
     return switchToAwsContextCluster(celoEnv, oracleContext)
   } else {

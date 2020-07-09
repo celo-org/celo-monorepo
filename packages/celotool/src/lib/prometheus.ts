@@ -1,4 +1,6 @@
 import fs from 'fs'
+import { AwsClusterConfig } from 'src/lib/aws'
+import { AzureClusterConfig } from 'src/lib/azure'
 import { createNamespaceIfNotExists } from './cluster'
 import { execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv } from './env-utils'
@@ -24,7 +26,7 @@ const sidecarImageTag = '0.7.3'
 // Prometheus container registry with latest tags: https://hub.docker.com/r/prom/prometheus/tags
 const prometheusImageTag = 'v2.17.0'
 
-export async function installPrometheusIfNotExists(configClusterName?: string) {
+export async function installPrometheusIfNotExists(clusterConfig?: AzureClusterConfig | AwsClusterConfig) {
   const prometheusExists = await outputIncludes(
     `helm list`,
     `prometheus-stackdriver`,
@@ -32,17 +34,17 @@ export async function installPrometheusIfNotExists(configClusterName?: string) {
   )
   if (!prometheusExists) {
     console.info('Installing prometheus-stackdriver')
-    await installPrometheus(configClusterName)
+    await installPrometheus(clusterConfig)
   }
 }
 
-async function installPrometheus(configClusterName?: string) {
+async function installPrometheus(clusterConfig?: AzureClusterConfig | AwsClusterConfig) {
   await createNamespaceIfNotExists('prometheus')
   return installGenericHelmChart(
     kubeNamespace,
     releaseName,
     helmChartPath,
-    await helmParameters(configClusterName)
+    await helmParameters(clusterConfig)
   )
 }
 
@@ -56,7 +58,7 @@ export async function upgradePrometheus() {
 }
 
 // async function helmParameters(clusterConfig?: AzureClusterConfig) {
-async function helmParameters(configClusterName?: string) {
+async function helmParameters(clusterConfig?: AzureClusterConfig | AwsClusterConfig) {
   const params = [
     `--set namespace=${kubeNamespace}`,
     `--set gcloud.project=${fetchEnv(envVar.TESTNET_PROJECT_NAME)}`,
@@ -71,12 +73,12 @@ async function helmParameters(configClusterName?: string) {
     // this results in a bunch of errors when the sidecar tries to send metrics to Stackdriver.
     `--set-string includeFilter='\\{job=~".+"\\,__name__!~"kube_.+_labels"\\,__name__!~"phoenix_.+"\\}'`,
   ]
-  if (configClusterName) {
+  if (clusterConfig) {
     params.push(
-      `--set cluster=${configClusterName}`,
-      `--set stackdriver_metrics_prefix=external.googleapis.com/prometheus/${configClusterName}`,
-      `--set gcloudServiceAccountKeyBase64=${await getPrometheusGcloudServiceAccountKeyBase64forAKS(
-        configClusterName
+      `--set cluster=${clusterConfig.clusterName}`,
+      `--set stackdriver_metrics_prefix=external.googleapis.com/prometheus/${clusterConfig.clusterName}`,
+      `--set gcloudServiceAccountKeyBase64=${await getPrometheusGcloudServiceAccountKeyBase64(
+        clusterConfig
       )}`
     )
   } else {
@@ -89,12 +91,12 @@ async function helmParameters(configClusterName?: string) {
   return params
 }
 
-async function getPrometheusGcloudServiceAccountKeyBase64forAKS(kubeClusterName: string) {
+async function getPrometheusGcloudServiceAccountKeyBase64(clusterConfig: AzureClusterConfig | AwsClusterConfig) {
   await switchToGCPProjectFromEnv()
 
   // TODO detect which cloud provider (Azure or AWS) to call correct getServiceAccountName
-  const serviceAccountName = getServiceAccountNameforAKS(kubeClusterName)
-  await createPrometheusGcloudServiceAccountforAKS(serviceAccountName)
+  const serviceAccountName = getServiceAccountName(clusterConfig)
+  await createPrometheusGcloudServiceAccount(serviceAccountName)
 
   const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
   const serviceAccountKeyPath = `/tmp/gcloud-key-${serviceAccountName}.json`
@@ -104,7 +106,7 @@ async function getPrometheusGcloudServiceAccountKeyBase64forAKS(kubeClusterName:
 
 // createPrometheusGcloudServiceAccount creates a gcloud service account with a given
 // name and the proper permissions for writing metrics to stackdriver
-async function createPrometheusGcloudServiceAccountforAKS(serviceAccountName: string) {
+async function createPrometheusGcloudServiceAccount(serviceAccountName: string) {
   const gcloudProjectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
   await execCmdWithExitOnFailure(`gcloud config set project ${gcloudProjectName}`)
   const accountCreated = await createServiceAccountIfNotExists(serviceAccountName)
@@ -116,8 +118,10 @@ async function createPrometheusGcloudServiceAccountforAKS(serviceAccountName: st
   }
 }
 
-function getServiceAccountNameforAKS(kubeClusterName: string) {
+function getServiceAccountName(clusterConfig: AzureClusterConfig | AwsClusterConfig) {
+  // Checks if resourceGroup, an Azure specific property, is present in config
+  const prefix = ('resourceGroup' in clusterConfig) ? 'aks' : 'aws'
   // Ensure the service account name is within the length restriction
   // and ends with an alphanumeric character
-  return `prometheus-aks-${kubeClusterName}`.substring(0, 30).replace(/[^a-zA-Z0-9]+$/g, '')
+  return `prometheus-${prefix}-${clusterConfig?.clusterName}`.substring(0, 30).replace(/[^a-zA-Z0-9]+$/g, '')
 }
