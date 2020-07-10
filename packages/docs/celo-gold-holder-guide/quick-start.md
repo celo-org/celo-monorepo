@@ -112,6 +112,8 @@ Use the mapping from this list (you can use Edit>Find in your browser):
 
 - [ReleaseGold deployments on 6/12/20 (“Wave 4”)](https://gist.githubusercontent.com/marekolszewski/70c65c9b379fdfc892bf8ab0fb915a8c/raw/d7e22bcad1ee53dfd998c46571d1c93503119a15/CeloMainnetReleaseGoldWave4.json): includes recipients that completed the address submission process by 6/8/20
 
+- [ReleaseGold deployments on 7/8/20 (“Wave 5”)](https://gist.githubusercontent.com/timmoreton/0f5062e9d27f14d87b96e5afaaa77b51/raw/449aeab58ab641da1c047ebfb2e886bcf816715a/CeloMainnetReleaseGoldWave5.json): includes recipients that completed the address submission process by 7/3/20
+
 If you have more than one beneficiary address, you'll want to step through this guide for each one.
 
 If you cannot locate your address in these mappings, please contact cLabs.
