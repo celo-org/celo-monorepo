@@ -13,10 +13,7 @@ import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { NotificationList } from 'src/notifications/NotificationList'
 import IncomingPaymentRequestListItem from 'src/paymentRequest/IncomingPaymentRequestListItem'
-import {
-  AddressValidationCheckCache,
-  getRecipientFromPaymentRequest,
-} from 'src/paymentRequest/utils'
+import { getRecipientFromPaymentRequest } from 'src/paymentRequest/utils'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
@@ -49,15 +46,8 @@ type Props = WithTranslation & StateProps & DispatchProps & NavProps
 export const listItemRenderer = (props: {
   recipientCache: NumberToRecipient
   declinePaymentRequest: typeof declinePaymentRequest
-  addressValidationCheckCache: AddressValidationCheckCache
 }) => (request: PaymentRequest, key: number | undefined = undefined) => {
   const requester = getRecipientFromPaymentRequest(request, props.recipientCache)
-  const { addressValidationCheckCache } = props
-  let addressValidationType
-
-  if (addressValidationCheckCache && requester.e164PhoneNumber) {
-    addressValidationType = addressValidationCheckCache[requester.e164PhoneNumber]
-  }
 
   return (
     <View key={key}>
@@ -67,7 +57,6 @@ export const listItemRenderer = (props: {
         requester={requester}
         comment={request.comment}
         declinePaymentRequest={props.declinePaymentRequest}
-        addressValidationType={addressValidationType}
       />
     </View>
   )
@@ -85,14 +74,13 @@ class IncomingPaymentRequestListScreen extends React.Component<Props> {
 
   render = () => {
     const { recipientCache, paymentRequests } = this.props
-    const { addressValidationCheckCache } = this.props.route.params
+
     return (
       <NotificationList
         items={paymentRequests}
         listItemRenderer={listItemRenderer({
           declinePaymentRequest: this.props.declinePaymentRequest,
           recipientCache,
-          addressValidationCheckCache,
         })}
         dollarBalance={this.props.dollarBalance}
       />

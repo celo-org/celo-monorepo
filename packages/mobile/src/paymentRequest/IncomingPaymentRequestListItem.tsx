@@ -12,7 +12,6 @@ import { declinePaymentRequest } from 'src/firebase/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { AddressValidationType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
@@ -25,14 +24,13 @@ interface OwnProps {
   comment: string
   id: string
   declinePaymentRequest: typeof declinePaymentRequest
-  addressValidationType?: AddressValidationType
 }
 
 type Props = OwnProps & WithTranslation
 
 export class IncomingPaymentRequestListItem extends React.Component<Props> {
   onPay = () => {
-    const { id, amount, comment: reason, requester: recipient, addressValidationType } = this.props
+    const { id, amount, comment: reason, requester: recipient } = this.props
 
     const transactionData: TransactionDataInput = {
       reason,
@@ -47,11 +45,7 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
       selectedAction: NotificationBannerCTATypes.pay,
     })
 
-    if (addressValidationType && addressValidationType !== AddressValidationType.NONE) {
-      navigate(Screens.ValidateRecipientIntro, { transactionData, addressValidationType })
-    } else {
-      navigate(Screens.SendConfirmation, { transactionData })
-    }
+    navigate(Screens.AddressFetchLoading, { transactionData })
   }
 
   onPaymentDecline = () => {

@@ -82,6 +82,7 @@ import PincodeEnter from 'src/pincode/PincodeEnter'
 import PincodeSet from 'src/pincode/PincodeSet'
 import { RootState } from 'src/redux/reducers'
 import { store } from 'src/redux/store'
+import AddressFetchLoading from 'src/send/AddressFetchLoading'
 import FeeEducation from 'src/send/FeeEducation'
 import Send, { sendScreenNavOptions } from 'src/send/Send'
 import SendAmount, { sendAmountScreenNavOptions } from 'src/send/SendAmount'
@@ -247,6 +248,11 @@ const sendScreens = (Navigator: typeof Stack) => (
       name={Screens.SendConfirmation}
       component={SendConfirmation}
       options={sendConfirmationScreenNavOptions}
+    />
+    <Navigator.Screen
+      name={Screens.AddressFetchLoading}
+      component={AddressFetchLoading}
+      options={AddressFetchLoading.navigationOptions}
     />
     <Navigator.Screen
       name={Screens.ValidateRecipientIntro}

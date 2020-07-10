@@ -31,6 +31,7 @@ export enum Actions {
   VALIDATE_RECIPIENT_ADDRESS = 'SEND/VALIDATE_RECIPIENT_ADDRESS',
   VALIDATE_RECIPIENT_ADDRESS_SUCCESS = 'SEND/VALIDATE_RECIPIENT_ADDRESS_SUCCESS',
   REQUIRE_SECURE_SEND = 'SEND/REQUIRE_SECURE_SEND',
+  DONE_FETCHING_ADDRESSES = 'DONE_FETCHING_ADDRESSES',
 }
 
 export interface StartVerificationAction {
@@ -140,6 +141,10 @@ export interface RequireSecureSendAction {
   addressValidationType: AddressValidationType
 }
 
+export interface DoneFetchingAddressesAction {
+  type: Actions.DONE_FETCHING_ADDRESSES
+}
+
 export type ActionTypes =
   | StartVerificationAction
   | CancelVerificationAction
@@ -159,6 +164,8 @@ export type ActionTypes =
   | ValidateRecipientAddressAction
   | ValidateRecipientAddressSuccessAction
   | RequireSecureSendAction
+  | FetchAddressesAndValidateAction
+  | DoneFetchingAddressesAction
 
 export const startVerification = (): StartVerificationAction => ({
   type: Actions.START_VERIFICATION,
@@ -289,4 +296,8 @@ export const requireSecureSend = (
   type: Actions.REQUIRE_SECURE_SEND,
   e164Number,
   addressValidationType,
+})
+
+export const doneFetchingAddresses = (): DoneFetchingAddressesAction => ({
+  type: Actions.DONE_FETCHING_ADDRESSES,
 })
