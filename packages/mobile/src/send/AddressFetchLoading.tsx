@@ -3,6 +3,7 @@ import { StackScreenProps } from '@react-navigation/stack'
 import React, { useEffect } from 'react'
 import { SafeAreaView, StyleSheet } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
+import { errorSelector } from 'src/alert/reducer'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
 import { fetchAddressesAndValidate } from 'src/identity/actions'
 import {
@@ -12,7 +13,7 @@ import {
 } from 'src/identity/reducer'
 import { getAddressValidationType } from 'src/identity/secureSend'
 import { headerWithCancelButton } from 'src/navigator/Headers.v2'
-import { replace } from 'src/navigator/NavigationService'
+import { navigateBack, replace } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 
@@ -23,6 +24,7 @@ function AddressFetchLoading(props: Props) {
   const dispatch = useDispatch()
   const secureSendPhoneNumberMapping = useSelector(secureSendPhoneNumberMappingSelector)
   const isFetchingAddresses = useSelector(isFetchingAddressesSelector)
+  const error = useSelector(errorSelector)
   const prevIsFetchingAddressesRef = React.useRef(isFetchingAddresses)
 
   const { transactionData } = props.route.params
@@ -31,15 +33,17 @@ function AddressFetchLoading(props: Props) {
   const addressValidationType = getAddressValidationType(recipient, secureSendPhoneNumberMapping)
 
   // TODO: Need a smoother animation here
-  const delayedNavigate = () => {
-    return setTimeout(() => {
-      if (addressValidationType === AddressValidationType.NONE) {
+  const delayedNavigate = () =>
+    setTimeout(() => {
+      // If there was an error fetching addresses, go back
+      if (error) {
+        navigateBack()
+      } else if (addressValidationType === AddressValidationType.NONE) {
         replace(Screens.SendConfirmation, { transactionData })
       } else {
         replace(Screens.ValidateRecipientIntro, { transactionData, addressValidationType })
       }
     }, 750)
-  }
 
   useEffect(() => {
     if (e164PhoneNumber) {

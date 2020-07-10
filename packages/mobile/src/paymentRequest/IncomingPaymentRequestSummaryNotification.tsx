@@ -33,7 +33,7 @@ interface StateProps {
   recipientCache: NumberToRecipient
 }
 
-const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
+const mapStateToProps = (state: RootState): StateProps => {
   return {
     recipientCache: recipientCacheSelector(state),
   }
@@ -85,7 +85,7 @@ export class IncomingPaymentRequestSummaryNotification extends React.Component<P
   }
 }
 
-export default connect<StateProps, DispatchProps, OwnProps, RootState>(
+export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
   mapDispatchToProps
 )(withTranslation<Props>(Namespaces.walletFlow5)(IncomingPaymentRequestSummaryNotification))

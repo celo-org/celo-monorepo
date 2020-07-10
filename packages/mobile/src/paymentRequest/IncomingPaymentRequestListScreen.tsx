@@ -69,15 +69,10 @@ class IncomingPaymentRequestListScreen extends React.Component<Props> {
   })
 
   render = () => {
-    const { recipientCache, paymentRequests } = this.props
-
     return (
       <NotificationList
-        items={paymentRequests}
-        listItemRenderer={listItemRenderer({
-          declinePaymentRequest: this.props.declinePaymentRequest,
-          recipientCache,
-        })}
+        items={this.props.paymentRequests}
+        listItemRenderer={listItemRenderer(this.props)}
         dollarBalance={this.props.dollarBalance}
       />
     )
