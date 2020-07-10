@@ -36,3 +36,8 @@
 
 # Hermes
 -keep class com.facebook.jni.** { *; }
+
+# Keychain
+-keep class com.facebook.crypto.** {
+   *;
+}

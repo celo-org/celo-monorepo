@@ -4,8 +4,8 @@ import * as RNFS from 'react-native-fs'
 import Share from 'react-native-share'
 import { call, put } from 'redux-saga/effects'
 import { showMessage } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { SendEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { validateRecipientAddressSuccess } from 'src/identity/actions'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
@@ -72,12 +72,15 @@ function* handleSecureSend(
   )
   if (!possibleRecievingAddressesFormatted.includes(userScannedAddress)) {
     const error = ErrorMessages.QR_FAILED_INVALID_RECIPIENT
-    CeloAnalytics.track(CustomEventNames.send_secure_incorrect, { method: 'scan', error })
+    ValoraAnalytics.track(SendEvents.send_secure_incorrect, {
+      confirmByScan: true,
+      error,
+    })
     yield put(showMessage(error))
     return false
   }
 
-  CeloAnalytics.track(CustomEventNames.send_secure_success, { method: 'scan' })
+  ValoraAnalytics.track(SendEvents.send_secure_complete, { confirmByScan: true })
   yield put(validateRecipientAddressSuccess(e164PhoneNumber, userScannedAddress))
   return true
 }

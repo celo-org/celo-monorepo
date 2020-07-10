@@ -10,8 +10,8 @@ import { WithTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { RequestEvents, SendEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { estimateFee, FeeType } from 'src/fees/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
@@ -111,18 +111,14 @@ export const sendScreenNavOptions = ({
       <TopBarIconButton
         icon={<Times />}
         onPress={navigateBack}
-        eventName={
-          route.params?.isRequest ? CustomEventNames.send_cancel : CustomEventNames.request_cancel
-        }
+        eventName={route.params?.isRequest ? RequestEvents.request_cancel : SendEvents.send_cancel}
       />
     ),
     headerLeftContainerStyle: styles.headerLeftContainer,
     headerRight: () => (
       <TopBarIconButton
         icon={<QRCodeBorderlessIcon height={32} color={colors.greenUI} />}
-        eventName={
-          route.params?.isRequest ? CustomEventNames.send_scan : CustomEventNames.request_scan
-        }
+        eventName={route.params?.isRequest ? RequestEvents.request_scan : SendEvents.send_scan}
         onPress={goQr}
       />
     ),
@@ -210,10 +206,7 @@ class Send extends React.Component<Props, State> {
 
     const hasGivenContactPermission = await requestContactsPermission()
     this.setState({ hasGivenContactPermission })
-
-    if (hasGivenContactPermission) {
-      this.props.importContacts()
-    }
+    this.props.importContacts()
   }
 
   onSearchQueryChanged = (searchQuery: string) => {
@@ -231,25 +224,15 @@ class Send extends React.Component<Props, State> {
 
     this.props.storeLatestInRecents(recipient)
 
-    CeloAnalytics.track(
-      isRequest
-        ? CustomEventNames.request_select_recipient
-        : CustomEventNames.send_select_recipient,
+    ValoraAnalytics.track(
+      isRequest ? RequestEvents.request_select_recipient : SendEvents.send_select_recipient,
       {
         recipientKind: recipient.kind,
-        didQuery: this.state.searchQuery.length > 0,
+        usedSearchBar: this.state.searchQuery.length > 0,
       }
     )
 
     navigate(Screens.SendAmount, { recipient, isRequest })
-  }
-
-  onPermissionsAccepted = async () => {
-    this.props.importContacts()
-    this.setState({
-      searchQuery: '',
-      hasGivenContactPermission: true,
-    })
   }
 
   onPressStartVerification = () => {

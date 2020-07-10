@@ -7,7 +7,6 @@ import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Image, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
-import { CustomEventNames } from 'src/analytics/constants'
 import BackButton from 'src/components/BackButton.v2'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import Dialog from 'src/components/Dialog'
@@ -45,7 +44,7 @@ export const fiatExchangesOptionsScreenOptions = ({
   )
   return {
     ...emptyHeader,
-    headerLeft: () => <BackButton eventName={CustomEventNames.send_amount_back} />,
+    headerLeft: () => <BackButton />,
     headerTitle: () => (
       <HeaderTitleWithSubtitle
         title={amount}
@@ -60,10 +59,11 @@ export const fiatExchangesOptionsScreenOptions = ({
 }
 
 function FiatExchangeOptions({ route, navigation }: Props) {
-  function goToProvider(screen: keyof StackParamList) {
-    return () => navigation.navigate(screen)
+  const { amount } = route.params
+  const goToProvider = (screen: keyof StackParamList) => {
+    return () => navigation.navigate(screen, { amount })
   }
-  function onDismiss() {
+  const onDismiss = () => {
     navigation.setParams({ isExplanationOpen: false })
   }
 

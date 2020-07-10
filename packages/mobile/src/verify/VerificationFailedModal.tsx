@@ -42,13 +42,22 @@ export function VerificationFailedModal(props: Props) {
     navigate(Screens.VerificationEducationScreen)
   }, [setIsDismissed, props.setRetryVerificationWithForno])
 
+  const userBalanceInsufficient =
+    props.verificationStatus === VerificationStatus.InsufficientBalance
+
   const isVisible =
     (props.verificationStatus === VerificationStatus.Failed ||
-      props.verificationStatus === VerificationStatus.RevealAttemptFailed) &&
+      props.verificationStatus === VerificationStatus.RevealAttemptFailed ||
+      userBalanceInsufficient) &&
     !isDismissed
 
   const allowEnterCodes = props.verificationStatus === VerificationStatus.RevealAttemptFailed
-  const promptRetryWithForno = props.retryWithForno && !props.fornoMode // Only prompt forno switch if not already in forno mode
+  // Only prompt forno switch if not already in forno mode and failure
+  // wasn't due to insuffuicient balance
+  const promptRetryWithForno =
+    props.retryWithForno &&
+    !props.fornoMode &&
+    props.verificationStatus !== VerificationStatus.InsufficientBalance
 
   return promptRetryWithForno ? (
     // Retry verification with forno with option to skip verificaion
@@ -79,8 +88,12 @@ export function VerificationFailedModal(props: Props) {
     <WarningModal
       isVisible={isVisible}
       header={t('failModal.header')}
-      body1={t('failModal.body1')}
-      body2={t('failModal.body2')}
+      body1={
+        userBalanceInsufficient ? t('failModal.body1InsufficientBalance') : t('failModal.body1')
+      }
+      body2={
+        userBalanceInsufficient ? t('failModal.body2InsufficientBalance') : t('failModal.body2')
+      }
       continueTitle={t('education.skip')}
       onContinue={onSkip}
     />

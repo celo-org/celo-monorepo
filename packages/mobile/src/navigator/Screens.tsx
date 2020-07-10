@@ -26,7 +26,6 @@ export enum Screens {
   MoonPay = 'MoonPay',
   GoldEducation = 'GoldEducation',
   ImportWallet = 'ImportWallet',
-  ImportWalletEmpty = 'ImportWalletEmpty',
   ImportWalletSocial = 'ImportWalletSocial',
   ImportContacts = 'ImportContactsScreen',
   IncomingPaymentRequestListScreen = 'IncomingPaymentRequestListScreen',
@@ -68,6 +67,7 @@ export enum Screens {
   VerificationInputScreen = 'VerificationInputScreen',
   VerificationInterstitialScreen = 'VerificationInterstitialScreen',
   VerificationLoadingScreen = 'VerificationLoadingScreen',
+  OnboardingEducationScreen = 'OnboardingEducationScreen',
   OnboardingSuccessScreen = 'OnboardingSuccessScreen',
   WalletHome = 'WalletHome',
 }

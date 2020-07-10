@@ -17,3 +17,17 @@ export enum BreakPoints {
   smallTablet = '@media (max-width: 590px)',
   tablet = '@media (max-width: 890px)',
 }
+
+export const rootStyle = css({
+  display: 'flex',
+  flexDirection: 'column',
+  minHeight: '100vh',
+  flex: 1,
+  alignItems: 'center',
+  justifyContent: ' space-between',
+})
+
+export const mainStyle = css({
+  width: '100%',
+  maxWidth: 960,
+})

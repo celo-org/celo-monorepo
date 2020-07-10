@@ -1,13 +1,12 @@
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
-import variables from '@celo/react-components/styles/variables'
 import { StackScreenProps } from '@react-navigation/stack'
 import { memoize } from 'lodash'
 import React, { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text } from 'react-native'
 import { RNCamera } from 'react-native-camera'
-import { useSafeArea } from 'react-native-safe-area-view'
+import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Defs, Mask, Rect, Svg } from 'react-native-svg'
 import { useDispatch } from 'react-redux'
 import { Namespaces } from 'src/i18n'
@@ -20,7 +19,7 @@ import Logger from 'src/utils/Logger'
 type Props = StackScreenProps<QRTabParamList, Screens.QRScanner>
 
 const SeeThroughOverlay = () => {
-  const { width, height } = variables
+  const { width, height } = useSafeAreaFrame()
 
   const margin = 40
   const centerBoxSize = width - margin * 2
@@ -52,7 +51,7 @@ const SeeThroughOverlay = () => {
 export default function QRScanner({ route }: Props) {
   const dispatch = useDispatch()
   const { t } = useTranslation(Namespaces.sendFlow7)
-  const inset = useSafeArea()
+  const inset = useSafeAreaInsets()
 
   const { scanIsForSecureSend, transactionData } = route.params || {}
 
@@ -90,6 +89,7 @@ export default function QRScanner({ route }: Props) {
 const styles = StyleSheet.create({
   camera: {
     flex: 1,
+    overflow: 'hidden',
   },
   infoBox: {
     paddingVertical: 9,

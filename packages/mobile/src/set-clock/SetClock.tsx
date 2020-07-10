@@ -7,7 +7,7 @@ import { WithTranslation } from 'react-i18next'
 import { Image, Platform, StyleSheet, Text, View } from 'react-native'
 import * as AndroidOpenSettings from 'react-native-android-open-settings'
 import { Namespaces, withTranslation } from 'src/i18n'
-import clockIcon from 'src/images/clock-icon.png'
+import { clockIcon } from 'src/images/Images'
 import { navigateHome } from 'src/navigator/NavigationService'
 import { getLocalTimezone, getRemoteTime } from 'src/utils/time'
 

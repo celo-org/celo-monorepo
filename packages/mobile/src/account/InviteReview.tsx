@@ -9,11 +9,9 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
 import Avatar from 'src/components/Avatar'
 import CurrencyDisplay, { DisplayType, FormatType } from 'src/components/CurrencyDisplay'
 import FeeIcon from 'src/components/FeeIcon'
@@ -99,12 +97,10 @@ export class InviteReview extends React.Component<Props, State> {
   }
 
   onInviteSMS = async () => {
-    CeloAnalytics.track(CustomEventNames.invite_friends_sms)
     await this.onInvite(InviteBy.SMS)
   }
 
   onInviteWhatsApp = async () => {
-    CeloAnalytics.track(CustomEventNames.invite_friends_whatsapp)
     await this.onInvite(InviteBy.WhatsApp)
   }
 
@@ -126,7 +122,6 @@ export class InviteReview extends React.Component<Props, State> {
   }
 
   onEdit = () => {
-    CeloAnalytics.track(CustomEventNames.invite_edit)
     navigateBack()
   }
 

@@ -7,15 +7,15 @@ import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
+import { checkPin } from 'src/pincode/authentication'
 import Pincode from 'src/pincode/Pincode'
-import { ensureCorrectPin } from 'src/pincode/utils'
 import { RootState } from 'src/redux/reducers'
 import { currentAccountSelector } from 'src/web3/selectors'
 
@@ -56,14 +56,16 @@ class PincodeEnter extends React.Component<Props, State> {
     })
   }
 
-  onPressConfirm = () => {
+  onPressConfirm = async () => {
     const { route, currentAccount } = this.props
     const { pin } = this.state
     const withVerification = route.params.withVerification
     if (withVerification && currentAccount) {
-      ensureCorrectPin(pin, currentAccount)
-        .then(this.onCorrectPin)
-        .catch(this.onWrongPin)
+      if (await checkPin(pin, currentAccount)) {
+        this.onCorrectPin(pin)
+      } else {
+        this.onWrongPin()
+      }
     } else {
       this.onCorrectPin(pin)
     }

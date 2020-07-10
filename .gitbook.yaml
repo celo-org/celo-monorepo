@@ -1,21 +1,26 @@
 root: ./packages/docs/
 
 redirects:
-  operations-manual/key-management/using-a-ledger-wallet: celo-gold-holder-guide/ledger.md
-  operations-manual/key-management/ledger: celo-gold-holder-guide/ledger.md
-  operations-manual/summary/ledger: celo-gold-holder-guide/ledger.md
-  operations-manual/using-a-ledger-wallet: celo-gold-holder-guide/ledger.md
-  validator-guide/key-management/using-a-ledger-wallet: celo-gold-holder-guide/ledger.md
-  validator-guide/key-management/ledger: celo-gold-holder-guide/ledger.md
-  validator-guide/summary/ledger: celo-gold-holder-guide/ledger.md
-  validator-guide/using-a-ledger-wallet: celo-gold-holder-guide/ledger.md
+  operations-manual/key-management/using-a-ledger-wallet: celo-holder-guide/ledger.md
+  operations-manual/key-management/ledger: celo-holder-guide/ledger.md
+  operations-manual/summary/ledger: celo-holder-guide/ledger.md
+  operations-manual/using-a-ledger-wallet: celo-holder-guide/ledger.md
+  validator-guide/key-management/using-a-ledger-wallet: celo-holder-guide/ledger.md
+  validator-guide/key-management/ledger: celo-holder-guide/ledger.md
+  validator-guide/summary/ledger: celo-holder-guide/ledger.md
+  validator-guide/using-a-ledger-wallet: celo-holder-guide/ledger.md
   getting-started/running-a-full-node: getting-started/running-a-full-node-in-baklava.md
   getting-started/running-a-validator: getting-started/running-a-validator-in-baklava.md
   getting-started/using-the-wallet: getting-started/using-the-mobile-wallet.md
-  celo-codebase/protocol/release-gold: celo-gold-holder-guide/release-gold.md
-  validator-guide/governance: celo-gold-holder-guide/voting-governance.md
+  celo-codebase/protocol/release-gold: celo-holder-guide/release-gold.md
+  validator-guide/governance: celo-holder-guide/voting-governance.md
   developer-guide/start/celo-truffle-box: developer-resources/walkthroughs/hello-mobile-dapp.md 
   important-information/rc-network-disclaimer: important-information/mainnet-network-disclaimer.md
   getting-started/rc1: getting-started/mainnet.md
   getting-started/rc1/running-a-full-node-in-rc1: getting-started/running-a-full-node-in-mainnet.md
   getting-started/rc1/running-a-validator-in-rc1: getting-started/running-a-validator-in-mainnet.md
+  celo-gold-holder-guide/ledger: celo-holder-guide/ledger.md
+  celo-gold-holder-guide/quick-start: celo-holder-guide/quick-start.md
+  celo-gold-holder-guide/release-gold: celo-holder-guide/release-gold.md
+  celo-gold-holder-guide/voting-governance: celo-holder-guide/voting-governance.md
+  celo-gold-holder-guide/voting-validators: celo-holder-guide/voting-validators.md

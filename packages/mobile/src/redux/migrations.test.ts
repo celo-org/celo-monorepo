@@ -1,5 +1,5 @@
 import { migrations } from 'src/redux/migrations'
-import { v0Schema, v1Schema, vNeg1Schema } from 'test/schemas'
+import { v0Schema, v1Schema, v2Schema, vNeg1Schema } from 'test/schemas'
 
 describe('Redux persist migrations', () => {
   it('works for v-1 to v0', () => {
@@ -42,5 +42,21 @@ describe('Redux persist migrations', () => {
     }
     const migratedSchema = migrations[2](v1Stub)
     expect(migratedSchema.app.numberVerified).toEqual(false)
+  })
+
+  it('works for v2 to v3', () => {
+    const v2Stub = {
+      ...v2Schema,
+      send: {
+        ...v2Schema.send,
+        recentPayments: [{ timestamp: Date.now(), amount: '100' }],
+      },
+      account: {
+        ...v2Schema.account,
+        hasMigratedToNewBip39: false,
+      },
+    }
+    const migratedSchema = migrations[3](v2Stub)
+    expect(migratedSchema.send.recentPayments.length).toEqual(0)
   })
 })
