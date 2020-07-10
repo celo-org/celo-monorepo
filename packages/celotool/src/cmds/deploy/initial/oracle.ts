@@ -1,7 +1,6 @@
 import { InitialArgv } from 'src/cmds/deploy/initial'
 import {
   addOracleMiddleware,
-  getOracleAzureContext,
   installHelmChart,
   OracleArgv,
   switchToAzureContextCluster,
@@ -18,15 +17,14 @@ type OracleInitialArgv = InitialArgv &
   }
 
 export const builder = (argv: yargs.Argv) => {
-  return addOracleMiddleware(argv).option('useFullNodes', {
-    description: 'Uses previously deployed full nodes in the same namespace for RPCs',
+  return addOracleMiddleware(argv).option('useForno', {
+    description: 'Uses forno for RPCs from the oracle clients',
     default: false,
     type: 'boolean',
   })
 }
 
 export const handler = async (argv: OracleInitialArgv) => {
-  const oracleAzureContext = getOracleAzureContext(argv.primary)
-  await switchToAzureContextCluster(argv.celoEnv, oracleAzureContext)
-  await installHelmChart(argv.celoEnv, oracleAzureContext, argv.useForno)
+  await switchToAzureContextCluster(argv.celoEnv, argv.context)
+  await installHelmChart(argv.celoEnv, argv.context, argv.useForno)
 }
