@@ -1,6 +1,6 @@
 # Overview
 
-This section highlights some of the key tools that will help developers start building applications
+This section contains information about some of the key tools and resources that will help developers start building applications
 on Celo.
 
 {% page-ref page="forno/" %}
