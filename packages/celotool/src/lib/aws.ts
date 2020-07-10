@@ -9,11 +9,14 @@ import { installAndEnableMetricsDeps, redeployTiller } from 'src/lib/helm_deploy
 export interface AwsClusterConfig {
   clusterRegion: string
   clusterName: string 
+<<<<<<< HEAD
   tag: string
   // subscriptionId: string
+=======
+>>>>>>> jason/celotool-aws-integration
 }
 
-// switchToCluster configures kubectl to connect to the EKS cluster
+// switchToAwsCluster configures kubectl to connect to the EKS cluster
 export async function switchToAwsCluster(
   celoEnv: string,
   clusterConfig: AwsClusterConfig,
@@ -24,16 +27,6 @@ export async function switchToAwsCluster(
   }
 
   // TODO Look into switching subscription between testing and production
-  // // Azure subscription switch
-  // let currentTenantId = null
-  // try {
-  //   ;[currentTenantId] = await execCmd('az account show --query id -o tsv')
-  // } catch (error) {
-  //   console.info('No azure account subscription currently set')
-  // }
-  // if (currentTenantId === null || currentTenantId.trim() !== clusterConfig.tenantId) {
-  //   await execCmdWithExitOnFailure(`az account set --subscription ${clusterConfig.subscriptionId}`)
-  // }
 
   let currentCluster = null
   try {
@@ -50,6 +43,7 @@ export async function switchToAwsCluster(
     if (existingContexts.includes(clusterConfig.clusterName)) {
       await execCmdWithExitOnFailure(`kubectl config use-context ${clusterConfig.clusterName}`)
     } else {
+      // If we don't already have the context, get it from AWS.
       await execCmdWithExitOnFailure(
         `aws eks --region ${clusterConfig.clusterRegion} update-kubeconfig --name ${clusterConfig.clusterName} --alias ${clusterConfig.clusterName}`
         ) 
@@ -66,10 +60,12 @@ async function setupCluster(celoEnv: string, clusterConfig: AwsClusterConfig) {
   console.info('Performing any cluster setup that needs to be done...')
 
   await redeployTiller()
-  await installAndEnableMetricsDeps(true, clusterConfig.clusterName)
-  // Should not execute AADPodIdentityif on AWS
+  await installAndEnableMetricsDeps(true, clusterConfig)
+  // TODO Find a substitute for AADPodIdentity on AWS
+  // Should not execute AADPodIdentity if on AWS
   // await installAADPodIdentity()
 }
+<<<<<<< HEAD
 
 // IP ADDRESS RELATED
 
@@ -103,3 +99,5 @@ export async function deallocateStaticIP(name: string, allocationID: string) {
     `az network public-ip delete --resource-group ${allocationID} --name ${name}`
   )
 }
+=======
+>>>>>>> jason/celotool-aws-integration

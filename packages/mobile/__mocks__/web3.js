@@ -60,10 +60,4 @@ export default class {
     isSyncing: jest.fn(() => ({ startingBlock: 0, currentBlock: 10, highestBlock: 100 })),
     sign: jest.fn(() => true),
   }
-
-  utils = {
-    sha3: () => 'a sha3 hash',
-    fromWei: (x) => x / 1000000000000000000.0,
-    toWei: (x) => x * 1000000000000000000.0,
-  }
 }

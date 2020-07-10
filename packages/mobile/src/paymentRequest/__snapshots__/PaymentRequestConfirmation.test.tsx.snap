@@ -27,6 +27,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
           "paddingVertical": 10,
         }
       }
+      keyboardShouldPersistTaps="handled"
     >
       <View>
         <View
@@ -172,8 +173,9 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                   "flex": 1,
                   "fontFamily": "Inter-Regular",
                   "fontSize": 18,
-                  "height": 200,
+                  "height": 100,
                   "lineHeight": 24,
+                  "textAlignVertical": "top",
                 }
               }
               testID="commentInput/request"
@@ -367,7 +369,8 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
     <View
       style={
         Object {
-          "marginHorizontal": 20,
+          "marginHorizontal": 16,
+          "paddingVertical": 16,
         }
       }
     >
@@ -440,6 +443,22 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
         </View>
       </View>
     </View>
+    <View
+      collapsable={false}
+      style={
+        Array [
+          Object {
+            "bottom": 0,
+            "left": 0,
+            "right": 0,
+          },
+          Object {
+            "height": 0,
+          },
+          undefined,
+        ]
+      }
+    />
   </View>
 </RNCSafeAreaView>
 `;

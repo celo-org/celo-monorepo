@@ -15,7 +15,7 @@ export interface AzureClusterConfig {
 }
 
 // switchToCluster configures kubectl to connect to the AKS cluster
-export async function switchToCluster(
+export async function switchToAzureCluster(
   celoEnv: string,
   clusterConfig: AzureClusterConfig,
   checkOrPromptIfStagingOrProduction = true
@@ -70,7 +70,7 @@ async function setupCluster(celoEnv: string, clusterConfig: AzureClusterConfig) 
   console.info('Performing any cluster setup that needs to be done...')
 
   await redeployTiller()
-  await installAndEnableMetricsDeps(true, clusterConfig.clusterName)
+  await installAndEnableMetricsDeps(true, clusterConfig)
   await installAADPodIdentity()
 }
 

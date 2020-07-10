@@ -1774,98 +1774,111 @@ exports[`HomePage renders 1`] = `
           </div>
           <div
             className="css-view-1dbjc4n"
-            onClick={[Function]}
-            onMouseDown={[Function]}
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
-            onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
+            style={
+              Object {
+                "WebkitBoxPack": "justify",
+                "WebkitJustifyContent": "space-between",
+                "justifyContent": "space-between",
+                "minHeight": "50px",
+                "msFlexPack": "justify",
+              }
+            }
           >
             <div
               className="css-view-1dbjc4n"
-              style={
-                Object {
-                  "WebkitBoxDirection": "normal",
-                  "WebkitBoxFlex": 0,
-                  "WebkitBoxOrient": "horizontal",
-                  "WebkitBoxPack": "center",
-                  "WebkitFlexDirection": "row",
-                  "WebkitFlexGrow": 0,
-                  "WebkitJustifyContent": "center",
-                  "backgroundColor": "rgba(0,0,0,0.00)",
-                  "borderBottomColor": "rgba(0,0,0,0.00)",
-                  "borderLeftColor": "rgba(0,0,0,0.00)",
-                  "borderRightColor": "rgba(0,0,0,0.00)",
-                  "borderTopColor": "rgba(0,0,0,0.00)",
-                  "flexDirection": "row",
-                  "flexGrow": 0,
-                  "justifyContent": "center",
-                  "msFlexDirection": "row",
-                  "msFlexPack": "center",
-                  "msFlexPositive": 0,
-                  "opacity": 1,
-                  "outlineColor": "transparent",
-                  "width": "fit-content",
-                }
-              }
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
             >
-              <a
-                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
-                data-focusable={true}
-                dir="auto"
-                href="/papers"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-                role="link"
+              <div
+                className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "WebkitAlignItems": "center",
-                    "WebkitBoxAlign": "center",
-                    "alignItems": "center",
-                    "color": "rgba(53,208,127,1.00)",
-                    "cursor": "pointer",
-                    "display": "inline-flex",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "16px",
-                    "fontWeight": "500",
-                    "lineHeight": "16px",
-                    "msFlexAlign": "center",
-                    "textAlign": "center",
-                    "textRendering": "geometricPrecision",
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxFlex": 0,
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitBoxPack": "center",
+                    "WebkitFlexDirection": "row",
+                    "WebkitFlexGrow": 0,
+                    "WebkitJustifyContent": "center",
+                    "backgroundColor": "rgba(0,0,0,0.00)",
+                    "borderBottomColor": "rgba(0,0,0,0.00)",
+                    "borderLeftColor": "rgba(0,0,0,0.00)",
+                    "borderRightColor": "rgba(0,0,0,0.00)",
+                    "borderTopColor": "rgba(0,0,0,0.00)",
+                    "flexDirection": "row",
+                    "flexGrow": 0,
+                    "justifyContent": "center",
+                    "msFlexDirection": "row",
+                    "msFlexPack": "center",
+                    "msFlexPositive": 0,
+                    "opacity": 1,
+                    "outlineColor": "transparent",
+                    "width": "fit-content",
                   }
                 }
               >
-                Read Stability White Paper
-                <div
-                  className="css-view-1dbjc4n"
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                  data-focusable={true}
+                  dir="auto"
+                  href="/papers"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
+                  role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "alignItems": "center",
+                      "color": "rgba(53,208,127,1.00)",
+                      "cursor": "pointer",
                       "display": "inline-flex",
-                      "paddingLeft": "0.4em",
-                      "paddingTop": "0.185em",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "16px",
+                      "msFlexAlign": "center",
+                      "textAlign": "center",
+                      "textRendering": "geometricPrecision",
                     }
                   }
                 >
-                  <svg
-                    fill="none"
-                    height="0.75em"
-                    style={Object {}}
-                    transform="rotate(0)"
-                    viewBox="0 0 8 12"
-                    width="0.75em"
+                  Read Stability White Paper
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "display": "inline-flex",
+                        "paddingLeft": "0.4em",
+                        "paddingTop": "0.185em",
+                      }
+                    }
                   >
-                    <path
-                      clipRule="evenodd"
-                      d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
-                      fill="#35D07F"
-                      fillRule="evenodd"
-                      opacity={1}
+                    <svg
+                      fill="none"
+                      height="0.75em"
                       style={Object {}}
-                    />
-                  </svg>
-                </div>
-              </a>
+                      transform="rotate(0)"
+                      viewBox="0 0 8 12"
+                      width="0.75em"
+                    >
+                      <path
+                        clipRule="evenodd"
+                        d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+                        fill="#35D07F"
+                        fillRule="evenodd"
+                        opacity={1}
+                        style={Object {}}
+                      />
+                    </svg>
+                  </div>
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -2010,98 +2023,207 @@ exports[`HomePage renders 1`] = `
           </div>
           <div
             className="css-view-1dbjc4n"
-            onClick={[Function]}
-            onMouseDown={[Function]}
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
-            onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
+            style={
+              Object {
+                "WebkitBoxPack": "justify",
+                "WebkitJustifyContent": "space-between",
+                "justifyContent": "space-between",
+                "minHeight": "50px",
+                "msFlexPack": "justify",
+              }
+            }
           >
             <div
               className="css-view-1dbjc4n"
-              style={
-                Object {
-                  "WebkitBoxDirection": "normal",
-                  "WebkitBoxFlex": 0,
-                  "WebkitBoxOrient": "horizontal",
-                  "WebkitBoxPack": "center",
-                  "WebkitFlexDirection": "row",
-                  "WebkitFlexGrow": 0,
-                  "WebkitJustifyContent": "center",
-                  "backgroundColor": "rgba(0,0,0,0.00)",
-                  "borderBottomColor": "rgba(0,0,0,0.00)",
-                  "borderLeftColor": "rgba(0,0,0,0.00)",
-                  "borderRightColor": "rgba(0,0,0,0.00)",
-                  "borderTopColor": "rgba(0,0,0,0.00)",
-                  "flexDirection": "row",
-                  "flexGrow": 0,
-                  "justifyContent": "center",
-                  "msFlexDirection": "row",
-                  "msFlexPack": "center",
-                  "msFlexPositive": 0,
-                  "opacity": 1,
-                  "outlineColor": "transparent",
-                  "width": "fit-content",
-                }
-              }
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
             >
-              <a
-                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
-                data-focusable={true}
-                dir="auto"
-                href="https://medium.com/celoorg/celo-gold-holders-make-your-voice-heard-through-on-chain-governance-96cb5a1e8b90"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-                role="link"
+              <div
+                className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "WebkitAlignItems": "center",
-                    "WebkitBoxAlign": "center",
-                    "alignItems": "center",
-                    "color": "rgba(53,208,127,1.00)",
-                    "cursor": "pointer",
-                    "display": "inline-flex",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "16px",
-                    "fontWeight": "500",
-                    "lineHeight": "16px",
-                    "msFlexAlign": "center",
-                    "textAlign": "center",
-                    "textRendering": "geometricPrecision",
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxFlex": 0,
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitBoxPack": "center",
+                    "WebkitFlexDirection": "row",
+                    "WebkitFlexGrow": 0,
+                    "WebkitJustifyContent": "center",
+                    "backgroundColor": "rgba(0,0,0,0.00)",
+                    "borderBottomColor": "rgba(0,0,0,0.00)",
+                    "borderLeftColor": "rgba(0,0,0,0.00)",
+                    "borderRightColor": "rgba(0,0,0,0.00)",
+                    "borderTopColor": "rgba(0,0,0,0.00)",
+                    "flexDirection": "row",
+                    "flexGrow": 0,
+                    "justifyContent": "center",
+                    "msFlexDirection": "row",
+                    "msFlexPack": "center",
+                    "msFlexPositive": 0,
+                    "opacity": 1,
+                    "outlineColor": "transparent",
+                    "width": "fit-content",
                   }
                 }
               >
-                Learn About Governance
-                <div
-                  className="css-view-1dbjc4n"
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                  data-focusable={true}
+                  dir="auto"
+                  href="https://celoreserve.org"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
+                  role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "alignItems": "center",
+                      "color": "rgba(53,208,127,1.00)",
+                      "cursor": "pointer",
                       "display": "inline-flex",
-                      "paddingLeft": "0.4em",
-                      "paddingTop": "0.185em",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "16px",
+                      "msFlexAlign": "center",
+                      "textAlign": "center",
+                      "textRendering": "geometricPrecision",
                     }
                   }
                 >
-                  <svg
-                    fill="none"
-                    height="0.75em"
-                    style={Object {}}
-                    transform="rotate(0)"
-                    viewBox="0 0 8 12"
-                    width="0.75em"
+                  View Reserve
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "display": "inline-flex",
+                        "paddingLeft": "0.4em",
+                        "paddingTop": "0.185em",
+                      }
+                    }
                   >
-                    <path
-                      clipRule="evenodd"
-                      d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
-                      fill="#35D07F"
-                      fillRule="evenodd"
-                      opacity={1}
+                    <svg
+                      fill="none"
+                      height="0.75em"
                       style={Object {}}
-                    />
-                  </svg>
-                </div>
-              </a>
+                      transform="rotate(0)"
+                      viewBox="0 0 8 12"
+                      width="0.75em"
+                    >
+                      <path
+                        clipRule="evenodd"
+                        d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+                        fill="#35D07F"
+                        fillRule="evenodd"
+                        opacity={1}
+                        style={Object {}}
+                      />
+                    </svg>
+                  </div>
+                </a>
+              </div>
+            </div>
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
+            >
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxFlex": 0,
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitBoxPack": "center",
+                    "WebkitFlexDirection": "row",
+                    "WebkitFlexGrow": 0,
+                    "WebkitJustifyContent": "center",
+                    "backgroundColor": "rgba(0,0,0,0.00)",
+                    "borderBottomColor": "rgba(0,0,0,0.00)",
+                    "borderLeftColor": "rgba(0,0,0,0.00)",
+                    "borderRightColor": "rgba(0,0,0,0.00)",
+                    "borderTopColor": "rgba(0,0,0,0.00)",
+                    "flexDirection": "row",
+                    "flexGrow": 0,
+                    "justifyContent": "center",
+                    "msFlexDirection": "row",
+                    "msFlexPack": "center",
+                    "msFlexPositive": 0,
+                    "opacity": 1,
+                    "outlineColor": "transparent",
+                    "width": "fit-content",
+                  }
+                }
+              >
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                  data-focusable={true}
+                  dir="auto"
+                  href="https://medium.com/celoorg/celo-gold-holders-make-your-voice-heard-through-on-chain-governance-96cb5a1e8b90"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
+                  role="link"
+                  style={
+                    Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "alignItems": "center",
+                      "color": "rgba(53,208,127,1.00)",
+                      "cursor": "pointer",
+                      "display": "inline-flex",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "16px",
+                      "msFlexAlign": "center",
+                      "textAlign": "center",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                >
+                  Learn About Governance
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "display": "inline-flex",
+                        "paddingLeft": "0.4em",
+                        "paddingTop": "0.185em",
+                      }
+                    }
+                  >
+                    <svg
+                      fill="none"
+                      height="0.75em"
+                      style={Object {}}
+                      transform="rotate(0)"
+                      viewBox="0 0 8 12"
+                      width="0.75em"
+                    >
+                      <path
+                        clipRule="evenodd"
+                        d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+                        fill="#35D07F"
+                        fillRule="evenodd"
+                        opacity={1}
+                        style={Object {}}
+                      />
+                    </svg>
+                  </div>
+                </a>
+              </div>
             </div>
           </div>
         </div>

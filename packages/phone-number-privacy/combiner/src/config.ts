@@ -46,7 +46,7 @@ if (DEV_MODE) {
       password: 'fakePass',
       database: 'phoneNumberPrivacy',
       host: 'fakeHost',
-      ssl: !DEV_MODE,
+      ssl: false,
     },
     pgpnpServices: {
       signers: '[{"url": "http://localhost:3000"}]',
@@ -68,7 +68,8 @@ if (DEV_MODE) {
       password: functionConfig.db.pass,
       database: functionConfig.db.name,
       host: `/cloudsql/${functionConfig.db.host}`,
-      ssl: !DEV_MODE,
+      // Cody TODO: replace with combined lib version once it's published
+      ssl: functionConfig.db.ssl ? functionConfig.db.ssl.toLowerCase() === 'true' : true,
     },
     pgpnpServices: {
       signers: functionConfig.pgpnpservices.signers,

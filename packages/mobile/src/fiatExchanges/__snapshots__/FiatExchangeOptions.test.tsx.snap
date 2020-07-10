@@ -63,7 +63,7 @@ exports[`FiatExchangeOptions renders correctly 1`] = `
                 resizeMode="contain"
                 source={
                   Object {
-                    "testUri": "../../../packages/mobile/src/images/fiat-providers/moonpay.png",
+                    "testUri": "../../../packages/mobile/src/images/moonpay.png",
                   }
                 }
                 style={

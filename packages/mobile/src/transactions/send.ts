@@ -1,11 +1,11 @@
 import { CURRENCY_ENUM } from '@celo/utils/src'
 import { BigNumber } from 'bignumber.js'
 import { call, delay, race, select, take } from 'redux-saga/effects'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { TransactionEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { DEFAULT_FORNO_URL } from 'src/config'
-import { getCurrencyAddress } from 'src/tokens/saga'
+import { getCurrencyAddress, getTokenContract } from 'src/tokens/saga'
 import {
   sendTransactionAsync,
   SendTransactionLogEvent,
@@ -31,7 +31,6 @@ const ALWAYS_FAILING_ERROR = 'always failing transaction'
 const KNOWN_TX_ERROR = 'known transaction'
 
 const getLogger = (tag: string, txId: string) => {
-  let startTime = Date.now()
   return (event: SendTransactionLogEvent) => {
     switch (event.type) {
       case SendTransactionLogEventType.Confirmed:
@@ -39,50 +38,39 @@ const getLogger = (tag: string, txId: string) => {
           Logger.warn(tag, `Transaction id ${txId} extra confirmation received: ${event.number}`)
         }
         Logger.debug(tag, `Transaction confirmed with id: ${txId}`)
+        ValoraAnalytics.track(TransactionEvents.transaction_start, { txId })
         break
       case SendTransactionLogEventType.EstimatedGas:
         Logger.debug(tag, `Transaction with id ${txId} estimated gas: ${event.gas}`)
-        ValoraAnalytics.track(AnalyticsEvents.transaction_send_gas_estimated, {
-          txId,
-          duration: Date.now() - startTime,
-        })
+        ValoraAnalytics.track(TransactionEvents.transaction_gas_estimated, { txId })
         break
       case SendTransactionLogEventType.ReceiptReceived:
         Logger.debug(
           tag,
           `Transaction id ${txId} received receipt: ${JSON.stringify(event.receipt)}`
         )
-        ValoraAnalytics.track(AnalyticsEvents.transaction_send_gas_receipt, {
-          txId,
-          duration: Date.now() - startTime,
-        })
+        ValoraAnalytics.track(TransactionEvents.transaction_receipt_received, { txId })
         break
       case SendTransactionLogEventType.TransactionHashReceived:
         Logger.debug(tag, `Transaction id ${txId} hash received: ${event.hash}`)
-        ValoraAnalytics.track(AnalyticsEvents.transaction_send_gas_hash_received, {
-          txId,
-          duration: Date.now() - startTime,
-        })
+        ValoraAnalytics.track(TransactionEvents.transaction_hash_received, { txId })
         break
       case SendTransactionLogEventType.Started:
-        startTime = Date.now()
         Logger.debug(tag, `Sending transaction with id ${txId}`)
-        ValoraAnalytics.track(AnalyticsEvents.transaction_send_start, { txId })
+        ValoraAnalytics.track(TransactionEvents.transaction_start, { txId })
         break
       case SendTransactionLogEventType.Failed:
         Logger.error(tag, `Transaction failed: ${txId}`, event.error)
-        ValoraAnalytics.track(AnalyticsEvents.transaction_error, {
+        ValoraAnalytics.track(TransactionEvents.transaction_error, {
           txId,
           error: event.error.message,
-          duration: Date.now() - startTime,
         })
         break
       case SendTransactionLogEventType.Exception:
         Logger.error(tag, `Transaction Exception caught ${txId}: `, event.error)
-        ValoraAnalytics.track(AnalyticsEvents.transaction_exception, {
+        ValoraAnalytics.track(TransactionEvents.transaction_exception, {
           txId,
           error: event.error.message,
-          duration: Date.now() - startTime,
         })
         break
       default:
@@ -104,8 +92,10 @@ export function* sendTransactionPromises(
   staticGas?: number
 ) {
   Logger.debug(`${TAG}@sendTransactionPromises`, `Going to send a transaction with id ${txId}`)
-  // Use stabletoken to pay for gas by default
-  const stableTokenAddress: string = yield call(getCurrencyAddress, CURRENCY_ENUM.DOLLAR)
+
+  const stableToken = yield getTokenContract(CURRENCY_ENUM.DOLLAR)
+  const stableTokenBalance = yield call([stableToken, stableToken.balanceOf], account)
+
   const fornoMode: boolean = yield select(fornoSelector)
   let gasPrice: BigNumber | undefined
 
@@ -127,7 +117,13 @@ export function* sendTransactionPromises(
     sendTransactionAsync,
     tx,
     account,
-    stableTokenAddress,
+    // Use stableToken to pay fee, unless its balance is Zero
+    // then use Celo (goldToken) to pay fee (pass undefined)
+    // TODO: make it transparent for a user
+    // TODO: check for balance should be more than fee instead of zero
+    stableTokenBalance.isGreaterThan(0)
+      ? yield call(getCurrencyAddress, CURRENCY_ENUM.DOLLAR)
+      : undefined,
     getLogger(tag, txId),
     staticGas,
     gasPrice ? gasPrice.toString() : gasPrice,

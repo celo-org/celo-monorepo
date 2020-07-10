@@ -1,11 +1,12 @@
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { Image, StyleSheet } from 'react-native'
+import { Image } from 'react-native'
 import { connect } from 'react-redux'
 import { PaymentRequest } from 'src/account/types'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { HomeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { declinePaymentRequest } from 'src/firebase/actions'
+import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
 import { Namespaces, withTranslation } from 'src/i18n'
 import {
   addressToE164NumberSelector,
@@ -13,7 +14,7 @@ import {
   e164NumberToAddressSelector,
   E164NumberToAddressType,
 } from 'src/identity/reducer'
-import { sendDollar } from 'src/images/Images'
+import { notificationIncomingRequest } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import SummaryNotification from 'src/notifications/SummaryNotification'
@@ -55,7 +56,10 @@ const mapDispatchToProps = {
 // Payment Request notification for the notification center on home screen
 export class IncomingPaymentRequestSummaryNotification extends React.Component<Props> {
   onReview = () => {
-    ValoraAnalytics.track(AnalyticsEvents.incoming_request_payment_review)
+    ValoraAnalytics.track(HomeEvents.notification_select, {
+      notificationType: NotificationBannerTypes.incoming_tx_request,
+      selectedAction: NotificationBannerCTATypes.review,
+    })
     navigate(Screens.IncomingPaymentRequestListScreen)
   }
 
@@ -83,20 +87,13 @@ export class IncomingPaymentRequestSummaryNotification extends React.Component<P
         items={requests}
         title={t('incomingPaymentRequestsSummaryTitle', { count: requests.length })}
         detailsI18nKey="walletFlow5:incomingPaymentRequestsSummaryDetails"
-        icon={<Image source={sendDollar} style={styles.image} resizeMode="contain" />}
+        icon={<Image source={notificationIncomingRequest} resizeMode="contain" />}
         onReview={this.onReview}
         itemRenderer={this.itemRenderer}
       />
     )
   }
 }
-
-const styles = StyleSheet.create({
-  image: {
-    width: 40,
-    height: 40,
-  },
-})
 
 export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
