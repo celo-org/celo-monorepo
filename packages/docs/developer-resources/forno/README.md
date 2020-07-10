@@ -8,7 +8,7 @@ As Forno is a public node you will have to sign transactions locally because wit
 
 ## Forno networks
 
-Consult [this page](getting-started/choosing-a-network.md) to determine which network is right for you.
+Consult [this page](../../getting-started/choosing-a-network.md) to determine which network is right for you.
 
 ```
 Alfajores = 'https://alfajores-forno.celo-testnet.org'
