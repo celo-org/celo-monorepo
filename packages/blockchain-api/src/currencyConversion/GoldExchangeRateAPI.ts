@@ -53,7 +53,7 @@ export default class GoldExchangeRateAPI<TContext = any> extends DataSource {
     sourceCurrencyCode,
     currencyCode,
     timestamp,
-  }: CurrencyConversionArgs): Promise<BigNumber> {
+  }: Omit<CurrencyConversionArgs, 'impliedCeloToCUSDExchangeRate'>): Promise<BigNumber> {
     const date = timestamp ? new Date(timestamp) : new Date()
 
     const pair = `${sourceCurrencyCode || CUSD}/${currencyCode}`
