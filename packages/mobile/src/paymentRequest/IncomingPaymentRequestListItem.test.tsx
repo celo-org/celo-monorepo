@@ -18,6 +18,7 @@ const mockTransactionData2 = {
   firebasePendingRequestUid: 1,
   type: TokenTransactionType.PayRequest,
 }
+const mockDeclinePaymentRequest = jest.fn()
 
 describe('IncomingPaymentRequestListItem', () => {
   it('renders correctly', () => {
@@ -25,6 +26,7 @@ describe('IncomingPaymentRequestListItem', () => {
       id: 1,
       amount: '24',
       comment: 'Hey thanks for the loan, Ill pay you back ASAP. LOVE YOU',
+      declinePaymentRequest: mockDeclinePaymentRequest,
       requester: {
         kind: RecipientKind.MobileNumber,
         e164PhoneNumber: '+15126608970',
@@ -37,7 +39,7 @@ describe('IncomingPaymentRequestListItem', () => {
 
     const tree = render(
       <Provider store={store}>
-        // @ts-ignore -- kind is not assignable?
+        {/* @ts-ignore -- kind is not assignable? */}
         <IncomingPaymentRequestListItem {...props} />
       </Provider>
     )
@@ -45,17 +47,18 @@ describe('IncomingPaymentRequestListItem', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  it('navigates to ValidateRecipientInfo screen when address needs validation', () => {
+  it('navigates to AddressFetchLoading screen when send is selected', () => {
     const props = {
       id: 1,
       amount: new BigNumber(1),
       requester: mockInvitableRecipient2,
       addressValidationType: AddressValidationType.FULL,
+      declinePaymentRequest: mockDeclinePaymentRequest,
     }
 
     const tree = render(
       <Provider store={store}>
-        // @ts-ignore -- kind is not assignable?
+        {/* @ts-ignore -- kind is not assignable? */}
         <IncomingPaymentRequestListItem {...props} />
       </Provider>
     )
@@ -65,33 +68,7 @@ describe('IncomingPaymentRequestListItem', () => {
         `IncomingPaymentRequestNotification/${props.id}/CallToActions/global:send/Button`
       )
     )
-    expect(navigate).toHaveBeenCalledWith(Screens.ValidateRecipientIntro, {
-      transactionData: mockTransactionData2,
-      addressValidationType: AddressValidationType.FULL,
-    })
-  })
-
-  it('navigates to SendConfirmation screen when address does not need validation', () => {
-    const props = {
-      id: 1,
-      amount: new BigNumber(1),
-      requester: mockInvitableRecipient2,
-      addressValidationType: AddressValidationType.NONE,
-    }
-
-    const tree = render(
-      <Provider store={store}>
-        // @ts-ignore -- kind is not assignable?
-        <IncomingPaymentRequestListItem {...props} />
-      </Provider>
-    )
-
-    fireEvent.press(
-      tree.getByTestId(
-        `IncomingPaymentRequestNotification/${props.id}/CallToActions/global:send/Button`
-      )
-    )
-    expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
+    expect(navigate).toHaveBeenCalledWith(Screens.AddressFetchLoading, {
       transactionData: mockTransactionData2,
     })
   })

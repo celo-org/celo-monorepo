@@ -68,7 +68,7 @@ function AddressFetchLoading(props: Props) {
   }, [isFetchingAddresses])
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView testID={'AddressFetchLoading'} style={styles.container}>
       <LoadingSpinner />
     </SafeAreaView>
   )
