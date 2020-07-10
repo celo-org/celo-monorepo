@@ -20,6 +20,7 @@
 - [Glossary](GLOSSARY.md)
 
 ## CELO Holder Guide
+
 - [Quick Start](celo-holder-guide/quick-start.md)
 - [Using a Ledger Wallet](celo-holder-guide/ledger.md)
 - [Understanding ReleaseGold](celo-holder-guide/release-gold.md)
@@ -38,6 +39,7 @@
 - [Celo Foundation Voting Policy](operations-manual/celo-foundation-voting-policy.md)
 
 ## Developer Guide
+
 - [Quick Start](developer-resources/start.md)
   - [Hello Celo](developer-resources/walkthroughs/hellocelo.md)
   - [Hello Contracts](developer-resources/walkthroughs/hellocontracts.md)
@@ -59,6 +61,7 @@
       - [Development Differences]()
     - [dApps on Celo]()
       - [What is a dApp?]() -->
+  - [Forno](developer-resources/forno/README.md)
   - [The Celo SDK](developer-resources/introduction.md)
     <!-- - [Architecture]() -->
     - [ContractKit](developer-resources/contractkit/README.md)
@@ -66,7 +69,6 @@
       - [Using the kit](developer-resources/contractkit/usage.md)
       - [Using Web3 from the Kit](developer-resources/contractkit/notes-web3-with-contractkit.md)
       - [Celo Core Contracts. Wrappers / Registry](developer-resources/contractkit/contracts-wrappers-registry.md)
-    - [Forno](developer-resources/forno/README.md)
       <!-- - [Example of querying (web3, kit)]()
       - [Example of sending tx (kit)]() -->
     <!-- - [Using Truffle]()
