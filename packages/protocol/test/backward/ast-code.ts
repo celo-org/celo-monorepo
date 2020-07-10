@@ -35,7 +35,7 @@ describe('#reportASTIncompatibilities()', () => {
   describe('when the contracts are the same', () => {
     it('reports no changes', () => {
       const report = reportASTIncompatibilities(testCases.original, testCases.original_copy)
-      assert.isEmpty(report.changes)
+      assert.isEmpty(report.getChanges())
     })
   })
 
@@ -43,7 +43,7 @@ describe('#reportASTIncompatibilities()', () => {
     it('reports only bytecode changes', () => {
       const report = reportASTIncompatibilities(testCases.original, testCases.inserted_constant)
       const expected = [new DeployedBytecodeChange('TestContract')]
-      assert.deepEqual(report.changes, expected)
+      assert.deepEqual(report.getChanges(), expected)
     })
   })
 
@@ -59,8 +59,9 @@ describe('#reportASTIncompatibilities()', () => {
         new MethodAddedChange('TestContract', 'newMethod1(uint256)'),
         new MethodAddedChange('TestContract', 'newMethod2(uint256)'),
       ].sort(comp)
-      report.changes.sort(comp)
-      assert.deepEqual(report.changes, expected)
+      const changes = report.getChanges()
+      changes.sort(comp)
+      assert.deepEqual(changes, expected)
     })
   })
 
@@ -75,8 +76,9 @@ describe('#reportASTIncompatibilities()', () => {
         new MethodRemovedChange('TestContract', 'newMethod1(uint256)'),
         new MethodRemovedChange('TestContract', 'newMethod2(uint256)'),
       ].sort(comp)
-      report.changes.sort(comp)
-      assert.deepEqual(report.changes, expected)
+      const changes = report.getChanges()
+      changes.sort(comp)
+      assert.deepEqual(changes, expected)
     })
   })
 
@@ -121,8 +123,9 @@ describe('#reportASTIncompatibilities()', () => {
           'uint256, memory string, uint256'
         ),
       ].sort(comp)
-      report.changes.sort(comp)
-      assert.deepEqual(report.changes, expected)
+      const changes = report.getChanges()
+      changes.sort(comp)
+      assert.deepEqual(changes, expected)
     })
   })
 })
