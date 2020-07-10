@@ -1,7 +1,7 @@
-import { ensureLeading0x, normalizeAddressWith0x, trimLeading0x } from '@celo/utils/lib/address'
+import { normalizeAddressWith0x } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
-import { BigNumber } from 'bignumber.js'
-import * as ethUtil from 'ethereumjs-util'
+import crypto from 'crypto'
+import { ec as EC } from 'elliptic'
 import Web3 from 'web3'
 import { EncodedTransaction, Tx } from 'web3-core'
 import { recoverTransaction, verifyEIP712TypedDataSigner } from '../utils/signing-utils'
@@ -11,49 +11,27 @@ import {
   ACCOUNT_ADDRESS2,
   ACCOUNT_ADDRESS_NEVER,
   CHAIN_ID,
-  PRIVATE_KEY1,
-  PRIVATE_KEY2,
   TYPED_DATA,
 } from './test-utils'
 
-// const mockSignResponse = {
-//   KeyId,
-//   Signature: Buffer.from(
-//     'MEQCIFiTzjBKbx90pkEr3XfFPug8ECWy3sCVPMlt8Rv4i4IdAiBxdxqF59JvAfFnFqfRtu9xHOyoaEafZ6M6dgVtKkAIDg==',
-//     'base64'
-//   ),
-//   SigningAlgorithm: 'ECDSA_SHA_256',
-// }
-
-// const mockGetPublicKeyResponse = {
-//   KeyId,
-//   PublicKey: Buffer.from(
-//     'MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEkl6JouLgmbQI+p/vc7yWOViLOsh95JdmS9wnWY2lJkb9XS7hsswNsv1kp9YwBpuMXjFftctGyKoUkZtsT1y9pQ==',
-//     'base64'
-//   ),
-//   CustomerMasterKeySpec: 'ECC_SECG_P256K1',
-//   KeyUsage: 'SIGN_VERIFY',
-//   SigningAlgorithms: ['ECDSA_SHA_256'],
-// }
-
 const USING_MOCK = typeof process.env.AWS_HSM_KEY_ID === 'undefined'
 const AWS_HSM_KEY_ID = USING_MOCK ? 'secp' : process.env.AWS_HSM_KEY_ID
-const keys: Map<string, { address: string; privateKey: string }> = new Map([
-  [
-    'secp',
-    {
-      address: ACCOUNT_ADDRESS1,
-      privateKey: PRIVATE_KEY1,
-    },
-  ],
-  [
-    'secp2',
-    {
-      address: ACCOUNT_ADDRESS2,
-      privateKey: PRIVATE_KEY2,
-    },
-  ],
-])
+
+const key1 = crypto.generateKeyPairSync('ec', {
+  namedCurve: 'secp256k1',
+  publicKeyEncoding: {
+    type: 'spki',
+    format: 'der',
+  },
+  privateKeyEncoding: {
+    type: 'pkcs8',
+    format: 'pem',
+  },
+})
+
+const ec = new EC('secp256k1')
+
+const keys: Map<string, crypto.KeyPairSyncResult<Buffer, string>> = new Map([['secp', key1]])
 const listKeysResponse = {
   Keys: Array.from(keys.keys()).map((id) => ({
     KeyId: id,
@@ -95,24 +73,23 @@ describe('AwsHsmWallet class', () => {
               }),
           }),
           getPublicKey: ({ KeyId }: { KeyId: string }) => ({
-            promise: () => {
+            promise: async () => {
               if (!keys.has(KeyId)) {
-                throw new Error('f')
+                throw new Error(`Key 'arn:aws:kms:123:key/${KeyId}' does not exist`)
               }
-              const privKey = keys.get(KeyId)!.privateKey
-              const pubKey = ethUtil.privateToPublic(ethUtil.toBuffer(privKey))
-              return new BigNumber(ensureLeading0x(pubKey.toString('hex')))
+              const key = keys.get(KeyId)
+              const publicKey = key?.publicKey
+              return { PublicKey: new Uint8Array(publicKey!.buffer) }
             },
           }),
           sign: ({ KeyId, Message }: { KeyId: string; Message: Buffer }) => ({
             promise: () => {
-              if (keys.has(KeyId)) {
-                const trimmedKey = trimLeading0x(keys.get(KeyId)!.privateKey)
-                const pkBuffer = Buffer.from(trimmedKey, 'hex')
-                const signature = ethUtil.ecsign(Message, pkBuffer)
-                // Azure HSM doesn't add the byte prefix (+27) while ecsign does
-                // Subtract 27 to properly mock the HSM signer
-                return { v: signature.v - 27, r: signature.r, s: signature.s }
+              const privateKey = keys.get(KeyId)?.privateKey
+              if (privateKey) {
+                const sign = crypto.createSign('sha256')
+                sign.update(Message)
+                const signature = ec.sign(Message, Buffer.from(privateKey), { canonical: true })
+                return { Signature: signature.toDER() }
               }
               throw new Error(`Unable to locate key: ${KeyId}`)
             },
