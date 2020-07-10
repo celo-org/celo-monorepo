@@ -38,12 +38,12 @@ describe('GoogleKeyProvider', () => {
     await expect(provider.fetchPrivateKeyFromStore()).rejects.toThrow()
   })
 
-  it('unitialized provider throws', async () => {
+  it('unitialized provider throws', () => {
     accessSecretVersion.mockResolvedValue(mockResponse)
 
     const provider = new GoogleKeyProvider()
     expect.assertions(1)
-    await expect(() => provider.getPrivateKey()).toThrow()
+    expect(() => provider.getPrivateKey()).toThrow()
   })
 
   it('set invalid private key throws', async () => {
