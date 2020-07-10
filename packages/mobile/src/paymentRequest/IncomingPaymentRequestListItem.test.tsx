@@ -15,7 +15,7 @@ import { mockInvitableRecipient2, mockTransactionData } from 'test/values'
 const store = createMockStore()
 const mockTransactionData2 = {
   ...mockTransactionData,
-  firebasePendingRequestUid: 1,
+  firebasePendingRequestUid: '1',
   type: TokenTransactionType.PayRequest,
 }
 const mockDeclinePaymentRequest = jest.fn()
@@ -23,7 +23,7 @@ const mockDeclinePaymentRequest = jest.fn()
 describe('IncomingPaymentRequestListItem', () => {
   it('renders correctly', () => {
     const props = {
-      id: 1,
+      id: '1',
       amount: '24',
       comment: 'Hey thanks for the loan, Ill pay you back ASAP. LOVE YOU',
       declinePaymentRequest: mockDeclinePaymentRequest,
@@ -39,7 +39,7 @@ describe('IncomingPaymentRequestListItem', () => {
 
     const tree = render(
       <Provider store={store}>
-        {/* @ts-ignore -- kind is not assignable? */}
+        // @ts-ignore -- kind is not assignable?
         <IncomingPaymentRequestListItem {...props} />
       </Provider>
     )
@@ -49,7 +49,7 @@ describe('IncomingPaymentRequestListItem', () => {
 
   it('navigates to AddressFetchLoading screen when send is selected', () => {
     const props = {
-      id: 1,
+      id: '1',
       amount: new BigNumber(1),
       requester: mockInvitableRecipient2,
       addressValidationType: AddressValidationType.FULL,
@@ -58,7 +58,7 @@ describe('IncomingPaymentRequestListItem', () => {
 
     const tree = render(
       <Provider store={store}>
-        {/* @ts-ignore -- kind is not assignable? */}
+        // @ts-ignore -- kind is not assignable?
         <IncomingPaymentRequestListItem {...props} />
       </Provider>
     )

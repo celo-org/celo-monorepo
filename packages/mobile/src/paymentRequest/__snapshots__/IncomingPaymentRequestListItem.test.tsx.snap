@@ -1,253 +1,256 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`IncomingPaymentRequestListItem renders correctly 1`] = `
-<View
-  style={
-    Object {
-      "marginBottom": 16,
-    }
-  }
->
+Array [
+  "// @ts-ignore -- kind is not assignable?",
   <View
     style={
-      Array [
-        Object {
-          "backgroundColor": "#FFFFFF",
-          "padding": 16,
-        },
-        Object {
-          "borderRadius": 8,
-        },
-        Object {
-          "elevation": 12,
-          "shadowColor": "rgba(156, 164, 169, 0.4)",
-          "shadowOffset": Object {
-            "height": 2,
-            "width": 0,
-          },
-          "shadowOpacity": 1,
-          "shadowRadius": 12,
-        },
-        Array [
-          Object {
-            "height": 144,
-          },
-          Object {},
-        ],
-      ]
+      Object {
+        "marginBottom": 16,
+      }
     }
-    testID="IncomingPaymentRequestNotification/1"
   >
     <View
       style={
-        Object {
-          "flex": 1,
-          "flexDirection": "row",
-        }
+        Array [
+          Object {
+            "backgroundColor": "#FFFFFF",
+            "padding": 16,
+          },
+          Object {
+            "borderRadius": 8,
+          },
+          Object {
+            "elevation": 12,
+            "shadowColor": "rgba(156, 164, 169, 0.4)",
+            "shadowOffset": Object {
+              "height": 2,
+              "width": 0,
+            },
+            "shadowOpacity": 1,
+            "shadowRadius": 12,
+          },
+          Array [
+            Object {
+              "height": 144,
+            },
+            Object {},
+          ],
+        ]
       }
+      testID="IncomingPaymentRequestNotification/1"
     >
       <View
         style={
           Object {
             "flex": 1,
-            "marginRight": 16,
+            "flexDirection": "row",
           }
         }
       >
-        <Text
-          numberOfLines={2}
+        <View
           style={
             Object {
-              "color": "#9CA4A9",
-              "fontFamily": "Inter-Regular",
-              "fontSize": 13,
-              "lineHeight": 16,
-              "marginBottom": 4,
+              "flex": 1,
+              "marginRight": 16,
             }
           }
-          testID="IncomingPaymentRequestNotification/1/Title"
         >
-          incomingPaymentRequestNotificationTitle
-        </Text>
-        <Text
-          numberOfLines={1}
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Inter-SemiBold",
-              "fontSize": 24,
-              "lineHeight": 28,
-              "marginBottom": 2,
+          <Text
+            numberOfLines={2}
+            style={
+              Object {
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 13,
+                "lineHeight": 16,
+                "marginBottom": 4,
+              }
             }
-          }
-          testID="IncomingPaymentRequestNotification/1/Amount"
-        >
+            testID="IncomingPaymentRequestNotification/1/Title"
+          >
+            incomingPaymentRequestNotificationTitle
+          </Text>
           <Text
             numberOfLines={1}
             style={
-              Array [
-                undefined,
-                Object {
-                  "color": undefined,
-                },
-              ]
-            }
-          >
-            
-            $
-            31.92
-          </Text>
-        </Text>
-        <Text
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Inter-Regular",
-              "fontSize": 14,
-              "lineHeight": 18,
-            }
-          }
-          testID="IncomingPaymentRequestNotification/1/Details"
-        >
-          Hey thanks for the loan, Ill pay you back ASAP. LOVE YOU
-        </Text>
-      </View>
-      <View
-        style={Object {}}
-      >
-        <View
-          style={
-            Array [
               Object {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "justifyContent": "center",
-              },
-              undefined,
-            ]
-          }
+                "color": "#2E3338",
+                "fontFamily": "Inter-SemiBold",
+                "fontSize": 24,
+                "lineHeight": 28,
+                "marginBottom": 2,
+              }
+            }
+            testID="IncomingPaymentRequestNotification/1/Amount"
+          >
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  undefined,
+                  Object {
+                    "color": undefined,
+                  },
+                ]
+              }
+            >
+              
+              $
+              31.92
+            </Text>
+          </Text>
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
+              }
+            }
+            testID="IncomingPaymentRequestNotification/1/Details"
+          >
+            Hey thanks for the loan, Ill pay you back ASAP. LOVE YOU
+          </Text>
+        </View>
+        <View
+          style={Object {}}
         >
           <View
             style={
               Array [
                 Object {
                   "alignItems": "center",
+                  "flexDirection": "row",
                   "justifyContent": "center",
                 },
-                Object {
-                  "backgroundColor": "#7AD6FE",
-                  "borderRadius": 20,
-                  "height": 40,
-                  "width": 40,
-                },
+                undefined,
               ]
             }
           >
-            <Text
+            <View
               style={
                 Array [
                   Object {
-                    "color": "#FFFFFF",
-                    "fontFamily": "Inter-Medium",
-                    "fontSize": 16,
+                    "alignItems": "center",
+                    "justifyContent": "center",
                   },
                   Object {
-                    "fontSize": 20,
+                    "backgroundColor": "#7AD6FE",
+                    "borderRadius": 20,
+                    "height": 40,
+                    "width": 40,
                   },
                 ]
               }
             >
-              5
-            </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#FFFFFF",
+                      "fontFamily": "Inter-Medium",
+                      "fontSize": 16,
+                    },
+                    Object {
+                      "fontSize": 20,
+                    },
+                  ]
+                }
+              >
+                5
+              </Text>
+            </View>
           </View>
         </View>
       </View>
-    </View>
-    <View
-      style={
-        Object {
-          "flexDirection": "row",
-        }
-      }
-      testID="IncomingPaymentRequestNotification/1/CallToActions"
-    >
       <View
-        accessible={true}
-        focusable={true}
-        nativeBackgroundAndroid={
+        style={
           Object {
-            "attribute": "selectableItemBackgroundBorderless",
-            "type": "ThemeAttrAndroid",
+            "flexDirection": "row",
           }
         }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        testID="IncomingPaymentRequestNotification/1/CallToActions/global:send/Button"
+        testID="IncomingPaymentRequestNotification/1/CallToActions"
       >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#1AB775",
-                "fontFamily": "Inter-SemiBold",
-                "fontSize": 16,
-                "lineHeight": 22,
-              },
-              Object {
-                "fontSize": 14,
-                "lineHeight": 16,
-                "marginRight": 24,
-              },
-            ]
+        <View
+          accessible={true}
+          focusable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackgroundBorderless",
+              "type": "ThemeAttrAndroid",
+            }
           }
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          testID="IncomingPaymentRequestNotification/1/CallToActions/global:send/Button"
         >
-          global:send
-        </Text>
-      </View>
-      <View
-        accessible={true}
-        focusable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackgroundBorderless",
-            "type": "ThemeAttrAndroid",
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#1AB775",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+                Object {
+                  "fontSize": 14,
+                  "lineHeight": 16,
+                  "marginRight": 24,
+                },
+              ]
+            }
+          >
+            global:send
+          </Text>
+        </View>
+        <View
+          accessible={true}
+          focusable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackgroundBorderless",
+              "type": "ThemeAttrAndroid",
+            }
           }
-        }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        testID="IncomingPaymentRequestNotification/1/CallToActions/global:decline/Button"
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#1AB775",
-                "fontFamily": "Inter-SemiBold",
-                "fontSize": 16,
-                "lineHeight": 22,
-              },
-              Object {
-                "fontSize": 14,
-                "lineHeight": 16,
-                "marginRight": 24,
-              },
-            ]
-          }
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          testID="IncomingPaymentRequestNotification/1/CallToActions/global:decline/Button"
         >
-          global:decline
-        </Text>
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#1AB775",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+                Object {
+                  "fontSize": 14,
+                  "lineHeight": 16,
+                  "marginRight": 24,
+                },
+              ]
+            }
+          >
+            global:decline
+          </Text>
+        </View>
       </View>
     </View>
-  </View>
-</View>
+  </View>,
+]
 `;
