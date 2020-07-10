@@ -13,8 +13,8 @@ const shouldReportFlakes =
 const shouldSkipKnownFlakes = shouldTrackFlakes && process.env.SKIP_KNOWN_FLAKES !== 'false'
 
 module.exports = {
-  shouldTrackFlakes: shouldTrackFlakes,
   numRetries: numRetries,
   shouldReportFlakes: shouldReportFlakes,
   shouldSkipKnownFlakes: shouldSkipKnownFlakes,
+  shouldTrackFlakes: shouldTrackFlakes,
 }

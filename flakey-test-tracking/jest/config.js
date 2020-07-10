@@ -45,7 +45,7 @@ module.exports = {
   detoxFlakeTracking: detoxFlakeTracking,
   jsdomFlakeTracking: jsdomFlakeTracking,
   nodeFlakeTracking: nodeFlakeTracking,
-  shouldTrackFlakes: shouldTrackFlakes,
-  shouldSkipKnownFlakes: shouldSkipKnownFlakes,
   numRetries: numRetries,
+  shouldSkipKnownFlakes: shouldSkipKnownFlakes,
+  shouldTrackFlakes: shouldTrackFlakes,
 }
