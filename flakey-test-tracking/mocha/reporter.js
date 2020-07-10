@@ -1,9 +1,9 @@
 const Mocha = require('mocha')
 const GitHub = require('../github')
-const { processFlakes } = require('../processor')
+const processFlakes = require('../processor')
 const { getTestID, fmtFlakeIssue } = require('./utils')
 const cache = require('../cache')
-const { skipKnownFlakes } = require('../config')
+const { shouldSkipKnownFlakes } = require('../config')
 
 function FlakeReporter(runner) {
   Mocha.reporters.Spec.call(this, runner)
@@ -17,19 +17,14 @@ function FlakeReporter(runner) {
     console.log('Fetching known flakey tests...\n')
     github = await GitHub.build()
     // cache.saveKnownFlakes(await github.fetchKnownFlakes())
-    // skip = cache.getKnownFlakes() //TODO(Alec)
+    // skip = cache.getKnownFlakes() //TODO(Alec): fix test skipping in mocha
   })
 
   after('Process Flakey Tests', async function() {
-    if (flakes.length) {
-      console.log('Flakey tests found. Sending to GitHub...')
-      await processFlakes(
-        flakes.map((f) => fmtFlakeIssue(f, cache.getErrors(f))),
-        github
-      )
-    } else {
-      console.log('No flakey tests found!')
-    }
+    await processFlakes(
+      flakes.map((f) => fmtFlakeIssue(f, cache.getErrors(f))),
+      github
+    )
   })
 
   // The `retry` event is only emmited by Mocha >= v6.0.0.
@@ -38,7 +33,7 @@ function FlakeReporter(runner) {
     cache.saveError(getTestID(test), JSON.stringify(err))
   })
 
-  // if (skipKnownFlakes) {
+  // if (shouldSkipKnownFlakes) {
   //   runner.on('test', function(test) {
   //     let testID = getTestID(test)
   //     console.log(testID)

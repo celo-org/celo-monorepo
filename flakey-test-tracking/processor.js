@@ -1,14 +1,20 @@
-function processFlakes(flakes, github) {
-  return Promise.all(flakes.map((f) => processFlake(f, github)))
-}
+const { shouldReportFlakes } = require('./config')
 
-function processFlake(flake, github) {
-  if (process.env.CI) {
-    return Promise.all([github.check(flake), github.issue(flake)])
+function processFlakes(flakes, github) {
+  if (flakes.length) {
+    console.log('\nFlakey tests found :( \n\n' + flakes)
+    //if (shouldReportFlakes) {
+    if (process.env.CI) {
+      console.log('\nSending flakey tests to GitHub...\n')
+      return Promise.all(flakes.map((f) => processFlake(f, github)))
+    }
+  } else {
+    console.log('No flakey tests found!')
   }
 }
 
-module.exports = {
-  processFlakes: processFlakes,
-  processFlake: processFlake,
+function processFlake(flake, github) {
+  return Promise.all([github.check(flake), github.issue(flake)])
 }
+
+module.exports = processFlakes

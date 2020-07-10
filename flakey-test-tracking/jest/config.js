@@ -1,4 +1,4 @@
-const { shouldTrackFlakes, numRetries, skipKnownFlakes } = require('../config')
+const { shouldTrackFlakes, numRetries, shouldSkipKnownFlakes } = require('../config')
 
 const base = {
   // No flake tracking
@@ -8,11 +8,6 @@ const base = {
 const flakeTracking = {
   ...base,
   //globalSetup: require.resolve('./setup.global.js'),
-  globals: {
-    FLAKES: Map,
-    RETRY_TIMES: numRetries,
-    SKIP_FLAKES: skipKnownFlakes,
-  },
   setupFilesAfterEnv: [require.resolve('./setup.js')],
 }
 
@@ -50,4 +45,7 @@ module.exports = {
   detoxFlakeTracking: detoxFlakeTracking,
   jsdomFlakeTracking: jsdomFlakeTracking,
   nodeFlakeTracking: nodeFlakeTracking,
+  shouldTrackFlakes: shouldTrackFlakes,
+  shouldSkipKnownFlakes: shouldSkipKnownFlakes,
+  numRetries: numRetries,
 }

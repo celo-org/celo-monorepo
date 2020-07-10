@@ -3,35 +3,10 @@ const { App } = require('@octokit/app')
 const { retry } = require('@octokit/plugin-retry')
 const Client = Octokit.plugin(retry)
 
-const FlakeLabel = 'FLAKEY :snowflake:'
+const FlakeLabel = 'FLAKEY'
 const defaults = {
   owner: process.env.CIRCLE_PROJECT_USERNAME || 'celo-org',
   repo: process.env.CIRCLE_PROJECT_REPONAME || 'celo-monorepo',
-}
-
-const startClient = async (app) => {
-  const rest = new Client({
-    auth: app.getSignedJsonWebToken(),
-  })
-
-  try {
-    const installationId = (
-      await rest.apps.getRepoInstallation({
-        ...defaults,
-      })
-    ).data.id
-
-    const installationAccessToken = await app.getInstallationAccessToken({
-      installationId,
-    })
-
-    return new Client({
-      auth: installationAccessToken,
-    })
-  } catch (error) {
-    console.error('Flake Tracker App failed to authenticate as an installation ' + error)
-    return rest
-  }
 }
 
 class GitHub {
@@ -51,7 +26,7 @@ class GitHub {
       //privateKey: privateKey,
     })
 
-    const rest = await startClient(app)
+    const rest = await auth(app)
 
     return new GitHub(app, rest)
   }
@@ -60,7 +35,7 @@ class GitHub {
     if (typeof this === 'undefined') {
       throw new Error('renew() cannot be called before build()')
     }
-    this.rest = await startClient(this.app)
+    this.rest = await auth(this.app)
   }
 
   async issue(flake) {
@@ -146,6 +121,32 @@ class GitHub {
         await this.renew()
       }
     }
+  }
+}
+
+// Authenticate as an installation of the Flake Tracker GitHub App
+const auth = async (app) => {
+  const rest = new Client({
+    auth: app.getSignedJsonWebToken(),
+  })
+
+  try {
+    const installationId = (
+      await rest.apps.getRepoInstallation({
+        ...defaults,
+      })
+    ).data.id
+
+    const installationAccessToken = await app.getInstallationAccessToken({
+      installationId,
+    })
+
+    return new Client({
+      auth: installationAccessToken,
+    })
+  } catch (error) {
+    console.error('Flake Tracker App failed to authenticate as an installation ' + error)
+    return rest // We're still authenticated by the JWT token, but it will expire sooner.
   }
 }
 

@@ -1,29 +1,4 @@
-const AnsiToHtml = require('ansi-to-html')
-const convert = new AnsiToHtml()
-
-const getTestTitles = (test) => {
-  const titles = []
-  let parent = test
-
-  do {
-    titles.unshift(parent.name)
-  } while ((parent = parent.parent))
-
-  return titles
-}
-
-function fmtTestTitles(titles) {
-  if (process.env.CIRCLECI) {
-    titles[0] = process.env.CIRCLE_JOB
-  } else {
-    titles.shift()
-  }
-  return titles.join(' -> ').trim()
-}
-
-const getTestID = (test) => {
-  return fmtTestTitles(getTestTitles(test))
-}
+const { fmtFlakeIssue, fmtTestTitles } = require('../utils')
 
 const buildFlakeyDescribe = (describeBlock, flakeMap) => {
   for (const child of describeBlock.children) {
@@ -46,34 +21,24 @@ const buildFlakeyDescribe = (describeBlock, flakeMap) => {
   return describeBlock
 }
 
-function parseFlake(tr) {
-  const testID = fmtTestTitles(tr.testPath)
-  const body = fmtIssueBody(tr.errors)
-  return {
-    title: '[FLAKEY TEST] ' + testID + ', at ' + parseTestLocation(body, '/packages'),
-    body: body,
-  }
+const getTestID = (test) => {
+  return fmtTestTitles(getTestTitles(test))
 }
 
-const parseTestLocation = (stack, rootDir) => {
-  const start = stack.indexOf(rootDir)
-  const end = start + stack.slice(start).indexOf(' at ')
-  return stack.slice(start, end)
-}
+const getTestTitles = (test) => {
+  const titles = []
+  let parent = test
 
-const fmtIssueBody = (errors) => {
-  errors.push('Test Passed!')
-  let body = ''
-  for (let i = 0; i < errors.length; i++) {
-    body += 'Attempt No. ' + (i + 1) + ':\n\n' + errors[i] + '\n\n'
-  }
-  return convert.toHtml(body)
+  do {
+    titles.unshift(parent.name)
+  } while ((parent = parent.parent))
+
+  return titles
 }
 
 module.exports = {
-  getTestID: getTestID,
-  fmtIssueBody: fmtIssueBody,
   buildFlakeyDescribe: buildFlakeyDescribe,
-  parseTestLocation: parseTestLocation,
-  parseFlake: parseFlake,
+  getTestID: getTestID,
+  fmtFlakeIssue: fmtFlakeIssue,
+  fmtTestTitles: fmtTestTitles,
 }
