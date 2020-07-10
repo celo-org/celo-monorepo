@@ -47,7 +47,7 @@
   - [Hello Mobile Dapp](developer-resources/walkthroughs/hello-mobile-dapp.md)
   - [Using Windows](developer-resources/develop-on-windows.md)
   <!-- - [Building a dApp with Contracts on Celo]() -->
-- [Overview]()
+- [Overview](developer-resources/overview.md)
   <!-- - [The Celo Protocol]()
     - [Architecture]()
     - [Similarities with Ethereum]()
