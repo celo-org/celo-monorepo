@@ -67,7 +67,7 @@ export interface CurrencyConversionArgs {
 export interface MoneyAmount {
   value: BigNumber.Value
   currencyCode: string
-  // Implied exchange rate (based on exact amount exchanged) which overwrites 
+  // Implied exchange rate (based on exact amount exchanged) which overwrites
   // the estimate in firebase (based on a constant exchange amount)
   impliedExchangeRates?: { [key: string]: BigNumber.Value }
   timestamp: number
