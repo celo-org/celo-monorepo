@@ -17,7 +17,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { USE_PHONE_NUMBER_PRIVACY } from 'src/config'
 import {
   Actions,
-  doneFetchingAddresses,
+  endFetchingAddresses,
   endImportContacts,
   FetchAddressesAndValidateAction,
   ImportContactsAction,
@@ -197,12 +197,12 @@ export function* fetchAddressesAndValidateSaga({ e164Number }: FetchAddressesAnd
     yield put(
       updateE164PhoneNumberAddresses(e164NumberToAddressUpdates, addressToE164NumberUpdates)
     )
-    yield put(doneFetchingAddresses())
+    yield put(endFetchingAddresses())
     ValoraAnalytics.track(IdentityEvents.phone_number_lookup_complete)
   } catch (error) {
     Logger.error(TAG + '@fetchAddressesAndValidateSaga', `Error fetching addresses`, error)
     yield put(showErrorOrFallback(error, ErrorMessages.ADDRESS_LOOKUP_FAILURE))
-    yield put(doneFetchingAddresses())
+    yield put(endFetchingAddresses())
     ValoraAnalytics.track(IdentityEvents.phone_number_lookup_error, {
       error: error.message,
     })

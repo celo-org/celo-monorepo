@@ -99,6 +99,7 @@ export const reducer = (
           current: 0,
           total: 0,
         },
+        isFetchingAddresses: false,
       }
     }
     case Actions.RESET_VERIFICATION:
@@ -221,7 +222,7 @@ export const reducer = (
         ...state,
         isFetchingAddresses: true,
       }
-    case Actions.DONE_FETCHING_ADDRESSES:
+    case Actions.END_FETCHING_ADDRESSES:
       return {
         ...state,
         isFetchingAddresses: false,
