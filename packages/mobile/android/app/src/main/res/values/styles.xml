@@ -1,7 +1,25 @@
 <resources>
-  <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-    <item name="android:windowLightNavigationBar">true</item>
-    <item name="android:navigationBarColor">@android:color/white</item>
+  <style name="AppTheme" parent="Base.V0.AppTheme"/>
+
+  <!--  Base theme, also see API specific overrides in values-vXX/styles.xml -->
+  <style name="Base.V0.AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <item name="android:statusBarColor">@android:color/transparent</item>
+    <item name="android:navigationBarColor">@android:color/black</item>
+    <!-- The window is always allowed to extend into then notch area -->
+    <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+    <!-- Allows us to have a fully transparent status bar (or nav bar) -->
+    <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    <!-- Without this we briefly see the theme preview before our own splash screen -->
+    <item name="android:windowDisablePreview">true</item>
     <item name="android:textColor">#000000</item>
+  </style>
+
+  <!-- Theme for the splash screen, based on AppTheme -->
+  <style name="SplashTheme" parent="AppTheme">
+    <item name="android:windowAnimationStyle">@style/SplashScreenAnimation</item>
+  </style>
+
+  <style name="SplashScreenAnimation">
+    <item name="android:windowExitAnimation">@android:anim/fade_out</item>
   </style>
 </resources>

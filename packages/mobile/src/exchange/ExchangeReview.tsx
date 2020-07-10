@@ -7,10 +7,10 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { CeloExchangeEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
 import FeeIcon from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow.v2'
@@ -85,16 +85,18 @@ export class ExchangeReview extends React.Component<Props, State> {
       dollarsAmount,
       this.props.localCurrencyExchangeRate
     )
-    CeloAnalytics.track(
-      isDollarToGold ? CustomEventNames.gold_buy_confirm : CustomEventNames.gold_sell_confirm,
+    ValoraAnalytics.track(
+      isDollarToGold ? CeloExchangeEvents.celo_buy_confirm : CeloExchangeEvents.celo_sell_confirm,
       {
-        localCurrencyAmount,
-        goldAmount,
+        localCurrencyAmount: localCurrencyAmount
+          ? localCurrencyAmount.toString()
+          : localCurrencyAmount,
+        goldAmount: goldAmount.toString(),
         inputToken,
-        goldToDollarExchangeRate,
+        goldToDollarExchangeRate: goldToDollarExchangeRate.toString(),
       }
     )
-    // END: Analytics
+
     this.props.exchangeTokens(makerToken, makerAmount)
   }
 

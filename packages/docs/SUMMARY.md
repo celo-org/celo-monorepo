@@ -19,12 +19,12 @@
 - [Validator Setup FAQ](getting-started/validator-troubleshooting-faq.md)
 - [Glossary](GLOSSARY.md)
 
-## Celo Gold Holder Guide
-- [Quick Start](celo-gold-holder-guide/quick-start.md)
-- [Using a Ledger Wallet](celo-gold-holder-guide/ledger.md)
-- [Understanding ReleaseGold](celo-gold-holder-guide/release-gold.md)
-- [Voting on Validator Groups](celo-gold-holder-guide/voting-validators.md)
-- [Voting on Governance](celo-gold-holder-guide/voting-governance.md)
+## CELO Holder Guide
+- [Quick Start](celo-holder-guide/quick-start.md)
+- [Using a Ledger Wallet](celo-holder-guide/ledger.md)
+- [Understanding ReleaseGold](celo-holder-guide/release-gold.md)
+- [Voting on Validator Groups](celo-holder-guide/voting-validators.md)
+- [Voting on Governance](celo-holder-guide/voting-governance.md)
 
 ## Validator Guide
 
@@ -190,6 +190,7 @@
       - [AttestationState](developer-resources/contractkit/reference/enums/_contractkit_src_wrappers_attestations_.attestationstate.md)
       - [AttestationsWrapper](developer-resources/contractkit/reference/classes/_contractkit_src_wrappers_attestations_.attestationswrapper.md)
       - [ActionableAttestation](developer-resources/contractkit/reference/interfaces/_contractkit_src_wrappers_attestations_.actionableattestation.md)
+      - [AttesationServiceRevealRequest](developer-resources/contractkit/reference/interfaces/_contractkit_src_wrappers_attestations_.attesationservicerevealrequest.md)
       - [AttestationStat](developer-resources/contractkit/reference/interfaces/_contractkit_src_wrappers_attestations_.attestationstat.md)
       - [AttestationStateForIssuer](developer-resources/contractkit/reference/interfaces/_contractkit_src_wrappers_attestations_.attestationstateforissuer.md)
       - [AttestationsConfig](developer-resources/contractkit/reference/interfaces/_contractkit_src_wrappers_attestations_.attestationsconfig.md)
@@ -357,6 +358,7 @@
       - [Signer](developer-resources/contractkit/reference/interfaces/_contractkit_src_wallets_signers_signer_.signer.md)
       - [Wallet](developer-resources/contractkit/reference/interfaces/_contractkit_src_wallets_wallet_.wallet.md)
       - [ActionableAttestation](developer-resources/contractkit/reference/interfaces/_contractkit_src_wrappers_attestations_.actionableattestation.md)
+      - [AttesationServiceRevealRequest](developer-resources/contractkit/reference/interfaces/_contractkit_src_wrappers_attestations_.attesationservicerevealrequest.md)
       - [AttestationStat](developer-resources/contractkit/reference/interfaces/_contractkit_src_wrappers_attestations_.attestationstat.md)
       - [AttestationStateForIssuer](developer-resources/contractkit/reference/interfaces/_contractkit_src_wrappers_attestations_.attestationstateforissuer.md)
       - [AttestationsConfig](developer-resources/contractkit/reference/interfaces/_contractkit_src_wrappers_attestations_.attestationsconfig.md)

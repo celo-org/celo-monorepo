@@ -4,8 +4,10 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
+import { OnboardingEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { exitBackupFlow } from 'src/app/actions'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { navigate, navigateHome } from 'src/navigator/NavigationService'
@@ -41,6 +43,7 @@ class BackupComplete extends React.Component<Props> {
         this.props.exitBackupFlow()
         navigateHome()
       } else if (backupCompleted) {
+        ValoraAnalytics.track(OnboardingEvents.backup_complete)
         navigate(Screens.BackupIntroduction)
       } else {
         throw new Error('Backup complete screen should not be reachable without completing backup')

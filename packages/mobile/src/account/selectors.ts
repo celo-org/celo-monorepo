@@ -24,3 +24,5 @@ export const defaultCountryCodeSelector = (state: RootState) => state.account.de
 export const userContactDetailsSelector = (state: RootState) => state.account.contactDetails
 export const pincodeTypeSelector = (state: RootState) => state.account.pincodeType
 export const promptFornoIfNeededSelector = (state: RootState) => state.account.promptFornoIfNeeded
+export const needsToMigrateToNewBip39 = (state: RootState) =>
+  !state.account.hasMigratedToNewBip39 && !!state.web3.account

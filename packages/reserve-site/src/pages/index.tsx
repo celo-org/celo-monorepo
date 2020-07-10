@@ -9,6 +9,7 @@ import ReserveAddresses from 'src/components/ReserveAddresses'
 import Section from 'src/components/Section'
 import { flexCol } from 'src/components/styles'
 import TargetGraph from 'src/components/TargetGraph'
+import { Updated } from 'src/components/Updated'
 import { Addresses, HoldingsData } from 'src/service/Data'
 
 interface ContentShape {
@@ -20,6 +21,7 @@ interface Props {
   INITIAL_TARGET: FrontMatterResult<ContentShape>
   ABOUT: FrontMatterResult<ContentShape>
   ATTESTATIONS: FrontMatterResult<ContentShape>
+  year: string
 }
 
 export default function Home(props: HoldingsData & Addresses & Props) {
@@ -76,22 +78,9 @@ export default function Home(props: HoldingsData & Addresses & Props) {
             />
           </main>
         </div>
-        <Footer />
+        <Footer year={props.year} />
       </div>
     </>
-  )
-}
-
-function Updated({ date }) {
-  return (
-    <small css={dateStyle}>
-      <strong>Updated </strong>
-      {new Date(date).toLocaleDateString('default', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      })}
-    </small>
   )
 }
 
@@ -108,8 +97,6 @@ const mainStyle = css({
   width: '100%',
   maxWidth: 960,
 })
-
-const dateStyle = css({ marginBottom: 36, display: 'block' })
 
 const containerStyle = css(flexCol, { flex: 1, width: '100%', alignItems: 'center' })
 
@@ -140,6 +127,7 @@ export async function getStaticProps() {
         INITIAL_TARGET,
         ABOUT,
         ATTESTATIONS,
+        year: new Date().getFullYear(),
       },
       // we will attempt to re-generate the page:
       // - when a request comes in
