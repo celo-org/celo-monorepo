@@ -1,5 +1,4 @@
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
-import { StackScreenProps } from '@react-navigation/stack/lib/typescript/src/types'
 import React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { View } from 'react-native'
@@ -9,8 +8,6 @@ import { PaymentRequest } from 'src/account/types'
 import { declinePaymentRequest } from 'src/firebase/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { HeaderTitleWithBalance } from 'src/navigator/Headers'
-import { Screens } from 'src/navigator/Screens'
-import { StackParamList } from 'src/navigator/types'
 import { NotificationList } from 'src/notifications/NotificationList'
 import IncomingPaymentRequestListItem from 'src/paymentRequest/IncomingPaymentRequestListItem'
 import { getRecipientFromPaymentRequest } from 'src/paymentRequest/utils'
@@ -18,7 +15,6 @@ import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 
-type NavProps = StackScreenProps<StackParamList, Screens.IncomingPaymentRequestListScreen>
 interface StateProps {
   dollarBalance: string | null
   paymentRequests: PaymentRequest[]
@@ -41,7 +37,7 @@ const mapDispatchToProps = {
   declinePaymentRequest,
 }
 
-type Props = WithTranslation & StateProps & DispatchProps & NavProps
+type Props = WithTranslation & StateProps & DispatchProps
 
 export const listItemRenderer = (props: {
   recipientCache: NumberToRecipient

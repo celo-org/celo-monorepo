@@ -8,13 +8,6 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { declinePaymentRequest } from 'src/firebase/actions'
 import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { fetchAddressesAndValidate } from 'src/identity/actions'
-import {
-  addressToE164NumberSelector,
-  AddressToE164NumberType,
-  e164NumberToAddressSelector,
-  E164NumberToAddressType,
-} from 'src/identity/reducer'
 import { notificationIncomingRequest } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -27,37 +20,27 @@ import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 
 interface OwnProps {
-  paymentRequests: PaymentRequest[]
+  requests: PaymentRequest[]
 }
 
 interface DispatchProps {
   declinePaymentRequest: typeof declinePaymentRequest
-  fetchAddressesAndValidate: typeof fetchAddressesAndValidate
 }
 
 type Props = OwnProps & DispatchProps & WithTranslation & StateProps
 
 interface StateProps {
-  e164PhoneNumberAddressMapping: E164NumberToAddressType
-  addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient
 }
 
 const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
-  const e164PhoneNumberAddressMapping = e164NumberToAddressSelector(state)
-  const addressToE164Number = addressToE164NumberSelector(state)
-  const recipientCache = recipientCacheSelector(state)
-
   return {
-    e164PhoneNumberAddressMapping,
-    addressToE164Number,
-    recipientCache,
+    recipientCache: recipientCacheSelector(state),
   }
 }
 
 const mapDispatchToProps = {
   declinePaymentRequest,
-  fetchAddressesAndValidate,
 }
 
 // Payment Request notification for the notification center on home screen
@@ -81,18 +64,18 @@ export class IncomingPaymentRequestSummaryNotification extends React.Component<P
   }
 
   render() {
-    const { recipientCache, paymentRequests, t } = this.props
+    const { recipientCache, requests, t } = this.props
 
-    return paymentRequests.length === 1 ? (
+    return requests.length === 1 ? (
       listItemRenderer({
         // accessing via this.props.<...> to avoid shadowing
         declinePaymentRequest: this.props.declinePaymentRequest,
         recipientCache,
-      })(paymentRequests[0])
+      })(requests[0])
     ) : (
       <SummaryNotification<PaymentRequest>
-        items={paymentRequests}
-        title={t('incomingPaymentRequestsSummaryTitle', { count: paymentRequests.length })}
+        items={requests}
+        title={t('incomingPaymentRequestsSummaryTitle', { count: requests.length })}
         detailsI18nKey="walletFlow5:incomingPaymentRequestsSummaryDetails"
         icon={<Image source={notificationIncomingRequest} resizeMode="contain" />}
         onReview={this.onReview}
