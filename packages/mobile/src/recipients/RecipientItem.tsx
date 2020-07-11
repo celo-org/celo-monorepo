@@ -5,7 +5,7 @@ import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { getRecipientThumbnail, Recipient, RecipientKind } from 'src/recipients/recipient'
+import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 
 interface Props {
   recipient: Recipient
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    height: 80,
+    height: 64,
     paddingHorizontal: variables.contentPadding,
     flex: 1,
   },
