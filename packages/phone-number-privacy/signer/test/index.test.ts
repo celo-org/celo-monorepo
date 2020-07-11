@@ -55,7 +55,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
     }
 
     it('provides signature', (done) => {
-      mockGetRemainingQueryCount.mockReturnValue([0, 10])
+      mockGetRemainingQueryCount.mockReturnValue({ performedQueryCount: 0, totalQuota: 10 })
       mockGetBlockNumber.mockReturnValue(10000)
       request(app)
         .post('/getBlindedSalt')
@@ -75,12 +75,21 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
         )
     })
     it('returns 403 on query count 0', (done) => {
-      mockGetRemainingQueryCount.mockReturnValue([10, 10])
+      mockGetRemainingQueryCount.mockReturnValue({ performedQueryCount: 10, totalQuota: 10 })
       request(app)
         .post('/getBlindedSalt')
         .send(mockRequestData)
         .expect('Content-Type', /json/)
         .expect(403, done)
+    })
+    // We don't want to block the user on DB or blockchain query failure
+    it('returns 200 on DB query failure', (done) => {
+      mockGetRemainingQueryCount.mockRejectedValue(undefined)
+      request(app)
+        .post('/getBlindedSalt')
+        .send(mockRequestData)
+        .expect('Content-Type', /json/)
+        .expect(200, done)
     })
     it('returns 500 on bls error', (done) => {
       mockGetRemainingQueryCount.mockReturnValue(10)

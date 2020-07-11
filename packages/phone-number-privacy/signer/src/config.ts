@@ -1,6 +1,8 @@
 import { toBool, toNum } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
 
+require('dotenv').config()
+
 export function getVersion(): string {
   return process.env.npm_package_version ? process.env.npm_package_version : '0.0.0'
 }
