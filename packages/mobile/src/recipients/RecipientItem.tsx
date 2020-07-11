@@ -17,10 +17,6 @@ class RecipientItem extends React.PureComponent<Props> {
     this.props.onSelectRecipient(this.props.recipient)
   }
 
-  isUnknown = (recipientKind: RecipientKind) => {
-    return recipientKind === RecipientKind.Address || recipientKind === RecipientKind.MobileNumber
-  }
-
   render() {
     const { recipient } = this.props
 
