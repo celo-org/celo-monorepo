@@ -8,21 +8,14 @@ import { AddressValidationType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import IncomingPaymentRequestListItem from 'src/paymentRequest/IncomingPaymentRequestListItem'
-import { RecipientKind } from 'src/recipients/recipient'
 import { createMockStore } from 'test/utils'
+import { mockE164Number, mockInvitableRecipient } from 'test/values'
 
 const props = {
   id: '1',
   amount: '24',
   comment: 'Hey thanks for the loan, Ill pay you back ASAP. LOVE YOU',
-  requester: {
-    kind: RecipientKind.MobileNumber,
-    e164PhoneNumber: '+15126608970',
-    displayId: '5126608970',
-    address: '0x91623f625e23ac1400',
-    displayName: '5126608970',
-    contact: undefined,
-  },
+  requester: mockInvitableRecipient,
 }
 
 const mockTransactionData = {
@@ -39,7 +32,6 @@ describe('IncomingPaymentRequestListItem', () => {
 
     const tree = render(
       <Provider store={store}>
-        // @ts-ignore -- kind is not assignable?
         <IncomingPaymentRequestListItem {...props} />
       </Provider>
     )
@@ -52,7 +44,6 @@ describe('IncomingPaymentRequestListItem', () => {
 
     const tree = render(
       <Provider store={store}>
-        // @ts-ignore -- kind is not assignable?
         <IncomingPaymentRequestListItem {...props} />
       </Provider>
     )
@@ -70,7 +61,6 @@ describe('IncomingPaymentRequestListItem', () => {
 
     const tree = render(
       <Provider store={store}>
-        // @ts-ignore -- kind is not assignable?
         <IncomingPaymentRequestListItem {...props} />
       </Provider>
     )
@@ -79,7 +69,7 @@ describe('IncomingPaymentRequestListItem', () => {
       identity: {
         isFetchingAddresses: false,
         secureSendPhoneNumberMapping: {
-          [props.requester.e164PhoneNumber]: {
+          [mockE164Number]: {
             addressValidationType: AddressValidationType.NONE,
           },
         },
@@ -88,7 +78,6 @@ describe('IncomingPaymentRequestListItem', () => {
 
     tree.rerender(
       <Provider store={updatedStore}>
-        // @ts-ignore -- kind is not assignable?
         <IncomingPaymentRequestListItem {...props} />
       </Provider>
     )
@@ -108,7 +97,6 @@ describe('IncomingPaymentRequestListItem', () => {
 
     const tree = render(
       <Provider store={store}>
-        // @ts-ignore -- kind is not assignable?
         <IncomingPaymentRequestListItem {...props} />
       </Provider>
     )
@@ -117,7 +105,7 @@ describe('IncomingPaymentRequestListItem', () => {
       identity: {
         isFetchingAddresses: false,
         secureSendPhoneNumberMapping: {
-          [props.requester.e164PhoneNumber]: {
+          [mockE164Number]: {
             addressValidationType: AddressValidationType.PARTIAL,
           },
         },
@@ -126,7 +114,6 @@ describe('IncomingPaymentRequestListItem', () => {
 
     tree.rerender(
       <Provider store={updatedStore}>
-        // @ts-ignore -- kind is not assignable?
         <IncomingPaymentRequestListItem {...props} />
       </Provider>
     )
