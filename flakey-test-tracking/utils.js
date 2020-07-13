@@ -1,6 +1,3 @@
-const AnsiToHtml = require('ansi-to-html')
-const convert = new AnsiToHtml()
-
 const fmtFlakeIssue = (testID, errors) => {
   return {
     title: '[FLAKEY TEST] ' + testID,
@@ -14,7 +11,7 @@ const fmtIssueBody = (errors) => {
   for (let i = 0; i < errors.length; i++) {
     body += 'Attempt No. ' + (i + 1) + ':\n\n' + errors[i] + '\n\n'
   }
-  return convert.toHtml(body)
+  return body
 }
 
 function fmtTestTitles(titles) {

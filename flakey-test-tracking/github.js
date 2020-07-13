@@ -2,6 +2,8 @@ const { Octokit } = require('@octokit/rest')
 const { App } = require('@octokit/app')
 const { retry } = require('@octokit/plugin-retry')
 const Client = Octokit.plugin(retry)
+const AnsiToHtml = require('ansi-to-html')
+const convert = new AnsiToHtml()
 
 const FlakeLabel = 'FLAKEY'
 const defaults = {
@@ -43,7 +45,7 @@ class GitHub {
       return this.rest.issues.create({
         ...defaults,
         title: flake.title,
-        body: flake.body,
+        body: convert.toHtml(flake.body),
         labels: [FlakeLabel],
       })
     }
@@ -102,6 +104,8 @@ class GitHub {
     }
 
     const errMsg = 'Failed to fetch existing flakey test issues from GitHub.'
+
+    console.log('\nFetching flakey tests from GitHub...\n')
 
     const flakeIssues = (await this.safeExec(fn, errMsg)) || []
 

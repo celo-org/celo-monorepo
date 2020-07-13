@@ -62,6 +62,7 @@ class FlakeTracker {
     if (event.name === 'test_start' && shouldSkipKnownFlakes) {
       const testID = getTestID(event.test)
       if (this.skip.some((knownFlake) => knownFlake.includes(testID))) {
+        console.log('\nSkipped known flakey test: ' + testID)
         event.test.mode = 'skip'
       }
     }

@@ -5,6 +5,8 @@ const { getTestID, fmtFlakeIssue } = require('./utils')
 const cache = require('../cache')
 const { shouldSkipKnownFlakes } = require('../config')
 
+const flakeMap = new Map() //TODO(Alec)
+
 function FlakeReporter(runner) {
   Mocha.reporters.Spec.call(this, runner)
 
@@ -47,6 +49,7 @@ function FlakeReporter(runner) {
   // }
 
   runner.on('pass', function(test) {
+    console.log(++i)
     if (test.currentRetry() > 0 && test.currentRetry() <= test.retries()) {
       flakes.push(getTestID(test))
     }
