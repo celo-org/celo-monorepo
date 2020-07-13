@@ -8,7 +8,7 @@ import ContractAST from '@openzeppelin/upgrades/lib/utils/ContractAST'
 
 export const VISIBILITY_PUBLIC = 'public'
 export const VISIBILITY_EXTERNAL = 'external'
-const CONTRACT_TYPE_CONTRACT = 'contract'
+const CONTRACT_KIND_CONTRACT = 'contract'
 const STORAGE_DEFAULT = 'default'
 
 const OUT_VOID_PARAMETER_STRING = 'void'
@@ -211,18 +211,21 @@ export class MethodReturnChange extends MethodValueChange {
   }
 }
 
-const getSignature = (method: any): string => {
+function getSignature(method: any): string {
   // This is used as the ID of a method
-  return `${method.selector}`
+  return method.selector
 }
 
 
-const createMethodIndex = (methods: any[]): any[] => {
+/**
+ * @returns A method index where {key: signature => value: method}
+ */
+function createMethodIndex(methods: any[]): any[] {
   const asPairs = methods.map(m => ({ [`${getSignature(m)}`]: m }))
   return Object.assign({}, ...asPairs)
 }
 
-const mergeReports = (reports: ASTCodeCompatibilityReport[]): ASTCodeCompatibilityReport => {
+function mergeReports(reports: ASTCodeCompatibilityReport[]): ASTCodeCompatibilityReport{
   const report = new ASTCodeCompatibilityReport([])
   reports.forEach((r: ASTCodeCompatibilityReport): void => {
     report.include(r)
@@ -230,7 +233,7 @@ const mergeReports = (reports: ASTCodeCompatibilityReport[]): ASTCodeCompatibili
   return report
 }
 
-const parametersSignature = (parameters: any[]): string => {
+function parametersSignature(parameters: any[]): string {
   if (parameters.length === 0) {
     return OUT_VOID_PARAMETER_STRING
   }
@@ -241,7 +244,7 @@ const parametersSignature = (parameters: any[]): string => {
   return parameters.map(singleSignature).join(', ')
 }
 
-const checkMethodCompatibility = (contract: string, m1: any, m2: any): ASTCodeCompatibilityReport => {
+function checkMethodCompatibility(contract: string, m1: any, m2: any): ASTCodeCompatibilityReport {
   const report = new ASTCodeCompatibilityReport([])
   const signature = getSignature(m1)
   // Sanity check
@@ -340,10 +343,10 @@ function generateASTCompatibilityReport(oldContract: ZContract, oldArtifacts: Bu
   const newAST = new ContractAST(newContract, newArtifacts)
   const newKind = newAST.getContractNode().contractKind
   if (oldContract === null) {
-    if (newKind === CONTRACT_TYPE_CONTRACT) {
+    if (newKind === CONTRACT_KIND_CONTRACT) {
       return new ASTCodeCompatibilityReport([new NewContractChange(contractName)])
     } else {
-      // New contract added of a non-contract type (library/interface)
+      // New contract added of a non-contract kind (library/interface)
       // therefore no functionality added
       return new ASTCodeCompatibilityReport([])
     }
