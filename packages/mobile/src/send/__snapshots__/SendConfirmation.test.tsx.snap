@@ -837,7 +837,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                 "height": 48,
                 "justifyContent": "center",
                 "opacity": undefined,
-                "paddingHorizontal": 16,
+                "paddingHorizontal": 24,
                 "paddingVertical": 5,
               }
             }
@@ -1717,7 +1717,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                 "height": 48,
                 "justifyContent": "center",
                 "opacity": undefined,
-                "paddingHorizontal": 16,
+                "paddingHorizontal": 24,
                 "paddingVertical": 5,
               }
             }
@@ -2594,7 +2594,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                 "height": 48,
                 "justifyContent": "center",
                 "opacity": undefined,
-                "paddingHorizontal": 16,
+                "paddingHorizontal": 24,
                 "paddingVertical": 5,
               }
             }
@@ -3535,7 +3535,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                 "height": 48,
                 "justifyContent": "center",
                 "opacity": undefined,
-                "paddingHorizontal": 16,
+                "paddingHorizontal": 24,
                 "paddingVertical": 5,
               }
             }

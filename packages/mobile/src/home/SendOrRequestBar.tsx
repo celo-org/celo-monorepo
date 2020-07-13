@@ -34,14 +34,14 @@ export default function SendOrRequestBar() {
     <View style={styles.container} testID="SendOrRequestBar">
       <Button
         style={styles.button}
-        size={BtnSizes.SMALL}
+        size={BtnSizes.MEDIUM}
         text={t('send')}
         onPress={onPressSend}
         testID="SendOrRequestBar/SendButton"
       />
       <Button
         style={[styles.button, styles.requestButton]}
-        size={BtnSizes.SMALL}
+        size={BtnSizes.MEDIUM}
         text={t('paymentRequestFlow:request')}
         onPress={onPressRequest}
         testID="SendOrRequestBar/RequestButton"
