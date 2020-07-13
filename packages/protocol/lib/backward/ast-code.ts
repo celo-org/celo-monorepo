@@ -13,6 +13,8 @@ const STORAGE_DEFAULT = 'default'
 
 const OUT_VOID_PARAMETER_STRING = 'void'
 
+// Exported classes
+
 /**
  * A compatibility report with all the detected changes from two compiled
  * contract folders.
@@ -211,16 +213,41 @@ export class MethodReturnChange extends MethodValueChange {
   }
 }
 
-function getSignature(method: any): string {
+// Types used by the Method interface
+// OpenZep uses 'any' for methods so we
+// define our own here
+
+interface TypeDescriptions {
+  typeString: string
+}
+
+interface Parameter {
+  storageLocation: string
+  typeDescriptions: TypeDescriptions
+}
+
+interface Parameters {
+  parameters: Parameter[]
+}
+interface Method {
+  selector: string
+  visibility: string
+  stateMutability: string
+  parameters: Parameters
+  returnParameters: Parameters
+}
+
+// Implementation
+
+function getSignature(method: Method): string {
   // This is used as the ID of a method
   return method.selector
 }
 
-
 /**
  * @returns A method index where {key: signature => value: method}
  */
-function createMethodIndex(methods: any[]): any[] {
+function createMethodIndex(methods: Method[]): Method[][] {
   const asPairs = methods.map(m => ({ [`${getSignature(m)}`]: m }))
   return Object.assign({}, ...asPairs)
 }
@@ -233,18 +260,19 @@ function mergeReports(reports: ASTCodeCompatibilityReport[]): ASTCodeCompatibili
   return report
 }
 
-function parametersSignature(parameters: any[]): string {
+function parametersSignature(parameters: Parameter[]): string {
   if (parameters.length === 0) {
     return OUT_VOID_PARAMETER_STRING
   }
-  const singleSignature = (p: any): string => {
+  const singleSignature = (p: Parameter): string => {
     const storage = p.storageLocation === STORAGE_DEFAULT ? '' : `${p.storageLocation} `
     return `${storage}${p.typeDescriptions.typeString}`
   }
   return parameters.map(singleSignature).join(', ')
 }
 
-function checkMethodCompatibility(contract: string, m1: any, m2: any): ASTCodeCompatibilityReport {
+
+function checkMethodCompatibility(contract: string, m1: Method, m2: Method): ASTCodeCompatibilityReport {
   const report = new ASTCodeCompatibilityReport([])
   const signature = getSignature(m1)
   // Sanity check
@@ -280,7 +308,7 @@ function checkMethodCompatibility(contract: string, m1: any, m2: any): ASTCodeCo
 }
 
 const getCheckableMethodsFromAST = (contract: ContractAST, id: string): any[] => {
-  const checkableMethods = (method: any) => method.visibility === VISIBILITY_EXTERNAL || method.visibility === VISIBILITY_PUBLIC
+  const checkableMethods = (method: Method) => method.visibility === VISIBILITY_EXTERNAL || method.visibility === VISIBILITY_PUBLIC
   try {
     return contract.getMethods().filter(checkableMethods)
   } catch (error) {
