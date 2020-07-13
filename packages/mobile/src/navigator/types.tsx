@@ -142,9 +142,6 @@ export type StackParamList = {
     reclaimPaymentInput: EscrowedPayment
   }
   [Screens.RegulatoryTerms]: undefined
-  [Screens.AddressFetchLoading]: {
-    transactionData: TransactionDataInput
-  }
   [Screens.SelectCountry]: {
     countries: Countries
     selectedCountryCodeAlpha2: string
