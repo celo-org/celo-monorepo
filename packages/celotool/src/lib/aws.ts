@@ -9,11 +9,9 @@ import { installAndEnableMetricsDeps, redeployTiller } from 'src/lib/helm_deploy
 export interface AwsClusterConfig {
   clusterRegion: string
   clusterName: string 
-<<<<<<< HEAD
-  tag: string
+  resourceGroupTag: string
+  // tag: string
   // subscriptionId: string
-=======
->>>>>>> jason/celotool-aws-integration
 }
 
 // switchToAwsCluster configures kubectl to connect to the EKS cluster
@@ -65,39 +63,54 @@ async function setupCluster(celoEnv: string, clusterConfig: AwsClusterConfig) {
   // Should not execute AADPodIdentity if on AWS
   // await installAADPodIdentity()
 }
-<<<<<<< HEAD
 
 // IP ADDRESS RELATED
+// IP addresses in AWS will have the following tags:
+// tag=resourceGroupTag Value=DynamicEnvVar.ORACLE_RESOURCE_GROUP_TAG
+// tag=IPNodeName Value=`${getStaticIPNamePrefix(celoEnv)}-${i}`
 
-export async function registerStaticIPIfNotRegistered(name: string, resourceGroupIP: string) {
-
-
-
+export async function registerAWSStaticIPIfNotRegistered(name: string, resourceGroup: string) {
   // This returns an array of matching IP addresses. If there is no matching IP
   // address, an empty array is returned. We expect at most 1 matching IP
+
+  // This fetches the IP addresses allocated that have the corresponding tag values of resourceGroup and name
   const [existingIpsStr] = await execCmdWithExitOnFailure(
-    `az network public-ip list --resource-group ${resourceGroupIP} --query "[?name == '${name}' && sku.name == 'Standard'].ipAddress" -o json`
+    `aws ec2 describe-addresses --filters "Name=tag:resourceGroupTag,Values=${resourceGroup}" "Name=tag:IPNodeName,Values=${name}" --query 'Addresses[*].[PublicIp]' --output json`
   )
   const existingIps = JSON.parse(existingIpsStr)
   if (existingIps.length) {
-    console.info(`Skipping IP address registration, ${name} on ${resourceGroupIP} exists`)
+    console.info(`Skipping IP address registration, ${name} on ${resourceGroup} exists`)
     // We expect only 1 matching IP
     return existingIps[0]
   }
-  console.info(`Registering IP address ${name} on ${resourceGroupIP}`)
-  const [address] = await execCmdWithExitOnFailure(
-    `az network public-ip create --resource-group ${resourceGroupIP} --name ${name} --allocation-method Static --sku Standard --query publicIp.ipAddress -o tsv`
+  console.info(`Registering IP address on AWS with tags where IPNodeName is ${name} and resourceGroupTag is ${resourceGroup}`)
+
+  // Allocate address on AWS and store allocationID
+  const [allocationID] = await execCmdWithExitOnFailure(
+    `aws ec2 allocate-address --query '[AllocationId]' --output text`
   )
+
+  // Add tags to allocationID
+  await execCmdWithExitOnFailure(
+    `aws ec2 create-tags
+     --resources ${allocationID.trim()} --tags Key=resourceGroupTag,Value=${resourceGroup} Key=IPNodeName,Value=${name}` 
+  )
+
+  // Fetch Address of newly created
+  const [address] = await execCmdWithExitOnFailure(
+    `aws ec2 describe-addresses --filters "Name=tag:resourceGroupTag,Values=${resourceGroup}" "Name=tag:IPNodeName,Values=${name}" --query 'Addresses[*].[PublicIp]' --output json`
+  )
+
   return address.trim()
 }
 
-export async function deallocateStaticIP(name: string, allocationID: string) {
-  console.info(`Deallocating IP address ${name} on ${allocationID}`)
-
-  //aws ec2 release-address --allocation id (IP's allocationID)
+export async function deallocateAWSStaticIP(name: string, resourceGroup: string) {
+  console.info(`Deallocating IP address ${name} on ${resourceGroup}`)
+  const [allocationID] = await execCmdWithExitOnFailure(
+    `aws ec2 describe-addresses --filters "Name=tag:resourceGroupTag,Values=${resourceGroup}" "Name=tag:IPNodeName,Values=${name}" --query 'Addresses[*].[allocationID]' --output text`
+  )
   return execCmdWithExitOnFailure(
-    `az network public-ip delete --resource-group ${allocationID} --name ${name}`
+    // `az network public-ip delete --resource-group ${allocationID} --name ${name}`
+    `aws ec2 release-address --allocation-id ${allocationID.trim()}`
   )
 }
-=======
->>>>>>> jason/celotool-aws-integration

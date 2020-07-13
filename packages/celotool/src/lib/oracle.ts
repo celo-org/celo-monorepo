@@ -58,6 +58,7 @@ const oracleContextAwsClusterConfigDynamicEnvVars: { [k in keyof AwsClusterConfi
   // Given that the context has region, it is possible to not include this environment variable
   // Could instead extract via parsing but downside is that it can be finicky
   clusterRegion: DynamicEnvVar.ORACLE_AWS_CLUSTER_REGION, 
+  resourceGroupTag: DynamicEnvVar.ORACLE_AWS_RESOURCE_GROUP_TAG,
 }
 
 interface OracleKeyVaultIdentityConfig {
@@ -410,6 +411,7 @@ export function getOracleContextDynamicEnvVarValues<T>(
   {})
 }
 
+
 /**
  * Reads the context and swithces to the appropriate Azure or AWS Cluster
  * Switches to the AKS cluster associated with the given context
@@ -418,8 +420,8 @@ export function switchToContextCluster(celoEnv: string, oracleContext: string) {
   if (!isValidOracleContext(oracleContext)) {
     throw Error(`Invalid oracle context, must be one of ${fetchEnv(envVar.ORACLE_CONTEXTS)}`)
   }
-  const isAwsContext = oracleContext.startsWith('AWS')
-  if (isAwsContext) {
+  const isContextAnAWSContext = isAwsContext(oracleContext)
+  if (isContextAnAWSContext) {
     return switchToAwsContextCluster(celoEnv, oracleContext)
   } else {
     return switchToAzureContextCluster(celoEnv, oracleContext)
@@ -440,6 +442,10 @@ export function switchToAzureContextCluster(celoEnv: string, oracleContext: stri
 export function switchToAwsContextCluster(celoEnv: string, context: string) {
   const awsClusterConfig = getAwsClusterConfig(context)
   return switchToAwsCluster(celoEnv, awsClusterConfig)
+}
+
+export function isAwsContext(oracleContext: string): boolean {
+  return oracleContext.startsWith('AWS')
 }
 
 /**

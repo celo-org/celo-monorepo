@@ -4,7 +4,7 @@ import {
   AzureClusterConfig,
   deallocateStaticIP,
   getAKSNodeResourceGroup,
-  registerStaticIPIfNotRegistered,
+  registerStaticIPIfNotRegistered
 } from './azure'
 import { createNamespaceIfNotExists } from './cluster'
 import { execCmdWithExitOnFailure } from './cmd-utils'
@@ -13,7 +13,7 @@ import {
   deletePersistentVolumeClaims,
   installGenericHelmChart,
   removeGenericHelmChart,
-  upgradeGenericHelmChart,
+  upgradeGenericHelmChart
 } from './helm_deploy'
 import { deleteResource, scaleResource } from './kubernetes'
 
@@ -40,7 +40,7 @@ function getStaticIPNamePrefix(celoEnv: string) {
   return `${celoEnv}-nodes`
 }
 
-export async function installFullNodeChart(celoEnv: string, deploymentConfig: AKSFullNodeDeploymentConfig) {
+export async function installAKSFullNodeChart(celoEnv: string, deploymentConfig: AKSFullNodeDeploymentConfig) {
   const kubeNamespace = getKubeNamespace(celoEnv)
   const releaseName = getReleaseName(celoEnv)
   await createNamespaceIfNotExists(kubeNamespace)
@@ -53,7 +53,7 @@ export async function installFullNodeChart(celoEnv: string, deploymentConfig: AK
   )
 }
 
-export async function upgradeFullNodeChart(
+export async function upgradeAKSFullNodeChart(
   celoEnv: string,
   deploymentConfig: AKSFullNodeDeploymentConfig,
   reset: boolean
@@ -75,7 +75,7 @@ export async function upgradeFullNodeChart(
   return
 }
 
-export async function removeFullNodeChart(celoEnv: string, deploymentConfig: AKSFullNodeDeploymentConfig) {
+export async function removeAKSFullNodeChart(celoEnv: string, deploymentConfig: AKSFullNodeDeploymentConfig) {
   const releaseName = getReleaseName(celoEnv)
   await removeGenericHelmChart(releaseName)
   await deletePersistentVolumeClaims(celoEnv, ['celo-fullnode'])
