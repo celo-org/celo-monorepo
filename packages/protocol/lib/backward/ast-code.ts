@@ -48,7 +48,7 @@ export interface ChangeVisitor<T> {
   onMethodVisibility(change: MethodVisibilityChange): T
   onMethodAdded(change: MethodAddedChange): T
   onMethodRemoved(change: MethodRemovedChange): T
-  onContractType(change: ContractTypeChange): T
+  onContractKind(change: ContractKindChange): T
   onNewContract(change: NewContractChange): T
   onDeployedBytecode(change: DeployedBytecodeChange): T
 }
@@ -115,10 +115,10 @@ export class DeployedBytecodeChange extends ContractChange {
  * The Kind / type of a contract changed. Kind / type examples are
  * 'contract' or 'library'.
  */
-export class ContractTypeChange extends ContractValueChange {
-  type = "ContractType"
+export class ContractKindChange extends ContractValueChange {
+  type = "ContractKind"
   accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.onContractType(this)
+    return visitor.onContractKind(this)
   }
 }
 
@@ -286,7 +286,10 @@ const getCheckableMethodsFromAST = (contract: ContractAST, id: string): any[] =>
   }
 }
 
-const doASTCompatibilityReport = (contractName: string, oldAST: ContractAST, newAST: ContractAST): ASTCodeCompatibilityReport => {
+function doASTCompatibilityReport(
+  contractName: string,
+  oldAST: ContractAST,
+  newAST: ContractAST): ASTCodeCompatibilityReport {
   const oldMethods = createMethodIndex(getCheckableMethodsFromAST(oldAST, 'old'))
   const newMethods = createMethodIndex(getCheckableMethodsFromAST(newAST, 'new'))
 
@@ -314,8 +317,8 @@ const doASTCompatibilityReport = (contractName: string, oldAST: ContractAST, new
   return report
 }
 
-const generateASTCompatibilityReport = (oldContract: ZContract, oldArtifacts: BuildArtifacts,
-  newContract: ZContract, newArtifacts: BuildArtifacts): ASTCodeCompatibilityReport => {
+function generateASTCompatibilityReport(oldContract: ZContract, oldArtifacts: BuildArtifacts,
+  newContract: ZContract, newArtifacts: BuildArtifacts): ASTCodeCompatibilityReport {
   // Sanity checks
   if (newContract === null) {
     throw new Error('newContract cannot be null')
@@ -349,10 +352,10 @@ const generateASTCompatibilityReport = (oldContract: ZContract, oldArtifacts: Bu
   }
 
   const oldAST = new ContractAST(oldContract, oldArtifacts)
-  const kind = oldAST.getContractNode().contractKind
-  if (kind !== newKind) {
+  const oldKind = oldAST.getContractNode().contractKind
+  if (oldKind !== newKind) {
     // different contract kind (library/interface/contract)
-    return new ASTCodeCompatibilityReport([new ContractTypeChange(contractName, kind, newKind)])
+    return new ASTCodeCompatibilityReport([new ContractKindChange(contractName, oldKind, newKind)])
   }
 
   const report = doASTCompatibilityReport(contractName, oldAST, newAST)
@@ -369,7 +372,9 @@ const generateASTCompatibilityReport = (oldContract: ZContract, oldArtifacts: Bu
  * @param oldArtifacts
  * @param newArtifacts
  */
-export const reportASTIncompatibilities = (oldArtifacts: BuildArtifacts, newArtifacts: BuildArtifacts): ASTCodeCompatibilityReport => {
+export function reportASTIncompatibilities(
+  oldArtifacts: BuildArtifacts,
+  newArtifacts: BuildArtifacts): ASTCodeCompatibilityReport {
   const reports = newArtifacts.listArtifacts()
   .map((newArtifact) => {
     const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)

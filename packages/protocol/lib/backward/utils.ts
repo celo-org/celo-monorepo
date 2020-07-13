@@ -50,7 +50,7 @@ export class ASTBackwardReport {
   ) {}
 }
 
-const ensureValidArtifacts = (artifactsPaths: string[]): void => {
+function ensureValidArtifacts(artifactsPaths: string[]): void {
   artifactsPaths.forEach((path) => {
     const artifact = readJsonSync(path)
     if (artifact.ast === undefined) {
@@ -60,7 +60,7 @@ const ensureValidArtifacts = (artifactsPaths: string[]): void => {
   })
 }
 
-export const instantiateArtifacts = (buildDirectory: string): BuildArtifacts => {
+export function instantiateArtifacts(buildDirectory: string): BuildArtifacts {
   // Check if all jsons in the buildDirectory are valid artifacts,
   // otherwise getBuildArtifacts fail with the enigmatic
   // "Cannot read property 'absolutePath' of undefined"

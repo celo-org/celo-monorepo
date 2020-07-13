@@ -8,7 +8,7 @@ const web3 = new Web3(null)
 //
 // Couldn't find an easy way of getting one just from contract artifacts. But
 // for getStorageLayout we really only need .schema.ast and .schema.contractName.
-export const makeZContract = (artifact: any): ZContract => {
+export function makeZContract(artifact: any): ZContract {
   const web3Contract = new web3.eth.Contract(artifact.abi)
   // @ts-ignore
   const contract = web3Contract as Contract
