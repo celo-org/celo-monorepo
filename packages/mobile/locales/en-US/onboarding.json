@@ -95,5 +95,8 @@
     "description": "This account doesn’t have any funds. Would you still like to use it?",
     "useAccount": "Use Account",
     "title": "Balance <0></0>"
+  },
+  "success": {
+    "message": "You're all set!"
   }
 }

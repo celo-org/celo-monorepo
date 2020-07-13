@@ -53,8 +53,8 @@
     "0": "Unable to load your feed",
     "1": "Please try again later"
   },
-  "noTransactionActivity": "Your transactions will appear here",
-  "noExchangeActivity": "You will see completed exchanges here",
+  "noTransactionActivity": "Your activity will appear here",
+  "noExchangeActivity": "Your activity will appear here",
   "maybeLater": "Maybe Later",
   "balanceNeedUpdating": "Balance needs updating",
   "refreshBalances": "Refresh Balances",
