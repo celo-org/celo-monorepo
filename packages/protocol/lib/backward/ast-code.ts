@@ -125,6 +125,9 @@ export class ContractKindChange extends ContractValueChange {
 /**
  * Abstract implementation for the {@link Change} interface for
  * method changes.
+ *
+ * Since we use the {@link signature} as the id of the method, it's
+ * the same value for the old and the new contract.
  */
 abstract class MethodChange extends ContractChange {
   constructor(contract: string, private readonly signature: string) {
