@@ -112,7 +112,7 @@ export class DeployedBytecodeChange extends ContractChange {
 }
 
 /**
- * The Kind / type of a contract changed. Kind / type examples are
+ * The Kind of a contract changed. Kind examples are
  * 'contract' or 'library'.
  */
 export class ContractKindChange extends ContractValueChange {
