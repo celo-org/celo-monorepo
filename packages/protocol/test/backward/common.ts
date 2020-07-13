@@ -13,7 +13,7 @@ function exec(cmd: string) {
 }
 
 // Return the latest modification time of a file in the given directory
-const getLatestUpdateTime = (dir) => {
+function getLatestUpdateTime(dir) {
   if (!fs.existsSync(dir)) {
     return 0
   }
@@ -24,7 +24,7 @@ const getLatestUpdateTime = (dir) => {
   return Math.max(...fs.readdirSync(dir).map((f) => fs.statSync(`${dir}/${f}`).mtimeMs))
 }
 
-const needsCompiling = (src: string, build: string): boolean => {
+function needsCompiling(src: string, build: string): boolean {
   const srcTime = getLatestUpdateTime(src)
   const buildTime = getLatestUpdateTime(build)
   if (buildTime === 0) {
@@ -42,7 +42,7 @@ const needsCompiling = (src: string, build: string): boolean => {
   return false
 }
 
-export const getTestArtifacts = (caseName: string) => {
+export function getTestArtifacts(caseName: string) {
   const back = './test/resources/backward'
   const srcDirectory = `${back}/contracts_${caseName}`
   const buildDirectory = `${back}/build/b_${caseName}`

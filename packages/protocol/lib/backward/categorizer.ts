@@ -1,7 +1,7 @@
 import {
   Change,
   ChangeVisitor,
-  ContractTypeChange, DeployedBytecodeChange, MethodAddedChange,
+  ContractKindChange, DeployedBytecodeChange, MethodAddedChange,
   MethodMutabilityChange, MethodParametersChange, MethodRemovedChange,
   MethodReturnChange, MethodVisibilityChange, NewContractChange,
   VISIBILITY_EXTERNAL, VISIBILITY_PUBLIC
@@ -20,7 +20,7 @@ export interface Categorizer extends ChangeVisitor<ChangeType> {}
 /**
  * @returns a mapping of {ChangeType => Change[]} according to the {@link categorizer} used
  */
-export const categorize = (changes: Change[], categorizer: Categorizer): Change[][] => {
+export function categorize(changes: Change[], categorizer: Categorizer): Change[][] {
   const byCategory = []
   for (const ct of Object.values(ChangeType)) {
     byCategory[ct] = []
@@ -44,7 +44,7 @@ export class DefaultCategorizer implements Categorizer {
   onMethodParameters = (_change: MethodParametersChange): ChangeType => ChangeType.Major
   onMethodReturn = (_change: MethodReturnChange): ChangeType => ChangeType.Major
   onMethodRemoved = (_change: MethodRemovedChange): ChangeType => ChangeType.Major
-  onContractType = (_change: ContractTypeChange): ChangeType => ChangeType.Major
+  onContractKind = (_change: ContractKindChange): ChangeType => ChangeType.Major
 
   onMethodAdded = (_change: MethodAddedChange): ChangeType => ChangeType.Minor
   onNewContract = (_change: NewContractChange): ChangeType => ChangeType.Minor
