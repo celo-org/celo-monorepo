@@ -5,15 +5,12 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "./SlasherUtil.sol";
 
-/**
- * Version: 2.0.0.0
- */
+/// @dev Version: 2.0.0.0
 contract DowntimeSlasher is SlasherUtil {
   using SafeMath for uint256;
 
-  // Maps validator address -> epoch number -> a block interval for which the
-  // validator has been slashed.
-  mapping(address => mapping(uint256 => uint256[2])) slashedIntervals;
+  // Maps validator address -> last block of the interval for which it has been slashed.
+  mapping(address => uint256) lastSlashedBlock;
 
   // Maps validator -> startBlock -> endBlock -> signature bitmap for that interval.
   // Note that startBlock and endBlock must always be in the same epoch.
@@ -218,37 +215,27 @@ contract DowntimeSlasher is SlasherUtil {
   }
 
   /**
-   * @notice Add to the validator a new slashedInterval if the validator was not already
-   * slashed in the same epoch of the startBlock or by a previous interval that contains at 
-   * least a block of the new interval.
+   * @notice Add to the validator a new lastSlashedBlock if the validator was not already slashed
+   * in the same epoch of the startBlock and if the blocks to slash are newer than the last one
    */
-  function addSlashedInterval(address validator, uint256 startBlock, uint256 endBlock) internal {
-    uint256 startEpoch = getEpochNumberOfBlock(startBlock);
-    uint256 endEpoch = getEpochNumberOfBlock(endBlock);
+  function addValidatorSlash(address validator, uint256 startBlock, uint256 endBlock) internal {
+    uint256 validatorLastSlashedBlock = lastSlashedBlock[validator];
 
-    uint256[2] memory blockInterval = slashedIntervals[validator][startEpoch];
-    require(blockInterval[0] == 0 && blockInterval[1] == 0, "already slashed in that epoch");
+    require(validatorLastSlashedBlock < startBlock, "validator has a newer slash");
 
-    // Check possible crossing epoch slash from the last epoch.
-    blockInterval = slashedIntervals[validator][startEpoch.sub(1)];
-    require(blockInterval[1] < startBlock, "slash shares blocks with another slash");
+    if (validatorLastSlashedBlock > 0) {
+      uint256 startEpoch = getEpochNumberOfBlock(startBlock);
+      uint256 lastSlashedEpoch = getEpochNumberOfBlock(validatorLastSlashedBlock);
 
-    // Check possible crossing epoch slash from the epoch of the endEpoch.
-    if (startEpoch != endEpoch) {
-      blockInterval = slashedIntervals[validator][endEpoch];
-      require(
-        blockInterval[0] == 0 || endBlock < blockInterval[0],
-        "slash shares blocks with another slash"
-      );
+      require(lastSlashedEpoch != startEpoch, "already slashed in that epoch");
     }
 
-    slashedIntervals[validator][startEpoch] = [startBlock, endBlock];
+    lastSlashedBlock[validator] = endBlock;
   }
 
   /**
    * @notice Requires that `wasDownForIntervals` returns true and that the account corresponding
-   * to `signer` has not already been slashed for the same startBlocks[0] epoch, or share blocks
-   * with slashes of other epochs.
+   * to `signer` has not already been slashed for the same startBlocks[0] epoch, or a newer block.
    * If so, fetches the `account` associated with `signer` and the group that
    * `signer` was a member of during the corresponding epoch.
    * Then, calls `LockedGold.slash` on both the validator and group accounts.
@@ -284,7 +271,7 @@ contract DowntimeSlasher is SlasherUtil {
     require(signerIndices.length > 0, "requires at least one signerIndex");
     address validator = getValidatorAccountFromSignerIndex(signerIndices[0], startBlocks[0]);
     uint256 endBlock = startBlocks[0].add(slashableDowntime).sub(1);
-    addSlashedInterval(validator, startBlocks[0], endBlock);
+    addValidatorSlash(validator, startBlocks[0], endBlock);
     require(
       endBlock <= endBlocks[endBlocks.length.sub(1)],
       "the intervals are not covering the slashableDowntime window"

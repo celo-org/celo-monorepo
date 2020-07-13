@@ -763,9 +763,8 @@ contract('DowntimeSlasher', (accounts: string[]) => {
           )
         })
 
-        it('cannot be slashed twice if the slash shares at least a block with a previous slash of another epoch', async () => {
-          // Beginning of epoch + 1 to avoid trying to generate the same intervals
-          const newStartBlock = getFirstBlockNumberForEpoch(epoch, epochSize) + 1
+        it('cannot be slashed if the validator has a newer slash', async () => {
+          const newStartBlock = getFirstBlockNumberForEpoch(epoch - 1, epochSize) + 1
 
           // Just to make sure that it was slashed
           const balance = await mockLockedGold.accountTotalLockedGold(validatorList[0])
@@ -786,7 +785,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
               [],
               []
             ),
-            'slash shares blocks with another slash'
+            'validator has a newer slash'
           )
         })
       })
