@@ -420,7 +420,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                 "height": 48,
                 "justifyContent": "center",
                 "opacity": undefined,
-                "paddingHorizontal": 16,
+                "paddingHorizontal": 24,
                 "paddingVertical": 5,
               }
             }

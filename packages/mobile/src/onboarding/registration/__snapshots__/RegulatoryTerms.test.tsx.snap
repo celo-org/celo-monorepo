@@ -164,7 +164,7 @@ exports[`RegulatoryTermsScreen renders correctly 1`] = `
             "height": 48,
             "justifyContent": "center",
             "opacity": 1,
-            "paddingHorizontal": 16,
+            "paddingHorizontal": 24,
             "paddingVertical": 5,
           }
         }
