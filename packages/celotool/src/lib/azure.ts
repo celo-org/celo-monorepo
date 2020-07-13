@@ -1,7 +1,7 @@
 import { createNamespaceIfNotExists } from 'src/lib/cluster'
 import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { doCheckOrPromptIfStagingOrProduction } from 'src/lib/env-utils'
-import { installAndEnableMetricsDeps, installOrUpgradeGenericHelmChart, redeployTiller } from 'src/lib/helm_deploy'
+import { installAndEnableMetricsDeps, redeployTiller, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
 import { retryCmd } from 'src/lib/utils'
 
 /**
@@ -81,21 +81,23 @@ function installAADPodIdentity() {
   // Until we upgrade to helm v3, we rely on our own helm chart adapted from:
   // https://raw.githubusercontent.com/Azure/aad-pod-identity/8a5f2ed5941496345592c42e1d6cbd12c32aeebf/deploy/infra/deployment-rbac.yaml
   console.info('Installing or upgrading aad-pod-identity')
-  return installOrUpgradeGenericHelmChart(
+  return upgradeGenericHelmChart(
     'default',
     'aad-pod-identity',
     '../helm-charts/aad-pod-identity',
-    []
+    [],
+    true
   )
 }
 
 function installPodSecurityPolicies() {
   console.info('Installing or upgrading pod-security-policies')
-  return installOrUpgradeGenericHelmChart(
+  return upgradeGenericHelmChart(
     'default',
     'pod-security-policies',
     '../helm-charts/pod-security-policies',
-    []
+    [],
+    true
   )
 }
 

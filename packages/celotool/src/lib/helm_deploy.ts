@@ -644,29 +644,16 @@ export async function upgradeGenericHelmChart(
   namespace: string,
   releaseName: string,
   chartDir: string,
-  parameters: string[]
+  parameters: string[],
+  install: boolean = false,
 ) {
   await buildHelmChartDependencies(chartDir)
 
   console.info(`Upgrading helm release ${releaseName}`)
   await helmCommand(
-    `helm upgrade ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(' ')}`
+    `helm upgrade ${releaseName} ${chartDir} --namespace ${namespace} ${install ? '--install' : ''} ${parameters.join(' ')}`
   )
   console.info(`Upgraded helm release ${releaseName}`)
-}
-
-export async function installOrUpgradeGenericHelmChart(
-  namespace: string,
-  releaseName: string,
-  chartDir: string,
-  parameters: string[]
-) {
-  const releaseExists = await outputIncludes(
-    `helm list`,
-    releaseName,
-  )
-  const fn = releaseExists ? upgradeGenericHelmChart : installGenericHelmChart
-  return fn(namespace, releaseName, chartDir, parameters)
 }
 
 export function isCelotoolVerbose() {
