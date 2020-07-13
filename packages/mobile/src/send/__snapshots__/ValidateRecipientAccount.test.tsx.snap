@@ -176,7 +176,7 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
                   "justifyContent": "center",
                   "minWidth": 120,
                   "opacity": undefined,
-                  "paddingHorizontal": 16,
+                  "paddingHorizontal": 24,
                   "paddingVertical": 5,
                 }
               }
@@ -985,7 +985,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                   "justifyContent": "center",
                   "minWidth": 120,
                   "opacity": undefined,
-                  "paddingHorizontal": 16,
+                  "paddingHorizontal": 24,
                   "paddingVertical": 5,
                 }
               }
