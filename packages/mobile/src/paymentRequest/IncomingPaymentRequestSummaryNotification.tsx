@@ -5,7 +5,6 @@ import { connect } from 'react-redux'
 import { PaymentRequest } from 'src/account/types'
 import { HomeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { declinePaymentRequest } from 'src/firebase/actions'
 import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { notificationIncomingRequest } from 'src/images/Images'
@@ -23,25 +22,15 @@ interface OwnProps {
   requests: PaymentRequest[]
 }
 
-interface DispatchProps {
-  declinePaymentRequest: typeof declinePaymentRequest
-}
-
-type Props = OwnProps & DispatchProps & WithTranslation & StateProps
+type Props = OwnProps & WithTranslation & StateProps
 
 interface StateProps {
   recipientCache: NumberToRecipient
 }
 
-const mapStateToProps = (state: RootState): StateProps => {
-  return {
-    recipientCache: recipientCacheSelector(state),
-  }
-}
-
-const mapDispatchToProps = {
-  declinePaymentRequest,
-}
+const mapStateToProps = (state: RootState): StateProps => ({
+  recipientCache: recipientCacheSelector(state),
+})
 
 // Payment Request notification for the notification center on home screen
 export class IncomingPaymentRequestSummaryNotification extends React.Component<Props> {
@@ -68,8 +57,6 @@ export class IncomingPaymentRequestSummaryNotification extends React.Component<P
 
     return requests.length === 1 ? (
       listItemRenderer({
-        // accessing via this.props.<...> to avoid shadowing
-        declinePaymentRequest: this.props.declinePaymentRequest,
         recipientCache,
       })(requests[0])
     ) : (
@@ -85,7 +72,7 @@ export class IncomingPaymentRequestSummaryNotification extends React.Component<P
   }
 }
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
+export default connect<StateProps, {}, {}, RootState>(
   mapStateToProps,
-  mapDispatchToProps
+  {}
 )(withTranslation<Props>(Namespaces.walletFlow5)(IncomingPaymentRequestSummaryNotification))

@@ -33,20 +33,16 @@ type Props = WithTranslation & StateProps
 export const listItemRenderer = (props: { recipientCache: NumberToRecipient }) => (
   request: PaymentRequest,
   key: number | undefined = undefined
-) => {
-  const requester = getRecipientFromPaymentRequest(request, props.recipientCache)
-
-  return (
-    <View key={key}>
-      <IncomingPaymentRequestListItem
-        id={request.uid || ''}
-        amount={request.amount}
-        requester={requester}
-        comment={request.comment}
-      />
-    </View>
-  )
-}
+) => (
+  <View key={key}>
+    <IncomingPaymentRequestListItem
+      id={request.uid || ''}
+      amount={request.amount}
+      requester={getRecipientFromPaymentRequest(request, props.recipientCache)}
+      comment={request.comment}
+    />
+  </View>
+)
 
 class IncomingPaymentRequestListScreen extends React.Component<Props> {
   static navigationOptions = () => ({
