@@ -48,8 +48,6 @@ function AddressFetchLoading(props: Props) {
   useEffect(() => {
     if (e164PhoneNumber) {
       // Need to check latest mapping to prevent user from accepting fradulent requests
-      // Unfortunately, can only check if we have recipient phone number (i.e., can't do it on
-      // payment requests from requesters that the user hasn't transacted with before)
       dispatch(fetchAddressesAndValidate(e164PhoneNumber))
     } else {
       const delayedNavFunction = delayedNavigate()
@@ -75,7 +73,9 @@ function AddressFetchLoading(props: Props) {
 }
 
 AddressFetchLoading.navigationOptions = () => {
-  return headerWithCancelButton
+  return {
+    ...headerWithCancelButton,
+  }
 }
 
 const styles = StyleSheet.create({

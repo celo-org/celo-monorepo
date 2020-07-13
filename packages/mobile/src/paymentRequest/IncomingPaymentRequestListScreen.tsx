@@ -5,7 +5,6 @@ import { View } from 'react-native'
 import { connect } from 'react-redux'
 import { getIncomingPaymentRequests } from 'src/account/selectors'
 import { PaymentRequest } from 'src/account/types'
-import { declinePaymentRequest } from 'src/firebase/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { HeaderTitleWithBalance } from 'src/navigator/Headers'
 import { NotificationList } from 'src/notifications/NotificationList'
@@ -21,10 +20,6 @@ interface StateProps {
   recipientCache: NumberToRecipient
 }
 
-interface DispatchProps {
-  declinePaymentRequest: typeof declinePaymentRequest
-}
-
 const mapStateToProps = (state: RootState): StateProps => {
   return {
     dollarBalance: state.stableToken.balance,
@@ -33,16 +28,12 @@ const mapStateToProps = (state: RootState): StateProps => {
   }
 }
 
-const mapDispatchToProps = {
-  declinePaymentRequest,
-}
+type Props = WithTranslation & StateProps
 
-type Props = WithTranslation & StateProps & DispatchProps
-
-export const listItemRenderer = (props: {
-  recipientCache: NumberToRecipient
-  declinePaymentRequest: typeof declinePaymentRequest
-}) => (request: PaymentRequest, key: number | undefined = undefined) => {
+export const listItemRenderer = (props: { recipientCache: NumberToRecipient }) => (
+  request: PaymentRequest,
+  key: number | undefined = undefined
+) => {
   const requester = getRecipientFromPaymentRequest(request, props.recipientCache)
 
   return (
@@ -52,7 +43,6 @@ export const listItemRenderer = (props: {
         amount={request.amount}
         requester={requester}
         comment={request.comment}
-        declinePaymentRequest={props.declinePaymentRequest}
       />
     </View>
   )
@@ -79,7 +69,7 @@ class IncomingPaymentRequestListScreen extends React.Component<Props> {
   }
 }
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
+export default connect<StateProps, {}, {}, RootState>(
   mapStateToProps,
-  mapDispatchToProps
+  {}
 )(withTranslation<Props>(Namespaces.paymentRequestFlow)(IncomingPaymentRequestListScreen))
