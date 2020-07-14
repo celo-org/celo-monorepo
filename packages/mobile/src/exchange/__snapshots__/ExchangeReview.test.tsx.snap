@@ -435,9 +435,9 @@ exports[`ExchangeReview renders correctly 1`] = `
                     },
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Bold",
+                      "fontFamily": "Inter-SemiBold",
                       "fontSize": 16,
-                      "lineHeight": 24,
+                      "lineHeight": 22,
                     },
                   ]
                 }
@@ -456,9 +456,9 @@ exports[`ExchangeReview renders correctly 1`] = `
                   },
                   Object {
                     "color": "#2E3338",
-                    "fontFamily": "Hind-Bold",
+                    "fontFamily": "Inter-SemiBold",
                     "fontSize": 16,
-                    "lineHeight": 24,
+                    "lineHeight": 22,
                   },
                 ]
               }
@@ -621,7 +621,7 @@ exports[`ExchangeReview renders correctly 1`] = `
             "height": 48,
             "justifyContent": "center",
             "opacity": undefined,
-            "paddingHorizontal": 16,
+            "paddingHorizontal": 24,
             "paddingVertical": 5,
           }
         }

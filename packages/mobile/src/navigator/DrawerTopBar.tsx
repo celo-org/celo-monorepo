@@ -1,7 +1,7 @@
 import colors from '@celo/react-components/styles/colors.v2'
 import { useNavigation } from '@react-navigation/native'
 import * as React from 'react'
-import { processColor, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { processColor, StyleSheet, TouchableOpacity } from 'react-native'
 import Animated, { cond, greaterThan } from 'react-native-reanimated'
 import Hamburger from 'src/icons/Hamburger'
 
@@ -34,7 +34,6 @@ function DrawerTopBar({ middleElement, scrollPosition, testID }: Props) {
         <Hamburger />
       </TouchableOpacity>
       {middleElement}
-      <View style={styles.spacer} />
     </Animated.View>
   )
 }
@@ -49,15 +48,15 @@ const styles = StyleSheet.create({
     height: 62,
     backgroundColor: 'transparent',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
   },
   hamburger: {
+    position: 'absolute',
+    left: 8,
+    top: 8,
     padding: 8,
     marginLeft: 4,
     marginBottom: 0,
-  },
-  spacer: {
-    width: 45,
   },
 })
 
