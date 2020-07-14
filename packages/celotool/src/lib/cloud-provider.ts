@@ -7,7 +7,7 @@ export interface ClusterConfig {
   cloudProviderName: string
 }
 
-// switchToAwsCluster configures kubectl to connect to the EKS cluster
+// Configures kubectl to connect to a cluster named clusterConfig.clusterName
 export async function isContextSet(
   clusterConfig: ClusterConfig,
 ) {
@@ -41,3 +41,4 @@ export async function setupCloudCluster(celoEnv: string, clusterConfig: ClusterC
   await redeployTiller()
   await installAndEnableMetricsDeps(true, clusterConfig)
 }
+
