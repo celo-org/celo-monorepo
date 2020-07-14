@@ -113,28 +113,34 @@ try {
   } else if (argv._.includes(COMMAND_SEM_INFER)) {
     out(`Inferred version: `)
     out(
-      backward.report.versionDelta
+      backward.report.global.versionDelta
         .appliedTo(ContractVersion.fromString(argv.old_version))
         .toString(),
       true
     )
     out(`\n`)
   } else if (argv._.includes(COMMAND_SEM_CHECK)) {
-    const expected = backward.report.versionDelta.appliedTo(
+    const expected = backward.report.global.versionDelta.appliedTo(
       ContractVersion.fromString(argv.old_version)
     )
     if (expected.toString() !== argv.new_version) {
-      out(`${argv.old_version} + ${backward.report.versionDelta} != ${argv.new_version}`, true)
+      out(
+        `${argv.old_version} + ${backward.report.global.versionDelta} != ${argv.new_version}`,
+        true
+      )
       out(`\n`)
       process.exit(1)
     } else {
-      out(`${argv.old_version} + ${backward.report.versionDelta} == ${argv.new_version}`, true)
+      out(
+        `${argv.old_version} + ${backward.report.global.versionDelta} == ${argv.new_version}`,
+        true
+      )
       out(`\n`)
       process.exit(0)
     }
   } else if (argv._.includes(COMMAND_SEM_DELTA)) {
     out(`Version delta: `)
-    out(`${backward.report.versionDelta}`, true)
+    out(`${backward.report.global.versionDelta}`, true)
     out(`\n`)
   } else {
     // Should never happen
