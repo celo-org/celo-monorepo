@@ -4,7 +4,7 @@ import { StyleSheet, View } from 'react-native'
 
 export interface CallToAction {
   onPress: () => unknown
-  text: string
+  text: string | JSX.Element
 }
 
 interface Props {
