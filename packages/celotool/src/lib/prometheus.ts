@@ -57,7 +57,6 @@ export async function upgradePrometheus() {
   return upgradeGenericHelmChart(kubeNamespace, releaseName, helmChartPath, await helmParameters())
 }
 
-// async function helmParameters(clusterConfig?: AzureClusterConfig) {
 async function helmParameters(clusterConfig?: ClusterConfig) {
   const params = [
     `--set namespace=${kubeNamespace}`,
