@@ -7,13 +7,20 @@ import { ASTStorageCompatibilityReport } from '@celo/protocol/lib/backward/ast-l
 import { categorize, Categorizer, ChangeType } from '@celo/protocol/lib/backward/categorizer'
 import { ContractVersionDelta } from '@celo/protocol/lib/backward/version'
 
-
+/**
+ * Value object holding all uncategorized storage and code reports.
+ */
 export class ASTReports {
   
   constructor(
     public readonly code: ASTCodeCompatibilityReport,
     public readonly storage: ASTStorageCompatibilityReport[]) {}
 
+  /**
+   * @return a new {@link ASTReports} with the same storage and code
+   * reports, excluding all contract names that match the {@param exclude}
+   * parameter.
+   */
   excluding = (exclude: RegExp): ASTReports => {
     const included = (contract: string): boolean => {
       if (exclude != null) {
@@ -27,10 +34,16 @@ export class ASTReports {
   }
 }
 
+/**
+ * A mapping {contract name => {@link CategorizedChanges}}.
+ */
 export interface CategorizedChangesIndex {
   [contract: string]: CategorizedChanges;
 }
 
+/**
+ * A {@link CategorizedChanges} builder pattern implementation.
+ */
 class CategorizedChangesBuilder {
   public storage: ASTStorageCompatibilityReport[] = []
   public major: Change[] = []
@@ -41,8 +54,16 @@ class CategorizedChangesBuilder {
   }
 }
 
+/**
+ * A semantic versioning categorization of a list of contract storage
+ * and code changes.
+ */
 export class CategorizedChanges {
 
+  /**
+   * @returns a new {@link CategorizedChanges} according to
+   * the {@link Categorizer} given.
+   */
   static fromReports(
     reports: ASTReports,
     categorizer: Categorizer): CategorizedChanges {
@@ -85,16 +106,26 @@ export class CategorizedChanges {
   }
 }
 
+/**
+ * A mapping {contract name => {@link ASTVersionedReport}}.
+ */
 export interface ASTVersionedReportIndex {
   [contract: string]: ASTVersionedReport
 }
 
 /**
- * Backward compatibility report, based on both the abstract syntax tree analysis of
- * both the storage layout, and code API.
+ * Backward compatibility report for a set of changes, based on 
+ * the abstract syntax tree analysis of both the storage layout, and code API.
+ * 
+ * Holds {@link CategorizedChanges} and the calculated {@link ContractVersionDelta}.
  */
 export class ASTVersionedReport {
   
+  /**
+   * @returns a new {@link ASTVersionedReport} with the provided 
+   * {@link CategorizedChanges} and a calculated version delta
+   * according to {@link ContractVersionDelta.fromChanges}.
+   */
   static create = (changes: CategorizedChanges): ASTVersionedReport => {
     const versionDelta = ContractVersionDelta.fromChanges(
       changes.storage.length > 0,
@@ -105,6 +136,11 @@ export class ASTVersionedReport {
     return new ASTVersionedReport(changes, versionDelta)
   }
 
+  /**
+   * @return a new {@link ASTVersionedReportIndex} defined by
+   * {contract name => {@link ASTVersionedReport}}, each built
+   * by the {@link CategorizedChanges} for each contract.
+   */
   static createByContract = (changes: CategorizedChanges): ASTVersionedReportIndex => {
     const changesIndex = changes.explode()
     const ret: ASTVersionedReportIndex = {}
@@ -119,6 +155,10 @@ export class ASTVersionedReport {
     public readonly versionDelta: ContractVersionDelta) {}
 }
 
+/**
+ * A report holding {@link ASTVersionedReport} for all global changes,
+ * plus the detailed {@link ASTVersionedReport} for each contract.
+ */
 export class ASTDetailedVersionedReport {
 
   static create = (fullReports: ASTReports, categorizer: Categorizer): ASTDetailedVersionedReport => {
