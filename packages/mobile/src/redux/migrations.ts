@@ -41,4 +41,17 @@ export const migrations = {
       },
     }
   },
+  3: (state: any) => {
+    return {
+      ...state,
+      send: {
+        ...state.send,
+        recentPayments: [],
+      },
+      account: {
+        ...state.account,
+        hasMigratedToNewBip39: false,
+      },
+    }
+  },
 }

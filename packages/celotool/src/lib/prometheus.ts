@@ -119,7 +119,9 @@ async function createPrometheusGcloudServiceAccountforAKS(serviceAccountName: st
 }
 
 function getServiceAccountNameforAKS(kubeClusterName: string) {
-  return `prometheus-aks-${kubeClusterName}`.substring(0, 30)
+  // Ensure the service account name is within the length restriction
+  // and ends with an alphanumeric character
+  return `prometheus-aks-${kubeClusterName}`.substring(0, 30).replace(/[^a-zA-Z0-9]+$/g, '')
 }
 
 export async function installGrafanaIfNotExists() {

@@ -19,7 +19,7 @@ Celo has a native unit of accounting, the cryptocurrency **CELO**, comparable to
 **ERC-20** is a standard interface for implementing cryptocurrencies or **tokens** as contracts, rather than via account balances. In Celo, CELO has a duality as both the native currency and is also an ERC-20 token on the Celo blockchain.
 
 {% hint style="warning" %}
-Celo assets exist on an independent blockchain, and cannot be accessed through wallets that connect to the Ethereum network. Only use wallets disigned to work with the Celo network.
+Celo assets exist on an independent blockchain, and cannot be accessed through wallets that connect to the Ethereum network. Only use wallets designed to work with the Celo network.
 {% endhint %}
 
 Users interact with the blockchain by creating signed **transactions.** These are requests to make a change to the ledger. They can: transfer value between accounts; execute a function in a smart contract and pass in arguments \(perhaps causing other smart contracts to be called, update their storage, or transfer value\); or create a new smart contract.
