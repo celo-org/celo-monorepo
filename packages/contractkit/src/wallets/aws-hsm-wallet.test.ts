@@ -13,6 +13,7 @@ import {
   CHAIN_ID,
   TYPED_DATA,
 } from './test-utils'
+require('dotenv').config()
 
 const USING_MOCK = typeof process.env.AWS_HSM_KEY_ID === 'undefined'
 const AWS_HSM_KEY_ID = USING_MOCK ? 'secp' : process.env.AWS_HSM_KEY_ID

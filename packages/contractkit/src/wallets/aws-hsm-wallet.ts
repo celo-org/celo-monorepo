@@ -1,13 +1,26 @@
 import { Address, publicKeyToAddress } from '@celo/utils/lib/address'
 import { KMS } from 'aws-sdk'
+import { BigNumber } from 'bignumber.js'
 import { publicKeyFromAsn1 } from '../utils/ber-utils'
+import { bigNumberToBuffer } from '../utils/signature-utils'
 import { RemoteWallet } from './remote-wallet'
 import AwsHsmSigner from './signers/aws-hsm-signer'
 import { Signer } from './signers/signer'
 import { Wallet } from './wallet'
 
+const defaultCredentials: KMS.ClientConfiguration = {
+  region: 'eu-central-1',
+  apiVersion: '2014-11-01',
+}
+
 export default class AwsHsmWallet extends RemoteWallet implements Wallet {
   private kms: KMS | undefined
+  private credentials: KMS.ClientConfiguration
+
+  constructor(awsCredentials?: KMS.ClientConfiguration) {
+    super()
+    this.credentials = awsCredentials || defaultCredentials
+  }
 
   protected async loadAccountSigners(): Promise<Map<Address, Signer>> {
     if (!this.kms) {
@@ -22,8 +35,11 @@ export default class AwsHsmWallet extends RemoteWallet implements Wallet {
           continue
         }
 
-        const address = await this.getAddressFromKeyId(KeyId!)
-        addressToSigner.set(address, new AwsHsmSigner(this.kms, KeyId!, address))
+        const publicKey = await this.getPublicKeyFromKeyId(KeyId!)
+        addressToSigner.set(
+          publicKeyToAddress(bigNumberToBuffer(publicKey, 64).toString('hex')),
+          new AwsHsmSigner(this.kms, KeyId!, publicKey)
+        )
       } catch (e) {
         // todo: what does the error look like here
         throw e
@@ -33,14 +49,19 @@ export default class AwsHsmWallet extends RemoteWallet implements Wallet {
   }
 
   private generateKmsClient() {
-    return new KMS({ region: 'eu-central-1', apiVersion: '2014-11-01' })
+    return new KMS(this.credentials)
   }
 
-  public async getAddressFromKeyId(keyId: string): Promise<string> {
+  private async getPublicKeyFromKeyId(keyId: string): Promise<BigNumber> {
     if (!this.kms) {
       throw new Error('AwsHsmWallet needs to be initialised first')
     }
     const { PublicKey } = await this.kms.getPublicKey({ KeyId: keyId }).promise()
-    return publicKeyToAddress(publicKeyFromAsn1(Buffer.from(PublicKey as Uint8Array)))
+    return publicKeyFromAsn1(Buffer.from(PublicKey as Uint8Array))
+  }
+
+  public async getAddressFromKeyId(keyId: string): Promise<string> {
+    const publicKey = await this.getPublicKeyFromKeyId(keyId)
+    return publicKeyToAddress(bigNumberToBuffer(publicKey, 64).toString('hex'))
   }
 }

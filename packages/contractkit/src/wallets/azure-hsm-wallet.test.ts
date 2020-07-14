@@ -9,7 +9,7 @@ import { BigNumber } from 'bignumber.js'
 import * as ethUtil from 'ethereumjs-util'
 import Web3 from 'web3'
 import { EncodedTransaction, Tx } from 'web3-core'
-import { Signature } from '../utils/azure-key-vault-client'
+import { Signature } from '../utils/signature-utils'
 import { recoverTransaction, verifyEIP712TypedDataSigner } from '../utils/signing-utils'
 import { AzureHSMWallet } from './azure-hsm-wallet'
 import {

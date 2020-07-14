@@ -1,5 +1,6 @@
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
+import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
 // @ts-ignore-next-line
 import { account as Account, bytes as Bytes, hash as Hash, RLP } from 'eth-lib'
@@ -7,6 +8,8 @@ import * as ethUtil from 'ethereumjs-util'
 import { EncodedTransaction, Tx } from 'web3-core'
 import * as helpers from 'web3-core-helpers'
 import { EIP712TypedData, generateTypedDataHash } from './sign-typed-data-utils'
+import { ecdsaRecover } from 'secp256k1'
+import { bufferToBigNumber } from './signature-utils'
 
 const debug = debugFactory('kit:tx:sign')
 
@@ -213,4 +216,30 @@ export function decodeSig(sig: any) {
     r: ethUtil.toBuffer(r) as Buffer,
     s: ethUtil.toBuffer(s) as Buffer,
   }
+}
+
+/**
+ * Attempts each recovery key to find a match
+ */
+export function recoverKeyIndex(
+  signature: Uint8Array,
+  publicKey: BigNumber,
+  hash: Uint8Array
+): number {
+  for (let i = 0; i < 4; i++) {
+    const compressed = false
+    const recoveredPublicKeyByteArr = ecdsaRecover(signature, i, hash, compressed)
+    const publicKeyBuff = Buffer.from(recoveredPublicKeyByteArr)
+    const recoveredPublicKey = bufferToBigNumber(publicKeyBuff)
+    console.log(
+      'Recovered key: ' + recoveredPublicKey,
+      'expected',
+      publicKey,
+      publicKey.eq(recoveredPublicKey)
+    )
+    if (publicKey.eq(recoveredPublicKey)) {
+      return i
+    }
+  }
+  throw new Error('Unable to generate recovery key from signature.')
 }

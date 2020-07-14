@@ -4,8 +4,8 @@ import { SecretClient } from '@azure/keyvault-secrets'
 import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
 import { ec as EC } from 'elliptic'
-import { ecdsaRecover } from 'secp256k1'
 import { bigNumberToBuffer, bufferToBigNumber, isCanonical, Signature } from './signature-utils'
+import { recoverKeyIndex } from './signing-utils'
 
 const debug = debugFactory('kit:wallet:akv-client')
 
@@ -105,11 +105,7 @@ export class AzureKeyVaultClient {
     const publicKey = await this.getPublicKey(keyName)
 
     // Azure doesn't provide the recovery key in the signature
-    const recoveryParam = AzureKeyVaultClient.recoverKeyIndex(
-      canonicalizedSignature,
-      publicKey,
-      message
-    )
+    const recoveryParam = recoverKeyIndex(canonicalizedSignature, publicKey, message)
     return new Signature(recoveryParam, rBuff, sBuff)
   }
 
@@ -131,27 +127,6 @@ export class AzureKeyVaultClient {
       throw new Error(`Could not locate secret ${secretName} in vault ${this.vaultName}`)
     }
     return secret.value
-  }
-
-  /**
-   * Attempts each recovery key to find a match
-   */
-  private static recoverKeyIndex(
-    signature: Uint8Array,
-    publicKey: BigNumber,
-    hash: Uint8Array
-  ): number {
-    for (let i = 0; i < 4; i++) {
-      const compressed = false
-      const recoveredPublicKeyByteArr = ecdsaRecover(signature, i, hash, compressed)
-      const publicKeyBuff = Buffer.from(recoveredPublicKeyByteArr)
-      const recoveredPublicKey = bufferToBigNumber(publicKeyBuff)
-      debug('Recovered key: ' + recoveredPublicKey)
-      if (publicKey.eq(recoveredPublicKey)) {
-        return i
-      }
-    }
-    throw new Error('Unable to generate recovery key from signature.')
   }
 
   private async getKey(keyName: string): Promise<KeyVaultKey> {
