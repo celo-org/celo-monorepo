@@ -13,6 +13,7 @@ import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/sele
 import { showErrorOrFallback } from 'src/alert/actions'
 import { IdentityEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
+import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { USE_PHONE_NUMBER_PRIVACY } from 'src/config'
 import {
@@ -282,9 +283,17 @@ const isValidNon0Address = (address: string) =>
 export function getAddressFromPhoneNumber(
   e164Number: string,
   e164NumberToAddress: E164NumberToAddressType,
-  secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
+  secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping,
+  type: TokenTransactionType,
+  requesterAddress?: string
 ): string | null | undefined {
   const addresses = e164NumberToAddress[e164Number]
+
+  // If there are no verified addresses for the number and it is a payment request,
+  // use the requester's given address
+  if (!addresses && type === TokenTransactionType.PayRequest && requesterAddress) {
+    return requesterAddress
+  }
 
   // If address is null (unverified) or undefined (in the process
   // of being updated) then just return that falsy value

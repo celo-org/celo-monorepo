@@ -76,6 +76,7 @@ export function* validateRecipientAddressSaga({
     }
   }
 }
+
 function* watchVerification() {
   yield takeLatest(Actions.START_VERIFICATION, startVerification)
 }
