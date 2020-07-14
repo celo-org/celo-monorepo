@@ -99,7 +99,7 @@ export default function IncomingPaymentRequestListItem({ id, amount, comment, re
         navigateToNextScreen()
       }
     }
-  }, [isFetchingAddresses])
+  }, [isFetchingAddresses, error])
 
   return (
     <View style={styles.container}>
