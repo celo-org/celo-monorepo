@@ -58,7 +58,7 @@ export default function IncomingPaymentRequestListItem({ id, amount, comment, re
     if (e164PhoneNumber) {
       setIsLoading(true)
       // Need to check latest mapping to prevent user from accepting fradulent requests
-      dispatch(fetchAddressesAndValidate(e164PhoneNumber))
+      dispatch(fetchAddressesAndValidate(e164PhoneNumber, recipient.address))
     } else {
       navigateToNextScreen()
     }

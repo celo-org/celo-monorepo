@@ -153,7 +153,10 @@ function* updateRecipientsCache(
   yield put(setRecipientCache({ ...e164NumberToRecipients, ...otherRecipients }))
 }
 
-export function* fetchAddressesAndValidateSaga({ e164Number }: FetchAddressesAndValidateAction) {
+export function* fetchAddressesAndValidateSaga({
+  e164Number,
+  requesterAddress,
+}: FetchAddressesAndValidateAction) {
   ValoraAnalytics.track(IdentityEvents.phone_number_lookup_start)
   try {
     Logger.debug(TAG + '@fetchAddressesAndValidate', `Fetching addresses for number`)
@@ -182,9 +185,15 @@ export function* fetchAddressesAndValidateSaga({ e164Number }: FetchAddressesAnd
 
     const userAddress = yield select(currentAccountSelector)
     const secureSendPhoneNumberMapping = yield select(secureSendPhoneNumberMappingSelector)
+    const possibleAddresses = addresses || []
+    // In the event the fetch is being done for a payment request from an unverified
+    // address, include the unverified address in the Secure Send option set
+    if (requesterAddress && !possibleAddresses.includes(requesterAddress)) {
+      possibleAddresses.push(requesterAddress)
+    }
     const addressValidationType = checkIfValidationRequired(
       oldAddresses,
-      addresses,
+      possibleAddresses,
       userAddress,
       secureSendPhoneNumberMapping,
       e164Number

@@ -90,6 +90,7 @@ export interface UpdateE164PhoneNumberSaltAction {
 export interface FetchAddressesAndValidateAction {
   type: Actions.FETCH_ADDRESSES_AND_VALIDATION_STATUS
   e164Number: string
+  requesterAddress?: string
 }
 
 export interface ImportContactsAction {
@@ -214,9 +215,13 @@ export const completeAttestationCode = (
   numComplete,
 })
 
-export const fetchAddressesAndValidate = (e164Number: string): FetchAddressesAndValidateAction => ({
+export const fetchAddressesAndValidate = (
+  e164Number: string,
+  requesterAddress?: string
+): FetchAddressesAndValidateAction => ({
   type: Actions.FETCH_ADDRESSES_AND_VALIDATION_STATUS,
   e164Number,
+  requesterAddress,
 })
 
 export const updateE164PhoneNumberAddresses = (
