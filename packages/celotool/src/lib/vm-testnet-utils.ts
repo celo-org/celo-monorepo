@@ -291,7 +291,7 @@ async function getTestnetVars(celoEnv: string, useExistingGenesis: boolean) {
     // Cloud DNS for our domains only lives in celo-testnet
     dns_gcloud_project: 'celo-testnet',
     dns_zone_name: dnsZoneName(domainName),
-    ethstats_host: `${celoEnv}-ethstats.${domainName}.org`,
+    ethstats_host: `${celoEnv}-celostats-server.${domainName}.org`,
     forno_host: `${celoEnv}-forno.${domainName}.org`,
     gcloud_secrets_bucket: secretsBucketName(),
     gcloud_secrets_base_path: secretsBasePath(celoEnv),

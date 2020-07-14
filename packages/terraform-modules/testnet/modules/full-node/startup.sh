@@ -169,11 +169,16 @@ IN_MEMORY_DISCOVERY_TABLE_FLAG=""
 
 RPC_APIS=${rpc_apis}
 
-if [[ ${proxy} == "true" ]]; then
-  ADDITIONAL_GETH_FLAGS="--proxy.proxy --proxy.internalendpoint :30503 --proxy.proxiedvalidatoraddress $PROXIED_VALIDATOR_ADDRESS"
-fi
-
 DATA_DIR=/root/.celo
+
+if [[ ${proxy} == "true" ]]; then
+  ADDITIONAL_GETH_FLAGS="--proxy.proxy \
+    --proxy.internalendpoint :30503 \
+    --proxy.proxiedvalidatoraddress $PROXIED_VALIDATOR_ADDRESS \
+    --unlock $ACCOUNT_ADDRESS \
+    --allow-insecure-unlock \
+    --password $DATA_DIR/account/accountSecret"
+fi
 
 mkdir -p $DATA_DIR/account
 echo -n "${genesis_content_base64}" | base64 -d > $DATA_DIR/genesis.json
