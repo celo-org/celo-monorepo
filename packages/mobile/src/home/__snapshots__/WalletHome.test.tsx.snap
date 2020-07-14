@@ -19,7 +19,7 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
         "borderBottomWidth": 1,
         "flexDirection": "row",
         "height": 62,
-        "justifyContent": "space-between",
+        "justifyContent": "center",
       }
     }
   >
@@ -35,10 +35,13 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
+          "left": 8,
           "marginBottom": 0,
           "marginLeft": 4,
           "opacity": 1,
           "padding": 8,
+          "position": "absolute",
+          "top": 8,
         }
       }
     >
@@ -100,13 +103,6 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
         style={Object {}}
       />
     </svg>
-    <View
-      style={
-        Object {
-          "width": 45,
-        }
-      }
-    />
   </View>
   <RCTScrollView
     data={
@@ -263,11 +259,11 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
             Object {
               "alignItems": "center",
               "backgroundColor": "#1AB775",
-              "height": 40,
+              "height": 48,
               "justifyContent": "center",
               "minWidth": 120,
               "opacity": undefined,
-              "paddingHorizontal": 16,
+              "paddingHorizontal": 24,
               "paddingVertical": 5,
             }
           }
@@ -338,11 +334,11 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
             Object {
               "alignItems": "center",
               "backgroundColor": "#1AB775",
-              "height": 40,
+              "height": 48,
               "justifyContent": "center",
               "minWidth": 120,
               "opacity": undefined,
-              "paddingHorizontal": 16,
+              "paddingHorizontal": 24,
               "paddingVertical": 5,
             }
           }
@@ -649,7 +645,7 @@ exports[`Testnet banner Renders when disconnected 1`] = `
         "borderBottomWidth": 1,
         "flexDirection": "row",
         "height": 62,
-        "justifyContent": "space-between",
+        "justifyContent": "center",
       }
     }
   >
@@ -665,10 +661,13 @@ exports[`Testnet banner Renders when disconnected 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
+          "left": 8,
           "marginBottom": 0,
           "marginLeft": 4,
           "opacity": 1,
           "padding": 8,
+          "position": "absolute",
+          "top": 8,
         }
       }
     >
@@ -730,13 +729,6 @@ exports[`Testnet banner Renders when disconnected 1`] = `
         style={Object {}}
       />
     </svg>
-    <View
-      style={
-        Object {
-          "width": 45,
-        }
-      }
-    />
   </View>
   <RCTScrollView
     data={
@@ -893,11 +885,11 @@ exports[`Testnet banner Renders when disconnected 1`] = `
             Object {
               "alignItems": "center",
               "backgroundColor": "#1AB775",
-              "height": 40,
+              "height": 48,
               "justifyContent": "center",
               "minWidth": 120,
               "opacity": undefined,
-              "paddingHorizontal": 16,
+              "paddingHorizontal": 24,
               "paddingVertical": 5,
             }
           }
@@ -968,11 +960,11 @@ exports[`Testnet banner Renders when disconnected 1`] = `
             Object {
               "alignItems": "center",
               "backgroundColor": "#1AB775",
-              "height": 40,
+              "height": 48,
               "justifyContent": "center",
               "minWidth": 120,
               "opacity": undefined,
-              "paddingHorizontal": 16,
+              "paddingHorizontal": 24,
               "paddingVertical": 5,
             }
           }
@@ -1279,7 +1271,7 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
         "borderBottomWidth": 1,
         "flexDirection": "row",
         "height": 62,
-        "justifyContent": "space-between",
+        "justifyContent": "center",
       }
     }
   >
@@ -1295,10 +1287,13 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
+          "left": 8,
           "marginBottom": 0,
           "marginLeft": 4,
           "opacity": 1,
           "padding": 8,
+          "position": "absolute",
+          "top": 8,
         }
       }
     >
@@ -1360,13 +1355,6 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
         style={Object {}}
       />
     </svg>
-    <View
-      style={
-        Object {
-          "width": 45,
-        }
-      }
-    />
   </View>
   <RCTScrollView
     data={
@@ -1523,11 +1511,11 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
             Object {
               "alignItems": "center",
               "backgroundColor": "#1AB775",
-              "height": 40,
+              "height": 48,
               "justifyContent": "center",
               "minWidth": 120,
               "opacity": undefined,
-              "paddingHorizontal": 16,
+              "paddingHorizontal": 24,
               "paddingVertical": 5,
             }
           }
@@ -1598,11 +1586,11 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
             Object {
               "alignItems": "center",
               "backgroundColor": "#1AB775",
-              "height": 40,
+              "height": 48,
               "justifyContent": "center",
               "minWidth": 120,
               "opacity": undefined,
-              "paddingHorizontal": 16,
+              "paddingHorizontal": 24,
               "paddingVertical": 5,
             }
           }
