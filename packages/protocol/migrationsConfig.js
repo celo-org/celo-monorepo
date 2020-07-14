@@ -422,8 +422,7 @@ const NetworkConfigs = {
   },
   alfajores: {
     election: {
-      minElectableValidators: 1,
-      frozen: false,
+      minElectableValidators: 5,
     },
     epochRewards: {
       targetVotingYieldParameters: {
