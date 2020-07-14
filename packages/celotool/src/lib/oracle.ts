@@ -3,7 +3,7 @@ import { AwsClusterConfig, switchToAwsCluster } from 'src/lib/aws'
 import { assignRoleIfNotAssigned, AzureClusterConfig, createIdentityIfNotExists, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity, switchToAzureCluster } from 'src/lib/azure'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { getFornoUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInternalUrl } from 'src/lib/endpoints'
-import { addCeloEnvMiddleware, DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback, getDynamicEnvVarName } from 'src/lib/env-utils'
+import { addCeloEnvMiddleware, doCheckOrPromptIfStagingOrProduction, DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback, getDynamicEnvVarName } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
 import yargs from 'yargs'
@@ -43,20 +43,21 @@ interface OracleConfig {
 /**
  * Env vars corresponding to each value for the AzureClusterConfig for a particular context
  */
+
 const oracleContextAzureClusterConfigDynamicEnvVars: { [k in keyof AzureClusterConfig]: DynamicEnvVar } = {
+  cloudProviderName: DynamicEnvVar.ORACLE_CLOUD_PROVIDER,
+  clusterName: DynamicEnvVar.ORACLE_KUBERNETES_CLUSTER_NAME,
   subscriptionId: DynamicEnvVar.ORACLE_AZURE_SUBSCRIPTION_ID,
   tenantId: DynamicEnvVar.ORACLE_AZURE_TENANT_ID,
   resourceGroup: DynamicEnvVar.ORACLE_AZURE_KUBERNETES_RESOURCE_GROUP,
-  clusterName: DynamicEnvVar.ORACLE_KUBERNETES_CLUSTER_NAME,
 }
 
 /**
  * Env vars corresponding to each value for the AwslusterConfig for a particular context
  */
 const oracleContextAwsClusterConfigDynamicEnvVars: { [k in keyof AwsClusterConfig]: DynamicEnvVar } = {
+  cloudProviderName: DynamicEnvVar.ORACLE_CLOUD_PROVIDER,
   clusterName: DynamicEnvVar.ORACLE_KUBERNETES_CLUSTER_NAME,
-  // Given that the context has region, it is possible to not include this environment variable
-  // Could instead extract via parsing but downside is that it can be finicky
   clusterRegion: DynamicEnvVar.ORACLE_AWS_CLUSTER_REGION, 
 }
 
@@ -362,7 +363,10 @@ function getOracleAzureIdentityName(keyVaultName: string, address: string) {
  * @return an AzureClusterConfig for the context
  */
 export function getAzureClusterConfig(oracleContext: string): AzureClusterConfig {
-  return getOracleContextDynamicEnvVarValues(oracleContextAzureClusterConfigDynamicEnvVars, oracleContext)
+  const cloudProviderNameIsAzure: { [k in keyof Pick<AzureClusterConfig, 'cloudProviderName'>]: string } = {
+    cloudProviderName: "azure"
+  }
+  return getOracleContextDynamicEnvVarValues(oracleContextAzureClusterConfigDynamicEnvVars, oracleContext, cloudProviderNameIsAzure)
 }
 
 /**
@@ -371,7 +375,10 @@ export function getAzureClusterConfig(oracleContext: string): AzureClusterConfig
  * @return an AwsClusterConfig for the context
  */
 export function getAwsClusterConfig(oracleContext: string): AwsClusterConfig {
-  return getOracleContextDynamicEnvVarValues(oracleContextAwsClusterConfigDynamicEnvVars, oracleContext)
+  const cloudProviderNameIsAWS: { [k in keyof Pick<AzureClusterConfig, 'cloudProviderName'>]: string } = {
+    cloudProviderName: "aws"
+  }
+  return getOracleContextDynamicEnvVarValues(oracleContextAwsClusterConfigDynamicEnvVars, oracleContext, cloudProviderNameIsAWS)
 }
 
 /**
@@ -387,7 +394,7 @@ export function getAwsClusterConfig(oracleContext: string): AwsClusterConfig {
 export function getOracleContextDynamicEnvVarValues<T>(
   dynamicEnvVars: { [k in keyof T]: DynamicEnvVar },
   oracleContext: string,
-  defaultValues?: { [k in keyof T]: string }
+  defaultValues?: { [k in keyof Pick<T, any>]: string}
 ): {
   [k in keyof T]: string
 } {
@@ -398,7 +405,7 @@ export function getOracleContextDynamicEnvVarValues<T>(
       const dynamicEnvVarName = getDynamicEnvVarName(dynamicEnvVar, {
         oracleContext
       })
-      const defaultValue = defaultValues ? defaultValues[key] : undefined
+      const defaultValue = (defaultValues && defaultValues[key]) ? defaultValues[key] : undefined
       const value = defaultValue !== undefined ?
         fetchEnvOrFallback(dynamicEnvVarName, defaultValue) :
         fetchEnv(dynamicEnvVarName)
@@ -414,9 +421,12 @@ export function getOracleContextDynamicEnvVarValues<T>(
  * Reads the context and swithces to the appropriate Azure or AWS Cluster
  * Switches to the AKS cluster associated with the given context
  */
-export function switchToContextCluster(celoEnv: string, oracleContext: string) {
+export async function switchToContextCluster(celoEnv: string, oracleContext: string, checkOrPromptIfStagingOrProduction = true) {
   if (!isValidOracleContext(oracleContext)) {
     throw Error(`Invalid oracle context, must be one of ${fetchEnv(envVar.ORACLE_CONTEXTS)}`)
+  }
+  if (checkOrPromptIfStagingOrProduction) {
+    await doCheckOrPromptIfStagingOrProduction()
   }
   const isAwsContext = oracleContext.startsWith('AWS')
   if (isAwsContext) {
@@ -429,7 +439,7 @@ export function switchToContextCluster(celoEnv: string, oracleContext: string) {
 /**
  * Switches to the AKS cluster associated with the given context
  */
-export function switchToAzureContextCluster(celoEnv: string, oracleContext: string) {
+export async function switchToAzureContextCluster(celoEnv: string, oracleContext: string) {
   const azureClusterConfig = getAzureClusterConfig(oracleContext)
   return switchToAzureCluster(celoEnv, azureClusterConfig)
 }

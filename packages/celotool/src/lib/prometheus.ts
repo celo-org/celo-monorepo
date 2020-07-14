@@ -1,6 +1,5 @@
 import fs from 'fs'
-import { AwsClusterConfig } from 'src/lib/aws'
-import { AzureClusterConfig } from 'src/lib/azure'
+import { ClusterConfig } from 'src/lib/cloud-provider'
 import { createNamespaceIfNotExists } from './cluster'
 import { execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv } from './env-utils'
@@ -16,6 +15,7 @@ import {
 } from './service-account-utils'
 import { outputIncludes, switchToProjectFromEnv as switchToGCPProjectFromEnv } from './utils'
 
+
 const helmChartPath = '../helm-charts/prometheus-stackdriver'
 const releaseName = 'prometheus-stackdriver'
 const kubeNamespace = 'prometheus'
@@ -26,7 +26,7 @@ const sidecarImageTag = '0.7.3'
 // Prometheus container registry with latest tags: https://hub.docker.com/r/prom/prometheus/tags
 const prometheusImageTag = 'v2.17.0'
 
-export async function installPrometheusIfNotExists(clusterConfig?: AzureClusterConfig | AwsClusterConfig) {
+export async function installPrometheusIfNotExists(clusterConfig?: ClusterConfig) {
   const prometheusExists = await outputIncludes(
     `helm list`,
     `prometheus-stackdriver`,
@@ -38,7 +38,7 @@ export async function installPrometheusIfNotExists(clusterConfig?: AzureClusterC
   }
 }
 
-async function installPrometheus(clusterConfig?: AzureClusterConfig | AwsClusterConfig) {
+async function installPrometheus(clusterConfig?: ClusterConfig) {
   await createNamespaceIfNotExists('prometheus')
   return installGenericHelmChart(
     kubeNamespace,
@@ -58,7 +58,7 @@ export async function upgradePrometheus() {
 }
 
 // async function helmParameters(clusterConfig?: AzureClusterConfig) {
-async function helmParameters(clusterConfig?: AzureClusterConfig | AwsClusterConfig) {
+async function helmParameters(clusterConfig?: ClusterConfig) {
   const params = [
     `--set namespace=${kubeNamespace}`,
     `--set gcloud.project=${fetchEnv(envVar.TESTNET_PROJECT_NAME)}`,
@@ -91,7 +91,7 @@ async function helmParameters(clusterConfig?: AzureClusterConfig | AwsClusterCon
   return params
 }
 
-async function getPrometheusGcloudServiceAccountKeyBase64(clusterConfig: AzureClusterConfig | AwsClusterConfig) {
+async function getPrometheusGcloudServiceAccountKeyBase64(clusterConfig: ClusterConfig) {
   await switchToGCPProjectFromEnv()
 
   // TODO detect which cloud provider (Azure or AWS) to call correct getServiceAccountName
@@ -118,10 +118,10 @@ async function createPrometheusGcloudServiceAccount(serviceAccountName: string) 
   }
 }
 
-function getServiceAccountName(clusterConfig: AzureClusterConfig | AwsClusterConfig) {
+function getServiceAccountName(clusterConfig: ClusterConfig) {
   // Checks if resourceGroup, an Azure specific property, is present in config
-  const prefix = ('resourceGroup' in clusterConfig) ? 'aks' : 'aws'
+  const prefix = (clusterConfig.cloudProviderName === "azure") ? 'aks' : 'aws'
   // Ensure the service account name is within the length restriction
-  // and ends with an alphanumeric character
-  return `prometheus-${prefix}-${clusterConfig?.clusterName}`.substring(0, 30).replace(/[^a-zA-Z0-9]+$/g, '')
+  // and ends with an alphanumeric characters
+  return `prometheus-${prefix}-${clusterConfig.clusterName}`.substring(0, 30).replace(/[^a-zA-Z0-9]+$/g, '')
 }
