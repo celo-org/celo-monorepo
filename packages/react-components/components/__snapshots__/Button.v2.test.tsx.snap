@@ -47,7 +47,7 @@ exports[`Button when type is SECONDARY renders 1`] = `
           "justifyContent": "center",
           "minWidth": 120,
           "opacity": undefined,
-          "paddingHorizontal": 16,
+          "paddingHorizontal": 24,
           "paddingVertical": 5,
         }
       }
@@ -116,7 +116,7 @@ exports[`Button when type is TERTIARY renders 1`] = `
           "justifyContent": "center",
           "minWidth": 120,
           "opacity": undefined,
-          "paddingHorizontal": 16,
+          "paddingHorizontal": 24,
           "paddingVertical": 5,
         }
       }
@@ -185,7 +185,7 @@ exports[`Button when type not given defaults to primary 1`] = `
           "justifyContent": "center",
           "minWidth": 120,
           "opacity": undefined,
-          "paddingHorizontal": 16,
+          "paddingHorizontal": 24,
           "paddingVertical": 5,
         }
       }

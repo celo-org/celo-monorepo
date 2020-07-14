@@ -152,15 +152,12 @@ function SendAmount(props: Props) {
     }
   }, [amount, setAmount])
 
-  const getDollarAmount = React.useCallback(
-    (localAmount: BigNumber.Value) => {
-      const dollarsAmount =
-        convertLocalAmountToDollars(localAmount, localCurrencyExchangeRate) || new BigNumber('')
+  const getDollarAmount = (localAmount: BigNumber.Value) => {
+    const dollarsAmount =
+      convertLocalAmountToDollars(localAmount, localCurrencyExchangeRate) || new BigNumber('')
 
-      return convertDollarsToMaxSupportedPrecision(dollarsAmount)
-    },
-    [localCurrencyExchangeRate]
-  )
+    return convertDollarsToMaxSupportedPrecision(dollarsAmount)
+  }
 
   const parsedLocalAmount = parseInputAmount(amount, decimalSeparator)
   const dollarAmount = getDollarAmount(parsedLocalAmount)
@@ -232,7 +229,6 @@ function SendAmount(props: Props) {
       navigate(Screens.ValidateRecipientIntro, {
         transactionData,
         addressValidationType,
-        isFromScan: props.route.params?.isFromScan,
       })
     } else {
       ValoraAnalytics.track(SendEvents.send_amount_continue, continueAnalyticsParams)
@@ -256,7 +252,7 @@ function SendAmount(props: Props) {
       navigate(Screens.ValidateRecipientIntro, {
         transactionData,
         addressValidationType,
-        isPaymentRequest: true,
+        isOutgoingPaymentRequest: true,
       })
     } else if (recipientVerificationStatus !== RecipientVerificationStatus.VERIFIED) {
       ValoraAnalytics.track(RequestEvents.request_unavailable, continueAnalyticsParams)

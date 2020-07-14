@@ -30,11 +30,16 @@ export enum SettingsEvents {
   forno_toggle = 'forno_toggle',
   licenses_view = 'licenses_view',
   tos_view = 'tos_view',
-  // intentially not tracking analytics opt in/out
+  // intentionally not tracking analytics opt in/out
   // to avoid tracking through omission
 }
 
 export enum OnboardingEvents {
+  onboarding_education_start = 'onboarding_education_start',
+  onboarding_education_scroll = 'onboarding_education_scroll',
+  onboarding_education_complete = 'onboarding_education_complete',
+  onboarding_education_cancel = 'onboarding_education_cancel',
+
   backup_education_start = 'backup_education_start',
   backup_education_scroll = 'backup_education_scroll',
   backup_education_complete = 'backup_education_complete',
@@ -125,6 +130,10 @@ export enum VerificationEvents {
   verification_reveal_attestation_await_code_complete = 'verification_reveal_attestation_await_code_complete',
   verification_reveal_attestation_complete = 'verification_reveal_attestation_complete',
   verification_reveal_attestation_error = 'verification_reveal_attestation_error',
+
+  verification_revoke_start = 'verification_revoke_start',
+  verification_revoke_finish = 'verification_revoke_finish',
+  verification_revoke_error = 'verification_revoke_error',
 }
 
 export enum IdentityEvents {

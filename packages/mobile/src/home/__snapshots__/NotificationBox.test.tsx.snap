@@ -669,11 +669,11 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
       style={
         Object {
           "backgroundColor": "#2E3338",
-          "borderRadius": 8,
+          "borderRadius": 5,
           "flex": 0,
-          "height": 8,
+          "height": 5,
           "marginHorizontal": 5,
-          "width": 8,
+          "width": 5,
         }
       }
     />
@@ -681,11 +681,11 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
       style={
         Object {
           "backgroundColor": "#9CA4A9",
-          "borderRadius": 8,
+          "borderRadius": 5,
           "flex": 0,
-          "height": 6,
+          "height": 5,
           "marginHorizontal": 5,
-          "width": 6,
+          "width": 5,
         }
       }
     />
@@ -693,11 +693,11 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
       style={
         Object {
           "backgroundColor": "#9CA4A9",
-          "borderRadius": 8,
+          "borderRadius": 5,
           "flex": 0,
-          "height": 6,
+          "height": 5,
           "marginHorizontal": 5,
-          "width": 6,
+          "width": 5,
         }
       }
     />
@@ -705,11 +705,11 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
       style={
         Object {
           "backgroundColor": "#9CA4A9",
-          "borderRadius": 8,
+          "borderRadius": 5,
           "flex": 0,
-          "height": 6,
+          "height": 5,
           "marginHorizontal": 5,
-          "width": 6,
+          "width": 5,
         }
       }
     />

@@ -6,6 +6,8 @@ import { RpcCaller } from '../../utils/rpc-caller'
 import { decodeSig } from '../../utils/signing-utils'
 import { Signer } from './signer'
 
+const INCORRECT_PASSWORD_ERROR = 'could not decrypt key with given password'
+
 const currentTimeInSeconds = () => Math.round(Date.now() / 1000)
 
 const toRpcHex = (val: string | number | BigNumber | BN | undefined) => {
@@ -102,15 +104,26 @@ export class RpcSigner implements Signer {
 
   getNativeKey = () => this.account
 
-  async unlock(passphrase: string, duration: number) {
-    const unlocked = await this.callAndCheckResponse(RpcSignerEndpoint.UnlockAccount, [
-      this.account,
-      passphrase,
-      duration,
-    ])
+  async unlock(passphrase: string, duration: number): Promise<boolean> {
+    try {
+      await this.callAndCheckResponse(RpcSignerEndpoint.UnlockAccount, [
+        this.account,
+        passphrase,
+        duration,
+      ])
+    } catch (error) {
+      // The callAndCheckResponse will throw an error if the passphrase is incorrect
+      if (error?.message?.toLowerCase()?.includes(INCORRECT_PASSWORD_ERROR)) {
+        return false
+      }
+
+      // Re-throw otherwise
+      throw error
+    }
+
     this.unlockTime = currentTimeInSeconds()
     this.unlockDuration = duration
-    return unlocked
+    return true
   }
 
   isUnlocked() {
