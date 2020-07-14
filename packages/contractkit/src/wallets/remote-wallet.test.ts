@@ -11,7 +11,7 @@ class RemoteWalletImpl extends RemoteWallet {
   }
 }
 
-describe('AzureHSMWallet class', () => {
+describe('RemoteWallet', () => {
   let wallet: RemoteWalletImpl
 
   // validate env file

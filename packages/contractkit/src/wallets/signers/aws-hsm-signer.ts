@@ -4,7 +4,12 @@ import BigNumber from 'bignumber.js'
 import { ec as EC } from 'elliptic'
 import * as ethUtil from 'ethereumjs-util'
 import { parseBERSignature } from '../../utils/ber-utils'
-import { bigNumberToBuffer, bufferToBigNumber, isCanonical } from '../../utils/signature-utils'
+import {
+  bigNumberToBuffer,
+  bufferToBigNumber,
+  isCanonical,
+  Signature,
+} from '../../utils/signature-utils'
 import { getHashFromEncoded, RLPEncodedTx } from '../../utils/signing-utils'
 import { Signer } from './signer'
 
@@ -63,7 +68,7 @@ export default class AwsHsmSigner implements Signer {
     return { S: S!, R: R! }
   }
 
-  private async sign(buffer: Buffer): Promise<{ v: number; r: Buffer; s: Buffer }> {
+  private async sign(buffer: Buffer): Promise<Signature> {
     const { R, S } = await this.findCanonicalSignature(buffer)
     const rBuff = bigNumberToBuffer(R, 32)
     const sBuff = bigNumberToBuffer(S, 32)
@@ -76,10 +81,7 @@ export default class AwsHsmSigner implements Signer {
     }
   }
 
-  async signTransaction(
-    addToV: number,
-    encodedTx: RLPEncodedTx
-  ): Promise<{ v: number; r: Buffer; s: Buffer }> {
+  async signTransaction(addToV: number, encodedTx: RLPEncodedTx): Promise<Signature> {
     const hash = getHashFromEncoded(encodedTx.rlpEncode)
     const bufferedMessage = Buffer.from(trimLeading0x(hash), 'hex')
     const { v, r, s } = await this.sign(bufferedMessage)
@@ -91,7 +93,7 @@ export default class AwsHsmSigner implements Signer {
     }
   }
 
-  async signPersonalMessage(data: string): Promise<{ v: number; r: Buffer; s: Buffer }> {
+  async signPersonalMessage(data: string): Promise<Signature> {
     const dataBuff = ethUtil.toBuffer(ensureLeading0x(data))
     const msgHashBuff = ethUtil.hashPersonalMessage(dataBuff) as Buffer
     const { v, r, s } = await this.sign(msgHashBuff)

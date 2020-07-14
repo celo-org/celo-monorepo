@@ -5,7 +5,7 @@ import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
 import { ec as EC } from 'elliptic'
 import { ecdsaRecover } from 'secp256k1'
-import { bigNumberToBuffer, bufferToBigNumber, isCanonical } from './signature-utils'
+import { bigNumberToBuffer, bufferToBigNumber, isCanonical, Signature } from './signature-utils'
 
 const debug = debugFactory('kit:wallet:akv-client')
 
@@ -186,17 +186,5 @@ export class AzureKeyVaultClient {
     }
 
     return this.cryptographyClientSet.get(keyName)!
-  }
-}
-
-export class Signature {
-  public v: number
-  public r: Buffer
-  public s: Buffer
-
-  constructor(v: number, r: Buffer, s: Buffer) {
-    this.v = v
-    this.r = r
-    this.s = s
   }
 }

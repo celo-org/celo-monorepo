@@ -21,3 +21,15 @@ export const bigNumberToBuffer = (input: BigNumber, lengthInBytes: number): Buff
   }
   return ethUtil.toBuffer(ensureLeading0x(hex)) as Buffer
 }
+
+export class Signature {
+  public v: number
+  public r: Buffer
+  public s: Buffer
+
+  constructor(v: number, r: Buffer, s: Buffer) {
+    this.v = v
+    this.r = r
+    this.s = s
+  }
+}

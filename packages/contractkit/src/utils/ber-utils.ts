@@ -10,8 +10,8 @@ export const toArrayBuffer = (buffer: Buffer): ArrayBuffer => {
   return ab
 }
 
-export function publicKeyFromAsn1(buf: Buffer): string {
-  const { result } = asn1.fromBER(toArrayBuffer(buf))
+export function publicKeyFromAsn1(b: Buffer): string {
+  const { result } = asn1.fromBER(b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength))
   const values = (result as asn1.Sequence).valueBlock.value
   const value = values[1] as asn1.BitString
   return ensureLeading0x(Buffer.from(value.valueBlock.valueHex.slice(1)).toString('hex'))
@@ -20,8 +20,8 @@ export function publicKeyFromAsn1(buf: Buffer): string {
 /**
  * AWS returns DER encoded signatures but DER is valid BER
  */
-export function parseBERSignature(sig: Buffer): { r: Buffer; s: Buffer } {
-  const { result } = asn1.fromBER(toArrayBuffer(sig))
+export function parseBERSignature(b: Buffer): { r: Buffer; s: Buffer } {
+  const { result } = asn1.fromBER(b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength))
 
   const part1 = (result as asn1.Sequence).valueBlock.value[0] as asn1.BitString
   const part2 = (result as asn1.Sequence).valueBlock.value[1] as asn1.BitString
