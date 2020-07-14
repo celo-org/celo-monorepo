@@ -175,8 +175,8 @@ function logResponseDiscrepancies(responses: SignMsgRespWithStatus[]) {
       const values = successfulResponses.map((response) => {
         return {
           signer: response.url,
-          performedQueryCount: response.signMessageResponse!.performedQueryCount,
-          totalQuota: response.signMessageResponse!.totalQuota,
+          performedQueryCount: response.signMessageResponse.performedQueryCount,
+          totalQuota: response.signMessageResponse.totalQuota,
         }
       })
       logger.error(`Discrepancy found in signers' measured quota values ${values}`)
@@ -189,7 +189,7 @@ function logResponseDiscrepancies(responses: SignMsgRespWithStatus[]) {
       const values = successfulResponses.map((response) => {
         return {
           signer: response.url,
-          blockNumber: response.signMessageResponse!.blockNumber,
+          blockNumber: response.signMessageResponse.blockNumber,
         }
       })
       logger.error(
