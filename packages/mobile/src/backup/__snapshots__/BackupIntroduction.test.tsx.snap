@@ -18,7 +18,7 @@ exports[`BackupIntroduction renders correctly when backup completed 1`] = `
         "borderBottomWidth": 1,
         "flexDirection": "row",
         "height": 62,
-        "justifyContent": "space-between",
+        "justifyContent": "center",
       }
     }
   >
@@ -34,10 +34,13 @@ exports[`BackupIntroduction renders correctly when backup completed 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
+          "left": 8,
           "marginBottom": 0,
           "marginLeft": 4,
           "opacity": 1,
           "padding": 8,
+          "position": "absolute",
+          "top": 8,
         }
       }
     >
@@ -76,13 +79,6 @@ exports[`BackupIntroduction renders correctly when backup completed 1`] = `
         />
       </svg>
     </View>
-    <View
-      style={
-        Object {
-          "width": 45,
-        }
-      }
-    />
   </View>
   <RCTScrollView
     contentContainerStyle={
@@ -202,7 +198,7 @@ exports[`BackupIntroduction renders correctly when backup not complete 1`] = `
         "borderBottomWidth": 1,
         "flexDirection": "row",
         "height": 62,
-        "justifyContent": "space-between",
+        "justifyContent": "center",
       }
     }
   >
@@ -218,10 +214,13 @@ exports[`BackupIntroduction renders correctly when backup not complete 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
+          "left": 8,
           "marginBottom": 0,
           "marginLeft": 4,
           "opacity": 1,
           "padding": 8,
+          "position": "absolute",
+          "top": 8,
         }
       }
     >
@@ -260,13 +259,6 @@ exports[`BackupIntroduction renders correctly when backup not complete 1`] = `
         />
       </svg>
     </View>
-    <View
-      style={
-        Object {
-          "width": 45,
-        }
-      }
-    />
   </View>
   <RCTScrollView
     contentContainerStyle={
@@ -374,7 +366,7 @@ exports[`BackupIntroduction renders correctly when backup not complete 1`] = `
                 "justifyContent": "center",
                 "minWidth": 120,
                 "opacity": undefined,
-                "paddingHorizontal": 16,
+                "paddingHorizontal": 24,
                 "paddingVertical": 5,
               }
             }

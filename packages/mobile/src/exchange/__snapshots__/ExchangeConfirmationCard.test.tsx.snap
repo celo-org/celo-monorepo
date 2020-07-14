@@ -433,9 +433,9 @@ exports[`renders correctly with giant numbers 1`] = `
                     },
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Bold",
+                      "fontFamily": "Inter-SemiBold",
                       "fontSize": 16,
-                      "lineHeight": 24,
+                      "lineHeight": 22,
                     },
                   ]
                 }
@@ -454,9 +454,9 @@ exports[`renders correctly with giant numbers 1`] = `
                   },
                   Object {
                     "color": "#2E3338",
-                    "fontFamily": "Hind-Bold",
+                    "fontFamily": "Inter-SemiBold",
                     "fontSize": 16,
-                    "lineHeight": 24,
+                    "lineHeight": 22,
                   },
                 ]
               }
@@ -1007,9 +1007,9 @@ exports[`renders correctly with no exchange rate 1`] = `
                     },
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Bold",
+                      "fontFamily": "Inter-SemiBold",
                       "fontSize": 16,
-                      "lineHeight": 24,
+                      "lineHeight": 22,
                     },
                   ]
                 }
@@ -1028,9 +1028,9 @@ exports[`renders correctly with no exchange rate 1`] = `
                   },
                   Object {
                     "color": "#2E3338",
-                    "fontFamily": "Hind-Bold",
+                    "fontFamily": "Inter-SemiBold",
                     "fontSize": 16,
-                    "lineHeight": 24,
+                    "lineHeight": 22,
                   },
                 ]
               }
