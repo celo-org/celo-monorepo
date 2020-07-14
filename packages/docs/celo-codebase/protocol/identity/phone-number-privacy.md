@@ -4,7 +4,7 @@ Celo's [identity protocol](README.md) allows users to associate their phone numb
 
 ## Understanding the problem
 
-When a users sends a payment to someone in their phone's address book, the mobile client must look up the identifier for that phone number on-chain to find the corresponding Celo blockchain address, which is needed in order to complete the payment transaction. If the identifier was simply the recipients phone number, then anyone would be able to associate phone numbers with blockhain accounts and balances. If instead, the identifier was the hash of the recipient's phone number, attackers would still be able to associate phone numbers with blockchain accounts and balances via a [rainbow table attack](https://en.wikipedia.org/wiki/Rainbow_table).
+When a user sends a payment to someone in their phone's address book, the mobile client must look up the identifier for that phone number on-chain to find the corresponding Celo blockchain address. This address is needed in order to complete the payment transaction. If the identifier was simply the recipient's phone number, then anyone would be able to associate their phone number with their blockchain account and balance. If instead, the identifier was the hash of the recipient's phone number, attackers would still be able to associate their phone number with their blockchain account and balance via a [rainbow table attack](https://en.wikipedia.org/wiki/Rainbow_table).
 
 ## The solution
 
