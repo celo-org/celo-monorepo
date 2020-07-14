@@ -5,9 +5,9 @@ import {
   getStorageLayout,
   Operation,
   StorageLayoutInfo
-} from '@openzeppelin/upgrades'
-import { Contract as Web3Contract } from 'web3-eth-contract'
-const Web3 = require('web3')
+} from '@openzeppelin/upgrades';
+import { Contract as Web3Contract } from 'web3-eth-contract';
+const  Web3 = require('web3')
 
 const web3 = new Web3(null)
 
@@ -32,23 +32,23 @@ interface Artifact {
 
 // Inlined from OpenZeppelin SDK since its not exported.
 interface TypeInfo {
-  id: string
-  kind: string
-  label: string
-  valueType?: string
-  length?: number
-  members?: StorageInfo[]
-  src?: any
+  id: string;
+  kind: string;
+  label: string;
+  valueType?: string;
+  length?: number;
+  members?: StorageInfo[];
+  src?: any;
 }
 
 // Inlined from OpenZeppelin SDK since its not exported.
 interface StorageInfo {
-  label: string
-  astId: number
-  type: any
-  src: string
-  path?: string
-  contract?: string
+  label: string;
+  astId: number;
+  type: any;
+  src: string;
+  path?: string;
+  contract?: string;
 }
 
 // getStorageLayout needs an oz-sdk Contract class instance. This class is a
@@ -88,7 +88,7 @@ export interface ASTStorageCompatibilityReport {
   errors: string[]
 }
 
-const generateErrorMessage = (operation: Operation) => {
+const operationToDescription = (operation: Operation) => {
   let message: string
 
   const updated = operation.updated
@@ -110,6 +110,9 @@ const generateErrorMessage = (operation: Operation) => {
     case 'rename':
       message = `variable ${updated.label} was renamed from ${original.label}`
       break
+    case 'append':
+      message = `variable ${updated.label} was appended`
+
     default:
       message = `unknown operation ${operation.action}`
   }
@@ -128,7 +131,7 @@ const generateLayoutCompatibilityReport = (oldLayout: StorageLayoutInfo, newLayo
   } else {
     return {
       compatible: false,
-      errors: incompatibilities.map(generateErrorMessage)
+      errors: incompatibilities.map(operationToDescription)
     }
   }
 }
@@ -152,7 +155,7 @@ const compareStructDefinitions = (oldType: TypeInfo, newType: TypeInfo) => {
     const oldMember = oldType.members[i]
     if (oldMember.label !== newMember.label) {
       return `struct ${newType.label} has new member ${newMember.label}`
-    }
+    } 
 
     if (oldMember.type !== newMember.type) {
       return `struct ${newType.label}'s member ${newMember.label} changed type from ${oldMember.type} to ${newMember.type}`
@@ -190,30 +193,24 @@ const generateStructsCompatibilityReport = (oldLayout: StorageLayoutInfo, newLay
   }
 }
 
-export const generateCompatibilityReport = (oldArtifact: Artifact, oldArtifacts: BuildArtifacts,
-  newArtifact: Artifact, newArtifacts: BuildArtifacts) => {
-  const oldLayout = getLayout(oldArtifact, oldArtifacts)
-  const newLayout = getLayout(newArtifact, newArtifacts)
-  const layoutReport = generateLayoutCompatibilityReport(oldLayout, newLayout)
-  const structsReport = generateStructsCompatibilityReport(oldLayout, newLayout)
-  return {
-    contract: newArtifact.contractName,
-    compatible: layoutReport.compatible && structsReport.compatible,
-    errors: layoutReport.errors.concat(structsReport.errors)
-  }
+export const generateCompatibilityReport  = (oldArtifact: Artifact, oldArtifacts: BuildArtifacts,
+                       newArtifact: Artifact, newArtifacts: BuildArtifacts) => {
+      const oldLayout = getLayout(oldArtifact, oldArtifacts)
+      const newLayout = getLayout(newArtifact, newArtifacts)
+      const layoutReport = generateLayoutCompatibilityReport(oldLayout, newLayout)
+      const structsReport = generateStructsCompatibilityReport(oldLayout, newLayout)
+      return {
+        contract: newArtifact.contractName,
+        compatible: layoutReport.compatible && structsReport.compatible,
+        errors: layoutReport.errors.concat(structsReport.errors)
+      }
 }
 
 export const reportLayoutIncompatibilities = (oldArtifacts: BuildArtifacts, newArtifacts: BuildArtifacts): ASTStorageCompatibilityReport[] => {
-  return newArtifacts.listArtifacts()
-  .map((newArtifact) => {
+  return newArtifacts.listArtifacts().map((newArtifact) => {
     const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
     if (oldArtifact !== undefined) {
       return generateCompatibilityReport(oldArtifact, oldArtifacts, newArtifact, newArtifacts)
-    }
-    return {
-      contract: newArtifact.contractName,
-      compatible: true,
-      errors: []
     }
   })
 }
