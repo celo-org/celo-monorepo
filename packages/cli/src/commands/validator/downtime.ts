@@ -1,10 +1,36 @@
+import { Address } from '@celo/contractkit'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { bitIsSet, parseBlockExtraData } from '@celo/utils/lib/istanbul'
 import { flags } from '@oclif/command'
+import { cli } from 'cli-ux'
 import { readFileSync } from 'fs'
 import { BaseCommand } from '../../base'
 import { Flags } from '../../utils/command'
 import { ElectionResultsCache } from '../../utils/election'
+
+interface VerboseValidatorEntry {
+  name: string
+  group: string
+  address: Address
+  missedBlocks: number[]
+}
+
+interface ValidatorEntry {
+  address: Address
+  missedBlocks: number[]
+}
+
+export const verboseStatusTable = {
+  address: {},
+  name: {},
+  group: {},
+  missedBlocks: {},
+}
+
+export const statusTable = {
+  address: {},
+  missedBlocks: {},
+}
 
 export default class ValidatorSignedBlocks extends BaseCommand {
   static description =
@@ -34,27 +60,43 @@ export default class ValidatorSignedBlocks extends BaseCommand {
 
   async run() {
     const res = this.parse(ValidatorSignedBlocks)
-    let electionCache
-
-    // Validators added from extra data in genesis
-    const missedBlocks = new Map<string, number[]>()
 
     const latest = res.flags['at-block']
       ? res.flags['at-block'] + 1
       : (await this.web3.eth.getBlock('latest')).number
 
-    // If running from genesis, do that, otherwise pull from contracts..
+    let electionCache
+    let validators, accounts
+    let haveContracts
     let electedSigners: string[]
-    if (!res.flags.genesis) {
+    const validatorToGroupName = new Map<Address, string>()
+    // Try to get contracts, if not try to fall back to genesis block
+    try {
       const election = await this.kit.contracts.getElection()
-      const validators = await this.kit.contracts.getValidators()
+      accounts = await this.kit.contracts.getAccounts()
+      validators = await this.kit.contracts.getValidators()
+      const vgroups = await validators.getRegisteredValidatorGroups()
+      for (const group of vgroups) {
+        for (const member of group.members) {
+          validatorToGroupName.set(member, group.name || '')
+        }
+      }
       const epochSize = await validators.getEpochSize()
       electionCache = new ElectionResultsCache(election, epochSize.toNumber())
       electedSigners = await electionCache.electedSigners(latest)
-    } else {
-      const genesisJson = JSON.parse(readFileSync(res.flags.genesis, 'utf-8'))
-      electedSigners = parseBlockExtraData(genesisJson.extraData).addedValidators
+      haveContracts = true
+    } catch {
+      if (res.flags.genesis) {
+        const genesisJson = JSON.parse(readFileSync(res.flags.genesis, 'utf-8'))
+        electedSigners = parseBlockExtraData(genesisJson.extraData).addedValidators
+      } else {
+        this.error('If contracts are not deployed, must provide the genesis block')
+      }
+      haveContracts = false
     }
+
+    // Validators added from extra data in genesis
+    const missedBlocks = new Map<string, number[]>()
 
     // Get blocks
     const blocks = await concurrentMap(10, [...Array(res.flags.lookback).keys()], (i) =>
@@ -63,7 +105,7 @@ export default class ValidatorSignedBlocks extends BaseCommand {
     // Calculate uptime
     for (const block of blocks) {
       // Grab new validators on new epoch
-      if (!res.flags.genesis) {
+      if (haveContracts) {
         // @ts-ignore
         electedSigners = await electionCache.electedSigners(block.number)
       }
@@ -80,8 +122,28 @@ export default class ValidatorSignedBlocks extends BaseCommand {
     }
 
     // Print info
-    for (const [signer, missed] of missedBlocks) {
-      console.info(`${signer} missed: ${missed}`)
+    if (haveContracts) {
+      const info: VerboseValidatorEntry[] = []
+      for (const [signer, missed] of missedBlocks) {
+        // @ts-ignore
+        const validator = await accounts.signerToAccount(signer)
+        let name = 'Unregistered Validator'
+        let group = ''
+        // @ts-ignore
+        if (await validators.isValidator(validator)) {
+          // @ts-ignore
+          name = (await accounts.getName(validator)) || ''
+          group = validatorToGroupName.get(validator) || ''
+        }
+        info.push({ address: signer, name, group, missedBlocks: missed })
+      }
+      cli.table(info, verboseStatusTable, { 'no-truncate': !res.flags.truncate })
+    } else {
+      const info: ValidatorEntry[] = []
+      for (const [signer, missed] of missedBlocks) {
+        info.push({ address: signer, missedBlocks: missed })
+      }
+      cli.table(info, statusTable, { 'no-truncate': !res.flags.truncate })
     }
   }
 }
