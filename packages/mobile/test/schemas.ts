@@ -340,6 +340,10 @@ export const v2Schema = {
     ...v1Schema.account,
     hasMigratedToNewBip39: false,
   },
+  identity: {
+    ...v1Schema.identity,
+    isFetchingAddresses: false,
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {
