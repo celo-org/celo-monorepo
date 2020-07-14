@@ -51,8 +51,6 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
    */
   slashableDowntime = proxyCall(this.contract.methods.slashableDowntime, undefined, valueToInt)
 
-  getEpochSize = proxyCall(this.contract.methods.getEpochSize, undefined, valueToBigNumber)
-
   /**
    * Returns current configuration parameters.
    */

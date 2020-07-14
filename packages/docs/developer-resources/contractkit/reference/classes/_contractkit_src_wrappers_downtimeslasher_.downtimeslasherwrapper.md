@@ -18,7 +18,6 @@ Contract handling slashing for Validator downtime using intervals.
 
 * [events](_contractkit_src_wrappers_downtimeslasher_.downtimeslasherwrapper.md#events)
 * [getBitmapForInterval](_contractkit_src_wrappers_downtimeslasher_.downtimeslasherwrapper.md#getbitmapforinterval)
-* [getEpochSize](_contractkit_src_wrappers_downtimeslasher_.downtimeslasherwrapper.md#getepochsize)
 * [isBitmapSetForInterval](_contractkit_src_wrappers_downtimeslasher_.downtimeslasherwrapper.md#isbitmapsetforinterval)
 * [setBitmapForInterval](_contractkit_src_wrappers_downtimeslasher_.downtimeslasherwrapper.md#setbitmapforinterval)
 * [slashableDowntime](_contractkit_src_wrappers_downtimeslasher_.downtimeslasherwrapper.md#slashabledowntime)
@@ -79,7 +78,7 @@ ___
     solidityBytesToString
   )
 
-*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:89](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L89)*
+*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:87](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L87)*
 
 Calculates and returns the signature bitmap for the specified interval.
 Similar to the parentSealBitmap of every block (where you have which validators were
@@ -109,29 +108,11 @@ Name | Type |
 
 ___
 
-###  getEpochSize
-
-• **getEpochSize**: *function* = proxyCall(this.contract.methods.getEpochSize, undefined, valueToBigNumber)
-
-*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L54)*
-
-#### Type declaration:
-
-▸ (...`args`: InputArgs): *Promise‹Output›*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`...args` | InputArgs |
-
-___
-
 ###  isBitmapSetForInterval
 
 • **isBitmapSetForInterval**: *function* = proxyCall(this.contract.methods.isBitmapSetForInterval)
 
-*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:112](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L112)*
+*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:110](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L110)*
 
 Shows if the user already called the `setBitmapForInterval` for
 the specific interval.
@@ -159,7 +140,7 @@ ___
 
 • **setBitmapForInterval**: *function* = proxySend(this.kit, this.contract.methods.setBitmapForInterval)
 
-*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:102](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L102)*
+*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:100](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L100)*
 
 Calculates and sets the signature bitmap for the specified interval.
 
@@ -238,7 +219,7 @@ ___
 
 • **wasDownForInterval**: *function* = proxyCall(this.contract.methods.wasDownForInterval)
 
-*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:75](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L75)*
+*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:73](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L73)*
 
 Check if a validator appears down in the bitmap for the interval of blocks.
 Both startBlock and endBlock should be part of the same epoch.
@@ -267,7 +248,7 @@ ___
 
 • **wasDownForIntervals**: *function* = proxyCall(this.contract.methods.wasDownForIntervals)
 
-*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:140](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L140)*
+*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:138](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L138)*
 
 Returns true if a validator has been down for the specified overlapping or adjacent
 intervals.
@@ -310,7 +291,7 @@ Contract address
 
 ▸ **getConfig**(): *Promise‹[DowntimeSlasherConfig](../interfaces/_contractkit_src_wrappers_downtimeslasher_.downtimeslasherconfig.md)›*
 
-*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L59)*
+*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L57)*
 
 Returns current configuration parameters.
 
@@ -343,7 +324,7 @@ ___
 
 ▸ **getValidatorSignerIndex**(`validatorOrSignerAddress`: [Address](../modules/_contractkit_src_base_.md#address), `blockNumber`: number): *Promise‹number›*
 
-*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:177](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L177)*
+*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:175](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L175)*
 
 Determines the validator signer given an account or signer address and block number.
 
@@ -362,7 +343,7 @@ ___
 
 ▸ **slashStartSignerIndex**(`startSignerIndex`: number, `startBlocks`: number[], `endBlocks`: number[]): *Promise‹[CeloTransactionObject](_contractkit_src_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
-*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:226](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L226)*
+*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:224](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L224)*
 
 Returns true if a validator has been down for the specified overlapping or adjacent
 intervals.
@@ -383,7 +364,7 @@ ___
 
 ▸ **slashValidator**(`validatorOrSignerAddress`: [Address](../modules/_contractkit_src_base_.md#address), `startBlocks`: number[], `endBlocks`: number[]): *Promise‹[CeloTransactionObject](_contractkit_src_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
-*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:202](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L202)*
+*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:200](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L200)*
 
 Returns true if a validator has been down for the specified overlapping or adjacent
 intervals.
@@ -404,7 +385,7 @@ ___
 
 ▸ **wasValidatorDown**(`validatorOrSignerAddress`: [Address](../modules/_contractkit_src_base_.md#address), `startBlocks`: number[], `endBlocks`: number[]): *Promise‹boolean›*
 
-*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:150](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L150)*
+*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:148](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L148)*
 
 Returns true if a validator has been down for the specified overlapping or adjacent
 intervals.
@@ -427,7 +408,7 @@ ___
 
 ▸ **wasValidatorDownForInterval**(`validatorOrSignerAddress`: [Address](../modules/_contractkit_src_base_.md#address), `startBlock`: number, `endBlock`: number): *Promise‹boolean›*
 
-*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:120](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L120)*
+*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:118](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L118)*
 
 Tests if the given validator or signer has been down in the interval.
 
