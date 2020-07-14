@@ -37,7 +37,7 @@ interface SignerService {
 
 interface SignMsgRespWithStatus {
   url: string
-  signMessageResponse?: SignMessageResponse
+  signMessageResponse: SignMessageResponse
   status: number
 }
 
@@ -160,17 +160,17 @@ function logResponseDiscrepancies(responses: SignMsgRespWithStatus[]) {
     return
   }
   // Compare the first response to the rest of the responses
-  const expectedQueryCount = successfulResponses[0].signMessageResponse!.performedQueryCount!
-  const expectedTotalQuota = successfulResponses[0].signMessageResponse!.totalQuota!
-  const expectedBlockNumber = successfulResponses[0].signMessageResponse!.blockNumber!
+  const expectedQueryCount = successfulResponses[0].signMessageResponse.performedQueryCount
+  const expectedTotalQuota = successfulResponses[0].signMessageResponse.totalQuota
+  const expectedBlockNumber = successfulResponses[0].signMessageResponse.blockNumber!
   let discrepancyFound = false
   for (const resp of successfulResponses) {
     // Performed query count should never diverge; however the totalQuota may
     // diverge if the queried block number is different
     if (
-      resp.signMessageResponse!.performedQueryCount !== expectedQueryCount ||
-      (resp.signMessageResponse!.totalQuota !== expectedTotalQuota &&
-        resp.signMessageResponse!.blockNumber === expectedBlockNumber)
+      resp.signMessageResponse.performedQueryCount !== expectedQueryCount ||
+      (resp.signMessageResponse.totalQuota !== expectedTotalQuota &&
+        resp.signMessageResponse.blockNumber === expectedBlockNumber)
     ) {
       const values = successfulResponses.map((response) => {
         return {
@@ -183,7 +183,7 @@ function logResponseDiscrepancies(responses: SignMsgRespWithStatus[]) {
       discrepancyFound = true
     }
     if (
-      Math.abs(resp.signMessageResponse!.blockNumber! - expectedBlockNumber) >
+      Math.abs(resp.signMessageResponse.blockNumber! - expectedBlockNumber) >
       MAX_BLOCK_DISCREPANCY_THRESHOLD
     ) {
       const values = successfulResponses.map((response) => {
