@@ -2907,6 +2907,13 @@
     typechain "1.0.5"
     web3 "1.2.4"
 
+"@celo/phone-number-privacy-common@1.0.5":
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.5.tgz#46f0b51ae8173003f85812daa13807a180e2955c"
+  integrity sha512-znXHyBakBLArrcqnOKBiJ6XQ2fS8iltGjbB5BQTCAvoDWqtU1VjGNLyqz7q0PU2ZtHLd4YCfQ7bJUco7a69XCw==
+  dependencies:
+    bignumber.js "^9.0.0"
+
 "@celo/utils@0.1.13":
   version "0.1.13"
   resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.1.13.tgz#af0d5a5e80d2045f3514f71553cc418c8022ccc9"
