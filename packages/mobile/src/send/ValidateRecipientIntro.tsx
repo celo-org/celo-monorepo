@@ -47,11 +47,13 @@ class ValidateRecipientIntro extends React.Component<Props> {
       addressValidationType,
       transactionData,
       isOutgoingPaymentRequest,
+      requesterAddress,
     } = this.props.route.params
     navigate(Screens.ValidateRecipientAccount, {
       transactionData,
       addressValidationType,
       isOutgoingPaymentRequest,
+      requesterAddress,
     })
 
     ValoraAnalytics.track(SendEvents.send_secure_start, { confirmByScan: false })

@@ -187,8 +187,8 @@ export function* fetchAddressesAndValidateSaga({
     const userAddress = yield select(currentAccountSelector)
     const secureSendPhoneNumberMapping = yield select(secureSendPhoneNumberMappingSelector)
     const possibleAddresses = addresses || []
-    // In the event the fetch is being done for a payment request from an unverified
-    // address, include the unverified address in the Secure Send option set
+    // If fetch is being done as part of a payment request from an unverified address,
+    // the unverified address should be considered in the Secure Send check
     if (requesterAddress && !possibleAddresses.includes(requesterAddress)) {
       possibleAddresses.push(requesterAddress)
     }

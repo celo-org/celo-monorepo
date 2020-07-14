@@ -53,12 +53,13 @@ export default function IncomingPaymentRequestListItem({ id, amount, comment, re
   const { recipient } = transactionData
   const { e164PhoneNumber } = recipient
   const addressValidationType = getAddressValidationType(recipient, secureSendPhoneNumberMapping)
+  const requesterAddress = requester.address
 
   const onPay = () => {
     if (e164PhoneNumber) {
       setIsLoading(true)
       // Need to check latest mapping to prevent user from accepting fradulent requests
-      dispatch(fetchAddressesAndValidate(e164PhoneNumber, recipient.address))
+      dispatch(fetchAddressesAndValidate(e164PhoneNumber, requesterAddress))
     } else {
       navigateToNextScreen()
     }
@@ -79,11 +80,16 @@ export default function IncomingPaymentRequestListItem({ id, amount, comment, re
   }
 
   const navigateToNextScreen = () => {
+    console.log(`${recipient.e164PhoneNumber}: ${addressValidationType}`)
     if (
       addressValidationType === AddressValidationType.FULL ||
       addressValidationType === AddressValidationType.PARTIAL
     ) {
-      navigate(Screens.ValidateRecipientIntro, { transactionData, addressValidationType })
+      navigate(Screens.ValidateRecipientIntro, {
+        transactionData,
+        addressValidationType,
+        requesterAddress,
+      })
     } else {
       navigate(Screens.SendConfirmation, { transactionData })
     }

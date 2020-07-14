@@ -128,6 +128,7 @@ export interface ValidateRecipientAddressAction {
   userInputOfFullAddressOrLastFourDigits: string
   addressValidationType: AddressValidationType
   recipient: Recipient
+  requesterAddress?: string
 }
 
 export interface ValidateRecipientAddressSuccessAction {
@@ -277,12 +278,14 @@ export const addContactsMatches = (matches: ContactMatches): AddContactMatchesAc
 export const validateRecipientAddress = (
   userInputOfFullAddressOrLastFourDigits: string,
   addressValidationType: AddressValidationType,
-  recipient: Recipient
+  recipient: Recipient,
+  requesterAddress?: string
 ): ValidateRecipientAddressAction => ({
   type: Actions.VALIDATE_RECIPIENT_ADDRESS,
   userInputOfFullAddressOrLastFourDigits,
   addressValidationType,
   recipient,
+  requesterAddress,
 })
 
 export const validateRecipientAddressSuccess = (
