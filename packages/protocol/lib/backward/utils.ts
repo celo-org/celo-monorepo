@@ -1,7 +1,7 @@
 import { reportASTIncompatibilities } from '@celo/protocol/lib/backward/ast-code'
 import { reportLayoutIncompatibilities } from '@celo/protocol/lib/backward/ast-layout'
 import { Categorizer } from '@celo/protocol/lib/backward/categorizer'
-import { ASTReports, ASTVersionedReport } from '@celo/protocol/lib/backward/report'
+import { ASTDetailedVersionedReport, ASTReports } from '@celo/protocol/lib/backward/report'
 import { BuildArtifacts, Contracts, getBuildArtifacts } from '@openzeppelin/upgrades'
 import { readJsonSync } from 'fs-extra'
 
@@ -36,17 +36,21 @@ export class ASTBackwardReport {
     const fullReports = new ASTReports(code, storage).excluding(excludeRegexp)
     
     logFunction("Generating backward report...")
-    const versionedReport = ASTVersionedReport.create(fullReports, categorizer)
+    const versionedReport = ASTDetailedVersionedReport.create(fullReports, categorizer)
     logFunction("Done\n")
     
-    return new ASTBackwardReport(oldArtifactsFolder, newArtifactsFolder, exclude, versionedReport)
+    return new ASTBackwardReport(
+      oldArtifactsFolder,
+      newArtifactsFolder,
+      exclude,
+      versionedReport)
   }
 
   constructor(
     public readonly oldArtifactsFolder: string,
     public readonly newArtifactsFolder: string,
     public readonly exclude: string,
-    public readonly report: ASTVersionedReport
+    public readonly report: ASTDetailedVersionedReport
   ) {}
 }
 

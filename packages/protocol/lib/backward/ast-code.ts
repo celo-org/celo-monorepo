@@ -105,6 +105,8 @@ abstract class ContractValueChange extends ContractChange {
  *
  * To avoid false positives, compile both old and new folders in the same
  * full path.
+ * 
+ * This is currently not stripping any compiler metadata from the bytecode.
  */
 export class DeployedBytecodeChange extends ContractChange {
   type = "DeployedBytecode"
@@ -244,10 +246,14 @@ function getSignature(method: Method): string {
   return method.selector
 }
 
+interface MethodIndex {
+  [signature: string]: Method;
+}
+
 /**
  * @returns A method index where {key: signature => value: method}
  */
-function createMethodIndex(methods: Method[]): Method[][] {
+function createMethodIndex(methods: Method[]): MethodIndex {
   const asPairs = methods.map(m => ({ [`${getSignature(m)}`]: m }))
   return Object.assign({}, ...asPairs)
 }
@@ -331,14 +337,14 @@ function doASTCompatibilityReport(
 
   // Check for modified or missing methods in the new version
   Object.keys(oldMethods).forEach((signature: string) => {
-    const method = oldMethods[signature]
+    const method: Method = oldMethods[signature]
     if (!newMethods.hasOwnProperty(signature)) {
       // Method deleted, major change
       report.push(new MethodRemovedChange(contractName, signature))
       // Continue
       return
     }
-    const newMethod = newMethods[signature]
+    const newMethod: Method = newMethods[signature]
     report.include(checkMethodCompatibility(contractName, method, newMethod))
   })
   // Check for added methods in the new version
