@@ -1,5 +1,5 @@
-import { reportLayoutIncompatibilities } from '@celo/protocol/lib/backward/ast-layout'
-import { getTestArtifacts } from '@celo/protocol/test/backward/common'
+import { reportLayoutIncompatibilities } from '@celo/protocol/lib/compatibility/ast-layout'
+import { getTestArtifacts } from '@celo/protocol/test/compatibility/common'
 import { assert } from 'chai'
 
 const testCases = {

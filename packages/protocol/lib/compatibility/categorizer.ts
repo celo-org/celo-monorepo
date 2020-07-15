@@ -5,7 +5,7 @@ import {
   MethodMutabilityChange, MethodParametersChange, MethodRemovedChange,
   MethodReturnChange, MethodVisibilityChange, NewContractChange,
   VISIBILITY_EXTERNAL, VISIBILITY_PUBLIC
-} from '@celo/protocol/lib/backward/ast-code'
+} from '@celo/protocol/lib/compatibility/ast-code'
 
 /**
  * Change type categories according to semantic versioning standards

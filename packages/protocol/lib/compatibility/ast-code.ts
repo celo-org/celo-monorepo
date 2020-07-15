@@ -1,5 +1,5 @@
 // tslint:disable: max-classes-per-file
-import { makeZContract } from '@celo/protocol/lib/backward/internal'
+import { makeZContract } from '@celo/protocol/lib/compatibility/internal'
 import {
   BuildArtifacts,
   Contract as ZContract

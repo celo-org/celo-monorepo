@@ -2,10 +2,10 @@
 import {
   ASTCodeCompatibilityReport,
   Change
-} from '@celo/protocol/lib/backward/ast-code'
-import { ASTStorageCompatibilityReport } from '@celo/protocol/lib/backward/ast-layout'
-import { categorize, Categorizer, ChangeType } from '@celo/protocol/lib/backward/categorizer'
-import { ContractVersionDelta } from '@celo/protocol/lib/backward/version'
+} from '@celo/protocol/lib/compatibility/ast-code'
+import { ASTStorageCompatibilityReport } from '@celo/protocol/lib/compatibility/ast-layout'
+import { categorize, Categorizer, ChangeType } from '@celo/protocol/lib/compatibility/categorizer'
+import { ContractVersionDelta } from '@celo/protocol/lib/compatibility/version'
 
 /**
  * Value object holding all uncategorized storage and code reports.
