@@ -29,13 +29,14 @@ export const validateRecipientIntroScreenNavOptions = () => ({
 
 class ValidateRecipientIntro extends React.Component<Props> {
   onPressScanCode = () => {
-    const { isOutgoingPaymentRequest, transactionData } = this.props.route.params
+    const { isOutgoingPaymentRequest, transactionData, requesterAddress } = this.props.route.params
     navigate(Screens.QRNavigator, {
       screen: Screens.QRScanner,
       params: {
         transactionData,
         scanIsForSecureSend: true,
         isOutgoingPaymentRequest,
+        requesterAddress,
       },
     })
 

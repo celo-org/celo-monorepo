@@ -201,6 +201,7 @@ export type QRTabParamList = {
         scanIsForSecureSend?: true
         transactionData?: TransactionDataInput
         isOutgoingPaymentRequest?: true
+        requesterAddress?: string
       }
     | undefined
 }
