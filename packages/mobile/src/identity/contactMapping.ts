@@ -13,7 +13,6 @@ import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/sele
 import { showErrorOrFallback } from 'src/alert/actions'
 import { IdentityEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { USE_PHONE_NUMBER_PRIVACY } from 'src/config'
 import {
@@ -169,7 +168,7 @@ export function* fetchAddressesAndValidateSaga({
     // Clear existing entries for those numbers so our mapping consumers know new status is pending.
     yield put(updateE164PhoneNumberAddresses({ [e164Number]: undefined }, {}))
 
-    const addresses: string[] | null = yield call(getAddresses, e164Number)
+    const addresses: string[] = yield call(getAddresses, e164Number)
 
     const e164NumberToAddressUpdates: E164NumberToAddressType = {}
     const addressToE164NumberUpdates: AddressToE164NumberType = {}
@@ -186,15 +185,14 @@ export function* fetchAddressesAndValidateSaga({
 
     const userAddress = yield select(currentAccountSelector)
     const secureSendPhoneNumberMapping = yield select(secureSendPhoneNumberMappingSelector)
-    const possibleAddresses = addresses || []
     // If fetch is being done as part of a payment request from an unverified address,
     // the unverified address should be considered in the Secure Send check
-    if (requesterAddress && !possibleAddresses.includes(requesterAddress)) {
-      possibleAddresses.push(requesterAddress)
+    if (requesterAddress && !addresses.includes(requesterAddress)) {
+      addresses.push(requesterAddress)
     }
     const addressValidationType = checkIfValidationRequired(
       oldAddresses,
-      possibleAddresses,
+      addresses,
       userAddress,
       secureSendPhoneNumberMapping,
       e164Number
@@ -229,7 +227,7 @@ function* getAddresses(e164Number: string) {
   }
 
   const lookupResult: IdentifierLookupResult = yield call(lookupAttestationIdentifiers, [phoneHash])
-  return getAddressesFromLookupResult(lookupResult, phoneHash)
+  return getAddressesFromLookupResult(lookupResult, phoneHash) || []
 }
 
 // Returns IdentifierLookupResult
@@ -284,14 +282,13 @@ export function getAddressFromPhoneNumber(
   e164Number: string,
   e164NumberToAddress: E164NumberToAddressType,
   secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping,
-  type: TokenTransactionType,
   requesterAddress?: string
 ): string | null | undefined {
   const addresses = e164NumberToAddress[e164Number]
 
-  // If there are no verified addresses for the number and it is a payment request,
+  // If there are no verified addresses for the number,
   // use the requester's given address
-  if (!addresses && type === TokenTransactionType.PayRequest && requesterAddress) {
+  if (!addresses && requesterAddress) {
     return requesterAddress
   }
 

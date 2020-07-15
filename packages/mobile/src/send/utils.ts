@@ -28,7 +28,7 @@ export const getConfirmationInput = (
   e164NumberToAddress: E164NumberToAddressType,
   secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
 ): ConfirmationInput => {
-  const { recipient, type } = transactionData
+  const { recipient } = transactionData
   let recipientAddress: string | null | undefined
 
   if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
@@ -38,7 +38,6 @@ export const getConfirmationInput = (
       recipient.e164PhoneNumber,
       e164NumberToAddress,
       secureSendPhoneNumberMapping,
-      type,
       recipient.address
     )
   }
