@@ -534,10 +534,12 @@ contract('DowntimeSlasher', (accounts: string[]) => {
       describe('when slashing succeeds', () => {
         let resp: Truffle.TransactionResponse
         let startBlock: number
+        let endBlock: number
 
         beforeEach(async () => {
           startBlock = getFirstBlockNumberForEpoch(epoch, epochSize)
           const slotArrays = await ensureValidatorIsSlashable(startBlock, [validatorIndexInEpoch])
+          endBlock = slotArrays.endBlocks[-1]
           resp = await slasher.slash(
             slotArrays.startBlocks,
             slotArrays.endBlocks,
@@ -559,6 +561,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
             args: {
               validator: validatorList[0],
               startBlock: new BigNumber(startBlock),
+              endBlock: new BigNumber(endBlock),
             },
           })
         })
