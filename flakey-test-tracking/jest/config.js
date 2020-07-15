@@ -2,8 +2,8 @@ const { shouldTrackFlakes, numRetries, shouldSkipKnownFlakes } = require('../con
 
 const base = {
   // No flake tracking
-  testRunner: 'jest-circus/runner',
   setupFilesAfterEnv: [],
+  testRunner: 'jest-circus/runner',
 }
 
 const flakeTracking = {
