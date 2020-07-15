@@ -53,7 +53,8 @@ export default function QRScanner({ route }: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
   const inset = useSafeAreaInsets()
 
-  const { scanIsForSecureSend, isOutgoingPaymentRequest, transactionData } = route.params || {}
+  const { scanIsForSecureSend, isOutgoingPaymentRequest, transactionData, requesterAddress } =
+    route.params || {}
 
   const onBarCodeDetected = useCallback(
     memoize(
@@ -64,13 +65,14 @@ export default function QRScanner({ route }: Props) {
             qrCode,
             scanIsForSecureSend,
             transactionData,
-            isOutgoingPaymentRequest
+            isOutgoingPaymentRequest,
+            requesterAddress
           )
         )
       },
       (qrCode) => qrCode.data
     ),
-    [scanIsForSecureSend, transactionData, isOutgoingPaymentRequest]
+    [scanIsForSecureSend, transactionData, isOutgoingPaymentRequest, requesterAddress]
   )
 
   return (

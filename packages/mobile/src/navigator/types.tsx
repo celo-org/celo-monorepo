@@ -176,11 +176,13 @@ export type StackParamList = {
     transactionData: TransactionDataInput
     addressValidationType: AddressValidationType
     isOutgoingPaymentRequest?: true
+    requesterAddress?: string
   }
   [Screens.ValidateRecipientAccount]: {
     transactionData: TransactionDataInput
     addressValidationType: AddressValidationType
     isOutgoingPaymentRequest?: true
+    requesterAddress?: string
   }
   [Screens.VerificationEducationScreen]: { showSkipDialog: boolean } | undefined
   [Screens.VerificationInputScreen]: { showHelpDialog: boolean } | undefined
@@ -199,6 +201,7 @@ export type QRTabParamList = {
         scanIsForSecureSend?: true
         transactionData?: TransactionDataInput
         isOutgoingPaymentRequest?: true
+        requesterAddress?: string
       }
     | undefined
 }
