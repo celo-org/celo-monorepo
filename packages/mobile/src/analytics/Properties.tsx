@@ -3,6 +3,7 @@ import { PincodeType } from 'src/account/reducer'
 import {
   AppEvents,
   CeloExchangeEvents,
+  ContractKitEvents,
   EscrowEvents,
   FeeEvents,
   GethEvents,
@@ -535,6 +536,20 @@ interface GethEventsProperties {
   [GethEvents.start_geth_finish]: undefined
 }
 
+interface ContractKitEventsProperties {
+  [ContractKitEvents.init_contractkit_start]: undefined
+  [ContractKitEvents.init_contractkit_geth_init_start]: {
+    retries: number
+  }
+  [ContractKitEvents.init_contractkit_geth_init_finish]: undefined
+  [ContractKitEvents.init_contractkit_get_ipc_start]: undefined
+  [ContractKitEvents.init_contractkit_get_ipc_finish]: undefined
+  [ContractKitEvents.init_contractkit_get_wallet_start]: undefined
+  [ContractKitEvents.init_contractkit_get_wallet_finish]: undefined
+  [ContractKitEvents.init_contractkit_init_wallet_finish]: undefined
+  [ContractKitEvents.init_contractkit_finish]: undefined
+}
+
 export type AnalyticsPropertiesList = AppEventsProperties &
   HomeEventsProperties &
   SettingsEventsProperties &
@@ -549,4 +564,5 @@ export type AnalyticsPropertiesList = AppEventsProperties &
   FeeEventsProperties &
   TransactionEventsProperties &
   CeloExchangeEventsProperties &
-  GethEventsProperties
+  GethEventsProperties &
+  ContractKitEventsProperties

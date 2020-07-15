@@ -276,6 +276,18 @@ export enum GethEvents {
   start_geth_finish = 'start_geth_finish',
 }
 
+export enum ContractKitEvents {
+  init_contractkit_start = 'init_contractkit_start',
+  init_contractkit_geth_init_start = 'init_contractkit_geth_init_start',
+  init_contractkit_geth_init_finish = 'init_contractkit_geth_init_finish',
+  init_contractkit_get_ipc_start = 'init_contractkit_get_ipc_start',
+  init_contractkit_get_ipc_finish = 'init_contractkit_get_ipc_finish',
+  init_contractkit_get_wallet_start = 'init_contractkit_get_wallet_start',
+  init_contractkit_get_wallet_finish = 'init_contractkit_get_wallet_finish',
+  init_contractkit_init_wallet_finish = 'init_contractkit_init_wallet_finish',
+  init_contractkit_finish = 'init_contractkit_finish',
+}
+
 export type AnalyticsEventType =
   | AppEvents
   | HomeEvents
