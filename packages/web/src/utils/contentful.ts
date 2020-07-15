@@ -89,9 +89,11 @@ export async function getPage(pageSlug: string) {
   const page = await getClient(false).getEntries<ContentFulPage>({
     content_type: 'page',
     'fields.slug': !pageSlug ? 'index' : pageSlug,
+    include: 3,
   })
 
   const data = page.items[0].fields
+
   const sections = data.sections.map((section) => section.fields)
   return { ...data, sections }
 }

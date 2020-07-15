@@ -1,23 +1,39 @@
 import * as React from 'react'
 import Page from 'src/experience/common/Page'
-// import { documentToReactComponents } from '@contentful/rich-text-react-renderer'
-import { Page as SideBarEntry } from 'src/experience/common/Sidebar'
+import { documentToReactComponents } from '@contentful/rich-text-react-renderer'
+import { Document } from '@contentful/rich-text-types'
 
-import { View } from 'react-native'
+import { Page as SideBarEntry } from 'src/experience/common/Sidebar'
+import { renderNode } from './nodes'
 
 export interface Props {
   kitName: string
   metaDescription: string
   path: string
   sidebar: SideBarEntry[]
-  sections: object
+  sections: Array<{
+    name: string
+    contentField: Document
+    slug: string
+  }>
 }
 
-export default function DynamicKit({ kitName, metaDescription, path, sidebar }: Props) {
+const OPTIONS = {
+  renderNode,
+}
+
+export default function DynamicKit({ kitName, metaDescription, path, sidebar, sections }: Props) {
+  const children = sections.map((section) => {
+    return {
+      id: section.slug,
+      children: documentToReactComponents(section.contentField, OPTIONS),
+    }
+  })
+
   return (
     <Page
       pages={sidebar}
-      sections={[{ id: 'fake', children: <View /> }]}
+      sections={children}
       title={`${kitName}`}
       kitName={kitName}
       path={path}
