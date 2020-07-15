@@ -54,8 +54,12 @@ describe('IncomingPaymentRequestListItem', () => {
   it('navigates to send confirmation if there is no validation needed ', () => {
     const store = createMockStore({
       identity: {
-        isFetchingAddresses: true,
-        secureSendPhoneNumberMapping: {},
+        secureSendPhoneNumberMapping: {
+          [mockE164Number]: {
+            addressValidationType: AddressValidationType.NONE,
+            isFetchingAddresses: true,
+          },
+        },
       },
     })
 
@@ -67,10 +71,10 @@ describe('IncomingPaymentRequestListItem', () => {
 
     const updatedStore = createMockStore({
       identity: {
-        isFetchingAddresses: false,
         secureSendPhoneNumberMapping: {
           [mockE164Number]: {
             addressValidationType: AddressValidationType.NONE,
+            isFetchingAddresses: false,
           },
         },
       },
@@ -90,8 +94,12 @@ describe('IncomingPaymentRequestListItem', () => {
   it('navigates to secure send if there is validation needed ', () => {
     const store = createMockStore({
       identity: {
-        isFetchingAddresses: true,
-        secureSendPhoneNumberMapping: {},
+        secureSendPhoneNumberMapping: {
+          [mockE164Number]: {
+            addressValidationType: AddressValidationType.NONE,
+            isFetchingAddresses: true,
+          },
+        },
       },
     })
 
@@ -103,10 +111,10 @@ describe('IncomingPaymentRequestListItem', () => {
 
     const updatedStore = createMockStore({
       identity: {
-        isFetchingAddresses: false,
         secureSendPhoneNumberMapping: {
           [mockE164Number]: {
             addressValidationType: AddressValidationType.PARTIAL,
+            isFetchingAddresses: false,
           },
         },
       },
