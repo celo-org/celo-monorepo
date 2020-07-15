@@ -19,6 +19,15 @@ import { deleteResource, scaleResource } from './kubernetes'
 
 const helmChartPath = '../helm-charts/celo-fullnode'
 
+export interface FullNodeDeploymentConfig {
+  diskSizeGb: number
+  replicas: number
+}
+
+export interface AKSFullNodeDeploymentConfig extends FullNodeDeploymentConfig {
+  clusterConfig: AzureClusterConfig
+}
+
 export function getReleaseName(celoEnv: string) {
   return `${celoEnv}-fullnodes`
 }
@@ -31,11 +40,7 @@ function getStaticIPNamePrefix(celoEnv: string) {
   return `${celoEnv}-nodes`
 }
 
-export function getReplicaCount() {
-  return parseInt(fetchEnv(envVar.AZURE_TX_NODES_COUNT), 10)
-}
-
-export async function installFullNodeChart(celoEnv: string, clusterConfig: AzureClusterConfig) {
+export async function installFullNodeChart(celoEnv: string, deploymentConfig: AKSFullNodeDeploymentConfig) {
   const kubeNamespace = getKubeNamespace(celoEnv)
   const releaseName = getReleaseName(celoEnv)
   await createNamespaceIfNotExists(kubeNamespace)
@@ -44,18 +49,17 @@ export async function installFullNodeChart(celoEnv: string, clusterConfig: Azure
     kubeNamespace,
     releaseName,
     helmChartPath,
-    await helmParameters(celoEnv, kubeNamespace, clusterConfig)
+    await helmParameters(celoEnv, kubeNamespace, deploymentConfig)
   )
 }
 
 export async function upgradeFullNodeChart(
   celoEnv: string,
-  clusterConfig: AzureClusterConfig,
-  reset: boolean = false
+  deploymentConfig: AKSFullNodeDeploymentConfig,
+  reset: boolean
 ) {
   const kubeNamespace = getKubeNamespace(celoEnv)
   const releaseName = getReleaseName(celoEnv)
-  const replicas = getReplicaCount()
 
   if (reset) {
     await scaleResource(celoEnv, 'StatefulSet', `${celoEnv}-fullnodes`, 0)
@@ -65,54 +69,54 @@ export async function upgradeFullNodeChart(
     kubeNamespace,
     releaseName,
     helmChartPath,
-    await helmParameters(celoEnv, kubeNamespace, clusterConfig)
+    await helmParameters(celoEnv, kubeNamespace, deploymentConfig)
   )
-  await scaleResource(celoEnv, 'StatefulSet', `${celoEnv}-fullnodes`, replicas)
+  await scaleResource(celoEnv, 'StatefulSet', `${celoEnv}-fullnodes`, deploymentConfig.replicas)
   return
 }
 
-export async function removeHelmRelease(celoEnv: string, clusterConfig: AzureClusterConfig) {
+export async function removeFullNodeChart(celoEnv: string, deploymentConfig: AKSFullNodeDeploymentConfig) {
   const releaseName = getReleaseName(celoEnv)
   await removeGenericHelmChart(releaseName)
   await deletePersistentVolumeClaims(celoEnv, ['celo-fullnode'])
-  await deallocateIPs(celoEnv, clusterConfig)
+  await deallocateIPs(celoEnv, deploymentConfig)
 }
 
 async function helmParameters(
   celoEnv: string,
   kubeNamespace: string,
-  clusterConfig: AzureClusterConfig
+  deploymentConfig: AKSFullNodeDeploymentConfig
 ) {
-  const staticIps = (await allocateStaticIPs(celoEnv, clusterConfig)).join(',')
-  const replicaCount = getReplicaCount()
+  const rpcApis = 'eth,net,rpc,web3'
+  const staticIps = (await allocateStaticIPs(celoEnv, deploymentConfig)).join(',')
   return [
     `--set namespace=${kubeNamespace}`,
-    `--set replicaCount=${replicaCount}`,
-    `--set storage.size=${parseInt(fetchEnv(envVar.AZURE_TX_NODES_DISK_SIZE), 10)}Gi`,
+    `--set replicaCount=${deploymentConfig.replicas}`,
+    `--set storage.size=${deploymentConfig.diskSizeGb}Gi`,
     `--set geth.expose_rpc_externally=false`,
     `--set geth.image.repository=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY)}`,
     `--set geth.image.tag=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_TAG)}`,
     `--set geth.public_ips='{${staticIps}}'`,
+    `--set-string geth.rpc_apis='${rpcApis.split(',').join('\\\,')}'`,
     `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
     `--set genesis.network=${celoEnv}`,
   ]
 }
 
-async function allocateStaticIPs(celoEnv: string, clusterConfig: AzureClusterConfig) {
+async function allocateStaticIPs(celoEnv: string, deploymentConfig: AKSFullNodeDeploymentConfig) {
   console.info(`Creating static IPs on Azure for ${celoEnv}`)
-  const resourceGroup = await getAKSNodeResourceGroup(clusterConfig)
-  const replicaCount = getReplicaCount()
-
+  const resourceGroup = await getAKSNodeResourceGroup(deploymentConfig.clusterConfig)
+  const { replicas } = deploymentConfig
   // Deallocate static ip if we are scaling down the replica count
   const existingStaticIPsCount = await getAzureStaticIPsCount(celoEnv, resourceGroup)
-  for (let i = existingStaticIPsCount - 1; i > replicaCount - 1; i--) {
+  for (let i = existingStaticIPsCount - 1; i > replicas - 1; i--) {
     await deleteResource(celoEnv, 'service', `${celoEnv}-fullnodes-${i}`, false)
     await waitDeattachingStaticIP(`${getStaticIPNamePrefix(celoEnv)}-${i}`, resourceGroup)
     await deallocateStaticIP(`${getStaticIPNamePrefix(celoEnv)}-${i}`, resourceGroup)
   }
 
   const staticIps = await Promise.all(
-    range(replicaCount).map((i) =>
+    range(replicas).map((i) =>
       registerStaticIPIfNotRegistered(`${getStaticIPNamePrefix(celoEnv)}-${i}`, resourceGroup)
     )
   )
@@ -131,13 +135,13 @@ async function getAzureStaticIPsCount(celoEnv: string, resourceGroup: string) {
   return parseInt(staticIPsCount.trim(), 10)
 }
 
-async function deallocateIPs(celoEnv: string, clusterConfig: AzureClusterConfig) {
+async function deallocateIPs(celoEnv: string, deploymentConfig: AKSFullNodeDeploymentConfig) {
   console.info(`Deallocating static IPs on Azure for ${celoEnv}`)
 
-  const resourceGroup = await getAKSNodeResourceGroup(clusterConfig)
+  const resourceGroup = await getAKSNodeResourceGroup(deploymentConfig.clusterConfig)
   const replicaCount = await getAzureStaticIPsCount(celoEnv, resourceGroup)
 
-  await waitDeattachingStaticIPs(celoEnv, clusterConfig)
+  await waitDeattachingStaticIPs(celoEnv, deploymentConfig)
 
   await Promise.all(
     range(replicaCount).map((i) =>
@@ -146,12 +150,11 @@ async function deallocateIPs(celoEnv: string, clusterConfig: AzureClusterConfig)
   )
 }
 
-async function waitDeattachingStaticIPs(celoEnv: string, clusterConfig: AzureClusterConfig) {
-  const replicaCount = getReplicaCount()
-  const resourceGroup = await getAKSNodeResourceGroup(clusterConfig)
+async function waitDeattachingStaticIPs(celoEnv: string, deploymentConfig: AKSFullNodeDeploymentConfig) {
+  const resourceGroup = await getAKSNodeResourceGroup(deploymentConfig.clusterConfig)
 
   await Promise.all(
-    range(replicaCount).map((i) =>
+    range(deploymentConfig.replicas).map((i) =>
       waitDeattachingStaticIP(`${getStaticIPNamePrefix(celoEnv)}-${i}`, resourceGroup)
     )
   )

@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`FiatExchange renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -14,13 +14,11 @@ exports[`FiatExchange renders correctly 1`] = `
       Object {
         "alignItems": "center",
         "backgroundColor": "transparent",
-        "borderBottomColor": AnimatedValue {
-          " __value": NaN,
-        },
+        "borderBottomColor": 0,
         "borderBottomWidth": 1,
         "flexDirection": "row",
         "height": 62,
-        "justifyContent": "space-between",
+        "justifyContent": "center",
       }
     }
   >
@@ -36,10 +34,13 @@ exports[`FiatExchange renders correctly 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
+          "left": 8,
           "marginBottom": 0,
           "marginLeft": 4,
           "opacity": 1,
           "padding": 8,
+          "position": "absolute",
+          "top": 8,
         }
       }
     >
@@ -78,13 +79,6 @@ exports[`FiatExchange renders correctly 1`] = `
         />
       </svg>
     </View>
-    <View
-      style={
-        Object {
-          "width": 45,
-        }
-      }
-    />
   </View>
   <View
     style={
@@ -142,31 +136,24 @@ exports[`FiatExchange renders correctly 1`] = `
       0.00
     </Text>
     <Text
+      numberOfLines={1}
       style={
-        Object {
-          "color": "#9CA4A9",
-          "fontFamily": "Inter-Regular",
-          "fontSize": 14,
-          "lineHeight": 18,
-        }
+        Array [
+          Object {
+            "color": "#9CA4A9",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+          },
+          Object {
+            "color": "#9CA4A9",
+          },
+        ]
       }
     >
-      <Text
-        numberOfLines={1}
-        style={
-          Array [
-            undefined,
-            Object {
-              "color": undefined,
-            },
-          ]
-        }
-      >
-        
-        0.00
-      </Text>
-       
-      Celo Dollars
+      
+      0.00
+       global:celoDollars
     </Text>
   </View>
   <View>
@@ -220,5 +207,5 @@ exports[`FiatExchange renders correctly 1`] = `
       </View>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

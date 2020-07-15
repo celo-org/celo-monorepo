@@ -31,12 +31,6 @@ interface SignerService {
   url: string
 }
 
-interface SignMsgRespWithStatus {
-  url: string
-  signature?: string
-  status: number
-}
-
 export async function handleGetDistributedBlindedMessageForSalt(
   request: Request<{}, {}, GetBlindedMessageForSaltRequest>,
   response: Response
@@ -62,7 +56,6 @@ export async function handleGetDistributedBlindedMessageForSalt(
 
 async function requestSignatures(request: Request, response: Response) {
   let successCount = 0
-  const responses: SignMsgRespWithStatus[] = []
   const signatures: ServicePartialSignature[] = []
   const errorCodes: Map<number, number> = new Map()
 
@@ -77,22 +70,24 @@ async function requestSignatures(request: Request, response: Response) {
     return requestSignature(service, request, controller)
       .then(async (res: FetchResponse) => {
         const status = res.status
+        const url = service.url
+        logger.info(`Service ${url} returned status ${status}`)
         if (res.ok) {
           const signResponse = (await res.json()) as SignMessageResponse
-          responses.push({ url: service.url, signature: signResponse.signature, status })
-          signatures.push({ url: service.url, signature: signResponse.signature })
+          signatures.push({ url, signature: signResponse.signature })
           successCount += 1
           // Send response immediately once we cross threshold
           if (!sentResult && successCount >= config.thresholdSignature.threshold) {
+            logger.debug('Enough signatures retrieved, combining')
             sentResult = true
             const combinedSignature = await BLSCryptographyClient.combinePartialBlindedSignatures(
               signatures,
               request.body.blindedQueryPhoneNumber
             )
+            logger.debug('Responding with combined signature')
             response.json({ success: true, combinedSignature, version: VERSION })
           }
         } else {
-          responses.push({ url: service.url, status })
           errorCodes.set(status, (errorCodes.get(status) || 0) + 1)
         }
       })
@@ -101,7 +96,6 @@ async function requestSignatures(request: Request, response: Response) {
           logger.error(`${ErrorMessage.TIMEOUT_FROM_SIGNER} from signer ${service.url}`)
         } else {
           logger.error(`${ErrorMessage.ERROR_REQUESTING_SIGNATURE} from signer ${service.url}`, e)
-          responses.push({ url: service.url, status: 500 })
         }
       })
       .finally(() => {
@@ -111,7 +105,10 @@ async function requestSignatures(request: Request, response: Response) {
 
   await Promise.all(signerReqs)
 
-  const majorityErrorCode = getMajorityErrorCode(errorCodes, responses)
+  const majorityErrorCode = getMajorityErrorCode(errorCodes)
+  logger.debug(
+    `Done requesting signatures. Success count: ${successCount}, majority error code ${majorityErrorCode}`
+  )
 
   return { successCount, majorityErrorCode }
 }
@@ -121,7 +118,9 @@ function requestSignature(
   request: Request,
   controller: AbortController
 ): Promise<FetchResponse> {
-  return fetch(service.url + PARTIAL_SIGN_MESSAGE_ENDPOINT, {
+  const url = service.url + PARTIAL_SIGN_MESSAGE_ENDPOINT
+  logger.debug(`Requesting sig from ${url}`)
+  return fetch(url, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -133,12 +132,9 @@ function requestSignature(
   })
 }
 
-function getMajorityErrorCode(errorCodes: Map<number, number>, responses: SignMsgRespWithStatus[]) {
+function getMajorityErrorCode(errorCodes: Map<number, number>) {
   if (errorCodes.size > 1) {
     logger.error(ErrorMessage.INCONSISTENT_SINGER_RESPONSES)
-    responses.forEach((resp) => {
-      logger.error(`${resp.url} returned ${resp.status}`)
-    })
   }
 
   let maxErrorCode = -1

@@ -7,8 +7,6 @@ import { SafeAreaView, StyleSheet, View } from 'react-native'
 import { connect } from 'react-redux'
 import { defaultCountryCodeSelector } from 'src/account/selectors'
 import { hideAlert, showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import ContactPermission from 'src/icons/ContactPermission'
@@ -85,10 +83,7 @@ class Invite extends React.Component<Props, State> {
 
     const hasGivenContactPermission = await requestContactsPermission()
     this.setState({ hasGivenContactPermission })
-
-    if (hasGivenContactPermission) {
-      this.props.importContacts()
-    }
+    this.props.importContacts()
   }
 
   onSearchQueryChanged = (searchQuery: string) => {
@@ -98,7 +93,6 @@ class Invite extends React.Component<Props, State> {
   onSelectRecipient = (recipient: Recipient) => {
     this.props.hideAlert()
     if (recipient.e164PhoneNumber) {
-      CeloAnalytics.track(CustomEventNames.friend_invited)
       navigate(Screens.InviteReview, { recipient })
     } else {
       this.props.showError(ErrorMessages.CANT_SELECT_INVALID_PHONE)

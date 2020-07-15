@@ -34,16 +34,16 @@ az postgres db create \
   --server-name $SERVER_NAME
 
 az postgres db list --resource-group $RESOURCE_GROUP --server-name $SERVER_NAME
-```
 
-To enable connection from the container instance, the default Connection Security settings of the database need to be changed to "Allow access to Azure services".
-_TODO find a way to do this via the Azure CLI. Use the portal for now._
+# Allow access to Azure services
+az postgres server firewall-rule create -g $RESOURCE_GROUP -s $SERVER_NAME -n AllowAllWindowsAzureIps --start-ip-address 0.0.0.0 --end-ip-address 0.0.0.0
+```
 
 You'll also need to run the db migrations, either via a special docker command or by temporarily whitelisting your dev box (see parent [Readme](../README.md)).
 
 ## Deploy the container instance and give it keyvault perms
 
-Fill in the `TODO` placeholder params in `container-parameters.json` and then run the following:
+Fill in the `TODO` placeholder params in `container-parameters.json`. The `dnsNameLabel` will act as the prefix for your cointainer hostname. Run the following:
 
 ```bash
 CONTAINER_NAME={YOUR_CONTAINER_NAME}

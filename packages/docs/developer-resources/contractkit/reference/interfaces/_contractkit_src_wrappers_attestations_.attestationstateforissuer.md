@@ -16,4 +16,4 @@
 
 • **attestationState**: *[AttestationState](../enums/_contractkit_src_wrappers_attestations_.attestationstate.md)*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L26)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L27)*
