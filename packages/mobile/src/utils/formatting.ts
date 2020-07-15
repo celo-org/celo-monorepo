@@ -39,7 +39,8 @@ export const getExchangeRateDisplayValue = (value: BigNumber.Value): string => {
 
 export const getFeeDisplayValue = (value: BigNumber.Value | null | undefined): string => {
   return value
-    ? BigNumber.max(value, 0.001)
+    ? // Show 0.001 if fee > 0 and <= 0.001
+      BigNumber.max(value, new BigNumber(value).isZero() ? 0 : 0.001)
         .decimalPlaces(4)
         .toFormat()
     : ''
