@@ -90,6 +90,7 @@ export interface UpdateE164PhoneNumberSaltAction {
 export interface FetchAddressesAndValidateAction {
   type: Actions.FETCH_ADDRESSES_AND_VALIDATION_STATUS
   e164Number: string
+  requesterAddress?: string
 }
 
 export interface ImportContactsAction {
@@ -127,6 +128,7 @@ export interface ValidateRecipientAddressAction {
   userInputOfFullAddressOrLastFourDigits: string
   addressValidationType: AddressValidationType
   recipient: Recipient
+  requesterAddress?: string
 }
 
 export interface ValidateRecipientAddressSuccessAction {
@@ -143,6 +145,7 @@ export interface RequireSecureSendAction {
 
 export interface EndFetchingAddressesAction {
   type: Actions.END_FETCHING_ADDRESSES
+  e164Number: string
 }
 
 export type ActionTypes =
@@ -214,9 +217,13 @@ export const completeAttestationCode = (
   numComplete,
 })
 
-export const fetchAddressesAndValidate = (e164Number: string): FetchAddressesAndValidateAction => ({
+export const fetchAddressesAndValidate = (
+  e164Number: string,
+  requesterAddress?: string
+): FetchAddressesAndValidateAction => ({
   type: Actions.FETCH_ADDRESSES_AND_VALIDATION_STATUS,
   e164Number,
+  requesterAddress,
 })
 
 export const updateE164PhoneNumberAddresses = (
@@ -272,12 +279,14 @@ export const addContactsMatches = (matches: ContactMatches): AddContactMatchesAc
 export const validateRecipientAddress = (
   userInputOfFullAddressOrLastFourDigits: string,
   addressValidationType: AddressValidationType,
-  recipient: Recipient
+  recipient: Recipient,
+  requesterAddress?: string
 ): ValidateRecipientAddressAction => ({
   type: Actions.VALIDATE_RECIPIENT_ADDRESS,
   userInputOfFullAddressOrLastFourDigits,
   addressValidationType,
   recipient,
+  requesterAddress,
 })
 
 export const validateRecipientAddressSuccess = (
@@ -298,6 +307,7 @@ export const requireSecureSend = (
   addressValidationType,
 })
 
-export const endFetchingAddresses = (): EndFetchingAddressesAction => ({
+export const endFetchingAddresses = (e164Number: string): EndFetchingAddressesAction => ({
   type: Actions.END_FETCHING_ADDRESSES,
+  e164Number,
 })
