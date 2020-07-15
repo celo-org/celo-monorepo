@@ -10,6 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { setSocialBackupCompleted } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
+import { currentLanguageSelector } from 'src/app/reducers'
 import BackupPhraseContainer, {
   BackupPhraseContainerMode,
   BackupPhraseType,
@@ -44,7 +45,7 @@ type Props = WithTranslation & StateProps & DispatchProps
 const mapStateToProps = (state: RootState): StateProps => {
   return {
     account: currentAccountSelector(state),
-    language: state.app.language,
+    language: currentLanguageSelector(state),
     socialBackupCompleted: state.account.socialBackupCompleted,
   }
 }

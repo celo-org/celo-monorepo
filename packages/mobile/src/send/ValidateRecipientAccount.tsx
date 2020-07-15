@@ -10,7 +10,7 @@ import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import AccountNumberCard from 'src/components/AccountNumberCard'
@@ -40,7 +40,7 @@ interface StateProps {
   transactionData: TransactionDataInput
   addressValidationType: AddressValidationType
   isValidRecipient: boolean
-  isPaymentRequest?: true
+  isOutgoingPaymentRequest?: true
   error?: ErrorMessages | null
 }
 
@@ -70,7 +70,7 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
     recipient,
     transactionData,
     isValidRecipient: state.identity.isValidRecipient,
-    isPaymentRequest: route.params.isPaymentRequest,
+    isOutgoingPaymentRequest: route.params.isOutgoingPaymentRequest,
     addressValidationType: route.params.addressValidationType,
     error,
   }
@@ -78,7 +78,7 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
 
 export const validateRecipientAccountScreenNavOptions = () => ({
   ...emptyHeader,
-  headerLeft: () => <BackButton eventName={AnalyticsEvents.send_secure_back} />,
+  headerLeft: () => <BackButton eventName={SendEvents.send_secure_back} />,
 })
 
 export class ValidateRecipientAccount extends React.Component<Props, State> {
@@ -89,15 +89,14 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
   }
 
   componentDidUpdate = (prevProps: Props) => {
-    const { isValidRecipient, isPaymentRequest, transactionData } = this.props
+    const { isValidRecipient, isOutgoingPaymentRequest, transactionData } = this.props
     if (isValidRecipient && !prevProps.isValidRecipient) {
-      if (isPaymentRequest) {
+      if (isOutgoingPaymentRequest) {
         navigate(Screens.PaymentRequestConfirmation, { transactionData })
       } else {
         navigate(Screens.SendConfirmation, {
           transactionData,
           addressJustValidated: true,
-          isFromScan: this.props.route.params?.isFromScan,
         })
       }
     }
@@ -111,7 +110,7 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
         ? inputValue
         : singleDigitInputValueArr.join('')
 
-    ValoraAnalytics.track(AnalyticsEvents.send_secure_submit, {
+    ValoraAnalytics.track(SendEvents.send_secure_submit, {
       partialAddressValidation: addressValidationType === AddressValidationType.PARTIAL,
       address: inputToValidate,
     })
@@ -133,11 +132,11 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
     const { addressValidationType } = this.props
 
     if (this.state.isModalVisible) {
-      ValoraAnalytics.track(AnalyticsEvents.send_secure_info, {
+      ValoraAnalytics.track(SendEvents.send_secure_info, {
         partialAddressValidation: addressValidationType === AddressValidationType.PARTIAL,
       })
     } else {
-      ValoraAnalytics.track(AnalyticsEvents.send_secure_info_dismissed, {
+      ValoraAnalytics.track(SendEvents.send_secure_info_dismissed, {
         partialAddressValidation: addressValidationType === AddressValidationType.PARTIAL,
       })
     }

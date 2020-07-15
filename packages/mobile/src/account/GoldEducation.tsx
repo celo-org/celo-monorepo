@@ -1,13 +1,13 @@
 import { BtnTypes } from '@celo/react-components/components/Button.v2'
-import * as React from 'react'
+import React, { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import Education from 'src/account/Education'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import Education, { EducationTopic, EmbeddedNavBar } from 'src/account/Education'
+import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setEducationCompleted } from 'src/goldToken/actions'
 import { Namespaces } from 'src/i18n'
-import { exchangeIcon, goldValue, shinyGold } from 'src/images/Images'
+import { celoEducation1, celoEducation2, celoEducation3, celoEducation4 } from 'src/images/Images'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import useSelector from 'src/redux/useSelector'
@@ -20,7 +20,7 @@ export default function GoldEducation() {
   const isCeloEducationComplete = useSelector((state) => state.goldToken.educationCompleted)
 
   const onFinish = () => {
-    ValoraAnalytics.track(AnalyticsEvents.exchange_gold_nux)
+    ValoraAnalytics.track(OnboardingEvents.celo_education_complete)
 
     if (isCeloEducationComplete) {
       navigateBack()
@@ -32,9 +32,13 @@ export default function GoldEducation() {
 
   const stepInfo = useStep()
 
+  useEffect(() => {
+    ValoraAnalytics.track(OnboardingEvents.celo_education_start)
+  }, [])
+
   return (
     <Education
-      isClosable={isCeloEducationComplete}
+      embeddedNavBar={isCeloEducationComplete ? EmbeddedNavBar.Close : EmbeddedNavBar.Drawer}
       stepInfo={stepInfo}
       onFinish={onFinish}
       finalButtonType={BtnTypes.TERTIARY}
@@ -50,28 +54,20 @@ function useStep() {
   return React.useMemo(() => {
     return [
       {
-        image: shinyGold,
-        cancelEvent: AnalyticsEvents.gold_cancel1,
-        progressEvent: AnalyticsEvents.gold_educate_1_next,
-        screenName: 'Gold_Nux_1',
+        image: celoEducation1,
+        topic: EducationTopic.celo,
       },
       {
-        image: goldValue,
-        cancelEvent: AnalyticsEvents.gold_cancel2,
-        progressEvent: AnalyticsEvents.gold_educate_2_next,
-        screenName: 'Gold_Nux_2',
+        image: celoEducation2,
+        topic: EducationTopic.celo,
       },
       {
-        image: exchangeIcon,
-        cancelEvent: AnalyticsEvents.gold_cancel3,
-        progressEvent: AnalyticsEvents.gold_educate_3_next,
-        screenName: 'Gold_Nux_3',
+        image: celoEducation3,
+        topic: EducationTopic.celo,
       },
       {
-        image: exchangeIcon, // Placeholder Image
-        cancelEvent: AnalyticsEvents.gold_cancel4,
-        progressEvent: AnalyticsEvents.gold_educate_4_next,
-        screenName: 'Gold_Nux_4',
+        image: celoEducation4, // Placeholder Image
+        topic: EducationTopic.celo,
       },
     ].map((step, index) => {
       return {

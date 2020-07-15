@@ -1,8 +1,7 @@
 import { AppState, Linking } from 'react-native'
-import { REHYDRATE } from 'redux-persist/es/constants'
 import { eventChannel } from 'redux-saga'
 import { call, cancelled, put, select, spawn, take, takeLatest } from 'redux-saga/effects'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { AppEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import {
   Actions,
@@ -20,7 +19,6 @@ import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { clockInSync } from 'src/utils/time'
 import { parse } from 'url'
@@ -34,18 +32,9 @@ const TAG = 'app/saga'
 //    (which will put an app into `background` state until dialog disappears).
 const DO_NOT_LOCK_PERIOD = 30000 // 30 sec
 
-export function* waitForRehydrate() {
-  const rehydrated = yield select((state: RootState) => state.networkInfo.rehydrated)
-  if (rehydrated) {
-    return
-  }
-  yield take(REHYDRATE)
-  return
-}
-
-export function* watchRehydrate() {
-  yield take(REHYDRATE)
-
+// Work that's done before other sagas are initalized
+// Be mindful to not put long blocking tasks here
+export function* appInit() {
   const isDeprecated: boolean = yield call(isAppVersionDeprecated)
 
   if (isDeprecated) {
@@ -113,7 +102,7 @@ function* watchAppState() {
       Logger.debug(`${TAG}@monitorAppState`, `App changed state: ${newState}`)
       yield put(setAppState(newState))
     } catch (error) {
-      ValoraAnalytics.track(AnalyticsEvents.app_state_error, { error: error.message })
+      ValoraAnalytics.track(AppEvents.app_state_error, { error: error.message })
       Logger.error(`${TAG}@monitorAppState`, `App state Error`, error)
     } finally {
       if (yield cancelled()) {
@@ -135,7 +124,6 @@ export function* handleSetAppState(action: SetAppState) {
 }
 
 export function* appSaga() {
-  yield spawn(watchRehydrate)
   yield spawn(watchDeepLinks)
   yield spawn(watchAppState)
   yield takeLatest(Actions.SET_APP_STATE, handleSetAppState)

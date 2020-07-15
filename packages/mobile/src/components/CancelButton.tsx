@@ -4,7 +4,6 @@ import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text } from 'react-native'
 import { AnalyticsEventType } from 'src/analytics/Events'
-import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { navigateBack } from 'src/navigator/NavigationService'
 
@@ -15,10 +14,6 @@ type Props = {
 
 class CancelButton extends React.PureComponent<Props> {
   cancel = () => {
-    if (this.props.eventName) {
-      ValoraAnalytics.track(this.props.eventName)
-    }
-
     if (this.props.onCancel) {
       this.props.onCancel()
     } else {

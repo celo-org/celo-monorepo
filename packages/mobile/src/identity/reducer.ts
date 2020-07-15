@@ -1,7 +1,5 @@
 import dotProp from 'dot-prop-immutable'
 import { RehydrateAction } from 'redux-persist'
-import { AnalyticsEvents } from 'src/analytics/Events'
-import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { Actions, ActionTypes } from 'src/identity/actions'
 import { ContactMatches, ImportContactsStatus, VerificationStatus } from 'src/identity/types'
 import { AttestationCode } from 'src/identity/verification'
@@ -61,6 +59,7 @@ export interface State {
   matchedContacts: ContactMatches
   isValidRecipient: boolean
   secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
+  isFetchingAddresses: boolean
 }
 
 const initialState: State = {
@@ -81,6 +80,7 @@ const initialState: State = {
   matchedContacts: {},
   isValidRecipient: false,
   secureSendPhoneNumberMapping: {},
+  isFetchingAddresses: false,
 }
 
 export const reducer = (
@@ -99,6 +99,7 @@ export const reducer = (
           current: 0,
           total: 0,
         },
+        isFetchingAddresses: false,
       }
     }
     case Actions.RESET_VERIFICATION:
@@ -179,9 +180,6 @@ export const reducer = (
       }
     case Actions.ADD_CONTACT_MATCHES:
       const matchedContacts = { ...state.matchedContacts, ...action.matches }
-      ValoraAnalytics.track(AnalyticsEvents.add_contact_match, {
-        contactsMatched: Object.keys(matchedContacts).length,
-      })
       return {
         ...state,
         matchedContacts,
@@ -219,6 +217,16 @@ export const reducer = (
           }
         ),
       }
+    case Actions.FETCH_ADDRESSES_AND_VALIDATION_STATUS:
+      return {
+        ...state,
+        isFetchingAddresses: true,
+      }
+    case Actions.END_FETCHING_ADDRESSES:
+      return {
+        ...state,
+        isFetchingAddresses: false,
+      }
     default:
       return state
   }
@@ -250,3 +258,4 @@ export const secureSendPhoneNumberMappingSelector = (state: RootState) =>
 export const importContactsProgressSelector = (state: RootState) =>
   state.identity.importContactsProgress
 export const matchedContactsSelector = (state: RootState) => state.identity.matchedContacts
+export const isFetchingAddressesSelector = (state: RootState) => state.identity.isFetchingAddresses

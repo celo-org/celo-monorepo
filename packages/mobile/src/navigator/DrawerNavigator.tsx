@@ -34,6 +34,8 @@ import {
 } from 'src/account/selectors'
 import SettingsScreen from 'src/account/Settings'
 import Support from 'src/account/Support'
+import { HomeEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import BackupIntroduction from 'src/backup/BackupIntroduction'
 import AccountNumber from 'src/components/AccountNumber'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
@@ -80,6 +82,9 @@ function CustomDrawerItemList({
     const focused = i === state.index
     const { title, drawerLabel, drawerIcon } = descriptors[route.key].options
     const navigateToItem = () => {
+      ValoraAnalytics.track(HomeEvents.drawer_navigation, {
+        navigateTo: title || route.name,
+      })
       navigation.dispatch({
         ...(focused ? DrawerActions.closeDrawer() : CommonActions.navigate(route.name)),
         target: state.key,
@@ -157,7 +162,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
         <Text style={fontStyles.label}>Account No.</Text>
         <View style={styles.accountOuterContainer}>
           <View style={styles.accountInnerContainer}>
-            <AccountNumber address={account || ''} />
+            <AccountNumber address={account || ''} location={Screens.DrawerNavigator} />
           </View>
         </View>
         <Text style={styles.smallLabel}>{`Version ${appVersion}`}</Text>

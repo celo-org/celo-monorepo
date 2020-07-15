@@ -3,7 +3,7 @@ import { retryAsync } from '@celo/utils/src/async'
 import BigNumber from 'bignumber.js'
 import { call, put, take, takeEvery } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { AppEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -74,7 +74,7 @@ export function tokenFetchFactory({ actionName, token, actionCreator, tag }: Tok
       const balanceInWei: BigNumber = yield call([tokenContract, tokenContract.balanceOf], account)
       const balance: BigNumber = yield call(convertFromContractDecimals, balanceInWei, token)
       ValoraAnalytics.track(
-        AnalyticsEvents.fetch_balance,
+        AppEvents.fetch_balance,
         token === CURRENCY_ENUM.DOLLAR
           ? {
               dollarBalance: balance.toString(),
@@ -142,7 +142,10 @@ export async function fetchTokenBalanceInWeiWithRetry(token: CURRENCY_ENUM, acco
   // Retry needed here because it's typically the app's first tx and seems to fail on occasion
   // TODO consider having retry logic for ALL contract calls and txs. ContractKit should have this logic.
   const balanceInWei = await retryAsync(tokenContract.balanceOf, 3, [account])
-  Logger.debug(TAG + '@fetchTokenBalanceInWeiWithRetry', 'Account balance', balanceInWei.toString())
+  Logger.debug(
+    TAG + '@fetchTokenBalanceInWeiWithRetry',
+    'Account balance ' + balanceInWei.toString()
+  )
   return balanceInWei
 }
 
@@ -188,7 +191,6 @@ export function tokenTransferFactory({
         yield call(sendAndMonitorTransaction, txId, tx, account, currency)
       } catch (error) {
         Logger.error(tag, 'Error transfering token', error)
-        ValoraAnalytics.track(AnalyticsEvents.transfer_token_error, { error: error.message })
         yield put(removeStandbyTransaction(txId))
         if (error.message === ErrorMessages.INCORRECT_PIN) {
           yield put(showError(ErrorMessages.INCORRECT_PIN))
