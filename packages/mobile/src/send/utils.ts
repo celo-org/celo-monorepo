@@ -37,7 +37,8 @@ export const getConfirmationInput = (
     recipientAddress = getAddressFromPhoneNumber(
       recipient.e164PhoneNumber,
       e164NumberToAddress,
-      secureSendPhoneNumberMapping
+      secureSendPhoneNumberMapping,
+      recipient.address
     )
   }
 
