@@ -25,6 +25,7 @@ class GitHub {
     const app = new App({
       id: 71131,
       privateKey: process.env.FLAKE_TRACKER_SECRET.replace(/\\n/gm, '\n'),
+      //privateKey: privateKey,
     })
 
     const rest = await auth(app)
@@ -91,7 +92,7 @@ class GitHub {
     const fn = () => {
       return this.rest.checks.create({
         ...defaults,
-        name: 'Flakey Bot',
+        name: 'Flake Tracker',
         head_sha: process.env.CIRCLE_SHA1,
         status: 'in_progress',
       })
@@ -157,7 +158,7 @@ class GitHub {
       return this.rest.paginate(this.rest.issues.listForRepo, {
         ...defaults,
         state: 'open',
-        labels: [FlakeLabel],
+        labels: [FlakeLabel, process.env.CIRCLE_JOB],
       })
     }
 
