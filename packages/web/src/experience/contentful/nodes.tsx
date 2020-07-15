@@ -8,32 +8,25 @@ import { fonts } from 'src/styles'
 import { Text } from 'react-native'
 
 export const renderNode: RenderNode = {
-  [BLOCKS.HEADING_1]: (node, children) => {
-    console.log(node)
+  [BLOCKS.HEADING_1]: (_, children) => {
     return <H1>{children}</H1>
   },
-  [BLOCKS.HEADING_2]: (node, children) => {
-    console.log(node)
+  [BLOCKS.HEADING_2]: (_, children) => {
     return <H2>{children}</H2>
   },
-  [BLOCKS.HEADING_3]: (node, children) => {
-    console.log(node)
+  [BLOCKS.HEADING_3]: (_, children) => {
     return <H3>{children}</H3>
   },
-  [BLOCKS.HEADING_4]: (node, children) => {
-    console.log(node)
+  [BLOCKS.HEADING_4]: (_, children) => {
     return <H4>{children}</H4>
   },
-  [BLOCKS.HEADING_5]: (node, children) => {
-    console.log(node)
+  [BLOCKS.HEADING_5]: (_, children) => {
     return <Text style={fonts.h5}>{children}</Text>
   },
-  [BLOCKS.PARAGRAPH]: (node, children) => {
-    console.log(node)
+  [BLOCKS.PARAGRAPH]: (_, children) => {
     return <Text style={fonts.p}>{children}</Text>
   },
   [INLINES.HYPERLINK]: (node, children) => {
-    console.log(node)
     return <InlineAnchor href={node.data.uri}>{children as string}</InlineAnchor>
   },
   [INLINES.EMBEDDED_ENTRY]: (node) => {
