@@ -1,4 +1,4 @@
-import { ClusterConfig, isContextSet, setupCloudCluster } from 'src/lib/cloud-provider'
+import { ClusterConfig, setContextAndCheckForMissingCredentials, setupCloudCluster } from 'src/lib/cloud-provider'
 import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { outputIncludes, retryCmd } from 'src/lib/utils'
 
@@ -27,7 +27,7 @@ export async function switchToAzureCluster(
     await execCmdWithExitOnFailure(`az account set --subscription ${clusterConfig.subscriptionId}`)
   }
 
-  const isContextSetCorrectly = await isContextSet(clusterConfig)
+  const isContextSetCorrectly = await setContextAndCheckForMissingCredentials(clusterConfig)
   if (!isContextSetCorrectly) {
       // If we don't already have the context, get it.
       // If a context is edited for some reason (eg switching default namespace),
