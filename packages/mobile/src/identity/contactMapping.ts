@@ -173,7 +173,7 @@ export function* fetchAddressesAndValidateSaga({
     const e164NumberToAddressUpdates: E164NumberToAddressType = {}
     const addressToE164NumberUpdates: AddressToE164NumberType = {}
 
-    if (!addresses) {
+    if (!addresses.length) {
       Logger.debug(TAG + '@fetchAddressesAndValidate', `No addresses for number`)
       // Save invalid/0 addresses to avoid checking again
       // null means a contact is unverified, whereas undefined means we haven't checked yet
