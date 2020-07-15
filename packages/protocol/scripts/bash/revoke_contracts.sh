@@ -20,7 +20,7 @@ for contract in $(<"$1"); do
     lockedgold=$(celocli lockedgold:show "$contract")
     total=$(echo "$lockedgold" | grep -o "total: [0-9]*" | cut -f2 -d : | tr -d '[:space:]')
     if [ "$total" != "0" ]; then
-      echo "Reject $contract"
+      echo "Reject $contract: locked CELO > 0"
       rejects+=( $contract )
       continue
     fi
