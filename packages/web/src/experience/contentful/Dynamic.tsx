@@ -1,22 +1,25 @@
 import * as React from 'react'
 import Page from 'src/experience/common/Page'
 // import { documentToReactComponents } from '@contentful/rich-text-react-renderer'
+import { Page as SideBarEntry } from 'src/experience/common/Sidebar'
 
 import { View } from 'react-native'
 
-interface Props {
-  name: string
+export interface Props {
+  kitName: string
   metaDescription: string
   path: string
-  sidebar: any
+  sidebar: SideBarEntry[]
+  sections: object
 }
 
-export default function DynamicKit({ name, metaDescription, path, sidebar }: Props) {
+export default function DynamicKit({ kitName, metaDescription, path, sidebar }: Props) {
   return (
     <Page
       pages={sidebar}
       sections={[{ id: 'fake', children: <View /> }]}
-      title={`${name}`}
+      title={`${kitName}`}
+      kitName={kitName}
       path={path}
       metaDescription={metaDescription}
       ogImage={require('src/experience/brandkit/images/ogimage-brandkit.png')}

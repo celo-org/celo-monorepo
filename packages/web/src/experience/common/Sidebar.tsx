@@ -130,7 +130,6 @@ function color(kind: Kind) {
 }
 
 function isActive(path: string, currentPath: string) {
-  console.log(path, currentPath)
   if (path === currentPath) {
     return true
   }

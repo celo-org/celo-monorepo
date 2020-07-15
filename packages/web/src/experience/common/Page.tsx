@@ -41,6 +41,7 @@ interface Props {
   sections: Section[]
   title: string
   path: string
+  kitName?: string
   metaDescription: string
   ogImage: ImageRequireSource
 }
@@ -162,7 +163,6 @@ class Page extends React.Component<Props & ScreenProps, State> {
   render() {
     const { screen, sections, router, path, metaDescription, title } = this.props
     const isMobile = screen === ScreenSizes.MOBILE
-    console.warn('PAGES', this.props.pages)
     return (
       <>
         <OpenGraph
@@ -173,7 +173,7 @@ class Page extends React.Component<Props & ScreenProps, State> {
         />
         <View style={styles.conatiner}>
           <View style={[styles.topbar, (this.state.isLineVisible || isMobile) && styles.grayLine]}>
-            <Topbar current={this.props.pages[0].href} />
+            <Topbar current={this.props.pages[0].href} kitName={this.props.kitName} />
           </View>
           <View style={styles.justNeedSpace} />
           {isMobile && (

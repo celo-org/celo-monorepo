@@ -1,15 +1,6 @@
-import { GetServerSideProps } from 'next'
 import Dynamic from 'src/experience/contentful/Dynamic'
-import { getKit } from 'src/utils/contentful'
+import getKitProps from 'src/experience/contentful/getServerSideProps'
 
 export default Dynamic
 
-export const getServerSideProps: GetServerSideProps<
-  object,
-  { kit: string; kitPage: string }
-> = async function getServerSideProp({ params }) {
-  const kit = await getKit(params.kit)
-  return {
-    props: kit,
-  }
-}
+export const getServerSideProps = getKitProps

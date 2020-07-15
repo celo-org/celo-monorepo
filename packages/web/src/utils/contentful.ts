@@ -1,4 +1,4 @@
-import { createClient } from 'contentful'
+import { createClient, Entry } from 'contentful'
 import getConfig from 'next/config'
 import { Page as SideBarEntry } from 'src/experience/common/Sidebar'
 
@@ -51,7 +51,7 @@ interface Kit {
 }
 
 interface InternalKit {
-  name: string
+  kitName: string
   metaDescription: string
   ogImage: object
   sidebar: SideBarEntry[]
@@ -66,15 +66,32 @@ export async function getKit(kitSlug: string): Promise<InternalKit> {
   const data = kit.items[0].fields
 
   return {
-    name: data.name,
+    kitName: data.name,
     metaDescription: data.metaDescription,
     ogImage: data.ogImage,
     sidebar: data.pages_.map((page) => {
       return {
         title: page.fields.title,
-        href: `/experience/${kitSlug}/${page.fields.slug || ''}`,
+        href: `/experience/${kitSlug}${page.fields.slug === 'index' ? '' : '/' + page.fields.slug}`,
         sections: [],
       }
     }),
   }
+}
+
+interface ContentFulPage {
+  title: string
+  slug: string
+  sections: Array<Entry<{ name: string; contentField: object; slug: string }>>
+}
+
+export async function getPage(pageSlug: string) {
+  const page = await getClient(false).getEntries<ContentFulPage>({
+    content_type: 'page',
+    'fields.slug': !pageSlug ? 'index' : pageSlug,
+  })
+
+  const data = page.items[0].fields
+  const sections = data.sections.map((section) => section.fields)
+  return { ...data, sections }
 }

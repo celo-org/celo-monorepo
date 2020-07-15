@@ -11,12 +11,13 @@ import { colors, fonts, standardStyles } from 'src/styles'
 
 interface Props {
   current: string
+  kitName?: string
 }
 
-export default function TopBar({ current }: Props) {
+export default function TopBar({ current, kitName }: Props) {
   const { isMobile } = useScreenSize()
   const { t } = useTranslation(NameSpaces.common)
-  const name = current === links.BRAND.link ? links.BRAND.name : links.EVENTS_KIT.name
+
   return (
     <View style={standardStyles.centered}>
       <View style={[standardStyles.row, styles.container]}>
@@ -33,7 +34,7 @@ export default function TopBar({ current }: Props) {
                   // @ts-ignore -- added initial to the aug but it still isnt liking it
                   style={[fonts.h3, styles.title]}
                 >
-                  {name}
+                  {kitName || getKitName(current)}
                 </Text>
               </TouchableOpacity>
             </a>
@@ -69,6 +70,10 @@ export default function TopBar({ current }: Props) {
       </View>
     </View>
   )
+}
+
+function getKitName(current) {
+  return current === links.BRAND.link ? links.BRAND.name : links.EVENTS_KIT.name
 }
 
 const styles = StyleSheet.create({
