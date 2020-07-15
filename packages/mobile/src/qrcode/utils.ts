@@ -153,6 +153,6 @@ export function* handleBarcode(
       addressJustValidated: true,
     })
   } else {
-    replace(Screens.SendAmount, { recipient, isFromScan: true })
+    replace(Screens.SendAmount, { recipient, isFromScan: true, isOutgoingPaymentRequest })
   }
 }

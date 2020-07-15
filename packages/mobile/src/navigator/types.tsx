@@ -149,12 +149,12 @@ export type StackParamList = {
   [Screens.SelectLocalCurrency]: undefined
   [Screens.Send]:
     | {
-        isRequest?: boolean
+        isOutgoingPaymentRequest?: true
       }
     | undefined
   [Screens.SendAmount]: {
     recipient: Recipient
-    isRequest?: boolean
+    isOutgoingPaymentRequest?: true
     isFromScan?: boolean
   }
   [Screens.SendConfirmation]: {

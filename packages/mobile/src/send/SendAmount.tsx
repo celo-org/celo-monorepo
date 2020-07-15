@@ -70,11 +70,11 @@ export const sendAmountScreenNavOptions = ({
 }: {
   route: RouteProp<StackParamList, Screens.SendAmount>
 }) => {
-  const title = route.params?.isRequest
+  const title = route.params?.isOutgoingPaymentRequest
     ? i18n.t('paymentRequestFlow:request')
     : i18n.t('sendFlow7:send')
 
-  const eventName = route.params?.isRequest
+  const eventName = route.params?.isOutgoingPaymentRequest
     ? RequestEvents.request_amount_back
     : SendEvents.send_amount_back
 
@@ -88,8 +88,7 @@ export const sendAmountScreenNavOptions = ({
 function SendAmount(props: Props) {
   const dispatch = useDispatch()
 
-  const isRequest = props.route.params?.isRequest ?? false
-  const recipient = props.route.params.recipient
+  const { isOutgoingPaymentRequest, recipient } = props.route.params
 
   React.useEffect(() => {
     dispatch(fetchDollarBalance())
@@ -292,7 +291,7 @@ function SendAmount(props: Props) {
         size={BtnSizes.FULL}
         text={t('global:review')}
         type={BtnTypes.SECONDARY}
-        onPress={isRequest ? onRequest : onSend}
+        onPress={isOutgoingPaymentRequest ? onRequest : onSend}
         disabled={reviewBtnDisabled}
         testID="Review"
       />
