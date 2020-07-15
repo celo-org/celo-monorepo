@@ -28,8 +28,8 @@ spec:
     metadata:
       labels:
 {{ include "celo-fullnode.labels" .  | indent 8 }}
+{{ if .Values.prometheus | default true }}
       annotations:
-{{ if .Values.prometheus | default true }} 
 {{ include "common.prometheus-annotations" . | indent 8 }}
 {{ end }}
     spec:

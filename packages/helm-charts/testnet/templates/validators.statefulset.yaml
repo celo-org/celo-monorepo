@@ -43,12 +43,10 @@ spec:
       labels:
 {{ include "common.standard.labels" .  | indent 8 }}
         component: validators
-{{ if .Values.geth.enable_metrics }}
+{{ if .Values.prometheus | default false }}
       annotations:
-        prometheus.io/path: /debug/metrics/prometheus
-        prometheus.io/port: "6060"
-        prometheus.io/scrape: "true"
-{{ end }}
+{{ include "common.prometheus-annotations" . | indent 8 }}
+{{- end }}
     spec:
       initContainers:
 {{ include "common.init-genesis-container" .  | indent 6 }}
@@ -172,8 +170,11 @@ spec:
           [[ "$PING_IP_FROM_PACKET" == "true" ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ping-ip-from-packet"
 
           [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --use-in-memory-discovery-table"
-          {{- if .Values.geth.enable_metrics | default false }}
-          ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics --pprof --pprofaddr=0.0.0.0 --pprofport=6060"
+          {{- if .metrics | default true }}
+          ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
+          {{- end }}
+          {{- if (or .Values.metrics .Values.pprof.enabled) | default false }}
+          ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .Values.pprof.port | default "6060" }} --pprofaddr 0.0.0.0"
           {{- end }}
           exec geth \
             --bootnodes=enode://`cat /root/.celo/bootnodeEnode` \

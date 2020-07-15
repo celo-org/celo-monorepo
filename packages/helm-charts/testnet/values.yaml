@@ -35,7 +35,6 @@ geth:
     limits:
       memory: "4Gi"
       cpu: "4"
-    enable_metrics: false
 
 gethexporter:
   image:

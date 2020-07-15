@@ -645,6 +645,15 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
       ]
     : []
 
+  const gethMetricsOverrides = fetchEnvOrFallback('GETH_ENABLE_METRICS', 'false') === "true"
+    ? [
+        `--set prometheus="${fetchEnvOrFallback('GETH_ENABLE_METRICS', 'false')}"`,
+        `--set pprof.enabled="${fetchEnvOrFallback('GETH_ENABLE_METRICS', 'false')}"`,
+        `--set pprof.path="/debug/metrics/prometheus"`,
+        `--set pprof.port="6060"`,
+      ]
+    : []
+
   const genesisContent = useExistingGenesis
     ? await getGenesisBlockFromGoogleStorage(celoEnv)
     : generateGenesisFromEnv()
@@ -667,7 +676,6 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     `--set promtosd.export_interval=${fetchEnv('PROMTOSD_EXPORT_INTERVAL')}`,
     `--set geth.blocktime=${fetchEnv('BLOCK_TIME')}`,
     `--set geth.validators="${fetchEnv('VALIDATORS')}"`,
-    `--set geth.enable_metrics="${fetchEnvOrFallback('GETH_ENABLE_METRICS', 'false')}"`,
     `--set geth.istanbulrequesttimeout=${fetchEnvOrFallback(
       'ISTANBUL_REQUEST_TIMEOUT_MS',
       '3000'
@@ -687,6 +695,7 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     `--set geth.diskSizeGB=${fetchEnvOrFallback(envVar.NODE_DISK_SIZE_GB, '10')}`,
     ...setHelmArray('geth.proxiesPerValidator', getProxiesPerValidator()),
     ...productionTagOverrides,
+    ...gethMetricsOverrides,
     ...(await helmIPParameters(celoEnv)),
   ]
 }

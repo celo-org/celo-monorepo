@@ -59,7 +59,6 @@ geth:
   debug: false
   syncmode: full
   gcmode: full
-  enable_metrics: false
   ping_ip_from_packet: false
   in_memory_discovery_table: false
   verbosity: 2

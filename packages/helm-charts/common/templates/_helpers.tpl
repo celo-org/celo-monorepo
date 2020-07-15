@@ -390,8 +390,9 @@ spec:
 Annotations to indicate to the prometheus server that this node should be scraped for metrics
 */}}
 {{- define "common.prometheus-annotations" -}}
+{{- $pprof := .Values.pprof | default dict -}}
 prometheus.io/scrape: "true"
-prometheus.io/path:  "{{ .Values.pprof.path | default /debug/metrics/prometheus }}"
-prometheus.io/port: "{{ .Values.pprof.port | default 6060 }}"
+prometheus.io/path:  "{{ $pprof.path | default "/debug/metrics/prometheus" }}"
+prometheus.io/port: "{{ $pprof.port | default 6060 }}"
 {{- end -}}
 

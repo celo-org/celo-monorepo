@@ -108,12 +108,10 @@ spec:
 {{ $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
         validator-proxied: "{{ $validatorProxied }}"
 {{- end }}
-{{ if .Values.geth.enable_metrics }}
+{{ if .Values.prometheus | default false }}
       annotations:
-        prometheus.io/path: /debug/metrics/prometheus
-        prometheus.io/port: "6060"
-        prometheus.io/scrape: "true"
-{{ end }}
+{{ include "common.prometheus-annotations" . | indent 8 }}
+{{- end }}
     spec:
       initContainers:
 {{ include "common.init-genesis-container" .  | indent 6 }}
@@ -122,7 +120,7 @@ spec:
 {{ include "common.import-geth-account-container" .  | indent 6 }}
 {{ end }}
       containers:
-{{ include "common.full-node-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "proxy" .proxy "proxy_allow_private_ip_flag" .proxy_allow_private_ip_flag "unlock" .unlock "expose" .expose "syncmode" .syncmode "gcmode" .gcmode "public_ips" .public_ips "ethstats" (printf "%s-ethstats.%s" (include "common.fullname" .) .Release.Namespace))  | indent 6 }}
+{{ include "common.full-node-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "proxy" .proxy "proxy_allow_private_ip_flag" .proxy_allow_private_ip_flag "unlock" .unlock "expose" .expose "syncmode" .syncmode "gcmode" .gcmode "pprof" (or (.Values.prometheus) (.Values.pprof.enabled)) "pprof_port" (.Values.pprof.port) "metrics" (or (.Values.prometheus) (.Values.metrics)) "public_ips" .public_ips "ethstats" (printf "%s-ethstats.%s" (include "common.fullname" .) .Release.Namespace))  | indent 6 }}
       volumes:
       - name: data
         emptyDir: {}
@@ -166,7 +164,6 @@ echo "Proxy external enode: $PROXY_EXTERNAL_ENODE"
 
 PROXY_ENODE_URL_PAIR=$PROXY_INTERNAL_ENODE\;$PROXY_EXTERNAL_ENODE
 {{- end -}}
-
 
 {{- define "celo.proxyipaddresses" -}}
 {{- if .Values.geth.static_ips -}}
