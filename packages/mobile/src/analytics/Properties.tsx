@@ -526,6 +526,13 @@ interface GethEventsProperties {
     error: string
     context: string
   }
+  [GethEvents.geth_init_start]: {
+    sync: boolean
+  }
+  [GethEvents.create_geth_start]: undefined
+  [GethEvents.create_geth_finish]: undefined
+  [GethEvents.start_geth_start]: undefined
+  [GethEvents.start_geth_finish]: undefined
 }
 
 export type AnalyticsPropertiesList = AppEventsProperties &

@@ -269,6 +269,11 @@ export enum GethEvents {
   geth_init_failure = 'geth_init_failure',
   geth_restart_to_fix_init = 'geth_restart_to_fix_init',
   prompt_forno = 'prompt_forno',
+  geth_init_start = 'geth_init_start',
+  create_geth_start = 'create_geth_start',
+  create_geth_finish = 'create_geth_finish',
+  start_geth_start = 'start_geth_start',
+  start_geth_finish = 'start_geth_finish',
 }
 
 export type AnalyticsEventType =
