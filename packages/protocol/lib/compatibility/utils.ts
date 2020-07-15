@@ -1,7 +1,7 @@
-import { reportASTIncompatibilities } from '@celo/protocol/lib/backward/ast-code'
-import { reportLayoutIncompatibilities } from '@celo/protocol/lib/backward/ast-layout'
-import { Categorizer } from '@celo/protocol/lib/backward/categorizer'
-import { ASTDetailedVersionedReport, ASTReports } from '@celo/protocol/lib/backward/report'
+import { reportASTIncompatibilities } from '@celo/protocol/lib/compatibility/ast-code'
+import { reportLayoutIncompatibilities } from '@celo/protocol/lib/compatibility/ast-layout'
+import { Categorizer } from '@celo/protocol/lib/compatibility/categorizer'
+import { ASTDetailedVersionedReport, ASTReports } from '@celo/protocol/lib/compatibility/report'
 import { BuildArtifacts, Contracts, getBuildArtifacts } from '@openzeppelin/upgrades'
 import { readJsonSync } from 'fs-extra'
 

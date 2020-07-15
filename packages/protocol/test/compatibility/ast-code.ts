@@ -8,8 +8,8 @@ import {
   MethodVisibilityChange,
   NewContractChange,
   reportASTIncompatibilities,
-} from '@celo/protocol/lib/backward/ast-code'
-import { getTestArtifacts } from '@celo/protocol/test/backward/common'
+} from '@celo/protocol/lib/compatibility/ast-code'
+import { getTestArtifacts } from '@celo/protocol/test/compatibility/common'
 import { assert } from 'chai'
 
 const testCases = {

@@ -1,3 +1,4 @@
+<<<<<<< HEAD:packages/protocol/test/backward/ast-layout.ts
 <<<<<<< HEAD:packages/protocol/test/layout/layout.ts
 import { getBuildArtifacts } from '@openzeppelin/upgrades'
 
@@ -36,6 +37,10 @@ const getTestArtifacts = (caseName: string) => {
 =======
 import { reportLayoutIncompatibilities } from '@celo/protocol/lib/backward/ast-layout'
 import { getTestArtifacts } from '@celo/protocol/test/backward/common'
+=======
+import { reportLayoutIncompatibilities } from '@celo/protocol/lib/compatibility/ast-layout'
+import { getTestArtifacts } from '@celo/protocol/test/compatibility/common'
+>>>>>>> Rename package backward to compatibility:packages/protocol/test/compatibility/ast-layout.ts
 import { assert } from 'chai'
 >>>>>>> Add backward compatibility check for contracts api based on the compiled AST:packages/protocol/test/backward/ast-layout.ts
 

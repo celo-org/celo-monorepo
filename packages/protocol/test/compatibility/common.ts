@@ -43,7 +43,7 @@ function needsCompiling(src: string, build: string): boolean {
 }
 
 export function getTestArtifacts(caseName: string) {
-  const back = './test/resources/backward'
+  const back = './test/resources/compatibility'
   const srcDirectory = `${back}/contracts_${caseName}`
   const buildDirectory = `${back}/build/b_${caseName}`
 

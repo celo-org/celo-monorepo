@@ -3,7 +3,7 @@ import {
   ContractVersionDelta,
   Delta,
   DeltaUtil,
-} from '@celo/protocol/lib/backward/version'
+} from '@celo/protocol/lib/compatibility/version'
 import { assert } from 'chai'
 
 describe('#version()', () => {
