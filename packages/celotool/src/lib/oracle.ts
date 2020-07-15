@@ -44,8 +44,7 @@ interface OracleConfig {
  * Env vars corresponding to each value for the AzureClusterConfig for a particular context
  */
 
-const oracleContextAzureClusterConfigDynamicEnvVars: { [k in keyof AzureClusterConfig]: DynamicEnvVar } = {
-  cloudProviderName: DynamicEnvVar.ORACLE_CLOUD_PROVIDER,
+const oracleContextAzureClusterConfigDynamicEnvVars: { [k in keyof Omit<AzureClusterConfig, 'cloudProviderName'>]: DynamicEnvVar } = {
   clusterName: DynamicEnvVar.ORACLE_KUBERNETES_CLUSTER_NAME,
   subscriptionId: DynamicEnvVar.ORACLE_AZURE_SUBSCRIPTION_ID,
   tenantId: DynamicEnvVar.ORACLE_AZURE_TENANT_ID,
@@ -55,8 +54,7 @@ const oracleContextAzureClusterConfigDynamicEnvVars: { [k in keyof AzureClusterC
 /**
  * Env vars corresponding to each value for the AwslusterConfig for a particular context
  */
-const oracleContextAwsClusterConfigDynamicEnvVars: { [k in keyof AwsClusterConfig]: DynamicEnvVar } = {
-  cloudProviderName: DynamicEnvVar.ORACLE_CLOUD_PROVIDER,
+const oracleContextAwsClusterConfigDynamicEnvVars: { [k in keyof Omit<AwsClusterConfig, 'cloudProviderName'>]: DynamicEnvVar } = {
   clusterName: DynamicEnvVar.ORACLE_KUBERNETES_CLUSTER_NAME,
   clusterRegion: DynamicEnvVar.ORACLE_AWS_CLUSTER_REGION, 
 }
@@ -363,10 +361,12 @@ function getOracleAzureIdentityName(keyVaultName: string, address: string) {
  * @return an AzureClusterConfig for the context
  */
 export function getAzureClusterConfig(oracleContext: string): AzureClusterConfig {
-  const cloudProviderNameIsAzure: { [k in keyof Pick<AzureClusterConfig, 'cloudProviderName'>]: string } = {
-    cloudProviderName: "azure"
+  const azureDynamicEnvVars = getOracleContextDynamicEnvVarValues(oracleContextAzureClusterConfigDynamicEnvVars, oracleContext)
+  const clusterConfig: AzureClusterConfig = {
+    cloudProviderName: 'azure',
+    ...azureDynamicEnvVars
   }
-  return getOracleContextDynamicEnvVarValues(oracleContextAzureClusterConfigDynamicEnvVars, oracleContext, cloudProviderNameIsAzure)
+  return clusterConfig
 }
 
 /**
@@ -375,10 +375,12 @@ export function getAzureClusterConfig(oracleContext: string): AzureClusterConfig
  * @return an AwsClusterConfig for the context
  */
 export function getAwsClusterConfig(oracleContext: string): AwsClusterConfig {
-  const cloudProviderNameIsAWS: { [k in keyof Pick<AzureClusterConfig, 'cloudProviderName'>]: string } = {
-    cloudProviderName: "aws"
+  const awsDynamicEnvVars = getOracleContextDynamicEnvVarValues(oracleContextAwsClusterConfigDynamicEnvVars, oracleContext)
+  const clusterConfig: AwsClusterConfig = {
+    cloudProviderName: 'aws',
+    ...awsDynamicEnvVars
   }
-  return getOracleContextDynamicEnvVarValues(oracleContextAwsClusterConfigDynamicEnvVars, oracleContext, cloudProviderNameIsAWS)
+  return clusterConfig
 }
 
 /**
@@ -405,7 +407,7 @@ export function getOracleContextDynamicEnvVarValues<T>(
       const dynamicEnvVarName = getDynamicEnvVarName(dynamicEnvVar, {
         oracleContext
       })
-      const defaultValue = (defaultValues && defaultValues[key]) ? defaultValues[key] : undefined
+      const defaultValue = (defaultValues && defaultValues[key] === undefined) ? defaultValues[key] : undefined
       const value = defaultValue !== undefined ?
         fetchEnvOrFallback(dynamicEnvVarName, defaultValue) :
         fetchEnv(dynamicEnvVarName)
@@ -419,7 +421,6 @@ export function getOracleContextDynamicEnvVarValues<T>(
 
 /**
  * Reads the context and swithces to the appropriate Azure or AWS Cluster
- * Switches to the AKS cluster associated with the given context
  */
 export async function switchToContextCluster(celoEnv: string, oracleContext: string, checkOrPromptIfStagingOrProduction = true) {
   if (!isValidOracleContext(oracleContext)) {
@@ -439,7 +440,7 @@ export async function switchToContextCluster(celoEnv: string, oracleContext: str
 /**
  * Switches to the AKS cluster associated with the given context
  */
-export async function switchToAzureContextCluster(celoEnv: string, oracleContext: string) {
+export function switchToAzureContextCluster(celoEnv: string, oracleContext: string) {
   const azureClusterConfig = getAzureClusterConfig(oracleContext)
   return switchToAzureCluster(celoEnv, azureClusterConfig)
 }

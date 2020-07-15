@@ -93,7 +93,6 @@ async function helmParameters(clusterConfig?: ClusterConfig) {
 async function getPrometheusGcloudServiceAccountKeyBase64(clusterConfig: ClusterConfig) {
   await switchToGCPProjectFromEnv()
 
-  // TODO detect which cloud provider (Azure or AWS) to call correct getServiceAccountName
   const serviceAccountName = getServiceAccountName(clusterConfig)
   await createPrometheusGcloudServiceAccount(serviceAccountName)
 
@@ -118,8 +117,7 @@ async function createPrometheusGcloudServiceAccount(serviceAccountName: string) 
 }
 
 function getServiceAccountName(clusterConfig: ClusterConfig) {
-  // Checks if resourceGroup, an Azure specific property, is present in config
-  const prefix = (clusterConfig.cloudProviderName === "azure") ? 'aks' : 'aws'
+  const prefix = (clusterConfig.cloudProviderName === 'azure') ? 'aks' : 'aws'
   // Ensure the service account name is within the length restriction
   // and ends with an alphanumeric character
   return `prometheus-${prefix}-${clusterConfig.clusterName}`.substring(0, 30).replace(/[^a-zA-Z0-9]+$/g, '')

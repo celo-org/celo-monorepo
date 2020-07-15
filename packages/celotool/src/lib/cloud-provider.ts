@@ -7,8 +7,12 @@ export interface ClusterConfig {
   cloudProviderName: string
 }
 
-// Configures kubectl to connect to a cluster named clusterConfig.clusterName
-export async function isContextSet(
+/**
+ * This will set the current context to the listed cluster name. 
+ * If a context with the cluster name does not exist, return false.
+ * @param clusterConfig 
+ */
+export async function setContextAndCheckForMissingCredentials(
   clusterConfig: ClusterConfig,
 ) {
   let currentCluster = null

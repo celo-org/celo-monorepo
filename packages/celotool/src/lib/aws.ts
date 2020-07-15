@@ -1,4 +1,4 @@
-import { ClusterConfig, isContextSet, setupCloudCluster } from 'src/lib/cloud-provider'
+import { ClusterConfig, setContextAndCheckForMissingCredentials, setupCloudCluster } from 'src/lib/cloud-provider'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 
 /**
@@ -16,8 +16,9 @@ export async function switchToAwsCluster(
 
   // TODO Look into switching subscription between testing and production
 
-  const isContextSetCorrectly = await isContextSet(clusterConfig)
+  const isContextSetCorrectly = await setContextAndCheckForMissingCredentials(clusterConfig)
   if (!isContextSetCorrectly) {
+    // If context does not exist, fetch it.
     await execCmdWithExitOnFailure(
       `aws eks --region ${clusterConfig.clusterRegion} update-kubeconfig --name ${clusterConfig.clusterName} --alias ${clusterConfig.clusterName}`
       ) 
