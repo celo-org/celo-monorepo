@@ -43,16 +43,16 @@ for contract in $(<"$1"); do
   fi
 
   contractExists=1
-  celocli releasegold:revoke --contract "$contract" --yesreally > /dev/null || contractExists=0
+  celocli releasegold:revoke --contract "$contract" --yesreally --useLedger > /dev/null || contractExists=0
   if [ "$contractExists" -eq 0 ]; then
     echo "Contract doesn't exist, rejecting $contract"
     rejects+=( $contract )
     continue
   fi
   if [ "$accountCreated" -ne 0 ]; then
-    celocli releasegold:locked-gold --contract "$contract" --action withdraw --value "$total" --yes 
+    celocli releasegold:locked-gold --contract "$contract" --action withdraw --value "$total" --yes --useLedger > /dev/null
   fi
-  celocli releasegold:refund-and-finalize --contract "$contract" > /dev/null
+  celocli releasegold:refund-and-finalize --contract "$contract" --useLedger > /dev/null
 
 done
 
