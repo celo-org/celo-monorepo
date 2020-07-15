@@ -12,37 +12,34 @@ for contract in $(<"$1"); do
   echo "Contract $contract"
 
   # Check that account has been created
-  accountExists=1
-  celocli lockedgold:show "$contract" > /dev/null 2>&1 || accountExists=0
-  if [ $accountExists -eq 0 ]; then
-    echo "Account not created, rejecting $contract"
-    rejects+=( $contract )
-    continue
-  fi
+  accountCreated=1
+  celocli lockedgold:show "$contract" > /dev/null 2>&1 || accountCreated=0
+  if [ $accountCreated -ne 0 ]; then
 
-  # Check that CELO has been unlocked
-  lockedgold=$(celocli lockedgold:show "$contract")
-  total=$(echo "$lockedgold" | grep -o "total: [0-9]*" | cut -f2 -d : | tr -d '[:space:]')
-  if [ "$total" != "0" ]; then
-    echo "Reject $contract"
-    rejects+=( $contract )
-    continue
-  fi
+    # Check that CELO has been unlocked
+    lockedgold=$(celocli lockedgold:show "$contract")
+    total=$(echo "$lockedgold" | grep -o "total: [0-9]*" | cut -f2 -d : | tr -d '[:space:]')
+    if [ "$total" != "0" ]; then
+      echo "Reject $contract"
+      rejects+=( $contract )
+      continue
+    fi
 
-  # Check that withdrawals are available
-  if [ -z $(echo "$lockedgold" | grep -o "time: [0-9]*" | cut -f2 -d :) ]; then
-    echo "No pending withdrawals"
-  else 
-    pendingTimes=$(echo "$lockedgold" | grep -o "time: [0-9]*" | cut -f2 -d :)
-    now=$(date +%s)
-    while IFS= read -r line
-    do 
-      if [ "$line" -ge "$now" ]; then
-        echo "Pending withdrawal not ready, rejecting $contract"
-        rejects+=( $contract )
-        continue 2
-      fi
-    done < <(printf '%s\n' "$pendingTimes")
+    # Check that withdrawals are available
+    if [ -z $(echo "$lockedgold" | grep -o "time: [0-9]*" | cut -f2 -d :) ]; then
+      echo "No pending withdrawals"
+    else 
+      pendingTimes=$(echo "$lockedgold" | grep -o "time: [0-9]*" | cut -f2 -d :)
+      now=$(date +%s)
+      while IFS= read -r line
+      do 
+        if [ "$line" -ge "$now" ]; then
+          echo "Pending withdrawal not ready, rejecting $contract"
+          rejects+=( $contract )
+          continue 2
+        fi
+      done < <(printf '%s\n' "$pendingTimes")
+    fi
   fi
 
   contractExists=1
@@ -52,7 +49,9 @@ for contract in $(<"$1"); do
     rejects+=( $contract )
     continue
   fi
-  celocli releasegold:locked-gold --contract "$contract" --action withdraw --value "$total" --yes 
+  if [ "$accountCreated" -ne 0 ]; then
+    celocli releasegold:locked-gold --contract "$contract" --action withdraw --value "$total" --yes 
+  fi
   celocli releasegold:refund-and-finalize --contract "$contract" > /dev/null
 
 done
