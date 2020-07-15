@@ -128,7 +128,7 @@ export const Flags = {
   path: flags.build({
     parse: parsePath,
     description: 'Path',
-    helpValue: 'celo/genesis.json',
+    helpValue: './genesis.json',
   }),
   wei: flags.build({
     parse: parseWei,
