@@ -9,7 +9,7 @@ import "./SlasherUtil.sol";
 contract DowntimeSlasher is SlasherUtil {
   using SafeMath for uint256;
 
-  // Maps validator address -> last block of the interval for which it has been slashed.
+  // Maps validator address -> end block of the latest interval for which it has been slashed.
   mapping(address => uint256) lastSlashedBlock;
 
   // Maps validator -> startBlock -> endBlock -> signature bitmap for that interval.
@@ -19,7 +19,11 @@ contract DowntimeSlasher is SlasherUtil {
   uint256 public slashableDowntime;
 
   event SlashableDowntimeSet(uint256 interval);
-  event DowntimeSlashPerformed(address indexed validator, uint256 indexed startBlock);
+  event DowntimeSlashPerformed(
+    address indexed validator,
+    uint256 indexed startBlock,
+    uint256 indexed endBlock
+  );
   event BitmapSetForInterval(uint256 indexed startBlock, uint256 indexed endblock, bytes32 bitmap);
 
   /**
@@ -47,18 +51,16 @@ contract DowntimeSlasher is SlasherUtil {
    */
   function setSlashableDowntime(uint256 interval) public onlyOwner {
     require(interval != 0, "slashable downtime cannot be zero");
-    require(interval < getEpochSize(), "slashable downtime must be smaller than epoch size");
     slashableDowntime = interval;
     emit SlashableDowntimeSet(interval);
   }
 
   /**
    * @notice Calculates and returns the signature bitmap for the specified interval.
-   * Similar to the parentSealBitmap of every block (where you have which validators were
-   * able to sign the previous block), this bitmap shows for that specific interval which
-   * validators signed at least one block
-   * @param startBlock First block of the downtime interval.
-   * @param endBlock Last block of the downtime interval.
+   * This bitmap will contain a one for any validator that signed at least one block in that
+   * interval, and zero otherwise.
+   * @param startBlock First block of the interval.
+   * @param endBlock Last block of the interval.
    * @return The signature uptime bitmap for the specified interval.
    * @dev startBlock and endBlock must be in the same epoch.
    * @dev The getParentSealBitmap precompile requires that startBlock must be within 4 epochs of 
@@ -70,17 +72,17 @@ contract DowntimeSlasher is SlasherUtil {
     returns (bytes32)
   {
     require(endBlock >= startBlock, "endBlock must be greater or equal than startBlock");
-    // The sealBitmap for the block N is stored in the block N+1
-    // (block.number - 1) is the currentBlock, and because we don't have the sealBitmap for
-    // the currentBlock, we should check against (currentBlock - 1).
-    uint256 lastBlockWithParentSealBitmap = block.number.sub(2);
+    // The signature bitmap for block N is stored in block N+1.
+    // The latest block is `block.number - 1`, which stores the signature bitmap for
+    // `block.number - 2`.
+    uint256 lastBlockWithSignatureBitmap = block.number.sub(2);
     require(
-      endBlock <= lastBlockWithParentSealBitmap,
-      "endBlock's parentSealBitmap is not yet available"
+      endBlock <= lastBlockWithSignatureBitmap,
+      "the signature bitmap for endBlock is not yet available"
     );
     uint256 epochSize = getEpochSize();
     require(
-      lastBlockWithParentSealBitmap.sub(startBlock) <= epochSize.mul(4),
+      lastBlockWithSignatureBitmap.sub(startBlock) <= epochSize.mul(4),
       "startBlock must be within 4 epochs of the current head"
     );
     require(
@@ -99,8 +101,8 @@ contract DowntimeSlasher is SlasherUtil {
 
   /**
    * @notice Calculates and sets the signature bitmap for the specified interval.
-   * @param startBlock First block of the downtime interval.
-   * @param endBlock Last block of the downtime interval.
+   * @param startBlock First block of the interval.
+   * @param endBlock Last block of the interval.
    * @return The signature bitmap for the specified interval.
    * @dev startBlock and endBlock must be in the same epoch.
    */
@@ -116,12 +118,12 @@ contract DowntimeSlasher is SlasherUtil {
   }
 
   /**
-   * @notice Check if a validator appears down in the bitmap for the interval of blocks.
-   * Both startBlock and endBlock should be part of the same epoch.
+   * @notice Returns true if the validator did not sign any blocks in the specified interval.
    * @param startBlock First block of the interval.
    * @param endBlock Last block of the interval.
    * @param signerIndex Index of the signer within the validator set.
-   * @return True if the validator does not appear in the bitmap of the interval.
+   * @return True if the validator did not sign any blocks in the specified interval.
+   * @dev Both startBlock and endBlock should be part of the same epoch.
    */
   function wasDownForInterval(uint256 startBlock, uint256 endBlock, uint256 signerIndex)
     public
@@ -138,12 +140,10 @@ contract DowntimeSlasher is SlasherUtil {
   }
 
   /**
-   * @notice Shows if the user already called setBitmapForInterval for
-   * the specific interval.
-   * @param startBlock First block of a calculated downtime interval.
-   * @param endBlock Last block of the calculated downtime interval.
-   * @return True if the user already called setBitmapForInterval for
-   * the specific interval.
+   * @notice Returns true if the bitmap has been set for the specified interval.
+   * @param startBlock First block of the interval.
+   * @param endBlock Last block of the interval.
+   * @return True if the bitmap has been set for the specified interval.
    */
   function isBitmapSetForInterval(uint256 startBlock, uint256 endBlock) public view returns (bool) {
     // It's impossible to have all the validators down in a interval.
@@ -153,8 +153,10 @@ contract DowntimeSlasher is SlasherUtil {
   /**
    * @notice Returns true if a validator has been down for the specified overlapping or adjacent
    * intervals.
-   * @param startBlocks startBlocks of the specified intervals.
-   * @param endBlocks endBlocks of the specified intervals.
+   * @param startBlocks A list of interval start blocks for which signature bitmaps have already
+   * been set.
+   * @param endBlocks A list of interval end blocks for which signature bitmaps have already
+   * been set.
    * @param signerIndices Indices of the signers within the validator set for every epoch change.
    * @return True if the validator signature does not appear in any block within the window.
    */
@@ -176,15 +178,15 @@ contract DowntimeSlasher is SlasherUtil {
       if (i > 0) {
         require(
           startBlocks[i.sub(1)] < startBlocks[i],
-          "each interval must start after the previous interval's start"
+          "each interval must start after the start of the previous interval"
         );
         require(
           startBlocks[i] <= endBlocks[i.sub(1)].add(1),
-          "each interval must start at least one block after previous interval's end"
+          "each interval must start at most one block after the end of the previous interval"
         );
         require(
           endBlocks[i.sub(1)] < endBlocks[i],
-          "each interval must end after the previous interval"
+          "each interval must end after the end of the previous interval"
         );
         // The signer index of a particular validator may change from epoch to epoch.
         // Because the intervals for which bitmaps are calculated in this contract do not span
@@ -215,37 +217,13 @@ contract DowntimeSlasher is SlasherUtil {
   }
 
   /**
-   * @notice Add to the validator a new lastSlashedBlock if the validator was not already slashed
-   * in the same epoch of the startBlock and if the blocks to slash are newer than the last one
-   */
-  function addValidatorSlash(address validator, uint256 startBlock, uint256 endBlock) internal {
-    uint256 validatorLastSlashedBlock = lastSlashedBlock[validator];
-
-    require(validatorLastSlashedBlock < startBlock, "validator has a newer slash");
-
-    if (validatorLastSlashedBlock > 0) {
-      uint256 startEpoch = getEpochNumberOfBlock(startBlock);
-      uint256 lastSlashedEpoch = getEpochNumberOfBlock(validatorLastSlashedBlock);
-
-      require(lastSlashedEpoch != startEpoch, "already slashed in that epoch");
-    }
-
-    lastSlashedBlock[validator] = endBlock;
-  }
-
-  /**
-   * @notice Requires that `wasDownForIntervals` returns true and that the account corresponding
-   * to `signer` has not already been slashed for the same startBlocks[0] epoch, or a newer block.
-   * If so, fetches the `account` associated with `signer` and the group that
-   * `signer` was a member of during the corresponding epoch.
-   * Then, calls `LockedGold.slash` on both the validator and group accounts.
-   * Calls `Validators.removeSlashedMember` to remove the validator from its
-   * current group if it is a member of one.
-   * Finally, stores that (account, epochNumber) has been slashed.
-   * @param startBlocks List of blocks that starts a previously validated interval.
-   * StartBlocks[0] will be use as the startBlock of the slashableDowntime.
-   * @param endBlocks List of blocks that ends a previously validated interval.
-   * @param signerIndices Validator indices for every epoch revised.
+   * @notice Slashes a validator that did not sign any blocks for at least `slashableDowntime`.
+   * @param startBlocks A list of interval start blocks for which signature bitmaps have already
+   * been set.
+   * @param endBlocks A list of interval end blocks for which signature bitmaps have already
+   * been set.
+   * @param signerIndices The index of the provided validator for each epoch over which the
+   * provided intervals span.
    * @param groupMembershipHistoryIndex Group membership index from where
    * the group should be found (For start block).
    * @param validatorElectionLessers Lesser pointers for validator slashing.
@@ -254,6 +232,7 @@ contract DowntimeSlasher is SlasherUtil {
    * @param groupElectionLessers Lesser pointers for group slashing.
    * @param groupElectionGreaters Greater pointers for group slashing.
    * @param groupElectionIndices Vote indices for group slashing.
+   * @dev startBlocks[0] will be use as the startBlock of the slashableDowntime.
    */
   function slash(
     uint256[] memory startBlocks,
@@ -267,20 +246,23 @@ contract DowntimeSlasher is SlasherUtil {
     address[] memory groupElectionGreaters,
     uint256[] memory groupElectionIndices
   ) public {
-    require(startBlocks.length > 0, "requires at least one interval");
-    require(signerIndices.length > 0, "requires at least one signerIndex");
-    address validator = getValidatorAccountFromSignerIndex(signerIndices[0], startBlocks[0]);
-    uint256 endBlock = startBlocks[0].add(slashableDowntime).sub(1);
-    addValidatorSlash(validator, startBlocks[0], endBlock);
+    uint256 startBlock = startBlocks[0];
+    uint256 endBlock = endBlocks[endBlocks.length.sub(1)];
     require(
-      endBlock <= endBlocks[endBlocks.length.sub(1)],
-      "the intervals are not covering the slashableDowntime window"
+      endBlock.sub(startBlock).add(1) >= slashableDowntime,
+      "the provided intervals must span slashableDowntime blocks"
+    );
+    address validator = getValidatorAccountFromSignerIndex(signerIndices[0], startBlock);
+    require(
+      startBlock > lastSlashedBlock[validator],
+      "cannot slash validator for downtime for which they may already have been slashed"
     );
     require(wasDownForIntervals(startBlocks, endBlocks, signerIndices), "not down");
+    lastSlashedBlock[validator] = endBlock;
     performSlashing(
       validator,
       msg.sender,
-      startBlocks[0],
+      startBlock,
       groupMembershipHistoryIndex,
       validatorElectionLessers,
       validatorElectionGreaters,
@@ -289,7 +271,7 @@ contract DowntimeSlasher is SlasherUtil {
       groupElectionGreaters,
       groupElectionIndices
     );
-    emit DowntimeSlashPerformed(validator, startBlocks[0]);
+    emit DowntimeSlashPerformed(validator, startBlock, endBlock);
   }
 
   function getValidatorAccountFromSignerIndex(uint256 signerIndex, uint256 blockNumber)
