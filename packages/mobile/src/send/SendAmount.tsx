@@ -229,7 +229,6 @@ function SendAmount(props: Props) {
       navigate(Screens.ValidateRecipientIntro, {
         transactionData,
         addressValidationType,
-        isFromScan: props.route.params?.isFromScan,
       })
     } else {
       ValoraAnalytics.track(SendEvents.send_amount_continue, continueAnalyticsParams)
@@ -253,7 +252,7 @@ function SendAmount(props: Props) {
       navigate(Screens.ValidateRecipientIntro, {
         transactionData,
         addressValidationType,
-        isPaymentRequest: true,
+        isOutgoingPaymentRequest: true,
       })
     } else if (recipientVerificationStatus !== RecipientVerificationStatus.VERIFIED) {
       ValoraAnalytics.track(RequestEvents.request_unavailable, continueAnalyticsParams)

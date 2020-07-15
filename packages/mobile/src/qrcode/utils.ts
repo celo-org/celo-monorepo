@@ -90,7 +90,8 @@ export function* handleBarcode(
   addressToE164Number: AddressToE164NumberType,
   recipientCache: NumberToRecipient,
   e164NumberToAddress: E164NumberToAddressType,
-  secureSendTxData?: TransactionDataInput
+  secureSendTxData?: TransactionDataInput,
+  isOutgoingPaymentRequest?: true
 ) {
   let data: { address: string; e164PhoneNumber: string; displayName: string } | undefined
 
@@ -141,9 +142,17 @@ export function* handleBarcode(
       }
   yield put(storeLatestInRecents(recipient))
 
-  if (secureSendTxData) {
-    replace(Screens.SendConfirmation, { transactionData: secureSendTxData })
+  if (secureSendTxData && isOutgoingPaymentRequest) {
+    replace(Screens.PaymentRequestConfirmation, {
+      transactionData: secureSendTxData,
+      addressJustValidated: true,
+    })
+  } else if (secureSendTxData) {
+    replace(Screens.SendConfirmation, {
+      transactionData: secureSendTxData,
+      addressJustValidated: true,
+    })
   } else {
-    replace(Screens.SendAmount, { recipient })
+    replace(Screens.SendAmount, { recipient, isFromScan: true })
   }
 }
