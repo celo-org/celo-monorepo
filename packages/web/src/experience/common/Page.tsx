@@ -162,6 +162,7 @@ class Page extends React.Component<Props & ScreenProps, State> {
   render() {
     const { screen, sections, router, path, metaDescription, title } = this.props
     const isMobile = screen === ScreenSizes.MOBILE
+    console.warn('PAGES', this.props.pages)
     return (
       <>
         <OpenGraph
@@ -187,7 +188,7 @@ class Page extends React.Component<Props & ScreenProps, State> {
               {!isMobile && (
                 <Sidebar
                   pages={this.props.pages}
-                  currentPathName={router.pathname}
+                  currentPathName={router.asPath}
                   routeHash={this.state.routeHash}
                   onChangeRoute={moveToHash}
                 />

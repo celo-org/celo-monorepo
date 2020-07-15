@@ -1,5 +1,7 @@
 import { createClient } from 'contentful'
 import getConfig from 'next/config'
+import { Page as SideBarEntry } from 'src/experience/common/Sidebar'
+
 function intialize(preview) {
   const { serverRuntimeConfig } = getConfig()
 
@@ -37,5 +39,42 @@ export default async function demo() {
   return {
     name: page.title,
     sections: page.sections,
+  }
+}
+
+interface Kit {
+  name: string
+  slug: string
+  metaDescription: string
+  ogImage: object
+  pages_: any[]
+}
+
+interface InternalKit {
+  name: string
+  metaDescription: string
+  ogImage: object
+  sidebar: SideBarEntry[]
+}
+
+export async function getKit(kitSlug: string): Promise<InternalKit> {
+  const kit = await getClient(false).getEntries<Kit>({
+    content_type: 'kit',
+    'fields.slug': kitSlug,
+  })
+
+  const data = kit.items[0].fields
+
+  return {
+    name: data.name,
+    metaDescription: data.metaDescription,
+    ogImage: data.ogImage,
+    sidebar: data.pages_.map((page) => {
+      return {
+        title: page.fields.title,
+        href: `/experience/${kitSlug}/${page.fields.slug || ''}`,
+        sections: [],
+      }
+    }),
   }
 }
