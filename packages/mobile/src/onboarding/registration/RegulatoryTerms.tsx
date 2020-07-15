@@ -3,7 +3,7 @@ import fontStyles from '@celo/react-components/styles/fonts.v2'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text } from 'react-native'
-import SafeAreaView, { SafeAreaConsumer } from 'react-native-safe-area-view'
+import { SafeAreaInsetsContext, SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { acceptTerms } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
@@ -78,7 +78,7 @@ export class RegulatoryTerms extends React.Component<Props> {
           <Text style={styles.header}>{t('terms.heading2')}</Text>
           <Text style={styles.disclaimer}>{t('terms.goldDisclaimer')}</Text>
         </ScrollView>
-        <SafeAreaConsumer>
+        <SafeAreaInsetsContext.Consumer>
           {(insets) => (
             <Button
               style={[styles.button, insets && insets.bottom <= MARGIN && { marginBottom: MARGIN }]}
@@ -89,7 +89,7 @@ export class RegulatoryTerms extends React.Component<Props> {
               testID={'AcceptTermsButton'}
             />
           )}
-        </SafeAreaConsumer>
+        </SafeAreaInsetsContext.Consumer>
       </SafeAreaView>
     )
   }

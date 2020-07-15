@@ -432,9 +432,9 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
             },
             Object {
               "color": "#2E3338",
-              "fontFamily": "Hind-Bold",
+              "fontFamily": "Inter-SemiBold",
               "fontSize": 16,
-              "lineHeight": 24,
+              "lineHeight": 22,
             },
           ]
         }
@@ -453,9 +453,9 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
           },
           Object {
             "color": "#2E3338",
-            "fontFamily": "Hind-Bold",
+            "fontFamily": "Inter-SemiBold",
             "fontSize": 16,
-            "lineHeight": 24,
+            "lineHeight": 22,
           },
         ]
       }

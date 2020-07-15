@@ -13,14 +13,14 @@ const GasPriceMinimum = {
 
 const StableToken = {
   balanceOf: jest.fn(async () => {
-    return new BigNumber(10000000000)
+    return new BigNumber(1e18)
   }),
   decimals: jest.fn(async () => '10'),
   transferWithComment: jest.fn(async () => ({ txo: txo() })),
 }
 
 const GoldToken = {
-  balanceOf: jest.fn(async () => new BigNumber(10000000000)),
+  balanceOf: jest.fn(async () => new BigNumber(1e18)),
   decimals: jest.fn(async () => '10'),
   transferWithComment: jest.fn(async () => ({ txo: txo() })),
 }

@@ -8,6 +8,7 @@ import {
   withTranslation as withTranslationI18Next,
 } from 'react-i18next'
 import * as RNLocalize from 'react-native-localize'
+import { APP_NAME } from 'src/config'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'i18n'
@@ -42,7 +43,9 @@ const availableResources = {
 }
 
 function getLanguage() {
-  const fallback = { languageTag: 'en', isRTL: false }
+  // We fallback to `undefined` to know we couldn't find the best language
+  // In that case i18n.language will report `undefined` but will use fallbackLng internally
+  const fallback = { languageTag: undefined }
   const { languageTag } =
     RNLocalize.findBestAvailableLanguage(Object.keys(availableResources)) || fallback
   return languageTag
@@ -88,16 +91,20 @@ i18n
     debug: true,
     interpolation: {
       escapeValue: false,
+      defaultVariables: { appName: APP_NAME },
     },
     missingInterpolationHandler: currencyInterpolator,
   })
   .catch((reason: any) => Logger.error(TAG, 'Failed init i18n', reason))
 
-RNLocalize.addEventListener('change', () => {
-  i18n
-    .changeLanguage(getLanguage())
-    .catch((reason: any) => Logger.error(TAG, 'Failed to change i18n language', reason))
-})
+// Disabling this for now as we have our own language selection within the app
+// and this will change the displayed language only for the current session
+// when the device locale is changed outside of the app.
+// RNLocalize.addEventListener('change', () => {
+//   i18n
+//     .changeLanguage(getLanguage())
+//     .catch((reason: any) => Logger.error(TAG, 'Failed to change i18n language', reason))
+// })
 
 // Create HOC wrapper that hoists statics
 // https://react.i18next.com/latest/withtranslation-hoc#hoist-non-react-statics

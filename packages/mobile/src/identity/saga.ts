@@ -8,8 +8,8 @@ import {
   takeLeading,
 } from 'redux-saga/effects'
 import { showErrorInline } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { SendEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
   Actions,
@@ -20,7 +20,7 @@ import { checkTxsForIdentityMetadata } from 'src/identity/commentEncryption'
 import { doImportContactsWrapper, fetchAddressesAndValidateSaga } from 'src/identity/contactMapping'
 import { AddressValidationType, e164NumberToAddressSelector } from 'src/identity/reducer'
 import { validateAndReturnMatch } from 'src/identity/secureSend'
-import { revokeVerification, startVerification } from 'src/identity/verification'
+import { startVerification } from 'src/identity/verification'
 import { Actions as TransactionActions } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -55,17 +55,17 @@ export function* validateRecipientAddressSaga({
       addressValidationType
     )
 
-    CeloAnalytics.track(CustomEventNames.send_secure_success, {
-      method: 'manual',
-      validationType: addressValidationType === AddressValidationType.FULL ? 'full' : 'partial',
+    ValoraAnalytics.track(SendEvents.send_secure_complete, {
+      confirmByScan: false,
+      partialAddressValidation: addressValidationType === AddressValidationType.PARTIAL,
     })
 
     yield put(validateRecipientAddressSuccess(e164PhoneNumber, validatedAddress))
   } catch (error) {
-    CeloAnalytics.track(CustomEventNames.send_secure_incorrect, {
-      method: 'manual',
-      validationType: addressValidationType === AddressValidationType.FULL ? 'full' : 'partial',
-      error,
+    ValoraAnalytics.track(SendEvents.send_secure_incorrect, {
+      confirmByScan: false,
+      partialAddressValidation: addressValidationType === AddressValidationType.PARTIAL,
+      error: error.message,
     })
 
     Logger.error(TAG, 'validateRecipientAddressSaga/Address validation error: ', error)
@@ -78,7 +78,6 @@ export function* validateRecipientAddressSaga({
 }
 function* watchVerification() {
   yield takeLatest(Actions.START_VERIFICATION, startVerification)
-  yield takeEvery(Actions.REVOKE_VERIFICATION, revokeVerification)
 }
 
 function* watchContactMapping() {

@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`IncomingPaymentRequestListScreen renders correctly with no requests 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -27,11 +27,11 @@ exports[`IncomingPaymentRequestListScreen renders correctly with no requests 1`]
   >
     global:emptyList
   </Text>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
 
 exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -804,5 +804,5 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
       </View>
     </View>
   </RCTScrollView>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

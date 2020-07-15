@@ -41,18 +41,20 @@ spec:
       - name: set-label
         image: {{ .Values.kubectl.image.repository }}:{{ .Values.kubectl.image.tag }}
         command:
-        - sh
+        - /bin/bash
         - -c
         args:
         - |
-           kubectl \
-            --namespace "$POD_NAMESPACE" \
-            --server="https://kubernetes.default.svc" \
-            --token="$TOKEN" \
-            --certificate-authority="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt" \
-            label pod "$POD_NAME" \
-            --overwrite \
-            "aadpodidbinding=$POD_NAME-identity-binding"
+          RID=${POD_NAME##*-}
+          TOKEN_ENV_VAR_NAME="TOKEN_$RID"
+          kubectl \
+          --namespace "$POD_NAMESPACE" \
+          --server="https://kubernetes.default.svc" \
+          --token="${!TOKEN_ENV_VAR_NAME}" \
+          --certificate-authority="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt" \
+          label pod "$POD_NAME" \
+          --overwrite \
+          "aadpodidbinding=$POD_NAME-identity-binding"
         env:
         - name: POD_NAMESPACE
           valueFrom:
@@ -62,11 +64,13 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        - name: TOKEN
+        {{ range $index, $e := .Values.kube.serviceAccountSecretNames }}
+        - name: TOKEN_{{ $index }}
           valueFrom:
             secretKeyRef:
               key: token
-              name: {{ .Values.kube.authTokenName }}
+              name: {{ $e }}
+        {{ end }}
       containers:
       - name: oracle-client
         image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
