@@ -264,7 +264,6 @@ data:
       {{ end }}
       echo "Generating private key with KEY_INDEX=$KEY_INDEX"
       celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType {{ .mnemonic_account_type }} --index $KEY_INDEX > /root/.celo/pkey
-      echo celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType {{ .mnemonic_account_type }} --index $KEY_INDEX
       echo "Private key $(cat /root/.celo/pkey)"
       echo 'Generating address'
       celotooljs.sh generate account-address --private-key $(cat /root/.celo/pkey) > /root/.celo/address
