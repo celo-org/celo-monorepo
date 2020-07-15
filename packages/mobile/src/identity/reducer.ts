@@ -59,6 +59,7 @@ export interface State {
   matchedContacts: ContactMatches
   isValidRecipient: boolean
   secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
+  isFetchingAddresses: boolean
 }
 
 const initialState: State = {
@@ -79,6 +80,7 @@ const initialState: State = {
   matchedContacts: {},
   isValidRecipient: false,
   secureSendPhoneNumberMapping: {},
+  isFetchingAddresses: false,
 }
 
 export const reducer = (
@@ -97,6 +99,7 @@ export const reducer = (
           current: 0,
           total: 0,
         },
+        isFetchingAddresses: false,
       }
     }
     case Actions.RESET_VERIFICATION:
@@ -214,6 +217,16 @@ export const reducer = (
           }
         ),
       }
+    case Actions.FETCH_ADDRESSES_AND_VALIDATION_STATUS:
+      return {
+        ...state,
+        isFetchingAddresses: true,
+      }
+    case Actions.END_FETCHING_ADDRESSES:
+      return {
+        ...state,
+        isFetchingAddresses: false,
+      }
     default:
       return state
   }
@@ -245,3 +258,4 @@ export const secureSendPhoneNumberMappingSelector = (state: RootState) =>
 export const importContactsProgressSelector = (state: RootState) =>
   state.identity.importContactsProgress
 export const matchedContactsSelector = (state: RootState) => state.identity.matchedContacts
+export const isFetchingAddressesSelector = (state: RootState) => state.identity.isFetchingAddresses
