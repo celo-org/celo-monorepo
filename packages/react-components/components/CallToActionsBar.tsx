@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 16,
     marginRight: 24,
-    width: 50,
-    height: 18,
+    minWidth: 48,
+    height: 16,
   },
 })

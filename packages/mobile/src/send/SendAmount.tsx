@@ -247,7 +247,11 @@ function SendAmount(props: Props) {
   const onRequest = React.useCallback(() => {
     const transactionData = getTransactionData(TokenTransactionType.PayRequest)
 
-    if (addressValidationType !== AddressValidationType.NONE) {
+    if (
+      addressValidationType !== AddressValidationType.NONE &&
+      recipient.kind !== RecipientKind.QrCode &&
+      recipient.kind !== RecipientKind.Address
+    ) {
       navigate(Screens.ValidateRecipientIntro, {
         transactionData,
         addressValidationType,
