@@ -81,26 +81,24 @@ export class CategorizedChanges {
     public readonly minor: Change[],
     public readonly patch: Change[]) {}
 
-
-
   /**
    * @returns a mapping {contract name => {@link CategorizedChanges}}
    */
-  explode = (): CategorizedChangesIndex => {
-    const builders: {[k: string]: CategorizedChangesBuilder} = {}
-    const builder = (k: string) => {
-      if (!builders.hasOwnProperty(k)) {
-        builders[k] = new CategorizedChangesBuilder()
+  byContract = (): CategorizedChangesIndex => {
+    const builders: {[contract: string]: CategorizedChangesBuilder} = {}
+    const builder = (contract: string) => {
+      if (!builders.hasOwnProperty(contract)) {
+        builders[contract] = new CategorizedChangesBuilder()
       }
-      return builders[k]
+      return builders[contract]
     }
     this.storage.forEach((r: ASTStorageCompatibilityReport) => builder(r.contract).storage.push(r))
     this.major.forEach((c: Change) => builder(c.getContract()).major.push(c))
     this.minor.forEach((c: Change) => builder(c.getContract()).minor.push(c))
     this.patch.forEach((c: Change) => builder(c.getContract()).patch.push(c))
     const ret: CategorizedChangesIndex = {}
-    Object.keys(builders).forEach((k: string) => {
-      ret[k] = builders[k].build()
+    Object.keys(builders).forEach((contract: string) => {
+      ret[contract] = builders[contract].build()
     })
     return ret
   }
@@ -142,10 +140,10 @@ export class ASTVersionedReport {
    * by the {@link CategorizedChanges} for each contract.
    */
   static createByContract = (changes: CategorizedChanges): ASTVersionedReportIndex => {
-    const changesIndex = changes.explode()
+    const changesByContract = changes.byContract()
     const ret: ASTVersionedReportIndex = {}
-    Object.keys(changesIndex).forEach((contract: string) => {
-      ret[contract] = ASTVersionedReport.create(changesIndex[contract])
+    Object.keys(changesByContract).forEach((contract: string) => {
+      ret[contract] = ASTVersionedReport.create(changesByContract[contract])
     })
     return ret
   }
