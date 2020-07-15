@@ -145,6 +145,7 @@ export interface RequireSecureSendAction {
 
 export interface EndFetchingAddressesAction {
   type: Actions.END_FETCHING_ADDRESSES
+  e164Number: string
 }
 
 export type ActionTypes =
@@ -306,6 +307,7 @@ export const requireSecureSend = (
   addressValidationType,
 })
 
-export const endFetchingAddresses = (): EndFetchingAddressesAction => ({
+export const endFetchingAddresses = (e164Number: string): EndFetchingAddressesAction => ({
   type: Actions.END_FETCHING_ADDRESSES,
+  e164Number,
 })
