@@ -219,7 +219,7 @@ describe('SendAmount', () => {
       expect(navigate).toHaveBeenCalledWith(Screens.ValidateRecipientIntro, {
         transactionData: mockTransactionData2,
         addressValidationType: AddressValidationType.FULL,
-        isPaymentRequest: true,
+        isOutgoingPaymentRequest: true,
       })
     })
 

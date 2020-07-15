@@ -96,7 +96,7 @@ async function helmParameters(
     `--set geth.expose_rpc_externally=false`,
     `--set geth.image.repository=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY)}`,
     `--set geth.image.tag=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_TAG)}`,
-    `--set geth.enable_metrics=${fetchEnvOrFallback(envVar.GETH_ENABLE_METRICS, 'false')}`,
+    `--set geth.metrics=${fetchEnvOrFallback(envVar.GETH_ENABLE_METRICS, 'false')}`,
     `--set geth.public_ips='{${staticIps}}'`,
     `--set-string geth.rpc_apis='${rpcApis.split(',').join('\\\,')}'`,
     `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
