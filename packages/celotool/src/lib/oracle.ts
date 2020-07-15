@@ -396,7 +396,7 @@ export function getAwsClusterConfig(oracleContext: string): AwsClusterConfig {
 export function getOracleContextDynamicEnvVarValues<T>(
   dynamicEnvVars: { [k in keyof T]: DynamicEnvVar },
   oracleContext: string,
-  defaultValues?: { [k in keyof Pick<T, any>]: string}
+  defaultValues?: { [k in keyof T]: string}
 ): {
   [k in keyof T]: string
 } {
@@ -407,7 +407,7 @@ export function getOracleContextDynamicEnvVarValues<T>(
       const dynamicEnvVarName = getDynamicEnvVarName(dynamicEnvVar, {
         oracleContext
       })
-      const defaultValue = (defaultValues && defaultValues[key] === undefined) ? defaultValues[key] : undefined
+      const defaultValue = defaultValues ? defaultValues[key] : undefined
       const value = defaultValue !== undefined ?
         fetchEnvOrFallback(dynamicEnvVarName, defaultValue) :
         fetchEnv(dynamicEnvVarName)
