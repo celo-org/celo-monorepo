@@ -1,40 +1,29 @@
 require('jest-circus')
 const { makeRunResult } = require('jest-circus/build/utils')
-const processFlakes = require('../processor')
-const GitHub = require('../github')
-const { getTestID, buildFlakeyDescribe, fmtFlakeIssue, fmtTestTitles } = require('./utils')
-const { shouldSkipKnownFlakes, shouldReportFlakes, numRetries } = require('./config')
+const db = require('../db')
+const { getTestID, buildFlakeyDescribe, fmtTestTitles } = require('./utils')
+const { shouldSkipKnownFlakes, numRetries } = require('./config')
 const clone = require('clone')
 
 class FlakeTracker {
-  constructor(global) {
-    this.global = global
-  }
-
   async setup() {
-    this.flakes = new Map() //TODO(Alec, nth): store these in db?
-    if (shouldReportFlakes || shouldSkipKnownFlakes) {
-      this.github = await GitHub.build()
-      if (shouldSkipKnownFlakes) {
-        this.skip = await this.github.fetchKnownFlakes()
-      }
-    }
-    //TODO(Alec, nth): Make githubclient interactions less frequent
+    this.flakes = new Map()
+    this.skip = shouldSkipKnownFlakes ? db.readKnownFlakes() : []
   }
 
   async handleTestEvent(event, state) {
     if (event.name === 'test_retry') {
-      console.log('Retry #' + event.test.invocations + ' for test: ' + getTestID(event.test))
+      console.log('Retry #' + event.test.invocations + ' for test: ' + getTestID(event.test)) //TODO(Alec): standardize
     }
 
     if (event.name === 'run_finish') {
+      // We make a fake describe block with all the accumulated errors and then use it
+      // to call `makeRunResult`. This converts our `TestEntry` objects into `TestResults`
+      // which have formatted errors.
       const describeBlock = buildFlakeyDescribe(clone(state.rootDescribeBlock), this.flakes)
-
-      const flakes = makeRunResult(describeBlock, state.unhandledErrors)
+      makeRunResult(describeBlock, state.unhandledErrors)
         .testResults.filter((tr) => tr.status === 'flakey')
-        .map((tr) => fmtFlakeIssue(fmtTestTitles(tr.testPath), tr.errors))
-
-      await processFlakes(flakes, this.github)
+        .forEach((tr) => db.writeErrors(fmtTestTitles(tr.testPath), tr.errors))
     }
 
     if (event.name === 'test_done') {
@@ -48,11 +37,8 @@ class FlakeTracker {
           this.flakes.delete(testID)
         } else {
           // Test will be retried => store error
-          let errors = []
-          let prevErrors = this.flakes.get(testID)
-          if (prevErrors) {
-            errors.push(...prevErrors)
-          }
+          const prevErrors = this.flakes.get(testID)
+          const errors = prevErrors || []
           errors.push(...event.test.errors)
           this.flakes.set(testID, errors)
         }

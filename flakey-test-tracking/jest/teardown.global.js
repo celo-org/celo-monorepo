@@ -1,3 +1,3 @@
 module.exports = async () => {
-  console.log('^^^^^^^^^^GLOBAL_TEARDOWN^^^^^^^^^^')
+  await global.FlakeManager.finish()
 }

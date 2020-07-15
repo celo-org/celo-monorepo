@@ -1,3 +1,4 @@
+const { fmtFlakeIssue } = require('./utils')
 const { tmpdir } = require('os')
 const { join } = require('path')
 const fs = require('fs')
@@ -15,23 +16,43 @@ const init = () => {
   mkDir(join(tmpdir(), flakeDir, errDir))
 }
 
-const saveError = (testID, err) => {
-  fs.appendFileSync(join(tmpdir(), flakeDir, errDir, fmtTestKey(testID)), err + delim)
+const writeErrors = (testID, errs) => {
+  writeError(testID, errs.join(delim))
 }
 
-const getErrors = (testID) => {
+const writeError = (testID, err) => {
+  const path = join(tmpdir(), flakeDir, errDir, fmtTestKey(testID))
+  if (!fs.existsSync(path)) {
+    fs.writeFileSync(path, testID)
+  }
+  fs.appendFileSync(path, delim + err)
+}
+
+const readErrors = (testID) => {
   return readFileInFlakeDir(join(errDir, fmtTestKey(testID)))
 }
 
-const saveKnownFlakes = (flakes) => {
-  fs.writeFileSync(join(tmpdir(), flakeDir, skipFile), flakes.join(delim))
+const writeKnownFlakes = (flakes) => {
+  if (flakes.length) {
+    fs.writeFileSync(join(tmpdir(), flakeDir, skipFile), flakes.join(delim))
+  }
 }
 
-const getKnownFlakes = () => {
+const readKnownFlakes = () => {
   return readFileInFlakeDir(skipFile)
 }
 
+const readNewFlakes = () => {
+  return fs.readdirSync(join(tmpdir(), flakeDir, errDir)).map(parseFlakeFile)
+}
+
 /* Helpers */
+
+const parseFlakeFile = (fileName) => {
+  const errors = readFileInFlakeDir(join(errDir, fileName))
+  const testID = errors.shift()
+  return fmtFlakeIssue(testID, errors)
+}
 
 const mkDir = (path) => {
   if (!fs.existsSync(path)) {
@@ -50,8 +71,13 @@ const mkTmpDir = (name) => {
 }
 
 const readFileInFlakeDir = (file) => {
-  const buf = fs.readFileSync(join(tmpdir(), flakeDir, file))
-  return buf.toString().split(delim)
+  const path = join(tmpdir(), flakeDir, file)
+  return fs.existsSync(path)
+    ? fs
+        .readFileSync(path)
+        .toString()
+        .split(delim)
+    : []
 }
 
 const fmtTestKey = (testID) => {
@@ -74,13 +100,15 @@ const hashCode = (str) => {
     hash = (hash << 5) - hash + chr
     hash |= 0 // Convert to 32bit integer
   }
-  return hash.toString()
+  return hash.toString().trim()
 }
 
 module.exports = {
+  readErrors: readErrors,
+  readKnownFlakes: readKnownFlakes,
+  readNewFlakes: readNewFlakes,
   init: init,
-  saveError: saveError,
-  getErrors: getErrors,
-  saveKnownFlakes: saveKnownFlakes,
-  getKnownFlakes: getKnownFlakes,
+  writeError: writeError,
+  writeErrors: writeErrors,
+  writeKnownFlakes: writeKnownFlakes,
 }

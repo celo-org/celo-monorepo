@@ -1,3 +1,5 @@
-// module.exports = async () => {
-//   console.log('^^^^^^^^^^GLOBAL_SETUP^^^^^^^^^^')
-// }
+const FlakeManager = require('../manager')
+
+module.exports = async () => {
+  global.FlakeManager = await FlakeManager.build()
+}

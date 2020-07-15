@@ -1,6 +1,6 @@
 const fmtFlakeIssue = (testID, errors) => {
   return {
-    title: '[FLAKEY TEST] ' + testID,
+    title: '[FLAKEY] ' + testID,
     body: fmtIssueBody(errors),
   }
 }

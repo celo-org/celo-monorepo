@@ -7,7 +7,8 @@ const base = {
 
 const flakeTracking = {
   ...base,
-  //globalSetup: require.resolve('./setup.global.js'),
+  globalSetup: require.resolve('./setup.global.js'),
+  globalTeardown: require.resolve('./teardown.global.js'),
   setupFilesAfterEnv: [require.resolve('./setup.js')],
 }
 

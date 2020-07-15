@@ -78,6 +78,8 @@
   },
   "dependencies": {},
   "resolutions": {
+    "**/truffle/mocha": "^6.2.2",
+    "**/truffle-security/mocha": "^6.2.2",
     "node-gyp": "5.0.1",
     "tar": "4.4.10",
     "lodash": "4.17.15",

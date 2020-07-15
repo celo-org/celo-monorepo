@@ -1,58 +1,48 @@
 const Mocha = require('mocha')
-const GitHub = require('../github')
-const processFlakes = require('../processor')
-const { getTestID, fmtFlakeIssue } = require('./utils')
-const cache = require('../cache')
-const { shouldSkipKnownFlakes } = require('../config')
-
-const flakeMap = new Map() //TODO(Alec)
+const FlakeManager = require('../manager')
+const { getTestID, fmtError } = require('./utils')
+const { Spec, Base } = Mocha.reporters
 
 function FlakeReporter(runner) {
-  Mocha.reporters.Spec.call(this, runner)
+  Spec.call(this, runner)
 
-  const flakes = []
-  let github
-  let skip
+  let manager
+  let skips = []
+  let currErrors = []
 
   before('Fetch Flakey Tests', async function() {
-    cache.init()
-    console.log('Fetching known flakey tests...\n')
-    github = await GitHub.build()
-    // cache.saveKnownFlakes(await github.fetchKnownFlakes())
-    // skip = cache.getKnownFlakes() //TODO(Alec): fix test skipping in mocha
+    manager = await FlakeManager.build()
+    skips = manager.knownFlakes
   })
 
   after('Process Flakey Tests', async function() {
-    await processFlakes(
-      flakes.map((f) => fmtFlakeIssue(f, cache.getErrors(f))),
-      github
-    )
-  })
+    await manager.finish()
+  }) //TODO(Alec, nth): use spec logger
 
-  // The `retry` event is only emmited by Mocha >= v6.0.0.
-  // See `interface.js` for details.
   runner.on('retry', function(test, err) {
-    cache.saveError(getTestID(test), JSON.stringify(err))
+    //console.log('Retry # ' + test.currentRetry() + ' for test ' + getTestID(test))
+    Base.consoleLog('Retry # ' + (test.currentRetry() + 1) + ' for test ' + getTestID(test))
+    currErrors.push(fmtError(err))
   })
 
-  // if (shouldSkipKnownFlakes) {
-  //   runner.on('test', function(test) {
-  //     let testID = getTestID(test)
-  //     console.log(testID)
-  //     if (skip.some((knownFlake) => knownFlake.includes(testID))) {
-  //       console.log('Test Skipped!')
-  //       test.parent.pending = true
-  //       test.pending = true
-  //       test.skip()
-  //     }
-  //   })
-  // }
+  runner.on('test', function(test) {
+    if (skips.length) {
+      let testID = getTestID(test)
+      if (skips.some((knownFlake) => knownFlake.includes(testID))) {
+        console.log('Skipping known flakey test: ' + testID)
+        test.pending = true
+      }
+    }
+  })
 
   runner.on('pass', function(test) {
-    console.log(++i)
-    if (test.currentRetry() > 0 && test.currentRetry() <= test.retries()) {
-      flakes.push(getTestID(test))
+    if (test.currentRetry() > 0) {
+      manager.saveErrors(getTestID(test), currErrors)
     }
+  })
+
+  runner.on('test end', function(test) {
+    currErrors = []
   })
 }
 

@@ -4,6 +4,7 @@ const { retry } = require('@octokit/plugin-retry')
 const Client = Octokit.plugin(retry)
 const AnsiToHtml = require('ansi-to-html')
 const convert = new AnsiToHtml()
+const { shouldCreateIssues, shouldAddCheckToPR, shouldSkipFlakes } = require('./utils')
 
 const FlakeLabel = 'FLAKEY'
 const defaults = {
@@ -24,11 +25,13 @@ class GitHub {
     const app = new App({
       id: 71131,
       privateKey: process.env.FLAKE_TRACKER_SECRET.replace(/\\n/gm, '\n'),
-      //privateKey: process.env.FLAKE_TRACKER_SECRET,
-      //privateKey: privateKey,
     })
 
     const rest = await auth(app)
+
+    if (shouldAddCheckToPR) {
+      await this.startCheck()
+    }
 
     return new GitHub(app, rest)
   }
@@ -40,13 +43,42 @@ class GitHub {
     this.rest = await auth(this.app)
   }
 
+  async report(flakes, skippedTests) {
+    console.log('Sending flake tracker results to GitHub...\n')
+
+    const promises = []
+
+    if (shouldCreateIssues) {
+      // Check list of flakey issues again to prevent duplicates
+      const knownFlakes = await this.fetchKnownFlakes()
+      const newFlakes = knownFlakes.filter((flake) => !knownFlakes.includes(flake))
+      if (newFlakes.length) {
+        promises.push(this.issues(newFlakes))
+      }
+    }
+
+    if (shouldAddCheckToPR) {
+      promises.push(this.endCheck(flakes, skippedTests))
+    }
+
+    return Promise.all(promises)
+  }
+
+  async issues(flakes) {
+    return Promise.all(newFlakes.map((f) => this.issue(f)))
+  }
+
   async issue(flake) {
+    if (process.env.CIRCLECI) {
+      flake.body = 'Discovered in PR ' + process.env.CIRCLE_PULL_REQUEST + '\n' + flake.body
+    }
+
     const fn = () => {
       return this.rest.issues.create({
         ...defaults,
         title: flake.title,
         body: convert.toHtml(flake.body),
-        labels: [FlakeLabel],
+        labels: [FlakeLabel, process.env.CIRCLE_JOB],
       })
     }
 
@@ -55,43 +87,69 @@ class GitHub {
     await this.safeExec(fn, errMsg)
   }
 
-  async check(flake) {
+  async startCheck() {
     const fn = () => {
       return this.rest.checks.create({
         ...defaults,
-        name: 'Flake Tracking',
+        name: 'Flakey Bot',
         head_sha: process.env.CIRCLE_SHA1,
+        status: 'in_progress',
       })
     }
 
-    const errMsg = 'Failed to create check run.'
+    const errMsg = 'Failed to start check run.'
+
+    this.checkID = (await this.safeExec(fn, errMsg)).id
+  }
+
+  async endCheck(flakes, skippedTests) {
+    const summaries = {
+      failure: 'flakey tests found',
+      neutral: 'some tests were skipped due to flakiness',
+      success: 'no flakey tests found!',
+    }
+
+    let conclusion = 'failure'
+    if (!flakes.length) {
+      conclusion = skippedTests.length ? 'neutral' : 'success'
+    }
+
+    let text = ''
+    flakes.forEach((flake) => {
+      text += flake.title + '\n' + flake.body + '\n'
+    })
+
+    const annotations = flakes.map((f) => {
+      const firstLineOfStack = f.body.split('at ')[1].split(':')
+      return {
+        title: f.title,
+        path: firstLineOfStack[0],
+        start_line: firstLineOfStack[1],
+        end_line: firstLineOfStack[1],
+        annotation_level: 'warning',
+        message: f.body,
+      }
+    })
+
+    const output = {
+      title: process.env.CIRCLE_JOB,
+      summary: summaries[conclusion],
+      text: text,
+      annotations: annotations,
+    }
+
+    const fn = () => {
+      return this.rest.checks.update({
+        ...defaults,
+        check_run_id: this.checkID,
+        conclusion: conclusion,
+        output: output,
+      })
+    }
+
+    const errMsg = 'Failed to end check run.'
 
     await this.safeExec(fn, errMsg)
-
-    // TODO(Alec, next): add checks
-    // console.log('PR COMMENT TRIGGERED \n')
-    // const prNumber = process.env.CIRCLE_PR_NUMBER
-    // console.log(prNumber)
-    // console.log(process.env.CIRCLE_PR_REPONAME)
-    // try {
-    //   await this.rest.pulls.createReviewComment({
-    //     ...defaults,
-    //     pull_number: prNumber,
-    //     commit_id: process.env.CIRCLE_SHA1,
-    //     path: flake.title.slice(flake.title.indexOf('/packages'), flake.title.indexOf(':')),
-    //     line: flake.title.split(':')[1],
-    //     body: flake.title + '\n' + flake.body,
-    //   })
-    // } catch (error) {
-    //
-    //   console.error(
-    //     '\nFailed to create PR comment for flakey test. ' +
-    //       'Title: "' +
-    //       flake.title +
-    //       '", Client Error: ' +
-    //       error
-    //   )
-    // }
   }
 
   async fetchKnownFlakes() {
