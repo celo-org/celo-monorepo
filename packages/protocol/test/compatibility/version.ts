@@ -15,20 +15,23 @@ describe('#version()', () => {
       assert.isFalse(ContractVersion.isValid('test'))
       assert.isFalse(ContractVersion.isValid('1.a.3.4'))
     })
+
     it('isValid true on valid string', () => {
       assert.isTrue(ContractVersion.isValid('1.2.3.4'))
       assert.isTrue(ContractVersion.isValid('-1.0.9.787'))
       assert.isTrue(ContractVersion.isValid('10.0.224.9'))
     })
   })
+
   describe('with a new ContractVersion instance', () => {
-    it('properties are well set', () => {
+    it('sets properties correctly', () => {
       const version = new ContractVersion(1, 2, 3, 4)
       assert.equal(version.storage, 1)
       assert.equal(version.major, 2)
       assert.equal(version.minor, 3)
       assert.equal(version.patch, 4)
     })
+
     it('toString works', () => {
       const version = new ContractVersion(2, 7, 9, 1)
       assert.equal(version.toString(), '2.7.9.1')
@@ -87,7 +90,7 @@ describe('#version()', () => {
   })
 
   describe('with a new ContractVersionDelta instance', () => {
-    it('properties are well set', () => {
+    it('sets properties correctly', () => {
       const cvd = new ContractVersionDelta(Delta.None, Delta.Reset, Delta.Increment, Delta.None)
       assert.equal(cvd.storage, Delta.None)
       assert.equal(cvd.major, Delta.Reset)

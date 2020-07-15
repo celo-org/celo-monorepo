@@ -32,7 +32,7 @@ export class ASTBackwardReport {
     const code = reportASTIncompatibilities(artifacts1, artifacts2)
     logFunction("Done\n")
   
-    const excludeRegexp: RegExp = exclude? new RegExp(exclude) : null
+    const excludeRegexp: RegExp = exclude ? new RegExp(exclude) : null
     const fullReports = new ASTReports(code, storage).excluding(excludeRegexp)
     
     logFunction("Generating backward report...")
