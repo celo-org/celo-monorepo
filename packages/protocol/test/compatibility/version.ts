@@ -8,7 +8,7 @@ import { assert } from 'chai'
 
 describe('#version()', () => {
   describe('ContractVersion', () => {
-    it('isValid fails on invalid string', () => {
+    it('returns false on invalid string for isValid', () => {
       assert.isFalse(ContractVersion.isValid('1.2.3'))
       assert.isFalse(ContractVersion.isValid('1.2'))
       assert.isFalse(ContractVersion.isValid('1.2.3.5.'))
@@ -16,7 +16,7 @@ describe('#version()', () => {
       assert.isFalse(ContractVersion.isValid('1.a.3.4'))
     })
 
-    it('isValid true on valid string', () => {
+    it('returns true on valid string for isValid', () => {
       assert.isTrue(ContractVersion.isValid('1.2.3.4'))
       assert.isTrue(ContractVersion.isValid('-1.0.9.787'))
       assert.isTrue(ContractVersion.isValid('10.0.224.9'))
@@ -32,7 +32,7 @@ describe('#version()', () => {
       assert.equal(version.patch, 4)
     })
 
-    it('toString works', () => {
+    it('has a correct toString method', () => {
       const version = new ContractVersion(2, 7, 9, 1)
       assert.equal(version.toString(), '2.7.9.1')
     })
@@ -82,7 +82,7 @@ describe('#version()', () => {
   })
 
   describe('DeltaUtil', () => {
-    it('applyToNumber() works properly', () => {
+    it('has a correct applyToNumber method', () => {
       assert.equal(DeltaUtil.applyToNumber(Delta.Reset, 7), 0)
       assert.equal(DeltaUtil.applyToNumber(Delta.Increment, 9), 10)
       assert.equal(DeltaUtil.applyToNumber(Delta.None, 11), 11)
@@ -104,7 +104,7 @@ describe('#version()', () => {
       assert.equal(cvd2.patch, Delta.Increment)
     })
 
-    it('toString() works properly', () => {
+    it('has a correct toString method', () => {
       assert.equal(
         new ContractVersionDelta(Delta.None, Delta.Reset, Delta.Increment, Delta.None).toString(),
         '=.0.+1.='
@@ -133,7 +133,7 @@ describe('#version()', () => {
       )
     })
 
-    it('applyTo works properly', () => {
+    it('has a correct applyTo method', () => {
       const v1 = new ContractVersion(10, 20, 30, 40)
       const v2 = new ContractVersionDelta(
         Delta.None,
