@@ -173,6 +173,11 @@ if [[ ${proxy} == "true" ]]; then
   ADDITIONAL_GETH_FLAGS="--proxy.proxy --proxy.internalendpoint :30503 --proxy.proxiedvalidatoraddress $PROXIED_VALIDATOR_ADDRESS"
 fi
 
+METRICS_FLAGS=""
+if [[ ${geth_metrics} == "true" ]]; then
+  METRICS_FLAGS="$METRICS_FLAGS --metrics --pprof --pprofport 6060 --pprofaddr 127.0.0.1"
+fi
+
 DATA_DIR=/root/.celo
 
 mkdir -p $DATA_DIR/account
@@ -207,6 +212,7 @@ docker run \
       --light.serve 90 \
       --light.maxpeers ${max_light_peers} \
       --maxpeers=${max_peers} \
+      --nousb \
       --rpc \
       --rpcaddr 0.0.0.0 \
       --rpcapi=$RPC_APIS \
@@ -230,20 +236,3 @@ docker run \
       $IN_MEMORY_DISCOVERY_TABLE_FLAG \
       $ADDITIONAL_GETH_FLAGS"
 
-# ---- Set Up and Run Geth Exporter ----
-
-GETH_EXPORTER_DOCKER_IMAGE=${geth_exporter_docker_image_repository}:${geth_exporter_docker_image_tag}
-
-echo "Pulling geth exporter..."
-docker pull $GETH_EXPORTER_DOCKER_IMAGE
-
-docker run \
-  -v $DATA_DIR:$DATA_DIR \
-  --name geth-exporter \
-  --restart always \
-  --net=host \
-  -d \
-  $GETH_EXPORTER_DOCKER_IMAGE \
-    /usr/local/bin/geth_exporter \
-      -ipc $DATA_DIR/geth.ipc \
-      -filter "(.*overall|percentiles_95)"

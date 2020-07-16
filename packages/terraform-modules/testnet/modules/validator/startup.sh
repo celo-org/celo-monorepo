@@ -202,13 +202,12 @@ if [[ ${proxied} == "true" ]]; then
 
     PROXY_INDEX=$(($PROXY_INDEX + 1))
   done
-  if docker run --rm --entrypoint --help | grep -q 'proxy.proxyenodeurlpairs'; then
+  if docker run --rm --entrypoint=geth $GETH_NODE_DOCKER_IMAGE --help | grep -q 'proxy.proxyenodeurlpairs'; then
     PROXY_FLAG_NAME="--proxy.proxyenodeurlpairs"
   else
     PROXY_FLAG_NAME="--proxy.proxyenodeurlpair"
   fi
   PROXIED_FLAGS="--proxy.proxied --nodiscover $PROXY_FLAG_NAME=\"$PROXY_ENODE_URL_PAIRS\""
-
 
   # if this validator is proxied, cut it off from the external internet after
   # we've downloaded everything
@@ -218,6 +217,11 @@ if [[ ${proxied} == "true" ]]; then
   # instance cannot reach the external internet so the success ack from the server
   # is never received
   timeout 20 gcloud compute instances delete-access-config ${validator_name} --zone=$GCLOUD_ZONE
+fi
+
+METRICS_FLAGS=""
+if [[ ${geth_metrics} == "true" ]]; then
+  METRICS_FLAGS="$METRICS_FLAGS --metrics --pprof --pprofport 6060 --pprofaddr 127.0.0.1"
 fi
 
 IN_MEMORY_DISCOVERY_TABLE_FLAG=""
@@ -259,6 +263,7 @@ docker run \
   rm \$TMP_PRIVATE_KEY_FILE ; \
   geth \
     --bootnodes=enode://$BOOTNODE_ENODE \
+    --nousb \
     --password=$DATA_DIR/account/accountSecret \
     --unlock=$ACCOUNT_ADDRESS \
     --mine \
@@ -281,21 +286,9 @@ docker run \
     --istanbul.blockperiod=${block_time} \
     --istanbul.requesttimeout=${istanbul_request_timeout_ms} \
     --maxpeers=${max_peers} \
-    --metrics \
-    --pprof \
     --allow-insecure-unlock \
+    $METRICS_FLAGS \
     $NAT_FLAG \
     $IN_MEMORY_DISCOVERY_TABLE_FLAG \
     $PROXIED_FLAGS"
 
-# ---- Set Up and Run Geth Exporter ----
-
-GETH_EXPORTER_DOCKER_IMAGE=${geth_exporter_docker_image_repository}:${geth_exporter_docker_image_tag}
-
-echo "Pulling geth exporter..."
-docker pull $GETH_EXPORTER_DOCKER_IMAGE
-
-docker run -v $DATA_DIR:$DATA_DIR --name geth-exporter --restart=always --net=host -d $GETH_EXPORTER_DOCKER_IMAGE \
-  /usr/local/bin/geth_exporter \
-    -ipc $DATA_DIR/geth.ipc \
-    -filter "(.*overall|percentiles_95)"

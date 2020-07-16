@@ -8,7 +8,7 @@ import {
   generatePublicKey,
   getAddressFromEnv,
   privateKeyToAddress,
-  privateKeyToPublicKey,
+  privateKeyToPublicKey
 } from './generate_utils'
 import {
   applyTerraformModule,
@@ -19,14 +19,14 @@ import {
   showTerraformModulePlan,
   taintTerraformModuleResource,
   TerraformVars,
-  untaintTerraformModuleResource,
+  untaintTerraformModuleResource
 } from './terraform'
 import {
   getGenesisBlockFromGoogleStorage,
   getProxiesPerValidator,
   getProxyName,
   uploadDataToGoogleStorage,
-  uploadTestnetInfoToGoogleStorage,
+  uploadTestnetInfoToGoogleStorage
 } from './testnet-utils'
 
 export interface ProxyIndex {
@@ -69,8 +69,7 @@ const testnetEnvVars: TerraformVars = {
   geth_verbosity: envVar.GETH_VERBOSITY,
   geth_bootnode_docker_image_repository: envVar.GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY,
   geth_bootnode_docker_image_tag: envVar.GETH_BOOTNODE_DOCKER_IMAGE_TAG,
-  geth_exporter_docker_image_repository: envVar.GETH_EXPORTER_DOCKER_IMAGE_REPOSITORY,
-  geth_exporter_docker_image_tag: envVar.GETH_EXPORTER_DOCKER_IMAGE_TAG,
+  geth_metrics: envVar.GETH_ENABLE_METRICS,
   geth_node_docker_image_repository: envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY,
   geth_node_docker_image_tag: envVar.GETH_NODE_DOCKER_IMAGE_TAG,
   in_memory_discovery_table: envVar.IN_MEMORY_DISCOVERY_TABLE,
