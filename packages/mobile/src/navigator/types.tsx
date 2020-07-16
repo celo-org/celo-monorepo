@@ -149,12 +149,12 @@ export type StackParamList = {
   [Screens.SelectLocalCurrency]: undefined
   [Screens.Send]:
     | {
-        isRequest?: boolean
+        isOutgoingPaymentRequest?: true
       }
     | undefined
   [Screens.SendAmount]: {
     recipient: Recipient
-    isRequest?: boolean
+    isOutgoingPaymentRequest?: true
     isFromScan?: boolean
   }
   [Screens.SendConfirmation]: {
@@ -175,14 +175,14 @@ export type StackParamList = {
   [Screens.ValidateRecipientIntro]: {
     transactionData: TransactionDataInput
     addressValidationType: AddressValidationType
-    isPaymentRequest?: true
-    isFromScan?: boolean
+    isOutgoingPaymentRequest?: true
+    requesterAddress?: string
   }
   [Screens.ValidateRecipientAccount]: {
     transactionData: TransactionDataInput
     addressValidationType: AddressValidationType
-    isPaymentRequest?: true
-    isFromScan?: boolean
+    isOutgoingPaymentRequest?: true
+    requesterAddress?: string
   }
   [Screens.VerificationEducationScreen]: { showSkipDialog: boolean } | undefined
   [Screens.VerificationInputScreen]: { showHelpDialog: boolean } | undefined
@@ -200,6 +200,8 @@ export type QRTabParamList = {
     | {
         scanIsForSecureSend?: true
         transactionData?: TransactionDataInput
+        isOutgoingPaymentRequest?: true
+        requesterAddress?: string
       }
     | undefined
 }

@@ -1,3 +1,4 @@
+import { toBool } from '@celo/phone-number-privacy-common'
 import * as functions from 'firebase-functions'
 import logger from './common/logger'
 
@@ -68,8 +69,7 @@ if (DEV_MODE) {
       password: functionConfig.db.pass,
       database: functionConfig.db.name,
       host: `/cloudsql/${functionConfig.db.host}`,
-      // Cody TODO: replace with combined lib version once it's published
-      ssl: functionConfig.db.ssl ? functionConfig.db.ssl.toLowerCase() === 'true' : true,
+      ssl: toBool(functionConfig.db.ssl, true),
     },
     pgpnpServices: {
       signers: functionConfig.pgpnpservices.signers,

@@ -1,5 +1,6 @@
+import { ErrorMessage, WarningMessage } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'firebase-functions'
-import { ErrorMessage, respondWithError, WarningMessage } from '../common/error-utils'
+import { respondWithError } from '../common/error-utils'
 import { authenticateUser, isVerified } from '../common/identity'
 import {
   hasValidAccountParam,
