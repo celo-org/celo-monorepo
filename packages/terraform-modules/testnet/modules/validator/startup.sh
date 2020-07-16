@@ -202,8 +202,12 @@ if [[ ${proxied} == "true" ]]; then
 
     PROXY_INDEX=$(($PROXY_INDEX + 1))
   done
-
-  PROXIED_FLAGS="--proxy.proxied --nodiscover --proxy.proxyenodeurlpairs=\"$PROXY_ENODE_URL_PAIRS\""
+  if docker run --rm --entrypoint --help | grep -q 'proxy.proxyenodeurlpairs'; then
+    PROXY_FLAG_NAME="--proxy.proxyenodeurlpairs"
+  else
+    PROXY_FLAG_NAME="--proxy.proxyenodeurlpair"
+  fi
+  PROXIED_FLAGS="--proxy.proxied --nodiscover $PROXY_FLAG_NAME=\"$PROXY_ENODE_URL_PAIRS\""
 
 
   # if this validator is proxied, cut it off from the external internet after

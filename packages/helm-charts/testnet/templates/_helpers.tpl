@@ -108,7 +108,7 @@ spec:
 {{ $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
         validator-proxied: "{{ $validatorProxied }}"
 {{- end }}
-{{ if .Values.prometheus | default false }}
+{{ if .Values.metrics | default false }}
       annotations:
 {{ include "common.prometheus-annotations" . | indent 8 }}
 {{- end }}
@@ -120,7 +120,7 @@ spec:
 {{ include "common.import-geth-account-container" .  | indent 6 }}
 {{ end }}
       containers:
-{{ include "common.full-node-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "proxy" .proxy "proxy_allow_private_ip_flag" .proxy_allow_private_ip_flag "unlock" .unlock "expose" .expose "syncmode" .syncmode "gcmode" .gcmode "pprof" (or (.Values.prometheus) (.Values.pprof.enabled)) "pprof_port" (.Values.pprof.port) "metrics" (or (.Values.prometheus) (.Values.metrics)) "public_ips" .public_ips "ethstats" (printf "%s-ethstats.%s" (include "common.fullname" .) .Release.Namespace))  | indent 6 }}
+{{ include "common.full-node-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "proxy" .proxy "proxy_allow_private_ip_flag" .proxy_allow_private_ip_flag "unlock" .unlock "expose" .expose "syncmode" .syncmode "gcmode" .gcmode "pprof" (or (.Values.metrics) (.Values.pprof.enabled)) "pprof_port" (.Values.pprof.port) "metrics" .Values.metrics "public_ips" .public_ips "ethstats" (printf "%s-ethstats.%s" (include "common.fullname" .) .Release.Namespace))  | indent 6 }}
       volumes:
       - name: data
         emptyDir: {}

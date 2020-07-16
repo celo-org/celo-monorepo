@@ -647,12 +647,15 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
 
   const gethMetricsOverrides = fetchEnvOrFallback('GETH_ENABLE_METRICS', 'false') === "true"
     ? [
-        `--set prometheus="${fetchEnvOrFallback('GETH_ENABLE_METRICS', 'false')}"`,
-        `--set pprof.enabled="${fetchEnvOrFallback('GETH_ENABLE_METRICS', 'false')}"`,
+        `--set metrics="true"`,
+        `--set pprof.enabled="true"`,
         `--set pprof.path="/debug/metrics/prometheus"`,
         `--set pprof.port="6060"`,
       ]
-    : []
+    : [
+        `--set metrics="false"`,
+        `--set pprof.enabled="false"`,
+      ]
 
   const genesisContent = useExistingGenesis
     ? await getGenesisBlockFromGoogleStorage(celoEnv)

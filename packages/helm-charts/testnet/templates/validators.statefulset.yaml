@@ -43,7 +43,7 @@ spec:
       labels:
 {{ include "common.standard.labels" .  | indent 8 }}
         component: validators
-{{ if .Values.prometheus | default false }}
+{{ if .Values.metrics | default false }}
       annotations:
 {{ include "common.prometheus-annotations" . | indent 8 }}
 {{- end }}
@@ -164,8 +164,14 @@ spec:
             ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --istanbul.faultymode $FAULTY_NODE_TYPE"
           fi
 
+          if geth --help | grep -q 'proxy.proxyenodeurlpairs'; then
+            PROXY_FLAG="--proxy.proxyenodeurlpairs"
+          else
+            PROXY_FLAG="--proxy.proxyenodeurlpair"
+          fi
+
           PROXY_COUNT=$(cat /root/.celo/proxyCount)
-          [ "$PROXY_COUNT" -gt 0 ] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxied --proxy.proxyenodeurlpairs=$(cat /root/.celo/proxyEnodeUrlPairs) --nodiscover --proxy.allowprivateip"
+          [ "$PROXY_COUNT" -gt 0 ] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxied ${PROXY_FLAG}=$(cat /root/.celo/proxyEnodeUrlPairs) --nodiscover --proxy.allowprivateip"
 
           [[ "$PING_IP_FROM_PACKET" == "true" ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ping-ip-from-packet"
 
