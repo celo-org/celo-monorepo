@@ -82,7 +82,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
   componentDidMount() {
     const { addressJustValidated, t } = this.props
     if (addressJustValidated) {
-      Logger.showMessage(t('addressConfirmed'))
+      Logger.showMessage(t('sendFlow7:addressConfirmed'))
     }
   }
 
