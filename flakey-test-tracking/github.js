@@ -39,13 +39,13 @@ class GitHub {
 
   async renew() {
     if (typeof this === 'undefined') {
-      throw new Error('renew() cannot be called before build()')
+      throw new Error('GitHub.renew() cannot be called before GitHub.build()')
     }
     this.rest = await auth(this.app)
   }
 
   async report(flakes, skippedTests) {
-    console.log('Sending flake tracker results to GitHub...\n')
+    console.log('\nSending flake tracker results to GitHub...\n')
 
     const promises = []
 

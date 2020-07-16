@@ -5,7 +5,7 @@ const fs = require('fs')
 const tmp = require('tmp')
 tmp.setGracefulCleanup()
 
-const flakeDir = 'flake-tracker'
+const flakeDir = 'flake-tracker__' + process.cwd().slice(process.cwd().lastIndexOf('/') + 1)
 const errDir = 'new-flakes'
 const skipFile = 'known-flakes.txt'
 

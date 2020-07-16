@@ -26,29 +26,39 @@ class FlakeManager {
   }
 
   async finish() {
-    console.log('\nFlakey Test Summary\n')
-
     const flakes = db.readNewFlakes()
-    if (flakes.length) {
-      console.log('\nFlakey tests found :( \n')
-      let i = 0
-      flakes.forEach((f) => {
-        console.log('\n' + ++i + ')')
-        console.log(f.title + '\n\n' + f.body)
-      })
-    } else {
-      console.log('\nNo flakey tests found! \n')
-    }
-
     const skippedTests = shouldSkipKnownFlakes ? db.readKnownFlakes() : []
-
-    if (skippedTests.length) {
-      console.log('\nThe following known flakey tests were skipped: \n')
-      skippedTests.forEach((skip) => console.log(skip))
-    }
 
     if (shouldUseGitHub) {
       await this.github.report(flakes, skippedTests)
+    }
+
+    console.log('\n_____Flakey Test Summary_____')
+
+    if (skippedTests.length) {
+      if (skippedTests.length === 1) {
+        console.log('\n1 known flakey test was skipped: \n')
+      } else {
+        console.log('\n' + skippedTests.length + ' known flakey tests skipped: \n')
+      }
+      skippedTests.forEach((skip) => console.log(skip))
+    } else {
+      console.log('\nNo known flakey tests were skipped')
+    }
+
+    if (flakes.length) {
+      if (flakes.length === 1) {
+        console.log('\n1 new flakey test found :(')
+      } else {
+        console.log('\n' + flakes.length + ' new flakey tests found :(')
+      }
+      let i = 0
+      flakes.forEach((f) => {
+        console.log('\n' + ++i + ')\n')
+        console.log(f.title + '\n\n' + f.body)
+      })
+    } else {
+      console.log('\nNo new flakey tests found!\n')
     }
   }
 
