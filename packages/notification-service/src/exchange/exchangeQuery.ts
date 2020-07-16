@@ -6,8 +6,8 @@ import { getContractKit } from '../util/utils'
 
 // Amounts to estimate the exchange rate, as the rate varies based on transaction size
 const SELL_AMOUNTS = {
-  [CURRENCY_ENUM.DOLLAR]: new BigNumber(10000 * 1000000000000000000), // 100 dollars
-  [CURRENCY_ENUM.GOLD]: new BigNumber(10 * 1000000000000000000), // 10 gold
+  [CURRENCY_ENUM.DOLLAR]: new BigNumber(1 * 1000000000000000000), // 1 dollar
+  [CURRENCY_ENUM.GOLD]: new BigNumber(1 * 1000000000000000000), // 1 gold
 }
 
 export async function handleExchangeQuery() {
