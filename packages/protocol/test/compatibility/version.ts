@@ -45,7 +45,8 @@ describe('#version()', () => {
       assert.equal(cvd.major, Delta.Reset)
       assert.equal(cvd.minor, Delta.Reset)
       assert.equal(cvd.patch, Delta.Reset)
-
+    })
+    it('sets properly the storage Delta', () => {
       const cvd2 = ContractVersionDelta.fromChanges(false, false, true, true)
       assert.equal(cvd2.storage, Delta.None)
       assert.notEqual(cvd2.major, Delta.Reset)
@@ -56,7 +57,8 @@ describe('#version()', () => {
       assert.equal(cvd.major, Delta.Increment)
       assert.equal(cvd.minor, Delta.Reset)
       assert.equal(cvd.patch, Delta.Reset)
-
+    })
+    it('sets properly the major Delta', () => {
       const cvd2 = ContractVersionDelta.fromChanges(false, false, true, true)
       assert.equal(cvd2.major, Delta.None)
       assert.notEqual(cvd2.minor, Delta.Reset)
@@ -66,7 +68,8 @@ describe('#version()', () => {
       const cvd = ContractVersionDelta.fromChanges(false, false, true, true)
       assert.equal(cvd.minor, Delta.Increment)
       assert.equal(cvd.patch, Delta.Reset)
-
+    })
+    it('sets properly the minor Delta', () => {
       const cvd2 = ContractVersionDelta.fromChanges(false, false, false, true)
       assert.equal(cvd2.minor, Delta.None)
       assert.notEqual(cvd2.patch, Delta.Reset)
@@ -75,7 +78,8 @@ describe('#version()', () => {
     it('sets properly the patch Delta', () => {
       const cvd = ContractVersionDelta.fromChanges(false, false, false, true)
       assert.equal(cvd.patch, Delta.Increment)
-
+    })
+    it('sets properly the patch Delta', () => {
       const cvd2 = ContractVersionDelta.fromChanges(false, false, false, false)
       assert.equal(cvd2.patch, Delta.None)
     })
