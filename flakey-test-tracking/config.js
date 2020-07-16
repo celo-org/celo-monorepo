@@ -3,7 +3,7 @@ const shouldTrackFlakes =
   (process.env.CIRCLECI && process.env.FLAKEY !== 'false') || process.env.FLAKEY === 'true'
 
 // numRetries === times test is run after the initial failure
-const numRetries = process.env.NUM_RETRIES ? Number(process.env.NUM_RETRIES) : 15
+const numRetries = process.env.NUM_RETRIES ? Number(process.env.NUM_RETRIES) : 25
 
 // shouldSkipKnownFlakes => flakey test issues are fetched from github and corresponding tests are skipped
 const shouldSkipKnownFlakes =
