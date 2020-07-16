@@ -159,8 +159,8 @@ exports[`InviteReview renders correctly 1`] = `
                       Object {
                         "color": "#2E3338",
                         "fontFamily": "Inter-Regular",
-                        "fontSize": 16,
-                        "lineHeight": 22,
+                        "fontSize": 14,
+                        "lineHeight": 18,
                       },
                       Object {
                         "alignItems": "center",
@@ -178,8 +178,8 @@ exports[`InviteReview renders correctly 1`] = `
                       Object {
                         "color": "#2E3338",
                         "fontFamily": "Inter-Regular",
-                        "fontSize": 16,
-                        "lineHeight": 22,
+                        "fontSize": 14,
+                        "lineHeight": 18,
                       },
                       Object {
                         "color": "#9CA4A9",

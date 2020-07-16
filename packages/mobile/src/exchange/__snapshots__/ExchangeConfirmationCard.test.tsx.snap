@@ -1,16 +1,16 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders correctly with giant numbers 1`] = `
-<RCTScrollView>
-  <View>
-    <RNCSafeAreaView
-      style={
-        Object {
-          "flex": 1,
-          "justifyContent": "space-between",
-        }
-      }
-    >
+<RNCSafeAreaView
+  style={
+    Object {
+      "flex": 1,
+      "justifyContent": "space-between",
+    }
+  }
+>
+  <RCTScrollView>
+    <View>
       <View
         style={
           Object {
@@ -569,22 +569,22 @@ exports[`renders correctly with giant numbers 1`] = `
           </View>
         </View>
       </View>
-    </RNCSafeAreaView>
-  </View>
-</RCTScrollView>
+    </View>
+  </RCTScrollView>
+</RNCSafeAreaView>
 `;
 
 exports[`renders correctly with no exchange rate 1`] = `
-<RCTScrollView>
-  <View>
-    <RNCSafeAreaView
-      style={
-        Object {
-          "flex": 1,
-          "justifyContent": "space-between",
-        }
-      }
-    >
+<RNCSafeAreaView
+  style={
+    Object {
+      "flex": 1,
+      "justifyContent": "space-between",
+    }
+  }
+>
+  <RCTScrollView>
+    <View>
       <View
         style={
           Object {
@@ -1143,7 +1143,7 @@ exports[`renders correctly with no exchange rate 1`] = `
           </View>
         </View>
       </View>
-    </RNCSafeAreaView>
-  </View>
-</RCTScrollView>
+    </View>
+  </RCTScrollView>
+</RNCSafeAreaView>
 `;
