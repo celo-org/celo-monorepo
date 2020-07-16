@@ -224,7 +224,11 @@ function SendAmount(props: Props) {
 
     dispatch(hideAlert())
 
-    if (addressValidationType !== AddressValidationType.NONE) {
+    if (
+      addressValidationType !== AddressValidationType.NONE &&
+      recipient.kind !== RecipientKind.QrCode &&
+      recipient.kind !== RecipientKind.Address
+    ) {
       navigate(Screens.ValidateRecipientIntro, {
         transactionData,
         addressValidationType,

@@ -102,7 +102,7 @@ export const sendScreenNavOptions = ({
 }) => {
   const isOutgoingPaymentRequest = route.params?.isOutgoingPaymentRequest
 
-  const gotoQRScanner = () =>
+  const goToQRScanner = () =>
     navigate(Screens.QRNavigator, {
       screen: Screens.QRScanner,
       params: {
@@ -128,7 +128,7 @@ export const sendScreenNavOptions = ({
       <TopBarIconButton
         icon={<QRCodeBorderlessIcon height={32} color={colors.greenUI} />}
         eventName={isOutgoingPaymentRequest ? RequestEvents.request_scan : SendEvents.send_scan}
-        onPress={gotoQRScanner}
+        onPress={goToQRScanner}
       />
     ),
     headerRightContainerStyle: styles.headerRightContainer,

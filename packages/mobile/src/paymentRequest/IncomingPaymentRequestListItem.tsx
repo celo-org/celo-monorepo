@@ -92,7 +92,7 @@ export default function IncomingPaymentRequestListItem({ id, amount, comment, re
   }
 
   React.useEffect(() => {
-    // Need this to make sure it's only triggered on clickyyyyy
+    // Need this to make sure it's only triggered on click
     if (!isLoading) {
       return
     }
