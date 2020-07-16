@@ -357,7 +357,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
                 "justifyContent": "center",
                 "minWidth": 120,
                 "opacity": 1,
-                "paddingHorizontal": 16,
+                "paddingHorizontal": 24,
                 "paddingVertical": 5,
               }
             }
@@ -756,7 +756,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
                 "justifyContent": "center",
                 "minWidth": 120,
                 "opacity": 1,
-                "paddingHorizontal": 16,
+                "paddingHorizontal": 24,
                 "paddingVertical": 5,
               }
             }

@@ -1,5 +1,5 @@
 import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
@@ -26,7 +26,7 @@ export default function TotalLineItem({ title, amount }: Props) {
     <>
       <LineItemRow
         title={title || t('total')}
-        textStyle={fontStyles.bodyBold}
+        textStyle={fontStyles.regular600}
         amount={<CurrencyDisplay amount={amount} />}
       />
       {localCurrencyCode !== LocalCurrencyCode.USD && localCurrencyExchangeRate && (

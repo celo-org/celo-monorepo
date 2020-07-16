@@ -7,42 +7,20 @@ import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { connect } from 'react-redux'
 import { SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import CancelButton from 'src/components/CancelButton.v2'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { AddressValidationType } from 'src/identity/reducer'
 import { emptyHeader } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
-import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
-import { RootState } from 'src/redux/reducers'
-import { TransactionDataInput } from 'src/send/SendAmount'
+import { getRecipientThumbnail } from 'src/recipients/recipient'
 
-const AVATAR_SIZE = 120
+const AVATAR_SIZE = 64
 
-interface StateProps {
-  recipient: Recipient
-  transactionData: TransactionDataInput
-  addressValidationType: AddressValidationType
-  isPaymentRequest?: true
-}
-
-type OwnProps = StackScreenProps<StackParamList, Screens.ValidateRecipientIntro>
-type Props = WithTranslation & StateProps & OwnProps
-
-const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
-  const { route } = ownProps
-  const { recipient } = route.params.transactionData
-  return {
-    recipient,
-    transactionData: route.params.transactionData,
-    addressValidationType: route.params.addressValidationType,
-    isPaymentRequest: route.params.isPaymentRequest,
-  }
-}
+type NavProps = StackScreenProps<StackParamList, Screens.ValidateRecipientIntro>
+type Props = WithTranslation & NavProps
 
 export const validateRecipientIntroScreenNavOptions = () => ({
   ...emptyHeader,
@@ -51,11 +29,14 @@ export const validateRecipientIntroScreenNavOptions = () => ({
 
 class ValidateRecipientIntro extends React.Component<Props> {
   onPressScanCode = () => {
+    const { isOutgoingPaymentRequest, transactionData, requesterAddress } = this.props.route.params
     navigate(Screens.QRNavigator, {
       screen: Screens.QRScanner,
       params: {
-        transactionData: this.props.transactionData,
+        transactionData,
         scanIsForSecureSend: true,
+        isOutgoingPaymentRequest,
+        requesterAddress,
       },
     })
 
@@ -63,19 +44,25 @@ class ValidateRecipientIntro extends React.Component<Props> {
   }
 
   onPressConfirmAccount = () => {
-    const { addressValidationType, transactionData, isPaymentRequest } = this.props
+    const {
+      addressValidationType,
+      transactionData,
+      isOutgoingPaymentRequest,
+      requesterAddress,
+    } = this.props.route.params
     navigate(Screens.ValidateRecipientAccount, {
       transactionData,
       addressValidationType,
-      isPaymentRequest,
-      isFromScan: this.props.route.params?.isFromScan,
+      isOutgoingPaymentRequest,
+      requesterAddress,
     })
 
     ValoraAnalytics.track(SendEvents.send_secure_start, { confirmByScan: false })
   }
 
   render() {
-    const { t, recipient } = this.props
+    const { t } = this.props
+    const { recipient } = this.props.route.params.transactionData
     const { displayName, e164PhoneNumber } = recipient
 
     return (
@@ -134,7 +121,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonContainer: {
-    paddingBottom: 60,
+    paddingBottom: 45,
     alignItems: 'center',
   },
   button: {
@@ -153,6 +140,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<StateProps, {}, OwnProps, RootState>(mapStateToProps)(
-  withTranslation<Props>(Namespaces.sendFlow7)(ValidateRecipientIntro)
-)
+export default withTranslation<Props>(Namespaces.sendFlow7)(ValidateRecipientIntro)

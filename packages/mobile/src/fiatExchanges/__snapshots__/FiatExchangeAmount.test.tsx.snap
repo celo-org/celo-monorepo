@@ -227,7 +227,7 @@ exports[`FiatExchangeAmount renders correctly 1`] = `
             "height": 48,
             "justifyContent": "center",
             "opacity": undefined,
-            "paddingHorizontal": 16,
+            "paddingHorizontal": 24,
             "paddingVertical": 5,
           }
         }

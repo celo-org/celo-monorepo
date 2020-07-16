@@ -5,7 +5,7 @@ import { TransactionEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { DEFAULT_FORNO_URL } from 'src/config'
-import { getCurrencyAddress } from 'src/tokens/saga'
+import { getCurrencyAddress, getTokenContract } from 'src/tokens/saga'
 import {
   sendTransactionAsync,
   SendTransactionLogEvent,
@@ -92,8 +92,10 @@ export function* sendTransactionPromises(
   staticGas?: number
 ) {
   Logger.debug(`${TAG}@sendTransactionPromises`, `Going to send a transaction with id ${txId}`)
-  // Use stabletoken to pay for gas by default
-  const stableTokenAddress: string = yield call(getCurrencyAddress, CURRENCY_ENUM.DOLLAR)
+
+  const stableToken = yield getTokenContract(CURRENCY_ENUM.DOLLAR)
+  const stableTokenBalance = yield call([stableToken, stableToken.balanceOf], account)
+
   const fornoMode: boolean = yield select(fornoSelector)
   let gasPrice: BigNumber | undefined
 
@@ -115,7 +117,13 @@ export function* sendTransactionPromises(
     sendTransactionAsync,
     tx,
     account,
-    stableTokenAddress,
+    // Use stableToken to pay fee, unless its balance is Zero
+    // then use Celo (goldToken) to pay fee (pass undefined)
+    // TODO: make it transparent for a user
+    // TODO: check for balance should be more than fee instead of zero
+    stableTokenBalance.isGreaterThan(0)
+      ? yield call(getCurrencyAddress, CURRENCY_ENUM.DOLLAR)
+      : undefined,
     getLogger(tag, txId),
     staticGas,
     gasPrice ? gasPrice.toString() : gasPrice,

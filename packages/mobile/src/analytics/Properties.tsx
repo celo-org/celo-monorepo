@@ -3,6 +3,7 @@ import { PincodeType } from 'src/account/reducer'
 import {
   AppEvents,
   CeloExchangeEvents,
+  ContractKitEvents,
   EscrowEvents,
   FeeEvents,
   GethEvents,
@@ -86,6 +87,14 @@ interface SettingsEventsProperties {
 }
 
 interface OnboardingEventsProperties {
+  [OnboardingEvents.onboarding_education_start]: undefined
+  [OnboardingEvents.onboarding_education_scroll]: {
+    currentStep: number
+    direction: ScrollDirection
+  }
+  [OnboardingEvents.onboarding_education_complete]: undefined
+  [OnboardingEvents.onboarding_education_cancel]: undefined
+
   [OnboardingEvents.backup_education_start]: undefined
   [OnboardingEvents.backup_education_scroll]: {
     currentStep: number
@@ -238,6 +247,11 @@ interface VerificationEventsProperties {
   }
   [VerificationEvents.verification_reveal_attestation_error]: {
     issuer: any
+    error: string
+  }
+  [VerificationEvents.verification_revoke_start]: undefined
+  [VerificationEvents.verification_revoke_finish]: undefined
+  [VerificationEvents.verification_revoke_error]: {
     error: string
   }
 }
@@ -513,6 +527,27 @@ interface GethEventsProperties {
     error: string
     context: string
   }
+  [GethEvents.geth_init_start]: {
+    sync: boolean
+  }
+  [GethEvents.create_geth_start]: undefined
+  [GethEvents.create_geth_finish]: undefined
+  [GethEvents.start_geth_start]: undefined
+  [GethEvents.start_geth_finish]: undefined
+}
+
+interface ContractKitEventsProperties {
+  [ContractKitEvents.init_contractkit_start]: undefined
+  [ContractKitEvents.init_contractkit_geth_init_start]: {
+    retries: number
+  }
+  [ContractKitEvents.init_contractkit_geth_init_finish]: undefined
+  [ContractKitEvents.init_contractkit_get_ipc_start]: undefined
+  [ContractKitEvents.init_contractkit_get_ipc_finish]: undefined
+  [ContractKitEvents.init_contractkit_get_wallet_start]: undefined
+  [ContractKitEvents.init_contractkit_get_wallet_finish]: undefined
+  [ContractKitEvents.init_contractkit_init_wallet_finish]: undefined
+  [ContractKitEvents.init_contractkit_finish]: undefined
 }
 
 export type AnalyticsPropertiesList = AppEventsProperties &
@@ -529,4 +564,5 @@ export type AnalyticsPropertiesList = AppEventsProperties &
   FeeEventsProperties &
   TransactionEventsProperties &
   CeloExchangeEventsProperties &
-  GethEventsProperties
+  GethEventsProperties &
+  ContractKitEventsProperties

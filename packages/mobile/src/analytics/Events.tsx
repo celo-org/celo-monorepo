@@ -30,11 +30,16 @@ export enum SettingsEvents {
   forno_toggle = 'forno_toggle',
   licenses_view = 'licenses_view',
   tos_view = 'tos_view',
-  // intentially not tracking analytics opt in/out
+  // intentionally not tracking analytics opt in/out
   // to avoid tracking through omission
 }
 
 export enum OnboardingEvents {
+  onboarding_education_start = 'onboarding_education_start',
+  onboarding_education_scroll = 'onboarding_education_scroll',
+  onboarding_education_complete = 'onboarding_education_complete',
+  onboarding_education_cancel = 'onboarding_education_cancel',
+
   backup_education_start = 'backup_education_start',
   backup_education_scroll = 'backup_education_scroll',
   backup_education_complete = 'backup_education_complete',
@@ -125,6 +130,10 @@ export enum VerificationEvents {
   verification_reveal_attestation_await_code_complete = 'verification_reveal_attestation_await_code_complete',
   verification_reveal_attestation_complete = 'verification_reveal_attestation_complete',
   verification_reveal_attestation_error = 'verification_reveal_attestation_error',
+
+  verification_revoke_start = 'verification_revoke_start',
+  verification_revoke_finish = 'verification_revoke_finish',
+  verification_revoke_error = 'verification_revoke_error',
 }
 
 export enum IdentityEvents {
@@ -260,6 +269,23 @@ export enum GethEvents {
   geth_init_failure = 'geth_init_failure',
   geth_restart_to_fix_init = 'geth_restart_to_fix_init',
   prompt_forno = 'prompt_forno',
+  geth_init_start = 'geth_init_start',
+  create_geth_start = 'create_geth_start',
+  create_geth_finish = 'create_geth_finish',
+  start_geth_start = 'start_geth_start',
+  start_geth_finish = 'start_geth_finish',
+}
+
+export enum ContractKitEvents {
+  init_contractkit_start = 'init_contractkit_start',
+  init_contractkit_geth_init_start = 'init_contractkit_geth_init_start',
+  init_contractkit_geth_init_finish = 'init_contractkit_geth_init_finish',
+  init_contractkit_get_ipc_start = 'init_contractkit_get_ipc_start',
+  init_contractkit_get_ipc_finish = 'init_contractkit_get_ipc_finish',
+  init_contractkit_get_wallet_start = 'init_contractkit_get_wallet_start',
+  init_contractkit_get_wallet_finish = 'init_contractkit_get_wallet_finish',
+  init_contractkit_init_wallet_finish = 'init_contractkit_init_wallet_finish',
+  init_contractkit_finish = 'init_contractkit_finish',
 }
 
 export type AnalyticsEventType =
