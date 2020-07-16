@@ -5,7 +5,6 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "./SlasherUtil.sol";
 
-/// @dev Version: 2.0.0.0
 contract DowntimeSlasher is SlasherUtil {
   using SafeMath for uint256;
 
@@ -25,6 +24,14 @@ contract DowntimeSlasher is SlasherUtil {
     uint256 indexed endBlock
   );
   event BitmapSetForInterval(uint256 indexed startBlock, uint256 indexed endblock, bytes32 bitmap);
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (2, 0, 0, 0);
+  }
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
