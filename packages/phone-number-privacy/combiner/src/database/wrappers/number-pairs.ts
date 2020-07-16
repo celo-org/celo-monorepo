@@ -1,4 +1,4 @@
-import { ErrorMessage } from '../../common/error-utils'
+import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import logger from '../../common/logger'
 import { getDatabase } from '../database'
 import { NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE, NumberPair } from '../models/numberPair'

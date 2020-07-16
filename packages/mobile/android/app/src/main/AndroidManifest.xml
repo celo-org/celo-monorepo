@@ -36,8 +36,5 @@
       <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/filepaths" />
     </provider>
 
-    <!-- Create a new process to handle native crashes
-         https://github.com/ivanarh/jndcrash#out-of-process -->
-    <service android:name=".NdkCrashService" android:process=":ndkCrashReportProcess"/>
   </application>
 </manifest>
