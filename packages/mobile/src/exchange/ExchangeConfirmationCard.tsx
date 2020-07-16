@@ -70,8 +70,8 @@ export default function ExchangeConfirmationCard(props: Props) {
   }
 
   return (
-    <ScrollView>
-      <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <ScrollView>
         <View style={styles.paddedContainer}>
           <View style={styles.flexStart}>
             <View style={styles.amountRow}>
@@ -101,8 +101,8 @@ export default function ExchangeConfirmationCard(props: Props) {
             <TotalLineItem amount={totalAmount} />
           </View>
         </View>
-      </SafeAreaView>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   )
 }
 
