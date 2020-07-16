@@ -121,9 +121,9 @@ exports[`Faucet renders 1`] = `
           }
         }
       >
-        Enter the address of your Alfajores Testnet account to receive additional funds. Each request adds 10 Celo Dollars and 5 Celo Gold.
+        Enter the address of your Alfajores Testnet account to receive additional funds. Each request adds 10 cUSD and 5 CELO.
 
-In the Celo Wallet, you can find your address by pressing the Settings cog icon at the top right. Press the address to copy it to your device’s clipboard.
+In the Celo Wallet, you can find your address by pressing the menu icon at the top left and scrolling down to bottom. Press the address to copy it to your device’s clipboard.
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -410,7 +410,7 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
           }
         }
       >
-        If you have an Android device, you can set up a funded account on the Alfajores Testnet by requesting a 
+        If you have an Android or iOS device, you can set up a funded account on the Alfajores Testnet by requesting a 
         <div
           className="css-view-1dbjc4n"
           onClick={[Function]}
