@@ -60,7 +60,7 @@
     "jest-circus": "^26.1.0",
     "jest-junit": "^10.0.0",
     "jest-message-util": "^26.1.0",
-    "jest-snapshot": "^25.1.0",
+    "jest-snapshot": "^26.1.0",
     "lerna": "^3.16.0",
     "patch-package": "^5.1.1",
     "prettier": "1.19.1",
