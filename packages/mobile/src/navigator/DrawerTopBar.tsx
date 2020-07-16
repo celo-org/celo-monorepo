@@ -4,6 +4,7 @@ import * as React from 'react'
 import { processColor, StyleSheet, TouchableOpacity } from 'react-native'
 import Animated, { cond, greaterThan } from 'react-native-reanimated'
 import Hamburger from 'src/icons/Hamburger'
+import { iconHitslop } from '@celo/react-components/styles/variables'
 
 interface Props {
   middleElement?: React.ReactNode
@@ -30,7 +31,11 @@ function DrawerTopBar({ middleElement, scrollPosition, testID }: Props) {
     <Animated.View testID={testID} style={viewStyle}>
       {/*
       // @ts-ignore Only used in a drawer */}
-      <TouchableOpacity style={styles.hamburger} onPress={navigation.toggleDrawer}>
+      <TouchableOpacity
+        style={styles.hamburger}
+        onPress={navigation.toggleDrawer}
+        hitSlop={iconHitslop}
+      >
         <Hamburger />
       </TouchableOpacity>
       {middleElement}
@@ -45,17 +50,16 @@ DrawerTopBar.defaultProps = {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    height: 62,
     backgroundColor: 'transparent',
+    height: 56,
     alignItems: 'center',
     justifyContent: 'center',
   },
   hamburger: {
     position: 'absolute',
-    left: 8,
-    top: 8,
-    padding: 8,
-    marginLeft: 4,
+    left: 0,
+    padding: 0,
+    marginLeft: 16,
     marginBottom: 0,
   },
 })
