@@ -52,7 +52,8 @@ export async function shareSVGImage(svg: SVG) {
 function* handleSecureSend(
   data: { address: string; e164PhoneNumber: string; displayName: string },
   e164NumberToAddress: E164NumberToAddressType,
-  secureSendTxData: TransactionDataInput
+  secureSendTxData: TransactionDataInput,
+  requesterAddress?: string
 ) {
   if (!secureSendTxData.recipient.e164PhoneNumber) {
     throw Error(`Invalid recipient type for Secure Send: ${secureSendTxData.recipient.kind}`)
@@ -67,6 +68,11 @@ function* handleSecureSend(
     throw Error("No addresses associated with recipient's phone number")
   }
 
+  // Need to add the requester address to the option set in the event
+  // a request is coming from an unverified account
+  if (requesterAddress && !possibleRecievingAddresses.includes(requesterAddress)) {
+    possibleRecievingAddresses.push(requesterAddress)
+  }
   const possibleRecievingAddressesFormatted = possibleRecievingAddresses.map((address) =>
     address.toLowerCase()
   )
@@ -91,7 +97,8 @@ export function* handleBarcode(
   recipientCache: NumberToRecipient,
   e164NumberToAddress: E164NumberToAddressType,
   secureSendTxData?: TransactionDataInput,
-  isOutgoingPaymentRequest?: true
+  isOutgoingPaymentRequest?: true,
+  requesterAddress?: string
 ) {
   let data: { address: string; e164PhoneNumber: string; displayName: string } | undefined
 
@@ -110,7 +117,13 @@ export function* handleBarcode(
   }
 
   if (secureSendTxData) {
-    const success = yield call(handleSecureSend, data, e164NumberToAddress, secureSendTxData)
+    const success = yield call(
+      handleSecureSend,
+      data,
+      e164NumberToAddress,
+      secureSendTxData,
+      requesterAddress
+    )
     if (!success) {
       return
     }
@@ -153,6 +166,6 @@ export function* handleBarcode(
       addressJustValidated: true,
     })
   } else {
-    replace(Screens.SendAmount, { recipient, isFromScan: true })
+    replace(Screens.SendAmount, { recipient, isFromScan: true, isOutgoingPaymentRequest })
   }
 }
