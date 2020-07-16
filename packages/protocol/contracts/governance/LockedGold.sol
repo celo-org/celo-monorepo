@@ -9,9 +9,16 @@ import "./interfaces/ILockedGold.sol";
 import "../common/Initializable.sol";
 import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
-contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistry {
+contract LockedGold is
+  ILockedGold,
+  ICeloVersionedContract,
+  ReentrancyGuard,
+  Initializable,
+  UsingRegistry
+{
   using SafeMath for uint256;
 
   struct PendingWithdrawal {

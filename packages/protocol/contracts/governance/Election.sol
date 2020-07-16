@@ -13,11 +13,13 @@ import "../common/Freezable.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
 import "../common/UsingPrecompiles.sol";
 import "../common/UsingRegistry.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/Heap.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
 contract Election is
   IElection,
+  ICeloVersionedContract,
   Ownable,
   ReentrancyGuard,
   Initializable,

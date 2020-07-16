@@ -10,13 +10,22 @@ import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/Freezable.sol";
 import "../common/UsingRegistry.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
 /**
  * @title Contract that allows to exchange StableToken for GoldToken and vice versa
  * using a Constant Product Market Maker Model
  */
-contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, ReentrancyGuard, Freezable {
+contract Exchange is
+  IExchange,
+  ICeloVersionedContract,
+  Initializable,
+  Ownable,
+  UsingRegistry,
+  ReentrancyGuard,
+  Freezable
+{
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 

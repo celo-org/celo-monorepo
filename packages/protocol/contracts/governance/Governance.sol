@@ -13,6 +13,7 @@ import "../common/FixidityLib.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
 // TODO(asa): Hardcode minimum times for queueExpiry, etc.
@@ -21,6 +22,7 @@ import "../common/libraries/ReentrancyGuard.sol";
  */
 contract Governance is
   IGovernance,
+  ICeloVersionedContract,
   Ownable,
   Initializable,
   ReentrancyGuard,
