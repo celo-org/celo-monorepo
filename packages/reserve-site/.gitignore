@@ -1,0 +1,10 @@
+node_modules
+
+out/.next/
+
+.next/
+
+yarn-error.log
+firebase-debug.log
+
+.env.local

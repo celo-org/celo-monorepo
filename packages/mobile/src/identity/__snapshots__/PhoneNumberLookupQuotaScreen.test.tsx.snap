@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`PhoneNumberLookupQuotaScreen renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -186,6 +186,35 @@ exports[`PhoneNumberLookupQuotaScreen renders correctly 1`] = `
   <View>
     <View
       style={
+        Object {
+          "alignItems": "center",
+        }
+      }
+    >
+      <View
+        style={
+          Object {
+            "height": 64,
+          }
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#EA6042",
+              "fontFamily": "Inter-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+            }
+          }
+        >
+          insufficientBalance
+           
+        </Text>
+      </View>
+    </View>
+    <View
+      style={
         Array [
           Object {
             "alignItems": "center",
@@ -196,14 +225,14 @@ exports[`PhoneNumberLookupQuotaScreen renders correctly 1`] = `
           null,
           undefined,
           Object {
-            "backgroundColor": "#42D689",
+            "backgroundColor": "#A3EBC6",
           },
         ]
       }
     >
       <View
         accessible={true}
-        focusable={true}
+        focusable={false}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -225,7 +254,7 @@ exports[`PhoneNumberLookupQuotaScreen renders correctly 1`] = `
               "justifyContent": "center",
             },
             Object {
-              "backgroundColor": "#42D689",
+              "backgroundColor": "#A3EBC6",
             },
             Object {
               "height": 50,
@@ -355,5 +384,21 @@ exports[`PhoneNumberLookupQuotaScreen renders correctly 1`] = `
       </View>
     </View>
   </View>
-</SafeAreaView>
+  <View
+    collapsable={false}
+    style={
+      Array [
+        Object {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+        },
+        Object {
+          "height": 0,
+        },
+        undefined,
+      ]
+    }
+  />
+</RNCSafeAreaView>
 `;

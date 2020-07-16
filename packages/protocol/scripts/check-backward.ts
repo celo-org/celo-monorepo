@@ -1,73 +1,154 @@
-import { ASTCompatibilityReport, reportASTIncompatibilities } from '@celo/protocol/lib/ast-backward'
-import { BuildArtifacts, Contracts, getBuildArtifacts } from '@openzeppelin/upgrades'
-import { readJsonSync } from 'fs-extra'
+import { DefaultCategorizer } from '@celo/protocol/lib/compatibility/categorizer'
+import { ASTBackwardReport } from '@celo/protocol/lib/compatibility/utils'
+import { ContractVersion } from '@celo/protocol/lib/compatibility/version'
+import { writeJsonSync } from 'fs-extra'
+import * as path from 'path'
+import * as tmp from 'tmp'
+import * as yargs from 'yargs'
 
-const CODE_MAJOR_CHANGE = 103
-const CODE_MINOR_CHANGE = 102
-const CODE_NO_CHANGE = 0
+const COMMAND_REPORT = 'report'
+const COMMAND_SEM_CHECK = 'sem_check'
+const COMMAND_SEM_INFER = 'sem_infer'
+const COMMAND_SEM_DELTA = 'sem_delta'
 
-const args = process.argv.slice(2)
-
-if (args.length !== 2) {
-  console.error('USAGE: check-backward <artifacts-directory-before> <artifacts-directory-after>')
-  process.exit(1)
+const verCheck = (ver): boolean => {
+  if (ver === undefined || ContractVersion.isValid(ver)) {
+    return true
+  }
+  throw new Error(`Invalid version format: '${ver}'. Expeting 's.x.y.z' instead`)
 }
 
-const ensureValidArtifacts = (artifactsPaths: string[]): void => {
-  artifactsPaths.forEach((path) => {
-    const artifact = readJsonSync(path)
-    if (artifact.ast == undefined) {
-      console.error(`ERROR: invalid artifact file found: '${path}'`)
-      process.exit(10001)
+const argv = yargs
+  .command(COMMAND_REPORT, 'Generates a backward compatibility report')
+  .command(
+    COMMAND_SEM_CHECK,
+    'Check if the semantic version change provided is correct (exit code 0, or 1 otherwise)',
+    {
+      old_version: {
+        demandOption: true,
+      },
+      new_version: {
+        demandOption: true,
+      },
     }
+  )
+  .command(COMMAND_SEM_INFER, 'Infer what the semantic version change should be', {
+    old_version: {
+      demandOption: true,
+    },
   })
-}
+  .command(COMMAND_SEM_DELTA, 'Generates the semantic version delta')
+  .option('exclude', {
+    alias: 'e',
+    description: 'Contract name exclusion pattern',
+    type: 'string',
+  })
+  .option('old_contracts', {
+    alias: 'o',
+    description: 'Old contracts build artifacts folder',
+    type: 'string',
+    demandOption: true,
+  })
+  .option('new_contracts', {
+    alias: 'n',
+    description: 'Old contracts build artifacts folder',
+    type: 'string',
+    demandOption: true,
+  })
+  .option('old_version', {
+    alias: 'v',
+    description: 'Semantic version string for the old contracts',
+    type: 'string',
+  })
+  .option('new_version', {
+    alias: 'w',
+    description: 'Semantic version string for the new contracts',
+    type: 'string',
+  })
+  .option('output_file', {
+    alias: 'f',
+    description: 'Destination file output for the compatibility report',
+    type: 'string',
+  })
+  .option('quiet', {
+    alias: 'q',
+    description: 'Run in quiet mode (no logs)',
+    default: false,
+    type: 'boolean',
+  })
+  .help()
+  .alias('help', 'h')
+  .showHelpOnFail(true)
+  .demandCommand()
+  .check((av) => verCheck(av.old_version))
+  .check((av) => verCheck(av.new_version))
+  .strict().argv
 
-const instantiateArtifacts = (buildDirectory: string): BuildArtifacts => {
-  // Check if all jsons in the buildDirectory are valid artifacts,
-  // otherwise getBuildArtifacts fail with the enigmatic
-  // "Cannot read property 'absolutePath' of undefined"
-  ensureValidArtifacts(Contracts.listBuildArtifacts(buildDirectory))
-  try {
-    return getBuildArtifacts(buildDirectory)
-  } catch (error) {
-    console.error(`ERROR: could not create BuildArtifacts on directory '${buildDirectory}`)
-    process.exit(10002)
+const oldArtifactsFolder = path.resolve(argv.old_contracts)
+const newArtifactsFolder = path.resolve(argv.new_contracts)
+
+const out = (msg: string, force?: boolean): void => {
+  if (force || !argv.quiet) {
+    process.stdout.write(msg)
   }
 }
 
-const artifacts1 = instantiateArtifacts(args[0])
-const artifacts2 = instantiateArtifacts(args[1])
-
-const printChanges = (title: string, changes: string[]) => {
-  if (changes.length > 0) {
-    console.log(`- ${title}`)
-  }
-  changes.forEach((c: string) => console.log(`-- ${c}`))
-}
-
-const printReport = (report: ASTCompatibilityReport) => {
-  var exitCode = CODE_NO_CHANGE
-  var changeMessage = `No change in APIs`
-  if (report.majorChanges.length > 0) {
-    changeMessage = `MAJOR contracts version change`
-    exitCode = CODE_MAJOR_CHANGE
-  } else {
-    if (report.minorChanges.length > 0) {
-      changeMessage = `MINOR contracts version change`
-      exitCode = CODE_MINOR_CHANGE
-    }
-  }
-  printChanges('MAJOR changes', report.majorChanges)
-  printChanges('MINOR changes', report.minorChanges)
-  console.log(changeMessage)
-  return exitCode
-}
+const outFile = argv.output_file ? argv.output_file : tmp.tmpNameSync({})
+const exclude = argv.exclude ? argv.exclude : ''
 
 try {
-  process.exit(printReport(reportASTIncompatibilities(artifacts1, artifacts2)))
+  const backward = ASTBackwardReport.create(
+    oldArtifactsFolder,
+    newArtifactsFolder,
+    exclude,
+    new DefaultCategorizer(),
+    out
+  )
+  out(`Writing report to ${outFile} ...`)
+  writeJsonSync(outFile, backward, { spaces: 2 })
+  out('Done\n')
+  if (argv._.includes(COMMAND_REPORT)) {
+    // Report always generated
+    // Placebo command
+  } else if (argv._.includes(COMMAND_SEM_INFER)) {
+    out(`Inferred version: `)
+    out(
+      backward.report.global.versionDelta
+        .appliedTo(ContractVersion.fromString(argv.old_version))
+        .toString(),
+      true
+    )
+    out(`\n`)
+  } else if (argv._.includes(COMMAND_SEM_CHECK)) {
+    const expected = backward.report.global.versionDelta.appliedTo(
+      ContractVersion.fromString(argv.old_version)
+    )
+    if (expected.toString() !== argv.new_version) {
+      out(
+        `${argv.old_version} + ${backward.report.global.versionDelta} != ${argv.new_version}`,
+        true
+      )
+      out(`\n`)
+      process.exit(1)
+    } else {
+      out(
+        `${argv.old_version} + ${backward.report.global.versionDelta} == ${argv.new_version}`,
+        true
+      )
+      out(`\n`)
+      process.exit(0)
+    }
+  } else if (argv._.includes(COMMAND_SEM_DELTA)) {
+    out(`Version delta: `)
+    out(`${backward.report.global.versionDelta}`, true)
+    out(`\n`)
+  } else {
+    // Should never happen
+    console.error('Error parsing command line arguments')
+    process.exit(10007)
+  }
 } catch (error) {
-  if (!!error.message) {
+  if (error.message) {
     console.error(error.message)
   } else {
     console.error(error)

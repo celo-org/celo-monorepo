@@ -6,7 +6,7 @@ import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { requestTxSignature } from 'src/dappkit/dappkit'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -177,4 +177,4 @@ const styles = StyleSheet.create({
 export default connect<null, DispatchProps>(
   null,
   mapDispatchToProps
-)(withTranslation(Namespaces.dappkit)(DappKitSignTxScreen))
+)(withTranslation<Props>(Namespaces.dappkit)(DappKitSignTxScreen))

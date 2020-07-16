@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders correctly with backup completed 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -71,11 +71,11 @@ exports[`renders correctly with backup completed 1`] = `
       </Text>
     </View>
   </RCTScrollView>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
 
 exports[`renders correctly with backup not completed 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -194,10 +194,14 @@ exports[`renders correctly with backup not completed 1`] = `
   >
     <View
       style={
-        Object {
-          "borderRadius": 100,
-          "overflow": "hidden",
-        }
+        Array [
+          Object {
+            "overflow": "hidden",
+          },
+          Object {
+            "borderRadius": 100,
+          },
+        ]
       }
     >
       <View
@@ -219,11 +223,12 @@ exports[`renders correctly with backup not completed 1`] = `
         style={
           Object {
             "alignItems": "center",
-            "backgroundColor": "#F5F4F0",
+            "backgroundColor": "#F1F0EB",
             "flexGrow": 1,
             "height": 48,
             "justifyContent": "center",
-            "paddingHorizontal": 16,
+            "opacity": undefined,
+            "paddingHorizontal": 24,
             "paddingVertical": 5,
           }
         }
@@ -243,5 +248,79 @@ exports[`renders correctly with backup not completed 1`] = `
       </View>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
+`;
+
+exports[`still renders when mnemonic doesnt show up 1`] = `
+<RNCSafeAreaView
+  style={
+    Object {
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+      "justifyContent": "space-between",
+      "padding": 16,
+    }
+  }
+>
+  <RCTScrollView
+    contentContainerStyle={
+      Object {
+        "flexGrow": 1,
+        "paddingBottom": 16,
+      }
+    }
+  >
+    <View>
+      <View>
+        <View
+          style={
+            Object {
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "paddingHorizontal": 2,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Medium",
+                "fontSize": 16,
+                "lineHeight": 22,
+              }
+            }
+          >
+            backupKey
+          </Text>
+        </View>
+        <View
+          style={
+            Object {
+              "alignContent": "center",
+              "backgroundColor": "#FFF9EE",
+              "borderRadius": 4,
+              "justifyContent": "center",
+              "marginTop": 16,
+              "padding": 16,
+            }
+          }
+        />
+      </View>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 16,
+            "lineHeight": 22,
+            "marginTop": 16,
+          }
+        }
+      >
+        backupKeySummary
+      </Text>
+    </View>
+  </RCTScrollView>
+</RNCSafeAreaView>
 `;

@@ -2,20 +2,21 @@
   "headerTitle": "Clave de la cuenta",
   "introTitle": "La clave de tu cuenta",
   "introBody": "La llave de su cuenta es la parte más importante de su cuenta. Lleva unos cinco minutos",
-  "introPrimaryAction": "Configurar ahora",
+  "introPrimaryAction": "Configurar Ahora",
   "delayBackup": "Espere una hora",
   "postSetupTitle":"La clave de tu cuenta",
-  "postSetupBody": "Si pierdes tu Clave de Cuenta, perderás el acceso a todos tus Celo Dólares y Oro. Nadie, ni siquiera Celo, podrá ayudarle a recuperar su cuenta sin su clave. Guárdela en un lugar seguro y no la comparta",
+  "postSetupBody": "Si pierdes tu Clave de Cuenta, perderás el acceso a todos tus Celo Dólares y CELO. Nadie, ni siquiera {{appName}}, podrá ayudarle a recuperar su cuenta sin su clave. Guárdela en un lugar seguro y no la comparta",
   "postSetupCTA": "Conozca las claves de la cuenta",
   "getBackupKey": "Obtener Clave de Respaldo",
   "setUpSocialBackup": "Configurar Salvaguardas",
   "failedFetchMnemonic": "No se pudo obtener su clave de respaldo",
   "backupAndRecovery": "Respaldo y recuperación",
   "writeDownKey": "Escriba su llave",
+  "completeEducation": "Comprendo",
   "backupKey": "Clave de la cuenta",
   "yourBackupKey": "Su clave de respaldo",
   "moreInfo": "Más Información",
-  "backupKeyNotification": "Sin una clave de respaldo, puede perder el acceso a la billetera.",
+  "backupKeyNotification": "Su clave de cuenta es la parte más importante de su cuenta",
   "backupKeySummary":  "Encuentra un lugar privado y anota tu Clave de Cuenta. Por favor, guárdela en un lugar seguro. No la guardes en tu teléfono.",
   "backupPrompt":
     "Para seguridad de sus fondos, su cuenta está bloqueada hasta que obtenga su clave de respaldo.",
@@ -45,6 +46,30 @@
     "confirmation": "He enviado cada una de las salvaguardas a un amigo de confianza.",
     "yourSafeguards": "Sus salvaguardas"
   },
+  "cancelDialog": {
+    "title": "Termine de configurar su Clave de Cuenta",
+    "body": "Las claves de la cuenta son extremadamente importantes. Sin una llave, puedes perder el acceso a tu billetera para siempre. Estarás bloqueado para enviar cualquier transacción hasta que termines de configurar tu Clave de Cuenta",
+    "action": "Completar ahora",
+    "secondary": "Establecer más tarde"
+  },
   "backupPhrasePlaceholder":
-    "caballo leopardo perro mono tiburón tigre lémur ballena calamar lobo ardilla ratón león elefante gato langostino oso pingüino ciervo tortuga zorro cebra cabra jirafa"
+    "caballo leopardo perro mono tiburón tigre lémur ballena calamar lobo ardilla ratón león elefante gato langostino oso pingüino ciervo tortuga zorro cebra cabra jirafa",
+  "guide": [
+    {
+      "title": "La clave de su cuenta es un tipo especial de contraseña",
+      "text": "La clave de su cuenta es la única manera de acceder a su cuenta"
+    },
+    {
+      "title": "Sin tu llave, puedes perder el acceso para siempre",
+      "text": "Si pierde su teléfono, debe tener la llave para recuperar su cuenta. Nadie, ni siquiera {{appName}}, podrá recuperar sus fondos sin ella"
+    },
+    {
+      "title": "Escríbelo",
+      "text": "Escriba su clave de cuenta y guárdela en un lugar seguro. No la guardes en tu teléfono."
+    },
+    {
+      "title": "Mantenga su llave en privado",
+      "text": "Cualquiera con su llave tendrá acceso a su cuenta y a todos sus fondos. No lo comparta con otros"
+    }
+  ]
 }

@@ -1,26 +1,37 @@
 import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
+import { Spacing } from '@celo/react-components/styles/styles.v2'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { StyleProp, StyleSheet, Text, TextStyle } from 'react-native'
+import { AnalyticsEventType } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 
 interface CommonProps {
   disabled?: boolean
   testID?: string
   onPress: () => void
+  eventName?: AnalyticsEventType
 }
 
 type WrapperProps = CommonProps & {
   children: JSX.Element
 }
 
-function Wrapper({ onPress, disabled, testID, children }: WrapperProps) {
+function Wrapper({ eventName, onPress, disabled, testID, children }: WrapperProps) {
+  const onPressLocal = React.useCallback(() => {
+    if (eventName) {
+      ValoraAnalytics.track(eventName)
+    }
+    onPress()
+  }, [onPress, eventName])
+
   return (
     <Touchable
       disabled={disabled}
       testID={testID}
-      onPress={onPress}
+      onPress={onPressLocal}
       borderless={true}
       hitSlop={variables.iconHitslop}
     >
@@ -55,6 +66,6 @@ const styles = StyleSheet.create({
   text: {
     ...fontStyles.regular,
     color: colors.greenUI,
-    paddingHorizontal: 16,
+    paddingHorizontal: Spacing.Thick24,
   },
 })

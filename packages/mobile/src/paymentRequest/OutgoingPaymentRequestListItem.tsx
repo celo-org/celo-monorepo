@@ -2,14 +2,14 @@ import ContactCircle from '@celo/react-components/components/ContactCircle'
 import RequestMessagingCard from '@celo/react-components/components/RequestMessagingCard'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { Image, StyleSheet, View } from 'react-native'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { StyleSheet, View } from 'react-native'
+import { HomeEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { cancelPaymentRequest, updatePaymentRequestNotified } from 'src/firebase/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
+import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { unknownUserIcon } from 'src/images/Images'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 import Logger from 'src/utils/Logger'
 
@@ -22,20 +22,25 @@ interface OwnProps {
   updatePaymentRequestNotified: typeof updatePaymentRequestNotified
 }
 
-const AVATAR_SIZE = 40
-
 type Props = OwnProps & WithTranslation
 
 export class OutgoingPaymentRequestListItem extends React.Component<Props> {
   onRemind = () => {
     const { id, t } = this.props
     this.props.updatePaymentRequestNotified(id, false)
-    CeloAnalytics.track(CustomEventNames.outgoing_request_payment_remind)
+    ValoraAnalytics.track(HomeEvents.notification_select, {
+      notificationType: NotificationBannerTypes.outgoing_tx_request,
+      selectedAction: NotificationBannerCTATypes.remind,
+    })
     Logger.showMessage(t('sendFlow7:reminderSent'))
   }
 
   onCancel = () => {
     const { id } = this.props
+    ValoraAnalytics.track(HomeEvents.notification_select, {
+      notificationType: NotificationBannerTypes.outgoing_tx_request,
+      selectedAction: NotificationBannerCTATypes.decline,
+    })
     this.props.cancelPaymentRequest(id)
   }
 
@@ -69,13 +74,10 @@ export class OutgoingPaymentRequestListItem extends React.Component<Props> {
           details={comment}
           icon={
             <ContactCircle
-              size={AVATAR_SIZE}
               address={requestee.address}
               name={name}
               thumbnailPath={getRecipientThumbnail(requestee)}
-            >
-              <Image source={unknownUserIcon} style={styles.unknownUser} />
-            </ContactCircle>
+            />
           }
           callToActions={this.getCTA()}
         />
@@ -88,12 +90,6 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: 16,
   },
-  unknownUser: {
-    height: AVATAR_SIZE,
-    width: AVATAR_SIZE,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
 })
 
-export default withTranslation(Namespaces.paymentRequestFlow)(OutgoingPaymentRequestListItem)
+export default withTranslation<Props>(Namespaces.paymentRequestFlow)(OutgoingPaymentRequestListItem)

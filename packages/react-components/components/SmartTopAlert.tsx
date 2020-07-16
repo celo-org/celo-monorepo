@@ -4,7 +4,7 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Animated, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
-import { useSafeArea } from 'react-native-safe-area-context'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 export enum NotificationTypes {
   MESSAGE = 'message',
@@ -21,13 +21,14 @@ interface AlertProps {
 }
 
 interface Props extends AlertProps {
+  isVisible: boolean
   timestamp: number
 }
 
 // This component needs to be always mounted for the hide animation to be visible
 function SmartTopAlert(props: Props) {
   const [visibleAlertState, setVisibleAlertState] = useState<AlertProps | null>(null)
-  const insets = useSafeArea()
+  const insets = useSafeAreaInsets()
   const yOffset = useRef(new Animated.Value(-500))
   const containerRef = useRef<View>()
   const animatedRef = useCallback((node) => {
@@ -37,8 +38,8 @@ function SmartTopAlert(props: Props) {
   const alertState = useMemo(() => {
     // tslint bug?
     // tslint:disable-next-line: no-shadowed-variable
-    const { type, title, text, buttonMessage, dismissAfter, onPress } = props
-    if (title || text) {
+    const { type, title, text, buttonMessage, dismissAfter, onPress, isVisible } = props
+    if (isVisible) {
       return {
         type,
         title,

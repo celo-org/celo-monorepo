@@ -5,16 +5,17 @@
   "introPrimaryAction": "Set Up Now",
   "delayBackup": "Wait One Hour",
   "postSetupTitle": "Your Account Key is Set Up",
-  "postSetupBody": "If you lose your Account Key, you will lose access to all of your Celo Dollars and Gold. Nobody, not even Celo, will be able to help you recover your account without your key. Store it in a safe place and do not share it.",
+  "postSetupBody": "If you lose your Account Key, you will lose access to all of your Celo Dollars and CELO. Nobody, not even {{appName}}, will be able to help you recover your account without your key. Store it in a safe place and do not share it.",
   "postSetupCTA": "Learn about Account Keys",
   "getBackupKey": "Get Backup Key",
   "setUpSocialBackup": "Set Up Safeguards",
   "failedFetchMnemonic": "Failed to fetch your Account Key",
   "backupAndRecovery": "Backup and Recovery",
   "writeDownKey": "Write down your key",
+  "completeEducation": "I Understand",
   "backupKey": "Account Key",
   "yourBackupKey": "Your Backup Key",
-  "backupKeyNotification": "Without a Backup Key, you may lose access to your wallet.",
+  "backupKeyNotification": "Your Account Key is the most important part of your account",
   "backupKeySummary":
     "Find a private place and write down your Account Key. Please store it somewhere safe. Do not save it in your phone.",
   "backupPrompt":
@@ -46,6 +47,30 @@
     "confirmation": "I have sent each Safeguard phrase to a trusted friend.",
     "yourSafeguards": "Your Safeguards"
   },
+  "cancelDialog": {
+    "title": "Finish setting up your Account Account Key",
+    "body": "Account Keys are extremely important. Without a key, you can lose access to your wallet forever.\nYou will be blocked from sending any transactions until you finish setting up your Account Key.",
+    "action": "Complete Now",
+    "secondary": "Set Up Later"
+  },
   "backupPhrasePlaceholder":
-    "horse leopard dog monkey shark tiger lemur whale squid wolf squirrel mouse lion elephant cat shrimp bear penguin deer turtle fox zebra goat giraffe"
+    "horse leopard dog monkey shark tiger lemur whale squid wolf squirrel mouse lion elephant cat shrimp bear penguin deer turtle fox zebra goat giraffe",
+  "guide": [
+    {
+      "title": "Your Account Key is a special kind of password",
+      "text": "Your Account Key is the one and only way to access your account."
+    },
+    {
+      "title": "Without your key, you can lose access forever",
+      "text": "If you lose your phone, you must have your key to get your account back. Nobody, not even {{appName}}, will be able to recover your funds without it."
+    },
+    {
+      "title": "Write it down",
+      "text": "Write down your Account Key and store it in a safe place. Do not save it in your phone."
+    },
+    {
+      "title": "Keep your key private",
+      "text": "Anyone with your key will have access to your account and all of its funds. Don’t share it with others."
+    }
+  ]
 }

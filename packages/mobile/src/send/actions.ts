@@ -25,6 +25,8 @@ export interface HandleBarcodeDetectedAction {
   data: QrCode
   scanIsForSecureSend?: true
   transactionData?: TransactionDataInput
+  isOutgoingPaymentRequest?: true
+  requesterAddress?: string
 }
 
 export interface StoreLatestInRecentsAction {
@@ -35,8 +37,7 @@ export interface StoreLatestInRecentsAction {
 export interface SendPaymentOrInviteAction {
   type: Actions.SEND_PAYMENT_OR_INVITE
   amount: BigNumber
-  timestamp: number
-  reason: string
+  comment: string
   recipient: Recipient
   recipientAddress?: string | null
   inviteMethod?: InviteBy
@@ -45,6 +46,7 @@ export interface SendPaymentOrInviteAction {
 
 export interface SendPaymentOrInviteSuccessAction {
   type: Actions.SEND_PAYMENT_OR_INVITE_SUCCESS
+  amount: BigNumber
 }
 
 export interface SendPaymentOrInviteFailureAction {
@@ -66,12 +68,16 @@ export const storeLatestInRecents = (recipient: Recipient): StoreLatestInRecents
 export const handleBarcodeDetected = (
   data: QrCode,
   scanIsForSecureSend?: true,
-  transactionData?: TransactionDataInput
+  transactionData?: TransactionDataInput,
+  isOutgoingPaymentRequest?: true,
+  requesterAddress?: string
 ): HandleBarcodeDetectedAction => ({
   type: Actions.BARCODE_DETECTED,
   data,
   scanIsForSecureSend,
   transactionData,
+  isOutgoingPaymentRequest,
+  requesterAddress,
 })
 
 export const shareQRCode = (qrCodeSvg: SVG) => ({
@@ -81,8 +87,7 @@ export const shareQRCode = (qrCodeSvg: SVG) => ({
 
 export const sendPaymentOrInvite = (
   amount: BigNumber,
-  timestamp: number,
-  reason: string,
+  comment: string,
   recipient: Recipient,
   recipientAddress: string | null | undefined,
   inviteMethod: InviteBy | undefined,
@@ -90,16 +95,18 @@ export const sendPaymentOrInvite = (
 ): SendPaymentOrInviteAction => ({
   type: Actions.SEND_PAYMENT_OR_INVITE,
   amount,
-  timestamp,
-  reason,
+  comment,
   recipient,
   recipientAddress,
   inviteMethod,
   firebasePendingRequestUid,
 })
 
-export const sendPaymentOrInviteSuccess = (): SendPaymentOrInviteSuccessAction => ({
+export const sendPaymentOrInviteSuccess = (
+  amount: BigNumber
+): SendPaymentOrInviteSuccessAction => ({
   type: Actions.SEND_PAYMENT_OR_INVITE_SUCCESS,
+  amount,
 })
 
 export const sendPaymentOrInviteFailure = (): SendPaymentOrInviteFailureAction => ({

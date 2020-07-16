@@ -5,24 +5,25 @@ import fontStyles from '@celo/react-components/styles/fonts.v2'
 import * as React from 'react'
 import { useTranslation, WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
-import { ErrorMessages } from 'src/app/ErrorMessages'
+import { OnboardingEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import BackupPhraseContainer, {
   BackupPhraseContainerMode,
   BackupPhraseType,
 } from 'src/backup/BackupPhraseContainer'
-import { getStoredMnemonic } from 'src/backup/utils'
-import CancelButton from 'src/components/CancelButton.v2'
+import CancelConfirm from 'src/backup/CancelConfirm'
+import { getStoredMnemonic, onGetMnemonicFail } from 'src/backup/utils'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import { navigate } from 'src/navigator/NavigationService'
+import { navigate, pushToStack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { RootState } from 'src/redux/reducers'
-import Logger from 'src/utils/Logger'
+import { currentAccountSelector } from 'src/web3/selectors'
+
+const TAG = 'backup/BackupPhrase'
 
 interface State {
   mnemonic: string
@@ -30,6 +31,7 @@ interface State {
 }
 
 interface StateProps {
+  account: string | null
   backupCompleted: boolean
 }
 
@@ -42,12 +44,13 @@ type Props = StateProps & DispatchProps & WithTranslation
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
+    account: currentAccountSelector(state),
     backupCompleted: state.account.backupCompleted,
   }
 }
 
 export const navOptionsForBackupPhrase = {
-  headerLeft: () => <CancelButton style={{ color: colors.gray4 }} />,
+  headerLeft: () => <CancelConfirm screen={TAG} />,
   headerTitle: i18n.t(`${Namespaces.backupKeyFlow6}:headerTitle`),
   headerRight: () => <HeaderRight />,
 }
@@ -70,16 +73,12 @@ class BackupPhrase extends React.Component<Props, State> {
     if (this.state.mnemonic) {
       return
     }
+    const mnemonic = await getStoredMnemonic(this.props.account)
 
-    try {
-      const mnemonic = await getStoredMnemonic()
-      if (!mnemonic) {
-        throw new Error('Mnemonic not found in key store')
-      }
+    if (mnemonic) {
       this.setState({ mnemonic })
-    } catch (e) {
-      Logger.error('BackupPhrase/retrieveMnemonic', 'Failed to retrieve mnemonic', e)
-      this.props.showError(ErrorMessages.FAILED_FETCH_MNEMONIC)
+    } else {
+      onGetMnemonicFail(this.props.showError, 'BackupPhrase')
     }
   }
 
@@ -90,13 +89,12 @@ class BackupPhrase extends React.Component<Props, State> {
   }
 
   onPressConfirmArea = () => {
-    this.setState((state) => ({ isConfirmChecked: !state.isConfirmChecked }))
+    this.onPressConfirmSwitch(!this.state.isConfirmChecked)
   }
 
   onPressContinue = () => {
-    const { mnemonic } = this.state
-    CeloAnalytics.track(CustomEventNames.backup_continue)
-    navigate(Screens.BackupQuiz, { mnemonic })
+    ValoraAnalytics.track(OnboardingEvents.backup_continue)
+    navigate(Screens.BackupQuiz)
   }
 
   render() {
@@ -137,7 +135,8 @@ class BackupPhrase extends React.Component<Props, State> {
 function HeaderRight() {
   const { t } = useTranslation(Namespaces.backupKeyFlow6)
   const onMoreInfoPressed = () => {
-    // TODO: Implement this
+    ValoraAnalytics.track(OnboardingEvents.backup_more_info)
+    pushToStack(Screens.AccountKeyEducation)
   }
   return <TopBarTextButton onPress={onMoreInfoPressed} title={t('moreInfo')} />
 }
@@ -172,4 +171,4 @@ const styles = StyleSheet.create({
 export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
   showError,
   hideAlert,
-})(withTranslation(Namespaces.backupKeyFlow6)(BackupPhrase))
+})(withTranslation<Props>(Namespaces.backupKeyFlow6)(BackupPhrase))

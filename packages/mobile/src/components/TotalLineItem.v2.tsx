@@ -15,35 +15,45 @@ import { useExchangeRate, useLocalCurrencyCode } from 'src/localCurrency/hooks'
 interface Props {
   title?: string
   amount: MoneyAmount
+  hideSign?: boolean
 }
 
-export default function TotalLineItem({ title, amount }: Props) {
+export default function TotalLineItem({ title, amount, hideSign }: Props) {
   const localCurrencyCode = useLocalCurrencyCode()
   const localCurrencyExchangeRate = useExchangeRate()
   const { t } = useTranslation(Namespaces.global)
+
+  const exchangeRate = amount.localAmount?.exchangeRate || localCurrencyExchangeRate
 
   return (
     <>
       <LineItemRow
         title={title || t('total')}
         textStyle={fontStyles.regular600}
-        amount={<CurrencyDisplay amount={amount} />}
+        amount={<CurrencyDisplay amount={amount} hideSign={hideSign} />}
       />
-      {localCurrencyCode !== LocalCurrencyCode.USD && localCurrencyExchangeRate && (
+      {localCurrencyCode !== LocalCurrencyCode.USD && exchangeRate && (
         <LineItemRow
           title={
             <Trans i18nKey="totalInDollars" ns={Namespaces.global}>
               Celo Dollars @{' '}
               <CurrencyDisplay
                 amount={{
-                  value: new BigNumber(localCurrencyExchangeRate).pow(-1),
+                  value: new BigNumber(exchangeRate).pow(-1),
                   currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
                 }}
                 showLocalAmount={false}
               />
             </Trans>
           }
-          amount={<CurrencyDisplay amount={amount} showLocalAmount={false} hideSymbol={true} />}
+          amount={
+            <CurrencyDisplay
+              amount={amount}
+              showLocalAmount={false}
+              hideSymbol={true}
+              hideSign={hideSign}
+            />
+          }
           style={styles.dollars}
           textStyle={styles.dollarsText}
         />

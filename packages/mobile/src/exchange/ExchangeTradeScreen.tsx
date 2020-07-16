@@ -11,10 +11,12 @@ import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
 import { Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
+import { CeloExchangeEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { MoneyAmount } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
@@ -26,6 +28,7 @@ import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import {
+  convertDollarsToLocalAmount,
   convertDollarsToMaxSupportedPrecision,
   convertLocalAmountToDollars,
 } from 'src/localCurrency/convert'
@@ -120,13 +123,42 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   goToReview = () => {
     const { inputToken } = this.state
     const inputTokenDisplayName = this.getInputTokenDisplayText()
+    const inputAmount = this.getInputTokenAmount()
+    // BEGIN: Analytics
+    const goldToDollarExchangeRate = getRateForMakerToken(
+      this.props.exchangeRatePair,
+      this.state.makerToken,
+      CURRENCY_ENUM.DOLLAR
+    )
+    const goldAmount = this.isDollarToGold()
+      ? this.getOppositeInputTokenAmount(inputAmount)
+      : inputAmount
+    const dollarsAmount = this.isDollarToGold()
+      ? inputAmount
+      : this.getOppositeInputTokenAmount(inputAmount)
+    const localCurrencyAmount = convertDollarsToLocalAmount(
+      dollarsAmount,
+      this.props.localCurrencyExchangeRate
+    )
+    ValoraAnalytics.track(
+      this.isDollarToGold()
+        ? CeloExchangeEvents.celo_buy_continue
+        : CeloExchangeEvents.celo_sell_continue,
+      {
+        localCurrencyAmount: localCurrencyAmount ? localCurrencyAmount.toString() : null,
+        goldAmount: goldAmount.toString(),
+        inputToken,
+        goldToDollarExchangeRate: goldToDollarExchangeRate.toString(),
+      }
+    )
+    // END: Analytics
     navigate(Screens.ExchangeReview, {
       exchangeInput: {
         makerToken: this.state.makerToken,
         makerTokenBalance: this.state.makerTokenAvailableBalance,
         inputToken,
         inputTokenDisplayName,
-        inputAmount: this.getInputTokenAmount(),
+        inputAmount,
       },
     })
   }
@@ -220,7 +252,11 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   }
 
   switchInputToken = () => {
-    this.setState({ inputToken: this.getOppositeInputToken() }, () => {
+    const inputToken = this.getOppositeInputToken()
+    ValoraAnalytics.track(CeloExchangeEvents.celo_toggle_input_currency, {
+      to: inputToken,
+    })
+    this.setState({ inputToken }, () => {
       this.updateError()
     })
   }
@@ -242,12 +278,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     )
 
     return (
-      <SafeAreaView
-        // Force inset as this screen uses auto focus and KeyboardSpacer padding is initially
-        // incorrect because of that
-        forceInset={{ top: 'never', bottom: 'always' }}
-        style={styles.container}
-      >
+      <SafeAreaView style={styles.container}>
         <DisconnectBanner />
         <KeyboardAwareScrollView
           keyboardShouldPersistTaps={'always'}
@@ -269,7 +300,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
               keyboardType={'decimal-pad'}
               onChangeText={this.onChangeExchangeAmount}
               value={this.getInputValue()}
-              placeholderTextColor={'#BDBDBD'}
+              placeholderTextColor={colors.gray3}
               placeholder={'0'}
               style={styles.currencyInput}
               testID="ExchangeInput"
@@ -297,10 +328,10 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
         </KeyboardAwareScrollView>
         <Button
           onPress={this.goToReview}
-          text={t(`${Namespaces.walletFlow5}:review`)}
+          text={t(`global:review`)}
           accessibilityLabel={t('continue')}
           disabled={this.isExchangeInvalid()}
-          type={BtnTypes.TERTIARY}
+          type={BtnTypes.SECONDARY}
           size={BtnSizes.FULL}
           style={styles.reviewBtn}
           testID="ExchangeReviewButton"
@@ -315,7 +346,7 @@ export default connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateT
   fetchExchangeRate,
   showError,
   hideAlert,
-})(withTranslation(Namespaces.exchangeFlow9)(ExchangeTradeScreen))
+})(withTranslation<Props>(Namespaces.exchangeFlow9)(ExchangeTradeScreen))
 
 const styles = StyleSheet.create({
   container: {
@@ -341,7 +372,8 @@ const styles = StyleSheet.create({
     ...fontStyles.small,
   },
   switchToText: {
-    ...fontStyles.label,
+    ...fontStyles.small,
+    fontSize: 13,
     textDecorationLine: 'underline',
     color: colors.gray4,
     marginTop: 4,

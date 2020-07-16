@@ -1,18 +1,26 @@
+import ContactCircle from '@celo/react-components/components/ContactCircle'
 import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
-import colors from '@celo/react-components/styles/colors'
-import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
+import TextButton from '@celo/react-components/components/TextButton.v2'
+import colors from '@celo/react-components/styles/colors.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
+import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { ActivityIndicator, StyleSheet, View } from 'react-native'
-import Modal from 'react-native-modal'
-import SafeAreaView from 'react-native-safe-area-view'
+import { StyleSheet, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { FeeEvents, SendEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
+import BackButton from 'src/components/BackButton.v2'
+import CommentTextInput from 'src/components/CommentTextInput'
+import CurrencyDisplay, { DisplayType } from 'src/components/CurrencyDisplay'
+import FeeDrawer from 'src/components/FeeDrawer'
 import InviteOptionsModal from 'src/components/InviteOptionsModal'
+import ShortenedAddress from 'src/components/ShortenedAddress'
+import TotalLineItem from 'src/components/TotalLineItem.v2'
 import { FeeType } from 'src/fees/actions'
 import CalculateFee, {
   CalculateFeeChildren,
@@ -24,29 +32,38 @@ import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { AddressValidationType } from 'src/identity/reducer'
 import { getAddressValidationType, getSecureSendAddress } from 'src/identity/secureSend'
 import { InviteBy } from 'src/invite/actions'
-import { navigate, navigateBack } from 'src/navigator/NavigationService'
+import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
+import { LocalCurrencyCode } from 'src/localCurrency/consts'
+import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
+import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
+import { emptyHeader } from 'src/navigator/Headers.v2'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
+import { getDisplayName, getRecipientThumbnail } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
 import { sendPaymentOrInvite } from 'src/send/actions'
 import { TransactionDataInput } from 'src/send/SendAmount'
-import TransferReviewCard from 'src/send/TransferReviewCard'
 import { ConfirmationInput, getConfirmationInput } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
+
 interface StateProps {
   account: string | null
   isSending: boolean
-  defaultCountryCode: string
+  defaultCountryCode: string | null
   dollarBalance: string
   appConnected: boolean
   transactionData: TransactionDataInput
   confirmationInput: ConfirmationInput
   addressValidationType: AddressValidationType
   validatedRecipientAddress?: string
+  addressJustValidated?: boolean
+  localCurrencyCode: LocalCurrencyCode
+  localCurrencyExchangeRate?: string | null
 }
 
 interface DispatchProps {
@@ -59,6 +76,7 @@ interface DispatchProps {
 interface State {
   modalVisible: boolean
   buttonReset: boolean
+  comment: string
 }
 
 type OwnProps = StackScreenProps<StackParamList, Screens.SendConfirmation>
@@ -73,7 +91,7 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const { route } = ownProps
-  const transactionData = route.params.transactionData
+  const { transactionData, addressJustValidated } = route.params
   const { e164NumberToAddress } = state.identity
   const { secureSendPhoneNumberMapping } = state.identity
   const confirmationInput = getConfirmationInput(
@@ -83,8 +101,10 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   )
   const { recipient } = transactionData
   const addressValidationType = getAddressValidationType(recipient, secureSendPhoneNumberMapping)
-  // Undefined or null means no addresses validated through secure send
+  // Undefined or null means no addresses ever validated through secure send
   const validatedRecipientAddress = getSecureSendAddress(recipient, secureSendPhoneNumberMapping)
+  const localCurrencyCode = getLocalCurrencyCode(state)
+  const localCurrencyExchangeRate = getLocalCurrencyExchangeRate(state)
 
   return {
     account: currentAccountSelector(state),
@@ -96,49 +116,71 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
     confirmationInput,
     addressValidationType,
     validatedRecipientAddress,
+    addressJustValidated,
+    localCurrencyCode,
+    localCurrencyExchangeRate,
   }
 }
 
-export class SendConfirmation extends React.Component<Props, State> {
-  static navigationOptions = { header: null }
+export const sendConfirmationScreenNavOptions = () => ({
+  ...emptyHeader,
+  headerLeft: () => <BackButton eventName={SendEvents.send_confirm_back} />,
+})
 
+export class SendConfirmation extends React.Component<Props, State> {
   state = {
     modalVisible: false,
     buttonReset: false,
+    comment: '',
   }
 
-  async componentDidMount() {
+  componentDidMount() {
+    const { addressJustValidated, t } = this.props
     this.props.fetchDollarBalance()
-  }
 
-  getNavParams = () => {
-    return this.props.route.params
+    if (addressJustValidated) {
+      Logger.showMessage(t('sendFlow7:addressConfirmed'))
+    }
   }
 
   onSendClick = () => {
-    const { recipientAddress } = this.props.confirmationInput
-    if (recipientAddress) {
-      this.sendOrInvite()
+    const { type } = this.props.confirmationInput
+    if (type === TokenTransactionType.InviteSent) {
+      this.showInviteModal()
     } else {
-      this.showModal()
+      this.sendOrInvite()
     }
   }
 
   sendOrInvite = (inviteMethod?: InviteBy) => {
     const {
+      type,
       amount,
-      reason,
       recipient,
       recipientAddress,
       firebasePendingRequestUid,
     } = this.props.confirmationInput
+    const { comment } = this.state
 
-    const timestamp = Date.now()
+    const localCurrencyAmount = convertDollarsToLocalAmount(
+      amount,
+      this.props.localCurrencyExchangeRate
+    )
+
+    ValoraAnalytics.track(SendEvents.send_confim_send, {
+      isScan: !!this.props.route.params?.isFromScan,
+      isInvite: !recipientAddress,
+      isRequest: type === TokenTransactionType.PayRequest,
+      localCurrencyExchangeRate: this.props.localCurrencyExchangeRate,
+      localCurrency: this.props.localCurrencyCode,
+      dollarAmount: amount.toString(),
+      localCurrencyAmount: localCurrencyAmount ? localCurrencyAmount.toString() : null,
+      commentLength: this.state.comment.length,
+    })
 
     this.props.sendPaymentOrInvite(
       amount,
-      timestamp,
-      reason,
+      comment,
       recipient,
       recipientAddress,
       inviteMethod,
@@ -148,24 +190,11 @@ export class SendConfirmation extends React.Component<Props, State> {
 
   onEditAddressClick = () => {
     const { transactionData, addressValidationType } = this.props
+    ValoraAnalytics.track(SendEvents.send_secure_edit)
     navigate(Screens.ValidateRecipientIntro, {
       transactionData,
       addressValidationType,
     })
-  }
-
-  onEditClick = () => {
-    CeloAnalytics.track(CustomEventNames.edit_dollar_confirm)
-    navigateBack()
-  }
-
-  onCancelClick = () => {
-    const { firebasePendingRequestUid } = this.props.confirmationInput
-    if (firebasePendingRequestUid) {
-      this.props.declinePaymentRequest(firebasePendingRequestUid)
-    }
-    Logger.showMessage(this.props.t('paymentRequestFlow:requestDeclined'))
-    navigateBack()
   }
 
   renderHeader = () => {
@@ -184,15 +213,11 @@ export class SendConfirmation extends React.Component<Props, State> {
     return <ReviewHeader title={title} />
   }
 
-  renderFooter = () => {
-    return this.props.isSending ? <ActivityIndicator size="large" color={colors.celoGreen} /> : null
-  }
-
-  showModal = () => {
+  showInviteModal = () => {
     this.setState({ modalVisible: true })
   }
 
-  hideModal = () => {
+  hideInviteModal = () => {
     this.setState({ modalVisible: false })
   }
 
@@ -203,13 +228,22 @@ export class SendConfirmation extends React.Component<Props, State> {
   }
 
   sendWhatsApp = () => {
-    this.hideModal()
+    this.hideInviteModal()
     this.sendOrInvite(InviteBy.WhatsApp)
   }
 
   sendSMS = () => {
-    this.hideModal()
+    this.hideInviteModal()
     this.sendOrInvite(InviteBy.SMS)
+  }
+
+  onCommentChange = (comment: string) => {
+    this.setState({ comment })
+  }
+
+  onBlur = () => {
+    const comment = this.state.comment.trim()
+    this.setState({ comment })
   }
 
   renderWithAsyncFee: CalculateFeeChildren = (asyncFee) => {
@@ -221,78 +255,132 @@ export class SendConfirmation extends React.Component<Props, State> {
       confirmationInput,
       validatedRecipientAddress,
     } = this.props
-    const { amount, reason, recipient, recipientAddress, type } = confirmationInput
+    const { amount, recipient, recipientAddress, type, reason } = confirmationInput
 
     const fee = getFeeDollars(asyncFee.result)
     const amountWithFee = amount.plus(fee || 0)
     const userHasEnough = !asyncFee.loading && amountWithFee.isLessThanOrEqualTo(dollarBalance)
     const isPrimaryButtonDisabled = isSending || !userHasEnough || !appConnected || !!asyncFee.error
 
+    const isInvite = type === TokenTransactionType.InviteSent
+    const inviteFee = getInvitationVerificationFeeInDollars()
+
+    const subtotalAmount = {
+      value: amount || inviteFee,
+      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+    }
+
     let primaryBtnInfo
-    let secondaryBtnInfo
     if (type === TokenTransactionType.PayRequest) {
       primaryBtnInfo = {
         action: this.sendOrInvite,
         text: i18n.t('global:pay'),
         disabled: isPrimaryButtonDisabled,
       }
-      secondaryBtnInfo = {
-        action: this.onCancelClick,
-        text: i18n.t('global:decline'),
-        disabled: isSending,
-      }
     } else {
       primaryBtnInfo = {
         action: this.onSendClick,
-        text: t('send'),
+        text: t('global:send'),
         disabled: isPrimaryButtonDisabled,
       }
-      secondaryBtnInfo = { action: this.onEditClick, text: t('edit'), disabled: isSending }
+    }
+
+    const paymentRequestComment = reason || ''
+
+    const renderFeeContainer = () => {
+      // 'fee' already contains the invitation fee for invites
+      // so we adjust it here
+      const securityFee = isInvite && fee ? fee.minus(inviteFee) : fee
+
+      ValoraAnalytics.track(FeeEvents.fee_rendered, {
+        feeType: 'Security',
+        fee: securityFee ? securityFee.toString() : securityFee,
+      })
+      const totalAmount = {
+        value: amountWithFee,
+        currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+      }
+
+      return (
+        <View style={styles.feeContainer}>
+          <FeeDrawer
+            testID={'feeDrawer/SendConfirmation'}
+            isEstimate={true}
+            currency={CURRENCY_ENUM.DOLLAR}
+            inviteFee={inviteFee}
+            isInvite={isInvite}
+            securityFee={securityFee}
+            feeLoading={asyncFee.loading}
+            feeHasError={!!asyncFee.error}
+            totalFee={fee}
+          />
+          <TotalLineItem amount={totalAmount} />
+        </View>
+      )
     }
 
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['bottom']}>
         <DisconnectBanner />
         <ReviewFrame
-          HeaderComponent={this.renderHeader}
-          FooterComponent={this.renderFooter}
+          FooterComponent={renderFeeContainer}
           confirmButton={primaryBtnInfo}
-          modifyButton={secondaryBtnInfo}
           shouldReset={this.state.buttonReset}
+          isSending={this.props.isSending}
         >
-          <TransferReviewCard
-            recipient={recipient}
-            address={recipientAddress || ''}
-            e164PhoneNumber={recipient.e164PhoneNumber}
-            comment={reason}
-            value={amount}
-            currency={CURRENCY_ENUM.DOLLAR} // User can only send in Dollars
-            fee={fee}
-            isLoadingFee={asyncFee.loading}
-            feeError={asyncFee.error}
-            type={type}
-            validatedRecipientAddress={validatedRecipientAddress}
-            onEditAddressClick={this.onEditAddressClick}
-          />
-          <Modal
-            isVisible={this.state.modalVisible}
-            style={styles.modal}
-            useNativeDriver={true}
-            hideModalContentWhileAnimating={true}
-            onBackButtonPress={this.cancelModal}
-          >
-            <View style={styles.modalContainer}>
-              <InviteOptionsModal
-                onWhatsApp={this.sendWhatsApp}
-                onSMS={this.sendSMS}
-                onCancel={this.cancelModal}
-                cancelText={t('cancel')}
-                SMSText={t('inviteFlow11:inviteWithSMS')}
-                whatsAppText={t('inviteFlow11:inviteWithWhatsapp')}
-                margin={15}
+          <View style={styles.transferContainer}>
+            {isInvite && <Text style={styles.inviteText}>{t('inviteMoneyEscrow')}</Text>}
+            <View style={styles.headerContainer}>
+              <ContactCircle
+                name={this.props.transactionData.recipient.displayName}
+                thumbnailPath={getRecipientThumbnail(recipient)}
+                address={recipientAddress || ''}
               />
+              <View style={styles.recipientInfoContainer}>
+                <Text style={styles.headerText} testID="HeaderText">
+                  {t('sending')}
+                </Text>
+                <Text style={styles.displayName}>
+                  {getDisplayName({ recipient, recipientAddress, t })}
+                </Text>
+                {validatedRecipientAddress && (
+                  <View style={styles.editContainer}>
+                    <ShortenedAddress style={styles.address} address={validatedRecipientAddress} />
+                    <TextButton
+                      style={styles.editButton}
+                      testID={'accountEditButton'}
+                      onPress={this.onEditAddressClick}
+                    >
+                      {t('edit')}
+                    </TextButton>
+                  </View>
+                )}
+              </View>
             </View>
-          </Modal>
+            <CurrencyDisplay
+              type={DisplayType.Default}
+              style={styles.amount}
+              amount={subtotalAmount}
+            />
+            {type === TokenTransactionType.PayRequest ? (
+              <View>
+                <Text style={styles.paymentRequestComment}>{paymentRequestComment}</Text>
+              </View>
+            ) : (
+              <CommentTextInput
+                testID={'send'}
+                onCommentChange={this.onCommentChange}
+                comment={this.state.comment}
+                onBlur={this.onBlur}
+              />
+            )}
+          </View>
+          <InviteOptionsModal
+            isVisible={this.state.modalVisible}
+            onWhatsApp={this.sendWhatsApp}
+            onSMS={this.sendSMS}
+            onCancel={this.cancelModal}
+          />
         </ReviewFrame>
       </SafeAreaView>
     )
@@ -304,11 +392,11 @@ export class SendConfirmation extends React.Component<Props, State> {
       throw Error('Account is required')
     }
 
-    const { amount, reason, recipientAddress } = confirmationInput
+    const { amount, recipientAddress } = confirmationInput
 
     const feeProps: CalculateFeeProps = recipientAddress
-      ? { feeType: FeeType.SEND, account, recipientAddress, amount, comment: reason }
-      : { feeType: FeeType.INVITE, account, amount, comment: reason }
+      ? { feeType: FeeType.SEND, account, recipientAddress, amount }
+      : { feeType: FeeType.INVITE, account, amount }
 
     return (
       // Note: intentionally passing a new child func here otherwise
@@ -321,21 +409,60 @@ export class SendConfirmation extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
-    paddingTop: 20,
+    backgroundColor: colors.light,
+    paddingHorizontal: 8,
   },
-  modal: {
-    flex: 1,
-    margin: 0,
+  feeContainer: {
+    padding: 16,
+    paddingBottom: 8,
   },
-  modalContainer: {
-    justifyContent: 'flex-end',
-    alignItems: 'stretch',
-    flex: 1,
+  inviteText: {
+    ...fontStyles.small,
+    color: colors.gray4,
+    paddingBottom: 24,
+  },
+  transferContainer: {
+    alignItems: 'flex-start',
+    paddingBottom: 24,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  recipientInfoContainer: {
+    paddingLeft: 8,
+  },
+  headerText: {
+    ...fontStyles.regular,
+    color: colors.gray4,
+  },
+  displayName: {
+    ...fontStyles.regular500,
+  },
+  editContainer: {
+    flexDirection: 'row',
+  },
+  address: {
+    ...fontStyles.small,
+    color: colors.gray5,
+    paddingRight: 4,
+  },
+  editButton: {
+    ...fontStyles.small,
+    color: colors.gray5,
+    textDecorationLine: 'underline',
+  },
+  amount: {
+    paddingVertical: 8,
+    ...fontStyles.largeNumber,
+  },
+  paymentRequestComment: {
+    ...fontStyles.large,
+    color: colors.gray5,
   },
 })
 
 export default connect<StateProps, DispatchProps, OwnProps, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.sendFlow7)(SendConfirmation))
+)(withTranslation<Props>(Namespaces.sendFlow7)(SendConfirmation))

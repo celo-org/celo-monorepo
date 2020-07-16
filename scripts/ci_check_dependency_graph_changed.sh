@@ -3,7 +3,7 @@ set -euo pipefail
 
 CHANGED=$(node -r ts-node/register ./scripts/check_dependency_graph_changed.ts)
 if [ $CHANGED = true ] ; then
-  echo "Generated dependency graph doesn't match what has been committed. Please verify and update it."
+  echo "Generated dependency graph doesn't match what has been committed. Please verify and update it by running `ts-node scripts/update_dependency_graph.ts`"
   exit 1
 fi
 

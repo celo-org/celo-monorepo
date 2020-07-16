@@ -3,11 +3,25 @@
   "subtitle":
     "A platform for fast, secure, stable digital payments to any mobile number at a fraction of today’s cost.",
   "coverText": "Celo is an open platform that makes financial tools accessible to anyone with a mobile phone",
-  "coverJoinList": "Join Mailing List",
-  "whitePaper": "White Paper",
+  "coverJoinList": "Stay connected",
+  "whitePaper": "Read Celo White Paper",
+  "stabilityPaper": "Read Stability White Paper",
   "stabilityAnalysis": "Stability Analysis",
   "readMore": "Read more about our technology",
-
+  "readIntroGuide": "Read Intro Guide",
+  "benefitsTitle": "Benefits of Celo",
+  "benefitsHeading": "Mobile-First Blockchain Platform",
+  "benefit1Title": "Global Impact",
+  "benefit1Text": "A mobile-first approach that provides the opportunity to positively impact 5.6B smartphone owners globally",
+  "benefit2Title": "Solving Community Needs",
+  "benefit2Text": "Supported by a mission-aligned network of technologists, international NGOs, and organizations committed to building an inclusive financial system",
+  "benefit3Title": "Usability-focused tech innovations",
+  "benefit3Text": "Technology innovations allow Celo to truly work across devices, carriers, & countries",
+  "twoMoneyTitle": "Digital money powered by a two asset system",
+  "cUSDinfo": "cUSD (Celo Dollars) are a stable asset that follows the US Dollar. With cUSD, you can share money faster, cheaper, and more easily on your mobile phone.",
+  "CELOinfo":"CELO is a utility and governance asset for the Celo community, which has a fixed supply and variable value. With CELO, you can help shape the direction of the Celo Platform.",
+  "learnGovernance": "Learn About Governance",
+  "viewReserve": "View Reserve",
   "stayConnected": "Stay Connected",
   "backers": "Backers",
   "systemsApproach": "We embrace a full-stack approach, reimagining technology at each layer",
@@ -52,6 +66,18 @@
       "empty": "Pending"
     }
   },
+  "involve": {
+    "subtitle": "Ways to get involved with the Celo ecosystem", 
+    "title": "Choose your path with Celo",
+    "paths": [
+         {"name": "Build", "title": "Develop mobile dApps on Celo", "primary": "Learn About SDK", "secondary": "Watch a Video", "text": "Explore, build, and ship ideas for your community using Celo’s developer tools." },
+         {"name": "Grow", "title": "Scale your business on Celo",  "primary": "Apply for Grants", "secondary": "Ecosystem VC Fund", "text": "Have a product, users, and traction? Or a tangible solution for the Celo ecosystem? Take your business to the next level with funding through the Celo Grants Program or the Polychain Ecosystem VC Fund."},
+         {"name": "Validate", "title": "Operate and secure the network", "primary": "Read Docs", "secondary": "Join the Conversation",  "text": "Participate as a validator in Celo's proof of stake consensus protocol."},
+         {"name": "Partner", "title": "Join the Alliance for Prosperity", "primary": "Learn More", "secondary": "Apply for Alliance",  "text": "Take action to solve real-world problems with a growing community of mission-aligned organizations around the world."},
+         {"name": "Connect", "title": "Join the Celo movement", "primary": "Become an Ambassador", "secondary": "Join an Event",  "text": "A place to belong with fellow developers, designers, dreamers, and doers. Connect with the Celo community to share your gifts of prosperity."},
+         {"name": "Work", "title": "Work with value", "primary": "View Open Roles", "secondary": "Apply for Fellowship",  "text": "Explore opportunities at cLabs, the team that initially shaped Celo and a member of the Alliance for Prosperity. cLabs has offices in Berlin, Buenos Aires, and San Francisco, with contributors around the world."}
+    ]
+  }, 
   "coinlist": {
     "title": "Become a Backer of Celo",
     "text": "Celo Gold will be available for purchase via CoinList. Everyone participating pays the same fair price and the minimum contribution is $100 USD. Available to non-US persons only, other restrictions apply.",

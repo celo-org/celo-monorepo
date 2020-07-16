@@ -1,6 +1,6 @@
 import { expectSaga } from 'redux-saga-test-plan'
 import { select } from 'redux-saga/effects'
-import { showError } from 'src/alert/actions'
+import { showMessage } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { validateRecipientAddressSuccess } from 'src/identity/actions'
 import {
@@ -56,6 +56,7 @@ describe(watchQrCodeDetections, () => {
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .silentRun()
     expect(replace).toHaveBeenCalledWith(Screens.SendAmount, {
+      isFromScan: true,
       recipient: {
         address: mockAccount,
         displayName: mockName,
@@ -78,6 +79,7 @@ describe(watchQrCodeDetections, () => {
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .silentRun()
     expect(replace).toHaveBeenCalledWith(Screens.SendAmount, {
+      isFromScan: true,
       recipient: {
         address: mockAccount,
         displayName: '',
@@ -103,6 +105,7 @@ describe(watchQrCodeDetections, () => {
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .silentRun()
     expect(replace).toHaveBeenCalledWith(Screens.SendAmount, {
+      isFromScan: true,
       recipient: {
         address: mockAccount,
         displayName: mockName,
@@ -124,7 +127,7 @@ describe(watchQrCodeDetections, () => {
         [select(e164NumberToAddressSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
-      .put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS))
+      .put(showMessage(ErrorMessages.QR_FAILED_NO_ADDRESS))
       .silentRun()
     expect(replace).not.toHaveBeenCalled()
   })
@@ -140,7 +143,7 @@ describe(watchQrCodeDetections, () => {
         [select(e164NumberToAddressSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
-      .put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS))
+      .put(showMessage(ErrorMessages.QR_FAILED_NO_ADDRESS))
       .silentRun()
     expect(replace).not.toHaveBeenCalled()
   })
@@ -157,12 +160,12 @@ describe(watchQrCodeDetections, () => {
         [select(e164NumberToAddressSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
-      .put(showError(ErrorMessages.QR_FAILED_INVALID_ADDRESS))
+      .put(showMessage(ErrorMessages.QR_FAILED_INVALID_ADDRESS))
       .silentRun()
     expect(replace).not.toHaveBeenCalled()
   })
 
-  it('navigates to the send confirmation screen when secure send scan is successful', async () => {
+  it('navigates to the send confirmation screen when secure send scan is successful for a send', async () => {
     const data: QrCode = { type: BarcodeTypes.QR_CODE, data: mockQrCodeData2 }
     const qrAction: HandleBarcodeDetectedAction = {
       type: Actions.BARCODE_DETECTED,
@@ -181,6 +184,31 @@ describe(watchQrCodeDetections, () => {
       .silentRun()
     expect(replace).toHaveBeenCalledWith(Screens.SendConfirmation, {
       transactionData: mockTransactionData,
+      addressJustValidated: true,
+    })
+  })
+
+  it('navigates to the payment request confirmation screen when secure send scan is successful for a request', async () => {
+    const data: QrCode = { type: BarcodeTypes.QR_CODE, data: mockQrCodeData2 }
+    const qrAction: HandleBarcodeDetectedAction = {
+      type: Actions.BARCODE_DETECTED,
+      data,
+      scanIsForSecureSend: true,
+      isOutgoingPaymentRequest: true,
+      transactionData: mockTransactionData,
+    }
+    await expectSaga(watchQrCodeDetections)
+      .provide([
+        [select(addressToE164NumberSelector), {}],
+        [select(recipientCacheSelector), {}],
+        [select(e164NumberToAddressSelector), mockE164NumberToAddress],
+      ])
+      .dispatch(qrAction)
+      .put(validateRecipientAddressSuccess(mockE164NumberInvite, mockAccount2Invite.toLowerCase()))
+      .silentRun()
+    expect(replace).toHaveBeenCalledWith(Screens.PaymentRequestConfirmation, {
+      transactionData: mockTransactionData,
+      addressJustValidated: true,
     })
   })
 
@@ -199,7 +227,7 @@ describe(watchQrCodeDetections, () => {
         [select(e164NumberToAddressSelector), mockE164NumberToAddress],
       ])
       .dispatch(qrAction)
-      .put(showError(ErrorMessages.QR_FAILED_INVALID_RECIPIENT))
+      .put(showMessage(ErrorMessages.QR_FAILED_INVALID_RECIPIENT))
       .silentRun()
     expect(replace).not.toHaveBeenCalled()
   })

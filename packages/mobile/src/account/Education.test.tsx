@@ -3,24 +3,24 @@ import 'react-native'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import Education from 'src/account/Education'
-import { CustomEventNames } from 'src/analytics/constants'
+import Education, { EducationTopic, EmbeddedNavBar } from 'src/account/Education'
 import { navigateBack } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
 import { createMockStore } from 'test/utils'
 
-const BUTTON_TEXT = 'Test'
+const BUTTON_TEXT = 'Done'
 
 const educationProps = {
   stepInfo: [
     {
-      image: './test.jpg',
-      text: 'Step 1',
-      cancelEvent: CustomEventNames.photo_education_cancel1,
-      screenName: Screens.Debug,
+      image: null,
+      topic: EducationTopic.celo,
+      title: 'Step 1',
+      text: 'The Journey Begins',
     },
   ],
-  buttonText: BUTTON_TEXT,
+  buttonText: 'next',
+  embeddedNavBar: EmbeddedNavBar.Close,
+  finalButtonText: BUTTON_TEXT,
   onFinish: jest.fn(),
 }
 
@@ -42,7 +42,7 @@ describe('Education', () => {
 
   it('navigates back', () => {
     const edu = render(<Education {...educationProps} />)
-    fireEvent.press(edu.getByTestId('Education-goback'))
+    fireEvent.press(edu.getByTestId('Education/CloseIcon'))
     expect(navigateBack).toBeCalled()
   })
 })

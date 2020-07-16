@@ -16,10 +16,9 @@ spec:
     - port: 30303
       targetPort: ethereum
       name: ethereum
-    - port: 8545
-      targetPort: rpc
-      protocol: TCP
-      name: rpc
+{{- if $.Values.geth.expose_rpc_externally }}
+{{ include "celo-fullnode.rpc-ports" . | indent 4 }}
+{{- end }}
   selector:
     statefulset.kubernetes.io/pod-name: {{ template "common.fullname" $ }}-{{ $index }}
 ---
@@ -33,9 +32,6 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-    - port: 8545
-      targetPort: rpc
-      protocol: TCP
-      name: rpc
+{{ include "celo-fullnode.rpc-ports" . | indent 4 }}
   selector:
 {{ include "celo-fullnode.labels" .  | indent 4 }}

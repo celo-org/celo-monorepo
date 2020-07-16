@@ -51,6 +51,11 @@ Ship Alfajores to Playstore Internal
 fastlane android pilotapp
 ```
 Ship Pilot to Playstore Internal
+### android mainnet
+```
+fastlane android mainnet
+```
+Ship Mainnet to Playstore Internal
 ### android build_apk
 ```
 fastlane android build_apk
@@ -80,6 +85,16 @@ Ship Alfajores to TestFlight
 fastlane ios pilotapp
 ```
 Ship Pilot to TestFlight
+### ios integration
+```
+fastlane ios integration
+```
+Ship Integration to TestFlight
+### ios mainnet
+```
+fastlane ios mainnet
+```
+Ship Mainnet to TestFlight
 
 ----
 
