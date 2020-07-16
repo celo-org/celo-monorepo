@@ -34,10 +34,13 @@ export enum AddressValidationType {
 }
 
 export interface SecureSendPhoneNumberMapping {
-  [e164Number: string]: {
-    address: string | undefined
-    addressValidationType: AddressValidationType
-  }
+  [e164Number: string]: SecureSendDetails
+}
+
+export interface SecureSendDetails {
+  address: string | undefined
+  addressValidationType: AddressValidationType
+  isFetchingAddresses: boolean
 }
 
 export interface State {
@@ -59,7 +62,6 @@ export interface State {
   matchedContacts: ContactMatches
   isValidRecipient: boolean
   secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
-  isFetchingAddresses: boolean
 }
 
 const initialState: State = {
@@ -80,7 +82,6 @@ const initialState: State = {
   matchedContacts: {},
   isValidRecipient: false,
   secureSendPhoneNumberMapping: {},
-  isFetchingAddresses: false,
 }
 
 export const reducer = (
@@ -220,12 +221,20 @@ export const reducer = (
     case Actions.FETCH_ADDRESSES_AND_VALIDATION_STATUS:
       return {
         ...state,
-        isFetchingAddresses: true,
+        secureSendPhoneNumberMapping: dotProp.set(
+          state.secureSendPhoneNumberMapping,
+          `${action.e164Number}.isFetchingAddresses`,
+          true
+        ),
       }
     case Actions.END_FETCHING_ADDRESSES:
       return {
         ...state,
-        isFetchingAddresses: false,
+        secureSendPhoneNumberMapping: dotProp.set(
+          state.secureSendPhoneNumberMapping,
+          `${action.e164Number}.isFetchingAddresses`,
+          false
+        ),
       }
     default:
       return state
@@ -258,4 +267,3 @@ export const secureSendPhoneNumberMappingSelector = (state: RootState) =>
 export const importContactsProgressSelector = (state: RootState) =>
   state.identity.importContactsProgress
 export const matchedContactsSelector = (state: RootState) => state.identity.matchedContacts
-export const isFetchingAddressesSelector = (state: RootState) => state.identity.isFetchingAddresses
