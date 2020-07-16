@@ -1,6 +1,7 @@
 {
   "extends": "../typescript/tsconfig.library.json",
   "compilerOptions": {
+    "typeRoots": ["../sdk-types"],
     "rootDir": "src",
     "outDir": "lib"
   },
