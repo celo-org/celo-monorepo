@@ -342,7 +342,6 @@ export const v2Schema = {
   },
   identity: {
     ...v1Schema.identity,
-    isFetchingAddresses: false,
   },
 }
 
