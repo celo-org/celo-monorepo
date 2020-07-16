@@ -92,6 +92,11 @@ export default function IncomingPaymentRequestListItem({ id, amount, comment, re
   }
 
   React.useEffect(() => {
+    // Need this to make sure it's only triggered on click
+    if (!isLoading) {
+      return
+    }
+
     const prevSecureSendDetails: SecureSendDetails | undefined = prevSecureSendDetailsRef.current
     prevSecureSendDetailsRef.current = secureSendDetails
     const wasFetchingAddresses = prevSecureSendDetails?.isFetchingAddresses

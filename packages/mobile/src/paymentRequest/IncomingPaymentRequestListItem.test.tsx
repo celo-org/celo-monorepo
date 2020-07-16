@@ -69,6 +69,8 @@ describe('IncomingPaymentRequestListItem', () => {
       </Provider>
     )
 
+    fireEvent.press(tree.getByText('global:send'))
+
     const updatedStore = createMockStore({
       identity: {
         secureSendPhoneNumberMapping: {
@@ -108,6 +110,8 @@ describe('IncomingPaymentRequestListItem', () => {
         <IncomingPaymentRequestListItem {...props} />
       </Provider>
     )
+
+    fireEvent.press(tree.getByText('global:send'))
 
     const updatedStore = createMockStore({
       identity: {
