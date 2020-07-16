@@ -28,11 +28,12 @@
     "section2Body": "To protect your privacy, only an obfuscated version of your phone number is stored on the Celo blockchain."
   },
   "loading": {
-    "verifyingNumber": "Verifying {{number}}",
-    "keepOpen": "Please keep the app open",
+    "confirming": "Confirming…",
+    "learnMore": "Learn more",
     "card1": "Verifying your account allows you to see which of your friends uses {{appName}}.",
     "card2": "With {{appName}}, you can send money to anyone using just their phone number.",
-    "card3": "{{appName}} is now requesting three text messages to confirm you own your phone number."
+    "card3": "{{appName}} is now requesting three text messages to confirm you own your phone number.",
+    "card4": "Confirming also allows you to see which of your friends are on {{appName}}."
   },
   "skipModal": {
     "header": "Skip Verification?",

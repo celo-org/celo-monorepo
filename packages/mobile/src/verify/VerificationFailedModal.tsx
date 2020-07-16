@@ -1,5 +1,6 @@
-import * as React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 import { setRetryVerificationWithForno } from 'src/account/actions'
 import { WarningModal } from 'src/components/WarningModal'
 import { Namespaces } from 'src/i18n'
@@ -13,51 +14,46 @@ interface Props {
   verificationStatus: VerificationStatus
   retryWithForno: boolean
   fornoMode: boolean
-  cancelVerification: typeof cancelVerification
-  setRetryVerificationWithForno: typeof setRetryVerificationWithForno
-  toggleFornoMode: typeof toggleFornoMode
 }
 
-export function VerificationFailedModal(props: Props) {
+export function VerificationFailedModal({ verificationStatus, retryWithForno, fornoMode }: Props) {
+  const dispatch = useDispatch()
   const { t } = useTranslation(Namespaces.nuxVerification2)
-  const [isDismissed, setIsDismissed] = React.useState(true)
+  const [isDismissed, setIsDismissed] = useState(true)
 
-  React.useEffect(() => {
+  useEffect(() => {
     setIsDismissed(false) // Prevents a ghost modal from showing up briefly
-  }, [setIsDismissed]) // after opening Verification Loading when it is already dismissed
+  }, []) // after opening Verification Loading when it is already dismissed
 
-  const onDismiss = React.useCallback(() => {
+  const onDismiss = () => {
     setIsDismissed(true)
-  }, [setIsDismissed])
+  }
 
-  const onSkip = React.useCallback(() => {
-    props.cancelVerification()
+  const onSkip = () => {
+    dispatch(cancelVerification())
     navigateHome()
-  }, [props.cancelVerification])
+  }
 
-  const onRetry = React.useCallback(() => {
-    props.toggleFornoMode(true) // Note that forno remains toggled on after verification retry
-    props.setRetryVerificationWithForno(false) // Only prompt retry with forno once
+  const onRetry = () => {
+    dispatch(toggleFornoMode(true)) // Note that forno remains toggled on after verification retry
+    dispatch(setRetryVerificationWithForno(false)) // Only prompt retry with forno once
     setIsDismissed(true)
     navigate(Screens.VerificationEducationScreen)
-  }, [setIsDismissed, props.setRetryVerificationWithForno])
+  }
 
-  const userBalanceInsufficient =
-    props.verificationStatus === VerificationStatus.InsufficientBalance
+  const userBalanceInsufficient = verificationStatus === VerificationStatus.InsufficientBalance
 
   const isVisible =
-    (props.verificationStatus === VerificationStatus.Failed ||
-      props.verificationStatus === VerificationStatus.RevealAttemptFailed ||
+    (verificationStatus === VerificationStatus.Failed ||
+      verificationStatus === VerificationStatus.RevealAttemptFailed ||
       userBalanceInsufficient) &&
     !isDismissed
 
-  const allowEnterCodes = props.verificationStatus === VerificationStatus.RevealAttemptFailed
+  const allowEnterCodes = verificationStatus === VerificationStatus.RevealAttemptFailed
   // Only prompt forno switch if not already in forno mode and failure
   // wasn't due to insuffuicient balance
   const promptRetryWithForno =
-    props.retryWithForno &&
-    !props.fornoMode &&
-    props.verificationStatus !== VerificationStatus.InsufficientBalance
+    retryWithForno && !fornoMode && verificationStatus !== VerificationStatus.InsufficientBalance
 
   return promptRetryWithForno ? (
     // Retry verification with forno with option to skip verificaion
