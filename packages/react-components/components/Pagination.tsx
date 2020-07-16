@@ -14,8 +14,8 @@ export default function Pagination({
   count,
   activeIndex,
   style,
-  dotStyle = progressDots.circleActive,
-  activeDotStyle = progressDots.circlePassive,
+  dotStyle = progressDots.circlePassive,
+  activeDotStyle = progressDots.circleActive,
 }: Props) {
   if (count < 2) {
     return null
