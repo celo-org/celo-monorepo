@@ -10,6 +10,7 @@ export interface Props {
   kitName: string
   metaDescription: string
   path: string
+  ogImage: string
   sidebar: SideBarEntry[]
   sections: Array<{
     name: string
@@ -22,7 +23,14 @@ const OPTIONS = {
   renderNode,
 }
 
-export default function DynamicKit({ kitName, metaDescription, path, sidebar, sections }: Props) {
+export default function DynamicKit({
+  kitName,
+  metaDescription,
+  path,
+  sidebar,
+  sections,
+  ogImage,
+}: Props) {
   const children = sections.map((section) => {
     return {
       id: section.slug,
@@ -38,7 +46,7 @@ export default function DynamicKit({ kitName, metaDescription, path, sidebar, se
       kitName={kitName}
       path={path}
       metaDescription={metaDescription}
-      ogImage={require('src/experience/brandkit/images/ogimage-brandkit.png')}
+      ogImage={ogImage}
     />
   )
 }

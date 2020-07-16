@@ -1,6 +1,7 @@
-import { createClient, Entry } from 'contentful'
+import { createClient, Entry, Asset } from 'contentful'
 import getConfig from 'next/config'
 import { Page as SideBarEntry } from 'src/experience/common/Sidebar'
+import { Document } from '@contentful/rich-text-types'
 
 function intialize(preview: boolean) {
   const { serverRuntimeConfig } = getConfig()
@@ -46,21 +47,22 @@ interface Kit {
   name: string
   slug: string
   metaDescription: string
-  ogImage: object
+  ogImage: Asset
   pages_: any[]
 }
 
 interface InternalKit {
   kitName: string
   metaDescription: string
-  ogImage: object
+  ogImage: Asset
   sidebar: SideBarEntry[]
 }
 
-export async function getKit(kitSlug: string, { preview }): Promise<InternalKit> {
+export async function getKit(kitSlug: string, { preview, locale }): Promise<InternalKit> {
   const kit = await getClient(preview).getEntries<Kit>({
     content_type: 'kit',
     'fields.slug': kitSlug,
+    locale,
   })
 
   const data = kit.items[0].fields
@@ -82,14 +84,15 @@ export async function getKit(kitSlug: string, { preview }): Promise<InternalKit>
 interface ContentFulPage {
   title: string
   slug: string
-  sections: Array<Entry<{ name: string; contentField: object; slug: string }>>
+  sections: Array<Entry<{ name: string; contentField: Document; slug: string }>>
 }
 
-export async function getPage(pageSlug: string, { preview }) {
+export async function getPage(pageSlug: string, { preview, locale }) {
   const page = await getClient(preview).getEntries<ContentFulPage>({
     content_type: 'page',
     'fields.slug': !pageSlug ? 'index' : pageSlug,
     include: 3,
+    locale,
   })
 
   const data = page.items[0].fields

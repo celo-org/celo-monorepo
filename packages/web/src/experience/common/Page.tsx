@@ -43,7 +43,7 @@ interface Props {
   path: string
   kitName?: string
   metaDescription: string
-  ogImage: ImageRequireSource
+  ogImage: ImageRequireSource | string
 }
 
 interface State {

@@ -130,7 +130,11 @@ function color(kind: Kind) {
 }
 
 function isActive(path: string, currentPath: string) {
-  if (path === currentPath) {
+  const hashIndex = currentPath.indexOf('#')
+  const pathSansHash = hashIndex !== -1 ? currentPath.substring(0, hashIndex) : currentPath
+
+  console.log(path, pathSansHash)
+  if (path === pathSansHash) {
     return true
   }
 
