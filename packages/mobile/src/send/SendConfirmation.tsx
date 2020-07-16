@@ -39,7 +39,6 @@ import { emptyHeader } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
-import { completePaymentRequest, declinePaymentRequest } from 'src/paymentRequest/actions'
 import { getDisplayName, getRecipientThumbnail } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
@@ -69,8 +68,6 @@ interface StateProps {
 interface DispatchProps {
   sendPaymentOrInvite: typeof sendPaymentOrInvite
   fetchDollarBalance: typeof fetchDollarBalance
-  declinePaymentRequest: typeof declinePaymentRequest
-  completePaymentRequest: typeof completePaymentRequest
 }
 
 interface State {
@@ -85,8 +82,6 @@ type Props = DispatchProps & StateProps & WithTranslation & OwnProps
 const mapDispatchToProps = {
   sendPaymentOrInvite,
   fetchDollarBalance,
-  declinePaymentRequest,
-  completePaymentRequest,
 }
 
 const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
