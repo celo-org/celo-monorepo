@@ -1,9 +1,12 @@
 import gql from 'graphql-tag'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { HomeEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType, TransferItemFragment } from 'src/apollo/types'
 import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
+import { InviteDetails } from 'src/invite/actions'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
 import TransactionFeedItem from 'src/transactions/TransactionFeedItem'
@@ -19,6 +22,8 @@ type Props = TransferItemFragment & {
   status: TransactionStatus
   addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient
+  recentTxRecipientsCache: NumberToRecipient
+  invitees: InviteDetails[]
   commentKey: string | null
 }
 
@@ -56,6 +61,7 @@ export function TransferFeedItem(props: Props) {
 
   const onPress = () => {
     navigateToTransactionReview(props)
+    ValoraAnalytics.track(HomeEvents.transaction_feed_item_select)
   }
 
   const {
@@ -68,16 +74,21 @@ export function TransferFeedItem(props: Props) {
     status,
     addressToE164Number,
     recipientCache,
+    recentTxRecipientsCache,
+    invitees,
   } = props
 
   const { title, info, recipient } = getTransferFeedParams(
     type,
     t,
     recipientCache,
+    recentTxRecipientsCache,
     address,
     addressToE164Number,
     comment,
-    commentKey
+    commentKey,
+    timestamp,
+    invitees
   )
 
   return (

@@ -1,19 +1,15 @@
-import TextInput, { TextInputProps } from '@celo/react-components/components/TextInput'
-import withTextInputLabeling from '@celo/react-components/components/WithTextInputLabeling'
+import SearchInput from '@celo/react-components/components/SearchInput'
 import colors from '@celo/react-components/styles/colors'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { StyleSheet, View } from 'react-native'
+import { SafeAreaView, StyleSheet, View } from 'react-native'
 import { connect } from 'react-redux'
 import { defaultCountryCodeSelector } from 'src/account/selectors'
 import { hideAlert, showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import ContactPermission from 'src/icons/ContactPermission'
-import Search from 'src/icons/Search'
 import { importContacts } from 'src/identity/actions'
 import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { headerWithCancelButton } from 'src/navigator/Headers'
@@ -28,8 +24,6 @@ import { SendCallToAction } from 'src/send/SendCallToAction'
 import { navigateToPhoneSettings } from 'src/utils/linking'
 import { requestContactsPermission } from 'src/utils/permissions'
 
-const InviteSearchInput = withTextInputLabeling<TextInputProps>(TextInput)
-
 interface State {
   searchQuery: string
   hasGivenContactPermission: boolean
@@ -41,7 +35,7 @@ interface Section {
 }
 
 interface StateProps {
-  defaultCountryCode: string
+  defaultCountryCode: string | null
   recipientCache: NumberToRecipient
 }
 
@@ -89,10 +83,7 @@ class Invite extends React.Component<Props, State> {
 
     const hasGivenContactPermission = await requestContactsPermission()
     this.setState({ hasGivenContactPermission })
-
-    if (hasGivenContactPermission) {
-      this.props.importContacts()
-    }
+    this.props.importContacts()
   }
 
   onSearchQueryChanged = (searchQuery: string) => {
@@ -102,7 +93,6 @@ class Invite extends React.Component<Props, State> {
   onSelectRecipient = (recipient: Recipient) => {
     this.props.hideAlert()
     if (recipient.e164PhoneNumber) {
-      CeloAnalytics.track(CustomEventNames.friend_invited)
       navigate(Screens.InviteReview, { recipient })
     } else {
       this.props.showError(ErrorMessages.CANT_SELECT_INVALID_PHONE)
@@ -151,17 +141,15 @@ class Invite extends React.Component<Props, State> {
   }
 
   render() {
+    const { t } = this.props
     return (
-      // Intentionally not using SafeAreaView here as RecipientPicker
-      // needs fullscreen rendering
-      <View style={style.container}>
+      <SafeAreaView style={style.container}>
         <DrawerTopBar />
         <View style={style.textInputContainer}>
-          <InviteSearchInput
+          <SearchInput
+            placeholder={t('global:search')}
             value={this.state.searchQuery}
             onChangeText={this.onSearchQueryChanged}
-            icon={<Search />}
-            placeholder={this.props.t('nameOrPhoneNumber')}
           />
         </View>
         <RecipientPicker
@@ -172,7 +160,7 @@ class Invite extends React.Component<Props, State> {
           onSelectRecipient={this.onSelectRecipient}
           listHeaderComponent={this.renderListHeader}
         />
-      </View>
+      </SafeAreaView>
     )
   }
 }
@@ -192,4 +180,4 @@ const style = StyleSheet.create({
 export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.sendFlow7)(Invite))
+)(withTranslation<Props>(Namespaces.sendFlow7)(Invite))

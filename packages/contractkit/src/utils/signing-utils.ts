@@ -205,3 +205,12 @@ export function verifyEIP712TypedDataSigner(
   const valid = verifySignature(ensureLeading0x(trimmedData), signedData, expectedAddress)
   return valid
 }
+
+export function decodeSig(sig: any) {
+  const [v, r, s] = Account.decodeSignature(sig)
+  return {
+    v: parseInt(v, 16),
+    r: ethUtil.toBuffer(r) as Buffer,
+    s: ethUtil.toBuffer(s) as Buffer,
+  }
+}

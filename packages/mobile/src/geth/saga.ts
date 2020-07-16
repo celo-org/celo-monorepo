@@ -3,20 +3,22 @@ import { eventChannel } from 'redux-saga'
 import { call, cancel, cancelled, delay, fork, put, race, select, take } from 'redux-saga/effects'
 import { setPromptForno } from 'src/account/actions'
 import { promptFornoIfNeededSelector } from 'src/account/selectors'
-import { waitForRehydrate } from 'src/app/saga'
+import { GethEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { Actions, setGethConnected, setInitState } from 'src/geth/actions'
 import {
   FailedToFetchGenesisBlockError,
   FailedToFetchStaticNodesError,
-  getGeth,
+  initGeth,
+  stopGethIfInitialized,
 } from 'src/geth/geth'
 import { InitializationState } from 'src/geth/reducer'
-import { isGethConnectedSelector } from 'src/geth/selectors'
+import { gethInitializedSelector, isGethConnectedSelector } from 'src/geth/selectors'
 import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { deleteChainDataAndRestartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
-import { setContractKitReady } from 'src/web3/actions'
+import { getWeb3 } from 'src/web3/contracts'
 import { fornoSelector } from 'src/web3/selectors'
 
 const gethEmitter = new NativeEventEmitter(NativeModules.RNGeth)
@@ -33,6 +35,19 @@ enum GethInitOutcomes {
   NETWORK_ERROR_FETCHING_GENESIS_BLOCK = 'NETWORK_ERROR_FETCHING_GENESIS_BLOCK',
 }
 
+export function* waitForGethInitialized() {
+  const gethState = yield select(gethInitializedSelector)
+  if (gethState === InitializationState.INITIALIZED) {
+    return
+  }
+  while (true) {
+    const action = yield take(Actions.SET_INIT_STATE)
+    if (action.state === InitializationState.INITIALIZED) {
+      return
+    }
+  }
+}
+
 export function* waitForGethConnectivity() {
   const connected = yield select(isGethConnectedSelector)
   if (connected) {
@@ -46,11 +61,26 @@ export function* waitForGethConnectivity() {
   }
 }
 
+export function* waitForNextBlock() {
+  const startTime = Date.now()
+  const web3 = yield call(getWeb3)
+  const initialBlockNumber = yield call(web3.eth.getBlockNumber)
+  while (Date.now() - startTime < NEW_BLOCK_TIMEOUT) {
+    const blockNumber = yield call(web3.eth.getBlockNumber)
+    if (blockNumber > initialBlockNumber) {
+      return
+    }
+    yield delay(GETH_MONITOR_DELAY)
+  }
+}
+
 function* waitForGethInstance() {
   try {
-    const gethInstance = yield call(getGeth)
-    if (gethInstance == null) {
-      throw new Error('geth instance is null')
+    const fornoMode = yield select(fornoSelector)
+    // get geth without syncing if fornoMode
+    const gethInstance = yield call(initGeth, !fornoMode)
+    if (!gethInstance) {
+      throw new Error('Geth instance is null')
     }
     return GethInitOutcomes.SUCCESS
   } catch (error) {
@@ -77,32 +107,33 @@ export function* initGethSaga() {
   })
 
   let restartAppAutomatically: boolean = false
+  let errorContext: string
   switch (result) {
     case GethInitOutcomes.SUCCESS: {
       Logger.debug(TAG, 'Geth initialized')
+      ValoraAnalytics.track(GethEvents.geth_init_success)
       yield put(setInitState(InitializationState.INITIALIZED))
       return
     }
     case GethInitOutcomes.NETWORK_ERROR_FETCHING_STATIC_NODES: {
-      Logger.error(
-        TAG,
+      errorContext =
         'Could not fetch static nodes from the network. Tell user to check data connection.'
-      )
+      Logger.error(TAG, errorContext)
       yield put(setInitState(InitializationState.DATA_CONNECTION_MISSING_ERROR))
       restartAppAutomatically = false
       break
     }
     case GethInitOutcomes.NETWORK_ERROR_FETCHING_GENESIS_BLOCK: {
-      Logger.error(
-        TAG,
+      errorContext =
         'Could not fetch genesis block from the network. Tell user to check data connection.'
-      )
+      Logger.error(TAG, errorContext)
       yield put(setInitState(InitializationState.DATA_CONNECTION_MISSING_ERROR))
       restartAppAutomatically = false
       break
     }
     case GethInitOutcomes.IRRECOVERABLE_FAILURE: {
-      Logger.error(TAG, 'Could not initialize geth. Will retry.')
+      errorContext = 'Could not initialize geth. Will retry.'
+      Logger.error(TAG, errorContext)
       yield put(setInitState(InitializationState.INITIALIZE_ERROR))
       restartAppAutomatically = true
       break
@@ -111,20 +142,31 @@ export function* initGethSaga() {
     // a new enum value is added to GethInitOutcomes and doesn't have a case added
     // for it, the error will be misleading.
     default: {
-      Logger.error(TAG, 'Geth initializtion timed out. Will retry.')
+      errorContext = 'Geth initializtion timed out. Will retry.'
+      Logger.error(TAG, errorContext)
       yield put(setInitState(InitializationState.INITIALIZE_ERROR))
       restartAppAutomatically = true
     }
   }
 
+  ValoraAnalytics.track(GethEvents.geth_init_failure, {
+    error: result,
+    context: errorContext,
+  })
+
   if (restartAppAutomatically) {
     Logger.error(TAG, 'Geth initialization failed, restarting the app.')
+    ValoraAnalytics.track(GethEvents.geth_restart_to_fix_init)
     deleteChainDataAndRestartApp()
   } else {
     // Suggest switch to forno for network-related errors
     if (yield select(promptFornoIfNeededSelector)) {
+      ValoraAnalytics.track(GethEvents.prompt_forno, {
+        error: result.message,
+        context: 'Geth init error',
+      })
       yield put(setPromptForno(false))
-      navigate(Screens.DataSaver, { promptModalVisible: true })
+      navigate(Screens.Settings, { promptFornoModal: true })
     } else {
       navigateToError('networkConnectionFailed')
     }
@@ -139,56 +181,56 @@ function createNewBlockChannel() {
 }
 
 function* monitorGeth() {
-  const newBlockChannel = yield createNewBlockChannel()
+  const fornoMode = yield select(fornoSelector)
 
-  while (true) {
-    try {
-      const { newBlock } = yield race({
-        newBlock: take(newBlockChannel),
-        timeout: delay(NEW_BLOCK_TIMEOUT),
-      })
-      if (newBlock) {
-        Logger.debug(`${TAG}@monitorGeth`, 'Received new blocks')
-        yield put(setGethConnected(true))
-        yield delay(GETH_MONITOR_DELAY)
-      } else {
-        Logger.error(
-          `${TAG}@monitorGeth`,
-          `Did not receive a block in ${NEW_BLOCK_TIMEOUT} milliseconds`
-        )
-        yield put(setGethConnected(false))
-      }
-    } catch (error) {
-      Logger.error(`${TAG}@monitorGeth`, error)
-    } finally {
-      if (yield cancelled()) {
-        try {
-          newBlockChannel.close()
-        } catch (error) {
-          Logger.debug(
+  if (!fornoMode) {
+    const newBlockChannel = yield createNewBlockChannel()
+
+    while (true) {
+      try {
+        const { newBlock } = yield race({
+          newBlock: take(newBlockChannel),
+          timeout: delay(NEW_BLOCK_TIMEOUT),
+        })
+        if (newBlock) {
+          Logger.debug(`${TAG}@monitorGeth`, 'Received new blocks')
+          yield put(setGethConnected(true))
+          yield delay(GETH_MONITOR_DELAY)
+        } else {
+          Logger.error(
             `${TAG}@monitorGeth`,
-            'Could not close newBlockChannel. May already be closed.',
-            error
+            `Did not receive a block in ${NEW_BLOCK_TIMEOUT} milliseconds`
           )
+          yield put(setGethConnected(false))
+        }
+      } catch (error) {
+        Logger.error(`${TAG}@monitorGeth`, error)
+      } finally {
+        if (yield cancelled()) {
+          try {
+            newBlockChannel.close()
+          } catch (error) {
+            Logger.debug(
+              `${TAG}@monitorGeth`,
+              'Could not close newBlockChannel. May already be closed.',
+              error
+            )
+          }
         }
       }
     }
+  } else {
+    yield put(setGethConnected(true))
+    // TODO: monitor RPC connection when not syncing
   }
 }
 
 export function* gethSaga() {
   yield call(initGethSaga)
-  const gethRelatedSagas = yield fork(monitorGeth)
-  yield take(Actions.CANCEL_GETH_SAGA)
-  yield cancel(gethRelatedSagas)
-  yield put(setGethConnected(true))
-}
+  const gethMonitor = yield fork(monitorGeth)
 
-export function* gethSagaIfNecessary() {
-  yield call(waitForRehydrate) // Wait for rehydrate to know if geth or forno mode
-  yield put(setContractKitReady(true)) // ContractKit is blocked (not ready) before rehydrate
-  if (!(yield select(fornoSelector))) {
-    Logger.debug(`${TAG}@gethSagaIfNecessary`, `Starting geth saga...`)
-    yield call(gethSaga)
-  }
+  yield take(Actions.CANCEL_GETH_SAGA)
+  yield put(setInitState(InitializationState.NOT_YET_INITIALIZED))
+  yield call(stopGethIfInitialized)
+  yield cancel(gethMonitor)
 }

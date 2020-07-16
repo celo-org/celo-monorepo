@@ -34,10 +34,13 @@ export enum AddressValidationType {
 }
 
 export interface SecureSendPhoneNumberMapping {
-  [e164Number: string]: {
-    address: string | undefined
-    addressValidationType: AddressValidationType
-  }
+  [e164Number: string]: SecureSendDetails
+}
+
+export interface SecureSendDetails {
+  address: string | undefined
+  addressValidationType: AddressValidationType
+  isFetchingAddresses: boolean
 }
 
 export interface State {
@@ -97,6 +100,7 @@ export const reducer = (
           current: 0,
           total: 0,
         },
+        isFetchingAddresses: false,
       }
     }
     case Actions.RESET_VERIFICATION:
@@ -176,9 +180,10 @@ export const reducer = (
         askedContactsPermission: true,
       }
     case Actions.ADD_CONTACT_MATCHES:
+      const matchedContacts = { ...state.matchedContacts, ...action.matches }
       return {
         ...state,
-        matchedContacts: { ...state.matchedContacts, ...action.matches },
+        matchedContacts,
       }
     case Actions.VALIDATE_RECIPIENT_ADDRESS:
       return {
@@ -213,6 +218,24 @@ export const reducer = (
           }
         ),
       }
+    case Actions.FETCH_ADDRESSES_AND_VALIDATION_STATUS:
+      return {
+        ...state,
+        secureSendPhoneNumberMapping: dotProp.set(
+          state.secureSendPhoneNumberMapping,
+          `${action.e164Number}.isFetchingAddresses`,
+          true
+        ),
+      }
+    case Actions.END_FETCHING_ADDRESSES:
+      return {
+        ...state,
+        secureSendPhoneNumberMapping: dotProp.set(
+          state.secureSendPhoneNumberMapping,
+          `${action.e164Number}.isFetchingAddresses`,
+          false
+        ),
+      }
     default:
       return state
   }
@@ -241,3 +264,6 @@ export const addressToE164NumberSelector = (state: RootState) => state.identity.
 export const e164NumberToSaltSelector = (state: RootState) => state.identity.e164NumberToSalt
 export const secureSendPhoneNumberMappingSelector = (state: RootState) =>
   state.identity.secureSendPhoneNumberMapping
+export const importContactsProgressSelector = (state: RootState) =>
+  state.identity.importContactsProgress
+export const matchedContactsSelector = (state: RootState) => state.identity.matchedContacts

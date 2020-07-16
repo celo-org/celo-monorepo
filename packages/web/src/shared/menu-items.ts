@@ -19,6 +19,10 @@ export const pagePaths = {
     name: 'BrandKit',
     link: '/experience/brand',
   },
+  BRAND_POLICY: {
+    name: 'Brand Policy',
+    link: '/brand-policy',
+  },
   BUILD: {
     name: 'Validators',
     link: '/validators',
@@ -109,6 +113,7 @@ export enum CeloLinks {
   gettingStarted = 'https://docs.celo.org/getting-started/alfajores-testnet',
   coinlist = 'https://coinlist.co/celo?utm_source=celo%20website&utm_medium=website%20widget&utm_campaign=celowebsite_20200318',
   gitHub = 'https://github.com/celo-org',
+  reserve = 'https://www.celoreserve.org',
   instagram = 'https://www.instagram.com/celoorg/',
   twitter = 'https://twitter.com/CeloOrg',
   medium = 'https://medium.com/celoOrg',

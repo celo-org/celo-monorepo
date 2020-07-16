@@ -8,6 +8,8 @@ import {
   takeLeading,
 } from 'redux-saga/effects'
 import { showErrorInline } from 'src/alert/actions'
+import { SendEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
   Actions,
@@ -16,9 +18,9 @@ import {
 } from 'src/identity/actions'
 import { checkTxsForIdentityMetadata } from 'src/identity/commentEncryption'
 import { doImportContactsWrapper, fetchAddressesAndValidateSaga } from 'src/identity/contactMapping'
-import { e164NumberToAddressSelector } from 'src/identity/reducer'
+import { AddressValidationType, e164NumberToAddressSelector } from 'src/identity/reducer'
 import { validateAndReturnMatch } from 'src/identity/secureSend'
-import { revokeVerification, startVerification } from 'src/identity/verification'
+import { startVerification } from 'src/identity/verification'
 import { Actions as TransactionActions } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -29,6 +31,7 @@ export function* validateRecipientAddressSaga({
   userInputOfFullAddressOrLastFourDigits,
   addressValidationType,
   recipient,
+  requesterAddress,
 }: ValidateRecipientAddressAction) {
   Logger.debug(TAG, 'Starting Recipient Address Validation')
   try {
@@ -41,9 +44,17 @@ export function* validateRecipientAddressSaga({
     const { e164PhoneNumber } = recipient
     const possibleRecievingAddresses = e164NumberToAddress[e164PhoneNumber]
 
-    // Should never happen since secure send is initiated due to there being several possible addresses
+    // Should never happen - Secure Send is initiated to deal with
+    // there being several possible addresses
     if (!possibleRecievingAddresses) {
       throw Error('There are no possible recipient addresses to validate against')
+    }
+
+    // E164NumberToAddress in redux store only holds verified addresses
+    // Need to add the requester address to the option set in the event
+    // a request is coming from an unverified account
+    if (requesterAddress && !possibleRecievingAddresses.includes(requesterAddress)) {
+      possibleRecievingAddresses.push(requesterAddress)
     }
 
     const validatedAddress = validateAndReturnMatch(
@@ -52,8 +63,20 @@ export function* validateRecipientAddressSaga({
       userAddress,
       addressValidationType
     )
+
+    ValoraAnalytics.track(SendEvents.send_secure_complete, {
+      confirmByScan: false,
+      partialAddressValidation: addressValidationType === AddressValidationType.PARTIAL,
+    })
+
     yield put(validateRecipientAddressSuccess(e164PhoneNumber, validatedAddress))
   } catch (error) {
+    ValoraAnalytics.track(SendEvents.send_secure_incorrect, {
+      confirmByScan: false,
+      partialAddressValidation: addressValidationType === AddressValidationType.PARTIAL,
+      error: error.message,
+    })
+
     Logger.error(TAG, 'validateRecipientAddressSaga/Address validation error: ', error)
     if (Object.values(ErrorMessages).includes(error.message)) {
       yield put(showErrorInline(error.message))
@@ -62,9 +85,9 @@ export function* validateRecipientAddressSaga({
     }
   }
 }
+
 function* watchVerification() {
   yield takeLatest(Actions.START_VERIFICATION, startVerification)
-  yield takeEvery(Actions.REVOKE_VERIFICATION, revokeVerification)
 }
 
 function* watchContactMapping() {

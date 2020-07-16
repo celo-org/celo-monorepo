@@ -1,6 +1,8 @@
+import { stopProvider } from '@celo/contractkit/lib/utils/provider-utils'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { flags } from '@oclif/command'
 import chalk from 'chalk'
+import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
 import { Flags } from '../../utils/command'
 import { ElectionResultsCache } from '../../utils/election'
@@ -16,7 +18,7 @@ export default class ValidatorSignedBlocks extends BaseCommand {
       required: true,
     }),
     'at-block': flags.integer({
-      description: 'latest block to examine for sginer activity',
+      description: 'latest block to examine for signer activity',
       exclusive: ['follow'],
     }),
     lookback: flags.integer({
@@ -27,21 +29,20 @@ export default class ValidatorSignedBlocks extends BaseCommand {
       description: 'line width for printing marks',
       default: 40,
     }),
-    /* TODO(victor): Fix this the follow functionality.
     follow: flags.boolean({
       char: 'f',
       default: false,
       exclusive: ['at-block'],
       hidden: true,
     }),
-    */
   }
 
   static examples = [
-    'heartbeat --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631',
-    'heartbeat --at-block 100000 --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631',
-    'heartbeat --lookback 500 --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631',
-    'heartbeat --lookback 50 --width 10 --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631',
+    'signed-blocks --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631',
+    'signed-blocks --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631 --follow',
+    'signed-blocks --at-block 100000 --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631',
+    'signed-blocks --lookback 500 --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631',
+    'signed-blocks --lookback 50 --width 10 --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631',
   ]
 
   async run() {
@@ -51,7 +52,13 @@ export default class ValidatorSignedBlocks extends BaseCommand {
     const epochSize = await validators.getEpochSize()
     const electionCache = new ElectionResultsCache(election, epochSize.toNumber())
 
-    const latest = res.flags['at-block'] ?? (await this.web3.eth.getBlock('latest')).number
+    if (res.flags.follow) {
+      console.info('Follow mode, press q or ctrl-c to quit')
+    }
+
+    const latest = res.flags['at-block']
+      ? res.flags['at-block'] + 1
+      : (await this.web3.eth.getBlock('latest')).number
 
     const blocks = await concurrentMap(10, [...Array(res.flags.lookback).keys()], (i) =>
       this.web3.eth.getBlock(latest - res.flags.lookback! + i + 1)
@@ -64,29 +71,33 @@ export default class ValidatorSignedBlocks extends BaseCommand {
         printer.addMark(block.number - 1, elected, signed)
       }
 
-      // TODO(victor) Fix the follow flag functionality.
-      /*
       if (res.flags.follow) {
-        const subscription = this.web3.eth.subscribe("newBlockHeaders", (error) =>  {
-          if (error) { this.error(error) }
-        }).on("data", (block) => {
-          const elected = electionCache.elected(res.flags.signer, block.number)
-          const signed = elected && electionCache.signed(res.flags.signer, block)
-          printer.addMark(block.number, elected, signed)
-        }).on("error", (error) => {
-          this.error(`error in block header subscription: ${error}`)
-        })
+        const web3 = await this.newWeb3()
+        const subscription = web3.eth
+          .subscribe('newBlockHeaders', (error) => {
+            if (error) {
+              this.error(error)
+            }
+          })
+          .on('data', async (block) => {
+            const elected = await electionCache.elected(res.flags.signer, block.number - 1)
+            const signed = elected && (await electionCache.signedParent(res.flags.signer, block))
+            printer.addMark(block.number - 1, elected, signed)
+          })
+          .on('error', (error) => {
+            this.error(`error in block header subscription: ${error}`)
+          })
 
         try {
           let response: string
           do {
-            response = await cli.prompt('', {prompt: '', type: 'single', required: false})
-          } while (response !== 'q' && response !== '\u0003' / ctrl-c /)
+            response = await cli.prompt('', { prompt: '', type: 'single', required: false })
+          } while (response !== 'q' && response !== '\u0003' /* ctrl-c */)
         } finally {
           await subscription.unsubscribe()
+          await stopProvider(web3.currentProvider)
         }
       }
-      */
     } finally {
       await printer.done()
     }

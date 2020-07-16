@@ -1,3 +1,4 @@
+import Expandable from '@celo/react-components/components/Expandable'
 import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
@@ -7,8 +8,8 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LayoutAnimation, StyleSheet, Text, View } from 'react-native'
 import AccountNumber from 'src/components/AccountNumber'
-import Expandable from 'src/components/Expandable'
 import { Namespaces } from 'src/i18n'
+import { Screens } from 'src/navigator/Screens'
 import { Recipient } from 'src/recipients/recipient'
 
 function getDisplayName(recipient?: Recipient, e164Number?: string, address?: string) {
@@ -94,7 +95,7 @@ export default function UserSection({
           )}
           <View style={styles.accountBox}>
             <Text style={styles.accountLabel}>{t('accountNumberLabel')}</Text>
-            <AccountNumber address={address || ''} />
+            <AccountNumber address={address || ''} location={Screens.TransactionReview} />
           </View>
         </View>
       )}
@@ -139,8 +140,9 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: colors.gray2,
     flexDirection: 'row',
+    justifyContent: 'space-between',
     paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingVertical: 16,
   },
   accountLabel: {
     ...fontStyles.label,

@@ -330,6 +330,9 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
 
+  --[no-]local                                   If set, only show local and hardware wallet accounts. Use no-local to
+                                                 only show keystore addresses.
+
   --useLedger                                    Set it to use a ledger wallet
 ```
 

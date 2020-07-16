@@ -1,7 +1,5 @@
 import { PaymentRequest } from 'src/account/types'
-import { AddressToE164NumberType, SecureSendPhoneNumberMapping } from 'src/identity/reducer'
-import { getAddressValidationType } from 'src/identity/secureSend'
-import { AddressValidationCheckCache } from 'src/paymentRequest/IncomingPaymentRequestListScreen'
+import { AddressToE164NumberType } from 'src/identity/reducer'
 import { NumberToRecipient, Recipient, RecipientKind } from 'src/recipients/recipient'
 
 export function getRecipientFromPaymentRequest(
@@ -18,12 +16,18 @@ export function getRecipientFromPaymentRequest(
       kind: RecipientKind.Contact,
       address: paymentRequest.requesterAddress,
     }
-  } else {
+  } else if (paymentRequest.requesterE164Number) {
     return {
       kind: RecipientKind.MobileNumber,
       address: paymentRequest.requesterAddress,
-      displayName: paymentRequest.requesterE164Number || paymentRequest.requesterAddress,
+      displayName: paymentRequest.requesterE164Number,
       e164PhoneNumber: paymentRequest.requesterE164Number,
+    }
+  } else {
+    return {
+      kind: RecipientKind.Address,
+      address: paymentRequest.requesterAddress,
+      displayName: paymentRequest.requesterAddress,
     }
   }
 }
@@ -57,24 +61,4 @@ export function getSenderFromPaymentRequest(
       displayName: e164PhoneNumber,
     }
   }
-}
-
-export const getAddressValidationCheckCache = (
-  paymentRequests: PaymentRequest[],
-  recipientCache: NumberToRecipient,
-  secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
-): AddressValidationCheckCache => {
-  const addressValidationCheckCache: AddressValidationCheckCache = {}
-
-  paymentRequests.forEach((payment) => {
-    const recipient = getRecipientFromPaymentRequest(payment, recipientCache)
-    const addressValidationType = getAddressValidationType(recipient, secureSendPhoneNumberMapping)
-
-    const { e164PhoneNumber } = recipient
-    if (e164PhoneNumber) {
-      addressValidationCheckCache[e164PhoneNumber] = addressValidationType
-    }
-  })
-
-  return addressValidationCheckCache
 }

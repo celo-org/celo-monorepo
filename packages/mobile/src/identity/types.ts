@@ -5,6 +5,7 @@ export enum RecipientVerificationStatus {
 }
 
 export enum VerificationStatus {
+  InsufficientBalance = -2,
   Failed = -1,
   Stopped = 0,
   Prepping = 1,
@@ -25,6 +26,7 @@ export enum ImportContactsStatus {
   Done = 5,
 }
 
+// Contacts that have been matched during the onboarding matchmaking process
 export interface ContactMatches {
   [e164Number: string]: { contactId: string }
 }

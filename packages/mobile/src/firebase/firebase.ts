@@ -10,6 +10,8 @@ import { eventChannel, EventChannel } from 'redux-saga'
 import { call, put, select, spawn, take } from 'redux-saga/effects'
 import { NotificationReceiveState } from 'src/account/types'
 import { showError } from 'src/alert/actions'
+import { RequestEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { FIREBASE_ENABLED } from 'src/config'
@@ -67,7 +69,10 @@ export const initializeAuth = async (app: ReactNativeFirebase.Module, address: s
     } else if (userData.address !== undefined && userData.address !== address) {
       // This shouldn't happen! If this is thrown it means the firebase user is reused
       // with different addresses (which we don't want) or the db was incorrectly changed remotely!
-      throw new Error("User address in the db doesn't match persisted address")
+      Logger.debug("User address in the db doesn't match persisted address - updating address")
+      return {
+        address,
+      }
     }
   })
   Logger.info(TAG, 'Firebase Auth initialized successfully')
@@ -173,6 +178,7 @@ export function* paymentRequestWriter({ paymentInfo }: WritePaymentRequest) {
     navigateHome()
   } catch (error) {
     Logger.error(TAG, 'Failed to write payment request to Firebase DB', error)
+    ValoraAnalytics.track(RequestEvents.request_error, { error: error.message })
     yield put(showError(ErrorMessages.PAYMENT_REQUEST_FAILED))
   }
 }
@@ -196,7 +202,7 @@ export function isVersionBelowMinimum(version: string, minVersion: string): bool
 
 /*
 Get the Version deprecation information.
-Firebase DB Format: 
+Firebase DB Format:
   (New) Add minVersion child to versions category with a string of the mininum version as string
 */
 export async function isAppVersionDeprecated() {

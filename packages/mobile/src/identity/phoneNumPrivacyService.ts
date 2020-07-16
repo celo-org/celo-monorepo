@@ -42,7 +42,7 @@ function handleFailure(res: Response) {
   Logger.error(`${TAG}@handleFailure`, `Response not okay. Status ${res.status}`)
   switch (res.status) {
     case 403:
-      throw new Error(ErrorMessages.SALT_QUOTA_EXCEEDED)
+      throw new Error(ErrorMessages.PGPNP_QUOTA_ERROR)
     default:
       throw new Error('Unknown failure')
   }

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Text as RNText, View } from 'react-native'
 import CopyToClipboard from 'src/dev/CopyToClipboard'
 import ProgressCutBar from 'src/dev/ProgressCutBar'
+import ValidatorsListBadges from 'src/dev/ValidatorsListBadges'
 import { styles } from 'src/dev/ValidatorsListStyles'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Checkmark from 'src/icons/Checkmark'
@@ -198,6 +199,7 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
                   </Text>
                 )}
               </Text>
+              <ValidatorsListBadges address={group.address} />
               <Text style={[styles.tableCellTitleSecRow]}>
                 <Text style={[styles.address]}>{cutAddress(group.address)}</Text>
                 <CopyToClipboard content={group.address} />
@@ -209,8 +211,7 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            <Text style={[styles.numberBlock, styles.numberBlockFirst]}>{group.elected}</Text>
-            <Text style={[styles.numberBlock]}>{group.numMembers}</Text>
+            {group.elected}/{group.numMembers}
           </Text>
           <Text style={[styles.tableCell, styles.sizeXL, styles.tableCellBars]}>
             <Text style={[styles.tableCellBarsValue]}>
@@ -335,7 +336,7 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
                 </Text>
                 <Text style={[styles.tableCell, styles.sizeM]} />
                 <Text style={[styles.tableCell, styles.sizeM]} />
-                <Text
+                {/*                <Text
                   style={[
                     styles.tableCell,
                     styles.tableCellCenter,
@@ -346,7 +347,7 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
                   ellipsizeMode="tail"
                 >
                   {formatNumber(validator.uptime, 1)}%
-                </Text>
+                </Text>*/}
                 <Text
                   style={[
                     styles.tableCell,
