@@ -154,7 +154,7 @@ const compareStructDefinitions = (oldType: TypeInfo, newType: TypeInfo) => {
   const memberErrors = newType.members.map((newMember, i) => {
     const oldMember = oldType.members[i]
     if (oldMember.label !== newMember.label) {
-      return `struct ${newType.label} has new member ${newMember.label}`
+      return `struct ${newType.label} had ${oldMember.label} in slot ${i}, now has ${newMember.label}`
     } 
 
     if (oldMember.type !== newMember.type) {
