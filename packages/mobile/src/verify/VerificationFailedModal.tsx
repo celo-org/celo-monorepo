@@ -56,7 +56,7 @@ export function VerificationFailedModal({ verificationStatus, retryWithForno, fo
     retryWithForno && !fornoMode && verificationStatus !== VerificationStatus.InsufficientBalance
 
   return promptRetryWithForno ? (
-    // Retry verification with forno with option to skip verificaion
+    // Retry verification with forno with option to skip verification
     <WarningModal
       isVisible={isVisible}
       header={t('retryWithFornoModal.header')}
