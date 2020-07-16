@@ -10,11 +10,11 @@ contract DowntimeSlasher is SlasherUtil {
   using SafeMath for uint256;
 
   // Maps validator address -> end block of the latest interval for which it has been slashed.
-  mapping(address => uint256) lastSlashedBlock;
+  mapping(address => uint256) public lastSlashedBlock;
 
-  // Maps validator -> startBlock -> endBlock -> signature bitmap for that interval.
+  // Maps user address -> startBlock -> endBlock -> signature bitmap for that interval.
   // Note that startBlock and endBlock must always be in the same epoch.
-  mapping(address => mapping(uint256 => mapping(uint256 => bytes32))) private bitmaps;
+  mapping(address => mapping(uint256 => mapping(uint256 => bytes32))) public bitmaps;
 
   uint256 public slashableDowntime;
 
@@ -274,6 +274,12 @@ contract DowntimeSlasher is SlasherUtil {
     emit DowntimeSlashPerformed(validator, startBlock, endBlock);
   }
 
+  /**
+   * @notice Returns the validator's address of the signer for an specific block number.
+   * @param signerIndex Index of the signer within the validator set for a specific epoch.
+   * @param blockNumber Block number where the validator was elected.
+   * @return Validator's address
+   */
   function getValidatorAccountFromSignerIndex(uint256 signerIndex, uint256 blockNumber)
     internal
     view
