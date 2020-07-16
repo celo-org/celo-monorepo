@@ -10,7 +10,7 @@ export class ContractVersion {
     const isNumber = (versionDigit) => !isNaN(Number(versionDigit))
     return v.every(isNumber)
   }
-  
+
   static fromString = (version: string): ContractVersion => {
     if (!ContractVersion.isValid(version)) {
       throw new Error(`Invalid version format: ${version}`)
@@ -23,7 +23,7 @@ export class ContractVersion {
       Number(v[3])
     )
   }
-  
+
   constructor(
     public readonly storage: number,
     public readonly major: number,
@@ -68,7 +68,7 @@ export class ContractVersionDelta {
     const r = Delta.Reset
     const n = Delta.None
     if (storageChanged) {
-      return new ContractVersionDelta(Delta.Increment, r, r, r) 
+      return new ContractVersionDelta(Delta.Increment, r, r, r)
     }
     if (majorChanged) {
       return new ContractVersionDelta(n, Delta.Increment, r, r)
@@ -81,7 +81,7 @@ export class ContractVersionDelta {
     }
     return new ContractVersionDelta(n, n, n, n)
   }
- 
+
   constructor(
     public readonly storage: Delta,
     public readonly major: Delta,
