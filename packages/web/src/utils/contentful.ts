@@ -2,7 +2,7 @@ import { createClient, Entry } from 'contentful'
 import getConfig from 'next/config'
 import { Page as SideBarEntry } from 'src/experience/common/Sidebar'
 
-function intialize(preview) {
+function intialize(preview: boolean) {
   const { serverRuntimeConfig } = getConfig()
 
   return createClient({
@@ -57,8 +57,8 @@ interface InternalKit {
   sidebar: SideBarEntry[]
 }
 
-export async function getKit(kitSlug: string): Promise<InternalKit> {
-  const kit = await getClient(false).getEntries<Kit>({
+export async function getKit(kitSlug: string, { preview }): Promise<InternalKit> {
+  const kit = await getClient(preview).getEntries<Kit>({
     content_type: 'kit',
     'fields.slug': kitSlug,
   })
@@ -85,8 +85,8 @@ interface ContentFulPage {
   sections: Array<Entry<{ name: string; contentField: object; slug: string }>>
 }
 
-export async function getPage(pageSlug: string) {
-  const page = await getClient(false).getEntries<ContentFulPage>({
+export async function getPage(pageSlug: string, { preview }) {
+  const page = await getClient(preview).getEntries<ContentFulPage>({
     content_type: 'page',
     'fields.slug': !pageSlug ? 'index' : pageSlug,
     include: 3,

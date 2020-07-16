@@ -5,8 +5,13 @@ import { Props } from 'src/experience/contentful/Dynamic'
 const getServerSideProps: GetServerSideProps<
   Props,
   { kit: string; kitPage: string }
-> = async function getServerSideProp({ params, req }) {
-  const [kit, page] = await Promise.all([getKit(params.kit), getPage(params.kitPage)])
+> = async function getServerSideProp({ params, req, query }) {
+  const preview = query.preview === 'true'
+
+  const [kit, page] = await Promise.all([
+    getKit(params.kit, { preview }),
+    getPage(params.kitPage, { preview }),
+  ])
 
   const sidebar = kit.sidebar.map((entry) => {
     if (entry.href === req.url) {
