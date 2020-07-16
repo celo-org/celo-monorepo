@@ -202,6 +202,7 @@ const auth = async (app) => {
 
     return new Client({
       auth: installationAccessToken,
+      log: console,
     })
   } catch (error) {
     console.error('Flake Tracker App failed to authenticate as an installation ' + error)
