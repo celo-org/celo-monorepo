@@ -422,9 +422,12 @@ const NetworkConfigs = {
   },
   alfajores: {
     election: {
-      minElectableValidators: '1',
+      minElectableValidators: 5,
     },
     epochRewards: {
+      targetVotingYieldParameters: {
+        initial: 0.00016,
+      },
       frozen: false,
     },
     exchange: {
@@ -434,14 +437,69 @@ const NetworkConfigs = {
     goldToken: {
       frozen: false,
     },
-    stableToken: {
-      frozen: false,
+    governance: {
+      // Set to allow an attentive individual complete a governance proposal in 2 hours.
+      dequeueFrequency: 30 * MINUTE,
+      approvalStageDuration: 30 * MINUTE,
+      referendumStageDuration: HOUR,
+      executionStageDuration: DAY,
+      participationBaseline: 1 / 200, // Very low participation requirement given its a testnet.
+      participationBaselineFloor: 1 / 100,
+      participationBaselineUpdateFactor: 1 / 5,
+      participationBaselineQuorumFactor: 1,
+    },
+    governanceApproverMultiSig: {
+      signatories: [
+        '0xCc50EaC48bA71343dC76852FAE1892c6Bd2971DA', // Google Cloud IAM managed account
+      ],
+      numRequiredConfirmations: 1,
+      numInternalRequiredConfirmations: 1,
+    },
+    lockedGold: {
+      unlockingPeriod: 6 * HOUR, // 1/12 of the Mainnet period.
+    },
+    oracles: {
+      // Allow old reports so Oracle does not have to run continuously.
+      reportExpiry: 1000 * DAY,
     },
     reserve: {
       initialBalance: 100000000, // CELO
+      frozenAssetsStartBalance: 80000000, // Matches Mainnet after CGP-6
+      frozenAssetsDays: 182, // 3x Mainnet thawing rate
+      otherAddresses: [],
     },
-    oracles: {
-      reportExpiry: 1000 * DAY,
+    reserveSpenderMultiSig: {
+      signatories: [
+        '0x50F5017cED9d69A47C29643bde02E0EB120E039A', // Google Cloud IAM managed account
+      ],
+      numRequiredConfirmations: 1,
+      numInternalRequiredConfirmations: 1,
+    },
+    stableToken: {
+      oracles: [
+        // Oracle addresses generated from alfajores mnemonic
+        '0x840b32F30e1a3b2E8b9E6C0972eBa0148E22B847',
+        '0x3E4DBf92e5f19BE41e1Faa6368779418A610191f',
+        '0xdD5Cb02066fde415dda4f04EE53fBb652066afEE',
+        '0x473a3be7C2A42452Ed0b521614B3b76BC59D2D1D',
+        '0x43c25991F0f037517D174B7E0ffD8c8Ccc471c6B',
+        '0x2c82F367e2eD1BA018f23219b0E3FBA60a4424d8',
+        '0xedf87d1e6A041cA55F857a01C10fC626C194c524',
+        '0x510Bf5D8feBCA69fCfe73d391783be01B3324c69',
+        '0xD7C06AfE310baCD786BA2929088298b9e60322ec',
+        '0xFc0Ea86dBDFE9CB432BaFDe251Bd2dEba022AFd7',
+      ],
+      frozen: false,
+    },
+    validators: {
+      groupLockedGoldRequirements: {
+        duration: 15 * DAY, // 1/12 of the Mainnet duration.
+      },
+      validatorLockedGoldRequirements: {
+        duration: 5 * DAY, // 1/12 of the Mainnet duration.
+      },
+      membershipHistoryLength: 15, // Number of epochs in the group lockup period.
+      votesRatioOfLastVsFirstGroup: 1.0,
     },
   },
 }
