@@ -9,7 +9,6 @@ module.exports = {
       isolatedModules: true,
       tsConfig: 'tsconfig.jest.json',
     },
-    ...jsdomFlakeTracking.globals,
   },
   moduleNameMapper: {
     '\\.(png|jpg|jpeg|gif)$': '<rootDir>/__mocks__/ImageStub.ts',

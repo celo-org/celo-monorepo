@@ -15,7 +15,6 @@ module.exports = {
       tsConfig: 'tsconfig.test.json',
     },
     window: true,
-    ...nodeFlakeTracking.globals,
   },
   haste: {
     ...reactNativeJestPreset.haste,

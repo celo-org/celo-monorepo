@@ -14,7 +14,6 @@ module.exports = {
       isolatedModules: true,
     },
     window: true,
-    ...nodeFlakeTracking.globals,
   },
   // Override default platform to android for now
   haste: {
