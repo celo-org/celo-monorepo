@@ -13,6 +13,7 @@
   ],
   "scripts": {
     "build": "tsc -b .",
+    "build-verbose": "tsc -b . --traceResolution",
     "clean": "tsc -b . --clean",
     "test": "jest --runInBand",
     "lint": "tslint -c tslint.json --project ."

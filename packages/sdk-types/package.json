@@ -2,7 +2,6 @@
   "name": "@celo/sdk-types",
   "version": "1.0.0",
   "description": "Type definitions to be used with the Celo SDK (dev dependency)",
-  "types": "./web3/index.d.ts",
   "author": "Celo",
   "license": "Apache-2.0",
   "keywords": [
@@ -16,16 +15,12 @@
     "test": "jest --runInBand",
     "lint": "tslint -c tslint.json --project ."
   },
-  "dependencies": {},
-  "devDependencies": {
-    "@types/bignumber.js": "^5.0.0",
-    "@types/bn.js": "^4.11.4",
-    "web3": "1.2.4",
+  "dependencies": {
     "web3-core": "1.2.4",
     "web3-core-helpers": "1.2.4",
-    "web3-eth-abi": "1.2.4",
-    "web3-eth-contract": "1.2.4",
-    "web3-utils": "1.2.4"
+    "web3-eth": "1.2.4",
+    "@types/bignumber.js": "^5.0.0",
+    "@types/bn.js": "^4.11.4"
   },
   "engines": {
     "node": ">=8.13.0"
