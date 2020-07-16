@@ -54,6 +54,6 @@ volumes:
   value: prod
 - name: LOGO
   value: /images/celo_logo.svg
-- name: LOGO
-  value: /images/celo_logo.svg
+- name: BLOCKSCOUT_VERSION
+  value: {{ .Values.blockscout.image.tag }}
 {{- end -}}

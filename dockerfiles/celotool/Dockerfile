@@ -16,6 +16,7 @@ RUN apt-get update && \
 # ensure yarn.lock is evaluated by kaniko cache diff
 COPY lerna.json package.json yarn.lock ./
 COPY scripts/ scripts/
+COPY patches/ patches/
 COPY packages/utils/package.json packages/utils/
 COPY packages/dev-utils/package.json packages/dev-utils/
 COPY packages/typescript/package.json packages/typescript/

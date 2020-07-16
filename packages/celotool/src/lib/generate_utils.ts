@@ -10,7 +10,14 @@ import path from 'path'
 import * as rlp from 'rlp'
 import Web3 from 'web3'
 import { envVar, fetchEnv, fetchEnvOrFallback, monorepoRoot } from './env-utils'
-import { CONTRACT_OWNER_STORAGE_LOCATION, GENESIS_MSG_HASH, GETH_CONFIG_OLD, ISTANBUL_MIX_HASH, REGISTRY_ADDRESS, TEMPLATE } from './genesis_constants'
+import {
+  CONTRACT_OWNER_STORAGE_LOCATION,
+  GENESIS_MSG_HASH,
+  GETH_CONFIG_OLD,
+  ISTANBUL_MIX_HASH,
+  REGISTRY_ADDRESS,
+  TEMPLATE
+} from './genesis_constants'
 import { GenesisConfig } from './interfaces/genesis-config'
 import { ensure0x, strip0x } from './utils'
 
@@ -27,6 +34,7 @@ export enum AccountType {
   PROXY = 7,
   ATTESTATION_BOT = 8,
   VOTING_BOT = 9,
+  TX_NODE_PRIVATE = 10,
 }
 
 export enum ConsensusType {
@@ -56,6 +64,7 @@ export const MNEMONIC_ACCOUNT_TYPE_CHOICES = [
   'proxy',
   'attestation_bot',
   'voting_bot',
+  'tx_node_private',
 ]
 
 export const add0x = (str: string) => {

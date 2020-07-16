@@ -16,9 +16,15 @@ const mockProvider: provider = {
     }
     if (payload.method === 'mock_error_method') {
       callback(new Error(payload.method))
-    } else {
-      callback(null, response)
+      return
+    } else if (payload.method === 'mock_response_error_method') {
+      ;(response.error as any) = {
+        code: -32000,
+        message: 'foobar',
+      }
     }
+
+    callback(null, response)
   },
   supportsSubscriptions: (): boolean => true,
   disconnect: (): boolean => true,
@@ -48,6 +54,14 @@ describe('RPC Caller class', () => {
   describe('when the provider fails', () => {
     it('raises an error', async () => {
       await expect(rpcCaller.call('mock_error_method', ['mock_param'])).rejects.toThrowError()
+    })
+  })
+
+  describe('when the result contains an error', () => {
+    it('raises an error with the error message', async () => {
+      await expect(
+        rpcCaller.call('mock_response_error_method', ['mock_param'])
+      ).rejects.toThrowError('foobar')
     })
   })
 })
@@ -110,7 +124,7 @@ describe('rpcCallHandler function', () => {
     })
   })
 
-  describe('when the handle succeds', () => {
+  describe('when the handle succeeds', () => {
     it('the callback receives a response with a result', (done) => {
       function callback(_error: null, response: JsonRpcResponse) {
         try {

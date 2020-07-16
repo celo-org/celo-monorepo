@@ -84,6 +84,11 @@ export const AttestationServiceStatusResponseType = t.type({
   blacklistedRegionCodes: t.array(t.string),
   accountAddress: AddressType,
   signature: t.union([SignatureType, t.undefined]),
+  version: t.string,
+  latestBlock: t.number,
+  ageOfLatestBlock: t.number,
+  isNodeSyncing: t.boolean,
+  appSignature: t.string,
 })
 
 export const AttestationServiceTestRequestType = t.type({

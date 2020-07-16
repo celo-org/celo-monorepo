@@ -7,7 +7,7 @@ import { Screens } from 'src/navigator/Screens'
 
 export function QRCodeIcon() {
   const onQrCodePress = React.useCallback(() => {
-    navigate(Screens.QRScanner)
+    navigate(Screens.QRNavigator, { screen: Screens.QRScanner })
   }, [])
 
   return (

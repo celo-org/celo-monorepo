@@ -14,7 +14,7 @@ import { H2 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import menuItems from 'src/shared/menu-items'
-import Navigation, { NavigationTheme } from 'src/shared/navigation'
+import Navigation, { NavigationTheme } from 'src/shared/Navigation'
 import Spinner from 'src/shared/Spinner'
 import { colors, standardStyles, textStyles } from 'src/styles'
 
@@ -118,7 +118,7 @@ class ValidatorsListApp extends React.PureComponent<Props> {
           path={menuItems.VALIDATORS_LIST.link}
           description="View status of Validators on the Celo Network"
         />
-        <View style={[styles.cover, styles.pStatic, compStyles.fullHeight]}>
+        <View style={[styles.cover, styles.pStaticOverflow, compStyles.fullHeight]}>
           <H2
             style={[
               textStyles.center,
@@ -136,7 +136,7 @@ class ValidatorsListApp extends React.PureComponent<Props> {
                   <Navigation
                     onPress={navigate}
                     text={name}
-                    theme={NavigationTheme.DARK}
+                    theme={NavigationTheme.DARKGOLD}
                     selected={this.props.router.pathname === link}
                   />
                 </View>

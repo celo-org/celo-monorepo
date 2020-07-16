@@ -73,6 +73,10 @@ async function helmParameters(
   blockscoutDBConnectionName: string
 ) {
   const privateNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
+  const useMetadataCrawler = fetchEnvOrFallback(
+    envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_REPOSITORY,
+    'false',
+  )
   const params = [
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set blockscout.image.repository=${fetchEnv(envVar.BLOCKSCOUT_DOCKER_IMAGE_REPOSITORY)}`,
@@ -86,6 +90,11 @@ async function helmParameters(
       envVar.BLOCKSCOUT_SUBNETWORK_NAME,
       celoEnv
     )}"`,
+    `--set promtosd.scrape_interval=${fetchEnv(envVar.PROMTOSD_SCRAPE_INTERVAL)}`,
+    `--set promtosd.export_interval=${fetchEnv(envVar.PROMTOSD_EXPORT_INTERVAL)}`,
+  ]
+  if (useMetadataCrawler !== 'false') {
+    params.push(
     `--set blockscout.metadata_crawler.image.repository=${fetchEnv(
       envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_REPOSITORY
     )}`,
@@ -94,10 +103,9 @@ async function helmParameters(
     )}`,
     `--set blockscout.metadata_crawler.schedule='${fetchEnv(
       envVar.BLOCKSCOUT_METADATA_CRAWLER_SCHEDULE
-    )}'`,
-    `--set promtosd.scrape_interval=${fetchEnv(envVar.PROMTOSD_SCRAPE_INTERVAL)}`,
-    `--set promtosd.export_interval=${fetchEnv(envVar.PROMTOSD_EXPORT_INTERVAL)}`,
-  ]
+    )}`,
+    )
+  }
   if (isVmBased()) {
     const txNodeLbIp = await getInternalTxNodeLoadBalancerIP(celoEnv)
     params.push(`--set blockscout.jsonrpc_http_url=http://${txNodeLbIp}:8545`)

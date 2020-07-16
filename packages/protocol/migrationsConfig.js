@@ -64,9 +64,9 @@ const DefaultConfig = {
   },
   epochRewards: {
     targetVotingYieldParameters: {
-      initial: 0, // Change to (x + 1) ^ 365 = 1.06 once mainnet activated.
+      initial: 0, // Change to (x + 1) ^ 365 = 1.06 once Mainnet activated.
       max: 0.0005, // (x + 1) ^ 365 = 1.20
-      adjustmentFactor: 0, // Change to 1 / 3650 once mainnet activated.
+      adjustmentFactor: 0, // Change to 1 / 3650 once Mainnet activated.
     },
     rewardsMultiplierParameters: {
       max: 2,
@@ -101,10 +101,10 @@ const DefaultConfig = {
   },
   governance: {
     queueExpiry: 4 * WEEK,
-    dequeueFrequency: DAY, // Change to 1 week once mainnet activated
+    dequeueFrequency: DAY, // Change to 1 week once Mainnet activated
     concurrentProposals: 3,
-    approvalStageDuration: DAY, // Change to 3 days once mainnet activated
-    referendumStageDuration: 2 * DAY, // Change to 1 week once mainnet activated
+    approvalStageDuration: DAY, // Change to 3 days once Mainnet activated
+    referendumStageDuration: 2 * DAY, // Change to 1 week once Mainnet activated
     executionStageDuration: 3 * DAY,
     minDeposit: 100, // 100 cGLD
     participationBaseline: 5 / 100, // Start with low participation requirements, let the protocol adjust
@@ -148,6 +148,8 @@ const DefaultConfig = {
     tobinTax: toFixed(0).toFixed(), // Tobin tax turned off to start
     tobinTaxReserveRatio: toFixed(0).toFixed(), // Tobin tax turned off to start
     dailySpendingRatio: toFixed(0.05).toFixed(), // 5%
+    frozenAssetsStartBalance: null,
+    frozenAssetsDays: null,
     spenders: [],
     otherAddresses: [
       '0x246f4599eFD3fA67AC44335Ed5e749E518Ffd8bB',
@@ -238,11 +240,11 @@ const DefaultConfig = {
   },
   validators: {
     groupLockedGoldRequirements: {
-      value: '10000000000000000000000', // 10k gold per validator
+      value: '10000000000000000000000', // 10k CELO per validator
       duration: 180 * DAY,
     },
     validatorLockedGoldRequirements: {
-      value: '10000000000000000000000', // 10k gold
+      value: '10000000000000000000000', // 10k CELO
       // MUST BE KEPT IN SYNC WITH MEMBERSHIP HISTORY LENGTH
       duration: 60 * DAY,
     },
@@ -256,11 +258,10 @@ const DefaultConfig = {
     maxGroupSize: 5,
     slashingPenaltyResetPeriod: 30 * DAY,
 
-    // Register a number of cLabs groups to contain an initial set of validators to run test
-    // networks.
+    // Register cLabs groups to contain an initial set of validators to run test networks.
     validatorKeys: [],
     attestationKeys: [],
-    groupName: 'C-Labs',
+    groupName: 'cLabs',
     commission: 0.1,
     votesRatioOfLastVsFirstGroup: 2.0,
   },
@@ -335,19 +336,25 @@ const NetworkConfigs = {
       frozen: false,
     },
     reserve: {
-      initialBalance: 100000000,
+      initialBalance: 100000000, // CELO
     },
   },
   baklava: {
-    blockchainParameters: {
-      minimumClientVersion: {
-        major: 0,
-        minor: 10,
-        patch: 0,
-      },
-    },
     election: {
-      minElectableValidators: '25', // About half of the expected genesis set.
+      minElectableValidators: 20,
+      frozen: false,
+    },
+    epochRewards: {
+      targetVotingYieldParameters: {
+        initial: 0.00016,
+      },
+      frozen: false,
+    },
+    exchange: {
+      frozen: false,
+    },
+    goldToken: {
+      frozen: false,
     },
     governance: {
       // Set to be able to complete a proposal in about a day, but give everyone a chance to participate.
@@ -355,33 +362,67 @@ const NetworkConfigs = {
       approvalStageDuration: 4 * HOUR,
       referendumStageDuration: DAY,
       executionStageDuration: WEEK,
+      participationBaseline: 1 / 200, // Very low participation requirement given its a testnet.
+      participationBaselineFloor: 1 / 100,
+      participationBaselineUpdateFactor: 1 / 5,
+      participationBaselineQuorumFactor: 1,
+    },
+    governanceApproverMultiSig: {
+      // 1/5 multsig
+      signatories: [
+        '0xb04778c00A8e30F59bFc91DD74853C4f32F34E54', // Google Cloud IAM managed account
+        '0x32830A3f65DF98aFCFA18bAd35009Aa51163D606', // Individual signer
+        '0x7c593219ad21e172c1fdc6bfdc359699fa428adb', // Individual signer
+        '0x31af68f73fb93815b3eB9a6FA76e63113De5f733', // Individual signer
+        '0x47fE4b9fFDB9712fC5793B1b5E86d96a4664cf02', // Individual signer
+      ],
+      numRequiredConfirmations: 1,
+      numInternalRequiredConfirmations: 2,
     },
     lockedGold: {
-      unlockingPeriod: 6 * HOUR, // 1/12 of the mainnet period.
+      unlockingPeriod: 6 * HOUR, // 1/12 of the Mainnet period.
+    },
+    reserve: {
+      initialBalance: 100000000, // CELO
+      frozenAssetsStartBalance: 80000000, // Matches Mainnet after CGP-6
+      frozenAssetsDays: 182, // 3x Mainnet thawing rate
+    },
+    reserveSpenderMultiSig: {
+      // 1/3 multsig
+      signatories: [
+        '0x62C6a0446BbD7f6260108dD538d88E8b53128a90', // Google Cloud IAM managed account
+        '0x49eFFA2ceF5FccA5540f421d6b28e76184cc0fDF', // Individual signer
+        '0x4550F1576fAC966Ac8b9F42e1D5D66D3A14dD8D3', // Individual signer
+      ],
+      numRequiredConfirmations: 1,
+      numInternalRequiredConfirmations: 2,
     },
     stableToken: {
+      // Don't set an initial gold price before oracles start to report.
+      goldPrice: null,
       oracles: [
-        '0x0d473f73AAf1C2bf7EBd2be7196C71dBa6C1724b',
-        '0x8F7ca85A9E4A18B551b765706bd0B6f26927D86F',
-        '0x3EaEe6C693420Ae86643EB2837978da8eEbf973f',
-        '0xDd3E5FcE22938c0f482004527D468a8799C4a61E',
-        '0xFb2Ee4Da251fC6A9DF7eb8d5c4ea1DeC99d127eA',
-        '0xd321C7356DFB5b6F4AD9e5B58C51B46409fe1442',
-        '0xbbbC38f6a383293522d4aEDaA98b7d2D73E90A73',
-        '0xB9E0b0B8fdA1001392c8fFd19f6B7ad5286589F2',
-        '0x44740e3eedfD3a2A2e7662de9165a6E20bBcC72C',
-        '0x7a2cb0438e7B9801C29B39Ff94439aFf930CDf9F',
-        '0xF4314cb9046bECe6AA54bb9533155434d0c76909',
+        '0xd71fea6b92d3f21f659152589223385a7329bb11',
+        '0x1e477fc9b6a49a561343cd16b2c541930f5da7d2',
+        '0x460b3f8d3c203363bb65b1a18d89d4ffb6b0c981',
+        '0x3b522230c454ca9720665d66e6335a72327291e8',
+        '0x0AFe167600a5542d10912f4A07DFc4EEe0769672',
+        '0x412ebe7859e9aa71ff5ce4038596f6878c359c96',
+        '0xbbfe73df8b346b3261b19ac91235888aba36d68c',
+        '0x02b1d1bea682fcab4448c0820f5db409cce4f702',
+        '0xe90f891710f625f18ecbf1e02efb4fd1ab236a10',
+        '0x28c52c722df87ed11c5d7665e585e84aa93d7964',
       ],
+      frozen: false,
     },
     validators: {
       groupLockedGoldRequirements: {
-        duration: 15 * DAY, // 1/12 of the mainnet duration.
+        duration: 15 * DAY, // 1/12 of the Mainnet duration.
       },
       validatorLockedGoldRequirements: {
-        duration: 5 * DAY, // 1/12 of the mainnet duration.
+        duration: 5 * DAY, // 1/12 of the Mainnet duration.
       },
       membershipHistoryLength: 15, // Number of epochs in the group lockup period.
+      votesRatioOfLastVsFirstGroup: 1.0,
     },
   },
   alfajores: {
@@ -402,7 +443,7 @@ const NetworkConfigs = {
       frozen: false,
     },
     reserve: {
-      initialBalance: 100000000,
+      initialBalance: 100000000, // CELO
     },
     oracles: {
       reportExpiry: 1000 * DAY,

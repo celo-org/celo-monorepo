@@ -1,21 +1,27 @@
 import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
 import colors from '@celo/react-components/styles/colors'
 import variables from '@celo/react-components/styles/variables'
-import * as _ from 'lodash'
+import _ from 'lodash'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import {
-  Animated,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   RefreshControl,
   RefreshControlProps,
   SectionList,
   SectionListData,
   StyleSheet,
 } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import Animated from 'react-native-reanimated'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
+import { migrateAccount } from 'src/account/actions'
+import { needsToMigrateToNewBip39 } from 'src/account/selectors'
 import { showMessage } from 'src/alert/actions'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { exitBackupFlow } from 'src/app/actions'
+import Dialog from 'src/components/Dialog'
 import { ALERT_BANNER_DURATION, DEFAULT_TESTNET, SHOW_TESTNET_BANNER } from 'src/config'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { refreshAllBalances, setLoading } from 'src/home/actions'
@@ -23,6 +29,8 @@ import NotificationBox from 'src/home/NotificationBox'
 import { callToActNotificationSelector, getActiveNotificationCount } from 'src/home/selectors'
 import SendOrRequestBar from 'src/home/SendOrRequestBar'
 import { Namespaces, withTranslation } from 'src/i18n'
+import Logo from 'src/icons/Logo.v2'
+import { importContacts } from 'src/identity/actions'
 import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
@@ -30,6 +38,7 @@ import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
 import { initializeSentryUserContext } from 'src/sentry/actions'
 import TransactionsList from 'src/transactions/TransactionsList'
+import { checkContactsPermission } from 'src/utils/permissions'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const HEADER_BUTTON_MARGIN = 12
@@ -41,6 +50,8 @@ interface StateProps {
   callToActNotification: boolean
   recipientCache: NumberToRecipient
   appConnected: boolean
+  numberVerified: boolean
+  needsToMigrateToNewBip39: boolean
 }
 
 interface DispatchProps {
@@ -49,6 +60,8 @@ interface DispatchProps {
   exitBackupFlow: typeof exitBackupFlow
   setLoading: typeof setLoading
   showMessage: typeof showMessage
+  importContacts: typeof importContacts
+  migrateAccount: typeof migrateAccount
 }
 
 type Props = StateProps & DispatchProps & WithTranslation
@@ -59,6 +72,8 @@ const mapDispatchToProps = {
   exitBackupFlow,
   setLoading,
   showMessage,
+  importContacts,
+  migrateAccount,
 }
 
 const mapStateToProps = (state: RootState): StateProps => ({
@@ -68,43 +83,58 @@ const mapStateToProps = (state: RootState): StateProps => ({
   callToActNotification: callToActNotificationSelector(state),
   recipientCache: recipientCacheSelector(state),
   appConnected: isAppConnected(state),
+  numberVerified: state.app.numberVerified,
+  needsToMigrateToNewBip39: needsToMigrateToNewBip39(state),
 })
 
 const AnimatedSectionList = Animated.createAnimatedComponent(SectionList)
 
-const HEADER_FADE_HEIGHT = 100
+interface State {
+  isMigrating: boolean
+}
 
-export class WalletHome extends React.Component<Props> {
-  animatedValue: Animated.Value
-  headerOpacity: Animated.AnimatedInterpolation
-  onScroll: () => void
+export class WalletHome extends React.Component<Props, State> {
+  scrollPosition: Animated.Value<number>
+  onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => void
 
   constructor(props: Props) {
     super(props)
 
-    this.animatedValue = new Animated.Value(0)
-    this.headerOpacity = this.animatedValue.interpolate({
-      inputRange: [0, HEADER_FADE_HEIGHT],
-      outputRange: [0, 1],
-      extrapolate: 'clamp',
-    })
-    this.onScroll = Animated.event(
-      [{ nativeEvent: { contentOffset: { y: this.animatedValue } } }],
-      {
-        useNativeDriver: true,
-      }
-    )
+    this.scrollPosition = new Animated.Value(0)
+    this.onScroll = Animated.event([{ nativeEvent: { contentOffset: { y: this.scrollPosition } } }])
+    this.state = { isMigrating: false }
   }
 
   onRefresh = async () => {
     this.props.refreshAllBalances()
   }
 
-  componentDidMount() {
+  componentDidMount = () => {
     // TODO find a better home for this, its unrelated to wallet home
     this.props.initializeSentryUserContext()
     if (SHOW_TESTNET_BANNER) {
       this.showTestnetBanner()
+    }
+
+    ValoraAnalytics.setUserAddress(this.props.address)
+
+    // Waiting 1/2 sec before triggering to allow
+    // rest of feed to load unencumbered
+    setTimeout(this.tryImportContacts, 500)
+  }
+
+  tryImportContacts = async () => {
+    const { numberVerified, recipientCache } = this.props
+
+    // Only import contacts if number is verified and
+    // recip cache is empty so we haven't already
+    if (!numberVerified || recipientCache.length) {
+      return
+    }
+
+    const hasGivenContactPermission = await checkContactsPermission()
+    if (hasGivenContactPermission) {
+      this.props.importContacts()
     }
   }
 
@@ -127,6 +157,11 @@ export class WalletHome extends React.Component<Props> {
       null,
       t('testnetAlert.0', { testnet: _.startCase(DEFAULT_TESTNET) })
     )
+  }
+
+  migrateAccount = () => {
+    this.setState({ isMigrating: true })
+    this.props.migrateAccount()
   }
 
   render() {
@@ -159,8 +194,9 @@ export class WalletHome extends React.Component<Props> {
 
     return (
       <SafeAreaView style={styles.container}>
-        <DrawerTopBar />
+        <DrawerTopBar middleElement={<Logo />} scrollPosition={this.scrollPosition} />
         <AnimatedSectionList
+          scrollEventThrottle={16}
           onScroll={this.onScroll}
           refreshControl={refresh}
           onRefresh={this.onRefresh}
@@ -172,6 +208,15 @@ export class WalletHome extends React.Component<Props> {
           keyExtractor={this.keyExtractor}
         />
         <SendOrRequestBar />
+        <Dialog
+          title={'Migrate to new Address'}
+          children={
+            'Due to a developer configuration error, you will need to migrate your account to a new address, which will include verifying again. You can keep your seed phrase. Do not close the app during migration. Please post on slack if you have questions.'
+          }
+          actionText={'Migrate'}
+          actionPress={this.migrateAccount}
+          isVisible={this.props.needsToMigrateToNewBip39 && !this.state.isMigrating}
+        />
       </SafeAreaView>
     )
   }
@@ -211,4 +256,4 @@ const styles = StyleSheet.create({
 export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.walletFlow5)(WalletHome))
+)(withTranslation<Props>(Namespaces.walletFlow5)(WalletHome))

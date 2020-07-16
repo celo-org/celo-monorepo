@@ -121,8 +121,16 @@ describe('TxParamsNormalizer class', () => {
       celoTx.feeCurrency = 'celoMagic'
       const newCeloTx = await populator.populate(celoTx)
       expect(newCeloTx.gasPrice).toBe('27')
-      expect(mockRpcCall.mock.calls.length).toBe(1)
-      expect(mockRpcCall.mock.calls[0]).toEqual(['eth_gasPriceInCurrency', ['celoMagic']])
+      expect(mockRpcCall.mock.calls[0]).toEqual(['eth_gasPrice', ['celoMagic']])
+    })
+
+    test('will not populate the gas price when fee currency is undefined', async () => {
+      const celoTx: Tx = { ...completeCeloTx }
+      celoTx.gasPrice = undefined
+      celoTx.feeCurrency = undefined
+      const newCeloTx = await populator.populate(celoTx)
+      expect(newCeloTx.gasPrice).toBe('27')
+      expect(mockRpcCall.mock.calls[0]).toEqual(['eth_gasPrice', []])
     })
   })
 })

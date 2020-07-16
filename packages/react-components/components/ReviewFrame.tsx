@@ -1,8 +1,10 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import CircleButton from '@celo/react-components/components/CircleButton'
+import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
+import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import colors from '@celo/react-components/styles/colors.v2'
 import * as React from 'react'
-import { ActivityIndicator, ScrollView, StyleSheet, View, ViewProps } from 'react-native'
+import { StyleSheet, View, ViewProps } from 'react-native'
 
 interface ButtonProps {
   text: string
@@ -51,17 +53,13 @@ class ReviewFrame extends React.PureComponent<Props, State> {
           {confirmButton && (
             <Button
               onPress={this.onConfirm}
-              text={
-                isSending ? (
-                  <ActivityIndicator size="small" color={colors.celoGreen} />
-                ) : (
-                  confirmButton.text
-                )
-              }
+              text={confirmButton.text}
+              showLoading={isSending}
               accessibilityLabel={confirmButton.text}
               type={BtnTypes.PRIMARY}
               size={BtnSizes.FULL}
               disabled={confirmButton.disabled || this.state.confirmed}
+              testID="ConfirmButton"
             />
           )}
           {modifyButton && (
@@ -95,12 +93,13 @@ class ReviewFrame extends React.PureComponent<Props, State> {
 
     return (
       <View style={[styles.body, style]}>
-        <ScrollView contentContainerStyle={styles.scrollViewContentContainer}>
+        <KeyboardAwareScrollView contentContainerStyle={styles.scrollViewContentContainer}>
           {HeaderComponent && <HeaderComponent />}
           <View style={styles.confirmationContainer}>{children}</View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
         {FooterComponent && <FooterComponent />}
         {this.renderButtons()}
+        <KeyboardSpacer />
       </View>
     )
   }
@@ -121,7 +120,8 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   bottomButtonStyle: {
-    marginHorizontal: 20,
+    marginHorizontal: 16,
+    paddingVertical: 16,
   },
   modifyButton: {
     marginBottom: 10,

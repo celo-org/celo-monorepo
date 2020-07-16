@@ -8,7 +8,7 @@ import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { requireSecureSend, updateE164PhoneNumberAddresses } from 'src/identity/actions'
 import { doImportContactsWrapper, fetchAddressesAndValidateSaga } from 'src/identity/contactMapping'
-import { fetchPhoneHashPrivate } from 'src/identity/privacy'
+import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import {
   AddressValidationType,
   e164NumberToAddressSelector,
@@ -17,7 +17,7 @@ import {
 import { setRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients } from 'src/recipients/recipient'
 import { getAllContacts } from 'src/utils/contacts'
-import { getContractKitOutsideGenerator } from 'src/web3/contracts'
+import { getContractKitAsync } from 'src/web3/contracts'
 import { getConnectedAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 import {
@@ -37,7 +37,7 @@ const allRecipients = { ...e164NumberRecipients, ...otherRecipients }
 
 describe('Import Contacts Saga', () => {
   it('imports contacts and creates contact mappings correctly', async () => {
-    await expectSaga(doImportContactsWrapper)
+    await expectSaga(doImportContactsWrapper, { doMatchmaking: false })
       .provide([
         [call(getConnectedAccount), null],
         [call(getAllContacts), mockContactList],
@@ -55,7 +55,7 @@ describe('Import Contacts Saga', () => {
   })
 
   it('shows errors correctly', async () => {
-    await expectSaga(doImportContactsWrapper)
+    await expectSaga(doImportContactsWrapper, { doMatchmaking: false })
       .provide([
         [call(getConnectedAccount), null],
         [call(getAllContacts), throwError(new Error('fake error'))],
@@ -69,7 +69,7 @@ describe('Import Contacts Saga', () => {
 
 describe('Fetch Addresses Saga', () => {
   it('fetches and caches addresses correctly', async () => {
-    const contractKit = await getContractKitOutsideGenerator()
+    const contractKit = await getContractKitAsync()
 
     const mockE164NumberToAddress = {
       [mockE164Number]: [mockAccount.toLowerCase()],
@@ -111,7 +111,7 @@ describe('Fetch Addresses Saga', () => {
   })
 
   it('requires SecureSend with partial verification when a new adddress is added and last 4 digits are unique', async () => {
-    const contractKit = await getContractKitOutsideGenerator()
+    const contractKit = await getContractKitAsync()
 
     const mockPhoneNumberLookup: IdentifierLookupResult = {
       [mockE164NumberHash]: {
@@ -154,7 +154,7 @@ describe('Fetch Addresses Saga', () => {
   })
 
   it('requires SecureSend with full verification when a new adddress is added and last 4 digits are not unique', async () => {
-    const contractKit = await getContractKitOutsideGenerator()
+    const contractKit = await getContractKitAsync()
 
     const mockPhoneNumberLookup: IdentifierLookupResult = {
       [mockE164NumberHash]: {

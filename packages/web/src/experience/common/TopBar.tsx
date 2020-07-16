@@ -6,7 +6,7 @@ import { useScreenSize } from 'src/layout/ScreenSize'
 import LogoLightBg from 'src/logos/LogoLightBg'
 import Button, { BTN } from 'src/shared/Button.3'
 import links, { CeloLinks } from 'src/shared/menu-items'
-import Navigation, { NavigationTheme } from 'src/shared/navigation'
+import Navigation, { NavigationTheme } from 'src/shared/Navigation'
 import { colors, fonts, standardStyles } from 'src/styles'
 
 interface Props {
@@ -16,7 +16,7 @@ interface Props {
 export default function TopBar({ current }: Props) {
   const { isMobile } = useScreenSize()
   const { t } = useTranslation(NameSpaces.common)
-  const name = links.BRAND.name
+  const name = current === links.BRAND.link ? links.BRAND.name : links.EVENTS_KIT.name
   return (
     <View style={standardStyles.centered}>
       <View style={[standardStyles.row, styles.container]}>
@@ -41,6 +41,13 @@ export default function TopBar({ current }: Props) {
         </View>
         <View style={styles.rowVerticalCenter}>
           <View style={styles.kits}>
+            <Navigation
+              style={styles.navLink}
+              text={links.EVENTS_KIT.name}
+              link={links.EVENTS_KIT.link}
+              selected={links.EVENTS_KIT.link === current}
+              theme={NavigationTheme.LIGHT}
+            />
             <Navigation
               style={styles.navLink}
               text={links.BRAND.name}

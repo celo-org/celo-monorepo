@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ValidateRecipientIntro renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -50,9 +50,9 @@ exports[`ValidateRecipientIntro renders correctly 1`] = `
                 },
                 Object {
                   "backgroundColor": "#7AD6FE",
-                  "borderRadius": 60,
-                  "height": 120,
-                  "width": 120,
+                  "borderRadius": 32,
+                  "height": 64,
+                  "width": 64,
                 },
               ]
             }
@@ -66,7 +66,7 @@ exports[`ValidateRecipientIntro renders correctly 1`] = `
                     "fontSize": 16,
                   },
                   Object {
-                    "fontSize": 60,
+                    "fontSize": 32,
                   },
                 ]
               }
@@ -80,9 +80,9 @@ exports[`ValidateRecipientIntro renders correctly 1`] = `
         style={
           Object {
             "color": "#2E3338",
-            "fontFamily": "Inter-SemiBold",
-            "fontSize": 19,
-            "lineHeight": 26,
+            "fontFamily": "Jost-Medium",
+            "fontSize": 22,
+            "lineHeight": 28,
             "paddingHorizontal": 5,
             "paddingVertical": 20,
             "textAlign": "center",
@@ -125,7 +125,7 @@ exports[`ValidateRecipientIntro renders correctly 1`] = `
     style={
       Object {
         "alignItems": "center",
-        "paddingBottom": 60,
+        "paddingBottom": 45,
       }
     }
   >
@@ -149,13 +149,17 @@ exports[`ValidateRecipientIntro renders correctly 1`] = `
     >
       <Text
         style={
-          Object {
-            "color": "#1AB775",
-            "fontFamily": "Inter-SemiBold",
-            "fontSize": 16,
-            "lineHeight": 22,
-            "paddingVertical": 16,
-          }
+          Array [
+            Object {
+              "color": "#1AB775",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 16,
+              "lineHeight": 22,
+            },
+            Object {
+              "paddingVertical": 16,
+            },
+          ]
         }
       >
         scanQRCode
@@ -181,18 +185,22 @@ exports[`ValidateRecipientIntro renders correctly 1`] = `
     >
       <Text
         style={
-          Object {
-            "color": "#1AB775",
-            "fontFamily": "Inter-SemiBold",
-            "fontSize": 16,
-            "lineHeight": 22,
-            "paddingVertical": 16,
-          }
+          Array [
+            Object {
+              "color": "#1AB775",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 16,
+              "lineHeight": 22,
+            },
+            Object {
+              "paddingVertical": 16,
+            },
+          ]
         }
       >
         confirmAccount.button
       </Text>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

@@ -1,0 +1,189 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`RegulatoryTermsScreen renders correctly 1`] = `
+<RNCSafeAreaView
+  style={
+    Object {
+      "flex": 1,
+    }
+  }
+>
+  <RNCSafeAreaView
+    style={
+      Object {
+        "height": 35,
+        "position": "absolute",
+        "right": 10,
+        "top": 10,
+        "width": 60,
+        "zIndex": 100,
+      }
+    }
+  >
+    <Text
+      accessible={true}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+    >
+         
+    </Text>
+  </RNCSafeAreaView>
+  <RCTScrollView
+    contentContainerStyle={
+      Object {
+        "paddingHorizontal": 24,
+        "paddingTop": 40,
+      }
+    }
+    style={
+      Object {
+        "marginTop": 40,
+      }
+    }
+    testID="scrollView"
+  >
+    <View>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Jost-Medium",
+            "fontSize": 22,
+            "lineHeight": 28,
+            "marginBottom": 10,
+          }
+        }
+      >
+        terms.heading1
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+            "marginBottom": 15,
+          }
+        }
+      >
+        <Text
+          onPress={[Function]}
+          style={
+            Object {
+              "textDecorationLine": "underline",
+            }
+          }
+        >
+          celo.org/terms
+        </Text>
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Jost-Medium",
+            "fontSize": 22,
+            "lineHeight": 28,
+            "marginBottom": 10,
+          }
+        }
+      >
+        terms.heading2
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+            "marginBottom": 15,
+          }
+        }
+      >
+        terms.goldDisclaimer
+      </Text>
+    </View>
+  </RCTScrollView>
+  <View
+    style={
+      Array [
+        Object {
+          "flexDirection": "column",
+        },
+        Array [
+          Object {
+            "marginHorizontal": 24,
+            "marginTop": 24,
+          },
+          null,
+        ],
+      ]
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {
+            "overflow": "hidden",
+          },
+          Object {
+            "borderRadius": 100,
+          },
+        ]
+      }
+    >
+      <View
+        accessible={true}
+        focusable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "alignItems": "center",
+            "backgroundColor": "#D6EAF3",
+            "flexGrow": 1,
+            "height": 48,
+            "justifyContent": "center",
+            "opacity": 1,
+            "paddingHorizontal": 24,
+            "paddingVertical": 5,
+          }
+        }
+        testID="AcceptTermsButton"
+      >
+        <Text
+          style={
+            Object {
+              "color": "#0768AE",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 16,
+              "lineHeight": 22,
+            }
+          }
+        >
+          global:accept
+        </Text>
+      </View>
+    </View>
+  </View>
+</RNCSafeAreaView>
+`;

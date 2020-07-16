@@ -22,7 +22,7 @@ describe('Support', () => {
 
   it('navigates to Web FAQ', () => {
     const contact = render(<Support />)
-    fireEvent.press(contact.getByTestId('WebFAQLink'))
+    fireEvent.press(contact.getByTestId('FAQLink'))
     expect(navigateToURI).toBeCalledWith(FAQ_LINK)
   })
 

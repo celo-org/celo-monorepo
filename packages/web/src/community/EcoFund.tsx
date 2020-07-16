@@ -15,7 +15,7 @@ import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Rings from 'src/logos/RingsGlyph'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import menuItems, { hashNav } from 'src/shared/menu-items'
-import Navigation from 'src/shared/navigation'
+import Navigation, { NavigationTheme } from 'src/shared/Navigation'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import {
   Application,
@@ -98,11 +98,13 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
             ]}
           >
             <Navigation
+              theme={NavigationTheme.LIGHT}
               onPress={this.selectApplication}
               text={t('ecoFund.applyForFunding')}
               selected={this.state.table === Tables.Applicants}
             />
             <Navigation
+              theme={NavigationTheme.LIGHT}
               onPress={this.selectRecommendation}
               text={t('ecoFund.recommendProject')}
               selected={this.state.table === Tables.Recommendations}

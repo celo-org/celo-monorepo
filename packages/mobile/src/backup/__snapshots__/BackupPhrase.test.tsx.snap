@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders correctly with backup completed 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -71,11 +71,11 @@ exports[`renders correctly with backup completed 1`] = `
       </Text>
     </View>
   </RCTScrollView>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
 
 exports[`renders correctly with backup not completed 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -194,10 +194,14 @@ exports[`renders correctly with backup not completed 1`] = `
   >
     <View
       style={
-        Object {
-          "borderRadius": 100,
-          "overflow": "hidden",
-        }
+        Array [
+          Object {
+            "overflow": "hidden",
+          },
+          Object {
+            "borderRadius": 100,
+          },
+        ]
       }
     >
       <View
@@ -219,11 +223,12 @@ exports[`renders correctly with backup not completed 1`] = `
         style={
           Object {
             "alignItems": "center",
-            "backgroundColor": "#F5F4F0",
+            "backgroundColor": "#F1F0EB",
             "flexGrow": 1,
             "height": 48,
             "justifyContent": "center",
-            "paddingHorizontal": 16,
+            "opacity": undefined,
+            "paddingHorizontal": 24,
             "paddingVertical": 5,
           }
         }
@@ -243,11 +248,11 @@ exports[`renders correctly with backup not completed 1`] = `
       </View>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
 
-exports[`still renders when mneumonic doesnt show up 1`] = `
-<SafeAreaView
+exports[`still renders when mnemonic doesnt show up 1`] = `
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -317,5 +322,5 @@ exports[`still renders when mneumonic doesnt show up 1`] = `
       </Text>
     </View>
   </RCTScrollView>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

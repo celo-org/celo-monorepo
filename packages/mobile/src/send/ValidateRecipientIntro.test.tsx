@@ -49,9 +49,12 @@ describe('ValidateRecipientIntro', () => {
       </Provider>
     )
     fireEvent.press(tree.getByTestId('scanQRCode'))
-    expect(navigate).toHaveBeenCalledWith(Screens.QRScanner, {
-      transactionData: mockTransactionData,
-      scanIsForSecureSend: true,
+    expect(navigate).toHaveBeenCalledWith(Screens.QRNavigator, {
+      screen: Screens.QRScanner,
+      params: {
+        transactionData: mockTransactionData,
+        scanIsForSecureSend: true,
+      },
     })
   })
 })

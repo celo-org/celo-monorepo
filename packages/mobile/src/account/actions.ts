@@ -1,7 +1,5 @@
 import { PincodeType } from 'src/account/reducer'
 import { PaymentRequest } from 'src/account/types'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { DefaultEventNames } from 'src/analytics/constants'
 
 // TODO(Rossy): Remove the _ACTION suffix from these actions for consistency with other other names
 export enum Actions {
@@ -16,7 +14,7 @@ export enum Actions {
   SET_BACKUP_COMPLETED_ACTION = 'ACCOUNT/SET_BACKUP_COMPLETED_ACTION',
   SET_BACKUP_DELAYED_ACTION = 'ACCOUNT/SET_BACKUP_DELAYED_ACTION',
   SET_SOCIAL_BACKUP_COMPLETED_ACTION = 'ACCOUNT/SET_SOCIAL_BACKUP_COMPLETED_ACTION',
-  RESET_BACKUP_STATE = 'ACCOUNT/RESET_BACKUP_STATE',
+  TOGGLE_BACKUP_STATE = 'ACCOUNT/TOGGLE_BACKUP_STATE',
   UPDATE_INCOMING_PAYMENT_REQUESTS = 'ACCOUNT/UPDATE_INCOMING_PAYMENT_REQUESTS',
   UPDATE_OUTGOING_PAYMENT_REQUESTS = 'ACCOUNT/UPDATE_OUTGOING_PAYMENT_REQUESTS',
   DISMISS_EARN_REWARDS = 'ACCOUNT/DISMISS_EARN_REWARDS',
@@ -26,6 +24,7 @@ export enum Actions {
   SET_PROMPT_FORNO = 'ACCOUNT/SET_PROMPT_FORNO',
   SET_RETRY_VERIFICATION_WITH_FORNO = 'ACCOUNT/SET_RETRY_VERIFICATION_WITH_FORNO',
   ACCEPT_TERMS = 'ACCOUNT/ACCEPT_TERMS',
+  MIGRATE_ACCOUNT_BIP39 = 'MIGRATE_ACCOUNT_BIP39',
 }
 
 export interface SetNameAction {
@@ -54,7 +53,6 @@ export interface PhotosNUXClickedAction {
 export interface SetPincodeAction {
   type: Actions.SET_PINCODE
   pincodeType: PincodeType
-  pin?: string
 }
 
 export interface SetPincodeSuccessAction {
@@ -82,8 +80,8 @@ export interface SetSocialBackupCompletedAction {
   type: Actions.SET_SOCIAL_BACKUP_COMPLETED_ACTION
 }
 
-export interface ResetBackupState {
-  type: Actions.RESET_BACKUP_STATE
+export interface ToggleBackupState {
+  type: Actions.TOGGLE_BACKUP_STATE
 }
 
 export interface UpdateIncomingPaymentRequestsAction {
@@ -124,6 +122,10 @@ export interface SetRetryVerificationWithFornoAction {
   retry: boolean
 }
 
+export interface MigrateAccount {
+  type: Actions.MIGRATE_ACCOUNT_BIP39
+}
+
 export type ActionTypes =
   | SetNameAction
   | SetPhoneNumberAction
@@ -136,7 +138,7 @@ export type ActionTypes =
   | SetBackupCompletedAction
   | SetBackupDelayedAction
   | SetSocialBackupCompletedAction
-  | ResetBackupState
+  | ToggleBackupState
   | DismissEarnRewardsAction
   | DismissInviteFriendsAction
   | DismissGetVerifiedAction
@@ -146,6 +148,7 @@ export type ActionTypes =
   | SetPromptFornoAction
   | SetRetryVerificationWithFornoAction
   | AcceptTermsAction
+  | MigrateAccount
 
 export function setName(name: string): SetNameAction {
   return {
@@ -160,7 +163,6 @@ export function acceptTerms(): AcceptTermsAction {
 }
 
 export function setPhoneNumber(e164PhoneNumber: string, countryCode: string): SetPhoneNumberAction {
-  CeloAnalytics.track(DefaultEventNames.phoneNumberSet, { countryCode })
   return {
     type: Actions.SET_PHONE_NUMBER,
     e164PhoneNumber,
@@ -176,10 +178,9 @@ export const photosNUXCompleted = (): PhotosNUXClickedAction => ({
   type: Actions.PHOTOSNUX_CLICKED,
 })
 
-export const setPincode = (pincodeType: PincodeType, pin?: string): SetPincodeAction => ({
+export const setPincode = (pincodeType: PincodeType): SetPincodeAction => ({
   type: Actions.SET_PINCODE,
   pincodeType,
-  pin,
 })
 
 export const setPincodeSuccess = (pincodeType: PincodeType): SetPincodeSuccessAction => ({
@@ -207,8 +208,8 @@ export const setSocialBackupCompleted = (): SetSocialBackupCompletedAction => ({
   type: Actions.SET_SOCIAL_BACKUP_COMPLETED_ACTION,
 })
 
-export const resetBackupState = (): ResetBackupState => ({
-  type: Actions.RESET_BACKUP_STATE,
+export const toggleBackupState = (): ToggleBackupState => ({
+  type: Actions.TOGGLE_BACKUP_STATE,
 })
 
 export const updateIncomingPaymentRequests = (
@@ -256,4 +257,8 @@ export const setUserContactDetails = (
   type: Actions.SET_USER_CONTACT_DETAILS,
   contactId,
   thumbnailPath,
+})
+
+export const migrateAccount = (): MigrateAccount => ({
+  type: Actions.MIGRATE_ACCOUNT_BIP39,
 })

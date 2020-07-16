@@ -1,7 +1,9 @@
-import { AttestationUtils, SignatureUtils } from '@celo/utils'
+import { AttestationUtils, SignatureUtils } from '@celo/utils/lib'
+import { eqAddress } from '@celo/utils/lib/address'
 import { concurrentMap, sleep } from '@celo/utils/lib/async'
 import { notEmpty, zip3 } from '@celo/utils/lib/collections'
 import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
+import { appendPath } from '@celo/utils/lib/string'
 import BigNumber from 'bignumber.js'
 import fetch from 'cross-fetch'
 import { Address, CeloContract, NULL_ADDRESS } from '../base'
@@ -14,6 +16,7 @@ import {
   valueToBigNumber,
   valueToInt,
 } from './BaseWrapper'
+import { Validator } from './Validators'
 
 export interface AttestationStat {
   completed: number
@@ -54,7 +57,7 @@ type AttestationServiceRunningCheckResult =
   | { isValid: true; result: ActionableAttestation }
   | { isValid: false; issuer: Address }
 
-interface AttesationServiceRevealRequest {
+export interface AttesationServiceRevealRequest {
   account: Address
   phoneNumber: string
   issuer: string
@@ -463,7 +466,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       salt,
       smsRetrieverAppSig,
     }
-    return fetch(serviceURL + '/attestations', {
+    return fetch(appendPath(serviceURL, 'attestations'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -501,4 +504,125 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       .call()
     return result.toLowerCase() !== NULL_ADDRESS
   }
+
+  /**
+   * Gets the relevant attestation service status for a validator
+   * @param validator Validator to get the attestation service status for
+   */
+  async getAttestationServiceStatus(
+    validator: Validator
+  ): Promise<AttestationServiceStatusResponse> {
+    const accounts = await this.kit.contracts.getAccounts()
+    const hasAttestationSigner = await accounts.hasAuthorizedAttestationSigner(validator.address)
+    const attestationSigner = await accounts.getAttestationSigner(validator.address)
+
+    let attestationServiceURL: string
+
+    const ret: AttestationServiceStatusResponse = {
+      ...validator,
+      hasAttestationSigner,
+      attestationSigner,
+      attestationServiceURL: null,
+      okStatus: false,
+      error: null,
+      smsProviders: [],
+      blacklistedRegionCodes: [],
+      rightAccount: false,
+      metadataURL: null,
+      state: AttestationServiceStatusState.NoAttestationSigner,
+      version: null,
+      ageOfLatestBlock: null,
+    }
+
+    if (!hasAttestationSigner) {
+      return ret
+    }
+
+    const metadataURL = await accounts.getMetadataURL(validator.address)
+    ret.metadataURL = metadataURL
+
+    if (!metadataURL) {
+      ret.state = AttestationServiceStatusState.NoMetadataURL
+    }
+
+    try {
+      const metadata = await IdentityMetadataWrapper.fetchFromURL(this.kit, metadataURL)
+      const attestationServiceURLClaim = metadata.findClaim(ClaimTypes.ATTESTATION_SERVICE_URL)
+
+      if (!attestationServiceURLClaim) {
+        ret.state = AttestationServiceStatusState.NoAttestationServiceURL
+        return ret
+      }
+
+      attestationServiceURL = attestationServiceURLClaim.url
+    } catch (error) {
+      ret.state = AttestationServiceStatusState.InvalidMetadata
+      ret.error = error
+      return ret
+    }
+
+    ret.attestationServiceURL = attestationServiceURL
+
+    try {
+      const statusResponse = await fetch(appendPath(attestationServiceURL, 'status'))
+
+      if (!statusResponse.ok) {
+        ret.state = AttestationServiceStatusState.UnreachableAttestationService
+        return ret
+      }
+
+      ret.okStatus = true
+      const statusResponseBody = await statusResponse.json()
+      ret.smsProviders = statusResponseBody.smsProviders
+      ret.blacklistedRegionCodes = statusResponseBody.blacklistedRegionCodes
+      ret.rightAccount = eqAddress(validator.address, statusResponseBody.accountAddress)
+      ret.state = AttestationServiceStatusState.Valid
+      ret.version = statusResponseBody.version
+      ret.ageOfLatestBlock = statusResponseBody.ageOfLatestBlock
+      return ret
+    } catch (error) {
+      ret.state = AttestationServiceStatusState.UnreachableAttestationService
+      ret.error = error
+      return ret
+    }
+  }
+
+  async revoke(identifer: string, account: Address) {
+    const accounts = await this.contract.methods.lookupAccountsForIdentifier(identifer).call()
+    const idx = accounts.findIndex((acc) => eqAddress(acc, account))
+    if (idx < 0) {
+      throw new Error("Account not found in identifier's accounts")
+    }
+    return toTransactionObject(this.kit, this.contract.methods.revoke(identifer, idx))
+  }
+}
+
+enum AttestationServiceStatusState {
+  NoAttestationSigner = 'NoAttestationSigner',
+  NoMetadataURL = 'NoMetadataURL',
+  InvalidMetadata = 'InvalidMetadata',
+  NoAttestationServiceURL = 'NoAttestationServiceURL',
+  UnreachableAttestationService = 'UnreachableAttestationService',
+  Valid = 'Valid',
+}
+interface AttestationServiceStatusResponse {
+  name: string
+  address: Address
+  ecdsaPublicKey: string
+  blsPublicKey: string
+  affiliation: string | null
+  score: BigNumber
+  hasAttestationSigner: boolean
+  attestationSigner: string
+  attestationServiceURL: string | null
+  metadataURL: string | null
+  okStatus: boolean
+  error: null | Error
+  smsProviders: string[]
+  blacklistedRegionCodes: string[]
+  rightAccount: boolean
+  signer: string
+  state: AttestationServiceStatusState
+  version: string | null
+  ageOfLatestBlock: number | null
 }

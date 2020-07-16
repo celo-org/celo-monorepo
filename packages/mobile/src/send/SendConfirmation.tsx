@@ -9,16 +9,16 @@ import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { FeeEvents, SendEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
+import BackButton from 'src/components/BackButton.v2'
 import CommentTextInput from 'src/components/CommentTextInput'
-import CurrencyDisplay, { DisplayType, FormatType } from 'src/components/CurrencyDisplay'
-import FeeIcon from 'src/components/FeeIcon'
+import CurrencyDisplay, { DisplayType } from 'src/components/CurrencyDisplay'
+import FeeDrawer from 'src/components/FeeDrawer'
 import InviteOptionsModal from 'src/components/InviteOptionsModal'
-import LineItemRow from 'src/components/LineItemRow.v2'
 import ShortenedAddress from 'src/components/ShortenedAddress'
 import TotalLineItem from 'src/components/TotalLineItem.v2'
 import { FeeType } from 'src/fees/actions'
@@ -33,7 +33,11 @@ import { AddressValidationType } from 'src/identity/reducer'
 import { getAddressValidationType, getSecureSendAddress } from 'src/identity/secureSend'
 import { InviteBy } from 'src/invite/actions'
 import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
-import { navigate, navigateBack } from 'src/navigator/NavigationService'
+import { LocalCurrencyCode } from 'src/localCurrency/consts'
+import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
+import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
+import { emptyHeader } from 'src/navigator/Headers.v2'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { getDisplayName, getRecipientThumbnail } from 'src/recipients/recipient'
@@ -50,7 +54,7 @@ import { currentAccountSelector } from 'src/web3/selectors'
 interface StateProps {
   account: string | null
   isSending: boolean
-  defaultCountryCode: string
+  defaultCountryCode: string | null
   dollarBalance: string
   appConnected: boolean
   transactionData: TransactionDataInput
@@ -58,6 +62,8 @@ interface StateProps {
   addressValidationType: AddressValidationType
   validatedRecipientAddress?: string
   addressJustValidated?: boolean
+  localCurrencyCode: LocalCurrencyCode
+  localCurrencyExchangeRate?: string | null
 }
 
 interface DispatchProps {
@@ -97,6 +103,8 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const addressValidationType = getAddressValidationType(recipient, secureSendPhoneNumberMapping)
   // Undefined or null means no addresses ever validated through secure send
   const validatedRecipientAddress = getSecureSendAddress(recipient, secureSendPhoneNumberMapping)
+  const localCurrencyCode = getLocalCurrencyCode(state)
+  const localCurrencyExchangeRate = getLocalCurrencyExchangeRate(state)
 
   return {
     account: currentAccountSelector(state),
@@ -109,8 +117,15 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
     addressValidationType,
     validatedRecipientAddress,
     addressJustValidated,
+    localCurrencyCode,
+    localCurrencyExchangeRate,
   }
 }
+
+export const sendConfirmationScreenNavOptions = () => ({
+  ...emptyHeader,
+  headerLeft: () => <BackButton eventName={SendEvents.send_confirm_back} />,
+})
 
 export class SendConfirmation extends React.Component<Props, State> {
   state = {
@@ -139,6 +154,7 @@ export class SendConfirmation extends React.Component<Props, State> {
 
   sendOrInvite = (inviteMethod?: InviteBy) => {
     const {
+      type,
       amount,
       recipient,
       recipientAddress,
@@ -146,11 +162,24 @@ export class SendConfirmation extends React.Component<Props, State> {
     } = this.props.confirmationInput
     const { comment } = this.state
 
-    const timestamp = Date.now()
+    const localCurrencyAmount = convertDollarsToLocalAmount(
+      amount,
+      this.props.localCurrencyExchangeRate
+    )
+
+    ValoraAnalytics.track(SendEvents.send_confim_send, {
+      isScan: !!this.props.route.params?.isFromScan,
+      isInvite: !recipientAddress,
+      isRequest: type === TokenTransactionType.PayRequest,
+      localCurrencyExchangeRate: this.props.localCurrencyExchangeRate,
+      localCurrency: this.props.localCurrencyCode,
+      dollarAmount: amount.toString(),
+      localCurrencyAmount: localCurrencyAmount ? localCurrencyAmount.toString() : null,
+      commentLength: this.state.comment.length,
+    })
 
     this.props.sendPaymentOrInvite(
       amount,
-      timestamp,
       comment,
       recipient,
       recipientAddress,
@@ -161,24 +190,11 @@ export class SendConfirmation extends React.Component<Props, State> {
 
   onEditAddressClick = () => {
     const { transactionData, addressValidationType } = this.props
+    ValoraAnalytics.track(SendEvents.send_secure_edit)
     navigate(Screens.ValidateRecipientIntro, {
       transactionData,
       addressValidationType,
     })
-  }
-
-  onEditClick = () => {
-    CeloAnalytics.track(CustomEventNames.edit_dollar_confirm)
-    navigateBack()
-  }
-
-  onCancelClick = () => {
-    const { firebasePendingRequestUid } = this.props.confirmationInput
-    if (firebasePendingRequestUid) {
-      this.props.declinePaymentRequest(firebasePendingRequestUid)
-    }
-    Logger.showMessage(this.props.t('paymentRequestFlow:requestDeclined'))
-    navigateBack()
   }
 
   renderHeader = () => {
@@ -239,7 +255,7 @@ export class SendConfirmation extends React.Component<Props, State> {
       confirmationInput,
       validatedRecipientAddress,
     } = this.props
-    const { amount, recipient, recipientAddress, type } = confirmationInput
+    const { amount, recipient, recipientAddress, type, reason } = confirmationInput
 
     const fee = getFeeDollars(asyncFee.result)
     const amountWithFee = amount.plus(fee || 0)
@@ -248,13 +264,9 @@ export class SendConfirmation extends React.Component<Props, State> {
 
     const isInvite = type === TokenTransactionType.InviteSent
     const inviteFee = getInvitationVerificationFeeInDollars()
-    const inviteFeeAmount = {
-      value: inviteFee,
-      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-    }
 
-    const subtotalAmount = amount.isGreaterThan(0) && {
-      value: amount,
+    const subtotalAmount = {
+      value: amount || inviteFee,
       currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
     }
 
@@ -268,51 +280,39 @@ export class SendConfirmation extends React.Component<Props, State> {
     } else {
       primaryBtnInfo = {
         action: this.onSendClick,
-        text: t('send'),
+        text: t('global:send'),
         disabled: isPrimaryButtonDisabled,
       }
     }
+
+    const paymentRequestComment = reason || ''
 
     const renderFeeContainer = () => {
       // 'fee' already contains the invitation fee for invites
       // so we adjust it here
       const securityFee = isInvite && fee ? fee.minus(inviteFee) : fee
 
-      const securityFeeAmount = securityFee && {
-        value: securityFee,
-        currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-      }
-
+      ValoraAnalytics.track(FeeEvents.fee_rendered, {
+        feeType: 'Security',
+        fee: securityFee ? securityFee.toString() : securityFee,
+      })
       const totalAmount = {
         value: amountWithFee,
         currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
       }
 
-      // Replace fee lines with a fee drawer
       return (
         <View style={styles.feeContainer}>
-          {subtotalAmount && (
-            <LineItemRow
-              title={t('global:subtotal')}
-              amount={<CurrencyDisplay amount={subtotalAmount} />}
-            />
-          )}
-          {isInvite && (
-            <LineItemRow
-              title={t('inviteFee')}
-              amount={<CurrencyDisplay amount={inviteFeeAmount} />}
-            />
-          )}
-          <LineItemRow
-            title={t('securityFee')}
-            titleIcon={<FeeIcon />}
-            amount={
-              securityFeeAmount && (
-                <CurrencyDisplay amount={securityFeeAmount} formatType={FormatType.Fee} />
-              )
-            }
-            isLoading={asyncFee.loading}
-            hasError={!!asyncFee.error}
+          <FeeDrawer
+            testID={'feeDrawer/SendConfirmation'}
+            isEstimate={true}
+            currency={CURRENCY_ENUM.DOLLAR}
+            inviteFee={inviteFee}
+            isInvite={isInvite}
+            securityFee={securityFee}
+            feeLoading={asyncFee.loading}
+            feeHasError={!!asyncFee.error}
+            totalFee={fee}
           />
           <TotalLineItem amount={totalAmount} />
         </View>
@@ -320,7 +320,7 @@ export class SendConfirmation extends React.Component<Props, State> {
     }
 
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['bottom']}>
         <DisconnectBanner />
         <ReviewFrame
           FooterComponent={renderFeeContainer}
@@ -337,7 +337,9 @@ export class SendConfirmation extends React.Component<Props, State> {
                 address={recipientAddress || ''}
               />
               <View style={styles.recipientInfoContainer}>
-                <Text style={styles.headerText}>{t('sending')}</Text>
+                <Text style={styles.headerText} testID="HeaderText">
+                  {t('sending')}
+                </Text>
                 <Text style={styles.displayName}>
                   {getDisplayName({ recipient, recipientAddress, t })}
                 </Text>
@@ -358,14 +360,20 @@ export class SendConfirmation extends React.Component<Props, State> {
             <CurrencyDisplay
               type={DisplayType.Default}
               style={styles.amount}
-              amount={subtotalAmount || inviteFeeAmount}
+              amount={subtotalAmount}
             />
-            <CommentTextInput
-              testID={'send'}
-              onCommentChange={this.onCommentChange}
-              comment={this.state.comment}
-              onBlur={this.onBlur}
-            />
+            {type === TokenTransactionType.PayRequest ? (
+              <View>
+                <Text style={styles.paymentRequestComment}>{paymentRequestComment}</Text>
+              </View>
+            ) : (
+              <CommentTextInput
+                testID={'send'}
+                onCommentChange={this.onCommentChange}
+                comment={this.state.comment}
+                onBlur={this.onBlur}
+              />
+            )}
           </View>
           <InviteOptionsModal
             isVisible={this.state.modalVisible}
@@ -402,7 +410,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.light,
-    padding: 8,
+    paddingHorizontal: 8,
   },
   feeContainer: {
     padding: 16,
@@ -448,9 +456,13 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     ...fontStyles.largeNumber,
   },
+  paymentRequestComment: {
+    ...fontStyles.large,
+    color: colors.gray5,
+  },
 })
 
 export default connect<StateProps, DispatchProps, OwnProps, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.sendFlow7)(SendConfirmation))
+)(withTranslation<Props>(Namespaces.sendFlow7)(SendConfirmation))
