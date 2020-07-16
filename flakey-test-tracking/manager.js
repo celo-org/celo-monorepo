@@ -1,4 +1,9 @@
-const { shouldUseGitHub, shouldSkipKnownFlakes, shouldReportFlakes } = require('./config')
+const {
+  shouldUseGitHub,
+  shouldSkipKnownFlakes,
+  shouldReportFlakes,
+  shouldAddCheckToPR,
+} = require('./config')
 const db = require('./db')
 const GitHub = require('./github')
 
@@ -20,6 +25,9 @@ class FlakeManager {
       if (shouldReportFlakes) {
         knownFlakes = await github.fetchKnownFlakes()
         db.writeKnownFlakes(knownFlakes)
+        if (shouldAddCheckToPR) {
+          await github.startCheck()
+        }
       }
     }
     return new FlakeManager(github, knownFlakes)

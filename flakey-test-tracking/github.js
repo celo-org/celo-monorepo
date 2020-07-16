@@ -19,9 +19,6 @@ class GitHub {
     }
     this.app = app
     this.rest = rest
-    if (shouldAddCheckToPR) {
-      this.startCheck()
-    }
   }
 
   static async build() {
@@ -44,8 +41,6 @@ class GitHub {
   }
 
   async report(flakes, skippedTests) {
-    console.log('\nSending flake tracker results to GitHub...\n')
-
     const promises = []
 
     if (shouldCreateIssues) {
@@ -60,6 +55,8 @@ class GitHub {
     if (shouldAddCheckToPR) {
       promises.push(this.endCheck(flakes, skippedTests))
     }
+
+    console.log('\nSending flake tracker results to GitHub...\n')
 
     return Promise.all(promises)
   }
@@ -163,7 +160,7 @@ class GitHub {
 
     const errMsg = 'Failed to fetch existing flakey test issues from GitHub.'
 
-    console.log('\nFetching flakey tests from GitHub...\n')
+    console.log('\nFetching known flakey tests from GitHub...\n')
 
     const flakeIssues = (await this.safeExec(fn, errMsg)) || []
 
