@@ -4,7 +4,7 @@ const { retry } = require('@octokit/plugin-retry')
 const Client = Octokit.plugin(retry)
 const AnsiToHtml = require('ansi-to-html')
 const convert = new AnsiToHtml()
-const { shouldCreateIssues, shouldAddCheckToPR, shouldSkipFlakes } = require('./utils')
+const { shouldCreateIssues, shouldAddCheckToPR, shouldSkipFlakes } = require('./config')
 
 const FlakeLabel = 'FLAKEY'
 const defaults = {
