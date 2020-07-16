@@ -19,6 +19,9 @@ class GitHub {
     }
     this.app = app
     this.rest = rest
+    if (shouldAddCheckToPR) {
+      this.startCheck()
+    }
   }
 
   static async build() {
@@ -29,10 +32,6 @@ class GitHub {
     })
 
     const rest = await auth(app)
-
-    if (shouldAddCheckToPR) {
-      await this.startCheck()
-    }
 
     return new GitHub(app, rest)
   }
