@@ -5,9 +5,10 @@ import { writeExchangeRatePair } from '../firebase'
 import { getContractKit } from '../util/utils'
 
 // Amounts to estimate the exchange rate, as the rate varies based on transaction size
+// A small amount returns a rate closer to the median rate
 const SELL_AMOUNTS = {
-  [CURRENCY_ENUM.DOLLAR]: new BigNumber(1 * 1000000000000000000), // 1 dollar
-  [CURRENCY_ENUM.GOLD]: new BigNumber(1 * 1000000000000000000), // 1 gold
+  [CURRENCY_ENUM.DOLLAR]: new BigNumber(0.01 * 1000000000000000000), // 0.01 dollar
+  [CURRENCY_ENUM.GOLD]: new BigNumber(0.01 * 1000000000000000000), // 0.01 gold
 }
 
 export async function handleExchangeQuery() {
@@ -32,6 +33,8 @@ export async function handleExchangeQuery() {
   )
 }
 
+// Note difference in gold vs dollar rate due the Exchange's forced spread of 0.5%
+// TODO: Fetch this data by listening directly for a MedianUpdated event on chain
 async function getExchangeRate(makerToken: CURRENCY_ENUM, contractKitInstance: ContractKit) {
   const exchange = await contractKitInstance.contracts.getExchange()
   const rate = await exchange.getExchangeRate(
