@@ -4,6 +4,8 @@ import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
 import RNGeth from 'react-native-geth'
+import { GethEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { DEFAULT_TESTNET } from 'src/config'
 import { SYNCING_MAX_PEERS } from 'src/geth/consts'
 import networkConfig from 'src/geth/networkConfig'
@@ -19,6 +21,8 @@ export const FailedToFetchStaticNodesError = new Error(
 export const FailedToFetchGenesisBlockError = new Error(
   'Failed to fetch genesis block from Google storage'
 )
+
+export const PROVIDER_CONNECTION_ERROR = "connection error: couldn't connect to node"
 
 // We are never going to run mobile node in full or fast mode.
 enum SyncMode {
@@ -108,12 +112,13 @@ async function createNewGeth(sync: boolean = true): Promise<typeof RNGeth> {
   return new RNGeth(gethOptions)
 }
 
-async function initGeth(sync: boolean = true) {
+export async function initGeth(sync: boolean = true): Promise<typeof gethInstance> {
+  ValoraAnalytics.track(GethEvents.geth_init_start, { sync })
   Logger.info('Geth@init', `Create a new Geth instance with sync=${sync}`)
 
   if (gethLock) {
     Logger.warn('Geth@init', 'Geth create already in progress.')
-    return
+    return null
   }
   gethLock = true
 
@@ -124,7 +129,9 @@ async function initGeth(sync: boolean = true) {
     if (!(await ensureStaticNodesInitialized(sync))) {
       throw FailedToFetchStaticNodesError
     }
+    ValoraAnalytics.track(GethEvents.create_geth_start)
     const geth = await createNewGeth(sync)
+    ValoraAnalytics.track(GethEvents.create_geth_finish)
 
     if (!sync) {
       // chain data must be deleted to prevent geth from syncing with data saver on
@@ -134,7 +141,9 @@ async function initGeth(sync: boolean = true) {
     }
 
     try {
+      ValoraAnalytics.track(GethEvents.start_geth_start)
       await geth.start()
+      ValoraAnalytics.track(GethEvents.start_geth_finish)
       gethInstance = geth
       if (sync) {
         geth.subscribeNewHead()
@@ -152,15 +161,18 @@ async function initGeth(sync: boolean = true) {
         throw e
       }
     }
+
+    return gethInstance
   } finally {
     gethLock = false
   }
 }
 
-export async function getGeth(sync: boolean = true): Promise<typeof gethInstance> {
-  Logger.debug('Geth@getGeth', 'Getting Geth Instance')
-  await initGeth(sync)
-  return gethInstance
+export function isProviderConnectionError(error: any) {
+  return error
+    ?.toString()
+    ?.toLowerCase()
+    .includes(PROVIDER_CONNECTION_ERROR)
 }
 
 async function ensureStaticNodesInitialized(sync: boolean = true): Promise<boolean> {

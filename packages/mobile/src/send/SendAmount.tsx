@@ -14,7 +14,7 @@ import { getNumberFormatSettings } from 'react-native-localize'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { RequestEvents, SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -70,13 +70,13 @@ export const sendAmountScreenNavOptions = ({
 }: {
   route: RouteProp<StackParamList, Screens.SendAmount>
 }) => {
-  const title = route.params?.isRequest
+  const title = route.params?.isOutgoingPaymentRequest
     ? i18n.t('paymentRequestFlow:request')
     : i18n.t('sendFlow7:send')
 
-  const eventName = route.params?.isRequest
-    ? AnalyticsEvents.request_amount_back
-    : AnalyticsEvents.send_amount_back
+  const eventName = route.params?.isOutgoingPaymentRequest
+    ? RequestEvents.request_amount_back
+    : SendEvents.send_amount_back
 
   return {
     ...emptyHeader,
@@ -88,8 +88,7 @@ export const sendAmountScreenNavOptions = ({
 function SendAmount(props: Props) {
   const dispatch = useDispatch()
 
-  const isRequest = props.route.params?.isRequest ?? false
-  const recipient = props.route.params.recipient
+  const { isOutgoingPaymentRequest, recipient } = props.route.params
 
   React.useEffect(() => {
     dispatch(fetchDollarBalance())
@@ -152,15 +151,12 @@ function SendAmount(props: Props) {
     }
   }, [amount, setAmount])
 
-  const getDollarAmount = React.useCallback(
-    (localAmount: BigNumber.Value) => {
-      const dollarsAmount =
-        convertLocalAmountToDollars(localAmount, localCurrencyExchangeRate) || new BigNumber('')
+  const getDollarAmount = (localAmount: BigNumber.Value) => {
+    const dollarsAmount =
+      convertLocalAmountToDollars(localAmount, localCurrencyExchangeRate) || new BigNumber('')
 
-      return convertDollarsToMaxSupportedPrecision(dollarsAmount)
-    },
-    [localCurrencyExchangeRate]
-  )
+    return convertDollarsToMaxSupportedPrecision(dollarsAmount)
+  }
 
   const parsedLocalAmount = parseInputAmount(amount, decimalSeparator)
   const dollarAmount = getDollarAmount(parsedLocalAmount)
@@ -228,14 +224,17 @@ function SendAmount(props: Props) {
 
     dispatch(hideAlert())
 
-    if (addressValidationType !== AddressValidationType.NONE) {
+    if (
+      addressValidationType !== AddressValidationType.NONE &&
+      recipient.kind !== RecipientKind.QrCode &&
+      recipient.kind !== RecipientKind.Address
+    ) {
       navigate(Screens.ValidateRecipientIntro, {
         transactionData,
         addressValidationType,
-        isFromScan: props.route.params?.isFromScan,
       })
     } else {
-      ValoraAnalytics.track(AnalyticsEvents.send_continue, continueAnalyticsParams)
+      ValoraAnalytics.track(SendEvents.send_amount_continue, continueAnalyticsParams)
       navigate(Screens.SendConfirmation, {
         transactionData,
         isFromScan: props.route.params?.isFromScan,
@@ -252,17 +251,21 @@ function SendAmount(props: Props) {
   const onRequest = React.useCallback(() => {
     const transactionData = getTransactionData(TokenTransactionType.PayRequest)
 
-    if (addressValidationType !== AddressValidationType.NONE) {
+    if (
+      addressValidationType !== AddressValidationType.NONE &&
+      recipient.kind !== RecipientKind.QrCode &&
+      recipient.kind !== RecipientKind.Address
+    ) {
       navigate(Screens.ValidateRecipientIntro, {
         transactionData,
         addressValidationType,
-        isPaymentRequest: true,
+        isOutgoingPaymentRequest: true,
       })
     } else if (recipientVerificationStatus !== RecipientVerificationStatus.VERIFIED) {
-      ValoraAnalytics.track(AnalyticsEvents.request_unavailable, continueAnalyticsParams)
+      ValoraAnalytics.track(RequestEvents.request_unavailable, continueAnalyticsParams)
       navigate(Screens.PaymentRequestUnavailable, { transactionData })
     } else {
-      ValoraAnalytics.track(AnalyticsEvents.request_continue, continueAnalyticsParams)
+      ValoraAnalytics.track(RequestEvents.request_amount_continue, continueAnalyticsParams)
       navigate(Screens.PaymentRequestConfirmation, { transactionData })
     }
   }, [addressValidationType, getTransactionData])
@@ -296,7 +299,7 @@ function SendAmount(props: Props) {
         size={BtnSizes.FULL}
         text={t('global:review')}
         type={BtnTypes.SECONDARY}
-        onPress={isRequest ? onRequest : onSend}
+        onPress={isOutgoingPaymentRequest ? onRequest : onSend}
         disabled={reviewBtnDisabled}
         testID="Review"
       />

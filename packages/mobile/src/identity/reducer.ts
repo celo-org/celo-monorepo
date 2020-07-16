@@ -1,7 +1,5 @@
 import dotProp from 'dot-prop-immutable'
 import { RehydrateAction } from 'redux-persist'
-import { AnalyticsEvents } from 'src/analytics/Events'
-import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { Actions, ActionTypes } from 'src/identity/actions'
 import { ContactMatches, ImportContactsStatus, VerificationStatus } from 'src/identity/types'
 import { AttestationCode } from 'src/identity/verification'
@@ -36,10 +34,13 @@ export enum AddressValidationType {
 }
 
 export interface SecureSendPhoneNumberMapping {
-  [e164Number: string]: {
-    address: string | undefined
-    addressValidationType: AddressValidationType
-  }
+  [e164Number: string]: SecureSendDetails
+}
+
+export interface SecureSendDetails {
+  address: string | undefined
+  addressValidationType: AddressValidationType
+  isFetchingAddresses: boolean
 }
 
 export interface State {
@@ -99,6 +100,7 @@ export const reducer = (
           current: 0,
           total: 0,
         },
+        isFetchingAddresses: false,
       }
     }
     case Actions.RESET_VERIFICATION:
@@ -179,9 +181,6 @@ export const reducer = (
       }
     case Actions.ADD_CONTACT_MATCHES:
       const matchedContacts = { ...state.matchedContacts, ...action.matches }
-      ValoraAnalytics.track(AnalyticsEvents.add_contact_match, {
-        contactsMatched: Object.keys(matchedContacts).length,
-      })
       return {
         ...state,
         matchedContacts,
@@ -217,6 +216,24 @@ export const reducer = (
             address: undefined,
             addressValidationType: action.addressValidationType,
           }
+        ),
+      }
+    case Actions.FETCH_ADDRESSES_AND_VALIDATION_STATUS:
+      return {
+        ...state,
+        secureSendPhoneNumberMapping: dotProp.set(
+          state.secureSendPhoneNumberMapping,
+          `${action.e164Number}.isFetchingAddresses`,
+          true
+        ),
+      }
+    case Actions.END_FETCHING_ADDRESSES:
+      return {
+        ...state,
+        secureSendPhoneNumberMapping: dotProp.set(
+          state.secureSendPhoneNumberMapping,
+          `${action.e164Number}.isFetchingAddresses`,
+          false
         ),
       }
     default:

@@ -5,6 +5,7 @@ import { DEV_SETTINGS_ACTIVE_INITIALLY } from 'src/config'
 import { features } from 'src/flags'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { getRemoteTime } from 'src/utils/time'
+import { Actions as Web3Actions, ActionTypes as Web3ActionTypes } from 'src/web3/actions'
 
 export interface State {
   name: string | null
@@ -28,6 +29,7 @@ export interface State {
   promptFornoIfNeeded: boolean
   retryVerificationWithForno: boolean
   acceptedTerms: boolean
+  hasMigratedToNewBip39: boolean
 }
 
 export enum PincodeType {
@@ -65,11 +67,12 @@ export const initialState = {
   promptFornoIfNeeded: false,
   acceptedTerms: false,
   retryVerificationWithForno: features.VERIFICATION_FORNO_RETRY,
+  hasMigratedToNewBip39: false,
 }
 
 export const reducer = (
   state: State | undefined = initialState,
-  action: ActionTypes | RehydrateAction
+  action: ActionTypes | RehydrateAction | Web3ActionTypes
 ): State => {
   switch (action.type) {
     case REHYDRATE: {
@@ -195,6 +198,12 @@ export const reducer = (
       }
     case Actions.ACCEPT_TERMS: {
       return { ...state, acceptedTerms: true }
+    }
+    case Web3Actions.SET_ACCOUNT: {
+      return {
+        ...state,
+        hasMigratedToNewBip39: true,
+      }
     }
     default:
       return state

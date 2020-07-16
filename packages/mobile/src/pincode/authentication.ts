@@ -5,14 +5,17 @@
  * The password is a combination of the two. It is used for unlocking the account in geth
  */
 
+import { isValidAddress, normalizeAddress } from '@celo/utils/src/address'
 import { sha256 } from 'ethereumjs-util'
 import { asyncRandomBytes } from 'react-native-secure-randombytes'
 import { call, select } from 'redux-saga/effects'
 import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
+import { ErrorMessages } from 'src/app/ErrorMessages'
 import { UNLOCK_DURATION } from 'src/geth/consts'
+import i18n from 'src/i18n'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import {
@@ -27,7 +30,7 @@ import {
 } from 'src/pincode/PasswordCache'
 import { retrieveStoredItem, storeItem } from 'src/storage/keychain'
 import Logger from 'src/utils/Logger'
-import { getConnectedWalletAsync } from 'src/web3/contracts'
+import { getWalletAsync } from 'src/web3/contracts'
 
 const TAG = 'pincode/authentication'
 
@@ -91,7 +94,10 @@ function getPasswordHash(password: string) {
 }
 
 function passwordHashStorageKey(account: string) {
-  return `${STORAGE_KEYS.PASSWORD_HASH}-${account}`
+  if (!isValidAddress(account)) {
+    throw new Error('Expecting valid address for computing storage key')
+  }
+  return `${STORAGE_KEYS.PASSWORD_HASH}-${normalizeAddress(account)}`
 }
 
 function storePasswordHash(hash: string, account: string) {
@@ -105,10 +111,11 @@ async function retrievePasswordHash(account: string) {
     try {
       hash = await retrieveStoredItem(passwordHashStorageKey(account))
     } catch (err) {
-      Logger.error(`${TAG}@retrievePasswordHash`, err)
+      Logger.error(`${TAG}@retrievePasswordHash`, 'Error retrieving hash', err, true)
       return null
     }
     if (!hash) {
+      Logger.warn(`${TAG}@retrievePasswordHash`, 'No password hash found in store')
       return null
     }
     setCachedPasswordHash(account, hash)
@@ -143,7 +150,7 @@ export function* getPasswordSaga(account: string, withVerification?: boolean, st
 
   if (pincodeType === PincodeType.Unset) {
     Logger.error(TAG + '@getPincode', 'Pin has never been set')
-    ValoraAnalytics.track(AnalyticsEvents.pin_never_set)
+    ValoraAnalytics.track(OnboardingEvents.pin_never_set)
     throw Error('Pin has never been set')
   }
 
@@ -195,7 +202,7 @@ export async function checkPin(pin: string, account: string) {
   const correctHash = await retrievePasswordHash(account)
 
   if (!correctHash) {
-    Logger.error(`${TAG}@checkPin`, 'No password hash stored. Creating and storing it.')
+    Logger.warn(`${TAG}@checkPin`, 'No password hash stored. Checking with rpcWallet instead.')
     const password = await getPasswordForPin(pin)
     const unlocked = await ensureCorrectPassword(password, account)
     if (unlocked) {
@@ -214,11 +221,12 @@ export async function ensureCorrectPassword(
   currentAccount: string
 ): Promise<boolean> {
   try {
-    const wallet = await getConnectedWalletAsync()
+    const wallet = await getWalletAsync()
     const result = await wallet.unlockAccount(currentAccount, password, UNLOCK_DURATION)
     return result
   } catch (error) {
-    Logger.error(TAG, 'Error attempting to unlock wallet')
+    Logger.error(TAG, 'Error attempting to unlock wallet', error, true)
+    Logger.showError(i18n.t(ErrorMessages.ACCOUNT_UNLOCK_FAILED))
     return false
   }
 }

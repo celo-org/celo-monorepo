@@ -16,14 +16,17 @@ import { connect } from 'react-redux'
 import { devModeTriggerClicked, toggleBackupState } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { SettingsEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import {
   resetAppOpenedState,
   setAnalyticsEnabled,
   setNumberVerified,
   setRequirePinOnAppOpen,
+  setSessionId,
 } from 'src/app/actions'
+import { sessionIdSelector } from 'src/app/selectors'
+import SessionId from 'src/components/SessionId'
 import { WarningModal } from 'src/components/WarningModal'
 import { AVAILABLE_LANGUAGES, TOS_LINK } from 'src/config'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -49,6 +52,7 @@ interface DispatchProps {
   devModeTriggerClicked: typeof devModeTriggerClicked
   setRequirePinOnAppOpen: typeof setRequirePinOnAppOpen
   toggleFornoMode: typeof toggleFornoMode
+  setSessionId: typeof setSessionId
 }
 
 interface StateProps {
@@ -63,6 +67,7 @@ interface StateProps {
   fornoEnabled: boolean
   gethStartedThisSession: boolean
   preferredCurrencyCode: LocalCurrencyCode
+  sessionId: string
 }
 
 type OwnProps = StackScreenProps<StackParamList, Screens.Settings>
@@ -82,6 +87,7 @@ const mapStateToProps = (state: RootState): StateProps => {
     fornoEnabled: state.web3.fornoMode,
     gethStartedThisSession: state.geth.gethStartedThisSession,
     preferredCurrencyCode: getLocalCurrencyCode(state),
+    sessionId: sessionIdSelector(state),
   }
 }
 
@@ -94,6 +100,7 @@ const mapDispatchToProps = {
   devModeTriggerClicked,
   setRequirePinOnAppOpen,
   toggleFornoMode,
+  setSessionId,
 }
 
 interface State {
@@ -101,13 +108,20 @@ interface State {
 }
 
 export class Account extends React.Component<Props, State> {
+  componentDidMount = () => {
+    const sessionId = ValoraAnalytics.getSessionId()
+    if (sessionId !== this.props.sessionId) {
+      this.props.setSessionId(sessionId)
+    }
+  }
+
   goToProfile = () => {
-    ValoraAnalytics.track(AnalyticsEvents.edit_profile)
+    ValoraAnalytics.track(SettingsEvents.settings_profile_edit)
     this.props.navigation.navigate(Screens.Profile)
   }
 
   goToLanguageSetting = () => {
-    this.props.navigation.navigate(Screens.Language, { fromSettings: true })
+    this.props.navigation.navigate(Screens.Language, { nextScreen: this.props.route.name })
   }
 
   goToLocalCurrencySetting = () => {
@@ -116,6 +130,7 @@ export class Account extends React.Component<Props, State> {
 
   goToLicenses = () => {
     this.props.navigation.navigate(Screens.Licenses)
+    ValoraAnalytics.track(SettingsEvents.licenses_view)
   }
 
   goToSupport = () => {
@@ -164,6 +179,10 @@ export class Account extends React.Component<Props, State> {
             </TouchableOpacity>
           </View> */}
           <View style={styles.devSettingsItem}>
+            <Text style={fontStyles.label}>Session ID</Text>
+            <SessionId sessionId={this.props.sessionId || ''} />
+          </View>
+          <View style={styles.devSettingsItem}>
             <TouchableOpacity onPress={this.toggleNumberVerified}>
               <Text>Toggle verification done</Text>
             </TouchableOpacity>
@@ -192,6 +211,13 @@ export class Account extends React.Component<Props, State> {
         </View>
       )
     }
+  }
+
+  handleRequirePinToggle = (value: boolean) => {
+    this.props.setRequirePinOnAppOpen(value)
+    ValoraAnalytics.track(SettingsEvents.pin_require_on_load, {
+      enabled: value,
+    })
   }
 
   disableFornoMode = () => {
@@ -229,6 +255,7 @@ export class Account extends React.Component<Props, State> {
 
   onTermsPress() {
     navigateToURI(TOS_LINK)
+    ValoraAnalytics.track(SettingsEvents.tos_view)
   }
 
   render() {
@@ -258,7 +285,7 @@ export class Account extends React.Component<Props, State> {
             <SettingsItemSwitch
               title={t('requirePinOnAppOpen')}
               value={this.props.requirePinOnAppOpen}
-              onValueChange={this.props.setRequirePinOnAppOpen}
+              onValueChange={this.handleRequirePinToggle}
             />
             <SettingsItemSwitch
               title={t('enableDataSaver')}
