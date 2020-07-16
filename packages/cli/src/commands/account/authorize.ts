@@ -30,6 +30,9 @@ export default class Authorize extends BaseCommand {
       description:
         'The BLS public key proof-of-possession, which consists of a signature on the account address. 48 bytes.',
     }),
+    ecdsaOnly: flags.boolean({
+      description: 'Authorize only ECDSA keys. BLS keys must be authorized in a separate step.',
+    }),
   }
 
   static args = []
@@ -63,7 +66,7 @@ export default class Authorize extends BaseCommand {
         res.flags.blsKey,
         res.flags.blsPop!
       )
-    } else if (res.flags.role === 'validator') {
+    } else if (res.flags.role === 'validator' && res.flags.ecdsaOnly) {
       tx = await accounts.authorizeValidatorSigner(res.flags.signer, sig)
     } else if (res.flags.role === 'attestation') {
       tx = await accounts.authorizeAttestationSigner(res.flags.signer, sig)
