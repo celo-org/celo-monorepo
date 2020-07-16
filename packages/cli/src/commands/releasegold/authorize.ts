@@ -27,6 +27,9 @@ export default class Authorize extends ReleaseGoldCommand {
       description:
         'The BLS public key proof-of-possession, which consists of a signature on the account address. 48 bytes.',
     }),
+    ecdsaOnly: flags.boolean({
+      description: 'Authorize only ECDSA keys. BLS keys must be authorized in a separate step.',
+    }),
   }
 
   static args = []
@@ -67,7 +70,7 @@ export default class Authorize extends ReleaseGoldCommand {
         flags.blsKey,
         flags.blsPop!
       )
-    } else if (role === 'validator') {
+    } else if (role === 'validator' && flags.ecdsaOnly) {
       tx = await this.releaseGoldWrapper.authorizeValidatorSigner(flags.signer, sig)
     } else if (role === 'attestation') {
       tx = await this.releaseGoldWrapper.authorizeAttestationSigner(flags.signer, sig)
