@@ -79,7 +79,7 @@ const fontStyles = StyleSheet.create({
     color: colors.dark,
   },
   large: standards.large,
-  regular: { ...standards.regular, fontWeight: 'normal' },
+  regular: { ...standards.regular },
   small: standards.small,
   large600: { ...standards.large, fontFamily: Inter.SemiBold },
   regular600: { ...standards.regular, fontFamily: Inter.SemiBold },
