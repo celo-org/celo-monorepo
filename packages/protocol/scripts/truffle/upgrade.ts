@@ -7,9 +7,6 @@ import { MultiSigInstance, ProxyInstance } from 'types'
 
 const Artifactor = require('truffle-artifactor')
 import fs = require('fs')
-const VM = require('ethereumjs-vm')
-
-const vm = new VM()
 
 const argv = require('minimist')(process.argv.slice(2))
 

@@ -1,4 +1,10 @@
 // tslint:disable: max-classes-per-file
+import { makeZContract } from '@celo/protocol/lib/compatibility/internal'
+import {
+  BuildArtifacts,
+  Contract as ZContract
+} from '@openzeppelin/upgrades'
+// const VM = require('ethereumjs-vm')
 
 export class ContractVersion {
 
@@ -33,6 +39,16 @@ export class ContractVersion {
   public toString = () : string => {
     const deltas = [this.storage, this.major, this.minor, this.patch]
     return deltas.join('.')
+  }
+
+  public getDelta = (fromVersion: ContractVersion): ContractVersionDelta => {
+    const difference = [this.storage - fromVersion.storage, this.major - fromVersion.major, this.minor - fromVersion.minor, this.patch - fromVersion.patch]
+    // ContractVersionDeltas require at most one version number be incremented.
+    const nonZero = difference.filter(x => x !== 0)
+    if (nonZero.length > 1 || nonZero.some(x => x !== 1)) {
+      throw new Error(`Invalid delta between versions: ${fromVersion.toString()} -> ${this.toString()}`)
+    }
+    return ContractVersionDelta.fromChanges.apply(null, difference.map(x => x != 0))
   }
 }
 
@@ -101,4 +117,102 @@ export class ContractVersionDelta {
     const deltas = [this.storage, this.major, this.minor, this.patch]
     return deltas.map(d => d.toString()).join('.')
   }
+}
+
+export class ContractVersionReport {
+  constructor(
+    public readonly contract: string,
+    public readonly oldVersion: ContractVersion,
+    public readonly newVersion: ContractVersion) {}
+  delta = (): ContractVersionDelta => {
+    return this.newVersion.getDelta(this.oldVersion)
+  }
+}
+
+/**
+ * A compatibility report with all the detected changes from two compiled
+ * contract folders.
+ */
+export class ContractVersionsReport {
+  constructor(private readonly versions: ContractVersionReport[]) {}
+  push(...versions: ContractVersionReport[]) {
+    this.versions.push(...versions)
+  }
+  include(other: ContractVersionsReport) {
+    this.push(...other.versions)
+  }
+  getVersions = (): ContractVersionReport[] => {
+    return this.versions
+  }
+}
+
+function mergeReports(reports: ContractVersionsReport[]): ContractVersionsReport {
+  const report = new ContractVersionsReport([])
+  reports.forEach((r: ContractVersionsReport): void => {
+    report.include(r)
+  })
+  return report
+}
+
+function getContractVersion(contract: ZContract): ContractVersion {
+  //const vm = new VM()
+  const bytecode = contract.schema.deployedBytecode
+  console.log(bytecode)
+  /*
+  const version = await new Promise((resolve, reject) => {
+    vm.runCode(
+      {
+        code: Buffer.from(bytecode.slice(2), 'hex'),
+      },
+      (err: any, results: any) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve('0x' + results.return.toString('hex'))
+        }
+      }
+    )
+  })
+  */
+  // TODO(asa): This is wrong!
+  return ContractVersion.fromString('1.0.0.0')
+}
+
+function generateContractVersionsReport(oldContract: ZContract, newContract: ZContract): ContractVersionsReport {
+  // Sanity checks
+  if (newContract === null) {
+    throw new Error('newContract cannot be null')
+  }
+  const contractName = newContract.schema.contractName
+
+
+  let oldVersion = ContractVersion.fromString('0.0.0.0')
+  if (oldContract !== null) {
+    oldVersion = getContractVersion(oldContract)
+    // Name sanity check
+    if (oldContract.schema.contractName !== contractName) {
+      throw new Error(`Contract names should be equal: ${oldContract.schema.contractName} !== ${contractName}`)
+    }
+  }
+
+  const newVersion = getContractVersion(newContract)
+  return new ContractVersionsReport([new ContractVersionReport(contractName, oldVersion, newVersion)])
+}
+
+/**
+ * Extracts contract versions from the provided artifacts.
+ *
+ * @param oldArtifacts
+ * @param newArtifacts
+ */
+export function reportContractVersions(
+  oldArtifacts: BuildArtifacts,
+  newArtifacts: BuildArtifacts): ContractVersionsReport {
+  const reports = newArtifacts.listArtifacts()
+  .map((newArtifact) => {
+    const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
+    const oldZContract = oldArtifact ? makeZContract(oldArtifact) : null
+    return generateContractVersionsReport(oldZContract, makeZContract(newArtifact))
+  })
+  return mergeReports(reports)
 }
