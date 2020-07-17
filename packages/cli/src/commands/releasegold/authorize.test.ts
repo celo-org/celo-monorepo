@@ -99,6 +99,7 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
       signer,
       '--signature',
       serializeSignature(pop),
+      '--ecdsaOnly',
     ])
     await ValidatorRegister.run([
       '--from',
