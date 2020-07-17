@@ -564,6 +564,11 @@ function* tryRevealPhoneNumber(
       return
     }
 
+    if (body.error && body.error.includes('Attestation already sent')) {
+      Logger.debug(TAG + '@tryRevealPhoneNumber', `Ignore already sent SMS for issuer: ${issuer}`)
+      return
+    }
+
     if (body.error && body.error.includes('No incomplete attestation found')) {
       // Retry as attestation service might not yet have received the block where it was made responsible for an attestation
       Logger.debug(TAG + '@tryRevealPhoneNumber', `Retrying revealing for issuer: ${issuer}`)
