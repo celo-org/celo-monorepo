@@ -2,14 +2,29 @@ const { Octokit } = require('@octokit/rest')
 const { App } = require('@octokit/app')
 const { retry } = require('@octokit/plugin-retry')
 const Client = Octokit.plugin(retry)
-const AnsiToHtml = require('ansi-to-html')
-const convert = new AnsiToHtml()
-const { shouldCreateIssues, shouldAddCheckToPR, shouldSkipFlakes } = require('./config')
+const stripAnsi = require('strip-ansi')
+const { shouldCreateIssues, shouldAddCheckToPR } = require('./config')
+const {
+  fmtSummary,
+  getTestSuiteTitles,
+  parseErrLineNumberFromStack,
+  parseFirstErrFromFlakeBody,
+  parsePathFromStack,
+  parseTestIdFromFlakeTitle,
+} = require('./utils')
 
 const FlakeLabel = 'FLAKEY'
 const defaults = {
   owner: process.env.CIRCLE_PROJECT_USERNAME || 'celo-org',
   repo: process.env.CIRCLE_PROJECT_REPONAME || 'celo-monorepo',
+}
+
+const getLabels = () => {
+  const labels = [FlakeLabel]
+  if (process.env.CIRCLECI) {
+    labels.push(process.env.CIRCLE_JOB)
+  }
+  return labels
 }
 
 class GitHub {
@@ -46,7 +61,7 @@ class GitHub {
     if (shouldCreateIssues) {
       // Check list of flakey issues again to prevent duplicates
       const knownFlakes = await this.fetchKnownFlakes()
-      const newFlakes = knownFlakes.filter((flake) => !knownFlakes.includes(flake))
+      const newFlakes = flakes.filter((flake) => !knownFlakes.includes(flake))
       if (newFlakes.length) {
         promises.push(this.issues(newFlakes))
       }
@@ -74,8 +89,8 @@ class GitHub {
       return this.rest.issues.create({
         ...defaults,
         title: flake.title,
-        body: convert.toHtml(flake.body),
-        labels: [FlakeLabel, process.env.CIRCLE_JOB],
+        body: stripAnsi(flake.body),
+        labels: getLabels(),
       })
     }
 
@@ -88,50 +103,51 @@ class GitHub {
     const fn = () => {
       return this.rest.checks.create({
         ...defaults,
-        name: 'Flake Tracker',
-        head_sha: process.env.CIRCLE_SHA1,
+        name: getTestSuiteTitles().join(' -> '),
+        //head_sha: process.env.CIRCLE_SHA1,
+        head_sha: '2945424b9d5d2be945851c1143adde027ec463ca',
         status: 'in_progress',
       })
     }
 
     const errMsg = 'Failed to start check run.'
 
-    this.checkID = (await this.safeExec(fn, errMsg)).id
+    this.checkID = (await this.safeExec(fn, errMsg)).data.id
   }
 
   async endCheck(flakes, skippedTests) {
-    const summaries = {
-      failure: 'flakey tests found',
-      neutral: 'some tests were skipped due to flakiness',
+    const statuses = {
+      failure: 'flakey tests were found',
+      neutral: 'flakey tests were skipped',
       success: 'no flakey tests found!',
     }
+
+    const summary_0 = fmtSummary(flakes, skippedTests, 0)
+    const summary_2 = fmtSummary(flakes, skippedTests, 2)
 
     let conclusion = 'failure'
     if (!flakes.length) {
       conclusion = skippedTests.length ? 'neutral' : 'success'
     }
 
-    let text = ''
-    flakes.forEach((flake) => {
-      text += flake.title + '\n' + flake.body + '\n'
-    })
-
     const annotations = flakes.map((f) => {
-      const firstLineOfStack = f.body.split('at ')[1].split(':')
+      const firstErr = parseFirstErrFromFlakeBody(f.body)
+      const lineNumber = parseErrLineNumberFromStack(firstErr)
+      const path = parsePathFromStack(firstErr)
       return {
         title: f.title,
-        path: firstLineOfStack[0],
-        start_line: firstLineOfStack[1],
-        end_line: firstLineOfStack[1],
+        path: path.slice(path.indexOf('packages/')),
+        start_line: lineNumber,
+        end_line: lineNumber + 1,
         annotation_level: 'warning',
-        message: f.body,
+        message: stripAnsi(parseFirstErrFromFlakeBody(f.body)),
       }
     })
 
     const output = {
-      title: process.env.CIRCLE_JOB,
-      summary: summaries[conclusion],
-      text: text,
+      title: statuses[conclusion],
+      summary: stripAnsi(summary_0),
+      text: stripAnsi(summary_2),
       annotations: annotations,
     }
 
@@ -154,7 +170,7 @@ class GitHub {
       return this.rest.paginate(this.rest.issues.listForRepo, {
         ...defaults,
         state: 'open',
-        labels: [FlakeLabel, process.env.CIRCLE_JOB],
+        labels: getLabels(),
       })
     }
 
@@ -164,7 +180,7 @@ class GitHub {
 
     const flakeIssues = (await this.safeExec(fn, errMsg)) || []
 
-    return flakeIssues.map((i) => i.title.replace('[FLAKEY TEST]', '').trim())
+    return flakeIssues.map((i) => parseTestIdFromFlakeTitle(i.title))
   }
 
   // Retries fn with fresh token if expired
@@ -202,7 +218,6 @@ const auth = async (app) => {
 
     return new Client({
       auth: installationAccessToken,
-      log: console,
     })
   } catch (error) {
     console.error('Flake Tracker App failed to authenticate as an installation ' + error)

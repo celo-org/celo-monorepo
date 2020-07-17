@@ -10,8 +10,7 @@ const shouldSkipKnownFlakes =
   shouldTrackFlakes && process.env.CIRCLECI && process.env.SKIP_KNOWN_FLAKES !== 'false'
 
 // shouldAddCheckToPR => GitHub Check added to PR
-const shouldAddCheckToPR = true
-//const shouldAddCheckToPR = shouldTrackFlakes && process.env.CIRCLECI
+const shouldAddCheckToPR = shouldTrackFlakes && process.env.CIRCLECI
 
 // shouldCreateIssues => GitHub Issues created for new flakey tests
 const shouldCreateIssues = true

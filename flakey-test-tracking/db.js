@@ -1,11 +1,11 @@
-const { fmtFlakeIssue } = require('./utils')
+const { fmtFlakeIssue, getTestSuiteDirName } = require('./utils')
 const { tmpdir } = require('os')
 const { join } = require('path')
 const fs = require('fs')
 const tmp = require('tmp')
 tmp.setGracefulCleanup()
 
-const flakeDir = 'flake-tracker__' + process.cwd().slice(process.cwd().lastIndexOf('/') + 1)
+const flakeDir = 'flake-tracker__' + getTestSuiteDirName()
 const errDir = 'new-flakes'
 const skipFile = 'known-flakes.txt'
 

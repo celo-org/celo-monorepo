@@ -33,6 +33,8 @@ const getTestTitles = (test) => {
     titles.unshift(parent.name)
   } while ((parent = parent.parent))
 
+  titles.shift() // Removes root describe block
+
   return titles
 }
 
