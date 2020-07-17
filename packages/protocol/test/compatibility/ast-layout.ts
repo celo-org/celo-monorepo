@@ -1,25 +1,11 @@
-<<<<<<< HEAD:packages/protocol/test/backward/ast-layout.ts
-<<<<<<< HEAD:packages/protocol/test/layout/layout.ts
 import { getBuildArtifacts } from '@openzeppelin/upgrades'
 
 /* HACK! truffle test was unable to compile this test (TypeScript would end up
-<<<<<<< HEAD
  * claiming that it couldn't find the name `assert`) without the following
  * lines.
  */
 import { MigrationsContract } from 'types'
 // @ts-ignore
-=======
- * claiming that it couldn't find the name `assert`) without the following 5
- * lines.
- */
-import { MigrationsContract } from 'types'
-<<<<<<< HEAD
-//@ts-ignore
->>>>>>> Start adding tests for layout checking script
-=======
-// @ts-ignore
->>>>>>> Appease the linter
 const Migrations: MigrationsContract = artifacts.require('Migrations')
 
 import { reportLayoutIncompatibilities } from '@celo/protocol/lib/layout'
@@ -34,46 +20,23 @@ import { reportLayoutIncompatibilities } from '@celo/protocol/lib/layout'
 const getTestArtifacts = (caseName: string) => {
   return getBuildArtifacts(`./test/resources/layout/build_${caseName}`)
 }
-=======
-import { reportLayoutIncompatibilities } from '@celo/protocol/lib/backward/ast-layout'
-import { getTestArtifacts } from '@celo/protocol/test/backward/common'
-=======
-import { reportLayoutIncompatibilities } from '@celo/protocol/lib/compatibility/ast-layout'
-import { getTestArtifacts } from '@celo/protocol/test/compatibility/common'
->>>>>>> Rename package backward to compatibility:packages/protocol/test/compatibility/ast-layout.ts
-import { assert } from 'chai'
->>>>>>> Add backward compatibility check for contracts api based on the compiled AST:packages/protocol/test/backward/ast-layout.ts
 
 const testCases = {
   original: getTestArtifacts('original'),
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Add tests
   inserted_constant: getTestArtifacts('inserted_constant'),
   appended: getTestArtifacts('appended'),
   inserted: getTestArtifacts('inserted'),
   appended_in_parent: getTestArtifacts('appended_in_parent'),
   removed: getTestArtifacts('removed'),
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Add typechange tests
   typechange: getTestArtifacts('typechange'),
   typechange_in_struct: getTestArtifacts('typechange_in_struct'),
   typechange_in_parent: getTestArtifacts('typechange_in_parent'),
   typechange_in_library_struct: getTestArtifacts('typechange_in_library_struct'),
-<<<<<<< HEAD
-=======
->>>>>>> Add tests
-=======
->>>>>>> Add typechange tests
   removed_from_struct: getTestArtifacts('removed_from_struct'),
   removed_from_parent: getTestArtifacts('removed_from_parent'),
   inserted_in_struct: getTestArtifacts('inserted_in_struct'),
   inserted_in_library_struct: getTestArtifacts('inserted_in_library_struct'),
   removed_from_library_struct: getTestArtifacts('removed_from_library_struct'),
-<<<<<<< HEAD
 
   original_complex: getTestArtifacts('original_complex'),
   shorter_fixed_array: getTestArtifacts('shorter_fixed_array'),
@@ -329,179 +292,6 @@ describe('#reportLayoutIncompatibilities()', () => {
       )
       assertNotCompatible(report)
       assertContractErrorsMatch(report, 'TestContract', [/had type/])
-=======
-=======
->>>>>>> Add tests
-}
-
-const assertCompatible = (report) => {
-  assert.isTrue(report.every((contractReport) => contractReport.compatible))
-}
-
-const assertNotCompatible = (report) => {
-  assert.isFalse(report.every((contractReport) => contractReport.compatible))
-}
-
-const selectReportFor = (report, contractName) => {
-  return report.find((contractReport) => contractReport.contract === contractName)
-}
-
-/* Checks that expected errors were reported for a contract.
- * @param report The list of CompatibilityInfo's to check.
- * @param contractName The name of the contract to check.
- * @param expectedMatches The regular expressions that each successive error for
- * `contractName` should match.
- */
-const assertContractErrorsMatch = (report, contractName, expectedMatches) => {
-  const contractReport = selectReportFor(report, contractName)
-  assert.equal(contractReport.errors.length, 1)
-
-  contractReport.errors.forEach((error, i) => {
-    assert.match(error, expectedMatches[i])
-  })
-}
-
-describe('#reportLayoutIncompatibilities()', () => {
-  describe('when the contracts are the same', () => {
-    it('reports no incompatibilities', () => {
-      const report = reportLayoutIncompatibilities(testCases.original, testCases.original)
-<<<<<<< HEAD
-      assert.isTrue(report.every((contractReport) => contractReport.compatible))
->>>>>>> Start adding tests for layout checking script
-=======
-      assertCompatible(report)
-    })
-  })
-
-  describe('when a constant is inserted in a contract', () => {
-    it('reports no incompatibilities', () => {
-      const report = reportLayoutIncompatibilities(testCases.original, testCases.inserted_constant)
-      assertCompatible(report)
-    })
-  })
-
-  describe('when a variable is appended in a contract', () => {
-    it('reports no incompatibilities', () => {
-      const report = reportLayoutIncompatibilities(testCases.original, testCases.appended)
-      assertCompatible(report)
-    })
-  })
-
-  describe('when a variable is inserted in a contract', () => {
-    it('reports an inserted variable', () => {
-      const report = reportLayoutIncompatibilities(testCases.original, testCases.inserted)
-      assertNotCompatible(report)
-      assertContractErrorsMatch(report, 'TestContract', [/inserted/])
-    })
-  })
-
-  describe('when a variable is appended in a parent contract', () => {
-    it('reports an inserted variable', () => {
-      const report = reportLayoutIncompatibilities(testCases.original, testCases.appended_in_parent)
-      assertNotCompatible(report)
-      assertContractErrorsMatch(report, 'TestContract', [/inserted/])
-    })
-  })
-
-  describe('when a variable is removed in a contract', () => {
-    it('reports a removed variable', () => {
-      const report = reportLayoutIncompatibilities(testCases.original, testCases.removed)
-      assertNotCompatible(report)
-      assertContractErrorsMatch(report, 'TestContract', [/removed/])
-    })
-  })
-
-  describe('when a variable is removed in a parent contract', () => {
-    it('reports a removed variable', () => {
-      const report = reportLayoutIncompatibilities(
-        testCases.original,
-        testCases.removed_from_parent
-      )
-      assertNotCompatible(report)
-      assertContractErrorsMatch(report, 'TestContract', [/removed/])
->>>>>>> Add tests
-    })
-  })
-
-  describe(`when a variable's type changes in a contract`, () => {
-    it('reports a typechanged variable', () => {
-      const report = reportLayoutIncompatibilities(testCases.original, testCases.typechange)
-      assertNotCompatible(report)
-      assertContractErrorsMatch(report, 'TestContract', [/had type/])
-    })
-  })
-
-  describe(`when a variable's type changes in a parent contract`, () => {
-    it('reports a typechanged variable', () => {
-      const report = reportLayoutIncompatibilities(
-        testCases.original,
-        testCases.typechange_in_parent
-      )
-      assertNotCompatible(report)
-      assertContractErrorsMatch(report, 'TestContract', [/had type/])
-    })
-  })
-
-  describe('when a field is added to a struct', () => {
-    it('reports a struct change', () => {
-      const report = reportLayoutIncompatibilities(testCases.original, testCases.inserted_in_struct)
-      assertNotCompatible(report)
-      assertContractErrorsMatch(report, 'TestContract', [/struct.*changed/])
-    })
-  })
-
-  describe('when a field changes type in a struct', () => {
-    it('reports a struct change', () => {
-      const report = reportLayoutIncompatibilities(
-        testCases.original,
-        testCases.typechange_in_struct
-      )
-      assertNotCompatible(report)
-      assertContractErrorsMatch(report, 'TestContract', [/struct.*changed/])
-    })
-  })
-
-  describe('when a field changes type in a library struct', () => {
-    it('reports a struct change', () => {
-      const report = reportLayoutIncompatibilities(
-        testCases.original,
-        testCases.typechange_in_library_struct
-      )
-      assertNotCompatible(report)
-      assertContractErrorsMatch(report, 'TestContract', [/struct.*changed/])
-    })
-  })
-
-  describe('when a field is removed from a struct', () => {
-    it('reports a struct change', () => {
-      const report = reportLayoutIncompatibilities(
-        testCases.original,
-        testCases.removed_from_struct
-      )
-      assertNotCompatible(report)
-      assertContractErrorsMatch(report, 'TestContract', [/struct.*changed/])
-    })
-  })
-
-  describe('when a field is removed from a library struct', () => {
-    it('reports a struct change', () => {
-      const report = reportLayoutIncompatibilities(
-        testCases.original,
-        testCases.removed_from_library_struct
-      )
-      assertNotCompatible(report)
-      assertContractErrorsMatch(report, 'TestContract', [/struct.*changed/])
-    })
-  })
-
-  describe('when a field is inserted in a library struct', () => {
-    it('reports a struct change', () => {
-      const report = reportLayoutIncompatibilities(
-        testCases.original,
-        testCases.inserted_in_library_struct
-      )
-      assertNotCompatible(report)
-      assertContractErrorsMatch(report, 'TestContract', [/struct.*changed/])
     })
   })
 })
