@@ -224,8 +224,12 @@ export function* doVerificationFlow() {
     return true
   } catch (error) {
     Logger.error(TAG, 'Error occured during verification flow', error)
-    yield put(setVerificationStatus(VerificationStatus.Failed))
-    yield put(showErrorOrFallback(error, ErrorMessages.VERIFICATION_FAILURE))
+    if (error.message === ErrorMessages.SALT_QUOTA_EXCEEDED) {
+      yield put(setVerificationStatus(VerificationStatus.SaltQuotaExceeded))
+    } else {
+      yield put(setVerificationStatus(VerificationStatus.Failed))
+      yield put(showErrorOrFallback(error, ErrorMessages.VERIFICATION_FAILURE))
+    }
     return error.message
   }
 }
@@ -237,7 +241,7 @@ export function* balanceSufficientForAttestations(attestationsRemaining: number)
   )
 }
 
-// Requests if necessary additional attestations and returns all revealable attestationsq
+// Requests if necessary additional attestations and returns all revealable attestations
 export function* requestAndRetrieveAttestations(
   attestationsWrapper: AttestationsWrapper,
   phoneHash: string,
