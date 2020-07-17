@@ -30,10 +30,10 @@
   "loading": {
     "confirming": "Confirming…",
     "learnMore": "Learn more",
-    "card1": "Verifying your account allows you to see which of your friends uses {{appName}}.",
-    "card2": "With {{appName}}, you can send money to anyone using just their phone number.",
-    "card3": "{{appName}} is now requesting three text messages to confirm you own your phone number.",
-    "card4": "Confirming also allows you to see which of your friends are on {{appName}}."
+    "card1": "To make sure your phone number is really yours, we're sending you three messages.",
+    "card2": "Once your number is confirmed, you can send and receive funds easily to your phone number.",
+    "card3": "Confirming also allows you to see which of your friends are on {{appName}}.",
+    "card4": "We require three confirmation messages to keep your account more secure."
   },
   "skipModal": {
     "header": "Skip Verification?",

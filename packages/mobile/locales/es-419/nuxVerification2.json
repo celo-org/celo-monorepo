@@ -28,11 +28,12 @@
     "section2Body": "Para proteger su privacidad, solo se guarda una versión oculta de su teléfono en la cadena de bloques de Celo."
   },
   "loading": {
-    "verifyingNumber": "Verificando {{number}}",
-    "keepOpen": "Deje abierta la aplicación",
-    "card1": "Verificar tu cuenta te permite ver cuál de tus amigos usa {{appName}}.",
-    "card2": "Con {{appName}}, puede enviar dinero a cualquier persona con tan solo el número telefónico.",
-    "card3": "{{appName}} ahora envía tres mensajes de texto para confirmar que es dueño de su propia línea telefónica."
+    "confirming": "Confirmando…",
+    "learnMore": "Aprende más",
+    "card1": "Para asegurarnos de que su número de teléfono sea realmente suyo, le enviamos tres mensajes.",
+    "card2": "Una vez que se confirma su número, puede enviar y recibir fondos fácilmente a su número de teléfono.",
+    "card3": "Confirmar también le permite ver cuáles de sus amigos están en {{appName}}.",
+    "card4": "Requerimos tres mensajes de confirmación para mantener su cuenta más segura."
   },
   "skipModal": {
     "header": "¿Omitir la verificación?",
