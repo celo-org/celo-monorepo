@@ -21,6 +21,9 @@ OPTIONS
 
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
+  --ecdsaOnly                                            Authorize only ECDSA keys. BLS keys must be authorized in a
+                                                         separate step.
+
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
 

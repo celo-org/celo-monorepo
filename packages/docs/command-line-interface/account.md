@@ -21,6 +21,9 @@ OPTIONS
   --blsPop=0x                                          The BLS public key proof-of-possession, which consists of a
                                                        signature on the account address. 48 bytes.
 
+  --ecdsaOnly                                          Authorize only ECDSA keys. BLS keys must be authorized in a
+                                                       separate step.
+
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Account Address
 
   --ledgerAddresses=ledgerAddresses                    [default: 1] If --useLedger is set, this will get the first N
