@@ -15,12 +15,12 @@ import { Screens } from 'src/navigator/Screens'
 export default function SendOrRequestBar() {
   const onPressSend = () => {
     ValoraAnalytics.track(HomeEvents.home_send)
-    navigate(Screens.Send, { isRequest: false })
+    navigate(Screens.Send)
   }
 
   const onPressRequest = () => {
     ValoraAnalytics.track(HomeEvents.home_request)
-    navigate(Screens.Send, { isRequest: true })
+    navigate(Screens.Send, { isOutgoingPaymentRequest: true })
   }
 
   const onPressQrCode = () => {
@@ -34,14 +34,14 @@ export default function SendOrRequestBar() {
     <View style={styles.container} testID="SendOrRequestBar">
       <Button
         style={styles.button}
-        size={BtnSizes.SMALL}
+        size={BtnSizes.MEDIUM}
         text={t('send')}
         onPress={onPressSend}
         testID="SendOrRequestBar/SendButton"
       />
       <Button
         style={[styles.button, styles.requestButton]}
-        size={BtnSizes.SMALL}
+        size={BtnSizes.MEDIUM}
         text={t('paymentRequestFlow:request')}
         onPress={onPressRequest}
         testID="SendOrRequestBar/RequestButton"

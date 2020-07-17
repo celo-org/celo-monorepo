@@ -40,7 +40,7 @@ interface StateProps {
   transactionData: TransactionDataInput
   addressValidationType: AddressValidationType
   isValidRecipient: boolean
-  isPaymentRequest?: true
+  isOutgoingPaymentRequest?: true
   error?: ErrorMessages | null
 }
 
@@ -70,7 +70,7 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
     recipient,
     transactionData,
     isValidRecipient: state.identity.isValidRecipient,
-    isPaymentRequest: route.params.isPaymentRequest,
+    isOutgoingPaymentRequest: route.params.isOutgoingPaymentRequest,
     addressValidationType: route.params.addressValidationType,
     error,
   }
@@ -89,15 +89,14 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
   }
 
   componentDidUpdate = (prevProps: Props) => {
-    const { isValidRecipient, isPaymentRequest, transactionData } = this.props
+    const { isValidRecipient, isOutgoingPaymentRequest, transactionData } = this.props
     if (isValidRecipient && !prevProps.isValidRecipient) {
-      if (isPaymentRequest) {
+      if (isOutgoingPaymentRequest) {
         navigate(Screens.PaymentRequestConfirmation, { transactionData })
       } else {
         navigate(Screens.SendConfirmation, {
           transactionData,
           addressJustValidated: true,
-          isFromScan: this.props.route.params?.isFromScan,
         })
       }
     }
@@ -106,6 +105,7 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
   onPressConfirm = () => {
     const { inputValue, singleDigitInputValueArr } = this.state
     const { recipient, addressValidationType } = this.props
+    const { requesterAddress } = this.props.route.params
     const inputToValidate =
       addressValidationType === AddressValidationType.FULL
         ? inputValue
@@ -116,7 +116,12 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
       address: inputToValidate,
     })
 
-    this.props.validateRecipientAddress(inputToValidate, addressValidationType, recipient)
+    this.props.validateRecipientAddress(
+      inputToValidate,
+      addressValidationType,
+      recipient,
+      requesterAddress
+    )
   }
 
   onInputChange = (value: string) => {

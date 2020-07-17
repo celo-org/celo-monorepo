@@ -331,7 +331,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
           text={t(`global:review`)}
           accessibilityLabel={t('continue')}
           disabled={this.isExchangeInvalid()}
-          type={BtnTypes.TERTIARY}
+          type={BtnTypes.SECONDARY}
           size={BtnSizes.FULL}
           style={styles.reviewBtn}
           testID="ExchangeReviewButton"

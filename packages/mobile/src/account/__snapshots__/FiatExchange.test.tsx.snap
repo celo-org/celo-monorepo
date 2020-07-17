@@ -18,7 +18,7 @@ exports[`FiatExchange renders correctly 1`] = `
         "borderBottomWidth": 1,
         "flexDirection": "row",
         "height": 62,
-        "justifyContent": "space-between",
+        "justifyContent": "center",
       }
     }
   >
@@ -34,10 +34,13 @@ exports[`FiatExchange renders correctly 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
+          "left": 8,
           "marginBottom": 0,
           "marginLeft": 4,
           "opacity": 1,
           "padding": 8,
+          "position": "absolute",
+          "top": 8,
         }
       }
     >
@@ -76,13 +79,6 @@ exports[`FiatExchange renders correctly 1`] = `
         />
       </svg>
     </View>
-    <View
-      style={
-        Object {
-          "width": 45,
-        }
-      }
-    />
   </View>
   <View
     style={

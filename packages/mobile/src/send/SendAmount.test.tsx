@@ -33,10 +33,10 @@ const storeData = {
   },
 }
 
-const mockScreenProps = (isRequest: boolean) =>
+const mockScreenProps = (isOutgoingPaymentRequest?: true) =>
   getMockStackScreenProps(Screens.SendAmount, {
     recipient: mockTransactionData.recipient,
-    isRequest,
+    isOutgoingPaymentRequest,
   })
 
 const enterAmount = (wrapper: RenderAPI, text: string) => {
@@ -56,7 +56,7 @@ describe('SendAmount', () => {
     const getWrapper = () =>
       render(
         <Provider store={store}>
-          <SendAmount {...mockScreenProps(false)} />
+          <SendAmount {...mockScreenProps()} />
         </Provider>
       )
 
@@ -92,7 +92,7 @@ describe('SendAmount', () => {
       const store = createMockStore(storeData)
       const wrapper = render(
         <Provider store={store}>
-          <SendAmount {...mockScreenProps(false)} />
+          <SendAmount {...mockScreenProps()} />
         </Provider>
       )
       enterAmount(wrapper, AMOUNT_TOO_MUCH)
@@ -120,7 +120,7 @@ describe('SendAmount', () => {
       const store = createMockStore(storeData)
       const wrapper = render(
         <Provider store={store}>
-          <SendAmount {...mockScreenProps(false)} />
+          <SendAmount {...mockScreenProps()} />
         </Provider>
       )
       enterAmount(wrapper, AMOUNT_ZERO)
@@ -157,7 +157,7 @@ describe('SendAmount', () => {
 
       const tree = render(
         <Provider store={store}>
-          <SendAmount {...mockScreenProps(false)} />
+          <SendAmount {...mockScreenProps()} />
         </Provider>
       )
       enterAmount(tree, AMOUNT_VALID)
@@ -183,7 +183,7 @@ describe('SendAmount', () => {
 
       const tree = render(
         <Provider store={store}>
-          <SendAmount {...mockScreenProps(false)} />
+          <SendAmount {...mockScreenProps()} />
         </Provider>
       )
       enterAmount(tree, AMOUNT_VALID)
@@ -219,7 +219,7 @@ describe('SendAmount', () => {
       expect(navigate).toHaveBeenCalledWith(Screens.ValidateRecipientIntro, {
         transactionData: mockTransactionData2,
         addressValidationType: AddressValidationType.FULL,
-        isPaymentRequest: true,
+        isOutgoingPaymentRequest: true,
       })
     })
 

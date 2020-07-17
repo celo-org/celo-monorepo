@@ -133,6 +133,7 @@
     "location": "packages/phone-number-privacy/combiner",
     "dependencies": [
       "@celo/contractkit",
+      "@celo/phone-number-privacy-common",
       "@celo/utils"
     ]
   },
@@ -144,6 +145,7 @@
     "location": "packages/phone-number-privacy/signer",
     "dependencies": [
       "@celo/contractkit",
+      "@celo/phone-number-privacy-common",
       "@celo/utils"
     ]
   }
