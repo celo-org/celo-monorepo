@@ -20,7 +20,7 @@ import {
 
 const ITEM_WIDTH = variables.width - Spacing.Thick24 * 2
 const ITEM_HEIGHT = ITEM_WIDTH * (211 / 292)
-//
+// Visible width of items which are on the left/right of the active item
 const ITEM_PARTIAL_VISIBLE_WIDTH = Spacing.Smallest8
 const ITEM_HORIZONTAL_SPACING = Spacing.Regular16
 const ITEM_SNAP_INTERVAL = ITEM_WIDTH + ITEM_HORIZONTAL_SPACING
