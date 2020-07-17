@@ -77,8 +77,8 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
    * Similar to the parentSealBitmap of every block (where you have which validators were
    * able to sign the previous block), this bitmap shows for that specific interval which
    * validators signed at least one block
-   * @param startBlock First block of the downtime interval.
-   * @param endBlock Last block of the downtime interval.
+   * @param startBlock First block of the interval.
+   * @param endBlock Last block of the interval.
    * @return (string) The signature uptime bitmap for the specified interval.
    * @dev startBlock and endBlock must be in the same epoch.
    * @dev The getParentSealBitmap precompile requires that startBlock must be within 4 epochs of
@@ -92,8 +92,8 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
 
   /**
    * Calculates and sets the signature bitmap for the specified interval.
-   * @param startBlock First block of the downtime interval.
-   * @param endBlock Last block of the downtime interval.
+   * @param startBlock First block of the interval.
+   * @param endBlock Last block of the interval.
    * @return The signature bitmap for the specified interval.
    * @dev startBlock and endBlock must be in the same epoch.
    */
@@ -110,7 +110,7 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
   isBitmapSetForInterval = proxyCall(this.contract.methods.isBitmapSetForInterval)
 
   /**
-   * Tests if the given validator or signer has been down in the interval.
+   * Tests if the given validator or signer did not sign any blocks in the interval.
    * @param validatorOrSignerAddress Address of the validator account or signer.
    * @param startBlock First block of the interval.
    * @param endBlock Last block of the interval.
@@ -128,21 +128,25 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
   }
 
   /**
-   * Returns true if a validator has been down for the specified overlapping or adjacent
+   * Returns true if the validator did not sign any blocks for the specified overlapping or adjacent
    * intervals.
-   * @param startBlocks startBlocks of the specified intervals.
-   * @param endBlocks endBlocks of the specified intervals.
-   * @param signerIndices Indices of the signers within the validator set for every epoch change.
+   * @param startBlocks A list of interval start blocks for which signature bitmaps have already
+   * been set.
+   * @param endBlocks A list of interval end blocks for which signature bitmaps have already
+   * been set.
+   * @param signerIndices Indices of the signer within the validator set for every epoch change.
    * @return True if the validator signature does not appear in any block within the window.
    */
   wasDownForIntervals = proxyCall(this.contract.methods.wasDownForIntervals)
 
   /**
-   * Returns true if a validator has been down for the specified overlapping or adjacent
+   * Returns true if the validator did not sign any blocks for the specified overlapping or adjacent
    * intervals.
    * @param validatorOrSignerAddress Address of the validator account or signer.
-   * @param startBlocks startBlocks of the specified intervals.
-   * @param endBlocks endBlocks of the specified intervals.
+   * @param startBlocks A list of interval start blocks for which signature bitmaps have already
+   * been set.
+   * @param endBlocks A list of interval end blocks for which signature bitmaps have already
+   * been set.
    * @return True if the validator signature does not appear in any block within the window.
    */
   async wasValidatorDown(
@@ -191,11 +195,13 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
   }
 
   /**
-   * Returns true if a validator has been down for the specified overlapping or adjacent
+   * Returns true if the validator did not sign any blocks for the specified overlapping or adjacent
    * intervals.
    * @param validatorOrSignerAddress Address of the validator account or signer.
-   * @param startBlocks startBlocks of the specified intervals.
-   * @param endBlocks endBlocks of the specified intervals.
+   * @param startBlocks A list of interval start blocks for which signature bitmaps have already
+   * been set.
+   * @param endBlocks A list of interval end blocks for which signature bitmaps have already
+   * been set.
    */
   async slashValidator(
     validatorOrSignerAddress: Address,
@@ -215,11 +221,13 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
   }
 
   /**
-   * Returns true if a validator has been down for the specified overlapping or adjacent
+   * Returns true if the validator did not sign any blocks for the specified overlapping or adjacent
    * intervals.
    * @param startSignerIndex Validator index at the first block.
-   * @param startBlocks startBlocks of the specified intervals.
-   * @param endBlocks endBlocks of the specified intervals.
+   * @param startBlocks A list of interval start blocks for which signature bitmaps have already
+   * been set.
+   * @param endBlocks A list of interval end blocks for which signature bitmaps have already
+   * been set.
    */
   async slashStartSignerIndex(
     startSignerIndex: number,
@@ -250,8 +258,10 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
    * Slash a Validator for downtime.
    * @param validator Validator to slash for downtime.
    * @param slashableWindow Window of the blocks to slash.
-   * @param startBlocks startBlocks of the specified intervals.
-   * @param endBlocks endBlocks of the specified intervals.
+   * @param startBlocks A list of interval start blocks for which signature bitmaps have already
+   * been set.
+   * @param endBlocks A list of interval end blocks for which signature bitmaps have already
+   * been set.
    * @param startSignerIndex Validator index at the first block.
    * @param endSignerIndex Validator index at the last block.
    */

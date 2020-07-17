@@ -98,9 +98,9 @@ contract DowntimeSlasher is SlasherUtil {
     );
 
     bytes32 bitmap;
-    for (uint256 n = startBlock; n <= endBlock; n++) {
+    for (uint256 blockNumber = startBlock; blockNumber <= endBlock; blockNumber++) {
       // The canonical signatures for block N are stored in the parent seal bitmap for block N+1.
-      bitmap |= getParentSealBitmap(n.add(1));
+      bitmap |= getParentSealBitmap(blockNumber.add(1));
     }
 
     return bitmap;
@@ -153,7 +153,7 @@ contract DowntimeSlasher is SlasherUtil {
    * @return True if the bitmap has been set for the specified interval.
    */
   function isBitmapSetForInterval(uint256 startBlock, uint256 endBlock) public view returns (bool) {
-    // It's impossible to have all the validators down in a interval.
+    // It's impossible to have all the validators down in an interval.
     return bitmaps[msg.sender][startBlock][endBlock] != 0;
   }
 
@@ -164,7 +164,7 @@ contract DowntimeSlasher is SlasherUtil {
    * been set.
    * @param endBlocks A list of interval end blocks for which signature bitmaps have already
    * been set.
-   * @param signerIndices Indices of the signers within the validator set for every epoch change.
+   * @param signerIndices Indices of the signer within the validator set for every epoch change.
    * @return True if the validator signature does not appear in any block within the window.
    */
   function wasDownForIntervals(
@@ -282,10 +282,10 @@ contract DowntimeSlasher is SlasherUtil {
   }
 
   /**
-   * @notice Returns the validator's address of the signer for an specific block number.
+   * @notice Returns the validator's address of the signer for a specific block number.
    * @param signerIndex Index of the signer within the validator set for a specific epoch.
    * @param blockNumber Block number where the validator was elected.
-   * @return Validator's address
+   * @return Validator's address.
    */
   function getValidatorAccountFromSignerIndex(uint256 signerIndex, uint256 blockNumber)
     internal
