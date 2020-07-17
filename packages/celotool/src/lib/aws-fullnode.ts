@@ -87,6 +87,7 @@ async function helmParameters(
     `--set namespace=${kubeNamespace}`,
     `--set replicaCount=${deploymentConfig.replicas}`,
     `--set storage.size=${deploymentConfig.diskSizeGb}Gi`,
+    `--set geth.azure_provider=false`,
     `--set geth.expose_rpc_externally=false`,
     `--set geth.image.repository=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY)}`,
     `--set geth.image.tag=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_TAG)}`,

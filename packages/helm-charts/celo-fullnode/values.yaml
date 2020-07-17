@@ -61,6 +61,7 @@ geth:
   gcmode: full
   ping_ip_from_packet: false
   in_memory_discovery_table: false
+  azure_provider: true
   verbosity: 2
   # Azure static ips
   public_ips:

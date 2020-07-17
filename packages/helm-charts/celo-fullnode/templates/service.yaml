@@ -4,13 +4,21 @@ kind: Service
 metadata:
   name: {{ template "common.fullname" $ }}-{{ $index }}
   annotations:
+  {{- if $.Values.geth.azure_provider }}
     service.beta.kubernetes.io/azure-load-balancer-mixed-protocols: "true"
+  {{- else }}
+    service.beta.kubernetes.io/aws-load-balancer-type: “nlb”
+  {{- end }}
   labels:
 {{ include "celo-fullnode.labels" $ | indent 4 }}
 spec:
   type: {{ $.Values.geth.service_type }}
 {{- if $.Values.geth.use_static_ips }}
+  {{- if $.Values.geth.azure_provider -}}
   loadBalancerIP: {{ index $.Values.geth.public_ips $index -}}
+  {{- else  -}}
+  service.beta.kubernetes.io/aws-load-balancer-eip-allocations: {{ index $.Values.geth.public_ips $index -}}
+  {{- end -}}
 {{- end }}
   ports:
     - port: 30303
