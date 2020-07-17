@@ -406,10 +406,8 @@ describe('governance tests', () => {
 
       // Prepare for member swapping.
       const groupWeb3 = new Web3(groupWeb3Url)
-      const provider = groupWeb3.currentProvider
 
       const groupKit = newKitFromWeb3(groupWeb3)
-      groupWeb3.setProvider(provider)
 
       const group: string = (await groupWeb3.eth.getAccounts())[0]
 
@@ -963,8 +961,8 @@ describe('governance tests', () => {
 
       const groupWeb3Url = 'ws://localhost:8555'
       const groupWeb3 = new Web3(groupWeb3Url)
-      const provider = groupWeb3.currentProvider
-      groupWeb3.setProvider(provider)
+
+      const groupKit = newKitFromWeb3(groupWeb3)
 
       // Prepare for key rotation.
       const validatorRpc = 'http://localhost:8549'
@@ -1009,7 +1007,7 @@ describe('governance tests', () => {
         }
       }
 
-      const subscription = groupWeb3.eth.subscribe('newBlockHeaders')
+      const subscription = groupKit.web3.eth.subscribe('newBlockHeaders')
       subscription.on('data', changeValidatorSet)
 
       // Wait for a few epochs while changing the validator set.

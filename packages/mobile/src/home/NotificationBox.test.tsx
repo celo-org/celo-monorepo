@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
-import * as renderer from 'react-test-renderer'
 import { DAYS_TO_BACKUP } from 'src/backup/utils'
 import NotificationBox from 'src/home/NotificationBox'
 import { createMockStore, getElementText } from 'test/utils'
@@ -40,7 +39,7 @@ describe('NotificationBox', () => {
     const store = createMockStore({
       ...storeDataNotificationsEnabled,
     })
-    const tree = renderer.create(
+    const tree = render(
       <Provider store={store}>
         <NotificationBox />
       </Provider>
@@ -80,7 +79,8 @@ describe('NotificationBox', () => {
       </Provider>
     )
     expect(getByText('exchangeFlow9:whatIsGold')).toBeTruthy()
-    expect(getByText('inviteFlow11:inviteFriendsToCelo')).toBeTruthy()
+    // Functionality disabled for now
+    // expect(getByText('inviteFlow11:inviteAnyone')).toBeTruthy()
   })
 
   it('renders incoming payment request when they exist', () => {
@@ -97,8 +97,12 @@ describe('NotificationBox', () => {
       </Provider>
     )
 
-    const element = getByTestId('IncomingPaymentRequestNotification/FAKE_ID_1/Title')
-    expect(getElementText(element)).toBe('+14155550000 requested $266,000.00')
+    const titleElement = getByTestId('IncomingPaymentRequestNotification/FAKE_ID_1/Title')
+    expect(getElementText(titleElement)).toBe('incomingPaymentRequestNotificationTitle')
+    const amountElement = getByTestId('IncomingPaymentRequestNotification/FAKE_ID_1/Amount')
+    expect(getElementText(amountElement)).toBe('$266,000.00')
+    const detailsElement = getByTestId('IncomingPaymentRequestNotification/FAKE_ID_1/Details')
+    expect(getElementText(detailsElement)).toBe('Dinner for me and the gals, PIZZAA!')
   })
 
   it('renders incoming payment requests when they exist', () => {
@@ -114,7 +118,7 @@ describe('NotificationBox', () => {
         <NotificationBox />
       </Provider>
     )
-    expect(getByText('incomingPaymentRequests')).toBeTruthy()
+    expect(getByText('incomingPaymentRequestsSummaryTitle')).toBeTruthy()
   })
 
   it('renders outgoing payment requests when they exist', () => {
@@ -130,7 +134,7 @@ describe('NotificationBox', () => {
         <NotificationBox />
       </Provider>
     )
-    expect(getByText('outgoingPaymentRequests')).toBeTruthy()
+    expect(getByText('outgoingPaymentRequestsSummaryTitle')).toBeTruthy()
   })
 
   it('renders outgoing payment request when they exist', () => {
@@ -146,8 +150,13 @@ describe('NotificationBox', () => {
         <NotificationBox />
       </Provider>
     )
-    const element = getByTestId('OutgoingPaymentRequestNotification/FAKE_ID_1/Title')
-    expect(getElementText(element)).toBe('Requested $266,000.00 from +14155550000')
+
+    const titleElement = getByTestId('OutgoingPaymentRequestNotification/FAKE_ID_1/Title')
+    expect(getElementText(titleElement)).toBe('outgoingPaymentRequestNotificationTitle')
+    const amountElement = getByTestId('OutgoingPaymentRequestNotification/FAKE_ID_1/Amount')
+    expect(getElementText(amountElement)).toBe('$266,000.00')
+    const detailsElement = getByTestId('OutgoingPaymentRequestNotification/FAKE_ID_1/Details')
+    expect(getElementText(detailsElement)).toBe('Dinner for me and the gals, PIZZAA!')
   })
 
   it('renders verification reminder when not verified', () => {
@@ -163,6 +172,6 @@ describe('NotificationBox', () => {
         <NotificationBox />
       </Provider>
     )
-    expect(getByText('nuxVerification2:notification.title')).toBeTruthy()
+    expect(getByText('nuxVerification2:notification.body')).toBeTruthy()
   })
 })

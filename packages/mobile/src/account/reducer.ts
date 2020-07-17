@@ -2,13 +2,15 @@ import { isE164Number } from '@celo/utils/src/phoneNumbers'
 import { Actions, ActionTypes } from 'src/account/actions'
 import { PaymentRequest } from 'src/account/types'
 import { DEV_SETTINGS_ACTIVE_INITIALLY } from 'src/config'
+import { features } from 'src/flags'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { getRemoteTime } from 'src/utils/time'
+import { Actions as Web3Actions, ActionTypes as Web3ActionTypes } from 'src/web3/actions'
 
 export interface State {
-  name: string
-  e164PhoneNumber: string
-  defaultCountryCode: string
+  name: string | null
+  e164PhoneNumber: string | null
+  defaultCountryCode: string | null
   contactDetails: UserContactDetails
   devModeActive: boolean
   devModeClickCount: number
@@ -25,12 +27,13 @@ export interface State {
   dismissedInviteFriends: boolean
   dismissedGetVerified: boolean
   promptFornoIfNeeded: boolean
+  retryVerificationWithForno: boolean
   acceptedTerms: boolean
+  hasMigratedToNewBip39: boolean
 }
 
 export enum PincodeType {
   Unset = 'Unset',
-  PhoneAuth = 'PhoneAuth',
   CustomPin = 'CustomPin',
 }
 
@@ -40,9 +43,9 @@ export interface UserContactDetails {
 }
 
 export const initialState = {
-  name: '',
-  e164PhoneNumber: '',
-  defaultCountryCode: '',
+  name: null,
+  e164PhoneNumber: null,
+  defaultCountryCode: null,
   contactDetails: {
     contactId: null,
     thumbnailPath: null,
@@ -63,11 +66,13 @@ export const initialState = {
   dismissedGetVerified: false,
   promptFornoIfNeeded: false,
   acceptedTerms: false,
+  retryVerificationWithForno: features.VERIFICATION_FORNO_RETRY,
+  hasMigratedToNewBip39: false,
 }
 
 export const reducer = (
   state: State | undefined = initialState,
-  action: ActionTypes | RehydrateAction
+  action: ActionTypes | RehydrateAction | Web3ActionTypes
 ): State => {
   switch (action.type) {
     case REHYDRATE: {
@@ -141,10 +146,10 @@ export const reducer = (
         ...state,
         socialBackupCompleted: true,
       }
-    case Actions.RESET_BACKUP_STATE:
+    case Actions.TOGGLE_BACKUP_STATE:
       return {
         ...state,
-        backupCompleted: false,
+        backupCompleted: !state.backupCompleted,
         socialBackupCompleted: false,
         backupDelayedTime: 0,
       }
@@ -186,8 +191,19 @@ export const reducer = (
         ...state,
         promptFornoIfNeeded: action.promptIfNeeded,
       }
+    case Actions.SET_RETRY_VERIFICATION_WITH_FORNO:
+      return {
+        ...state,
+        retryVerificationWithForno: action.retry,
+      }
     case Actions.ACCEPT_TERMS: {
       return { ...state, acceptedTerms: true }
+    }
+    case Web3Actions.SET_ACCOUNT: {
+      return {
+        ...state,
+        hasMigratedToNewBip39: true,
+      }
     }
     default:
       return state

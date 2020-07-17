@@ -23,11 +23,11 @@ ContractKit currently supports the following types of claim:
 
 - **Keybase User Claim** - Accounts can make claims on [Keybase](https://keybase.io) usernames. This claim is verifiable by signing a message with the account and hosting it on the publicly accessible path of the Keybase file system.
 
+- **Domain Claim** - Accounts can make claims on domain names. This claim is verifiable by signing a message with the account and embedding it in a [TXT record](https://en.wikipedia.org/wiki/TXT_record).
+
 In the future ContractKit may support other types of claim, including:
 
 - **Twitter User Claim** - Accounts can make claims on [Twitter](https://twitter.com/) usernames. This claim is verifiable by signing a message with the account and posting it as a tweet. Any client can verify the claim with a reference to the tweet in the claim.
-
-- **Domain Claim** - Accounts can make claims on domain names. This claim is verifiable by signing a message with the account and embedding it in a [TXT record](https://en.wikipedia.org/wiki/TXT_record).
 
 ## Handling Metadata
 

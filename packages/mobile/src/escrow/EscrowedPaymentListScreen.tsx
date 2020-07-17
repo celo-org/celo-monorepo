@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { View } from 'react-native'
-import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentListItem from 'src/escrow/EscrowedPaymentListItem'
@@ -36,7 +35,7 @@ interface SentEscrowPaymentsAndInvitees {
   invitees: InviteDetails[]
 }
 
-type Props = NavigationInjectedProps & WithTranslation & StateProps
+type Props = WithTranslation & StateProps
 
 export const listItemRenderer = (
   item: SentEscrowPaymentsAndInvitees,
@@ -69,5 +68,5 @@ EscrowedPaymentListScreen.navigationOptions = titleWithBalanceNavigationOptions(
 )
 
 export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(
-  withTranslation(Namespaces.global)(EscrowedPaymentListScreen)
+  withTranslation<Props>(Namespaces.global)(EscrowedPaymentListScreen)
 )

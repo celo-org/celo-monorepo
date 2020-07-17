@@ -5,7 +5,6 @@ import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import useBalanceAutoRefresh from 'src/home/useBalanceAutoRefresh'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -28,12 +27,12 @@ function CeloDollarsOverview({ t }: Props) {
   return (
     <View style={styles.container}>
       {dollarBalanceAmount && (
-        <Text style={styles.balance}>
+        <Text style={styles.balance} testID="DollarBalance">
           <CurrencyDisplay style={fontStyles.semiBold} amount={dollarBalanceAmount} />
         </Text>
       )}
       {!isUsdLocalCurrency && dollarBalanceAmount && (
-        <Text style={styles.dollarBalance}>
+        <Text style={styles.dollarBalance} testID="GoldBalance">
           <Trans i18nKey="dollarBalance" ns={Namespaces.walletFlow5}>
             <CurrencyDisplay
               amount={dollarBalanceAmount}
@@ -72,4 +71,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(withTranslation(Namespaces.walletFlow5)(CeloDollarsOverview))
+export default withTranslation<Props>(Namespaces.walletFlow5)(CeloDollarsOverview)

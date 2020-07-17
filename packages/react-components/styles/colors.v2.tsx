@@ -1,5 +1,5 @@
 // Designer Created Figma Colors
-export enum colorsEnum {
+export enum Colors {
   greenFaint = '#97DFC1', // green disabled
   greenBrand = '#42D689',
   greenUI = '#1AB775',
@@ -7,7 +7,7 @@ export enum colorsEnum {
   goldBrand = '#FBCC5C',
   goldUI = '#EEB93C',
   goldDark = '#9C6E00',
-  beige = '#F5F4F0',
+  beige = '#F1F0EB',
   brownFaint = '#FFF9EE',
   warning = '#EA6042',
   dark = '#2E3338',
@@ -17,26 +17,17 @@ export enum colorsEnum {
   gray2 = '#EDEEEF',
   gray1 = '#F8F9F9',
   light = '#FFFFFF',
+  purple = '#D39CFE',
+  teal = '#7AD6FE',
+  orange = '#FEB45E',
+  onboardingBrownLight = '#A49B80',
+  onboardingBlue = '#0768AE',
+  onboardingLightBlue = '#D6EAF3',
+  onboardingBackground = '#F9F6F0',
 }
 
 export default {
-  greenFaint: colorsEnum.greenFaint,
-  greenBrand: colorsEnum.greenBrand,
-  greenUI: colorsEnum.greenUI,
-  goldFaint: colorsEnum.goldFaint,
-  goldBrand: colorsEnum.goldBrand,
-  goldUI: colorsEnum.goldUI,
-  goldDark: colorsEnum.goldDark,
-  beige: colorsEnum.beige,
-  brownFaint: colorsEnum.brownFaint,
-  warning: colorsEnum.warning,
-  dark: colorsEnum.dark,
-  gray5: colorsEnum.gray5,
-  gray4: colorsEnum.gray4,
-  gray3: colorsEnum.gray3,
-  gray2: colorsEnum.gray2,
-  gray1: colorsEnum.gray1,
-  light: colorsEnum.light,
+  ...Colors,
   get background() {
     return deprecationNotice('light')
   },
@@ -84,5 +75,5 @@ export default {
 function deprecationNotice(color: string) {
   console.warn(`deprecated: trying colors.${color}`)
   // @ts-ignore
-  return colorsEnum[color]
+  return Colors[color]
 }

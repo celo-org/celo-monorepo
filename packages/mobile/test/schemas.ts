@@ -22,10 +22,12 @@ export const vNeg1Schema = {
   },
   networkInfo: {
     connected: true,
+    rehydrated: true,
   },
   send: {
     isSending: false,
     recentRecipients: [],
+    recentPayments: [],
   },
   recipients: {
     recipientCache: {},
@@ -146,9 +148,7 @@ export const vNeg1Schema = {
   },
 }
 
-export const v0Schema = vNeg1Schema
-
-export const v1Schema = {
+export const v0Schema = {
   app: {
     inviteCodeEntered: false,
     loggedIn: false,
@@ -167,10 +167,12 @@ export const v1Schema = {
   },
   networkInfo: {
     connected: true,
+    rehydrated: true,
   },
   send: {
     isSending: false,
     recentRecipients: [],
+    recentPayments: [],
   },
   recipients: {
     recipientCache: {},
@@ -291,6 +293,58 @@ export const v1Schema = {
   },
 }
 
+export const v1Schema = {
+  ...v0Schema,
+  exchange: {
+    ...v0Schema.exchange,
+    history: {
+      ...v0Schema.exchange.history,
+      aggregatedExchangeRates: [],
+      granularity: 60,
+      range: 30 * 24 * 60 * 60 * 1000, // 30 days
+    },
+  },
+  identity: {
+    ...v0Schema.identity,
+    importContactsProgress: {
+      status: 0,
+      current: 0,
+      total: 0,
+    },
+    matchedContacts: {},
+    isValidRecipient: false,
+    secureSendPhoneNumberMapping: {},
+  },
+  transactions: {
+    ...v0Schema.transactions,
+    knownFeedTransactions: {},
+    recentTxRecipientsCache: {},
+  },
+  account: {
+    ...v0Schema.account,
+    retryVerificationWithForno: true,
+  },
+  app: {
+    ...v0Schema.app,
+    requirePinOnAppOpen: false,
+  },
+}
+
+export const v2Schema = {
+  ...v1Schema,
+  app: {
+    ...v1Schema.app,
+    sessionId: '',
+  },
+  account: {
+    ...v1Schema.account,
+    hasMigratedToNewBip39: false,
+  },
+  identity: {
+    ...v1Schema.identity,
+  },
+}
+
 export function getLatestSchema(): Partial<RootState> {
-  return v1Schema as Partial<RootState>
+  return v2Schema as Partial<RootState>
 }

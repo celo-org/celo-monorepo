@@ -15,9 +15,9 @@ exports[`renders correctly for input backup phrase 1`] = `
       style={
         Object {
           "color": "#2E3338",
-          "fontFamily": "Hind-SemiBold",
+          "fontFamily": "Inter-Medium",
           "fontSize": 16,
-          "lineHeight": 24,
+          "lineHeight": 22,
         }
       }
     >
@@ -39,19 +39,19 @@ exports[`renders correctly for input backup phrase 1`] = `
       multiline={true}
       onChangeText={[Function]}
       placeholder="backupPhrasePlaceholder"
-      placeholderTextColor="#D1D5D8"
+      placeholderTextColor="#9CA4A9"
       rejectResponderTermination={true}
       shouldShowClipboard={[Function]}
       style={
         Array [
           Object {
-            "borderColor": "#D1D5D8",
+            "borderColor": "#EDEEEF",
             "borderRadius": 4,
             "borderWidth": 1,
             "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
+            "fontFamily": "Inter-Regular",
             "fontSize": 16,
-            "lineHeight": 24,
+            "lineHeight": 22,
             "minHeight": 125,
             "padding": 14,
             "paddingTop": 16,
@@ -82,9 +82,9 @@ exports[`renders correctly for input social backup phrase 1`] = `
       style={
         Object {
           "color": "#2E3338",
-          "fontFamily": "Hind-SemiBold",
+          "fontFamily": "Inter-Medium",
           "fontSize": 16,
-          "lineHeight": 24,
+          "lineHeight": 22,
         }
       }
     >
@@ -106,19 +106,19 @@ exports[`renders correctly for input social backup phrase 1`] = `
       multiline={true}
       onChangeText={[Function]}
       placeholder="backupPhrasePlaceholder"
-      placeholderTextColor="#D1D5D8"
+      placeholderTextColor="#9CA4A9"
       rejectResponderTermination={true}
       shouldShowClipboard={[Function]}
       style={
         Array [
           Object {
-            "borderColor": "#D1D5D8",
+            "borderColor": "#EDEEEF",
             "borderRadius": 4,
             "borderWidth": 1,
             "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
+            "fontFamily": "Inter-Regular",
             "fontSize": 16,
-            "lineHeight": 24,
+            "lineHeight": 22,
             "minHeight": 125,
             "padding": 14,
             "paddingTop": 16,
@@ -151,9 +151,9 @@ exports[`renders correctly for readonly backup phrase 1`] = `
       style={
         Object {
           "color": "#2E3338",
-          "fontFamily": "Hind-SemiBold",
+          "fontFamily": "Inter-Medium",
           "fontSize": 16,
-          "lineHeight": 24,
+          "lineHeight": 22,
         }
       }
     >
@@ -164,21 +164,21 @@ exports[`renders correctly for readonly backup phrase 1`] = `
     style={
       Object {
         "alignContent": "center",
-        "backgroundColor": "#EEEEEE",
+        "backgroundColor": "#FFF9EE",
         "borderRadius": 4,
         "justifyContent": "center",
-        "marginTop": 10,
-        "padding": 14,
+        "marginTop": 16,
+        "padding": 16,
       }
     }
   >
     <Text
       style={
         Object {
-          "color": "#81868B",
-          "fontFamily": "Hind-Regular",
+          "color": "#2E3338",
+          "fontFamily": "Inter-Regular",
           "fontSize": 16,
-          "lineHeight": 27,
+          "lineHeight": 22,
         }
       }
     >
@@ -203,9 +203,9 @@ exports[`renders correctly for readonly social backup phrase 1`] = `
       style={
         Object {
           "color": "#2E3338",
-          "fontFamily": "Hind-SemiBold",
+          "fontFamily": "Inter-Medium",
           "fontSize": 16,
-          "lineHeight": 24,
+          "lineHeight": 22,
         }
       }
     >
@@ -216,21 +216,21 @@ exports[`renders correctly for readonly social backup phrase 1`] = `
     style={
       Object {
         "alignContent": "center",
-        "backgroundColor": "#EEEEEE",
+        "backgroundColor": "#FFF9EE",
         "borderRadius": 4,
         "justifyContent": "center",
-        "marginTop": 10,
-        "padding": 14,
+        "marginTop": 16,
+        "padding": 16,
       }
     }
   >
     <Text
       style={
         Object {
-          "color": "#81868B",
-          "fontFamily": "Hind-Regular",
+          "color": "#2E3338",
+          "fontFamily": "Inter-Regular",
           "fontSize": 16,
-          "lineHeight": 27,
+          "lineHeight": 22,
         }
       }
     >

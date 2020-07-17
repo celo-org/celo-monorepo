@@ -1,10 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`VerificationLoadingScreen renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FAFAFA",
+      "backgroundColor": "#F9F6F0",
       "flex": 1,
     }
   }
@@ -21,12 +21,22 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
         Object {
           "left": 5,
           "position": "absolute",
+          "top": 10,
+          "zIndex": 1,
         }
       }
     >
       <View
         accessible={true}
         focusable={true}
+        hitSlop={
+          Object {
+            "bottom": 10,
+            "left": 10,
+            "right": 10,
+            "top": 10,
+          }
+        }
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
@@ -40,22 +50,22 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
         onResponderTerminate={[Function]}
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
-        style={
-          Object {
-            "paddingHorizontal": 20,
-            "paddingVertical": 10,
-          }
-        }
         testID="CancelButton"
       >
         <Text
           style={
-            Object {
-              "color": "#42D689",
-              "fontFamily": "Hind-SemiBold",
-              "fontSize": 14,
-              "lineHeight": 22,
-            }
+            Array [
+              Object {
+                "color": "#1AB775",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingHorizontal": 24,
+              },
+              Object {
+                "color": "#2E3338",
+              },
+            ]
           }
         >
           cancel
@@ -72,34 +82,6 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
       }
     >
       <View>
-        <View
-          style={
-            Object {
-              "height": 35,
-              "paddingRight": 10,
-              "paddingTop": 10,
-              "position": "absolute",
-              "right": 0,
-              "top": 0,
-              "width": 70,
-              "zIndex": 100,
-            }
-          }
-        >
-          <Text
-            accessible={true}
-            focusable={true}
-            onClick={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-          >
-               
-          </Text>
-        </View>
         <View
           style={
             Object {
@@ -145,9 +127,9 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
             style={
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-SemiBold",
+                "fontFamily": "Inter-SemiBold",
                 "fontSize": 16,
-                "lineHeight": 24,
+                "lineHeight": 22,
                 "marginTop": 20,
               }
             }
@@ -158,10 +140,10 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
             style={
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
+                "fontFamily": "Inter-Regular",
                 "fontSize": 16,
-                "lineHeight": 24,
-                "marginTop": 5,
+                "lineHeight": 22,
+                "marginTop": 10,
               }
             }
           >
@@ -278,7 +260,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
         <Text
           style={
             Object {
-              "color": "#FD785B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Bold",
               "fontSize": 18,
               "marginVertical": 15,
@@ -286,7 +268,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
             }
           }
         >
-          failModal.header
+          retryWithFornoModal.header
         </Text>
         <Text
           style={
@@ -298,7 +280,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
             }
           }
         >
-          failModal.body1
+          retryWithFornoModal.body1
         </Text>
         <Text
           style={
@@ -315,7 +297,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
             ]
           }
         >
-          failModal.body2
+          retryWithFornoModal.body2
         </Text>
         <View
           style={
@@ -354,7 +336,46 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                     "lineHeight": 18,
                   },
                   Object {
-                    "color": "#2E3338",
+                    "color": "rgba(0, 0, 0, .4)",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 16,
+                    "lineHeight": 24,
+                    "paddingRight": 40,
+                  },
+                ]
+              }
+            >
+              education.skip
+            </Text>
+          </View>
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#42D689",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  },
+                  Object {
+                    "color": "#42D689",
                     "fontFamily": "Hind-SemiBold",
                     "fontSize": 16,
                     "lineHeight": 24,
@@ -362,21 +383,21 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                 ]
               }
             >
-              missingCodesModal.skip
+              retryWithFornoModal.retryButton
             </Text>
           </View>
         </View>
       </View>
     </View>
   </Modal>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
 
 exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FAFAFA",
+      "backgroundColor": "#F9F6F0",
       "flex": 1,
     }
   }
@@ -393,12 +414,22 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
         Object {
           "left": 5,
           "position": "absolute",
+          "top": 10,
+          "zIndex": 1,
         }
       }
     >
       <View
         accessible={true}
         focusable={true}
+        hitSlop={
+          Object {
+            "bottom": 10,
+            "left": 10,
+            "right": 10,
+            "top": 10,
+          }
+        }
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
@@ -412,22 +443,22 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
         onResponderTerminate={[Function]}
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
-        style={
-          Object {
-            "paddingHorizontal": 20,
-            "paddingVertical": 10,
-          }
-        }
         testID="CancelButton"
       >
         <Text
           style={
-            Object {
-              "color": "#42D689",
-              "fontFamily": "Hind-SemiBold",
-              "fontSize": 14,
-              "lineHeight": 22,
-            }
+            Array [
+              Object {
+                "color": "#1AB775",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingHorizontal": 24,
+              },
+              Object {
+                "color": "#2E3338",
+              },
+            ]
           }
         >
           cancel
@@ -444,34 +475,6 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
       }
     >
       <View>
-        <View
-          style={
-            Object {
-              "height": 35,
-              "paddingRight": 10,
-              "paddingTop": 10,
-              "position": "absolute",
-              "right": 0,
-              "top": 0,
-              "width": 70,
-              "zIndex": 100,
-            }
-          }
-        >
-          <Text
-            accessible={true}
-            focusable={true}
-            onClick={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-          >
-               
-          </Text>
-        </View>
         <View
           style={
             Object {
@@ -517,9 +520,9 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
             style={
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-SemiBold",
+                "fontFamily": "Inter-SemiBold",
                 "fontSize": 16,
-                "lineHeight": 24,
+                "lineHeight": 22,
                 "marginTop": 20,
               }
             }
@@ -530,10 +533,10 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
             style={
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
+                "fontFamily": "Inter-Regular",
                 "fontSize": 16,
-                "lineHeight": 24,
-                "marginTop": 5,
+                "lineHeight": 22,
+                "marginTop": 10,
               }
             }
           >
@@ -650,7 +653,7 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
         <Text
           style={
             Object {
-              "color": "#FD785B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Bold",
               "fontSize": 18,
               "marginVertical": 15,
@@ -658,7 +661,7 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
             }
           }
         >
-          failModal.header
+          retryWithFornoModal.header
         </Text>
         <Text
           style={
@@ -670,7 +673,7 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
             }
           }
         >
-          failModal.body1
+          retryWithFornoModal.body1
         </Text>
         <Text
           style={
@@ -687,7 +690,7 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
             ]
           }
         >
-          failModal.body2
+          retryWithFornoModal.body2
         </Text>
         <View
           style={
@@ -726,7 +729,46 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
                     "lineHeight": 18,
                   },
                   Object {
-                    "color": "#2E3338",
+                    "color": "rgba(0, 0, 0, .4)",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 16,
+                    "lineHeight": 24,
+                    "paddingRight": 40,
+                  },
+                ]
+              }
+            >
+              education.skip
+            </Text>
+          </View>
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#42D689",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  },
+                  Object {
+                    "color": "#42D689",
                     "fontFamily": "Hind-SemiBold",
                     "fontSize": 16,
                     "lineHeight": 24,
@@ -734,12 +776,12 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
                 ]
               }
             >
-              missingCodesModal.skip
+              retryWithFornoModal.retryButton
             </Text>
           </View>
         </View>
       </View>
     </View>
   </Modal>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

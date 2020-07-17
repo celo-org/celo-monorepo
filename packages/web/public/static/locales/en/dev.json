@@ -4,7 +4,7 @@
   "aboutTheChallengeButton": "Get Involved",
   "expandLeaderboard": "Expand Leaderboard",
   "collapseLeaderboard": "Collapse Leaderboard",
-  "makeWithCelo": "Build Celo",
+  "makeWithCelo": "Operate Celo",
   "makeWithCeloSubtitle": "Participate in Celo's proof-of-stake consensus and produce blocks",
   "greatStakeOff": "The Great Celo\nStake Off",
   "greatStakeOffSubtitle": "Win prizes by operating and hardening\nthe Baklava Testnet",
@@ -75,7 +75,7 @@
     },
     "tutorial": {
       "title": "Tutorial",
-      "copy": "Deploy Celo blockchain software and connect to Mainnet Release Candidate 1",
+      "copy": "Deploy Celo blockchain software and connect to Mainnet",
       "btnText": "Read Tutorial"
     },
     "blog": {

@@ -19,6 +19,10 @@ export const pagePaths = {
     name: 'BrandKit',
     link: '/experience/brand',
   },
+  BRAND_POLICY: {
+    name: 'Brand Policy',
+    link: '/brand-policy',
+  },
   BUILD: {
     name: 'Validators',
     link: '/validators',
@@ -30,6 +34,10 @@ export const pagePaths = {
   COMMUNITY: {
     name: 'Community',
     link: '/community',
+  },
+  EVENTS_KIT: {
+    name: 'EventKit',
+    link: '/experience/events',
   },
   DEVELOPERS: {
     name: 'Developers',
@@ -105,6 +113,7 @@ export enum CeloLinks {
   gettingStarted = 'https://docs.celo.org/getting-started/alfajores-testnet',
   coinlist = 'https://coinlist.co/celo?utm_source=celo%20website&utm_medium=website%20widget&utm_campaign=celowebsite_20200318',
   gitHub = 'https://github.com/celo-org',
+  reserve = 'https://www.celoreserve.org',
   instagram = 'https://www.instagram.com/celoorg/',
   twitter = 'https://twitter.com/CeloOrg',
   medium = 'https://medium.com/celoOrg',
@@ -172,6 +181,33 @@ export const hashNav = {
     overview: 'overview',
   },
   brandTypography: { overview: 'overview', scale: 'type-scale' },
+  eventsIntro: {
+    overview: 'overview',
+    brandVoice: 'brand-voice',
+  },
+  eventsFlavor: {
+    overview: 'overview',
+    codeOfConduct: 'code-of-conduct',
+    foster: 'foster',
+    uniqueGifts: 'unique-gifts',
+    rituals: 'rituals',
+    tenets: 'tenets',
+  },
+  eventsResources: {
+    overview: 'overview',
+    quickTips: 'quick-tips',
+    planning: 'planning',
+    social: 'social-media',
+  },
+  eventExamples: {
+    examples: 'examples',
+    slideDecks: 'slide-decks',
+    videos: 'videos',
+  },
+  eventCircles: {
+    overview: 'overview',
+    sponsorship: 'sponsorship',
+  },
 }
 
 export default pagePaths

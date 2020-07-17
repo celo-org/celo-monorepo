@@ -2,15 +2,14 @@ import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import BigNumber from 'bignumber.js'
 import { call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { SendEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { calculateFee } from 'src/fees/saga'
 import { completePaymentRequest } from 'src/firebase/actions'
-import { features } from 'src/flags'
 import { transferGoldToken } from 'src/goldToken/actions'
-import { encryptComment } from 'src/identity/commentKey'
-import { addressToE164NumberSelector } from 'src/identity/reducer'
+import { encryptComment } from 'src/identity/commentEncryption'
+import { addressToE164NumberSelector, e164NumberToAddressSelector } from 'src/identity/reducer'
 import { InviteBy } from 'src/invite/actions'
 import { sendInvite } from 'src/invite/saga'
 import { navigateHome } from 'src/navigator/NavigationService'
@@ -40,12 +39,16 @@ export async function getSendTxGas(
   currency: CURRENCY_ENUM,
   params: BasicTokenTransfer
 ) {
-  Logger.debug(`${TAG}/getSendTxGas`, 'Getting gas estimate for send tx')
-  const tx = await createTokenTransferTransaction(currency, params)
-  const txParams = { from: account, feeCurrency: await getCurrencyAddress(currency) }
-  const gas = await estimateGas(tx.txo, txParams)
-  Logger.debug(`${TAG}/getSendTxGas`, `Estimated gas of ${gas.toString()}`)
-  return gas
+  try {
+    Logger.debug(`${TAG}/getSendTxGas`, 'Getting gas estimate for send tx')
+    const tx = await createTokenTransferTransaction(currency, params)
+    const txParams = { from: account, feeCurrency: await getCurrencyAddress(currency) }
+    const gas = await estimateGas(tx.txo, txParams)
+    Logger.debug(`${TAG}/getSendTxGas`, `Estimated gas of ${gas.toString()}`)
+    return gas
+  } catch (error) {
+    throw Error(ErrorMessages.INSUFFICIENT_BALANCE)
+  }
 }
 
 export async function getSendFee(
@@ -53,8 +56,12 @@ export async function getSendFee(
   currency: CURRENCY_ENUM,
   params: BasicTokenTransfer
 ) {
-  const gas = await getSendTxGas(account, currency, params)
-  return calculateFee(gas)
+  try {
+    const gas = await getSendTxGas(account, currency, params)
+    return calculateFee(gas)
+  } catch (error) {
+    throw error
+  }
 }
 
 export function* watchQrCodeDetections() {
@@ -63,8 +70,27 @@ export function* watchQrCodeDetections() {
     Logger.debug(TAG, 'Barcode detected in watcher')
     const addressToE164Number = yield select(addressToE164NumberSelector)
     const recipientCache = yield select(recipientCacheSelector)
+    const e164NumberToAddress = yield select(e164NumberToAddressSelector)
+    const isOutgoingPaymentRequest = action.isOutgoingPaymentRequest
+    let secureSendTxData
+    let requesterAddress
+
+    if (action.scanIsForSecureSend) {
+      secureSendTxData = action.transactionData
+      requesterAddress = action.requesterAddrress
+    }
+
     try {
-      yield call(handleBarcode, action.data, addressToE164Number, recipientCache)
+      yield call(
+        handleBarcode,
+        action.data,
+        addressToE164Number,
+        recipientCache,
+        e164NumberToAddress,
+        secureSendTxData,
+        isOutgoingPaymentRequest,
+        requesterAddress
+      )
     } catch (error) {
       Logger.error(TAG, 'Error handling the barcode', error)
     }
@@ -89,6 +115,7 @@ function* sendPayment(
   currency: CURRENCY_ENUM
 ) {
   try {
+    ValoraAnalytics.track(SendEvents.send_tx_start)
     const txId = generateStandbyTransactionId(recipientAddress)
 
     switch (currency) {
@@ -118,36 +145,37 @@ function* sendPayment(
         Logger.showError(`Sending currency ${currency} not yet supported`)
       }
     }
+    ValoraAnalytics.track(SendEvents.send_tx_complete)
   } catch (error) {
     Logger.error(`${TAG}/sendPayment`, 'Could not send payment', error)
+    ValoraAnalytics.track(SendEvents.send_tx_error, { error: error.message })
     throw error
   }
 }
 
 function* sendPaymentOrInviteSaga({
   amount,
-  reason,
+  comment,
   recipient,
   recipientAddress,
   inviteMethod,
   firebasePendingRequestUid,
 }: SendPaymentOrInviteAction) {
   try {
-    recipientAddress
-      ? CeloAnalytics.track(CustomEventNames.send_dollar_confirm)
-      : CeloAnalytics.track(CustomEventNames.send_invite)
-    if (!recipient || (!recipient.e164PhoneNumber && !recipient.address)) {
-      throw new Error("Can't send to recipient without valid e164 number or address")
+    if (!recipient?.e164PhoneNumber && !recipient?.address) {
+      throw new Error("Can't send to recipient without valid e164PhoneNumber or address")
     }
 
-    const ownAddress = yield select(currentAccountSelector)
-    const comment = features.USE_COMMENT_ENCRYPTION
-      ? yield call(encryptComment, reason, recipientAddress, ownAddress)
-      : reason
-
+    const ownAddress: string = yield select(currentAccountSelector)
     if (recipientAddress) {
-      yield call(sendPayment, recipientAddress, amount, comment, CURRENCY_ENUM.DOLLAR)
-      CeloAnalytics.track(CustomEventNames.send_dollar_transaction)
+      const encryptedComment = yield call(
+        encryptComment,
+        comment,
+        recipientAddress,
+        ownAddress,
+        true
+      )
+      yield call(sendPayment, recipientAddress, amount, encryptedComment, CURRENCY_ENUM.DOLLAR)
     } else if (recipient.e164PhoneNumber) {
       yield call(
         sendInvite,
@@ -161,8 +189,9 @@ function* sendPaymentOrInviteSaga({
     if (firebasePendingRequestUid) {
       yield put(completePaymentRequest(firebasePendingRequestUid))
     }
+
     navigateHome()
-    yield put(sendPaymentOrInviteSuccess())
+    yield put(sendPaymentOrInviteSuccess(amount))
   } catch (e) {
     yield put(showError(ErrorMessages.SEND_PAYMENT_FAILED))
     yield put(sendPaymentOrInviteFailure())

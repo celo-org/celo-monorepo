@@ -15,13 +15,13 @@
   },
   "dependencies": {
     "@celo/react-native-sms-retriever": "git+https://github.com/celo-org/react-native-sms-retriever#b88e502",
-    "@celo/utils": "0.1.15-dev",
+    "@celo/utils": "0.1.17-dev",
     "hoist-non-react-statics": "^3.3.0",
     "lodash": "^4.17.14",
     "react-native-autocomplete-input": "^4.1.0",
     "react-native-contacts": "https://github.com/celo-org/react-native-contacts#e473717",
     "react-native-platform-touchable": "^1.1.1",
-    "react-native-safe-area-view": "^1.1.1",
+    "react-native-safe-area-context": "^3.0.6",
     "svgs": "^4.1.0"
   },
   "devDependencies": {
@@ -33,12 +33,10 @@
     "react": "16.11.0",
     "react-dom": "16.11.0",
     "react-native-testing-library": "^1.12.0",
-    "react-navigation": "^4.0.10",
     "react-test-renderer": "16.11.0"
   },
   "peerDependencies": {
     "react": "*",
-    "react-native": "*",
-    "react-navigation": "*"
+    "react-native": "*"
   }
 }

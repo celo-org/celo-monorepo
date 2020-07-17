@@ -5,7 +5,8 @@ import * as renderer from 'react-test-renderer'
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
-import { createMockNavigationProp, createMockStore } from 'test/utils'
+import { Screens } from 'src/navigator/Screens'
+import { createMockStore, getMockStackScreenProps } from 'test/utils'
 
 const exchangeRatePair: ExchangeRatePair = { goldMaker: '0.11', dollarMaker: '10' }
 
@@ -25,25 +26,21 @@ const store = createMockStore({
   },
 })
 
+const mockScreenProps = getMockStackScreenProps(Screens.ExchangeReview, {
+  exchangeInput: {
+    makerToken: CURRENCY_ENUM.GOLD,
+    makerTokenBalance: '20',
+    inputToken: CURRENCY_ENUM.GOLD,
+    inputTokenDisplayName: 'gold',
+    inputAmount: new BigNumber(10),
+  },
+})
+
 describe('ExchangeReview', () => {
   it('renders correctly', () => {
-    const navigation = createMockNavigationProp({
-      makerToken: CURRENCY_ENUM.GOLD,
-      makerTokenBalance: '20',
-      inputToken: CURRENCY_ENUM.GOLD,
-      inputTokenDisplayName: 'gold',
-      inputAmount: new BigNumber(10),
-    })
     const tree = renderer.create(
       <Provider store={store}>
-        <ExchangeReview
-          navigation={navigation}
-          fee={'0'}
-          appConnected={true}
-          fetchExchangeRate={jest.fn()}
-          exchangeRatePair={exchangeRatePair}
-          exchangeTokens={jest.fn()}
-        />
+        <ExchangeReview {...mockScreenProps} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()

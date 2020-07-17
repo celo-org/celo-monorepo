@@ -40,6 +40,6 @@ export const Counters = {
   }),
   attestationRequestUnexpectedErrors: new Counter({
     name: 'attestation_requests_unexpected_errors',
-    help: 'Counter for the number of unexpected errrors',
+    help: 'Counter for the number of unexpected errors',
   }),
 }

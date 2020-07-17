@@ -1,10 +1,211 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`FiatExchange renders correctly 1`] = `
-<ActivityIndicator
-  animating={true}
-  color="#42D689"
-  hidesWhenStopped={true}
-  size="large"
-/>
+<RNCSafeAreaView
+  style={
+    Object {
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "backgroundColor": "transparent",
+        "borderBottomColor": 0,
+        "borderBottomWidth": 1,
+        "flexDirection": "row",
+        "height": 62,
+        "justifyContent": "center",
+      }
+    }
+  >
+    <View
+      accessible={true}
+      focusable={false}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "left": 8,
+          "marginBottom": 0,
+          "marginLeft": 4,
+          "opacity": 1,
+          "padding": 8,
+          "position": "absolute",
+          "top": 8,
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height="32"
+        viewBox="0 0 32 32"
+        width="32"
+      >
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="9.75"
+          y2="9.75"
+        />
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="15.75"
+          y2="15.75"
+        />
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="21.75"
+          y2="21.75"
+        />
+      </svg>
+    </View>
+  </View>
+  <View
+    style={
+      Object {
+        "height": 200,
+      }
+    }
+  />
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "borderBottomColor": "#EDEEEF",
+        "borderBottomWidth": 1,
+        "height": 112,
+        "justifyContent": "flex-end",
+        "marginLeft": 16,
+        "paddingRight": 16,
+        "paddingVertical": 16,
+      }
+    }
+  >
+    <Text
+      style={
+        Object {
+          "color": "#2E3338",
+          "fontFamily": "Jost-Medium",
+          "fontSize": 22,
+          "lineHeight": 28,
+          "marginBottom": 4,
+        }
+      }
+    >
+      global:currentBalance
+    </Text>
+    <Text
+      numberOfLines={1}
+      style={
+        Array [
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 18,
+            "lineHeight": 24,
+            "marginBottom": 2,
+          },
+          Object {
+            "color": "#2E3338",
+          },
+        ]
+      }
+    >
+      
+      $
+      0.00
+    </Text>
+    <Text
+      numberOfLines={1}
+      style={
+        Array [
+          Object {
+            "color": "#9CA4A9",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+          },
+          Object {
+            "color": "#9CA4A9",
+          },
+        ]
+      }
+    >
+      
+      0.00
+       global:celoDollars
+    </Text>
+  </View>
+  <View>
+    <View
+      style={
+        Object {
+          "backgroundColor": "#FFFFFF",
+        }
+      }
+    >
+      <View
+        accessible={true}
+        focusable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackgroundBorderless",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+      >
+        <View
+          style={
+            Object {
+              "borderBottomColor": "#EDEEEF",
+              "borderBottomWidth": 1,
+              "marginLeft": 16,
+              "paddingVertical": 16,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+              }
+            }
+          >
+            fiatExchangeFlow:addFunds
+          </Text>
+        </View>
+      </View>
+    </View>
+  </View>
+</RNCSafeAreaView>
 `;

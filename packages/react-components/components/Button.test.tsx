@@ -28,7 +28,7 @@ describe('Button', () => {
           testID={'ButtonTestId'}
         />
       )
-      const button = getByName('TouchableDefault')
+      const button = getByName('Touchable')
       fireEvent.press(button)
       fireEvent.press(button)
       fireEvent.press(button)
@@ -68,7 +68,7 @@ describe('Button', () => {
           <Text>child text</Text>
         </Button>
       )
-      expect(getByName('TouchableDefault').props).toMatchObject({
+      expect(getByName('Touchable').props).toMatchObject({
         testID: 'jest-test',
         disabled: true,
       })

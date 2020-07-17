@@ -35,3 +35,23 @@ Create chart name and version as used by the chart label.
 {{ include "common.standard.labels" . }}
 component: celo-fullnode
 {{- end -}}
+
+{{- define "celo-fullnode.rpc-ports" -}}
+- port: 8545
+  targetPort: rpc
+  protocol: TCP
+  name: rpc
+- port: 8546
+  targetPort: ws
+  protocol: TCP
+  name: ws
+{{- end -}}
+
+{{/*
+Annotations to indicate to the prometheus server that this node should be scraped for metrics
+*/}}
+{{- define "prometheus-annotations" -}}
+prometheus.io/scrape: "true"
+prometheus.io/path:  "{{ .Values.pprof.path }}"
+prometheus.io/port: "{{ .Values.pprof.port }}"
+{{- end -}}

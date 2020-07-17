@@ -16,7 +16,7 @@ By default, `geth` will use `/root/.celo` as the data dir, if you would like to 
 
 cLabs generally hosts bootnodes to help nodes discover each other on the network. You can fetch those under `https://www.googleapis.com/storage/v1/b/env_bootnodes/o/${NETWORK_NAME}\?alt\=media`.
 
-The current network ID for the Alfajores testnet is `44786`, for the Baklava testnet it is `200110`.
+The current network ID for the Alfajores testnet is `44787`, for the Baklava testnet it is `62320`.
 
 This is all you should need to connect to a network:
 
@@ -41,6 +41,8 @@ Forno networks:
 Alfajores = 'https://alfajores-forno.celo-testnet.org'
 
 Baklava = 'https://baklava-forno.celo-testnet.org'
+
+Mainnet = 'https://rc1-forno.celo-testnet.org'
 ```
 
 ### Blockscout
@@ -51,6 +53,8 @@ We also expose data on the cLabs run blockscout instance. Blockscout itself expo
 Alfajores = 'https://alfajores-blockscout.celo-testnet.org'
 
 Baklava = 'https://baklava-blockscout.celo-testnet.org'
+
+Mainnet = 'https://explorer.celo.org/'
 ```
 
 
@@ -58,7 +62,7 @@ Baklava = 'https://baklava-blockscout.celo-testnet.org'
 
 Compared to Ethereum transaction, Celo transactions have 3 additional, optional fields:
 
-- `feeCurrency` - Specifies the address of the currency in which fees should be paid. If `null`, the native token `cGLD` is assumed.
+- `feeCurrency` - Specifies the address of the currency in which fees should be paid. If `null`, the native token `CELO` is assumed.
 - `gatewayFeeRecipient` - As part of [Full Node Incentives](../../celo-codebase/protocol/transactions/full-node-incentives.md), light clients will need to specify the address of their gateway for it to forward the transactions onto the network.
 - `gatewayFee` - The value of the gateway fee.
 

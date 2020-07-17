@@ -52,4 +52,11 @@ declare module 'web3-eth' {
 
 declare module 'web3-core-helpers' {
   export type Callback<T> = (error: Error | null, result?: T) => void
+  export interface JsonRpcResponse {
+    jsonrpc: string
+    id: number
+    result?: any
+    // this shows us how we are using it, but there is no way of overriding the type of an attribute
+    error?: string | { message: string; code: number }
+  }
 }

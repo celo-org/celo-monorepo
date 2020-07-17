@@ -2,10 +2,13 @@ import { isValidAddress } from '@celo/utils/src/address'
 import { isEmpty } from 'lodash'
 import * as RNFS from 'react-native-fs'
 import Share from 'react-native-share'
-import { put } from 'redux-saga/effects'
-import { showError } from 'src/alert/actions'
+import { call, put } from 'redux-saga/effects'
+import { showMessage } from 'src/alert/actions'
+import { SendEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { AddressToE164NumberType } from 'src/identity/reducer'
+import { validateRecipientAddressSuccess } from 'src/identity/actions'
+import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import { replace } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import {
@@ -15,6 +18,7 @@ import {
   RecipientKind,
 } from 'src/recipients/recipient'
 import { QrCode, storeLatestInRecents, SVG } from 'src/send/actions'
+import { TransactionDataInput } from 'src/send/SendAmount'
 import Logger from 'src/utils/Logger'
 
 export enum BarcodeTypes {
@@ -45,25 +49,86 @@ export async function shareSVGImage(svg: SVG) {
   })
 }
 
+function* handleSecureSend(
+  data: { address: string; e164PhoneNumber: string; displayName: string },
+  e164NumberToAddress: E164NumberToAddressType,
+  secureSendTxData: TransactionDataInput,
+  requesterAddress?: string
+) {
+  if (!secureSendTxData.recipient.e164PhoneNumber) {
+    throw Error(`Invalid recipient type for Secure Send: ${secureSendTxData.recipient.kind}`)
+  }
+
+  const userScannedAddress = data.address.toLowerCase()
+  const { e164PhoneNumber } = secureSendTxData.recipient
+  const possibleRecievingAddresses = e164NumberToAddress[e164PhoneNumber]
+  // This should never happen. Secure Send is triggered when there are
+  // multiple addrresses for a given phone number
+  if (!possibleRecievingAddresses) {
+    throw Error("No addresses associated with recipient's phone number")
+  }
+
+  // Need to add the requester address to the option set in the event
+  // a request is coming from an unverified account
+  if (requesterAddress && !possibleRecievingAddresses.includes(requesterAddress)) {
+    possibleRecievingAddresses.push(requesterAddress)
+  }
+  const possibleRecievingAddressesFormatted = possibleRecievingAddresses.map((address) =>
+    address.toLowerCase()
+  )
+  if (!possibleRecievingAddressesFormatted.includes(userScannedAddress)) {
+    const error = ErrorMessages.QR_FAILED_INVALID_RECIPIENT
+    ValoraAnalytics.track(SendEvents.send_secure_incorrect, {
+      confirmByScan: true,
+      error,
+    })
+    yield put(showMessage(error))
+    return false
+  }
+
+  ValoraAnalytics.track(SendEvents.send_secure_complete, { confirmByScan: true })
+  yield put(validateRecipientAddressSuccess(e164PhoneNumber, userScannedAddress))
+  return true
+}
+
 export function* handleBarcode(
   barcode: QrCode,
   addressToE164Number: AddressToE164NumberType,
-  recipientCache: NumberToRecipient
+  recipientCache: NumberToRecipient,
+  e164NumberToAddress: E164NumberToAddressType,
+  secureSendTxData?: TransactionDataInput,
+  isOutgoingPaymentRequest?: true,
+  requesterAddress?: string
 ) {
   let data: { address: string; e164PhoneNumber: string; displayName: string } | undefined
+
   try {
     data = JSON.parse(barcode.data)
   } catch (e) {
     Logger.warn(TAG, 'QR code read failed with ' + e)
   }
   if (typeof data !== 'object' || isEmpty(data.address)) {
-    yield put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS))
+    yield put(showMessage(ErrorMessages.QR_FAILED_NO_ADDRESS))
     return
   }
   if (!isValidAddress(data.address)) {
-    yield put(showError(ErrorMessages.QR_FAILED_INVALID_ADDRESS))
+    yield put(showMessage(ErrorMessages.QR_FAILED_INVALID_ADDRESS))
     return
   }
+
+  if (secureSendTxData) {
+    const success = yield call(
+      handleSecureSend,
+      data,
+      e164NumberToAddress,
+      secureSendTxData,
+      requesterAddress
+    )
+    if (!success) {
+      return
+    }
+  }
+
   if (typeof data.e164PhoneNumber !== 'string') {
     // Default for invalid e164PhoneNumber
     data.e164PhoneNumber = ''
@@ -90,5 +155,17 @@ export function* handleBarcode(
       }
   yield put(storeLatestInRecents(recipient))
 
-  replace(Screens.SendAmount, { recipient })
+  if (secureSendTxData && isOutgoingPaymentRequest) {
+    replace(Screens.PaymentRequestConfirmation, {
+      transactionData: secureSendTxData,
+      addressJustValidated: true,
+    })
+  } else if (secureSendTxData) {
+    replace(Screens.SendConfirmation, {
+      transactionData: secureSendTxData,
+      addressJustValidated: true,
+    })
+  } else {
+    replace(Screens.SendAmount, { recipient, isFromScan: true, isOutgoingPaymentRequest })
+  }
 }

@@ -24,13 +24,16 @@ const MENU = [menu.HOME, ...MAIN_MENU]
 const TECH_MENU = [
   { name: 'Docs', link: CeloLinks.docs },
   { name: 'Security Audits', link: CeloLinks.audits },
+  { name: 'Reserve', link: CeloLinks.reserve },
   menu.PAPERS,
 ]
 const eventsLink = `${menu.COMMUNITY.link}#${hashNav.connect.events}`
 const ecoFundLink = `${menu.COMMUNITY.link}#${hashNav.connect.fund}`
 const RESOURCE_MENU = [
   menu.CODE_OF_CONDUCT,
+  menu.BRAND_POLICY,
   { name: 'Events', link: eventsLink },
+  menu.EVENTS_KIT,
   menu.BRAND,
   { name: 'Ecosystem Fund', link: ecoFundLink },
 ]
@@ -131,8 +134,7 @@ export default function Footer() {
         mobileStyle={standardStyles.blockMarginMobile}
       >
         <Cell span={Spans.full} style={isMobile ? standardStyles.centered : styles.toes}>
-          <Lazy once={true}>
-            {' '}
+          <Lazy unmountIfInvisible={true}>
             <ChangeStory />
           </Lazy>
           <Text style={[fonts.legal, styles.copyright, isMobile && textStyles.center]}>

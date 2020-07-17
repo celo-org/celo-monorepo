@@ -1,8 +1,7 @@
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { Platform, StyleSheet } from 'react-native'
+import { Platform, StyleSheet, View } from 'react-native'
 import { WebView } from 'react-native-webview'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 
@@ -21,19 +20,26 @@ class Licenses extends React.Component<Props> {
 
   render() {
     return (
-      <WebView
-        style={styles.licensesWebView}
-        source={{ uri: licenseURI }}
-        originWhitelist={['file://']}
-      />
+      <View style={styles.container}>
+        <WebView
+          style={styles.licensesWebView}
+          source={{ uri: licenseURI }}
+          originWhitelist={['file://']}
+        />
+      </View>
     )
   }
 }
 
 const styles = StyleSheet.create({
+  container: {
+    overflow: 'hidden',
+    flex: 1,
+  },
   licensesWebView: {
+    opacity: 0.99,
     marginHorizontal: 20,
   },
 })
 
-export default componentWithAnalytics(withTranslation(Namespaces.accountScreen10)(Licenses))
+export default withTranslation<Props>(Namespaces.accountScreen10)(Licenses)

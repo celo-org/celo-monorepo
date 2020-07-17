@@ -12,6 +12,16 @@ For this reason, despite the fact that Celo uses a proof-of-stake protocol, user
 Full node incentives have not been enabled yet because the mechanism for negotiating a gateway fee is still under development. Currently, light clients are configured to send a gateway fee of 0 and full nodes are set to accept a minimum gateway fee of 0.
 {% endhint %}
 
+{% hint style="info" %}
+If you are transitioning from the Baklava network prior to the June 24 reset, you will need to start with a fresh chain database. You can either shut down your existing node, delete the `celo` folder, and continue by following the guide below starting with [configuring your node](#configure-the-node), or create a new node following these directions.
+
+Key differences are:
+* New network ID is `62320`
+* A new image has been pushed to `us.gcr.io/celo-testnet/celo-node:baklava`, matching Celo client v1.0.0
+* A new genesis block and bootnode enode are included in the Docker image
+* `ReleaseGold` contracts are available for all previously faucetted addresses [here](https://gist.github.com/nategraf/245232883a34cbb162eb599e34afd7c0)
+{% endhint %}
+
 ## Prerequisites
 
 - **You have Docker installed.** If you don’t have it already, follow the instructions here: [Get Started with Docker](https://www.docker.com/get-started). It will involve creating or signing in with a Docker account, downloading a desktop app, and then launching the app to be able to use the Docker CLI. If you are running on a Linux server, follow the instructions for your distro [here](https://docs.docker.com/install/#server). You may be required to run Docker with `sudo` depending on your installation environment.
@@ -28,7 +38,7 @@ First we are going to setup the environment variables required for `Baklava` net
 
 ```bash
 export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
-export NETWORK_ID=40120
+export NETWORK_ID=62320
 ```
 
 ## Pull the Celo Docker image
@@ -109,6 +119,18 @@ You will have fully synced with the network once you have pulled the latest bloc
 {% hint style="danger" %}
 **Security**: The command line above includes the parameter `--rpcaddr 0.0.0.0` which makes the Celo Blockchain software listen for incoming RPC requests on all network adaptors. Exercise extreme caution in doing this when running outside Docker, as it means that any unlocked accounts and their funds may be accessed from other machines on the Internet. In the context of running a Docker container on your local machine, this together with the `docker -p` flags allows you to make RPC calls from outside the container, i.e from your local host, but not from outside your machine. Read more about [Docker Networking](https://docs.docker.com/network/network-tutorial-standalone/#use-user-defined-bridge-networks) here.
 {% endhint %}
+
+## Command Line Interface
+
+Once the full node is running, it can serve the [Command Line Interface](../command-line-interface/introduction.md) tool `celocli`. For example:
+```bash
+$ npm install -g @celo/celocli
+...
+$ celocli node:synced
+true
+$ celocli account:new
+...
+```
 
 ## Light Client Serving
 

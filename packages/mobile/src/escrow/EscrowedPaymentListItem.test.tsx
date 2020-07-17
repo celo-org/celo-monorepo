@@ -36,7 +36,9 @@ describe('EscrowedPaymentReminderNotification', () => {
       </Provider>
     )
 
-    fireEvent.press(contact.getByTestId('EscrowedPaymentListItem/global:remind/Button'))
+    fireEvent.press(
+      contact.getByTestId('EscrowedPaymentListItem/CallToActions/global:remind/Button')
+    )
     await flushMicrotasksQueue()
     expect(SendIntentAndroid.sendSms).toHaveBeenCalled()
   })
@@ -52,7 +54,9 @@ describe('EscrowedPaymentReminderNotification', () => {
       </Provider>
     )
 
-    fireEvent.press(contact.getByTestId('EscrowedPaymentListItem/global:remind/Button'))
+    fireEvent.press(
+      contact.getByTestId('EscrowedPaymentListItem/CallToActions/global:remind/Button')
+    )
     await flushMicrotasksQueue()
     expect(SendSMS.send).toHaveBeenCalled()
   })
