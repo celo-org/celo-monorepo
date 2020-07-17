@@ -4,10 +4,10 @@ import {
   Contract as ZContract,
   getStorageLayout,
   Operation,
-  StorageLayoutInfo,
-} from '@openzeppelin/upgrades'
-const  Web3 = require('web3')
+  StorageLayoutInfo
+} from '@openzeppelin/upgrades';
 import { Contract as Web3Contract } from 'web3-eth-contract';
+const  Web3 = require('web3')
 
 const web3 = new Web3(null)
 
@@ -82,7 +82,7 @@ export const getLayout = (artifact: Artifact, artifacts: BuildArtifacts) => {
 const selectIncompatibleOperations = (diff: Operation[]) =>
   diff.filter(operation => operation.action !== 'append')
 
-export interface CompatibilityInfo {
+export interface ASTStorageCompatibilityReport {
   contract: string
   compatible: boolean
   errors: string[]
@@ -206,7 +206,7 @@ export const generateCompatibilityReport  = (oldArtifact: Artifact, oldArtifacts
       }
 }
 
-export const reportLayoutIncompatibilities = (oldArtifacts: BuildArtifacts, newArtifacts: BuildArtifacts): CompatibilityInfo[] => {
+export const reportLayoutIncompatibilities = (oldArtifacts: BuildArtifacts, newArtifacts: BuildArtifacts): ASTStorageCompatibilityReport[] => {
   return newArtifacts.listArtifacts().map((newArtifact) => {
     const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
     if (oldArtifact !== undefined) {

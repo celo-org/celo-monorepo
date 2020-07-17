@@ -1,25 +1,6 @@
-import { getBuildArtifacts } from '@openzeppelin/upgrades'
-
-/* HACK! truffle test was unable to compile this test (TypeScript would end up
- * claiming that it couldn't find the name `assert`) without the following
- * lines.
- */
-import { MigrationsContract } from 'types'
-// @ts-ignore
-const Migrations: MigrationsContract = artifacts.require('Migrations')
-
-import { reportLayoutIncompatibilities } from '@celo/protocol/lib/layout'
-
-/* We store artifacts for the various test cases in ./test/resources/layout
- * For each test case, there should be a build_<test case name> directory with
- * truffle-compile output, and contracts_<test case name> directory with the
- * corresponding contracts.
- *
- * The base for most of these tests is in contracts_original
- */
-const getTestArtifacts = (caseName: string) => {
-  return getBuildArtifacts(`./test/resources/layout/build_${caseName}`)
-}
+import { reportLayoutIncompatibilities } from '@celo/protocol/lib/compatibility/ast-layout'
+import { getTestArtifacts } from '@celo/protocol/test/compatibility/common'
+import { assert } from 'chai'
 
 const testCases = {
   original: getTestArtifacts('original'),
