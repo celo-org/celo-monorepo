@@ -4,7 +4,7 @@ import _unused from '@celo/dev-utils/lib/matchers'
 import { waitForPortOpen } from '@celo/dev-utils/lib/network'
 import * as path from 'path'
 // @ts-ignore
-import flakeTrackerSetup from '../../../../flakey-test-tracking/jest/setup.global'
+import flakeTrackerSetup from '../../../../flakey-test-tracking/src/jest/setup.global'
 
 // Warning: There should be an unused import of '@celo/dev-utils/lib/matchers' above.
 // If there is not, then your editor probably deleted it automatically.

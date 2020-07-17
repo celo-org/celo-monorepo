@@ -1,7 +1,7 @@
 {
   "bail": 3,
-  "setupFilesAfterEnv": ["../../../flakey-test-tracking/jest/setup.js"],
-  "testEnvironment": "../../../flakey-test-tracking/jest/environments/detox.js",
+  "setupFilesAfterEnv": ["../../../flakey-test-tracking/src/jest/setup.js"],
+  "testEnvironment": "../../../flakey-test-tracking/src/jest/environments/detox.js",
   "reporters": ["detox/runners/jest/streamlineReporter"],
   "verbose": true,
   "testMatch": ["**/*.spec.js"],
