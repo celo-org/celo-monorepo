@@ -36,6 +36,8 @@ import { VerificationFailedModal } from 'src/verify/VerificationFailedModal'
 
 const TAG = 'VerificationLoadingScreen'
 
+const WAIT_AFTER_REVEAL = 6000 // 6s
+
 const mapStateToProps = (state: RootState) => {
   return {
     e164Number: state.account.e164PhoneNumber,
@@ -65,11 +67,17 @@ export default function VerificationLoadingScreen() {
     }
     verificationStatusRef.current = verificationStatus
 
+    let timeout: number | undefined
+
     if (verificationStatus === VerificationStatus.RevealingNumber) {
-      navigate(Screens.VerificationInterstitialScreen)
+      timeout = window.setTimeout(() => {
+        navigate(Screens.VerificationInputScreen)
+      }, WAIT_AFTER_REVEAL)
     } else if (verificationStatus === VerificationStatus.Done) {
       navigate(Screens.ImportContacts)
     }
+
+    return () => clearTimeout(timeout)
   }, [verificationStatus, isFocused])
 
   useBackHandler(() => {

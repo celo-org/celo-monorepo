@@ -39,11 +39,6 @@
     "body1": "La verificación permite que otras personas le envíen valores a su número telefónico.",
     "body2": "Sin la verificación, igual podrá recibir pagos, pero solo mediante las direcciones de cuenta o códigos QR."
   },
-  "interstitial": {
-    "header": "Ya casi estamos",
-    "body1": "¡Estamos enviando sus mensajes de texto! Ingrese los tres códigos a medida que los reciba.",
-    "body2": "Esto puede tardar un poco."
-  },
   "failModal": {
     "header": "Error de verificación",
     "body1": "Se produjo un problema al verificar su número de teléfono.",

@@ -40,11 +40,6 @@
     "body1": "Verifying allows others to send value to your phone number.",
     "body2": "Without verification, you can still send payments, but only using account numbers or QR codes."
   },
-  "interstitial": {
-    "header": "Almost Done",
-    "body1": "Your text messages are on the way! Please enter your three codes as you receive them.",
-    "body2": "This may take a minute."
-  },
   "failModal": {
     "header": "Verification Error",
     "body1": "An issue has occurred while verifying your phone number.",
