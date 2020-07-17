@@ -157,6 +157,25 @@ const getFaucetedAccountsFor = (
   }))
 }
 
+const getFaucetedAccountsForLoadTest = (
+  accountType: AccountType,
+  mnemonic: string,
+  clients: number,
+  threads: number,
+  balance: string
+) => {
+  const addresses: string[] = [];
+  for (const c of range(0, clients)) {
+    for (const t of range(0, threads)) {
+      addresses.push(strip0x(generateAddress(mnemonic, accountType, parseInt(`${c}${t}`, 10))))
+    }
+  }
+  return addresses.map((address) => ({
+    address,
+    balance,
+  }))
+}
+
 export const getFaucetedAccounts = (mnemonic: string) => {
   const numFaucetAccounts = parseInt(fetchEnvOrFallback(envVar.FAUCET_GENESIS_ACCOUNTS, '0'), 10)
   const faucetAccounts = getFaucetedAccountsFor(
@@ -167,10 +186,13 @@ export const getFaucetedAccounts = (mnemonic: string) => {
   )
 
   const numLoadTestAccounts = parseInt(fetchEnvOrFallback(envVar.LOAD_TEST_CLIENTS, '0'), 10)
-  const loadTestAccounts = getFaucetedAccountsFor(
+  const numLoadTestThreads = parseInt(fetchEnvOrFallback(envVar.LOAD_TEST_THREADS, '0'), 10)
+
+  const loadTestAccounts = getFaucetedAccountsForLoadTest(
     AccountType.LOAD_TESTING_ACCOUNT,
     mnemonic,
     numLoadTestAccounts,
+    numLoadTestThreads,
     faucetBalance()
   )
 
@@ -331,7 +353,6 @@ export const generateGenesis = ({
       const maxElectableValidators = 100
       const validatoElectedCount = Math.min(validators.length, maxElectableValidators)
       genesis.extraData = generateIstanbulExtraData(validators.slice(0, validatoElectedCount))
-      console.info(`jcortejoso: validators: ${validators.slice(0, validatoElectedCount)}`)
     }
     genesis.config.istanbul = {
       // see github.com/celo-org/celo-blockchain/blob/master/consensus/istanbul/config.go#L21-L25
