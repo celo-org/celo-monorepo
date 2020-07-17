@@ -151,7 +151,7 @@ To allow you to keep your Beneficiary Ledger offline on a day-to-day basis, itâ€
 A vote signer can either be another Ledger device or a cloud Hardware Security Module (HSM). Explore [this guide](../developer-resources/integrations/cloud-hsm.md) to learn more about cloud HSM setup and celocli integration.
 {% endhint %}
 
-This is a two step process. First, you create a "proof of possession" that shows that the holder of the beneficiary key also holds the vote signer key. Then, you will use that when the benficiary signs a transaction authorizing the vote signer key. This proves to the Celo network that a single entity holds both keys.
+This is a two step process. First, you create a "proof of possession" that shows that the holder of the beneficiary key also holds the vote signer key. Then, you will use that when the beneficiary signs a transaction authorizing the vote signer key. This proves to the Celo network that a single entity holds both keys.
 
 {% hint style="info" %}
 Connect your **Vote Signer Ledger** now, unlock it, and open the Celo application.
