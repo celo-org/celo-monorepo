@@ -1,13 +1,14 @@
 import { RpcWallet, RpcWalletErrors } from '@celo/contractkit/lib/wallets/rpc-wallet'
+import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { generateKeys, generateMnemonic, MnemonicStrength } from '@celo/utils/src/account'
-import { privateKeyToAddress } from '@celo/utils/src/address'
-import { deriveCEK } from '@celo/utils/src/commentEncryption'
+import { eqAddress, hexToBuffer, privateKeyToAddress } from '@celo/utils/src/address'
+import { compressedPubKey, deriveCEK } from '@celo/utils/src/commentEncryption'
 import * as bip39 from 'react-native-bip39'
 import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { setAccountCreationTime, setPromptForno } from 'src/account/actions'
 import { promptFornoIfNeededSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
-import { GethEvents, SettingsEvents } from 'src/analytics/Events'
+import { GethEvents, OnboardingEvents, SettingsEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
@@ -21,19 +22,32 @@ import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getPasswordSaga } from 'src/pincode/authentication'
 import { clearPasswordCaches } from 'src/pincode/PasswordCache'
+import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
 import {
   Actions,
   completeWeb3Sync,
+  registerDataEncryptionKey,
   setAccount,
+  setDataEncryptionKey,
   setFornoMode,
   SetIsFornoAction,
-  setPrivateCommentKey,
   updateWeb3SyncProgress,
   Web3SyncProgress,
 } from 'src/web3/actions'
-import { destroyContractKit, getWallet, getWeb3, initContractKit } from 'src/web3/contracts'
-import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
+import {
+  destroyContractKit,
+  getContractKit,
+  getWallet,
+  getWeb3,
+  initContractKit,
+} from 'src/web3/contracts'
+import {
+  currentAccountSelector,
+  dataEncryptionKeySelector,
+  fornoSelector,
+  isDekRegisteredSelector,
+} from 'src/web3/selectors'
 import { getLatestBlock } from 'src/web3/utils'
 import { Block } from 'web3-eth'
 
@@ -208,6 +222,7 @@ export function* assignAccountFromPrivateKey(privateKey: string) {
     yield put(setAccount(account))
     yield put(setAccountCreationTime())
     yield call(assignDataKeyFromPrivateKey, privateKey)
+    ValoraAnalytics.setUserAddress(account)
     return account
   } catch (e) {
     Logger.error(TAG + '@assignAccountFromPrivateKey', 'Error assigning account', e)
@@ -217,7 +232,68 @@ export function* assignAccountFromPrivateKey(privateKey: string) {
 
 function* assignDataKeyFromPrivateKey(privateKey: string) {
   const privateCEK = deriveCEK(privateKey).toString('hex')
-  yield put(setPrivateCommentKey(privateCEK))
+  yield put(setDataEncryptionKey(privateCEK))
+}
+
+// Register the address and DEK with the Accounts contract
+// A no-op if registration has already been done
+export function* registerAccountDEK(account: string) {
+  try {
+    const isAlreadyRegistered = yield select(isDekRegisteredSelector)
+    if (isAlreadyRegistered) {
+      return
+    }
+
+    Logger.debug(
+      `${TAG}@registerAccountDEK`,
+      'Setting wallet address and public data encryption key'
+    )
+
+    const privateDataKey: string | null = yield select(dataEncryptionKeySelector)
+    if (!privateDataKey) {
+      throw new Error('No data key in store. Should never happen.')
+    }
+    const publicDataKey = compressedPubKey(hexToBuffer(privateDataKey))
+
+    const contractKit = yield call(getContractKit)
+    const accountsWrapper: AccountsWrapper = yield call([
+      contractKit.contracts,
+      contractKit.contracts.getAccounts,
+    ])
+
+    const upToDate: boolean = yield call(isAccountUpToDate, accountsWrapper, account, publicDataKey)
+    if (upToDate) {
+      Logger.debug(`${TAG}@registerAccountDEK`, 'Address and DEK up to date, skipping.')
+      return
+    }
+
+    const setAccountTx = accountsWrapper.setAccount('', publicDataKey, account)
+    yield call(sendTransaction, setAccountTx.txo, account, TAG, 'Set Wallet Address & DEK')
+    yield put(registerDataEncryptionKey())
+    ValoraAnalytics.track(OnboardingEvents.account_dek_set)
+  } catch (error) {
+    // DEK registration failures are not considered fatal. Swallow the error and allow calling saga to proceed.
+    // Registration will be re-attempted on next payment send
+    Logger.error(`${TAG}@registerAccountDEK`, 'Failure registering DEK', error)
+  }
+}
+
+// Check if account address and DEK match what's in
+// the Accounts contract
+async function isAccountUpToDate(
+  accountsWrapper: AccountsWrapper,
+  address: string,
+  dataKey: string
+) {
+  if (!address || !dataKey) {
+    return false
+  }
+
+  const [currentWalletAddress, currentDEK] = await Promise.all([
+    accountsWrapper.getWalletAddress(address),
+    accountsWrapper.getDataEncryptionKey(address),
+  ])
+  return eqAddress(currentWalletAddress, address) && currentDEK && eqAddress(currentDEK, dataKey)
 }
 
 // Wait for account to exist and then return it

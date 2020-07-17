@@ -30,9 +30,9 @@ import {
 } from 'src/identity/reducer'
 import { NewTransactionsInFeedAction } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
-import { setPrivateCommentKey } from 'src/web3/actions'
+import { setDataEncryptionKey } from 'src/web3/actions'
 import { getContractKit } from 'src/web3/contracts'
-import { privateCommentKeySelector } from 'src/web3/selectors'
+import { dataEncryptionKeySelector } from 'src/web3/selectors'
 
 const TAG = 'identity/commentKey'
 // A separator to split the comment content from the metadata
@@ -46,7 +46,7 @@ const PHONE_METADATA_REGEX = new RegExp(
 export function* createCommentKey(seedPrivateKey: string) {
   Logger.debug(TAG, 'Creating a new comment key')
   const privateCEK = bufferToHex(deriveCEK(seedPrivateKey))
-  yield put(setPrivateCommentKey(privateCEK))
+  yield put(setDataEncryptionKey(privateCEK))
 }
 
 export function* getCommentKey(address: string) {
@@ -180,7 +180,7 @@ export function* checkTxsForIdentityMetadata({ transactions }: NewTransactionsIn
     }
     Logger.debug(TAG + 'checkTxsForIdentityMetadata', `Checking ${transactions.length} txs`)
 
-    const commentKeyPrivate: string | null = yield select(privateCommentKeySelector)
+    const commentKeyPrivate: string | null = yield select(dataEncryptionKeySelector)
     if (!commentKeyPrivate) {
       Logger.error(TAG + 'checkTxsForIdentityMetadata', 'Missing comment key, should never happen.')
       return

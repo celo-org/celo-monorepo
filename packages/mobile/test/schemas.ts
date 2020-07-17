@@ -343,6 +343,10 @@ export const v2Schema = {
   identity: {
     ...v1Schema.identity,
   },
+  web3: {
+    ...v1Schema.web3,
+    isDEKRegistered: false,
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {

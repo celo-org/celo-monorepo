@@ -49,7 +49,7 @@ import { getAppStoreId } from 'src/utils/appstore'
 import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 import { getContractKitAsync, getWallet, getWeb3 } from 'src/web3/contracts'
-import { getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
+import { getOrCreateAccount, registerAccountDEK, waitWeb3LastBlock } from 'src/web3/saga'
 
 const TAG = 'invite/saga'
 export const REDEEM_INVITE_TIMEOUT = 2 * 60 * 1000 // 2 minutes
@@ -333,6 +333,7 @@ export function* doRedeemInvite(inviteCode: string) {
       CURRENCY_ENUM.DOLLAR,
       SENTINEL_INVITE_COMMENT
     )
+    yield call(registerAccountDEK, newAccount)
     yield put(fetchDollarBalance())
     ValoraAnalytics.track(OnboardingEvents.invite_redeem_complete)
     return true

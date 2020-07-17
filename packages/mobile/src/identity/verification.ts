@@ -1,15 +1,12 @@
 import { CeloTransactionObject } from '@celo/contractkit'
-import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import {
   ActionableAttestation,
   AttesationServiceRevealRequest,
   AttestationsWrapper,
   UnselectedRequest,
 } from '@celo/contractkit/lib/wrappers/Attestations'
-import { eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import { retryAsync } from '@celo/utils/src/async'
 import { AttestationsStatus, extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
-import { compressedPubKey } from '@celo/utils/src/commentEncryption'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import functions from '@react-native-firebase/functions'
 import BigNumber from 'bignumber.js'
@@ -42,8 +39,7 @@ import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
-import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
-import { privateCommentKeySelector } from 'src/web3/selectors'
+import { getConnectedAccount, getConnectedUnlockedAccount, registerAccountDEK } from 'src/web3/saga'
 
 const TAG = 'identity/verification'
 
@@ -122,18 +118,11 @@ export function* doVerificationFlow() {
       address: account,
     })
 
-    const privDataKey = yield select(privateCommentKeySelector)
-    const dataKey = compressedPubKey(hexToBuffer(privDataKey))
-
     const contractKit = yield call(getContractKit)
 
     const attestationsWrapper: AttestationsWrapper = yield call([
       contractKit.contracts,
       contractKit.contracts.getAttestations,
-    ])
-    const accountsWrapper: AccountsWrapper = yield call([
-      contractKit.contracts,
-      contractKit.contracts.getAccounts,
     ])
 
     ValoraAnalytics.track(VerificationEvents.verification_fetch_status_start)
@@ -200,8 +189,6 @@ export function* doVerificationFlow() {
       yield put(setVerificationStatus(VerificationStatus.RevealingNumber))
       ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_start)
       yield all([
-        // Set acccount and data encryption key in contract
-        call(setAccount, accountsWrapper, account, dataKey),
         // Request codes for the attestations needed
         call(
           revealNeededAttestations,
@@ -210,6 +197,9 @@ export function* doVerificationFlow() {
           phoneHashDetails,
           attestations
         ),
+        // Set acccount and data encryption key in Accounts contract
+        // This is done in other places too, intentionally keeping it for more coverage
+        call(registerAccountDEK, account),
       ])
       ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_complete)
 
@@ -667,31 +657,4 @@ function* waitForAttestationCode(issuer: string) {
       return action.code
     }
   }
-}
-
-function* setAccount(accountsWrapper: AccountsWrapper, address: string, dataKey: string) {
-  Logger.debug(TAG, 'Setting wallet address and public data encryption key')
-  const upToDate: boolean = yield call(isAccountUpToDate, accountsWrapper, address, dataKey)
-  if (upToDate) {
-    return
-  }
-  const setAccountTx = accountsWrapper.setAccount('', dataKey, address)
-  yield call(sendTransaction, setAccountTx.txo, address, TAG, 'Set Wallet Address & DEK')
-  ValoraAnalytics.setUserAddress(address)
-  ValoraAnalytics.track(VerificationEvents.verification_account_set)
-}
-
-async function isAccountUpToDate(
-  accountsWrapper: AccountsWrapper,
-  address: string,
-  dataKey: string
-) {
-  const [currentWalletAddress, currentDEK] = await Promise.all([
-    accountsWrapper.getWalletAddress(address),
-    // getDataEncryptionKey actually returns a string instead of an array
-    accountsWrapper.getDataEncryptionKey(address).then((key) => [key]),
-  ])
-  return (
-    eqAddress(currentWalletAddress, address) && currentDEK && eqAddress(currentDEK.join(), dataKey)
-  )
 }

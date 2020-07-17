@@ -16,7 +16,7 @@ import {
 import { lookupAttestationIdentifiers } from 'src/identity/contactMapping'
 import { PhoneNumberHashDetails } from 'src/identity/privateHashing'
 import { e164NumberToAddressSelector, e164NumberToSaltSelector } from 'src/identity/reducer'
-import { privateCommentKeySelector } from 'src/web3/selectors'
+import { dataEncryptionKeySelector } from 'src/web3/selectors'
 import { getMockStoreData } from 'test/utils'
 import {
   mockAccount,
@@ -233,7 +233,7 @@ describe(checkTxsForIdentityMetadata, () => {
     }
     await expectSaga(checkTxsForIdentityMetadata, { transactions })
       .provide([
-        [select(privateCommentKeySelector), mockPrivateDEK2],
+        [select(dataEncryptionKeySelector), mockPrivateDEK2],
         [matchers.call.fn(lookupAttestationIdentifiers), lookupResult],
         [select(e164NumberToSaltSelector), {}],
         [select(e164NumberToAddressSelector), {}],
@@ -251,7 +251,7 @@ describe(checkTxsForIdentityMetadata, () => {
   it('Ignores invalid identity claims', async () => {
     await expectSaga(checkTxsForIdentityMetadata, { transactions })
       .provide([
-        [select(privateCommentKeySelector), mockPrivateDEK2],
+        [select(dataEncryptionKeySelector), mockPrivateDEK2],
         [matchers.call.fn(lookupAttestationIdentifiers), {}],
       ])
       .run()
