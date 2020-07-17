@@ -1,38 +1,20 @@
 import { range } from 'lodash'
 import sleep from 'sleep-promise'
 import { AwsClusterConfig, deallocateAWSStaticIP, registerAWSStaticIPIfNotRegistered } from 'src/lib/aws'
+import { baseHelmParameters, FullNodeDeploymentConfig, getKubeNamespace, getReleaseName, getStaticIPNamePrefix, upgradeBaseFullNodeChart } from './cloud-provider'
 import { createNamespaceIfNotExists } from './cluster'
 import { execCmdWithExitOnFailure } from './cmd-utils'
-import { envVar, fetchEnv } from './env-utils'
 import {
   deletePersistentVolumeClaims,
   installGenericHelmChart,
-  removeGenericHelmChart,
-  upgradeGenericHelmChart
+  removeGenericHelmChart
 } from './helm_deploy'
-import { deleteResource, scaleResource } from './kubernetes'
+import { deleteResource } from './kubernetes'
 
 const helmChartPath = '../helm-charts/celo-fullnode'
 
-export interface FullNodeDeploymentConfig {
-  diskSizeGb: number
-  replicas: number
-}
-
 export interface AWSFullNodeDeploymentConfig extends FullNodeDeploymentConfig {
   clusterConfig: AwsClusterConfig
-}
-
-export function getReleaseName(celoEnv: string) {
-  return `${celoEnv}-fullnodes`
-}
-
-export function getKubeNamespace(celoEnv: string) {
-  return celoEnv
-}
-
-function getStaticIPNamePrefix(celoEnv: string) {
-  return `${celoEnv}-nodes`
 }
 
 export async function installAWSFullNodeChart(celoEnv: string, deploymentConfig: AWSFullNodeDeploymentConfig) {
@@ -54,19 +36,9 @@ export async function upgradeAWSFullNodeChart(
   reset: boolean
 ) {
   const kubeNamespace = getKubeNamespace(celoEnv)
-  const releaseName = getReleaseName(celoEnv)
+  const aksHelmParameters = await helmParameters(celoEnv, kubeNamespace, deploymentConfig)
 
-  if (reset) {
-    await scaleResource(celoEnv, 'StatefulSet', `${celoEnv}-fullnodes`, 0)
-    await deletePersistentVolumeClaims(celoEnv, ['celo-fullnode'])
-  }
-  await upgradeGenericHelmChart(
-    kubeNamespace,
-    releaseName,
-    helmChartPath,
-    await helmParameters(celoEnv, kubeNamespace, deploymentConfig)
-  )
-  await scaleResource(celoEnv, 'StatefulSet', `${celoEnv}-fullnodes`, deploymentConfig.replicas)
+  await upgradeBaseFullNodeChart(celoEnv, deploymentConfig, reset, aksHelmParameters)
   return
 }
 
@@ -83,18 +55,11 @@ async function helmParameters(
   deploymentConfig: AWSFullNodeDeploymentConfig
 ) {
   const staticIps = (await allocateStaticIPs(celoEnv, deploymentConfig)).join(',')
-  return [
-    `--set namespace=${kubeNamespace}`,
-    `--set replicaCount=${deploymentConfig.replicas}`,
-    `--set storage.size=${deploymentConfig.diskSizeGb}Gi`,
-    `--set geth.azure_provider=false`,
-    `--set geth.expose_rpc_externally=false`,
-    `--set geth.image.repository=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY)}`,
-    `--set geth.image.tag=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_TAG)}`,
+  const baseparams = await baseHelmParameters(celoEnv, kubeNamespace, deploymentConfig)
+  const additionalParameters = [
     `--set geth.public_ips='{${staticIps}}'`,
-    `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
-    `--set genesis.network=${celoEnv}`,
   ]
+  return baseparams.concat(additionalParameters)
 }
 
 // IP related functions
