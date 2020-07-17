@@ -104,7 +104,8 @@ export async function upgradeBaseFullNodeChart(
   celoEnv: string,
   deploymentConfig: FullNodeDeploymentConfig,
   reset: boolean,
-  cloudHelmParameters: string[]
+  cloudHelmParameters: string[],
+  helmChartPath = '../helm-charts/celo-fullnode'
 ) {
   const kubeNamespace = getKubeNamespace(celoEnv)
   const releaseName = getReleaseName(celoEnv)

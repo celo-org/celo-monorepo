@@ -85,7 +85,7 @@ async function allocateStaticIPs(celoEnv: string, deploymentConfig: AWSFullNodeD
       registerAWSStaticIPIfNotRegistered(`${getStaticIPNamePrefix(celoEnv)}-${i}`, resourceGroup)
     )
   )
-
+  
   const addresses = staticIps.map((address, _) => address)
 
   return addresses
@@ -128,9 +128,11 @@ async function waitDeattachingStaticIP(name: string, resourceGroup: string) {
   const retries = 10
   const sleepTime = 5
   for (let i = 0; i <= retries; i++) {
-    const [allocated] = await execCmdWithExitOnFailure(
-      `az network public-ip show --resource-group ${resourceGroup} --name ${name} --query ipConfiguration.id -o tsv`
-    )
+    // const [allocated] = await execCmdWithExitOnFailure(
+    //   `az network public-ip show --resource-group ${resourceGroup} --name ${name} --query ipConfiguration.id -o tsv`
+    // )
+    console.info(`${name} being deattached form ${resourceGroup}`)
+    const allocated = '' 
     if (allocated.trim() === '') {
       return true
     }

@@ -41,18 +41,18 @@ async function setupCluster(celoEnv: string, clusterConfig: AwsClusterConfig) {
 // tag=IPNodeName Value=`${getStaticIPNamePrefix(celoEnv)}-${i}`
 
 export async function registerAWSStaticIPIfNotRegistered(name: string, resourceGroup: string) {
-  // This returns an array of matching IP addresses. If there is no matching IP
-  // address, an empty array is returned. We expect at most 1 matching IP
+  // This returns an array of matching Allocation Ids for IP addresses. If there is no matching IP
+  // address, an empty array is returned. We expect at most 1 matching Allocation ID
 
-  // This fetches the IP addresses allocated that have the corresponding tag values of resourceGroup and name
-  const [existingIpsStr] = await execCmdWithExitOnFailure(
-    `aws ec2 describe-addresses --filters "Name=tag:resourceGroupTag,Values=${resourceGroup}" "Name=tag:IPNodeName,Values=${name}" --query 'Addresses[*].[PublicIp]' --output json`
+  // This fetches the IP allocation ID that have the corresponding tag values of resourceGroup and name
+  const [existingAllocIdsStr] = await execCmdWithExitOnFailure(
+    `aws ec2 describe-addresses --filters "Name=tag:resourceGroupTag,Values=${resourceGroup}" "Name=tag:IPNodeName,Values=${name}" --query 'Addresses[*].[AllocationId]' --output json`
   )
-  const existingIps = JSON.parse(existingIpsStr)
-  if (existingIps.length) {
+  const existingAllocIds = JSON.parse(existingAllocIdsStr)
+  if (existingAllocIds.length) {
     console.info(`Skipping IP address registration, ${name} on ${resourceGroup} exists`)
     // We expect only 1 matching IP
-    return existingIps[0]
+    return existingAllocIds[0]
   }
   console.info(`Registering IP address on AWS with tags where IPNodeName is ${name} and resourceGroupTag is ${resourceGroup}`)
 
@@ -68,11 +68,12 @@ export async function registerAWSStaticIPIfNotRegistered(name: string, resourceG
   )
 
   // Fetch Address of newly created
-  const [address] = await execCmdWithExitOnFailure(
-    `aws ec2 describe-addresses --filters "Name=tag:resourceGroupTag,Values=${resourceGroup}" "Name=tag:IPNodeName,Values=${name}" --query 'Addresses[*].[PublicIp]' --output json`
-  )
+  // const [address] = await execCmdWithExitOnFailure(
+  //   `aws ec2 describe-addresses --filters "Name=tag:resourceGroupTag,Values=${resourceGroup}" "Name=tag:IPNodeName,Values=${name}" --query 'Addresses[*].[PublicIp]' --output json`
+  // )
 
-  return address.trim()
+  // return address.trim()
+  return allocationID.trim()
 }
 
 export async function deallocateAWSStaticIP(name: string, resourceGroup: string) {
