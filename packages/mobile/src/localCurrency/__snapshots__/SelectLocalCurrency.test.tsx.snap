@@ -2,774 +2,806 @@
 
 exports[`SelectLocalCurrency renders correctly 1`] = `
 <RCTScrollView
-  data={
-    Array [
-      "USD",
-      "CAD",
-      "EUR",
-      "MXN",
-      "COP",
-      "PHP",
-      "LRD",
-      "SLL",
-      "KES",
-      "UGX",
-      "GHS",
-      "NGN",
-    ]
+  style={
+    Object {
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+    }
   }
-  disableVirtualization={false}
-  extraData="MXN"
-  getItem={[Function]}
-  getItemCount={[Function]}
-  horizontal={false}
-  initialNumToRender={10}
-  keyExtractor={[Function]}
-  maxToRenderPerBatch={10}
-  onContentSizeChange={[Function]}
-  onEndReachedThreshold={2}
-  onLayout={[Function]}
-  onMomentumScrollEnd={[Function]}
-  onScroll={[Function]}
-  onScrollBeginDrag={[Function]}
-  onScrollEndDrag={[Function]}
-  removeClippedSubviews={true}
-  renderItem={[Function]}
-  scrollEventThrottle={50}
-  stickyHeaderIndices={Array []}
-  style={Object {}}
-  updateCellsBatchingPeriod={50}
-  viewabilityConfigCallbackPairs={Array []}
-  windowSize={21}
 >
   <View>
-    <View
-      onLayout={[Function]}
-      style={null}
-    >
-      <View
-        accessible={true}
-        focusable={true}
-        nativeBackgroundAndroid={
+    <RNCSafeAreaView>
+      <Text
+        style={
           Object {
-            "attribute": "selectableItemBackground",
-            "type": "ThemeAttrAndroid",
+            "color": "#2E3338",
+            "fontFamily": "Jost-Medium",
+            "fontSize": 22,
+            "lineHeight": 28,
+            "margin": 16,
           }
         }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
+        testID="ChooseLanguageTitle"
       >
-        <View
-          style={
-            Object {
-              "alignItems": "center",
-              "borderBottomWidth": 1,
-              "borderColor": "#EDEEEF",
-              "flexDirection": "row",
-              "marginLeft": 16,
-              "paddingVertical": 14,
-            }
+        selectCurrency
+      </Text>
+      <RCTScrollView
+        data={
+          Array [
+            "USD",
+            "CAD",
+            "EUR",
+            "MXN",
+            "COP",
+            "PHP",
+            "LRD",
+            "SLL",
+            "KES",
+            "UGX",
+            "GHS",
+            "NGN",
+          ]
+        }
+        disableVirtualization={false}
+        extraData="MXN"
+        getItem={[Function]}
+        getItemCount={[Function]}
+        horizontal={false}
+        initialNumToRender={10}
+        keyExtractor={[Function]}
+        maxToRenderPerBatch={10}
+        onContentSizeChange={[Function]}
+        onEndReachedThreshold={2}
+        onLayout={[Function]}
+        onMomentumScrollEnd={[Function]}
+        onScroll={[Function]}
+        onScrollBeginDrag={[Function]}
+        onScrollEndDrag={[Function]}
+        removeClippedSubviews={true}
+        renderItem={[Function]}
+        scrollEventThrottle={50}
+        stickyHeaderIndices={Array []}
+        style={
+          Object {
+            "backgroundColor": "#FFFFFF",
+            "flex": 1,
           }
-        >
+        }
+        updateCellsBatchingPeriod={50}
+        viewabilityConfigCallbackPairs={Array []}
+        windowSize={21}
+      >
+        <View>
           <View
-            style={
-              Object {
-                "marginRight": 16,
-              }
-            }
+            onLayout={[Function]}
+            style={null}
           >
             <View
-              style={
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
                 Object {
-                  "borderColor": "#9CA4A9",
-                  "borderRadius": 12,
-                  "borderWidth": 2,
-                  "height": 24,
-                  "paddingTop": 2,
-                  "width": 24,
+                  "attribute": "selectableItemBackground",
+                  "type": "ThemeAttrAndroid",
                 }
               }
-            />
-          </View>
-          <Text
-            numberOfLines={1}
-            style={
-              Object {
-                "color": "#2E3338",
-                "flex": 1,
-                "fontFamily": "Inter-Regular",
-                "fontSize": 16,
-                "lineHeight": 22,
-                "marginRight": 16,
-              }
-            }
-          >
-            USD
-          </Text>
-        </View>
-      </View>
-    </View>
-    <View
-      onLayout={[Function]}
-      style={null}
-    >
-      <View
-        accessible={true}
-        focusable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackground",
-            "type": "ThemeAttrAndroid",
-          }
-        }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-      >
-        <View
-          style={
-            Object {
-              "alignItems": "center",
-              "borderBottomWidth": 1,
-              "borderColor": "#EDEEEF",
-              "flexDirection": "row",
-              "marginLeft": 16,
-              "paddingVertical": 14,
-            }
-          }
-        >
-          <View
-            style={
-              Object {
-                "marginRight": 16,
-              }
-            }
-          >
-            <View
-              style={
-                Object {
-                  "borderColor": "#9CA4A9",
-                  "borderRadius": 12,
-                  "borderWidth": 2,
-                  "height": 24,
-                  "paddingTop": 2,
-                  "width": 24,
-                }
-              }
-            />
-          </View>
-          <Text
-            numberOfLines={1}
-            style={
-              Object {
-                "color": "#2E3338",
-                "flex": 1,
-                "fontFamily": "Inter-Regular",
-                "fontSize": 16,
-                "lineHeight": 22,
-                "marginRight": 16,
-              }
-            }
-          >
-            CAD
-          </Text>
-        </View>
-      </View>
-    </View>
-    <View
-      onLayout={[Function]}
-      style={null}
-    >
-      <View
-        accessible={true}
-        focusable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackground",
-            "type": "ThemeAttrAndroid",
-          }
-        }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-      >
-        <View
-          style={
-            Object {
-              "alignItems": "center",
-              "borderBottomWidth": 1,
-              "borderColor": "#EDEEEF",
-              "flexDirection": "row",
-              "marginLeft": 16,
-              "paddingVertical": 14,
-            }
-          }
-        >
-          <View
-            style={
-              Object {
-                "marginRight": 16,
-              }
-            }
-          >
-            <View
-              style={
-                Object {
-                  "borderColor": "#9CA4A9",
-                  "borderRadius": 12,
-                  "borderWidth": 2,
-                  "height": 24,
-                  "paddingTop": 2,
-                  "width": 24,
-                }
-              }
-            />
-          </View>
-          <Text
-            numberOfLines={1}
-            style={
-              Object {
-                "color": "#2E3338",
-                "flex": 1,
-                "fontFamily": "Inter-Regular",
-                "fontSize": 16,
-                "lineHeight": 22,
-                "marginRight": 16,
-              }
-            }
-          >
-            EUR
-          </Text>
-        </View>
-      </View>
-    </View>
-    <View
-      onLayout={[Function]}
-      style={null}
-    >
-      <View
-        accessible={true}
-        focusable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackground",
-            "type": "ThemeAttrAndroid",
-          }
-        }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-      >
-        <View
-          style={
-            Object {
-              "alignItems": "center",
-              "borderBottomWidth": 1,
-              "borderColor": "#EDEEEF",
-              "flexDirection": "row",
-              "marginLeft": 16,
-              "paddingVertical": 14,
-            }
-          }
-        >
-          <View
-            style={
-              Object {
-                "marginRight": 16,
-              }
-            }
-          >
-            <svg
-              height={24}
-              style={Object {}}
-              viewBox="0 0 24 24"
-              width={24}
-              xmlns="http://www.w3.org/2000/svg"
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
             >
-              <circle
-                cx="12"
-                cy="12"
-                fill="#1AB775"
-                r="12"
-                style={Object {}}
-              />
-              <path
-                clip-rule="evenodd"
-                d="M9.74449 16.6294C9.74581 16.6307 9.74713 16.6321 9.74846 16.6334C10.0609 16.9458 10.5674 16.9458 10.8798 16.6334L18.2336 9.2796C18.5461 8.96718 18.5461 8.46065 18.2336 8.14823C17.9212 7.83581 17.4147 7.83581 17.1023 8.14823L10.3142 14.9363L7.29707 11.9192C6.98465 11.6068 6.47812 11.6068 6.1657 11.9192C5.85328 12.2317 5.85328 12.7382 6.1657 13.0506L9.74449 16.6294Z"
-                fill="white"
-                fill-rule="evenodd"
-                style={Object {}}
-              />
-            </svg>
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "borderBottomWidth": 1,
+                    "borderColor": "#EDEEEF",
+                    "flexDirection": "row",
+                    "marginLeft": 16,
+                    "paddingVertical": 14,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "marginRight": 16,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      Object {
+                        "borderColor": "#9CA4A9",
+                        "borderRadius": 12,
+                        "borderWidth": 2,
+                        "height": 24,
+                        "paddingTop": 2,
+                        "width": 24,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  numberOfLines={1}
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "flex": 1,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                      "marginRight": 16,
+                    }
+                  }
+                >
+                  USD
+                </Text>
+              </View>
+            </View>
           </View>
-          <Text
-            numberOfLines={1}
-            style={
-              Object {
-                "color": "#2E3338",
-                "flex": 1,
-                "fontFamily": "Inter-Regular",
-                "fontSize": 16,
-                "lineHeight": 22,
-                "marginRight": 16,
-              }
-            }
+          <View
+            onLayout={[Function]}
+            style={null}
           >
-            MXN
-          </Text>
-        </View>
-      </View>
-    </View>
-    <View
-      onLayout={[Function]}
-      style={null}
-    >
-      <View
-        accessible={true}
-        focusable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackground",
-            "type": "ThemeAttrAndroid",
-          }
-        }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-      >
-        <View
-          style={
-            Object {
-              "alignItems": "center",
-              "borderBottomWidth": 1,
-              "borderColor": "#EDEEEF",
-              "flexDirection": "row",
-              "marginLeft": 16,
-              "paddingVertical": 14,
-            }
-          }
-        >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackground",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "borderBottomWidth": 1,
+                    "borderColor": "#EDEEEF",
+                    "flexDirection": "row",
+                    "marginLeft": 16,
+                    "paddingVertical": 14,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "marginRight": 16,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      Object {
+                        "borderColor": "#9CA4A9",
+                        "borderRadius": 12,
+                        "borderWidth": 2,
+                        "height": 24,
+                        "paddingTop": 2,
+                        "width": 24,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  numberOfLines={1}
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "flex": 1,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                      "marginRight": 16,
+                    }
+                  }
+                >
+                  CAD
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View
+            onLayout={[Function]}
+            style={null}
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackground",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "borderBottomWidth": 1,
+                    "borderColor": "#EDEEEF",
+                    "flexDirection": "row",
+                    "marginLeft": 16,
+                    "paddingVertical": 14,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "marginRight": 16,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      Object {
+                        "borderColor": "#9CA4A9",
+                        "borderRadius": 12,
+                        "borderWidth": 2,
+                        "height": 24,
+                        "paddingTop": 2,
+                        "width": 24,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  numberOfLines={1}
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "flex": 1,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                      "marginRight": 16,
+                    }
+                  }
+                >
+                  EUR
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View
+            onLayout={[Function]}
+            style={null}
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackground",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "borderBottomWidth": 1,
+                    "borderColor": "#EDEEEF",
+                    "flexDirection": "row",
+                    "marginLeft": 16,
+                    "paddingVertical": 14,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "marginRight": 16,
+                    }
+                  }
+                >
+                  <svg
+                    height={24}
+                    style={Object {}}
+                    viewBox="0 0 24 24"
+                    width={24}
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      fill="#1AB775"
+                      r="12"
+                      style={Object {}}
+                    />
+                    <path
+                      clip-rule="evenodd"
+                      d="M9.74449 16.6294C9.74581 16.6307 9.74713 16.6321 9.74846 16.6334C10.0609 16.9458 10.5674 16.9458 10.8798 16.6334L18.2336 9.2796C18.5461 8.96718 18.5461 8.46065 18.2336 8.14823C17.9212 7.83581 17.4147 7.83581 17.1023 8.14823L10.3142 14.9363L7.29707 11.9192C6.98465 11.6068 6.47812 11.6068 6.1657 11.9192C5.85328 12.2317 5.85328 12.7382 6.1657 13.0506L9.74449 16.6294Z"
+                      fill="white"
+                      fill-rule="evenodd"
+                      style={Object {}}
+                    />
+                  </svg>
+                </View>
+                <Text
+                  numberOfLines={1}
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "flex": 1,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                      "marginRight": 16,
+                    }
+                  }
+                >
+                  MXN
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View
+            onLayout={[Function]}
+            style={null}
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackground",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "borderBottomWidth": 1,
+                    "borderColor": "#EDEEEF",
+                    "flexDirection": "row",
+                    "marginLeft": 16,
+                    "paddingVertical": 14,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "marginRight": 16,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      Object {
+                        "borderColor": "#9CA4A9",
+                        "borderRadius": 12,
+                        "borderWidth": 2,
+                        "height": 24,
+                        "paddingTop": 2,
+                        "width": 24,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  numberOfLines={1}
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "flex": 1,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                      "marginRight": 16,
+                    }
+                  }
+                >
+                  COP
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View
+            onLayout={[Function]}
+            style={null}
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackground",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "borderBottomWidth": 1,
+                    "borderColor": "#EDEEEF",
+                    "flexDirection": "row",
+                    "marginLeft": 16,
+                    "paddingVertical": 14,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "marginRight": 16,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      Object {
+                        "borderColor": "#9CA4A9",
+                        "borderRadius": 12,
+                        "borderWidth": 2,
+                        "height": 24,
+                        "paddingTop": 2,
+                        "width": 24,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  numberOfLines={1}
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "flex": 1,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                      "marginRight": 16,
+                    }
+                  }
+                >
+                  PHP
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View
+            onLayout={[Function]}
+            style={null}
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackground",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "borderBottomWidth": 1,
+                    "borderColor": "#EDEEEF",
+                    "flexDirection": "row",
+                    "marginLeft": 16,
+                    "paddingVertical": 14,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "marginRight": 16,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      Object {
+                        "borderColor": "#9CA4A9",
+                        "borderRadius": 12,
+                        "borderWidth": 2,
+                        "height": 24,
+                        "paddingTop": 2,
+                        "width": 24,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  numberOfLines={1}
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "flex": 1,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                      "marginRight": 16,
+                    }
+                  }
+                >
+                  LRD
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View
+            onLayout={[Function]}
+            style={null}
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackground",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "borderBottomWidth": 1,
+                    "borderColor": "#EDEEEF",
+                    "flexDirection": "row",
+                    "marginLeft": 16,
+                    "paddingVertical": 14,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "marginRight": 16,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      Object {
+                        "borderColor": "#9CA4A9",
+                        "borderRadius": 12,
+                        "borderWidth": 2,
+                        "height": 24,
+                        "paddingTop": 2,
+                        "width": 24,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  numberOfLines={1}
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "flex": 1,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                      "marginRight": 16,
+                    }
+                  }
+                >
+                  SLL
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View
+            onLayout={[Function]}
+            style={null}
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackground",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "borderBottomWidth": 1,
+                    "borderColor": "#EDEEEF",
+                    "flexDirection": "row",
+                    "marginLeft": 16,
+                    "paddingVertical": 14,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "marginRight": 16,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      Object {
+                        "borderColor": "#9CA4A9",
+                        "borderRadius": 12,
+                        "borderWidth": 2,
+                        "height": 24,
+                        "paddingTop": 2,
+                        "width": 24,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  numberOfLines={1}
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "flex": 1,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                      "marginRight": 16,
+                    }
+                  }
+                >
+                  KES
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View
+            onLayout={[Function]}
+            style={null}
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackground",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "borderBottomWidth": 1,
+                    "borderColor": "#EDEEEF",
+                    "flexDirection": "row",
+                    "marginLeft": 16,
+                    "paddingVertical": 14,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "marginRight": 16,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      Object {
+                        "borderColor": "#9CA4A9",
+                        "borderRadius": 12,
+                        "borderWidth": 2,
+                        "height": 24,
+                        "paddingTop": 2,
+                        "width": 24,
+                      }
+                    }
+                  />
+                </View>
+                <Text
+                  numberOfLines={1}
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "flex": 1,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                      "marginRight": 16,
+                    }
+                  }
+                >
+                  UGX
+                </Text>
+              </View>
+            </View>
+          </View>
           <View
             style={
               Object {
-                "marginRight": 16,
+                "height": 0,
               }
             }
-          >
-            <View
-              style={
-                Object {
-                  "borderColor": "#9CA4A9",
-                  "borderRadius": 12,
-                  "borderWidth": 2,
-                  "height": 24,
-                  "paddingTop": 2,
-                  "width": 24,
-                }
-              }
-            />
-          </View>
-          <Text
-            numberOfLines={1}
-            style={
-              Object {
-                "color": "#2E3338",
-                "flex": 1,
-                "fontFamily": "Inter-Regular",
-                "fontSize": 16,
-                "lineHeight": 22,
-                "marginRight": 16,
-              }
-            }
-          >
-            COP
-          </Text>
+          />
         </View>
-      </View>
-    </View>
-    <View
-      onLayout={[Function]}
-      style={null}
-    >
-      <View
-        accessible={true}
-        focusable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackground",
-            "type": "ThemeAttrAndroid",
-          }
-        }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-      >
-        <View
-          style={
-            Object {
-              "alignItems": "center",
-              "borderBottomWidth": 1,
-              "borderColor": "#EDEEEF",
-              "flexDirection": "row",
-              "marginLeft": 16,
-              "paddingVertical": 14,
-            }
-          }
-        >
-          <View
-            style={
-              Object {
-                "marginRight": 16,
-              }
-            }
-          >
-            <View
-              style={
-                Object {
-                  "borderColor": "#9CA4A9",
-                  "borderRadius": 12,
-                  "borderWidth": 2,
-                  "height": 24,
-                  "paddingTop": 2,
-                  "width": 24,
-                }
-              }
-            />
-          </View>
-          <Text
-            numberOfLines={1}
-            style={
-              Object {
-                "color": "#2E3338",
-                "flex": 1,
-                "fontFamily": "Inter-Regular",
-                "fontSize": 16,
-                "lineHeight": 22,
-                "marginRight": 16,
-              }
-            }
-          >
-            PHP
-          </Text>
-        </View>
-      </View>
-    </View>
-    <View
-      onLayout={[Function]}
-      style={null}
-    >
-      <View
-        accessible={true}
-        focusable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackground",
-            "type": "ThemeAttrAndroid",
-          }
-        }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-      >
-        <View
-          style={
-            Object {
-              "alignItems": "center",
-              "borderBottomWidth": 1,
-              "borderColor": "#EDEEEF",
-              "flexDirection": "row",
-              "marginLeft": 16,
-              "paddingVertical": 14,
-            }
-          }
-        >
-          <View
-            style={
-              Object {
-                "marginRight": 16,
-              }
-            }
-          >
-            <View
-              style={
-                Object {
-                  "borderColor": "#9CA4A9",
-                  "borderRadius": 12,
-                  "borderWidth": 2,
-                  "height": 24,
-                  "paddingTop": 2,
-                  "width": 24,
-                }
-              }
-            />
-          </View>
-          <Text
-            numberOfLines={1}
-            style={
-              Object {
-                "color": "#2E3338",
-                "flex": 1,
-                "fontFamily": "Inter-Regular",
-                "fontSize": 16,
-                "lineHeight": 22,
-                "marginRight": 16,
-              }
-            }
-          >
-            LRD
-          </Text>
-        </View>
-      </View>
-    </View>
-    <View
-      onLayout={[Function]}
-      style={null}
-    >
-      <View
-        accessible={true}
-        focusable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackground",
-            "type": "ThemeAttrAndroid",
-          }
-        }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-      >
-        <View
-          style={
-            Object {
-              "alignItems": "center",
-              "borderBottomWidth": 1,
-              "borderColor": "#EDEEEF",
-              "flexDirection": "row",
-              "marginLeft": 16,
-              "paddingVertical": 14,
-            }
-          }
-        >
-          <View
-            style={
-              Object {
-                "marginRight": 16,
-              }
-            }
-          >
-            <View
-              style={
-                Object {
-                  "borderColor": "#9CA4A9",
-                  "borderRadius": 12,
-                  "borderWidth": 2,
-                  "height": 24,
-                  "paddingTop": 2,
-                  "width": 24,
-                }
-              }
-            />
-          </View>
-          <Text
-            numberOfLines={1}
-            style={
-              Object {
-                "color": "#2E3338",
-                "flex": 1,
-                "fontFamily": "Inter-Regular",
-                "fontSize": 16,
-                "lineHeight": 22,
-                "marginRight": 16,
-              }
-            }
-          >
-            SLL
-          </Text>
-        </View>
-      </View>
-    </View>
-    <View
-      onLayout={[Function]}
-      style={null}
-    >
-      <View
-        accessible={true}
-        focusable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackground",
-            "type": "ThemeAttrAndroid",
-          }
-        }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-      >
-        <View
-          style={
-            Object {
-              "alignItems": "center",
-              "borderBottomWidth": 1,
-              "borderColor": "#EDEEEF",
-              "flexDirection": "row",
-              "marginLeft": 16,
-              "paddingVertical": 14,
-            }
-          }
-        >
-          <View
-            style={
-              Object {
-                "marginRight": 16,
-              }
-            }
-          >
-            <View
-              style={
-                Object {
-                  "borderColor": "#9CA4A9",
-                  "borderRadius": 12,
-                  "borderWidth": 2,
-                  "height": 24,
-                  "paddingTop": 2,
-                  "width": 24,
-                }
-              }
-            />
-          </View>
-          <Text
-            numberOfLines={1}
-            style={
-              Object {
-                "color": "#2E3338",
-                "flex": 1,
-                "fontFamily": "Inter-Regular",
-                "fontSize": 16,
-                "lineHeight": 22,
-                "marginRight": 16,
-              }
-            }
-          >
-            KES
-          </Text>
-        </View>
-      </View>
-    </View>
-    <View
-      onLayout={[Function]}
-      style={null}
-    >
-      <View
-        accessible={true}
-        focusable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackground",
-            "type": "ThemeAttrAndroid",
-          }
-        }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-      >
-        <View
-          style={
-            Object {
-              "alignItems": "center",
-              "borderBottomWidth": 1,
-              "borderColor": "#EDEEEF",
-              "flexDirection": "row",
-              "marginLeft": 16,
-              "paddingVertical": 14,
-            }
-          }
-        >
-          <View
-            style={
-              Object {
-                "marginRight": 16,
-              }
-            }
-          >
-            <View
-              style={
-                Object {
-                  "borderColor": "#9CA4A9",
-                  "borderRadius": 12,
-                  "borderWidth": 2,
-                  "height": 24,
-                  "paddingTop": 2,
-                  "width": 24,
-                }
-              }
-            />
-          </View>
-          <Text
-            numberOfLines={1}
-            style={
-              Object {
-                "color": "#2E3338",
-                "flex": 1,
-                "fontFamily": "Inter-Regular",
-                "fontSize": 16,
-                "lineHeight": 22,
-                "marginRight": 16,
-              }
-            }
-          >
-            UGX
-          </Text>
-        </View>
-      </View>
-    </View>
-    <View
-      style={
-        Object {
-          "height": 0,
-        }
-      }
-    />
+      </RCTScrollView>
+    </RNCSafeAreaView>
   </View>
 </RCTScrollView>
 `;

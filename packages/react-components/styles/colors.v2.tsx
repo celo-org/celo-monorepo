@@ -20,14 +20,10 @@ export enum Colors {
   purple = '#D39CFE',
   teal = '#7AD6FE',
   orange = '#FEB45E',
-  onboardingGreen = '#1E845F',
-  onboardingBrown = '#66541A',
   onboardingBrownLight = '#A49B80',
-  onboardingAccent = '#0C689C',
-  onboardingLightBlue = '#D6E7EF',
-  onboardingSecondaryButton = '#EBEBE1',
-  onboardingDark = '#EBEBE1',
-  onboardingBackground = '#F9F5ED',
+  onboardingBlue = '#0768AE',
+  onboardingLightBlue = '#D6EAF3',
+  onboardingBackground = '#F9F6F0',
 }
 
 export default {

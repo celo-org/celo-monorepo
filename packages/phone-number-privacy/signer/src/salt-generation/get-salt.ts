@@ -1,6 +1,12 @@
+import {
+  ErrorMessage,
+  SignMessageResponse,
+  SignMessageResponseFailure,
+  WarningMessage,
+} from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
 import { computeBlindedSignature } from '../bls/bls-cryptography-client'
-import { ErrorMessages, respondWithError } from '../common/error-utils'
+import { respondWithError } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
 import {
   hasValidAccountParam,
@@ -9,9 +15,10 @@ import {
   phoneNumberHashIsValidIfExists,
 } from '../common/input-validation'
 import logger from '../common/logger'
-import { VERSION } from '../config'
+import { getVersion } from '../config'
 import { incrementQueryCount } from '../database/wrappers/account'
 import { getKeyProvider } from '../key-management/key-provider'
+import { getBlockNumber } from '../web3/contracts'
 import { getRemainingQueryCount } from './query-quota'
 
 interface GetBlindedMessageForSaltRequest {
@@ -27,19 +34,48 @@ export async function handleGetBlindedMessageForSalt(
   logger.info('Begin getBlindedSalt request')
   try {
     if (!isValidGetSignatureInput(request.body)) {
-      respondWithError(response, 400, ErrorMessages.INVALID_INPUT)
+      respondWithError(response, 400, WarningMessage.INVALID_INPUT)
       return
     }
     if (!authenticateUser(request)) {
-      respondWithError(response, 401, ErrorMessages.UNAUTHENTICATED_USER)
+      respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER)
       return
     }
 
     const { account, blindedQueryPhoneNumber, hashedPhoneNumber } = request.body
-    const remainingQueryCount = await getRemainingQueryCount(account, hashedPhoneNumber)
-    if (remainingQueryCount <= 0) {
+
+    // Set default values in the case of an error
+    let performedQueryCount = -1
+    let totalQuota = -1
+    let blockNumber = -1
+    let errorMsg
+    // In the case of a DB or blockchain connection failure, don't block user
+    // but set the error status accordingly
+    try {
+      const queryCount = await getRemainingQueryCount(account, hashedPhoneNumber)
+      performedQueryCount = queryCount.performedQueryCount
+      totalQuota = queryCount.totalQuota
+    } catch (error) {
+      logger.error('Failed to get user quota', error)
+      errorMsg = ErrorMessage.DATABASE_GET_FAILURE
+    }
+    try {
+      blockNumber = await getBlockNumber()
+    } catch (error) {
+      logger.error('Failed to get latest block number', error)
+      errorMsg = ErrorMessage.CONTRACT_GET_FAILURE
+    }
+
+    if (errorMsg !== ErrorMessage.DATABASE_GET_FAILURE && performedQueryCount >= totalQuota) {
       logger.debug('No remaining query count')
-      respondWithError(response, 403, ErrorMessages.EXCEEDED_QUOTA)
+      respondWithError(
+        response,
+        403,
+        WarningMessage.EXCEEDED_QUOTA,
+        performedQueryCount,
+        totalQuota,
+        blockNumber
+      )
       return
     }
     const keyProvider = getKeyProvider()
@@ -47,10 +83,27 @@ export async function handleGetBlindedMessageForSalt(
     const signature = computeBlindedSignature(blindedQueryPhoneNumber, privateKey)
     await incrementQueryCount(account)
     logger.debug('Salt retrieval success')
-    response.json({ success: true, signature, version: VERSION })
+
+    let signMessageResponse: SignMessageResponse
+    const signMessageResponseSuccess: SignMessageResponse = {
+      success: !errorMsg,
+      signature,
+      version: getVersion(),
+      performedQueryCount,
+      totalQuota,
+      blockNumber,
+    }
+    if (errorMsg) {
+      const signMessageResponseFailure = signMessageResponseSuccess as SignMessageResponseFailure
+      signMessageResponseFailure.error = errorMsg
+      signMessageResponse = signMessageResponseFailure
+    } else {
+      signMessageResponse = signMessageResponseSuccess
+    }
+    response.json(signMessageResponse)
   } catch (error) {
     logger.error('Failed to getSalt', error)
-    respondWithError(response, 500, ErrorMessages.UNKNOWN_ERROR)
+    respondWithError(response, 500, ErrorMessage.UNKNOWN_ERROR)
   }
 }
 

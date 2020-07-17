@@ -8,10 +8,10 @@ import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { SendEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import AccountNumberCard from 'src/components/AccountNumberCard'
 import BackButton from 'src/components/BackButton.v2'
@@ -40,7 +40,7 @@ interface StateProps {
   transactionData: TransactionDataInput
   addressValidationType: AddressValidationType
   isValidRecipient: boolean
-  isPaymentRequest?: true
+  isOutgoingPaymentRequest?: true
   error?: ErrorMessages | null
 }
 
@@ -70,7 +70,7 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
     recipient,
     transactionData,
     isValidRecipient: state.identity.isValidRecipient,
-    isPaymentRequest: route.params.isPaymentRequest,
+    isOutgoingPaymentRequest: route.params.isOutgoingPaymentRequest,
     addressValidationType: route.params.addressValidationType,
     error,
   }
@@ -78,7 +78,7 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
 
 export const validateRecipientAccountScreenNavOptions = () => ({
   ...emptyHeader,
-  headerLeft: () => <BackButton eventName={CustomEventNames.send_secure_back} />,
+  headerLeft: () => <BackButton eventName={SendEvents.send_secure_back} />,
 })
 
 export class ValidateRecipientAccount extends React.Component<Props, State> {
@@ -89,15 +89,14 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
   }
 
   componentDidUpdate = (prevProps: Props) => {
-    const { isValidRecipient, isPaymentRequest, transactionData } = this.props
+    const { isValidRecipient, isOutgoingPaymentRequest, transactionData } = this.props
     if (isValidRecipient && !prevProps.isValidRecipient) {
-      if (isPaymentRequest) {
+      if (isOutgoingPaymentRequest) {
         navigate(Screens.PaymentRequestConfirmation, { transactionData })
       } else {
         navigate(Screens.SendConfirmation, {
           transactionData,
           addressJustValidated: true,
-          isFromScan: this.props.route.params?.isFromScan,
         })
       }
     }
@@ -106,17 +105,23 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
   onPressConfirm = () => {
     const { inputValue, singleDigitInputValueArr } = this.state
     const { recipient, addressValidationType } = this.props
+    const { requesterAddress } = this.props.route.params
     const inputToValidate =
       addressValidationType === AddressValidationType.FULL
         ? inputValue
         : singleDigitInputValueArr.join('')
 
-    CeloAnalytics.track(CustomEventNames.send_secure_submit, {
-      validationType: addressValidationType === AddressValidationType.FULL ? 'full' : 'partial',
+    ValoraAnalytics.track(SendEvents.send_secure_submit, {
+      partialAddressValidation: addressValidationType === AddressValidationType.PARTIAL,
       address: inputToValidate,
     })
 
-    this.props.validateRecipientAddress(inputToValidate, addressValidationType, recipient)
+    this.props.validateRecipientAddress(
+      inputToValidate,
+      addressValidationType,
+      recipient,
+      requesterAddress
+    )
   }
 
   onInputChange = (value: string) => {
@@ -130,12 +135,16 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
   }
 
   toggleModal = () => {
-    const validationType =
-      this.props.addressValidationType === AddressValidationType.FULL ? 'full' : 'partial'
+    const { addressValidationType } = this.props
+
     if (this.state.isModalVisible) {
-      CeloAnalytics.track(CustomEventNames.send_secure_info, { validationType })
+      ValoraAnalytics.track(SendEvents.send_secure_info, {
+        partialAddressValidation: addressValidationType === AddressValidationType.PARTIAL,
+      })
     } else {
-      CeloAnalytics.track(CustomEventNames.send_secure_info_dismissed, { validationType })
+      ValoraAnalytics.track(SendEvents.send_secure_info_dismissed, {
+        partialAddressValidation: addressValidationType === AddressValidationType.PARTIAL,
+      })
     }
 
     this.setState({ isModalVisible: !this.state.isModalVisible })

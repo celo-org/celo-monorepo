@@ -4,11 +4,11 @@
   "title": "Fund your Testnet Account",
   "addFunds": "Add Funds",
   "addFundsText":
-    "Enter the address of your Alfajores Testnet account to receive additional funds. Each request adds 10 Celo Dollars and 5 Celo Gold.\n\nIn the Celo Wallet, you can find your address by pressing the Settings cog icon at the top right. Press the address to copy it to your device’s clipboard.",
+    "Enter the address of your Alfajores Testnet account to receive additional funds. Each request adds 10 cUSD and 5 CELO.\n\nIn the Celo Wallet, you can find your address by pressing the menu icon at the top left and scrolling down to bottom. Press the address to copy it to your device’s clipboard.",
   "getDollars": "Add Funds",
   "whatsNext": "What's Next",
   "getTestnetText":
-    "If you have an Android device, you can set up a funded account on the Alfajores Testnet by requesting a <0>Celo Wallet invite</0>. You can also <2>create an account via the command line<2>.",
+    "If you have an Android or iOS device, you can set up a funded account on the Alfajores Testnet by requesting a <0>Celo Wallet invite</0>. You can also <2>create an account via the command line<2>.",
   "getTestnetAddress": "Create an Account",
   "buildLocally": "Build the Celo Wallet locally.",
   "buildLocallyText":

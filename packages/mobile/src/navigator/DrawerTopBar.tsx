@@ -1,35 +1,39 @@
 import colors from '@celo/react-components/styles/colors.v2'
 import { useNavigation } from '@react-navigation/native'
 import * as React from 'react'
-import { StyleSheet, TouchableOpacity, View } from 'react-native'
+import { processColor, StyleSheet, TouchableOpacity } from 'react-native'
 import Animated, { cond, greaterThan } from 'react-native-reanimated'
 import Hamburger from 'src/icons/Hamburger'
 
 interface Props {
   middleElement?: React.ReactNode
   scrollPosition?: Animated.Value<number>
+  testID?: string
 }
 
-function DrawerTopBar({ middleElement, scrollPosition }: Props) {
+function DrawerTopBar({ middleElement, scrollPosition, testID }: Props) {
   const navigation = useNavigation()
   const viewStyle = React.useMemo(
     () => ({
       ...styles.container,
-      borderBottomColor: colors.gray2,
-      borderBottomWidth: cond(greaterThan(scrollPosition ?? new Animated.Value(0), 0), 1, 0),
+      borderBottomWidth: 1,
+      borderBottomColor: cond(
+        greaterThan(scrollPosition ?? new Animated.Value(0), 0),
+        processColor(colors.gray2),
+        processColor('transparent')
+      ),
     }),
     [scrollPosition]
   )
 
   return (
-    <Animated.View style={viewStyle}>
+    <Animated.View testID={testID} style={viewStyle}>
       {/*
       // @ts-ignore Only used in a drawer */}
       <TouchableOpacity style={styles.hamburger} onPress={navigation.toggleDrawer}>
         <Hamburger />
       </TouchableOpacity>
       {middleElement}
-      <View style={styles.spacer} />
     </Animated.View>
   )
 }
@@ -44,19 +48,15 @@ const styles = StyleSheet.create({
     height: 62,
     backgroundColor: 'transparent',
     alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  withBorderBottom: {
-    borderBottomColor: colors.gray2,
-    borderBottomWidth: 1,
+    justifyContent: 'center',
   },
   hamburger: {
+    position: 'absolute',
+    left: 8,
+    top: 8,
     padding: 8,
     marginLeft: 4,
     marginBottom: 0,
-  },
-  spacer: {
-    width: 45,
   },
 })
 

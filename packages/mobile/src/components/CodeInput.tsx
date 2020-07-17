@@ -33,6 +33,8 @@ export interface Props {
   inputPlaceholderWithClipboardContent?: string
   onInputChange: (value: string) => void
   shouldShowClipboard: (value: string) => boolean
+  multiline?: boolean
+  testID?: string
   style?: StyleProp<ViewStyle>
 }
 
@@ -44,6 +46,8 @@ export default function CodeInput({
   inputPlaceholderWithClipboardContent,
   onInputChange,
   shouldShowClipboard,
+  multiline,
+  testID,
   style,
 }: Props) {
   const clipboardContent = useClipboard()
@@ -86,6 +90,8 @@ export default function CodeInput({
                     : inputPlaceholder
                 }
                 onChangeText={onInputChange}
+                multiline={multiline}
+                testID={testID}
               />
             ) : (
               <Text style={styles.codeValue} numberOfLines={1}>

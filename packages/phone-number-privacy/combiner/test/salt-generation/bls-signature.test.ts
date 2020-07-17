@@ -5,8 +5,6 @@ import {
 } from '../../src/bls/bls-cryptography-client'
 import config from '../../src/config'
 
-const USING_MOCK = config.keyVault.azureClientSecret === 'useMock'
-
 config.thresholdSignature = {
   threshold: 3,
   polynomial:
@@ -17,18 +15,6 @@ const PUBLIC_KEY =
   '813a7deecc0f058cc804358efbcd83f84dfeddcaec0a0b601e73b74d7dead680b8b1d7b65769026512b8c7438c95a401c3ce218d454222948e782656ef5b37aabbe78ace335731afe5213cb07d26eebb093741ebde38296206893a2c217e4601'
 
 describe(`BLS service computes signature`, () => {
-  beforeEach(() => {
-    // Use mock client if env vars not specified
-    if (!USING_MOCK) {
-      // Ensure all env vars are specified
-      expect(config.keyVault.azureClientID).not.toBe('useMock')
-      expect(config.keyVault.azureClientSecret).not.toBe('useMock')
-      expect(config.keyVault.azureTenant).not.toBe('useMock')
-      expect(config.keyVault.azureVaultName).not.toBe('useMock')
-      expect(config.keyVault.azureSecretName).not.toBe('useMock')
-    }
-  })
-
   it('provides blinded signature', async () => {
     const signatures: ServicePartialSignature[] = [
       {
@@ -62,10 +48,17 @@ describe(`BLS service computes signature`, () => {
     const blindedMsgResult = threshold_bls.blind(message, userSeed)
     const blindedMsg = Buffer.from(blindedMsgResult.message).toString('base64')
 
-    const actual = await BLSCryptographyClient.combinePartialBlindedSignatures(
-      signatures,
-      blindedMsg
-    )
+    const blsCryptoClient = new BLSCryptographyClient()
+    for (let i = 0; i < signatures.length; i++) {
+      await blsCryptoClient.addSignature(signatures[i], blindedMsg)
+      if (i >= 2) {
+        expect(blsCryptoClient.hasSufficientVerifiedSignatures()).toBeTruthy()
+      } else {
+        expect(blsCryptoClient.hasSufficientVerifiedSignatures()).toBeFalsy()
+      }
+    }
+
+    const actual = await blsCryptoClient.combinePartialBlindedSignatures()
     expect(actual).toEqual('vy4TFsSNeyNsQK/xjGoH2TwLRI9ZCOiyvfMU7aRLJYw/oOIF/xCrBiwpK9gwLTQA')
 
     const unblindedSignedMessage = threshold_bls.unblind(
@@ -107,10 +100,11 @@ describe(`BLS service computes signature`, () => {
     const blindedMsgResult = threshold_bls.blind(message, userSeed)
     const blindedMsg = Buffer.from(blindedMsgResult.message).toString('base64')
 
-    const actual = await BLSCryptographyClient.combinePartialBlindedSignatures(
-      signatures,
-      blindedMsg
-    )
+    const blsCryptoClient = new BLSCryptographyClient()
+    await signatures.forEach(async (signature) => {
+      await blsCryptoClient.addSignature(signature, blindedMsg)
+    })
+    const actual = await blsCryptoClient.combinePartialBlindedSignatures()
     expect(actual).toEqual('vy4TFsSNeyNsQK/xjGoH2TwLRI9ZCOiyvfMU7aRLJYw/oOIF/xCrBiwpK9gwLTQA')
 
     const unblindedSignedMessage = threshold_bls.unblind(
@@ -151,8 +145,12 @@ describe(`BLS service computes signature`, () => {
     const blindedMsgResult = threshold_bls.blind(message, userSeed)
     const blindedMsg = Buffer.from(blindedMsgResult.message).toString('base64')
 
+    const blsCryptoClient = new BLSCryptographyClient()
+    await signatures.forEach(async (signature) => {
+      await blsCryptoClient.addSignature(signature, blindedMsg)
+    })
     try {
-      await BLSCryptographyClient.combinePartialBlindedSignatures(signatures, blindedMsg)
+      await blsCryptoClient.combinePartialBlindedSignatures()
     } catch (e) {
       expect(e.message.includes('Not enough not enough partial signatures'))
     }

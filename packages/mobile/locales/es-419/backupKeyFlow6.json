@@ -2,10 +2,10 @@
   "headerTitle": "Clave de la cuenta",
   "introTitle": "La clave de tu cuenta",
   "introBody": "La llave de su cuenta es la parte más importante de su cuenta. Lleva unos cinco minutos",
-  "introPrimaryAction": "Configurar ahora",
+  "introPrimaryAction": "Configurar Ahora",
   "delayBackup": "Espere una hora",
   "postSetupTitle":"La clave de tu cuenta",
-  "postSetupBody": "Si pierdes tu Clave de Cuenta, perderás el acceso a todos tus Celo Dólares y Oro. Nadie, ni siquiera Celo, podrá ayudarle a recuperar su cuenta sin su clave. Guárdela en un lugar seguro y no la comparta",
+  "postSetupBody": "Si pierdes tu Clave de Cuenta, perderás el acceso a todos tus Celo Dólares y CELO. Nadie, ni siquiera {{appName}}, podrá ayudarle a recuperar su cuenta sin su clave. Guárdela en un lugar seguro y no la comparta",
   "postSetupCTA": "Conozca las claves de la cuenta",
   "getBackupKey": "Obtener Clave de Respaldo",
   "setUpSocialBackup": "Configurar Salvaguardas",
@@ -16,7 +16,7 @@
   "backupKey": "Clave de la cuenta",
   "yourBackupKey": "Su clave de respaldo",
   "moreInfo": "Más Información",
-  "backupKeyNotification": "Sin una clave de respaldo, puede perder el acceso a la billetera.",
+  "backupKeyNotification": "Su clave de cuenta es la parte más importante de su cuenta",
   "backupKeySummary":  "Encuentra un lugar privado y anota tu Clave de Cuenta. Por favor, guárdela en un lugar seguro. No la guardes en tu teléfono.",
   "backupPrompt":
     "Para seguridad de sus fondos, su cuenta está bloqueada hasta que obtenga su clave de respaldo.",
@@ -61,7 +61,7 @@
     },
     {
       "title": "Sin tu llave, puedes perder el acceso para siempre",
-      "text": "Si pierde su teléfono, debe tener la llave para recuperar su cuenta. Nadie, ni siquiera Celo, podrá recuperar sus fondos sin ella"
+      "text": "Si pierde su teléfono, debe tener la llave para recuperar su cuenta. Nadie, ni siquiera {{appName}}, podrá recuperar sus fondos sin ella"
     },
     {
       "title": "Escríbelo",

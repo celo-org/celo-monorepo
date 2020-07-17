@@ -89,7 +89,7 @@ _See code: [packages/cli/src/commands/releasegold/create-account.ts](https://git
 
 ### Locked-gold
 
-Perform actions [lock, unlock, withdraw] on Celo Gold that has been locked via the provided ReleaseGold contract.
+Perform actions [lock, unlock, withdraw] on CELO that has been locked via the provided ReleaseGold contract.
 
 ```
 USAGE

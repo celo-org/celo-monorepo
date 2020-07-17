@@ -132,7 +132,7 @@ function Exception(error: Error): Exception {
 export async function sendTransactionAsync<T>(
   tx: TransactionObject<T>,
   account: string,
-  feeCurrencyAddress: string,
+  feeCurrencyAddress: string | undefined,
   logger: TxLogger = emptyTxLogger,
   estimatedGas?: number,
   gasPrice?: string,

@@ -61,11 +61,15 @@ export interface CurrencyConversionArgs {
   sourceCurrencyCode?: string
   currencyCode: string
   timestamp?: number
+  impliedExchangeRates?: MoneyAmount['impliedExchangeRates']
 }
 
 export interface MoneyAmount {
   value: BigNumber.Value
   currencyCode: string
+  // Implied exchange rate (based on exact amount exchanged) which overwrites
+  // the estimate in firebase (based on a constant exchange amount)
+  impliedExchangeRates?: { [key: string]: BigNumber.Value }
   timestamp: number
 }
 
@@ -310,6 +314,7 @@ export const resolvers = {
         sourceCurrencyCode: moneyAmount.currencyCode,
         currencyCode: localCurrencyCode || 'USD',
         timestamp: moneyAmount.timestamp,
+        impliedExchangeRates: moneyAmount.impliedExchangeRates,
       })
       return {
         value: new BigNumber(moneyAmount.value).multipliedBy(rate).toString(),

@@ -6,7 +6,7 @@ import { ExchangeItemFragment } from 'src/apollo/types'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
-import { exchangeGoldGreen, exchangeGreenGold } from 'src/images/Images'
+import { transactionExchange } from 'src/images/Images'
 import { navigateToExchangeReview } from 'src/transactions/actions'
 import TransactionFeedItem from 'src/transactions/TransactionFeedItem'
 import { TransactionStatus } from 'src/transactions/types'
@@ -27,7 +27,7 @@ export function ExchangeFeedItem(props: Props) {
   }
 
   const boughtGold = takerAmount.currencyCode === CURRENCIES[CURRENCY_ENUM.GOLD].code
-  const icon = boughtGold ? exchangeGreenGold : exchangeGoldGreen
+  const icon = transactionExchange
   const goldAmount = boughtGold ? takerAmount : makerAmount
 
   return (

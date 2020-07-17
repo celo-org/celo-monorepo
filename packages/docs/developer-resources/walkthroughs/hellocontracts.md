@@ -105,7 +105,7 @@ When you are ready to deploy your contract to Alfajores, you'll need a Celo clie
 
 ```bash
 export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:alfajores
-export NETWORK_ID=44786
+export NETWORK_ID=44787
 ```
 
 ### Pull the Celo Docker image
@@ -181,7 +181,7 @@ After a few seconds of syncing (with [Celo's ultralight sync](../../celo-codebas
 docker exec celo-ultralight-node geth attach --exec 'eth.getBalance("<YOUR-ACCOUNT-ADDRESS>")'
 ```
 
-If you go to our [Alfajores Faucet Page](https://celo.org/build/faucet), you should be able to faucet your account some Celo Gold and see your balance increase with the above command.
+If you go to our [Alfajores Faucet Page](https://celo.org/build/faucet), you should be able to faucet your account some CELO and see your balance increase with the above command.
 
 ### Deploy the contract
 
@@ -197,7 +197,7 @@ In your `truffle-config.js` reference your node:
 alfajores: {
   host: "127.0.0.1",
   port: 8545,
-  network_id: 44786
+  network_id: 44787
 }
 ```
 
