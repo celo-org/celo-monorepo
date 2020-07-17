@@ -1,19 +1,25 @@
 import * as React from 'react'
-import 'react-native'
+import { render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
-import * as renderer from 'react-test-renderer'
 import { VerificationStatus } from 'src/identity/types'
 import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
 import { createMockStore } from 'test/utils'
 
+// Mock AnimatedScrollView this way otherwise we get a
+// `JavaScript heap out of memory` error when ref is set (?!)
+jest.mock(
+  'react-native/Libraries/Animated/src/components/AnimatedScrollView.js',
+  () => 'RCTScrollView'
+)
+
 describe('VerificationLoadingScreen', () => {
   it('renders correctly', () => {
-    const tree = renderer.create(
+    const { toJSON } = render(
       <Provider store={createMockStore()}>
         <VerificationLoadingScreen />
       </Provider>
     )
-    expect(tree).toMatchSnapshot()
+    expect(toJSON()).toMatchSnapshot()
   })
 
   it('renders correctly with fail modal', () => {
@@ -22,11 +28,11 @@ describe('VerificationLoadingScreen', () => {
         verificationStatus: VerificationStatus.Failed,
       },
     })
-    const tree = renderer.create(
+    const { toJSON } = render(
       <Provider store={store}>
         <VerificationLoadingScreen />
       </Provider>
     )
-    expect(tree).toMatchSnapshot()
+    expect(toJSON()).toMatchSnapshot()
   })
 })
