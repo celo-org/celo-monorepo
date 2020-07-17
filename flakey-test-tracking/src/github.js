@@ -104,8 +104,7 @@ class GitHub {
       return this.rest.checks.create({
         ...defaults,
         name: getTestSuiteTitles().join(' -> '),
-        //head_sha: process.env.CIRCLE_SHA1,
-        head_sha: '2945424b9d5d2be945851c1143adde027ec463ca',
+        head_sha: process.env.CIRCLE_SHA1,
         status: 'in_progress',
       })
     }
