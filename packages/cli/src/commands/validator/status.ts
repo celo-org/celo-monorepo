@@ -28,7 +28,7 @@ export const statusTable = {
   proposed: { get: (v: ValidatorStatusEntry) => (v.elected || v.proposed ? v.proposed : '') },
   signatures: {
     get: (v: ValidatorStatusEntry) =>
-      isNaN(v.signatures) ? '' : Math.round(v.signatures * 100) + '%',
+      isNaN(v.signatures) ? '' : (v.signatures * 100).toFixed(2) + '%',
   },
 }
 
@@ -193,7 +193,7 @@ export default class ValidatorStatus extends BaseCommand {
       const signers = await electionCache.electedSigners(i)
       signers.map((s) => {
         const count = countsBySigner.get(s) === undefined ? 0 : countsBySigner.get(s)
-        countsBySigner.set(s, count + (j - i))
+        countsBySigner.set(s, count + (j - i) + 1)
       })
       i = j + 1
     }
