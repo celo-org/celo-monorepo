@@ -358,9 +358,10 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   }
 
   /** Get list of registered validator group addresses */
-  getRegisteredValidatorGroupsAddresses: () => Promise<Address[]> = proxyCall(
-    this.contract.methods.getRegisteredValidatorGroups
-  )
+  async getRegisteredValidatorGroupsAddresses(blockNumber?: number): Promise<Address[]> {
+    // @ts-ignore: Expected 0-1 arguments, but got 2
+    return this.contract.methods.getRegisteredValidatorGroups().call({}, blockNumber)
+  }
 
   /** Get list of registered validators */
   async getRegisteredValidators(blockNumber?: number): Promise<Validator[]> {
@@ -369,9 +370,11 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   }
 
   /** Get list of registered validator groups */
-  async getRegisteredValidatorGroups(): Promise<ValidatorGroup[]> {
-    const vgAddresses = await this.getRegisteredValidatorGroupsAddresses()
-    return concurrentMap(10, vgAddresses, (addr) => this.getValidatorGroup(addr, false))
+  async getRegisteredValidatorGroups(blockNumber?: number): Promise<ValidatorGroup[]> {
+    const vgAddresses = await this.getRegisteredValidatorGroupsAddresses(blockNumber)
+    return concurrentMap(10, vgAddresses, (addr) =>
+      this.getValidatorGroup(addr, false, blockNumber)
+    )
   }
 
   /**
