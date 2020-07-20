@@ -14,7 +14,7 @@ import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import Avatar from 'src/components/Avatar'
 import CurrencyDisplay, { DisplayType, FormatType } from 'src/components/CurrencyDisplay'
-import FeeIcon from 'src/components/FeeIcon'
+import { SecurityFeeIcon } from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow.v2'
 import TotalLineItem from 'src/components/TotalLineItem.v2'
 import { FeeType } from 'src/fees/actions'
@@ -227,7 +227,7 @@ export class InviteReview extends React.Component<Props, State> {
                     />
                     <LineItemRow
                       title={t('sendFlow7:securityFee')}
-                      titleIcon={<FeeIcon />}
+                      titleIcon={<SecurityFeeIcon />}
                       amount={
                         securityFeeAmount && (
                           <CurrencyDisplay amount={securityFeeAmount} formatType={FormatType.Fee} />

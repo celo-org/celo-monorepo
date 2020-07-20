@@ -1,8 +1,16 @@
+import {
+  ErrorMessage,
+  SignMessageResponse,
+  SignMessageResponseFailure,
+  SignMessageResponseSuccess,
+  WarningMessage,
+} from '@celo/phone-number-privacy-common'
 import AbortController from 'abort-controller'
 import { Request, Response } from 'firebase-functions'
 import fetch, { Response as FetchResponse } from 'node-fetch'
-import { BLSCryptographyClient, ServicePartialSignature } from '../bls/bls-cryptography-client'
-import { ErrorMessage, respondWithError, WarningMessage } from '../common/error-utils'
+import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
+import { MAX_BLOCK_DISCREPANCY_THRESHOLD } from '../common/constants'
+import { respondWithError } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
 import {
   hasValidAccountParam,
@@ -15,20 +23,22 @@ import config, { VERSION } from '../config'
 
 const PARTIAL_SIGN_MESSAGE_ENDPOINT = '/getBlindedSalt'
 
+type SignerResponse = SignMessageResponseSuccess | SignMessageResponseFailure
+
 interface GetBlindedMessageForSaltRequest {
   account: string
   blindedQueryPhoneNumber: string
   hashedPhoneNumber?: string
 }
 
-interface SignMessageResponse {
-  success: boolean
-  signature: string
-  version: string
-}
-
 interface SignerService {
   url: string
+}
+
+interface SignMsgRespWithStatus {
+  url: string
+  signMessageResponse: SignMessageResponse
+  status: number
 }
 
 export async function handleGetDistributedBlindedMessageForSalt(
@@ -45,19 +55,17 @@ export async function handleGetDistributedBlindedMessageForSalt(
       return
     }
     logger.debug('Requesting signatures')
-    const { successCount, majorityErrorCode } = await requestSignatures(request, response)
-    if (successCount < config.thresholdSignature.threshold) {
-      handleMissingSignatures(majorityErrorCode, response)
-    }
+    await requestSignatures(request, response)
   } catch (e) {
     respondWithError(response, 500, ErrorMessage.UNKNOWN_ERROR)
   }
 }
 
 async function requestSignatures(request: Request, response: Response) {
-  let successCount = 0
-  const signatures: ServicePartialSignature[] = []
+  const responses: SignMsgRespWithStatus[] = []
+  const sentResult = { sent: false }
   const errorCodes: Map<number, number> = new Map()
+  const blsCryptoClient = new BLSCryptographyClient()
 
   const signers = JSON.parse(config.pgpnpServices.signers) as SignerService[]
   const signerReqs = signers.map((service) => {
@@ -65,7 +73,6 @@ async function requestSignatures(request: Request, response: Response) {
     const timeout = setTimeout(() => {
       controller.abort()
     }, config.pgpnpServices.timeoutMilliSeconds)
-    let sentResult: boolean = false
 
     return requestSignature(service, request, controller)
       .then(async (res: FetchResponse) => {
@@ -73,20 +80,16 @@ async function requestSignatures(request: Request, response: Response) {
         const url = service.url
         logger.info(`Service ${url} returned status ${status}`)
         if (res.ok) {
-          const signResponse = (await res.json()) as SignMessageResponse
-          signatures.push({ url, signature: signResponse.signature })
-          successCount += 1
-          // Send response immediately once we cross threshold
-          if (!sentResult && successCount >= config.thresholdSignature.threshold) {
-            logger.debug('Enough signatures retrieved, combining')
-            sentResult = true
-            const combinedSignature = await BLSCryptographyClient.combinePartialBlindedSignatures(
-              signatures,
-              request.body.blindedQueryPhoneNumber
-            )
-            logger.debug('Responding with combined signature')
-            response.json({ success: true, combinedSignature, version: VERSION })
-          }
+          await handleSuccessResponse(
+            res,
+            res.status,
+            response,
+            sentResult,
+            responses,
+            service.url,
+            blsCryptoClient,
+            request.body.blindedQueryPhoneNumber
+          )
         } else {
           errorCodes.set(status, (errorCodes.get(status) || 0) + 1)
         }
@@ -105,12 +108,99 @@ async function requestSignatures(request: Request, response: Response) {
 
   await Promise.all(signerReqs)
 
+  logResponseDiscrepancies(responses)
   const majorityErrorCode = getMajorityErrorCode(errorCodes)
-  logger.debug(
-    `Done requesting signatures. Success count: ${successCount}, majority error code ${majorityErrorCode}`
+  if (!blsCryptoClient.hasSufficientVerifiedSignatures()) {
+    handleMissingSignatures(majorityErrorCode, response)
+  }
+}
+
+async function handleSuccessResponse(
+  res: FetchResponse,
+  status: number,
+  response: Response,
+  sentResult: { sent: boolean },
+  responses: SignMsgRespWithStatus[],
+  serviceUrl: string,
+  blsCryptoClient: BLSCryptographyClient,
+  blindedQueryPhoneNumber: string
+) {
+  const signResponse = (await res.json()) as SignerResponse
+  if (!signResponse.success) {
+    // Continue on failure as long as signature is present to unblock user
+    logger.error(`${signResponse.error} from signer ${serviceUrl}`)
+  }
+  if (!signResponse.signature) {
+    throw new Error(`Signature is missing from signer ${serviceUrl}`)
+  }
+  responses.push({ url: serviceUrl, signMessageResponse: signResponse, status })
+  const partialSig = { url: serviceUrl, signature: signResponse.signature }
+  await blsCryptoClient.addSignature(partialSig, blindedQueryPhoneNumber)
+  // Send response immediately once we cross threshold
+  if (!sentResult.sent && blsCryptoClient.hasSufficientVerifiedSignatures()) {
+    const combinedSignature = await blsCryptoClient.combinePartialBlindedSignatures()
+    if (!sentResult.sent) {
+      response.json({ success: true, combinedSignature, version: VERSION })
+      sentResult.sent = true
+    }
+  }
+}
+
+function logResponseDiscrepancies(responses: SignMsgRespWithStatus[]) {
+  // Only compare responses which have values for the quota fields
+  const successfulResponses = responses.filter(
+    (response) =>
+      response.signMessageResponse &&
+      response.signMessageResponse.performedQueryCount &&
+      response.signMessageResponse.totalQuota &&
+      response.signMessageResponse.blockNumber
   )
 
-  return { successCount, majorityErrorCode }
+  if (successfulResponses.length === 0) {
+    return
+  }
+  // Compare the first response to the rest of the responses
+  const expectedQueryCount = successfulResponses[0].signMessageResponse.performedQueryCount
+  const expectedTotalQuota = successfulResponses[0].signMessageResponse.totalQuota
+  const expectedBlockNumber = successfulResponses[0].signMessageResponse.blockNumber!
+  let discrepancyFound = false
+  for (const resp of successfulResponses) {
+    // Performed query count should never diverge; however the totalQuota may
+    // diverge if the queried block number is different
+    if (
+      resp.signMessageResponse.performedQueryCount !== expectedQueryCount ||
+      (resp.signMessageResponse.totalQuota !== expectedTotalQuota &&
+        resp.signMessageResponse.blockNumber === expectedBlockNumber)
+    ) {
+      const values = successfulResponses.map((response) => {
+        return {
+          signer: response.url,
+          performedQueryCount: response.signMessageResponse.performedQueryCount,
+          totalQuota: response.signMessageResponse.totalQuota,
+        }
+      })
+      logger.error(`Discrepancy found in signers' measured quota values ${values}`)
+      discrepancyFound = true
+    }
+    if (
+      Math.abs(resp.signMessageResponse.blockNumber! - expectedBlockNumber) >
+      MAX_BLOCK_DISCREPANCY_THRESHOLD
+    ) {
+      const values = successfulResponses.map((response) => {
+        return {
+          signer: response.url,
+          blockNumber: response.signMessageResponse.blockNumber,
+        }
+      })
+      logger.error(
+        `Discrepancy found in signers' latest block number that exceeds threshold ${values}`
+      )
+      discrepancyFound = true
+    }
+    if (discrepancyFound) {
+      return
+    }
+  }
 }
 
 function requestSignature(
@@ -134,7 +224,7 @@ function requestSignature(
 
 function getMajorityErrorCode(errorCodes: Map<number, number>) {
   if (errorCodes.size > 1) {
-    logger.error(ErrorMessage.INCONSISTENT_SINGER_RESPONSES)
+    logger.error(ErrorMessage.INCONSISTENT_SIGNER_RESPONSES)
   }
 
   let maxErrorCode = -1
