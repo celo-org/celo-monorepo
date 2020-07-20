@@ -12,11 +12,9 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
-import { AnalyticsEvents } from 'src/analytics/Events'
-import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import Avatar from 'src/components/Avatar'
 import CurrencyDisplay, { DisplayType, FormatType } from 'src/components/CurrencyDisplay'
-import FeeIcon from 'src/components/FeeIcon'
+import { SecurityFeeIcon } from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow.v2'
 import TotalLineItem from 'src/components/TotalLineItem.v2'
 import { FeeType } from 'src/fees/actions'
@@ -99,12 +97,10 @@ export class InviteReview extends React.Component<Props, State> {
   }
 
   onInviteSMS = async () => {
-    ValoraAnalytics.track(AnalyticsEvents.invite_friends_sms)
     await this.onInvite(InviteBy.SMS)
   }
 
   onInviteWhatsApp = async () => {
-    ValoraAnalytics.track(AnalyticsEvents.invite_friends_whatsapp)
     await this.onInvite(InviteBy.WhatsApp)
   }
 
@@ -126,7 +122,6 @@ export class InviteReview extends React.Component<Props, State> {
   }
 
   onEdit = () => {
-    ValoraAnalytics.track(AnalyticsEvents.invite_edit)
     navigateBack()
   }
 
@@ -232,7 +227,7 @@ export class InviteReview extends React.Component<Props, State> {
                     />
                     <LineItemRow
                       title={t('sendFlow7:securityFee')}
-                      titleIcon={<FeeIcon />}
+                      titleIcon={<SecurityFeeIcon />}
                       amount={
                         securityFeeAmount && (
                           <CurrencyDisplay amount={securityFeeAmount} formatType={FormatType.Fee} />

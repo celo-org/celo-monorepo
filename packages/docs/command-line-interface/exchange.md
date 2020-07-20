@@ -1,5 +1,5 @@
 ---
-description: Exchange Celo Dollars and Celo Gold via the stability mechanism
+description: Exchange Celo Dollars and CELO via the stability mechanism
 ---
 
 ## Commands

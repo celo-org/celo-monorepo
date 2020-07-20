@@ -107,6 +107,11 @@ const fontStyles = StyleSheet.create({
     fontFamily: Inter.Medium,
     color: colors.white,
   },
+  emptyState: {
+    ...standards.large,
+    color: colors.gray3,
+    textAlign: 'center',
+  },
 })
 
 export default fontStyles

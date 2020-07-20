@@ -1,5 +1,5 @@
+import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import { SecretsManager } from 'aws-sdk'
-import { ErrorMessage } from '../common/error-utils'
 import logger from '../common/logger'
 import config from '../config'
 import { KeyProviderBase } from './key-provider-base'

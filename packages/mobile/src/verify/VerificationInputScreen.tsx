@@ -27,8 +27,8 @@ import {
 import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers.v2'
 import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
+import TopBarTextButtonOnboarding from 'src/onboarding/TopBarTextButtonOnboarding'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import VerificationCodeInput from 'src/verify/VerificationCodeInput'
@@ -103,12 +103,11 @@ class VerificationInputScreen extends React.Component<Props, State> {
       />
     ),
     headerRight: () => (
-      <TopBarTextButton
+      <TopBarTextButtonOnboarding
         title={i18n.t('global:help')}
         testID="VerificationInputHelp"
         // tslint:disable-next-line: jsx-no-lambda
         onPress={() => navigation.setParams({ showHelpDialog: true })}
-        titleStyle={{ color: colors.onboardingBrownLight }}
       />
     ),
   })
@@ -314,7 +313,7 @@ const styles = StyleSheet.create({
   },
   tip: {
     opacity: 0,
-    backgroundColor: colors.onboardingAccent,
+    backgroundColor: colors.onboardingBlue,
     borderRadius: 4,
     marginHorizontal: Spacing.Regular16,
     marginVertical: Spacing.Regular16,

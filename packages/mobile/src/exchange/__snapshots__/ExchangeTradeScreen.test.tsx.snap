@@ -238,12 +238,12 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
         style={
           Object {
             "alignItems": "center",
-            "backgroundColor": "#E3C376",
+            "backgroundColor": "#F1F0EB",
             "flexGrow": 1,
             "height": 48,
             "justifyContent": "center",
             "opacity": undefined,
-            "paddingHorizontal": 16,
+            "paddingHorizontal": 24,
             "paddingVertical": 5,
           }
         }
@@ -253,7 +253,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
           accessibilityLabel="continue"
           style={
             Object {
-              "color": "#FFFFFF",
+              "color": "#9CA4A9",
               "fontFamily": "Inter-SemiBold",
               "fontSize": 16,
               "lineHeight": 22,

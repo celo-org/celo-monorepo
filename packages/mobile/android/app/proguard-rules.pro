@@ -23,9 +23,6 @@
 -keep class com.rt2zz.reactnativecontacts.** {*;}
 -keepclassmembers class com.rt2zz.reactnativecontacts.** {*;}
 
-# NDK crash handler
--keep class ru.ivanarh.jndcrash.** { *; }
-
 # Instabug
 -dontwarn com.instabug.**
 
