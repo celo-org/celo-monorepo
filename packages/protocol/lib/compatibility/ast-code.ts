@@ -6,11 +6,32 @@ import {
 } from '@openzeppelin/upgrades'
 import ContractAST from '@openzeppelin/upgrades/lib/utils/ContractAST'
 
-export const VISIBILITY_PUBLIC = 'public'
-export const VISIBILITY_EXTERNAL = 'external'
-const CONTRACT_KIND_CONTRACT = 'contract'
-const STORAGE_DEFAULT = 'default'
+export enum Visibility {
+  NONE = "",
+  EXTERNAL = "external",
+  PUBLIC = "public",
+  INTERNAL = "internal",
+  PRIVATE = "private"
+}
 
+export enum Mutability {
+  NONE = "",
+  PURE = "pure",
+  VIEW = "view",
+  PAYABLE = "payable"
+}
+
+enum StorageLocation {
+  NONE = "",
+  // Default gets replaced to None when comparing parameter storage locations
+  DEFAULT = "default",
+
+  STORAGE = "storage",
+  MEMORY = "memory",
+  CALLDATA = "calldata",
+}
+
+const CONTRACT_KIND_CONTRACT = 'contract'
 const OUT_VOID_PARAMETER_STRING = 'void'
 
 // Exported classes
@@ -224,17 +245,18 @@ interface TypeDescriptions {
 }
 
 interface Parameter {
-  storageLocation: string
+  storageLocation: StorageLocation
   typeDescriptions: TypeDescriptions
 }
 
 interface Parameters {
   parameters: Parameter[]
 }
+
 interface Method {
   selector: string
-  visibility: string
-  stateMutability: string
+  visibility: Visibility
+  stateMutability: Mutability
   parameters: Parameters
   returnParameters: Parameters
 }
@@ -271,7 +293,7 @@ function parametersSignature(parameters: Parameter[]): string {
     return OUT_VOID_PARAMETER_STRING
   }
   const singleSignature = (p: Parameter): string => {
-    const storage = p.storageLocation === STORAGE_DEFAULT ? '' : `${p.storageLocation} `
+    const storage = p.storageLocation === StorageLocation.DEFAULT ? StorageLocation.NONE : `${p.storageLocation} `
     return `${storage}${p.typeDescriptions.typeString}`
   }
   return parameters.map(singleSignature).join(', ')
@@ -314,7 +336,7 @@ function checkMethodCompatibility(contract: string, m1: Method, m2: Method): AST
 }
 
 const getCheckableMethodsFromAST = (contract: ContractAST, id: string): any[] => {
-  const checkableMethods = (method: Method) => method.visibility === VISIBILITY_EXTERNAL || method.visibility === VISIBILITY_PUBLIC
+  const checkableMethods = (method: Method) => method.visibility === Visibility.EXTERNAL || method.visibility === Visibility.PUBLIC
   try {
     return contract.getMethods().filter(checkableMethods)
   } catch (error) {

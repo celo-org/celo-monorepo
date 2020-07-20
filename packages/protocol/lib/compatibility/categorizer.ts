@@ -4,7 +4,7 @@ import {
   ContractKindChange, DeployedBytecodeChange, MethodAddedChange,
   MethodMutabilityChange, MethodParametersChange, MethodRemovedChange,
   MethodReturnChange, MethodVisibilityChange, NewContractChange,
-  VISIBILITY_EXTERNAL, VISIBILITY_PUBLIC
+  Visibility
 } from '@celo/protocol/lib/compatibility/ast-code'
 
 /**
@@ -33,7 +33,7 @@ export function categorize(changes: Change[], categorizer: Categorizer): Change[
  * Default implementation of {@link Categorizer}, where:
  *  Major:
  *    Mutability, Params, Return Params, Method Removed, Contract type,
- *    Visibilty changes
+ *    Visibility changes
  *  Minor:
  *    Method Added, New Contract, Visibility (from Public to External) changes
  *  Patch:
@@ -49,7 +49,7 @@ export class DefaultCategorizer implements Categorizer {
   onMethodAdded = (_change: MethodAddedChange): ChangeType => ChangeType.Minor
   onNewContract = (_change: NewContractChange): ChangeType => ChangeType.Minor
   onMethodVisibility = (change: MethodVisibilityChange): ChangeType => {
-    if (change.oldValue === VISIBILITY_PUBLIC && change.newValue === VISIBILITY_EXTERNAL) {
+    if (change.oldValue === Visibility.EXTERNAL && change.newValue === Visibility.PUBLIC) {
       // Broader visibility, minor change
       return ChangeType.Minor
     }
