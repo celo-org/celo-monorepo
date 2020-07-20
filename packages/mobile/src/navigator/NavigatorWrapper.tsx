@@ -3,7 +3,7 @@ import { NavigationContainer, NavigationState } from '@react-navigation/native'
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import AlertBanner from 'src/alert/AlertBanner'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { getAppLocked } from 'src/app/selectors'
 import { DEV_RESTORE_NAV_STATE_ON_RELOAD } from 'src/config'
 import { navigationRef } from 'src/navigator/NavigationService'
@@ -92,7 +92,7 @@ export const NavigatorWrapper = () => {
     if (previousRouteName !== currentRouteName) {
       // The line below uses the @react-native-firebase/analytics tracker
       // Change this line to use another Mobile analytics SDK
-      CeloAnalytics.page(currentRouteName, {
+      ValoraAnalytics.page(currentRouteName, {
         previousScreen: previousRouteName,
         currentScreen: currentRouteName,
       })

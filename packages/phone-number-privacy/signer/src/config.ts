@@ -1,6 +1,11 @@
+import { toBool, toNum } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
 
-export const VERSION = process.env.npm_package_version
+require('dotenv').config()
+
+export function getVersion(): string {
+  return process.env.npm_package_version ? process.env.npm_package_version : '0.0.0'
+}
 export const DEV_MODE = process.env.NODE_ENV !== 'production'
 
 export const DEV_PUBLIC_KEY =
@@ -67,13 +72,10 @@ interface Config {
     aws: {
       region: string
       secretName: string
+      secretKey: string
     }
   }
 }
-
-const toNum = (value: BigNumber.Value) => new BigNumber(value).toNumber()
-const toBool = (value: string | undefined, fallback: boolean) =>
-  value ? value.toLowerCase() === 'true' : fallback
 
 const env = process.env as any
 const config: Config = {
@@ -119,7 +121,8 @@ const config: Config = {
     },
     aws: {
       region: env.KEYSTORE_AWS_REGION,
-      secretName: env.KEYSTORE_AWS_SECRET_NAME || 'signer-secret',
+      secretName: env.KEYSTORE_AWS_SECRET_NAME,
+      secretKey: env.KEYSTORE_AWS_SECRET_KEY,
     },
   },
 }

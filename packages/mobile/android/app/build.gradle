@@ -260,11 +260,9 @@ dependencies {
 
     def multidex_version = "2.0.1"
     implementation 'androidx.multidex:multidex:$multidex_version'
-    implementation 'ru.ivanarh.ndcrash:jndcrash-libunwind:0.7'
     implementation 'androidx.appcompat:appcompat:1.1.0-rc01'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-alpha02'
     implementation project(':react-native-geth')
-    implementation project(':react-native-confirm-device-credentials')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'  // From node_modules

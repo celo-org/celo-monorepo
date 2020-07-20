@@ -1,5 +1,5 @@
 export const WEI_PER_CELO = 1000000000000000000.0
-export const UNLOCK_DURATION = 600
+export const UNLOCK_DURATION = 300
 
 // 25 is react native geth default
 export const SYNCING_MAX_PEERS = 25

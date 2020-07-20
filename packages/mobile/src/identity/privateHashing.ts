@@ -4,6 +4,8 @@ import crypto from 'crypto'
 import BlindThresholdBls from 'react-native-blind-threshold-bls'
 import { call, put, select } from 'redux-saga/effects'
 import { e164NumberSelector } from 'src/account/selectors'
+import { IdentityEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import networkConfig from 'src/geth/networkConfig'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
@@ -220,7 +222,7 @@ function* navigateToQuotaPurchaseScreen() {
     yield new Promise((resolve, reject) => {
       navigate(Screens.PhoneNumberLookupQuota, {
         onBuy: resolve,
-        onSkip: reject,
+        onSkip: () => reject('skipped'),
       })
     })
 
@@ -247,10 +249,18 @@ function* navigateToQuotaPurchaseScreen() {
       throw new Error('Purchase tx failed')
     }
 
+    ValoraAnalytics.track(IdentityEvents.phone_number_lookup_purchase_complete)
     Logger.debug(`${TAG}@navigateToQuotaPurchaseScreen`, `Quota purchase successful`)
     navigateBack()
     return true
   } catch (error) {
+    if (error === 'skipped') {
+      ValoraAnalytics.track(IdentityEvents.phone_number_lookup_purchase_skip)
+    } else {
+      ValoraAnalytics.track(IdentityEvents.phone_number_lookup_purchase_error, {
+        error: error.message,
+      })
+    }
     Logger.error(
       `${TAG}@navigateToQuotaPurchaseScreen`,
       `Quota purchase cancelled or skipped`,

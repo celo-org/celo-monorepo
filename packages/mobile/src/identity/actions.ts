@@ -31,6 +31,7 @@ export enum Actions {
   VALIDATE_RECIPIENT_ADDRESS = 'SEND/VALIDATE_RECIPIENT_ADDRESS',
   VALIDATE_RECIPIENT_ADDRESS_SUCCESS = 'SEND/VALIDATE_RECIPIENT_ADDRESS_SUCCESS',
   REQUIRE_SECURE_SEND = 'SEND/REQUIRE_SECURE_SEND',
+  END_FETCHING_ADDRESSES = 'END_FETCHING_ADDRESSES',
 }
 
 export interface StartVerificationAction {
@@ -89,6 +90,7 @@ export interface UpdateE164PhoneNumberSaltAction {
 export interface FetchAddressesAndValidateAction {
   type: Actions.FETCH_ADDRESSES_AND_VALIDATION_STATUS
   e164Number: string
+  requesterAddress?: string
 }
 
 export interface ImportContactsAction {
@@ -126,6 +128,7 @@ export interface ValidateRecipientAddressAction {
   userInputOfFullAddressOrLastFourDigits: string
   addressValidationType: AddressValidationType
   recipient: Recipient
+  requesterAddress?: string
 }
 
 export interface ValidateRecipientAddressSuccessAction {
@@ -138,6 +141,11 @@ export interface RequireSecureSendAction {
   type: Actions.REQUIRE_SECURE_SEND
   e164Number: E164Number
   addressValidationType: AddressValidationType
+}
+
+export interface EndFetchingAddressesAction {
+  type: Actions.END_FETCHING_ADDRESSES
+  e164Number: string
 }
 
 export type ActionTypes =
@@ -159,6 +167,8 @@ export type ActionTypes =
   | ValidateRecipientAddressAction
   | ValidateRecipientAddressSuccessAction
   | RequireSecureSendAction
+  | FetchAddressesAndValidateAction
+  | EndFetchingAddressesAction
 
 export const startVerification = (): StartVerificationAction => ({
   type: Actions.START_VERIFICATION,
@@ -207,9 +217,13 @@ export const completeAttestationCode = (
   numComplete,
 })
 
-export const fetchAddressesAndValidate = (e164Number: string): FetchAddressesAndValidateAction => ({
+export const fetchAddressesAndValidate = (
+  e164Number: string,
+  requesterAddress?: string
+): FetchAddressesAndValidateAction => ({
   type: Actions.FETCH_ADDRESSES_AND_VALIDATION_STATUS,
   e164Number,
+  requesterAddress,
 })
 
 export const updateE164PhoneNumberAddresses = (
@@ -265,12 +279,14 @@ export const addContactsMatches = (matches: ContactMatches): AddContactMatchesAc
 export const validateRecipientAddress = (
   userInputOfFullAddressOrLastFourDigits: string,
   addressValidationType: AddressValidationType,
-  recipient: Recipient
+  recipient: Recipient,
+  requesterAddress?: string
 ): ValidateRecipientAddressAction => ({
   type: Actions.VALIDATE_RECIPIENT_ADDRESS,
   userInputOfFullAddressOrLastFourDigits,
   addressValidationType,
   recipient,
+  requesterAddress,
 })
 
 export const validateRecipientAddressSuccess = (
@@ -289,4 +305,9 @@ export const requireSecureSend = (
   type: Actions.REQUIRE_SECURE_SEND,
   e164Number,
   addressValidationType,
+})
+
+export const endFetchingAddresses = (e164Number: string): EndFetchingAddressesAction => ({
+  type: Actions.END_FETCHING_ADDRESSES,
+  e164Number,
 })

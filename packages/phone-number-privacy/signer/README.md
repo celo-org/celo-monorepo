@@ -63,7 +63,7 @@ Use the following to configure the AWS Secrets Manager. To authenticate with Ama
 
 - `KEYSTORE_AWS_REGION` - The AWS Region code where the secret is, for example: `us-east-1`.
 - `KEYSTORE_AWS_SECRET_NAME` - The secret's name.
-- `KEYSTORE_AWS_SECRET_KEY` - The key inside the secret where the private key is save. `key` by default.
+- `KEYSTORE_AWS_SECRET_KEY` - The key for the secret key/value pair.
 
 ## Operations
 

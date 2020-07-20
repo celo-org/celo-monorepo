@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Support renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -14,13 +14,11 @@ exports[`Support renders correctly 1`] = `
       Object {
         "alignItems": "center",
         "backgroundColor": "transparent",
-        "borderBottomColor": AnimatedValue {
-          " __value": NaN,
-        },
+        "borderBottomColor": 0,
         "borderBottomWidth": 1,
         "flexDirection": "row",
         "height": 62,
-        "justifyContent": "space-between",
+        "justifyContent": "center",
       }
     }
   >
@@ -36,10 +34,13 @@ exports[`Support renders correctly 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
+          "left": 8,
           "marginBottom": 0,
           "marginLeft": 4,
           "opacity": 1,
           "padding": 8,
+          "position": "absolute",
+          "top": 8,
         }
       }
     >
@@ -78,227 +79,245 @@ exports[`Support renders correctly 1`] = `
         />
       </svg>
     </View>
-    <View
-      style={
-        Object {
-          "width": 45,
-        }
-      }
-    />
   </View>
-  <View
-    style={
-      Object {
-        "borderColor": "#EEEEEE",
-        "borderTopWidth": 1,
-        "paddingLeft": 20,
-      }
-    }
-  >
-    <View
-      style={
-        Object {
-          "backgroundColor": "#FFFFFF",
-        }
-      }
-    >
-      <View
-        accessible={true}
-        focusable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackgroundBorderless",
-            "type": "ThemeAttrAndroid",
-          }
-        }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        testID="WebFAQLink"
-      >
-        <View
-          style={
-            Object {
-              "borderBottomColor": "#EDEEEF",
-              "borderBottomWidth": 1,
-              "marginLeft": 16,
-              "paddingVertical": 16,
-            }
-          }
-        >
-          <View
-            style={
-              Object {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "paddingRight": 16,
-              }
-            }
-          >
-            <View
-              style={
-                Array [
-                  Object {
-                    "justifyContent": "center",
-                  },
-                ]
-              }
-            >
-              <Text
-                style={
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Inter-Regular",
-                    "fontSize": 16,
-                    "lineHeight": 22,
-                  }
-                }
-              >
-                webFaq
-              </Text>
-            </View>
-          </View>
-        </View>
-      </View>
-    </View>
-    <View
-      style={
-        Object {
-          "backgroundColor": "#FFFFFF",
-        }
-      }
-    >
-      <View
-        accessible={true}
-        focusable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackgroundBorderless",
-            "type": "ThemeAttrAndroid",
-          }
-        }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        testID="ForumLink"
-      >
-        <View
-          style={
-            Object {
-              "borderBottomColor": "#EDEEEF",
-              "borderBottomWidth": 1,
-              "marginLeft": 16,
-              "paddingVertical": 16,
-            }
-          }
-        >
-          <View
-            style={
-              Object {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "paddingRight": 16,
-              }
-            }
-          >
-            <View
-              style={
-                Array [
-                  Object {
-                    "justifyContent": "center",
-                  },
-                ]
-              }
-            >
-              <Text
-                style={
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Inter-Regular",
-                    "fontSize": 16,
-                    "lineHeight": 22,
-                  }
-                }
-              >
-                forum
-              </Text>
-            </View>
-          </View>
-        </View>
-      </View>
-    </View>
-  </View>
-  <View
-    style={
-      Object {
-        "marginTop": 30,
-        "paddingLeft": 30,
-      }
-    }
-  >
-    <Text
-      style={
-        Object {
-          "color": "#2E3338",
-          "fontFamily": "Hind-Regular",
-          "fontSize": 16,
-          "lineHeight": 24,
-        }
-      }
-    >
-      contactText
-       
-    </Text>
-    <View
-      accessible={true}
-      focusable={true}
-      nativeBackgroundAndroid={
-        Object {
-          "attribute": "selectableItemBackgroundBorderless",
-          "type": "ThemeAttrAndroid",
-        }
-      }
-      onClick={[Function]}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
-      testID="SupportContactLink"
-    >
+  <RCTScrollView>
+    <View>
       <Text
         style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 13,
-              "lineHeight": 18,
-              "textDecorationLine": "underline",
-            },
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 16,
-              "lineHeight": 24,
-            },
-          ]
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Jost-Book",
+            "fontSize": 26,
+            "lineHeight": 32,
+            "margin": 16,
+          }
+        }
+        testID="SettingsTitle"
+      >
+        global:help
+      </Text>
+      <View
+        style={
+          Object {
+            "flex": 1,
+          }
         }
       >
-        contactUs
-      </Text>
+        <View
+          style={
+            Object {
+              "backgroundColor": "#FFFFFF",
+            }
+          }
+        >
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            testID="FAQLink"
+          >
+            <View
+              style={
+                Object {
+                  "borderBottomColor": "#EDEEEF",
+                  "borderBottomWidth": 1,
+                  "marginLeft": 16,
+                  "paddingVertical": 16,
+                }
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                    "paddingRight": 16,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Array [
+                      Object {
+                        "justifyContent": "center",
+                      },
+                    ]
+                  }
+                >
+                  <Text
+                    style={
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
+                      }
+                    }
+                  >
+                    faq
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+        <View
+          style={
+            Object {
+              "backgroundColor": "#FFFFFF",
+            }
+          }
+        >
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            testID="ForumLink"
+          >
+            <View
+              style={
+                Object {
+                  "borderBottomColor": "#EDEEEF",
+                  "borderBottomWidth": 1,
+                  "marginLeft": 16,
+                  "paddingVertical": 16,
+                }
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                    "paddingRight": 16,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Array [
+                      Object {
+                        "justifyContent": "center",
+                      },
+                    ]
+                  }
+                >
+                  <Text
+                    style={
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
+                      }
+                    }
+                  >
+                    forum
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+        <View
+          style={
+            Object {
+              "backgroundColor": "#FFFFFF",
+            }
+          }
+        >
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            testID="SupportContactLink"
+          >
+            <View
+              style={
+                Object {
+                  "borderBottomColor": "#EDEEEF",
+                  "borderBottomWidth": 1,
+                  "marginLeft": 16,
+                  "paddingVertical": 16,
+                }
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                    "paddingRight": 16,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Array [
+                      Object {
+                        "justifyContent": "center",
+                      },
+                    ]
+                  }
+                >
+                  <Text
+                    style={
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
+                      }
+                    }
+                  >
+                    contact
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
     </View>
-  </View>
-</SafeAreaView>
+  </RCTScrollView>
+</RNCSafeAreaView>
 `;

@@ -69,7 +69,7 @@ function Carousel(props: OwnProps) {
         dotsLength={props.items.length}
         activeDotIndex={activeItem}
         containerStyle={styles.paginationContainer}
-        dotColor={colors.onboardingAccent}
+        dotColor={colors.onboardingBlue}
         inactiveDotColor={colors.onboardingBrownLight}
         inactiveDotOpacity={0.5}
         inactiveDotScale={1}

@@ -13,7 +13,9 @@ export const signMoonpay = functions.https.onRequest((request, response) => {
     '&walletAddress=' +
     request.body.address +
     '&baseCurrencyCode=' +
-    request.body.fiatCurrency
+    request.body.fiatCurrency +
+    '&baseCurrencyAmount=' +
+    request.body.fiatAmount
   console.log(`Requested signature for: ${url}`)
 
   const signature = crypto
