@@ -43,8 +43,11 @@ const TAG = 'exchange/saga'
 // Amounts to estimate the exchange rate, as the rate varies based on transaction size
 // These values needs to be in-sync with the ones here:
 // https://github.com/celo-org/celo-monorepo/blob/master/packages/notification-service/src/exchange/exchangeQuery.ts#L9-L10
-const LARGE_DOLLARS_SELL_AMOUNT_IN_WEI = new BigNumber(10000 * 1000000000000000000) //  100 dollars
-const LARGE_GOLD_SELL_AMOUNT_IN_WEI = new BigNumber(10 * 1000000000000000000) // 10 gold
+// A small amount returns a rate closer to the median rate
+// TODO: Use CELO_AMOUNT_FOR_ESTIMATE and DOLLAR_AMOUNT_FOR_ESTIMATE from `@celo/utils`
+const WEI_PER_UNIT = 1000000000000000000
+const LARGE_DOLLARS_SELL_AMOUNT_IN_WEI = new BigNumber(0.01 * WEI_PER_UNIT) // 0.01 dollar
+const LARGE_GOLD_SELL_AMOUNT_IN_WEI = new BigNumber(0.01 * WEI_PER_UNIT) // 0.01 celo
 const EXCHANGE_DIFFERENCE_TOLERATED = 0.01 // Maximum difference between actual and displayed takerAmount
 
 export function* doFetchTobinTax({ makerAmount, makerToken }: FetchTobinTaxAction) {
