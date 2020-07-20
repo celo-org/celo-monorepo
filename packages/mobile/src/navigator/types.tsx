@@ -75,8 +75,6 @@ export type StackParamList = {
       makerTokenBalance: string
     }
   }
-  [Screens.FeeEducation]: undefined
-  [Screens.FeeExchangeEducation]: undefined
   [Screens.FiatExchange]: undefined
   [Screens.FiatExchangeAmount]: {
     isAddFunds: boolean
