@@ -67,7 +67,6 @@ export default class ValidatorSignedBlocks extends BaseCommand {
 
     let electionCache
     let validators, accounts
-    let haveContracts
     let electedSigners: string[]
     const validatorToGroupName = new Map<Address, string>()
     // Try to get contracts, if not try to fall back to genesis block
@@ -84,15 +83,13 @@ export default class ValidatorSignedBlocks extends BaseCommand {
       const epochSize = await validators.getEpochSize()
       electionCache = new ElectionResultsCache(election, epochSize.toNumber())
       electedSigners = await electionCache.electedSigners(latest)
-      haveContracts = true
-    } catch {
+    } catch (e) {
       if (res.flags.genesis) {
         const genesisJson = JSON.parse(readFileSync(res.flags.genesis, 'utf-8'))
         electedSigners = parseBlockExtraData(genesisJson.extraData).addedValidators
       } else {
         this.error('If contracts are not deployed, must provide the genesis block')
       }
-      haveContracts = false
     }
 
     // Validators added from extra data in genesis
@@ -105,8 +102,7 @@ export default class ValidatorSignedBlocks extends BaseCommand {
     // Calculate uptime
     for (const block of blocks) {
       // Grab new validators on new epoch
-      if (haveContracts) {
-        // @ts-ignore
+      if (electionCache) {
         electedSigners = await electionCache.electedSigners(block.number)
       }
       for (let i = 0; i < electedSigners.length; i++) {
@@ -115,23 +111,20 @@ export default class ValidatorSignedBlocks extends BaseCommand {
         }
         const bitmap = parseBlockExtraData(block.extraData).parentAggregatedSeal.bitmap
         if (!bitIsSet(bitmap, i)) {
-          // @ts-ignore
+          // @ts-ignore - TS can't realize that I already initialized this validator entry.
           missedBlocks.get(electedSigners[i]).push(block.number)
         }
       }
     }
 
     // Print info
-    if (haveContracts) {
+    if (accounts && validators) {
       const info: VerboseValidatorEntry[] = []
       for (const [signer, missed] of missedBlocks) {
-        // @ts-ignore
         const validator = await accounts.signerToAccount(signer)
         let name = 'Unregistered Validator'
         let group = ''
-        // @ts-ignore
         if (await validators.isValidator(validator)) {
-          // @ts-ignore
           name = (await accounts.getName(validator)) || ''
           group = validatorToGroupName.get(validator) || ''
         }
