@@ -15,15 +15,11 @@ import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
 import { Namespaces } from 'src/i18n'
 import { fetchAddressesAndValidate } from 'src/identity/actions'
-import {
-  AddressValidationType,
-  isFetchingAddressesSelector,
-  secureSendPhoneNumberMappingSelector,
-} from 'src/identity/reducer'
-import { getAddressValidationType } from 'src/identity/secureSend'
+import { AddressValidationType, SecureSendDetails } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
+import { RootState } from 'src/redux/reducers'
 import { TransactionDataInput } from 'src/send/SendAmount'
 import Logger from 'src/utils/Logger'
 
@@ -37,28 +33,22 @@ interface Props {
 export default function IncomingPaymentRequestListItem({ id, amount, comment, requester }: Props) {
   const { t } = useTranslation(Namespaces.paymentRequestFlow)
   const dispatch = useDispatch()
-  const secureSendPhoneNumberMapping = useSelector(secureSendPhoneNumberMappingSelector)
-  const isFetchingAddresses = useSelector(isFetchingAddressesSelector)
-  const error = useSelector(errorSelector)
-  const prevIsFetchingAddressesRef = useRef(isFetchingAddresses)
   const [isLoading, setIsLoading] = useState(false)
+  const error = useSelector(errorSelector)
 
-  const transactionData: TransactionDataInput = {
-    reason: comment,
-    recipient: requester,
-    amount: new BigNumber(amount),
-    type: TokenTransactionType.PayRequest,
-    firebasePendingRequestUid: id,
-  }
-  const { recipient } = transactionData
-  const { e164PhoneNumber } = recipient
-  const addressValidationType = getAddressValidationType(recipient, secureSendPhoneNumberMapping)
+  const { e164PhoneNumber } = requester
+  const requesterAddress = requester.address
+
+  const secureSendDetails: SecureSendDetails | undefined = useSelector(
+    (state: RootState) => state.identity.secureSendPhoneNumberMapping[e164PhoneNumber || '']
+  )
+  const prevSecureSendDetailsRef = useRef(secureSendDetails)
 
   const onPay = () => {
     if (e164PhoneNumber) {
       setIsLoading(true)
       // Need to check latest mapping to prevent user from accepting fradulent requests
-      dispatch(fetchAddressesAndValidate(e164PhoneNumber))
+      dispatch(fetchAddressesAndValidate(e164PhoneNumber, requesterAddress))
     } else {
       navigateToNextScreen()
     }
@@ -79,27 +69,46 @@ export default function IncomingPaymentRequestListItem({ id, amount, comment, re
   }
 
   const navigateToNextScreen = () => {
-    if (
-      addressValidationType === AddressValidationType.FULL ||
-      addressValidationType === AddressValidationType.PARTIAL
-    ) {
-      navigate(Screens.ValidateRecipientIntro, { transactionData, addressValidationType })
-    } else {
+    const transactionData: TransactionDataInput = {
+      reason: comment,
+      recipient: requester,
+      amount: new BigNumber(amount),
+      type: TokenTransactionType.PayRequest,
+      firebasePendingRequestUid: id,
+    }
+
+    const addressValidationType =
+      secureSendDetails?.addressValidationType || AddressValidationType.NONE
+
+    if (addressValidationType === AddressValidationType.NONE) {
       navigate(Screens.SendConfirmation, { transactionData })
+    } else {
+      navigate(Screens.ValidateRecipientIntro, {
+        transactionData,
+        addressValidationType,
+        requesterAddress,
+      })
     }
   }
 
   React.useEffect(() => {
-    const prevIsFetchingAddresses = prevIsFetchingAddressesRef.current
-    prevIsFetchingAddressesRef.current = isFetchingAddresses
+    // Need this to make sure it's only triggered on click
+    if (!isLoading) {
+      return
+    }
 
-    if (prevIsFetchingAddresses === true && isFetchingAddresses === false) {
+    const prevSecureSendDetails: SecureSendDetails | undefined = prevSecureSendDetailsRef.current
+    prevSecureSendDetailsRef.current = secureSendDetails
+    const wasFetchingAddresses = prevSecureSendDetails?.isFetchingAddresses
+    const isFetchingAddresses = secureSendDetails?.isFetchingAddresses
+
+    if (wasFetchingAddresses === true && isFetchingAddresses === false) {
       setIsLoading(false)
       if (!error) {
         navigateToNextScreen()
       }
     }
-  }, [isFetchingAddresses, error])
+  }, [secureSendDetails, error])
 
   return (
     <View style={styles.container}>

@@ -105,6 +105,7 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
   onPressConfirm = () => {
     const { inputValue, singleDigitInputValueArr } = this.state
     const { recipient, addressValidationType } = this.props
+    const { requesterAddress } = this.props.route.params
     const inputToValidate =
       addressValidationType === AddressValidationType.FULL
         ? inputValue
@@ -115,7 +116,12 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
       address: inputToValidate,
     })
 
-    this.props.validateRecipientAddress(inputToValidate, addressValidationType, recipient)
+    this.props.validateRecipientAddress(
+      inputToValidate,
+      addressValidationType,
+      recipient,
+      requesterAddress
+    )
   }
 
   onInputChange = (value: string) => {
