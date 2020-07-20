@@ -1,3 +1,4 @@
+import fs from 'fs'
 import { entries, range } from 'lodash'
 import sleep from 'sleep-promise'
 import { AzureClusterConfig } from './azure'
@@ -555,7 +556,52 @@ async function helmIPParameters(celoEnv: string) {
   return ipAddressParameters
 }
 
+async function helmParametersFile(celoEnv: string, useExistingGenesis: boolean) {
+  const parameters: any = {}
+  if (isProduction()) {
+    parameters.bucket = `contract_artifacts_production`
+    parameters.gethexporter.image.repository=fetchEnv('GETH_EXPORTER_DOCKER_IMAGE_REPOSITORY')
+    parameters.gethexporter.image.tag=fetchEnv('GETH_EXPORTER_DOCKER_IMAGE_TAG')
+  } else {
+    parameters.bucket = `contract_artifacts`
+  }
+  parameters.domain.name=fetchEnv('CLUSTER_DOMAIN_NAME')
+  parameters.genesis.networkId=fetchEnv(envVar.NETWORK_ID)
+  parameters.geth.verbosity=fetchEnvOrFallback('GETH_VERBOSITY', '4')
+  parameters.geth.vmodule=fetchEnvOrFallback('GETH_VMODULE', '')
+  parameters.geth.resources.requests.cpu=fetchEnv('GETH_NODE_CPU_REQUEST')
+  parameters.geth.resources.requests.memory=fetchEnv('GETH_NODE_MEMORY_REQUEST')
+  parameters.geth.image.repository=fetchEnv('GETH_NODE_DOCKER_IMAGE_REPOSITORY')
+  parameters.geth.image.tag=fetchEnv('GETH_NODE_DOCKER_IMAGE_TAG')
+  parameters.bootnode.image.repository=fetchEnv('GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY')
+  parameters.bootnode.image.tag=fetchEnv('GETH_BOOTNODE_DOCKER_IMAGE_TAG')
+  parameters.cluster.zone=fetchEnv('KUBERNETES_CLUSTER_ZONE')
+  parameters.cluster.name=fetchEnv('KUBERNETES_CLUSTER_NAME')
+  parameters.project.name=fetchEnv('TESTNET_PROJECT_NAME')
+  parameters.celotool.image.repository=fetchEnv('CELOTOOL_DOCKER_IMAGE_REPOSITORY')
+  parameters.celotool.image.tag=fetchEnv('CELOTOOL_DOCKER_IMAGE_TAG')
+  parameters.promtosd.scrape_interval=fetchEnv('PROMTOSD_SCRAPE_INTERVAL')
+  parameters.promtosd.export_interval=fetchEnv('PROMTOSD_EXPORT_INTERVAL')
+  parameters.geth.consensus_type=fetchEnv('CONSENSUS_TYPE')
+  parameters.geth.blocktime=fetchEnv('BLOCK_TIME')
+  parameters.geth.validators=fetchEnv('VALIDATORS')
+  parameters.geth.istanbulrequesttimeout=fetchEnvOrFallback('ISTANBUL_REQUEST_TIMEOUT_MS', '3000')
+  parameters.geth.faultyValidators=fetchEnvOrFallback('FAULTY_VALIDATORS', '0')
+  parameters.geth.faultyValidatorType=fetchEnvOrFallback('FAULTY_VALIDATOR_TYPE', '0')
+  parameters.geth.tx_nodes=fetchEnv('TX_NODES')
+  parameters.geth.private_tx_nodes=fetchEnv(envVar.PRIVATE_TX_NODES)
+  parameters.geth.ssd_disks=fetchEnvOrFallback(envVar.GETH_NODES_SSD_DISKS, 'true')
+  parameters.mnemonic=fetchEnv('MNEMONIC')
+  parameters.geth.account.secret=fetchEnv('GETH_ACCOUNT_SECRET')
+  parameters.geth.ping_ip_from_packet=fetchEnvOrFallback('PING_IP_FROM_PACKET', 'false')
+  parameters.geth.in_memory_discovery_table=fetchEnvOrFallback('IN_MEMORY_DISCOVERY_TABLE', 'false')
+  parameters.geth.clean_validator_rountstate_folder=fetchEnvOrFallback('CLEAN_VALIDATOR_ROUNTSTATE_FOLDER', 'false')
+  parameters.geth.proxiedValidators=fetchEnvOrFallback(envVar.PROXIED_VALIDATORS, '0')
+}
+
 async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
+  const valueFilePath = `/tmp/${celoEnv}-testnet-values.yaml`
+  await saveHelmValuesFile(celoEnv, valueFilePath, useExistingGenesis)
   const bucketName = isProduction() ? 'contract_artifacts_production' : 'contract_artifacts'
   const productionTagOverrides = isProduction()
     ? [
@@ -564,13 +610,9 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
       ]
     : []
 
-  const genesisContent = useExistingGenesis
-    ? await getGenesisBlockFromGoogleStorage(celoEnv)
-    : generateGenesisFromEnv()
-
   return [
+    `-f ${valueFilePath}`,
     `--set domain.name=${fetchEnv('CLUSTER_DOMAIN_NAME')}`,
-    `--set genesis.genesisFileBase64=${Buffer.from(genesisContent).toString('base64')}`,
     `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
     `--set geth.verbosity=${fetchEnvOrFallback('GETH_VERBOSITY', '4')}`,
     `--set geth.vmodule=${fetchEnvOrFallback('GETH_VMODULE', '')}`,
@@ -615,6 +657,13 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     ...productionTagOverrides,
     ...(await helmIPParameters(celoEnv)),
   ]
+}
+
+const VALUE_FILE_TEMPLATE = {
+  domain: {},
+  genesis: {},
+  geth: {},
+  bootnode: {},
 }
 
 async function helmCommand(command: string) {
@@ -749,4 +798,16 @@ export async function deleteFromCluster(celoEnv: string) {
 
 function useStaticIPsForGethNodes() {
   return fetchEnv(envVar.STATIC_IPS_FOR_GETH_NODES) === 'true'
+}
+
+async function saveHelmValuesFile(celoEnv:string, valueFilePath: string, useExistingGenesis: boolean) {
+  const genesisContent = useExistingGenesis
+  ? await getGenesisBlockFromGoogleStorage(celoEnv)
+  : generateGenesisFromEnv()
+
+  const valueFileContent = `
+genesis:
+  genesisFileBase64: ${Buffer.from(genesisContent).toString('base64')}
+`
+  fs.writeFileSync(valueFilePath, valueFileContent)
 }
