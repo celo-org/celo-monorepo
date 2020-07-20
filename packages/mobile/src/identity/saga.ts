@@ -31,6 +31,7 @@ export function* validateRecipientAddressSaga({
   userInputOfFullAddressOrLastFourDigits,
   addressValidationType,
   recipient,
+  requesterAddress,
 }: ValidateRecipientAddressAction) {
   Logger.debug(TAG, 'Starting Recipient Address Validation')
   try {
@@ -43,9 +44,17 @@ export function* validateRecipientAddressSaga({
     const { e164PhoneNumber } = recipient
     const possibleRecievingAddresses = e164NumberToAddress[e164PhoneNumber]
 
-    // Should never happen since secure send is initiated due to there being several possible addresses
+    // Should never happen - Secure Send is initiated to deal with
+    // there being several possible addresses
     if (!possibleRecievingAddresses) {
       throw Error('There are no possible recipient addresses to validate against')
+    }
+
+    // E164NumberToAddress in redux store only holds verified addresses
+    // Need to add the requester address to the option set in the event
+    // a request is coming from an unverified account
+    if (requesterAddress && !possibleRecievingAddresses.includes(requesterAddress)) {
+      possibleRecievingAddresses.push(requesterAddress)
     }
 
     const validatedAddress = validateAndReturnMatch(
@@ -76,6 +85,7 @@ export function* validateRecipientAddressSaga({
     }
   }
 }
+
 function* watchVerification() {
   yield takeLatest(Actions.START_VERIFICATION, startVerification)
 }

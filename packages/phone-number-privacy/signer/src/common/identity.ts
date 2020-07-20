@@ -1,7 +1,5 @@
-import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { Request } from 'express'
-import { getContractKit } from '../web3/contracts'
 import logger from './logger'
 
 /*
@@ -20,20 +18,4 @@ export function authenticateUser(request: Request): boolean {
 
   const message = JSON.stringify(request.body)
   return verifySignature(message, messageSignature, signer)
-}
-
-export async function isVerified(account: string, hashedPhoneNumber: string): Promise<boolean> {
-  // TODO (amyslawson) wrap forno request in retry
-  const attestationsWrapper: AttestationsWrapper = await getContractKit().contracts.getAttestations()
-  const {
-    isVerified: _isVerified,
-    completed,
-    numAttestationsRemaining,
-    total,
-  } = await attestationsWrapper.getVerifiedStatus(hashedPhoneNumber, account)
-
-  logger.debug(
-    `Account ${account} is verified=${_isVerified} with ${completed} completed attestations, ${numAttestationsRemaining} remaining, total of ${total} requested.`
-  )
-  return _isVerified
 }
