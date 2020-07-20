@@ -18,8 +18,6 @@ export enum Screens {
   ExchangeHomeScreen = 'ExchangeHomeScreen',
   ExchangeReview = 'ExchangeReview',
   ExchangeTradeScreen = 'ExchangeTradeScreen',
-  FeeEducation = 'FeeEducation',
-  FeeExchangeEducation = 'FeeExchangeEducation',
   FiatExchange = 'FiatExchange',
   FiatExchangeAmount = 'FiatExchangeAmount',
   FiatExchangeOptions = 'FiatExchangeOptions',
@@ -67,6 +65,7 @@ export enum Screens {
   VerificationInputScreen = 'VerificationInputScreen',
   VerificationInterstitialScreen = 'VerificationInterstitialScreen',
   VerificationLoadingScreen = 'VerificationLoadingScreen',
+  OnboardingEducationScreen = 'OnboardingEducationScreen',
   OnboardingSuccessScreen = 'OnboardingSuccessScreen',
   WalletHome = 'WalletHome',
 }

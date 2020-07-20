@@ -1,16 +1,10 @@
 import NetInfo, { NetInfoState } from '@react-native-community/netinfo'
-import { REHYDRATE } from 'redux-persist/es/constants'
 import { eventChannel } from 'redux-saga'
 import { call, cancelled, put, spawn, take } from 'redux-saga/effects'
 import { setNetworkConnectivity } from 'src/networkInfo/actions'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'networkInfo/saga'
-
-export function* waitForRehydrate() {
-  yield take(REHYDRATE)
-  return
-}
 
 function createNetworkStatusChannel() {
   return eventChannel((emit) => {
@@ -23,7 +17,6 @@ const isConnected = (connectionInfo: NetInfoState) => {
 }
 
 function* subscribeToNetworkStatus() {
-  yield call(waitForRehydrate)
   const networkStatusChannel = yield createNetworkStatusChannel()
   let connectionInfo: NetInfoState = yield call(NetInfo.fetch)
   yield put(setNetworkConnectivity(isConnected(connectionInfo)))

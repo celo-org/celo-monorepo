@@ -34,4 +34,11 @@ describe(`BLS service computes signature`, () => {
     const publicKey = Buffer.from(DEV_PUBLIC_KEY, 'hex')
     expect(threshold_bls.verify(publicKey, message, unblindedSignedMessage))
   })
+
+  it('invalid blind message throws an error', async () => {
+    const blindedMsg = Buffer.from('invalid blinded message').toString('base64')
+
+    expect.assertions(1)
+    await expect(() => computeBlindedSignature(blindedMsg, DEV_PRIVATE_KEY)).toThrow()
+  })
 })

@@ -4,7 +4,7 @@ import * as RNFS from 'react-native-fs'
 import Share from 'react-native-share'
 import { call, put } from 'redux-saga/effects'
 import { showMessage } from 'src/alert/actions'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { validateRecipientAddressSuccess } from 'src/identity/actions'
@@ -52,7 +52,8 @@ export async function shareSVGImage(svg: SVG) {
 function* handleSecureSend(
   data: { address: string; e164PhoneNumber: string; displayName: string },
   e164NumberToAddress: E164NumberToAddressType,
-  secureSendTxData: TransactionDataInput
+  secureSendTxData: TransactionDataInput,
+  requesterAddress?: string
 ) {
   if (!secureSendTxData.recipient.e164PhoneNumber) {
     throw Error(`Invalid recipient type for Secure Send: ${secureSendTxData.recipient.kind}`)
@@ -67,12 +68,17 @@ function* handleSecureSend(
     throw Error("No addresses associated with recipient's phone number")
   }
 
+  // Need to add the requester address to the option set in the event
+  // a request is coming from an unverified account
+  if (requesterAddress && !possibleRecievingAddresses.includes(requesterAddress)) {
+    possibleRecievingAddresses.push(requesterAddress)
+  }
   const possibleRecievingAddressesFormatted = possibleRecievingAddresses.map((address) =>
     address.toLowerCase()
   )
   if (!possibleRecievingAddressesFormatted.includes(userScannedAddress)) {
     const error = ErrorMessages.QR_FAILED_INVALID_RECIPIENT
-    ValoraAnalytics.track(AnalyticsEvents.send_secure_incorrect, {
+    ValoraAnalytics.track(SendEvents.send_secure_incorrect, {
       confirmByScan: true,
       error,
     })
@@ -80,7 +86,7 @@ function* handleSecureSend(
     return false
   }
 
-  ValoraAnalytics.track(AnalyticsEvents.send_secure_success, { confirmByScan: true })
+  ValoraAnalytics.track(SendEvents.send_secure_complete, { confirmByScan: true })
   yield put(validateRecipientAddressSuccess(e164PhoneNumber, userScannedAddress))
   return true
 }
@@ -90,7 +96,9 @@ export function* handleBarcode(
   addressToE164Number: AddressToE164NumberType,
   recipientCache: NumberToRecipient,
   e164NumberToAddress: E164NumberToAddressType,
-  secureSendTxData?: TransactionDataInput
+  secureSendTxData?: TransactionDataInput,
+  isOutgoingPaymentRequest?: true,
+  requesterAddress?: string
 ) {
   let data: { address: string; e164PhoneNumber: string; displayName: string } | undefined
 
@@ -109,7 +117,13 @@ export function* handleBarcode(
   }
 
   if (secureSendTxData) {
-    const success = yield call(handleSecureSend, data, e164NumberToAddress, secureSendTxData)
+    const success = yield call(
+      handleSecureSend,
+      data,
+      e164NumberToAddress,
+      secureSendTxData,
+      requesterAddress
+    )
     if (!success) {
       return
     }
@@ -141,9 +155,17 @@ export function* handleBarcode(
       }
   yield put(storeLatestInRecents(recipient))
 
-  if (secureSendTxData) {
-    replace(Screens.SendConfirmation, { transactionData: secureSendTxData })
+  if (secureSendTxData && isOutgoingPaymentRequest) {
+    replace(Screens.PaymentRequestConfirmation, {
+      transactionData: secureSendTxData,
+      addressJustValidated: true,
+    })
+  } else if (secureSendTxData) {
+    replace(Screens.SendConfirmation, {
+      transactionData: secureSendTxData,
+      addressJustValidated: true,
+    })
   } else {
-    replace(Screens.SendAmount, { recipient })
+    replace(Screens.SendAmount, { recipient, isFromScan: true, isOutgoingPaymentRequest })
   }
 }
