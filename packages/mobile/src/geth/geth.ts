@@ -4,6 +4,8 @@ import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
 import RNGeth from 'react-native-geth'
+import { GethEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { DEFAULT_TESTNET } from 'src/config'
 import { SYNCING_MAX_PEERS } from 'src/geth/consts'
 import networkConfig from 'src/geth/networkConfig'
@@ -111,6 +113,7 @@ async function createNewGeth(sync: boolean = true): Promise<typeof RNGeth> {
 }
 
 export async function initGeth(sync: boolean = true): Promise<typeof gethInstance> {
+  ValoraAnalytics.track(GethEvents.geth_init_start, { sync })
   Logger.info('Geth@init', `Create a new Geth instance with sync=${sync}`)
 
   if (gethLock) {
@@ -126,7 +129,9 @@ export async function initGeth(sync: boolean = true): Promise<typeof gethInstanc
     if (!(await ensureStaticNodesInitialized(sync))) {
       throw FailedToFetchStaticNodesError
     }
+    ValoraAnalytics.track(GethEvents.create_geth_start)
     const geth = await createNewGeth(sync)
+    ValoraAnalytics.track(GethEvents.create_geth_finish)
 
     if (!sync) {
       // chain data must be deleted to prevent geth from syncing with data saver on
@@ -136,7 +141,9 @@ export async function initGeth(sync: boolean = true): Promise<typeof gethInstanc
     }
 
     try {
+      ValoraAnalytics.track(GethEvents.start_geth_start)
       await geth.start()
+      ValoraAnalytics.track(GethEvents.start_geth_finish)
       gethInstance = geth
       if (sync) {
         geth.subscribeNewHead()

@@ -5,15 +5,8 @@ import { connect } from 'react-redux'
 import { PaymentRequest } from 'src/account/types'
 import { HomeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { declinePaymentRequest } from 'src/firebase/actions'
 import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
 import { Namespaces, withTranslation } from 'src/i18n'
-import {
-  addressToE164NumberSelector,
-  AddressToE164NumberType,
-  e164NumberToAddressSelector,
-  E164NumberToAddressType,
-} from 'src/identity/reducer'
 import { notificationIncomingRequest } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -29,29 +22,15 @@ interface OwnProps {
   requests: PaymentRequest[]
 }
 
-interface DispatchProps {
-  declinePaymentRequest: typeof declinePaymentRequest
-}
-
-type Props = OwnProps & DispatchProps & WithTranslation & StateProps
+type Props = OwnProps & WithTranslation & StateProps
 
 interface StateProps {
-  e164PhoneNumberAddressMapping: E164NumberToAddressType
-  addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient
 }
 
-const mapStateToProps = (state: RootState): StateProps => {
-  return {
-    e164PhoneNumberAddressMapping: e164NumberToAddressSelector(state),
-    addressToE164Number: addressToE164NumberSelector(state),
-    recipientCache: recipientCacheSelector(state),
-  }
-}
-
-const mapDispatchToProps = {
-  declinePaymentRequest,
-}
+const mapStateToProps = (state: RootState): StateProps => ({
+  recipientCache: recipientCacheSelector(state),
+})
 
 // Payment Request notification for the notification center on home screen
 export class IncomingPaymentRequestSummaryNotification extends React.Component<Props> {
@@ -78,8 +57,6 @@ export class IncomingPaymentRequestSummaryNotification extends React.Component<P
 
     return requests.length === 1 ? (
       listItemRenderer({
-        // accessing via this.props.<...> to avoid shadowing
-        declinePaymentRequest: this.props.declinePaymentRequest,
         recipientCache,
       })(requests[0])
     ) : (
@@ -95,7 +72,7 @@ export class IncomingPaymentRequestSummaryNotification extends React.Component<P
   }
 }
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
+export default connect<StateProps, {}, {}, RootState>(
   mapStateToProps,
-  mapDispatchToProps
+  {}
 )(withTranslation<Props>(Namespaces.walletFlow5)(IncomingPaymentRequestSummaryNotification))
