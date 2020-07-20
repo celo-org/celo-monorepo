@@ -1,7 +1,5 @@
 TODO(Alec): Fill in README
 
-TODO(Alec): Move into /src
-
 TODO(Alec): Add "fixing" feature
 
 TODO(Alec): ensure 100% coverage

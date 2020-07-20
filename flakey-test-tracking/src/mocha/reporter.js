@@ -1,7 +1,7 @@
 const Mocha = require('mocha')
 const FlakeManager = require('../manager')
 const { getTestID, fmtError } = require('./utils')
-const { Spec, Base } = Mocha.reporters
+const { Spec } = Mocha.reporters
 
 function FlakeReporter(runner) {
   Spec.call(this, runner)
@@ -17,11 +17,10 @@ function FlakeReporter(runner) {
 
   after('Process Flakey Tests', async function() {
     await manager.finish()
-  }) //TODO(Alec, nth): use spec logger
+  })
 
   runner.on('retry', function(test, err) {
-    //console.log('Retry # ' + test.currentRetry() + ' for test ' + getTestID(test))
-    Base.consoleLog('Retry # ' + (test.currentRetry() + 1) + ' for test ' + getTestID(test))
+    console.log('Retry #' + test.currentRetry() + ' for test ' + getTestID(test))
     currErrors.push(fmtError(err))
   })
 
@@ -29,7 +28,7 @@ function FlakeReporter(runner) {
     if (skips.length) {
       let testID = getTestID(test)
       if (skips.some((knownFlake) => knownFlake.includes(testID))) {
-        console.log('Skipping known flakey test: ' + testID)
+        console.log('Skipped known flakey test: ' + testID)
         test.pending = true
       }
     }

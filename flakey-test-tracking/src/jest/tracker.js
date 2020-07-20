@@ -1,7 +1,7 @@
 require('jest-circus')
 const { makeRunResult } = require('jest-circus/build/utils')
 const db = require('../db')
-const { getTestID, buildFlakeyDescribe, fmtTestTitles } = require('./utils')
+const { getTestID, getTestIDFromTestPath, buildFlakeyDescribe } = require('./utils')
 const { shouldSkipKnownFlakes, numRetries } = require('./config')
 const clone = require('clone')
 
@@ -13,7 +13,7 @@ class FlakeTracker {
 
   async handleTestEvent(event, state) {
     if (event.name === 'test_retry') {
-      console.log('Retry #' + event.test.invocations + ' for test: ' + getTestID(event.test)) //TODO(Alec): standardize
+      console.log('Retry #' + event.test.invocations + ' for test: ' + getTestID(event.test))
     }
 
     if (event.name === 'run_finish') {
@@ -23,7 +23,7 @@ class FlakeTracker {
       const describeBlock = buildFlakeyDescribe(clone(state.rootDescribeBlock), this.flakes)
       makeRunResult(describeBlock, state.unhandledErrors)
         .testResults.filter((tr) => tr.status === 'flakey')
-        .forEach((tr) => db.writeErrors(fmtTestTitles(tr.testPath), tr.errors))
+        .forEach((tr) => db.writeErrors(getTestIDFromTestPath(tr.testPath), tr.errors))
     }
 
     if (event.name === 'test_done') {
@@ -48,7 +48,7 @@ class FlakeTracker {
     if (event.name === 'test_start' && shouldSkipKnownFlakes) {
       const testID = getTestID(event.test)
       if (this.skip.some((knownFlake) => knownFlake.includes(testID))) {
-        console.log('\nSkipped known flakey test: ' + testID)
+        console.log('Skipped known flakey test: ' + testID)
         event.test.mode = 'skip'
       }
     }

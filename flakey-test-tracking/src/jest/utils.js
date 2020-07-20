@@ -38,9 +38,15 @@ const getTestTitles = (test) => {
   return titles
 }
 
+const getTestIDFromTestPath = (testPath) => {
+  testPath.shift()
+  return fmtTestTitles(testPath)
+}
+
 module.exports = {
   buildFlakeyDescribe: buildFlakeyDescribe,
   getTestID: getTestID,
+  getTestIDFromTestPath: getTestIDFromTestPath,
   fmtFlakeIssue: fmtFlakeIssue,
   fmtTestTitles: fmtTestTitles,
 }

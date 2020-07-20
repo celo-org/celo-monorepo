@@ -24,7 +24,7 @@ class FlakeManager {
     if (shouldUseGitHub) {
       github = await GitHub.build()
       if (shouldReportFlakes) {
-        knownFlakes = await github.fetchKnownFlakes()
+        knownFlakes = await github.fetchKnownFlakesToSkip()
         db.writeKnownFlakes(knownFlakes)
         if (shouldAddCheckToPR) {
           await github.startCheck()
@@ -36,13 +36,13 @@ class FlakeManager {
 
   async finish() {
     const flakes = db.readNewFlakes()
-    const skippedTests = shouldSkipKnownFlakes ? db.readKnownFlakes() : []
+    const skippedTests = shouldSkipKnownFlakes ? this.knownFlakes : []
 
     if (shouldUseGitHub) {
       await this.github.report(flakes, skippedTests)
     }
 
-    console.log(fmtSummary(flakes, skippedTests, 2))
+    console.log(fmtSummary(flakes, skippedTests, 3))
   }
 
   saveErrors(testID, errors) {

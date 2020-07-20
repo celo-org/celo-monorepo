@@ -6,9 +6,12 @@ const stripAnsi = require('strip-ansi')
 const { shouldCreateIssues, shouldAddCheckToPR } = require('./config')
 const {
   fmtSummary,
+  getPackageName,
+  getPullNumber,
   getTestSuiteTitles,
   parseErrLineNumberFromStack,
   parseFirstErrFromFlakeBody,
+  parseMandatoryTestIssuesFromPullBody,
   parsePathFromStack,
   parseTestIdFromFlakeTitle,
 } = require('./utils')
@@ -20,11 +23,7 @@ const defaults = {
 }
 
 const getLabels = () => {
-  const labels = [FlakeLabel]
-  if (process.env.CIRCLECI) {
-    labels.push(process.env.CIRCLE_JOB)
-  }
-  return labels
+  return [FlakeLabel, getPackageName()]
 }
 
 class GitHub {
@@ -59,9 +58,9 @@ class GitHub {
     const promises = []
 
     if (shouldCreateIssues) {
-      // Check list of flakey issues again to prevent duplicates
+      // Check list of ALL flakey issues to ensure no duplicates
       const knownFlakes = await this.fetchKnownFlakes()
-      const newFlakes = flakes.filter((flake) => !knownFlakes.includes(flake))
+      const newFlakes = flakes.filter((flake) => !knownFlakes.includes(flake.title))
       if (newFlakes.length) {
         promises.push(this.issues(newFlakes))
       }
@@ -77,12 +76,13 @@ class GitHub {
   }
 
   async issues(flakes) {
-    return Promise.all(newFlakes.map((f) => this.issue(f)))
+    return Promise.all(flakes.map((f) => this.issue(f)))
   }
 
   async issue(flake) {
     if (process.env.CIRCLECI) {
-      flake.body = 'Discovered in PR ' + process.env.CIRCLE_PULL_REQUEST + '\n' + flake.body
+      flake.body =
+        'Discovered in PR ' + process.env.CIRCLE_PULL_REQUEST + '\n\n' + flake.body + '\n'
     }
 
     const fn = () => {
@@ -122,7 +122,7 @@ class GitHub {
     }
 
     const summary_0 = fmtSummary(flakes, skippedTests, 0)
-    const summary_2 = fmtSummary(flakes, skippedTests, 2)
+    const summary_3 = fmtSummary(flakes, skippedTests, 3)
 
     let conclusion = 'failure'
     if (!flakes.length) {
@@ -131,7 +131,7 @@ class GitHub {
 
     const annotations = flakes.map((f) => {
       const firstErr = parseFirstErrFromFlakeBody(f.body)
-      const lineNumber = parseErrLineNumberFromStack(firstErr)
+      const lineNumber = parseErrLineNumberFromStack(firstErr) || 1
       const path = parsePathFromStack(firstErr)
       return {
         title: f.title,
@@ -146,7 +146,7 @@ class GitHub {
     const output = {
       title: statuses[conclusion],
       summary: stripAnsi(summary_0),
-      text: stripAnsi(summary_2),
+      text: stripAnsi(summary_3),
       annotations: annotations,
     }
 
@@ -164,7 +164,28 @@ class GitHub {
     await this.safeExec(fn, errMsg)
   }
 
-  async fetchKnownFlakes() {
+  async fetchMandatoryTestsForPR() {
+    if (!process.env.CIRCLECI) return []
+
+    const prNumber = getPullNumber()
+
+    const fn = () => {
+      return this.rest.pulls.get({
+        ...defaults,
+        pull_number: prNumber,
+      })
+    }
+
+    const errMsg = 'Failed to fetch mandatory tests for PR ' + prNumber
+
+    console.log('\nFetching mandatory tests for PR ' + prNumber + '...\n')
+
+    const prBody = (await this.safeExec(fn, errMsg)).data.body
+
+    return parseMandatoryTestIssuesFromPullBody(prBody)
+  }
+
+  async fetchFlakeIssues() {
     const fn = () => {
       return this.rest.paginate(this.rest.issues.listForRepo, {
         ...defaults,
@@ -175,11 +196,25 @@ class GitHub {
 
     const errMsg = 'Failed to fetch existing flakey test issues from GitHub.'
 
-    console.log('\nFetching known flakey tests from GitHub...\n')
+    console.log('\nFetching known flakey tests from GitHub...')
 
-    const flakeIssues = (await this.safeExec(fn, errMsg)) || []
+    return (await this.safeExec(fn, errMsg)) || []
+  }
 
-    return flakeIssues.map((i) => parseTestIdFromFlakeTitle(i.title))
+  async fetchKnownFlakesToSkip() {
+    const flakeIssues = await this.fetchFlakeIssues()
+    const mandatoryTests = await this.fetchMandatoryTestsForPR()
+    console.log(JSON.stringify(mandatoryTests))
+    const knownFlakesToSkip = flakeIssues.filter((i) => {
+      console.log(JSON.stringify(i))
+      return !mandatoryTests.includes(i.number)
+    })
+    return knownFlakesToSkip.map((i) => i.title)
+  }
+
+  async fetchKnownFlakes() {
+    const flakeIssues = await this.fetchFlakeIssues()
+    return flakeIssues.map((i) => i.title)
   }
 
   // Retries fn with fresh token if expired
