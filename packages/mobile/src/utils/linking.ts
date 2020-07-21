@@ -22,7 +22,7 @@ export function navigateToURI(uri: string, backupUri?: string) {
   Linking.openURL(uri).catch((reason: string) => {
     Logger.debug(TAG, 'URI not supported', uri)
     if (backupUri) {
-      Logger.debug(TAG, 'Trying backup URI', uri)
+      Logger.debug(TAG, 'Trying backup URI', backupUri)
       navigateToURI(backupUri)
     } else {
       Logger.error(TAG, `Error navigating to URI: ${reason}`)
