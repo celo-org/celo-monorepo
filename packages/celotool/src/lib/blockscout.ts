@@ -103,7 +103,7 @@ async function helmParameters(
     )}`,
     `--set blockscout.metadata_crawler.schedule='${fetchEnv(
       envVar.BLOCKSCOUT_METADATA_CRAWLER_SCHEDULE
-    )}`,
+    )}'`,
     )
   }
   if (isVmBased()) {

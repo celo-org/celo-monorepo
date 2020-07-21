@@ -121,7 +121,7 @@ spec:
           --syncmode=lightest \
           --consoleformat=json \
           --consoleoutput=stdout \
-          --verbosity={{ $.Values.geth.verbosity }} \
+          --verbosity=1 \
           --unlock=$ACCOUNT_ADDRESS \
           --password=/root/.celo/account/accountSecret \
           --port {{ add 30303 $index }} \
