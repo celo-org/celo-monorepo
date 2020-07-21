@@ -20,10 +20,6 @@ import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'dappkit/DappKitAccountScreen'
 
-interface State {
-  dappName: string | null
-}
-
 interface StateProps {
   account: string | null
   phoneNumber: string | null
@@ -47,22 +43,8 @@ const mapDispatchToProps = {
   approveAccountAuth,
 }
 
-class DappKitAccountAuthScreen extends React.Component<Props, State> {
+class DappKitAccountAuthScreen extends React.Component<Props> {
   static navigationOptions = { header: null }
-  state = {
-    dappName: null,
-  }
-
-  componentDidMount() {
-    const request = this.props.route.params.dappKitRequest
-
-    if (!request) {
-      Logger.error(TAG, 'No request found in navigation props')
-      return
-    }
-
-    this.setState({ dappName: request.dappName })
-  }
 
   linkBack = () => {
     const { account, route, phoneNumber } = this.props
@@ -89,17 +71,15 @@ class DappKitAccountAuthScreen extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, account } = this.props
-    const { dappName } = this.state
+    const { t, account, route } = this.props
+    const { dappName } = route.params.dappKitRequest
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.logo}>
             <DappkitExchangeIcon />
           </View>
-          {dappName && (
-            <Text style={styles.header}>{t('connectToWallet', { dappname: dappName })}</Text>
-          )}
+          {!!dappName && <Text style={styles.header}>{t('connectToWallet', { dappName })}</Text>}
 
           <Text style={styles.share}>{t('shareInfo')}</Text>
 
