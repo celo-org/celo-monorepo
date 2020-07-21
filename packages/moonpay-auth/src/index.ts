@@ -11,11 +11,14 @@ import {
 const URL = require('url').URL
 
 // TODO: This staging function is left in place to test the cUSD integration
-// when finished by Moonpay. It will be removed after the full CELO, cUSD integration
-// is complete
+// that we are waitin on from Moonpay. It will be removed after
+// cUSD is added and tested
 export const signMoonpayStaging = functions.https.onRequest((request, response) => {
   const fiatCurrency = request.body.fiatCurrency || 'USD'
-  const fiatAmount = request.body.fiatAmount || '20'
+  let fiatAmount = request.body.fiatAmount || '20'
+  if (parseFloat(fiatAmount) < 20) {
+    fiatAmount = '20' // Minimum order of 20, else Moonpay prefills to 200
+  }
   const url =
     MOONPAY_URL_STAGING +
     '?apiKey=' +
