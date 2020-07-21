@@ -20,6 +20,7 @@ import { revokePhoneMapping } from 'src/identity/revoke'
 import { Actions as ImportActions } from 'src/import/actions'
 import { importBackupPhraseSaga } from 'src/import/saga'
 import { moveAllFundsFromAccount } from 'src/invite/saga'
+import { removeAccountLocally } from 'src/pincode/authentication'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount } from 'src/web3/saga'
@@ -97,6 +98,10 @@ function* migrateAccountToProperBip39() {
   }
 }
 
+function* clearStoredAccount() {
+  yield call(removeAccountLocally)
+}
+
 export function* watchMigrateAccountToProperBip39() {
   yield take(Actions.MIGRATE_ACCOUNT_BIP39)
   yield call(migrateAccountToProperBip39)
@@ -106,7 +111,12 @@ export function* watchSetPincode() {
   yield takeLeading(Actions.SET_PINCODE, setPincode)
 }
 
+export function* watchClearStoredAccount() {
+  yield takeLeading(Actions.CLEAR_STORED_ACCOUNT, clearStoredAccount)
+}
+
 export function* accountSaga() {
   yield spawn(watchMigrateAccountToProperBip39)
   yield spawn(watchSetPincode)
+  yield spawn(watchClearStoredAccount)
 }

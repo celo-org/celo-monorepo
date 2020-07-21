@@ -26,7 +26,11 @@ type NestedNavigatorParams<ParamList> = {
 
 // tslint:disable-next-line: interface-over-type-literal
 export type StackParamList = {
-  [Screens.BackupComplete]: undefined
+  [Screens.BackupComplete]:
+    | undefined
+    | {
+        fromSettings: boolean
+      }
   [Screens.BackupIntroduction]:
     | {
         fromSettings?: boolean
@@ -37,8 +41,16 @@ export type StackParamList = {
     | {
         nextScreen: keyof StackParamList
       }
-  [Screens.BackupPhrase]: undefined
-  [Screens.BackupQuiz]: undefined
+  [Screens.BackupPhrase]:
+    | undefined
+    | {
+        fromSettings: boolean
+      }
+  [Screens.BackupQuiz]:
+    | undefined
+    | {
+        fromSettings: boolean
+      }
   [Screens.BackupSocial]: undefined
   [Screens.BackupSocialIntro]: {
     incomingFromBackupFlow: boolean
@@ -163,7 +175,9 @@ export type StackParamList = {
     isFromScan?: boolean
   }
   [Screens.SetClock]: undefined
-  [Screens.Settings]: { promptFornoModal: boolean } | undefined
+  [Screens.Settings]:
+    | { promptFornoModal?: boolean; promptConfirmRemovalModal?: boolean }
+    | undefined
   [Screens.Support]: undefined
   [Screens.SupportContact]: undefined
   [Screens.Sync]: undefined

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { setRetryVerificationWithForno } from 'src/account/actions'
-import { WarningModal } from 'src/components/WarningModal'
+import Dialog from 'src/components/Dialog'
 import { Namespaces } from 'src/i18n'
 import { cancelVerification } from 'src/identity/actions'
 import { VerificationStatus } from 'src/identity/types'
@@ -61,41 +61,44 @@ export function VerificationFailedModal(props: Props) {
 
   return promptRetryWithForno ? (
     // Retry verification with forno with option to skip verificaion
-    <WarningModal
+    <Dialog
       isVisible={isVisible}
-      header={t('retryWithFornoModal.header')}
-      body1={t('retryWithFornoModal.body1')}
-      body2={t('retryWithFornoModal.body2')}
-      continueTitle={t('retryWithFornoModal.retryButton')}
-      cancelTitle={t('education.skip')}
-      onCancel={onSkip}
-      onContinue={onRetry}
-    />
+      title={t('retryWithFornoModal.header')}
+      actionText={t('retryWithFornoModal.retryButton')}
+      secondaryActionText={t('education.skip')}
+      actionPress={onRetry}
+      secondaryActionPress={onSkip}
+    >
+      {t('retryWithFornoModal.body1')}
+      {'\n\n'}
+      {t('retryWithFornoModal.body2')}
+    </Dialog>
   ) : allowEnterCodes ? (
     // Option to enter codes if reveal attempt failed
-    <WarningModal
+    <Dialog
       isVisible={isVisible}
-      header={t('failModal.header')}
-      body1={t('failModal.body1')}
-      body2={t('failModal.enterCodesBody')}
-      continueTitle={t('education.skip')}
-      cancelTitle={t('global:goBack')}
-      onCancel={onDismiss}
-      onContinue={onSkip}
-    />
+      title={t('failModal.header')}
+      actionText={t('education.skip')}
+      secondaryActionText={t('global:goBack')}
+      actionPress={onSkip}
+      secondaryActionPress={onDismiss}
+    >
+      {t('failModal.body1')}
+      {'\n\n'}
+      {t('failModal.enterCodesBody')}
+    </Dialog>
   ) : (
     // Else skip verification
-    <WarningModal
+    <Dialog
       isVisible={isVisible}
-      header={t('failModal.header')}
-      body1={
-        userBalanceInsufficient ? t('failModal.body1InsufficientBalance') : t('failModal.body1')
-      }
-      body2={
-        userBalanceInsufficient ? t('failModal.body2InsufficientBalance') : t('failModal.body2')
-      }
-      continueTitle={t('education.skip')}
-      onContinue={onSkip}
-    />
+      title={t('failModal.header')}
+      actionPress={onSkip}
+      actionText={t('education.skip')}
+      secondaryActionDisabled={true}
+    >
+      {userBalanceInsufficient ? t('failModal.body1InsufficientBalance') : t('failModal.body1')}
+      {'\n\n'}
+      {userBalanceInsufficient ? t('failModal.body2InsufficientBalance') : t('failModal.body2')}
+    </Dialog>
   )
 }

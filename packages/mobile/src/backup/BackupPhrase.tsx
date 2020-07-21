@@ -2,6 +2,7 @@ import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Bu
 import Switch from '@celo/react-components/components/Switch.v2'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { useTranslation, WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
@@ -20,6 +21,7 @@ import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { navigate, pushToStack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import { currentAccountSelector } from 'src/web3/selectors'
 
@@ -40,7 +42,10 @@ interface DispatchProps {
   hideAlert: typeof hideAlert
 }
 
-type Props = StateProps & DispatchProps & WithTranslation
+type Props = StateProps &
+  DispatchProps &
+  WithTranslation &
+  StackScreenProps<StackParamList, Screens.BackupPhrase>
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -94,12 +99,17 @@ class BackupPhrase extends React.Component<Props, State> {
 
   onPressContinue = () => {
     ValoraAnalytics.track(OnboardingEvents.backup_continue)
-    navigate(Screens.BackupQuiz)
+    navigate(Screens.BackupQuiz, { fromSettings: this.fromSettings() })
+  }
+
+  fromSettings = () => {
+    return this.props.route.params?.fromSettings ?? false
   }
 
   render() {
     const { t, backupCompleted } = this.props
     const { mnemonic, isConfirmChecked } = this.state
+    const fromSettings = this.fromSettings()
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -110,7 +120,7 @@ class BackupPhrase extends React.Component<Props, State> {
           />
           <Text style={styles.body}>{t('backupKeySummary')}</Text>
         </ScrollView>
-        {!backupCompleted && (
+        {(!backupCompleted || fromSettings) && (
           <>
             <View style={styles.confirmationSwitchContainer}>
               <Switch value={isConfirmChecked} onValueChange={this.onPressConfirmSwitch} />

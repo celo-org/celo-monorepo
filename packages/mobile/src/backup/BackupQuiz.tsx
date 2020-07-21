@@ -175,7 +175,8 @@ export class BackupQuiz extends React.Component<Props, State> {
     if (lengthsMatch && contentMatches(userChosenWords, mnemonic)) {
       Logger.debug(TAG, 'Backup quiz passed')
       this.props.setBackupCompleted()
-      navigate(Screens.BackupComplete)
+      const fromSettings = this.props.route.params?.fromSettings ?? false
+      navigate(Screens.BackupComplete, { fromSettings })
       ValoraAnalytics.track(OnboardingEvents.backup_quiz_complete)
     } else {
       Logger.debug(TAG, 'Backup quiz failed, reseting words')

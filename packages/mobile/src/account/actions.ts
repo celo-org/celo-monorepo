@@ -25,6 +25,7 @@ export enum Actions {
   SET_RETRY_VERIFICATION_WITH_FORNO = 'ACCOUNT/SET_RETRY_VERIFICATION_WITH_FORNO',
   ACCEPT_TERMS = 'ACCOUNT/ACCEPT_TERMS',
   MIGRATE_ACCOUNT_BIP39 = 'MIGRATE_ACCOUNT_BIP39',
+  CLEAR_STORED_ACCOUNT = 'CLEAR_STORED_ACCOUNT',
 }
 
 export interface SetNameAction {
@@ -126,6 +127,10 @@ export interface MigrateAccount {
   type: Actions.MIGRATE_ACCOUNT_BIP39
 }
 
+export interface ClearStoredAccount {
+  type: Actions.CLEAR_STORED_ACCOUNT
+}
+
 export type ActionTypes =
   | SetNameAction
   | SetPhoneNumberAction
@@ -149,6 +154,7 @@ export type ActionTypes =
   | SetRetryVerificationWithFornoAction
   | AcceptTermsAction
   | MigrateAccount
+  | ClearStoredAccount
 
 export function setName(name: string): SetNameAction {
   return {
@@ -261,4 +267,8 @@ export const setUserContactDetails = (
 
 export const migrateAccount = (): MigrateAccount => ({
   type: Actions.MIGRATE_ACCOUNT_BIP39,
+})
+
+export const clearStoredAccount = (): ClearStoredAccount => ({
+  type: Actions.CLEAR_STORED_ACCOUNT,
 })

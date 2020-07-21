@@ -236,6 +236,18 @@ export const reducer = (
           false
         ),
       }
+    case Actions.DELETE_USER_DATA:
+      return {
+        // TODO: Make sure these are indeed the things we want to save.
+        ...initialState,
+        addressToE164Number: state.addressToE164Number,
+        e164NumberToAddress: state.e164NumberToAddress,
+        e164NumberToSalt: state.e164NumberToSalt,
+        askedContactsPermission: state.askedContactsPermission,
+        importContactsProgress: state.importContactsProgress,
+        matchedContacts: state.matchedContacts,
+        secureSendPhoneNumberMapping: state.secureSendPhoneNumberMapping,
+      }
     default:
       return state
   }

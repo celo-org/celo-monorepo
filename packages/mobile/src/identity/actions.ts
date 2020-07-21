@@ -32,6 +32,7 @@ export enum Actions {
   VALIDATE_RECIPIENT_ADDRESS_SUCCESS = 'SEND/VALIDATE_RECIPIENT_ADDRESS_SUCCESS',
   REQUIRE_SECURE_SEND = 'SEND/REQUIRE_SECURE_SEND',
   END_FETCHING_ADDRESSES = 'END_FETCHING_ADDRESSES',
+  DELETE_USER_DATA = 'IDENTITY/DELETE_USER_DATA',
 }
 
 export interface StartVerificationAction {
@@ -148,6 +149,10 @@ export interface EndFetchingAddressesAction {
   e164Number: string
 }
 
+export interface DeleteUserDataAction {
+  type: Actions.DELETE_USER_DATA
+}
+
 export type ActionTypes =
   | StartVerificationAction
   | CancelVerificationAction
@@ -169,6 +174,7 @@ export type ActionTypes =
   | RequireSecureSendAction
   | FetchAddressesAndValidateAction
   | EndFetchingAddressesAction
+  | DeleteUserDataAction
 
 export const startVerification = (): StartVerificationAction => ({
   type: Actions.START_VERIFICATION,
@@ -310,4 +316,8 @@ export const requireSecureSend = (
 export const endFetchingAddresses = (e164Number: string): EndFetchingAddressesAction => ({
   type: Actions.END_FETCHING_ADDRESSES,
   e164Number,
+})
+
+export const deleteUserData = (): DeleteUserDataAction => ({
+  type: Actions.DELETE_USER_DATA,
 })
