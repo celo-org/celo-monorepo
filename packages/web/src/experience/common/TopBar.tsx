@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import Octocat from 'src/icons/Octocat'
 import { useScreenSize } from 'src/layout/ScreenSize'
@@ -8,7 +8,7 @@ import Button, { BTN } from 'src/shared/Button.3'
 import links, { CeloLinks } from 'src/shared/menu-items'
 import Navigation, { NavigationTheme } from 'src/shared/Navigation'
 import { colors, fonts, standardStyles } from 'src/styles'
-
+import { useBooleanToggle } from 'src/utils/useBooleanToggle'
 interface Props {
   current: string
 }
@@ -16,6 +16,7 @@ interface Props {
 export default function TopBar({ current }: Props) {
   const { isMobile, isDesktop } = useScreenSize()
   const { t } = useTranslation(NameSpaces.common)
+  const [showingKits, toggleKits] = useBooleanToggle()
   const name = current === links.BRAND.link ? links.BRAND.name : links.EVENTS_KIT.name
   return (
     <View style={standardStyles.centered}>
@@ -26,44 +27,30 @@ export default function TopBar({ current }: Props) {
               <LogoLightBg height={30} />
             </TouchableOpacity>
           </a>
-          {!isMobile && (
-            <a href={current}>
-              <TouchableOpacity style={styles.rowVerticalCenter}>
-                <Text
-                  // @ts-ignore -- added initial to the aug but it still isnt liking it
-                  style={[fonts.h3, styles.title]}
-                >
-                  {name}
-                </Text>
-              </TouchableOpacity>
-            </a>
-          )}
+          <a href={current}>
+            <TouchableOpacity style={styles.rowVerticalCenter}>
+              <Text
+                // @ts-ignore -- added initial to the aug but it still isnt liking it
+                style={[fonts.h3, styles.title]}
+              >
+                {name}
+              </Text>
+            </TouchableOpacity>
+          </a>
         </View>
         <View style={styles.rowVerticalCenter}>
-          <View style={styles.kits}>
-            <Navigation
-              style={styles.navLink}
-              text={links.BRAND.name}
-              link={links.BRAND.link}
-              selected={links.BRAND.link === current}
-              theme={NavigationTheme.LIGHT}
-            />
-            <Navigation
-              style={styles.navLink}
-              text={links.EVENTS_KIT.name}
-              link={links.EVENTS_KIT.link}
-              selected={links.EVENTS_KIT.link === current}
-              theme={NavigationTheme.LIGHT}
-            />
-
-            <Navigation
-              style={styles.navLink}
-              text={links.MERCHANTS.name}
-              link={links.MERCHANTS.link}
-              selected={links.MERCHANTS.link === current}
-              theme={NavigationTheme.LIGHT}
-            />
-          </View>
+          {isMobile ? (
+            <TouchableOpacity onPress={toggleKits}>
+              <Image
+                source={require('src/icons/prosper-light-bg.png')}
+                style={{ height: 40, width: 30 }}
+              />
+            </TouchableOpacity>
+          ) : (
+            <View style={styles.kits}>
+              <Kits current={current} />
+            </View>
+          )}
           {isDesktop && (
             <Button
               kind={BTN.NAV}
@@ -75,7 +62,41 @@ export default function TopBar({ current }: Props) {
           )}
         </View>
       </View>
+      {showingKits && (
+        <View style={styles.kitsMobileShown}>
+          <Kits current={current} />
+        </View>
+      )}
     </View>
+  )
+}
+
+function Kits({ current }) {
+  return (
+    <>
+      <Navigation
+        style={styles.navLink}
+        text={links.BRAND.name}
+        link={links.BRAND.link}
+        selected={links.BRAND.link === current}
+        theme={NavigationTheme.LIGHT}
+      />
+      <Navigation
+        style={styles.navLink}
+        text={links.EVENTS_KIT.name}
+        link={links.EVENTS_KIT.link}
+        selected={links.EVENTS_KIT.link === current}
+        theme={NavigationTheme.LIGHT}
+      />
+
+      <Navigation
+        style={styles.navLink}
+        text={links.MERCHANTS.name}
+        link={links.MERCHANTS.link}
+        selected={links.MERCHANTS.link === current}
+        theme={NavigationTheme.LIGHT}
+      />
+    </>
   )
 }
 
@@ -101,6 +122,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     marginHorizontal: 30,
+  },
+  kitsMobileShown: {
+    position: 'fixed',
+    left: 0,
+    right: 0,
+    top: 80,
+    paddingVertical: 20,
+    borderColor: 'red',
+    borderWifth: 1,
+    width: '100%',
+    backgroundColor: 'white',
+    justifyContent: 'space-around',
+    height: '40%',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.gray,
+  },
+  kitsMobileHidden: {
+    display: 'none',
   },
   navLink: {
     marginBottom: 0,
