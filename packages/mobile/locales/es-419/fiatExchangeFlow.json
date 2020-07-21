@@ -3,7 +3,7 @@
   "cashOut": "Retirar",
   "celoDollarsAt": "Celo Dollars @ <1></1>",
   "disclaimerCeloDollars": "Los valores del dólar celo son estimados.",
-  "dollarsNotYetEnabledNote": "Los dólares celos aún no están disponibles en Moonpay. Para obtener dólares celos, compre CELO y cámbielos por dólares celos en la pestaña CELO.",
+  "dollarsNotYetEnabledNote": "Los dólares celos aún no están disponibles en ningún proveedor. Para obtener dólares celos, compre CELO y cámbielos por dólares celos en la pestaña CELO.",
   "pleaseSelectProvider": "Seleccione un proveedor a continuación. Estos enlaces se conectan a un servicio de terceros.",
   "explanationModal": {
     "title": "Sobre proveedores",
