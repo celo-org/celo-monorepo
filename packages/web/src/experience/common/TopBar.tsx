@@ -14,7 +14,7 @@ interface Props {
 }
 
 export default function TopBar({ current }: Props) {
-  const { isMobile } = useScreenSize()
+  const { isMobile, isDesktop } = useScreenSize()
   const { t } = useTranslation(NameSpaces.common)
   const name = current === links.BRAND.link ? links.BRAND.name : links.EVENTS_KIT.name
   return (
@@ -43,20 +43,28 @@ export default function TopBar({ current }: Props) {
           <View style={styles.kits}>
             <Navigation
               style={styles.navLink}
-              text={links.EVENTS_KIT.name}
-              link={links.EVENTS_KIT.link}
-              selected={links.EVENTS_KIT.link === current}
-              theme={NavigationTheme.LIGHT}
-            />
-            <Navigation
-              style={styles.navLink}
               text={links.BRAND.name}
               link={links.BRAND.link}
               selected={links.BRAND.link === current}
               theme={NavigationTheme.LIGHT}
             />
+            <Navigation
+              style={styles.navLink}
+              text={links.EVENTS_KIT.name}
+              link={links.EVENTS_KIT.link}
+              selected={links.EVENTS_KIT.link === current}
+              theme={NavigationTheme.LIGHT}
+            />
+
+            <Navigation
+              style={styles.navLink}
+              text={links.MERCHANTS.name}
+              link={links.MERCHANTS.link}
+              selected={links.MERCHANTS.link === current}
+              theme={NavigationTheme.LIGHT}
+            />
           </View>
-          {!isMobile && (
+          {isDesktop && (
             <Button
               kind={BTN.NAV}
               href={CeloLinks.gitHub}

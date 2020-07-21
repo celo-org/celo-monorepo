@@ -57,7 +57,7 @@ export const pagePaths = {
   },
   MERCHANTS: {
     name: 'MerchantKit',
-    link: '/experience/merchants',
+    link: '/experience/merchant',
   },
   PRIVACY: {
     name: 'Privacy Policy',
