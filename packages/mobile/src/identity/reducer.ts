@@ -40,8 +40,8 @@ export interface SecureSendPhoneNumberMapping {
 export interface SecureSendDetails {
   address: string | undefined
   addressValidationType: AddressValidationType
-  isFetchingAddresses: boolean
-  validationSuccessful: boolean
+  isFetchingAddresses: boolean | undefined
+  validationSuccessful: boolean | undefined
 }
 
 export interface State {
