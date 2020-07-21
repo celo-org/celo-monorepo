@@ -11,6 +11,8 @@ import {
 const URL = require('url').URL
 
 export const signMoonpayStaging = functions.https.onRequest((request, response) => {
+  const fiatCurrency = request.body.fiatCurrency || 'USD'
+  const fiatAmount = request.body.fiatAmount || '20'
   const url =
     MOONPAY_URL_STAGING +
     '?apiKey=' +
@@ -20,9 +22,9 @@ export const signMoonpayStaging = functions.https.onRequest((request, response) 
     '&walletAddress=' +
     request.body.address +
     '&baseCurrencyCode=' +
-    request.body.fiatCurrency +
+    fiatCurrency +
     '&baseCurrencyAmount=' +
-    request.body.fiatAmount
+    fiatAmount
   console.log(`Requested signature for: ${url}`)
 
   const signature = crypto
@@ -37,6 +39,8 @@ export const signMoonpayStaging = functions.https.onRequest((request, response) 
 
 export const signMoonpayProd = functions.https.onRequest((request, response) => {
   console.log(`Public key (non sensitive): ${MOONPAY_PUBLIC_KEY_PROD}`)
+  const fiatCurrency = request.body.fiatCurrency || 'USD'
+  const fiatAmount = request.body.fiatAmount || '20'
   const url =
     MOONPAY_URL_PROD +
     '?apiKey=' +
@@ -46,9 +50,9 @@ export const signMoonpayProd = functions.https.onRequest((request, response) => 
     '&walletAddress=' +
     request.body.address +
     '&baseCurrencyCode=' +
-    request.body.fiatCurrency +
+    fiatCurrency +
     '&baseCurrencyAmount=' +
-    request.body.fiatAmount
+    fiatAmount
   console.log(`Requested signature for: ${url}`)
 
   const signature = crypto
