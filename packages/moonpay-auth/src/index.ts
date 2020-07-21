@@ -10,6 +10,9 @@ import {
 } from './config'
 const URL = require('url').URL
 
+// TODO: This staging function is left in place to test the cUSD integration
+// when finished by Moonpay. It will be removed after the full CELO, cUSD integration
+// is complete
 export const signMoonpayStaging = functions.https.onRequest((request, response) => {
   const fiatCurrency = request.body.fiatCurrency || 'USD'
   const fiatAmount = request.body.fiatAmount || '20'
