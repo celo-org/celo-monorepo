@@ -37,6 +37,8 @@ function getPullNumber() {
 function parseMandatoryTestIssuesFromPullBody(prBody) {
   // Slice off everything before list of mandatory test issues
   prBody = prBody.split('DO_NOT_SKIP')[1]
+  // Remove `.com` references in issue urls so that `.` can mark end of list.
+  prBody = prBody.replace('.com', '')
   // Slice off everything after list of mandatory test issues
   prBody = prBody.slice(0, prBody.indexOf('.'))
   // Return list of issue numbers
