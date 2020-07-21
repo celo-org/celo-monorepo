@@ -19,30 +19,6 @@ function getClient(preview: boolean) {
   return intialize(preview)
 }
 
-interface Page {
-  title: string
-  slug: string
-  sections: any[]
-}
-
-export default async function demo() {
-  console.warn('TEST')
-  const slug = 'welcome'
-
-  const pages = await getClient(false).getEntries<Page>({
-    content_type: 'page',
-    'fields.slug': slug,
-  })
-
-  const page = pages.items[0].fields
-
-  console.warn(page.title, page.sections)
-  return {
-    name: page.title,
-    sections: page.sections,
-  }
-}
-
 interface Kit {
   name: string
   slug: string

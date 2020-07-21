@@ -1,12 +1,14 @@
 import { GetServerSideProps } from 'next'
-import { getKit, getPage } from 'src/utils/contentful'
 import { Props } from 'src/experience/contentful/Dynamic'
-
+import { getKit, getPage } from 'src/utils/contentful'
+import getConfig from 'next/config'
 const getServerSideProps: GetServerSideProps<
   Props,
   { kit: string; kitPage: string }
 > = async function getServerSideProp({ params, req, query }) {
-  const preview = query.preview === 'true'
+  const { publicRuntimeConfig } = getConfig()
+
+  const preview = publicRuntimeConfig.ENV === 'development'
   const locale = query.locale || 'en-US'
   const [kit, page] = await Promise.all([
     getKit(params.kit, { preview, locale }),
