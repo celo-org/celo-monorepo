@@ -23,7 +23,7 @@ contract DowntimeSlasher is SlasherUtil {
     uint256 indexed startBlock,
     uint256 indexed endBlock
   );
-  event BitmapSetForInterval(uint256 indexed startBlock, uint256 indexed endblock, bytes32 bitmap);
+  event BitmapSetForInterval(uint256 indexed startBlock, uint256 indexed endBlock, bytes32 bitmap);
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
@@ -89,7 +89,7 @@ contract DowntimeSlasher is SlasherUtil {
     );
     uint256 epochSize = getEpochSize();
     require(
-      lastBlockWithSignatureBitmap.sub(startBlock) <= epochSize.mul(4),
+      block.number.sub(startBlock) < epochSize.mul(4),
       "startBlock must be within 4 epochs of the current head"
     );
     require(
@@ -200,7 +200,7 @@ contract DowntimeSlasher is SlasherUtil {
         // epochs, and because intervals processed by this function are guaranteed to be
         // overlapping or contiguous, whenever we cross epoch boundaries we are guaranteed to
         // process an interval that starts with the first block of that epoch.
-        if (startBlocks[i].sub(1).mod(epochSize) == 0) {
+        if (startBlocks[i].mod(epochSize) == 1) {
           require(
             getValidatorAccountFromSignerIndex(
               signerIndices[signerIndicesIndex],

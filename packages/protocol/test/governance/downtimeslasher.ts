@@ -1,12 +1,11 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
-  assertContainSubset,
+  assertLogMatches2,
   assertRevert,
   getEpochNumberOfBlock,
   getFirstBlockNumberForEpoch,
   jsonRpc,
 } from '@celo/protocol/lib/test-utils'
-import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
   AccountsInstance,
@@ -152,15 +151,14 @@ contract('DowntimeSlasher', (accounts: string[]) => {
       await assertRevert(slasher.setSlashingIncentives(123, 678))
     })
 
-    it('should emit the corresponding event', async () => {
+    it('should emit the SlashingIncentivesSet corresponding event', async () => {
       const resp = await slasher.setSlashingIncentives(123, 67)
       assert.equal(resp.logs.length, 1)
-      const log = resp.logs[0]
-      assertContainSubset(log, {
+      assertLogMatches2(resp.logs[0], {
         event: 'SlashingIncentivesSet',
         args: {
-          penalty: new BigNumber(123),
-          reward: new BigNumber(67),
+          penalty: 123,
+          reward: 67,
         },
       })
     })
@@ -171,24 +169,122 @@ contract('DowntimeSlasher', (accounts: string[]) => {
       await assertRevert(slasher.setSlashableDowntime(23, { from: nonOwner }))
     })
 
-    it('slashable downtime has to be smaller than epoch length', async () => {
-      await assertRevert(slasher.setSlashableDowntime(epochSize))
-    })
-
     it('should have set slashable downtime', async () => {
       await slasher.setSlashableDowntime(23)
       const res = await slasher.slashableDowntime()
       assert.equal(res.toNumber(), 23)
     })
 
-    it('should emit the corresponding event', async () => {
+    it('should emit the SlashableDowntimeSet corresponding event', async () => {
       const resp = await slasher.setSlashableDowntime(23)
       assert.equal(resp.logs.length, 1)
-      const log = resp.logs[0]
-      assertContainSubset(log, {
+      assertLogMatches2(resp.logs[0], {
         event: 'SlashableDowntimeSet',
         args: {
-          interval: new BigNumber(23),
+          interval: 23,
+        },
+      })
+    })
+  })
+
+  describe('#getBitmapForInterval()', () => {
+    let blockNumber: number
+    let epoch: number
+
+    beforeEach(async () => {
+      await slasher.setNumberValidators(2)
+      blockNumber = await web3.eth.getBlockNumber()
+      epoch = getEpochNumberOfBlock(blockNumber, epochSize)
+      await slasher.setEpochSigner(epoch, 0, validatorList[0])
+    })
+
+    it('fails if endBlock < startBlock', async () => {
+      await assertRevert(
+        slasher.getBitmapForInterval(2, 3),
+        'endBlock must be greater or equal than startBlock'
+      )
+    })
+
+    it('fails if the currentBlock is part of the interval', async () => {
+      const currentBlock = await web3.eth.getBlockNumber()
+      await assertRevert(
+        slasher.getBitmapForInterval(currentBlock, currentBlock),
+        'the signature bitmap for endBlock is not yet available'
+      )
+    })
+
+    it('fails if startBlock is older than 4 epochs', async () => {
+      // we make sure that 4 epochs passed
+      do {
+        blockNumber = await web3.eth.getBlockNumber()
+        await jsonRpc(web3, 'evm_mine', [])
+      } while (blockNumber < epochSize * 4 + 2)
+      blockNumber = blockNumber - epochSize * 4
+      await assertRevert(
+        slasher.getBitmapForInterval(blockNumber, blockNumber),
+        'startBlock must be within 4 epochs of the current head'
+      )
+    })
+
+    it('fails if startBlock and endBlock are not from the same epoch', async () => {
+      blockNumber = blockNumber - 2
+      await assertRevert(
+        slasher.getBitmapForInterval(blockNumber - epochSize, blockNumber),
+        'startBlock and endBlock must be in the same epoch'
+      )
+    })
+
+    it('fails if startBlock and endBlock are not from the same epoch', async () => {
+      blockNumber = blockNumber - 2
+      await assertRevert(
+        slasher.getBitmapForInterval(blockNumber - epochSize, blockNumber),
+        'startBlock and endBlock must be in the same epoch'
+      )
+    })
+  })
+
+  describe('#setBitmapForInterval()', () => {
+    let blockNumber: number
+    let epoch: number
+
+    beforeEach(async () => {
+      await slasher.setNumberValidators(2)
+      blockNumber = await web3.eth.getBlockNumber()
+      // To ensure blockNumber with valid parentSealBitmap
+      blockNumber = blockNumber - 3
+      // This ensures 2 consecutive blocks in the same epoch
+      blockNumber = blockNumber % epochSize === 0 ? blockNumber - 1 : blockNumber
+      epoch = getEpochNumberOfBlock(blockNumber, epochSize)
+      await slasher.setEpochSigner(epoch, 0, validatorList[0])
+      await slasher.setParentSealBitmap(
+        blockNumber + 1,
+        '0x0000000000000000000000000000000000000000000000000000000000000001'
+      )
+      await slasher.setParentSealBitmap(
+        blockNumber + 2,
+        '0x0000000000000000000000000000000000000000000000000000000000000002'
+      )
+    })
+
+    it('fails if the interval was already set', async () => {
+      const resp = await slasher.setBitmapForInterval(blockNumber, blockNumber + 1)
+      assert.equal(resp.logs.length, 1)
+
+      await assertRevert(
+        slasher.setBitmapForInterval(blockNumber, blockNumber + 1),
+        'bitmap already set'
+      )
+    })
+
+    it('should emit the BitmapSetForInterval corresponding event', async () => {
+      const resp = await slasher.setBitmapForInterval(blockNumber, blockNumber + 1)
+      assert.equal(resp.logs.length, 1)
+      assertLogMatches2(resp.logs[0], {
+        event: 'BitmapSetForInterval',
+        args: {
+          startBlock: blockNumber,
+          endBlock: blockNumber + 1,
+          bitmap: '0x0000000000000000000000000000000000000000000000000000000000000003',
         },
       })
     })
@@ -262,26 +358,6 @@ contract('DowntimeSlasher', (accounts: string[]) => {
       } else {
         epoch = newEpoch
       }
-    })
-
-    it('fails if the slash window has the currentBlock as part of the interval', async () => {
-      await slasher.setEpochSigner(epoch, validatorIndexInEpoch, validatorList[0])
-      const actualBlockNumber = await web3.eth.getBlockNumber()
-      const startBlock = actualBlockNumber - 3
-      await assertRevert(
-        slasher.slash(
-          [startBlock, startBlock + intervalSize],
-          [startBlock + intervalSize - 1, startBlock + 2 * intervalSize - 1],
-          [validatorIndexInEpoch],
-          0,
-          [],
-          [],
-          [],
-          [],
-          [],
-          []
-        )
-      )
     })
 
     describe('slashable interval in the same epoch', async () => {
@@ -539,7 +615,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
         beforeEach(async () => {
           startBlock = getFirstBlockNumberForEpoch(epoch, epochSize)
           const slotArrays = await ensureValidatorIsSlashable(startBlock, [validatorIndexInEpoch])
-          endBlock = slotArrays.endBlocks[-1]
+          endBlock = slotArrays.endBlocks[slotArrays.endBlocks.length - 1]
           resp = await slasher.slash(
             slotArrays.startBlocks,
             slotArrays.endBlocks,
@@ -554,14 +630,13 @@ contract('DowntimeSlasher', (accounts: string[]) => {
           )
         })
 
-        it('should emit the corresponding event', async () => {
-          const log = resp.logs[0]
-          assertContainSubset(log, {
+        it('should emit the DowntimeSlashPerformed corresponding event', async () => {
+          assertLogMatches2(resp.logs[0], {
             event: 'DowntimeSlashPerformed',
             args: {
               validator: validatorList[0],
-              startBlock: new BigNumber(startBlock),
-              endBlock: new BigNumber(endBlock),
+              startBlock,
+              endBlock,
             },
           })
         })
@@ -576,30 +651,29 @@ contract('DowntimeSlasher', (accounts: string[]) => {
           assert.equal(balance.toNumber(), 40000)
         })
 
-        it('cannot be slashed twice in the same epoch', async () => {
+        it('can be slashed twice in the same epoch', async () => {
           // Just to make sure that the validator was slashed
-          const balance = await mockLockedGold.accountTotalLockedGold(validatorList[0])
+          let balance = await mockLockedGold.accountTotalLockedGold(validatorList[0])
           assert.equal(balance.toNumber(), 40000)
           const newStartBlock = startBlock + slashableDowntime * 2
           const slotArrays = await ensureValidatorIsSlashable(newStartBlock, [
             validatorIndexInEpoch,
             validatorIndexInEpoch,
           ])
-          await assertRevert(
-            slasher.slash(
-              slotArrays.startBlocks,
-              slotArrays.endBlocks,
-              [validatorIndexInEpoch],
-              0,
-              [],
-              [],
-              [],
-              [],
-              [],
-              []
-            ),
-            'already slashed in that epoch'
+          await slasher.slash(
+            slotArrays.startBlocks,
+            slotArrays.endBlocks,
+            [validatorIndexInEpoch],
+            0,
+            [],
+            [],
+            [],
+            [],
+            [],
+            []
           )
+          balance = await mockLockedGold.accountTotalLockedGold(validatorList[0])
+          assert.equal(balance.toNumber(), 30000)
         })
       })
     })
