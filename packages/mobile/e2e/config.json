@@ -1,15 +1,12 @@
 {
   "bail": 3,
-  "setupFilesAfterEnv": ["../../../flakey-test-tracking/src/jest/setup.js"],
+  "setupFilesAfterEnv": ["init.js", "../../../flakey-test-tracking/src/jest/setup.js"],
+  "globalSetup": "../../../flakey-test-tracking/src/jest/setup.global.js",
+  "globalTeardown": "../../../flakey-test-tracking/src/jest/teardown.global.js",
   "testEnvironment": "../../../flakey-test-tracking/src/jest/environments/detox.js",
   "reporters": ["detox/runners/jest/streamlineReporter"],
   "verbose": true,
   "testMatch": ["**/*.spec.js"],
   "testTimeout": 120000,
-  "globals": {
-    "FLAKES": "Map",
-    "RETRY_TIMES": 10,
-    "SKIP_FLAKES": true
-  },
   "testRunner": "jest-circus/runner"
 }
