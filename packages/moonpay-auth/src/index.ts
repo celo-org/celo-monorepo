@@ -43,7 +43,10 @@ export const signMoonpayStaging = functions.https.onRequest((request, response) 
 export const signMoonpayProd = functions.https.onRequest((request, response) => {
   console.log(`Public key (non sensitive): ${MOONPAY_PUBLIC_KEY_PROD}`)
   const fiatCurrency = request.body.fiatCurrency || 'USD'
-  const fiatAmount = request.body.fiatAmount || '20'
+  let fiatAmount = request.body.fiatAmount || '20'
+  if (parseFloat(fiatAmount) < 20) {
+    fiatAmount = '20' // Minimum order of 20, else Moonpay prefills to 200
+  }
   const url =
     MOONPAY_URL_PROD +
     '?apiKey=' +
