@@ -11,6 +11,7 @@ import { e164NumberSelector } from 'src/account/selectors'
 import { approveAccountAuth } from 'src/dappkit/dappkit'
 import { Namespaces, withTranslation } from 'src/i18n'
 import DappkitExchangeIcon from 'src/icons/DappkitExchange'
+import { noHeader } from 'src/navigator/Headers.v2'
 import { navigateBack, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -44,7 +45,7 @@ const mapDispatchToProps = {
 }
 
 class DappKitAccountAuthScreen extends React.Component<Props> {
-  static navigationOptions = { header: null }
+  static navigationOptions = noHeader
 
   linkBack = () => {
     const { account, route, phoneNumber } = this.props

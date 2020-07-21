@@ -10,6 +10,7 @@ import { connect } from 'react-redux'
 import { requestTxSignature } from 'src/dappkit/dappkit'
 import { Namespaces, withTranslation } from 'src/i18n'
 import DappkitExchangeIcon from 'src/icons/DappkitExchange'
+import { noHeader } from 'src/navigator/Headers.v2'
 import { navigate, navigateBack, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -30,7 +31,7 @@ const mapDispatchToProps = {
 }
 
 class DappKitSignTxScreen extends React.Component<Props> {
-  static navigationOptions = { header: null }
+  static navigationOptions = noHeader
 
   componentDidMount() {
     const request = this.props.route.params.dappKitRequest
