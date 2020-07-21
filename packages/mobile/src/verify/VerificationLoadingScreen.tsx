@@ -92,6 +92,15 @@ export default function VerificationLoadingScreen() {
     navigate(Screens.VerificationEducationScreen)
   }
 
+  const onFinishCountdown = () => {
+    // For now switch to the verification screen
+    // if we haven't reached the reveal stage yet
+    if (!isFocused || verificationStatus === VerificationStatus.RevealingNumber) {
+      return
+    }
+    navigate(Screens.VerificationInputScreen)
+  }
+
   const onPressLearnMore = () => {
     scrollViewRef.current?.getNode().scrollToEnd({ animated: true })
   }
@@ -209,7 +218,7 @@ export default function VerificationLoadingScreen() {
         >
           <Animated.View style={statusContainerStyle}>
             <Text style={styles.statusText}>{t('loading.confirming')}</Text>
-            <VerificationCountdown />
+            <VerificationCountdown onFinish={onFinishCountdown} />
           </Animated.View>
           <Animated.View style={learnMoreContainerStyle}>
             <TouchableOpacity style={styles.upHandleContainer} onPress={onPressLearnMore}>

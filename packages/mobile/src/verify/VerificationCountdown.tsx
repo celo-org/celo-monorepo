@@ -20,18 +20,15 @@ function formatTimeRemaining(seconds: number) {
   return m + ':' + String(s).padStart(2, '0')
 }
 
-export default function VerificationCountdown() {
+interface Props {
+  onFinish: () => void
+}
+
+export default function VerificationCountdown({ onFinish }: Props) {
+  const hasCalledOnFinishedRef = useRef(false)
   const endTime = useRef(Date.now() + TOTAL_TIME).current
   // Used for re-rendering, actual value unused
   const [, setTimer] = useState(0)
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTimer((timer) => timer + 1)
-    }, 1000)
-
-    return () => clearInterval(interval)
-  }, [])
 
   const progressAnimatedStyle = useMemo(() => {
     const progress = loop({
@@ -50,6 +47,27 @@ export default function VerificationCountdown() {
   }, [])
 
   const secondsLeft = (endTime - Date.now()) / 1000
+
+  // Update timer effect
+  useEffect(() => {
+    if (secondsLeft <= 0) {
+      return
+    }
+
+    const interval = setInterval(() => {
+      setTimer((timer) => timer + 1)
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [secondsLeft <= 0])
+
+  // Effect to call onFinish when appropriate
+  useEffect(() => {
+    if (secondsLeft <= 0 && !hasCalledOnFinishedRef.current) {
+      hasCalledOnFinishedRef.current = true
+      onFinish()
+    }
+  }, [secondsLeft <= 0, onFinish])
 
   return (
     <Animated.View>
