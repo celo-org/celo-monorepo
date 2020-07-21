@@ -6,9 +6,26 @@ import "openzeppelin-solidity/contracts/utils/Address.sol";
 
 import "./Initializable.sol";
 
-/// @title Multisignature wallet - Allows multiple parties to agree on transactions before
-/// execution.
-/// @author Stefan George - <stefan.george@consensys.net>
+/**
+ * @title Multisignature wallet - Allows multiple parties to agree on transactions before
+ * execution.
+ * @author Stefan George - <stefan.george@consensys.net>
+ * @dev NOTE: This contract has its limitations and is not viable for every
+ * multi-signature setup. On a case by case basis, evaluate whether this is the
+ * correct contract for your use case.
+ * In particular, this contract doesn't have an atomic "add owners and increase
+ * requirement" operation.
+ * This can be tricky, for example, in a situation where a MultiSig starts out
+ * owned by a single owner. Safely increasing the owner set and requirement at
+ * the same time is not trivial. One way to work around this situation is to
+ * first add a second address controlled by the original owner, increase the
+ * requirement, and then replace the auxillary address with the intended second
+ * owner.
+ * Again, this is just one example, in general make sure to verify this contract
+ * will support your intended usage. The goal of this contract is to offer a
+ * simple, minimal multi-signature API that's easy to understand even for novice
+ * Solidity users.
+ */
 contract MultiSig is Initializable {
   using SafeMath for uint256;
   /*

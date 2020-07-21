@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import Avatar from 'src/components/Avatar'
 import CurrencyDisplay, { DisplayType, FormatType } from 'src/components/CurrencyDisplay'
-import FeeIcon from 'src/components/FeeIcon'
+import { SecurityFeeIcon } from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow'
 import TotalLineItem from 'src/components/TotalLineItem'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
@@ -50,7 +50,7 @@ export default function ReclaimPaymentConfirmationCard({
       <LineItemRow title={t('amount')} amount={<CurrencyDisplay amount={amount} />} />
       <LineItemRow
         title={t('securityFee')}
-        titleIcon={<FeeIcon />}
+        titleIcon={<SecurityFeeIcon />}
         amount={
           securityFeeAmount && (
             <CurrencyDisplay amount={securityFeeAmount} formatType={FormatType.Fee} />
