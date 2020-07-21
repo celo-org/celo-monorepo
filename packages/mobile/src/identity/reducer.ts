@@ -34,10 +34,13 @@ export enum AddressValidationType {
 }
 
 export interface SecureSendPhoneNumberMapping {
-  [e164Number: string]: {
-    address: string | undefined
-    addressValidationType: AddressValidationType
-  }
+  [e164Number: string]: SecureSendDetails
+}
+
+export interface SecureSendDetails {
+  address: string | undefined
+  addressValidationType: AddressValidationType
+  isFetchingAddresses: boolean
 }
 
 export interface State {
@@ -97,6 +100,7 @@ export const reducer = (
           current: 0,
           total: 0,
         },
+        isFetchingAddresses: false,
       }
     }
     case Actions.RESET_VERIFICATION:
@@ -212,6 +216,24 @@ export const reducer = (
             address: undefined,
             addressValidationType: action.addressValidationType,
           }
+        ),
+      }
+    case Actions.FETCH_ADDRESSES_AND_VALIDATION_STATUS:
+      return {
+        ...state,
+        secureSendPhoneNumberMapping: dotProp.set(
+          state.secureSendPhoneNumberMapping,
+          `${action.e164Number}.isFetchingAddresses`,
+          true
+        ),
+      }
+    case Actions.END_FETCHING_ADDRESSES:
+      return {
+        ...state,
+        secureSendPhoneNumberMapping: dotProp.set(
+          state.secureSendPhoneNumberMapping,
+          `${action.e164Number}.isFetchingAddresses`,
+          false
         ),
       }
     default:

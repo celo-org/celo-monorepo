@@ -213,7 +213,7 @@ exports[`Contact renders correctly 1`] = `
                 "justifyContent": "center",
                 "minWidth": 120,
                 "opacity": undefined,
-                "paddingHorizontal": 16,
+                "paddingHorizontal": 24,
                 "paddingVertical": 5,
               }
             }

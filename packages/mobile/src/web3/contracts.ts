@@ -7,6 +7,8 @@ import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { RpcWallet } from '@celo/contractkit/lib/wallets/rpc-wallet'
 import { sleep } from '@celo/utils/src/async'
 import { call, delay, select } from 'redux-saga/effects'
+import { ContractKitEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { DEFAULT_FORNO_URL } from 'src/config'
 import { isProviderConnectionError } from 'src/geth/geth'
@@ -20,13 +22,15 @@ import { IpcProvider } from 'web3-core'
 
 const TAG = 'web3/contracts'
 const KIT_INIT_RETRY_DELAY = 2000
+const CONTRACT_KIT_RETRIES = 3
 
 let ipcProvider: IpcProvider | undefined
 let gethWallet: RpcWallet | undefined
 let contractKit: ContractKit | undefined
 
 export function* initContractKit() {
-  let retries = 3
+  ValoraAnalytics.track(ContractKitEvents.init_contractkit_start)
+  let retries = CONTRACT_KIT_RETRIES
   // Wrap init in retries to handle cases where Geth is initialized but the
   // IPC is not ready yet. Without changing Geth + RN-Geth, we have no way to
   // listen for this readiness
@@ -34,7 +38,11 @@ export function* initContractKit() {
     try {
       // The kit must wait for Geth to be initialized because
       // Geth is required for the RpcWallet
+      ValoraAnalytics.track(ContractKitEvents.init_contractkit_geth_init_start, {
+        retries: CONTRACT_KIT_RETRIES - retries,
+      })
       yield call(waitForGethInitialized)
+      ValoraAnalytics.track(ContractKitEvents.init_contractkit_geth_init_finish)
 
       if (contractKit || ipcProvider || gethWallet) {
         throw new Error('Kit not properly destroyed')
@@ -43,18 +51,24 @@ export function* initContractKit() {
       const fornoMode = yield select(fornoSelector)
       Logger.info(`${TAG}@initContractKit`, `Initializing contractkit, forno mode: ${fornoMode}`)
 
+      ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_ipc_start)
       ipcProvider = getIpcProvider()
+      ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_ipc_finish)
       const web3 = new Web3(fornoMode ? getHttpProvider(DEFAULT_FORNO_URL) : ipcProvider)
 
       Logger.info(`${TAG}@initContractKit`, 'Initializing wallet')
+      ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_wallet_start)
       gethWallet = new RpcWallet(ipcProvider)
+      ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_wallet_finish)
       yield call([gethWallet, gethWallet.init])
+      ValoraAnalytics.track(ContractKitEvents.init_contractkit_init_wallet_finish)
       Logger.info(
         `${TAG}@initContractKit`,
         `Initialized wallet with accounts: ${gethWallet.getAccounts()}`
       )
       contractKit = newKitFromWeb3(web3, gethWallet)
       Logger.info(`${TAG}@initContractKit`, 'Initialized kit')
+      ValoraAnalytics.track(ContractKitEvents.init_contractkit_finish)
       return
     } catch (error) {
       if (isProviderConnectionError(error)) {
