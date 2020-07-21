@@ -55,6 +55,10 @@ export const pagePaths = {
     name: 'Join',
     link: '/jobs',
   },
+  MERCHANTS: {
+    name: 'MerchantKit',
+    link: '/experience/merchants',
+  },
   PRIVACY: {
     name: 'Privacy Policy',
     link: '/privacy',
