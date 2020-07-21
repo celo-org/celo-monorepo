@@ -1,7 +1,8 @@
 import { GetServerSideProps } from 'next'
+import getConfig from 'next/config'
 import { Props } from 'src/experience/contentful/Dynamic'
 import { getKit, getPage } from 'src/utils/contentful'
-import getConfig from 'next/config'
+
 const getServerSideProps: GetServerSideProps<
   Props,
   { kit: string; kitPage: string }
@@ -39,11 +40,3 @@ const getServerSideProps: GetServerSideProps<
 }
 
 export default getServerSideProps
-
-function appendLocale(locale) {
-  if (locale === 'en-US') {
-    return ''
-  } else {
-    return `?locale=${locale}`
-  }
-}

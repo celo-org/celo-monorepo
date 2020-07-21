@@ -50,7 +50,9 @@ export async function getKit(kitSlug: string, { preview, locale }): Promise<Inte
     sidebar: data.pages_.map((page) => {
       return {
         title: page.fields.title,
-        href: `/experience/${kitSlug}${page.fields.slug === 'index' ? '' : '/' + page.fields.slug}`,
+        href: `/experience/${kitSlug}${
+          page.fields.slug === 'index' ? '' : '/' + page.fields.slug
+        }${addLocale(locale)}`,
         sections: [],
       }
     }),
@@ -75,4 +77,12 @@ export async function getPage(pageSlug: string, { preview, locale }) {
 
   const sections = data.sections.map((section) => section.fields)
   return { ...data, sections }
+}
+
+export function addLocale(locale) {
+  if (locale === 'en-US') {
+    return ''
+  } else {
+    return `?locale=${locale}`
+  }
 }
