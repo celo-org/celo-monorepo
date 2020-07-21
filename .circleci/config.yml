@@ -799,13 +799,6 @@ jobs:
       - attach_workspace:
           at: ~/app
       - run:
-          name: Install node 10 and dependencies
-          command: |
-            brew uninstall --ignore-dependencies node icu4c
-            brew install node@10
-            brew link --overwrite --force node@10
-            yarn
-      - run:
           name: Check if the test should run
           command: |
             ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
