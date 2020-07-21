@@ -131,11 +131,20 @@ export function navigateBack(params?: object) {
     })
 }
 
-export function navigateHome(params?: object) {
+interface NavigateHomeOptions {
+  onAfterNavigate?: () => void
+  params?: StackParamList[Screens.DrawerNavigator]
+}
+
+export function navigateHome({ onAfterNavigate, params }: NavigateHomeOptions) {
   navigationRef.current?.reset({
     index: 0,
     routes: [{ name: Screens.DrawerNavigator, params }],
   })
+
+  if (onAfterNavigate) {
+    requestAnimationFrame(onAfterNavigate)
+  }
 }
 
 export function navigateToError(errorMessage: string, error?: Error) {

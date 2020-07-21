@@ -29,7 +29,12 @@ interface StateProps {
   phoneNumber: string | null
 }
 
+interface DispatchProps {
+  approveAccountAuth: typeof approveAccountAuth
+}
+
 type Props = StateProps &
+  DispatchProps &
   WithTranslation &
   StackScreenProps<StackParamList, Screens.DappKitAccountAuth>
 
@@ -37,6 +42,10 @@ const mapStateToProps = (state: RootState): StateProps => ({
   account: currentAccountSelector(state),
   phoneNumber: e164NumberSelector(state),
 })
+
+const mapDispatchToProps = {
+  approveAccountAuth,
+}
 
 class DappKitAccountAuthScreen extends React.Component<Props, State> {
   static navigationOptions = { header: null }
@@ -72,7 +81,7 @@ class DappKitAccountAuthScreen extends React.Component<Props, State> {
       Logger.error(TAG, 'No phone number set up for this wallet')
       return
     }
-    navigateHome({ dispatchAfterNavigate: approveAccountAuth(request) })
+    navigateHome({ onAfterNavigate: () => this.props.approveAccountAuth(request) })
   }
 
   cancel = () => {
@@ -169,6 +178,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<StateProps, null, {}, RootState>(mapStateToProps)(
-  withTranslation<Props>(Namespaces.dappkit)(DappKitAccountAuthScreen)
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation<Props>(Namespaces.dappkit)(DappKitAccountAuthScreen))

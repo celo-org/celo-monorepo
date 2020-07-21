@@ -55,7 +55,7 @@ class DappKitSignTxScreen extends React.Component<Props, State> {
       return
     }
 
-    navigateHome({ dispatchAfterNavigate: requestTxSignature(this.state.request!) })
+    navigateHome({ onAfterNavigate: () => this.props.requestTxSignature(this.state.request!) })
   }
 
   showDetails = () => {
