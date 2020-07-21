@@ -1,8 +1,13 @@
 import { RpcWallet, RpcWalletErrors } from '@celo/contractkit/lib/wallets/rpc-wallet'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { generateKeys, generateMnemonic, MnemonicStrength } from '@celo/utils/src/account'
-import { eqAddress, hexToBuffer, privateKeyToAddress } from '@celo/utils/src/address'
-import { compressedPubKey, deriveCEK } from '@celo/utils/src/commentEncryption'
+import {
+  ensureLeading0x,
+  eqAddress,
+  hexToBuffer,
+  privateKeyToAddress,
+} from '@celo/utils/src/address'
+import { compressedPubKey, deriveDEK } from '@celo/utils/src/dataEncryptionKey'
 import * as bip39 from 'react-native-bip39'
 import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { setAccountCreationTime, setPromptForno } from 'src/account/actions'
@@ -178,13 +183,13 @@ export function* getOrCreateAccount() {
       throw new Error('Failed to generate mnemonic')
     }
 
-    const keys = yield call(generateKeys, mnemonic, undefined, undefined, bip39)
+    const keys = yield call(generateKeys, mnemonic, undefined, undefined, undefined, bip39)
     privateKey = keys.privateKey
     if (!privateKey) {
       throw new Error('Failed to convert mnemonic to hex')
     }
 
-    const accountAddress: string = yield call(assignAccountFromPrivateKey, privateKey)
+    const accountAddress: string = yield call(assignAccountFromPrivateKey, privateKey, mnemonic)
     if (!accountAddress) {
       throw new Error('Failed to assign account from private key')
     }
@@ -199,7 +204,7 @@ export function* getOrCreateAccount() {
   }
 }
 
-export function* assignAccountFromPrivateKey(privateKey: string) {
+export function* assignAccountFromPrivateKey(privateKey: string, mnemonic: string) {
   try {
     const account = privateKeyToAddress(privateKey)
     const wallet: RpcWallet = yield call(getWallet)
@@ -221,18 +226,16 @@ export function* assignAccountFromPrivateKey(privateKey: string) {
     Logger.debug(TAG + '@assignAccountFromPrivateKey', `Added to wallet: ${account}`)
     yield put(setAccount(account))
     yield put(setAccountCreationTime())
-    yield call(assignDataKeyFromPrivateKey, privateKey)
+
+    const { privateKey: DekPrivateKey } = yield call(deriveDEK, mnemonic, bip39)
+    yield put(setDataEncryptionKey(ensureLeading0x(DekPrivateKey)))
+
     ValoraAnalytics.setUserAddress(account)
     return account
   } catch (e) {
     Logger.error(TAG + '@assignAccountFromPrivateKey', 'Error assigning account', e)
     throw e
   }
-}
-
-function* assignDataKeyFromPrivateKey(privateKey: string) {
-  const privateCEK = deriveCEK(privateKey).toString('hex')
-  yield put(setDataEncryptionKey(privateCEK))
 }
 
 // Register the address and DEK with the Accounts contract

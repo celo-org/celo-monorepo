@@ -4,10 +4,9 @@
 
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { IdentifierLookupResult } from '@celo/contractkit/lib/wrappers/Attestations'
-import { bufferToHex, eqAddress, hexToBuffer } from '@celo/utils/src/address'
+import { eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import {
   decryptComment as decryptCommentRaw,
-  deriveCEK,
   encryptComment as encryptCommentRaw,
 } from '@celo/utils/src/commentEncryption'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
@@ -30,7 +29,6 @@ import {
 } from 'src/identity/reducer'
 import { NewTransactionsInFeedAction } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
-import { setDataEncryptionKey } from 'src/web3/actions'
 import { getContractKit } from 'src/web3/contracts'
 import { dataEncryptionKeySelector } from 'src/web3/selectors'
 
@@ -41,13 +39,6 @@ const METADATA_CONTENT_SEPARATOR = '~'
 const PHONE_METADATA_REGEX = new RegExp(
   `(.*)${METADATA_CONTENT_SEPARATOR}([+][1-9][0-9]{1,14})([a-zA-Z0-9+/]{13})$`
 )
-
-// Derive a new comment key from the provided private key
-export function* createCommentKey(seedPrivateKey: string) {
-  Logger.debug(TAG, 'Creating a new comment key')
-  const privateCEK = bufferToHex(deriveCEK(seedPrivateKey))
-  yield put(setDataEncryptionKey(privateCEK))
-}
 
 export function* getCommentKey(address: string) {
   const contractKit = yield call(getContractKit)
