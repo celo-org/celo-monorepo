@@ -71,9 +71,7 @@ export function VerificationFailedModal({ verificationStatus, retryWithForno, fo
         onContinue={onRetry}
       />
     )
-  }
-
-  if (allowEnterCodes) {
+  } else if (allowEnterCodes) {
     // Option to enter codes if reveal attempt failed
     return (
       <WarningModal
@@ -82,14 +80,12 @@ export function VerificationFailedModal({ verificationStatus, retryWithForno, fo
         body1={t('failModal.body1')}
         body2={t('failModal.enterCodesBody')}
         continueTitle={t('education.skip')}
-        cancelTitle={t('global:goBack')}
+        cancelTitle={t('failModal.enterCodesButton')}
         onCancel={onDismiss}
         onContinue={onSkip}
       />
     )
-  }
-
-  if (userBalanceInsufficient) {
+  } else if (userBalanceInsufficient) {
     // Show userBalanceInsufficient message and skip verification
     return (
       <WarningModal
@@ -101,9 +97,7 @@ export function VerificationFailedModal({ verificationStatus, retryWithForno, fo
         onContinue={onSkip}
       />
     )
-  }
-
-  if (saltQuotaExceeded) {
+  } else if (saltQuotaExceeded) {
     // Show saltQuotaExceeded message and skip verification
     return (
       <WarningModal
@@ -115,17 +109,17 @@ export function VerificationFailedModal({ verificationStatus, retryWithForno, fo
         onContinue={onSkip}
       />
     )
+  } else {
+    return (
+      // Show general error and skip verification
+      <WarningModal
+        isVisible={isVisible}
+        header={t('failModal.header')}
+        body1={t('failModal.body1')}
+        body2={t('failModal.body2')}
+        continueTitle={t('education.skip')}
+        onContinue={onSkip}
+      />
+    )
   }
-
-  return (
-    // Show general error and skip verification
-    <WarningModal
-      isVisible={isVisible}
-      header={t('failModal.header')}
-      body1={t('failModal.body1')}
-      body2={t('failModal.body2')}
-      continueTitle={t('education.skip')}
-      onContinue={onSkip}
-    />
-  )
 }

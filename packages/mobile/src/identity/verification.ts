@@ -6,6 +6,7 @@ import {
   AttestationsWrapper,
   UnselectedRequest,
 } from '@celo/contractkit/lib/wrappers/Attestations'
+
 import { eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import { retryAsync } from '@celo/utils/src/async'
 import { AttestationsStatus, extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
@@ -337,8 +338,20 @@ function* requestAttestations(
     phoneHash,
     account
   )
+  let isUnselectedRequestValid = unselectedRequest.blockNumber !== 0
+  if (isUnselectedRequestValid) {
+    isUnselectedRequestValid = !(yield call(
+      [attestationsWrapper, attestationsWrapper.isAttestationExpired],
+      unselectedRequest.blockNumber
+    ))
+  }
 
-  if (unselectedRequest.blockNumber === 0) {
+  if (isUnselectedRequestValid) {
+    Logger.debug(
+      `${TAG}@requestAttestations`,
+      `Valid unselected request found, skipping approval/request`
+    )
+  } else {
     Logger.debug(
       `${TAG}@requestAttestations`,
       `Approving ${numAttestationsRequestsNeeded} new attestations`
@@ -364,11 +377,6 @@ function* requestAttestations(
 
     yield call(sendTransaction, requestTx.txo, account, TAG, 'Request Attestations')
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_request_tx_sent)
-  } else {
-    Logger.debug(
-      `${TAG}@requestAttestations`,
-      `Unselected request found, skipping approval/request`
-    )
   }
 
   Logger.debug(`${TAG}@requestAttestations`, 'Waiting for block to select issuer')
@@ -565,7 +573,7 @@ function* tryRevealPhoneNumber(
     }
 
     if (body.error && body.error.includes('Attestation already sent')) {
-      Logger.debug(TAG + '@tryRevealPhoneNumber', `Ignore already sent SMS for issuer: ${issuer}`)
+      Logger.warn(TAG + '@tryRevealPhoneNumber', `Ignore already sent SMS for issuer: ${issuer}`)
       return
     }
 
