@@ -136,7 +136,8 @@ interface NavigateHomeOptions {
   params?: StackParamList[Screens.DrawerNavigator]
 }
 
-export function navigateHome({ onAfterNavigate, params }: NavigateHomeOptions) {
+export function navigateHome(options?: NavigateHomeOptions) {
+  const { onAfterNavigate, params } = options ?? {}
   navigationRef.current?.reset({
     index: 0,
     routes: [{ name: Screens.DrawerNavigator, params }],
