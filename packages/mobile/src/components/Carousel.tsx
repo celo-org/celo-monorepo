@@ -1,138 +1,104 @@
-/**
- * A custom style carousel based on react-native-snap-carousel
- */
-
-import colors from '@celo/react-components/styles/colors.v2'
+import Card from '@celo/react-components/components/Card'
+import Pagination from '@celo/react-components/components/Pagination'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
+import progressDots from '@celo/react-components/styles/progressDots'
+import { Spacing } from '@celo/react-components/styles/styles.v2'
 import variables from '@celo/react-components/styles/variables'
-import * as React from 'react'
-import { Platform, StyleSheet, Text, View, ViewStyle } from 'react-native'
-import { BoxShadow } from 'react-native-shadow'
-import RNCarousel, { Pagination } from 'react-native-snap-carousel'
+import React, { useState } from 'react'
+import {
+  Image,
+  ImageSourcePropType,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  ScrollView,
+  StyleProp,
+  StyleSheet,
+  Text,
+  View,
+  ViewStyle,
+} from 'react-native'
 
-const ITEM_WIDTH = variables.width - 70
-const ITEM_HEIGHT = 300
-
-interface OwnProps {
-  containerStyle: ViewStyle
-  items: CarouselItem[]
-}
+const ITEM_WIDTH = variables.width - Spacing.Thick24 * 2
+const ITEM_HEIGHT = ITEM_WIDTH * (211 / 292)
+// Visible width of items which are on the left/right of the active item
+const ITEM_PARTIAL_VISIBLE_WIDTH = Spacing.Smallest8
+const ITEM_HORIZONTAL_SPACING = Spacing.Regular16
+const ITEM_SNAP_INTERVAL = ITEM_WIDTH + ITEM_HORIZONTAL_SPACING
 
 export interface CarouselItem {
   text: string
-  icon?: React.ReactElement
+  icon: ImageSourcePropType
 }
 
-function renderItem({ item, index }: { item: CarouselItem; index: number }) {
+interface Props {
+  style: StyleProp<ViewStyle>
+  items: CarouselItem[]
+}
+
+function Carousel({ items, style }: Props) {
+  const [activeIndex, setActiveIndex] = useState(0)
+
+  const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const newActiveIndex = Math.round(event.nativeEvent.contentOffset.x / ITEM_SNAP_INTERVAL)
+
+    if (newActiveIndex === activeIndex) {
+      return
+    }
+
+    setActiveIndex(newActiveIndex)
+  }
+
   return (
-    <View style={styles.itemWrapper}>
-      {Platform.OS === 'android' ? (
-        <BoxShadow setting={shadowOpt}>
-          <View style={styles.itemContainer}>
-            {item.icon}
+    <View style={style}>
+      <ScrollView
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+        snapToInterval={ITEM_SNAP_INTERVAL}
+        decelerationRate="fast"
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollViewContent}
+        onScroll={onScroll}
+      >
+        {items.map((item, index) => (
+          <Card key={index} rounded={true} style={styles.card}>
+            <Image source={item.icon} />
             <Text style={styles.itemText}>{item.text}</Text>
-          </View>
-        </BoxShadow>
-      ) : (
-        <View style={styles.itemContainer}>
-          {item.icon}
-          <Text style={styles.itemText}>{item.text}</Text>
-        </View>
-      )}
-    </View>
-  )
-}
-
-function Carousel(props: OwnProps) {
-  const ref = React.useRef(null)
-  const [activeItem, setActiveItem] = React.useState(0)
-
-  return (
-    <View style={props.containerStyle}>
-      {/* For some reason the carousel is adding a bunch of item height, wrapping to cut it off*/}
-      <View style={styles.carouselContainer}>
-        <RNCarousel
-          ref={ref}
-          data={props.items}
-          renderItem={renderItem}
-          sliderWidth={variables.width}
-          sliderHeight={ITEM_HEIGHT}
-          itemWidth={ITEM_WIDTH}
-          itemHeight={ITEM_HEIGHT}
-          inactiveSlideScale={0.9}
-          inactiveSlideOpacity={1}
-          onSnapToItem={setActiveItem}
-          removeClippedSubviews={false}
-        />
-      </View>
+          </Card>
+        ))}
+      </ScrollView>
       <Pagination
-        dotsLength={props.items.length}
-        activeDotIndex={activeItem}
-        containerStyle={styles.paginationContainer}
-        dotColor={colors.onboardingBlue}
-        inactiveDotColor={colors.onboardingBrownLight}
-        inactiveDotOpacity={0.5}
-        inactiveDotScale={1}
-        carouselRef={ref as any}
-        tappableDots={false}
+        count={items.length}
+        activeIndex={activeIndex}
+        dotStyle={progressDots.circlePassiveOnboarding}
+        activeDotStyle={progressDots.circleActiveOnboarding}
       />
     </View>
   )
 }
 
-const RADIUS = 8
-const OPACITY = 0.15
-
-const shadowOpt = {
-  width: ITEM_WIDTH,
-  height: ITEM_HEIGHT,
-  color: '#6b7b8b',
-  border: 1,
-  opacity: 0.02,
-  radius: 12,
-  x: 0,
-  y: 0,
-  style: {
-    padding: 3,
-  },
-}
-
 const styles = StyleSheet.create({
-  itemContainer: {
-    padding: 20,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 2,
-    borderColor: 'rgba(255, 255, 255, 0.5)',
-    borderRadius: 12,
-    width: ITEM_WIDTH - 6,
-    height: ITEM_HEIGHT - 6,
+  scrollView: {
+    overflow: 'visible',
+  },
+  scrollViewContent: {
+    paddingHorizontal: ITEM_HORIZONTAL_SPACING / 2 + ITEM_PARTIAL_VISIBLE_WIDTH,
+    // top and bottom padding are needed
+    // on Android so the shadow is not clipped
+    paddingTop: 10,
+    paddingBottom: 25,
+  },
+  card: {
+    padding: Spacing.Thick24,
+    width: ITEM_WIDTH,
+    height: ITEM_HEIGHT,
+    marginHorizontal: ITEM_HORIZONTAL_SPACING / 2,
     alignItems: 'center',
     justifyContent: 'center',
-    // Android only
-    elevation: 1,
-    // iOS only
-    shadowOpacity: OPACITY,
-    shadowRadius: RADIUS,
-    shadowColor: colors.dark,
-    shadowOffset: { height: 0, width: 0 },
-  },
-  itemWrapper: {
-    paddingVertical: 15,
-    position: 'relative',
-    overflow: 'visible',
   },
   itemText: {
     ...fontStyles.regular,
     textAlign: 'center',
-    marginTop: 20,
-  },
-  carouselContainer: {
-    height: ITEM_HEIGHT + 30,
-    overflow: 'visible',
-  },
-  paginationContainer: {
-    marginTop: 0,
-    paddingVertical: 0,
+    marginTop: Spacing.Small12,
   },
 })
 

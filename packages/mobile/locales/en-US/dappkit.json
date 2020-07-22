@@ -1,5 +1,5 @@
 {
-  "connectToWallet": "{{dappname}} would like to connect to {{appName}}",
+  "connectToWallet": "{{dappName}} would like to connect to {{appName}}",
   "connect": "Connect",
   "cancel": "Cancel",
   "allow": "Allow",
