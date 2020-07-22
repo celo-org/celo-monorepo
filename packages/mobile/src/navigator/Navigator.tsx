@@ -116,9 +116,21 @@ const commonScreens = (Navigator: typeof Stack) => {
       />
       <Navigator.Screen name={Screens.ErrorScreen} component={ErrorScreen} options={noHeader} />
       <Navigator.Screen name={Screens.UpgradeScreen} component={UpgradeScreen} />
-      <Navigator.Screen name={Screens.DappKitAccountAuth} component={DappKitAccountScreen} />
-      <Navigator.Screen name={Screens.DappKitSignTxScreen} component={DappKitSignTxScreen} />
-      <Navigator.Screen name={Screens.DappKitTxDataScreen} component={DappKitTxDataScreen} />
+      <Navigator.Screen
+        name={Screens.DappKitAccountAuth}
+        component={DappKitAccountScreen}
+        options={DappKitAccountScreen.navigationOptions}
+      />
+      <Navigator.Screen
+        name={Screens.DappKitSignTxScreen}
+        component={DappKitSignTxScreen}
+        options={DappKitSignTxScreen.navigationOptions}
+      />
+      <Navigator.Screen
+        name={Screens.DappKitTxDataScreen}
+        component={DappKitTxDataScreen}
+        options={DappKitTxDataScreen.navigationOptions}
+      />
       <Navigator.Screen name={Screens.Debug} component={Debug} options={Debug.navigationOptions} />
       <Navigator.Screen
         name={Screens.PhoneNumberLookupQuota}

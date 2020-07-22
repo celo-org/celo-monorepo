@@ -241,7 +241,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
           ]
         }
       >
-        amount
+        global:amount
       </Text>
     </View>
     <Text
