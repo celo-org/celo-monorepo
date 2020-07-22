@@ -2,11 +2,11 @@ import { NativeSigner, verifySignature } from '@celo/utils/lib/signatureUtils'
 import { execSync } from 'child_process'
 import fetch from 'cross-fetch'
 import debugFactory from 'debug'
-import { writeFile } from 'fs'
+import { mkdirSync, writeFile } from 'fs'
+import { parse } from 'path'
 import { ContractKit } from '../kit'
 import { ClaimTypes } from './claims/types'
 import { IdentityMetadataWrapper } from './metadata'
-
 const debug = debugFactory('offchaindata')
 
 export default class OffchainDataWrapper {
@@ -49,6 +49,20 @@ export default class OffchainDataWrapper {
   }
 }
 
+export class NameSchema {
+  constructor(readonly wrapper: OffchainDataWrapper) {}
+
+  DATAPATH = '/account/name'
+  readName(account: string) {
+    return this.wrapper.readDataFrom(account, this.DATAPATH)
+  }
+
+  async writeName(name: string) {
+    await this.wrapper.writeDataTo(name, this.DATAPATH)
+    return
+  }
+}
+
 abstract class StorageWriter {
   abstract write(_data: string, _dataPath: string): Promise<void>
 }
@@ -63,7 +77,8 @@ export class LocalStorageWriter extends StorageWriter {
 
   protected async writeToFs(data: string, dataPath: string): Promise<void> {
     await new Promise((resolve, reject) => {
-      // TODO: Create necessary folders
+      const directory = parse(dataPath).dir
+      mkdirSync(this.root + directory, { recursive: true })
       writeFile(this.root + dataPath, data, (error) => {
         if (error) {
           reject(error)

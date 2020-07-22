@@ -1,3 +1,4 @@
+import { NameSchema } from '@celo/contractkit/src/identity/offchain-data-wrapper'
 import { flags } from '@oclif/command'
 import { OffchainDataCommand } from '../../utils/off-chain-data'
 
@@ -20,6 +21,7 @@ export default class Register extends OffchainDataCommand {
   async run() {
     const res = this.parse(Register)
     this.kit.defaultAccount = res.flags.from
-    await this.offchainDataWrapper.writeDataTo(res.flags.message, '/testname')
+    const nameSchema = new NameSchema(this.offchainDataWrapper)
+    await nameSchema.writeName(res.flags.message)
   }
 }
