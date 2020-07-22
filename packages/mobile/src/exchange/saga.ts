@@ -3,6 +3,7 @@ import { ExchangeWrapper } from '@celo/contractkit/lib/wrappers/Exchange'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
 import { ReserveWrapper } from '@celo/contractkit/lib/wrappers/Reserve'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
+import { CELO_AMOUNT_FOR_ESTIMATE, DOLLAR_AMOUNT_FOR_ESTIMATE } from '@celo/utils/src/celoHistory'
 import BigNumber from 'bignumber.js'
 import { all, call, put, select, spawn, takeEvery, takeLatest } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
@@ -40,11 +41,6 @@ import * as util from 'util'
 
 const TAG = 'exchange/saga'
 
-// Amounts to estimate the exchange rate, as the rate varies based on transaction size
-// These values needs to be in-sync with the ones here:
-// https://github.com/celo-org/celo-monorepo/blob/master/packages/notification-service/src/exchange/exchangeQuery.ts#L9-L10
-const LARGE_DOLLARS_SELL_AMOUNT_IN_WEI = new BigNumber(10000 * 1000000000000000000) //  100 dollars
-const LARGE_GOLD_SELL_AMOUNT_IN_WEI = new BigNumber(10 * 1000000000000000000) // 10 gold
 const EXCHANGE_DIFFERENCE_TOLERATED = 0.01 // Maximum difference between actual and displayed takerAmount
 
 export function* doFetchTobinTax({ makerAmount, makerToken }: FetchTobinTaxAction) {
@@ -107,11 +103,11 @@ export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
     const goldMakerAmount =
       makerAmountInWei && !makerAmountInWei.isZero() && makerToken === CURRENCY_ENUM.GOLD
         ? makerAmountInWei
-        : LARGE_GOLD_SELL_AMOUNT_IN_WEI
+        : CELO_AMOUNT_FOR_ESTIMATE
     const dollarMakerAmount =
       makerAmountInWei && !makerAmountInWei.isZero() && makerToken === CURRENCY_ENUM.DOLLAR
         ? makerAmountInWei
-        : LARGE_DOLLARS_SELL_AMOUNT_IN_WEI
+        : DOLLAR_AMOUNT_FOR_ESTIMATE
 
     const contractKit = yield call(getContractKit)
 
@@ -215,8 +211,8 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
 
     const exceedsExpectedSize =
       makerToken === CURRENCY_ENUM.GOLD
-        ? convertedMakerAmount.isGreaterThan(LARGE_GOLD_SELL_AMOUNT_IN_WEI)
-        : convertedMakerAmount.isGreaterThan(LARGE_DOLLARS_SELL_AMOUNT_IN_WEI)
+        ? convertedMakerAmount.isGreaterThan(CELO_AMOUNT_FOR_ESTIMATE)
+        : convertedMakerAmount.isGreaterThan(DOLLAR_AMOUNT_FOR_ESTIMATE)
 
     if (exceedsExpectedSize) {
       Logger.error(

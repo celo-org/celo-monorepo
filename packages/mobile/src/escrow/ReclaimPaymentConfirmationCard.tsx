@@ -47,7 +47,7 @@ export default function ReclaimPaymentConfirmationCard({
       <Avatar recipient={recipientContact} e164Number={recipientPhone} />
       <CurrencyDisplay type={DisplayType.Big} amount={amount} />
       <HorizontalLine />
-      <LineItemRow title={t('amount')} amount={<CurrencyDisplay amount={amount} />} />
+      <LineItemRow title={t('global:amount')} amount={<CurrencyDisplay amount={amount} />} />
       <LineItemRow
         title={t('securityFee')}
         titleIcon={<SecurityFeeIcon />}
