@@ -200,7 +200,7 @@ export function* doVerificationFlow() {
       yield put(setVerificationStatus(VerificationStatus.RevealingNumber))
       ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_start)
       yield all([
-        // Set acccount and data encryption key in contract
+        // Set account and data encryption key in contract
         call(setAccount, accountsWrapper, account, dataKey),
         // Request codes for the attestations needed
         call(
