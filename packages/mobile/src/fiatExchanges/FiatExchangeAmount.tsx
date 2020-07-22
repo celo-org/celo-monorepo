@@ -18,7 +18,7 @@ import BackButton from 'src/components/BackButton.v2'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import LineItemRow from 'src/components/LineItemRow'
 import { DOLLAR_ADD_FUNDS_MIN_AMOUNT, DOLLAR_CASH_OUT_MIN_AMOUNT } from 'src/config'
-import { CUSD_MOONPAY_ENABLED } from 'src/flags'
+import { features } from 'src/flags'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import {
@@ -148,7 +148,7 @@ export function ExchangeTradeScreen({ navigation, route }: Props) {
           }
         />
       </KeyboardAwareScrollView>
-      {CUSD_MOONPAY_ENABLED ? (
+      {features.CUSD_MOONPAY_ENABLED ? (
         <Text style={styles.disclaimerCeloDollars}>{t('disclaimerCeloDollars')}</Text>
       ) : (
         <Text style={styles.dollarsNotYetEnabledNote}>
