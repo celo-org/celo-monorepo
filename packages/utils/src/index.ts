@@ -1,6 +1,5 @@
 export { AccountUtils } from './account'
 export { AttestationUtils } from './attestations'
-export { DOLLAR_AMOUNT_FOR_ESTIMATE, CELO_AMOUNT_FOR_ESTIMATE } from './celoHistory'
 export { commentEncryption } from './commentEncryption'
 export * from './contacts'
 export * from './countries'
