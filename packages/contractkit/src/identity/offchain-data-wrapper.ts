@@ -1,12 +1,10 @@
 import { NativeSigner, verifySignature } from '@celo/utils/lib/signatureUtils'
-import { execSync } from 'child_process'
 import fetch from 'cross-fetch'
 import debugFactory from 'debug'
-import { mkdirSync, writeFile } from 'fs'
-import { parse } from 'path'
 import { ContractKit } from '../kit'
 import { ClaimTypes } from './claims/types'
 import { IdentityMetadataWrapper } from './metadata'
+import { StorageWriter } from './offchain/storage-writers'
 const debug = debugFactory('offchaindata')
 
 export default class OffchainDataWrapper {
@@ -46,59 +44,6 @@ export default class OffchainDataWrapper {
     // TODO: Prefix signing abstraction
     const sig = await NativeSigner(this.kit.web3.eth.sign, this.self).sign(data)
     await this.storageWriter.write(sig, dataPath + '.signature')
-  }
-}
-
-export class NameSchema {
-  constructor(readonly wrapper: OffchainDataWrapper) {}
-
-  DATAPATH = '/account/name'
-  readName(account: string) {
-    return this.wrapper.readDataFrom(account, this.DATAPATH)
-  }
-
-  async writeName(name: string) {
-    await this.wrapper.writeDataTo(name, this.DATAPATH)
-    return
-  }
-}
-
-abstract class StorageWriter {
-  abstract write(_data: string, _dataPath: string): Promise<void>
-}
-
-export class LocalStorageWriter extends StorageWriter {
-  constructor(readonly root: string) {
-    super()
-  }
-  async write(data: string, dataPath: string): Promise<void> {
-    return this.writeToFs(data, dataPath)
-  }
-
-  protected async writeToFs(data: string, dataPath: string): Promise<void> {
-    await new Promise((resolve, reject) => {
-      const directory = parse(dataPath).dir
-      mkdirSync(this.root + directory, { recursive: true })
-      writeFile(this.root + dataPath, data, (error) => {
-        if (error) {
-          reject(error)
-        }
-
-        resolve()
-      })
-    })
-  }
-}
-
-export class GitStorageWriter extends LocalStorageWriter {
-  async write(data: string, dataPath: string): Promise<void> {
-    await this.writeToFs(data, dataPath)
-    execSync(`git add ${dataPath.substr(1)}`, {
-      cwd: this.root,
-    })
-    execSync(`git commit --message "Upload ${dataPath}"`, { cwd: this.root })
-    execSync(`git push origin master`, { cwd: this.root })
-    return
   }
 }
 
