@@ -52,8 +52,7 @@ const DefaultConfig = {
   downtimeSlasher: {
     reward: '10000000000000000000', // 10 cGLD
     penalty: '100000000000000000000', // 100 cGLD
-    // slashableDowntime: (8 * HOUR) / 5, // ~8 hours
-    slashableDowntime: (12 * MINUTE) / 5, // ~12 hours
+    slashableDowntime: (8 * HOUR) / 5, // ~8 hours
   },
   election: {
     minElectableValidators: '22',
