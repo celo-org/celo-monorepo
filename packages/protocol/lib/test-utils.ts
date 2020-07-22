@@ -4,16 +4,12 @@ import * as chai from 'chai'
 import * as chaiSubset from 'chai-subset'
 import { spawn, SpawnOptions } from 'child_process'
 import { keccak256 } from 'ethereumjs-util'
-import {
-  ProxyInstance,
-  RegistryInstance,
-  UsingRegistryInstance,
-} from 'types'
+import { ProxyInstance, RegistryInstance, UsingRegistryInstance } from 'types'
+import Web3 from 'web3'
 const soliditySha3 = new (require('web3'))().utils.soliditySha3
 
 // tslint:disable-next-line: ordered-imports
 import BN = require('bn.js')
-import Web3 from 'web3'
 
 const isNumber = (x: any) =>
   typeof x === 'number' || (BN as any).isBN(x) || BigNumber.isBigNumber(x)
@@ -72,11 +68,16 @@ export async function mineBlocks(blocks: number, web3: Web3) {
   }
 }
 
-export async function currentEpochNumber(web3) {
+export async function currentEpochNumber(web3: Web3, epochSize: number = EPOCH) {
   const blockNumber = await web3.eth.getBlockNumber()
+
+  return getEpochNumberOfBlock(blockNumber, epochSize)
+}
+
+export function getEpochNumberOfBlock(blockNumber: number, epochSize: number = EPOCH) {
   // Follows GetEpochNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
-  const epochNumber = Math.floor(blockNumber / EPOCH)
-  if (blockNumber % EPOCH === 0) {
+  const epochNumber = Math.floor(blockNumber / epochSize)
+  if (blockNumber % epochSize === 0) {
     return epochNumber
   } else {
     return epochNumber + 1
@@ -84,18 +85,18 @@ export async function currentEpochNumber(web3) {
 }
 
 // Follows GetEpochFirstBlockNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
-export function getFirstBlockNumberForEpoch(epochNumber: number) {
+export function getFirstBlockNumberForEpoch(epochNumber: number, epochSize: number = EPOCH) {
   if (epochNumber === 0) {
     // No first block for epoch 0
     return 0
   }
-  return (epochNumber - 1) * EPOCH + 1
+  return (epochNumber - 1) * epochSize + 1
 }
 
-export async function mineToNextEpoch(web3) {
+export async function mineToNextEpoch(web3: Web3, epochSize: number = EPOCH) {
   const blockNumber = await web3.eth.getBlockNumber()
-  const epochNumber = await currentEpochNumber(web3)
-  const blocksUntilNextEpoch = getFirstBlockNumberForEpoch(epochNumber + 1) - blockNumber
+  const epochNumber = await currentEpochNumber(web3, epochSize)
+  const blocksUntilNextEpoch = getFirstBlockNumberForEpoch(epochNumber + 1, epochSize) - blockNumber
   await mineBlocks(blocksUntilNextEpoch, web3)
 }
 
