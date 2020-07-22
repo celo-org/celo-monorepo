@@ -53,7 +53,7 @@ export function VerificationFailedModal({ verificationStatus, retryWithForno, fo
 
   const allowEnterCodes = verificationStatus === VerificationStatus.RevealAttemptFailed
   // Only prompt forno switch if not already in forno mode and failure
-  // wasn't due to insuffuicient balance
+  // wasn't due to insuffuicient balance or exceeded quota for lookups
   const promptRetryWithForno =
     retryWithForno && !fornoMode && !userBalanceInsufficient && !saltQuotaExceeded
 
