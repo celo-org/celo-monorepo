@@ -165,9 +165,11 @@ const getFaucetedAccountsForLoadTest = (
   balance: string
 ) => {
   const addresses: string[] = [];
+  // const length = clients.toString.length + threads.toString.length
   for (const c of range(0, clients)) {
     for (const t of range(0, threads)) {
-      addresses.push(strip0x(generateAddress(mnemonic, accountType, parseInt(`${c}${t}`, 10))))
+      const index = c * 10000 + t
+      addresses.push(strip0x(generateAddress(mnemonic, accountType, parseInt(`${index}`, 10))))
     }
   }
   return addresses.map((address) => ({
