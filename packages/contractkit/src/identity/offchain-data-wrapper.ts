@@ -50,72 +50,40 @@ export default class OffchainDataWrapper {
 }
 
 abstract class StorageWriter {
-  // Not thread safe!
-  toFlush: string[] = []
-  pendingFlushing: string[] = []
-
-  uploader: StorageUploader | undefined
-
   abstract write(_data: string, _dataPath: string): Promise<void>
-  abstract flushWrites(): Promise<void>
-  abstract shouldFlushWrites(): boolean
 }
 
 export class LocalStorageWriter extends StorageWriter {
   constructor(readonly root: string) {
     super()
   }
-  write(data: string, dataPath: string): Promise<void> {
-    return new Promise((resolve, reject) => {
+  async write(data: string, dataPath: string): Promise<void> {
+    return this.writeToFs(data, dataPath)
+  }
+
+  protected async writeToFs(data: string, dataPath: string): Promise<void> {
+    await new Promise((resolve, reject) => {
       // TODO: Create necessary folders
       writeFile(this.root + dataPath, data, (error) => {
         if (error) {
           reject(error)
         }
-        this.toFlush.push(dataPath)
+
         resolve()
       })
     })
   }
-
-  async flushWrites() {
-    if (this.uploader === undefined) {
-      throw new Error('No uploader to flush writes on')
-    }
-    if (this.pendingFlushing.length > 0) {
-      throw new Error('flushing in progress')
-    }
-
-    this.pendingFlushing = this.toFlush
-    this.toFlush = []
-    await this.uploader.upload(this.pendingFlushing)
-    this.pendingFlushing = []
-    return
-  }
-  shouldFlushWrites() {
-    return this.uploader === undefined
-  }
 }
 
-abstract class StorageUploader {
-  abstract upload(dataPaths: string[]): Promise<void>
-}
-
-export class GitStorageUploader extends StorageUploader {
-  constructor(readonly root: string) {
-    super()
-  }
-  upload(dataPaths: string[]) {
-    dataPaths.forEach((path) =>
-      execSync(`git add ${path.substr(1)}`, {
-        cwd: this.root,
-      })
-    )
-
-    execSync(`git commit --message "Upload"`, { cwd: this.root })
-
+export class GitStorageWriter extends LocalStorageWriter {
+  async write(data: string, dataPath: string): Promise<void> {
+    await this.writeToFs(data, dataPath)
+    execSync(`git add ${dataPath.substr(1)}`, {
+      cwd: this.root,
+    })
+    execSync(`git commit --message "Upload ${dataPath}"`, { cwd: this.root })
     execSync(`git push origin master`, { cwd: this.root })
-    return Promise.resolve()
+    return
   }
 }
 

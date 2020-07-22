@@ -7,7 +7,7 @@ export default class Register extends OffchainDataCommand {
 
   static flags = {
     ...OffchainDataCommand.flags,
-    name: flags.string(),
+    message: flags.string({ required: true }),
   }
 
   static args = []
@@ -20,8 +20,6 @@ export default class Register extends OffchainDataCommand {
   async run() {
     const res = this.parse(Register)
     this.kit.defaultAccount = res.flags.from
-    await this.offchainDataWrapper.writeDataTo('Hello 3', '/testname')
-    // @ts-ignore cant encode that we set it in OffchainDataCommand.init
-    await this.offchainDataWrapper.storageWriter.flushWrites()
+    await this.offchainDataWrapper.writeDataTo(res.flags.message, '/testname')
   }
 }
