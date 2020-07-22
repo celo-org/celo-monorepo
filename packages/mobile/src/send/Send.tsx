@@ -100,8 +100,17 @@ export const sendScreenNavOptions = ({
 }: {
   route: RouteProp<StackParamList, Screens.Send>
 }) => {
-  const goQr = () => navigate(Screens.QRNavigator)
-  const title = route.params?.isRequest
+  const isOutgoingPaymentRequest = route.params?.isOutgoingPaymentRequest
+
+  const goToQRScanner = () =>
+    navigate(Screens.QRNavigator, {
+      screen: Screens.QRScanner,
+      params: {
+        isOutgoingPaymentRequest,
+      },
+    })
+
+  const title = isOutgoingPaymentRequest
     ? i18n.t('paymentRequestFlow:request')
     : i18n.t('sendFlow7:send')
 
@@ -111,15 +120,15 @@ export const sendScreenNavOptions = ({
       <TopBarIconButton
         icon={<Times />}
         onPress={navigateBack}
-        eventName={route.params?.isRequest ? RequestEvents.request_cancel : SendEvents.send_cancel}
+        eventName={isOutgoingPaymentRequest ? RequestEvents.request_cancel : SendEvents.send_cancel}
       />
     ),
     headerLeftContainerStyle: styles.headerLeftContainer,
     headerRight: () => (
       <TopBarIconButton
         icon={<QRCodeBorderlessIcon height={32} color={colors.greenUI} />}
-        eventName={route.params?.isRequest ? RequestEvents.request_scan : SendEvents.send_scan}
-        onPress={goQr}
+        eventName={isOutgoingPaymentRequest ? RequestEvents.request_scan : SendEvents.send_scan}
+        onPress={goToQRScanner}
       />
     ),
     headerRightContainerStyle: styles.headerRightContainer,
@@ -215,7 +224,7 @@ class Send extends React.Component<Props, State> {
 
   onSelectRecipient = (recipient: Recipient) => {
     this.props.hideAlert()
-    const isRequest = this.props.route.params?.isRequest ?? false
+    const isOutgoingPaymentRequest = this.props.route.params?.isOutgoingPaymentRequest
 
     if (!recipient.e164PhoneNumber && !recipient.address) {
       this.props.showError(ErrorMessages.CANT_SELECT_INVALID_PHONE)
@@ -225,14 +234,16 @@ class Send extends React.Component<Props, State> {
     this.props.storeLatestInRecents(recipient)
 
     ValoraAnalytics.track(
-      isRequest ? RequestEvents.request_select_recipient : SendEvents.send_select_recipient,
+      isOutgoingPaymentRequest
+        ? RequestEvents.request_select_recipient
+        : SendEvents.send_select_recipient,
       {
         recipientKind: recipient.kind,
         usedSearchBar: this.state.searchQuery.length > 0,
       }
     )
 
-    navigate(Screens.SendAmount, { recipient, isRequest })
+    navigate(Screens.SendAmount, { recipient, isOutgoingPaymentRequest })
   }
 
   onPressStartVerification = () => {

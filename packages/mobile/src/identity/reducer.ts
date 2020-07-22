@@ -34,10 +34,14 @@ export enum AddressValidationType {
 }
 
 export interface SecureSendPhoneNumberMapping {
-  [e164Number: string]: {
-    address: string | undefined
-    addressValidationType: AddressValidationType
-  }
+  [e164Number: string]: SecureSendDetails
+}
+
+export interface SecureSendDetails {
+  address: string | undefined
+  addressValidationType: AddressValidationType
+  isFetchingAddresses: boolean | undefined
+  validationSuccessful: boolean | undefined
 }
 
 export interface State {
@@ -57,9 +61,7 @@ export interface State {
   importContactsProgress: ImportContactProgress
   // Contacts found during the matchmaking process
   matchedContacts: ContactMatches
-  isValidRecipient: boolean
   secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
-  isFetchingAddresses: boolean
 }
 
 const initialState: State = {
@@ -78,9 +80,7 @@ const initialState: State = {
     total: 0,
   },
   matchedContacts: {},
-  isValidRecipient: false,
   secureSendPhoneNumberMapping: {},
-  isFetchingAddresses: false,
 }
 
 export const reducer = (
@@ -184,15 +184,9 @@ export const reducer = (
         ...state,
         matchedContacts,
       }
-    case Actions.VALIDATE_RECIPIENT_ADDRESS:
-      return {
-        ...state,
-        isValidRecipient: false,
-      }
     case Actions.VALIDATE_RECIPIENT_ADDRESS_SUCCESS:
       return {
         ...state,
-        isValidRecipient: true,
         // Overwrite the previous mapping when a new address is validated
         secureSendPhoneNumberMapping: dotProp.set(
           state.secureSendPhoneNumberMapping,
@@ -200,13 +194,22 @@ export const reducer = (
           {
             address: action.validatedAddress,
             addressValidationType: AddressValidationType.NONE,
+            validationSuccessful: true,
           }
+        ),
+      }
+    case Actions.VALIDATE_RECIPIENT_ADDRESS_RESET:
+      return {
+        ...state,
+        secureSendPhoneNumberMapping: dotProp.set(
+          state.secureSendPhoneNumberMapping,
+          `${action.e164Number}.validationSuccessful`,
+          false
         ),
       }
     case Actions.REQUIRE_SECURE_SEND:
       return {
         ...state,
-        isValidRecipient: false,
         // Erase the previous mapping when new validation is required
         secureSendPhoneNumberMapping: dotProp.set(
           state.secureSendPhoneNumberMapping,
@@ -220,12 +223,20 @@ export const reducer = (
     case Actions.FETCH_ADDRESSES_AND_VALIDATION_STATUS:
       return {
         ...state,
-        isFetchingAddresses: true,
+        secureSendPhoneNumberMapping: dotProp.set(
+          state.secureSendPhoneNumberMapping,
+          `${action.e164Number}.isFetchingAddresses`,
+          true
+        ),
       }
     case Actions.END_FETCHING_ADDRESSES:
       return {
         ...state,
-        isFetchingAddresses: false,
+        secureSendPhoneNumberMapping: dotProp.set(
+          state.secureSendPhoneNumberMapping,
+          `${action.e164Number}.isFetchingAddresses`,
+          false
+        ),
       }
     default:
       return state
@@ -258,4 +269,3 @@ export const secureSendPhoneNumberMappingSelector = (state: RootState) =>
 export const importContactsProgressSelector = (state: RootState) =>
   state.identity.importContactsProgress
 export const matchedContactsSelector = (state: RootState) => state.identity.matchedContacts
-export const isFetchingAddressesSelector = (state: RootState) => state.identity.isFetchingAddresses

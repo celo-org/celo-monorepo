@@ -71,12 +71,13 @@ export function* watchQrCodeDetections() {
     const addressToE164Number = yield select(addressToE164NumberSelector)
     const recipientCache = yield select(recipientCacheSelector)
     const e164NumberToAddress = yield select(e164NumberToAddressSelector)
+    const isOutgoingPaymentRequest = action.isOutgoingPaymentRequest
     let secureSendTxData
-    let isOutgoingPaymentRequest
+    let requesterAddress
 
     if (action.scanIsForSecureSend) {
       secureSendTxData = action.transactionData
-      isOutgoingPaymentRequest = action.isOutgoingPaymentRequest
+      requesterAddress = action.requesterAddrress
     }
 
     try {
@@ -87,7 +88,8 @@ export function* watchQrCodeDetections() {
         recipientCache,
         e164NumberToAddress,
         secureSendTxData,
-        isOutgoingPaymentRequest
+        isOutgoingPaymentRequest,
+        requesterAddress
       )
     } catch (error) {
       Logger.error(TAG, 'Error handling the barcode', error)
