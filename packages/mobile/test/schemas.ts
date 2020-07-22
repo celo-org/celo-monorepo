@@ -312,7 +312,6 @@ export const v1Schema = {
       total: 0,
     },
     matchedContacts: {},
-    isValidRecipient: false,
     secureSendPhoneNumberMapping: {},
   },
   transactions: {

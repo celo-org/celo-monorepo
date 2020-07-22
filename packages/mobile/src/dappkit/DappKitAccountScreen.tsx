@@ -11,6 +11,7 @@ import { e164NumberSelector } from 'src/account/selectors'
 import { approveAccountAuth } from 'src/dappkit/dappkit'
 import { Namespaces, withTranslation } from 'src/i18n'
 import DappkitExchangeIcon from 'src/icons/DappkitExchange'
+import { noHeader } from 'src/navigator/Headers.v2'
 import { navigateBack, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -20,16 +21,17 @@ import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'dappkit/DappKitAccountScreen'
 
-interface State {
-  dappName: string | null
-}
-
 interface StateProps {
   account: string | null
   phoneNumber: string | null
 }
 
+interface DispatchProps {
+  approveAccountAuth: typeof approveAccountAuth
+}
+
 type Props = StateProps &
+  DispatchProps &
   WithTranslation &
   StackScreenProps<StackParamList, Screens.DappKitAccountAuth>
 
@@ -38,22 +40,12 @@ const mapStateToProps = (state: RootState): StateProps => ({
   phoneNumber: e164NumberSelector(state),
 })
 
-class DappKitAccountAuthScreen extends React.Component<Props, State> {
-  static navigationOptions = { header: null }
-  state = {
-    dappName: null,
-  }
+const mapDispatchToProps = {
+  approveAccountAuth,
+}
 
-  componentDidMount() {
-    const request = this.props.route.params.dappKitRequest
-
-    if (!request) {
-      Logger.error(TAG, 'No request found in navigation props')
-      return
-    }
-
-    this.setState({ dappName: request.dappName })
-  }
+class DappKitAccountAuthScreen extends React.Component<Props> {
+  static navigationOptions = noHeader
 
   linkBack = () => {
     const { account, route, phoneNumber } = this.props
@@ -72,7 +64,7 @@ class DappKitAccountAuthScreen extends React.Component<Props, State> {
       Logger.error(TAG, 'No phone number set up for this wallet')
       return
     }
-    navigateHome({ dispatchAfterNavigate: approveAccountAuth(request) })
+    navigateHome({ onAfterNavigate: () => this.props.approveAccountAuth(request) })
   }
 
   cancel = () => {
@@ -80,17 +72,15 @@ class DappKitAccountAuthScreen extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, account } = this.props
-    const { dappName } = this.state
+    const { t, account, route } = this.props
+    const { dappName } = route.params.dappKitRequest
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.logo}>
             <DappkitExchangeIcon />
           </View>
-          {dappName && (
-            <Text style={styles.header}>{t('connectToWallet', { dappname: dappName })}</Text>
-          )}
+          {!!dappName && <Text style={styles.header}>{t('connectToWallet', { dappName })}</Text>}
 
           <Text style={styles.share}>{t('shareInfo')}</Text>
 
@@ -169,6 +159,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<StateProps, null, {}, RootState>(mapStateToProps)(
-  withTranslation<Props>(Namespaces.dappkit)(DappKitAccountAuthScreen)
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation<Props>(Namespaces.dappkit)(DappKitAccountAuthScreen))
