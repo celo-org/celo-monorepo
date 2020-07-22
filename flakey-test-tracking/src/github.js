@@ -13,7 +13,6 @@ const {
   parseFirstErrFromFlakeBody,
   parseMandatoryTestIssuesFromPullBody,
   parsePathFromStack,
-  parseTestIdFromFlakeTitle,
 } = require('./utils')
 
 const FlakeLabel = 'FLAKEY'
@@ -204,10 +203,10 @@ class GitHub {
   async fetchKnownFlakesToSkip() {
     const flakeIssues = await this.fetchFlakeIssues()
     const mandatoryTests = await this.fetchMandatoryTestsForPR()
-    console.log(JSON.stringify(mandatoryTests))
+    console.log(JSON.stringify(mandatoryTests)) //TODO(Alec): delete logs
     const knownFlakesToSkip = flakeIssues.filter((i) => {
       console.log(JSON.stringify(i))
-      return !mandatoryTests.includes(i.number)
+      return !mandatoryTests.includes(i.number.toString())
     })
     return knownFlakesToSkip.map((i) => i.title)
   }
