@@ -214,7 +214,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
                 }
               }
             >
-              1:59
+              2:00
             </Text>
           </View>
         </View>

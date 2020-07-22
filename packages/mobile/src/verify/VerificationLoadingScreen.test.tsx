@@ -12,6 +12,9 @@ jest.mock(
   () => 'RCTScrollView'
 )
 
+// Lock time so snapshots always show the same countdown value
+jest.spyOn(Date, 'now').mockImplementation(() => 1487076708000)
+
 describe('VerificationLoadingScreen', () => {
   it('renders correctly', () => {
     const { toJSON } = render(
