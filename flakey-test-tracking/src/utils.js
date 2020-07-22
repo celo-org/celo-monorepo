@@ -35,14 +35,11 @@ function getPullNumber() {
 // Parses list of flakey test issues to ignore from the PR's body.
 // The tests corresponding to these issues will not be skipped.
 function parseMandatoryTestIssuesFromPullBody(prBody) {
-  // Slice off everything before list of mandatory test issues
-  prBody = prBody.split('DO_NOT_SKIP')[1]
-  // Remove `.com` references in issue urls so that `.` can mark end of list.
-  prBody = prBody.replace('.com', '')
-  // Slice off everything after list of mandatory test issues
-  prBody = prBody.slice(0, prBody.indexOf('.'))
-  // Return list of issue numbers
-  return prBody.split(/[^0-9]+/gm)
+  const urls = prBody.match(/https[\S]+/g)
+  const issueNumbers = urls.map((url) =>
+    url.slice(url.lastIndexOf('/') + 1).replace(/[^0-9]+/g, '')
+  )
+  return issueNumbers
 }
 
 function getPackageName() {
