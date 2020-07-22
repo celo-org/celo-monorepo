@@ -96,7 +96,6 @@ import { getDatetimeDisplayString } from 'src/utils/time'
 import { ExtractProps } from 'src/utils/typescript'
 import VerificationEducationScreen from 'src/verify/VerificationEducationScreen'
 import VerificationInputScreen from 'src/verify/VerificationInputScreen'
-import VerificationInterstitialScreen from 'src/verify/VerificationInterstitialScreen'
 import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
 
 const Stack = createStackNavigator<StackParamList>()
@@ -142,11 +141,6 @@ const verificationScreens = (Navigator: typeof Stack) => {
         name={Screens.VerificationLoadingScreen}
         component={VerificationLoadingScreen}
         options={VerificationLoadingScreen.navigationOptions}
-      />
-      <Navigator.Screen
-        name={Screens.VerificationInterstitialScreen}
-        component={VerificationInterstitialScreen}
-        options={VerificationInterstitialScreen.navigationOptions}
       />
       <Navigator.Screen
         name={Screens.VerificationInputScreen}
