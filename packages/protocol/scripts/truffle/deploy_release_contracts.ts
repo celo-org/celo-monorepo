@@ -442,7 +442,10 @@ async function compile(template: ReleaseGoldTemplate): Promise<ReleaseGoldConfig
 
 async function handleJSONFile(data) {
   const templates: ReleaseGoldTemplate[] = JSON.parse(data)
-  const grants = await Promise.all(templates.map(compile))
+  const grants: ReleaseGoldConfig[] = []
+  for (const template of templates) {
+    grants.push(await compile(template))
+  }
 
   if (grants.length === 0) {
     console.error(
