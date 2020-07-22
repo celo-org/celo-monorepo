@@ -8,6 +8,14 @@ import { createMockStore, getMockStackScreenProps } from 'test/utils'
 import { mockE164NumberToInvitableRecipient } from 'test/values'
 
 describe('Invite', () => {
+  beforeAll(() => {
+    jest.useFakeTimers()
+  })
+
+  afterAll(() => {
+    jest.useRealTimers()
+  })
+
   it('renders correctly with recipients', () => {
     const tree = renderer.create(
       <Provider
