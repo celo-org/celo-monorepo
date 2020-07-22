@@ -11,7 +11,7 @@ import {
 const URL = require('url').URL
 
 // TODO: This staging function is left in place to test the cUSD integration
-// that we are waitin on from Moonpay. It will be removed after
+// that we are waiting on from Moonpay. It will be removed after
 // cUSD is added and tested
 export const signMoonpayStaging = functions.https.onRequest((request, response) => {
   const fiatCurrency = request.body.fiatCurrency || 'USD'
