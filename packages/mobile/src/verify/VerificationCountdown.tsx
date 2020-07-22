@@ -25,7 +25,7 @@ interface Props {
 }
 
 export default function VerificationCountdown({ onFinish }: Props) {
-  const hasCalledOnFinishedRef = useRef(false)
+  const hasCalledOnFinishRef = useRef(false)
   const endTime = useRef(Date.now() + TOTAL_TIME).current
   // Used for re-rendering, actual value unused
   const [, setTimer] = useState(0)
@@ -63,8 +63,8 @@ export default function VerificationCountdown({ onFinish }: Props) {
 
   // Effect to call onFinish when appropriate
   useEffect(() => {
-    if (secondsLeft <= 0 && !hasCalledOnFinishedRef.current) {
-      hasCalledOnFinishedRef.current = true
+    if (secondsLeft <= 0 && !hasCalledOnFinishRef.current) {
+      hasCalledOnFinishRef.current = true
       onFinish()
     }
   }, [secondsLeft <= 0, onFinish])
