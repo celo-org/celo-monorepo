@@ -380,7 +380,9 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
             Object {
               "flexDirection": "column",
             },
-            undefined,
+            Object {
+              "marginBottom": 16,
+            },
           ]
         }
       >

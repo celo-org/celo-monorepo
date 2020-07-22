@@ -797,7 +797,9 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
             Object {
               "flexDirection": "column",
             },
-            undefined,
+            Object {
+              "marginBottom": 16,
+            },
           ]
         }
       >
@@ -1677,7 +1679,9 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             Object {
               "flexDirection": "column",
             },
-            undefined,
+            Object {
+              "marginBottom": 16,
+            },
           ]
         }
       >
@@ -2554,7 +2558,9 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             Object {
               "flexDirection": "column",
             },
-            undefined,
+            Object {
+              "marginBottom": 16,
+            },
           ]
         }
       >
@@ -3495,7 +3501,9 @@ exports[`SendConfirmation renders correctly when there are multiple user address
             Object {
               "flexDirection": "column",
             },
-            undefined,
+            Object {
+              "marginBottom": 16,
+            },
           ]
         }
       >

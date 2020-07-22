@@ -308,7 +308,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     ]
                   }
                 >
-                  amount
+                  global:amount
                 </Text>
               </View>
               <Text
@@ -840,7 +840,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
             Object {
               "flexDirection": "column",
             },
-            undefined,
+            Object {
+              "marginBottom": 16,
+            },
           ]
         }
       >
@@ -1300,7 +1302,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     ]
                   }
                 >
-                  amount
+                  global:amount
                 </Text>
               </View>
               <Text
@@ -1832,7 +1834,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
             Object {
               "flexDirection": "column",
             },
-            undefined,
+            Object {
+              "marginBottom": 16,
+            },
           ]
         }
       >
@@ -2292,7 +2296,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     ]
                   }
                 >
-                  amount
+                  global:amount
                 </Text>
               </View>
               <Text
@@ -2821,7 +2825,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
             Object {
               "flexDirection": "column",
             },
-            undefined,
+            Object {
+              "marginBottom": 16,
+            },
           ]
         }
       >
