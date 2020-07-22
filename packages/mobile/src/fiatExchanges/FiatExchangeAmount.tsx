@@ -18,6 +18,7 @@ import BackButton from 'src/components/BackButton.v2'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import LineItemRow from 'src/components/LineItemRow'
 import { DOLLAR_ADD_FUNDS_MIN_AMOUNT, DOLLAR_CASH_OUT_MIN_AMOUNT } from 'src/config'
+import { features } from 'src/flags'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import {
@@ -147,7 +148,13 @@ export function ExchangeTradeScreen({ navigation, route }: Props) {
           }
         />
       </KeyboardAwareScrollView>
-      <Text style={styles.dislamerCeloDollars}>{t('dislamerCeloDollars')}</Text>
+      {features.CUSD_MOONPAY_ENABLED ? (
+        <Text style={styles.disclaimerCeloDollars}>{t('disclaimerCeloDollars')}</Text>
+      ) : (
+        <Text style={styles.dollarsNotYetEnabledNote}>
+          {t('dollarsNotYetEnabledNote') + ' ' + t('disclaimerCeloDollars')}
+        </Text>
+      )}
       <Button
         onPress={goNext}
         text={t('global:next')}
@@ -200,9 +207,15 @@ const styles = StyleSheet.create({
   reviewBtn: {
     padding: variables.contentPadding,
   },
-  dislamerCeloDollars: {
+  disclaimerCeloDollars: {
     ...fontStyles.small,
     color: colors.gray4,
     textAlign: 'center',
+  },
+  dollarsNotYetEnabledNote: {
+    ...fontStyles.small,
+    color: colors.gray4,
+    textAlign: 'center',
+    paddingHorizontal: 10,
   },
 })
