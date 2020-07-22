@@ -30,7 +30,8 @@ export async function installHelmChart(
       celoEnv,
       blockscoutDBUsername,
       blockscoutDBPassword,
-      blockscoutDBConnectionName
+      blockscoutDBConnectionName,
+      true
     )
   )
 }
@@ -44,7 +45,8 @@ export async function upgradeHelmChart(
   helmReleaseName: string,
   blockscoutDBUsername: string,
   blockscoutDBPassword: string,
-  blockscoutDBConnectionName: string
+  blockscoutDBConnectionName: string,
+  blockscoutResetDB: boolean
 ) {
   console.info(`Upgrading helm release ${helmReleaseName}`)
   const params = (
@@ -52,7 +54,8 @@ export async function upgradeHelmChart(
       celoEnv,
       blockscoutDBUsername,
       blockscoutDBPassword,
-      blockscoutDBConnectionName
+      blockscoutDBConnectionName,
+      blockscoutResetDB
     )
   ).join(' ')
   if (process.env.CELOTOOL_VERBOSE === 'true') {
@@ -70,7 +73,8 @@ async function helmParameters(
   celoEnv: string,
   blockscoutDBUsername: string,
   blockscoutDBPassword: string,
-  blockscoutDBConnectionName: string
+  blockscoutDBConnectionName: string,
+  blockscoutResetDB: boolean
 ) {
   const privateNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
   const useMetadataCrawler = fetchEnvOrFallback(
@@ -84,7 +88,7 @@ async function helmParameters(
     `--set blockscout.db.username=${blockscoutDBUsername}`,
     `--set blockscout.db.password=${blockscoutDBPassword}`,
     `--set blockscout.db.connection_name=${blockscoutDBConnectionName.trim()}`,
-    `--set blockscout.db.drop=${fetchEnvOrFallback(envVar.BLOCKSCOUT_DROP_DB, 'false')}`,
+    `--set blockscout.db.drop="${blockscoutResetDB}"`,
     `--set blockscout.replicas=${fetchEnv(envVar.BLOCKSCOUT_WEB_REPLICAS)}`,
     `--set blockscout.subnetwork="${fetchEnvOrFallback(
       envVar.BLOCKSCOUT_SUBNETWORK_NAME,

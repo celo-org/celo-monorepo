@@ -47,30 +47,26 @@ async function copySecret(secretName: string, srcNamespace: string, destNamespac
   sed 's/default/${destNamespace}/' | kubectl apply --namespace=${destNamespace} -f -`)
 }
 
-export async function createCloudSQLInstance(celoEnv: string, instanceName: string) {
+export async function createCloudSQLInstanceIfNotExists(celoEnv: string, instanceName: string, dbSuffix: string) {
   await ensureAuthenticatedGcloudAccount()
   console.info('Creating Cloud SQL database, this might take a minute or two ...')
 
   await failIfSecretMissing(CLOUDSQL_SECRET_NAME, 'default')
 
-  try {
-    await execCmd(`gcloud sql instances describe ${instanceName}`)
-    // if we get to here, that means the instance already exists
-    console.warn(
-      `A Cloud SQL instance named ${instanceName} already exists, so in all likelihood you cannot deploy initial with ${instanceName}`
+  const DBExists = await outputIncludes(
+    `gcloud sql instances list`,
+    `${instanceName} `,
+    `DB exists, skipping creation: ${instanceName}`
+  )
+
+  if (DBExists) {
+    console.info(
+      `A Cloud SQL instance named ${instanceName} already exists, so we skip the database ${instanceName} creation`
     )
-  } catch (error) {
-    if (
-      error.message.trim() !==
-      `Command failed: gcloud sql instances describe ${instanceName}\nERROR: (gcloud.sql.instances.describe) HTTPError 404: The Cloud SQL instance does not exist.`
-    ) {
-      console.error(error.message.trim())
-      process.exit(1)
-    }
+    return retrieveCloudSQLConnectionInfo(celoEnv, instanceName, dbSuffix)
   }
 
   // Quite often these commands timeout, but actually succeed anyway. By ignoring errors we allow them to be re-run.
-
   try {
     await execCmd(
       `gcloud sql instances create ${instanceName} --zone ${fetchEnv(
@@ -264,10 +260,10 @@ export async function retrieveCloudSQLConnectionInfo(
   await validateExistingCloudSQLInstance(instanceName)
   const secretName = `${celoEnv}-blockscout${dbSuffix}`
   const [blockscoutDBUsername] = await execCmdWithExitOnFailure(
-    `kubectl get secret ${secretName} -o jsonpath='{.data.DATABASE_USER}' -n ${celoEnv} | base64 --decode`
+    `kubectl get secret ${secretName} --namespace ${celoEnv} -o jsonpath='{.data.DATABASE_USER}' -n ${celoEnv} | base64 --decode`
   )
   const [blockscoutDBPassword] = await execCmdWithExitOnFailure(
-    `kubectl get secret ${secretName} -o jsonpath='{.data.DATABASE_PASSWORD}' -n ${celoEnv} | base64 --decode`
+    `kubectl get secret ${secretName} --namespace ${celoEnv} -o jsonpath='{.data.DATABASE_PASSWORD}' -n ${celoEnv} | base64 --decode`
   )
   const [blockscoutDBConnectionName] = await execCmdWithExitOnFailure(
     `gcloud sql instances describe ${instanceName} --format="value(connectionName)"`
@@ -298,6 +294,7 @@ export async function resetCloudSQLInstance(instanceName: string) {
 
   console.info('Creating blockscout database')
   await execCmdWithExitOnFailure(`gcloud sql databases create blockscout -i ${instanceName}`)
+
 }
 
 async function registerIPAddress(name: string) {
