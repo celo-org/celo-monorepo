@@ -357,20 +357,23 @@ _See code: [packages/cli/src/commands/account/lock.ts](https://github.com/celo-o
 
 ### New
 
-Creates a new account locally using the Celo Derivation Path (m/44'/52752'/0/0/indexAddress) and print out the key information. Save this information for local transaction signing or import into a Celo node. Ledger: this command has been tested swapping mnemonics with the Ledger successfully (only supports english)
+Creates a new account locally using the Celo Derivation Path (m/44'/52752'/0/changeIndex/addressIndex) and print out the key information. Save this information for local transaction signing or import into a Celo node. Ledger: this command has been tested swapping mnemonics with the Ledger successfully (only supports english)
 
 ```
 USAGE
   $ celocli account:new
 
 OPTIONS
+  --addressIndex=addressIndex
+      Choose the address index for the derivation path
+
+  --changeIndex=changeIndex
+      Choose the change index for the derivation path
+
   --derivationPath=derivationPath
       Choose a different derivation Path (Celo's default is "m/44'/52752'/0'/0"). Use "eth" as an alias of the Ethereum
       derivation path ("m/44'/60'/0'/0/"). Recreating the same account requires knowledge of the mnemonic, passphrase (if
       any), and the derivation path
-
-  --indexAddress=indexAddress
-      Choose the index address of the derivation path
 
   --language=chinese_simplified|chinese_traditional|english|french|italian|japanese|korean|spanish
       [default: english] Language for the mnemonic words. **WARNING**, some hardware wallets don't support other languages
