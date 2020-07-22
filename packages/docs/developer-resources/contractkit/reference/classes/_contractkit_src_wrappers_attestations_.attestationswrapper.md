@@ -39,6 +39,7 @@
 * [getNonCompliantIssuers](_contractkit_src_wrappers_attestations_.attestationswrapper.md#getnoncompliantissuers)
 * [getPastEvents](_contractkit_src_wrappers_attestations_.attestationswrapper.md#getpastevents)
 * [getVerifiedStatus](_contractkit_src_wrappers_attestations_.attestationswrapper.md#getverifiedstatus)
+* [isAttestationExpired](_contractkit_src_wrappers_attestations_.attestationswrapper.md#isattestationexpired)
 * [lookupIdentifiers](_contractkit_src_wrappers_attestations_.attestationswrapper.md#lookupidentifiers)
 * [request](_contractkit_src_wrappers_attestations_.attestationswrapper.md#request)
 * [revealPhoneNumberToIssuer](_contractkit_src_wrappers_attestations_.attestationswrapper.md#revealphonenumbertoissuer)
@@ -134,7 +135,7 @@ ___
 
 • **getAttestationIssuers**: *function* = proxyCall(this.contract.methods.getAttestationIssuers)
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:175](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L175)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:186](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L186)*
 
 Returns the issuers of attestations for a phoneNumber/account combo
 
@@ -162,7 +163,7 @@ ___
     (stat) => ({ completed: valueToInt(stat[0]), total: valueToInt(stat[1]) })
   )
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:197](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L197)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:208](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L208)*
 
 Returns the attestation stats of a identifer/account pair
 
@@ -191,7 +192,7 @@ ___
     (state) => ({ attestationState: valueToInt(state[0]) })
   )
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:182](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L182)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:193](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L193)*
 
 Returns the attestation state of a phone number/account/issuer tuple
 
@@ -285,7 +286,7 @@ Contract address
 
 ▸ **approveAttestationFee**(`attestationsRequested`: number): *Promise‹[CeloTransactionObject](_contractkit_src_wrappers_basewrapper_.celotransactionobject.md)‹boolean››*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:244](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L244)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:255](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L255)*
 
 Approves the necessary amount of StableToken to request Attestations
 
@@ -303,7 +304,7 @@ ___
 
 ▸ **complete**(`identifier`: string, `account`: [Address](../modules/_contractkit_src_base_.md#address), `issuer`: [Address](../modules/_contractkit_src_base_.md#address), `code`: string): *Promise‹[CeloTransactionObject](_contractkit_src_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:330](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L330)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:341](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L341)*
 
 Completes an attestation with the corresponding code
 
@@ -324,7 +325,7 @@ ___
 
 ▸ **findMatchingIssuer**(`identifier`: string, `account`: [Address](../modules/_contractkit_src_base_.md#address), `code`: string, `issuers`: string[]): *Promise‹string | null›*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:352](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L352)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:363](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L363)*
 
 Given a list of issuers, finds the matching issuer for a given code
 
@@ -345,7 +346,7 @@ ___
 
 ▸ **getActionableAttestations**(`identifier`: string, `account`: [Address](../modules/_contractkit_src_base_.md#address)): *Promise‹[ActionableAttestation](../interfaces/_contractkit_src_wrappers_attestations_.actionableattestation.md)[]›*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:256](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L256)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:267](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L267)*
 
 Returns an array of attestations that can be completed, along with the issuers' attestation
 service urls
@@ -365,7 +366,7 @@ ___
 
 ▸ **getAttestationFeeRequired**(`attestationsRequested`: number): *Promise‹BigNumber‹››*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:234](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L234)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:245](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L245)*
 
 Calculates the amount of StableToken required to request Attestations
 
@@ -383,7 +384,7 @@ ___
 
 ▸ **getAttestationServiceStatus**(`validator`: [Validator](../interfaces/_contractkit_src_wrappers_validators_.validator.md)): *Promise‹AttestationServiceStatusResponse›*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:512](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L512)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:523](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L523)*
 
 Gets the relevant attestation service status for a validator
 
@@ -401,7 +402,7 @@ ___
 
 ▸ **getConfig**(`tokens`: string[]): *Promise‹[AttestationsConfig](../interfaces/_contractkit_src_wrappers_attestations_.attestationsconfig.md)›*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:380](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L380)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:391](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L391)*
 
 Returns the current configuration parameters for the contract.
 
@@ -419,7 +420,7 @@ ___
 
 ▸ **getNonCompliantIssuers**(`identifier`: string, `account`: [Address](../modules/_contractkit_src_base_.md#address)): *Promise‹[Address](../modules/_contractkit_src_base_.md#address)[]›*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:278](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L278)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:289](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L289)*
 
 Returns an array of issuer addresses that were found to not run the attestation service
 
@@ -459,7 +460,7 @@ ___
 
 ▸ **getVerifiedStatus**(`identifier`: string, `account`: [Address](../modules/_contractkit_src_base_.md#address), `numAttestationsRequired?`: undefined | number, `attestationThreshold?`: undefined | number): *Promise‹AttestationsStatus›*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:216](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L216)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:227](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L227)*
 
 Returns the verified status of an identifier/account pair indicating whether the attestation
 stats for a given pair are completed beyond a certain threshold of confidence (aka "verified")
@@ -477,11 +478,27 @@ Name | Type | Description |
 
 ___
 
+###  isAttestationExpired
+
+▸ **isAttestationExpired**(`attestationRequestBlockNumber`: number): *Promise‹boolean›*
+
+*Defined in [contractkit/src/wrappers/Attestations.ts:145](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L145)*
+
+**Parameters:**
+
+Name | Type | Description |
+------ | ------ | ------ |
+`attestationRequestBlockNumber` | number | Attestation Request Block Number to be checked  |
+
+**Returns:** *Promise‹boolean›*
+
+___
+
 ###  lookupIdentifiers
 
 ▸ **lookupIdentifiers**(`identifiers`: string[]): *Promise‹[IdentifierLookupResult](../modules/_contractkit_src_wrappers_attestations_.md#identifierlookupresult)›*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:397](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L397)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:408](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L408)*
 
 Lookup mapped wallet addresses for a given list of identifiers
 
@@ -499,7 +516,7 @@ ___
 
 ▸ **request**(`identifier`: string, `attestationsRequested`: number): *Promise‹[CeloTransactionObject](_contractkit_src_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:438](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L438)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:449](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L449)*
 
 Requests a new attestation
 
@@ -518,7 +535,7 @@ ___
 
 ▸ **revealPhoneNumberToIssuer**(`phoneNumber`: string, `account`: [Address](../modules/_contractkit_src_base_.md#address), `issuer`: [Address](../modules/_contractkit_src_base_.md#address), `serviceURL`: string, `salt?`: undefined | string, `smsRetrieverAppSig?`: undefined | string): *Promise‹Response›*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:454](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L454)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:465](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L465)*
 
 **Parameters:**
 
@@ -539,7 +556,7 @@ ___
 
 ▸ **revoke**(`identifer`: string, `account`: [Address](../modules/_contractkit_src_base_.md#address)): *Promise‹[CeloTransactionObject](_contractkit_src_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:590](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L590)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:601](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L601)*
 
 **Parameters:**
 
@@ -556,7 +573,7 @@ ___
 
 ▸ **selectIssuers**(`identifier`: string): *[CeloTransactionObject](_contractkit_src_wrappers_basewrapper_.celotransactionobject.md)‹void›*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:450](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L450)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:461](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L461)*
 
 Selects the issuers for previously requested attestations for a phone number
 
@@ -574,7 +591,7 @@ ___
 
 ▸ **validateAttestationCode**(`identifier`: string, `account`: [Address](../modules/_contractkit_src_base_.md#address), `issuer`: [Address](../modules/_contractkit_src_base_.md#address), `code`: string): *Promise‹boolean›*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:485](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L485)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:496](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L496)*
 
 Validates a given code by the issuer on-chain
 
@@ -595,7 +612,7 @@ ___
 
 ▸ **waitForSelectingIssuers**(`identifier`: string, `account`: [Address](../modules/_contractkit_src_base_.md#address), `timeoutSeconds`: number, `pollDurationSeconds`: number): *Promise‹void›*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:146](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L146)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:157](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L157)*
 
 **Parameters:**
 
