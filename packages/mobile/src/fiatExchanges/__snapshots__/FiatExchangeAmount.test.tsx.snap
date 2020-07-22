@@ -173,11 +173,12 @@ exports[`FiatExchangeAmount renders correctly 1`] = `
         "fontFamily": "Inter-Regular",
         "fontSize": 14,
         "lineHeight": 18,
+        "paddingHorizontal": 10,
         "textAlign": "center",
       }
     }
   >
-    dislamerCeloDollars
+    dollarsNotYetEnabledNote disclaimerCeloDollars
   </Text>
   <View
     style={

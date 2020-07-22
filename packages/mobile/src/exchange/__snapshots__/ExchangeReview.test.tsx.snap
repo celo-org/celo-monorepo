@@ -163,233 +163,146 @@ exports[`ExchangeReview renders correctly 1`] = `
               </Text>
             </Text>
           </View>
-          <View
-            style={
-              Array [
-                Object {
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "marginVertical": 5,
-                },
-                undefined,
-              ]
-            }
-          >
+          <View>
             <View
-              style={
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
                 Object {
-                  "alignItems": "center",
-                  "flexDirection": "row",
-                  "marginRight": 5,
+                  "attribute": "selectableItemBackground",
+                  "type": "ThemeAttrAndroid",
                 }
               }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              testID="feeDrawer/ExchangeReview"
             >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 22,
-                    },
-                    undefined,
-                  ]
-                }
-              >
-                exchangeFee
-              </Text>
               <View
-                accessible={true}
-                focusable={true}
-                hitSlop={
-                  Object {
-                    "bottom": 10,
-                    "left": 10,
-                    "right": 10,
-                    "top": 10,
-                  }
-                }
-                nativeBackgroundAndroid={
-                  Object {
-                    "attribute": "selectableItemBackgroundBorderless",
-                    "type": "ThemeAttrAndroid",
-                  }
-                }
-                onClick={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
                 style={
                   Object {
-                    "alignItems": "center",
-                    "justifyContent": "flex-end",
-                    "paddingHorizontal": 5,
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
                   }
                 }
               >
-                <Image
-                  source={
-                    Object {
-                      "testUri": "../../../packages/mobile/src/images/info.png",
-                    }
-                  }
+                <View
                   style={
                     Object {
-                      "height": 12,
-                      "tintColor": "#BDBDBD",
-                      "width": 12,
+                      "alignItems": "center",
+                      "flexDirection": "row",
                     }
                   }
-                />
-              </View>
-            </View>
-            <Text
-              style={
-                Array [
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Inter-Regular",
-                    "fontSize": 16,
-                    "lineHeight": 22,
-                  },
-                  undefined,
-                ]
-              }
-            >
-              <Text
-                numberOfLines={1}
-                style={
-                  Array [
-                    undefined,
-                    Object {
-                      "color": undefined,
-                    },
-                  ]
-                }
-              >
-                
-                $
-                0.001
-              </Text>
-            </Text>
-          </View>
-          <View
-            style={
-              Array [
-                Object {
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "marginVertical": 5,
-                },
-                undefined,
-              ]
-            }
-          >
-            <View
-              style={
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "row",
-                  "marginRight": 5,
-                }
-              }
-            >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 22,
-                    },
-                    undefined,
-                  ]
-                }
-              >
-                securityFee
-              </Text>
-              <View
-                accessible={true}
-                focusable={true}
-                hitSlop={
-                  Object {
-                    "bottom": 10,
-                    "left": 10,
-                    "right": 10,
-                    "top": 10,
-                  }
-                }
-                nativeBackgroundAndroid={
-                  Object {
-                    "attribute": "selectableItemBackgroundBorderless",
-                    "type": "ThemeAttrAndroid",
-                  }
-                }
-                onClick={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
-                style={
-                  Object {
-                    "alignItems": "center",
-                    "justifyContent": "flex-end",
-                    "paddingHorizontal": 5,
-                  }
-                }
-              >
-                <Image
-                  source={
-                    Object {
-                      "testUri": "../../../packages/mobile/src/images/info.png",
+                >
+                  <Text
+                    style={
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
+                      }
                     }
-                  }
+                  >
+                    feeActual
+                  </Text>
+                  <View
+                    style={
+                      Object {
+                        "transform": Array [
+                          Object {
+                            "rotate": "0deg",
+                          },
+                        ],
+                      }
+                    }
+                  >
+                    <svg
+                      fill="none"
+                      height={16}
+                      viewBox="0 0 16 16"
+                      width={16}
+                    >
+                      <path
+                        d="M3 6l5 5 5-5"
+                        stroke="#B4B9BD"
+                      />
+                    </svg>
+                  </View>
+                </View>
+                <View
                   style={
-                    Object {
-                      "height": 12,
-                      "tintColor": "#BDBDBD",
-                      "width": 12,
-                    }
+                    Array [
+                      Object {
+                        "flexDirection": "row",
+                        "justifyContent": "space-between",
+                        "marginVertical": 5,
+                      },
+                      undefined,
+                    ]
                   }
-                />
+                >
+                  <View
+                    style={
+                      Object {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "marginRight": 5,
+                      }
+                    }
+                  >
+                    <Text
+                      style={
+                        Array [
+                          Object {
+                            "color": "#2E3338",
+                            "fontFamily": "Inter-Regular",
+                            "fontSize": 16,
+                            "lineHeight": 22,
+                          },
+                          undefined,
+                        ]
+                      }
+                    >
+                      
+                    </Text>
+                  </View>
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "fontFamily": "Inter-Regular",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        undefined,
+                      ]
+                    }
+                  >
+                    <Text
+                      numberOfLines={1}
+                      style={
+                        Array [
+                          undefined,
+                          Object {
+                            "color": undefined,
+                          },
+                        ]
+                      }
+                    >
+                      
+                      $
+                      0
+                    </Text>
+                  </Text>
+                </View>
               </View>
             </View>
-            <Text
-              style={
-                Array [
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Inter-Regular",
-                    "fontSize": 16,
-                    "lineHeight": 22,
-                  },
-                  undefined,
-                ]
-              }
-            >
-              <Text
-                numberOfLines={1}
-                style={
-                  Array [
-                    undefined,
-                    Object {
-                      "color": undefined,
-                    },
-                  ]
-                }
-              >
-                
-                $
-                0.001
-              </Text>
-            </Text>
           </View>
           <View
             style={

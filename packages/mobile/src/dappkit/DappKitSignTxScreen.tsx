@@ -1,7 +1,6 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { SignTxRequest } from '@celo/utils/src/dappkit'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -11,6 +10,7 @@ import { connect } from 'react-redux'
 import { requestTxSignature } from 'src/dappkit/dappkit'
 import { Namespaces, withTranslation } from 'src/i18n'
 import DappkitExchangeIcon from 'src/icons/DappkitExchange'
+import { noHeader } from 'src/navigator/Headers.v2'
 import { navigate, navigateBack, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -18,9 +18,6 @@ import Logger from 'src/utils/Logger'
 
 const TAG = 'dappkit/DappKitSignTxScreen'
 
-interface State {
-  request: SignTxRequest | null
-}
 interface DispatchProps {
   requestTxSignature: typeof requestTxSignature
 }
@@ -33,11 +30,8 @@ const mapDispatchToProps = {
   requestTxSignature,
 }
 
-class DappKitSignTxScreen extends React.Component<Props, State> {
-  static navigationOptions = { header: null }
-  state = {
-    request: null,
-  }
+class DappKitSignTxScreen extends React.Component<Props> {
+  static navigationOptions = noHeader
 
   componentDidMount() {
     const request = this.props.route.params.dappKitRequest
@@ -50,22 +44,22 @@ class DappKitSignTxScreen extends React.Component<Props, State> {
     this.setState({ request })
   }
 
-  linkBack = () => {
-    if (!this.state.request) {
-      return
-    }
+  getRequest = () => {
+    return this.props.route.params.dappKitRequest
+  }
 
-    navigateHome({ dispatchAfterNavigate: requestTxSignature(this.state.request!) })
+  linkBack = () => {
+    const request = this.getRequest()
+
+    navigateHome({ onAfterNavigate: () => this.props.requestTxSignature(request) })
   }
 
   showDetails = () => {
-    if (!this.state.request) {
-      return
-    }
+    const request = this.getRequest()
 
     // TODO(sallyjyl): figure out which data to pass in for multitx
     navigate(Screens.DappKitTxDataScreen, {
-      dappKitData: (this.state.request! as SignTxRequest).txs[0].txData,
+      dappKitData: request.txs[0].txData,
     })
   }
 
@@ -75,17 +69,16 @@ class DappKitSignTxScreen extends React.Component<Props, State> {
 
   render() {
     const { t } = this.props
+    const request = this.getRequest()
+    const { dappName } = request
+
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.logo}>
             <DappkitExchangeIcon />
           </View>
-          <Text style={styles.header}>
-            {t('connectToWallet', {
-              dappname: this.state.request && (this.state.request! as SignTxRequest).dappName,
-            })}
-          </Text>
+          {!!dappName && <Text style={styles.header}>{t('connectToWallet', { dappName })}</Text>}
 
           <Text style={styles.share}> {t('shareInfo')} </Text>
 
