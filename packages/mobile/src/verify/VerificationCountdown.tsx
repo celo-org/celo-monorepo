@@ -80,8 +80,6 @@ export default function VerificationCountdown({ onFinish }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: {},
-  image: {},
   content: {
     ...StyleSheet.absoluteFillObject,
     alignItems: 'center',
