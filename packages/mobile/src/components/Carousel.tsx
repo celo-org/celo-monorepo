@@ -39,13 +39,13 @@ function Carousel({ items, style }: Props) {
   const [activeIndex, setActiveIndex] = useState(0)
 
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const newnActiveIndex = Math.round(event.nativeEvent.contentOffset.x / ITEM_SNAP_INTERVAL)
+    const newActiveIndex = Math.round(event.nativeEvent.contentOffset.x / ITEM_SNAP_INTERVAL)
 
-    if (newnActiveIndex === activeIndex) {
+    if (newActiveIndex === activeIndex) {
       return
     }
 
-    setActiveIndex(newnActiveIndex)
+    setActiveIndex(newActiveIndex)
   }
 
   return (
