@@ -22,7 +22,7 @@ const defaults = {
 }
 
 const getLabels = () => {
-  return [FlakeLabel, getPackageName()]
+  return [FlakeLabel, getPackageName(), process.env.CIRCLE_JOB]
 }
 
 class GitHub {
