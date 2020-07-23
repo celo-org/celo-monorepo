@@ -469,13 +469,13 @@ jobs:
           command: |
             ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
       - run:
-          name: Check versions
+          name: Check contract versions
           command: |
             git checkout rc1 && yarn build:sol && mkdir build/mainnet && mv build/contracts build/mainnet
             git checkout master && yarn build:sol && mkdir build/master && mv build/contracts build/master
             yarn ts-node scripts/check-backward.ts sem_check -o ./build/rc1/contracts -n ./build/master/contracts -e ".*Test.*|I[A-Z].*|ReleaseGold"
       - run:
-          name: test
+          name: Unit tests
           # Flaky tests - run them twice
           command: yarn --cwd packages/protocol test || yarn --cwd packages/protocol test
 
