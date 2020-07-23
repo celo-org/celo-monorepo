@@ -152,6 +152,15 @@ class ValoraAnalytics {
       Logger.error(TAG, 'Error tracking page', err)
     })
   }
+
+  async reset() {
+    try {
+      await Analytics.flush()
+      await Analytics.reset()
+    } catch (error) {
+      Logger.error(TAG, 'Error resetting analytics', error)
+    }
+  }
 }
 
 export default new ValoraAnalytics()
