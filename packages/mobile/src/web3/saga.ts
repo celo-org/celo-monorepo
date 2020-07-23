@@ -26,6 +26,7 @@ import {
   Actions,
   completeWeb3Sync,
   setAccount,
+  SetAccountAction,
   setFornoMode,
   SetIsFornoAction,
   setPrivateCommentKey,
@@ -228,7 +229,7 @@ export function* getAccount() {
       return account
     }
 
-    const action = yield take(Actions.SET_ACCOUNT)
+    const action: SetAccountAction = yield take(Actions.SET_ACCOUNT)
     if (action.address) {
       // account exists
       return action.address
