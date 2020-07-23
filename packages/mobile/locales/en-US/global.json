@@ -176,5 +176,6 @@
   "insufficientBalance": "Your balance is too low to make this transaction",
   "amount": "Amount",
   "currentBalance": "Current Balance",
-  "restore": "Restore"
+  "restore": "Restore",
+  "commentUnavailable": "Comment Unavailable"
 }

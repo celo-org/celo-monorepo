@@ -11,7 +11,7 @@ import {
   embedPhoneNumberMetadata,
   encryptComment,
   extractPhoneNumberMetadata,
-  getCommentKey,
+  getDataEncryptionKey,
 } from 'src/identity/commentEncryption'
 import { lookupAttestationIdentifiers } from 'src/identity/contactMapping'
 import { PhoneNumberHashDetails } from 'src/identity/privateHashing'
@@ -70,8 +70,8 @@ describe('Encrypt Comment', () => {
   it('Handles basic comment', async () => {
     await expectSaga(encryptComment, simpleComment, mockAccount2, mockAccount)
       .provide([
-        [call(getCommentKey, mockAccount), hexToBuffer(mockPublicDEK)],
-        [call(getCommentKey, mockAccount2), hexToBuffer(mockPublicDEK2)],
+        [call(getDataEncryptionKey, mockAccount), hexToBuffer(mockPublicDEK)],
+        [call(getDataEncryptionKey, mockAccount2), hexToBuffer(mockPublicDEK2)],
       ])
       .returns(simpleCommentEnc)
       .run()
@@ -80,8 +80,8 @@ describe('Encrypt Comment', () => {
   it('Handles complex comment', async () => {
     await expectSaga(encryptComment, complexComment, mockAccount2, mockAccount)
       .provide([
-        [call(getCommentKey, mockAccount), hexToBuffer(mockPublicDEK)],
-        [call(getCommentKey, mockAccount2), hexToBuffer(mockPublicDEK2)],
+        [call(getDataEncryptionKey, mockAccount), hexToBuffer(mockPublicDEK)],
+        [call(getDataEncryptionKey, mockAccount2), hexToBuffer(mockPublicDEK2)],
       ])
       .returns(complexCommentEnc)
       .run()
@@ -95,8 +95,8 @@ describe('Encrypt Comment', () => {
     await expectSaga(encryptComment, simpleComment, mockAccount2, mockAccount, true)
       .withState(mockState)
       .provide([
-        [call(getCommentKey, mockAccount), hexToBuffer(mockPublicDEK)],
-        [call(getCommentKey, mockAccount2), hexToBuffer(mockPublicDEK2)],
+        [call(getDataEncryptionKey, mockAccount), hexToBuffer(mockPublicDEK)],
+        [call(getDataEncryptionKey, mockAccount2), hexToBuffer(mockPublicDEK2)],
       ])
       .returns(simpleCommentWithMetadataEnc)
       .run()

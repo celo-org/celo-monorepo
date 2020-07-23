@@ -176,5 +176,6 @@
   "insufficientBalance": "Su saldo es demasiado bajo para realizar esta transacción.",
   "amount": "Monto",
   "currentBalance": "Saldo actual",
-  "restore": "Restaurar"
+  "restore": "Restaurar",
+  "commentUnavailable": "Comentario no disponible"
 }
