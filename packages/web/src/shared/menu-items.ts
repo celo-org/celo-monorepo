@@ -2,7 +2,7 @@ export interface MenuLink {
   name: string
   link: string
 }
-export const pagePaths: Record<string, MenuLink> = {
+export const pagePaths = {
   HOME: {
     name: 'Home',
     link: '/',
