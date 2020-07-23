@@ -1374,7 +1374,7 @@ exports[`Experience/Color renders 1`] = `
         className="css-view-1dbjc4n"
         style={
           Object {
-            "minHeight": "calc(100vh - 225px)",
+            "minHeight": "calc(100vh - 75px)",
           }
         }
       >

@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
   },
   footer: { zIndex: -10, backgroundColor: colors.white, marginTop: 50 },
   childrenArea: {
-    minHeight: `calc(100vh - ${HEADER_HEIGHT * 3}px)`,
+    minHeight: `calc(100vh - ${HEADER_HEIGHT}px)`,
   },
   childrenAreaDesktop: {
     // Design calls for *baseline* of text Title to match that of intro on side nav
