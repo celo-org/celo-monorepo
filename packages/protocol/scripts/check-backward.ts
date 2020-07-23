@@ -76,7 +76,6 @@ try {
     // Report always generated
     // Placebo command
   } else if (argv._.includes(COMMAND_SEM_CHECK)) {
-    console.log('blah')
     const doVersionCheck = async () => {
       const versionReport = await ASTContractVersionsReport.create(
         instantiateArtifacts(oldArtifactsFolder),

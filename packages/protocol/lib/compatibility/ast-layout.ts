@@ -211,6 +211,9 @@ export const reportLayoutIncompatibilities = (oldArtifacts: BuildArtifacts, newA
     const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
     if (oldArtifact !== undefined) {
       return generateCompatibilityReport(oldArtifact, oldArtifacts, newArtifact, newArtifacts)
+    } else {
+      // Generate an empty report for new contracts.
+      return generateCompatibilityReport(newArtifact, newArtifacts, newArtifact, newArtifacts)
     }
-  }).filter((r) => r !== undefined)
+  })
 }

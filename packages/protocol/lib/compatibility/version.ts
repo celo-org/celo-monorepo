@@ -121,21 +121,6 @@ export class ContractVersionDelta {
   }
 }
 
-export class ContractVersionReport {
-  public expectedVersion = (): ContractVersion => {
-    return this.expectedDelta.appliedTo(this.oldVersion)
-  }
-
-  public isNewVersionExpected = (): boolean => {
-    return this.newVersion.toString() === this.expectedVersion().toString()
-  }
-
-  constructor(
-    public readonly oldVersion: ContractVersion,
-    public readonly newVersion: ContractVersion,
-    public readonly expectedDelta: ContractVersionDelta) {}
-}
-
 /**
  * A mapping {contract name => {@link ContractVersionDelta}}.
  */
@@ -156,8 +141,10 @@ export interface ContractVersionIndex {
 export class ContractVersions {
   static fromArtifacts = async (artifacts: BuildArtifacts): Promise<ContractVersions>=> {
     const contracts = {}
-    const election = artifacts.listArtifacts().filter((artifact) => artifact.contractName === 'Election')
-    contracts['Election'] = await getContractVersion(makeZContract(election[0]))
+
+    await Promise.all(artifacts.listArtifacts().map(async (artifact) => {
+      contracts[artifact.contractName] = await getContractVersion(makeZContract(artifact))
+    }))
     return new ContractVersions(contracts)
   }
 
