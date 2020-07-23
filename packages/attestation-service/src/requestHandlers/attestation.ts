@@ -143,11 +143,16 @@ class AttestationRequestHandler {
   }
 
   async validateAttestationRequest() {
-    const { phoneNumber, account, issuer } = this.attestationRequest
+    const { account, issuer } = this.attestationRequest
 
-    const attestationRecord = await existingAttestationRequestRecord(phoneNumber, account, issuer, {
-      logging: this.sequelizeLogger,
-    })
+    const attestationRecord = await existingAttestationRequestRecord(
+      this.identifier,
+      account,
+      issuer,
+      {
+        logging: this.sequelizeLogger,
+      }
+    )
     // check if it exists in the database
     if (attestationRecord && !attestationRecord.canSendSms()) {
       Counters.attestationRequestsAlreadySent.inc()
@@ -185,12 +190,11 @@ class AttestationRequestHandler {
   }
 
   async validateAttestation(attestationCode: string) {
-    const { phoneNumber, account, salt } = this.attestationRequest
+    const { account } = this.attestationRequest
     const address = getAccountAddress()
-    const identifier = PhoneNumberUtils.getPhoneHash(phoneNumber, salt)
     const attestations = await kit.contracts.getAttestations()
     const isValid = await attestations.validateAttestationCode(
-      identifier,
+      this.identifier,
       account,
       address,
       attestationCode

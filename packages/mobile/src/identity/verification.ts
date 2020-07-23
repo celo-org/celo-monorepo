@@ -214,8 +214,12 @@ export function* doVerificationFlow() {
     return true
   } catch (error) {
     Logger.error(TAG, 'Error occured during verification flow', error)
-    yield put(setVerificationStatus(VerificationStatus.Failed))
-    yield put(showErrorOrFallback(error, ErrorMessages.VERIFICATION_FAILURE))
+    if (error.message === ErrorMessages.SALT_QUOTA_EXCEEDED) {
+      yield put(setVerificationStatus(VerificationStatus.SaltQuotaExceeded))
+    } else {
+      yield put(setVerificationStatus(VerificationStatus.Failed))
+      yield put(showErrorOrFallback(error, ErrorMessages.VERIFICATION_FAILURE))
+    }
     return error.message
   }
 }
@@ -227,7 +231,7 @@ export function* balanceSufficientForAttestations(attestationsRemaining: number)
   )
 }
 
-// Requests if necessary additional attestations and returns all revealable attestationsq
+// Requests if necessary additional attestations and returns all revealable attestations
 export function* requestAndRetrieveAttestations(
   attestationsWrapper: AttestationsWrapper,
   phoneHash: string,
@@ -323,8 +327,20 @@ function* requestAttestations(
     phoneHash,
     account
   )
+  let isUnselectedRequestValid = unselectedRequest.blockNumber !== 0
+  if (isUnselectedRequestValid) {
+    isUnselectedRequestValid = !(yield call(
+      [attestationsWrapper, attestationsWrapper.isAttestationExpired],
+      unselectedRequest.blockNumber
+    ))
+  }
 
-  if (unselectedRequest.blockNumber === 0) {
+  if (isUnselectedRequestValid) {
+    Logger.debug(
+      `${TAG}@requestAttestations`,
+      `Valid unselected request found, skipping approval/request`
+    )
+  } else {
     Logger.debug(
       `${TAG}@requestAttestations`,
       `Approving ${numAttestationsRequestsNeeded} new attestations`
@@ -350,11 +366,6 @@ function* requestAttestations(
 
     yield call(sendTransaction, requestTx.txo, account, TAG, 'Request Attestations')
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_request_tx_sent)
-  } else {
-    Logger.debug(
-      `${TAG}@requestAttestations`,
-      `Unselected request found, skipping approval/request`
-    )
   }
 
   Logger.debug(`${TAG}@requestAttestations`, 'Waiting for block to select issuer')
@@ -547,6 +558,11 @@ function* tryRevealPhoneNumber(
         neededRetry: false,
         issuer,
       })
+      return
+    }
+
+    if (body.error && body.error.includes('Attestation already sent')) {
+      Logger.warn(TAG + '@tryRevealPhoneNumber', `Ignore already sent SMS for issuer: ${issuer}`)
       return
     }
 

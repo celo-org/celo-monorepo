@@ -42,56 +42,84 @@ export function VerificationFailedModal({ verificationStatus, retryWithForno, fo
   }
 
   const userBalanceInsufficient = verificationStatus === VerificationStatus.InsufficientBalance
+  const saltQuotaExceeded = verificationStatus === VerificationStatus.SaltQuotaExceeded
 
   const isVisible =
     (verificationStatus === VerificationStatus.Failed ||
       verificationStatus === VerificationStatus.RevealAttemptFailed ||
-      userBalanceInsufficient) &&
+      userBalanceInsufficient ||
+      saltQuotaExceeded) &&
     !isDismissed
 
   const allowEnterCodes = verificationStatus === VerificationStatus.RevealAttemptFailed
   // Only prompt forno switch if not already in forno mode and failure
-  // wasn't due to insuffuicient balance
+  // wasn't due to insuffuicient balance or exceeded quota for lookups
   const promptRetryWithForno =
-    retryWithForno && !fornoMode && verificationStatus !== VerificationStatus.InsufficientBalance
+    retryWithForno && !fornoMode && !userBalanceInsufficient && !saltQuotaExceeded
 
-  return promptRetryWithForno ? (
-    // Retry verification with forno with option to skip verification
-    <WarningModal
-      isVisible={isVisible}
-      header={t('retryWithFornoModal.header')}
-      body1={t('retryWithFornoModal.body1')}
-      body2={t('retryWithFornoModal.body2')}
-      continueTitle={t('retryWithFornoModal.retryButton')}
-      cancelTitle={t('education.skip')}
-      onCancel={onSkip}
-      onContinue={onRetry}
-    />
-  ) : allowEnterCodes ? (
+  if (promptRetryWithForno) {
+    // Retry verification with forno with option to skip verificaion
+    return (
+      <WarningModal
+        isVisible={isVisible}
+        header={t('retryWithFornoModal.header')}
+        body1={t('retryWithFornoModal.body1')}
+        body2={t('retryWithFornoModal.body2')}
+        continueTitle={t('retryWithFornoModal.retryButton')}
+        cancelTitle={t('education.skip')}
+        onCancel={onSkip}
+        onContinue={onRetry}
+      />
+    )
+  } else if (allowEnterCodes) {
     // Option to enter codes if reveal attempt failed
-    <WarningModal
-      isVisible={isVisible}
-      header={t('failModal.header')}
-      body1={t('failModal.body1')}
-      body2={t('failModal.enterCodesBody')}
-      continueTitle={t('education.skip')}
-      cancelTitle={t('global:goBack')}
-      onCancel={onDismiss}
-      onContinue={onSkip}
-    />
-  ) : (
-    // Else skip verification
-    <WarningModal
-      isVisible={isVisible}
-      header={t('failModal.header')}
-      body1={
-        userBalanceInsufficient ? t('failModal.body1InsufficientBalance') : t('failModal.body1')
-      }
-      body2={
-        userBalanceInsufficient ? t('failModal.body2InsufficientBalance') : t('failModal.body2')
-      }
-      continueTitle={t('education.skip')}
-      onContinue={onSkip}
-    />
-  )
+    return (
+      <WarningModal
+        isVisible={isVisible}
+        header={t('failModal.header')}
+        body1={t('failModal.body1')}
+        body2={t('failModal.enterCodesBody')}
+        continueTitle={t('education.skip')}
+        cancelTitle={t('failModal.enterCodesButton')}
+        onCancel={onDismiss}
+        onContinue={onSkip}
+      />
+    )
+  } else if (userBalanceInsufficient) {
+    // Show userBalanceInsufficient message and skip verification
+    return (
+      <WarningModal
+        isVisible={isVisible}
+        header={t('failModal.header')}
+        body1={t('failModal.body1InsufficientBalance')}
+        body2={t('failModal.body2InsufficientBalance')}
+        continueTitle={t('education.skip')}
+        onContinue={onSkip}
+      />
+    )
+  } else if (saltQuotaExceeded) {
+    // Show saltQuotaExceeded message and skip verification
+    return (
+      <WarningModal
+        isVisible={isVisible}
+        header={t('failModal.header')}
+        body1={t('failModal.body1SaltQuotaExceeded')}
+        body2={t('failModal.body2SaltQuotaExceeded')}
+        continueTitle={t('education.skip')}
+        onContinue={onSkip}
+      />
+    )
+  } else {
+    return (
+      // Show general error and skip verification
+      <WarningModal
+        isVisible={isVisible}
+        header={t('failModal.header')}
+        body1={t('failModal.body1')}
+        body2={t('failModal.body2')}
+        continueTitle={t('education.skip')}
+        onContinue={onSkip}
+      />
+    )
+  }
 }
