@@ -4,9 +4,8 @@ import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { Flags } from '../../utils/command'
 
-export default class Register extends BaseCommand {
-  static description =
-    'Register an account on-chain. This allows you to lock Gold, which is a pre-requisite for registering a Validator or Group, participating in Validator elections and on-chain Governance, and earning epoch rewards.'
+export default class OffchainRead extends BaseCommand {
+  static description = 'DEV: Reads the name from offchain storage'
 
   static flags = {
     ...BaseCommand.flags,
@@ -17,13 +16,10 @@ export default class Register extends BaseCommand {
 
   static args = []
 
-  static examples = [
-    'register --from 0x5409ed021d9299bf6814279a6a1411a7e866a631',
-    'register --from 0x5409ed021d9299bf6814279a6a1411a7e866a631 --name test-account',
-  ]
+  static examples = ['offchain-read --from 0x5409ed021d9299bf6814279a6a1411a7e866a631']
 
   async run() {
-    const res = this.parse(Register)
+    const res = this.parse(OffchainRead)
     this.kit.defaultAccount = res.flags.from
     const provider = new OffchainDataWrapper(res.flags.from, this.kit)
     const nameApplication = new NameAccessor(provider)

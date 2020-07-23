@@ -1,4 +1,5 @@
-import { NativeSigner, verifySignature } from '@celo/utils/lib/signatureUtils'
+import { eqAddress } from '@celo/utils/lib/address'
+import { guessSigner, NativeSigner } from '@celo/utils/lib/signatureUtils'
 import fetch from 'cross-fetch'
 import debugFactory from 'debug'
 import { ContractKit } from '../kit'
@@ -17,6 +18,7 @@ export default class OffchainDataWrapper {
     const metadataURL = await accounts.getMetadataURL(account)
     debug({ account, metadataURL })
     const metadata = await IdentityMetadataWrapper.fetchFromURL(this.kit, metadataURL)
+    // TODO: Filter StorageRoots with the datapath glob
     const storageRoots = metadata
       .filterClaims(ClaimTypes.STORAGE)
       .map((_) => new StorageRoot(account, _.address))
@@ -29,7 +31,6 @@ export default class OffchainDataWrapper {
 
     const [actualData, error] = data
     if (error) {
-      console.log(error)
       return undefined
     }
 
@@ -50,6 +51,7 @@ export default class OffchainDataWrapper {
 class StorageRoot {
   constructor(readonly account: string, readonly address: string) {}
 
+  // TODO: Add decryption metadata (i.e. indicates ciphertext to be decrypted/which key to use)
   async read(dataPath: string): Promise<[any, any]> {
     const data = await fetch(this.address + dataPath)
     if (!data.ok) {
@@ -64,10 +66,19 @@ class StorageRoot {
       return [null, 'Signature could not be fetched']
     }
 
-    const isSigned = verifySignature(body, await signature.text(), this.account)
+    // TODO: Compare against registered on-chain signers or off-chain signers
+    const signer = guessSigner(body, await signature.text())
 
-    if (!isSigned) {
-      return [null, 'Signature is not valid']
+    if (eqAddress(signer, this.account)) {
+      return [body, null]
+    }
+
+    // The signer might be authorized off-chain
+    // TODO: Only if the signer is authorized with an on-chain key
+    const [, err] = await this.read(`/account/authorizedSigners/${signer}`)
+
+    if (err) {
+      return [null, err]
     }
 
     return [body, null]

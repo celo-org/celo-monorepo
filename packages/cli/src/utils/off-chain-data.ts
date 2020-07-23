@@ -1,7 +1,8 @@
-import OffchainDataWrapper, {
+import OffchainDataWrapper from '@celo/contractkit/src/identity/offchain-data-wrapper'
+import {
   GitStorageWriter,
   LocalStorageWriter,
-} from '@celo/contractkit/src/identity/offchain-data-wrapper'
+} from '@celo/contractkit/src/identity/offchain/storage-writers'
 import { flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
 import { BaseCommand } from '../base'
@@ -19,7 +20,10 @@ export abstract class OffchainDataCommand extends BaseCommand {
       required: true,
       description: 'To which directory data should be written',
     }),
-    uploadWithGit: flags.boolean({ default: false }),
+    uploadWithGit: flags.boolean({
+      default: false,
+      description: 'If the CLI should attempt to push changes to the origin via git',
+    }),
   }
 
   // @ts-ignore Can't encode that this is happening in init
