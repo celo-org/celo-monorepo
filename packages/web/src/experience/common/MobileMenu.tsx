@@ -3,6 +3,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ROUTE_TO_TITLE } from 'src/experience/brandkit/common/Page'
 import scrollToHash from 'src/experience/common/scrollToHash'
 import Sidebar, { Page } from 'src/experience/common/Sidebar'
+import { ROUTE_TO_TITLE as EVENT_ROUTE_TO_TITLE } from 'src/experience/eventkit/Page'
 import Triangle, { Direction } from 'src/shared/Triangle'
 import { colors, fonts, standardStyles } from 'src/styles'
 interface Props {
@@ -65,7 +66,7 @@ export default class MobileMenu extends React.PureComponent<Props, State> {
 }
 
 function pageTitleFromRoute(route: string) {
-  return ROUTE_TO_TITLE[route]
+  return ROUTE_TO_TITLE[route] || EVENT_ROUTE_TO_TITLE[route]
 }
 
 const styles = StyleSheet.create({
