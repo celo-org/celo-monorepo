@@ -71,8 +71,8 @@ function pageTitleFromRoute(route: string) {
 const styles = StyleSheet.create({
   sideBar: {
     position: 'absolute',
-    backgroundColor: `${colors.light}`,
-    height: 'calc(100vh - 130px)',
+    backgroundColor: colors.light,
+    height: '100vh',
     overflow: 'scroll',
     width: '100%',
     padding: 15,
@@ -80,9 +80,11 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     backgroundColor: colors.white,
+    zIndex: -1,
   },
   bar: {
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomColor: colors.gray,
