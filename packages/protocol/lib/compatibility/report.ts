@@ -5,7 +5,7 @@ import {
 } from '@celo/protocol/lib/compatibility/ast-code'
 import { ASTStorageCompatibilityReport } from '@celo/protocol/lib/compatibility/ast-layout'
 import { categorize, Categorizer, ChangeType } from '@celo/protocol/lib/compatibility/categorizer'
-import { ContractVersionDelta } from '@celo/protocol/lib/compatibility/version'
+import { ContractVersionDelta, ContractVersionDeltaIndex } from '@celo/protocol/lib/compatibility/version'
 
 /**
  * Value object holding all uncategorized storage and code reports.
@@ -164,6 +164,14 @@ export class ASTDetailedVersionedReport {
     const global = ASTVersionedReport.create(changes)
     const contracts: ASTVersionedReportIndex = ASTVersionedReport.createByContract(changes)
     return new ASTDetailedVersionedReport(global, contracts)
+  }
+
+  versionDeltas = (): ContractVersionDeltaIndex => {
+    const deltas = {}
+    Object.keys(this.contracts).map((contract: string) => {
+      deltas[contract] = this.contracts[contract].versionDelta
+    })
+    return deltas
   }
 
   constructor(

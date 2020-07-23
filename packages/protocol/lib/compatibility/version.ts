@@ -40,16 +40,6 @@ export class ContractVersion {
     const deltas = [this.storage, this.major, this.minor, this.patch]
     return deltas.join('.')
   }
-
-  public getDelta = (fromVersion: ContractVersion): ContractVersionDelta => {
-    const difference = [this.storage - fromVersion.storage, this.major - fromVersion.major, this.minor - fromVersion.minor, this.patch - fromVersion.patch]
-    // ContractVersionDeltas require at most one version number be incremented.
-    const nonZero = difference.filter(x => x !== 0)
-    if (nonZero.length > 1 || nonZero.some(x => x !== 1)) {
-      throw new Error(`Invalid delta between versions: ${fromVersion.toString()} -> ${this.toString()}`)
-    }
-    return ContractVersionDelta.fromChanges.apply(null, difference.map(x => x != 0))
-  }
 }
 
 export enum Delta {
@@ -120,44 +110,56 @@ export class ContractVersionDelta {
 }
 
 export class ContractVersionReport {
-  constructor(
-    public readonly contract: string,
-    public readonly oldVersion: ContractVersion,
-    public readonly newVersion: ContractVersion) {}
-  delta = (): ContractVersionDelta => {
-    return this.newVersion.getDelta(this.oldVersion)
+  public expectedVersion = (): ContractVersion => {
+    return this.expectedDelta.appliedTo(this.oldVersion)
   }
+
+  public isNewVersionExpected = (): boolean => {
+    return this.newVersion.toString() === this.expectedVersion().toString()
+  }
+
+  constructor(
+    public readonly oldVersion: ContractVersion,
+    public readonly newVersion: ContractVersion,
+    public readonly expectedDelta: ContractVersionDelta) {}
 }
 
 /**
- * A compatibility report with all the detected changes from two compiled
- * contract folders.
+ * A mapping {contract name => {@link ContractVersionDelta}}.
  */
-export class ContractVersionsReport {
-  constructor(private readonly versions: ContractVersionReport[]) {}
-  push(...versions: ContractVersionReport[]) {
-    this.versions.push(...versions)
-  }
-  include(other: ContractVersionsReport) {
-    this.push(...other.versions)
-  }
-  getVersions = (): ContractVersionReport[] => {
-    return this.versions
-  }
+export interface ContractVersionDeltaIndex {
+  [contract: string]: ContractVersionDelta
 }
 
-function mergeReports(reports: ContractVersionsReport[]): ContractVersionsReport {
-  const report = new ContractVersionsReport([])
-  reports.forEach((r: ContractVersionsReport): void => {
-    report.include(r)
-  })
-  return report
+/**
+ * A mapping {contract name => {@link ContractVersion}}.
+ */
+export interface ContractVersionIndex {
+  [contract: string]: ContractVersion;
+}
+
+/**
+ * A mapping {contract name => {@link ContractVersion}}.
+ */
+export class ContractVersions {
+  static fromArtifacts = (artifacts: BuildArtifacts): ContractVersions => {
+    const contracts = {}
+
+    artifacts.listArtifacts().map((artifact) => {
+      contracts[artifact.contractName] = getContractVersion(makeZContract(artifact))
+    })
+    return new ContractVersions(contracts)
+  }
+
+  constructor(public readonly contracts: ContractVersionIndex) {}
 }
 
 function getContractVersion(contract: ZContract): ContractVersion {
   //const vm = new VM()
   const bytecode = contract.schema.deployedBytecode
+  if (false) {
   console.log(bytecode)
+  }
   /*
   const version = await new Promise((resolve, reject) => {
     vm.runCode(
@@ -176,43 +178,4 @@ function getContractVersion(contract: ZContract): ContractVersion {
   */
   // TODO(asa): This is wrong!
   return ContractVersion.fromString('1.0.0.0')
-}
-
-function generateContractVersionsReport(oldContract: ZContract, newContract: ZContract): ContractVersionsReport {
-  // Sanity checks
-  if (newContract === null) {
-    throw new Error('newContract cannot be null')
-  }
-  const contractName = newContract.schema.contractName
-
-
-  let oldVersion = ContractVersion.fromString('0.0.0.0')
-  if (oldContract !== null) {
-    oldVersion = getContractVersion(oldContract)
-    // Name sanity check
-    if (oldContract.schema.contractName !== contractName) {
-      throw new Error(`Contract names should be equal: ${oldContract.schema.contractName} !== ${contractName}`)
-    }
-  }
-
-  const newVersion = getContractVersion(newContract)
-  return new ContractVersionsReport([new ContractVersionReport(contractName, oldVersion, newVersion)])
-}
-
-/**
- * Extracts contract versions from the provided artifacts.
- *
- * @param oldArtifacts
- * @param newArtifacts
- */
-export function reportContractVersions(
-  oldArtifacts: BuildArtifacts,
-  newArtifacts: BuildArtifacts): ContractVersionsReport {
-  const reports = newArtifacts.listArtifacts()
-  .map((newArtifact) => {
-    const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
-    const oldZContract = oldArtifact ? makeZContract(oldArtifact) : null
-    return generateContractVersionsReport(oldZContract, makeZContract(newArtifact))
-  })
-  return mergeReports(reports)
 }

@@ -1,6 +1,6 @@
 import { DefaultCategorizer } from '@celo/protocol/lib/compatibility/categorizer'
 import { instantiateArtifacts, ASTBackwardReport } from '@celo/protocol/lib/compatibility/utils'
-import { reportContractVersions } from '@celo/protocol/lib/compatibility/version'
+import { ASTContractVersionsReport } from '@celo/protocol/lib/compatibility/ast-version'
 import { writeJsonSync } from 'fs-extra'
 import * as path from 'path'
 import * as tmp from 'tmp'
@@ -69,19 +69,30 @@ try {
     new DefaultCategorizer(),
     out
   )
-  out(`Writing report to ${outFile} ...`)
+  out(`Writing compatibility report to ${outFile} ...`)
   writeJsonSync(outFile, backward, { spaces: 2 })
   out('Done\n')
   if (argv._.includes(COMMAND_REPORT)) {
     // Report always generated
     // Placebo command
   } else if (argv._.includes(COMMAND_SEM_CHECK)) {
-    const versions = reportContractVersions(
+    const versionReport = ASTContractVersionsReport.create(
       instantiateArtifacts(oldArtifactsFolder),
-      instantiateArtifacts(newArtifactsFolder)
+      instantiateArtifacts(newArtifactsFolder),
+      backward.report.versionDeltas()
     )
-    console.log(versions)
-    process.exit(0)
+    console.log(versionReport)
+    const mismatches = versionReport.mismatches()
+    if (mismatches.isEmpty()) {
+      console.log('Actual version numbers match expected')
+      process.exit(0)
+    } else {
+      const outFile2 = argv.output_file ? argv.output_file : tmp.tmpNameSync({})
+      console.error('Version mismatch detected...')
+      console.error(`Writing version mismatch to ${outFile2} ...`)
+      writeJsonSync(outFile2, mismatches, { spaces: 2 })
+      process.exit(1)
+    }
   } else {
     // Should never happen
     console.error('Error parsing command line arguments')
