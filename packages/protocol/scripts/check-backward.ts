@@ -77,11 +77,15 @@ try {
     // Placebo command
   } else if (argv._.includes(COMMAND_SEM_CHECK)) {
     const doVersionCheck = async () => {
-      const versionReport = await ASTContractVersionsReport.create(
-        instantiateArtifacts(oldArtifactsFolder),
-        instantiateArtifacts(newArtifactsFolder),
-        backward.report.versionDeltas()
-      )
+      const excludeRegexp: RegExp = exclude ? new RegExp(exclude) : null
+      const versionReport = (
+        await ASTContractVersionsReport.create(
+          instantiateArtifacts(oldArtifactsFolder),
+          instantiateArtifacts(newArtifactsFolder),
+          backward.report.versionDeltas()
+        )
+      ).excluding(excludeRegexp)
+
       const mismatches = versionReport.mismatches()
       if (mismatches.isEmpty()) {
         console.log('Actual version numbers match expected')

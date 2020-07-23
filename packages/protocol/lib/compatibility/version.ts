@@ -166,12 +166,6 @@ async function getContractVersion(contract: ZContract): Promise<ContractVersion>
     static: true,
     data: Buffer.from(data.slice(2), 'hex')
   })
-  if (contract.schema.contractName === 'Governance') {
-    // 94810
-    console.log(linkedBytecode.length)
-    console.log(result)
-    console.log(result.execResult.returnValue)
-  }
   if (result.execResult.exceptionError === undefined) {
     const value = result.execResult.returnValue
     if (value.length === 4 * 32) {

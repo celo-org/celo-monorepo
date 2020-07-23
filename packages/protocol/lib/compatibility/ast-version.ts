@@ -40,6 +40,25 @@ export class ASTContractVersionsReport {
   }
   constructor(public readonly contracts: ASTContractVersionReportIndex) {}
 
+  /**
+   * @return a new {@link ASTContractVersionsResport} with the same version 
+   * reports, excluding all contract names that match the {@param exclude}
+   * parameter.
+   */
+  excluding = (exclude: RegExp): ASTContractVersionsReport => {
+    const included = (contract: string): boolean => {
+      if (exclude != null) {
+        return !exclude.test(contract)
+      }
+      return true
+    }
+    const contracts = {}
+    Object.keys(this.contracts).filter(included).map((contract: string) => {
+      contracts[contract] = this.contracts[contract]
+    })
+    return new ASTContractVersionsReport(contracts)
+  }
+
 
   public mismatches = () : ASTContractVersionsReport => {
     const mismatches = {}
