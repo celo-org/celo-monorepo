@@ -2,7 +2,7 @@ import throttle from 'lodash.throttle'
 import { SingletonRouter, withRouter } from 'next/router'
 import * as React from 'react'
 import { findNodeHandle, ImageRequireSource, StyleSheet, View } from 'react-native'
-import MobileMenu from 'src/experience/common/MobileMenu'
+import MobileKitMenu from 'src/experience/common/MobileKitMenu'
 import scrollToHash from 'src/experience/common/scrollToHash'
 import Sidebar, { Page as Pages } from 'src/experience/common/Sidebar'
 import Topbar from 'src/experience/common/TopBar'
@@ -181,7 +181,7 @@ class Page extends React.Component<Props & ScreenProps, State> {
               <Topbar current={this.props.pages[0].href} />
             </View>
             {isMobile && (
-              <MobileMenu
+              <MobileKitMenu
                 pages={this.props.pages}
                 pathname={router.pathname}
                 routeHash={this.state.routeHash}
