@@ -155,13 +155,23 @@ async function getContractVersion(contract: ZContract): Promise<ContractVersion>
   const vm = new VM()
   const bytecode = contract.schema.deployedBytecode
   const data = '0x' + abi.methodID('getVersionNumber', []).toString('hex')
+  const nullAddress = '0000000000000000000000000000000000000000'
+  // Artificially link all libraries to the null address, since we're not calling into them anyway.
+  const linkedBytecode = bytecode.split(/[_]+[A-Za-z0-9]+[_]+/).join(nullAddress)
+  //const linkedBytecode = bytecode
   const result = await vm.runCall({
     to: Buffer.from('756F45E3FA69347A9A973A725E3C98bC4db0b5a0', 'hex'),
     caller: Buffer.from('756F45E3FA69347A9A973A725E3C98bC4db0b5a0', 'hex'),
-    code: Buffer.from(bytecode.slice(2), 'hex'),
+    code: Buffer.from(linkedBytecode.slice(2), 'hex'),
     static: true,
     data: Buffer.from(data.slice(2), 'hex')
   })
+  if (contract.schema.contractName === 'Governance') {
+    // 94810
+    console.log(linkedBytecode.length)
+    console.log(result)
+    console.log(result.execResult.returnValue)
+  }
   if (result.execResult.exceptionError === undefined) {
     const value = result.execResult.returnValue
     if (value.length === 4 * 32) {
