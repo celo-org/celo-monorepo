@@ -9,7 +9,7 @@ import config from '../../src/config'
 
 require('dotenv').config()
 
-const PHONE_NUM_PRIVACY_SERVICE = process.env.PHONE_NUM_PRIVACY_SERVICE_URL
+const PHONE_NUM_PRIVACY_SERVICE = process.env.PHONE_NUM_PRIVACY_SIGNER_SERVICE_URL
 const SIGN_MESSAGE_ENDPOINT = '/getDistributedBlindedSalt'
 
 const PRIVATE_KEY1 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'

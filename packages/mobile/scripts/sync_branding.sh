@@ -21,7 +21,7 @@ echo $mobile_root
 cd "$mobile_root"
 
 # Please update the sha when valora branding updates are needed
-valora_branding_sha=4f414a0
+valora_branding_sha=a3f5867
 
 if [[ "$branding" == "valora" ]]; then
   # prevents git from asking credentials
@@ -50,8 +50,8 @@ patterns_to_delete=(
   "android/app/src/*.xml"
   "android/app/src/*.png"
   "android/app/src/*.jpg"
-  "ios/*.png"
-  "ios/*.jpg"
+  "ios/celo/*.png"
+  "ios/celo/*.jpg"
   "src/*.png"
   "src/*.jpg"
 )
@@ -62,7 +62,7 @@ patterns_to_delete=(
 # outputs elements in set1 that are not in set2
 # See https://unix.stackexchange.com/questions/11343/linux-tools-to-treat-files-as-sets-and-perform-set-operations-on-them?rq=1
 to_delete=$(comm -23 \
-  <(git ls-files --ignored --exclude-standard -o ${patterns_to_delete[@]} | sort) \
+  <(git ls-files --others ${patterns_to_delete[@]} | sort) \
   <(cd "branding/$branding"; git ls-files ${patterns_to_delete[@]} | sort)
 )
 
