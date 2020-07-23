@@ -17,6 +17,8 @@ module.exports = async (callback: (error?: any) => number) => {
     const argv = require('minimist')(process.argv.slice(2), {
       string: ['account'],
     })
+    const selector = web3.eth.abi.encodeFunctionSignature('getVersionNumber()')
+    console.log(selector)
 
     const goldToken = await getDeployedProxiedContract<GoldTokenInstance>('GoldToken', artifacts)
     const stableToken = await getDeployedProxiedContract<StableTokenInstance>(

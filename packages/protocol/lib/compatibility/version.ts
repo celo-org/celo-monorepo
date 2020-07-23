@@ -4,7 +4,8 @@ import {
   BuildArtifacts,
   Contract as ZContract
 } from '@openzeppelin/upgrades'
-// const VM = require('ethereumjs-vm')
+const VM = require('ethereumjs-vm').default
+const abi = require('ethereumjs-abi')
 
 export class ContractVersion {
 
@@ -142,40 +143,37 @@ export interface ContractVersionIndex {
  * A mapping {contract name => {@link ContractVersion}}.
  */
 export class ContractVersions {
-  static fromArtifacts = (artifacts: BuildArtifacts): ContractVersions => {
+  static fromArtifacts = async (artifacts: BuildArtifacts): Promise<ContractVersions>=> {
     const contracts = {}
-
-    artifacts.listArtifacts().map((artifact) => {
-      contracts[artifact.contractName] = getContractVersion(makeZContract(artifact))
-    })
+    const election = artifacts.listArtifacts().filter((artifact) => artifact.contractName === 'Election')
+    contracts['Election'] = await getContractVersion(makeZContract(election[0]))
     return new ContractVersions(contracts)
   }
 
   constructor(public readonly contracts: ContractVersionIndex) {}
 }
 
-function getContractVersion(contract: ZContract): ContractVersion {
-  //const vm = new VM()
+async function getContractVersion(contract: ZContract): Promise<ContractVersion> {
+  const vm = new VM()
   const bytecode = contract.schema.deployedBytecode
-  if (false) {
-  console.log(bytecode)
-  }
+  const data = '0x' + abi.methodID('getVersionNumber', []).toString('hex')
+  console.log('data', data)
+
+//   0x54255be0
   /*
-  const version = await new Promise((resolve, reject) => {
-    vm.runCode(
-      {
-        code: Buffer.from(bytecode.slice(2), 'hex'),
-      },
-      (err: any, results: any) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve('0x' + results.return.toString('hex'))
-        }
-      }
-    )
+  vm.on('step', function (data) {
+    console.log(`Opcode: ${data.opcode.name}\tStack: ${data.stack}`)
   })
   */
-  // TODO(asa): This is wrong!
+
+  console.log('Running call...', data)
+  const result = await vm.runCall({
+    to: Buffer.from('756F45E3FA69347A9A973A725E3C98bC4db0b5a0', 'hex'),
+    caller: Buffer.from('756F45E3FA69347A9A973A725E3C98bC4db0b5a0', 'hex'),
+    code: Buffer.from(bytecode.slice(2), 'hex'),
+    static: true,
+    data: Buffer.from(data.slice(2), 'hex')
+  })
+  console.log('--------result-----------------------------------', result)
   return ContractVersion.fromString('1.0.0.0')
 }

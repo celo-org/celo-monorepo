@@ -27,10 +27,9 @@ export interface ASTContractVersionReportIndex {
 }
 
 export class ASTContractVersionsReport {
-  static create = (oldArtifacts: BuildArtifacts, newArtifacts: BuildArtifacts, expectedVersionDeltas: ContractVersionDeltaIndex): ASTContractVersionsReport => {
-    const oldVersions = ContractVersions.fromArtifacts(oldArtifacts)
-    const newVersions = ContractVersions.fromArtifacts(newArtifacts)
-    console.log(expectedVersionDeltas)
+  static create = async (oldArtifacts: BuildArtifacts, newArtifacts: BuildArtifacts, expectedVersionDeltas: ContractVersionDeltaIndex): Promise<ASTContractVersionsReport> => {
+    const oldVersions = await ContractVersions.fromArtifacts(oldArtifacts)
+    const newVersions = await ContractVersions.fromArtifacts(newArtifacts)
     const contracts = {}
     Object.keys(newVersions.contracts).map((contract:string) => {
       const versionDelta = expectedVersionDeltas[contract] === undefined ? ContractVersionDelta.fromChanges(false, false, false, false) : expectedVersionDeltas[contract]

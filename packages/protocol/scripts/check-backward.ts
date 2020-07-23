@@ -76,23 +76,25 @@ try {
     // Report always generated
     // Placebo command
   } else if (argv._.includes(COMMAND_SEM_CHECK)) {
-    const versionReport = ASTContractVersionsReport.create(
-      instantiateArtifacts(oldArtifactsFolder),
-      instantiateArtifacts(newArtifactsFolder),
-      backward.report.versionDeltas()
-    )
-    console.log(versionReport)
-    const mismatches = versionReport.mismatches()
-    if (mismatches.isEmpty()) {
-      console.log('Actual version numbers match expected')
-      process.exit(0)
-    } else {
-      const outFile2 = argv.output_file ? argv.output_file : tmp.tmpNameSync({})
-      console.error('Version mismatch detected...')
-      console.error(`Writing version mismatch to ${outFile2} ...`)
-      writeJsonSync(outFile2, mismatches, { spaces: 2 })
-      process.exit(1)
+    const doVersionCheck = async () => {
+      const versionReport = await ASTContractVersionsReport.create(
+        instantiateArtifacts(oldArtifactsFolder),
+        instantiateArtifacts(newArtifactsFolder),
+        backward.report.versionDeltas()
+      )
+      const mismatches = versionReport.mismatches()
+      if (mismatches.isEmpty()) {
+        console.log('Actual version numbers match expected')
+        process.exit(0)
+      } else {
+        const outFile2 = argv.output_file ? argv.output_file : tmp.tmpNameSync({})
+        console.error('Version mismatch detected...')
+        console.error(`Writing version mismatch to ${outFile2} ...`)
+        writeJsonSync(outFile2, mismatches, { spaces: 2 })
+        process.exit(1)
+      }
     }
+    doVersionCheck()
   } else {
     // Should never happen
     console.error('Error parsing command line arguments')
