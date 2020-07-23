@@ -201,8 +201,8 @@ exports[`Avatar renders correctly with contact 1`] = `
           Object {
             "color": "#2E3338",
             "fontFamily": "Inter-Regular",
-            "fontSize": 16,
-            "lineHeight": 22,
+            "fontSize": 14,
+            "lineHeight": 18,
           },
           Object {
             "alignItems": "center",
@@ -220,8 +220,8 @@ exports[`Avatar renders correctly with contact 1`] = `
           Object {
             "color": "#2E3338",
             "fontFamily": "Inter-Regular",
-            "fontSize": 16,
-            "lineHeight": 22,
+            "fontSize": 14,
+            "lineHeight": 18,
           },
           Object {
             "color": "#9CA4A9",
@@ -326,8 +326,8 @@ exports[`Avatar renders correctly with number but without contact 1`] = `
           Object {
             "color": "#2E3338",
             "fontFamily": "Inter-Regular",
-            "fontSize": 16,
-            "lineHeight": 22,
+            "fontSize": 14,
+            "lineHeight": 18,
           },
           Object {
             "alignItems": "center",
@@ -345,8 +345,8 @@ exports[`Avatar renders correctly with number but without contact 1`] = `
           Object {
             "color": "#2E3338",
             "fontFamily": "Inter-Regular",
-            "fontSize": 16,
-            "lineHeight": 22,
+            "fontSize": 14,
+            "lineHeight": 18,
           },
           Object {
             "color": "#9CA4A9",
