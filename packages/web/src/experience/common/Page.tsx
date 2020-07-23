@@ -218,7 +218,7 @@ class Page extends React.Component<Props & ScreenProps, State> {
             </Cell>
           </GridRow>
           <View style={styles.footer} nativeID={FOOTER_ID} ref={this.footer}>
-            <Footer />
+            <Footer hideForm={true} />
           </View>
         </View>
       </>
