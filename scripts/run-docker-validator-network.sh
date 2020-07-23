@@ -7,7 +7,7 @@ export LC_ALL=en_US.UTF-8
 COMMAND=${1:-"pull,accounts,run-validator,run-proxy,status,print-env"}
 DATA_DIR=${2:-"$HOME/.celo/network"}
 
-export CELO_IMAGE=${3:-"us.gcr.io/celo-testnet/celo-node:baklava"}
+export CELO_IMAGE=${3:-"us.gcr.io/celo-org/celo-node:baklava"}
 export NETWORK_ID=${4:-"200110"}
 export NETWORK_NAME=${5:-"baklava"}
 export DEFAULT_PASSWORD=${6:-"1234"}

@@ -25,7 +25,7 @@
 #METADATA_URL=
 #GROUP_METADATA_URL=
 
-#CELO_IMAGE="us.gcr.io/celo-testnet/celo-node:baklava"
+#CELO_IMAGE="us.gcr.io/celo-org/celo-node:baklava"
 #NETWORK_ID=200110
 #NETWORK_NAME=baklava
 #CELO_IMAGE_ATTESTATION="us.gcr.io/celo-testnet/celo-monorepo:attestation-service-8f87dda20f1854c9532a5cbcf8ff556f48dff413"

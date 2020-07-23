@@ -46,7 +46,7 @@ storage:
 
 geth:
   image:
-    repository: us.gcr.io/celo-testnet/geth
+    repository: us.gcr.io/celo-org/geth
     tag: 1b40b25d315bfcd792138e288ea61351d6c44d09
     imagePullPolicy: IfNotPresent
   resources:

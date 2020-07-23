@@ -41,7 +41,7 @@ variable geth_node_docker_image {
   type        = map(string)
 
   default = {
-    repository = "us.gcr.io/celo-testnet/celo-node"
+    repository = "us.gcr.io/celo-org/celo-node"
     tag        = "baklava"
   }
 }

@@ -122,7 +122,7 @@
     },
     "gethNodeDockerImageRepository": {
       "type": "string",
-      "defaultValue": "us.gcr.io/celo-testnet/celo-node",
+      "defaultValue": "us.gcr.io/celo-org/celo-node",
       "metadata": {
         "description": "Celo geth Docker image repository"
       }
