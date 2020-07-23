@@ -1,5 +1,6 @@
 const org = process.env.CIRCLE_PROJECT_USERNAME || 'celo-org'
 const repo = process.env.CIRCLE_PROJECT_REPONAME || 'celo-monorepo'
+const numJobsBeingTracked = 21
 
 // shouldTrackFlakes => tests are retried `numRetries` times and flakey results are logged w/ test output
 const shouldTrackFlakes =
@@ -29,6 +30,7 @@ const shouldReportFlakes = shouldAddCheckToPR || shouldCreateIssues
 const shouldUseGitHub = shouldSkipKnownFlakes || shouldReportFlakes
 
 module.exports = {
+  numJobsBeingTracked: numJobsBeingTracked,
   numRetries: numRetries,
   org: org,
   repo: repo,

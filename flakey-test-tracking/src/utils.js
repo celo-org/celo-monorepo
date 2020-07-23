@@ -104,7 +104,7 @@ function fmtSummary(flakes, skippedTests, verbosity) {
     if (skippedTests.length) {
       return 'Some tests were skipped due to flakiness. No new flakiness detected.'
     }
-    return 'We have achieved zero flakiness ' + hands + ' ' + greenCheck
+    return 'We have achieved zero flakiness ' + hands
   }
 
   let summary = verbosity > 2 ? '\n_____FlakeTracker_____\n' : ''
@@ -163,14 +163,18 @@ module.exports = {
   fmtFlakeIssue: fmtFlakeIssue,
   fmtSummary: fmtSummary,
   fmtTestTitles: fmtTestTitles,
+  greenCheck: greenCheck,
   getPackageName: getPackageName,
   getPullNumber: getPullNumber,
   getTestSuiteDir: getTestSuiteDir,
   getTestSuiteTitles: getTestSuiteTitles,
+  hands: hands,
   parseErrLineNumberFromStack: parseErrLineNumberFromStack,
   parseFirstErrFromFlakeBody: parseFirstErrFromFlakeBody,
   parseFirstLineOfStack: parseFirstLineOfStack,
   parseMandatoryTestIssuesFromPullBody: parseMandatoryTestIssuesFromPullBody,
   parsePathFromStack: parsePathFromStack,
   parseTestIdFromFlakeTitle: parseTestIdFromFlakeTitle,
+  redX: redX,
+  warning: warning,
 }

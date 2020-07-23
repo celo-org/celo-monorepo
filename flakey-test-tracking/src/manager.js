@@ -1,17 +1,14 @@
-const {
-  shouldUseGitHub,
-  shouldSkipKnownFlakes,
-  shouldReportFlakes,
-  shouldAddCheckToPR,
-} = require('./config')
+const { shouldAddCheckToPR, shouldUseGitHub, shouldSkipKnownFlakes } = require('./config')
 const db = require('./db')
 const GitHub = require('./github')
 const { fmtSummary } = require('./utils')
 
 class FlakeManager {
   constructor(github, knownFlakes) {
-    if (github === undefined && shouldUseGitHub) {
-      throw new Error('GitHub cannot be undefined if flake skipping, PR check, or issues enabled.')
+    if (github === undefined || knownFlakes === undefined) {
+      throw new Error(
+        'FlakeManager constructor should not be called directly. Please use FlakeManager.build()'
+      )
     }
     this.github = github
     this.knownFlakes = knownFlakes
@@ -23,7 +20,7 @@ class FlakeManager {
     let knownFlakes = []
     if (shouldUseGitHub) {
       github = await GitHub.build()
-      if (shouldReportFlakes) {
+      if (shouldSkipKnownFlakes) {
         knownFlakes = await github.fetchKnownFlakesToSkip()
         db.writeKnownFlakes(knownFlakes)
         if (shouldAddCheckToPR) {
@@ -36,7 +33,7 @@ class FlakeManager {
 
   async finish() {
     const flakes = db.readNewFlakes()
-    const skippedTests = shouldSkipKnownFlakes ? this.knownFlakes : []
+    const skippedTests = this.knownFlakes
 
     if (shouldUseGitHub) {
       await this.github.report(flakes, skippedTests)
