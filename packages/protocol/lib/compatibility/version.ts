@@ -31,6 +31,17 @@ export class ContractVersion {
     )
   }
 
+  static fromBuffer = (version: Buffer): ContractVersion => {
+    if (version.length !== 4 * 32) {
+      throw new Error(`Invalid version buffer: ${version}`)
+    }
+    const storage = version.slice(0, 32)
+    const major = version.slice(32, 64)
+    const minor = version.slice(64, 96)
+    const patch = version.slice(96, 128)
+    return ContractVersion.fromString(`${storage.toString('hex')}.${major.toString('hex')}.${minor.toString('hex')}.${patch.toString('hex')}`)
+  }
+
   constructor(
     public readonly storage: number,
     public readonly major: number,
@@ -157,16 +168,6 @@ async function getContractVersion(contract: ZContract): Promise<ContractVersion>
   const vm = new VM()
   const bytecode = contract.schema.deployedBytecode
   const data = '0x' + abi.methodID('getVersionNumber', []).toString('hex')
-  console.log('data', data)
-
-//   0x54255be0
-  /*
-  vm.on('step', function (data) {
-    console.log(`Opcode: ${data.opcode.name}\tStack: ${data.stack}`)
-  })
-  */
-
-  console.log('Running call...', data)
   const result = await vm.runCall({
     to: Buffer.from('756F45E3FA69347A9A973A725E3C98bC4db0b5a0', 'hex'),
     caller: Buffer.from('756F45E3FA69347A9A973A725E3C98bC4db0b5a0', 'hex'),
@@ -174,6 +175,12 @@ async function getContractVersion(contract: ZContract): Promise<ContractVersion>
     static: true,
     data: Buffer.from(data.slice(2), 'hex')
   })
-  console.log('--------result-----------------------------------', result)
+  if (result.execResult.exceptionError === undefined) {
+    const value = result.execResult.returnValue
+    if (value.length === 4 * 32) {
+      return ContractVersion.fromBuffer(value)
+    }
+  }
+  // If we can't fetch the version number, assume version 1.0.0.0.
   return ContractVersion.fromString('1.0.0.0')
 }

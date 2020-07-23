@@ -212,5 +212,5 @@ export const reportLayoutIncompatibilities = (oldArtifacts: BuildArtifacts, newA
     if (oldArtifact !== undefined) {
       return generateCompatibilityReport(oldArtifact, oldArtifacts, newArtifact, newArtifacts)
     }
-  })
+  }).filter((r) => r !== undefined)
 }
