@@ -281,7 +281,7 @@ export class Account extends React.Component<Props, State> {
   }
 
   confirmAccountRemoval = async () => {
-    await this.props.clearStoredAccount()
+    await this.props.clearStoredAccount(this.props.account)
     this.props.navigation.setParams({ promptConfirmRemovalModal: false })
     this.props.navigation.reset({
       index: 0,

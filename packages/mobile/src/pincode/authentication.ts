@@ -232,11 +232,9 @@ export async function ensureCorrectPassword(
   }
 }
 
-export async function removeAccountLocally() {
+export async function removeAccountLocally(account: string) {
   clearPasswordCaches()
-  const removed = await removeStoredItem(STORAGE_KEYS.PEPPER)
-  if (!removed) {
-    // This shouldn't happen, should we do something here?
-  }
+  await removeStoredItem(STORAGE_KEYS.PEPPER)
+  await removeStoredItem(passwordHashStorageKey(account))
   // TODO: Remove the account from geth.
 }

@@ -6,6 +6,7 @@ import BigNumber from 'bignumber.js'
 import { call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import {
   Actions,
+  ClearStoredAccountAction,
   SetPincodeAction,
   setPincodeFailure,
   setPincodeSuccess,
@@ -98,8 +99,8 @@ function* migrateAccountToProperBip39() {
   }
 }
 
-function* clearStoredAccount() {
-  yield call(removeAccountLocally)
+function* clearStoredAccount({ account }: ClearStoredAccountAction) {
+  yield call(removeAccountLocally, account)
 }
 
 export function* watchMigrateAccountToProperBip39() {

@@ -127,8 +127,9 @@ export interface MigrateAccount {
   type: Actions.MIGRATE_ACCOUNT_BIP39
 }
 
-export interface ClearStoredAccount {
+export interface ClearStoredAccountAction {
   type: Actions.CLEAR_STORED_ACCOUNT
+  account: string
 }
 
 export type ActionTypes =
@@ -154,7 +155,7 @@ export type ActionTypes =
   | SetRetryVerificationWithFornoAction
   | AcceptTermsAction
   | MigrateAccount
-  | ClearStoredAccount
+  | ClearStoredAccountAction
 
 export function setName(name: string): SetNameAction {
   return {
@@ -269,6 +270,7 @@ export const migrateAccount = (): MigrateAccount => ({
   type: Actions.MIGRATE_ACCOUNT_BIP39,
 })
 
-export const clearStoredAccount = (): ClearStoredAccount => ({
+export const clearStoredAccount = (account: string): ClearStoredAccountAction => ({
   type: Actions.CLEAR_STORED_ACCOUNT,
+  account,
 })
