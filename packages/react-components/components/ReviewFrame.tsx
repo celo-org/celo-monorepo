@@ -58,6 +58,7 @@ class ReviewFrame extends React.PureComponent<Props, State> {
               accessibilityLabel={confirmButton.text}
               type={BtnTypes.PRIMARY}
               size={BtnSizes.FULL}
+              style={styles.confirmButton}
               disabled={confirmButton.disabled || this.state.confirmed}
               testID="ConfirmButton"
             />
@@ -125,6 +126,9 @@ const styles = StyleSheet.create({
   },
   modifyButton: {
     marginBottom: 10,
+  },
+  confirmButton: {
+    marginBottom: 16,
   },
 })
 

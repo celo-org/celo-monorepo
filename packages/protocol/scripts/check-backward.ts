@@ -1,6 +1,7 @@
 import { DefaultCategorizer } from '@celo/protocol/lib/compatibility/categorizer'
 import { instantiateArtifacts, ASTBackwardReport } from '@celo/protocol/lib/compatibility/utils'
 import { ASTContractVersionsReport } from '@celo/protocol/lib/compatibility/ast-version'
+import { ContractVersion } from '@celo/protocol/lib/compatibility/version'
 import { writeJsonSync } from 'fs-extra'
 import * as path from 'path'
 import * as tmp from 'tmp'
@@ -11,10 +12,7 @@ const COMMAND_SEM_CHECK = 'sem_check'
 
 const argv = yargs
   .command(COMMAND_REPORT, 'Generates a backward compatibility report')
-  .command(
-    COMMAND_SEM_CHECK,
-    'Check if the semantic version change is correct (exit code 0, or 1 otherwise)'
-  )
+  .command(COMMAND_SEM_DELTA, 'Generates the semantic version delta')
   .option('exclude', {
     alias: 'e',
     description: 'Contract name exclusion pattern',

@@ -1,25 +1,28 @@
 import * as React from 'react'
-import 'react-native'
+import { render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
-import * as renderer from 'react-test-renderer'
 import { VerificationStatus } from 'src/identity/types'
-import { Screens } from 'src/navigator/Screens'
 import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
-import { createMockStore, getMockStackScreenProps } from 'test/utils'
+import { createMockStore } from 'test/utils'
 
-// Mocking the carousel since it seems to cause transient snapshot failures
-jest.mock('react-native-snap-carousel')
+// Mock AnimatedScrollView this way otherwise we get a
+// `JavaScript heap out of memory` error when ref is set (?!)
+jest.mock(
+  'react-native/Libraries/Animated/src/components/AnimatedScrollView.js',
+  () => 'RCTScrollView'
+)
+
+// Lock time so snapshots always show the same countdown value
+jest.spyOn(Date, 'now').mockImplementation(() => 1487076708000)
 
 describe('VerificationLoadingScreen', () => {
   it('renders correctly', () => {
-    const tree = renderer.create(
+    const { toJSON } = render(
       <Provider store={createMockStore()}>
-        <VerificationLoadingScreen
-          {...getMockStackScreenProps(Screens.VerificationLoadingScreen)}
-        />
+        <VerificationLoadingScreen />
       </Provider>
     )
-    expect(tree).toMatchSnapshot()
+    expect(toJSON()).toMatchSnapshot()
   })
 
   it('renders correctly with fail modal', () => {
@@ -28,13 +31,11 @@ describe('VerificationLoadingScreen', () => {
         verificationStatus: VerificationStatus.Failed,
       },
     })
-    const tree = renderer.create(
+    const { toJSON } = render(
       <Provider store={store}>
-        <VerificationLoadingScreen
-          {...getMockStackScreenProps(Screens.VerificationLoadingScreen)}
-        />
+        <VerificationLoadingScreen />
       </Provider>
     )
-    expect(tree).toMatchSnapshot()
+    expect(toJSON()).toMatchSnapshot()
   })
 })

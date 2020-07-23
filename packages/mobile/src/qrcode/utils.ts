@@ -61,22 +61,22 @@ function* handleSecureSend(
 
   const userScannedAddress = data.address.toLowerCase()
   const { e164PhoneNumber } = secureSendTxData.recipient
-  const possibleRecievingAddresses = e164NumberToAddress[e164PhoneNumber]
+  const possibleReceivingAddresses = e164NumberToAddress[e164PhoneNumber]
   // This should never happen. Secure Send is triggered when there are
-  // multiple addrresses for a given phone number
-  if (!possibleRecievingAddresses) {
+  // multiple addresses for a given phone number
+  if (!possibleReceivingAddresses) {
     throw Error("No addresses associated with recipient's phone number")
   }
 
   // Need to add the requester address to the option set in the event
   // a request is coming from an unverified account
-  if (requesterAddress && !possibleRecievingAddresses.includes(requesterAddress)) {
-    possibleRecievingAddresses.push(requesterAddress)
+  if (requesterAddress && !possibleReceivingAddresses.includes(requesterAddress)) {
+    possibleReceivingAddresses.push(requesterAddress)
   }
-  const possibleRecievingAddressesFormatted = possibleRecievingAddresses.map((address) =>
+  const possibleReceivingAddressesFormatted = possibleReceivingAddresses.map((address) =>
     address.toLowerCase()
   )
-  if (!possibleRecievingAddressesFormatted.includes(userScannedAddress)) {
+  if (!possibleReceivingAddressesFormatted.includes(userScannedAddress)) {
     const error = ErrorMessages.QR_FAILED_INVALID_RECIPIENT
     ValoraAnalytics.track(SendEvents.send_secure_incorrect, {
       confirmByScan: true,

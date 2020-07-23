@@ -11,11 +11,16 @@ export async function retryTx(fn: any, args: any[]) {
       return rvalue
     } catch (e) {
       console.error(e)
-      await prompts({
+      const { confirmation } = await prompts({
         type: 'confirm',
         name: 'confirmation',
-        message: 'Error while sending tx, press enter when resolved to try again',
+        // @ts-ignore: typings incorrectly only accept string.
+        initial: true,
+        message: 'Error while sending tx. Try again?',
       })
+      if (!confirmation) {
+        throw e
+      }
     }
   }
 }

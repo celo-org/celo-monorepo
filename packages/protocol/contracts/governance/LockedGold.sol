@@ -38,7 +38,7 @@ contract LockedGold is
     PendingWithdrawal[] pendingWithdrawals;
   }
 
-  mapping(address => Balances) private balances;
+  mapping(address => Balances) internal balances;
 
   // Iterable map to store whitelisted identifiers.
   // Necessary to allow iterating over whitelisted IDs to check ID's address at runtime.
@@ -177,6 +177,7 @@ contract LockedGold is
     );
     _decrementNonvotingAccountBalance(msg.sender, value);
     uint256 available = now.add(unlockingPeriod);
+    // CERTORA: the slot containing the length could be MAX_UINT
     account.pendingWithdrawals.push(PendingWithdrawal(value, available));
     emit GoldUnlocked(msg.sender, value, available);
   }

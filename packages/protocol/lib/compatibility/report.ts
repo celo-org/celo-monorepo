@@ -178,5 +178,4 @@ export class ASTDetailedVersionedReport {
     public readonly global: ASTVersionedReport,
     public readonly contracts: ASTVersionedReportIndex
   ) {}
-
 }

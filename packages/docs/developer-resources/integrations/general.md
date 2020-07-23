@@ -16,7 +16,7 @@ By default, `geth` will use `/root/.celo` as the data dir, if you would like to 
 
 cLabs generally hosts bootnodes to help nodes discover each other on the network. You can fetch those under `https://www.googleapis.com/storage/v1/b/env_bootnodes/o/${NETWORK_NAME}\?alt\=media`.
 
-The current network ID for the Alfajores testnet is `44786`, for the Baklava testnet it is `200110`.
+The current network ID for the Alfajores testnet is `44787`, for the Baklava testnet it is `62320`.
 
 This is all you should need to connect to a network:
 
