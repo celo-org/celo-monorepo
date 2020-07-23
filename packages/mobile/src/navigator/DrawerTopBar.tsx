@@ -1,10 +1,10 @@
 import colors from '@celo/react-components/styles/colors.v2'
+import { iconHitslop } from '@celo/react-components/styles/variables'
 import { useNavigation } from '@react-navigation/native'
 import * as React from 'react'
 import { processColor, StyleSheet, TouchableOpacity } from 'react-native'
 import Animated, { cond, greaterThan } from 'react-native-reanimated'
 import Hamburger from 'src/icons/Hamburger'
-import { iconHitslop } from '@celo/react-components/styles/variables'
 
 interface Props {
   middleElement?: React.ReactNode
@@ -29,10 +29,9 @@ function DrawerTopBar({ middleElement, scrollPosition, testID }: Props) {
 
   return (
     <Animated.View testID={testID} style={viewStyle}>
-      {/*
-      // @ts-ignore Only used in a drawer */}
       <TouchableOpacity
         style={styles.hamburger}
+        // @ts-ignore Only used in a drawer
         onPress={navigation.toggleDrawer}
         hitSlop={iconHitslop}
       >
