@@ -1,6 +1,7 @@
 const Mocha = require('mocha')
 const FlakeManager = require('../manager')
 const { getTestID, fmtError } = require('./utils')
+const { shouldLogRetryErrorsOnFailure } = require('../config')
 const { Spec } = Mocha.reporters
 
 function FlakeReporter(runner) {
@@ -21,6 +22,9 @@ function FlakeReporter(runner) {
 
   runner.on('retry', function(test, err) {
     console.log('Retry #' + test.currentRetry() + ' for test ' + getTestID(test))
+    if (shouldLogRetryErrorsOnFailure) {
+      console.log('\n' + err + '\n')
+    }
     currErrors.push(fmtError(err))
   })
 

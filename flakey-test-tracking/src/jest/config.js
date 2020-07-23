@@ -1,4 +1,9 @@
-const { shouldTrackFlakes, numRetries, shouldSkipKnownFlakes } = require('../config')
+const {
+  numRetries,
+  shouldLogRetryErrorsOnFailure,
+  shouldSkipKnownFlakes,
+  shouldTrackFlakes,
+} = require('../config')
 
 const base = {
   // No flake tracking
@@ -48,6 +53,7 @@ module.exports = {
   jsdomFlakeTracking: jsdomFlakeTracking,
   nodeFlakeTracking: nodeFlakeTracking,
   numRetries: numRetries,
+  shouldLogRetryErrorsOnFailure: shouldLogRetryErrorsOnFailure,
   shouldSkipKnownFlakes: shouldSkipKnownFlakes,
   shouldTrackFlakes: shouldTrackFlakes,
 }

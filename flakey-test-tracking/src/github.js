@@ -3,7 +3,7 @@ const { App } = require('@octokit/app')
 const { retry } = require('@octokit/plugin-retry')
 const Client = Octokit.plugin(retry)
 const stripAnsi = require('strip-ansi')
-const { shouldCreateIssues, shouldAddCheckToPR } = require('./config')
+const { org, repo, shouldCreateIssues, shouldAddCheckToPR } = require('./config')
 const {
   fmtSummary,
   getPackageName,
@@ -15,11 +15,12 @@ const {
   parsePathFromStack,
 } = require('./utils')
 
-const FlakeLabel = 'FLAKEY'
 const defaults = {
-  owner: process.env.CIRCLE_PROJECT_USERNAME || 'celo-org',
-  repo: process.env.CIRCLE_PROJECT_REPONAME || 'celo-monorepo',
+  owner: org,
+  repo: repo,
 }
+
+const FlakeLabel = 'FLAKEY'
 
 const getLabels = () => {
   return [FlakeLabel, getPackageName(), process.env.CIRCLE_JOB]
@@ -38,7 +39,6 @@ class GitHub {
     const app = new App({
       id: 71131,
       privateKey: process.env.FLAKE_TRACKER_SECRET.replace(/\\n/gm, '\n'),
-      //privateKey: privateKey,
     })
 
     const rest = await auth(app)
@@ -203,9 +203,7 @@ class GitHub {
   async fetchKnownFlakesToSkip() {
     const flakeIssues = await this.fetchFlakeIssues()
     const mandatoryTests = await this.fetchMandatoryTestsForPR()
-    console.log(JSON.stringify(mandatoryTests)) //TODO(Alec): delete logs
     const knownFlakesToSkip = flakeIssues.filter((i) => {
-      console.log(JSON.stringify(i))
       return !mandatoryTests.includes(i.number.toString())
     })
     return knownFlakesToSkip.map((i) => i.title)

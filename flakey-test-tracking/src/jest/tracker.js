@@ -2,7 +2,7 @@ require('jest-circus')
 const { makeRunResult } = require('jest-circus/build/utils')
 const db = require('../db')
 const { getTestID, getTestIDFromTestPath, buildFlakeyDescribe } = require('./utils')
-const { shouldSkipKnownFlakes, numRetries } = require('./config')
+const { shouldLogRetryErrorsOnFailure, shouldSkipKnownFlakes, numRetries } = require('./config')
 const clone = require('clone')
 
 class FlakeTracker {
@@ -36,6 +36,9 @@ class FlakeTracker {
           // Test failed on every retry => not flakey
           this.flakes.delete(testID)
         } else {
+          if (shouldLogRetryErrorsOnFailure) {
+            console.log('\n' + event.test.errors + '\n')
+          }
           // Test will be retried => store error
           const prevErrors = this.flakes.get(testID)
           const errors = prevErrors || []
