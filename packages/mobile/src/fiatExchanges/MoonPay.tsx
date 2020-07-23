@@ -1,4 +1,5 @@
 import colors from '@celo/react-components/styles/colors'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import { WebView } from 'react-native-webview'
@@ -7,18 +8,16 @@ import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import config from 'src/geth/networkConfig'
 import i18n from 'src/i18n'
-import { emptyHeader } from 'src/navigator/Headers.v2'
-import { navigate } from 'src/navigator/NavigationService'
-
-import { StackScreenProps } from '@react-navigation/stack'
 import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
 import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
+import { emptyHeader } from 'src/navigator/Headers.v2'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
 import { currentAccountSelector } from 'src/web3/selectors'
 
-const celoCurrencyCode = 'CUSD'
+const celoCurrencyCode = 'celo'
 
 export const moonPayOptions = () => {
   const navigateToFiatExchange = () => navigate(Screens.FiatExchange)

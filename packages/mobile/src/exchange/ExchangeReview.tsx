@@ -11,8 +11,8 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { CeloExchangeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
-import FeeIcon from 'src/components/FeeIcon'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import FeeDrawer from 'src/components/FeeDrawer'
 import LineItemRow from 'src/components/LineItemRow.v2'
 import TotalLineItem from 'src/components/TotalLineItem'
 import { exchangeTokens, fetchExchangeRate, fetchTobinTax } from 'src/exchange/actions'
@@ -30,8 +30,8 @@ import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange
 
 interface StateProps {
   exchangeRatePair: ExchangeRatePair | null
-  tobinTax: string
-  fee: string
+  tobinTax: BigNumber
+  fee: BigNumber
   appConnected: boolean
   localCurrencyExchangeRate: string | null | undefined
 }
@@ -55,8 +55,9 @@ type Props = StateProps & WithTranslation & DispatchProps & OwnProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
   exchangeRatePair: state.exchange.exchangeRatePair,
-  tobinTax: state.exchange.tobinTax || '0',
-  fee: '0',
+  tobinTax: new BigNumber(state.exchange.tobinTax || 0),
+  // TODO: use real fee
+  fee: new BigNumber(0),
   appConnected: isAppConnected(state),
   localCurrencyExchangeRate: getLocalCurrencyExchangeRate(state),
 })
@@ -159,7 +160,7 @@ export class ExchangeReview extends React.Component<Props, State> {
   }
 
   render() {
-    const { exchangeRatePair, fee, t, appConnected, tobinTax } = this.props
+    const { exchangeRatePair, t, appConnected, tobinTax, fee } = this.props
 
     const exchangeRate = getRateForMakerToken(
       exchangeRatePair,
@@ -180,16 +181,10 @@ export class ExchangeReview extends React.Component<Props, State> {
       value: dollarAmount,
       currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
     }
-    const exchangeFeeAmount = {
-      value: tobinTax,
-      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-    }
-    const securityFeeAmount = {
-      value: fee,
-      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-    }
+    const totalFee = new BigNumber(tobinTax).plus(fee)
+
     const totalAmount = {
-      value: dollarAmount.plus(tobinTax).plus(fee),
+      value: dollarAmount.plus(totalFee),
       currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
     }
 
@@ -221,16 +216,15 @@ export class ExchangeReview extends React.Component<Props, State> {
                 }
                 amount={<CurrencyDisplay amount={subtotalAmount} />}
               />
-              <LineItemRow
-                title={t('exchangeFee')}
-                titleIcon={<FeeIcon />}
-                amount={<CurrencyDisplay amount={exchangeFeeAmount} formatType={FormatType.Fee} />}
+              <FeeDrawer
+                testID={'feeDrawer/ExchangeReview'}
+                currency={CURRENCY_ENUM.DOLLAR}
+                securityFee={fee}
+                exchangeFee={tobinTax}
+                isExchange={true}
+                totalFee={totalFee}
               />
-              <LineItemRow
-                title={t('securityFee')}
-                titleIcon={<FeeIcon isExchange={true} />}
-                amount={<CurrencyDisplay amount={securityFeeAmount} formatType={FormatType.Fee} />}
-              />
+
               <HorizontalLine />
               <TotalLineItem amount={totalAmount} />
             </View>

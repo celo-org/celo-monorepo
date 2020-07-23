@@ -30,6 +30,7 @@ export enum Actions {
   ADD_CONTACT_MATCHES = 'IDENTITY/ADD_CONTACT_MATCHES',
   VALIDATE_RECIPIENT_ADDRESS = 'SEND/VALIDATE_RECIPIENT_ADDRESS',
   VALIDATE_RECIPIENT_ADDRESS_SUCCESS = 'SEND/VALIDATE_RECIPIENT_ADDRESS_SUCCESS',
+  VALIDATE_RECIPIENT_ADDRESS_RESET = 'SEND/VALIDATE_RECIPIENT_ADDRESS_RESET',
   REQUIRE_SECURE_SEND = 'SEND/REQUIRE_SECURE_SEND',
   END_FETCHING_ADDRESSES = 'END_FETCHING_ADDRESSES',
 }
@@ -137,6 +138,11 @@ export interface ValidateRecipientAddressSuccessAction {
   validatedAddress: string
 }
 
+export interface ValidateRecipientAddressResetAction {
+  type: Actions.VALIDATE_RECIPIENT_ADDRESS_RESET
+  e164Number: string
+}
+
 export interface RequireSecureSendAction {
   type: Actions.REQUIRE_SECURE_SEND
   e164Number: E164Number
@@ -166,6 +172,7 @@ export type ActionTypes =
   | AddContactMatchesAction
   | ValidateRecipientAddressAction
   | ValidateRecipientAddressSuccessAction
+  | ValidateRecipientAddressResetAction
   | RequireSecureSendAction
   | FetchAddressesAndValidateAction
   | EndFetchingAddressesAction
@@ -296,6 +303,13 @@ export const validateRecipientAddressSuccess = (
   type: Actions.VALIDATE_RECIPIENT_ADDRESS_SUCCESS,
   e164Number,
   validatedAddress,
+})
+
+export const validateRecipientAddressReset = (
+  e164Number: E164Number
+): ValidateRecipientAddressResetAction => ({
+  type: Actions.VALIDATE_RECIPIENT_ADDRESS_RESET,
+  e164Number,
 })
 
 export const requireSecureSend = (

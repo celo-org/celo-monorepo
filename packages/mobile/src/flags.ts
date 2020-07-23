@@ -5,6 +5,7 @@ export const features = {
   DATA_SAVER: true,
   PHONE_NUM_METADATA_IN_TRANSFERS: true,
   VERIFICATION_FORNO_RETRY: true,
+  CUSD_MOONPAY_ENABLED: false,
 }
 
 export const pausedFeatures = {

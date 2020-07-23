@@ -28,6 +28,7 @@
 
 * [addAccount](_contractkit_src_kit_.contractkit.md#addaccount)
 * [getEpochNumberOfBlock](_contractkit_src_kit_.contractkit.md#getepochnumberofblock)
+* [getEpochSize](_contractkit_src_kit_.contractkit.md#getepochsize)
 * [getFirstBlockNumberForEpoch](_contractkit_src_kit_.contractkit.md#getfirstblocknumberforepoch)
 * [getLastBlockNumberForEpoch](_contractkit_src_kit_.contractkit.md#getlastblocknumberforepoch)
 * [getNetworkConfig](_contractkit_src_kit_.contractkit.md#getnetworkconfig)
@@ -218,7 +219,7 @@ ___
 
 ▸ **getEpochNumberOfBlock**(`blockNumber`: number): *Promise‹number›*
 
-*Defined in [contractkit/src/kit.ts:369](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L369)*
+*Defined in [contractkit/src/kit.ts:374](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L374)*
 
 **Parameters:**
 
@@ -230,11 +231,21 @@ Name | Type |
 
 ___
 
+###  getEpochSize
+
+▸ **getEpochSize**(): *Promise‹number›*
+
+*Defined in [contractkit/src/kit.ts:347](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L347)*
+
+**Returns:** *Promise‹number›*
+
+___
+
 ###  getFirstBlockNumberForEpoch
 
 ▸ **getFirstBlockNumberForEpoch**(`epochNumber`: number): *Promise‹number›*
 
-*Defined in [contractkit/src/kit.ts:347](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L347)*
+*Defined in [contractkit/src/kit.ts:354](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L354)*
 
 **Parameters:**
 
@@ -250,7 +261,7 @@ ___
 
 ▸ **getLastBlockNumberForEpoch**(`epochNumber`: number): *Promise‹number›*
 
-*Defined in [contractkit/src/kit.ts:358](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L358)*
+*Defined in [contractkit/src/kit.ts:364](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L364)*
 
 **Parameters:**
 
@@ -370,6 +381,6 @@ ___
 
 ▸ **stop**(): *void*
 
-*Defined in [contractkit/src/kit.ts:381](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L381)*
+*Defined in [contractkit/src/kit.ts:385](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L385)*
 
 **Returns:** *void*

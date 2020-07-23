@@ -17,9 +17,11 @@ import { handleBarcode, shareSVGImage } from 'src/qrcode/utils'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import {
   Actions,
+  HandleBarcodeDetectedAction,
   SendPaymentOrInviteAction,
   sendPaymentOrInviteFailure,
   sendPaymentOrInviteSuccess,
+  ShareQRCodeAction,
 } from 'src/send/actions'
 import { transferStableToken } from 'src/stableToken/actions'
 import {
@@ -66,7 +68,7 @@ export async function getSendFee(
 
 export function* watchQrCodeDetections() {
   while (true) {
-    const action = yield take(Actions.BARCODE_DETECTED)
+    const action: HandleBarcodeDetectedAction = yield take(Actions.BARCODE_DETECTED)
     Logger.debug(TAG, 'Barcode detected in watcher')
     const addressToE164Number = yield select(addressToE164NumberSelector)
     const recipientCache = yield select(recipientCacheSelector)
@@ -77,7 +79,7 @@ export function* watchQrCodeDetections() {
 
     if (action.scanIsForSecureSend) {
       secureSendTxData = action.transactionData
-      requesterAddress = action.requesterAddrress
+      requesterAddress = action.requesterAddress
     }
 
     try {
@@ -99,7 +101,7 @@ export function* watchQrCodeDetections() {
 
 export function* watchQrCodeShare() {
   while (true) {
-    const action = yield take(Actions.QRCODE_SHARE)
+    const action: ShareQRCodeAction = yield take(Actions.QRCODE_SHARE)
     try {
       yield call(shareSVGImage, action.qrCodeSvg)
     } catch (error) {
