@@ -70,7 +70,6 @@ function pageTitleFromRoute(route: string) {
 
 const styles = StyleSheet.create({
   sideBar: {
-    zIndex: 10,
     position: 'absolute',
     backgroundColor: `${colors.light}`,
     height: 'calc(100vh - 130px)',
@@ -79,9 +78,7 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   container: {
-    position: 'fixed',
     width: '100%',
-    top: 70,
     backgroundColor: colors.white,
   },
   bar: {

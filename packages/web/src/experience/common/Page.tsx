@@ -171,17 +171,24 @@ class Page extends React.Component<Props & ScreenProps, State> {
           image={this.props.ogImage}
         />
         <View style={styles.conatiner}>
-          <View style={[styles.topbar, (this.state.isLineVisible || isMobile) && styles.grayLine]}>
-            <Topbar current={this.props.pages[0].href} />
+          <View style={styles.topbar}>
+            <View
+              style={[
+                styles.grayLineOff,
+                (this.state.isLineVisible || isMobile) && styles.grayLine,
+              ]}
+            >
+              <Topbar current={this.props.pages[0].href} />
+            </View>
+            {isMobile && (
+              <MobileMenu
+                pages={this.props.pages}
+                pathname={router.pathname}
+                routeHash={this.state.routeHash}
+              />
+            )}
           </View>
-          <View style={styles.justNeedSpace} />
-          {isMobile && (
-            <MobileMenu
-              pages={this.props.pages}
-              pathname={router.pathname}
-              routeHash={this.state.routeHash}
-            />
-          )}
+
           <GridRow mobileStyle={styles.mobileMain} desktopStyle={standardStyles.sectionMarginTop}>
             <Cell span={Spans.fourth} style={styles.sidebar}>
               {!isMobile && (
@@ -221,27 +228,27 @@ class Page extends React.Component<Props & ScreenProps, State> {
 
 const styles = StyleSheet.create({
   conatiner: { isolation: 'isolate' },
-  mobileMain: { zIndex: -5, marginTop: 50 },
+  mobileMain: { zIndex: -5, marginTop: 116 },
   desktopMain: { flex: 1, flexBasis: 'calc(75% - 50px)' },
   sidebar: { minWidth: 190, paddingLeft: 0 },
-  justNeedSpace: {
-    marginTop: HEADER_HEIGHT,
+  grayLineOff: {
+    transitionProperty: 'box-shadow',
+    transitionDuration: '400ms',
+    marginBottom: 1,
+    boxShadow: `0px 0px 0px 0px rgba(0,0,0,0)`,
   },
   grayLine: {
     boxShadow: `0px 1px 1px -1px rgba(0,0,0,0.5)`,
   },
   topbar: {
-    transitionProperty: 'box-shadow',
-    transitionDuration: '400ms',
-    boxShadow: `0px 0px 0px 0px rgba(0,0,0,0)`,
+    zIndex: 10,
     position: 'fixed',
     width: '100%',
-    zIndex: 10,
-    marginBottom: HEADER_HEIGHT,
+    backgroundColor: colors.white,
   },
   footer: { zIndex: -10, backgroundColor: colors.white, marginTop: 50 },
   childrenArea: {
-    minHeight: `calc(100vh - ${HEADER_HEIGHT}px)`,
+    minHeight: `calc(100vh - ${HEADER_HEIGHT * 3}px)`,
   },
   childrenAreaDesktop: {
     // Design calls for *baseline* of text Title to match that of intro on side nav

@@ -1,13 +1,10 @@
 import * as React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Hamburger from 'src/header/Hamburger'
-import { NameSpaces, useTranslation } from 'src/i18n'
-import Octocat from 'src/icons/Octocat'
 import { useScreenSize } from 'src/layout/ScreenSize'
 import LogoLightBg from 'src/logos/LogoLightBg'
 import RingsGlyph from 'src/logos/RingsGlyph'
-import Button, { BTN } from 'src/shared/Button.3'
-import links, { CeloLinks } from 'src/shared/menu-items'
+import links from 'src/shared/menu-items'
 import MobileMenu from 'src/shared/MobileMenu'
 import Navigation, { NavigationTheme } from 'src/shared/Navigation'
 import { colors, fonts, standardStyles } from 'src/styles'
@@ -19,18 +16,17 @@ interface Props {
 const KITS = [links.BRAND, links.EVENTS_KIT, links.MERCHANTS]
 
 export default function TopBar({ current }: Props) {
-  const { isMobile, isDesktop } = useScreenSize()
-  const { t } = useTranslation(NameSpaces.common)
+  const { isMobile } = useScreenSize()
   const [showingKits, toggleKits] = useBooleanToggle()
   const name = current === links.BRAND.link ? links.BRAND.name : links.EVENTS_KIT.name
 
   return (
     <View style={standardStyles.centered}>
-      <View style={[standardStyles.row, styles.container]}>
+      <View style={[standardStyles.row, styles.container, isMobile && styles.containerMobile]}>
         <View style={styles.rowVerticalCenter}>
           <a href={links.HOME.link}>
             <TouchableOpacity style={styles.rowVerticalCenter}>
-              {isMobile ? <RingsGlyph /> : <LogoLightBg height={30} />}
+              {isMobile ? <RingsGlyph height={30} /> : <LogoLightBg height={30} />}
             </TouchableOpacity>
           </a>
           <a href={current}>
@@ -50,21 +46,12 @@ export default function TopBar({ current }: Props) {
               onPress={toggleKits}
               isOpen={showingKits}
               color={colors.dark}
-              style={{ margin: 0, zIndex: 100 }}
+              style={styles.hamburger}
             />
           ) : (
             <View style={styles.kits}>
               <Kits current={current} />
             </View>
-          )}
-          {isDesktop && (
-            <Button
-              kind={BTN.NAV}
-              href={CeloLinks.gitHub}
-              text={t('github')}
-              target={'_blank'}
-              iconRight={<Octocat size={22} color={colors.dark} />}
-            />
           )}
           {showingKits && (
             <View style={styles.kitsMobileShown}>
@@ -103,13 +90,18 @@ const styles = StyleSheet.create({
   },
   container: {
     maxWidth: 1600,
-    backgroundColor: colors.faintGold,
+    backgroundColor: colors.white,
     justifyContent: 'space-between',
     padding: 20,
     alignItems: 'center',
     width: '100%',
     flex: 1,
   },
+  containerMobile: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+  },
+  hamburger: { marginVertical: 0, marginHorizontal: 0, zIndex: 100 },
   rowVerticalCenter: {
     alignContent: 'center',
     flexDirection: 'row',
@@ -120,8 +112,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 30,
   },
   kitsMobileShown: {
+    zIndex: 10,
     position: 'fixed',
-    overflow: 'scroll',
     left: 0,
     right: 0,
     top: 0,
@@ -129,11 +121,8 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     borderWifth: 1,
     width: '100%',
-    backgroundColor: 'white',
+    backgroundColor: colors.white,
     justifyContent: 'space-around',
-  },
-  kitsMobileHidden: {
-    display: 'none',
   },
   navLink: {
     marginBottom: 0,
