@@ -13,7 +13,7 @@ If you are transitioning from the Baklava network prior to the June 24 reset, yo
 
 Key differences are:
 * New network ID is `62320`
-* A new image has been pushed to `us.gcr.io/celo-testnet/celo-node:baklava`, matching Celo client v1.0.0
+* A new image has been pushed to `us.gcr.io/celo-org/celo-node:baklava`, matching Celo client v1.0.0
 * A new genesis block and bootnode enode are included in the Docker image
 * `ReleaseGold` contracts are available for all previously faucetted addresses [here](https://gist.github.com/nategraf/245232883a34cbb162eb599e34afd7c0)
 {% endhint %}
@@ -155,7 +155,7 @@ This section outlines the steps needed to configure your Proxy and Validator nod
 First we are going to set up the main environment variables related to the Baklava network. Run these on both your **Validator** and **Proxy** machines:
 
 ```bash
-export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
+export CELO_IMAGE=us.gcr.io/celo-org/celo-node:baklava
 export NETWORK_ID=62320
 ```
 
@@ -167,7 +167,7 @@ In all the commands we are going to see the `CELO_IMAGE` variable to refer to th
 docker pull $CELO_IMAGE
 ```
 
-The `us.gcr.io/celo-testnet/celo-node:baklava` image contains the [genesis block](https://github.com/celo-org/celo-monorepo/tree/master/packages/celotool/genesis_baklava.json) in addition to the Celo Blockchain binary.
+The `us.gcr.io/celo-org/celo-node:baklava` image contains the [genesis block](https://github.com/celo-org/celo-monorepo/tree/master/packages/celotool/genesis_baklava.json) in addition to the Celo Blockchain binary.
 
 ### Start your Accounts node
 
