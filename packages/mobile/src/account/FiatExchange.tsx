@@ -51,9 +51,13 @@ function FiatExchange() {
         <ListItem onPress={goToAddFunds}>
           <Text style={styles.optionTitle}>{t('fiatExchangeFlow:addFunds')}</Text>
         </ListItem>
-        {SHOW_CASH_OUT && (
+        {SHOW_CASH_OUT ? (
           <ListItem onPress={goToCashOut}>
             <Text style={styles.optionTitle}>{t('fiatExchangeFlow:cashOut')}</Text>
+          </ListItem>
+        ) : (
+          <ListItem>
+            <Text style={styles.optionTitleComingSoon}>{t('fiatExchangeFlow:cashOut')}</Text>
           </ListItem>
         )}
       </View>
@@ -95,12 +99,10 @@ const styles = StyleSheet.create({
 
   optionTitle: {
     ...fontStyles.regular,
-    // marginLeft: variables.contentPadding,
   },
   optionTitleComingSoon: {
     ...fontStyles.regular,
     color: colors.gray3,
-    paddingLeft: variables.contentPadding,
   },
 })
 
