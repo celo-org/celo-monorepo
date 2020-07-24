@@ -103,7 +103,7 @@ commands:
       - run:
           name: Create cached node_modules (if necessary)
           command: |
-            if [ ! -e ~/.tmp/node_modules.tgz ]; then 
+            if [ ! -e ~/.tmp/node_modules.tgz ]; then
               tar -c node_modules/ packages/*/node_modules/ packages/phone-number-privacy/*/node_modules/ | gzip --fast > ~/.tmp/node_modules.tgz
             fi
       - save_cache:
@@ -471,9 +471,19 @@ jobs:
       - run:
           name: Check contract versions
           command: |
-            git checkout rc1 && yarn build:sol && mkdir build/mainnet && mv build/contracts build/mainnet
-            git checkout master && yarn build:sol && mkdir build/master && mv build/contracts build/master
-            yarn ts-node scripts/check-backward.ts sem_check -o ./build/rc1/contracts -n ./build/master/contracts -e ".*Test.*|I[A-Z].*|ReleaseGold"
+            RELEASE_BRANCH=$(git branch --list release/contracts/* | tail -1)
+            BUILD_DIR_0=build/$(echo $test | sed -e 's/\//_/g')
+            git checkout $RELEASE_BRANCH
+            yarn build:sol
+            mkdir -p $BUILD_DIR
+            mv build/contracts $BUILD_DIR
+
+            BUILD_DIR_1=build/$(echo $CIRCLE_BRANCH | sed -e 's/\//_/g')
+            git checkout ${CIRCLE_BRANCH}
+            yarn build:sol
+            mkdir -p $BUILD_DIR
+            mv build/contracts $BUILD_DIR
+            yarn ts-node scripts/check-backward.ts sem_check -o $BUILD_DIR_0 -n $BUILD_DIR_1 -e ".*Test.*|I[A-Z].*|ReleaseGold"
       - run:
           name: Unit tests
           # Flaky tests - run them twice

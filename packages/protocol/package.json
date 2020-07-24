@@ -29,6 +29,7 @@
     "revoke": "./scripts/bash/revoke.sh",
     "govern": "./scripts/bash/govern.sh",
     "console": "./scripts/bash/console.sh",
+    "check-versions": "./scripts/bash/check-versions.sh",
     "invite": "./scripts/bash/invite.sh",
     "ganache-dev": "./scripts/bash/ganache.sh",
     "pretruffle:migrate": "yarn build:ts",
