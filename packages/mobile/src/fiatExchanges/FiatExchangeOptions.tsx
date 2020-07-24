@@ -14,6 +14,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackButton from 'src/components/BackButton.v2'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import Dialog from 'src/components/Dialog'
+import { MOONPAY_PUBLIC_KEY } from 'src/config'
 import { features } from 'src/flags'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
@@ -27,7 +28,6 @@ import { TopBarIconButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
 import Logger from 'src/utils/Logger'
 
-const MOONPAY_PUBLIC_KEY = 'pk_test_EDT0SRJUlsJezJUFGaVZIr8LuaTsF5NO'
 const MOONPAY_RATE_API = `https://api.moonpay.io/v3/currencies/celo/price?apiKey=${MOONPAY_PUBLIC_KEY}`
 const FALLBACK_CURRENCY = LocalCurrencyCode.USD
 
@@ -80,6 +80,8 @@ export const fiatExchangesOptionsScreenOptions = ({
 function FiatExchangeOptions({ route, navigation }: Props) {
   const [providerLocalAmount, setProviderLocalAmount] = React.useState<BigNumber>()
   const [providerlocalCurrency, setProviderLocalCurrency] = React.useState<LocalCurrencyCode>()
+  // All currency exchange calculations handled here as
+  // different providers may provide different fiat, CELO and cUSD rates
 
   const localCurrency = useSelector(getLocalCurrencyCode)
   const { amount } = route.params
@@ -97,9 +99,6 @@ function FiatExchangeOptions({ route, navigation }: Props) {
     navigation.setParams({ isExplanationOpen: false })
   }
 
-  // Amount represents local currency amount
-  // All currency exchange should be handled in FiatExchangeOptions
-  // as different providers may provide different fiat rates
   const dispatch = useDispatch()
   React.useEffect(() => {
     async function getMoonpayRates() {
