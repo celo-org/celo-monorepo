@@ -21,10 +21,9 @@ function FlakeReporter(runner) {
   })
 
   runner.on('retry', function(test, err) {
-    console.log('Retry #' + test.currentRetry() + ' for test ' + getTestID(test))
+    console.log('Retry #' + (test.currentRetry() + 1) + ' for test ' + getTestID(test))
     if (shouldLogRetryErrorsOnFailure) {
-      // Note that this error will not be formatted
-      console.log('\n' + err + '\n')
+      console.log('\n' + fmtError(err) + '\n')
     }
     currErrors.push(fmtError(err))
   })

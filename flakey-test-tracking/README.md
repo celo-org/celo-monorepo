@@ -2,9 +2,8 @@
 
 ## How It Works
 
-Flake Tracker integrates with Mocha and Jest to retry failed tests a configurable number of times. When tests pass on a retry, they are identified as flakey. Using the GitHub API, we automatically create new issues for flakey tests.
-Optionally, FlakeTracker can skip known flakey tests by fetching the list of flakey test issues from GitHub before each test suite. FlakeTracker authenticates with the GitHub API as a GitHub App, which allows it to provide rich feedback
-on PRs via GitHub Checks.
+Flake Tracker integrates with Mocha and Jest to retry failed tests a configurable number of times. When tests pass on a retry, they are identified as flakey. Using the GitHub API, we automatically create new issues when flakey tests are found on `master` (i.e. only once they're merged).
+Optionally, FlakeTracker can skip known flakey tests by fetching the list of flakey test issues from GitHub before each test suite. FlakeTracker authenticates with the GitHub API as a GitHub App, which allows it to provide rich feedback on PRs via GitHub Checks.
 
 ## Configuration
 
@@ -27,11 +26,13 @@ You can configure FlakeTracker via the following environment variables.
 
 To ensure that a specific known flakey test is run for your PR, simply include the link to the flakey test's issue anywhere in the body of your PR.
 
-## Manually Reporting Flakey Tests
+## Still Seeing Flakey Tests?
 
 Some flakey tests are not uncovered by retries. That is, if they fail the first time then every retry will also fail. If you encounter tests like this, please create an issue to track it. If you do so correctly, the flakey test will be disabled until the issue is closed.
 To manually create a flakey test issue, mimic the format of issues created by the FlakeTracker bot. Specifically, make sure to add the `FLAKEY` label as well as labels for the package name and the ci job the test is run in. Also, include the `testID` of the test in the issue title.
-The `testID` can be derived as follows: `jobName -> packageName -> rootDescribeBlockTitle -> ... -> testTitle`. The effort of tracing down the title path will be well worth it! Please also include the test error in the issue body.
+The `testID` can be derived as follows: `jobName -> packageName -> rootDescribeBlockTitle -> ... -> testTitle`. The `testID` is printed each time the test is retried and can be found easily in the logs. Please also include the test error in the issue body.
+
+It is important to note that some flakiness might exist in setup/teardown steps like `before` and `after` hooks. FlakeTracker does not currently address these cases, but you should still create issues to track them!
 
 ## Tricks For Fixing Flakey Tests
 
@@ -53,6 +54,11 @@ To subscribe to flakey test issues for a specific job or package, just add the j
 /github subscribe celo-org/celo-monorepo issues +label:FLAKEY +label:general-test +label:utils
 ```
 
+## A Warning For Reviewers
+
+When FlakeTracker is enabled, reviewers should exercise caution on PRs that have skipped flakey tests. Note that tests can now be disabled by just creating a github issue, so we should inspect every test that is skipped an ensure it is not relevant to the PR. If you find that a relevant test was skipped,
+just include the link to the corresponding flakey test issue in the PR body and run the build again. This will force the flakey test to run. If you wish to disable skipping flakey tests entirely for a given job you can do so by setting `SKIP_KNOWN_FLAKES=false`.
+
 ## TODO
 
 TODO(Alec): add option to log all errors on failure (DONE)
@@ -65,9 +71,11 @@ TODO(Alec): address PR comments
 
 TODO(Alec): Fill in README (DONE)
 
+TODO(Alec): fill in PR template
+
 TODO(Alec): ensure 100% coverage
 
-TODO(Alec): manually make issues for flakey tests
+TODO(Alec): manually make issues for flakey tests (DONE)
 
 TODO(Alec): Finalize config
 

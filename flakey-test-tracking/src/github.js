@@ -165,7 +165,7 @@ class GitHub {
           conclusion: 'success',
           output: {
             title: statuses['success'],
-            summary: fmtSummary([], [], 0),
+            summary: utils.fmtSummary([], [], 0),
             images: [
               {
                 image_url: utils.getRandomHoorayImage(),
