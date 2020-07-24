@@ -32,6 +32,10 @@ export function* fetchDataEncryptionKeyWrapper({ address }: FetchDataEncryptionK
 }
 
 export function* doFetchDataEncryptionKey(address: string) {
+  // TODO consider caching here
+  // We could use the values in the DekMap instead of looking up each time
+  // But Deks can change, how should we invalidate the cache?
+
   const contractKit = yield call(getContractKit)
   const accountsWrapper: AccountsWrapper = yield call([
     contractKit.contracts,
@@ -98,6 +102,7 @@ export function* registerAccountDek(account: string) {
     const upToDate: boolean = yield call(isAccountUpToDate, accountsWrapper, account, publicDataKey)
     if (upToDate) {
       Logger.debug(`${TAG}@registerAccountDEK`, 'Address and DEK up to date, skipping.')
+      yield put(registerDataEncryptionKey())
       return
     }
 
