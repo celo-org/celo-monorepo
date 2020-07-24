@@ -4,7 +4,7 @@ import { render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import FiatExchangeOptions from 'src/fiatExchanges/FiatExchangeOptions'
 import { Screens } from 'src/navigator/Screens'
-import { getMockStackScreenProps, createMockStore } from 'test/utils'
+import { createMockStore, getMockStackScreenProps } from 'test/utils'
 
 const mockScreenProps = (isAddFunds: boolean) =>
   getMockStackScreenProps(Screens.FiatExchangeOptions, {

@@ -1,6 +1,7 @@
 {
-  "addFunds": "Añadir fondos",
+  "addFunds": "Añadir Fondos",
   "cashOut": "Retirar",
+  "cashOutComingSoon": "Retirar (Muy Pronto)",
   "celoDollarsAt": "Celo Dollars @ <1></1>",
   "amountCelo": "Monto (CELO)",
   "disclaimerCeloDollars": "Los valores del dólar celo son estimados.",

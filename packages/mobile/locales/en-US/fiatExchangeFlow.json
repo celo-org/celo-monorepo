@@ -1,6 +1,7 @@
 {
-  "addFunds": "Add funds",
-  "cashOut": "Cash out",
+  "addFunds": "Add Funds",
+  "cashOut": "Cash Out",
+  "cashOutComingSoon": "Cash Out (Coming Soon)",
   "celoDollarsAt": "Celo Dollars @ <1></1>",
   "amountCelo": "Amount (CELO)",
   "disclaimerCeloDollars": "Celo dollar values are estimates.",

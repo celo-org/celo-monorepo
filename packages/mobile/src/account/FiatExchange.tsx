@@ -57,7 +57,9 @@ function FiatExchange() {
           </ListItem>
         ) : (
           <ListItem>
-            <Text style={styles.optionTitleComingSoon}>{t('fiatExchangeFlow:cashOut')}</Text>
+            <Text style={styles.optionTitleComingSoon}>
+              {t('fiatExchangeFlow:cashOutComingSoon')}
+            </Text>
           </ListItem>
         )}
       </View>
@@ -75,8 +77,6 @@ const styles = StyleSheet.create({
     paddingVertical: variables.contentPadding,
     paddingRight: variables.contentPadding,
     marginLeft: variables.contentPadding,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.gray2,
     height: 112,
     justifyContent: 'flex-end',
     alignItems: 'center',
