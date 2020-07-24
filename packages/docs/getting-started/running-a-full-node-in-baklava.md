@@ -17,7 +17,7 @@ If you are transitioning from the Baklava network prior to the June 24 reset, yo
 
 Key differences are:
 * New network ID is `62320`
-* A new image has been pushed to `us.gcr.io/celo-testnet/celo-node:baklava`, matching Celo client v1.0.0
+* A new image has been pushed to `us.gcr.io/celo-org/celo-node:baklava`, matching Celo client v1.0.0
 * A new genesis block and bootnode enode are included in the Docker image
 * `ReleaseGold` contracts are available for all previously faucetted addresses [here](https://gist.github.com/nategraf/245232883a34cbb162eb599e34afd7c0)
 {% endhint %}
@@ -37,7 +37,7 @@ When you see text in angle brackets &lt;&gt;, replace them and the text inside w
 First we are going to setup the environment variables required for `Baklava` network. Run:
 
 ```bash
-export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
+export CELO_IMAGE=us.gcr.io/celo-org/celo-node:baklava
 export NETWORK_ID=62320
 ```
 
