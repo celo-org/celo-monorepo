@@ -56,7 +56,7 @@ To subscribe to flakey test issues for a specific job or package, just add the j
 
 ## A Warning For Reviewers
 
-When FlakeTracker is enabled, reviewers should exercise caution on PRs that have skipped flakey tests. Note that tests can now be disabled by just creating a github issue, so we should inspect every test that is skipped an ensure it is not relevant to the PR. If you find that a relevant test was skipped,
+When FlakeTracker is enabled, reviewers should exercise caution on PRs that have skipped flakey tests. Note that tests can now be disabled by just creating a github issue, so we should inspect every test that is skipped and ensure it is not relevant to the PR. If you find that a relevant test was skipped,
 just include the link to the corresponding flakey test issue in the PR body and run the build again. This will force the flakey test to run. If you wish to disable skipping flakey tests entirely for a given job you can do so by setting `SKIP_KNOWN_FLAKES=false`.
 
 ## TODO
@@ -67,11 +67,11 @@ TODO(Alec): make checks less verbose (DONE)
 
 TODO(Alec): cleanup code, add comments (DONE)
 
-TODO(Alec): address PR comments
+TODO(Alec): address PR comments (NEXT)
+
+TODO(Alec): add fail fast without flaky (NEXT)
 
 TODO(Alec): fix skipping logic and add cleanup (DONE)
-
-TODO(Alec): add fail fast without flaky
 
 TODO(Alec): Fill in README (DONE)
 

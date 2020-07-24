@@ -33,12 +33,6 @@ const readErrors = (testID) => {
   return readFileInFlakeDir(join(errDir, fmtTestKey(testID)))
 }
 
-const writeKnownFlakes = (flakes) => {
-  if (flakes.length) {
-    fs.writeFileSync(join(tmpdir(), flakeDir, knownFlakeFile), flakes.join(delim))
-  }
-}
-
 const readSkippedFlakes = () => {
   return readFileInFlakeDir(skippedFlakeFile)
 }
@@ -53,8 +47,17 @@ const writeSkippedFlake = (testID) => {
   fs.appendFileSync(join(tmpdir(), flakeDir, skippedFlakeFile), testID + delim)
 }
 
+const writeKnownFlakes = (flakes) => {
+  if (flakes.length) {
+    fs.writeFileSync(
+      join(tmpdir(), flakeDir, knownFlakeFile),
+      flakes.map((i) => JSON.stringify(i)).join(delim)
+    )
+  }
+}
+
 const readKnownFlakes = () => {
-  return readFileInFlakeDir(knownFlakeFile)
+  return readFileInFlakeDir(knownFlakeFile).map((i) => JSON.parse(i))
 }
 
 const readNewFlakes = () => {
