@@ -63,7 +63,6 @@ function FiatExchange() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.background,
     flex: 1,
   },
   image: { height: 200 },
