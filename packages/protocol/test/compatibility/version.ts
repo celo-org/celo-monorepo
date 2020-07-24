@@ -14,11 +14,11 @@ describe('#version()', () => {
       assert.isFalse(ContractVersion.isValid('1.2.3.5.'))
       assert.isFalse(ContractVersion.isValid('test'))
       assert.isFalse(ContractVersion.isValid('1.a.3.4'))
+      assert.isFalse(ContractVersion.isValid('-1.0.9.787'))
     })
 
     it('returns true on valid string for isValid', () => {
       assert.isTrue(ContractVersion.isValid('1.2.3.4'))
-      assert.isTrue(ContractVersion.isValid('-1.0.9.787'))
       assert.isTrue(ContractVersion.isValid('10.0.224.9'))
     })
   })
@@ -39,47 +39,51 @@ describe('#version()', () => {
   })
 
   describe('ContractVersionDelta.fromChanges', () => {
-    it('sets properly the storage Delta', () => {
+    it('properly sets the storage Delta', () => {
       const cvd = ContractVersionDelta.fromChanges(true, false, true, true)
       assert.equal(cvd.storage, Delta.Increment)
       assert.equal(cvd.major, Delta.Reset)
       assert.equal(cvd.minor, Delta.Reset)
       assert.equal(cvd.patch, Delta.Reset)
     })
-    it('sets properly the storage Delta', () => {
+
+    it('properly sets the storage Delta', () => {
       const cvd2 = ContractVersionDelta.fromChanges(false, false, true, true)
       assert.equal(cvd2.storage, Delta.None)
       assert.notEqual(cvd2.major, Delta.Reset)
     })
 
-    it('sets properly the major Delta', () => {
+    it('properly sets the major Delta', () => {
       const cvd = ContractVersionDelta.fromChanges(false, true, true, true)
       assert.equal(cvd.major, Delta.Increment)
       assert.equal(cvd.minor, Delta.Reset)
       assert.equal(cvd.patch, Delta.Reset)
     })
-    it('sets properly the major Delta', () => {
+
+    it('properly sets the major Delta', () => {
       const cvd2 = ContractVersionDelta.fromChanges(false, false, true, true)
       assert.equal(cvd2.major, Delta.None)
       assert.notEqual(cvd2.minor, Delta.Reset)
     })
 
-    it('sets properly the minor Delta', () => {
+    it('properly sets the minor Delta', () => {
       const cvd = ContractVersionDelta.fromChanges(false, false, true, true)
       assert.equal(cvd.minor, Delta.Increment)
       assert.equal(cvd.patch, Delta.Reset)
     })
-    it('sets properly the minor Delta', () => {
+
+    it('properly sets the minor Delta', () => {
       const cvd2 = ContractVersionDelta.fromChanges(false, false, false, true)
       assert.equal(cvd2.minor, Delta.None)
       assert.notEqual(cvd2.patch, Delta.Reset)
     })
 
-    it('sets properly the patch Delta', () => {
+    it('properly sets the patch Delta', () => {
       const cvd = ContractVersionDelta.fromChanges(false, false, false, true)
       assert.equal(cvd.patch, Delta.Increment)
     })
-    it('sets properly the patch Delta', () => {
+
+    it('properly sets the patch Delta', () => {
       const cvd2 = ContractVersionDelta.fromChanges(false, false, false, false)
       assert.equal(cvd2.patch, Delta.None)
     })

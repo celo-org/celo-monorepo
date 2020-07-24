@@ -7,8 +7,11 @@ export class ContractVersion {
     if (v.length !== 4) {
       return false
     }
-    const isNumber = (versionDigit) => !isNaN(Number(versionDigit))
-    return v.every(isNumber)
+    const isNonNegativeNumber = (versionComponent): boolean => {
+      const number = Number(versionComponent)
+      return !isNaN(number) && number >= 0
+    }
+    return v.every(isNonNegativeNumber)
   }
   
   static fromString = (version: string): ContractVersion => {
