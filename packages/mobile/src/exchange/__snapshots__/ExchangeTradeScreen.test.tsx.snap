@@ -2,6 +2,11 @@
 
 exports[`ExchangeTradeScreen renders correctly 1`] = `
 <RNCSafeAreaView
+  edges={
+    Array [
+      "bottom",
+    ]
+  }
   style={
     Object {
       "flex": 1,

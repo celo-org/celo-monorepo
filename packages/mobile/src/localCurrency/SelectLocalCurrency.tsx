@@ -49,7 +49,7 @@ function SelectLocalCurrency() {
 
   return (
     <ScrollView style={styles.container}>
-      <SafeAreaView>
+      <SafeAreaView edges={['bottom']}>
         <Text style={styles.title} testID={'ChooseLanguageTitle'}>
           {t('selectCurrency')}
         </Text>

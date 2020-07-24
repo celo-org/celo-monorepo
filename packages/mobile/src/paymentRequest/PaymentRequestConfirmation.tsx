@@ -152,7 +152,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
     }
 
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['bottom']}>
         <DisconnectBanner />
         <ReviewFrame
           FooterComponent={this.renderFooter}

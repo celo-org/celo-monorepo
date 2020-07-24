@@ -833,6 +833,21 @@ contract('Election', (accounts: string[]) => {
       })
 
       describe('when the revoked value is equal to the active votes', () => {
+        describe('#revokeAllActive', () => {
+          const index = 0
+          beforeEach(async () => {
+            await election.revokeAllActive(group, NULL_ADDRESS, NULL_ADDRESS, index)
+          })
+
+          it('should be consistent', async () => {
+            await assertConsistentSums()
+          })
+
+          it("should decrement all of the account's active votes for the group", async () => {
+            assertEqualBN(await election.getActiveVotesForGroupByAccount(group, voter0), 0)
+          })
+        })
+
         describe('when the correct index is provided', () => {
           const index = 0
           const revokedValue = voteValue0 + reward0

@@ -1672,7 +1672,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                 >
                   
                   $
-                  0.001
+                  0
                 </Text>
               </Text>
             </View>
@@ -2384,7 +2384,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
                 >
                   
                   $
-                  0.001
+                  0
                 </Text>
               </Text>
             </View>
