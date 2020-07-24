@@ -153,7 +153,8 @@ class GitHub {
 
     // If a check suite has not yet been created by the FlakeTracker app, then no
     // flakiness has been detected in the earlier jobs.
-    if (!numCheckSuites) {
+    //if (!numCheckSuites) {
+    if (true) {
       // Add a succesful check showing no flakiness has been detected.
 
       fn = () => {
