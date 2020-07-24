@@ -33,14 +33,14 @@ const shouldLogRetryErrorsOnFailure = true
 const numRetries = process.env.NUM_RETRIES ? Number(process.env.NUM_RETRIES) : 10
 
 // shouldSkipKnownFlakes => flakey test issues are fetched from github and corresponding tests are skipped
-const shouldSkipKnownFlakes =
-  shouldTrackFlakes && process.env.CIRCLECI && process.env.SKIP_KNOWN_FLAKES !== 'false'
+const shouldSkipKnownFlakes = true
+//shouldTrackFlakes && process.env.CIRCLECI && process.env.SKIP_KNOWN_FLAKES !== 'false'
 
 // shouldAddCheckToPR => GitHub Check added to PR
 const shouldAddCheckToPR = shouldTrackFlakes && process.env.CIRCLECI
 
 // shouldCreateIssues => GitHub Issues created for new flakey tests
-const shouldCreateIssues = true
+const shouldCreateIssues = false
 // const shouldCreateIssues =
 //   shouldTrackFlakes && process.env.CIRCLECI && process.env.CIRCLE_BRANCH === 'master'
 

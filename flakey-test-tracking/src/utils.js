@@ -88,6 +88,17 @@ function parseTestIdFromFlakeTitle(title) {
   return title.replace(flakeTitlePrefix, '').trim()
 }
 
+function parseDownFlakeIssue(issue) {
+  const parsedIssue = (({ title, url, number }) => ({
+    title,
+    url,
+    number,
+  }))(issue)
+
+  console.log('%%%%%%%' + JSON.stringify(parsedIssue))
+  return parsedIssue
+}
+
 function getConclusion(flakes, skippedTests) {
   let conclusion = 'failure'
   if (!flakes.length) {
@@ -179,7 +190,7 @@ function getRandomHoorayImage() {
 }
 
 function calcObsoleteFlakeIssues(skippedTests, knownFlakes) {
-  return knownFlakes.filter((i) => !skippedTests.some((st) => i.title.includes(st)))
+  return knownFlakes.filter((i) => !skippedTests.some((skipped) => i.title.includes(skipped)))
 }
 
 module.exports = {
@@ -193,6 +204,7 @@ module.exports = {
   getRandomHoorayImage: getRandomHoorayImage,
   getTestSuiteDir: getTestSuiteDir,
   getTestSuiteTitles: getTestSuiteTitles,
+  parseDownFlakeIssue: parseDownFlakeIssue,
   parseErrLineNumberFromStack: parseErrLineNumberFromStack,
   parseFirstErrFromFlakeBody: parseFirstErrFromFlakeBody,
   parseFirstLineOfStack: parseFirstLineOfStack,

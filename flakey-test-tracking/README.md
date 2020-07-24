@@ -18,6 +18,7 @@ You can configure FlakeTracker via the following environment variables.
 - `NUM_RETRIES`
   - Only relevant when flake tracker is enabled.
   - Specifies how many retries should be performed before a test is failed. Defaults to 10.
+  - If you want a "fail fast without flakes" option (let's say you know a bunch of tests will fail, and you want to skip all the flakey tests without retrying each failed test a bunch of times) you can accomplish this by setting `NUM_RETRIES=0`
 - `SKIP_KNOWN_FLAKES`
   - Only relevant when flake tracker is enabled and tests are run in CI.
   - Set `SKIP_KNOWN_FLAKES=false` to disable the skipping of known flakes in CI. Defaults to `true`.
@@ -67,19 +68,17 @@ TODO(Alec): make checks less verbose (DONE)
 
 TODO(Alec): cleanup code, add comments (DONE)
 
-TODO(Alec): address PR comments (NEXT)
-
-TODO(Alec): add fail fast without flaky (NEXT)
+TODO(Alec): manually make issues for flakey tests (DONE)
 
 TODO(Alec): fix skipping logic and add cleanup (DONE)
 
 TODO(Alec): Fill in README (DONE)
 
+TODO(Alec): address PR comments (NEXT)
+
 TODO(Alec): fill in PR template
 
 TODO(Alec): ensure 100% coverage
-
-TODO(Alec): manually make issues for flakey tests (DONE)
 
 TODO(Alec): Finalize config
 

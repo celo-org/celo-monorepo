@@ -57,7 +57,7 @@ const writeKnownFlakes = (flakes) => {
 }
 
 const readKnownFlakes = () => {
-  return readFileInFlakeDir(knownFlakeFile).map((i) => JSON.parse(i))
+  return readFileInFlakeDir(knownFlakeFile).map(JSON.parse)
 }
 
 const readNewFlakes = () => {

@@ -29,8 +29,8 @@ class FlakeManager {
   // Called at the end of each test suite
   async finish() {
     const flakes = db.readNewFlakes()
+    let skippedTests = []
     if (shouldUseGitHub) {
-      let skippedTests = []
       let obsoleteIssues = []
       if (shouldSkipKnownFlakes) {
         skippedTests = db.readSkippedFlakes()

@@ -42,6 +42,7 @@ class GitHub {
     const app = new App({
       id: flakeTrackerID,
       privateKey: process.env.FLAKE_TRACKER_SECRET.replace(/\\n/gm, '\n'),
+      //privateKey: privateKey,
     })
     const rest = await auth(app)
     return new GitHub(app, rest)
@@ -61,7 +62,7 @@ class GitHub {
       // Note: we could technically still have duplicate issues if one is added by another build
       // right after we fetch the list of issues. This seems unlikely so we'll leave it for now and
       // revisit if duplicate issues start appearing.
-      const knownFlakes = (await this.fetchKnownFlakes()).map((i) => i.title)
+      const knownFlakes = (await this.fetchFlakeIssues()).map((i) => i.title)
       const newFlakes = flakes.filter((flake) => !knownFlakes.includes(flake.title))
       if (newFlakes.length) {
         promises.push(this.createIssues(newFlakes))
@@ -123,21 +124,18 @@ class GitHub {
     }
     console.log('\nFetching known flakey tests from GitHub...')
     const errMsg = 'Failed to fetch existing flakey test issues from GitHub.'
-    return (await this.safeExec(fn, errMsg)) || []
+    const issues = (await this.safeExec(fn, errMsg)) || []
+    return issues.map(utils.parseDownFlakeIssue)
   }
 
   async fetchKnownFlakesToSkip() {
     const flakeIssues = await this.fetchFlakeIssues()
     const mandatoryTests = await this.fetchMandatoryTestsForPR()
-    const knownFlakesToSkip = flakeIssues.filter((i) => {
-      return !mandatoryTests.includes(i.number.toString())
-    })
+    const knownFlakesToSkip = flakeIssues.filter(
+      (i) => !mandatoryTests.includes(i.number.toString())
+    )
+    console.log('^^^^^^' + JSON.stringify(knownFlakesToSkip))
     return knownFlakesToSkip
-  }
-
-  async fetchKnownFlakes() {
-    const flakeIssues = await this.fetchFlakeIssues()
-    return flakeIssues
   }
 
   async addObsoleteIssuesCheck(obsoleteIssues) {
