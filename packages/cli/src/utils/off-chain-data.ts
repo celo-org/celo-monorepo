@@ -1,8 +1,8 @@
-import OffchainDataWrapper from '@celo/contractkit/src/identity/offchain-data-wrapper'
+import OffchainDataWrapper from '@celo/contractkit/lib/identity/offchain-data-wrapper'
 import {
   GitStorageWriter,
   LocalStorageWriter,
-} from '@celo/contractkit/src/identity/offchain/storage-writers'
+} from '@celo/contractkit/lib/identity/offchain/storage-writers'
 import { flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
 import { BaseCommand } from '../base'

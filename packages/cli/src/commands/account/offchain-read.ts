@@ -1,5 +1,5 @@
-import OffchainDataWrapper from '@celo/contractkit/src/identity/offchain-data-wrapper'
-import { NameAccessor } from '@celo/contractkit/src/identity/offchain/schemas'
+import OffchainDataWrapper from '@celo/contractkit/lib/identity/offchain-data-wrapper'
+import { NameAccessor } from '@celo/contractkit/lib/identity/offchain/schemas'
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { Flags } from '../../utils/command'
