@@ -139,6 +139,17 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   )
 
   /**
+   * @notice Checks if attestation request is expired.
+   * @param attestationRequestBlockNumber Attestation Request Block Number to be checked
+   */
+  isAttestationExpired = async (attestationRequestBlockNumber: number) => {
+    // We duplicate the implementation here, until Attestation.sol->isAttestationExpired is not external
+    const attestationExpiryBlocks = await this.attestationExpiryBlocks()
+    const blockNumber = await this.kit.web3.eth.getBlockNumber()
+    return blockNumber >= attestationRequestBlockNumber + attestationExpiryBlocks
+  }
+
+  /**
    * @notice Waits for appropriate block numbers for before issuer can be selected
    * @param identifier Attestation identifier (e.g. phone hash)
    * @param account Address of the account

@@ -13,7 +13,7 @@ const argv = require('minimist')(process.argv.slice(2), {
 })
 
 const SOLC_VERSION = '0.5.8'
-const ALFAJORES_NETWORKID = 44786
+const ALFAJORES_NETWORKID = 44787
 const BAKLAVA_NETWORKID = 62320
 const BAKLAVASTAGING_NETWORKID = 31420
 
