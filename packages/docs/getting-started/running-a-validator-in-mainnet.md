@@ -145,7 +145,7 @@ There are a number of environment variables in this guide, and you may use this 
 
 ## Network Deployment Timeline
 
-The setup of RC1 is similar to the new Baklava network and the deployment timeline is as follows (all dates are subject to change):
+The setup of mainnet is similar to the new Baklava network and the deployment timeline is as follows (all dates are subject to change):
 
 Done:
 * 4/19 00:00 UTC: Docker image with genesis block distributed
@@ -172,10 +172,10 @@ This section outlines the steps needed to configure your Proxy and Validator nod
 
 ### Environment Variables
 
-First we are going to set up the main environment variables related to the RC1 network. Run these on both your **Validator** and **Proxy** machines:
+First we are going to set up the main environment variables related to the mainnet network. Run these on both your **Validator** and **Proxy** machines:
 
 ```bash
-export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:rc1
+export CELO_IMAGE=us.gcr.io/celo-org/celo-node:mainnet
 export NETWORK_ID=42220
 ```
 
@@ -187,7 +187,7 @@ In all the commands we are going to see the `CELO_IMAGE` variable to refer to th
 docker pull $CELO_IMAGE
 ```
 
-The `us.gcr.io/celo-testnet/celo-node:rc1` image contains the [genesis block](https://github.com/celo-org/celo-monorepo/blob/master/packages/celotool/genesis_rc1.json) in addition to the Celo Blockchain binary.
+The `us.gcr.io/celo-org/celo-node:mainnet` image contains the [genesis block](https://github.com/celo-org/celo-monorepo/blob/master/packages/celotool/genesis_rc1.json) in addition to the Celo Blockchain binary.
 
 ### Start your Accounts node
 
@@ -609,7 +609,7 @@ celocli election:show $CELO_VALIDATOR_RG_ADDRESS --voter
 Users in the Celo protocol receive epoch rewards for voting in Validator Elections only after submitting a special transaction to enable rewards. This must be done every time new votes are cast, and can only be made after the most recent epoch has ended. For convenience, we can use the following command, which will wait until the epoch has ended before sending a transaction:
 
 {% hint style="info" %}
-Epoch lengths in the RC1 network are set to be the number of blocks produced in a day. As a result, votes may need to be activated up to 24 hours after they are cast.
+Epoch lengths in the mainnet network are set to be the number of blocks produced in a day. As a result, votes may need to be activated up to 24 hours after they are cast.
 {% endhint %}
 
 ```bash
