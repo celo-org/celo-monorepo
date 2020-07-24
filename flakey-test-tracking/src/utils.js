@@ -88,6 +88,14 @@ function parseTestIdFromFlakeTitle(title) {
   return title.replace(flakeTitlePrefix, '').trim()
 }
 
+function getConclusion(flakes, skippedTests) {
+  let conclusion = 'failure'
+  if (!flakes.length) {
+    conclusion = skippedTests.length ? 'neutral' : 'success'
+  }
+  return conclusion
+}
+
 // You can set verbosity to either 0, 1, 2, 3, or 4
 //  4 => header + list of skipped tests + errors from every retry for each new flakey test
 //  3 => header + list of skipped tests + 1 errror for each new flakey test
@@ -106,7 +114,7 @@ function fmtSummary(flakes, skippedTests, verbosity) {
     if (skippedTests.length) {
       return 'Some tests were skipped due to flakiness. No new flakiness detected.'
     }
-    return 'We have achieved zero flakiness ' + hands
+    return 'We have achieved zero flakiness ' + hands + ' ' + greenCheck
   }
 
   let summary = verbosity > 2 ? '\n_____FlakeTracker_____\n' : ''
@@ -161,22 +169,29 @@ function fmtSummary(flakes, skippedTests, verbosity) {
   return summary
 }
 
+function getRandomHoorayImage() {
+  // Please add more gifs :)
+  const images = [
+    'https://media.giphy.com/media/mQG644PY8O7rG/giphy.gif',
+    'https://media.giphy.com/media/4xpB3eE00FfBm/giphy.gif',
+  ]
+  return images[Math.floor(Math.random() * images.length)]
+}
+
 module.exports = {
   fmtFlakeIssue: fmtFlakeIssue,
   fmtSummary: fmtSummary,
   fmtTestTitles: fmtTestTitles,
-  greenCheck: greenCheck,
+  getConclusion: getConclusion,
   getPackageName: getPackageName,
   getPullNumber: getPullNumber,
+  getRandomHoorayImage: getRandomHoorayImage,
   getTestSuiteDir: getTestSuiteDir,
   getTestSuiteTitles: getTestSuiteTitles,
-  hands: hands,
   parseErrLineNumberFromStack: parseErrLineNumberFromStack,
   parseFirstErrFromFlakeBody: parseFirstErrFromFlakeBody,
   parseFirstLineOfStack: parseFirstLineOfStack,
   parseMandatoryTestIssuesFromPullBody: parseMandatoryTestIssuesFromPullBody,
   parsePathFromStack: parsePathFromStack,
   parseTestIdFromFlakeTitle: parseTestIdFromFlakeTitle,
-  redX: redX,
-  warning: warning,
 }

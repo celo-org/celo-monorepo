@@ -33,11 +33,9 @@ class FlakeManager {
   async finish() {
     const flakes = db.readNewFlakes()
     const skippedTests = this.knownFlakes
-
     if (shouldUseGitHub) {
       await this.github.report(flakes, skippedTests)
     }
-
     console.log(fmtSummary(flakes, skippedTests, 3))
   }
 

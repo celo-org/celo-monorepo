@@ -1,6 +1,5 @@
 const org = process.env.CIRCLE_PROJECT_USERNAME || 'celo-org'
 const repo = process.env.CIRCLE_PROJECT_REPONAME || 'celo-monorepo'
-const numJobsBeingTracked = 21 // IMPORTANT: This needs to be updated when we add jobs to circleci or GitHub checks may not complete.
 
 // NOTE: Avoid editing this file unless you are making changes to the flake trackers' functionality.
 // This file serves mainly to distill various environment variables into easy to use booleans for the rest of the project.
@@ -50,7 +49,6 @@ const shouldReportFlakes = shouldAddCheckToPR || shouldCreateIssues
 const shouldUseGitHub = shouldSkipKnownFlakes || shouldReportFlakes
 
 module.exports = {
-  numJobsBeingTracked: numJobsBeingTracked,
   numRetries: numRetries,
   org: org,
   repo: repo,

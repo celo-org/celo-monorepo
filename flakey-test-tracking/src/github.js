@@ -6,14 +6,12 @@ const stripAnsi = require('strip-ansi')
 const config = require('./config')
 const utils = require('./utils')
 
+// This is the FlakeTracker GitHub App ID. Can be found at github.com -> celo-org -> app settings
+const flakeTrackerID = 71131
+
 const defaults = {
   owner: config.org,
   repo: config.repo,
-}
-
-const FlakeLabel = 'FLAKEY'
-const getLabels = () => {
-  return [FlakeLabel, utils.getPackageName(), process.env.CIRCLE_JOB]
 }
 
 const statuses = {
@@ -22,18 +20,13 @@ const statuses = {
   success: 'no flakey tests found!',
 }
 
-const emojis = {
-  failure: utils.redX,
-  neutral: utils.warning,
-  success: utils.greenCheck,
-}
-
-const getConclusion = (flakes, skippedTests) => {
-  let conclusion = 'failure'
-  if (!flakes.length) {
-    conclusion = skippedTests.length ? 'neutral' : 'success'
+const FlakeLabel = 'FLAKEY'
+const getLabels = () => {
+  const labels = [FlakeLabel, utils.getPackageName()]
+  if (process.env.CIRCLECI) {
+    labels.push(process.env.CIRCLE_JOB)
   }
-  return conclusion
+  return labels
 }
 
 class GitHub {
@@ -47,7 +40,7 @@ class GitHub {
 
   static async build() {
     const app = new App({
-      id: 71131, // This is the FlakeTracker GitHub App ID. Can be found at github.com -> celo-org -> app settings
+      id: flakeTrackerID,
       privateKey: process.env.FLAKE_TRACKER_SECRET.replace(/\\n/gm, '\n'),
     })
     const rest = await auth(app)
@@ -75,7 +68,7 @@ class GitHub {
       }
     }
     if (config.shouldAddCheckToPR) {
-      promises.push(this.endCheck(flakes, skippedTests))
+      promises.push(this.addCheck(flakes, skippedTests))
     }
     console.log('\nSending flake tracker results to GitHub...\n')
     return Promise.all(promises)
@@ -99,124 +92,6 @@ class GitHub {
       })
     }
     const errMsg = 'Failed to create issue for flakey test. ' + 'Title: "' + flake.title + '",'
-    await this.safeExec(fn, errMsg)
-  }
-
-  // The first job to complete creates a 'summary' check run that is updated by subsequent jobs.
-  // The last job to complete sets the conclusion status.
-  async getSummaryCheck() {
-    let fn = () => {
-      return this.rest.checks.listForRef({
-        ...defaults,
-        ref: process.env.CIRCLE_SHA1,
-        check_name: 'FlakeTracker',
-      })
-    }
-    let errMsg = 'Failed to get summary check run.'
-    const res = (await this.safeExec(fn, errMsg)).data
-
-    // If summary check does not yet exist, create it
-    if (res.total_count == 0) {
-      fn = () => {
-        return this.rest.checks.create({
-          ...defaults,
-          name: 'FlakeTracker',
-          head_sha: process.env.CIRCLE_SHA1,
-          status: 'in_progress',
-        })
-      }
-      errMsg = 'Failed to start summary check run.'
-      return (await this.safeExec(fn, errMsg)).data
-    }
-
-    return res.check_runs[0]
-  }
-
-  async updateSummaryCheck(flakes, skippedTests) {
-    const conclusion = getConclusion(flakes, skippedTests)
-
-    const summaryCheck = await this.getSummaryCheck()
-
-    let body = summaryCheck.output ? summaryCheck.output.text : ''
-    body += utils.getTestSuiteTitles().join(' -> ') + ' ' + emojis[conclusion] + '\n'
-    const isLastJob = body.match('\n').length == config.numJobsBeingTracked
-
-    if (body.includes(emojis['failure'])) {
-      conclusion = 'failure'
-    } else if (body.includes(emojis['neutral'])) {
-      conclusion = 'neutral'
-    } // else: we already have conclusion == 'success'
-
-    const output = {
-      title: statuses[conclusion],
-      summary: statuses[conclusion] + ' ' + emojis[conclusion],
-      text: body,
-    }
-    const opts = {
-      ...defaults,
-      check_run_id: summaryCheck.id,
-      output: output,
-    }
-    if (isLastJob) {
-      opts.conclusion = conclusion // Check run will show as 'pending' until a conclusion is set
-      if (conclusion == 'success') {
-        opts.output.summary = fmtSummary([], [], 0)
-      }
-    }
-
-    // Note that if multiple jobs complete at about the same time there could be a concurrency issue
-    // where the summary check is never concluded. We can leave this for now and revisit if it becomes
-    // an issue.
-
-    const fn = () => {
-      return this.rest.checks.update(opts)
-    }
-    const errMsg = 'Failed to add check run.'
-    await this.safeExec(fn, errMsg)
-  }
-
-  // When a job finishes, addCheck() is called to
-  // 1) update the summary check run
-  // 2) add additional check runs (with detailed info) if job encountered flakiness or skipped tests.
-  async addCheck(flakes, skippedTests) {
-    await this.updateSummaryCheck(flakes, skippedTests)
-
-    const conclusion = getConclusion(flakes, skippedTests)
-    if (conclusion === 'success') return // Only add checks when there's flakiness (otherwise check suite gets cluttered)
-
-    const summary_0 = utils.fmtSummary(flakes, skippedTests, 0)
-    const summary_3 = utils.fmtSummary(flakes, skippedTests, 3)
-
-    const annotations = flakes.map((f) => {
-      const firstErr = utils.parseFirstErrFromFlakeBody(f.body)
-      const lineNumber = utils.parseErrLineNumberFromStack(firstErr) || 1
-      const path = utils.parsePathFromStack(firstErr)
-      return {
-        title: f.title,
-        path: path.slice(path.indexOf('packages/')),
-        start_line: lineNumber,
-        end_line: lineNumber + 1,
-        annotation_level: 'warning',
-        message: stripAnsi(utils.parseFirstErrFromFlakeBody(f.body)),
-      }
-    })
-    const output = {
-      title: statuses[conclusion],
-      summary: stripAnsi(summary_0),
-      text: stripAnsi(summary_3),
-      annotations: annotations,
-    }
-
-    const fn = () => {
-      return this.rest.checks.create({
-        ...defaults,
-        name: utils.getTestSuiteTitles().join(' -> '),
-        head_sha: process.env.CIRCLE_SHA1,
-        conclusion: conclusion,
-        output: output,
-      })
-    }
-    const errMsg = 'Failed to add check run.'
     await this.safeExec(fn, errMsg)
   }
 
@@ -260,6 +135,90 @@ class GitHub {
   async fetchKnownFlakes() {
     const flakeIssues = await this.fetchFlakeIssues()
     return flakeIssues.map((i) => i.title)
+  }
+
+  // This is called only in a final job added to the workflow.
+  // It adds a 'success' GitHub check to the PR when no flakiness has been reported.
+  async addSummaryCheck() {
+    // Get number of check runs added so far
+    let fn = () => {
+      return this.rest.checks.listSuitesForRef({
+        ...defaults,
+        ref: process.env.CIRCLE_SHA1,
+        app_id: flakeTrackerID, // only list suites created by the FlakeTracker app
+      })
+    }
+    let errMsg = 'Failed to list check suites.'
+    const numCheckSuites = (await this.safeExec(fn, errMsg)).data.total_count
+
+    // If a check suite has not yet been created by the FlakeTracker app, then no
+    // flakiness has been detected in the earlier jobs.
+    if (!numCheckSuites) {
+      // Add a succesful check showing no flakiness has been detected.
+
+      fn = () => {
+        return this.rest.checks.create({
+          ...defaults,
+          name: 'Summary',
+          head_sha: process.env.CIRCLE_SHA1,
+          conclusion: 'success',
+          output: {
+            title: statuses['success'],
+            summary: fmtSummary([], [], 0),
+            images: [
+              {
+                image_url: utils.getRandomHoorayImage(),
+                alt: 'Hooray!',
+              },
+            ],
+          },
+        })
+      }
+      errMsg = 'Failed to add summary check run.'
+      await this.safeExec(fn, errMsg)
+    }
+  }
+
+  async addCheck(flakes, skippedTests) {
+    const conclusion = utils.getConclusion(flakes, skippedTests)
+
+    // Only add checks when there's flakiness (otherwise check suite gets cluttered)
+    if (conclusion === 'success') return
+
+    const summary_0 = utils.fmtSummary(flakes, skippedTests, 0)
+    const summary_3 = utils.fmtSummary(flakes, skippedTests, 3)
+
+    const annotations = flakes.map((f) => {
+      const firstErr = utils.parseFirstErrFromFlakeBody(f.body)
+      const lineNumber = utils.parseErrLineNumberFromStack(firstErr) || 1
+      const path = utils.parsePathFromStack(firstErr)
+      return {
+        title: f.title,
+        path: path.slice(path.indexOf('packages/')),
+        start_line: lineNumber,
+        end_line: lineNumber + 1,
+        annotation_level: 'warning',
+        message: stripAnsi(utils.parseFirstErrFromFlakeBody(f.body)),
+      }
+    })
+    const output = {
+      title: statuses[conclusion],
+      summary: stripAnsi(summary_0),
+      text: stripAnsi(summary_3),
+      annotations: annotations,
+    }
+
+    const fn = () => {
+      return this.rest.checks.create({
+        ...defaults,
+        name: utils.getTestSuiteTitles().join(' -> '),
+        head_sha: process.env.CIRCLE_SHA1,
+        conclusion: conclusion,
+        output: output,
+      })
+    }
+    const errMsg = 'Failed to add check run.'
+    await this.safeExec(fn, errMsg)
   }
 
   // Retries fn with fresh token if expired

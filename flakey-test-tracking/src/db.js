@@ -63,6 +63,9 @@ const mkDir = (path) => {
 // Creates a directory that will be automatically removed on process exit.
 const mkTmpDir = (name) => {
   if (!fs.existsSync(join(tmpdir(), name))) {
+    // Add option `keep: true` to keep flakey test files after process exits.
+    // You can also specify a custom location for the files. This can be helpful for debugging.
+    // See https://www.npmjs.com/package/tmp
     tmp.dirSync({
       name: name,
       unsafeCleanup: true,

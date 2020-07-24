@@ -2,7 +2,7 @@ TODO(Alec): add option to log all errors on failure (DONE)
 
 TODO(Alec): make checks less verbose (DONE)
 
-TODO(Alec): cleanup code, add comments
+TODO(Alec): cleanup code, add comments (DONE)
 
 TODO(Alec): address PR comments
 
