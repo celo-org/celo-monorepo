@@ -194,7 +194,7 @@ export class ExchangeReview extends React.Component<Props, State> {
     }
 
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['bottom']}>
         <View style={styles.paddedContainer}>
           <DisconnectBanner />
           <ScrollView>
