@@ -69,6 +69,10 @@ TODO(Alec): cleanup code, add comments (DONE)
 
 TODO(Alec): address PR comments
 
+TODO(Alec): fix skipping logic and add cleanup (DONE)
+
+TODO(Alec): add fail fast without flaky
+
 TODO(Alec): Fill in README (DONE)
 
 TODO(Alec): fill in PR template

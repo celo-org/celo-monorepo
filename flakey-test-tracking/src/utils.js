@@ -178,7 +178,12 @@ function getRandomHoorayImage() {
   return images[Math.floor(Math.random() * images.length)]
 }
 
+function calcObsoleteFlakeIssues(skippedTests, knownFlakes) {
+  return knownFlakes.filter((i) => !skippedTests.some((st) => i.title.includes(st)))
+}
+
 module.exports = {
+  calcObsoleteFlakeIssues: calcObsoleteFlakeIssues,
   fmtFlakeIssue: fmtFlakeIssue,
   fmtSummary: fmtSummary,
   fmtTestTitles: fmtTestTitles,

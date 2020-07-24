@@ -54,14 +54,14 @@ class GitHub {
     this.rest = await auth(this.app)
   }
 
-  async report(flakes, skippedTests) {
+  async report(flakes, skippedTests, obsoleteIssues) {
     const promises = []
     if (config.shouldCreateIssues) {
       // Check list of ALL flakey issues to ensure no duplicates
       // Note: we could technically still have duplicate issues if one is added by another build
       // right after we fetch the list of issues. This seems unlikely so we'll leave it for now and
       // revisit if duplicate issues start appearing.
-      const knownFlakes = await this.fetchKnownFlakes()
+      const knownFlakes = (await this.fetchKnownFlakes()).map((i) => i.title)
       const newFlakes = flakes.filter((flake) => !knownFlakes.includes(flake.title))
       if (newFlakes.length) {
         promises.push(this.createIssues(newFlakes))
@@ -69,6 +69,9 @@ class GitHub {
     }
     if (config.shouldAddCheckToPR) {
       promises.push(this.addCheck(flakes, skippedTests))
+      if (config.shouldSkipKnownFlakes && obsoleteIssues.length) {
+        promises.push(this.addObsoleteIssuesCheck(obsoleteIssues))
+      }
     }
     console.log('\nSending flake tracker results to GitHub...\n')
     return Promise.all(promises)
@@ -129,12 +132,32 @@ class GitHub {
     const knownFlakesToSkip = flakeIssues.filter((i) => {
       return !mandatoryTests.includes(i.number.toString())
     })
-    return knownFlakesToSkip.map((i) => i.title)
+    return knownFlakesToSkip
   }
 
   async fetchKnownFlakes() {
     const flakeIssues = await this.fetchFlakeIssues()
-    return flakeIssues.map((i) => i.title)
+    return flakeIssues
+  }
+
+  async addObsoleteIssuesCheck(obsoleteIssues) {
+    const fn = () => {
+      return this.rest.checks.create({
+        ...defaults,
+        name: utils.getTestSuiteTitles().join(' -> '),
+        head_sha: process.env.CIRCLE_SHA1,
+        conclusion: 'action_required',
+        output: {
+          title: 'Obsolete Issues',
+          summary: 'Some flakey test issues no longer correspond to actual tests',
+          text:
+            'If tests have been refactored, renamed or moved please close or update the following issues as they are now obsolete.' +
+            obsoleteIssues.map((i) => i.url).join('\n\n'),
+        },
+      })
+    }
+    const errMsg = 'Failed to add check run.'
+    await this.safeExec(fn, errMsg)
   }
 
   // This is called only in a final job added to the workflow.

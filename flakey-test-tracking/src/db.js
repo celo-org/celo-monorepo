@@ -7,7 +7,8 @@ tmp.setGracefulCleanup()
 
 const flakeDir = 'flake-tracker_' + getTestSuiteDir().replace('/', '_')
 const errDir = 'new-flakes'
-const skipFile = 'known-flakes.txt'
+const knownFlakeFile = 'known-flakes.txt'
+const skippedFlakeFile = 'skipped-flakes.txt'
 
 const delim = '\n===============\n'
 
@@ -34,12 +35,26 @@ const readErrors = (testID) => {
 
 const writeKnownFlakes = (flakes) => {
   if (flakes.length) {
-    fs.writeFileSync(join(tmpdir(), flakeDir, skipFile), flakes.join(delim))
+    fs.writeFileSync(join(tmpdir(), flakeDir, knownFlakeFile), flakes.join(delim))
   }
 }
 
+const readSkippedFlakes = () => {
+  return readFileInFlakeDir(skippedFlakeFile)
+}
+
+const writeSkippedFlakes = (testIDs) => {
+  if (testIDs.length) {
+    writeSkippedFlake(testIDs.join(delim))
+  }
+}
+
+const writeSkippedFlake = (testID) => {
+  fs.appendFileSync(join(tmpdir(), flakeDir, skippedFlakeFile), testID + delim)
+}
+
 const readKnownFlakes = () => {
-  return readFileInFlakeDir(skipFile)
+  return readFileInFlakeDir(knownFlakeFile)
 }
 
 const readNewFlakes = () => {
@@ -110,8 +125,11 @@ module.exports = {
   readErrors: readErrors,
   readKnownFlakes: readKnownFlakes,
   readNewFlakes: readNewFlakes,
+  readSkippedFlakes: readSkippedFlakes,
   init: init,
   writeError: writeError,
   writeErrors: writeErrors,
   writeKnownFlakes: writeKnownFlakes,
+  writeSkippedFlake: writeSkippedFlake,
+  writeSkippedFlakes: writeSkippedFlakes,
 }

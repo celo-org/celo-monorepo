@@ -10,7 +10,8 @@ class FlakeTracker {
     // For each describe block, we cache errors in this map as tests execute and
     // only write them to the db on 'run_finish'.
     this.flakes = new Map()
-    this.skip = shouldSkipKnownFlakes ? db.readKnownFlakes() : []
+    this.skip = shouldSkipKnownFlakes ? db.readKnownFlakes().map((i) => i.title) : []
+    this.skipped = []
   }
 
   async handleTestEvent(event, state) {
@@ -31,6 +32,7 @@ class FlakeTracker {
       // The alternative to using the db would be to send results to github at the
       // end of each describe block. Instead,  we use the db and only message github
       // on global.setup and global.teardown.
+      db.writeSkippedFlakes(this.skipped)
     }
 
     // This event is fired at the end of each test (including retries) before errors are cleared
@@ -62,6 +64,7 @@ class FlakeTracker {
       const testID = getTestID(event.test)
       if (this.skip.some((knownFlake) => knownFlake.includes(testID))) {
         console.log('Skipped known flakey test: ' + testID)
+        this.skipped.push(testID)
         event.test.mode = 'skip' // This tricks jest into skipping the test
       }
     }
