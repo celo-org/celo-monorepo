@@ -49,7 +49,8 @@ import { getAppStoreId } from 'src/utils/appstore'
 import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 import { getContractKitAsync, getWallet, getWeb3 } from 'src/web3/contracts'
-import { getOrCreateAccount, registerAccountDEK, waitWeb3LastBlock } from 'src/web3/saga'
+import { registerAccountDEK } from 'src/web3/dataEncryptionKey'
+import { getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 
 const TAG = 'invite/saga'
 export const REDEEM_INVITE_TIMEOUT = 2 * 60 * 1000 // 2 minutes

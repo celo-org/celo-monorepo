@@ -2,7 +2,6 @@
 // Use these instead of the functions in @celo/utils/src/commentEncryption
 // because these manage comment metadata
 
-import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { IdentifierLookupResult } from '@celo/contractkit/lib/wrappers/Attestations'
 import { eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import {
@@ -31,7 +30,7 @@ import {
 } from 'src/identity/reducer'
 import { NewTransactionsInFeedAction } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
-import { getContractKit } from 'src/web3/contracts'
+import { doFetchDataEncryptionKey } from 'src/web3/dataEncryptionKey'
 import { dataEncryptionKeySelector } from 'src/web3/selectors'
 
 const TAG = 'identity/commentKey'
@@ -41,16 +40,6 @@ const METADATA_CONTENT_SEPARATOR = '~'
 const PHONE_METADATA_REGEX = new RegExp(
   `(.*)${METADATA_CONTENT_SEPARATOR}([+][1-9][0-9]{1,14})([a-zA-Z0-9+/]{13})$`
 )
-
-export function* getDataEncryptionKey(address: string) {
-  const contractKit = yield call(getContractKit)
-  const accountsWrapper: AccountsWrapper = yield call([
-    contractKit.contracts,
-    contractKit.contracts.getAccounts,
-  ])
-  const hexString: string = yield call(accountsWrapper.getDataEncryptionKey, address)
-  return !hexString ? null : hexToBuffer(hexString)
-}
 
 export function* encryptComment(
   comment: string | null,
@@ -64,13 +53,13 @@ export function* encryptComment(
     return comment
   }
 
-  const fromKey: Buffer | null = yield call(getDataEncryptionKey, fromAddress)
+  const fromKey: Buffer | null = yield call(doFetchDataEncryptionKey, fromAddress)
   if (!fromKey) {
     Logger.debug(TAG + 'encryptComment', 'No sender key found, skipping encryption')
     return comment
   }
 
-  const toKey: Buffer | null = yield call(getDataEncryptionKey, toAddress)
+  const toKey: Buffer | null = yield call(doFetchDataEncryptionKey, toAddress)
   if (!toKey) {
     Logger.debug(TAG + 'encryptComment', 'No recipient key found, skipping encryption')
     return comment

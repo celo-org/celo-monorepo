@@ -31,7 +31,7 @@ import {
 } from 'src/tokens/saga'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
-import { registerAccountDEK } from 'src/web3/saga'
+import { getRegisterDekTxGas, registerAccountDEK } from 'src/web3/dataEncryptionKey'
 import { currentAccountSelector } from 'src/web3/selectors'
 import { estimateGas } from 'src/web3/utils'
 
@@ -57,10 +57,16 @@ export async function getSendTxGas(
 export async function getSendFee(
   account: string,
   currency: CURRENCY_ENUM,
-  params: BasicTokenTransfer
+  params: BasicTokenTransfer,
+  includeDekFee: boolean = false
 ) {
   try {
-    const gas = await getSendTxGas(account, currency, params)
+    let gas = await getSendTxGas(account, currency, params)
+    if (includeDekFee) {
+      const dekGas = await getRegisterDekTxGas(account, currency)
+      gas = gas.plus(dekGas)
+    }
+
     return calculateFee(gas)
   } catch (error) {
     throw error

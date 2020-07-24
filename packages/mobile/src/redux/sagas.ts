@@ -33,10 +33,6 @@ const loggerBlacklist = [
   'SEND/SET_RECIPIENT_CACHE',
   'IMPORT/IMPORT_BACKUP_PHRASE',
   'WEB3/SET_COMMENT_KEY',
-  'IDENTITY/UPDATE_E164_PHONE_NUMBER_ADDRESSES',
-  'IDENTITY/UPDATE_E164_PHONE_NUMBER_SALT',
-  'IDENTITY/FETCH_PHONE_ADDRESSES',
-  'IDENTITY/ADD_CONTACT_MATCHES',
   'INVITE/REDEEM_INVITE',
   'INVITE/STORE_INVITEE_DATA',
   'EXCHANGE/UPDATE_CELO_GOLD_EXCHANGE_RATE_HISTORY', // Not private, just noisy
@@ -50,9 +46,13 @@ function* loggerSaga() {
   }
 
   yield takeEvery('*', (action: AnyAction) => {
-    if (action && action.type && loggerBlacklist.includes(action.type)) {
+    if (
+      action?.type &&
+      (action.type.includes('IDENTITY/') || loggerBlacklist.includes(action.type))
+    ) {
       // Log only action type, but not the payload as it can have
-      // sensitive information.
+      // sensitive information. Excluding all IDENTITY/ actions because high likelyhood
+      // they contain PII and the blacklist may get out of date.
       Logger.debug('redux/saga@logger', `${action.type} (payload not logged)`)
       return
     }

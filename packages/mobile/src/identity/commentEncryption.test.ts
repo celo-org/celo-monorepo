@@ -11,11 +11,11 @@ import {
   embedPhoneNumberMetadata,
   encryptComment,
   extractPhoneNumberMetadata,
-  getDataEncryptionKey,
 } from 'src/identity/commentEncryption'
 import { lookupAttestationIdentifiers } from 'src/identity/contactMapping'
 import { PhoneNumberHashDetails } from 'src/identity/privateHashing'
 import { e164NumberToAddressSelector, e164NumberToSaltSelector } from 'src/identity/reducer'
+import { doFetchDataEncryptionKey } from 'src/web3/dataEncryptionKey'
 import { dataEncryptionKeySelector } from 'src/web3/selectors'
 import { getMockStoreData } from 'test/utils'
 import {
@@ -70,8 +70,8 @@ describe('Encrypt Comment', () => {
   it('Handles basic comment', async () => {
     await expectSaga(encryptComment, simpleComment, mockAccount2, mockAccount)
       .provide([
-        [call(getDataEncryptionKey, mockAccount), hexToBuffer(mockPublicDEK)],
-        [call(getDataEncryptionKey, mockAccount2), hexToBuffer(mockPublicDEK2)],
+        [call(doFetchDataEncryptionKey, mockAccount), hexToBuffer(mockPublicDEK)],
+        [call(doFetchDataEncryptionKey, mockAccount2), hexToBuffer(mockPublicDEK2)],
       ])
       .returns(simpleCommentEnc)
       .run()
@@ -80,8 +80,8 @@ describe('Encrypt Comment', () => {
   it('Handles complex comment', async () => {
     await expectSaga(encryptComment, complexComment, mockAccount2, mockAccount)
       .provide([
-        [call(getDataEncryptionKey, mockAccount), hexToBuffer(mockPublicDEK)],
-        [call(getDataEncryptionKey, mockAccount2), hexToBuffer(mockPublicDEK2)],
+        [call(doFetchDataEncryptionKey, mockAccount), hexToBuffer(mockPublicDEK)],
+        [call(doFetchDataEncryptionKey, mockAccount2), hexToBuffer(mockPublicDEK2)],
       ])
       .returns(complexCommentEnc)
       .run()
@@ -95,8 +95,8 @@ describe('Encrypt Comment', () => {
     await expectSaga(encryptComment, simpleComment, mockAccount2, mockAccount, true)
       .withState(mockState)
       .provide([
-        [call(getDataEncryptionKey, mockAccount), hexToBuffer(mockPublicDEK)],
-        [call(getDataEncryptionKey, mockAccount2), hexToBuffer(mockPublicDEK2)],
+        [call(doFetchDataEncryptionKey, mockAccount), hexToBuffer(mockPublicDEK)],
+        [call(doFetchDataEncryptionKey, mockAccount2), hexToBuffer(mockPublicDEK2)],
       ])
       .returns(simpleCommentWithMetadataEnc)
       .run()

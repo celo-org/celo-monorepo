@@ -341,6 +341,7 @@ export const v2Schema = {
   },
   identity: {
     ...v1Schema.identity,
+    addressToDataEncryptionKey: {},
   },
   web3: {
     ...v1Schema.web3,

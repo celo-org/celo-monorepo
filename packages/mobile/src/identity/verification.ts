@@ -39,7 +39,8 @@ import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
-import { getConnectedAccount, getConnectedUnlockedAccount, registerAccountDEK } from 'src/web3/saga'
+import { registerAccountDEK } from 'src/web3/dataEncryptionKey'
+import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 
 const TAG = 'identity/verification'
 
