@@ -524,24 +524,33 @@ export const simulateClient = async (
     // const feeCurrencyGold = true
 
     let feeCurrency
-    if (!feeCurrencyGold) {
-      try {
-        feeCurrency = await kit.registry.addressFor(CeloContract.StableToken)
-      } catch (error) {
-        tracerLog({
-          tag: LOG_TAG_CONTRACT_ADDRESS_ERROR,
-          error: error.toString(),
-          ...baseLogMessage,
-        })
-      }
+    try {
+      feeCurrency = feeCurrencyGold ? await kit.registry.addressFor(CeloContract.GoldToken) : await kit.registry.addressFor(CeloContract.StableToken)
     }
-    baseLogMessage.feeCurrency = feeCurrency || ''
+    catch (error) {
+      tracerLog({
+        tag: LOG_TAG_CONTRACT_ADDRESS_ERROR,
+        error: error.toString(),
+        ...baseLogMessage,
+      })
+    }
+
+    feeCurrency = feeCurrency || ''
+    baseLogMessage.feeCurrency = feeCurrency
+
+    const gasPriceMinimum = await kit.contracts.getGasPriceMinimum()
+    const gasPrice = new BigNumber(
+      await gasPriceMinimum.getGasPriceMinimum(feeCurrency)
+    ).times(5)
+
+    const txOptions = {
+      gasPrice: gasPrice.toString(),
+      feeCurrency,
+    }
 
     // We purposely do not use await syntax so we sleep after sending the transaction,
     // not after processing a transaction's result
-    transferFn(kit, senderAddress, recipientAddress, LOAD_TEST_TRANSFER_WEI, {
-      feeCurrency,
-    })
+    transferFn(kit, senderAddress, recipientAddress, LOAD_TEST_TRANSFER_WEI, txOptions)
       .then(async (txResult: TransactionResult) => {
         await onLoadTestTxResult(
           kit,
