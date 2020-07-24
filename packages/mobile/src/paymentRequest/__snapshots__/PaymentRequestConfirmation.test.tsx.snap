@@ -9,7 +9,6 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
   }
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "padding": 8,
     }
