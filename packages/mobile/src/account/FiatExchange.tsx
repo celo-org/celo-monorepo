@@ -10,7 +10,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useSelector } from 'react-redux'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
-import { SHOW_CASH_OUT } from 'src/config'
+import { features } from 'src/flags'
 import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { Screens } from 'src/navigator/Screens'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
@@ -51,7 +51,7 @@ function FiatExchange() {
         <ListItem onPress={goToAddFunds}>
           <Text style={styles.optionTitle}>{t('fiatExchangeFlow:addFunds')}</Text>
         </ListItem>
-        {SHOW_CASH_OUT ? (
+        {features.SHOW_CASH_OUT ? (
           <ListItem onPress={goToCashOut}>
             <Text style={styles.optionTitle}>{t('fiatExchangeFlow:cashOut')}</Text>
           </ListItem>
