@@ -370,10 +370,10 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   }
 
   /** Get list of registered validator groups */
-  async getRegisteredValidatorGroups(_blockNumber?: number): Promise<ValidatorGroup[]> {
-    const vgAddresses = await this.getRegisteredValidatorGroupsAddresses(_blockNumber)
+  async getRegisteredValidatorGroups(blockNumber?: number): Promise<ValidatorGroup[]> {
+    const vgAddresses = await this.getRegisteredValidatorGroupsAddresses(blockNumber)
     return concurrentMap(10, vgAddresses, (addr) =>
-      this.getValidatorGroup(addr, false, _blockNumber)
+      this.getValidatorGroup(addr, false, blockNumber)
     )
   }
 

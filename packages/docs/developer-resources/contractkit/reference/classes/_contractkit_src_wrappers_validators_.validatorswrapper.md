@@ -735,7 +735,7 @@ ___
 
 ###  getRegisteredValidatorGroups
 
-▸ **getRegisteredValidatorGroups**(`_blockNumber?`: undefined | number): *Promise‹[ValidatorGroup](../interfaces/_contractkit_src_wrappers_validators_.validatorgroup.md)[]›*
+▸ **getRegisteredValidatorGroups**(`blockNumber?`: undefined | number): *Promise‹[ValidatorGroup](../interfaces/_contractkit_src_wrappers_validators_.validatorgroup.md)[]›*
 
 *Defined in [contractkit/src/wrappers/Validators.ts:373](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L373)*
 
@@ -745,7 +745,7 @@ Get list of registered validator groups
 
 Name | Type |
 ------ | ------ |
-`_blockNumber?` | undefined &#124; number |
+`blockNumber?` | undefined &#124; number |
 
 **Returns:** *Promise‹[ValidatorGroup](../interfaces/_contractkit_src_wrappers_validators_.validatorgroup.md)[]›*
 
