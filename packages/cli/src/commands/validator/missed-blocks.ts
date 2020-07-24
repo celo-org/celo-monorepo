@@ -74,7 +74,7 @@ export default class ValidatorSignedBlocks extends BaseCommand {
       const election = await this.kit.contracts.getElection()
       accounts = await this.kit.contracts.getAccounts()
       validators = await this.kit.contracts.getValidators()
-      const vgroups = await validators.getRegisteredValidatorGroups()
+      const vgroups = await validators.getRegisteredValidatorGroups(latest)
       for (const group of vgroups) {
         for (const member of group.members) {
           validatorToGroupName.set(member, group.name || '')
@@ -88,7 +88,13 @@ export default class ValidatorSignedBlocks extends BaseCommand {
         const genesisJson = JSON.parse(readFileSync(res.flags.genesis, 'utf-8'))
         electedSigners = parseBlockExtraData(genesisJson.extraData).addedValidators
       } else {
-        this.error('If contracts are not deployed, must provide the genesis block')
+        if (res.flags['at-block']) {
+          this.error(
+            'Unable to read contracts at the desired block. Double check that your node provider '
+          )
+        } else {
+          this.error('Unable to read contracts & not able to fall back onto genesis.json')
+        }
       }
     }
 
