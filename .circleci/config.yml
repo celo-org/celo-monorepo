@@ -893,7 +893,7 @@ workflows:
       - phone-number-privacy-test:
           requires:
             - lint-checks
-      - flakeTrackerSummary:
+      - flake-tracker-summary:
           requires:
             - end-to-end-mobile-test-android
             - end-to-end-mobile-test-ios
