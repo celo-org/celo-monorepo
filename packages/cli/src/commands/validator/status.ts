@@ -16,7 +16,6 @@ interface ValidatorStatusEntry {
   elected: boolean
   frontRunner: boolean
   signatures: number
-  proposed: number
 }
 
 export const statusTable = {
@@ -25,7 +24,6 @@ export const statusTable = {
   signer: {},
   elected: {},
   frontRunner: {},
-  proposed: { get: (v: ValidatorStatusEntry) => (v.elected || v.proposed ? v.proposed : '') },
   signatures: {
     get: (v: ValidatorStatusEntry) =>
       isNaN(v.signatures) ? '' : (v.signatures * 100).toFixed(2) + '%',
@@ -226,7 +224,6 @@ export default class ValidatorStatus extends BaseCommand {
     if (await validators.isValidator(validator)) {
       name = (await accounts.getName(validator)) || ''
     }
-    const proposedCount = 0
     let signatures = signatureCounts.get(validator)
     if (signatures === undefined) {
       signatures = 0
@@ -241,7 +238,6 @@ export default class ValidatorStatus extends BaseCommand {
       signer,
       elected: await electionCache.elected(signer, await this.web3.eth.getBlockNumber()),
       frontRunner: frontRunnerSigners.some(eqAddress.bind(null, signer)),
-      proposed: proposedCount,
       signatures: signatures / elected, // may be NaN
     }
   }
