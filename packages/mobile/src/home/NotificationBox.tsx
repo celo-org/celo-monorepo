@@ -1,5 +1,5 @@
+import Pagination from '@celo/react-components/components/Pagination'
 import SimpleMessagingCard from '@celo/react-components/components/SimpleMessagingCard'
-import progressDotsStyle from '@celo/react-components/styles/progressDots'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -290,28 +290,6 @@ export class NotificationBox extends React.Component<Props, State> {
     return actions.map((notification, i) => <SimpleMessagingCard key={i} {...notification} />)
   }
 
-  paginationDots = (notifications: Array<React.ReactElement<any>>) => {
-    if (notifications.length < 2) {
-      return null
-    }
-    return (
-      <View style={styles.pagination}>
-        {notifications.map((n, i) => {
-          return (
-            <View
-              key={i}
-              style={
-                this.state.currentIndex === i
-                  ? progressDotsStyle.circleActive
-                  : progressDotsStyle.circlePassive
-              }
-            />
-          )
-        })}
-      </View>
-    )
-  }
-
   handleScroll = (event: { nativeEvent: NativeScrollEvent }) => {
     const { currentIndex } = this.state
     const nextIndex = Math.round(event.nativeEvent.contentOffset.x / variables.width)
@@ -354,7 +332,11 @@ export class NotificationBox extends React.Component<Props, State> {
             </View>
           ))}
         </ScrollView>
-        {this.paginationDots(notifications)}
+        <Pagination
+          style={styles.pagination}
+          count={notifications.length}
+          activeIndex={this.state.currentIndex}
+        />
       </View>
     )
   }
@@ -371,11 +353,7 @@ const styles = StyleSheet.create({
     marginBottom: 24, // Enough space so the shadow is not clipped
   },
   pagination: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
     paddingBottom: variables.contentPadding,
-    alignItems: 'center',
   },
 })
 

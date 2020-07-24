@@ -42,7 +42,7 @@ export class Profile extends React.Component<Props> {
     const { t, userContact, name } = this.props
     return (
       <ScrollView style={styles.container}>
-        <SafeAreaView>
+        <SafeAreaView edges={['bottom']}>
           <Text style={styles.title}>{t('editProfile')}</Text>
           <View style={styles.accountProfile}>
             <ContactCircle thumbnailPath={userContact.thumbnailPath} name={name} size={80} />

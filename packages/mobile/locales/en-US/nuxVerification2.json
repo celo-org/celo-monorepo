@@ -28,21 +28,17 @@
     "section2Body": "To protect your privacy, only an obfuscated version of your phone number is stored on the Celo blockchain."
   },
   "loading": {
-    "verifyingNumber": "Verifying {{number}}",
-    "keepOpen": "Please keep the app open",
-    "card1": "Verifying your account allows you to see which of your friends uses {{appName}}.",
-    "card2": "With {{appName}}, you can send money to anyone using just their phone number.",
-    "card3": "{{appName}} is now requesting three text messages to confirm you own your phone number."
+    "confirming": "Confirming…",
+    "learnMore": "Learn more",
+    "card1": "To make sure your phone number is really yours, we're sending you three messages.",
+    "card2": "Once your number is confirmed, you can send and receive funds easily to your phone number.",
+    "card3": "Confirming also allows you to see which of your friends are on {{appName}}.",
+    "card4": "We require three confirmation messages to keep your account more secure."
   },
   "skipModal": {
     "header": "Skip Verification?",
     "body1": "Verifying allows others to send value to your phone number.",
     "body2": "Without verification, you can still send payments, but only using account numbers or QR codes."
-  },
-  "interstitial": {
-    "header": "Almost Done",
-    "body1": "Your text messages are on the way! Please enter your three codes as you receive them.",
-    "body2": "This may take a minute."
   },
   "failModal": {
     "header": "Verification Error",
@@ -50,6 +46,8 @@
     "body2": "You can skip verification for now and try again later.",
     "body1InsufficientBalance": "Your current balance is not high enough to complete the verification process.",
     "body2InsufficientBalance": "Please try again when you have added funds to your wallet.",
+    "body1SaltQuotaExceeded": "Your phone number lookup quota is used up",
+    "body2SaltQuotaExceeded": "Please try again when you have purchased more lookups",
     "enterCodesBody": " If you already received three codes via SMS, you can still enter them.",
     "enterCodesButton": "Enter Codes"
   },

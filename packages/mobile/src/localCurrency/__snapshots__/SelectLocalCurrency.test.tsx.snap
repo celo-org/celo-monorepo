@@ -10,7 +10,13 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
   }
 >
   <View>
-    <RNCSafeAreaView>
+    <RNCSafeAreaView
+      edges={
+        Array [
+          "bottom",
+        ]
+      }
+    >
       <Text
         style={
           Object {
