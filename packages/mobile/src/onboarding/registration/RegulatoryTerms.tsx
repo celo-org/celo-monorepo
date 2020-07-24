@@ -10,7 +10,6 @@ import { PincodeType } from 'src/account/reducer'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { CELO_TERMS_LINK } from 'src/config'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -37,8 +36,6 @@ const mapDispatchToProps: DispatchProps = {
 type Props = WithTranslation & DispatchProps & StateProps
 
 export class RegulatoryTerms extends React.Component<Props> {
-  static navigationOptions = nuxNavigationOptions
-
   onPressAccept = () => {
     this.props.acceptTerms()
     this.goToNextScreen()

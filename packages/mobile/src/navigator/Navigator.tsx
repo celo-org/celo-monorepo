@@ -112,7 +112,14 @@ const commonScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen
         name={Screens.PincodeEnter}
         component={PincodeEnter}
-        options={headerWithBackButton}
+        options={{
+          ...noHeader,
+          cardStyleInterpolator: ({ current }) => ({
+            containerStyle: {
+              opacity: current.progress,
+            },
+          }),
+        }}
       />
       <Navigator.Screen name={Screens.ErrorScreen} component={ErrorScreen} options={noHeader} />
       <Navigator.Screen name={Screens.UpgradeScreen} component={UpgradeScreen} />
@@ -203,7 +210,10 @@ const nuxScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen
       name={Screens.RegulatoryTerms}
       component={RegulatoryTerms}
-      options={nuxNavigationOptions}
+      options={{
+        ...nuxNavigationOptions,
+        ...TransitionPresets.ModalSlideFromBottomIOS,
+      }}
     />
     <Navigator.Screen
       name={Screens.PincodeSet}
@@ -241,7 +251,14 @@ const nuxScreens = (Navigator: typeof Stack) => (
 const sendScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen name={Screens.Send} component={Send} options={sendScreenNavOptions} />
-    <Navigator.Screen name={Screens.QRNavigator} component={QRNavigator} options={noHeader} />
+    <Navigator.Screen
+      name={Screens.QRNavigator}
+      component={QRNavigator}
+      options={{
+        ...noHeader,
+        ...TransitionPresets.ModalSlideFromBottomIOS,
+      }}
+    />
     <Navigator.Screen
       name={Screens.SendAmount}
       component={SendAmount}
@@ -364,7 +381,10 @@ const backupScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen
       name={Screens.AccountKeyEducation}
       component={AccountKeyEducation}
-      options={noHeader}
+      options={{
+        ...noHeader,
+        ...TransitionPresets.ModalSlideFromBottomIOS,
+      }}
     />
     <Navigator.Screen
       name={Screens.BackupPhrase}
@@ -439,7 +459,14 @@ const generalScreens = (Navigator: typeof Stack) => (
       component={TransactionReview}
       options={transactionReviewOptions}
     />
-    <Navigator.Screen name={Screens.GoldEducation} component={GoldEducation} options={noHeader} />
+    <Navigator.Screen
+      name={Screens.GoldEducation}
+      component={GoldEducation}
+      options={{
+        ...noHeader,
+        ...TransitionPresets.ModalSlideFromBottomIOS,
+      }}
+    />
   </>
 )
 

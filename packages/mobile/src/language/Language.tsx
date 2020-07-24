@@ -1,7 +1,7 @@
 import SelectionOption from '@celo/react-components/components/SelectionOption'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
-import { StackScreenProps } from '@react-navigation/stack'
+import { StackScreenProps, TransitionPresets } from '@react-navigation/stack'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { FlatList, ListRenderItemInfo, ScrollView, StyleSheet, Text } from 'react-native'
@@ -79,7 +79,12 @@ function LanguageScreen({ route }: Props) {
 }
 
 LanguageScreen.navigationOptions = ({ navigation }: ScreenProps) => {
-  return navigation.canGoBack() ? headerWithBackButton : emptyHeader
+  return navigation.canGoBack()
+    ? {
+        ...headerWithBackButton,
+        ...TransitionPresets.ModalSlideFromBottomIOS,
+      }
+    : emptyHeader
 }
 
 const styles = StyleSheet.create({

@@ -6,12 +6,12 @@ import colors from '@celo/react-components/styles/colors'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import BackButton from 'src/components/BackButton.v2'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { checkPin } from 'src/pincode/authentication'
@@ -31,8 +31,6 @@ interface StateProps {
 type Props = StateProps & WithTranslation & StackScreenProps<StackParamList, Screens.PincodeEnter>
 
 class PincodeEnter extends React.Component<Props, State> {
-  static navigationOptions = { gestureEnabled: false, ...nuxNavigationOptions }
-
   state = {
     pin: '',
     errorText: undefined,
@@ -76,6 +74,9 @@ class PincodeEnter extends React.Component<Props, State> {
     const { pin, errorText } = this.state
     return (
       <SafeAreaView style={style.container}>
+        <View style={style.backButton}>
+          <BackButton />
+        </View>
         <Pincode
           title={t('confirmPin.title')}
           errorText={errorText}
@@ -93,6 +94,10 @@ const style = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     justifyContent: 'space-between',
+  },
+  backButton: {
+    alignSelf: 'flex-start',
+    marginTop: 16,
   },
 })
 

@@ -20,6 +20,7 @@ import {
   DrawerNavigationState,
   useLinkBuilder,
 } from '@react-navigation/native'
+import { TransitionPresets } from '@react-navigation/stack'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
@@ -204,7 +205,11 @@ export default function DrawerNavigator() {
         <Drawer.Screen
           name={Screens.GoldEducation}
           component={GoldEducation}
-          options={{ title: t('celoGold'), drawerIcon: Gold }}
+          options={{
+            title: t('celoGold'),
+            drawerIcon: Gold,
+            ...TransitionPresets.ModalSlideFromBottomIOS,
+          }}
         />
       )}
       <Drawer.Screen

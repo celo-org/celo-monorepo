@@ -3,7 +3,7 @@ import Times from '@celo/react-components/icons/Times'
 import VerifyPhone from '@celo/react-components/icons/VerifyPhone'
 import colors from '@celo/react-components/styles/colors.v2'
 import { RouteProp } from '@react-navigation/native'
-import { StackScreenProps } from '@react-navigation/stack'
+import { StackScreenProps, TransitionPresets } from '@react-navigation/stack'
 import { throttle } from 'lodash'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -133,6 +133,7 @@ export const sendScreenNavOptions = ({
     ),
     headerRightContainerStyle: styles.headerRightContainer,
     headerTitle: title,
+    ...TransitionPresets.ModalSlideFromBottomIOS,
   }
 }
 
