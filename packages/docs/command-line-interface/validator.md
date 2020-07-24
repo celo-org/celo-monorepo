@@ -156,10 +156,10 @@ OPTIONS
   --lookback=lookback       [default: 120] how many blocks to look back for signer activity
 
 EXAMPLES
-  downtime --genesis ./genesis.json
   downtime
-  downtime --at-block 100000 --genesis ./genesis.json
-  downtime --lookback 500 --genesis ./genesis.json
+  downtime --genesis genesis.json
+  downtime --at-block 100000 --genesis genesis.json
+  downtime --lookback 500
 ```
 
 _See code: [packages/cli/src/commands/validator/missed-blocks.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/missed-blocks.ts)_
