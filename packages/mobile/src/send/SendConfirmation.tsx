@@ -69,7 +69,7 @@ interface StateProps {
   addressJustValidated?: boolean
   localCurrencyCode: LocalCurrencyCode
   localCurrencyExchangeRate?: string | null
-  isDEKRegistered: boolean
+  isDekRegistered: boolean
   addressToDataEncryptionKey: AddressToDataEncryptionKeyType
 }
 
@@ -129,7 +129,7 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
     addressJustValidated,
     localCurrencyCode,
     localCurrencyExchangeRate,
-    isDEKRegistered: isDekRegisteredSelector(state),
+    isDekRegistered: isDekRegisteredSelector(state) ?? false,
     addressToDataEncryptionKey: state.identity.addressToDataEncryptionKey,
   }
 }
@@ -285,7 +285,7 @@ export class SendConfirmation extends React.Component<Props, State> {
       dollarBalance,
       confirmationInput,
       validatedRecipientAddress,
-      isDEKRegistered,
+      isDekRegistered,
       addressToDataEncryptionKey,
     } = this.props
     const { amount, recipient, recipientAddress, type, reason } = confirmationInput
@@ -327,7 +327,7 @@ export class SendConfirmation extends React.Component<Props, State> {
         // 'fee' already contains the invitation fee for invites
         // so we adjust it here
         securityFee = fee.minus(inviteFee)
-      } else if (!isDEKRegistered && fee) {
+      } else if (!isDekRegistered && fee) {
         // 'fee' contains cost for both DEK registration and
         // send payment so we adjust it here
         securityFee = fee.dividedBy(2)
@@ -352,7 +352,7 @@ export class SendConfirmation extends React.Component<Props, State> {
             inviteFee={inviteFee}
             isInvite={isInvite}
             securityFee={securityFee}
-            showDekfee={!isDEKRegistered}
+            showDekfee={!isDekRegistered}
             dekFee={dekFee}
             feeLoading={asyncFee.loading}
             feeHasError={!!asyncFee.error}
@@ -454,7 +454,7 @@ export class SendConfirmation extends React.Component<Props, State> {
   }
 
   render() {
-    const { account, confirmationInput, isDEKRegistered } = this.props
+    const { account, confirmationInput, isDekRegistered } = this.props
     if (!account) {
       throw Error('Account is required')
     }
@@ -467,7 +467,7 @@ export class SendConfirmation extends React.Component<Props, State> {
           account,
           recipientAddress,
           amount,
-          includeDekFee: !isDEKRegistered,
+          includeDekFee: !isDekRegistered,
         }
       : { feeType: FeeType.INVITE, account, amount }
 

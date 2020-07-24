@@ -345,7 +345,7 @@ export const v2Schema = {
   },
   web3: {
     ...v1Schema.web3,
-    isDEKRegistered: false,
+    isDekRegistered: false,
   },
 }
 
