@@ -159,8 +159,8 @@ async function getContractVersion(contract: ZContract): Promise<ContractVersion>
   // Artificially link all libraries to the null address.
   const linkedBytecode = bytecode.split(/[_]+[A-Za-z0-9]+[_]+/).join(nullAddress)
   const result = await vm.runCall({
-    to: Buffer.from('756F45E3FA69347A9A973A725E3C98bC4db0b5a0', 'hex'),
-    caller: Buffer.from('756F45E3FA69347A9A973A725E3C98bC4db0b5a0', 'hex'),
+    to: Buffer.from(nullAddress, 'hex'),
+    caller: Buffer.from(nullAddress, 'hex'),
     code: Buffer.from(linkedBytecode.slice(2), 'hex'),
     static: true,
     data: Buffer.from(data.slice(2), 'hex')
