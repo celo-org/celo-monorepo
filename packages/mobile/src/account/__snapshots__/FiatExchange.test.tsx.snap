@@ -206,6 +206,37 @@ exports[`FiatExchange renders correctly 1`] = `
         </View>
       </View>
     </View>
+    <View
+      style={
+        Object {
+          "backgroundColor": "#FFFFFF",
+        }
+      }
+    >
+      <View
+        style={
+          Object {
+            "borderBottomColor": "#EDEEEF",
+            "borderBottomWidth": 1,
+            "marginLeft": 16,
+            "paddingVertical": 16,
+          }
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#B4B9BD",
+              "fontFamily": "Inter-Regular",
+              "fontSize": 16,
+              "lineHeight": 22,
+            }
+          }
+        >
+          fiatExchangeFlow:cashOut
+        </Text>
+      </View>
+    </View>
   </View>
 </RNCSafeAreaView>
 `;
