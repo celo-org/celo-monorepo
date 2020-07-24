@@ -15,7 +15,6 @@ import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressLinkedList.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
 /**
@@ -23,7 +22,6 @@ import "../common/libraries/ReentrancyGuard.sol";
  */
 contract Validators is
   IValidators,
-  ICeloVersionedContract,
   Ownable,
   ReentrancyGuard,
   Initializable,
@@ -157,14 +155,6 @@ contract Validators is
   modifier onlySlasher() {
     require(getLockedGold().isSlasher(msg.sender), "Only registered slasher can call");
     _;
-  }
-
-  /**
-   * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return The storage, major, minor, and patch version of the contract.
-   */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 0, 1, 0);
   }
 
   /**
@@ -916,9 +906,7 @@ contract Validators is
    */
   function meetsAccountLockedGoldRequirements(address account) public view returns (bool) {
     uint256 balance = getLockedGold().getAccountTotalLockedGold(account);
-    // Add a bit of "wiggle room" to accommodate the fact that vote activation can result in a 1
-    // wei rounding error.
-    return balance.add(10) >= getAccountLockedGoldRequirement(account);
+    return balance >= getAccountLockedGoldRequirement(account);
   }
 
   /**
