@@ -472,7 +472,7 @@ jobs:
           name: Check contract versions
           command: |
             RELEASE_BRANCH=$(git branch --list release/contracts/* | tail -1)
-            yarn check-versions -o $RELEASE_BRANCH -n $CIRCLE_BRANCH
+            yarn --cwd packages/protocol check-versions -o $RELEASE_BRANCH -n $CIRCLE_BRANCH
       - run:
           name: Unit tests
           # Flaky tests - run them twice
