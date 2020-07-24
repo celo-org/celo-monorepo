@@ -28,7 +28,7 @@ const nodeFlakeTracking = shouldTrackFlakes
       testEnvironment: 'node',
     }
 
-const jsdomFlakeTracking = shouldTrackFlakes
+const jsdomFlakeTracking = shouldTrackFlakes //TODO(Alec): check that jsdom tests are covered
   ? {
       ...flakeTracking,
       testEnvironment: require.resolve('./environments/jsdom'),
@@ -38,6 +38,8 @@ const jsdomFlakeTracking = shouldTrackFlakes
       testEnvironment: 'jsdom',
     }
 
+// Note that detox e2e tests require a config.json file, which means we currently can't use the object below.
+// Presumably this will change in future versions of detox, so we've added this here anyway.
 const detoxFlakeTracking = shouldTrackFlakes
   ? {
       ...flakeTracking,

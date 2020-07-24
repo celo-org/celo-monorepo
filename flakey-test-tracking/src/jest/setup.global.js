@@ -2,6 +2,7 @@ require('regenerator-runtime/runtime') // See https://stackoverflow.com/question
 
 const FlakeManager = require('../manager')
 
+// This is called at the beginning of each jest test suite
 module.exports = async function jestFlakeTrackerSetup() {
-  global.FlakeManager = await FlakeManager.build()
+  global.FlakeManager = await FlakeManager.build() // Note that this global variable is not available anywhere else besides global.teardown
 }

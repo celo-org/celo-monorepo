@@ -28,8 +28,10 @@ function fmtIssueBody(errors) {
 }
 
 function getPullNumber() {
-  const prUrl = process.env.CIRCLE_PULL_REQUEST
-  return prUrl.slice(prUrl.lastIndexOf('/') + 1)
+  if (process.env.CIRCLECI) {
+    const prUrl = process.env.CIRCLE_PULL_REQUEST
+    return prUrl.slice(prUrl.lastIndexOf('/') + 1)
+  }
 }
 
 // Parses list of flakey test issues to ignore from the PR's body.

@@ -38,7 +38,7 @@ const getConclusion = (flakes, skippedTests) => {
 
 class GitHub {
   constructor(app, rest) {
-    if (typeof app === 'undefined' || typeof rest === 'undefined') {
+    if (app === undefined || rest === undefined) {
       throw new Error('GitHub constructor should not be called directly. Please use GitHub.build()')
     }
     this.app = app
@@ -55,7 +55,7 @@ class GitHub {
   }
 
   async renew() {
-    if (typeof this === 'undefined') {
+    if (this === undefined) {
       throw new Error('GitHub.renew() cannot be called before GitHub.build()')
     }
     this.rest = await auth(this.app)
@@ -65,6 +65,9 @@ class GitHub {
     const promises = []
     if (config.shouldCreateIssues) {
       // Check list of ALL flakey issues to ensure no duplicates
+      // Note: we could technically still have duplicate issues if one is added by another build
+      // right after we fetch the list of issues. This seems unlikely so we'll leave it for now and
+      // revisit if duplicate issues start appearing.
       const knownFlakes = await this.fetchKnownFlakes()
       const newFlakes = flakes.filter((flake) => !knownFlakes.includes(flake.title))
       if (newFlakes.length) {
@@ -161,6 +164,10 @@ class GitHub {
       }
     }
 
+    // Note that if multiple jobs complete at about the same time there could be a concurrency issue
+    // where the summary check is never concluded. We can leave this for now and revisit if it becomes
+    // an issue.
+
     const fn = () => {
       return this.rest.checks.update(opts)
     }
@@ -168,19 +175,14 @@ class GitHub {
     await this.safeExec(fn, errMsg)
   }
 
-  async startCheck() {
-    await this.getSummaryCheck()
-  }
-
-  // When a job finishes, endCheck() is called to
+  // When a job finishes, addCheck() is called to
   // 1) update the summary check run
   // 2) add additional check runs (with detailed info) if job encountered flakiness or skipped tests.
-  async endCheck(flakes, skippedTests) {
+  async addCheck(flakes, skippedTests) {
     await this.updateSummaryCheck(flakes, skippedTests)
 
     const conclusion = getConclusion(flakes, skippedTests)
-    // Only add checks when there's flakiness (otherwise check suite gets cluttered)
-    if (conclusion === 'success') return
+    if (conclusion === 'success') return // Only add checks when there's flakiness (otherwise check suite gets cluttered)
 
     const summary_0 = utils.fmtSummary(flakes, skippedTests, 0)
     const summary_3 = utils.fmtSummary(flakes, skippedTests, 3)

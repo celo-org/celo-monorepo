@@ -23,6 +23,7 @@ function FlakeReporter(runner) {
   runner.on('retry', function(test, err) {
     console.log('Retry #' + test.currentRetry() + ' for test ' + getTestID(test))
     if (shouldLogRetryErrorsOnFailure) {
+      // Note that this error will not be formatted
       console.log('\n' + err + '\n')
     }
     currErrors.push(fmtError(err))
@@ -40,7 +41,11 @@ function FlakeReporter(runner) {
 
   runner.on('pass', function(test) {
     if (test.currentRetry() > 0) {
-      manager.saveErrors(getTestID(test), currErrors)
+      // Note that we could store these errors locally in a map and not use the db at all.
+      // We use the db here for consistency with jest which must use the db, and also because
+      // writing to a tmp file (the db) is convenient for debugging.
+      // This design could be improved.
+      manager.saveErrors(getTestID(test), currErrors) // This writes errors to the db.
     }
   })
 
