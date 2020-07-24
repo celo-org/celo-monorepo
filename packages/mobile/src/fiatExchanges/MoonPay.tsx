@@ -34,11 +34,9 @@ type Props = RouteProps
 
 function FiatExchangeWeb({ route }: Props) {
   const [uri, setUri] = React.useState('')
-  const { amount } = route.params
+  const { localAmount, currencyCode } = route.params
   const account = useSelector(currentAccountSelector)
-  const localCurrencyCode = useSelector(getLocalCurrencyCode)
-  const localCurrencyExchangeRate = useSelector(getLocalCurrencyExchangeRate)
-  const localAmount = convertDollarsToLocalAmount(amount, localCurrencyExchangeRate)
+
   React.useEffect(() => {
     const getSignedUrl = async () => {
       const response = await fetch(config.signMoonpayUrl, {
@@ -50,7 +48,7 @@ function FiatExchangeWeb({ route }: Props) {
         body: JSON.stringify({
           currency: celoCurrencyCode,
           address: account,
-          fiatCurrency: localCurrencyCode,
+          fiatCurrency: currencyCode,
           fiatAmount: localAmount?.toString(),
         }),
       })
