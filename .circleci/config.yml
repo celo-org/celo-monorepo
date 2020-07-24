@@ -471,6 +471,7 @@ jobs:
       - run:
           name: Check contract versions
           command: |
+            mkdir -p ~/.ssh
             ssh-keyscan github.com >> ~/.ssh/known_hosts
             git fetch --all
             RELEASE_BRANCH=$(git branch -a --list *release/contracts/* | tail -1 | sed -e 's/remotes\/origin\///g')
