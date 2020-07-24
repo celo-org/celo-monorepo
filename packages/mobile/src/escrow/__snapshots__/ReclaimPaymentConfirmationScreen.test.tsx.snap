@@ -166,8 +166,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                       Object {
                         "color": "#2E3338",
                         "fontFamily": "Inter-Regular",
-                        "fontSize": 16,
-                        "lineHeight": 22,
+                        "fontSize": 14,
+                        "lineHeight": 18,
                       },
                       Object {
                         "alignItems": "center",
@@ -185,8 +185,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                       Object {
                         "color": "#2E3338",
                         "fontFamily": "Inter-Regular",
-                        "fontSize": 16,
-                        "lineHeight": 22,
+                        "fontSize": 14,
+                        "lineHeight": 18,
                       },
                       Object {
                         "color": "#9CA4A9",
@@ -308,7 +308,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     ]
                   }
                 >
-                  amount
+                  global:amount
                 </Text>
               </View>
               <Text
@@ -840,7 +840,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
             Object {
               "flexDirection": "column",
             },
-            undefined,
+            Object {
+              "marginBottom": 16,
+            },
           ]
         }
       >
@@ -1158,8 +1160,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       Object {
                         "color": "#2E3338",
                         "fontFamily": "Inter-Regular",
-                        "fontSize": 16,
-                        "lineHeight": 22,
+                        "fontSize": 14,
+                        "lineHeight": 18,
                       },
                       Object {
                         "alignItems": "center",
@@ -1177,8 +1179,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       Object {
                         "color": "#2E3338",
                         "fontFamily": "Inter-Regular",
-                        "fontSize": 16,
-                        "lineHeight": 22,
+                        "fontSize": 14,
+                        "lineHeight": 18,
                       },
                       Object {
                         "color": "#9CA4A9",
@@ -1300,7 +1302,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     ]
                   }
                 >
-                  amount
+                  global:amount
                 </Text>
               </View>
               <Text
@@ -1832,7 +1834,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
             Object {
               "flexDirection": "column",
             },
-            undefined,
+            Object {
+              "marginBottom": 16,
+            },
           ]
         }
       >
@@ -2150,8 +2154,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       Object {
                         "color": "#2E3338",
                         "fontFamily": "Inter-Regular",
-                        "fontSize": 16,
-                        "lineHeight": 22,
+                        "fontSize": 14,
+                        "lineHeight": 18,
                       },
                       Object {
                         "alignItems": "center",
@@ -2169,8 +2173,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       Object {
                         "color": "#2E3338",
                         "fontFamily": "Inter-Regular",
-                        "fontSize": 16,
-                        "lineHeight": 22,
+                        "fontSize": 14,
+                        "lineHeight": 18,
                       },
                       Object {
                         "color": "#9CA4A9",
@@ -2292,7 +2296,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     ]
                   }
                 >
-                  amount
+                  global:amount
                 </Text>
               </View>
               <Text
@@ -2821,7 +2825,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
             Object {
               "flexDirection": "column",
             },
-            undefined,
+            Object {
+              "marginBottom": 16,
+            },
           ]
         }
       >
