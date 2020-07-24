@@ -472,18 +472,7 @@ jobs:
           name: Check contract versions
           command: |
             RELEASE_BRANCH=$(git branch --list release/contracts/* | tail -1)
-            BUILD_DIR_0=build/$(echo $test | sed -e 's/\//_/g')
-            git checkout $RELEASE_BRANCH
-            yarn build:sol
-            mkdir -p $BUILD_DIR
-            mv build/contracts $BUILD_DIR
-
-            BUILD_DIR_1=build/$(echo $CIRCLE_BRANCH | sed -e 's/\//_/g')
-            git checkout ${CIRCLE_BRANCH}
-            yarn build:sol
-            mkdir -p $BUILD_DIR
-            mv build/contracts $BUILD_DIR
-            yarn ts-node scripts/check-backward.ts sem_check -o $BUILD_DIR_0 -n $BUILD_DIR_1 -e ".*Test.*|I[A-Z].*|ReleaseGold"
+            yarn check-versions -o $RELEASE_BRANCH -n $CIRCLE_BRANCH
       - run:
           name: Unit tests
           # Flaky tests - run them twice
