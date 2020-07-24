@@ -193,7 +193,6 @@ class PaymentRequestConfirmation extends React.Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light,
     padding: 8,
   },
   feeContainer: {
