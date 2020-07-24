@@ -4,7 +4,6 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
     }
@@ -653,7 +652,6 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
     }

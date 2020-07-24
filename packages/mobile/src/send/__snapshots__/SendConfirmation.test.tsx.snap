@@ -9,7 +9,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
   }
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "paddingHorizontal": 8,
     }
@@ -891,7 +890,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
   }
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "paddingHorizontal": 8,
     }
@@ -1773,7 +1771,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
   }
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "paddingHorizontal": 8,
     }
@@ -2652,7 +2649,6 @@ exports[`SendConfirmation renders correctly when there are multiple user address
   }
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "paddingHorizontal": 8,
     }
