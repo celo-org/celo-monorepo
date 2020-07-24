@@ -156,9 +156,8 @@ async function getContractVersion(contract: ZContract): Promise<ContractVersion>
   const bytecode = contract.schema.deployedBytecode
   const data = '0x' + abi.methodID('getVersionNumber', []).toString('hex')
   const nullAddress = '0000000000000000000000000000000000000000'
-  // Artificially link all libraries to the null address, since we're not calling into them anyway.
+  // Artificially link all libraries to the null address.
   const linkedBytecode = bytecode.split(/[_]+[A-Za-z0-9]+[_]+/).join(nullAddress)
-  //const linkedBytecode = bytecode
   const result = await vm.runCall({
     to: Buffer.from('756F45E3FA69347A9A973A725E3C98bC4db0b5a0', 'hex'),
     caller: Buffer.from('756F45E3FA69347A9A973A725E3C98bC4db0b5a0', 'hex'),

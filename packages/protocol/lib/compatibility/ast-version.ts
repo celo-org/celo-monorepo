@@ -1,8 +1,8 @@
 // tslint:disable: max-classes-per-file
+import { ContractVersion, ContractVersionDelta, ContractVersionDeltaIndex, ContractVersions } from '@celo/protocol/lib/compatibility/version'
 import {
   BuildArtifacts,
 } from '@openzeppelin/upgrades'
-import { ContractVersion, ContractVersions, ContractVersionDelta, ContractVersionDeltaIndex } from '@celo/protocol/lib/compatibility/version'
 
 /**
  * A version report for a specific contract.

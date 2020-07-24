@@ -1,6 +1,6 @@
-import { DefaultCategorizer } from '@celo/protocol/lib/compatibility/categorizer'
-import { instantiateArtifacts, ASTBackwardReport } from '@celo/protocol/lib/compatibility/utils'
 import { ASTContractVersionsReport } from '@celo/protocol/lib/compatibility/ast-version'
+import { DefaultCategorizer } from '@celo/protocol/lib/compatibility/categorizer'
+import { ASTBackwardReport, instantiateArtifacts } from '@celo/protocol/lib/compatibility/utils'
 import { writeJsonSync } from 'fs-extra'
 import * as path from 'path'
 import * as tmp from 'tmp'
@@ -88,7 +88,7 @@ try {
 
       const mismatches = versionReport.mismatches()
       if (mismatches.isEmpty()) {
-        console.log('Actual version numbers match expected')
+        out('Actual version numbers match expected\n')
         process.exit(0)
       } else {
         const outFile2 = argv.output_file ? argv.output_file : tmp.tmpNameSync({})
@@ -98,7 +98,10 @@ try {
         process.exit(1)
       }
     }
-    doVersionCheck()
+    doVersionCheck().catch((err) => {
+      console.error('Error when performing version check', err)
+      process.exit(1)
+    })
   } else {
     // Should never happen
     console.error('Error parsing command line arguments')

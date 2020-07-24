@@ -479,14 +479,16 @@ contract StableToken is
     return true;
   }
 
-  /**
-   * @notice Reserve balance for making payments for gas in this StableToken currency.
-   * @param from The account to reserve balance from
-   * @param value The amount of balance to reserve
+  /* TODO: Add this to the natspec as part of the next changes to this contract.
    * @dev Note that this function is called by the protocol when paying for tx fees in this
    * currency. After the tx is executed, gas is refunded to the sender and credited to the
    * various tx fee recipients via a call to `creditGasFees`. Note too that the events emitted
    * by `creditGasFees` reflect the *net* gas fee payments for the transaction.
+   */
+  /**
+   * @notice Reserve balance for making payments for gas in this StableToken currency.
+   * @param from The account to reserve balance from
+   * @param value The amount of balance to reserve
    */
   function debitGasFees(address from, uint256 value)
     external
@@ -499,6 +501,12 @@ contract StableToken is
     totalSupply_ = totalSupply_.sub(units);
   }
 
+  /* TODO: Add this to the natspec as part of the next changes to this contract.
+   * @dev Note that this function is called by the protocol when paying for tx fees in this
+   * currency. Before the tx is executed, gas is debited from the sender via a call to
+   * `debitGasFees`. Note too that the events emitted by `creditGasFees` reflect the *net* gas fee
+   * payments for the transaction.
+   */
   /**
    * @notice Alternative function to credit balance after making payments
    * for gas in this StableToken currency.
@@ -509,10 +517,6 @@ contract StableToken is
    * @param tipTxFee Coinbase fee
    * @param baseTxFee Community fund fee
    * @param gatewayFee Gateway fee
-   * @dev Note that this function is called by the protocol when paying for tx fees in this
-   * currency. Before the tx is executed, gas is debited from the sender via a call to
-   * `debitGasFees`. Note too that the events emitted by `creditGasFees` reflect the *net* gas fee
-   * payments for the transaction.
    */
   function creditGasFees(
     address from,

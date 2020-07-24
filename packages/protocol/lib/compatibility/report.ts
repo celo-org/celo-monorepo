@@ -166,6 +166,11 @@ export class ASTDetailedVersionedReport {
     return new ASTDetailedVersionedReport(global, contracts)
   }
 
+  constructor(
+    public readonly global: ASTVersionedReport,
+    public readonly contracts: ASTVersionedReportIndex
+  ) {}
+
   versionDeltas = (): ContractVersionDeltaIndex => {
     const deltas = {}
     Object.keys(this.contracts).map((contract: string) => {
@@ -173,9 +178,4 @@ export class ASTDetailedVersionedReport {
     })
     return deltas
   }
-
-  constructor(
-    public readonly global: ASTVersionedReport,
-    public readonly contracts: ASTVersionedReportIndex
-  ) {}
 }
