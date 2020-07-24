@@ -52,10 +52,10 @@ export default class ValidatorSignedBlocks extends BaseCommand {
   }
 
   static examples = [
-    'downtime --genesis ./genesis.json',
     'downtime',
-    'downtime --at-block 100000 --genesis ./genesis.json',
-    'downtime --lookback 500 --genesis ./genesis.json',
+    'downtime --genesis genesis.json',
+    'downtime --at-block 100000 --genesis genesis.json',
+    'downtime --lookback 500',
   ]
 
   async run() {
@@ -90,7 +90,7 @@ export default class ValidatorSignedBlocks extends BaseCommand {
       } else {
         if (res.flags['at-block']) {
           this.error(
-            'Unable to read contracts at the desired block. Double check that your node provider '
+            'Unable to read contracts at the desired block. Double check that your node provider has not pruned that state.'
           )
         } else {
           this.error('Unable to read contracts & not able to fall back onto genesis.json')
