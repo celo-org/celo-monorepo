@@ -49,8 +49,8 @@ export default function AccountNumber({ address, touchDisabled, location }: Prop
   ) : (
     <TouchableOpacity
       style={styles.container}
-      onPress={onPressAddress}
       onLongPress={onPressAddress}
+      onPress={onPressAddress}
     >
       {formattedAddress}
     </TouchableOpacity>

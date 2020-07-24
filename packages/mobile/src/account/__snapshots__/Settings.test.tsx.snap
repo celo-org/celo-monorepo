@@ -17,7 +17,7 @@ exports[`Account renders correctly 1`] = `
         "borderBottomColor": 0,
         "borderBottomWidth": 1,
         "flexDirection": "row",
-        "height": 62,
+        "height": 56,
         "justifyContent": "center",
       }
     }
@@ -25,6 +25,14 @@ exports[`Account renders correctly 1`] = `
     <View
       accessible={true}
       focusable={false}
+      hitSlop={
+        Object {
+          "bottom": 10,
+          "left": 10,
+          "right": 10,
+          "top": 10,
+        }
+      }
       onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
@@ -34,13 +42,12 @@ exports[`Account renders correctly 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
-          "left": 8,
+          "left": 0,
           "marginBottom": 0,
-          "marginLeft": 4,
+          "marginLeft": 16,
           "opacity": 1,
-          "padding": 8,
+          "padding": 0,
           "position": "absolute",
-          "top": 8,
         }
       }
     >
@@ -1234,7 +1241,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
         "borderBottomColor": 0,
         "borderBottomWidth": 1,
         "flexDirection": "row",
-        "height": 62,
+        "height": 56,
         "justifyContent": "center",
       }
     }
@@ -1242,6 +1249,14 @@ exports[`Account renders correctly when dev mode active 1`] = `
     <View
       accessible={true}
       focusable={false}
+      hitSlop={
+        Object {
+          "bottom": 10,
+          "left": 10,
+          "right": 10,
+          "top": 10,
+        }
+      }
       onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
@@ -1251,13 +1266,12 @@ exports[`Account renders correctly when dev mode active 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
-          "left": 8,
+          "left": 0,
           "marginBottom": 0,
-          "marginLeft": 4,
+          "marginLeft": 16,
           "opacity": 1,
-          "padding": 8,
+          "padding": 0,
           "position": "absolute",
-          "top": 8,
         }
       }
     >
