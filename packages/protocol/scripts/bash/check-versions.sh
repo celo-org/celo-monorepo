@@ -32,6 +32,6 @@ mv build/contracts $BUILD_DIR_1
 BUILD_DIR_2=$(echo build/$(echo $BRANCH_2 | sed -e 's/\//_/g'))
 git checkout $BRANCH_2
 yarn build:sol
-rf -rm $BUILD_DIR_2 && mkdir -p $BUILD_DIR_2
+rm -rf $BUILD_DIR_2 && mkdir -p $BUILD_DIR_2
 mv build/contracts $BUILD_DIR_2
 yarn ts-node scripts/check-backward.ts sem_check -o $BUILD_DIR_1 -n $BUILD_DIR_2 -e ".*Test.*|I[A-Z].*|ReleaseGold"
