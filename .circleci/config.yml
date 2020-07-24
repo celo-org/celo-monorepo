@@ -471,7 +471,8 @@ jobs:
       - run:
           name: Check contract versions
           command: |
-            RELEASE_BRANCH=$(git branch --list release/contracts/* | tail -1)
+            git fetch --all
+            RELEASE_BRANCH=$(git branch -a --list *release/contracts/* | tail -1 | sed -e 's/remotes\/origin\///g')
             yarn --cwd packages/protocol check-versions -o $RELEASE_BRANCH -n $CIRCLE_BRANCH
       - run:
           name: Unit tests
