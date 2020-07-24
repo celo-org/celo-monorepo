@@ -11,7 +11,7 @@ export interface State {
   // TODO rename in the next store migration
   commentKey: string | null
   // Has the data encryption key been registered in the Accounts contract
-  isDEKRegistered: boolean
+  isDekRegistered: boolean | undefined
   fornoMode: boolean
 }
 
@@ -25,7 +25,7 @@ const initialState: State = {
   account: null,
   accountInWeb3Keystore: null,
   commentKey: null,
-  isDEKRegistered: false,
+  isDekRegistered: false,
   fornoMode: networkConfig.initiallyForno,
 }
 
@@ -73,7 +73,7 @@ export const reducer = (
     case Actions.REGISTER_DATA_ENCRYPTION_KEY:
       return {
         ...state,
-        isDEKRegistered: true,
+        isDekRegistered: true,
       }
     case Actions.COMPLETE_WEB3_SYNC:
       return {

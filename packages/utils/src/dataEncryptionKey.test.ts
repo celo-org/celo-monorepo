@@ -1,14 +1,14 @@
 import { randomBytes } from 'crypto'
 import { ec as EC } from 'elliptic'
-import { decompressPublicKey, deriveDEK } from './dataEncryptionKey'
+import { decompressPublicKey, deriveDek } from './dataEncryptionKey'
 
 const ec = new EC('secp256k1')
 
-describe('deriveCEK', () => {
+describe('deriveDek', () => {
   it('should produce a the expected keys', async () => {
     const mnemonic =
       'language quiz proud sample canoe trend topic upper coil rack choice engage noodle panda mutual grab shallow thrive forget trophy pull pool mask height'
-    const { publicKey, privateKey } = await deriveDEK(mnemonic)
+    const { publicKey, privateKey } = await deriveDek(mnemonic)
     expect(publicKey).toBe('032e4027fc0a763a6651551f66ea50084b436cd7399564f9a05e916d2c37322a60')
     expect(privateKey).toBe('d8428ba6a3a55e46d9b53cad26aca4a2be4c288e48a769f81c96a3ef1b391972')
   })

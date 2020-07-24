@@ -7,7 +7,7 @@
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { ensureLeading0x, eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
-import { compressedPubKey, deriveDEK } from '@celo/utils/src/dataEncryptionKey'
+import { compressedPubKey, deriveDek } from '@celo/utils/src/dataEncryptionKey'
 import * as bip39 from 'react-native-bip39'
 import { call, put, select } from 'redux-saga/effects'
 import { OnboardingEvents } from 'src/analytics/Events'
@@ -37,24 +37,24 @@ export function* doFetchDataEncryptionKey(address: string) {
     contractKit.contracts,
     contractKit.contracts.getAccounts,
   ])
-  const DEK: string = yield call(accountsWrapper.getDataEncryptionKey, address)
-  yield put(updateAddressDekMap(address, DEK || null))
-  return !DEK ? null : hexToBuffer(DEK)
+  const dek: string = yield call(accountsWrapper.getDataEncryptionKey, address)
+  yield put(updateAddressDekMap(address, dek || null))
+  return !dek ? null : hexToBuffer(dek)
 }
 
-export function* createAccountDEK(mnemonic: string) {
+export function* createAccountDek(mnemonic: string) {
   if (!mnemonic) {
     throw new Error('Cannot generate DEK with empty mnemonic')
   }
-  const { privateKey } = yield call(deriveDEK, mnemonic, bip39)
-  const newDEK = ensureLeading0x(privateKey)
-  yield put(setDataEncryptionKey(newDEK))
-  return newDEK
+  const { privateKey } = yield call(deriveDek, mnemonic, bip39)
+  const newDek = ensureLeading0x(privateKey)
+  yield put(setDataEncryptionKey(newDek))
+  return newDek
 }
 
 // Register the address and DEK with the Accounts contract
 // A no-op if registration has already been done
-export function* registerAccountDEK(account: string) {
+export function* registerAccountDek(account: string) {
   try {
     const isAlreadyRegistered = yield select(isDekRegisteredSelector)
     if (isAlreadyRegistered) {
@@ -79,7 +79,7 @@ export function* registerAccountDEK(account: string) {
      * If it's still here by 2020/08/23 please remove it.
      */
     const mnemonic = yield call(getStoredMnemonic, account)
-    privateDataKey = yield call(createAccountDEK, mnemonic)
+    privateDataKey = yield call(createAccountDek, mnemonic)
     if (!privateDataKey) {
       throw new Error('Failed to create new DEK in migration hack')
     }

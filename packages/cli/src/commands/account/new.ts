@@ -22,7 +22,7 @@ export default class NewAccount extends LocalCommand {
     ...LocalCommand.flags,
     passphrasePath: flags.string({
       description:
-        'Path to a file that contains the BIP39 passphrase to combine with the mnemonic specified using the mnemonicPath flag and the index specified using the indexAddress flag. Every passphrase generates a different private key and wallet address.',
+        'Path to a file that contains the BIP39 passphrase to combine with the mnemonic specified using the mnemonicPath flag and the index specified using the addressIndex flag. Every passphrase generates a different private key and wallet address.',
     }),
     changeIndex: flags.integer({
       default: 0,
@@ -61,8 +61,8 @@ export default class NewAccount extends LocalCommand {
     'new',
     'new --passphrasePath myFolder/my_passphrase_file',
     'new --language spanish',
-    'new --passphrasePath some_folder/my_passphrase_file --language japanese --indexAddress 5',
-    'new --passphrasePath some_folder/my_passphrase_file --mnemonicPath some_folder/my_mnemonic_file --indexAddress 5',
+    'new --passphrasePath some_folder/my_passphrase_file --language japanese --addressIndex 5',
+    'new --passphrasePath some_folder/my_passphrase_file --mnemonicPath some_folder/my_mnemonic_file --addressIndex 5',
   ]
 
   static languageOptions(language: string): MnemonicLanguages | undefined {

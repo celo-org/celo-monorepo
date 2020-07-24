@@ -32,7 +32,7 @@ import {
   Web3SyncProgress,
 } from 'src/web3/actions'
 import { destroyContractKit, getWallet, getWeb3, initContractKit } from 'src/web3/contracts'
-import { createAccountDEK } from 'src/web3/dataEncryptionKey'
+import { createAccountDek } from 'src/web3/dataEncryptionKey'
 import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
 import { getLatestBlock } from 'src/web3/utils'
 import { Block } from 'web3-eth'
@@ -207,7 +207,7 @@ export function* assignAccountFromPrivateKey(privateKey: string, mnemonic: strin
     Logger.debug(TAG + '@assignAccountFromPrivateKey', `Added to wallet: ${account}`)
     yield put(setAccount(account))
     yield put(setAccountCreationTime())
-    yield call(createAccountDEK, mnemonic)
+    yield call(createAccountDek, mnemonic)
     ValoraAnalytics.setUserAddress(account)
     return account
   } catch (e) {

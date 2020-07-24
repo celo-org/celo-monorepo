@@ -385,15 +385,15 @@ OPTIONS
 
   --passphrasePath=passphrasePath
       Path to a file that contains the BIP39 passphrase to combine with the mnemonic specified using the mnemonicPath flag
-      and the index specified using the indexAddress flag. Every passphrase generates a different private key and wallet
+      and the index specified using the addressIndex flag. Every passphrase generates a different private key and wallet
       address.
 
 EXAMPLES
   new
   new --passphrasePath myFolder/my_passphrase_file
   new --language spanish
-  new --passphrasePath some_folder/my_passphrase_file --language japanese --indexAddress 5
-  new --passphrasePath some_folder/my_passphrase_file --mnemonicPath some_folder/my_mnemonic_file --indexAddress 5
+  new --passphrasePath some_folder/my_passphrase_file --language japanese --addressIndex 5
+  new --passphrasePath some_folder/my_passphrase_file --mnemonicPath some_folder/my_mnemonic_file --addressIndex 5
 ```
 
 _See code: [packages/cli/src/commands/account/new.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/new.ts)_

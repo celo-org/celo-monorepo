@@ -32,7 +32,7 @@ export function decompressPublicKey(publicKey: Buffer): Buffer {
  * @param {string} privateKey Hex encoded private account key.
  * @returns {Buffer} Comment Encryption Private key.
  */
-export function deriveDEK(mnemonic: string, bip39ToUse?: Bip39) {
+export function deriveDek(mnemonic: string, bip39ToUse?: Bip39) {
   if (!mnemonic) {
     throw new Error('Invalid mnemonic')
   }
@@ -49,5 +49,5 @@ export function deriveDEK(mnemonic: string, bip39ToUse?: Bip39) {
 export const DataEncryptionKeyUtils = {
   compressedPubKey,
   decompressPublicKey,
-  deriveDEK,
+  deriveDek,
 }
