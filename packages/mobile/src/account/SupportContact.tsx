@@ -184,7 +184,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   innerContainer: {
     flexGrow: 1,

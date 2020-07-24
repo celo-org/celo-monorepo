@@ -482,7 +482,6 @@ export class SendConfirmation extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light,
     paddingHorizontal: 8,
   },
   feeContainer: {
