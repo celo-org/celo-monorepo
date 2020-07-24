@@ -24,7 +24,7 @@ done
 
 BUILD_DIR_1=$(echo build/$(echo $BRANCH_1 | sed -e 's/\//_/g'))
 git checkout $BRANCH_1
-yarn build:sol
+yarn build
 mkdir -p $BUILD_DIR_1
 mv build/contracts $BUILD_DIR_1
 
