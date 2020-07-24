@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
-import AppStores from 'src/download/AppStores'
+// import AppStores from 'src/download/AppStores'
 import Cover from 'src/download/Cover'
 import CoverActions from 'src/download/CoverActions'
 import OpenGraph from 'src/header/OpenGraph'
@@ -27,7 +27,7 @@ export default class MobileApp extends React.PureComponent {
           <Cover />
           <CoverActions />
         </View>
-        <AppStores />
+        {/* <AppStores /> */}
       </>
     )
   }
