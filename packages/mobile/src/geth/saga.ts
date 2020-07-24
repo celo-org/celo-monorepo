@@ -5,7 +5,13 @@ import { setPromptForno } from 'src/account/actions'
 import { promptFornoIfNeededSelector } from 'src/account/selectors'
 import { GethEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { Actions, setGethConnected, setInitState } from 'src/geth/actions'
+import {
+  Actions,
+  setGethConnected,
+  SetGethConnectedAction,
+  setInitState,
+  SetInitStateAction,
+} from 'src/geth/actions'
 import {
   FailedToFetchGenesisBlockError,
   FailedToFetchStaticNodesError,
@@ -41,7 +47,7 @@ export function* waitForGethInitialized() {
     return
   }
   while (true) {
-    const action = yield take(Actions.SET_INIT_STATE)
+    const action: SetInitStateAction = yield take(Actions.SET_INIT_STATE)
     if (action.state === InitializationState.INITIALIZED) {
       return
     }
@@ -54,7 +60,7 @@ export function* waitForGethConnectivity() {
     return
   }
   while (true) {
-    const action = yield take(Actions.SET_GETH_CONNECTED)
+    const action: SetGethConnectedAction = yield take(Actions.SET_GETH_CONNECTED)
     if (action.connected) {
       return
     }
