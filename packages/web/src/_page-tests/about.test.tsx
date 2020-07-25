@@ -25,11 +25,4 @@ describe('About', () => {
       .toJSON()
     expect(tree).toMatchSnapshot()
   })
-
-  it('should fail sometimes', async () => {
-    const x = Math.floor(Math.random() * Math.floor(4))
-    expect(x).toBeGreaterThan(1)
-    const y = Math.floor(Math.random() * Math.floor(5))
-    expect(y).toBeGreaterThan(2)
-  })
 })
