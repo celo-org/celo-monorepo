@@ -176,7 +176,7 @@ class GitHub {
               ? 'Because these flakey test issues are now obsolete on master, they have been automatically closed.'
               : 'If tests have been refactored or renamed please update the following issues accordingly. If left unchanged, these issues will be automatically closed when this PR is merged.') +
             '\n\n' +
-            obsoleteIssues.map((i) => i.url).join('\n\n'),
+            obsoleteIssues.map((i) => i.html_url).join('\n\n'),
         },
       })
     }

@@ -89,9 +89,9 @@ function parseTestIdFromFlakeTitle(title) {
 }
 
 function parseDownFlakeIssue(issue) {
-  return (({ title, url, number }) => ({
+  return (({ title, html_url, number }) => ({
     title,
-    url,
+    html_url,
     number,
   }))(issue)
 }
