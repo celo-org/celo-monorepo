@@ -85,3 +85,4 @@ export const MOONPAY_PUBLIC_KEY = keyOrUndefined(
   Config.SECRETS_KEY,
   'MOONPAY_PUBLIC_KEY'
 )
+export const MOONPAY_RATE_API = `https://api.moonpay.io/v3/currencies/celo/price?apiKey=${MOONPAY_PUBLIC_KEY}`

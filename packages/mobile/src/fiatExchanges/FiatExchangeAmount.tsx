@@ -86,8 +86,9 @@ export function ExchangeTradeScreen({ navigation, route }: Props) {
       return
     }
 
+    const amount = features.CUSD_MOONPAY_ENABLED ? dollarAmount : new BigNumber(parsedInputAmount)
     navigation.navigate(Screens.FiatExchangeOptions, {
-      amount: features.CUSD_MOONPAY_ENABLED ? dollarAmount : new BigNumber(inputAmount),
+      amount,
       isAddFunds,
     })
   }
