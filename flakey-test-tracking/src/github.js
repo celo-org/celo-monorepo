@@ -70,7 +70,7 @@ class GitHub {
     if (config.shouldAddCheckToPR) {
       promises.push(this.addCheck(flakes, skippedTests))
       if (config.shouldSkipKnownFlakes && obsoleteIssues.length) {
-        promises.push(this.addObsoleteIssuesCheck(obsoleteIssues))
+        promises.push(this.handleObsoleteIssues(obsoleteIssues))
       }
     }
     console.log('\nSending flake tracker results to GitHub...\n')
@@ -136,6 +136,31 @@ class GitHub {
     return knownFlakesToSkip
   }
 
+  async handleObsoleteIssues(obsoleteIssues) {
+    const promises = [this.addObsoleteIssuesCheck(obsoleteIssues)]
+    if (process.env.CIRCLE_BRANCH === 'master') {
+      promises.push(this.closeIssues(obsoleteIssues))
+    }
+    return Promise.all(promises)
+  }
+
+  async closeIssues(issues) {
+    return Promise.all(issues.map(closeIssue))
+  }
+
+  async closeIssue(issue) {
+    const fn = () => {
+      return this.rest.issues.update({
+        ...defaults,
+        issue_number: issue.number,
+        state: 'closed',
+      })
+    }
+    console.log('\nClosing obsolete issue ' + issue.number + '...')
+    const errMsg = 'Failed to close obsolete issue.'
+    await this.safeExec(fn, errMsg)
+  }
+
   async addObsoleteIssuesCheck(obsoleteIssues) {
     const fn = () => {
       return this.rest.checks.create({
@@ -147,12 +172,15 @@ class GitHub {
           title: 'Obsolete Issues',
           summary: 'Some flakey test issues no longer correspond to actual tests',
           text:
-            'If tests have been refactored, renamed or moved please close or update the following issues as they are now obsolete.' +
+            (process.env.CIRCLE_BRANCH === 'master'
+              ? 'Because these flakey test issues are now obsolete on master, they have been automatically closed.'
+              : 'If tests have been refactored or renamed please update the following issues accordingly. If left unchanged, these issues will be automatically closed when this PR is merged.') +
+            '\n\n' +
             obsoleteIssues.map((i) => i.url).join('\n\n'),
         },
       })
     }
-    const errMsg = 'Failed to add check run.'
+    const errMsg = 'Failed to add obsolete issues check run.'
     await this.safeExec(fn, errMsg)
   }
 

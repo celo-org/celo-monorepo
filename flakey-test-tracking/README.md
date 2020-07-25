@@ -62,15 +62,13 @@ just include the link to the corresponding flakey test issue in the PR body and 
 
 ## TODO
 
-TODO(Alec): cleanup code, add comments (DONE)
+TODO(Alec): ensure 100% coverage (TESTING)
 
-TODO(Alec): fix skipping logic and add cleanup (NEXT)
-
-TODO(Alec): address PR comments (NEXT)
-
-TODO(Alec): ensure 100% coverage (NEXT)
+TODO(Alec): fix skipping logic and add issue cleanup (TESTING)
 
 TODO(Alec): flesh out summary check (NEXT)
+
+TODO(Alec): address PR comments
 
 TODO(Alec): fill in PR template
 
