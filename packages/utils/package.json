@@ -28,7 +28,6 @@
     "crypto-js": "^3.1.9-1",
     "elliptic": "^6.4.1",
     "ethereumjs-util": "^5.2.0",
-    "futoin-hkdf": "^1.0.3",
     "google-libphonenumber": "^3.2.4",
     "keccak256": "^1.0.0",
     "lodash": "^4.17.14",

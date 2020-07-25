@@ -113,5 +113,13 @@
   "addressConfirmed": "Account number confirmed",
   "sending": "Sending",
   "feeActual": "Fees",
-  "feeEstimate": "Estimated Fees"
+  "feeEstimate": "Estimated Fees",
+  "encryption": {
+    "warningLabel": "This comment will not be encrypted",
+    "warningModalHeader": "About Encryption",
+    "warningModalBody": "Encryption ensures your comments are kept private. Valora uses encryption on transaction comments when both the sender and receiver have this feature set up. Set up will normally occur automatically once a user sends their first transaction.",
+    "feeLabel": "One-Time Encryption Fee",
+    "feeModalHeader": "One-Time Encryption Fee",
+    "feeModalBody": "Encryption helps keep your sensitive data private. A small one-time fee is added to your first transaction to setup encryption. This ensures your comments will be sent securely and privately.",
+  }
 }

@@ -357,20 +357,23 @@ _See code: [packages/cli/src/commands/account/lock.ts](https://github.com/celo-o
 
 ### New
 
-Creates a new account locally using the Celo Derivation Path (m/44'/52752'/0/0/indexAddress) and print out the key information. Save this information for local transaction signing or import into a Celo node. Ledger: this command has been tested swapping mnemonics with the Ledger successfully (only supports english)
+Creates a new account locally using the Celo Derivation Path (m/44'/52752'/0/changeIndex/addressIndex) and print out the key information. Save this information for local transaction signing or import into a Celo node. Ledger: this command has been tested swapping mnemonics with the Ledger successfully (only supports english)
 
 ```
 USAGE
   $ celocli account:new
 
 OPTIONS
+  --addressIndex=addressIndex
+      Choose the address index for the derivation path
+
+  --changeIndex=changeIndex
+      Choose the change index for the derivation path
+
   --derivationPath=derivationPath
       Choose a different derivation Path (Celo's default is "m/44'/52752'/0'/0"). Use "eth" as an alias of the Ethereum
       derivation path ("m/44'/60'/0'/0/"). Recreating the same account requires knowledge of the mnemonic, passphrase (if
       any), and the derivation path
-
-  --indexAddress=indexAddress
-      Choose the index address of the derivation path
 
   --language=chinese_simplified|chinese_traditional|english|french|italian|japanese|korean|spanish
       [default: english] Language for the mnemonic words. **WARNING**, some hardware wallets don't support other languages
@@ -382,15 +385,15 @@ OPTIONS
 
   --passphrasePath=passphrasePath
       Path to a file that contains the BIP39 passphrase to combine with the mnemonic specified using the mnemonicPath flag
-      and the index specified using the indexAddress flag. Every passphrase generates a different private key and wallet
+      and the index specified using the addressIndex flag. Every passphrase generates a different private key and wallet
       address.
 
 EXAMPLES
   new
   new --passphrasePath myFolder/my_passphrase_file
   new --language spanish
-  new --passphrasePath some_folder/my_passphrase_file --language japanese --indexAddress 5
-  new --passphrasePath some_folder/my_passphrase_file --mnemonicPath some_folder/my_mnemonic_file --indexAddress 5
+  new --passphrasePath some_folder/my_passphrase_file --language japanese --addressIndex 5
+  new --passphrasePath some_folder/my_passphrase_file --mnemonicPath some_folder/my_mnemonic_file --addressIndex 5
 ```
 
 _See code: [packages/cli/src/commands/account/new.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/new.ts)_
