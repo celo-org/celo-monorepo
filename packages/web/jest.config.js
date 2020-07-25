@@ -3,7 +3,6 @@ const { jsdomFlakeTracking } = require('../../flakey-test-tracking/src/jest/conf
 
 module.exports = {
   ...defaultConfig,
-  ...jsdomFlakeTracking,
   globals: {
     'ts-jest': {
       isolatedModules: true,
@@ -19,6 +18,7 @@ module.exports = {
     'public/(.*)$': '<rootDir>/public/$1',
   },
   preset: 'react-native-web',
+  ...jsdomFlakeTracking,
   setupFiles: ['./jestSetup.js', 'jest-canvas-mock'],
   setupFilesAfterEnv: ['./jestSetupAfter.ts', ...jsdomFlakeTracking.setupFilesAfterEnv],
 }

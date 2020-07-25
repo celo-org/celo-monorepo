@@ -8,7 +8,6 @@
   "scripts": {
     "test": "jest --ci --silent --coverage --runInBand",
     "test:verbose": "jest --ci --verbose --runInBand",
-    "test:flakey": "FLAKEY=true yarn test",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "start": "node ./dist/index.js",
     "start:dev": "tsc-watch --onSuccess \"node ./dist/index.js\" ",

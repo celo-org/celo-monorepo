@@ -89,14 +89,11 @@ function parseTestIdFromFlakeTitle(title) {
 }
 
 function parseDownFlakeIssue(issue) {
-  const parsedIssue = (({ title, url, number }) => ({
+  return (({ title, url, number }) => ({
     title,
     url,
     number,
   }))(issue)
-
-  console.log('%%%%%%%' + JSON.stringify(parsedIssue))
-  return parsedIssue
 }
 
 function getConclusion(flakes, skippedTests) {
@@ -180,12 +177,21 @@ function fmtSummary(flakes, skippedTests, verbosity) {
   return summary
 }
 
-function getRandomHoorayImage() {
-  // Please add more gifs :)
+function getRandomSuccessImage() {
+  const fmtImage = (url) => {
+    return {
+      image_url: url,
+      alt: 'Hooray! ' + url,
+    }
+  }
   const images = [
-    'https://media.giphy.com/media/mQG644PY8O7rG/giphy.gif',
-    'https://media.giphy.com/media/4xpB3eE00FfBm/giphy.gif',
-  ]
+    // Please add more gifs :)
+    'https://media.giphy.com/media/mQG644PY8O7rG/source.gif',
+    'https://media.giphy.com/media/4xpB3eE00FfBm/source.gif',
+    'https://media.giphy.com/media/kBZBlLVlfECvOQAVno/source.gif',
+    'https://media.giphy.com/media/l4JySAWfMaY7w88sU/source.gif',
+    'https://media.giphy.com/media/2fQ1Gq3KOpvNs4NTmu/source.gif',
+  ].map(fmtImage)
   return images[Math.floor(Math.random() * images.length)]
 }
 
@@ -201,7 +207,7 @@ module.exports = {
   getConclusion: getConclusion,
   getPackageName: getPackageName,
   getPullNumber: getPullNumber,
-  getRandomHoorayImage: getRandomHoorayImage,
+  getRandomSuccessImage: getRandomSuccessImage,
   getTestSuiteDir: getTestSuiteDir,
   getTestSuiteTitles: getTestSuiteTitles,
   parseDownFlakeIssue: parseDownFlakeIssue,

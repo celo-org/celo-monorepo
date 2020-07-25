@@ -1,8 +1,8 @@
 import About from 'pages/about'
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import { TestProvider } from 'src/_page-tests/test-utils'
 import { Contributor } from 'src/about/Contributor'
+import { TestProvider } from 'src/_page-tests/test-utils'
 
 const CONTRIBUTORS: Contributor[] = [
   {
@@ -24,5 +24,12 @@ describe('About', () => {
       )
       .toJSON()
     expect(tree).toMatchSnapshot()
+  })
+
+  it('should fail sometimes', async () => {
+    const x = Math.floor(Math.random() * Math.floor(4))
+    expect(x).toBeGreaterThan(1)
+    const y = Math.floor(Math.random() * Math.floor(5))
+    expect(y).toBeGreaterThan(2)
   })
 })

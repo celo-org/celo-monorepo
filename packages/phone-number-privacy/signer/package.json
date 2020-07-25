@@ -12,7 +12,6 @@
     "build": "tsc -b .",
     "lint": "tslint --project .",
     "test": "jest --runInBand --testPathIgnorePatterns test/end-to-end",
-    "test:flakey": "FLAKEY=true yarn test",
     "db:migrate": "ts-node scripts/run-migrations.ts",
     "bls:keygen": "ts-node scripts/create-bls-keys.ts",
     "ssl:keygen": "./scripts/create-ssl-cert.sh"

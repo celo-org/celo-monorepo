@@ -239,12 +239,4 @@ describe('tryObtainValueWithRetries()', () => {
     expect(tryGetValue).toHaveBeenCalledTimes(currentCalls)
     expect(task.isRunning()).toBeFalsy()
   })
-
-  test('should fail sometimes', async () => {
-    const x = Math.floor(Math.random() * Math.floor(4))
-    expect(x).toBeGreaterThan(1)
-
-    const y = Math.floor(Math.random() * Math.floor(5))
-    expect(y).toBeGreaterThan(2)
-  })
 })

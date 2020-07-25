@@ -88,17 +88,6 @@ contract('Accounts', (accounts: string[]) => {
       assert.isAbove(y, 2)
     })
 
-    it('should also fail sometimes', async () => {
-      const x = Math.floor(Math.random() * Math.floor(4))
-      assert.isAbove(x, 1)
-      const y = Math.floor(Math.random() * Math.floor(5))
-      assert.isAbove(y, 2)
-    })
-
-    it.skip('should always fail', async () => {
-      assert.equal(2, 1)
-    })
-
     it('creates the account', async () => {
       let isAccount = await accountsInstance.isAccount(account)
       assert.isFalse(isAccount)

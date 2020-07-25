@@ -4,7 +4,6 @@ const { nodeFlakeTracking } = require('../../flakey-test-tracking/src/jest/confi
 
 module.exports = {
   ...tsjPreset,
-  ...nodeFlakeTracking,
   globals: {
     navigator: true,
     'ts-jest': {
@@ -22,6 +21,7 @@ module.exports = {
   },
   modulePathIgnorePatterns: ['<rootDir>/node_modules/(.*)/node_modules/react-native'],
   preset: 'react-native',
+  ...nodeFlakeTracking,
   setupFilesAfterEnv: ['<rootDir>/jest_setup', ...nodeFlakeTracking.setupFilesAfterEnv],
   testPathIgnorePatterns: ['/node_modules/', '<rootDir>/e2e'],
   transform: {

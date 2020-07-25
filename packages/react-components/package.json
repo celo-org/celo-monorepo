@@ -10,7 +10,6 @@
     "build": "tsc",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "test": "export TZ=UTC && jest --ci --silent --coverage --maxWorkers=2",
-    "test:flakey": "FLAKEY=true yarn test",
     "test:verbose": "export TZ=UTC && jest --ci --verbose --runInBand",
     "test:watch": "export TZ=UTC && jest --watch"
   },

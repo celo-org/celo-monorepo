@@ -42,7 +42,6 @@ class GitHub {
     const app = new App({
       id: flakeTrackerID,
       privateKey: process.env.FLAKE_TRACKER_SECRET.replace(/\\n/gm, '\n'),
-      //privateKey: privateKey,
     })
     const rest = await auth(app)
     return new GitHub(app, rest)
@@ -134,7 +133,6 @@ class GitHub {
     const knownFlakesToSkip = flakeIssues.filter(
       (i) => !mandatoryTests.includes(i.number.toString())
     )
-    console.log('^^^^^^' + JSON.stringify(knownFlakesToSkip))
     return knownFlakesToSkip
   }
 
@@ -187,12 +185,7 @@ class GitHub {
           output: {
             title: statuses['success'],
             summary: utils.fmtSummary([], [], 0),
-            images: [
-              {
-                image_url: utils.getRandomHoorayImage(),
-                alt: 'Hooray!',
-              },
-            ],
+            images: [utils.getRandSuccessImage()],
           },
         })
       }

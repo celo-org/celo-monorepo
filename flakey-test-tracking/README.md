@@ -1,6 +1,6 @@
 # FlakeTracker
 
-## How It Works
+## Overview
 
 Flake Tracker integrates with Mocha and Jest to retry failed tests a configurable number of times. When tests pass on a retry, they are identified as flakey. Using the GitHub API, we automatically create new issues when flakey tests are found on `master` (i.e. only once they're merged).
 Optionally, FlakeTracker can skip known flakey tests by fetching the list of flakey test issues from GitHub before each test suite. FlakeTracker authenticates with the GitHub API as a GitHub App, which allows it to provide rich feedback on PRs via GitHub Checks.
@@ -62,23 +62,17 @@ just include the link to the corresponding flakey test issue in the PR body and 
 
 ## TODO
 
-TODO(Alec): add option to log all errors on failure (DONE)
-
-TODO(Alec): make checks less verbose (DONE)
-
 TODO(Alec): cleanup code, add comments (DONE)
 
-TODO(Alec): manually make issues for flakey tests (DONE)
-
-TODO(Alec): fix skipping logic and add cleanup (DONE)
-
-TODO(Alec): Fill in README (DONE)
+TODO(Alec): fix skipping logic and add cleanup (NEXT)
 
 TODO(Alec): address PR comments (NEXT)
 
-TODO(Alec): fill in PR template
+TODO(Alec): ensure 100% coverage (NEXT)
 
-TODO(Alec): ensure 100% coverage
+TODO(Alec): flesh out summary check (NEXT)
+
+TODO(Alec): fill in PR template
 
 TODO(Alec): Finalize config
 
