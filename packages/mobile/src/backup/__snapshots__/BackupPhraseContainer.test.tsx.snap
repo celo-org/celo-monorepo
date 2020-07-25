@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[` renders correctly for input backup phrase 1`] = `
+exports[`renders correctly for input backup phrase 1`] = `
 <View>
   <View
     style={
@@ -67,7 +67,7 @@ exports[` renders correctly for input backup phrase 1`] = `
 </View>
 `;
 
-exports[` renders correctly for input social backup phrase 1`] = `
+exports[`renders correctly for input social backup phrase 1`] = `
 <View>
   <View
     style={
@@ -136,7 +136,7 @@ exports[` renders correctly for input social backup phrase 1`] = `
 </View>
 `;
 
-exports[` renders correctly for readonly backup phrase 1`] = `
+exports[`renders correctly for readonly backup phrase 1`] = `
 <View>
   <View
     style={
@@ -188,7 +188,7 @@ exports[` renders correctly for readonly backup phrase 1`] = `
 </View>
 `;
 
-exports[` renders correctly for readonly social backup phrase 1`] = `
+exports[`renders correctly for readonly social backup phrase 1`] = `
 <View>
   <View
     style={
