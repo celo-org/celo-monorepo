@@ -30,7 +30,7 @@ const shouldTrackFlakes =
 const shouldLogRetryErrorsOnFailure = true
 
 // numRetries === times test is run after the initial failure
-const numRetries = process.env.NUM_RETRIES ? Number(process.env.NUM_RETRIES) : 10
+const numRetries = process.env.NUM_RETRIES ? Number(process.env.NUM_RETRIES) : 20
 
 // shouldSkipKnownFlakes => flakey test issues are fetched from github and corresponding tests are skipped
 const shouldSkipKnownFlakes = true
