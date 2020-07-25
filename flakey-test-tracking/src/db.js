@@ -44,7 +44,12 @@ const writeSkippedFlakes = (testIDs) => {
 }
 
 const writeSkippedFlake = (testID) => {
-  fs.appendFileSync(join(tmpdir(), flakeDir, skippedFlakeFile), testID + delim)
+  const path = join(tmpdir(), flakeDir, skippedFlakeFile)
+  if (!fs.existsSync(path)) {
+    fs.appendFileSync(path, testID)
+  } else {
+    fs.appendFileSync(path, delim + testID)
+  }
 }
 
 const writeKnownFlakes = (flakes) => {
