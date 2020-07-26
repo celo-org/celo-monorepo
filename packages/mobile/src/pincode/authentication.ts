@@ -233,15 +233,7 @@ export async function ensureCorrectPassword(
 }
 
 export async function removeAccountLocally(account: string) {
-  try {
-    ValoraAnalytics.reset().catch((error) => {
-      Logger.error(TAG, 'Error attempting to reset analytics', error, true)
-    })
-    clearPasswordCaches()
-    await removeStoredItem(STORAGE_KEYS.PEPPER)
-    await removeStoredItem(passwordHashStorageKey(account))
-    // TODO: Remove the account from geth.
-  } catch (error) {
-    Logger.error(TAG, 'Error attempting to remove account', error, true)
-  }
+  clearPasswordCaches()
+  await removeStoredItem(STORAGE_KEYS.PEPPER)
+  await removeStoredItem(passwordHashStorageKey(account))
 }

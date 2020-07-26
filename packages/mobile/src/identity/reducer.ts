@@ -1,5 +1,6 @@
 import dotProp from 'dot-prop-immutable'
 import { RehydrateAction } from 'redux-persist'
+import { Actions as AccountActions, ClearStoredAccountAction } from 'src/account/actions'
 import { Actions, ActionTypes } from 'src/identity/actions'
 import { ContactMatches, ImportContactsStatus, VerificationStatus } from 'src/identity/types'
 import { AttestationCode } from 'src/identity/verification'
@@ -85,7 +86,7 @@ const initialState: State = {
 
 export const reducer = (
   state: State | undefined = initialState,
-  action: ActionTypes | RehydrateAction
+  action: ActionTypes | RehydrateAction | ClearStoredAccountAction
 ): State => {
   switch (action.type) {
     case REHYDRATE: {
@@ -238,15 +239,13 @@ export const reducer = (
           false
         ),
       }
-    case Actions.DELETE_USER_DATA:
+    case AccountActions.CLEAR_STORED_ACCOUNT:
       return {
         // TODO: Make sure these are indeed the things we want to save.
         ...initialState,
         addressToE164Number: state.addressToE164Number,
         e164NumberToAddress: state.e164NumberToAddress,
         e164NumberToSalt: state.e164NumberToSalt,
-        askedContactsPermission: state.askedContactsPermission,
-        importContactsProgress: state.importContactsProgress,
         matchedContacts: state.matchedContacts,
         secureSendPhoneNumberMapping: state.secureSendPhoneNumberMapping,
       }

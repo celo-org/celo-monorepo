@@ -273,15 +273,15 @@ export class Account extends React.Component<Props, State> {
 
   onPressContinueWithAccountRemoval = () => {
     this.setState({ showAccountKeyModal: false })
-    this.props.navigation.navigate(Screens.BackupPhrase, { fromSettings: true })
+    this.props.navigation.navigate(Screens.BackupPhrase, { navigatedFromSettings: true })
   }
 
   hideConfirmRemovalModal = () => {
     this.props.navigation.setParams({ promptConfirmRemovalModal: false })
   }
 
-  confirmAccountRemoval = async () => {
-    await this.props.clearStoredAccount(this.props.account || '')
+  confirmAccountRemoval = () => {
+    this.props.clearStoredAccount(this.props.account || '')
     this.props.navigation.setParams({ promptConfirmRemovalModal: false })
     this.props.navigation.reset({
       index: 0,

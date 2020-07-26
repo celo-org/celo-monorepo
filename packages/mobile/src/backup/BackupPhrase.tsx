@@ -99,17 +99,17 @@ class BackupPhrase extends React.Component<Props, State> {
 
   onPressContinue = () => {
     ValoraAnalytics.track(OnboardingEvents.backup_continue)
-    navigate(Screens.BackupQuiz, { fromSettings: this.fromSettings() })
+    navigate(Screens.BackupQuiz, { navigatedFromSettings: this.navigatedFromSettings() })
   }
 
-  fromSettings = () => {
-    return this.props.route.params?.fromSettings ?? false
+  navigatedFromSettings = () => {
+    return this.props.route.params?.navigatedFromSettings ?? false
   }
 
   render() {
     const { t, backupCompleted } = this.props
     const { mnemonic, isConfirmChecked } = this.state
-    const fromSettings = this.fromSettings()
+    const navigatedFromSettings = this.navigatedFromSettings()
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -120,7 +120,7 @@ class BackupPhrase extends React.Component<Props, State> {
           />
           <Text style={styles.body}>{t('backupKeySummary')}</Text>
         </ScrollView>
-        {(!backupCompleted || fromSettings) && (
+        {(!backupCompleted || navigatedFromSettings) && (
           <>
             <View style={styles.confirmationSwitchContainer}>
               <Switch value={isConfirmChecked} onValueChange={this.onPressConfirmSwitch} />

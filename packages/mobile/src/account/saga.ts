@@ -2,6 +2,7 @@ import { ContractKit } from '@celo/contractkit'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
 import { CURRENCY_ENUM } from '@celo/utils'
+import firebase from '@react-native-firebase/app'
 import BigNumber from 'bignumber.js'
 import { call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import {
@@ -16,7 +17,8 @@ import { showError } from 'src/alert/actions'
 import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { getStoredMnemonic } from 'src/backup/utils'
+import { clearStoredMnemonic, getStoredMnemonic } from 'src/backup/utils'
+import { firebaseSignOut } from 'src/firebase/firebase'
 import { revokePhoneMapping } from 'src/identity/revoke'
 import { Actions as ImportActions } from 'src/import/actions'
 import { importBackupPhraseSaga } from 'src/import/saga'
@@ -99,8 +101,16 @@ function* migrateAccountToProperBip39() {
   }
 }
 
-function* clearStoredAccount({ account }: ClearStoredAccountAction) {
-  yield call(removeAccountLocally, account)
+function* clearStoredAccountSaga({ account }: ClearStoredAccountAction) {
+  try {
+    yield call(removeAccountLocally, account)
+    yield call(clearStoredMnemonic)
+    yield call(ValoraAnalytics.reset)
+    yield call(firebaseSignOut, firebase.app())
+    // TODO: Remove the account from geth.
+  } catch (error) {
+    Logger.info(TAG + '@clearStoredAccount', 'Error while removing account', error)
+  }
 }
 
 export function* watchMigrateAccountToProperBip39() {
@@ -113,7 +123,7 @@ export function* watchSetPincode() {
 }
 
 export function* watchClearStoredAccount() {
-  yield takeLeading(Actions.CLEAR_STORED_ACCOUNT, clearStoredAccount)
+  yield takeLeading(Actions.CLEAR_STORED_ACCOUNT, clearStoredAccountSaga)
 }
 
 export function* accountSaga() {

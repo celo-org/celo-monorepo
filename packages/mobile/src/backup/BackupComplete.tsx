@@ -44,8 +44,8 @@ class BackupComplete extends React.Component<Props> {
     // Show success check for a while before leaving screen
     const { backupCompleted, socialBackupCompleted } = this.props
     setTimeout(() => {
-      const fromSettings = this.props.route.params?.fromSettings ?? false
-      if (fromSettings) {
+      const navigatedFromSettings = this.props.route.params?.navigatedFromSettings ?? false
+      if (navigatedFromSettings) {
         navigate(Screens.Settings, { promptConfirmRemovalModal: true })
       } else if (socialBackupCompleted) {
         this.props.exitBackupFlow()

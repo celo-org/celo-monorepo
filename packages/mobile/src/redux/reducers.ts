@@ -10,7 +10,6 @@ import { reducer as fees, State as FeesState } from 'src/fees/reducer'
 import { gethReducer as geth, State as GethState } from 'src/geth/reducer'
 import { reducer as goldToken, State as GoldTokenState } from 'src/goldToken/reducer'
 import { homeReducer as home, State as HomeState } from 'src/home/reducers'
-import { deleteUserData } from 'src/identity/actions'
 import { reducer as identity, State as IdentityState } from 'src/identity/reducer'
 import { reducer as imports, State as ImportState } from 'src/import/reducer'
 import { inviteReducer as invite, State as InviteState } from 'src/invite/reducer'
@@ -52,7 +51,7 @@ const rootReducer = (state: RootState | undefined, action: Action): RootState =>
     return {
       ...initialState,
       localCurrency: state.localCurrency,
-      identity: identity(state.identity, deleteUserData()),
+      identity: identity(state.identity, action),
     }
   }
   return appReducer(state, action)

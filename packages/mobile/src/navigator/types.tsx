@@ -29,11 +29,11 @@ export type StackParamList = {
   [Screens.BackupComplete]:
     | undefined
     | {
-        fromSettings: boolean
+        navigatedFromSettings: boolean
       }
   [Screens.BackupIntroduction]:
     | {
-        fromSettings?: boolean
+        navigatedFromSettings?: boolean
       }
     | undefined
   [Screens.AccountKeyEducation]:
@@ -44,12 +44,12 @@ export type StackParamList = {
   [Screens.BackupPhrase]:
     | undefined
     | {
-        fromSettings: boolean
+        navigatedFromSettings: boolean
       }
   [Screens.BackupQuiz]:
     | undefined
     | {
-        fromSettings: boolean
+        navigatedFromSettings: boolean
       }
   [Screens.BackupSocial]: undefined
   [Screens.BackupSocialIntro]: {
