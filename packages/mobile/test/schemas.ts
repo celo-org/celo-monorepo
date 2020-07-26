@@ -312,7 +312,6 @@ export const v1Schema = {
       total: 0,
     },
     matchedContacts: {},
-    isValidRecipient: false,
     secureSendPhoneNumberMapping: {},
   },
   transactions: {
@@ -342,6 +341,11 @@ export const v2Schema = {
   },
   identity: {
     ...v1Schema.identity,
+    addressToDataEncryptionKey: {},
+  },
+  web3: {
+    ...v1Schema.web3,
+    isDekRegistered: false,
   },
 }
 

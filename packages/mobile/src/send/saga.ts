@@ -17,9 +17,11 @@ import { handleBarcode, shareSVGImage } from 'src/qrcode/utils'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import {
   Actions,
+  HandleBarcodeDetectedAction,
   SendPaymentOrInviteAction,
   sendPaymentOrInviteFailure,
   sendPaymentOrInviteSuccess,
+  ShareQRCodeAction,
 } from 'src/send/actions'
 import { transferStableToken } from 'src/stableToken/actions'
 import {
@@ -29,6 +31,7 @@ import {
 } from 'src/tokens/saga'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
+import { getRegisterDekTxGas, registerAccountDek } from 'src/web3/dataEncryptionKey'
 import { currentAccountSelector } from 'src/web3/selectors'
 import { estimateGas } from 'src/web3/utils'
 
@@ -54,10 +57,16 @@ export async function getSendTxGas(
 export async function getSendFee(
   account: string,
   currency: CURRENCY_ENUM,
-  params: BasicTokenTransfer
+  params: BasicTokenTransfer,
+  includeDekFee: boolean = false
 ) {
   try {
-    const gas = await getSendTxGas(account, currency, params)
+    let gas = await getSendTxGas(account, currency, params)
+    if (includeDekFee) {
+      const dekGas = await getRegisterDekTxGas(account, currency)
+      gas = gas.plus(dekGas)
+    }
+
     return calculateFee(gas)
   } catch (error) {
     throw error
@@ -66,7 +75,7 @@ export async function getSendFee(
 
 export function* watchQrCodeDetections() {
   while (true) {
-    const action = yield take(Actions.BARCODE_DETECTED)
+    const action: HandleBarcodeDetectedAction = yield take(Actions.BARCODE_DETECTED)
     Logger.debug(TAG, 'Barcode detected in watcher')
     const addressToE164Number = yield select(addressToE164NumberSelector)
     const recipientCache = yield select(recipientCacheSelector)
@@ -77,7 +86,7 @@ export function* watchQrCodeDetections() {
 
     if (action.scanIsForSecureSend) {
       secureSendTxData = action.transactionData
-      requesterAddress = action.requesterAddrress
+      requesterAddress = action.requesterAddress
     }
 
     try {
@@ -99,7 +108,7 @@ export function* watchQrCodeDetections() {
 
 export function* watchQrCodeShare() {
   while (true) {
-    const action = yield take(Actions.QRCODE_SHARE)
+    const action: ShareQRCodeAction = yield take(Actions.QRCODE_SHARE)
     try {
       yield call(shareSVGImage, action.qrCodeSvg)
     } catch (error) {
@@ -118,13 +127,19 @@ function* sendPayment(
     ValoraAnalytics.track(SendEvents.send_tx_start)
     const txId = generateStandbyTransactionId(recipientAddress)
 
+    const ownAddress: string = yield select(currentAccountSelector)
+    // Ensure comment encryption is possible by first ensuring the account's DEK has been registered
+    // For most users, this happens during redeem invite or verification. This is a fallback.
+    yield call(registerAccountDek, ownAddress)
+    const encryptedComment = yield call(encryptComment, comment, recipientAddress, ownAddress, true)
+
     switch (currency) {
       case CURRENCY_ENUM.GOLD: {
         yield put(
           transferGoldToken({
             recipientAddress,
             amount: amount.toString(),
-            comment,
+            comment: encryptedComment,
             txId,
           })
         )
@@ -135,14 +150,14 @@ function* sendPayment(
           transferStableToken({
             recipientAddress,
             amount: amount.toString(),
-            comment,
+            comment: encryptedComment,
             txId,
           })
         )
         break
       }
       default: {
-        Logger.showError(`Sending currency ${currency} not yet supported`)
+        throw new Error(`Sending currency ${currency} not yet supported`)
       }
     }
     ValoraAnalytics.track(SendEvents.send_tx_complete)
@@ -166,16 +181,8 @@ function* sendPaymentOrInviteSaga({
       throw new Error("Can't send to recipient without valid e164PhoneNumber or address")
     }
 
-    const ownAddress: string = yield select(currentAccountSelector)
     if (recipientAddress) {
-      const encryptedComment = yield call(
-        encryptComment,
-        comment,
-        recipientAddress,
-        ownAddress,
-        true
-      )
-      yield call(sendPayment, recipientAddress, amount, encryptedComment, CURRENCY_ENUM.DOLLAR)
+      yield call(sendPayment, recipientAddress, amount, comment, CURRENCY_ENUM.DOLLAR)
     } else if (recipient.e164PhoneNumber) {
       yield call(
         sendInvite,

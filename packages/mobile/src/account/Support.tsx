@@ -1,5 +1,4 @@
 import { SettingsItemTextValue } from '@celo/react-components/components/SettingsItem'
-import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
@@ -52,7 +51,6 @@ const Support = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   containerList: {
     flex: 1,

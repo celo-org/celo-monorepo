@@ -27,7 +27,10 @@ const pgpnpUrlStaging = 'https://us-central1-celo-phone-number-privacy-stg.cloud
 const pgpnpPubKeyStaging =
   '7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA'
 
-const signMoonpayUrlStaging = 'https://us-central1-celo-org-mobile.cloudfunctions.net/signMoonpay'
+const signMoonpayUrlStaging =
+  'https://us-central1-celo-org-mobile.cloudfunctions.net/signMoonpayStaging'
+const signMoonpayUrlProd =
+  'https://us-central1-celo-mobile-mainnet.cloudfunctions.net/signMoonpayProd'
 
 const networkConfigs: { [testnet: string]: NetworkConfig } = {
   [Testnets.integration]: {
@@ -103,7 +106,7 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     pgpnpUrl: 'https://us-central1-celo-pgpnp-mainnet.cloudfunctions.net',
     pgpnpPubKey:
       'FvreHfLmhBjwxHxsxeyrcOLtSonC9j7K3WrS4QapYsQH6LdaDTaNGmnlQMfFY04Bp/K4wAvqQwO9/bqPVCKf8Ze8OZo8Frmog4JY4xAiwrsqOXxug11+htjEe1pj4uMA',
-    signMoonpayUrl: signMoonpayUrlStaging, // TODO
+    signMoonpayUrl: signMoonpayUrlProd,
   },
 }
 
