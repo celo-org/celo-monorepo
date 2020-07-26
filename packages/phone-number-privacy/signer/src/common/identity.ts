@@ -1,21 +1,46 @@
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { Request } from 'express'
+import { getDataEncryptionKey } from '../web3/contracts'
 import logger from './logger'
 
 /*
  * Confirms that user is who they say they are and throws error on failure to confirm.
  * Authorization header should contain the EC signed body
  */
-export function authenticateUser(request: Request): boolean {
+export async function authenticateUser(request: Request): Promise<boolean> {
   logger.debug('Authenticating user')
 
   // https://tools.ietf.org/html/rfc7235#section-4.2
   const messageSignature = request.get('Authorization')
+  const message = JSON.stringify(request.body)
+  if (!messageSignature || !message) {
+    return false
+  }
   const signer = request.body.account
   if (!messageSignature || !signer) {
     return false
   }
 
-  const message = JSON.stringify(request.body)
+  const registeredEncryptionKey = await getDataEncryptionKey(signer)
+  if (!registeredEncryptionKey) {
+    logger.info(`Account ${signer} does not have registered encryption key`)
+  } else {
+    const validSignature: boolean = verifySignature(
+      message,
+      messageSignature,
+      registeredEncryptionKey
+    )
+    if (validSignature) {
+      return true
+    }
+  }
+
+  // Fallback to previous signing pattern
+  logger.info(
+    `Message from ${signer} was not authenticated with DEK, attempting to authenticate using wallet key`
+  )
   return verifySignature(message, messageSignature, signer)
+  //
+  // const key = ec.keyFromPublic(registeredEncryptionKey)
+  // if (!key.verify(message, messageSignature)) {
 }

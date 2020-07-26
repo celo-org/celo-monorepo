@@ -1,9 +1,10 @@
+import { obfuscateNumberForMatchmaking, PhoneNumberHashDetails } from '@celo/contractkit'
 import { FetchMock } from 'jest-fetch-mock'
 import { expectSaga } from 'redux-saga-test-plan'
 import { call } from 'redux-saga/effects'
 import { addContactsMatches } from 'src/identity/actions'
-import { fetchContactMatches, obfuscateNumberForMatchmaking } from 'src/identity/matchmaking'
-import { getUserSelfPhoneHashDetails, PhoneNumberHashDetails } from 'src/identity/privateHashing'
+import { fetchContactMatches } from 'src/identity/matchmaking'
+import { getUserSelfPhoneHashDetails } from 'src/identity/privateHashing'
 import { NumberToRecipient, RecipientKind } from 'src/recipients/recipient'
 import { getConnectedUnlockedAccount } from 'src/web3/saga'
 import {

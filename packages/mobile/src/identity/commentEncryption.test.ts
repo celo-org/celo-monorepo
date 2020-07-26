@@ -1,3 +1,4 @@
+import { PhoneNumberHashDetails } from '@celo/contractkit'
 import { IdentifierLookupResult } from '@celo/contractkit/lib/wrappers/Attestations'
 import { hexToBuffer } from '@celo/utils/src/address'
 import { expectSaga } from 'redux-saga-test-plan'
@@ -14,7 +15,6 @@ import {
   getCommentKey,
 } from 'src/identity/commentEncryption'
 import { lookupAttestationIdentifiers } from 'src/identity/contactMapping'
-import { PhoneNumberHashDetails } from 'src/identity/privateHashing'
 import { e164NumberToAddressSelector, e164NumberToSaltSelector } from 'src/identity/reducer'
 import { privateCommentKeySelector } from 'src/web3/selectors'
 import { getMockStoreData } from 'test/utils'

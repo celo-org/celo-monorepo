@@ -6,6 +6,9 @@ export * from './kit'
 export { GenesisBlockUtils } from './network-utils/genesis-block-utils'
 export { StaticNodeUtils } from './network-utils/static-node-utils'
 export { CeloProvider } from './providers/celo-provider'
+export * from './utils/phone-number-lookup/matchmaking'
+export * from './utils/phone-number-lookup/phone-number-identifier'
+export * from './utils/phone-number-lookup/phone-number-lookup'
 export { CeloTransactionObject, CeloTransactionParams } from './wrappers/BaseWrapper'
 
 /**

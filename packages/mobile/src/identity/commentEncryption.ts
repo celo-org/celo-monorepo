@@ -2,10 +2,12 @@
 // Use these instead of the functions in @celo/utils/src/commentEncryption
 // because these manage comment metadata
 
+import { AuthenticationMethod, AuthSigner, PhoneNumberHashDetails } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { IdentifierLookupResult } from '@celo/contractkit/lib/wrappers/Attestations'
 import { bufferToHex, eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import {
+  compressedPubKey,
   decryptComment as decryptCommentRaw,
   deriveCEK,
   encryptComment as encryptCommentRaw,
@@ -20,7 +22,7 @@ import {
   getAddressesFromLookupResult,
   lookupAttestationIdentifiers,
 } from 'src/identity/contactMapping'
-import { getUserSelfPhoneHashDetails, PhoneNumberHashDetails } from 'src/identity/privateHashing'
+import { getUserSelfPhoneHashDetails } from 'src/identity/privateHashing'
 import {
   AddressToE164NumberType,
   e164NumberToAddressSelector,
@@ -306,4 +308,35 @@ function* updatePhoneNumberMappings(newIdentityData: IdentityMetadataInTx[]) {
 
   yield put(updateE164PhoneNumberSalts(e164NumberToSaltUpdates))
   yield put(updateE164PhoneNumberAddresses(e164NumberToAddressUpdates, addressToE164NumberUpdates))
+}
+
+export async function* getAuthSignerForAccount(account: string) {
+  // Use the DEK for authentication if the current DEK is registered with this account
+  const registeredEncryptionKey: Buffer | null = yield call(getCommentKey, account)
+  let authSigner: AuthSigner | undefined
+  if (registeredEncryptionKey) {
+    const encryptionKeyPrivate: string | null = yield select(privateCommentKeySelector)
+    if (!encryptionKeyPrivate) {
+      Logger.error(TAG + 'getAuthSignerForAccount', 'Missing comment key, should never happen.')
+    } else {
+      const encryptionKeyPublic = hexToBuffer(compressedPubKey(hexToBuffer(encryptionKeyPrivate)))
+      if (encryptionKeyPublic !== registeredEncryptionKey) {
+        Logger.warn(TAG + 'getAuthSignerForAccount', 'DEK mismatch.')
+      } else {
+        authSigner = {
+          authenticationMethod: AuthenticationMethod.ENCRYPTIONKEY,
+          rawKey: hexToBuffer(encryptionKeyPrivate),
+        }
+      }
+    }
+  }
+  // Fallback to using wallet key
+  if (!authSigner) {
+    const contractKit = yield call(getContractKit)
+    authSigner = {
+      authenticationMethod: AuthenticationMethod.WALLETKEY,
+      contractKit,
+    }
+  }
+  return authSigner
 }

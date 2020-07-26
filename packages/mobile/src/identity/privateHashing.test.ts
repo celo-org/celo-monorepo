@@ -1,9 +1,10 @@
+import { getSaltFromThresholdSignature } from '@celo/contractkit'
 import { FetchMock } from 'jest-fetch-mock'
 import { expectSaga } from 'redux-saga-test-plan'
 import { call, select } from 'redux-saga/effects'
 import { e164NumberSelector } from 'src/account/selectors'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
-import { fetchPhoneHashPrivate, getSaltFromThresholdSignature } from 'src/identity/privateHashing'
+import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import { e164NumberToSaltSelector } from 'src/identity/reducer'
 import { getConnectedUnlockedAccount } from 'src/web3/saga'
 import { mockAccount, mockE164Number, mockE164Number2 } from 'test/values'
@@ -57,6 +58,7 @@ describe('Fetch phone hash details', () => {
 describe(getSaltFromThresholdSignature, () => {
   it('Hashes sigs correctly', () => {
     const base64Sig = 'vJeFZJ3MY5KlpI9+kIIozKkZSR4cMymLPh2GHZUatWIiiLILyOcTiw2uqK/LBReA'
-    expect(getSaltFromThresholdSignature(base64Sig)).toBe('piWqRHHYWtfg9')
+    const signature = new Buffer(base64Sig, 'base64')
+    expect(getSaltFromThresholdSignature(signature)).toBe('piWqRHHYWtfg9')
   })
 })

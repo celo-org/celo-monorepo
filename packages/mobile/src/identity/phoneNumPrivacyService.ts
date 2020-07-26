@@ -1,15 +1,16 @@
 // Utilities for interacting with the Phone Number Privacy Service service (aka PGPNP)
 
-import { ContractKit } from '@celo/contractkit'
+import { ec as EC } from 'elliptic'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import networkConfig from 'src/geth/networkConfig'
 import Logger from 'src/utils/Logger'
+const ec = new EC('secp256k1')
 
 const TAG = 'identity/phoneNumPrivacyService'
 
 export async function postToPhoneNumPrivacyService<ResponseType>(
   account: string,
-  contractKit: ContractKit,
+  encryptionKeyPrivate: Buffer,
   body: object,
   endpoint: string
 ) {
@@ -17,7 +18,9 @@ export async function postToPhoneNumPrivacyService<ResponseType>(
 
   // Sign payload using account privkey
   const bodyString = JSON.stringify(body)
-  const authHeader = await contractKit.web3.eth.sign(bodyString, account)
+
+  const key = ec.keyFromPrivate(encryptionKeyPrivate)
+  const authHeader = key.sign(bodyString).toDER()
   const { pgpnpUrl } = networkConfig
   const res = await fetch(pgpnpUrl + endpoint, {
     method: 'POST',
