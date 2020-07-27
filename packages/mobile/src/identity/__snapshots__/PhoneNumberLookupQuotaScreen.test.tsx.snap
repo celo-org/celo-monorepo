@@ -4,7 +4,6 @@ exports[`PhoneNumberLookupQuotaScreen renders correctly 1`] = `
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
     }

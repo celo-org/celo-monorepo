@@ -4,7 +4,6 @@ exports[`BackupSocialIntro renders correctly when social backup is complete 1`] 
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
     }
@@ -195,7 +194,6 @@ exports[`BackupSocialIntro renders correctly when social backup is not complete 
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
     }

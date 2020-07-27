@@ -1,7 +1,7 @@
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
-import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import colors from '@celo/react-components/styles/colors.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { isValidAddress } from '@celo/utils/src/address'
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as React from 'react'
@@ -112,18 +112,16 @@ export class RecipientPicker extends React.Component<RecipientProps> {
       {this.props.searchQuery !== '' ? (
         <>
           <View style={style.emptyViewBody}>
-            <Text style={fontStyles.body}>{this.props.t('noResultsFor')}</Text>
-            <Text style={[fontStyles.body, style.emptyViewBodyDark]}>
-              {` "${this.props.searchQuery}"`}
+            <Text style={fontStyles.emptyState}>
+              {this.props.t('noResultsFor')}
+              <Text style={fontStyles.emptyState}>{` "${this.props.searchQuery}"`}</Text>
             </Text>
+            <Text style={style.emptyStateBody}>{this.props.t('searchForSomeone')}</Text>
           </View>
-          <Text style={[fontStyles.subSmall, style.footer]}>
-            {this.props.t('searchForSomeone')}
-          </Text>
         </>
       ) : (
         <View style={style.emptyViewBody}>
-          <Text style={fontStyles.body}>{this.props.t('noContacts')}</Text>
+          <Text style={fontStyles.emptyState}>{this.props.t('noContacts')}</Text>
         </View>
       )}
     </View>
@@ -215,31 +213,20 @@ const style = StyleSheet.create({
   body: {
     flex: 1,
   },
-  separator: {
-    backgroundColor: colors.darkLightest,
-    height: 1,
-    marginLeft: 60,
-  },
-  footer: {
+  separator: {},
+  emptyStateBody: {
+    ...fontStyles.regular,
+    color: colors.gray3,
     textAlign: 'center',
-    paddingVertical: 20,
-    paddingHorizontal: 50,
+    marginTop: 12,
   },
   emptyView: {
-    paddingHorizontal: 50,
+    paddingHorizontal: 24,
     justifyContent: 'center',
   },
   emptyViewBody: {
-    flexDirection: 'row',
     justifyContent: 'center',
-    paddingVertical: 20,
-    textAlign: 'center',
-  },
-  emptyViewBodyDark: {
-    color: colors.dark,
-  },
-  emptyViewBodySmall: {
-    justifyContent: 'center',
+    paddingVertical: 24,
     textAlign: 'center',
   },
 })

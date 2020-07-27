@@ -37,7 +37,7 @@ mkdir celo-data-dir $ cd celo-data-dir
 Create an account by running this command:
 
 ```bash
-docker run -v `pwd`:/root/.celo --rm -it us.gcr.io/celo-testnet/celo-node:alfajores account new
+docker run -v `pwd`:/root/.celo --rm -it us.gcr.io/celo-org/celo-node:alfajores account new
 ```
 
 It will prompt you for a passphrase, ask you to confirm it, and then will output your account address:

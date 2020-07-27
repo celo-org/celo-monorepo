@@ -21,6 +21,10 @@ export interface E164NumberToSaltType {
   [e164PhoneNumber: string]: string | null // null means unverified
 }
 
+export interface AddressToDataEncryptionKeyType {
+  [address: string]: string | null // null means no DEK registered
+}
+
 export interface ImportContactProgress {
   status: ImportContactsStatus
   current: number
@@ -34,10 +38,14 @@ export enum AddressValidationType {
 }
 
 export interface SecureSendPhoneNumberMapping {
-  [e164Number: string]: {
-    address: string | undefined
-    addressValidationType: AddressValidationType
-  }
+  [e164Number: string]: SecureSendDetails
+}
+
+export interface SecureSendDetails {
+  address: string | undefined
+  addressValidationType: AddressValidationType
+  isFetchingAddresses: boolean | undefined
+  validationSuccessful: boolean | undefined
 }
 
 export interface State {
@@ -52,12 +60,12 @@ export interface State {
   // Note: Do not access values in this directly, use the `getAddressFromPhoneNumber` helper in contactMapping
   e164NumberToAddress: E164NumberToAddressType
   e164NumberToSalt: E164NumberToSaltType
+  addressToDataEncryptionKey: AddressToDataEncryptionKeyType
   // Has the user already been asked for contacts permission
   askedContactsPermission: boolean
   importContactsProgress: ImportContactProgress
   // Contacts found during the matchmaking process
   matchedContacts: ContactMatches
-  isValidRecipient: boolean
   secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
 }
 
@@ -70,6 +78,7 @@ const initialState: State = {
   addressToE164Number: {},
   e164NumberToAddress: {},
   e164NumberToSalt: {},
+  addressToDataEncryptionKey: {},
   askedContactsPermission: false,
   importContactsProgress: {
     status: ImportContactsStatus.Stopped,
@@ -77,7 +86,6 @@ const initialState: State = {
     total: 0,
   },
   matchedContacts: {},
-  isValidRecipient: false,
   secureSendPhoneNumberMapping: {},
 }
 
@@ -97,6 +105,7 @@ export const reducer = (
           current: 0,
           total: 0,
         },
+        isFetchingAddresses: false,
       }
     }
     case Actions.RESET_VERIFICATION:
@@ -181,15 +190,9 @@ export const reducer = (
         ...state,
         matchedContacts,
       }
-    case Actions.VALIDATE_RECIPIENT_ADDRESS:
-      return {
-        ...state,
-        isValidRecipient: false,
-      }
     case Actions.VALIDATE_RECIPIENT_ADDRESS_SUCCESS:
       return {
         ...state,
-        isValidRecipient: true,
         // Overwrite the previous mapping when a new address is validated
         secureSendPhoneNumberMapping: dotProp.set(
           state.secureSendPhoneNumberMapping,
@@ -197,13 +200,22 @@ export const reducer = (
           {
             address: action.validatedAddress,
             addressValidationType: AddressValidationType.NONE,
+            validationSuccessful: true,
           }
+        ),
+      }
+    case Actions.VALIDATE_RECIPIENT_ADDRESS_RESET:
+      return {
+        ...state,
+        secureSendPhoneNumberMapping: dotProp.set(
+          state.secureSendPhoneNumberMapping,
+          `${action.e164Number}.validationSuccessful`,
+          false
         ),
       }
     case Actions.REQUIRE_SECURE_SEND:
       return {
         ...state,
-        isValidRecipient: false,
         // Erase the previous mapping when new validation is required
         secureSendPhoneNumberMapping: dotProp.set(
           state.secureSendPhoneNumberMapping,
@@ -212,6 +224,33 @@ export const reducer = (
             address: undefined,
             addressValidationType: action.addressValidationType,
           }
+        ),
+      }
+    case Actions.FETCH_ADDRESSES_AND_VALIDATION_STATUS:
+      return {
+        ...state,
+        secureSendPhoneNumberMapping: dotProp.set(
+          state.secureSendPhoneNumberMapping,
+          `${action.e164Number}.isFetchingAddresses`,
+          true
+        ),
+      }
+    case Actions.END_FETCHING_ADDRESSES:
+      return {
+        ...state,
+        secureSendPhoneNumberMapping: dotProp.set(
+          state.secureSendPhoneNumberMapping,
+          `${action.e164Number}.isFetchingAddresses`,
+          false
+        ),
+      }
+    case Actions.UPDATE_ADDRESS_DEK_MAP:
+      return {
+        ...state,
+        addressToDataEncryptionKey: dotProp.set(
+          state.addressToDataEncryptionKey,
+          action.address,
+          action.dataEncryptionKey
         ),
       }
     default:

@@ -8,7 +8,7 @@ const circle = {
   height: CIRCLE_SIZE,
   width: CIRCLE_SIZE,
   borderRadius: CIRCLE_SIZE,
-  marginHorizontal: 5,
+  marginHorizontal: 3,
 }
 
 export default StyleSheet.create({

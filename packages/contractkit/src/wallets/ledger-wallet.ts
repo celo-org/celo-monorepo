@@ -97,7 +97,7 @@ export class LedgerWallet extends RemoteWallet implements Wallet {
 
     // Each address must be retrieved synchronously, (ledger lock)
     for (const value of this.derivationPathIndexes) {
-      const derivationPath = `${this.baseDerivationPath}/${value}`
+      const derivationPath = `${this.baseDerivationPath}/0/${value}`
       const addressInfo = await this.ledger!.getAddress(derivationPath, validationRequired)
       addressToSigner.set(
         addressInfo.address,

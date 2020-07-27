@@ -89,6 +89,8 @@ export enum OnboardingEvents {
   escrow_redeem_start = 'escrow_redeem_start', // when escrow redemption starts (only happens on user invite redeemption)
   escrow_redeem_complete = 'escrow_redeem_complete',
   escrow_redeem_error = 'escrow_redeem_error',
+
+  account_dek_set = 'account_dek_set',
 }
 
 export enum VerificationEvents {
@@ -118,7 +120,6 @@ export enum VerificationEvents {
   verification_code_received = 'verification_code_received',
   verification_code_validate_start = 'verification_code_validate_start',
   verification_code_validate_complete = 'verification_code_validate_complete',
-  verification_account_set = 'verification_account_set',
 
   verification_reveal_all_attestations_start = 'verification_reveal_all_attestations_start',
   verification_reveal_all_attestations_complete = 'verification_reveal_all_attestations_complete',
@@ -269,6 +270,23 @@ export enum GethEvents {
   geth_init_failure = 'geth_init_failure',
   geth_restart_to_fix_init = 'geth_restart_to_fix_init',
   prompt_forno = 'prompt_forno',
+  geth_init_start = 'geth_init_start',
+  create_geth_start = 'create_geth_start',
+  create_geth_finish = 'create_geth_finish',
+  start_geth_start = 'start_geth_start',
+  start_geth_finish = 'start_geth_finish',
+}
+
+export enum ContractKitEvents {
+  init_contractkit_start = 'init_contractkit_start',
+  init_contractkit_geth_init_start = 'init_contractkit_geth_init_start',
+  init_contractkit_geth_init_finish = 'init_contractkit_geth_init_finish',
+  init_contractkit_get_ipc_start = 'init_contractkit_get_ipc_start',
+  init_contractkit_get_ipc_finish = 'init_contractkit_get_ipc_finish',
+  init_contractkit_get_wallet_start = 'init_contractkit_get_wallet_start',
+  init_contractkit_get_wallet_finish = 'init_contractkit_get_wallet_finish',
+  init_contractkit_init_wallet_finish = 'init_contractkit_init_wallet_finish',
+  init_contractkit_finish = 'init_contractkit_finish',
 }
 
 export type AnalyticsEventType =

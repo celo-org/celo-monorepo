@@ -1,20 +1,22 @@
-import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
-import BigNumber from 'bignumber.js'
-import { isVerified } from '../common/identity'
+import { retryAsyncWithBackOff } from '@celo/utils/lib/async'
+import { BigNumber } from 'bignumber.js'
+import { RETRY_COUNT, RETRY_DELAY_IN_MS } from '../common/constants'
 import logger from '../common/logger'
 import config from '../config'
 import { getPerformedQueryCount } from '../database/wrappers/account'
-import { getContractKit } from '../web3/contracts'
+import { getContractKit, isVerified } from '../web3/contracts'
 
 /*
- * Returns how many queries the account can make based on the
- * calculated query quota and the number of queries already performed.
+ * Returns the number of queries already performed and the calculated query quota.
  */
-export async function getRemainingQueryCount(account: string, hashedPhoneNumber?: string) {
+export async function getRemainingQueryCount(
+  account: string,
+  hashedPhoneNumber?: string
+): Promise<{ performedQueryCount: number; totalQuota: number }> {
   logger.debug('Retrieving remaining query count')
-  const queryQuota = await getQueryQuota(account, hashedPhoneNumber)
+  const totalQuota = await getQueryQuota(account, hashedPhoneNumber)
   const performedQueryCount = await getPerformedQueryCount(account)
-  return queryQuota - performedQueryCount
+  return { performedQueryCount, totalQuota }
 }
 
 /*
@@ -45,12 +47,20 @@ async function getQueryQuota(account: string, hashedPhoneNumber?: string) {
   return 0
 }
 
-async function getTransactionCountFromAccount(account: string): Promise<number> {
-  // TODO (amyslawson) wrap forno request in retry
-  return getContractKit().web3.eth.getTransactionCount(account)
+export async function getTransactionCountFromAccount(account: string): Promise<number> {
+  return retryAsyncWithBackOff(
+    () => getContractKit().web3.eth.getTransactionCount(account),
+    RETRY_COUNT,
+    [],
+    RETRY_DELAY_IN_MS
+  )
 }
 
-async function getDollarBalance(account: string): Promise<BigNumber> {
-  const stableTokenWrapper: StableTokenWrapper = await getContractKit().contracts.getStableToken()
-  return stableTokenWrapper.balanceOf(account)
+export async function getDollarBalance(account: string): Promise<BigNumber> {
+  return retryAsyncWithBackOff(
+    async () => (await getContractKit().contracts.getStableToken()).balanceOf(account),
+    RETRY_COUNT,
+    [],
+    RETRY_DELAY_IN_MS
+  )
 }
