@@ -24,6 +24,7 @@ done
 
 BUILD_DIR_1=$(echo build/$(echo $BRANCH_1 | sed -e 's/\//_/g'))
 git checkout $BRANCH_1
+rm -rf build/contracts
 yarn build
 rm -rf $BUILD_DIR_1 && mkdir -p $BUILD_DIR_1
 mv build/contracts $BUILD_DIR_1
@@ -31,6 +32,7 @@ mv build/contracts $BUILD_DIR_1
 
 BUILD_DIR_2=$(echo build/$(echo $BRANCH_2 | sed -e 's/\//_/g'))
 git checkout $BRANCH_2
+rm -rf build/contracts
 yarn build:sol
 rm -rf $BUILD_DIR_2 && mkdir -p $BUILD_DIR_2
 mv build/contracts $BUILD_DIR_2
