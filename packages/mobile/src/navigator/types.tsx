@@ -188,6 +188,7 @@ export type StackParamList = {
   [Screens.OnboardingEducationScreen]: undefined
   [Screens.OnboardingSuccessScreen]: undefined
   [Screens.WalletHome]: undefined
+  [Screens.Welcome]: undefined
 }
 
 // tslint:disable-next-line: interface-over-type-literal

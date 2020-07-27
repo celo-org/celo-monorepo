@@ -69,6 +69,7 @@ import JoinCelo from 'src/onboarding/registration/JoinCelo'
 import RegulatoryTerms from 'src/onboarding/registration/RegulatoryTerms'
 import SelectCountry from 'src/onboarding/registration/SelectCountry'
 import OnboardingSuccessScreen from 'src/onboarding/success/OnboardingSuccessScreen'
+import Welcome from 'src/onboarding/welcome/Welcome'
 import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import OutgoingPaymentRequestListScreen from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
 import PaymentRequestConfirmation, {
@@ -186,6 +187,11 @@ const nuxScreens = (Navigator: typeof Stack) => (
       name={Screens.OnboardingEducationScreen}
       component={OnboardingEducationScreen}
       options={OnboardingEducationScreen.navigationOptions}
+    />
+    <Navigator.Screen
+      name={Screens.Welcome}
+      component={Welcome}
+      options={Welcome.navigationOptions}
     />
     <Navigator.Screen
       name={Screens.JoinCelo}
