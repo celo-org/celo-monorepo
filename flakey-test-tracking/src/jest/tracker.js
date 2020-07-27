@@ -5,7 +5,7 @@ const { getTestID, getTestIDFromTestPath, buildFlakeyDescribe } = require('./uti
 const { shouldLogRetryErrorsOnFailure, shouldSkipKnownFlakes, numRetries } = require('./config')
 const clone = require('clone')
 
-class FlakeTracker {
+class JestFlakeTracker {
   async setup() {
     // For each describe block, we cache errors in this map as tests execute and
     // only write them to the db on 'run_finish'.
@@ -71,4 +71,4 @@ class FlakeTracker {
   }
 }
 
-module.exports = FlakeTracker
+module.exports = JestFlakeTracker

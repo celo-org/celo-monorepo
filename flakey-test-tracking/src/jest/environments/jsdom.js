@@ -1,10 +1,10 @@
 const JSDOMEnvironment = require('jest-environment-jsdom')
-const FlakeTracker = require('../tracker')
+const JestFlakeTracker = require('../tracker')
 
 class FlakeTrackingJSDOMEnv extends JSDOMEnvironment {
   constructor(config) {
     super(config)
-    this.tracker = new FlakeTracker(this.global)
+    this.tracker = new JestFlakeTracker(this.global)
   }
 
   async setup() {

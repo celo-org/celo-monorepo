@@ -3,13 +3,13 @@ const {
   SpecReporter,
   WorkerAssignReporter,
 } = require('detox/runners/jest-circus')
-const FlakeTracker = require('../tracker')
+const JestFlakeTracker = require('../tracker')
 
 class FlakeTrackingDetoxEnv extends DetoxCircusEnvironment {
   constructor(config) {
     super(config)
 
-    this.tracker = new FlakeTracker(this.global)
+    this.tracker = new JestFlakeTracker(this.global)
 
     // Can be safely removed, if you are content with the default value (=300000ms)
     this.initTimeout = 300000
