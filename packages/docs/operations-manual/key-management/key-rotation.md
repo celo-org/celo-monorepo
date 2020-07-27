@@ -35,7 +35,7 @@ Because the Validator signer key is constantly in use to sign consensus messages
     ```
   
   {% hint style="warning" %}
-  Please note that the BLS key and proof of possession will change when the validator signer key is rotated, as the BLS key is derived from the validator signer ECDSA key. If the new BLS key is not authorized, then the validator will be unable to process aggregated signatures during consensus, resulting in downtime. For more details, please read [the BLS key section of the Celo account role descriptions](./detailed.md#authorized-validator-bls-signers).
+  Please note that the BLS key will change along with the validator signer ECDSA key on the node. If the new BLS key is not authorized, then the validator will be unable to process aggregated signatures during consensus, **resulting in downtime**. For more details, please read [the BLS key section of the Celo account role descriptions](./detailed.md#authorized-validator-bls-signers).
   {% endhint %}
 
 3. **Leave all validator and proxy nodes running** until the next epoch change. At the start the next epoch, the new Validator signer should take over participation in consensus.
