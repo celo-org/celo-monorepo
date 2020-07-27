@@ -1,6 +1,5 @@
 import ContactCircle from '@celo/react-components/components/ContactCircle'
 import { SettingsItemInput } from '@celo/react-components/components/SettingsItem'
-import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -42,7 +41,7 @@ export class Profile extends React.Component<Props> {
     const { t, userContact, name } = this.props
     return (
       <ScrollView style={styles.container}>
-        <SafeAreaView>
+        <SafeAreaView edges={['bottom']}>
           <Text style={styles.title}>{t('editProfile')}</Text>
           <View style={styles.accountProfile}>
             <ContactCircle thumbnailPath={userContact.thumbnailPath} name={name} size={80} />
@@ -61,6 +60,9 @@ export class Profile extends React.Component<Props> {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   accountProfile: {
     paddingLeft: 10,
     paddingTop: 30,
@@ -68,18 +70,6 @@ const styles = StyleSheet.create({
     paddingBottom: 15,
     flexDirection: 'column',
     alignItems: 'center',
-  },
-  underlinedBox: {
-    borderTopWidth: 1,
-    borderColor: '#EEEEEE',
-  },
-  scrollView: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  container: {
-    flex: 1,
-    backgroundColor: colors.light,
   },
   title: {
     ...fontStyles.h2,

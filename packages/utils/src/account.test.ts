@@ -1,10 +1,4 @@
-import {
-  generateKeys,
-  generateKeysSync,
-  generateMnemonic,
-  MnemonicStrength,
-  validateMnemonic,
-} from './account'
+import { generateKeys, generateMnemonic, MnemonicStrength, validateMnemonic } from './account'
 
 describe('Mnemonic validation', () => {
   it('should generate 24 word mnemonic', async () => {
@@ -17,7 +11,7 @@ describe('Mnemonic validation', () => {
     expect(mnemonic.split(' ').length).toEqual(12)
   })
 
-  it('should generate an expected private key for a mnemonic', () => {
+  it('should generate an expected private key for a mnemonic', async () => {
     // 10 random mnemonic
     const mnemonics = [
       'language quiz proud sample canoe trend topic upper coil rack choice engage noodle panda mutual grab shallow thrive forget trophy pull pool mask height',
@@ -176,34 +170,10 @@ describe('Mnemonic validation', () => {
     expect(mnemonics.length).toEqual(expectedPrivateKeys.length)
     for (let i = 0; i < mnemonics.length; ++i) {
       expect(validateMnemonic(mnemonics[i])).toBeTruthy()
-      const derivation0 = generateKeysSync(mnemonics[i])
-      const derivation1 = generateKeysSync(mnemonics[i], undefined, 1)
-      const password = generateKeysSync(mnemonics[i], 'password')
+      const derivation0 = await generateKeys(mnemonics[i])
+      const derivation1 = await generateKeys(mnemonics[i], undefined, 0, 1)
+      const password = await generateKeys(mnemonics[i], 'password')
       expect({ derivation0, derivation1, password }).toEqual(expectedPrivateKeys[i])
     }
-  })
-
-  it('should generate async an expected private key for a mnemonic', async () => {
-    const expectedPrivateKey = {
-      derivation0: {
-        privateKey: '9b20170cd294190efb2eb1d406a51e6705461cb540e777784565c1d8342016d7',
-        publicKey: '0257780786b4ba7bf47b3be6082f65069f552012735a17c2080648de67cfb440c1',
-      },
-      derivation1: {
-        privateKey: '29c025cda952cb59d8504cca390bcdbc2cc3706ca5bfb65a5b6f5dd5dc5176dd',
-        publicKey: '029c90f394bea3d46c46896b0bd1b36119b031a6da498b49a32aad77f10ce1f672',
-      },
-      password: {
-        privateKey: '92956ef74d530224029380385ca556240be042b7e5592ffece5945286f1562c3',
-        publicKey: '0331003f16d42ea996da1bc91188ff170ea451570a9bed4779682dd27da1892303',
-      },
-    }
-    const mnemonic =
-      'language quiz proud sample canoe trend topic upper coil rack choice engage noodle panda mutual grab shallow thrive forget trophy pull pool mask height'
-
-    const derivation0 = await generateKeys(mnemonic)
-    const derivation1 = await generateKeys(mnemonic, undefined, 1)
-    const password = await generateKeys(mnemonic, 'password')
-    expect({ derivation0, derivation1, password }).toEqual(expectedPrivateKey)
   })
 })

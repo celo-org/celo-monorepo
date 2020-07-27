@@ -75,7 +75,7 @@ A signature should be produced over the image automatically built at the corresp
 Release image signatures can be verified with the following command:
 
 ```bash
-docker save us.gcr.io/celo-testnet/celo-node:vX.Y.Z | gpg --verify celo-blockchain-vX.Y.Z.docker.asc -
+docker save us.gcr.io/celo-org/celo-node:X.Y.Z | gpg --verify celo-blockchain-vX.Y.Z.docker.asc -
 ```
 
 ## Testing

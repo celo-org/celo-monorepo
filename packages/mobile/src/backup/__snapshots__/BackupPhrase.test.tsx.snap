@@ -4,7 +4,6 @@ exports[`renders correctly with backup completed 1`] = `
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
       "padding": 16,
@@ -78,7 +77,6 @@ exports[`renders correctly with backup not completed 1`] = `
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
       "padding": 16,
@@ -255,7 +253,6 @@ exports[`still renders when mnemonic doesnt show up 1`] = `
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
       "padding": 16,
