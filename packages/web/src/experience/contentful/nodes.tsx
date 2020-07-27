@@ -57,7 +57,7 @@ function embedded(node) {
       const numberAcross = node.data.target.fields.by
       const ratio = node.data.target.fields.tileRatio
       return (
-        <View style={brandStyles.tiling}>
+        <View style={[brandStyles.tiling, { marginHorizontal: -10 }]}>
           {node.data.target.fields.content.map((content: Content) => (
             <Tile
               key={content.sys.id}
@@ -140,7 +140,14 @@ function useTileSize(numberAcross: NumberAcross) {
         return 222
     }
   } else if (numberAcross === '3') {
-    return 226
+    switch (screen) {
+      case ScreenSizes.DESKTOP:
+        return 226
+      case ScreenSizes.MOBILE:
+        return '100%'
+      case ScreenSizes.TABLET:
+        return 180
+    }
   } else if (numberAcross === '4') {
     return 165
   }
