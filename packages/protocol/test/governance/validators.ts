@@ -1599,7 +1599,7 @@ contract('Validators', (accounts: string[]) => {
             beforeEach(async () => {
               await mockLockedGold.setAccountTotalLockedGold(
                 group,
-                groupLockedGoldRequirements.value.times(2).minus(1)
+                groupLockedGoldRequirements.value.times(2).minus(11)
               )
               await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS)
               await registerValidator(validator2)
