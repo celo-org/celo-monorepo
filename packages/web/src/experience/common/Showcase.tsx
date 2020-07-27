@@ -82,8 +82,7 @@ const styles = StyleSheet.create({
   text: { flex: 1 },
   pullStart: { paddingLeft: 0 },
   container: {
-    justifyContent: 'space-between',
-    backgroundColor: 'red',
+    // justifyContent: 'space-between',
   },
   'variant-circle': {
     borderRadius: 60,
