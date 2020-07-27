@@ -520,12 +520,12 @@ export const simulateClient = async (
     baseLogMessage.tokenName = transferGold ? 'cGLD' : 'cUSD'
 
     // randomly choose which gas currency to use
-    const feeCurrencyGold = Boolean(Math.round(Math.random()))
-    // const feeCurrencyGold = true
-
-    let feeCurrency
+    // const feeCurrencyGold = Boolean(Math.round(Math.random()))
+    const feeCurrencyGold = true
+    
+    let feeCurrency, gasPrice
     try {
-      feeCurrency = feeCurrencyGold ? await kit.registry.addressFor(CeloContract.GoldToken) : await kit.registry.addressFor(CeloContract.StableToken)
+      feeCurrency = feeCurrencyGold ? '' : await kit.registry.addressFor(CeloContract.StableToken)
     }
     catch (error) {
       tracerLog({
@@ -539,9 +539,17 @@ export const simulateClient = async (
     baseLogMessage.feeCurrency = feeCurrency
 
     const gasPriceMinimum = await kit.contracts.getGasPriceMinimum()
-    const gasPrice = new BigNumber(
-      await gasPriceMinimum.getGasPriceMinimum(feeCurrency)
-    ).times(5)
+
+    if (feeCurrency) {
+      gasPrice = new BigNumber(
+        await gasPriceMinimum.getGasPriceMinimum(feeCurrency)
+      ).times(5)
+    } else {
+      gasPrice = new BigNumber(
+        await gasPriceMinimum.gasPriceMinimum()
+      ).times(5)
+    }
+
 
     const txOptions = {
       gasPrice: gasPrice.toString(),
