@@ -1,15 +1,16 @@
 import { RenderNode } from '@contentful/rich-text-react-renderer'
 import { BLOCKS, INLINES } from '@contentful/rich-text-types'
+import { Asset, Sys } from 'contentful'
 import { Image, Text, View } from 'react-native'
 import YouTube from 'react-youtube'
+import { brandStyles } from 'src/experience/common/constants'
 import Showcase from 'src/experience/common/Showcase'
 import { H1, H2, H3, H4 } from 'src/fonts/Fonts'
+import { ScreenSizes, useScreenSize } from 'src/layout/ScreenSize'
 import Button from 'src/shared/Button.3'
 import InlineAnchor from 'src/shared/InlineAnchor'
 import { fonts, standardStyles } from 'src/styles'
 import { AssetTypes } from '../brandkit/tracking'
-import { brandStyles } from 'src/experience/common/constants'
-import { Asset, Sys } from 'contentful'
 
 export const renderNode: RenderNode = {
   [BLOCKS.HEADING_1]: (_, children: string) => {
@@ -42,9 +43,7 @@ export const renderNode: RenderNode = {
 }
 
 function embedded(node) {
-  console.warn(node)
   const fields = node.data.target.fields
-  debugger
   switch (node.data?.target?.sys?.contentType?.sys?.id) {
     case 'button':
       return (
@@ -55,9 +54,18 @@ function embedded(node) {
         />
       )
     case 'grid':
+      const numberAcross = node.data.target.fields.by
+      const ratio = node.data.target.fields.tileRatio
       return (
         <View style={brandStyles.tiling}>
-          {node.data.target.fields.content.map(renderGridContent)}
+          {node.data.target.fields.content.map((content: Content) => (
+            <Tile
+              key={content.sys.id}
+              content={content}
+              numberAcross={numberAcross}
+              ratio={ratio}
+            />
+          ))}
         </View>
       )
     case 'iFrameEmbed':
@@ -93,20 +101,47 @@ interface Content {
     image: Asset
   }
 }
+// Contentful sends these values as strings
+type NumberAcross = '2' | '3' | '4'
 
-function renderGridContent(content: Content) {
-  console.warn(content)
+interface TileProps {
+  content: Content
+  numberAcross: NumberAcross
+  ratio: number
+}
+
+function Tile({ content, numberAcross, ratio }: TileProps) {
+  const size = useTileSize(numberAcross)
   return (
     <Showcase
       key={content.sys.id}
-      ratio={1.5}
+      ratio={ratio || 1}
       assetType={AssetTypes.illustration}
       description={content.fields.description}
       name={content.fields.title}
       preview={content.fields.image.fields.file.url}
       uri={''}
       loading={false}
-      size={180}
+      size={size}
     />
   )
+}
+
+function useTileSize(numberAcross: NumberAcross) {
+  const { screen } = useScreenSize()
+
+  if (numberAcross === '2') {
+    switch (screen) {
+      case ScreenSizes.DESKTOP:
+        return 350
+      case ScreenSizes.MOBILE:
+        return 345
+      case ScreenSizes.TABLET:
+        return 222
+    }
+  } else if (numberAcross === '3') {
+    return 226
+  } else if (numberAcross === '4') {
+    return 165
+  }
 }

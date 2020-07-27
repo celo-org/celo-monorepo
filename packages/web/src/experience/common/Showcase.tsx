@@ -62,10 +62,10 @@ export default React.memo(function Showcase({
           </AspectRatio>
         </View>
         <View style={styles.text}>
-          <Text style={titleStyle}>{name}</Text>
-          <Text style={fonts.legal}>{description}</Text>
+          {name && <Text style={titleStyle}>{name}</Text>}
+          {description && <Text style={fonts.legal}>{description}</Text>}
         </View>
-        <DownloadButton uri={uri} trackingData={trackingData} />
+        {uri && <DownloadButton uri={uri} trackingData={trackingData} />}
       </Fade>
     </View>
   )
@@ -83,6 +83,7 @@ const styles = StyleSheet.create({
   pullStart: { paddingLeft: 0 },
   container: {
     justifyContent: 'space-between',
+    backgroundColor: 'red',
   },
   'variant-circle': {
     borderRadius: 60,
