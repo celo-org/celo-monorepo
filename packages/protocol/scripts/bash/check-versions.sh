@@ -36,4 +36,4 @@ rm -rf build/contracts
 yarn build:sol
 rm -rf $BUILD_DIR_2 && mkdir -p $BUILD_DIR_2
 mv build/contracts $BUILD_DIR_2
-yarn ts-node scripts/check-backward.ts sem_check -o $BUILD_DIR_1 -n $BUILD_DIR_2 -e ".*Test.*|I[A-Z].*|ReleaseGold"
+yarn ts-node scripts/check-backward.ts sem_check -o $BUILD_DIR_1/contracts -n $BUILD_DIR_2/contracts -e ".*Test.*|I[A-Z].*|ReleaseGold"
