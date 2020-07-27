@@ -213,7 +213,7 @@ class GitHub {
           output: {
             title: statuses['success'],
             summary: utils.fmtSummary([], [], 0),
-            images: [utils.getRandSuccessImage()],
+            images: [utils.getRandomSuccessImage()],
           },
         })
       }
