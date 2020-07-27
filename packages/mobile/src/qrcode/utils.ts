@@ -18,7 +18,7 @@ import {
   RecipientKind,
   RecipientWithQrCode,
 } from 'src/recipients/recipient'
-import { QrCode, SVG } from 'src/send/actions'
+import { QrCode, storeLatestInRecents, SVG } from 'src/send/actions'
 import { TransactionDataInput } from 'src/send/SendAmount'
 import Logger from 'src/utils/Logger'
 
@@ -147,6 +147,7 @@ export function* handleBarcode(
     thumbnailPath: cachedRecipient?.thumbnailPath,
     contactId: cachedRecipient?.contactId,
   }
+  yield put(storeLatestInRecents(recipient))
 
   if (secureSendTxData) {
     if (isOutgoingPaymentRequest) {
