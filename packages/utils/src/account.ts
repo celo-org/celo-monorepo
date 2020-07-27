@@ -2,7 +2,7 @@ import * as bip32 from 'bip32'
 import * as bip39 from 'bip39'
 import randomBytes from 'randombytes'
 
-export const CELO_DERIVATION_PATH_BASE = "m/44'/52752'/0'/0"
+export const CELO_DERIVATION_PATH_BASE = "m/44'/52752'/0'"
 
 export enum MnemonicStrength {
   s128_12words = 128,
@@ -25,7 +25,7 @@ type RandomNumberGenerator = (
   callback: (err: Error | null, buf: Buffer) => void
 ) => void
 
-interface Bip39 {
+export interface Bip39 {
   mnemonicToSeedSync: (mnemonic: string, password?: string) => Buffer
   mnemonicToSeed: (mnemonic: string, password?: string) => Promise<Buffer>
   generateMnemonic: (
@@ -81,34 +81,20 @@ export function validateMnemonic(
 export async function generateKeys(
   mnemonic: string,
   password?: string,
+  changeIndex: number = 0,
   addressIndex: number = 0,
   bip39ToUse: Bip39 = bip39Wrapper,
   derivationPath: string = CELO_DERIVATION_PATH_BASE
 ): Promise<{ privateKey: string; publicKey: string }> {
   const seed = await bip39ToUse.mnemonicToSeed(mnemonic, password)
   const node = bip32.fromSeed(seed)
-  const newNode = node.derivePath(`${derivationPath}/${addressIndex}`)
+  const newNode = node.derivePath(`${derivationPath}/${changeIndex}/${addressIndex}`)
   if (!newNode.privateKey) {
     // As we are generating the node from a seed, the node will always have a private key and this would never happened
     throw new Error('utils-accounts@generateKeys: invalid node to derivate')
   }
   return {
     privateKey: newNode.privateKey.toString('hex'),
-    publicKey: newNode.publicKey.toString('hex'),
-  }
-}
-
-export function generateKeysSync(
-  mnemonic: string,
-  password?: string,
-  addressIndex: number = 0,
-  bip39ToUse: Bip39 = bip39Wrapper
-): { privateKey: string; publicKey: string } {
-  const seed = bip39ToUse.mnemonicToSeedSync(mnemonic, password)
-  const node = bip32.fromSeed(seed)
-  const newNode = node.derivePath(`${CELO_DERIVATION_PATH_BASE}/${addressIndex}`)
-  return {
-    privateKey: newNode.privateKey!.toString('hex'),
     publicKey: newNode.publicKey.toString('hex'),
   }
 }
@@ -141,5 +127,4 @@ export const AccountUtils = {
   generateMnemonic,
   validateMnemonic,
   generateKeys,
-  generateKeysSync,
 }

@@ -11,7 +11,7 @@ import { ContractVersionDelta, ContractVersionDeltaIndex } from '@celo/protocol/
  * Value object holding all uncategorized storage and code reports.
  */
 export class ASTReports {
-  
+
   constructor(
     public readonly code: ASTCodeCompatibilityReport,
     public readonly storage: ASTStorageCompatibilityReport[]) {}
@@ -112,15 +112,15 @@ export interface ASTVersionedReportIndex {
 }
 
 /**
- * Backward compatibility report for a set of changes, based on 
+ * Backward compatibility report for a set of changes, based on
  * the abstract syntax tree analysis of both the storage layout, and code API.
- * 
+ *
  * Holds {@link CategorizedChanges} and the calculated {@link ContractVersionDelta}.
  */
 export class ASTVersionedReport {
-  
+
   /**
-   * @returns a new {@link ASTVersionedReport} with the provided 
+   * @returns a new {@link ASTVersionedReport} with the provided
    * {@link CategorizedChanges} and a calculated version delta
    * according to {@link ContractVersionDelta.fromChanges}.
    */

@@ -4,7 +4,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "paddingTop": 20,
     }
@@ -998,7 +997,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "paddingTop": 20,
     }
@@ -1992,7 +1990,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "paddingTop": 20,
     }

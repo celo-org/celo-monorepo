@@ -1,4 +1,3 @@
-import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import React from 'react'
@@ -43,7 +42,6 @@ export function titleWithBalanceNavigationOptions(title: string) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.background,
     flex: 1,
   },
   scrollArea: {
