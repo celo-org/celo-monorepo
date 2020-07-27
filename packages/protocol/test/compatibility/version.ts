@@ -19,7 +19,6 @@ describe('#version()', () => {
 
     it('returns true on valid string for isValid', () => {
       assert.isTrue(ContractVersion.isValid('1.2.3.4'))
-      assert.isTrue(ContractVersion.isValid('-1.0.9.787'))
       assert.isTrue(ContractVersion.isValid('10.0.224.9'))
     })
   })
@@ -47,6 +46,7 @@ describe('#version()', () => {
       assert.equal(cvd.minor, Delta.Reset)
       assert.equal(cvd.patch, Delta.Reset)
     })
+
     it('properly sets the storage Delta', () => {
       const cvd2 = ContractVersionDelta.fromChanges(false, false, true, true)
       assert.equal(cvd2.storage, Delta.None)
@@ -59,6 +59,7 @@ describe('#version()', () => {
       assert.equal(cvd.minor, Delta.Reset)
       assert.equal(cvd.patch, Delta.Reset)
     })
+
     it('properly sets the major Delta', () => {
       const cvd2 = ContractVersionDelta.fromChanges(false, false, true, true)
       assert.equal(cvd2.major, Delta.None)
@@ -70,6 +71,7 @@ describe('#version()', () => {
       assert.equal(cvd.minor, Delta.Increment)
       assert.equal(cvd.patch, Delta.Reset)
     })
+
     it('properly sets the minor Delta', () => {
       const cvd2 = ContractVersionDelta.fromChanges(false, false, false, true)
       assert.equal(cvd2.minor, Delta.None)
