@@ -1,18 +1,18 @@
 import { zeroAddress } from 'ethereumjs-util'
 import { isRight } from 'fp-ts/lib/Either'
 import { PathReporter } from 'io-ts/lib/PathReporter'
-import { BaseQrData, LocalPaymentQrData, qrDataFromJson, UserQrData } from 'src/qrcode/scheme'
+import { qrDataFromJson } from 'src/qrcode/scheme'
 
-const validBaseData: BaseQrData = { address: zeroAddress() }
-const validUserData: UserQrData = {
-  ...validBaseData,
+const validAddressData = { address: zeroAddress() }
+const validUserData = {
+  ...validAddressData,
   displayName: 'alice',
-  e164PhoneNumber: '+19995550123',
+  e164PhoneNumber: '+14155552671',
 }
-const validLocalPaymentData: LocalPaymentQrData = {
-  ...validBaseData,
+const validLocalPaymentData = {
+  ...validAddressData,
   currencyCode: 'PHP',
-  amount: 521.46,
+  amount: '521.46',
 }
 
 describe('#qrDataFromJson', () => {
@@ -23,7 +23,7 @@ describe('#qrDataFromJson', () => {
     })
 
   it('should parse valid address', () =>
-    validParse(validBaseData, validUserData, validLocalPaymentData))
+    validParse(validAddressData, validUserData, validLocalPaymentData))
 
   it('should parse valid user data', () => validParse(validUserData))
 
@@ -43,4 +43,6 @@ describe('#qrDataFromJson', () => {
       obj: { address: zeroAddress().slice(0, -1) },
       s: 'is not a valid address',
     }))
+
+  // TODO(yorke): add tests for invalid local payment or user data
 })

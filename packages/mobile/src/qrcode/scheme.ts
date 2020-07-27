@@ -2,28 +2,14 @@ import { AddressType, E164PhoneNumberType } from '@celo/utils/lib/io'
 import * as t from 'io-ts'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 
-export const BaseQrDataType = t.type({
+export const QrDataType = t.type({
   address: AddressType,
+  // io-ts way of defining optional key-value pair
+  displayName: t.union([t.undefined, t.string]),
+  e164PhoneNumber: t.union([t.undefined, E164PhoneNumberType]),
+  currencyCode: t.union([t.undefined, t.keyof(LocalCurrencyCode)]),
+  // TODO: amount string is valid BigNumber
+  amount: t.union([t.undefined, t.string]),
 })
-export type BaseQrData = t.TypeOf<typeof BaseQrDataType>
 
-export const UserQrDataType = t.intersection([
-  BaseQrDataType,
-  t.type({
-    displayName: t.string,
-    e164PhoneNumber: E164PhoneNumberType,
-  }),
-])
-export type UserQrData = t.TypeOf<typeof UserQrDataType>
-
-export const LocalPaymentQrDataType = t.intersection([
-  BaseQrDataType,
-  t.type({
-    currencyCode: t.keyof(LocalCurrencyCode),
-    amount: t.number,
-  }),
-])
-export type LocalPaymentQrData = t.TypeOf<typeof LocalPaymentQrDataType>
-
-const TopQrDataType = t.union([BaseQrDataType, UserQrDataType, LocalPaymentQrDataType])
-export const qrDataFromJson = (obj: object) => TopQrDataType.decode(obj)
+export const qrDataFromJson = (obj: object) => QrDataType.decode(obj)

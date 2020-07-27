@@ -1,5 +1,5 @@
-import { isValidAddress } from '@celo/utils/src/address'
-import { isEmpty } from 'lodash'
+import { isLeft } from 'fp-ts/lib/Either'
+import { PathReporter } from 'io-ts/lib/PathReporter'
 import * as RNFS from 'react-native-fs'
 import Share from 'react-native-share'
 import { call, put } from 'redux-saga/effects'
@@ -11,13 +11,14 @@ import { validateRecipientAddressSuccess } from 'src/identity/actions'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import { replace } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { qrDataFromJson } from 'src/qrcode/scheme'
 import {
   getRecipientFromAddress,
   NumberToRecipient,
-  Recipient,
   RecipientKind,
+  RecipientWithQrCode,
 } from 'src/recipients/recipient'
-import { QrCode, storeLatestInRecents, SVG } from 'src/send/actions'
+import { QrCode, SVG } from 'src/send/actions'
 import { TransactionDataInput } from 'src/send/SendAmount'
 import Logger from 'src/utils/Logger'
 
@@ -54,7 +55,7 @@ export async function shareSVGImage(svg: SVG) {
 }
 
 function* handleSecureSend(
-  data: { address: string; e164PhoneNumber: string; displayName: string },
+  address: string,
   e164NumberToAddress: E164NumberToAddressType,
   secureSendTxData: TransactionDataInput,
   requesterAddress?: string
@@ -63,7 +64,7 @@ function* handleSecureSend(
     throw Error(`Invalid recipient type for Secure Send: ${secureSendTxData.recipient.kind}`)
   }
 
-  const userScannedAddress = data.address.toLowerCase()
+  const userScannedAddress = address.toLowerCase()
   const { e164PhoneNumber } = secureSendTxData.recipient
   const possibleReceivingAddresses = e164NumberToAddress[e164PhoneNumber]
   // This should never happen. Secure Send is triggered when there are
@@ -77,8 +78,8 @@ function* handleSecureSend(
   if (requesterAddress && !possibleReceivingAddresses.includes(requesterAddress)) {
     possibleReceivingAddresses.push(requesterAddress)
   }
-  const possibleReceivingAddressesFormatted = possibleReceivingAddresses.map((address) =>
-    address.toLowerCase()
+  const possibleReceivingAddressesFormatted = possibleReceivingAddresses.map((addr) =>
+    addr.toLowerCase()
   )
   if (!possibleReceivingAddressesFormatted.includes(userScannedAddress)) {
     const error = ErrorMessages.QR_FAILED_INVALID_RECIPIENT
@@ -104,26 +105,25 @@ export function* handleBarcode(
   isOutgoingPaymentRequest?: true,
   requesterAddress?: string
 ) {
-  let data: { address: string; e164PhoneNumber: string; displayName: string } | undefined
-
+  let data: object
   try {
     data = JSON.parse(barcode.data)
   } catch (e) {
     Logger.warn(TAG, 'QR code read failed with ' + e)
-  }
-  if (typeof data !== 'object' || isEmpty(data.address)) {
-    yield put(showMessage(ErrorMessages.QR_FAILED_NO_ADDRESS))
     return
   }
-  if (!isValidAddress(data.address)) {
-    yield put(showMessage(ErrorMessages.QR_FAILED_INVALID_ADDRESS))
+
+  const either = qrDataFromJson(data)
+  if (isLeft(either)) {
+    yield put(showMessage(PathReporter.report(either)[0]))
     return
   }
+  const parsed = either.right
 
   if (secureSendTxData) {
     const success = yield call(
       handleSecureSend,
-      data,
+      parsed.address,
       e164NumberToAddress,
       secureSendTxData,
       requesterAddress
@@ -133,43 +133,40 @@ export function* handleBarcode(
     }
   }
 
-  if (typeof data.e164PhoneNumber !== 'string') {
-    // Default for invalid e164PhoneNumber
-    data.e164PhoneNumber = ''
+  const cachedRecipient = getRecipientFromAddress(
+    parsed.address,
+    addressToE164Number,
+    recipientCache
+  )
+  const recipient: RecipientWithQrCode = {
+    kind: RecipientKind.QrCode,
+    address: parsed.address,
+    displayId: parsed.e164PhoneNumber,
+    displayName: parsed.displayName || 'QR Code',
+    phoneNumberLabel: cachedRecipient?.phoneNumberLabel,
+    thumbnailPath: cachedRecipient?.thumbnailPath,
+    contactId: cachedRecipient?.contactId,
   }
-  if (typeof data.displayName !== 'string') {
-    // Default for invalid displayName
-    data.displayName = ''
-  }
-  const cachedRecipient = getRecipientFromAddress(data.address, addressToE164Number, recipientCache)
 
-  const recipient: Recipient = cachedRecipient
-    ? {
-        ...data,
-        kind: RecipientKind.QrCode,
-        displayId: data.e164PhoneNumber,
-        phoneNumberLabel: 'QR Code',
-        thumbnailPath: cachedRecipient.thumbnailPath,
-        contactId: cachedRecipient.contactId,
-      }
-    : {
-        ...data,
-        kind: RecipientKind.QrCode,
-        displayId: data.e164PhoneNumber,
-      }
-  yield put(storeLatestInRecents(recipient))
-
-  if (secureSendTxData && isOutgoingPaymentRequest) {
-    replace(Screens.PaymentRequestConfirmation, {
-      transactionData: secureSendTxData,
-      addressJustValidated: true,
-    })
-  } else if (secureSendTxData) {
-    replace(Screens.SendConfirmation, {
-      transactionData: secureSendTxData,
-      addressJustValidated: true,
-    })
+  if (secureSendTxData) {
+    if (isOutgoingPaymentRequest) {
+      replace(Screens.PaymentRequestConfirmation, {
+        transactionData: secureSendTxData,
+        addressJustValidated: true,
+      })
+    } else {
+      replace(Screens.SendConfirmation, {
+        transactionData: secureSendTxData,
+        addressJustValidated: true,
+      })
+    }
   } else {
-    replace(Screens.SendAmount, { recipient, isFromScan: true, isOutgoingPaymentRequest })
+    replace(Screens.SendAmount, {
+      recipient,
+      isFromScan: true,
+      isOutgoingPaymentRequest,
+      currencyCode: parsed.currencyCode,
+      amount: parsed.amount,
+    })
   }
 }

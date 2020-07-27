@@ -51,6 +51,8 @@ import { getFeeType, isPaymentLimitReached, showLimitReachedError } from 'src/se
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
+import { selectPreferredCurrency } from 'src/localCurrency/actions'
+import { LocalCurrencyCode } from 'src/localCurrency/consts'
 
 export interface TransactionDataInput {
   recipient: Recipient
@@ -88,11 +90,19 @@ export const sendAmountScreenNavOptions = ({
 function SendAmount(props: Props) {
   const dispatch = useDispatch()
 
-  const { isOutgoingPaymentRequest, recipient } = props.route.params
+  const {
+    isOutgoingPaymentRequest,
+    recipient,
+    currencyCode: qrCurrencyCode,
+    amount: qrAmount,
+  } = props.route.params
 
   React.useEffect(() => {
     dispatch(fetchDollarBalance())
     if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
+      if (qrCurrencyCode) {
+        dispatch(selectPreferredCurrency(LocalCurrencyCode[qrCurrencyCode]))
+      }
       return
     }
 
@@ -105,7 +115,7 @@ function SendAmount(props: Props) {
 
   const { t } = useTranslation(Namespaces.sendFlow7)
 
-  const [amount, setAmount] = React.useState('')
+  const [amount, setAmount] = React.useState(qrAmount || '')
 
   const localCurrencyCode = useSelector(getLocalCurrencyCode)
   const localCurrencyExchangeRate = useSelector(getLocalCurrencyExchangeRate)
