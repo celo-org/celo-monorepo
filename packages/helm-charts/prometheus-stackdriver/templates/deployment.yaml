@@ -18,18 +18,19 @@ metadata:
   name: prometheus
   namespace: {{ .Values.namespace }}
   labels:
-    name: prometheus
-    chart: prometheus-stackdriver
-    release: prometheus-stackdriver
-    heritage: prometheus-stackdriver
-    component: prometheus-stackdriver
+{{ include "prometheus-stackdriver.labels" .  | indent 4 }}
 spec:
   replicas: 1
   template:
     metadata:
       labels:
+{{ include "prometheus-stackdriver.labels" .  | indent 8 }}
         app: prometheus-server
     spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       containers:
         - name: prometheus
           image: prom/prometheus:{{ .Values.prometheus.imageTag }}
@@ -77,7 +78,8 @@ spec:
             defaultMode: 420
             name: prometheus-server-conf
         - name: prometheus-storage-volume
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: prometheus
 {{- if not (kindIs "invalid" .Values.gcloudServiceAccountKeyBase64) }}
         - name: prometheus-service-account-key
           secret:

@@ -68,6 +68,8 @@ async function helmParameters(clusterConfig?: AzureClusterConfig) {
     `--set sidecar.imageTag=${sidecarImageTag}`,
     `--set prometheus.imageTag=${prometheusImageTag}`,
     `--set stackdriver_metrics_prefix=${prometheusImageTag}`,
+    `--set storageClassName=standard`,
+    `--set storageSize=50Gi`,
     // Stackdriver allows a maximum of 10 custom labels. kube-state-metrics
     // has some metrics of the form "kube_.+_labels" that provides the labels
     // of k8s resources as metric labels. If some k8s resources have too many labels,
