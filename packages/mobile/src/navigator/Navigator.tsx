@@ -345,14 +345,6 @@ const exchangeScreens = (Navigator: typeof Stack) => (
 const backupScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen
-      name={Screens.AccountKeyEducation}
-      component={AccountKeyEducation}
-      options={{
-        ...noHeader,
-        ...TransitionPresets.ModalTransition,
-      }}
-    />
-    <Navigator.Screen
       name={Screens.BackupPhrase}
       component={BackupPhrase}
       options={navOptionsForBackupPhrase}
@@ -419,14 +411,6 @@ const generalScreens = (Navigator: typeof Stack) => (
       name={Screens.TransactionReview}
       component={TransactionReview}
       options={transactionReviewOptions}
-    />
-    <Navigator.Screen
-      name={Screens.GoldEducation}
-      component={GoldEducation}
-      options={{
-        ...noHeader,
-        ...TransitionPresets.ModalTransition,
-      }}
     />
   </>
 )
@@ -554,6 +538,22 @@ const animatedScreens = (Navigator: typeof Stack) => (
       component={RegulatoryTerms}
       options={{
         ...nuxNavigationOptions,
+        ...TransitionPresets.ModalTransition,
+      }}
+    />
+    <Navigator.Screen
+      name={Screens.GoldEducation}
+      component={GoldEducation}
+      options={{
+        ...noHeader,
+        ...TransitionPresets.ModalTransition,
+      }}
+    />
+    <Navigator.Screen
+      name={Screens.AccountKeyEducation}
+      component={AccountKeyEducation}
+      options={{
+        ...noHeader,
         ...TransitionPresets.ModalTransition,
       }}
     />
