@@ -89,6 +89,8 @@ export enum OnboardingEvents {
   escrow_redeem_start = 'escrow_redeem_start', // when escrow redemption starts (only happens on user invite redeemption)
   escrow_redeem_complete = 'escrow_redeem_complete',
   escrow_redeem_error = 'escrow_redeem_error',
+
+  account_dek_set = 'account_dek_set',
 }
 
 export enum VerificationEvents {
@@ -118,7 +120,6 @@ export enum VerificationEvents {
   verification_code_received = 'verification_code_received',
   verification_code_validate_start = 'verification_code_validate_start',
   verification_code_validate_complete = 'verification_code_validate_complete',
-  verification_account_set = 'verification_account_set',
 
   verification_reveal_all_attestations_start = 'verification_reveal_all_attestations_start',
   verification_reveal_all_attestations_complete = 'verification_reveal_all_attestations_complete',

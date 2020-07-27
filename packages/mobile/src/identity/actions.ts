@@ -22,17 +22,19 @@ export enum Actions {
   UPDATE_E164_PHONE_NUMBER_ADDRESSES = 'IDENTITY/UPDATE_E164_PHONE_NUMBER_ADDRESSES',
   UPDATE_E164_PHONE_NUMBER_SALT = 'IDENTITY/UPDATE_E164_PHONE_NUMBER_SALT',
   FETCH_ADDRESSES_AND_VALIDATION_STATUS = 'IDENTITY/FETCH_ADDRESSES_AND_VALIDATION_STATUS',
+  END_FETCHING_ADDRESSES = 'IDENTITY/END_FETCHING_ADDRESSES',
   IMPORT_CONTACTS = 'IDENTITY/IMPORT_CONTACTS',
   UPDATE_IMPORT_CONTACT_PROGRESS = 'IDENTITY/UPDATE_IMPORT_CONTACT_PROGRESS',
   CANCEL_IMPORT_CONTACTS = 'IDENTITY/CANCEL_IMPORT_CONTACTS',
   END_IMPORT_CONTACTS = 'IDENTITY/END_IMPORT_CONTACTS',
   DENY_IMPORT_CONTACTS = 'IDENTITY/DENY_IMPORT_CONTACTS',
   ADD_CONTACT_MATCHES = 'IDENTITY/ADD_CONTACT_MATCHES',
-  VALIDATE_RECIPIENT_ADDRESS = 'SEND/VALIDATE_RECIPIENT_ADDRESS',
-  VALIDATE_RECIPIENT_ADDRESS_SUCCESS = 'SEND/VALIDATE_RECIPIENT_ADDRESS_SUCCESS',
-  VALIDATE_RECIPIENT_ADDRESS_RESET = 'SEND/VALIDATE_RECIPIENT_ADDRESS_RESET',
-  REQUIRE_SECURE_SEND = 'SEND/REQUIRE_SECURE_SEND',
-  END_FETCHING_ADDRESSES = 'END_FETCHING_ADDRESSES',
+  VALIDATE_RECIPIENT_ADDRESS = 'IDENTITY/VALIDATE_RECIPIENT_ADDRESS',
+  VALIDATE_RECIPIENT_ADDRESS_SUCCESS = 'IDENTITY/VALIDATE_RECIPIENT_ADDRESS_SUCCESS',
+  VALIDATE_RECIPIENT_ADDRESS_RESET = 'IDENTITY/VALIDATE_RECIPIENT_ADDRESS_RESET',
+  REQUIRE_SECURE_SEND = 'IDENTITY/REQUIRE_SECURE_SEND',
+  FETCH_DATA_ENCRYPTION_KEY = 'IDENTITY/FETCH_DATA_ENCRYPTION_KEY',
+  UPDATE_ADDRESS_DEK_MAP = 'IDENTITY/UPDATE_ADDRESS_DEK_MAP',
 }
 
 export interface StartVerificationAction {
@@ -94,6 +96,11 @@ export interface FetchAddressesAndValidateAction {
   requesterAddress?: string
 }
 
+export interface EndFetchingAddressesAction {
+  type: Actions.END_FETCHING_ADDRESSES
+  e164Number: string
+}
+
 export interface ImportContactsAction {
   type: Actions.IMPORT_CONTACTS
   doMatchmaking: boolean
@@ -149,9 +156,15 @@ export interface RequireSecureSendAction {
   addressValidationType: AddressValidationType
 }
 
-export interface EndFetchingAddressesAction {
-  type: Actions.END_FETCHING_ADDRESSES
-  e164Number: string
+export interface FetchDataEncryptionKeyAction {
+  type: Actions.FETCH_DATA_ENCRYPTION_KEY
+  address: string
+}
+
+export interface UpdateAddressDekMapAction {
+  type: Actions.UPDATE_ADDRESS_DEK_MAP
+  address: string
+  dataEncryptionKey: string | null
 }
 
 export type ActionTypes =
@@ -176,6 +189,8 @@ export type ActionTypes =
   | RequireSecureSendAction
   | FetchAddressesAndValidateAction
   | EndFetchingAddressesAction
+  | FetchDataEncryptionKeyAction
+  | UpdateAddressDekMapAction
 
 export const startVerification = (): StartVerificationAction => ({
   type: Actions.START_VERIFICATION,
@@ -231,6 +246,11 @@ export const fetchAddressesAndValidate = (
   type: Actions.FETCH_ADDRESSES_AND_VALIDATION_STATUS,
   e164Number,
   requesterAddress,
+})
+
+export const endFetchingAddresses = (e164Number: string): EndFetchingAddressesAction => ({
+  type: Actions.END_FETCHING_ADDRESSES,
+  e164Number,
 })
 
 export const updateE164PhoneNumberAddresses = (
@@ -321,7 +341,16 @@ export const requireSecureSend = (
   addressValidationType,
 })
 
-export const endFetchingAddresses = (e164Number: string): EndFetchingAddressesAction => ({
-  type: Actions.END_FETCHING_ADDRESSES,
-  e164Number,
+export const fetchDataEncryptionKey = (address: string): FetchDataEncryptionKeyAction => ({
+  type: Actions.FETCH_DATA_ENCRYPTION_KEY,
+  address,
+})
+
+export const updateAddressDekMap = (
+  address: string,
+  dataEncryptionKey: string | null
+): UpdateAddressDekMapAction => ({
+  type: Actions.UPDATE_ADDRESS_DEK_MAP,
+  address,
+  dataEncryptionKey,
 })

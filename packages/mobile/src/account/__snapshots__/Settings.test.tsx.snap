@@ -4,7 +4,6 @@ exports[`Account renders correctly 1`] = `
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
@@ -1228,7 +1227,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
