@@ -6,7 +6,7 @@
 * @asaj @cmcewen @timmoreton
 
 # directory and file-level owners. Feel free to add to this!
-/packages/attestation-proxy/ 
+/packages/attestation-proxy/ @jmrossy 
 /packages/attestation-service/ @nambrot
 /packages/azure/ @codyborn
 /packages/blockchain-api/ @jmrossy @cmcewen
@@ -31,9 +31,6 @@
 /packages/transaction-metrics-exporter/ 
 /packages/typescript/ @cmcewen
 /packages/utils/ @jmrossy
-/packages/verification-pool-api/
-/packages/verifier/
-/packages/walletkit/
 /packages/web/validator-badges @cla-bel @bohan-zhang @pranaymohan
 /packages/web/openpgpkey @nategraf
 /packages/web/ @aaronmgdr
