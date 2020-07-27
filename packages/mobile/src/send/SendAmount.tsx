@@ -30,6 +30,8 @@ import {
 } from 'src/identity/reducer'
 import { getAddressValidationType } from 'src/identity/secureSend'
 import { RecipientVerificationStatus } from 'src/identity/types'
+import { selectPreferredCurrency } from 'src/localCurrency/actions'
+import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import {
   convertDollarsToLocalAmount,
   convertDollarsToMaxSupportedPrecision,
@@ -51,8 +53,6 @@ import { getFeeType, isPaymentLimitReached, showLimitReachedError } from 'src/se
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
-import { selectPreferredCurrency } from 'src/localCurrency/actions'
-import { LocalCurrencyCode } from 'src/localCurrency/consts'
 
 export interface TransactionDataInput {
   recipient: Recipient
