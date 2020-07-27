@@ -11,5 +11,6 @@ export const QrDataType = t.type({
   // TODO: amount string is valid BigNumber
   amount: t.union([t.undefined, t.string]),
 })
+export type QrData = t.TypeOf<typeof QrDataType>
 
 export const qrDataFromJson = (obj: object) => QrDataType.decode(obj)
