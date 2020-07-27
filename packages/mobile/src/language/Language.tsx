@@ -1,5 +1,4 @@
 import SelectionOption from '@celo/react-components/components/SelectionOption'
-import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { StackScreenProps } from '@react-navigation/stack'
 import React from 'react'
@@ -63,7 +62,7 @@ function LanguageScreen({ route }: Props) {
 
   return (
     <ScrollView style={styles.container}>
-      <SafeAreaView>
+      <SafeAreaView edges={['bottom']}>
         <Text style={styles.title} testID={'ChooseLanguageTitle'}>
           {t('selectLanguage')}
         </Text>
@@ -85,7 +84,6 @@ LanguageScreen.navigationOptions = ({ navigation }: ScreenProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light,
   },
   title: {
     ...fontStyles.h2,

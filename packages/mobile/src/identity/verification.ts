@@ -1,15 +1,12 @@
 import { CeloTransactionObject } from '@celo/contractkit'
-import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import {
   ActionableAttestation,
   AttesationServiceRevealRequest,
   AttestationsWrapper,
   UnselectedRequest,
 } from '@celo/contractkit/lib/wrappers/Attestations'
-import { eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import { retryAsync } from '@celo/utils/src/async'
 import { AttestationsStatus, extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
-import { compressedPubKey } from '@celo/utils/src/commentEncryption'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import functions from '@react-native-firebase/functions'
 import BigNumber from 'bignumber.js'
@@ -42,8 +39,8 @@ import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
+import { registerAccountDek } from 'src/web3/dataEncryptionKey'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
-import { privateCommentKeySelector } from 'src/web3/selectors'
 
 const TAG = 'identity/verification'
 
@@ -122,18 +119,11 @@ export function* doVerificationFlow() {
       address: account,
     })
 
-    const privDataKey = yield select(privateCommentKeySelector)
-    const dataKey = compressedPubKey(hexToBuffer(privDataKey))
-
     const contractKit = yield call(getContractKit)
 
     const attestationsWrapper: AttestationsWrapper = yield call([
       contractKit.contracts,
       contractKit.contracts.getAttestations,
-    ])
-    const accountsWrapper: AccountsWrapper = yield call([
-      contractKit.contracts,
-      contractKit.contracts.getAccounts,
     ])
 
     ValoraAnalytics.track(VerificationEvents.verification_fetch_status_start)
@@ -200,8 +190,6 @@ export function* doVerificationFlow() {
       yield put(setVerificationStatus(VerificationStatus.RevealingNumber))
       ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_start)
       yield all([
-        // Set acccount and data encryption key in contract
-        call(setAccount, accountsWrapper, account, dataKey),
         // Request codes for the attestations needed
         call(
           revealNeededAttestations,
@@ -210,6 +198,9 @@ export function* doVerificationFlow() {
           phoneHashDetails,
           attestations
         ),
+        // Set acccount and data encryption key in Accounts contract
+        // This is done in other places too, intentionally keeping it for more coverage
+        call(registerAccountDek, account),
       ])
       ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_complete)
 
@@ -224,8 +215,12 @@ export function* doVerificationFlow() {
     return true
   } catch (error) {
     Logger.error(TAG, 'Error occured during verification flow', error)
-    yield put(setVerificationStatus(VerificationStatus.Failed))
-    yield put(showErrorOrFallback(error, ErrorMessages.VERIFICATION_FAILURE))
+    if (error.message === ErrorMessages.SALT_QUOTA_EXCEEDED) {
+      yield put(setVerificationStatus(VerificationStatus.SaltQuotaExceeded))
+    } else {
+      yield put(setVerificationStatus(VerificationStatus.Failed))
+      yield put(showErrorOrFallback(error, ErrorMessages.VERIFICATION_FAILURE))
+    }
     return error.message
   }
 }
@@ -237,7 +232,7 @@ export function* balanceSufficientForAttestations(attestationsRemaining: number)
   )
 }
 
-// Requests if necessary additional attestations and returns all revealable attestationsq
+// Requests if necessary additional attestations and returns all revealable attestations
 export function* requestAndRetrieveAttestations(
   attestationsWrapper: AttestationsWrapper,
   phoneHash: string,
@@ -333,8 +328,20 @@ function* requestAttestations(
     phoneHash,
     account
   )
+  let isUnselectedRequestValid = unselectedRequest.blockNumber !== 0
+  if (isUnselectedRequestValid) {
+    isUnselectedRequestValid = !(yield call(
+      [attestationsWrapper, attestationsWrapper.isAttestationExpired],
+      unselectedRequest.blockNumber
+    ))
+  }
 
-  if (unselectedRequest.blockNumber === 0) {
+  if (isUnselectedRequestValid) {
+    Logger.debug(
+      `${TAG}@requestAttestations`,
+      `Valid unselected request found, skipping approval/request`
+    )
+  } else {
     Logger.debug(
       `${TAG}@requestAttestations`,
       `Approving ${numAttestationsRequestsNeeded} new attestations`
@@ -360,11 +367,6 @@ function* requestAttestations(
 
     yield call(sendTransaction, requestTx.txo, account, TAG, 'Request Attestations')
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_request_tx_sent)
-  } else {
-    Logger.debug(
-      `${TAG}@requestAttestations`,
-      `Unselected request found, skipping approval/request`
-    )
   }
 
   Logger.debug(`${TAG}@requestAttestations`, 'Waiting for block to select issuer')
@@ -560,6 +562,11 @@ function* tryRevealPhoneNumber(
       return
     }
 
+    if (body.error && body.error.includes('Attestation already sent')) {
+      Logger.warn(TAG + '@tryRevealPhoneNumber', `Ignore already sent SMS for issuer: ${issuer}`)
+      return
+    }
+
     if (body.error && body.error.includes('No incomplete attestation found')) {
       // Retry as attestation service might not yet have received the block where it was made responsible for an attestation
       Logger.debug(TAG + '@tryRevealPhoneNumber', `Retrying revealing for issuer: ${issuer}`)
@@ -667,31 +674,4 @@ function* waitForAttestationCode(issuer: string) {
       return action.code
     }
   }
-}
-
-function* setAccount(accountsWrapper: AccountsWrapper, address: string, dataKey: string) {
-  Logger.debug(TAG, 'Setting wallet address and public data encryption key')
-  const upToDate: boolean = yield call(isAccountUpToDate, accountsWrapper, address, dataKey)
-  if (upToDate) {
-    return
-  }
-  const setAccountTx = accountsWrapper.setAccount('', dataKey, address)
-  yield call(sendTransaction, setAccountTx.txo, address, TAG, 'Set Wallet Address & DEK')
-  ValoraAnalytics.setUserAddress(address)
-  ValoraAnalytics.track(VerificationEvents.verification_account_set)
-}
-
-async function isAccountUpToDate(
-  accountsWrapper: AccountsWrapper,
-  address: string,
-  dataKey: string
-) {
-  const [currentWalletAddress, currentDEK] = await Promise.all([
-    accountsWrapper.getWalletAddress(address),
-    // getDataEncryptionKey actually returns a string instead of an array
-    accountsWrapper.getDataEncryptionKey(address).then((key) => [key]),
-  ])
-  return (
-    eqAddress(currentWalletAddress, address) && currentDEK && eqAddress(currentDEK.join(), dataKey)
-  )
 }

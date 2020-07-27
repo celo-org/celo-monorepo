@@ -29,6 +29,11 @@ export interface HandleBarcodeDetectedAction {
   requesterAddress?: string
 }
 
+export interface ShareQRCodeAction {
+  type: Actions.QRCODE_SHARE
+  qrCodeSvg: SVG
+}
+
 export interface StoreLatestInRecentsAction {
   type: Actions.STORE_LATEST_IN_RECENTS
   recipient: Recipient
@@ -55,6 +60,7 @@ export interface SendPaymentOrInviteFailureAction {
 
 export type ActionTypes =
   | HandleBarcodeDetectedAction
+  | ShareQRCodeAction
   | StoreLatestInRecentsAction
   | SendPaymentOrInviteAction
   | SendPaymentOrInviteSuccessAction
@@ -80,7 +86,7 @@ export const handleBarcodeDetected = (
   requesterAddress,
 })
 
-export const shareQRCode = (qrCodeSvg: SVG) => ({
+export const shareQRCode = (qrCodeSvg: SVG): ShareQRCodeAction => ({
   type: Actions.QRCODE_SHARE,
   qrCodeSvg,
 })

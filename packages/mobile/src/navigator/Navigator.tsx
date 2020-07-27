@@ -31,7 +31,6 @@ import EscrowedPaymentListScreen from 'src/escrow/EscrowedPaymentListScreen'
 import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmationScreen'
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
-import FeeExchangeEducation from 'src/exchange/FeeExchangeEducation'
 import FiatExchangeAmount, {
   fiatExchangesAmountScreenOptions,
 } from 'src/fiatExchanges/FiatExchangeAmount'
@@ -82,7 +81,6 @@ import PincodeEnter from 'src/pincode/PincodeEnter'
 import PincodeSet from 'src/pincode/PincodeSet'
 import { RootState } from 'src/redux/reducers'
 import { store } from 'src/redux/store'
-import FeeEducation from 'src/send/FeeEducation'
 import Send, { sendScreenNavOptions } from 'src/send/Send'
 import SendAmount, { sendAmountScreenNavOptions } from 'src/send/SendAmount'
 import SendConfirmation, { sendConfirmationScreenNavOptions } from 'src/send/SendConfirmation'
@@ -98,7 +96,6 @@ import { getDatetimeDisplayString } from 'src/utils/time'
 import { ExtractProps } from 'src/utils/typescript'
 import VerificationEducationScreen from 'src/verify/VerificationEducationScreen'
 import VerificationInputScreen from 'src/verify/VerificationInputScreen'
-import VerificationInterstitialScreen from 'src/verify/VerificationInterstitialScreen'
 import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
 
 const Stack = createStackNavigator<StackParamList>()
@@ -119,9 +116,21 @@ const commonScreens = (Navigator: typeof Stack) => {
       />
       <Navigator.Screen name={Screens.ErrorScreen} component={ErrorScreen} options={noHeader} />
       <Navigator.Screen name={Screens.UpgradeScreen} component={UpgradeScreen} />
-      <Navigator.Screen name={Screens.DappKitAccountAuth} component={DappKitAccountScreen} />
-      <Navigator.Screen name={Screens.DappKitSignTxScreen} component={DappKitSignTxScreen} />
-      <Navigator.Screen name={Screens.DappKitTxDataScreen} component={DappKitTxDataScreen} />
+      <Navigator.Screen
+        name={Screens.DappKitAccountAuth}
+        component={DappKitAccountScreen}
+        options={DappKitAccountScreen.navigationOptions}
+      />
+      <Navigator.Screen
+        name={Screens.DappKitSignTxScreen}
+        component={DappKitSignTxScreen}
+        options={DappKitSignTxScreen.navigationOptions}
+      />
+      <Navigator.Screen
+        name={Screens.DappKitTxDataScreen}
+        component={DappKitTxDataScreen}
+        options={DappKitTxDataScreen.navigationOptions}
+      />
       <Navigator.Screen name={Screens.Debug} component={Debug} options={Debug.navigationOptions} />
       <Navigator.Screen
         name={Screens.PhoneNumberLookupQuota}
@@ -144,11 +153,6 @@ const verificationScreens = (Navigator: typeof Stack) => {
         name={Screens.VerificationLoadingScreen}
         component={VerificationLoadingScreen}
         options={VerificationLoadingScreen.navigationOptions}
-      />
-      <Navigator.Screen
-        name={Screens.VerificationInterstitialScreen}
-        component={VerificationInterstitialScreen}
-        options={VerificationInterstitialScreen.navigationOptions}
       />
       <Navigator.Screen
         name={Screens.VerificationInputScreen}
@@ -352,7 +356,6 @@ const exchangeScreens = (Navigator: typeof Stack) => (
       component={ExchangeReview}
       options={exchangeReviewScreenOptions}
     />
-    <Navigator.Screen name={Screens.FeeExchangeEducation} component={FeeExchangeEducation} />
   </>
 )
 
@@ -437,7 +440,6 @@ const generalScreens = (Navigator: typeof Stack) => (
       options={transactionReviewOptions}
     />
     <Navigator.Screen name={Screens.GoldEducation} component={GoldEducation} options={noHeader} />
-    <Navigator.Screen name={Screens.FeeEducation} component={FeeEducation} />
   </>
 )
 

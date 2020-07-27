@@ -5,7 +5,6 @@ exports[`FullscreenCTA renders correctly 1`] = `
   style={
     Object {
       "alignItems": "center",
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "height": 1292,
       "justifyContent": "space-between",
