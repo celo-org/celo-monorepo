@@ -82,7 +82,7 @@ LanguageScreen.navigationOptions = ({ navigation }: ScreenProps) => {
   return navigation.canGoBack()
     ? {
         ...headerWithBackButton,
-        ...TransitionPresets.ModalSlideFromBottomIOS,
+        ...TransitionPresets.ModalTransition,
       }
     : emptyHeader
 }

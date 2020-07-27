@@ -208,7 +208,7 @@ export default function DrawerNavigator() {
           options={{
             title: t('celoGold'),
             drawerIcon: Gold,
-            ...TransitionPresets.ModalSlideFromBottomIOS,
+            ...TransitionPresets.ModalTransition,
           }}
         />
       )}

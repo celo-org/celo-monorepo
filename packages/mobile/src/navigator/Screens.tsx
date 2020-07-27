@@ -33,6 +33,7 @@ export enum Screens {
   Language = 'Language',
   Licenses = 'Licenses',
   Main = 'Main',
+  Animated = 'Animated',
   OutgoingPaymentRequestListScreen = 'OutgoingPaymentRequestListScreen',
   PaymentRequestConfirmation = 'PaymentRequestConfirmation',
   PaymentRequestUnavailable = 'PaymentRequestUnavailable',

@@ -104,23 +104,6 @@ const RootStack = createStackNavigator<StackParamList>()
 const commonScreens = (Navigator: typeof Stack) => {
   return (
     <>
-      <Navigator.Screen
-        name={Screens.Language}
-        component={Language}
-        options={Language.navigationOptions}
-      />
-      <Navigator.Screen
-        name={Screens.PincodeEnter}
-        component={PincodeEnter}
-        options={{
-          ...noHeader,
-          cardStyleInterpolator: ({ current }) => ({
-            containerStyle: {
-              opacity: current.progress,
-            },
-          }),
-        }}
-      />
       <Navigator.Screen name={Screens.ErrorScreen} component={ErrorScreen} options={noHeader} />
       <Navigator.Screen name={Screens.UpgradeScreen} component={UpgradeScreen} />
       <Navigator.Screen
@@ -208,14 +191,6 @@ const nuxScreens = (Navigator: typeof Stack) => (
       }}
     />
     <Navigator.Screen
-      name={Screens.RegulatoryTerms}
-      component={RegulatoryTerms}
-      options={{
-        ...nuxNavigationOptions,
-        ...TransitionPresets.ModalSlideFromBottomIOS,
-      }}
-    />
-    <Navigator.Screen
       name={Screens.PincodeSet}
       component={PincodeSet}
       options={pincodeSetScreenOptions}
@@ -250,15 +225,6 @@ const nuxScreens = (Navigator: typeof Stack) => (
 
 const sendScreens = (Navigator: typeof Stack) => (
   <>
-    <Navigator.Screen name={Screens.Send} component={Send} options={sendScreenNavOptions} />
-    <Navigator.Screen
-      name={Screens.QRNavigator}
-      component={QRNavigator}
-      options={{
-        ...noHeader,
-        ...TransitionPresets.ModalSlideFromBottomIOS,
-      }}
-    />
     <Navigator.Screen
       name={Screens.SendAmount}
       component={SendAmount}
@@ -383,7 +349,7 @@ const backupScreens = (Navigator: typeof Stack) => (
       component={AccountKeyEducation}
       options={{
         ...noHeader,
-        ...TransitionPresets.ModalSlideFromBottomIOS,
+        ...TransitionPresets.ModalTransition,
       }}
     />
     <Navigator.Screen
@@ -409,11 +375,6 @@ const settingsScreens = (Navigator: typeof Stack) => (
       options={headerWithBackButton}
       name={Screens.InviteReview}
       component={InviteReview}
-    />
-    <Navigator.Screen
-      options={headerWithBackButton}
-      name={Screens.SelectLocalCurrency}
-      component={SelectLocalCurrency}
     />
     <Navigator.Screen options={headerWithBackButton} name={Screens.Licenses} component={Licenses} />
     <Navigator.Screen
@@ -464,7 +425,7 @@ const generalScreens = (Navigator: typeof Stack) => (
       component={GoldEducation}
       options={{
         ...noHeader,
-        ...TransitionPresets.ModalSlideFromBottomIOS,
+        ...TransitionPresets.ModalTransition,
       }}
     />
   </>
@@ -554,18 +515,65 @@ const modalScreenOptions: ScreenOptions = Platform.select({
   }),
 })
 
+const animatedScreens = (Navigator: typeof Stack) => (
+  <>
+    <Navigator.Screen name={Screens.Send} component={Send} options={sendScreenNavOptions} />
+    <Navigator.Screen
+      name={Screens.Language}
+      component={Language}
+      options={Language.navigationOptions}
+    />
+    <Navigator.Screen
+      options={headerWithBackButton}
+      name={Screens.SelectLocalCurrency}
+      component={SelectLocalCurrency}
+    />
+    <Navigator.Screen
+      name={Screens.PincodeEnter}
+      component={PincodeEnter}
+      options={{
+        ...headerWithBackButton,
+        gestureEnabled: false,
+        cardStyleInterpolator: ({ current }) => ({
+          containerStyle: {
+            opacity: current.progress,
+          },
+        }),
+      }}
+    />
+    <Navigator.Screen
+      name={Screens.QRNavigator}
+      component={QRNavigator}
+      options={{
+        ...noHeader,
+        ...TransitionPresets.ModalTransition,
+      }}
+    />
+    <Navigator.Screen
+      name={Screens.RegulatoryTerms}
+      component={RegulatoryTerms}
+      options={{
+        ...nuxNavigationOptions,
+        ...TransitionPresets.ModalTransition,
+      }}
+    />
+  </>
+)
+
 function RootStackScreen() {
   return (
-    <RootStack.Navigator mode="modal" screenOptions={modalScreenOptions}>
+    <RootStack.Navigator mode="modal">
       <RootStack.Screen
         name={Screens.Main}
         component={MainStackScreen}
-        options={{ headerShown: false }}
+        options={{ ...modalScreenOptions, headerShown: false }}
       />
+      {animatedScreens(RootStack)}
       <RootStack.Screen
         name={Screens.SelectCountry}
         component={SelectCountry}
         options={{
+          ...modalScreenOptions,
           ...headerWithCloseButton,
           headerTitle: i18n.t('onboarding:selectCountryCode'),
           headerTransparent: false,

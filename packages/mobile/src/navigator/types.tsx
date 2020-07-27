@@ -115,6 +115,7 @@ export type StackParamList = {
     | undefined
   [Screens.Licenses]: undefined
   [Screens.Main]: undefined
+  [Screens.Animated]: undefined
   [Screens.OutgoingPaymentRequestListScreen]: undefined
   [Screens.PaymentRequestUnavailable]: {
     transactionData: TransactionDataInput

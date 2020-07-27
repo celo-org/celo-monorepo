@@ -133,7 +133,7 @@ export const sendScreenNavOptions = ({
     ),
     headerRightContainerStyle: styles.headerRightContainer,
     headerTitle: title,
-    ...TransitionPresets.ModalSlideFromBottomIOS,
+    ...TransitionPresets.ModalTransition,
   }
 }
 
