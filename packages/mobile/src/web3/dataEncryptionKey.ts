@@ -119,7 +119,7 @@ export function* registerAccountDek(account: string) {
 
 // Check if account address and DEK match what's in
 // the Accounts contract
-async function isAccountUpToDate(
+export async function isAccountUpToDate(
   accountsWrapper: AccountsWrapper,
   address: string,
   dataKey: string

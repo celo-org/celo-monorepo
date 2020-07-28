@@ -1,8 +1,6 @@
 // Utilities for interacting with the Phone Number Privacy Service service (aka PGPNP)
 
-import { ec as EC } from 'elliptic'
 import { ContractKit } from '../../kit'
-const ec = new EC('secp256k1')
 const TAG = 'contractkit/utils/phone-number-lookup/phone-number-lookup'
 
 export interface WalletKeySigner {
@@ -12,7 +10,8 @@ export interface WalletKeySigner {
 
 export interface EncryptionKeySigner {
   authenticationMethod: AuthenticationMethod.ENCRYPTIONKEY
-  rawKey: Buffer
+  contractKit: ContractKit
+  rawKey: string
 }
 
 // Support signing with the DEK or with the
@@ -74,13 +73,11 @@ export async function postToPhoneNumPrivacyService<ResponseType>(
   // Sign payload using account privkey
   const bodyString = JSON.stringify(body)
 
-  let authHeader = ''
+  let account = body.account
   if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTIONKEY) {
-    const key = ec.keyFromPrivate(signer.rawKey)
-    authHeader = key.sign(bodyString).toDER()
-  } else {
-    authHeader = await signer.contractKit.web3.eth.sign(bodyString, body.account)
+    account = signer.rawKey
   }
+  const authHeader = await signer.contractKit.web3.eth.sign(bodyString, account)
 
   const { pgpnpUrl } = context
   const res = await fetch(pgpnpUrl + endpoint, {
