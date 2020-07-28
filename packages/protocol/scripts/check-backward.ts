@@ -1,4 +1,4 @@
-import { ASTContractVersionsReport } from '@celo/protocol/lib/compatibility/ast-version'
+import { ASTContractVersionsChecker } from '@celo/protocol/lib/compatibility/ast-version'
 import { DefaultCategorizer } from '@celo/protocol/lib/compatibility/categorizer'
 import { ASTBackwardReport, instantiateArtifacts } from '@celo/protocol/lib/compatibility/utils'
 import { writeJsonSync } from 'fs-extra'
@@ -78,15 +78,15 @@ try {
   } else if (argv._.includes(COMMAND_SEM_CHECK)) {
     const doVersionCheck = async () => {
       const excludeRegexp: RegExp = exclude ? new RegExp(exclude) : null
-      const versionReport = (
-        await ASTContractVersionsReport.create(
+      const versionChecker = (
+        await ASTContractVersionsChecker.create(
           instantiateArtifacts(oldArtifactsFolder),
           instantiateArtifacts(newArtifactsFolder),
           backward.report.versionDeltas()
         )
       ).excluding(excludeRegexp)
 
-      const mismatches = versionReport.mismatches()
+      const mismatches = versionChecker.mismatches()
       if (mismatches.isEmpty()) {
         out('Actual version numbers match expected\n')
         process.exit(0)

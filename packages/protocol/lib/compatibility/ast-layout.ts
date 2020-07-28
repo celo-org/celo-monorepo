@@ -212,8 +212,13 @@ export const reportLayoutIncompatibilities = (oldArtifacts: BuildArtifacts, newA
     if (oldArtifact !== undefined) {
       return generateCompatibilityReport(oldArtifact, oldArtifacts, newArtifact, newArtifacts)
     } else {
-      // Generate an empty report for new contracts.
-      return generateCompatibilityReport(newArtifact, newArtifacts, newArtifact, newArtifacts)
+      // Generate an empty report for new contracts, which are, by definition, backwards
+      // compatible.
+      return {
+        contract: newArtifact.contractName,
+        compatible: true,
+        errors: []
+      }
     }
   })
 }

@@ -1,12 +1,4 @@
 // tslint:disable: max-classes-per-file
-import { makeZContract } from '@celo/protocol/lib/compatibility/internal'
-import {
-  BuildArtifacts,
-  Contract as ZContract
-} from '@openzeppelin/upgrades'
-const VM = require('ethereumjs-vm').default
-const abi = require('ethereumjs-abi')
-
 export class ContractVersion {
 
   static isValid = (version: string): boolean => {
@@ -35,7 +27,11 @@ export class ContractVersion {
     )
   }
 
-  static fromBuffer = (version: Buffer): ContractVersion => {
+  /**
+   * @param version A 256 byte buffer containing the 32 byte storage, major, minor, and patch
+   * version numbers.
+   */
+  static fromGetVersionNumberReturnValue = (version: Buffer): ContractVersion => {
     if (version.length !== 4 * 32) {
       throw new Error(`Invalid version buffer: ${version}`)
     }
@@ -140,41 +136,24 @@ export interface ContractVersionIndex {
 }
 
 /**
- * A mapping {contract name => {@link ContractVersion}}.
+ * A version checker for a specific contract.
  */
-export class ContractVersions {
-  static fromArtifacts = async (artifacts: BuildArtifacts): Promise<ContractVersions>=> {
-    const contracts = {}
+export class ContractVersionChecker {
+  constructor(public readonly oldVersion: ContractVersion, public readonly newVersion: ContractVersion, public readonly expectedDelta: ContractVersionDelta) {}
 
-    await Promise.all(artifacts.listArtifacts().map(async (artifact) => {
-      contracts[artifact.contractName] = await getContractVersion(makeZContract(artifact))
-    }))
-    return new ContractVersions(contracts)
+  public expectedVersion = (): ContractVersion => {
+    return this.expectedDelta.appliedTo(this.oldVersion)
   }
 
-  constructor(public readonly contracts: ContractVersionIndex) {}
+  public matches = (): boolean => {
+    return this.newVersion.toString() === this.expectedVersion().toString()
+  }
 }
 
-async function getContractVersion(contract: ZContract): Promise<ContractVersion> {
-  const vm = new VM()
-  const bytecode = contract.schema.deployedBytecode
-  const data = '0x' + abi.methodID('getVersionNumber', []).toString('hex')
-  const nullAddress = '0000000000000000000000000000000000000000'
-  // Artificially link all libraries to the null address.
-  const linkedBytecode = bytecode.split(/[_]+[A-Za-z0-9]+[_]+/).join(nullAddress)
-  const result = await vm.runCall({
-    to: Buffer.from(nullAddress, 'hex'),
-    caller: Buffer.from(nullAddress, 'hex'),
-    code: Buffer.from(linkedBytecode.slice(2), 'hex'),
-    static: true,
-    data: Buffer.from(data.slice(2), 'hex')
-  })
-  if (result.execResult.exceptionError === undefined) {
-    const value = result.execResult.returnValue
-    if (value.length === 4 * 32) {
-      return ContractVersion.fromBuffer(value)
-    }
-  }
-  // If we can't fetch the version number, assume version 1.0.0.0.
-  return ContractVersion.fromString('1.0.0.0')
+/**
+ * A mapping {contract name => {@link ContractVersionChecker}}.
+ */
+export interface ContractVersionCheckerIndex {
+  [contract: string]: ContractVersionChecker
 }
+

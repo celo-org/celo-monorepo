@@ -33,6 +33,7 @@ enum StorageLocation {
 
 const CONTRACT_KIND_CONTRACT = 'contract'
 const OUT_VOID_PARAMETER_STRING = 'void'
+const CONTRACT_METADATA_REGEXP = /^(.*)a165627a7a72305820.*0029$/i
 
 // Exported classes
 
@@ -111,23 +112,20 @@ export class NewContractChange extends ContractChange {
  */
 abstract class ContractValueChange extends ContractChange {
   constructor(
-    contract: string, 
-    public readonly oldValue: string, 
+    contract: string,
+    public readonly oldValue: string,
     public readonly newValue: string) {
     super(contract)
   }
 }
 
 /**
- * The deployedBytecode field in the built json artifact has changed
- * from the old folder to the new one. This is, barring metadata
- * differences (e.ge source folder full path), due to an implementation
- * change.
+ * The deployedBytecode field in the built json artifact has changed, with
+ * the exception of metadata, from the old folder to the new one. This is
+ * due to an implementation change.
  *
  * To avoid false positives, compile both old and new folders in the same
  * full path.
- * 
- * This is currently not stripping any compiler metadata from the bytecode.
  */
 export class DeployedBytecodeChange extends ContractChange {
   type = "DeployedBytecode"
@@ -356,7 +354,7 @@ const getCheckableMethodsFromAST = (contract: ContractAST, id: string): any[] =>
 const stripMetadataIfPresent = (bytecode: string): string => {
   try {
     // TODO: use proper CBOR parser
-    const [, bytes] = bytecode.match(/^(.*)a165627a7a72305820.*0029$/i)
+    const [, bytes] = bytecode.match(CONTRACT_METADATA_REGEXP)
     return bytes
   } catch (e) {
     return bytecode
