@@ -1,4 +1,5 @@
 import fs from 'fs'
+import { scaleResource } from 'src/lib/kubernetes'
 import { execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback, isVmBased } from './env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from './helm_deploy'
@@ -167,4 +168,14 @@ export async function switchIngressService(celoEnv: string, ingressName: string)
   const command = `kubectl patch --namespace=${celoEnv} ing/${celoEnv}-blockscout-web-ingress --type=json\
    -p='[{"op": "replace", "path": "/spec/rules/0/http/paths/0/backend/serviceName", "value":"${ingressName}-web"}]'`
   await execCmdWithExitOnFailure(command)
+}
+
+export async function scaleDownBlockscout(celoEnv: string, releaseName: string) {
+  await scaleResource(celoEnv, `deployment`, `${releaseName}-web`, 0)
+  await scaleResource(celoEnv, `deployment`, `${releaseName}-indexer`, 0)
+}
+
+export async function scaleUpBlockscout(celoEnv: string, releaseName: string) {
+  await scaleResource(celoEnv, `deployment`, `${releaseName}-web`, parseInt(fetchEnv(envVar.BLOCKSCOUT_WEB_REPLICAS), 10))
+  await scaleResource(celoEnv, `deployment`, `${releaseName}-indexer`, 1)
 }
