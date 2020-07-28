@@ -42,10 +42,7 @@ describe('#version()', () => {
     describe('ContractVersion.fromGetVersionNumberReturnValue', () => {
       it('parses the buffer correctly', () => {
         const zeros = '0'.repeat(63)
-        const v = `${zeros}1${zeros}2${zeros}3${zeros}4`
-        console.log(v)
-        const buffer = Buffer.from(v, 'hex')
-        console.log(buffer.toString('hex'))
+        const buffer = Buffer.from(`${zeros}1${zeros}2${zeros}3${zeros}4`, 'hex')
         const version = ContractVersion.fromGetVersionNumberReturnValue(buffer)
         assert.equal(version.toString(), '1.2.3.4')
       })
