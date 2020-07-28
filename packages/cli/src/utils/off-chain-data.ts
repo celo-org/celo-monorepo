@@ -1,8 +1,9 @@
-import OffchainDataWrapper from '@celo/contractkit/lib/identity/offchain-data-wrapper'
+import OffchainDataWrapper from '@celo/contractkit/src/identity/offchain-data-wrapper'
 import {
   GitStorageWriter,
+  GoogleStorageWriter,
   LocalStorageWriter,
-} from '@celo/contractkit/lib/identity/offchain/storage-writers'
+} from '@celo/contractkit/src/identity/offchain/storage-writers'
 import { flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
 import { BaseCommand } from '../base'
@@ -20,9 +21,11 @@ export abstract class OffchainDataCommand extends BaseCommand {
       required: true,
       description: 'To which directory data should be written',
     }),
-    uploadWithGit: flags.boolean({
-      default: false,
-      description: 'If the CLI should attempt to push changes to the origin via git',
+    provider: flags.string({
+      description: `Which provider to use to store the data with`,
+    }),
+    bucketName: flags.string({
+      description: 'Name of the bucket to store data in',
     }),
   }
 
@@ -33,8 +36,11 @@ export abstract class OffchainDataCommand extends BaseCommand {
     const res: ParserOutput<any, any> = this.parse()
     this.offchainDataWrapper = new OffchainDataWrapper(res.flags.from, this.kit)
 
-    this.offchainDataWrapper.storageWriter = res.flags.uploadWithGit
-      ? new GitStorageWriter(res.flags.directory)
-      : new LocalStorageWriter(res.flags.directory)
+    this.offchainDataWrapper.storageWriter =
+      res.flags.provider === 'google' && res.flags.bucketName
+        ? new GoogleStorageWriter(res.flags.bucketName, res.flags.directory)
+        : res.flags.provider === 'git'
+        ? new GitStorageWriter(res.flags.directory)
+        : new LocalStorageWriter(res.flags.directory)
   }
 }

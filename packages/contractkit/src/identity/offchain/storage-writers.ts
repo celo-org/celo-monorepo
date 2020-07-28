@@ -1,3 +1,7 @@
+import {
+  Storage as GoogleStorage,
+  StorageOptions as GoogleStorageOptions,
+} from '@google-cloud/storage'
 import { execSync } from 'child_process'
 import { mkdirSync, writeFile } from 'fs'
 import { parse } from 'path'
@@ -38,5 +42,24 @@ export class GitStorageWriter extends LocalStorageWriter {
     execSync(`git commit --message "Upload ${dataPath}"`, { cwd: this.root })
     execSync(`git push origin master`, { cwd: this.root })
     return
+  }
+}
+
+export class GoogleStorageWriter extends LocalStorageWriter {
+  private client: GoogleStorage
+  private bucketName: string
+
+  constructor(bucketName: string, localPath: string, options?: GoogleStorageOptions) {
+    super(localPath)
+    this.bucketName = bucketName
+    this.client = new GoogleStorage(options)
+  }
+
+  async write(data: string, path: string): Promise<void> {
+    await this.writeToFs(data, path)
+    console.log('>>>', this.root, path)
+    await this.client.bucket(this.bucketName).upload(this.root + path, {
+      destination: path,
+    })
   }
 }
