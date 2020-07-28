@@ -5,7 +5,6 @@ exports[`ErrorScreen with errorMessage renders correctly 1`] = `
   style={
     Object {
       "alignItems": "center",
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "height": 1292,
       "justifyContent": "space-between",
@@ -169,7 +168,6 @@ exports[`ErrorScreen without errorMessage renders correctly 1`] = `
   style={
     Object {
       "alignItems": "center",
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "height": 1292,
       "justifyContent": "space-between",

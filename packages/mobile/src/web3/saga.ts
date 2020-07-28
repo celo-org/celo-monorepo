@@ -1,7 +1,6 @@
 import { RpcWallet, RpcWalletErrors } from '@celo/contractkit/lib/wallets/rpc-wallet'
 import { generateKeys, generateMnemonic, MnemonicStrength } from '@celo/utils/src/account'
 import { privateKeyToAddress } from '@celo/utils/src/address'
-import { deriveCEK } from '@celo/utils/src/commentEncryption'
 import * as bip39 from 'react-native-bip39'
 import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { setAccountCreationTime, setPromptForno } from 'src/account/actions'
@@ -26,13 +25,14 @@ import {
   Actions,
   completeWeb3Sync,
   setAccount,
+  SetAccountAction,
   setFornoMode,
   SetIsFornoAction,
-  setPrivateCommentKey,
   updateWeb3SyncProgress,
   Web3SyncProgress,
 } from 'src/web3/actions'
 import { destroyContractKit, getWallet, getWeb3, initContractKit } from 'src/web3/contracts'
+import { createAccountDek } from 'src/web3/dataEncryptionKey'
 import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
 import { getLatestBlock } from 'src/web3/utils'
 import { Block } from 'web3-eth'
@@ -164,13 +164,13 @@ export function* getOrCreateAccount() {
       throw new Error('Failed to generate mnemonic')
     }
 
-    const keys = yield call(generateKeys, mnemonic, undefined, undefined, bip39)
+    const keys = yield call(generateKeys, mnemonic, undefined, undefined, undefined, bip39)
     privateKey = keys.privateKey
     if (!privateKey) {
       throw new Error('Failed to convert mnemonic to hex')
     }
 
-    const accountAddress: string = yield call(assignAccountFromPrivateKey, privateKey)
+    const accountAddress: string = yield call(assignAccountFromPrivateKey, privateKey, mnemonic)
     if (!accountAddress) {
       throw new Error('Failed to assign account from private key')
     }
@@ -185,7 +185,7 @@ export function* getOrCreateAccount() {
   }
 }
 
-export function* assignAccountFromPrivateKey(privateKey: string) {
+export function* assignAccountFromPrivateKey(privateKey: string, mnemonic: string) {
   try {
     const account = privateKeyToAddress(privateKey)
     const wallet: RpcWallet = yield call(getWallet)
@@ -207,17 +207,13 @@ export function* assignAccountFromPrivateKey(privateKey: string) {
     Logger.debug(TAG + '@assignAccountFromPrivateKey', `Added to wallet: ${account}`)
     yield put(setAccount(account))
     yield put(setAccountCreationTime())
-    yield call(assignDataKeyFromPrivateKey, privateKey)
+    yield call(createAccountDek, mnemonic)
+    ValoraAnalytics.setUserAddress(account)
     return account
   } catch (e) {
     Logger.error(TAG + '@assignAccountFromPrivateKey', 'Error assigning account', e)
     throw e
   }
-}
-
-function* assignDataKeyFromPrivateKey(privateKey: string) {
-  const privateCEK = deriveCEK(privateKey).toString('hex')
-  yield put(setPrivateCommentKey(privateCEK))
 }
 
 // Wait for account to exist and then return it
@@ -228,7 +224,7 @@ export function* getAccount() {
       return account
     }
 
-    const action = yield take(Actions.SET_ACCOUNT)
+    const action: SetAccountAction = yield take(Actions.SET_ACCOUNT)
     if (action.address) {
       // account exists
       return action.address

@@ -161,7 +161,7 @@ npm install lerna
 # install dependencies and run post-install script
 yarn
 # build all packages
-yarn build
+yarn build --ignore docs
 ```
 
 > Note that if you do your checkouts with a different method, Yarn will fail if
@@ -172,6 +172,9 @@ yarn build
 > When removing a dependency via `yarn remove some-package`, be sure to also run `yarn postinstall` so
 > you aren't left with freshly unpackaged modules. This is because we use `patch-package`
 > and the `postinstall` step which uses it is not automatically run after using `yarn remove`.
+
+> The docs package relies on gitbook which has problems off of a fresh install. Running
+> `yarn build --ignore docs` is a known workaround. 
 
 
 ## Running the mobile wallet

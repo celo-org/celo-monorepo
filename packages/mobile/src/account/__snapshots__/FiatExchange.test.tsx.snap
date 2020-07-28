@@ -4,7 +4,6 @@ exports[`FiatExchange renders correctly 1`] = `
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
@@ -17,7 +16,7 @@ exports[`FiatExchange renders correctly 1`] = `
         "borderBottomColor": 0,
         "borderBottomWidth": 1,
         "flexDirection": "row",
-        "height": 62,
+        "height": 56,
         "justifyContent": "center",
       }
     }
@@ -25,6 +24,14 @@ exports[`FiatExchange renders correctly 1`] = `
     <View
       accessible={true}
       focusable={false}
+      hitSlop={
+        Object {
+          "bottom": 10,
+          "left": 10,
+          "right": 10,
+          "top": 10,
+        }
+      }
       onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
@@ -34,13 +41,12 @@ exports[`FiatExchange renders correctly 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
-          "left": 8,
+          "left": 0,
           "marginBottom": 0,
-          "marginLeft": 4,
+          "marginLeft": 16,
           "opacity": 1,
-          "padding": 8,
+          "padding": 0,
           "position": "absolute",
-          "top": 8,
         }
       }
     >
@@ -91,8 +97,6 @@ exports[`FiatExchange renders correctly 1`] = `
     style={
       Object {
         "alignItems": "center",
-        "borderBottomColor": "#EDEEEF",
-        "borderBottomWidth": 1,
         "height": 112,
         "justifyContent": "flex-end",
         "marginLeft": 16,
@@ -204,6 +208,37 @@ exports[`FiatExchange renders correctly 1`] = `
             fiatExchangeFlow:addFunds
           </Text>
         </View>
+      </View>
+    </View>
+    <View
+      style={
+        Object {
+          "backgroundColor": "#FFFFFF",
+        }
+      }
+    >
+      <View
+        style={
+          Object {
+            "borderBottomColor": "#EDEEEF",
+            "borderBottomWidth": 1,
+            "marginLeft": 16,
+            "paddingVertical": 16,
+          }
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#B4B9BD",
+              "fontFamily": "Inter-Regular",
+              "fontSize": 16,
+              "lineHeight": 22,
+            }
+          }
+        >
+          fiatExchangeFlow:cashOutComingSoon
+        </Text>
       </View>
     </View>
   </View>

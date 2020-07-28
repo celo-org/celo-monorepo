@@ -51,7 +51,7 @@
     "title": "Color",
     "headline": "The Celo color palette consistes of primary brand colors, accent colors, and grays.",
     "primaries": "Primary Brand Colors",
-    "primariesText": "Primary brand colors are Celo Green, Celo Gold, Celo Dark, and Celo Light.\n\nCelo Green is used to denote value and action including communication and applications of the cUSD. Celo Gold is used more often when speaking to actions related to cGLD like validation, proof of stake, and governance.\n\nCelo Dark and Celo Light are high contrast complementary colors, interchangeably switching between background and typography. Celo Dark has a tendency to represent technical content while Celo Light represents non-technical topics.",
+    "primariesText": "Primary brand colors are Celo Green, Celo Gold, Celo Dark, and Celo Light.\n\nCelo Green is used to denote value and action including communication and applications of the cUSD. Celo Gold is used more often when speaking to actions related to CELO like validation, proof of stake, and governance.\n\nCelo Dark and Celo Light are high contrast complementary colors, interchangeably switching between background and typography. Celo Dark has a tendency to represent technical content while Celo Light represents non-technical topics.",
     "accents": "Accent Colors",
     "accentsText": "Accent colors include violet, red, cyan, and blue.\n\nViolet, red, and cyan are colors that often represent alternative coins, projects, and personas in the ecosystem.\n\nBlue represents help within digital experiences like websites and mobile applications.",
     "grays": "Grays",

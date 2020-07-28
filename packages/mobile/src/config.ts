@@ -75,9 +75,14 @@ export const DEFAULT_SYNC_MODE: GethSyncMode = Config.DEFAULT_SYNC_MODE
   : GethSyncMode.Lightest
 // TODO Remove when feature is stable
 export const USE_PHONE_NUMBER_PRIVACY = true
-export const SHOW_CASH_OUT = stringToBoolean(Config.SHOW_CASH_OUT || 'false')
 
 // SECRETS
 export const SEGMENT_API_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SEGMENT_API_KEY')
 export const FIREBASE_WEB_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'FIREBASE_WEB_KEY')
 export const SENTRY_URL = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SENTRY_URL')
+export const MOONPAY_PUBLIC_KEY = keyOrUndefined(
+  secretsFile,
+  Config.SECRETS_KEY,
+  'MOONPAY_PUBLIC_KEY'
+)
+export const MOONPAY_RATE_API = `https://api.moonpay.io/v3/currencies/celo/price?apiKey=${MOONPAY_PUBLIC_KEY}`
