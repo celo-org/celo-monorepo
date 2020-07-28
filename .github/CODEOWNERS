@@ -21,7 +21,7 @@
 /packages/metadata-crawler/ @aaitor
 /packages/mobile/ @jeanregisser @cmcewen @jmrossy @i1skn 
 /packages/moonpay-auth/ @annakaz @i1skn 
-/packages/notification-service/ @annakaz @cmcewen @i1skn 
+/packages/notification-service/ @annakaz @cmcewen @i1skn @jeanregisser
 /packages/phone-number-privacy/ @jmrossy
 /packages/protocol/ @asaj @nategraf
 /packages/react-components/ @jmrossy @aaronmgdr
