@@ -1,5 +1,6 @@
 import { AddressType, SignatureType } from '@celo/utils/lib/io'
 import * as t from 'io-ts'
+import { toChecksumAddress } from 'web3-utils'
 import { Address } from '../../base'
 import OffchainDataWrapper from '../offchain-data-wrapper'
 import { readWithSchema, SingleSchema, writeWithSchema } from './schema-utils'
@@ -30,15 +31,20 @@ export class AuthorizedSignerAccessor {
       this.wrapper,
       AuthorizedSignerSchema,
       account,
-      this.basePath + '/' + signer
+      this.basePath + '/' + toChecksumAddress(signer)
     )
   }
 
   async write(signer: Address, proofOfPossession: string, filteredDataPaths: string) {
-    return writeWithSchema(this.wrapper, AuthorizedSignerSchema, this.basePath + '/' + signer, {
-      address: signer,
-      proofOfPossession,
-      filteredDataPaths,
-    })
+    return writeWithSchema(
+      this.wrapper,
+      AuthorizedSignerSchema,
+      this.basePath + '/' + toChecksumAddress(signer),
+      {
+        address: toChecksumAddress(signer),
+        proofOfPossession,
+        filteredDataPaths,
+      }
+    )
   }
 }

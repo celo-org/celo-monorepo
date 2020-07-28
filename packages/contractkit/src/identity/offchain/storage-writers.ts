@@ -40,3 +40,13 @@ export class GitStorageWriter extends LocalStorageWriter {
     return
   }
 }
+
+export class MockStorageWriter extends LocalStorageWriter {
+  constructor(readonly root: string, readonly mockedStorageRoot: string, readonly fetchMock: any) {
+    super(root)
+  }
+  async write(data: string, dataPath: string): Promise<void> {
+    await this.writeToFs(data, dataPath)
+    this.fetchMock.mock(this.mockedStorageRoot + dataPath, data)
+  }
+}

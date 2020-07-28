@@ -1,7 +1,7 @@
 import { eqAddress } from '@celo/utils/lib/address'
 import { guessSigner, NativeSigner } from '@celo/utils/lib/signatureUtils'
-import fetch from 'cross-fetch'
 import debugFactory from 'debug'
+import { toChecksumAddress } from 'web3-utils'
 import { ContractKit } from '../kit'
 import { ClaimTypes } from './claims/types'
 import { IdentityMetadataWrapper } from './metadata'
@@ -75,7 +75,7 @@ class StorageRoot {
 
     // The signer might be authorized off-chain
     // TODO: Only if the signer is authorized with an on-chain key
-    const [, err] = await this.read(`/account/authorizedSigners/${signer}`)
+    const [, err] = await this.read(`/account/authorizedSigners/${toChecksumAddress(signer)}`)
 
     if (err) {
       return [null, err]
