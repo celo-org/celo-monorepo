@@ -28,21 +28,17 @@
     "section2Body": "Para proteger su privacidad, solo se guarda una versión oculta de su teléfono en la cadena de bloques de Celo."
   },
   "loading": {
-    "verifyingNumber": "Verificando {{number}}",
-    "keepOpen": "Deje abierta la aplicación",
-    "card1": "Verificar tu cuenta te permite ver cuál de tus amigos usa {{appName}}.",
-    "card2": "Con {{appName}}, puede enviar dinero a cualquier persona con tan solo el número telefónico.",
-    "card3": "{{appName}} ahora envía tres mensajes de texto para confirmar que es dueño de su propia línea telefónica."
+    "confirming": "Confirmando…",
+    "learnMore": "Aprende más",
+    "card1": "Para asegurarnos de que su número de teléfono sea realmente suyo, le enviamos tres mensajes.",
+    "card2": "Una vez que se confirma su número, puede enviar y recibir fondos fácilmente a su número de teléfono.",
+    "card3": "Confirmar también le permite ver cuáles de sus amigos están en {{appName}}.",
+    "card4": "Requerimos tres mensajes de confirmación para mantener su cuenta más segura."
   },
   "skipModal": {
     "header": "¿Omitir la verificación?",
     "body1": "La verificación permite que otras personas le envíen valores a su número telefónico.",
     "body2": "Sin la verificación, igual podrá recibir pagos, pero solo mediante las direcciones de cuenta o códigos QR."
-  },
-  "interstitial": {
-    "header": "Ya casi estamos",
-    "body1": "¡Estamos enviando sus mensajes de texto! Ingrese los tres códigos a medida que los reciba.",
-    "body2": "Esto puede tardar un poco."
   },
   "failModal": {
     "header": "Error de verificación",
@@ -50,6 +46,8 @@
     "body2": "Puede saltar la verificación y volver a intentarlo más tarde.",
     "body1InsufficientBalance": "Su saldo actual no es lo suficientemente alto como para completar el proceso de verificación.",
     "body2InsufficientBalance": "Intente nuevamente cuando haya agregado fondos a su billetera.",
+    "body1SaltQuotaExceeded": "Su cuota de búsqueda de número de teléfono está agotada",
+    "body2SaltQuotaExceeded": "Intente nuevamente cuando haya comprado más búsquedas",
     "enterCodesBody": " Si ya recibió tres códigos por SMS, aún puede ingresarlos.",
     "enterCodesButton": "Ingresar códigos"
   },

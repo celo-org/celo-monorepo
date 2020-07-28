@@ -163,6 +163,7 @@
   "addressValidationPartialPoorlyFormatted": "Account numbers only contain numbers and letters, please provide the last 4 digits. Press the link below for help",
   "addressValidationFullOwnAddress": "Please enter your contact's account number, not your own. Press the link below for help",
   "addressValidationPartialOwnAddress": "Please enter the last 4 digits of your contact's account number, not your own. Press the link below for help",
+  "providerRateFetchFailed": "Could not fetch provider rate. You can continue without a prefilled rate.",
   "helpFindAccount": "Help your contact find their account number",
   "close": "Close",
   "home": "Home",
@@ -176,5 +177,6 @@
   "insufficientBalance": "Your balance is too low to make this transaction",
   "amount": "Amount",
   "currentBalance": "Current Balance",
-  "restore": "Restore"
+  "restore": "Restore",
+  "commentUnavailable": "Comment Unavailable"
 }
