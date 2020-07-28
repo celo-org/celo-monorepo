@@ -1,7 +1,5 @@
-import {
-  DEFAULT_VERSION_STRING,
-  getContractVersion,
-} from '@celo/protocol/lib/compatibility/ast-version'
+import { getContractVersion } from '@celo/protocol/lib/compatibility/ast-version'
+import { DEFAULT_VERSION_STRING } from '@celo/protocol/lib/compatibility/version'
 import { getTestArtifacts } from '@celo/protocol/test/compatibility/common'
 import { assert } from 'chai'
 

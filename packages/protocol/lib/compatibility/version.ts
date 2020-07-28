@@ -35,7 +35,7 @@ export class ContractVersion {
    */
   static fromGetVersionNumberReturnValue = (version: Buffer): ContractVersion => {
     if (version.length !== 4 * 32) {
-      throw new Error(`Invalid version buffer: ${version}`)
+      throw new Error(`Invalid version buffer: ${version.toString('hex')}`)
     }
     const versions = [
       version.slice(0, 32),  // Storage

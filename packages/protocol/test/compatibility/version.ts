@@ -2,6 +2,7 @@ import {
   ContractVersion,
   ContractVersionChecker,
   ContractVersionDelta,
+  DEFAULT_VERSION_STRING,
   Delta,
   DeltaUtil,
 } from '@celo/protocol/lib/compatibility/version'
@@ -40,8 +41,11 @@ describe('#version()', () => {
 
     describe('ContractVersion.fromGetVersionNumberReturnValue', () => {
       it('parses the buffer correctly', () => {
-        const zeros = '0'.repeat(31)
-        const buffer = Buffer.from(`${zeros}1${zeros}2${zeros}3${zeros}4`)
+        const zeros = '0'.repeat(63)
+        const v = `${zeros}1${zeros}2${zeros}3${zeros}4`
+        console.log(v)
+        const buffer = Buffer.from(v, 'hex')
+        console.log(buffer.toString('hex'))
         const version = ContractVersion.fromGetVersionNumberReturnValue(buffer)
         assert.equal(version.toString(), '1.2.3.4')
       })
@@ -193,6 +197,20 @@ describe('#version()', () => {
 
       it('returns the expected version number', () => {
         assert.equal(cvc.expectedVersion().toString(), '2.0.0.0')
+      })
+
+      it('returns that the expected version number matches', () => {
+        assert.isTrue(cvc.matches())
+      })
+    })
+
+    describe('when the old version is null', () => {
+      const newVersion = new ContractVersion(1, 1, 0, 0)
+      const cvd = ContractVersionDelta.fromChanges(false, false, false, false)
+      const cvc = new ContractVersionChecker(null, newVersion, cvd)
+
+      it('returns the default expected version number', () => {
+        assert.equal(cvc.expectedVersion().toString(), DEFAULT_VERSION_STRING)
       })
 
       it('returns that the expected version number matches', () => {
