@@ -84,6 +84,14 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
     })
   })
 
+  server.get('/experience/merchant/', (_, res) => {
+    res.redirect(`https://celo-merchants.squarespace.com/`)
+  })
+
+  server.get('/experience/merchant/*', (req, res) => {
+    res.redirect(`https://celo-merchants.squarespace.com/merchant/${req.params[0]}`)
+  })
+
   server.get('/build/*', (req, res) => {
     res.redirect(`/developers/${req.params[0]}`)
   })

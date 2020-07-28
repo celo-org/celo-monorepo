@@ -87,6 +87,18 @@ export const SecurityFeeIcon = ({ tintColor }: Pick<Props, 'tintColor'>) => {
   )
 }
 
+export const EncryptionFeeIcon = ({ tintColor }: Pick<Props, 'tintColor'>) => {
+  const { t } = useTranslation(Namespaces.sendFlow7)
+  return (
+    <FeeIcon
+      title={t('encryption.feeLabel')}
+      description={t('encryption.feeModalBody')}
+      dismissText={t('global:dismiss')}
+      tintColor={tintColor}
+    />
+  )
+}
+
 const styles = StyleSheet.create({
   area: {
     paddingHorizontal: 5,
