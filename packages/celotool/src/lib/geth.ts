@@ -515,15 +515,14 @@ export const simulateClient = async (
 
     // randomly choose which token to use
     const transferGold = Boolean(Math.round(Math.random()))
-    // const transferGold = true
     const transferFn = transferGold ? transferCeloGold : transferCeloDollars
     baseLogMessage.tokenName = transferGold ? 'cGLD' : 'cUSD'
 
     // randomly choose which gas currency to use
-    // const feeCurrencyGold = Boolean(Math.round(Math.random()))
-    const feeCurrencyGold = true
+    const feeCurrencyGold = Boolean(Math.round(Math.random()))
+    // const feeCurrencyGold = false
     
-    let feeCurrency, gasPrice
+    let feeCurrency, gasPrice, txOptions
     try {
       feeCurrency = feeCurrencyGold ? '' : await kit.registry.addressFor(CeloContract.StableToken)
     }
@@ -537,23 +536,27 @@ export const simulateClient = async (
 
     feeCurrency = feeCurrency || ''
     baseLogMessage.feeCurrency = feeCurrency
-
-    const gasPriceMinimum = await kit.contracts.getGasPriceMinimum()
-
-    if (feeCurrency) {
-      gasPrice = new BigNumber(
-        await gasPriceMinimum.getGasPriceMinimum(feeCurrency)
-      ).times(5)
-    } else {
-      gasPrice = new BigNumber(
-        await gasPriceMinimum.gasPriceMinimum()
-      ).times(5)
-    }
-
-
-    const txOptions = {
-      gasPrice: gasPrice.toString(),
-      feeCurrency,
+  
+    try {
+      if (!feeCurrencyGold) {
+        const gasPriceMinimum = await kit.contracts.getGasPriceMinimum()
+        gasPrice = new BigNumber(
+          await gasPriceMinimum.getGasPriceMinimum(feeCurrency)
+        ).times(5)
+        txOptions = {
+          gas: 500000,
+          gasPrice: gasPrice.toString(),
+          feeCurrency,
+        }
+      } else {
+        txOptions = {}
+      }
+    } catch (error) {
+      tracerLog({
+        tag: LOG_TAG_CONTRACT_ADDRESS_ERROR,
+        error: error.toString(),
+        ...baseLogMessage,
+      })
     }
 
     // We purposely do not use await syntax so we sleep after sending the transaction,
@@ -1078,7 +1081,7 @@ export function writeGenesis(gethConfig: GethRunConfig, validators: Validator[],
   fs.writeFileSync(genesisPath, genesis)
 
   if (verbose) {
-    console.log(`wrote   genesis to ${genesisPath}`)
+    console.log(`wrote genesis to ${genesisPath}`)
   }
 }
 

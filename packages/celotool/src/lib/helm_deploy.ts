@@ -913,7 +913,7 @@ function useStaticIPsForGethNodes() {
   return fetchEnv(envVar.STATIC_IPS_FOR_GETH_NODES) === 'true'
 }
 
-async function saveHelmValuesFile(celoEnv:string, valueFilePath: string, useExistingGenesis: boolean) {
+export async function saveHelmValuesFile(celoEnv:string, valueFilePath: string, useExistingGenesis: boolean) {
   const genesisContent = useExistingGenesis
   ? await getGenesisBlockFromGoogleStorage(celoEnv)
   : generateGenesisFromEnv()
