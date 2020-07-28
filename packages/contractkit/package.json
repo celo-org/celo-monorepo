@@ -41,7 +41,6 @@
     "ethereumjs-util": "^5.2.0",
     "fp-ts": "2.1.1",
     "io-ts": "2.0.1",
-    "ms-rest-azure": "^3.0.0",
     "qrcode": "^1.4.4",
     "secp256k1": "^4.0.0",
     "web3": "1.2.4",
