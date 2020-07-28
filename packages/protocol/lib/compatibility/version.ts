@@ -35,11 +35,13 @@ export class ContractVersion {
     if (version.length !== 4 * 32) {
       throw new Error(`Invalid version buffer: ${version}`)
     }
-    const storage = version.slice(0, 32)
-    const major = version.slice(32, 64)
-    const minor = version.slice(64, 96)
-    const patch = version.slice(96, 128)
-    return ContractVersion.fromString(`${storage.toString('hex')}.${major.toString('hex')}.${minor.toString('hex')}.${patch.toString('hex')}`)
+    const versions = [
+      version.slice(0, 32),  // Storage
+      version.slice(32, 64), // Major
+      version.slice(64, 96), // Minor
+      version.slice(96, 128) // Patch
+    ]
+    return ContractVersion.fromString(versions.map((x) => x.toString('hex')).join('.'))
   }
 
   constructor(

@@ -25,6 +25,7 @@ done
 BUILD_DIR_1=$(echo build/$(echo $BRANCH_1 | sed -e 's/\//_/g'))
 git checkout $BRANCH_1
 rm -rf build/contracts
+# TODO: Move to yarn build:sol after the next contract release.
 yarn build
 rm -rf $BUILD_DIR_1 && mkdir -p $BUILD_DIR_1
 mv build/contracts $BUILD_DIR_1
@@ -36,4 +37,6 @@ rm -rf build/contracts
 yarn build:sol
 rm -rf $BUILD_DIR_2 && mkdir -p $BUILD_DIR_2
 mv build/contracts $BUILD_DIR_2
-yarn ts-node scripts/check-backward.ts sem_check -o $BUILD_DIR_1/contracts -n $BUILD_DIR_2/contracts -e ".*Test.*|I[A-Z].*|ReleaseGold"
+
+CONTRACT_EXCLUSION_REGEX=".*Test.*|I[A-Z].*|ReleaseGold"
+yarn ts-node scripts/check-backward.ts sem_check -o $BUILD_DIR_1/contracts -n $BUILD_DIR_2/contracts -e $CONTRACT_EXCLUSION_REGEX
