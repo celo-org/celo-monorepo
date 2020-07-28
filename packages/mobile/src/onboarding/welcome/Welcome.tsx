@@ -5,19 +5,31 @@ import { Spacing } from '@celo/react-components/styles/styles.v2'
 import React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useDispatch } from 'react-redux'
+import { chooseRestoreAccount } from 'src/account/actions'
 import Logo, { LogoTypes } from 'src/icons/Logo.v2'
 import { welcomeBgContent, welcomeBgHeader } from 'src/images/Images'
 import { nuxNavigationOptions } from 'src/navigator/Headers.v2'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import LanguageButton from 'src/onboarding/LanguageButton'
 
-interface Props {}
-
-export default function Welcome(props: Props) {
-  const onPressCreateAccount = () => {}
-
-  const onPressRestoreAccount = () => {}
-
+export default function Welcome() {
+  const dispatch = useDispatch()
   const insets = useSafeAreaInsets()
+
+  const navigateNext = () => {
+    navigate(Screens.RegulatoryTerms)
+  }
+
+  const onPressCreateAccount = () => {
+    navigateNext()
+  }
+
+  const onPressRestoreAccount = () => {
+    dispatch(chooseRestoreAccount())
+    navigateNext()
+  }
 
   return (
     <SafeAreaView style={styles.container}>

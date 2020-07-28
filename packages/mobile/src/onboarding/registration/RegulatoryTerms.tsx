@@ -20,10 +20,14 @@ const MARGIN = 24
 
 interface StateProps {
   pincodeType: PincodeType
+  isRestoringAccount: boolean | undefined
 }
 
 function mapStateToProps(state: RootState): StateProps {
-  return { pincodeType: state.account.pincodeType }
+  return {
+    pincodeType: state.account.pincodeType,
+    isRestoringAccount: state.account.isRestoringAccount,
+  }
 }
 
 interface DispatchProps {
@@ -45,11 +49,7 @@ export class RegulatoryTerms extends React.Component<Props> {
   }
 
   goToNextScreen = () => {
-    if (this.props.pincodeType === PincodeType.Unset) {
-      navigate(Screens.PincodeSet)
-    } else {
-      navigate(Screens.EnterInviteCode)
-    }
+    navigate(Screens.NameAndNumber)
   }
 
   onPressGoToTerms = () => {
@@ -61,7 +61,7 @@ export class RegulatoryTerms extends React.Component<Props> {
 
     return (
       <SafeAreaView style={styles.container}>
-        <DevSkipButton nextScreen={Screens.PincodeSet} />
+        <DevSkipButton nextScreen={Screens.NameAndNumber} />
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}

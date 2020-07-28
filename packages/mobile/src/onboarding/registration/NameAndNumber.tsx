@@ -42,7 +42,7 @@ interface DispatchProps {
   setName: typeof setName
 }
 
-type OwnProps = StackScreenProps<StackParamList, Screens.JoinCelo>
+type OwnProps = StackScreenProps<StackParamList, Screens.NameAndNumber>
 
 type Props = StateProps & DispatchProps & WithTranslation & OwnProps
 
@@ -123,13 +123,7 @@ export class JoinCelo extends React.Component<Props, State> {
   }
 
   goToNextScreen = () => {
-    if (!this.props.acceptedTerms) {
-      navigate(Screens.RegulatoryTerms)
-    } else if (this.props.pincodeType === PincodeType.Unset) {
-      navigate(Screens.PincodeSet)
-    } else {
-      navigate(Screens.EnterInviteCode)
-    }
+    navigate(Screens.PincodeSet)
   }
 
   onChangeNameInput = (value: string) => {

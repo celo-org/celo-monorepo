@@ -3,6 +3,8 @@ import { PaymentRequest } from 'src/account/types'
 
 // TODO(Rossy): Remove the _ACTION suffix from these actions for consistency with other other names
 export enum Actions {
+  CHOOSE_RESTORE_ACCOUNT = 'ACCOUNT/CHOOSE_RESTORE',
+  CANCEL_CREATE_OR_RESTORE_ACCOUNT = 'ACCOUNT/CANCEL_CREATE_OR_RESTORE_ACCOUNT',
   SET_NAME = 'ACCOUNT/SET_NAME',
   SET_PHONE_NUMBER = 'ACCOUNT/SET_PHONE_NUMBER',
   DEV_MODE_TRIGGER_CLICKED = 'ACCOUNT/NAME_CLICKED',
@@ -25,6 +27,14 @@ export enum Actions {
   SET_RETRY_VERIFICATION_WITH_FORNO = 'ACCOUNT/SET_RETRY_VERIFICATION_WITH_FORNO',
   ACCEPT_TERMS = 'ACCOUNT/ACCEPT_TERMS',
   MIGRATE_ACCOUNT_BIP39 = 'MIGRATE_ACCOUNT_BIP39',
+}
+
+export interface ChooseRestoreAccountAction {
+  type: Actions.CHOOSE_RESTORE_ACCOUNT
+}
+
+export interface CancelCreateOrRestoreAccountAction {
+  type: Actions.CANCEL_CREATE_OR_RESTORE_ACCOUNT
 }
 
 export interface SetNameAction {
@@ -127,6 +137,8 @@ export interface MigrateAccount {
 }
 
 export type ActionTypes =
+  | ChooseRestoreAccountAction
+  | CancelCreateOrRestoreAccountAction
   | SetNameAction
   | SetPhoneNumberAction
   | DevModeTriggerClickedAction
@@ -149,6 +161,18 @@ export type ActionTypes =
   | SetRetryVerificationWithFornoAction
   | AcceptTermsAction
   | MigrateAccount
+
+export function chooseRestoreAccount(): ChooseRestoreAccountAction {
+  return {
+    type: Actions.CHOOSE_RESTORE_ACCOUNT,
+  }
+}
+
+export function cancelCreateOrRestoreAccount(): CancelCreateOrRestoreAccountAction {
+  return {
+    type: Actions.CANCEL_CREATE_OR_RESTORE_ACCOUNT,
+  }
+}
 
 export function setName(name: string): SetNameAction {
   return {

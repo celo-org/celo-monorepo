@@ -6,7 +6,7 @@ import * as renderer from 'react-test-renderer'
 import { PincodeType } from 'src/account/reducer'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { Screens } from 'src/navigator/Screens'
-import JoinCelo, { JoinCelo as JoinCeloClass } from 'src/onboarding/registration/JoinCelo'
+import JoinCelo, { JoinCelo as JoinCeloClass } from 'src/onboarding/registration/NameAndNumber'
 import { createMockStore, getMockI18nProps, getMockStackScreenProps } from 'test/utils'
 
 const mockScreenProps = getMockStackScreenProps(Screens.JoinCelo)

@@ -30,6 +30,7 @@ export interface State {
   retryVerificationWithForno: boolean
   acceptedTerms: boolean
   hasMigratedToNewBip39: boolean
+  isRestoringAccount: boolean | undefined
 }
 
 export enum PincodeType {
@@ -68,6 +69,7 @@ export const initialState = {
   acceptedTerms: false,
   retryVerificationWithForno: features.VERIFICATION_FORNO_RETRY,
   hasMigratedToNewBip39: false,
+  isRestoringAccount: false,
 }
 
 export const reducer = (
@@ -83,6 +85,18 @@ export const reducer = (
         dismissedGetVerified: false,
       }
     }
+    case Actions.CHOOSE_RESTORE_ACCOUNT:
+      return {
+        ...state,
+        isRestoringAccount: true,
+      }
+    case Actions.CANCEL_CREATE_OR_RESTORE_ACCOUNT:
+      return {
+        ...state,
+        isRestoringAccount: undefined,
+        pincodeType: PincodeType.Unset,
+        isSettingPin: false,
+      }
     case Actions.SET_NAME:
       return {
         ...state,

@@ -65,7 +65,7 @@ import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
 import ImportContactsScreen from 'src/onboarding/contacts/ImportContactsScreen'
 import OnboardingEducationScreen from 'src/onboarding/education/OnboardingEducationScreen'
-import JoinCelo from 'src/onboarding/registration/JoinCelo'
+import NameAndNumber from 'src/onboarding/registration/NameAndNumber'
 import RegulatoryTerms from 'src/onboarding/registration/RegulatoryTerms'
 import SelectCountry from 'src/onboarding/registration/SelectCountry'
 import OnboardingSuccessScreen from 'src/onboarding/success/OnboardingSuccessScreen'
@@ -194,8 +194,8 @@ const nuxScreens = (Navigator: typeof Stack) => (
       options={Welcome.navigationOptions}
     />
     <Navigator.Screen
-      name={Screens.JoinCelo}
-      component={JoinCelo}
+      name={Screens.NameAndNumber}
+      component={NameAndNumber}
       options={{
         ...nuxNavigationOptions,
         headerTitle: () => (
@@ -451,6 +451,7 @@ const generalScreens = (Navigator: typeof Stack) => (
 
 const mapStateToProps = (state: RootState) => {
   return {
+    isRestoringAccount: state.account.isRestoringAccount,
     language: currentLanguageSelector(state),
     e164Number: state.account.e164PhoneNumber,
     acceptedTerms: state.account.acceptedTerms,
@@ -468,6 +469,7 @@ export function MainStackScreen() {
   const [initialRouteName, setInitialRoute] = React.useState<InitialRouteName>(undefined)
   React.useEffect(() => {
     const {
+      isRestoringAccount,
       language,
       e164Number,
       acceptedTerms,
@@ -488,7 +490,7 @@ export function MainStackScreen() {
     } else if (pincodeType === PincodeType.Unset) {
       initialRoute = Screens.PincodeSet
     } else if (!redeemComplete && !account) {
-      initialRoute = Screens.EnterInviteCode
+      initialRoute = isRestoringAccount ? Screens.ImportWallet : Screens.EnterInviteCode
     } else if (!hasSeenVerificationNux) {
       initialRoute = Screens.VerificationEducationScreen
     } else {
