@@ -46,26 +46,28 @@ export default React.memo(function Showcase({
       ]}
     >
       <Fade duration={FADE_MS}>
-        <View style={styles.previewContainer}>
-          <AspectRatio ratio={ratio}>
-            {loading ? (
-              <Spinner color={colors.primary} size="small" />
-            ) : (
-              <Image
-                // onLoadEnd={load}
-                resizeMode="contain"
-                accessibilityLabel={`Preview of ${name}`}
-                source={{ uri: preview }}
-                style={[standardStyles.image, styles[`variant-${variant}`]]}
-              />
-            )}
-          </AspectRatio>
+        <View>
+          <View style={styles.previewContainer}>
+            <AspectRatio ratio={ratio}>
+              {loading ? (
+                <Spinner color={colors.primary} size="small" />
+              ) : (
+                <Image
+                  // onLoadEnd={load}
+                  resizeMode="contain"
+                  accessibilityLabel={`Preview of ${name}`}
+                  source={{ uri: preview }}
+                  style={[standardStyles.image, styles[`variant-${variant}`]]}
+                />
+              )}
+            </AspectRatio>
+          </View>
+          <View style={styles.text}>
+            {name && <Text style={titleStyle}>{name.trimLeft()}</Text>}
+            {description && <Text style={fonts.legal}>{description}</Text>}
+          </View>
+          {uri && <DownloadButton uri={uri} trackingData={trackingData} />}
         </View>
-        <View style={styles.text}>
-          {name && <Text style={titleStyle}>{name}</Text>}
-          {description && <Text style={fonts.legal}>{description}</Text>}
-        </View>
-        {uri && <DownloadButton uri={uri} trackingData={trackingData} />}
       </Fade>
     </View>
   )

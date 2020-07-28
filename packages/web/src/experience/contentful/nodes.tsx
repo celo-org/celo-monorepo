@@ -72,15 +72,17 @@ function embedded(node) {
       const url = node.data.target.fields.url
       return <iframe src={url} height="500px" />
     case 'tile':
+      const { width, height } = fields?.image?.fields?.file?.details?.image || {}
+      const realRatio = width && height ? width / height : ratio || 1
       return (
         <Showcase
           key={node.data.target.id}
-          ratio={1}
+          ratio={realRatio}
           assetType={AssetTypes.illustration}
           description={fields.description}
           name={fields.title}
-          preview={fields.image}
-          uri={fields.uri}
+          preview={fields.image?.fields?.file?.url}
+          uri={fields.download?.fields?.file?.url}
           loading={false}
           size={120}
         />
@@ -99,6 +101,7 @@ interface Content {
     description: string
     title: string
     image: Asset
+    download: Asset
   }
 }
 // Contentful sends these values as strings
@@ -112,15 +115,17 @@ interface TileProps {
 
 function Tile({ content, numberAcross, ratio }: TileProps) {
   const size = useTileSize(numberAcross)
+  const { width, height } = content?.fields?.image?.fields?.file?.details?.image || {}
+  const realRatio = width && height ? width / height : ratio || 1
   return (
     <Showcase
       key={content.sys.id}
-      ratio={ratio || 1}
+      ratio={realRatio || 1}
       assetType={AssetTypes.illustration}
       description={content.fields.description}
       name={content.fields.title}
-      preview={content.fields.image.fields.file.url}
-      uri={''}
+      preview={content?.fields?.image?.fields?.file?.url}
+      uri={content?.fields?.download?.fields?.file?.url}
       loading={false}
       size={size}
     />
