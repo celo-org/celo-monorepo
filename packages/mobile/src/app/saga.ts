@@ -21,6 +21,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import Logger from 'src/utils/Logger'
 import { clockInSync } from 'src/utils/time'
+import { getContractKit } from 'src/web3/contracts'
 import { parse } from 'url'
 
 const TAG = 'app/saga'
@@ -100,6 +101,24 @@ function* watchAppState() {
     try {
       const newState = yield take(appStateChannel)
       Logger.debug(`${TAG}@monitorAppState`, `App changed state: ${newState}`)
+      if (newState === 'inactive' || newState === 'background') {
+        // const contractKit = yield call(getContractKit)
+        // console.log('contractKit.web3', contractKit.web3)
+        // console.log('contractKit.web3.les.saveServerPoolNodes', contractKit.web3.les.saveServerPoolNodes)
+        const res = yield call(fetch, 'http://localhost:8545', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: '{"jsonrpc":"2.0","method":"les_saveServerPoolNodes","params":[],"id":67}',
+        })
+        const text = yield call(res.text)
+        console.log('text', text)
+        // yield call([
+        //   contractKit.web3,
+        //   contractKit.web3.les.saveServerPoolNodes
+        // ])
+      }
       yield put(setAppState(newState))
     } catch (error) {
       ValoraAnalytics.track(AppEvents.app_state_error, { error: error.message })
