@@ -29,6 +29,7 @@ import {
   InputAttestationCodeAction,
   ReceiveAttestationMessageAction,
   resetVerification,
+  setCompletedCodes,
   setVerificationStatus,
 } from 'src/identity/actions'
 import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privateHashing'
@@ -154,9 +155,7 @@ export function* doVerificationFlow() {
       }
 
       // Mark codes completed in previous attempts
-      yield put(
-        completeAttestationCode(NUM_ATTESTATIONS_REQUIRED - status.numAttestationsRemaining)
-      )
+      yield put(setCompletedCodes(NUM_ATTESTATIONS_REQUIRED - status.numAttestationsRemaining))
 
       yield put(setVerificationStatus(VerificationStatus.RequestingAttestations))
 
@@ -516,7 +515,7 @@ function* revealAndCompleteAttestation(
 
   ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_complete, { issuer })
 
-  yield put(completeAttestationCode())
+  yield put(completeAttestationCode(code))
   Logger.debug(TAG + '@revealAttestation', `Attestation for issuer ${issuer} completed`)
 }
 
@@ -609,7 +608,6 @@ function* tryRevealPhoneNumber(
       issuer,
       error: error.message,
     })
-    yield put(showError(ErrorMessages.REVEAL_ATTESTATION_FAILURE))
     yield put(setVerificationStatus(VerificationStatus.RevealAttemptFailed))
   }
 }

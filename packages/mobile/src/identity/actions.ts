@@ -15,6 +15,7 @@ export enum Actions {
   RESET_VERIFICATION = 'IDENTITY/RESET_VERIFICATION',
   SET_VERIFICATION_STATUS = 'IDENTITY/SET_VERIFICATION_STATUS',
   SET_SEEN_VERIFICATION_NUX = 'IDENTITY/SET_SEEN_VERIFICATION_NUX',
+  SET_COMPLETED_CODES = 'IDENTITY/SET_COMPLETED_CODES',
   REVOKE_VERIFICATION = 'IDENTITY/REVOKE_VERIFICATION',
   RECEIVE_ATTESTATION_MESSAGE = 'IDENTITY/RECEIVE_ATTESTATION_MESSAGE',
   INPUT_ATTESTATION_CODE = 'IDENTITY/INPUT_ATTESTATION_CODE',
@@ -69,6 +70,11 @@ export interface ReceiveAttestationMessageAction {
   inputType: CodeInputType
 }
 
+export interface SetCompletedCodes {
+  type: Actions.SET_COMPLETED_CODES
+  numComplete: number
+}
+
 export interface InputAttestationCodeAction {
   type: Actions.INPUT_ATTESTATION_CODE
   code: AttestationCode
@@ -76,7 +82,7 @@ export interface InputAttestationCodeAction {
 
 export interface CompleteAttestationCodeAction {
   type: Actions.COMPLETE_ATTESTATION_CODE
-  numComplete: number
+  code: AttestationCode
 }
 
 export interface UpdateE164PhoneNumberAddressesAction {
@@ -173,6 +179,7 @@ export type ActionTypes =
   | ResetVerificationAction
   | SetVerificationStatusAction
   | SetHasSeenVerificationNux
+  | SetCompletedCodes
   | ReceiveAttestationMessageAction
   | InputAttestationCodeAction
   | CompleteAttestationCodeAction
@@ -227,16 +234,19 @@ export const receiveAttestationMessage = (
   inputType,
 })
 
+export const setCompletedCodes = (numComplete: number): SetCompletedCodes => ({
+  type: Actions.SET_COMPLETED_CODES,
+  numComplete,
+})
+
 export const inputAttestationCode = (code: AttestationCode): InputAttestationCodeAction => ({
   type: Actions.INPUT_ATTESTATION_CODE,
   code,
 })
 
-export const completeAttestationCode = (
-  numComplete: number = 1
-): CompleteAttestationCodeAction => ({
+export const completeAttestationCode = (code: AttestationCode): CompleteAttestationCodeAction => ({
   type: Actions.COMPLETE_ATTESTATION_CODE,
-  numComplete,
+  code,
 })
 
 export const fetchAddressesAndValidate = (
