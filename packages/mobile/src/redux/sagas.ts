@@ -69,7 +69,7 @@ export function* rootSaga() {
   // Delay all sagas until rehydrate is done
   // This prevents them from running with missing state
   yield call(waitForRehydrate)
-  yield call(appInit)
+  yield spawn(appInit)
 
   // Note, the order of these does matter in certain cases
   yield spawn(loggerSaga)
