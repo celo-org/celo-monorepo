@@ -906,7 +906,9 @@ contract Validators is
    */
   function meetsAccountLockedGoldRequirements(address account) public view returns (bool) {
     uint256 balance = getLockedGold().getAccountTotalLockedGold(account);
-    return balance >= getAccountLockedGoldRequirement(account);
+    // Add a bit of "wiggle room" to accommodate the fact that vote activation can result in a 1
+    // wei rounding error.
+    return balance.add(10) >= getAccountLockedGoldRequirement(account);
   }
 
   /**
