@@ -52,6 +52,7 @@ const shouldReportFlakes = shouldAddCheckToPR || shouldCreateIssues
 const shouldUseGitHub = shouldSkipKnownFlakes || shouldReportFlakes
 
 module.exports = {
+  newflakesShouldFailCheckSuite: newflakesShouldFailCheckSuite,
   numRetries: numRetries,
   org: org,
   repo: repo,

@@ -140,7 +140,7 @@ class GitHub {
 
   async closeIssues(issues) {
     if (!process.env.CIRCLECI) return
-    return Promise.all(issues.map(this.closeIssue))
+    return Promise.all(issues.map((i) => this.closeIssue(i)))
   }
 
   async closeIssue(issue) {
@@ -208,6 +208,8 @@ class GitHub {
       // There should only be one check suite for the FlakeTracker app
       const checkSuite = res.check_suites[0]
 
+      console.log(JSON.stringify(checkSuite))
+
       fn = () =>
         this.rest.paginate(this.rest.checks.listForSuite, {
           ...defaults,
@@ -215,7 +217,11 @@ class GitHub {
         })
 
       errMsg = 'Failed to get check runs in suite.'
-      const checkRuns = (await this.safeExec(fn, errMsg)).check_runs
+      res = await this.safeExec(fn, errMsg)
+
+      console.log(JSON.stringify(res))
+
+      const checkRuns = res.check_runs
 
       const foundFlakes = {}
       const skippedFlakes = {}
