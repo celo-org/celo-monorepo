@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
-import { chooseRestoreAccount } from 'src/account/actions'
+import { chooseCreateAccount, chooseRestoreAccount } from 'src/account/actions'
 import { Namespaces } from 'src/i18n'
 import Logo, { LogoTypes } from 'src/icons/Logo.v2'
 import { welcomeBackground } from 'src/images/Images'
@@ -15,17 +15,24 @@ import { nuxNavigationOptions } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import LanguageButton from 'src/onboarding/LanguageButton'
+import useSelector from 'src/redux/useSelector'
 
 export default function Welcome() {
   const { t } = useTranslation(Namespaces.onboarding)
   const dispatch = useDispatch()
+  const acceptedTerms = useSelector((state) => state.account.acceptedTerms)
   const insets = useSafeAreaInsets()
 
   const navigateNext = () => {
-    navigate(Screens.RegulatoryTerms)
+    if (!acceptedTerms) {
+      navigate(Screens.RegulatoryTerms)
+    } else {
+      navigate(Screens.NameAndNumber)
+    }
   }
 
   const onPressCreateAccount = () => {
+    dispatch(chooseCreateAccount())
     navigateNext()
   }
 

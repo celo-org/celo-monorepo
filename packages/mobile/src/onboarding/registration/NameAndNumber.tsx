@@ -13,7 +13,6 @@ import * as RNLocalize from 'react-native-localize'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { setName, setPhoneNumber, setPromptForno } from 'src/account/actions'
-import { PincodeType } from 'src/account/reducer'
 import { hideAlert, showError } from 'src/alert/actions'
 import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
@@ -30,8 +29,6 @@ interface StateProps {
   cachedName: string | null
   cachedNumber: string | null
   cachedCountryCallingCode: string | null
-  pincodeType: PincodeType
-  acceptedTerms: boolean
 }
 
 interface DispatchProps {
@@ -67,8 +64,6 @@ const mapStateToProps = (state: RootState): StateProps => {
     cachedName: state.account.name,
     cachedNumber: state.account.e164PhoneNumber,
     cachedCountryCallingCode: state.account.defaultCountryCode,
-    pincodeType: state.account.pincodeType,
-    acceptedTerms: state.account.acceptedTerms,
   }
 }
 

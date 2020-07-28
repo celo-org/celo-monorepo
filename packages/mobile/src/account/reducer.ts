@@ -85,6 +85,11 @@ export const reducer = (
         dismissedGetVerified: false,
       }
     }
+    case Actions.CHOOSE_CREATE_ACCOUNT:
+      return {
+        ...state,
+        isRestoringAccount: false,
+      }
     case Actions.CHOOSE_RESTORE_ACCOUNT:
       return {
         ...state,

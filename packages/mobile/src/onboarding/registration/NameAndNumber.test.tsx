@@ -3,7 +3,6 @@ import 'react-native'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import { PincodeType } from 'src/account/reducer'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { Screens } from 'src/navigator/Screens'
 import NameAndNumber, {
@@ -40,7 +39,6 @@ describe('NameAndNumberScreen', () => {
     const wrapper = render(
       <Provider store={store}>
         <NameAndNumberClass
-          acceptedTerms={false}
           showError={showErrorMock}
           hideAlert={jest.fn()}
           setPromptForno={jest.fn()}
@@ -49,7 +47,6 @@ describe('NameAndNumberScreen', () => {
           cachedName={''}
           cachedNumber={''}
           cachedCountryCallingCode={'+1'}
-          pincodeType={PincodeType.Unset}
           {...getMockI18nProps()}
           {...mockScreenProps}
         />
@@ -64,7 +61,6 @@ describe('NameAndNumberScreen', () => {
     const wrapper = render(
       <Provider store={createMockStore()}>
         <NameAndNumberClass
-          acceptedTerms={false}
           showError={jest.fn()}
           hideAlert={jest.fn()}
           setPromptForno={jest.fn()}
@@ -73,7 +69,6 @@ describe('NameAndNumberScreen', () => {
           cachedName={''}
           cachedNumber={''}
           cachedCountryCallingCode={''}
-          pincodeType={PincodeType.Unset}
           {...getMockI18nProps()}
           {...mockScreenProps}
         />
@@ -88,7 +83,6 @@ describe('NameAndNumberScreen', () => {
     const wrapper = render(
       <Provider store={createMockStore()}>
         <NameAndNumberClass
-          acceptedTerms={false}
           showError={error}
           hideAlert={jest.fn()}
           setPhoneNumber={jest.fn()}
@@ -97,7 +91,6 @@ describe('NameAndNumberScreen', () => {
           cachedName={''}
           cachedNumber={''}
           cachedCountryCallingCode={''}
-          pincodeType={PincodeType.Unset}
           {...getMockI18nProps()}
           {...mockScreenProps}
         />

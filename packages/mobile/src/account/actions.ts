@@ -3,6 +3,7 @@ import { PaymentRequest } from 'src/account/types'
 
 // TODO(Rossy): Remove the _ACTION suffix from these actions for consistency with other other names
 export enum Actions {
+  CHOOSE_CREATE_ACCOUNT = 'ACCOUNT/CHOOSE_CREATE',
   CHOOSE_RESTORE_ACCOUNT = 'ACCOUNT/CHOOSE_RESTORE',
   CANCEL_CREATE_OR_RESTORE_ACCOUNT = 'ACCOUNT/CANCEL_CREATE_OR_RESTORE_ACCOUNT',
   SET_NAME = 'ACCOUNT/SET_NAME',
@@ -29,6 +30,9 @@ export enum Actions {
   MIGRATE_ACCOUNT_BIP39 = 'MIGRATE_ACCOUNT_BIP39',
 }
 
+export interface ChooseCreateAccountAction {
+  type: Actions.CHOOSE_CREATE_ACCOUNT
+}
 export interface ChooseRestoreAccountAction {
   type: Actions.CHOOSE_RESTORE_ACCOUNT
 }
@@ -137,6 +141,7 @@ export interface MigrateAccount {
 }
 
 export type ActionTypes =
+  | ChooseCreateAccountAction
   | ChooseRestoreAccountAction
   | CancelCreateOrRestoreAccountAction
   | SetNameAction
@@ -161,6 +166,12 @@ export type ActionTypes =
   | SetRetryVerificationWithFornoAction
   | AcceptTermsAction
   | MigrateAccount
+
+export function chooseCreateAccount(): ChooseCreateAccountAction {
+  return {
+    type: Actions.CHOOSE_CREATE_ACCOUNT,
+  }
+}
 
 export function chooseRestoreAccount(): ChooseRestoreAccountAction {
   return {

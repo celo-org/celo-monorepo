@@ -18,7 +18,15 @@ describe('Welcome', () => {
     fireEvent.press(getByTestId('CreateAccountButton'))
     jest.runAllTimers()
     expect(navigate).toHaveBeenCalledWith(Screens.RegulatoryTerms)
-    expect(store.getActions()).toMatchInlineSnapshot(`Array []`)
+    expect(store.getActions()).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "type": "ACCOUNT/CHOOSE_CREATE",
+        },
+      ]
+    `)
+
+    store.clearActions()
 
     fireEvent.press(getByTestId('RestoreAccountButton'))
     jest.runAllTimers()

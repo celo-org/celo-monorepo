@@ -483,12 +483,9 @@ export function MainStackScreen() {
 
     if (!language) {
       initialRoute = Screens.Language
-    } else if (!e164Number) {
+    } else if (!e164Number || !acceptedTerms || pincodeType === PincodeType.Unset) {
+      // User didn't go far enough in onboarding, start again from education
       initialRoute = Screens.OnboardingEducationScreen
-    } else if (!acceptedTerms) {
-      initialRoute = Screens.RegulatoryTerms
-    } else if (pincodeType === PincodeType.Unset) {
-      initialRoute = Screens.PincodeSet
     } else if (!redeemComplete && !account) {
       initialRoute = isRestoringAccount ? Screens.ImportWallet : Screens.EnterInviteCode
     } else if (!hasSeenVerificationNux) {
