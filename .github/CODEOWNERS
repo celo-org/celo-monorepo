@@ -9,7 +9,7 @@
 /packages/attestation-proxy/ @jmrossy 
 /packages/attestation-service/ @nambrot
 /packages/azure/ @codyborn
-/packages/blockchain-api/ @jmrossy @cmcewen @i1skn 
+/packages/blockchain-api/ @jmrossy @cmcewen @i1skn @jeanregisser
 /packages/celotool/ @asaj
 /packages/cli/ @mcortesi @gastonponti
 /packages/contractkit/ @mcortesi @gastonponti
