@@ -143,7 +143,7 @@ class GitHub {
   }
 
   async closeIssues(issues) {
-    return Promise.all(issues.map(closeIssue))
+    return Promise.all(issues.map(this.closeIssue))
   }
 
   async closeIssue(issue) {
