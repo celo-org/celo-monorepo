@@ -64,11 +64,11 @@ just include the link to the corresponding flakey test issue in the PR body and 
 
 TODO(Alec): Add issue cleanup (TESTING)
 
-TODO(Alec): flesh out summary check (TESTING)
+TODO(Alec): change statuses for checks (use emojis instead?) (Testing)
 
-TODO(Alec): change statuses for checks (use emojis instead?)
+TODO(Alec): flesh out summary check (NEXT)
 
-TODO(Alec): address PR comments
+TODO(Alec): address PR comments (NEXT)
 
 TODO(Alec): fill in PR template
 

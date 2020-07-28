@@ -14,12 +14,6 @@ const defaults = {
   repo: config.repo,
 }
 
-const statuses = {
-  failure: 'flakey tests were found',
-  neutral: 'flakey tests were skipped',
-  success: 'no flakey tests found!',
-}
-
 const FlakeLabel = 'FLAKEY'
 const getLabels = () => {
   const labels = [FlakeLabel, utils.getPackageName()]
@@ -138,6 +132,7 @@ class GitHub {
     const promises = [this.addObsoleteIssuesCheck(obsoleteIssues)]
     //if (process.env.CIRCLE_BRANCH === 'master') {
     if (true) {
+      //TODO(Alec)
       promises.push(this.closeIssues(obsoleteIssues))
     }
     return Promise.all(promises)
@@ -300,18 +295,25 @@ class GitHub {
       }
     })
     const output = {
-      title: statuses[conclusion],
+      title: utils.statuses[conclusion],
       summary: stripAnsi(summary_0),
       text: stripAnsi(summary_3),
       annotations: annotations,
     }
 
+    let name = utils.getTestSuiteTitles().join(' -> ')
+    let conclusionToDisplay = conclusion
+    if (!config.newflakesShouldFailCheckSuite && conclusion !== 'success') {
+      name = utils.emojis[conclusion] + ' ' + name
+      conclusionToDisplay = 'neutral'
+    }
+
     await this.addCheckRun(
       {
         ...defaults,
-        name: utils.redX + utils.getTestSuiteTitles().join(' -> '),
+        name: name,
         head_sha: process.env.CIRCLE_SHA1,
-        conclusion: conclusion,
+        conclusion: conclusionToDisplay,
         output: output,
       },
       'Failed to add check run.'

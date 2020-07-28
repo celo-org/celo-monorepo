@@ -1,7 +1,10 @@
 const org = process.env.CIRCLE_PROJECT_USERNAME || 'celo-org'
 const repo = process.env.CIRCLE_PROJECT_REPONAME || 'celo-monorepo'
 
-// NOTE: Avoid editing this file unless you are making changes to the flake trackers' functionality.
+// newflakesShouldFailCheckSuite => determines whether GitHub Check has status 'failure' or 'neutral' when new flakey tests are found.
+const newflakesShouldFailCheckSuite = false
+
+// NOTE: Avoid editing the following constants unless you are making changes to the flake trackers' functionality.
 // This file serves mainly to distill various environment variables into easy to use booleans for the rest of the project.
 // Configuration should be done via env variables in config.yaml (or command line if running locally)
 

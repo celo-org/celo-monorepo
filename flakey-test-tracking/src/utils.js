@@ -11,6 +11,18 @@ const hands = String.fromCodePoint(0x1f64c)
 
 const flakeTitlePrefix = '[FLAKEY TEST] '
 
+const statuses = {
+  failure: 'flakey tests were found',
+  neutral: 'flakey tests were skipped',
+  success: 'no flakey tests found!',
+}
+
+const emojis = {
+  failure: redX,
+  neutral: warning,
+  success: greenCheck,
+}
+
 function fmtFlakeIssue(testID, errors) {
   return {
     title: flakeTitlePrefix + testID,
@@ -201,6 +213,7 @@ function calcObsoleteFlakeIssues(skippedTests, knownFlakes) {
 
 module.exports = {
   calcObsoleteFlakeIssues: calcObsoleteFlakeIssues,
+  emojis: emojis,
   fmtFlakeIssue: fmtFlakeIssue,
   fmtSummary: fmtSummary,
   fmtTestTitles: fmtTestTitles,
@@ -217,5 +230,5 @@ module.exports = {
   parseMandatoryTestIssuesFromPullBody: parseMandatoryTestIssuesFromPullBody,
   parsePathFromStack: parsePathFromStack,
   parseTestIdFromFlakeTitle: parseTestIdFromFlakeTitle,
-  redX: redX,
+  statuses: statuses,
 }
