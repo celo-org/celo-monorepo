@@ -1,12 +1,11 @@
 // tslint:disable: max-classes-per-file
-import { makeZContract } from '@celo/protocol/lib/compatibility/internal'
+import { Artifact } from '@celo/protocol/lib/compatibility/internal'
 import { ContractVersionChecker, ContractVersionCheckerIndex, ContractVersionDelta, ContractVersionDeltaIndex, ContractVersion, ContractVersionIndex } from '@celo/protocol/lib/compatibility/version'
-import {
-  BuildArtifacts,
-  Contract as ZContract
-} from '@openzeppelin/upgrades'
+import { BuildArtifacts } from '@openzeppelin/upgrades'
 const VM = require('ethereumjs-vm').default
 const abi = require('ethereumjs-abi')
+
+export const DEFAULT_VERSION_STRING = '1.0.0.0'
 
 /**
  * A mapping {contract name => {@link ContractVersion}}.
@@ -16,7 +15,7 @@ export class ASTContractVersions {
     const contracts = {}
 
     await Promise.all(artifacts.listArtifacts().map(async (artifact) => {
-      contracts[artifact.contractName] = await getContractVersion(makeZContract(artifact))
+      contracts[artifact.contractName] = await getContractVersion(artifact)
     }))
     return new ASTContractVersions(contracts)
   }
@@ -30,9 +29,9 @@ export class ASTContractVersions {
  *
  * If the contract version cannot be retrieved, returns version 1.0.0.0 by default.
  */
-async function getContractVersion(contract: ZContract): Promise<ContractVersion> {
+export async function getContractVersion(artifact: Artifact): Promise<ContractVersion> {
   const vm = new VM()
-  const bytecode = contract.schema.deployedBytecode
+  const bytecode = artifact.deployedBytecode
   const data = '0x' + abi.methodID('getVersionNumber', []).toString('hex')
   const nullAddress = '0000000000000000000000000000000000000000'
   // Artificially link all libraries to the null address.
@@ -50,8 +49,8 @@ async function getContractVersion(contract: ZContract): Promise<ContractVersion>
       return ContractVersion.fromGetVersionNumberReturnValue(value)
     }
   }
-  // If we can't fetch the version number, assume version 1.0.0.0.
-  return ContractVersion.fromString('1.0.0.0')
+  // If we can't fetch the version number, assume default version.
+  return ContractVersion.fromString(DEFAULT_VERSION_STRING)
 }
 
 export class ASTContractVersionsChecker {

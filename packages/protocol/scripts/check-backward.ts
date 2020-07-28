@@ -59,12 +59,16 @@ const out = (msg: string, force?: boolean): void => {
 }
 
 const outFile = argv.output_file ? argv.output_file : tmp.tmpNameSync({})
-const exclude = argv.exclude ? argv.exclude : ''
+const exclude: RegExp = argv.exclude ? new RegExp(argv.exclude) : null
+const oldArtifacts = instantiateArtifacts(oldArtifactsFolder)
+const newArtifacts = instantiateArtifacts(newArtifactsFolder)
 
 try {
   const backward = ASTBackwardReport.create(
     oldArtifactsFolder,
     newArtifactsFolder,
+    oldArtifacts,
+    newArtifacts,
     exclude,
     new DefaultCategorizer(),
     out
@@ -77,16 +81,12 @@ try {
     // Placebo command
   } else if (argv._.includes(COMMAND_SEM_CHECK)) {
     const doVersionCheck = async () => {
-      const excludeRegexp: RegExp = exclude ? new RegExp(exclude) : null
-      const versionChecker = (
-        await ASTContractVersionsChecker.create(
-          instantiateArtifacts(oldArtifactsFolder),
-          instantiateArtifacts(newArtifactsFolder),
-          backward.report.versionDeltas()
-        )
-      ).excluding(excludeRegexp)
-
-      const mismatches = versionChecker.mismatches()
+      const versionChecker = await ASTContractVersionsChecker.create(
+        oldArtifacts,
+        newArtifacts,
+        backward.report.versionDeltas()
+      )
+      const mismatches = versionChecker.excluding(exclude).mismatches()
       if (mismatches.isEmpty()) {
         out('Actual version numbers match expected\n')
         process.exit(0)

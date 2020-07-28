@@ -11,7 +11,6 @@ import { ContractVersionDelta, ContractVersionDeltaIndex } from '@celo/protocol/
  * Value object holding all uncategorized storage and code reports.
  */
 export class ASTReports {
-
   constructor(
     public readonly code: ASTCodeCompatibilityReport,
     public readonly storage: ASTStorageCompatibilityReport[]) {}
