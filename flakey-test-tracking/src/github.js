@@ -68,7 +68,7 @@ class GitHub {
       }
     }
     if (config.shouldAddCheckToPR) {
-      promises.push(this.addCheck(flakes, skippedTests))
+      promises.push(this.addFlakeCheck(flakes, skippedTests))
       if (config.shouldSkipKnownFlakes && obsoleteIssues.length) {
         promises.push(this.handleObsoleteIssues(obsoleteIssues))
       }
@@ -86,14 +86,13 @@ class GitHub {
       flake.body =
         'Discovered in PR ' + process.env.CIRCLE_PULL_REQUEST + '\n\n' + flake.body + '\n'
     }
-    const fn = () => {
-      return this.rest.issues.create({
+    const fn = () =>
+      this.rest.issues.create({
         ...defaults,
         title: flake.title,
         body: stripAnsi(flake.body),
         labels: getLabels(),
       })
-    }
     const errMsg = 'Failed to create issue for flakey test. ' + 'Title: "' + flake.title + '",'
     await this.safeExec(fn, errMsg)
   }
@@ -101,12 +100,11 @@ class GitHub {
   async fetchMandatoryTestsForPR() {
     if (!process.env.CIRCLECI) return []
     const prNumber = utils.getPullNumber()
-    const fn = () => {
-      return this.rest.pulls.get({
+    const fn = () =>
+      this.rest.pulls.get({
         ...defaults,
         pull_number: prNumber,
       })
-    }
     console.log('\nFetching mandatory tests for PR ' + prNumber + '...\n')
     const errMsg = 'Failed to fetch mandatory tests for PR ' + prNumber
     const prBody = (await this.safeExec(fn, errMsg)).data.body
@@ -114,13 +112,12 @@ class GitHub {
   }
 
   async fetchFlakeIssues() {
-    const fn = () => {
-      return this.rest.paginate(this.rest.issues.listForRepo, {
+    const fn = () =>
+      this.rest.paginate(this.rest.issues.listForRepo, {
         ...defaults,
         state: 'open',
         labels: getLabels(),
       })
-    }
     console.log('\nFetching known flakey tests from GitHub...')
     const errMsg = 'Failed to fetch existing flakey test issues from GitHub.'
     const issues = (await this.safeExec(fn, errMsg)) || []
@@ -138,7 +135,8 @@ class GitHub {
 
   async handleObsoleteIssues(obsoleteIssues) {
     const promises = [this.addObsoleteIssuesCheck(obsoleteIssues)]
-    if (process.env.CIRCLE_BRANCH === 'master') {
+    //if (process.env.CIRCLE_BRANCH === 'master') {
+    if (true) {
       promises.push(this.closeIssues(obsoleteIssues))
     }
     return Promise.all(promises)
@@ -149,80 +147,131 @@ class GitHub {
   }
 
   async closeIssue(issue) {
-    const fn = () => {
-      return this.rest.issues.update({
+    const fn = () =>
+      this.rest.issues.update({
         ...defaults,
         issue_number: issue.number,
         state: 'closed',
       })
-    }
     console.log('\nClosing obsolete issue ' + issue.number + '...')
     const errMsg = 'Failed to close obsolete issue.'
     await this.safeExec(fn, errMsg)
   }
 
   async addObsoleteIssuesCheck(obsoleteIssues) {
-    const fn = () => {
-      return this.rest.checks.create({
-        ...defaults,
-        name: utils.getTestSuiteTitles().join(' -> '),
-        head_sha: process.env.CIRCLE_SHA1,
-        conclusion: 'action_required',
-        output: {
-          title: 'Obsolete Issues',
-          summary: 'Some flakey test issues no longer correspond to actual tests',
-          text:
-            (process.env.CIRCLE_BRANCH === 'master'
-              ? 'Because these flakey test issues are now obsolete on master, they have been automatically closed.'
-              : 'If tests have been refactored or renamed please update the following issues accordingly. If left unchanged, these issues will be automatically closed when this PR is merged.') +
-            '\n\n' +
-            obsoleteIssues.map((i) => i.html_url).join('\n\n'),
+    if (obsoleteIssues.length) {
+      await this.addCheckRun(
+        {
+          ...defaults,
+          name: utils.getTestSuiteTitles().join(' -> '),
+          head_sha: process.env.CIRCLE_SHA1,
+          conclusion: 'neutral',
+          output: {
+            title: 'Obsolete Issues',
+            summary: 'Some flakey test issues no longer correspond to actual tests',
+            text:
+              (process.env.CIRCLE_BRANCH === 'master'
+                ? 'Because these flakey test issues are now obsolete on master, they have been automatically closed.'
+                : 'If tests have been refactored or renamed please update the following issues accordingly. If left unchanged, these issues will be automatically closed when this PR is merged.') +
+              '\n\n' +
+              obsoleteIssues.map((i) => i.html_url).join('\n\n'),
+          },
         },
-      })
+        'Failed to add obsolete issues check run.'
+      )
     }
-    const errMsg = 'Failed to add obsolete issues check run.'
-    await this.safeExec(fn, errMsg)
   }
 
-  // This is called only in a final job added to the workflow.
-  // It adds a 'success' GitHub check to the PR when no flakiness has been reported.
+  // addSummaryCheck is called in a final job added to the CI workflow.
+  // It provides a breakdown of where flakey tests are located.
   async addSummaryCheck() {
-    // Get number of check runs added so far
-    let fn = () => {
-      return this.rest.checks.listSuitesForRef({
+    const title = 'Flakey Test Summary'
+    const optsBase = { ...defaults, name: 'Summary', head_sha: process.env.CIRCLE_SHA1 }
+
+    // Get FlakeTracker check runs added so far
+    let fn = () =>
+      this.rest.checks.listSuitesForRef({
         ...defaults,
         ref: process.env.CIRCLE_SHA1,
-        app_id: flakeTrackerID, // only list suites created by the FlakeTracker app
+        app_id: flakeTrackerID,
       })
-    }
+
     let errMsg = 'Failed to list check suites.'
-    const numCheckSuites = (await this.safeExec(fn, errMsg)).data.total_count
+    let res = (await this.safeExec(fn, errMsg)).data
+    const numCheckSuites = res.total_count
 
-    // If a check suite has not yet been created by the FlakeTracker app, then no
-    // flakiness has been detected in the earlier jobs.
-    //if (!numCheckSuites) {
-    if (true) {
-      // Add a succesful check showing no flakiness has been detected.
+    let opts
 
-      fn = () => {
-        return this.rest.checks.create({
+    if (numCheckSuites) {
+      //TODO(Alec)
+
+      // There should only be one check suite for the FlakeTracker app
+      const checkSuite = res.check_suites[0]
+
+      fn = () =>
+        this.rest.paginate(this.rest.checks.listForSuite, {
           ...defaults,
-          name: 'Summary',
-          head_sha: process.env.CIRCLE_SHA1,
-          conclusion: 'success',
-          output: {
-            title: statuses['success'],
-            summary: utils.fmtSummary([], [], 0),
-            images: [utils.getRandomSuccessImage()],
-          },
+          check_suite_id: checkSuite.id,
         })
+
+      errMsg = 'Failed to get check runs in suite.'
+      const checkRuns = await this.safeExec(fn, errMsg).data.check_runs
+
+      const foundFlakes = {}
+      const skippedFlakes = {}
+      const totalFlakes = {}
+
+      checkRuns
+        .map((checkRun) => checkRun.output.text)
+        .forEach((text) => {
+          let skipped = 0
+          let found = 0
+          text
+            .match(/[0-9]+\sflakey/)
+            .map((s) => s.replace(/^[0-9]+/, ''))
+            .forEach((n) => (skipped += Number(n)))
+          text
+            .match(/[0-9]+\snew\sflakey/)
+            .map((s) => s.replace(/^[0-9]+/, ''))
+            .forEach((n) => (found += Number(n)))
+          skippedFlakes[checkRun.name] = skipped
+          foundFlakes[checkRun.name] = found
+          totalFlakes[checkRun.name] = skipped + found
+        })
+
+      opts = {
+        ...optsBase,
+        conclusion: 'neutral',
+        output: {
+          title: title,
+          summary: utils.fmtSummary(Object.keys(foundFlakes), Object.keys(skippedFlakes), 0),
+          text:
+            JSON.stringify(totalFlakes) +
+            '\n\n' +
+            JSON.stringify(foundFlakes) +
+            '\n\n' +
+            JSON.stringify(skippedFlakes) +
+            '\n\n',
+        },
       }
-      errMsg = 'Failed to add summary check run.'
-      await this.safeExec(fn, errMsg)
+    } else {
+      // If a check suite has not yet been created by the FlakeTracker app, then no
+      // flakiness has been detected in the earlier jobs.
+      opts = {
+        ...optsBase,
+        conclusion: 'success',
+        output: {
+          title: title,
+          summary: utils.fmtSummary([], [], 0),
+          images: [utils.getRandomSuccessImage()],
+        },
+      }
     }
+
+    await this.addCheckRun(opts, 'Failed to add summary check run.')
   }
 
-  async addCheck(flakes, skippedTests) {
+  async addFlakeCheck(flakes, skippedTests) {
     const conclusion = utils.getConclusion(flakes, skippedTests)
 
     // Only add checks when there's flakiness (otherwise check suite gets cluttered)
@@ -251,16 +300,22 @@ class GitHub {
       annotations: annotations,
     }
 
-    const fn = () => {
-      return this.rest.checks.create({
+    await this.addCheckRun(
+      {
         ...defaults,
-        name: utils.getTestSuiteTitles().join(' -> '),
+        name: utils.redX + utils.getTestSuiteTitles().join(' -> '),
         head_sha: process.env.CIRCLE_SHA1,
         conclusion: conclusion,
         output: output,
-      })
+      },
+      'Failed to add check run.'
+    )
+  }
+
+  async addCheckRun(opts, errMsg) {
+    const fn = () => {
+      return this.rest.checks.create(opts)
     }
-    const errMsg = 'Failed to add check run.'
     await this.safeExec(fn, errMsg)
   }
 

@@ -120,7 +120,7 @@ function fmtSummary(flakes, skippedTests, verbosity) {
       return 'New flakiness detected ' + redX
     }
     if (skippedTests.length) {
-      return 'Some tests were skipped due to flakiness. No new flakiness detected.'
+      return 'Some tests were skipped due to flakiness.'
     }
     return 'We have achieved zero flakiness ' + hands + ' ' + greenCheck
   }
@@ -217,4 +217,5 @@ module.exports = {
   parseMandatoryTestIssuesFromPullBody: parseMandatoryTestIssuesFromPullBody,
   parsePathFromStack: parsePathFromStack,
   parseTestIdFromFlakeTitle: parseTestIdFromFlakeTitle,
+  redX: redX,
 }

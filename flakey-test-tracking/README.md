@@ -62,11 +62,11 @@ just include the link to the corresponding flakey test issue in the PR body and 
 
 ## TODO
 
-TODO(Alec): ensure 100% coverage (TESTING)
+TODO(Alec): Add issue cleanup (TESTING)
 
-TODO(Alec): fix skipping logic and add issue cleanup (TESTING)
+TODO(Alec): flesh out summary check (TESTING)
 
-TODO(Alec): flesh out summary check (NEXT)
+TODO(Alec): change statuses for checks (use emojis instead?)
 
 TODO(Alec): address PR comments
 
