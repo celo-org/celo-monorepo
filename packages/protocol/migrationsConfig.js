@@ -17,9 +17,7 @@ const network = require('./truffle-config.js').networks[argv.network]
 
 // Almost never use exponential notation in toString
 // http://mikemcl.github.io/bignumber.js/#exponential-at
-BigNumber.config({
-  EXPONENTIAL_AT: 1e9,
-})
+BigNumber.config({ EXPONENTIAL_AT: 1e9 })
 
 const SECOND = 1
 const MINUTE = 60 * SECOND
@@ -52,14 +50,14 @@ const DefaultConfig = {
   downtimeSlasher: {
     reward: '10000000000000000000', // 10 cGLD
     penalty: '100000000000000000000', // 100 cGLD
-    slashableDowntime: (1 * HOUR) / 5, // ~8 hours
+    slashableDowntime: (8 * HOUR) / 5, // ~8 hours
   },
   election: {
     minElectableValidators: '22',
     maxElectableValidators: '100',
     maxVotesPerAccount: 10,
     electabilityThreshold: 1 / 1000,
-    frozen: false,
+    frozen: true,
   },
   epochRewards: {
     targetVotingYieldParameters: {
@@ -81,14 +79,14 @@ const DefaultConfig = {
     communityRewardFraction: 1 / 4,
     carbonOffsettingPartner: '0x0000000000000000000000000000000000000000',
     carbonOffsettingFraction: 1 / 1000,
-    frozen: false,
+    frozen: true,
   },
   exchange: {
     spread: 5 / 1000,
     reserveFraction: 1 / 100,
     updateFrequency: 5 * MINUTE,
     minimumReports: 5,
-    frozen: false,
+    frozen: true,
   },
   gasPriceMinimum: {
     minimumFloor: 100000000,
@@ -96,7 +94,7 @@ const DefaultConfig = {
     adjustmentSpeed: 1 / 2,
   },
   goldToken: {
-    frozen: false,
+    frozen: true,
   },
   governance: {
     queueExpiry: 4 * WEEK,
@@ -192,7 +190,7 @@ const DefaultConfig = {
       '0x5091110175318A2A8aF88309D1648c1D84d31B29',
       '0xBBd6e54Af7A5722f42461C6313F37Bd50729F195',
     ],
-    frozen: false,
+    frozen: true,
   },
   transferWhitelist: {
     // Whitelist genesis block addresses.
