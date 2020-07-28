@@ -310,7 +310,7 @@ function* updatePhoneNumberMappings(newIdentityData: IdentityMetadataInTx[]) {
   yield put(updateE164PhoneNumberAddresses(e164NumberToAddressUpdates, addressToE164NumberUpdates))
 }
 
-export async function* getAuthSignerForAccount(account: string) {
+export function* getAuthSignerForAccount(account: string) {
   // Use the DEK for authentication if the current DEK is registered with this account
   const registeredEncryptionKey: Buffer | null = yield call(getCommentKey, account)
   let authSigner: AuthSigner | undefined
@@ -323,15 +323,20 @@ export async function* getAuthSignerForAccount(account: string) {
       if (encryptionKeyPublic !== registeredEncryptionKey) {
         Logger.warn(TAG + 'getAuthSignerForAccount', 'DEK mismatch.')
       } else {
+        Logger.info(TAG + 'getAuthSignerForAccount', 'Using DEK for authentication')
         authSigner = {
           authenticationMethod: AuthenticationMethod.ENCRYPTIONKEY,
           rawKey: hexToBuffer(encryptionKeyPrivate),
         }
       }
     }
+  } else {
+    Logger.info(TAG + 'getAuthSignerForAccount', 'DEK not yet registered')
   }
+
   // Fallback to using wallet key
   if (!authSigner) {
+    Logger.info(TAG + 'getAuthSignerForAccount', 'Using wallet key for authentication')
     const contractKit = yield call(getContractKit)
     authSigner = {
       authenticationMethod: AuthenticationMethod.WALLETKEY,

@@ -1,6 +1,6 @@
 import { getPhoneHash, isE164Number } from '@celo/utils/lib/phoneNumbers'
-import threshold_bls from 'blind-threshold-bls'
 import { createHash } from 'crypto'
+import { BlsBlindingClient, WasmBlsBlindingClient } from './bls-blinding-client'
 import {
   AuthSigner,
   Logger,
@@ -10,7 +10,7 @@ import {
   SignMessageResponse,
 } from './phone-number-lookup'
 
-const crypto = require('crypto')
+// const crypto = require('crypto')
 const SALT_CHAR_LENGTH = 13
 const SIGN_MESSAGE_ENDPOINT = '/getDistributedBlindedSalt'
 const TAG = 'contractkit/utils/phone-number-lookup/phone-number-identifier'
@@ -32,22 +32,22 @@ export async function getPhoneNumberIdentifier(
   logger: Logger,
   failureCallback: (response: Response) => void,
   selfPhoneHash?: string,
-  walletVersion?: string
+  walletVersion?: string,
+  blsBlindingClient?: BlsBlindingClient
 ): Promise<PhoneNumberHashDetails> {
   logger.debug(`${TAG}@getPhoneNumberIdentifier`, 'Getting phone number salt')
 
   if (!isE164Number(e164Number)) {
     throw new Error(`Invalid phone number: ${e164Number}`)
   }
+  // Fallback to using Wasm version if not specified
+  if (!blsBlindingClient) {
+    blsBlindingClient = new WasmBlsBlindingClient(context.pgpnpPubKey)
+  }
 
   logger.debug(`${TAG}@getPhoneNumberIdentifier`, 'Retrieving blinded message')
-  // const base64PhoneNumber = Buffer.from(e164Number).toString('base64')
-
-  const userSeed = crypto.randomBytes(32)
-  const rawMessage = Buffer.from(e164Number)
-  const blindedValue = await threshold_bls.blind(rawMessage, userSeed)
-  const blindedMessage = blindedValue.message
-  const base64BlindedMessage = Buffer.from(blindedMessage).toString('base64')
+  const base64PhoneNumber = Buffer.from(e164Number).toString('base64')
+  const base64BlindedMessage = await blsBlindingClient.blindMessage(base64PhoneNumber)
 
   const body: SignMessageRequest = {
     account,
@@ -67,16 +67,11 @@ export async function getPhoneNumberIdentifier(
   )
   const base64BlindSig = response.combinedSignature
   logger.debug(`${TAG}@getPhoneNumberIdentifier`, 'Retrieving unblinded signature')
-  const pgpnpPubKey = new Uint8Array(Buffer.from(context.pgpnpPubKey, 'base64'))
-  // const base64UnblindedSig = await BlindThresholdBls.unblindMessage(base64BlindSig, pgpnpPubKey)
-  const blindedSignature = new Uint8Array(Buffer.from(base64BlindSig, 'base64'))
-
-  const unblindMessage = await threshold_bls.unblind(blindedSignature, blindedValue.blindingFactor)
-  // (this throws on error)
-  threshold_bls.verify(pgpnpPubKey, rawMessage, unblindMessage)
+  const base64UnblindedSig = await blsBlindingClient.unblindAndVerifyMessage(base64BlindSig)
+  const sigBuf = Buffer.from(base64UnblindedSig, 'base64')
 
   logger.debug(`${TAG}@getPhoneNumberIdentifier`, 'Converting sig to salt')
-  const salt = getSaltFromThresholdSignature(Buffer.from(unblindMessage))
+  const salt = getSaltFromThresholdSignature(sigBuf)
   const phoneHash = getPhoneHash(e164Number, salt)
   return { e164Number, phoneHash, salt }
 }

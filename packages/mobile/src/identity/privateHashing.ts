@@ -8,6 +8,7 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import networkConfig from 'src/geth/networkConfig'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
+import { ReactBlsBlindingClient } from 'src/identity/bls-blinding-client'
 import { getAuthSignerForAccount } from 'src/identity/commentEncryption'
 import { e164NumberToSaltSelector, E164NumberToSaltType } from 'src/identity/reducer'
 import { isUserBalanceSufficient } from 'src/identity/utils'
@@ -84,7 +85,7 @@ function* doFetchPhoneHashPrivate(e164Number: string) {
 // Unlike the getPhoneHash in utils, this leverages the phone number
 // privacy service to compute a secure, unique salt for the phone number
 // and then appends it before hashing.
-async function* getPhoneHashPrivate(e164Number: string, account: string, selfPhoneHash?: string) {
+function* getPhoneHashPrivate(e164Number: string, account: string, selfPhoneHash?: string) {
   if (!isE164Number(e164Number)) {
     throw new Error(ErrorMessages.INVALID_PHONE_NUMBER)
   }
@@ -100,6 +101,9 @@ async function* getPhoneHashPrivate(e164Number: string, account: string, selfPho
     }
   }
 
+  const { pgpnpPubKey } = networkConfig
+  const blsBlindingClient = new ReactBlsBlindingClient(pgpnpPubKey)
+
   return yield call(
     getPhoneNumberIdentifier,
     e164Number,
@@ -109,7 +113,8 @@ async function* getPhoneHashPrivate(e164Number: string, account: string, selfPho
     Logger,
     failureCallback,
     selfPhoneHash,
-    DeviceInfo.getVersion()
+    DeviceInfo.getVersion(),
+    blsBlindingClient
   )
 }
 
