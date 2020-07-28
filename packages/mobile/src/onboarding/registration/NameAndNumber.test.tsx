@@ -6,17 +6,19 @@ import * as renderer from 'react-test-renderer'
 import { PincodeType } from 'src/account/reducer'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { Screens } from 'src/navigator/Screens'
-import JoinCelo, { JoinCelo as JoinCeloClass } from 'src/onboarding/registration/NameAndNumber'
+import NameAndNumber, {
+  NameAndNumber as NameAndNumberClass,
+} from 'src/onboarding/registration/NameAndNumber'
 import { createMockStore, getMockI18nProps, getMockStackScreenProps } from 'test/utils'
 
-const mockScreenProps = getMockStackScreenProps(Screens.JoinCelo)
+const mockScreenProps = getMockStackScreenProps(Screens.NameAndNumber)
 
-describe('JoinCeloScreen', () => {
+describe('NameAndNumberScreen', () => {
   it('renders correctly', () => {
     const store = createMockStore()
     const tree = renderer.create(
       <Provider store={store}>
-        <JoinCelo {...mockScreenProps} />
+        <NameAndNumber {...mockScreenProps} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
@@ -26,7 +28,7 @@ describe('JoinCeloScreen', () => {
     const store = createMockStore({ alert: { underlyingError: ErrorMessages.INVALID_INVITATION } })
     const tree = renderer.create(
       <Provider store={store}>
-        <JoinCelo {...mockScreenProps} />
+        <NameAndNumber {...mockScreenProps} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
@@ -37,7 +39,7 @@ describe('JoinCeloScreen', () => {
     const store = createMockStore()
     const wrapper = render(
       <Provider store={store}>
-        <JoinCeloClass
+        <NameAndNumberClass
           acceptedTerms={false}
           showError={showErrorMock}
           hideAlert={jest.fn()}
@@ -54,14 +56,14 @@ describe('JoinCeloScreen', () => {
       </Provider>
     )
     fireEvent.changeText(wrapper.getByTestId('PhoneNumberField'), '4155556666')
-    fireEvent.press(wrapper.getByTestId('JoinCeloContinueButton'))
+    fireEvent.press(wrapper.getByTestId('NameAndNumberContinueButton'))
     expect(showErrorMock.mock.calls[0][0]).toBe(ErrorMessages.MISSING_FULL_NAME)
   })
 
   it('is disabled with no text', () => {
     const wrapper = render(
       <Provider store={createMockStore()}>
-        <JoinCeloClass
+        <NameAndNumberClass
           acceptedTerms={false}
           showError={jest.fn()}
           hideAlert={jest.fn()}
@@ -85,7 +87,7 @@ describe('JoinCeloScreen', () => {
 
     const wrapper = render(
       <Provider store={createMockStore()}>
-        <JoinCeloClass
+        <NameAndNumberClass
           acceptedTerms={false}
           showError={error}
           hideAlert={jest.fn()}

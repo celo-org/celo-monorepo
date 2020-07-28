@@ -6,7 +6,6 @@ import { ScrollView, StyleSheet, Text } from 'react-native'
 import { SafeAreaInsetsContext, SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { acceptTerms } from 'src/account/actions'
-import { PincodeType } from 'src/account/reducer'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { CELO_TERMS_LINK } from 'src/config'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -18,18 +17,6 @@ import { navigateToURI } from 'src/utils/linking'
 
 const MARGIN = 24
 
-interface StateProps {
-  pincodeType: PincodeType
-  isRestoringAccount: boolean | undefined
-}
-
-function mapStateToProps(state: RootState): StateProps {
-  return {
-    pincodeType: state.account.pincodeType,
-    isRestoringAccount: state.account.isRestoringAccount,
-  }
-}
-
 interface DispatchProps {
   acceptTerms: typeof acceptTerms
 }
@@ -38,7 +25,7 @@ const mapDispatchToProps: DispatchProps = {
   acceptTerms,
 }
 
-type Props = WithTranslation & DispatchProps & StateProps
+type Props = WithTranslation & DispatchProps
 
 export class RegulatoryTerms extends React.Component<Props> {
   static navigationOptions = nuxNavigationOptions
@@ -95,8 +82,8 @@ export class RegulatoryTerms extends React.Component<Props> {
   }
 }
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
-  mapStateToProps,
+export default connect<{}, DispatchProps, {}, RootState>(
+  null,
   mapDispatchToProps
 )(withTranslation<Props>(Namespaces.nuxNamePin1)(RegulatoryTerms))
 

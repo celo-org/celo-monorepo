@@ -152,7 +152,7 @@ const style = StyleSheet.create({
   },
 })
 
-export default connect<{}, DispatchProps>(
+export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
   mapDispatchToProps
 )(withTranslation<Props>(Namespaces.onboarding)(PincodeSet))

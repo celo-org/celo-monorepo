@@ -95,10 +95,6 @@ export class EnterInviteCode extends React.Component<Props, State> {
     }
   }
 
-  onPressImportClick = async () => {
-    navigate(Screens.ImportWallet)
-  }
-
   onPressGoToFaucet = () => {
     navigateToURI(CELO_FAUCET_LINK)
   }

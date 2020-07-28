@@ -335,9 +335,14 @@ export const v2Schema = {
     ...v1Schema.app,
     sessionId: '',
   },
+}
+
+export const v3Schema = {
+  ...v2Schema,
   account: {
     ...v1Schema.account,
     hasMigratedToNewBip39: false,
+    isRestoringAccount: false,
   },
   identity: {
     ...v1Schema.identity,
@@ -350,5 +355,5 @@ export const v2Schema = {
 }
 
 export function getLatestSchema(): Partial<RootState> {
-  return v2Schema as Partial<RootState>
+  return v3Schema as Partial<RootState>
 }

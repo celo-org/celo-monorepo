@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`JoinCeloScreen renders correctly 1`] = `
+exports[`NameAndNumberScreen renders correctly 1`] = `
 <RNCSafeAreaView
   style={
     Object {
@@ -361,7 +361,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
                 "paddingVertical": 5,
               }
             }
-            testID="JoinCeloContinueButton"
+            testID="NameAndNumberContinueButton"
           >
             <Text
               style={
@@ -399,7 +399,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
 </RNCSafeAreaView>
 `;
 
-exports[`JoinCeloScreen renders with an error 1`] = `
+exports[`NameAndNumberScreen renders with an error 1`] = `
 <RNCSafeAreaView
   style={
     Object {
@@ -760,7 +760,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
                 "paddingVertical": 5,
               }
             }
-            testID="JoinCeloContinueButton"
+            testID="NameAndNumberContinueButton"
           >
             <Text
               style={

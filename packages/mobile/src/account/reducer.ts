@@ -93,7 +93,7 @@ export const reducer = (
     case Actions.CANCEL_CREATE_OR_RESTORE_ACCOUNT:
       return {
         ...state,
-        isRestoringAccount: undefined,
+        isRestoringAccount: false,
         pincodeType: PincodeType.Unset,
         isSettingPin: false,
       }

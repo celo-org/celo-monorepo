@@ -48,12 +48,14 @@ export default function Welcome() {
           size={BtnSizes.FULL}
           type={BtnTypes.ONBOARDING}
           style={styles.createAccountButton}
+          testID={'CreateAccountButton'}
         />
         <Button
           onPress={onPressRestoreAccount}
           text={t('welcome.restoreAccount')}
           size={BtnSizes.FULL}
           type={BtnTypes.ONBOARDING_SECONDARY}
+          testID={'RestoreAccountButton'}
         />
       </View>
     </SafeAreaView>

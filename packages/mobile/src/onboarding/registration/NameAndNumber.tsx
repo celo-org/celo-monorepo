@@ -96,7 +96,7 @@ function getPhoneNumberState(
   }
 }
 
-export class JoinCelo extends React.Component<Props, State> {
+export class NameAndNumber extends React.Component<Props, State> {
   static navigationOptions = nuxNavigationOptions
 
   countries = new Countries(this.props.i18n.language)
@@ -222,7 +222,7 @@ export class JoinCelo extends React.Component<Props, State> {
             size={BtnSizes.MEDIUM}
             type={BtnTypes.ONBOARDING}
             disabled={!this.state.isValidNumber}
-            testID={'JoinCeloContinueButton'}
+            testID={'NameAndNumberContinueButton'}
           />
         </ScrollView>
         <KeyboardSpacer />
@@ -249,4 +249,4 @@ const styles = StyleSheet.create({
 export default connect<StateProps, DispatchProps, OwnProps, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation<Props>(Namespaces.nuxNamePin1)(JoinCelo))
+)(withTranslation<Props>(Namespaces.nuxNamePin1)(NameAndNumber))
