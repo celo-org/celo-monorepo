@@ -1,4 +1,6 @@
 // tslint:disable: max-classes-per-file
+export const DEFAULT_VERSION_STRING = '1.1.0.0'
+
 export class ContractVersion {
 
   static isValid = (version: string): boolean => {
@@ -144,7 +146,12 @@ export class ContractVersionChecker {
   constructor(public readonly oldVersion: ContractVersion, public readonly newVersion: ContractVersion, public readonly expectedDelta: ContractVersionDelta) {}
 
   public expectedVersion = (): ContractVersion => {
-    return this.expectedDelta.appliedTo(this.oldVersion)
+    if (this.oldVersion === null) {
+      // Newly added contracts should have version 1.1.0.0
+      return ContractVersion.fromString(DEFAULT_VERSION_STRING)
+    } else { 
+      return this.expectedDelta.appliedTo(this.oldVersion)
+    }
   }
 
   public matches = (): boolean => {

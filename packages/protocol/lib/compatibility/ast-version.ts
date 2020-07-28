@@ -1,11 +1,9 @@
 // tslint:disable: max-classes-per-file
 import { Artifact } from '@celo/protocol/lib/compatibility/internal'
-import { ContractVersionChecker, ContractVersionCheckerIndex, ContractVersionDelta, ContractVersionDeltaIndex, ContractVersion, ContractVersionIndex } from '@celo/protocol/lib/compatibility/version'
+import { ContractVersionChecker, ContractVersionCheckerIndex, ContractVersionDelta, ContractVersionDeltaIndex, ContractVersion, ContractVersionIndex, DEFAULT_VERSION_STRING } from '@celo/protocol/lib/compatibility/version'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
 const VM = require('ethereumjs-vm').default
 const abi = require('ethereumjs-abi')
-
-export const DEFAULT_VERSION_STRING = '1.0.0.0'
 
 /**
  * A mapping {contract name => {@link ContractVersion}}.
@@ -60,9 +58,7 @@ export class ASTContractVersionsChecker {
     const contracts = {}
     Object.keys(newVersions.contracts).map((contract:string) => {
       const versionDelta = expectedVersionDeltas[contract] === undefined ? ContractVersionDelta.fromChanges(false, false, false, false) : expectedVersionDeltas[contract]
-      // For new contracts, the expected version delta is no change. Defaulting to an old version
-      // of 1.0.0.0 will thus imply a version of 1.0.0.0 for added contracts.
-      const oldVersion = oldVersions.contracts[contract] === undefined ? ContractVersion.fromString(DEFAULT_VERSION_STRING) : oldVersions.contracts[contract]
+      const oldVersion = oldVersions.contracts[contract] === undefined ? null : oldVersions.contracts[contract]
       contracts[contract] = new ContractVersionChecker(oldVersion, newVersions.contracts[contract], versionDelta)
     })
     return new ASTContractVersionsChecker(contracts)
