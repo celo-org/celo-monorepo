@@ -3,18 +3,21 @@ import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { Spacing } from '@celo/react-components/styles/styles.v2'
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
 import { chooseRestoreAccount } from 'src/account/actions'
+import { Namespaces } from 'src/i18n'
 import Logo, { LogoTypes } from 'src/icons/Logo.v2'
-import { welcomeBgContent, welcomeBgHeader } from 'src/images/Images'
+import { welcomeBackground } from 'src/images/Images'
 import { nuxNavigationOptions } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import LanguageButton from 'src/onboarding/LanguageButton'
 
 export default function Welcome() {
+  const { t } = useTranslation(Namespaces.onboarding)
   const dispatch = useDispatch()
   const insets = useSafeAreaInsets()
 
@@ -33,25 +36,22 @@ export default function Welcome() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <SafeAreaView style={styles.headerBgImage} edges={['top']}>
-        <Image source={welcomeBgHeader} />
-      </SafeAreaView>
-      <Image source={welcomeBgContent} style={styles.contentBgImage} />
+      <Image source={welcomeBackground} style={styles.backgroundImage} />
       <View style={styles.titleContainer}>
         <Logo type={LogoTypes.COLOR} height={64} />
-        <Text style={styles.title}>Your value,{'\n'}on your phone</Text>
+        <Text style={styles.title}>{t('welcome.title')}</Text>
       </View>
-      <View style={[styles.buttonsContainer, { marginBottom: Math.max(0, 40 - insets.bottom) }]}>
+      <View style={{ marginBottom: Math.max(0, 40 - insets.bottom) }}>
         <Button
           onPress={onPressCreateAccount}
-          text={'Create new account'}
+          text={t('welcome.createAccount')}
           size={BtnSizes.FULL}
           type={BtnTypes.ONBOARDING}
           style={styles.createAccountButton}
         />
         <Button
           onPress={onPressRestoreAccount}
-          text={'I have an account'}
+          text={t('welcome.restoreAccount')}
           size={BtnSizes.FULL}
           type={BtnTypes.ONBOARDING_SECONDARY}
         />
@@ -71,27 +71,20 @@ const styles = StyleSheet.create({
     backgroundColor: colors.onboardingBackground,
     paddingHorizontal: Spacing.Thick24,
   },
-  headerBgImage: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-  },
-  contentBgImage: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
+    width: undefined,
+    height: undefined,
   },
   titleContainer: {
-    top: '23%',
+    flex: 1,
+    justifyContent: 'center',
   },
   title: {
     ...fontStyles.h1,
     fontSize: 30,
     lineHeight: 36,
     marginTop: Spacing.Smallest8,
-  },
-  buttonsContainer: {
-    marginTop: 'auto',
   },
   createAccountButton: {
     marginBottom: Spacing.Smallest8,

@@ -29,5 +29,4 @@ export const verificationEducation1 = require('src/images/verification-education
 export const verificationEducation2 = require('src/images/verification-education-2.png')
 export const verificationEducation3 = require('src/images/verification-education-3.png')
 export const verificationEducation4 = require('src/images/verification-education-4.png')
-export const welcomeBgContent = require('src/images/welcome-bg-content.png')
-export const welcomeBgHeader = require('src/images/welcome-bg-header.png')
+export const welcomeBackground = require('src/images/welcome-background.png')
