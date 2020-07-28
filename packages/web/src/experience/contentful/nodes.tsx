@@ -71,22 +71,6 @@ function embedded(node) {
     case 'iFrameEmbed':
       const url = node.data.target.fields.url
       return <iframe src={url} height="500px" />
-    case 'tile':
-      const { width, height } = fields?.image?.fields?.file?.details?.image || {}
-      const realRatio = width && height ? width / height : ratio || 1
-      return (
-        <Showcase
-          key={node.data.target.id}
-          ratio={realRatio}
-          assetType={AssetTypes.illustration}
-          description={fields.description}
-          name={fields.title}
-          preview={fields.image?.fields?.file?.url}
-          uri={fields.download?.fields?.file?.url}
-          loading={false}
-          size={120}
-        />
-      )
     case 'video':
       return <YouTube videoId={fields.youtubeID} />
     default:
