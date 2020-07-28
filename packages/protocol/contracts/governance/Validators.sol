@@ -22,6 +22,7 @@ import "../common/libraries/ReentrancyGuard.sol";
  */
 contract Validators is
   IValidators,
+  ICeloVersionedContract,
   Ownable,
   ReentrancyGuard,
   Initializable,
@@ -155,6 +156,14 @@ contract Validators is
   modifier onlySlasher() {
     require(getLockedGold().isSlasher(msg.sender), "Only registered slasher can call");
     _;
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 0, 1);
   }
 
   /**
