@@ -8,6 +8,8 @@ import { Image, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
 import { chooseCreateAccount, chooseRestoreAccount } from 'src/account/actions'
+import { OnboardingEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { Namespaces } from 'src/i18n'
 import Logo, { LogoTypes } from 'src/icons/Logo.v2'
 import { welcomeBackground } from 'src/images/Images'
@@ -32,11 +34,13 @@ export default function Welcome() {
   }
 
   const onPressCreateAccount = () => {
+    ValoraAnalytics.track(OnboardingEvents.create_account_start)
     dispatch(chooseCreateAccount())
     navigateNext()
   }
 
   const onPressRestoreAccount = () => {
+    ValoraAnalytics.track(OnboardingEvents.restore_account_start)
     dispatch(chooseRestoreAccount())
     navigateNext()
   }

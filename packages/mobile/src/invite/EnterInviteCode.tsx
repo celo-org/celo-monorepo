@@ -9,6 +9,7 @@ import { Trans, WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
+import { OnboardingEvents } from 'src/analytics/Events'
 import CodeInput, { CodeInputStatus } from 'src/components/CodeInput'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { CELO_FAUCET_LINK, SHOW_GET_INVITE_LINK } from 'src/config'
@@ -139,7 +140,9 @@ export class EnterInviteCode extends React.Component<Props, State> {
           <SafeAreaInsetsContext.Consumer>
             {(insets) => (
               <View style={styles.container}>
-                <UseBackToWelcomeScreen />
+                <UseBackToWelcomeScreen
+                  backAnalyticsEvent={OnboardingEvents.create_account_cancel}
+                />
                 <DevSkipButton nextScreen={Screens.VerificationEducationScreen} />
                 <KeyboardAwareScrollView
                   style={headerHeight ? { marginTop: headerHeight } : undefined}
