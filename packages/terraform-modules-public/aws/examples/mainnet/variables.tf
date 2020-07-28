@@ -32,7 +32,7 @@ variable key_pair_name {
 variable celo_image {
   type        = string
   description = "Docker image for Celo nodes"
-  default     = "us.gcr.io/celo-testnet/celo-node:mainnet"
+  default     = "us.gcr.io/celo-org/celo-node:mainnet"
 }
 
 variable celo_network_id {
