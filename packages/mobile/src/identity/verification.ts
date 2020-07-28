@@ -1,5 +1,4 @@
 import { CeloTransactionObject, PhoneNumberHashDetails } from '@celo/contractkit'
-import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import {
   ActionableAttestation,
   AttesationServiceRevealRequest,

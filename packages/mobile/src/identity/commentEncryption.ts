@@ -3,11 +3,10 @@
 // because these manage comment metadata
 
 import { AuthenticationMethod, AuthSigner, PhoneNumberHashDetails } from '@celo/contractkit'
-import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { IdentifierLookupResult } from '@celo/contractkit/lib/wrappers/Attestations'
+import { compressedPubKey } from '@celo/utils/lib/dataEncryptionKey'
 import { eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import {
-  compressedPubKey,
   decryptComment as decryptCommentRaw,
   encryptComment as encryptCommentRaw,
 } from '@celo/utils/src/commentEncryption'
@@ -33,6 +32,7 @@ import {
 } from 'src/identity/reducer'
 import { NewTransactionsInFeedAction } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
+import { getContractKit } from 'src/web3/contracts'
 import { doFetchDataEncryptionKey } from 'src/web3/dataEncryptionKey'
 import { dataEncryptionKeySelector } from 'src/web3/selectors'
 
@@ -298,10 +298,10 @@ function* updatePhoneNumberMappings(newIdentityData: IdentityMetadataInTx[]) {
 
 export function* getAuthSignerForAccount(account: string) {
   // Use the DEK for authentication if the current DEK is registered with this account
-  const registeredEncryptionKey: Buffer | null = yield call(getCommentKey, account)
+  const registeredEncryptionKey: Buffer | null = yield call(doFetchDataEncryptionKey, account)
   let authSigner: AuthSigner | undefined
   if (registeredEncryptionKey) {
-    const encryptionKeyPrivate: string | null = yield select(privateCommentKeySelector)
+    const encryptionKeyPrivate: string | null = yield select(dataEncryptionKeySelector)
     if (!encryptionKeyPrivate) {
       Logger.error(TAG + 'getAuthSignerForAccount', 'Missing comment key, should never happen.')
     } else {
