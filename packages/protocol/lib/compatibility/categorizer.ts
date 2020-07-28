@@ -32,12 +32,11 @@ export function categorize(changes: Change[], categorizer: Categorizer): Change[
 /**
  * Default implementation of {@link Categorizer}, where:
  *  Major:
- *    Mutability, Params, Return Params, Method Removed, Contract type,
- *    Visibility changes
+ *    Mutability, Params, Return Params, Method Removed, Contract type changes
  *  Minor:
- *    Method Added, New Contract, Visibility (from Public to External) changes
+ *    Method Added, New Contract changes
  *  Patch:
- *    Bytecode (implementation) changes
+ *    Visibility, Bytecode (implementation) changes
  */
 export class DefaultCategorizer implements Categorizer {
   onMethodMutability = (_change: MethodMutabilityChange): ChangeType => ChangeType.Major
@@ -48,12 +47,7 @@ export class DefaultCategorizer implements Categorizer {
 
   onMethodAdded = (_change: MethodAddedChange): ChangeType => ChangeType.Minor
   onNewContract = (_change: NewContractChange): ChangeType => ChangeType.Minor
-  onMethodVisibility = (change: MethodVisibilityChange): ChangeType => {
-    if (change.oldValue === Visibility.EXTERNAL && change.newValue === Visibility.PUBLIC) {
-      // Broader visibility, minor change
-      return ChangeType.Minor
-    }
-    return ChangeType.Major
-  }
+  // Changing between public and external visibility are not impactful.
+  onMethodVisibility = (change: MethodVisibilityChange): ChangeType => ChangeType.Patch
   onDeployedBytecode = (_change: DeployedBytecodeChange): ChangeType => ChangeType.Patch
 }
