@@ -46,7 +46,7 @@ export class DefaultCategorizer implements Categorizer {
 
   onMethodAdded = (_change: MethodAddedChange): ChangeType => ChangeType.Minor
   onNewContract = (_change: NewContractChange): ChangeType => ChangeType.Minor
-  // Changing between public and external visibility are not impactful.
+  // Changing between public and external visibility has no impact.
   onMethodVisibility = (_change: MethodVisibilityChange): ChangeType => ChangeType.Patch
   onDeployedBytecode = (_change: DeployedBytecodeChange): ChangeType => ChangeType.Patch
 }

@@ -1,0 +1,34 @@
+[
+  {
+    "identifier": "0x111111111",
+    "releaseStartTime": "MAINNET",
+    "releaseCliffTime": 0,
+    "numReleasePeriods": 1,
+    "releasePeriod": 100000000,
+    "amountReleasedPerPeriod": 10002,
+    "revocable": false,
+    "beneficiary": "0x5409ED021D9299bf6814279A6A1411A7e866A631",
+    "releaseOwner": "0x6Ecbe1DB9EF729CBe972C83Fb886247691Fb6beb",
+    "refundAddress": "0x0000000000000000000000000000000000000000",
+    "subjectToLiquidityProvision": true,
+    "initialDistributionRatio": 1000,
+    "canVote": true,
+    "canValidate": true
+  },
+  {
+    "identifier": "0x222222222",
+    "releaseStartTime": "MAINNET",
+    "releaseCliffTime": 0,
+    "numReleasePeriods": 1,
+    "releasePeriod": 100000000,
+    "amountReleasedPerPeriod": 2,
+    "revocable": true,
+    "beneficiary": "0x6Ecbe1DB9EF729CBe972C83Fb886247691Fb6beb",
+    "releaseOwner": "0x5409ED021D9299bf6814279A6A1411A7e866A631",
+    "refundAddress": "0x5409ED021D9299bf6814279A6A1411A7e866A631",
+    "subjectToLiquidityProvision": false,
+    "initialDistributionRatio": 1000,
+    "canVote": true,
+    "canValidate": false
+  }
+]

@@ -62,7 +62,7 @@ export class ASTContractVersionsChecker {
       const versionDelta = expectedVersionDeltas[contract] === undefined ? ContractVersionDelta.fromChanges(false, false, false, false) : expectedVersionDeltas[contract]
       // For new contracts, the expected version delta is no change. Defaulting to an old version
       // of 1.0.0.0 will thus imply a version of 1.0.0.0 for added contracts.
-      const oldVersion = oldVersions.contracts[contract] === undefined ? ContractVersion.fromString('1.0.0.0') : oldVersions.contracts[contract]
+      const oldVersion = oldVersions.contracts[contract] === undefined ? ContractVersion.fromString(DEFAULT_VERSION_STRING) : oldVersions.contracts[contract]
       contracts[contract] = new ContractVersionChecker(oldVersion, newVersions.contracts[contract], versionDelta)
     })
     return new ASTContractVersionsChecker(contracts)
