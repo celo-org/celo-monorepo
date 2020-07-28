@@ -120,7 +120,7 @@ function fmtSummary(flakes, skippedTests, verbosity) {
       return 'New flakiness detected ' + redX
     }
     if (skippedTests.length) {
-      return 'Some tests were skipped due to flakiness.'
+      return 'Some tests were skipped due to flakiness. No new flakey tests were found.'
     }
     return 'We have achieved zero flakiness ' + hands + ' ' + greenCheck
   }

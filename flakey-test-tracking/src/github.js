@@ -55,6 +55,7 @@ class GitHub {
   }
 
   async report(flakes, skippedTests, obsoleteIssues) {
+    if (!process.env.CIRCLECI) return
     const promises = []
     if (config.shouldCreateIssues) {
       // Check list of ALL flakey issues to ensure no duplicates
@@ -78,14 +79,13 @@ class GitHub {
   }
 
   async createIssues(flakes) {
+    if (!process.env.CIRCLECI) return
     return Promise.all(flakes.map((f) => this.createIssue(f)))
   }
 
   async createIssue(flake) {
-    if (process.env.CIRCLECI) {
-      flake.body =
-        'Discovered in PR ' + process.env.CIRCLE_PULL_REQUEST + '\n\n' + flake.body + '\n'
-    }
+    if (!process.env.CIRCLECI) return
+    flake.body = 'Discovered in PR ' + process.env.CIRCLE_PULL_REQUEST + '\n\n' + flake.body + '\n'
     const fn = () =>
       this.rest.issues.create({
         ...defaults,
@@ -134,6 +134,7 @@ class GitHub {
   }
 
   async handleObsoleteIssues(obsoleteIssues) {
+    if (!process.env.CIRCLECI) return
     const promises = [this.addObsoleteIssuesCheck(obsoleteIssues)]
     //if (process.env.CIRCLE_BRANCH === 'master') {
     if (true) {
@@ -143,10 +144,12 @@ class GitHub {
   }
 
   async closeIssues(issues) {
+    if (!process.env.CIRCLECI) return
     return Promise.all(issues.map(this.closeIssue))
   }
 
   async closeIssue(issue) {
+    if (!process.env.CIRCLECI) return
     const fn = () =>
       this.rest.issues.update({
         ...defaults,
@@ -159,6 +162,7 @@ class GitHub {
   }
 
   async addObsoleteIssuesCheck(obsoleteIssues) {
+    if (!process.env.CIRCLECI) return
     if (obsoleteIssues.length) {
       await this.addCheckRun(
         {
@@ -185,6 +189,7 @@ class GitHub {
   // addSummaryCheck is called in a final job added to the CI workflow.
   // It provides a breakdown of where flakey tests are located.
   async addSummaryCheck() {
+    if (!process.env.CIRCLECI) return
     const title = 'Flakey Test Summary'
     const optsBase = { ...defaults, name: 'Summary', head_sha: process.env.CIRCLE_SHA1 }
 
@@ -215,7 +220,7 @@ class GitHub {
         })
 
       errMsg = 'Failed to get check runs in suite.'
-      const checkRuns = await this.safeExec(fn, errMsg).data.check_runs
+      const checkRuns = (await this.safeExec(fn, errMsg)).check_runs
 
       const foundFlakes = {}
       const skippedFlakes = {}
@@ -272,6 +277,7 @@ class GitHub {
   }
 
   async addFlakeCheck(flakes, skippedTests) {
+    if (!process.env.CIRCLECI) return
     const conclusion = utils.getConclusion(flakes, skippedTests)
 
     // Only add checks when there's flakiness (otherwise check suite gets cluttered)
@@ -313,6 +319,7 @@ class GitHub {
   }
 
   async addCheckRun(opts, errMsg) {
+    if (!process.env.CIRCLECI) return
     const fn = () => {
       return this.rest.checks.create(opts)
     }
