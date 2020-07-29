@@ -25,7 +25,7 @@ const sidecarImageTag = '0.7.3'
 // Prometheus container registry with latest tags: https://hub.docker.com/r/prom/prometheus/tags
 const prometheusImageTag = 'v2.17.0'
 
-export async function installPrometheusIfNotExists(clusterConfig?: AzureClusterConfig) {
+export async function installPrometheusIfNotExists(clusterConfig?: AzureClusterConfig, usePodSecurityPolicy: boolean = false) {
   const prometheusExists = await outputIncludes(
     `helm list`,
     `prometheus-stackdriver`,
@@ -33,17 +33,17 @@ export async function installPrometheusIfNotExists(clusterConfig?: AzureClusterC
   )
   if (!prometheusExists) {
     console.info('Installing prometheus-stackdriver')
-    await installPrometheus(clusterConfig)
+    await installPrometheus(clusterConfig, usePodSecurityPolicy)
   }
 }
 
-async function installPrometheus(clusterConfig?: AzureClusterConfig) {
+async function installPrometheus(clusterConfig?: AzureClusterConfig, usePodSecurityPolicy: boolean = false) {
   await createNamespaceIfNotExists('prometheus')
   return installGenericHelmChart(
     kubeNamespace,
     releaseName,
     helmChartPath,
-    await helmParameters(clusterConfig)
+    await helmParameters(clusterConfig, usePodSecurityPolicy)
   )
 }
 
@@ -56,7 +56,7 @@ export async function upgradePrometheus() {
   return upgradeGenericHelmChart(kubeNamespace, releaseName, helmChartPath, await helmParameters())
 }
 
-async function helmParameters(clusterConfig?: AzureClusterConfig) {
+async function helmParameters(clusterConfig?: AzureClusterConfig, usePodSecurityPolicy: boolean = false) {
   const params = [
     `--set namespace=${kubeNamespace}`,
     `--set gcloud.project=${fetchEnv(envVar.TESTNET_PROJECT_NAME)}`,
@@ -65,6 +65,7 @@ async function helmParameters(clusterConfig?: AzureClusterConfig) {
     `--set sidecar.imageTag=${sidecarImageTag}`,
     `--set prometheus.imageTag=${prometheusImageTag}`,
     `--set stackdriver_metrics_prefix=${prometheusImageTag}`,
+    `--set usePodSecurityPolicy=${usePodSecurityPolicy}`,
     // Stackdriver allows a maximum of 10 custom labels. kube-state-metrics
     // has some metrics of the form "kube_.+_labels" that provides the labels
     // of k8s resources as metric labels. If some k8s resources have too many labels,

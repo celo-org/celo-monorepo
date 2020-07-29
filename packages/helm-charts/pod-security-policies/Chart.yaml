@@ -1,0 +1,6 @@
+name: pod-security-policies
+version: 1.0.0
+description: A chart with basic pod security policies
+keywords:
+- security
+appVersion: v1.7.3

@@ -33,6 +33,8 @@ spec:
 {{ include "prometheus-annotations" . | indent 8 }}
 {{ end }}
     spec:
+      serviceAccountName: {{ template "common.fullname" . }}
+      automountServiceAccountToken: false
       initContainers:
 {{ include "common.init-genesis-container" .  | indent 6 }}
       containers:

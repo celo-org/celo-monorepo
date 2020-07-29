@@ -214,8 +214,8 @@ export async function installCertManager() {
 }
 
 export async function installAndEnableMetricsDeps(
-  installPrometheus: boolean,
-  clusterConfig?: AzureClusterConfig
+  clusterConfig?: AzureClusterConfig,
+  usePodSecurityPolicy: boolean = false,
 ) {
   const kubeStateMetricsReleaseExists = await outputIncludes(
     `helm list`,
@@ -227,9 +227,7 @@ export async function installAndEnableMetricsDeps(
       `helm install --name kube-state-metrics stable/kube-state-metrics --set rbac.create=true`
     )
   }
-  if (installPrometheus) {
-    await installPrometheusIfNotExists(clusterConfig)
-  }
+  return installPrometheusIfNotExists(clusterConfig, usePodSecurityPolicy)
 }
 
 export async function grantRoles(serviceAccountName: string, role: string) {
@@ -629,7 +627,7 @@ function buildHelmChartDependencies(chartDir: string) {
 }
 
 export async function installGenericHelmChart(
-  celoEnv: string,
+  namespace: string,
   releaseName: string,
   chartDir: string,
   parameters: string[]
@@ -638,21 +636,22 @@ export async function installGenericHelmChart(
 
   console.info(`Installing helm release ${releaseName}`)
   await helmCommand(
-    `helm install ${chartDir} --name ${releaseName} --namespace ${celoEnv} ${parameters.join(' ')}`
+    `helm install ${chartDir} --name ${releaseName} --namespace ${namespace} ${parameters.join(' ')}`
   )
 }
 
 export async function upgradeGenericHelmChart(
-  celoEnv: string,
+  namespace: string,
   releaseName: string,
   chartDir: string,
-  parameters: string[]
+  parameters: string[],
+  install: boolean = false,
 ) {
   await buildHelmChartDependencies(chartDir)
 
   console.info(`Upgrading helm release ${releaseName}`)
   await helmCommand(
-    `helm upgrade ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(' ')}`
+    `helm upgrade ${releaseName} ${chartDir} --namespace ${namespace} ${install ? '--install' : ''} ${parameters.join(' ')}`
   )
   console.info(`Upgraded helm release ${releaseName}`)
 }

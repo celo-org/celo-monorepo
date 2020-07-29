@@ -30,6 +30,7 @@ spec:
       labels:
         app: prometheus-server
     spec:
+      serviceAccountName: prometheus
       containers:
         - name: prometheus
           image: prom/prometheus:{{ .Values.prometheus.imageTag }}
