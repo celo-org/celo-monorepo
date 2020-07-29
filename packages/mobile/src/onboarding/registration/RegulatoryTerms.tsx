@@ -28,12 +28,12 @@ const mapDispatchToProps: DispatchProps = {
 
 type Props = WithTranslation & DispatchProps
 
-export const regulatoryTermsNavOptions = {
-  ...nuxNavigationOptions,
-  ...TransitionPresets.ModalTransition,
-}
-
 export class RegulatoryTerms extends React.Component<Props> {
+  static navigationOptions = {
+    ...nuxNavigationOptions,
+    ...TransitionPresets.ModalTransition,
+  }
+
   onPressAccept = () => {
     this.props.acceptTerms()
     this.goToNextScreen()

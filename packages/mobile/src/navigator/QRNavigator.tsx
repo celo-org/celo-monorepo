@@ -100,11 +100,6 @@ function AnimatedScannerScene({ position, ...props }: AnimatedScannerSceneProps)
 const pager: ExtractProps<typeof Tab.Navigator>['pager'] =
   Platform.OS === 'ios' ? (props) => <ScrollPager {...props} /> : undefined
 
-export const qrNavigatorNavOptions = {
-  ...noHeader,
-  ...TransitionPresets.ModalTransition,
-}
-
 export default function QRNavigator() {
   const position = useRef(new Animated.Value(0)).current
   const qrSvgRef = useRef<SVG>()
@@ -131,6 +126,11 @@ export default function QRNavigator() {
       </Tab.Screen>
     </Tab.Navigator>
   )
+}
+
+QRNavigator.navigationOptions = {
+  ...noHeader,
+  ...TransitionPresets.ModalTransition,
 }
 
 const styles = StyleSheet.create({

@@ -29,17 +29,17 @@ interface StateProps {
 
 type Props = StateProps & WithTranslation & StackScreenProps<StackParamList, Screens.PincodeEnter>
 
-export const pincodeEnterNavOptions = {
-  ...headerWithBackButton,
-  gestureEnabled: false,
-  cardStyleInterpolator: ({ current }: StackCardInterpolationProps) => ({
-    containerStyle: {
-      opacity: current.progress,
-    },
-  }),
-}
-
 class PincodeEnter extends React.Component<Props, State> {
+  static navigationOptions = {
+    ...headerWithBackButton,
+    gestureEnabled: false,
+    cardStyleInterpolator: ({ current }: StackCardInterpolationProps) => ({
+      containerStyle: {
+        opacity: current.progress,
+      },
+    }),
+  }
+
   state = {
     pin: '',
     errorText: undefined,

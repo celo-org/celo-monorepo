@@ -95,49 +95,47 @@ const mapDispatchToProps = {
   estimateFee,
 }
 
-export const sendScreenNavOptions = ({
-  route,
-}: {
-  route: RouteProp<StackParamList, Screens.Send>
-}) => {
-  const isOutgoingPaymentRequest = route.params?.isOutgoingPaymentRequest
-
-  const goToQRScanner = () =>
-    navigate(Screens.QRNavigator, {
-      screen: Screens.QRScanner,
-      params: {
-        isOutgoingPaymentRequest,
-      },
-    })
-
-  const title = isOutgoingPaymentRequest
-    ? i18n.t('paymentRequestFlow:request')
-    : i18n.t('sendFlow7:send')
-
-  return {
-    ...emptyHeader,
-    headerLeft: () => (
-      <TopBarIconButton
-        icon={<Times />}
-        onPress={navigateBack}
-        eventName={isOutgoingPaymentRequest ? RequestEvents.request_cancel : SendEvents.send_cancel}
-      />
-    ),
-    headerLeftContainerStyle: styles.headerLeftContainer,
-    headerRight: () => (
-      <TopBarIconButton
-        icon={<QRCodeBorderlessIcon height={32} color={colors.greenUI} />}
-        eventName={isOutgoingPaymentRequest ? RequestEvents.request_scan : SendEvents.send_scan}
-        onPress={goToQRScanner}
-      />
-    ),
-    headerRightContainerStyle: styles.headerRightContainer,
-    headerTitle: title,
-    ...TransitionPresets.ModalTransition,
-  }
-}
-
 class Send extends React.Component<Props, State> {
+  static navigationOptions = ({ route }: { route: RouteProp<StackParamList, Screens.Send> }) => {
+    const isOutgoingPaymentRequest = route.params?.isOutgoingPaymentRequest
+
+    const goToQRScanner = () =>
+      navigate(Screens.QRNavigator, {
+        screen: Screens.QRScanner,
+        params: {
+          isOutgoingPaymentRequest,
+        },
+      })
+
+    const title = isOutgoingPaymentRequest
+      ? i18n.t('paymentRequestFlow:request')
+      : i18n.t('sendFlow7:send')
+
+    return {
+      ...emptyHeader,
+      headerLeft: () => (
+        <TopBarIconButton
+          icon={<Times />}
+          onPress={navigateBack}
+          eventName={
+            isOutgoingPaymentRequest ? RequestEvents.request_cancel : SendEvents.send_cancel
+          }
+        />
+      ),
+      headerLeftContainerStyle: styles.headerLeftContainer,
+      headerRight: () => (
+        <TopBarIconButton
+          icon={<QRCodeBorderlessIcon height={32} color={colors.greenUI} />}
+          eventName={isOutgoingPaymentRequest ? RequestEvents.request_scan : SendEvents.send_scan}
+          onPress={goToQRScanner}
+        />
+      ),
+      headerRightContainerStyle: styles.headerRightContainer,
+      headerTitle: title,
+      ...TransitionPresets.ModalTransition,
+    }
+  }
+
   throttledSearch!: (searchQuery: string) => void
   allRecipientsFilter!: FilterType
   recentRecipientsFilter!: FilterType

@@ -18,13 +18,6 @@ const keyExtractor = (item: LocalizedCountry) => item.alpha2
 
 type Props = StackScreenProps<StackParamList, Screens.SelectCountry>
 
-export const selectCountryNavOptions = (navOptions: Props) => ({
-  ...modalScreenOptions(navOptions),
-  ...headerWithCloseButton,
-  headerTitle: i18n.t('onboarding:selectCountryCode'),
-  headerTransparent: false,
-})
-
 export default function SelectCountry({ navigation, route }: Props) {
   const { countries, selectedCountryCodeAlpha2 } = route.params
   const { t } = useTranslation(Namespaces.accountScreen10)
@@ -75,6 +68,13 @@ export default function SelectCountry({ navigation, route }: Props) {
     </View>
   )
 }
+
+SelectCountry.navigationOptions = (navOptions: Props) => ({
+  ...modalScreenOptions(navOptions),
+  ...headerWithCloseButton,
+  headerTitle: i18n.t('onboarding:selectCountryCode'),
+  headerTransparent: false,
+})
 
 const styles = StyleSheet.create({
   container: { flex: 1 },

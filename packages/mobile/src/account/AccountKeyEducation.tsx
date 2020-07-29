@@ -14,11 +14,6 @@ import { StackParamList } from 'src/navigator/types'
 
 type Props = StackScreenProps<StackParamList, Screens.AccountKeyEducation>
 
-export const accountKeyEducationNavOptions = {
-  ...noHeader,
-  ...TransitionPresets.ModalTransition,
-}
-
 export default function AccountKeyEducation(props: Props) {
   function onComplete() {
     ValoraAnalytics.track(OnboardingEvents.backup_education_complete)
@@ -47,6 +42,11 @@ export default function AccountKeyEducation(props: Props) {
       finalButtonType={BtnTypes.PRIMARY}
     />
   )
+}
+
+AccountKeyEducation.navigationOptions = {
+  ...noHeader,
+  ...TransitionPresets.ModalTransition,
 }
 
 function useSteps() {

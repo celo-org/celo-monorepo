@@ -4,8 +4,8 @@ import { createStackNavigator, StackScreenProps, TransitionPresets } from '@reac
 import * as React from 'react'
 import { Platform } from 'react-native'
 import SplashScreen from 'react-native-splash-screen'
-import AccountKeyEducation, { accountKeyEducationNavOptions } from 'src/account/AccountKeyEducation'
-import GoldEducation, { goldEducationNavOptions } from 'src/account/GoldEducation'
+import AccountKeyEducation from 'src/account/AccountKeyEducation'
+import GoldEducation from 'src/account/GoldEducation'
 import InviteReview from 'src/account/InviteReview'
 import Licenses from 'src/account/Licenses'
 import Profile from 'src/account/Profile'
@@ -58,17 +58,15 @@ import {
   nuxNavigationOptions,
 } from 'src/navigator/Headers.v2'
 import { navigateBack, navigateToExchangeHome } from 'src/navigator/NavigationService'
-import QRNavigator, { qrNavigatorNavOptions } from 'src/navigator/QRNavigator'
+import QRNavigator from 'src/navigator/QRNavigator'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
 import ImportContactsScreen from 'src/onboarding/contacts/ImportContactsScreen'
 import OnboardingEducationScreen from 'src/onboarding/education/OnboardingEducationScreen'
 import NameAndNumber from 'src/onboarding/registration/NameAndNumber'
-import RegulatoryTerms, {
-  regulatoryTermsNavOptions,
-} from 'src/onboarding/registration/RegulatoryTerms'
-import SelectCountry, { selectCountryNavOptions } from 'src/onboarding/registration/SelectCountry'
+import RegulatoryTerms from 'src/onboarding/registration/RegulatoryTerms'
+import SelectCountry from 'src/onboarding/registration/SelectCountry'
 import OnboardingSuccessScreen from 'src/onboarding/success/OnboardingSuccessScreen'
 import Welcome from 'src/onboarding/welcome/Welcome'
 import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
@@ -79,11 +77,11 @@ import PaymentRequestConfirmation, {
 import PaymentRequestUnavailable, {
   paymentRequestUnavailableScreenNavOptions,
 } from 'src/paymentRequest/PaymentRequestUnavailable'
-import PincodeEnter, { pincodeEnterNavOptions } from 'src/pincode/PincodeEnter'
+import PincodeEnter from 'src/pincode/PincodeEnter'
 import PincodeSet from 'src/pincode/PincodeSet'
 import { RootState } from 'src/redux/reducers'
 import { store } from 'src/redux/store'
-import Send, { sendScreenNavOptions } from 'src/send/Send'
+import Send from 'src/send/Send'
 import SendAmount, { sendAmountScreenNavOptions } from 'src/send/SendAmount'
 import SendConfirmation, { sendConfirmationScreenNavOptions } from 'src/send/SendConfirmation'
 import ValidateRecipientAccount, {
@@ -508,46 +506,46 @@ export function MainStackScreen() {
 
 const modalAnimatedScreens = (Navigator: typeof Stack) => (
   <>
-    <Navigator.Screen name={Screens.Send} component={Send} options={sendScreenNavOptions} />
+    <Navigator.Screen name={Screens.Send} component={Send} options={Send.navigationOptions} />
     <Navigator.Screen
       name={Screens.Language}
       component={Language}
       options={Language.navigationOptions}
     />
     <Navigator.Screen
-      options={headerWithBackButton}
       name={Screens.SelectLocalCurrency}
       component={SelectLocalCurrency}
+      options={headerWithBackButton}
     />
     <Navigator.Screen
       name={Screens.PincodeEnter}
       component={PincodeEnter}
-      options={pincodeEnterNavOptions}
+      options={PincodeEnter.navigationOptions}
     />
     <Navigator.Screen
       name={Screens.QRNavigator}
       component={QRNavigator}
-      options={qrNavigatorNavOptions}
+      options={QRNavigator.navigationOptions}
     />
     <Navigator.Screen
       name={Screens.RegulatoryTerms}
       component={RegulatoryTerms}
-      options={regulatoryTermsNavOptions}
+      options={RegulatoryTerms.navigationOptions}
     />
     <Navigator.Screen
       name={Screens.GoldEducation}
       component={GoldEducation}
-      options={goldEducationNavOptions}
+      options={GoldEducation.navigationOptions}
     />
     <Navigator.Screen
       name={Screens.AccountKeyEducation}
       component={AccountKeyEducation}
-      options={accountKeyEducationNavOptions}
+      options={AccountKeyEducation.navigationOptions}
     />
     <Navigator.Screen
       name={Screens.SelectCountry}
       component={SelectCountry}
-      options={selectCountryNavOptions}
+      options={SelectCountry.navigationOptions}
     />
   </>
 )

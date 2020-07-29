@@ -14,11 +14,6 @@ import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import useSelector from 'src/redux/useSelector'
 
-export const goldEducationNavOptions = {
-  ...noHeader,
-  ...TransitionPresets.ModalTransition,
-}
-
 export default function GoldEducation() {
   const { t } = useTranslation(Namespaces.global)
 
@@ -53,6 +48,11 @@ export default function GoldEducation() {
       buttonText={t('global:next')}
     />
   )
+}
+
+GoldEducation.navigationOptions = {
+  ...noHeader,
+  ...TransitionPresets.ModalTransition,
 }
 
 function useStep() {
