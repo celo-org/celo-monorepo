@@ -12,6 +12,7 @@ import Progress from 'src/shared/Progress'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { getSentry, initSentry } from 'src/utils/sentry'
 import { appWithTranslation } from '../src/i18n'
+import pagePaths from 'src/shared/menu-items'
 
 config({ ssrReveal: true })
 
@@ -36,9 +37,13 @@ class MyApp extends App {
   }
 
   // there are a few pages we dont want the header on
-  // currently this is just the animation demo pages and BrandKit
+  // currently this is just the animation demo pages and experience kits and out art project
   skipHeader() {
-    return this.props.router.asPath.startsWith('/animation') || this.isBrand()
+    return (
+      this.props.router.asPath.startsWith('/animation') ||
+      this.isBrand() ||
+      this.props.router.asPath.startsWith(pagePaths.WISH.link)
+    )
   }
 
   isBrand = () => {

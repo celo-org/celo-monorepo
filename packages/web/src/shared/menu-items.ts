@@ -47,6 +47,10 @@ export const pagePaths = {
     name: 'Developers',
     link: '/developers',
   },
+  WISH: {
+    name: 'Wish',
+    link: '/wealth-flowers',
+  },
   FAQ: {
     name: 'FAQ',
     link: '/faq',
