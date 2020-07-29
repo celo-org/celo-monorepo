@@ -21,6 +21,10 @@ export interface E164NumberToSaltType {
   [e164PhoneNumber: string]: string | null // null means unverified
 }
 
+export interface AddressToDataEncryptionKeyType {
+  [address: string]: string | null // null means no DEK registered
+}
+
 export interface ImportContactProgress {
   status: ImportContactsStatus
   current: number
@@ -56,6 +60,7 @@ export interface State {
   // Note: Do not access values in this directly, use the `getAddressFromPhoneNumber` helper in contactMapping
   e164NumberToAddress: E164NumberToAddressType
   e164NumberToSalt: E164NumberToSaltType
+  addressToDataEncryptionKey: AddressToDataEncryptionKeyType
   // Has the user already been asked for contacts permission
   askedContactsPermission: boolean
   importContactsProgress: ImportContactProgress
@@ -73,6 +78,7 @@ const initialState: State = {
   addressToE164Number: {},
   e164NumberToAddress: {},
   e164NumberToSalt: {},
+  addressToDataEncryptionKey: {},
   askedContactsPermission: false,
   importContactsProgress: {
     status: ImportContactsStatus.Stopped,
@@ -236,6 +242,15 @@ export const reducer = (
           state.secureSendPhoneNumberMapping,
           `${action.e164Number}.isFetchingAddresses`,
           false
+        ),
+      }
+    case Actions.UPDATE_ADDRESS_DEK_MAP:
+      return {
+        ...state,
+        addressToDataEncryptionKey: dotProp.set(
+          state.addressToDataEncryptionKey,
+          action.address,
+          action.dataEncryptionKey
         ),
       }
     default:

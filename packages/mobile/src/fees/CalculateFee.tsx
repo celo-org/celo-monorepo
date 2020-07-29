@@ -33,6 +33,7 @@ interface SendProps extends CommonProps {
   recipientAddress: string
   amount: BigNumber
   comment?: string
+  includeDekFee: boolean
 }
 
 interface ExchangeProps extends CommonProps {
@@ -93,14 +94,20 @@ const CalculateSendFee: FunctionComponent<SendProps> = (props) => {
       account: string,
       recipientAddress: string,
       amount: BigNumber,
-      comment: string = MAX_PLACEHOLDER_COMMENT
+      comment: string = MAX_PLACEHOLDER_COMMENT,
+      includeDekFee: boolean = false
     ) =>
-      getSendFee(account, CURRENCY_ENUM.DOLLAR, {
-        recipientAddress,
-        amount: amount.valueOf(),
-        comment,
-      }),
-    [props.account, props.recipientAddress, props.amount, props.comment]
+      getSendFee(
+        account,
+        CURRENCY_ENUM.DOLLAR,
+        {
+          recipientAddress,
+          amount: amount.valueOf(),
+          comment,
+        },
+        includeDekFee
+      ),
+    [props.account, props.recipientAddress, props.amount, props.comment, props.includeDekFee]
   )
   return props.children(asyncResult) as React.ReactElement
 }

@@ -4,7 +4,6 @@ exports[`BackupComplete renders correctly when social backup is complete 1`] = `
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
@@ -41,7 +40,6 @@ exports[`BackupComplete renders correctly when social backup is not complete 1`]
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }

@@ -23,6 +23,7 @@ import { validateAndReturnMatch } from 'src/identity/secureSend'
 import { startVerification } from 'src/identity/verification'
 import { Actions as TransactionActions } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
+import { fetchDataEncryptionKeyWrapper } from 'src/web3/dataEncryptionKey'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'identity/saga'
@@ -103,6 +104,10 @@ function* watchNewFeedTransactions() {
   yield takeEvery(TransactionActions.NEW_TRANSACTIONS_IN_FEED, checkTxsForIdentityMetadata)
 }
 
+function* watchFetchDataEncryptionKey() {
+  yield takeLeading(Actions.FETCH_DATA_ENCRYPTION_KEY, fetchDataEncryptionKeyWrapper)
+}
+
 export function* identitySaga() {
   Logger.debug(TAG, 'Initializing identity sagas')
   try {
@@ -110,6 +115,7 @@ export function* identitySaga() {
     yield spawn(watchContactMapping)
     yield spawn(watchValidateRecipientAddress)
     yield spawn(watchNewFeedTransactions)
+    yield spawn(watchFetchDataEncryptionKey)
   } catch (error) {
     Logger.error(TAG, 'Error initializing identity sagas', error)
   } finally {

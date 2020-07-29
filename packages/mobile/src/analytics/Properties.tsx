@@ -170,6 +170,8 @@ interface OnboardingEventsProperties {
   [OnboardingEvents.escrow_redeem_error]: {
     error: string
   }
+
+  [OnboardingEvents.account_dek_set]: undefined
 }
 
 interface VerificationEventsProperties {
@@ -224,7 +226,6 @@ interface VerificationEventsProperties {
   [VerificationEvents.verification_code_validate_complete]: {
     issuer: any
   }
-  [VerificationEvents.verification_account_set]: undefined
 
   [VerificationEvents.verification_reveal_all_attestations_start]: undefined
   [VerificationEvents.verification_reveal_attestation_revealed]: {

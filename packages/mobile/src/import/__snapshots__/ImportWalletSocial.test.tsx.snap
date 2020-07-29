@@ -4,7 +4,6 @@ exports[`ImportWalletSocial renders correctly and is disabled with no text 1`] =
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
     }

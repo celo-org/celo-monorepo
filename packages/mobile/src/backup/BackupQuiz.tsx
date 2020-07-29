@@ -320,7 +320,6 @@ function getShuffledWordSet(mnemonic: string) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
     justifyContent: 'space-between',
     paddingHorizontal: 24,
     paddingBottom: 24,
