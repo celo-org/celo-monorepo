@@ -1,7 +1,7 @@
 import { RenderNode } from '@contentful/rich-text-react-renderer'
 import { BLOCKS, INLINES } from '@contentful/rich-text-types'
 import { Asset, Sys } from 'contentful'
-import { Image, Text, View } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import YouTube from 'react-youtube'
 import { brandStyles } from 'src/experience/common/constants'
 import Showcase from 'src/experience/common/Showcase'
@@ -57,7 +57,7 @@ function embedded(node) {
       const numberAcross = node.data.target.fields.by
       const ratio = node.data.target.fields.tileRatio
       return (
-        <View style={[brandStyles.tiling, { marginHorizontal: -10 }]}>
+        <View style={[brandStyles.tiling, styles.grid]}>
           {node.data.target.fields.content.map((content: Content) => (
             <Tile
               key={content.sys.id}
@@ -141,3 +141,7 @@ function useTileSize(numberAcross: NumberAcross) {
     return 165
   }
 }
+
+const styles = StyleSheet.create({
+  grid: { marginHorizontal: -10 },
+})
