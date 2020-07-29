@@ -168,7 +168,6 @@ class Invite extends React.Component<Props, State> {
 const style = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   textInputContainer: {
     paddingBottom: 5,

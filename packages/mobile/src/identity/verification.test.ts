@@ -12,6 +12,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
   cancelVerification,
   completeAttestationCode,
+  setCompletedCodes,
   setVerificationStatus,
 } from 'src/identity/actions'
 import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
@@ -28,7 +29,7 @@ import {
 } from 'src/identity/verification'
 import { getContractKitAsync } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
-import { privateCommentKeySelector } from 'src/web3/selectors'
+import { dataEncryptionKeySelector } from 'src/web3/selectors'
 import { sleep } from 'test/utils'
 import {
   mockAccount,
@@ -213,7 +214,7 @@ describe('Do Verification Saga', () => {
           call(fetchPhoneHashPrivate, mockE164Number),
           { phoneHash: mockE164NumberHash, e164Number: mockE164Number },
         ],
-        [select(privateCommentKeySelector), mockPrivateDEK],
+        [select(dataEncryptionKeySelector), mockPrivateDEK],
         [
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
           mockAttestationsWrapperUnverified,
@@ -225,11 +226,12 @@ describe('Do Verification Saga', () => {
       ])
       .put(setVerificationStatus(VerificationStatus.Prepping))
       .put(setVerificationStatus(VerificationStatus.GettingStatus))
+      .put(setCompletedCodes(0))
       .put(setVerificationStatus(VerificationStatus.RequestingAttestations))
       .put(setVerificationStatus(VerificationStatus.RevealingNumber))
-      .put(completeAttestationCode())
-      .put(completeAttestationCode())
-      .put(completeAttestationCode())
+      .put(completeAttestationCode(attestationCode0))
+      .put(completeAttestationCode(attestationCode1))
+      .put(completeAttestationCode(attestationCode2))
       .put(setVerificationStatus(VerificationStatus.Done))
       .put(setNumberVerified(true))
       .returns(true)
@@ -251,11 +253,12 @@ describe('Do Verification Saga', () => {
           call(fetchPhoneHashPrivate, mockE164Number),
           { phoneHash: mockE164NumberHash, e164Number: mockE164Number },
         ],
-        [select(privateCommentKeySelector), mockPrivateDEK],
+        [select(dataEncryptionKeySelector), mockPrivateDEK],
         [call(balanceSufficientForAttestations, mockAttestationsRemainingForPartialVerified), true],
         [select(attestationCodesSelector), attestationCodes],
       ])
-      .put(completeAttestationCode())
+      .put(setCompletedCodes(2))
+      .put(completeAttestationCode(attestationCode0))
       .put(setVerificationStatus(VerificationStatus.Done))
       .put(setNumberVerified(true))
       .returns(true)
@@ -272,7 +275,7 @@ describe('Do Verification Saga', () => {
           call(fetchPhoneHashPrivate, mockE164Number),
           { phoneHash: mockE164NumberHash, e164Number: mockE164Number },
         ],
-        [select(privateCommentKeySelector), mockPrivateDEK],
+        [select(dataEncryptionKeySelector), mockPrivateDEK],
         [
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
           mockAttestationsWrapperVerified,
@@ -294,7 +297,7 @@ describe('Do Verification Saga', () => {
           call(fetchPhoneHashPrivate, mockE164Number),
           { phoneHash: mockE164NumberHash, e164Number: mockE164Number },
         ],
-        [select(privateCommentKeySelector), mockPrivateDEK],
+        [select(dataEncryptionKeySelector), mockPrivateDEK],
         [
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
           mockAttestationsWrapperUnverified,
@@ -315,7 +318,7 @@ describe('Do Verification Saga', () => {
           call(fetchPhoneHashPrivate, mockE164Number),
           { phoneHash: mockE164NumberHash, e164Number: mockE164Number },
         ],
-        [select(privateCommentKeySelector), mockPrivateDEK],
+        [select(dataEncryptionKeySelector), mockPrivateDEK],
         [
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
           mockAttestationsWrapperUnverified,
@@ -346,7 +349,7 @@ describe('Do Verification Saga', () => {
           call(fetchPhoneHashPrivate, mockE164Number),
           { phoneHash: mockE164NumberHash, e164Number: mockE164Number },
         ],
-        [select(privateCommentKeySelector), mockPrivateDEK],
+        [select(dataEncryptionKeySelector), mockPrivateDEK],
         [
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
           mockAttestationsWrapperRevealFailure,
@@ -355,7 +358,6 @@ describe('Do Verification Saga', () => {
         [call(balanceSufficientForAttestations, mockAttestationsRemainingForPartialVerified), true],
         [select(attestationCodesSelector), attestationCodes],
       ])
-      .put(showError(ErrorMessages.REVEAL_ATTESTATION_FAILURE))
       .put(setVerificationStatus(VerificationStatus.RevealAttemptFailed))
       .run()
   })

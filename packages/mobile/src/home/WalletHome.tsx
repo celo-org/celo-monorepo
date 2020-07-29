@@ -1,5 +1,5 @@
 import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
 import variables from '@celo/react-components/styles/variables'
 import _ from 'lodash'
 import * as React from 'react'
@@ -171,7 +171,7 @@ export class WalletHome extends React.Component<Props, State> {
       <RefreshControl
         refreshing={this.props.loading}
         onRefresh={this.onRefresh}
-        colors={[colors.celoGreen]}
+        colors={[colors.greenUI]}
       />
     ) as React.ReactElement<RefreshControlProps>
 
@@ -225,7 +225,6 @@ export class WalletHome extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
     position: 'relative',
   },
   banner: { paddingVertical: 15, marginTop: 50 },
@@ -233,7 +232,7 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   header: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',

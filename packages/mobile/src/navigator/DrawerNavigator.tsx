@@ -186,7 +186,7 @@ export default function DrawerNavigator() {
       drawerContent={drawerContent}
       backBehavior={'initialRoute'}
       drawerContentOptions={{
-        labelStyle: [fontStyles.regular, { marginLeft: -20 }],
+        labelStyle: [fontStyles.regular, { marginLeft: -20, fontWeight: 'normal' }],
         activeBackgroundColor: colorsV2.gray2,
       }}
     >

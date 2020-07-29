@@ -14,7 +14,7 @@ export class PhoneNumberWithFlag extends React.PureComponent<Props> {
     const parsedNumber = parsePhoneNumber(this.props.e164PhoneNumber, this.props.defaultCountryCode)
     return (
       <View style={style.container}>
-        <Text style={[fontStyles.regular, style.countryCodeContainer]}>
+        <Text style={[fontStyles.small, style.countryCodeContainer]}>
           {parsedNumber
             ? getCountryEmoji(
                 this.props.e164PhoneNumber,
@@ -23,7 +23,7 @@ export class PhoneNumberWithFlag extends React.PureComponent<Props> {
               )
             : getCountryEmoji(this.props.e164PhoneNumber)}
         </Text>
-        <Text style={[fontStyles.regular, style.phoneNumber]}>
+        <Text style={[fontStyles.small, style.phoneNumber]}>
           {parsedNumber ? `+${parsedNumber.countryCode} ${parsedNumber.displayNumber}` : ''}
         </Text>
       </View>

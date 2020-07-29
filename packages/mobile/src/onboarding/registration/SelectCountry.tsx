@@ -36,7 +36,7 @@ export default function SelectCountry({ navigation, route }: Props) {
   ])
 
   function onSelect(country: LocalizedCountry) {
-    navigation.navigate(Screens.JoinCelo, { selectedCountryCodeAlpha2: country.alpha2 })
+    navigation.navigate(Screens.NameAndNumber, { selectedCountryCodeAlpha2: country.alpha2 })
   }
 
   const renderItem = useCallback(

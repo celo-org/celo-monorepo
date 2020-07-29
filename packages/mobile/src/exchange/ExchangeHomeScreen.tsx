@@ -231,7 +231,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   background: {
-    backgroundColor: colors.background,
     flex: 1,
     justifyContent: 'space-between',
   },
