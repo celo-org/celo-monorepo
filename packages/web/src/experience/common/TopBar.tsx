@@ -8,7 +8,7 @@ import links from 'src/shared/menu-items'
 import MobileMenu from 'src/shared/MobileMenu'
 import Navigation, { NavigationTheme } from 'src/shared/Navigation'
 import { colors, fonts, standardStyles } from 'src/styles'
-import { useBooleanToggle } from 'src/utils/useBooleanToggle'
+import { useBooleanToggle } from 'src/hooks/useBooleanToggle'
 interface Props {
   current: string
 }

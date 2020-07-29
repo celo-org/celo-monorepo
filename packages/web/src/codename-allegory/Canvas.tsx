@@ -9,7 +9,7 @@ import SideBar from 'src/codename-allegory/SideBar'
 import OpenGraph from 'src/header/OpenGraph'
 import menuItems from 'src/shared/menu-items'
 import { fonts, textStyles } from 'src/styles'
-import { useBooleanToggle } from 'src/utils/useBooleanToggle'
+import { useBooleanToggle } from 'src/hooks/useBooleanToggle'
 
 export default function Canvas() {
   const [isOpen, toggleSidebar] = useBooleanToggle()
