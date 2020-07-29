@@ -29,9 +29,7 @@ export async function authenticateUser(request: Request): Promise<boolean> {
     logger.info(`Found DEK ${registeredEncryptionKey} for ${signer}`)
     try {
       const key = ec.keyFromPublic(trimLeading0x(registeredEncryptionKey), 'hex')
-      logger.info(`Verifying signature message: ${message}\nmessageSignature: ${messageSignature}`)
       const parsedSig = JSON.parse(messageSignature)
-      logger.info('parsedSig:' + parsedSig)
       const validSignature = key.verify(message, parsedSig)
       if (validSignature) {
         return true
