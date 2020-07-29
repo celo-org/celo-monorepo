@@ -1,13 +1,8 @@
 import { Linking } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
-import { CELO_VERIFIER_DOWNLOAD_LINK, CELO_VERIFIER_START_MINING_LINK } from 'src/config'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'utils/linking'
-
-export function navigateToVerifierApp() {
-  navigateToURI(CELO_VERIFIER_START_MINING_LINK, CELO_VERIFIER_DOWNLOAD_LINK)
-}
 
 export function navigateToWalletPlayStorePage() {
   navigateToURI(`market://details?id=${DeviceInfo.getBundleId()}`)
