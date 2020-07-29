@@ -13,6 +13,7 @@ import { FIREBASE_ENABLED } from 'src/config'
 import { handleNotification } from 'src/firebase/notifications'
 import { NotificationReceiveState } from 'src/notifications/types'
 import Logger from 'src/utils/Logger'
+import { Awaited } from 'src/utils/typescript'
 
 const TAG = 'firebase/firebase'
 
@@ -76,8 +77,12 @@ export function* initializeCloudMessaging(app: ReactNativeFirebase.Module, addre
   Logger.info(TAG, 'Initializing Firebase Cloud Messaging')
 
   // this call needs to include context: https://github.com/redux-saga/redux-saga/issues/27
-  const enabled = yield call([app.messaging(), 'hasPermission'])
-  if (!enabled) {
+  // Manual type checking because yield calls can't infer return type yet :'(
+  const authStatus: Awaited<ReturnType<
+    FirebaseMessagingTypes.Module['hasPermission']
+  >> = yield call([app.messaging(), 'hasPermission'])
+  Logger.info(TAG, 'Current messaging authorization status', authStatus.toString())
+  if (authStatus === firebase.messaging.AuthorizationStatus.NOT_DETERMINED) {
     try {
       yield call([app.messaging(), 'requestPermission'])
     } catch (error) {
@@ -104,8 +109,8 @@ export function* initializeCloudMessaging(app: ReactNativeFirebase.Module, addre
 
   // Listen for notification messages while the app is open
   const channelOnNotification: EventChannel<NotificationChannelEvent> = eventChannel((emitter) => {
-    const unsuscribe = () => {
-      Logger.info(TAG, 'Notification channel closed, reseting callbacks. This is likely an error.')
+    const unsubscribe = () => {
+      Logger.info(TAG, 'Notification channel closed, resetting callbacks. This is likely an error.')
       app.messaging().onMessage(() => null)
       app.messaging().onNotificationOpenedApp(() => null)
     }
@@ -125,7 +130,7 @@ export function* initializeCloudMessaging(app: ReactNativeFirebase.Module, addre
         stateType: NotificationReceiveState.APP_FOREGROUNDED,
       })
     })
-    return unsuscribe
+    return unsubscribe
   })
   yield spawn(watchFirebaseNotificationChannel, channelOnNotification)
 

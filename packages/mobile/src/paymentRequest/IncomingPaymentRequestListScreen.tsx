@@ -5,23 +5,12 @@ import { View } from 'react-native'
 import { connect } from 'react-redux'
 import { getIncomingPaymentRequests } from 'src/account/selectors'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import { fetchAddressesAndValidate } from 'src/identity/actions'
-import {
-  addressToE164NumberSelector,
-  AddressToE164NumberType,
-  AddressValidationType,
-  e164NumberToAddressSelector,
-  E164NumberToAddressType,
-} from 'src/identity/reducer'
+import { AddressToE164NumberType } from 'src/identity/reducer'
 import { HeaderTitleWithBalance } from 'src/navigator/Headers'
 import { NotificationList } from 'src/notifications/NotificationList'
-import { declinePaymentRequest } from 'src/paymentRequest/actions'
 import IncomingPaymentRequestListItem from 'src/paymentRequest/IncomingPaymentRequestListItem'
 import { PaymentRequest } from 'src/paymentRequest/types'
-import {
-  getAddressValidationCheckCache,
-  getRequesterFromPaymentRequest,
-} from 'src/paymentRequest/utils'
+import { getRequesterFromPaymentRequest } from 'src/paymentRequest/utils'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
@@ -29,80 +18,36 @@ import { RootState } from 'src/redux/reducers'
 interface StateProps {
   dollarBalance: string | null
   paymentRequests: PaymentRequest[]
-  e164PhoneNumberAddressMapping: E164NumberToAddressType
-  addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient
-  addressValidationCheckCache: AddressValidationCheckCache
-}
-
-interface DispatchProps {
-  declinePaymentRequest: typeof declinePaymentRequest
-  fetchAddressesAndValidate: typeof fetchAddressesAndValidate
-}
-
-export interface AddressValidationCheckCache {
-  [e164Number: string]: AddressValidationType
 }
 
 const mapStateToProps = (state: RootState): StateProps => {
-  const paymentRequests = getIncomingPaymentRequests(state)
-  const addressToE164Number = addressToE164NumberSelector(state)
-  const e164PhoneNumberAddressMapping = e164NumberToAddressSelector(state)
-  const recipientCache = recipientCacheSelector(state)
-  const { secureSendPhoneNumberMapping } = state.identity
-  // TODO use Reselect for this to avoid recomputing it on each redux
-  // action dispatch (which will trigger this mapStateToProps)
-  const addressValidationCheckCache = getAddressValidationCheckCache(
-    paymentRequests,
-    addressToE164Number,
-    recipientCache,
-    secureSendPhoneNumberMapping
-  )
-
   return {
     dollarBalance: state.stableToken.balance,
-    paymentRequests,
-    addressToE164Number,
-    e164PhoneNumberAddressMapping,
-    recipientCache,
-    addressValidationCheckCache,
+    paymentRequests: getIncomingPaymentRequests(state),
+    recipientCache: recipientCacheSelector(state),
   }
 }
 
-const mapDispatchToProps = {
-  declinePaymentRequest,
-  fetchAddressesAndValidate,
-}
-
-type Props = WithTranslation & StateProps & DispatchProps
+type Props = WithTranslation & StateProps
 
 export const listItemRenderer = (props: {
   addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient
-  declinePaymentRequest: typeof declinePaymentRequest
-  addressValidationCheckCache?: AddressValidationCheckCache
-}) => (request: PaymentRequest, key: number | undefined = undefined) => {
-  const { addressValidationCheckCache, addressToE164Number, recipientCache } = props
-  const requester = getRequesterFromPaymentRequest(request, addressToE164Number, recipientCache)
-  let addressValidationType
-
-  if (addressValidationCheckCache && requester.e164PhoneNumber) {
-    addressValidationType = addressValidationCheckCache[requester.e164PhoneNumber]
-  }
-
-  return (
-    <View key={key}>
-      <IncomingPaymentRequestListItem
-        id={request.uid || ''}
-        amount={request.amount}
-        requester={requester}
-        comment={request.comment}
-        declinePaymentRequest={props.declinePaymentRequest}
-        addressValidationType={addressValidationType}
-      />
-    </View>
-  )
-}
+}) => (request: PaymentRequest, key: number | undefined = undefined) => (
+  <View key={key}>
+    <IncomingPaymentRequestListItem
+      id={request.uid || ''}
+      amount={request.amount}
+      requester={getRequesterFromPaymentRequest(
+        request,
+        props.addressToE164Number,
+        props.recipientCache
+      )}
+      comment={request.comment}
+    />
+  </View>
+)
 
 class IncomingPaymentRequestListScreen extends React.Component<Props> {
   static navigationOptions = () => ({
@@ -113,28 +58,6 @@ class IncomingPaymentRequestListScreen extends React.Component<Props> {
       />
     ),
   })
-
-  componentDidMount() {
-    // Need to check latest mapping to prevent user from accepting fradulent requests
-    this.fetchLatestAddressesAndValidate()
-  }
-
-  fetchLatestAddressesAndValidate = () => {
-    const { paymentRequests, addressToE164Number, recipientCache } = this.props
-
-    // TODO: Look into creating a batch lookup function so we dont rerender on each lookup
-    paymentRequests.forEach((paymentRequest) => {
-      const recipient = getRequesterFromPaymentRequest(
-        paymentRequest,
-        addressToE164Number,
-        recipientCache
-      )
-      const { e164PhoneNumber } = recipient
-      if (e164PhoneNumber) {
-        this.props.fetchAddressesAndValidate(e164PhoneNumber)
-      }
-    })
-  }
 
   render = () => {
     return (
@@ -147,7 +70,7 @@ class IncomingPaymentRequestListScreen extends React.Component<Props> {
   }
 }
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
+export default connect<StateProps, {}, {}, RootState>(
   mapStateToProps,
-  mapDispatchToProps
+  {}
 )(withTranslation<Props>(Namespaces.paymentRequestFlow)(IncomingPaymentRequestListScreen))

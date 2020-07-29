@@ -52,7 +52,8 @@ export async function shareSVGImage(svg: SVG) {
 function* handleSecureSend(
   data: { address: string; e164PhoneNumber: string; displayName: string },
   e164NumberToAddress: E164NumberToAddressType,
-  secureSendTxData: TransactionDataInput
+  secureSendTxData: TransactionDataInput,
+  requesterAddress?: string
 ) {
   if (!secureSendTxData.recipient.e164PhoneNumber) {
     throw Error(`Invalid recipient type for Secure Send: ${secureSendTxData.recipient.kind}`)
@@ -60,17 +61,22 @@ function* handleSecureSend(
 
   const userScannedAddress = data.address.toLowerCase()
   const { e164PhoneNumber } = secureSendTxData.recipient
-  const possibleRecievingAddresses = e164NumberToAddress[e164PhoneNumber]
+  const possibleReceivingAddresses = e164NumberToAddress[e164PhoneNumber]
   // This should never happen. Secure Send is triggered when there are
-  // multiple addrresses for a given phone number
-  if (!possibleRecievingAddresses) {
+  // multiple addresses for a given phone number
+  if (!possibleReceivingAddresses) {
     throw Error("No addresses associated with recipient's phone number")
   }
 
-  const possibleRecievingAddressesFormatted = possibleRecievingAddresses.map((address) =>
+  // Need to add the requester address to the option set in the event
+  // a request is coming from an unverified account
+  if (requesterAddress && !possibleReceivingAddresses.includes(requesterAddress)) {
+    possibleReceivingAddresses.push(requesterAddress)
+  }
+  const possibleReceivingAddressesFormatted = possibleReceivingAddresses.map((address) =>
     address.toLowerCase()
   )
-  if (!possibleRecievingAddressesFormatted.includes(userScannedAddress)) {
+  if (!possibleReceivingAddressesFormatted.includes(userScannedAddress)) {
     const error = ErrorMessages.QR_FAILED_INVALID_RECIPIENT
     ValoraAnalytics.track(SendEvents.send_secure_incorrect, {
       confirmByScan: true,
@@ -90,7 +96,9 @@ export function* handleBarcode(
   addressToE164Number: AddressToE164NumberType,
   recipientCache: NumberToRecipient,
   e164NumberToAddress: E164NumberToAddressType,
-  secureSendTxData?: TransactionDataInput
+  secureSendTxData?: TransactionDataInput,
+  isOutgoingPaymentRequest?: true,
+  requesterAddress?: string
 ) {
   let data: { address: string; e164PhoneNumber: string; displayName: string } | undefined
 
@@ -109,7 +117,13 @@ export function* handleBarcode(
   }
 
   if (secureSendTxData) {
-    const success = yield call(handleSecureSend, data, e164NumberToAddress, secureSendTxData)
+    const success = yield call(
+      handleSecureSend,
+      data,
+      e164NumberToAddress,
+      secureSendTxData,
+      requesterAddress
+    )
     if (!success) {
       return
     }
@@ -141,9 +155,17 @@ export function* handleBarcode(
       }
   yield put(storeLatestInRecents(recipient))
 
-  if (secureSendTxData) {
-    replace(Screens.SendConfirmation, { transactionData: secureSendTxData })
+  if (secureSendTxData && isOutgoingPaymentRequest) {
+    replace(Screens.PaymentRequestConfirmation, {
+      transactionData: secureSendTxData,
+      addressJustValidated: true,
+    })
+  } else if (secureSendTxData) {
+    replace(Screens.SendConfirmation, {
+      transactionData: secureSendTxData,
+      addressJustValidated: true,
+    })
   } else {
-    replace(Screens.SendAmount, { recipient })
+    replace(Screens.SendAmount, { recipient, isFromScan: true, isOutgoingPaymentRequest })
   }
 }

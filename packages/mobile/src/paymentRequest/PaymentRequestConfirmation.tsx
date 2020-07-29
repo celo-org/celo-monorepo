@@ -82,7 +82,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
   componentDidMount() {
     const { addressJustValidated, t } = this.props
     if (addressJustValidated) {
-      Logger.showMessage(t('addressConfirmed'))
+      Logger.showMessage(t('sendFlow7:addressConfirmed'))
     }
   }
 
@@ -152,7 +152,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
     }
 
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['bottom']}>
         <DisconnectBanner />
         <ReviewFrame
           FooterComponent={this.renderFooter}
@@ -193,7 +193,6 @@ class PaymentRequestConfirmation extends React.Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light,
     padding: 8,
   },
   feeContainer: {

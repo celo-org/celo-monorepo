@@ -278,7 +278,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     )
 
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['bottom']}>
         <DisconnectBanner />
         <KeyboardAwareScrollView
           keyboardShouldPersistTaps={'always'}
@@ -331,7 +331,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
           text={t(`global:review`)}
           accessibilityLabel={t('continue')}
           disabled={this.isExchangeInvalid()}
-          type={BtnTypes.TERTIARY}
+          type={BtnTypes.SECONDARY}
           size={BtnSizes.FULL}
           style={styles.reviewBtn}
           testID="ExchangeReviewButton"

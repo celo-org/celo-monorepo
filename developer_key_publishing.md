@@ -6,7 +6,7 @@ In support of these uses, [OpenPGP](https://www.openpgp.org/) public keys can be
 
 If you want to read more about OpenPGP keys, including their structure and metadata, check out [Anatomy of a GPG Key by Dave Steele](https://davesteele.github.io/gpg/2014/09/20/anatomy-of-a-gpg-key/).
 
-> Note: This guide assumes you have an @clabs.co email address, but if you do not, simply change the email domain to your primary developer email (e.g. @example.com for alice@example.com)
+> Note: This guide assumes you have an @clabs.co email address, but if you do not, simply change the email domain to your primary developer email (e.g. @example.com for alice@example.com) Some additional setup will be required in the DNS records for your domain to configure [OpenPGP WKD]((https://gnupg.org/blog/20161027-hosting-a-web-key-directory.html)).
 
 ## Setup
 
@@ -30,10 +30,12 @@ OpenPGP supports a number of cryptographic algorithms including [RSA](https://en
 
 Here we recommend `secp256k1`, which is the algorithm underlying identity on the Celo blockchain, because it is fast, secure, and promotes interoperability within the Celo ecosystem. (e.g. Your OpenPGP key could be used to take actions on-chain, which is pretty neat.)
 
+> Note: When using a YubiKey with firmware version less than 5.2.3, `secp256k1` is not available. Instead, we recommend using `rsa2048`.
+
 #### User Identifier
 In OpenPGP, each key is associated with a user identity, which is commonly an email address and your name (e.g. "Alice Turing <alice@example.com>"). A public key created by `gpg` will automatically include the username, in addition to the cryptographic public key information, so when someone downloads your public key, they will know it is intended for your email address.
 
-By publishing keys on [celo.org](https://celo.org), users can securely download any published key associated with an `@celo.org` user identifier, and know that it is the correct one because publishing to [celo.org](https://celo.org) requires approval of the Celo core developers.
+By publishing keys on [celo.org](https://celo.org), users can securely download developer keys from their `@clabs.co` email address, and know that it is the correct one because publishing to [celo.org](https://celo.org) requires approval of the Celo core developers.
 
 ### On your YubiKey
 
@@ -103,23 +105,6 @@ You should see `Good signature from ...` with your real name and email.
 
 Keys are published to [celo.org](https://celo.org) using [OpenPGP WKD](https://gnupg.org/blog/20161027-hosting-a-web-key-directory.html), which is essentially just a hosted folder of public keys. Published keys are managed by submitting a pull request to the `master` branch of `celo-monorepo` on [GitHub](https://github.com/celo-org/celo-monorepo).
 
-#### Configuring your key
-
-The domain (e.g. `celo.org`) of the user identifier much match the site it's hosted on, so you'll need to run the following command to add the `celo.org` domain to your key:
-
-```bash
-gpg --quick-add-uid ${USER_NAME}@clabs.co "${REAL_NAME} <${USER_NAME}@celo.org>"
-```
-
-> Note: You do not need an `@celo.org` email address to publish a key with the `@celo.org` domain, but it must not conflict with an existing email or published key.
-
-Additionally you may want to add identities for `staging.celo.org` and `dev.celo.org` so you can confirm your keys are published correctly on a non-production version of the website.
-
-```bash
-gpg --quick-add-uid ${USER_NAME}@clabs.co "${REAL_NAME} <${USER_NAME}@staging.celo.org>"
-gpg --quick-add-uid ${USER_NAME}@clabs.co "${REAL_NAME} <${USER_NAME}@dev.celo.org>"
-```
-
 #### Adding your key to the repository
 
 Adding your key to the `@celo/web` package of `celo-monorepo` will allow them to be available on [celo.org](https://celo.org) with the next website deployment.
@@ -130,32 +115,21 @@ Running the following command from the root of `celo-monorepo` will add your key
 gpg --list-options show-only-fpr-mbox -k ${USER_NAME}@clabs.co | $(gpgconf --list-dirs libexecdir)/gpg-wks-client -v --install-key -C packages/web/openpgpkey
 ```
 
-You should confirm that new key files were added to the `packages/web/openpgpkey/` directory and open a pull request with the changes. You should see new files in the `packages/web/openpgpkey/${DOMAIN}/hu` folders for each of the domains you added to you key, including `clabs.co`, `celo.org`, `staging.celo.org` and `dev.celo.org` if you followed the directions above.
+You should confirm that new key files were added to the `packages/web/openpgpkey/` directory and open a pull request with the changes. You should see new files in the `packages/web/openpgpkey/clabs.co/hu` folder, if you followed the directions above.
 
 #### Verifying the published key
 
 Once a new version of [celo.org](https://celo.org) is published, you will be able to verify your keys are published correctly with the key lookup instructions below.
 
-If you have access to the cLabs Google Cloud project, verifying your keys are correctly added to the repository can be accomplished by pushing your changes to `dev.celo.org`.
-
-After making sure you are not going to clobber another engineer's changes, run the following commands in the `packages/web` directory of `celo-monorepo`.
-
-```bash
-yarn deploy:dev
-gpg --auto-key-locate wkd --locate-external-keys ${USER_NAME}@dev.celo.org
-```
-
-If correctly configured you will see the message "not changed" on the first line of the output and the downloaded key will match the key you just generated.
-
 ## Key Lookup
 
-Users can lookup keys on the `@celo.org` domain with the following command:
+Users can lookup keys on the `@clabs.co` domain with the following command:
 
 ```bash
-gpg --auto-key-locate wkd --locate-external-keys ${USER_NAME}@celo.org
+gpg --auto-key-locate wkd --locate-external-keys ${USER_NAME}@clabs.co
 ```
 
-This command will query [celo.org](https://celo.org) over HTTPS and retrieve the latest key for `${USER_NAME}@celo.org`.
+This command will query [celo.org](https://celo.org) over HTTPS and retrieve the latest key for `${USER_NAME}@clabs.co`.
 
 ## Document Signing
 

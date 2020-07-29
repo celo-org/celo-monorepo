@@ -3,6 +3,7 @@ import { PincodeType } from 'src/account/reducer'
 import {
   AppEvents,
   CeloExchangeEvents,
+  ContractKitEvents,
   EscrowEvents,
   FeeEvents,
   GethEvents,
@@ -169,6 +170,8 @@ interface OnboardingEventsProperties {
   [OnboardingEvents.escrow_redeem_error]: {
     error: string
   }
+
+  [OnboardingEvents.account_dek_set]: undefined
 }
 
 interface VerificationEventsProperties {
@@ -223,7 +226,6 @@ interface VerificationEventsProperties {
   [VerificationEvents.verification_code_validate_complete]: {
     issuer: any
   }
-  [VerificationEvents.verification_account_set]: undefined
 
   [VerificationEvents.verification_reveal_all_attestations_start]: undefined
   [VerificationEvents.verification_reveal_attestation_revealed]: {
@@ -526,6 +528,27 @@ interface GethEventsProperties {
     error: string
     context: string
   }
+  [GethEvents.geth_init_start]: {
+    sync: boolean
+  }
+  [GethEvents.create_geth_start]: undefined
+  [GethEvents.create_geth_finish]: undefined
+  [GethEvents.start_geth_start]: undefined
+  [GethEvents.start_geth_finish]: undefined
+}
+
+interface ContractKitEventsProperties {
+  [ContractKitEvents.init_contractkit_start]: undefined
+  [ContractKitEvents.init_contractkit_geth_init_start]: {
+    retries: number
+  }
+  [ContractKitEvents.init_contractkit_geth_init_finish]: undefined
+  [ContractKitEvents.init_contractkit_get_ipc_start]: undefined
+  [ContractKitEvents.init_contractkit_get_ipc_finish]: undefined
+  [ContractKitEvents.init_contractkit_get_wallet_start]: undefined
+  [ContractKitEvents.init_contractkit_get_wallet_finish]: undefined
+  [ContractKitEvents.init_contractkit_init_wallet_finish]: undefined
+  [ContractKitEvents.init_contractkit_finish]: undefined
 }
 
 export type AnalyticsPropertiesList = AppEventsProperties &
@@ -542,4 +565,5 @@ export type AnalyticsPropertiesList = AppEventsProperties &
   FeeEventsProperties &
   TransactionEventsProperties &
   CeloExchangeEventsProperties &
-  GethEventsProperties
+  GethEventsProperties &
+  ContractKitEventsProperties

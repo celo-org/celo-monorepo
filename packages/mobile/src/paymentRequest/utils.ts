@@ -1,6 +1,4 @@
-import { AddressToE164NumberType, SecureSendPhoneNumberMapping } from 'src/identity/reducer'
-import { getAddressValidationType } from 'src/identity/secureSend'
-import { AddressValidationCheckCache } from 'src/paymentRequest/IncomingPaymentRequestListScreen'
+import { AddressToE164NumberType } from 'src/identity/reducer'
 import { PaymentRequest } from 'src/paymentRequest/types'
 import { NumberToRecipient, Recipient, RecipientKind } from 'src/recipients/recipient'
 
@@ -65,25 +63,4 @@ function getRecipientObjectFromPaymentRequest(
       displayName: e164PhoneNumber,
     }
   }
-}
-
-export const getAddressValidationCheckCache = (
-  paymentRequests: PaymentRequest[],
-  addressToE164Number: AddressToE164NumberType,
-  recipientCache: NumberToRecipient,
-  secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
-): AddressValidationCheckCache => {
-  const addressValidationCheckCache: AddressValidationCheckCache = {}
-
-  paymentRequests.forEach((payment) => {
-    const recipient = getRequesterFromPaymentRequest(payment, addressToE164Number, recipientCache)
-    const addressValidationType = getAddressValidationType(recipient, secureSendPhoneNumberMapping)
-
-    const { e164PhoneNumber } = recipient
-    if (e164PhoneNumber) {
-      addressValidationCheckCache[e164PhoneNumber] = addressValidationType
-    }
-  })
-
-  return addressValidationCheckCache
 }

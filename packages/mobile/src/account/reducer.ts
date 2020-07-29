@@ -24,7 +24,6 @@ export interface State {
   // TODO move these to a new paymentRequest/reducer.ts
   incomingPaymentRequests: PaymentRequest[]
   outgoingPaymentRequests: PaymentRequest[]
-  dismissedEarnRewards: boolean
   dismissedInviteFriends: boolean
   dismissedGetVerified: boolean
   promptFornoIfNeeded: boolean
@@ -62,7 +61,6 @@ export const initialState = {
   backupCompleted: false,
   backupDelayedTime: 0,
   socialBackupCompleted: false,
-  dismissedEarnRewards: false,
   dismissedInviteFriends: false,
   dismissedGetVerified: false,
   promptFornoIfNeeded: false,
@@ -127,22 +125,22 @@ export const reducer = (
         pincodeType: PincodeType.Unset,
         isSettingPin: false,
       }
-    case Actions.SET_ACCOUNT_CREATION_TIME_ACTION:
+    case Actions.SET_ACCOUNT_CREATION_TIME:
       return {
         ...state,
         accountCreationTime: getRemoteTime(),
       }
-    case Actions.SET_BACKUP_COMPLETED_ACTION:
+    case Actions.SET_BACKUP_COMPLETED:
       return {
         ...state,
         backupCompleted: true,
       }
-    case Actions.SET_BACKUP_DELAYED_ACTION:
+    case Actions.SET_BACKUP_DELAYED:
       return {
         ...state,
         backupDelayedTime: getRemoteTime(),
       }
-    case Actions.SET_SOCIAL_BACKUP_COMPLETED_ACTION:
+    case Actions.SET_SOCIAL_BACKUP_COMPLETED:
       return {
         ...state,
         socialBackupCompleted: true,
@@ -163,11 +161,6 @@ export const reducer = (
       return {
         ...state,
         outgoingPaymentRequests: action.paymentRequests,
-      }
-    case Actions.DISMISS_EARN_REWARDS:
-      return {
-        ...state,
-        dismissedEarnRewards: true,
       }
     case Actions.DISMISS_INVITE_FRIENDS:
       return {
