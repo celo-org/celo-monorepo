@@ -2,6 +2,9 @@ import { PincodeType } from 'src/account/reducer'
 import { PaymentRequest } from 'src/account/types'
 
 export enum Actions {
+  CHOOSE_CREATE_ACCOUNT = 'ACCOUNT/CHOOSE_CREATE',
+  CHOOSE_RESTORE_ACCOUNT = 'ACCOUNT/CHOOSE_RESTORE',
+  CANCEL_CREATE_OR_RESTORE_ACCOUNT = 'ACCOUNT/CANCEL_CREATE_OR_RESTORE_ACCOUNT',
   SET_NAME = 'ACCOUNT/SET_NAME',
   SET_PHONE_NUMBER = 'ACCOUNT/SET_PHONE_NUMBER',
   DEV_MODE_TRIGGER_CLICKED = 'ACCOUNT/NAME_CLICKED',
@@ -23,6 +26,17 @@ export enum Actions {
   SET_RETRY_VERIFICATION_WITH_FORNO = 'ACCOUNT/SET_RETRY_VERIFICATION_WITH_FORNO',
   ACCEPT_TERMS = 'ACCOUNT/ACCEPT_TERMS',
   MIGRATE_ACCOUNT_BIP39 = 'MIGRATE_ACCOUNT_BIP39',
+}
+
+export interface ChooseCreateAccountAction {
+  type: Actions.CHOOSE_CREATE_ACCOUNT
+}
+export interface ChooseRestoreAccountAction {
+  type: Actions.CHOOSE_RESTORE_ACCOUNT
+}
+
+export interface CancelCreateOrRestoreAccountAction {
+  type: Actions.CANCEL_CREATE_OR_RESTORE_ACCOUNT
 }
 
 export interface SetNameAction {
@@ -121,6 +135,9 @@ export interface MigrateAccount {
 }
 
 export type ActionTypes =
+  | ChooseCreateAccountAction
+  | ChooseRestoreAccountAction
+  | CancelCreateOrRestoreAccountAction
   | SetNameAction
   | SetPhoneNumberAction
   | DevModeTriggerClickedAction
@@ -142,6 +159,24 @@ export type ActionTypes =
   | SetRetryVerificationWithFornoAction
   | AcceptTermsAction
   | MigrateAccount
+
+export function chooseCreateAccount(): ChooseCreateAccountAction {
+  return {
+    type: Actions.CHOOSE_CREATE_ACCOUNT,
+  }
+}
+
+export function chooseRestoreAccount(): ChooseRestoreAccountAction {
+  return {
+    type: Actions.CHOOSE_RESTORE_ACCOUNT,
+  }
+}
+
+export function cancelCreateOrRestoreAccount(): CancelCreateOrRestoreAccountAction {
+  return {
+    type: Actions.CANCEL_CREATE_OR_RESTORE_ACCOUNT,
+  }
+}
 
 export function setName(name: string): SetNameAction {
   return {
