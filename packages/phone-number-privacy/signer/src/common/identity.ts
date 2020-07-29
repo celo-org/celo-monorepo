@@ -1,7 +1,11 @@
+import { trimLeading0x } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
+import { ec as EC } from 'elliptic'
 import { Request } from 'express'
 import { getDataEncryptionKey } from '../web3/contracts'
 import logger from './logger'
+
+const ec = new EC('secp256k1')
 
 /*
  * Confirms that user is who they say they are and throws error on failure to confirm.
@@ -25,11 +29,10 @@ export async function authenticateUser(request: Request): Promise<boolean> {
   if (!registeredEncryptionKey) {
     logger.info(`Account ${signer} does not have registered encryption key`)
   } else {
-    const validSignature: boolean = verifySignature(
-      message,
-      messageSignature,
-      registeredEncryptionKey
-    )
+    logger.info(`Found DEK ${registeredEncryptionKey} for ${signer}`)
+    const key = ec.keyFromPublic(trimLeading0x(registeredEncryptionKey), 'hex')
+    const validSignature = key.verify(message, messageSignature)
+
     if (validSignature) {
       return true
     }
@@ -40,7 +43,4 @@ export async function authenticateUser(request: Request): Promise<boolean> {
     `Message from ${signer} was not authenticated with DEK, attempting to authenticate using wallet key`
   )
   return verifySignature(message, messageSignature, signer)
-  //
-  // const key = ec.keyFromPublic(registeredEncryptionKey)
-  // if (!key.verify(message, messageSignature)) {
 }

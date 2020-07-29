@@ -310,6 +310,8 @@ export function* getAuthSignerForAccount(account: string) {
     Logger.error(TAG + 'getAuthSignerForAccount', 'Missing comment key, should never happen.')
   } else {
     const publicDataKey = compressedPubKey(hexToBuffer(privateDataKey))
+    Logger.warn(TAG + 'getAuthSignerForAccount', `privateDataKey [DELETE]: ${privateDataKey}`)
+    Logger.warn(TAG + 'getAuthSignerForAccount', `publicDataKey [DELETE]: ${publicDataKey}`)
     const upToDate: boolean = yield call(isAccountUpToDate, accountsWrapper, account, publicDataKey)
     if (!upToDate) {
       Logger.warn(TAG + 'getAuthSignerForAccount', `DEK mismatch.`)

@@ -132,6 +132,7 @@ export async function isAccountUpToDate(
     accountsWrapper.getWalletAddress(address),
     accountsWrapper.getDataEncryptionKey(address),
   ])
+  Logger.debug(`${TAG}/isAccountUpToDate`, `Found match for DEK ${currentDEK}`)
   return eqAddress(currentWalletAddress, address) && currentDEK && eqAddress(currentDEK, dataKey)
 }
 

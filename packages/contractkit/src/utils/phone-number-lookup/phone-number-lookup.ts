@@ -1,7 +1,12 @@
 // Utilities for interacting with the Phone Number Privacy Service service (aka PGPNP)
 
+import { hexToBuffer, trimLeading0x } from '@celo/utils/lib/address'
+import { ec as EC } from 'elliptic'
 import { ContractKit } from '../../kit'
+import { AccountsWrapper } from '../../wrappers/Accounts'
 const TAG = 'contractkit/utils/phone-number-lookup/phone-number-lookup'
+
+const ec = new EC('secp256k1')
 
 export interface WalletKeySigner {
   authenticationMethod: AuthenticationMethod.WALLETKEY
@@ -73,11 +78,23 @@ export async function postToPhoneNumPrivacyService<ResponseType>(
   // Sign payload using account privkey
   const bodyString = JSON.stringify(body)
 
-  let account = body.account
+  let authHeader = ''
   if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTIONKEY) {
-    account = signer.rawKey
+    const key = ec.keyFromPrivate(hexToBuffer(signer.rawKey))
+    authHeader = key.sign(bodyString).toDER()
+  } else {
+    authHeader = await signer.contractKit.web3.eth.sign(bodyString, body.account)
   }
-  const authHeader = await signer.contractKit.web3.eth.sign(bodyString, account)
+
+  // Verify signature before sending
+  if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTIONKEY) {
+    const accountWrapper: AccountsWrapper = await signer.contractKit.contracts.getAccounts()
+    const dek = await accountWrapper.getDataEncryptionKey(body.account)
+    const key = ec.keyFromPublic(trimLeading0x(dek), 'hex')
+
+    const validSignature: boolean = key.verify(bodyString, authHeader)
+    logger.debug(`${TAG}@postToPGPNP`, `Signature is valid: ${validSignature} signed by ${dek}`)
+  }
 
   const { pgpnpUrl } = context
   const res = await fetch(pgpnpUrl + endpoint, {
