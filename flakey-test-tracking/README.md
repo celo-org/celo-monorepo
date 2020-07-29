@@ -37,7 +37,7 @@ Some flakey tests are not uncovered by retries. That is, if they fail the first 
 To manually create a flakey test issue, mimic the format of issues created by the FlakeTracker bot. Specifically, make sure to add the `FLAKEY` label as well as labels for the package name and the ci job the test is run in. Also, include the `testID` of the test in the issue title.
 The `testID` can be derived as follows: `jobName -> packageName -> rootDescribeBlockTitle -> ... -> testTitle`. The `testID` is printed each time the test is retried and can be found easily in the logs. Please also include the test error in the issue body.
 
-It is important to note that some flakiness might exist in setup/teardown steps like `before` and `after` hooks. FlakeTracker does not currently address these cases, but you should still create issues to track them!
+It is important to note that some flakiness might exist in setup/teardown steps like `before` and `after` hooks. FlakeTracker does not currently address these cases, but you should still create issues to track them! Make sure to include the string `FLAKEY SETUP` in the title of the issue (see example at <https://github.com/celo-org/celo-monorepo/issues/4570>) so that FlakeTracker doesn't try to associate the issue with a test.
 
 ## Tricks For Fixing Flakey Tests
 

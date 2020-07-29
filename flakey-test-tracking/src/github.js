@@ -123,7 +123,9 @@ class GitHub {
     const flakeIssues = await this.fetchFlakeIssues()
     const mandatoryTests = await this.fetchMandatoryTestsForPR()
     const knownFlakesToSkip = flakeIssues.filter(
-      (i) => !mandatoryTests.includes(i.number.toString())
+      // We filter out issues that have been referenced in the PR body or that correspond to
+      // setup/teardown steps rather than actual tests.
+      (i) => !i.title.includes('FLAKEY SETUP') && !mandatoryTests.includes(i.number.toString())
     )
     return knownFlakesToSkip
   }
