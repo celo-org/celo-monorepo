@@ -4,7 +4,6 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
 <RCTScrollView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
@@ -69,7 +68,6 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
         stickyHeaderIndices={Array []}
         style={
           Object {
-            "backgroundColor": "#FFFFFF",
             "flex": 1,
           }
         }

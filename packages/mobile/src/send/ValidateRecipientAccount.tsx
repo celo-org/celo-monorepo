@@ -278,7 +278,6 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light,
     justifyContent: 'space-between',
   },
   scrollContainer: {

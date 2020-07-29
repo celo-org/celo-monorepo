@@ -1,9 +1,11 @@
 {
-  "addFunds": "Add funds",
-  "cashOut": "Cash out",
+  "addFunds": "Add Funds",
+  "cashOut": "Cash Out",
+  "cashOutComingSoon": "Cash Out (Coming Soon)",
   "celoDollarsAt": "Celo Dollars @ <1></1>",
+  "amountCelo": "Amount (CELO)",
   "disclaimerCeloDollars": "Celo dollar values are estimates.",
-  "dollarsNotYetEnabledNote": "Celo dollars are not yet available on any providers. To get Celo dollars, purchase CELO and exchange it for Celo dollars in the CELO tab.",
+  "dollarsNotYetEnabledNote": "Celo Dollars are not yet available on any providers. To get Celo Dollars, purchase CELO and exchange it for Celo Dollars in the CELO tab.",
   "pleaseSelectProvider": "Please select a provider below. These links connect to a third party service.",
   "explanationModal": {
     "title": "About Providers",

@@ -1,6 +1,5 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import Switch from '@celo/react-components/components/Switch.v2'
-import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import * as React from 'react'
 import { useTranslation, WithTranslation } from 'react-i18next'
@@ -144,7 +143,6 @@ function HeaderRight() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light,
     justifyContent: 'space-between',
     padding: 16,
   },

@@ -7,9 +7,9 @@
   "terms": {
     "title": "Términos",
     "heading1": "Datos y Privacidad",
-    "heading2": "Acerca de los Activos de Celo",
-    "privacy": "Al unirte a esta red, nos das permiso para recopilar información anónima sobre cómo utilizas la aplicación. Además, si verificas tu número de teléfono, se almacenará una copia ofuscada en la Red de Celo. Más información en <0>celo.org/terms</0>",
-    "goldDisclaimer": "Por favor ten en cuenta que tanto cUSD como CELO son parte de una nueva clase de activos y presentan riesgos de pérdidas finacieras. Considera cuidadosamente tu situación financiera y tu tolerancia a riesgos antes de comprar CELO o cUSD."
+    "heading2": "Activos de Celo y Cuenta {{appName}}",
+    "privacy": "Al unirte a esta red, nos das permiso para recopilar información anónima tu uso de la aplicación. Además, si verificas tu número de teléfono, se almacenará un resultado de una función hash en la Red de Celo. Más información en <0>celo.org/terms</0>",
+    "goldDisclaimer": "Cuando creas una ‘cuenta’ con {{appName}} estas creando una billetera digital de la que solo tú tienes las claves. Ninguna otra persona o entidad, incluyendo cLabs, puede recuperar tus claves, cambiar o deshacer transacciones, ni recuperar fondos perdidos. Ten en cuenta que tanto cUSD como CELO son parte de una nueva clase de activos y presentan riesgos de pérdidas financieras. Considera cuidadosamente tu situación financiera y tu tolerancia a riesgos antes de comprar cualquiera de éstos. Solo puedes enviar hasta 500 cUSD por día a través de {{appName}} (“Límite Diario”). Debes contactar a support@cLabs.co y proporcionar información personal adicional para aumentar este Límite Diario. Podría haber una demora para realizar el cumplimiento requerido."
   },
   "phoneNumber": "Número de teléfono",
   "fullName": "Nombre completo",
