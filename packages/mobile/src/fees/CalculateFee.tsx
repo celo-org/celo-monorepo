@@ -47,9 +47,6 @@ interface ReclaimEscrowProps extends CommonProps {
   paymentID: string
 }
 
-// TODO: remove this once we use TS 3.5
-type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
-
 export type PropsWithoutChildren =
   | Omit<InviteProps, 'children'>
   | Omit<SendProps, 'children'>

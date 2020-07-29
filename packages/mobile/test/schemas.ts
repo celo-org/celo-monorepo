@@ -110,7 +110,6 @@ export const vNeg1Schema = {
     incomingPaymentRequests: [],
     outgoingPaymentRequests: [],
     dismissedGetVerified: false,
-    dismissedEarnRewards: false,
     dismissedInviteFriends: false,
     promptFornoIfNeeded: false,
     acceptedTerms: false,
