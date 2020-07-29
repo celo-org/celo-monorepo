@@ -11,12 +11,12 @@ export enum PaymentRequestStatus {
 export interface PaymentRequest {
   uid?: string
   amount: string
+  comment?: string
   timestamp: Date
   requesterAddress: string
   requesteeAddress: string
+  requesterE164Number?: string
   currency: SHORT_CURRENCIES
-  // TODO find a way to enable comment encryption here
-  comment: string
   status: PaymentRequestStatus
   notified: boolean
   type?: NotificationTypes.PAYMENT_REQUESTED

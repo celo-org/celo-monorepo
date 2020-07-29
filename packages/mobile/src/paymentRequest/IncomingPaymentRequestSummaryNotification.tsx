@@ -6,6 +6,7 @@ import { HomeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
 import { Namespaces, withTranslation } from 'src/i18n'
+import { addressToE164NumberSelector, AddressToE164NumberType } from 'src/identity/reducer'
 import { notificationIncomingRequest } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -25,10 +26,12 @@ interface OwnProps {
 type Props = OwnProps & WithTranslation & StateProps
 
 interface StateProps {
+  addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient
 }
 
 const mapStateToProps = (state: RootState): StateProps => ({
+  addressToE164Number: addressToE164NumberSelector(state),
   recipientCache: recipientCacheSelector(state),
 })
 

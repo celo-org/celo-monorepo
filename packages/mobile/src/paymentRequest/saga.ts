@@ -12,12 +12,6 @@ import {
   takeEvery,
   takeLeading,
 } from 'redux-saga/effects'
-import {
-  updateIncomingPaymentRequests,
-  UpdateIncomingPaymentRequestsAction,
-  updateOutgoingPaymentRequests,
-  UpdateOutgoingPaymentRequestsAction,
-} from 'src/account/actions'
 import { showError } from 'src/alert/actions'
 import { RequestEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
@@ -29,13 +23,18 @@ import {
   CancelPaymentRequestAction,
   CompletePaymentRequestAction,
   DeclinePaymentRequestAction,
+  updateIncomingPaymentRequests,
+  UpdateIncomingPaymentRequestsAction,
+  updateOutgoingPaymentRequests,
+  UpdateOutgoingPaymentRequestsAction,
   UpdatePaymentRequestNotifiedAction,
-  WritePaymentRequest,
+  WritePaymentRequestAction,
 } from 'src/paymentRequest/actions'
 import { PaymentRequest, PaymentRequestStatus } from 'src/paymentRequest/types'
+import { decryptPaymentRequest, encryptPaymentRequest } from 'src/paymentRequest/utils'
 import Logger from 'src/utils/Logger'
 import { getAccount } from 'src/web3/saga'
-import { currentAccountSelector } from 'src/web3/selectors'
+import { currentAccountSelector, dataEncryptionKeySelector } from 'src/web3/selectors'
 
 const TAG = 'paymentRequests/saga'
 const VALUE_CHANGE_HOOK = 'value'
@@ -90,18 +89,23 @@ function* subscribeToPaymentRequests(
 ) {
   yield all([call(waitForFirebaseAuth), call(getAccount)])
   const address = yield select(currentAccountSelector)
+  const dataEncryptionKey: string | null = yield select(dataEncryptionKeySelector)
   const paymentRequestChannel = yield createPaymentRequestChannel(address, addressKeyField)
   while (true) {
     try {
-      const paymentRequestsObject = yield take(paymentRequestChannel)
+      const paymentRequestsObject: { [key: string]: PaymentRequest } = yield take(
+        paymentRequestChannel
+      )
       Logger.debug(`${TAG}@subscribeToPaymentRequests`, 'New payment request object from channel')
-      const paymentRequests = Object.keys(paymentRequestsObject)
+      const paymentRequests: PaymentRequest[] = Object.keys(paymentRequestsObject)
         .map((key) => ({
           uid: key,
           ...paymentRequestsObject[key],
         }))
         .sort(compareTimestamps)
         .filter(onlyRequested)
+        .map((pr) => decryptPaymentRequest(pr, dataEncryptionKey))
+
       yield put(updatePaymentRequestsActionCreator(paymentRequests))
     } catch (error) {
       Logger.error(`${TAG}@subscribeToPaymentRequests`, error)
@@ -113,11 +117,17 @@ function* subscribeToPaymentRequests(
   }
 }
 
-function* paymentRequestWriter({ paymentInfo }: WritePaymentRequest) {
+function* paymentRequestWriter({ paymentRequest }: WritePaymentRequestAction) {
   try {
     Logger.info(TAG, `Writing pending request to database`)
+
+    const encryptedPaymentRequest: PaymentRequest = yield call(
+      encryptPaymentRequest,
+      paymentRequest
+    )
+
     const pendingRequestRef = firebase.database().ref(`pendingRequests`)
-    yield call(() => pendingRequestRef.push(paymentInfo))
+    yield call(() => pendingRequestRef.push(encryptedPaymentRequest))
 
     navigateHome()
   } catch (error) {
@@ -171,15 +181,15 @@ function* subscribeToOutgoingPaymentRequests() {
 }
 
 function* watchPaymentRequestStatusUpdates() {
-  yield takeLeading(Actions.PAYMENT_REQUEST_UPDATE_STATUS, updatePaymentRequestStatus)
+  yield takeLeading(Actions.UPDATE_REQUEST_STATUS, updatePaymentRequestStatus)
 }
 
 function* watchPaymentRequestNotifiedUpdates() {
-  yield takeLeading(Actions.PAYMENT_REQUEST_UPDATE_NOTIFIED, updatePaymentRequestNotified)
+  yield takeLeading(Actions.UPDATE_REQUEST_NOTIFIED, updatePaymentRequestNotified)
 }
 
 function* watchWritePaymentRequest() {
-  yield takeEvery(Actions.PAYMENT_REQUEST_WRITE, paymentRequestWriter)
+  yield takeEvery(Actions.WRITE_PAYMENT_REQUEST, paymentRequestWriter)
 }
 
 export function* paymentRequestSaga() {

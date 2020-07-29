@@ -24,10 +24,10 @@ import { TransactionDataInput } from 'src/send/SendAmount'
 import Logger from 'src/utils/Logger'
 
 interface Props {
+  id: string
   requester: Recipient
   amount: string
-  comment: string
-  id: string
+  comment?: string
 }
 
 export default function IncomingPaymentRequestListItem({ id, amount, comment, requester }: Props) {

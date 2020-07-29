@@ -3,12 +3,12 @@ import React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { View } from 'react-native'
 import { connect } from 'react-redux'
-import { getIncomingPaymentRequests } from 'src/account/selectors'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import { AddressToE164NumberType } from 'src/identity/reducer'
+import { addressToE164NumberSelector, AddressToE164NumberType } from 'src/identity/reducer'
 import { HeaderTitleWithBalance } from 'src/navigator/Headers'
 import { NotificationList } from 'src/notifications/NotificationList'
 import IncomingPaymentRequestListItem from 'src/paymentRequest/IncomingPaymentRequestListItem'
+import { getIncomingPaymentRequests } from 'src/paymentRequest/selectors'
 import { PaymentRequest } from 'src/paymentRequest/types'
 import { getRequesterFromPaymentRequest } from 'src/paymentRequest/utils'
 import { NumberToRecipient } from 'src/recipients/recipient'
@@ -18,6 +18,7 @@ import { RootState } from 'src/redux/reducers'
 interface StateProps {
   dollarBalance: string | null
   paymentRequests: PaymentRequest[]
+  addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient
 }
 
@@ -25,6 +26,7 @@ const mapStateToProps = (state: RootState): StateProps => {
   return {
     dollarBalance: state.stableToken.balance,
     paymentRequests: getIncomingPaymentRequests(state),
+    addressToE164Number: addressToE164NumberSelector(state),
     recipientCache: recipientCacheSelector(state),
   }
 }

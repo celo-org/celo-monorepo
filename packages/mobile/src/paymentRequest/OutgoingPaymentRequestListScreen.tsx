@@ -2,7 +2,6 @@ import React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { View } from 'react-native'
 import { connect } from 'react-redux'
-import { getOutgoingPaymentRequests } from 'src/account/selectors'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import {
   AddressToE164NumberType,
@@ -15,6 +14,7 @@ import {
 } from 'src/notifications/NotificationList'
 import { cancelPaymentRequest, updatePaymentRequestNotified } from 'src/paymentRequest/actions'
 import OutgoingPaymentRequestListItem from 'src/paymentRequest/OutgoingPaymentRequestListItem'
+import { getOutgoingPaymentRequests } from 'src/paymentRequest/selectors'
 import { PaymentRequest } from 'src/paymentRequest/types'
 import { getRequesteeFromPaymentRequest } from 'src/paymentRequest/utils'
 import { NumberToRecipient } from 'src/recipients/recipient'

@@ -85,6 +85,8 @@ describe('NotificationBox', () => {
       ...storeDataNotificationsDisabled,
       account: {
         ...storeDataNotificationsDisabled.account,
+      },
+      paymentRequest: {
         incomingPaymentRequests: [mockPaymentRequests[0]],
       },
     })
@@ -107,6 +109,8 @@ describe('NotificationBox', () => {
       ...storeDataNotificationsDisabled,
       account: {
         ...storeDataNotificationsDisabled.account,
+      },
+      paymentRequest: {
         incomingPaymentRequests: mockPaymentRequests,
       },
     })
@@ -123,6 +127,8 @@ describe('NotificationBox', () => {
       ...storeDataNotificationsDisabled,
       account: {
         ...storeDataNotificationsDisabled.account,
+      },
+      paymentRequest: {
         outgoingPaymentRequests: mockPaymentRequests,
       },
     })
@@ -139,6 +145,8 @@ describe('NotificationBox', () => {
       ...storeDataNotificationsDisabled,
       account: {
         ...storeDataNotificationsDisabled.account,
+      },
+      paymentRequest: {
         outgoingPaymentRequests: [mockPaymentRequests[0]],
       },
     })

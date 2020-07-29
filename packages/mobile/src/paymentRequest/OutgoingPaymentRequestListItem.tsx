@@ -14,10 +14,10 @@ import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 import Logger from 'src/utils/Logger'
 
 interface OwnProps {
+  id: string
   requestee: Recipient
   amount: string
-  comment: string
-  id: string
+  comment?: string
   cancelPaymentRequest: typeof cancelPaymentRequest
   updatePaymentRequestNotified: typeof updatePaymentRequestNotified
 }

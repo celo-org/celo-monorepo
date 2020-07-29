@@ -113,14 +113,12 @@ class PaymentRequestConfirmation extends React.Component<Props> {
 
     const paymentInfo = {
       amount: amount.toString(),
-      // TODO: discuss if sending address would be better
-      // Would help with protection of PII but would possibly make the UX worst?
+      comment: this.state.comment || undefined,
       timestamp: new Date(),
       requesterAddress: address,
-      requesterE164Number: this.props.e164PhoneNumber ? this.props.e164PhoneNumber : undefined,
+      requesterE164Number: this.props.e164PhoneNumber ?? undefined,
       requesteeAddress,
       currency: currencyToShortMap[CURRENCY_ENUM.DOLLAR],
-      comment: this.state.comment,
       status: PaymentRequestStatus.REQUESTED,
       notified: false,
     }
