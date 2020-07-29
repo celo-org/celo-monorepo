@@ -272,6 +272,7 @@ export class Account extends React.Component<Props, State> {
   }
 
   onPressContinueWithAccountRemoval = () => {
+    ValoraAnalytics.track(SettingsEvents.start_account_removal)
     this.setState({ showAccountKeyModal: false })
     this.props.navigation.navigate(Screens.BackupPhrase, { navigatedFromSettings: true })
   }
@@ -281,6 +282,7 @@ export class Account extends React.Component<Props, State> {
   }
 
   confirmAccountRemoval = () => {
+    ValoraAnalytics.track(SettingsEvents.completed_account_removal)
     this.props.clearStoredAccount(this.props.account || '')
     this.props.navigation.setParams({ promptConfirmRemovalModal: false })
     this.props.navigation.reset({
