@@ -19,3 +19,44 @@ export function makeZContract(artifact: any): ZContract {
   contract.schema.deployedBytecode = artifact.deployedBytecode
   return contract
 }
+
+// Inlined from OpenZeppelin SDK since its not exported.
+export interface Artifact {
+  abi: any[]
+  ast: any
+  bytecode: string
+  compiler: any
+  contractName: string
+  deployedBytecode: string
+  deployedSourceMap: string
+  fileName: string
+  legacyAST?: any
+  networks: any
+  schemaVersion: string
+  source: string
+  sourceMap: string
+  sourcePath: string
+  updatedAt: string
+}
+
+// Inlined from OpenZeppelin SDK since its not exported.
+export interface TypeInfo {
+  id: string;
+  kind: string;
+  label: string;
+  valueType?: string;
+  length?: number;
+  members?: StorageInfo[];
+  src?: any;
+}
+
+// Inlined from OpenZeppelin SDK since its not exported.
+export interface StorageInfo {
+  label: string;
+  astId: number;
+  type: any;
+  src: string;
+  path?: string;
+  contract?: string;
+}
+

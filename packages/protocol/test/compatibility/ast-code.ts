@@ -17,6 +17,7 @@ const testCases = {
   original_copy: getTestArtifacts('original_copy'),
   inserted_constant: getTestArtifacts('inserted_constant'),
   added_methods_and_contracts: getTestArtifacts('added_methods_and_contracts'),
+  metadata_changed: getTestArtifacts('metadata_changed'),
   big_original: getTestArtifacts('big_original'),
   big_original_modified: getTestArtifacts('big_original_modified'),
 }
@@ -35,6 +36,13 @@ describe('#reportASTIncompatibilities()', () => {
   describe('when the contracts are the same', () => {
     it('reports no changes', () => {
       const report = reportASTIncompatibilities(testCases.original, testCases.original_copy)
+      assert.isEmpty(report.getChanges())
+    })
+  })
+
+  describe('when only metadata has changed', () => {
+    it('reports no changes', () => {
+      const report = reportASTIncompatibilities(testCases.original, testCases.metadata_changed)
       assert.isEmpty(report.getChanges())
     })
   })
