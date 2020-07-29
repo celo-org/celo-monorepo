@@ -451,7 +451,7 @@ const generalScreens = (Navigator: typeof Stack) => (
 
 const mapStateToProps = (state: RootState) => {
   return {
-    isRestoringAccount: state.account.isRestoringAccount,
+    choseToRestoreAccount: state.account.choseToRestoreAccount,
     language: currentLanguageSelector(state),
     e164Number: state.account.e164PhoneNumber,
     acceptedTerms: state.account.acceptedTerms,
@@ -469,7 +469,7 @@ export function MainStackScreen() {
   const [initialRouteName, setInitialRoute] = React.useState<InitialRouteName>(undefined)
   React.useEffect(() => {
     const {
-      isRestoringAccount,
+      choseToRestoreAccount,
       language,
       e164Number,
       acceptedTerms,
@@ -487,7 +487,7 @@ export function MainStackScreen() {
       // User didn't go far enough in onboarding, start again from education
       initialRoute = Screens.OnboardingEducationScreen
     } else if (!redeemComplete && !account) {
-      initialRoute = isRestoringAccount ? Screens.ImportWallet : Screens.EnterInviteCode
+      initialRoute = choseToRestoreAccount ? Screens.ImportWallet : Screens.EnterInviteCode
     } else if (!hasSeenVerificationNux) {
       initialRoute = Screens.VerificationEducationScreen
     } else {

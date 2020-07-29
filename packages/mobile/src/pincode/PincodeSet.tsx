@@ -23,7 +23,7 @@ import Pincode from 'src/pincode/Pincode'
 import { RootState } from 'src/redux/reducers'
 
 interface StateProps {
-  isRestoringAccount: boolean | undefined
+  choseToRestoreAccount: boolean | undefined
 }
 
 interface DispatchProps {
@@ -42,7 +42,7 @@ type Props = ScreenProps & StateProps & DispatchProps & WithTranslation
 
 function mapStateToProps(state: RootState): StateProps {
   return {
-    isRestoringAccount: state.account.isRestoringAccount,
+    choseToRestoreAccount: state.account.choseToRestoreAccount,
   }
 }
 
@@ -60,7 +60,7 @@ export class PincodeSet extends React.Component<Props, State> {
   }
 
   getNextScreen = () => {
-    if (this.props.isRestoringAccount) {
+    if (this.props.choseToRestoreAccount) {
       return Screens.ImportWallet
     }
 

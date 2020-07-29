@@ -342,7 +342,7 @@ export const v3Schema = {
   account: {
     ...v1Schema.account,
     hasMigratedToNewBip39: false,
-    isRestoringAccount: false,
+    choseToRestoreAccount: false,
   },
   identity: {
     ...v1Schema.identity,
