@@ -41,6 +41,9 @@ export async function getPhoneNumberIdentifier(
   }
   // Fallback to using Wasm version if not specified
   if (!blsBlindingClient) {
+    debug(
+      `${TAG}@getPhoneNumberIdentifier` + 'No BLSBlindingClient found, using WasmBlsBlindingClient'
+    )
     blsBlindingClient = new WasmBlsBlindingClient(context.pgpnpPubKey)
   }
 
