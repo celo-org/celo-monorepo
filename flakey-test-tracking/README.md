@@ -45,6 +45,10 @@ It is important to note that some flakiness might exist in setup/teardown steps 
 - You can test for flakiness locally by setting `FLAKEY=true`.
 - You can save all FlakeTracker results to text files. See comments in `./db.js`
 
+## Obsolete Flakey Test Issues
+
+- If tests are removed, renamed or refactored their `testID` will change and any flakey test issues corresponding to them will be marked as obsolete. This happens when FlakeTracker no longer encounters the `testID` during the course of test execution. When obsolete issues are found on a PR that has not yet been merged, a GitHub Check will alert the PR's author and reviewers that the issue should be renamed with the updated `testID` if possible. Obsolete issues that are found on `master` (i.e. after the PR is merged) will be automatically closed. Note, changes to obsolete flakey test issues should occur only shortly before the PR is merged to avoid interfering with other workflows.
+
 ## Slack Notifications
 
 To receive Slack notifications when new flakey tests are discovered, first [add GitHub to Slack](https://slack.github.com/). Then, send the following Slack command to the GitHub bot to subscribe to issues with the `FLAKEY` label.
@@ -63,15 +67,3 @@ To subscribe to flakey test issues for a specific job or package, just add the j
 
 When FlakeTracker is enabled, reviewers should exercise caution on PRs that have skipped flakey tests. Note that tests can now be disabled by just creating a github issue, so we should inspect every test that is skipped and ensure it is not relevant to the PR. If you find that a relevant test was skipped,
 just include the link to the corresponding flakey test issue in the PR body and run the build again. This will force the flakey test to run. If you wish to disable skipping flakey tests entirely for a given job you can do so by setting `SKIP_KNOWN_FLAKES=false`.
-
-## TODO
-
-TODO(Alec): Add comment in issue cleanup (DONE)
-
-TODO(Alec): change statuses for checks (use emojis instead?) (DONE)
-
-TODO(Alec): flesh out summary check (DONE)
-
-TODO(Alec): go through git diff (NEXT)
-
-TODO(Alec): fill in PR template (NEXT)

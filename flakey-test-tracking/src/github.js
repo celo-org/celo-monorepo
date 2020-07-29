@@ -175,7 +175,7 @@ class GitHub {
             text:
               (process.env.CIRCLE_BRANCH === 'master'
                 ? 'Because these flakey test issues are now obsolete on master, they have been automatically closed.'
-                : 'If tests have been refactored or renamed please update the following issues accordingly. If left unchanged, these issues will be automatically closed when this PR is merged.') +
+                : 'If tests have been refactored or renamed please update the following issues accordingly (but not too long before your PR is merged, as to avoid interfering with other concurrent workflows). If left unchanged, these issues will be automatically closed when this PR is merged.') +
               '\n\n' +
               obsoleteIssues.map((i) => i.html_url).join('\n\n'),
           },
