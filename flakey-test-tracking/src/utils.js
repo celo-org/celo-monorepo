@@ -50,7 +50,7 @@ function getPullNumber() {
 // Parses list of flakey test issues to ignore from the PR's body.
 // The tests corresponding to these issues will not be skipped.
 function parseMandatoryTestIssuesFromPullBody(prBody) {
-  const urls = prBody.match(/https?[\S]+issues\/[0-9]+/g)
+  const urls = prBody.match(/https?[\S]+issues\/[0-9]+/g) || []
   const issueNumbers = urls.map((url) =>
     url.slice(url.lastIndexOf('/') + 1).replace(/[^0-9]+/g, '')
   )
