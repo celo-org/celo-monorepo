@@ -110,9 +110,11 @@ export function* watchQrCodeShare() {
   while (true) {
     const action: ShareQRCodeAction = yield take(Actions.QRCODE_SHARE)
     try {
-      yield call(shareSVGImage, action.qrCodeSvg)
+      const result = yield call(shareSVGImage, action.qrCodeSvg)
+      // Note: when user cancels the share sheet, result contains {"dismissedAction":true}
+      Logger.info(TAG, 'Share done', JSON.stringify(result))
     } catch (error) {
-      Logger.error(TAG, 'Error handling the barcode', error)
+      Logger.error(TAG, 'Error sharing qr code', error)
     }
   }
 }
