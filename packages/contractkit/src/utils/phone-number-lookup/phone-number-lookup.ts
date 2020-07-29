@@ -1,6 +1,6 @@
 // Utilities for interacting with the Phone Number Privacy Service service (aka PGPNP)
 
-import { hexToBuffer } from '@celo/utils/lib/address'
+import { hexToBuffer, trimLeading0x } from '@celo/utils/lib/address'
 import debugFactory from 'debug'
 import { ec as EC } from 'elliptic'
 import { ContractKit } from '../../kit'
@@ -79,7 +79,13 @@ export async function postToPhoneNumPrivacyService<ResponseType>(
   let authHeader = ''
   if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTIONKEY) {
     const key = ec.keyFromPrivate(hexToBuffer(signer.rawKey))
-    authHeader = key.sign(bodyString).toDER()
+    authHeader = JSON.stringify(key.sign(bodyString).toDER())
+
+    // Verify signature before sending
+    const dek = key.getPublic(true, 'hex')
+    const pubkey = ec.keyFromPublic(trimLeading0x(dek), 'hex')
+    const validSignature: boolean = pubkey.verify(bodyString, JSON.parse(authHeader))
+    debug(`${TAG}@postToPGPNP` + `Signature is valid: ${validSignature} signed by ${dek}`)
   } else {
     authHeader = await signer.contractKit.web3.eth.sign(bodyString, body.account)
   }
