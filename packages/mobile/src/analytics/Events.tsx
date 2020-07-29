@@ -232,6 +232,7 @@ export enum TransactionEvents {
   transaction_gas_estimated = 'transaction_gas_estimated',
   transaction_hash_received = 'transaction_hash_received',
   transaction_receipt_received = 'transaction_receipt_received',
+  transaction_confirmed = 'transaction_confirmed',
   transaction_error = 'transaction_error',
   transaction_exception = 'transaction_exception',
 }

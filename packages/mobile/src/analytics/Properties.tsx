@@ -442,6 +442,9 @@ interface TransactionEventsProperties {
   [TransactionEvents.transaction_hash_received]: {
     txId: string
   }
+  [TransactionEvents.transaction_confirmed]: {
+    txId: string
+  }
   [TransactionEvents.transaction_receipt_received]: {
     txId: string
   }
