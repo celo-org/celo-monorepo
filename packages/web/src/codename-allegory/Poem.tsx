@@ -10,7 +10,9 @@ export default function Poem() {
       <H4 style={[textStyles.italic, standardStyles.elementalMarginBottom]}>As Wealth Flowers</H4>
       <Text style={fonts.p}>
         {STANZAS.map((verse) => (
-          <Fade>{verse} </Fade>
+          <Fade bottom={true} duration={1800} delay={200} distance={'20px'}>
+            {verse}{' '}
+          </Fade>
         ))}
       </Text>
     </View>
@@ -18,9 +20,7 @@ export default function Poem() {
 }
 
 const styles = StyleSheet.create({
-  root: {
-    width: 380,
-  },
+  root: {},
 })
 
 const STANZAS = [
