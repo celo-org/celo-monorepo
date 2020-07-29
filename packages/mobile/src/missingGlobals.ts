@@ -1,4 +1,3 @@
-// TODO remove, move to celo/utils
 export interface Global {
   btoa: any
   URL: any
