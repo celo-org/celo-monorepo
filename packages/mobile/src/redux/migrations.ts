@@ -54,4 +54,13 @@ export const migrations = {
       },
     }
   },
+  4: (state: any) => {
+    return {
+      ...state,
+      identity: {
+        ...state.identity,
+        acceptedAttestationCodes: [],
+      },
+    }
+  },
 }
