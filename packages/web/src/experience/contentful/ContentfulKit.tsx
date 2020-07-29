@@ -1,7 +1,7 @@
-import * as React from 'react'
-import Page from 'src/experience/common/Page'
 import { documentToReactComponents } from '@contentful/rich-text-react-renderer'
 import { Document } from '@contentful/rich-text-types'
+import * as React from 'react'
+import Page from 'src/experience/common/Page'
 
 import { Page as SideBarEntry } from 'src/experience/common/Sidebar'
 import { renderNode } from './nodes'

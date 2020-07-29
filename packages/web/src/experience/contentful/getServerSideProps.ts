@@ -1,6 +1,6 @@
 import { GetServerSideProps } from 'next'
 import getConfig from 'next/config'
-import { Props } from 'src/experience/contentful/Dynamic'
+import { Props } from 'src/experience/contentful/ContentfulKit'
 import { getKit, getPage } from 'src/utils/contentful'
 
 const getServerSideProps: GetServerSideProps<

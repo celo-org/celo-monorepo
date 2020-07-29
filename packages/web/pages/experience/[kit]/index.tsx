@@ -1,4 +1,4 @@
-import Dynamic from 'src/experience/contentful/Dynamic'
+import Dynamic from 'src/experience/contentful/ContentfulKit'
 import getKitProps from 'src/experience/contentful/getServerSideProps'
 
 export default Dynamic
