@@ -48,7 +48,7 @@
     "body2InsufficientBalance": "Intente nuevamente cuando haya agregado fondos a su billetera.",
     "body1SaltQuotaExceeded": "Su cuota de búsqueda de número de teléfono está agotada",
     "body2SaltQuotaExceeded": "Intente nuevamente cuando haya comprado más búsquedas",
-    "enterCodesBody": " Si ya recibió tres códigos por SMS, aún puede ingresarlos.",
+    "enterCodesBody": "Si ya recibió tres códigos por SMS, aún puede ingresarlos.",
     "enterCodesButton": "Ingresar códigos"
   },
   "retryWithFornoModal": {
