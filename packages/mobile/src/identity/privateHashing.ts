@@ -9,7 +9,6 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import networkConfig from 'src/geth/networkConfig'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
 import { ReactBlsBlindingClient } from 'src/identity/bls-blinding-client'
-import { getAuthSignerForAccount } from 'src/identity/commentEncryption'
 import { e164NumberToSaltSelector, E164NumberToSaltType } from 'src/identity/reducer'
 import { isUserBalanceSufficient } from 'src/identity/utils'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
@@ -19,6 +18,7 @@ import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
 import { waitForTransactionWithId } from 'src/transactions/saga'
 import Logger from 'src/utils/Logger'
+import { getAuthSignerForAccount } from 'src/web3/dataEncryptionKey'
 import { getConnectedUnlockedAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 
@@ -91,31 +91,27 @@ function* getPhoneHashPrivate(e164Number: string, account: string, selfPhoneHash
   }
 
   const authSigner = yield call(getAuthSignerForAccount, account)
-  const failureCallback = (response: Response) => {
-    Logger.error(`${TAG}@handleFailure`, `Response not okay. Status ${response.status}`)
-    switch (response.status) {
-      case 403:
-        throw new Error(ErrorMessages.SALT_QUOTA_EXCEEDED)
-      default:
-        throw new Error('Unknown failure')
-    }
-  }
 
   const { pgpnpPubKey } = networkConfig
   const blsBlindingClient = new ReactBlsBlindingClient(pgpnpPubKey)
 
-  return yield call(
-    getPhoneNumberIdentifier,
-    e164Number,
-    account,
-    authSigner,
-    networkConfig,
-    Logger,
-    failureCallback,
-    selfPhoneHash,
-    DeviceInfo.getVersion(),
-    blsBlindingClient
-  )
+  try {
+    return yield call(
+      getPhoneNumberIdentifier,
+      e164Number,
+      account,
+      authSigner,
+      networkConfig,
+      selfPhoneHash,
+      DeviceInfo.getVersion(),
+      blsBlindingClient
+    )
+  } catch (error) {
+    if (error.message === ErrorMessages.PGPNP_QUOTA_ERROR) {
+      throw new Error(ErrorMessages.MATCHMAKING_QUOTA_EXCEEDED)
+    }
+    throw error
+  }
 }
 
 // Get the wallet user's own phone hash details if they're cached

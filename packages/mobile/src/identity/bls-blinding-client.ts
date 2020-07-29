@@ -12,7 +12,7 @@ export class ReactBlsBlindingClient implements BlsBlindingClient {
     return (await BlindThresholdBls.blindMessage(base64PhoneNumber)).trim()
   }
 
-  async unblindAndVerifyMessage(base64BlindSig: string): Promise<string> {
+  unblindAndVerifyMessage(base64BlindSig: string): Promise<string> {
     return BlindThresholdBls.unblindMessage(base64BlindSig, this.pgpnpPubKey)
   }
 }

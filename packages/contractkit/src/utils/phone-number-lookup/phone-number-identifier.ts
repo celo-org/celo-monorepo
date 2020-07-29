@@ -1,16 +1,17 @@
 import { getPhoneHash, isE164Number } from '@celo/utils/lib/phoneNumbers'
 import { createHash } from 'crypto'
+import debugFactory from 'debug'
 import { BlsBlindingClient, WasmBlsBlindingClient } from './bls-blinding-client'
 import {
   AuthSigner,
-  Logger,
   postToPhoneNumPrivacyService,
   ServiceContext,
   SignMessageRequest,
   SignMessageResponse,
 } from './phone-number-lookup'
 
-// const crypto = require('crypto')
+const debug = debugFactory('kit:registry')
+
 const SALT_CHAR_LENGTH = 13
 const SIGN_MESSAGE_ENDPOINT = '/getDistributedBlindedSalt'
 const TAG = 'contractkit/utils/phone-number-lookup/phone-number-identifier'
@@ -29,13 +30,11 @@ export async function getPhoneNumberIdentifier(
   account: string,
   signer: AuthSigner,
   context: ServiceContext,
-  logger: Logger,
-  failureCallback: (response: Response) => void,
   selfPhoneHash?: string,
   walletVersion?: string,
   blsBlindingClient?: BlsBlindingClient
 ): Promise<PhoneNumberHashDetails> {
-  logger.debug(`${TAG}@getPhoneNumberIdentifier`, 'Getting phone number salt')
+  debug(`${TAG}@getPhoneNumberIdentifier` + 'Getting phone number salt')
 
   if (!isE164Number(e164Number)) {
     throw new Error(`Invalid phone number: ${e164Number}`)
@@ -45,7 +44,7 @@ export async function getPhoneNumberIdentifier(
     blsBlindingClient = new WasmBlsBlindingClient(context.pgpnpPubKey)
   }
 
-  logger.debug(`${TAG}@getPhoneNumberIdentifier`, 'Retrieving blinded message')
+  debug(`${TAG}@getPhoneNumberIdentifier` + 'Retrieving blinded message')
   const base64PhoneNumber = Buffer.from(e164Number).toString('base64')
   const base64BlindedMessage = await blsBlindingClient.blindMessage(base64PhoneNumber)
 
@@ -61,16 +60,14 @@ export async function getPhoneNumberIdentifier(
     signer,
     body,
     context,
-    SIGN_MESSAGE_ENDPOINT,
-    logger,
-    failureCallback
+    SIGN_MESSAGE_ENDPOINT
   )
   const base64BlindSig = response.combinedSignature
-  logger.debug(`${TAG}@getPhoneNumberIdentifier`, 'Retrieving unblinded signature')
+  debug(`${TAG}@getPhoneNumberIdentifier` + 'Retrieving unblinded signature')
   const base64UnblindedSig = await blsBlindingClient.unblindAndVerifyMessage(base64BlindSig)
   const sigBuf = Buffer.from(base64UnblindedSig, 'base64')
 
-  logger.debug(`${TAG}@getPhoneNumberIdentifier`, 'Converting sig to salt')
+  debug(`${TAG}@getPhoneNumberIdentifier` + 'Converting sig to salt')
   const salt = getSaltFromThresholdSignature(sigBuf)
   const phoneHash = getPhoneHash(e164Number, salt)
   return { e164Number, phoneHash, salt }

@@ -1,11 +1,12 @@
 // Utilities for interacting with the Phone Number Privacy Service service (aka PGPNP)
 
-import { hexToBuffer, trimLeading0x } from '@celo/utils/lib/address'
+import { hexToBuffer } from '@celo/utils/lib/address'
+import debugFactory from 'debug'
 import { ec as EC } from 'elliptic'
 import { ContractKit } from '../../kit'
-import { AccountsWrapper } from '../../wrappers/Accounts'
-const TAG = 'contractkit/utils/phone-number-lookup/phone-number-lookup'
 
+const TAG = 'contractkit/utils/phone-number-lookup/phone-number-lookup'
+const debug = debugFactory('kit:registry')
 const ec = new EC('secp256k1')
 
 export interface WalletKeySigner {
@@ -15,7 +16,6 @@ export interface WalletKeySigner {
 
 export interface EncryptionKeySigner {
   authenticationMethod: AuthenticationMethod.ENCRYPTIONKEY
-  contractKit: ContractKit
   rawKey: string
 }
 
@@ -56,8 +56,8 @@ export interface MatchmakingResponse {
   }>
 }
 
-export interface Logger {
-  debug: (tag: string, ...messages: string[]) => void
+export enum ErrorMessages {
+  PGPNP_QUOTA_ERROR = 'pgpnpQuotaError',
 }
 
 export interface ServiceContext {
@@ -69,11 +69,9 @@ export async function postToPhoneNumPrivacyService<ResponseType>(
   signer: AuthSigner,
   body: PhoneNumberPrivacyRequest,
   context: ServiceContext,
-  endpoint: string,
-  logger: Logger,
-  handleFailure: (response: Response) => void
+  endpoint: string
 ) {
-  logger.debug(`${TAG}@postToPGPNP`, `Posting to ${endpoint}`)
+  debug(`${TAG}@postToPGPNP` + `Posting to ${endpoint}`)
 
   // Sign payload using account privkey
   const bodyString = JSON.stringify(body)
@@ -84,16 +82,6 @@ export async function postToPhoneNumPrivacyService<ResponseType>(
     authHeader = key.sign(bodyString).toDER()
   } else {
     authHeader = await signer.contractKit.web3.eth.sign(bodyString, body.account)
-  }
-
-  // Verify signature before sending
-  if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTIONKEY) {
-    const accountWrapper: AccountsWrapper = await signer.contractKit.contracts.getAccounts()
-    const dek = await accountWrapper.getDataEncryptionKey(body.account)
-    const key = ec.keyFromPublic(trimLeading0x(dek), 'hex')
-
-    const validSignature: boolean = key.verify(bodyString, authHeader)
-    logger.debug(`${TAG}@postToPGPNP`, `Signature is valid: ${validSignature} signed by ${dek}`)
   }
 
   const { pgpnpUrl } = context
@@ -108,10 +96,16 @@ export async function postToPhoneNumPrivacyService<ResponseType>(
   })
 
   if (!res.ok) {
-    handleFailure(res)
+    debug(`${TAG}@handleFailure` + `Response not okay. Status ${res.status}`)
+    switch (res.status) {
+      case 403:
+        throw new Error(ErrorMessages.PGPNP_QUOTA_ERROR)
+      default:
+        throw new Error(`Unknown failure ${res.status}`)
+    }
   }
 
-  logger.debug(`${TAG}@postToPGPNP`, 'Response ok. Parsing.')
+  debug(`${TAG}@postToPGPNP` + 'Response ok. Parsing.')
   const response = await res.json()
   return response as ResponseType
 }

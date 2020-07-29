@@ -33,11 +33,14 @@ export async function authenticateUser(request: Request): Promise<boolean> {
     logger.info(`Account ${signer} does not have registered encryption key`)
   } else {
     logger.info(`Found DEK ${registeredEncryptionKey} for ${signer}`)
-    const key = ec.keyFromPublic(trimLeading0x(registeredEncryptionKey), 'hex')
-    const validSignature = key.verify(message, messageSignature)
-
-    if (validSignature) {
-      return true
+    try {
+      const key = ec.keyFromPublic(trimLeading0x(registeredEncryptionKey), 'hex')
+      const validSignature = key.verify(message, messageSignature)
+      if (validSignature) {
+        return true
+      }
+    } catch (error) {
+      logger.error(`Failed to verify auth sig ${error}`)
     }
   }
 

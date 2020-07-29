@@ -4,6 +4,7 @@
  * but keeping it here for now since that's where other account state is
  */
 
+import { AuthenticationMethod, AuthSigner } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { ensureLeading0x, eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
@@ -150,4 +151,40 @@ export async function getRegisterDekTxGas(account: string, currency: CURRENCY_EN
     Logger.warn(`${TAG}/getRegisterDekTxGas`, 'Failed to estimate DEK tx gas', error)
     throw Error(ErrorMessages.INSUFFICIENT_BALANCE)
   }
+}
+
+export function* getAuthSignerForAccount(account: string) {
+  // Use the DEK for authentication if the current DEK is registered with this account
+  let authSigner: AuthSigner | undefined
+  const contractKit = yield call(getContractKit)
+  const accountsWrapper: AccountsWrapper = yield call([
+    contractKit.contracts,
+    contractKit.contracts.getAccounts,
+  ])
+  const privateDataKey: string | null = yield select(dataEncryptionKeySelector)
+  if (!privateDataKey) {
+    Logger.error(TAG + 'getAuthSignerForAccount', 'Missing comment key, should never happen.')
+  } else {
+    const publicDataKey = compressedPubKey(hexToBuffer(privateDataKey))
+    const upToDate: boolean = yield call(isAccountUpToDate, accountsWrapper, account, publicDataKey)
+    if (!upToDate) {
+      Logger.warn(TAG + 'getAuthSignerForAccount', `DEK mismatch.`)
+    } else {
+      Logger.info(TAG + 'getAuthSignerForAccount', 'Using DEK for authentication')
+      authSigner = {
+        authenticationMethod: AuthenticationMethod.ENCRYPTIONKEY,
+        rawKey: privateDataKey,
+      }
+    }
+  }
+
+  // Fallback to using wallet key
+  if (!authSigner) {
+    Logger.info(TAG + 'getAuthSignerForAccount', 'Using wallet key for authentication')
+    authSigner = {
+      authenticationMethod: AuthenticationMethod.WALLETKEY,
+      contractKit,
+    }
+  }
+  return authSigner
 }

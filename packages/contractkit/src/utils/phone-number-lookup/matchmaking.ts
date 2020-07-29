@@ -1,13 +1,15 @@
 import { E164Number } from '@celo/utils/lib/io'
 import crypto from 'crypto'
+import debugFactory from 'debug'
 import {
   AuthSigner,
-  Logger,
   MatchmakingRequest,
   MatchmakingResponse,
   postToPhoneNumPrivacyService,
   ServiceContext,
 } from './phone-number-lookup'
+
+const debug = debugFactory('kit:registry')
 
 const MATCHMAKING_ENDPOINT = '/getContactMatches'
 // Eventually, the matchmaking process will use blinded numbers same as salt lookups
@@ -18,16 +20,14 @@ const TAG = 'contractkit/utils/phone-number-lookup/matchmaking'
 // Uses the phone number privacy service to find mutual matches between Celo users
 export async function getContactMatches(
   e164NumberCaller: E164Number,
-  e164NumberMatches: E164Number[],
+  e164NumberContacts: E164Number[],
   account: string,
   signer: AuthSigner,
   context: ServiceContext,
-  logger: Logger,
-  failureCallback: (response: Response) => void,
   walletVersion?: string
 ): Promise<E164Number[]> {
   const selfPhoneNumObfuscated = obfuscateNumberForMatchmaking(e164NumberCaller)
-  const obfucsatedNumToE164Number = getContactNumsObfuscated(e164NumberMatches)
+  const obfucsatedNumToE164Number = getContactNumsObfuscated(e164NumberContacts)
 
   const body: MatchmakingRequest = {
     account,
@@ -42,15 +42,13 @@ export async function getContactMatches(
     signer,
     body,
     context,
-    MATCHMAKING_ENDPOINT,
-    logger,
-    failureCallback
+    MATCHMAKING_ENDPOINT
   )
 
   const matchHashes: string[] = response.matchedContacts.map((match) => match.phoneNumber)
 
   if (!matchHashes || !matchHashes.length) {
-    logger.debug(TAG, 'No matches found')
+    debug(TAG + 'No matches found')
     return []
   }
 

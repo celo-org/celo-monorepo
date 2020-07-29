@@ -4,11 +4,11 @@ import { call, put } from 'redux-saga/effects'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import networkConfig from 'src/geth/networkConfig'
 import { addContactsMatches } from 'src/identity/actions'
-import { getAuthSignerForAccount } from 'src/identity/commentEncryption'
 import { getUserSelfPhoneHashDetails } from 'src/identity/privateHashing'
 import { ContactMatches } from 'src/identity/types'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import Logger from 'src/utils/Logger'
+import { getAuthSignerForAccount } from 'src/web3/dataEncryptionKey'
 import { getConnectedUnlockedAccount } from 'src/web3/saga'
 
 const TAG = 'identity/matchmaking'
@@ -27,29 +27,26 @@ export function* fetchContactMatches(e164NumberToRecipients: NumberToRecipient) 
   }
 
   const authSigner = yield call(getAuthSignerForAccount, account)
-  const failureCallback = (response: Response) => {
-    Logger.error(`${TAG}@handleFailure`, `Response not okay. Status ${response.status}`)
-    switch (response.status) {
-      case 403:
-        throw new Error(ErrorMessages.MATCHMAKING_QUOTA_EXCEEDED)
-      default:
-        throw new Error('Unknown failure')
-    }
-  }
 
-  const matchedE164Number: string[] = yield call(
-    getContactMatches,
-    selfPhoneDetails.e164Number,
-    Object.keys(e164NumberToRecipients),
-    account,
-    authSigner,
-    networkConfig,
-    Logger,
-    failureCallback,
-    DeviceInfo.getVersion()
-  )
-  const matches = getMatchedContacts(e164NumberToRecipients, matchedE164Number)
-  yield put(addContactsMatches(matches))
+  try {
+    const matchedE164Number: string[] = yield call(
+      getContactMatches,
+      selfPhoneDetails.e164Number,
+      Object.keys(e164NumberToRecipients),
+      account,
+      authSigner,
+      networkConfig,
+      DeviceInfo.getVersion()
+    )
+
+    const matches = getMatchedContacts(e164NumberToRecipients, matchedE164Number)
+    yield put(addContactsMatches(matches))
+  } catch (error) {
+    if (error.message === ErrorMessages.PGPNP_QUOTA_ERROR) {
+      throw new Error(ErrorMessages.MATCHMAKING_QUOTA_EXCEEDED)
+    }
+    throw error
+  }
 }
 
 function getMatchedContacts(

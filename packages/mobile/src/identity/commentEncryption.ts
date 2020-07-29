@@ -2,10 +2,8 @@
 // Use these instead of the functions in @celo/utils/src/commentEncryption
 // because these manage comment metadata
 
-import { AuthenticationMethod, AuthSigner, PhoneNumberHashDetails } from '@celo/contractkit'
-import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
+import { PhoneNumberHashDetails } from '@celo/contractkit'
 import { IdentifierLookupResult } from '@celo/contractkit/lib/wrappers/Attestations'
-import { compressedPubKey } from '@celo/utils/lib/dataEncryptionKey'
 import { eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import {
   decryptComment as decryptCommentRaw,
@@ -33,8 +31,7 @@ import {
 } from 'src/identity/reducer'
 import { NewTransactionsInFeedAction } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
-import { getContractKit } from 'src/web3/contracts'
-import { doFetchDataEncryptionKey, isAccountUpToDate } from 'src/web3/dataEncryptionKey'
+import { doFetchDataEncryptionKey } from 'src/web3/dataEncryptionKey'
 import { dataEncryptionKeySelector } from 'src/web3/selectors'
 
 const TAG = 'identity/commentKey'
@@ -295,43 +292,4 @@ function* updatePhoneNumberMappings(newIdentityData: IdentityMetadataInTx[]) {
 
   yield put(updateE164PhoneNumberSalts(e164NumberToSaltUpdates))
   yield put(updateE164PhoneNumberAddresses(e164NumberToAddressUpdates, addressToE164NumberUpdates))
-}
-
-export function* getAuthSignerForAccount(account: string) {
-  // Use the DEK for authentication if the current DEK is registered with this account
-  let authSigner: AuthSigner | undefined
-  const contractKit = yield call(getContractKit)
-  const accountsWrapper: AccountsWrapper = yield call([
-    contractKit.contracts,
-    contractKit.contracts.getAccounts,
-  ])
-  const privateDataKey: string | null = yield select(dataEncryptionKeySelector)
-  if (!privateDataKey) {
-    Logger.error(TAG + 'getAuthSignerForAccount', 'Missing comment key, should never happen.')
-  } else {
-    const publicDataKey = compressedPubKey(hexToBuffer(privateDataKey))
-    Logger.warn(TAG + 'getAuthSignerForAccount', `privateDataKey [DELETE]: ${privateDataKey}`)
-    Logger.warn(TAG + 'getAuthSignerForAccount', `publicDataKey [DELETE]: ${publicDataKey}`)
-    const upToDate: boolean = yield call(isAccountUpToDate, accountsWrapper, account, publicDataKey)
-    if (!upToDate) {
-      Logger.warn(TAG + 'getAuthSignerForAccount', `DEK mismatch.`)
-    } else {
-      Logger.info(TAG + 'getAuthSignerForAccount', 'Using DEK for authentication')
-      authSigner = {
-        authenticationMethod: AuthenticationMethod.ENCRYPTIONKEY,
-        contractKit,
-        rawKey: privateDataKey,
-      }
-    }
-  }
-
-  // Fallback to using wallet key
-  if (!authSigner) {
-    Logger.info(TAG + 'getAuthSignerForAccount', 'Using wallet key for authentication')
-    authSigner = {
-      authenticationMethod: AuthenticationMethod.WALLETKEY,
-      contractKit,
-    }
-  }
-  return authSigner
 }
