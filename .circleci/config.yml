@@ -103,7 +103,7 @@ commands:
       - run:
           name: Create cached node_modules (if necessary)
           command: |
-            if [ ! -e ~/.tmp/node_modules.tgz ]; then 
+            if [ ! -e ~/.tmp/node_modules.tgz ]; then
               tar -c node_modules/ packages/*/node_modules/ packages/phone-number-privacy/*/node_modules/ | gzip --fast > ~/.tmp/node_modules.tgz
             fi
       - save_cache:
@@ -469,7 +469,16 @@ jobs:
           command: |
             ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
       - run:
-          name: test
+          name: Check contract versions
+          command: |
+            mkdir -p ~/.ssh
+            ssh-keyscan github.com >> ~/.ssh/known_hosts
+            git fetch --all
+            RELEASE_BRANCH=$(git branch -a --list *release/contracts/* | tail -1 | sed -e 's/remotes\/origin\///g')
+            yarn --cwd packages/protocol check-versions -o $RELEASE_BRANCH -n $CIRCLE_BRANCH
+      - run:
+          name: Unit tests
+          # Flaky tests - run them twice
           command: yarn --cwd packages/protocol test
 
   # Slow and flaky compared to protocol-test which runs without coverage
