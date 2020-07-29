@@ -1,8 +1,11 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { H4 } from 'src/fonts/Fonts'
-import { textStyles, fonts, standardStyles } from 'src/styles'
+import { textStyles, fonts, standardStyles, colors } from 'src/styles'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
+import LightButon from './LightButton'
+import TwitterLogo from 'src/icons/TwitterLogo'
+import Chainlink from 'src/icons/Chainlink'
 
 export default function SideBar({ isOpen }) {
   return (
@@ -32,8 +35,17 @@ export default function SideBar({ isOpen }) {
             href="#artlink"
             size={SIZE.normal}
           />
+          <View style={[standardStyles.row, standardStyles.elementalMargin]}>
+            <LightButon>
+              <TwitterLogo height={14} color={colors.dark} /> Tweet
+            </LightButon>
+            <LightButon style={{ marginLeft: 10 }}>
+              <Chainlink size={16} color={colors.dark} /> Copy
+            </LightButon>
+          </View>
         </View>
         <View style={standardStyles.elementalMarginTop}>
+          <View style={styles.line} />
           <Contributor role="Poetry" name="Gabrielle Micheletti, cLabs" />
           <Contributor role="Code & Animation" name="Aaron DeRuvo, cLabs" />
           <Contributor role="Art & Design" name="Taylor Lahey, cLabs" />
@@ -74,10 +86,11 @@ const styles = StyleSheet.create({
   },
   showSide: {
     marginHorizontal: 24,
+    opacity: 1,
   },
   hideSide: {
     transform: [{ translateX: 300 }],
-    opacity: 0.5,
+    opacity: 0.1,
   },
   role: {
     textTransform: 'uppercase',
@@ -85,5 +98,9 @@ const styles = StyleSheet.create({
   },
   contributor: {
     marginBottom: 10,
+  },
+  line: {
+    width: 26,
+    height: 1,
   },
 })

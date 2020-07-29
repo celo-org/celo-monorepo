@@ -8,7 +8,7 @@ import SideBar from 'src/codename-allegory/SideBar'
 // import { H4 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import menuItems from 'src/shared/menu-items'
-import { fonts } from 'src/styles'
+import { fonts, textStyles } from 'src/styles'
 import { useBooleanToggle } from 'src/utils/useBooleanToggle'
 
 export default function Canvas() {
@@ -22,7 +22,7 @@ export default function Canvas() {
       />
       <View style={styles.root}>
         <View style={styles.nav}>
-          <Text onPress={toggleSidebar} style={fonts.p}>
+          <Text onPress={toggleSidebar} style={[fonts.p, textStyles.heavy]}>
             {isOpen ? 'Close' : 'About'}{' '}
           </Text>
         </View>
