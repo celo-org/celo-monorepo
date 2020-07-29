@@ -1,4 +1,5 @@
 // tslint:disable: max-classes-per-file
+export const DEFAULT_VERSION_STRING = '1.1.0.0'
 
 export class ContractVersion {
 
@@ -7,13 +8,14 @@ export class ContractVersion {
     if (v.length !== 4) {
       return false
     }
+
     const isNonNegativeNumber = (versionComponent): boolean => {
       const number = Number(versionComponent)
       return !isNaN(number) && number >= 0
     }
     return v.every(isNonNegativeNumber)
   }
-  
+
   static fromString = (version: string): ContractVersion => {
     if (!ContractVersion.isValid(version)) {
       throw new Error(`Invalid version format: ${version}`)
@@ -26,7 +28,24 @@ export class ContractVersion {
       Number(v[3])
     )
   }
-  
+
+  /**
+   * @param version A 256 byte buffer containing the 32 byte storage, major, minor, and patch
+   * version numbers.
+   */
+  static fromGetVersionNumberReturnValue = (version: Buffer): ContractVersion => {
+    if (version.length !== 4 * 32) {
+      throw new Error(`Invalid version buffer: ${version.toString('hex')}`)
+    }
+    const versions = [
+      version.slice(0, 32),  // Storage
+      version.slice(32, 64), // Major
+      version.slice(64, 96), // Minor
+      version.slice(96, 128) // Patch
+    ]
+    return ContractVersion.fromString(versions.map((x) => x.toString('hex')).join('.'))
+  }
+
   constructor(
     public readonly storage: number,
     public readonly major: number,
@@ -71,7 +90,7 @@ export class ContractVersionDelta {
     const r = Delta.Reset
     const n = Delta.None
     if (storageChanged) {
-      return new ContractVersionDelta(Delta.Increment, r, r, r) 
+      return new ContractVersionDelta(Delta.Increment, r, r, r)
     }
     if (majorChanged) {
       return new ContractVersionDelta(n, Delta.Increment, r, r)
@@ -84,7 +103,7 @@ export class ContractVersionDelta {
     }
     return new ContractVersionDelta(n, n, n, n)
   }
- 
+
   constructor(
     public readonly storage: Delta,
     public readonly major: Delta,
@@ -105,3 +124,45 @@ export class ContractVersionDelta {
     return deltas.map(d => d.toString()).join('.')
   }
 }
+
+/**
+ * A mapping {contract name => {@link ContractVersionDelta}}.
+ */
+export interface ContractVersionDeltaIndex {
+  [contract: string]: ContractVersionDelta
+}
+
+/**
+ * A mapping {contract name => {@link ContractVersion}}.
+ */
+export interface ContractVersionIndex {
+  [contract: string]: ContractVersion;
+}
+
+/**
+ * A version checker for a specific contract.
+ */
+export class ContractVersionChecker {
+  constructor(public readonly oldVersion: ContractVersion, public readonly newVersion: ContractVersion, public readonly expectedDelta: ContractVersionDelta) {}
+
+  public expectedVersion = (): ContractVersion => {
+    if (this.oldVersion === null) {
+      // Newly added contracts should have version 1.1.0.0
+      return ContractVersion.fromString(DEFAULT_VERSION_STRING)
+    } else { 
+      return this.expectedDelta.appliedTo(this.oldVersion)
+    }
+  }
+
+  public matches = (): boolean => {
+    return this.newVersion.toString() === this.expectedVersion().toString()
+  }
+}
+
+/**
+ * A mapping {contract name => {@link ContractVersionChecker}}.
+ */
+export interface ContractVersionCheckerIndex {
+  [contract: string]: ContractVersionChecker
+}
+
