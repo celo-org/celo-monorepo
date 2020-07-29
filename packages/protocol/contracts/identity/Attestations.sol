@@ -8,6 +8,7 @@ import "openzeppelin-solidity/contracts/utils/SafeCast.sol";
 import "./interfaces/IAttestations.sol";
 import "./interfaces/IRandom.sol";
 import "../common/interfaces/IAccounts.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
@@ -20,6 +21,7 @@ import "../common/libraries/ReentrancyGuard.sol";
  */
 contract Attestations is
   IAttestations,
+  ICeloVersionedContract,
   Ownable,
   Initializable,
   UsingRegistry,
@@ -148,6 +150,14 @@ contract Attestations is
     for (uint256 i = 0; i < attestationRequestFeeTokens.length; i = i.add(1)) {
       setAttestationRequestFee(attestationRequestFeeTokens[i], attestationRequestFeeValues[i]);
     }
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
   }
 
   /**
