@@ -31,7 +31,6 @@ export enum Screens {
   Language = 'Language',
   Licenses = 'Licenses',
   Main = 'Main',
-  Animated = 'Animated',
   MoonPay = 'MoonPay',
   NameAndNumber = 'NameAndNumber',
   OnboardingEducationScreen = 'OnboardingEducationScreen',
