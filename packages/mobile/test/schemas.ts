@@ -340,16 +340,16 @@ export const v2Schema = {
 export const v3Schema = {
   ...v2Schema,
   account: {
-    ...v1Schema.account,
+    ...v2Schema.account,
     hasMigratedToNewBip39: false,
     choseToRestoreAccount: false,
   },
   identity: {
-    ...v1Schema.identity,
+    ...v2Schema.identity,
     addressToDataEncryptionKey: {},
   },
   web3: {
-    ...v1Schema.web3,
+    ...v2Schema.web3,
     isDekRegistered: false,
   },
 }
