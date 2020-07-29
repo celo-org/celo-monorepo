@@ -31,7 +31,7 @@ export async function getPhoneNumberIdentifier(
   signer: AuthSigner,
   context: ServiceContext,
   selfPhoneHash?: string,
-  walletVersion?: string,
+  clientVersion?: string,
   blsBlindingClient?: BlsBlindingClient
 ): Promise<PhoneNumberHashDetails> {
   debug(`${TAG}@getPhoneNumberIdentifier` + 'Getting phone number salt')
@@ -52,7 +52,7 @@ export async function getPhoneNumberIdentifier(
     account,
     blindedQueryPhoneNumber: base64BlindedMessage,
     hashedPhoneNumber: selfPhoneHash,
-    version: walletVersion ? walletVersion : 'unknown',
+    version: clientVersion ? clientVersion : 'unknown',
     authenticationMethod: signer.authenticationMethod,
   }
 

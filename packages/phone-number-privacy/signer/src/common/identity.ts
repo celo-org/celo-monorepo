@@ -17,9 +17,6 @@ export async function authenticateUser(request: Request): Promise<boolean> {
   // https://tools.ietf.org/html/rfc7235#section-4.2
   const messageSignature = request.get('Authorization')
   const message = JSON.stringify(request.body)
-  if (!messageSignature || !message) {
-    return false
-  }
   const signer = request.body.account
   if (!messageSignature || !signer) {
     return false

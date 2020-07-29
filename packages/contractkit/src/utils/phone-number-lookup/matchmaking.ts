@@ -24,7 +24,7 @@ export async function getContactMatches(
   account: string,
   signer: AuthSigner,
   context: ServiceContext,
-  walletVersion?: string
+  clientVersion?: string
 ): Promise<E164Number[]> {
   const selfPhoneNumObfuscated = obfuscateNumberForMatchmaking(e164NumberCaller)
   const obfucsatedNumToE164Number = getContactNumsObfuscated(e164NumberContacts)
@@ -34,7 +34,7 @@ export async function getContactMatches(
     userPhoneNumber: selfPhoneNumObfuscated,
     contactPhoneNumbers: Object.keys(obfucsatedNumToE164Number),
     hashedPhoneNumber: selfPhoneNumObfuscated,
-    version: walletVersion ? walletVersion : 'unknown',
+    version: clientVersion ? clientVersion : 'unknown',
     authenticationMethod: signer.authenticationMethod,
   }
 
