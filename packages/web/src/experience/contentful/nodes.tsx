@@ -74,7 +74,6 @@ function embedded(node) {
     case 'video':
       return <YouTube videoId={fields.youtubeID} />
     default:
-      console.warn(node)
       return null
   }
 }

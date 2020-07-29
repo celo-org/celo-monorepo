@@ -31,10 +31,15 @@ interface InternalKit {
   kitName: string
   metaDescription: string
   ogImage: Asset
+  pageID: string
   sidebar: SideBarEntry[]
 }
 
-export async function getKit(kitSlug: string, { preview, locale }): Promise<InternalKit> {
+export async function getKit(
+  kitSlug: string,
+  pageSlug: string,
+  { preview, locale }
+): Promise<InternalKit> {
   const kit = await getClient(preview).getEntries<Kit>({
     content_type: 'kit',
     'fields.slug': kitSlug,
@@ -42,11 +47,13 @@ export async function getKit(kitSlug: string, { preview, locale }): Promise<Inte
   })
 
   const data = kit.items[0].fields
-
+  const pageID = data.pages_.find((p) => p.fields.slug === (!pageSlug ? 'index' : pageSlug))?.sys
+    ?.id
   return {
     kitName: data.name,
     metaDescription: data.metaDescription,
     ogImage: data.ogImage,
+    pageID,
     sidebar: data.pages_.map((page) => {
       return {
         title: page.fields.title,
@@ -65,15 +72,16 @@ interface ContentFulPage {
   sections: Array<Entry<{ name: string; contentField: Document; slug: string }>>
 }
 
-export async function getPage(pageSlug: string, { preview, locale }) {
-  const page = await getClient(preview).getEntries<ContentFulPage>({
+export async function getPage(pageSlug: string, id, { preview, locale }) {
+  const pages = await getClient(preview).getEntries<ContentFulPage>({
     content_type: 'page',
     'fields.slug': !pageSlug ? 'index' : pageSlug,
+    'sys.id': id,
     include: 3,
     locale,
   })
 
-  const data = page.items[0].fields
+  const data = pages.items[0].fields
 
   const sections = data.sections.map((section) => section.fields)
   return { ...data, sections }

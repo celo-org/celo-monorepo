@@ -53,7 +53,6 @@ export default React.memo(function Showcase({
                 <Spinner color={colors.primary} size="small" />
               ) : (
                 <Image
-                  // onLoadEnd={load}
                   resizeMode="contain"
                   accessibilityLabel={`Preview of ${name}`}
                   source={{ uri: preview }}
@@ -83,9 +82,7 @@ const styles = StyleSheet.create({
   },
   text: { flex: 1 },
   pullStart: { paddingLeft: 0 },
-  container: {
-    // justifyContent: 'space-between',
-  },
+  container: {},
   'variant-circle': {
     borderRadius: 60,
   },

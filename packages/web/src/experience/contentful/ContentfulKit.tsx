@@ -23,7 +23,7 @@ const OPTIONS = {
   renderNode,
 }
 
-export default function DynamicKit({
+export default function ContentfulKit({
   kitName,
   metaDescription,
   path,
