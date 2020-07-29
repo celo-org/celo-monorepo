@@ -2,19 +2,19 @@
 // Use these instead of the functions in @celo/utils/src/commentEncryption
 // because these manage comment metadata
 
-import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { IdentifierLookupResult } from '@celo/contractkit/lib/wrappers/Attestations'
-import { bufferToHex, eqAddress, hexToBuffer } from '@celo/utils/src/address'
+import { eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import {
   decryptComment as decryptCommentRaw,
-  deriveCEK,
   encryptComment as encryptCommentRaw,
 } from '@celo/utils/src/commentEncryption'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import { memoize, values } from 'lodash'
 import { call, put, select } from 'redux-saga/effects'
 import { TokenTransactionType, TransactionFeedFragment } from 'src/apollo/types'
+import { MAX_COMMENT_LENGTH } from 'src/config'
 import { features } from 'src/flags'
+import i18n from 'src/i18n'
 import { updateE164PhoneNumberAddresses, updateE164PhoneNumberSalts } from 'src/identity/actions'
 import {
   getAddressesFromLookupResult,
@@ -30,9 +30,8 @@ import {
 } from 'src/identity/reducer'
 import { NewTransactionsInFeedAction } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
-import { setPrivateCommentKey } from 'src/web3/actions'
-import { getContractKit } from 'src/web3/contracts'
-import { privateCommentKeySelector } from 'src/web3/selectors'
+import { doFetchDataEncryptionKey } from 'src/web3/dataEncryptionKey'
+import { dataEncryptionKeySelector } from 'src/web3/selectors'
 
 const TAG = 'identity/commentKey'
 // A separator to split the comment content from the metadata
@@ -41,23 +40,6 @@ const METADATA_CONTENT_SEPARATOR = '~'
 const PHONE_METADATA_REGEX = new RegExp(
   `(.*)${METADATA_CONTENT_SEPARATOR}([+][1-9][0-9]{1,14})([a-zA-Z0-9+/]{13})$`
 )
-
-// Derive a new comment key from the provided private key
-export function* createCommentKey(seedPrivateKey: string) {
-  Logger.debug(TAG, 'Creating a new comment key')
-  const privateCEK = bufferToHex(deriveCEK(seedPrivateKey))
-  yield put(setPrivateCommentKey(privateCEK))
-}
-
-export function* getCommentKey(address: string) {
-  const contractKit = yield call(getContractKit)
-  const accountsWrapper: AccountsWrapper = yield call([
-    contractKit.contracts,
-    contractKit.contracts.getAccounts,
-  ])
-  const hexString: string = yield call(accountsWrapper.getDataEncryptionKey, address)
-  return !hexString ? null : hexToBuffer(hexString)
-}
 
 export function* encryptComment(
   comment: string | null,
@@ -71,16 +53,13 @@ export function* encryptComment(
     return comment
   }
 
-  // TODO currently users register this key when the get verified
-  // We should nudge unverified users to register a key as well otherwise
-  // they don't benefit from comment encryption
-  const fromKey: Buffer | null = yield call(getCommentKey, fromAddress)
+  const fromKey: Buffer | null = yield call(doFetchDataEncryptionKey, fromAddress)
   if (!fromKey) {
     Logger.debug(TAG + 'encryptComment', 'No sender key found, skipping encryption')
     return comment
   }
 
-  const toKey: Buffer | null = yield call(getCommentKey, toAddress)
+  const toKey: Buffer | null = yield call(doFetchDataEncryptionKey, toAddress)
   if (!toKey) {
     Logger.debug(TAG + 'encryptComment', 'No recipient key found, skipping encryption')
     return comment
@@ -118,28 +97,34 @@ export const decryptComment = memoize(_decryptComment, (...args) => values(args)
 
 function _decryptComment(
   comment: string | null,
-  commentKeyPrivate: string | null,
+  dataEncryptionKey: string | null,
   isSender: boolean
 ): DecryptedComment {
   Logger.debug(TAG + 'decryptComment', 'Decrypting comment')
 
-  if (!features.USE_COMMENT_ENCRYPTION || !comment || !commentKeyPrivate) {
+  if (!features.USE_COMMENT_ENCRYPTION || !comment || !dataEncryptionKey) {
     Logger.debug(TAG + 'decryptComment', 'Invalid params, skipping decryption')
     return { comment }
   }
 
   const { comment: decryptedComment, success } = decryptCommentRaw(
     comment,
-    hexToBuffer(commentKeyPrivate),
+    hexToBuffer(dataEncryptionKey),
     isSender
   )
 
   if (success) {
     Logger.debug(TAG + 'decryptComment', 'Comment decryption succeeded')
     return extractPhoneNumberMetadata(decryptedComment)
-  } else {
-    Logger.error(TAG + 'decryptComment', 'Decrypting comment failed, returning raw comment')
+  } else if (comment.length <= MAX_COMMENT_LENGTH) {
+    Logger.warn(TAG + 'decryptComment', 'Decrypting comment failed, returning raw comment')
     return { comment }
+  } else {
+    // Since we've changed the DEK derivation strategy, comment decryption would fail
+    // for old comments and/or mismatch between DEK types btwn sender + receiver
+    // To cover this case, the comment is hidden instead of showing garbage
+    Logger.warn(TAG + 'decryptComment', 'Comment appears to be ciphertext, hiding comment')
+    return { comment: i18n.t('global:commentUnavailable') }
   }
 }
 
@@ -180,7 +165,7 @@ export function* checkTxsForIdentityMetadata({ transactions }: NewTransactionsIn
     }
     Logger.debug(TAG + 'checkTxsForIdentityMetadata', `Checking ${transactions.length} txs`)
 
-    const commentKeyPrivate: string | null = yield select(privateCommentKeySelector)
+    const commentKeyPrivate: string | null = yield select(dataEncryptionKeySelector)
     if (!commentKeyPrivate) {
       Logger.error(TAG + 'checkTxsForIdentityMetadata', 'Missing comment key, should never happen.')
       return

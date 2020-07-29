@@ -1,7 +1,6 @@
 import { PincodeType } from 'src/account/reducer'
 import { PaymentRequest } from 'src/account/types'
 
-// TODO(Rossy): Remove the _ACTION suffix from these actions for consistency with other other names
 export enum Actions {
   SET_NAME = 'ACCOUNT/SET_NAME',
   SET_PHONE_NUMBER = 'ACCOUNT/SET_PHONE_NUMBER',
@@ -10,14 +9,13 @@ export enum Actions {
   SET_PINCODE = 'ACCOUNT/SET_PINCODE',
   SET_PINCODE_SUCCESS = 'ACCOUNT/SET_PINCODE_SUCCESS',
   SET_PINCODE_FAILURE = 'ACCOUNT/SET_PINCODE_FAILURE',
-  SET_ACCOUNT_CREATION_TIME_ACTION = 'ACCOUNT/SET_ACCOUNT_CREATION_TIME_ACTION',
-  SET_BACKUP_COMPLETED_ACTION = 'ACCOUNT/SET_BACKUP_COMPLETED_ACTION',
-  SET_BACKUP_DELAYED_ACTION = 'ACCOUNT/SET_BACKUP_DELAYED_ACTION',
-  SET_SOCIAL_BACKUP_COMPLETED_ACTION = 'ACCOUNT/SET_SOCIAL_BACKUP_COMPLETED_ACTION',
+  SET_ACCOUNT_CREATION_TIME = 'ACCOUNT/SET_ACCOUNT_CREATION_TIME',
+  SET_BACKUP_COMPLETED = 'ACCOUNT/SET_BACKUP_COMPLETED',
+  SET_BACKUP_DELAYED = 'ACCOUNT/SET_BACKUP_DELAYED',
+  SET_SOCIAL_BACKUP_COMPLETED = 'ACCOUNT/SET_SOCIAL_BACKUP_COMPLETED',
   TOGGLE_BACKUP_STATE = 'ACCOUNT/TOGGLE_BACKUP_STATE',
   UPDATE_INCOMING_PAYMENT_REQUESTS = 'ACCOUNT/UPDATE_INCOMING_PAYMENT_REQUESTS',
   UPDATE_OUTGOING_PAYMENT_REQUESTS = 'ACCOUNT/UPDATE_OUTGOING_PAYMENT_REQUESTS',
-  DISMISS_EARN_REWARDS = 'ACCOUNT/DISMISS_EARN_REWARDS',
   DISMISS_INVITE_FRIENDS = 'ACCOUNT/DISMISS_INVITE_FRIENDS',
   DISMISS_GET_VERIFIED = 'ACCOUNT/DISMISS_GET_VERIFIED',
   SET_USER_CONTACT_DETAILS = 'ACCOUNT/SET_USER_CONTACT_DETAILS',
@@ -66,19 +64,19 @@ export interface SetPincodeFailureAction {
 }
 
 export interface SetAccountCreationAction {
-  type: Actions.SET_ACCOUNT_CREATION_TIME_ACTION
+  type: Actions.SET_ACCOUNT_CREATION_TIME
 }
 
 export interface SetBackupCompletedAction {
-  type: Actions.SET_BACKUP_COMPLETED_ACTION
+  type: Actions.SET_BACKUP_COMPLETED
 }
 
 export interface SetBackupDelayedAction {
-  type: Actions.SET_BACKUP_DELAYED_ACTION
+  type: Actions.SET_BACKUP_DELAYED
 }
 
 export interface SetSocialBackupCompletedAction {
-  type: Actions.SET_SOCIAL_BACKUP_COMPLETED_ACTION
+  type: Actions.SET_SOCIAL_BACKUP_COMPLETED
 }
 
 export interface ToggleBackupState {
@@ -93,10 +91,6 @@ export interface UpdateIncomingPaymentRequestsAction {
 export interface UpdateOutgoingPaymentRequestsAction {
   type: Actions.UPDATE_OUTGOING_PAYMENT_REQUESTS
   paymentRequests: PaymentRequest[]
-}
-
-export interface DismissEarnRewardsAction {
-  type: Actions.DISMISS_EARN_REWARDS
 }
 
 export interface DismissInviteFriendsAction {
@@ -145,7 +139,6 @@ export type ActionTypes =
   | SetBackupDelayedAction
   | SetSocialBackupCompletedAction
   | ToggleBackupState
-  | DismissEarnRewardsAction
   | DismissInviteFriendsAction
   | DismissGetVerifiedAction
   | UpdateIncomingPaymentRequestsAction
@@ -200,19 +193,19 @@ export const setPincodeFailure = (): SetPincodeFailureAction => ({
 })
 
 export const setAccountCreationTime = (): SetAccountCreationAction => ({
-  type: Actions.SET_ACCOUNT_CREATION_TIME_ACTION,
+  type: Actions.SET_ACCOUNT_CREATION_TIME,
 })
 
 export const setBackupCompleted = (): SetBackupCompletedAction => ({
-  type: Actions.SET_BACKUP_COMPLETED_ACTION,
+  type: Actions.SET_BACKUP_COMPLETED,
 })
 
 export const setBackupDelayed = (): SetBackupDelayedAction => ({
-  type: Actions.SET_BACKUP_DELAYED_ACTION,
+  type: Actions.SET_BACKUP_DELAYED,
 })
 
 export const setSocialBackupCompleted = (): SetSocialBackupCompletedAction => ({
-  type: Actions.SET_SOCIAL_BACKUP_COMPLETED_ACTION,
+  type: Actions.SET_SOCIAL_BACKUP_COMPLETED,
 })
 
 export const toggleBackupState = (): ToggleBackupState => ({
@@ -231,10 +224,6 @@ export const updateOutgoingPaymentRequests = (
 ): UpdateOutgoingPaymentRequestsAction => ({
   type: Actions.UPDATE_OUTGOING_PAYMENT_REQUESTS,
   paymentRequests,
-})
-
-export const dismissEarnRewards = (): DismissEarnRewardsAction => ({
-  type: Actions.DISMISS_EARN_REWARDS,
 })
 
 export const dismissInviteFriends = (): DismissInviteFriendsAction => ({

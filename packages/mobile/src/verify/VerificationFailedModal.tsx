@@ -27,6 +27,7 @@ export function VerificationFailedModal({ verificationStatus, retryWithForno, fo
 
   const onDismiss = () => {
     setIsDismissed(true)
+    navigate(Screens.VerificationInputScreen)
   }
 
   const onSkip = () => {

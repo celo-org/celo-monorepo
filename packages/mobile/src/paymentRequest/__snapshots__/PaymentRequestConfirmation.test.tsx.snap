@@ -2,9 +2,13 @@
 
 exports[`PaymentRequestConfirmation renders correctly for request payment confirmation 1`] = `
 <RNCSafeAreaView
+  edges={
+    Array [
+      "bottom",
+    ]
+  }
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "padding": 8,
     }
@@ -155,7 +159,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
             </Text>
             <TextInput
               allowFontScaling={true}
-              autoFocus={true}
+              autoFocus={false}
               maxLength={70}
               multiline={true}
               numberOfLines={5}

@@ -4,16 +4,16 @@ import {
   AzureClusterConfig,
   deallocateStaticIP,
   getAKSNodeResourceGroup,
-  registerStaticIPIfNotRegistered,
+  registerStaticIPIfNotRegistered
 } from './azure'
 import { createNamespaceIfNotExists } from './cluster'
 import { execCmdWithExitOnFailure } from './cmd-utils'
-import { envVar, fetchEnv } from './env-utils'
+import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   deletePersistentVolumeClaims,
   installGenericHelmChart,
   removeGenericHelmChart,
-  upgradeGenericHelmChart,
+  upgradeGenericHelmChart
 } from './helm_deploy'
 import { deleteResource, scaleResource } from './kubernetes'
 
@@ -96,6 +96,7 @@ async function helmParameters(
     `--set geth.expose_rpc_externally=false`,
     `--set geth.image.repository=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY)}`,
     `--set geth.image.tag=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_TAG)}`,
+    `--set geth.metrics=${fetchEnvOrFallback(envVar.GETH_ENABLE_METRICS, 'false')}`,
     `--set geth.public_ips='{${staticIps}}'`,
     `--set-string geth.rpc_apis='${rpcApis.split(',').join('\\\,')}'`,
     `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,

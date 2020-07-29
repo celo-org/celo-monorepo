@@ -110,7 +110,6 @@ export const vNeg1Schema = {
     incomingPaymentRequests: [],
     outgoingPaymentRequests: [],
     dismissedGetVerified: false,
-    dismissedEarnRewards: false,
     dismissedInviteFriends: false,
     promptFornoIfNeeded: false,
     acceptedTerms: false,
@@ -341,6 +340,11 @@ export const v2Schema = {
   },
   identity: {
     ...v1Schema.identity,
+    addressToDataEncryptionKey: {},
+  },
+  web3: {
+    ...v1Schema.web3,
+    isDekRegistered: false,
   },
 }
 
