@@ -6,7 +6,6 @@ import { ScrollView, StyleSheet, Text } from 'react-native'
 import { SafeAreaInsetsContext, SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { acceptTerms } from 'src/account/actions'
-import { PincodeType } from 'src/account/reducer'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { CELO_TERMS_LINK } from 'src/config'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -18,14 +17,6 @@ import { navigateToURI } from 'src/utils/linking'
 
 const MARGIN = 24
 
-interface StateProps {
-  pincodeType: PincodeType
-}
-
-function mapStateToProps(state: RootState): StateProps {
-  return { pincodeType: state.account.pincodeType }
-}
-
 interface DispatchProps {
   acceptTerms: typeof acceptTerms
 }
@@ -34,7 +25,7 @@ const mapDispatchToProps: DispatchProps = {
   acceptTerms,
 }
 
-type Props = WithTranslation & DispatchProps & StateProps
+type Props = WithTranslation & DispatchProps
 
 export class RegulatoryTerms extends React.Component<Props> {
   static navigationOptions = nuxNavigationOptions
@@ -45,11 +36,7 @@ export class RegulatoryTerms extends React.Component<Props> {
   }
 
   goToNextScreen = () => {
-    if (this.props.pincodeType === PincodeType.Unset) {
-      navigate(Screens.PincodeSet)
-    } else {
-      navigate(Screens.EnterInviteCode)
-    }
+    navigate(Screens.NameAndNumber)
   }
 
   onPressGoToTerms = () => {
@@ -61,7 +48,7 @@ export class RegulatoryTerms extends React.Component<Props> {
 
     return (
       <SafeAreaView style={styles.container}>
-        <DevSkipButton nextScreen={Screens.PincodeSet} />
+        <DevSkipButton nextScreen={Screens.NameAndNumber} />
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
@@ -95,8 +82,8 @@ export class RegulatoryTerms extends React.Component<Props> {
   }
 }
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
-  mapStateToProps,
+export default connect<{}, DispatchProps, {}, RootState>(
+  null,
   mapDispatchToProps
 )(withTranslation<Props>(Namespaces.nuxNamePin1)(RegulatoryTerms))
 

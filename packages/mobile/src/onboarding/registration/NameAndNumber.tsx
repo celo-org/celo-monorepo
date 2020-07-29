@@ -13,7 +13,6 @@ import * as RNLocalize from 'react-native-localize'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { setName, setPhoneNumber, setPromptForno } from 'src/account/actions'
-import { PincodeType } from 'src/account/reducer'
 import { hideAlert, showError } from 'src/alert/actions'
 import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
@@ -30,8 +29,6 @@ interface StateProps {
   cachedName: string | null
   cachedNumber: string | null
   cachedCountryCallingCode: string | null
-  pincodeType: PincodeType
-  acceptedTerms: boolean
 }
 
 interface DispatchProps {
@@ -42,7 +39,7 @@ interface DispatchProps {
   setName: typeof setName
 }
 
-type OwnProps = StackScreenProps<StackParamList, Screens.JoinCelo>
+type OwnProps = StackScreenProps<StackParamList, Screens.NameAndNumber>
 
 type Props = StateProps & DispatchProps & WithTranslation & OwnProps
 
@@ -67,8 +64,6 @@ const mapStateToProps = (state: RootState): StateProps => {
     cachedName: state.account.name,
     cachedNumber: state.account.e164PhoneNumber,
     cachedCountryCallingCode: state.account.defaultCountryCode,
-    pincodeType: state.account.pincodeType,
-    acceptedTerms: state.account.acceptedTerms,
   }
 }
 
@@ -96,7 +91,7 @@ function getPhoneNumberState(
   }
 }
 
-export class JoinCelo extends React.Component<Props, State> {
+export class NameAndNumber extends React.Component<Props, State> {
   static navigationOptions = nuxNavigationOptions
 
   countries = new Countries(this.props.i18n.language)
@@ -123,13 +118,7 @@ export class JoinCelo extends React.Component<Props, State> {
   }
 
   goToNextScreen = () => {
-    if (!this.props.acceptedTerms) {
-      navigate(Screens.RegulatoryTerms)
-    } else if (this.props.pincodeType === PincodeType.Unset) {
-      navigate(Screens.PincodeSet)
-    } else {
-      navigate(Screens.EnterInviteCode)
-    }
+    navigate(Screens.PincodeSet)
   }
 
   onChangeNameInput = (value: string) => {
@@ -228,7 +217,7 @@ export class JoinCelo extends React.Component<Props, State> {
             size={BtnSizes.MEDIUM}
             type={BtnTypes.ONBOARDING}
             disabled={!this.state.isValidNumber}
-            testID={'JoinCeloContinueButton'}
+            testID={'NameAndNumberContinueButton'}
           />
         </ScrollView>
         <KeyboardSpacer />
@@ -255,4 +244,4 @@ const styles = StyleSheet.create({
 export default connect<StateProps, DispatchProps, OwnProps, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation<Props>(Namespaces.nuxNamePin1)(JoinCelo))
+)(withTranslation<Props>(Namespaces.nuxNamePin1)(NameAndNumber))
