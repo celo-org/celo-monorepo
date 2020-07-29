@@ -17,17 +17,21 @@ You can configure FlakeTracker via the following environment variables.
   - Enables error logging after retries even for tests that never pass. Defaults to `false`.
 - `NUM_RETRIES`
   - Only relevant when flake tracker is enabled.
-  - Specifies how many retries should be performed before a test is failed. Defaults to 10.
-  - If you want a "fail fast without flakes" option (let's say you know a bunch of tests will fail, and you want to skip all the flakey tests without retrying each failed test a bunch of times) you can accomplish this by setting `NUM_RETRIES=0`
+  - Specifies how many retries should be performed before a test is failed.
+  - If you want a "fail fast without flakes" option (let's say you know a bunch of tests will fail, and you want to skip all the flakey tests without retrying each failed test a bunch of times) you can accomplish this by setting `NUM_RETRIES=0`.
 - `SKIP_KNOWN_FLAKES`
   - Only relevant when flake tracker is enabled and tests are run in CI.
   - Set `SKIP_KNOWN_FLAKES=false` to disable the skipping of known flakes in CI. Defaults to `true`.
+- `FLAKES_FAIL_CHECK_SUITE`
+  - If true, new flakey tests will be reported as 'failures' on GitHub Checks. Note this does not affect the CI workflow.
 
 ## Disabling Skipping For Specific Tests
 
 To ensure that a specific known flakey test is run for your PR, simply include the link to the flakey test's issue anywhere in the body of your PR.
 
 ## Still Seeing Flakey Tests?
+
+Sometimes a flakey test will fail all retries. You can try bumping up the number of retries that are attempted by setting the `NUM_RETRIES` env variable.
 
 Some flakey tests are not uncovered by retries. That is, if they fail the first time then every retry will also fail. If you encounter tests like this, please create an issue to track it. If you do so correctly, the flakey test will be disabled until the issue is closed.
 To manually create a flakey test issue, mimic the format of issues created by the FlakeTracker bot. Specifically, make sure to add the `FLAKEY` label as well as labels for the package name and the ci job the test is run in. Also, include the `testID` of the test in the issue title.
@@ -62,18 +66,12 @@ just include the link to the corresponding flakey test issue in the PR body and 
 
 ## TODO
 
-TODO(Alec): Add issue cleanup (TESTING)
+TODO(Alec): Add comment in issue cleanup (DONE)
 
-TODO(Alec): change statuses for checks (use emojis instead?) (Testing)
+TODO(Alec): change statuses for checks (use emojis instead?) (DONE)
 
-TODO(Alec): flesh out summary check (NEXT)
+TODO(Alec): flesh out summary check (DONE)
 
-TODO(Alec): address PR comments (NEXT)
+TODO(Alec): go through git diff (NEXT)
 
-TODO(Alec): fill in PR template
-
-TODO(Alec): Finalize config
-
-TODO(Alec): remove fake flakey tests
-
-TODO(Alec): go through git diff
+TODO(Alec): fill in PR template (NEXT)

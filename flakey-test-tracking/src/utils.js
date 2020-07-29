@@ -8,6 +8,7 @@ const snowflake = String.fromCharCode(0x2744)
 const warning = String.fromCodePoint(0x26a0)
 const relievedSmileFace = String.fromCodePoint(0x1f60c)
 const hands = String.fromCodePoint(0x1f64c)
+const warningLight = String.fromCodePoint(0x1f6a8)
 
 const flakeTitlePrefix = '[FLAKEY TEST] '
 
@@ -19,7 +20,7 @@ const statuses = {
 
 const emojis = {
   failure: redX,
-  neutral: warning,
+  neutral: warningLight,
   success: greenCheck,
 }
 
@@ -101,10 +102,11 @@ function parseTestIdFromFlakeTitle(title) {
 }
 
 function parseDownFlakeIssue(issue) {
-  return (({ title, html_url, number }) => ({
+  return (({ title, html_url, number, body }) => ({
     title,
     html_url,
     number,
+    body,
   }))(issue)
 }
 
@@ -189,6 +191,83 @@ function fmtSummary(flakes, skippedTests, verbosity) {
   return summary
 }
 
+function sumVals(obj) {
+  return Object.values(obj).reduce((acc, x) => acc + x, 0)
+}
+
+// Use i == 0 for breakdowns by job, i == 1 for breakdowns by package
+function parseBreakdown(breakdownByTestSuite, i) {
+  const breakdown = {}
+  Object.keys(breakdownByTestSuite).forEach((testSuite) => {
+    const key = testSuite.split(' -> ')[i] // We id test suites by `jobName -> packageName`
+    breakdown[key] = breakdown[key]
+      ? breakdown[key] + breakdownByTestSuite[testSuite]
+      : breakdownByTestSuite[testSuite]
+  })
+  return breakdown
+}
+
+function fmtBreakdown(breakdownByTestSuite, total) {
+  let text = ''
+  const breakdownByPackage = parseBreakdown(breakdownByTestSuite, 1)
+  const breakdownByJob = parseBreakdown(breakdownByTestSuite, 0)
+
+  const fmtPercentage = (n, d) => {
+    return ((n / d) * 100).toFixed(1) + '%'
+  }
+
+  text += '\n\tBy Package:\n'
+  Object.keys(breakdownByPackage).forEach((pkg) => {
+    const num = breakdownByPackage[pkg]
+    text += '\n\t\t' + pkg + ': ' + num + ' (' + fmtPercentage(num, total) + ')\n'
+  })
+
+  text += '\n\tBy Job:\n'
+  Object.keys(breakdownByJob).forEach((job) => {
+    const num = breakdownByJob[job]
+    text += '\n\t\t' + job + ': ' + num + ' (' + fmtPercentage(num, total) + ')\n'
+  })
+
+  return text
+}
+
+function parseNumFlakes(text, regex) {
+  return (text.match(regex) || [])
+    .map((str) => str.replace(/[^0-9]+/, ''))
+    .reduce((acc, x) => acc + Number(x), 0)
+}
+
+// This is used only by the flakey-test-summary job added to the end of the workflow
+function fmtWorkflowSummary(foundFlakes, skippedFlakes, totalFlakes) {
+  let summary = '\n_____FlakeTracker Workflow Summary_____\n'
+
+  const total = sumVals(totalFlakes)
+  const found = sumVals(foundFlakes)
+  const skipped = sumVals(skippedFlakes)
+
+  summary +=
+    '\nTotal flakey tests in this workflow: ' +
+    total +
+    ' ' +
+    '(discovered: ' +
+    found +
+    ', skipped: ' +
+    skipped +
+    ')\n'
+
+  if (total) {
+    summary += '\nBreakdown of all flakey tests:\n' + fmtBreakdown(totalFlakes, total)
+    if (found) {
+      summary += '\nBreakdown of new flakey tests:\n' + fmtBreakdown(foundFlakes, found)
+    }
+    if (skipped) {
+      summary += '\nBreakdown of skipped flakey tests:\n' + fmtBreakdown(skippedFlakes, skipped)
+    }
+  }
+
+  return summary
+}
+
 function getRandomSuccessImage() {
   const fmtImage = (url) => {
     return {
@@ -217,6 +296,7 @@ module.exports = {
   fmtFlakeIssue: fmtFlakeIssue,
   fmtSummary: fmtSummary,
   fmtTestTitles: fmtTestTitles,
+  fmtWorkflowSummary: fmtWorkflowSummary,
   getConclusion: getConclusion,
   getPackageName: getPackageName,
   getPullNumber: getPullNumber,
@@ -228,6 +308,7 @@ module.exports = {
   parseFirstErrFromFlakeBody: parseFirstErrFromFlakeBody,
   parseFirstLineOfStack: parseFirstLineOfStack,
   parseMandatoryTestIssuesFromPullBody: parseMandatoryTestIssuesFromPullBody,
+  parseNumFlakes: parseNumFlakes,
   parsePathFromStack: parsePathFromStack,
   parseTestIdFromFlakeTitle: parseTestIdFromFlakeTitle,
   statuses: statuses,

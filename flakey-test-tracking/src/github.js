@@ -69,6 +69,7 @@ class GitHub {
       }
     }
     console.log('\nSending flake tracker results to GitHub...\n')
+    // This is intentionally not atomic. That is, we don't mind if a flakey test is only partly reported.
     return Promise.all(promises)
   }
 
@@ -150,6 +151,11 @@ class GitHub {
         ...defaults,
         issue_number: issue.number,
         state: 'closed',
+        body:
+          'FlakeTracker closed this issue after PR ' +
+          process.env.CIRCLE_PULL_REQUEST +
+          '\n\n' +
+          issue.body,
       })
     console.log('\nClosing obsolete issue ' + issue.number + '...')
     const errMsg = 'Failed to close obsolete issue.'
@@ -197,18 +203,24 @@ class GitHub {
       })
 
     let errMsg = 'Failed to list check suites.'
-    let res = (await this.safeExec(fn, errMsg)).data
+    const res = (await this.safeExec(fn, errMsg)).data
     const numCheckSuites = res.total_count
 
-    let opts
+    // If a check suite has not yet been created by the FlakeTracker app, then no
+    // flakiness has been detected in the earlier jobs.
+    let opts = {
+      ...optsBase,
+      conclusion: 'success',
+      output: {
+        title: title,
+        summary: utils.fmtSummary([], [], 0),
+        images: [utils.getRandomSuccessImage()],
+      },
+    }
 
     if (numCheckSuites) {
-      //TODO(Alec)
-
       // There should only be one check suite for the FlakeTracker app
       const checkSuite = res.check_suites[0]
-
-      console.log(JSON.stringify(checkSuite))
 
       fn = () =>
         this.rest.paginate(this.rest.checks.listForSuite, {
@@ -217,60 +229,38 @@ class GitHub {
         })
 
       errMsg = 'Failed to get check runs in suite.'
-      res = await this.safeExec(fn, errMsg)
 
-      console.log(JSON.stringify(res))
+      const checkRuns = await this.safeExec(fn, errMsg)
 
-      const checkRuns = res.check_runs
-
-      const foundFlakes = {}
-      const skippedFlakes = {}
-      const totalFlakes = {}
-
-      checkRuns
-        .map((checkRun) => checkRun.output.text)
-        .forEach((text) => {
-          let skipped = 0
-          let found = 0
-          text
-            .match(/[0-9]+\sflakey/)
-            .map((s) => s.replace(/^[0-9]+/, ''))
-            .forEach((n) => (skipped += Number(n)))
-          text
-            .match(/[0-9]+\snew\sflakey/)
-            .map((s) => s.replace(/^[0-9]+/, ''))
-            .forEach((n) => (found += Number(n)))
-          skippedFlakes[checkRun.name] = skipped
-          foundFlakes[checkRun.name] = found
-          totalFlakes[checkRun.name] = skipped + found
+      // If there exists a check run in the suite that is not just reporting obsolete issues,
+      // then add summary check run with breakdown of flakey tests across the workflow.
+      if (checkRuns.some((checkRun) => !checkRun.output.title.includes('Obsolete'))) {
+        // Get breakdowns by test suite (keys are `jobName -> packageName`)
+        const foundFlakes = {}
+        const skippedFlakes = {}
+        const totalFlakes = {}
+        checkRuns.forEach((checkRun) => {
+          const name = checkRun.name.slice(checkRun.name.search(/[a-zA-Z]/)) // remove emoji prefix if any
+          const skipped = utils.parseNumFlakes(checkRun.output.text, /[0-9]+\sflakey/)
+          const found = utils.parseNumFlakes(checkRun.output.text, /[0-9]+\snew\sflakey/)
+          if (skipped) skippedFlakes[name] = skipped
+          if (found) foundFlakes[name] = found
+          if (found || skipped) totalFlakes[name] = skipped + found
         })
 
-      opts = {
-        ...optsBase,
-        conclusion: 'neutral',
-        output: {
-          title: title,
-          summary: utils.fmtSummary(Object.keys(foundFlakes), Object.keys(skippedFlakes), 0),
-          text:
-            JSON.stringify(totalFlakes) +
-            '\n\n' +
-            JSON.stringify(foundFlakes) +
-            '\n\n' +
-            JSON.stringify(skippedFlakes) +
-            '\n\n',
-        },
-      }
-    } else {
-      // If a check suite has not yet been created by the FlakeTracker app, then no
-      // flakiness has been detected in the earlier jobs.
-      opts = {
-        ...optsBase,
-        conclusion: 'success',
-        output: {
-          title: title,
-          summary: utils.fmtSummary([], [], 0),
-          images: [utils.getRandomSuccessImage()],
-        },
+        const text = utils.fmtWorkflowSummary(foundFlakes, skippedFlakes, totalFlakes)
+
+        console.log(text)
+
+        opts = {
+          ...optsBase,
+          conclusion: 'neutral',
+          output: {
+            title: title,
+            summary: utils.fmtSummary(Object.keys(foundFlakes), Object.keys(skippedFlakes), 0),
+            text: text,
+          },
+        }
       }
     }
 
@@ -309,7 +299,7 @@ class GitHub {
 
     let name = utils.getTestSuiteTitles().join(' -> ')
     let conclusionToDisplay = conclusion
-    if (!config.newflakesShouldFailCheckSuite && conclusion !== 'success') {
+    if (!config.newFlakesShouldFailCheckSuite && conclusion !== 'success') {
       name = utils.emojis[conclusion] + ' ' + name
       conclusionToDisplay = 'neutral'
     }
