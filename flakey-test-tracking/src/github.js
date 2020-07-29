@@ -131,9 +131,7 @@ class GitHub {
   async handleObsoleteIssues(obsoleteIssues) {
     if (!process.env.CIRCLECI) return
     const promises = [this.addObsoleteIssuesCheck(obsoleteIssues)]
-    //if (process.env.CIRCLE_BRANCH === 'master') {
-    if (true) {
-      //TODO(Alec)
+    if (process.env.CIRCLE_BRANCH === 'master') {
       promises.push(this.closeIssues(obsoleteIssues))
     }
     return Promise.all(promises)
