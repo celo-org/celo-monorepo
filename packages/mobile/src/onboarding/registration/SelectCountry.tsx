@@ -7,7 +7,9 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FlatList, StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Namespaces } from 'src/i18n'
+import i18n, { Namespaces } from 'src/i18n'
+import { headerWithCloseButton } from 'src/navigator/Headers.v2'
+import { modalScreenOptions } from 'src/navigator/Navigator'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import SelectCountryItem from 'src/onboarding/registration/SelectCountryItem'
@@ -15,6 +17,13 @@ import SelectCountryItem from 'src/onboarding/registration/SelectCountryItem'
 const keyExtractor = (item: LocalizedCountry) => item.alpha2
 
 type Props = StackScreenProps<StackParamList, Screens.SelectCountry>
+
+export const selectCountryNavOptions = (navOptions: Props) => ({
+  ...modalScreenOptions(navOptions),
+  ...headerWithCloseButton,
+  headerTitle: i18n.t('onboarding:selectCountryCode'),
+  headerTransparent: false,
+})
 
 export default function SelectCountry({ navigation, route }: Props) {
   const { countries, selectedCountryCodeAlpha2 } = route.params

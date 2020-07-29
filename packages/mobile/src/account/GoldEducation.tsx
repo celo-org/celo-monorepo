@@ -1,4 +1,5 @@
 import { BtnTypes } from '@celo/react-components/components/Button.v2'
+import { TransitionPresets } from '@react-navigation/stack'
 import React, { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
@@ -8,9 +9,15 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setEducationCompleted } from 'src/goldToken/actions'
 import { Namespaces } from 'src/i18n'
 import { celoEducation1, celoEducation2, celoEducation3, celoEducation4 } from 'src/images/Images'
+import { noHeader } from 'src/navigator/Headers.v2'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import useSelector from 'src/redux/useSelector'
+
+export const goldEducationNavOptions = {
+  ...noHeader,
+  ...TransitionPresets.ModalTransition,
+}
 
 export default function GoldEducation() {
   const { t } = useTranslation(Namespaces.global)

@@ -1,5 +1,5 @@
 import { BtnTypes } from '@celo/react-components/components/Button.v2'
-import { StackScreenProps } from '@react-navigation/stack'
+import { StackScreenProps, TransitionPresets } from '@react-navigation/stack'
 import React, { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import Education, { EducationTopic, EmbeddedNavBar } from 'src/account/Education'
@@ -7,11 +7,17 @@ import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { Namespaces } from 'src/i18n'
 import { accountKey1, accountKey2, accountKey3, accountKey4 } from 'src/images/Images'
+import { noHeader } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 
 type Props = StackScreenProps<StackParamList, Screens.AccountKeyEducation>
+
+export const accountKeyEducationNavOptions = {
+  ...noHeader,
+  ...TransitionPresets.ModalTransition,
+}
 
 export default function AccountKeyEducation(props: Props) {
   function onComplete() {

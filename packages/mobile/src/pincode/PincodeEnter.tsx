@@ -3,7 +3,7 @@
  * when we need to fetch a PIN from a user.
  */
 import colors from '@celo/react-components/styles/colors'
-import { StackScreenProps } from '@react-navigation/stack'
+import { StackCardInterpolationProps, StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
@@ -11,6 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { Namespaces, withTranslation } from 'src/i18n'
+import { headerWithBackButton } from 'src/navigator/Headers.v2'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { checkPin } from 'src/pincode/authentication'
@@ -28,6 +29,16 @@ interface StateProps {
 }
 
 type Props = StateProps & WithTranslation & StackScreenProps<StackParamList, Screens.PincodeEnter>
+
+export const pincodeEnterNavOptions = {
+  ...headerWithBackButton,
+  gestureEnabled: false,
+  cardStyleInterpolator: ({ current }: StackCardInterpolationProps) => ({
+    containerStyle: {
+      opacity: current.progress,
+    },
+  }),
+}
 
 class PincodeEnter extends React.Component<Props, State> {
   state = {

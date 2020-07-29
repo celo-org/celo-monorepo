@@ -1,11 +1,11 @@
 import colors from '@celo/react-components/styles/colors.v2'
 import { RouteProp } from '@react-navigation/core'
-import { createStackNavigator, TransitionPresets } from '@react-navigation/stack'
+import { createStackNavigator, StackScreenProps, TransitionPresets } from '@react-navigation/stack'
 import * as React from 'react'
 import { Platform } from 'react-native'
 import SplashScreen from 'react-native-splash-screen'
-import AccountKeyEducation from 'src/account/AccountKeyEducation'
-import GoldEducation from 'src/account/GoldEducation'
+import AccountKeyEducation, { accountKeyEducationNavOptions } from 'src/account/AccountKeyEducation'
+import GoldEducation, { goldEducationNavOptions } from 'src/account/GoldEducation'
 import InviteReview from 'src/account/InviteReview'
 import Licenses from 'src/account/Licenses'
 import Profile from 'src/account/Profile'
@@ -53,21 +53,22 @@ import {
   HeaderTitleWithSubtitle,
   headerWithBackButton,
   headerWithCancelButton,
-  headerWithCloseButton,
   noHeader,
   noHeaderGestureDisabled,
   nuxNavigationOptions,
 } from 'src/navigator/Headers.v2'
 import { navigateBack, navigateToExchangeHome } from 'src/navigator/NavigationService'
-import QRNavigator from 'src/navigator/QRNavigator'
+import QRNavigator, { qrNavigatorNavOptions } from 'src/navigator/QRNavigator'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
 import ImportContactsScreen from 'src/onboarding/contacts/ImportContactsScreen'
 import OnboardingEducationScreen from 'src/onboarding/education/OnboardingEducationScreen'
 import JoinCelo from 'src/onboarding/registration/JoinCelo'
-import RegulatoryTerms from 'src/onboarding/registration/RegulatoryTerms'
-import SelectCountry from 'src/onboarding/registration/SelectCountry'
+import RegulatoryTerms, {
+  regulatoryTermsNavOptions,
+} from 'src/onboarding/registration/RegulatoryTerms'
+import SelectCountry, { selectCountryNavOptions } from 'src/onboarding/registration/SelectCountry'
 import OnboardingSuccessScreen from 'src/onboarding/success/OnboardingSuccessScreen'
 import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import OutgoingPaymentRequestListScreen from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
@@ -77,7 +78,7 @@ import PaymentRequestConfirmation, {
 import PaymentRequestUnavailable, {
   paymentRequestUnavailableScreenNavOptions,
 } from 'src/paymentRequest/PaymentRequestUnavailable'
-import PincodeEnter from 'src/pincode/PincodeEnter'
+import PincodeEnter, { pincodeEnterNavOptions } from 'src/pincode/PincodeEnter'
 import PincodeSet from 'src/pincode/PincodeSet'
 import { RootState } from 'src/redux/reducers'
 import { store } from 'src/redux/store'
@@ -100,6 +101,20 @@ import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
 
 const Stack = createStackNavigator<StackParamList>()
 const RootStack = createStackNavigator<StackParamList>()
+
+type NavigationOptions = StackScreenProps<StackParamList>
+
+export const modalScreenOptions = ({ route, navigation }: NavigationOptions) =>
+  Platform.select({
+    // iOS 13 modal presentation
+    ios: {
+      gestureEnabled: true,
+      cardOverlayEnabled: true,
+      headerStatusBarHeight:
+        navigation.dangerouslyGetState().routes.indexOf(route) > 0 ? 0 : undefined,
+      ...TransitionPresets.ModalPresentationIOS,
+    },
+  })
 
 const commonScreens = (Navigator: typeof Stack) => {
   return (
@@ -486,20 +501,7 @@ export function MainStackScreen() {
   )
 }
 
-type ScreenOptions = ExtractProps<typeof RootStack.Navigator>['screenOptions']
-
-const modalScreenOptions: ScreenOptions = Platform.select({
-  // iOS 13 modal presentation
-  ios: ({ route, navigation }) => ({
-    gestureEnabled: true,
-    cardOverlayEnabled: true,
-    headerStatusBarHeight:
-      navigation.dangerouslyGetState().routes.indexOf(route) > 0 ? 0 : undefined,
-    ...TransitionPresets.ModalPresentationIOS,
-  }),
-})
-
-const animatedScreens = (Navigator: typeof Stack) => (
+const modalAnimatedScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen name={Screens.Send} component={Send} options={sendScreenNavOptions} />
     <Navigator.Screen
@@ -515,50 +517,40 @@ const animatedScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen
       name={Screens.PincodeEnter}
       component={PincodeEnter}
-      options={{
-        ...headerWithBackButton,
-        gestureEnabled: false,
-        cardStyleInterpolator: ({ current }) => ({
-          containerStyle: {
-            opacity: current.progress,
-          },
-        }),
-      }}
+      options={pincodeEnterNavOptions}
     />
     <Navigator.Screen
       name={Screens.QRNavigator}
       component={QRNavigator}
-      options={{
-        ...noHeader,
-        ...TransitionPresets.ModalTransition,
-      }}
+      options={qrNavigatorNavOptions}
     />
     <Navigator.Screen
       name={Screens.RegulatoryTerms}
       component={RegulatoryTerms}
-      options={{
-        ...nuxNavigationOptions,
-        ...TransitionPresets.ModalTransition,
-      }}
+      options={regulatoryTermsNavOptions}
     />
     <Navigator.Screen
       name={Screens.GoldEducation}
       component={GoldEducation}
-      options={{
-        ...noHeader,
-        ...TransitionPresets.ModalTransition,
-      }}
+      options={goldEducationNavOptions}
     />
     <Navigator.Screen
       name={Screens.AccountKeyEducation}
       component={AccountKeyEducation}
-      options={{
-        ...noHeader,
-        ...TransitionPresets.ModalTransition,
-      }}
+      options={accountKeyEducationNavOptions}
+    />
+    <Navigator.Screen
+      name={Screens.SelectCountry}
+      component={SelectCountry}
+      options={selectCountryNavOptions}
     />
   </>
 )
+
+const mainScreenNavOptions = (navOptions: NavigationOptions) => ({
+  ...modalScreenOptions(navOptions),
+  headerShown: false,
+})
 
 function RootStackScreen() {
   return (
@@ -566,19 +558,9 @@ function RootStackScreen() {
       <RootStack.Screen
         name={Screens.Main}
         component={MainStackScreen}
-        options={{ ...modalScreenOptions, headerShown: false }}
+        options={mainScreenNavOptions}
       />
-      {animatedScreens(RootStack)}
-      <RootStack.Screen
-        name={Screens.SelectCountry}
-        component={SelectCountry}
-        options={{
-          ...modalScreenOptions,
-          ...headerWithCloseButton,
-          headerTitle: i18n.t('onboarding:selectCountryCode'),
-          headerTransparent: false,
-        }}
-      />
+      {modalAnimatedScreens(RootStack)}
     </RootStack.Navigator>
   )
 }
