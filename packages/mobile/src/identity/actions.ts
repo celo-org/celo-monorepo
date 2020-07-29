@@ -70,7 +70,7 @@ export interface ReceiveAttestationMessageAction {
   inputType: CodeInputType
 }
 
-export interface SetCompletedCodes {
+export interface SetCompletedCodesAction {
   type: Actions.SET_COMPLETED_CODES
   numComplete: number
 }
@@ -179,7 +179,7 @@ export type ActionTypes =
   | ResetVerificationAction
   | SetVerificationStatusAction
   | SetHasSeenVerificationNux
-  | SetCompletedCodes
+  | SetCompletedCodesAction
   | ReceiveAttestationMessageAction
   | InputAttestationCodeAction
   | CompleteAttestationCodeAction
@@ -234,7 +234,7 @@ export const receiveAttestationMessage = (
   inputType,
 })
 
-export const setCompletedCodes = (numComplete: number): SetCompletedCodes => ({
+export const setCompletedCodes = (numComplete: number): SetCompletedCodesAction => ({
   type: Actions.SET_COMPLETED_CODES,
   numComplete,
 })
