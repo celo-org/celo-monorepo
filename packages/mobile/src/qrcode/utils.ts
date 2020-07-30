@@ -33,19 +33,23 @@ export async function shareSVGImage(svg: SVG) {
   if (!svg) {
     return
   }
-  svg.toDataURL(async (data: string) => {
-    const path = RNFS.DocumentDirectoryPath + QRFileName
-    try {
-      await RNFS.writeFile(path, data, 'base64')
-      Share.open({
-        url: 'file://' + path,
-        type: 'image/png',
-      }).catch((err: Error) => {
-        throw err
-      })
-    } catch (e) {
-      Logger.warn(TAG, e)
-    }
+  const data = await new Promise<string>((resolve, reject) => {
+    svg.toDataURL((dataURL: string | undefined) => {
+      if (dataURL) {
+        resolve(dataURL)
+      } else {
+        // Not supposed to happen, but throw in case it does :)
+        reject(new Error('Got invalid SVG data'))
+      }
+    })
+  })
+
+  const path = RNFS.DocumentDirectoryPath + QRFileName
+  await RNFS.writeFile(path, data, 'base64')
+  return Share.open({
+    url: 'file://' + path,
+    type: 'image/png',
+    failOnCancel: false, // don't throw if user cancels share
   })
 }
 
