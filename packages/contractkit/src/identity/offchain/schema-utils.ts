@@ -10,7 +10,7 @@ class OffchainError extends Error {
   }
 }
 type SchemaErrors = OffchainError | InvalidDataError
-
+type SchemaResponse<T> = { status: 'ok'; data: T } | { status: 'error'; error: SchemaErrors }
 export class SingleSchema<T> {
   constructor(
     readonly wrapper: OffchainDataWrapper,
@@ -32,23 +32,23 @@ export const readWithSchema = async <T>(
   type: t.Type<T>,
   account: Address,
   dataPath: string
-): Promise<[T | null, SchemaErrors | null]> => {
-  const [data, err] = await wrapper.readDataFrom(account, dataPath)
-  if (err) {
-    return [null, new OffchainError(err)]
+): Promise<SchemaResponse<T>> => {
+  const resp = await wrapper.readDataFrom(account, dataPath)
+  if (resp.status === 'error') {
+    return { status: 'error', error: new OffchainError(resp.error) }
   }
   let asJson: any
   try {
-    asJson = JSON.parse(data)
+    asJson = JSON.parse(resp.data)
   } catch (error) {
-    return [null, new InvalidDataError()]
+    return { status: 'error', error: new InvalidDataError() }
   }
   const parseResult = type.decode(asJson)
   if (isLeft(parseResult)) {
-    return [null, new InvalidDataError()]
+    return { status: 'error', error: new InvalidDataError() }
   }
 
-  return [parseResult.right, null]
+  return { status: 'ok', data: parseResult.right }
 }
 
 export const writeWithSchema = async <T>(

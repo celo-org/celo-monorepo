@@ -56,10 +56,13 @@ testWithGanache('Offchain Data', (web3) => {
       const nameAccessor = new NameAccessor(wrapper)
       await nameAccessor.write({ name: testname })
 
-      const [receivedName, err] = await nameAccessor.read(writer)
-      expect(err).toEqual(null)
-      expect(receivedName).toBeDefined()
-      expect(receivedName!.name).toEqual(testname)
+      const resp = await nameAccessor.read(writer)
+
+      if (resp.status === 'ok') {
+        expect(resp.data.name).toEqual(testname)
+      } else {
+        expect(false).toBeTruthy()
+      }
     })
 
     it('cannot write with a signer that is not authorized', async () => {
@@ -121,9 +124,12 @@ testWithGanache('Offchain Data', (web3) => {
       const nameAccessor = new NameAccessor(wrapper)
       await nameAccessor.write({ name: testname })
 
-      const receivedName = await nameAccessor.read(writer)
-      expect(receivedName).toBeDefined()
-      expect(receivedName!.name).toEqual(testname)
+      const resp = await nameAccessor.read(writer)
+      if (resp.status === 'ok') {
+        expect(resp.data.name).toEqual(testname)
+      } else {
+        expect(false).toBeTruthy()
+      }
     })
   })
 })

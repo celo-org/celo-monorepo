@@ -12,13 +12,14 @@ class FetchError extends Error {}
 class InvalidSignature extends Error {}
 class NoStorageRootProvidedData extends Error {}
 export type OffchainErrors = FetchError | InvalidSignature | NoStorageRootProvidedData
+export type ReadResponse = { status: 'ok'; data: any } | { status: 'error'; error: OffchainErrors }
 
 export default class OffchainDataWrapper {
   storageWriter: StorageWriter | undefined
 
   constructor(readonly self: string, readonly kit: ContractKit) {}
 
-  async readDataFrom(account: string, dataPath: string): Promise<[any, OffchainErrors | null]> {
+  async readDataFrom(account: string, dataPath: string): Promise<ReadResponse> {
     const accounts = await this.kit.contracts.getAccounts()
     const metadataURL = await accounts.getMetadataURL(account)
     debug({ account, metadataURL })
@@ -30,15 +31,11 @@ export default class OffchainDataWrapper {
     debug({ account, storageRoots })
 
     if (storageRoots.length === 0) {
-      return [null, new NoStorageRootProvidedData()]
+      return { status: 'error', error: new NoStorageRootProvidedData() }
     }
-    const [actualData, err] = (await Promise.all(storageRoots.map((_) => _.read(dataPath))))[0]
+    const resp = (await Promise.all(storageRoots.map((_) => _.read(dataPath))))[0]
 
-    if (err) {
-      return [null, err]
-    }
-
-    return [actualData, null]
+    return resp
   }
 
   async writeDataTo(data: string, dataPath: string) {
@@ -56,10 +53,10 @@ class StorageRoot {
   constructor(readonly account: string, readonly address: string) {}
 
   // TODO: Add decryption metadata (i.e. indicates ciphertext to be decrypted/which key to use)
-  async read(dataPath: string): Promise<[any, OffchainErrors | null]> {
+  async read(dataPath: string): Promise<ReadResponse> {
     const data = await fetch(this.address + dataPath)
     if (!data.ok) {
-      return [null, new FetchError()]
+      return { status: 'error', error: new FetchError() }
     }
 
     const body = await data.text()
@@ -67,24 +64,20 @@ class StorageRoot {
     const signature = await fetch(this.address + dataPath + '.signature')
 
     if (!signature.ok) {
-      return [null, new FetchError()]
+      return { status: 'error', error: new FetchError() }
     }
 
     // TODO: Compare against registered on-chain signers or off-chain signers
     const signer = guessSigner(body, await signature.text())
 
     if (eqAddress(signer, this.account)) {
-      return [body, null]
+      return { status: 'ok', data: body }
     }
 
     // The signer might be authorized off-chain
     // TODO: Only if the signer is authorized with an on-chain key
-    const [, err] = await this.read(`/account/authorizedSigners/${toChecksumAddress(signer)}`)
+    const resp = await this.read(`/account/authorizedSigners/${toChecksumAddress(signer)}`)
 
-    if (err) {
-      return [null, err]
-    }
-
-    return [body, null]
+    return resp
   }
 }
