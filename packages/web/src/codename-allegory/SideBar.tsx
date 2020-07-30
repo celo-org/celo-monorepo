@@ -47,8 +47,8 @@ export default function SideBar({ isOpen }) {
             </LightButon>
           </View>
         </View>
-        <View style={standardStyles.elementalMarginTop}>
-          <View style={styles.line} />
+        <View style={standardStyles.elementalMargin}>
+          <View style={[styles.line, standardStyles.elementalMarginBottom]} />
           <Contributor role="Poetry" name="Gabrielle Micheletti, cLabs" />
           <Contributor role="Code & Animation" name="Aaron DeRuvo, cLabs" />
           <Contributor role="Art & Design" name="Taylor Lahey, cLabs" />
@@ -114,5 +114,6 @@ const styles = StyleSheet.create({
   line: {
     width: 26,
     height: 1,
+    backgroundColor: colors.dark,
   },
 })

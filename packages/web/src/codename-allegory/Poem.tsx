@@ -7,10 +7,14 @@ import Fade from 'react-reveal/Fade'
 export default function Poem() {
   return (
     <View style={styles.root}>
-      <H4 style={[textStyles.italic, standardStyles.elementalMarginBottom]}>As Wealth Flowers</H4>
+      <H4 style={[textStyles.italic, standardStyles.elementalMarginBottom]}>
+        <Fade fraction={0.9} bottom={true} duration={2000} delay={300} distance={'20px'}>
+          As Wealth Flowers
+        </Fade>
+      </H4>
       <Text style={fonts.p}>
         {STANZAS.map((verse, i) => (
-          <Fade key={i} bottom={true} duration={1800} delay={200} distance={'20px'}>
+          <Fade fraction={0.85} key={i} bottom={true} duration={2000} delay={100} distance={'20px'}>
             {verse}
           </Fade>
         ))}
@@ -21,9 +25,7 @@ export default function Poem() {
 
 const styles = StyleSheet.create({
   root: {
-    marginTop: 40,
-    marginBottom: 70,
-    // transform: [{translateY: - 200}]
+    transform: [{ translateY: -100 }],
   },
 })
 
