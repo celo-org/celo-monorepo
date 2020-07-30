@@ -86,6 +86,23 @@ To interact with cUSD, is the same but with a different contract:
 const stabletoken = await kit.contracts.getStableToken()
 ```
 
+If you would like to pay fees in cUSD, set the gas price manually:
+
+```ts
+const stableTokenAddress = await kit.registry.addressFor(CeloContract.StableToken)
+const gasPriceMinimumContract = await kit.contracts.getGasPriceMinimum()
+const gasPriceMinimum = await gasPriceMinimumContract.getGasPriceMinimum(stableTokenAddress)
+const gasPrice = Math.ceil(gasPriceMinimum * 1.3) // Wiggle room if gas price minimum changes before tx is sent
+contractKit.setFeeCurrency(CeloContract.StableToken) // Default to paying fees in cUSD
+
+const stableTokenContract = kit.contracts.getStableToken()
+const tx = await stableTokenContract
+  .transfer(recipient, weiTransferAmount)
+  .send({ from: myAddress, gasPrice })
+const hash = await tx.getHash()
+const receipt = await tx.waitReceipt()
+```
+
 ### Interacting with Other Contracts
 
 Apart from GoldToken and StableToken, there are many core contracts.
