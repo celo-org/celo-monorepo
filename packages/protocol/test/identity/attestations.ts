@@ -64,6 +64,7 @@ contract('Attestations', (accounts: string[]) => {
   const web3: Web3 = new Web3Class(provider)
   const phoneNumber: string = '+18005551212'
   const caller: string = accounts[0]
+  const replacementAddress: string = accounts[1]
   // Private keys of each of the 10 miners, in the same order as their addresses in 'accounts'.
   const accountPrivateKeys: string[] = [
     '0xf2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d',
@@ -981,6 +982,33 @@ contract('Attestations', (accounts: string[]) => {
       assert.lengthOf(addresses, 0)
       assert.lengthOf(completed, 0)
       assert.lengthOf(total, 0)
+    })
+  })
+
+  describe('#transferAttestationMapping()', () => {
+    beforeEach(async () => {
+      await requestAndCompleteAttestations()
+    })
+
+    it('should allow a user to change their mapped address', async () => {
+      const originalAttestationStats = await attestations.getAttestationStats(phoneHash, caller)
+      const originalUnselectedRequestions = await attestations.getUnselectedRequest(
+        phoneHash,
+        caller
+      )
+      await attestations.transferAttestationMapping(phoneHash, 0, replacementAddress)
+      const attestedAccounts = await attestations.lookupAccountsForIdentifier.call(phoneHash)
+      assert.deepEqual(attestedAccounts, [replacementAddress])
+      const newAttestationStats = await attestations.getAttestationStats(
+        phoneHash,
+        replacementAddress
+      )
+      const newUnselectedRequestions = await attestations.getUnselectedRequest(
+        phoneHash,
+        replacementAddress
+      )
+      assert.deepEqual(originalAttestationStats, newAttestationStats)
+      assert.deepEqual(originalUnselectedRequestions, newUnselectedRequestions)
     })
   })
 })
