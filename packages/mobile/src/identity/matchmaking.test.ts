@@ -18,11 +18,12 @@ import {
   mockE164NumberSalt,
 } from 'test/values'
 
-jest.mock('../web3/dataEncryptionKey.ts', () => ({
+jest.mock('../web3/dataEncryptionKey', () => ({
+  ...jest.requireActual('../web3/dataEncryptionKey'),
   isAccountUpToDate: jest.fn(() => true),
 }))
 
-describe('Fetch contact matches', () => {
+describe.only('Fetch contact matches', () => {
   const mockFetch = fetch as FetchMock
   beforeEach(() => {
     mockFetch.resetMocks()
