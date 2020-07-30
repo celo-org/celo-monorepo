@@ -406,7 +406,7 @@ contract('Exchange', (accounts: string[]) => {
   const sellFunctionNames = ['sell', 'exchange']
 
   for (const fnName of sellFunctionNames) {
-    describe(`#${name}`, () => {
+    describe(`#${fnName}`, () => {
       const user = accounts[1]
 
       // This test is run for both the `sell` and `exchange` functions
