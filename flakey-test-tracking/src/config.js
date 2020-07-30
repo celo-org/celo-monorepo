@@ -1,6 +1,7 @@
 const org = process.env.CIRCLE_PROJECT_USERNAME || 'celo-org'
 const repo = process.env.CIRCLE_PROJECT_REPONAME || 'celo-monorepo'
 const defaultNumRetries = process.env.CIRCLE_BRANCH === 'master' ? 15 : 5
+const flakeTrackerID = 71131 // This is the FlakeTracker GitHub App ID.
 
 // NOTE: Avoid editing the following constants unless you are making changes to the flake trackers' functionality.
 // This file serves mainly to distill various environment variables into easy to use booleans for the rest of the project.
@@ -53,6 +54,7 @@ const shouldReportFlakes = shouldAddCheckToPR || shouldCreateIssues
 const shouldUseGitHub = shouldSkipKnownFlakes || shouldReportFlakes
 
 module.exports = {
+  flakeTrackerID: flakeTrackerID,
   newFlakesShouldFailCheckSuite: newFlakesShouldFailCheckSuite,
   numRetries: numRetries,
   org: org,

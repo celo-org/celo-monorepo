@@ -6,9 +6,6 @@ const stripAnsi = require('strip-ansi')
 const config = require('./config')
 const utils = require('./utils')
 
-// This is the FlakeTracker GitHub App ID. Can be found at github.com -> celo-org -> app settings
-const flakeTrackerID = 71131
-
 const defaults = {
   owner: config.org,
   repo: config.repo,
@@ -34,7 +31,7 @@ class GitHub {
 
   static async build() {
     const app = new App({
-      id: flakeTrackerID,
+      id: config.flakeTrackerID,
       privateKey: process.env.FLAKE_TRACKER_SECRET.replace(/\\n/gm, '\n'),
     })
     const rest = await auth(app)
@@ -199,7 +196,7 @@ class GitHub {
       this.rest.checks.listSuitesForRef({
         ...defaults,
         ref: process.env.CIRCLE_SHA1,
-        app_id: flakeTrackerID,
+        app_id: config.flakeTrackerID,
       })
 
     let errMsg = 'Failed to list check suites.'
