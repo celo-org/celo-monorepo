@@ -402,202 +402,472 @@ contract('Exchange', (accounts: string[]) => {
     })
   })
 
-  describe('#exchange', () => {
-    const user = accounts[1]
+  // Run the following test for both these functions
+  const sellFunctionNames = ['sell', 'exchange']
 
-    describe('when exchanging gold for stable', () => {
-      const goldTokenAmount = unit.div(500).integerValue(BigNumber.ROUND_FLOOR)
-      const expectedStableBalance = getBuyTokenAmount(
-        goldTokenAmount,
-        initialGoldBucket,
-        initialStableBucket
-      )
-      let oldGoldBalance: BigNumber
-      let oldReserveGoldBalance: BigNumber
-      let oldTotalSupply: BigNumber
-      beforeEach(async () => {
-        oldTotalSupply = await stableToken.totalSupply()
-        oldReserveGoldBalance = await goldToken.balanceOf(mockReserve.address)
-        await goldToken.approve(exchange.address, goldTokenAmount, { from: user })
-        oldGoldBalance = await goldToken.balanceOf(user)
+  for (const fnName of sellFunctionNames) {
+    describe(`#${name}`, () => {
+      const user = accounts[1]
+
+      // This test is run for both the `sell` and `exchange` functions
+      let fn: ExchangeInstance['sell'] | ExchangeInstance['exchange']
+      beforeEach(() => {
+        fn = exchange[fnName]
       })
 
-      it(`should increase the user's stable balance`, async () => {
-        await exchange.sell(
+      describe('when selling gold for stable', () => {
+        const goldTokenAmount = unit.div(500).integerValue(BigNumber.ROUND_FLOOR)
+        const expectedStableBalance = getBuyTokenAmount(
           goldTokenAmount,
-          expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
-          true,
-          {
-            from: user,
-          }
+          initialGoldBucket,
+          initialStableBucket
         )
-        const newStableBalance = await stableToken.balanceOf(user)
-        assertEqualBN(newStableBalance, expectedStableBalance)
-      })
-
-      it(`should decrease the user's gold balance`, async () => {
-        await exchange.sell(
-          goldTokenAmount,
-          expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
-          true,
-          {
-            from: user,
-          }
-        )
-        const actualGoldBalance = await goldToken.balanceOf(user)
-        let expectedGoldBalance = oldGoldBalance.minus(goldTokenAmount)
-        const block = await web3.eth.getBlock('latest')
-        if (isSameAddress(block.miner, user)) {
-          const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
-          expectedGoldBalance = expectedGoldBalance.plus(blockReward)
-        }
-        assertEqualBN(actualGoldBalance, expectedGoldBalance)
-      })
-
-      it(`should remove the user's allowance`, async () => {
-        await exchange.sell(
-          goldTokenAmount,
-          expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
-          true,
-          {
-            from: user,
-          }
-        )
-        const allowance = await goldToken.allowance(user, exchange.address)
-        assert.isTrue(allowance.isZero())
-      })
-
-      it(`should increase the Reserve's balance`, async () => {
-        await exchange.sell(
-          goldTokenAmount,
-          expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
-          true,
-          {
-            from: user,
-          }
-        )
-        const newReserveGoldBalance = await goldToken.balanceOf(mockReserve.address)
-        assert.isTrue(newReserveGoldBalance.eq(oldReserveGoldBalance.plus(goldTokenAmount)))
-      })
-
-      it('should increase the total StableToken supply', async () => {
-        await exchange.sell(
-          goldTokenAmount,
-          expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
-          true,
-          {
-            from: user,
-          }
-        )
-        const newTotalSupply = await stableToken.totalSupply()
-        assert.isTrue(newTotalSupply.eq(oldTotalSupply.plus(expectedStableBalance)))
-      })
-
-      it('should affect token supplies', async () => {
-        await exchange.sell(
-          goldTokenAmount,
-          expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
-          true,
-          {
-            from: user,
-          }
-        )
-        const [mintableStable, tradeableGold] = await exchange.getBuyAndSellBuckets(true)
-        const expectedTradeableGold = initialGoldBucket.plus(goldTokenAmount)
-        const expectedMintableStable = initialStableBucket.minus(expectedStableBalance)
-        assertEqualBN(tradeableGold, expectedTradeableGold)
-        assertEqualBN(mintableStable, expectedMintableStable)
-      })
-
-      it('should emit an Exchanged event', async () => {
-        const exchangeTx = await exchange.sell(
-          goldTokenAmount,
-          expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
-          true,
-          {
-            from: user,
-          }
-        )
-        const exchangeLogs = exchangeTx.logs.filter((x) => x.event === 'Exchanged')
-        assert(exchangeLogs.length === 1, 'Did not receive event')
-
-        const log = exchangeLogs[0]
-        assertLogMatches2(log, {
-          event: 'Exchanged',
-          args: {
-            exchanger: user,
-            sellAmount: goldTokenAmount,
-            buyAmount: expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
-            soldGold: true,
-          },
+        let oldGoldBalance: BigNumber
+        let oldReserveGoldBalance: BigNumber
+        let oldTotalSupply: BigNumber
+        beforeEach(async () => {
+          oldTotalSupply = await stableToken.totalSupply()
+          oldReserveGoldBalance = await goldToken.balanceOf(mockReserve.address)
+          await goldToken.approve(exchange.address, goldTokenAmount, { from: user })
+          oldGoldBalance = await goldToken.balanceOf(user)
         })
-      })
 
-      it('should revert without sufficient approvals', async () => {
-        await assertRevert(
-          exchange.sell(
-            goldTokenAmount.plus(1),
+        it(`should increase the user's stable balance`, async () => {
+          await fn(
+            goldTokenAmount,
             expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
             true,
             {
               from: user,
             }
           )
-        )
-      })
+          const newStableBalance = await stableToken.balanceOf(user)
+          assertEqualBN(newStableBalance, expectedStableBalance)
+        })
 
-      it('should revert if the minBuyAmount could not be satisfied', async () => {
-        await assertRevert(
-          exchange.sell(
+        it(`should decrease the user's gold balance`, async () => {
+          await fn(
             goldTokenAmount,
-            expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR).plus(1),
+            expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
             true,
             {
               from: user,
             }
           )
-        )
-      })
-
-      describe('when buckets need updating', () => {
-        // fundReserve() will double the amount in the gold bucket
-        const updatedGoldBucket = initialGoldBucket.times(2)
-
-        const updatedStableBucket = updatedGoldBucket
-          .times(stableAmountForRate)
-          .div(goldAmountForRate)
-
-        beforeEach(async () => {
-          await fundReserve()
-          await timeTravel(updateFrequency, web3)
-          await mockSortedOracles.setMedianTimestampToNow(stableToken.address)
+          const actualGoldBalance = await goldToken.balanceOf(user)
+          let expectedGoldBalance = oldGoldBalance.minus(goldTokenAmount)
+          const block = await web3.eth.getBlock('latest')
+          if (isSameAddress(block.miner, user)) {
+            const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
+            expectedGoldBalance = expectedGoldBalance.plus(blockReward)
+          }
+          assertEqualBN(actualGoldBalance, expectedGoldBalance)
         })
 
-        describe('when the oldest oracle report is not expired', () => {
-          const expectedStableAmount = getBuyTokenAmount(
+        it(`should remove the user's allowance`, async () => {
+          await fn(
             goldTokenAmount,
-            updatedGoldBucket,
-            updatedStableBucket
+            expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
+            true,
+            {
+              from: user,
+            }
           )
+          const allowance = await goldToken.allowance(user, exchange.address)
+          assert.isTrue(allowance.isZero())
+        })
 
-          it('the exchange should succeed', async () => {
-            await exchange.sell(
-              goldTokenAmount,
-              expectedStableAmount.integerValue(BigNumber.ROUND_FLOOR),
+        it(`should increase the Reserve's balance`, async () => {
+          await fn(
+            goldTokenAmount,
+            expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
+            true,
+            {
+              from: user,
+            }
+          )
+          const newReserveGoldBalance = await goldToken.balanceOf(mockReserve.address)
+          assert.isTrue(newReserveGoldBalance.eq(oldReserveGoldBalance.plus(goldTokenAmount)))
+        })
+
+        it('should increase the total StableToken supply', async () => {
+          await fn(
+            goldTokenAmount,
+            expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
+            true,
+            {
+              from: user,
+            }
+          )
+          const newTotalSupply = await stableToken.totalSupply()
+          assert.isTrue(newTotalSupply.eq(oldTotalSupply.plus(expectedStableBalance)))
+        })
+
+        it('should affect token supplies', async () => {
+          await fn(
+            goldTokenAmount,
+            expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
+            true,
+            {
+              from: user,
+            }
+          )
+          const [mintableStable, tradeableGold] = await exchange.getBuyAndSellBuckets(true)
+          const expectedTradeableGold = initialGoldBucket.plus(goldTokenAmount)
+          const expectedMintableStable = initialStableBucket.minus(expectedStableBalance)
+          assertEqualBN(tradeableGold, expectedTradeableGold)
+          assertEqualBN(mintableStable, expectedMintableStable)
+        })
+
+        it('should emit an Exchanged event', async () => {
+          const exchangeTx = await fn(
+            goldTokenAmount,
+            expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
+            true,
+            {
+              from: user,
+            }
+          )
+          const exchangeLogs = exchangeTx.logs.filter((x) => x.event === 'Exchanged')
+          assert(exchangeLogs.length === 1, 'Did not receive event')
+
+          const log = exchangeLogs[0]
+          assertLogMatches2(log, {
+            event: 'Exchanged',
+            args: {
+              exchanger: user,
+              sellAmount: goldTokenAmount,
+              buyAmount: expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
+              soldGold: true,
+            },
+          })
+        })
+
+        it('should revert without sufficient approvals', async () => {
+          await assertRevert(
+            fn(
+              goldTokenAmount.plus(1),
+              expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
               true,
               {
                 from: user,
               }
             )
-            const newStableBalance = await stableToken.balanceOf(user)
-            assertEqualBN(newStableBalance, expectedStableAmount)
+          )
+        })
+
+        it('should revert if the minBuyAmount could not be satisfied', async () => {
+          await assertRevert(
+            fn(
+              goldTokenAmount,
+              expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR).plus(1),
+              true,
+              {
+                from: user,
+              }
+            )
+          )
+        })
+
+        describe('when buckets need updating', () => {
+          // fundReserve() will double the amount in the gold bucket
+          const updatedGoldBucket = initialGoldBucket.times(2)
+
+          const updatedStableBucket = updatedGoldBucket
+            .times(stableAmountForRate)
+            .div(goldAmountForRate)
+
+          beforeEach(async () => {
+            await fundReserve()
+            await timeTravel(updateFrequency, web3)
+            await mockSortedOracles.setMedianTimestampToNow(stableToken.address)
+          })
+
+          describe('when the oldest oracle report is not expired', () => {
+            const expectedStableAmount = getBuyTokenAmount(
+              goldTokenAmount,
+              updatedGoldBucket,
+              updatedStableBucket
+            )
+
+            it('the exchange should succeed', async () => {
+              await fn(
+                goldTokenAmount,
+                expectedStableAmount.integerValue(BigNumber.ROUND_FLOOR),
+                true,
+                {
+                  from: user,
+                }
+              )
+              const newStableBalance = await stableToken.balanceOf(user)
+              assertEqualBN(newStableBalance, expectedStableAmount)
+            })
+
+            it('should update the buckets', async () => {
+              await fn(
+                goldTokenAmount,
+                expectedStableAmount.integerValue(BigNumber.ROUND_FLOOR),
+                true,
+                {
+                  from: user,
+                }
+              )
+              const newGoldBucket = await exchange.goldBucket()
+              const newStableBucket = await exchange.stableBucket()
+
+              // The new value should be the updatedGoldBucket value, which is 2x the
+              // initial amount after fundReserve() is called, plus the amount of gold
+              // that was paid in the exchange.
+              assertEqualBN(newGoldBucket, updatedGoldBucket.plus(goldTokenAmount))
+
+              // The new value should be the updatedStableBucket (derived from the new
+              // Gold Bucket value), minus the amount purchased during the exchange
+              assertEqualBN(newStableBucket, updatedStableBucket.minus(expectedStableAmount))
+            })
+          })
+
+          describe('when the oldest oracle report is expired', () => {
+            const expectedStableAmount = getBuyTokenAmount(
+              goldTokenAmount,
+              initialGoldBucket,
+              initialStableBucket
+            )
+
+            beforeEach(async () => {
+              await mockSortedOracles.setOldestReportExpired(stableToken.address)
+            })
+
+            it('the exchange should succeed', async () => {
+              await fn(
+                goldTokenAmount,
+                expectedStableAmount.integerValue(BigNumber.ROUND_FLOOR),
+                true,
+                {
+                  from: user,
+                }
+              )
+              const newStableBalance = await stableToken.balanceOf(user)
+              assertEqualBN(newStableBalance, expectedStableAmount)
+            })
+
+            it('should not update the buckets', async () => {
+              await fn(
+                goldTokenAmount,
+                expectedStableAmount.integerValue(BigNumber.ROUND_FLOOR),
+                true,
+                {
+                  from: user,
+                }
+              )
+              const newGoldBucket = await exchange.goldBucket()
+              const newStableBucket = await exchange.stableBucket()
+
+              // The new value should be the initialGoldBucket value plus the goldTokenAmount.
+              assertEqualBN(newGoldBucket, initialGoldBucket.plus(goldTokenAmount))
+
+              // The new value should be the initialStableBucket minus the amount purchased during the exchange
+              assertEqualBN(newStableBucket, initialStableBucket.minus(expectedStableAmount))
+            })
+          })
+        })
+      })
+
+      describe('when selling stable for gold', () => {
+        const stableTokenBalance = unit.div(1000).integerValue(BigNumber.ROUND_FLOOR)
+        const expectedGoldBalanceIncrease = getBuyTokenAmount(
+          stableTokenBalance,
+          initialStableBucket,
+          initialGoldBucket
+        )
+        let oldGoldBalance: BigNumber
+        let oldReserveGoldBalance: BigNumber
+        beforeEach(async () => {
+          await registry.setAddressFor(CeloContractName.Exchange, owner)
+          await stableToken.mint(user, stableTokenBalance)
+          await registry.setAddressFor(CeloContractName.Exchange, exchange.address)
+
+          oldReserveGoldBalance = await goldToken.balanceOf(mockReserve.address)
+          await stableToken.approve(exchange.address, stableTokenBalance, { from: user })
+          oldGoldBalance = await goldToken.balanceOf(user)
+        })
+
+        it(`should decrease the user's stable balance`, async () => {
+          await fn(
+            stableTokenBalance,
+            expectedGoldBalanceIncrease.integerValue(BigNumber.ROUND_FLOOR),
+            false,
+            {
+              from: user,
+            }
+          )
+          const newStableBalance = await stableToken.balanceOf(user)
+          assert.isTrue(newStableBalance.isZero())
+        })
+
+        it(`should increase the user's gold balance`, async () => {
+          await fn(
+            stableTokenBalance,
+            expectedGoldBalanceIncrease.integerValue(BigNumber.ROUND_FLOOR),
+            false,
+            {
+              from: user,
+            }
+          )
+          const actualGoldBalance = await goldToken.balanceOf(user)
+          let expectedGoldBalance = oldGoldBalance.plus(expectedGoldBalanceIncrease)
+          const block = await web3.eth.getBlock('latest')
+          if (isSameAddress(block.miner, user)) {
+            const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
+            expectedGoldBalance = expectedGoldBalance.plus(blockReward)
+          }
+          assert.isTrue(actualGoldBalance.eq(expectedGoldBalance))
+        })
+
+        it(`should remove the user's allowance`, async () => {
+          await fn(
+            stableTokenBalance,
+            expectedGoldBalanceIncrease.integerValue(BigNumber.ROUND_FLOOR),
+            false,
+            {
+              from: user,
+            }
+          )
+          const allowance = await goldToken.allowance(user, exchange.address)
+          assert.isTrue(allowance.isZero())
+        })
+
+        it(`should decrease the Reserve's balance`, async () => {
+          await fn(
+            stableTokenBalance,
+            expectedGoldBalanceIncrease.integerValue(BigNumber.ROUND_FLOOR),
+            false,
+            {
+              from: user,
+            }
+          )
+          const newReserveGoldBalance = await goldToken.balanceOf(mockReserve.address)
+          assert.isTrue(
+            newReserveGoldBalance.eq(oldReserveGoldBalance.minus(expectedGoldBalanceIncrease))
+          )
+        })
+
+        it('should decrease the total StableToken supply', async () => {
+          await fn(
+            stableTokenBalance,
+            expectedGoldBalanceIncrease.integerValue(BigNumber.ROUND_FLOOR),
+            false,
+            {
+              from: user,
+            }
+          )
+          const newTotalSupply = await stableToken.totalSupply()
+          assert.isTrue(newTotalSupply.isZero())
+        })
+
+        it('should affect token supplies', async () => {
+          await fn(
+            stableTokenBalance,
+            expectedGoldBalanceIncrease.integerValue(BigNumber.ROUND_FLOOR),
+            false,
+            {
+              from: user,
+            }
+          )
+          const [tradeableGold, mintableStable] = await exchange.getBuyAndSellBuckets(false)
+          const expectedMintableStable = initialStableBucket.plus(stableTokenBalance)
+          const expectedTradeableGold = initialGoldBucket.minus(expectedGoldBalanceIncrease)
+          assert.isTrue(mintableStable.eq(expectedMintableStable))
+          assert.isTrue(tradeableGold.eq(expectedTradeableGold))
+        })
+
+        it('should emit an Exchanged event', async () => {
+          const exchangeTx = await fn(
+            stableTokenBalance,
+            expectedGoldBalanceIncrease.integerValue(BigNumber.ROUND_FLOOR),
+            false,
+            {
+              from: user,
+            }
+          )
+          const exchangeLogs = exchangeTx.logs.filter((x) => x.event === 'Exchanged')
+          assert(exchangeLogs.length === 1, 'Did not receive event')
+
+          const log = exchangeLogs[0]
+          assertLogMatches2(log, {
+            event: 'Exchanged',
+            args: {
+              exchanger: user,
+              sellAmount: stableTokenBalance,
+              buyAmount: expectedGoldBalanceIncrease,
+              soldGold: false,
+            },
+          })
+        })
+
+        it('should revert without sufficient approvals', async () => {
+          await assertRevert(
+            fn(
+              stableTokenBalance.plus(1),
+              expectedGoldBalanceIncrease.integerValue(BigNumber.ROUND_FLOOR),
+              false,
+              {
+                from: user,
+              }
+            )
+          )
+        })
+
+        it('should revert if the minBuyAmount could not be satisfied', async () => {
+          await assertRevert(
+            fn(
+              stableTokenBalance,
+              expectedGoldBalanceIncrease.integerValue(BigNumber.ROUND_FLOOR).plus(1),
+              false,
+              {
+                from: user,
+              }
+            )
+          )
+        })
+
+        describe('when buckets need updating', () => {
+          // fundReserve() will double the amount in the gold bucket
+          const updatedGoldBucket = initialGoldBucket.times(2)
+
+          const updatedStableBucket = updatedGoldBucket
+            .times(stableAmountForRate)
+            .div(goldAmountForRate)
+
+          const expectedGoldAmount = getBuyTokenAmount(
+            stableTokenBalance,
+            updatedStableBucket,
+            updatedGoldBucket
+          )
+
+          beforeEach(async () => {
+            await fundReserve()
+            await timeTravel(updateFrequency, web3)
+            await mockSortedOracles.setMedianTimestampToNow(stableToken.address)
+          })
+
+          it('the exchange should succeed', async () => {
+            await fn(
+              stableTokenBalance,
+              expectedGoldAmount.integerValue(BigNumber.ROUND_FLOOR),
+              false,
+              {
+                from: user,
+              }
+            )
+            const newGoldBalance = await goldToken.balanceOf(user)
+            assertEqualBN(newGoldBalance, oldGoldBalance.plus(expectedGoldAmount))
           })
 
           it('should update the buckets', async () => {
-            await exchange.sell(
-              goldTokenAmount,
-              expectedStableAmount.integerValue(BigNumber.ROUND_FLOOR),
-              true,
+            await fn(
+              stableTokenBalance,
+              expectedGoldAmount.integerValue(BigNumber.ROUND_FLOOR),
+              false,
               {
                 from: user,
               }
@@ -608,309 +878,50 @@ contract('Exchange', (accounts: string[]) => {
             // The new value should be the updatedGoldBucket value, which is 2x the
             // initial amount after fundReserve() is called, plus the amount of gold
             // that was paid in the exchange.
-            assertEqualBN(newGoldBucket, updatedGoldBucket.plus(goldTokenAmount))
+            assertEqualBN(newGoldBucket, updatedGoldBucket.minus(expectedGoldAmount))
 
             // The new value should be the updatedStableBucket (derived from the new
             // Gold Bucket value), minus the amount purchased during the exchange
-            assertEqualBN(newStableBucket, updatedStableBucket.minus(expectedStableAmount))
-          })
-        })
-
-        describe('when the oldest oracle report is expired', () => {
-          const expectedStableAmount = getBuyTokenAmount(
-            goldTokenAmount,
-            initialGoldBucket,
-            initialStableBucket
-          )
-
-          beforeEach(async () => {
-            await mockSortedOracles.setOldestReportExpired(stableToken.address)
+            assertEqualBN(newStableBucket, updatedStableBucket.plus(stableTokenBalance))
           })
 
-          it('the exchange should succeed', async () => {
-            await exchange.sell(
-              goldTokenAmount,
-              expectedStableAmount.integerValue(BigNumber.ROUND_FLOOR),
-              true,
+          it('should emit an BucketsUpdated event', async () => {
+            const exchangeTx = await fn(
+              stableTokenBalance,
+              expectedGoldAmount.integerValue(BigNumber.ROUND_FLOOR),
+              false,
               {
                 from: user,
               }
             )
-            const newStableBalance = await stableToken.balanceOf(user)
-            assertEqualBN(newStableBalance, expectedStableAmount)
-          })
 
-          it('should not update the buckets', async () => {
-            await exchange.sell(
-              goldTokenAmount,
-              expectedStableAmount.integerValue(BigNumber.ROUND_FLOOR),
-              true,
-              {
-                from: user,
-              }
-            )
-            const newGoldBucket = await exchange.goldBucket()
-            const newStableBucket = await exchange.stableBucket()
+            const exchangeLogs = exchangeTx.logs.filter((x) => x.event === 'BucketsUpdated')
+            assert(exchangeLogs.length === 1, 'Did not receive event')
 
-            // The new value should be the initialGoldBucket value plus the goldTokenAmount.
-            assertEqualBN(newGoldBucket, initialGoldBucket.plus(goldTokenAmount))
-
-            // The new value should be the initialStableBucket minus the amount purchased during the exchange
-            assertEqualBN(newStableBucket, initialStableBucket.minus(expectedStableAmount))
+            const log = exchangeLogs[0]
+            assertLogMatches2(log, {
+              event: 'BucketsUpdated',
+              args: {
+                goldBucket: updatedGoldBucket,
+                stableBucket: updatedStableBucket,
+              },
+            })
           })
         })
       })
-    })
 
-    describe('when exchanging stable for gold', () => {
-      const stableTokenBalance = unit.div(1000).integerValue(BigNumber.ROUND_FLOOR)
-      const expectedGoldBalanceIncrease = getBuyTokenAmount(
-        stableTokenBalance,
-        initialStableBucket,
-        initialGoldBucket
-      )
-      let oldGoldBalance: BigNumber
-      let oldReserveGoldBalance: BigNumber
-      beforeEach(async () => {
-        await registry.setAddressFor(CeloContractName.Exchange, owner)
-        await stableToken.mint(user, stableTokenBalance)
-        await registry.setAddressFor(CeloContractName.Exchange, exchange.address)
-
-        oldReserveGoldBalance = await goldToken.balanceOf(mockReserve.address)
-        await stableToken.approve(exchange.address, stableTokenBalance, { from: user })
-        oldGoldBalance = await goldToken.balanceOf(user)
-      })
-
-      it(`should decrease the user's stable balance`, async () => {
-        await exchange.sell(
-          stableTokenBalance,
-          expectedGoldBalanceIncrease.integerValue(BigNumber.ROUND_FLOOR),
-          false,
-          {
-            from: user,
-          }
-        )
-        const newStableBalance = await stableToken.balanceOf(user)
-        assert.isTrue(newStableBalance.isZero())
-      })
-
-      it(`should increase the user's gold balance`, async () => {
-        await exchange.sell(
-          stableTokenBalance,
-          expectedGoldBalanceIncrease.integerValue(BigNumber.ROUND_FLOOR),
-          false,
-          {
-            from: user,
-          }
-        )
-        const actualGoldBalance = await goldToken.balanceOf(user)
-        let expectedGoldBalance = oldGoldBalance.plus(expectedGoldBalanceIncrease)
-        const block = await web3.eth.getBlock('latest')
-        if (isSameAddress(block.miner, user)) {
-          const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
-          expectedGoldBalance = expectedGoldBalance.plus(blockReward)
-        }
-        assert.isTrue(actualGoldBalance.eq(expectedGoldBalance))
-      })
-
-      it(`should remove the user's allowance`, async () => {
-        await exchange.sell(
-          stableTokenBalance,
-          expectedGoldBalanceIncrease.integerValue(BigNumber.ROUND_FLOOR),
-          false,
-          {
-            from: user,
-          }
-        )
-        const allowance = await goldToken.allowance(user, exchange.address)
-        assert.isTrue(allowance.isZero())
-      })
-
-      it(`should decrease the Reserve's balance`, async () => {
-        await exchange.sell(
-          stableTokenBalance,
-          expectedGoldBalanceIncrease.integerValue(BigNumber.ROUND_FLOOR),
-          false,
-          {
-            from: user,
-          }
-        )
-        const newReserveGoldBalance = await goldToken.balanceOf(mockReserve.address)
-        assert.isTrue(
-          newReserveGoldBalance.eq(oldReserveGoldBalance.minus(expectedGoldBalanceIncrease))
-        )
-      })
-
-      it('should decrease the total StableToken supply', async () => {
-        await exchange.sell(
-          stableTokenBalance,
-          expectedGoldBalanceIncrease.integerValue(BigNumber.ROUND_FLOOR),
-          false,
-          {
-            from: user,
-          }
-        )
-        const newTotalSupply = await stableToken.totalSupply()
-        assert.isTrue(newTotalSupply.isZero())
-      })
-
-      it('should affect token supplies', async () => {
-        await exchange.sell(
-          stableTokenBalance,
-          expectedGoldBalanceIncrease.integerValue(BigNumber.ROUND_FLOOR),
-          false,
-          {
-            from: user,
-          }
-        )
-        const [tradeableGold, mintableStable] = await exchange.getBuyAndSellBuckets(false)
-        const expectedMintableStable = initialStableBucket.plus(stableTokenBalance)
-        const expectedTradeableGold = initialGoldBucket.minus(expectedGoldBalanceIncrease)
-        assert.isTrue(mintableStable.eq(expectedMintableStable))
-        assert.isTrue(tradeableGold.eq(expectedTradeableGold))
-      })
-
-      it('should emit an Exchanged event', async () => {
-        const exchangeTx = await exchange.sell(
-          stableTokenBalance,
-          expectedGoldBalanceIncrease.integerValue(BigNumber.ROUND_FLOOR),
-          false,
-          {
-            from: user,
-          }
-        )
-        const exchangeLogs = exchangeTx.logs.filter((x) => x.event === 'Exchanged')
-        assert(exchangeLogs.length === 1, 'Did not receive event')
-
-        const log = exchangeLogs[0]
-        assertLogMatches2(log, {
-          event: 'Exchanged',
-          args: {
-            exchanger: user,
-            sellAmount: stableTokenBalance,
-            buyAmount: expectedGoldBalanceIncrease,
-            soldGold: false,
-          },
-        })
-      })
-
-      it('should revert without sufficient approvals', async () => {
-        await assertRevert(
-          exchange.sell(
-            stableTokenBalance.plus(1),
-            expectedGoldBalanceIncrease.integerValue(BigNumber.ROUND_FLOOR),
-            false,
-            {
-              from: user,
-            }
-          )
-        )
-      })
-
-      it('should revert if the minBuyAmount could not be satisfied', async () => {
-        await assertRevert(
-          exchange.sell(
-            stableTokenBalance,
-            expectedGoldBalanceIncrease.integerValue(BigNumber.ROUND_FLOOR).plus(1),
-            false,
-            {
-              from: user,
-            }
-          )
-        )
-      })
-
-      describe('when buckets need updating', () => {
-        // fundReserve() will double the amount in the gold bucket
-        const updatedGoldBucket = initialGoldBucket.times(2)
-
-        const updatedStableBucket = updatedGoldBucket
-          .times(stableAmountForRate)
-          .div(goldAmountForRate)
-
-        const expectedGoldAmount = getBuyTokenAmount(
-          stableTokenBalance,
-          updatedStableBucket,
-          updatedGoldBucket
-        )
-
+      describe('when the contract is frozen', () => {
         beforeEach(async () => {
-          await fundReserve()
-          await timeTravel(updateFrequency, web3)
-          await mockSortedOracles.setMedianTimestampToNow(stableToken.address)
+          await freezer.freeze(exchange.address)
         })
 
-        it('the exchange should succeed', async () => {
-          await exchange.sell(
-            stableTokenBalance,
-            expectedGoldAmount.integerValue(BigNumber.ROUND_FLOOR),
-            false,
-            {
-              from: user,
-            }
-          )
-          const newGoldBalance = await goldToken.balanceOf(user)
-          assertEqualBN(newGoldBalance, oldGoldBalance.plus(expectedGoldAmount))
-        })
-
-        it('should update the buckets', async () => {
-          await exchange.sell(
-            stableTokenBalance,
-            expectedGoldAmount.integerValue(BigNumber.ROUND_FLOOR),
-            false,
-            {
-              from: user,
-            }
-          )
-          const newGoldBucket = await exchange.goldBucket()
-          const newStableBucket = await exchange.stableBucket()
-
-          // The new value should be the updatedGoldBucket value, which is 2x the
-          // initial amount after fundReserve() is called, plus the amount of gold
-          // that was paid in the exchange.
-          assertEqualBN(newGoldBucket, updatedGoldBucket.minus(expectedGoldAmount))
-
-          // The new value should be the updatedStableBucket (derived from the new
-          // Gold Bucket value), minus the amount purchased during the exchange
-          assertEqualBN(newStableBucket, updatedStableBucket.plus(stableTokenBalance))
-        })
-
-        it('should emit an BucketsUpdated event', async () => {
-          const exchangeTx = await exchange.sell(
-            stableTokenBalance,
-            expectedGoldAmount.integerValue(BigNumber.ROUND_FLOOR),
-            false,
-            {
-              from: user,
-            }
-          )
-
-          const exchangeLogs = exchangeTx.logs.filter((x) => x.event === 'BucketsUpdated')
-          assert(exchangeLogs.length === 1, 'Did not receive event')
-
-          const log = exchangeLogs[0]
-          assertLogMatches2(log, {
-            event: 'BucketsUpdated',
-            args: {
-              goldBucket: updatedGoldBucket,
-              stableBucket: updatedStableBucket,
-            },
-          })
+        it('should revert', async () => {
+          await goldToken.approve(exchange.address, 1000)
+          await assertRevert(fn(1000, 1, true))
         })
       })
     })
-
-    describe('when the contract is frozen', () => {
-      beforeEach(async () => {
-        await freezer.freeze(exchange.address)
-      })
-
-      it('should revert', async () => {
-        await goldToken.approve(exchange.address, 1000)
-        await assertRevert(exchange.sell(1000, 1, true))
-      })
-    })
-  })
+  }
 
   describe('#buy', () => {
     const user = accounts[1]
@@ -1056,11 +1067,11 @@ contract('Exchange', (accounts: string[]) => {
         )
       })
 
-      it('should revert if the minBuyAmount could not be satisfied', async () => {
+      it('should revert if the maxSellAmount could not be satisfied', async () => {
         await assertRevert(
           exchange.buy(
             buyStableAmount,
-            expectedGoldAmount.integerValue(BigNumber.ROUND_FLOOR).plus(1),
+            expectedGoldAmount.integerValue(BigNumber.ROUND_FLOOR).minus(1),
             false,
             {
               from: user,
@@ -1089,27 +1100,8 @@ contract('Exchange', (accounts: string[]) => {
             updatedGoldBucket,
             updatedStableBucket
           )
-          let actual: number
 
-          it(`the exchange should succeed ${expectedGoldAmount} ${initialGoldBucket} ${initialStableBucket} ${expectedGoldAmount.integerValue(
-            BigNumber.ROUND_FLOOR
-          )}`, async () => {
-            try {
-              console.log('expectedGoldAmount', expectedGoldAmount)
-              console.log('initialGoldBucket', initialGoldBucket)
-              console.log('initialStableBucket', initialStableBucket)
-              console.log(
-                'expectedGoldAmount.integerValue(BigNumber.ROUND_FLOOR)',
-                expectedGoldAmount.integerValue(BigNumber.ROUND_FLOOR)
-              )
-              console.log(
-                'actual sellAmount',
-                await exchange.getSellTokenAmount(buyStableAmount, true)
-              )
-              actual = (await exchange.getSellTokenAmount(buyStableAmount, true)).toNumber()
-            } catch (e) {
-              console.log('e', e)
-            }
+          it(`the exchange should succeed`, async () => {
             await exchange.buy(
               buyStableAmount,
               expectedGoldAmount.integerValue(BigNumber.ROUND_FLOOR),
@@ -1122,7 +1114,7 @@ contract('Exchange', (accounts: string[]) => {
             assertEqualBN(newStableBalance, buyStableAmount)
           })
 
-          it('should update the buckets ' + actual, async () => {
+          it('should update the buckets', async () => {
             await exchange.buy(
               buyStableAmount,
               expectedGoldAmount.integerValue(BigNumber.ROUND_FLOOR),
@@ -1334,11 +1326,11 @@ contract('Exchange', (accounts: string[]) => {
         )
       })
 
-      it('should revert if the minBuyAmount could not be satisfied', async () => {
+      it('should revert if the maxSellAmount could not be satisfied', async () => {
         await assertRevert(
           exchange.buy(
             buyGoldAmount,
-            expectedStableAmount.integerValue(BigNumber.ROUND_FLOOR).plus(1),
+            expectedStableAmount.integerValue(BigNumber.ROUND_FLOOR).minus(1),
             true,
             {
               from: user,

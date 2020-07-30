@@ -101,7 +101,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
   }
 
   /**
-   * @dev Exchanges sellAmount of sellToken in exchange for at least minBuyAmount of buyToken
+   * @dev Deprecated. Exchanges sellAmount of sellToken in exchange for at least minBuyAmount of buyToken
    * Requires the sellAmount to have been approved to the exchange
    * @param sellAmount The amount of sellToken the user is selling to the exchange
    * @param minBuyAmount The minimum amount of buyToken the user has to receive for this
@@ -146,13 +146,13 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
    * @dev Exchanges buyAmount of buyToken in exchange for at least minSellAmount of sellToken
    * Requires the sellAmount to have been approved to the exchange
    * @param buyAmount The amount of buyToken the user is buying from the exchange
-   * @param minSellAmount The minimum amount of sellToken the user has to sell for this
+   * @param maxSellAmount The maximum amount of sellToken the user can sell for this
    * transaction to succeed
    * @param buyGold `true` if gold is the buy token
    * @return The amount of sellToken that was sold
    * @dev This function can be frozen using the Freezable interface.
    */
-  function buy(uint256 buyAmount, uint256 minSellAmount, bool buyGold)
+  function buy(uint256 buyAmount, uint256 maxSellAmount, bool buyGold)
     external
     onlyWhenNotFrozen
     updateBucketsIfNecessary
@@ -163,8 +163,8 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     uint256 sellAmount = _getSellTokenAmount(buyAmount, sellGold);
 
     require(
-      sellAmount >= minSellAmount,
-      "Calculated sellAmount was less than specified minSellAmount"
+      sellAmount <= maxSellAmount,
+      "Calculated sellAmount was greater than specified maxSellAmount"
     );
 
     _exchangeAmounts(sellAmount, buyAmount, sellGold);
