@@ -6,12 +6,15 @@ import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import LightButon from './LightButton'
 import TwitterLogo from 'src/icons/TwitterLogo'
 import Chainlink from 'src/icons/Chainlink'
+import { useScreenSize } from 'src/layout/ScreenSize'
 
 export default function SideBar({ isOpen }) {
+  const { isMobile } = useScreenSize()
+  const openStyle = isMobile ? styles.showSideMobile : styles.showSide
   return (
     <>
       <View style={[styles.expander, isOpen && styles.expanderOpen]} />
-      <View style={[styles.root, isOpen ? styles.showSide : styles.hideSide]}>
+      <View style={[styles.root, isOpen ? openStyle : styles.hideSide]}>
         <View>
           <H4 style={[textStyles.italic, standardStyles.elementalMarginBottom]}>
             As Wealth Flowers
@@ -76,13 +79,22 @@ const styles = StyleSheet.create({
   },
   root: {
     justifyContent: 'space-between',
-    height: 'calc(100vh - 90px)',
+    minHeight: 'calc(100vh - 50px)',
     willChange: 'transform, opacity',
     transitionProperty: 'transform, opacity',
     transitionDuration: '600ms',
     width: 270,
     position: 'absolute',
     right: 0,
+  },
+  showSideMobile: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    width: '100vw',
+    top: 0,
+    paddingHorizontal: 16,
+    overflow: 'scroll',
   },
   showSide: {
     marginHorizontal: 24,

@@ -1,11 +1,8 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-// import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-// import { useScreenSize } from 'src/layout/ScreenSize'
+import { useScreenSize } from 'src/layout/ScreenSize'
 import Body from 'src/codename-allegory/Body'
 import SideBar from 'src/codename-allegory/SideBar'
-// import Fade from 'react-reveal/Fade'
-// import { H4 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import menuItems from 'src/shared/menu-items'
 import { fonts, textStyles } from 'src/styles'
@@ -16,6 +13,7 @@ const DURATION = 600
 
 export default function Canvas() {
   const [isOpen, toggleSidebar] = useBooleanToggle()
+  const { isMobile } = useScreenSize()
   return (
     <>
       <OpenGraph
@@ -37,7 +35,7 @@ export default function Canvas() {
           </Text>
         </View>
         <View style={styles.container}>
-          <Body />
+          {!(isMobile && isOpen) && <Body />}
           <SideBar isOpen={isOpen} />
         </View>
       </View>

@@ -5,10 +5,13 @@ import Flower from 'src/codename-allegory/Flower'
 import Poem from 'src/codename-allegory/Poem'
 import RingsGlyph from 'src/logos/RingsGlyph'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+import { useScreenSize } from 'src/layout/ScreenSize'
 
 export default React.memo(function Body() {
+  const { isMobile } = useScreenSize()
+
   return (
-    <View style={styles.root}>
+    <View style={[styles.root, isMobile && { width: '100vw' }]}>
       <RingsGlyph color={colors.dark} height={30} />
       <Flower />
       <Poem />
