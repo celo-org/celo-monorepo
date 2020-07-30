@@ -119,26 +119,28 @@ export const reducer = (
       return {
         ...state,
         verificationStatus: action.status,
-        // Reset accepted codes on fail otherwise there's no way for user
-        // to try again with same codes
-        acceptedAttestationCodes:
-          action.status === VerificationStatus.Failed ? [] : state.acceptedAttestationCodes,
       }
     case Actions.SET_SEEN_VERIFICATION_NUX:
       return {
         ...state,
         hasSeenVerificationNux: action.status,
       }
+    case Actions.SET_COMPLETED_CODES:
+      return {
+        ...state,
+        ...completeCodeReducer(state, action.numComplete),
+      }
+
     case Actions.INPUT_ATTESTATION_CODE:
       return {
         ...state,
         attestationCodes: [...state.attestationCodes, action.code],
-        acceptedAttestationCodes: [...state.acceptedAttestationCodes, action.code],
       }
     case Actions.COMPLETE_ATTESTATION_CODE:
       return {
         ...state,
-        ...completeCodeReducer(state, state.numCompleteAttestations + action.numComplete),
+        ...completeCodeReducer(state, state.numCompleteAttestations + 1),
+        acceptedAttestationCodes: [...state.acceptedAttestationCodes, action.code],
       }
     case Actions.UPDATE_E164_PHONE_NUMBER_ADDRESSES:
       return {

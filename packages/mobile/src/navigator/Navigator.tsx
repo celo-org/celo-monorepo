@@ -65,10 +65,11 @@ import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
 import ImportContactsScreen from 'src/onboarding/contacts/ImportContactsScreen'
 import OnboardingEducationScreen from 'src/onboarding/education/OnboardingEducationScreen'
-import JoinCelo from 'src/onboarding/registration/JoinCelo'
+import NameAndNumber from 'src/onboarding/registration/NameAndNumber'
 import RegulatoryTerms from 'src/onboarding/registration/RegulatoryTerms'
 import SelectCountry from 'src/onboarding/registration/SelectCountry'
 import OnboardingSuccessScreen from 'src/onboarding/success/OnboardingSuccessScreen'
+import Welcome from 'src/onboarding/welcome/Welcome'
 import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import OutgoingPaymentRequestListScreen from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
 import PaymentRequestConfirmation, {
@@ -188,8 +189,13 @@ const nuxScreens = (Navigator: typeof Stack) => (
       options={OnboardingEducationScreen.navigationOptions}
     />
     <Navigator.Screen
-      name={Screens.JoinCelo}
-      component={JoinCelo}
+      name={Screens.Welcome}
+      component={Welcome}
+      options={Welcome.navigationOptions}
+    />
+    <Navigator.Screen
+      name={Screens.NameAndNumber}
+      component={NameAndNumber}
       options={{
         ...nuxNavigationOptions,
         headerTitle: () => (
@@ -445,6 +451,7 @@ const generalScreens = (Navigator: typeof Stack) => (
 
 const mapStateToProps = (state: RootState) => {
   return {
+    choseToRestoreAccount: state.account.choseToRestoreAccount,
     language: currentLanguageSelector(state),
     e164Number: state.account.e164PhoneNumber,
     acceptedTerms: state.account.acceptedTerms,
@@ -462,6 +469,7 @@ export function MainStackScreen() {
   const [initialRouteName, setInitialRoute] = React.useState<InitialRouteName>(undefined)
   React.useEffect(() => {
     const {
+      choseToRestoreAccount,
       language,
       e164Number,
       acceptedTerms,
@@ -475,14 +483,11 @@ export function MainStackScreen() {
 
     if (!language) {
       initialRoute = Screens.Language
-    } else if (!e164Number) {
+    } else if (!e164Number || !acceptedTerms || pincodeType === PincodeType.Unset) {
+      // User didn't go far enough in onboarding, start again from education
       initialRoute = Screens.OnboardingEducationScreen
-    } else if (!acceptedTerms) {
-      initialRoute = Screens.RegulatoryTerms
-    } else if (pincodeType === PincodeType.Unset) {
-      initialRoute = Screens.PincodeSet
     } else if (!redeemComplete && !account) {
-      initialRoute = Screens.EnterInviteCode
+      initialRoute = choseToRestoreAccount ? Screens.ImportWallet : Screens.EnterInviteCode
     } else if (!hasSeenVerificationNux) {
       initialRoute = Screens.VerificationEducationScreen
     } else {
