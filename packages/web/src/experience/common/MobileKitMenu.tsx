@@ -65,7 +65,8 @@ export default class MobileMenu extends React.PureComponent<Props, State> {
 
 function Title({ pages, pathname }: Omit<Props, 'routeHash'>) {
   const pageTitle = React.useMemo(() => {
-    return pages.find((page) => pathname === page.href)?.title
+    const page = pages.find((p) => pathname === p.href)
+    return page && page.title
   }, [pathname])
 
   return <Text style={fonts.h6}>{pageTitle}</Text>

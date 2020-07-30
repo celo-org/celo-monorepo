@@ -1,6 +1,6 @@
-import Dynamic from 'src/experience/contentful/ContentfulKit'
+import Kit from 'src/experience/contentful/ContentfulKit'
 import getKitProps from 'src/experience/contentful/getServerSideProps'
 
-export default Dynamic
+export default Kit
 
 export const getServerSideProps = getKitProps

@@ -1,7 +1,7 @@
-import { createClient, Entry, Asset } from 'contentful'
+import { Document } from '@contentful/rich-text-types'
+import { Asset, createClient, Entry } from 'contentful'
 import getConfig from 'next/config'
 import { Page as SideBarEntry } from 'src/experience/common/Sidebar'
-import { Document } from '@contentful/rich-text-types'
 
 function intialize(preview: boolean) {
   const { serverRuntimeConfig } = getConfig()
