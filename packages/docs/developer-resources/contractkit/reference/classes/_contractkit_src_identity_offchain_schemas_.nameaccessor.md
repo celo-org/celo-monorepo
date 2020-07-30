@@ -31,7 +31,7 @@
 
 *Overrides [SingleSchema](_contractkit_src_identity_offchain_schema_utils_.singleschema.md).[constructor](_contractkit_src_identity_offchain_schema_utils_.singleschema.md#constructor)*
 
-*Defined in [contractkit/src/identity/offchain/schemas.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schemas.ts#L12)*
+*Defined in [contractkit/src/identity/offchain/schemas.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schemas.ts#L13)*
 
 **Parameters:**
 
@@ -69,7 +69,7 @@ ___
 
 *Overrides [SingleSchema](_contractkit_src_identity_offchain_schema_utils_.singleschema.md).[wrapper](_contractkit_src_identity_offchain_schema_utils_.singleschema.md#wrapper)*
 
-*Defined in [contractkit/src/identity/offchain/schemas.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schemas.ts#L13)*
+*Defined in [contractkit/src/identity/offchain/schemas.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schemas.ts#L14)*
 
 ## Methods
 

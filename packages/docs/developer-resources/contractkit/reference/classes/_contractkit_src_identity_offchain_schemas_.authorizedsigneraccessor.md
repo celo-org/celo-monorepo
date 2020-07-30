@@ -26,7 +26,7 @@
 
 \+ **new AuthorizedSignerAccessor**(`wrapper`: [OffchainDataWrapper](_contractkit_src_identity_offchain_data_wrapper_.offchaindatawrapper.md)): *[AuthorizedSignerAccessor](_contractkit_src_identity_offchain_schemas_.authorizedsigneraccessor.md)*
 
-*Defined in [contractkit/src/identity/offchain/schemas.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schemas.ts#L25)*
+*Defined in [contractkit/src/identity/offchain/schemas.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schemas.ts#L26)*
 
 **Parameters:**
 
@@ -42,7 +42,7 @@ Name | Type |
 
 • **basePath**: *string* = "/account/authorizedSigners"
 
-*Defined in [contractkit/src/identity/offchain/schemas.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schemas.ts#L25)*
+*Defined in [contractkit/src/identity/offchain/schemas.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schemas.ts#L26)*
 
 ___
 
@@ -50,7 +50,7 @@ ___
 
 • **wrapper**: *[OffchainDataWrapper](_contractkit_src_identity_offchain_data_wrapper_.offchaindatawrapper.md)*
 
-*Defined in [contractkit/src/identity/offchain/schemas.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schemas.ts#L26)*
+*Defined in [contractkit/src/identity/offchain/schemas.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schemas.ts#L27)*
 
 ## Methods
 
@@ -58,7 +58,7 @@ ___
 
 ▸ **read**(`account`: [Address](../modules/_contractkit_src_base_.md#address), `signer`: [Address](../modules/_contractkit_src_base_.md#address)): *Promise‹undefined | object›*
 
-*Defined in [contractkit/src/identity/offchain/schemas.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schemas.ts#L28)*
+*Defined in [contractkit/src/identity/offchain/schemas.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schemas.ts#L29)*
 
 **Parameters:**
 
@@ -75,7 +75,7 @@ ___
 
 ▸ **write**(`signer`: [Address](../modules/_contractkit_src_base_.md#address), `proofOfPossession`: string, `filteredDataPaths`: string): *Promise‹void›*
 
-*Defined in [contractkit/src/identity/offchain/schemas.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schemas.ts#L37)*
+*Defined in [contractkit/src/identity/offchain/schemas.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schemas.ts#L38)*
 
 **Parameters:**
 

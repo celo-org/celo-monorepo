@@ -8,6 +8,8 @@
 
   ↳ [GitStorageWriter](_contractkit_src_identity_offchain_storage_writers_.gitstoragewriter.md)
 
+  ↳ [MockStorageWriter](_contractkit_src_identity_offchain_storage_writers_.mockstoragewriter.md)
+
 ## Index
 
 ### Constructors
