@@ -145,7 +145,6 @@ contract Exchange is
    * transaction to succeed
    * @param sellGold `true` if gold is the sell token
    * @return The amount of buyToken that was transfered
-   * @dev This function can be frozen using the Freezable interface.
    */
   function _sell(uint256 sellAmount, uint256 minBuyAmount, bool sellGold)
     private
@@ -160,7 +159,7 @@ contract Exchange is
   }
 
   /**
-   * @dev Exchanges buyAmount of buyToken in exchange for at least minSellAmount of sellToken
+   * @dev Exchanges buyAmount of buyToken in exchange for at most maxSellAmount of sellToken
    * Requires the sellAmount to have been approved to the exchange
    * @param buyAmount The amount of buyToken the user is buying from the exchange
    * @param maxSellAmount The maximum amount of sellToken the user can sell for this
@@ -194,7 +193,6 @@ contract Exchange is
    * @param sellAmount The amount of sellToken the user is selling to the exchange
    * @param buyAmount The amount of buyToken the user is buying from the exchange
    * @param sellGold `true` if gold is the sell token
-   * @dev This function can be frozen using the Freezable interface.
    */
   function _exchangeAmounts(uint256 sellAmount, uint256 buyAmount, bool sellGold) private {
     IReserve reserve = IReserve(registry.getAddressForOrDie(RESERVE_REGISTRY_ID));
