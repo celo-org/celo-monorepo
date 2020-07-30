@@ -56,9 +56,10 @@ function getRecipientObjectFromPaymentRequest(
     e164PhoneNumber = addressToE164Number[address] ?? undefined
   } else {
     address = paymentRequest.requesterAddress
-    // For now, we prefer the cached number to the one in the request, as the cached one
-    // has come from the on-chain mapping. This may be revisted later.
-    e164PhoneNumber = addressToE164Number[address] ?? paymentRequest.requesterE164Number
+    // For now, priority is given the # in the request over the cached #
+    // from the on-chain mapping. This may be revisted later.
+    e164PhoneNumber =
+      paymentRequest.requesterE164Number ?? addressToE164Number[address] ?? undefined
   }
 
   if (!e164PhoneNumber) {
@@ -88,20 +89,20 @@ function getRecipientObjectFromPaymentRequest(
 
 // Encrypt sensitive data in the payment request using the recipient and sender DEK
 export function* encryptPaymentRequest(paymentRequest: PaymentRequest) {
-  Logger.debug(TAG + 'encryptPaymentRequest', 'Encrypting payment request')
+  Logger.debug(`${TAG}@encryptPaymentRequest`, 'Encrypting payment request')
 
   const fromKey: Buffer | null = yield call(
     doFetchDataEncryptionKey,
     paymentRequest.requesterAddress
   )
   if (!fromKey) {
-    Logger.debug(TAG + 'encryptPaymentRequest', 'No sender key found, skipping encryption')
+    Logger.debug(`${TAG}@encryptPaymentRequest`, 'No sender key found, skipping encryption')
     return sanitizePaymentRequest(paymentRequest)
   }
 
   const toKey: Buffer | null = yield call(doFetchDataEncryptionKey, paymentRequest.requesteeAddress)
   if (!toKey) {
-    Logger.debug(TAG + 'encryptPaymentRequest', 'No recipient key found, skipping encryption')
+    Logger.debug(`${TAG}@encryptPaymentRequest`, 'No recipient key found, skipping encryption')
     return sanitizePaymentRequest(paymentRequest)
   }
 
@@ -138,8 +139,10 @@ export function decryptPaymentRequest(
   paymentRequest: PaymentRequest,
   dataEncryptionKey: string | null
 ) {
+  Logger.debug(`${TAG}@decryptPaymentRequest`, 'Decrypting payment request')
+
   if (!dataEncryptionKey) {
-    Logger.error(TAG + 'decryptPaymentRequest', 'Missing DEK, should never happen.')
+    Logger.error(`${TAG}@decryptPaymentRequest`, 'Missing DEK, should never happen.')
     return paymentRequest
   }
   const dekBuffer = hexToBuffer(dataEncryptionKey)
@@ -159,13 +162,13 @@ export function decryptPaymentRequest(
       decryptedPaymentRequest.requesterE164Number = decryptedRequesterE164Number
     } else if (isE164Number(requesterE164Number)) {
       Logger.warn(
-        TAG + 'decryptPaymentRequest',
+        `${TAG}@decryptPaymentRequest`,
         'Decrypting requesterE164Number failed, using raw number'
       )
       decryptedPaymentRequest.requesterE164Number = requesterE164Number
     } else {
       Logger.warn(
-        TAG + 'decryptPaymentRequest',
+        `${TAG}@decryptPaymentRequest`,
         'requesterE164Number appears to be ciphertext, excluding it'
       )
       decryptedPaymentRequest.requesterE164Number = undefined
@@ -178,10 +181,13 @@ export function decryptPaymentRequest(
     if (success) {
       decryptedPaymentRequest.comment = decryptedComment
     } else if (comment.length <= MAX_COMMENT_LENGTH) {
-      Logger.warn(TAG + 'decryptPaymentRequest', 'Decrypting comment failed, using raw comment')
+      Logger.warn(`${TAG}@decryptPaymentRequest`, 'Decrypting comment failed, using raw comment')
       decryptedPaymentRequest.comment = comment
     } else {
-      Logger.warn(TAG + 'decryptPaymentRequest', 'Comment appears to be ciphertext, hiding comment')
+      Logger.warn(
+        `${TAG}@decryptPaymentRequest`,
+        'Comment appears to be ciphertext, hiding comment'
+      )
       decryptedPaymentRequest.comment = i18n.t('global:commentUnavailable')
     }
   }
