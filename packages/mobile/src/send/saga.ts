@@ -114,9 +114,17 @@ function* sendPayment(
   comment: string,
   currency: CURRENCY_ENUM
 ) {
+  const txId = generateStandbyTransactionId(recipientAddress)
+
   try {
-    ValoraAnalytics.track(SendEvents.send_tx_start)
-    const txId = generateStandbyTransactionId(recipientAddress)
+    const txAnalyticsData = {
+      txId,
+      recipientAddress,
+      amount: amount.toString(),
+      currency,
+    }
+
+    ValoraAnalytics.track(SendEvents.send_tx_start, txAnalyticsData)
 
     switch (currency) {
       case CURRENCY_ENUM.GOLD: {
@@ -145,10 +153,10 @@ function* sendPayment(
         Logger.showError(`Sending currency ${currency} not yet supported`)
       }
     }
-    ValoraAnalytics.track(SendEvents.send_tx_complete)
+    ValoraAnalytics.track(SendEvents.send_tx_complete, txAnalyticsData)
   } catch (error) {
     Logger.error(`${TAG}/sendPayment`, 'Could not send payment', error)
-    ValoraAnalytics.track(SendEvents.send_tx_error, { error: error.message })
+    ValoraAnalytics.track(SendEvents.send_tx_error, { txId, error: error.message })
     throw error
   }
 }

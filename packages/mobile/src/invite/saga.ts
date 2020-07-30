@@ -154,7 +154,8 @@ export function* sendInvite(
   currency?: CURRENCY_ENUM
 ) {
   try {
-    ValoraAnalytics.track(InviteEvents.invite_tx_start)
+    const escrowIncluded = !!amount
+    ValoraAnalytics.track(InviteEvents.invite_tx_start, { escrowIncluded })
     const web3 = yield call(getWeb3)
     const randomness = yield call(asyncRandomBytes, 64)
     const temporaryWalletAccount = web3.eth.accounts.create(randomness.toString('ascii'))
@@ -195,7 +196,7 @@ export function* sendInvite(
     )
 
     yield call(waitForTransactionWithId, txId)
-    ValoraAnalytics.track(InviteEvents.invite_tx_complete)
+    ValoraAnalytics.track(InviteEvents.invite_tx_complete, { escrowIncluded })
     Logger.debug(TAG + '@sendInviteSaga', 'Sent money to new wallet')
 
     // If this invitation has a payment attached to it, send the payment to the escrow.

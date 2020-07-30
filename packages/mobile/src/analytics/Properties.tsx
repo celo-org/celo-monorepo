@@ -287,8 +287,12 @@ interface IdentityEventsProperties {
 }
 
 interface InviteEventsProperties {
-  [InviteEvents.invite_tx_start]: undefined
-  [InviteEvents.invite_tx_complete]: undefined
+  [InviteEvents.invite_tx_start]: {
+    escrowIncluded: boolean
+  }
+  [InviteEvents.invite_tx_complete]: {
+    escrowIncluded: boolean
+  }
   [InviteEvents.invite_tx_error]: {
     error: string
   }
@@ -340,7 +344,7 @@ interface SendEventsProperties {
     localCurrencyAmount: string | null
   }
   [SendEvents.send_confirm_back]: undefined
-  [SendEvents.send_confim_send]: {
+  [SendEvents.send_confirm_send]: {
     isScan: boolean
     isInvite: boolean
     isRequest: boolean
@@ -377,9 +381,20 @@ interface SendEventsProperties {
   }
   [SendEvents.send_secure_edit]: undefined
 
-  [SendEvents.send_tx_start]: undefined
-  [SendEvents.send_tx_complete]: undefined
+  [SendEvents.send_tx_start]: {
+    txId: string
+    recipientAddress: string
+    amount: string
+    currency: string
+  }
+  [SendEvents.send_tx_complete]: {
+    txId: string
+    recipientAddress: string
+    amount: string
+    currency: string
+  }
   [SendEvents.send_tx_error]: {
+    txId: string
     error: string
   }
 }
@@ -500,7 +515,11 @@ interface CeloExchangeEventsProperties {
   }
 
   [CeloExchangeEvents.celo_exchange_start]: undefined
-  [CeloExchangeEvents.celo_exchange_complete]: undefined
+  [CeloExchangeEvents.celo_exchange_complete]: {
+    txId: string
+    currency: string
+    amount: string
+  }
   [CeloExchangeEvents.celo_exchange_error]: {
     error: string
   }
