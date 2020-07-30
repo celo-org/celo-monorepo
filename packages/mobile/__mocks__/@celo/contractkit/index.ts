@@ -97,3 +97,20 @@ export function getSaltFromThresholdSignature(sigBuf: Buffer) {
     .digest('base64')
     .slice(0, SALT_CHAR_LENGTH)
 }
+
+enum AuthenticationMethod {
+  WALLETKEY = 'wallet_key',
+  ENCRYPTIONKEY = 'encryption_key',
+}
+
+export const PNPUtils = {
+  Matchmaking: {
+    obfuscateNumberForMatchmaking: obfuscateNumberForMatchmaking,
+  },
+  PhoneNumberIdentifier: {
+    getSaltFromThresholdSignature: getSaltFromThresholdSignature,
+  },
+  PhoneNumberLookup: {
+    AuthenticationMethod: AuthenticationMethod,
+  },
+}
