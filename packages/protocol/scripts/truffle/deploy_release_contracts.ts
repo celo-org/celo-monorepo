@@ -298,15 +298,19 @@ async function checkBalance(config: ReleaseGoldConfig) {
 }
 
 async function compile(template: ReleaseGoldTemplate): Promise<ReleaseGoldConfig> {
+  const isUnspecified = (value: any): boolean => {
+    return value === undefined || value === null
+  }
+
   const questions = []
-  if (template.identifier == undefined) {
+  if (isUnspecified(template.identifier)) {
     questions.push({
       type: 'text',
       name: 'identifier',
       message: 'Identifier',
     })
   }
-  if (template.releaseStartTime == undefined) {
+  if (isUnspecified(template.releaseStartTime)) {
     questions.push({
       type: 'text',
       name: 'releaseStartTime',
@@ -314,7 +318,7 @@ async function compile(template: ReleaseGoldTemplate): Promise<ReleaseGoldConfig
       message: 'Release start time',
     })
   }
-  if (template.releaseCliffTime == undefined) {
+  if (isUnspecified(template.releaseCliffTime)) {
     questions.push({
       type: 'number',
       name: 'releaseCliffTime',
@@ -322,7 +326,7 @@ async function compile(template: ReleaseGoldTemplate): Promise<ReleaseGoldConfig
       min: 0,
     })
   }
-  if (template.numReleasePeriods == undefined) {
+  if (isUnspecified(template.numReleasePeriods)) {
     questions.push({
       type: 'number',
       name: 'numReleasePeriods',
@@ -330,7 +334,7 @@ async function compile(template: ReleaseGoldTemplate): Promise<ReleaseGoldConfig
       min: 1,
     })
   }
-  if (template.releasePeriod == undefined) {
+  if (isUnspecified(template.releasePeriod)) {
     questions.push({
       type: 'number',
       name: 'releasePeriod',
@@ -338,7 +342,7 @@ async function compile(template: ReleaseGoldTemplate): Promise<ReleaseGoldConfig
       min: 1,
     })
   }
-  if (template.amountReleasedPerPeriod == undefined) {
+  if (isUnspecified(template.amountReleasedPerPeriod)) {
     questions.push({
       type: 'number',
       name: 'amountReleasedPerPeriod',
@@ -346,14 +350,14 @@ async function compile(template: ReleaseGoldTemplate): Promise<ReleaseGoldConfig
       min: 0,
     })
   }
-  if (template.revocable == undefined) {
+  if (isUnspecified(template.revocable)) {
     questions.push({
       type: 'toggle',
       name: 'revocable',
       message: 'Revocable?',
     })
   }
-  if (template.beneficiary == undefined) {
+  if (isUnspecified(template.beneficiary)) {
     questions.push({
       type: 'text',
       name: 'beneficiary',
@@ -366,7 +370,7 @@ async function compile(template: ReleaseGoldTemplate): Promise<ReleaseGoldConfig
           : 'Please enter a valid non-zero Celo address.',
     })
   }
-  if (template.releaseOwner == undefined) {
+  if (isUnspecified(template.releaseOwner)) {
     questions.push({
       type: 'text',
       name: 'releaseOwner',
@@ -377,7 +381,7 @@ async function compile(template: ReleaseGoldTemplate): Promise<ReleaseGoldConfig
           : 'Please enter a valid non-zero Celo address.',
     })
   }
-  if (template.refundAddress == undefined) {
+  if (isUnspecified(template.refundAddress)) {
     questions.push({
       type: 'text',
       name: 'refundAddress',
@@ -386,14 +390,14 @@ async function compile(template: ReleaseGoldTemplate): Promise<ReleaseGoldConfig
       validate: (value) => (isValidAddress(value) ? true : 'Please enter a valid Celo address.'),
     })
   }
-  if (template.subjectToLiquidityProvision == undefined) {
+  if (isUnspecified(template.subjectToLiquidityProvision)) {
     questions.push({
       type: 'toggle',
       name: 'subjectToLiquidityProvision',
       message: 'Subject to liquidity provision?',
     })
   }
-  if (template.initialDistributionRatio == undefined) {
+  if (isUnspecified(template.initialDistributionRatio)) {
     questions.push({
       type: 'number',
       name: 'initialDistributionRatio',
@@ -403,14 +407,14 @@ async function compile(template: ReleaseGoldTemplate): Promise<ReleaseGoldConfig
       max: 1000,
     })
   }
-  if (template.canValidate == undefined) {
+  if (isUnspecified(template.canValidate)) {
     questions.push({
       type: 'toggle',
       name: 'canValidate',
       message: 'Can validate?',
     })
   }
-  if (template.canVote == undefined) {
+  if (isUnspecified(template.canVote)) {
     questions.push({
       type: 'toggle',
       name: 'canVote',
@@ -443,8 +447,8 @@ async function compile(template: ReleaseGoldTemplate): Promise<ReleaseGoldConfig
 async function handleJSONFile(data) {
   const templates: ReleaseGoldTemplate[] = JSON.parse(data)
   const grants: ReleaseGoldConfig[] = []
-  for (const template of templates) {
-    grants.push(await compile(template))
+  for (const t of templates) {
+    grants.push(await compile(t))
   }
 
   if (grants.length === 0) {
