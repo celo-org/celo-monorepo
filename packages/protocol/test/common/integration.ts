@@ -414,7 +414,7 @@ contract('Integration: Exchange', (accounts: string[]) => {
       originalGold = await goldToken.balanceOf(accounts[0])
       originalReserve = await goldToken.balanceOf(reserve.address)
       await goldToken.approve(exchange.address, sellAmount)
-      await exchange.exchange(sellAmount, minBuyAmount, true)
+      await exchange.sell(sellAmount, minBuyAmount, true)
       finalStable = await stableToken.balanceOf(accounts[0])
       finalGold = await goldToken.balanceOf(accounts[0])
       finalReserve = await goldToken.balanceOf(reserve.address)
@@ -447,7 +447,7 @@ contract('Integration: Exchange', (accounts: string[]) => {
       originalReserve = await goldToken.balanceOf(reserve.address)
       await stableToken.approve(exchange.address, sellAmount)
       // Cannot sell more than was purchased in the previous test.
-      await exchange.exchange(sellAmount.div(20), minBuyAmount, false)
+      await exchange.sell(sellAmount.div(20), minBuyAmount, false)
       finalStable = await stableToken.balanceOf(accounts[0])
       finalGold = await goldToken.balanceOf(accounts[0])
       finalReserve = await goldToken.balanceOf(reserve.address)

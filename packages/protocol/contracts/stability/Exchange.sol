@@ -90,6 +90,26 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
    * @return The amount of buyToken that was transfered
    * @dev This function can be frozen using the Freezable interface.
    */
+  function sell(uint256 sellAmount, uint256 minBuyAmount, bool sellGold)
+    external
+    onlyWhenNotFrozen
+    updateBucketsIfNecessary
+    nonReentrant
+    returns (uint256)
+  {
+    return _sell(sellAmount, minBuyAmount, sellGold);
+  }
+
+  /**
+   * @dev Exchanges sellAmount of sellToken in exchange for at least minBuyAmount of buyToken
+   * Requires the sellAmount to have been approved to the exchange
+   * @param sellAmount The amount of sellToken the user is selling to the exchange
+   * @param minBuyAmount The minimum amount of buyToken the user has to receive for this
+   * transaction to succeed
+   * @param sellGold `true` if gold is the sell token
+   * @return The amount of buyToken that was transfered
+   * @dev This function can be frozen using the Freezable interface.
+   */
   function exchange(uint256 sellAmount, uint256 minBuyAmount, bool sellGold)
     external
     onlyWhenNotFrozen
@@ -97,10 +117,69 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     nonReentrant
     returns (uint256)
   {
+    return _sell(sellAmount, minBuyAmount, sellGold);
+  }
+
+  /**
+   * @dev Exchanges sellAmount of sellToken in exchange for at least minBuyAmount of buyToken
+   * Requires the sellAmount to have been approved to the exchange
+   * @param sellAmount The amount of sellToken the user is selling to the exchange
+   * @param minBuyAmount The minimum amount of buyToken the user has to receive for this
+   * transaction to succeed
+   * @param sellGold `true` if gold is the sell token
+   * @return The amount of buyToken that was transfered
+   * @dev This function can be frozen using the Freezable interface.
+   */
+  function _sell(uint256 sellAmount, uint256 minBuyAmount, bool sellGold)
+    private
+    returns (uint256)
+  {
     uint256 buyAmount = _getBuyTokenAmount(sellAmount, sellGold);
 
     require(buyAmount >= minBuyAmount, "Calculated buyAmount was less than specified minBuyAmount");
 
+    _exchangeAmounts(sellAmount, buyAmount, sellGold);
+    return buyAmount;
+  }
+
+  /**
+   * @dev Exchanges buyAmount of buyToken in exchange for at least minSellAmount of sellToken
+   * Requires the sellAmount to have been approved to the exchange
+   * @param buyAmount The amount of buyToken the user is buying from the exchange
+   * @param minSellAmount The minimum amount of sellToken the user has to sell for this
+   * transaction to succeed
+   * @param buyGold `true` if gold is the buy token
+   * @return The amount of sellToken that was sold
+   * @dev This function can be frozen using the Freezable interface.
+   */
+  function buy(uint256 buyAmount, uint256 minSellAmount, bool buyGold)
+    external
+    onlyWhenNotFrozen
+    updateBucketsIfNecessary
+    nonReentrant
+    returns (uint256)
+  {
+    bool sellGold = !buyGold;
+    uint256 sellAmount = _getSellTokenAmount(buyAmount, sellGold);
+
+    require(
+      sellAmount >= minSellAmount,
+      "Calculated sellAmount was less than specified minSellAmount"
+    );
+
+    _exchangeAmounts(sellAmount, buyAmount, sellGold);
+    return sellAmount;
+  }
+
+  /**
+   * @dev Exchanges sellAmount of sellToken in exchange for buyAmount of buyToken
+   * Requires the sellAmount to have been approved to the exchange
+   * @param sellAmount The amount of sellToken the user is selling to the exchange
+   * @param buyAmount The amount of buyToken the user is buying from the exchange
+   * @param sellGold `true` if gold is the sell token
+   * @dev This function can be frozen using the Freezable interface.
+   */
+  function _exchangeAmounts(uint256 sellAmount, uint256 buyAmount, bool sellGold) private {
     IReserve reserve = IReserve(registry.getAddressForOrDie(RESERVE_REGISTRY_ID));
 
     if (sellGold) {
@@ -124,7 +203,6 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     }
 
     emit Exchanged(msg.sender, sellAmount, buyAmount, sellGold);
-    return buyAmount;
   }
 
   /**
@@ -275,6 +353,27 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     FixidityLib.Fraction memory denominator = FixidityLib.newFixed(sellTokenBucket).add(
       reducedSellAmount
     );
+
+    // See comment in getBuyTokenAmount
+    return numerator.unwrap().div(denominator.unwrap());
+  }
+
+  /**
+   * @dev Returns the amount of sellToken a user would need to exchange to receive buyAmount of
+   * buyToken.
+   * @param buyAmount The amount of buyToken the user would like to purchase.
+   * @param sellGold `true` if gold is the sell token
+   * @return The corresponding sellToken amount.
+   */
+  function _getSellTokenAmount(uint256 buyAmount, bool sellGold) private view returns (uint256) {
+    uint256 sellTokenBucket;
+    uint256 buyTokenBucket;
+    (buyTokenBucket, sellTokenBucket) = getBuyAndSellBuckets(sellGold);
+
+    FixidityLib.Fraction memory numerator = FixidityLib.newFixed(buyAmount.mul(sellTokenBucket));
+    FixidityLib.Fraction memory denominator = FixidityLib
+      .newFixed(buyTokenBucket.sub(buyAmount))
+      .multiply(FixidityLib.fixed1().subtract(spread));
 
     // See comment in getBuyTokenAmount
     return numerator.unwrap().div(denominator.unwrap());
