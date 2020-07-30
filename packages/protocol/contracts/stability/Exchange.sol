@@ -118,7 +118,8 @@ contract Exchange is
   }
 
   /**
-   * @dev Deprecated. Exchanges sellAmount of sellToken in exchange for at least minBuyAmount of buyToken
+   * @dev Deprecated. Exchanges sellAmount of sellToken in exchange for at
+   * least minBuyAmount of buyToken.
    * Requires the sellAmount to have been approved to the exchange
    * @param sellAmount The amount of sellToken the user is selling to the exchange
    * @param minBuyAmount The minimum amount of buyToken the user has to receive for this
