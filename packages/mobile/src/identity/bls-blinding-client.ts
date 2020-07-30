@@ -1,4 +1,4 @@
-import { BlsBlindingClient } from '@celo/contractkit'
+import { BlsBlindingClient } from '@celo/contractkit/lib/utils/phone-number-lookup/bls-blinding-client'
 import BlindThresholdBls from 'react-native-blind-threshold-bls'
 
 /**

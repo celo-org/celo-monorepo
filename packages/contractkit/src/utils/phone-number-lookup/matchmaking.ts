@@ -9,13 +9,12 @@ import {
   ServiceContext,
 } from './phone-number-lookup'
 
-const debug = debugFactory('kit:registry')
+const debug = debugFactory('kit:phone-number-lookup:matchmaking')
 
 const MATCHMAKING_ENDPOINT = '/getContactMatches'
 // Eventually, the matchmaking process will use blinded numbers same as salt lookups
 // But for now numbers are simply hashed using this static salt
 const SALT = '__celo__'
-const TAG = 'contractkit/utils/phone-number-lookup/matchmaking'
 
 // Uses the phone number privacy service to find mutual matches between Celo users
 export async function getContactMatches(
@@ -48,7 +47,7 @@ export async function getContactMatches(
   const matchHashes: string[] = response.matchedContacts.map((match) => match.phoneNumber)
 
   if (!matchHashes || !matchHashes.length) {
-    debug(TAG + 'No matches found')
+    debug('No matches found')
     return []
   }
 

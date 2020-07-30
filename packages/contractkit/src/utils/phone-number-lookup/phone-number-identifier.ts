@@ -10,11 +10,10 @@ import {
   SignMessageResponse,
 } from './phone-number-lookup'
 
-const debug = debugFactory('kit:registry')
+const debug = debugFactory('kit:phone-number-lookup:phone-number-identifier')
 
 const SALT_CHAR_LENGTH = 13
 const SIGN_MESSAGE_ENDPOINT = '/getDistributedBlindedSalt'
-const TAG = 'contractkit/utils/phone-number-lookup/phone-number-identifier'
 
 export interface PhoneNumberHashDetails {
   e164Number: string
@@ -34,20 +33,18 @@ export async function getPhoneNumberIdentifier(
   clientVersion?: string,
   blsBlindingClient?: BlsBlindingClient
 ): Promise<PhoneNumberHashDetails> {
-  debug(`${TAG}@getPhoneNumberIdentifier` + 'Getting phone number salt')
+  debug('Getting phone number salt')
 
   if (!isE164Number(e164Number)) {
     throw new Error(`Invalid phone number: ${e164Number}`)
   }
   // Fallback to using Wasm version if not specified
   if (!blsBlindingClient) {
-    debug(
-      `${TAG}@getPhoneNumberIdentifier` + 'No BLSBlindingClient found, using WasmBlsBlindingClient'
-    )
+    debug('No BLSBlindingClient found, using WasmBlsBlindingClient')
     blsBlindingClient = new WasmBlsBlindingClient(context.pgpnpPubKey)
   }
 
-  debug(`${TAG}@getPhoneNumberIdentifier` + 'Retrieving blinded message')
+  debug('Retrieving blinded message')
   const base64PhoneNumber = Buffer.from(e164Number).toString('base64')
   const base64BlindedMessage = await blsBlindingClient.blindMessage(base64PhoneNumber)
 
@@ -66,11 +63,11 @@ export async function getPhoneNumberIdentifier(
     SIGN_MESSAGE_ENDPOINT
   )
   const base64BlindSig = response.combinedSignature
-  debug(`${TAG}@getPhoneNumberIdentifier` + 'Retrieving unblinded signature')
+  debug('Retrieving unblinded signature')
   const base64UnblindedSig = await blsBlindingClient.unblindAndVerifyMessage(base64BlindSig)
   const sigBuf = Buffer.from(base64UnblindedSig, 'base64')
 
-  debug(`${TAG}@getPhoneNumberIdentifier` + 'Converting sig to salt')
+  debug('Converting sig to salt')
   const salt = getSaltFromThresholdSignature(sigBuf)
   const phoneHash = getPhoneHash(e164Number, salt)
   return { e164Number, phoneHash, salt }

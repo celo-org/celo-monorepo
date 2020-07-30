@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import crypto from 'crypto'
 import Web3 from 'web3'
 
 const txo = (response?: any) => ({
@@ -77,4 +78,22 @@ export enum CeloContract {
   SortedOracles = 'SortedOracles',
   StableToken = 'StableToken',
   Validators = 'Validators',
+}
+
+const SALT = '__celo__'
+export function obfuscateNumberForMatchmaking(e164Number: string) {
+  return crypto
+    .createHash('sha256')
+    .update(e164Number + SALT)
+    .digest('base64')
+}
+
+const SALT_CHAR_LENGTH = 13
+export function getSaltFromThresholdSignature(sigBuf: Buffer) {
+  // Currently uses 13 chars for a 78 bit salt
+  return crypto
+    .createHash('sha256')
+    .update(sigBuf)
+    .digest('base64')
+    .slice(0, SALT_CHAR_LENGTH)
 }

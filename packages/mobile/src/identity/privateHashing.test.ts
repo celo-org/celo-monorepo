@@ -1,4 +1,4 @@
-import { getSaltFromThresholdSignature } from '@celo/contractkit'
+import { PNPUtils } from '@celo/contractkit'
 import { FetchMock } from 'jest-fetch-mock'
 import { expectSaga } from 'redux-saga-test-plan'
 import { call, select } from 'redux-saga/effects'
@@ -55,10 +55,12 @@ describe('Fetch phone hash details', () => {
   })
 })
 
-describe(getSaltFromThresholdSignature, () => {
+describe(PNPUtils.PhoneNumberIdentifier.getSaltFromThresholdSignature, () => {
   it('Hashes sigs correctly', () => {
     const base64Sig = 'vJeFZJ3MY5KlpI9+kIIozKkZSR4cMymLPh2GHZUatWIiiLILyOcTiw2uqK/LBReA'
     const signature = new Buffer(base64Sig, 'base64')
-    expect(getSaltFromThresholdSignature(signature)).toBe('piWqRHHYWtfg9')
+    expect(PNPUtils.PhoneNumberIdentifier.getSaltFromThresholdSignature(signature)).toBe(
+      'piWqRHHYWtfg9'
+    )
   })
 })

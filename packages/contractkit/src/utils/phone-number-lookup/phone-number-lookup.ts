@@ -5,8 +5,7 @@ import debugFactory from 'debug'
 import { ec as EC } from 'elliptic'
 import { ContractKit } from '../../kit'
 
-const TAG = 'contractkit/utils/phone-number-lookup/phone-number-lookup'
-const debug = debugFactory('kit:registry')
+const debug = debugFactory('kit:phone-number-lookup:phone-number-lookup')
 const ec = new EC('secp256k1')
 
 export interface WalletKeySigner {
@@ -78,7 +77,7 @@ export async function postToPhoneNumPrivacyService<ResponseType>(
   context: ServiceContext,
   endpoint: string
 ) {
-  debug(`${TAG}@postToPGPNP` + `Posting to ${endpoint}`)
+  debug(`Posting to ${endpoint}`)
 
   // Sign payload using account privkey
   const bodyString = JSON.stringify(body)
@@ -92,7 +91,7 @@ export async function postToPhoneNumPrivacyService<ResponseType>(
     const dek = key.getPublic(true, 'hex')
     const pubkey = ec.keyFromPublic(trimLeading0x(dek), 'hex')
     const validSignature: boolean = pubkey.verify(bodyString, JSON.parse(authHeader))
-    debug(`${TAG}@postToPGPNP` + `Signature is valid: ${validSignature} signed by ${dek}`)
+    debug(`Signature is valid: ${validSignature} signed by ${dek}`)
   } else {
     authHeader = await signer.contractKit.web3.eth.sign(bodyString, body.account)
   }
@@ -109,7 +108,7 @@ export async function postToPhoneNumPrivacyService<ResponseType>(
   })
 
   if (!res.ok) {
-    debug(`${TAG}@handleFailure` + `Response not okay. Status ${res.status}`)
+    debug(`Response not okay. Status ${res.status}`)
     switch (res.status) {
       case 403:
         throw new Error(ErrorMessages.PGPNP_QUOTA_ERROR)
@@ -118,7 +117,7 @@ export async function postToPhoneNumPrivacyService<ResponseType>(
     }
   }
 
-  debug(`${TAG}@postToPGPNP` + 'Response ok. Parsing.')
+  debug('Response ok. Parsing.')
   const response = await res.json()
   return response as ResponseType
 }

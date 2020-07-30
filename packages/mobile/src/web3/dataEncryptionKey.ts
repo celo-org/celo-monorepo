@@ -4,7 +4,7 @@
  * but keeping it here for now since that's where other account state is
  */
 
-import { AuthenticationMethod } from '@celo/contractkit'
+import { PNPUtils } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { ensureLeading0x, eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
@@ -133,7 +133,7 @@ export async function isAccountUpToDate(
     accountsWrapper.getWalletAddress(address),
     accountsWrapper.getDataEncryptionKey(address),
   ])
-  Logger.debug(`${TAG}/isAccountUpToDate`, `Found match for DEK ${currentDEK}`)
+  Logger.debug(`${TAG}/isAccountUpToDate`, `DEK associated with account ${currentDEK}`)
   return eqAddress(currentWalletAddress, address) && currentDEK && eqAddress(currentDEK, dataKey)
 }
 
@@ -167,11 +167,11 @@ export function* getAuthSignerForAccount(account: string) {
     const publicDataKey = compressedPubKey(hexToBuffer(privateDataKey))
     const upToDate: boolean = yield call(isAccountUpToDate, accountsWrapper, account, publicDataKey)
     if (!upToDate) {
-      Logger.warn(TAG + 'getAuthSignerForAccount', `DEK mismatch.`)
+      Logger.error(TAG + 'getAuthSignerForAccount', `DEK mismatch.`)
     } else {
       Logger.info(TAG + 'getAuthSignerForAccount', 'Using DEK for authentication')
       return {
-        authenticationMethod: AuthenticationMethod.ENCRYPTIONKEY,
+        authenticationMethod: PNPUtils.PhoneNumberLookup.AuthenticationMethod.ENCRYPTIONKEY,
         rawKey: privateDataKey,
       }
     }
@@ -180,7 +180,7 @@ export function* getAuthSignerForAccount(account: string) {
   // Fallback to using wallet key
   Logger.info(TAG + 'getAuthSignerForAccount', 'Using wallet key for authentication')
   return {
-    authenticationMethod: AuthenticationMethod.WALLETKEY,
+    authenticationMethod: PNPUtils.PhoneNumberLookup.AuthenticationMethod.WALLETKEY,
     contractKit,
   }
 }

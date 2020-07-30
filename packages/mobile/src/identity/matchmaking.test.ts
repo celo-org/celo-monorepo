@@ -1,4 +1,5 @@
-import { obfuscateNumberForMatchmaking, PhoneNumberHashDetails } from '@celo/contractkit'
+import { PNPUtils } from '@celo/contractkit'
+import { PhoneNumberHashDetails } from '@celo/contractkit/lib/utils/phone-number-lookup/phone-number-identifier'
 import { FetchMock } from 'jest-fetch-mock'
 import { expectSaga } from 'redux-saga-test-plan'
 import { call } from 'redux-saga/effects'
@@ -74,9 +75,9 @@ describe('Fetch contact matches', () => {
   })
 })
 
-describe(obfuscateNumberForMatchmaking, () => {
+describe(PNPUtils.Matchmaking.obfuscateNumberForMatchmaking, () => {
   it('Hashes sigs correctly', () => {
-    expect(obfuscateNumberForMatchmaking(mockE164Number2)).toBe(
+    expect(PNPUtils.Matchmaking.obfuscateNumberForMatchmaking(mockE164Number2)).toBe(
       'Fox23FU+SCdDPhk2I2h4e2UC63lyOWMygxc4wTAXu9w='
     )
   })

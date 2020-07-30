@@ -1,4 +1,4 @@
-import { PhoneNumberHashDetails } from '@celo/contractkit'
+import { PhoneNumberHashDetails } from '@celo/contractkit/lib/utils/phone-number-lookup/phone-number-identifier'
 import { IdentifierLookupResult } from '@celo/contractkit/lib/wrappers/Attestations'
 import { hexToBuffer } from '@celo/utils/src/address'
 import { expectSaga } from 'redux-saga-test-plan'

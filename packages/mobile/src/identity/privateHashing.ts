@@ -1,8 +1,5 @@
-import {
-  AuthenticationMethod,
-  getPhoneNumberIdentifier,
-  PhoneNumberHashDetails,
-} from '@celo/contractkit'
+import { PNPUtils } from '@celo/contractkit'
+import { PhoneNumberHashDetails } from '@celo/contractkit/lib/utils/phone-number-lookup/phone-number-identifier'
 import { getPhoneHash, isE164Number, PhoneNumberUtils } from '@celo/utils/src/phoneNumbers'
 import DeviceInfo from 'react-native-device-info'
 import { call, put, select } from 'redux-saga/effects'
@@ -96,7 +93,9 @@ function* getPhoneHashPrivate(e164Number: string, account: string, selfPhoneHash
 
   const authSigner = yield call(getAuthSignerForAccount, account)
   // Unlock the account if the authentication is signed by the wallet
-  if (authSigner.authenticationMethod === AuthenticationMethod.WALLETKEY) {
+  if (
+    authSigner.authenticationMethod === PNPUtils.PhoneNumberLookup.AuthenticationMethod.WALLETKEY
+  ) {
     const success: boolean = yield call(unlockAccount, account)
     if (!success) {
       throw new Error(ErrorMessages.INCORRECT_PIN)
@@ -105,10 +104,9 @@ function* getPhoneHashPrivate(e164Number: string, account: string, selfPhoneHash
 
   const { pgpnpPubKey } = networkConfig
   const blsBlindingClient = new ReactBlsBlindingClient(pgpnpPubKey)
-
   try {
     return yield call(
-      getPhoneNumberIdentifier,
+      PNPUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier,
       e164Number,
       account,
       authSigner,

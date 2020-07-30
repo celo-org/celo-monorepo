@@ -1,4 +1,11 @@
-export * from './bls-blinding-client'
-export * from './matchmaking'
-export * from './phone-number-identifier'
-export * from './phone-number-lookup'
+import * as BlsBlindingClient from './bls-blinding-client'
+import * as Matchmaking from './matchmaking'
+import * as PhoneNumberIdentifier from './phone-number-identifier'
+import * as PhoneNumberLookup from './phone-number-lookup'
+
+export const PNPUtils = {
+  BlsBlindingClient,
+  PhoneNumberLookup,
+  Matchmaking,
+  PhoneNumberIdentifier,
+}

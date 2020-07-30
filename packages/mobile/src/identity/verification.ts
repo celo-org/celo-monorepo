@@ -1,4 +1,5 @@
-import { CeloTransactionObject, PhoneNumberHashDetails } from '@celo/contractkit'
+import { CeloTransactionObject } from '@celo/contractkit'
+import { PhoneNumberHashDetails } from '@celo/contractkit/lib/utils/phone-number-lookup/phone-number-identifier'
 import {
   ActionableAttestation,
   AttesationServiceRevealRequest,
@@ -40,7 +41,7 @@ import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
 import { registerAccountDek } from 'src/web3/dataEncryptionKey'
-import { getConnectedAccount, getConnectedUnlockedAccount, unlockAccount } from 'src/web3/saga'
+import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 
 const TAG = 'identity/verification'
 
@@ -159,12 +160,6 @@ export function* doVerificationFlow() {
       )
 
       yield put(setVerificationStatus(VerificationStatus.RequestingAttestations))
-
-      // Account needs to be unlocked to submit attestations
-      const unlocked: boolean = yield call(unlockAccount, account)
-      if (!unlocked) {
-        throw new Error(ErrorMessages.INCORRECT_PIN)
-      }
       ValoraAnalytics.track(VerificationEvents.verification_request_all_attestations_start, {
         attestationsToRequest: status.numAttestationsRemaining,
       })
@@ -194,11 +189,6 @@ export function* doVerificationFlow() {
 
       yield put(setVerificationStatus(VerificationStatus.RevealingNumber))
       ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_start)
-      // Unlock account to sign attestations txs
-      const success: boolean = yield call(unlockAccount, account)
-      if (!success) {
-        throw new Error(ErrorMessages.INCORRECT_PIN)
-      }
       yield all([
         // Request codes for the attestations needed
         call(
