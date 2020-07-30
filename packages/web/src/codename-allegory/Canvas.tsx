@@ -10,6 +10,9 @@ import OpenGraph from 'src/header/OpenGraph'
 import menuItems from 'src/shared/menu-items'
 import { fonts, textStyles } from 'src/styles'
 import { useBooleanToggle } from 'src/hooks/useBooleanToggle'
+import Fade from 'react-reveal/Fade'
+
+const DURATION = 600
 
 export default function Canvas() {
   const [isOpen, toggleSidebar] = useBooleanToggle()
@@ -23,7 +26,14 @@ export default function Canvas() {
       <View style={styles.root}>
         <View style={styles.nav}>
           <Text onPress={toggleSidebar} style={[fonts.p, textStyles.heavy]}>
-            {isOpen ? 'Close' : 'About'}{' '}
+            <View style={{ position: 'absolute' }}>
+              <Fade duration={DURATION} left={true} cascade={true} opposite={true} when={!isOpen}>
+                About
+              </Fade>
+            </View>
+            <Fade duration={DURATION} right={true} cascade={true} opposite={true} when={isOpen}>
+              Close
+            </Fade>
           </Text>
         </View>
         <View style={styles.container}>
