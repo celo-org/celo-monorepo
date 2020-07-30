@@ -830,9 +830,7 @@ jobs:
           name: Build and run - Accounts
           command: |
             cd packages/protocol
-            sed -i 's/mapping(address => Account) private accounts;/mapping(address => Account) internal accounts;/g' contracts/common/Accounts.sol
             certoraRun specs/harnesses/AccountsHarness.sol --verify AccountsHarness:specs/accounts.spec --settings -assumeUnwindCond
-            sed -i 's/mapping(address => Account) internal accounts;/mapping(address => Account) private accounts;/g' contracts/common/Accounts.sol
 
 workflows:
   version: 2
