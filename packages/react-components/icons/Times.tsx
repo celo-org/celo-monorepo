@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
 import Animated from 'react-native-reanimated'
 import Svg, { Path } from 'svgs'

@@ -1,5 +1,5 @@
 import Touchable from '@celo/react-components/components/Touchable'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'

@@ -2,7 +2,7 @@ import interpolateColors from '@celo/react-components/components/interpolateColo
 import SegmentedControl from '@celo/react-components/components/SegmentedControl'
 import Share from '@celo/react-components/icons/Share'
 import Times from '@celo/react-components/icons/Times'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import { MaterialTopTabBarProps } from '@react-navigation/material-top-tabs'
 import React, { useMemo } from 'react'
 import { StyleSheet, View } from 'react-native'

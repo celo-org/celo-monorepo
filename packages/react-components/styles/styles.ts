@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import { fontFamily } from '@celo/react-components/styles/fonts'
 import { StyleSheet } from 'react-native'
 

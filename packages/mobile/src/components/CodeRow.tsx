@@ -1,7 +1,7 @@
 import TextInput from '@celo/react-components/components/TextInput'
 import withTextInputPasteAware from '@celo/react-components/components/WithTextInputPasteAware'
 import Checkmark from '@celo/react-components/icons/Checkmark'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'

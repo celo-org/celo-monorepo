@@ -1,5 +1,5 @@
 import SmoothX from '@celo/react-components/icons/SmoothX'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import { iconHitslop } from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'

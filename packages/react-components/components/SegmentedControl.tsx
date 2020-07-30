@@ -1,6 +1,6 @@
 import interpolateColors from '@celo/react-components/components/interpolateColors'
 import Touchable from '@celo/react-components/components/Touchable'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import MaskedView from '@react-native-community/masked-view'
 import React from 'react'
