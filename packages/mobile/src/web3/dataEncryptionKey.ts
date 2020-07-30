@@ -15,6 +15,7 @@ import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { getStoredMnemonic } from 'src/backup/utils'
+import { features } from 'src/flags'
 import { FetchDataEncryptionKeyAction, updateAddressDekMap } from 'src/identity/actions'
 import { getCurrencyAddress } from 'src/tokens/saga'
 import { sendTransaction } from 'src/transactions/send'
@@ -154,25 +155,33 @@ export async function getRegisterDekTxGas(account: string, currency: CURRENCY_EN
 }
 
 export function* getAuthSignerForAccount(account: string) {
-  // Use the DEK for authentication if the current DEK is registered with this account
   const contractKit = yield call(getContractKit)
-  const accountsWrapper: AccountsWrapper = yield call([
-    contractKit.contracts,
-    contractKit.contracts.getAccounts,
-  ])
-  const privateDataKey: string | null = yield select(dataEncryptionKeySelector)
-  if (!privateDataKey) {
-    Logger.error(TAG + 'getAuthSignerForAccount', 'Missing comment key, should never happen.')
-  } else {
-    const publicDataKey = compressedPubKey(hexToBuffer(privateDataKey))
-    const upToDate: boolean = yield call(isAccountUpToDate, accountsWrapper, account, publicDataKey)
-    if (!upToDate) {
-      Logger.error(TAG + 'getAuthSignerForAccount', `DEK mismatch.`)
+
+  if (features.PNP_USE_DEK_FOR_AUTH) {
+    // Use the DEK for authentication if the current DEK is registered with this account
+    const accountsWrapper: AccountsWrapper = yield call([
+      contractKit.contracts,
+      contractKit.contracts.getAccounts,
+    ])
+    const privateDataKey: string | null = yield select(dataEncryptionKeySelector)
+    if (!privateDataKey) {
+      Logger.error(TAG + 'getAuthSignerForAccount', 'Missing comment key, should never happen.')
     } else {
-      Logger.info(TAG + 'getAuthSignerForAccount', 'Using DEK for authentication')
-      return {
-        authenticationMethod: PNPUtils.PhoneNumberLookup.AuthenticationMethod.ENCRYPTIONKEY,
-        rawKey: privateDataKey,
+      const publicDataKey = compressedPubKey(hexToBuffer(privateDataKey))
+      const upToDate: boolean = yield call(
+        isAccountUpToDate,
+        accountsWrapper,
+        account,
+        publicDataKey
+      )
+      if (!upToDate) {
+        Logger.error(TAG + 'getAuthSignerForAccount', `DEK mismatch.`)
+      } else {
+        Logger.info(TAG + 'getAuthSignerForAccount', 'Using DEK for authentication')
+        return {
+          authenticationMethod: PNPUtils.PhoneNumberLookup.AuthenticationMethod.ENCRYPTIONKEY,
+          rawKey: privateDataKey,
+        }
       }
     }
   }

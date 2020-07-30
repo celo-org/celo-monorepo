@@ -7,6 +7,7 @@ export const features = {
   VERIFICATION_FORNO_RETRY: true,
   CUSD_MOONPAY_ENABLED: false,
   SHOW_CASH_OUT: false,
+  PNP_USE_DEK_FOR_AUTH: false,
 }
 
 export const pausedFeatures = {
