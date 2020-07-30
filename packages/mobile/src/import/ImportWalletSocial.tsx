@@ -1,7 +1,7 @@
 import { BtnTypes } from '@celo/react-components/components/Button'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
@@ -127,7 +127,7 @@ export class ImportWalletSocial extends React.Component<Props, State> {
 
         {isImportingWallet && (
           <View style={styles.loadingSpinnerContainer} testID="ImportWalletLoadingCircle">
-            <ActivityIndicator size="large" color={colors.celoGreen} />
+            <ActivityIndicator size="large" color={colors.greenBrand} />
           </View>
         )}
 

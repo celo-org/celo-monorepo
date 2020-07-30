@@ -154,7 +154,7 @@ function SupportContact() {
         </View>
         {inProgress && (
           <View style={styles.loadingSpinnerContainer} testID="ImportWalletLoadingCircle">
-            <ActivityIndicator size="large" color={colors.celoGreen} />
+            <ActivityIndicator size="large" color={colors.greenBrand} />
           </View>
         )}
 

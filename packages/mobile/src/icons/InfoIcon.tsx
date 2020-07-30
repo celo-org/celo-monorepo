@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
 import * as React from 'react'
 import { Image } from 'react-native'
 
@@ -10,7 +10,7 @@ interface Props {
 export default class InfoIcon extends React.PureComponent<Props> {
   static defaultProps = {
     size: 12,
-    tintColor: colors.celoGreen,
+    tintColor: colors.greenBrand,
   }
 
   render() {

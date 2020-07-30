@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -82,10 +82,10 @@ const styles = StyleSheet.create({
     lineHeight: undefined,
   },
   textGrey: {
-    color: colors.disconnectBannerGrey,
+    color: colors.gray4,
   },
   textRed: {
-    color: colors.disconnectBannerRed,
+    color: colors.warning,
   },
 })
 

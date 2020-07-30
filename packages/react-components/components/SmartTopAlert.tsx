@@ -1,6 +1,6 @@
 import SmallButton from '@celo/react-components/components/SmallButton'
 import Error from '@celo/react-components/icons/Error'
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Animated, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.messageBlue,
+    backgroundColor: colors.onboardingBlue,
     paddingBottom: PADDING_VERTICAL,
     paddingHorizontal: 25,
   },

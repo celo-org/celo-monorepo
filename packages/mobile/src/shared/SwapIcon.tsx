@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
 import * as React from 'react'
 import Svg, { Circle, Path } from 'svgs'
 
@@ -10,7 +10,7 @@ interface Props {
 export default class SwapIcon extends React.PureComponent<Props> {
   static defaultProps = {
     size: 20,
-    color: colors.celoGreen,
+    color: colors.greenBrand,
   }
 
   render() {

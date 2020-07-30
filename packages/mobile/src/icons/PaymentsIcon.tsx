@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
 import * as React from 'react'
 import Svg, { Line, Rect } from 'svgs'
 

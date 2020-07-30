@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
 import * as React from 'react'
 import { StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.errorRed,
   },
   debugButton: {
-    backgroundColor: colors.messageBlue,
+    backgroundColor: colors.onboardingBlue,
   },
   hiddenButton: {
     flex: 1,

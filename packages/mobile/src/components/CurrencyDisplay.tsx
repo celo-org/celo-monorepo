@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
@@ -166,7 +166,7 @@ export default function CurrencyDisplay({
   const color = useColors
     ? currency === CURRENCY_ENUM.GOLD
       ? colors.celoGold
-      : colors.celoGreen
+      : colors.greenBrand
     : StyleSheet.flatten(style)?.color
 
   if (type === DisplayType.Big) {

@@ -33,7 +33,9 @@ export class NoActivity extends React.PureComponent<Props> {
 
     return (
       <View style={styles.container}>
-        {loading && <ActivityIndicator style={styles.icon} size="large" color={colors.celoGreen} />}
+        {loading && (
+          <ActivityIndicator style={styles.icon} size="large" color={colors.greenBrand} />
+        )}
         <Text style={styles.text}>{statusText} </Text>
       </View>
     )

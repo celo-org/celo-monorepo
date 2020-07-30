@@ -1,5 +1,5 @@
 import Touchable from '@celo/react-components/components/Touchable'
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { debounce } from 'lodash'
 import React, { useCallback } from 'react'
@@ -69,7 +69,7 @@ export default function Button(props: ButtonProps) {
       borderColor = disabled ? colors.celoGreenInactive : colors.celoGreen
       break
     case BtnTypes.TERTIARY:
-      textColor = disabled ? colors.inactiveDark : colors.dark
+      textColor = disabled ? colors.gray4 : colors.dark
       backgroundColor = 'transparent'
       borderColor = 'transparent'
       break

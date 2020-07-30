@@ -129,7 +129,7 @@ exports[`Contact renders correctly 1`] = `
           }
           testID="SwitchLogs"
           thumbTintColor="#FFFFFF"
-          trackColorForFalse="#D1D5D8"
+          trackColorForFalse="#9CA4A9"
           trackColorForTrue="#42D689"
           trackTintColor="#42D689"
         />

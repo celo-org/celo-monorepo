@@ -34,7 +34,7 @@ export default function LineItemRow({
       {hasError && <Text style={textStyle}>---</Text>}
       {isLoading && (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="small" color={colors.celoGreen} />
+          <ActivityIndicator size="small" color={colors.greenBrand} />
         </View>
       )}
     </View>

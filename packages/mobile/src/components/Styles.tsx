@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
 import variables from '@celo/react-components/styles/variables'
 import { Dimensions, StyleSheet } from 'react-native'
 

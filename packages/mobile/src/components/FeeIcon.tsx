@@ -1,5 +1,5 @@
 import Touchable from '@celo/react-components/components/Touchable'
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
 import { iconHitslop } from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
@@ -22,7 +22,7 @@ interface State {
 // /* tslint:disable:max-classes-per-file */
 class FeeIcon extends React.Component<Props, State> {
   static defaultProps = {
-    tintColor: colors.lightGray,
+    tintColor: colors.gray3,
   }
 
   state = {

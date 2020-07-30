@@ -2,7 +2,7 @@ import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
@@ -164,7 +164,7 @@ export class InviteReview extends React.Component<Props, State> {
         />
         {inviteInProgress && (
           <View style={styles.loadingIcon}>
-            <ActivityIndicator size="large" color={colors.celoGreen} />
+            <ActivityIndicator size="large" color={colors.greenBrand} />
           </View>
         )}
       </View>

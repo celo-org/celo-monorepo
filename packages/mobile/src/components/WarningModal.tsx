@@ -1,5 +1,5 @@
 import TextButton from '@celo/react-components/components/TextButton'
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
@@ -75,6 +75,6 @@ const styles = StyleSheet.create({
   modalContinueText: {
     ...fontStyles.body,
     ...fontStyles.semiBold,
-    color: colors.celoGreen,
+    color: colors.greenBrand,
   },
 })

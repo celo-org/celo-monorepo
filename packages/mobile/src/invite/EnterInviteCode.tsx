@@ -165,7 +165,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
                   </View>
                   {isSkippingInvite && (
                     <View>
-                      <ActivityIndicator size="large" color={colors.celoGreen} />
+                      <ActivityIndicator size="large" color={colors.greenBrand} />
                     </View>
                   )}
                   <View>

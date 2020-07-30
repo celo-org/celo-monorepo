@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
 import { StyleSheet } from 'react-native'
 
 const HindSilguri = {
@@ -178,7 +178,7 @@ export const fontStyles = StyleSheet.create({
   },
   messageText: {
     fontSize: 12,
-    color: colors.messageBlue,
+    color: colors.onboardingBlue,
   },
   center: {
     textAlign: 'center',

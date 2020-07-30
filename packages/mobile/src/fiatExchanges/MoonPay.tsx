@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
@@ -62,7 +62,7 @@ function FiatExchangeWeb({ route }: Props) {
   return (
     <View style={styles.container}>
       {uri === '' ? (
-        <ActivityIndicator size="large" color={colors.celoGreen} />
+        <ActivityIndicator size="large" color={colors.greenBrand} />
       ) : (
         <WebView style={styles.exchangeWebView} source={{ uri }} />
       )}

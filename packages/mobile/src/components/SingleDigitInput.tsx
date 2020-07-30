@@ -1,5 +1,5 @@
 import TextInput from '@celo/react-components/components/TextInput'
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { StyleSheet } from 'react-native'

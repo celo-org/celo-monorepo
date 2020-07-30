@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
 import BigNumber from 'bignumber.js'
 import { CURRENCIES, CURRENCY_ENUM, WEI_PER_CELO } from 'src/geth/consts'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
@@ -107,7 +107,7 @@ export function roundUp(
 export const getCurrencyColor = (currencyType: CURRENCY_ENUM): string => {
   switch (currencyType) {
     case CURRENCY_ENUM.DOLLAR:
-      return colors.celoGreen
+      return colors.greenBrand
     case CURRENCY_ENUM.GOLD:
       return colors.celoGold
   }
@@ -115,7 +115,7 @@ export const getCurrencyColor = (currencyType: CURRENCY_ENUM): string => {
 
 export const getBalanceColor = (accountBalance: BigNumber): string => {
   if (accountBalance.isGreaterThan(0)) {
-    return colors.celoGreen
+    return colors.greenBrand
   }
   if (accountBalance.isLessThan(0)) {
     return colors.errorRed

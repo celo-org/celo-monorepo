@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
   },
   name: { ...fontStyles.regular500, color: colors.dark },
   invite: {
-    color: colors.celoGreen,
+    color: colors.greenBrand,
     lineHeight: 41,
     alignSelf: 'center',
     paddingHorizontal: 10,

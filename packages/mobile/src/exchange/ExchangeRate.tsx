@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
 import BigNumber from 'bignumber.js'

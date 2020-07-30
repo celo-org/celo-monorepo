@@ -1,7 +1,7 @@
 import TextInput from '@celo/react-components/components/TextInput'
 import withTextInputPasteAware from '@celo/react-components/components/WithTextInputPasteAware'
 import Checkmark from '@celo/react-components/icons/Checkmark'
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
@@ -63,7 +63,7 @@ function CodeRow({
     return (
       <View style={styles.codeProcessingContainer}>
         <Text style={styles.codeValue}>{shortenedInput || t('processing')}</Text>
-        <ActivityIndicator size="small" color={colors.celoGreen} style={styles.codeInputSpinner} />
+        <ActivityIndicator size="small" color={colors.greenBrand} style={styles.codeInputSpinner} />
       </View>
     )
   }
