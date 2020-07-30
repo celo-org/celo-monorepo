@@ -23,6 +23,7 @@ const styles = StyleSheet.create({
   root: {
     marginTop: 40,
     marginBottom: 70,
+    // transform: [{translateY: - 200}]
   },
 })
 
