@@ -101,7 +101,12 @@ release: {{ .Release.Name }}
     fi
     NAT_FLAG="--nat=extip:${NAT_IP}"
     ADDITIONAL_FLAGS='{{ .geth_flags | default "" }}'
-    [[ -f /root/.celo/pkey ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --nodekey=/root/.celo/pkey"
+    if [[ -f /root/.celo/pkey ]]; then
+      NODE_KEY=$(cat /root/.celo/pkey)
+      if [[ ! -z ${NODE_KEY} ]]; then
+        ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --nodekey=/root/.celo/pkey" && echo "Node key: ${NODE_KEY}"
+      fi
+    fi
     {{ if .proxy | default false }}
     VALIDATOR_HEX_ADDRESS=$(cat /root/.celo/validator_address)
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxiedvalidatoraddress $VALIDATOR_HEX_ADDRESS --proxy.proxy --proxy.internalendpoint :30503"
@@ -152,6 +157,7 @@ release: {{ .Release.Name }}
       --consoleoutput=stdout \
       --verbosity={{ .Values.geth.verbosity }} \
       --vmodule={{ .Values.geth.vmodule }} \
+      --istanbul.blockperiod={{ .Values.geth.blocktime | default 5 }} \
       ${ADDITIONAL_FLAGS}
   env:
   - name: GETH_DEBUG
@@ -249,14 +255,22 @@ data:
     - |
       [[ $REPLICA_NAME =~ -([0-9]+)$ ]] || exit 1
       RID=${BASH_REMATCH[1]}
-      echo "Generating private key for rid=$RID"
-      celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType {{ .mnemonic_account_type }} --index $RID > /root/.celo/pkey
+      {{ if .proxy }}
+      # To allow proxies to scale up easily without conflicting with keys of
+      # proxies associated with other validators
+      KEY_INDEX=$(( ({{ .validator_index }} * 10000) + $RID ))
+      {{ else }}
+      KEY_INDEX=$RID
+      {{ end }}
+      echo "Generating private key with KEY_INDEX=$KEY_INDEX"
+      celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType {{ .mnemonic_account_type }} --index $KEY_INDEX > /root/.celo/pkey
+      echo "Private key $(cat /root/.celo/pkey)"
       echo 'Generating address'
       celotooljs.sh generate account-address --private-key $(cat /root/.celo/pkey) > /root/.celo/address
       {{ if .proxy }}
       # Generating the account address of the validator
-      echo "Generating the account address of the validator $RID"
-      celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType validator --index $RID > /root/.celo/validator_pkey
+      echo "Generating the account address of the validator {{ .validator_index }}"
+      celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType validator --index {{ .validator_index }} > /root/.celo/validator_pkey
       celotooljs.sh generate account-address --private-key `cat /root/.celo/validator_pkey` > /root/.celo/validator_address
       rm -f /root/.celo/validator_pkey
       {{ end }}
@@ -276,7 +290,7 @@ data:
         fi
       else
         echo 'Using $IP_ADDRESSES'
-        echo $IP_ADDRESSES | cut -d ',' -f $((RID + 1)) > /root/.celo/ipAddress
+        echo $IP_ADDRESSES | cut -d '/' -f $((RID + 1)) > /root/.celo/ipAddress
       fi
       echo "/root/.celo/ipAddress"
       cat /root/.celo/ipAddress
@@ -297,7 +311,7 @@ data:
         apiVersion: v1
         fieldPath: status.podIP
   - name: BOOTNODE_IP_ADDRESS
-    value: {{ default "none" .Values.geth.bootnodeIpAddress  }}
+    value: {{ default "none" .Values.geth.bootnodeIpAddress }}
   - name: REPLICA_NAME
     valueFrom:
       fieldRef:
@@ -308,7 +322,7 @@ data:
         name: {{ template "common.fullname" . }}-geth-account
         key: mnemonic
   - name: IP_ADDRESSES
-    value:  "{{ join "," .ip_addresses }}"
+    value: {{ .ip_addresses }}
   volumeMounts:
   - name: data
     mountPath: /root/.celo
@@ -370,3 +384,14 @@ spec:
   value: "{{ (index .dict .value_name) }}"
 {{- end }}
 {{- end -}}
+
+{{/*
+Annotations to indicate to the prometheus server that this node should be scraped for metrics
+*/}}
+{{- define "common.prometheus-annotations" -}}
+{{- $pprof := .Values.pprof | default dict -}}
+prometheus.io/scrape: "true"
+prometheus.io/path:  "{{ $pprof.path | default "/debug/metrics/prometheus" }}"
+prometheus.io/port: "{{ $pprof.port | default 6060 }}"
+{{- end -}}
+

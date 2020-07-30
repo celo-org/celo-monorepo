@@ -59,4 +59,15 @@ describe('Redux persist migrations', () => {
     const migratedSchema = migrations[3](v2Stub)
     expect(migratedSchema.send.recentPayments.length).toEqual(0)
   })
+  it('works for v3 to v4', () => {
+    const v3Stub = {
+      ...v2Schema,
+      identity: {
+        ...v2Schema.identity,
+        acceptedAttestationCodes: [{ code: 'code', issuer: 'issuer' }],
+      },
+    }
+    const migratedSchema = migrations[4](v3Stub)
+    expect(migratedSchema.identity.acceptedAttestationCodes.length).toEqual(0)
+  })
 })

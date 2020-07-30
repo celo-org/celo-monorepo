@@ -2,7 +2,12 @@
   "education": {
     "step1": "Send and receive money instantly",
     "step2": "Pay anyone, anywhere with very low fees",
-    "step3": "Confidently and safely use {{appName}}",
+    "step3": "Confidently and safely use {{appName}}"
+  },
+  "welcome": {
+    "title": "Your value,\non your phone",
+    "createAccount": "Create new account",
+    "restoreAccount": "I have an account"
   },
   "contacts": {
     "header": "Connect Contacts",

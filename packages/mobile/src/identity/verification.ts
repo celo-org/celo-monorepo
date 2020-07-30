@@ -20,7 +20,8 @@ import { VerificationEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { DEFAULT_TESTNET, SMS_RETRIEVER_APP_SIGNATURE, USE_PHONE_NUMBER_PRIVACY } from 'src/config'
+import { DEFAULT_TESTNET, SMS_RETRIEVER_APP_SIGNATURE } from 'src/config'
+import { features } from 'src/flags'
 import { refreshAllBalances } from 'src/home/actions'
 import {
   Actions,
@@ -29,6 +30,7 @@ import {
   InputAttestationCodeAction,
   ReceiveAttestationMessageAction,
   resetVerification,
+  setCompletedCodes,
   setVerificationStatus,
 } from 'src/identity/actions'
 import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privateHashing'
@@ -99,10 +101,9 @@ export function* doVerificationFlow() {
     yield put(setVerificationStatus(VerificationStatus.Prepping))
     const account: string = yield call(getConnectedUnlockedAccount)
     const e164Number: string = yield select(e164NumberSelector)
-    // TODO cleanup when feature flag is removed
     let phoneHash: string
     let phoneHashDetails: PhoneNumberHashDetails
-    if (USE_PHONE_NUMBER_PRIVACY) {
+    if (features.USE_PHONE_NUMBER_PRIVACY) {
       phoneHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
       phoneHash = phoneHashDetails.phoneHash
     } else {
@@ -154,9 +155,7 @@ export function* doVerificationFlow() {
       }
 
       // Mark codes completed in previous attempts
-      yield put(
-        completeAttestationCode(NUM_ATTESTATIONS_REQUIRED - status.numAttestationsRemaining)
-      )
+      yield put(setCompletedCodes(NUM_ATTESTATIONS_REQUIRED - status.numAttestationsRemaining))
 
       yield put(setVerificationStatus(VerificationStatus.RequestingAttestations))
 
@@ -516,7 +515,7 @@ function* revealAndCompleteAttestation(
 
   ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_complete, { issuer })
 
-  yield put(completeAttestationCode())
+  yield put(completeAttestationCode(code))
   Logger.debug(TAG + '@revealAttestation', `Attestation for issuer ${issuer} completed`)
 }
 
@@ -530,12 +529,12 @@ function* tryRevealPhoneNumber(
   Logger.debug(TAG + '@tryRevealPhoneNumber', `Revealing an attestation for issuer: ${issuer}`)
 
   try {
-    const smsRetrieverAppSig =
-      Platform.OS === 'android' && USE_PHONE_NUMBER_PRIVACY
-        ? SMS_RETRIEVER_APP_SIGNATURE
-        : undefined
+    // Only include retriever app sig for android, iOS doesn't support auto-read
+    const smsRetrieverAppSig = Platform.OS === 'android' ? SMS_RETRIEVER_APP_SIGNATURE : undefined
 
-    const useProxy = DEFAULT_TESTNET === 'mainnet' // Proxy required for any network where attestation service domains are not static
+    // Proxy required for any network where attestation service domains are not static
+    // This works around TLS issues
+    const useProxy = DEFAULT_TESTNET === 'mainnet'
 
     const revealRequestBody: AttesationServiceRevealRequest = {
       account,
@@ -609,7 +608,6 @@ function* tryRevealPhoneNumber(
       issuer,
       error: error.message,
     })
-    yield put(showError(ErrorMessages.REVEAL_ATTESTATION_FAILURE))
     yield put(setVerificationStatus(VerificationStatus.RevealAttemptFailed))
   }
 }
