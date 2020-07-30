@@ -56,7 +56,8 @@ testWithGanache('Offchain Data', (web3) => {
       const nameAccessor = new NameAccessor(wrapper)
       await nameAccessor.write({ name: testname })
 
-      const receivedName = await nameAccessor.read(writer)
+      const [receivedName, err] = await nameAccessor.read(writer)
+      expect(err).toEqual(null)
       expect(receivedName).toBeDefined()
       expect(receivedName!.name).toEqual(testname)
     })

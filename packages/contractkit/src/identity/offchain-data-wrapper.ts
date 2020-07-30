@@ -8,12 +8,17 @@ import { IdentityMetadataWrapper } from './metadata'
 import { StorageWriter } from './offchain/storage-writers'
 const debug = debugFactory('offchaindata')
 
+class FetchError extends Error {}
+class InvalidSignature extends Error {}
+class NoStorageRootProvidedData extends Error {}
+export type OffchainErrors = FetchError | InvalidSignature | NoStorageRootProvidedData
+
 export default class OffchainDataWrapper {
   storageWriter: StorageWriter | undefined
 
   constructor(readonly self: string, readonly kit: ContractKit) {}
 
-  async readDataFrom(account: string, dataPath: string) {
+  async readDataFrom(account: string, dataPath: string): Promise<[any, OffchainErrors | null]> {
     const accounts = await this.kit.contracts.getAccounts()
     const metadataURL = await accounts.getMetadataURL(account)
     debug({ account, metadataURL })
@@ -23,18 +28,17 @@ export default class OffchainDataWrapper {
       .filterClaims(ClaimTypes.STORAGE)
       .map((_) => new StorageRoot(account, _.address))
     debug({ account, storageRoots })
-    const data = (await Promise.all(storageRoots.map((_) => _.read(dataPath)))).find((_) => _)
 
-    if (data === undefined) {
-      return undefined
+    if (storageRoots.length === 0) {
+      return [null, new NoStorageRootProvidedData()]
+    }
+    const [actualData, err] = (await Promise.all(storageRoots.map((_) => _.read(dataPath))))[0]
+
+    if (err) {
+      return [null, err]
     }
 
-    const [actualData, error] = data
-    if (error) {
-      return undefined
-    }
-
-    return actualData
+    return [actualData, null]
   }
 
   async writeDataTo(data: string, dataPath: string) {
@@ -52,10 +56,10 @@ class StorageRoot {
   constructor(readonly account: string, readonly address: string) {}
 
   // TODO: Add decryption metadata (i.e. indicates ciphertext to be decrypted/which key to use)
-  async read(dataPath: string): Promise<[any, any]> {
+  async read(dataPath: string): Promise<[any, OffchainErrors | null]> {
     const data = await fetch(this.address + dataPath)
     if (!data.ok) {
-      return [null, 'No can do']
+      return [null, new FetchError()]
     }
 
     const body = await data.text()
@@ -63,7 +67,7 @@ class StorageRoot {
     const signature = await fetch(this.address + dataPath + '.signature')
 
     if (!signature.ok) {
-      return [null, 'Signature could not be fetched']
+      return [null, new FetchError()]
     }
 
     // TODO: Compare against registered on-chain signers or off-chain signers

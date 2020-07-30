@@ -1,7 +1,15 @@
 import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import { Address } from '../../base'
-import OffchainDataWrapper from '../offchain-data-wrapper'
+import OffchainDataWrapper, { OffchainErrors } from '../offchain-data-wrapper'
+
+class InvalidDataError extends Error {}
+class OffchainError extends Error {
+  constructor(readonly error: OffchainErrors) {
+    super()
+  }
+}
+type SchemaErrors = OffchainError | InvalidDataError
 
 export class SingleSchema<T> {
   constructor(
@@ -24,18 +32,23 @@ export const readWithSchema = async <T>(
   type: t.Type<T>,
   account: Address,
   dataPath: string
-) => {
-  const data = await wrapper.readDataFrom(account, dataPath)
-  if (data === undefined) {
-    return
+): Promise<[T | null, SchemaErrors | null]> => {
+  const [data, err] = await wrapper.readDataFrom(account, dataPath)
+  if (err) {
+    return [null, new OffchainError(err)]
   }
-  const asJson = JSON.parse(data)
+  let asJson: any
+  try {
+    asJson = JSON.parse(data)
+  } catch (error) {
+    return [null, new InvalidDataError()]
+  }
   const parseResult = type.decode(asJson)
   if (isLeft(parseResult)) {
-    return undefined
+    return [null, new InvalidDataError()]
   }
 
-  return parseResult.right
+  return [parseResult.right, null]
 }
 
 export const writeWithSchema = async <T>(
