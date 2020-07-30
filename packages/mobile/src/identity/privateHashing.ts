@@ -1,4 +1,8 @@
-import { getPhoneNumberIdentifier, PhoneNumberHashDetails } from '@celo/contractkit'
+import {
+  AuthenticationMethod,
+  getPhoneNumberIdentifier,
+  PhoneNumberHashDetails,
+} from '@celo/contractkit'
 import { getPhoneHash, isE164Number, PhoneNumberUtils } from '@celo/utils/src/phoneNumbers'
 import DeviceInfo from 'react-native-device-info'
 import { call, put, select } from 'redux-saga/effects'
@@ -19,7 +23,7 @@ import { generateStandbyTransactionId } from 'src/transactions/actions'
 import { waitForTransactionWithId } from 'src/transactions/saga'
 import Logger from 'src/utils/Logger'
 import { getAuthSignerForAccount } from 'src/web3/dataEncryptionKey'
-import { getConnectedUnlockedAccount } from 'src/web3/saga'
+import { getConnectedAccount, unlockAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'identity/privateHashing'
@@ -56,7 +60,7 @@ export function* fetchPhoneHashPrivate(e164Number: string) {
  * otherwise query from the service
  */
 function* doFetchPhoneHashPrivate(e164Number: string) {
-  const account: string = yield call(getConnectedUnlockedAccount)
+  const account: string = yield call(getConnectedAccount)
   Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Fetching phone hash details')
   const saltCache: E164NumberToSaltType = yield select(e164NumberToSaltSelector)
   const cachedSalt = saltCache[e164Number]
@@ -91,6 +95,13 @@ function* getPhoneHashPrivate(e164Number: string, account: string, selfPhoneHash
   }
 
   const authSigner = yield call(getAuthSignerForAccount, account)
+  // Unlock the account if the authentication is signed by the wallet
+  if (authSigner.authenticationMethod === AuthenticationMethod.WALLETKEY) {
+    const success: boolean = yield call(unlockAccount, account)
+    if (!success) {
+      throw new Error(ErrorMessages.INCORRECT_PIN)
+    }
+  }
 
   const { pgpnpPubKey } = networkConfig
   const blsBlindingClient = new ReactBlsBlindingClient(pgpnpPubKey)

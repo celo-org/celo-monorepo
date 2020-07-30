@@ -1,6 +1,9 @@
 import { BlsBlindingClient } from '@celo/contractkit'
 import BlindThresholdBls from 'react-native-blind-threshold-bls'
 
+/**
+ * Wraps the React Native BLS client
+ */
 export class ReactBlsBlindingClient implements BlsBlindingClient {
   private pgpnpPubKey: string
 

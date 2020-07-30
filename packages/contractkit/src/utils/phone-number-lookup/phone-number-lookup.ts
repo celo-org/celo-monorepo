@@ -65,6 +65,13 @@ export interface ServiceContext {
   pgpnpPubKey: string
 }
 
+/**
+ * Make a request to lookup the phone number identifier or perform matchmaking
+ * @param signer type of key to sign with
+ * @param body request body
+ * @param context contains service URL
+ * @param endpoint endpoint to hit
+ */
 export async function postToPhoneNumPrivacyService<ResponseType>(
   signer: AuthSigner,
   body: PhoneNumberPrivacyRequest,
