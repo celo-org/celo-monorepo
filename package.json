@@ -95,6 +95,8 @@
     "yargs-parser": "^13.1.2",
     "npm": "^5.10.0",
     "npmi": "^4.0.0",
-    "websocket-extensions": "^0.1.4"
+    "websocket-extensions": "^0.1.4",
+    "elliptic": "^6.5.3",
+    "dot-prop": "^5.2.0"
   }
 }
