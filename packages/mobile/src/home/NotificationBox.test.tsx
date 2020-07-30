@@ -17,6 +17,8 @@ const storeDataNotificationsEnabled = {
     dismissedInviteFriends: false,
     dismissedGetVerified: false,
     accountCreationTime: EXPIRED_BACKUP_TIME,
+  },
+  paymentRequest: {
     incomingPaymentRequests: mockPaymentRequests.slice(0, 2),
   },
 }
@@ -28,6 +30,8 @@ const storeDataNotificationsDisabled = {
     dismissedInviteFriends: true,
     dismissedGetVerified: true,
     accountCreationTime: RECENT_BACKUP_TIME,
+  },
+  paymentRequest: {
     incomingPaymentRequests: [],
   },
 }

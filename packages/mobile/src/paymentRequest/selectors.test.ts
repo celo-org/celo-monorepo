@@ -1,15 +1,15 @@
+import { createMockPaymentRequest } from 'src/paymentRequest/__mocks__'
 import {
   getIncomingPaymentRequests,
   getOutgoingPaymentRequests,
 } from 'src/paymentRequest/selectors'
 import { PaymentRequestStatus } from 'src/paymentRequest/types'
-import { createMockPaymentRequest } from 'src/paymentRequest/__mocks__'
 
 describe('selectors', () => {
   describe(getIncomingPaymentRequests, () => {
     it('excludes declined and completed requests', () => {
       const state: any = {
-        account: {
+        paymentRequest: {
           incomingPaymentRequests: [
             createMockPaymentRequest({ status: PaymentRequestStatus.DECLINED }),
             createMockPaymentRequest({ status: PaymentRequestStatus.COMPLETED }),
@@ -23,7 +23,7 @@ describe('selectors', () => {
       const goodRequest = createMockPaymentRequest({ status: PaymentRequestStatus.REQUESTED })
 
       const state: any = {
-        account: {
+        paymentRequest: {
           incomingPaymentRequests: [
             createMockPaymentRequest({
               status: PaymentRequestStatus.COMPLETED,
@@ -40,7 +40,7 @@ describe('selectors', () => {
   describe(getOutgoingPaymentRequests, () => {
     it('excludes declined and completed requests', () => {
       const state: any = {
-        account: {
+        paymentRequest: {
           outgoingPaymentRequests: [
             createMockPaymentRequest({ status: PaymentRequestStatus.DECLINED }),
             createMockPaymentRequest({ status: PaymentRequestStatus.COMPLETED }),
@@ -54,7 +54,7 @@ describe('selectors', () => {
       const goodRequest = createMockPaymentRequest({ status: PaymentRequestStatus.REQUESTED })
 
       const state: any = {
-        account: {
+        paymentRequest: {
           outgoingPaymentRequests: [
             createMockPaymentRequest({
               status: PaymentRequestStatus.COMPLETED,

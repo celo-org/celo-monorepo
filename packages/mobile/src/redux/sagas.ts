@@ -34,12 +34,11 @@ const loggerBlacklist = [
   'SEND/SET_RECIPIENT_CACHE',
   'SEND/STORE_LATEST_IN_RECENTS',
   'IMPORT/IMPORT_BACKUP_PHRASE',
-  'WEB3/SET_COMMENT_KEY',
+  'WEB3/SET_DATA_ENCRYPTION_KEY',
   'INVITE/REDEEM_INVITE',
   'INVITE/STORE_INVITEE_DATA',
   'EXCHANGE/UPDATE_CELO_GOLD_EXCHANGE_RATE_HISTORY', // Not private, just noisy
   'TRANSACTIONS/NEW_TRANSACTIONS_IN_FEED',
-  'PAYMENT_REQUEST/PAYMENT_REQUEST_WRITE', //TODO wrong
 ]
 
 function* loggerSaga() {
@@ -49,8 +48,6 @@ function* loggerSaga() {
   }
 
   yield takeEvery('*', (action: AnyAction) => {
-    //TODO this is still logging some sensitive info
-    // like SendPayment has recipient which has phone number
     if (
       action?.type &&
       (action.type.includes('IDENTITY/') || loggerBlacklist.includes(action.type))
