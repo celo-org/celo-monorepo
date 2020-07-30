@@ -31,7 +31,6 @@ import EscrowedPaymentListScreen from 'src/escrow/EscrowedPaymentListScreen'
 import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmationScreen'
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
-import FeeExchangeEducation from 'src/exchange/FeeExchangeEducation'
 import FiatExchangeAmount, {
   fiatExchangesAmountScreenOptions,
 } from 'src/fiatExchanges/FiatExchangeAmount'
@@ -66,10 +65,11 @@ import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
 import ImportContactsScreen from 'src/onboarding/contacts/ImportContactsScreen'
 import OnboardingEducationScreen from 'src/onboarding/education/OnboardingEducationScreen'
-import JoinCelo from 'src/onboarding/registration/JoinCelo'
+import NameAndNumber from 'src/onboarding/registration/NameAndNumber'
 import RegulatoryTerms from 'src/onboarding/registration/RegulatoryTerms'
 import SelectCountry from 'src/onboarding/registration/SelectCountry'
 import OnboardingSuccessScreen from 'src/onboarding/success/OnboardingSuccessScreen'
+import Welcome from 'src/onboarding/welcome/Welcome'
 import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import OutgoingPaymentRequestListScreen from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
 import PaymentRequestConfirmation, {
@@ -82,7 +82,6 @@ import PincodeEnter from 'src/pincode/PincodeEnter'
 import PincodeSet from 'src/pincode/PincodeSet'
 import { RootState } from 'src/redux/reducers'
 import { store } from 'src/redux/store'
-import FeeEducation from 'src/send/FeeEducation'
 import Send, { sendScreenNavOptions } from 'src/send/Send'
 import SendAmount, { sendAmountScreenNavOptions } from 'src/send/SendAmount'
 import SendConfirmation, { sendConfirmationScreenNavOptions } from 'src/send/SendConfirmation'
@@ -98,7 +97,6 @@ import { getDatetimeDisplayString } from 'src/utils/time'
 import { ExtractProps } from 'src/utils/typescript'
 import VerificationEducationScreen from 'src/verify/VerificationEducationScreen'
 import VerificationInputScreen from 'src/verify/VerificationInputScreen'
-import VerificationInterstitialScreen from 'src/verify/VerificationInterstitialScreen'
 import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
 
 const Stack = createStackNavigator<StackParamList>()
@@ -119,9 +117,21 @@ const commonScreens = (Navigator: typeof Stack) => {
       />
       <Navigator.Screen name={Screens.ErrorScreen} component={ErrorScreen} options={noHeader} />
       <Navigator.Screen name={Screens.UpgradeScreen} component={UpgradeScreen} />
-      <Navigator.Screen name={Screens.DappKitAccountAuth} component={DappKitAccountScreen} />
-      <Navigator.Screen name={Screens.DappKitSignTxScreen} component={DappKitSignTxScreen} />
-      <Navigator.Screen name={Screens.DappKitTxDataScreen} component={DappKitTxDataScreen} />
+      <Navigator.Screen
+        name={Screens.DappKitAccountAuth}
+        component={DappKitAccountScreen}
+        options={DappKitAccountScreen.navigationOptions}
+      />
+      <Navigator.Screen
+        name={Screens.DappKitSignTxScreen}
+        component={DappKitSignTxScreen}
+        options={DappKitSignTxScreen.navigationOptions}
+      />
+      <Navigator.Screen
+        name={Screens.DappKitTxDataScreen}
+        component={DappKitTxDataScreen}
+        options={DappKitTxDataScreen.navigationOptions}
+      />
       <Navigator.Screen name={Screens.Debug} component={Debug} options={Debug.navigationOptions} />
       <Navigator.Screen
         name={Screens.PhoneNumberLookupQuota}
@@ -144,11 +154,6 @@ const verificationScreens = (Navigator: typeof Stack) => {
         name={Screens.VerificationLoadingScreen}
         component={VerificationLoadingScreen}
         options={VerificationLoadingScreen.navigationOptions}
-      />
-      <Navigator.Screen
-        name={Screens.VerificationInterstitialScreen}
-        component={VerificationInterstitialScreen}
-        options={VerificationInterstitialScreen.navigationOptions}
       />
       <Navigator.Screen
         name={Screens.VerificationInputScreen}
@@ -184,8 +189,13 @@ const nuxScreens = (Navigator: typeof Stack) => (
       options={OnboardingEducationScreen.navigationOptions}
     />
     <Navigator.Screen
-      name={Screens.JoinCelo}
-      component={JoinCelo}
+      name={Screens.Welcome}
+      component={Welcome}
+      options={Welcome.navigationOptions}
+    />
+    <Navigator.Screen
+      name={Screens.NameAndNumber}
+      component={NameAndNumber}
       options={{
         ...nuxNavigationOptions,
         headerTitle: () => (
@@ -352,7 +362,6 @@ const exchangeScreens = (Navigator: typeof Stack) => (
       component={ExchangeReview}
       options={exchangeReviewScreenOptions}
     />
-    <Navigator.Screen name={Screens.FeeExchangeEducation} component={FeeExchangeEducation} />
   </>
 )
 
@@ -437,12 +446,12 @@ const generalScreens = (Navigator: typeof Stack) => (
       options={transactionReviewOptions}
     />
     <Navigator.Screen name={Screens.GoldEducation} component={GoldEducation} options={noHeader} />
-    <Navigator.Screen name={Screens.FeeEducation} component={FeeEducation} />
   </>
 )
 
 const mapStateToProps = (state: RootState) => {
   return {
+    choseToRestoreAccount: state.account.choseToRestoreAccount,
     language: currentLanguageSelector(state),
     e164Number: state.account.e164PhoneNumber,
     acceptedTerms: state.account.acceptedTerms,
@@ -460,6 +469,7 @@ export function MainStackScreen() {
   const [initialRouteName, setInitialRoute] = React.useState<InitialRouteName>(undefined)
   React.useEffect(() => {
     const {
+      choseToRestoreAccount,
       language,
       e164Number,
       acceptedTerms,
@@ -473,14 +483,11 @@ export function MainStackScreen() {
 
     if (!language) {
       initialRoute = Screens.Language
-    } else if (!e164Number) {
+    } else if (!e164Number || !acceptedTerms || pincodeType === PincodeType.Unset) {
+      // User didn't go far enough in onboarding, start again from education
       initialRoute = Screens.OnboardingEducationScreen
-    } else if (!acceptedTerms) {
-      initialRoute = Screens.RegulatoryTerms
-    } else if (pincodeType === PincodeType.Unset) {
-      initialRoute = Screens.PincodeSet
     } else if (!redeemComplete && !account) {
-      initialRoute = Screens.EnterInviteCode
+      initialRoute = choseToRestoreAccount ? Screens.ImportWallet : Screens.EnterInviteCode
     } else if (!hasSeenVerificationNux) {
       initialRoute = Screens.VerificationEducationScreen
     } else {

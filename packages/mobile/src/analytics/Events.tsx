@@ -40,6 +40,12 @@ export enum OnboardingEvents {
   onboarding_education_complete = 'onboarding_education_complete',
   onboarding_education_cancel = 'onboarding_education_cancel',
 
+  create_account_start = 'create_account_start',
+  create_account_cancel = 'create_account_cancel',
+
+  restore_account_start = 'create_account_start',
+  restore_account_cancel = 'create_account_cancel',
+
   backup_education_start = 'backup_education_start',
   backup_education_scroll = 'backup_education_scroll',
   backup_education_complete = 'backup_education_complete',
@@ -89,6 +95,8 @@ export enum OnboardingEvents {
   escrow_redeem_start = 'escrow_redeem_start', // when escrow redemption starts (only happens on user invite redeemption)
   escrow_redeem_complete = 'escrow_redeem_complete',
   escrow_redeem_error = 'escrow_redeem_error',
+
+  account_dek_set = 'account_dek_set',
 }
 
 export enum VerificationEvents {
@@ -118,7 +126,6 @@ export enum VerificationEvents {
   verification_code_received = 'verification_code_received',
   verification_code_validate_start = 'verification_code_validate_start',
   verification_code_validate_complete = 'verification_code_validate_complete',
-  verification_account_set = 'verification_account_set',
 
   verification_reveal_all_attestations_start = 'verification_reveal_all_attestations_start',
   verification_reveal_all_attestations_complete = 'verification_reveal_all_attestations_complete',
@@ -231,6 +238,7 @@ export enum TransactionEvents {
   transaction_gas_estimated = 'transaction_gas_estimated',
   transaction_hash_received = 'transaction_hash_received',
   transaction_receipt_received = 'transaction_receipt_received',
+  transaction_confirmed = 'transaction_confirmed',
   transaction_error = 'transaction_error',
   transaction_exception = 'transaction_exception',
 }

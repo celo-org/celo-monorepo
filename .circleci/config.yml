@@ -103,7 +103,7 @@ commands:
       - run:
           name: Create cached node_modules (if necessary)
           command: |
-            if [ ! -e ~/.tmp/node_modules.tgz ]; then 
+            if [ ! -e ~/.tmp/node_modules.tgz ]; then
               tar -c node_modules/ packages/*/node_modules/ packages/phone-number-privacy/*/node_modules/ | gzip --fast > ~/.tmp/node_modules.tgz
             fi
       - save_cache:
@@ -469,7 +469,15 @@ jobs:
           command: |
             ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
       - run:
-          name: test
+          name: Check contract versions
+          command: |
+            mkdir -p ~/.ssh
+            ssh-keyscan github.com >> ~/.ssh/known_hosts
+            git fetch --all
+            RELEASE_BRANCH=$(git branch -a --list *release/contracts/* | tail -1 | sed -e 's/remotes\/origin\///g')
+            yarn --cwd packages/protocol check-versions -o $RELEASE_BRANCH -n $CIRCLE_BRANCH
+      - run:
+          name: Unit tests
           # Flaky tests - run them twice
           command: yarn --cwd packages/protocol test || yarn --cwd packages/protocol test
 
@@ -791,11 +799,47 @@ jobs:
           name: Run Tests for signer
           command: yarn --cwd=packages/phone-number-privacy/signer test
 
+  certora-test:
+    working_directory: ~/app
+    docker:
+      - image: circleci/openjdk:11-jdk-node
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
+      - run:
+          name: Certora dependencies
+          command: |
+            echo "export PATH=$PATH:~/.local/bin" >> $BASH_ENV
+            sudo apt-get update || sudo apt-get update
+            sudo apt-get install -y software-properties-common
+            sudo apt-get install python3-pip
+            pip3 install certora-cli==0.1.1
+            wget https://github.com/ethereum/solidity/releases/download/v0.5.12/solc-static-linux
+            chmod +x solc-static-linux
+            sudo mv solc-static-linux /usr/bin/solc
+      - run:
+          name: Build and run - Locked Gold
+          command: |
+            cd packages/protocol
+            certoraRun specs/harnesses/GoldTokenHarness.sol specs/harnesses/LockedGoldHarness.sol --link LockedGoldHarness:goldToken=GoldTokenHarness --verify LockedGoldHarness:specs/lockedGold.spec --settings -assumeUnwindCond
+      - run:
+          name: Build and run - Accounts
+          command: |
+            cd packages/protocol
+            certoraRun specs/harnesses/AccountsHarness.sol --verify AccountsHarness:specs/accounts.spec --settings -assumeUnwindCond
+
 workflows:
   version: 2
   celo-monorepo-build:
     jobs:
       - install_dependencies
+      - certora-test:
+          requires:
+            - install_dependencies
       - lint-checks:
           requires:
             - install_dependencies
