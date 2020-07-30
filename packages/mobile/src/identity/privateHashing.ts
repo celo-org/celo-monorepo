@@ -117,7 +117,7 @@ function* getPhoneHashPrivate(e164Number: string, account: string, selfPhoneHash
     )
   } catch (error) {
     if (error.message === ErrorMessages.PGPNP_QUOTA_ERROR) {
-      throw new Error(ErrorMessages.MATCHMAKING_QUOTA_EXCEEDED)
+      throw new Error(ErrorMessages.SALT_QUOTA_EXCEEDED)
     }
     throw error
   }
