@@ -41,7 +41,7 @@ function fmtIssueBody(errors) {
 }
 
 function getPullNumber() {
-  if (process.env.CIRCLECI) {
+  if (process.env.CIRCLECI && process.env.CIRCLE_BRANCH !== 'master') {
     const prUrl = process.env.CIRCLE_PULL_REQUEST
     return prUrl.slice(prUrl.lastIndexOf('/') + 1)
   }
