@@ -97,6 +97,12 @@ interface OnboardingEventsProperties {
   [OnboardingEvents.onboarding_education_complete]: undefined
   [OnboardingEvents.onboarding_education_cancel]: undefined
 
+  [OnboardingEvents.create_account_start]: undefined
+  [OnboardingEvents.create_account_cancel]: undefined
+
+  [OnboardingEvents.restore_account_start]: undefined
+  [OnboardingEvents.restore_account_cancel]: undefined
+
   [OnboardingEvents.backup_education_start]: undefined
   [OnboardingEvents.backup_education_scroll]: {
     currentStep: number
@@ -442,6 +448,9 @@ interface TransactionEventsProperties {
     txId: string
   }
   [TransactionEvents.transaction_hash_received]: {
+    txId: string
+  }
+  [TransactionEvents.transaction_confirmed]: {
     txId: string
   }
   [TransactionEvents.transaction_receipt_received]: {
