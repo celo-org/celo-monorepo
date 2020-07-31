@@ -996,7 +996,7 @@ contract('Attestations', (accounts: string[]) => {
         phoneHash,
         caller
       )
-      await attestations.transferAttestationMapping(phoneHash, 0, replacementAddress)
+      await attestations.transfer(phoneHash, 0, replacementAddress)
       const attestedAccounts = await attestations.lookupAccountsForIdentifier.call(phoneHash)
       assert.deepEqual(attestedAccounts, [replacementAddress])
       const newAttestationStats = await attestations.getAttestationStats(

@@ -115,7 +115,7 @@ contract Attestations is
   event AttestationRequestFeeSet(address indexed token, uint256 value);
   event SelectIssuersWaitBlocksSet(uint256 value);
   event MaxAttestationsSet(uint256 value);
-  event AttestationMappingTransferred(
+  event AttestationsTransferred(
     bytes32 indexed identifier,
     address indexed fromAccount,
     address indexed toAccount
@@ -655,16 +655,15 @@ contract Attestations is
   }
 
   /**
-   * @notice Transfer an attestation identifier mapping from the sender address to a replacement address.
+   * @notice Transfer an attestation identifier mapping from the sender address to a
+   * replacement address.
    * @param identifier The hash of the identifier for this attestation.
    * @param index The index of the account in the accounts array.
    * @param replacementAddress The address to replace the sender address in the indifier mapping.
    * @dev Throws if index is out of bound for account array.
    & @dev Throws if msg.sender is not in the account array at the given index.
    */
-  function transferAttestationMapping(bytes32 identifier, uint256 index, address replacementAddress)
-    external
-  {
+  function transfer(bytes32 identifier, uint256 index, address replacementAddress) external {
     uint256 numAccounts = identifiers[identifier].accounts.length;
     require(index < numAccounts, "Index is invalid");
     require(
@@ -672,14 +671,13 @@ contract Attestations is
       "Index does not match msg.sender"
     );
     identifiers[identifier].accounts[index] = replacementAddress;
-    AttestedAddress memory attestedAddress = identifiers[identifier].attestations[msg.sender];
-    UnselectedRequest memory unselectedRequests = identifiers[identifier].unselectedRequests[msg
-      .sender];
+    identifiers[identifier].attestations[replacementAddress] = identifiers[identifier]
+      .attestations[msg.sender];
+    identifiers[identifier].unselectedRequests[replacementAddress] = identifiers[identifier]
+      .unselectedRequests[msg.sender];
     delete identifiers[identifier].attestations[msg.sender];
     delete identifiers[identifier].unselectedRequests[msg.sender];
-    identifiers[identifier].attestations[replacementAddress] = attestedAddress;
-    identifiers[identifier].unselectedRequests[replacementAddress] = unselectedRequests;
-    emit AttestationMappingTransferred(identifier, msg.sender, replacementAddress);
+    emit AttestationsTransferred(identifier, msg.sender, replacementAddress);
   }
 
   // TODO(@i1skn): make this method external, so we can check it from outside
