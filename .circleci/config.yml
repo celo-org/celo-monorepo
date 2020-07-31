@@ -476,6 +476,12 @@ jobs:
             git fetch --all
             RELEASE_BRANCH=$(git branch -a --list *release/contracts/* | tail -1 | sed -e 's/remotes\/origin\///g')
             yarn --cwd packages/protocol check-versions -o $RELEASE_BRANCH -n $CIRCLE_BRANCH
+
+            LIBRARIES_CHANGED=$(git diff $RELEASE_BRANCH --name-only contracts/common/linkedlist/*)
+            if [[ $LIBRARIES_CHANGED ]]; then
+              echo "Changing the linked list libraries is not currently supported."
+              exit 0
+            fi
       - run:
           name: Unit tests
           # Flaky tests - run them twice
