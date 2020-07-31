@@ -1,6 +1,6 @@
 import { assertEqualBN, assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
 import { Address, ensureLeading0x } from '@celo/utils/lib/address'
-import { generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
+import { generateTypedDataHash, structHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { parseSignature } from '@celo/utils/lib/signatureUtils'
 import { MetaTransactionWalletContract, MetaTransactionWalletInstance } from 'types'
 
@@ -9,13 +9,15 @@ const MetaTransactionWallet: MetaTransactionWalletContract = artifacts.require(
 )
 
 const chainId = 42220
-const constructMetaTransactionExecutionDigest = (
-  walletAddress: Address,
-  value: number,
-  destination: Address,
-  data: string,
+
+interface MetaTransaction {
+  destination: Address
+  value: number
+  data: string
   nonce: number
-) => {
+}
+
+const getTypedData = (walletAddress: Address, tx?: MetaTransaction) => {
   const typedData = {
     types: {
       EIP712Domain: [
@@ -34,18 +36,34 @@ const constructMetaTransactionExecutionDigest = (
     primaryType: 'ExecuteMetaTransaction',
     domain: {
       name: 'MetaTransactionWallet',
-      version: '1',
+      version: '1.1',
       chainId,
       verifyingContract: walletAddress,
     },
-    message: {
-      destination,
-      value,
-      data,
-      nonce,
-    },
+    message: tx
+      ? {
+          destination: tx.destination,
+          value: tx.value,
+          data: tx.data,
+          nonce: tx.nonce,
+        }
+      : {},
   }
+  return typedData
+}
 
+const getDomainDigest = (walletAddress: Address, chainId?: number) => {
+  const typedData = getTypedData(walletAddress)
+  if (chainId) {
+    typedData.domain.chainId = chainId
+  }
+  return ensureLeading0x(
+    structHash('EIP712Domain', typedData.domain, typedData.types).toString('hex')
+  )
+}
+
+const constructMetaTransactionExecutionDigest = (walletAddress: Address, tx: MetaTransaction) => {
+  const typedData = getTypedData(walletAddress, tx)
   return ensureLeading0x(generateTypedDataHash(typedData).toString('hex'))
 }
 
@@ -86,10 +104,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     })
 
     it('should have set the EIP-712 domain separator', async () => {
-      assert.equal(
-        await wallet.EIP712_DOMAIN_SEPARATOR(),
-        '0x82620ec9dcebe24c530e5ecd53f40856d95360dc561d0ecbd65bad46e1ff89ad'
-      )
+      assert.equal(await wallet.eip712DomainSeparator(), getDomainDigest(wallet.address))
     })
 
     it('should emit the SignerSet event', () => {
@@ -105,8 +120,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
       assertLogMatches2(initializeRes.logs[1], {
         event: 'EIP712DomainSeparatorSet',
         args: {
-          eip712DomainSeparator:
-            '0x82620ec9dcebe24c530e5ecd53f40856d95360dc561d0ecbd65bad46e1ff89ad',
+          eip712DomainSeparator: getDomainDigest(wallet.address),
         },
       })
     })
@@ -167,16 +181,15 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
       })
       it('should set a new separator', async () => {
         assert.equal(
-          await wallet.EIP712_DOMAIN_SEPARATOR(),
-          '0x82620ec9dcebe24c530e5ecd53f40856d95360dc561d0ecbd65bad46e1ff89ad'
+          await wallet.eip712DomainSeparator(),
+          getDomainDigest(wallet.address, newChainId)
         )
       })
       it('should emit the EIP712DomainSeparatorSet event', async () => {
         assertLogMatches2(res.logs[0], {
           event: 'EIP712DomainSeparatorSet',
           args: {
-            eip712DomainSeparator:
-              '0x82620ec9dcebe24c530e5ecd53f40856d95360dc561d0ecbd65bad46e1ff89ad',
+            eip712DomainSeparator: getDomainDigest(wallet.address, newChainId),
           },
         })
       })
@@ -302,13 +315,12 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
       const data = '0x'
       const nonce = 0
 
-      const digest = constructMetaTransactionExecutionDigest(
-        wallet.address,
+      const digest = constructMetaTransactionExecutionDigest(wallet.address, {
         value,
         destination,
         data,
-        nonce
-      )
+        nonce,
+      })
 
       assert.equal(await wallet.getMetaTransactionDigest(destination, value, data, nonce), digest)
     })
@@ -323,13 +335,12 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     let transferSigner
 
     const doTransfer = async () => {
-      const digest = constructMetaTransactionExecutionDigest(
-        wallet.address,
+      const digest = constructMetaTransactionExecutionDigest(wallet.address, {
         value,
         destination,
         data,
-        nonce
-      )
+        nonce,
+      })
       const { v, r, s } = await getSignatureForDigest(digest, transferSigner)
 
       return wallet.executeMetaTransaction(destination, value, data, v, r, s, {
