@@ -5,7 +5,7 @@
   "chooseCountry": "País",
   "joinText": "{{appName}} te ayuda a enviar, recibir y guardar valor en la red de Celo.",
   "terms": {
-    "title": "Términos",
+    "title": "Términos y Condiciones",
     "heading1": "Datos y Privacidad",
     "heading2": "Activos de Celo y Cuenta {{appName}}",
     "privacy": "Al unirte a esta red, nos das permiso para recopilar información anónima tu uso de la aplicación. Además, si verificas tu número de teléfono, se almacenará un resultado de una función hash en la Red de Celo. Más información en <0>celo.org/terms</0>",
