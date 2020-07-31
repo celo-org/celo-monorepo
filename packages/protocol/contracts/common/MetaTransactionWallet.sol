@@ -69,15 +69,15 @@ contract MetaTransactionWallet is
    * @dev Should be called every time the wallet is upgraded to a new version.
    */
   function setEip712DomainSeparator(uint256 chainId) public onlyOwner {
-    // TODO: Use the actual version number
-    // (uint256 a, uint256 b, uint256 c, uint256 d) = getVersionNumber();
+    // Note: `version` is the storage.major part of this contract's version (an
+    // increase to either of these could mean backwards incompatibilities).
     eip712DomainSeparator = keccak256(
       abi.encode(
         keccak256(
           "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
         ),
         keccak256(bytes("MetaTransactionWallet")),
-        keccak256("1"),
+        keccak256("1.1"),
         chainId,
         address(this)
       )
