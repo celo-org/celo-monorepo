@@ -16,8 +16,8 @@ contract MetaTransactionWallet is
 {
   using SafeMath for uint256;
 
-  bytes32 public EIP712_DOMAIN_SEPARATOR;
-  // bytes32 public constant EIP712_EXECUTE_META_TRANSACTION_TYPEHASH = keccak256("ExecuteMetaTransaction(address destination,uint256 value,bytes data,uint256 nonce)");
+  bytes32 public eip712DomainSeparator;
+  // The EIP712 typehash for ExecuteMetaTransaction, i.e. keccak256("ExecuteMetaTransaction(address destination,uint256 value,bytes data,uint256 nonce)");
   bytes32 public constant EIP712_EXECUTE_META_TRANSACTION_TYPEHASH = 0x509c6e92324b7214543573524d0bb493d654d3410fa4f4937b3d2f4a903edd33;
   uint256 public nonce;
   address public signer;
@@ -71,7 +71,7 @@ contract MetaTransactionWallet is
   function setEip712DomainSeparator(uint256 chainId) public onlyOwner {
     // TODO: Use the actual version number
     // (uint256 a, uint256 b, uint256 c, uint256 d) = getVersionNumber();
-    EIP712_DOMAIN_SEPARATOR = keccak256(
+    eip712DomainSeparator = keccak256(
       abi.encode(
         keccak256(
           "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
@@ -82,7 +82,7 @@ contract MetaTransactionWallet is
         address(this)
       )
     );
-    emit EIP712DomainSeparatorSet(EIP712_DOMAIN_SEPARATOR);
+    emit EIP712DomainSeparatorSet(eip712DomainSeparator);
   }
 
   // For debugging purposes.
