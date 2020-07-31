@@ -38,11 +38,13 @@ export async function fetchExchangeRate(currencyCode: string): Promise<string> {
   return new BigNumber(rate).toString()
 }
 
-export function* fetchLocalCurrencyRateSaga() {
+export function* fetchLocalCurrencyRateSaga(localCurrencyCode?: LocalCurrencyCode) {
   try {
-    const localCurrencyCode: LocalCurrencyCode | null = yield select(getLocalCurrencyCode)
     if (!localCurrencyCode) {
-      throw new Error("Can't fetch local currency rate without a currency code")
+      localCurrencyCode = yield select(getLocalCurrencyCode)
+      if (!localCurrencyCode) {
+        throw new Error("Can't fetch local currency rate without a currency code")
+      }
     }
     const rate = yield call(fetchExchangeRate, localCurrencyCode)
     yield put(fetchCurrentRateSuccess(localCurrencyCode, rate, Date.now()))

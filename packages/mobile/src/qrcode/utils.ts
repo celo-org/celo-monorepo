@@ -2,16 +2,20 @@ import { isLeft } from 'fp-ts/lib/Either'
 import { PathReporter } from 'io-ts/lib/PathReporter'
 import * as RNFS from 'react-native-fs'
 import Share from 'react-native-share'
-import { call, put } from 'redux-saga/effects'
+import { call, put, select } from 'redux-saga/effects'
 import { showMessage } from 'src/alert/actions'
 import { SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
+import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { validateRecipientAddressSuccess } from 'src/identity/actions'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
+import { convertLocalAmountToDollars } from 'src/localCurrency/convert'
+import { fetchExchangeRate } from 'src/localCurrency/saga'
+import { getLocalCurrencyCode } from 'src/localCurrency/selectors'
 import { replace } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { qrDataFromJson } from 'src/qrcode/scheme'
+import { qrDataFromJson } from 'src/qrcode/schema'
 import {
   getRecipientFromAddress,
   NumberToRecipient,
@@ -113,17 +117,19 @@ export function* handleBarcode(
     return
   }
 
-  const either = qrDataFromJson(data)
-  if (isLeft(either)) {
-    yield put(showMessage(PathReporter.report(either)[0]))
+  const maybeQrData = qrDataFromJson(data)
+  if (isLeft(maybeQrData)) {
+    yield put(showMessage(PathReporter.report(maybeQrData)[0]))
     return
   }
-  const parsed = either.right
+  const qrData = maybeQrData.right
+
+  Logger.warn(TAG, 'QR succeeded with ' + JSON.stringify(qrData))
 
   if (secureSendTxData) {
     const success = yield call(
       handleSecureSend,
-      parsed.address,
+      qrData.address,
       e164NumberToAddress,
       secureSendTxData,
       requesterAddress
@@ -134,15 +140,15 @@ export function* handleBarcode(
   }
 
   const cachedRecipient = getRecipientFromAddress(
-    parsed.address,
+    qrData.address,
     addressToE164Number,
     recipientCache
   )
   const recipient: RecipientWithQrCode = {
     kind: RecipientKind.QrCode,
-    address: parsed.address,
-    displayId: parsed.e164PhoneNumber,
-    displayName: parsed.displayName || 'QR Code',
+    address: qrData.address,
+    displayId: qrData.e164PhoneNumber,
+    displayName: qrData.displayName || 'QR Code',
     phoneNumberLabel: cachedRecipient?.phoneNumberLabel,
     thumbnailPath: cachedRecipient?.thumbnailPath,
     contactId: cachedRecipient?.contactId,
@@ -162,12 +168,22 @@ export function* handleBarcode(
       })
     }
   } else {
-    replace(Screens.SendAmount, {
-      recipient,
-      isFromScan: true,
-      isOutgoingPaymentRequest,
-      currencyCode: parsed.currencyCode,
-      amount: parsed.amount,
-    })
+    if (qrData.amount) {
+      const preferredCurrencyCode = yield select(getLocalCurrencyCode)
+      const exchangeRate = yield call(
+        fetchExchangeRate,
+        qrData.currencyCode || preferredCurrencyCode
+      )
+      const amount = convertLocalAmountToDollars(qrData.amount, exchangeRate)!
+      const transactionData: TransactionDataInput = {
+        recipient,
+        amount,
+        reason: qrData.comment,
+        type: TokenTransactionType.Sent,
+      }
+      replace(Screens.SendConfirmation, { transactionData, isFromScan: true })
+    } else {
+      replace(Screens.SendAmount, { recipient, isFromScan: true, isOutgoingPaymentRequest })
+    }
   }
 }

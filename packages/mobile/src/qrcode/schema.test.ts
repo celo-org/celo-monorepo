@@ -1,7 +1,7 @@
 import { zeroAddress } from 'ethereumjs-util'
 import { isRight } from 'fp-ts/lib/Either'
 import { PathReporter } from 'io-ts/lib/PathReporter'
-import { qrDataFromJson } from 'src/qrcode/scheme'
+import { qrDataFromJson } from 'src/qrcode/schema'
 
 const validAddressData = { address: zeroAddress() }
 const validUserData = {
@@ -13,6 +13,13 @@ const validLocalPaymentData = {
   ...validAddressData,
   currencyCode: 'PHP',
   amount: '521.46',
+}
+const validBeamAndGoPaymentData = {
+  address: '0xf7f551752A78Ce650385B58364225e5ec18D96cB',
+  displayName: 'Super 8',
+  currencyCode: 'PHP',
+  amount: '500',
+  comment: '92a53156-c0f2-11ea-b3de-0242ac13000',
 }
 
 describe('#qrDataFromJson', () => {
@@ -28,6 +35,8 @@ describe('#qrDataFromJson', () => {
   it('should parse valid user data', () => validParse(validUserData))
 
   it('should parse valid local payment data', () => validParse(validLocalPaymentData))
+
+  it('should parse valid BeamAndGo payment data', () => validParse(validBeamAndGoPaymentData))
 
   const invalidParse = (...pairs: Array<{ obj: object; s: string }>) =>
     pairs.forEach((pair) => {

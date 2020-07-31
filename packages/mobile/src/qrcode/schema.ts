@@ -10,6 +10,7 @@ export const QrDataType = t.type({
   currencyCode: t.union([t.undefined, t.keyof(LocalCurrencyCode)]),
   // TODO: amount string is valid BigNumber
   amount: t.union([t.undefined, t.string]),
+  comment: t.union([t.undefined, t.string]),
 })
 export type QrData = t.TypeOf<typeof QrDataType>
 

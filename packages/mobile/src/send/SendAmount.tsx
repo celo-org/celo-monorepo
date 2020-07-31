@@ -30,8 +30,6 @@ import {
 } from 'src/identity/reducer'
 import { getAddressValidationType } from 'src/identity/secureSend'
 import { RecipientVerificationStatus } from 'src/identity/types'
-import { selectPreferredCurrency } from 'src/localCurrency/actions'
-import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import {
   convertDollarsToLocalAmount,
   convertDollarsToMaxSupportedPrecision,
@@ -90,19 +88,11 @@ export const sendAmountScreenNavOptions = ({
 function SendAmount(props: Props) {
   const dispatch = useDispatch()
 
-  const {
-    isOutgoingPaymentRequest,
-    recipient,
-    currencyCode: qrCurrencyCode,
-    amount: qrAmount,
-  } = props.route.params
+  const { isOutgoingPaymentRequest, recipient } = props.route.params
 
   React.useEffect(() => {
     dispatch(fetchDollarBalance())
     if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
-      if (qrCurrencyCode) {
-        dispatch(selectPreferredCurrency(LocalCurrencyCode[qrCurrencyCode]))
-      }
       return
     }
 
@@ -115,7 +105,7 @@ function SendAmount(props: Props) {
 
   const { t } = useTranslation(Namespaces.sendFlow7)
 
-  const [amount, setAmount] = React.useState(qrAmount || '')
+  const [amount, setAmount] = React.useState('')
 
   const localCurrencyCode = useSelector(getLocalCurrencyCode)
   const localCurrencyExchangeRate = useSelector(getLocalCurrencyExchangeRate)

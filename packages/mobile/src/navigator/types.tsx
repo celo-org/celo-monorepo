@@ -159,8 +159,6 @@ export type StackParamList = {
     recipient: Recipient
     isOutgoingPaymentRequest?: true
     isFromScan?: boolean
-    currencyCode?: keyof typeof LocalCurrencyCode
-    amount?: string
   }
   [Screens.SendConfirmation]: {
     transactionData: TransactionDataInput
