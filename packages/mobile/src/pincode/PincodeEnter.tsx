@@ -2,7 +2,6 @@
  * This is a reactnavigation SCREEN to which we navigate,
  * when we need to fetch a PIN from a user.
  */
-import colors from '@celo/react-components/styles/colors'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -91,7 +90,6 @@ class PincodeEnter extends React.Component<Props, State> {
 const style = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
     justifyContent: 'space-between',
   },
 })

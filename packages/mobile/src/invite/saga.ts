@@ -13,10 +13,11 @@ import { showError, showMessage } from 'src/alert/actions'
 import { InviteEvents, OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION, USE_PHONE_NUMBER_PRIVACY } from 'src/config'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
+import { features } from 'src/flags'
 import { CURRENCY_ENUM, UNLOCK_DURATION } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
 import i18n from 'src/i18n'
@@ -49,6 +50,7 @@ import { getAppStoreId } from 'src/utils/appstore'
 import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 import { getContractKitAsync, getWallet, getWeb3 } from 'src/web3/contracts'
+import { registerAccountDek } from 'src/web3/dataEncryptionKey'
 import { getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 
 const TAG = 'invite/saga'
@@ -219,7 +221,7 @@ function* initiateEscrowTransfer(temporaryAddress: string, e164Number: string, a
   const escrowTxId = generateStandbyTransactionId(temporaryAddress)
   try {
     let phoneHash: string
-    if (USE_PHONE_NUMBER_PRIVACY) {
+    if (features.USE_PHONE_NUMBER_PRIVACY) {
       const phoneHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
       phoneHash = phoneHashDetails.phoneHash
     } else {
@@ -333,6 +335,7 @@ export function* doRedeemInvite(inviteCode: string) {
       CURRENCY_ENUM.DOLLAR,
       SENTINEL_INVITE_COMMENT
     )
+    yield call(registerAccountDek, newAccount)
     yield put(fetchDollarBalance())
     ValoraAnalytics.track(OnboardingEvents.invite_redeem_complete)
     return true
