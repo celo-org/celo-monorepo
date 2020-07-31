@@ -6,7 +6,7 @@
   "joinText": "{{appName}} helps you to send, receive, and save value on the Celo Network.",
   "phoneNumber": "Phone Number",
   "terms": {
-    "title": "Terms",
+    "title": "Terms and Conditions",
     "heading1": "Data and Privacy",
     "heading2": "Celo Assets and {{appName}} Account",
     "privacy": "By joining this network, you give us permission to collect anonymous information about your use of the app. Additionally, if you verify your phone number, a hashed copy of it will be stored on the Celo Network. Learn more at <0>celo.org/terms</0> ",
