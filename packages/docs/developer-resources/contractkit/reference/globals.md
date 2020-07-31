@@ -36,7 +36,6 @@
 * ["contractkit/src/utils/phone-number-lookup/phone-number-lookup-utils"](modules/_contractkit_src_utils_phone_number_lookup_phone_number_lookup_utils_.md)
 * ["contractkit/src/utils/provider-utils"](modules/_contractkit_src_utils_provider_utils_.md)
 * ["contractkit/src/utils/rpc-caller"](modules/_contractkit_src_utils_rpc_caller_.md)
-* ["contractkit/src/utils/sign-typed-data-utils"](modules/_contractkit_src_utils_sign_typed_data_utils_.md)
 * ["contractkit/src/utils/signing-utils"](modules/_contractkit_src_utils_signing_utils_.md)
 * ["contractkit/src/utils/tx-params-normalizer"](modules/_contractkit_src_utils_tx_params_normalizer_.md)
 * ["contractkit/src/utils/tx-result"](modules/_contractkit_src_utils_tx_result_.md)

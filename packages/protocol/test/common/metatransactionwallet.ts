@@ -52,10 +52,10 @@ const getTypedData = (walletAddress: Address, tx?: MetaTransaction) => {
   return typedData
 }
 
-const getDomainDigest = (walletAddress: Address, chainId?: number) => {
+const getDomainDigest = (walletAddress: Address, _chainId?: number) => {
   const typedData = getTypedData(walletAddress)
-  if (chainId) {
-    typedData.domain.chainId = chainId
+  if (_chainId) {
+    typedData.domain.chainId = _chainId
   }
   return ensureLeading0x(
     structHash('EIP712Domain', typedData.domain, typedData.types).toString('hex')

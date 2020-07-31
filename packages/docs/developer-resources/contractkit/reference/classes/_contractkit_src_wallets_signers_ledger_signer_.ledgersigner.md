@@ -98,7 +98,7 @@ ___
 
 ###  signTypedData
 
-▸ **signTypedData**(`typedData`: [EIP712TypedData](../interfaces/_contractkit_src_utils_sign_typed_data_utils_.eip712typeddata.md)): *Promise‹object›*
+▸ **signTypedData**(`typedData`: EIP712TypedData): *Promise‹object›*
 
 *Defined in [contractkit/src/wallets/signers/ledger-signer.ts:104](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/ledger-signer.ts#L104)*
 
@@ -106,6 +106,6 @@ ___
 
 Name | Type |
 ------ | ------ |
-`typedData` | [EIP712TypedData](../interfaces/_contractkit_src_utils_sign_typed_data_utils_.eip712typeddata.md) |
+`typedData` | EIP712TypedData |
 
 **Returns:** *Promise‹object›*
