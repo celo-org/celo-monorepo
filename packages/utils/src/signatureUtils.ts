@@ -161,7 +161,7 @@ export function guessSigner(message: string, signature: string): string {
   return ethjsutil.bufferToHex(ethjsutil.pubToAddress(publicKey))
 }
 
-export function parseSignatureAsVrs(signature: string) {
+function parseSignatureAsVrs(signature: string) {
   let v: number = parseInt(signature.slice(0, 2), 16)
   const r: string = `0x${signature.slice(2, 66)}`
   const s: string = `0x${signature.slice(66, 130)}`
@@ -171,7 +171,7 @@ export function parseSignatureAsVrs(signature: string) {
   return { v, r, s }
 }
 
-export function parseSignatureAsRsv(signature: string) {
+function parseSignatureAsRsv(signature: string) {
   const r: string = `0x${signature.slice(0, 64)}`
   const s: string = `0x${signature.slice(64, 128)}`
   let v: number = parseInt(signature.slice(128, 130), 16)

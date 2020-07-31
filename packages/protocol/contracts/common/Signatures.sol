@@ -27,7 +27,7 @@ library Signatures {
   * @param s Output value s of the ECDSA signature.
   */
   function getSignerOfMessageHash(bytes32 messageHash, uint8 v, bytes32 r, bytes32 s)
-    public
+    internal
     pure
     returns (address)
   {

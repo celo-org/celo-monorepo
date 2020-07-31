@@ -1,5 +1,6 @@
 import { assertEqualBN, assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
-//import { parseSignatureAsVrs } from '@celo/utils/lib/signatureUtils'
+import { ensureLeading0x } from '@celo/utils/lib/address'
+import { parseSignature } from '@celo/utils/lib/signatureUtils'
 import { generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { MetaTransactionWalletContract, MetaTransactionWalletInstance } from 'types'
 
@@ -178,7 +179,6 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     })
   })
 
-  // WIP
   describe('#executeMetaTransaction()', () => {
     const value = 100
     const destination = web3.utils.toChecksumAddress(web3.utils.randomHex(20))
@@ -186,12 +186,10 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     describe('when submitted by a non-signer', () => {
       describe('when the nonce is valid', () => {
         const nonce = 0
-        let typedData: any
-        describe.only('when signed by the signer', () => {
+        let res: any
+        describe('when signed by the signer', () => {
           beforeEach(async () => {
-            // Following the example at https://github.com/ethereum/EIPs/blob/master/assets/eip-712/Example.js
-            // and https://github.com/ethereum/EIPs/blob/master/EIPS/eip-712.md
-            typedData = {
+            const typedData = {
               types: {
                 EIP712Domain: [
                   { name: 'name', type: 'string' },
@@ -220,31 +218,20 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
                 nonce,
               },
             }
-
-            /*
-            // Not a method, need to adapt contract to read signatures with message prefix.
-            const { v, r, s } = parseSignatureAsVrs(await web3.eth.signTypedData(signer, typedData))
-            console.log(v, r, s)
-
+            const digest = ensureLeading0x(generateTypedDataHash(typedData).toString('hex'))
+            // Sanity check.
+            assert.equal(
+              await wallet.getMetaTransactionDigest(destination, value, data, nonce),
+              digest
+            )
+            const { v, r, s } = parseSignature(digest, await web3.eth.sign(digest, signer), signer)
             await web3.eth.sendTransaction({ from: accounts[0], to: wallet.address, value })
             // @ts-ignore
-            res = await wallet.executeMetaTransaction(destination, value, data, 0, v, r, s, { from: signer })
-            */
+            res = await wallet.executeMetaTransaction(destination, value, data, v, r, s, {
+              from: signer,
+            })
           })
 
-          it('should match hashes', async () => {
-            console.log('domain separator', await wallet.EIP172_DOMAIN_SEPARATOR())
-            console.log(
-              'struct hash',
-              await wallet.getMetaTransactionStructHash(destination, value, data, nonce)
-            )
-            const hash = generateTypedDataHash(typedData)
-            assert.equal(
-              `0x${hash.toString('hex')}`,
-              await wallet.getMetaTransactionDigest(destination, value, data, nonce)
-            )
-          })
-          /*
           it('should execute the transaction', async () => {
             assert.equal(await web3.eth.getBalance(destination), value)
           })
@@ -261,10 +248,9 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
                 value,
                 data: null,
                 returnData: null,
-              }
+              },
             })
           })
-          */
         })
 
         describe('when signed by a non-signer', () => {

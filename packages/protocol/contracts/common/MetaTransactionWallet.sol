@@ -1,5 +1,4 @@
 pragma solidity ^0.5.3;
-import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/utils/Address.sol";
@@ -7,6 +6,7 @@ import "openzeppelin-solidity/contracts/utils/Address.sol";
 import "./interfaces/ICeloVersionedContract.sol";
 import "./interfaces/IMetaTransactionWallet.sol";
 import "./Initializable.sol";
+import "./Signatures.sol";
 
 contract MetaTransactionWallet is
   IMetaTransactionWallet,
@@ -85,19 +85,7 @@ contract MetaTransactionWallet is
     emit EIP172DomainSeparatorSet(EIP172_DOMAIN_SEPARATOR);
   }
 
-  // for debugging, this doesn't seem to match the sign-typed-data-utils implementation
-  function getMetaTransactionStructHash(
-    address destination,
-    uint256 value,
-    bytes memory data,
-    uint256 _nonce
-  ) public view returns (bytes32) {
-    return
-      keccak256(
-        abi.encode(EIP172_EXECUTE_META_TRANSACTION_TYPEHASH, destination, value, data, _nonce)
-      );
-  }
-
+  // For debugging purposes.
   function getMetaTransactionDigest(
     address destination,
     uint256 value,
@@ -107,7 +95,10 @@ contract MetaTransactionWallet is
     bytes32 structHash = keccak256(
       abi.encode(
         EIP172_EXECUTE_META_TRANSACTION_TYPEHASH,
-        abi.encode(destination, value, data, _nonce)
+        destination,
+        value,
+        keccak256(data),
+        _nonce
       )
     );
     return keccak256(abi.encodePacked("\x19\x01", EIP172_DOMAIN_SEPARATOR, structHash));
@@ -126,19 +117,13 @@ contract MetaTransactionWallet is
     bytes32 r,
     bytes32 s
   ) public view returns (address) {
-    // TODO: Should use Signatures library given we expect to use the Ethereum Signed Message prefix
     bytes32 digest = getMetaTransactionDigest(destination, value, data, _nonce);
-    bytes memory signature = new bytes(65);
-    // Concatenate (r, s, v) into signature.
-    assembly {
-      mstore(add(signature, 32), r)
-      mstore(add(signature, 64), s)
-      mstore8(add(signature, 96), v)
-    }
-    return ECDSA.recover(digest, signature);
+    // TODO: Should we link, or inline, this library?
+    // Currently modified it to be inlined, but that will cause bytecode changes
+    // to all other contracts that use getSignerOfMessageHash.
+    return Signatures.getSignerOfMessageHash(digest, v, r, s);
   }
 
-  // TODO(asa): Should this take a nonce?
   /**
    * @notice Executes a meta-transaction on behalf of the signer.`
    * @return The return value of the meta-transaction execution.
@@ -158,7 +143,6 @@ contract MetaTransactionWallet is
     return returnData;
   }
 
-  // TODO(asa): Should this take a nonce?
   /**
    * @notice Executes a transaction on behalf of the signer.`
    * @return The return value of the transaction execution.
