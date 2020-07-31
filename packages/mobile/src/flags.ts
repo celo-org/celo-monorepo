@@ -1,3 +1,4 @@
+// Feature flags
 export const features = {
   SHOW_SHOW_REWARDS_APP_LINK: false,
   USE_COMMENT_ENCRYPTION: true,
@@ -8,6 +9,7 @@ export const features = {
   CUSD_MOONPAY_ENABLED: false,
   SHOW_CASH_OUT: false,
   PNP_USE_DEK_FOR_AUTH: false,
+  USE_PHONE_NUMBER_PRIVACY: true,
 }
 
 export const pausedFeatures = {

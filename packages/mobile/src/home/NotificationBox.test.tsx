@@ -14,7 +14,6 @@ const storeDataNotificationsEnabled = {
   goldToken: { educationCompleted: false },
   account: {
     backupCompleted: false,
-    dismissedEarnRewards: false,
     dismissedInviteFriends: false,
     dismissedGetVerified: false,
     accountCreationTime: EXPIRED_BACKUP_TIME,
@@ -26,7 +25,6 @@ const storeDataNotificationsDisabled = {
   goldToken: { educationCompleted: true },
   account: {
     backupCompleted: true,
-    dismissedEarnRewards: true,
     dismissedInviteFriends: true,
     dismissedGetVerified: true,
     accountCreationTime: RECENT_BACKUP_TIME,
@@ -69,7 +67,6 @@ describe('NotificationBox', () => {
       goldToken: { educationCompleted: false },
       account: {
         ...storeDataNotificationsDisabled.account,
-        dismissedEarnRewards: false,
         dismissedInviteFriends: false,
       },
     })

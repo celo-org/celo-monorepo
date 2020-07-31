@@ -15,7 +15,7 @@ import { showErrorOrFallback } from 'src/alert/actions'
 import { IdentityEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { USE_PHONE_NUMBER_PRIVACY } from 'src/config'
+import { features } from 'src/flags'
 import {
   Actions,
   endFetchingAddresses,
@@ -220,7 +220,7 @@ export function* fetchAddressesAndValidateSaga({
 
 function* getAddresses(e164Number: string) {
   let phoneHash: string
-  if (USE_PHONE_NUMBER_PRIVACY) {
+  if (features.USE_PHONE_NUMBER_PRIVACY) {
     const phoneHashDetails: PhoneNumberHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
     phoneHash = phoneHashDetails.phoneHash
   } else {
