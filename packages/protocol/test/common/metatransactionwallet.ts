@@ -67,12 +67,12 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     initializeRes = await wallet.initialize(signer, chainId)
   })
 
-  describe('#EIP172_EXECUTE_META_TRANSACTION_TYPEHASH()', () => {
+  describe('#EIP712_EXECUTE_META_TRANSACTION_TYPEHASH()', () => {
     it('should have set the right typehash', async () => {
       const expectedTypehash = web3.utils.soliditySha3(
         'ExecuteMetaTransaction(address destination,uint256 value,bytes data,uint256 nonce)'
       )
-      assert.equal(await wallet.EIP172_EXECUTE_META_TRANSACTION_TYPEHASH(), expectedTypehash)
+      assert.equal(await wallet.EIP712_EXECUTE_META_TRANSACTION_TYPEHASH(), expectedTypehash)
     })
   })
 
@@ -85,9 +85,9 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
       assert.equal(await wallet.signer(), signer)
     })
 
-    it('should have set the EIP-172 domain separator', async () => {
+    it('should have set the EIP-712 domain separator', async () => {
       assert.equal(
-        await wallet.EIP172_DOMAIN_SEPARATOR(),
+        await wallet.EIP712_DOMAIN_SEPARATOR(),
         '0x82620ec9dcebe24c530e5ecd53f40856d95360dc561d0ecbd65bad46e1ff89ad'
       )
     })
@@ -101,11 +101,11 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
       })
     })
 
-    it('should emit the EIP172DomainSeparatorSet event', () => {
+    it('should emit the EIP712DomainSeparatorSet event', () => {
       assertLogMatches2(initializeRes.logs[1], {
-        event: 'EIP172DomainSeparatorSet',
+        event: 'EIP712DomainSeparatorSet',
         args: {
-          eip172DomainSeparator:
+          eip712DomainSeparator:
             '0x82620ec9dcebe24c530e5ecd53f40856d95360dc561d0ecbd65bad46e1ff89ad',
         },
       })
@@ -156,26 +156,26 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     })
   })
 
-  describe('#setEip172DomainSeparator()', () => {
+  describe('#setEip712DomainSeparator()', () => {
     const newChainId = chainId + 1
     describe('when called by the wallet contract', () => {
       let res
       beforeEach(async () => {
         // @ts-ignore
-        const data = wallet.contract.methods.setEip172DomainSeparator(newChainId).encodeABI()
+        const data = wallet.contract.methods.setEip712DomainSeparator(newChainId).encodeABI()
         res = await executeOnSelf(data)
       })
       it('should set a new separator', async () => {
         assert.equal(
-          await wallet.EIP172_DOMAIN_SEPARATOR(),
+          await wallet.EIP712_DOMAIN_SEPARATOR(),
           '0x82620ec9dcebe24c530e5ecd53f40856d95360dc561d0ecbd65bad46e1ff89ad'
         )
       })
-      it('should emit the EIP172DomainSeparatorSet event', async () => {
+      it('should emit the EIP712DomainSeparatorSet event', async () => {
         assertLogMatches2(res.logs[2], {
-          event: 'EIP172DomainSeparatorSet',
+          event: 'EIP712DomainSeparatorSet',
           args: {
-            eip172DomainSeparator:
+            eip712DomainSeparator:
               '0x82620ec9dcebe24c530e5ecd53f40856d95360dc561d0ecbd65bad46e1ff89ad',
           },
         })
@@ -184,7 +184,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
 
     describe('when called by the signer', () => {
       it('should revert', async () => {
-        await assertRevert(wallet.setEip172DomainSeparator(newChainId, { from: signer }))
+        await assertRevert(wallet.setEip712DomainSeparator(newChainId, { from: signer }))
       })
     })
   })

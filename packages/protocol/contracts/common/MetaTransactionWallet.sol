@@ -16,14 +16,14 @@ contract MetaTransactionWallet is
 {
   using SafeMath for uint256;
 
-  bytes32 public EIP172_DOMAIN_SEPARATOR;
-  // bytes32 public constant EIP172_EXECUTE_META_TRANSACTION_TYPEHASH = keccak256("ExecuteMetaTransaction(address destination,uint256 value,bytes data,uint256 nonce)");
-  bytes32 public constant EIP172_EXECUTE_META_TRANSACTION_TYPEHASH = 0x509c6e92324b7214543573524d0bb493d654d3410fa4f4937b3d2f4a903edd33;
+  bytes32 public EIP712_DOMAIN_SEPARATOR;
+  // bytes32 public constant EIP712_EXECUTE_META_TRANSACTION_TYPEHASH = keccak256("ExecuteMetaTransaction(address destination,uint256 value,bytes data,uint256 nonce)");
+  bytes32 public constant EIP712_EXECUTE_META_TRANSACTION_TYPEHASH = 0x509c6e92324b7214543573524d0bb493d654d3410fa4f4937b3d2f4a903edd33;
   uint256 public nonce;
   address public signer;
 
   event SignerSet(address signer);
-  event EIP172DomainSeparatorSet(bytes32 eip172DomainSeparator);
+  event EIP712DomainSeparatorSet(bytes32 eip712DomainSeparator);
   event TransactionExecution(address destination, uint256 value, bytes data, bytes returnData);
   event MetaTransactionExecution(address destination, uint256 value, bytes data, bytes returnData);
 
@@ -46,7 +46,7 @@ contract MetaTransactionWallet is
    */
   function initialize(address _signer, uint256 chainId) external initializer {
     setSigner(_signer);
-    setEip172DomainSeparator(chainId);
+    setEip712DomainSeparator(chainId);
     // MetaTransactionWallet owns itself, which necessitates that all onlyOwner functions
     // be called via executeTransaction or executeMetaTransaction.
     // If the signer was the owner, onlyOwner functions would not be callable via
@@ -64,14 +64,14 @@ contract MetaTransactionWallet is
   }
 
   /**
-   * @notice Sets the EIP-172 domain separator.
+   * @notice Sets the EIP-712 domain separator.
    * @param chainId The chain ID on which the contract is running.
    * @dev Should be called every time the wallet is upgraded to a new version.
    */
-  function setEip172DomainSeparator(uint256 chainId) public onlyOwner {
+  function setEip712DomainSeparator(uint256 chainId) public onlyOwner {
     // TODO: Use the actual version number
     // (uint256 a, uint256 b, uint256 c, uint256 d) = getVersionNumber();
-    EIP172_DOMAIN_SEPARATOR = keccak256(
+    EIP712_DOMAIN_SEPARATOR = keccak256(
       abi.encode(
         keccak256(
           "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
@@ -82,7 +82,7 @@ contract MetaTransactionWallet is
         address(this)
       )
     );
-    emit EIP172DomainSeparatorSet(EIP172_DOMAIN_SEPARATOR);
+    emit EIP712DomainSeparatorSet(EIP712_DOMAIN_SEPARATOR);
   }
 
   // For debugging purposes.
@@ -94,14 +94,14 @@ contract MetaTransactionWallet is
   ) public view returns (bytes32) {
     bytes32 structHash = keccak256(
       abi.encode(
-        EIP172_EXECUTE_META_TRANSACTION_TYPEHASH,
+        EIP712_EXECUTE_META_TRANSACTION_TYPEHASH,
         destination,
         value,
         keccak256(data),
         _nonce
       )
     );
-    return keccak256(abi.encodePacked("\x19\x01", EIP172_DOMAIN_SEPARATOR, structHash));
+    return keccak256(abi.encodePacked("\x19\x01", EIP712_DOMAIN_SEPARATOR, structHash));
   }
 
   /**
