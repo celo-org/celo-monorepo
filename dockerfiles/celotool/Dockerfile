@@ -22,6 +22,7 @@ COPY packages/typescript/package.json packages/typescript/
 COPY packages/contractkit/package.json packages/contractkit/
 COPY packages/protocol/package.json packages/protocol/
 COPY packages/celotool/package.json packages/celotool/
+COPY packages/flake-tracker/package.json packages/flake-tracker/package.json
 
 RUN yarn install --network-timeout 100000 --frozen-lockfile && yarn cache clean
 
