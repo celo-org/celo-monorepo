@@ -14,7 +14,8 @@ interface MetaTransaction {
   data: string
   nonce: number
 }
-let chainId
+// The value currently returned by the chainId assembly code in ganache.
+const chainId = 1
 const getTypedData = (walletAddress: Address, tx?: MetaTransaction) => {
   const typedData = {
     types: {
@@ -76,9 +77,8 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     wallet.executeTransaction(wallet.address, value, data, nonce, { from: signer })
 
   beforeEach(async () => {
-    chainId = await web3.eth.net.getId()
     wallet = await MetaTransactionWallet.new()
-    initializeRes = await wallet.initialize(signer, chainId)
+    initializeRes = await wallet.initialize(signer)
   })
 
   describe('#EIP712_EXECUTE_META_TRANSACTION_TYPEHASH()', () => {
@@ -132,7 +132,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     })
 
     it('should not be callable again', async () => {
-      await assertRevert(wallet.initialize(signer, chainId))
+      await assertRevert(wallet.initialize(signer))
     })
   })
 
