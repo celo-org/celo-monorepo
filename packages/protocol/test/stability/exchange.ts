@@ -1101,7 +1101,7 @@ contract('Exchange', (accounts: string[]) => {
             updatedStableBucket
           )
 
-          it(`the exchange should succeed`, async () => {
+          it('the exchange should succeed', async () => {
             await exchange.buy(
               buyStableAmount,
               expectedGoldAmountNoReportExpired.integerValue(BigNumber.ROUND_FLOOR),
