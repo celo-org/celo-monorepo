@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/utils/Address.sol";
@@ -44,9 +44,9 @@ contract MetaTransactionWallet is
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param _signer The address authorized to execute transactions via this wallet.
    */
-  function initialize(address _signer, uint256 chainId) external initializer {
+  function initialize(address _signer) external initializer {
     setSigner(_signer);
-    setEip712DomainSeparator(chainId);
+    setEip712DomainSeparator();
     // MetaTransactionWallet owns itself, which necessitates that all onlyOwner functions
     // be called via executeTransaction or executeMetaTransaction.
     // If the signer was the owner, onlyOwner functions would not be callable via
@@ -65,11 +65,13 @@ contract MetaTransactionWallet is
 
   /**
    * @notice Sets the EIP-712 domain separator.
-   * @param chainId The chain ID on which the contract is running.
    * @dev Should be called every time the wallet is upgraded to a new version.
-   * TODO: Upgrade contract to solidity 0.5.12 to read chainId programatically.
    */
-  function setEip712DomainSeparator(uint256 chainId) public onlyOwner {
+  function setEip712DomainSeparator() public {
+    uint256 id;
+    assembly {
+      id := chainid
+    }
     // Note: `version` is the storage.major part of this contract's version (an
     // increase to either of these could mean backwards incompatibilities).
     eip712DomainSeparator = keccak256(
@@ -79,7 +81,7 @@ contract MetaTransactionWallet is
         ),
         keccak256(bytes("MetaTransactionWallet")),
         keccak256("1.1"),
-        chainId,
+        id,
         address(this)
       )
     );

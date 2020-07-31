@@ -8,15 +8,13 @@ const MetaTransactionWallet: MetaTransactionWalletContract = artifacts.require(
   'MetaTransactionWallet'
 )
 
-const chainId = 42220
-
 interface MetaTransaction {
   destination: Address
   value: number
   data: string
   nonce: number
 }
-
+let chainId
 const getTypedData = (walletAddress: Address, tx?: MetaTransaction) => {
   const typedData = {
     types: {
@@ -52,11 +50,8 @@ const getTypedData = (walletAddress: Address, tx?: MetaTransaction) => {
   return typedData
 }
 
-const getDomainDigest = (walletAddress: Address, _chainId?: number) => {
+const getDomainDigest = (walletAddress: Address) => {
   const typedData = getTypedData(walletAddress)
-  if (_chainId) {
-    typedData.domain.chainId = _chainId
-  }
   return ensureLeading0x(
     structHash('EIP712Domain', typedData.domain, typedData.types).toString('hex')
   )
@@ -81,6 +76,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     wallet.executeTransaction(wallet.address, value, data, nonce, { from: signer })
 
   beforeEach(async () => {
+    chainId = await web3.eth.net.getId()
     wallet = await MetaTransactionWallet.new()
     initializeRes = await wallet.initialize(signer, chainId)
   })
@@ -166,38 +162,6 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     describe('when called by the signer', () => {
       it('should revert', async () => {
         await assertRevert(wallet.setSigner(newSigner, { from: signer }))
-      })
-    })
-  })
-
-  describe('#setEip712DomainSeparator()', () => {
-    const newChainId = chainId + 1
-    describe('when called by the wallet contract', () => {
-      let res
-      beforeEach(async () => {
-        // @ts-ignore
-        const data = wallet.contract.methods.setEip712DomainSeparator(newChainId).encodeABI()
-        res = await executeOnSelf(data)
-      })
-      it('should set a new separator', async () => {
-        assert.equal(
-          await wallet.eip712DomainSeparator(),
-          getDomainDigest(wallet.address, newChainId)
-        )
-      })
-      it('should emit the EIP712DomainSeparatorSet event', async () => {
-        assertLogMatches2(res.logs[0], {
-          event: 'EIP712DomainSeparatorSet',
-          args: {
-            eip712DomainSeparator: getDomainDigest(wallet.address, newChainId),
-          },
-        })
-      })
-    })
-
-    describe('when called by the signer', () => {
-      it('should revert', async () => {
-        await assertRevert(wallet.setEip712DomainSeparator(newChainId, { from: signer }))
       })
     })
   })
