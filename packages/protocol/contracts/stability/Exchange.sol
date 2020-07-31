@@ -64,7 +64,7 @@ contract Exchange is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 1, 2, 0);
   }
 
   /**
@@ -98,7 +98,7 @@ contract Exchange is
   }
 
   /**
-   * @dev Exchanges sellAmount of sellToken in exchange for at least minBuyAmount of buyToken
+   * @notice Exchanges sellAmount of sellToken in exchange for at least minBuyAmount of buyToken
    * Requires the sellAmount to have been approved to the exchange
    * @param sellAmount The amount of sellToken the user is selling to the exchange
    * @param minBuyAmount The minimum amount of buyToken the user has to receive for this
@@ -118,7 +118,7 @@ contract Exchange is
   }
 
   /**
-   * @dev Deprecated. Exchanges sellAmount of sellToken in exchange for at
+   * @notice Deprecated. Exchanges sellAmount of sellToken in exchange for at
    * least minBuyAmount of buyToken.
    * Requires the sellAmount to have been approved to the exchange
    * @param sellAmount The amount of sellToken the user is selling to the exchange
@@ -139,7 +139,7 @@ contract Exchange is
   }
 
   /**
-   * @dev Exchanges sellAmount of sellToken in exchange for at least minBuyAmount of buyToken
+   * @notice Exchanges sellAmount of sellToken in exchange for at least minBuyAmount of buyToken
    * Requires the sellAmount to have been approved to the exchange
    * @param sellAmount The amount of sellToken the user is selling to the exchange
    * @param minBuyAmount The minimum amount of buyToken the user has to receive for this
@@ -160,7 +160,7 @@ contract Exchange is
   }
 
   /**
-   * @dev Exchanges buyAmount of buyToken in exchange for at most maxSellAmount of sellToken
+   * @notice Exchanges buyAmount of buyToken in exchange for at most maxSellAmount of sellToken
    * Requires the sellAmount to have been approved to the exchange
    * @param buyAmount The amount of buyToken the user is buying from the exchange
    * @param maxSellAmount The maximum amount of sellToken the user can sell for this
@@ -189,7 +189,7 @@ contract Exchange is
   }
 
   /**
-   * @dev Exchanges sellAmount of sellToken in exchange for buyAmount of buyToken
+   * @notice Exchanges sellAmount of sellToken in exchange for buyAmount of buyToken
    * Requires the sellAmount to have been approved to the exchange
    * @param sellAmount The amount of sellToken the user is selling to the exchange
    * @param buyAmount The amount of buyToken the user is buying from the exchange
@@ -222,7 +222,7 @@ contract Exchange is
   }
 
   /**
-   * @dev Returns the amount of buyToken a user would get for sellAmount of sellToken
+   * @notice Returns the amount of buyToken a user would get for sellAmount of sellToken
    * @param sellAmount The amount of sellToken the user is selling to the exchange
    * @param sellGold `true` if gold is the sell token
    * @return The corresponding buyToken amount.
@@ -249,7 +249,7 @@ contract Exchange is
   }
 
   /**
-   * @dev Returns the amount of sellToken a user would need to exchange to receive buyAmount of
+   * @notice Returns the amount of sellToken a user would need to exchange to receive buyAmount of
    * buyToken.
    * @param buyAmount The amount of buyToken the user would like to purchase.
    * @param sellGold `true` if gold is the sell token
@@ -375,7 +375,7 @@ contract Exchange is
   }
 
   /**
-   * @dev Returns the amount of sellToken a user would need to exchange to receive buyAmount of
+   * @notice Returns the amount of sellToken a user would need to exchange to receive buyAmount of
    * buyToken.
    * @param buyAmount The amount of buyToken the user would like to purchase.
    * @param sellGold `true` if gold is the sell token
@@ -384,7 +384,7 @@ contract Exchange is
   function _getSellTokenAmount(uint256 buyAmount, bool sellGold) private view returns (uint256) {
     uint256 sellTokenBucket;
     uint256 buyTokenBucket;
-    (buyTokenBucket, sellTokenBucket) = getBuyAndSellBuckets(sellGold);
+    (buyTokenBucket, sellTokenBucket) = _getBuyAndSellBuckets(sellGold);
 
     FixidityLib.Fraction memory numerator = FixidityLib.newFixed(buyAmount.mul(sellTokenBucket));
     FixidityLib.Fraction memory denominator = FixidityLib
@@ -426,7 +426,7 @@ contract Exchange is
   }
 
   /**
-   * @dev Calculates the sell amount reduced by the spread.
+   * @notice Calculates the sell amount reduced by the spread.
    * @param sellAmount The original sell amount.
    * @return The reduced sell amount, computed as (1 - spread) * sellAmount
    */
@@ -439,7 +439,7 @@ contract Exchange is
   }
 
   /*
-   * Checks conditions required for bucket updates.
+   * @notice Checks conditions required for bucket updates.
    * @return Whether or not buckets should be updated.
    */
   function shouldUpdateBuckets() private view returns (bool) {
