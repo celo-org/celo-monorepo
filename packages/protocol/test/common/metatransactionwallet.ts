@@ -143,7 +143,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
         assertLogMatches2(res.logs[0], {
           event: 'SignerSet',
           args: {
-            newSigner,
+            signer: newSigner,
           },
         })
       })
