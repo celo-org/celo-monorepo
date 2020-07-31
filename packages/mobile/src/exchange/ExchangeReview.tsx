@@ -80,9 +80,9 @@ export class ExchangeReview extends React.Component<Props, State> {
       CURRENCY_ENUM.DOLLAR
     )
     const goldAmount = isDollarToGold ? makerAmount : inputAmount
-    const dollarsAmount = isDollarToGold ? inputAmount : makerAmount
+    const dollarAmount = isDollarToGold ? inputAmount : makerAmount
     const localCurrencyAmount = convertDollarsToLocalAmount(
-      dollarsAmount,
+      dollarAmount,
       this.props.localCurrencyExchangeRate
     )
     ValoraAnalytics.track(
@@ -91,6 +91,7 @@ export class ExchangeReview extends React.Component<Props, State> {
         localCurrencyAmount: localCurrencyAmount
           ? localCurrencyAmount.toString()
           : localCurrencyAmount,
+        dollarAmount,
         goldAmount: goldAmount.toString(),
         inputToken,
         goldToDollarExchangeRate: goldToDollarExchangeRate.toString(),
