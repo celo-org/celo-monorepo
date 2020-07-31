@@ -140,8 +140,8 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
         assert.equal(await wallet.signer(), newSigner)
       })
       it('should emit the SignerSet event', async () => {
-        assertLogMatches2(res.logs[1], {
-          event: 'SignerSet'
+        assertLogMatches2(res.logs[2], {
+          event: 'SignerSet',
           args: {
             newSigner,
           },
