@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Animated, Image, StyleSheet } from 'react-native'
+import { Animated, Image, StyleSheet, View } from 'react-native'
 import Cambio from 'src/codename-allegory/cambio-flower.jpg'
 import Outline from 'src/codename-allegory/outline-flower.png'
 import AspectRatio from 'src/shared/AspectRatio'
@@ -13,7 +13,7 @@ function useAnimatedScroll() {
 
   const handleScroll = (event) => {
     requestAnimationFrame(() => {
-      const percent = window.scrollY / event.target.scrollingElement.scrollHeight
+      const percent = window.scrollY / event?.target?.scrollingElement?.scrollHeight
       position.setValue(percent)
     })
   }
@@ -43,7 +43,7 @@ export default function Flower() {
   const translateY = value.interpolate(isMobile ? POSITIONING_MOBILE : POSITIONING_DESKTOP)
 
   return (
-    <>
+    <View style={styles.breathe}>
       <Animated.View
         style={[
           styles.root,
@@ -58,30 +58,44 @@ export default function Flower() {
           <Image source={Cambio} style={standardStyles.image} />
         </AnimatedRatio>
       </Animated.View>
-    </>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
   root: {
     marginTop: 60,
-    maxWidth: 1270,
     width: '100%',
     willChange: 'transform, opacity',
     transformOrigin: 'center',
     justifyContent: 'center',
-    // transitionDuration: '500ms'
   },
   mobileRoot: {
     transformOrigin: 'bottom',
-
     marginTop: 0,
     height: 'calc(100vh - 75px)',
   },
   outline: {
     position: 'absolute',
     width: '100%',
-    hieght: '100%',
+    height: '100%',
+  },
+  breathe: {
+    maxWidth: 1270,
+    justifyContent: 'center',
+    width: '100%',
+    animationIterationCount: 100,
+    animationDirection: 'alternate',
+    animationDuration: '3s',
+    animationFillMode: 'both',
+    animationKeyframes: [
+      {
+        from: { opacity: 0.6 },
+        '10%': { opacity: 0.6 },
+        '90%': { opacity: 1 },
+        to: { opacity: 1, transform: [{ scale: 1.01 }] },
+      },
+    ],
   },
 })
 const COLOR_OPACITY = {

@@ -3,10 +3,12 @@ import { Text, StyleSheet, View } from 'react-native'
 import { H4 } from 'src/fonts/Fonts'
 import { fonts, textStyles, standardStyles } from 'src/styles'
 import Fade from 'react-reveal/Fade'
+import { useScreenSize } from 'src/layout/ScreenSize'
 
 export default function Poem() {
+  const { isTablet } = useScreenSize()
   return (
-    <View style={styles.root}>
+    <View style={isTablet ? styles.tabletRoot : styles.root}>
       <H4 style={[textStyles.italic, standardStyles.elementalMarginBottom]}>
         <Fade fraction={0.9} bottom={true} duration={2000} delay={300} distance={'20px'}>
           As Wealth Flowers
@@ -27,6 +29,7 @@ const styles = StyleSheet.create({
   root: {
     transform: [{ translateY: -100 }],
   },
+  tabletRoot: {},
 })
 
 const STANZAS = [
