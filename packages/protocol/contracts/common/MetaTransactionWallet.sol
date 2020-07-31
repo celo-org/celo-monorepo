@@ -19,7 +19,9 @@ contract MetaTransactionWallet is
   bytes32 public eip712DomainSeparator;
   // The EIP712 typehash for ExecuteMetaTransaction, i.e. keccak256(
   // "ExecuteMetaTransaction(address destination,uint256 value,bytes data,uint256 nonce)");
-  bytes32 public constant EIP712_EXECUTE_META_TRANSACTION_TYPEHASH = 0x509c6e92324b7214543573524d0bb493d654d3410fa4f4937b3d2f4a903edd33;
+  bytes32 public constant EIP712_EXECUTE_META_TRANSACTION_TYPEHASH = (
+    0x509c6e92324b7214543573524d0bb493d654d3410fa4f4937b3d2f4a903edd33
+  );
   uint256 public nonce;
   address public signer;
 
