@@ -1,22 +1,70 @@
 import { assertEqualBN, assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
-import { ensureLeading0x } from '@celo/utils/lib/address'
-import { parseSignature } from '@celo/utils/lib/signatureUtils'
+import { Address, ensureLeading0x } from '@celo/utils/lib/address'
 import { generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
+import { parseSignature } from '@celo/utils/lib/signatureUtils'
 import { MetaTransactionWalletContract, MetaTransactionWalletInstance } from 'types'
 
 const MetaTransactionWallet: MetaTransactionWalletContract = artifacts.require(
   'MetaTransactionWallet'
 )
 
+const chainId = 42220
+const constructMetaTransactionExecutionDigest = (
+  walletAddress: Address,
+  value: number,
+  destination: Address,
+  data: string,
+  nonce: number
+) => {
+  const typedData = {
+    types: {
+      EIP712Domain: [
+        { name: 'name', type: 'string' },
+        { name: 'version', type: 'string' },
+        { name: 'chainId', type: 'uint256' },
+        { name: 'verifyingContract', type: 'address' },
+      ],
+      ExecuteMetaTransaction: [
+        { name: 'destination', type: 'address' },
+        { name: 'value', type: 'uint256' },
+        { name: 'data', type: 'bytes' },
+        { name: 'nonce', type: 'uint256' },
+      ],
+    },
+    primaryType: 'ExecuteMetaTransaction',
+    domain: {
+      name: 'MetaTransactionWallet',
+      version: '1',
+      chainId,
+      verifyingContract: walletAddress,
+    },
+    message: {
+      destination,
+      value,
+      data,
+      nonce,
+    },
+  }
+
+  return ensureLeading0x(generateTypedDataHash(typedData).toString('hex'))
+}
+
+const getSignatureForDigest = async (digest: string, signer: Address) => {
+  return parseSignature(digest, await web3.eth.sign(digest, signer), signer)
+}
+
 contract('MetaTransactionWallet', (accounts: string[]) => {
   let wallet: MetaTransactionWalletInstance
-  const chainId = 42220
+  let initializeRes
   const signer = accounts[1]
   const nonSigner = accounts[2]
 
+  const executeOnSelf = (data: string, nonce = 0, value = 0) =>
+    wallet.executeTransaction(wallet.address, value, data, nonce, { from: signer })
+
   beforeEach(async () => {
     wallet = await MetaTransactionWallet.new()
-    await wallet.initialize(signer, chainId)
+    initializeRes = await wallet.initialize(signer, chainId)
   })
 
   describe('#EIP172_EXECUTE_META_TRANSACTION_TYPEHASH()', () => {
@@ -28,7 +76,6 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     })
   })
 
-  // TODO(asa): Check events
   describe('#initialize()', () => {
     it('should have set the owner to itself', async () => {
       assert.equal(await wallet.owner(), wallet.address)
@@ -45,30 +92,100 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
       )
     })
 
+    it('should emit the SignerSet event', () => {
+      assertLogMatches2(initializeRes.logs[0], {
+        event: 'SignerSet',
+        args: {
+          signer,
+        },
+      })
+    })
+
+    it('should emit the EIP172DomainSeparatorSet event', () => {
+      assertLogMatches2(initializeRes.logs[1], {
+        event: 'EIP172DomainSeparatorSet',
+        args: {
+          eip172DomainSeparator:
+            '0x82620ec9dcebe24c530e5ecd53f40856d95360dc561d0ecbd65bad46e1ff89ad',
+        },
+      })
+    })
+
+    it('should emit the OwnershipTransferred event', () => {
+      assertLogMatches2(initializeRes.logs[2], {
+        event: 'OwnershipTransferred',
+        args: {
+          previousOwner: accounts[0],
+          newOwner: wallet.address,
+        },
+      })
+    })
+
     it('should not be callable again', async () => {
       await assertRevert(wallet.initialize(signer, chainId))
     })
   })
 
   describe('#setSigner()', () => {
+    const newSigner = accounts[3]
+
     describe('when called by the wallet contract', () => {
-      it('should set a new signer', async () => {})
-      it('should emit the SignerSet event', async () => {})
+      let res
+      beforeEach(async () => {
+        // @ts-ignore
+        const data = wallet.contract.methods.setSigner(newSigner).encodeABI()
+        res = await executeOnSelf(data)
+      })
+      it('should set a new signer', async () => {
+        assert.equal(await wallet.signer(), newSigner)
+      })
+      it('should emit the SignerSet event', async () => {
+        assertLogMatches2(res.logs[1], {
+          event: 'SignerSet'
+          args: {
+            newSigner,
+          },
+        })
+      })
     })
 
     describe('when called by the signer', () => {
-      it('should revert', async () => {})
+      it('should revert', async () => {
+        await assertRevert(wallet.setSigner(newSigner, { from: signer }))
+      })
     })
   })
 
   describe('#setEip172DomainSeparator()', () => {
+    const newChainId = chainId + 1
     describe('when called by the wallet contract', () => {
-      it('should set a new signer', async () => {})
-      it('should emit the SignerSet event', async () => {})
+      let res
+      beforeEach(async () => {
+        // @ts-ignore
+        const data = wallet.contract.methods.setEip172DomainSeparator(newChainId).encodeABI()
+        res = await executeOnSelf(data)
+      })
+      it('should set a new separator', async () => {
+        assert.equal(
+          await wallet.EIP172_DOMAIN_SEPARATOR(),
+          '0x82620ec9dcebe24c530e5ecd53f40856d95360dc561d0ecbd65bad46e1ff89ad'
+        )
+      })
+      it('should emit the EIP172DomainSeparatorSet event', async () => {
+        assertLogMatches2(res.logs[2], {
+          event: 'EIP172DomainSeparatorSet',
+          args: {
+            eip172DomainSeparator:
+              '0x82620ec9dcebe24c530e5ecd53f40856d95360dc561d0ecbd65bad46e1ff89ad',
+          },
+        })
+      })
     })
 
     describe('when called by the signer', () => {
-      it('should revert', async () => {})
+      it('should revert', async () => {
+        await assertRevert(wallet.setEip172DomainSeparator(newChainId, { from: signer }))
+      })
     })
   })
 
@@ -87,7 +204,6 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
       describe('when the caller is the signer', () => {
         describe('when a valid nonce is provided', () => {
           beforeEach(async () => {
-            // @ts-ignore
             res = await wallet.executeTransaction(destination, value, data, 0, { from: signer })
           })
 
@@ -179,57 +295,68 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     })
   })
 
+  describe('#getMetaTransactionDigest', () => {
+    it('creates the digest as expected', async () => {
+      const value = 100
+      const destination = web3.utils.toChecksumAddress(web3.utils.randomHex(20))
+      const data = '0x'
+      const nonce = 0
+
+      const digest = constructMetaTransactionExecutionDigest(
+        wallet.address,
+        value,
+        destination,
+        data,
+        nonce
+      )
+
+      assert.equal(await wallet.getMetaTransactionDigest(destination, value, data, nonce), digest)
+    })
+  })
+
   describe('#executeMetaTransaction()', () => {
     const value = 100
     const destination = web3.utils.toChecksumAddress(web3.utils.randomHex(20))
     const data = '0x'
+    let submitter
+    let nonce
+    let transferSigner
+
+    const doTransfer = async () => {
+      const digest = constructMetaTransactionExecutionDigest(
+        wallet.address,
+        value,
+        destination,
+        data,
+        nonce
+      )
+      const { v, r, s } = await getSignatureForDigest(digest, transferSigner)
+
+      return wallet.executeMetaTransaction(destination, value, data, v, r, s, {
+        from: submitter,
+      })
+    }
+
+    beforeEach(async () => {
+      // Transfer some funds to the wallet
+      await web3.eth.sendTransaction({ from: accounts[0], to: wallet.address, value })
+    })
+
     describe('when submitted by a non-signer', () => {
+      beforeEach(() => {
+        submitter = nonSigner
+      })
+
       describe('when the nonce is valid', () => {
-        const nonce = 0
+        beforeEach(() => {
+          nonce = 0
+        })
+
         let res: any
         describe('when signed by the signer', () => {
           beforeEach(async () => {
-            const typedData = {
-              types: {
-                EIP712Domain: [
-                  { name: 'name', type: 'string' },
-                  { name: 'version', type: 'string' },
-                  { name: 'chainId', type: 'uint256' },
-                  { name: 'verifyingContract', type: 'address' },
-                ],
-                ExecuteMetaTransaction: [
-                  { name: 'destination', type: 'address' },
-                  { name: 'value', type: 'uint256' },
-                  { name: 'data', type: 'bytes' },
-                  { name: 'nonce', type: 'uint256' },
-                ],
-              },
-              primaryType: 'ExecuteMetaTransaction',
-              domain: {
-                name: 'MetaTransactionWallet',
-                version: '1',
-                chainId,
-                verifyingContract: wallet.address,
-              },
-              message: {
-                destination,
-                value,
-                data,
-                nonce,
-              },
-            }
-            const digest = ensureLeading0x(generateTypedDataHash(typedData).toString('hex'))
-            // Sanity check.
-            assert.equal(
-              await wallet.getMetaTransactionDigest(destination, value, data, nonce),
-              digest
-            )
-            const { v, r, s } = parseSignature(digest, await web3.eth.sign(digest, signer), signer)
-            await web3.eth.sendTransaction({ from: accounts[0], to: wallet.address, value })
-            // @ts-ignore
-            res = await wallet.executeMetaTransaction(destination, value, data, v, r, s, {
-              from: signer,
-            })
+            transferSigner = signer
+            res = await doTransfer()
           })
 
           it('should execute the transaction', async () => {
@@ -254,13 +381,24 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
         })
 
         describe('when signed by a non-signer', () => {
-          it('should revert', async () => {})
+          it('should revert', async () => {
+            transferSigner = nonSigner
+            await assertRevert(doTransfer())
+          })
         })
       })
 
       describe('when the nonce is invalid', () => {
+        beforeEach(() => {
+          nonce = 1
+        })
         describe('when signed by the signer', () => {
-          it('should revert', async () => {})
+          beforeEach(() => {
+            transferSigner = signer
+          })
+          it('should revert', async () => {
+            await assertRevert(doTransfer())
+          })
         })
       })
     })
