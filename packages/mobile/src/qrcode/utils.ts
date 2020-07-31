@@ -179,7 +179,7 @@ export function* handleBarcode(
         recipient,
         amount,
         reason: qrData.comment,
-        type: TokenTransactionType.Sent,
+        type: TokenTransactionType.PayRequest,
       }
       replace(Screens.SendConfirmation, { transactionData, isFromScan: true })
     } else {
