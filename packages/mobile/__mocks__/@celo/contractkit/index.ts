@@ -102,15 +102,3 @@ enum AuthenticationMethod {
   WALLETKEY = 'wallet_key',
   ENCRYPTIONKEY = 'encryption_key',
 }
-
-export const PNPUtils = {
-  Matchmaking: {
-    obfuscateNumberForMatchmaking: obfuscateNumberForMatchmaking,
-  },
-  PhoneNumberIdentifier: {
-    getSaltFromThresholdSignature: getSaltFromThresholdSignature,
-  },
-  PhoneNumberLookup: {
-    AuthenticationMethod: AuthenticationMethod,
-  },
-}

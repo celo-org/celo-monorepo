@@ -2,12 +2,14 @@ import { PNPUtils } from '@celo/contractkit'
 import { PhoneNumberHashDetails } from '@celo/contractkit/lib/utils/phone-number-lookup/phone-number-identifier'
 import { FetchMock } from 'jest-fetch-mock'
 import { expectSaga } from 'redux-saga-test-plan'
+import * as matchers from 'redux-saga-test-plan/matchers'
 import { call } from 'redux-saga/effects'
 import { PincodeType } from 'src/account/reducer'
 import { addContactsMatches } from 'src/identity/actions'
 import { fetchContactMatches } from 'src/identity/matchmaking'
 import { getUserSelfPhoneHashDetails } from 'src/identity/privateHashing'
 import { NumberToRecipient, RecipientKind } from 'src/recipients/recipient'
+import { isAccountUpToDate } from 'src/web3/dataEncryptionKey'
 import { getConnectedUnlockedAccount } from 'src/web3/saga'
 import { createMockStore } from 'test/utils'
 import {
@@ -18,18 +20,18 @@ import {
   mockE164NumberSalt,
 } from 'test/values'
 
-jest.mock('../web3/dataEncryptionKey', () => ({
-  ...jest.requireActual('../web3/dataEncryptionKey'),
-  isAccountUpToDate: jest.fn(() => true),
+jest.mock('@celo/contractkit', () => ({
+  ...jest.requireActual('@celo/contractkit'),
+  ...jest.requireActual('../../__mocks__/@celo/contractkit/index'),
 }))
 
-describe.only('Fetch contact matches', () => {
+describe('Fetch contact matches', () => {
   const mockFetch = fetch as FetchMock
   beforeEach(() => {
     mockFetch.resetMocks()
   })
 
-  it.only('retrieves matches correctly', async () => {
+  it('retrieves matches correctly', async () => {
     mockFetch.mockResponseOnce(
       JSON.stringify({
         success: true,
@@ -81,6 +83,8 @@ describe.only('Fetch contact matches', () => {
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
         [call(getUserSelfPhoneHashDetails), phoneHashDetails],
+        [matchers.call.fn(isAccountUpToDate), true],
+        [matchers.call.fn(PNPUtils.Matchmaking.getContactMatches), [mockE164Number2]],
       ])
       .withState(state)
       .put(addContactsMatches(expectedMatches))
