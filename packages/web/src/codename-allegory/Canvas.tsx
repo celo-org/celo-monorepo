@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { useScreenSize } from 'src/layout/ScreenSize'
 import Body from 'src/codename-allegory/Body'
 import SideBar from 'src/codename-allegory/SideBar'
 import OpenGraph from 'src/header/OpenGraph'
@@ -13,7 +12,6 @@ const DURATION = 600
 
 export default function Canvas() {
   const [isOpen, toggleSidebar] = useBooleanToggle()
-  const { isMobile } = useScreenSize()
   return (
     <>
       <OpenGraph
@@ -35,7 +33,7 @@ export default function Canvas() {
           </Text>
         </View>
         <View style={styles.container}>
-          {!(isMobile && isOpen) && <Body />}
+          <Body isOpen={isOpen} />
           <SideBar isOpen={isOpen} />
         </View>
       </View>
@@ -51,6 +49,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   container: {
+    overflow: 'hidden',
     flexDirection: 'row',
   },
 })

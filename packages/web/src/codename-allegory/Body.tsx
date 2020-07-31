@@ -7,11 +7,17 @@ import RingsGlyph from 'src/logos/RingsGlyph'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import { useScreenSize } from 'src/layout/ScreenSize'
 
-export default React.memo(function Body() {
+interface Props {
+  isOpen: boolean
+}
+
+export default React.memo(function Body({ isOpen }: Props) {
   const { isMobile } = useScreenSize()
 
   return (
-    <View style={[styles.root, isMobile && { width: '100vw' }]}>
+    <View
+      style={[styles.root, isMobile && { width: '100vw', opacity: isOpen && isMobile ? 0 : 1 }]}
+    >
       <RingsGlyph color={colors.dark} height={30} />
       <Flower />
       <Poem />
@@ -32,7 +38,7 @@ export default React.memo(function Body() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    marginHorizontal: 24,
+    paddingHorizontal: 24,
     alignItems: 'center',
   },
   footer: {

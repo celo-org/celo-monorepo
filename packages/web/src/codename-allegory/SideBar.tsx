@@ -78,6 +78,7 @@ const styles = StyleSheet.create({
     width: 270,
   },
   root: {
+    backgroundColor: colors.white,
     justifyContent: 'space-between',
     minHeight: 'calc(100vh - 50px)',
     willChange: 'transform, opacity',
