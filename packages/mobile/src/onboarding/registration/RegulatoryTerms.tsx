@@ -10,6 +10,7 @@ import { acceptTerms } from 'src/account/actions'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { CELO_TERMS_LINK } from 'src/config'
 import { Namespaces, withTranslation } from 'src/i18n'
+import Logo, { LogoTypes } from 'src/icons/Logo.v2'
 import { nuxNavigationOptions } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -58,6 +59,8 @@ export class RegulatoryTerms extends React.Component<Props> {
           contentContainerStyle={styles.scrollContent}
           testID="scrollView"
         >
+          <Logo type={LogoTypes.DARK} height={32} />
+          <Text style={styles.title}>{t('terms.title')}</Text>
           <Text style={styles.header}>{t('terms.heading1')}</Text>
           <Text style={styles.disclaimer}>
             <Trans ns={Namespaces.nuxNamePin1} i18nKey={'terms.privacy'}>
@@ -106,6 +109,11 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     paddingBottom: 15,
+  },
+  title: {
+    ...fontStyles.h1,
+    marginTop: 30,
+    marginBottom: 24,
   },
   header: {
     ...fontStyles.h2,
