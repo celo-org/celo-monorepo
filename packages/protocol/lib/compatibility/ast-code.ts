@@ -35,9 +35,9 @@ const CONTRACT_KIND_CONTRACT = 'contract'
 const OUT_VOID_PARAMETER_STRING = 'void'
 const CONTRACT_METADATA_REGEXPS = [
   // 0.5.8
-  /^(.*)a165627a7a72305820.*0029$/i,
+  'a165627a7a72305820.*0029',
   // 0.5.12
-  /^(.*)a265627a7a72315820.*64736f6c6343.*0032$/i
+  'a265627a7a72315820.*64736f6c6343.*0032'
 ]
 
 // Exported classes
@@ -358,9 +358,10 @@ const getCheckableMethodsFromAST = (contract: ContractAST, id: string): any[] =>
  */
 const stripMetadataIfPresent = (bytecode: string): string => {
   try {
-    const regexp = new RegExp(CONTRACT_METADATA_REGEXPS.map(r => r.source).join('|'))
+    const regexp = new RegExp(`^(.*)(${CONTRACT_METADATA_REGEXPS.map(r => '(' + r + ')').join('|')})$`, 'i')
+    console.log(regexp.source)
     // TODO: use proper CBOR parser
-    const [, bytes] = bytecode.match(regex)
+    const [, bytes] = bytecode.match(regexp)
     return bytes
   } catch (e) {
     return bytecode
@@ -440,6 +441,10 @@ function generateASTCompatibilityReport(oldContract: ZContract, oldArtifacts: Bu
   }
 
   const report = doASTCompatibilityReport(contractName, oldAST, newAST)
+  if (contractName === 'CalledByVm') {
+    console.log('old metadata', stripMetadataIfPresent(oldContract.schema.deployedBytecode))
+    console.log('new metadata', stripMetadataIfPresent(newContract.schema.deployedBytecode))
+  }
   // Check deployed byte code change
   if (stripMetadataIfPresent(oldContract.schema.deployedBytecode) !== stripMetadataIfPresent(newContract.schema.deployedBytecode)) {
     report.push(new DeployedBytecodeChange(contractName))
