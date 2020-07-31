@@ -6,6 +6,7 @@ COPY packages/phone-number-privacy/signer signer
 
 WORKDIR /celo-phone-number-privacy/signer
 COPY yarn.lock ./
+COPY packages/flake-tracker node_modules/flake-tracker
 
 RUN yarn install --frozen-lockfile --network-timeout 100000 && yarn cache clean
 
