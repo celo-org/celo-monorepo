@@ -78,7 +78,6 @@ const styles = StyleSheet.create({
   outline: {
     position: 'absolute',
     width: '100%',
-    height: '100%',
   },
   breathe: {
     maxWidth: 1270,
