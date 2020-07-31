@@ -1,4 +1,6 @@
 import { assertEqualBN, assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
+//import { parseSignatureAsVrs } from '@celo/utils/lib/signatureUtils'
+import { generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { MetaTransactionWalletContract, MetaTransactionWalletInstance } from 'types'
 
 const MetaTransactionWallet: MetaTransactionWalletContract = artifacts.require(
@@ -176,24 +178,102 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     })
   })
 
+  // WIP
   describe('#executeMetaTransaction()', () => {
+    const value = 100
+    const destination = web3.utils.toChecksumAddress(web3.utils.randomHex(20))
+    const data = '0x'
     describe('when submitted by a non-signer', () => {
-      describe('when signed by the signer', () => {
-        describe('when the nonce is valid', () => {
-          it('should succeed', async () => {})
+      describe('when the nonce is valid', () => {
+        const nonce = 0
+        let typedData: any
+        describe.only('when signed by the signer', () => {
+          beforeEach(async () => {
+            // Following the example at https://github.com/ethereum/EIPs/blob/master/assets/eip-712/Example.js
+            // and https://github.com/ethereum/EIPs/blob/master/EIPS/eip-712.md
+            typedData = {
+              types: {
+                EIP712Domain: [
+                  { name: 'name', type: 'string' },
+                  { name: 'version', type: 'string' },
+                  { name: 'chainId', type: 'uint256' },
+                  { name: 'verifyingContract', type: 'address' },
+                ],
+                ExecuteMetaTransaction: [
+                  { name: 'destination', type: 'address' },
+                  { name: 'value', type: 'uint256' },
+                  { name: 'data', type: 'bytes' },
+                  { name: 'nonce', type: 'uint256' },
+                ],
+              },
+              primaryType: 'ExecuteMetaTransaction',
+              domain: {
+                name: 'MetaTransactionWallet',
+                version: '1',
+                chainId,
+                verifyingContract: wallet.address,
+              },
+              message: {
+                destination,
+                value,
+                data,
+                nonce,
+              },
+            }
 
-          it('should increment the nonce', async () => {})
+            /*
+            // Not a method, need to adapt contract to read signatures with message prefix.
+            const { v, r, s } = parseSignatureAsVrs(await web3.eth.signTypedData(signer, typedData))
+            console.log(v, r, s)
 
-          it('should emit a MetaTransactionExecuted event', async () => {})
+            await web3.eth.sendTransaction({ from: accounts[0], to: wallet.address, value })
+            // @ts-ignore
+            res = await wallet.executeMetaTransaction(destination, value, data, 0, v, r, s, { from: signer })
+            */
+          })
+
+          it('should match hashes', async () => {
+            console.log('domain separator', await wallet.EIP172_DOMAIN_SEPARATOR())
+            console.log(
+              'struct hash',
+              await wallet.getMetaTransactionStructHash(destination, value, data, nonce)
+            )
+            const hash = generateTypedDataHash(typedData)
+            assert.equal(
+              `0x${hash.toString('hex')}`,
+              await wallet.getMetaTransactionDigest(destination, value, data, nonce)
+            )
+          })
+          /*
+          it('should execute the transaction', async () => {
+            assert.equal(await web3.eth.getBalance(destination), value)
+          })
+
+          it('should increment the nonce', async () => {
+            assertEqualBN(await wallet.nonce(), 1)
+          })
+
+          it('should emit the MetaTransactionExecution event', () => {
+            assertLogMatches2(res.logs[0], {
+              event: 'MetaTransactionExecution',
+              args: {
+                destination,
+                value,
+                data: null,
+                returnData: null,
+              }
+            })
+          })
+          */
         })
 
-        describe('when the nonce is invalid', () => {
+        describe('when signed by a non-signer', () => {
           it('should revert', async () => {})
         })
       })
 
-      describe('when signed by a non-signer', () => {
-        describe('when the nonce is valid', () => {
+      describe('when the nonce is invalid', () => {
+        describe('when signed by the signer', () => {
           it('should revert', async () => {})
         })
       })

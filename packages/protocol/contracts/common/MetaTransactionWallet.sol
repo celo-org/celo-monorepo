@@ -69,19 +69,48 @@ contract MetaTransactionWallet is
    * @dev Should be called every time the wallet is upgraded to a new version.
    */
   function setEip172DomainSeparator(uint256 chainId) public onlyOwner {
-    (uint256 a, uint256 b, uint256 c, uint256 d) = getVersionNumber();
+    // TODO: Use the actual version number
+    // (uint256 a, uint256 b, uint256 c, uint256 d) = getVersionNumber();
     EIP172_DOMAIN_SEPARATOR = keccak256(
       abi.encode(
         keccak256(
           "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
         ),
         keccak256(bytes("MetaTransactionWallet")),
-        keccak256(abi.encode(a, b, c, d)),
+        keccak256("1"),
         chainId,
         address(this)
       )
     );
     emit EIP172DomainSeparatorSet(EIP172_DOMAIN_SEPARATOR);
+  }
+
+  // for debugging, this doesn't seem to match the sign-typed-data-utils implementation
+  function getMetaTransactionStructHash(
+    address destination,
+    uint256 value,
+    bytes memory data,
+    uint256 _nonce
+  ) public view returns (bytes32) {
+    return
+      keccak256(
+        abi.encode(EIP172_EXECUTE_META_TRANSACTION_TYPEHASH, destination, value, data, _nonce)
+      );
+  }
+
+  function getMetaTransactionDigest(
+    address destination,
+    uint256 value,
+    bytes memory data,
+    uint256 _nonce
+  ) public view returns (bytes32) {
+    bytes32 structHash = keccak256(
+      abi.encode(
+        EIP172_EXECUTE_META_TRANSACTION_TYPEHASH,
+        abi.encode(destination, value, data, _nonce)
+      )
+    );
+    return keccak256(abi.encodePacked("\x19\x01", EIP172_DOMAIN_SEPARATOR, structHash));
   }
 
   /**
@@ -97,10 +126,8 @@ contract MetaTransactionWallet is
     bytes32 r,
     bytes32 s
   ) public view returns (address) {
-    bytes32 structHash = keccak256(
-      abi.encode(EIP172_EXECUTE_META_TRANSACTION_TYPEHASH, destination, value, data, _nonce)
-    );
-    bytes32 digest = keccak256(abi.encodePacked("\x19\x01", EIP172_DOMAIN_SEPARATOR, structHash));
+    // TODO: Should use Signatures library given we expect to use the Ethereum Signed Message prefix
+    bytes32 digest = getMetaTransactionDigest(destination, value, data, _nonce);
     bytes memory signature = new bytes(65);
     // Concatenate (r, s, v) into signature.
     assembly {
