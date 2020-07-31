@@ -38,7 +38,7 @@ const getLogger = (tag: string, txId: string) => {
           Logger.warn(tag, `Transaction id ${txId} extra confirmation received: ${event.number}`)
         }
         Logger.debug(tag, `Transaction confirmed with id: ${txId}`)
-        ValoraAnalytics.track(TransactionEvents.transaction_start, { txId })
+        ValoraAnalytics.track(TransactionEvents.transaction_confirmed, { txId })
         break
       case SendTransactionLogEventType.EstimatedGas:
         Logger.debug(tag, `Transaction with id ${txId} estimated gas: ${event.gas}`)

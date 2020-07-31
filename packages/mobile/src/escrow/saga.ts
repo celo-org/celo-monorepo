@@ -82,7 +82,6 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
       NUM_ATTESTATIONS_REQUIRED
     )
     ValoraAnalytics.track(EscrowEvents.escrow_transfer_transfer_tx_sent)
-    // TODO check types
     yield call(sendAndMonitorTransaction, action.txId, transferTx, account)
     yield put(fetchSentEscrowPayments())
     ValoraAnalytics.track(EscrowEvents.escrow_transfer_complete)
