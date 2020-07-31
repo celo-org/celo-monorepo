@@ -990,7 +990,7 @@ contract('Attestations', (accounts: string[]) => {
     })
   })
 
-  describe.only('#approveTransfer()', () => {
+  describe('#approveTransfer()', () => {
     it('is able to approve an account', async () => {
       await attestations.approveTransfer(caller, true, {
         from: replacementAddress,
