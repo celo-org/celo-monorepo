@@ -23,7 +23,7 @@ COPY packages/dev-utils packages/dev-utils/
 COPY packages/protocol packages/protocol/
 COPY packages/contractkit packages/contractkit/
 COPY packages/attestation-service packages/attestation-service/
-COPY flakey-test-tracking/ flakey-test-tracking/
+COPY packages/flake-tracker packages/flake-tracker
 
 ENV NODE_ENV production
 

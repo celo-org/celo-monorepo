@@ -23,7 +23,7 @@ COPY packages/dev-utils packages/dev-utils/
 COPY packages/protocol packages/protocol/
 COPY packages/contractkit packages/contractkit/
 COPY packages/leaderboard packages/leaderboard/
-COPY flakey-test-tracking/ flakey-test-tracking/
+COPY packages/flake-tracker packages/flake-tracker
 
 # build all
 RUN yarn build

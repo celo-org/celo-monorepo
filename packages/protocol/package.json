@@ -81,6 +81,7 @@
     "web3-utils": "1.2.4"
   },
   "devDependencies": {
+    "@celo/flake-tracker": "0.0.1-dev",
     "@celo/typechain-target-web3-v1-celo": "0.0.2",
     "@celo/typescript": "0.0.1",
     "@types/bn.js": "^4.11.0",

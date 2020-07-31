@@ -31,7 +31,7 @@ COPY packages/typescript packages/typescript/
 COPY packages/contractkit packages/contractkit/
 COPY packages/protocol packages/protocol/
 COPY packages/celotool packages/celotool/
-COPY flakey-test-tracking/ flakey-test-tracking/
+COPY packages/flake-tracker packages/flake-tracker
 
 RUN yarn build
 

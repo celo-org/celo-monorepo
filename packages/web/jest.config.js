@@ -1,5 +1,5 @@
 const defaultConfig = require('../../jest.config.js')
-const { jsdomFlakeTracking } = require('../../flakey-test-tracking/src/jest/config.js')
+const { jsdomFlakeTracking } = require('@celo/flake-tracker/src/jest/config.js')
 
 module.exports = {
   ...defaultConfig,
