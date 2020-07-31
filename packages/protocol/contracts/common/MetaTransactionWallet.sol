@@ -106,6 +106,13 @@ contract MetaTransactionWallet is
 
   /**
    * @notice Returns the address that signed the provided meta-transaction.
+   * @param destination The address to which the meta-transaction is to be sent.
+   * @param value The CELO value to be sent with the meta-transaction.
+   * @param data The data to be sent with the meta-transaction.
+   * @param _nonce The nonce for this meta-transaction local to this wallet.
+   * @param v The recovery id of the ECDSA signature of the meta-transaction.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
    * @return The address that signed the provided meta-transaction.
    */
   function getMetaTransactionSigner(
@@ -126,6 +133,12 @@ contract MetaTransactionWallet is
 
   /**
    * @notice Executes a meta-transaction on behalf of the signer.`
+   * @param destination The address to which the meta-transaction is to be sent.
+   * @param value The CELO value to be sent with the meta-transaction.
+   * @param data The data to be sent with the meta-transaction.
+   * @param v The recovery id of the ECDSA signature of the meta-transaction.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
    * @return The return value of the meta-transaction execution.
    */
   function executeMetaTransaction(
@@ -145,6 +158,10 @@ contract MetaTransactionWallet is
 
   /**
    * @notice Executes a transaction on behalf of the signer.`
+   * @param destination The address to which the transaction is to be sent.
+   * @param value The CELO value to be sent with the transaction.
+   * @param data The data to be sent with the transaction.
+   * @param _nonce The nonce for this transaction local to this wallet.
    * @return The return value of the transaction execution.
    */
   function executeTransaction(
@@ -162,6 +179,9 @@ contract MetaTransactionWallet is
 
   /**
    * @notice Executes a transaction on behalf of the signer.`
+   * @param destination The address to which the transaction is to be sent.
+   * @param value The CELO value to be sent with the transaction.
+   * @param data The data to be sent with the transaction.
    * @return The return value of the transaction execution.
    */
   function _executeTransaction(address destination, uint256 value, bytes memory data)
