@@ -140,7 +140,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
         assert.equal(await wallet.signer(), newSigner)
       })
       it('should emit the SignerSet event', async () => {
-        assertLogMatches2(res.logs[2], {
+        assertLogMatches2(res.logs[0], {
           event: 'SignerSet',
           args: {
             newSigner,
@@ -172,7 +172,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
         )
       })
       it('should emit the EIP712DomainSeparatorSet event', async () => {
-        assertLogMatches2(res.logs[2], {
+        assertLogMatches2(res.logs[0], {
           event: 'EIP712DomainSeparatorSet',
           args: {
             eip712DomainSeparator:
