@@ -338,11 +338,6 @@ export class SendConfirmation extends React.Component<Props, State> {
         currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
       }
 
-      Logger.warn(
-        'SendConfirmation.renderWithAsyncFee',
-        JSON.stringify(this.props.confirmationInput)
-      )
-
       return (
         <View style={styles.feeContainer}>
           <FeeDrawer
@@ -458,7 +453,6 @@ export class SendConfirmation extends React.Component<Props, State> {
     if (!account) {
       throw Error('Account is required')
     }
-    // Logger.warn("SendConfirmation.render", JSON.stringify(confirmationInput))
 
     const { amount, recipientAddress } = confirmationInput
 
