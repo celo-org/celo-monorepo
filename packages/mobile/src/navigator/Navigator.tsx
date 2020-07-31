@@ -401,7 +401,11 @@ const settingsScreens = (Navigator: typeof Stack) => (
       name={Screens.SelectLocalCurrency}
       component={SelectLocalCurrency}
     />
-    <Navigator.Screen options={headerWithBackButton} name={Screens.Licenses} component={Licenses} />
+    <Navigator.Screen
+      options={Licenses.navigationOptions}
+      name={Screens.Licenses}
+      component={Licenses}
+    />
     <Navigator.Screen
       options={headerWithBackButton}
       name={Screens.SupportContact}
