@@ -6,9 +6,9 @@ import Fade from 'react-reveal/Fade'
 import { useScreenSize } from 'src/layout/ScreenSize'
 
 export default function Poem() {
-  const { isTablet } = useScreenSize()
+  const { isDesktop } = useScreenSize()
   return (
-    <View style={isTablet ? styles.tabletRoot : styles.root}>
+    <View style={isDesktop && styles.root}>
       <H4 style={[textStyles.italic, standardStyles.elementalMarginBottom]}>
         <Fade fraction={0.9} bottom={true} duration={2000} delay={300} distance={'20px'}>
           As Wealth Flowers
@@ -27,9 +27,8 @@ export default function Poem() {
 
 const styles = StyleSheet.create({
   root: {
-    transform: [{ translateY: -100 }],
+    // transform: [{ translateY: -100 }],
   },
-  tabletRoot: {},
 })
 
 const STANZAS = [

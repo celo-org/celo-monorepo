@@ -20,10 +20,12 @@ export default function SideBar({ isOpen }) {
             As Wealth Flowers
           </H4>
           <Text style={fonts.p}>
-            A poem and art piece that... Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-            veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-            consequat.
+            This art form is a testament to creative biunity of poetry and illustration. ‘Kuneco’ is
+            an Esperanto word signifying togetherness, and this communal interdependence forms the
+            heart of the creators’ work from within Celo. As a sacred gift, the spirit embodied
+            within this art piece gathers a space for intimate connection and an expressive tenor of
+            togetherness — in dedication to making conditions for collective prosperity to flower
+            throughout the world.
           </Text>
           <Button
             style={standardStyles.elementalMargin}
@@ -89,13 +91,11 @@ const styles = StyleSheet.create({
     right: 0,
   },
   showSideMobile: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    width: '100vw',
-    top: 0,
-    paddingHorizontal: 16,
+    height: 400,
+    minHeight: 'calc(100vh - 50px)',
     overflow: 'scroll',
+    width: '100vw',
+    paddingHorizontal: 16,
   },
   showSide: {
     marginHorizontal: 24,

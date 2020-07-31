@@ -3,9 +3,9 @@ import { StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import Flower from 'src/codename-allegory/Flower'
 import Poem from 'src/codename-allegory/Poem'
+import { useScreenSize } from 'src/layout/ScreenSize'
 import RingsGlyph from 'src/logos/RingsGlyph'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-import { useScreenSize } from 'src/layout/ScreenSize'
 
 interface Props {
   isOpen: boolean
@@ -15,9 +15,7 @@ export default React.memo(function Body({ isOpen }: Props) {
   const { isMobile } = useScreenSize()
 
   return (
-    <View
-      style={[styles.root, isMobile && { width: '100vw', opacity: isOpen && isMobile ? 0 : 1 }]}
-    >
+    <View style={[styles.root, isMobile && styles.mobile, isMobile && isOpen && styles.open]}>
       <RingsGlyph color={colors.dark} height={30} />
       <Flower />
       <Poem />
@@ -28,7 +26,7 @@ export default React.memo(function Body({ isOpen }: Props) {
             {'  '}
             Imagined with Celo
           </Text>
-          <Text style={[fonts.legal, textStyles.center]}>Design & Built by cLabs, 🄯 Celo 2020</Text>
+          <Text style={[fonts.legal, textStyles.center]}>Design & Built by cLabs, © Celo 2020</Text>
         </View>
       </Fade>
     </View>
@@ -43,5 +41,11 @@ const styles = StyleSheet.create({
   },
   footer: {
     marginVertical: 30,
+  },
+  open: {
+    height: 'calc(100vh - 50px)',
+  },
+  mobile: {
+    width: '100vw',
   },
 })

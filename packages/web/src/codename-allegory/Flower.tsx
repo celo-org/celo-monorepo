@@ -49,7 +49,7 @@ export default function Flower() {
   const translateY = value.interpolate(isMobile ? POSITIONING_MOBILE : POSITIONING_DESKTOP)
 
   return (
-    <View style={styles.breathe}>
+    <View style={[styles.breathe, isMobile && styles.breatheMobile]}>
       <Animated.View
         style={[
           styles.root,
@@ -81,11 +81,13 @@ const styles = StyleSheet.create({
   mobileRoot: {
     transformOrigin: 'bottom',
     marginTop: 0,
-    height: 'calc(100vh - 75px)',
   },
   outline: {
     position: 'absolute',
     width: '100%',
+  },
+  breatheMobile: {
+    height: 'calc(100vh - 50px)',
   },
   breathe: {
     maxWidth: 1270,
