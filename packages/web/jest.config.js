@@ -1,4 +1,5 @@
 const defaultConfig = require('../../jest.config.js')
+const { jsdomFlakeTracking } = require('@celo/flake-tracker/src/jest/config.js')
 
 module.exports = {
   ...defaultConfig,
@@ -17,7 +18,7 @@ module.exports = {
     'public/(.*)$': '<rootDir>/public/$1',
   },
   preset: 'react-native-web',
+  ...jsdomFlakeTracking,
   setupFiles: ['./jestSetup.js', 'jest-canvas-mock'],
-  setupFilesAfterEnv: ['./jestSetupAfter.ts'],
-  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['./jestSetupAfter.ts', ...jsdomFlakeTracking.setupFilesAfterEnv],
 }
