@@ -67,6 +67,7 @@ contract MetaTransactionWallet is
    * @notice Sets the EIP-712 domain separator.
    * @param chainId The chain ID on which the contract is running.
    * @dev Should be called every time the wallet is upgraded to a new version.
+   * TODO: Upgrade contract to solidity 0.5.12 to read chainId programatically.
    */
   function setEip712DomainSeparator(uint256 chainId) public onlyOwner {
     // Note: `version` is the storage.major part of this contract's version (an
@@ -101,7 +102,7 @@ contract MetaTransactionWallet is
         _nonce
       )
     );
-    return keccak256(abi.encodePacked("\x19\x01", EIP712_DOMAIN_SEPARATOR, structHash));
+    return keccak256(abi.encodePacked("\x19\x01", eip712DomainSeparator, structHash));
   }
 
   /**
