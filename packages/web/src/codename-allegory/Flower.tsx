@@ -31,6 +31,12 @@ function useScroll(handleScroll: (event: any) => void) {
 }
 
 export default function Flower() {
+  const [isLoaded, setIsLoaded] = React.useState(false)
+
+  function showImage() {
+    setIsLoaded(true)
+  }
+
   const { isMobile } = useScreenSize()
   const value = useAnimatedScroll()
 
@@ -48,14 +54,14 @@ export default function Flower() {
         style={[
           styles.root,
           isMobile && styles.mobileRoot,
-          { transform: [{ scale }, { translateY }] },
+          { transform: [{ scale }, { translateY }], opacity: isLoaded ? 1 : 0 },
         ]}
       >
         <AnimatedRatio ratio={1} style={[styles.outline, { opacity: outlineOpacity }]}>
           <Image source={Outline} style={standardStyles.image} />
         </AnimatedRatio>
         <AnimatedRatio ratio={1} style={{ opacity: colorOpacity }}>
-          <Image source={Cambio} style={standardStyles.image} />
+          <Image source={Cambio} style={standardStyles.image} onLoadEnd={showImage} />
         </AnimatedRatio>
       </Animated.View>
     </View>
@@ -67,6 +73,8 @@ const styles = StyleSheet.create({
     marginTop: 60,
     width: '100%',
     willChange: 'transform, opacity',
+    transitionProperty: 'opacity',
+    transitionDuration: '4s',
     transformOrigin: 'center',
     justifyContent: 'center',
   },
@@ -89,8 +97,8 @@ const styles = StyleSheet.create({
     animationFillMode: 'both',
     animationKeyframes: [
       {
-        from: { opacity: 0.6 },
-        '10%': { opacity: 0.6 },
+        from: { opacity: 0.7 },
+        '10%': { opacity: 0.7 },
         '90%': { opacity: 1 },
         to: { opacity: 1, transform: [{ scale: 1.01 }] },
       },
