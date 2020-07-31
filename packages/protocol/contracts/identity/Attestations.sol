@@ -93,7 +93,7 @@ contract Attestations is
   mapping(address => mapping(address => uint256)) public pendingWithdrawals;
 
   // Maps approval of attesation transfer
-  mapping(address => mapping(address => bool)) public transferAllowed;
+  mapping(address => mapping(bytes32 => bool)) public transferApprovals;
 
   event AttestationsRequested(
     bytes32 indexed identifier,
@@ -125,7 +125,12 @@ contract Attestations is
     address indexed fromAccount,
     address indexed toAccount
   );
-  event TransferApproval(address indexed destination, address indexed source, bool approved);
+  event TransferApproval(
+    address indexed approver,
+    address indexed from,
+    address indexed to,
+    bool approved
+  );
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -669,54 +674,67 @@ contract Attestations is
   }
 
   /**
-   * @notice Update the approval status of allowing an attestation identifier 
-   * mapping to be transfered from the specified address to msg.sender
-   * @param source The current attesation address to be transfered
+   * @notice Update the approval status of allowing an attestation identifier
+   * mapping to be transfered from an address to another.  The "to" or "from"
+   * addresses must both approve.  If the other has already approved, then the transfer
+   * is executed.
+   * @param identifier The identifier for this attestation.
+   * @param from The current attestation address to which the identifier is mapped.
+   * @param to The new address to map to identifier.
    * @param status The approval status
    */
-  function approveTransfer(address source, bool status) external returns (bool) {
-    require(source != address(0), "reserved address 0x0 cannot have approval");
-    transferAllowed[msg.sender][source] = status;
-    emit TransferApproval(msg.sender, source, status);
+  function approveTransfer(bytes32 identifier, uint256 index, address from, address to, bool status)
+    external
+  {
+    require(from != address(0) && to != address(0), "reserved address 0x0 cannot have approval");
+    bytes32 key = keccak256(abi.encodePacked(identifier, from, to));
+    if (
+      status && (isOtherAddressApproved(from, to, key) || isOtherAddressApproved(to, from, key))
+    ) {
+      _transfer(identifier, index, from, to);
+      transferApprovals[to][key] = false;
+      transferApprovals[from][key] = false;
+    } else {
+      transferApprovals[msg.sender][key] = status;
+      emit TransferApproval(msg.sender, from, to, status);
+    }
+  }
+
+  function isOtherAddressApproved(address current, address other, bytes32 key)
+    internal
+    view
+    returns (bool)
+  {
+    return msg.sender == current && transferApprovals[other][key];
   }
 
   /**
    * @notice Transfer an attestation identifier mapping from the sender address to a
    * replacement address.
-   * @param identifier The hash of the identifier for this attestation.
+   * @param identifier The identifier for this attestation.
    * @param index The index of the account in the accounts array.
-   * @param replacementAddress The address to replace the sender address in the indifier mapping.
+   * @param from The current attestation address to which the identifier is mapped.
+   * @param to The address to replace the sender address in the indentifier mapping.
    * @dev Throws if index is out of bound for account array.
-   * @dev Throws if msg.sender is not in the account array at the given index.
-   * @dev Throws if msg.sender is not approved by replacementAddress
-   * @dev Throws if replacementAddress allready has attestations
+   * @dev Throws if `from` is not in the account array at the given index.
+   * @dev Throws if `to` already has attestations
    */
-  function transfer(bytes32 identifier, uint256 index, address replacementAddress) external {
+  function _transfer(bytes32 identifier, uint256 index, address from, address to) internal {
     uint256 numAccounts = identifiers[identifier].accounts.length;
     require(index < numAccounts, "Index is invalid");
+    require(from == identifiers[identifier].accounts[index], "Index does not match from address");
     require(
-      msg.sender == identifiers[identifier].accounts[index],
-      "Index does not match msg.sender"
-    );
-    require(
-      transferAllowed[replacementAddress][msg.sender] == true,
-      "msg.sender is not allowed to transfer to replacementAddress"
-    );
-    // TODO: Is This requirement enough to ensure that the replacementAddress
-    // is free of attestations.
-    require(
-      identifiers[identifier].attestations[replacementAddress].requested == 0,
-      "replacementAddress has already requested attestations"
+      identifiers[identifier].attestations[to].requested == 0,
+      "address tranferring to has already requested attestations"
     );
 
-    identifiers[identifier].accounts[index] = replacementAddress;
-    identifiers[identifier].attestations[replacementAddress] = identifiers[identifier]
-      .attestations[msg.sender];
-    identifiers[identifier].unselectedRequests[replacementAddress] = identifiers[identifier]
-      .unselectedRequests[msg.sender];
-    delete identifiers[identifier].attestations[msg.sender];
-    delete identifiers[identifier].unselectedRequests[msg.sender];
-    emit AttestationsTransferred(identifier, msg.sender, replacementAddress);
+    identifiers[identifier].accounts[index] = to;
+    identifiers[identifier].attestations[to] = identifiers[identifier].attestations[from];
+    identifiers[identifier].unselectedRequests[to] = identifiers[identifier]
+      .unselectedRequests[from];
+    delete identifiers[identifier].attestations[from];
+    delete identifiers[identifier].unselectedRequests[from];
+    emit AttestationsTransferred(identifier, from, to);
   }
 
   // TODO(@i1skn): make this method external, so we can check it from outside

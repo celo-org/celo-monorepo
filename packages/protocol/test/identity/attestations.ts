@@ -991,72 +991,54 @@ contract('Attestations', (accounts: string[]) => {
   })
 
   describe('#approveTransfer()', () => {
-    it('is able to approve an account', async () => {
-      await attestations.approveTransfer(caller, true, {
-        from: replacementAddress,
-      })
-    })
-
-    it('is not able to approve 0x0', async () => {
-      await assertRevert(
-        attestations.approveTransfer.sendTransaction(
-          '0x0000000000000000000000000000000000000000',
-          true,
-          {
-            from: replacementAddress,
-          }
-        ),
-        'revert reserved address 0x0 cannot have approval'
-      )
-    })
-  })
-
-  describe('#transfer()', () => {
-    beforeEach(async () => {
-      await requestAndCompleteAttestations()
-    })
-
-    it("fails when the destination hasn't approved the transfer", async () => {
-      await assertRevert(
-        attestations.transfer.sendTransaction(phoneHash, 0, replacementAddress),
-        'msg.sender is not allowed to transfer to replacementAddress'
-      )
-    })
-
-    describe('when the destination address has approved the transfer', () => {
-      beforeEach(async () => {
-        await attestations.approveTransfer.sendTransaction(caller, true, {
-          from: replacementAddress,
-        })
-      })
-
-      it('fails when the replacementAddress has attestations', async () => {
-        // TODO: This test isn't working. The intent here is to create attestations
-        // for the replacementAddress in order to verify the invariant.
-        await attestations.request(phoneHash, attestationsRequested, mockStableToken.address, {
-          from: replacementAddress,
-        })
-        const requestBlockNumber = await web3.eth.getBlockNumber()
-        await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
-        await attestations.selectIssuers(phoneHash, {
-          from: replacementAddress,
-        })
-        const issuer = (await attestations.getAttestationIssuers(phoneHash, replacementAddress))[0]
-        const [v, r, s] = await getVerificationCodeSignature(replacementAddress, issuer)
-        await attestations.complete(phoneHash, v, r, s)
-
+    describe('when approving transfer', () => {
+      it('is not able to approve transfer to 0x0', async () => {
         await assertRevert(
-          attestations.transfer.call(phoneHash, 0, replacementAddress),
-          'replacementAddress has already requested attestations'
+          attestations.approveTransfer.sendTransaction(
+            phoneHash,
+            0,
+            caller,
+            '0x0000000000000000000000000000000000000000',
+            true
+          ),
+          'revert reserved address 0x0 cannot have approval'
         )
       })
 
-      it('should allow a user to change their mapped address', async () => {
+      it('is not able to approve transfer from 0x0', async () => {
+        await assertRevert(
+          attestations.approveTransfer.sendTransaction(
+            phoneHash,
+            0,
+            '0x0000000000000000000000000000000000000000',
+            caller,
+            true
+          ),
+          'revert reserved address 0x0 cannot have approval'
+        )
+      })
+    })
+
+    describe('when the attestation exists', () => {
+      beforeEach(async () => {
+        await requestAndCompleteAttestations()
+      })
+
+      it('should allow a user to change their mapped address when approved in the order from-->to', async () => {
         const originalAttestationStats = await attestations.getAttestationStats(phoneHash, caller)
         const originalUnselectedRequest = await attestations.getUnselectedRequest(phoneHash, caller)
-        await attestations.transfer(phoneHash, 0, replacementAddress)
+        await attestations.approveTransfer(phoneHash, 0, caller, replacementAddress, true, {
+          from: caller,
+        })
         const attestedAccounts = await attestations.lookupAccountsForIdentifier.call(phoneHash)
-        assert.deepEqual(attestedAccounts, [replacementAddress])
+        await assert.deepEqual(attestedAccounts, [caller])
+        await attestations.approveTransfer(phoneHash, 0, caller, replacementAddress, true, {
+          from: replacementAddress,
+        })
+        const attestedAccountsAfterApproval = await attestations.lookupAccountsForIdentifier.call(
+          phoneHash
+        )
+        assert.deepEqual(attestedAccountsAfterApproval, [replacementAddress])
         const newAttestationStats = await attestations.getAttestationStats(
           phoneHash,
           replacementAddress
@@ -1067,6 +1049,62 @@ contract('Attestations', (accounts: string[]) => {
         )
         assert.deepEqual(originalAttestationStats, newAttestationStats)
         assert.deepEqual(originalUnselectedRequest, newUnselectedRequest)
+      })
+
+      it('should allow a user to change their mapped address when approved in the order to-->from', async () => {
+        const originalAttestationStats = await attestations.getAttestationStats(phoneHash, caller)
+        const originalUnselectedRequest = await attestations.getUnselectedRequest(phoneHash, caller)
+        await attestations.approveTransfer(phoneHash, 0, caller, replacementAddress, true, {
+          from: replacementAddress,
+        })
+        const attestedAccounts = await attestations.lookupAccountsForIdentifier.call(phoneHash)
+        await assert.deepEqual(attestedAccounts, [caller])
+        await attestations.approveTransfer(phoneHash, 0, caller, replacementAddress, true, {
+          from: caller,
+        })
+        const attestedAccountsAfterApproval = await attestations.lookupAccountsForIdentifier.call(
+          phoneHash
+        )
+        assert.deepEqual(attestedAccountsAfterApproval, [replacementAddress])
+        const newAttestationStats = await attestations.getAttestationStats(
+          phoneHash,
+          replacementAddress
+        )
+        const newUnselectedRequest = await attestations.getUnselectedRequest(
+          phoneHash,
+          replacementAddress
+        )
+        assert.deepEqual(originalAttestationStats, newAttestationStats)
+        assert.deepEqual(originalUnselectedRequest, newUnselectedRequest)
+      })
+
+      it('fails when the `to` address has attestations existing', async () => {
+        await attestations.request(phoneHash, attestationsRequested, mockStableToken.address, {
+          from: replacementAddress,
+        })
+        const requestBlockNumber = await web3.eth.getBlockNumber()
+        await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
+        await attestations.selectIssuers(phoneHash, { from: replacementAddress })
+
+        const issuer = (
+          await attestations.getAttestationIssuers(phoneHash, replacementAddress, {
+            from: replacementAddress,
+          })
+        )[0]
+        const [v, r, s] = await getVerificationCodeSignature(replacementAddress, issuer)
+        await attestations.complete(phoneHash, v, r, s, { from: replacementAddress })
+        await attestations.approveTransfer(phoneHash, 0, caller, replacementAddress, true, {
+          from: replacementAddress,
+        })
+        await attestations.approveTransfer(phoneHash, 0, caller, replacementAddress, true, {
+          from: replacementAddress,
+        })
+        await assertRevert(
+          attestations.approveTransfer(phoneHash, 0, caller, replacementAddress, true, {
+            from: caller,
+          }),
+          'address tranferring to has already requested attestations'
+        )
       })
     })
   })
