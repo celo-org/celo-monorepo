@@ -77,7 +77,7 @@ class GitHub {
 
   async createIssue(flake) {
     if (!process.env.CIRCLECI) return
-    flake.body = 'Discovered in PR ' + process.env.CIRCLE_PULL_REQUEST + '\n\n' + flake.body + '\n'
+    flake.body = 'Discovered in commit ' + process.env.CIRCLE_SHA1 + '\n\n' + flake.body + '\n'
     const fn = () =>
       this.rest.issues.create({
         ...defaults,
@@ -90,7 +90,7 @@ class GitHub {
   }
 
   async fetchMandatoryTestsForPR() {
-    if (!process.env.CIRCLECI) return []
+    if (!process.env.CIRCLECI || process.env.CIRCLE_BRANCH === 'master') return []
     const prNumber = utils.getPullNumber()
     const fn = () =>
       this.rest.pulls.get({
@@ -149,8 +149,8 @@ class GitHub {
         issue_number: issue.number,
         state: 'closed',
         body:
-          'FlakeTracker closed this issue after PR ' +
-          process.env.CIRCLE_PULL_REQUEST +
+          'FlakeTracker closed this issue after commit ' +
+          process.env.CIRCLE_SHA1 +
           '\n\n' +
           issue.body,
       })
