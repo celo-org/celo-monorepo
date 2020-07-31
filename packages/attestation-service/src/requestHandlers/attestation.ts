@@ -12,7 +12,7 @@ import { getAccountAddress, getAttestationSignerAddress } from '../env'
 import { Counters } from '../metrics'
 import { AttestationModel, AttestationStatus } from '../models/attestation'
 import { respondWithError, Response } from '../request'
-import { smsProviderFor } from '../sms'
+import { startSendSms } from '../sms'
 import { SmsProviderType } from '../sms/base'
 
 const SMS_SENDING_ERROR = 'Something went wrong while attempting to send SMS, try again later'
@@ -159,8 +159,6 @@ class AttestationRequestHandler {
       throw new Error(ATTESTATION_ALREADY_SENT_ERROR)
     }
     const address = getAccountAddress()
-
-    // TODO: Check with the new Accounts.sol
     if (!eqAddress(address, issuer)) {
       Counters.attestationRequestsWrongIssuer.inc()
       throw new Error(`Mismatching issuer, I am ${address}`)
@@ -207,6 +205,31 @@ class AttestationRequestHandler {
     return
   }
 
+  async persistFinalAttesationResult(result: AttestationStatus) {
+    if (result === AttestationStatus.COMPLETE) {
+      Counters.attestationRequestsBelievedDelivered.inc()
+    } else if (result === AttestationStatus.FAILED) {
+      Counters.attestationRequestsFailedToDeliverSms.inc()
+    }
+
+    const transaction = await sequelize!.transaction({ logging: this.sequelizeLogger })
+    try {
+      const attestationRecord = await ensureLockedRecord(
+        this.attestationRequest,
+        this.identifier,
+        transaction
+      )
+      await attestationRecord.update(
+        { status: result },
+        { transaction, logging: this.sequelizeLogger }
+      )
+      await transaction.commit()
+    } catch (err) {
+      this.logger.error({ err })
+      await transaction.rollback()
+    }
+  }
+
   async sendSmsAndPersistAttestation(attestationCode: string) {
     const textMessage = createAttestationTextMessage(
       attestationCode,
@@ -222,31 +245,28 @@ class AttestationRequestHandler {
         this.identifier,
         transaction
       )
-      const provider = smsProviderFor(this.attestationRequest.phoneNumber)
-
-      if (!provider) {
-        await attestationRecord.update(
-          { status: AttestationStatus.UNABLE_TO_SERVE, smsProvider: SmsProviderType.UNKNOWN },
-          { transaction, logging: this.sequelizeLogger }
-        )
-        await transaction.commit()
-        Counters.attestationRequestsUnableToServe.inc()
-        return attestationRecord
-      }
 
       try {
-        await provider.sendSms(this.attestationRequest.phoneNumber, textMessage)
-        this.logger.info('Sent sms')
+        const sentVia = await startSendSms(
+          this.attestationRequest.phoneNumber,
+          textMessage,
+          () => {
+            void this.persistFinalAttesationResult(AttestationStatus.FAILED)
+          },
+          () => {
+            void this.persistFinalAttesationResult(AttestationStatus.COMPLETE)
+          }
+        )
         Counters.attestationRequestsSentSms.inc()
         await attestationRecord.update(
-          { status: AttestationStatus.SENT, smsProvider: provider.type },
+          { status: AttestationStatus.SENT, smsProvider: sentVia },
           { transaction, logging: this.sequelizeLogger }
         )
       } catch (err) {
         this.logger.error({ err })
         Counters.attestationRequestsFailedToSendSms.inc()
         await attestationRecord.update(
-          { status: AttestationStatus.FAILED, smsProvider: provider.type },
+          { status: AttestationStatus.FAILED, smsProvider: SmsProviderType.UNKNOWN },
           { transaction, logging: this.sequelizeLogger }
         )
       }

@@ -1,4 +1,4 @@
-import { Counter } from 'prom-client'
+import { Counter, Gauge } from 'prom-client'
 
 export const Counters = {
   attestationRequestsTotal: new Counter({
@@ -38,8 +38,34 @@ export const Counters = {
     name: 'attestation_requests_failed_to_send_sms',
     help: 'Counter for the number of sms that failed to send',
   }),
+  attestationRequestsBelievedDelivered: new Counter({
+    name: 'attestation_requests_believed_delivered_sms',
+    help: 'Counter for the number of sms that delivered with or without receipt',
+  }),
+  attestationRequestsFailedToDeliverSms: new Counter({
+    name: 'attestation_requests_failed_to_deliver_sms',
+    help: 'Counter for the number of sms that sent but failed to deliver',
+  }),
   attestationRequestUnexpectedErrors: new Counter({
     name: 'attestation_requests_unexpected_errors',
     help: 'Counter for the number of unexpected errors',
+  }),
+  attestationProviderDeliveryStatus: new Counter({
+    name: 'attestation_requests_delivery_status',
+    labelNames: ['provider', 'country', 'status'],
+    help: 'Counter for delivery status by provider and country',
+  }),
+  attestationProviderDeliveryErrorCodes: new Counter({
+    name: 'attestation_requests_delivery_error_codes',
+    labelNames: ['provider', 'country', 'code'],
+    help: 'Counter for delivery error codes by provider and country',
+  }),
+}
+
+export const Gauges = {
+  attestationProviderBalance: new Gauge({
+    name: 'attestation_provider_balance',
+    labelNames: ['provider'],
+    help: 'Gauge for provider outstanding account balance',
   }),
 }

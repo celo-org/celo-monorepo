@@ -3,26 +3,34 @@ import express from 'express'
 import rateLimit from 'express-rate-limit'
 import requestIdMiddleware from 'express-request-id'
 import * as PromClient from 'prom-client'
-import { initializeDB, initializeKit } from './db'
-import { getAccountAddress, getAttestationSignerAddress } from './env'
+import { initializeDB, initializeKit, verifyConfiguration } from './db'
+import { fetchEnv, fetchEnvOrDefault } from './env'
 import { rootLogger } from './logger'
 import { asyncHandler, createValidatedHandler, loggerMiddleware } from './request'
 import { AttestationRequestType, handleAttestationRequest } from './requestHandlers/attestation'
+import { handleAttestationDeliveryStatus } from './requestHandlers/delivery'
 import { handleLivenessRequest } from './requestHandlers/liveness'
 import { handleStatusRequest, StatusRequestType } from './requestHandlers/status'
 import { handleTestAttestationRequest } from './requestHandlers/test_attestation'
-import { initializeSmsProviders } from './sms'
+import { initializeSmsProviders, smsProvidersWithDeliveryStatus } from './sms'
+
+const deliveryStatusURLForProviderType = (t: string) =>
+  `${fetchEnv('EXTERNAL_CALLBACK_HOSTPORT')}/delivery_status_${t}`
 
 async function init() {
   await initializeDB()
   await initializeKit()
-  // TODO: Validate that the attestation signer has been authorized by the account
-  getAttestationSignerAddress()
-  getAccountAddress()
-  await initializeSmsProviders()
+
+  // Verify configuration.
+  const verifyConfig = fetchEnvOrDefault('VERIFY_CONFIG_ON_STARTUP', '1').toLowerCase()
+  if (verifyConfig === '1' || verifyConfig === 'y') {
+    await verifyConfiguration()
+  }
+
+  await initializeSmsProviders(deliveryStatusURLForProviderType)
 
   const app = express()
-  app.use([express.json(), requestIdMiddleware(), loggerMiddleware])
+  app.use([requestIdMiddleware(), loggerMiddleware])
   const port = process.env.PORT || 3000
   app.listen(port, () => rootLogger.info({ port }, 'Attestation Service started'))
 
@@ -40,12 +48,23 @@ async function init() {
   app.get('/healthz', rateLimiter, asyncHandler(handleLivenessRequest))
   app.post(
     '/attestations',
+    express.json(),
     createValidatedHandler(AttestationRequestType, handleAttestationRequest)
   )
   app.post(
     '/test_attestations',
+    express.json(),
     createValidatedHandler(AttestationServiceTestRequestType, handleTestAttestationRequest)
   )
+
+  for (const p of smsProvidersWithDeliveryStatus()) {
+    const path = `/delivery_status_${p.type}`
+    rootLogger.info(
+      { url: deliveryStatusURLForProviderType(p.type) },
+      'Registered delivery status handler'
+    )
+    app.post(path, ...p.deliveryStatusHandlers(), handleAttestationDeliveryStatus(p.type))
+  }
 }
 
 init().catch((err) => {
