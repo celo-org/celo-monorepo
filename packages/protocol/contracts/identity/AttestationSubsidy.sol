@@ -35,20 +35,20 @@ contract AttestationSubsidy is
   uint256 public maxSubsidisedAttestations;
 
   event AttestationSubsidised(address indexed account, uint256 value);
-  event MaxSubsidiesAttestationsSet(uint256 value);
+  event MaxSubsidisedAttestationsSet(uint256 value);
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
-   * @param maxSubsidiesAttestations Maximum number of attestations that can be subsidies in one request
+   * @param _maxSubsidisedAttestations Maximum number of attestations that can be subsidies in one request
    */
-  function initialize(address registryAddress, uint256 maxSubsidisedAttestations)
+  function initialize(address registryAddress, uint256 _maxSubsidisedAttestations)
     external
     initializer
   {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    setMaxSubsidisedAttestations(maxSubsidisedAttestations);
+    setMaxSubsidisedAttestations(_maxSubsidisedAttestations);
   }
 
   /**
@@ -58,7 +58,7 @@ contract AttestationSubsidy is
   function setMaxSubsidisedAttestations(uint256 _maxSubsidisedAttestations) public onlyOwner {
     require(_maxSubsidisedAttestations > 0, "maxSubsidisedAttestations has to be greater than 0");
     maxSubsidisedAttestations = _maxSubsidisedAttestations;
-    emit MaxSubsidiesAttestationsSet(_maxSubsidisedAttestations);
+    emit MaxSubsidisedAttestationsSet(_maxSubsidisedAttestations);
   }
 
   /**
@@ -89,29 +89,65 @@ contract AttestationSubsidy is
     require(s.length == 2, "two signatures are required (approve,request)");
     require(attestationsRequested < maxSubsidisedAttestations, "too many attestations requested");
 
-    (, uint256 requestsBefore) = getAttestations().getAttestationStats(
+    uint256 requestsBefore = getAttestationRequests(identifier, beneficiaryMetaWallet);
+    uint256 totalFee = _requestAttestationsWithSubsidy(
+      beneficiaryMetaWallet,
       identifier,
-      beneficiaryMetaWallet
+      attestationsRequested,
+      v,
+      r,
+      s
     );
-    uint256 totalFee = calculateTotalFee(attestationsRequested);
+    uint256 requestsAfter = getAttestationRequests(identifier, beneficiaryMetaWallet);
 
+    require(
+      requestsBefore + attestationsRequested == requestsAfter,
+      "meta-transaction didn not result in attestations being requested"
+    );
+
+    emit AttestationSubsidised(beneficiaryMetaWallet, totalFee);
+  }
+
+  /**
+   * @notice Executes the three steps needed to perform the subsidised attestation
+   * @param beneficiaryMetaWallet The address of the beneficiary meta-wallet
+   * @param identifier The identifier to request attestations for (see Attestations.sol)
+   * @param attestationsRequested The number of attestations requested (see Attestations.sol)
+   * @param v Array of signature components `v` for the meta-txs
+   * @param r Array of signature components `r` for the meta-txs
+   * @param s Array of signature components `s` for the meta-txs
+   * @dev The signature component arrays should have 2 items:
+   *   (v,r,s)[0] = signature for cUSD.approve(Attestations.sol, attestationsRequested*fee)
+   *   (v,r,s)[1] = signature for Attestations.request(identifier, attestationsRequested, cUSD)
+   */
+  function _requestAttestationsWithSubsidy(
+    address beneficiaryMetaWallet,
+    bytes32 identifier,
+    uint256 attestationsRequested,
+    uint8[] memory v,
+    bytes32[] memory r,
+    bytes32[] memory s
+  ) internal returns (uint256 totalFee) {
+    totalFee = calculateTotalFee(attestationsRequested);
     IMetaTransactionWallet metaWallet = IMetaTransactionWallet(beneficiaryMetaWallet);
     IERC20 cUSD = IERC20(address(getStableToken()));
 
     metaApproveCUSD(metaWallet, totalFee, v[0], r[0], s[0]);
     cUSD.transfer(beneficiaryMetaWallet, totalFee);
     metaRequestAttestations(metaWallet, identifier, attestationsRequested, v[1], r[1], s[1]);
+  }
 
-    (, uint256 requestsAfter) = getAttestations().getAttestationStats(
-      identifier,
-      beneficiaryMetaWallet
-    );
-    require(
-      requestsBefore + attestationsRequested == requestsAfter,
-      "meta-transaction didn't result in attestations being requested"
-    );
-
-    emit AttestationSubsidised(beneficiaryMetaWallet, totalFee);
+  /**
+   * @notice get the number of attestations requests for the identifier address combo
+   * @param identifier The phone number identifier (see Attestations.sol)
+   * @param account The accont to check attestations for
+   */
+  function getAttestationRequests(bytes32 identifier, address account)
+    internal
+    view
+    returns (uint256 requests)
+  {
+    (, requests) = getAttestations().getAttestationStats(identifier, account);
   }
 
   /**

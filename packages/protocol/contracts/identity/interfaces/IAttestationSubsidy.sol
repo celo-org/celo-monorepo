@@ -5,8 +5,8 @@ interface IAttestationSubsidy {
     address beneficiaryMetaWallet,
     bytes32 identifier,
     uint256 attestationsRequested,
-    uint8[] v,
-    bytes32[] r,
-    bytes32[] s
+    uint8[] calldata v,
+    bytes32[] calldata r,
+    bytes32[] calldata s
   ) external;
 }
