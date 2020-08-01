@@ -387,7 +387,11 @@ const settingsScreens = (Navigator: typeof Stack) => (
       name={Screens.InviteReview}
       component={InviteReview}
     />
-    <Navigator.Screen options={headerWithBackButton} name={Screens.Licenses} component={Licenses} />
+    <Navigator.Screen
+      options={Licenses.navigationOptions}
+      name={Screens.Licenses}
+      component={Licenses}
+    />
     <Navigator.Screen
       options={headerWithBackButton}
       name={Screens.SupportContact}
