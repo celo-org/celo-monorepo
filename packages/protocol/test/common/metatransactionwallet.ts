@@ -8,7 +8,7 @@ const MetaTransactionWallet: MetaTransactionWalletContract = artifacts.require(
   'MetaTransactionWallet'
 )
 
-interface MetaTransaction {
+export interface MetaTransaction {
   destination: Address
   value: number
   data: string
@@ -58,12 +58,15 @@ const getDomainDigest = (walletAddress: Address) => {
   )
 }
 
-const constructMetaTransactionExecutionDigest = (walletAddress: Address, tx: MetaTransaction) => {
+export const constructMetaTransactionExecutionDigest = (
+  walletAddress: Address,
+  tx: MetaTransaction
+) => {
   const typedData = getTypedData(walletAddress, tx)
   return ensureLeading0x(generateTypedDataHash(typedData).toString('hex'))
 }
 
-const getSignatureForDigest = async (digest: string, signer: Address) => {
+export const getSignatureForDigest = async (digest: string, signer: Address) => {
   return parseSignature(digest, await web3.eth.sign(digest, signer), signer)
 }
 
