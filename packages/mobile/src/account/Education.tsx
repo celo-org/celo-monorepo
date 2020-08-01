@@ -180,6 +180,7 @@ export default class Education extends React.Component<Props, State> {
             loop={false}
             dotStyle={dotStyle}
             activeDotStyle={activeDotStyle}
+            removeClippedSubviews={false}
           >
             {stepInfo.map((step: EducationStep, i: number) => {
               return (
