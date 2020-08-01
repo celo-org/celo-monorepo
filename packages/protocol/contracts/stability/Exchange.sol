@@ -98,7 +98,8 @@ contract Exchange is
   }
 
   /**
-   * @notice Exchanges a specific amount of one token for an unspecified amount of another.
+   * @notice Exchanges a specific amount of one token for an unspecified amount
+   * (greater than a threshold) of another.
    * @param sellAmount The number of tokens to send to the exchange.
    * @param minBuyAmount The minimum number of tokens for the exchange to send in return.
    * @param sellGold True if the caller is sending CELO to the exchange, false otherwise.
@@ -107,45 +108,10 @@ contract Exchange is
    * @dev This function can be frozen via the Freezable interface.
    */
   function sell(uint256 sellAmount, uint256 minBuyAmount, bool sellGold)
-    external
+    public
     onlyWhenNotFrozen
     updateBucketsIfNecessary
     nonReentrant
-    returns (uint256)
-  {
-    return _sell(sellAmount, minBuyAmount, sellGold);
-  }
-
-  /**
-   * @dev DEPRECATED - Use `buy` or `sell`
-   * @notice Exchanges a specific amount of one token for an unspecified amount of another.
-   * @param sellAmount The number of tokens to send to the exchange.
-   * @param minBuyAmount The minimum number of tokens for the exchange to send in return.
-   * @param sellGold True if the caller is sending CELO to the exchange, false otherwise.
-   * @return The number of tokens sent by the exchange.
-   * @dev The caller must first have approved `sellAmount` to the exchange.
-   * @dev This function can be frozen via the Freezable interface.
-   */
-  function exchange(uint256 sellAmount, uint256 minBuyAmount, bool sellGold)
-    external
-    onlyWhenNotFrozen
-    updateBucketsIfNecessary
-    nonReentrant
-    returns (uint256)
-  {
-    return _sell(sellAmount, minBuyAmount, sellGold);
-  }
-
-  /**
-   * @notice Exchanges a specific amount of one token for an unspecified amount of another.
-   * @param sellAmount The number of tokens to send to the exchange.
-   * @param minBuyAmount The minimum number of tokens for the exchange to send in return.
-   * @param sellGold True if the caller is sending CELO to the exchange, false otherwise.
-   * @return The number of tokens sent by the exchange.
-   * @dev The caller must first have approved `sellAmount` to the exchange.
-   */
-  function _sell(uint256 sellAmount, uint256 minBuyAmount, bool sellGold)
-    private
     returns (uint256)
   {
     (uint256 buyTokenBucket, uint256 sellTokenBucket) = _getBuyAndSellBuckets(sellGold);
@@ -158,7 +124,26 @@ contract Exchange is
   }
 
   /**
-   * @notice Exchanges an unspecified amount of one token for a specific amount of another.
+   * @dev DEPRECATED - Use `buy` or `sell`.
+   * @notice Exchanges a specific amount of one token for an unspecified amount
+   * (greater than a threshold) of another.
+   * @param sellAmount The number of tokens to send to the exchange.
+   * @param minBuyAmount The minimum number of tokens for the exchange to send in return.
+   * @param sellGold True if the caller is sending CELO to the exchange, false otherwise.
+   * @return The number of tokens sent by the exchange.
+   * @dev The caller must first have approved `sellAmount` to the exchange.
+   * @dev This function can be frozen via the Freezable interface.
+   */
+  function exchange(uint256 sellAmount, uint256 minBuyAmount, bool sellGold)
+    external
+    returns (uint256)
+  {
+    return sell(sellAmount, minBuyAmount, sellGold);
+  }
+
+  /**
+   * @notice Exchanges an unspecified amount (up to a threshold) of one token for
+   * a specific amount of another.
    * @param buyAmount The number of tokens for the exchange to send in return.
    * @param maxSellAmount The maximum number of tokens to send to the exchange.
    * @param buyGold True if the exchange is sending CELO to the caller, false otherwise.
@@ -219,14 +204,12 @@ contract Exchange is
   }
 
   /**
-   * @notice Returns the amount of buy tokens a user would get for sellAmount of the sell token
-   * @param sellAmount The amount of sellToken the user is selling to the exchange
-   * @param sellGold `true` if gold is the sell token
+   * @notice Returns the amount of buy tokens a user would get for sellAmount of the sell token.
+   * @param sellAmount The amount of sellToken the user is selling to the exchange.
+   * @param sellGold `true` if gold is the sell token.
    * @return The corresponding buyToken amount.
    */
   function getBuyTokenAmount(uint256 sellAmount, bool sellGold) external view returns (uint256) {
-    if (sellAmount == 0) return 0;
-
     (uint256 buyTokenBucket, uint256 sellTokenBucket) = getBuyAndSellBuckets(sellGold);
     return _getBuyTokenAmount(buyTokenBucket, sellTokenBucket, sellAmount);
   }
@@ -235,12 +218,10 @@ contract Exchange is
    * @notice Returns the amount of sell tokens a user would need to exchange to receive buyAmount of
    * buy tokens.
    * @param buyAmount The amount of buyToken the user would like to purchase.
-   * @param sellGold `true` if gold is the sell token
+   * @param sellGold `true` if gold is the sell token.
    * @return The corresponding sellToken amount.
    */
   function getSellTokenAmount(uint256 buyAmount, bool sellGold) external view returns (uint256) {
-    if (buyAmount == 0) return 0;
-
     (uint256 buyTokenBucket, uint256 sellTokenBucket) = getBuyAndSellBuckets(sellGold);
     return _getSellTokenAmount(buyTokenBucket, sellTokenBucket, buyAmount);
   }
@@ -248,7 +229,7 @@ contract Exchange is
   /**
    * @notice Returns the buy token and sell token bucket sizes, in order. The ratio of
    * the two also represents the exchange rate between the two.
-   * @param sellGold `true` if gold is the sell token
+   * @param sellGold `true` if gold is the sell token.
    * @return (buyTokenBucket, sellTokenBucket)
    */
   function getBuyAndSellBuckets(bool sellGold) public view returns (uint256, uint256) {
@@ -315,7 +296,7 @@ contract Exchange is
   /**
    * @notice Returns the sell token and buy token bucket sizes, in order. The ratio of
    * the two also represents the exchange rate between the two.
-   * @param sellGold `true` if gold is the sell token
+   * @param sellGold `true` if gold is the sell token.
    * @return (sellTokenBucket, buyTokenBucket)
    */
   function _getBuyAndSellBuckets(bool sellGold) private view returns (uint256, uint256) {
@@ -327,10 +308,10 @@ contract Exchange is
   }
 
   /**
-   * @dev Returns the amount of buy tokens a user would get for sellAmount of the sell token
-   * @param buyTokenBucket The buy token bucket size
-   * @param sellTokenBucket The sell token bucket size
-   * @param sellAmount The amount the user is selling to the exchange
+   * @dev Returns the amount of buy tokens a user would get for sellAmount of the sell.
+   * @param buyTokenBucket The buy token bucket size.
+   * @param sellTokenBucket The sell token bucket size.
+   * @param sellAmount The amount the user is selling to the exchange.
    * @return The corresponding buy amount.
    */
   function _getBuyTokenAmount(uint256 buyTokenBucket, uint256 sellTokenBucket, uint256 sellAmount)
@@ -338,6 +319,8 @@ contract Exchange is
     view
     returns (uint256)
   {
+    if (sellAmount == 0) return 0;
+
     FixidityLib.Fraction memory reducedSellAmount = getReducedSellAmount(sellAmount);
     FixidityLib.Fraction memory numerator = reducedSellAmount.multiply(
       FixidityLib.newFixed(buyTokenBucket)
@@ -356,9 +339,9 @@ contract Exchange is
   /**
    * @notice Returns the amount of sell tokens a user would need to exchange to receive buyAmount of
    * buy tokens.
-   * @param buyTokenBucket The buy token bucket size
-   * @param sellTokenBucket The sell token bucket size
-   * @param buyAmount The amount the user is buying from the exchange
+   * @param buyTokenBucket The buy token bucket size.
+   * @param sellTokenBucket The sell token bucket size.
+   * @param buyAmount The amount the user is buying from the exchange.
    * @return The corresponding sell amount.
    */
   function _getSellTokenAmount(uint256 buyTokenBucket, uint256 sellTokenBucket, uint256 buyAmount)
@@ -366,6 +349,8 @@ contract Exchange is
     view
     returns (uint256)
   {
+    if (buyAmount == 0) return 0;
+
     FixidityLib.Fraction memory numerator = FixidityLib.newFixed(buyAmount.mul(sellTokenBucket));
     FixidityLib.Fraction memory denominator = FixidityLib
       .newFixed(buyTokenBucket.sub(buyAmount))

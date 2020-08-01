@@ -1,5 +1,6 @@
 import { constitution } from '@celo/protocol/governanceConstitution'
 import {
+  addressMinedLatestBlock,
   assertEqualBN,
   isSameAddress,
   stripHexEncoding,
@@ -427,8 +428,7 @@ contract('Integration: Exchange', (accounts: string[]) => {
       })
 
       it(`should reduce user's gold`, async () => {
-        const block = await web3.eth.getBlock('latest')
-        if (isSameAddress(block.miner, accounts[0])) {
+        if (addressMinedLatestBlock(accounts[0])) {
           const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
           assert.isTrue(finalGold.lt(originalGold.plus(blockReward)))
         } else {
@@ -490,8 +490,7 @@ contract('Integration: Exchange', (accounts: string[]) => {
       })
 
       it(`should reduce user's gold`, async () => {
-        const block = await web3.eth.getBlock('latest')
-        if (isSameAddress(block.miner, accounts[0])) {
+        if (addressMinedLatestBlock(accounts[0])) {
           const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
           assert.isTrue(finalGold.lt(originalGold.plus(blockReward)))
         } else {

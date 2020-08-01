@@ -1,5 +1,6 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
+  addressMinedLatestBlock,
   assertEqualBN,
   assertLogMatches2,
   assertRevert,
@@ -389,11 +390,11 @@ contract('Exchange', (accounts: string[]) => {
 
   describe('#getSellTokenAmount', () => {
     it('should return the correct amount of sellToken', async () => {
-      const amount = 10
-      const sellAmount = await exchange.getSellTokenAmount(amount, true)
+      const buyAmount = 10
+      const sellAmount = await exchange.getSellTokenAmount(buyAmount, true)
 
       const expectedSellAmount = getSellTokenAmount(
-        new BigNumber(amount),
+        new BigNumber(buyAmount),
         initialGoldBucket,
         initialStableBucket
       )
@@ -402,17 +403,18 @@ contract('Exchange', (accounts: string[]) => {
     })
   })
 
-  // Run the following test for both these functions
+  // Run the following test for both these functions. Exchange is deprecated
+  // and has the same functionality as sell.
   const sellFunctionNames = ['sell', 'exchange']
 
-  for (const fnName of sellFunctionNames) {
-    describe(`#${fnName}`, () => {
+  for (const sellFunctionName of sellFunctionNames) {
+    describe(`#${sellFunctionName}`, () => {
       const user = accounts[1]
 
       // This test is run for both the `sell` and `exchange` functions
-      let fn: ExchangeInstance['sell'] | ExchangeInstance['exchange']
+      let sellFunction: ExchangeInstance['sell'] | ExchangeInstance['exchange']
       beforeEach(() => {
-        fn = exchange[fnName]
+        sellFunction = exchange[sellFunctionName]
       })
 
       describe('when selling gold for stable', () => {
@@ -433,7 +435,7 @@ contract('Exchange', (accounts: string[]) => {
         })
 
         it(`should increase the user's stable balance`, async () => {
-          await fn(
+          await sellFunction(
             goldTokenAmount,
             expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
             true,
@@ -446,7 +448,7 @@ contract('Exchange', (accounts: string[]) => {
         })
 
         it(`should decrease the user's gold balance`, async () => {
-          await fn(
+          await sellFunction(
             goldTokenAmount,
             expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
             true,
@@ -456,8 +458,7 @@ contract('Exchange', (accounts: string[]) => {
           )
           const actualGoldBalance = await goldToken.balanceOf(user)
           let expectedGoldBalance = oldGoldBalance.minus(goldTokenAmount)
-          const block = await web3.eth.getBlock('latest')
-          if (isSameAddress(block.miner, user)) {
+          if (addressMinedLatestBlock(user)) {
             const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
             expectedGoldBalance = expectedGoldBalance.plus(blockReward)
           }
@@ -465,7 +466,7 @@ contract('Exchange', (accounts: string[]) => {
         })
 
         it(`should remove the user's allowance`, async () => {
-          await fn(
+          await sellFunction(
             goldTokenAmount,
             expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
             true,
@@ -478,7 +479,7 @@ contract('Exchange', (accounts: string[]) => {
         })
 
         it(`should increase the Reserve's balance`, async () => {
-          await fn(
+          await sellFunction(
             goldTokenAmount,
             expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
             true,
@@ -491,7 +492,7 @@ contract('Exchange', (accounts: string[]) => {
         })
 
         it('should increase the total StableToken supply', async () => {
-          await fn(
+          await sellFunction(
             goldTokenAmount,
             expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
             true,
@@ -503,8 +504,8 @@ contract('Exchange', (accounts: string[]) => {
           assert.isTrue(newTotalSupply.eq(oldTotalSupply.plus(expectedStableBalance)))
         })
 
-        it('should affect token supplies', async () => {
-          await fn(
+        it('should affect token buckets', async () => {
+          await sellFunction(
             goldTokenAmount,
             expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
             true,
@@ -520,7 +521,7 @@ contract('Exchange', (accounts: string[]) => {
         })
 
         it('should emit an Exchanged event', async () => {
-          const exchangeTx = await fn(
+          const exchangeTx = await sellFunction(
             goldTokenAmount,
             expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
             true,
@@ -545,7 +546,7 @@ contract('Exchange', (accounts: string[]) => {
 
         it('should revert without sufficient approvals', async () => {
           await assertRevert(
-            fn(
+            sellFunction(
               goldTokenAmount.plus(1),
               expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
               true,
@@ -558,7 +559,7 @@ contract('Exchange', (accounts: string[]) => {
 
         it('should revert if the minBuyAmount could not be satisfied', async () => {
           await assertRevert(
-            fn(
+            sellFunction(
               goldTokenAmount,
               expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR).plus(1),
               true,
@@ -591,7 +592,7 @@ contract('Exchange', (accounts: string[]) => {
             )
 
             it('the exchange should succeed', async () => {
-              await fn(
+              await sellFunction(
                 goldTokenAmount,
                 expectedStableAmount.integerValue(BigNumber.ROUND_FLOOR),
                 true,
@@ -604,7 +605,7 @@ contract('Exchange', (accounts: string[]) => {
             })
 
             it('should update the buckets', async () => {
-              await fn(
+              await sellFunction(
                 goldTokenAmount,
                 expectedStableAmount.integerValue(BigNumber.ROUND_FLOOR),
                 true,
@@ -638,7 +639,7 @@ contract('Exchange', (accounts: string[]) => {
             })
 
             it('the exchange should succeed', async () => {
-              await fn(
+              await sellFunction(
                 goldTokenAmount,
                 expectedStableAmount.integerValue(BigNumber.ROUND_FLOOR),
                 true,
@@ -651,7 +652,7 @@ contract('Exchange', (accounts: string[]) => {
             })
 
             it('should not update the buckets', async () => {
-              await fn(
+              await sellFunction(
                 goldTokenAmount,
                 expectedStableAmount.integerValue(BigNumber.ROUND_FLOOR),
                 true,
@@ -692,7 +693,7 @@ contract('Exchange', (accounts: string[]) => {
         })
 
         it(`should decrease the user's stable balance`, async () => {
-          await fn(
+          await sellFunction(
             stableTokenBalance,
             expectedGoldBalanceIncrease.integerValue(BigNumber.ROUND_FLOOR),
             false,
@@ -705,7 +706,7 @@ contract('Exchange', (accounts: string[]) => {
         })
 
         it(`should increase the user's gold balance`, async () => {
-          await fn(
+          await sellFunction(
             stableTokenBalance,
             expectedGoldBalanceIncrease.integerValue(BigNumber.ROUND_FLOOR),
             false,
@@ -715,8 +716,7 @@ contract('Exchange', (accounts: string[]) => {
           )
           const actualGoldBalance = await goldToken.balanceOf(user)
           let expectedGoldBalance = oldGoldBalance.plus(expectedGoldBalanceIncrease)
-          const block = await web3.eth.getBlock('latest')
-          if (isSameAddress(block.miner, user)) {
+          if (addressMinedLatestBlock(user)) {
             const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
             expectedGoldBalance = expectedGoldBalance.plus(blockReward)
           }
@@ -724,7 +724,7 @@ contract('Exchange', (accounts: string[]) => {
         })
 
         it(`should remove the user's allowance`, async () => {
-          await fn(
+          await sellFunction(
             stableTokenBalance,
             expectedGoldBalanceIncrease.integerValue(BigNumber.ROUND_FLOOR),
             false,
@@ -737,7 +737,7 @@ contract('Exchange', (accounts: string[]) => {
         })
 
         it(`should decrease the Reserve's balance`, async () => {
-          await fn(
+          await sellFunction(
             stableTokenBalance,
             expectedGoldBalanceIncrease.integerValue(BigNumber.ROUND_FLOOR),
             false,
@@ -752,7 +752,7 @@ contract('Exchange', (accounts: string[]) => {
         })
 
         it('should decrease the total StableToken supply', async () => {
-          await fn(
+          await sellFunction(
             stableTokenBalance,
             expectedGoldBalanceIncrease.integerValue(BigNumber.ROUND_FLOOR),
             false,
@@ -764,8 +764,8 @@ contract('Exchange', (accounts: string[]) => {
           assert.isTrue(newTotalSupply.isZero())
         })
 
-        it('should affect token supplies', async () => {
-          await fn(
+        it('should affect token buckets', async () => {
+          await sellFunction(
             stableTokenBalance,
             expectedGoldBalanceIncrease.integerValue(BigNumber.ROUND_FLOOR),
             false,
@@ -781,7 +781,7 @@ contract('Exchange', (accounts: string[]) => {
         })
 
         it('should emit an Exchanged event', async () => {
-          const exchangeTx = await fn(
+          const exchangeTx = await sellFunction(
             stableTokenBalance,
             expectedGoldBalanceIncrease.integerValue(BigNumber.ROUND_FLOOR),
             false,
@@ -806,7 +806,7 @@ contract('Exchange', (accounts: string[]) => {
 
         it('should revert without sufficient approvals', async () => {
           await assertRevert(
-            fn(
+            sellFunction(
               stableTokenBalance.plus(1),
               expectedGoldBalanceIncrease.integerValue(BigNumber.ROUND_FLOOR),
               false,
@@ -819,7 +819,7 @@ contract('Exchange', (accounts: string[]) => {
 
         it('should revert if the minBuyAmount could not be satisfied', async () => {
           await assertRevert(
-            fn(
+            sellFunction(
               stableTokenBalance,
               expectedGoldBalanceIncrease.integerValue(BigNumber.ROUND_FLOOR).plus(1),
               false,
@@ -851,7 +851,7 @@ contract('Exchange', (accounts: string[]) => {
           })
 
           it('the exchange should succeed', async () => {
-            await fn(
+            await sellFunction(
               stableTokenBalance,
               expectedGoldAmount.integerValue(BigNumber.ROUND_FLOOR),
               false,
@@ -864,7 +864,7 @@ contract('Exchange', (accounts: string[]) => {
           })
 
           it('should update the buckets', async () => {
-            await fn(
+            await sellFunction(
               stableTokenBalance,
               expectedGoldAmount.integerValue(BigNumber.ROUND_FLOOR),
               false,
@@ -886,7 +886,7 @@ contract('Exchange', (accounts: string[]) => {
           })
 
           it('should emit an BucketsUpdated event', async () => {
-            const exchangeTx = await fn(
+            const exchangeTx = await sellFunction(
               stableTokenBalance,
               expectedGoldAmount.integerValue(BigNumber.ROUND_FLOOR),
               false,
@@ -917,7 +917,7 @@ contract('Exchange', (accounts: string[]) => {
 
         it('should revert', async () => {
           await goldToken.approve(exchange.address, 1000)
-          await assertRevert(fn(1000, 1, true))
+          await assertRevert(sellFunction(1000, 1, true))
         })
       })
     })
@@ -967,8 +967,7 @@ contract('Exchange', (accounts: string[]) => {
         )
         const actualGoldBalance = await goldToken.balanceOf(user)
         let expectedGoldBalance = oldGoldBalance.minus(expectedGoldAmount)
-        const block = await web3.eth.getBlock('latest')
-        if (isSameAddress(block.miner, user)) {
+        if (addressMinedLatestBlock(user)) {
           const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
           expectedGoldBalance = expectedGoldBalance.plus(blockReward)
         }
@@ -1014,7 +1013,7 @@ contract('Exchange', (accounts: string[]) => {
         assert.isTrue(newTotalSupply.eq(oldTotalSupply.plus(buyStableAmount)))
       })
 
-      it('should affect token supplies', async () => {
+      it('should affect token buckets', async () => {
         await exchange.buy(
           buyStableAmount,
           expectedGoldAmount.integerValue(BigNumber.ROUND_FLOOR),
@@ -1226,8 +1225,7 @@ contract('Exchange', (accounts: string[]) => {
         )
         const actualGoldBalance = await goldToken.balanceOf(user)
         let expectedGoldBalance = oldGoldBalance.plus(buyGoldAmount)
-        const block = await web3.eth.getBlock('latest')
-        if (isSameAddress(block.miner, user)) {
+        if (addressMinedLatestBlock(user) {
           const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
           expectedGoldBalance = expectedGoldBalance.plus(blockReward)
         }
@@ -1273,7 +1271,7 @@ contract('Exchange', (accounts: string[]) => {
         assert.isTrue(newTotalSupply.isZero())
       })
 
-      it('should affect token supplies', async () => {
+      it('should affect token buckets', async () => {
         await exchange.buy(
           buyGoldAmount,
           expectedStableAmount.integerValue(BigNumber.ROUND_FLOOR),
