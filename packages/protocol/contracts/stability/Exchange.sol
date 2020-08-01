@@ -149,7 +149,7 @@ contract Exchange is
     returns (uint256)
   {
     (uint256 buyTokenBucket, uint256 sellTokenBucket) = _getBuyAndSellBuckets(sellGold);
-    uint256 buyAmount = _getBuyTokenAmount(buyTokenBucket, sellTokenBucket, sellGold);
+    uint256 buyAmount = _getBuyTokenAmount(buyTokenBucket, sellTokenBucket, sellAmount);
 
     require(buyAmount >= minBuyAmount, "Calculated buyAmount was less than specified minBuyAmount");
 
@@ -219,7 +219,7 @@ contract Exchange is
   }
 
   /**
-   * @notice Returns the amount of buyToken a user would get for sellAmount of sellToken
+   * @notice Returns the amount of buy tokens a user would get for sellAmount of the sell token
    * @param sellAmount The amount of sellToken the user is selling to the exchange
    * @param sellGold `true` if gold is the sell token
    * @return The corresponding buyToken amount.
@@ -228,12 +228,12 @@ contract Exchange is
     if (sellAmount == 0) return 0;
 
     (uint256 buyTokenBucket, uint256 sellTokenBucket) = getBuyAndSellBuckets(sellGold);
-    return _getBuyTokenAmount(buyTokenBucket, sellTokenBucket, buyAmount);
+    return _getBuyTokenAmount(buyTokenBucket, sellTokenBucket, sellAmount);
   }
 
   /**
-   * @notice Returns the amount of sellToken a user would need to exchange to receive buyAmount of
-   * buyToken.
+   * @notice Returns the amount of sell tokens a user would need to exchange to receive buyAmount of
+   * buy tokens.
    * @param buyAmount The amount of buyToken the user would like to purchase.
    * @param sellGold `true` if gold is the sell token
    * @return The corresponding sellToken amount.
@@ -327,10 +327,11 @@ contract Exchange is
   }
 
   /**
-   * @dev Returns the amount of buyToken a user would get for sellAmount of sellToken
-   * @param sellAmount The amount of sellToken the user is selling to the exchange
-   * @param sellGold `true` if gold is the sell token
-   * @return The corresponding buyToken amount.
+   * @dev Returns the amount of buy tokens a user would get for sellAmount of the sell token
+   * @param buyTokenBucket The buy token bucket size
+   * @param sellTokenBucket The sell token bucket size
+   * @param sellAmount The amount the user is selling to the exchange
+   * @return The corresponding buy amount.
    */
   function _getBuyTokenAmount(uint256 buyTokenBucket, uint256 sellTokenBucket, uint256 sellAmount)
     private
@@ -353,11 +354,12 @@ contract Exchange is
   }
 
   /**
-   * @notice Returns the amount of sellToken a user would need to exchange to receive buyAmount of
-   * buyToken.
-   * @param buyAmount The amount of buyToken the user would like to purchase.
-   * @param sellGold `true` if gold is the sell token
-   * @return The corresponding sellToken amount.
+   * @notice Returns the amount of sell tokens a user would need to exchange to receive buyAmount of
+   * buy tokens.
+   * @param buyTokenBucket The buy token bucket size
+   * @param sellTokenBucket The sell token bucket size
+   * @param buyAmount The amount the user is buying from the exchange
+   * @return The corresponding sell amount.
    */
   function _getSellTokenAmount(uint256 buyTokenBucket, uint256 sellTokenBucket, uint256 buyAmount)
     private
