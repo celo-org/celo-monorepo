@@ -44,7 +44,7 @@ const getLogger = (tag: string, txId: string, fornoMode?: boolean) => {
         Logger.debug(tag, `Transaction with id ${txId} estimated gas: ${event.gas}`)
         ValoraAnalytics.track(TransactionEvents.transaction_gas_estimated, {
           txId,
-          estimateGas: event.gas,
+          estimatedGas: event.gas,
         })
         break
       case SendTransactionLogEventType.ReceiptReceived:

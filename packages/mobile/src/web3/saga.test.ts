@@ -94,6 +94,10 @@ describe(checkWeb3SyncProgress, () => {
         number: 100,
         timestamp: Math.round(Date.now() / 1000) - 600,
       })
+      .mockReturnValueOnce({
+        number: 200,
+        timestamp: Math.round(Date.now() / 1000),
+      })
 
     // @ts-ignore
     await expectSaga(checkWeb3SyncProgress)

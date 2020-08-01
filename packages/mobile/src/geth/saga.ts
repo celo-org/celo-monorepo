@@ -232,7 +232,7 @@ function* monitorGeth() {
 }
 
 function* trackConnectionStatus() {
-  const connected = yield select(isGethConnectedSelector)
+  let connected = yield select(isGethConnectedSelector)
   while (true) {
     const action: SetGethConnectedAction = yield take(Actions.SET_GETH_CONNECTED)
     const fornoMode = yield select(fornoSelector)

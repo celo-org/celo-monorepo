@@ -48,7 +48,7 @@ const BLOCK_AGE_LIMIT = 5 * 60 // if the latest block is older than 5 minutes, t
 
 // Returns true if the block was produced within the block age limit.
 function blockIsFresh(block: Block) {
-  return Math.round(Date.now() / 1000) - block.timestamp < BLOCK_AGE_LIMIT
+  return Math.round(Date.now() / 1000) - Number(block.timestamp) < BLOCK_AGE_LIMIT
 }
 
 enum SyncStatus {
