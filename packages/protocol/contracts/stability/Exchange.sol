@@ -148,7 +148,8 @@ contract Exchange is
     private
     returns (uint256)
   {
-    uint256 buyAmount = _getBuyTokenAmount(sellAmount, sellGold);
+    (uint256 buyTokenBucket, uint256 sellTokenBucket) = _getBuyAndSellBuckets(sellGold);
+    uint256 buyAmount = _getBuyTokenAmount(buyTokenBucket, sellTokenBucket, sellGold);
 
     require(buyAmount >= minBuyAmount, "Calculated buyAmount was less than specified minBuyAmount");
 
@@ -225,23 +226,9 @@ contract Exchange is
    */
   function getBuyTokenAmount(uint256 sellAmount, bool sellGold) external view returns (uint256) {
     if (sellAmount == 0) return 0;
-    uint256 sellTokenBucket;
-    uint256 buyTokenBucket;
-    (buyTokenBucket, sellTokenBucket) = getBuyAndSellBuckets(sellGold);
 
-    FixidityLib.Fraction memory reducedSellAmount = getReducedSellAmount(sellAmount);
-    FixidityLib.Fraction memory numerator = reducedSellAmount.multiply(
-      FixidityLib.newFixed(buyTokenBucket)
-    );
-    FixidityLib.Fraction memory denominator = FixidityLib.newFixed(sellTokenBucket).add(
-      reducedSellAmount
-    );
-
-    // Can't use FixidityLib.divide because denominator can easily be greater
-    // than maxFixedDivisor.
-    // Fortunately, we expect an integer result, so integer division gives us as
-    // much precision as we could hope for.
-    return numerator.unwrap().div(denominator.unwrap());
+    (uint256 buyTokenBucket, uint256 sellTokenBucket) = getBuyAndSellBuckets(sellGold);
+    return _getBuyTokenAmount(buyTokenBucket, sellTokenBucket, buyAmount);
   }
 
   /**
@@ -345,11 +332,11 @@ contract Exchange is
    * @param sellGold `true` if gold is the sell token
    * @return The corresponding buyToken amount.
    */
-  function _getBuyTokenAmount(uint256 sellAmount, bool sellGold) private view returns (uint256) {
-    uint256 sellTokenBucket;
-    uint256 buyTokenBucket;
-    (buyTokenBucket, sellTokenBucket) = _getBuyAndSellBuckets(sellGold);
-
+  function _getBuyTokenAmount(uint256 buyTokenBucket, uint256 sellTokenBucket, uint256 sellAmount)
+    private
+    view
+    returns (uint256)
+  {
     FixidityLib.Fraction memory reducedSellAmount = getReducedSellAmount(sellAmount);
     FixidityLib.Fraction memory numerator = reducedSellAmount.multiply(
       FixidityLib.newFixed(buyTokenBucket)
@@ -358,7 +345,10 @@ contract Exchange is
       reducedSellAmount
     );
 
-    // See comment in getBuyTokenAmount
+    // Can't use FixidityLib.divide because denominator can easily be greater
+    // than maxFixedDivisor.
+    // Fortunately, we expect an integer result, so integer division gives us as
+    // much precision as we could hope for.
     return numerator.unwrap().div(denominator.unwrap());
   }
 
@@ -379,7 +369,7 @@ contract Exchange is
       .newFixed(buyTokenBucket.sub(buyAmount))
       .multiply(FixidityLib.fixed1().subtract(spread));
 
-    // See comment in getBuyTokenAmount
+    // See comment in _getBuyTokenAmount
     return numerator.unwrap().div(denominator.unwrap());
   }
 
