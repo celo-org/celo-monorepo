@@ -36,6 +36,7 @@ contract AttestationSubsidy is
 
   event AttestationSubsidised(address indexed account, uint256 value);
   event MaxSubsidiesAttestationsSet(uint256 value);
+
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
