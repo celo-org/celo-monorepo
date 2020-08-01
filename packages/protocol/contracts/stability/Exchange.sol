@@ -173,7 +173,8 @@ contract Exchange is
     returns (uint256)
   {
     bool sellGold = !buyGold;
-    uint256 sellAmount = _getSellTokenAmount(buyAmount, sellGold);
+    (uint256 buyTokenBucket, uint256 sellTokenBucket) = _getBuyAndSellBuckets(sellGold);
+    uint256 sellAmount = _getSellTokenAmount(buyTokenBucket, sellTokenBucket, buyAmount);
 
     require(
       sellAmount <= maxSellAmount,
@@ -252,17 +253,9 @@ contract Exchange is
    */
   function getSellTokenAmount(uint256 buyAmount, bool sellGold) external view returns (uint256) {
     if (buyAmount == 0) return 0;
-    uint256 sellTokenBucket;
-    uint256 buyTokenBucket;
-    (buyTokenBucket, sellTokenBucket) = getBuyAndSellBuckets(sellGold);
 
-    FixidityLib.Fraction memory numerator = FixidityLib.newFixed(buyAmount.mul(sellTokenBucket));
-    FixidityLib.Fraction memory denominator = FixidityLib
-      .newFixed(buyTokenBucket.sub(buyAmount))
-      .multiply(FixidityLib.fixed1().subtract(spread));
-
-    // See comment in getBuyTokenAmount
-    return numerator.unwrap().div(denominator.unwrap());
+    (uint256 buyTokenBucket, uint256 sellTokenBucket) = getBuyAndSellBuckets(sellGold);
+    return _getSellTokenAmount(buyTokenBucket, sellTokenBucket, buyAmount);
   }
 
   /**
@@ -376,11 +369,11 @@ contract Exchange is
    * @param sellGold `true` if gold is the sell token
    * @return The corresponding sellToken amount.
    */
-  function _getSellTokenAmount(uint256 buyAmount, bool sellGold) private view returns (uint256) {
-    uint256 sellTokenBucket;
-    uint256 buyTokenBucket;
-    (buyTokenBucket, sellTokenBucket) = _getBuyAndSellBuckets(sellGold);
-
+  function _getSellTokenAmount(uint256 buyTokenBucket, uint256 sellTokenBucket, uint256 buyAmount)
+    private
+    view
+    returns (uint256)
+  {
     FixidityLib.Fraction memory numerator = FixidityLib.newFixed(buyAmount.mul(sellTokenBucket));
     FixidityLib.Fraction memory denominator = FixidityLib
       .newFixed(buyTokenBucket.sub(buyAmount))
