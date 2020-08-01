@@ -3,7 +3,7 @@ import { eventChannel } from 'redux-saga'
 import { call, cancel, cancelled, delay, fork, put, race, select, take } from 'redux-saga/effects'
 import { setPromptForno } from 'src/account/actions'
 import { promptFornoIfNeededSelector } from 'src/account/selectors'
-import { GethEvents } from 'src/analytics/Events'
+import { GethEvents, NetworkEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import {
   Actions,
@@ -231,12 +231,29 @@ function* monitorGeth() {
   }
 }
 
+function* trackConnectionStatus() {
+  const connected = yield select(isGethConnectedSelector)
+  while (true) {
+    const action: SetGethConnectedAction = yield take(Actions.SET_GETH_CONNECTED)
+    const fornoMode = yield select(fornoSelector)
+    if (connected !== action.connected) {
+      ValoraAnalytics.track(
+        connected ? NetworkEvents.network_connected : NetworkEvents.network_disconnected,
+        { fornoMode }
+      )
+    }
+    connected = action.connected
+  }
+}
+
 export function* gethSaga() {
   yield call(initGethSaga)
   const gethMonitor = yield fork(monitorGeth)
+  const connectionTracker = yield fork(trackConnectionStatus)
 
   yield take(Actions.CANCEL_GETH_SAGA)
   yield put(setInitState(InitializationState.NOT_YET_INITIALIZED))
   yield call(stopGethIfInitialized)
   yield cancel(gethMonitor)
+  yield cancel(connectionTracker)
 }

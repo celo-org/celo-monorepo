@@ -130,7 +130,11 @@ export async function initGeth(sync: boolean = true): Promise<typeof gethInstanc
       throw FailedToFetchStaticNodesError
     }
     ValoraAnalytics.track(GethEvents.create_geth_start)
-    const geth = await createNewGeth(sync)
+    try {
+      const geth = await createNewGeth(sync)
+    } catch (error) {
+      ValoraAnalytics.track(GethEvents.create_geth_error, { error: error.message })
+    }
     ValoraAnalytics.track(GethEvents.create_geth_finish)
 
     if (!sync) {
