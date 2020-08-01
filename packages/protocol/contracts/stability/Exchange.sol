@@ -98,14 +98,13 @@ contract Exchange is
   }
 
   /**
-   * @notice Exchanges sellAmount of sellToken in exchange for at least minBuyAmount of buyToken
-   * Requires the sellAmount to have been approved to the exchange
-   * @param sellAmount The amount of sellToken the user is selling to the exchange
-   * @param minBuyAmount The minimum amount of buyToken the user has to receive for this
-   * transaction to succeed
-   * @param sellGold `true` if gold is the sell token
-   * @return The amount of buyToken that was transfered
-   * @dev This function can be frozen using the Freezable interface.
+   * @notice Exchanges a specific amount of one token for an unspecified amount of another.
+   * @param sellAmount The number of tokens to send to the exchange.
+   * @param minBuyAmount The minimum number of tokens for the exchange to send in return.
+   * @param sellGold True if the caller is sending CELO to the exchange, false otherwise.
+   * @return The number of tokens sent by the exchange.
+   * @dev The caller must first have approved `sellAmount` to the exchange.
+   * @dev This function can be frozen via the Freezable interface.
    */
   function sell(uint256 sellAmount, uint256 minBuyAmount, bool sellGold)
     external
@@ -118,15 +117,14 @@ contract Exchange is
   }
 
   /**
-   * @notice Deprecated. Exchanges sellAmount of sellToken in exchange for at
-   * least minBuyAmount of buyToken.
-   * Requires the sellAmount to have been approved to the exchange
-   * @param sellAmount The amount of sellToken the user is selling to the exchange
-   * @param minBuyAmount The minimum amount of buyToken the user has to receive for this
-   * transaction to succeed
-   * @param sellGold `true` if gold is the sell token
-   * @return The amount of buyToken that was transfered
-   * @dev This function can be frozen using the Freezable interface.
+   * @dev DEPRECATED - Use `buy` or `sell`
+   * @notice Exchanges a specific amount of one token for an unspecified amount of another.
+   * @param sellAmount The number of tokens to send to the exchange.
+   * @param minBuyAmount The minimum number of tokens for the exchange to send in return.
+   * @param sellGold True if the caller is sending CELO to the exchange, false otherwise.
+   * @return The number of tokens sent by the exchange.
+   * @dev The caller must first have approved `sellAmount` to the exchange.
+   * @dev This function can be frozen via the Freezable interface.
    */
   function exchange(uint256 sellAmount, uint256 minBuyAmount, bool sellGold)
     external
@@ -139,13 +137,12 @@ contract Exchange is
   }
 
   /**
-   * @notice Exchanges sellAmount of sellToken in exchange for at least minBuyAmount of buyToken
-   * Requires the sellAmount to have been approved to the exchange
-   * @param sellAmount The amount of sellToken the user is selling to the exchange
-   * @param minBuyAmount The minimum amount of buyToken the user has to receive for this
-   * transaction to succeed
-   * @param sellGold `true` if gold is the sell token
-   * @return The amount of buyToken that was transfered
+   * @notice Exchanges a specific amount of one token for an unspecified amount of another.
+   * @param sellAmount The number of tokens to send to the exchange.
+   * @param minBuyAmount The minimum number of tokens for the exchange to send in return.
+   * @param sellGold True if the caller is sending CELO to the exchange, false otherwise.
+   * @return The number of tokens sent by the exchange.
+   * @dev The caller must first have approved `sellAmount` to the exchange.
    */
   function _sell(uint256 sellAmount, uint256 minBuyAmount, bool sellGold)
     private
@@ -155,19 +152,18 @@ contract Exchange is
 
     require(buyAmount >= minBuyAmount, "Calculated buyAmount was less than specified minBuyAmount");
 
-    _exchangeAmounts(sellAmount, buyAmount, sellGold);
+    _exchange(sellAmount, buyAmount, sellGold);
     return buyAmount;
   }
 
   /**
-   * @notice Exchanges buyAmount of buyToken in exchange for at most maxSellAmount of sellToken
-   * Requires the sellAmount to have been approved to the exchange
-   * @param buyAmount The amount of buyToken the user is buying from the exchange
-   * @param maxSellAmount The maximum amount of sellToken the user can sell for this
-   * transaction to succeed
-   * @param buyGold `true` if gold is the buy token
-   * @return The amount of sellToken that was sold
-   * @dev This function can be frozen using the Freezable interface.
+   * @notice Exchanges an unspecified amount of one token for a specific amount of another.
+   * @param buyAmount The number of tokens for the exchange to send in return.
+   * @param maxSellAmount The maximum number of tokens to send to the exchange.
+   * @param buyGold True if the exchange is sending CELO to the caller, false otherwise.
+   * @return The number of tokens sent to the exchange.
+   * @dev The caller must first have approved `maxSellAmount` to the exchange.
+   * @dev This function can be frozen via the Freezable interface.
    */
   function buy(uint256 buyAmount, uint256 maxSellAmount, bool buyGold)
     external
@@ -184,18 +180,17 @@ contract Exchange is
       "Calculated sellAmount was greater than specified maxSellAmount"
     );
 
-    _exchangeAmounts(sellAmount, buyAmount, sellGold);
+    _exchange(sellAmount, buyAmount, sellGold);
     return sellAmount;
   }
 
   /**
-   * @notice Exchanges sellAmount of sellToken in exchange for buyAmount of buyToken
-   * Requires the sellAmount to have been approved to the exchange
-   * @param sellAmount The amount of sellToken the user is selling to the exchange
-   * @param buyAmount The amount of buyToken the user is buying from the exchange
-   * @param sellGold `true` if gold is the sell token
+   * @notice Exchanges a specific amount of one token for a specific amount of another.
+   * @param sellAmount The number of tokens to send to the exchange.
+   * @param buyAmount The number of tokens for the exchange to send in return.
+   * @param sellGold True if the msg.sender is sending CELO to the exchange, false otherwise.
    */
-  function _exchangeAmounts(uint256 sellAmount, uint256 buyAmount, bool sellGold) private {
+  function _exchange(uint256 sellAmount, uint256 buyAmount, bool sellGold) private {
     IReserve reserve = IReserve(registry.getAddressForOrDie(RESERVE_REGISTRY_ID));
 
     if (sellGold) {
