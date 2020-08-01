@@ -37,10 +37,10 @@ contract AttestationSubsidy is
   event AttestationSubsidised(address indexed account, uint256 value);
   event MaxSubsidiesAttestationsSet(uint256 value);
   /**
-    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
-    * @param registryAddress The address of the registry core smart contract.
-    * @param maxSubsidiesAttestations Maximum number of attestations that can be subsidies in one request
-    */
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
+   * @param maxSubsidiesAttestations Maximum number of attestations that can be subsidies in one request
+   */
   function initialize(address registryAddress, uint256 maxSubsidisedAttestations)
     external
     initializer
@@ -61,20 +61,20 @@ contract AttestationSubsidy is
   }
 
   /**
-    * @notice Used to batch three operations:
-    * - Approve cUSD transfer between the beneficiary meta-wallet and the attestations contract
-    * - Transfer the cUSD subsidy to the meta-wallet
-    * - Execute the attestation request to spend the cUSD subsidy
-    * @param beneficiaryMetaWallet The address of the beneficiary meta-wallet
-    * @param identifier The identifier to request attestations for (see Attestations.sol)
-    * @param attestationsRequested The number of attestations requested (see Attestations.sol)
-    * @param v Array of signature components `v` for the meta-txs
-    * @param r Array of signature components `r` for the meta-txs
-    * @param s Array of signature components `s` for the meta-txs
-    * @dev The signature component arrays should have 2 items:
-    *   (v,r,s)[0] = signature for cUSD.approve(Attestations.sol, attestationsRequested*fee)
-    *   (v,r,s)[1] = signature for Attestations.request(identifier, attestationsRequested, cUSD)
-    */
+   * @notice Used to batch three operations:
+   * - Approve cUSD transfer between the beneficiary meta-wallet and the attestations contract
+   * - Transfer the cUSD subsidy to the meta-wallet
+   * - Execute the attestation request to spend the cUSD subsidy
+   * @param beneficiaryMetaWallet The address of the beneficiary meta-wallet
+   * @param identifier The identifier to request attestations for (see Attestations.sol)
+   * @param attestationsRequested The number of attestations requested (see Attestations.sol)
+   * @param v Array of signature components `v` for the meta-txs
+   * @param r Array of signature components `r` for the meta-txs
+   * @param s Array of signature components `s` for the meta-txs
+   * @dev The signature component arrays should have 2 items:
+   *   (v,r,s)[0] = signature for cUSD.approve(Attestations.sol, attestationsRequested*fee)
+   *   (v,r,s)[1] = signature for Attestations.request(identifier, attestationsRequested, cUSD)
+   */
   function requestAttestationsWithSubsidy(
     address beneficiaryMetaWallet,
     bytes32 identifier,
@@ -114,13 +114,13 @@ contract AttestationSubsidy is
   }
 
   /**
-    * @notice executes the cUSD approval from the metaWallet to the Attestations contract
-    * @param metaWallet The MetaTransactionWallet in question
-    * @param totalFee The total amount of cUSD to be approved
-    * @param v The signature component `v` for the meta-transaction
-    * @param r The signature component `r` for the meta-transaction
-    * @param s The signature component `s` for the meta-transaction
-    */
+   * @notice executes the cUSD approval from the metaWallet to the Attestations contract
+   * @param metaWallet The MetaTransactionWallet in question
+   * @param totalFee The total amount of cUSD to be approved
+   * @param v The signature component `v` for the meta-transaction
+   * @param r The signature component `r` for the meta-transaction
+   * @param s The signature component `s` for the meta-transaction
+   */
   function metaApproveCUSD(
     IMetaTransactionWallet metaWallet,
     uint256 totalFee,
@@ -137,14 +137,14 @@ contract AttestationSubsidy is
   }
 
   /**
-    * @notice executes the request attestations meta transaction on the metaWallet
-    * @param metaWallet The wallet in question
-    * @param identifier The identifier for the attestation (see Attestations.sol)
-    * @param attestationsRequested The number of attestations requested (see Attestations.sol)
-    * @param v The signature component `v` for the meta-transaction
-    * @param r The signature component `r` for the meta-transaction
-    * @param s The signature component `s` for the meta-transaction
-    */
+   * @notice executes the request attestations meta transaction on the metaWallet
+   * @param metaWallet The wallet in question
+   * @param identifier The identifier for the attestation (see Attestations.sol)
+   * @param attestationsRequested The number of attestations requested (see Attestations.sol)
+   * @param v The signature component `v` for the meta-transaction
+   * @param r The signature component `r` for the meta-transaction
+   * @param s The signature component `s` for the meta-transaction
+   */
   function metaRequestAttestations(
     IMetaTransactionWallet metaWallet,
     bytes32 identifier,
@@ -163,9 +163,9 @@ contract AttestationSubsidy is
   }
 
   /**
-    * @notice calculates the total fee of the attestation request that will be subsidized
-    * @param attestationsRequested The number of attestations requested (see Attestations.sol)
-    */
+   * @notice calculates the total fee of the attestation request that will be subsidized
+   * @param attestationsRequested The number of attestations requested (see Attestations.sol)
+   */
   function calculateTotalFee(uint256 attestationsRequested) internal view returns (uint256) {
     return
       getAttestations().getAttestationRequestFee(address(getStableToken())).mul(
