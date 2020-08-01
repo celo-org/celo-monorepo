@@ -428,7 +428,7 @@ contract('Integration: Exchange', (accounts: string[]) => {
       })
 
       it(`should reduce user's gold`, async () => {
-        if (addressMinedLatestBlock(accounts[0])) {
+        if (await addressMinedLatestBlock(accounts[0])) {
           const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
           assert.isTrue(finalGold.lt(originalGold.plus(blockReward)))
         } else {
@@ -490,7 +490,7 @@ contract('Integration: Exchange', (accounts: string[]) => {
       })
 
       it(`should reduce user's gold`, async () => {
-        if (addressMinedLatestBlock(accounts[0])) {
+        if (await addressMinedLatestBlock(accounts[0])) {
           const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
           assert.isTrue(finalGold.lt(originalGold.plus(blockReward)))
         } else {

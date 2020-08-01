@@ -458,7 +458,7 @@ contract('Exchange', (accounts: string[]) => {
           )
           const actualGoldBalance = await goldToken.balanceOf(user)
           let expectedGoldBalance = oldGoldBalance.minus(goldTokenAmount)
-          if (addressMinedLatestBlock(user)) {
+          if (await addressMinedLatestBlock(user)) {
             const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
             expectedGoldBalance = expectedGoldBalance.plus(blockReward)
           }
@@ -716,7 +716,7 @@ contract('Exchange', (accounts: string[]) => {
           )
           const actualGoldBalance = await goldToken.balanceOf(user)
           let expectedGoldBalance = oldGoldBalance.plus(expectedGoldBalanceIncrease)
-          if (addressMinedLatestBlock(user)) {
+          if (await addressMinedLatestBlock(user)) {
             const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
             expectedGoldBalance = expectedGoldBalance.plus(blockReward)
           }
@@ -967,7 +967,7 @@ contract('Exchange', (accounts: string[]) => {
         )
         const actualGoldBalance = await goldToken.balanceOf(user)
         let expectedGoldBalance = oldGoldBalance.minus(expectedGoldAmount)
-        if (addressMinedLatestBlock(user)) {
+        if (await addressMinedLatestBlock(user)) {
           const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
           expectedGoldBalance = expectedGoldBalance.plus(blockReward)
         }
@@ -1225,7 +1225,7 @@ contract('Exchange', (accounts: string[]) => {
         )
         const actualGoldBalance = await goldToken.balanceOf(user)
         let expectedGoldBalance = oldGoldBalance.plus(buyGoldAmount)
-        if (addressMinedLatestBlock(user)) {
+        if (await addressMinedLatestBlock(user)) {
           const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
           expectedGoldBalance = expectedGoldBalance.plus(blockReward)
         }
