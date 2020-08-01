@@ -8,6 +8,7 @@ import "openzeppelin-solidity/contracts/utils/SafeCast.sol";
 import "./interfaces/IAttestations.sol";
 import "./interfaces/IRandom.sol";
 import "../common/interfaces/IAccounts.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
@@ -20,6 +21,7 @@ import "../common/libraries/ReentrancyGuard.sol";
  */
 contract Attestations is
   IAttestations,
+  ICeloVersionedContract,
   Ownable,
   Initializable,
   UsingRegistry,
@@ -148,6 +150,14 @@ contract Attestations is
     for (uint256 i = 0; i < attestationRequestFeeTokens.length; i = i.add(1)) {
       setAttestationRequestFee(attestationRequestFeeTokens[i], attestationRequestFeeValues[i]);
     }
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
   }
 
   /**
@@ -295,11 +305,12 @@ contract Attestations is
    * @dev Throws if msg.sender does not have any rewards to withdraw.
    */
   function withdraw(address token) external {
-    uint256 value = pendingWithdrawals[token][msg.sender];
+    address issuer = getAccounts().attestationSignerToAccount(msg.sender);
+    uint256 value = pendingWithdrawals[token][issuer];
     require(value > 0, "value was negative/zero");
-    pendingWithdrawals[token][msg.sender] = 0;
-    require(IERC20(token).transfer(msg.sender, value), "token transfer failed");
-    emit Withdrawal(msg.sender, token, value);
+    pendingWithdrawals[token][issuer] = 0;
+    require(IERC20(token).transfer(issuer, value), "token transfer failed");
+    emit Withdrawal(issuer, token, value);
   }
 
   /**
