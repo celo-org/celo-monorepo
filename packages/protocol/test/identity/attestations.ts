@@ -1007,16 +1007,18 @@ contract('Attestations', (accounts: string[]) => {
     })
   })
 
-  describe.only('#requireNAttestationRequests()', () => {
+  describe('#requireNAttestationRequests()', () => {
+    const requestNError = 'requested attestations does not match expected'
+
     describe('with none requested', () => {
       it('does not revert when called with 0', async () => {
-        await attestations.requireNAttestationRequests(phoneHash, caller, 0)
+        await attestations.requireNAttestationsRequested(phoneHash, caller, 0)
       })
 
       it('does revert when called with something else', async () => {
         await assertRevert(
-          attestations.requireNAttestationRequests(phoneHash, caller, 2),
-          'number of requests does not match expectations'
+          attestations.requireNAttestationsRequested(phoneHash, caller, 2),
+          requestNError
         )
       })
     })
@@ -1028,13 +1030,13 @@ contract('Attestations', (accounts: string[]) => {
 
       it('does revert when called with 0', async () => {
         await assertRevert(
-          attestations.requireNAttestationRequests(phoneHash, caller, 0),
-          'number of requests does not match expectations'
+          attestations.requireNAttestationsRequested(phoneHash, caller, 0),
+          requestNError
         )
       })
 
       it('does not revert when called with the correct number', async () => {
-        await attestations.requireNAttestationRequests(phoneHash, caller, attestationsRequested)
+        await attestations.requireNAttestationsRequested(phoneHash, caller, attestationsRequested)
       })
     })
   })

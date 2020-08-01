@@ -586,12 +586,12 @@ contract Attestations is
    * @dev It can be used when batching meta-transactions to validate
    * attestation are requested as expected in untrusted scenarios
    */
-  function requireNAttestationRequests(bytes32 identifier, address account, uint32 expected)
+  function requireNAttestationsRequested(bytes32 identifier, address account, uint32 expected)
     external
     view
   {
     uint256 requested = identifiers[identifier].attestations[account].requested;
-    require(requested == expected, "number of requests does not match expectations");
+    require(requested == expected, "requested attestations does not match expected");
   }
 
   /**
