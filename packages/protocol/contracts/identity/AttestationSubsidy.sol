@@ -51,8 +51,8 @@ contract AttestationSubsidy is
   }
 
   /**
-   * @notice Updates 'maxSubsidiesAttestations'.
-   * @param _maxSubsidiesAttestations Maximum number of attestations that can be subsidies in one request
+   * @notice Updates 'maxSubsidisedAttestations'.
+   * @param _maxSubsidisedAttestations Maximum number of attestations that can be subsidised in one request
    */
   function setMaxSubsidisedAttestations(uint256 _maxSubsidisedAttestations) public onlyOwner {
     require(_maxSubsidisedAttestations > 0, "maxSubsidisedAttestations has to be greater than 0");
