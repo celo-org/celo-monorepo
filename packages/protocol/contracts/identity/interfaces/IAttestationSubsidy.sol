@@ -2,14 +2,11 @@ pragma solidity ^0.5.3;
 
 interface IAttestationSubsidy {
   function requestAttestationsWithSubsidy(
-    address,
-    bytes32,
-    uint8,
-    bytes32,
-    bytes32,
-    bytes32,
-    uint8,
-    bytes32,
-    bytes32
+    address beneficiaryMetaWallet,
+    bytes32 identifier,
+    uint256 attestationsRequested,
+    uint8[] v,
+    bytes32[] r,
+    bytes32[] s
   ) external;
 }
