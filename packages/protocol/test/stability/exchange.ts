@@ -1225,7 +1225,7 @@ contract('Exchange', (accounts: string[]) => {
         )
         const actualGoldBalance = await goldToken.balanceOf(user)
         let expectedGoldBalance = oldGoldBalance.plus(buyGoldAmount)
-        if (addressMinedLatestBlock(user) {
+        if (addressMinedLatestBlock(user)) {
           const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
           expectedGoldBalance = expectedGoldBalance.plus(blockReward)
         }
