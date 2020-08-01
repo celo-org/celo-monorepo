@@ -2,6 +2,7 @@ pragma solidity ^0.5.13;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/utils/Address.sol";
+import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 import "./interfaces/ICeloVersionedContract.sol";
 import "./interfaces/IMetaTransactionWallet.sol";
@@ -15,6 +16,7 @@ contract MetaTransactionWallet is
   Ownable
 {
   using SafeMath for uint256;
+  using BytesLib for bytes;
 
   bytes32 public eip712DomainSeparator;
   // The EIP712 typehash for ExecuteMetaTransaction, i.e. keccak256(
@@ -138,7 +140,7 @@ contract MetaTransactionWallet is
   }
 
   /**
-   * @notice Executes a meta-transaction on behalf of the signer.`
+   * @notice Executes a meta-transaction on behalf of the signer.
    * @param destination The address to which the meta-transaction is to be sent.
    * @param value The CELO value to be sent with the meta-transaction.
    * @param data The data to be sent with the meta-transaction.
@@ -150,11 +152,11 @@ contract MetaTransactionWallet is
   function executeMetaTransaction(
     address destination,
     uint256 value,
-    bytes calldata data,
+    bytes memory data,
     uint8 v,
     bytes32 r,
     bytes32 s
-  ) external returns (bytes memory) {
+  ) public returns (bytes memory) {
     address _signer = getMetaTransactionSigner(destination, value, data, nonce, v, r, s);
     require(_signer == signer, "Invalid meta-transaction signer");
     bytes memory returnData = _executeTransaction(destination, value, data);
@@ -170,17 +172,67 @@ contract MetaTransactionWallet is
    * @param _nonce The nonce for this transaction local to this wallet.
    * @return The return value of the transaction execution.
    */
-  function executeTransaction(
-    address destination,
-    uint256 value,
-    bytes calldata data,
-    uint256 _nonce
-  ) external returns (bytes memory) {
+  function executeTransaction(address destination, uint256 value, bytes memory data, uint256 _nonce)
+    public
+    returns (bytes memory)
+  {
     require(msg.sender == signer, "Invalid transaction sender");
     require(_nonce == nonce, "Invalid transaction nonce");
     bytes memory returnData = _executeTransaction(destination, value, data);
     emit TransactionExecution(destination, value, data, returnData);
     return returnData;
+  }
+
+  /**
+   * @notice Executes multiple transactions on behalf of the signer.`
+   * @param destinations The address to which each transaction is to be sent.
+   * @param values The CELO value to be sent with each transaction.
+   * @param data The concatenated data to be sent in each transaction.
+   * @param dataLengths The length of each transaction's data.
+   * @param nonces The nonce for each transaction local to this wallet.
+   */
+  function executeTransactions(
+    address[] calldata destinations,
+    uint256[] calldata values,
+    bytes calldata data,
+    uint256[] calldata dataLengths,
+    uint256[] calldata nonces
+  ) external {
+    require(
+      destinations.length == values.length &&
+        values.length == dataLengths.length &&
+        dataLengths.length == nonces.length,
+      "Input arrays must be same length"
+    );
+    uint256 dataPosition = 0;
+    for (uint256 i = 0; i < destinations.length; i++) {
+      executeTransaction(
+        destinations[i],
+        values[i],
+        sliceData(data, dataPosition, dataLengths[i]),
+        nonces[i]
+      );
+      dataPosition = dataPosition.add(dataLengths[i]);
+    }
+  }
+
+  /**
+   * @notice Returns a slice from a byte array.
+   * @param data The byte array.
+   * @param start The start index of the slice to take.
+   * @param length The length of the slice to take.
+   * @return A slice from a byte array.
+   */
+  function sliceData(bytes memory data, uint256 start, uint256 length)
+    internal
+    returns (bytes memory)
+  {
+    // When length == 0 bytes.slice does not seem to always return an empty byte array.
+    bytes memory sliced;
+    if (length > 0) {
+      sliced = data.slice(start, length);
+    }
+    return sliced;
   }
 
   /**

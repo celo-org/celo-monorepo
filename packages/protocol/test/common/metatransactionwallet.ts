@@ -1,5 +1,5 @@
 import { assertEqualBN, assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
-import { Address, ensureLeading0x } from '@celo/utils/lib/address'
+import { Address, ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { generateTypedDataHash, structHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { parseSignature } from '@celo/utils/lib/signatureUtils'
 import { MetaTransactionWalletContract, MetaTransactionWalletInstance } from 'types'
@@ -266,6 +266,72 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
                 wallet.executeTransaction(destination, value, '0x1234', 0, { from: signer })
               )
             })
+          })
+        })
+      })
+    })
+  })
+
+  describe('#executeTransactions()', () => {
+    describe('when the transactions are a mix of contract and non-contract calls', () => {
+      const value = 100
+      let transactions: any[]
+      beforeEach(async () => {
+        transactions = []
+        // CELO transfer
+        transactions.push({
+          destination: web3.utils.toChecksumAddress(web3.utils.randomHex(20)),
+          value,
+          data: '0x',
+        })
+        // No-op transfer ownership
+        transactions.push({
+          destination: wallet.address,
+          value: 0,
+          // @ts-ignore
+          data: wallet.contract.methods.transferOwnership(wallet.address).encodeABI(),
+        })
+        // CELO transfer
+        transactions.push({
+          destination: web3.utils.toChecksumAddress(web3.utils.randomHex(20)),
+          value,
+          data: '0x',
+        })
+        // Change signer
+        transactions.push({
+          destination: wallet.address,
+          value: 0,
+          // @ts-ignore
+          data: wallet.contract.methods.setSigner(nonSigner).encodeABI(),
+        })
+      })
+
+      describe('when the caller is the signer', () => {
+        describe('when valid nonces are provided', () => {
+          beforeEach(async () => {
+            await web3.eth.sendTransaction({
+              from: accounts[0],
+              to: wallet.address,
+              value: value * 2,
+            })
+            await wallet.executeTransactions(
+              transactions.map((t) => t.destination),
+              transactions.map((t) => t.value),
+              ensureLeading0x(transactions.map((t) => trimLeading0x(t.data)).join('')),
+              transactions.map((t) => trimLeading0x(t.data).length / 2),
+              transactions.map((_, i) => i),
+              { from: signer }
+            )
+          })
+
+          it('should execute the transactions', async () => {
+            assert.equal(await web3.eth.getBalance(transactions[0].destination), value)
+            assert.equal(await web3.eth.getBalance(transactions[2].destination), value)
+            assert.equal(await wallet.signer(), nonSigner)
+          })
+
+          it('should increment the nonce', async () => {
+            assertEqualBN(await wallet.nonce(), transactions.length)
           })
         })
       })
