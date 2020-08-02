@@ -1,11 +1,11 @@
 pragma solidity ^0.5.13;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/utils/Address.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 import "./interfaces/ICeloVersionedContract.sol";
 import "./interfaces/IMetaTransactionWallet.sol";
+import "./ExternalCall.sol";
 import "./Initializable.sol";
 import "./Signatures.sol";
 
@@ -170,7 +170,7 @@ contract MetaTransactionWallet is
     address _signer = getMetaTransactionSigner(destination, value, data, nonce, v, r, s);
     require(_signer == signer, "Invalid meta-transaction signer");
     nonce = nonce.add(1);
-    bytes memory returnData = _executeTransaction(destination, value, data);
+    bytes memory returnData = ExternalCall.execute(destination, value, data);
     emit MetaTransactionExecution(destination, value, data, nonce.sub(1), returnData);
     return returnData;
   }
@@ -189,7 +189,7 @@ contract MetaTransactionWallet is
     // Allowing the owner to call execute transaction allows, when the contract is self-owned,
     // for the signer to sign and execute a batch of transactions via a meta-transaction.
     require(msg.sender == signer || msg.sender == owner(), "Invalid transaction sender");
-    bytes memory returnData = _executeTransaction(destination, value, data);
+    bytes memory returnData = ExternalCall.execute(destination, value, data);
     emit TransactionExecution(destination, value, data, returnData);
     return returnData;
   }
@@ -235,24 +235,5 @@ contract MetaTransactionWallet is
       sliced = data.slice(start, length);
     }
     return sliced;
-  }
-
-  /**
-   * @notice Executes a transaction on behalf of the signer.`
-   * @param destination The address to which the transaction is to be sent.
-   * @param value The CELO value to be sent with the transaction.
-   * @param data The data to be sent with the transaction.
-   * @return The return value of the transaction execution.
-   */
-  function _executeTransaction(address destination, uint256 value, bytes memory data)
-    private
-    returns (bytes memory)
-  {
-    if (data.length > 0) require(Address.isContract(destination), "Invalid contract address");
-    bool success;
-    bytes memory returnData;
-    (success, returnData) = destination.call.value(value)(data);
-    require(success, "Transaction execution failed.");
-    return returnData;
   }
 }
