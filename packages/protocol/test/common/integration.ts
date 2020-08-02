@@ -2,7 +2,6 @@ import { constitution } from '@celo/protocol/governanceConstitution'
 import {
   addressMinedLatestBlock,
   assertEqualBN,
-  isSameAddress,
   stripHexEncoding,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'

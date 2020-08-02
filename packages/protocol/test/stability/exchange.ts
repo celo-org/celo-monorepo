@@ -4,7 +4,6 @@ import {
   assertEqualBN,
   assertLogMatches2,
   assertRevert,
-  isSameAddress,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { fixed1, fromFixed, multiply, toFixed } from '@celo/utils/lib/fixidity'
