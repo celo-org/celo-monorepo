@@ -28,5 +28,6 @@ interface IAttestations {
     view
     returns (uint32[] memory, address[] memory, uint256[] memory, bytes memory);
 
+  function requireNAttestationsRequested(bytes32, address, uint32) external view;
   function approveTransfer(bytes32, uint256, address, address, bool) external;
 }
