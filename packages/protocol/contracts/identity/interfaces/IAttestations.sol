@@ -27,4 +27,6 @@ interface IAttestations {
     external
     view
     returns (uint32[] memory, address[] memory, uint256[] memory, bytes memory);
+
+  function approveTransfer(bytes32, uint256, address, address, bool) external;
 }
