@@ -1005,6 +1005,40 @@ contract('Attestations', (accounts: string[]) => {
     })
   })
 
+  describe('#requireNAttestationRequests()', () => {
+    const requestNError = 'requested attestations does not match expected'
+
+    describe('with none requested', () => {
+      it('does not revert when called with 0', async () => {
+        await attestations.requireNAttestationsRequested(phoneHash, caller, 0)
+      })
+
+      it('does revert when called with something else', async () => {
+        await assertRevert(
+          attestations.requireNAttestationsRequested(phoneHash, caller, 2),
+          requestNError
+        )
+      })
+    })
+
+    describe('with some requested', () => {
+      beforeEach(async () => {
+        await requestAttestations()
+      })
+
+      it('does revert when called with 0', async () => {
+        await assertRevert(
+          attestations.requireNAttestationsRequested(phoneHash, caller, 0),
+          requestNError
+        )
+      })
+
+      it('does not revert when called with the correct number', async () => {
+        await attestations.requireNAttestationsRequested(phoneHash, caller, attestationsRequested)
+      })
+    })
+  })
+
   describe('#approveTransfer()', () => {
     const replacementAddress: string = accounts[1]
     describe('when the attestation exists', () => {
