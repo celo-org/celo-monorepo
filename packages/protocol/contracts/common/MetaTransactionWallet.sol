@@ -186,6 +186,8 @@ contract MetaTransactionWallet is
     public
     returns (bytes memory)
   {
+    // Allowing the owner to call execute transaction allows, when the contract is self-owned,
+    // for the signer to sign and execute a batch of transactions via a meta-transaction.
     require(msg.sender == signer || msg.sender == owner(), "Invalid transaction sender");
     bytes memory returnData = _executeTransaction(destination, value, data);
     emit TransactionExecution(destination, value, data, returnData);
