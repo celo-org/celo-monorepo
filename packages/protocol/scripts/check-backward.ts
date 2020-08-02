@@ -91,7 +91,7 @@ try {
         out('Actual version numbers match expected\n')
         process.exit(0)
       } else {
-        console.error(`Version mismatch detected:\n${mismatches}`)
+        console.error(`Version mismatch detected:\n${JSON.stringify(mismatches, null, 4)}`)
         process.exit(1)
       }
     }
