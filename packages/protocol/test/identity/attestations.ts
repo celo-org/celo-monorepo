@@ -1013,7 +1013,7 @@ contract('Attestations', (accounts: string[]) => {
     })
   })
 
-  describe.only('#approveTransfer()', () => {
+  describe('#approveTransfer()', () => {
     describe('when the attestation exists', () => {
       beforeEach(async () => {
         await requestAndCompleteAttestations()
