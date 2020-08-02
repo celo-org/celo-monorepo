@@ -163,11 +163,6 @@ contract('Attestations', (accounts: string[]) => {
           accountsInstance.authorizeAttestationSigner,
           account
         )
-        await unlockAndAuthorizeKey(
-          KeyOffsets.NEW_VALIDATING_KEY_OFFSET,
-          accountsInstance.authorizeValidatorSigner,
-          account
-        )
       })
     )
 
