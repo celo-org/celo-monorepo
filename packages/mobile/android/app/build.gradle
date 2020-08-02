@@ -74,7 +74,7 @@ import com.android.build.OutputFile
  */
 
 project.ext.react = [
-        enableHermes: false,  // clean and rebuild if changing
+        enableHermes: true,  // clean and rebuild if changing
         bundleInIntegration: true,
         devDisabledInIntegration: true,
         bundleInAlfajores: true,
@@ -283,7 +283,6 @@ dependencies {
         def hermesPath = "../../../../node_modules/hermes-engine/android/";
         debugImplementation files(hermesPath + "hermes-debug.aar")
         integrationImplementation files(hermesPath + "hermes-release.aar")
-        stagingImplementation files(hermesPath + "hermes-release.aar")
         alfajoresImplementation files(hermesPath + "hermes-release.aar")
         pilotImplementation files(hermesPath + "hermes-release.aar")
         mainnetImplementation files(hermesPath + "hermes-release.aar")
@@ -312,7 +311,7 @@ if (enableFirebase.toBoolean()){
 // https://github.com/facebook/react-native/issues/26400#issuecomment-539395814
 configurations.all {
      resolutionStrategy {
-       force "com.facebook.soloader:soloader:0.8.1"
+       force "com.facebook.soloader:soloader:0.8.2"
      }
 }
 
