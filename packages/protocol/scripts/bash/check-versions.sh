@@ -38,5 +38,5 @@ yarn build:sol
 rm -rf $BUILD_DIR_2 && mkdir -p $BUILD_DIR_2
 mv build/contracts $BUILD_DIR_2
 
-CONTRACT_EXCLUSION_REGEX=".*Test.*|I[A-Z].*|ReleaseGold"
+CONTRACT_EXCLUSION_REGEX=".*Test.*|I[A-Z].*|ReleaseGold|.*LinkedList.*"
 yarn ts-node scripts/check-backward.ts sem_check -o $BUILD_DIR_1/contracts -n $BUILD_DIR_2/contracts -e $CONTRACT_EXCLUSION_REGEX
