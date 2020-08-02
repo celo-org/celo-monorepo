@@ -30,11 +30,17 @@ contract MetaTransactionWallet is
   event SignerSet(address signer);
   event EIP712DomainSeparatorSet(bytes32 eip712DomainSeparator);
   event TransactionExecution(address destination, uint256 value, bytes data, bytes returnData);
-  event MetaTransactionExecution(address destination, uint256 value, bytes data, bytes returnData);
+  event MetaTransactionExecution(
+    address destination,
+    uint256 value,
+    bytes data,
+    uint256 nonce,
+    bytes returnData
+  );
 
   /**
-    * @dev Fallback function allows to deposit ether.
-    */
+   * @dev Fallback function allows to deposit ether.
+   */
   function() external payable {}
 
   /**
@@ -93,7 +99,14 @@ contract MetaTransactionWallet is
     emit EIP712DomainSeparatorSet(eip712DomainSeparator);
   }
 
-  // For debugging purposes.
+  /**
+   * @notice Returns the digest of the provided meta-transaction, to be signed by `sender`.
+   * @param destination The address to which the meta-transaction is to be sent.
+   * @param value The CELO value to be sent with the meta-transaction.
+   * @param data The data to be sent with the meta-transaction.
+   * @param _nonce The nonce for this meta-transaction local to this wallet.
+   * @return The digest of the provided meta-transaction.
+   */
   function getMetaTransactionDigest(
     address destination,
     uint256 value,
@@ -133,9 +146,6 @@ contract MetaTransactionWallet is
     bytes32 s
   ) public view returns (address) {
     bytes32 digest = getMetaTransactionDigest(destination, value, data, _nonce);
-    // TODO: Should we link, or inline, this library?
-    // Currently modified it to be inlined, but that will cause bytecode changes
-    // to all other contracts that use getSignerOfMessageHash.
     return Signatures.getSignerOfMessageHash(digest, v, r, s);
   }
 
@@ -152,15 +162,16 @@ contract MetaTransactionWallet is
   function executeMetaTransaction(
     address destination,
     uint256 value,
-    bytes memory data,
+    bytes calldata data,
     uint8 v,
     bytes32 r,
     bytes32 s
-  ) public returns (bytes memory) {
+  ) external returns (bytes memory) {
     address _signer = getMetaTransactionSigner(destination, value, data, nonce, v, r, s);
     require(_signer == signer, "Invalid meta-transaction signer");
+    nonce = nonce.add(1);
     bytes memory returnData = _executeTransaction(destination, value, data);
-    emit MetaTransactionExecution(destination, value, data, returnData);
+    emit MetaTransactionExecution(destination, value, data, nonce.sub(1), returnData);
     return returnData;
   }
 
@@ -169,15 +180,13 @@ contract MetaTransactionWallet is
    * @param destination The address to which the transaction is to be sent.
    * @param value The CELO value to be sent with the transaction.
    * @param data The data to be sent with the transaction.
-   * @param _nonce The nonce for this transaction local to this wallet.
    * @return The return value of the transaction execution.
    */
-  function executeTransaction(address destination, uint256 value, bytes memory data, uint256 _nonce)
+  function executeTransaction(address destination, uint256 value, bytes memory data)
     public
     returns (bytes memory)
   {
-    require(msg.sender == signer, "Invalid transaction sender");
-    require(_nonce == nonce, "Invalid transaction nonce");
+    require(msg.sender == signer || msg.sender == owner(), "Invalid transaction sender");
     bytes memory returnData = _executeTransaction(destination, value, data);
     emit TransactionExecution(destination, value, data, returnData);
     return returnData;
@@ -189,29 +198,20 @@ contract MetaTransactionWallet is
    * @param values The CELO value to be sent with each transaction.
    * @param data The concatenated data to be sent in each transaction.
    * @param dataLengths The length of each transaction's data.
-   * @param nonces The nonce for each transaction local to this wallet.
    */
   function executeTransactions(
     address[] calldata destinations,
     uint256[] calldata values,
     bytes calldata data,
-    uint256[] calldata dataLengths,
-    uint256[] calldata nonces
+    uint256[] calldata dataLengths
   ) external {
     require(
-      destinations.length == values.length &&
-        values.length == dataLengths.length &&
-        dataLengths.length == nonces.length,
+      destinations.length == values.length && values.length == dataLengths.length,
       "Input arrays must be same length"
     );
     uint256 dataPosition = 0;
     for (uint256 i = 0; i < destinations.length; i++) {
-      executeTransaction(
-        destinations[i],
-        values[i],
-        sliceData(data, dataPosition, dataLengths[i]),
-        nonces[i]
-      );
+      executeTransaction(destinations[i], values[i], sliceData(data, dataPosition, dataLengths[i]));
       dataPosition = dataPosition.add(dataLengths[i]);
     }
   }
@@ -246,7 +246,6 @@ contract MetaTransactionWallet is
     private
     returns (bytes memory)
   {
-    nonce = nonce.add(1);
     if (data.length > 0) require(Address.isContract(destination), "Invalid contract address");
     bool success;
     bytes memory returnData;

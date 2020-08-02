@@ -73,8 +73,9 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
   const signer = accounts[1]
   const nonSigner = accounts[2]
 
-  const executeOnSelf = (data: string, nonce = 0, value = 0) =>
-    wallet.executeTransaction(wallet.address, value, data, nonce, { from: signer })
+  const executeOnSelf = (data: string, value = 0) =>
+    // @ts-ignore
+    wallet.executeTransaction(wallet.address, value, data, { from: signer })
 
   beforeEach(async () => {
     wallet = await MetaTransactionWallet.new()
@@ -179,48 +180,36 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
       })
 
       describe('when the caller is the signer', () => {
-        describe('when a valid nonce is provided', () => {
-          beforeEach(async () => {
-            res = await wallet.executeTransaction(destination, value, data, 0, { from: signer })
-          })
-
-          it('should execute the transaction', async () => {
-            assert.equal(await wallet.signer(), nonSigner)
-          })
-
-          it('should increment the nonce', async () => {
-            assertEqualBN(await wallet.nonce(), 1)
-          })
-
-          it('should emit the TransactionExecution event', () => {
-            assertLogMatches2(res.logs[1], {
-              event: 'TransactionExecution',
-              args: {
-                destination,
-                value,
-                data,
-                returnData: null,
-              },
-            })
-          })
+        beforeEach(async () => {
+          res = await wallet.executeTransaction(destination, value, data, { from: signer })
         })
 
-        describe('when an invalid nonce is provided', () => {
-          it('should revert', async () => {
-            await assertRevert(
-              wallet.executeTransaction(destination, value, data, 1, { from: signer })
-            )
+        it('should execute the transaction', async () => {
+          assert.equal(await wallet.signer(), nonSigner)
+        })
+
+        it('should not increment the nonce', async () => {
+          assertEqualBN(await wallet.nonce(), 0)
+        })
+
+        it('should emit the TransactionExecution event', () => {
+          assertLogMatches2(res.logs[1], {
+            event: 'TransactionExecution',
+            args: {
+              destination,
+              value,
+              data,
+              returnData: null,
+            },
           })
         })
       })
 
       describe('when the caller is not the signer', () => {
-        describe('when the a valid nonce is provided', () => {
-          it('should revert', async () => {
-            await assertRevert(
-              wallet.executeTransaction(destination, value, data, 0, { from: nonSigner })
-            )
-          })
+        it('should revert', async () => {
+          await assertRevert(
+            wallet.executeTransaction(destination, value, data, { from: nonSigner })
+          )
         })
       })
     })
@@ -229,43 +218,41 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
       const value = 100
       const destination = web3.utils.toChecksumAddress(web3.utils.randomHex(20))
       describe('when the caller is the signer', () => {
-        describe('when a valid nonce is provided', () => {
-          describe('when data is empty', () => {
-            let res: any
-            const data = '0x'
-            beforeEach(async () => {
-              await web3.eth.sendTransaction({ from: accounts[0], to: wallet.address, value })
-              // @ts-ignore
-              res = await wallet.executeTransaction(destination, value, data, 0, { from: signer })
-            })
-
-            it('should execute the transaction', async () => {
-              assert.equal(await web3.eth.getBalance(destination), value)
-            })
-
-            it('should increment the nonce', async () => {
-              assertEqualBN(await wallet.nonce(), 1)
-            })
-
-            it('should emit the TransactionExecution event', () => {
-              assertLogMatches2(res.logs[0], {
-                event: 'TransactionExecution',
-                args: {
-                  destination,
-                  value,
-                  data: null,
-                  returnData: null,
-                },
-              })
-            })
+        describe('when data is empty', () => {
+          let res: any
+          const data = '0x'
+          beforeEach(async () => {
+            await web3.eth.sendTransaction({ from: accounts[0], to: wallet.address, value })
+            // @ts-ignore
+            res = await wallet.executeTransaction(destination, value, data, { from: signer })
           })
 
-          describe('when data is not empty', () => {
-            it('should revert', async () => {
-              await assertRevert(
-                wallet.executeTransaction(destination, value, '0x1234', 0, { from: signer })
-              )
+          it('should execute the transaction', async () => {
+            assert.equal(await web3.eth.getBalance(destination), value)
+          })
+
+          it('should not increment the nonce', async () => {
+            assertEqualBN(await wallet.nonce(), 0)
+          })
+
+          it('should emit the TransactionExecution event', () => {
+            assertLogMatches2(res.logs[0], {
+              event: 'TransactionExecution',
+              args: {
+                destination,
+                value,
+                data: null,
+                returnData: null,
+              },
             })
+          })
+        })
+
+        describe('when data is not empty', () => {
+          it('should revert', async () => {
+            await assertRevert(
+              wallet.executeTransaction(destination, value, '0x1234', { from: signer })
+            )
           })
         })
       })
@@ -304,22 +291,21 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
           // @ts-ignore
           data: wallet.contract.methods.setSigner(nonSigner).encodeABI(),
         })
+        await web3.eth.sendTransaction({
+          from: accounts[0],
+          to: wallet.address,
+          value: value * 2,
+        })
       })
 
       describe('when the caller is the signer', () => {
-        describe('when valid nonces are provided', () => {
+        describe('when the transactions are executed directly', () => {
           beforeEach(async () => {
-            await web3.eth.sendTransaction({
-              from: accounts[0],
-              to: wallet.address,
-              value: value * 2,
-            })
             await wallet.executeTransactions(
               transactions.map((t) => t.destination),
               transactions.map((t) => t.value),
               ensureLeading0x(transactions.map((t) => trimLeading0x(t.data)).join('')),
               transactions.map((t) => trimLeading0x(t.data).length / 2),
-              transactions.map((_, i) => i),
               { from: signer }
             )
           })
@@ -330,8 +316,42 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
             assert.equal(await wallet.signer(), nonSigner)
           })
 
+          it('should not increment the nonce', async () => {
+            assertEqualBN(await wallet.nonce(), 0)
+          })
+        })
+
+        describe('when the transactions are executed as a meta-transaction', () => {
+          beforeEach(async () => {
+            // @ts-ignore
+            const data = wallet.contract.methods
+              .executeTransactions(
+                transactions.map((t) => t.destination),
+                transactions.map((t) => t.value),
+                ensureLeading0x(transactions.map((t) => trimLeading0x(t.data)).join('')),
+                transactions.map((t) => trimLeading0x(t.data).length / 2)
+              )
+              .encodeABI()
+            const digest = constructMetaTransactionExecutionDigest(wallet.address, {
+              destination: wallet.address,
+              value: 0,
+              data,
+              nonce: 0,
+            })
+            const { v, r, s } = await getSignatureForDigest(digest, signer)
+            await wallet.executeMetaTransaction(wallet.address, 0, data, v, r, s, {
+              from: signer,
+            })
+          })
+
+          it('should execute the transactions', async () => {
+            assert.equal(await web3.eth.getBalance(transactions[0].destination), value)
+            assert.equal(await web3.eth.getBalance(transactions[2].destination), value)
+            assert.equal(await wallet.signer(), nonSigner)
+          })
+
           it('should increment the nonce', async () => {
-            assertEqualBN(await wallet.nonce(), transactions.length)
+            assertEqualBN(await wallet.nonce(), 1)
           })
         })
       })
@@ -415,6 +435,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
                 destination,
                 value,
                 data: null,
+                nonce: 0,
                 returnData: null,
               },
             })
