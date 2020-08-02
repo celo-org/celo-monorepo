@@ -990,35 +990,7 @@ contract('Attestations', (accounts: string[]) => {
     })
   })
 
-  describe('#approveTransfer()', () => {
-    describe('when approving transfer', () => {
-      it('is not able to approve transfer to 0x0', async () => {
-        await assertRevert(
-          attestations.approveTransfer.sendTransaction(
-            phoneHash,
-            0,
-            caller,
-            '0x0000000000000000000000000000000000000000',
-            true
-          ),
-          'revert reserved address 0x0 cannot have approval'
-        )
-      })
-
-      it('is not able to approve transfer from 0x0', async () => {
-        await assertRevert(
-          attestations.approveTransfer.sendTransaction(
-            phoneHash,
-            0,
-            '0x0000000000000000000000000000000000000000',
-            caller,
-            true
-          ),
-          'revert reserved address 0x0 cannot have approval'
-        )
-      })
-    })
-
+  describe.only('#approveTransfer()', () => {
     describe('when the attestation exists', () => {
       beforeEach(async () => {
         await requestAndCompleteAttestations()
@@ -1103,7 +1075,7 @@ contract('Attestations', (accounts: string[]) => {
           attestations.approveTransfer(phoneHash, 0, caller, replacementAddress, true, {
             from: caller,
           }),
-          'address tranferring to has already requested attestations'
+          'Address tranferring to has already requested attestations'
         )
       })
     })

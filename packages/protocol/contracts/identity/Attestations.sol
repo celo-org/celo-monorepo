@@ -92,7 +92,7 @@ contract Attestations is
   // Maps a token and attestation issuer to the amount that they're owed.
   mapping(address => mapping(address => uint256)) public pendingWithdrawals;
 
-  // Maps approval of attesation transfer
+  // Attestation transfer approvals, keyed by user and keccak(identifier, from, to)
   mapping(address => mapping(bytes32 => bool)) public transferApprovals;
 
   event AttestationsRequested(
@@ -127,8 +127,9 @@ contract Attestations is
   );
   event TransferApproval(
     address indexed approver,
-    address indexed from,
-    address indexed to,
+    bytes32 indexed indentifier,
+    address from,
+    address to,
     bool approved
   );
 
@@ -686,26 +687,15 @@ contract Attestations is
   function approveTransfer(bytes32 identifier, uint256 index, address from, address to, bool status)
     external
   {
-    require(from != address(0) && to != address(0), "reserved address 0x0 cannot have approval");
     bytes32 key = keccak256(abi.encodePacked(identifier, from, to));
-    if (
-      status && (isOtherAddressApproved(from, to, key) || isOtherAddressApproved(to, from, key))
-    ) {
+    address other = msg.sender == from ? to : from;
+    if (status && transferApprovals[other][key]) {
       _transfer(identifier, index, from, to);
-      transferApprovals[to][key] = false;
-      transferApprovals[from][key] = false;
+      transferApprovals[other][key] = false;
     } else {
       transferApprovals[msg.sender][key] = status;
-      emit TransferApproval(msg.sender, from, to, status);
+      emit TransferApproval(msg.sender, identifier, from, to, status);
     }
-  }
-
-  function isOtherAddressApproved(address current, address other, bytes32 key)
-    internal
-    view
-    returns (bool)
-  {
-    return msg.sender == current && transferApprovals[other][key];
   }
 
   /**
@@ -725,7 +715,7 @@ contract Attestations is
     require(from == identifiers[identifier].accounts[index], "Index does not match from address");
     require(
       identifiers[identifier].attestations[to].requested == 0,
-      "address tranferring to has already requested attestations"
+      "Address tranferring to has already requested attestations"
     );
 
     identifiers[identifier].accounts[index] = to;
