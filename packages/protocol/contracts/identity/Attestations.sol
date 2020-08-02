@@ -594,6 +594,23 @@ contract Attestations is
   }
 
   /**
+   * @notice Require that a given identifier/address pair has
+   * requested a specific number of attestations.
+   * @param identifier Hash of the identifier.
+   * @param account Address of the account.
+   * @param expected Number of expected attestations
+   * @dev It can be used when batching meta-transactions to validate
+   * attestation are requested as expected in untrusted scenarios
+   */
+  function requireNAttestationsRequested(bytes32 identifier, address account, uint32 expected)
+    external
+    view
+  {
+    uint256 requested = identifiers[identifier].attestations[account].requested;
+    require(requested == expected, "requested attestations does not match expected");
+  }
+
+  /**
    * @notice Helper function for batchGetAttestationStats to calculate the
              total number of addresses that have >0 complete attestations for the identifiers.
    * @param identifiersToLookup Array of n identifiers.
