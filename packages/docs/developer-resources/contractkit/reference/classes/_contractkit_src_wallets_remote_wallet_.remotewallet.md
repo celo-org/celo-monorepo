@@ -133,7 +133,7 @@ ___
 
 ###  signTypedData
 
-▸ **signTypedData**(`address`: [Address](../modules/_contractkit_src_base_.md#address), `typedData`: [EIP712TypedData](../interfaces/_contractkit_src_utils_sign_typed_data_utils_.eip712typeddata.md)): *Promise‹string›*
+▸ **signTypedData**(`address`: [Address](../modules/_contractkit_src_base_.md#address), `typedData`: EIP712TypedData): *Promise‹string›*
 
 *Overrides [WalletBase](_contractkit_src_wallets_wallet_.walletbase.md).[signTypedData](_contractkit_src_wallets_wallet_.walletbase.md#signtypeddata)*
 
@@ -144,7 +144,7 @@ ___
 Name | Type | Description |
 ------ | ------ | ------ |
 `address` | [Address](../modules/_contractkit_src_base_.md#address) | Address of the account to sign with |
-`typedData` | [EIP712TypedData](../interfaces/_contractkit_src_utils_sign_typed_data_utils_.eip712typeddata.md) | the typed data object |
+`typedData` | EIP712TypedData | the typed data object |
 
 **Returns:** *Promise‹string›*
 

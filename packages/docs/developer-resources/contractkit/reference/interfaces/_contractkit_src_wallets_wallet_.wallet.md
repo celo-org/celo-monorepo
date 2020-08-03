@@ -107,11 +107,11 @@ ___
 
 #### Type declaration:
 
-▸ (`address`: [Address](../modules/_contractkit_src_base_.md#address), `typedData`: [EIP712TypedData](_contractkit_src_utils_sign_typed_data_utils_.eip712typeddata.md)): *Promise‹string›*
+▸ (`address`: [Address](../modules/_contractkit_src_base_.md#address), `typedData`: EIP712TypedData): *Promise‹string›*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
 `address` | [Address](../modules/_contractkit_src_base_.md#address) |
-`typedData` | [EIP712TypedData](_contractkit_src_utils_sign_typed_data_utils_.eip712typeddata.md) |
+`typedData` | EIP712TypedData |
