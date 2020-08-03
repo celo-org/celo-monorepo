@@ -44,7 +44,7 @@ const MNEMONIC_BIT_LENGTH = MnemonicStrength.s256_24words
 export const SYNC_TIMEOUT = 2 * 60 * 1000 // 2 minutes
 const SWITCH_TO_FORNO_TIMEOUT = 15000 // if syncing takes >15 secs, suggest switch to forno
 const WEB3_MONITOR_DELAY = 100
-const BLOCK_AGE_LIMIT = 5 * 60 // if the latest block is older than 5 minutes, the node is not synced.
+const BLOCK_AGE_LIMIT = 30 // if the latest block is older than 30 seconds, the node is not synced.
 
 // Returns true if the block was produced within the block age limit.
 function blockIsFresh(block: Block) {

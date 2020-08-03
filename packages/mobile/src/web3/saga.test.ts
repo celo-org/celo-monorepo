@@ -92,7 +92,7 @@ describe(checkWeb3SyncProgress, () => {
       // @ts-ignore
       .mockReturnValueOnce({
         number: 100,
-        timestamp: Math.round(Date.now() / 1000) - 600,
+        timestamp: Math.round(Date.now() / 1000) - 40,
       })
       .mockReturnValueOnce({
         number: 200,
