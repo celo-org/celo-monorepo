@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@celo/utils": "0.1.9",
+    "@contentful/rich-text-react-renderer": "^14.1.1",
     "@next/bundle-analyzer": "^9.3.5",
     "@sentry/browser": "^5.10.2",
     "@sentry/node": "^5.10.2",
@@ -36,6 +37,7 @@
     "colortranslator": "^1.1.1",
     "compression": "^1.7.4",
     "connect-slashes": "^1.4.0",
+    "contentful": "^7.14.5",
     "core-js": "^2.6.9",
     "cross-fetch": "^3.0.4",
     "debounce": "^1.2.0",

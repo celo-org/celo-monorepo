@@ -4,7 +4,7 @@ import * as React from 'react'
 import { ImageRequireSource } from 'react-native'
 interface Props {
   description: string
-  image?: ImageRequireSource
+  image?: ImageRequireSource | string
   title: string
   path: string
 }

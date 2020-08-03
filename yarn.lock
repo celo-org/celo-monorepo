@@ -2913,6 +2913,18 @@
   dependencies:
     arrify "^1.0.1"
 
+"@contentful/rich-text-react-renderer@^14.1.1":
+  version "14.1.1"
+  resolved "https://registry.yarnpkg.com/@contentful/rich-text-react-renderer/-/rich-text-react-renderer-14.1.1.tgz#7a205c74c76bdf3ff7e6f315be2aadd3b8df8409"
+  integrity sha512-J9NhI3OeYt/ivj4uXj0874A1IhBADEcMSkyfNmU2XiKTwLfEab577+Tma5pe7mp/4NF4xGrq5YTU146vKufNHA==
+  dependencies:
+    "@contentful/rich-text-types" "^14.1.1"
+
+"@contentful/rich-text-types@^14.1.1":
+  version "14.1.1"
+  resolved "https://registry.yarnpkg.com/@contentful/rich-text-types/-/rich-text-types-14.1.1.tgz#2b105c8fdb36cd1f8ed06ce077a853f4ab5e3770"
+  integrity sha512-Iow9U3so7V+2AngYLmt42BGtHjHGl+DQpxvXaryJe1X9LPHrQ41pALztJZFzDgajoEswBjOgmI9CFeQ1oUAdJA==
+
 "@egjs/hammerjs@^2.0.17":
   version "2.0.17"
   resolved "https://registry.yarnpkg.com/@egjs/hammerjs/-/hammerjs-2.0.17.tgz#5dc02af75a6a06e4c2db0202cae38c9263895124"
@@ -9436,7 +9448,14 @@ axios@^0.19.0:
     follow-redirects "1.5.10"
     is-buffer "^2.0.2"
 
-babel-code-frame@^6.26.0:
+axios@^0.19.1:
+  version "0.19.2"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.19.2.tgz#3ea36c5d8818d0d5f8a8a97a6d36b86cdc00cb27"
+  integrity sha512-fjgm5MvRHLhx+osE2xoekY70AhARk3a6hkN+3Io1jc00jtquGvxYlKlsFUhmUET0V5te6CcZI7lcv2Ym61mjHA==
+  dependencies:
+    follow-redirects "1.5.10"
+
+babel-code-frame@^6.22.0, babel-code-frame@^6.26.0:
   version "6.26.0"
   resolved "https://registry.yarnpkg.com/babel-code-frame/-/babel-code-frame-6.26.0.tgz#63fd43f7dc1e3bb7ce35947db8fe369a3f58c74b"
   integrity sha1-Y/1D99weO7fONZR9uP42mj9Yx0s=
@@ -12541,6 +12560,32 @@ content-type@^1.0.4, content-type@~1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/content-type/-/content-type-1.0.4.tgz#e138cc75e040c727b1966fe5e5f8c9aee256fe3b"
   integrity sha512-hIP3EEPs8tB9AT1L+NUqtwOAps4mk2Zob89MWXMHjHWg9milF/j4osnnQLXBCBFBk/tvIG/tUc9mOUJiPBhPXA==
+
+contentful-resolve-response@^1.1.4:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/contentful-resolve-response/-/contentful-resolve-response-1.2.2.tgz#3f83a5f4742854de740e250a11020b4fb646da91"
+  integrity sha512-KyRz05f2YFJDSFs/L5jtsptbL5Fk3+ukSjRF94zFXq0FOtYoaxyCbqKgHhK2+3hlipxVQ+KGRus/tSaD6PoPMg==
+  dependencies:
+    lodash "^4.17.15"
+
+contentful-sdk-core@^6.4.5:
+  version "6.4.5"
+  resolved "https://registry.yarnpkg.com/contentful-sdk-core/-/contentful-sdk-core-6.4.5.tgz#e73f4c5426f354608543fc73e46c17c6730180e9"
+  integrity sha512-rygNuiwbG6UKrJg6EDlaKewayTeLWrjA2wJwVmq7rV/DYo0cic6t28y0EMhRQ4pgJDV5HyUQFoFeBm2lwLfG2Q==
+  dependencies:
+    lodash "^4.17.10"
+    qs "^6.5.2"
+
+contentful@^7.14.5:
+  version "7.14.5"
+  resolved "https://registry.yarnpkg.com/contentful/-/contentful-7.14.5.tgz#ca8ff1301b1278b88bf475cfc87ee9ba9f196034"
+  integrity sha512-Ou3L6xcVXV2TjC9uaw9w5OGp4hHGeQ9wCwsuROKpPEhb53GdcY962zxVzMZ7YTt/WmKkMrZRFsGMWCi3yS6p9g==
+  dependencies:
+    axios "^0.19.1"
+    contentful-resolve-response "^1.1.4"
+    contentful-sdk-core "^6.4.5"
+    json-stringify-safe "^5.0.1"
+    lodash "^4.17.11"
 
 continuation-local-storage@^3.2.1:
   version "3.2.1"
