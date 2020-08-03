@@ -39,8 +39,7 @@ describe('Running against a deployed service', () => {
       expect(response.status).toBe(400)
     })
 
-    // TODO: Enable test when blindedQueryPhoneNumber input validation is added
-    xit('With invalid blindedQueryPhoneNumber', async () => {
+    it('With invalid blindedQueryPhoneNumber', async () => {
       const response = await postToSignMessage('invalid', PRIVATE_KEY1, ACCOUNT_ADDRESS1)
       expect(response.status).toBe(400)
     })
