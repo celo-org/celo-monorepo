@@ -91,8 +91,8 @@ export class ExchangeReview extends React.Component<Props, State> {
         localCurrencyAmount: localCurrencyAmount
           ? localCurrencyAmount.toString()
           : localCurrencyAmount,
-        dollarAmount,
         goldAmount: goldAmount.toString(),
+        dollarAmount: dollarAmount.toString(),
         inputToken,
         goldToDollarExchangeRate: goldToDollarExchangeRate.toString(),
       }

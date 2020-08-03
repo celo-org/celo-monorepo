@@ -28,6 +28,8 @@ interface AppEventsProperties {
     // TODO: Figure out how to measure loadingDuration iOS and make param required
     loadingDuration?: number
     deviceInfo?: object
+    deviceHeight: number
+    deviceWidth: number
   }
   [AppEvents.app_state_error]: {
     error: string
@@ -381,12 +383,7 @@ interface SendEventsProperties {
   }
   [SendEvents.send_secure_edit]: undefined
 
-  [SendEvents.send_tx_start]: {
-    txId: string
-    recipientAddress: string
-    amount: string
-    currency: string
-  }
+  [SendEvents.send_tx_start]: undefined
   [SendEvents.send_tx_complete]: {
     txId: string
     recipientAddress: string
@@ -394,7 +391,6 @@ interface SendEventsProperties {
     currency: string
   }
   [SendEvents.send_tx_error]: {
-    txId: string
     error: string
   }
 }
@@ -488,6 +484,7 @@ interface CeloExchangeEventsProperties {
   [CeloExchangeEvents.celo_buy_confirm]: {
     localCurrencyAmount: string | null
     goldAmount: string
+    dollarAmount: string
     inputToken: CURRENCY_ENUM
     goldToDollarExchangeRate: string
   }
@@ -505,6 +502,7 @@ interface CeloExchangeEventsProperties {
   [CeloExchangeEvents.celo_sell_confirm]: {
     localCurrencyAmount: string | null
     goldAmount: string
+    dollarAmount: string
     inputToken: CURRENCY_ENUM
     goldToDollarExchangeRate: string
   }
