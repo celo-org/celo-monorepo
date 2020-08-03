@@ -1,4 +1,4 @@
-import { newKitFromWeb3 } from '@celo/contractkit'
+import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold'
 import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold'
 import { getContractFromEvent, testWithGanache, timeTravel } from '@celo/dev-utils/lib/ganache-test'
@@ -12,7 +12,7 @@ process.env.NO_SYNCCHECK = 'true'
 
 testWithGanache('releasegold:withdraw cmd', (web3: Web3) => {
   let contractAddress: string
-  let kit: any
+  let kit: ContractKit
 
   beforeEach(async () => {
     const contractCanValidate = true
@@ -34,7 +34,7 @@ testWithGanache('releasegold:withdraw cmd', (web3: Web3) => {
     const balanceBefore = await kit.getTotalBalance(beneficiary)
     await Withdraw.run(['--contract', contractAddress, '--value', '10000000000000000000000'])
     const balanceAfter = await kit.getTotalBalance(beneficiary)
-    await expect(balanceBefore.gold.toNumber()).toBeLessThan(balanceAfter.gold.toNumber())
+    await expect(balanceBefore.CELO.toNumber()).toBeLessThan(balanceAfter.CELO.toNumber())
   })
 
   test("can't withdraw the whole balance if there is a cUSD balance", async () => {
@@ -67,7 +67,7 @@ testWithGanache('releasegold:withdraw cmd', (web3: Web3) => {
 
     await Withdraw.run(['--contract', contractAddress, '--value', remainingBalance.toString()])
     const balanceAfter = await kit.getTotalBalance(beneficiary)
-    await expect(balanceBefore.gold.toNumber()).toBeLessThan(balanceAfter.gold.toNumber())
+    await expect(balanceBefore.CELO.toNumber()).toBeLessThan(balanceAfter.CELO.toNumber())
 
     // Contract should self-destruct now
     await expect(releaseGoldWrapper.getRemainingUnlockedBalance()).rejects.toThrow()
