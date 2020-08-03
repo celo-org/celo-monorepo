@@ -90,6 +90,7 @@ function encodeData(primaryType: string, data: EIP712Object, types: EIP712Types)
     }
   }
 
+  // @ts-ignore
   return coder.encodeParameters(encodedTypes, encodedValues)
 }
 
@@ -103,6 +104,6 @@ function typeHash(primaryType: string, types: EIP712Types): Buffer {
   return sha3(encodeType(primaryType, types)) as Buffer
 }
 
-function structHash(primaryType: string, data: EIP712Object, types: EIP712Types): Buffer {
+export function structHash(primaryType: string, data: EIP712Object, types: EIP712Types): Buffer {
   return sha3(encodeData(primaryType, data, types)) as Buffer
 }

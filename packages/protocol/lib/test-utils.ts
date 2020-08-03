@@ -398,3 +398,8 @@ export default {
   timeTravel,
   isSameAddress,
 }
+
+export async function addressMinedLatestBlock(address: string) {
+  const block = await web3.eth.getBlock('latest')
+  return isSameAddress(block.miner, address)
+}

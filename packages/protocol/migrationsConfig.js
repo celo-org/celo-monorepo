@@ -531,7 +531,14 @@ const linkedLibraries = {
   AddressSortedLinkedList: ['Election', 'ElectionTest'],
   IntegerSortedLinkedList: ['Governance', 'GovernanceTest', 'IntegerSortedLinkedListTest'],
   AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianTest'],
-  Signatures: ['Accounts', 'TestAttestations', 'Attestations', 'LockedGold', 'Escrow'],
+  Signatures: [
+    'Accounts',
+    'TestAttestations',
+    'Attestations',
+    'LockedGold',
+    'Escrow',
+    'MetaTransactionWallet',
+  ],
 }
 
 const config = lodash.cloneDeep(DefaultConfig)
