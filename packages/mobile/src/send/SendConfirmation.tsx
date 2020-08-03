@@ -189,7 +189,7 @@ export class SendConfirmation extends React.Component<Props, State> {
       this.props.localCurrencyExchangeRate
     )
 
-    ValoraAnalytics.track(SendEvents.send_confim_send, {
+    ValoraAnalytics.track(SendEvents.send_confirm_send, {
       isScan: !!this.props.route.params?.isFromScan,
       isInvite: !recipientAddress,
       isRequest: type === TokenTransactionType.PayRequest,

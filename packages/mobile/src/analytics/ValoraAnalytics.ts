@@ -28,7 +28,6 @@ async function getDeviceInfo() {
     MaxMemory: await DeviceInfo.getMaxMemory(),
     Model: DeviceInfo.getModel(),
     ReadableVersion: DeviceInfo.getReadableVersion(),
-    SerialNumber: await DeviceInfo.getSerialNumber(),
     SystemName: DeviceInfo.getSystemName(),
     SystemVersion: DeviceInfo.getSystemVersion(),
     TotalDiskCapacity: await DeviceInfo.getTotalDiskCapacity(),

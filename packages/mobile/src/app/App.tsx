@@ -1,7 +1,14 @@
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { ApolloProvider } from 'react-apollo'
-import { DeviceEventEmitter, Linking, Platform, StatusBar, YellowBox } from 'react-native'
+import {
+  DeviceEventEmitter,
+  Dimensions,
+  Linking,
+  Platform,
+  StatusBar,
+  YellowBox,
+} from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { enableScreens } from 'react-native-screens'
@@ -48,6 +55,7 @@ export class App extends React.Component {
   async componentDidMount() {
     await ValoraAnalytics.init()
     const appLoadedAt: Date = new Date()
+    const { width, height } = Dimensions.get('window')
 
     if (Platform.OS === 'android') {
       const appStartListener = DeviceEventEmitter.addListener(
@@ -55,12 +63,19 @@ export class App extends React.Component {
         (appInitializedAtString: string) => {
           const appInitializedAt = new Date(appInitializedAtString)
           const loadingDuration = appLoadedAt.getTime() - appInitializedAt.getTime()
-          ValoraAnalytics.startSession(AppEvents.app_launched, { loadingDuration })
+          ValoraAnalytics.startSession(AppEvents.app_launched, {
+            loadingDuration,
+            deviceHeight: height,
+            deviceWidth: width,
+          })
           appStartListener.remove()
         }
       )
     } else {
-      ValoraAnalytics.startSession(AppEvents.app_launched, {})
+      ValoraAnalytics.startSession(AppEvents.app_launched, {
+        deviceHeight: height,
+        deviceWidth: width,
+      })
     }
 
     Linking.addEventListener('url', this.handleOpenURL)

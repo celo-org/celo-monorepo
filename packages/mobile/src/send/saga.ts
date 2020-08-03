@@ -162,7 +162,12 @@ function* sendPayment(
         throw new Error(`Sending currency ${currency} not yet supported`)
       }
     }
-    ValoraAnalytics.track(SendEvents.send_tx_complete)
+    ValoraAnalytics.track(SendEvents.send_tx_complete, {
+      txId,
+      recipientAddress,
+      amount: amount.toString(),
+      currency,
+    })
   } catch (error) {
     Logger.error(`${TAG}/sendPayment`, 'Could not send payment', error)
     ValoraAnalytics.track(SendEvents.send_tx_error, { error: error.message })

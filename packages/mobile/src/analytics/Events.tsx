@@ -195,7 +195,7 @@ export enum SendEvents {
   send_amount_back = 'send_amount_back', // back button pressed on amount screen
   send_amount_continue = 'send_amount_continue', // when next button pressed on amount enter page
   send_confirm_back = 'send_confirm_back', // when back button pressed on send confirmation screen
-  send_confim_send = 'send_confim_send', // when send button pressed on send confirmation screen
+  send_confirm_send = 'send_confirm_send', // when send button pressed on send confirmation screen
 
   send_secure_start = 'send_secure_start', // when either secure send scan or manual confirm button pressed
   send_secure_back = 'send_secure_back', // when back button is pressed during secure send

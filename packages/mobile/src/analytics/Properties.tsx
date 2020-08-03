@@ -28,6 +28,8 @@ interface AppEventsProperties {
     // TODO: Figure out how to measure loadingDuration iOS and make param required
     loadingDuration?: number
     deviceInfo?: object
+    deviceHeight: number
+    deviceWidth: number
   }
   [AppEvents.app_state_error]: {
     error: string
@@ -294,9 +296,14 @@ interface IdentityEventsProperties {
 }
 
 interface InviteEventsProperties {
-  [InviteEvents.invite_tx_start]: undefined
-  [InviteEvents.invite_tx_complete]: undefined
+  [InviteEvents.invite_tx_start]: {
+    escrowIncluded: boolean
+  }
+  [InviteEvents.invite_tx_complete]: {
+    escrowIncluded: boolean
+  }
   [InviteEvents.invite_tx_error]: {
+    escrowIncluded: boolean
     error: string
   }
   [InviteEvents.invite_method_sms]: undefined
@@ -347,7 +354,7 @@ interface SendEventsProperties {
     localCurrencyAmount: string | null
   }
   [SendEvents.send_confirm_back]: undefined
-  [SendEvents.send_confim_send]: {
+  [SendEvents.send_confirm_send]: {
     isScan: boolean
     isInvite: boolean
     isRequest: boolean
@@ -385,7 +392,12 @@ interface SendEventsProperties {
   [SendEvents.send_secure_edit]: undefined
 
   [SendEvents.send_tx_start]: undefined
-  [SendEvents.send_tx_complete]: undefined
+  [SendEvents.send_tx_complete]: {
+    txId: string
+    recipientAddress: string
+    amount: string
+    currency: string
+  }
   [SendEvents.send_tx_error]: {
     error: string
   }
@@ -483,6 +495,7 @@ interface CeloExchangeEventsProperties {
   [CeloExchangeEvents.celo_buy_confirm]: {
     localCurrencyAmount: string | null
     goldAmount: string
+    dollarAmount: string
     inputToken: CURRENCY_ENUM
     goldToDollarExchangeRate: string
   }
@@ -500,6 +513,7 @@ interface CeloExchangeEventsProperties {
   [CeloExchangeEvents.celo_sell_confirm]: {
     localCurrencyAmount: string | null
     goldAmount: string
+    dollarAmount: string
     inputToken: CURRENCY_ENUM
     goldToDollarExchangeRate: string
   }
@@ -510,7 +524,11 @@ interface CeloExchangeEventsProperties {
   }
 
   [CeloExchangeEvents.celo_exchange_start]: undefined
-  [CeloExchangeEvents.celo_exchange_complete]: undefined
+  [CeloExchangeEvents.celo_exchange_complete]: {
+    txId: string
+    currency: string
+    amount: string
+  }
   [CeloExchangeEvents.celo_exchange_error]: {
     error: string
   }
