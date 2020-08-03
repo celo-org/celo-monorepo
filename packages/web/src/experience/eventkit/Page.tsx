@@ -81,6 +81,7 @@ export default function BrandKitPage({ sections, title, path }: Props) {
       pages={PAGES}
       sections={sections}
       title={`EventKit / ${title}`}
+      kitName="EventKit"
       path={path}
       metaDescription={metaDescription}
       ogImage={require('src/experience/brandkit/images/ogimage-brandkit.png')}
