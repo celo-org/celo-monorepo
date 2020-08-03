@@ -15,10 +15,6 @@ function intialize(preview: boolean) {
   })
 }
 
-function getClient(preview: boolean) {
-  return intialize(preview)
-}
-
 interface Kit {
   name: string
   slug: string
@@ -40,7 +36,7 @@ export async function getKit(
   pageSlug: string,
   { preview, locale }
 ): Promise<InternalKit> {
-  const kit = await getClient(preview).getEntries<Kit>({
+  const kit = await intialize(preview).getEntries<Kit>({
     content_type: 'kit',
     'fields.slug': kitSlug,
     locale,
