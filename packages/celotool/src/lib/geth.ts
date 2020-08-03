@@ -574,7 +574,8 @@ export const simulateClient = async (
         )
       })
       .catch((error: any) => {
-        console.error('Load test transaction failed with error:', JSON.stringify(error))
+        // console.error('Load test transaction failed with error:', JSON.stringify(error))
+        console.error('Load test transaction failed with error:', error)
         tracerLog({
           tag: LOG_TAG_TRANSACTION_ERROR,
           error: error.toString(),

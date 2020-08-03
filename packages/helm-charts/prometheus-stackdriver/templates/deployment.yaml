@@ -23,6 +23,10 @@ spec:
   replicas: 1
   template:
     metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path:  "/metrics"
+        prometheus.io/port: "9090"
       labels:
 {{ include "prometheus-stackdriver.labels" .  | indent 8 }}
         app: prometheus-server
@@ -36,8 +40,8 @@ spec:
           image: prom/prometheus:{{ .Values.prometheus.imageTag }}
           resources:
             requests:
-              memory: 1Gi
-              cpu: 500m
+              memory: 4Gi
+              cpu: 2
           args:
             - "--config.file=/etc/prometheus/prometheus.yml"
             - "--storage.tsdb.path=/prometheus/"
@@ -48,6 +52,7 @@ spec:
               mountPath: /etc/prometheus/
             - name: prometheus-storage-volume
               mountPath: /prometheus/
+{{- if not .Values.disableStackDriverMetrics }}
         - name: sidecar
           image: gcr.io/stackdriver-prometheus/stackdriver-prometheus-sidecar:{{ .Values.sidecar.imageTag }}
           imagePullPolicy: Always
@@ -71,6 +76,7 @@ spec:
           env:
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: /var/secrets/google/prometheus-service-account.json
+{{- end }}
 {{- end }}
       volumes:
         - name: prometheus-config-volume

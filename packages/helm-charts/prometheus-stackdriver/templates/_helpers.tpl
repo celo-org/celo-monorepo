@@ -6,14 +6,12 @@
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "prometheus-stackdriver.short_labels" -}}
-app: {{ template "prometheus-stackdriver.name" . }}
-release: {{ .Release.Name }}
-{{- end -}}
-
-
+{{/*
+Common labels that are recommended to be used by Helm and Kubernetes
+*/}}
 {{- define "prometheus-stackdriver.labels" -}}
-{{- include "prometheus-stackdriver.short_labels" . }}
-chart: {{ template "prometheus-stackdriver.chart" . }}
-heritage: {{ .Release.Service }}
+app.kubernetes.io/name: {{ template "prometheus-stackdriver.name" . }}
+helm.sh/chart: {{ template "prometheus-stackdriver.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}

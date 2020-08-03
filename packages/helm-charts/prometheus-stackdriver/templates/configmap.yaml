@@ -22,7 +22,7 @@ metadata:
 data:
   prometheus.yml: |-
     global:
-      scrape_interval: 60s
+      scrape_interval: {{ .Values.scrape_interval | default "60s" }}
       evaluation_interval: 5s
 
     scrape_configs:
@@ -83,7 +83,7 @@ data:
           regex: true
         - source_labels: [__meta_kubernetes_pod_name]
           action: drop
-          regex: (.*)(prometheus|blockscout)(.*)
+          regex: (.*)(blockscout)(.*)
         - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
           action: replace
           target_label: __metrics_path__
@@ -118,7 +118,7 @@ data:
           regex: true
         - source_labels: [__meta_kubernetes_pod_name]
           action: keep
-          regex: (.*)(prometheus|blockscout)(.*)
+          regex: (.*)(blockscout)(.*)
         - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
           action: replace
           target_label: __metrics_path__

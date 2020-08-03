@@ -788,6 +788,21 @@ export async function upgradeGenericHelmChart(
   console.info(`Upgraded helm release ${releaseName}`)
 }
 
+export async function installUpgradeGenericChart(
+  celoEnv: string,
+  releaseName: string,
+  chartDir: string,
+  parameters: string[]
+) {
+  await buildHelmChartDependencies(chartDir)
+
+  console.info(`Installing or Upgrading helm release ${releaseName}`)
+  await helmCommand(
+    `helm upgrade ${releaseName} --install ${chartDir} --namespace ${celoEnv} ${parameters.join(' ')}`
+  )
+  console.info(`Installed or Upgraded helm release ${releaseName}`)
+}
+
 export function isCelotoolVerbose() {
   return process.env.CELOTOOL_VERBOSE === 'true'
 }
