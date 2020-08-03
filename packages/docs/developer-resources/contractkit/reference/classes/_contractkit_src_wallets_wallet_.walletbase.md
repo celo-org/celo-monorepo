@@ -95,7 +95,7 @@ ___
 
 ###  signTypedData
 
-▸ **signTypedData**(`address`: [Address](../modules/_contractkit_src_base_.md#address), `typedData`: [EIP712TypedData](../interfaces/_contractkit_src_utils_sign_typed_data_utils_.eip712typeddata.md)): *Promise‹string›*
+▸ **signTypedData**(`address`: [Address](../modules/_contractkit_src_base_.md#address), `typedData`: EIP712TypedData): *Promise‹string›*
 
 *Defined in [contractkit/src/wallets/wallet.ts:98](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L98)*
 
@@ -106,7 +106,7 @@ Sign an EIP712 Typed Data message.
 Name | Type | Description |
 ------ | ------ | ------ |
 `address` | [Address](../modules/_contractkit_src_base_.md#address) | Address of the account to sign with |
-`typedData` | [EIP712TypedData](../interfaces/_contractkit_src_utils_sign_typed_data_utils_.eip712typeddata.md) | the typed data object |
+`typedData` | EIP712TypedData | the typed data object |
 
 **Returns:** *Promise‹string›*
 

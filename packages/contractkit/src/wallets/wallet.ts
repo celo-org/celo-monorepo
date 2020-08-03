@@ -1,8 +1,8 @@
 import { isHexString, normalizeAddressWith0x } from '@celo/utils/lib/address'
+import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import * as ethUtil from 'ethereumjs-util'
 import { EncodedTransaction, Tx } from 'web3-core'
 import { Address } from '../base'
-import { EIP712TypedData, generateTypedDataHash } from '../utils/sign-typed-data-utils'
 import {
   chainIdTransformationForSigning,
   encodeTransaction,
