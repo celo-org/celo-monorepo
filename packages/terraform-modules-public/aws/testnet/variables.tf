@@ -36,7 +36,7 @@ variable instance_types {
 }
 
 variable iam_instance_profiles {
-  description = "Optional IAM instances profile names for each component. For example, a profile that gives CloudWatch agent permissions"
+  description = "Optional IAM instances profile names for each component. For example, a profile that gives CloudWatch agent permissions (https://amzn.to/3gpfCt5)"
   type        = map(string)
 
   default = {
