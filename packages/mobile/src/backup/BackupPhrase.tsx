@@ -50,7 +50,6 @@ const mapStateToProps = (state: RootState): StateProps => {
 
 export const navOptionsForBackupPhrase = {
   headerLeft: () => <CancelConfirm screen={TAG} />,
-  headerTitle: i18n.t(`${Namespaces.backupKeyFlow6}:headerTitle`),
   headerRight: () => <HeaderRight />,
 }
 
