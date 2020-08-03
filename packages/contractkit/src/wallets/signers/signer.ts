@@ -12,4 +12,5 @@ export interface Signer {
   ) => Promise<{ v: number; r: Buffer; s: Buffer }>
   signPersonalMessage: (data: string) => Promise<{ v: number; r: Buffer; s: Buffer }>
   getNativeKey: () => string
+  decrypt: (ciphertext: Buffer) => Promise<Buffer>
 }

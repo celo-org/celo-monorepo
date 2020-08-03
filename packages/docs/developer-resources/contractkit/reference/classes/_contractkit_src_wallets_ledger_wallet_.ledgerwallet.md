@@ -27,6 +27,7 @@
 
 ### Methods
 
+* [decrypt](_contractkit_src_wallets_ledger_wallet_.ledgerwallet.md#decrypt)
 * [getAccounts](_contractkit_src_wallets_ledger_wallet_.ledgerwallet.md#getaccounts)
 * [hasAccount](_contractkit_src_wallets_ledger_wallet_.ledgerwallet.md#hasaccount)
 * [init](_contractkit_src_wallets_ledger_wallet_.ledgerwallet.md#init)
@@ -96,6 +97,25 @@ ___
 Transport to connect the ledger device
 
 ## Methods
+
+###  decrypt
+
+▸ **decrypt**(`address`: string, `ciphertext`: Buffer): *Promise‹Buffer‹››*
+
+*Inherited from [WalletBase](_contractkit_src_wallets_wallet_.walletbase.md).[decrypt](_contractkit_src_wallets_wallet_.walletbase.md#decrypt)*
+
+*Defined in [contractkit/src/wallets/wallet.ts:121](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L121)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`address` | string |
+`ciphertext` | Buffer |
+
+**Returns:** *Promise‹Buffer‹››*
+
+___
 
 ###  getAccounts
 
