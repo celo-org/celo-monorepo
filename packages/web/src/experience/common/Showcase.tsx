@@ -37,14 +37,7 @@ export default React.memo(function Showcase({
   ])
   const titleStyle = [fonts.h6, styles.title]
   return (
-    <View
-      style={[
-        brandStyles.gap,
-        standardStyles.elementalMarginTop,
-        styles.container,
-        { width: size },
-      ]}
-    >
+    <View style={[brandStyles.gap, standardStyles.elementalMarginTop, { width: size }]}>
       <Fade duration={FADE_MS}>
         <View>
           <View style={styles.previewContainer}>
@@ -82,7 +75,6 @@ const styles = StyleSheet.create({
   },
   text: { flex: 1 },
   pullStart: { paddingLeft: 0 },
-  container: {},
   'variant-circle': {
     borderRadius: 60,
   },
