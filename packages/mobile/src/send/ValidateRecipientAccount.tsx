@@ -22,7 +22,7 @@ import { SingleDigitInput } from 'src/components/SingleDigitInput'
 import { Namespaces, withTranslation } from 'src/i18n'
 import HamburgerCard from 'src/icons/HamburgerCard'
 import InfoIcon from 'src/icons/InfoIcon.v2'
-import { validateRecipientAddress, validateRecipientAddressReset } from 'src/identity/actions'
+import { validateRecipientAddress } from 'src/identity/actions'
 import { AddressValidationType } from 'src/identity/reducer'
 import { emptyHeader } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
@@ -38,9 +38,9 @@ const PARTIAL_ADDRESS_PLACEHOLDER = ['k', '0', 'F', '4']
 interface StateProps {
   recipient: Recipient
   transactionData: TransactionDataInput
-  validationSuccessful: boolean
-  isOutgoingPaymentRequest?: true
   addressValidationType: AddressValidationType
+  isValidRecipient: boolean
+  isOutgoingPaymentRequest?: true
   error?: ErrorMessages | null
 }
 
@@ -51,7 +51,6 @@ interface State {
 }
 
 interface DispatchProps {
-  validateRecipientAddressReset: typeof validateRecipientAddressReset
   validateRecipientAddress: typeof validateRecipientAddress
 }
 
@@ -59,7 +58,6 @@ type OwnProps = StackScreenProps<StackParamList, Screens.ValidateRecipientAccoun
 type Props = StateProps & DispatchProps & WithTranslation & OwnProps
 
 const mapDispatchToProps = {
-  validateRecipientAddressReset,
   validateRecipientAddress,
 }
 
@@ -67,18 +65,13 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const { route } = ownProps
   const transactionData = route.params.transactionData
   const { recipient } = transactionData
-  const { e164PhoneNumber } = recipient
   const error = state.alert ? state.alert.underlyingError : null
-  const validationSuccessful = e164PhoneNumber
-    ? state.identity.secureSendPhoneNumberMapping[e164PhoneNumber].validationSuccessful
-    : false
-
   return {
     recipient,
     transactionData,
-    addressValidationType: route.params.addressValidationType,
-    validationSuccessful,
+    isValidRecipient: state.identity.isValidRecipient,
     isOutgoingPaymentRequest: route.params.isOutgoingPaymentRequest,
+    addressValidationType: route.params.addressValidationType,
     error,
   }
 }
@@ -95,17 +88,9 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
     isModalVisible: false,
   }
 
-  componentDidMount = () => {
-    const { e164PhoneNumber } = this.props.recipient
-    if (e164PhoneNumber) {
-      this.props.validateRecipientAddressReset(e164PhoneNumber)
-    }
-  }
-
-  componentDidUpdate = () => {
-    const { validationSuccessful, isOutgoingPaymentRequest, transactionData } = this.props
-
-    if (validationSuccessful) {
+  componentDidUpdate = (prevProps: Props) => {
+    const { isValidRecipient, isOutgoingPaymentRequest, transactionData } = this.props
+    if (isValidRecipient && !prevProps.isValidRecipient) {
       if (isOutgoingPaymentRequest) {
         navigate(Screens.PaymentRequestConfirmation, { transactionData })
       } else {

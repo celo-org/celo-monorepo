@@ -41,7 +41,6 @@ export interface SecureSendDetails {
   address: string | undefined
   addressValidationType: AddressValidationType
   isFetchingAddresses: boolean
-  validationSuccessful: boolean
 }
 
 export interface State {
@@ -61,6 +60,7 @@ export interface State {
   importContactsProgress: ImportContactProgress
   // Contacts found during the matchmaking process
   matchedContacts: ContactMatches
+  isValidRecipient: boolean
   secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
 }
 
@@ -80,6 +80,7 @@ const initialState: State = {
     total: 0,
   },
   matchedContacts: {},
+  isValidRecipient: false,
   secureSendPhoneNumberMapping: {},
 }
 
@@ -184,9 +185,15 @@ export const reducer = (
         ...state,
         matchedContacts,
       }
+    case Actions.VALIDATE_RECIPIENT_ADDRESS:
+      return {
+        ...state,
+        isValidRecipient: false,
+      }
     case Actions.VALIDATE_RECIPIENT_ADDRESS_SUCCESS:
       return {
         ...state,
+        isValidRecipient: true,
         // Overwrite the previous mapping when a new address is validated
         secureSendPhoneNumberMapping: dotProp.set(
           state.secureSendPhoneNumberMapping,
@@ -194,22 +201,13 @@ export const reducer = (
           {
             address: action.validatedAddress,
             addressValidationType: AddressValidationType.NONE,
-            validationSuccessful: true,
           }
-        ),
-      }
-    case Actions.VALIDATE_RECIPIENT_ADDRESS_RESET:
-      return {
-        ...state,
-        secureSendPhoneNumberMapping: dotProp.set(
-          state.secureSendPhoneNumberMapping,
-          `${action.e164Number}.validationSuccessful`,
-          false
         ),
       }
     case Actions.REQUIRE_SECURE_SEND:
       return {
         ...state,
+        isValidRecipient: false,
         // Erase the previous mapping when new validation is required
         secureSendPhoneNumberMapping: dotProp.set(
           state.secureSendPhoneNumberMapping,
