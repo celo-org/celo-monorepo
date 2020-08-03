@@ -181,4 +181,10 @@ export class LedgerSigner implements Signer {
       }
     }
   }
+
+  decrypt(_ciphertext: Buffer) {
+    throw new Error('Decryption operation is not supported on this signer')
+    // To make the compiler happy
+    return Promise.resolve(_ciphertext)
+  }
 }
