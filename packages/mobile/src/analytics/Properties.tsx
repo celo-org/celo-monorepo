@@ -588,8 +588,7 @@ interface NetworkEventsProperties {
     latestBlock: number
   }
   [NetworkEvents.network_sync_error]: {
-    error?: string
-    context?: string
+    error: string
   }
 }
 

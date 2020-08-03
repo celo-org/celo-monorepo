@@ -104,7 +104,7 @@ export function* checkWeb3SyncProgress() {
       // If sync has been in progrees for too long, prompt the user to try forno instead.
       if (syncLoops * WEB3_MONITOR_DELAY > SWITCH_TO_FORNO_TIMEOUT) {
         if (yield select(promptFornoIfNeededSelector) && features.DATA_SAVER) {
-          ValoraAnalytics.track(NetworkEvents.network_sync_error, { context: 'sync timeout' })
+          ValoraAnalytics.track(NetworkEvents.network_sync_error, { error: 'sync timeout' })
           yield put(setPromptForno(false))
           navigate(Screens.Settings, { promptFornoModal: true })
           return true
