@@ -70,7 +70,7 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const { e164PhoneNumber } = recipient
   const error = state.alert ? state.alert.underlyingError : null
   const validationSuccessful = e164PhoneNumber
-    ? !!state.identity.secureSendPhoneNumberMapping[e164PhoneNumber]?.validationSuccessful
+    ? state.identity.secureSendPhoneNumberMapping[e164PhoneNumber]?.validationSuccessful
     : false
 
   return {
