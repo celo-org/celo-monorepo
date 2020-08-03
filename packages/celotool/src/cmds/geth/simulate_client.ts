@@ -90,6 +90,7 @@ export const handler = async (argv: SimulateClientArgv) => {
     console.info(`Sleeping for ${sleepMs} ms`)
     await sleep(sleepMs)
 
+    console.error(`jcortejoso simulateClient recipientAddress: ${recipientAddress}`)
     // tslint:disable-next-line: no-floating-promises
     simulateClient(
       senderAddress,
