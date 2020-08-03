@@ -45,7 +45,6 @@ describe('ValidateRecipientAccount', () => {
         secureSendPhoneNumberMapping: {
           [mockE164NumberInvite]: {
             addressValidationType: AddressValidationType.NONE,
-            validationSuccessful: false,
           },
         },
       },
