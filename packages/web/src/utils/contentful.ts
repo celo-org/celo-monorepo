@@ -69,7 +69,7 @@ interface ContentFulPage {
 }
 
 export async function getPage(pageSlug: string, id, { preview, locale }) {
-  const pages = await getClient(preview).getEntries<ContentFulPage>({
+  const pages = await intialize(preview).getEntries<ContentFulPage>({
     content_type: 'page',
     'fields.slug': !pageSlug ? 'index' : pageSlug,
     'sys.id': id,
