@@ -136,11 +136,7 @@ function isActive(path: string, currentPath: string) {
   const hashIndex = currentPath.indexOf('#')
   const pathSansHash = hashIndex !== -1 ? currentPath.substring(0, hashIndex) : currentPath
 
-  if (path === pathSansHash) {
-    return true
-  }
-
-  return false
+  return path === pathSansHash
 }
 
 function isActiveSection(path: string, routeHash: string) {
