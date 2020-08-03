@@ -18,6 +18,7 @@ Signs the EVM transaction using an HSM key in Azure Key Vault
 
 ### Methods
 
+* [decrypt](_contractkit_src_wallets_signers_azure_hsm_signer_.azurehsmsigner.md#decrypt)
 * [getNativeKey](_contractkit_src_wallets_signers_azure_hsm_signer_.azurehsmsigner.md#getnativekey)
 * [signPersonalMessage](_contractkit_src_wallets_signers_azure_hsm_signer_.azurehsmsigner.md#signpersonalmessage)
 * [signTransaction](_contractkit_src_wallets_signers_azure_hsm_signer_.azurehsmsigner.md#signtransaction)
@@ -40,6 +41,22 @@ Name | Type |
 **Returns:** *[AzureHSMSigner](_contractkit_src_wallets_signers_azure_hsm_signer_.azurehsmsigner.md)*
 
 ## Methods
+
+###  decrypt
+
+▸ **decrypt**(`_ciphertext`: Buffer): *Promise‹Buffer‹››*
+
+*Defined in [contractkit/src/wallets/signers/azure-hsm-signer.ts:60](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-hsm-signer.ts#L60)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`_ciphertext` | Buffer |
+
+**Returns:** *Promise‹Buffer‹››*
+
+___
 
 ###  getNativeKey
 

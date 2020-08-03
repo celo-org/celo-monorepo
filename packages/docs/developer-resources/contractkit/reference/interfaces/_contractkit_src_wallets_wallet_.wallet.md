@@ -24,6 +24,7 @@
 
 ### Properties
 
+* [decrypt](_contractkit_src_wallets_wallet_.wallet.md#decrypt)
 * [getAccounts](_contractkit_src_wallets_wallet_.wallet.md#getaccounts)
 * [hasAccount](_contractkit_src_wallets_wallet_.wallet.md#hasaccount)
 * [signPersonalMessage](_contractkit_src_wallets_wallet_.wallet.md#signpersonalmessage)
@@ -31,6 +32,25 @@
 * [signTypedData](_contractkit_src_wallets_wallet_.wallet.md#signtypeddata)
 
 ## Properties
+
+###  decrypt
+
+• **decrypt**: *function*
+
+*Defined in [contractkit/src/wallets/wallet.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L19)*
+
+#### Type declaration:
+
+▸ (`address`: [Address](../modules/_contractkit_src_base_.md#address), `ciphertext`: Buffer): *Promise‹Buffer›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`address` | [Address](../modules/_contractkit_src_base_.md#address) |
+`ciphertext` | Buffer |
+
+___
 
 ###  getAccounts
 

@@ -15,11 +15,30 @@
 
 ### Properties
 
+* [decrypt](_contractkit_src_wallets_signers_signer_.signer.md#decrypt)
 * [getNativeKey](_contractkit_src_wallets_signers_signer_.signer.md#getnativekey)
 * [signPersonalMessage](_contractkit_src_wallets_signers_signer_.signer.md#signpersonalmessage)
 * [signTransaction](_contractkit_src_wallets_signers_signer_.signer.md#signtransaction)
 
 ## Properties
+
+###  decrypt
+
+• **decrypt**: *function*
+
+*Defined in [contractkit/src/wallets/signers/signer.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/signer.ts#L15)*
+
+#### Type declaration:
+
+▸ (`ciphertext`: Buffer): *Promise‹Buffer›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`ciphertext` | Buffer |
+
+___
 
 ###  getNativeKey
 

@@ -16,6 +16,7 @@ export interface Wallet {
   signTransaction: (txParams: Tx) => Promise<EncodedTransaction>
   signTypedData: (address: Address, typedData: EIP712TypedData) => Promise<string>
   signPersonalMessage: (address: Address, data: string) => Promise<string>
+  decrypt: (address: Address, ciphertext: Buffer) => Promise<Buffer>
 }
 
 export abstract class WalletBase implements Wallet {
@@ -115,5 +116,10 @@ export abstract class WalletBase implements Wallet {
       throw new Error(`Could not find address ${normalizedAddress}`)
     }
     return this.accountSigners.get(normalizedAddress)!
+  }
+
+  async decrypt(address: string, ciphertext: Buffer) {
+    const signer = this.getSigner(address)
+    return signer.decrypt(ciphertext)
   }
 }

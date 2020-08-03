@@ -140,4 +140,10 @@ export class RpcSigner implements Signer {
     }
     return response.result! as RpcSignerEndpointResult[typeof endpoint]
   }
+
+  decrypt(_ciphertext: Buffer) {
+    throw new Error('Decryption operation is not supported on this signer')
+    // To make the compiler happy
+    return Promise.resolve(_ciphertext)
+  }
 }
