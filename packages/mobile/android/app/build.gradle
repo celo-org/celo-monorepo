@@ -84,6 +84,8 @@ project.ext.react = [
         bundleInMainnet: true,
         devDisabledInMainnet: true,
         cliPath: "../../node_modules/react-native/cli.js",
+        hermesCommand: "../../../../node_modules/hermes-engine/%OS-BIN%/hermes",
+        composeSourceMapsPath: "../../node_modules/react-native/scripts/compose-source-maps.js",
         entryFile: "index.js",
 ]
 
@@ -93,6 +95,10 @@ project.ext.envConfigFiles = [
     alfajores: ".env.alfajores",
     pilot: ".env.pilot",
     mainnet: ".env.mainnet",
+]
+
+project.ext.sentryCli = [
+    logLevel: "debug"
 ]
 
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
