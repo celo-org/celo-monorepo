@@ -70,10 +70,8 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const { e164PhoneNumber } = recipient
   const error = state.alert ? state.alert.underlyingError : null
   const validationSuccessful = e164PhoneNumber
-    ? state.identity.secureSendPhoneNumberMapping[e164PhoneNumber]?.validationSuccessful
+    ? state.identity.secureSendPhoneNumberMapping[e164PhoneNumber].validationSuccessful
     : false
-
-  console.log('start: ', validationSuccessful, e164PhoneNumber)
 
   return {
     recipient,
@@ -106,14 +104,10 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
 
   componentDidUpdate = () => {
     const { validationSuccessful, isOutgoingPaymentRequest, transactionData } = this.props
-    console.log(validationSuccessful)
 
     if (validationSuccessful) {
       if (isOutgoingPaymentRequest) {
-        navigate(Screens.PaymentRequestConfirmation, {
-          transactionData,
-          addressJustValidated: true,
-        })
+        navigate(Screens.PaymentRequestConfirmation, { transactionData })
       } else {
         navigate(Screens.SendConfirmation, {
           transactionData,
