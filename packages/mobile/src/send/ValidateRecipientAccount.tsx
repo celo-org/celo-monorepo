@@ -38,9 +38,9 @@ const PARTIAL_ADDRESS_PLACEHOLDER = ['k', '0', 'F', '4']
 interface StateProps {
   recipient: Recipient
   transactionData: TransactionDataInput
-  addressValidationType: AddressValidationType
   validationSuccessful: boolean
   isOutgoingPaymentRequest?: true
+  addressValidationType: AddressValidationType
   error?: ErrorMessages | null
 }
 
@@ -73,12 +73,14 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
     ? state.identity.secureSendPhoneNumberMapping[e164PhoneNumber]?.validationSuccessful
     : false
 
+  console.log('start: ', validationSuccessful, e164PhoneNumber)
+
   return {
     recipient,
     transactionData,
+    addressValidationType: route.params.addressValidationType,
     validationSuccessful,
     isOutgoingPaymentRequest: route.params.isOutgoingPaymentRequest,
-    addressValidationType: route.params.addressValidationType,
     error,
   }
 }
@@ -104,6 +106,7 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
 
   componentDidUpdate = () => {
     const { validationSuccessful, isOutgoingPaymentRequest, transactionData } = this.props
+    console.log(validationSuccessful)
 
     if (validationSuccessful) {
       if (isOutgoingPaymentRequest) {
