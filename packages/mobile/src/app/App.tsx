@@ -55,8 +55,7 @@ export class App extends React.Component {
   async componentDidMount() {
     await ValoraAnalytics.init()
     const appLoadedAt: Date = new Date()
-    const deviceWidth = Dimensions.get('window').width
-    const deviceHeight = Dimensions.get('window').height
+    const { width, height } = Dimensions.get('window')
 
     if (Platform.OS === 'android') {
       const appStartListener = DeviceEventEmitter.addListener(
@@ -66,14 +65,17 @@ export class App extends React.Component {
           const loadingDuration = appLoadedAt.getTime() - appInitializedAt.getTime()
           ValoraAnalytics.startSession(AppEvents.app_launched, {
             loadingDuration,
-            deviceHeight,
-            deviceWidth,
+            deviceHeight: height,
+            deviceWidth: width,
           })
           appStartListener.remove()
         }
       )
     } else {
-      ValoraAnalytics.startSession(AppEvents.app_launched, { deviceHeight, deviceWidth })
+      ValoraAnalytics.startSession(AppEvents.app_launched, {
+        deviceHeight: height,
+        deviceWidth: width,
+      })
     }
 
     Linking.addEventListener('url', this.handleOpenURL)
