@@ -3,7 +3,6 @@ import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { toChecksumAddress } from '@celo/utils/lib/address'
 import { NativeSigner, serializeSignature } from '@celo/utils/lib/signatureUtils'
 import fetchMock from 'fetch-mock'
-import { isRight } from 'fp-ts/lib/Either'
 import { newKitFromWeb3 } from '../kit'
 import { AccountsWrapper } from '../wrappers/Accounts'
 import { createStorageClaim } from './claims/claim'
@@ -58,12 +57,7 @@ testWithGanache('Offchain Data', (web3) => {
       await nameAccessor.write({ name: testname })
 
       const resp = await nameAccessor.read(writer)
-
-      if (isRight(resp)) {
-        expect(resp.right.name).toEqual(testname)
-      } else {
-        expect(false).toBeTruthy()
-      }
+      expect(resp.name).toEqual(testname)
     })
 
     it('cannot write with a signer that is not authorized', async () => {
@@ -126,11 +120,7 @@ testWithGanache('Offchain Data', (web3) => {
       await nameAccessor.write({ name: testname })
 
       const resp = await nameAccessor.read(writer)
-      if (isRight(resp)) {
-        expect(resp.right.name).toEqual(testname)
-      } else {
-        expect(false).toBeTruthy()
-      }
+      expect(resp.name).toEqual(testname)
     })
   })
 })
