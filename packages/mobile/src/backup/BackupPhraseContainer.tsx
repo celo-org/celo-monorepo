@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   },
   phraseContainer: {
     marginTop: 16,
-    backgroundColor: colors.brownFaint,
+    backgroundColor: colors.beige,
     borderRadius: 4,
     alignContent: 'center',
     justifyContent: 'center',
