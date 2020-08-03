@@ -296,6 +296,7 @@ interface InviteEventsProperties {
     escrowIncluded: boolean
   }
   [InviteEvents.invite_tx_error]: {
+    escrowIncluded: boolean
     error: string
   }
   [InviteEvents.invite_method_sms]: undefined

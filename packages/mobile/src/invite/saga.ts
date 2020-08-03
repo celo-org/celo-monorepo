@@ -153,8 +153,8 @@ export function* sendInvite(
   amount?: BigNumber,
   currency?: CURRENCY_ENUM
 ) {
+  const escrowIncluded = !!amount
   try {
-    const escrowIncluded = !!amount
     ValoraAnalytics.track(InviteEvents.invite_tx_start, { escrowIncluded })
     const web3 = yield call(getWeb3)
     const randomness = yield call(asyncRandomBytes, 64)
@@ -210,7 +210,7 @@ export function* sendInvite(
     yield put(updateE164PhoneNumberAddresses({}, addressToE164Number))
     yield call(navigateToInviteMessageApp, e164Number, inviteMode, message)
   } catch (e) {
-    ValoraAnalytics.track(InviteEvents.invite_tx_error, { error: e.message })
+    ValoraAnalytics.track(InviteEvents.invite_tx_error, { escrowIncluded, error: e.message })
     Logger.error(TAG, 'Send invite error: ', e)
     throw e
   }
