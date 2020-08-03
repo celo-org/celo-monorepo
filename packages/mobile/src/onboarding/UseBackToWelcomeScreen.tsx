@@ -52,9 +52,12 @@ export function useBackToWelcomeScreen({ backAnalyticsEvent }: Props) {
     // Check if this screen is removed while focused (hardware back button, swipe, or simply navigate back)
     // so we can reset some state
     // See https://reactnavigation.org/docs/preventing-going-back
-    const cancelBeforeRemove = navigation.addListener('beforeRemove', (e) => {
-      ValoraAnalytics.track(backAnalyticsEvent)
-      dispatch(cancelCreateOrRestoreAccount())
+    const cancelBeforeRemove = navigation.addListener('beforeRemove', (event) => {
+      const resetScreenName = (event?.data?.action?.payload as any)?.routes?.[0]?.name
+      if (resetScreenName !== Screens.DrawerNavigator) {
+        ValoraAnalytics.track(backAnalyticsEvent)
+        dispatch(cancelCreateOrRestoreAccount())
+      }
     })
 
     return () => {
