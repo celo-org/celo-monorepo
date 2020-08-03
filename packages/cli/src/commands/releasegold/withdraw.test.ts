@@ -37,7 +37,7 @@ testWithGanache('releasegold:withdraw cmd', (web3: Web3) => {
     await expect(balanceBefore.gold.toNumber()).toBeLessThan(balanceAfter.gold.toNumber())
   })
 
-  test('cant withdraw the whole balance if there is a cUSD balance', async () => {
+  test("can't withdraw the whole balance if there is a cUSD balance", async () => {
     await SetLiquidityProvision.run(['--contract', contractAddress, '--yesreally'])
     // ReleasePeriod of default contract
     await timeTravel(100000000, web3)
