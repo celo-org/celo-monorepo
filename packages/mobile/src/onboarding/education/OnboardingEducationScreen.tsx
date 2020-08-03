@@ -56,7 +56,7 @@ export default function OnboardingEducationScreen() {
 
   const onFinish = () => {
     ValoraAnalytics.track(OnboardingEvents.onboarding_education_complete)
-    navigate(Screens.JoinCelo)
+    navigate(Screens.Welcome)
   }
 
   return (

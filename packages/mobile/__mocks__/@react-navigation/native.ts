@@ -11,4 +11,6 @@ module.exports = {
     addListener: jest.fn(),
     removeListener: jest.fn(),
   }),
+  useIsFocused: () => true,
+  useFocusEffect: jest.fn(),
 }

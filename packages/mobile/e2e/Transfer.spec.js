@@ -53,8 +53,18 @@ describe('Transfer Works', () => {
     }
   })
 
-  it('Join', async () => {
-    await waitFor(element(by.id('JoinCeloContinueButton')))
+  it('Welcome', async () => {
+    await element(by.id('RestoreAccountButton')).tap()
+  })
+
+  it('Terms', async () => {
+    await element(by.id('scrollView')).scrollTo('bottom')
+    expect(element(by.id('AcceptTermsButton'))).toBeVisible()
+    await element(by.id('AcceptTermsButton')).tap()
+  })
+
+  it('Name and Number', async () => {
+    await waitFor(element(by.id('NameAndNumberContinueButton')))
       .toBeVisible()
       .withTimeout(2000)
 
@@ -67,13 +77,7 @@ describe('Transfer Works', () => {
     await expect(element(by.id('PhoneNumberField'))).toBeVisible()
     await element(by.id('PhoneNumberField')).replaceText(VERIFICATION_PHONE_NUMBER)
 
-    await element(by.id('JoinCeloContinueButton')).tap()
-  })
-
-  it('Terms', async () => {
-    await element(by.id('scrollView')).scrollTo('bottom')
-    expect(element(by.id('AcceptTermsButton'))).toBeVisible()
-    await element(by.id('AcceptTermsButton')).tap()
+    await element(by.id('NameAndNumberContinueButton')).tap()
   })
 
   it('Pin', async () => {
@@ -88,12 +92,6 @@ describe('Transfer Works', () => {
 
   // Restore existing wallet
   it('Restore Wallet Backup', async () => {
-    await waitFor(element(by.id('RestoreExistingWallet')))
-      .toBeVisible()
-      .withTimeout(8000)
-
-    await element(by.id('RestoreExistingWallet')).tap()
-
     await waitFor(element(by.id('ImportWalletBackupKeyInputField')))
       .toBeVisible()
       .withTimeout(2000)

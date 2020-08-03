@@ -1,3 +1,7 @@
+export interface MenuLink {
+  name: string
+  link: string
+}
 export const pagePaths = {
   HOME: {
     name: 'Home',
@@ -54,6 +58,10 @@ export const pagePaths = {
   JOBS: {
     name: 'Join',
     link: '/jobs',
+  },
+  MERCHANTS: {
+    name: 'MerchantKit',
+    link: '/experience/merchant',
   },
   PRIVACY: {
     name: 'Privacy Policy',

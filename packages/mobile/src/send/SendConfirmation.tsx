@@ -2,8 +2,10 @@ import ContactCircle from '@celo/react-components/components/ContactCircle'
 import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import TextButton from '@celo/react-components/components/TextButton.v2'
+import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
+import { iconHitslop } from '@celo/react-components/styles/variables'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
@@ -17,6 +19,7 @@ import { TokenTransactionType } from 'src/apollo/types'
 import BackButton from 'src/components/BackButton.v2'
 import CommentTextInput from 'src/components/CommentTextInput'
 import CurrencyDisplay, { DisplayType } from 'src/components/CurrencyDisplay'
+import Dialog from 'src/components/Dialog'
 import FeeDrawer from 'src/components/FeeDrawer'
 import InviteOptionsModal from 'src/components/InviteOptionsModal'
 import ShortenedAddress from 'src/components/ShortenedAddress'
@@ -29,7 +32,9 @@ import CalculateFee, {
 import { getFeeDollars } from 'src/fees/selectors'
 import { completePaymentRequest, declinePaymentRequest } from 'src/firebase/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import { AddressValidationType } from 'src/identity/reducer'
+import InfoIcon from 'src/icons/InfoIcon'
+import { fetchDataEncryptionKey } from 'src/identity/actions'
+import { AddressToDataEncryptionKeyType, AddressValidationType } from 'src/identity/reducer'
 import { getAddressValidationType, getSecureSendAddress } from 'src/identity/secureSend'
 import { InviteBy } from 'src/invite/actions'
 import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
@@ -49,7 +54,7 @@ import { ConfirmationInput, getConfirmationInput } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import Logger from 'src/utils/Logger'
-import { currentAccountSelector } from 'src/web3/selectors'
+import { currentAccountSelector, isDekRegisteredSelector } from 'src/web3/selectors'
 
 interface StateProps {
   account: string | null
@@ -64,6 +69,8 @@ interface StateProps {
   addressJustValidated?: boolean
   localCurrencyCode: LocalCurrencyCode
   localCurrencyExchangeRate?: string | null
+  isDekRegistered: boolean
+  addressToDataEncryptionKey: AddressToDataEncryptionKeyType
 }
 
 interface DispatchProps {
@@ -71,10 +78,12 @@ interface DispatchProps {
   fetchDollarBalance: typeof fetchDollarBalance
   declinePaymentRequest: typeof declinePaymentRequest
   completePaymentRequest: typeof completePaymentRequest
+  fetchDataEncryptionKey: typeof fetchDataEncryptionKey
 }
 
 interface State {
   modalVisible: boolean
+  encryptionDialogVisible: boolean
   buttonReset: boolean
   comment: string
 }
@@ -87,6 +96,7 @@ const mapDispatchToProps = {
   fetchDollarBalance,
   declinePaymentRequest,
   completePaymentRequest,
+  fetchDataEncryptionKey,
 }
 
 const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
@@ -119,6 +129,8 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
     addressJustValidated,
     localCurrencyCode,
     localCurrencyExchangeRate,
+    isDekRegistered: isDekRegisteredSelector(state) ?? false,
+    addressToDataEncryptionKey: state.identity.addressToDataEncryptionKey,
   }
 }
 
@@ -128,8 +140,9 @@ export const sendConfirmationScreenNavOptions = () => ({
 })
 
 export class SendConfirmation extends React.Component<Props, State> {
-  state = {
+  state: State = {
     modalVisible: false,
+    encryptionDialogVisible: false,
     buttonReset: false,
     comment: '',
   }
@@ -140,6 +153,15 @@ export class SendConfirmation extends React.Component<Props, State> {
 
     if (addressJustValidated) {
       Logger.showMessage(t('sendFlow7:addressConfirmed'))
+    }
+
+    this.triggerFetchDataEncryptionKey()
+  }
+
+  triggerFetchDataEncryptionKey = () => {
+    const address = this.props.confirmationInput.recipientAddress
+    if (address) {
+      this.props.fetchDataEncryptionKey(address)
     }
   }
 
@@ -246,7 +268,16 @@ export class SendConfirmation extends React.Component<Props, State> {
     this.setState({ comment })
   }
 
+  onShowEncryptionModal = () => {
+    this.setState({ encryptionDialogVisible: true })
+  }
+
+  onDismissEncryptionModal = () => {
+    this.setState({ encryptionDialogVisible: false })
+  }
+
   renderWithAsyncFee: CalculateFeeChildren = (asyncFee) => {
+    const { comment, modalVisible, buttonReset, encryptionDialogVisible } = this.state
     const {
       t,
       appConnected,
@@ -254,6 +285,8 @@ export class SendConfirmation extends React.Component<Props, State> {
       dollarBalance,
       confirmationInput,
       validatedRecipientAddress,
+      isDekRegistered,
+      addressToDataEncryptionKey,
     } = this.props
     const { amount, recipient, recipientAddress, type, reason } = confirmationInput
 
@@ -287,10 +320,19 @@ export class SendConfirmation extends React.Component<Props, State> {
 
     const paymentRequestComment = reason || ''
 
-    const renderFeeContainer = () => {
-      // 'fee' already contains the invitation fee for invites
-      // so we adjust it here
-      const securityFee = isInvite && fee ? fee.minus(inviteFee) : fee
+    const FeeContainer = () => {
+      let securityFee
+      let dekFee
+      if (isInvite && fee) {
+        // 'fee' already contains the invitation fee for invites
+        // so we adjust it here
+        securityFee = fee.minus(inviteFee)
+      } else if (!isDekRegistered && fee) {
+        // 'fee' contains cost for both DEK registration and
+        // send payment so we adjust it here
+        securityFee = fee.dividedBy(2)
+        dekFee = fee.dividedBy(2)
+      }
 
       ValoraAnalytics.track(FeeEvents.fee_rendered, {
         feeType: 'Security',
@@ -310,6 +352,8 @@ export class SendConfirmation extends React.Component<Props, State> {
             inviteFee={inviteFee}
             isInvite={isInvite}
             securityFee={securityFee}
+            showDekfee={!isDekRegistered}
+            dekFee={dekFee}
             feeLoading={asyncFee.loading}
             feeHasError={!!asyncFee.error}
             totalFee={fee}
@@ -319,13 +363,27 @@ export class SendConfirmation extends React.Component<Props, State> {
       )
     }
 
+    const EncryptionWarningLabel = () => {
+      const showLabel = !recipientAddress || addressToDataEncryptionKey[recipientAddress] === null
+
+      return showLabel ? (
+        <View style={styles.encryptionWarningLabelContainer}>
+          <Text style={styles.encryptionWarningLabel}>{t('encryption.warningLabel')}</Text>
+          <Touchable onPress={this.onShowEncryptionModal} borderless={true} hitSlop={iconHitslop}>
+            <InfoIcon size={12} tintColor={colors.gray3} />
+          </Touchable>
+        </View>
+      ) : null
+    }
+
     return (
       <SafeAreaView style={styles.container} edges={['bottom']}>
         <DisconnectBanner />
         <ReviewFrame
-          FooterComponent={renderFeeContainer}
+          FooterComponent={FeeContainer}
+          LabelAboveKeyboard={EncryptionWarningLabel}
           confirmButton={primaryBtnInfo}
-          shouldReset={this.state.buttonReset}
+          shouldReset={buttonReset}
           isSending={this.props.isSending}
         >
           <View style={styles.transferContainer}>
@@ -370,24 +428,33 @@ export class SendConfirmation extends React.Component<Props, State> {
               <CommentTextInput
                 testID={'send'}
                 onCommentChange={this.onCommentChange}
-                comment={this.state.comment}
+                comment={comment}
                 onBlur={this.onBlur}
               />
             )}
           </View>
           <InviteOptionsModal
-            isVisible={this.state.modalVisible}
+            isVisible={modalVisible}
             onWhatsApp={this.sendWhatsApp}
             onSMS={this.sendSMS}
             onCancel={this.cancelModal}
           />
+          {/** Encryption warning dialog */}
+          <Dialog
+            title={t('encryption.warningModalHeader')}
+            isVisible={encryptionDialogVisible}
+            actionText={t('global:dismiss')}
+            actionPress={this.onDismissEncryptionModal}
+          >
+            {t('encryption.warningModalBody')}
+          </Dialog>
         </ReviewFrame>
       </SafeAreaView>
     )
   }
 
   render() {
-    const { account, confirmationInput } = this.props
+    const { account, confirmationInput, isDekRegistered } = this.props
     if (!account) {
       throw Error('Account is required')
     }
@@ -395,7 +462,13 @@ export class SendConfirmation extends React.Component<Props, State> {
     const { amount, recipientAddress } = confirmationInput
 
     const feeProps: CalculateFeeProps = recipientAddress
-      ? { feeType: FeeType.SEND, account, recipientAddress, amount }
+      ? {
+          feeType: FeeType.SEND,
+          account,
+          recipientAddress,
+          amount,
+          includeDekFee: !isDekRegistered,
+        }
       : { feeType: FeeType.INVITE, account, amount }
 
     return (
@@ -409,7 +482,6 @@ export class SendConfirmation extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light,
     paddingHorizontal: 8,
   },
   feeContainer: {
@@ -459,6 +531,17 @@ const styles = StyleSheet.create({
   paymentRequestComment: {
     ...fontStyles.large,
     color: colors.gray5,
+  },
+  encryptionWarningLabelContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 16,
+    marginVertical: 16,
+  },
+  encryptionWarningLabel: {
+    ...fontStyles.small,
+    color: colors.gray4,
+    paddingRight: 8,
   },
 })
 

@@ -29,7 +29,7 @@ export default function CommentTextInput({ testID, onCommentChange, comment, onB
     <TextInput
       testID={`commentInput/${testID}`}
       style={styles.inputContainer}
-      autoFocus={true}
+      autoFocus={false}
       multiline={true}
       numberOfLines={5}
       maxLength={MAX_COMMENT_LENGTH}
