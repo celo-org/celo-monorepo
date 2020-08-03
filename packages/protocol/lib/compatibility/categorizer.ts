@@ -3,8 +3,7 @@ import {
   ChangeVisitor,
   ContractKindChange, DeployedBytecodeChange, MethodAddedChange,
   MethodMutabilityChange, MethodParametersChange, MethodRemovedChange,
-  MethodReturnChange, MethodVisibilityChange, NewContractChange,
-  Visibility
+  MethodReturnChange, MethodVisibilityChange, NewContractChange
 } from '@celo/protocol/lib/compatibility/ast-code'
 
 /**
@@ -32,14 +31,14 @@ export function categorize(changes: Change[], categorizer: Categorizer): Change[
 /**
  * Default implementation of {@link Categorizer}, where:
  *  Major:
- *    Mutability, Params, Return Params, Method Removed, Contract type,
- *    Visibility changes
+ *    New contract, Mutability, Params, Return Params, Method Removed, Contract type changes
  *  Minor:
- *    Method Added, New Contract, Visibility (from Public to External) changes
+ *    Method Added
  *  Patch:
- *    Bytecode (implementation) changes
+ *    Visibility, Bytecode (implementation) changes
  */
 export class DefaultCategorizer implements Categorizer {
+  onNewContract = (_change: NewContractChange): ChangeType => ChangeType.Major
   onMethodMutability = (_change: MethodMutabilityChange): ChangeType => ChangeType.Major
   onMethodParameters = (_change: MethodParametersChange): ChangeType => ChangeType.Major
   onMethodReturn = (_change: MethodReturnChange): ChangeType => ChangeType.Major
@@ -47,13 +46,7 @@ export class DefaultCategorizer implements Categorizer {
   onContractKind = (_change: ContractKindChange): ChangeType => ChangeType.Major
 
   onMethodAdded = (_change: MethodAddedChange): ChangeType => ChangeType.Minor
-  onNewContract = (_change: NewContractChange): ChangeType => ChangeType.Minor
-  onMethodVisibility = (change: MethodVisibilityChange): ChangeType => {
-    if (change.oldValue === Visibility.EXTERNAL && change.newValue === Visibility.PUBLIC) {
-      // Broader visibility, minor change
-      return ChangeType.Minor
-    }
-    return ChangeType.Major
-  }
+  // Changing between public and external visibility has no impact.
+  onMethodVisibility = (_change: MethodVisibilityChange): ChangeType => ChangeType.Patch
   onDeployedBytecode = (_change: DeployedBytecodeChange): ChangeType => ChangeType.Patch
 }

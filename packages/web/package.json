@@ -94,6 +94,7 @@
     "yiq": "^3.0.1"
   },
   "devDependencies": {
+    "@celo/flake-tracker": "0.0.1-dev",
     "@firebase/app-types": "^0.6.0",
     "@sentry/types": "^5.10.0",
     "@testing-library/dom": "^7.2.1",
