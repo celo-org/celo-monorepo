@@ -1,4 +1,5 @@
-import { isLeft } from 'fp-ts/lib/Either'
+import { chain, Either, parseJSON } from 'fp-ts/lib/Either'
+import { pipe } from 'fp-ts/lib/pipeable'
 import * as t from 'io-ts'
 import { Address } from '../../base'
 import OffchainDataWrapper, { OffchainErrors } from '../offchain-data-wrapper'
@@ -10,7 +11,7 @@ class OffchainError extends Error {
   }
 }
 type SchemaErrors = OffchainError | InvalidDataError
-type SchemaResponse<T> = { status: 'ok'; data: T } | { status: 'error'; error: SchemaErrors }
+
 export class SingleSchema<T> {
   constructor(
     readonly wrapper: OffchainDataWrapper,
@@ -32,23 +33,12 @@ export const readWithSchema = async <T>(
   type: t.Type<T>,
   account: Address,
   dataPath: string
-): Promise<SchemaResponse<T>> => {
-  const resp = await wrapper.readDataFrom(account, dataPath)
-  if (resp.status === 'error') {
-    return { status: 'error', error: new OffchainError(resp.error) }
-  }
-  let asJson: any
-  try {
-    asJson = JSON.parse(resp.data)
-  } catch (error) {
-    return { status: 'error', error: new InvalidDataError() }
-  }
-  const parseResult = type.decode(asJson)
-  if (isLeft(parseResult)) {
-    return { status: 'error', error: new InvalidDataError() }
-  }
-
-  return { status: 'ok', data: parseResult.right }
+): Promise<Either<t.Errors, T>> => {
+  return pipe(
+    await wrapper.readDataFrom(account, dataPath),
+    chain((data: string) => parseJSON(data, () => new InvalidDataError())),
+    type.decode
+  )
 }
 
 export const writeWithSchema = async <T>(

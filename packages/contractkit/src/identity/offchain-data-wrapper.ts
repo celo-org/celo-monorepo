@@ -1,11 +1,13 @@
 import { eqAddress } from '@celo/utils/lib/address'
 import { guessSigner, NativeSigner } from '@celo/utils/lib/signatureUtils'
 import debugFactory from 'debug'
+import { Either, isRight, left, right } from 'fp-ts/lib/Either'
 import { toChecksumAddress } from 'web3-utils'
 import { ContractKit } from '../kit'
 import { ClaimTypes } from './claims/types'
 import { IdentityMetadataWrapper } from './metadata'
 import { StorageWriter } from './offchain/storage-writers'
+
 const debug = debugFactory('offchaindata')
 
 class FetchError extends Error {}
@@ -19,7 +21,7 @@ export default class OffchainDataWrapper {
 
   constructor(readonly self: string, readonly kit: ContractKit) {}
 
-  async readDataFrom(account: string, dataPath: string): Promise<ReadResponse> {
+  async readDataFrom(account: string, dataPath: string): Promise<Either<OffchainErrors, string>> {
     const accounts = await this.kit.contracts.getAccounts()
     const metadataURL = await accounts.getMetadataURL(account)
     debug({ account, metadataURL })
@@ -31,9 +33,13 @@ export default class OffchainDataWrapper {
     debug({ account, storageRoots })
 
     if (storageRoots.length === 0) {
-      return { status: 'error', error: new NoStorageRootProvidedData() }
+      return left(new NoStorageRootProvidedData())
     }
-    const resp = (await Promise.all(storageRoots.map((_) => _.read(dataPath))))[0]
+    const resp = (await Promise.all(storageRoots.map((_) => _.read(dataPath)))).find(isRight)
+
+    if (resp === undefined) {
+      return left(new NoStorageRootProvidedData())
+    }
 
     return resp
   }
@@ -53,10 +59,10 @@ class StorageRoot {
   constructor(readonly account: string, readonly address: string) {}
 
   // TODO: Add decryption metadata (i.e. indicates ciphertext to be decrypted/which key to use)
-  async read(dataPath: string): Promise<ReadResponse> {
+  async read(dataPath: string): Promise<Either<OffchainErrors, string>> {
     const data = await fetch(this.address + dataPath)
     if (!data.ok) {
-      return { status: 'error', error: new FetchError() }
+      return left(new FetchError())
     }
 
     const body = await data.text()
@@ -64,19 +70,23 @@ class StorageRoot {
     const signature = await fetch(this.address + dataPath + '.signature')
 
     if (!signature.ok) {
-      return { status: 'error', error: new FetchError() }
+      return left(new FetchError())
     }
 
     // TODO: Compare against registered on-chain signers or off-chain signers
     const signer = guessSigner(body, await signature.text())
 
     if (eqAddress(signer, this.account)) {
-      return { status: 'ok', data: body }
+      return right(body)
     }
 
     // The signer might be authorized off-chain
     // TODO: Only if the signer is authorized with an on-chain key
     const resp = await this.read(`/account/authorizedSigners/${toChecksumAddress(signer)}`)
+
+    if (isRight(resp)) {
+      return right(body)
+    }
 
     return resp
   }

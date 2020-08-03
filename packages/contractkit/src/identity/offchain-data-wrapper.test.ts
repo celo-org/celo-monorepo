@@ -3,6 +3,7 @@ import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { toChecksumAddress } from '@celo/utils/lib/address'
 import { NativeSigner, serializeSignature } from '@celo/utils/lib/signatureUtils'
 import fetchMock from 'fetch-mock'
+import { isRight } from 'fp-ts/lib/Either'
 import { newKitFromWeb3 } from '../kit'
 import { AccountsWrapper } from '../wrappers/Accounts'
 import { createStorageClaim } from './claims/claim'
@@ -58,8 +59,8 @@ testWithGanache('Offchain Data', (web3) => {
 
       const resp = await nameAccessor.read(writer)
 
-      if (resp.status === 'ok') {
-        expect(resp.data.name).toEqual(testname)
+      if (isRight(resp)) {
+        expect(resp.right.name).toEqual(testname)
       } else {
         expect(false).toBeTruthy()
       }
@@ -125,8 +126,8 @@ testWithGanache('Offchain Data', (web3) => {
       await nameAccessor.write({ name: testname })
 
       const resp = await nameAccessor.read(writer)
-      if (resp.status === 'ok') {
-        expect(resp.data.name).toEqual(testname)
+      if (isRight(resp)) {
+        expect(resp.right.name).toEqual(testname)
       } else {
         expect(false).toBeTruthy()
       }
