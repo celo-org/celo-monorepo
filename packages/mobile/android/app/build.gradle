@@ -75,6 +75,8 @@ import com.android.build.OutputFile
 
 project.ext.react = [
         enableHermes: true,  // clean and rebuild if changing
+        hermesFlagsRelease: ["-w", "-O", "-output-source-map"],
+        hermesFlagsDebug: ["-w", "-O", "-output-source-map"],
         bundleInIntegration: true,
         devDisabledInIntegration: true,
         bundleInAlfajores: true,
