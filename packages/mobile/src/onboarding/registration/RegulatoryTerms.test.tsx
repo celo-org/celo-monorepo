@@ -3,7 +3,6 @@ import 'react-native'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import { PincodeType } from 'src/account/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import RegulatoryTerms, {
@@ -32,45 +31,22 @@ describe('RegulatoryTermsScreen', () => {
       const acceptTerms = jest.fn()
       const wrapper = render(
         <Provider store={store}>
-          <RegulatoryTermsClass
-            pincodeType={PincodeType.Unset}
-            {...getMockI18nProps()}
-            acceptTerms={acceptTerms}
-          />
+          <RegulatoryTermsClass {...getMockI18nProps()} acceptTerms={acceptTerms} />
         </Provider>
       )
       fireEvent.press(wrapper.getByTestId('AcceptTermsButton'))
       expect(acceptTerms).toHaveBeenCalled()
     })
-    it('navigates to PincodeSet when pin has not been set', () => {
+    it('navigates to NameAndNumber', () => {
       const store = createMockStore({})
       const acceptTerms = jest.fn()
       const wrapper = render(
         <Provider store={store}>
-          <RegulatoryTermsClass
-            pincodeType={PincodeType.Unset}
-            {...getMockI18nProps()}
-            acceptTerms={acceptTerms}
-          />
+          <RegulatoryTermsClass {...getMockI18nProps()} acceptTerms={acceptTerms} />
         </Provider>
       )
       fireEvent.press(wrapper.getByTestId('AcceptTermsButton'))
-      expect(navigate).toHaveBeenCalledWith(Screens.PincodeSet)
-    })
-    it('navigates to EnterInviteCode when pin has been set', () => {
-      const store = createMockStore({})
-      const acceptTerms = jest.fn()
-      const wrapper = render(
-        <Provider store={store}>
-          <RegulatoryTermsClass
-            pincodeType={PincodeType.CustomPin}
-            {...getMockI18nProps()}
-            acceptTerms={acceptTerms}
-          />
-        </Provider>
-      )
-      fireEvent.press(wrapper.getByTestId('AcceptTermsButton'))
-      expect(navigate).toHaveBeenCalledWith(Screens.EnterInviteCode)
+      expect(navigate).toHaveBeenCalledWith(Screens.NameAndNumber)
     })
   })
 })

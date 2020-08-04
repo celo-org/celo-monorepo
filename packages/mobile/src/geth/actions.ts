@@ -6,7 +6,7 @@ export enum Actions {
   CANCEL_GETH_SAGA = 'GETH/CANCEL_GETH_SAGA',
 }
 
-interface SetInitStateAction {
+export interface SetInitStateAction {
   type: Actions.SET_INIT_STATE
   state: InitializationState
 }
@@ -20,7 +20,7 @@ export const cancelGethSaga = () => ({
   type: Actions.CANCEL_GETH_SAGA,
 })
 
-interface SetGethConnectedAction {
+export interface SetGethConnectedAction {
   type: Actions.SET_GETH_CONNECTED
   connected: boolean
 }

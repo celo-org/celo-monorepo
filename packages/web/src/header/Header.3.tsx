@@ -26,6 +26,8 @@ const CookieConsent = dynamic(
 )
 
 const menuItems = MAIN_MENU
+const mobileMenu = [menu.HOME, ...MAIN_MENU]
+
 const DARK_PAGES = new Set([
   menu.BUILD.link,
   menu.ALLIANCE_COLLECTIVE.link,
@@ -279,7 +281,7 @@ export class Header extends React.PureComponent<Props, State> {
         {this.state.mobileMenuActive && (
           <View style={styles.menuActive}>
             <View style={styles.mobileOpenContainer}>
-              <MobileMenu currentPage={this.props.router.pathname} />
+              <MobileMenu currentPage={this.props.router.pathname} menu={mobileMenu} />
             </View>
           </View>
         )}

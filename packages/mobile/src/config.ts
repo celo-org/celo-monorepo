@@ -53,10 +53,6 @@ export const DEFAULT_TESTNET = Config.DEFAULT_TESTNET || 'integration'
 export const DAILY_PAYMENT_LIMIT_CUSD = 500
 export const SMS_RETRIEVER_APP_SIGNATURE = Config.SMS_RETRIEVER_APP_SIGNATURE
 
-// LINKS
-export const CELO_VERIFIER_DOWNLOAD_LINK = 'https://celo.org/rewards'
-export const CELO_VERIFIER_START_MINING_LINK = 'celo://verifier/start'
-
 // TODO: remove special case for mainnet
 export const DEFAULT_FORNO_URL = `https://${
   DEFAULT_TESTNET === 'mainnet' ? 'rc1' : DEFAULT_TESTNET
@@ -64,7 +60,6 @@ export const DEFAULT_FORNO_URL = `https://${
 
 // FEATURE FLAGS
 export const FIREBASE_ENABLED = stringToBoolean(Config.FIREBASE_ENABLED || 'true')
-export const PROMOTE_REWARDS_APP = false
 export const SHOW_TESTNET_BANNER = stringToBoolean(Config.SHOW_TESTNET_BANNER || 'false')
 export const SHOW_GET_INVITE_LINK = stringToBoolean(Config.SHOW_GET_INVITE_LINK || 'false')
 export const FORNO_ENABLED_INITIALLY = Config.FORNO_ENABLED_INITIALLY
@@ -73,12 +68,14 @@ export const FORNO_ENABLED_INITIALLY = Config.FORNO_ENABLED_INITIALLY
 export const DEFAULT_SYNC_MODE: GethSyncMode = Config.DEFAULT_SYNC_MODE
   ? new BigNumber(Config.DEFAULT_SYNC_MODE).toNumber()
   : GethSyncMode.Lightest
-// TODO Remove when feature is stable
-export const USE_PHONE_NUMBER_PRIVACY = true
-export const USE_FULL_NODE_DISCOVERY = true
-export const SHOW_CASH_OUT = stringToBoolean(Config.SHOW_CASH_OUT || 'false')
 
 // SECRETS
 export const SEGMENT_API_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SEGMENT_API_KEY')
 export const FIREBASE_WEB_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'FIREBASE_WEB_KEY')
 export const SENTRY_URL = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SENTRY_URL')
+export const MOONPAY_PUBLIC_KEY = keyOrUndefined(
+  secretsFile,
+  Config.SECRETS_KEY,
+  'MOONPAY_PUBLIC_KEY'
+)
+export const MOONPAY_RATE_API = `https://api.moonpay.io/v3/currencies/celo/price?apiKey=${MOONPAY_PUBLIC_KEY}`

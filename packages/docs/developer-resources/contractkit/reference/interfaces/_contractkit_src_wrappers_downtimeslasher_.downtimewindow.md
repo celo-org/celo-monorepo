@@ -18,7 +18,7 @@
 
 • **end**: *number*
 
-*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L25)*
+*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L27)*
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **length**: *number*
 
-*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L26)*
+*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L28)*
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **start**: *number*
 
-*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L24)*
+*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L26)*

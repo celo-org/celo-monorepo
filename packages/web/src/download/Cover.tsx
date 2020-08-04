@@ -2,8 +2,8 @@ import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import AppLogo from 'src/download/AppLogo'
 import PhoneIllo from 'src/download/PhoneIllo'
-import { RequestType } from 'src/fauceting/FaucetInterfaces'
-import RequestFunds from 'src/fauceting/RequestFunds'
+// import { RequestType } from 'src/fauceting/FaucetInterfaces'
+// import RequestFunds from 'src/fauceting/RequestFunds'
 import { H1, H4 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
@@ -41,7 +41,7 @@ export default withScreenSize(
               <H4 style={[textStyles.invert, isMobile && textStyles.center]}>
                 {t('coverSubTitle')}
               </H4>
-              <RequestFunds kind={RequestType.Invite} />
+              {/* <RequestFunds kind={RequestType.Invite} /> */}
             </View>
             <View style={[standardStyles.centered, styles.flex1, phoneStyle(screen)]}>
               <PhoneIllo />

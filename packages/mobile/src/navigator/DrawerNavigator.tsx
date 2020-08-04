@@ -20,6 +20,7 @@ import {
   DrawerNavigationState,
   useLinkBuilder,
 } from '@react-navigation/native'
+import { TransitionPresets } from '@react-navigation/stack'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
@@ -185,7 +186,7 @@ export default function DrawerNavigator() {
       drawerContent={drawerContent}
       backBehavior={'initialRoute'}
       drawerContentOptions={{
-        labelStyle: [fontStyles.regular, { marginLeft: -20 }],
+        labelStyle: [fontStyles.regular, { marginLeft: -20, fontWeight: 'normal' }],
         activeBackgroundColor: colorsV2.gray2,
       }}
     >
@@ -204,7 +205,11 @@ export default function DrawerNavigator() {
         <Drawer.Screen
           name={Screens.GoldEducation}
           component={GoldEducation}
-          options={{ title: t('celoGold'), drawerIcon: Gold }}
+          options={{
+            title: t('celoGold'),
+            drawerIcon: Gold,
+            ...TransitionPresets.ModalTransition,
+          }}
         />
       )}
       <Drawer.Screen
