@@ -1,10 +1,4 @@
 import CountryData from 'country-data'
-// import {
-//   PhoneNumber,
-//   PhoneNumberFormat,
-//   PhoneNumberType,
-//   PhoneNumberUtil,
-// } from 'google-libphonenumber'
 import {
   CountryCode,
   getCountries,
