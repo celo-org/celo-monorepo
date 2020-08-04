@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     willChange: 'transform, opacity',
     transitionProperty: 'opacity',
     transitionDuration: '4s',
-    transformOrigin: 'center',
+    transformOrigin: 'bottom',
     justifyContent: 'center',
   },
   mobileRoot: {
@@ -107,29 +107,30 @@ const styles = StyleSheet.create({
     ],
   },
 })
+
 const COLOR_OPACITY = {
-  inputRange: [0, 0.1, 0.15, 0.2],
-  outputRange: [1, 1, 0.1, 0],
+  inputRange: [0, 0.15, 0.25],
+  outputRange: [1, 1, 0.1],
 }
 
 const COLOR_OPACITY_MOBILE = {
-  inputRange: [0, 0.15, 0.2],
+  inputRange: [0, 0.4, 0.5],
   outputRange: [1, 0.1, 0],
 }
 
 const OUTLINE_OPACITY = {
-  inputRange: [0, 0.05, 0.175, 0.3],
-  outputRange: [0, 0, 1, 0],
+  inputRange: [0, 0.1, 0.3, 0.4],
+  outputRange: [0, 1, 1, 0],
 }
 
 const OUTLINE_OPACITY_MOBILE = {
   inputRange: [0, 0.05, 0.175, 0.2],
-  outputRange: [0, 0, 1, 0],
+  outputRange: [0, 0, 1, 1],
 }
 
 const SCALER_DESKTOP = {
-  inputRange: [0, 0.1, 0.2, 0.3, 1],
-  outputRange: [1, 0.5, 0.5, 0.35, 0.3],
+  inputRange: [0, 0.1, 0.5],
+  outputRange: [1, 0.75, 0.1],
 }
 
 const SCALER_MOBILE = {
@@ -138,8 +139,8 @@ const SCALER_MOBILE = {
 }
 
 const POSITIONING_DESKTOP = {
-  inputRange: [0, 0.1, 0.2, 0.35, 1],
-  outputRange: ['0%', '0%', '50%', '150%', '300%'],
+  inputRange: [0, 0.1, 0.5],
+  outputRange: ['0%', '1%', '30%'],
 }
 
 const POSITIONING_MOBILE = {
