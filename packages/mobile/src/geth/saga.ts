@@ -211,6 +211,7 @@ export function* initGethSaga() {
   }
 }
 
+// Create a channel wrapped around the native event emitter for new blocks.
 function createNewBlockChannel() {
   return eventChannel((emit: any) => {
     const eventSubscription = gethEmitter.addListener('GethNewHead', emit)
