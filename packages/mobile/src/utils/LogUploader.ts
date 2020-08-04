@@ -47,8 +47,6 @@ export default class FirebaseLogUploader {
   ): Promise<void> {
     const tmpFilePath = logFilePath + '.tmp'
     await RNFS.moveFile(logFilePath, tmpFilePath)
-    // Don't "await" here. While everything else in this async method is relatively fast, data upload can be slow
-    // and we don't want to block the user from using the app.
     FirebaseLogUploader.uploadLogsToFirebaseStorage(tmpFilePath, uploadPath, uploadFileName).catch()
   }
 
