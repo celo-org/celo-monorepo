@@ -11,6 +11,7 @@ import { authenticateUser } from '../common/identity'
 import {
   hasValidAccountParam,
   hasValidQueryPhoneNumberParam,
+  hasValidTimestamp,
   isBodyReasonablySized,
   phoneNumberHashIsValidIfExists,
 } from '../common/input-validation'
@@ -25,6 +26,7 @@ interface GetBlindedMessageForSaltRequest {
   account: string
   blindedQueryPhoneNumber: string
   hashedPhoneNumber?: string
+  timestamp?: number
 }
 
 export async function handleGetBlindedMessageForSalt(
@@ -112,6 +114,7 @@ function isValidGetSignatureInput(requestBody: GetBlindedMessageForSaltRequest):
     hasValidAccountParam(requestBody) &&
     hasValidQueryPhoneNumberParam(requestBody) &&
     phoneNumberHashIsValidIfExists(requestBody) &&
-    isBodyReasonablySized(requestBody)
+    isBodyReasonablySized(requestBody) &&
+    hasValidTimestamp(requestBody)
   )
 }

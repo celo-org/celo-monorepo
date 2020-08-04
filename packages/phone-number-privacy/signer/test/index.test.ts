@@ -1,5 +1,6 @@
 import request from 'supertest'
 import { computeBlindedSignature } from '../src/bls/bls-cryptography-client'
+import { REQUEST_EXPIRY_WINDOW } from '../src/common/constants'
 import { authenticateUser } from '../src/common/identity'
 import { DEV_PRIVATE_KEY, getVersion } from '../src/config'
 import {
@@ -47,11 +48,13 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
     const blindedQueryPhoneNumber = '+5555555555'
     const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
     const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
+    const timestamp = Date.now()
 
     const mockRequestData = {
       blindedQueryPhoneNumber,
       hashedPhoneNumber,
       account,
+      timestamp,
     }
 
     it('provides signature', (done) => {
@@ -108,11 +111,13 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
       const blindedQueryPhoneNumber = '+5555555555'
       const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
       const account = 'd31509C31d654056A45185ECb6'
+      const timestamp = Date.now()
 
       const mockRequestData = {
         blindedQueryPhoneNumber,
         hashedPhoneNumber,
         account,
+        timestamp,
       }
 
       request(app)
@@ -125,11 +130,32 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
       const blindedQueryPhoneNumber = '+5555555555'
       const hashedPhoneNumber = '+1234567890'
       const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
+      const timestamp = Date.now()
 
       const mockRequestData = {
         blindedQueryPhoneNumber,
         hashedPhoneNumber,
         account,
+        timestamp,
+      }
+
+      request(app)
+        .post('/getBlindedSalt')
+        .send(mockRequestData)
+        .expect(400, done)
+    })
+
+    it('expired timestamp returns 400', (done) => {
+      const blindedQueryPhoneNumber = '+5555555555'
+      const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
+      const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
+      const timestamp = Date.now() - REQUEST_EXPIRY_WINDOW
+
+      const mockRequestData = {
+        blindedQueryPhoneNumber,
+        hashedPhoneNumber,
+        account,
+        timestamp,
       }
 
       request(app)
