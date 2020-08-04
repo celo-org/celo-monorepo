@@ -5,7 +5,7 @@ import { GAS_INFLATION_FACTOR } from 'src/config'
 import Logger from 'src/utils/Logger'
 import { getWeb3, getWeb3Async } from 'src/web3/contracts'
 import { Tx } from 'web3-core'
-import { TransactionObject } from 'web3-eth'
+import { BlockHeader, TransactionObject } from 'web3-eth'
 
 const TAG = 'web3/utils'
 

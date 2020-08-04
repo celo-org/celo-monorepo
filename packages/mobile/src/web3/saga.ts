@@ -34,7 +34,7 @@ import {
 import { destroyContractKit, getWallet, getWeb3, initContractKit } from 'src/web3/contracts'
 import { createAccountDek } from 'src/web3/dataEncryptionKey'
 import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
-import { getLatestBlock, blockIsFresh } from 'src/web3/utils'
+import { blockIsFresh, getLatestBlock } from 'src/web3/utils'
 import { BlockHeader } from 'web3-eth'
 
 const TAG = 'web3/saga'

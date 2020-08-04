@@ -10,7 +10,6 @@ import {
   setChainHead,
   setGethConnected,
   SetGethConnectedAction,
-  SetChainHeadAction,
   setInitState,
   SetInitStateAction,
 } from 'src/geth/actions'
@@ -232,7 +231,7 @@ function* monitorGeth() {
           timeout: delay(NEW_BLOCK_TIMEOUT),
         })
         if (newBlock) {
-          chainHead = {
+          const chainHead = {
             number: newBlock.number,
             hash: newBlock.hash,
             timestamp: Number(
