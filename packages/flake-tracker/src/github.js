@@ -77,7 +77,7 @@ class GitHub {
 
   async createIssue(flake) {
     if (!process.env.CIRCLECI) return
-    flake.body = 'Discovered in commit ' + process.env.CIRCLE_SHA1 + '\n\n' + flake.body + '\n'
+    flake.body = 'Discovered at commit ' + process.env.CIRCLE_SHA1 + '\n\n' + flake.body + '\n'
     const fn = () =>
       this.rest.issues.create({
         ...defaults,
