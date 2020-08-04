@@ -24,6 +24,7 @@ import { Actions as ImportActions } from 'src/import/actions'
 import { importBackupPhraseSaga } from 'src/import/saga'
 import { moveAllFundsFromAccount } from 'src/invite/saga'
 import { removeAccountLocally } from 'src/pincode/authentication'
+import { persistor } from 'src/redux/store'
 import { restartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
@@ -110,7 +111,8 @@ function* clearStoredAccountSaga({ account }: ClearStoredAccountAction) {
     yield call(firebaseSignOut, firebase.app())
     // TODO: Remove the account from geth.
 
-    yield call(() => setTimeout(() => restartApp(), 2000))
+    yield call(persistor.flush)
+    yield call(restartApp)
   } catch (error) {
     Logger.info(TAG + '@clearStoredAccount', 'Error while removing account', error)
   }
