@@ -97,6 +97,12 @@ async function createNewGeth(sync: boolean = true): Promise<typeof RNGeth> {
     useLightweightKDF: true,
     ipcPath: IPC_PATH,
     noDiscovery: !USE_FULL_NODE_DISCOVERY,
+    httpHost: '0.0.0.0',
+    httpPort: 8545,
+    httpVirtualHosts: ['*'].join(','),
+    httpModules: ['rpc', 'txpool', 'admin', 'istanbul', 'les', 'net', 'web3', 'debug', 'eth'].join(
+      ','
+    ),
   }
 
   if (USE_FULL_NODE_DISCOVERY) {
