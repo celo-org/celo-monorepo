@@ -2,7 +2,6 @@ import { eqAddress, findAddressIndex, normalizeAddress } from '@celo/utils/lib/a
 import { concurrentMap, concurrentValuesMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
-import { range } from 'lodash'
 import { EventLog } from 'web3-core'
 import { Address, NULL_ADDRESS } from '../base'
 import { Election } from '../generated/Election'
@@ -19,6 +18,8 @@ import {
   valueToInt,
 } from './BaseWrapper'
 import { Validator, ValidatorGroup } from './Validators'
+
+const range = (to: number) => Array.from(Array(to).keys())
 
 export interface ValidatorGroupVote {
   address: Address
@@ -151,7 +152,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    */
   async getValidatorSigners(blockNumber: number): Promise<Address[]> {
     const numValidators = await this.numberValidatorsInSet(blockNumber)
-    return concurrentMap(10, range(0, numValidators, 1), (i: number) =>
+    return concurrentMap(10, range(numValidators), (i: number) =>
       this.validatorSignerAddressFromSet(i, blockNumber)
     )
   }
