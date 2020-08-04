@@ -578,6 +578,14 @@ interface NetworkEventsProperties {
   [NetworkEvents.network_disconnected]: {
     fornoMode: boolean
   }
+  [NetworkEvents.network_sync_lost]: {
+    latestBlock: number
+    latestTimestamp: number
+  }
+  [NetworkEvents.network_sync_restored]: {
+    latestBlock: number
+    latestTimestamp: number
+  }
   [NetworkEvents.network_sync_waiting]: undefined
   [NetworkEvents.network_sync_start]: {
     startingBlock: number

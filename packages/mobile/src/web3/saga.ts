@@ -34,8 +34,8 @@ import {
 import { destroyContractKit, getWallet, getWeb3, initContractKit } from 'src/web3/contracts'
 import { createAccountDek } from 'src/web3/dataEncryptionKey'
 import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
-import { getLatestBlock } from 'src/web3/utils'
-import { Block } from 'web3-eth'
+import { getLatestBlock, blockIsFresh } from 'src/web3/utils'
+import { BlockHeader } from 'web3-eth'
 
 const TAG = 'web3/saga'
 
@@ -44,12 +44,6 @@ const MNEMONIC_BIT_LENGTH = MnemonicStrength.s256_24words
 export const SYNC_TIMEOUT = 2 * 60 * 1000 // 2 minutes
 const SWITCH_TO_FORNO_TIMEOUT = 15000 // if syncing takes >15 secs, suggest switch to forno
 const WEB3_MONITOR_DELAY = 100
-const BLOCK_AGE_LIMIT = 30 // if the latest block is older than 30 seconds, the node is not synced.
-
-// Returns true if the block was produced within the block age limit.
-function blockIsFresh(block: Block) {
-  return Math.round(Date.now() / 1000) - Number(block.timestamp) < BLOCK_AGE_LIMIT
-}
 
 enum SyncStatus {
   UNKNOWN,
@@ -74,7 +68,7 @@ export function* checkWeb3SyncProgress() {
       if (typeof syncProgress === 'boolean' && !syncProgress) {
         Logger.debug(TAG, 'checkWeb3SyncProgress', 'Sync maybe complete, checking')
 
-        const latestBlock: Block = yield call(getLatestBlock)
+        const latestBlock: BlockHeader = yield call(getLatestBlock)
         if (latestBlock && blockIsFresh(latestBlock)) {
           yield put(completeWeb3Sync(latestBlock.number))
           Logger.debug(TAG, 'checkWeb3SyncProgress', 'Sync is complete')

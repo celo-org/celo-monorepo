@@ -290,6 +290,10 @@ export enum NetworkEvents {
   network_connected = 'network_connected',
   network_disconnected = 'network_disconnected',
 
+  // Events triggered when the app detects it loses or restores sync with the Celo network.
+  network_sync_lost = 'network_sync_lost',
+  network_sync_restored = 'network_sync_restored',
+
   // Events triggered during a syncing or waiting to start syncing.
   network_sync_waiting = 'network_sync_waiting',
   network_sync_start = 'network_sync_start',
