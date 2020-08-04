@@ -5,6 +5,7 @@ import { colors, fonts, textStyles } from 'src/styles'
 
 interface Props {
   href?: string
+  onPress?: () => void
   children: React.ReactNode
   style?: any
 }
@@ -24,7 +25,7 @@ function usePressable() {
     setPressing(true)
   }
   const onMouseUp = () => {
-    setPressing(true)
+    setPressing(false)
   }
   return {
     onMouseEnter,
@@ -36,14 +37,14 @@ function usePressable() {
   }
 }
 
-export default function LightButon({ href, children, style }: Props) {
+export default function LightButon({ href, children, style, onPress }: Props) {
   const {
     onMouseEnter,
     onMouseLeave,
     onMouseDown,
     onMouseUp,
-    // isPressing,
-    // isHovering
+    isPressing,
+    isHovering,
   } = usePressable()
   return (
     <Hoverable
@@ -51,8 +52,19 @@ export default function LightButon({ href, children, style }: Props) {
       onHoverOut={onMouseLeave}
       onPressDown={onMouseDown}
       onPressUp={onMouseUp}
+      onPress={onPress}
     >
-      <Text style={[styles.root, fonts.mini, textStyles.heavy, style]} href={href}>
+      <Text
+        style={[
+          styles.root,
+          fonts.mini,
+          textStyles.heavy,
+          style,
+          isHovering && styles.hover,
+          isPressing && styles.pressing,
+        ]}
+        href={href}
+      >
         {children}
       </Text>
     </Hoverable>
@@ -62,12 +74,24 @@ export default function LightButon({ href, children, style }: Props) {
 const styles = StyleSheet.create({
   root: {
     borderRadius: 4,
-    backgroundColor: '#edeeef',
+    backgroundColor: colors.lightGray,
     color: colors.dark,
     paddingHorizontal: 7,
+    borderWidth: 1,
+    borderColor: colors.lightGray,
     paddingVertical: 9,
     cursor: 'pointer',
     alignItems: 'center',
     display: 'inline-flex',
+    transitionProperty: 'background-color, border',
+    transitionDuration: '300ms',
+  },
+  hover: {
+    backgroundColor: colors.white,
+    borderColor: colors.dark,
+  },
+  pressing: {
+    borderColor: colors.white,
+    backgroundColor: colors.lightGray,
   },
 })

@@ -4,9 +4,10 @@ import { H4 } from 'src/fonts/Fonts'
 import { textStyles, fonts, standardStyles, colors } from 'src/styles'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import LightButon from './LightButton'
-import TwitterLogo from 'src/icons/TwitterLogo'
+import { TweetLogo } from 'src/icons/TwitterLogo'
 import Chainlink from 'src/icons/Chainlink'
 import { useScreenSize } from 'src/layout/ScreenSize'
+import { copyToClipboad } from 'src/utils/utils'
 
 export default function SideBar({ isOpen }) {
   const { isMobile } = useScreenSize()
@@ -42,9 +43,9 @@ export default function SideBar({ isOpen }) {
           />
           <View style={[standardStyles.row, standardStyles.elementalMargin]}>
             <LightButon>
-              <TwitterLogo height={14} color={colors.dark} /> Tweet
+              <TweetLogo height={14} color={colors.dark} /> Tweet
             </LightButon>
-            <LightButon style={{ marginLeft: 10 }}>
+            <LightButon onPress={copyURL} style={styles.copyButton}>
               <Chainlink size={16} color={colors.dark} /> Copy
             </LightButon>
           </View>
@@ -58,6 +59,10 @@ export default function SideBar({ isOpen }) {
       </View>
     </>
   )
+}
+
+function copyURL() {
+  copyToClipboad(window.location.href)
 }
 
 function Contributor({ role, name }) {
@@ -117,4 +122,5 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: colors.dark,
   },
+  copyButton: { marginLeft: 10 },
 })
