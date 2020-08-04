@@ -2,28 +2,20 @@ import { isLeft } from 'fp-ts/lib/Either'
 import { PathReporter } from 'io-ts/lib/PathReporter'
 import * as RNFS from 'react-native-fs'
 import Share from 'react-native-share'
-import { call, put, select } from 'redux-saga/effects'
+import { call, put } from 'redux-saga/effects'
 import { showMessage } from 'src/alert/actions'
 import { SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { validateRecipientAddressSuccess } from 'src/identity/actions'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
-import { convertLocalAmountToDollars } from 'src/localCurrency/convert'
-import { fetchExchangeRate } from 'src/localCurrency/saga'
-import { getLocalCurrencyCode } from 'src/localCurrency/selectors'
 import { replace } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { qrDataFromJson } from 'src/qrcode/schema'
-import {
-  getRecipientFromAddress,
-  NumberToRecipient,
-  RecipientKind,
-  RecipientWithQrCode,
-} from 'src/recipients/recipient'
-import { QrCode, storeLatestInRecents, SVG } from 'src/send/actions'
+import { QrData, qrDataFromJson } from 'src/qrcode/schema'
+import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
+import { QrCode, SVG } from 'src/send/actions'
 import { TransactionDataInput } from 'src/send/SendAmount'
+import { handleSendPaymentData } from 'src/send/utils'
 import Logger from 'src/utils/Logger'
 
 export enum BarcodeTypes {
@@ -122,7 +114,7 @@ export function* handleBarcode(
     yield put(showMessage(PathReporter.report(maybeQrData)[0]))
     return
   }
-  const qrData = maybeQrData.right
+  const qrData: QrData = maybeQrData.right
 
   Logger.warn(TAG, 'QR succeeded with ' + JSON.stringify(qrData))
 
@@ -137,25 +129,7 @@ export function* handleBarcode(
     if (!success) {
       return
     }
-  }
 
-  const cachedRecipient = getRecipientFromAddress(
-    qrData.address,
-    addressToE164Number,
-    recipientCache
-  )
-  const recipient: RecipientWithQrCode = {
-    kind: RecipientKind.QrCode,
-    address: qrData.address,
-    displayId: qrData.e164PhoneNumber,
-    displayName: qrData.displayName || 'QR Code',
-    phoneNumberLabel: cachedRecipient?.phoneNumberLabel,
-    thumbnailPath: cachedRecipient?.thumbnailPath,
-    contactId: cachedRecipient?.contactId,
-  }
-  yield put(storeLatestInRecents(recipient))
-
-  if (secureSendTxData) {
     if (isOutgoingPaymentRequest) {
       replace(Screens.PaymentRequestConfirmation, {
         transactionData: secureSendTxData,
@@ -167,23 +141,13 @@ export function* handleBarcode(
         addressJustValidated: true,
       })
     }
-  } else {
-    if (qrData.amount) {
-      const preferredCurrencyCode = yield select(getLocalCurrencyCode)
-      const exchangeRate = yield call(
-        fetchExchangeRate,
-        qrData.currencyCode || preferredCurrencyCode
-      )
-      const amount = convertLocalAmountToDollars(qrData.amount, exchangeRate)!
-      const transactionData: TransactionDataInput = {
-        recipient,
-        amount,
-        reason: qrData.comment,
-        type: TokenTransactionType.PayRequest,
-      }
-      replace(Screens.SendConfirmation, { transactionData, isFromScan: true })
-    } else {
-      replace(Screens.SendAmount, { recipient, isFromScan: true, isOutgoingPaymentRequest })
-    }
   }
+
+  const cachedRecipient = getRecipientFromAddress(
+    qrData.address,
+    addressToE164Number,
+    recipientCache
+  )
+
+  yield call(handleSendPaymentData, qrData, cachedRecipient)
 }

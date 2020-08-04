@@ -1,5 +1,8 @@
 import BigNumber from 'bignumber.js'
-import { showError } from 'src/alert/actions'
+import { isLeft } from 'fp-ts/lib/Either'
+import { PathReporter } from 'io-ts/lib/PathReporter'
+import { call, put, select } from 'redux-saga/effects'
+import { showError, showMessage } from 'src/alert/actions'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ALERT_BANNER_DURATION, DAILY_PAYMENT_LIMIT_CUSD } from 'src/config'
@@ -7,12 +10,25 @@ import { FeeType } from 'src/fees/actions'
 import { getAddressFromPhoneNumber } from 'src/identity/contactMapping'
 import { E164NumberToAddressType, SecureSendPhoneNumberMapping } from 'src/identity/reducer'
 import { RecipientVerificationStatus } from 'src/identity/types'
-import { LocalCurrencySymbol } from 'src/localCurrency/consts'
-import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
-import { Recipient, RecipientKind } from 'src/recipients/recipient'
+import { selectPreferredCurrency } from 'src/localCurrency/actions'
+import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
+import { convertDollarsToLocalAmount, convertLocalAmountToDollars } from 'src/localCurrency/convert'
+import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
+import { replace } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
+import { QrData, qrDataFromJson } from 'src/qrcode/schema'
+import {
+  Recipient,
+  RecipientKind,
+  RecipientWithContact,
+  RecipientWithQrCode,
+} from 'src/recipients/recipient'
+import { storeLatestInRecents } from 'src/send/actions'
 import { PaymentInfo } from 'src/send/reducers'
 import { TransactionDataInput } from 'src/send/SendAmount'
+import Logger from 'src/utils/Logger'
 import { timeDeltaInHours } from 'src/utils/time'
+import { parse } from 'url'
 
 export interface ConfirmationInput {
   recipient: Recipient
@@ -104,4 +120,52 @@ export function showLimitReachedError(
   }
 
   return showError(ErrorMessages.PAYMENT_LIMIT_REACHED, ALERT_BANNER_DURATION, translationParams)
+}
+
+export function* handleSendPaymentData(data: QrData, cachedRecipient?: RecipientWithContact) {
+  const recipient: RecipientWithQrCode = {
+    kind: RecipientKind.QrCode,
+    address: data.address,
+    displayId: data.e164PhoneNumber,
+    displayName: data.displayName || cachedRecipient?.displayName || 'QR Code',
+    phoneNumberLabel: cachedRecipient?.phoneNumberLabel,
+    thumbnailPath: cachedRecipient?.thumbnailPath,
+    contactId: cachedRecipient?.contactId,
+  }
+  yield put(storeLatestInRecents(recipient))
+
+  if (data.currencyCode) {
+    yield put(selectPreferredCurrency(data.currencyCode as LocalCurrencyCode))
+  }
+
+  if (data.amount) {
+    const exchangeRate = yield select(getLocalCurrencyExchangeRate)
+    const amount = convertLocalAmountToDollars(data.amount, exchangeRate)
+    if (!amount) {
+      Logger.warn('handleSendPaymentData', 'null amount')
+      return
+    }
+    const transactionData: TransactionDataInput = {
+      recipient,
+      amount,
+      reason: data.comment,
+      type: TokenTransactionType.PayRequest,
+    }
+    replace(Screens.SendConfirmation, { transactionData, isFromScan: true })
+  } else {
+    replace(Screens.SendAmount, { recipient, isFromScan: true })
+  }
+}
+
+export function* handlePaymentDeeplink(deeplink: string) {
+  const parsed = parse(deeplink, true)
+  const maybeData = qrDataFromJson(parsed.query)
+  if (isLeft(maybeData)) {
+    yield put(showMessage(PathReporter.report(maybeData)[0]))
+    return
+  }
+  const paymentData: QrData = maybeData.right
+
+  Logger.warn('handlePaymentDeepLink', 'Deeplink succeeded with ' + JSON.stringify(paymentData))
+  yield call(handleSendPaymentData, paymentData)
 }
