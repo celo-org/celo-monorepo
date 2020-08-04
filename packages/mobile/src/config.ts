@@ -53,10 +53,6 @@ export const DEFAULT_TESTNET = Config.DEFAULT_TESTNET || 'integration'
 export const DAILY_PAYMENT_LIMIT_CUSD = 500
 export const SMS_RETRIEVER_APP_SIGNATURE = Config.SMS_RETRIEVER_APP_SIGNATURE
 
-// LINKS
-export const CELO_VERIFIER_DOWNLOAD_LINK = 'https://celo.org/rewards'
-export const CELO_VERIFIER_START_MINING_LINK = 'celo://verifier/start'
-
 // TODO: remove special case for mainnet
 export const DEFAULT_FORNO_URL = `https://${
   DEFAULT_TESTNET === 'mainnet' ? 'rc1' : DEFAULT_TESTNET
@@ -64,7 +60,6 @@ export const DEFAULT_FORNO_URL = `https://${
 
 // FEATURE FLAGS
 export const FIREBASE_ENABLED = stringToBoolean(Config.FIREBASE_ENABLED || 'true')
-export const PROMOTE_REWARDS_APP = false
 export const SHOW_TESTNET_BANNER = stringToBoolean(Config.SHOW_TESTNET_BANNER || 'false')
 export const SHOW_GET_INVITE_LINK = stringToBoolean(Config.SHOW_GET_INVITE_LINK || 'false')
 export const FORNO_ENABLED_INITIALLY = Config.FORNO_ENABLED_INITIALLY
@@ -73,8 +68,6 @@ export const FORNO_ENABLED_INITIALLY = Config.FORNO_ENABLED_INITIALLY
 export const DEFAULT_SYNC_MODE: GethSyncMode = Config.DEFAULT_SYNC_MODE
   ? new BigNumber(Config.DEFAULT_SYNC_MODE).toNumber()
   : GethSyncMode.Lightest
-// TODO Remove when feature is stable
-export const USE_PHONE_NUMBER_PRIVACY = true
 
 // SECRETS
 export const SEGMENT_API_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SEGMENT_API_KEY')
