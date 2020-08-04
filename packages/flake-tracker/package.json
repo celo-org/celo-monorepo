@@ -10,6 +10,9 @@
   "keywords": [
     "celo"
   ],
+  "scripts": {
+    "build": "echo flake-tracker does not require build"
+  },
   "devDependencies": {
     "@octokit/app": "^4.2.0",
     "@octokit/plugin-retry": "^3.0.3",
