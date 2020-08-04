@@ -335,7 +335,7 @@ function* trackSyncStatus() {
       yield delay(expiration)
       head = yield select(chainHeadSelector)
     } else {
-      synced = synced === true ? false : undefined
+      synced = synced === undefined ? undefined : false
       head = (yield take(Actions.SET_CHAIN_HEAD)).head
     }
   }
