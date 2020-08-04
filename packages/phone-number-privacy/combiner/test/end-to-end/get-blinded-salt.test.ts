@@ -29,19 +29,25 @@ describe('Running against a deployed service', () => {
         BLINDED_PHONE_NUMBER,
         PRIVATE_KEY1,
         '0x1234',
+        Date.now(),
         'ignore'
       )
       expect(response.status).toBe(400)
     })
 
     it('With missing blindedQueryPhoneNumber', async () => {
-      const response = await postToSignMessage('', PRIVATE_KEY1, ACCOUNT_ADDRESS1)
+      const response = await postToSignMessage('', PRIVATE_KEY1, ACCOUNT_ADDRESS1, Date.now())
       expect(response.status).toBe(400)
     })
 
     // TODO: Enable test when blindedQueryPhoneNumber input validation is added
     xit('With invalid blindedQueryPhoneNumber', async () => {
-      const response = await postToSignMessage('invalid', PRIVATE_KEY1, ACCOUNT_ADDRESS1)
+      const response = await postToSignMessage(
+        'invalid',
+        PRIVATE_KEY1,
+        ACCOUNT_ADDRESS1,
+        Date.now()
+      )
       expect(response.status).toBe(400)
     })
   })
@@ -52,17 +58,20 @@ describe('Running against a deployed service', () => {
         BLINDED_PHONE_NUMBER,
         PRIVATE_KEY1,
         ACCOUNT_ADDRESS1,
+        Date.now(),
         'invalid'
       )
       expect(response.status).toBe(401)
     })
 
     it('With auth header signer mismatch', async () => {
+      const timestamp = Date.now()
       // Sign body with different account
       const body = JSON.stringify({
         hashedPhoneNumber: '+1455556600',
         blindedQueryPhoneNumber: BLINDED_PHONE_NUMBER.trim(),
         ACCOUNT_ADDRESS1,
+        timestamp,
       })
       const signature = signMessage(JSON.stringify(body), PRIVATE_KEY2, ACCOUNT_ADDRESS2)
       const authHeader = serializeSignature(signature)
@@ -71,25 +80,36 @@ describe('Running against a deployed service', () => {
         BLINDED_PHONE_NUMBER,
         PRIVATE_KEY1,
         ACCOUNT_ADDRESS1,
+        timestamp,
         authHeader
       )
       expect(response.status).toBe(401)
     })
 
     it('With missing blindedQueryPhoneNumber', async () => {
-      const response = await postToSignMessage('', PRIVATE_KEY1, ACCOUNT_ADDRESS1)
+      const response = await postToSignMessage('', PRIVATE_KEY1, ACCOUNT_ADDRESS1, Date.now())
       expect(response.status).toBe(400)
     })
   })
 
   it('Address salt querying out of quota', async () => {
-    const response = await postToSignMessage(BLINDED_PHONE_NUMBER, PRIVATE_KEY1, ACCOUNT_ADDRESS1)
+    const response = await postToSignMessage(
+      BLINDED_PHONE_NUMBER,
+      PRIVATE_KEY1,
+      ACCOUNT_ADDRESS1,
+      Date.now()
+    )
     expect(response.status).toBe(403)
   })
 
   xit('Address salt querying succeeds with funded account', async () => {
     // TODO: Figure out a common way to prefund account to provide quota
-    const response = await postToSignMessage(BLINDED_PHONE_NUMBER, PRIVATE_KEY2, ACCOUNT_ADDRESS2)
+    const response = await postToSignMessage(
+      BLINDED_PHONE_NUMBER,
+      PRIVATE_KEY2,
+      ACCOUNT_ADDRESS2,
+      Date.now()
+    )
     expect(response.status).toBe(200)
   })
 })
@@ -98,12 +118,14 @@ async function postToSignMessage(
   base64BlindedMessage: string,
   privateKey: string,
   account: string,
+  timestamp: number,
   authHeader?: string
 ): Promise<Response> {
   const body = JSON.stringify({
     hashedPhoneNumber: IDENTIFIER,
     blindedQueryPhoneNumber: base64BlindedMessage.trim(),
     account,
+    timestamp,
   })
   if (!authHeader) {
     const web3 = new Web3(new Web3.providers.HttpProvider(DEFAULT_FORNO_URL))
