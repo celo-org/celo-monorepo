@@ -30,7 +30,7 @@
     "crypto-js": "^3.1.9-1",
     "elliptic": "^6.5.3",
     "ethereumjs-util": "^5.2.0",
-    "google-libphonenumber": "^3.2.4",
+    "libphonenumber-js": "^1.7.50",
     "keccak256": "^1.0.0",
     "lodash": "^4.17.14",
     "numeral": "^2.0.6",
