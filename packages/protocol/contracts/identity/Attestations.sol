@@ -14,6 +14,7 @@ import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/Signatures.sol";
 import "../common/UsingPrecompiles.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
 /**
@@ -92,6 +93,9 @@ contract Attestations is
   // Maps a token and attestation issuer to the amount that they're owed.
   mapping(address => mapping(address => uint256)) public pendingWithdrawals;
 
+  // Attestation transfer approvals, keyed by user and keccak(identifier, from, to)
+  mapping(address => mapping(bytes32 => bool)) public transferApprovals;
+
   event AttestationsRequested(
     bytes32 indexed identifier,
     address indexed account,
@@ -117,6 +121,18 @@ contract Attestations is
   event AttestationRequestFeeSet(address indexed token, uint256 value);
   event SelectIssuersWaitBlocksSet(uint256 value);
   event MaxAttestationsSet(uint256 value);
+  event AttestationsTransferred(
+    bytes32 indexed identifier,
+    address indexed fromAccount,
+    address indexed toAccount
+  );
+  event TransferApproval(
+    address indexed approver,
+    bytes32 indexed indentifier,
+    address from,
+    address to,
+    bool approved
+  );
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -578,6 +594,23 @@ contract Attestations is
   }
 
   /**
+   * @notice Require that a given identifier/address pair has
+   * requested a specific number of attestations.
+   * @param identifier Hash of the identifier.
+   * @param account Address of the account.
+   * @param expected Number of expected attestations
+   * @dev It can be used when batching meta-transactions to validate
+   * attestation are requested as expected in untrusted scenarios
+   */
+  function requireNAttestationsRequested(bytes32 identifier, address account, uint32 expected)
+    external
+    view
+  {
+    uint256 requested = identifiers[identifier].attestations[account].requested;
+    require(requested == expected, "requested attestations does not match expected");
+  }
+
+  /**
    * @notice Helper function for batchGetAttestationStats to calculate the
              total number of addresses that have >0 complete attestations for the identifiers.
    * @param identifiersToLookup Array of n identifiers.
@@ -658,6 +691,60 @@ contract Attestations is
       issuersLength = issuersLength.sub(1);
       issuers[idx] = issuers[issuersLength];
     }
+  }
+
+  /**
+   * @notice Update the approval status of allowing an attestation identifier
+   * mapping to be transfered from an address to another.  The "to" or "from"
+   * addresses must both approve.  If the other has already approved, then the transfer
+   * is executed.
+   * @param identifier The identifier for this attestation.
+   * @param from The current attestation address to which the identifier is mapped.
+   * @param to The new address to map to identifier.
+   * @param status The approval status
+   */
+  function approveTransfer(bytes32 identifier, uint256 index, address from, address to, bool status)
+    external
+  {
+    require(msg.sender == from || msg.sender == to);
+    bytes32 key = keccak256(abi.encodePacked(identifier, from, to));
+    address other = msg.sender == from ? to : from;
+    if (status && transferApprovals[other][key]) {
+      _transfer(identifier, index, from, to);
+      transferApprovals[other][key] = false;
+    } else {
+      transferApprovals[msg.sender][key] = status;
+      emit TransferApproval(msg.sender, identifier, from, to, status);
+    }
+  }
+
+  /**
+   * @notice Transfer an attestation identifier mapping from the sender address to a
+   * replacement address.
+   * @param identifier The identifier for this attestation.
+   * @param index The index of the account in the accounts array.
+   * @param from The current attestation address to which the identifier is mapped.
+   * @param to The address to replace the sender address in the indentifier mapping.
+   * @dev Throws if index is out of bound for account array.
+   * @dev Throws if `from` is not in the account array at the given index.
+   * @dev Throws if `to` already has attestations
+   */
+  function _transfer(bytes32 identifier, uint256 index, address from, address to) internal {
+    uint256 numAccounts = identifiers[identifier].accounts.length;
+    require(index < numAccounts, "Index is invalid");
+    require(from == identifiers[identifier].accounts[index], "Index does not match from address");
+    require(
+      identifiers[identifier].attestations[to].requested == 0,
+      "Address tranferring to has already requested attestations"
+    );
+
+    identifiers[identifier].accounts[index] = to;
+    identifiers[identifier].attestations[to] = identifiers[identifier].attestations[from];
+    identifiers[identifier].unselectedRequests[to] = identifiers[identifier]
+      .unselectedRequests[from];
+    delete identifiers[identifier].attestations[from];
+    delete identifiers[identifier].unselectedRequests[from];
+    emit AttestationsTransferred(identifier, from, to);
   }
 
   // TODO(@i1skn): make this method external, so we can check it from outside

@@ -53,7 +53,7 @@ export function useBackToWelcomeScreen({ backAnalyticsEvent }: Props) {
     // so we can reset some state
     // See https://reactnavigation.org/docs/preventing-going-back
     const cancelBeforeRemove = navigation.addListener('beforeRemove', (event) => {
-      const resetScreenName = event?.data?.action?.payload?.routes?.[0]?.name
+      const resetScreenName = (event?.data?.action?.payload as any)?.routes?.[0]?.name
       if (resetScreenName !== Screens.DrawerNavigator) {
         ValoraAnalytics.track(backAnalyticsEvent)
         dispatch(cancelCreateOrRestoreAccount())
