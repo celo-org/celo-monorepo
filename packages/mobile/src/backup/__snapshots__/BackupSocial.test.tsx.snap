@@ -63,6 +63,7 @@ exports[`BackupSocialIntro renders correctly when social backup is complete 1`] 
                   "fontFamily": "Inter-Medium",
                   "fontSize": 16,
                   "lineHeight": 22,
+                  "marginBottom": 8,
                 }
               }
             >
@@ -103,10 +104,10 @@ exports[`BackupSocialIntro renders correctly when social backup is complete 1`] 
             style={
               Object {
                 "alignContent": "center",
-                "backgroundColor": "#FFF9EE",
+                "backgroundColor": "#F1F0EB",
                 "borderRadius": 4,
                 "justifyContent": "center",
-                "marginTop": 16,
+                "marginTop": 8,
                 "padding": 16,
               }
             }
@@ -135,6 +136,7 @@ exports[`BackupSocialIntro renders correctly when social backup is complete 1`] 
                   "fontFamily": "Inter-Medium",
                   "fontSize": 16,
                   "lineHeight": 22,
+                  "marginBottom": 8,
                 }
               }
             >
@@ -175,10 +177,10 @@ exports[`BackupSocialIntro renders correctly when social backup is complete 1`] 
             style={
               Object {
                 "alignContent": "center",
-                "backgroundColor": "#FFF9EE",
+                "backgroundColor": "#F1F0EB",
                 "borderRadius": 4,
                 "justifyContent": "center",
-                "marginTop": 16,
+                "marginTop": 8,
                 "padding": 16,
               }
             }
@@ -253,6 +255,7 @@ exports[`BackupSocialIntro renders correctly when social backup is not complete 
                   "fontFamily": "Inter-Medium",
                   "fontSize": 16,
                   "lineHeight": 22,
+                  "marginBottom": 8,
                 }
               }
             >
@@ -293,10 +296,10 @@ exports[`BackupSocialIntro renders correctly when social backup is not complete 
             style={
               Object {
                 "alignContent": "center",
-                "backgroundColor": "#FFF9EE",
+                "backgroundColor": "#F1F0EB",
                 "borderRadius": 4,
                 "justifyContent": "center",
-                "marginTop": 16,
+                "marginTop": 8,
                 "padding": 16,
               }
             }
@@ -325,6 +328,7 @@ exports[`BackupSocialIntro renders correctly when social backup is not complete 
                   "fontFamily": "Inter-Medium",
                   "fontSize": 16,
                   "lineHeight": 22,
+                  "marginBottom": 8,
                 }
               }
             >
@@ -365,10 +369,10 @@ exports[`BackupSocialIntro renders correctly when social backup is not complete 
             style={
               Object {
                 "alignContent": "center",
-                "backgroundColor": "#FFF9EE",
+                "backgroundColor": "#F1F0EB",
                 "borderRadius": 4,
                 "justifyContent": "center",
-                "marginTop": 16,
+                "marginTop": 8,
                 "padding": 16,
               }
             }
