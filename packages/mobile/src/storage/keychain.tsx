@@ -43,11 +43,11 @@ export async function retrieveStoredItem(key: string) {
 
 export async function removeStoredItem(key: string) {
   try {
-    return await Keychain.resetGenericPassword({
+    return Keychain.resetGenericPassword({
       service: key,
     })
   } catch (error) {
     Logger.error(TAG, 'Error clearing item', error, true)
-    return false
+    throw new Error(ErrorMessages.KEYCHAIN_STORAGE_ERROR)
   }
 }

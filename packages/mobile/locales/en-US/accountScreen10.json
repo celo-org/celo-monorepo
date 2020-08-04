@@ -29,7 +29,7 @@
   "accountKeyModal": {
     "header": "Without your Account Key you will lose access to your funds forever",
     "body1": "In order to reset Valora, you will need to confirm you've written your Account Key.",
-    "body2": "Nobody, not event Valora, can recover your account without your key."
+    "body2": "Nobody, not even Valora, can recover your account without your key."
   },
   "promptConfirmRemovalModal": {
     "header": "Are you sure you want to reset Valora?",

@@ -114,7 +114,8 @@ function* clearStoredAccountSaga({ account }: ClearStoredAccountAction) {
     yield call(persistor.flush)
     yield call(restartApp)
   } catch (error) {
-    Logger.info(TAG + '@clearStoredAccount', 'Error while removing account', error)
+    Logger.error(TAG + '@clearStoredAccount', 'Error while removing account', error)
+    yield put(showError(ErrorMessages.ACCOUNT_CLEAR_FAILED))
   }
 }
 
@@ -128,7 +129,8 @@ export function* watchSetPincode() {
 }
 
 export function* watchClearStoredAccount() {
-  yield takeLeading(Actions.CLEAR_STORED_ACCOUNT, clearStoredAccountSaga)
+  const action = yield take(Actions.CLEAR_STORED_ACCOUNT)
+  yield call(clearStoredAccountSaga, action)
 }
 
 export function* accountSaga() {

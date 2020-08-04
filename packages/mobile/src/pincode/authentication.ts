@@ -234,6 +234,8 @@ export async function ensureCorrectPassword(
 
 export async function removeAccountLocally(account: string) {
   clearPasswordCaches()
-  await removeStoredItem(STORAGE_KEYS.PEPPER)
-  await removeStoredItem(passwordHashStorageKey(account))
+  return Promise.all([
+    removeStoredItem(STORAGE_KEYS.PEPPER),
+    removeStoredItem(passwordHashStorageKey(account)),
+  ])
 }
