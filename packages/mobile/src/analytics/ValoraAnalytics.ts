@@ -103,7 +103,7 @@ class ValoraAnalytics {
 
   setUserAddress(address?: string | null) {
     if (address) {
-      this.userAddress = address
+      this.userAddress = address.toLowerCase()
     } else if (address === null) {
       this.userAddress = 'unverified'
     } else {
@@ -137,7 +137,7 @@ class ValoraAnalytics {
 
     Logger.info(TAG, `Tracking event ${eventName} with properties: ${JSON.stringify(props)}`)
 
-    Analytics.track(eventName, props).catch((err) => {
+    Analytics.track(eventName, props, { context: { device: { name: null } } }).catch((err) => {
       Logger.error(TAG, `Failed to track event ${eventName}`, err)
     })
   }
