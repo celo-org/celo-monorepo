@@ -137,7 +137,7 @@ class ValoraAnalytics {
 
     Logger.info(TAG, `Tracking event ${eventName} with properties: ${JSON.stringify(props)}`)
 
-    Analytics.track(eventName, props, { context: { device: { name: null } } }).catch((err) => {
+    Analytics.track(eventName, props).catch((err) => {
       Logger.error(TAG, `Failed to track event ${eventName}`, err)
     })
   }
