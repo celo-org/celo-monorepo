@@ -43,6 +43,9 @@
     "ts-node": "^8.3.0",
     "typescript": "^3.8.3"
   },
+  "peerDependencies": {
+    "@celo/flake-tracker": "0.0.1-dev"
+  },
   "engines": {
     "node": "10"
   }
