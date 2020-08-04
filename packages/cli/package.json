@@ -64,6 +64,7 @@
   "devDependencies": {
     "@celo/dev-cli": "^2.0.3",
     "@celo/dev-utils": "0.0.1-dev",
+    "@celo/flake-tracker": "0.0.1-dev",
     "@types/cli-table": "^0.3.0",
     "@types/debug": "^4.1.4",
     "@types/fs-extra": "^8.0.0",

@@ -16,7 +16,7 @@ import BackupPhraseContainer, {
 } from 'src/backup/BackupPhraseContainer'
 import CancelConfirm from 'src/backup/CancelConfirm'
 import { getStoredMnemonic, onGetMnemonicFail } from 'src/backup/utils'
-import i18n, { Namespaces, withTranslation } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { navigate, pushToStack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
@@ -55,7 +55,6 @@ const mapStateToProps = (state: RootState): StateProps => {
 
 export const navOptionsForBackupPhrase = {
   headerLeft: () => <CancelConfirm screen={TAG} />,
-  headerTitle: i18n.t(`${Namespaces.backupKeyFlow6}:headerTitle`),
   headerRight: () => <HeaderRight />,
 }
 

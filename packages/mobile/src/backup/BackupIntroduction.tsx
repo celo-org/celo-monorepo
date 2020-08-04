@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   },
   keyArea: {
     padding: Spacing.Regular16,
-    backgroundColor: colorsV2.brownFaint,
+    backgroundColor: colorsV2.beige,
     marginTop: Spacing.Regular16,
   },
   postSetupBody: {

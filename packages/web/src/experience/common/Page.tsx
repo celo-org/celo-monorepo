@@ -41,8 +41,9 @@ interface Props {
   sections: Section[]
   title: string
   path: string
+  kitName?: string
   metaDescription: string
-  ogImage: ImageRequireSource
+  ogImage: ImageRequireSource | string
 }
 
 interface State {
@@ -114,7 +115,12 @@ class Page extends React.Component<Props & ScreenProps, State> {
 
     if (this.state.routeHash !== top.id) {
       this.setState({ routeHash: top.id })
-      window.history.replaceState({}, top.id, `${location.pathname}#${top.id}`)
+
+      window.history.replaceState(
+        {},
+        top.id,
+        `${location.pathname}${window.location.search}#${top.id}`
+      )
     }
   }
 
@@ -178,12 +184,12 @@ class Page extends React.Component<Props & ScreenProps, State> {
                 (this.state.isLineVisible || isMobile) && styles.grayLine,
               ]}
             >
-              <Topbar current={this.props.pages[0].href} />
+              <Topbar current={this.props.pages[0].href} kitName={this.props.kitName} />
             </View>
             {isMobile && (
               <MobileKitMenu
                 pages={this.props.pages}
-                pathname={router.pathname}
+                pathname={router.asPath}
                 routeHash={this.state.routeHash}
               />
             )}
@@ -194,7 +200,7 @@ class Page extends React.Component<Props & ScreenProps, State> {
               {!isMobile && (
                 <Sidebar
                   pages={this.props.pages}
-                  currentPathName={router.pathname}
+                  currentPathName={router.asPath}
                   routeHash={this.state.routeHash}
                   onChangeRoute={moveToHash}
                 />

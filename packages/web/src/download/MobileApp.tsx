@@ -8,6 +8,7 @@ import { NameSpaces } from 'src/i18n'
 import { CeloLinks } from 'src/shared/menu-items'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors } from 'src/styles'
+
 export default class MobileApp extends React.PureComponent {
   static getInitialProps() {
     return {
