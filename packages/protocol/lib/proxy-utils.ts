@@ -11,6 +11,7 @@ export async function retryTx(fn: any, args: any[]) {
       return rvalue
     } catch (e) {
       console.error(e)
+      // @ts-ignore
       const { confirmation } = await prompts({
         type: 'confirm',
         name: 'confirmation',

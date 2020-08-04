@@ -18,6 +18,7 @@
     "location": "packages/blockchain-api",
     "dependencies": [
       "@celo/contractkit",
+      "@celo/flake-tracker",
       "@celo/utils"
     ]
   },
@@ -26,6 +27,7 @@
     "dependencies": [
       "@celo/contractkit",
       "@celo/dev-utils",
+      "@celo/flake-tracker",
       "@celo/protocol",
       "@celo/utils"
     ]
@@ -35,6 +37,7 @@
     "dependencies": [
       "@celo/contractkit",
       "@celo/dev-utils",
+      "@celo/flake-tracker",
       "@celo/utils"
     ]
   },
@@ -42,6 +45,7 @@
     "location": "packages/contractkit",
     "dependencies": [
       "@celo/dev-utils",
+      "@celo/flake-tracker",
       "@celo/protocol",
       "@celo/utils"
     ]
@@ -68,6 +72,10 @@
       "@celo/utils"
     ]
   },
+  "@celo/flake-tracker": {
+    "location": "packages/flake-tracker",
+    "dependencies": []
+  },
   "@celo/metadata-crawler": {
     "location": "packages/metadata-crawler",
     "dependencies": [
@@ -79,6 +87,7 @@
     "location": "packages/mobile",
     "dependencies": [
       "@celo/contractkit",
+      "@celo/flake-tracker",
       "@celo/react-components",
       "@celo/typescript",
       "@celo/utils"
@@ -92,12 +101,14 @@
     "location": "packages/notification-service",
     "dependencies": [
       "@celo/contractkit",
+      "@celo/flake-tracker",
       "@celo/utils"
     ]
   },
   "@celo/protocol": {
     "location": "packages/protocol",
     "dependencies": [
+      "@celo/flake-tracker",
       "@celo/typescript",
       "@celo/utils"
     ]
@@ -105,6 +116,7 @@
   "@celo/react-components": {
     "location": "packages/react-components",
     "dependencies": [
+      "@celo/flake-tracker",
       "@celo/typescript",
       "@celo/utils"
     ]
@@ -120,12 +132,14 @@
   "@celo/utils": {
     "location": "packages/utils",
     "dependencies": [
+      "@celo/flake-tracker",
       "@celo/typescript"
     ]
   },
   "@celo/web": {
     "location": "packages/web",
     "dependencies": [
+      "@celo/flake-tracker",
       "@celo/utils"
     ]
   },
@@ -133,6 +147,7 @@
     "location": "packages/phone-number-privacy/combiner",
     "dependencies": [
       "@celo/contractkit",
+      "@celo/flake-tracker",
       "@celo/phone-number-privacy-common",
       "@celo/utils"
     ]
@@ -145,6 +160,7 @@
     "location": "packages/phone-number-privacy/signer",
     "dependencies": [
       "@celo/contractkit",
+      "@celo/flake-tracker",
       "@celo/phone-number-privacy-common",
       "@celo/utils"
     ]

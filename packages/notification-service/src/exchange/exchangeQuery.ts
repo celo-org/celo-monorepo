@@ -6,6 +6,7 @@ import { getContractKit } from '../util/utils'
 
 // Amounts to estimate the exchange rate, as the rate varies based on transaction size
 // A small amount returns a rate closer to the median rate
+// TODO: Use CELO_AMOUNT_FOR_ESTIMATE and DOLLAR_AMOUNT_FOR_ESTIMATE from `@celo/utils`
 const WEI_PER_UNIT = 1000000000000000000
 const SELL_AMOUNTS = {
   [CURRENCY_ENUM.DOLLAR]: new BigNumber(0.01 * WEI_PER_UNIT), // 0.01 dollar
