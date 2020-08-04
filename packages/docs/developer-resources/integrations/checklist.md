@@ -10,7 +10,7 @@ Addresses are similar to Ethereum addresses. When displaying and asking for user
 
 ### QR Codes
 
-Celo has [WIP QR code standard CIP16](https://github.com/celo-org/celo-proposals/pull/40) that aims to standardize how applications can ask wallets for transactions to avoid the user having to manually copy/paste addresses.
+Celo has [WIP QR code standard CIP16](https://github.com/celo-org/celo-proposals/pull/40) that aims to standardize how applications can ask wallets for transactions to avoid the user having to manually copy/paste addresses and other transaction metadata.
 
 
 ## Custodian/Exchange
