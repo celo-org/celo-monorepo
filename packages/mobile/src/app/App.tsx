@@ -54,15 +54,15 @@ BigNumber.config({
 export class App extends React.Component {
   async componentDidMount() {
     await ValoraAnalytics.init()
-    const appLoadedAt: Date = new Date()
+    const appLoadedMillis: number = Date.now()
     const { width, height } = Dimensions.get('window')
 
     if (Platform.OS === 'android') {
       const appStartListener = DeviceEventEmitter.addListener(
         'AppStartedLoading',
-        (appInitializedAtString: string) => {
-          const appInitializedAt = new Date(appInitializedAtString)
-          const loadingDuration = appLoadedAt.getTime() - appInitializedAt.getTime()
+        (appStartedMillisStr: string) => {
+          const appStartedMillis: number = +appStartedMillisStr
+          const loadingDuration = appLoadedMillis - appStartedMillis
           ValoraAnalytics.startSession(AppEvents.app_launched, {
             loadingDuration,
             deviceHeight: height,
