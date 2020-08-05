@@ -103,7 +103,7 @@ class ValoraAnalytics {
 
   setUserAddress(address?: string | null) {
     if (address) {
-      this.userAddress = address
+      this.userAddress = address.toLowerCase()
     } else if (address === null) {
       this.userAddress = 'unverified'
     } else {
