@@ -18,11 +18,12 @@ import {
 import logger from '../common/logger'
 import { getVersion } from '../config'
 import { incrementQueryCount } from '../database/wrappers/account'
+import { getRequestExists, storeRequest } from '../database/wrappers/request'
 import { getKeyProvider } from '../key-management/key-provider'
 import { getBlockNumber } from '../web3/contracts'
 import { getRemainingQueryCount } from './query-quota'
 
-interface GetBlindedMessageForSaltRequest {
+export interface GetBlindedMessageForSaltRequest {
   account: string
   blindedQueryPhoneNumber: string
   hashedPhoneNumber?: string
@@ -35,7 +36,7 @@ export async function handleGetBlindedMessageForSalt(
 ) {
   logger.info('Begin getBlindedSalt request')
   try {
-    if (!isValidGetSignatureInput(request.body)) {
+    if (!isValidGetSignatureInput(request.body) || (await getRequestExists(request.body))) {
       respondWithError(response, 400, WarningMessage.INVALID_INPUT)
       return
     }
@@ -85,6 +86,8 @@ export async function handleGetBlindedMessageForSalt(
     const signature = computeBlindedSignature(blindedQueryPhoneNumber, privateKey)
     await incrementQueryCount(account)
     logger.debug('Salt retrieval success')
+    await storeRequest(request.body)
+    logger.debug('Salt request stored')
 
     let signMessageResponse: SignMessageResponse
     const signMessageResponseSuccess: SignMessageResponse = {

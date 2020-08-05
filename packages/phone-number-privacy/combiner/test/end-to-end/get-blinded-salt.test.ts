@@ -102,15 +102,28 @@ describe('Running against a deployed service', () => {
     expect(response.status).toBe(403)
   })
 
-  xit('Address salt querying succeeds with funded account', async () => {
+  xdescribe('With funded account', () => {
     // TODO: Figure out a common way to prefund account to provide quota
-    const response = await postToSignMessage(
-      BLINDED_PHONE_NUMBER,
-      PRIVATE_KEY2,
-      ACCOUNT_ADDRESS2,
-      Date.now()
-    )
-    expect(response.status).toBe(200)
+    const timestamp = Date.now()
+    it('Address salt querying succeeds with unused request', async () => {
+      const response = await postToSignMessage(
+        BLINDED_PHONE_NUMBER,
+        PRIVATE_KEY2,
+        ACCOUNT_ADDRESS2,
+        timestamp
+      )
+      expect(response.status).toBe(200)
+    })
+
+    it('Address salt querying fails with used request', async () => {
+      const response = await postToSignMessage(
+        BLINDED_PHONE_NUMBER,
+        PRIVATE_KEY2,
+        ACCOUNT_ADDRESS2,
+        timestamp
+      )
+      expect(response.status).toBe(400)
+    })
   })
 })
 
