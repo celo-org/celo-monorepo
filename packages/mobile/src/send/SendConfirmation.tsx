@@ -176,8 +176,10 @@ export class SendConfirmation extends React.Component<Props, State> {
       recipient,
       recipientAddress,
       firebasePendingRequestUid,
+      reason,
     } = this.props.confirmationInput
-    const { comment } = this.state
+
+    const comment = type === TokenTransactionType.PayRequest ? reason || '' : this.state.comment
 
     const localCurrencyAmount = convertDollarsToLocalAmount(
       amount,
@@ -192,7 +194,7 @@ export class SendConfirmation extends React.Component<Props, State> {
       localCurrency: this.props.localCurrencyCode,
       dollarAmount: amount.toString(),
       localCurrencyAmount: localCurrencyAmount ? localCurrencyAmount.toString() : null,
-      commentLength: this.state.comment.length,
+      commentLength: comment.length,
     })
 
     this.props.sendPaymentOrInvite(
