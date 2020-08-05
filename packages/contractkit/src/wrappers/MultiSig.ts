@@ -1,6 +1,6 @@
+import { Address } from '@celo/sdk-types/commons'
 import BigNumber from 'bignumber.js'
 import { TransactionObject } from 'web3-eth'
-import { Address } from '../base'
 import { MultiSig } from '../generated/MultiSig'
 import {
   BaseWrapper,

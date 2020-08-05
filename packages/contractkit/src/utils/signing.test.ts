@@ -24,7 +24,7 @@ testWithGanache('Signing', (web3) => {
   it('signs a message that was hashed the same way via RPC and with an explicit private key', async () => {
     // This test checks that the prefixing in `signMessage` appropriately considers hex strings
     // as bytes the same way the native RPC signing would
-    const message = web3.utils.soliditySha3('message')
+    const message = web3.utils.soliditySha3('message')!
     const nativeSignature = await nativeSigner.sign(message)
     const localSignature = await localSigner.sign(message)
 

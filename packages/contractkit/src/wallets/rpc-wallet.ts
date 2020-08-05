@@ -1,9 +1,10 @@
+import { CeloTx } from '@celo/sdk-types/commons'
 import {
   ensureLeading0x,
   normalizeAddressWith0x,
   privateKeyToAddress,
 } from '@celo/utils/lib/address'
-import { provider, Tx } from 'web3-core'
+import { provider } from 'web3-core'
 import { DefaultRpcCaller, RpcCaller } from '../utils/rpc-caller'
 import { RemoteWallet } from './remote-wallet'
 import { RpcSigner } from './signers/rpc-signer'
@@ -65,7 +66,7 @@ export class RpcWallet extends RemoteWallet {
    * @param txParams Transaction to sign
    * @dev overrides WalletBase.signTransaction
    */
-  async signTransaction(txParams: Tx) {
+  async signTransaction(txParams: CeloTx) {
     // Get the signer from the 'from' field
     const fromAddress = txParams.from!.toString()
     const signer = this.getSigner(fromAddress) as RpcSigner

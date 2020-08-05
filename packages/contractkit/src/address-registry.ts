@@ -1,6 +1,7 @@
+import { Address, NULL_ADDRESS } from '@celo/sdk-types/commons'
 import debugFactory from 'debug'
 import Web3 from 'web3'
-import { Address, AllContracts, CeloContract, NULL_ADDRESS } from './base'
+import { AllContracts, CeloContract } from './base'
 import { newRegistry, Registry } from './generated/Registry'
 import { ContractKit } from './kit'
 
@@ -29,7 +30,7 @@ export class AddressRegistry {
       const proxyStrippedContract = contract.replace('Proxy', '') as CeloContract
       debug('Fetching address from Registry for %s', contract)
       const hash = Web3.utils.soliditySha3({ type: 'string', value: proxyStrippedContract })
-      const address = await this.registry.methods.getAddressFor(hash).call()
+      const address = await this.registry.methods.getAddressFor(hash!).call()
 
       debug('Fetched address:  %s = %s', address)
       if (!address || address === NULL_ADDRESS) {

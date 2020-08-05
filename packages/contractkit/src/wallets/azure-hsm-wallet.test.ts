@@ -1,3 +1,4 @@
+import { CeloTx } from '@celo/sdk-types/commons'
 import {
   Address,
   ensureLeading0x,
@@ -9,7 +10,7 @@ import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import * as ethUtil from 'ethereumjs-util'
 import Web3 from 'web3'
-import { EncodedTransaction, Tx } from 'web3-core'
+import { EncodedTransaction } from 'web3-core'
 import { Signature } from '../utils/azure-key-vault-client'
 import { recoverTransaction, verifyEIP712TypedDataSigner } from '../utils/signing-utils'
 import { AzureHSMWallet } from './azure-hsm-wallet'
@@ -139,7 +140,7 @@ describe('AzureHSMWallet class', () => {
 
   describe('without initializing', () => {
     const knownAddress = ACCOUNT_ADDRESS1
-    let celoTransaction: Tx
+    let celoTransaction: CeloTx
     beforeEach(() => {
       celoTransaction = {
         from: knownAddress,
@@ -205,7 +206,7 @@ describe('AzureHSMWallet class', () => {
     describe('with an account', () => {
       describe('signing', () => {
         describe('using an unknown key', () => {
-          let celoTransaction: Tx
+          let celoTransaction: CeloTx
           const unknownKey: string = 'invalidKey'
           const unknownAddress = ACCOUNT_ADDRESS_NEVER
 
@@ -263,7 +264,7 @@ describe('AzureHSMWallet class', () => {
         })
 
         describe('using a known key', () => {
-          let celoTransaction: Tx
+          let celoTransaction: CeloTx
           const knownKey: string = AZURE_KEY_NAME!
           let knownAddress: Address
           const otherAddress: string = ACCOUNT_ADDRESS2

@@ -59,11 +59,12 @@
     "randombytes": "^2.0.1",
     "save": "^2.4.0",
     "tslib": "^1",
-    "web3": "1.2.4"
+    "web3": "1.2.11"
   },
   "devDependencies": {
     "@celo/dev-cli": "^2.0.3",
     "@celo/dev-utils": "0.0.1-dev",
+    "@celo/sdk-types": "1.0.0-dev",
     "@types/cli-table": "^0.3.0",
     "@types/debug": "^4.1.4",
     "@types/fs-extra": "^8.0.0",

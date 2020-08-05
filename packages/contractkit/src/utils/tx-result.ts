@@ -1,6 +1,7 @@
+import { CeloTxReceipt } from '@celo/sdk-types/commons'
 import { Future } from '@celo/utils/lib/future'
 import debugFactory from 'debug'
-import { PromiEvent, TransactionReceipt } from 'web3-core'
+import { PromiEvent } from 'web3-core'
 
 const debug = debugFactory('kit:tx:result')
 
@@ -20,19 +21,19 @@ export function toTxResult(pe: PromiEvent<any>) {
  */
 export class TransactionResult {
   private hashFuture = new Future<string>()
-  private receiptFuture = new Future<TransactionReceipt>()
+  private receiptFuture = new Future<CeloTxReceipt>()
 
   constructor(pe: PromiEvent<any>) {
     pe.on('transactionHash', (hash: string) => {
       debug('hash: %s', hash)
       this.hashFuture.resolve(hash)
     })
-      .on('receipt', (receipt: TransactionReceipt) => {
+      .on('receipt', (receipt: CeloTxReceipt) => {
         debug('receipt: %O', receipt)
         this.receiptFuture.resolve(receipt)
       })
 
-      .on('error', ((error: any, receipt: TransactionReceipt | false) => {
+      .on('error', ((error: any, receipt: CeloTxReceipt | false) => {
         if (!receipt) {
           debug('send-error: %o', error)
           this.hashFuture.reject(error)

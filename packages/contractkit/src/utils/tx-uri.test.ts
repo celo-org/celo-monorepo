@@ -1,4 +1,4 @@
-import { Tx } from 'web3-core'
+import { CeloTx } from '@celo/sdk-types/commons'
 import { CeloContract } from '../base'
 import { newKit } from '../kit'
 import { buildUri, parseUri } from './tx-uri'
@@ -7,17 +7,17 @@ describe('URI utils', () => {
   const recipient = '0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef'
   const value = '100'
 
-  const simpleTransferTx: Tx = {
+  const simpleTransferTx: CeloTx = {
     value,
     to: recipient,
   }
   const simpleTransferUri = `celo:${recipient}?value=${value}`
 
   let stableTokenTransferUri: string
-  let stableTokenTransferTx: Tx
+  let stableTokenTransferTx: CeloTx
 
   let lockGoldUri: string
-  let lockGoldTx: Tx
+  let lockGoldTx: CeloTx
 
   const kit = newKit('http://localhost:8545')
 

@@ -3,16 +3,15 @@ import 'web3-core'
 import { Tx } from 'web3-core'
 
 declare module 'web3-core' {
-  export interface TransactionConfig extends TransactionConfig {
-    value?: number | string | BigNumber
-    gasPrice?: number | string | BigNumber
-  }
+  // export interface TransactionConfig extends TransactionConfig {
+  //   value?: number | string | BigNumber
+  //   gasPrice?: number | string | BigNumber
+  // }
 
   export interface Tx extends TransactionConfig {
     feeCurrency?: string
     gatewayFeeRecipient?: string
     gatewayFee?: string
-    nonce?: number
   }
 
   export interface EncodedTransaction {
@@ -47,11 +46,11 @@ declare module 'web3-eth' {
     encodeABI(): string
   }
 
-  export type BlockType = string | number | BN | BigNumber | 'latest' | 'pending' | 'earliest'
+  // export type BlockType = string | number | BN | BigNumber | 'latest' | 'pending' | 'earliest'
 }
 
 declare module 'web3-core-helpers' {
-  export type Callback<T> = (error: Error | null, result?: T) => void
+  //  export type Callback<T> = (error: Error | null, result?: T) => void
   export interface JsonRpcResponse {
     jsonrpc: string
     id: number

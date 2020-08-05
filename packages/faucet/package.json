@@ -18,8 +18,8 @@
     "build:rules": "firebase-bolt database-rules.bolt"
   },
   "dependencies": {
-    "@celo/contractkit": "0.3.6",
-    "@celo/utils": "0.1.9",
+    "@celo/contractkit": "0.4.10-dev",
+    "@celo/utils": "0.1.17-dev",
     "@firebase/app": "^0.5.3",
     "@google-cloud/logging": "^7.1.0",
     "debug": "^4.1.1",
@@ -27,8 +27,8 @@
     "firebase-admin": "^8.10.0",
     "firebase-functions": "^3.6.0",
     "twilio": "^3.39.3",
-    "web3": "1.2.4",
-    "web3-core-helpers": "1.2.4"
+    "web3": "1.2.11",
+    "web3-core-helpers": "1.2.11"
   },
   "devDependencies": {
     "@types/debug": "^4.1.4",

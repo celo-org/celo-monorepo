@@ -1,6 +1,7 @@
+import { Wallet } from '@celo/sdk-types/wallet'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import { LocalSigner } from './signers/local-signer'
-import { Wallet, WalletBase } from './wallet'
+import { WalletBase } from './wallet-base'
 
 export class LocalWallet extends WalletBase implements Wallet {
   /**

@@ -1,9 +1,10 @@
+import { Address, CeloTx } from '@celo/sdk-types/commons'
+import { Wallet } from '@celo/sdk-types/wallet'
 import { sleep } from '@celo/utils/lib/async'
-import { EncodedTransaction, Tx } from 'web3-core'
-import { Address } from '../base'
+import { EncodedTransaction } from 'web3-core'
 import { EIP712TypedData } from '../utils/sign-typed-data-utils'
 import { Signer } from './signers/signer'
-import { Wallet, WalletBase } from './wallet'
+import { WalletBase } from './wallet-base'
 
 /**
  * Abstract class representing a remote wallet that requires async initialization
@@ -76,7 +77,7 @@ export abstract class RemoteWallet extends WalletBase implements Wallet {
    * Signs the EVM transaction using the signer pulled from the from field
    * @param txParams EVM transaction
    */
-  async signTransaction(txParams: Tx): Promise<EncodedTransaction> {
+  async signTransaction(txParams: CeloTx): Promise<EncodedTransaction> {
     this.initializationRequired()
     return super.signTransaction(txParams)
   }

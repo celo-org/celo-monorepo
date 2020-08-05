@@ -1,15 +1,15 @@
-import { PromiEvent, TransactionReceipt, Tx } from 'web3-core'
-import { TransactionObject } from 'web3-eth'
+import { CeloTx, CeloTxObject, CeloTxReceipt } from '@celo/sdk-types/commons'
+import { PromiEvent } from 'web3-core'
 import { newKit } from './kit'
 import { promiEventSpy } from './test-utils/PromiEventStub'
 
-interface TransactionObjectStub<T> extends TransactionObject<T> {
-  sendMock: jest.Mock<PromiEvent<any>, [Tx | undefined]>
+interface TransactionObjectStub<T> extends CeloTxObject<T> {
+  sendMock: jest.Mock<PromiEvent<any>, [CeloTx | undefined]>
   estimateGasMock: jest.Mock<Promise<number>, []>
   resolveHash(hash: string): void
-  resolveReceipt(receipt: TransactionReceipt): void
+  resolveReceipt(receipt: CeloTxReceipt): void
   rejectHash(error: any): void
-  rejectReceipt(receipt: TransactionReceipt, error: any): void
+  rejectReceipt(receipt: CeloTxReceipt, error: any): void
 }
 
 export function txoStub<T>(): TransactionObjectStub<T> {

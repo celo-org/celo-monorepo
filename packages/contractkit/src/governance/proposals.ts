@@ -151,7 +151,6 @@ export class ProposalBuilder {
       if (tx.value === undefined) {
         tx.value = '0'
       }
-      // TODO fix types
-      return this.fromWeb3tx(txo, { to: (contract as any)._address, value: tx.value })
+      return this.fromWeb3tx(txo, { to: contract.options.address, value: tx.value })
     })
 }

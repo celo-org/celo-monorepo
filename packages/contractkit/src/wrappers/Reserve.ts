@@ -1,6 +1,6 @@
+import { Address } from '@celo/sdk-types/commons'
 import BigNumber from 'bignumber.js'
 import { EventLog } from 'web3-core'
-import { Address } from '../base'
 import { Reserve } from '../generated/Reserve'
 import { BaseWrapper, proxyCall, proxySend, valueToBigNumber } from './BaseWrapper'
 

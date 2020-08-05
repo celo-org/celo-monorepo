@@ -1,9 +1,9 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
+import { CeloTx } from '@celo/sdk-types/commons'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/src/address'
 import net from 'net'
 import Web3 from 'web3'
-import { Tx } from 'web3-core'
 import { newKit } from '../kit'
 import { recoverTransaction, verifyEIP712TypedDataSigner } from '../utils/signing-utils'
 import { RpcWallet } from './rpc-wallet'
@@ -159,7 +159,7 @@ testWithGanache('rpc-wallet', (web3) => {
           })
 
           describe('when calling signTransaction', () => {
-            let celoTransaction: Tx
+            let celoTransaction: CeloTx
 
             beforeEach(() => {
               celoTransaction = {

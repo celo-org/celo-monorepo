@@ -1,10 +1,11 @@
+import { CeloTx } from '@celo/sdk-types/commons'
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import debugFactory from 'debug'
 // @ts-ignore-next-line
 import { account as Account, bytes as Bytes, hash as Hash, RLP } from 'eth-lib'
 import * as ethUtil from 'ethereumjs-util'
-import { EncodedTransaction, Tx } from 'web3-core'
+import { EncodedTransaction } from 'web3-core'
 import * as helpers from 'web3-core-helpers'
 import { EIP712TypedData, generateTypedDataHash } from './sign-typed-data-utils'
 
@@ -18,7 +19,7 @@ function isNullOrUndefined(value: any): boolean {
 }
 
 export interface RLPEncodedTx {
-  transaction: Tx
+  transaction: CeloTx
   rlpEncode: any
 }
 
@@ -66,7 +67,7 @@ function stringNumberToHex(num?: number | string): string {
   return Bytes.fromNumber(auxNumber)
 }
 
-export function rlpEncodedTx(tx: Tx): RLPEncodedTx {
+export function rlpEncodedTx(tx: CeloTx): RLPEncodedTx {
   if (!tx.gas) {
     throw new Error('"gas" is missing')
   }
@@ -85,7 +86,7 @@ export function rlpEncodedTx(tx: Tx): RLPEncodedTx {
   if (tx.nonce! < 0 || tx.gas! < 0 || tx.gasPrice! < 0 || tx.chainId! < 0) {
     throw new Error('Gas, gasPrice, nonce or chainId is lower than 0')
   }
-  const transaction: Tx = helpers.formatters.inputCallFormatter(tx)
+  const transaction: CeloTx = helpers.formatters.inputCallFormatter(tx)
   transaction.to = Bytes.fromNat(tx.to || '0x').toLowerCase()
   transaction.nonce = Number(((tx.nonce as any) !== '0x' ? tx.nonce : 0) || 0)
   transaction.data = Bytes.fromNat(tx.data || '0x').toLowerCase()
@@ -153,13 +154,13 @@ export async function encodeTransaction(
 
 // Recover transaction and sender address from a raw transaction.
 // This is used for testing.
-export function recoverTransaction(rawTx: string): [Tx, string] {
+export function recoverTransaction(rawTx: string): [CeloTx, string] {
   const rawValues = RLP.decode(rawTx)
   debug('signing-utils@recoverTransaction: values are %s', rawValues)
   const recovery = Bytes.toNumber(rawValues[9])
   // tslint:disable-next-line:no-bitwise
   const chainId = Bytes.fromNumber((recovery - 35) >> 1)
-  const celoTx: Tx = {
+  const celoTx: CeloTx = {
     nonce: rawValues[0].toLowerCase() === '0x' ? 0 : parseInt(rawValues[0], 16),
     gasPrice: rawValues[1].toLowerCase() === '0x' ? 0 : parseInt(rawValues[1], 16),
     gas: rawValues[2].toLowerCase() === '0x' ? 0 : parseInt(rawValues[2], 16),

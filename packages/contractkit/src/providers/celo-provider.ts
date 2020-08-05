@@ -1,11 +1,12 @@
+import { Callback } from '@celo/sdk-types/commons'
+import { Wallet } from '@celo/sdk-types/wallet'
 import debugFactory from 'debug'
 import { provider } from 'web3-core'
-import { Callback, JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
+import { JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
 import { hasProperty, stopProvider } from '../utils/provider-utils'
 import { DefaultRpcCaller, RpcCaller, rpcCallHandler } from '../utils/rpc-caller'
 import { TxParamsNormalizer } from '../utils/tx-params-normalizer'
 import { LocalWallet } from '../wallets/local-wallet'
-import { Wallet } from '../wallets/wallet'
 
 const debug = debugFactory('kit:provider:connection')
 const debugPayload = debugFactory('kit:provider:payload')

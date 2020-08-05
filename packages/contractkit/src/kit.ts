@@ -1,16 +1,15 @@
+import { Address, CeloTx, CeloTxObject } from '@celo/sdk-types/commons'
+import { Wallet } from '@celo/sdk-types/wallet'
 import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
 import net from 'net'
 import Web3 from 'web3'
-import { Tx } from 'web3-core'
-import { TransactionObject } from 'web3-eth'
 import { AddressRegistry } from './address-registry'
-import { Address, CeloContract, CeloToken } from './base'
+import { CeloContract, CeloToken } from './base'
 import { WrapperCache } from './contract-cache'
 import { CeloProvider } from './providers/celo-provider'
 import { toTxResult, TransactionResult } from './utils/tx-result'
 import { estimateGas } from './utils/web3-utils'
-import { Wallet } from './wallets/wallet'
 import { Web3ContractCache } from './web3-contract-cache'
 import { AttestationsConfig } from './wrappers/Attestations'
 import { DowntimeSlasherConfig } from './wrappers/DowntimeSlasher'
@@ -271,7 +270,7 @@ export class ContractKit {
    *  - estimatesGas before sending
    *  - returns a `TransactionResult` instead of `PromiEvent`
    */
-  async sendTransaction(tx: Tx): Promise<TransactionResult> {
+  async sendTransaction(tx: CeloTx): Promise<TransactionResult> {
     tx = this.fillTxDefaults(tx)
 
     let gas = tx.gas
@@ -296,19 +295,19 @@ export class ContractKit {
   }
 
   async sendTransactionObject(
-    txObj: TransactionObject<any>,
-    tx?: Omit<Tx, 'data'>
+    txObj: CeloTxObject<any>,
+    tx?: Omit<CeloTx, 'data'>
   ): Promise<TransactionResult> {
     tx = this.fillTxDefaults(tx)
 
     let gas = tx.gas
     if (gas == null) {
-      const gasEstimator = (_tx: Tx) => txObj.estimateGas({ ..._tx })
-      const getCallTx = (_tx: Tx) => {
+      const gasEstimator = (_tx: CeloTx) => txObj.estimateGas({ ..._tx })
+      const getCallTx = (_tx: CeloTx) => {
         // @ts-ignore missing _parent property from TransactionObject type.
         return { ..._tx, data: txObj.encodeABI(), to: txObj._parent._address }
       }
-      const caller = (_tx: Tx) => this.web3.eth.call(getCallTx(_tx))
+      const caller = (_tx: CeloTx) => this.web3.eth.call(getCallTx(_tx))
       try {
         gas = Math.round(
           (await estimateGas(tx, gasEstimator, caller)) * this.config.gasInflationFactor
@@ -327,8 +326,8 @@ export class ContractKit {
     )
   }
 
-  private fillTxDefaults(tx?: Tx): Tx {
-    const defaultTx: Tx = {
+  private fillTxDefaults(tx?: CeloTx): CeloTx {
+    const defaultTx: CeloTx = {
       from: this.config.from,
       feeCurrency: this.config.feeCurrency,
       gasPrice: this.config.gasPrice,

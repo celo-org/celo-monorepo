@@ -1,12 +1,12 @@
-import { Tx } from 'web3-core'
-import { Callback, JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
+import { Callback, CeloTx } from '@celo/sdk-types/commons'
+import { JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
 import { RpcCaller } from './rpc-caller'
 import { TxParamsNormalizer } from './tx-params-normalizer'
 
 describe('TxParamsNormalizer class', () => {
   let populator: TxParamsNormalizer
   let mockRpcCall: any
-  const completeCeloTx: Tx = {
+  const completeCeloTx: CeloTx = {
     nonce: 1,
     chainId: 1,
     from: 'test',
@@ -42,7 +42,7 @@ describe('TxParamsNormalizer class', () => {
 
   describe('when missing parameters', () => {
     test('will populate the chaindId', async () => {
-      const celoTx: Tx = { ...completeCeloTx }
+      const celoTx: CeloTx = { ...completeCeloTx }
       celoTx.chainId = undefined
       const newCeloTx = await populator.populate(celoTx)
       expect(newCeloTx.chainId).toBe(27)
@@ -51,7 +51,7 @@ describe('TxParamsNormalizer class', () => {
     })
 
     test('will retrieve only once the chaindId', async () => {
-      const celoTx: Tx = { ...completeCeloTx }
+      const celoTx: CeloTx = { ...completeCeloTx }
       celoTx.chainId = undefined
       const newCeloTx = await populator.populate(celoTx)
       expect(newCeloTx.chainId).toBe(27)
@@ -64,7 +64,7 @@ describe('TxParamsNormalizer class', () => {
     })
 
     test('will populate the nonce', async () => {
-      const celoTx: Tx = { ...completeCeloTx }
+      const celoTx: CeloTx = { ...completeCeloTx }
       celoTx.nonce = undefined
       const newCeloTx = await populator.populate(celoTx)
       expect(newCeloTx.nonce).toBe(39) // 0x27 => 39
@@ -73,7 +73,7 @@ describe('TxParamsNormalizer class', () => {
     })
 
     test('will populate the gas', async () => {
-      const celoTx: Tx = { ...completeCeloTx }
+      const celoTx: CeloTx = { ...completeCeloTx }
       celoTx.gas = undefined
       const newCeloTx = await populator.populate(celoTx)
       expect(newCeloTx.gas).toBe('27')
@@ -84,7 +84,7 @@ describe('TxParamsNormalizer class', () => {
     /* Disabled till the coinbase issue is fixed
 
     test('will populate the gatewayFeeRecipient', async () => {
-      const celoTx: Tx = { ...completeCeloTx }
+      const celoTx: CeloTx = { ...completeCeloTx }
       celoTx.gatewayFeeRecipient = undefined
       const newCeloTx = await populator.populate(celoTx)
       expect(newCeloTx.gatewayFeeRecipient).toBe('27')
@@ -93,7 +93,7 @@ describe('TxParamsNormalizer class', () => {
     })
 
     test('will retrieve only once the gatewayFeeRecipient', async () => {
-      const celoTx: Tx = { ...completeCeloTx }
+      const celoTx: CeloTx = { ...completeCeloTx }
       celoTx.gatewayFeeRecipient = undefined
       const newCeloTx = await populator.populate(celoTx)
       expect(newCeloTx.gatewayFeeRecipient).toBe('27')
@@ -107,7 +107,7 @@ describe('TxParamsNormalizer class', () => {
     */
 
     test('will populate the gas price without fee currency', async () => {
-      const celoTx: Tx = { ...completeCeloTx }
+      const celoTx: CeloTx = { ...completeCeloTx }
       celoTx.gasPrice = undefined
       const newCeloTx = await populator.populate(celoTx)
       expect(newCeloTx.gasPrice).toBe('27')
@@ -116,7 +116,7 @@ describe('TxParamsNormalizer class', () => {
     })
 
     test('will populate the gas price with fee currency', async () => {
-      const celoTx: Tx = { ...completeCeloTx }
+      const celoTx: CeloTx = { ...completeCeloTx }
       celoTx.gasPrice = undefined
       celoTx.feeCurrency = 'celoMagic'
       const newCeloTx = await populator.populate(celoTx)
@@ -125,7 +125,7 @@ describe('TxParamsNormalizer class', () => {
     })
 
     test('will not populate the gas price when fee currency is undefined', async () => {
-      const celoTx: Tx = { ...completeCeloTx }
+      const celoTx: CeloTx = { ...completeCeloTx }
       celoTx.gasPrice = undefined
       celoTx.feeCurrency = undefined
       const newCeloTx = await populator.populate(celoTx)

@@ -1,11 +1,10 @@
-import { findAddressIndex } from '@celo/utils/lib/address'
+import { Address, findAddressIndex } from '@celo/utils/lib/address'
 import {
   hashMessageWithPrefix,
   Signature,
   signedMessageToPublicKey,
 } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
-import { Address } from '../base'
 import { ReleaseGold } from '../generated/ReleaseGold'
 import {
   BaseWrapper,
@@ -462,9 +461,9 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
     const account = this.address
     if (await validators.isValidator(account)) {
       const message = this.kit.web3.utils.soliditySha3({ type: 'address', value: account })
-      const prefixedMsg = hashMessageWithPrefix(message)
+      const prefixedMsg = hashMessageWithPrefix(message!)
       const pubKey = signedMessageToPublicKey(
-        prefixedMsg,
+        prefixedMsg!,
         proofOfSigningKeyPossession.v,
         proofOfSigningKeyPossession.r,
         proofOfSigningKeyPossession.s
@@ -510,9 +509,9 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
   ): Promise<CeloTransactionObject<void>> {
     const account = this.address
     const message = this.kit.web3.utils.soliditySha3({ type: 'address', value: account })
-    const prefixedMsg = hashMessageWithPrefix(message)
+    const prefixedMsg = hashMessageWithPrefix(message!)
     const pubKey = signedMessageToPublicKey(
-      prefixedMsg,
+      prefixedMsg!,
       proofOfSigningKeyPossession.v,
       proofOfSigningKeyPossession.r,
       proofOfSigningKeyPossession.s

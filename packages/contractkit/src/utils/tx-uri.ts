@@ -1,9 +1,9 @@
+import { CeloTx } from '@celo/sdk-types/commons'
 import { trimLeading0x } from '@celo/utils/lib/address'
 import BN from 'bn.js'
 import { range } from 'lodash'
 import qrcode from 'qrcode'
 import querystring from 'querystring'
-import { Tx } from 'web3-core'
 import abi from 'web3-eth-abi'
 
 // see https://solidity.readthedocs.io/en/v0.5.3/abi-spec.html#function-selector-and-argument-encoding
@@ -21,14 +21,14 @@ const URI_REGEX_STR = `^celo:${ADDRESS_REGEX_STR}(@${CHAIN_ID_REGEX})?(/${FUNCTI
 
 const uriRegexp = new RegExp(URI_REGEX_STR)
 
-export function parseUri(uri: string): Tx {
+export function parseUri(uri: string): CeloTx {
   const matchObj = uriRegexp.exec(uri)
   if (matchObj == null) {
     throw new Error(`URI ${uri}\n did not match\n ${URI_REGEX_STR}`)
   }
   const namedGroups = (matchObj as any).groups
 
-  let tx: Tx = {
+  let tx: CeloTx = {
     to: namedGroups.address,
   }
 
@@ -60,7 +60,7 @@ export function parseUri(uri: string): Tx {
   return tx
 }
 
-export function buildUri(tx: Tx, functionName?: string, abiTypes: string[] = []): string {
+export function buildUri(tx: CeloTx, functionName?: string, abiTypes: string[] = []): string {
   if (!tx.to) {
     throw new Error("'to' address must be defined for celo URIs")
   }

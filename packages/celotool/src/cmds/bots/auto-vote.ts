@@ -1,8 +1,7 @@
 // The purpose of the Voting bot in a testnet is to add incentives for good
 // behavior by validators. This introduces some non-validator stakers into the
 // network that will judge the validator groups, and vote accordingly.
-import { ContractKit, newKit } from '@celo/contractkit'
-import { Address } from '@celo/contractkit/lib/base'
+import { Address, ContractKit, newKit } from '@celo/contractkit'
 import {
   ensureLeading0x,
   eqAddress,

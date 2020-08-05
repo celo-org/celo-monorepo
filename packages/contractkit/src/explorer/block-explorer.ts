@@ -1,5 +1,6 @@
+import { CeloTxPending } from '@celo/sdk-types/commons'
 import { Address } from '@celo/utils/lib/address'
-import { Block, Transaction } from 'web3-eth'
+import { Block } from 'web3-eth'
 import abi, { ABIDefinition } from 'web3-eth-abi'
 import { PROXY_ABI } from '../governance/proxy'
 import { ContractKit } from '../kit'
@@ -15,7 +16,7 @@ export interface CallDetails {
 
 export interface ParsedTx {
   callDetails: CallDetails
-  tx: Transaction
+  tx: CeloTxPending
 }
 
 export interface ParsedBlock {
@@ -84,7 +85,7 @@ export class BlockExplorer {
     }
   }
 
-  tryParseTx(tx: Transaction): null | ParsedTx {
+  tryParseTx(tx: CeloTxPending): null | ParsedTx {
     const callDetails = this.tryParseTxInput(tx.to!, tx.input)
     if (!callDetails) {
       return null

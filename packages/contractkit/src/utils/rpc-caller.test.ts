@@ -1,5 +1,6 @@
+import { Callback } from '@celo/sdk-types/commons'
 import { provider } from 'web3-core'
-import { Callback, JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
+import { JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
 import { DefaultRpcCaller, RpcCaller, rpcCallHandler } from './rpc-caller'
 
 const mockProvider: provider = {

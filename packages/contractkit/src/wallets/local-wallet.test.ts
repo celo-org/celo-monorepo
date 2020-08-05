@@ -1,7 +1,8 @@
+import { CeloTx } from '@celo/sdk-types/commons'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import Web3 from 'web3'
-import { EncodedTransaction, Tx } from 'web3-core'
+import { EncodedTransaction } from 'web3-core'
 import { recoverTransaction, verifyEIP712TypedDataSigner } from '../utils/signing-utils'
 import { LocalWallet } from './local-wallet'
 
@@ -96,7 +97,7 @@ describe('Local wallet class', () => {
 
     describe('signing', () => {
       describe('using an unknown address', () => {
-        let celoTransaction: Tx
+        let celoTransaction: CeloTx
         const unknownAddress: string = ACCOUNT_ADDRESS2
 
         beforeEach(() => {
@@ -131,7 +132,7 @@ describe('Local wallet class', () => {
 
       describe('using a known address', () => {
         describe('when calling signTransaction', () => {
-          let celoTransaction: Tx
+          let celoTransaction: CeloTx
 
           beforeEach(() => {
             celoTransaction = {

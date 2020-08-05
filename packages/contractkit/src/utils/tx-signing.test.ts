@@ -1,8 +1,9 @@
+import { Callback, CeloTx } from '@celo/sdk-types/commons'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import debugFactory from 'debug'
 import Web3 from 'web3'
-import { provider, Tx } from 'web3-core'
-import { Callback, JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
+import { provider } from 'web3-core'
+import { JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
 import { CeloProvider } from '../providers/celo-provider'
 import { recoverTransaction } from './signing-utils'
 
@@ -19,7 +20,7 @@ debug(`Account Address 1: ${ACCOUNT_ADDRESS1}`)
 debug(`Private key 2: ${PRIVATE_KEY2}`)
 debug(`Account Address 2: ${ACCOUNT_ADDRESS2}`)
 
-async function verifyLocalSigning(web3: Web3, celoTransaction: Tx): Promise<void> {
+async function verifyLocalSigning(web3: Web3, celoTransaction: CeloTx): Promise<void> {
   debug('Signer Testing using Account: %s', celoTransaction.from)
   const signedTransaction = await web3.eth.signTransaction(celoTransaction)
   debug('Singer Testing: Signed transaction %o', signedTransaction)
@@ -110,7 +111,7 @@ async function verifyLocalSigningInAllPermutations(
   // tslint:disable:no-bitwise
   // Test all possible combinations for rigor.
   for (let i = 0; i < 16; i++) {
-    const celoTransaction: Tx = {
+    const celoTransaction: CeloTx = {
       from,
       to,
       value: amountInWei,

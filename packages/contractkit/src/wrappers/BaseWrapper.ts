@@ -1,8 +1,9 @@
+import { CeloTx, CeloTxObject } from '@celo/sdk-types/commons'
 import { bufferToHex, ensureLeading0x } from '@celo/utils/lib/address'
 import { zip } from '@celo/utils/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { EventLog, TransactionReceipt, Tx } from 'web3-core'
+import { EventLog, TransactionReceipt } from 'web3-core'
 import { TransactionObject } from 'web3-eth'
 import { Contract, PastEventOptions } from 'web3-eth-contract'
 import { ContractKit } from '../kit'
@@ -232,19 +233,20 @@ export function proxySend<InputArgs extends any[], ParsedInputArgs extends any[]
   }
 }
 
+export type CeloTransactionParams = Omit<CeloTx, 'data'>
+
 export function toTransactionObject<O>(
   kit: ContractKit,
-  txo: TransactionObject<O>,
-  defaultParams?: Omit<Tx, 'data'>
+  txo: CeloTxObject<O>,
+  defaultParams?: CeloTransactionParams
 ): CeloTransactionObject<O> {
   return new CeloTransactionObject(kit, txo, defaultParams)
 }
 
-export type CeloTransactionParams = Omit<Tx, 'data'>
 export class CeloTransactionObject<O> {
   constructor(
     private kit: ContractKit,
-    readonly txo: TransactionObject<O>,
+    readonly txo: CeloTxObject<O>,
     readonly defaultParams?: CeloTransactionParams
   ) {}
 

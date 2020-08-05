@@ -1,6 +1,7 @@
+import { Callback } from '@celo/sdk-types/commons'
 import debugFactory from 'debug'
 import { provider } from 'web3-core'
-import { Callback, JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
+import { JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
 
 const debugRpcPayload = debugFactory('rpc:payload')
 const debugRpcResponse = debugFactory('rpc:response')
@@ -107,7 +108,7 @@ export class DefaultRpcCaller implements RpcCaller {
     }) as Callback<JsonRpcResponse>
 
     if (this.defaultProvider && typeof this.defaultProvider !== 'string') {
-      this.defaultProvider.send(payload, decoratedCallback)
+      this.defaultProvider.send!(payload, decoratedCallback)
     }
   }
 }

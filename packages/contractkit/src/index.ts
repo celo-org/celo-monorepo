@@ -1,6 +1,7 @@
 import Web3 from 'web3'
 
-export { Address, AllContracts, CeloContract, CeloToken, NULL_ADDRESS } from './base'
+export { Address, NULL_ADDRESS } from '@celo/sdk-types/commons'
+export { AllContracts, CeloContract, CeloToken } from './base'
 export { IdentityMetadataWrapper } from './identity'
 export * from './kit'
 export { GenesisBlockUtils } from './network-utils/genesis-block-utils'

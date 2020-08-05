@@ -1,3 +1,4 @@
+import { Address } from '@celo/sdk-types/commons'
 import {
   hashMessageWithPrefix,
   LocalSigner,
@@ -8,7 +9,6 @@ import {
   Signer,
 } from '@celo/utils/lib/signatureUtils'
 import Web3 from 'web3'
-import { Address } from '../base'
 import { Accounts } from '../generated/Accounts'
 import {
   BaseWrapper,
@@ -208,9 +208,9 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     const account = this.kit.defaultAccount || (await this.kit.web3.eth.getAccounts())[0]
     if (await validators.isValidator(account)) {
       const message = this.kit.web3.utils.soliditySha3({ type: 'address', value: account })
-      const prefixedMsg = hashMessageWithPrefix(message)
+      const prefixedMsg = hashMessageWithPrefix(message!)
       const pubKey = signedMessageToPublicKey(
-        prefixedMsg,
+        prefixedMsg!,
         proofOfSigningKeyPossession.v,
         proofOfSigningKeyPossession.r,
         proofOfSigningKeyPossession.s
@@ -256,9 +256,9 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   ): Promise<CeloTransactionObject<void>> {
     const account = this.kit.defaultAccount || (await this.kit.web3.eth.getAccounts())[0]
     const message = this.kit.web3.utils.soliditySha3({ type: 'address', value: account })
-    const prefixedMsg = hashMessageWithPrefix(message)
+    const prefixedMsg = hashMessageWithPrefix(message!)
     const pubKey = signedMessageToPublicKey(
-      prefixedMsg,
+      prefixedMsg!,
       proofOfSigningKeyPossession.v,
       proofOfSigningKeyPossession.r,
       proofOfSigningKeyPossession.s
@@ -410,12 +410,12 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
 
   parseSignatureOfAddress(address: Address, signer: string, signature: string) {
     const hash = Web3.utils.soliditySha3({ type: 'address', value: address })
-    return parseSignature(hash, signature, signer)
+    return parseSignature(hash!, signature, signer)
   }
 
   private async getParsedSignatureOfAddress(address: Address, signer: string, signerFn: Signer) {
     const hash = Web3.utils.soliditySha3({ type: 'address', value: address })
-    const signature = await signerFn.sign(hash)
-    return parseSignature(hash, signature, signer)
+    const signature = await signerFn.sign(hash!)
+    return parseSignature(hash!, signature, signer)
   }
 }

@@ -1,13 +1,13 @@
+import { Address } from '@celo/sdk-types/commons'
+import { Wallet } from '@celo/sdk-types/wallet'
 import { CELO_DERIVATION_PATH_BASE } from '@celo/utils/lib/account'
 import { TransportError, TransportStatusError } from '@ledgerhq/errors'
 import Ledger from '@ledgerhq/hw-app-eth'
 import debugFactory from 'debug'
-import { Address } from '../base'
 import { transportErrorFriendlyMessage } from '../utils/ledger-utils'
 import { RemoteWallet } from './remote-wallet'
 import { LedgerSigner } from './signers/ledger-signer'
 import { Signer } from './signers/signer'
-import { Wallet } from './wallet'
 
 export const CELO_BASE_DERIVATION_PATH = CELO_DERIVATION_PATH_BASE.slice(2)
 const ADDRESS_QTY = 5

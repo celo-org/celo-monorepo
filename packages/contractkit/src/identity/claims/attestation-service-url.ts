@@ -1,10 +1,10 @@
+import { Address } from '@celo/sdk-types/commons'
 import { eqAddress } from '@celo/utils/lib/address'
 import { AttestationServiceStatusResponseType, UrlType } from '@celo/utils/lib/io'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import fetch from 'cross-fetch'
 import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
-import { Address } from '../../base'
 import { ContractKit } from '../../kit'
 import { ClaimTypes, now, TimestampType } from './types'
 

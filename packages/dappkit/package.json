@@ -10,7 +10,7 @@
     "expo": "^36.0.2",
     "expo-contacts": "8.0.0",
     "libphonenumber-js": "^1.7.22",
-    "web3-eth-contract": "1.2.4"
+    "web3-eth-contract": "1.2.11"
   },
   "devDependencies": {
   },

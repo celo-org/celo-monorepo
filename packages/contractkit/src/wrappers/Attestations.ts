@@ -1,3 +1,4 @@
+import { Address, NULL_ADDRESS } from '@celo/sdk-types/commons'
 import { AttestationUtils, SignatureUtils } from '@celo/utils/lib'
 import { eqAddress } from '@celo/utils/lib/address'
 import { concurrentMap, sleep } from '@celo/utils/lib/async'
@@ -6,7 +7,7 @@ import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
 import { appendPath } from '@celo/utils/lib/string'
 import BigNumber from 'bignumber.js'
 import fetch from 'cross-fetch'
-import { Address, CeloContract, NULL_ADDRESS } from '../base'
+import { CeloContract } from '../base'
 import { Attestations } from '../generated/Attestations'
 import { ClaimTypes, IdentityMetadataWrapper } from '../identity'
 import {

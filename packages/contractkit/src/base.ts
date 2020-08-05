@@ -1,5 +1,3 @@
-export type Address = string
-
 export enum CeloContract {
   Accounts = 'Accounts',
   Attestations = 'Attestations',
@@ -55,5 +53,3 @@ export type CeloToken = CeloContract.GoldToken | CeloContract.StableToken
 export const AllContracts = Object.keys(CeloContract).map(
   (k) => (CeloContract as any)[k as any]
 ) as CeloContract[]
-
-export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000' as Address

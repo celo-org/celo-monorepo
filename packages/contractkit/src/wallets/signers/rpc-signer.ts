@@ -1,7 +1,8 @@
+import { CeloTx } from '@celo/sdk-types/commons'
 import { ensureLeading0x, normalizeAddressWith0x, trimLeading0x } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import BN from 'bn.js'
-import { EncodedTransaction, Tx } from 'web3-core'
+import { EncodedTransaction } from 'web3-core'
 import { RpcCaller } from '../../utils/rpc-caller'
 import { decodeSig } from '../../utils/signing-utils'
 import { Signer } from './signer'
@@ -73,7 +74,7 @@ export class RpcSigner implements Signer {
       passphrase,
     ])
 
-  async signRawTransaction(tx: Tx) {
+  async signRawTransaction(tx: CeloTx) {
     if (normalizeAddressWith0x(tx.from! as string) !== this.account) {
       throw new Error(`RpcSigner cannot sign tx with 'from' ${tx.from}`)
     }

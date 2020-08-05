@@ -36,7 +36,7 @@ testWithGanache('Accounts Wrapper', (web3) => {
   }
 
   const getParsedSignatureOfAddress = async (address: string, signer: string) => {
-    const addressHash = web3.utils.soliditySha3({ type: 'address', value: address })
+    const addressHash = web3.utils.soliditySha3({ type: 'address', value: address })!
     const signature = await web3.eth.sign(addressHash, signer)
     return parseSignature(addressHash, signature, signer)
   }

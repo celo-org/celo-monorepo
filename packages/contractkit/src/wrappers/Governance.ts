@@ -1,3 +1,4 @@
+import { Address, CeloTxPending } from '@celo/sdk-types/commons'
 import {
   bufferToHex,
   ensureLeading0x,
@@ -9,8 +10,6 @@ import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import { fromFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { Transaction } from 'web3-eth'
-import { Address } from '../base'
 import { Governance } from '../generated/Governance'
 import {
   BaseWrapper,
@@ -67,7 +66,7 @@ export interface ProposalMetadata {
 }
 
 export type ProposalParams = Parameters<Governance['methods']['propose']>
-export type ProposalTransaction = Pick<Transaction, 'to' | 'input' | 'value'>
+export type ProposalTransaction = Pick<CeloTxPending, 'to' | 'input' | 'value'>
 export type Proposal = ProposalTransaction[]
 
 export const proposalToParams = (proposal: Proposal, descriptionURL: string): ProposalParams => {

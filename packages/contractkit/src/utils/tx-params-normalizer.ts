@@ -1,4 +1,4 @@
-import { Tx } from 'web3-core'
+import { CeloTx } from '@celo/sdk-types/commons'
 import { RpcCaller } from './rpc-caller'
 import { estimateGas } from './web3-utils'
 
@@ -18,7 +18,7 @@ export class TxParamsNormalizer {
 
   constructor(readonly rpcCaller: RpcCaller) {}
 
-  public async populate(celoTxParams: Tx): Promise<Tx> {
+  public async populate(celoTxParams: CeloTx): Promise<CeloTx> {
     const txParams = { ...celoTxParams }
 
     if (txParams.chainId == null) {
@@ -57,13 +57,13 @@ export class TxParamsNormalizer {
     return nonce
   }
 
-  private async getEstimateGas(txParams: Tx): Promise<string> {
+  private async getEstimateGas(txParams: CeloTx): Promise<string> {
     // Reference: https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_estimategas
-    const gasEstimator = async (tx: Tx) => {
+    const gasEstimator = async (tx: CeloTx) => {
       const gasResult = await this.rpcCaller.call('eth_estimateGas', [tx])
       return gasResult.result as number
     }
-    const caller = async (tx: Tx) => {
+    const caller = async (tx: CeloTx) => {
       const callResult = await this.rpcCaller.call('eth_call', [tx])
       return callResult.result as string
     }

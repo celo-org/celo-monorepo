@@ -1,6 +1,5 @@
-import { Tx } from 'web3-core'
-import { ABIDefinition, DecodedParamsObject } from 'web3-eth-abi'
-const web3EthAbi = require('web3-eth-abi')
+import { CeloTx } from '@celo/sdk-types/commons'
+import web3EthAbi, { ABIDefinition, DecodedParamsObject } from 'web3-eth-abi'
 
 export const getAbiTypes = (abi: ABIDefinition[], methodName: string) =>
   abi.find((entry) => entry.name! === methodName)!.inputs!.map((input) => input.type)
@@ -19,9 +18,9 @@ export const parseDecodedParams = (params: DecodedParamsObject) => {
 }
 
 export const estimateGas = async (
-  tx: Tx,
-  gasEstimator: (tx: Tx) => Promise<number>,
-  caller: (tx: Tx) => Promise<string>
+  tx: CeloTx,
+  gasEstimator: (tx: CeloTx) => Promise<number>,
+  caller: (tx: CeloTx) => Promise<string>
 ) => {
   try {
     const gas = await gasEstimator({ ...tx })

@@ -1,3 +1,4 @@
+import { CeloTx } from '@celo/sdk-types/commons'
 import {
   ensureLeading0x,
   normalizeAddressWith0x,
@@ -10,7 +11,7 @@ import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import { account as Account } from 'eth-lib'
 import * as ethUtil from 'ethereumjs-util'
 import Web3 from 'web3'
-import { EncodedTransaction, Tx } from 'web3-core'
+import { EncodedTransaction } from 'web3-core'
 import {
   chainIdTransformationForSigning,
   getHashFromEncoded,
@@ -182,7 +183,7 @@ describe('LedgerWallet class', () => {
   })
 
   describe('without initializing', () => {
-    let celoTransaction: Tx
+    let celoTransaction: CeloTx
     beforeAll(() => {
       celoTransaction = {
         from: knownAddress,
@@ -255,7 +256,7 @@ describe('LedgerWallet class', () => {
     })
 
     describe('with an account', () => {
-      let celoTransaction: Tx
+      let celoTransaction: CeloTx
       beforeEach(() => {
         celoTransaction = {
           from: unknownAddress,
