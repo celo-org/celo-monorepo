@@ -94,7 +94,6 @@
     "yiq": "^3.0.1"
   },
   "devDependencies": {
-    "@celo/flake-tracker": "0.0.1-dev",
     "@firebase/app-types": "^0.6.0",
     "@sentry/types": "^5.20.1",
     "@testing-library/dom": "^7.2.1",
@@ -122,5 +121,8 @@
     "postcss-scss": "^2.0.0",
     "react-native-svg": "^9.13.6",
     "webpack": "4.41.2"
+  },
+  "peerDependencies": {
+    "@celo/flake-tracker": "0.0.1-dev"
   }
 }
