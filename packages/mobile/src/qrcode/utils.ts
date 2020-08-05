@@ -9,7 +9,7 @@ import { validateRecipientAddressSuccess } from 'src/identity/actions'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import { replace } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { UriData, uriDataFromJson, uriDataFromUrl } from 'src/qrcode/schema'
+import { UriData, uriDataFromUrl } from 'src/qrcode/schema'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 import { QrCode, SVG } from 'src/send/actions'
 import { TransactionDataInput } from 'src/send/SendAmount'
@@ -104,8 +104,6 @@ export function* handleBarcode(
     qrData = uriDataFromUrl(barcode.data)
   } catch (e) {
     Logger.warn(TAG, 'qr scan failed with ' + e)
-    // DEPRECATED:
-    qrData = uriDataFromJson(JSON.parse(barcode.data))
     return
   }
 

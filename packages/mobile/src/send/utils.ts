@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import { call, put, select } from 'redux-saga/effects'
+import { call, put, select, take } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -8,7 +8,7 @@ import { FeeType } from 'src/fees/actions'
 import { getAddressFromPhoneNumber } from 'src/identity/contactMapping'
 import { E164NumberToAddressType, SecureSendPhoneNumberMapping } from 'src/identity/reducer'
 import { RecipientVerificationStatus } from 'src/identity/types'
-import { selectPreferredCurrency } from 'src/localCurrency/actions'
+import { Actions, selectPreferredCurrency } from 'src/localCurrency/actions'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 import { convertDollarsToLocalAmount, convertLocalAmountToDollars } from 'src/localCurrency/convert'
 import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
@@ -124,7 +124,7 @@ export function* handleSendPaymentData(data: UriData, cachedRecipient?: Recipien
     kind: RecipientKind.QrCode,
     address: data.address,
     displayId: data.e164PhoneNumber,
-    displayName: data.displayName || cachedRecipient?.displayName || 'QR Code',
+    displayName: data.displayName || cachedRecipient?.displayName || 'anonymous',
     phoneNumberLabel: cachedRecipient?.phoneNumberLabel,
     thumbnailPath: cachedRecipient?.thumbnailPath,
     contactId: cachedRecipient?.contactId,
@@ -133,6 +133,7 @@ export function* handleSendPaymentData(data: UriData, cachedRecipient?: Recipien
 
   if (data.currencyCode) {
     yield put(selectPreferredCurrency(data.currencyCode as LocalCurrencyCode))
+    yield take([Actions.FETCH_CURRENT_RATE_SUCCESS, Actions.FETCH_CURRENT_RATE_FAILURE])
   }
 
   if (data.amount) {
