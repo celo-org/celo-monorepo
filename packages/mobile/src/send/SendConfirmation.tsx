@@ -179,7 +179,10 @@ export class SendConfirmation extends React.Component<Props, State> {
       reason,
     } = this.props.confirmationInput
 
-    const comment = type === TokenTransactionType.PayRequest ? reason || '' : this.state.comment
+    const comment =
+      type === TokenTransactionType.PayRequest || type === TokenTransactionType.PayPrefill
+        ? reason || ''
+        : this.state.comment
 
     const localCurrencyAmount = convertDollarsToLocalAmount(
       amount,
@@ -301,7 +304,7 @@ export class SendConfirmation extends React.Component<Props, State> {
     }
 
     let primaryBtnInfo
-    if (type === TokenTransactionType.PayRequest) {
+    if (type === TokenTransactionType.PayRequest || type === TokenTransactionType.PayPrefill) {
       primaryBtnInfo = {
         action: this.sendOrInvite,
         text: i18n.t('global:pay'),
@@ -315,7 +318,7 @@ export class SendConfirmation extends React.Component<Props, State> {
       }
     }
 
-    const paymentRequestComment = reason || ''
+    const paymentComment = reason || ''
 
     const FeeContainer = () => {
       let securityFee
@@ -417,9 +420,10 @@ export class SendConfirmation extends React.Component<Props, State> {
               style={styles.amount}
               amount={subtotalAmount}
             />
-            {type === TokenTransactionType.PayRequest ? (
+            {type === TokenTransactionType.PayRequest ||
+            type === TokenTransactionType.PayPrefill ? (
               <View>
-                <Text style={styles.paymentRequestComment}>{paymentRequestComment}</Text>
+                <Text style={styles.paymentComment}>{paymentComment}</Text>
               </View>
             ) : (
               <CommentTextInput
@@ -525,7 +529,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     ...fontStyles.largeNumber,
   },
-  paymentRequestComment: {
+  paymentComment: {
     ...fontStyles.large,
     color: colors.gray5,
   },
