@@ -351,6 +351,14 @@ export const v3Schema = {
     ...v2Schema.web3,
     isDekRegistered: false,
   },
+  geth: {
+    ...v2Schema.geth,
+    chainHead: {
+      number: 100,
+      timestamp: 1596502618,
+      hash: '0x0000000000000000000000000000000000000000000000000000000000000F00',
+    },
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {
