@@ -30,7 +30,6 @@ import CalculateFee, {
   PropsWithoutChildren as CalculateFeeProps,
 } from 'src/fees/CalculateFee'
 import { getFeeDollars } from 'src/fees/selectors'
-import { completePaymentRequest, declinePaymentRequest } from 'src/firebase/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import InfoIcon from 'src/icons/InfoIcon'
 import { fetchDataEncryptionKey } from 'src/identity/actions'
@@ -76,8 +75,6 @@ interface StateProps {
 interface DispatchProps {
   sendPaymentOrInvite: typeof sendPaymentOrInvite
   fetchDollarBalance: typeof fetchDollarBalance
-  declinePaymentRequest: typeof declinePaymentRequest
-  completePaymentRequest: typeof completePaymentRequest
   fetchDataEncryptionKey: typeof fetchDataEncryptionKey
 }
 
@@ -94,8 +91,6 @@ type Props = DispatchProps & StateProps & WithTranslation & OwnProps
 const mapDispatchToProps = {
   sendPaymentOrInvite,
   fetchDollarBalance,
-  declinePaymentRequest,
-  completePaymentRequest,
   fetchDataEncryptionKey,
 }
 
