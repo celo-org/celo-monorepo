@@ -1,4 +1,4 @@
-import { IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
+import { IdentityMetadataWrapper } from '@celo/contractkit'
 import { IArg } from '@oclif/parser/lib/args'
 import { writeFileSync } from 'fs'
 import { Args } from '../../utils/command'

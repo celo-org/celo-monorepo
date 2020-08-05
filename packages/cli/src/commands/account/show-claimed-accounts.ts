@@ -1,5 +1,5 @@
-import { ContractKit } from '@celo/contractkit'
-import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
+import { ContractKit, IdentityMetadataWrapper } from '@celo/contractkit'
+import { ClaimTypes } from '@celo/contractkit/lib/identity'
 import { AccountClaim } from '@celo/contractkit/lib/identity/claims/account'
 import { verifyAccountClaim } from '@celo/contractkit/lib/identity/claims/verify'
 import { ensureLeading0x } from '@celo/utils/lib/address'

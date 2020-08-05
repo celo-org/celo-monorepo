@@ -1,4 +1,4 @@
-import { IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
+import { IdentityMetadataWrapper } from '@celo/contractkit'
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'

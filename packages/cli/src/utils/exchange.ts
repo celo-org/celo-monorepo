@@ -1,5 +1,4 @@
-import { CeloContract } from '@celo/contractkit/lib/base'
-import { ContractKit } from '@celo/contractkit/lib/kit'
+import { CeloContract, ContractKit } from '@celo/contractkit'
 import BigNumber from 'bignumber.js'
 import { binaryPrompt } from './cli'
 
