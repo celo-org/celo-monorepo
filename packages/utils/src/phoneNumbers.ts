@@ -2,6 +2,7 @@ import CountryData from 'country-data'
 import {
   CountryCode,
   getCountries,
+  getCountryCallingCode,
   getExampleNumber as libGetExampleNumber,
   parsePhoneNumber as libParsePhoneNumber,
   parsePhoneNumberFromString,
@@ -85,13 +86,19 @@ export function getRegionCode(e164PhoneNumber: string) {
   }
 }
 
-function _getRegionCodeFromCountryCode(countryCode: string | undefined): CountryCode | null {
+function _getRegionCodeFromCountryCode(countryCode: string | undefined): CountryCode | undefined {
   if (!countryCode) {
-    return null
+    return undefined
   }
   const countries = getCountries()
-  const regionCode = countries[parseInt(countryCode, 10)]
-  return regionCode
+  const asNumber = parseInt(countryCode, 10)
+  // TODO: precalculate a dictionary country calling code => country iso code
+  // to avoid this iteration
+  return countries.find((country) => {
+    const cc = getCountryCallingCode(country) as string
+    const ccAsNumber = parseInt(cc, 10)
+    return ccAsNumber === asNumber
+  })
 }
 
 export function getRegionCodeFromCountryCode(countryCode: string) {
