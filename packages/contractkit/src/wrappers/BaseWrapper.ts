@@ -1,16 +1,14 @@
-import { CeloTx, CeloTxObject } from '@celo/sdk-types/commons'
+import { CeloTx, CeloTxObject, CeloTxReceipt, EventLog } from '@celo/sdk-types/commons'
 import { bufferToHex, ensureLeading0x } from '@celo/utils/lib/address'
 import { zip } from '@celo/utils/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { EventLog, TransactionReceipt } from 'web3-core'
-import { TransactionObject } from 'web3-eth'
 import { Contract, PastEventOptions } from 'web3-eth-contract'
 import { ContractKit } from '../kit'
 import { TransactionResult } from '../utils/tx-result'
 
 /** Represents web3 native contract Method */
-type Method<I extends any[], O> = (...args: I) => TransactionObject<O>
+type Method<I extends any[], O> = (...args: I) => CeloTxObject<O>
 
 export interface Filter {
   [key: string]: number | string | string[] | number[]
@@ -256,6 +254,6 @@ export class CeloTransactionObject<O> {
   }
 
   /** send the transaction and waits for the receipt */
-  sendAndWaitForReceipt = (params?: CeloTransactionParams): Promise<TransactionReceipt> =>
+  sendAndWaitForReceipt = (params?: CeloTransactionParams): Promise<CeloTxReceipt> =>
     this.send(params).then((result) => result.waitReceipt())
 }

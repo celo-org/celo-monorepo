@@ -1,6 +1,4 @@
-import { CeloTxPending } from '@celo/sdk-types/commons'
-import { Address } from '@celo/utils/lib/address'
-import { Block } from 'web3-eth'
+import { Address, Block, CeloTxPending } from '@celo/sdk-types/commons'
 import abi, { ABIDefinition } from 'web3-eth-abi'
 import { PROXY_ABI } from '../governance/proxy'
 import { ContractKit } from '../kit'

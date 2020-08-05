@@ -1,11 +1,10 @@
-import { CeloTx } from '@celo/sdk-types/commons'
+import { CeloTx, EncodedTransaction } from '@celo/sdk-types/commons'
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import debugFactory from 'debug'
 // @ts-ignore-next-line
 import { account as Account, bytes as Bytes, hash as Hash, RLP } from 'eth-lib'
 import * as ethUtil from 'ethereumjs-util'
-import { EncodedTransaction } from 'web3-core'
 import * as helpers from 'web3-core-helpers'
 import { EIP712TypedData, generateTypedDataHash } from './sign-typed-data-utils'
 

@@ -1,4 +1,4 @@
-import { CeloTx } from '@celo/sdk-types/commons'
+import { CeloTx, EncodedTransaction } from '@celo/sdk-types/commons'
 import {
   ensureLeading0x,
   normalizeAddressWith0x,
@@ -11,7 +11,6 @@ import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import { account as Account } from 'eth-lib'
 import * as ethUtil from 'ethereumjs-util'
 import Web3 from 'web3'
-import { EncodedTransaction } from 'web3-core'
 import {
   chainIdTransformationForSigning,
   getHashFromEncoded,

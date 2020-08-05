@@ -1,6 +1,5 @@
-import { Address } from '@celo/sdk-types/commons'
+import { Address, CeloTxObject } from '@celo/sdk-types/commons'
 import BigNumber from 'bignumber.js'
-import { TransactionObject } from 'web3-eth'
 import { MultiSig } from '../generated/MultiSig'
 import {
   BaseWrapper,
@@ -35,7 +34,7 @@ export class MultiSigWrapper extends BaseWrapper<MultiSig> {
    */
   async submitOrConfirmTransaction(
     destination: string,
-    txObject: TransactionObject<any>,
+    txObject: CeloTxObject<any>,
     value: string = '0'
   ) {
     const data = stringToSolidityBytes(txObject.encodeABI())

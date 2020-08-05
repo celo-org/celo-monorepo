@@ -1,8 +1,7 @@
-import { CeloTx } from '@celo/sdk-types/commons'
+import { CeloTx, EncodedTransaction } from '@celo/sdk-types/commons'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import Web3 from 'web3'
-import { EncodedTransaction } from 'web3-core'
 import { recoverTransaction, verifyEIP712TypedDataSigner } from '../utils/signing-utils'
 import { LocalWallet } from './local-wallet'
 

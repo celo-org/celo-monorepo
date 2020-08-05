@@ -1,5 +1,6 @@
+import { CeloTxReceipt, EventLog } from '@celo/sdk-types/commons'
 import { Address } from '@celo/utils/lib/address'
-import { EventLog, Log, TransactionReceipt } from 'web3-core'
+import { Log } from 'web3-core'
 import abi, { ABIDefinition } from 'web3-eth-abi'
 import { ContractKit } from '../kit'
 import { ContractDetails, mapFromPairs, obtainKitContractDetails } from './base'
@@ -46,11 +47,11 @@ export class LogExplorer {
     }
   }
 
-  async fetchTxReceipt(txhash: string): Promise<TransactionReceipt> {
+  async fetchTxReceipt(txhash: string): Promise<CeloTxReceipt> {
     return this.kit.web3.eth.getTransactionReceipt(txhash)
   }
 
-  getKnownLogs(tx: TransactionReceipt): EventLog[] {
+  getKnownLogs(tx: CeloTxReceipt): EventLog[] {
     const res: EventLog[] = []
     for (const log of tx.logs || []) {
       const event = this.tryParseLog(log)

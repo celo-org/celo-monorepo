@@ -1,6 +1,6 @@
+import { CeloTxObject, CeloTxPending } from '@celo/sdk-types/commons'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { keccak256 } from 'ethereumjs-util'
-import { Transaction, TransactionObject } from 'web3-eth'
 import { Contract } from 'web3-eth-contract'
 import { CeloContract } from '../base'
 import { obtainKitContractDetails } from '../explorer/base'
@@ -52,7 +52,7 @@ export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
   const blockExplorer = new BlockExplorer(kit, contractDetails)
 
   return concurrentMap<ProposalTransaction, ProposalTransactionJSON>(4, proposal, async (tx) => {
-    const parsedTx = blockExplorer.tryParseTx(tx as Transaction)
+    const parsedTx = blockExplorer.tryParseTx(tx as CeloTxPending)
     if (parsedTx == null) {
       throw new Error(`Unable to parse ${tx} with block explorer`)
     }
@@ -88,7 +88,7 @@ export class ProposalBuilder {
    * @param tx A Web3 transaction object to convert.
    * @param params Parameters for how the transaction should be executed.
    */
-  fromWeb3tx = (tx: TransactionObject<any>, params: ProposalTxParams): ProposalTransaction => ({
+  fromWeb3tx = (tx: CeloTxObject<any>, params: ProposalTxParams): ProposalTransaction => ({
     value: params.value,
     to: params.to,
     input: tx.encodeABI(),
@@ -114,7 +114,7 @@ export class ProposalBuilder {
    * @param tx A Web3 transaction object to add to the proposal.
    * @param params Parameters for how the transaction should be executed.
    */
-  addWeb3Tx = (tx: TransactionObject<any>, params: ProposalTxParams) =>
+  addWeb3Tx = (tx: CeloTxObject<any>, params: ProposalTxParams) =>
     this.builders.push(async () => this.fromWeb3tx(tx, params))
 
   /**

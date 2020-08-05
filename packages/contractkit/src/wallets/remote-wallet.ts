@@ -1,7 +1,6 @@
-import { Address, CeloTx } from '@celo/sdk-types/commons'
+import { Address, CeloTx, EncodedTransaction } from '@celo/sdk-types/commons'
 import { Wallet } from '@celo/sdk-types/wallet'
 import { sleep } from '@celo/utils/lib/async'
-import { EncodedTransaction } from 'web3-core'
 import { EIP712TypedData } from '../utils/sign-typed-data-utils'
 import { Signer } from './signers/signer'
 import { WalletBase } from './wallet-base'

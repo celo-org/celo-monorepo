@@ -1,6 +1,5 @@
 import { Address, NULL_ADDRESS } from '@celo/sdk-types/commons'
 import debugFactory from 'debug'
-import Web3 from 'web3'
 import { AllContracts, CeloContract } from './base'
 import { newRegistry, Registry } from './generated/Registry'
 import { ContractKit } from './kit'
@@ -17,7 +16,7 @@ export class AddressRegistry {
   private readonly registry: Registry
   private readonly cache: Map<CeloContract, Address> = new Map()
 
-  constructor(kit: ContractKit) {
+  constructor(private readonly kit: ContractKit) {
     this.cache.set(CeloContract.Registry, REGISTRY_CONTRACT_ADDRESS)
     this.registry = newRegistry(kit.web3, REGISTRY_CONTRACT_ADDRESS)
   }
@@ -29,7 +28,10 @@ export class AddressRegistry {
     if (!this.cache.has(contract)) {
       const proxyStrippedContract = contract.replace('Proxy', '') as CeloContract
       debug('Fetching address from Registry for %s', contract)
-      const hash = Web3.utils.soliditySha3({ type: 'string', value: proxyStrippedContract })
+      const hash = this.kit.web3.utils.soliditySha3({
+        type: 'string',
+        value: proxyStrippedContract,
+      })
       const address = await this.registry.methods.getAddressFor(hash!).call()
 
       debug('Fetched address:  %s = %s', address)

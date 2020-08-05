@@ -1,6 +1,5 @@
-import { CeloTx } from '@celo/sdk-types/commons'
+import { Address, CeloTx, EncodedTransaction } from '@celo/sdk-types/commons'
 import {
-  Address,
   ensureLeading0x,
   normalizeAddressWith0x,
   privateKeyToAddress,
@@ -10,7 +9,6 @@ import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import * as ethUtil from 'ethereumjs-util'
 import Web3 from 'web3'
-import { EncodedTransaction } from 'web3-core'
 import { Signature } from '../utils/azure-key-vault-client'
 import { recoverTransaction, verifyEIP712TypedDataSigner } from '../utils/signing-utils'
 import { AzureHSMWallet } from './azure-hsm-wallet'
