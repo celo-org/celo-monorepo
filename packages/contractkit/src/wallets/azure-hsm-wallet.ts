@@ -1,11 +1,10 @@
 import { Address } from '@celo/sdk-types/commons'
-import { Wallet } from '@celo/sdk-types/wallet'
+import { Signer, Wallet } from '@celo/sdk-types/wallet'
 import { ensureLeading0x } from '@celo/utils/lib/address'
 import * as ethUtil from 'ethereumjs-util'
 import { AzureKeyVaultClient } from '../utils/azure-key-vault-client'
 import { RemoteWallet } from './remote-wallet'
 import { AzureHSMSigner } from './signers/azure-hsm-signer'
-import { Signer } from './signers/signer'
 
 // Azure Key Vault implementation of a RemoteWallet
 export class AzureHSMWallet extends RemoteWallet implements Wallet {

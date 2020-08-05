@@ -1,5 +1,5 @@
 import { Address, CeloTx, EncodedTransaction } from '@celo/sdk-types/commons'
-import { Wallet } from '@celo/sdk-types/wallet'
+import { Signer, Wallet } from '@celo/sdk-types/wallet'
 import { isHexString, normalizeAddressWith0x } from '@celo/utils/lib/address'
 import * as ethUtil from 'ethereumjs-util'
 import { EIP712TypedData, generateTypedDataHash } from '../utils/sign-typed-data-utils'
@@ -8,7 +8,6 @@ import {
   encodeTransaction,
   rlpEncodedTx,
 } from '../utils/signing-utils'
-import { Signer } from './signers/signer'
 
 export abstract class WalletBase implements Wallet {
   // By creating the Signers in advance we can have a common pattern across wallets

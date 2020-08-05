@@ -1,7 +1,6 @@
-import { CeloTxReceipt } from '@celo/sdk-types/commons'
+import { CeloTxReceipt, PromiEvent } from '@celo/sdk-types/commons'
 import { Future } from '@celo/utils/lib/future'
 import debugFactory from 'debug'
-import { PromiEvent } from 'web3-core'
 
 const debug = debugFactory('kit:tx:result')
 

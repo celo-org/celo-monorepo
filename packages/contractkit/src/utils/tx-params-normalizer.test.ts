@@ -1,5 +1,4 @@
-import { Callback, CeloTx } from '@celo/sdk-types/commons'
-import { JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
+import { Callback, CeloTx, JsonRpcPayload, JsonRpcResponse } from '@celo/sdk-types/commons'
 import { RpcCaller } from './rpc-caller'
 import { TxParamsNormalizer } from './tx-params-normalizer'
 

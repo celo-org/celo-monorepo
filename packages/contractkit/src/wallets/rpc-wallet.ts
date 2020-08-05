@@ -1,14 +1,13 @@
-import { CeloTx } from '@celo/sdk-types/commons'
+import { CeloTx, Provider } from '@celo/sdk-types/commons'
+import { Signer } from '@celo/sdk-types/wallet'
 import {
   ensureLeading0x,
   normalizeAddressWith0x,
   privateKeyToAddress,
 } from '@celo/utils/lib/address'
-import { provider } from 'web3-core'
 import { DefaultRpcCaller, RpcCaller } from '../utils/rpc-caller'
 import { RemoteWallet } from './remote-wallet'
 import { RpcSigner } from './signers/rpc-signer'
-import { Signer } from './signers/signer'
 
 export enum RpcWalletErrors {
   FetchAccounts = 'RpcWallet: failed to fetch accounts from server',
@@ -22,7 +21,7 @@ export enum RpcWalletErrors {
 export class RpcWallet extends RemoteWallet {
   protected readonly rpc: RpcCaller
 
-  constructor(protected _provider: provider) {
+  constructor(protected _provider: Provider) {
     super()
     this.rpc = new DefaultRpcCaller(_provider)
   }

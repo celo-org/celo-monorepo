@@ -1,4 +1,4 @@
-import { Address, CeloTx, CeloTxObject } from '@celo/sdk-types/commons'
+import { Address, CeloTx, CeloTxObject, Provider } from '@celo/sdk-types/commons'
 import { Wallet } from '@celo/sdk-types/wallet'
 import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
@@ -101,7 +101,7 @@ export class ContractKit {
       gasPrice: '0',
     }
     if (!(web3.currentProvider instanceof CeloProvider)) {
-      const celoProviderInstance = new CeloProvider(web3.currentProvider, wallet)
+      const celoProviderInstance = new CeloProvider(web3.currentProvider as Provider, wallet)
       // as any because of web3 migration
       web3.setProvider(celoProviderInstance as any)
     }

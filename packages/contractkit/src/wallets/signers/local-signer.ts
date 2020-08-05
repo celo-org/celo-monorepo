@@ -1,9 +1,9 @@
+import { Signer } from '@celo/sdk-types/wallet'
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 // @ts-ignore-next-line
 import { account as Account } from 'eth-lib'
 import * as ethUtil from 'ethereumjs-util'
 import { decodeSig, getHashFromEncoded, RLPEncodedTx } from '../../utils/signing-utils'
-import { Signer } from './signer'
 
 /**
  * Signs the EVM transaction using the provided private key

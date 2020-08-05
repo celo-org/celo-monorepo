@@ -1,3 +1,4 @@
+import { Signer } from '@celo/sdk-types/wallet'
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { TransportStatusError } from '@ledgerhq/errors'
 import debugFactory from 'debug'
@@ -7,7 +8,6 @@ import { EIP712TypedData, generateTypedDataHash } from '../../utils/sign-typed-d
 import { RLPEncodedTx } from '../../utils/signing-utils'
 import { compareLedgerAppVersions, tokenInfoByAddressAndChainId } from '../ledger-utils/tokens'
 import { AddressValidation } from '../ledger-wallet'
-import { Signer } from './signer'
 
 const debug = debugFactory('kit:wallet:ledger')
 const CELO_APP_ACCEPTS_CONTRACT_DATA_FROM_VERSION = '1.0.2'

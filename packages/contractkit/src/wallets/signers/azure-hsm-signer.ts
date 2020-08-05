@@ -1,8 +1,8 @@
+import { Signer } from '@celo/sdk-types/wallet'
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import * as ethUtil from 'ethereumjs-util'
 import { AzureKeyVaultClient } from '../../utils/azure-key-vault-client'
 import { getHashFromEncoded, RLPEncodedTx } from '../../utils/signing-utils'
-import { Signer } from './signer'
 
 /**
  * Signs the EVM transaction using an HSM key in Azure Key Vault

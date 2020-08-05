@@ -1,8 +1,6 @@
-import { Callback } from '@celo/sdk-types/commons'
+import { Callback, JsonRpcPayload, JsonRpcResponse, Provider } from '@celo/sdk-types/commons'
 import { Wallet } from '@celo/sdk-types/wallet'
 import debugFactory from 'debug'
-import { provider } from 'web3-core'
-import { JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
 import { hasProperty, stopProvider } from '../utils/provider-utils'
 import { DefaultRpcCaller, RpcCaller, rpcCallHandler } from '../utils/rpc-caller'
 import { TxParamsNormalizer } from '../utils/tx-params-normalizer'
@@ -21,13 +19,13 @@ enum InterceptedMethods {
   signTypedData = 'eth_signTypedData',
 }
 
-export class CeloProvider {
+export class CeloProvider implements Provider {
   private readonly rpcCaller: RpcCaller
   private readonly paramsPopulator: TxParamsNormalizer
   private alreadyStopped: boolean = false
   wallet: Wallet
 
-  constructor(readonly existingProvider: provider, wallet: Wallet = new LocalWallet()) {
+  constructor(readonly existingProvider: Provider, wallet: Wallet = new LocalWallet()) {
     this.rpcCaller = new DefaultRpcCaller(existingProvider)
     this.paramsPopulator = new TxParamsNormalizer(this.rpcCaller)
     this.wallet = wallet
@@ -62,10 +60,10 @@ export class CeloProvider {
 
     debugPayload('%O', payload)
 
-    const decoratedCallback = ((error: Error, result: JsonRpcResponse) => {
+    const decoratedCallback = (error: Error | null, result?: JsonRpcResponse) => {
       debugResponse('%O', result)
-      callback(error as any, result)
-    }) as Callback<JsonRpcResponse>
+      callback(error, result)
+    }
 
     if (this.alreadyStopped) {
       throw Error('CeloProvider already stopped')

@@ -1,11 +1,7 @@
-import { Callback } from '@celo/sdk-types/commons'
-import { provider } from 'web3-core'
-import { JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
+import { Callback, JsonRpcPayload, JsonRpcResponse, Provider } from '@celo/sdk-types/commons'
 import { DefaultRpcCaller, RpcCaller, rpcCallHandler } from './rpc-caller'
 
-const mockProvider: provider = {
-  host: '',
-  connected: true,
+const mockProvider: Provider = {
   send: (payload: JsonRpcPayload, callback: Callback<JsonRpcResponse>): any => {
     const response: JsonRpcResponse = {
       jsonrpc: payload.jsonrpc,
@@ -19,7 +15,7 @@ const mockProvider: provider = {
       callback(new Error(payload.method))
       return
     } else if (payload.method === 'mock_response_error_method') {
-      ;(response.error as any) = {
+      response.error = {
         code: -32000,
         message: 'foobar',
       }
@@ -27,8 +23,6 @@ const mockProvider: provider = {
 
     callback(null, response)
   },
-  supportsSubscriptions: (): boolean => true,
-  disconnect: (): boolean => true,
 }
 
 describe('RPC Caller class', () => {
@@ -94,7 +88,7 @@ describe('rpcCallHandler function', () => {
 
   describe('when the handle promise fails', () => {
     it('the callback receives a response with the error', (done) => {
-      function callback(_error: null, response: JsonRpcResponse) {
+      function callback(_error: Error | null, response?: JsonRpcResponse) {
         try {
           expect((response as any).error.code).toBe(-32000)
           done()
@@ -104,13 +98,13 @@ describe('rpcCallHandler function', () => {
       }
       expect.assertions(1)
       payload.method = 'fail_promise'
-      rpcCallHandler(payload, handleMock, callback as Callback<JsonRpcResponse>)
+      rpcCallHandler(payload, handleMock, callback)
     })
   })
 
   describe('when the handle fails (not the promise)', () => {
     it('the callback receives a response with the error', (done) => {
-      function callback(error: null, response: JsonRpcResponse) {
+      function callback(error: Error | null, response?: JsonRpcResponse) {
         try {
           expect(response).toBeUndefined()
           expect(error).not.toBeNull()
@@ -121,23 +115,23 @@ describe('rpcCallHandler function', () => {
       }
       expect.assertions(2)
       payload.method = 'fail_not_promise'
-      rpcCallHandler(payload, handleMock, callback as Callback<JsonRpcResponse>)
+      rpcCallHandler(payload, handleMock, callback)
     })
   })
 
   describe('when the handle succeeds', () => {
     it('the callback receives a response with a result', (done) => {
-      function callback(_error: null, response: JsonRpcResponse) {
+      function callback(_error: Error | null, response?: JsonRpcResponse) {
         try {
           expect((response as any).error).toBeUndefined()
-          expect(response.result).toBe('mock_response')
+          expect(response!.result).toBe('mock_response')
           done()
         } catch (error) {
           done(error)
         }
       }
       expect.assertions(2)
-      rpcCallHandler(payload, handleMock, callback as Callback<JsonRpcResponse>)
+      rpcCallHandler(payload, handleMock, callback)
     })
   })
 })

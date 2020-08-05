@@ -1,7 +1,5 @@
-import { Callback } from '@celo/sdk-types/commons'
+import { Callback, JsonRpcPayload, JsonRpcResponse, Provider } from '@celo/sdk-types/commons'
 import debugFactory from 'debug'
-import { provider } from 'web3-core'
-import { JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
 
 const debugRpcPayload = debugFactory('rpc:payload')
 const debugRpcResponse = debugFactory('rpc:response')
@@ -54,8 +52,8 @@ function toRPCResponse(payload: JsonRpcPayload, result: any, error?: Error): Jso
   }
 
   if (error != null) {
-    ;(response.error as any) = {
-      message: error.message || error.stack || error,
+    response.error = {
+      message: error.message || error.stack || error.toString(),
       code: -32000,
     }
   }
@@ -67,7 +65,7 @@ export interface RpcCaller {
   send: (payload: JsonRpcPayload, callback: Callback<JsonRpcResponse>) => void
 }
 export class DefaultRpcCaller implements RpcCaller {
-  constructor(readonly defaultProvider: provider, readonly jsonrpcVersion: string = '2.0') {}
+  constructor(readonly defaultProvider: Provider, readonly jsonrpcVersion: string = '2.0') {}
 
   public async call(method: string, params: any[]): Promise<JsonRpcResponse> {
     return new Promise((resolve, reject) => {
@@ -77,21 +75,24 @@ export class DefaultRpcCaller implements RpcCaller {
         method,
         params,
       }
-      this.send(payload, ((err: any, response: JsonRpcResponse) => {
+      this.send(payload, (err: any, response?: JsonRpcResponse) => {
         if (err != null) {
           reject(err)
         } else {
           resolve(response)
         }
-      }) as Callback<JsonRpcResponse>)
+      })
     })
   }
 
   public send(payload: JsonRpcPayload, callback: Callback<JsonRpcResponse>) {
     debugRpcPayload('%O', payload)
 
-    const decoratedCallback = ((error: Error, result: JsonRpcResponse): void => {
-      let err: Error = error
+    const decoratedCallback: Callback<JsonRpcResponse> = (
+      error: Error | null,
+      result?: JsonRpcResponse
+    ): void => {
+      let err: Error | null = error
       debugRpcResponse('%O', result)
       // The provider send call will not provide an error to the callback if
       // the result itself specifies an error. Here, we extract the error in the
@@ -100,12 +101,12 @@ export class DefaultRpcCaller implements RpcCaller {
         result &&
         result.error != null &&
         typeof result.error !== 'string' &&
-        (result.error as any).message != null
+        result.error.message != null
       ) {
-        err = new Error((result.error as any).message)
+        err = new Error(result.error.message)
       }
-      callback(err as any, result)
-    }) as Callback<JsonRpcResponse>
+      callback(err, result)
+    }
 
     if (this.defaultProvider && typeof this.defaultProvider !== 'string') {
       this.defaultProvider.send!(payload, decoratedCallback)

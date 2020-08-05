@@ -1,5 +1,5 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
-import { CeloTx } from '@celo/sdk-types/commons'
+import { CeloTx, Provider } from '@celo/sdk-types/commons'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/src/address'
 import net from 'net'
@@ -86,7 +86,7 @@ describe.skip('rpc-wallet', () => {
 
 testWithGanache('rpc-wallet', (web3) => {
   const provider = web3.currentProvider
-  const rpcWallet = new RpcWallet(provider)
+  const rpcWallet = new RpcWallet(provider as Provider)
 
   describe('with ganache web3 provider', () => {
     let ganacheAccounts: string[]

@@ -1,9 +1,13 @@
-import { Callback, CeloTx } from '@celo/sdk-types/commons'
+import {
+  Callback,
+  CeloTx,
+  JsonRpcPayload,
+  JsonRpcResponse,
+  Provider,
+} from '@celo/sdk-types/commons'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import debugFactory from 'debug'
 import Web3 from 'web3'
-import { provider } from 'web3-core'
-import { JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
 import { CeloProvider } from '../providers/celo-provider'
 import { recoverTransaction } from './signing-utils'
 
@@ -137,9 +141,7 @@ async function verifyLocalSigningInAllPermutations(
 describe('Transaction Utils', () => {
   // only needed for the eth_coinbase rcp call
   let celoProvider: CeloProvider
-  const mockProvider: provider = {
-    host: '',
-    connected: true,
+  const mockProvider: Provider = {
     send: (payload: JsonRpcPayload, callback: Callback<JsonRpcResponse>): void => {
       if (payload.method === 'eth_coinbase') {
         const response: JsonRpcResponse = {
@@ -152,8 +154,6 @@ describe('Transaction Utils', () => {
         callback(new Error(payload.method))
       }
     },
-    supportsSubscriptions: (): boolean => true,
-    disconnect: (): boolean => true,
   }
   const web3: Web3 = new Web3()
 

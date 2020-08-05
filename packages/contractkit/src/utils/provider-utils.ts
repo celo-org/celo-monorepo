@@ -1,10 +1,10 @@
-import { provider } from 'web3-core'
+import { Provider } from '@celo/sdk-types/commons'
 
 export function hasProperty<T>(object: any, property: string): object is T {
   return property in object
 }
 
-export function stopProvider(defaultProvider: provider) {
+export function stopProvider(defaultProvider: Provider) {
   if (hasProperty<{ stop: () => void }>(defaultProvider, 'stop')) {
     defaultProvider.stop()
   } else {
