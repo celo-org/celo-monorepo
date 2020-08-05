@@ -287,7 +287,11 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       return
     }
     yield call(sendAndMonitorTransaction, txId, tx, account)
-    ValoraAnalytics.track(CeloExchangeEvents.celo_exchange_complete)
+    ValoraAnalytics.track(CeloExchangeEvents.celo_exchange_complete, {
+      txId,
+      currency: makerToken,
+      amount: makerAmount.toString(),
+    })
   } catch (error) {
     ValoraAnalytics.track(CeloExchangeEvents.celo_exchange_error, { error: error.message })
     Logger.error(TAG, 'Error doing exchange', error)

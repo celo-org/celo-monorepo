@@ -4,7 +4,7 @@ import { sha256 } from 'ethereumjs-util'
 import DeviceInfo from 'react-native-device-info'
 import { AppEvents } from 'src/analytics/Events'
 import { AnalyticsPropertiesList } from 'src/analytics/Properties'
-import { SEGMENT_API_KEY } from 'src/config'
+import { DEFAULT_TESTNET, SEGMENT_API_KEY } from 'src/config'
 import { store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
 
@@ -28,7 +28,6 @@ async function getDeviceInfo() {
     MaxMemory: await DeviceInfo.getMaxMemory(),
     Model: DeviceInfo.getModel(),
     ReadableVersion: DeviceInfo.getReadableVersion(),
-    SerialNumber: await DeviceInfo.getSerialNumber(),
     SystemName: DeviceInfo.getSystemName(),
     SystemVersion: DeviceInfo.getSystemVersion(),
     TotalDiskCapacity: await DeviceInfo.getTotalDiskCapacity(),
@@ -133,6 +132,7 @@ class ValoraAnalytics {
       timestamp: Date.now(),
       sessionId: this.sessionId,
       userAddress: this.userAddress,
+      celoNetwork: DEFAULT_TESTNET,
       ...eventProperties,
     }
 

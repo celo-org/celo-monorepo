@@ -49,6 +49,15 @@ export enum SendTransactionLogEventType {
   Exception,
 }
 
+export type SendTransactionLogEvent =
+  | Started
+  | EstimatedGas
+  | ReceiptReceived
+  | TransactionHashReceived
+  | Confirmed
+  | Failed
+  | Exception
+
 interface Started {
   type: SendTransactionLogEventType.Started
 }
@@ -62,15 +71,6 @@ interface Confirmed {
 function Confirmed(n: number): Confirmed {
   return { type: SendTransactionLogEventType.Confirmed, number: n }
 }
-
-export type SendTransactionLogEvent =
-  | Started
-  | EstimatedGas
-  | ReceiptReceived
-  | TransactionHashReceived
-  | Confirmed
-  | Failed
-  | Exception
 
 interface EstimatedGas {
   type: SendTransactionLogEventType.EstimatedGas

@@ -13,11 +13,13 @@ import "../common/Freezable.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
 import "../common/UsingPrecompiles.sol";
 import "../common/UsingRegistry.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/Heap.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
 contract Election is
   IElection,
+  ICeloVersionedContract,
   Ownable,
   ReentrancyGuard,
   Initializable,
@@ -130,6 +132,14 @@ contract Election is
     uint256 units
   );
   event EpochRewardsDistributedToVoters(address indexed group, uint256 value);
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.

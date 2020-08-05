@@ -13,10 +13,11 @@ import { showError, showMessage } from 'src/alert/actions'
 import { InviteEvents, OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION, USE_PHONE_NUMBER_PRIVACY } from 'src/config'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
+import { features } from 'src/flags'
 import { CURRENCY_ENUM, UNLOCK_DURATION } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
 import i18n from 'src/i18n'
@@ -154,8 +155,9 @@ export function* sendInvite(
   amount?: BigNumber,
   currency?: CURRENCY_ENUM
 ) {
+  const escrowIncluded = !!amount
   try {
-    ValoraAnalytics.track(InviteEvents.invite_tx_start)
+    ValoraAnalytics.track(InviteEvents.invite_tx_start, { escrowIncluded })
     const web3 = yield call(getWeb3)
     const randomness = yield call(asyncRandomBytes, 64)
     const temporaryWalletAccount = web3.eth.accounts.create(randomness.toString('ascii'))
@@ -196,7 +198,7 @@ export function* sendInvite(
     )
 
     yield call(waitForTransactionWithId, txId)
-    ValoraAnalytics.track(InviteEvents.invite_tx_complete)
+    ValoraAnalytics.track(InviteEvents.invite_tx_complete, { escrowIncluded })
     Logger.debug(TAG + '@sendInviteSaga', 'Sent money to new wallet')
 
     // If this invitation has a payment attached to it, send the payment to the escrow.
@@ -210,7 +212,7 @@ export function* sendInvite(
     yield put(updateE164PhoneNumberAddresses({}, addressToE164Number))
     yield call(navigateToInviteMessageApp, e164Number, inviteMode, message)
   } catch (e) {
-    ValoraAnalytics.track(InviteEvents.invite_tx_error, { error: e.message })
+    ValoraAnalytics.track(InviteEvents.invite_tx_error, { escrowIncluded, error: e.message })
     Logger.error(TAG, 'Send invite error: ', e)
     throw e
   }
@@ -220,7 +222,7 @@ function* initiateEscrowTransfer(temporaryAddress: string, e164Number: string, a
   const escrowTxId = generateStandbyTransactionId(temporaryAddress)
   try {
     let phoneHash: string
-    if (USE_PHONE_NUMBER_PRIVACY) {
+    if (features.USE_PHONE_NUMBER_PRIVACY) {
       const phoneHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
       phoneHash = phoneHashDetails.phoneHash
     } else {

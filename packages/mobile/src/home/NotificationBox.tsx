@@ -5,13 +5,12 @@ import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { NativeScrollEvent, ScrollView, StyleSheet, View } from 'react-native'
 import { connect } from 'react-redux'
-import { dismissEarnRewards, dismissGetVerified, dismissInviteFriends } from 'src/account/actions'
+import { dismissGetVerified, dismissInviteFriends } from 'src/account/actions'
 import { getIncomingPaymentRequests, getOutgoingPaymentRequests } from 'src/account/selectors'
 import { PaymentRequest } from 'src/account/types'
 import { HomeEvents } from 'src/analytics/Events'
 import { ScrollDirection } from 'src/analytics/types'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { PROMOTE_REWARDS_APP } from 'src/config'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentReminderSummaryNotification from 'src/escrow/EscrowedPaymentReminderSummaryNotification'
 import { getReclaimableEscrowPayments } from 'src/escrow/reducer'
@@ -26,7 +25,6 @@ import IncomingPaymentRequestSummaryNotification from 'src/paymentRequest/Incomi
 import OutgoingPaymentRequestSummaryNotification from 'src/paymentRequest/OutgoingPaymentRequestSummaryNotification'
 import { RootState } from 'src/redux/reducers'
 import { isBackupTooLate } from 'src/redux/selectors'
-import { navigateToVerifierApp } from 'src/utils/linking'
 
 export enum NotificationBannerTypes {
   incoming_tx_request = 'incoming_tx_request',
@@ -34,7 +32,6 @@ export enum NotificationBannerTypes {
   escrow_tx_summary = 'escrow_tx_summary',
   escrow_tx_pending = 'escrow_tx_pending',
   celo_asset_education = 'celo_asset_education',
-  celo_rewards_education = 'celo_rewards_education',
   invite_prompt = 'invite_prompt',
   verification_prompt = 'verification_prompt',
   backup_prompt = 'backup_prompt',
@@ -53,7 +50,6 @@ interface StateProps {
   backupCompleted: boolean
   numberVerified: boolean
   goldEducationCompleted: boolean
-  dismissedEarnRewards: boolean
   dismissedInviteFriends: boolean
   dismissedGetVerified: boolean
   incomingPaymentRequests: PaymentRequest[]
@@ -64,7 +60,6 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  dismissEarnRewards: typeof dismissEarnRewards
   dismissInviteFriends: typeof dismissInviteFriends
   dismissGetVerified: typeof dismissGetVerified
 }
@@ -77,7 +72,6 @@ const mapStateToProps = (state: RootState): StateProps => ({
   goldEducationCompleted: state.goldToken.educationCompleted,
   incomingPaymentRequests: getIncomingPaymentRequests(state),
   outgoingPaymentRequests: getOutgoingPaymentRequests(state),
-  dismissedEarnRewards: state.account.dismissedEarnRewards,
   dismissedInviteFriends: state.account.dismissedInviteFriends,
   dismissedGetVerified: state.account.dismissedGetVerified,
   backupTooLate: isBackupTooLate(state),
@@ -86,7 +80,6 @@ const mapStateToProps = (state: RootState): StateProps => ({
 })
 
 const mapDispatchToProps = {
-  dismissEarnRewards,
   dismissInviteFriends,
   dismissGetVerified,
 }
@@ -140,7 +133,6 @@ export class NotificationBox extends React.Component<Props, State> {
       backupCompleted,
       numberVerified,
       goldEducationCompleted,
-      dismissedEarnRewards,
       dismissedInviteFriends,
       dismissedGetVerified,
     } = this.props
@@ -148,7 +140,7 @@ export class NotificationBox extends React.Component<Props, State> {
 
     if (!backupCompleted) {
       actions.push({
-        title: t('backupKeyFlow6:yourBackupKey'),
+        title: t('backupKeyFlow6:yourAccountKey'),
         text: t('backupKeyFlow6:backupKeyNotification'),
         icon: backupKey,
         callToActions: [
@@ -190,37 +182,6 @@ export class NotificationBox extends React.Component<Props, State> {
                 selectedAction: NotificationBannerCTATypes.decline,
               })
               this.props.dismissGetVerified()
-            },
-          },
-        ],
-      })
-    }
-
-    if (!dismissedEarnRewards && PROMOTE_REWARDS_APP) {
-      actions.push({
-        title: t('walletFlow5:earnCeloRewards'),
-        text: t('walletFlow5:earnCeloGold'),
-        icon: null,
-        callToActions: [
-          {
-            text: t('walletFlow5:startEarning'),
-            onPress: () => {
-              this.props.dismissEarnRewards()
-              ValoraAnalytics.track(HomeEvents.notification_select, {
-                notificationType: NotificationBannerTypes.celo_rewards_education,
-                selectedAction: NotificationBannerCTATypes.accept,
-              })
-              navigateToVerifierApp()
-            },
-          },
-          {
-            text: t('maybeLater'),
-            onPress: () => {
-              this.props.dismissEarnRewards()
-              ValoraAnalytics.track(HomeEvents.notification_select, {
-                notificationType: NotificationBannerTypes.celo_rewards_education,
-                selectedAction: NotificationBannerCTATypes.decline,
-              })
             },
           },
         ],
