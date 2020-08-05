@@ -12,7 +12,7 @@ import { Actions, selectPreferredCurrency } from 'src/localCurrency/actions'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 import { convertDollarsToLocalAmount, convertLocalAmountToDollars } from 'src/localCurrency/convert'
 import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
-import { replace } from 'src/navigator/NavigationService'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { UriData, uriDataFromUrl } from 'src/qrcode/schema'
 import {
@@ -137,6 +137,7 @@ export function* handleSendPaymentData(data: UriData, cachedRecipient?: Recipien
   }
 
   if (data.amount) {
+    // TODO: integrate with SendConfirmation component
     const exchangeRate = yield select(getLocalCurrencyExchangeRate)
     const amount = convertLocalAmountToDollars(data.amount, exchangeRate)
     if (!amount) {
@@ -147,11 +148,11 @@ export function* handleSendPaymentData(data: UriData, cachedRecipient?: Recipien
       recipient,
       amount,
       reason: data.comment,
-      type: TokenTransactionType.PayRequest,
+      type: TokenTransactionType.PayPrefill,
     }
-    replace(Screens.SendConfirmation, { transactionData, isFromScan: true })
+    navigate(Screens.SendConfirmation, { transactionData, isFromScan: true })
   } else {
-    replace(Screens.SendAmount, { recipient, isFromScan: true })
+    navigate(Screens.SendAmount, { recipient, isFromScan: true })
   }
 }
 
