@@ -54,10 +54,17 @@ async function helmParameters(
   kubeNamespace: string,
   deploymentConfig: AWSFullNodeDeploymentConfig
 ) {
-  const staticIps = (await allocateStaticIPs(celoEnv, deploymentConfig)).join(',')
+  const allocationIds = (await allocateStaticIPs(celoEnv, deploymentConfig)).join(',')
+  const staticIps = (await fetchStaticIPAddresses(allocationIds)).join(',')
+  // const subnetCount = (await getSubnetCount(deploymentConfig))
+  console.info(allocationIds)
+  console.info(staticIps)
   const baseparams = await baseHelmParameters(celoEnv, kubeNamespace, deploymentConfig)
   const additionalParameters = [
+    `--set geth.azure_provider=false`,
+    `--set geth.eip_allocation_ids='{${allocationIds}}'`,
     `--set geth.public_ips='{${staticIps}}'`,
+    // `--set geth.subnet_count='{${subnetCount}}'`,
   ]
   return baseparams.concat(additionalParameters)
 }
@@ -67,10 +74,15 @@ async function helmParameters(
 // tag=resourceGroupTag Value=DynamicEnvVar.ORACLE_RESOURCE_GROUP_TAG
 // tag=IPNodeName Value=`${getStaticIPNamePrefix(celoEnv)}-${i}`
 
+/**
+ * Returns a list of Allocation Ids corresponded to allocated static IPs
+ * @param celoEnv 
+ * @param deploymentConfig 
+ */
 async function allocateStaticIPs(celoEnv: string, deploymentConfig: AWSFullNodeDeploymentConfig) {
   console.info(`Creating static IPs on AWS for ${celoEnv}`)
   // const resourceGroup = await getAKSNodeResourceGroup(deploymentConfig.clusterConfig)
-  const resourceGroup = ""
+  const resourceGroup = deploymentConfig.clusterConfig.resourceGroupTag
   const { replicas } = deploymentConfig
   // Deallocate static ip if we are scaling down the replica count
   const existingStaticIPsCount = await getAWSStaticIPsCount(resourceGroup)
@@ -80,21 +92,43 @@ async function allocateStaticIPs(celoEnv: string, deploymentConfig: AWSFullNodeD
     await deallocateAWSStaticIP(`${getStaticIPNamePrefix(celoEnv)}-${i}`, resourceGroup)
   }
 
-  const staticIps = await Promise.all(
+  const staticAllocationIds = await Promise.all(
     range(replicas).map((i) =>
       registerAWSStaticIPIfNotRegistered(`${getStaticIPNamePrefix(celoEnv)}-${i}`, resourceGroup)
     )
   )
   
-  const addresses = staticIps.map((address, _) => address)
+  const EIPAllocationIds = staticAllocationIds.map((allocationID, _) => allocationID)
 
+  return EIPAllocationIds
+}
+
+// async function getSubnetCount(deploymentConfig: AWSFullNodeDeploymentConfig) {
+//   const clusterName: string = deploymentConfig.clusterConfig.clusterName
+//   const [subnetCount] = await execCmdWithExitOnFailure(
+//     ` aws ec2 describe-subnets --filters "Name=tag-key,Values=kubernetes.io/cluster/${clusterName}" "Name=tag-key,Values=kubernetes.io/role/elb" --query "Subnets[*][SubnetId]" --output text | wc -l`
+//   )
+//   return subnetCount.trim()
+// }
+
+async function fetchStaticIPAddresses(allocationIDs: string) {
+  const allocationIDList = allocationIDs.split(',')
+  const addresses = await Promise.all(allocationIDList.map((allocId) => (fetchStaticIPAddress(allocId))))
   return addresses
+}
+
+async function fetchStaticIPAddress(allocationId: string) {
+  const [staticIp] = await execCmdWithExitOnFailure(
+    
+  `aws ec2 describe-addresses --allocation-ids ${allocationId} --query 'Addresses[*].[PublicIp]' --output text`
+  )
+  return staticIp.trim()
 }
 
 async function getAWSStaticIPsCount(resourceGroup: string) {
   // This gets the count of allocated IP Addresses that has resourceGroup as the value for tag resourceGroupTag and CONTAINS a tag key (ignores value) for "IPNodeName"
   const [staticIPsCount] = await execCmdWithExitOnFailure(
-    `aws ec2 describe-addresses --filters "Name=tag:resourceGroupTag,Values=${resourceGroup}" "Name=tag-key,Values=IPNodeName" --query "Addresses[*].[PublicIp]" --output tsv | wc -l` 
+    `aws ec2 describe-addresses --filters "Name=tag:resourceGroupTag,Values=${resourceGroup}" "Name=tag-key,Values=IPNodeName" --query "Addresses[*].[PublicIp]" --output text | wc -l` 
   )
   return parseInt(staticIPsCount.trim(), 10)
 }

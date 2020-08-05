@@ -77,7 +77,6 @@ export async function baseHelmParameters(
     `--set namespace=${kubeNamespace}`,
     `--set replicaCount=${deploymentConfig.replicas}`,
     `--set storage.size=${deploymentConfig.diskSizeGb}Gi`,
-    `--set geth.azure_provider=true`,
     `--set geth.expose_rpc_externally=false`,
     `--set geth.image.repository=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY)}`,
     `--set geth.image.tag=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_TAG)}`,
@@ -125,3 +124,19 @@ export async function upgradeBaseFullNodeChart(
   await scaleResource(celoEnv, 'StatefulSet', `${celoEnv}-fullnodes`, deploymentConfig.replicas)
   return
 }
+
+
+
+// {{- if $.Values.geth.azure_provider }}
+// service.beta.kubernetes.io/azure-load-balancer-mixed-protocols: "true"
+// {{- else }}
+// service.beta.kubernetes.io/aws-load-balancer-type: “nlb”
+// {{- end }}
+
+
+// {{- if $.Values.geth.use_static_ips }}
+//   {{- if $.Values.geth.azure_provider -}}
+//   loadBalancerIP: {{ index $.Values.geth.public_ips $index -}}
+//   {{- else  }}
+//   service.beta.kubernetes.io/aws-load-balancer-eip-allocations: {{ index $.Values.geth.public_ips $index -}}
+//   {{- end -}}

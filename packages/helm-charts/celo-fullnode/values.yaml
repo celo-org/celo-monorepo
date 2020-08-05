@@ -40,6 +40,8 @@ storage:
   # AKS default storageclasses:
   #   - default for Azure Standard storage (HDD)
   #   - managed-premium for Azure Premium Disks (SSD)
+  # AWS DOES NOT have 'default' storage class by default
+  # Need to launch default in cluster first 
   storageClass: default
   accessModes: ReadWriteOnce
   size: 20Gi
@@ -61,14 +63,18 @@ geth:
   gcmode: full
   ping_ip_from_packet: false
   in_memory_discovery_table: false
-  azure_provider: true
   verbosity: 2
-  # Azure static ips
+  # static ips
   public_ips:
   - 1.2.3.4
   - 5.6.7.8
+  # subnet_count: 1
+  eip_allocation_ids:
+  - eipalloc-075d872246b732ed3,eipalloc-0f2df291b641378b4,eipalloc-038dc935dafb7ccd4
+  - eip-alloc-etc2
   service_type: LoadBalancer
   expose_rpc_externally: false
+  azure_provider: true
   azure_mixed_protocols: true
   use_static_ips: true
   readiness_probe_max_block_age_seconds: 30

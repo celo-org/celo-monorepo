@@ -63,6 +63,7 @@ async function helmParameters(
 
   const baseparams = await baseHelmParameters(celoEnv, kubeNamespace, deploymentConfig)
   const additionalParameters = [
+    `--set geth.azure_provider=true`,
     `--set geth.public_ips='{${staticIps}}'`,
   ]
   return baseparams.concat(additionalParameters)

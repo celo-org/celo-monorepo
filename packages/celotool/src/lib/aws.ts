@@ -16,7 +16,7 @@ export async function switchToAwsCluster(
 ) {
 
   // TODO Look into switching subscription between testing and production
-
+  console.info(clusterConfig.resourceGroupTag)
   const isContextSetCorrectly = await setContextAndCheckForMissingCredentials(clusterConfig)
   if (!isContextSetCorrectly) {
     // If context does not exist, fetch it.
@@ -63,8 +63,7 @@ export async function registerAWSStaticIPIfNotRegistered(name: string, resourceG
 
   // Add tags to allocationID
   await execCmdWithExitOnFailure(
-    `aws ec2 create-tags
-     --resources ${allocationID.trim()} --tags Key=resourceGroupTag,Value=${resourceGroup} Key=IPNodeName,Value=${name}` 
+    `aws ec2 create-tags --resources ${allocationID.trim()} --tags Key=resourceGroupTag,Value=${resourceGroup} Key=IPNodeName,Value=${name}` 
   )
 
   // Fetch Address of newly created
@@ -79,10 +78,9 @@ export async function registerAWSStaticIPIfNotRegistered(name: string, resourceG
 export async function deallocateAWSStaticIP(name: string, resourceGroup: string) {
   console.info(`Deallocating IP address ${name} on ${resourceGroup}`)
   const [allocationID] = await execCmdWithExitOnFailure(
-    `aws ec2 describe-addresses --filters "Name=tag:resourceGroupTag,Values=${resourceGroup}" "Name=tag:IPNodeName,Values=${name}" --query 'Addresses[*].[allocationID]' --output text`
+    `aws ec2 describe-addresses --filters "Name=tag:resourceGroupTag,Values=${resourceGroup}" "Name=tag:IPNodeName,Values=${name}" --query 'Addresses[*].[AllocationId]' --output text`
   )
   return execCmdWithExitOnFailure(
-    // `az network public-ip delete --resource-group ${allocationID} --name ${name}`
     `aws ec2 release-address --allocation-id ${allocationID.trim()}`
   )
 }
