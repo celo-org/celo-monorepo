@@ -27,7 +27,10 @@ const flakeTrackerID = 71131 // This is the FlakeTracker GitHub App ID.
 
 // shouldTrackFlakes => tests are retried `numRetries` times and flakey results are logged w/ test output
 const shouldTrackFlakes =
-  (process.env.CIRCLECI && process.env.FLAKEY !== 'false') || process.env.FLAKEY === 'true'
+  (process.env.CIRCLECI &&
+    process.env.CIRCLE_PROJECT_REPONAME !== 'celo-blockchain' &&
+    process.env.FLAKEY !== 'false') ||
+  process.env.FLAKEY === 'true'
 
 // shouldLogRetryErrorsOnFailure => log raw test error immediately after every retry.
 const shouldLogRetryErrorsOnFailure = shouldTrackFlakes && process.env.LOG_ALL_RETRY_ERRORS
