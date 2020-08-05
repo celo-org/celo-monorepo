@@ -11,7 +11,7 @@ import { ContractKitEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { DEFAULT_FORNO_URL } from 'src/config'
-import { isProviderConnectionError } from 'src/geth/geth'
+import { getGethInstance, isProviderConnectionError } from 'src/geth/geth'
 import { waitForGethInitialized } from 'src/geth/saga'
 import { navigateToError } from 'src/navigator/NavigationService'
 import Logger from 'src/utils/Logger'
@@ -19,13 +19,15 @@ import { getHttpProvider, getIpcProvider } from 'src/web3/providers'
 import { fornoSelector } from 'src/web3/selectors'
 import Web3 from 'web3'
 import { IpcProvider } from 'web3-core'
+import { RNGethWallet } from './RNGethWallet'
+import { Wallet } from '@celo/contractkit/lib/wallets/wallet'
 
 const TAG = 'web3/contracts'
 const KIT_INIT_RETRY_DELAY = 2000
 const CONTRACT_KIT_RETRIES = 3
 
 let ipcProvider: IpcProvider | undefined
-let gethWallet: RpcWallet | undefined
+let gethWallet: Wallet | undefined
 let contractKit: ContractKit | undefined
 
 export function* initContractKit() {
@@ -58,13 +60,19 @@ export function* initContractKit() {
 
       Logger.info(`${TAG}@initContractKit`, 'Initializing wallet')
       ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_wallet_start)
-      gethWallet = new RpcWallet(ipcProvider)
-      ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_wallet_finish)
-      yield call([gethWallet, gethWallet.init])
-      ValoraAnalytics.track(ContractKitEvents.init_contractkit_init_wallet_finish)
+      if (fornoMode) {
+        gethWallet = new RNGethWallet(getGethInstance())
+        ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_wallet_finish)
+        ValoraAnalytics.track(ContractKitEvents.init_contractkit_init_wallet_finish)
+      } else {
+        gethWallet = new RpcWallet(ipcProvider)
+        ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_wallet_finish)
+        yield call([gethWallet, (gethWallet as RpcWallet).init])
+        ValoraAnalytics.track(ContractKitEvents.init_contractkit_init_wallet_finish)
+      }
       Logger.info(
         `${TAG}@initContractKit`,
-        `Initialized wallet with accounts: ${gethWallet.getAccounts()}`
+        `Initialized wallet with accounts: ${gethWallet?.getAccounts()}`
       )
       contractKit = newKitFromWeb3(web3, gethWallet)
       Logger.info(`${TAG}@initContractKit`, 'Initialized kit')

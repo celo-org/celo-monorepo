@@ -175,6 +175,14 @@ export async function initGeth(sync: boolean = true): Promise<typeof gethInstanc
   }
 }
 
+// TODO: This needs a bigger change to the design
+// I'm exposing this now in order to build a proof
+// of concept but I need input from the wallet team
+// regarding what's the best way to expose the instance.
+export function getGethInstance() {
+  return gethInstance
+}
+
 export function isProviderConnectionError(error: any) {
   return error
     ?.toString()
