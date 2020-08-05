@@ -22,7 +22,6 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import Logger from 'src/utils/Logger'
 import { clockInSync } from 'src/utils/time'
-import { getContractKit } from 'src/web3/contracts'
 import { parse } from 'url'
 
 const TAG = 'app/saga'
@@ -37,35 +36,44 @@ const DO_NOT_LOCK_PERIOD = 30000 // 30 sec
 // Work that's done before other sagas are initalized
 // Be mindful to not put long blocking tasks here
 export function* appInit() {
-  const isDeprecated: boolean = yield call(isAppVersionDeprecated)
+  Logger.warn('sup??')
+  try {
+    if (false) {
+      yield call(isAppVersionDeprecated)
+    }
+    const isDeprecated: boolean = false
+    Logger.warn('after')
+    if (isDeprecated) {
+      Logger.warn(TAG, 'App version is deprecated')
+      navigate(Screens.UpgradeScreen)
+      return
+    } else {
+      Logger.debug(TAG, 'App version is valid')
+    }
 
-  if (isDeprecated) {
-    Logger.warn(TAG, 'App version is deprecated')
-    navigate(Screens.UpgradeScreen)
-    return
-  } else {
-    Logger.debug(TAG, 'App version is valid')
-  }
+    const language = yield select(currentLanguageSelector)
+    if (language) {
+      yield put(setLanguage(language))
+    }
 
-  const language = yield select(currentLanguageSelector)
-  if (language) {
-    yield put(setLanguage(language))
-  }
+    const deepLink: string | null = yield call(Linking.getInitialURL)
+    const inSync = yield call(clockInSync)
+    if (!inSync) {
+      navigate(Screens.SetClock)
+      return
+    }
 
-  const deepLink: string | null = yield call(Linking.getInitialURL)
-  const inSync = yield call(clockInSync)
-  if (!inSync) {
-    navigate(Screens.SetClock)
-    return
+    if (deepLink) {
+      // TODO: this should dispatch (put) but since this appInit
+      // is called before the listener is set, we do it this way.
+      // This is fragile, change me :D
+      yield call(handleDeepLink, openDeepLink(deepLink))
+      return
+    }
+  } catch (err) {
+    Logger.error('AppInit error', err.message)
   }
-
-  if (deepLink) {
-    // TODO: this should dispatch (put) but since this appInit
-    // is called before the listener is set, we do it this way.
-    // This is fragile, change me :D
-    yield call(handleDeepLink, openDeepLink(deepLink))
-    return
-  }
+  Logger.warn('Afterrr')
 }
 
 export function* handleDeepLink(action: OpenDeepLink) {
@@ -105,24 +113,6 @@ function* watchAppState() {
     try {
       const newState = yield take(appStateChannel)
       Logger.debug(`${TAG}@monitorAppState`, `App changed state: ${newState}`)
-      if (newState === 'inactive' || newState === 'background') {
-        // const contractKit = yield call(getContractKit)
-        // console.log('contractKit.web3', contractKit.web3)
-        // console.log('contractKit.web3.les.saveServerPoolNodes', contractKit.web3.les.saveServerPoolNodes)
-        const res = yield call(fetch, 'http://localhost:8545', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: '{"jsonrpc":"2.0","method":"les_saveServerPoolNodes","params":[],"id":67}',
-        })
-        const text = yield call(res.text)
-        console.log('text', text)
-        // yield call([
-        //   contractKit.web3,
-        //   contractKit.web3.les.saveServerPoolNodes
-        // ])
-      }
       yield put(setAppState(newState))
     } catch (error) {
       ValoraAnalytics.track(AppEvents.app_state_error, { error: error.message })

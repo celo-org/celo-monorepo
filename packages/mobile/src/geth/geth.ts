@@ -106,9 +106,9 @@ async function createNewGeth(sync: boolean = true): Promise<typeof RNGeth> {
   }
 
   if (USE_FULL_NODE_DISCOVERY) {
-    // const nodes = (await BootnodeUtils.getBootnodesAsync(DEFAULT_TESTNET)).trim()
-    const nodes =
-      'enode://be3a43b8a04a02cdee034ec2d133c6bd331429574cad91b739200ac88872dbd6acc81c20d1f891d598da77e47bb01e405464458d214052c1043f9b3d50d94f5c@34.83.199.141:30303'
+    const nodes = (await BootnodeUtils.getBootnodesAsync(DEFAULT_TESTNET)).trim()
+    // const nodes =
+    //   'enode://be3a43b8a04a02cdee034ec2d133c6bd331429574cad91b739200ac88872dbd6acc81c20d1f891d598da77e47bb01e405464458d214052c1043f9b3d50d94f5c@34.83.199.141:30303'
     gethOptions.bootnodeEnodes = nodes.split(';')
     Logger.debug('Geth@newGeth', 'bootnodes = ' + nodes.split(';'))
   }
@@ -121,7 +121,7 @@ async function createNewGeth(sync: boolean = true): Promise<typeof RNGeth> {
   gethOptions.logFile = logFilePath
   // Only log info and above to the log file.
   // The logcat logging mode remains unchanged.
-  gethOptions.logFileLogLevel = 6
+  gethOptions.logFileLogLevel = LogLevel.TRACE
   Logger.debug('Geth@newGeth', 'Geth logs will be piped to ' + logFilePath)
 
   return new RNGeth(gethOptions)

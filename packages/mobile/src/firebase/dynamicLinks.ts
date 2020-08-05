@@ -12,6 +12,7 @@ export async function generateShortInviteLink({
   appStoreId: string | undefined
   bundleId: string
 }): Promise<string> {
+  Logger.warn('generateShortInviteLink()', link)
   try {
     const dynamicLinkParams: FirebaseDynamicLinksTypes.DynamicLinkParameters = {
       link,
