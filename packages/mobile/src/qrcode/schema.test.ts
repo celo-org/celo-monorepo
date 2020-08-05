@@ -38,7 +38,7 @@ describe('#qrDataFromJson', () => {
       try {
         uriDataFromJson(JSON.parse(JSON.stringify(pair.obj)))
       } catch (e) {
-        expect(e).toBe(pair.s)
+        expect(e).toEqual(new Error(pair.s))
       }
     })
 
