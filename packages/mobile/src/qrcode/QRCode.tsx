@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { shallowEqual, useSelector } from 'react-redux'
 import { AvatarSelf } from 'src/components/AvatarSelf'
 import QRCode from 'src/qrcode/QRGen'
-import { QrData } from 'src/qrcode/schema'
+import { UriData, urlFromUriData } from 'src/qrcode/schema'
 import { RootState } from 'src/redux/reducers'
 import { SVG } from 'src/send/actions'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -16,15 +16,22 @@ interface Props {
   qrSvgRef: React.MutableRefObject<SVG>
 }
 
-const mapStateToProps = (state: RootState): Partial<QrData> => ({
+const mapStateToProps = (state: RootState): UriData => ({
   address: currentAccountSelector(state)!,
   displayName: state.account.name || undefined,
   e164PhoneNumber: state.account.e164PhoneNumber || undefined,
+  currencyCode: undefined,
+  amount: undefined,
+  comment: undefined,
 })
 
 export default function QRCodeDisplay({ qrSvgRef }: Props) {
   const data = useSelector(mapStateToProps, shallowEqual)
-  const qrContent = useMemo(() => JSON.stringify(data), Object.values(data))
+  const qrContent = useMemo(() => urlFromUriData(data), [
+    data.address,
+    data.displayName,
+    data.e164PhoneNumber,
+  ])
   return (
     <SafeAreaView style={styles.container}>
       <AvatarSelf iconSize={64} displayNameStyle={fontStyles.h2} />

@@ -1,7 +1,5 @@
 import { zeroAddress } from 'ethereumjs-util'
-import { isRight } from 'fp-ts/lib/Either'
-import { PathReporter } from 'io-ts/lib/PathReporter'
-import { qrDataFromJson } from 'src/qrcode/schema'
+import { uriDataFromJson } from 'src/qrcode/schema'
 
 const validAddressData = { address: zeroAddress() }
 const validUserData = {
@@ -24,10 +22,7 @@ const validBeamAndGoPaymentData = {
 
 describe('#qrDataFromJson', () => {
   const validParse = (...objects: object[]) =>
-    objects.forEach((obj) => {
-      const parsed = qrDataFromJson(JSON.parse(JSON.stringify(obj)))
-      expect(isRight(parsed)).toBeTruthy()
-    })
+    objects.forEach((obj) => uriDataFromJson(JSON.parse(JSON.stringify(obj))))
 
   it('should parse valid address', () =>
     validParse(validAddressData, validUserData, validLocalPaymentData))
@@ -40,11 +35,11 @@ describe('#qrDataFromJson', () => {
 
   const invalidParse = (...pairs: Array<{ obj: object; s: string }>) =>
     pairs.forEach((pair) => {
-      const parsed = qrDataFromJson(JSON.parse(JSON.stringify(pair.obj)))
-      if (isRight(parsed)) {
-        fail('should be left')
+      try {
+        uriDataFromJson(JSON.parse(JSON.stringify(pair.obj)))
+      } catch (e) {
+        expect(e).toBe(pair.s)
       }
-      expect(PathReporter.report(parsed)[0]).toBe(pair.s)
     })
 
   it('should parse with error on invalid address', () =>

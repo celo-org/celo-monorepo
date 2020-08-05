@@ -1,5 +1,3 @@
-import { isLeft } from 'fp-ts/lib/Either'
-import { PathReporter } from 'io-ts/lib/PathReporter'
 import * as RNFS from 'react-native-fs'
 import Share from 'react-native-share'
 import { call, put } from 'redux-saga/effects'
@@ -11,7 +9,7 @@ import { validateRecipientAddressSuccess } from 'src/identity/actions'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import { replace } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { QrData, qrDataFromJson } from 'src/qrcode/schema'
+import { UriData, uriDataFromJson, uriDataFromUrl } from 'src/qrcode/schema'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 import { QrCode, SVG } from 'src/send/actions'
 import { TransactionDataInput } from 'src/send/SendAmount'
@@ -101,22 +99,15 @@ export function* handleBarcode(
   isOutgoingPaymentRequest?: true,
   requesterAddress?: string
 ) {
-  let data: object
+  let qrData: UriData
   try {
-    data = JSON.parse(barcode.data)
+    qrData = uriDataFromUrl(barcode.data)
   } catch (e) {
-    Logger.warn(TAG, 'QR code read failed with ' + e)
+    Logger.warn(TAG, 'qr scan failed with ' + e)
+    // DEPRECATED:
+    qrData = uriDataFromJson(JSON.parse(barcode.data))
     return
   }
-
-  const maybeQrData = qrDataFromJson(data)
-  if (isLeft(maybeQrData)) {
-    yield put(showMessage(PathReporter.report(maybeQrData)[0]))
-    return
-  }
-  const qrData: QrData = maybeQrData.right
-
-  Logger.warn(TAG, 'QR succeeded with ' + JSON.stringify(qrData))
 
   if (secureSendTxData) {
     const success = yield call(

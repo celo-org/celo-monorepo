@@ -1,7 +1,7 @@
 import { expectSaga } from 'redux-saga-test-plan'
 import * as matchers from 'redux-saga-test-plan/matchers'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
-import { QrData } from 'src/qrcode/schema'
+import { UriData, urlFromUriData } from 'src/qrcode/schema'
 import { PaymentInfo } from 'src/send/reducers'
 import {
   dailyAmountRemaining,
@@ -120,15 +120,14 @@ describe('send/utils', () => {
       comment: '92a53156-c0f2-11ea-b3de-0242ac13000',
     }
 
-    const params = new URLSearchParams(data)
-    const deepLink = `celo://wallet/pay?${params.toString()}`
+    const deeplink = urlFromUriData(data)
 
     it('should call handleSendPaymentData with parsed payment data ', async () => {
-      const parsed: QrData = {
+      const parsed: UriData = {
         ...data,
         e164PhoneNumber: undefined,
       }
-      await expectSaga(handlePaymentDeeplink, deepLink)
+      await expectSaga(handlePaymentDeeplink, deeplink)
         .provide([[matchers.call.fn(handleSendPaymentData), parsed]])
         .run()
     })

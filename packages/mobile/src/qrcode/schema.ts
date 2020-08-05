@@ -1,17 +1,42 @@
 import { AddressType, E164PhoneNumberType } from '@celo/utils/lib/io'
-import * as t from 'io-ts'
+import { isLeft } from 'fp-ts/lib/Either'
+import {
+  keyof as ioKeyof,
+  string as ioString,
+  type as ioType,
+  TypeOf as ioTypeOf,
+  undefined as ioUndefined,
+  union as ioUnion,
+} from 'io-ts'
+import { PathReporter } from 'io-ts/lib/PathReporter'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
+import { parse } from 'url'
 
-export const QrDataType = t.type({
+export const UriDataType = ioType({
   address: AddressType,
-  // io-ts way of defining optional key-value pair
-  displayName: t.union([t.undefined, t.string]),
-  e164PhoneNumber: t.union([t.undefined, E164PhoneNumberType]),
-  currencyCode: t.union([t.undefined, t.keyof(LocalCurrencyCode)]),
+  displayName: ioUnion([ioUndefined, ioString]),
+  e164PhoneNumber: ioUnion([ioUndefined, E164PhoneNumberType]),
+  currencyCode: ioUnion([ioUndefined, ioKeyof(LocalCurrencyCode)]),
   // TODO: amount string is valid BigNumber
-  amount: t.union([t.undefined, t.string]),
-  comment: t.union([t.undefined, t.string]),
+  amount: ioUnion([ioUndefined, ioString]),
+  comment: ioUnion([ioUndefined, ioString]),
 })
-export type QrData = t.TypeOf<typeof QrDataType>
+export type UriData = ioTypeOf<typeof UriDataType>
 
-export const qrDataFromJson = (obj: object) => QrDataType.decode(obj)
+export const uriDataFromJson = (obj: object): UriData => {
+  const either = UriDataType.decode(obj)
+  if (isLeft(either)) {
+    throw new Error(PathReporter.report(either)[0])
+  }
+  return either.right
+}
+export const uriDataFromUrl = (url: string) => uriDataFromJson(parse(url, true).query)
+
+enum UriMethod {
+  pay = 'pay',
+}
+
+export const urlFromUriData = (data: Partial<UriData>, method: UriMethod = UriMethod.pay) => {
+  const params = new URLSearchParams(JSON.stringify(data))
+  return `celo://wallet/${method.toString()}?${params.toString()}`
+}

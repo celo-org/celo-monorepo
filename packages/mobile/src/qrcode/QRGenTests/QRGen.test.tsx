@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
 import QRCode, { genMatrix } from 'src/qrcode/QRGen'
-import { QrData } from 'src/qrcode/schema'
+import { UriData, urlFromUriData } from 'src/qrcode/schema'
 
 describe('QRCode', () => {
   it('renders correctly', () => {
@@ -33,7 +33,7 @@ describe('QRCode', () => {
 
   it('does not call onError in case of valid BeamAndGo data', () => {
     const onErrorMock = jest.fn()
-    const data: QrData = {
+    const data: UriData = {
       address: '0xf7f551752A78Ce650385B58364225e5ec18D96cB',
       e164PhoneNumber: undefined,
       displayName: 'Super 8',
@@ -42,7 +42,7 @@ describe('QRCode', () => {
       comment: '92a53156-c0f2-11ea-b3de-0242ac13000',
     }
     renderer.create(
-      <QRCode value={JSON.stringify(data)} onError={onErrorMock} svgRef={{ current: null }} />
+      <QRCode value={urlFromUriData(data)} onError={onErrorMock} svgRef={{ current: null }} />
     )
     expect(onErrorMock).not.toHaveBeenCalled()
   })
