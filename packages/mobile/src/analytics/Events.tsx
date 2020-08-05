@@ -273,15 +273,32 @@ export enum CeloExchangeEvents {
 
 export enum GethEvents {
   blockchain_corruption = 'blockchain_corruption',
+  geth_init_start = 'geth_init_start',
   geth_init_success = 'geth_init_success',
   geth_init_failure = 'geth_init_failure',
   geth_restart_to_fix_init = 'geth_restart_to_fix_init',
   prompt_forno = 'prompt_forno',
-  geth_init_start = 'geth_init_start',
   create_geth_start = 'create_geth_start',
   create_geth_finish = 'create_geth_finish',
+  create_geth_error = 'create_geth_error',
   start_geth_start = 'start_geth_start',
   start_geth_finish = 'start_geth_finish',
+}
+
+export enum NetworkEvents {
+  // Events triggered when the app detects it is connected or disconnected from the Celo network.
+  network_connected = 'network_connected',
+  network_disconnected = 'network_disconnected',
+
+  // Events triggered when the app detects it loses or restores sync with the Celo network.
+  network_sync_lost = 'network_sync_lost',
+  network_sync_restored = 'network_sync_restored',
+
+  // Events triggered during a syncing or waiting to start syncing.
+  network_sync_waiting = 'network_sync_waiting',
+  network_sync_start = 'network_sync_start',
+  network_sync_finish = 'network_sync_finish',
+  network_sync_error = 'network_sync_error',
 }
 
 export enum ContractKitEvents {
@@ -311,3 +328,4 @@ export type AnalyticsEventType =
   | TransactionEvents
   | CeloExchangeEvents
   | GethEvents
+  | NetworkEvents

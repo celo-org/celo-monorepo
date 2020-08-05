@@ -6,7 +6,7 @@ import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-s
 import { setAccountCreationTime, setPromptForno } from 'src/account/actions'
 import { promptFornoIfNeededSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
-import { GethEvents, SettingsEvents } from 'src/analytics/Events'
+import { GethEvents, NetworkEvents, SettingsEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
@@ -34,8 +34,8 @@ import {
 import { destroyContractKit, getWallet, getWeb3, initContractKit } from 'src/web3/contracts'
 import { createAccountDek } from 'src/web3/dataEncryptionKey'
 import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
-import { getLatestBlock } from 'src/web3/utils'
-import { Block } from 'web3-eth'
+import { blockIsFresh, getLatestBlock } from 'src/web3/utils'
+import { BlockHeader } from 'web3-eth'
 
 const TAG = 'web3/saga'
 
@@ -45,11 +45,18 @@ export const SYNC_TIMEOUT = 2 * 60 * 1000 // 2 minutes
 const SWITCH_TO_FORNO_TIMEOUT = 15000 // if syncing takes >15 secs, suggest switch to forno
 const WEB3_MONITOR_DELAY = 100
 
+enum SyncStatus {
+  UNKNOWN,
+  WAITING,
+  SYNCING,
+}
+
 // checks if web3 claims it is currently syncing and attempts to wait for it to complete
 export function* checkWeb3SyncProgress() {
   Logger.debug(TAG, 'checkWeb3SyncProgress', 'Checking sync progress')
 
   let syncLoops = 0
+  let status = SyncStatus.UNKNOWN
   while (true) {
     try {
       let syncProgress: boolean | Web3SyncProgress
@@ -61,29 +68,44 @@ export function* checkWeb3SyncProgress() {
       if (typeof syncProgress === 'boolean' && !syncProgress) {
         Logger.debug(TAG, 'checkWeb3SyncProgress', 'Sync maybe complete, checking')
 
-        const latestBlock: Block = yield call(getLatestBlock)
-        if (latestBlock && latestBlock.number > 0) {
+        const latestBlock: BlockHeader = yield call(getLatestBlock)
+        if (latestBlock && blockIsFresh(latestBlock)) {
           yield put(completeWeb3Sync(latestBlock.number))
           Logger.debug(TAG, 'checkWeb3SyncProgress', 'Sync is complete')
+          ValoraAnalytics.track(NetworkEvents.network_sync_finish, {
+            latestBlock: latestBlock.number,
+          })
           return true
         } else {
           Logger.debug(TAG, 'checkWeb3SyncProgress', 'Sync not actually complete, still waiting')
+          if (status !== SyncStatus.WAITING) {
+            status = SyncStatus.WAITING
+            ValoraAnalytics.track(NetworkEvents.network_sync_waiting)
+          }
         }
       } else if (typeof syncProgress === 'object') {
         yield put(updateWeb3SyncProgress(syncProgress))
+        if (status !== SyncStatus.SYNCING) {
+          status = SyncStatus.SYNCING
+          ValoraAnalytics.track(NetworkEvents.network_sync_start, syncProgress)
+        }
       } else {
         throw new Error('Invalid syncProgress type')
       }
       yield delay(WEB3_MONITOR_DELAY) // wait 100ms while web3 syncs then check again
       syncLoops += 1
+
+      // If sync has been in progrees for too long, prompt the user to try forno instead.
       if (syncLoops * WEB3_MONITOR_DELAY > SWITCH_TO_FORNO_TIMEOUT) {
         if (yield select(promptFornoIfNeededSelector) && features.DATA_SAVER) {
+          ValoraAnalytics.track(NetworkEvents.network_sync_error, { error: 'sync timeout' })
           yield put(setPromptForno(false))
           navigate(Screens.Settings, { promptFornoModal: true })
           return true
         }
       }
     } catch (error) {
+      ValoraAnalytics.track(NetworkEvents.network_sync_error, { error: error.message })
       if (isProviderConnectionError(error)) {
         ValoraAnalytics.track(GethEvents.blockchain_corruption)
         const deleted = yield call(deleteChainData)
