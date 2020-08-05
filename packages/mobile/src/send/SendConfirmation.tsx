@@ -224,7 +224,7 @@ export class SendConfirmation extends React.Component<Props, State> {
     const { type } = this.props.confirmationInput
     let title
 
-    if (type === TokenTransactionType.PayRequest) {
+    if (type === TokenTransactionType.PayRequest || type === TokenTransactionType.PayPrefill) {
       title = t('payRequest')
     } else if (type === TokenTransactionType.InviteSent) {
       title = t('inviteVerifyPayment')
