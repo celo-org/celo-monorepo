@@ -2,26 +2,26 @@ import * as React from 'react'
 import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import { PaymentRequest } from 'src/account/types'
-import { paymentRequestDouble } from 'src/paymentRequest/__mocks__'
+import { createMockPaymentRequest } from 'src/paymentRequest/__mocks__'
 import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
+import { PaymentRequest } from 'src/paymentRequest/types'
 import { createMockStore } from 'test/utils'
 import { mockAccount, mockE164Number } from 'test/values'
 
 const requests = [
-  paymentRequestDouble({
+  createMockPaymentRequest({
     amount: '20',
     comment: 'Just the best',
     requesterE164Number: '+1555-867-5309',
     requesterAddress: mockAccount,
   }),
-  paymentRequestDouble({
+  createMockPaymentRequest({
     amount: '102',
     comment: 'Just the best for the best. Thanos & Zeus Gods of ultimate Power',
     requesterE164Number: mockE164Number,
     requesterAddress: mockAccount,
   }),
-  paymentRequestDouble({
+  createMockPaymentRequest({
     amount: '1',
     comment: 'Just the best but less',
     requesterE164Number: mockE164Number,
@@ -32,7 +32,7 @@ const requests = [
 function testStore(incomingPaymentRequests: PaymentRequest[]) {
   return createMockStore({
     stableToken: { balance: '120' },
-    account: { incomingPaymentRequests },
+    paymentRequest: { incomingPaymentRequests },
   })
 }
 
