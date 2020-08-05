@@ -187,7 +187,6 @@ spec:
             --nousb \
             --password=/root/.celo/account/accountSecret \
             --unlock=${ACCOUNT_ADDRESS} \
-            --validator \
             --rpc \
             --rpcaddr 0.0.0.0 \
             --rpcapi=eth,net,web3,debug \
@@ -205,6 +204,7 @@ spec:
             --consoleoutput=stdout \
             --verbosity={{ .Values.geth.verbosity }} \
             --vmodule={{ .Values.geth.vmodule }} \
+            --istanbul.validator \
             --istanbul.blockperiod={{ .Values.geth.blocktime }} \
             --istanbul.requesttimeout={{ .Values.geth.istanbulrequesttimeout }} \
             --maxpeers=125 \
