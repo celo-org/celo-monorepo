@@ -7,17 +7,11 @@ import '@react-native-firebase/messaging'
 import { FirebaseMessagingTypes } from '@react-native-firebase/messaging'
 import DeviceInfo from 'react-native-device-info'
 import { eventChannel, EventChannel } from 'redux-saga'
-import { call, put, select, spawn, take } from 'redux-saga/effects'
-import { NotificationReceiveState } from 'src/account/types'
-import { showError } from 'src/alert/actions'
-import { RequestEvents } from 'src/analytics/Events'
-import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { ErrorMessages } from 'src/app/ErrorMessages'
+import { call, select, spawn, take } from 'redux-saga/effects'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { FIREBASE_ENABLED } from 'src/config'
-import { WritePaymentRequest } from 'src/firebase/actions'
 import { handleNotification } from 'src/firebase/notifications'
-import { navigateHome } from 'src/navigator/NavigationService'
+import { NotificationReceiveState } from 'src/notifications/types'
 import Logger from 'src/utils/Logger'
 import { Awaited } from 'src/utils/typescript'
 
@@ -171,20 +165,6 @@ export const registerTokenToDb = async (
   } catch (error) {
     Logger.error(TAG, 'Failed to register Firebase FCM token', error)
     throw error
-  }
-}
-
-export function* paymentRequestWriter({ paymentInfo }: WritePaymentRequest) {
-  try {
-    Logger.info(TAG, `Writing pending request to database`)
-    const pendingRequestRef = firebase.database().ref(`pendingRequests`)
-    yield call(() => pendingRequestRef.push(paymentInfo))
-
-    navigateHome()
-  } catch (error) {
-    Logger.error(TAG, 'Failed to write payment request to Firebase DB', error)
-    ValoraAnalytics.track(RequestEvents.request_error, { error: error.message })
-    yield put(showError(ErrorMessages.PAYMENT_REQUEST_FAILED))
   }
 }
 

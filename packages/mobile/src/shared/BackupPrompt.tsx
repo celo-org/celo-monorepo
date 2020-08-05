@@ -1,4 +1,4 @@
-import SmartTopAlert, { NotificationTypes } from '@celo/react-components/components/SmartTopAlert'
+import SmartTopAlert, { AlertTypes } from '@celo/react-components/components/SmartTopAlert'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
@@ -43,7 +43,7 @@ export class BackupPrompt extends React.Component<Props> {
         timestamp={Date.now()}
         text={isVisible ? t('backupPrompt') : null}
         onPress={this.goToBackup}
-        type={NotificationTypes.MESSAGE}
+        type={AlertTypes.MESSAGE}
         buttonMessage={isVisible ? t('getBackupKey') : null}
       />
     )

@@ -2,13 +2,14 @@
 import { StackNavigationProp } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import { MinimalContact } from 'react-native-contacts'
-import { NotificationTypes, PaymentRequest, PaymentRequestStatus } from 'src/account/types'
 import { TokenTransactionType } from 'src/apollo/types'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import { AttestationCode } from 'src/identity/verification'
 import { StackParamList } from 'src/navigator/types'
+import { NotificationTypes } from 'src/notifications/types'
+import { PaymentRequest, PaymentRequestStatus } from 'src/paymentRequest/types'
 import {
   RecipientKind,
   RecipientWithContact,
@@ -240,9 +241,9 @@ export const mockPaymentRequests: PaymentRequest[] = [
     uid: 'FAKE_ID_1',
     timestamp: date,
     comment: 'Dinner for me and the gals, PIZZAA!',
-    requesterE164Number: mockE164Number,
     requesteeAddress: mockAccount,
     requesterAddress: mockAccount2,
+    requesterE164Number: mockE164Number,
     status: PaymentRequestStatus.REQUESTED,
     currency,
     notified: true,
@@ -253,9 +254,9 @@ export const mockPaymentRequests: PaymentRequest[] = [
     amount: '180.89',
     uid: 'FAKE_ID_2',
     comment: 'My Birthday Present. :) Am I not the best? Celebration. Bam!',
-    requesterE164Number: mockE164Number,
     requesteeAddress: mockAccount,
     requesterAddress: mockAccount2,
+    requesterE164Number: mockE164Number,
     status: PaymentRequestStatus.REQUESTED,
     currency,
     notified: true,
@@ -266,9 +267,9 @@ export const mockPaymentRequests: PaymentRequest[] = [
     amount: '180.89',
     uid: 'FAKE_ID_3',
     comment: 'My Birthday Present. :) Am I not the best? Celebration. Bam!',
-    requesterE164Number: mockE164Number,
     requesteeAddress: mockAccount,
     requesterAddress: mockAccount2,
+    requesterE164Number: mockE164Number,
     status: PaymentRequestStatus.REQUESTED,
     currency,
     notified: true,

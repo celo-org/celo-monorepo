@@ -1,5 +1,4 @@
 import { PincodeType } from 'src/account/reducer'
-import { PaymentRequest } from 'src/account/types'
 
 export enum Actions {
   CHOOSE_CREATE_ACCOUNT = 'ACCOUNT/CHOOSE_CREATE',
@@ -17,8 +16,6 @@ export enum Actions {
   SET_BACKUP_DELAYED = 'ACCOUNT/SET_BACKUP_DELAYED',
   SET_SOCIAL_BACKUP_COMPLETED = 'ACCOUNT/SET_SOCIAL_BACKUP_COMPLETED',
   TOGGLE_BACKUP_STATE = 'ACCOUNT/TOGGLE_BACKUP_STATE',
-  UPDATE_INCOMING_PAYMENT_REQUESTS = 'ACCOUNT/UPDATE_INCOMING_PAYMENT_REQUESTS',
-  UPDATE_OUTGOING_PAYMENT_REQUESTS = 'ACCOUNT/UPDATE_OUTGOING_PAYMENT_REQUESTS',
   DISMISS_INVITE_FRIENDS = 'ACCOUNT/DISMISS_INVITE_FRIENDS',
   DISMISS_GET_VERIFIED = 'ACCOUNT/DISMISS_GET_VERIFIED',
   SET_USER_CONTACT_DETAILS = 'ACCOUNT/SET_USER_CONTACT_DETAILS',
@@ -96,16 +93,6 @@ export interface ToggleBackupState {
   type: Actions.TOGGLE_BACKUP_STATE
 }
 
-export interface UpdateIncomingPaymentRequestsAction {
-  type: Actions.UPDATE_INCOMING_PAYMENT_REQUESTS
-  paymentRequests: PaymentRequest[]
-}
-
-export interface UpdateOutgoingPaymentRequestsAction {
-  type: Actions.UPDATE_OUTGOING_PAYMENT_REQUESTS
-  paymentRequests: PaymentRequest[]
-}
-
 export interface DismissInviteFriendsAction {
   type: Actions.DISMISS_INVITE_FRIENDS
 }
@@ -152,8 +139,6 @@ export type ActionTypes =
   | ToggleBackupState
   | DismissInviteFriendsAction
   | DismissGetVerifiedAction
-  | UpdateIncomingPaymentRequestsAction
-  | UpdateOutgoingPaymentRequestsAction
   | SetContactDetailsAction
   | SetPromptFornoAction
   | SetRetryVerificationWithFornoAction
@@ -238,20 +223,6 @@ export const setSocialBackupCompleted = (): SetSocialBackupCompletedAction => ({
 
 export const toggleBackupState = (): ToggleBackupState => ({
   type: Actions.TOGGLE_BACKUP_STATE,
-})
-
-export const updateIncomingPaymentRequests = (
-  paymentRequests: PaymentRequest[]
-): UpdateIncomingPaymentRequestsAction => ({
-  type: Actions.UPDATE_INCOMING_PAYMENT_REQUESTS,
-  paymentRequests,
-})
-
-export const updateOutgoingPaymentRequests = (
-  paymentRequests: PaymentRequest[]
-): UpdateOutgoingPaymentRequestsAction => ({
-  type: Actions.UPDATE_OUTGOING_PAYMENT_REQUESTS,
-  paymentRequests,
 })
 
 export const dismissInviteFriends = (): DismissInviteFriendsAction => ({

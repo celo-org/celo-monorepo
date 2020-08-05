@@ -6,7 +6,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Animated, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-export enum NotificationTypes {
+export enum AlertTypes {
   MESSAGE = 'message',
   ERROR = 'error',
 }
@@ -15,7 +15,7 @@ interface AlertProps {
   title?: string | null
   text: string | null
   onPress: () => void
-  type: NotificationTypes
+  type: AlertTypes
   dismissAfter?: number | null
   buttonMessage?: string | null
 }
@@ -132,7 +132,7 @@ function SmartTopAlert(props: Props) {
   }
 
   const { type, title, text, buttonMessage, onPress } = visibleAlertState
-  const isError = type === NotificationTypes.ERROR
+  const isError = type === AlertTypes.ERROR
 
   const testID = isError ? 'errorBanner' : 'infoBanner'
 
