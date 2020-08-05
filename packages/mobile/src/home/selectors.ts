@@ -1,6 +1,9 @@
 import { createSelector } from 'reselect'
-import { getIncomingPaymentRequests, getOutgoingPaymentRequests } from 'src/account/selectors'
 import { getReclaimableEscrowPayments } from 'src/escrow/reducer'
+import {
+  getIncomingPaymentRequests,
+  getOutgoingPaymentRequests,
+} from 'src/paymentRequest/selectors'
 import { RootState } from 'src/redux/reducers'
 import { isBackupTooLate } from 'src/redux/selectors'
 
