@@ -10,6 +10,7 @@ import {
   HomeEvents,
   IdentityEvents,
   InviteEvents,
+  NetworkEvents,
   OnboardingEvents,
   RequestEvents,
   SendEvents,
@@ -453,12 +454,15 @@ interface FeeEventsProperties {
 interface TransactionEventsProperties {
   [TransactionEvents.transaction_start]: {
     txId: string
+    fornoMode?: boolean
   }
   [TransactionEvents.transaction_gas_estimated]: {
     txId: string
+    estimatedGas: number
   }
   [TransactionEvents.transaction_hash_received]: {
     txId: string
+    txHash: string
   }
   [TransactionEvents.transaction_confirmed]: {
     txId: string
@@ -552,7 +556,7 @@ interface GethEventsProperties {
   }
   [GethEvents.geth_restart_to_fix_init]: undefined
   [GethEvents.prompt_forno]: {
-    error: string
+    error?: string
     context: string
   }
   [GethEvents.geth_init_start]: {
@@ -560,8 +564,40 @@ interface GethEventsProperties {
   }
   [GethEvents.create_geth_start]: undefined
   [GethEvents.create_geth_finish]: undefined
+  [GethEvents.create_geth_error]: {
+    error: string
+  }
   [GethEvents.start_geth_start]: undefined
   [GethEvents.start_geth_finish]: undefined
+}
+
+interface NetworkEventsProperties {
+  [NetworkEvents.network_connected]: {
+    fornoMode: boolean
+  }
+  [NetworkEvents.network_disconnected]: {
+    fornoMode: boolean
+  }
+  [NetworkEvents.network_sync_lost]: {
+    latestBlock: number
+    latestTimestamp: number
+  }
+  [NetworkEvents.network_sync_restored]: {
+    latestBlock: number
+    latestTimestamp: number
+  }
+  [NetworkEvents.network_sync_waiting]: undefined
+  [NetworkEvents.network_sync_start]: {
+    startingBlock: number
+    currentBlock: number
+    highestBlock: number
+  }
+  [NetworkEvents.network_sync_finish]: {
+    latestBlock: number
+  }
+  [NetworkEvents.network_sync_error]: {
+    error: string
+  }
 }
 
 interface ContractKitEventsProperties {
@@ -593,4 +629,5 @@ export type AnalyticsPropertiesList = AppEventsProperties &
   TransactionEventsProperties &
   CeloExchangeEventsProperties &
   GethEventsProperties &
+  NetworkEventsProperties &
   ContractKitEventsProperties
