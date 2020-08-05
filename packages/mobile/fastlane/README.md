@@ -31,16 +31,6 @@ Build the Android application - requires environment param
 fastlane android integration
 ```
 Ship Integration to Playstore Internal
-### android staging
-```
-fastlane android staging
-```
-Ship Staging to Playstore Internal
-### android production
-```
-fastlane android production
-```
-Ship Production to Playstore Alpha.
 ### android alfajores
 ```
 fastlane android alfajores

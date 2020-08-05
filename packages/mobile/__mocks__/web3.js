@@ -38,9 +38,9 @@ export default class {
     getTransactionCount: () => {},
     getGasPrice: async () => GAS_PRICE_PLACEHOLDER,
     estimateGas: async () => GAS_PER_TRANSACTION,
-    getBlock: async (number) => {
+    getBlock: jest.fn(async (number) => {
       return number === 'latest' ? latestBlock : otherBlock
-    },
+    }),
     getAccounts: () => {},
     accounts: {
       privateKeyToAccount: () => ({ address: '0x0000000000000000000000000000000000007E57' }),
