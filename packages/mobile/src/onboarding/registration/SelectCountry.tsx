@@ -29,7 +29,10 @@ export default function SelectCountry({ navigation, route }: Props) {
   ])
 
   function onSelect(country: LocalizedCountry) {
-    navigation.navigate(Screens.NameAndNumber, { selectedCountryCodeAlpha2: country.alpha2 })
+    navigation.navigate(Screens.NameAndNumber, {
+      selectedCountryCodeAlpha2: country.alpha2,
+      country: country.displayNameNoDiacritics,
+    })
   }
 
   const renderItem = useCallback(

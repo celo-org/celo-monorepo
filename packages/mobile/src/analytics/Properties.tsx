@@ -142,6 +142,7 @@ interface OnboardingEventsProperties {
 
   [OnboardingEvents.phone_number_set]: {
     countryCode: string
+    country?: string
   }
   [OnboardingEvents.phone_number_invalid]: {
     obfuscatedPhoneNumber: string
