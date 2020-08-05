@@ -2,6 +2,7 @@
 // Use these instead of the functions in @celo/utils/src/commentEncryption
 // because these manage comment metadata
 
+import { PhoneNumberHashDetails } from '@celo/contractkit/lib/utils/phone-number-lookup/phone-number-identifier'
 import { IdentifierLookupResult } from '@celo/contractkit/lib/wrappers/Attestations'
 import { eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import {
@@ -20,7 +21,7 @@ import {
   getAddressesFromLookupResult,
   lookupAttestationIdentifiers,
 } from 'src/identity/contactMapping'
-import { getUserSelfPhoneHashDetails, PhoneNumberHashDetails } from 'src/identity/privateHashing'
+import { getUserSelfPhoneHashDetails } from 'src/identity/privateHashing'
 import {
   AddressToE164NumberType,
   e164NumberToAddressSelector,

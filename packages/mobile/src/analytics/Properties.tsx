@@ -10,6 +10,7 @@ import {
   HomeEvents,
   IdentityEvents,
   InviteEvents,
+  NetworkEvents,
   OnboardingEvents,
   RequestEvents,
   SendEvents,
@@ -28,6 +29,8 @@ interface AppEventsProperties {
     // TODO: Figure out how to measure loadingDuration iOS and make param required
     loadingDuration?: number
     deviceInfo?: object
+    deviceHeight: number
+    deviceWidth: number
   }
   [AppEvents.app_state_error]: {
     error: string
@@ -139,6 +142,7 @@ interface OnboardingEventsProperties {
 
   [OnboardingEvents.phone_number_set]: {
     countryCode: string
+    country?: string
   }
   [OnboardingEvents.phone_number_invalid]: {
     obfuscatedPhoneNumber: string
@@ -294,9 +298,14 @@ interface IdentityEventsProperties {
 }
 
 interface InviteEventsProperties {
-  [InviteEvents.invite_tx_start]: undefined
-  [InviteEvents.invite_tx_complete]: undefined
+  [InviteEvents.invite_tx_start]: {
+    escrowIncluded: boolean
+  }
+  [InviteEvents.invite_tx_complete]: {
+    escrowIncluded: boolean
+  }
   [InviteEvents.invite_tx_error]: {
+    escrowIncluded: boolean
     error: string
   }
   [InviteEvents.invite_method_sms]: undefined
@@ -347,7 +356,7 @@ interface SendEventsProperties {
     localCurrencyAmount: string | null
   }
   [SendEvents.send_confirm_back]: undefined
-  [SendEvents.send_confim_send]: {
+  [SendEvents.send_confirm_send]: {
     isScan: boolean
     isInvite: boolean
     isRequest: boolean
@@ -385,7 +394,12 @@ interface SendEventsProperties {
   [SendEvents.send_secure_edit]: undefined
 
   [SendEvents.send_tx_start]: undefined
-  [SendEvents.send_tx_complete]: undefined
+  [SendEvents.send_tx_complete]: {
+    txId: string
+    recipientAddress: string
+    amount: string
+    currency: string
+  }
   [SendEvents.send_tx_error]: {
     error: string
   }
@@ -441,12 +455,15 @@ interface FeeEventsProperties {
 interface TransactionEventsProperties {
   [TransactionEvents.transaction_start]: {
     txId: string
+    fornoMode?: boolean
   }
   [TransactionEvents.transaction_gas_estimated]: {
     txId: string
+    estimatedGas: number
   }
   [TransactionEvents.transaction_hash_received]: {
     txId: string
+    txHash: string
   }
   [TransactionEvents.transaction_confirmed]: {
     txId: string
@@ -483,6 +500,7 @@ interface CeloExchangeEventsProperties {
   [CeloExchangeEvents.celo_buy_confirm]: {
     localCurrencyAmount: string | null
     goldAmount: string
+    dollarAmount: string
     inputToken: CURRENCY_ENUM
     goldToDollarExchangeRate: string
   }
@@ -500,6 +518,7 @@ interface CeloExchangeEventsProperties {
   [CeloExchangeEvents.celo_sell_confirm]: {
     localCurrencyAmount: string | null
     goldAmount: string
+    dollarAmount: string
     inputToken: CURRENCY_ENUM
     goldToDollarExchangeRate: string
   }
@@ -510,7 +529,11 @@ interface CeloExchangeEventsProperties {
   }
 
   [CeloExchangeEvents.celo_exchange_start]: undefined
-  [CeloExchangeEvents.celo_exchange_complete]: undefined
+  [CeloExchangeEvents.celo_exchange_complete]: {
+    txId: string
+    currency: string
+    amount: string
+  }
   [CeloExchangeEvents.celo_exchange_error]: {
     error: string
   }
@@ -534,7 +557,7 @@ interface GethEventsProperties {
   }
   [GethEvents.geth_restart_to_fix_init]: undefined
   [GethEvents.prompt_forno]: {
-    error: string
+    error?: string
     context: string
   }
   [GethEvents.geth_init_start]: {
@@ -542,8 +565,40 @@ interface GethEventsProperties {
   }
   [GethEvents.create_geth_start]: undefined
   [GethEvents.create_geth_finish]: undefined
+  [GethEvents.create_geth_error]: {
+    error: string
+  }
   [GethEvents.start_geth_start]: undefined
   [GethEvents.start_geth_finish]: undefined
+}
+
+interface NetworkEventsProperties {
+  [NetworkEvents.network_connected]: {
+    fornoMode: boolean
+  }
+  [NetworkEvents.network_disconnected]: {
+    fornoMode: boolean
+  }
+  [NetworkEvents.network_sync_lost]: {
+    latestBlock: number
+    latestTimestamp: number
+  }
+  [NetworkEvents.network_sync_restored]: {
+    latestBlock: number
+    latestTimestamp: number
+  }
+  [NetworkEvents.network_sync_waiting]: undefined
+  [NetworkEvents.network_sync_start]: {
+    startingBlock: number
+    currentBlock: number
+    highestBlock: number
+  }
+  [NetworkEvents.network_sync_finish]: {
+    latestBlock: number
+  }
+  [NetworkEvents.network_sync_error]: {
+    error: string
+  }
 }
 
 interface ContractKitEventsProperties {
@@ -575,4 +630,5 @@ export type AnalyticsPropertiesList = AppEventsProperties &
   TransactionEventsProperties &
   CeloExchangeEventsProperties &
   GethEventsProperties &
+  NetworkEventsProperties &
   ContractKitEventsProperties

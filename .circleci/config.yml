@@ -8,11 +8,11 @@ reference:
   android_config: &android_config
     working_directory: *workspace
     macos:
-      xcode: '11.5.0'
+      xcode: "11.5.0"
     shell: /bin/bash --login -eo pipefail
     environment:
       TERM: dumb
-      _JAVA_OPTIONS: '-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap'
+      _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
       GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
 
 defaults: &defaults
@@ -21,7 +21,7 @@ defaults: &defaults
     - image: celohq/node10-gcloud:v3
   environment:
     # To avoid ENOMEM problem when running node
-    NODE_OPTIONS: '--max-old-space-size=4096'
+    NODE_OPTIONS: "--max-old-space-size=4096"
 
 e2e-defaults: &e2e-defaults
   <<: *defaults
@@ -31,9 +31,9 @@ e2e-defaults: &e2e-defaults
     CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
 general:
   artifacts:
-    - 'mobile/coverage'
-    - 'web/coverage'
-    - 'protocol/coverage'
+    - "mobile/coverage"
+    - "web/coverage"
+    - "protocol/coverage"
 
 commands:
   yarn_install:
@@ -129,7 +129,7 @@ jobs:
       - save_cache:
           key: source-v1-{{ .Branch }}-{{ .Revision }}
           paths:
-            - '.git'
+            - ".git"
 
       - run:
           name: Verify setup for incremental testing
@@ -277,7 +277,7 @@ jobs:
 
   end-to-end-mobile-test-ios:
     macos:
-      xcode: '11.3.1'
+      xcode: "11.3.1"
     working_directory: ~/app_osx
     steps:
       - checkout
@@ -476,10 +476,16 @@ jobs:
             git fetch --all
             RELEASE_BRANCH=$(git branch -a --list *release/contracts/* | tail -1 | sed -e 's/remotes\/origin\///g')
             yarn --cwd packages/protocol check-versions -o $RELEASE_BRANCH -n $CIRCLE_BRANCH
+
+            LIBRARIES_CHANGED=$(git diff $RELEASE_BRANCH --name-only packages/protocol/contracts/common/linkedlists)
+            if [[ $LIBRARIES_CHANGED ]]; then
+              echo "Changing the linked list libraries is not currently supported."
+              exit 0
+            fi
       - run:
           name: Unit tests
           # Flaky tests - run them twice
-          command: yarn --cwd packages/protocol test || yarn --cwd packages/protocol test
+          command: yarn --cwd packages/protocol test
 
   # Slow and flaky compared to protocol-test which runs without coverage
   protocol-test-with-code-coverage:
@@ -493,8 +499,7 @@ jobs:
             ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
       - run:
           name: test
-          # Flaky tests - run them twice
-          command: yarn --cwd packages/protocol test:coverage || yarn --cwd packages/protocol test:coverage
+          command: yarn --cwd packages/protocol test:coverage
       - store_artifacts:
           path: packages/protocol/coverage
           destination: protocol/coverage
@@ -832,6 +837,16 @@ jobs:
             cd packages/protocol
             certoraRun specs/harnesses/AccountsHarness.sol --verify AccountsHarness:specs/accounts.spec --settings -assumeUnwindCond
 
+  flakey-test-summary:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Add summary of flakey tests to GitHub Checks
+          command: |
+            node ./packages/flake-tracker/scripts/summary.js
+
 workflows:
   version: 2
   celo-monorepo-build:
@@ -893,12 +908,25 @@ workflows:
       - phone-number-privacy-test:
           requires:
             - lint-checks
+      - flakey-test-summary:
+          requires:
+            - end-to-end-mobile-test-android
+            - end-to-end-mobile-test-ios
+            - protocol-test
+            - mobile-test
+            - end-to-end-geth-transfer-test
+            - end-to-end-geth-blockchain-parameters-test
+            - end-to-end-geth-slashing-test
+            - end-to-end-geth-governance-test
+            - end-to-end-geth-sync-test
+            - end-to-end-geth-validator-order-test
+            - phone-number-privacy-test
   npm-install-testing-cron-workflow:
     triggers:
       - schedule:
           # 7 PM in UTC = noon in PDT.
           # Best for test to fail during SF afternoon, so that, someone can fix it during the day time.
-          cron: '0 19 * * *'
+          cron: "0 19 * * *"
           filters:
             branches:
               only:
@@ -913,7 +941,7 @@ workflows:
       - schedule:
           # 1 PM in UTC = 6 AM in PDT.
           # Best for this slow test (~3 hours) to run during SF early morning.
-          cron: '0 13 * * *'
+          cron: "0 13 * * *"
           filters:
             branches:
               only:
