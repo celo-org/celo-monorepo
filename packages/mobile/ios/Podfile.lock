@@ -472,9 +472,9 @@ PODS:
     - React
   - RNScreens (2.7.0):
     - React
-  - RNSentry (1.6.2):
+  - RNSentry (1.7.1):
     - React
-    - Sentry (~> 5.1.8)
+    - Sentry (~> 5.2.0)
   - RNShare (3.3.0):
     - React
   - RNSVG (12.1.0):
@@ -488,9 +488,9 @@ PODS:
     - Analytics (~> 3.2)
     - Firebase/Core (~> 6.2)
     - FirebaseAnalytics (~> 6.1)
-  - Sentry (5.1.9):
-    - Sentry/Core (= 5.1.9)
-  - Sentry/Core (5.1.9)
+  - Sentry (5.2.0):
+    - Sentry/Core (= 5.2.0)
+  - Sentry/Core (5.2.0)
   - Toast (4.0.0)
   - Yoga (1.14.0)
 
@@ -831,11 +831,11 @@ SPEC CHECKSUMS:
   RNPermissions: ad71dd4f767ec254f2cd57592fbee02afee75467
   RNReanimated: b5ccb50650ba06f6e749c7c329a1bc3ae0c88b43
   RNScreens: cf198f915f8a2bf163de94ca9f5bfc8d326c3706
-  RNSentry: 9d68f0ce79608e90e10ac320c409321efc114b8f
+  RNSentry: 2bae4ffee2e66376ef42cb845a494c3bde17bc56
   RNShare: fea1801315aa8875d6db73a4010b14afcd568765
   RNSVG: ce9d996113475209013317e48b05c21ee988d42e
   Segment-Firebase: 9ac8c3bf9d5c6dcaf248408aca604e023c4b5aad
-  Sentry: 81f7f2bd3cb041137ea7efcde3aa5ad0d5a67632
+  Sentry: 6e04bc3e11bf771ca79140a112de64dcfbc7d8cb
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   Yoga: 3ebccbdd559724312790e7742142d062476b698e
 

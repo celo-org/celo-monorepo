@@ -173,7 +173,10 @@ export class NameAndNumber extends React.Component<Props, State> {
     }
 
     this.props.setPromptForno(true) // Allow forno prompt after Welcome screen
-    ValoraAnalytics.track(OnboardingEvents.phone_number_set, { countryCode: countryCallingCode })
+    ValoraAnalytics.track(OnboardingEvents.phone_number_set, {
+      country: this.props.route.params?.country,
+      countryCode: countryCallingCode,
+    })
     this.props.setPhoneNumber(e164Number, countryCallingCode)
     this.props.setName(name)
     this.goToNextScreen()
