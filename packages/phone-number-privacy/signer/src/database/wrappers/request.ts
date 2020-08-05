@@ -10,7 +10,9 @@ function requests() {
 }
 
 export async function getRequestExists(request: GetBlindedMessageForSaltRequest): Promise<boolean> {
-  if (!request.timestamp) return false //TODO(Alec) make timestamps required
+  if (!request.timestamp) {
+    return false // TODO(Alec) make timestamps required
+  }
   logger.debug('Checking if request exists')
   try {
     const existingRequest = await requests()
@@ -29,7 +31,8 @@ export async function getRequestExists(request: GetBlindedMessageForSaltRequest)
 export async function storeRequest(request: GetBlindedMessageForSaltRequest) {
   logger.debug('Storing salt request')
   try {
-    return insertRecord(new Request(request))
+    await insertRecord(new Request(request))
+    return true
   } catch (e) {
     logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE, e)
     return null
