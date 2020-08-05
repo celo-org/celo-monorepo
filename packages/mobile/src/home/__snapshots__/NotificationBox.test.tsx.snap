@@ -668,13 +668,16 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
   </RCTScrollView>
   <View
     style={
-      Object {
-        "alignItems": "center",
-        "display": "flex",
-        "flexDirection": "row",
-        "justifyContent": "center",
-        "paddingBottom": 16,
-      }
+      Array [
+        Object {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "justifyContent": "center",
+        },
+        Object {
+          "paddingBottom": 16,
+        },
+      ]
     }
   >
     <View
@@ -684,7 +687,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
           "borderRadius": 5,
           "flex": 0,
           "height": 5,
-          "marginHorizontal": 5,
+          "marginHorizontal": 3,
           "width": 5,
         }
       }
@@ -696,7 +699,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
           "borderRadius": 5,
           "flex": 0,
           "height": 5,
-          "marginHorizontal": 5,
+          "marginHorizontal": 3,
           "width": 5,
         }
       }
@@ -708,7 +711,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
           "borderRadius": 5,
           "flex": 0,
           "height": 5,
-          "marginHorizontal": 5,
+          "marginHorizontal": 3,
           "width": 5,
         }
       }
@@ -720,7 +723,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
           "borderRadius": 5,
           "flex": 0,
           "height": 5,
-          "marginHorizontal": 5,
+          "marginHorizontal": 3,
           "width": 5,
         }
       }

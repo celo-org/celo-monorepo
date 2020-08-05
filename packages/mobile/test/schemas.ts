@@ -110,7 +110,6 @@ export const vNeg1Schema = {
     incomingPaymentRequests: [],
     outgoingPaymentRequests: [],
     dismissedGetVerified: false,
-    dismissedEarnRewards: false,
     dismissedInviteFriends: false,
     promptFornoIfNeeded: false,
     acceptedTerms: false,
@@ -312,7 +311,6 @@ export const v1Schema = {
       total: 0,
     },
     matchedContacts: {},
-    isValidRecipient: false,
     secureSendPhoneNumberMapping: {},
   },
   transactions: {
@@ -336,15 +334,33 @@ export const v2Schema = {
     ...v1Schema.app,
     sessionId: '',
   },
+}
+
+export const v3Schema = {
+  ...v2Schema,
   account: {
-    ...v1Schema.account,
+    ...v2Schema.account,
     hasMigratedToNewBip39: false,
+    choseToRestoreAccount: false,
   },
   identity: {
-    ...v1Schema.identity,
+    ...v2Schema.identity,
+    addressToDataEncryptionKey: {},
+  },
+  web3: {
+    ...v2Schema.web3,
+    isDekRegistered: false,
+  },
+  geth: {
+    ...v2Schema.geth,
+    chainHead: {
+      number: 100,
+      timestamp: 1596502618,
+      hash: '0x0000000000000000000000000000000000000000000000000000000000000F00',
+    },
   },
 }
 
 export function getLatestSchema(): Partial<RootState> {
-  return v2Schema as Partial<RootState>
+  return v3Schema as Partial<RootState>
 }

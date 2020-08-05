@@ -755,7 +755,7 @@ async function helmCommand(command: string) {
 function buildHelmChartDependencies(chartDir: string) {
   console.info(`Building any chart dependencies...`)
   console.info(`helm dep build ${chartDir}`)
-  // return helmCommand(`helm dep build ${chartDir}`)
+  return helmCommand(`helm dep build ${chartDir}`)
 }
 
 export async function installGenericHelmChart(

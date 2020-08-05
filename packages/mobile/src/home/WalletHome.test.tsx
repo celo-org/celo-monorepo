@@ -10,7 +10,6 @@ const storeData = {
   goldToken: { educationCompleted: true },
   account: {
     backupCompleted: true,
-    dismissedEarnRewards: true,
     dismissedInviteFriends: true,
     accountCreationTime: new Date().getTime() - TWO_DAYS_MS,
     paymentRequests: [],
