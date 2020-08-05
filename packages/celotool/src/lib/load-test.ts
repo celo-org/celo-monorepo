@@ -74,5 +74,6 @@ async function helmParameters(
     `--set mnemonic="${fetchEnv(envVar.MNEMONIC)}"`,
     `--set replicas=${replicas}`,
     `--set threads=${threads}`,
+    `--set genesis.useGenesisFileBase64=true`,
   ]
 }
