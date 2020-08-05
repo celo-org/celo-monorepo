@@ -44,6 +44,7 @@ spec:
               cpu: 2
           args:
             - "--config.file=/etc/prometheus/prometheus.yml"
+            - "--storage.tsdb.retention.time={{ .Values.prometheus.retention_time | default "7d" }}"
             - "--storage.tsdb.path=/prometheus/"
           ports:
             - containerPort: 9090

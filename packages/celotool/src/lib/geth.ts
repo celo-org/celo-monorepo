@@ -455,7 +455,6 @@ export const transferCeloGold = async (
   } = {}
 ) => {
   const kitGoldToken = await kit.contracts.getGoldToken()
-  console.error(`jcortejoso transferCeloGold fromAddress: ${fromAddress}`)
   return kitGoldToken.transfer(toAddress, amount.toString()).send({
     from: fromAddress,
     gas: txOptions.gas,
@@ -480,7 +479,6 @@ export const transferCeloDollars = async (
   } = {}
 ) => {
   const kitStableToken = await kit.contracts.getStableToken()
-  console.log(`jcortejoso transferCeloDollars fromAddress: ${fromAddress}`)
   return kitStableToken.transfer(toAddress, amount.toString()).send({
     from: fromAddress,
     gas: txOptions.gas,
