@@ -39,6 +39,20 @@ export default class Withdraw extends ReleaseGoldCommand {
       .addCheck('Contract has met liquidity provision if applicable', () =>
         this.releaseGoldWrapper.getLiquidityProvisionMet()
       )
+      .addCheck(
+        'Contract would self-destruct with cUSD left when withdrawing the whole balance',
+        async () => {
+          if (value.eq(remainingUnlockedBalance)) {
+            const stableToken = await this.kit.contracts.getStableToken()
+            const stableBalance = await stableToken.balanceOf(this.releaseGoldWrapper.address)
+            if (stableBalance.gt(0)) {
+              return false
+            }
+          }
+
+          return true
+        }
+      )
       .runChecks()
 
     this.kit.defaultAccount = await this.releaseGoldWrapper.getBeneficiary()

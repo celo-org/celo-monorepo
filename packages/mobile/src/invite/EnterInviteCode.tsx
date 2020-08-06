@@ -9,15 +9,18 @@ import { Trans, WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
+import { OnboardingEvents } from 'src/analytics/Events'
 import CodeInput, { CodeInputStatus } from 'src/components/CodeInput'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { CELO_FAUCET_LINK, SHOW_GET_INVITE_LINK } from 'src/config'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { redeemInvite, skipInvite } from 'src/invite/actions'
 import { extractValidInviteCode, getValidInviteCodeFromReferrerData } from 'src/invite/utils'
-import { HeaderTitleWithSubtitle, nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers.v2'
+import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import TopBarTextButtonOnboarding from 'src/onboarding/TopBarTextButtonOnboarding'
+import UseBackToWelcomeScreen from 'src/onboarding/UseBackToWelcomeScreen'
 import { RootState } from 'src/redux/reducers'
 import { navigateToURI } from 'src/utils/linking'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -57,7 +60,15 @@ type Props = StateProps & DispatchProps & WithTranslation
 
 export class EnterInviteCode extends React.Component<Props, State> {
   static navigationOptions = {
-    ...nuxNavigationOptionsNoBackButton,
+    ...nuxNavigationOptions,
+    headerLeft: () => (
+      <TopBarTextButtonOnboarding
+        title={i18n.t('global:cancel')}
+        // Note: redux state reset is handled by UseBackToWelcomeScreen
+        // tslint:disable-next-line: jsx-no-lambda
+        onPress={() => navigate(Screens.Welcome)}
+      />
+    ),
     headerTitle: () => (
       <HeaderTitleWithSubtitle
         title={i18n.t('onboarding:inviteCode.title')}
@@ -83,10 +94,6 @@ export class EnterInviteCode extends React.Component<Props, State> {
       this.props.redeemInvite(validCode)
       return
     }
-  }
-
-  onPressImportClick = async () => {
-    navigate(Screens.ImportWallet)
   }
 
   onPressGoToFaucet = () => {
@@ -133,6 +140,9 @@ export class EnterInviteCode extends React.Component<Props, State> {
           <SafeAreaInsetsContext.Consumer>
             {(insets) => (
               <View style={styles.container}>
+                <UseBackToWelcomeScreen
+                  backAnalyticsEvent={OnboardingEvents.create_account_cancel}
+                />
                 <DevSkipButton nextScreen={Screens.VerificationEducationScreen} />
                 <KeyboardAwareScrollView
                   style={headerHeight ? { marginTop: headerHeight } : undefined}
@@ -175,16 +185,6 @@ export class EnterInviteCode extends React.Component<Props, State> {
                         {t('inviteCode.noCode')}
                       </TextButton>
                     )}
-
-                    {/* TODO: remove this button once we have the screen asking for import earlier in the onboarding flow */}
-                    <TextButton
-                      style={styles.bottomButton}
-                      onPress={this.onPressImportClick}
-                      disabled={isRedeemingInvite || !!account}
-                      testID="RestoreExistingWallet"
-                    >
-                      {t('nuxNamePin1:importIt')}
-                    </TextButton>
                   </View>
                 </KeyboardAwareScrollView>
                 <KeyboardSpacer onToggle={this.onToggleKeyboard} />

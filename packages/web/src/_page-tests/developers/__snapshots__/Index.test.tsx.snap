@@ -1222,7 +1222,7 @@ exports[`DevelopersPage renders 1`] = `
                   }
                 }
               >
-                Exchange between cUSD and cGLD
+                Exchange between cUSD and CELO
               </li>
               <li
                 className="css-reset-4rbku5 css-text-901oao"

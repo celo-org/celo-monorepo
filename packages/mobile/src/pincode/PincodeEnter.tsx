@@ -2,8 +2,7 @@
  * This is a reactnavigation SCREEN to which we navigate,
  * when we need to fetch a PIN from a user.
  */
-import colors from '@celo/react-components/styles/colors'
-import { StackScreenProps } from '@react-navigation/stack'
+import { StackCardInterpolationProps, StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
@@ -11,7 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { nuxNavigationOptions } from 'src/navigator/Headers'
+import { headerWithBackButton } from 'src/navigator/Headers.v2'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { checkPin } from 'src/pincode/authentication'
@@ -31,7 +30,15 @@ interface StateProps {
 type Props = StateProps & WithTranslation & StackScreenProps<StackParamList, Screens.PincodeEnter>
 
 class PincodeEnter extends React.Component<Props, State> {
-  static navigationOptions = { gestureEnabled: false, ...nuxNavigationOptions }
+  static navigationOptions = {
+    ...headerWithBackButton,
+    gestureEnabled: false,
+    cardStyleInterpolator: ({ current }: StackCardInterpolationProps) => ({
+      containerStyle: {
+        opacity: current.progress,
+      },
+    }),
+  }
 
   state = {
     pin: '',
@@ -91,7 +98,6 @@ class PincodeEnter extends React.Component<Props, State> {
 const style = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
     justifyContent: 'space-between',
   },
 })

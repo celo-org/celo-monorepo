@@ -3,6 +3,7 @@ import { InitializationState } from 'src/geth/reducer'
 export enum Actions {
   SET_INIT_STATE = 'GETH/SET_INIT_STATE',
   SET_GETH_CONNECTED = 'GETH/SET_GETH_CONNECTED',
+  SET_CHAIN_HEAD = 'GETH/SET_CHAIN_HEAD',
   CANCEL_GETH_SAGA = 'GETH/CANCEL_GETH_SAGA',
 }
 
@@ -30,4 +31,20 @@ export const setGethConnected = (connected: boolean): SetGethConnectedAction => 
   connected,
 })
 
-export type ActionTypes = SetInitStateAction | SetGethConnectedAction
+export interface ChainHead {
+  number: number
+  hash: string
+  timestamp: number
+}
+
+export interface SetChainHeadAction {
+  type: Actions.SET_CHAIN_HEAD
+  head: ChainHead | null
+}
+
+export const setChainHead = (head: ChainHead | null): SetChainHeadAction => ({
+  type: Actions.SET_CHAIN_HEAD,
+  head,
+})
+
+export type ActionTypes = SetInitStateAction | SetGethConnectedAction | SetChainHeadAction
