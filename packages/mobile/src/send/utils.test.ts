@@ -1,5 +1,14 @@
+import { expectSaga } from 'redux-saga-test-plan'
+import * as matchers from 'redux-saga-test-plan/matchers'
+import { LocalCurrencyCode } from 'src/localCurrency/consts'
+import { UriData, urlFromUriData } from 'src/qrcode/schema'
 import { PaymentInfo } from 'src/send/reducers'
-import { dailyAmountRemaining, isPaymentLimitReached } from 'src/send/utils'
+import {
+  dailyAmountRemaining,
+  handlePaymentDeeplink,
+  handleSendPaymentData,
+  isPaymentLimitReached,
+} from 'src/send/utils'
 
 describe('send/utils', () => {
   const HOURS = 3600 * 1000
@@ -99,6 +108,28 @@ describe('send/utils', () => {
         { timestamp: now - 16 * HOURS, amount: 300 },
       ]
       expect(dailyAmountRemaining(now, recentPayments)).toEqual(200)
+    })
+  })
+
+  describe('paymentDeepLinks', () => {
+    const data = {
+      address: '0xf7f551752A78Ce650385B58364225e5ec18D96cB',
+      displayName: 'Super 8',
+      currencyCode: 'PHP' as LocalCurrencyCode,
+      amount: '500',
+      comment: '92a53156-c0f2-11ea-b3de-0242ac13000',
+    }
+
+    const deeplink = urlFromUriData(data)
+
+    it('should call handleSendPaymentData with parsed payment data ', async () => {
+      const parsed: UriData = {
+        ...data,
+        e164PhoneNumber: undefined,
+      }
+      await expectSaga(handlePaymentDeeplink, deeplink)
+        .provide([[matchers.call.fn(handleSendPaymentData), parsed]])
+        .run()
     })
   })
 })
