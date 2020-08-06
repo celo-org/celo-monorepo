@@ -44,7 +44,6 @@ export class RNGethSigner implements Signer {
     }
     const encoded = rlpEncodedTx(tx)
     const signedTxRLP = await this.geth.signTransaction(encoded.rlpEncode, this.account)
-    console.log(signedTxRLP)
     return await encodeTransaction(encoded, extractSignature(signedTxRLP))
   }
 
