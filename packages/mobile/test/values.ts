@@ -47,14 +47,18 @@ export const mockDisplayNumber2 = '(209) 555-9790'
 export const mockComment = 'Rent request for June, it is already late!!!'
 export const mockCountryCode = '+1'
 
-export const mockQrCodeData = `{"address":"${mockAccount}","e164PhoneNumber":"${mockE164Number}","displayName":"${mockName}"}`
+export const mockQrCodeData = {
+  address: mockAccount,
+  e164PhoneNumber: mockE164Number,
+  displayName: mockName,
+}
 
 export const mockNameInvite = 'Jane Doe'
 export const mockName2Invite = 'George Bogart'
 export const mockE164NumberInvite = '+13105550000'
 export const mockDisplayNumberInvite = '13105550000'
-export const mockE164Number2Invite = '+21255550000'
-export const mockDisplayNumber2Invite = '21255550000'
+export const mockE164Number2Invite = '+442012341234'
+export const mockDisplayNumber2Invite = '442012341234'
 export const mockAccountInvite = '0x9335BaFcE54cAa0D6690d1D4DA6406568b52488F'
 export const mockAccountInvitePrivKey =
   '0xe59c12feb5ea13dabcc068a28d1d521a26e39464faa7bbcc01f43b8340e92fa6'
@@ -62,7 +66,11 @@ export const mockAccount2Invite = '0x8e1Df47B7064D005Ef071a89D0D7dc8634BC8A9C'
 export const mockAccountInvite2PrivKey =
   '0xb33eac631fd3a415f3738649db8cad57da78b99ec92cd8f77b76b5dae2ebdf27'
 
-export const mockQrCodeData2 = `{"address":"${mockAccount2Invite}","e164PhoneNumber":"${mockE164Number2Invite}","displayName":"${mockName2Invite}"}`
+export const mockQrCodeData2 = {
+  address: mockAccount2Invite,
+  e164PhoneNumber: mockE164Number2Invite,
+  displayName: mockName2Invite,
+}
 
 export const mockInviteDetails = {
   timestamp: 1588200517518,
