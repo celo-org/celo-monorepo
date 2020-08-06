@@ -8,7 +8,12 @@ import { FeeType } from 'src/fees/actions'
 import { getAddressFromPhoneNumber } from 'src/identity/contactMapping'
 import { E164NumberToAddressType, SecureSendPhoneNumberMapping } from 'src/identity/reducer'
 import { RecipientVerificationStatus } from 'src/identity/types'
-import { Actions, selectPreferredCurrency } from 'src/localCurrency/actions'
+import {
+  Actions,
+  FetchCurrentRateFailureAction,
+  FetchCurrentRateSuccessAction,
+  selectPreferredCurrency,
+} from 'src/localCurrency/actions'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 import { convertDollarsToLocalAmount, convertLocalAmountToDollars } from 'src/localCurrency/convert'
 import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
@@ -26,6 +31,8 @@ import { PaymentInfo } from 'src/send/reducers'
 import { TransactionDataInput } from 'src/send/SendAmount'
 import Logger from 'src/utils/Logger'
 import { timeDeltaInHours } from 'src/utils/time'
+
+const TAG = 'send/utils'
 
 export interface ConfirmationInput {
   recipient: Recipient
@@ -134,7 +141,15 @@ export function* handleSendPaymentData(data: UriData, cachedRecipient?: Recipien
 
   if (data.currencyCode) {
     yield put(selectPreferredCurrency(data.currencyCode as LocalCurrencyCode))
-    yield take([Actions.FETCH_CURRENT_RATE_SUCCESS, Actions.FETCH_CURRENT_RATE_FAILURE])
+    const action: FetchCurrentRateSuccessAction | FetchCurrentRateFailureAction = yield take([
+      Actions.FETCH_CURRENT_RATE_SUCCESS,
+      Actions.FETCH_CURRENT_RATE_FAILURE,
+    ])
+    if (action.type === Actions.FETCH_CURRENT_RATE_FAILURE) {
+      yield put(showError(ErrorMessages.EXCHANGE_RATE_FAILED))
+      Logger.warn(TAG, '@handleSendPaymentData failed to fetch current rate')
+      return
+    }
   }
 
   if (data.amount) {
@@ -142,7 +157,7 @@ export function* handleSendPaymentData(data: UriData, cachedRecipient?: Recipien
     const exchangeRate = yield select(getLocalCurrencyExchangeRate)
     const amount = convertLocalAmountToDollars(data.amount, exchangeRate)
     if (!amount) {
-      Logger.warn('handleSendPaymentData', 'null amount')
+      Logger.warn(TAG, '@handleSendPaymentData null amount')
       return
     }
     const transactionData: TransactionDataInput = {

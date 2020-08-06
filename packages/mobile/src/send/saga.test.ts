@@ -59,7 +59,7 @@ describe(watchQrCodeDetections, () => {
     expect(navigate).toHaveBeenCalledWith(Screens.SendAmount, {
       isFromScan: true,
       recipient: {
-        address: mockAccount,
+        address: mockAccount.toLowerCase(),
         displayName: mockName,
         displayId: mockE164Number,
         e164PhoneNumber: mockE164Number,
@@ -91,7 +91,7 @@ describe(watchQrCodeDetections, () => {
     expect(navigate).toHaveBeenCalledWith(Screens.SendAmount, {
       isFromScan: true,
       recipient: {
-        address: mockAccount,
+        address: mockAccount.toLowerCase(),
         displayName: 'anonymous',
         displayId: mockE164Number,
         e164PhoneNumber: mockE164Number,
@@ -123,7 +123,7 @@ describe(watchQrCodeDetections, () => {
     expect(navigate).toHaveBeenCalledWith(Screens.SendAmount, {
       isFromScan: true,
       recipient: {
-        address: mockAccount,
+        address: mockAccount.toLowerCase(),
         displayName: mockName,
         displayId: undefined,
         e164PhoneNumber: undefined,

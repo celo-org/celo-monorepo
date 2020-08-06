@@ -17,7 +17,6 @@ export const UriDataType = ioType({
   displayName: ioUnion([ioUndefined, ioString]),
   e164PhoneNumber: ioUnion([ioUndefined, E164PhoneNumberType]),
   currencyCode: ioUnion([ioUndefined, ioKeyof(LocalCurrencyCode)]),
-  // TODO: amount string is valid BigNumber
   amount: ioUnion([ioUndefined, ioString]),
   comment: ioUnion([ioUndefined, ioString]),
 })

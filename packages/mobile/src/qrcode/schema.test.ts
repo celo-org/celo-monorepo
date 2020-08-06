@@ -47,6 +47,4 @@ describe('#qrDataFromJson', () => {
       obj: { address: zeroAddress().slice(0, -1) },
       s: 'is not a valid address',
     }))
-
-  // TODO(yorke): add tests for invalid local payment or user data
 })
