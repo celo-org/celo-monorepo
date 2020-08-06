@@ -2,13 +2,35 @@ import { isRight } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import { Address } from '../../base'
 import OffchainDataWrapper, { OffchainErrors } from '../offchain-data-wrapper'
+import { Err, isError, Ok, RootError, Task } from '../task'
 
-class InvalidDataError extends Error {}
-class OffchainError extends Error {
+export enum SchemaErrorTypes {
+  InvalidDataError = 'InvalidDataError',
+  OffchainError = 'OffchainError',
+}
+
+export interface InvalidDataError {
+  errorType: SchemaErrorTypes.InvalidDataError
+}
+export interface IOffchainError {
+  errorType: SchemaErrorTypes.OffchainError
+  error: OffchainErrors
+}
+
+export class OffchainError extends RootError<SchemaErrorTypes.OffchainError>
+  implements IOffchainError {
   constructor(readonly error: OffchainErrors) {
-    super()
+    super(SchemaErrorTypes.OffchainError)
   }
 }
+
+type SchemaErrors = InvalidDataError | IOffchainError
+
+export const isInvalidDataError = (error: SchemaErrors): error is InvalidDataError =>
+  error.errorType === SchemaErrorTypes.InvalidDataError
+export const isOffchainError = (error: SchemaErrors): error is OffchainError =>
+  error.errorType === SchemaErrorTypes.OffchainError
+
 export class SingleSchema<T> {
   constructor(
     readonly wrapper: OffchainDataWrapper,
@@ -25,29 +47,38 @@ export class SingleSchema<T> {
   }
 }
 
+function foo(err: SchemaErrors) {
+  switch (err.errorType) {
+    case SchemaErrorTypes.OffchainError:
+      err
+      break
+
+    default:
+      break
+  }
+}
+
 export const readWithSchema = async <T>(
   wrapper: OffchainDataWrapper,
   type: t.Type<T>,
   account: Address,
   dataPath: string
-): Promise<T> => {
-  let resp
+): Promise<Task<T, SchemaErrors>> => {
+  const resp = await wrapper.readDataFrom(account, dataPath)
 
-  try {
-    resp = await wrapper.readDataFrom(account, dataPath)
-  } catch (error) {
-    throw new OffchainError(error)
+  if (isError(resp)) {
+    return Err(new OffchainError(resp.error))
   }
 
   try {
-    const asJson = JSON.parse(resp)
+    const asJson = JSON.parse(resp.result)
     const parseResult = type.decode(asJson)
     if (isRight(parseResult)) {
-      return parseResult.right
+      return Ok(parseResult.right)
     }
-    throw new InvalidDataError()
+    return Err(new RootError<SchemaErrorTypes.InvalidDataError>(SchemaErrorTypes.InvalidDataError))
   } catch (error) {
-    throw new InvalidDataError()
+    return Err(new RootError<SchemaErrorTypes.InvalidDataError>(SchemaErrorTypes.InvalidDataError))
   }
 }
 

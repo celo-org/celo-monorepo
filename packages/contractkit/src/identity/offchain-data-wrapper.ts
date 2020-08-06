@@ -6,21 +6,34 @@ import { ContractKit } from '../kit'
 import { ClaimTypes } from './claims/types'
 import { IdentityMetadataWrapper } from './metadata'
 import { StorageWriter } from './offchain/storage-writers'
+import { Err, isResult, Ok, RootError, Task } from './task'
 
 const debug = debugFactory('offchaindata')
 
-class FetchError extends Error {}
-class InvalidSignature extends Error {}
-class NoStorageRootProvidedData extends Error {}
+export enum OffchainErrorTypes {
+  FetchError = 'FetchError',
+  InvalidSignature = 'InvalidSignature',
+  NoStorageRootProvidedData = 'NoStorageRootProvidedData',
+}
+
+interface FetchError {
+  errorType: OffchainErrorTypes.FetchError
+}
+interface InvalidSignature {
+  errorType: OffchainErrorTypes.InvalidSignature
+}
+interface NoStorageRootProvidedData {
+  errorType: OffchainErrorTypes.NoStorageRootProvidedData
+}
+
 export type OffchainErrors = FetchError | InvalidSignature | NoStorageRootProvidedData
-export type ReadResponse = { status: 'ok'; data: any } | { status: 'error'; error: OffchainErrors }
 
 export default class OffchainDataWrapper {
   storageWriter: StorageWriter | undefined
 
   constructor(readonly self: string, readonly kit: ContractKit) {}
 
-  async readDataFrom(account: string, dataPath: string): Promise<string> {
+  async readDataFrom(account: string, dataPath: string): Promise<Task<string, OffchainErrors>> {
     const accounts = await this.kit.contracts.getAccounts()
     const metadataURL = await accounts.getMetadataURL(account)
     debug({ account, metadataURL })
@@ -32,23 +45,13 @@ export default class OffchainDataWrapper {
     debug({ account, storageRoots })
 
     if (storageRoots.length === 0) {
-      throw new NoStorageRootProvidedData()
+      return Err(new RootError(OffchainErrorTypes.FetchError))
     }
 
-    const resp = await Promise.all(
-      storageRoots.map((_) => {
-        try {
-          return _.read(dataPath)
-        } catch (error) {
-          // Ignore error
-          return undefined
-        }
-      })
-    )
+    const item = await (await Promise.all(storageRoots.map((_) => _.read(dataPath)))).find(isResult)
 
-    const item = resp.find((x) => x)
     if (item === undefined) {
-      throw new NoStorageRootProvidedData()
+      return Err(new RootError(OffchainErrorTypes.FetchError))
     }
 
     return item
@@ -69,10 +72,10 @@ class StorageRoot {
   constructor(readonly account: string, readonly address: string) {}
 
   // TODO: Add decryption metadata (i.e. indicates ciphertext to be decrypted/which key to use)
-  async read(dataPath: string): Promise<string> {
+  async read(dataPath: string): Promise<Task<string, FetchError>> {
     const data = await fetch(this.address + dataPath)
     if (!data.ok) {
-      throw new FetchError()
+      return Err(new RootError<OffchainErrorTypes.FetchError>(OffchainErrorTypes.FetchError))
     }
 
     const body = await data.text()
@@ -80,23 +83,18 @@ class StorageRoot {
     const signature = await fetch(this.address + dataPath + '.signature')
 
     if (!signature.ok) {
-      throw new FetchError()
+      return Err(new RootError<OffchainErrorTypes.FetchError>(OffchainErrorTypes.FetchError))
     }
 
     // TODO: Compare against registered on-chain signers or off-chain signers
     const signer = guessSigner(body, await signature.text())
 
     if (eqAddress(signer, this.account)) {
-      return body
+      return Ok(body)
     }
 
     // The signer might be authorized off-chain
     // TODO: Only if the signer is authorized with an on-chain key
-    try {
-      await this.read(`/account/authorizedSigners/${toChecksumAddress(signer)}`)
-      return body
-    } catch (error) {
-      throw error
-    }
+    return this.read(`/account/authorizedSigners/${toChecksumAddress(signer)}`)
   }
 }

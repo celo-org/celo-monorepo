@@ -7,9 +7,11 @@ import { newKitFromWeb3 } from '../kit'
 import { AccountsWrapper } from '../wrappers/Accounts'
 import { createStorageClaim } from './claims/claim'
 import { IdentityMetadataWrapper } from './metadata'
-import OffchainDataWrapper from './offchain-data-wrapper'
+import OffchainDataWrapper, { OffchainErrorTypes } from './offchain-data-wrapper'
+import { SchemaErrorTypes } from './offchain/schema-utils'
 import { AuthorizedSignerAccessor, NameAccessor } from './offchain/schemas'
 import { MockStorageWriter } from './offchain/storage-writers'
+import { isResult } from './task'
 
 testWithGanache('Offchain Data', (web3) => {
   const kit = newKitFromWeb3(web3)
@@ -57,7 +59,34 @@ testWithGanache('Offchain Data', (web3) => {
       await nameAccessor.write({ name: testname })
 
       const resp = await nameAccessor.read(writer)
-      expect(resp.name).toEqual(testname)
+
+      if (isResult(resp)) {
+        expect(resp.result.name).toEqual(testname)
+      } else {
+        const error = resp.error
+        switch (error.errorType) {
+          case SchemaErrorTypes.InvalidDataError:
+            console.log("Something was wrong with the schema, can't try again")
+            break
+          case SchemaErrorTypes.OffchainError:
+            const offchainError = error.error
+            switch (offchainError.errorType) {
+              case OffchainErrorTypes.FetchError:
+                console.log('Something went wrong with fetching, try again')
+                break
+              case OffchainErrorTypes.InvalidSignature:
+                console.log('Signature was wrong')
+                break
+              case OffchainErrorTypes.NoStorageRootProvidedData:
+                console.log('Account has not data for this type')
+              default:
+                break
+            }
+
+          default:
+            break
+        }
+      }
     })
 
     it('cannot write with a signer that is not authorized', async () => {
