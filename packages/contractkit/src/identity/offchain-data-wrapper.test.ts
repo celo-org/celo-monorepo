@@ -79,7 +79,6 @@ testWithGanache('Offchain Data', (web3) => {
                 break
               case OffchainErrorTypes.NoStorageRootProvidedData:
                 console.log('Account has not data for this type')
-              default:
                 break
             }
 
@@ -149,7 +148,9 @@ testWithGanache('Offchain Data', (web3) => {
       await nameAccessor.write({ name: testname })
 
       const resp = await nameAccessor.read(writer)
-      expect(resp.name).toEqual(testname)
+      if (isResult(resp)) {
+        expect(resp.result.name).toEqual(testname)
+      }
     })
   })
 })

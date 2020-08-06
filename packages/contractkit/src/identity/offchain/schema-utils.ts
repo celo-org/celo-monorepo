@@ -26,11 +26,6 @@ export class OffchainError extends RootError<SchemaErrorTypes.OffchainError>
 
 type SchemaErrors = InvalidDataError | IOffchainError
 
-export const isInvalidDataError = (error: SchemaErrors): error is InvalidDataError =>
-  error.errorType === SchemaErrorTypes.InvalidDataError
-export const isOffchainError = (error: SchemaErrors): error is OffchainError =>
-  error.errorType === SchemaErrorTypes.OffchainError
-
 export class SingleSchema<T> {
   constructor(
     readonly wrapper: OffchainDataWrapper,
