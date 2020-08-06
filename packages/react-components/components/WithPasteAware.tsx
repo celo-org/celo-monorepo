@@ -20,8 +20,8 @@ interface PasteAwareState {
   clipboardContent: string | null
 }
 
-export default function withPasteAware<P extends TextInputProps>(
-  WrappedInput: React.ComponentType<PasteAwareWrappedElementProps>
+export function withPasteAware<P extends TextInputProps>(
+  WrappedView: React.ComponentType<P & PasteAwareWrappedElementProps>
 ) {
   return class WithPasteAware extends React.Component<P & PasteAwareProps> {
     state: PasteAwareState = {
@@ -83,7 +83,7 @@ export default function withPasteAware<P extends TextInputProps>(
       const { isPasteIconVisible } = this.state
 
       return (
-        <WrappedInput
+        <WrappedView
           {...this.props}
           isPasteIconVisible={isPasteIconVisible}
           onPressPaste={this.onPressPaste}

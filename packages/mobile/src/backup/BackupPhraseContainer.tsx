@@ -1,5 +1,4 @@
 import Touchable from '@celo/react-components/components/Touchable'
-import withPasteAware from '@celo/react-components/components/WithPasteAware'
 import withTextInputPasteAware from '@celo/react-components/components/WithTextInputPasteAware'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
@@ -11,9 +10,7 @@ import { isValidBackupPhrase, isValidSocialBackupPhrase } from 'src/backup/utils
 import { Namespaces, withTranslation } from 'src/i18n'
 import Logger from 'src/utils/Logger'
 
-const PhraseInput = withPasteAware(
-  withTextInputPasteAware(TextInput, { top: undefined, right: 12, bottom: 12 })
-)
+const PhraseInput = withTextInputPasteAware(TextInput, { top: undefined, right: 12, bottom: 12 })
 
 export enum BackupPhraseContainerMode {
   READONLY = 'READONLY',

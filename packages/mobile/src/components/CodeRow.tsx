@@ -1,5 +1,4 @@
 import TextInput from '@celo/react-components/components/TextInput'
-import withPasteAware from '@celo/react-components/components/WithPasteAware'
 import withTextInputPasteAware from '@celo/react-components/components/WithTextInputPasteAware'
 import Checkmark from '@celo/react-components/icons/Checkmark'
 import colors from '@celo/react-components/styles/colors'
@@ -10,7 +9,7 @@ import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import { Namespaces, withTranslation } from 'src/i18n'
 
-const CodeInput = withPasteAware(withTextInputPasteAware(TextInput))
+const CodeInput = withTextInputPasteAware(TextInput)
 
 export enum CodeRowStatus {
   DISABLED, // input disabled

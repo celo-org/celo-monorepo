@@ -1,5 +1,4 @@
 import TextInput from '@celo/react-components/components/TextInput.v2'
-import withPasteAware from '@celo/react-components/components/WithPasteAware'
 import withTextSearchPasteAware from '@celo/react-components/components/WithTextSearchPasteAware'
 import { isValidAddress } from '@celo/utils/src/address'
 import * as React from 'react'
@@ -7,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import { Namespaces } from 'src/i18n'
 
-const SearchInput = withPasteAware(withTextSearchPasteAware(TextInput))
+const SearchInput = withTextSearchPasteAware(TextInput)
 
 interface SendSearchInputProps {
   onChangeText: (value: string) => void
