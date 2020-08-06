@@ -17127,11 +17127,6 @@ fp-ts@2.1.1:
   resolved "https://registry.yarnpkg.com/fp-ts/-/fp-ts-2.1.1.tgz#c910544499d7c959351bb4260ee7c44a544084c1"
   integrity sha512-YcWhMdDCFCja0MmaDroTgNu+NWWrrnUEn92nvDgrtVy9Z71YFnhNVIghoHPt8gs82ijoMzFGeWKvArbyICiJgw==
 
-fp-ts@^2.8.1:
-  version "2.8.1"
-  resolved "https://registry.yarnpkg.com/fp-ts/-/fp-ts-2.8.1.tgz#b1812171469a7c0fcbc0b770ac2568f8356d1993"
-  integrity sha512-HuA/6roEliHoBgEOLCKmGRcM90e2trW/ITZZ9d9P/ra7PreqQagC3Jg6OzqWkai13KUbG90b8QO9rHPBGK/ckw==
-
 fraction.js@4.0.8:
   version "4.0.8"
   resolved "https://registry.yarnpkg.com/fraction.js/-/fraction.js-4.0.8.tgz#e53618112e3b36b348c61a81323173bceb01e418"
