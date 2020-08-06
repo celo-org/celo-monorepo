@@ -54,9 +54,11 @@ exports[`CodeRow renders correctly for all CodeRowStatus states 2`] = `
 >
   <TextInput
     allowFontScaling={true}
+    isPasteIconVisible={false}
     onBlur={[Function]}
     onChangeText={[MockFunction]}
     onFocus={[Function]}
+    onPressPaste={[Function]}
     placeholder="placeholder"
     rejectResponderTermination={true}
     shouldShowClipboard={[MockFunction]}

@@ -98,9 +98,11 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
             >
               <TextInput
                 allowFontScaling={true}
+                isPasteIconVisible={false}
                 onBlur={[Function]}
                 onChangeText={[Function]}
                 onFocus={[Function]}
+                onPressPaste={[Function]}
                 placeholder="0xf1b1d5a6e7728g309c4a025k122d71ad75a61976"
                 rejectResponderTermination={true}
                 shouldShowClipboard={[Function]}
