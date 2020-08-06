@@ -542,9 +542,9 @@ export const simulateClient = async (
         const gasPriceMinimum = await kit.contracts.getGasPriceMinimum()
         gasPrice = new BigNumber(
           await gasPriceMinimum.getGasPriceMinimum(feeCurrency)
-        ).times(5)
+        ).times(1)
         txOptions = {
-          gas: 500000,
+          // gas: 70000,
           gasPrice: gasPrice.toString(),
           feeCurrency,
         }

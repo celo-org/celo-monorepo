@@ -285,6 +285,11 @@ const NetworkConfigs = {
     goldToken: {
       frozen: false,
     },
+    // TODO(jcortejoso): Delete this before merging
+    governance: {
+      skipSetConstitution: true,
+      skipTransferOwnership: true,
+    },
     governanceApproverMultiSig: {
       signatories: [network.from],
       numRequiredConfirmations: 1,
