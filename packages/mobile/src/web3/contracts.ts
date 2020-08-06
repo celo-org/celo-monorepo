@@ -27,6 +27,7 @@ let gethWallet: RNGethWallet | undefined
 let contractKit: ContractKit | undefined
 
 function* initWallet() {
+  ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_wallet_start)
   const wallet = new RNGethWallet(yield call(getGethInstance))
   ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_wallet_finish)
   yield call([wallet, wallet.init])
@@ -39,9 +40,9 @@ function* initWeb3() {
   if (fornoMode) {
     return new Web3(getHttpProvider(DEFAULT_FORNO_URL))
   } else {
-    ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_ipc_finish)
+    ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_ipc_start)
     const ipcProvider = getIpcProvider()
-    ValoraAnalytics.track(ContractKitEvents.init_contractkit_geth_init_finish)
+    ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_ipc_finish)
     return new Web3(ipcProvider)
   }
 }
@@ -58,7 +59,12 @@ export function* initContractKit() {
         throw new Error('Kit not properly destroyed')
       }
 
+      ValoraAnalytics.track(ContractKitEvents.init_contractkit_geth_init_start, {
+        retries: CONTRACT_KIT_RETRIES - retries,
+      })
       yield call(waitForGethInitialized)
+      ValoraAnalytics.track(ContractKitEvents.init_contractkit_geth_init_finish)
+
       const fornoMode = yield select(fornoSelector)
 
       Logger.info(`${TAG}@initContractKit`, `Initializing contractkit, forno mode: ${fornoMode}`)
