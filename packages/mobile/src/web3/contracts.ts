@@ -4,7 +4,6 @@
  * Leaving the name for recognizability to current devs
  */
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { RpcWallet } from '@celo/contractkit/lib/wallets/rpc-wallet'
 import { sleep } from '@celo/utils/src/async'
 import { call, delay, select } from 'redux-saga/effects'
 import { ContractKitEvents } from 'src/analytics/Events'
@@ -18,17 +17,34 @@ import Logger from 'src/utils/Logger'
 import { getHttpProvider, getIpcProvider } from 'src/web3/providers'
 import { fornoSelector } from 'src/web3/selectors'
 import Web3 from 'web3'
-import { IpcProvider } from 'web3-core'
-import { RNGethWallet } from './RNGethWallet'
-import { Wallet } from '@celo/contractkit/lib/wallets/wallet'
+import { RNGethWallet } from '../geth/RNGethWallet'
 
 const TAG = 'web3/contracts'
 const KIT_INIT_RETRY_DELAY = 2000
 const CONTRACT_KIT_RETRIES = 3
 
-let ipcProvider: IpcProvider | undefined
-let gethWallet: Wallet | undefined
+let gethWallet: RNGethWallet | undefined
 let contractKit: ContractKit | undefined
+
+function* initWallet() {
+  const wallet = new RNGethWallet(yield call(getGethInstance))
+  ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_wallet_finish)
+  yield call([wallet, wallet.init])
+  ValoraAnalytics.track(ContractKitEvents.init_contractkit_init_wallet_finish)
+  return wallet
+}
+
+function* initWeb3() {
+  const fornoMode = yield select(fornoSelector)
+  if (fornoMode) {
+    return new Web3(getHttpProvider(DEFAULT_FORNO_URL))
+  } else {
+    ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_ipc_finish)
+    const ipcProvider = getIpcProvider()
+    ValoraAnalytics.track(ContractKitEvents.init_contractkit_geth_init_finish)
+    return new Web3(ipcProvider)
+  }
+}
 
 export function* initContractKit() {
   ValoraAnalytics.track(ContractKitEvents.init_contractkit_start)
@@ -38,38 +54,19 @@ export function* initContractKit() {
   // listen for this readiness
   while (retries > 0) {
     try {
-      // The kit must wait for Geth to be initialized because
-      // Geth is required for the RpcWallet
-      ValoraAnalytics.track(ContractKitEvents.init_contractkit_geth_init_start, {
-        retries: CONTRACT_KIT_RETRIES - retries,
-      })
-      yield call(waitForGethInitialized)
-      ValoraAnalytics.track(ContractKitEvents.init_contractkit_geth_init_finish)
-
-      if (contractKit || ipcProvider || gethWallet) {
+      if (contractKit || gethWallet) {
         throw new Error('Kit not properly destroyed')
       }
 
+      yield call(waitForGethInitialized)
       const fornoMode = yield select(fornoSelector)
+
       Logger.info(`${TAG}@initContractKit`, `Initializing contractkit, forno mode: ${fornoMode}`)
-
-      ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_ipc_start)
-      ipcProvider = getIpcProvider()
-      ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_ipc_finish)
-      const web3 = new Web3(fornoMode ? getHttpProvider(DEFAULT_FORNO_URL) : ipcProvider)
-
       Logger.info(`${TAG}@initContractKit`, 'Initializing wallet')
-      ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_wallet_start)
-      if (fornoMode) {
-        gethWallet = new RNGethWallet(getGethInstance())
-        ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_wallet_finish)
-        ValoraAnalytics.track(ContractKitEvents.init_contractkit_init_wallet_finish)
-      } else {
-        gethWallet = new RpcWallet(ipcProvider)
-        ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_wallet_finish)
-        yield call([gethWallet, (gethWallet as RpcWallet).init])
-        ValoraAnalytics.track(ContractKitEvents.init_contractkit_init_wallet_finish)
-      }
+
+      gethWallet = yield call(initWallet)
+      let web3 = yield call(initWeb3)
+
       Logger.info(
         `${TAG}@initContractKit`,
         `Initialized wallet with accounts: ${gethWallet?.getAccounts()}`
@@ -107,7 +104,6 @@ export function destroyContractKit() {
   Logger.debug(`${TAG}@closeContractKit`)
   contractKit = undefined
   gethWallet = undefined
-  ipcProvider = undefined
 }
 
 export function* getContractKit() {

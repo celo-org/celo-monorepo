@@ -52,6 +52,7 @@ import Logger from 'src/utils/Logger'
 import { getContractKitAsync, getWallet, getWeb3 } from 'src/web3/contracts'
 import { registerAccountDek } from 'src/web3/dataEncryptionKey'
 import { getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
+import { Wallet, WritableWallet } from '@celo/contractkit/lib/wallets/wallet'
 
 const TAG = 'invite/saga'
 export const REDEEM_INVITE_TIMEOUT = 2 * 60 * 1000 // 2 minutes
@@ -374,7 +375,7 @@ function* addTempAccountToWallet(inviteCode: string) {
   Logger.debug(TAG + '@addTempAccountToWallet', 'Attempting to add temp wallet')
   try {
     // Import account into the local geth node
-    const wallet: RpcWallet = yield call(getWallet)
+    const wallet: Wallet = yield call(getWallet)
     const account = privateKeyToAddress(inviteCode)
     const password: string = yield call(getPasswordSaga, account, false, true)
     const tempAccount = yield call([wallet, wallet.addAccount], inviteCode, password)
@@ -397,7 +398,7 @@ export function* moveAllFundsFromAccount(
   comment: string
 ) {
   Logger.debug(TAG + '@moveAllFundsFromAccount', 'Unlocking account')
-  const wallet: RpcWallet = yield call(getWallet)
+  const wallet: WritableWallet = yield call(getWallet)
   const password: string = yield call(getPasswordSaga, account, false, true)
   yield call([wallet, wallet.unlockAccount], account, password, UNLOCK_DURATION)
 

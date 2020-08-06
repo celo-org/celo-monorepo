@@ -161,7 +161,7 @@ export function extractSignature(rawTx: string): { v: number; r: Buffer; s: Buff
   s = ensureLeading0x(trimLeading0x(s).padStart(64, '0'))
 
   return {
-    v: rawValues[0],
+    v: rawValues[9],
     r,
     s,
   }

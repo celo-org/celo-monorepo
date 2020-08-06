@@ -114,7 +114,7 @@ export function* waitForNextBlock() {
 function* waitForGethInstance() {
   try {
     const fornoMode = yield select(fornoSelector)
-    // get geth without syncing if fornoMode
+    // get geth without starting if fornoMode
     const gethInstance = yield call(initGeth, !fornoMode)
     if (!gethInstance) {
       throw new Error('Geth instance is null')
