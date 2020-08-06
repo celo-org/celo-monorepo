@@ -103,6 +103,7 @@ export function* handleBarcode(
   try {
     qrData = uriDataFromUrl(barcode.data)
   } catch (e) {
+    yield put(showMessage(ErrorMessages.QR_FAILED_INVALID_ADDRESS))
     Logger.error(TAG, 'qr scan failed', e)
     return
   }

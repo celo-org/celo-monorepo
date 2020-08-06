@@ -125,6 +125,7 @@ export function* handleSendPaymentData(data: UriData, cachedRecipient?: Recipien
     address: data.address,
     displayId: data.e164PhoneNumber,
     displayName: data.displayName || cachedRecipient?.displayName || 'anonymous',
+    e164PhoneNumber: data.e164PhoneNumber,
     phoneNumberLabel: cachedRecipient?.phoneNumberLabel,
     thumbnailPath: cachedRecipient?.thumbnailPath,
     contactId: cachedRecipient?.contactId,

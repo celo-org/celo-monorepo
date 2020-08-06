@@ -37,6 +37,6 @@ enum UriMethod {
 }
 
 export const urlFromUriData = (data: Partial<UriData>, method: UriMethod = UriMethod.pay) => {
-  const params = new URLSearchParams(JSON.stringify(data))
+  const params = new URLSearchParams(Object(data))
   return `celo://wallet/${method.toString()}?${params.toString()}`
 }
