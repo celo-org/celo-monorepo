@@ -103,7 +103,7 @@ export function* handleBarcode(
   try {
     qrData = uriDataFromUrl(barcode.data)
   } catch (e) {
-    Logger.warn(TAG, 'qr scan failed with ' + e)
+    Logger.error(TAG, 'qr scan failed', e)
     return
   }
 
