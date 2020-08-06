@@ -500,7 +500,7 @@ jobs:
           name: Unit tests
           command: yarn --cwd packages/protocol test compatibility/
 
-  protocol-test-governance:
+  protocol-test-governance-network:
     <<: *defaults
     resource_class: large
     steps:
@@ -512,7 +512,35 @@ jobs:
             ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
       - run:
           name: Unit tests
-          command: yarn --cwd packages/protocol test governance/
+          command: yarn --cwd packages/protocol test governance/network/
+
+  protocol-test-governance-validators:
+    <<: *defaults
+    resource_class: large
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
+      - run:
+          name: Unit tests
+          command: yarn --cwd packages/protocol test governance/validators/
+
+  protocol-test-governance-voting:
+    <<: *defaults
+    resource_class: large
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
+      - run:
+          name: Unit tests
+          command: yarn --cwd packages/protocol test governance/voting/
 
   protocol-test-identity:
     <<: *defaults
@@ -933,7 +961,13 @@ workflows:
       - protocol-test-compatibility:
           requires:
             - lint-checks
-      - protocol-test-governance:
+      - protocol-test-governance-network:
+          requires:
+            - lint-checks
+      - protocol-test-governance-validators:
+          requires:
+            - lint-checks
+      - protocol-test-governance-voting:
           requires:
             - lint-checks
       - protocol-test-identity:
@@ -981,7 +1015,9 @@ workflows:
             - end-to-end-mobile-test-ios
             - protocol-test-common
             - protocol-test-compatibility
-            - protocol-test-governance
+            - protocol-test-governance-network
+            - protocol-test-governance-validators
+            - protocol-test-governance-voting
             - protocol-test-identity
             - protocol-test-stability
             - mobile-test
