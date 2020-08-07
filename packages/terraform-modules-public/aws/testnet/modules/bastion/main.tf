@@ -10,7 +10,8 @@ resource "aws_instance" "bastion" {
   vpc_security_group_ids = [
     var.security_group_id
   ]
-  key_name = var.key_pair_name
+  key_name             = var.key_pair_name
+  iam_instance_profile = var.iam_instance_profile
 
   user_data = join("\n", [
     file("${path.module}/../startup-scripts/install-base.sh"),
