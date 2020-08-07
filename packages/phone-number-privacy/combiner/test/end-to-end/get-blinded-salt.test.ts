@@ -9,7 +9,7 @@ import config from '../../src/config'
 
 require('dotenv').config()
 
-const PHONE_NUM_PRIVACY_SERVICE = process.env.ODIS_COMBINER_SERVICE_URL
+const ODIS_COMBINER = process.env.ODIS_COMBINER_SERVICE_URL
 const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessageSig'
 
 const PRIVATE_KEY1 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
@@ -112,7 +112,7 @@ async function postToSignMessage(
     authHeader = await contractKit.web3.eth.sign(body, account)
   }
 
-  const res = await fetch(PHONE_NUM_PRIVACY_SERVICE + SIGN_MESSAGE_ENDPOINT, {
+  const res = await fetch(ODIS_COMBINER + SIGN_MESSAGE_ENDPOINT, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
