@@ -83,7 +83,11 @@ A number of metrics are tracked for the parent of the last sealed block received
 
 - `consensus_istanbul_blocks_missedbyus`: Counts the blocks for which this validator was elected but not included in the child's parent seal (this block could count towards downtime if 12 successive blocks are missed).  Consider monitoring the rate.
 
-- `consensus_istanbul_blocks_proposedbyus`: (_Future release_) Counts the blocks for which this validator was elected and for which a block it proposed was succesfully included in the chain. Consider monitoring the rate.
+- `consensus_istanbul_blocks_missedbyusinarow`: (_since 1.0.2_) Counts the blocks for which this validator was elected but not included in the child's parent seal in a row.  Consider monitoring the gauge.
+
+- `consensus_istanbul_blocks_proposedbyus`: (_since 1.0.2_) Counts the blocks for which this validator was elected and for which a block it proposed was succesfully included in the chain. Consider monitoring the rate.
+
+- `consensus_istanbul_blocks_downtimeevent`: (_since 1.0.2_) Counts the blocks for which this validator was elected and for blocks where it is considered down (occurs when `missedbyusinarow` is >= 12). Consider monitoring the rate.
 
 ### Consensus metrics
 
@@ -99,7 +103,9 @@ A number of metrics are tracked for the parent of the last sealed block received
 
 - `consensus_istanbul_blocks_missedrounds`: Sum of the `round` included in the `parentAggregatedSeal` for the blocks seen. That is, the cumulative number of consensus round changes these blocks needed to make to get to this agreed block. This metric is only incremented when a block is succesfully produced after consensus rounds fails, indicating down validators or network issues.
 
-- `consensus_istanbul_blocks_validators`: (_Future release_) Total number of validators eligible to sign blocks.
+- `consensus_istanbul_blocks_missedroundsasproposer`: (_since 1.0.2_) A meter noting when this validator was elected and could have proposed a block with their signature but did not. In some cases this could be required by the Istanbul BFT protocol.
+
+- `consensus_istanbul_blocks_validators`: (_since 1.0.2_) Total number of validators eligible to sign blocks.
 
 - `consensus_istanbul_core_consensus_count`: Count and timer for succesful completions of consensus (Use `quantile` tag to find percentiles: `0.5`, `0.75`, `0.95`, `0.99`, `0.999`)
 
