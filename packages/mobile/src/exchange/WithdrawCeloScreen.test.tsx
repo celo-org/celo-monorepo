@@ -70,4 +70,31 @@ describe('WithdrawCeloScreen', () => {
     fireEvent.changeText(getByTestId('CeloAmount'), '55.00002')
     expect(getByTestId('WithdrawReviewButton').props.disabled).toBe(true)
   })
+
+  it('disables the review button if the address is not the correct length or format', async () => {
+    const { getByTestId } = render(
+      <Provider store={store}>
+        <WithdrawCeloScreen {...mockScreenProps} />
+      </Provider>
+    )
+    fireEvent.changeText(getByTestId('CeloAmount'), '1')
+
+    // Address is too long
+    fireEvent.changeText(getByTestId('AccountAddress'), SAMPLE_ADDRESS + 'a')
+    expect(getByTestId('WithdrawReviewButton').props.disabled).toBe(true)
+
+    // Address doesn't start with 0x
+    fireEvent.changeText(
+      getByTestId('AccountAddress'),
+      '1xcc642068bdbbdeb91f348213492d2a80ab1ed23c'
+    )
+    expect(getByTestId('WithdrawReviewButton').props.disabled).toBe(true)
+
+    // Address is too short
+    fireEvent.changeText(getByTestId('AccountAddress'), '0xcc642068bdbbdeb91f348213492d2a80ab1ed23')
+    expect(getByTestId('WithdrawReviewButton').props.disabled).toBe(true)
+
+    fireEvent.changeText(getByTestId('AccountAddress'), SAMPLE_ADDRESS)
+    expect(getByTestId('WithdrawReviewButton').props.disabled).toBe(false)
+  })
 })

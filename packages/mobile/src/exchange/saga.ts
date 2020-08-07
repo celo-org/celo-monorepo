@@ -396,6 +396,8 @@ function* withdrawCelo(action: WithdrawCeloAction) {
     ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_error, {
       error,
     })
+
+    navigateToExchangeScreenIfReviewing()
   }
 }
 

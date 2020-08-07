@@ -39,9 +39,9 @@ function WithdrawCeloScreen({ navigation }: Props) {
   const { t } = useTranslation(Namespaces.exchangeFlow9)
 
   const celoToTransferNumber = new BigNumber(celoToTransfer)
-  // TODO: Maybe add some validation to accountAddress?
   const readyToReview =
-    accountAddress &&
+    accountAddress.startsWith('0x') &&
+    accountAddress.length === 42 &&
     celoToTransferNumber.isGreaterThan(0) &&
     celoToTransferNumber.isLessThanOrEqualTo(goldBalanceNumber)
 
