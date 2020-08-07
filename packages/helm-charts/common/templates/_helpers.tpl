@@ -147,7 +147,8 @@ release: {{ .Release.Name }}
       --bootnodes=$(cat /root/.celo/bootnodeEnode) \
       --light.serve {{ .light_serve | default 90 }} \
       --light.maxpeers {{ .light_maxpeers | default 1000 }} \
-      --maxpeers {{ .maxpeers | default 1100 }} \
+      --maxpeers {{ .maxpeers | default 2000 }} \
+      --maxpendpeers=300 \
       --networkid=${NETWORK_ID} \
       --nousb \
       --syncmode={{ .syncmode | default .Values.geth.syncmode }} \
@@ -178,6 +179,8 @@ release: {{ .Release.Name }}
       - /bin/sh
       - "-c"
       - |
+        # TODO: WORKAROUND DELETE
+        exit 0
         # fail if any wgets fail
         set -euo pipefail
         RPC_URL=http://localhost:8545
@@ -306,8 +309,9 @@ data:
       cat /root/.celo/bootnodeEnode
 
       # Workaround adding txnode static-node file
+      # echo {{ .Values.staticnodes.staticnodesBase64 | b64dec | quote }} > /root/.celo/static-nodes.json
       txnode_key=$(celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType tx_node_private --index 0)
-      echo "{$txnode_key@$TX_NODES_PRIVATE_SERVICE_HOST:30303}" > /root/.celo/static-nodes.json
+      echo "[\"enode://$txnode_key@$TX_NODES_PRIVATE_SERVICE_HOST:30303\"]" > /root/.celo/static-nodes.json
   env:
   - name: POD_IP
     valueFrom:

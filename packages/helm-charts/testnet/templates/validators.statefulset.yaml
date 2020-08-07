@@ -121,9 +121,11 @@ spec:
 
               PROXY_INDEX=$(( $PROXY_INDEX + 1 ))
             done
-          else
+            # Workaround
+            # wget https://storage.googleapis.com/static_nodes/{{ .Release.Namespace }} -O /root/.celo/static-nodes.json
+            # echo {{ .Values.staticnodes.staticnodesBase64 | b64dec | quote }} > /root/.celo/static-nodes.json
             txnode_key=$(celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType tx_node_private --index 0)
-            echo "{$txnode_key@$TX_NODES_PRIVATE_SERVICE_HOST:30303}" > /root/.celo/static-nodes.json
+            echo "[\"enode://$txnode_key@$TX_NODES_PRIVATE_SERVICE_HOST:30303\"]" > /root/.celo/static-nodes.json
           fi
         env:
         - name: POD_IP
@@ -175,6 +177,7 @@ spec:
 
           PROXY_COUNT=$(cat /root/.celo/proxyCount)
           [ "$PROXY_COUNT" -gt 0 ] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxied ${PROXY_FLAG}=$(cat /root/.celo/proxyEnodeUrlPairs) --nodiscover --proxy.allowprivateip"
+          [ -z "$PROXY_COUNT" ] && rm -f /root/.celo/static-nodes.json
 
           [[ "$PING_IP_FROM_PACKET" == "true" ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ping-ip-from-packet"
 
@@ -211,6 +214,7 @@ spec:
             --istanbul.blockperiod={{ .Values.geth.blocktime }} \
             --istanbul.requesttimeout={{ .Values.geth.istanbulrequesttimeout }} \
             --maxpeers=500 \
+            --maxpendpeers=300 \
             --nat=extip:`cat /root/.celo/ipAddress` \
             --allow-insecure-unlock \
             ${ADDITIONAL_FLAGS}

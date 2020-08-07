@@ -54,6 +54,8 @@ metadata:
 spec:
   sessionAffinity: ClientIP
   ports:
+  - port: 30303
+    name: ethereum
   - port: 8545
     name: rpc
   - port: 8546
