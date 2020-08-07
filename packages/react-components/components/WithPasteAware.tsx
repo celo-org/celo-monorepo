@@ -35,6 +35,8 @@ export function withPasteAware<P extends TextInputProps>(
     async componentDidMount() {
       this._isMounted = true
       AppState.addEventListener('change', this.checkClipboardContents)
+      // TODO: make it work for iOS 14
+      // https://9to5mac.com/2020/06/24/ios-14-clipboard-notifications/
       this._interval = window.setInterval(async () => {
         await this.checkClipboardContents()
       }, 1000) // Every 1s

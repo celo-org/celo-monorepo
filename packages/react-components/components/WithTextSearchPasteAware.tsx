@@ -30,7 +30,7 @@ export default function withTextSearchPasteAware<P extends TextInputProps>(
             showClearButton={!isPasteIconVisible}
           />
           {isPasteIconVisible && (
-            <TouchableDefault style={[styles.pasteIconContainer]} onPress={onPressPaste}>
+            <TouchableDefault onPress={onPressPaste}>
               <Paste />
             </TouchableDefault>
           )}
@@ -55,10 +55,6 @@ const styles = StyleSheet.create({
   searchIconContainer: {
     marginLeft: 17,
     marginRight: 13,
-  },
-  pasteIconContainer: {
-    // marginLeft: 17,
-    // marginRight: 40,
   },
   input: {
     paddingVertical: 6,
