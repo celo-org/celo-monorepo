@@ -3,7 +3,7 @@ import {
   MaterialTopTabBarProps,
 } from '@react-navigation/material-top-tabs'
 import { useIsFocused } from '@react-navigation/native'
-import { TransitionPresets } from '@react-navigation/stack'
+import { StackScreenProps, TransitionPresets } from '@react-navigation/stack'
 import { memoize } from 'lodash'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAsync } from 'react-async-hook'
@@ -16,6 +16,7 @@ import { useDispatch } from 'react-redux'
 import { Namespaces } from 'src/i18n'
 import { noHeader } from 'src/navigator/Headers.v2'
 import { Screens } from 'src/navigator/Screens'
+import { QRTabParamList } from 'src/navigator/types'
 import QRCode from 'src/qrcode/QRCode'
 import QRScanner from 'src/qrcode/QRScanner'
 import QRTabBar from 'src/qrcode/QRTabBar'
@@ -28,7 +29,7 @@ const Tab = createMaterialTopTabNavigator()
 const width = Dimensions.get('window').width
 const initialLayout = { width }
 
-type AnimatedScannerSceneProps = ExtractProps<typeof QRScanner> & {
+type AnimatedScannerSceneProps = StackScreenProps<QRTabParamList, Screens.QRScanner> & {
   position: Animated.Value<number>
 }
 
