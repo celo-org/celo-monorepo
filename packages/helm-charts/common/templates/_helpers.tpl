@@ -304,6 +304,10 @@ data:
       echo "enode://$(cat /root/.celo/bootnodeEnodeAddress)@$BOOTNODE_IP_ADDRESS:30301" > /root/.celo/bootnodeEnode
       echo -n "Generating Bootnode enode for tx node: "
       cat /root/.celo/bootnodeEnode
+
+      # Workaround adding txnode static-node file
+      txnode_key=$(celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType tx_node_private --index 0)
+      echo "{$txnode_key@$TX_NODES_PRIVATE_SERVICE_HOST:30303}" > /root/.celo/static-nodes.json
   env:
   - name: POD_IP
     valueFrom:

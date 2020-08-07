@@ -121,6 +121,9 @@ spec:
 
               PROXY_INDEX=$(( $PROXY_INDEX + 1 ))
             done
+          else
+            txnode_key=$(celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType tx_node_private --index 0)
+            echo "{$txnode_key@$TX_NODES_PRIVATE_SERVICE_HOST:30303}" > /root/.celo/static-nodes.json
           fi
         env:
         - name: POD_IP
@@ -207,7 +210,7 @@ spec:
             --vmodule={{ .Values.geth.vmodule }} \
             --istanbul.blockperiod={{ .Values.geth.blocktime }} \
             --istanbul.requesttimeout={{ .Values.geth.istanbulrequesttimeout }} \
-            --maxpeers=125 \
+            --maxpeers=500 \
             --nat=extip:`cat /root/.celo/ipAddress` \
             --allow-insecure-unlock \
             ${ADDITIONAL_FLAGS}
