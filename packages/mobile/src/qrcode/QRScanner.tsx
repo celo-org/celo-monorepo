@@ -61,6 +61,7 @@ export default function QRScanner({ onBarCodeDetected }: QRScannerProps) {
       // @ts-ignore
       androidCameraPermissionOptions={null}
       notAuthorizedView={<NotAuthorizedView />}
+      testID={'Camera'}
     >
       <SeeThroughOverlay />
       <Text style={[styles.infoText, { marginBottom: inset.bottom }]}>{t('cameraScanInfo')}</Text>

@@ -92,8 +92,9 @@ function WithdrawCeloScreen({ navigation }: Props) {
             onPress={onPasteAddress}
             color={colors.goldUI}
             currentValue={accountAddress}
+            testID={'PasteButton'}
           />
-          <Touchable borderless={true} onPress={onPressQrCode}>
+          <Touchable testID={'ScanQR'} borderless={true} onPress={onPressQrCode}>
             <QRCodeBorderlessIcon height={32} color={colors.goldUI} />
           </Touchable>
         </TextInputWithButtons>
@@ -108,7 +109,7 @@ function WithdrawCeloScreen({ navigation }: Props) {
           value={celoToTransfer}
           testID={'CeloAmount'}
         >
-          <TouchableOpacity onPress={setMaxAmount}>
+          <TouchableOpacity testID={'MaxAmount'} onPress={setMaxAmount}>
             <Text style={styles.maxAmount}>{'Max'}</Text>
           </TouchableOpacity>
         </TextInputWithButtons>

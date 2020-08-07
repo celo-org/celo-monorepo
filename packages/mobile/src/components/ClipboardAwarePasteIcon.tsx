@@ -12,9 +12,10 @@ interface PasteAwareProps {
   color: string
   onPress: (text: string) => void
   currentValue: string
+  testID?: string
 }
 
-function ClipboardAwarePasteIcon({ currentValue, style, color, onPress }: PasteAwareProps) {
+function ClipboardAwarePasteIcon({ currentValue, style, color, onPress, testID }: PasteAwareProps) {
   const [isPasteIconVisible, setPasteIconVisible] = useState(false)
   const [clipboardContent, setClipboardContent] = useState('')
 
@@ -67,7 +68,7 @@ function ClipboardAwarePasteIcon({ currentValue, style, color, onPress }: PasteA
   }
 
   return (
-    <TouchableDefault style={style} onPress={onPressPaste} hitSlop={iconHitslop}>
+    <TouchableDefault testID={testID} style={style} onPress={onPressPaste} hitSlop={iconHitslop}>
       <Paste color={color} />
     </TouchableDefault>
   )
