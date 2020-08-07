@@ -16,7 +16,7 @@ export enum MnemonicLanguages {
   spanish,
 }
 
-type RandomNumberGenerator = (
+export type RandomNumberGenerator = (
   size: number,
   callback: (err: Error | null, buf: Buffer) => void
 ) => void

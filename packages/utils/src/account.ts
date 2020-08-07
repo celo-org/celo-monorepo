@@ -1,40 +1,15 @@
+import * as base from '@celo/base/lib/account'
 import * as bip32 from 'bip32'
 import * as bip39 from 'bip39'
 import randomBytes from 'randombytes'
 
-export const CELO_DERIVATION_PATH_BASE = "m/44'/52752'/0'"
-
-export enum MnemonicStrength {
-  s128_12words = 128,
-  s256_24words = 256,
-}
-
-export enum MnemonicLanguages {
-  chinese_simplified,
-  chinese_traditional,
-  english,
-  french,
-  italian,
-  japanese,
-  korean,
-  spanish,
-}
-
-type RandomNumberGenerator = (
-  size: number,
-  callback: (err: Error | null, buf: Buffer) => void
-) => void
-
-export interface Bip39 {
-  mnemonicToSeedSync: (mnemonic: string, password?: string) => Buffer
-  mnemonicToSeed: (mnemonic: string, password?: string) => Promise<Buffer>
-  generateMnemonic: (
-    strength?: number,
-    rng?: RandomNumberGenerator,
-    wordlist?: string[]
-  ) => Promise<string>
-  validateMnemonic: (mnemonic: string, wordlist?: string[]) => boolean
-}
+// Exports moved to @celo/base, forwarding them
+// here for backwards compatibility
+export import CELO_DERIVATION_PATH_BASE = base.CELO_DERIVATION_PATH_BASE
+export import MnemonicStrength = base.MnemonicStrength
+export import MnemonicLanguages = base.MnemonicLanguages
+export type RandomNumberGenerator = base.RandomNumberGenerator
+export import Bip39 = base.Bip39
 
 function defaultGenerateMnemonic(
   strength?: number,
