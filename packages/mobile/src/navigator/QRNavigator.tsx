@@ -4,20 +4,23 @@ import {
 } from '@react-navigation/material-top-tabs'
 import { useIsFocused } from '@react-navigation/native'
 import { TransitionPresets } from '@react-navigation/stack'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { memoize } from 'lodash'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAsync } from 'react-async-hook'
 import { useTranslation } from 'react-i18next'
 import { Dimensions, Platform, StatusBar, StyleSheet } from 'react-native'
 import { check, PERMISSIONS, RESULTS } from 'react-native-permissions'
 import Animated, { call, greaterThan, onChange } from 'react-native-reanimated'
 import { ScrollPager } from 'react-native-tab-view'
+import { useDispatch } from 'react-redux'
 import { Namespaces } from 'src/i18n'
 import { noHeader } from 'src/navigator/Headers.v2'
 import { Screens } from 'src/navigator/Screens'
 import QRCode from 'src/qrcode/QRCode'
 import QRScanner from 'src/qrcode/QRScanner'
 import QRTabBar from 'src/qrcode/QRTabBar'
-import { SVG } from 'src/send/actions'
+import { handleBarcodeDetected, QrCode, SVG } from 'src/send/actions'
+import Logger from 'src/utils/Logger'
 import { ExtractProps } from 'src/utils/typescript'
 
 const Tab = createMaterialTopTabNavigator()
@@ -30,7 +33,7 @@ type AnimatedScannerSceneProps = ExtractProps<typeof QRScanner> & {
 }
 
 // Component doing our custom transition for the QR scanner
-function AnimatedScannerScene({ position, ...props }: AnimatedScannerSceneProps) {
+function AnimatedScannerScene({ route, position, ...props }: AnimatedScannerSceneProps) {
   const isFocused = useIsFocused()
   const [wasFocused, setWasFocused] = useState(isFocused)
   const [isPartiallyVisible, setIsPartiallyVisible] = useState(false)
@@ -88,10 +91,33 @@ function AnimatedScannerScene({ position, ...props }: AnimatedScannerSceneProps)
   // react-native-camera.
   const enableCamera = isFocused || (isPartiallyVisible && (hasAskedCameraPermission || wasFocused))
 
+  const dispatch = useDispatch()
+  const { scanIsForSecureSend, isOutgoingPaymentRequest, transactionData, requesterAddress } =
+    route.params || {}
+
+  const onBarCodeDetected = useCallback(
+    memoize(
+      (qrCode: QrCode) => {
+        Logger.debug('QRScanner', 'Bar code detected')
+        dispatch(
+          handleBarcodeDetected(
+            qrCode,
+            scanIsForSecureSend,
+            transactionData,
+            isOutgoingPaymentRequest,
+            requesterAddress
+          )
+        )
+      },
+      (qrCode) => qrCode.data
+    ),
+    [scanIsForSecureSend, transactionData, isOutgoingPaymentRequest, requesterAddress]
+  )
+
   return (
     <Animated.View style={animatedStyle}>
       {isFocused && <StatusBar barStyle="light-content" />}
-      {enableCamera && <QRScanner {...props} />}
+      {enableCamera && <QRScanner onBarCodeDetected={onBarCodeDetected} />}
     </Animated.View>
   )
 }

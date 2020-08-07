@@ -178,5 +178,6 @@
   "amount": "Monto",
   "currentBalance": "Saldo actual",
   "restore": "Restaurar",
-  "commentUnavailable": "Comentario no disponible"
+  "commentUnavailable": "Comentario no disponible",
+  "withdraw": "Retirar"
 }

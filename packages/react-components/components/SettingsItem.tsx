@@ -53,6 +53,21 @@ export function SettingsItemTextValue({
   )
 }
 
+type SettingsItemTextProps = BaseProps
+
+export function SettingsItemText({ testID, title, onPress }: SettingsItemTextProps) {
+  return (
+    <Wrapper testID={testID} onPress={onPress}>
+      <View style={styles.container}>
+        <Title value={title} />
+        <View style={styles.right}>
+          <ForwardChevron />
+        </View>
+      </View>
+    </Wrapper>
+  )
+}
+
 type SettingsItemSwitchProps = {
   value: boolean
   onValueChange: (value: boolean) => void
