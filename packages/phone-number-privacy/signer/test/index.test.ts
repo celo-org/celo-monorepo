@@ -8,8 +8,8 @@ import {
   setDidMatchmaking,
 } from '../src/database/wrappers/account'
 import { getKeyProvider } from '../src/key-management/key-provider'
-import { getRemainingQueryCount } from '../src/salt-generation/query-quota'
 import { createServer } from '../src/server'
+import { getRemainingQueryCount } from '../src/signing/query-quota'
 import { getBlockNumber } from '../src/web3/contracts'
 
 const BLS_SIGNATURE = '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A'
@@ -18,7 +18,7 @@ jest.mock('../src/common/identity')
 const mockAuthenticateUser = authenticateUser as jest.Mock
 mockAuthenticateUser.mockReturnValue(true)
 
-jest.mock('../src/salt-generation/query-quota')
+jest.mock('../src/signing/query-quota')
 const mockGetRemainingQueryCount = getRemainingQueryCount as jest.Mock
 
 jest.mock('../src/key-management/key-provider')
@@ -58,7 +58,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
       mockGetRemainingQueryCount.mockReturnValue({ performedQueryCount: 0, totalQuota: 10 })
       mockGetBlockNumber.mockReturnValue(10000)
       request(app)
-        .post('/getBlindedSalt')
+        .post('/getBlindedMessagePartialSig')
         .send(mockRequestData)
         .expect('Content-Type', /json/)
         .expect(
@@ -77,7 +77,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
     it('returns 403 on query count 0', (done) => {
       mockGetRemainingQueryCount.mockReturnValue({ performedQueryCount: 10, totalQuota: 10 })
       request(app)
-        .post('/getBlindedSalt')
+        .post('/getBlindedMessagePartialSig')
         .send(mockRequestData)
         .expect('Content-Type', /json/)
         .expect(403, done)
@@ -86,7 +86,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
     it('returns 200 on DB query failure', (done) => {
       mockGetRemainingQueryCount.mockRejectedValue(undefined)
       request(app)
-        .post('/getBlindedSalt')
+        .post('/getBlindedMessagePartialSig')
         .send(mockRequestData)
         .expect('Content-Type', /json/)
         .expect(200, done)
@@ -97,7 +97,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
         throw Error()
       })
       request(app)
-        .post('/getBlindedSalt')
+        .post('/getBlindedMessagePartialSig')
         .send(mockRequestData)
         .expect('Content-Type', /json/)
         .expect(500, done)
@@ -116,7 +116,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
       }
 
       request(app)
-        .post('/getBlindedSalt')
+        .post('/getBlindedMessagePartialSig')
         .send(mockRequestData)
         .expect(400, done)
     })
@@ -133,7 +133,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
       }
 
       request(app)
-        .post('/getBlindedSalt')
+        .post('/getBlindedMessagePartialSig')
         .send(mockRequestData)
         .expect(400, done)
     })

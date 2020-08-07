@@ -9,8 +9,8 @@ import config from '../../src/config'
 
 require('dotenv').config()
 
-const PHONE_NUM_PRIVACY_SERVICE = process.env.PHONE_NUM_PRIVACY_SIGNER_SERVICE_URL
-const SIGN_MESSAGE_ENDPOINT = '/getBlindedSalt'
+const PHONE_NUM_PRIVACY_SERVICE = process.env.ODIS_SIGNER_SERVICE_URL
+const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessagePartialSig'
 
 const PRIVATE_KEY1 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
 const ACCOUNT_ADDRESS1 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY1))
@@ -82,12 +82,12 @@ describe('Running against a deployed service', () => {
     })
   })
 
-  it('Address salt querying out of quota', async () => {
+  it('Returns error when querying out of quota', async () => {
     const response = await postToSignMessage(BLINDED_PHONE_NUMBER, PRIVATE_KEY1, ACCOUNT_ADDRESS1)
     expect(response.status).toBe(403)
   })
 
-  xit('Address salt querying succeeds with funded account', async () => {
+  xit('Returns signature when querying succeeds with funded account', async () => {
     // TODO: Figure out a common way to prefund account to provide quota
     const response = await postToSignMessage(BLINDED_PHONE_NUMBER, PRIVATE_KEY2, ACCOUNT_ADDRESS2)
     expect(response.status).toBe(200)

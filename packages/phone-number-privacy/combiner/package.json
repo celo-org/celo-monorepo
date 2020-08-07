@@ -1,7 +1,7 @@
 {
   "name": "@celo/phone-number-privacy-combiner",
-  "version": "1.0.0",
-  "description": "Orchestrates and combines threshold signatures for use in PGPNP",
+  "version": "1.1.0",
+  "description": "Orchestrates and combines threshold signatures for use in ODIS",
   "author": "Celo",
   "license": "Apache-2.0",
   "main": "dist/index.js",
