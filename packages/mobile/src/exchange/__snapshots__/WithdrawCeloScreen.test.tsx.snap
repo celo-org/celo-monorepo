@@ -296,7 +296,7 @@ exports[`WithdrawCeloScreen renders correctly 1`] = `
             "paddingVertical": 5,
           }
         }
-        testID="ExchangeReviewButton"
+        testID="WithdrawReviewButton"
       >
         <Text
           accessibilityLabel="continue"

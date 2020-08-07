@@ -35,13 +35,18 @@ function WithdrawCeloScreen({ navigation }: Props) {
   const [celoToTransfer, setCeloToTransfer] = useState('')
 
   const goldBalance = useSelector((state) => state.goldToken.balance)
+  const goldBalanceNumber = new BigNumber(goldBalance || 0)
   const { t } = useTranslation(Namespaces.exchangeFlow9)
 
+  const celoToTransferNumber = new BigNumber(celoToTransfer)
   // TODO: Maybe add some validation to accountAddress?
-  const readyToReview = accountAddress && parseFloat(celoToTransfer) > 0
+  const readyToReview =
+    accountAddress &&
+    celoToTransferNumber.isGreaterThan(0) &&
+    celoToTransferNumber.isLessThanOrEqualTo(goldBalanceNumber)
 
   const onConfirm = useCallback(() => {
-    const celoAmount = new BigNumber(parseFloat(celoToTransfer))
+    const celoAmount = new BigNumber(celoToTransfer)
     ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_review, {
       amount: celoAmount.toString(),
     })
@@ -122,7 +127,7 @@ function WithdrawCeloScreen({ navigation }: Props) {
         type={BtnTypes.SECONDARY}
         size={BtnSizes.FULL}
         style={styles.reviewBtn}
-        testID="ExchangeReviewButton"
+        testID="WithdrawReviewButton"
       />
       <KeyboardSpacer />
     </SafeAreaView>
