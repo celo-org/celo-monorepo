@@ -6,6 +6,6 @@ export function appendPath(baseUrl: string, path: string) {
   return baseUrl + '/' + path
 }
 
-export const StringUtils = {
+export const StringBase = {
   appendPath,
 }

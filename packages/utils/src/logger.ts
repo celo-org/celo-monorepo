@@ -1,15 +1,8 @@
-export type Logger = (...args: any[]) => void
+import * as base from '@celo/base/lib/logger'
 
-export const noopLogger: Logger = () => {
-  /*noop*/
-}
-
-export const prefixLogger = (prefix: string, logger: Logger) => {
-  if (logger === noopLogger) {
-    return noopLogger
-  } else {
-    return (...args: any[]) => logger(`${prefix}:: `, ...args)
-  }
-}
-
-export const consoleLogger: Logger = console.log
+// Exports moved to @celo/base, forwarding them
+// here for backwards compatibility
+export import Logger = base.Logger
+export import noopLogger = base.noopLogger
+export import prefixLogger = base.prefixLogger
+export import consoleLogger = base.consoleLogger

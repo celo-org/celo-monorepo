@@ -32,7 +32,7 @@ export function anonymizedPhone(phoneNumber: string) {
   return phoneNumber.slice(0, -4) + 'XXXX'
 }
 
-export const PhoneNumberUtils = {
+export const PhoneNumberBase = {
   getPhoneHash,
   isE164Number,
 }

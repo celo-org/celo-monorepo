@@ -1,7 +1,13 @@
+import * as base from '@celo/base/lib/signatureUtils'
 import * as Web3Utils from 'web3-utils'
 import { eqAddress, privateKeyToAddress } from './address'
 
-export const POP_SIZE = 65
+// Exports moved to @celo/base, forwarding them
+// here for backwards compatibility
+export import POP_SIZE = base.POP_SIZE
+export import NativeSigner = base.NativeSigner
+export import Signature = base.Signature
+export import serializeSignature = base.serializeSignature
 
 const ethjsutil = require('ethereumjs-util')
 
@@ -23,9 +29,7 @@ export function hashMessage(message: string): string {
   return Web3Utils.soliditySha3({ type: 'string', value: message })
 }
 
-export interface Signer {
-  sign: (message: string) => Promise<string>
-}
+export import Signer = base.Signer
 
 export async function addressToPublicKey(
   signer: string,
@@ -53,17 +57,6 @@ export async function addressToPublicKey(
   return '0x' + pubKey.toString('hex')
 }
 
-// Uses a native function to sign (as signFn), most commonly `web.eth.sign`
-export function NativeSigner(
-  signFn: (message: string, signer: string) => Promise<string>,
-  signer: string
-): Signer {
-  return {
-    sign: async (message: string) => {
-      return signFn(message, signer)
-    },
-  }
-}
 export function LocalSigner(privateKey: string): Signer {
   return {
     sign: async (message: string) =>
@@ -103,19 +96,6 @@ export function signMessageWithoutPrefix(messageHash: string, privateKey: string
     throw new Error('Unable to validate signature')
   }
   return { v, r: ethjsutil.bufferToHex(r), s: ethjsutil.bufferToHex(s) }
-}
-
-export interface Signature {
-  v: number
-  r: string
-  s: string
-}
-
-export function serializeSignature(signature: Signature) {
-  const serializedV = signature.v.toString(16)
-  const serializedR = signature.r.slice(2)
-  const serializedS = signature.s.slice(2)
-  return '0x' + serializedV + serializedR + serializedS
 }
 
 export function verifySignature(message: string, signature: string, signer: string) {
