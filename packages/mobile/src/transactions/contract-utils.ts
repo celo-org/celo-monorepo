@@ -1,7 +1,6 @@
+import { CeloTx, CeloTxObject, CeloTxReceipt } from '@celo/sdk-types/commons'
 import { values } from 'lodash'
 import { estimateGas } from 'src/web3/utils'
-import { Tx } from 'web3-core'
-import { TransactionObject, TransactionReceipt } from 'web3-eth'
 
 export type TxLogger = (event: SendTransactionLogEvent) => void
 
@@ -10,7 +9,7 @@ export function emptyTxLogger(_event: SendTransactionLogEvent) {
 }
 
 interface TxPromiseResolvers {
-  receipt: (receipt: TransactionReceipt) => void
+  receipt: (receipt: CeloTxReceipt) => void
   transactionHash: (transactionHash: string) => void
   confirmation: (confirmation: boolean) => void
 }
@@ -23,7 +22,7 @@ interface TxPromiseReject {
 }
 
 export interface TxPromises {
-  receipt: Promise<TransactionReceipt>
+  receipt: Promise<CeloTxReceipt>
   transactionHash: Promise<string>
   confirmation: Promise<boolean>
 }
@@ -32,12 +31,7 @@ export function awaitConfirmation(txPromises: TxPromises) {
   return txPromises.confirmation
 }
 
-// Couldn't figure out how to make it generic
-export type SendTransaction<T> = (
-  tx: TransactionObject<any>,
-  account: string,
-  txId?: string
-) => Promise<T>
+export type SendTransaction<T> = (tx: CeloTxObject<T>, account: string, txId?: string) => Promise<T>
 
 export enum SendTransactionLogEventType {
   Started,
@@ -83,10 +77,10 @@ function EstimatedGas(gas: number): EstimatedGas {
 
 interface ReceiptReceived {
   type: SendTransactionLogEventType.ReceiptReceived
-  receipt: TransactionReceipt
+  receipt: CeloTxReceipt
 }
 
-function ReceiptReceived(receipt: TransactionReceipt): ReceiptReceived {
+function ReceiptReceived(receipt: CeloTxReceipt): ReceiptReceived {
   return { type: SendTransactionLogEventType.ReceiptReceived, receipt }
 }
 
@@ -130,7 +124,7 @@ function Exception(error: Error): Exception {
  *               a transaction ID
  */
 export async function sendTransactionAsync<T>(
-  tx: TransactionObject<T>,
+  tx: CeloTxObject<T>,
   account: string,
   feeCurrencyAddress: string | undefined,
   logger: TxLogger = emptyTxLogger,
@@ -143,7 +137,7 @@ export async function sendTransactionAsync<T>(
   // @ts-ignore
   const rejectors: TxPromiseReject = {}
 
-  const receipt: Promise<TransactionReceipt> = new Promise((resolve, reject) => {
+  const receipt: Promise<CeloTxReceipt> = new Promise((resolve, reject) => {
     resolvers.receipt = resolve
     rejectors.receipt = reject
   })
@@ -167,7 +161,7 @@ export async function sendTransactionAsync<T>(
 
   try {
     logger(Started)
-    const txParams: Tx = {
+    const txParams: CeloTx = {
       from: account,
       feeCurrency: feeCurrencyAddress,
       // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add
@@ -183,7 +177,7 @@ export async function sendTransactionAsync<T>(
 
     tx.send({ ...txParams, gas: estimatedGas })
       // @ts-ignore
-      .once('receipt', (r: TransactionReceipt) => {
+      .once('receipt', (r: CeloTxReceipt) => {
         logger(ReceiptReceived(r))
         if (resolvers.receipt) {
           resolvers.receipt(r)

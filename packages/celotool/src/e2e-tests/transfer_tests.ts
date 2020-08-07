@@ -1,14 +1,12 @@
 // tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
-/// <reference path="../../../contractkit/types/web3-celo.d.ts" />
-
 import { CeloContract, CeloToken, ContractKit, newKit, newKitFromWeb3 } from '@celo/contractkit'
 import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
+import { CeloTxPending, CeloTxReceipt } from '@celo/sdk-types/commons'
 import { eqAddress } from '@celo/utils/lib/address'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
-import { TransactionReceipt } from 'web3-core'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { getHooks, initAndSyncGethWithRetry, killInstance, sleep } from './utils'
@@ -402,7 +400,7 @@ describe('Transfer tests', function(this: any) {
     return '0x' + hex.substr(26)
   }
 
-  function parseEvents(receipt: TransactionReceipt | undefined) {
+  function parseEvents(receipt: CeloTxReceipt | undefined) {
     if (!receipt) {
       return []
     }
@@ -429,7 +427,7 @@ describe('Transfer tests', function(this: any) {
     assert.isAbove(parseInt(minGasPrice, 10), 0)
 
     let ok = false
-    let receipt: TransactionReceipt | undefined
+    let receipt: CeloTxReceipt | undefined
     try {
       receipt = await txResult.waitReceipt()
       ok = true
@@ -447,7 +445,7 @@ describe('Transfer tests', function(this: any) {
     const gasVal = receipt ? receipt.gasUsed : expectedGasUsed
     assert.isAbove(gasVal, 0)
     const txHash = await txResult.getHash()
-    const tx = await kit.web3.eth.getTransaction(txHash)
+    const tx: CeloTxPending = await kit.web3.eth.getTransaction(txHash)
     assert.isAbove(parseInt(tx.gasPrice, 10), 0)
     const txFee = new BigNumber(gasVal).times(tx.gasPrice)
     const txFeeBase = new BigNumber(gasVal).times(minGasPrice)

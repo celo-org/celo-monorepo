@@ -1,7 +1,6 @@
-import { Address } from '@celo/contractkit'
+import { Address, BlockHeader } from '@celo/sdk-types/commons'
 import { eqAddress } from '@celo/utils/lib/address'
 import { bitIsSet, parseBlockExtraData } from '@celo/utils/lib/istanbul'
-import { BlockHeader } from 'web3-eth'
 
 /**
  * Cache to efficiently retreive the elected validators for many blocks within an epoch.

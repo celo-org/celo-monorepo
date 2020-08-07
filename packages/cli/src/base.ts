@@ -5,6 +5,7 @@ import {
   AddressValidation,
   newLedgerWalletWithSetup,
 } from '@celo/contractkit/lib/wallets/ledger-wallet'
+import { Provider } from '@celo/sdk-types/commons'
 import { Wallet } from '@celo/sdk-types/wallet'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import { Command, flags } from '@oclif/command'
@@ -175,7 +176,7 @@ export abstract class BaseCommand extends LocalCommand {
 
   finally(arg: Error | undefined): Promise<any> {
     try {
-      stopProvider(this.web3.currentProvider)
+      stopProvider(this.web3.currentProvider as Provider)
     } catch (error) {
       this.log(`Failed to close the connection: ${error}`)
     }

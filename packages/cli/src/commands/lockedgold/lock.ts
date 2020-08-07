@@ -1,4 +1,4 @@
-import { Address } from '@celo/utils/lib/address'
+import { Address } from '@celo/sdk-types/commons'
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'

@@ -1,14 +1,14 @@
 import { CeloTransactionObject } from '@celo/contractkit'
 import { parseDecodedParams } from '@celo/contractkit/lib/utils/web3-utils'
+import { CeloTx, EventLog } from '@celo/sdk-types/commons'
 import { CLIError } from '@oclif/errors'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
 import Table from 'cli-table'
 import { cli } from 'cli-ux'
-import { EventLog, Tx } from 'web3-core'
 
 // TODO: How can we deploy contracts with the Celo provider w/o a CeloTransactionObject?
-export async function displayWeb3Tx(name: string, txObj: any, tx?: Omit<Tx, 'data'>) {
+export async function displayWeb3Tx(name: string, txObj: any, tx?: Omit<CeloTx, 'data'>) {
   cli.action.start(`Sending Transaction: ${name}`)
   const result = await txObj.send(tx)
   console.log(result)
@@ -18,7 +18,7 @@ export async function displayWeb3Tx(name: string, txObj: any, tx?: Omit<Tx, 'dat
 export async function displaySendTx<A>(
   name: string,
   txObj: CeloTransactionObject<A>,
-  tx?: Omit<Tx, 'data'>,
+  tx?: Omit<CeloTx, 'data'>,
   displayEventName?: string
 ) {
   cli.action.start(`Sending Transaction: ${name}`)

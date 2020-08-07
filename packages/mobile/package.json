@@ -145,7 +145,7 @@
   "devDependencies": {
     "@apollo/react-testing": "^3.1.3",
     "@celo/typescript": "0.0.1",
-    "@celo/sdk-types": "1.0.0",
+    "@celo/sdk-types": "1.0.0-dev",
     "@graphql-codegen/add": "^1.10.0",
     "@graphql-codegen/cli": "^1.10.0",
     "@graphql-codegen/fragment-matcher": "1.10.0",

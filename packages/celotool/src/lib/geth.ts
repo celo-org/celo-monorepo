@@ -1,11 +1,10 @@
 // tslint:disable:no-console
-// tslint:disable-next-line:no-reference (Required to make this work w/ ts-node)
-/// <reference path="../../../contractkit/types/web3-celo.d.ts" />
 import { CeloContract, ContractKit, newKit } from '@celo/contractkit'
 import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
 import { waitForPortOpen } from '@celo/dev-utils/lib/network'
+import { CeloTxReceipt } from '@celo/sdk-types/commons'
 import BigNumber from 'bignumber.js'
 import { spawn } from 'child_process'
 import fs from 'fs'
@@ -14,7 +13,6 @@ import fetch from 'node-fetch'
 import path from 'path'
 import sleep from 'sleep-promise'
 import Web3 from 'web3'
-import { TransactionReceipt } from 'web3-core'
 import { Admin } from 'web3-eth-admin'
 import { spawnCmd, spawnCmdWithExitOnFailure } from './cmd-utils'
 import { convertToContractDecimals } from './contract-utils'
@@ -24,7 +22,7 @@ import {
   generateGenesis,
   generatePrivateKey,
   privateKeyToPublicKey,
-  Validator,
+  Validator
 } from './generate_utils'
 import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
 import { GethInstanceConfig } from './interfaces/geth-instance-config'
@@ -638,7 +636,7 @@ export const transferERC20Token = async (
   password: string,
   txParams: any = {},
   onTransactionHash?: (hash: string) => void,
-  onReceipt?: (receipt: TransactionReceipt) => void,
+  onReceipt?: (receipt: CeloTxReceipt) => void,
   onError?: (error: any) => void
 ) => {
   txParams.from = from

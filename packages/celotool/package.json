@@ -33,6 +33,7 @@
   "devDependencies": {
     "@celo/dev-utils": "file:../dev-utils",
     "@celo/protocol": "*",
+    "@celo/sdk-types": "1.0.0-dev",
     "@types/bunyan": "1.8.4",
     "@types/dotenv": "^8.2.0",
     "@types/node-fetch": "^2.1.2",

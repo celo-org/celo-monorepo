@@ -21,7 +21,7 @@ export interface CeloTxObject<T> {
 }
 
 export { EventLog, PromiEvent, RLPEncodedTransaction as EncodedTransaction } from 'web3-core'
-export { Block } from 'web3-eth'
+export { Block, BlockHeader } from 'web3-eth'
 
 export type CeloTxPending = Transaction & Partial<CeloParams>
 export type CeloTxReceipt = TransactionReceipt & Partial<CeloParams>

@@ -1,7 +1,7 @@
-import { Address } from '@celo/contractkit'
 import { GroupVoterReward, VoterReward } from '@celo/contractkit/lib/wrappers/Election'
 import { AccountSlashed } from '@celo/contractkit/lib/wrappers/LockedGold'
 import { Validator, ValidatorReward } from '@celo/contractkit/lib/wrappers/Validators'
+import { Address } from '@celo/sdk-types/commons'
 import { eqAddress } from '@celo/utils/lib/address'
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'

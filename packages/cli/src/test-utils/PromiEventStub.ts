@@ -1,12 +1,12 @@
+import { CeloTxReceipt, PromiEvent } from '@celo/sdk-types/commons'
 import { EventEmitter } from 'events'
-import { PromiEvent, TransactionReceipt } from 'web3-core'
 
 interface PromiEventStub<T> extends PromiEvent<T> {
   emitter: EventEmitter
   resolveHash(hash: string): void
-  resolveReceipt(receipt: TransactionReceipt): void
+  resolveReceipt(receipt: CeloTxReceipt): void
   rejectHash(error: any): void
-  rejectReceipt(receipt: TransactionReceipt, error: any): void
+  rejectReceipt(receipt: CeloTxReceipt, error: any): void
 }
 export function promiEventSpy<T>(): PromiEventStub<T> {
   const ee = new EventEmitter()
@@ -27,13 +27,13 @@ export function promiEventSpy<T>(): PromiEventStub<T> {
     resolveHash: (hash: string) => {
       ee.emit('transactionHash', hash)
     },
-    resolveReceipt: (receipt: TransactionReceipt) => {
+    resolveReceipt: (receipt: CeloTxReceipt) => {
       ee.emit('receipt', receipt)
     },
     rejectHash: (error: any) => {
       ee.emit('error', error, false)
     },
-    rejectReceipt: (receipt: TransactionReceipt, error: any) => {
+    rejectReceipt: (receipt: CeloTxReceipt, error: any) => {
       ee.emit('error', error, receipt)
     },
   }

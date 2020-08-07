@@ -1,23 +1,22 @@
 import { estimateGas as ckEstimateGas } from '@celo/contractkit/lib/utils/web3-utils'
+import { CeloTx, CeloTxObject } from '@celo/sdk-types/commons'
 import BigNumber from 'bignumber.js'
 import { call } from 'redux-saga/effects'
 import { GAS_INFLATION_FACTOR } from 'src/config'
 import Logger from 'src/utils/Logger'
 import { getWeb3, getWeb3Async } from 'src/web3/contracts'
-import { Tx } from 'web3-core'
-import { TransactionObject } from 'web3-eth'
 
 const TAG = 'web3/utils'
 
 // Estimate gas taking into account the configured inflation factor
-export async function estimateGas(txObj: TransactionObject<any>, txParams: Tx) {
+export async function estimateGas(txObj: CeloTxObject<any>, txParams: CeloTx) {
   const web3 = await getWeb3Async()
-  const gasEstimator = (_tx: Tx) => txObj.estimateGas({ ..._tx })
-  const getCallTx = (_tx: Tx) => {
+  const gasEstimator = (_tx: CeloTx) => txObj.estimateGas({ ..._tx })
+  const getCallTx = (_tx: CeloTx) => {
     // @ts-ignore missing _parent property from TransactionObject type.
     return { ..._tx, data: txObj.encodeABI(), to: txObj._parent._address }
   }
-  const caller = (_tx: Tx) => web3.eth.call(getCallTx(_tx))
+  const caller = (_tx: CeloTx) => web3.eth.call(getCallTx(_tx))
   const gas = new BigNumber(await ckEstimateGas(txParams, gasEstimator, caller))
     .times(GAS_INFLATION_FACTOR)
     .integerValue()

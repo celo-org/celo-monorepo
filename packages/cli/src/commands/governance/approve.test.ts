@@ -6,7 +6,7 @@ import {
   ProposalStage,
 } from '@celo/contractkit/lib/wrappers/Governance'
 import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/ganache-test'
-import { Address } from '@celo/utils/lib/address'
+import { Address } from '@celo/sdk-types/commons'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import Approve from './approve'

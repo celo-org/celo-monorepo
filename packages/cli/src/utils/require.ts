@@ -1,4 +1,4 @@
-import { TransactionObject } from 'web3-eth'
+import { CeloTxObject } from '@celo/sdk-types/commons'
 import { failWith } from './cli'
 
 export enum Op {
@@ -24,7 +24,7 @@ export function requireOp<A>(value: A, op: Op, expected: A, ctx: string) {
   }
 }
 export async function requireCall<A>(
-  callPromise: TransactionObject<A>,
+  callPromise: CeloTxObject<A>,
   op: Op,
   expected: A,
   ctx: string

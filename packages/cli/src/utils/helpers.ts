@@ -1,5 +1,5 @@
+import { Block } from '@celo/sdk-types/commons'
 import Web3 from 'web3'
-import { Block } from 'web3-eth'
 import { failWith } from './cli'
 
 export async function nodeIsSynced(web3: Web3): Promise<boolean> {
