@@ -83,7 +83,7 @@ A number of metrics are tracked for the parent of the last sealed block received
 
 - `consensus_istanbul_blocks_missedbyus`: Counts the blocks for which this validator was elected but not included in the child's parent seal (this block could count towards downtime if 12 successive blocks are missed).  Consider monitoring the rate.
 
-- `consensus_istanbul_blocks_missedbyusinarow`: (_since 1.0.2) Counts the blocks for which this validator was elected but not included in the child's parent seal in a row.  Consider monitoring the gauge.
+- `consensus_istanbul_blocks_missedbyusinarow`: (_since 1.0.2_) Counts the blocks for which this validator was elected but not included in the child's parent seal in a row.  Consider monitoring the gauge.
 
 - `consensus_istanbul_blocks_proposedbyus`: (_since 1.0.2_) Counts the blocks for which this validator was elected and for which a block it proposed was succesfully included in the chain. Consider monitoring the rate.
 
