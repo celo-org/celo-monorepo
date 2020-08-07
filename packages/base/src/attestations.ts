@@ -20,14 +20,14 @@ export function getIdentifierPrefix(type: IdentifierType) {
 }
 
 export function hashIdentifier(
+  sha3: (a: string) => string | null,
   identifier: string,
   type: IdentifierType,
-  salt: string,
-  sha3: (a: string) => string
+  salt?: string
 ) {
   switch (type) {
     case IdentifierType.PHONE_NUMBER:
-      return PhoneNumberUtils.getPhoneHash(identifier, salt, sha3)
+      return PhoneNumberUtils.getPhoneHash(sha3, identifier, salt)
     default:
       throw new Error('Unsupported Identifier Type')
   }

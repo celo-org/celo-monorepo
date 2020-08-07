@@ -32,18 +32,18 @@ const TEST_PHONE_NUMBERS = {
 describe('Phone number formatting and utilities', () => {
   describe('Phone hashing', () => {
     it('Hashes an valid number without a salt', () => {
-      expect(getPhoneHash(TEST_PHONE_NUMBERS.VALID_E164, '', sha3)).toBe(
+      expect(getPhoneHash(sha3, TEST_PHONE_NUMBERS.VALID_E164, '')).toBe(
         '0x483128504c69591aed5751690805ba9aad6c390644421dc189f6dbb6e085aadf'
       )
     })
     it('Hashes an valid number with a salt', () => {
-      expect(getPhoneHash(TEST_PHONE_NUMBERS.VALID_E164, 'abcdefg', sha3)).toBe(
+      expect(getPhoneHash(sha3, TEST_PHONE_NUMBERS.VALID_E164, 'abcdefg')).toBe(
         '0xf08257f6b126597dbd090fecf4f5106cfb59c98ef997644cef16f9349464810c'
       )
     })
     it('Throws for an invalid number', () => {
       try {
-        getPhoneHash(TEST_PHONE_NUMBERS.VALID_US_1, '', sha3)
+        getPhoneHash(sha3, TEST_PHONE_NUMBERS.VALID_US_1, '')
         fail('expected an error')
       } catch (error) {
         // Error expected

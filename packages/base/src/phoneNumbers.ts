@@ -12,9 +12,9 @@ const PHONE_SALT_SEPARATOR = '__'
 const E164_REGEX = /^\+[1-9][0-9]{1,14}$/
 
 export const getPhoneHash = (
+  sha3: (a: string) => string | null,
   phoneNumber: string,
-  salt: string,
-  sha3: (a: string) => string | null
+  salt?: string
 ): string => {
   if (!phoneNumber || !isE164Number(phoneNumber)) {
     throw Error('Attempting to hash a non-e164 number: ' + phoneNumber)
