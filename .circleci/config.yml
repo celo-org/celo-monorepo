@@ -458,7 +458,7 @@ jobs:
           name: Upload to CodeCov
           command: yarn codecov -F mobile
 
-  protocol-test:
+  protocol-test-common:
     <<: *defaults
     resource_class: large
     steps:
@@ -484,8 +484,91 @@ jobs:
             fi
       - run:
           name: Unit tests
-          # Flaky tests - run them twice
-          command: yarn --cwd packages/protocol test
+          command: yarn --cwd packages/protocol test common/
+
+  protocol-test-compatibility:
+    <<: *defaults
+    resource_class: large
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
+      - run:
+          name: Unit tests
+          command: yarn --cwd packages/protocol test compatibility/
+
+  protocol-test-governance-network:
+    <<: *defaults
+    resource_class: large
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
+      - run:
+          name: Unit tests
+          command: yarn --cwd packages/protocol test governance/network/
+
+  protocol-test-governance-validators:
+    <<: *defaults
+    resource_class: large
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
+      - run:
+          name: Unit tests
+          command: yarn --cwd packages/protocol test governance/validators/
+
+  protocol-test-governance-voting:
+    <<: *defaults
+    resource_class: large
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
+      - run:
+          name: Unit tests
+          command: yarn --cwd packages/protocol test governance/voting/
+
+  protocol-test-identity:
+    <<: *defaults
+    resource_class: large
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
+      - run:
+          name: Unit tests
+          command: yarn --cwd packages/protocol test identity/
+
+  protocol-test-stability:
+    <<: *defaults
+    resource_class: large
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
+      - run:
+          name: Unit tests
+          command: yarn --cwd packages/protocol test stability/
 
   # Slow and flaky compared to protocol-test which runs without coverage
   protocol-test-with-code-coverage:
@@ -872,7 +955,25 @@ workflows:
             - lint-checks
       - end-to-end-mobile-test-android
       - end-to-end-mobile-test-ios
-      - protocol-test:
+      - protocol-test-common:
+          requires:
+            - lint-checks
+      - protocol-test-compatibility:
+          requires:
+            - lint-checks
+      - protocol-test-governance-network:
+          requires:
+            - lint-checks
+      - protocol-test-governance-validators:
+          requires:
+            - lint-checks
+      - protocol-test-governance-voting:
+          requires:
+            - lint-checks
+      - protocol-test-identity:
+          requires:
+            - lint-checks
+      - protocol-test-stability:
           requires:
             - lint-checks
       - typescript-test:
@@ -912,7 +1013,13 @@ workflows:
           requires:
             - end-to-end-mobile-test-android
             - end-to-end-mobile-test-ios
-            - protocol-test
+            - protocol-test-common
+            - protocol-test-compatibility
+            - protocol-test-governance-network
+            - protocol-test-governance-validators
+            - protocol-test-governance-voting
+            - protocol-test-identity
+            - protocol-test-stability
             - mobile-test
             - end-to-end-geth-transfer-test
             - end-to-end-geth-blockchain-parameters-test
