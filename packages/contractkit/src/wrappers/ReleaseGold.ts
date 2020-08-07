@@ -1,4 +1,4 @@
-import { findAddressIndex } from '@celo/utils/lib/address'
+import { findAddressIndex } from '@celo/base/lib/address'
 import {
   hashMessageWithPrefix,
   Signature,

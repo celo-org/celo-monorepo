@@ -1,4 +1,9 @@
-import { AddressListItem, linkedListChanges, zip } from '@celo/utils/lib/collections'
+import {
+  AddressListItem as ALI,
+  Comparator,
+  linkedListChanges,
+  zip,
+} from '@celo/base/lib/collections'
 import BigNumber from 'bignumber.js'
 import { EventLog } from 'web3-core'
 import { Address } from '../base'
@@ -12,6 +17,10 @@ import {
   valueToBigNumber,
   valueToString,
 } from '../wrappers/BaseWrapper'
+
+type AddressListItem = ALI<BigNumber>
+// BigNumber comparator
+const bnc: Comparator<BigNumber> = (a: BigNumber, b: BigNumber) => a.lt(b)
 
 export interface VotingDetails {
   accountAddress: Address
@@ -249,7 +258,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     groups: AddressListItem[]
   ) {
     const changed = await this.computeDecrementsForSlashing(account, penalty, groups)
-    const changes = linkedListChanges(groups, changed)
+    const changes = linkedListChanges(groups, changed, bnc)
     return { ...changes, indices: changed.map((a) => a.index) }
   }
 
