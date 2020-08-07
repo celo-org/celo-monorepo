@@ -23,8 +23,6 @@ export const hexToBuffer = (input: string) => Buffer.from(trimLeading0x(input), 
 
 export const bufferToHex = (buf: Buffer) => ensureLeading0x(buf.toString('hex'))
 
-export { isValidChecksumAddress, toChecksumAddress } from 'ethereumjs-util'
-
 export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 export const findAddressIndex = (address: Address, addresses: Address[]) =>
