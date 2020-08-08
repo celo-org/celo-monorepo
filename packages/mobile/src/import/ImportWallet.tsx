@@ -12,7 +12,7 @@ import { Keyboard, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { hideAlert } from 'src/alert/actions'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import {
   formatBackupPhraseOnEdit,
@@ -25,8 +25,11 @@ import Dialog from 'src/components/Dialog'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { importBackupPhrase } from 'src/import/actions'
 import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers.v2'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
+import TopBarTextButtonOnboarding from 'src/onboarding/TopBarTextButtonOnboarding'
+import UseBackToWelcomeScreen from 'src/onboarding/UseBackToWelcomeScreen'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
 
@@ -59,6 +62,14 @@ const mapStateToProps = (state: RootState): StateProps => {
 export class ImportWallet extends React.Component<Props, State> {
   static navigationOptions = {
     ...nuxNavigationOptions,
+    headerLeft: () => (
+      <TopBarTextButtonOnboarding
+        title={i18n.t('global:cancel')}
+        // Note: redux state reset is handled by UseBackToWelcomeScreen
+        // tslint:disable-next-line: jsx-no-lambda
+        onPress={() => navigate(Screens.Welcome)}
+      />
+    ),
     headerTitle: () => (
       <HeaderTitleWithSubtitle
         title={i18n.t('nuxNamePin1:importIt')}
@@ -72,6 +83,7 @@ export class ImportWallet extends React.Component<Props, State> {
     keyboardVisible: false,
   }
   componentDidMount() {
+    ValoraAnalytics.track(OnboardingEvents.wallet_import_start)
     this.props.navigation.addListener('focus', this.checkCleanBackupPhrase)
   }
 
@@ -105,7 +117,7 @@ export class ImportWallet extends React.Component<Props, State> {
     const useEmptyWallet = !!route.params?.showZeroBalanceModal
     Keyboard.dismiss()
     this.props.hideAlert()
-    ValoraAnalytics.track(AnalyticsEvents.import_wallet_submit)
+    ValoraAnalytics.track(OnboardingEvents.wallet_import_complete)
 
     const formattedPhrase = formatBackupPhraseOnSubmit(this.state.backupPhrase)
     this.setState({
@@ -125,6 +137,7 @@ export class ImportWallet extends React.Component<Props, State> {
     this.setState({
       backupPhrase: '',
     })
+    ValoraAnalytics.track(OnboardingEvents.wallet_import_cancel)
     navigation.setParams({ clean: false, showZeroBalanceModal: false })
   }
 
@@ -142,6 +155,9 @@ export class ImportWallet extends React.Component<Props, State> {
           <SafeAreaInsetsContext.Consumer>
             {(insets) => (
               <View style={styles.container}>
+                <UseBackToWelcomeScreen
+                  backAnalyticsEvent={OnboardingEvents.restore_account_cancel}
+                />
                 <KeyboardAwareScrollView
                   style={headerHeight ? { marginTop: headerHeight } : undefined}
                   contentContainerStyle={[

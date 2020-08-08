@@ -1,6 +1,5 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import Switch from '@celo/react-components/components/Switch'
-import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
@@ -10,6 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { setSocialBackupCompleted } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
+import { currentLanguageSelector } from 'src/app/reducers'
 import BackupPhraseContainer, {
   BackupPhraseContainerMode,
   BackupPhraseType,
@@ -44,7 +44,7 @@ type Props = WithTranslation & StateProps & DispatchProps
 const mapStateToProps = (state: RootState): StateProps => {
   return {
     account: currentAccountSelector(state),
-    language: state.app.language,
+    language: currentLanguageSelector(state),
     socialBackupCompleted: state.account.socialBackupCompleted,
   }
 }
@@ -149,7 +149,6 @@ class BackupSocial extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
     justifyContent: 'space-between',
   },
   scrollContainer: {

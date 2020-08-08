@@ -1,7 +1,8 @@
 import { RESTDataSource } from 'apollo-datasource-rest'
 import BigNumber from 'bignumber.js'
 import { BLOCKSCOUT_API, FAUCET_ADDRESS, VERIFICATION_REWARDS_ADDRESS } from './config'
-import { EventArgs, EventTypes, TokenTransactionArgs, TransferEvent } from './schema'
+import { CGLD, CUSD } from './currencyConversion/consts'
+import { EventArgs, EventTypes, MoneyAmount, TokenTransactionArgs, TransferEvent } from './schema'
 import { formatCommentString, getContractAddresses } from './utils'
 
 // to get rid of 18 extra 0s in the values
@@ -280,6 +281,18 @@ export class BlockscoutAPI extends RESTDataSource {
       return undefined
     }
 
+    const impliedExchangeRates: MoneyAmount['impliedExchangeRates'] = {}
+    if (inTransfer.token === CGLD && outTransfer.token === CUSD) {
+      impliedExchangeRates['cGLD/cUSD'] = new BigNumber(outTransfer.value).dividedBy(
+        inTransfer.value
+      )
+    }
+    if (outTransfer.token === CGLD && inTransfer.token === CUSD) {
+      impliedExchangeRates['cGLD/cUSD'] = new BigNumber(inTransfer.value).dividedBy(
+        outTransfer.value
+      )
+    }
+
     return {
       type: EventTypes.EXCHANGE,
       timestamp,
@@ -292,16 +305,19 @@ export class BlockscoutAPI extends RESTDataSource {
           .toString(),
         currencyCode: tokenTransfer.token,
         timestamp,
+        impliedExchangeRates,
       },
       makerAmount: {
         value: new BigNumber(inTransfer.value).dividedBy(WEI_PER_GOLD).toString(),
         currencyCode: inTransfer.token,
         timestamp,
+        impliedExchangeRates,
       },
       takerAmount: {
         value: new BigNumber(outTransfer.value).dividedBy(WEI_PER_GOLD).toString(),
         currencyCode: outTransfer.token,
         timestamp,
+        impliedExchangeRates,
       },
       hash,
     }

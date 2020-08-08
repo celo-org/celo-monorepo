@@ -3,6 +3,7 @@ import { eqAddress } from '@celo/utils/lib/address'
 import { concurrentMap, sleep } from '@celo/utils/lib/async'
 import { notEmpty, zip3 } from '@celo/utils/lib/collections'
 import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
+import { appendPath } from '@celo/utils/lib/string'
 import BigNumber from 'bignumber.js'
 import fetch from 'cross-fetch'
 import { Address, CeloContract, NULL_ADDRESS } from '../base'
@@ -136,6 +137,17 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       attestationRequestFeeToken: res[2],
     })
   )
+
+  /**
+   * @notice Checks if attestation request is expired.
+   * @param attestationRequestBlockNumber Attestation Request Block Number to be checked
+   */
+  isAttestationExpired = async (attestationRequestBlockNumber: number) => {
+    // We duplicate the implementation here, until Attestation.sol->isAttestationExpired is not external
+    const attestationExpiryBlocks = await this.attestationExpiryBlocks()
+    const blockNumber = await this.kit.web3.eth.getBlockNumber()
+    return blockNumber >= attestationRequestBlockNumber + attestationExpiryBlocks
+  }
 
   /**
    * @notice Waits for appropriate block numbers for before issuer can be selected
@@ -465,7 +477,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       salt,
       smsRetrieverAppSig,
     }
-    return fetch(serviceURL + '/attestations', {
+    return fetch(appendPath(serviceURL, 'attestations'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -529,6 +541,8 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       rightAccount: false,
       metadataURL: null,
       state: AttestationServiceStatusState.NoAttestationSigner,
+      version: null,
+      ageOfLatestBlock: null,
     }
 
     if (!hasAttestationSigner) {
@@ -561,7 +575,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     ret.attestationServiceURL = attestationServiceURL
 
     try {
-      const statusResponse = await fetch(attestationServiceURL + '/status')
+      const statusResponse = await fetch(appendPath(attestationServiceURL, 'status'))
 
       if (!statusResponse.ok) {
         ret.state = AttestationServiceStatusState.UnreachableAttestationService
@@ -574,12 +588,23 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       ret.blacklistedRegionCodes = statusResponseBody.blacklistedRegionCodes
       ret.rightAccount = eqAddress(validator.address, statusResponseBody.accountAddress)
       ret.state = AttestationServiceStatusState.Valid
+      ret.version = statusResponseBody.version
+      ret.ageOfLatestBlock = statusResponseBody.ageOfLatestBlock
       return ret
     } catch (error) {
       ret.state = AttestationServiceStatusState.UnreachableAttestationService
       ret.error = error
       return ret
     }
+  }
+
+  async revoke(identifer: string, account: Address) {
+    const accounts = await this.contract.methods.lookupAccountsForIdentifier(identifer).call()
+    const idx = accounts.findIndex((acc) => eqAddress(acc, account))
+    if (idx < 0) {
+      throw new Error("Account not found in identifier's accounts")
+    }
+    return toTransactionObject(this.kit, this.contract.methods.revoke(identifer, idx))
   }
 }
 
@@ -609,4 +634,6 @@ interface AttestationServiceStatusResponse {
   rightAccount: boolean
   signer: string
   state: AttestationServiceStatusState
+  version: string | null
+  ageOfLatestBlock: number | null
 }

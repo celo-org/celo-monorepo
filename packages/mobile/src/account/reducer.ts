@@ -1,10 +1,10 @@
 import { isE164Number } from '@celo/utils/src/phoneNumbers'
 import { Actions, ActionTypes } from 'src/account/actions'
-import { PaymentRequest } from 'src/account/types'
 import { DEV_SETTINGS_ACTIVE_INITIALLY } from 'src/config'
 import { features } from 'src/flags'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { getRemoteTime } from 'src/utils/time'
+import { Actions as Web3Actions, ActionTypes as Web3ActionTypes } from 'src/web3/actions'
 
 export interface State {
   name: string | null
@@ -20,14 +20,13 @@ export interface State {
   backupCompleted: boolean
   backupDelayedTime: number
   socialBackupCompleted: boolean
-  incomingPaymentRequests: PaymentRequest[]
-  outgoingPaymentRequests: PaymentRequest[]
-  dismissedEarnRewards: boolean
   dismissedInviteFriends: boolean
   dismissedGetVerified: boolean
   promptFornoIfNeeded: boolean
   retryVerificationWithForno: boolean
   acceptedTerms: boolean
+  hasMigratedToNewBip39: boolean
+  choseToRestoreAccount: boolean | undefined
 }
 
 export enum PincodeType {
@@ -54,22 +53,21 @@ export const initialState = {
   pincodeType: PincodeType.Unset,
   isSettingPin: false,
   accountCreationTime: 99999999999999,
-  incomingPaymentRequests: [],
-  outgoingPaymentRequests: [],
   backupCompleted: false,
   backupDelayedTime: 0,
   socialBackupCompleted: false,
-  dismissedEarnRewards: false,
   dismissedInviteFriends: false,
   dismissedGetVerified: false,
   promptFornoIfNeeded: false,
   acceptedTerms: false,
   retryVerificationWithForno: features.VERIFICATION_FORNO_RETRY,
+  hasMigratedToNewBip39: false,
+  choseToRestoreAccount: false,
 }
 
 export const reducer = (
   state: State | undefined = initialState,
-  action: ActionTypes | RehydrateAction
+  action: ActionTypes | RehydrateAction | Web3ActionTypes
 ): State => {
   switch (action.type) {
     case REHYDRATE: {
@@ -80,6 +78,23 @@ export const reducer = (
         dismissedGetVerified: false,
       }
     }
+    case Actions.CHOOSE_CREATE_ACCOUNT:
+      return {
+        ...state,
+        choseToRestoreAccount: false,
+      }
+    case Actions.CHOOSE_RESTORE_ACCOUNT:
+      return {
+        ...state,
+        choseToRestoreAccount: true,
+      }
+    case Actions.CANCEL_CREATE_OR_RESTORE_ACCOUNT:
+      return {
+        ...state,
+        choseToRestoreAccount: false,
+        pincodeType: PincodeType.Unset,
+        isSettingPin: false,
+      }
     case Actions.SET_NAME:
       return {
         ...state,
@@ -123,22 +138,22 @@ export const reducer = (
         pincodeType: PincodeType.Unset,
         isSettingPin: false,
       }
-    case Actions.SET_ACCOUNT_CREATION_TIME_ACTION:
+    case Actions.SET_ACCOUNT_CREATION_TIME:
       return {
         ...state,
         accountCreationTime: getRemoteTime(),
       }
-    case Actions.SET_BACKUP_COMPLETED_ACTION:
+    case Actions.SET_BACKUP_COMPLETED:
       return {
         ...state,
         backupCompleted: true,
       }
-    case Actions.SET_BACKUP_DELAYED_ACTION:
+    case Actions.SET_BACKUP_DELAYED:
       return {
         ...state,
         backupDelayedTime: getRemoteTime(),
       }
-    case Actions.SET_SOCIAL_BACKUP_COMPLETED_ACTION:
+    case Actions.SET_SOCIAL_BACKUP_COMPLETED:
       return {
         ...state,
         socialBackupCompleted: true,
@@ -149,21 +164,6 @@ export const reducer = (
         backupCompleted: !state.backupCompleted,
         socialBackupCompleted: false,
         backupDelayedTime: 0,
-      }
-    case Actions.UPDATE_INCOMING_PAYMENT_REQUESTS:
-      return {
-        ...state,
-        incomingPaymentRequests: action.paymentRequests,
-      }
-    case Actions.UPDATE_OUTGOING_PAYMENT_REQUESTS:
-      return {
-        ...state,
-        outgoingPaymentRequests: action.paymentRequests,
-      }
-    case Actions.DISMISS_EARN_REWARDS:
-      return {
-        ...state,
-        dismissedEarnRewards: true,
       }
     case Actions.DISMISS_INVITE_FRIENDS:
       return {
@@ -195,6 +195,12 @@ export const reducer = (
       }
     case Actions.ACCEPT_TERMS: {
       return { ...state, acceptedTerms: true }
+    }
+    case Web3Actions.SET_ACCOUNT: {
+      return {
+        ...state,
+        hasMigratedToNewBip39: true,
+      }
     }
     default:
       return state

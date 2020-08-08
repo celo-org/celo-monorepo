@@ -6,7 +6,7 @@ import { createRef } from 'react'
 import sleep from 'sleep-promise'
 import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -93,7 +93,7 @@ export async function ensurePincode(): Promise<boolean> {
 
   if (pincodeType === PincodeType.Unset) {
     Logger.error(TAG + '@ensurePincode', 'Pin has never been set')
-    ValoraAnalytics.track(AnalyticsEvents.pin_never_set)
+    ValoraAnalytics.track(OnboardingEvents.pin_never_set)
     return false
   }
 
@@ -131,11 +131,21 @@ export function navigateBack(params?: object) {
     })
 }
 
-export function navigateHome(params?: object) {
+interface NavigateHomeOptions {
+  onAfterNavigate?: () => void
+  params?: StackParamList[Screens.DrawerNavigator]
+}
+
+export function navigateHome(options?: NavigateHomeOptions) {
+  const { onAfterNavigate, params } = options ?? {}
   navigationRef.current?.reset({
     index: 0,
     routes: [{ name: Screens.DrawerNavigator, params }],
   })
+
+  if (onAfterNavigate) {
+    requestAnimationFrame(onAfterNavigate)
+  }
 }
 
 export function navigateToError(errorMessage: string, error?: Error) {

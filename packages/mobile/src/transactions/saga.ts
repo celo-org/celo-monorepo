@@ -3,8 +3,6 @@ import '@react-native-firebase/database'
 import '@react-native-firebase/messaging'
 import { call, put, select, spawn, take, takeEvery, takeLatest } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
-import { AnalyticsEvents } from 'src/analytics/Events'
-import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { fetchGoldBalance } from 'src/goldToken/actions'
@@ -90,7 +88,6 @@ export function* sendAndMonitorTransaction<T>(
     if (currency === CURRENCY_ENUM.GOLD) {
       yield put(fetchGoldBalance())
     } else if (currency === CURRENCY_ENUM.DOLLAR) {
-      ValoraAnalytics.track(AnalyticsEvents.send_dollar_transaction_confirmed)
       yield put(fetchDollarBalance())
     } else {
       // Fetch both balances for exchange

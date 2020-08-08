@@ -141,12 +141,11 @@ There are a number of environment variables in this guide, and you may use this 
 | CELO_ATTESTATION_SERVICE_URL              | The URL to access the deployed Attestation Service                                                                                   |
 | METADATA_URL                         | The URL to access the metadata file for your Attestation Service                                                                     |
 | DATABASE_URL                         | The URL under which your database is accessible, currently supported are `postgres://`, `mysql://` and `sqlite://`                   |
-| APP_SIGNATURE                        | The hash with which clients can auto-read SMS messages on android                                                                    |
 | SMS_PROVIDERS                        | A comma-separated list of providers you want to configure, Celo currently supports `nexmo` & `twilio`                                   |
 
 ## Network Deployment Timeline
 
-The setup of RC1 is similar to the new Baklava network and the deployment timeline is as follows (all dates are subject to change):
+The setup of mainnet is similar to the new Baklava network and the deployment timeline is as follows (all dates are subject to change):
 
 Done:
 * 4/19 00:00 UTC: Docker image with genesis block distributed
@@ -173,10 +172,10 @@ This section outlines the steps needed to configure your Proxy and Validator nod
 
 ### Environment Variables
 
-First we are going to set up the main environment variables related to the RC1 network. Run these on both your **Validator** and **Proxy** machines:
+First we are going to set up the main environment variables related to the mainnet network. Run these on both your **Validator** and **Proxy** machines:
 
 ```bash
-export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:rc1
+export CELO_IMAGE=us.gcr.io/celo-org/celo-node:mainnet
 export NETWORK_ID=42220
 ```
 
@@ -188,7 +187,7 @@ In all the commands we are going to see the `CELO_IMAGE` variable to refer to th
 docker pull $CELO_IMAGE
 ```
 
-The `us.gcr.io/celo-testnet/celo-node:rc1` image contains the [genesis block](https://github.com/celo-org/celo-monorepo/blob/master/packages/celotool/genesis_rc1.json) in addition to the Celo Blockchain binary.
+The `us.gcr.io/celo-org/celo-node:mainnet` image contains the [genesis block](https://github.com/celo-org/celo-monorepo/blob/master/packages/celotool/genesis_rc1.json) in addition to the Celo Blockchain binary.
 
 ### Start your Accounts node
 
@@ -610,7 +609,7 @@ celocli election:show $CELO_VALIDATOR_RG_ADDRESS --voter
 Users in the Celo protocol receive epoch rewards for voting in Validator Elections only after submitting a special transaction to enable rewards. This must be done every time new votes are cast, and can only be made after the most recent epoch has ended. For convenience, we can use the following command, which will wait until the epoch has ended before sending a transaction:
 
 {% hint style="info" %}
-Epoch lengths in the RC1 network are set to be the number of blocks produced in a day. As a result, votes may need to be activated up to 24 hours after they are cast.
+Epoch lengths in the mainnet network are set to be the number of blocks produced in a day. As a result, votes may need to be activated up to 24 hours after they are cast.
 {% endhint %}
 
 ```bash
@@ -701,7 +700,7 @@ Next we will set up the Attestation Service itself. First, specify the following
 
 ```bash
 # On the Attestation machine
-export CELO_IMAGE_ATTESTATION=us.gcr.io/celo-testnet/celo-monorepo:attestation-service-rc1
+export CELO_IMAGE_ATTESTATION=us.gcr.io/celo-testnet/celo-monorepo:attestation-service-1-0-1
 # if you followed the instruction of setting up the attestation signer
 export CELO_PROVIDER=http://localhost:8545
 ```
@@ -721,11 +720,7 @@ Twilio is the most common and popular provider. For that you will need to provis
 | TWILIO_AUTH_TOKEN            | The API authentication token                                    |
 | TWILIO_BLACKLIST             | A comma-separated list of country codes you do not want to serve |
 
-After you signed up for Twilio at [https://www.twilio.com/try-twilio](https://www.twilio.com/try-twilio), you should see your `ACCOUNT SID` and your `AUTH_TOKEN` in the top right of the console. You'll also want to enter in a credit card to fund the account. For most text messages, the costs are typically very low (and significantly lower than the attestation fee paid by the user). Find a more comprehensive price list at [https://www.twilio.com/sms/pricing](https://www.twilio.com/sms/pricing). If there are countries that you do not want to serve, you can specify them with the `TWILIO_BLACKLIST`. In any case, you'll want to adjust your Geo settings to serve phone numbers globally under [https://www.twilio.com/console/sms/settings/geo-permissions](https://www.twilio.com/console/sms/settings/geo-permissions).
-
-{% hint style="info" %}
-Make sure you can serve requests for numbers in US, Europe, Australia, Mexico, Argentina, the Philippines, and Kenya.
-{% endhint %}
+After you signed up for Twilio at [https://www.twilio.com/try-twilio](https://www.twilio.com/try-twilio), you should see your `ACCOUNT SID` and your `AUTH_TOKEN` in the top right of the console. You'll also want to enter in a credit card to fund the account. For most text messages, the costs are typically very low (and significantly lower than the attestation fee paid by the user). Find a more comprehensive price list at [https://www.twilio.com/sms/pricing](https://www.twilio.com/sms/pricing). If there are countries that you do not want to serve, you can specify them with the `TWILIO_BLACKLIST`. In any case, you'll want to adjust your Geo settings to serve phone numbers globally under [https://www.twilio.com/console/sms/settings/geo-permissions](https://www.twilio.com/console/sms/settings/geo-permissions). Otherwise, the service will not be sending SMS to Celo's global user base and your validator will negatively impact the Celo user experience.
 
 To actually be able to send SMS, you need to create a messaging service under [Programmable SMS > SMS](https://www.twilio.com/console/sms/services). The resulting `SID` you want to specify under the `TWILIO_MESSAGING_SERVICE_SID`. Now that you have provisioned your messaging service, you need to buy at least 1 phone number to send SMS from. You can do so under the `Numbers` option of the messaging service page. To maximize the chances of reliable and prompt SMS sending (and thus attestation fee revenue), you can buy numbers in many locales, and Twilio will intelligently select the best number to send each SMS.
 

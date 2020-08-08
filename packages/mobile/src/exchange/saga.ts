@@ -3,10 +3,11 @@ import { ExchangeWrapper } from '@celo/contractkit/lib/wrappers/Exchange'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
 import { ReserveWrapper } from '@celo/contractkit/lib/wrappers/Reserve'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
+import { CELO_AMOUNT_FOR_ESTIMATE, DOLLAR_AMOUNT_FOR_ESTIMATE } from '@celo/utils/src/celoHistory'
 import BigNumber from 'bignumber.js'
 import { all, call, put, select, spawn, takeEvery, takeLatest } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { CeloExchangeEvents, FeeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -40,8 +41,6 @@ import * as util from 'util'
 
 const TAG = 'exchange/saga'
 
-const LARGE_DOLLARS_SELL_AMOUNT_IN_WEI = new BigNumber(1000 * 1000000000000000000) // To estimate exchange rate from exchange contract
-const LARGE_GOLD_SELL_AMOUNT_IN_WEI = new BigNumber(100 * 1000000000000000000)
 const EXCHANGE_DIFFERENCE_TOLERATED = 0.01 // Maximum difference between actual and displayed takerAmount
 
 export function* doFetchTobinTax({ makerAmount, makerToken }: FetchTobinTaxAction) {
@@ -76,7 +75,7 @@ export function* doFetchTobinTax({ makerAmount, makerToken }: FetchTobinTaxActio
     Logger.debug(TAG, `Retrieved Tobin tax rate: ${tobinTax}`)
     yield put(setTobinTax(tobinTax.toString()))
   } catch (error) {
-    ValoraAnalytics.track(AnalyticsEvents.fetch_tobin_tax_failed, { error: error.message })
+    ValoraAnalytics.track(FeeEvents.fetch_tobin_tax_failed, { error: error.message })
     Logger.error(TAG, 'Error fetching Tobin tax', error)
     yield put(showError(ErrorMessages.CALCULATE_FEE_FAILED))
   }
@@ -87,6 +86,7 @@ export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
 
   const { makerToken, makerAmount } = action
   try {
+    ValoraAnalytics.track(CeloExchangeEvents.celo_fetch_exchange_rate_start)
     yield call(getConnectedAccount)
 
     let makerAmountInWei
@@ -103,11 +103,11 @@ export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
     const goldMakerAmount =
       makerAmountInWei && !makerAmountInWei.isZero() && makerToken === CURRENCY_ENUM.GOLD
         ? makerAmountInWei
-        : LARGE_GOLD_SELL_AMOUNT_IN_WEI
+        : CELO_AMOUNT_FOR_ESTIMATE
     const dollarMakerAmount =
       makerAmountInWei && !makerAmountInWei.isZero() && makerToken === CURRENCY_ENUM.DOLLAR
         ? makerAmountInWei
-        : LARGE_DOLLARS_SELL_AMOUNT_IN_WEI
+        : DOLLAR_AMOUNT_FOR_ESTIMATE
 
     const contractKit = yield call(getContractKit)
 
@@ -139,8 +139,15 @@ export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
         dollarMaker: dollarMakerExchangeRate.toString(),
       })
     )
+    // Always tracking in dollars for consistancy
+    ValoraAnalytics.track(CeloExchangeEvents.celo_fetch_exchange_rate_complete, {
+      makerAmount: dollarMakerAmount,
+      exchangeRate: dollarMakerExchangeRate.toNumber(),
+    })
   } catch (error) {
-    ValoraAnalytics.track(AnalyticsEvents.fetch_exchange_rate_failed, { error: error.message })
+    ValoraAnalytics.track(CeloExchangeEvents.celo_fetch_exchange_rate_error, {
+      error: error.message,
+    })
     Logger.error(TAG, 'Error fetching exchange rate', error)
     yield put(showError(ErrorMessages.EXCHANGE_RATE_FAILED))
   }
@@ -153,19 +160,20 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
   let txId: string | null = null
   try {
     navigate(Screens.ExchangeHomeScreen) // Must navigate to final screen before getting unlocked account which prompts pin
+    ValoraAnalytics.track(CeloExchangeEvents.celo_exchange_start)
     const account: string = yield call(getConnectedUnlockedAccount)
     const exchangeRatePair: ExchangeRatePair = yield select(exchangeRatePairSelector)
     const exchangeRate = getRateForMakerToken(exchangeRatePair, makerToken)
     if (!exchangeRate) {
-      ValoraAnalytics.track(AnalyticsEvents.invalid_exchange_rate, {
-        context: 'Invalid exchange rate from exchange contract',
+      ValoraAnalytics.track(CeloExchangeEvents.celo_exchange_error, {
+        error: 'Invalid exchange rate from exchange contract',
       })
       Logger.error(TAG, 'Invalid exchange rate from exchange contract')
       return
     }
     if (exchangeRate.isZero()) {
-      ValoraAnalytics.track(AnalyticsEvents.invalid_exchange_rate, {
-        context: 'Cannot do exchange with rate of 0',
+      ValoraAnalytics.track(CeloExchangeEvents.celo_exchange_error, {
+        error: 'Cannot do exchange with rate of 0',
       })
       Logger.error(TAG, 'Cannot do exchange with rate of 0. Stopping.')
       throw new Error('Invalid exchange rate')
@@ -203,8 +211,8 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
 
     const exceedsExpectedSize =
       makerToken === CURRENCY_ENUM.GOLD
-        ? convertedMakerAmount.isGreaterThan(LARGE_GOLD_SELL_AMOUNT_IN_WEI)
-        : convertedMakerAmount.isGreaterThan(LARGE_DOLLARS_SELL_AMOUNT_IN_WEI)
+        ? convertedMakerAmount.isGreaterThan(CELO_AMOUNT_FOR_ESTIMATE)
+        : convertedMakerAmount.isGreaterThan(DOLLAR_AMOUNT_FOR_ESTIMATE)
 
     if (exceedsExpectedSize) {
       Logger.error(
@@ -221,10 +229,8 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     )
     const updatedTakerAmount = getTakerAmount(makerAmount, updatedExchangeRate)
     if (minimumTakerAmount.isGreaterThan(updatedTakerAmount)) {
-      ValoraAnalytics.track(AnalyticsEvents.exchange_rate_change_failure, {
-        makerToken,
-        takerAmount: updatedTakerAmount.toString(),
-        context: `Expected ${minimumTakerAmount}`,
+      ValoraAnalytics.track(CeloExchangeEvents.celo_exchange_error, {
+        error: `Not receiving enough ${makerToken}. Expected ${minimumTakerAmount} but received ${updatedTakerAmount.toString()}`,
       })
       Logger.error(
         TAG,
@@ -258,7 +264,9 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
         convertedMakerAmount.toString()
       )
     } else {
-      ValoraAnalytics.track(AnalyticsEvents.unexpected_maker_token, { makerToken })
+      ValoraAnalytics.track(CeloExchangeEvents.celo_exchange_error, {
+        error: `Unexpected maker token: ${makerToken}`,
+      })
       Logger.error(TAG, `Unexpected maker token ${makerToken}`)
       return
     }
@@ -274,18 +282,23 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     )
 
     if (!txId) {
-      ValoraAnalytics.track(AnalyticsEvents.missing_tx_id)
+      ValoraAnalytics.track(CeloExchangeEvents.celo_exchange_error, { error: 'Missing tx id ' })
       Logger.error(TAG, 'No txId. Did not exchange.')
       return
     }
     yield call(sendAndMonitorTransaction, txId, tx, account)
+    ValoraAnalytics.track(CeloExchangeEvents.celo_exchange_complete, {
+      txId,
+      currency: makerToken,
+      amount: makerAmount.toString(),
+    })
   } catch (error) {
-    ValoraAnalytics.track(AnalyticsEvents.exchange_failed, { error: error.message })
+    ValoraAnalytics.track(CeloExchangeEvents.celo_exchange_error, { error: error.message })
     Logger.error(TAG, 'Error doing exchange', error)
     const isDollarToGold = makerToken === CURRENCY_ENUM.DOLLAR
 
     ValoraAnalytics.track(
-      isDollarToGold ? AnalyticsEvents.gold_buy_error : AnalyticsEvents.gold_sell_error,
+      isDollarToGold ? CeloExchangeEvents.celo_buy_error : CeloExchangeEvents.celo_sell_error,
       {
         error,
       }

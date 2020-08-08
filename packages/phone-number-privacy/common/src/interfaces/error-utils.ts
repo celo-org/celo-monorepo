@@ -7,9 +7,10 @@ export enum ErrorMessage {
   SIGNATURE_COMPUTATION_FAILURE = 'CELO_PNP_ERR_05 SIG_ERR Failed to compute BLS signature',
   VERIFY_PARITAL_SIGNATURE_ERROR = 'CELO_PNP_ERR_06 SIG_ERR BLS partial signature verification Failure',
   NOT_ENOUGH_PARTIAL_SIGNATURES = 'CELO_PNP_ERR_07 SIG_ERR Not enough partial signatures',
-  INCONSISTENT_SINGER_RESPONSES = 'CELO_PNP_ERR_08 SIG_ERR Inconsistent responses from signers',
+  INCONSISTENT_SIGNER_RESPONSES = 'CELO_PNP_ERR_08 SIG_ERR Inconsistent responses from signers',
   ERROR_REQUESTING_SIGNATURE = 'CELO_PNP_ERR_09 SIG_ERR Failed to request signature from signer',
   TIMEOUT_FROM_SIGNER = 'CELO_PNP_ERR_10 SIG_ERR Timeout from signer',
+  CONTRACT_GET_FAILURE = 'CELO_PNP_ERR_11 SIG_ERR Failed to read contract state',
 }
 
 export enum WarningMessage {

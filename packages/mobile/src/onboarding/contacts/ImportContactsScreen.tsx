@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { IdentityEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import i18n, { Namespaces } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
@@ -19,8 +19,8 @@ import { ImportContactsStatus } from 'src/identity/types'
 import { HeaderTitleWithSubtitle, nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
+import TopBarTextButtonOnboarding from 'src/onboarding/TopBarTextButtonOnboarding'
 import { requestContactsPermission } from 'src/utils/permissions'
 
 type ScreenProps = StackScreenProps<StackParamList, Screens.ImportContacts>
@@ -85,11 +85,11 @@ function ImportContactsScreen({ route, navigation }: Props) {
   }
 
   const onPressConnect = async () => {
-    ValoraAnalytics.track(AnalyticsEvents.import_contacts)
-    const hasGivenContactPermission = await requestContactsPermission()
-    if (hasGivenContactPermission) {
-      dispatch(importContacts(isFindMeSwitchChecked))
-    }
+    ValoraAnalytics.track(IdentityEvents.contacts_connect, {
+      matchMakingEnabled: isFindMeSwitchChecked,
+    })
+    await requestContactsPermission()
+    dispatch(importContacts(isFindMeSwitchChecked))
   }
 
   const onToggleFindMeSwitch = (value: boolean) => {
@@ -168,11 +168,10 @@ ImportContactsScreen.navigationOptions = ({ route }: ScreenProps) => {
     ),
     headerRight: !importDone
       ? () => (
-          <TopBarTextButton
+          <TopBarTextButtonOnboarding
             title={i18n.t('global:skip')}
             testID="ImportContactsSkip"
             onPress={onPressSkip}
-            titleStyle={styles.skipButtonStyle}
           />
         )
       : () => null,
@@ -227,8 +226,5 @@ const styles = StyleSheet.create({
   switchText: {
     ...fontStyles.regular500,
     paddingLeft: 8,
-  },
-  skipButtonStyle: {
-    color: colors.goldDark,
   },
 })

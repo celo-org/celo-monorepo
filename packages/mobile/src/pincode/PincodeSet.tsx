@@ -10,7 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { setPincode } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -20,6 +20,11 @@ import { StackParamList } from 'src/navigator/types'
 import { DEFAULT_CACHE_ACCOUNT, isPinValid } from 'src/pincode/authentication'
 import { setCachedPin } from 'src/pincode/PasswordCache'
 import Pincode from 'src/pincode/Pincode'
+import { RootState } from 'src/redux/reducers'
+
+interface StateProps {
+  choseToRestoreAccount: boolean | undefined
+}
 
 interface DispatchProps {
   setPincode: typeof setPincode
@@ -33,7 +38,13 @@ interface State {
 
 type ScreenProps = StackScreenProps<StackParamList, Screens.PincodeSet>
 
-type Props = ScreenProps & DispatchProps & WithTranslation
+type Props = ScreenProps & StateProps & DispatchProps & WithTranslation
+
+function mapStateToProps(state: RootState): StateProps {
+  return {
+    choseToRestoreAccount: state.account.choseToRestoreAccount,
+  }
+}
 
 const mapDispatchToProps = {
   setPincode,
@@ -46,6 +57,14 @@ export class PincodeSet extends React.Component<Props, State> {
     pin1: '',
     pin2: '',
     errorText: undefined,
+  }
+
+  getNextScreen = () => {
+    if (this.props.choseToRestoreAccount) {
+      return Screens.ImportWallet
+    }
+
+    return Screens.EnterInviteCode
   }
 
   onChangePin1 = (pin1: string) => {
@@ -68,7 +87,7 @@ export class PincodeSet extends React.Component<Props, State> {
     if (this.isPin1Valid(this.state.pin1)) {
       this.props.navigation.setParams({ isVerifying: true })
     } else {
-      ValoraAnalytics.track(AnalyticsEvents.pin_invalid, { error: 'Pin is invalid' })
+      ValoraAnalytics.track(OnboardingEvents.pin_invalid, { error: 'Pin is invalid' })
       this.setState({
         pin1: '',
         pin2: '',
@@ -82,11 +101,11 @@ export class PincodeSet extends React.Component<Props, State> {
     if (this.isPin1Valid(pin1) && this.isPin2Valid(pin2)) {
       setCachedPin(DEFAULT_CACHE_ACCOUNT, pin1)
       this.props.setPincode(PincodeType.CustomPin)
-      ValoraAnalytics.track(AnalyticsEvents.pin_created)
-      this.props.navigation.navigate(Screens.EnterInviteCode)
+      ValoraAnalytics.track(OnboardingEvents.pin_set)
+      this.props.navigation.navigate(this.getNextScreen())
     } else {
       this.props.navigation.setParams({ isVerifying: false })
-      ValoraAnalytics.track(AnalyticsEvents.pin_invalid, { error: 'Pins do not match' })
+      ValoraAnalytics.track(OnboardingEvents.pin_invalid, { error: 'Pins do not match' })
       this.setState({
         pin1: '',
         pin2: '',
@@ -102,7 +121,7 @@ export class PincodeSet extends React.Component<Props, State> {
 
     return (
       <SafeAreaView style={style.container}>
-        <DevSkipButton nextScreen={Screens.EnterInviteCode} />
+        <DevSkipButton nextScreen={this.getNextScreen()} />
         {isVerifying ? (
           // Verify
           <Pincode
@@ -133,7 +152,7 @@ const style = StyleSheet.create({
   },
 })
 
-export default connect<{}, DispatchProps>(
-  null,
+export default connect<StateProps, DispatchProps, {}, RootState>(
+  mapStateToProps,
   mapDispatchToProps
 )(withTranslation<Props>(Namespaces.onboarding)(PincodeSet))

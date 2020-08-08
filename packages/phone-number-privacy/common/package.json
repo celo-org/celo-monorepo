@@ -1,6 +1,6 @@
 {
   "name": "@celo/phone-number-privacy-common",
-  "version": "1.0.0",
+  "version": "1.0.6-dev",
   "description": "Common library for the combiner and signer libraries",
   "author": "Celo",
   "license": "Apache-2.0",

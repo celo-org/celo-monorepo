@@ -1,13 +1,20 @@
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { ApolloProvider } from 'react-apollo'
-import { DeviceEventEmitter, Linking, Platform, StatusBar, YellowBox } from 'react-native'
+import {
+  DeviceEventEmitter,
+  Dimensions,
+  Linking,
+  Platform,
+  StatusBar,
+  YellowBox,
+} from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { enableScreens } from 'react-native-screens'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
-import { AnalyticsEvents } from 'src/analytics/Events'
+import { AppEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { apolloClient } from 'src/apollo/index'
 import { openDeepLink } from 'src/app/actions'
@@ -47,20 +54,28 @@ BigNumber.config({
 export class App extends React.Component {
   async componentDidMount() {
     await ValoraAnalytics.init()
-    const appLoadedAt: Date = new Date()
+    const appLoadedMillis: number = Date.now()
+    const { width, height } = Dimensions.get('window')
 
     if (Platform.OS === 'android') {
       const appStartListener = DeviceEventEmitter.addListener(
         'AppStartedLoading',
-        (appInitializedAtString: string) => {
-          const appInitializedAt = new Date(appInitializedAtString)
-          const loadingDuration = appLoadedAt.getTime() - appInitializedAt.getTime()
-          ValoraAnalytics.startSession(AnalyticsEvents.app_launched, { loadingDuration })
+        (appStartedMillisStr: string) => {
+          const appStartedMillis: number = +appStartedMillisStr
+          const loadingDuration = appLoadedMillis - appStartedMillis
+          ValoraAnalytics.startSession(AppEvents.app_launched, {
+            loadingDuration,
+            deviceHeight: height,
+            deviceWidth: width,
+          })
           appStartListener.remove()
         }
       )
     } else {
-      ValoraAnalytics.startSession(AnalyticsEvents.app_launched, { loadingDuration: null })
+      ValoraAnalytics.startSession(AppEvents.app_launched, {
+        deviceHeight: height,
+        deviceWidth: width,
+      })
     }
 
     Linking.addEventListener('url', this.handleOpenURL)
