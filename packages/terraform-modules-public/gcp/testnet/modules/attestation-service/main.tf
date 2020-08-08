@@ -1,5 +1,6 @@
 locals {
   name_prefix = "${var.gcloud_project}-attestation-service"
+  #name_prefix = "${var.celo_env}-attestation-service"
 }
 
 resource "google_sql_database_instance" "master" {

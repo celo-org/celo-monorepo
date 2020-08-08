@@ -12,7 +12,8 @@ cat <<'EOF' > '/etc/logrotate.d/rsyslog'
         delaycompress
         compress
         postrotate
-                invoke-rc.d rsyslog rotate > /dev/null
+                #invoke-rc.d rsyslog rotate > /dev/null
+                kill -HUP `pidof rsyslogd`
         endscript
 }
 
@@ -29,7 +30,8 @@ cat <<'EOF' > '/etc/logrotate.d/rsyslog'
         delaycompress
         compress
         postrotate
-                invoke-rc.d rsyslog rotate > /dev/null
+                #invoke-rc.d rsyslog rotate > /dev/null
+                kill -HUP `pidof rsyslogd`
         endscript
 }
 
@@ -49,7 +51,8 @@ cat <<'EOF' > '/etc/logrotate.d/rsyslog'
         delaycompress
         sharedscripts
         postrotate
-                invoke-rc.d rsyslog rotate > /dev/null
+                #invoke-rc.d rsyslog rotate > /dev/null
+                kill -HUP `pidof rsyslogd`
         endscript
 }
 EOF
@@ -164,6 +167,7 @@ sleep 5
 #note this will likely need to be upgraded to rsync, as the tar operation is slow on the persistent disk storage
 tar -C /root/.celo/celo -zcvf /root/chaindata.tgz chaindata
 gsutil cp /root/chaindata.tgz gs://${gcloud_project}-chaindata
+rm -f /root/chaindata.tgz
 sleep 3
 systemctl start geth.service
 EOF

@@ -22,8 +22,8 @@ resource "google_compute_instance" "proxy" {
   name         = "${local.name_prefix}-${count.index}"
   machine_type = var.instance_type
 
-  #deletion_protection = false
-  deletion_protection = true
+  deletion_protection = false
+  #deletion_protection = true
 
   count = var.validator_count
 
