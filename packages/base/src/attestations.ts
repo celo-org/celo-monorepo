@@ -1,4 +1,4 @@
-import { PhoneNumberUtils } from './phoneNumbers'
+import { getPhoneHash } from './phoneNumbers'
 
 const DEFAULT_NUM_ATTESTATIONS_REQUIRED = 3
 const DEFAULT_ATTESTATION_THRESHOLD = 0.25
@@ -27,7 +27,7 @@ export function hashIdentifier(
 ) {
   switch (type) {
     case IdentifierType.PHONE_NUMBER:
-      return PhoneNumberUtils.getPhoneHash(sha3, identifier, salt)
+      return getPhoneHash(sha3, identifier, salt)
     default:
       throw new Error('Unsupported Identifier Type')
   }
