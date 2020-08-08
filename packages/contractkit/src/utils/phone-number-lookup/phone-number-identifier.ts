@@ -72,7 +72,7 @@ export async function getPhoneNumberIdentifier(
 
   debug('Converting sig to salt')
   const salt = getSaltFromThresholdSignature(sigBuf)
-  const phoneHash = getPhoneHash(e164Number, salt, sha3)
+  const phoneHash = getPhoneHash(sha3, e164Number, salt)
   return { e164Number, phoneHash, salt }
 }
 
