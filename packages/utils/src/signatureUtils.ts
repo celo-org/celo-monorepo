@@ -1,14 +1,16 @@
-import * as base from '@celo/base/lib/signatureUtils'
+import { NativeSigner, serializeSignature, Signer } from '@celo/base/lib/signatureUtils'
 import * as Web3Utils from 'web3-utils'
 import { eqAddress, privateKeyToAddress } from './address'
 
 // Exports moved to @celo/base, forwarding them
 // here for backwards compatibility
-export import POP_SIZE = base.POP_SIZE
-export import NativeSigner = base.NativeSigner
-export import Signature = base.Signature
-export import serializeSignature = base.serializeSignature
-
+export {
+  NativeSigner,
+  POP_SIZE,
+  serializeSignature,
+  Signature,
+  Signer,
+} from '@celo/base/lib/signatureUtils'
 const ethjsutil = require('ethereumjs-util')
 
 // If messages is a hex, the length of it should be the number of bytes
@@ -28,8 +30,6 @@ export function hashMessageWithPrefix(message: string) {
 export function hashMessage(message: string): string {
   return Web3Utils.soliditySha3({ type: 'string', value: message })
 }
-
-export import Signer = base.Signer
 
 export async function addressToPublicKey(
   signer: string,

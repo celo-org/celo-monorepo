@@ -1,10 +1,8 @@
-import * as base from '@celo/base/lib/parsing'
 import BigNumber from 'bignumber.js'
 
 // Exports moved to @celo/base, forwarding them
 // here for backwards compatibility
-export import stringToBoolean = base.stringToBoolean
-export import parseSolidityStringArray = base.parseSolidityStringArray
+export { parseSolidityStringArray, stringToBoolean } from '@celo/base/lib/parsing'
 
 export const parseInputAmount = (inputString: string, decimalSeparator = '.'): BigNumber => {
   if (decimalSeparator !== '.') {

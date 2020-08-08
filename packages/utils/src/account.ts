@@ -1,15 +1,23 @@
-import * as base from '@celo/base/lib/account'
+import {
+  Bip39,
+  CELO_DERIVATION_PATH_BASE,
+  MnemonicLanguages,
+  MnemonicStrength,
+  RandomNumberGenerator,
+} from '@celo/base/lib/account'
 import * as bip32 from 'bip32'
 import * as bip39 from 'bip39'
 import randomBytes from 'randombytes'
 
 // Exports moved to @celo/base, forwarding them
 // here for backwards compatibility
-export import CELO_DERIVATION_PATH_BASE = base.CELO_DERIVATION_PATH_BASE
-export import MnemonicStrength = base.MnemonicStrength
-export import MnemonicLanguages = base.MnemonicLanguages
-export type RandomNumberGenerator = base.RandomNumberGenerator
-export import Bip39 = base.Bip39
+export {
+  Bip39,
+  CELO_DERIVATION_PATH_BASE,
+  MnemonicLanguages,
+  MnemonicStrength,
+  RandomNumberGenerator,
+} from '@celo/base/lib/account'
 
 function defaultGenerateMnemonic(
   strength?: number,

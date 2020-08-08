@@ -1,12 +1,14 @@
-import * as base from '@celo/base/lib/inputValidation'
+import { BaseProps, validateDecimal, validateInteger } from '@celo/base/lib/inputValidation'
 import { getDisplayPhoneNumber } from './phoneNumbers'
 
 // Exports moved to @celo/base, forwarding them
 // here for backwards compatibility
-export import ValidatorKind = base.ValidatorKind
-export import BaseProps = base.BaseProps
-export import validateInteger = base.validateInteger
-export import validateDecimal = base.validateDecimal
+export {
+  BaseProps,
+  validateDecimal,
+  validateInteger,
+  ValidatorKind,
+} from '@celo/base/lib/inputValidation'
 
 export function validatePhone(input: string, countryCallingCode?: string): string {
   input = input.replace(/[^0-9()\- ]/g, '')

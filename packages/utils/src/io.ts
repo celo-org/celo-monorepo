@@ -1,4 +1,4 @@
-import * as base from '@celo/base/lib/io'
+import { URL_REGEX } from '@celo/base/lib/io'
 import { isValidPublic, toChecksumAddress } from 'ethereumjs-util'
 import { either } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
@@ -7,8 +7,7 @@ import { isE164NumberStrict } from './phoneNumbers'
 
 // Exports moved to @celo/base, forwarding them
 // here for backwards compatibility
-export import URL_REGEX = base.URL_REGEX
-export import isValidUrl = base.isValidUrl
+export { isValidUrl, URL_REGEX } from '@celo/base/lib/io'
 
 export const UrlType = new t.Type<string, string, unknown>(
   'Url',

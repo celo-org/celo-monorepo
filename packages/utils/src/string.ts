@@ -1,9 +1,7 @@
-import * as base from '@celo/base/lib/string'
-
+import { appendPath } from '@celo/base/lib/string'
 // Exports moved to @celo/base, forwarding them
 // here for backwards compatibility
-export import appendPath = base.appendPath
-
+export { appendPath } from '@celo/base/lib/string'
 export const StringUtils = {
   appendPath,
 }

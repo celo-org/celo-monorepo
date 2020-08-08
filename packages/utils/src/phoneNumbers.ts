@@ -1,4 +1,8 @@
-import * as base from '@celo/base/lib/phoneNumbers'
+import {
+  getPhoneHash as baseGetPhoneHash,
+  isE164Number,
+  ParsedPhoneNumber,
+} from '@celo/base/lib/phoneNumbers'
 import CountryData from 'country-data'
 import {
   PhoneNumber,
@@ -10,13 +14,12 @@ import { soliditySha3 } from 'web3-utils'
 
 // Exports moved to @celo/base, forwarding them
 // here for backwards compatibility
-export import ParsedPhoneNumber = base.ParsedPhoneNumber
+export { anonymizedPhone, isE164Number, ParsedPhoneNumber } from '@celo/base/lib/phoneNumbers'
+
 const sha3 = (v: string): string | null => soliditySha3({ type: 'string', value: v })
 export const getPhoneHash = (phoneNumber: string, salt?: string): string => {
-  return base.getPhoneHash(sha3, phoneNumber, salt)
+  return baseGetPhoneHash(sha3, phoneNumber, salt)
 }
-export import isE164Number = base.isE164Number
-export import anonymizedPhone = base.anonymizedPhone
 
 const phoneUtil = PhoneNumberUtil.getInstance()
 const MIN_PHONE_LENGTH = 4
