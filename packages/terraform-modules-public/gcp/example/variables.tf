@@ -66,8 +66,7 @@ variable geth_node_docker_image {
 
   default = {
     repository = "us.gcr.io/celo-org/celo-node"
-    tag        = "f4bda6d027f0af6c68ae4d146abe791739ae6cba
-    # critical security fix in v1.0.1 on this tag"
+    tag        = "mainnet"
   }
 }
 
@@ -144,8 +143,7 @@ variable proxy_name {
 variable reset_geth_data {
   type        = bool
   description = "Specifies if the existing chain data should be removed while creating the instance"
-  default     = false
-  #default     = true    #use if chain is corrupted and we need to rebuild.
+  default     = true    #will restore chaindata from GCS if available
 }
 
 variable geth_verbosity {
@@ -327,7 +325,6 @@ variable "service_account_scopes" {
   default = [
     "https://www.googleapis.com/auth/monitoring.write",
     "https://www.googleapis.com/auth/logging.write",
-    #"https://www.googleapis.com/auth/devstorage.read_write"   #hoping this isn't r/w to ALL buckets
     "https://www.googleapis.com/auth/cloud-platform"         #this gives r/w to all storage buckets, which is overly broad
     ]
 }
