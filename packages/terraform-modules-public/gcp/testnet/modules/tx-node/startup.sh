@@ -186,23 +186,16 @@ systemctl start geth.service
 EOF
 chmod u+x /root/backup_rsync.sh
 
-# ---- Add backup to cron
+# ---- Add backups to cron
 # note that this will make the txnode unavailable during the backup, so do not run on prod systems
 cat <<'EOF' > /root/backup.crontab
 # m h  dom mon dow   command
-# backup full tarball once a week
+# backup full tarball once a week at 00:57
 57 0 * * 0 /root/backup.sh > /dev/null 2>&1
-EOF
-/usr/bin/crontab /root/backup.crontab
-
-# ---- Add rsync backup to cron
-# note that this will make the txnode unavailable during the backup, so do not run on prod systems
-cat <<'EOF' > /root/backup_rsync.crontab
-# m h  dom mon dow   command
-# run every day at 00:17
+# backup via rsync run every day at 00:17
 17 0 * * * /root/backup_rsync.sh > /dev/null 2>&1
 EOF
-/usr/bin/crontab /root/backup_rsync.crontab
+/usr/bin/crontab /root/backup.crontab
 
 # ---- Create restore script
 echo "Creating chaindata restore script" | logger
