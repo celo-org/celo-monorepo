@@ -403,7 +403,3 @@ export async function addressMinedLatestBlock(address: string) {
   const block = await web3.eth.getBlock('latest')
   return isSameAddress(block.miner, address)
 }
-
-export function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
