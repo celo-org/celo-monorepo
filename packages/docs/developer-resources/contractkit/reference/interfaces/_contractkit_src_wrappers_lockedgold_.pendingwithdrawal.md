@@ -17,7 +17,7 @@
 
 • **time**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L41)*
+*Defined in [contractkit/src/wrappers/LockedGold.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L50)*
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **value**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L42)*
+*Defined in [contractkit/src/wrappers/LockedGold.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L51)*
