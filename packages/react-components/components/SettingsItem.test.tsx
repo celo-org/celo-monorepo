@@ -1,7 +1,6 @@
 import {
   SettingsItemInput,
   SettingsItemSwitch,
-  SettingsItemText,
   SettingsItemTextValue,
 } from '@celo/react-components/components/SettingsItem'
 import * as React from 'react'
@@ -27,22 +26,6 @@ describe('SettingsItemTextValue', () => {
     const onPress = jest.fn()
     const { getByTestId } = render(
       <SettingsItemTextValue testID={testID} title={title} value={value} onPress={onPress} />
-    )
-    fireEvent.press(getByTestId(testID))
-    expect(onPress).toHaveBeenCalled()
-  })
-})
-
-describe('SettingsItemText', () => {
-  it('renders correctly', () => {
-    const wrapper = render(<SettingsItemText title={title} />)
-    expect(wrapper.toJSON()).toMatchSnapshot()
-  })
-
-  it('reacts on press', () => {
-    const onPress = jest.fn()
-    const { getByTestId } = render(
-      <SettingsItemText testID={testID} title={title} onPress={onPress} />
     )
     fireEvent.press(getByTestId(testID))
     expect(onPress).toHaveBeenCalled()
