@@ -1,77 +1,45 @@
 // VIEW Paste icon that disappears when the |currentValue| passed matches the content
 // of the clipboard.
 
-import TouchableDefault from '@celo/react-components/components/Touchable'
+import Touchable from '@celo/react-components/components/Touchable'
+import {
+  PasteAwareWrappedElementProps,
+  withPasteAware,
+} from '@celo/react-components/components/WithPasteAware'
 import Paste from '@celo/react-components/icons/Paste'
 import { iconHitslop } from '@celo/react-components/styles/variables'
-import React, { useEffect, useRef, useState } from 'react'
-import { AppState, Clipboard, StyleProp, ViewStyle } from 'react-native'
+import React from 'react'
+import { StyleProp, ViewProps, ViewStyle } from 'react-native'
 
 interface PasteAwareProps {
   style?: StyleProp<ViewStyle>
   color: string
-  onPress: (text: string) => void
-  currentValue: string
   testID?: string
+  onChangeText: (text: string) => void
+  value: string
 }
 
-function ClipboardAwarePasteIcon({ currentValue, style, color, onPress, testID }: PasteAwareProps) {
-  const [isPasteIconVisible, setPasteIconVisible] = useState(false)
-  const [clipboardContent, setClipboardContent] = useState('')
-
-  const currentValueRef = useRef<string>()
-  useEffect(() => {
-    currentValueRef.current = currentValue
-  })
-
-  const checkClipboardContents = async () => {
-    try {
-      const clipboardString = await Clipboard.getString()
-      if (clipboardString && currentValueRef.current !== clipboardString) {
-        setPasteIconVisible(true)
-        setClipboardContent(clipboardString)
-      } else {
-        setPasteIconVisible(false)
-        setClipboardContent('')
+export default function ClipboardAwarePasteIcon({
+  style,
+  color,
+  testID,
+  ...otherProps
+}: PasteAwareProps) {
+  class Wrapper extends React.Component<ViewProps & PasteAwareWrappedElementProps> {
+    render() {
+      const { isPasteIconVisible, onPressPaste } = this.props
+      if (!isPasteIconVisible) {
+        return null
       }
-    } catch (error) {
-      console.error('Error checking clipboard contents', error)
+      return (
+        <Touchable testID={testID} style={style} onPress={onPressPaste} hitSlop={iconHitslop}>
+          <Paste color={color} />
+        </Touchable>
+      )
     }
   }
 
-  useEffect(() => {
-    AppState.addEventListener('change', checkClipboardContents)
-    const interval = setInterval(async () => {
-      await checkClipboardContents()
-    }, 1000) // Every 1s
-
-    checkClipboardContents().catch()
-
-    return () => {
-      AppState.removeEventListener('change', checkClipboardContents)
-      clearInterval(interval)
-    }
-  }, [])
-
-  const onPressPaste = () => {
-    if (!clipboardContent) {
-      console.error('Attempted to paste but clipboard content empty. Should never happen.')
-      return
-    }
-    setPasteIconVisible(false)
-    setClipboardContent('')
-    onPress(clipboardContent)
-  }
-
-  if (!isPasteIconVisible) {
-    return null
-  }
-
-  return (
-    <TouchableDefault testID={testID} style={style} onPress={onPressPaste} hitSlop={iconHitslop}>
-      <Paste color={color} />
-    </TouchableDefault>
-  )
+  const Icon = withPasteAware(Wrapper)
+  const shouldShowClipboard = () => true
+  return <Icon shouldShowClipboard={shouldShowClipboard} {...otherProps} />
 }
-
-export default ClipboardAwarePasteIcon

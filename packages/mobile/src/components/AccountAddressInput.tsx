@@ -23,10 +23,6 @@ export default function AccountAddressInput({
   onAddressChanged,
   color = colors.goldUI,
 }: Props) {
-  const onPasteAddress = (text: string) => {
-    onAddressChanged(text)
-  }
-
   const onPressQrCode = () => {
     navigate(Screens.WithdrawCeloQrScannerScreen, {
       onAddressScanned: onAddressChanged,
@@ -45,9 +41,9 @@ export default function AccountAddressInput({
     >
       <ClipboardAwarePasteIcon
         style={styles.paste}
-        onPress={onPasteAddress}
+        onChangeText={onAddressChanged}
         color={color}
-        currentValue={accountAddress}
+        value={accountAddress}
         testID={'PasteButton'}
       />
       <Touchable testID={'ScanQR'} borderless={true} onPress={onPressQrCode}>
