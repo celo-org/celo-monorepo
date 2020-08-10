@@ -1,4 +1,5 @@
-import { Address, CeloTx, EncodedTransaction } from '../commons'
+import { Address } from '@celo/utils/lib/address'
+import { CeloTx, EncodedTransaction } from '../commons'
 
 export interface Wallet {
   getAccounts: () => Address[]

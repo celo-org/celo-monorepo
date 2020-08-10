@@ -1,9 +1,6 @@
 import { provider, Transaction, TransactionConfig, TransactionReceipt } from 'web3-core'
 import WebCoreHelper from 'web3-core-helpers'
 
-export type Address = string
-export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000' as Address
-
 export interface CeloParams {
   feeCurrency: string
   gatewayFeeRecipient: string
@@ -23,8 +20,8 @@ export interface CeloTxObject<T> {
 export { EventLog, PromiEvent, RLPEncodedTransaction as EncodedTransaction } from 'web3-core'
 export { Block, BlockHeader } from 'web3-eth'
 
-export type CeloTxPending = Transaction & Partial<CeloParams>
-export type CeloTxReceipt = TransactionReceipt & Partial<CeloParams>
+export type CeloTxPending = Transaction & CeloParams
+export type CeloTxReceipt = TransactionReceipt & CeloParams
 
 export type Callback<T> = (error: Error | null, result?: T) => void
 
