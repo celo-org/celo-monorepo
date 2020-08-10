@@ -4,25 +4,22 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
-import TextInputWithButtons from '@celo/react-components/components/TextInputWithButtons'
-import Touchable from '@celo/react-components/components/Touchable'
-import QRCodeBorderlessIcon from '@celo/react-components/icons/QRCodeBorderless'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
-import React, { useCallback, useState } from 'react'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, Text, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { CeloExchangeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import ClipboardAwarePasteIcon from 'src/components/ClipboardAwarePasteIcon'
+import AccountAddressInput from 'src/components/AccountAddressInput'
+import CeloAmountInput from 'src/components/CeloAmountInput'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import { HeaderTitleWithBalance, headerWithBackButton } from 'src/navigator/Headers.v2'
-import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import useSelector from 'src/redux/useSelector'
@@ -45,7 +42,7 @@ function WithdrawCeloScreen({ navigation }: Props) {
     celoToTransferNumber.isGreaterThan(0) &&
     celoToTransferNumber.isLessThanOrEqualTo(goldBalanceNumber)
 
-  const onConfirm = useCallback(() => {
+  const onConfirm = () => {
     const celoAmount = new BigNumber(celoToTransfer)
     ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_review, {
       amount: celoAmount.toString(),
@@ -54,26 +51,7 @@ function WithdrawCeloScreen({ navigation }: Props) {
       amount: celoAmount,
       recipientAddress: accountAddress,
     })
-  }, [accountAddress, celoToTransfer])
-
-  const setMaxAmount = useCallback(() => {
-    if (goldBalance) {
-      setCeloToTransfer(goldBalance)
-    }
-  }, [setCeloToTransfer])
-
-  const onPasteAddress = useCallback(
-    (text) => {
-      setAccountAddress(text)
-    },
-    [setAccountAddress]
-  )
-
-  const onPressQrCode = useCallback(() => {
-    navigate(Screens.WithdrawCeloQrScannerScreen, {
-      onAddressScanned: setAccountAddress,
-    })
-  }, [])
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
@@ -83,41 +61,19 @@ function WithdrawCeloScreen({ navigation }: Props) {
         contentContainerStyle={styles.contentContainer}
       >
         <Text style={styles.inputLabel}>{t('accountAddressLabel')}</Text>
-        <TextInputWithButtons
-          style={styles.inputContainer}
+        <AccountAddressInput
+          inputContainerStyle={styles.inputContainer}
           inputStyle={styles.input}
-          placeholder={'0x1234...5678'}
-          placeholderTextColor={colors.gray3}
-          onChangeText={setAccountAddress}
-          value={accountAddress}
-          testID={'AccountAddress'}
-        >
-          <ClipboardAwarePasteIcon
-            style={styles.paste}
-            onPress={onPasteAddress}
-            color={colors.goldUI}
-            currentValue={accountAddress}
-            testID={'PasteButton'}
-          />
-          <Touchable testID={'ScanQR'} borderless={true} onPress={onPressQrCode}>
-            <QRCodeBorderlessIcon height={32} color={colors.goldUI} />
-          </Touchable>
-        </TextInputWithButtons>
+          onAddressChanged={setAccountAddress}
+          accountAddress={accountAddress}
+        />
         <Text style={styles.inputLabel}>{t('celoAmountLabel')}</Text>
-        <TextInputWithButtons
-          style={styles.inputContainer}
+        <CeloAmountInput
+          inputContainerStyle={styles.inputContainer}
           inputStyle={styles.input}
-          placeholder={'0'}
-          placeholderTextColor={colors.gray3}
-          keyboardType={'decimal-pad'}
-          onChangeText={setCeloToTransfer}
-          value={celoToTransfer}
-          testID={'CeloAmount'}
-        >
-          <TouchableOpacity testID={'MaxAmount'} onPress={setMaxAmount}>
-            <Text style={styles.maxAmount}>{'Max'}</Text>
-          </TouchableOpacity>
-        </TextInputWithButtons>
+          onCeloChanged={setCeloToTransfer}
+          celo={celoToTransfer}
+        />
       </KeyboardAwareScrollView>
       <Button
         onPress={onConfirm}
@@ -167,13 +123,6 @@ const styles = StyleSheet.create({
   },
   input: {
     ...fontStyles.regular,
-  },
-  paste: {
-    marginRight: 8,
-  },
-  maxAmount: {
-    ...fontStyles.small600,
-    color: colors.goldUI,
   },
   reviewBtn: {
     padding: variables.contentPadding,
