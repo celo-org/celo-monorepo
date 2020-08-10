@@ -68,7 +68,7 @@ export const emptyHeader: StackNavigationOptions = {
     alignItems: 'center',
   },
   headerTitleAlign: 'center',
-  cardStyle: { backgroundColor: colors.background },
+  cardStyle: { backgroundColor: colors.light },
   headerStyle: {
     backgroundColor: colors.light,
     shadowRadius: 0,

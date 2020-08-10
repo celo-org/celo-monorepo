@@ -10,7 +10,7 @@ interface Props {
 export default class CeloGold extends React.PureComponent<Props> {
   static defaultProps = {
     height: 50,
-    color: colors.celoGold,
+    color: colors.goldBrand,
   }
 
   render() {

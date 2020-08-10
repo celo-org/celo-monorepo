@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
   },
   tip: {
     ...fontStyles.bodySmall,
-    color: colors.darkSecondary,
+    color: colors.gray5,
     marginTop: 20,
     marginHorizontal: 2,
   },

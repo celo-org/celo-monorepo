@@ -71,7 +71,7 @@ export default React.memo(function Button(props: ButtonProps) {
           testID={testID}
         >
           {showLoading ? (
-            <ActivityIndicator size="small" color={colors.celoGreen} />
+            <ActivityIndicator size="small" color={colors.greenBrand} />
           ) : (
             <Text
               accessibilityLabel={accessibilityLabel}

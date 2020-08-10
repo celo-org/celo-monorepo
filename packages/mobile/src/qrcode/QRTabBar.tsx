@@ -36,7 +36,7 @@ export default function QRTabBar({ state, descriptors, navigation, position, qrS
 
   const color = interpolateColors(position, {
     inputRange: [0.9, 1],
-    outputColorRange: [colors.dark, colors.white],
+    outputColorRange: [colors.dark, colors.light],
   })
 
   const onPressClose = () => {

@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     bottom: 32,
     ...fontStyles.small600,
     lineHeight: undefined,
-    color: colors.white,
+    color: colors.light,
     textAlign: 'center',
   },
 })

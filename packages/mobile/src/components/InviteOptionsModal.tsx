@@ -41,7 +41,7 @@ const InviteOptionsModal = ({ onCancel, onWhatsApp, onSMS, isVisible }: Props) =
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.light,
   },
   buttonContainer: {
     flexDirection: 'row',

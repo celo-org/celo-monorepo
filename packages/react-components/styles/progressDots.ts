@@ -14,7 +14,7 @@ const circle = {
 export default StyleSheet.create({
   circlePassive: {
     ...circle,
-    backgroundColor: colors.inactive,
+    backgroundColor: colors.gray4,
   },
   circleActive: {
     ...circle,

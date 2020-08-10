@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     color: colors.gray4,
   },
   option: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
   },
 
   optionTitle: {

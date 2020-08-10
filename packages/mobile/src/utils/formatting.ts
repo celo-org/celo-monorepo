@@ -109,7 +109,7 @@ export const getCurrencyColor = (currencyType: CURRENCY_ENUM): string => {
     case CURRENCY_ENUM.DOLLAR:
       return colors.greenBrand
     case CURRENCY_ENUM.GOLD:
-      return colors.celoGold
+      return colors.goldBrand
   }
 }
 
@@ -118,7 +118,7 @@ export const getBalanceColor = (accountBalance: BigNumber): string => {
     return colors.greenBrand
   }
   if (accountBalance.isLessThan(0)) {
-    return colors.errorRed
+    return colors.warning
   }
   return colors.dark
 }

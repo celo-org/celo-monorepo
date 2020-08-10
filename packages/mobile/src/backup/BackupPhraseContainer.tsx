@@ -110,7 +110,7 @@ export class BackupPhraseContainer extends React.Component<Props> {
                   : isValidSocialBackupPhrase
               }
               underlineColorAndroid="transparent"
-              placeholderTextColor={colors.inactive}
+              placeholderTextColor={colors.gray4}
               enablesReturnKeyAutomatically={true}
               multiline={true}
               autoCorrect={false}
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
   phraseInputText: {
     ...fontStyles.regular,
     borderWidth: 1,
-    borderColor: colors.inputBorder,
+    borderColor: colors.gray2,
     borderRadius: 4,
     minHeight: 125,
     padding: 14,

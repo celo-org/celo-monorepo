@@ -10,7 +10,7 @@ interface Props {
 export default class QuestionIcon extends React.PureComponent<Props> {
   static defaultProps = {
     size: 32,
-    color: colors.darkSecondary,
+    color: colors.gray5,
   }
 
   render() {

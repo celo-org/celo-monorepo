@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     height: 25,
   },
   skipButton: {
-    backgroundColor: colors.errorRed,
+    backgroundColor: colors.warning,
   },
   debugButton: {
     backgroundColor: colors.onboardingBlue,

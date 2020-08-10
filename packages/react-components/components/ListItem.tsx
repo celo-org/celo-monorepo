@@ -27,7 +27,7 @@ export default function ListItem({ children, onPress, disabled, testID }: Props)
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
   },
   innerView: {
     paddingVertical: variables.contentPadding,

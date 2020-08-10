@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 25,
   },
   containerError: {
-    backgroundColor: colors.errorRed,
+    backgroundColor: colors.warning,
   },
   containerWithButton: {
     flexDirection: 'column',
@@ -206,11 +206,11 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 8,
-    borderColor: colors.white,
+    borderColor: colors.light,
     alignSelf: 'center',
   },
   buttonText: {
-    color: colors.white,
+    color: colors.light,
   },
 })
 

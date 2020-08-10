@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   head: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
