@@ -626,7 +626,7 @@ jobs:
             set -euo pipefail
             cd packages/base
             yarn pack
-            cd packages/utils
+            cd ../utils
             yarn pack
             cd /tmp
             npm install ~/app/packages/base/*.tgz
