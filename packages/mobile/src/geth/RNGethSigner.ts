@@ -4,9 +4,11 @@ import { Signer } from '@celo/contractkit/lib/wallets/signers/signer'
 import {
   encodeTransaction,
   extractSignature,
+  RLPEncodedTx,
   rlpEncodedTx,
 } from '@celo/contractkit/lib/utils/signing-utils'
 import RNGeth from 'react-native-geth'
+import * as ethUtil from 'ethereumjs-util'
 
 const INCORRECT_PASSWORD_ERROR = 'could not decrypt key with given password'
 const currentTimeInSeconds = () => Math.round(Date.now() / 1000)
@@ -24,7 +26,6 @@ export class RNGethSigner implements Signer {
    * latency and timing inconsistencies on the node
    * @param unlockTime Timestamp in seconds when the signer was last unlocked
    * @param unlockDuration Number of seconds that the signer was last unlocked for
-   * TODO: Fix geth: any by adding typings
    */
   constructor(
     protected geth: RNGeth,
@@ -42,17 +43,23 @@ export class RNGethSigner implements Signer {
     if (normalizeAddressWith0x(tx.from! as string) !== this.account) {
       throw new Error(`RNGethSigner(${this.account}) cannot sign tx with 'from' ${tx.from}`)
     }
-    const encoded = rlpEncodedTx(tx)
-    const signedTxRLP = await this.geth.signTransaction(encoded.rlpEncode, this.account)
-    return await encodeTransaction(encoded, extractSignature(signedTxRLP))
+    const encodedTx = rlpEncodedTx(tx)
+    const signature = await this.signTransaction(0, encodedTx)
+    return encodeTransaction(encodedTx, signature)
   }
 
-  async signTransaction(): Promise<{ v: number; r: Buffer; s: Buffer }> {
-    throw new Error('signTransaction unimplemented; use signRawTransaction')
+  async signTransaction(
+    addToV: number,
+    encodedTx: RLPEncodedTx
+  ): Promise<{ v: number; r: Buffer; s: Buffer }> {
+    // addToV (chainId) is ignored here because geth is configured with it
+    return extractSignature(await this.geth.signTransaction(encodedTx.rlpEncode, this.account))
   }
 
   async signPersonalMessage(data: string): Promise<{ v: number; r: Buffer; s: Buffer }> {
-    throw new Error('signPersonalTransaction notimplemented;')
+    const hash = ethUtil.hashPersonalMessage(Buffer.from(data, 'hex'))
+    const signatureHex = await this.geth.signHash(hash.toString('hex'), this.account)
+    return ethUtil.fromRpcSig(signatureHex)
   }
 
   getNativeKey = () => this.account
