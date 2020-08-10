@@ -107,6 +107,7 @@ function CustomDrawerItemList({
     return (
       <DrawerItem
         {...passThroughProps}
+        testID={`DrawerItem/${title}`}
         key={route.key}
         label={drawerLabel !== undefined ? drawerLabel : title !== undefined ? title : route.name}
         icon={drawerIcon}

@@ -22,7 +22,7 @@ import {
 } from 'src/exchange/actions'
 import { ExchangeRatePair, exchangeRatePairSelector } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
-import { navigate, navigateIf } from 'src/navigator/NavigationService'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { convertToContractDecimals, createTokenTransferTransaction } from 'src/tokens/saga'
 import {
@@ -339,18 +339,13 @@ function* createStandbyTx(
   return txId
 }
 
-function navigateToExchangeScreenIfReviewing() {
-  navigateIf(
-    (nav) => nav?.getCurrentRoute()?.name === Screens.WithdrawCeloReviewScreen,
-    Screens.ExchangeHomeScreen
-  )
-}
-
 function* withdrawCelo(action: WithdrawCeloAction) {
   let txId: string | null = null
   try {
     const { recipientAddress, amount } = action
     const account: string = yield call(getConnectedUnlockedAccount)
+
+    navigate(Screens.ExchangeHomeScreen)
 
     txId = generateStandbyTransactionId(account)
     yield put(
@@ -366,10 +361,6 @@ function* withdrawCelo(action: WithdrawCeloAction) {
       })
     )
 
-    setTimeout(() => {
-      navigateToExchangeScreenIfReviewing()
-    }, 3000)
-
     const tx: CeloTransactionObject<boolean> = yield call(
       createTokenTransferTransaction,
       CURRENCY_ENUM.GOLD,
@@ -384,8 +375,6 @@ function* withdrawCelo(action: WithdrawCeloAction) {
     ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_completed, {
       amount: amount.toString(),
     })
-
-    navigateToExchangeScreenIfReviewing()
   } catch (error) {
     Logger.error(TAG, 'Error withdrawing CELO', error)
     if (txId) {

@@ -12,6 +12,7 @@ import { CeloExchangeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TransferItemFragment } from 'src/apollo/types'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import { formatShortenedAddress } from 'src/components/ShortenedAddress'
 import { Namespaces } from 'src/i18n'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
 import { TransactionStatus } from 'src/transactions/types'
@@ -47,7 +48,7 @@ export function CeloTransferFeedItem(props: Props) {
           <View style={styles.desc}>
             <Text style={styles.txMode}>
               {t(isWithdrawal ? 'feedItemGoldWithdrawal' : 'feedItemGoldReceived', {
-                address: `${address.slice(0, 6)}...${address.slice(-4)}`,
+                address: formatShortenedAddress(address),
               })}
             </Text>
           </View>

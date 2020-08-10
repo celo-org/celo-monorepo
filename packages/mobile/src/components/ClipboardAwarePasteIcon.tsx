@@ -2,7 +2,7 @@
 // of the clipboard.
 
 import TouchableDefault from '@celo/react-components/components/Touchable'
-import Paste from '@celo/react-components/icons/Paste.v2'
+import Paste from '@celo/react-components/icons/Paste'
 import { iconHitslop } from '@celo/react-components/styles/variables'
 import React, { useEffect, useRef, useState } from 'react'
 import { AppState, Clipboard, StyleProp, ViewStyle } from 'react-native'

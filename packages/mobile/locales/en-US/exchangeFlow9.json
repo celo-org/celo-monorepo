@@ -46,7 +46,5 @@
   "withdrawCeloReview": "Review",
   "withdrawCeloTo": "Withdraw to",
   "withdrawCeloAmount": "Amount (CELO)",
-  "withdrewCelo": "CELO Withdrawal",
-  "withdrawnTo": "Withdrawn to",
   "withdrawScanQrTitle": "Scan"
 }

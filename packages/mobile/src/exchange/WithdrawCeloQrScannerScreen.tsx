@@ -5,7 +5,7 @@ import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import { StackScreenProps } from '@react-navigation/stack'
 import { memoize } from 'lodash'
-import React, { useCallback } from 'react'
+import React from 'react'
 import BackButton from 'src/components/BackButton.v2'
 import i18n from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers.v2'
@@ -31,18 +31,15 @@ function fetchAddressFromQrData(data: string): string | null {
 function WithdrawCeloQrScannerScreen({ route }: Props) {
   const { onAddressScanned } = route.params
 
-  const onBarCodeDetected = useCallback(
-    memoize(
-      (qrCode: QrCode) => {
-        const qrData = qrCode.data
-        Logger.debug(TAG, 'Bar code detected: ' + qrData)
-        const address = fetchAddressFromQrData(qrData) || qrData
-        onAddressScanned(address)
-        navigateBack()
-      },
-      (qrCode) => qrCode.data
-    ),
-    []
+  const onBarCodeDetected = memoize(
+    (qrCode: QrCode) => {
+      const qrData = qrCode.data
+      Logger.debug(TAG, 'Bar code detected: ' + qrData)
+      const address = fetchAddressFromQrData(qrData) || qrData
+      onAddressScanned(address)
+      navigateBack()
+    },
+    (qrCode) => qrCode.data
   )
 
   return <QRScanner onBarCodeDetected={onBarCodeDetected} />

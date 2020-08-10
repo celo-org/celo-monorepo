@@ -88,31 +88,6 @@ export function navigate<RouteName extends keyof StackParamList>(
     })
 }
 
-export function navigateIf<RouteName extends keyof StackParamList>(
-  condition: (navigator: NavigationContainerRef | null) => boolean,
-  ...args: undefined extends StackParamList[RouteName]
-    ? [RouteName] | [RouteName, StackParamList[RouteName]]
-    : [RouteName, StackParamList[RouteName]]
-) {
-  const [routeName, params] = args
-  ensureNavigator()
-    .then(() => {
-      Logger.debug(`${TAG}@navigate`, `Dispatch ${routeName}`)
-
-      if (condition(navigationRef.current)) {
-        navigationRef.current?.dispatch(
-          NavigationActions.navigate({
-            routeName,
-            params,
-          })
-        )
-      }
-    })
-    .catch((reason) => {
-      Logger.error(`${TAG}@navigate`, `Navigation failure: ${reason}`)
-    })
-}
-
 export async function ensurePincode(): Promise<boolean> {
   const pincodeType = pincodeTypeSelector(store.getState())
 

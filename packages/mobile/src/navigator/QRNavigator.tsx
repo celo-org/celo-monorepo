@@ -5,7 +5,7 @@ import {
 import { useIsFocused } from '@react-navigation/native'
 import { StackScreenProps, TransitionPresets } from '@react-navigation/stack'
 import { memoize } from 'lodash'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useAsync } from 'react-async-hook'
 import { useTranslation } from 'react-i18next'
 import { Dimensions, Platform, StatusBar, StyleSheet } from 'react-native'
@@ -96,23 +96,20 @@ function AnimatedScannerScene({ route, position, ...props }: AnimatedScannerScen
   const { scanIsForSecureSend, isOutgoingPaymentRequest, transactionData, requesterAddress } =
     route.params || {}
 
-  const onBarCodeDetected = useCallback(
-    memoize(
-      (qrCode: QrCode) => {
-        Logger.debug('QRScanner', 'Bar code detected')
-        dispatch(
-          handleBarcodeDetected(
-            qrCode,
-            scanIsForSecureSend,
-            transactionData,
-            isOutgoingPaymentRequest,
-            requesterAddress
-          )
+  const onBarCodeDetected = memoize(
+    (qrCode: QrCode) => {
+      Logger.debug('QRScanner', 'Bar code detected')
+      dispatch(
+        handleBarcodeDetected(
+          qrCode,
+          scanIsForSecureSend,
+          transactionData,
+          isOutgoingPaymentRequest,
+          requesterAddress
         )
-      },
-      (qrCode) => qrCode.data
-    ),
-    [scanIsForSecureSend, transactionData, isOutgoingPaymentRequest, requesterAddress]
+      )
+    },
+    (qrCode) => qrCode.data
   )
 
   return (

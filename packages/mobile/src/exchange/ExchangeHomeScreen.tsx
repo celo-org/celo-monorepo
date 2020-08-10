@@ -1,7 +1,7 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import ItemSeparator from '@celo/react-components/components/ItemSeparator'
 import SectionHead from '@celo/react-components/components/SectionHeadGold'
-import { SettingsItemText } from '@celo/react-components/components/SettingsItem'
+import { SettingsItemTextValue } from '@celo/react-components/components/SettingsItem'
 import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
@@ -212,7 +212,12 @@ function ExchangeHomeScreen({ navigation }: Props) {
           <ItemSeparator />
           <CeloGoldOverview testID="ExchangeAccountOverview" />
           <ItemSeparator />
-          <SettingsItemText title={t('withdrawCelo')} onPress={goToWithdrawCelo} />
+          <SettingsItemTextValue
+            title={t('withdrawCelo')}
+            onPress={goToWithdrawCelo}
+            testID={'WithdrawCELO'}
+            showChevron={true}
+          />
           <SectionHead text={t('global:activity')} />
           <TransactionsList currency={CURRENCY_ENUM.GOLD} />
         </SafeAreaView>
