@@ -36,7 +36,7 @@ export class RNGethSigner implements Signer {
   ) {}
 
   async init(privateKey: string, passphrase: string) {
-    return await this.geth.addAccount(privateKey, passphrase)
+    return this.geth.addAccount(privateKey, passphrase)
   }
 
   async signRawTransaction(tx: Tx) {

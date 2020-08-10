@@ -56,7 +56,7 @@ export class RpcWallet extends RemoteWallet<RpcSigner> implements WritableWallet
   }
 
   isAccountUnlocked(address: string) {
-    const signer = this.getSigner(address) as RpcSigner
+    const signer = this.getSigner(address)
     return signer.isUnlocked()
   }
 
@@ -68,7 +68,7 @@ export class RpcWallet extends RemoteWallet<RpcSigner> implements WritableWallet
   async signTransaction(txParams: Tx) {
     // Get the signer from the 'from' field
     const fromAddress = txParams.from!.toString()
-    const signer = this.getSigner(fromAddress) as RpcSigner
+    const signer = this.getSigner(fromAddress)
     return signer.signRawTransaction(txParams)
   }
 }
