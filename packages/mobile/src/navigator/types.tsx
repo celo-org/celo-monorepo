@@ -107,7 +107,12 @@ export type StackParamList = {
   [Screens.InviteReview]: {
     recipient: Recipient
   }
-  [Screens.NameAndNumber]: { selectedCountryCodeAlpha2: string } | undefined
+  [Screens.NameAndNumber]:
+    | {
+        selectedCountryCodeAlpha2: string
+        country: string
+      }
+    | undefined
   [Screens.Language]:
     | {
         nextScreen: keyof StackParamList

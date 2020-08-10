@@ -351,8 +351,36 @@ export const v3Schema = {
     ...v2Schema.web3,
     isDekRegistered: false,
   },
+  geth: {
+    ...v2Schema.geth,
+    chainHead: {
+      number: 100,
+      timestamp: 1596502618,
+      hash: '0x0000000000000000000000000000000000000000000000000000000000000F00',
+    },
+  },
+}
+
+// Skipping v4 to match the Redux store version
+// It's not critical but it's good to keep those in sync
+export const v5Schema = {
+  ...v3Schema,
+  account: {
+    ...v3Schema.account,
+    incomingPaymentRequests: undefined,
+    outgoingPaymentRequests: undefined,
+  },
+  paymentRequest: {
+    incomingPaymentRequests: [],
+    outgoingPaymentRequests: [],
+  },
+  web3: {
+    ...v3Schema.web3,
+    dataEncryptionKey: '0x0000000000000000000000000000000000008F68',
+    commentKey: undefined,
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {
-  return v3Schema as Partial<RootState>
+  return v5Schema as Partial<RootState>
 }

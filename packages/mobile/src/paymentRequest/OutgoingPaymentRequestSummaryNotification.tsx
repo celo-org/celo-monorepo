@@ -2,10 +2,8 @@ import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Image } from 'react-native'
 import { connect } from 'react-redux'
-import { PaymentRequest } from 'src/account/types'
 import { HomeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { cancelPaymentRequest, updatePaymentRequestNotified } from 'src/firebase/actions'
 import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
 import { Namespaces, withTranslation } from 'src/i18n'
 import {
@@ -18,9 +16,11 @@ import { notificationOutgoingRequest } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import SummaryNotification from 'src/notifications/SummaryNotification'
+import { cancelPaymentRequest, updatePaymentRequestNotified } from 'src/paymentRequest/actions'
 import { listItemRenderer } from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
 import PaymentRequestNotificationInner from 'src/paymentRequest/PaymentRequestNotificationInner'
-import { getSenderFromPaymentRequest } from 'src/paymentRequest/utils'
+import { PaymentRequest } from 'src/paymentRequest/types'
+import { getRequesteeFromPaymentRequest } from 'src/paymentRequest/utils'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
@@ -63,7 +63,7 @@ export class OutgoingPaymentRequestSummaryNotification extends React.Component<P
       <PaymentRequestNotificationInner
         key={item.uid}
         amount={item.amount}
-        recipient={getSenderFromPaymentRequest(
+        recipient={getRequesteeFromPaymentRequest(
           item,
           this.props.addressToE164Number,
           this.props.recipientCache

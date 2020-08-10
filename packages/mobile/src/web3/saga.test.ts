@@ -80,6 +80,7 @@ describe(checkWeb3SyncProgress, () => {
     const web3 = await getWeb3Async()
     web3.eth.isSyncing
       // @ts-ignore
+      .mockReturnValueOnce(false)
       .mockReturnValueOnce({
         startingBlock: 0,
         currentBlock: 10,
@@ -87,10 +88,21 @@ describe(checkWeb3SyncProgress, () => {
       })
       .mockReturnValueOnce(false)
 
+    web3.eth.getBlock
+      // @ts-ignore
+      .mockReturnValueOnce({
+        number: 100,
+        timestamp: Math.round(Date.now() / 1000) - 40,
+      })
+      .mockReturnValueOnce({
+        number: 200,
+        timestamp: Math.round(Date.now() / 1000),
+      })
+
     // @ts-ignore
     await expectSaga(checkWeb3SyncProgress)
       .withState(state)
-      .provide([[delay(100), true]])
+      .provide([[delay(100), delay(100), true]])
       .put(updateWeb3SyncProgress({ startingBlock: 0, currentBlock: 10, highestBlock: 100 })) // is syncing the first time
       .put(completeWeb3Sync(LAST_BLOCK_NUMBER)) // finished syncing the second time
       .returns(true)
