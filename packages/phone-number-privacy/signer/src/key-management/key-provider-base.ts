@@ -19,7 +19,8 @@ export abstract class KeyProviderBase implements KeyProvider {
   public abstract async fetchPrivateKeyFromStore(): Promise<void>
 
   protected setPrivateKey(key: string) {
-    if (!key || key.length !== PRIVATE_KEY_SIZE) {
+    key = key ? key.trim() : ''
+    if (key.length !== PRIVATE_KEY_SIZE) {
       throw new Error('Invalid private key')
     }
     this.privateKey = key

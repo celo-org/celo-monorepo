@@ -195,7 +195,7 @@ export enum SendEvents {
   send_amount_back = 'send_amount_back', // back button pressed on amount screen
   send_amount_continue = 'send_amount_continue', // when next button pressed on amount enter page
   send_confirm_back = 'send_confirm_back', // when back button pressed on send confirmation screen
-  send_confim_send = 'send_confim_send', // when send button pressed on send confirmation screen
+  send_confirm_send = 'send_confirm_send', // when send button pressed on send confirmation screen
 
   send_secure_start = 'send_secure_start', // when either secure send scan or manual confirm button pressed
   send_secure_back = 'send_secure_back', // when back button is pressed during secure send
@@ -273,15 +273,32 @@ export enum CeloExchangeEvents {
 
 export enum GethEvents {
   blockchain_corruption = 'blockchain_corruption',
+  geth_init_start = 'geth_init_start',
   geth_init_success = 'geth_init_success',
   geth_init_failure = 'geth_init_failure',
   geth_restart_to_fix_init = 'geth_restart_to_fix_init',
   prompt_forno = 'prompt_forno',
-  geth_init_start = 'geth_init_start',
   create_geth_start = 'create_geth_start',
   create_geth_finish = 'create_geth_finish',
+  create_geth_error = 'create_geth_error',
   start_geth_start = 'start_geth_start',
   start_geth_finish = 'start_geth_finish',
+}
+
+export enum NetworkEvents {
+  // Events triggered when the app detects it is connected or disconnected from the Celo network.
+  network_connected = 'network_connected',
+  network_disconnected = 'network_disconnected',
+
+  // Events triggered when the app detects it loses or restores sync with the Celo network.
+  network_sync_lost = 'network_sync_lost',
+  network_sync_restored = 'network_sync_restored',
+
+  // Events triggered during a syncing or waiting to start syncing.
+  network_sync_waiting = 'network_sync_waiting',
+  network_sync_start = 'network_sync_start',
+  network_sync_finish = 'network_sync_finish',
+  network_sync_error = 'network_sync_error',
 }
 
 export enum ContractKitEvents {
@@ -311,3 +328,4 @@ export type AnalyticsEventType =
   | TransactionEvents
   | CeloExchangeEvents
   | GethEvents
+  | NetworkEvents
