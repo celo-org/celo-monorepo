@@ -128,7 +128,7 @@ export const setLanguage = (language: string) => {
   }
 }
 
-export const openDeepLink = (deepLink: string) => {
+export const openDeepLink = (deepLink: string): OpenDeepLink => {
   return {
     type: Actions.OPEN_DEEP_LINK,
     deepLink,

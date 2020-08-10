@@ -15,12 +15,12 @@ import { Screens } from 'src/navigator/Screens'
 export default function SendOrRequestBar() {
   const onPressSend = () => {
     ValoraAnalytics.track(HomeEvents.home_send)
-    navigate(Screens.Send, { isRequest: false })
+    navigate(Screens.Send)
   }
 
   const onPressRequest = () => {
     ValoraAnalytics.track(HomeEvents.home_request)
-    navigate(Screens.Send, { isRequest: true })
+    navigate(Screens.Send, { isOutgoingPaymentRequest: true })
   }
 
   const onPressQrCode = () => {

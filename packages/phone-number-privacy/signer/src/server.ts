@@ -3,7 +3,7 @@ import fs from 'fs'
 import https from 'https'
 import morgan from 'morgan'
 import logger from './common/logger'
-import config, { VERSION } from './config'
+import config, { getVersion } from './config'
 import { handleGetBlindedMessageForSalt } from './salt-generation/get-salt'
 
 export function createServer() {
@@ -18,7 +18,7 @@ export function createServer() {
 
   app.get('/status', (_req, res) => {
     res.status(200).json({
-      version: VERSION,
+      version: getVersion(),
     })
   })
 

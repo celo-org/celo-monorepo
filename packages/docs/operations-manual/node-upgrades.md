@@ -15,7 +15,7 @@ Use these instructions to update non-validating nodes, such as your account node
 ### Pull the latest Docker image
 
 ```bash
-export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
+export CELO_IMAGE=us.gcr.io/celo-org/celo-node:baklava
 export NETWORK_ID=200110 # Baklava testnet phases 2 and 3
 docker pull $CELO_IMAGE
 ```

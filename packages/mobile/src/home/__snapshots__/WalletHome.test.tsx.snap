@@ -4,7 +4,6 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "position": "relative",
     }
@@ -18,7 +17,7 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
         "borderBottomColor": 0,
         "borderBottomWidth": 1,
         "flexDirection": "row",
-        "height": 62,
+        "height": 56,
         "justifyContent": "center",
       }
     }
@@ -26,6 +25,14 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
     <View
       accessible={true}
       focusable={false}
+      hitSlop={
+        Object {
+          "bottom": 10,
+          "left": 10,
+          "right": 10,
+          "top": 10,
+        }
+      }
       onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
@@ -35,13 +42,12 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
-          "left": 8,
+          "left": 0,
           "marginBottom": 0,
-          "marginLeft": 4,
+          "marginLeft": 16,
           "opacity": 1,
-          "padding": 8,
+          "padding": 0,
           "position": "absolute",
-          "top": 8,
         }
       }
     >
@@ -135,7 +141,7 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
       <RefreshControlMock
         colors={
           Array [
-            "#42D689",
+            "#1AB775",
           ]
         }
         onRefresh={[Function]}
@@ -148,7 +154,6 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
     stickyHeaderIndices={Array []}
     style={
       Object {
-        "backgroundColor": "#FFFFFF",
         "flex": 1,
         "position": "relative",
       }
@@ -630,7 +635,6 @@ exports[`Testnet banner Renders when disconnected 1`] = `
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "position": "relative",
     }
@@ -644,7 +648,7 @@ exports[`Testnet banner Renders when disconnected 1`] = `
         "borderBottomColor": 0,
         "borderBottomWidth": 1,
         "flexDirection": "row",
-        "height": 62,
+        "height": 56,
         "justifyContent": "center",
       }
     }
@@ -652,6 +656,14 @@ exports[`Testnet banner Renders when disconnected 1`] = `
     <View
       accessible={true}
       focusable={false}
+      hitSlop={
+        Object {
+          "bottom": 10,
+          "left": 10,
+          "right": 10,
+          "top": 10,
+        }
+      }
       onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
@@ -661,13 +673,12 @@ exports[`Testnet banner Renders when disconnected 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
-          "left": 8,
+          "left": 0,
           "marginBottom": 0,
-          "marginLeft": 4,
+          "marginLeft": 16,
           "opacity": 1,
-          "padding": 8,
+          "padding": 0,
           "position": "absolute",
-          "top": 8,
         }
       }
     >
@@ -761,7 +772,7 @@ exports[`Testnet banner Renders when disconnected 1`] = `
       <RefreshControlMock
         colors={
           Array [
-            "#42D689",
+            "#1AB775",
           ]
         }
         onRefresh={[Function]}
@@ -774,7 +785,6 @@ exports[`Testnet banner Renders when disconnected 1`] = `
     stickyHeaderIndices={Array []}
     style={
       Object {
-        "backgroundColor": "#FFFFFF",
         "flex": 1,
         "position": "relative",
       }
@@ -1256,7 +1266,6 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "position": "relative",
     }
@@ -1270,7 +1279,7 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
         "borderBottomColor": 0,
         "borderBottomWidth": 1,
         "flexDirection": "row",
-        "height": 62,
+        "height": 56,
         "justifyContent": "center",
       }
     }
@@ -1278,6 +1287,14 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
     <View
       accessible={true}
       focusable={false}
+      hitSlop={
+        Object {
+          "bottom": 10,
+          "left": 10,
+          "right": 10,
+          "top": 10,
+        }
+      }
       onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
@@ -1287,13 +1304,12 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
-          "left": 8,
+          "left": 0,
           "marginBottom": 0,
-          "marginLeft": 4,
+          "marginLeft": 16,
           "opacity": 1,
-          "padding": 8,
+          "padding": 0,
           "position": "absolute",
-          "top": 8,
         }
       }
     >
@@ -1387,7 +1403,7 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
       <RefreshControlMock
         colors={
           Array [
-            "#42D689",
+            "#1AB775",
           ]
         }
         onRefresh={[Function]}
@@ -1400,7 +1416,6 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
     stickyHeaderIndices={Array []}
     style={
       Object {
-        "backgroundColor": "#FFFFFF",
         "flex": 1,
         "position": "relative",
       }

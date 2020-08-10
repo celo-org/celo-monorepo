@@ -75,8 +75,6 @@ export type StackParamList = {
       makerTokenBalance: string
     }
   }
-  [Screens.FeeEducation]: undefined
-  [Screens.FeeExchangeEducation]: undefined
   [Screens.FiatExchange]: undefined
   [Screens.FiatExchangeAmount]: {
     isAddFunds: boolean
@@ -84,11 +82,11 @@ export type StackParamList = {
   [Screens.FiatExchangeOptions]: {
     isAddFunds: boolean
     amount: BigNumber
-    currencyCode: LocalCurrencyCode
     isExplanationOpen?: boolean
   }
   [Screens.MoonPay]: {
-    amount: BigNumber
+    localAmount: BigNumber
+    currencyCode: LocalCurrencyCode
   }
   [Screens.GoldEducation]: undefined
   [Screens.ImportWallet]:
@@ -109,7 +107,12 @@ export type StackParamList = {
   [Screens.InviteReview]: {
     recipient: Recipient
   }
-  [Screens.JoinCelo]: { selectedCountryCodeAlpha2: string } | undefined
+  [Screens.NameAndNumber]:
+    | {
+        selectedCountryCodeAlpha2: string
+        country: string
+      }
+    | undefined
   [Screens.Language]:
     | {
         nextScreen: keyof StackParamList
@@ -149,12 +152,12 @@ export type StackParamList = {
   [Screens.SelectLocalCurrency]: undefined
   [Screens.Send]:
     | {
-        isRequest?: boolean
+        isOutgoingPaymentRequest?: true
       }
     | undefined
   [Screens.SendAmount]: {
     recipient: Recipient
-    isRequest?: boolean
+    isOutgoingPaymentRequest?: true
     isFromScan?: boolean
   }
   [Screens.SendConfirmation]: {
@@ -176,19 +179,21 @@ export type StackParamList = {
     transactionData: TransactionDataInput
     addressValidationType: AddressValidationType
     isOutgoingPaymentRequest?: true
+    requesterAddress?: string
   }
   [Screens.ValidateRecipientAccount]: {
     transactionData: TransactionDataInput
     addressValidationType: AddressValidationType
     isOutgoingPaymentRequest?: true
+    requesterAddress?: string
   }
   [Screens.VerificationEducationScreen]: { showSkipDialog: boolean } | undefined
   [Screens.VerificationInputScreen]: { showHelpDialog: boolean } | undefined
-  [Screens.VerificationInterstitialScreen]: undefined
   [Screens.VerificationLoadingScreen]: undefined
   [Screens.OnboardingEducationScreen]: undefined
   [Screens.OnboardingSuccessScreen]: undefined
   [Screens.WalletHome]: undefined
+  [Screens.Welcome]: undefined
 }
 
 // tslint:disable-next-line: interface-over-type-literal
@@ -199,6 +204,7 @@ export type QRTabParamList = {
         scanIsForSecureSend?: true
         transactionData?: TransactionDataInput
         isOutgoingPaymentRequest?: true
+        requesterAddress?: string
       }
     | undefined
 }

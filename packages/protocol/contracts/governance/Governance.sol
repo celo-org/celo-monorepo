@@ -13,6 +13,7 @@ import "../common/FixidityLib.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
 // TODO(asa): Hardcode minimum times for queueExpiry, etc.
@@ -21,6 +22,7 @@ import "../common/libraries/ReentrancyGuard.sol";
  */
 contract Governance is
   IGovernance,
+  ICeloVersionedContract,
   Ownable,
   Initializable,
   ReentrancyGuard,
@@ -177,6 +179,14 @@ contract Governance is
 
   function() external payable {
     require(msg.data.length == 0, "unknown method");
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 2, 0, 0);
   }
 
   /**

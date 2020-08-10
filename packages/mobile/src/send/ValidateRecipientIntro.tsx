@@ -1,6 +1,5 @@
 import ContactCircle from '@celo/react-components/components/ContactCircle'
 import TextButton from '@celo/react-components/components/TextButton.v2'
-import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
@@ -29,13 +28,14 @@ export const validateRecipientIntroScreenNavOptions = () => ({
 
 class ValidateRecipientIntro extends React.Component<Props> {
   onPressScanCode = () => {
-    const { isOutgoingPaymentRequest, transactionData } = this.props.route.params
+    const { isOutgoingPaymentRequest, transactionData, requesterAddress } = this.props.route.params
     navigate(Screens.QRNavigator, {
       screen: Screens.QRScanner,
       params: {
         transactionData,
         scanIsForSecureSend: true,
         isOutgoingPaymentRequest,
+        requesterAddress,
       },
     })
 
@@ -47,11 +47,13 @@ class ValidateRecipientIntro extends React.Component<Props> {
       addressValidationType,
       transactionData,
       isOutgoingPaymentRequest,
+      requesterAddress,
     } = this.props.route.params
     navigate(Screens.ValidateRecipientAccount, {
       transactionData,
       addressValidationType,
       isOutgoingPaymentRequest,
+      requesterAddress,
     })
 
     ValoraAnalytics.track(SendEvents.send_secure_start, { confirmByScan: false })
@@ -104,7 +106,6 @@ class ValidateRecipientIntro extends React.Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light,
     justifyContent: 'space-between',
   },
   scrollContainer: {
