@@ -1,0 +1,39 @@
+{
+  "name": "@celo/wallet-remote-azurehsm",
+  "version": "1.0.0-dev",
+  "description": "Azure HSM wallet implementation",
+  "author": "Celo",
+  "license": "Apache-2.0",
+  "keywords": [
+    "celo",
+    "blockchain",
+    "sdk"
+  ],
+  "scripts": {
+    "build": "tsc -b .",
+    "clean": "tsc -b . --clean",
+    "test": "jest --runInBand",
+    "lint": "tslint -c tslint.json --project ."
+  },
+  "dependencies": {
+    "@azure/identity": "^1.0.2",
+    "@azure/keyvault-keys": "^4.0.2",
+    "@azure/keyvault-secrets": "^4.0.2",
+    "@celo/utils": "0.1.17-dev",
+    "@celo/wallet-base": "1.0.0-dev",
+    "@celo/wallet-remote": "1.0.0-dev",
+    "eth-lib": "^0.2.8",
+    "ethereumjs-util": "^5.2.0",
+    "elliptic": "6.5.2",
+    "bignumber.js": "^9.0.0",
+    "secp256k1": "^4.0.0",
+    "debug": "^4.1.1"
+  },
+  "devDependencies": {
+    "@celo/sdk-types": "1.0.0-dev",
+    "web3": "1.2.11"
+  },
+  "engines": {
+    "node": ">=8.13.0"
+  }
+}
