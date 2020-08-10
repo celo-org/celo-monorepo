@@ -593,6 +593,24 @@ jobs:
             cd /tmp
             npm install ~/app/packages/typescript/*.tgz
 
+  base-test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/base
+      - run:
+          name: Install and test the npm package
+          command: |
+            set -euo pipefail
+            cd packages/base
+            yarn pack
+            cd /tmp
+            npm install ~/app/packages/base/*.tgz
+
   utils-test:
     <<: *defaults
     steps:
@@ -606,9 +624,12 @@ jobs:
           name: Install and test the npm package
           command: |
             set -euo pipefail
+            cd packages/base
+            yarn pack
             cd packages/utils
             yarn pack
             cd /tmp
+            npm install ~/app/packages/base/*.tgz
             npm install ~/app/packages/utils/*.tgz
 
   end-to-end-geth-transfer-test:
