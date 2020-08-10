@@ -1,4 +1,4 @@
-import { BootnodeUtils, GenesisBlockUtils, StaticNodeUtils } from '@celo/contractkit'
+import { GenesisBlockUtils, StaticNodeUtils } from '@celo/contractkit'
 import BigNumber from 'bignumber.js'
 import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
@@ -6,7 +6,7 @@ import * as RNFS from 'react-native-fs'
 import RNGeth from 'react-native-geth'
 import { GethEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { DEFAULT_TESTNET, USE_FULL_NODE_DISCOVERY } from 'src/config'
+import { DEFAULT_TESTNET, USE_FULL_NODE_DISCOVERY, USE_STATIC_NODES } from 'src/config'
 import { SYNCING_MAX_PEERS } from 'src/geth/consts'
 import networkConfig from 'src/geth/networkConfig'
 import Logger from 'src/utils/Logger'
@@ -78,7 +78,10 @@ function getFolder(filePath: string) {
   return filePath.substr(0, filePath.lastIndexOf('/'))
 }
 
-async function createNewGeth(sync: boolean = true): Promise<typeof RNGeth> {
+async function createNewGeth(
+  sync: boolean = true,
+  bootnodeEnodes: string[]
+): Promise<typeof RNGeth> {
   Logger.debug('Geth@newGeth', 'Configure and create new Geth')
   const { nodeDir, syncMode } = networkConfig
   const genesis: string = await readGenesisBlockFile(nodeDir)
@@ -106,11 +109,8 @@ async function createNewGeth(sync: boolean = true): Promise<typeof RNGeth> {
   }
 
   if (USE_FULL_NODE_DISCOVERY) {
-    const nodes = (await BootnodeUtils.getBootnodesAsync(DEFAULT_TESTNET)).trim()
-    // const nodes =
-    //   'enode://be3a43b8a04a02cdee034ec2d133c6bd331429574cad91b739200ac88872dbd6acc81c20d1f891d598da77e47bb01e405464458d214052c1043f9b3d50d94f5c@34.83.199.141:30303'
-    gethOptions.bootnodeEnodes = nodes.split(';')
-    Logger.debug('Geth@newGeth', 'bootnodes = ' + nodes.split(';'))
+    Logger.debug('Geth@newGeth', 'Using discovery, bootnodes = ' + bootnodeEnodes)
+    gethOptions.bootnodeEnodes = bootnodeEnodes
   }
 
   // Setup Logging
@@ -141,15 +141,19 @@ export async function initGeth(sync: boolean = true): Promise<typeof gethInstanc
     if (!(await ensureGenesisBlockWritten())) {
       throw FailedToFetchGenesisBlockError
     }
-    Logger.info('USE_FULL_NODE_DISCOVERY', `${USE_FULL_NODE_DISCOVERY}`)
-    if (!USE_FULL_NODE_DISCOVERY && !(await ensureStaticNodesInitialized(sync))) {
-      throw FailedToFetchStaticNodesError
-    }
+    let staticNodes: string[] = await getStaticNodes(sync)
+    Logger.info('Geth@init', `Using static nodes: ${staticNodes}`)
+    // Always write the static nodes file, even if staticNodes is empty,
+    // to ensure any static nodes written from a previous session are not used
+    await initializeStaticNodesFile(staticNodes)
 
     let geth: typeof RNGeth
     ValoraAnalytics.track(GethEvents.create_geth_start)
     try {
-      geth = await createNewGeth(sync)
+      // Use staticNodes as bootnodes because they support v4 and v5 discovery,
+      // and there are many of them.
+      // The dedicated bootnode currently only supports v4.
+      geth = await createNewGeth(sync, staticNodes)
     } catch (error) {
       ValoraAnalytics.track(GethEvents.create_geth_error, { error: error.message })
       throw error
@@ -198,25 +202,26 @@ export function isProviderConnectionError(error: any) {
     .includes(PROVIDER_CONNECTION_ERROR)
 }
 
-async function ensureStaticNodesInitialized(sync: boolean = true): Promise<boolean> {
-  const { nodeDir } = networkConfig
-  Logger.debug('Geth@ensureStaticNodesInitialized', 'initializing static nodes')
-  let enodes: string | null = null
+async function getStaticNodes(sync: boolean): Promise<string[]> {
   try {
-    enodes = sync ? await StaticNodeUtils.getStaticNodesAsync(DEFAULT_TESTNET) : '[]'
+    const enodesStr =
+      sync && USE_STATIC_NODES ? await StaticNodeUtils.getStaticNodesAsync(DEFAULT_TESTNET) : '[]'
+    return JSON.parse(enodesStr)
   } catch (error) {
     Logger.error(
       `Failed to get static nodes for network ${DEFAULT_TESTNET},` +
         `the node will not be able to sync with the network till restart`,
       error
     )
-    return false
+    throw FailedToFetchStaticNodesError
   }
-  if (enodes != null) {
-    await writeStaticNodes(nodeDir, enodes)
-    return true
-  }
-  return false
+}
+
+// Writes static nodes to the correct location
+async function initializeStaticNodesFile(staticNodes: string[]): Promise<void> {
+  const { nodeDir } = networkConfig
+  Logger.debug('Geth@ensureStaticNodesInitialized', 'initializing static nodes')
+  return writeStaticNodes(nodeDir, JSON.stringify(staticNodes))
 }
 
 export async function stopGethIfInitialized() {
