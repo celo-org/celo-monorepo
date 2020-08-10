@@ -1,10 +1,10 @@
 /* tslint:disable:no-console */
-import { NULL_ADDRESS } from '@celo/protocol/lib/test-utils'
 import {
   getDeployedProxiedContract,
   sendTransactionWithPrivateKey,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
+import { CeloTxObject, NULL_ADDRESS } from '@celo/sdk-types/commons'
 import { privateKeyToAddress, privateKeyToPublicKey } from '@celo/utils/lib/address'
 import { getBlsPoP, getBlsPublicKey } from '@celo/utils/lib/bls'
 import { toFixed } from '@celo/utils/lib/fixidity'
@@ -12,7 +12,6 @@ import { signMessage } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import { AccountsInstance, ElectionInstance, LockedGoldInstance, ValidatorsInstance } from 'types'
 import Web3, * as Web3Class from 'web3'
-import { TransactionObject } from 'web3-eth'
 
 const truffle = require('@celo/protocol/truffle-config.js')
 const bip39 = require('bip39')
@@ -39,7 +38,7 @@ let extraKeys = []
 
 async function sendTransaction<T>(
   web3: Web3,
-  tx: TransactionObject<T> | null,
+  tx: CeloTxObject<T> | null,
   privateKey: string,
   txArgs: any
 ) {

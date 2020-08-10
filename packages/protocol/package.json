@@ -79,6 +79,7 @@
     "web3-utils": "1.2.11"
   },
   "devDependencies": {
+    "@celo/sdk-types": "1.0.0-dev",
     "@celo/typescript": "0.0.1",
     "@celo/typechain-target-web3-v1-celo": "0.1.0-beta",
     "@types/bn.js": "^4.11.0",

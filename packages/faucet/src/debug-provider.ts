@@ -1,6 +1,5 @@
+import { JsonRpcPayload, JsonRpcResponse, Provider } from '@celo/sdk-types/commons'
 import Web3 from 'web3'
-import { provider as Provider } from 'web3-core'
-import { JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
 
 export type Callback<T> = (error: Error | null, result?: T) => void
 
@@ -10,12 +9,11 @@ class DebugProvider {
   send(payload: JsonRpcPayload, callback: Callback<JsonRpcResponse>): any {
     console.log('rpc: -> %O', payload)
 
-    const callbackDecorator = (error: Error, result: JsonRpcResponse) => {
+    const callbackDecorator = (error: Error | null, result?: JsonRpcResponse) => {
       console.log('rpc: <- %O', payload)
-      callback(error as any, result)
+      callback(error, result)
     }
-    // TODO fix types
-    return (this.provider! as any).send(payload, callbackDecorator as any)
+    return this.provider.send(payload, callbackDecorator)
   }
 }
 
@@ -25,5 +23,5 @@ export function wrap(provider: Provider) {
 
 export function injectDebugProvider(web3: Web3) {
   // TODO fix types
-  web3.setProvider(wrap(web3.currentProvider) as any)
+  web3.setProvider(wrap(web3.currentProvider as Provider) as any)
 }

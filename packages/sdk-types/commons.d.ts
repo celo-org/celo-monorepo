@@ -20,8 +20,15 @@ export interface CeloTxObject<T> {
   encodeABI(): string
 }
 
-export { EventLog, PromiEvent, RLPEncodedTransaction as EncodedTransaction } from 'web3-core'
+export {
+  BlockNumber,
+  EventLog,
+  PromiEvent,
+  RLPEncodedTransaction as EncodedTransaction,
+} from 'web3-core'
 export { Block, BlockHeader } from 'web3-eth'
+export { Contract, PastEventOptions } from 'web3-eth-contract'
+export { AbiItem } from 'web3-utils'
 
 export type CeloTxPending = Transaction & Partial<CeloParams>
 export type CeloTxReceipt = TransactionReceipt & Partial<CeloParams>

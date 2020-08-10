@@ -1,18 +1,20 @@
-import { CeloTx, CeloTxObject, CeloTxReceipt, EventLog } from '@celo/sdk-types/commons'
+import {
+  CeloTx,
+  CeloTxObject,
+  CeloTxReceipt,
+  Contract,
+  EventLog,
+  PastEventOptions,
+} from '@celo/sdk-types/commons'
 import { bufferToHex, ensureLeading0x } from '@celo/utils/lib/address'
 import { zip } from '@celo/utils/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { Contract, PastEventOptions } from 'web3-eth-contract'
 import { ContractKit } from '../kit'
 import { TransactionResult } from '../utils/tx-result'
 
 /** Represents web3 native contract Method */
 type Method<I extends any[], O> = (...args: I) => CeloTxObject<O>
-
-export interface Filter {
-  [key: string]: number | string | string[] | number[]
-}
 
 /** Base ContractWrapper */
 export abstract class BaseWrapper<T extends Contract> {

@@ -31,6 +31,7 @@
     "web3-core-helpers": "1.2.11"
   },
   "devDependencies": {
+    "@celo/sdk-types": "1.0.0-dev",
     "@types/debug": "^4.1.4",
     "@types/twilio": "^0.0.10",
     "@types/yargs": "^13.0.2",

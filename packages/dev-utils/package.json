@@ -25,7 +25,8 @@
   },
   "devDependencies": {
     "@types/fs-extra": "^8.1.0",
-    "@types/targz": "1.0.0"
+    "@types/targz": "1.0.0",
+    "@celo/sdk-types": "1.0.0-dev"
   },
   "engines": {
     "node": ">=8.13.0"
