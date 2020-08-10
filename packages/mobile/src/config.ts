@@ -80,5 +80,6 @@ export const MOONPAY_PUBLIC_KEY = keyOrUndefined(
 )
 export const MOONPAY_RATE_API = `https://api.moonpay.io/v3/currencies/celo/price?apiKey=${MOONPAY_PUBLIC_KEY}`
 
-export const USE_FULL_NODE_DISCOVERY = true
-export const USE_STATIC_NODES = true
+export const GETH_USE_FULL_NODE_DISCOVERY = true
+export const GETH_USE_STATIC_NODES = true
+export const GETH_START_HTTP_RPC_SERVER = false

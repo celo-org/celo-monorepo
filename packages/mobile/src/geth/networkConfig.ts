@@ -2,7 +2,8 @@ import {
   DEFAULT_SYNC_MODE,
   DEFAULT_TESTNET,
   FORNO_ENABLED_INITIALLY,
-  USE_FULL_NODE_DISCOVERY,
+  GETH_USE_FULL_NODE_DISCOVERY,
+  GETH_USE_STATIC_NODES,
 } from 'src/config'
 import { GethSyncMode } from 'src/geth/consts'
 import Logger from 'src/utils/Logger'
@@ -22,11 +23,12 @@ interface NetworkConfig {
   nodeDir: string
   syncMode: GethSyncMode
   initiallyForno: boolean
-  peerDiscovery: boolean
   blockchainApiUrl: string
   pgpnpUrl: string // Phone Number Privacy service url
   pgpnpPubKey: string
   signMoonpayUrl: string
+  useDiscovery: boolean
+  useStaticNodes: boolean
 }
 
 const pgpnpUrlStaging = 'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net'
@@ -46,8 +48,9 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     blockchainApiUrl: 'https://integration-dot-celo-testnet.appspot.com/',
     pgpnpUrl: pgpnpUrlStaging,
     pgpnpPubKey: pgpnpPubKeyStaging,
-    peerDiscovery: USE_FULL_NODE_DISCOVERY,
     signMoonpayUrl: signMoonpayUrlStaging,
+    useDiscovery: GETH_USE_FULL_NODE_DISCOVERY,
+    useStaticNodes: GETH_USE_STATIC_NODES,
   },
   [Testnets.alfajoresstaging]: {
     nodeDir: `.${Testnets.alfajoresstaging}`,
@@ -56,19 +59,21 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     blockchainApiUrl: 'https://alfajoresstaging-dot-celo-testnet.wl.r.appspot.com/',
     pgpnpUrl: pgpnpUrlStaging,
     pgpnpPubKey: pgpnpPubKeyStaging,
-    peerDiscovery: USE_FULL_NODE_DISCOVERY,
     signMoonpayUrl: signMoonpayUrlStaging,
+    useDiscovery: GETH_USE_FULL_NODE_DISCOVERY,
+    useStaticNodes: GETH_USE_STATIC_NODES,
   },
   [Testnets.alfajores]: {
     nodeDir: `.${Testnets.alfajores}`,
     syncMode: DEFAULT_SYNC_MODE,
     initiallyForno: FORNO_ENABLED_INITIALLY,
-    peerDiscovery: USE_FULL_NODE_DISCOVERY,
     blockchainApiUrl: 'https://blockchain-api-dot-celo-mobile-alfajores.appspot.com/',
     pgpnpUrl: 'https://us-central1-celo-phone-number-privacy.cloudfunctions.net',
     pgpnpPubKey:
       'kPoRxWdEdZ/Nd3uQnp3FJFs54zuiS+ksqvOm9x8vY6KHPG8jrfqysvIRU0wtqYsBKA7SoAsICMBv8C/Fb2ZpDOqhSqvr/sZbZoHmQfvbqrzbtDIPvUIrHgRS0ydJCMsA',
     signMoonpayUrl: signMoonpayUrlStaging,
+    useDiscovery: GETH_USE_FULL_NODE_DISCOVERY,
+    useStaticNodes: GETH_USE_STATIC_NODES,
   },
   [Testnets.pilot]: {
     nodeDir: `.${Testnets.pilot}`,
@@ -77,8 +82,9 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     blockchainApiUrl: 'https://pilot-dot-celo-testnet-production.appspot.com/',
     pgpnpUrl: pgpnpUrlStaging,
     pgpnpPubKey: pgpnpPubKeyStaging,
-    peerDiscovery: USE_FULL_NODE_DISCOVERY,
     signMoonpayUrl: signMoonpayUrlStaging,
+    useDiscovery: GETH_USE_FULL_NODE_DISCOVERY,
+    useStaticNodes: GETH_USE_STATIC_NODES,
   },
   [Testnets.pilotstaging]: {
     nodeDir: `.${Testnets.pilotstaging}`,
@@ -87,8 +93,9 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     blockchainApiUrl: 'https://pilotstaging-dot-celo-testnet.appspot.com/',
     pgpnpUrl: pgpnpUrlStaging,
     pgpnpPubKey: pgpnpPubKeyStaging,
-    peerDiscovery: USE_FULL_NODE_DISCOVERY,
     signMoonpayUrl: signMoonpayUrlStaging,
+    useDiscovery: GETH_USE_FULL_NODE_DISCOVERY,
+    useStaticNodes: GETH_USE_STATIC_NODES,
   },
   [Testnets.baklavastaging]: {
     nodeDir: `.${Testnets.baklavastaging}`,
@@ -97,8 +104,9 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     blockchainApiUrl: 'https://baklavastaging-dot-celo-testnet.appspot.com/',
     pgpnpUrl: pgpnpUrlStaging,
     pgpnpPubKey: pgpnpPubKeyStaging,
-    peerDiscovery: USE_FULL_NODE_DISCOVERY,
     signMoonpayUrl: signMoonpayUrlStaging,
+    useDiscovery: GETH_USE_FULL_NODE_DISCOVERY,
+    useStaticNodes: GETH_USE_STATIC_NODES,
   },
   [Testnets.baklava]: {
     nodeDir: `.${Testnets.baklava}`,
@@ -107,8 +115,9 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     blockchainApiUrl: 'https://baklava-dot-celo-testnet-production.appspot.com/',
     pgpnpUrl: pgpnpUrlStaging,
     pgpnpPubKey: pgpnpPubKeyStaging,
-    peerDiscovery: USE_FULL_NODE_DISCOVERY,
     signMoonpayUrl: signMoonpayUrlStaging,
+    useDiscovery: GETH_USE_FULL_NODE_DISCOVERY,
+    useStaticNodes: GETH_USE_STATIC_NODES,
   },
   [Testnets.mainnet]: {
     nodeDir: `.${Testnets.mainnet}`,
@@ -119,7 +128,8 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     pgpnpPubKey:
       'FvreHfLmhBjwxHxsxeyrcOLtSonC9j7K3WrS4QapYsQH6LdaDTaNGmnlQMfFY04Bp/K4wAvqQwO9/bqPVCKf8Ze8OZo8Frmog4JY4xAiwrsqOXxug11+htjEe1pj4uMA',
     signMoonpayUrl: signMoonpayUrlProd,
-    peerDiscovery: USE_FULL_NODE_DISCOVERY,
+    useDiscovery: GETH_USE_FULL_NODE_DISCOVERY,
+    useStaticNodes: GETH_USE_STATIC_NODES,
   },
 }
 

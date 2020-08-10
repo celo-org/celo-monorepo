@@ -6,7 +6,7 @@ import * as RNFS from 'react-native-fs'
 import RNGeth from 'react-native-geth'
 import { GethEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { DEFAULT_TESTNET, USE_FULL_NODE_DISCOVERY, USE_STATIC_NODES } from 'src/config'
+import { DEFAULT_TESTNET, GETH_START_HTTP_RPC_SERVER } from 'src/config'
 import { SYNCING_MAX_PEERS } from 'src/geth/consts'
 import networkConfig from 'src/geth/networkConfig'
 import Logger from 'src/utils/Logger'
@@ -83,7 +83,7 @@ async function createNewGeth(
   bootnodeEnodes: string[]
 ): Promise<typeof RNGeth> {
   Logger.debug('Geth@newGeth', 'Configure and create new Geth')
-  const { nodeDir, syncMode } = networkConfig
+  const { nodeDir, useDiscovery, useStaticNodes, syncMode } = networkConfig
   const genesis: string = await readGenesisBlockFile(nodeDir)
   const networkID: number = GenesisBlockUtils.getChainIdFromGenesis(genesis)
 
@@ -91,7 +91,7 @@ async function createNewGeth(
 
   const maxPeers = sync ? SYNCING_MAX_PEERS : 0
 
-  const gethOptions: any = {
+  let gethOptions: any = {
     nodeDir,
     networkID,
     genesis,
@@ -99,18 +99,23 @@ async function createNewGeth(
     maxPeers,
     useLightweightKDF: true,
     ipcPath: IPC_PATH,
-    noDiscovery: !USE_FULL_NODE_DISCOVERY,
-    httpHost: '0.0.0.0',
-    httpPort: 8545,
-    httpVirtualHosts: ['*'].join(','),
-    httpModules: ['rpc', 'txpool', 'admin', 'istanbul', 'les', 'net', 'web3', 'debug', 'eth'].join(
-      ','
-    ),
+    noDiscovery: !useDiscovery,
   }
 
-  if (USE_FULL_NODE_DISCOVERY) {
+  if (useDiscovery) {
     Logger.debug('Geth@newGeth', 'Using discovery, bootnodes = ' + bootnodeEnodes)
     gethOptions.bootnodeEnodes = bootnodeEnodes
+  }
+
+  if (GETH_START_HTTP_RPC_SERVER) {
+    Logger.debug('Geth@newGeth', 'Starting HTTP RPC server')
+    gethOptions = {
+      ...gethOptions,
+      httpHost: '0.0.0.0',
+      httpPort: 8545,
+      httpVirtualHosts: '*',
+      httpModules: 'admin,debug,eth,istanbul,les,net,rpc,txpool,web3',
+    }
   }
 
   // Setup Logging
@@ -121,7 +126,7 @@ async function createNewGeth(
   gethOptions.logFile = gethLogFilePath
   // Only log info and above to the log file.
   // The logcat logging mode remains unchanged.
-  gethOptions.logFileLogLevel = LogLevel.TRACE
+  gethOptions.logFileLogLevel = LogLevel.INFO
   Logger.debug('Geth@newGeth', 'Geth logs will be piped to ' + gethLogFilePath)
 
   return new RNGeth(gethOptions)
@@ -137,15 +142,21 @@ export async function initGeth(sync: boolean = true): Promise<typeof gethInstanc
   }
   gethLock = true
 
+  const { useDiscovery, useStaticNodes } = networkConfig
+
   try {
     if (!(await ensureGenesisBlockWritten())) {
       throw FailedToFetchGenesisBlockError
     }
-    let staticNodes: string[] = await getStaticNodes(sync)
-    Logger.info('Geth@init', `Using static nodes: ${staticNodes}`)
+    let staticNodes: string[] = []
+    // Static nodes enodes are also used as bootnodes for discovery
+    if (!sync && (useDiscovery || useStaticNodes)) {
+      staticNodes = await getStaticNodes(sync)
+    }
+    Logger.info('Geth@init', `Retrieved static nodes: ${staticNodes}`)
     // Always write the static nodes file, even if staticNodes is empty,
     // to ensure any static nodes written from a previous session are not used
-    await initializeStaticNodesFile(staticNodes)
+    await initializeStaticNodesFile(useStaticNodes ? staticNodes : [])
 
     let geth: typeof RNGeth
     ValoraAnalytics.track(GethEvents.create_geth_start)
@@ -203,9 +214,11 @@ export function isProviderConnectionError(error: any) {
 }
 
 async function getStaticNodes(sync: boolean): Promise<string[]> {
+  if (!sync) {
+    return []
+  }
   try {
-    const enodesStr =
-      sync && USE_STATIC_NODES ? await StaticNodeUtils.getStaticNodesAsync(DEFAULT_TESTNET) : '[]'
+    const enodesStr = await StaticNodeUtils.getStaticNodesAsync(DEFAULT_TESTNET)
     return JSON.parse(enodesStr)
   } catch (error) {
     Logger.error(
