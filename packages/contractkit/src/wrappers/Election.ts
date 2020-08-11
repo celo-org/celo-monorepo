@@ -5,6 +5,7 @@ import BigNumber from 'bignumber.js'
 import { EventLog } from 'web3-core'
 import { Address, NULL_ADDRESS } from '../base'
 import { Election } from '../generated/Election'
+import { zeroRange } from '../utils/array'
 import {
   BaseWrapper,
   CeloTransactionObject,
@@ -18,8 +19,6 @@ import {
   valueToInt,
 } from './BaseWrapper'
 import { Validator, ValidatorGroup } from './Validators'
-
-const range = (to: number) => Array.from(Array(to).keys())
 
 export interface ValidatorGroupVote {
   address: Address
@@ -152,7 +151,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    */
   async getValidatorSigners(blockNumber: number): Promise<Address[]> {
     const numValidators = await this.numberValidatorsInSet(blockNumber)
-    return concurrentMap(10, range(numValidators), (i: number) =>
+    return concurrentMap(10, zeroRange(numValidators), (i: number) =>
       this.validatorSignerAddressFromSet(i, blockNumber)
     )
   }
