@@ -1,5 +1,5 @@
 import { BtnTypes } from '@celo/react-components/components/Button.v2'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import progressDots from '@celo/react-components/styles/progressDots'
 import { Spacing } from '@celo/react-components/styles/styles.v2'
 import { useHeaderHeight } from '@react-navigation/stack'

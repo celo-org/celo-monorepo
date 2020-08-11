@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { StackScreenProps } from '@react-navigation/stack'
 import { memoize } from 'lodash'
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     bottom: 32,
     ...fontStyles.small600,
     lineHeight: undefined,
-    color: colors.white,
+    color: colors.light,
     textAlign: 'center',
   },
 })
