@@ -55,6 +55,7 @@
   * [contractkit/src/test-utils/PromiEventStub](modules/_contractkit_src_test_utils_promieventstub_.md)
   * [contractkit/src/test-utils/setup.global](modules/_contractkit_src_test_utils_setup_global_.md)
   * [contractkit/src/test-utils/teardown.global](modules/_contractkit_src_test_utils_teardown_global_.md)
+  * [contractkit/src/utils/array](modules/_contractkit_src_utils_array_.md)
   * [contractkit/src/utils/azure-key-vault-client](modules/_contractkit_src_utils_azure_key_vault_client_.md)
   * [AzureKeyVaultClient](classes/_contractkit_src_utils_azure_key_vault_client_.azurekeyvaultclient.md)
   * [Signature](classes/_contractkit_src_utils_azure_key_vault_client_.signature.md)
