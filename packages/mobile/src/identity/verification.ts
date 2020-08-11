@@ -1,4 +1,5 @@
 import { CeloTransactionObject } from '@celo/contractkit'
+import { PhoneNumberHashDetails } from '@celo/contractkit/lib/utils/phone-number-lookup/phone-number-identifier'
 import {
   ActionableAttestation,
   AttesationServiceRevealRequest,
@@ -33,7 +34,7 @@ import {
   setCompletedCodes,
   setVerificationStatus,
 } from 'src/identity/actions'
-import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privateHashing'
+import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import { acceptedAttestationCodesSelector, attestationCodesSelector } from 'src/identity/reducer'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
 import { VerificationStatus } from 'src/identity/types'
@@ -158,7 +159,6 @@ export function* doVerificationFlow() {
       yield put(setCompletedCodes(NUM_ATTESTATIONS_REQUIRED - status.numAttestationsRemaining))
 
       yield put(setVerificationStatus(VerificationStatus.RequestingAttestations))
-
       ValoraAnalytics.track(VerificationEvents.verification_request_all_attestations_start, {
         attestationsToRequest: status.numAttestationsRemaining,
       })

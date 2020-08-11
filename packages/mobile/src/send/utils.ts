@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import { call, put, select, take } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -7,12 +8,31 @@ import { FeeType } from 'src/fees/actions'
 import { getAddressFromPhoneNumber } from 'src/identity/contactMapping'
 import { E164NumberToAddressType, SecureSendPhoneNumberMapping } from 'src/identity/reducer'
 import { RecipientVerificationStatus } from 'src/identity/types'
-import { LocalCurrencySymbol } from 'src/localCurrency/consts'
-import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
-import { Recipient, RecipientKind } from 'src/recipients/recipient'
+import {
+  Actions,
+  FetchCurrentRateFailureAction,
+  FetchCurrentRateSuccessAction,
+  selectPreferredCurrency,
+} from 'src/localCurrency/actions'
+import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
+import { convertDollarsToLocalAmount, convertLocalAmountToDollars } from 'src/localCurrency/convert'
+import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
+import { UriData, uriDataFromUrl } from 'src/qrcode/schema'
+import {
+  Recipient,
+  RecipientKind,
+  RecipientWithContact,
+  RecipientWithQrCode,
+} from 'src/recipients/recipient'
+import { storeLatestInRecents } from 'src/send/actions'
 import { PaymentInfo } from 'src/send/reducers'
 import { TransactionDataInput } from 'src/send/SendAmount'
+import Logger from 'src/utils/Logger'
 import { timeDeltaInHours } from 'src/utils/time'
+
+const TAG = 'send/utils'
 
 export interface ConfirmationInput {
   recipient: Recipient
@@ -104,4 +124,59 @@ export function showLimitReachedError(
   }
 
   return showError(ErrorMessages.PAYMENT_LIMIT_REACHED, ALERT_BANNER_DURATION, translationParams)
+}
+
+export function* handleSendPaymentData(data: UriData, cachedRecipient?: RecipientWithContact) {
+  const recipient: RecipientWithQrCode = {
+    kind: RecipientKind.QrCode,
+    address: data.address,
+    displayId: data.e164PhoneNumber,
+    displayName: data.displayName || cachedRecipient?.displayName || 'anonymous',
+    e164PhoneNumber: data.e164PhoneNumber,
+    phoneNumberLabel: cachedRecipient?.phoneNumberLabel,
+    thumbnailPath: cachedRecipient?.thumbnailPath,
+    contactId: cachedRecipient?.contactId,
+  }
+  yield put(storeLatestInRecents(recipient))
+
+  if (data.currencyCode) {
+    yield put(selectPreferredCurrency(data.currencyCode as LocalCurrencyCode))
+    const action: FetchCurrentRateSuccessAction | FetchCurrentRateFailureAction = yield take([
+      Actions.FETCH_CURRENT_RATE_SUCCESS,
+      Actions.FETCH_CURRENT_RATE_FAILURE,
+    ])
+    if (action.type === Actions.FETCH_CURRENT_RATE_FAILURE) {
+      yield put(showError(ErrorMessages.EXCHANGE_RATE_FAILED))
+      Logger.warn(TAG, '@handleSendPaymentData failed to fetch current rate')
+      return
+    }
+  }
+
+  if (data.amount) {
+    // TODO: integrate with SendConfirmation component
+    const exchangeRate = yield select(getLocalCurrencyExchangeRate)
+    const amount = convertLocalAmountToDollars(data.amount, exchangeRate)
+    if (!amount) {
+      Logger.warn(TAG, '@handleSendPaymentData null amount')
+      return
+    }
+    const transactionData: TransactionDataInput = {
+      recipient,
+      amount,
+      reason: data.comment,
+      type: TokenTransactionType.PayPrefill,
+    }
+    navigate(Screens.SendConfirmation, { transactionData, isFromScan: true })
+  } else {
+    navigate(Screens.SendAmount, { recipient, isFromScan: true })
+  }
+}
+
+export function* handlePaymentDeeplink(deeplink: string) {
+  try {
+    const paymentData = uriDataFromUrl(deeplink)
+    yield call(handleSendPaymentData, paymentData)
+  } catch (e) {
+    Logger.warn('handlePaymentDeepLink', `deeplink ${deeplink} failed with ${e}`)
+  }
 }
