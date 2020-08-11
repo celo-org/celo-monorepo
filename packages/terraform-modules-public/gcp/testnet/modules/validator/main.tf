@@ -1,6 +1,7 @@
 locals {
   attached_disk_name = "celo-data"
-  name_prefix        = "${var.celo_env}-validator"
+  #name_prefix        = "${var.celo_env}-validator"
+  name_prefix = "${var.gcloud_project}-validator"
 }
 
 resource "google_compute_address" "validator_internal" {
@@ -15,6 +16,9 @@ resource "google_compute_instance" "validator" {
   name         = "${local.name_prefix}-${count.index}"
   machine_type = var.instance_type
 
+  #deletion_protection = true
+  deletion_protection = false
+
   count = var.validator_count
 
   tags = ["${var.celo_env}-validator"]
@@ -23,7 +27,8 @@ resource "google_compute_instance" "validator" {
 
   boot_disk {
     initialize_params {
-      image = "debian-cloud/debian-9"
+      #image = "debian-cloud/debian-9"
+      image = "debian-cloud/debian-10"
     }
   }
 
@@ -53,6 +58,7 @@ resource "google_compute_instance" "validator" {
       istanbul_request_timeout_ms : var.istanbul_request_timeout_ms,
       max_peers : var.validator_max_peers,
       network_id : var.network_id,
+      gcloud_project : var.gcloud_project,
       rid : count.index,
       validator_name : var.validator_name,
       validator_account_address : var.validator_signer_account_addresses[count.index],
@@ -64,14 +70,19 @@ resource "google_compute_instance" "validator" {
       reset_geth_data : var.reset_geth_data
     }
   )
+
+  service_account {
+    scopes = var.service_account_scopes
+  }
 }
 
 resource "google_compute_disk" "validator" {
-  name  = "${local.name_prefix}-disk-${count.index}"
+  name  = "${local.name_prefix}-celo-data-disk-${count.index}"
   count = var.validator_count
 
-  type = "pd-ssd"
+  #type = "pd-ssd"
+  type = "pd-standard"      #disk I/O doesn't yet warrant SSD backed validators/proxies
   # in GB
-  size                      = 100
+  size                      = 50
   physical_block_size_bytes = 4096
 }
