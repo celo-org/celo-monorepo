@@ -2771,9 +2771,17 @@
     web3 "1.2.4"
     web3-core-helpers "1.2.4"
 
-"@celo/ganache-cli@git+https://github.com/celo-org/ganache-cli.git#2fcd376":
+"@celo/ganache-cli@git+https://github.com/celo-org/ganache-cli.git#21652da":
   version "6.6.1"
-  resolved "git+https://github.com/celo-org/ganache-cli.git#2fcd376819c88fb9db32a7dc61e8d288e216298e"
+  resolved "git+https://github.com/celo-org/ganache-cli.git#21652da953de1a7217c0cb86b596e94d22c2cc76"
+  dependencies:
+    ethereumjs-util "6.1.0"
+    source-map-support "0.5.12"
+    yargs "13.2.4"
+
+"@celo/ganache-cli@git+https://github.com/celo-org/ganache-cli.git#e933297":
+  version "6.6.1"
+  resolved "git+https://github.com/celo-org/ganache-cli.git#e93329707efbe899ac2f32a30ccf2badbbec8bdf"
   dependencies:
     ethereumjs-util "6.1.0"
     source-map-support "0.5.12"

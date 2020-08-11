@@ -26,6 +26,7 @@ enum RpcSignerEndpoint {
   UnlockAccount = 'personal_unlockAccount',
   SignTransaction = 'eth_signTransaction',
   SignBytes = 'eth_sign',
+  Decrypt = 'personal_decrypt',
 }
 
 // tslint:disable-next-line: interface-over-type-literal
@@ -34,6 +35,7 @@ type RpcSignerEndpointInputs = {
   personal_unlockAccount: [string, string, number]
   eth_signTransaction: [any] // RpcTx doesn't match Tx because of nonce as string instead of number
   eth_sign: [string, string]
+  personal_decrypt: [string, string]
 }
 
 // tslint:disable-next-line: interface-over-type-literal
@@ -42,6 +44,7 @@ type RpcSignerEndpointResult = {
   personal_unlockAccount: boolean
   eth_signTransaction: EncodedTransaction
   eth_sign: string
+  personal_decrypt: string
 }
 
 /**
@@ -141,9 +144,12 @@ export class RpcSigner implements Signer {
     return response.result! as RpcSignerEndpointResult[typeof endpoint]
   }
 
-  decrypt(_ciphertext: Buffer) {
-    throw new Error('Decryption operation is not supported on this signer')
-    // To make the compiler happy
-    return Promise.resolve(_ciphertext)
+  async decrypt(ciphertext: Buffer) {
+    const resp = await this.callAndCheckResponse(RpcSignerEndpoint.Decrypt, [
+      this.account,
+      ensureLeading0x(ciphertext.toString('hex')),
+    ])
+
+    return Buffer.from(trimLeading0x(resp), 'hex')
   }
 }
