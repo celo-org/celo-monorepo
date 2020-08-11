@@ -1,20 +1,12 @@
 ## Key Rotation
 
-<<<<<<< HEAD
 As detailed in [the Celo account roles description page](./detailed.md), Celo Locked Gold accounts can authorize separate signer keys for various roles such as voting or validating. This way, if an authorized signer key is lost or compromised, the Locked Gold account can authorize a new signer to replace the old one, without risking the key that custodies funds. This prevents losing an authorized signer key from becoming a catastrophic event. In fact, it is recommended as an operational best practice to regularly rotate keys to limit the impact of keys being silently compromised.
-=======
-As detailed in [the Celo account roles description page](./detailed), Celo Locked Gold accounts can authorize separate signer keys for various roles such as voting or validating. This way, if an authorized signer key is lost or compromised, the Locked Gold account can authorize a new signer to replace the old one. This prevents losing an authorized signer key from becoming a catastrophic event. In fact, it is recommended as an operational best practice to regularly rotate keys to limit the impact of keys being silently compromised.
->>>>>>> a14f476ee1364ce968216ba48732d941159c299a
 
 ### Validator Signer Rotation
 
 Because the Validator signer key is constantly in use to sign consensus messages, special care must be taken when authorizing a new Validator signer key. The following steps detail the recommended procedure for rotating the validator signer key of an active and elected validator:
 
-<<<<<<< HEAD
 1. Create a new Validator instance as detailed in the [Deploy a Validator](../../getting-started/running-a-validator-in-mainnet.md#deploy-a-validator-machine) section of the getting started documentation. When using a proxy, additionally create a new proxy and peer it with the new validator instance, as described in the same document. Wait for the new instances to sync before proceeding. Please note that when running the proxy, the `--proxy.proxiedvalidatoraddress` flag should reflect the new validator signer address. Otherwise, the proxy will not be able to peer with the validator.
-=======
-1. Create a new Validator instance as detailed in the [Deploy a Validator](../../getting-started/mainnet/running-a-validator-in-mainnet.md#deploy-a-validator-machine) section of the getting started documentation. When using a proxy, additionally create a new proxy and peer it with the new validator instance, as described in the same document. Wait for the new instances to sync before proceeding. Please note that when running the proxy, the `--proxy.proxiedvalidatoraddress` flag should reflect the new validator signer address. Otherwise, the proxy will not be able to forward messages for the validator.
->>>>>>> a14f476ee1364ce968216ba48732d941159c299a
 
   {% hint style="warning" %}
   Before proceeding to step 2 ensure there is sufficient time until the end of the epoch to complete key rotation.
