@@ -250,6 +250,41 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/account/claim-name.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-name.ts)_
 
+### Claim-storage
+
+Claim a storage root and add the claim to a local metadata file
+
+```
+USAGE
+  $ celocli account:claim-storage FILE
+
+ARGUMENTS
+  FILE  Path of the metadata file
+
+OPTIONS
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
+                                                     authorized signer for the address in the metadata
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
+  --url=https://www.celo.org                         (required) The URL of the storage root you want to claim
+
+  --useLedger                                        Set it to use a ledger wallet
+
+EXAMPLE
+  claim-storage ~/metadata.json --url http://test.com/myurl --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
+```
+
+_See code: [packages/cli/src/commands/account/claim-storage.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-storage.ts)_
+
 ### Create-metadata
 
 Create an empty identity metadata file. Use this metadata file to store claims attesting to ownership of off-chain resources. Claims can be generated with the account:claim-\* commands.
