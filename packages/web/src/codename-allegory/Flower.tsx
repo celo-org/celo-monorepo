@@ -48,13 +48,20 @@ export default function Flower() {
 
   const translateY = value.interpolate(isMobile ? POSITIONING_MOBILE : POSITIONING_DESKTOP)
 
+  const skewX = value.interpolate(SKEW)
+
+  const rotate = value.interpolate(ROTATE)
+
   return (
     <View style={[styles.breathe, isMobile && styles.breatheMobile]}>
       <Animated.View
         style={[
           styles.root,
           isMobile && styles.mobileRoot,
-          { transform: [{ scale }, { translateY }], opacity: isLoaded ? 1 : 0 },
+          {
+            transform: [{ scale }, { translateY }, { skewX }, { rotate }],
+            opacity: isLoaded ? 1 : 0,
+          },
         ]}
       >
         <AnimatedRatio ratio={1} style={[styles.outline, { opacity: outlineOpacity }]}>
@@ -146,4 +153,14 @@ const POSITIONING_DESKTOP = {
 const POSITIONING_MOBILE = {
   inputRange: [0, 0.1, 0.5, 1],
   outputRange: ['0%', '0%', '25%', '100%'],
+}
+
+const SKEW = {
+  inputRange: [0, 0.27, 0.45, 0.66],
+  outputRange: ['0deg', '4deg', '-2deg', '2deg'],
+}
+
+const ROTATE = {
+  inputRange: [0, 0.66],
+  outputRange: ['0deg', '45deg'],
 }
