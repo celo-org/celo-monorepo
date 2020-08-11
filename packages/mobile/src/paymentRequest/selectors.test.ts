@@ -1,15 +1,18 @@
-import { getIncomingPaymentRequests, getOutgoingPaymentRequests } from 'src/account/selectors'
-import { PaymentRequestStatus } from 'src/account/types'
-import { paymentRequestDouble } from 'src/paymentRequest/__mocks__'
+import { createMockPaymentRequest } from 'src/paymentRequest/__mocks__'
+import {
+  getIncomingPaymentRequests,
+  getOutgoingPaymentRequests,
+} from 'src/paymentRequest/selectors'
+import { PaymentRequestStatus } from 'src/paymentRequest/types'
 
 describe('selectors', () => {
   describe(getIncomingPaymentRequests, () => {
     it('excludes declined and completed requests', () => {
       const state: any = {
-        account: {
+        paymentRequest: {
           incomingPaymentRequests: [
-            paymentRequestDouble({ status: PaymentRequestStatus.DECLINED }),
-            paymentRequestDouble({ status: PaymentRequestStatus.COMPLETED }),
+            createMockPaymentRequest({ status: PaymentRequestStatus.DECLINED }),
+            createMockPaymentRequest({ status: PaymentRequestStatus.COMPLETED }),
           ],
         },
       }
@@ -17,12 +20,12 @@ describe('selectors', () => {
     })
 
     it('returns requested payments', () => {
-      const goodRequest = paymentRequestDouble({ status: PaymentRequestStatus.REQUESTED })
+      const goodRequest = createMockPaymentRequest({ status: PaymentRequestStatus.REQUESTED })
 
       const state: any = {
-        account: {
+        paymentRequest: {
           incomingPaymentRequests: [
-            paymentRequestDouble({
+            createMockPaymentRequest({
               status: PaymentRequestStatus.COMPLETED,
             }),
             goodRequest,
@@ -37,10 +40,10 @@ describe('selectors', () => {
   describe(getOutgoingPaymentRequests, () => {
     it('excludes declined and completed requests', () => {
       const state: any = {
-        account: {
+        paymentRequest: {
           outgoingPaymentRequests: [
-            paymentRequestDouble({ status: PaymentRequestStatus.DECLINED }),
-            paymentRequestDouble({ status: PaymentRequestStatus.COMPLETED }),
+            createMockPaymentRequest({ status: PaymentRequestStatus.DECLINED }),
+            createMockPaymentRequest({ status: PaymentRequestStatus.COMPLETED }),
           ],
         },
       }
@@ -48,12 +51,12 @@ describe('selectors', () => {
     })
 
     it('returns requested payments', () => {
-      const goodRequest = paymentRequestDouble({ status: PaymentRequestStatus.REQUESTED })
+      const goodRequest = createMockPaymentRequest({ status: PaymentRequestStatus.REQUESTED })
 
       const state: any = {
-        account: {
+        paymentRequest: {
           outgoingPaymentRequests: [
-            paymentRequestDouble({
+            createMockPaymentRequest({
               status: PaymentRequestStatus.COMPLETED,
             }),
             goodRequest,

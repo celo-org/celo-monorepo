@@ -59,6 +59,7 @@ describe('Redux persist migrations', () => {
     const migratedSchema = migrations[3](v2Stub)
     expect(migratedSchema.send.recentPayments.length).toEqual(0)
   })
+
   it('works for v3 to v4', () => {
     const v3Stub = {
       ...v2Schema,
@@ -69,5 +70,24 @@ describe('Redux persist migrations', () => {
     }
     const migratedSchema = migrations[4](v3Stub)
     expect(migratedSchema.identity.acceptedAttestationCodes.length).toEqual(0)
+  })
+
+  it('works for v4 to v5', () => {
+    const v4Stub = {
+      account: {
+        incomingPaymentRequests: [1, 2, 3],
+        outgoingPaymentRequests: [],
+      },
+      web3: {
+        commentKey: 'key',
+      },
+    }
+    const migratedSchema = migrations[5](v4Stub)
+    expect(migratedSchema.paymentRequest.incomingPaymentRequests).toMatchObject([1, 2, 3])
+    expect(migratedSchema.paymentRequest.outgoingPaymentRequests).toMatchObject([])
+    expect(migratedSchema.account.incomingPaymentRequests).toBe(undefined)
+    expect(migratedSchema.account.outgoingPaymentRequests).toBe(undefined)
+    expect(migratedSchema.web3.dataEncryptionKey).toBe('key')
+    expect(migratedSchema.web3.commentKey).toBe(undefined)
   })
 })
