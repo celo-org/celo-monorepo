@@ -35,6 +35,37 @@ variable instance_types {
   }
 }
 
+variable iam_instance_profiles {
+  description = "Optional IAM instances profile names for each component. For example, a profile that gives CloudWatch agent permissions (https://amzn.to/3gpfCt5)"
+  type        = map(string)
+
+  default = {
+    bastion             = null
+    proxy               = null
+    validator           = null
+    attestation_service = null
+  }
+}
+
+variable cloudwatch_log_group_names {
+  description = "Optional log group names to log Docker output to CloudWatch. If this is set for a node type, that node will install the CloudWatch agent. Make sure iam_instance_profile is also set on that node type with CloudWatch agent permissions."
+  type        = map(string)
+
+  default = {
+    proxy               = ""
+    validator           = ""
+    attestation_service = ""
+    attestation_node    = ""
+  }
+
+}
+
+variable cloudwatch_collect_disk_and_memory_usage {
+  description = "Determines if the CloudWatch agent should be installed to collect disk and memory usage"
+  type        = bool
+  default     = false
+}
+
 variable key_pair_name {
   type        = string
   description = "AWS Key Pair name for SSH access"

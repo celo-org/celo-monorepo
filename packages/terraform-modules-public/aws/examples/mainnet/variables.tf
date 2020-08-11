@@ -15,11 +15,11 @@ variable cidr_blocks {
   })
   description = "The cidr_blocks for the different subnets in a redundant Celo network"
   default = {
-    vpc                 = "10.10.0.0/16"
-    subnet_az1_public   = "10.10.0.0/24"
-    subnet_az1_private  = "10.10.1.0/24"
-    subnet_az2_public   = "10.10.10.0/24"
-    subnet_az2_private  = "10.10.11.0/24"
+    vpc                 = "10.20.0.0/16"
+    subnet_az1_public   = "10.20.0.0/24"
+    subnet_az1_private  = "10.20.1.0/24"
+    subnet_az2_public   = "10.20.10.0/24"
+    subnet_az2_private  = "10.20.11.0/24"
     allowed_ssh_clients = "0.0.0.0/0"
   }
 }
@@ -32,19 +32,19 @@ variable key_pair_name {
 variable celo_image {
   type        = string
   description = "Docker image for Celo nodes"
-  default     = "us.gcr.io/celo-testnet/celo-node:baklava"
+  default     = "us.gcr.io/celo-org/celo-node:mainnet"
 }
 
 variable celo_network_id {
   type        = string
   description = "ID of the Celo network to join"
-  default     = "40120"
+  default     = "42220"
 }
 
 variable ethstats_host {
   type        = string
   description = "Hostname for ethstats"
-  default     = "baklava-celostats-server.celo-testnet.org"
+  default     = "stats-server.celo.org"
 }
 
 variable proxies {
@@ -162,7 +162,7 @@ variable validators {
 variable celo_image_attestation {
   type        = string
   description = "Docker image for Celo attestation service"
-  default     = "us.gcr.io/celo-testnet/celo-monorepo:attestation-service-baklava"
+  default     = "us.gcr.io/celo-testnet/celo-monorepo:attestation-service-1-0-1"
 }
 
 variable twilio_messaging_service_sid {
