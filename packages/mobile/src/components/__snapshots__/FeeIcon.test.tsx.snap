@@ -43,7 +43,7 @@ Array [
       style={
         Object {
           "height": 12,
-          "tintColor": "#BDBDBD",
+          "tintColor": "#B4B9BD",
           "width": 12,
         }
       }
@@ -295,7 +295,7 @@ Array [
       style={
         Object {
           "height": 12,
-          "tintColor": "#BDBDBD",
+          "tintColor": "#B4B9BD",
           "width": 12,
         }
       }

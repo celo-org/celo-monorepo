@@ -2,7 +2,7 @@ import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Bu
 import FormInput from '@celo/react-components/components/FormInput'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import PhoneNumberInput from '@celo/react-components/components/PhoneNumberInput'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import { Countries } from '@celo/utils/src/countries'
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import { StackScreenProps } from '@react-navigation/stack'
