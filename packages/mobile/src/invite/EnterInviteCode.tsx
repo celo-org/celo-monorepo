@@ -1,7 +1,7 @@
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import TextButton from '@celo/react-components/components/TextButton.v2'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { HeaderHeightContext } from '@react-navigation/stack'
 import * as React from 'react'
@@ -165,7 +165,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
                   </View>
                   {isSkippingInvite && (
                     <View>
-                      <ActivityIndicator size="large" color={colors.celoGreen} />
+                      <ActivityIndicator size="large" color={colors.greenBrand} />
                     </View>
                   )}
                   <View>

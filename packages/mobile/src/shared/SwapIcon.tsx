@@ -10,7 +10,7 @@ interface Props {
 export default class SwapIcon extends React.PureComponent<Props> {
   static defaultProps = {
     size: 20,
-    color: colors.celoGreen,
+    color: colors.greenBrand,
   }
 
   render() {

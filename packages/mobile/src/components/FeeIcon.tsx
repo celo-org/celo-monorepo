@@ -22,7 +22,7 @@ interface State {
 // /* tslint:disable:max-classes-per-file */
 class FeeIcon extends React.Component<Props, State> {
   static defaultProps = {
-    tintColor: colors.lightGray,
+    tintColor: colors.gray3,
   }
 
   state = {

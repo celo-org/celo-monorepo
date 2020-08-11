@@ -72,7 +72,9 @@ async function test() {
 
     const testGlob =
       argv._.length > 0
-        ? argv._.map((testName) => `test/\*\*/${testName}.ts`).join(' ')
+        ? argv._.map((testName) =>
+            testName.endsWith('/') ? `test/${testName}\*\*/*.ts` : `test/\*\*/${testName}.ts`
+          ).join(' ')
         : `test/\*\*/*.ts`
     const testFiles = glob.readdirSync(testGlob)
     if (testFiles.length === 0) {
