@@ -1,5 +1,5 @@
 import { Response } from 'node-fetch'
-import { REQUEST_EXPIRY_WINDOW } from '../../signer/src/common/constants'
+import { REQUEST_EXPIRY_WINDOW_MS } from '../../common/src/utils/constants'
 import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
 import { authenticateUser, isVerified } from '../src/common/identity'
 import { VERSION } from '../src/config'
@@ -158,7 +158,7 @@ describe(`POST /getDistributedBlindedSalt endpoint`, () => {
       const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
       const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
       const mockHeader = 'fdsfdsfs'
-      const timestamp = Date.now() - REQUEST_EXPIRY_WINDOW
+      const timestamp = Date.now() - REQUEST_EXPIRY_WINDOW_MS
 
       const mockRequestData = {
         blindedQueryPhoneNumber,

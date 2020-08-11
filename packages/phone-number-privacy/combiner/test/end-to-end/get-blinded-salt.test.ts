@@ -4,7 +4,7 @@ import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/add
 import { serializeSignature, signMessage } from '@celo/utils/lib/signatureUtils'
 import 'isomorphic-fetch'
 import Web3 from 'web3'
-import { getBlindedPhoneNumber } from '../../../common/test/utils'
+import { getBlindedPhoneNumber, replenishQuota } from '../../../common/test/utils'
 import config from '../../src/config'
 
 require('dotenv').config()
@@ -21,6 +21,8 @@ const IDENTIFIER = PhoneNumberUtils.getPhoneHash(PHONE_NUMBER)
 const BLINDING_FACTOR = new Buffer('0IsBvRfkBrkKCIW6HV0/T1zrzjQSe8wRyU3PKojCnww=', 'base64')
 const BLINDED_PHONE_NUMBER = getBlindedPhoneNumber(PHONE_NUMBER, BLINDING_FACTOR)
 const DEFAULT_FORNO_URL = config.blockchain.provider
+
+jest.setTimeout(15000)
 
 describe('Running against a deployed service', () => {
   describe('Returns status 400 with invalid input', () => {
@@ -102,10 +104,10 @@ describe('Running against a deployed service', () => {
     expect(response.status).toBe(403)
   })
 
-  xdescribe('With funded account', () => {
-    // TODO: Figure out a common way to prefund account to provide quota
+  xdescribe('With enough quota', () => {
     const timestamp = Date.now()
     it('Address salt querying succeeds with unused request', async () => {
+      await replenishQuota(ACCOUNT_ADDRESS2, PRIVATE_KEY2, DEFAULT_FORNO_URL)
       const response = await postToSignMessage(
         BLINDED_PHONE_NUMBER,
         PRIVATE_KEY2,
@@ -115,14 +117,15 @@ describe('Running against a deployed service', () => {
       expect(response.status).toBe(200)
     })
 
-    it('Address salt querying fails with used request', async () => {
+    it('Address salt querying succeeds with used request', async () => {
+      await replenishQuota(ACCOUNT_ADDRESS2, PRIVATE_KEY2, DEFAULT_FORNO_URL)
       const response = await postToSignMessage(
         BLINDED_PHONE_NUMBER,
         PRIVATE_KEY2,
         ACCOUNT_ADDRESS2,
         timestamp
       )
-      expect(response.status).toBe(400)
+      expect(response.status).toBe(200)
     })
   })
 })

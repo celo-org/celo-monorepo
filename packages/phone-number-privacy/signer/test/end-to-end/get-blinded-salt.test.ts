@@ -4,13 +4,14 @@ import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/add
 import { serializeSignature, signMessage } from '@celo/utils/lib/signatureUtils'
 import 'isomorphic-fetch'
 import Web3 from 'web3'
-import { getBlindedPhoneNumber } from '../../../common/test/utils'
+import { getBlindedPhoneNumber, replenishQuota } from '../../../common/test/utils'
 import config from '../../src/config'
 
 require('dotenv').config()
 
 const PHONE_NUM_PRIVACY_SERVICE = process.env.PHONE_NUM_PRIVACY_SIGNER_SERVICE_URL
 const SIGN_MESSAGE_ENDPOINT = '/getBlindedSalt'
+const GET_QUOTA_ENDPOINT = '/getQuota'
 
 const PRIVATE_KEY1 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
 const ACCOUNT_ADDRESS1 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY1))
@@ -22,10 +23,12 @@ const BLINDING_FACTOR = new Buffer('0IsBvRfkBrkKCIW6HV0/T1zrzjQSe8wRyU3PKojCnww=
 const BLINDED_PHONE_NUMBER = getBlindedPhoneNumber(PHONE_NUMBER, BLINDING_FACTOR)
 const DEFAULT_FORNO_URL = config.blockchain.provider
 
+jest.setTimeout(15000)
+
 describe('Running against a deployed service', () => {
   describe('Returns status 400 with invalid input', () => {
     it('With invalid address', async () => {
-      const response = await postToSignMessage(
+      const response = await postToSignGetSaltMessage(
         BLINDED_PHONE_NUMBER,
         PRIVATE_KEY1,
         '0x1234',
@@ -36,13 +39,18 @@ describe('Running against a deployed service', () => {
     })
 
     it('With missing blindedQueryPhoneNumber', async () => {
-      const response = await postToSignMessage('', PRIVATE_KEY1, ACCOUNT_ADDRESS1, Date.now())
+      const response = await postToSignGetSaltMessage(
+        '',
+        PRIVATE_KEY1,
+        ACCOUNT_ADDRESS1,
+        Date.now()
+      )
       expect(response.status).toBe(400)
     })
 
     xit('With invalid blindedQueryPhoneNumber', async () => {
       // TODO: update input-validation.ts to detect invalid blindedQueryPhoneNumber
-      const response = await postToSignMessage(
+      const response = await postToSignGetSaltMessage(
         'invalid',
         PRIVATE_KEY1,
         ACCOUNT_ADDRESS1,
@@ -54,7 +62,7 @@ describe('Running against a deployed service', () => {
 
   describe('Returns status 401 with invalid authentication headers', () => {
     it('With invalid auth header', async () => {
-      const response = await postToSignMessage(
+      const response = await postToSignGetSaltMessage(
         BLINDED_PHONE_NUMBER,
         PRIVATE_KEY1,
         ACCOUNT_ADDRESS1,
@@ -76,7 +84,7 @@ describe('Running against a deployed service', () => {
       const signature = signMessage(JSON.stringify(body), PRIVATE_KEY2, ACCOUNT_ADDRESS2)
       const authHeader = serializeSignature(signature)
 
-      const response = await postToSignMessage(
+      const response = await postToSignGetSaltMessage(
         BLINDED_PHONE_NUMBER,
         PRIVATE_KEY1,
         ACCOUNT_ADDRESS1,
@@ -87,13 +95,18 @@ describe('Running against a deployed service', () => {
     })
 
     it('With missing blindedQueryPhoneNumber', async () => {
-      const response = await postToSignMessage('', PRIVATE_KEY1, ACCOUNT_ADDRESS1, Date.now())
+      const response = await postToSignGetSaltMessage(
+        '',
+        PRIVATE_KEY1,
+        ACCOUNT_ADDRESS1,
+        Date.now()
+      )
       expect(response.status).toBe(400)
     })
   })
 
   it('Address salt querying out of quota', async () => {
-    const response = await postToSignMessage(
+    const response = await postToSignGetSaltMessage(
       BLINDED_PHONE_NUMBER,
       PRIVATE_KEY1,
       ACCOUNT_ADDRESS1,
@@ -102,11 +115,17 @@ describe('Running against a deployed service', () => {
     expect(response.status).toBe(403)
   })
 
-  xdescribe('With funded account', () => {
-    // TODO: Figure out a common way to prefund account to provide quota
-    const timestamp = Date.now()
+  describe('With enough quota', () => {
+    let initialQueryCount: number
+    let timestamp: number
+    beforeAll(async () => {
+      initialQueryCount = await getQuota(PRIVATE_KEY2, ACCOUNT_ADDRESS2, IDENTIFIER)
+      timestamp = Date.now()
+    })
+
     it('Address salt querying succeeds with unused request', async () => {
-      const response = await postToSignMessage(
+      await replenishQuota(ACCOUNT_ADDRESS2, PRIVATE_KEY2, DEFAULT_FORNO_URL)
+      const response = await postToSignGetSaltMessage(
         BLINDED_PHONE_NUMBER,
         PRIVATE_KEY2,
         ACCOUNT_ADDRESS2,
@@ -115,19 +134,60 @@ describe('Running against a deployed service', () => {
       expect(response.status).toBe(200)
     })
 
-    it('Address salt querying fails with used request', async () => {
-      const response = await postToSignMessage(
+    it('Address salt querying with unused request increments query count', async () => {
+      const queryCount = await getQuota(PRIVATE_KEY2, ACCOUNT_ADDRESS2, IDENTIFIER)
+      expect(queryCount).toEqual(initialQueryCount + 1)
+    })
+
+    it('Address salt querying succeeds with used request', async () => {
+      await replenishQuota(ACCOUNT_ADDRESS2, PRIVATE_KEY2, DEFAULT_FORNO_URL)
+      const response = await postToSignGetSaltMessage(
         BLINDED_PHONE_NUMBER,
         PRIVATE_KEY2,
         ACCOUNT_ADDRESS2,
         timestamp
       )
-      expect(response.status).toBe(400)
+      expect(response.status).toBe(200)
+    })
+
+    it('Address salt querying with used request does not increment query count', async () => {
+      const queryCount = await getQuota(PRIVATE_KEY2, ACCOUNT_ADDRESS2, IDENTIFIER)
+      expect(queryCount).toEqual(initialQueryCount + 1)
     })
   })
 })
 
-async function postToSignMessage(
+async function getQuota(
+  privateKey: string,
+  account: string,
+  hashedPhoneNumber?: string,
+  authHeader?: string
+): Promise<number> {
+  const body = JSON.stringify({
+    account,
+    hashedPhoneNumber,
+  })
+  if (!authHeader) {
+    const web3 = new Web3(new Web3.providers.HttpProvider(DEFAULT_FORNO_URL))
+    const contractKit = newKitFromWeb3(web3)
+    contractKit.addAccount(privateKey)
+    authHeader = await contractKit.web3.eth.sign(body, account)
+  }
+
+  const res = await fetch(PHONE_NUM_PRIVACY_SERVICE + GET_QUOTA_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: authHeader,
+    },
+    body,
+  })
+
+  return (await res.json()).performedQueryCount
+}
+
+async function postToSignGetSaltMessage(
   base64BlindedMessage: string,
   privateKey: string,
   account: string,

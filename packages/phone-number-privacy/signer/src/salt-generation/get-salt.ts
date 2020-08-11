@@ -1,5 +1,10 @@
 import {
   ErrorMessage,
+  hasValidAccountParam,
+  hasValidQueryPhoneNumberParam,
+  hasValidTimestamp,
+  isBodyReasonablySized,
+  phoneNumberHashIsValidIfExists,
   SignMessageResponse,
   SignMessageResponseFailure,
   WarningMessage,
@@ -8,13 +13,6 @@ import { Request, Response } from 'express'
 import { computeBlindedSignature } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
-import {
-  hasValidAccountParam,
-  hasValidQueryPhoneNumberParam,
-  hasValidTimestamp,
-  isBodyReasonablySized,
-  phoneNumberHashIsValidIfExists,
-} from '../common/input-validation'
 import logger from '../common/logger'
 import { getVersion } from '../config'
 import { incrementQueryCount } from '../database/wrappers/account'
@@ -36,7 +34,7 @@ export async function handleGetBlindedMessageForSalt(
 ) {
   logger.info('Begin getBlindedSalt request')
   try {
-    if (!isValidGetSignatureInput(request.body) || (await getRequestExists(request.body))) {
+    if (!isValidGetSignatureInput(request.body)) {
       respondWithError(response, 400, WarningMessage.INVALID_INPUT)
       return
     }
@@ -84,10 +82,13 @@ export async function handleGetBlindedMessageForSalt(
     const keyProvider = getKeyProvider()
     const privateKey = keyProvider.getPrivateKey()
     const signature = computeBlindedSignature(blindedQueryPhoneNumber, privateKey)
-    await incrementQueryCount(account)
+    if (!(await getRequestExists(request.body))) {
+      await incrementQueryCount(account)
+      await storeRequest(request.body)
+    } else {
+      logger.debug('Salt request already exists in db. Leaving quota unchanged.')
+    }
     logger.debug('Salt retrieval success')
-    await storeRequest(request.body)
-    logger.debug('Salt request stored')
 
     let signMessageResponse: SignMessageResponse
     const signMessageResponseSuccess: SignMessageResponse = {

@@ -1,5 +1,11 @@
 import {
   ErrorMessage,
+  hasValidAccountParam,
+  hasValidQueryPhoneNumberParam,
+  hasValidTimestamp,
+  isBodyReasonablySized,
+  MAX_BLOCK_DISCREPANCY_THRESHOLD,
+  phoneNumberHashIsValidIfExists,
   SignMessageResponse,
   SignMessageResponseFailure,
   SignMessageResponseSuccess,
@@ -9,16 +15,8 @@ import AbortController from 'abort-controller'
 import { Request, Response } from 'firebase-functions'
 import fetch, { Response as FetchResponse } from 'node-fetch'
 import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
-import { MAX_BLOCK_DISCREPANCY_THRESHOLD } from '../common/constants'
 import { respondWithError } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
-import {
-  hasValidAccountParam,
-  hasValidQueryPhoneNumberParam,
-  hasValidTimestamp,
-  isBodyReasonablySized,
-  phoneNumberHashIsValidIfExists,
-} from '../common/input-validation'
 import logger from '../common/logger'
 import config, { VERSION } from '../config'
 

@@ -1,5 +1,4 @@
-import { ErrorMessage } from '@celo/phone-number-privacy-common'
-import { DB_TIMEOUT } from '../../common/constants'
+import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
 import logger from '../../common/logger'
 import { GetBlindedMessageForSaltRequest } from '../../salt-generation/get-salt'
 import { getDatabase } from '../database'
@@ -16,10 +15,11 @@ export async function getRequestExists(request: GetBlindedMessageForSaltRequest)
   logger.debug('Checking if request exists')
   try {
     const existingRequest = await requests()
-      .where(REQUESTS_COLUMNS.timestamp, new Date(request.timestamp as number)) // indexed
-      .andWhere(REQUESTS_COLUMNS.address, request.account)
-      .andWhere(REQUESTS_COLUMNS.hashedPhoneNumber, request.hashedPhoneNumber as string) // TODO(Alec) why is this not always defined?
-      .andWhere(REQUESTS_COLUMNS.blindedQueryPhoneNumber, request.blindedQueryPhoneNumber)
+      .where({
+        [REQUESTS_COLUMNS.timestamp]: new Date(request.timestamp as number),
+        [REQUESTS_COLUMNS.address]: request.account,
+        [REQUESTS_COLUMNS.blindedQueryPhoneNumber]: request.blindedQueryPhoneNumber,
+      })
       .first()
     return !!existingRequest
   } catch (e) {
