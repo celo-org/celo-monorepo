@@ -1,7 +1,10 @@
 /* tslint:disable:no-console */
-import { readJsonSync, writeJsonSync } from 'fs-extra'
+import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
+import { readdirSync, readJsonSync, writeJsonSync } from 'fs-extra'
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
+import { Address, eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { linkedLibraries } from '@celo/protocol/migrationsConfig'
+import { basename, join } from 'path'
 
 // import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 
@@ -50,18 +53,19 @@ class ContractDependencies {
 }
 
 class ContractAddresses {
-  dependencies: Map<string, Address>
-  constructor(contracts: string[], registry: Registry) {
-    this.addresses = new Map()
-    contracts.forEach((contract: string) => {
+  constructor(public addresses: Map<string, Address>) {}
+  static async create(contracts: string[], registry: any) {
+    const addresses = new Map()
+    contracts.forEach(async (contract: string) => {
       const registeredAddress = await registry.getAddressForString(contract)
-      if (!eqAddress(registeredAddress, nullAddress)) {
-        this.addresses.set(contract, registeredAddress)
+      if (!eqAddress(registeredAddress, NULL_ADDRESS)) {
+        addresses.set(contract, registeredAddress)
       }
     })
+    return new ContractAddresses(addresses)
   }
 
-  public get = (contract: string): string[] => {
+  public get = (contract: string): Address => {
     if (this.addresses.has(contract)) {
       return this.addresses.get(contract)
     } else {
@@ -75,20 +79,10 @@ class ContractAddresses {
 }
 
 /*
- * TOOD:
- *   Ensure libraries are linked
- *     First, create a dependency graph:
- *       For each contract in the build directory, see if it links a library
- *     Second, create a mapping of contract -> address:
- *       Fetch from registry, when possible
- *       Otherwise, read from a file
- *     Then, do the following recursion:
- *       if the contract has been marked as upgraded, nothing
- *       else if the contract has not been marked as upgraded:
- *         upgrade each of its dependencies
- *         link libraries in the contract
- *         upgrade the contract
- *         set the contract -> address mapping
+ * TODO:
+ *   Deal with libraries:
+ *     For the first iteration of this tool, all libraries should be re-deployed. - DONE
+ *     Should check that all contracts linking libraries have changes.- NOT DONE
  *   Figure out setAndInitialize data
  */
 module.exports = async (callback: (error?: any) => number) => {
@@ -98,41 +92,75 @@ module.exports = async (callback: (error?: any) => number) => {
     })
     const report: ASTDetailedVersionedReport = readJsonSync(argv.report).report
     const dependencies = new ContractDependencies(linkedLibraries)
-    const contracts = fs.readdirSync(argv.build_directory).map((x) => path.basename(x))
+    const contracts = readdirSync(join(argv.build_directory, 'contracts')).map((x) =>
+      basename(x, '.json')
+    )
     const registry = await artifacts
       .require('Registry')
       .at('0x000000000000000000000000000000000000ce10')
-    const addresses = new ContractAddresses(contracts, registry)
+    const addresses = await ContractAddresses.create(contracts, registry)
     const released: Set<string> = new Set([])
     const proposal = []
     const release = async (contractName: string) => {
-      console.log(`Releasing ${contractName}`)
       if (released.has(contractName)) {
-        console.log(`Already released ${contractName}`)
         return
       } else {
         // 1. Release all dependencies.
         const contractDependencies = dependencies.get(contractName)
-        contractDependencies.forEach(async (dependency: string) => {
+        for (const dependency of contractDependencies) {
           await release(dependency)
-        })
+        }
         // 2. Link dependencies.
-        const Contract = artifacts.require(contractName)
+        const Contract = await artifacts.require(contractName)
         await Promise.all(contractDependencies.map((d) => Contract.link(d, addresses.get(d))))
+
+        // TODO(asa): Redeploying all libraries is only needed for release 1.
+        // Remove `isLibrary` for future releases.
+        const isLibrary = Object.keys(linkedLibraries).includes(contractName)
+        const deployImplementation = Object.keys(report.contracts).includes(contractName)
+        const deployProxy =
+          deployImplementation && report.contracts[contractName].changes.storage.length
+
         // 3. Deploy new versions of the contract and proxy, if needed.
-        if (Object.keys(report.contracts).includes(contractName)) {
+        if (deployImplementation || isLibrary) {
           console.log(`Deploying implementation of ${contractName}`)
           const contract = await Contract.new()
-          proposal.push({
-            contract: `${contractName}Proxy`,
-            function: '_setImplementation',
-            args: [contract.address],
-            value: '0',
-          })
-          if (report.contracts[contractName].changes.storage.length) {
+          if (deployProxy || isLibrary) {
             console.log(`Deploying proxy for ${contractName}`)
-            const Proxy = artifacts.require(`${contractName}Proxy`)
+            const Proxy = await artifacts.require(`${contractName}Proxy`)
             const proxy = await Proxy.new()
+            if (isLibrary) {
+              await proxy._setImplementation(contract.address)
+            } else {
+              // TODO(asa): This is a hack!
+              const initializerAbi = (contract as any).abi.find(
+                (abi: any) => abi.type === 'function' && abi.name === 'initialize'
+              )
+              const args = ['0x000000000000000000000000000000000000ce10', 10, 5, 20]
+              await setAndInitializeImplementation(
+                web3,
+                proxy,
+                contract.address,
+                initializerAbi,
+                {},
+                ...args
+              )
+            }
+            // TODO(asa): This makes essentially every contract dependent on Governance.
+            // How to handle?
+            await proxy._transferOwnership(addresses.get('Governance'))
+            const proxiedContract = await artifacts.require(contractName).at(proxy.address)
+            // TODO(asa): How to deal with non-ownable
+            const transferOwnershipAbi = (contract as any).abi.find(
+              (abi: any) => abi.type === 'function' && abi.name === 'transferOwnership'
+            )
+            if (transferOwnershipAbi) {
+              await proxiedContract.transferOwnership(addresses.get('Governance'))
+            } else {
+              console.log(`Unable to transfer ownership for ${contractName}`)
+            }
+            // 4. Update the contract's address, if needed.
+            addresses.set(contractName, proxy.address)
             proposal.push({
               contract: 'Registry',
               function: 'setAddressFor',
@@ -141,23 +169,24 @@ module.exports = async (callback: (error?: any) => number) => {
                 proxy.address,
               ],
               value: '0',
+              description: `Registry: ${contractName} -> ${proxy.address}`,
             })
-            // TODO(asa): Need to actually pass something here...
-            await proxy._setAndInitializeImplementation('0x')
-            // TODO(asa): This makes essentially every contract dependent on Governance.
-            // How to handle?
-            await proxy._transferOwnership(addresses.get('Governance'))
-            // 4. Update the contract's address, if needed.
-            addresses.set(contractName, proxy.address)
+          } else {
+            proposal.push({
+              contract: `${contractName}Proxy`,
+              function: '_setImplementation',
+              args: [contract.address],
+              value: '0',
+            })
           }
         }
         // 5. Mark the contract as released
         released.add(contractName)
       }
     }
-    contracts.forEach(async (contractName: string) => {
+    for (const contractName of contracts) {
       await release(contractName)
-    })
+    }
     writeJsonSync(argv.proposal, proposal, { spaces: 2 })
     callback()
   } catch (error) {
