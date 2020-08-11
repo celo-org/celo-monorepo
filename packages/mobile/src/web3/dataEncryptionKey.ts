@@ -179,7 +179,7 @@ export function* getAuthSignerForAccount(account: string) {
       } else {
         Logger.info(TAG + 'getAuthSignerForAccount', 'Using DEK for authentication')
         return {
-          authenticationMethod: PNPUtils.PhoneNumberLookup.AuthenticationMethod.ENCRYPTIONKEY,
+          authenticationMethod: PNPUtils.PhoneNumberLookup.AuthenticationMethod.ENCRYPTION_KEY,
           rawKey: privateDataKey,
         }
       }
@@ -189,7 +189,7 @@ export function* getAuthSignerForAccount(account: string) {
   // Fallback to using wallet key
   Logger.info(TAG + 'getAuthSignerForAccount', 'Using wallet key for authentication')
   return {
-    authenticationMethod: PNPUtils.PhoneNumberLookup.AuthenticationMethod.WALLETKEY,
+    authenticationMethod: PNPUtils.PhoneNumberLookup.AuthenticationMethod.WALLET_KEY,
     contractKit,
   }
 }

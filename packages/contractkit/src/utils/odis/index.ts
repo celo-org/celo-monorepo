@@ -3,7 +3,7 @@ import * as Matchmaking from './matchmaking'
 import * as PhoneNumberIdentifier from './phone-number-identifier'
 import * as PhoneNumberLookup from './phone-number-lookup'
 
-export const PNPUtils = {
+export const OdisUtils = {
   BlsBlindingClient,
   PhoneNumberLookup,
   Matchmaking,

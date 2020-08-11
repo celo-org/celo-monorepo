@@ -9,7 +9,7 @@ import {
   ServiceContext,
 } from './phone-number-lookup'
 
-const debug = debugFactory('kit:phone-number-lookup:matchmaking')
+const debug = debugFactory('kit:odis:matchmaking')
 
 const MATCHMAKING_ENDPOINT = '/getContactMatches'
 // Eventually, the matchmaking process will use blinded numbers same as salt lookups

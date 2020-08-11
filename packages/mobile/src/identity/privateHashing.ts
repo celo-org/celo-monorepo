@@ -94,7 +94,7 @@ function* getPhoneHashPrivate(e164Number: string, account: string, selfPhoneHash
   const authSigner = yield call(getAuthSignerForAccount, account)
   // Unlock the account if the authentication is signed by the wallet
   if (
-    authSigner.authenticationMethod === PNPUtils.PhoneNumberLookup.AuthenticationMethod.WALLETKEY
+    authSigner.authenticationMethod === PNPUtils.PhoneNumberLookup.AuthenticationMethod.WALLET_KEY
   ) {
     const success: boolean = yield call(unlockAccount, account)
     if (!success) {
@@ -102,8 +102,8 @@ function* getPhoneHashPrivate(e164Number: string, account: string, selfPhoneHash
     }
   }
 
-  const { pgpnpPubKey } = networkConfig
-  const blsBlindingClient = new ReactBlsBlindingClient(pgpnpPubKey)
+  const { odisPubKey } = networkConfig
+  const blsBlindingClient = new ReactBlsBlindingClient(odisPubKey)
   try {
     return yield call(
       PNPUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier,
@@ -116,7 +116,7 @@ function* getPhoneHashPrivate(e164Number: string, account: string, selfPhoneHash
       blsBlindingClient
     )
   } catch (error) {
-    if (error.message === ErrorMessages.PGPNP_QUOTA_ERROR) {
+    if (error.message === ErrorMessages.ODIS_QUOTA_ERROR) {
       throw new Error(ErrorMessages.SALT_QUOTA_EXCEEDED)
     }
     throw error

@@ -43,7 +43,7 @@ export function* fetchContactMatches(e164NumberToRecipients: NumberToRecipient) 
     const matches = getMatchedContacts(e164NumberToRecipients, matchedE164Number)
     yield put(addContactsMatches(matches))
   } catch (error) {
-    if (error.message === ErrorMessages.PGPNP_QUOTA_ERROR) {
+    if (error.message === ErrorMessages.ODIS_QUOTA_ERROR) {
       throw new Error(ErrorMessages.MATCHMAKING_QUOTA_EXCEEDED)
     }
     throw error
