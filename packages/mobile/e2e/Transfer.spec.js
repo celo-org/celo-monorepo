@@ -220,6 +220,9 @@ describe('Transfer Works', () => {
       .toBeVisible()
       .withTimeout(10000)
     await element(by.id('ConfirmWithdrawButton')).tap()
+    await waitFor(element(by.id('WithdrawCELO')))
+      .toBeVisible()
+      .withTimeout(10000)
   })
 
   // TODO(erdal): generate a new invite
