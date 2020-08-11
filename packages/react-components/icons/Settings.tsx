@@ -11,7 +11,7 @@ export default class Settings extends React.PureComponent<Props> {
   static defaultProps = {
     width: 18,
     height: 18,
-    color: colors.darkSecondary,
+    color: colors.gray5,
   }
 
   render() {

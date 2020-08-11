@@ -490,7 +490,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
         style={
           Object {
             "borderStyle": "solid",
-            "borderTopColor": "#EEEEEE",
+            "borderTopColor": "#F8F9F9",
             "borderTopWidth": 1,
             "marginBottom": 15,
             "marginTop": 10,
@@ -957,7 +957,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
         style={
           Object {
             "borderStyle": "solid",
-            "borderTopColor": "#EEEEEE",
+            "borderTopColor": "#F8F9F9",
             "borderTopWidth": 1,
             "marginBottom": 15,
             "marginTop": 10,
@@ -1427,7 +1427,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
           style={
             Object {
               "borderStyle": "solid",
-              "borderTopColor": "#EEEEEE",
+              "borderTopColor": "#F8F9F9",
               "borderTopWidth": 1,
               "marginBottom": 15,
               "marginTop": 10,
@@ -1465,7 +1465,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
         style={
           Object {
             "borderStyle": "solid",
-            "borderTopColor": "#EEEEEE",
+            "borderTopColor": "#F8F9F9",
             "borderTopWidth": 1,
             "marginBottom": 15,
             "marginTop": 10,
@@ -2139,7 +2139,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
           style={
             Object {
               "borderStyle": "solid",
-              "borderTopColor": "#EEEEEE",
+              "borderTopColor": "#F8F9F9",
               "borderTopWidth": 1,
               "marginBottom": 15,
               "marginTop": 10,
@@ -2177,7 +2177,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
         style={
           Object {
             "borderStyle": "solid",
-            "borderTopColor": "#EEEEEE",
+            "borderTopColor": "#F8F9F9",
             "borderTopWidth": 1,
             "marginBottom": 15,
             "marginTop": 10,

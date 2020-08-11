@@ -23,7 +23,7 @@ export default class SectionHead extends React.PureComponent<Props> {
 
 const style = StyleSheet.create({
   sectionHead: {
-    backgroundColor: colors.altDarkBg,
+    backgroundColor: colors.gray1,
     paddingHorizontal: 10,
     height: 36,
     display: 'flex',
@@ -36,7 +36,7 @@ const style = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    backgroundColor: colors.messageBlue,
+    backgroundColor: colors.onboardingBlue,
     borderRadius: 10,
     padding: 1,
     margin: 5,

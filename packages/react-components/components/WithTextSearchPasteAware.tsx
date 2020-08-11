@@ -6,7 +6,7 @@ import {
 } from '@celo/react-components/components/WithPasteAware'
 import Paste from '@celo/react-components/icons/Paste'
 import Search from '@celo/react-components/icons/Search'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
 import { StyleSheet, TextInputProps, View } from 'react-native'
 
