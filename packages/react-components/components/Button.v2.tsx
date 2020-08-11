@@ -1,5 +1,5 @@
 import Touchable from '@celo/react-components/components/Touchable'
-import colors, { Colors } from '@celo/react-components/styles/colors.v2'
+import colors, { Colors } from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { debounce } from 'lodash'
 import React, { ReactNode, useCallback } from 'react'
@@ -50,7 +50,7 @@ export default React.memo(function Button(props: ButtonProps) {
     rounded = true,
     style,
     showLoading,
-    loadingColor = colors.celoGreen,
+    loadingColor = colors.greenBrand,
   } = props
 
   // Debounce onPress event so that it is called once on trigger and

@@ -171,7 +171,7 @@ const style = StyleSheet.create({
   },
   textInputContainer: {
     paddingBottom: 5,
-    borderBottomColor: colors.listBorder,
+    borderBottomColor: colors.gray2,
     borderBottomWidth: 1,
   },
 })

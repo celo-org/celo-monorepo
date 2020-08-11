@@ -985,7 +985,7 @@ exports[`Account renders correctly 1`] = `
                         "lineHeight": 18,
                       },
                       Object {
-                        "color": "rgba(0, 0, 0, .4)",
+                        "color": "#81868B",
                         "fontFamily": "Hind-SemiBold",
                         "fontSize": 16,
                         "lineHeight": 24,
@@ -1189,7 +1189,7 @@ exports[`Account renders correctly 1`] = `
                         "lineHeight": 18,
                       },
                       Object {
-                        "color": "rgba(0, 0, 0, .4)",
+                        "color": "#81868B",
                         "fontFamily": "Hind-SemiBold",
                         "fontSize": 16,
                         "lineHeight": 24,
@@ -2439,7 +2439,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
                         "lineHeight": 18,
                       },
                       Object {
-                        "color": "rgba(0, 0, 0, .4)",
+                        "color": "#81868B",
                         "fontFamily": "Hind-SemiBold",
                         "fontSize": 16,
                         "lineHeight": 24,
@@ -2643,7 +2643,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
                         "lineHeight": 18,
                       },
                       Object {
-                        "color": "rgba(0, 0, 0, .4)",
+                        "color": "#81868B",
                         "fontFamily": "Hind-SemiBold",
                         "fontSize": 16,
                         "lineHeight": 24,

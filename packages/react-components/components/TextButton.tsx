@@ -25,6 +25,6 @@ const styles = StyleSheet.create({
   text: {
     ...fontStyles.bodySmall,
     ...fontStyles.semiBold,
-    color: colors.celoGreen,
+    color: colors.greenBrand,
   },
 })

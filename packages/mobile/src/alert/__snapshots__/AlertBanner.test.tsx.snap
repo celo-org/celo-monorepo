@@ -23,7 +23,7 @@ exports[`AlertBanner when error message passed in renders error message 1`] = `
     style={
       Object {
         "alignItems": "center",
-        "backgroundColor": "#FD785B",
+        "backgroundColor": "#EA6042",
         "flexDirection": "row",
         "justifyContent": "center",
         "paddingBottom": 10,
@@ -119,7 +119,7 @@ exports[`AlertBanner when message and title passed in renders title with message
     style={
       Object {
         "alignItems": "center",
-        "backgroundColor": "#3C9BF4",
+        "backgroundColor": "#0768AE",
         "flexDirection": "row",
         "justifyContent": "center",
         "paddingBottom": 10,
@@ -198,7 +198,7 @@ exports[`AlertBanner when message passed in renders message 1`] = `
     style={
       Object {
         "alignItems": "center",
-        "backgroundColor": "#3C9BF4",
+        "backgroundColor": "#0768AE",
         "flexDirection": "row",
         "justifyContent": "center",
         "paddingBottom": 10,
