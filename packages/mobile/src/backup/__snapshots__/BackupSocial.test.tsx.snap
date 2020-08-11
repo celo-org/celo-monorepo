@@ -395,9 +395,9 @@ exports[`BackupSocialIntro renders correctly when social backup is not complete 
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           thumbTintColor="#FFFFFF"
-          trackColorForFalse="#D1D5D8"
+          trackColorForFalse="#9CA4A9"
           trackColorForTrue="#42D689"
-          trackTintColor="#D1D5D8"
+          trackTintColor="#9CA4A9"
         />
         <Text
           style={
@@ -429,7 +429,7 @@ exports[`BackupSocialIntro renders correctly when social backup is not complete 
         null,
         undefined,
         Object {
-          "backgroundColor": "#A3EBC6",
+          "backgroundColor": "#97DFC1",
         },
       ]
     }
@@ -458,7 +458,7 @@ exports[`BackupSocialIntro renders correctly when social backup is not complete 
             "justifyContent": "center",
           },
           Object {
-            "backgroundColor": "#A3EBC6",
+            "backgroundColor": "#97DFC1",
           },
           Object {
             "height": 50,

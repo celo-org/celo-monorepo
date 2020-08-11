@@ -89,7 +89,7 @@ exports[`Invite renders correctly with no recipients 1`] = `
   <View
     style={
       Object {
-        "borderBottomColor": "rgba(134, 138, 141, 0.15)",
+        "borderBottomColor": "#EDEEEF",
         "borderBottomWidth": 1,
         "paddingBottom": 5,
       }
@@ -394,7 +394,7 @@ exports[`Invite renders correctly with recipients 1`] = `
   <View
     style={
       Object {
-        "borderBottomColor": "rgba(134, 138, 141, 0.15)",
+        "borderBottomColor": "#EDEEEF",
         "borderBottomWidth": 1,
         "paddingBottom": 5,
       }

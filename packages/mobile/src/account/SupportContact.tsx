@@ -2,7 +2,7 @@ import Button, { BtnTypes } from '@celo/react-components/components/Button.v2'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import Switch from '@celo/react-components/components/Switch'
 import TextInput from '@celo/react-components/components/TextInput.v2'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { anonymizedPhone } from '@celo/utils/src/phoneNumbers'
 import React, { useCallback, useState } from 'react'
@@ -154,7 +154,7 @@ function SupportContact() {
         </View>
         {inProgress && (
           <View style={styles.loadingSpinnerContainer} testID="ImportWalletLoadingCircle">
-            <ActivityIndicator size="large" color={colors.celoGreen} />
+            <ActivityIndicator size="large" color={colors.greenBrand} />
           </View>
         )}
 
