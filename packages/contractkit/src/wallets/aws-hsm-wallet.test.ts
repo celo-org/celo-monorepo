@@ -1,9 +1,11 @@
-import { normalizeAddressWith0x } from '@celo/utils/lib/address'
+import { ensureLeading0x, normalizeAddressWith0x, trimLeading0x } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
-import crypto from 'crypto'
+import { BigNumber } from 'bignumber.js'
 import { ec as EC } from 'elliptic'
+import * as ethUtil from 'ethereumjs-util'
 import Web3 from 'web3'
 import { EncodedTransaction, Tx } from 'web3-core'
+import { asn1FromPublicKey } from '../utils/ber-utils'
 import { recoverTransaction, verifyEIP712TypedDataSigner } from '../utils/signing-utils'
 import AwsHsmWallet from './aws-hsm-wallet'
 import {
@@ -11,28 +13,20 @@ import {
   ACCOUNT_ADDRESS2,
   ACCOUNT_ADDRESS_NEVER,
   CHAIN_ID,
+  PRIVATE_KEY1,
   TYPED_DATA,
 } from './test-utils'
 require('dotenv').config()
 
 const USING_MOCK = typeof process.env.AWS_HSM_KEY_ID === 'undefined'
-const AWS_HSM_KEY_ID = USING_MOCK ? 'secp' : process.env.AWS_HSM_KEY_ID
+const AWS_HSM_KEY_ID = USING_MOCK
+  ? '1d6db902-9a45-4dd5-bd1e-7250b2306f18'
+  : process.env.AWS_HSM_KEY_ID
 
-const key1 = crypto.generateKeyPairSync('ec', {
-  namedCurve: 'secp256k1',
-  publicKeyEncoding: {
-    type: 'spki',
-    format: 'der',
-  },
-  privateKeyEncoding: {
-    type: 'pkcs8',
-    format: 'pem',
-  },
-})
-
+const key1 = PRIVATE_KEY1
 const ec = new EC('secp256k1')
 
-const keys: Map<string, crypto.KeyPairSyncResult<Buffer, string>> = new Map([['secp', key1]])
+const keys: Map<string, string> = new Map([['1d6db902-9a45-4dd5-bd1e-7250b2306f18', key1]])
 const listKeysResponse = {
   Keys: Array.from(keys.keys()).map((id) => ({
     KeyId: id,
@@ -43,10 +37,8 @@ const listKeysResponse = {
 
 describe('AwsHsmWallet class', () => {
   let wallet: AwsHsmWallet
-  // @ts-ignore
   let knownAddress: string
-  // @ts-ignore
-  let otherAddress: string
+  const otherAddress: string = ACCOUNT_ADDRESS2
 
   beforeEach(async () => {
     wallet = new AwsHsmWallet()
@@ -75,22 +67,27 @@ describe('AwsHsmWallet class', () => {
           }),
           getPublicKey: ({ KeyId }: { KeyId: string }) => ({
             promise: async () => {
+              const isGuid = /[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/
+              if (!KeyId.match(isGuid)) {
+                throw new Error(`Invalid keyId ${KeyId}`)
+              }
               if (!keys.has(KeyId)) {
                 throw new Error(`Key 'arn:aws:kms:123:key/${KeyId}' does not exist`)
               }
-              const key = keys.get(KeyId)
-              const publicKey = key?.publicKey
-              return { PublicKey: new Uint8Array(publicKey!.buffer) }
+              const privateKey = keys.get(KeyId)
+              const pubKey = ethUtil.privateToPublic(ethUtil.toBuffer(privateKey))
+              const temp = new BigNumber(ensureLeading0x(pubKey.toString('hex')))
+              const asn1Key = asn1FromPublicKey(temp)
+              return { PublicKey: new Uint8Array(asn1Key) }
             },
           }),
           sign: ({ KeyId, Message }: { KeyId: string; Message: Buffer }) => ({
             promise: () => {
-              const privateKey = keys.get(KeyId)?.privateKey
+              const privateKey = trimLeading0x(keys.get(KeyId)!)
               if (privateKey) {
-                const sign = crypto.createSign('sha256')
-                sign.update(Message)
-                const signature = ec.sign(Message, Buffer.from(privateKey), { canonical: true })
-                return { Signature: signature.toDER() }
+                const pkBuffer = Buffer.from(privateKey, 'hex')
+                const signature = ec.sign(Message, pkBuffer, { canonical: true })
+                return { Signature: Buffer.from(signature.toDER()) }
               }
               throw new Error(`Unable to locate key: ${KeyId}`)
             },

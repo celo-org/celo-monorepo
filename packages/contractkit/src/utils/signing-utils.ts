@@ -1,20 +1,24 @@
-import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
+import { Address, ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
 // @ts-ignore-next-line
 import { account as Account, bytes as Bytes, hash as Hash, RLP } from 'eth-lib'
 import * as ethUtil from 'ethereumjs-util'
+import { ecdsaRecover } from 'secp256k1'
 import { EncodedTransaction, Tx } from 'web3-core'
 import * as helpers from 'web3-core-helpers'
 import { EIP712TypedData, generateTypedDataHash } from './sign-typed-data-utils'
-import { ecdsaRecover } from 'secp256k1'
 import { bufferToBigNumber } from './signature-utils'
 
 const debug = debugFactory('kit:tx:sign')
 
 // Original code taken from
 // https://github.com/ethereum/web3.js/blob/1.x/packages/web3-eth-accounts/src/index.js
+
+// 0x04 prefix indicates that the key is not compressed
+// https://tools.ietf.org/html/rfc5480#section-2.2
+export const publicKeyPrefix: number = 0x04
 
 function isNullOrUndefined(value: any): boolean {
   return value === null || value === undefined
@@ -242,4 +246,16 @@ export function recoverKeyIndex(
     }
   }
   throw new Error('Unable to generate recovery key from signature.')
+}
+
+/**
+ * Maps the publicKey to its address
+ */
+export function getAddressFromPublicKey(publicKey: BigNumber): Address {
+  const pkBuffer = ethUtil.toBuffer(ensureLeading0x(publicKey.toString(16)))
+  if (!ethUtil.isValidPublic(pkBuffer, true)) {
+    throw new Error(`Invalid secp256k1 public key ${publicKey}`)
+  }
+  const address = ethUtil.pubToAddress(pkBuffer, true)
+  return ensureLeading0x(address.toString('hex'))
 }

@@ -1,6 +1,6 @@
 import * as asn1 from 'asn1js'
 import { BigNumber } from 'bignumber.js'
-import { bufferToBigNumber } from './signature-utils'
+import { bigNumberToBuffer, bufferToBigNumber } from './signature-utils'
 
 export const toArrayBuffer = (b: Buffer): ArrayBuffer => {
   return b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength)
@@ -11,6 +11,27 @@ export function publicKeyFromAsn1(b: Buffer): BigNumber {
   const values = (result as asn1.Sequence).valueBlock.value
   const value = values[1] as asn1.BitString
   return bufferToBigNumber(Buffer.from(value.valueBlock.valueHex.slice(1)))
+}
+
+/**
+ * This is used only for mocking
+ * Creates an asn1 key to emulate KMS response
+ */
+export function asn1FromPublicKey(bn: BigNumber): Buffer {
+  const pkbuff = bigNumberToBuffer(bn, 64)
+  const sequence = new asn1.Sequence()
+  const values = sequence.valueBlock.value
+  for (const i of [0, 1]) {
+    values.push(
+      new asn1.Integer({
+        value: i,
+      })
+    )
+  }
+  const value = values[1] as asn1.BitString
+  const padding = Buffer.from(new Uint8Array([0x00]))
+  value.valueBlock.valueHex = Buffer.concat([padding, pkbuff])
+  return Buffer.from(sequence.toBER(false))
 }
 
 /**

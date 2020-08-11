@@ -1,8 +1,9 @@
-import { Address, publicKeyToAddress } from '@celo/utils/lib/address'
+import { Address } from '@celo/utils/lib/address'
 import { KMS } from 'aws-sdk'
 import { BigNumber } from 'bignumber.js'
 import { publicKeyFromAsn1 } from '../utils/ber-utils'
-import { bigNumberToBuffer } from '../utils/signature-utils'
+import { bigNumberToBuffer, bufferToBigNumber } from '../utils/signature-utils'
+import { getAddressFromPublicKey, publicKeyPrefix } from '../utils/signing-utils'
 import { RemoteWallet } from './remote-wallet'
 import AwsHsmSigner from './signers/aws-hsm-signer'
 import { Signer } from './signers/signer'
@@ -13,6 +14,12 @@ const defaultCredentials: KMS.ClientConfiguration = {
   apiVersion: '2014-11-01',
 }
 
+/**
+ * A Cloud HSM wallet built on AWS KMS
+ * https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/KMS.html
+ * When using the default credentials, it's expected to set the
+ * aws_access_key_id and aws_secret_access_key in ~/.aws/credentials
+ */
 export default class AwsHsmWallet extends RemoteWallet implements Wallet {
   private kms: KMS | undefined
   private credentials: KMS.ClientConfiguration
@@ -29,20 +36,25 @@ export default class AwsHsmWallet extends RemoteWallet implements Wallet {
     const { Keys } = await this.kms.listKeys().promise()
     const addressToSigner = new Map<Address, Signer>()
     for (const { KeyId } of Keys!) {
+      if (!KeyId) {
+        throw new Error(`Missing KeyId in KMS response object ${Keys!}`)
+      }
       try {
-        const { KeyMetadata } = await this.kms.describeKey({ KeyId: KeyId! }).promise()
+        const { KeyMetadata } = await this.kms.describeKey({ KeyId }).promise()
         if (!KeyMetadata?.Enabled) {
           continue
         }
 
-        const publicKey = await this.getPublicKeyFromKeyId(KeyId!)
-        addressToSigner.set(
-          publicKeyToAddress(bigNumberToBuffer(publicKey, 64).toString('hex')),
-          new AwsHsmSigner(this.kms, KeyId!, publicKey)
-        )
+        const publicKey = await this.getPublicKeyFromKeyId(KeyId)
+        const address = getAddressFromPublicKey(publicKey)
+        addressToSigner.set(address, new AwsHsmSigner(this.kms, KeyId, publicKey))
       } catch (e) {
-        // todo: what does the error look like here
-        throw e
+        // Safely ignore non-secp256k1 keys
+        if (!e.name || e.name !== 'UnsupportedOperationException') {
+          const t = e
+          console.log(t)
+          throw e
+        }
       }
     }
     return addressToSigner
@@ -57,11 +69,20 @@ export default class AwsHsmWallet extends RemoteWallet implements Wallet {
       throw new Error('AwsHsmWallet needs to be initialised first')
     }
     const { PublicKey } = await this.kms.getPublicKey({ KeyId: keyId }).promise()
-    return publicKeyFromAsn1(Buffer.from(PublicKey as Uint8Array))
+    const pubKey = publicKeyFromAsn1(Buffer.from(PublicKey as Uint8Array))
+    const pkbuff = bigNumberToBuffer(pubKey, 64)
+    const pubKeyPrefix = Buffer.from(new Uint8Array([publicKeyPrefix]))
+    const rawPublicKey = Buffer.concat([pubKeyPrefix, pkbuff])
+    return bufferToBigNumber(rawPublicKey)
   }
 
-  public async getAddressFromKeyId(keyId: string): Promise<string> {
+  /**
+   * Returns the EVM address for the given key
+   * Useful for initially getting the 'from' field given a keyName
+   * @param keyName Azure KeyVault key name
+   */
+  async getAddressFromKeyId(keyId: string): Promise<Address> {
     const publicKey = await this.getPublicKeyFromKeyId(keyId)
-    return publicKeyToAddress(bigNumberToBuffer(publicKey, 64).toString('hex'))
+    return getAddressFromPublicKey(publicKey)
   }
 }
