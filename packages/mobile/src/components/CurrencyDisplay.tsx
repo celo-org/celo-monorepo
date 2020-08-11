@@ -165,8 +165,8 @@ export default function CurrencyDisplay({
 
   const color = useColors
     ? currency === CURRENCY_ENUM.GOLD
-      ? colors.celoGold
-      : colors.celoGreen
+      ? colors.goldBrand
+      : colors.greenBrand
     : StyleSheet.flatten(style)?.color
 
   if (type === DisplayType.Big) {
