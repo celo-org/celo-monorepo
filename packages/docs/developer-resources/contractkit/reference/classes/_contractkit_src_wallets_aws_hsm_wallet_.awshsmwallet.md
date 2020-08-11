@@ -1,43 +1,62 @@
-# Class: RemoteWallet
+# Class: AwsHsmWallet
 
-Abstract class representing a remote wallet that requires async initialization
+A Cloud HSM wallet built on AWS KMS
+https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/KMS.html
+When using the default credentials, it's expected to set the
+aws_access_key_id and aws_secret_access_key in ~/.aws/credentials
 
 ## Hierarchy
 
-* [WalletBase](_contractkit_src_wallets_wallet_.walletbase.md)
+  ↳ [RemoteWallet](_contractkit_src_wallets_remote_wallet_.remotewallet.md)
 
-  ↳ **RemoteWallet**
-
-  ↳ [AwsHsmWallet](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md)
-
-  ↳ [AzureHSMWallet](_contractkit_src_wallets_azure_hsm_wallet_.azurehsmwallet.md)
-
-  ↳ [LedgerWallet](_contractkit_src_wallets_ledger_wallet_.ledgerwallet.md)
-
-  ↳ [RpcWallet](_contractkit_src_wallets_rpc_wallet_.rpcwallet.md)
+  ↳ **AwsHsmWallet**
 
 ## Implements
 
 * [Wallet](../interfaces/_contractkit_src_wallets_wallet_.wallet.md)
 * [Wallet](../interfaces/_contractkit_src_wallets_wallet_.wallet.md)
+* [Wallet](../interfaces/_contractkit_src_wallets_wallet_.wallet.md)
 
 ## Index
 
+### Constructors
+
+* [constructor](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md#constructor)
+
 ### Methods
 
-* [getAccounts](_contractkit_src_wallets_remote_wallet_.remotewallet.md#getaccounts)
-* [hasAccount](_contractkit_src_wallets_remote_wallet_.remotewallet.md#hasaccount)
-* [init](_contractkit_src_wallets_remote_wallet_.remotewallet.md#init)
-* [isSetupFinished](_contractkit_src_wallets_remote_wallet_.remotewallet.md#issetupfinished)
-* [signPersonalMessage](_contractkit_src_wallets_remote_wallet_.remotewallet.md#signpersonalmessage)
-* [signTransaction](_contractkit_src_wallets_remote_wallet_.remotewallet.md#signtransaction)
-* [signTypedData](_contractkit_src_wallets_remote_wallet_.remotewallet.md#signtypeddata)
+* [getAccounts](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md#getaccounts)
+* [getAddressFromKeyId](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md#getaddressfromkeyid)
+* [hasAccount](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md#hasaccount)
+* [init](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md#init)
+* [isSetupFinished](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md#issetupfinished)
+* [signPersonalMessage](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md#signpersonalmessage)
+* [signTransaction](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md#signtransaction)
+* [signTypedData](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md#signtypeddata)
+
+## Constructors
+
+###  constructor
+
+\+ **new AwsHsmWallet**(`awsCredentials?`: KMS.ClientConfiguration): *[AwsHsmWallet](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md)*
+
+*Defined in [contractkit/src/wallets/aws-hsm-wallet.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/aws-hsm-wallet.ts#L25)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`awsCredentials?` | KMS.ClientConfiguration |
+
+**Returns:** *[AwsHsmWallet](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md)*
 
 ## Methods
 
 ###  getAccounts
 
 ▸ **getAccounts**(): *[Address](../modules/_contractkit_src_base_.md#address)[]*
+
+*Inherited from [RemoteWallet](_contractkit_src_wallets_remote_wallet_.remotewallet.md).[getAccounts](_contractkit_src_wallets_remote_wallet_.remotewallet.md#getaccounts)*
 
 *Overrides [WalletBase](_contractkit_src_wallets_wallet_.walletbase.md).[getAccounts](_contractkit_src_wallets_wallet_.walletbase.md#getaccounts)*
 
@@ -49,9 +68,30 @@ Get a list of accounts in the remote wallet
 
 ___
 
+###  getAddressFromKeyId
+
+▸ **getAddressFromKeyId**(`keyId`: string): *Promise‹[Address](../modules/_contractkit_src_base_.md#address)›*
+
+*Defined in [contractkit/src/wallets/aws-hsm-wallet.ts:82](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/aws-hsm-wallet.ts#L82)*
+
+Returns the EVM address for the given key
+Useful for initially getting the 'from' field given a keyName
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`keyId` | string |
+
+**Returns:** *Promise‹[Address](../modules/_contractkit_src_base_.md#address)›*
+
+___
+
 ###  hasAccount
 
 ▸ **hasAccount**(`address?`: [Address](../modules/_contractkit_src_base_.md#address)): *boolean*
+
+*Inherited from [RemoteWallet](_contractkit_src_wallets_remote_wallet_.remotewallet.md).[hasAccount](_contractkit_src_wallets_remote_wallet_.remotewallet.md#hasaccount)*
 
 *Overrides [WalletBase](_contractkit_src_wallets_wallet_.walletbase.md).[hasAccount](_contractkit_src_wallets_wallet_.walletbase.md#hasaccount)*
 
@@ -73,6 +113,8 @@ ___
 
 ▸ **init**(): *Promise‹void›*
 
+*Inherited from [RemoteWallet](_contractkit_src_wallets_remote_wallet_.remotewallet.md).[init](_contractkit_src_wallets_remote_wallet_.remotewallet.md#init)*
+
 *Defined in [contractkit/src/wallets/remote-wallet.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/remote-wallet.ts#L20)*
 
 Discovers wallet accounts and caches results in memory
@@ -86,6 +128,8 @@ ___
 
 ▸ **isSetupFinished**(): *boolean*
 
+*Inherited from [RemoteWallet](_contractkit_src_wallets_remote_wallet_.remotewallet.md).[isSetupFinished](_contractkit_src_wallets_remote_wallet_.remotewallet.md#issetupfinished)*
+
 *Defined in [contractkit/src/wallets/remote-wallet.ts:110](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/remote-wallet.ts#L110)*
 
 **Returns:** *boolean*
@@ -95,6 +139,8 @@ ___
 ###  signPersonalMessage
 
 ▸ **signPersonalMessage**(`address`: [Address](../modules/_contractkit_src_base_.md#address), `data`: string): *Promise‹string›*
+
+*Inherited from [RemoteWallet](_contractkit_src_wallets_remote_wallet_.remotewallet.md).[signPersonalMessage](_contractkit_src_wallets_remote_wallet_.remotewallet.md#signpersonalmessage)*
 
 *Overrides [WalletBase](_contractkit_src_wallets_wallet_.walletbase.md).[signPersonalMessage](_contractkit_src_wallets_wallet_.walletbase.md#signpersonalmessage)*
 
@@ -117,6 +163,8 @@ ___
 
 ▸ **signTransaction**(`txParams`: Tx): *Promise‹EncodedTransaction›*
 
+*Inherited from [RemoteWallet](_contractkit_src_wallets_remote_wallet_.remotewallet.md).[signTransaction](_contractkit_src_wallets_remote_wallet_.remotewallet.md#signtransaction)*
+
 *Overrides [WalletBase](_contractkit_src_wallets_wallet_.walletbase.md).[signTransaction](_contractkit_src_wallets_wallet_.walletbase.md#signtransaction)*
 
 *Defined in [contractkit/src/wallets/remote-wallet.ts:79](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/remote-wallet.ts#L79)*
@@ -136,6 +184,8 @@ ___
 ###  signTypedData
 
 ▸ **signTypedData**(`address`: [Address](../modules/_contractkit_src_base_.md#address), `typedData`: [EIP712TypedData](../interfaces/_contractkit_src_utils_sign_typed_data_utils_.eip712typeddata.md)): *Promise‹string›*
+
+*Inherited from [RemoteWallet](_contractkit_src_wallets_remote_wallet_.remotewallet.md).[signTypedData](_contractkit_src_wallets_remote_wallet_.remotewallet.md#signtypeddata)*
 
 *Overrides [WalletBase](_contractkit_src_wallets_wallet_.walletbase.md).[signTypedData](_contractkit_src_wallets_wallet_.walletbase.md#signtypeddata)*
 

@@ -6,6 +6,7 @@
 
 ## Implemented by
 
+* [AwsHsmSigner](../classes/_contractkit_src_wallets_signers_aws_hsm_signer_.awshsmsigner.md)
 * [AzureHSMSigner](../classes/_contractkit_src_wallets_signers_azure_hsm_signer_.azurehsmsigner.md)
 * [LedgerSigner](../classes/_contractkit_src_wallets_signers_ledger_signer_.ledgersigner.md)
 * [LocalSigner](../classes/_contractkit_src_wallets_signers_local_signer_.localsigner.md)
