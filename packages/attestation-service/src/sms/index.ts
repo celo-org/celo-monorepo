@@ -17,9 +17,9 @@ const phoneUtil = PhoneNumberUtil.getInstance()
 export async function initializeSmsProviders(
   deliveryStatusURLForProviderType: (type: string) => string
 ) {
-  const smsProvidersToConfigure = fetchEnv('SMS_PROVIDERS').split(',') as Array<
-    SmsProviderType | string
-  >
+  const smsProvidersToConfigure = fetchEnv('SMS_PROVIDERS')
+    .split(',')
+    .filter((t) => t != null && t !== '') as Array<SmsProviderType | string>
 
   if (smsProvidersToConfigure.length === 0) {
     throw new Error('You have to specify at least one sms provider')
@@ -51,14 +51,37 @@ export async function initializeSmsProviders(
 // Return all SMS providers for the given phone number, in order of preference for that region,
 // and not including any providers that has that region on its denylist.
 export function smsProvidersFor(countryCode: string, phoneNumber: E164Number) {
-  const providersForRegion = fetchEnvOrDefault(`SMS_PROVIDERS_${countryCode}`, '').split(',')
-  const providers =
+  const providersForRegion = fetchEnvOrDefault(`SMS_PROVIDERS_${countryCode}`, '')
+    .split(',')
+    .filter((t) => t != null && t !== '')
+  var providers =
     providersForRegion.length === 0
       ? smsProviders
       : providersForRegion.map((name) => smsProvidersByType[name])
-  return providers.filter(
+  providers = providers.filter(
     (provider) => provider != null && provider.canServePhoneNumber(countryCode, phoneNumber)
   )
+  if (providers.length === 0) {
+    rootLogger.warn(
+      {
+        countryCode,
+        phoneNumber: obfuscateNumber(phoneNumber),
+        countryProvidersConfigValue: providersForRegion,
+      },
+      'No providers found that could serve number: check all providers are listed under SMS_PROVIDERS, ' +
+        `check *_UNSUPPORTED_REGIONS are not overly restrictive, and that if provided SMS_PROVIDERS_${countryCode} lists valid providers`
+    )
+  } else {
+    rootLogger.debug(
+      {
+        countryCode,
+        phoneNumber: obfuscateNumber(phoneNumber),
+        providers: providers.map((p) => p.type),
+      },
+      'Providers found'
+    )
+  }
+  return providers
 }
 
 export function smsProviderOfType(type: string) {
@@ -87,12 +110,12 @@ export async function startSendSms(
 ): Promise<SmsProviderType> {
   const countryCode = phoneUtil.getRegionCodeForNumber(phoneUtil.parse(phoneNumber))
   if (!countryCode) {
-    throw Error('Could not parse number')
+    throw new Error('Could not parse number')
   }
 
   const providers = smsProvidersFor(countryCode, phoneNumber)
   if (providers.length === 0) {
-    throw Error('No SMS providers available') // TODO
+    throw new Error(`No SMS providers available for ${countryCode}`)
   }
 
   const delivery: SmsDelivery = {
@@ -244,7 +267,7 @@ export function receivedDeliveryReport(
         .inc()
 
       if (errorCode != null) {
-        Counters.attestationProviderDeliveryStatus
+        Counters.attestationProviderDeliveryErrorCodes
           .labels(delivery.providers[0].type, delivery.countryCode, errorCode)
           .inc()
       }

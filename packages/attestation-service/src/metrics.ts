@@ -51,14 +51,14 @@ export const Counters = {
     help: 'Counter for the number of unexpected errors',
   }),
   attestationProviderDeliveryStatus: new Counter({
-    name: 'attestation_requests_delivery_status',
+    name: 'attestation_attempts_delivery_status',
     labelNames: ['provider', 'country', 'status'],
-    help: 'Counter for delivery status by provider and country',
+    help: 'Counter for status of each delivery attempt by provider and country',
   }),
   attestationProviderDeliveryErrorCodes: new Counter({
-    name: 'attestation_requests_delivery_error_codes',
+    name: 'attestation_attempts_delivery_error_codes',
     labelNames: ['provider', 'country', 'code'],
-    help: 'Counter for delivery error codes by provider and country',
+    help: 'Counter for error code of each failed delivery attempt by provider and country',
   }),
 }
 

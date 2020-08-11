@@ -64,7 +64,7 @@ export function readUnsupportedRegionsFromEnv(...envVarNames: string[]) {
 
 export function obfuscateNumber(phoneNumber: string): string {
   try {
-    return phoneNumber.slice(0, 6) + '...'
+    return phoneNumber.slice(0, 7) + '...'
   } catch {
     return ''
   }
