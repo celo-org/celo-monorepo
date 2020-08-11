@@ -101,6 +101,6 @@
     "websocket-extensions": "^0.1.4",
     "elliptic": "^6.5.3",
     "dot-prop": "^5.2.0",
-    "bl": "^4.0.3"
+    "serialize-javascript": "^3.1.0"
   }
 }
