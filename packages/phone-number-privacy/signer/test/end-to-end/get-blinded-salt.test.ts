@@ -117,6 +117,8 @@ describe('Running against a deployed service', () => {
   })
 
   describe('With enough quota', () => {
+    // if these tests are failing, it may just be that the address needs to be fauceted:
+    // celotooljs account faucet --account ACCOUNT_ADDRESS2 --dollar 1 --gold 1 -e <ENV> --verbose
     let initialQueryCount: number
     let timestamp: number
     beforeAll(async () => {

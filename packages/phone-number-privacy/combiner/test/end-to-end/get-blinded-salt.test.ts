@@ -106,6 +106,8 @@ describe('Running against a deployed service', () => {
   })
 
   xdescribe('With enough quota', () => {
+    // if these tests are failing, it may just be that the address needs to be fauceted:
+    // celotooljs account faucet --account ACCOUNT_ADDRESS2 --dollar 1 --gold 1 -e <ENV> --verbose
     const timestamp = Date.now()
     it('Address salt querying succeeds with unused request', async () => {
       await replenishQuota(ACCOUNT_ADDRESS2, PRIVATE_KEY2, DEFAULT_FORNO_URL)
