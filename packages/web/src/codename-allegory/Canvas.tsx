@@ -7,6 +7,7 @@ import menuItems from 'src/shared/menu-items'
 import { fonts, textStyles } from 'src/styles'
 import { useBooleanToggle } from 'src/hooks/useBooleanToggle'
 import Fade from 'react-reveal/Fade'
+import Head from 'next/head'
 
 const DURATION = 600
 
@@ -19,6 +20,9 @@ export default function Canvas() {
         description="Changing the Heart of Money"
         path={menuItems.WISH.link}
       />
+      <Head>
+        <script async={true} src="https://platform.twitter.com/widgets.js" />
+      </Head>
       <View style={styles.root}>
         <View style={styles.nav}>
           <Text onPress={toggleSidebar} style={[fonts.p, textStyles.heavy]}>

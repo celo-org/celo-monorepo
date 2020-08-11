@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 7,
     borderWidth: 1,
     borderColor: colors.lightGray,
-    paddingVertical: 9,
+    paddingVertical: 5,
     cursor: 'pointer',
     alignItems: 'center',
     display: 'inline-flex',

@@ -1,13 +1,12 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { H4 } from 'src/fonts/Fonts'
-import { textStyles, fonts, standardStyles, colors } from 'src/styles'
-import Button, { BTN, SIZE } from 'src/shared/Button.3'
-import LightButon from './LightButton'
-import { TweetLogo } from 'src/icons/TwitterLogo'
 import Chainlink from 'src/icons/Chainlink'
 import { useScreenSize } from 'src/layout/ScreenSize'
+import Button, { BTN, SIZE } from 'src/shared/Button.3'
+import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import { copyToClipboad } from 'src/utils/utils'
+import LightButon from './LightButton'
 
 export default function SideBar({ isOpen }) {
   const { isMobile } = useScreenSize()
@@ -42,9 +41,18 @@ export default function SideBar({ isOpen }) {
             size={SIZE.normal}
           />
           <View style={[standardStyles.row, standardStyles.elementalMargin]}>
-            <LightButon>
-              <TweetLogo height={14} color={colors.dark} /> Tweet
-            </LightButon>
+            <a
+              href="https://twitter.com/share?ref_src=twsrc%5Etfw"
+              className="twitter-share-button"
+              data-size="large"
+              data-text="As Wealth Flowers"
+              data-via="celoOrg"
+              data-hashtags="kuneco"
+              data-related="celoOrg"
+              data-show-count="false"
+            >
+              Tweet
+            </a>
             <LightButon onPress={copyURL} style={styles.copyButton}>
               <Chainlink size={16} color={colors.dark} /> Copy
             </LightButon>
