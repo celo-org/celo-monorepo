@@ -77,6 +77,8 @@
     "graphql": "^14.1.1",
     "hermes-engine": "0.4.2-rc1",
     "i18next": "^19.4.3",
+    "io-ts": "2.0.1",
+    "fp-ts": "2.1.1",
     "js-sha3": "^0.8.0",
     "lodash": "^4.17.14",
     "lottie-ios": "^3.1.8",

@@ -7,9 +7,8 @@ export interface State {
   latestBlockNumber: number
   account: string | null
   accountInWeb3Keystore: string | null
-  // AKA data encryption key (DEK)
-  // TODO rename in the next store migration
-  commentKey: string | null
+  // The DEK private key
+  dataEncryptionKey: string | null
   // Has the data encryption key been registered in the Accounts contract
   isDekRegistered: boolean | undefined
   fornoMode: boolean
@@ -24,7 +23,7 @@ const initialState: State = {
   latestBlockNumber: 0,
   account: null,
   accountInWeb3Keystore: null,
-  commentKey: null,
+  dataEncryptionKey: null,
   isDekRegistered: false,
   fornoMode: networkConfig.initiallyForno,
 }
@@ -68,7 +67,7 @@ export const reducer = (
     case Actions.SET_DATA_ENCRYPTION_KEY:
       return {
         ...state,
-        commentKey: action.key,
+        dataEncryptionKey: action.key,
       }
     case Actions.REGISTER_DATA_ENCRYPTION_KEY:
       return {
