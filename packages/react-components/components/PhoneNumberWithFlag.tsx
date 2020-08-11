@@ -1,4 +1,4 @@
-import colorsV2 from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { getCountryEmoji, parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as React from 'react'
@@ -41,7 +41,7 @@ const style = StyleSheet.create({
     marginRight: 4,
   },
   phoneNumber: {
-    color: colorsV2.gray4,
+    color: colors.gray4,
   },
 })
 

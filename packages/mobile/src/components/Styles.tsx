@@ -31,7 +31,7 @@ const Styles = StyleSheet.create({
     color: 'white',
   },
   grayText: {
-    color: colors.gray,
+    color: colors.gray5,
   },
   listItem: {
     flexDirection: 'row',

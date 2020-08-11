@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import { StyleSheet } from 'react-native'
 
 const Inter = {
@@ -105,7 +105,7 @@ const fontStyles = StyleSheet.create({
   iconText: {
     fontSize: 16,
     fontFamily: Inter.Medium,
-    color: colors.white,
+    color: colors.light,
   },
   emptyState: {
     ...standards.large,
