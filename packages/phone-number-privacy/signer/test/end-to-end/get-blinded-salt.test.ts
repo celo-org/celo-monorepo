@@ -1,4 +1,3 @@
-import { newKitFromWeb3 } from '@celo/contractkit'
 import { PhoneNumberUtils } from '@celo/utils'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import { serializeSignature, signMessage } from '@celo/utils/lib/signatureUtils'
@@ -22,6 +21,8 @@ const IDENTIFIER = PhoneNumberUtils.getPhoneHash(PHONE_NUMBER)
 const BLINDING_FACTOR = new Buffer('0IsBvRfkBrkKCIW6HV0/T1zrzjQSe8wRyU3PKojCnww=', 'base64')
 const BLINDED_PHONE_NUMBER = getBlindedPhoneNumber(PHONE_NUMBER, BLINDING_FACTOR)
 const DEFAULT_FORNO_URL = config.blockchain.provider
+
+const web3 = new Web3(new Web3.providers.HttpProvider(DEFAULT_FORNO_URL))
 
 jest.setTimeout(15000)
 
@@ -167,19 +168,13 @@ async function getQuota(
     account,
     hashedPhoneNumber,
   })
-  if (!authHeader) {
-    const web3 = new Web3(new Web3.providers.HttpProvider(DEFAULT_FORNO_URL))
-    const contractKit = newKitFromWeb3(web3)
-    contractKit.addAccount(privateKey)
-    authHeader = await contractKit.web3.eth.sign(body, account)
-  }
 
   const res = await fetch(PHONE_NUM_PRIVACY_SERVICE + GET_QUOTA_ENDPOINT, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
-      Authorization: authHeader,
+      Authorization: authHeader || web3.eth.accounts.sign(body, privateKey).signature,
     },
     body,
   })
@@ -200,19 +195,13 @@ async function postToSignGetSaltMessage(
     account,
     timestamp,
   })
-  if (!authHeader) {
-    const web3 = new Web3(new Web3.providers.HttpProvider(DEFAULT_FORNO_URL))
-    const contractKit = newKitFromWeb3(web3)
-    contractKit.addAccount(privateKey)
-    authHeader = await contractKit.web3.eth.sign(body, account)
-  }
 
   const res = await fetch(PHONE_NUM_PRIVACY_SERVICE + SIGN_MESSAGE_ENDPOINT, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
-      Authorization: authHeader,
+      Authorization: authHeader || web3.eth.accounts.sign(body, privateKey).signature,
     },
     body,
   })

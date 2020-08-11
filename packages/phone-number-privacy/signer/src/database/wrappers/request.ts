@@ -18,7 +18,7 @@ export async function getRequestExists(request: GetBlindedMessageForSaltRequest)
       .where({
         [REQUESTS_COLUMNS.timestamp]: new Date(request.timestamp as number),
         [REQUESTS_COLUMNS.address]: request.account,
-        [REQUESTS_COLUMNS.blindedQueryPhoneNumber]: request.blindedQueryPhoneNumber,
+        [REQUESTS_COLUMNS.blindedQuery]: request.blindedQueryPhoneNumber,
       })
       .first()
     return !!existingRequest
@@ -31,17 +31,10 @@ export async function getRequestExists(request: GetBlindedMessageForSaltRequest)
 export async function storeRequest(request: GetBlindedMessageForSaltRequest) {
   logger.debug('Storing salt request')
   try {
-    await insertRecord(new Request(request))
-    return true
+    await requests()
+      .insert(new Request(request))
+      .timeout(DB_TIMEOUT)
   } catch (e) {
     logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE, e)
-    return null
   }
-}
-
-async function insertRecord(data: Request) {
-  await requests()
-    .insert(data)
-    .timeout(DB_TIMEOUT)
-  return true
 }
