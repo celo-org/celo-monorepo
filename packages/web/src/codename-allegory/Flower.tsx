@@ -121,8 +121,8 @@ const COLOR_OPACITY = {
 }
 
 const COLOR_OPACITY_MOBILE = {
-  inputRange: [0, 0.4, 0.5],
-  outputRange: [1, 0.1, 0],
+  inputRange: [0, 0.15, 0.25],
+  outputRange: [1, 1, 0.1],
 }
 
 const OUTLINE_OPACITY = {
@@ -131,8 +131,8 @@ const OUTLINE_OPACITY = {
 }
 
 const OUTLINE_OPACITY_MOBILE = {
-  inputRange: [0, 0.05, 0.175, 0.2],
-  outputRange: [0, 0, 1, 1],
+  inputRange: [0, 0.1, 0.3, 0.4],
+  outputRange: [0, 1, 1, 0],
 }
 
 const SCALER_DESKTOP = {
@@ -141,8 +141,8 @@ const SCALER_DESKTOP = {
 }
 
 const SCALER_MOBILE = {
-  inputRange: [0, 0.1, 0.2, 1],
-  outputRange: [1, 1, 0.5, 0.3],
+  inputRange: [0, 1],
+  outputRange: [1, 0.75],
 }
 
 const POSITIONING_DESKTOP = {
@@ -151,8 +151,8 @@ const POSITIONING_DESKTOP = {
 }
 
 const POSITIONING_MOBILE = {
-  inputRange: [0, 0.1, 0.5, 1],
-  outputRange: ['0%', '0%', '25%', '100%'],
+  inputRange: [0, 0.1, 0.5],
+  outputRange: ['0%', '10%', '40%'],
 }
 
 const SKEW = {

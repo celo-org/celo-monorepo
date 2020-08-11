@@ -41,18 +41,7 @@ export default function SideBar({ isOpen }) {
             size={SIZE.normal}
           />
           <View style={[standardStyles.row, standardStyles.elementalMargin]}>
-            <a
-              href="https://twitter.com/share?ref_src=twsrc%5Etfw"
-              className="twitter-share-button"
-              data-size="large"
-              data-text="As Wealth Flowers"
-              data-via="celoOrg"
-              data-hashtags="kuneco"
-              data-related="celoOrg"
-              data-show-count="false"
-            >
-              Tweet
-            </a>
+            <TweetButton />
             <LightButon onPress={copyURL} style={styles.copyButton}>
               <Chainlink size={16} color={colors.dark} /> Copy
             </LightButon>
@@ -72,6 +61,23 @@ export default function SideBar({ isOpen }) {
 function copyURL() {
   copyToClipboad(window.location.href)
 }
+
+const TweetButton = React.memo(() => {
+  return (
+    <a
+      href="https://twitter.com/share?ref_src=twsrc%5Etfw"
+      className="twitter-share-button"
+      data-size="large"
+      data-text="As Wealth Flowers"
+      data-via="celoOrg"
+      data-hashtags="kuneco"
+      data-related="celoOrg"
+      data-show-count="false"
+    >
+      Tweet
+    </a>
+  )
+})
 
 function Contributor({ role, name }) {
   return (
