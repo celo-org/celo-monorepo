@@ -1,5 +1,6 @@
 locals {
-  name_prefix = "${var.celo_env}-attestation-service"
+  name_prefix = "${var.gcloud_project}-attestation-service"
+  #name_prefix = "${var.celo_env}-attestation-service"
 }
 
 resource "google_sql_database_instance" "master" {
@@ -35,16 +36,18 @@ resource "google_compute_address" "attestation_service_internal" {
 
 resource "google_compute_instance" "attestation_service" {
   count        = var.attestation_service_count > 0 ? var.attestation_service_count : 0
-  name         = "${local.name_prefix}-instance"
+  name         = "${local.name_prefix}-${count.index}"
   machine_type = var.instance_type
+  
+  deletion_protection = true
 
   tags = ["${var.celo_env}-attestation-service"]
 
-  allow_stopping_for_update = true
+  allow_stopping_for_update = false   # cannot update in place w/o a persistent disk
 
   boot_disk {
     initialize_params {
-      image = "debian-cloud/debian-9"
+      image = "debian-cloud/debian-10"
     }
   }
 
@@ -56,15 +59,13 @@ resource "google_compute_instance" "attestation_service" {
     }
   }
 
-  service_account {
-    scopes = ["https://www.googleapis.com/auth/sqlservice.admin"]
-  }
-
   metadata_startup_script = templatefile(
     format("%s/startup.sh", path.module), {
       rid : count.index,
       attestation_key : "0x${var.attestation_key[count.index]}",
       account_address : var.account_address[count.index],
+      validator_signer_address : var.validator_signer_account_addresses[count.index],
+      validator_release_gold_address : var.validator_release_gold_addresses[count.index],
       celo_provider : var.celo_provider,
       attestation_service_docker_image_repository : var.attestation_service_docker_image_repository,
       attestation_service_docker_image_tag : var.attestation_service_docker_image_tag,
@@ -81,6 +82,11 @@ resource "google_compute_instance" "attestation_service" {
       twilio_blacklist : var.twilio_blacklist,
     }
   )
+
+  service_account {
+    scopes = var.service_account_scopes
+  }
+
 }
 
 resource "random_id" "db_name" {

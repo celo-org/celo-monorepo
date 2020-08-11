@@ -50,7 +50,12 @@ resource "google_compute_firewall" "ssh_firewall" {
   name    = "${var.celo_env}-ssh-firewall"
   network = var.network_name
 
-  target_tags = concat(local.firewall_target_tags_txnode, local.firewall_target_tags_validator, local.firewall_target_tags_proxy, local.firewall_target_tags_attestation_service)
+  target_tags = concat(
+                  local.firewall_target_tags_txnode,
+                  local.firewall_target_tags_validator,
+                  local.firewall_target_tags_proxy,
+                  local.firewall_target_tags_attestation_service
+                )
 
   allow {
     protocol = "tcp"
@@ -75,17 +80,18 @@ resource "google_compute_firewall" "geth_firewall" {
   }
 }
 
-resource "google_compute_firewall" "geth_firewall_validator" {
-  name    = "${var.celo_env}-geth-firewall-validator"
-  network = var.network_name
+#opening tcp/30303 to the validator is unnecessary, as the validator peers via the proxy and has no public IP
+#resource "google_compute_firewall" "geth_firewall_validator" {
+#  name    = "${var.celo_env}-geth-firewall-validator"
+#  network = var.network_name
 
-  target_tags = concat(local.firewall_target_tags_validator)
+#  target_tags = concat(local.firewall_target_tags_validator)
 
-  allow {
-    protocol = "tcp"
-    ports    = ["30303"]
-  }
-}
+#  allow {
+  #  protocol = "tcp"
+  #  ports    = ["30303"]
+#  }
+#}
 
 resource "google_compute_firewall" "geth_metrics_firewall" {
   name    = "${var.celo_env}-geth-metrics-firewall"
@@ -98,7 +104,7 @@ resource "google_compute_firewall" "geth_metrics_firewall" {
 
   allow {
     protocol = "tcp"
-    ports    = ["9200"]
+    ports    = ["6060"]
   }
 }
 
@@ -107,6 +113,8 @@ resource "google_compute_firewall" "rpc_firewall" {
   network = var.network_name
 
   target_tags = local.firewall_target_tags_txnode
+
+  source_ranges = [data.google_compute_subnetwork.celo.ip_cidr_range]
 
   allow {
     protocol = "tcp"
@@ -132,7 +140,7 @@ resource "google_compute_firewall" "attestation-service" {
   network = var.network_name
 
   target_tags   = local.firewall_target_tags_attestation_service
-  source_ranges = [data.google_compute_subnetwork.celo.ip_cidr_range]
+  #source_ranges = [data.google_compute_subnetwork.celo.ip_cidr_range]
 
   allow {
     protocol = "tcp"
@@ -145,6 +153,7 @@ module "tx_node" {
   # variables
   block_time                            = var.block_time
   celo_env                              = var.celo_env
+  gcloud_project                        = var.gcloud_project
   instance_type                         = var.instance_types["txnode"]
   ethstats_host                         = var.ethstats_host
   genesis_content_base64                = base64encode(data.http.genesis.body)
@@ -158,6 +167,10 @@ module "tx_node" {
   network_name                          = var.network_name
   tx_node_count                         = var.tx_node_count
   bootnodes_base64                      = base64encode(data.http.bootnodes.body)
+  attestation_signer_addresses          = var.attestation_signer_addresses
+  attestation_signer_private_keys       = var.attestation_signer_private_keys
+  attestation_signer_account_passwords  = var.attestation_signer_account_passwords
+  service_account_scopes                = var.service_account_scopes
 }
 
 module "proxy" {
@@ -165,6 +178,7 @@ module "proxy" {
   # variables
   block_time                            = var.block_time
   celo_env                              = var.celo_env
+  gcloud_project                        = var.gcloud_project
   instance_type                         = var.instance_types["proxy"]
   ethstats_host                         = var.ethstats_host
   genesis_content_base64                = base64encode(data.http.genesis.body)
@@ -182,9 +196,12 @@ module "proxy" {
   reset_geth_data                       = var.reset_geth_data
 
   proxy_name                         = var.proxy_name
+  proxy_addresses                    = var.proxy_addresses
   proxy_private_keys                 = var.proxy_private_keys
+  proxy_account_passwords            = var.proxy_account_passwords
   validator_signer_account_addresses = var.validator_signer_account_addresses
   bootnodes_base64                   = base64encode(data.http.bootnodes.body)
+  service_account_scopes                = var.service_account_scopes
 }
 
 module "validator" {
@@ -192,6 +209,7 @@ module "validator" {
   # variables
   block_time                            = var.block_time
   celo_env                              = var.celo_env
+  gcloud_project                        = var.gcloud_project
   instance_type                         = var.instance_types["validator"]
   ethstats_host                         = var.ethstats_host
   genesis_content_base64                = base64encode(data.http.genesis.body)
@@ -215,6 +233,8 @@ module "validator" {
   proxy_enodes                       = var.proxy_enodes
   proxy_internal_ips                 = module.proxy.internal_ip_addresses
   proxy_external_ips                 = module.proxy.external_ip_addresses
+
+  service_account_scopes             = var.service_account_scopes
 }
 
 module "attestation-service" {
@@ -222,6 +242,7 @@ module "attestation-service" {
   # Variables
   celo_env                                    = var.celo_env
   gcloud_region                               = var.gcloud_region
+  gcloud_project                              = var.gcloud_project
   instance_type                               = var.instance_types["attestation_service"]
   network_name                                = var.network_name
   attestation_service_count                   = var.attestation_service_count
@@ -231,6 +252,8 @@ module "attestation-service" {
   attestation_service_docker_image_tag        = var.attestation_service_docker_image_tag
   account_address                             = var.attestation_signer_addresses
   attestation_key                             = var.attestation_signer_private_keys
+  validator_signer_account_addresses          = var.validator_signer_account_addresses
+  validator_release_gold_addresses            = var.validator_release_gold_addresses
   celo_provider                               = var.attestation_service_celo_provider != "" ? var.attestation_service_celo_provider : "http://${module.tx_node.internal_ip_addresses[0]}:8545"
   sms_providers                               = var.attestation_service_sms_providers
   nexmo_key                                   = var.attestation_service_nexmo_key
@@ -240,4 +263,5 @@ module "attestation-service" {
   twilio_messaging_service_sid                = var.attestation_service_twilio_messaging_service_sid
   twilio_auth_token                           = var.attestation_service_twilio_auth_token
   twilio_blacklist                            = var.attestation_service_twilio_blacklist
+  service_account_scopes                      = var.service_account_scopes
 }
