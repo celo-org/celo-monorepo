@@ -1,7 +1,7 @@
 // VIEW that's used on the CELO screen activity feed for CELO transfers (in or out).
 
 import Touchable from '@celo/react-components/components/Touchable'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import BigNumber from 'bignumber.js'
