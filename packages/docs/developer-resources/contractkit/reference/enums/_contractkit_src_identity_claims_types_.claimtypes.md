@@ -10,6 +10,7 @@
 * [KEYBASE](_contractkit_src_identity_claims_types_.claimtypes.md#keybase)
 * [NAME](_contractkit_src_identity_claims_types_.claimtypes.md#name)
 * [PROFILE_PICTURE](_contractkit_src_identity_claims_types_.claimtypes.md#profile_picture)
+* [STORAGE](_contractkit_src_identity_claims_types_.claimtypes.md#storage)
 * [TWITTER](_contractkit_src_identity_claims_types_.claimtypes.md#twitter)
 
 ## Enumeration members
@@ -62,8 +63,16 @@ ___
 
 ___
 
+###  STORAGE
+
+• **STORAGE**: = "STORAGE"
+
+*Defined in [contractkit/src/identity/claims/types.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L15)*
+
+___
+
 ###  TWITTER
 
 • **TWITTER**: = "TWITTER"
 
-*Defined in [contractkit/src/identity/claims/types.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L15)*
+*Defined in [contractkit/src/identity/claims/types.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L16)*
