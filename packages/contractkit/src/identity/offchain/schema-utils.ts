@@ -1,6 +1,6 @@
+import { Address } from '@celo/sdk-types/commons'
 import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
-import { Address } from '../../base'
 import OffchainDataWrapper from '../offchain-data-wrapper'
 
 export class SingleSchema<T> {

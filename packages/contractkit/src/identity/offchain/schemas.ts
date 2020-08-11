@@ -1,7 +1,7 @@
+import { Address } from '@celo/sdk-types/commons'
 import { AddressType, SignatureType } from '@celo/utils/lib/io'
 import * as t from 'io-ts'
 import { toChecksumAddress } from 'web3-utils'
-import { Address } from '../../base'
 import OffchainDataWrapper from '../offchain-data-wrapper'
 import { readWithSchema, SingleSchema, writeWithSchema } from './schema-utils'
 

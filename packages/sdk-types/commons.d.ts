@@ -44,3 +44,8 @@ export interface JsonRpcPayload extends WebCoreHelper.JsonRpcPayload {}
 export interface Provider extends provider {
   send(payload: JsonRpcPayload, callback: Callback<JsonRpcResponse>): void
 }
+
+export interface RLPEncodedTx {
+  transaction: CeloTx
+  rlpEncode: any
+}

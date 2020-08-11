@@ -1,3 +1,4 @@
+import { RLPEncodedTx } from '@celo/sdk-types/commons'
 import { Signer } from '@celo/sdk-types/wallet'
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
@@ -5,7 +6,6 @@ import { TransportStatusError } from '@ledgerhq/errors'
 import debugFactory from 'debug'
 import * as ethUtil from 'ethereumjs-util'
 import { transportErrorFriendlyMessage } from '../../utils/ledger-utils'
-import { RLPEncodedTx } from '../../utils/signing-utils'
 import { compareLedgerAppVersions, tokenInfoByAddressAndChainId } from '../ledger-utils/tokens'
 import { AddressValidation } from '../ledger-wallet'
 
