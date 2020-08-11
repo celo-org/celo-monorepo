@@ -166,13 +166,13 @@ export function* checkTxsForIdentityMetadata({ transactions }: NewTransactionsIn
     }
     Logger.debug(TAG + 'checkTxsForIdentityMetadata', `Checking ${transactions.length} txs`)
 
-    const commentKeyPrivate: string | null = yield select(dataEncryptionKeySelector)
-    if (!commentKeyPrivate) {
-      Logger.error(TAG + 'checkTxsForIdentityMetadata', 'Missing comment key, should never happen.')
+    const dataEncryptionKey: string | null = yield select(dataEncryptionKeySelector)
+    if (!dataEncryptionKey) {
+      Logger.error(TAG + 'checkTxsForIdentityMetadata', 'Missing DEK, should never happen.')
       return
     }
 
-    const newIdentityData = findIdentityMetadataInComments(transactions, commentKeyPrivate)
+    const newIdentityData = findIdentityMetadataInComments(transactions, dataEncryptionKey)
 
     const verifiedMetadata: IdentityMetadataInTx[] = yield call(
       verifyIdentityMetadata,
@@ -189,14 +189,14 @@ export function* checkTxsForIdentityMetadata({ transactions }: NewTransactionsIn
 // Check all transaction comments for metadata
 function findIdentityMetadataInComments(
   transactions: TransactionFeedFragment[],
-  commentKeyPrivate: string
+  dataEncryptionKey: string
 ) {
   const newIdentityData: IdentityMetadataInTx[] = []
   for (const tx of transactions) {
     if (tx.__typename !== 'TokenTransfer' || tx.type !== TokenTransactionType.Received) {
       continue
     }
-    const { e164Number, salt } = decryptComment(tx.comment, commentKeyPrivate, false)
+    const { e164Number, salt } = decryptComment(tx.comment, dataEncryptionKey, false)
     if (!e164Number || !salt) {
       continue
     }

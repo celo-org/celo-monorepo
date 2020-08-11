@@ -52,3 +52,18 @@ variable validators {
     proxy_public_ip                  = string
   }))
 }
+
+variable iam_instance_profile {
+  type    = string
+  default = null
+}
+
+variable cloudwatch_log_group_name {
+  type    = string
+  default = ""
+}
+
+variable cloudwatch_collect_disk_and_memory_usage {
+  type    = bool
+  default = false
+}

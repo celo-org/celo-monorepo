@@ -2,7 +2,7 @@ import interpolateColors from '@celo/react-components/components/interpolateColo
 import SegmentedControl from '@celo/react-components/components/SegmentedControl'
 import Share from '@celo/react-components/icons/Share'
 import Times from '@celo/react-components/icons/Times'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import { MaterialTopTabBarProps } from '@react-navigation/material-top-tabs'
 import React, { useMemo } from 'react'
 import { StyleSheet, View } from 'react-native'
@@ -36,7 +36,7 @@ export default function QRTabBar({ state, descriptors, navigation, position, qrS
 
   const color = interpolateColors(position, {
     inputRange: [0.9, 1],
-    outputColorRange: [colors.dark, colors.white],
+    outputColorRange: [colors.dark, colors.light],
   })
 
   const onPressClose = () => {

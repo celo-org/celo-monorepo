@@ -18,7 +18,7 @@ terraform {
 }
 
 module "celo_cluster" {
-  source = "../testnet"
+  source = "../../testnet"
 
   region                       = var.region
   cidr_blocks                  = var.cidr_blocks
