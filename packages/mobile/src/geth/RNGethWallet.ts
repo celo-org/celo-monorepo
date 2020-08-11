@@ -7,7 +7,7 @@ import {
   privateKeyToAddress,
 } from '@celo/utils/lib/address'
 import { RemoteWallet } from '@celo/contractkit/lib/wallets/remote-wallet'
-import RNGeth, { Account } from 'react-native-geth'
+import RNGeth from 'react-native-geth'
 import Logger from '../utils/Logger'
 
 export enum RNGethWalletErrors {
@@ -29,7 +29,7 @@ export class RNGethWallet extends RemoteWallet<RNGethSigner> implements Writable
   }
 
   async loadAccountSigners(): Promise<Map<string, RNGethSigner>> {
-    let accounts: Account[]
+    let accounts: string[]
     const addressToSigner = new Map<string, RNGethSigner>()
     try {
       accounts = await this.geth.listAccounts()
@@ -37,7 +37,7 @@ export class RNGethWallet extends RemoteWallet<RNGethSigner> implements Writable
       console.log(e)
       throw new Error(RNGethWalletErrors.FetchAccounts)
     }
-    accounts.forEach(({ address }) => {
+    accounts.forEach((address) => {
       const cleanAddress = normalizeAddressWith0x(address)
       addressToSigner.set(cleanAddress, new RNGethSigner(this.geth, cleanAddress))
     })

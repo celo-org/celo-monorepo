@@ -9,6 +9,7 @@ import {
 } from '@celo/contractkit/lib/utils/signing-utils'
 import RNGeth from 'react-native-geth'
 import * as ethUtil from 'ethereumjs-util'
+import { ensureLeading0x } from '@celo/utils/lib/address'
 
 const INCORRECT_PASSWORD_ERROR = 'could not decrypt key with given password'
 const currentTimeInSeconds = () => Math.round(Date.now() / 1000)
@@ -36,7 +37,7 @@ export class RNGethSigner implements Signer {
   ) {}
 
   async init(privateKey: string, passphrase: string) {
-    return this.geth.addAccount(privateKey, passphrase)
+    return this.geth.addAccount(this.hexToBase64(privateKey), passphrase)
   }
 
   async signRawTransaction(tx: Tx) {
@@ -53,13 +54,17 @@ export class RNGethSigner implements Signer {
     encodedTx: RLPEncodedTx
   ): Promise<{ v: number; r: Buffer; s: Buffer }> {
     // addToV (chainId) is ignored here because geth is configured with it
-    return extractSignature(await this.geth.signTransaction(encodedTx.rlpEncode, this.account))
+    const signedTxBase64 = await this.geth.signTransaction(
+      this.hexToBase64(encodedTx.rlpEncode),
+      this.account
+    )
+    return extractSignature(this.base64ToHex(signedTxBase64))
   }
 
   async signPersonalMessage(data: string): Promise<{ v: number; r: Buffer; s: Buffer }> {
     const hash = ethUtil.hashPersonalMessage(Buffer.from(data, 'hex'))
-    const signatureHex = await this.geth.signHash(hash.toString('hex'), this.account)
-    return ethUtil.fromRpcSig(signatureHex)
+    const signatureBase64 = await this.geth.signHash(hash.toString('base64'), this.account)
+    return ethUtil.fromRpcSig(this.base64ToHex(signatureBase64))
   }
 
   getNativeKey = () => this.account
@@ -87,5 +92,13 @@ export class RNGethSigner implements Signer {
 
   decrypt(_ciphertext: Buffer) {
     return Promise.reject(new Error('Decryption operation is not supported on this signer'))
+  }
+
+  hexToBase64(hex: string) {
+    return Buffer.from(hex.replace('0x', ''), 'hex').toString('base64')
+  }
+
+  base64ToHex(base64: string) {
+    return ensureLeading0x(Buffer.from(base64, 'base64').toString('hex'))
   }
 }
