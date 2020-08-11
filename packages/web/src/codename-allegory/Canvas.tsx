@@ -1,13 +1,13 @@
+import Head from 'next/head'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import Fade from 'react-reveal/Fade'
 import Body from 'src/codename-allegory/Body'
 import SideBar from 'src/codename-allegory/SideBar'
 import OpenGraph from 'src/header/OpenGraph'
+import { useBooleanToggle } from 'src/hooks/useBooleanToggle'
 import menuItems from 'src/shared/menu-items'
 import { fonts, textStyles } from 'src/styles'
-import { useBooleanToggle } from 'src/hooks/useBooleanToggle'
-import Fade from 'react-reveal/Fade'
-import Head from 'next/head'
 
 const DURATION = 600
 
