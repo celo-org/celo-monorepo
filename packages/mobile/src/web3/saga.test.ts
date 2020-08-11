@@ -11,6 +11,7 @@ import {
   waitForWeb3Sync,
 } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
+import { BLOCK_AGE_LIMIT } from 'src/web3/utils'
 import { createMockStore, sleep } from 'test/utils'
 import { mockAccount } from 'test/values'
 
@@ -92,7 +93,7 @@ describe(checkWeb3SyncProgress, () => {
       // @ts-ignore
       .mockReturnValueOnce({
         number: 100,
-        timestamp: Math.round(Date.now() / 1000) - 40,
+        timestamp: Math.round(Date.now() / 1000) - BLOCK_AGE_LIMIT,
       })
       .mockReturnValueOnce({
         number: 200,
