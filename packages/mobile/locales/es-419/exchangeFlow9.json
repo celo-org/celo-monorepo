@@ -43,6 +43,7 @@
   "soldGold": "CELO vendido",
   "accountAddressLabel": "Nro de cuenta o dirección",
   "celoAmountLabel": "Cantidad (CELO)",
+  "maxSymbol": "Max",
   "withdrawCeloReview": "Resúmen",
   "withdrawCeloTo": "Retirar en",
   "withdrawCeloAmount": "Cantidad (CELO)",
