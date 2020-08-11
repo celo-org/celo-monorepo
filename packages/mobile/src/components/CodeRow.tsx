@@ -63,7 +63,7 @@ function CodeRow({
     return (
       <View style={styles.codeProcessingContainer}>
         <Text style={styles.codeValue}>{shortenedInput || t('processing')}</Text>
-        <ActivityIndicator size="small" color={colors.celoGreen} style={styles.codeInputSpinner} />
+        <ActivityIndicator size="small" color={colors.greenBrand} style={styles.codeInputSpinner} />
       </View>
     )
   }
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     ...componentStyles.roundedBorder,
     flex: 0,
     backgroundColor: '#FFF',
-    borderColor: colors.inputBorder,
+    borderColor: colors.gray2,
     height: 50,
     marginVertical: 5,
   },
@@ -107,12 +107,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginVertical: 5,
     paddingHorizontal: 10,
-    backgroundColor: colors.darkLightest,
+    backgroundColor: colors.gray1,
     borderRadius: 3,
     height: 50,
   },
   checkmarkContainer: {
-    backgroundColor: colors.darkLightest,
+    backgroundColor: colors.gray1,
     position: 'absolute',
     top: 3,
     right: 3,
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginVertical: 5,
     paddingHorizontal: 10,
-    borderColor: colors.inputBorder,
+    borderColor: colors.gray2,
     height: 50,
   },
   codeInputSpinner: {
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 10,
     marginVertical: 5,
-    borderColor: colors.inputBorder,
+    borderColor: colors.gray2,
     borderRadius: 3,
     borderWidth: 1,
     height: 50,
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
   codeValue: {
     ...fontStyles.body,
     fontSize: 15,
-    color: colors.darkSecondary,
+    color: colors.gray5,
   },
 })
 

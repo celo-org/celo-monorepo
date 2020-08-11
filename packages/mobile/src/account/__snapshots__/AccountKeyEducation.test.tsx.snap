@@ -92,7 +92,7 @@ exports[`AccountKeyEducation renders correctly 1`] = `
           "borderRadius": 5,
           "flex": 0,
           "height": 5,
-          "marginHorizontal": 5,
+          "marginHorizontal": 3,
           "width": 5,
         }
       }
@@ -102,12 +102,13 @@ exports[`AccountKeyEducation renders correctly 1`] = `
           "borderRadius": 5,
           "flex": 0,
           "height": 5,
-          "marginHorizontal": 5,
+          "marginHorizontal": 3,
           "width": 5,
         }
       }
       loop={false}
       onIndexChanged={[Function]}
+      removeClippedSubviews={false}
     >
       <View
         style={
@@ -396,7 +397,7 @@ exports[`AccountKeyEducation renders correctly 1`] = `
               "justifyContent": "center",
               "minWidth": 120,
               "opacity": undefined,
-              "paddingHorizontal": 16,
+              "paddingHorizontal": 24,
               "paddingVertical": 5,
             }
           }

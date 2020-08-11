@@ -17,7 +17,7 @@ import { recentTxRecipientsCacheSelector } from 'src/transactions/reducer'
 import TransferFeedItem from 'src/transactions/TransferFeedItem'
 import { TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
-import { privateCommentKeySelector } from 'src/web3/selectors'
+import { dataEncryptionKeySelector } from 'src/web3/selectors'
 
 const TAG = 'transactions/TransactionFeed'
 
@@ -46,7 +46,7 @@ type Props = {
 } & StateProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
-  commentKey: privateCommentKeySelector(state),
+  commentKey: dataEncryptionKeySelector(state),
   addressToE164Number: state.identity.addressToE164Number,
   recipientCache: recipientCacheSelector(state),
   recentTxRecipientsCache: recentTxRecipientsCacheSelector(state),

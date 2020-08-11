@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { ApolloError } from 'apollo-boost'
 import * as React from 'react'
@@ -22,7 +22,6 @@ export class NoActivity extends React.PureComponent<Props> {
     if (error) {
       return (
         <View style={styles.container}>
-          <View style={styles.circleRed} />
           <Text style={styles.text}>{t('errorLoadingActivity.0')}</Text>
           <Text style={styles.text}>{t('errorLoadingActivity.1')}</Text>
         </View>
@@ -34,7 +33,9 @@ export class NoActivity extends React.PureComponent<Props> {
 
     return (
       <View style={styles.container}>
-        {loading && <ActivityIndicator style={styles.icon} size="large" color={colors.celoGreen} />}
+        {loading && (
+          <ActivityIndicator style={styles.icon} size="large" color={colors.greenBrand} />
+        )}
         <Text style={styles.text}>{statusText} </Text>
       </View>
     )
@@ -61,13 +62,6 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 20,
     alignSelf: 'center',
-  },
-  circleRed: {
-    marginVertical: 20,
-    height: 30,
-    width: 30,
-    borderRadius: 15,
-    backgroundColor: colors.errorRed,
   },
 })
 

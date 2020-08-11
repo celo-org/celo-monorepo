@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import React from 'react'
 import { StyleSheet } from 'react-native'
 import { TopBarTextButton, TopBarTextButtonProps } from 'src/navigator/TopBarButton.v2'

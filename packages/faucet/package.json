@@ -18,7 +18,7 @@
     "build:rules": "firebase-bolt database-rules.bolt"
   },
   "dependencies": {
-    "@celo/contractkit": "0.4.10-dev",
+    "@celo/contractkit": "0.4.11-dev",
     "@celo/utils": "0.1.17-dev",
     "@firebase/app": "^0.5.3",
     "@google-cloud/logging": "^7.1.0",
