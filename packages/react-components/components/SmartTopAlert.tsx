@@ -184,12 +184,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.messageBlue,
+    backgroundColor: colors.onboardingBlue,
     paddingBottom: PADDING_VERTICAL,
     paddingHorizontal: 25,
   },
   containerError: {
-    backgroundColor: colors.errorRed,
+    backgroundColor: colors.warning,
   },
   containerWithButton: {
     flexDirection: 'column',
@@ -206,11 +206,11 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 8,
-    borderColor: colors.white,
+    borderColor: colors.light,
     alignSelf: 'center',
   },
   buttonText: {
-    color: colors.white,
+    color: colors.light,
   },
 })
 

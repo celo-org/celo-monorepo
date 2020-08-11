@@ -199,7 +199,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
     style={
       Object {
         "borderStyle": "solid",
-        "borderTopColor": "#EEEEEE",
+        "borderTopColor": "#F8F9F9",
         "borderTopWidth": 1,
         "marginBottom": 15,
         "marginTop": 10,
@@ -351,7 +351,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
           style={
             Object {
               "height": 12,
-              "tintColor": "#BDBDBD",
+              "tintColor": "#B4B9BD",
               "width": 12,
             }
           }
@@ -592,7 +592,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
     style={
       Object {
         "borderStyle": "solid",
-        "borderTopColor": "#EEEEEE",
+        "borderTopColor": "#F8F9F9",
         "borderTopWidth": 1,
         "marginBottom": 15,
         "marginTop": 10,

@@ -5,7 +5,12 @@ variable block_time {
 
 variable celo_env {
   type        = string
-  description = "Name of the testnet Celo environment"
+  description = "Name of the Celo environment"
+}
+
+variable gcloud_project {
+  type        = string
+  description = "Name of the Google Cloud project to use"
 }
 
 variable instance_type {
@@ -74,8 +79,34 @@ variable bootnodes_base64 {
   description = "Bootnodes ethereum address encoded as base64"
 }
 
+variable reset_geth_data {
+  type        = bool
+  description = "Specifies if the existing chain data should be removed while creating the instance"
+  default     = true
+}
+
 variable txnode_max_peers {
   type        = number
   description = "Max number of peers to connect with"
   default     = 120
+}
+
+variable attestation_signer_addresses {
+  type        = list(string)
+  description = "The address to use for signing attestation requests"
+}
+
+variable attestation_signer_account_passwords {
+  type        = list(string)
+  description = "Array with the attestation_signer account passwords"
+}
+
+variable attestation_signer_private_keys {
+  type        = list(string)
+  description = "Array with the attestation_signer private keys"
+}
+
+variable service_account_scopes {
+  type        = list(string)
+  description = "Scopes to apply to the service account which all nodes in the cluster will inherit"
 }
