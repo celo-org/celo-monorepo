@@ -29,6 +29,7 @@ export function asn1FromPublicKey(bn: BigNumber): Buffer {
     )
   }
   const value = values[1] as asn1.BitString
+  // Adding a dummy padding byte
   const padding = Buffer.from(new Uint8Array([0x00]))
   value.valueBlock.valueHex = Buffer.concat([padding, pkbuff])
   return Buffer.from(sequence.toBER(false))

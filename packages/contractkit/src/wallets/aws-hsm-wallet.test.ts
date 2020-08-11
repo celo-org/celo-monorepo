@@ -19,14 +19,13 @@ import {
 require('dotenv').config()
 
 const USING_MOCK = typeof process.env.AWS_HSM_KEY_ID === 'undefined'
-const AWS_HSM_KEY_ID = USING_MOCK
-  ? '1d6db902-9a45-4dd5-bd1e-7250b2306f18'
-  : process.env.AWS_HSM_KEY_ID
+const MOCK_KEY_ID = '1d6db902-9a45-4dd5-bd1e-7250b2306f18'
+const AWS_HSM_KEY_ID = USING_MOCK ? MOCK_KEY_ID : process.env.AWS_HSM_KEY_ID
 
 const key1 = PRIVATE_KEY1
 const ec = new EC('secp256k1')
 
-const keys: Map<string, string> = new Map([['1d6db902-9a45-4dd5-bd1e-7250b2306f18', key1]])
+const keys: Map<string, string> = new Map([[MOCK_KEY_ID, key1]])
 const listKeysResponse = {
   Keys: Array.from(keys.keys()).map((id) => ({
     KeyId: id,
