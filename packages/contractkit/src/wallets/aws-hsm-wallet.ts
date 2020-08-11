@@ -51,8 +51,6 @@ export default class AwsHsmWallet extends RemoteWallet implements Wallet {
       } catch (e) {
         // Safely ignore non-secp256k1 keys
         if (!e.name || e.name !== 'UnsupportedOperationException') {
-          const t = e
-          console.log(t)
           throw e
         }
       }
