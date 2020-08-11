@@ -1,7 +1,7 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button.v2'
 import BackChevron from '@celo/react-components/icons/BackChevron.v2'
 import Times from '@celo/react-components/icons/Times'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import progressDots from '@celo/react-components/styles/progressDots'
 import * as React from 'react'

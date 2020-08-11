@@ -164,7 +164,7 @@ export class InviteReview extends React.Component<Props, State> {
         />
         {inviteInProgress && (
           <View style={styles.loadingIcon}>
-            <ActivityIndicator size="large" color={colors.celoGreen} />
+            <ActivityIndicator size="large" color={colors.greenBrand} />
           </View>
         )}
       </View>
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
   },
 })
 

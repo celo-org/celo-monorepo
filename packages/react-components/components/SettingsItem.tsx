@@ -1,7 +1,7 @@
 import ListItem from '@celo/react-components/components/ListItem'
 import TextInput from '@celo/react-components/components/TextInput.v2'
 import ForwardChevron from '@celo/react-components/icons/ForwardChevron'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import * as React from 'react'
 import { StyleSheet, Switch, Text, View } from 'react-native'

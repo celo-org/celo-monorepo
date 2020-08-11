@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flex: 1,
     width: '100%',
-    backgroundColor: colors.celoGreen,
+    backgroundColor: colors.greenBrand,
   },
 
   button: {

@@ -1,6 +1,6 @@
 import Touchable from '@celo/react-components/components/Touchable'
 import withTextInputPasteAware from '@celo/react-components/components/WithTextInputPasteAware'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -110,7 +110,7 @@ export class BackupPhraseContainer extends React.Component<Props> {
                   : isValidSocialBackupPhrase
               }
               underlineColorAndroid="transparent"
-              placeholderTextColor={colors.inactive}
+              placeholderTextColor={colors.gray4}
               enablesReturnKeyAutomatically={true}
               multiline={true}
               autoCorrect={false}
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
   phraseInputText: {
     ...fontStyles.regular,
     borderWidth: 1,
-    borderColor: colors.inputBorder,
+    borderColor: colors.gray2,
     borderRadius: 4,
     minHeight: 125,
     padding: 14,

@@ -86,7 +86,7 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
                   },
                   Object {
                     "backgroundColor": "#FFF",
-                    "borderColor": "#D1D5D8",
+                    "borderColor": "#EDEEEF",
                     "borderRadius": 3,
                     "borderWidth": 1,
                     "flex": 0,
@@ -107,7 +107,7 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
                 style={
                   Object {
                     "backgroundColor": "#FFFFFF",
-                    "borderColor": "#D1D5D8",
+                    "borderColor": "#EDEEEF",
                     "borderRadius": 3,
                     "flex": 1,
                     "fontFamily": "Hind-Regular",
@@ -735,7 +735,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                       },
                       Object {
                         "backgroundColor": "#FFF",
-                        "borderColor": "#D1D5D8",
+                        "borderColor": "#EDEEEF",
                         "borderRadius": 3,
                         "borderWidth": 1,
                         "flex": 0,
@@ -757,7 +757,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                     style={
                       Object {
                         "backgroundColor": "#FFFFFF",
-                        "borderColor": "#D1D5D8",
+                        "borderColor": "#EDEEEF",
                         "borderRadius": 3,
                         "flex": 1,
                         "fontFamily": "Hind-Regular",
@@ -787,7 +787,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                       },
                       Object {
                         "backgroundColor": "#FFF",
-                        "borderColor": "#D1D5D8",
+                        "borderColor": "#EDEEEF",
                         "borderRadius": 3,
                         "borderWidth": 1,
                         "flex": 0,
@@ -809,7 +809,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                     style={
                       Object {
                         "backgroundColor": "#FFFFFF",
-                        "borderColor": "#D1D5D8",
+                        "borderColor": "#EDEEEF",
                         "borderRadius": 3,
                         "flex": 1,
                         "fontFamily": "Hind-Regular",
@@ -839,7 +839,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                       },
                       Object {
                         "backgroundColor": "#FFF",
-                        "borderColor": "#D1D5D8",
+                        "borderColor": "#EDEEEF",
                         "borderRadius": 3,
                         "borderWidth": 1,
                         "flex": 0,
@@ -861,7 +861,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                     style={
                       Object {
                         "backgroundColor": "#FFFFFF",
-                        "borderColor": "#D1D5D8",
+                        "borderColor": "#EDEEEF",
                         "borderRadius": 3,
                         "flex": 1,
                         "fontFamily": "Hind-Regular",
@@ -891,7 +891,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                       },
                       Object {
                         "backgroundColor": "#FFF",
-                        "borderColor": "#D1D5D8",
+                        "borderColor": "#EDEEEF",
                         "borderRadius": 3,
                         "borderWidth": 1,
                         "flex": 0,
@@ -913,7 +913,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                     style={
                       Object {
                         "backgroundColor": "#FFFFFF",
-                        "borderColor": "#D1D5D8",
+                        "borderColor": "#EDEEEF",
                         "borderRadius": 3,
                         "flex": 1,
                         "fontFamily": "Hind-Regular",

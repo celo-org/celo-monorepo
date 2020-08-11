@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
   bodyText: {
     ...fontStyles.paragraph,
     fontSize: 15,
-    color: colors.darkSecondary,
+    color: colors.gray5,
   },
 })
 

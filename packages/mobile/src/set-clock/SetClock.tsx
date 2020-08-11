@@ -76,7 +76,7 @@ const style = StyleSheet.create({
     paddingBottom: 10,
   },
   bodyText: {
-    color: colors.darkSecondary,
+    color: colors.gray5,
   },
   instructions: {
     textAlign: 'center',

@@ -1,6 +1,6 @@
 import Touchable from '@celo/react-components/components/Touchable'
 import CheckCircle from '@celo/react-components/icons/CheckCircle'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
@@ -67,6 +67,6 @@ const styles = StyleSheet.create({
     width: 24,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: colors.inactive,
+    borderColor: colors.gray4,
   },
 })

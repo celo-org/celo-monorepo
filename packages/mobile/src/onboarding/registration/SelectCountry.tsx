@@ -1,6 +1,6 @@
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import SearchInput from '@celo/react-components/components/SearchInput'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import { LocalizedCountry } from '@celo/utils/src/countries'
 import { StackScreenProps } from '@react-navigation/stack'
 import React, { useCallback, useMemo, useState } from 'react'
