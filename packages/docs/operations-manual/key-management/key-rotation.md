@@ -1,12 +1,12 @@
 ## Key Rotation
 
-If an authorized signer key is lost or compromised, the Locked Gold Account can authorize a new signer to replace the old one. This prevents losing an authorized signer key from becoming a catastrophic event. It is recommended to regularly rotate keys to limit the impact of keys being silently compromised.
+As detailed in [the Celo account roles description page](./detailed.md), Celo Locked Gold accounts can authorize separate signer keys for various roles such as voting or validating. This way, if an authorized signer key is lost or compromised, the Locked Gold account can authorize a new signer to replace the old one, without risking the key that custodies funds. This prevents losing an authorized signer key from becoming a catastrophic event. In fact, it is recommended as an operational best practice to regularly rotate keys to limit the impact of keys being silently compromised.
 
 ### Validator Signer Rotation
 
-Because the Validator signer key is constantly in use to sign consensus messages, special care must be taken when authorizing a new Validator signer. The following steps detail the recommended procedure for rotating the validator signer of an active and elected validator:
+Because the Validator signer key is constantly in use to sign consensus messages, special care must be taken when authorizing a new Validator signer key. The following steps detail the recommended procedure for rotating the validator signer key of an active and elected validator:
 
-1. Create a new Validator instance as detailed in the [Deploy a Validator](../../getting-started/running-a-validator-in-baklava.md#deploy-a-validator-machine) section of the getting started documentation. When using a proxy, additionally create a new proxy and peer it with the new validator instance, as described in the same document. Wait for the new instances to sync before proceeding.
+1. Create a new Validator instance as detailed in the [Deploy a Validator](../../getting-started/running-a-validator-in-mainnet.md#deploy-a-validator-machine) section of the getting started documentation. When using a proxy, additionally create a new proxy and peer it with the new validator instance, as described in the same document. Wait for the new instances to sync before proceeding. Please note that when running the proxy, the `--proxy.proxiedvalidatoraddress` flag should reflect the new validator signer address. Otherwise, the proxy will not be able to peer with the validator.
 
   {% hint style="warning" %}
   Before proceeding to step 2 ensure there is sufficient time until the end of the epoch to complete key rotation.
@@ -33,6 +33,10 @@ Because the Validator signer key is constantly in use to sign consensus messages
     # From a node with access to the beneficiary key of VALIDATOR_ACCOUNT_ADDRESS
     celocli releasegold:authorize --contract $VALIDATOR_ACCOUNT_ADDRESS --role validator --signer $SIGNER_TO_AUTHORIZE --signature 0x$SIGNER_PROOF_OF_POSSESSION --blsKey $BLS_PUBLIC_KEY --blsPop $BLS_PROOF_OF_POSSESSION
     ```
+  
+  {% hint style="warning" %}
+  Please note that the BLS key will change along with the validator signer ECDSA key on the node. If the new BLS key is not authorized, then the validator will be unable to process aggregated signatures during consensus, **resulting in downtime**. For more details, please read [the BLS key section of the Celo account role descriptions](./detailed.md#authorized-validator-bls-signers).
+  {% endhint %}
 
 3. **Leave all validator and proxy nodes running** until the next epoch change. At the start the next epoch, the new Validator signer should take over participation in consensus.
 
