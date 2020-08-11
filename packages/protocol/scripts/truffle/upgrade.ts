@@ -49,7 +49,7 @@ function getProxiedContracts() {
 
   return names.map((contractName: string) => {
     // tslint:disable-next-line:no-console
-    console.log('Reading artifact', contractName)
+    console.log('Reading artifact for', contractName)
     return [
       artifacts.require(contractName) as Truffle.Contract<any>,
       artifacts.require(contractName + 'Proxy') as Truffle.Contract<ProxyInstance>,
@@ -58,11 +58,7 @@ function getProxiedContracts() {
 }
 
 function fill(a: string) {
-  let res = '__' + a
-  while (res.length < 40) {
-    res = res + '_'
-  }
-  return new RegExp(res, 'g')
+  return new RegExp(('__' + a).padEnd(40, '_'), 'g')
 }
 
 function linkBytecode(Contract: Truffle.Contract<any>) {
@@ -117,7 +113,7 @@ async function needsUpgrade(Contract: Truffle.Contract<any>, proxy: ProxyInstanc
   const compiledBytecode = stripMetadata(await getCompiledBytecode(Contract))
   const res = implementationBytecode !== compiledBytecode
   if (!res) {
-    console.info('Not changed', Contract.contractName)
+    console.info(`Hasn't changed ${Contract.contractName}`)
   }
   return res
 }
@@ -209,7 +205,7 @@ module.exports = async (callback: (error?: any) => number) => {
         process.exit(0)
       }
 
-      const lst = await Promise.all(
+      const proposalList = await Promise.all(
         contractsToUpgrade.map(
           async ([Contract, Proxy]: [Truffle.Contract<any>, Truffle.Contract<ProxyInstance>]) => {
             // tslint:disable-next-line:no-console
@@ -222,7 +218,7 @@ module.exports = async (callback: (error?: any) => number) => {
       // tslint:disable-next-line:no-console
       console.log('Generated proposal')
       // tslint:disable-next-line:no-console
-      console.log(JSON.stringify(lst, null, 2))
+      console.log(JSON.stringify(proposalList, null, 2))
     } else {
       // tslint:disable-next-line:no-console
       console.log('All contracts up to date')
