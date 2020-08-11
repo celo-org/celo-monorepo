@@ -900,6 +900,9 @@ workflows:
       - typescript-test:
           requires:
             - install_dependencies
+      - base-test:
+          requires:
+            - install_dependencies
       - utils-test:
           requires:
             - install_dependencies
