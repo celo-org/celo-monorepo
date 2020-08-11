@@ -54,7 +54,7 @@ const parseWei: ParseFn<BigNumber> = (input) => {
   }
 }
 
-const parsePath: ParseFn<string> = (input) => {
+export const parsePath: ParseFn<string> = (input) => {
   if (pathExistsSync(input)) {
     return input
   } else {
