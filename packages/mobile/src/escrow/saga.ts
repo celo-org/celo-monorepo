@@ -68,7 +68,7 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
 
     yield call(sendTransaction, approvalTx.txo, account, TAG, 'approval')
 
-    ValoraAnalytics.track(EscrowEvents.escrow_transfer_transfer_tx_sent)
+    ValoraAnalytics.track(EscrowEvents.escrow_transfer_approve_tx_sent)
     Logger.debug(TAG + '@transferToEscrow', 'Transfering to escrow')
 
     yield call(registerStandbyTransaction, action.txId, amount.toString(), escrow.address)
@@ -82,7 +82,6 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
       NUM_ATTESTATIONS_REQUIRED
     )
     ValoraAnalytics.track(EscrowEvents.escrow_transfer_transfer_tx_sent)
-    // TODO check types
     yield call(sendAndMonitorTransaction, action.txId, transferTx, account)
     yield put(fetchSentEscrowPayments())
     ValoraAnalytics.track(EscrowEvents.escrow_transfer_complete)

@@ -18,6 +18,7 @@ Signs the EVM transaction with a Ledger device
 
 ### Methods
 
+* [decrypt](_contractkit_src_wallets_signers_ledger_signer_.ledgersigner.md#decrypt)
 * [getNativeKey](_contractkit_src_wallets_signers_ledger_signer_.ledgersigner.md#getnativekey)
 * [signPersonalMessage](_contractkit_src_wallets_signers_ledger_signer_.ledgersigner.md#signpersonalmessage)
 * [signTransaction](_contractkit_src_wallets_signers_ledger_signer_.ledgersigner.md#signtransaction)
@@ -52,6 +53,22 @@ Name | Type |
 **Returns:** *[LedgerSigner](_contractkit_src_wallets_signers_ledger_signer_.ledgersigner.md)*
 
 ## Methods
+
+###  decrypt
+
+▸ **decrypt**(`_ciphertext`: Buffer): *Promise‹Buffer‹››*
+
+*Defined in [contractkit/src/wallets/signers/ledger-signer.ts:185](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/ledger-signer.ts#L185)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`_ciphertext` | Buffer |
+
+**Returns:** *Promise‹Buffer‹››*
+
+___
 
 ###  getNativeKey
 
@@ -98,7 +115,7 @@ ___
 
 ###  signTypedData
 
-▸ **signTypedData**(`typedData`: [EIP712TypedData](../interfaces/_contractkit_src_utils_sign_typed_data_utils_.eip712typeddata.md)): *Promise‹object›*
+▸ **signTypedData**(`typedData`: EIP712TypedData): *Promise‹object›*
 
 *Defined in [contractkit/src/wallets/signers/ledger-signer.ts:104](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/ledger-signer.ts#L104)*
 
@@ -106,6 +123,6 @@ ___
 
 Name | Type |
 ------ | ------ |
-`typedData` | [EIP712TypedData](../interfaces/_contractkit_src_utils_sign_typed_data_utils_.eip712typeddata.md) |
+`typedData` | EIP712TypedData |
 
 **Returns:** *Promise‹object›*

@@ -1,4 +1,5 @@
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
+import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import debugFactory from 'debug'
 // @ts-ignore-next-line
@@ -6,7 +7,6 @@ import { account as Account, bytes as Bytes, hash as Hash, RLP } from 'eth-lib'
 import * as ethUtil from 'ethereumjs-util'
 import { EncodedTransaction, Tx } from 'web3-core'
 import * as helpers from 'web3-core-helpers'
-import { EIP712TypedData, generateTypedDataHash } from './sign-typed-data-utils'
 
 const debug = debugFactory('kit:tx:sign')
 

@@ -5,13 +5,12 @@ import {
 } from '@celo/protocol/lib/compatibility/ast-code'
 import { ASTStorageCompatibilityReport } from '@celo/protocol/lib/compatibility/ast-layout'
 import { categorize, Categorizer, ChangeType } from '@celo/protocol/lib/compatibility/categorizer'
-import { ContractVersionDelta } from '@celo/protocol/lib/compatibility/version'
+import { ContractVersionDelta, ContractVersionDeltaIndex } from '@celo/protocol/lib/compatibility/version'
 
 /**
  * Value object holding all uncategorized storage and code reports.
  */
 export class ASTReports {
-  
   constructor(
     public readonly code: ASTCodeCompatibilityReport,
     public readonly storage: ASTStorageCompatibilityReport[]) {}
@@ -112,15 +111,15 @@ export interface ASTVersionedReportIndex {
 }
 
 /**
- * Backward compatibility report for a set of changes, based on 
+ * Backward compatibility report for a set of changes, based on
  * the abstract syntax tree analysis of both the storage layout, and code API.
- * 
+ *
  * Holds {@link CategorizedChanges} and the calculated {@link ContractVersionDelta}.
  */
 export class ASTVersionedReport {
-  
+
   /**
-   * @returns a new {@link ASTVersionedReport} with the provided 
+   * @returns a new {@link ASTVersionedReport} with the provided
    * {@link CategorizedChanges} and a calculated version delta
    * according to {@link ContractVersionDelta.fromChanges}.
    */
@@ -171,4 +170,11 @@ export class ASTDetailedVersionedReport {
     public readonly contracts: ASTVersionedReportIndex
   ) {}
 
+  versionDeltas = (): ContractVersionDeltaIndex => {
+    const deltas = {}
+    Object.keys(this.contracts).map((contract: string) => {
+      deltas[contract] = this.contracts[contract].versionDelta
+    })
+    return deltas
+  }
 }

@@ -134,7 +134,14 @@ if [ $PLATFORM = "android" ]; then
   fi
 
   echo "Starting the emulator"
-  $ANDROID_SDK_ROOT/emulator/emulator -avd $VD_NAME -no-boot-anim -noaudio -gpu swiftshader_indirect -no-snapshot -no-window -netdelay $NET_DELAY &
+  $ANDROID_SDK_ROOT/emulator/emulator \
+    -avd $VD_NAME \
+    -no-boot-anim \
+    -noaudio \
+    -no-snapshot \
+    -netdelay $NET_DELAY \
+    ${CI:+-gpu swiftshader_indirect -no-window} \
+    &
 
   echo "Waiting for device to connect to Wifi, this is a good proxy the device is ready"
   until [ `adb shell dumpsys wifi | grep "mNetworkInfo" | grep "state: CONNECTED" | wc -l` -gt 0 ]

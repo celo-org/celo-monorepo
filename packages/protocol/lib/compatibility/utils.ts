@@ -14,26 +14,21 @@ export class ASTBackwardReport {
   static create = (
     oldArtifactsFolder: string, 
     newArtifactsFolder: string, 
-    exclude: string,
+    oldArtifacts: BuildArtifacts, 
+    newArtifacts: BuildArtifacts, 
+    exclude: RegExp,
     categorizer: Categorizer,
     logFunction: (msg: string) => void): ASTBackwardReport => {
       
-    logFunction("Instantiating old artifacts...")
-    const artifacts1 = instantiateArtifacts(oldArtifactsFolder)
-    logFunction("Done\n")
-    logFunction("Instantiating new artifacts...")
-    const artifacts2 = instantiateArtifacts(newArtifactsFolder)
-    logFunction("Done\n")
     // Run reports
     logFunction("Running storage report...")
-    const storage = reportLayoutIncompatibilities(artifacts1, artifacts2)
+    const storage = reportLayoutIncompatibilities(oldArtifacts, newArtifacts)
     logFunction("Done\n")
     logFunction("Running code report...")
-    const code = reportASTIncompatibilities(artifacts1, artifacts2)
+    const code = reportASTIncompatibilities(oldArtifacts, newArtifacts)
     logFunction("Done\n")
   
-    const excludeRegexp: RegExp = exclude ? new RegExp(exclude) : null
-    const fullReports = new ASTReports(code, storage).excluding(excludeRegexp)
+    const fullReports = new ASTReports(code, storage).excluding(exclude)
     
     logFunction("Generating backward report...")
     const versionedReport = ASTDetailedVersionedReport.create(fullReports, categorizer)
@@ -42,7 +37,7 @@ export class ASTBackwardReport {
     return new ASTBackwardReport(
       oldArtifactsFolder,
       newArtifactsFolder,
-      exclude,
+      exclude.toString(),
       versionedReport)
   }
 

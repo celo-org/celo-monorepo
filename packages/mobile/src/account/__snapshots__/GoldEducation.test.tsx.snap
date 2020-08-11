@@ -124,6 +124,7 @@ exports[`renders correctly 1`] = `
       }
       loop={false}
       onIndexChanged={[Function]}
+      removeClippedSubviews={false}
     >
       <View
         style={

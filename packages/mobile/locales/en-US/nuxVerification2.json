@@ -48,7 +48,7 @@
     "body2InsufficientBalance": "Please try again when you have added funds to your wallet.",
     "body1SaltQuotaExceeded": "Your phone number lookup quota is used up",
     "body2SaltQuotaExceeded": "Please try again when you have purchased more lookups",
-    "enterCodesBody": " If you already received three codes via SMS, you can still enter them.",
+    "enterCodesBody": "If you already received three codes via SMS, you can still enter them.",
     "enterCodesButton": "Enter Codes"
   },
   "retryWithFornoModal": {

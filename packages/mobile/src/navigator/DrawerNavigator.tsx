@@ -1,6 +1,6 @@
 import ContactCircle from '@celo/react-components/components/ContactCircle'
 import PhoneNumberWithFlag from '@celo/react-components/components/PhoneNumberWithFlag'
-import colorsV2 from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
 import {
@@ -20,6 +20,7 @@ import {
   DrawerNavigationState,
   useLinkBuilder,
 } from '@react-navigation/native'
+import { TransitionPresets } from '@react-navigation/stack'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
@@ -186,7 +187,7 @@ export default function DrawerNavigator() {
       backBehavior={'initialRoute'}
       drawerContentOptions={{
         labelStyle: [fontStyles.regular, { marginLeft: -20, fontWeight: 'normal' }],
-        activeBackgroundColor: colorsV2.gray2,
+        activeBackgroundColor: colors.gray2,
       }}
     >
       <Drawer.Screen
@@ -204,7 +205,11 @@ export default function DrawerNavigator() {
         <Drawer.Screen
           name={Screens.GoldEducation}
           component={GoldEducation}
-          options={{ title: t('celoGold'), drawerIcon: Gold }}
+          options={{
+            title: t('celoGold'),
+            drawerIcon: Gold,
+            ...TransitionPresets.ModalTransition,
+          }}
         />
       )}
       <Drawer.Screen
@@ -246,17 +251,17 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 12,
     height: 1,
-    backgroundColor: colorsV2.gray2,
+    backgroundColor: colors.gray2,
     alignSelf: 'stretch',
   },
   dollarsLabel: {
     ...fontStyles.small,
-    color: colorsV2.gray4,
+    color: colors.gray4,
     marginTop: 2,
   },
   borderBottom: {
     height: 1,
-    backgroundColor: colorsV2.gray2,
+    backgroundColor: colors.gray2,
     alignSelf: 'stretch',
     marginTop: 12,
     marginBottom: 12,
@@ -276,6 +281,6 @@ const styles = StyleSheet.create({
   },
   smallLabel: {
     ...fontStyles.small,
-    color: colorsV2.gray4,
+    color: colors.gray4,
   },
 })

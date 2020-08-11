@@ -107,7 +107,12 @@ export type StackParamList = {
   [Screens.InviteReview]: {
     recipient: Recipient
   }
-  [Screens.JoinCelo]: { selectedCountryCodeAlpha2: string } | undefined
+  [Screens.NameAndNumber]:
+    | {
+        selectedCountryCodeAlpha2: string
+        country: string
+      }
+    | undefined
   [Screens.Language]:
     | {
         nextScreen: keyof StackParamList
@@ -188,6 +193,7 @@ export type StackParamList = {
   [Screens.OnboardingEducationScreen]: undefined
   [Screens.OnboardingSuccessScreen]: undefined
   [Screens.WalletHome]: undefined
+  [Screens.Welcome]: undefined
 }
 
 // tslint:disable-next-line: interface-over-type-literal
