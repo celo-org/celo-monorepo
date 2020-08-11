@@ -26,7 +26,7 @@ export default function Canvas() {
       <View style={styles.root}>
         <View style={styles.nav}>
           <Text onPress={toggleSidebar} style={[fonts.p, textStyles.heavy]}>
-            <View style={{ position: 'absolute' }}>
+            <View style={styles.about}>
               <Fade duration={DURATION} left={true} cascade={true} opposite={true} when={!isOpen}>
                 About
               </Fade>
@@ -56,4 +56,5 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     flexDirection: 'row',
   },
+  about: { position: 'absolute' },
 })

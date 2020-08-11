@@ -16,7 +16,15 @@ export default function Poem() {
       </H4>
       <Text style={fonts.p}>
         {STANZAS.map((verse, i) => (
-          <Fade fraction={0.85} key={i} bottom={true} duration={2000} delay={100} distance={'20px'}>
+          <Fade
+            fraction={0.85}
+            key={i}
+            left={i % 2 === 0}
+            right={i % 2 === 1}
+            duration={2000}
+            delay={100}
+            distance={'50%'}
+          >
             {verse}
           </Fade>
         ))}
