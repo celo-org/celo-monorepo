@@ -34,6 +34,7 @@ export interface PhoneNumberPrivacyRequest {
 
 export interface SignMessageRequest extends PhoneNumberPrivacyRequest {
   blindedQueryPhoneNumber: string
+  timestamp: number
   hashedPhoneNumber?: string
 }
 
@@ -97,27 +98,39 @@ export async function postToPhoneNumPrivacyService<ResponseType>(
   }
 
   const { pgpnpUrl } = context
-  const res = await fetch(pgpnpUrl + endpoint, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: authHeader,
-    },
-    body: bodyString,
-  })
 
-  if (!res.ok) {
+  const tries = 3
+  let lastError
+  for (let i = 1; i <= tries; i++) {
+    const res = await fetch(pgpnpUrl + endpoint, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: authHeader,
+      },
+      body: bodyString,
+    })
+
+    if (res.ok) {
+      debug('Response ok. Parsing.')
+      const response = await res.json()
+      return response as ResponseType
+    }
+
     debug(`Response not okay. Status ${res.status}`)
+
     switch (res.status) {
       case 403:
         throw new Error(ErrorMessages.PGPNP_QUOTA_ERROR)
       default:
-        throw new Error(`Unknown failure ${res.status}`)
+        lastError = new Error(`Unknown failure ${res.status}`)
+        if (i < tries) {
+          debug(`Retrying request...`)
+          debug(body)
+        }
     }
   }
 
-  debug('Response ok. Parsing.')
-  const response = await res.json()
-  return response as ResponseType
+  throw lastError
 }

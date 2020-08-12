@@ -50,6 +50,7 @@ export async function getPhoneNumberIdentifier(
 
   const body: SignMessageRequest = {
     account,
+    timestamp: Date.now(),
     blindedQueryPhoneNumber: base64BlindedMessage,
     hashedPhoneNumber: selfPhoneHash,
     version: clientVersion ? clientVersion : 'unknown',
