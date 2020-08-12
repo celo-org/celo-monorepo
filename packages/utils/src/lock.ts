@@ -27,7 +27,7 @@ export class Lock {
 
   // Acquire the lock, blocking until the lock is available.
   acquire(): Promise<void> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       // Attempt to grab the lock without waiting.
       if (this.tryAcquire()) {
         resolve()
@@ -36,9 +36,13 @@ export class Lock {
 
       // Wait for an event emitted when releasing the lock.
       const callback = () => {
-        if (this.tryAcquire()) {
-          this.emitter.removeListener(LockEvent.Unlock, callback)
-          resolve()
+        try {
+          if (this.tryAcquire()) {
+            this.emitter.removeListener(LockEvent.Unlock, callback)
+            resolve()
+          }
+        } catch (error) {
+          reject(error)
         }
       }
       this.emitter.on(LockEvent.Unlock, callback)
