@@ -466,6 +466,51 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/account/proof-of-possession.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/proof-of-possession.ts)_
 
+### Recover-old
+
+Recovers the Valora old account and print out the key information. The old Valora app (in a beta state) generated the user address using a seed of 32 bytes, instead of 64 bytes. As the app fixed that, some old accounts were left with some funds. This command allows the user to recover those funds.
+
+```
+USAGE
+  $ celocli account:recover-old
+
+OPTIONS
+  --addressIndex=addressIndex
+      Choose the address index for the derivation path
+
+  --changeIndex=changeIndex
+      Choose the change index for the derivation path
+
+  --derivationPath=derivationPath
+      Choose a different derivation Path (Celo's default is "m/44'/52752'/0'/0"). Use "eth" as an alias of the Ethereum
+      derivation path ("m/44'/60'/0'/0/"). Recreating the same account requires knowledge of the mnemonic, passphrase (if
+      any), and the derivation path
+
+  --language=chinese_simplified|chinese_traditional|english|french|italian|japanese|korean|spanish
+      [default: english] Language for the mnemonic words. **WARNING**, some hardware wallets don't support other languages
+
+  --mnemonicPath=mnemonicPath
+      (required) Path to a file that contains all the mnemonic words separated by a space (example: "word1 word2 word3 ...
+      word24"). If the words are a language other than English, the --language flag must be used. Only BIP39 mnemonics are
+      supported
+
+  --passphrasePath=passphrasePath
+      Path to a file that contains the BIP39 passphrase to combine with the mnemonic specified using the mnemonicPath flag
+      and the index specified using the addressIndex flag. Every passphrase generates a different private key and wallet
+      address.
+
+EXAMPLES
+  recover-old --mnemonicPath some_folder/my_mnemonic_file
+  recover-old --mnemonicPath some_folder/my_mnemonic_file --passphrasePath myFolder/my_passphrase_file
+  recover-old --mnemonicPath some_folder/my_mnemonic_file --language spanish
+  recover-old --mnemonicPath some_folder/my_mnemonic_file --passphrasePath some_folder/my_passphrase_file --language
+  japanese --addressIndex 5
+  recover-old --mnemonicPath some_folder/my_mnemonic_file --passphrasePath some_folder/my_passphrase_file --addressIndex
+  5
+```
+
+_See code: [packages/cli/src/commands/account/recover-old.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/recover-old.ts)_
+
 ### Register
 
 Register an account on-chain. This allows you to lock Gold, which is a pre-requisite for registering a Validator or Group, participating in Validator elections and on-chain Governance, and earning epoch rewards.
