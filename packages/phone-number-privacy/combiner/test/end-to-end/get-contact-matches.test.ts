@@ -18,6 +18,8 @@ const CONTACT_PHONE_NUMBERS = [CONTACT_PHONE_NUMBER]
 const IDENTIFIER = PhoneNumberUtils.getPhoneHash(PHONE_NUMBER)
 const DEFAULT_FORNO_URL = config.blockchain.provider
 
+jest.setTimeout(15000)
+
 describe('Running against a deployed service', () => {
   it('Address salt querying fails with account with 0 CELO', async () => {
     const response = await postToSignMessage(

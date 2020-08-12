@@ -2787,10 +2787,10 @@
     source-map-support "0.5.12"
     yargs "13.2.4"
 
-"@celo/phone-number-privacy-common@1.0.5":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.5.tgz#46f0b51ae8173003f85812daa13807a180e2955c"
-  integrity sha512-znXHyBakBLArrcqnOKBiJ6XQ2fS8iltGjbB5BQTCAvoDWqtU1VjGNLyqz7q0PU2ZtHLd4YCfQ7bJUco7a69XCw==
+"@celo/phone-number-privacy-common@1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.6.tgz#aa5e003c71b320807c6be63d4be41d38b5c54fd6"
+  integrity sha512-DXs5O+kLrirPXJ5iCGvPOV+4ofh1nANkEUEaKMYke2Jky+JdvU1d/Ac2qlr0BE+msZdPHK8Si/SBDJYPD8/yAA==
   dependencies:
     bignumber.js "^9.0.0"
 
