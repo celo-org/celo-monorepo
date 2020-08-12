@@ -83,7 +83,7 @@ async function createNewGeth(
   bootnodeEnodes: string[]
 ): Promise<typeof RNGeth> {
   Logger.debug('Geth@newGeth', 'Configure and create new Geth')
-  const { nodeDir, useDiscovery, useStaticNodes, syncMode } = networkConfig
+  const { nodeDir, useDiscovery, syncMode } = networkConfig
   const genesis: string = await readGenesisBlockFile(nodeDir)
   const networkID: number = GenesisBlockUtils.getChainIdFromGenesis(genesis)
 
@@ -150,7 +150,7 @@ export async function initGeth(sync: boolean = true): Promise<typeof gethInstanc
     }
     let staticNodes: string[] = []
     // Static nodes enodes are also used as bootnodes for discovery
-    if (!sync && (useDiscovery || useStaticNodes)) {
+    if (sync && (useDiscovery || useStaticNodes)) {
       staticNodes = await getStaticNodes(sync)
     }
     Logger.info('Geth@init', `Retrieved static nodes: ${staticNodes}`)

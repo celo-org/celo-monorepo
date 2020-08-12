@@ -82,4 +82,5 @@ export const MOONPAY_RATE_API = `https://api.moonpay.io/v3/currencies/celo/price
 
 export const GETH_USE_FULL_NODE_DISCOVERY = true
 export const GETH_USE_STATIC_NODES = true
+// Development purposes only
 export const GETH_START_HTTP_RPC_SERVER = false

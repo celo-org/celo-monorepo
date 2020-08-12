@@ -36,37 +36,34 @@ const DO_NOT_LOCK_PERIOD = 30000 // 30 sec
 // Work that's done before other sagas are initalized
 // Be mindful to not put long blocking tasks here
 export function* appInit() {
-  try {
-    const isDeprecated: boolean = yield call(isAppVersionDeprecated)
-    if (isDeprecated) {
-      Logger.warn(TAG, 'App version is deprecated')
-      navigate(Screens.UpgradeScreen)
-      return
-    } else {
-      Logger.debug(TAG, 'App version is valid')
-    }
+  const isDeprecated: boolean = yield call(isAppVersionDeprecated)
 
-    const language = yield select(currentLanguageSelector)
-    if (language) {
-      yield put(setLanguage(language))
-    }
+  if (isDeprecated) {
+    Logger.warn(TAG, 'App version is deprecated')
+    navigate(Screens.UpgradeScreen)
+    return
+  } else {
+    Logger.debug(TAG, 'App version is valid')
+  }
 
-    const deepLink: string | null = yield call(Linking.getInitialURL)
-    const inSync = yield call(clockInSync)
-    if (!inSync) {
-      navigate(Screens.SetClock)
-      return
-    }
+  const language = yield select(currentLanguageSelector)
+  if (language) {
+    yield put(setLanguage(language))
+  }
 
-    if (deepLink) {
-      // TODO: this should dispatch (put) but since this appInit
-      // is called before the listener is set, we do it this way.
-      // This is fragile, change me :D
-      yield call(handleDeepLink, openDeepLink(deepLink))
-      return
-    }
-  } catch (err) {
-    Logger.error('AppInit error', err.message)
+  const deepLink: string | null = yield call(Linking.getInitialURL)
+  const inSync = yield call(clockInSync)
+  if (!inSync) {
+    navigate(Screens.SetClock)
+    return
+  }
+
+  if (deepLink) {
+    // TODO: this should dispatch (put) but since this appInit
+    // is called before the listener is set, we do it this way.
+    // This is fragile, change me :D
+    yield call(handleDeepLink, openDeepLink(deepLink))
+    return
   }
 }
 
