@@ -16,13 +16,10 @@ interface Props {
   qrSvgRef: React.MutableRefObject<SVG>
 }
 
-const mapStateToProps = (state: RootState): UriData => ({
+const mapStateToProps = (state: RootState): Partial<UriData> => ({
   address: currentAccountSelector(state)!,
   displayName: state.account.name || undefined,
   e164PhoneNumber: state.account.e164PhoneNumber || undefined,
-  currencyCode: undefined,
-  amount: undefined,
-  comment: undefined,
 })
 
 export default function QRCodeDisplay({ qrSvgRef }: Props) {
