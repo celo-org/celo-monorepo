@@ -1,5 +1,10 @@
 import {
   ErrorMessage,
+  hasValidAccountParam,
+  hasValidQueryPhoneNumberParam,
+  hasValidTimestamp,
+  isBodyReasonablySized,
+  phoneNumberHashIsValidIfExists,
   SignMessageResponse,
   SignMessageResponseFailure,
   WarningMessage,
@@ -8,23 +13,19 @@ import { Request, Response } from 'express'
 import { computeBlindedSignature } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
-import {
-  hasValidAccountParam,
-  hasValidQueryPhoneNumberParam,
-  isBodyReasonablySized,
-  phoneNumberHashIsValidIfExists,
-} from '../common/input-validation'
 import logger from '../common/logger'
 import { getVersion } from '../config'
 import { incrementQueryCount } from '../database/wrappers/account'
+import { getRequestExists, storeRequest } from '../database/wrappers/request'
 import { getKeyProvider } from '../key-management/key-provider'
 import { getBlockNumber } from '../web3/contracts'
 import { getRemainingQueryCount } from './query-quota'
 
-interface GetBlindedMessageForSaltRequest {
+export interface GetBlindedMessageForSaltRequest {
   account: string
   blindedQueryPhoneNumber: string
   hashedPhoneNumber?: string
+  timestamp?: number
 }
 
 export async function handleGetBlindedMessageForSalt(
@@ -81,7 +82,12 @@ export async function handleGetBlindedMessageForSalt(
     const keyProvider = getKeyProvider()
     const privateKey = keyProvider.getPrivateKey()
     const signature = computeBlindedSignature(blindedQueryPhoneNumber, privateKey)
-    await incrementQueryCount(account)
+    if (!(await getRequestExists(request.body))) {
+      await incrementQueryCount(account)
+      await storeRequest(request.body)
+    } else {
+      logger.debug('Salt request already exists in db. Leaving quota unchanged.')
+    }
     logger.debug('Salt retrieval success')
 
     let signMessageResponse: SignMessageResponse
@@ -112,6 +118,7 @@ function isValidGetSignatureInput(requestBody: GetBlindedMessageForSaltRequest):
     hasValidAccountParam(requestBody) &&
     hasValidQueryPhoneNumberParam(requestBody) &&
     phoneNumberHashIsValidIfExists(requestBody) &&
-    isBodyReasonablySized(requestBody)
+    isBodyReasonablySized(requestBody) &&
+    hasValidTimestamp(requestBody)
   )
 }
