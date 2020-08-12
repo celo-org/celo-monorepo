@@ -197,11 +197,13 @@ describe('Transfer Works', () => {
   })
 
   it('Wallet Home -> Exchange CELO', async () => {
+    // Open Hamburguer menu and go to CELO screen.
     await element(by.id('Hamburguer')).tap()
     await waitFor(element(by.id('DrawerItem/CELO')))
       .toBeVisible()
       .withTimeout(10000)
     await element(by.id('DrawerItem/CELO')).tap()
+    // Go through the education flow.
     await element(by.id('Education/progressButton')).tap()
     await element(by.id('Education/progressButton')).tap()
     await element(by.id('Education/progressButton')).tap()
@@ -209,17 +211,20 @@ describe('Transfer Works', () => {
     await waitFor(element(by.id('WithdrawCELO')))
       .toBeVisible()
       .withTimeout(10000)
+    // Go to the Withdraw Celo screen and fill the data.
     await element(by.id('WithdrawCELO')).tap()
     await waitFor(element(by.id('AccountAddress')))
       .toBeVisible()
       .withTimeout(10000)
     await element(by.id('AccountAddress')).replaceText(DEFAULT_RECIPIENT_ADDRESS)
     await element(by.id('CeloAmount')).replaceText(CELO_TO_SEND)
+    // Tap review to go to the review screen and confirm.
     await element(by.id('WithdrawReviewButton')).tap()
     await waitFor(element(by.id('ConfirmWithdrawButton')))
       .toBeVisible()
       .withTimeout(10000)
     await element(by.id('ConfirmWithdrawButton')).tap()
+    // Make sure we return to the Exchange CELO screen after confirming.
     await waitFor(element(by.id('WithdrawCELO')))
       .toBeVisible()
       .withTimeout(10000)
