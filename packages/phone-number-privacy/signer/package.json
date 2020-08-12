@@ -1,7 +1,7 @@
 {
   "name": "@celo/phone-number-privacy-signer",
-  "version": "1.0.3",
-  "description": "Signing participator of a the PGPNP threshold signature scheme",
+  "version": "1.1.0",
+  "description": "Signing participator of ODIS",
   "author": "Celo",
   "license": "Apache-2.0",
   "main": "dist/index.js",
