@@ -5,7 +5,7 @@ import {
   AuthSigner,
   MatchmakingRequest,
   MatchmakingResponse,
-  postToPhoneNumPrivacyService,
+  postToOdis,
   ServiceContext,
 } from './phone-number-lookup'
 
@@ -37,7 +37,7 @@ export async function getContactMatches(
     authenticationMethod: signer.authenticationMethod,
   }
 
-  const response = await postToPhoneNumPrivacyService<MatchmakingResponse>(
+  const response = await postToOdis<MatchmakingResponse>(
     signer,
     body,
     context,

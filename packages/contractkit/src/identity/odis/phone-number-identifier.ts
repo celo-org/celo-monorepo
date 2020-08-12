@@ -4,7 +4,7 @@ import debugFactory from 'debug'
 import { BlsBlindingClient, WasmBlsBlindingClient } from './bls-blinding-client'
 import {
   AuthSigner,
-  postToPhoneNumPrivacyService,
+  postToOdis,
   ServiceContext,
   SignMessageRequest,
   SignMessageResponse,
@@ -56,7 +56,7 @@ export async function getPhoneNumberIdentifier(
     authenticationMethod: signer.authenticationMethod,
   }
 
-  const response = await postToPhoneNumPrivacyService<SignMessageResponse>(
+  const response = await postToOdis<SignMessageResponse>(
     signer,
     body,
     context,

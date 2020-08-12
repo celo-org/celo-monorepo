@@ -71,7 +71,7 @@ export interface ServiceContext {
  * @param context contains service URL
  * @param endpoint endpoint to hit
  */
-export async function postToPhoneNumPrivacyService<ResponseType>(
+export async function postToOdis<ResponseType>(
   signer: AuthSigner,
   body: PhoneNumberPrivacyRequest,
   context: ServiceContext,
