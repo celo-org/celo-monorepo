@@ -86,7 +86,33 @@ export async function generateKeys(
   bip39ToUse: Bip39 = bip39Wrapper,
   derivationPath: string = CELO_DERIVATION_PATH_BASE
 ): Promise<{ privateKey: string; publicKey: string }> {
-  const seed = await bip39ToUse.mnemonicToSeed(mnemonic, password)
+  const seed: Buffer = await generateSeed(mnemonic, password, bip39ToUse)
+  return generateKeysFromSeed(seed, changeIndex, addressIndex, derivationPath)
+}
+
+// keyByteLength truncates the seed. *Avoid its use*
+// It was added only because a backwards compatibility bug
+export async function generateSeed(
+  mnemonic: string,
+  password?: string,
+  bip39ToUse: Bip39 = bip39Wrapper,
+  keyByteLength: number = 64
+): Promise<Buffer> {
+  let seed: Buffer = await bip39ToUse.mnemonicToSeed(mnemonic, password)
+  if (keyByteLength > 0 && seed.byteLength > keyByteLength) {
+    const bufAux = Buffer.allocUnsafe(keyByteLength)
+    seed.copy(bufAux, 0, 0, keyByteLength)
+    seed = bufAux
+  }
+  return seed
+}
+
+export function generateKeysFromSeed(
+  seed: Buffer,
+  changeIndex: number = 0,
+  addressIndex: number = 0,
+  derivationPath: string = CELO_DERIVATION_PATH_BASE
+): { privateKey: string; publicKey: string } {
   const node = bip32.fromSeed(seed)
   const newNode = node.derivePath(`${derivationPath}/${changeIndex}/${addressIndex}`)
   if (!newNode.privateKey) {
@@ -127,4 +153,6 @@ export const AccountUtils = {
   generateMnemonic,
   validateMnemonic,
   generateKeys,
+  generateSeed,
+  generateKeysFromSeed,
 }
