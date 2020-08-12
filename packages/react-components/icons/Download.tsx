@@ -8,7 +8,7 @@ interface Props {
 
 export default class Download extends React.PureComponent<Props> {
   static defaultProps = {
-    color: colors.white,
+    color: colors.light,
   }
 
   render() {

@@ -1,9 +1,9 @@
 import QRCodeBorderlessIcon from '@celo/react-components/icons/QRCodeBorderless'
 import Times from '@celo/react-components/icons/Times'
 import VerifyPhone from '@celo/react-components/icons/VerifyPhone'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import { RouteProp } from '@react-navigation/native'
-import { StackScreenProps } from '@react-navigation/stack'
+import { StackScreenProps, TransitionPresets } from '@react-navigation/stack'
 import { throttle } from 'lodash'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -95,48 +95,47 @@ const mapDispatchToProps = {
   estimateFee,
 }
 
-export const sendScreenNavOptions = ({
-  route,
-}: {
-  route: RouteProp<StackParamList, Screens.Send>
-}) => {
-  const isOutgoingPaymentRequest = route.params?.isOutgoingPaymentRequest
-
-  const goToQRScanner = () =>
-    navigate(Screens.QRNavigator, {
-      screen: Screens.QRScanner,
-      params: {
-        isOutgoingPaymentRequest,
-      },
-    })
-
-  const title = isOutgoingPaymentRequest
-    ? i18n.t('paymentRequestFlow:request')
-    : i18n.t('sendFlow7:send')
-
-  return {
-    ...emptyHeader,
-    headerLeft: () => (
-      <TopBarIconButton
-        icon={<Times />}
-        onPress={navigateBack}
-        eventName={isOutgoingPaymentRequest ? RequestEvents.request_cancel : SendEvents.send_cancel}
-      />
-    ),
-    headerLeftContainerStyle: styles.headerLeftContainer,
-    headerRight: () => (
-      <TopBarIconButton
-        icon={<QRCodeBorderlessIcon height={32} color={colors.greenUI} />}
-        eventName={isOutgoingPaymentRequest ? RequestEvents.request_scan : SendEvents.send_scan}
-        onPress={goToQRScanner}
-      />
-    ),
-    headerRightContainerStyle: styles.headerRightContainer,
-    headerTitle: title,
-  }
-}
-
 class Send extends React.Component<Props, State> {
+  static navigationOptions = ({ route }: { route: RouteProp<StackParamList, Screens.Send> }) => {
+    const isOutgoingPaymentRequest = route.params?.isOutgoingPaymentRequest
+
+    const goToQRScanner = () =>
+      navigate(Screens.QRNavigator, {
+        screen: Screens.QRScanner,
+        params: {
+          isOutgoingPaymentRequest,
+        },
+      })
+
+    const title = isOutgoingPaymentRequest
+      ? i18n.t('paymentRequestFlow:request')
+      : i18n.t('sendFlow7:send')
+
+    return {
+      ...emptyHeader,
+      headerLeft: () => (
+        <TopBarIconButton
+          icon={<Times />}
+          onPress={navigateBack}
+          eventName={
+            isOutgoingPaymentRequest ? RequestEvents.request_cancel : SendEvents.send_cancel
+          }
+        />
+      ),
+      headerLeftContainerStyle: styles.headerLeftContainer,
+      headerRight: () => (
+        <TopBarIconButton
+          icon={<QRCodeBorderlessIcon height={32} color={colors.greenUI} />}
+          eventName={isOutgoingPaymentRequest ? RequestEvents.request_scan : SendEvents.send_scan}
+          onPress={goToQRScanner}
+        />
+      ),
+      headerRightContainerStyle: styles.headerRightContainer,
+      headerTitle: title,
+      ...TransitionPresets.ModalTransition,
+    }
+  }
+
   throttledSearch!: (searchQuery: string) => void
   allRecipientsFilter!: FilterType
   recentRecipientsFilter!: FilterType

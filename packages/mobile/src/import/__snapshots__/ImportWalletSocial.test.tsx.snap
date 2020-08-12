@@ -110,6 +110,7 @@ exports[`ImportWalletSocial renders correctly and is disabled with no text 1`] =
                 "fontFamily": "Inter-Medium",
                 "fontSize": 16,
                 "lineHeight": 22,
+                "marginBottom": 8,
               }
             }
           >
@@ -183,6 +184,7 @@ exports[`ImportWalletSocial renders correctly and is disabled with no text 1`] =
                 "fontFamily": "Inter-Medium",
                 "fontSize": 16,
                 "lineHeight": 22,
+                "marginBottom": 8,
               }
             }
           >
@@ -270,7 +272,7 @@ exports[`ImportWalletSocial renders correctly and is disabled with no text 1`] =
         null,
         undefined,
         Object {
-          "backgroundColor": "#A3EBC6",
+          "backgroundColor": "#97DFC1",
         },
       ]
     }
@@ -299,7 +301,7 @@ exports[`ImportWalletSocial renders correctly and is disabled with no text 1`] =
             "justifyContent": "center",
           },
           Object {
-            "backgroundColor": "#A3EBC6",
+            "backgroundColor": "#97DFC1",
           },
           Object {
             "height": 50,

@@ -1,5 +1,6 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
+import { TransitionPresets } from '@react-navigation/stack'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text } from 'react-native'
@@ -9,7 +10,8 @@ import { acceptTerms } from 'src/account/actions'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { CELO_TERMS_LINK } from 'src/config'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { nuxNavigationOptions } from 'src/navigator/Headers'
+import Logo, { LogoTypes } from 'src/icons/Logo.v2'
+import { nuxNavigationOptions } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -28,7 +30,10 @@ const mapDispatchToProps: DispatchProps = {
 type Props = WithTranslation & DispatchProps
 
 export class RegulatoryTerms extends React.Component<Props> {
-  static navigationOptions = nuxNavigationOptions
+  static navigationOptions = {
+    ...nuxNavigationOptions,
+    ...TransitionPresets.ModalTransition,
+  }
 
   onPressAccept = () => {
     this.props.acceptTerms()
@@ -54,6 +59,8 @@ export class RegulatoryTerms extends React.Component<Props> {
           contentContainerStyle={styles.scrollContent}
           testID="scrollView"
         >
+          <Logo type={LogoTypes.DARK} height={32} />
+          <Text style={styles.title}>{t('terms.title')}</Text>
           <Text style={styles.header}>{t('terms.heading1')}</Text>
           <Text style={styles.disclaimer}>
             <Trans ns={Namespaces.nuxNamePin1} i18nKey={'terms.privacy'}>
@@ -102,6 +109,11 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     paddingBottom: 15,
+  },
+  title: {
+    ...fontStyles.h1,
+    marginTop: 30,
+    marginBottom: 24,
   },
   header: {
     ...fontStyles.h2,
