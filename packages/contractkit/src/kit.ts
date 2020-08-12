@@ -102,7 +102,7 @@ export class ContractKit {
       gasInflationFactor: 1.3,
       // gasPrice:0 means the node will compute gasPrice on its own
       gasPrice: '0',
-      gasPriceSuggestionMultiplier: 3,
+      gasPriceSuggestionMultiplier: 5,
     }
     if (!(web3.currentProvider instanceof CeloProvider)) {
       const celoProviderInstance = new CeloProvider(web3.currentProvider, wallet)
