@@ -75,6 +75,7 @@ export interface NetworkConfig {
 export interface KitOptions {
   gasInflationFactor: number
   gasPrice: string
+  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
   gasPriceSuggestionMultiplier: number
   feeCurrency?: Address
   from?: Address
