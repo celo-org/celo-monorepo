@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { Text, StyleSheet, View } from 'react-native'
-import { H4 } from 'src/fonts/Fonts'
-import { fonts, textStyles, standardStyles } from 'src/styles'
+import { StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
+import { H4 } from 'src/fonts/Fonts'
 import { useScreenSize } from 'src/layout/ScreenSize'
+import { fonts, standardStyles, textStyles } from 'src/styles'
 
 export default function Poem() {
   const { isDesktop } = useScreenSize()
@@ -16,15 +16,7 @@ export default function Poem() {
       </H4>
       <Text style={fonts.p}>
         {STANZAS.map((verse, i) => (
-          <Fade
-            fraction={0.85}
-            key={i}
-            left={i % 2 === 0}
-            right={i % 2 === 1}
-            duration={2000}
-            delay={100}
-            distance={'50%'}
-          >
+          <Fade fraction={0.85} key={i} bottom={true} duration={2000} delay={100} distance={'50%'}>
             {verse}
           </Fade>
         ))}
@@ -35,7 +27,7 @@ export default function Poem() {
 
 const styles = StyleSheet.create({
   root: {
-    // transform: [{ translateY: -100 }],
+    marginTop: '40vh',
   },
 })
 
@@ -54,7 +46,8 @@ Gathering, together
 in generous abundance,
 held, by
 humbled enchantments of
-Our worth
+Our worth`,
+  `
 For we believe
 in beautiful money
 Seeding, with

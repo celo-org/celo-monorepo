@@ -46,10 +46,12 @@ export default function Canvas() {
 }
 
 const styles = StyleSheet.create({
-  root: {},
+  root: {
+    paddingTop: 10,
+  },
   nav: {
     flexDirection: 'row-reverse',
-    paddingHorizontal: 30,
+    paddingHorizontal: 40,
     paddingVertical: 10,
   },
   container: {

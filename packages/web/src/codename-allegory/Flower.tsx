@@ -2,9 +2,9 @@ import * as React from 'react'
 import { Animated, Image, StyleSheet, View } from 'react-native'
 import Cambio from 'src/codename-allegory/cambio-flower.jpg'
 import Outline from 'src/codename-allegory/outline-flower.png'
+import { useScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
 import { standardStyles } from 'src/styles'
-import { useScreenSize } from 'src/layout/ScreenSize'
 
 const AnimatedRatio = Animated.createAnimatedComponent(AspectRatio)
 
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
 })
 
 const COLOR_OPACITY = {
-  inputRange: [0, 0.15, 0.25],
+  inputRange: [0, 0.25, 0.35],
   outputRange: [1, 1, 0.1],
 }
 
@@ -126,7 +126,7 @@ const COLOR_OPACITY_MOBILE = {
 }
 
 const OUTLINE_OPACITY = {
-  inputRange: [0, 0.1, 0.3, 0.4],
+  inputRange: [0, 0.25, 0.3, 0.4],
   outputRange: [0, 1, 1, 0],
 }
 
@@ -136,7 +136,7 @@ const OUTLINE_OPACITY_MOBILE = {
 }
 
 const SCALER_DESKTOP = {
-  inputRange: [0, 0.1, 0.5],
+  inputRange: [0, 0.15, 0.5],
   outputRange: [1, 0.75, 0.1],
 }
 
@@ -146,8 +146,8 @@ const SCALER_MOBILE = {
 }
 
 const POSITIONING_DESKTOP = {
-  inputRange: [0, 0.1, 0.5],
-  outputRange: ['0%', '1%', '30%'],
+  inputRange: [0, 0.5],
+  outputRange: ['0%', '30%'],
 }
 
 const POSITIONING_MOBILE = {
