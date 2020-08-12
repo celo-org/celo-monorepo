@@ -40,7 +40,7 @@ aws_access_key_id and aws_secret_access_key in ~/.aws/credentials
 
 \+ **new AwsHsmWallet**(`awsCredentials?`: KMS.ClientConfiguration): *[AwsHsmWallet](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md)*
 
-*Defined in [contractkit/src/wallets/aws-hsm-wallet.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/aws-hsm-wallet.ts#L25)*
+*Defined in [contractkit/src/wallets/aws-hsm-wallet.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/aws-hsm-wallet.ts#L28)*
 
 **Parameters:**
 
@@ -72,7 +72,7 @@ ___
 
 ▸ **getAddressFromKeyId**(`keyId`: string): *Promise‹[Address](../modules/_contractkit_src_base_.md#address)›*
 
-*Defined in [contractkit/src/wallets/aws-hsm-wallet.ts:82](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/aws-hsm-wallet.ts#L82)*
+*Defined in [contractkit/src/wallets/aws-hsm-wallet.ts:87](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/aws-hsm-wallet.ts#L87)*
 
 Returns the EVM address for the given key
 Useful for initially getting the 'from' field given a keyName
