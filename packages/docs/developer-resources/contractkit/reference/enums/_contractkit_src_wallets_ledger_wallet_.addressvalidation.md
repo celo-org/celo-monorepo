@@ -15,7 +15,7 @@
 
 • **everyTransaction**:
 
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L20)*
+*Defined in [contractkit/src/wallets/ledger-wallet.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L21)*
 
 ___
 
@@ -23,7 +23,7 @@ ___
 
 • **firstTransactionPerAddress**:
 
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L22)*
+*Defined in [contractkit/src/wallets/ledger-wallet.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L23)*
 
 ___
 
@@ -31,7 +31,7 @@ ___
 
 • **initializationOnly**:
 
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L18)*
+*Defined in [contractkit/src/wallets/ledger-wallet.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L19)*
 
 ___
 
@@ -39,4 +39,4 @@ ___
 
 • **never**:
 
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L24)*
+*Defined in [contractkit/src/wallets/ledger-wallet.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L25)*

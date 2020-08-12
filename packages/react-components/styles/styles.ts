@@ -29,12 +29,12 @@ export const componentStyles = StyleSheet.create({
   },
   row: {
     borderWidth: 1,
-    borderColor: colors.inactive,
+    borderColor: colors.gray4,
     borderRadius: 3,
     flexDirection: 'row',
     marginVertical: 5,
     alignItems: 'center',
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
     height: 60,
   },
   input: {
@@ -46,7 +46,7 @@ export const componentStyles = StyleSheet.create({
   },
   inputRow: {
     alignItems: 'center',
-    borderColor: colors.darkLightest,
+    borderColor: colors.gray1,
     borderRadius: 3,
     borderWidth: 1,
     flexDirection: 'row',
@@ -64,10 +64,10 @@ export const componentStyles = StyleSheet.create({
   line: {
     height: 5,
     borderBottomWidth: 1,
-    borderColor: colors.darkLightest,
+    borderColor: colors.gray1,
   },
   roundedBorder: {
-    borderColor: colors.darkLightest,
+    borderColor: colors.gray1,
     borderRadius: 3,
     borderWidth: 1,
   },

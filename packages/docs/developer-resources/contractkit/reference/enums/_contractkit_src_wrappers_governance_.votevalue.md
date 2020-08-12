@@ -15,7 +15,7 @@
 
 • **Abstain**: = "Abstain"
 
-*Defined in [contractkit/src/wrappers/Governance.ts:100](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L100)*
+*Defined in [contractkit/src/wrappers/Governance.ts:101](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L101)*
 
 ___
 
@@ -23,7 +23,7 @@ ___
 
 • **No**: = "No"
 
-*Defined in [contractkit/src/wrappers/Governance.ts:101](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L101)*
+*Defined in [contractkit/src/wrappers/Governance.ts:102](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L102)*
 
 ___
 
@@ -31,7 +31,7 @@ ___
 
 • **None**: = "NONE"
 
-*Defined in [contractkit/src/wrappers/Governance.ts:99](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L99)*
+*Defined in [contractkit/src/wrappers/Governance.ts:100](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L100)*
 
 ___
 
@@ -39,4 +39,4 @@ ___
 
 • **Yes**: = "Yes"
 
-*Defined in [contractkit/src/wrappers/Governance.ts:102](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L102)*
+*Defined in [contractkit/src/wrappers/Governance.ts:103](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L103)*
