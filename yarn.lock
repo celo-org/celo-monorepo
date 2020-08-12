@@ -2972,10 +2972,10 @@
     source-map-support "0.5.12"
     yargs "13.2.4"
 
-"@celo/phone-number-privacy-common@1.0.5":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.5.tgz#46f0b51ae8173003f85812daa13807a180e2955c"
-  integrity sha512-znXHyBakBLArrcqnOKBiJ6XQ2fS8iltGjbB5BQTCAvoDWqtU1VjGNLyqz7q0PU2ZtHLd4YCfQ7bJUco7a69XCw==
+"@celo/phone-number-privacy-common@1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.6.tgz#aa5e003c71b320807c6be63d4be41d38b5c54fd6"
+  integrity sha512-DXs5O+kLrirPXJ5iCGvPOV+4ofh1nANkEUEaKMYke2Jky+JdvU1d/Ac2qlr0BE+msZdPHK8Si/SBDJYPD8/yAA==
   dependencies:
     bignumber.js "^9.0.0"
 
@@ -30860,10 +30860,12 @@ serialize-error@^2.1.0:
   resolved "https://registry.yarnpkg.com/serialize-error/-/serialize-error-2.1.0.tgz#50b679d5635cdf84667bdc8e59af4e5b81d5f60a"
   integrity sha1-ULZ51WNc34Rme9yOWa9OW4HV9go=
 
-serialize-javascript@^2.1.2:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/serialize-javascript/-/serialize-javascript-2.1.2.tgz#ecec53b0e0317bdc95ef76ab7074b7384785fa61"
-  integrity sha512-rs9OggEUF0V4jUSecXazOYsLfu7OGK2qIn3c7IPBiffz32XniEp/TX9Xmc9LQfK2nQ2QKHvZ2oygKUGU0lG4jQ==
+serialize-javascript@^2.1.2, serialize-javascript@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/serialize-javascript/-/serialize-javascript-3.1.0.tgz#8bf3a9170712664ef2561b44b691eafe399214ea"
+  integrity sha512-JIJT1DGiWmIKhzRsG91aS6Ze4sFUrYbltlkg2onR5OrnNM02Kl/hnY/T4FN2omvyeBbQmMJv+K4cPOpGzOTFBg==
+  dependencies:
+    randombytes "^2.1.0"
 
 serve-static@1.14.1, serve-static@^1.13.1:
   version "1.14.1"
