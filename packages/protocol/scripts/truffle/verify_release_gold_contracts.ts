@@ -17,8 +17,9 @@ let ReleaseGoldMultiSigProxy: ReleaseGoldMultiSigProxyContract
 // const ONE_CGLD = web3.utils.toWei('1', 'ether')
 
 async function verifyContract(contract: any, config: any) {
-  // Balance is often not useful because balances change via rewards and contract use
   let verified = true
+  // Balance check should only be used immediately after contract deployments.
+  // Otherwise, balances may increase via rewards, or decrease via withdrawals, leading to false negatives.
   // verified = verified && (await verifyBalance(contract.ContractAddress, config))
   verified = verified && (await verifyMultisig(contract.MultiSigProxyAddress, config))
   verified =
@@ -71,6 +72,7 @@ async function verifyReleaseGold(releaseGoldAddress: any, multiSigAddress: any, 
   return true
 }
 
+// Uncomment if using `verifyBalance` just after contract deployment.
 // async function verifyBalance(contractAddress: any, releaseGoldConfig: any) {
 //   const contractBalance = new BigNumber(await web3.eth.getBalance(contractAddress))
 //   const weiAmountReleasedPerPeriod = new BigNumber(
