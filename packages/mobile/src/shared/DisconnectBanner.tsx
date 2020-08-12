@@ -82,13 +82,13 @@ const styles = StyleSheet.create({
     lineHeight: undefined,
   },
   textGrey: {
-    color: colors.disconnectBannerGrey,
+    color: colors.gray4,
   },
   textRed: {
-    color: colors.disconnectBannerRed,
+    color: colors.warning,
   },
 })
 
 export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(
-  withTranslation(Namespaces.global)(DisconnectBanner)
+  withTranslation<Props>(Namespaces.global)(DisconnectBanner)
 )

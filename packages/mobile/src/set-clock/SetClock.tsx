@@ -7,7 +7,7 @@ import { WithTranslation } from 'react-i18next'
 import { Image, Platform, StyleSheet, Text, View } from 'react-native'
 import * as AndroidOpenSettings from 'react-native-android-open-settings'
 import { Namespaces, withTranslation } from 'src/i18n'
-import clockIcon from 'src/images/clock-icon.png'
+import { clockIcon } from 'src/images/Images'
 import { navigateHome } from 'src/navigator/NavigationService'
 import { getLocalTimezone, getRemoteTime } from 'src/utils/time'
 
@@ -58,7 +58,6 @@ export class SetClock extends React.Component<WithTranslation> {
 
 const style = StyleSheet.create({
   backgroundContainer: {
-    backgroundColor: 'white',
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'space-between',
@@ -77,7 +76,7 @@ const style = StyleSheet.create({
     paddingBottom: 10,
   },
   bodyText: {
-    color: colors.darkSecondary,
+    color: colors.gray5,
   },
   instructions: {
     textAlign: 'center',
@@ -85,4 +84,4 @@ const style = StyleSheet.create({
   },
 })
 
-export default withTranslation(Namespaces.global)(SetClock)
+export default withTranslation<WithTranslation>(Namespaces.global)(SetClock)

@@ -10,7 +10,6 @@ const storeData = {
   goldToken: { educationCompleted: true },
   account: {
     backupCompleted: true,
-    dismissedEarnRewards: true,
     dismissedInviteFriends: true,
     accountCreationTime: new Date().getTime() - TWO_DAYS_MS,
     paymentRequests: [],
@@ -43,6 +42,10 @@ describe('Testnet banner', () => {
           recipientCache={{}}
           activeNotificationCount={0}
           callToActNotification={false}
+          numberVerified={true}
+          importContacts={jest.fn()}
+          migrateAccount={jest.fn()}
+          needsToMigrateToNewBip39={false}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -67,6 +70,10 @@ describe('Testnet banner', () => {
           recipientCache={{}}
           activeNotificationCount={0}
           callToActNotification={false}
+          numberVerified={true}
+          importContacts={jest.fn()}
+          migrateAccount={jest.fn()}
+          needsToMigrateToNewBip39={false}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -89,6 +96,10 @@ describe('Testnet banner', () => {
           recipientCache={{}}
           activeNotificationCount={0}
           callToActNotification={false}
+          numberVerified={true}
+          importContacts={jest.fn()}
+          migrateAccount={jest.fn()}
+          needsToMigrateToNewBip39={false}
           {...getMockI18nProps()}
         />
       </Provider>

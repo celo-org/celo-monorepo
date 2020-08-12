@@ -167,7 +167,7 @@ describe('Transaction Utils', () => {
     }
   })
 
-  describe('Signer Testing with single local account and pay gas in Celo Gold', () => {
+  describe('Signer Testing with single local account and pay gas in CELO', () => {
     it('Test1 should be able to sign and get the signer back with single local account', async () => {
       jest.setTimeout(60 * 1000)
       celoProvider.addAccount(PRIVATE_KEY1)

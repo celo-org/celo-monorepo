@@ -2,7 +2,7 @@ import { createNamespaceIfNotExists } from 'src/lib/cluster'
 import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { doCheckOrPromptIfStagingOrProduction } from 'src/lib/env-utils'
 import { installAndEnableMetricsDeps, redeployTiller } from 'src/lib/helm_deploy'
-import { outputIncludes } from 'src/lib/utils'
+import { outputIncludes, retryCmd } from 'src/lib/utils'
 
 /**
  * Basic info for an AKS cluster
@@ -27,7 +27,7 @@ export async function switchToCluster(
   // Azure subscription switch
   let currentTenantId = null
   try {
-    ;[currentTenantId] = await execCmd('az account show --query tenantId -o tsv')
+    ;[currentTenantId] = await execCmd('az account show --query id -o tsv')
   } catch (error) {
     console.info('No azure account subscription currently set')
   }
@@ -42,13 +42,22 @@ export async function switchToCluster(
     console.info('No cluster currently set')
   }
 
+  // We expect the context to be the cluster name. If the context isn't known,
+  // we get the context from Azure.
   if (currentCluster === null || currentCluster.trim() !== clusterConfig.clusterName) {
-    // If a context is edited for some reason (eg switching default namespace),
-    // a warning and prompt is shown asking if the existing context should be
-    // overwritten. To avoid this, --overwrite-existing force overwrites.
-    await execCmdWithExitOnFailure(
-      `az aks get-credentials --resource-group ${clusterConfig.resourceGroup} --name ${clusterConfig.clusterName} --subscription ${clusterConfig.subscriptionId} --overwrite-existing`
-    )
+    const [existingContextsStr] = await execCmdWithExitOnFailure('kubectl config get-contexts -o name')
+    const existingContexts = existingContextsStr.trim().split('\n')
+    if (existingContexts.includes(clusterConfig.clusterName)) {
+      await execCmdWithExitOnFailure(`kubectl config use-context ${clusterConfig.clusterName}`)
+    } else {
+      // If we don't already have the context, get it.
+      // If a context is edited for some reason (eg switching default namespace),
+      // a warning and prompt is shown asking if the existing context should be
+      // overwritten. To avoid this, --overwrite-existing force overwrites.
+      await execCmdWithExitOnFailure(
+        `az aks get-credentials --resource-group ${clusterConfig.resourceGroup} --name ${clusterConfig.clusterName} --subscription ${clusterConfig.subscriptionId} --overwrite-existing`
+      )
+    }
   }
   await setupCluster(celoEnv, clusterConfig)
 }
@@ -83,12 +92,37 @@ async function installAADPodIdentity() {
   }
 }
 
+/**
+ * getIdentity gets basic info on an existing identity. If the identity doesn't
+ * exist, undefined is returned
+ */
+export async function getIdentity(
+  clusterConfig: AzureClusterConfig,
+  identityName: string
+) {
+  const [matchingIdentitiesStr] = await execCmdWithExitOnFailure(
+    `az identity list -g ${clusterConfig.resourceGroup} --query "[?name == '${identityName}']" -o json`
+  )
+  const matchingIdentities = JSON.parse(matchingIdentitiesStr)
+  if (!matchingIdentities.length) {
+    return
+  }
+  // There should only be one exact match by name
+  return matchingIdentities[0]
+}
+
 // createIdentityIfNotExists creates an identity if it doesn't already exist.
 // Returns an object including basic info on the identity.
 export async function createIdentityIfNotExists(
   clusterConfig: AzureClusterConfig,
   identityName: string
 ) {
+  const identity = await getIdentity(clusterConfig, identityName)
+  if (identity) {
+    console.info(`Skipping identity creation, ${identityName} in resource group ${clusterConfig.resourceGroup} already exists`)
+    return identity
+  }
+  console.info(`Creating identity ${identityName} in resource group ${clusterConfig.resourceGroup}`)
   // This command is idempotent-- if the identity exists, the existing one is given
   const [results] = await execCmdWithExitOnFailure(
     `az identity create -n ${identityName} -g ${clusterConfig.resourceGroup} -o json`
@@ -105,14 +139,30 @@ export function deleteIdentity(clusterConfig: AzureClusterConfig, identityName: 
   )
 }
 
-/**
- * getIdentity gets basic info on an existing identity
- */
-export async function getIdentity(clusterConfig: AzureClusterConfig, identityName: string) {
-  const [results] = await execCmdWithExitOnFailure(
-    `az identity show -n ${identityName} -g ${clusterConfig.resourceGroup} -o json`
+async function roleIsAssigned(assignee: string, scope: string, role: string) {
+  const [matchingAssignedRoles] = await retryCmd(
+    () =>
+      execCmdWithExitOnFailure(
+        `az role assignment list --assignee ${assignee} --scope ${scope} --query "length([?roleDefinitionName == '${role}'])" -o tsv`
+      ),
+    10
   )
-  return JSON.parse(results)
+  return parseInt(matchingAssignedRoles.trim(), 10) > 0
+}
+
+export async function assignRoleIfNotAssigned(assigneeObjectId: string, assigneePrincipalType: string, scope: string, role: string) {
+  if (await roleIsAssigned(assigneeObjectId, scope, role)) {
+    console.info(`Skipping role assignment, role ${role} already assigned to ${assigneeObjectId} for scope ${scope}`)
+    return
+  }
+  console.info(`Assigning role ${role} to ${assigneeObjectId} type ${assigneePrincipalType} for scope ${scope}`)
+  await retryCmd(
+    () =>
+      execCmdWithExitOnFailure(
+        `az role assignment create --role "${role}" --assignee-object-id ${assigneeObjectId} --assignee-principal-type ${assigneePrincipalType} --scope ${scope}`
+      ),
+    10
+  )
 }
 
 export async function getAKSNodeResourceGroup(clusterConfig: AzureClusterConfig) {
@@ -122,7 +172,50 @@ export async function getAKSNodeResourceGroup(clusterConfig: AzureClusterConfig)
   return nodeResourceGroup.trim()
 }
 
-export async function registerStaticIP(name: string, resourceGroupIP: string) {
+/**
+ * Gets the AKS Service Principal Object ID if one exists. Otherwise, an empty string is given.
+ */
+export async function getAKSServicePrincipalObjectId(clusterConfig: AzureClusterConfig) {
+  // Get the correct object ID depending on the cluster configuration
+  // See https://github.com/Azure/aad-pod-identity/blob/b547ba86ab9b16d238db8a714aaec59a046afdc5/docs/readmes/README.role-assignment.md#obtaining-the-id-of-the-managed-identity--service-principal
+  const [rawServicePrincipalClientId] = await execCmdWithExitOnFailure(
+    `az aks show -n ${clusterConfig.clusterName} --query servicePrincipalProfile.clientId -g ${clusterConfig.resourceGroup} -o tsv`
+  )
+  const servicePrincipalClientId = rawServicePrincipalClientId.trim()
+  // This will be the value of the service principal client ID if a managed service identity
+  // is being used instead of a service principal.
+  if (servicePrincipalClientId === 'msi') {
+    return ''
+  }
+  const [rawObjectId] = await execCmdWithExitOnFailure(
+    `az ad sp show --id ${servicePrincipalClientId} --query objectId -o tsv`
+  )
+  return rawObjectId.trim()
+}
+
+/**
+ * If an AKS cluster is using a managed service identity, the objectId is returned.
+ * Otherwise, an empty string is given.
+ */
+export async function getAKSManagedServiceIdentityObjectId(clusterConfig: AzureClusterConfig) {
+  const [managedIdentityObjectId] = await execCmdWithExitOnFailure(
+    `az aks show -n ${clusterConfig.clusterName} --query identityProfile.kubeletidentity.objectId -g ${clusterConfig.resourceGroup} -o tsv`
+  )
+  return managedIdentityObjectId.trim()
+}
+
+export async function registerStaticIPIfNotRegistered(name: string, resourceGroupIP: string) {
+  // This returns an array of matching IP addresses. If there is no matching IP
+  // address, an empty array is returned. We expect at most 1 matching IP
+  const [existingIpsStr] = await execCmdWithExitOnFailure(
+    `az network public-ip list --resource-group ${resourceGroupIP} --query "[?name == '${name}' && sku.name == 'Standard'].ipAddress" -o json`
+  )
+  const existingIps = JSON.parse(existingIpsStr)
+  if (existingIps.length) {
+    console.info(`Skipping IP address registration, ${name} on ${resourceGroupIP} exists`)
+    // We expect only 1 matching IP
+    return existingIps[0]
+  }
   console.info(`Registering IP address ${name} on ${resourceGroupIP}`)
   const [address] = await execCmdWithExitOnFailure(
     `az network public-ip create --resource-group ${resourceGroupIP} --name ${name} --allocation-method Static --sku Standard --query publicIp.ipAddress -o tsv`

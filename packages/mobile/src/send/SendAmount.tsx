@@ -11,19 +11,15 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { RequestEvents, SendEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackButton from 'src/components/BackButton.v2'
-import {
-  DAILY_PAYMENT_LIMIT_CUSD,
-  DOLLAR_TRANSACTION_MIN_AMOUNT,
-  NUMBER_INPUT_MAX_DECIMALS,
-} from 'src/config'
+import { DOLLAR_TRANSACTION_MIN_AMOUNT, NUMBER_INPUT_MAX_DECIMALS } from 'src/config'
 import { getFeeEstimateDollars } from 'src/fees/selectors'
 import i18n, { Namespaces } from 'src/i18n'
 import { fetchAddressesAndValidate } from 'src/identity/actions'
@@ -51,7 +47,7 @@ import { StackParamList } from 'src/navigator/types'
 import { getRecipientVerificationStatus, Recipient, RecipientKind } from 'src/recipients/recipient'
 import useSelector from 'src/redux/useSelector'
 import { getRecentPayments } from 'src/send/selectors'
-import { dailyAmountRemaining, getFeeType, isPaymentLimitReached } from 'src/send/utils'
+import { getFeeType, isPaymentLimitReached, showLimitReachedError } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
@@ -74,13 +70,17 @@ export const sendAmountScreenNavOptions = ({
 }: {
   route: RouteProp<StackParamList, Screens.SendAmount>
 }) => {
-  const title = route.params?.isRequest
+  const title = route.params?.isOutgoingPaymentRequest
     ? i18n.t('paymentRequestFlow:request')
     : i18n.t('sendFlow7:send')
 
+  const eventName = route.params?.isOutgoingPaymentRequest
+    ? RequestEvents.request_amount_back
+    : SendEvents.send_amount_back
+
   return {
     ...emptyHeader,
-    headerLeft: () => <BackButton eventName={CustomEventNames.send_amount_back} />,
+    headerLeft: () => <BackButton eventName={eventName} />,
     headerTitle: () => <HeaderTitleWithBalance title={title} token={CURRENCY_ENUM.DOLLAR} />,
   }
 }
@@ -88,8 +88,7 @@ export const sendAmountScreenNavOptions = ({
 function SendAmount(props: Props) {
   const dispatch = useDispatch()
 
-  const isRequest = props.route.params?.isRequest ?? false
-  const recipient = props.route.params.recipient
+  const { isOutgoingPaymentRequest, recipient } = props.route.params
 
   React.useEffect(() => {
     dispatch(fetchDollarBalance())
@@ -152,15 +151,12 @@ function SendAmount(props: Props) {
     }
   }, [amount, setAmount])
 
-  const getDollarAmount = React.useCallback(
-    (localAmount: BigNumber.Value) => {
-      const dollarsAmount =
-        convertLocalAmountToDollars(localAmount, localCurrencyExchangeRate) || new BigNumber('')
+  const getDollarAmount = (localAmount: BigNumber.Value) => {
+    const dollarsAmount =
+      convertLocalAmountToDollars(localAmount, localCurrencyExchangeRate) || new BigNumber('')
 
-      return convertDollarsToMaxSupportedPrecision(dollarsAmount)
-    },
-    [localCurrencyExchangeRate]
-  )
+    return convertDollarsToMaxSupportedPrecision(dollarsAmount)
+  }
 
   const parsedLocalAmount = parseInputAmount(amount, decimalSeparator)
   const dollarAmount = getDollarAmount(parsedLocalAmount)
@@ -191,38 +187,18 @@ function SendAmount(props: Props) {
     [recipient, dollarAmount]
   )
   const recentPayments = useSelector(getRecentPayments)
-
-  const showLimitReachedError = React.useCallback(
-    (now: number) => {
-      const dailyRemainingcUSD = dailyAmountRemaining(now, recentPayments)
-      const dailyRemaining = convertDollarsToLocalAmount(
-        dailyRemainingcUSD,
-        localCurrencyExchangeRate
-      )
-      const dailyLimit = convertDollarsToLocalAmount(
-        DAILY_PAYMENT_LIMIT_CUSD,
-        localCurrencyExchangeRate
-      )
-
-      const translationParams = {
-        currencySymbol: localCurrencySymbol,
-        dailyRemaining,
-        dailyLimit,
-        dailyRemainingcUSD,
-        dailyLimitcUSD: DAILY_PAYMENT_LIMIT_CUSD,
-      }
-      dispatch(showError(ErrorMessages.PAYMENT_LIMIT_REACHED, null, translationParams))
-    },
-    [recentPayments]
-  )
+  const localCurrencyAmount = convertDollarsToLocalAmount(dollarAmount, localCurrencyExchangeRate)
 
   const continueAnalyticsParams = React.useMemo(() => {
     return {
-      method: props.route.params?.isFromScan ? 'scan' : 'search',
+      isScan: !!props.route.params?.isFromScan,
+      isInvite: recipientVerificationStatus !== RecipientVerificationStatus.VERIFIED,
       localCurrencyExchangeRate,
       localCurrency: localCurrencyCode,
-      dollarAmount,
-      localCurrencyAmount: convertDollarsToLocalAmount(dollarAmount, localCurrencyExchangeRate),
+      dollarAmount: dollarAmount.toString(),
+      localCurrencyAmount: localCurrencyAmount
+        ? localCurrencyAmount.toString()
+        : localCurrencyAmount,
     }
   }, [props.route, localCurrencyCode, localCurrencyExchangeRate, dollarAmount])
 
@@ -235,30 +211,30 @@ function SendAmount(props: Props) {
     const now = Date.now()
     const isLimitReached = isPaymentLimitReached(now, recentPayments, dollarAmount.toNumber())
     if (isLimitReached) {
-      showLimitReachedError(now)
+      dispatch(
+        showLimitReachedError(now, recentPayments, localCurrencyExchangeRate, localCurrencySymbol)
+      )
       return
     }
 
-    let transactionData: TransactionDataInput
-
-    if (recipientVerificationStatus === RecipientVerificationStatus.VERIFIED) {
-      transactionData = getTransactionData(TokenTransactionType.Sent)
-      CeloAnalytics.track(CustomEventNames.transaction_details)
-    } else {
-      transactionData = getTransactionData(TokenTransactionType.InviteSent)
-      CeloAnalytics.track(CustomEventNames.send_invite_details)
-    }
+    const transactionData =
+      recipientVerificationStatus === RecipientVerificationStatus.VERIFIED
+        ? getTransactionData(TokenTransactionType.Sent)
+        : getTransactionData(TokenTransactionType.InviteSent)
 
     dispatch(hideAlert())
 
-    if (addressValidationType !== AddressValidationType.NONE) {
+    if (
+      addressValidationType !== AddressValidationType.NONE &&
+      recipient.kind !== RecipientKind.QrCode &&
+      recipient.kind !== RecipientKind.Address
+    ) {
       navigate(Screens.ValidateRecipientIntro, {
         transactionData,
         addressValidationType,
-        isFromScan: props.route.params?.isFromScan,
       })
     } else {
-      CeloAnalytics.track(CustomEventNames.send_continue, continueAnalyticsParams)
+      ValoraAnalytics.track(SendEvents.send_amount_continue, continueAnalyticsParams)
       navigate(Screens.SendConfirmation, {
         transactionData,
         isFromScan: props.route.params?.isFromScan,
@@ -275,17 +251,21 @@ function SendAmount(props: Props) {
   const onRequest = React.useCallback(() => {
     const transactionData = getTransactionData(TokenTransactionType.PayRequest)
 
-    if (addressValidationType !== AddressValidationType.NONE) {
+    if (
+      addressValidationType !== AddressValidationType.NONE &&
+      recipient.kind !== RecipientKind.QrCode &&
+      recipient.kind !== RecipientKind.Address
+    ) {
       navigate(Screens.ValidateRecipientIntro, {
         transactionData,
         addressValidationType,
-        isPaymentRequest: true,
+        isOutgoingPaymentRequest: true,
       })
     } else if (recipientVerificationStatus !== RecipientVerificationStatus.VERIFIED) {
-      CeloAnalytics.track(CustomEventNames.request_unavailable, continueAnalyticsParams)
+      ValoraAnalytics.track(RequestEvents.request_unavailable, continueAnalyticsParams)
       navigate(Screens.PaymentRequestUnavailable, { transactionData })
     } else {
-      CeloAnalytics.track(CustomEventNames.request_continue, continueAnalyticsParams)
+      ValoraAnalytics.track(RequestEvents.request_amount_continue, continueAnalyticsParams)
       navigate(Screens.PaymentRequestConfirmation, { transactionData })
     }
   }, [addressValidationType, getTransactionData])
@@ -319,7 +299,7 @@ function SendAmount(props: Props) {
         size={BtnSizes.FULL}
         text={t('global:review')}
         type={BtnTypes.SECONDARY}
-        onPress={isRequest ? onRequest : onSend}
+        onPress={isOutgoingPaymentRequest ? onRequest : onSend}
         disabled={reviewBtnDisabled}
         testID="Review"
       />

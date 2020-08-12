@@ -1,2 +1,5 @@
 environment:
   name: default
+
+oracle:
+  replicas: 1

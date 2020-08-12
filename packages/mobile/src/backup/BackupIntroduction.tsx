@@ -1,25 +1,26 @@
 import Button from '@celo/react-components/components/Button.v2'
 import TextButton from '@celo/react-components/components/TextButton.v2'
-import { default as colors, default as colorsV2 } from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { Spacing } from '@celo/react-components/styles/styles.v2'
-import { StackNavigationOptions } from '@react-navigation/stack'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { OnboardingEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { enterBackupFlow, exitBackupFlow } from 'src/app/actions'
 import DelayButton from 'src/backup/DelayButton'
 import { useAccountKey } from 'src/backup/utils'
 import { Namespaces } from 'src/i18n'
 import Logo from 'src/icons/Logo.v2'
 import DrawerTopBar from 'src/navigator/DrawerTopBar'
-import { drawerHeader } from 'src/navigator/Headers.v2'
+import { emptyHeader, headerWithBackButton } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 
 interface StateProps {
@@ -31,7 +32,9 @@ interface DispatchProps {
   exitBackupFlow: typeof exitBackupFlow
 }
 
-type Props = StateProps & DispatchProps
+type NavigationProps = StackScreenProps<StackParamList, Screens.BackupIntroduction>
+
+type Props = StateProps & DispatchProps & NavigationProps
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -39,10 +42,16 @@ const mapStateToProps = (state: RootState): StateProps => {
   }
 }
 
-export const navOptionsForAccount: StackNavigationOptions = {
-  ...drawerHeader,
-  headerTitle: '',
-  headerRight: () => <DelayButton />,
+export const navOptionsForAccount = ({ route }: NavigationProps) => {
+  if (route.params?.fromSettings) {
+    return headerWithBackButton
+  }
+
+  return {
+    ...emptyHeader,
+    headerTitle: '',
+    headerRight: () => <DelayButton />,
+  }
 }
 
 class BackupIntroduction extends React.Component<Props> {
@@ -55,15 +64,16 @@ class BackupIntroduction extends React.Component<Props> {
   }
 
   onPressBackup = () => {
-    CeloAnalytics.track(CustomEventNames.backup_start)
+    ValoraAnalytics.track(OnboardingEvents.backup_start)
     navigate(Screens.AccountKeyEducation)
   }
 
   render() {
-    const { backupCompleted } = this.props
+    const { backupCompleted, route } = this.props
+    const fromSettings = route.params?.fromSettings
     return (
       <SafeAreaView style={styles.container}>
-        <DrawerTopBar />
+        {!fromSettings && <DrawerTopBar />}
         {backupCompleted ? (
           <AccountKeyPostSetup />
         ) : (
@@ -140,7 +150,7 @@ const styles = StyleSheet.create({
   },
   keyArea: {
     padding: Spacing.Regular16,
-    backgroundColor: colorsV2.brownFaint,
+    backgroundColor: colors.beige,
     marginTop: Spacing.Regular16,
   },
   postSetupBody: {

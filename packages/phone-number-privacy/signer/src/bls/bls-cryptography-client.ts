@@ -1,5 +1,5 @@
+import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import threshold_bls from 'blind-threshold-bls'
-import { ErrorMessages } from '../common/error-utils'
 import logger from '../common/logger'
 
 /*
@@ -7,7 +7,7 @@ import logger from '../common/logger'
  */
 export function computeBlindedSignature(base64BlindedMessage: string, privateKey: string) {
   try {
-    const keyBuffer = Buffer.from(privateKey, 'base64')
+    const keyBuffer = Buffer.from(privateKey, 'hex')
     const msgBuffer = Buffer.from(base64BlindedMessage, 'base64')
 
     logger.debug('Calling theshold sign')
@@ -20,7 +20,7 @@ export function computeBlindedSignature(base64BlindedMessage: string, privateKey
 
     return Buffer.from(signedMsg).toString('base64')
   } catch (e) {
-    logger.error(ErrorMessages.SIGNATURE_COMPUTATION_FAILURE, e)
+    logger.error(ErrorMessage.SIGNATURE_COMPUTATION_FAILURE, e)
     throw e
   }
 }

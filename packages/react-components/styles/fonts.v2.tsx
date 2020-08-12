@@ -1,10 +1,15 @@
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import { StyleSheet } from 'react-native'
 
 const Inter = {
   Regular: 'Inter-Regular',
   Medium: 'Inter-Medium',
   SemiBold: 'Inter-SemiBold',
+}
+
+const Jost = {
+  Book: 'Jost-Book',
+  Medium: 'Jost-Medium',
 }
 
 export const fontFamily = Inter.Regular
@@ -32,21 +37,39 @@ const standards = {
 // Figma Font Styles
 const fontStyles = StyleSheet.create({
   h1: {
-    fontSize: 24,
+    fontSize: 26,
     lineHeight: 32,
-    fontFamily: Inter.Medium,
+    fontFamily: Jost.Book,
     color: colors.dark,
   },
   h2: {
-    fontSize: 19,
-    lineHeight: 26,
-    fontFamily: Inter.SemiBold,
+    fontSize: 22,
+    lineHeight: 28,
+    fontFamily: Jost.Medium,
     color: colors.dark,
   },
   sectionHeader: {
     fontSize: 14,
     lineHeight: 16,
     fontFamily: Inter.Medium,
+    color: colors.dark,
+  },
+  navigationHeader: {
+    fontSize: 16,
+    lineHeight: 20,
+    fontFamily: Jost.Medium,
+    color: colors.dark,
+  },
+  notificationHeadline: {
+    fontSize: 18,
+    lineHeight: 22,
+    fontFamily: Jost.Medium,
+    color: colors.dark,
+  },
+  displayName: {
+    fontSize: 18,
+    lineHeight: 24,
+    fontFamily: Jost.Medium,
     color: colors.dark,
   },
   label: {
@@ -82,7 +105,12 @@ const fontStyles = StyleSheet.create({
   iconText: {
     fontSize: 16,
     fontFamily: Inter.Medium,
-    color: colors.white,
+    color: colors.light,
+  },
+  emptyState: {
+    ...standards.large,
+    color: colors.gray3,
+    textAlign: 'center',
   },
 })
 

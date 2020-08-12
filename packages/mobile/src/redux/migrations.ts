@@ -41,4 +41,45 @@ export const migrations = {
       },
     }
   },
+  3: (state: any) => {
+    return {
+      ...state,
+      send: {
+        ...state.send,
+        recentPayments: [],
+      },
+      account: {
+        ...state.account,
+        hasMigratedToNewBip39: false,
+      },
+    }
+  },
+  4: (state: any) => {
+    return {
+      ...state,
+      identity: {
+        ...state.identity,
+        acceptedAttestationCodes: [],
+      },
+    }
+  },
+  5: (state: any) => {
+    return {
+      ...state,
+      paymentRequest: {
+        incomingPaymentRequests: state.account.incomingPaymentRequests || [],
+        outgoingPaymentRequests: state.account.outgoingPaymentRequests || [],
+      },
+      account: {
+        ...state.account,
+        incomingPaymentRequests: undefined,
+        outgoingPaymentRequests: undefined,
+      },
+      web3: {
+        ...state.web3,
+        dataEncryptionKey: state.web3.commentKey,
+        commentKey: undefined,
+      },
+    }
+  },
 }

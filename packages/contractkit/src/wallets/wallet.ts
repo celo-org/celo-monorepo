@@ -1,8 +1,8 @@
 import { isHexString, normalizeAddressWith0x } from '@celo/utils/lib/address'
+import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import * as ethUtil from 'ethereumjs-util'
 import { EncodedTransaction, Tx } from 'web3-core'
 import { Address } from '../base'
-import { EIP712TypedData, generateTypedDataHash } from '../utils/sign-typed-data-utils'
 import {
   chainIdTransformationForSigning,
   encodeTransaction,
@@ -16,6 +16,7 @@ export interface Wallet {
   signTransaction: (txParams: Tx) => Promise<EncodedTransaction>
   signTypedData: (address: Address, typedData: EIP712TypedData) => Promise<string>
   signPersonalMessage: (address: Address, data: string) => Promise<string>
+  decrypt: (address: Address, ciphertext: Buffer) => Promise<Buffer>
 }
 
 export abstract class WalletBase implements Wallet {
@@ -109,11 +110,16 @@ export abstract class WalletBase implements Wallet {
     return ethUtil.toRpcSig(sig.v, sig.r, sig.s)
   }
 
-  private getSigner(address: string): Signer {
+  protected getSigner(address: string): Signer {
     const normalizedAddress = normalizeAddressWith0x(address)
     if (!this.accountSigners.has(normalizedAddress)) {
       throw new Error(`Could not find address ${normalizedAddress}`)
     }
     return this.accountSigners.get(normalizedAddress)!
+  }
+
+  async decrypt(address: string, ciphertext: Buffer) {
+    const signer = this.getSigner(address)
+    return signer.decrypt(ciphertext)
   }
 }

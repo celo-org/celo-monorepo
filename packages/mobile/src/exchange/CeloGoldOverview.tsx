@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
@@ -67,4 +67,4 @@ const styles = StyleSheet.create({
   code: {},
 })
 
-export default withTranslation(Namespaces.exchangeFlow9)(CeloGoldOverview)
+export default withTranslation<Props>(Namespaces.exchangeFlow9)(CeloGoldOverview)

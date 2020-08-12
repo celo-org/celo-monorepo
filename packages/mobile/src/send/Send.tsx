@@ -1,17 +1,17 @@
 import QRCodeBorderlessIcon from '@celo/react-components/icons/QRCodeBorderless'
 import Times from '@celo/react-components/icons/Times'
 import VerifyPhone from '@celo/react-components/icons/VerifyPhone'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import { RouteProp } from '@react-navigation/native'
-import { StackScreenProps } from '@react-navigation/stack'
+import { StackScreenProps, TransitionPresets } from '@react-navigation/stack'
 import { throttle } from 'lodash'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { RequestEvents, SendEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { estimateFee, FeeType } from 'src/fees/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
@@ -95,43 +95,47 @@ const mapDispatchToProps = {
   estimateFee,
 }
 
-export const sendScreenNavOptions = ({
-  route,
-}: {
-  route: RouteProp<StackParamList, Screens.Send>
-}) => {
-  const goQr = () => navigate(Screens.QRNavigator)
-  const title = route.params?.isRequest
-    ? i18n.t('paymentRequestFlow:request')
-    : i18n.t('sendFlow7:send')
-
-  return {
-    ...emptyHeader,
-    headerLeft: () => (
-      <TopBarIconButton
-        icon={<Times />}
-        onPress={navigateBack}
-        eventName={
-          route.params?.isRequest ? CustomEventNames.send_cancel : CustomEventNames.request_cancel
-        }
-      />
-    ),
-    headerLeftContainerStyle: styles.headerContainer,
-    headerRight: () => (
-      <TopBarIconButton
-        icon={<QRCodeBorderlessIcon height={32} color={colors.greenUI} />}
-        eventName={
-          route.params?.isRequest ? CustomEventNames.send_scan : CustomEventNames.request_scan
-        }
-        onPress={goQr}
-      />
-    ),
-    headerRightContainerStyle: styles.headerContainer,
-    headerTitle: title,
-  }
-}
-
 class Send extends React.Component<Props, State> {
+  static navigationOptions = ({ route }: { route: RouteProp<StackParamList, Screens.Send> }) => {
+    const isOutgoingPaymentRequest = route.params?.isOutgoingPaymentRequest
+
+    const goToQRScanner = () =>
+      navigate(Screens.QRNavigator, {
+        screen: Screens.QRScanner,
+        params: {
+          isOutgoingPaymentRequest,
+        },
+      })
+
+    const title = isOutgoingPaymentRequest
+      ? i18n.t('paymentRequestFlow:request')
+      : i18n.t('sendFlow7:send')
+
+    return {
+      ...emptyHeader,
+      headerLeft: () => (
+        <TopBarIconButton
+          icon={<Times />}
+          onPress={navigateBack}
+          eventName={
+            isOutgoingPaymentRequest ? RequestEvents.request_cancel : SendEvents.send_cancel
+          }
+        />
+      ),
+      headerLeftContainerStyle: styles.headerLeftContainer,
+      headerRight: () => (
+        <TopBarIconButton
+          icon={<QRCodeBorderlessIcon height={32} color={colors.greenUI} />}
+          eventName={isOutgoingPaymentRequest ? RequestEvents.request_scan : SendEvents.send_scan}
+          onPress={goToQRScanner}
+        />
+      ),
+      headerRightContainerStyle: styles.headerRightContainer,
+      headerTitle: title,
+      ...TransitionPresets.ModalTransition,
+    }
+  }
+
   throttledSearch!: (searchQuery: string) => void
   allRecipientsFilter!: FilterType
   recentRecipientsFilter!: FilterType
@@ -160,16 +164,16 @@ class Send extends React.Component<Props, State> {
     this.props.estimateFee(FeeType.SEND)
   }
 
-  componentDidUpdate(prevPops: Props) {
+  componentDidUpdate(prevProps: Props) {
     const { recentRecipients, allRecipients } = this.props
 
     if (
-      recentRecipients !== prevPops.recentRecipients ||
-      allRecipients !== prevPops.allRecipients
+      recentRecipients !== prevProps.recentRecipients ||
+      allRecipients !== prevProps.allRecipients
     ) {
       this.createRecipientSearchFilters(
-        recentRecipients !== prevPops.recentRecipients,
-        allRecipients !== prevPops.allRecipients
+        recentRecipients !== prevProps.recentRecipients,
+        allRecipients !== prevProps.allRecipients
       )
       // Clear search when recipients change to avoid tricky states
       this.onSearchQueryChanged('')
@@ -210,10 +214,7 @@ class Send extends React.Component<Props, State> {
 
     const hasGivenContactPermission = await requestContactsPermission()
     this.setState({ hasGivenContactPermission })
-
-    if (hasGivenContactPermission) {
-      this.props.importContacts()
-    }
+    this.props.importContacts()
   }
 
   onSearchQueryChanged = (searchQuery: string) => {
@@ -222,7 +223,7 @@ class Send extends React.Component<Props, State> {
 
   onSelectRecipient = (recipient: Recipient) => {
     this.props.hideAlert()
-    const isRequest = this.props.route.params?.isRequest ?? false
+    const isOutgoingPaymentRequest = this.props.route.params?.isOutgoingPaymentRequest
 
     if (!recipient.e164PhoneNumber && !recipient.address) {
       this.props.showError(ErrorMessages.CANT_SELECT_INVALID_PHONE)
@@ -231,25 +232,17 @@ class Send extends React.Component<Props, State> {
 
     this.props.storeLatestInRecents(recipient)
 
-    CeloAnalytics.track(
-      isRequest
-        ? CustomEventNames.request_select_recipient
-        : CustomEventNames.send_select_recipient,
+    ValoraAnalytics.track(
+      isOutgoingPaymentRequest
+        ? RequestEvents.request_select_recipient
+        : SendEvents.send_select_recipient,
       {
         recipientKind: recipient.kind,
-        didQuery: this.state.searchQuery.length > 0,
+        usedSearchBar: this.state.searchQuery.length > 0,
       }
     )
 
-    navigate(Screens.SendAmount, { recipient, isRequest })
-  }
-
-  onPermissionsAccepted = async () => {
-    this.props.importContacts()
-    this.setState({
-      searchQuery: '',
-      hasGivenContactPermission: true,
-    })
+    navigate(Screens.SendAmount, { recipient, isOutgoingPaymentRequest })
   }
 
   onPressStartVerification = () => {
@@ -300,7 +293,7 @@ class Send extends React.Component<Props, State> {
   }
 
   render() {
-    const { defaultCountryCode, numberVerified } = this.props
+    const { defaultCountryCode } = this.props
     const { searchQuery } = this.state
 
     return (
@@ -308,7 +301,7 @@ class Send extends React.Component<Props, State> {
       // needs fullscreen rendering
       <View style={styles.body}>
         <DisconnectBanner />
-        <SendSearchInput isPhoneEnabled={numberVerified} onChangeText={this.onSearchQueryChanged} />
+        <SendSearchInput onChangeText={this.onSearchQueryChanged} />
         <RecipientPicker
           testID={'RecipientPicker'}
           sections={this.buildSections()}
@@ -325,14 +318,16 @@ class Send extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   body: {
     flex: 1,
-    backgroundColor: colors.background,
   },
-  headerContainer: {
+  headerLeftContainer: {
     paddingLeft: 16,
+  },
+  headerRightContainer: {
+    paddingRight: 16,
   },
 })
 
 export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.sendFlow7)(Send))
+)(withTranslation<Props>(Namespaces.sendFlow7)(Send))

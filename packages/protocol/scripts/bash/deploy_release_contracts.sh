@@ -44,8 +44,7 @@ done
 [ -z "$OUTPUT_FILE" ] && echo "Need to set output file via the -o flag" && exit 1;
 
 if ! nc -z 127.0.0.1 8545 ; then
-  echo "Port 8545 not open"
-  exit 1
+  echo "Warning: port 8545 not open" >&2
 fi
 
 yarn run build && \

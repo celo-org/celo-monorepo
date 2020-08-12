@@ -1,7 +1,7 @@
 import { sleep } from '@celo/utils/lib/async'
+import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import { EncodedTransaction, Tx } from 'web3-core'
 import { Address } from '../base'
-import { EIP712TypedData } from '../utils/sign-typed-data-utils'
 import { Signer } from './signers/signer'
 import { Wallet, WalletBase } from './wallet'
 
@@ -106,4 +106,6 @@ export abstract class RemoteWallet extends WalletBase implements Wallet {
       throw new Error('wallet needs to be initialized first')
     }
   }
+
+  public isSetupFinished = () => this.setupFinished
 }

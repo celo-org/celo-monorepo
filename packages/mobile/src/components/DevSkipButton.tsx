@@ -1,6 +1,7 @@
 import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
 import { StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { devModeTriggerClicked } from 'src/account/actions'
 import { devModeSelector } from 'src/account/selectors'
@@ -43,7 +44,7 @@ class DevSkipButton extends React.Component<Props> {
 
   render() {
     return (
-      <View style={styles.devButtonContainer}>
+      <SafeAreaView style={styles.devButtonContainer}>
         {this.props.devModeActive && (
           <View style={styles.devButtonContent}>
             <TouchableOpacity
@@ -63,7 +64,7 @@ class DevSkipButton extends React.Component<Props> {
             <Text>{'   '}</Text>
           </TouchableWithoutFeedback>
         )}
-      </View>
+      </SafeAreaView>
     )
   }
 }
@@ -71,13 +72,11 @@ class DevSkipButton extends React.Component<Props> {
 const styles = StyleSheet.create({
   devButtonContainer: {
     position: 'absolute',
-    top: 0,
-    right: 0,
-    width: 70,
+    top: 10,
+    right: 10,
+    width: 60,
     height: 35,
     zIndex: 100,
-    paddingRight: 10,
-    paddingTop: 10,
   },
   devButtonContent: {
     flex: 1,
@@ -92,10 +91,10 @@ const styles = StyleSheet.create({
     height: 25,
   },
   skipButton: {
-    backgroundColor: colors.errorRed,
+    backgroundColor: colors.warning,
   },
   debugButton: {
-    backgroundColor: colors.messageBlue,
+    backgroundColor: colors.onboardingBlue,
   },
   hiddenButton: {
     flex: 1,

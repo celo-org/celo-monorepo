@@ -5,16 +5,19 @@ import { FlatList } from 'react-native'
 import { connect } from 'react-redux'
 import { TransactionFeedFragment } from 'src/apollo/types'
 import { AddressToE164NumberType } from 'src/identity/reducer'
+import { InviteDetails } from 'src/invite/actions'
+import { inviteesSelector } from 'src/invite/reducer'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 import ExchangeFeedItem from 'src/transactions/ExchangeFeedItem'
 import GoldTransactionFeedItem from 'src/transactions/GoldTransactionFeedItem'
 import NoActivity from 'src/transactions/NoActivity'
+import { recentTxRecipientsCacheSelector } from 'src/transactions/reducer'
 import TransferFeedItem from 'src/transactions/TransferFeedItem'
 import { TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
-import { privateCommentKeySelector } from 'src/web3/selectors'
+import { dataEncryptionKeySelector } from 'src/web3/selectors'
 
 const TAG = 'transactions/TransactionFeed'
 
@@ -27,6 +30,8 @@ interface StateProps {
   commentKey: string | null
   addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient
+  recentTxRecipientsCache: NumberToRecipient
+  invitees: InviteDetails[]
 }
 
 export type FeedItem = TransactionFeedFragment & {
@@ -41,9 +46,11 @@ type Props = {
 } & StateProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
-  commentKey: privateCommentKeySelector(state),
+  commentKey: dataEncryptionKeySelector(state),
   addressToE164Number: state.identity.addressToE164Number,
   recipientCache: recipientCacheSelector(state),
+  recentTxRecipientsCache: recentTxRecipientsCacheSelector(state),
+  invitees: inviteesSelector(state),
 })
 
 export class TransactionFeed extends React.PureComponent<Props> {
@@ -60,7 +67,14 @@ export class TransactionFeed extends React.PureComponent<Props> {
   }
 
   renderItem = ({ item: tx }: { item: FeedItem; index: number }) => {
-    const { addressToE164Number, recipientCache, commentKey, kind } = this.props
+    const {
+      addressToE164Number,
+      recipientCache,
+      recentTxRecipientsCache,
+      invitees,
+      commentKey,
+      kind,
+    } = this.props
 
     switch (tx.__typename) {
       case 'TokenTransfer':
@@ -68,6 +82,8 @@ export class TransactionFeed extends React.PureComponent<Props> {
           <TransferFeedItem
             addressToE164Number={addressToE164Number}
             recipientCache={recipientCache}
+            recentTxRecipientsCache={recentTxRecipientsCache}
+            invitees={invitees}
             commentKey={commentKey}
             {...tx}
           />

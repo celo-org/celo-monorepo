@@ -1,17 +1,14 @@
-import { REHYDRATE } from 'redux-persist/es/constants'
 import { expectSaga } from 'redux-saga-test-plan'
-import { call, select } from 'redux-saga/effects'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import * as matchers from 'redux-saga-test-plan/matchers'
+import { select } from 'redux-saga/effects'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { appLock, openDeepLink, setAppState } from 'src/app/actions'
-import { handleDeepLink, handleSetAppState, watchRehydrate } from 'src/app/saga'
-import { getAppLocked, getLastTimeBackgrounded, getLockWithPinEnabled } from 'src/app/selectors'
+import { handleDeepLink, handleSetAppState } from 'src/app/saga'
+import { getAppLocked, getLastTimeBackgrounded, getRequirePinOnAppOpen } from 'src/app/selectors'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
-import { isAppVersionDeprecated } from 'src/firebase/firebase'
 import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
-import { getCachedPincode } from 'src/pincode/PincodeCache'
+import { handlePaymentDeeplink } from 'src/send/utils'
 
 jest.mock('src/utils/time', () => ({
   clockInSync: () => true,
@@ -19,7 +16,7 @@ jest.mock('src/utils/time', () => ({
 
 jest.mock('src/dappkit/dappkit')
 
-const MockedAnalytics = CeloAnalytics as any
+const MockedAnalytics = ValoraAnalytics as any
 
 describe('App saga', () => {
   beforeEach(() => {
@@ -27,14 +24,6 @@ describe('App saga', () => {
   })
   afterEach(() => {
     jest.clearAllMocks()
-  })
-
-  it('Version Deprecated', async () => {
-    await expectSaga(watchRehydrate)
-      .dispatch({ type: REHYDRATE })
-      .provide([[call(isAppVersionDeprecated), true]])
-      .run()
-    expect(navigate).toHaveBeenCalledWith(Screens.UpgradeScreen)
   })
 
   it('Handles Dappkit deep link', async () => {
@@ -49,14 +38,29 @@ describe('App saga', () => {
       .run()
   })
 
+  it('Handles payment deep link', async () => {
+    const data = {
+      address: '0xf7f551752A78Ce650385B58364225e5ec18D96cB',
+      displayName: 'Super 8',
+      currencyCode: 'PHP',
+      amount: '500',
+      comment: '92a53156-c0f2-11ea-b3de-0242ac13000',
+    }
+
+    const params = new URLSearchParams(data)
+    const deepLink = `celo://wallet/pay?${params.toString()}`
+
+    await expectSaga(handleDeepLink, openDeepLink(deepLink))
+      .provide([[matchers.call.fn(handlePaymentDeeplink), deepLink]])
+      .run()
+  })
+
   it('Handles set app state', async () => {
-    const mockedGetCachedPincode = getCachedPincode as jest.Mock
-    mockedGetCachedPincode.mockReturnValue(null)
     await expectSaga(handleSetAppState, setAppState('active'))
       .provide([
         [select(getAppLocked), false],
         [select(getLastTimeBackgrounded), 0],
-        [select(getLockWithPinEnabled), true],
+        [select(getRequirePinOnAppOpen), true],
       ])
       .put(appLock())
       .run()
@@ -65,7 +69,7 @@ describe('App saga', () => {
       .provide([
         [select(getAppLocked), true],
         [select(getLastTimeBackgrounded), 0],
-        [select(getLockWithPinEnabled), true],
+        [select(getRequirePinOnAppOpen), true],
       ])
       .run()
 
@@ -73,7 +77,7 @@ describe('App saga', () => {
       .provide([
         [select(getAppLocked), false],
         [select(getLastTimeBackgrounded), Date.now()],
-        [select(getLockWithPinEnabled), true],
+        [select(getRequirePinOnAppOpen), true],
       ])
       .run()
 
@@ -81,16 +85,15 @@ describe('App saga', () => {
       .provide([
         [select(getAppLocked), false],
         [select(getLastTimeBackgrounded), 0],
-        [select(getLockWithPinEnabled), false],
+        [select(getRequirePinOnAppOpen), false],
       ])
       .run()
 
-    mockedGetCachedPincode.mockReturnValue('123456')
     await expectSaga(handleSetAppState, setAppState('active'))
       .provide([
         [select(getAppLocked), false],
         [select(getLastTimeBackgrounded), 0],
-        [select(getLockWithPinEnabled), true],
+        [select(getRequirePinOnAppOpen), true],
       ])
       .run()
   })

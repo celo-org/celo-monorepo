@@ -1,10 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Testnet banner Renders when connected with backup complete 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "position": "relative",
     }
@@ -13,25 +12,27 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
   <View
     style={
       Object {
-        "alignItems": "flex-end",
-        "backgroundColor": "#FFFFFF",
-        "elevation": 1,
+        "alignItems": "center",
+        "backgroundColor": "transparent",
+        "borderBottomColor": 0,
+        "borderBottomWidth": 1,
         "flexDirection": "row",
-        "height": 62,
-        "justifyContent": "space-between",
-        "shadowColor": "black",
-        "shadowOffset": Object {
-          "height": 0.5,
-          "width": 0,
-        },
-        "shadowOpacity": 0.3,
-        "shadowRadius": 0.8,
+        "height": 56,
+        "justifyContent": "center",
       }
     }
   >
     <View
       accessible={true}
       focusable={false}
+      hitSlop={
+        Object {
+          "bottom": 10,
+          "left": 10,
+          "right": 10,
+          "top": 10,
+        }
+      }
       onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
@@ -41,10 +42,12 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
+          "left": 0,
           "marginBottom": 0,
-          "marginLeft": 4,
+          "marginLeft": 16,
           "opacity": 1,
-          "padding": 8,
+          "padding": 0,
+          "position": "absolute",
         }
       }
     >
@@ -83,44 +86,29 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
         />
       </svg>
     </View>
-    <View
-      style={
-        Object {
-          "marginBottom": 13,
-        }
-      }
+    <svg
+      fill="none"
+      height={25}
+      style={Object {}}
+      viewBox="0 0 25 25"
+      width={25}
     >
-      <svg
-        fill="none"
-        height={25}
+      <path
+        d="M9.86842 22.3684C13.8653 22.3684 17.1053 19.1284 17.1053 15.1316C17.1053 11.1348 13.8653 7.89476 9.86842 7.89476C5.87158 7.89476 2.63158 11.1348 2.63158 15.1316C2.63158 19.1284 5.87158 22.3684 9.86842 22.3684ZM9.86842 25C4.41842 25 0 20.5816 0 15.1316C0 9.6816 4.41842 5.26318 9.86842 5.26318C15.3184 5.26318 19.7368 9.6816 19.7368 15.1316C19.7368 20.5816 15.3184 25 9.86842 25Z"
+        fill="#FBCC5C"
         style={Object {}}
-        viewBox="0 0 25 25"
-        width={25}
-      >
-        <path
-          d="M9.86842 22.3684C13.8653 22.3684 17.1053 19.1284 17.1053 15.1316C17.1053 11.1348 13.8653 7.89476 9.86842 7.89476C5.87158 7.89476 2.63158 11.1348 2.63158 15.1316C2.63158 19.1284 5.87158 22.3684 9.86842 22.3684ZM9.86842 25C4.41842 25 0 20.5816 0 15.1316C0 9.6816 4.41842 5.26318 9.86842 5.26318C15.3184 5.26318 19.7368 9.6816 19.7368 15.1316C19.7368 20.5816 15.3184 25 9.86842 25Z"
-          fill="#FBCC5C"
-          style={Object {}}
-        />
-        <path
-          d="M15.1316 17.1053C19.1284 17.1053 22.3684 13.8653 22.3684 9.86842C22.3684 5.87158 19.1284 2.63158 15.1316 2.63158C11.1348 2.63158 7.89476 5.87158 7.89476 9.86842C7.89476 13.8653 11.1348 17.1053 15.1316 17.1053ZM15.1316 19.7368C9.6816 19.7368 5.26318 15.3184 5.26318 9.86842C5.26318 4.41842 9.6816 0 15.1316 0C20.5816 0 25 4.41842 25 9.86842C25 15.3184 20.5816 19.7368 15.1316 19.7368Z"
-          fill="#42D689"
-          style={Object {}}
-        />
-        <path
-          d="M15.4577 19.7369C16.1419 18.9077 16.6324 17.9361 16.8932 16.8932C17.9361 16.6324 18.9077 16.1421 19.7369 15.4579C19.699 16.6658 19.439 17.8563 18.9695 18.9698C17.8561 19.439 16.6656 19.6992 15.4577 19.7369ZM8.10687 8.10687C7.06397 8.36766 6.09239 8.85792 5.26318 9.54213C5.30108 8.33424 5.56108 7.14371 6.03055 6.03029C7.14397 5.56108 8.3345 5.30082 9.54239 5.26318C8.85818 6.09239 8.36766 7.06397 8.10687 8.10687Z"
-          fill="#5EA33B"
-          style={Object {}}
-        />
-      </svg>
-    </View>
-    <View
-      style={
-        Object {
-          "width": 45,
-        }
-      }
-    />
+      />
+      <path
+        d="M15.1316 17.1053C19.1284 17.1053 22.3684 13.8653 22.3684 9.86842C22.3684 5.87158 19.1284 2.63158 15.1316 2.63158C11.1348 2.63158 7.89476 5.87158 7.89476 9.86842C7.89476 13.8653 11.1348 17.1053 15.1316 17.1053ZM15.1316 19.7368C9.6816 19.7368 5.26318 15.3184 5.26318 9.86842C5.26318 4.41842 9.6816 0 15.1316 0C20.5816 0 25 4.41842 25 9.86842C25 15.3184 20.5816 19.7368 15.1316 19.7368Z"
+        fill="#42D689"
+        style={Object {}}
+      />
+      <path
+        d="M15.4577 19.7369C16.1419 18.9077 16.6324 17.9361 16.8932 16.8932C17.9361 16.6324 18.9077 16.1421 19.7369 15.4579C19.699 16.6658 19.439 17.8563 18.9695 18.9698C17.8561 19.439 16.6656 19.6992 15.4577 19.7369ZM8.10687 8.10687C7.06397 8.36766 6.09239 8.85792 5.26318 9.54213C5.30108 8.33424 5.56108 7.14371 6.03055 6.03029C7.14397 5.56108 8.3345 5.30082 9.54239 5.26318C8.85818 6.09239 8.36766 7.06397 8.10687 8.10687Z"
+        fill="#5EA33B"
+        style={Object {}}
+      />
+    </svg>
   </View>
   <RCTScrollView
     data={
@@ -153,7 +141,7 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
       <RefreshControlMock
         colors={
           Array [
-            "#42D689",
+            "#1AB775",
           ]
         }
         onRefresh={[Function]}
@@ -162,11 +150,10 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
     }
     refreshing={false}
     renderItem={[Function]}
-    scrollEventThrottle={50}
+    scrollEventThrottle={16}
     stickyHeaderIndices={Array []}
     style={
       Object {
-        "backgroundColor": "#FFFFFF",
         "flex": 1,
         "position": "relative",
       }
@@ -182,14 +169,17 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
       >
         <View
           style={
-            Object {
-              "alignItems": "center",
-              "backgroundColor": "#FFFFFF",
-              "flexDirection": "row",
-              "justifyContent": "space-between",
-              "paddingHorizontal": 16,
-              "paddingVertical": 8,
-            }
+            Array [
+              Object {
+                "alignItems": "center",
+                "backgroundColor": "#FFFFFF",
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "paddingHorizontal": 16,
+                "paddingVertical": 8,
+              },
+              undefined,
+            ]
           }
         >
           <Text
@@ -244,10 +234,14 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
     >
       <View
         style={
-          Object {
-            "borderRadius": 100,
-            "overflow": "hidden",
-          }
+          Array [
+            Object {
+              "overflow": "hidden",
+            },
+            Object {
+              "borderRadius": 100,
+            },
+          ]
         }
       >
         <View
@@ -270,10 +264,11 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
             Object {
               "alignItems": "center",
               "backgroundColor": "#1AB775",
-              "height": 40,
+              "height": 48,
               "justifyContent": "center",
-              "minWidth": 98,
-              "paddingHorizontal": 16,
+              "minWidth": 120,
+              "opacity": undefined,
+              "paddingHorizontal": 24,
               "paddingVertical": 5,
             }
           }
@@ -314,10 +309,14 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
     >
       <View
         style={
-          Object {
-            "borderRadius": 100,
-            "overflow": "hidden",
-          }
+          Array [
+            Object {
+              "overflow": "hidden",
+            },
+            Object {
+              "borderRadius": 100,
+            },
+          ]
         }
       >
         <View
@@ -340,10 +339,11 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
             Object {
               "alignItems": "center",
               "backgroundColor": "#1AB775",
-              "height": 40,
+              "height": 48,
               "justifyContent": "center",
-              "minWidth": 98,
-              "paddingHorizontal": 16,
+              "minWidth": 120,
+              "opacity": undefined,
+              "paddingHorizontal": 24,
               "paddingVertical": 5,
             }
           }
@@ -428,14 +428,213 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
       </svg>
     </View>
   </View>
-</SafeAreaView>
+  <Modal
+    animationType="none"
+    hardwareAccelerated={false}
+    hideModalContentWhileAnimating={false}
+    onModalHide={[Function]}
+    onModalWillHide={[Function]}
+    onModalWillShow={[Function]}
+    onRequestClose={[Function]}
+    scrollHorizontal={false}
+    scrollOffset={0}
+    scrollOffsetMax={0}
+    scrollTo={null}
+    statusBarTranslucent={true}
+    supportedOrientations={
+      Array [
+        "portrait",
+        "landscape",
+      ]
+    }
+    swipeThreshold={100}
+    transparent={true}
+    visible={false}
+  >
+    <View
+      accessible={true}
+      focusable={true}
+      forwardedRef={[Function]}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "backgroundColor": "black",
+          "bottom": 0,
+          "height": 1334,
+          "left": 0,
+          "opacity": 0,
+          "position": "absolute",
+          "right": 0,
+          "top": 0,
+          "width": 750,
+        }
+      }
+    />
+    <View
+      forwardedRef={[Function]}
+      hideModalContentWhileAnimating={false}
+      onModalHide={[Function]}
+      onModalWillHide={[Function]}
+      onModalWillShow={[Function]}
+      pointerEvents="box-none"
+      scrollHorizontal={false}
+      scrollOffset={0}
+      scrollOffsetMax={0}
+      scrollTo={null}
+      statusBarTranslucent={true}
+      style={
+        Object {
+          "flex": 1,
+          "justifyContent": "center",
+          "margin": 37.5,
+          "transform": Array [
+            Object {
+              "translateY": 0,
+            },
+          ],
+        }
+      }
+      supportedOrientations={
+        Array [
+          "portrait",
+          "landscape",
+        ]
+      }
+      swipeThreshold={100}
+    >
+      <RNCSafeAreaView>
+        <View
+          style={
+            Array [
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "padding": 16,
+              },
+              Object {
+                "borderRadius": 8,
+              },
+              Object {
+                "elevation": 12,
+                "shadowColor": "rgba(156, 164, 169, 0.4)",
+                "shadowOffset": Object {
+                  "height": 2,
+                  "width": 0,
+                },
+                "shadowOpacity": 1,
+                "shadowRadius": 12,
+              },
+              Array [
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "maxHeight": "100%",
+                  "padding": 24,
+                },
+                undefined,
+              ],
+            ]
+          }
+        >
+          <RCTScrollView
+            contentContainerStyle={
+              Object {
+                "alignItems": "center",
+              }
+            }
+          >
+            <View>
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Jost-Medium",
+                    "fontSize": 22,
+                    "lineHeight": 28,
+                    "marginBottom": 12,
+                    "textAlign": "center",
+                  }
+                }
+              >
+                Migrate to new Address
+              </Text>
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                    "marginBottom": 24,
+                    "textAlign": "center",
+                  }
+                }
+              >
+                Due to a developer configuration error, you will need to migrate your account to a new address, which will include verifying again. You can keep your seed phrase. Do not close the app during migration. Please post on slack if you have questions.
+              </Text>
+            </View>
+          </RCTScrollView>
+          <View
+            style={
+              Object {
+                "flexDirection": "row",
+                "flexWrap": "wrap",
+                "justifyContent": "space-around",
+                "maxWidth": "100%",
+              }
+            }
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#1AB775",
+                      "fontFamily": "Inter-SemiBold",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    },
+                    Object {
+                      "paddingTop": 16,
+                    },
+                  ]
+                }
+              >
+                Migrate
+              </Text>
+            </View>
+          </View>
+        </View>
+      </RNCSafeAreaView>
+    </View>
+  </Modal>
+</RNCSafeAreaView>
 `;
 
 exports[`Testnet banner Renders when disconnected 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "position": "relative",
     }
@@ -444,25 +643,27 @@ exports[`Testnet banner Renders when disconnected 1`] = `
   <View
     style={
       Object {
-        "alignItems": "flex-end",
-        "backgroundColor": "#FFFFFF",
-        "elevation": 1,
+        "alignItems": "center",
+        "backgroundColor": "transparent",
+        "borderBottomColor": 0,
+        "borderBottomWidth": 1,
         "flexDirection": "row",
-        "height": 62,
-        "justifyContent": "space-between",
-        "shadowColor": "black",
-        "shadowOffset": Object {
-          "height": 0.5,
-          "width": 0,
-        },
-        "shadowOpacity": 0.3,
-        "shadowRadius": 0.8,
+        "height": 56,
+        "justifyContent": "center",
       }
     }
   >
     <View
       accessible={true}
       focusable={false}
+      hitSlop={
+        Object {
+          "bottom": 10,
+          "left": 10,
+          "right": 10,
+          "top": 10,
+        }
+      }
       onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
@@ -472,10 +673,12 @@ exports[`Testnet banner Renders when disconnected 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
+          "left": 0,
           "marginBottom": 0,
-          "marginLeft": 4,
+          "marginLeft": 16,
           "opacity": 1,
-          "padding": 8,
+          "padding": 0,
+          "position": "absolute",
         }
       }
     >
@@ -514,44 +717,29 @@ exports[`Testnet banner Renders when disconnected 1`] = `
         />
       </svg>
     </View>
-    <View
-      style={
-        Object {
-          "marginBottom": 13,
-        }
-      }
+    <svg
+      fill="none"
+      height={25}
+      style={Object {}}
+      viewBox="0 0 25 25"
+      width={25}
     >
-      <svg
-        fill="none"
-        height={25}
+      <path
+        d="M9.86842 22.3684C13.8653 22.3684 17.1053 19.1284 17.1053 15.1316C17.1053 11.1348 13.8653 7.89476 9.86842 7.89476C5.87158 7.89476 2.63158 11.1348 2.63158 15.1316C2.63158 19.1284 5.87158 22.3684 9.86842 22.3684ZM9.86842 25C4.41842 25 0 20.5816 0 15.1316C0 9.6816 4.41842 5.26318 9.86842 5.26318C15.3184 5.26318 19.7368 9.6816 19.7368 15.1316C19.7368 20.5816 15.3184 25 9.86842 25Z"
+        fill="#FBCC5C"
         style={Object {}}
-        viewBox="0 0 25 25"
-        width={25}
-      >
-        <path
-          d="M9.86842 22.3684C13.8653 22.3684 17.1053 19.1284 17.1053 15.1316C17.1053 11.1348 13.8653 7.89476 9.86842 7.89476C5.87158 7.89476 2.63158 11.1348 2.63158 15.1316C2.63158 19.1284 5.87158 22.3684 9.86842 22.3684ZM9.86842 25C4.41842 25 0 20.5816 0 15.1316C0 9.6816 4.41842 5.26318 9.86842 5.26318C15.3184 5.26318 19.7368 9.6816 19.7368 15.1316C19.7368 20.5816 15.3184 25 9.86842 25Z"
-          fill="#FBCC5C"
-          style={Object {}}
-        />
-        <path
-          d="M15.1316 17.1053C19.1284 17.1053 22.3684 13.8653 22.3684 9.86842C22.3684 5.87158 19.1284 2.63158 15.1316 2.63158C11.1348 2.63158 7.89476 5.87158 7.89476 9.86842C7.89476 13.8653 11.1348 17.1053 15.1316 17.1053ZM15.1316 19.7368C9.6816 19.7368 5.26318 15.3184 5.26318 9.86842C5.26318 4.41842 9.6816 0 15.1316 0C20.5816 0 25 4.41842 25 9.86842C25 15.3184 20.5816 19.7368 15.1316 19.7368Z"
-          fill="#42D689"
-          style={Object {}}
-        />
-        <path
-          d="M15.4577 19.7369C16.1419 18.9077 16.6324 17.9361 16.8932 16.8932C17.9361 16.6324 18.9077 16.1421 19.7369 15.4579C19.699 16.6658 19.439 17.8563 18.9695 18.9698C17.8561 19.439 16.6656 19.6992 15.4577 19.7369ZM8.10687 8.10687C7.06397 8.36766 6.09239 8.85792 5.26318 9.54213C5.30108 8.33424 5.56108 7.14371 6.03055 6.03029C7.14397 5.56108 8.3345 5.30082 9.54239 5.26318C8.85818 6.09239 8.36766 7.06397 8.10687 8.10687Z"
-          fill="#5EA33B"
-          style={Object {}}
-        />
-      </svg>
-    </View>
-    <View
-      style={
-        Object {
-          "width": 45,
-        }
-      }
-    />
+      />
+      <path
+        d="M15.1316 17.1053C19.1284 17.1053 22.3684 13.8653 22.3684 9.86842C22.3684 5.87158 19.1284 2.63158 15.1316 2.63158C11.1348 2.63158 7.89476 5.87158 7.89476 9.86842C7.89476 13.8653 11.1348 17.1053 15.1316 17.1053ZM15.1316 19.7368C9.6816 19.7368 5.26318 15.3184 5.26318 9.86842C5.26318 4.41842 9.6816 0 15.1316 0C20.5816 0 25 4.41842 25 9.86842C25 15.3184 20.5816 19.7368 15.1316 19.7368Z"
+        fill="#42D689"
+        style={Object {}}
+      />
+      <path
+        d="M15.4577 19.7369C16.1419 18.9077 16.6324 17.9361 16.8932 16.8932C17.9361 16.6324 18.9077 16.1421 19.7369 15.4579C19.699 16.6658 19.439 17.8563 18.9695 18.9698C17.8561 19.439 16.6656 19.6992 15.4577 19.7369ZM8.10687 8.10687C7.06397 8.36766 6.09239 8.85792 5.26318 9.54213C5.30108 8.33424 5.56108 7.14371 6.03055 6.03029C7.14397 5.56108 8.3345 5.30082 9.54239 5.26318C8.85818 6.09239 8.36766 7.06397 8.10687 8.10687Z"
+        fill="#5EA33B"
+        style={Object {}}
+      />
+    </svg>
   </View>
   <RCTScrollView
     data={
@@ -584,7 +772,7 @@ exports[`Testnet banner Renders when disconnected 1`] = `
       <RefreshControlMock
         colors={
           Array [
-            "#42D689",
+            "#1AB775",
           ]
         }
         onRefresh={[Function]}
@@ -593,11 +781,10 @@ exports[`Testnet banner Renders when disconnected 1`] = `
     }
     refreshing={false}
     renderItem={[Function]}
-    scrollEventThrottle={50}
+    scrollEventThrottle={16}
     stickyHeaderIndices={Array []}
     style={
       Object {
-        "backgroundColor": "#FFFFFF",
         "flex": 1,
         "position": "relative",
       }
@@ -613,14 +800,17 @@ exports[`Testnet banner Renders when disconnected 1`] = `
       >
         <View
           style={
-            Object {
-              "alignItems": "center",
-              "backgroundColor": "#FFFFFF",
-              "flexDirection": "row",
-              "justifyContent": "space-between",
-              "paddingHorizontal": 16,
-              "paddingVertical": 8,
-            }
+            Array [
+              Object {
+                "alignItems": "center",
+                "backgroundColor": "#FFFFFF",
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "paddingHorizontal": 16,
+                "paddingVertical": 8,
+              },
+              undefined,
+            ]
           }
         >
           <Text
@@ -675,10 +865,14 @@ exports[`Testnet banner Renders when disconnected 1`] = `
     >
       <View
         style={
-          Object {
-            "borderRadius": 100,
-            "overflow": "hidden",
-          }
+          Array [
+            Object {
+              "overflow": "hidden",
+            },
+            Object {
+              "borderRadius": 100,
+            },
+          ]
         }
       >
         <View
@@ -701,10 +895,11 @@ exports[`Testnet banner Renders when disconnected 1`] = `
             Object {
               "alignItems": "center",
               "backgroundColor": "#1AB775",
-              "height": 40,
+              "height": 48,
               "justifyContent": "center",
-              "minWidth": 98,
-              "paddingHorizontal": 16,
+              "minWidth": 120,
+              "opacity": undefined,
+              "paddingHorizontal": 24,
               "paddingVertical": 5,
             }
           }
@@ -745,10 +940,14 @@ exports[`Testnet banner Renders when disconnected 1`] = `
     >
       <View
         style={
-          Object {
-            "borderRadius": 100,
-            "overflow": "hidden",
-          }
+          Array [
+            Object {
+              "overflow": "hidden",
+            },
+            Object {
+              "borderRadius": 100,
+            },
+          ]
         }
       >
         <View
@@ -771,10 +970,11 @@ exports[`Testnet banner Renders when disconnected 1`] = `
             Object {
               "alignItems": "center",
               "backgroundColor": "#1AB775",
-              "height": 40,
+              "height": 48,
               "justifyContent": "center",
-              "minWidth": 98,
-              "paddingHorizontal": 16,
+              "minWidth": 120,
+              "opacity": undefined,
+              "paddingHorizontal": 24,
               "paddingVertical": 5,
             }
           }
@@ -859,14 +1059,213 @@ exports[`Testnet banner Renders when disconnected 1`] = `
       </svg>
     </View>
   </View>
-</SafeAreaView>
+  <Modal
+    animationType="none"
+    hardwareAccelerated={false}
+    hideModalContentWhileAnimating={false}
+    onModalHide={[Function]}
+    onModalWillHide={[Function]}
+    onModalWillShow={[Function]}
+    onRequestClose={[Function]}
+    scrollHorizontal={false}
+    scrollOffset={0}
+    scrollOffsetMax={0}
+    scrollTo={null}
+    statusBarTranslucent={true}
+    supportedOrientations={
+      Array [
+        "portrait",
+        "landscape",
+      ]
+    }
+    swipeThreshold={100}
+    transparent={true}
+    visible={false}
+  >
+    <View
+      accessible={true}
+      focusable={true}
+      forwardedRef={[Function]}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "backgroundColor": "black",
+          "bottom": 0,
+          "height": 1334,
+          "left": 0,
+          "opacity": 0,
+          "position": "absolute",
+          "right": 0,
+          "top": 0,
+          "width": 750,
+        }
+      }
+    />
+    <View
+      forwardedRef={[Function]}
+      hideModalContentWhileAnimating={false}
+      onModalHide={[Function]}
+      onModalWillHide={[Function]}
+      onModalWillShow={[Function]}
+      pointerEvents="box-none"
+      scrollHorizontal={false}
+      scrollOffset={0}
+      scrollOffsetMax={0}
+      scrollTo={null}
+      statusBarTranslucent={true}
+      style={
+        Object {
+          "flex": 1,
+          "justifyContent": "center",
+          "margin": 37.5,
+          "transform": Array [
+            Object {
+              "translateY": 0,
+            },
+          ],
+        }
+      }
+      supportedOrientations={
+        Array [
+          "portrait",
+          "landscape",
+        ]
+      }
+      swipeThreshold={100}
+    >
+      <RNCSafeAreaView>
+        <View
+          style={
+            Array [
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "padding": 16,
+              },
+              Object {
+                "borderRadius": 8,
+              },
+              Object {
+                "elevation": 12,
+                "shadowColor": "rgba(156, 164, 169, 0.4)",
+                "shadowOffset": Object {
+                  "height": 2,
+                  "width": 0,
+                },
+                "shadowOpacity": 1,
+                "shadowRadius": 12,
+              },
+              Array [
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "maxHeight": "100%",
+                  "padding": 24,
+                },
+                undefined,
+              ],
+            ]
+          }
+        >
+          <RCTScrollView
+            contentContainerStyle={
+              Object {
+                "alignItems": "center",
+              }
+            }
+          >
+            <View>
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Jost-Medium",
+                    "fontSize": 22,
+                    "lineHeight": 28,
+                    "marginBottom": 12,
+                    "textAlign": "center",
+                  }
+                }
+              >
+                Migrate to new Address
+              </Text>
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                    "marginBottom": 24,
+                    "textAlign": "center",
+                  }
+                }
+              >
+                Due to a developer configuration error, you will need to migrate your account to a new address, which will include verifying again. You can keep your seed phrase. Do not close the app during migration. Please post on slack if you have questions.
+              </Text>
+            </View>
+          </RCTScrollView>
+          <View
+            style={
+              Object {
+                "flexDirection": "row",
+                "flexWrap": "wrap",
+                "justifyContent": "space-around",
+                "maxWidth": "100%",
+              }
+            }
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#1AB775",
+                      "fontFamily": "Inter-SemiBold",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    },
+                    Object {
+                      "paddingTop": 16,
+                    },
+                  ]
+                }
+              >
+                Migrate
+              </Text>
+            </View>
+          </View>
+        </View>
+      </RNCSafeAreaView>
+    </View>
+  </Modal>
+</RNCSafeAreaView>
 `;
 
 exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "position": "relative",
     }
@@ -875,25 +1274,27 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
   <View
     style={
       Object {
-        "alignItems": "flex-end",
-        "backgroundColor": "#FFFFFF",
-        "elevation": 1,
+        "alignItems": "center",
+        "backgroundColor": "transparent",
+        "borderBottomColor": 0,
+        "borderBottomWidth": 1,
         "flexDirection": "row",
-        "height": 62,
-        "justifyContent": "space-between",
-        "shadowColor": "black",
-        "shadowOffset": Object {
-          "height": 0.5,
-          "width": 0,
-        },
-        "shadowOpacity": 0.3,
-        "shadowRadius": 0.8,
+        "height": 56,
+        "justifyContent": "center",
       }
     }
   >
     <View
       accessible={true}
       focusable={false}
+      hitSlop={
+        Object {
+          "bottom": 10,
+          "left": 10,
+          "right": 10,
+          "top": 10,
+        }
+      }
       onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
@@ -903,10 +1304,12 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
+          "left": 0,
           "marginBottom": 0,
-          "marginLeft": 4,
+          "marginLeft": 16,
           "opacity": 1,
-          "padding": 8,
+          "padding": 0,
+          "position": "absolute",
         }
       }
     >
@@ -945,44 +1348,29 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
         />
       </svg>
     </View>
-    <View
-      style={
-        Object {
-          "marginBottom": 13,
-        }
-      }
+    <svg
+      fill="none"
+      height={25}
+      style={Object {}}
+      viewBox="0 0 25 25"
+      width={25}
     >
-      <svg
-        fill="none"
-        height={25}
+      <path
+        d="M9.86842 22.3684C13.8653 22.3684 17.1053 19.1284 17.1053 15.1316C17.1053 11.1348 13.8653 7.89476 9.86842 7.89476C5.87158 7.89476 2.63158 11.1348 2.63158 15.1316C2.63158 19.1284 5.87158 22.3684 9.86842 22.3684ZM9.86842 25C4.41842 25 0 20.5816 0 15.1316C0 9.6816 4.41842 5.26318 9.86842 5.26318C15.3184 5.26318 19.7368 9.6816 19.7368 15.1316C19.7368 20.5816 15.3184 25 9.86842 25Z"
+        fill="#FBCC5C"
         style={Object {}}
-        viewBox="0 0 25 25"
-        width={25}
-      >
-        <path
-          d="M9.86842 22.3684C13.8653 22.3684 17.1053 19.1284 17.1053 15.1316C17.1053 11.1348 13.8653 7.89476 9.86842 7.89476C5.87158 7.89476 2.63158 11.1348 2.63158 15.1316C2.63158 19.1284 5.87158 22.3684 9.86842 22.3684ZM9.86842 25C4.41842 25 0 20.5816 0 15.1316C0 9.6816 4.41842 5.26318 9.86842 5.26318C15.3184 5.26318 19.7368 9.6816 19.7368 15.1316C19.7368 20.5816 15.3184 25 9.86842 25Z"
-          fill="#FBCC5C"
-          style={Object {}}
-        />
-        <path
-          d="M15.1316 17.1053C19.1284 17.1053 22.3684 13.8653 22.3684 9.86842C22.3684 5.87158 19.1284 2.63158 15.1316 2.63158C11.1348 2.63158 7.89476 5.87158 7.89476 9.86842C7.89476 13.8653 11.1348 17.1053 15.1316 17.1053ZM15.1316 19.7368C9.6816 19.7368 5.26318 15.3184 5.26318 9.86842C5.26318 4.41842 9.6816 0 15.1316 0C20.5816 0 25 4.41842 25 9.86842C25 15.3184 20.5816 19.7368 15.1316 19.7368Z"
-          fill="#42D689"
-          style={Object {}}
-        />
-        <path
-          d="M15.4577 19.7369C16.1419 18.9077 16.6324 17.9361 16.8932 16.8932C17.9361 16.6324 18.9077 16.1421 19.7369 15.4579C19.699 16.6658 19.439 17.8563 18.9695 18.9698C17.8561 19.439 16.6656 19.6992 15.4577 19.7369ZM8.10687 8.10687C7.06397 8.36766 6.09239 8.85792 5.26318 9.54213C5.30108 8.33424 5.56108 7.14371 6.03055 6.03029C7.14397 5.56108 8.3345 5.30082 9.54239 5.26318C8.85818 6.09239 8.36766 7.06397 8.10687 8.10687Z"
-          fill="#5EA33B"
-          style={Object {}}
-        />
-      </svg>
-    </View>
-    <View
-      style={
-        Object {
-          "width": 45,
-        }
-      }
-    />
+      />
+      <path
+        d="M15.1316 17.1053C19.1284 17.1053 22.3684 13.8653 22.3684 9.86842C22.3684 5.87158 19.1284 2.63158 15.1316 2.63158C11.1348 2.63158 7.89476 5.87158 7.89476 9.86842C7.89476 13.8653 11.1348 17.1053 15.1316 17.1053ZM15.1316 19.7368C9.6816 19.7368 5.26318 15.3184 5.26318 9.86842C5.26318 4.41842 9.6816 0 15.1316 0C20.5816 0 25 4.41842 25 9.86842C25 15.3184 20.5816 19.7368 15.1316 19.7368Z"
+        fill="#42D689"
+        style={Object {}}
+      />
+      <path
+        d="M15.4577 19.7369C16.1419 18.9077 16.6324 17.9361 16.8932 16.8932C17.9361 16.6324 18.9077 16.1421 19.7369 15.4579C19.699 16.6658 19.439 17.8563 18.9695 18.9698C17.8561 19.439 16.6656 19.6992 15.4577 19.7369ZM8.10687 8.10687C7.06397 8.36766 6.09239 8.85792 5.26318 9.54213C5.30108 8.33424 5.56108 7.14371 6.03055 6.03029C7.14397 5.56108 8.3345 5.30082 9.54239 5.26318C8.85818 6.09239 8.36766 7.06397 8.10687 8.10687Z"
+        fill="#5EA33B"
+        style={Object {}}
+      />
+    </svg>
   </View>
   <RCTScrollView
     data={
@@ -1015,7 +1403,7 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
       <RefreshControlMock
         colors={
           Array [
-            "#42D689",
+            "#1AB775",
           ]
         }
         onRefresh={[Function]}
@@ -1024,11 +1412,10 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
     }
     refreshing={false}
     renderItem={[Function]}
-    scrollEventThrottle={50}
+    scrollEventThrottle={16}
     stickyHeaderIndices={Array []}
     style={
       Object {
-        "backgroundColor": "#FFFFFF",
         "flex": 1,
         "position": "relative",
       }
@@ -1044,14 +1431,17 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
       >
         <View
           style={
-            Object {
-              "alignItems": "center",
-              "backgroundColor": "#FFFFFF",
-              "flexDirection": "row",
-              "justifyContent": "space-between",
-              "paddingHorizontal": 16,
-              "paddingVertical": 8,
-            }
+            Array [
+              Object {
+                "alignItems": "center",
+                "backgroundColor": "#FFFFFF",
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "paddingHorizontal": 16,
+                "paddingVertical": 8,
+              },
+              undefined,
+            ]
           }
         >
           <Text
@@ -1106,10 +1496,14 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
     >
       <View
         style={
-          Object {
-            "borderRadius": 100,
-            "overflow": "hidden",
-          }
+          Array [
+            Object {
+              "overflow": "hidden",
+            },
+            Object {
+              "borderRadius": 100,
+            },
+          ]
         }
       >
         <View
@@ -1132,10 +1526,11 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
             Object {
               "alignItems": "center",
               "backgroundColor": "#1AB775",
-              "height": 40,
+              "height": 48,
               "justifyContent": "center",
-              "minWidth": 98,
-              "paddingHorizontal": 16,
+              "minWidth": 120,
+              "opacity": undefined,
+              "paddingHorizontal": 24,
               "paddingVertical": 5,
             }
           }
@@ -1176,10 +1571,14 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
     >
       <View
         style={
-          Object {
-            "borderRadius": 100,
-            "overflow": "hidden",
-          }
+          Array [
+            Object {
+              "overflow": "hidden",
+            },
+            Object {
+              "borderRadius": 100,
+            },
+          ]
         }
       >
         <View
@@ -1202,10 +1601,11 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
             Object {
               "alignItems": "center",
               "backgroundColor": "#1AB775",
-              "height": 40,
+              "height": 48,
               "justifyContent": "center",
-              "minWidth": 98,
-              "paddingHorizontal": 16,
+              "minWidth": 120,
+              "opacity": undefined,
+              "paddingHorizontal": 24,
               "paddingVertical": 5,
             }
           }
@@ -1290,5 +1690,205 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
       </svg>
     </View>
   </View>
-</SafeAreaView>
+  <Modal
+    animationType="none"
+    hardwareAccelerated={false}
+    hideModalContentWhileAnimating={false}
+    onModalHide={[Function]}
+    onModalWillHide={[Function]}
+    onModalWillShow={[Function]}
+    onRequestClose={[Function]}
+    scrollHorizontal={false}
+    scrollOffset={0}
+    scrollOffsetMax={0}
+    scrollTo={null}
+    statusBarTranslucent={true}
+    supportedOrientations={
+      Array [
+        "portrait",
+        "landscape",
+      ]
+    }
+    swipeThreshold={100}
+    transparent={true}
+    visible={false}
+  >
+    <View
+      accessible={true}
+      focusable={true}
+      forwardedRef={[Function]}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "backgroundColor": "black",
+          "bottom": 0,
+          "height": 1334,
+          "left": 0,
+          "opacity": 0,
+          "position": "absolute",
+          "right": 0,
+          "top": 0,
+          "width": 750,
+        }
+      }
+    />
+    <View
+      forwardedRef={[Function]}
+      hideModalContentWhileAnimating={false}
+      onModalHide={[Function]}
+      onModalWillHide={[Function]}
+      onModalWillShow={[Function]}
+      pointerEvents="box-none"
+      scrollHorizontal={false}
+      scrollOffset={0}
+      scrollOffsetMax={0}
+      scrollTo={null}
+      statusBarTranslucent={true}
+      style={
+        Object {
+          "flex": 1,
+          "justifyContent": "center",
+          "margin": 37.5,
+          "transform": Array [
+            Object {
+              "translateY": 0,
+            },
+          ],
+        }
+      }
+      supportedOrientations={
+        Array [
+          "portrait",
+          "landscape",
+        ]
+      }
+      swipeThreshold={100}
+    >
+      <RNCSafeAreaView>
+        <View
+          style={
+            Array [
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "padding": 16,
+              },
+              Object {
+                "borderRadius": 8,
+              },
+              Object {
+                "elevation": 12,
+                "shadowColor": "rgba(156, 164, 169, 0.4)",
+                "shadowOffset": Object {
+                  "height": 2,
+                  "width": 0,
+                },
+                "shadowOpacity": 1,
+                "shadowRadius": 12,
+              },
+              Array [
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "maxHeight": "100%",
+                  "padding": 24,
+                },
+                undefined,
+              ],
+            ]
+          }
+        >
+          <RCTScrollView
+            contentContainerStyle={
+              Object {
+                "alignItems": "center",
+              }
+            }
+          >
+            <View>
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Jost-Medium",
+                    "fontSize": 22,
+                    "lineHeight": 28,
+                    "marginBottom": 12,
+                    "textAlign": "center",
+                  }
+                }
+              >
+                Migrate to new Address
+              </Text>
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                    "marginBottom": 24,
+                    "textAlign": "center",
+                  }
+                }
+              >
+                Due to a developer configuration error, you will need to migrate your account to a new address, which will include verifying again. You can keep your seed phrase. Do not close the app during migration. Please post on slack if you have questions.
+              </Text>
+            </View>
+          </RCTScrollView>
+          <View
+            style={
+              Object {
+                "flexDirection": "row",
+                "flexWrap": "wrap",
+                "justifyContent": "space-around",
+                "maxWidth": "100%",
+              }
+            }
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#1AB775",
+                      "fontFamily": "Inter-SemiBold",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    },
+                    Object {
+                      "paddingTop": 16,
+                    },
+                  ]
+                }
+              >
+                Migrate
+              </Text>
+            </View>
+          </View>
+        </View>
+      </RNCSafeAreaView>
+    </View>
+  </Modal>
+</RNCSafeAreaView>
 `;

@@ -10,9 +10,9 @@ interface Props {
 
 export default class Search extends React.PureComponent<Props> {
   static defaultProps = {
-    width: 18,
-    height: 18,
-    color: colors.darkSecondary,
+    width: 14,
+    height: 14,
+    color: colors.gray5,
   }
 
   render() {

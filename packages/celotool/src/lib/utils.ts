@@ -94,5 +94,5 @@ export async function retryCmd(
       await sleep(sleepTimeInMs)
     }
   }
-  return null
+  throw Error(`Retried ${numAttempts} without any successes`)
 }

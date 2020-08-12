@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
-import * as renderer from 'react-test-renderer'
 import { DAYS_TO_BACKUP } from 'src/backup/utils'
 import NotificationBox from 'src/home/NotificationBox'
 import { createMockStore, getElementText } from 'test/utils'
@@ -15,10 +14,11 @@ const storeDataNotificationsEnabled = {
   goldToken: { educationCompleted: false },
   account: {
     backupCompleted: false,
-    dismissedEarnRewards: false,
     dismissedInviteFriends: false,
     dismissedGetVerified: false,
     accountCreationTime: EXPIRED_BACKUP_TIME,
+  },
+  paymentRequest: {
     incomingPaymentRequests: mockPaymentRequests.slice(0, 2),
   },
 }
@@ -27,10 +27,11 @@ const storeDataNotificationsDisabled = {
   goldToken: { educationCompleted: true },
   account: {
     backupCompleted: true,
-    dismissedEarnRewards: true,
     dismissedInviteFriends: true,
     dismissedGetVerified: true,
     accountCreationTime: RECENT_BACKUP_TIME,
+  },
+  paymentRequest: {
     incomingPaymentRequests: [],
   },
 }
@@ -40,7 +41,7 @@ describe('NotificationBox', () => {
     const store = createMockStore({
       ...storeDataNotificationsEnabled,
     })
-    const tree = renderer.create(
+    const tree = render(
       <Provider store={store}>
         <NotificationBox />
       </Provider>
@@ -70,7 +71,6 @@ describe('NotificationBox', () => {
       goldToken: { educationCompleted: false },
       account: {
         ...storeDataNotificationsDisabled.account,
-        dismissedEarnRewards: false,
         dismissedInviteFriends: false,
       },
     })
@@ -80,7 +80,8 @@ describe('NotificationBox', () => {
       </Provider>
     )
     expect(getByText('exchangeFlow9:whatIsGold')).toBeTruthy()
-    expect(getByText('inviteFlow11:inviteAnyone')).toBeTruthy()
+    // Functionality disabled for now
+    // expect(getByText('inviteFlow11:inviteAnyone')).toBeTruthy()
   })
 
   it('renders incoming payment request when they exist', () => {
@@ -88,6 +89,8 @@ describe('NotificationBox', () => {
       ...storeDataNotificationsDisabled,
       account: {
         ...storeDataNotificationsDisabled.account,
+      },
+      paymentRequest: {
         incomingPaymentRequests: [mockPaymentRequests[0]],
       },
     })
@@ -110,6 +113,8 @@ describe('NotificationBox', () => {
       ...storeDataNotificationsDisabled,
       account: {
         ...storeDataNotificationsDisabled.account,
+      },
+      paymentRequest: {
         incomingPaymentRequests: mockPaymentRequests,
       },
     })
@@ -126,6 +131,8 @@ describe('NotificationBox', () => {
       ...storeDataNotificationsDisabled,
       account: {
         ...storeDataNotificationsDisabled.account,
+      },
+      paymentRequest: {
         outgoingPaymentRequests: mockPaymentRequests,
       },
     })
@@ -142,6 +149,8 @@ describe('NotificationBox', () => {
       ...storeDataNotificationsDisabled,
       account: {
         ...storeDataNotificationsDisabled.account,
+      },
+      paymentRequest: {
         outgoingPaymentRequests: [mockPaymentRequests[0]],
       },
     })

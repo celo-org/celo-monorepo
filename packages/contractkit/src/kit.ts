@@ -80,10 +80,9 @@ export interface KitOptions {
 }
 
 interface AccountBalance {
-  gold: BigNumber
-  usd: BigNumber
-  total: BigNumber
-  lockedGold: BigNumber
+  CELO: BigNumber
+  cUSD: BigNumber
+  lockedCELO: BigNumber
   pending: BigNumber
 }
 
@@ -114,28 +113,23 @@ export class ContractKit {
   }
 
   async getTotalBalance(address: string): Promise<AccountBalance> {
-    const goldToken = await this.contracts.getGoldToken()
+    const celoToken = await this.contracts.getGoldToken()
     const stableToken = await this.contracts.getStableToken()
-    const lockedGold = await this.contracts.getLockedGold()
-    const exchange = await this.contracts.getExchange()
-    const goldBalance = await goldToken.balanceOf(address)
-    const lockedBalance = await lockedGold.getAccountTotalLockedGold(address)
+    const lockedCelo = await this.contracts.getLockedGold()
+    const goldBalance = await celoToken.balanceOf(address)
+    const lockedBalance = await lockedCelo.getAccountTotalLockedGold(address)
     const dollarBalance = await stableToken.balanceOf(address)
-    const converted = await exchange.quoteUsdSell(dollarBalance)
     let pending = new BigNumber(0)
     try {
-      pending = await lockedGold.getPendingWithdrawalsTotalValue(address)
+      pending = await lockedCelo.getPendingWithdrawalsTotalValue(address)
     } catch (err) {
       // Just means that it's not an account
     }
+
     return {
-      gold: goldBalance,
-      lockedGold: lockedBalance,
-      usd: dollarBalance,
-      total: goldBalance
-        .plus(lockedBalance)
-        .plus(converted)
-        .plus(pending),
+      CELO: goldBalance,
+      lockedCELO: lockedBalance,
+      cUSD: dollarBalance,
       pending,
     }
   }
@@ -190,7 +184,7 @@ export class ContractKit {
 
   /**
    * Set CeloToken to use to pay for gas fees
-   * @param token cUSD (StableToken) or cGLD (GoldToken)
+   * @param token cUSD (StableToken) or CELO (GoldToken)
    */
   async setFeeCurrency(token: CeloToken): Promise<void> {
     this.config.feeCurrency =
@@ -238,7 +232,7 @@ export class ContractKit {
    * Set the ERC20 address for the token to use to pay for transaction fees.
    * The ERC20 must be whitelisted for gas.
    *
-   * Set to `null` to use cGLD
+   * Set to `null` to use CELO
    *
    * @param address ERC20 address
    */
@@ -351,31 +345,35 @@ export class ContractKit {
     }
   }
 
-  async getFirstBlockNumberForEpoch(epochNumber: number): Promise<number> {
+  async getEpochSize(): Promise<number> {
     const validators = await this.contracts.getValidators()
     const epochSize = await validators.getEpochSize()
+
+    return epochSize.toNumber()
+  }
+
+  async getFirstBlockNumberForEpoch(epochNumber: number): Promise<number> {
+    const epochSize = await this.getEpochSize()
     // Follows GetEpochFirstBlockNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
     if (epochNumber === 0) {
       // No first block for epoch 0
       return 0
     }
-    return (epochNumber - 1) * epochSize.toNumber() + 1
+    return (epochNumber - 1) * epochSize + 1
   }
 
   async getLastBlockNumberForEpoch(epochNumber: number): Promise<number> {
-    const validators = await this.contracts.getValidators()
-    const epochSize = await validators.getEpochSize()
+    const epochSize = await this.getEpochSize()
     // Follows GetEpochLastBlockNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
     if (epochNumber === 0) {
       return 0
     }
     const firstBlockNumberForEpoch = await this.getFirstBlockNumberForEpoch(epochNumber)
-    return firstBlockNumberForEpoch + (epochSize.toNumber() - 1)
+    return firstBlockNumberForEpoch + (epochSize - 1)
   }
 
   async getEpochNumberOfBlock(blockNumber: number): Promise<number> {
-    const validators = await this.contracts.getValidators()
-    const epochSize = (await validators.getEpochSize()).toNumber()
+    const epochSize = await this.getEpochSize()
     // Follows GetEpochNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
     const epochNumber = Math.floor(blockNumber / epochSize)
     if (blockNumber % epochSize === 0) {

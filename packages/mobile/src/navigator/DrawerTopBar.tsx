@@ -1,48 +1,65 @@
-import colorsV2 from '@celo/react-components/styles/colors.v2'
-import { elevationShadowStyle } from '@celo/react-components/styles/styles'
+import colors from '@celo/react-components/styles/colors'
+import { iconHitslop } from '@celo/react-components/styles/variables'
 import { useNavigation } from '@react-navigation/native'
 import * as React from 'react'
-import { StyleSheet, TouchableOpacity, View } from 'react-native'
-import Logo from 'src/icons/Logo.v2'
-import Hamburger from 'src/navigator/Hamburger'
+import { processColor, StyleSheet, TouchableOpacity } from 'react-native'
+import Animated, { cond, greaterThan } from 'react-native-reanimated'
+import Hamburger from 'src/icons/Hamburger'
 
-const DrawerTopBar = () => {
+interface Props {
+  middleElement?: React.ReactNode
+  scrollPosition?: Animated.Value<number>
+  testID?: string
+}
+
+function DrawerTopBar({ middleElement, scrollPosition, testID }: Props) {
   const navigation = useNavigation()
+  const viewStyle = React.useMemo(
+    () => ({
+      ...styles.container,
+      borderBottomWidth: 1,
+      borderBottomColor: cond(
+        greaterThan(scrollPosition ?? new Animated.Value(0), 0),
+        processColor(colors.gray2),
+        processColor('transparent')
+      ),
+    }),
+    [scrollPosition]
+  )
 
   return (
-    <View style={styles.container}>
-      {/*
-      // @ts-ignore Only used in a drawer */}
-      <TouchableOpacity style={styles.hamburger} onPress={navigation.toggleDrawer}>
+    <Animated.View testID={testID} style={viewStyle}>
+      <TouchableOpacity
+        style={styles.hamburger}
+        // @ts-ignore Only used in a drawer
+        onPress={navigation.toggleDrawer}
+        hitSlop={iconHitslop}
+      >
         <Hamburger />
       </TouchableOpacity>
-      <View style={styles.logo}>
-        <Logo />
-      </View>
-      <View style={styles.spacer} />
-    </View>
+      {middleElement}
+    </Animated.View>
   )
+}
+
+DrawerTopBar.defaultProps = {
+  showLogo: true,
 }
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    height: 62,
-    backgroundColor: colorsV2.white,
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-    ...elevationShadowStyle(1),
+    backgroundColor: 'transparent',
+    height: 56,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   hamburger: {
-    padding: 8,
-    marginLeft: 4,
+    position: 'absolute',
+    left: 0,
+    padding: 0,
+    marginLeft: 16,
     marginBottom: 0,
-  },
-  logo: {
-    marginBottom: 13,
-  },
-  spacer: {
-    width: 45,
   },
 })
 
