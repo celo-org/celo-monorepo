@@ -5,6 +5,8 @@ enum LockEvent {
 }
 
 // Lock which can be used to ensure mutual exclusion in concurrent code.
+//
+// This lock is non-reentrant, and attempting to acquire it while holding the lock will result in a deadlock.
 export class Lock {
   private locked: boolean = false
   private emitter: EventEmitter
@@ -14,7 +16,6 @@ export class Lock {
   }
 
   // Attempt to aquire the lock without blocking.
-  //
   // @returns {boolean} True if the lock was aquired.
   tryAcquire(): boolean {
     if (!this.locked) {
@@ -45,6 +46,7 @@ export class Lock {
   }
 
   // Release the lock such that another caller can aquire it.
+  // If not locked, calling this method has no effect.
   release() {
     if (this.locked) {
       this.locked = false
