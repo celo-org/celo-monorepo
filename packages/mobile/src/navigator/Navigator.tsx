@@ -187,6 +187,11 @@ const pincodeSetScreenOptions = ({
 const nuxScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen
+      name={Screens.Language}
+      component={Language}
+      options={Language.navigationOptions}
+    />
+    <Navigator.Screen
       name={Screens.OnboardingEducationScreen}
       component={OnboardingEducationScreen}
       options={OnboardingEducationScreen.navigationOptions}
@@ -456,6 +461,7 @@ type InitialRouteName = ExtractProps<typeof Stack.Navigator>['initialRouteName']
 
 export function MainStackScreen() {
   const [initialRouteName, setInitialRoute] = React.useState<InitialRouteName>(undefined)
+
   React.useEffect(() => {
     const {
       choseToRestoreAccount,
