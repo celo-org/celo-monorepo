@@ -19,11 +19,8 @@ import { sessionIdSelector } from 'src/app/selectors'
 import { CELO_SUPPORT_EMAIL_ADDRESS, DEFAULT_TESTNET } from 'src/config'
 import { Namespaces } from 'src/i18n'
 import { navigateBack } from 'src/navigator/NavigationService'
-import { store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
-
-const TAG = 'SupportContact'
 
 interface Email {
   subject: string
@@ -67,8 +64,6 @@ function SupportContact() {
   const currentAccount = useSelector(currentAccountSelector)
   const sessionId = useSelector(sessionIdSelector)
   const dispatch = useDispatch()
-
-  Logger.debug(`${TAG}@reduxStore: `, JSON.stringify(store.getState()))
 
   const navigateBackAndToast = () => {
     navigateBack()
