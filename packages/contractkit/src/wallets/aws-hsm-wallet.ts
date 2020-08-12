@@ -1,13 +1,16 @@
 import { Address } from '@celo/utils/lib/address'
 import { KMS } from 'aws-sdk'
 import { BigNumber } from 'bignumber.js'
+import debugFactory from 'debug'
 import { publicKeyFromAsn1 } from '../utils/ber-utils'
 import { bigNumberToBuffer, bufferToBigNumber } from '../utils/signature-utils'
-import { getAddressFromPublicKey, publicKeyPrefix } from '../utils/signing-utils'
+import { getAddressFromPublicKey, publicKeyPrefix, sixtyFour } from '../utils/signing-utils'
 import { RemoteWallet } from './remote-wallet'
 import AwsHsmSigner from './signers/aws-hsm-signer'
 import { Signer } from './signers/signer'
 import { Wallet } from './wallet'
+
+const debug = debugFactory('kit:wallet:aws-hsm-wallet')
 
 const defaultCredentials: KMS.ClientConfiguration = {
   region: 'eu-central-1',
@@ -52,6 +55,8 @@ export default class AwsHsmWallet extends RemoteWallet implements Wallet {
         // Safely ignore non-secp256k1 keys
         if (!e.name || e.name !== 'UnsupportedOperationException') {
           throw e
+        } else {
+          debug(`Ignoring non-secp256k1 key ${KeyId}`)
         }
       }
     }
@@ -68,7 +73,7 @@ export default class AwsHsmWallet extends RemoteWallet implements Wallet {
     }
     const { PublicKey } = await this.kms.getPublicKey({ KeyId: keyId }).promise()
     const pubKey = publicKeyFromAsn1(Buffer.from(PublicKey as Uint8Array))
-    const pkbuff = bigNumberToBuffer(pubKey, 64)
+    const pkbuff = bigNumberToBuffer(pubKey, sixtyFour)
     const pubKeyPrefix = Buffer.from(new Uint8Array([publicKeyPrefix]))
     const rawPublicKey = Buffer.concat([pubKeyPrefix, pkbuff])
     return bufferToBigNumber(rawPublicKey)

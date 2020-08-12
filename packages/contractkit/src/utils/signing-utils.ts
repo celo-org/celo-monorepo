@@ -19,6 +19,8 @@ const debug = debugFactory('kit:tx:sign')
 // 0x04 prefix indicates that the key is not compressed
 // https://tools.ietf.org/html/rfc5480#section-2.2
 export const publicKeyPrefix: number = 0x04
+export const sixtyFour: number = 64
+export const thirtyTwo: number = 32
 
 function isNullOrUndefined(value: any): boolean {
   return value === null || value === undefined
