@@ -1,4 +1,5 @@
 import { Response } from 'node-fetch'
+import { REQUEST_EXPIRY_WINDOW_MS } from '../../common/src/utils/constants'
 import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
 import { authenticateUser, isVerified } from '../src/common/identity'
 import { VERSION } from '../src/config'
@@ -56,11 +57,13 @@ describe(`POST /getDistributedBlindedSalt endpoint`, () => {
     const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
     const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
     const mockHeader = 'fdsfdsfs'
+    const timestamp = Date.now()
 
     const mockRequestData = {
       blindedQueryPhoneNumber,
       hashedPhoneNumber,
       account,
+      timestamp,
     }
     const req = {
       body: mockRequestData,
@@ -100,11 +103,13 @@ describe(`POST /getDistributedBlindedSalt endpoint`, () => {
       const blindedQueryPhoneNumber = '+5555555555'
       const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
       const account = 'd31509C31d654056A45185ECb6'
+      const timestamp = Date.now()
 
       const mockRequestData = {
         blindedQueryPhoneNumber,
         hashedPhoneNumber,
         account,
+        timestamp,
       }
       const req = { body: mockRequestData }
 
@@ -123,11 +128,13 @@ describe(`POST /getDistributedBlindedSalt endpoint`, () => {
       const hashedPhoneNumber = '+1234567890'
       const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
       const mockHeader = 'fdsfdsfs'
+      const timestamp = Date.now()
 
       const mockRequestData = {
         blindedQueryPhoneNumber,
         hashedPhoneNumber,
         account,
+        timestamp,
       }
       const req = {
         body: mockRequestData,
@@ -145,6 +152,36 @@ describe(`POST /getDistributedBlindedSalt endpoint`, () => {
       }
       // @ts-ignore TODO fix req type to make it a mock express req
       await getDistributedBlindedSalt(req, res)
+    })
+    it('expired timestamp returns 400', () => {
+      const blindedQueryPhoneNumber = '+5555555555'
+      const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
+      const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
+      const mockHeader = 'fdsfdsfs'
+      const timestamp = Date.now() - REQUEST_EXPIRY_WINDOW_MS
+
+      const mockRequestData = {
+        blindedQueryPhoneNumber,
+        hashedPhoneNumber,
+        account,
+        timestamp,
+      }
+      const req = {
+        body: mockRequestData,
+        headers: {
+          authorization: mockHeader,
+        },
+      }
+
+      const res = {
+        status: (status: any) => {
+          expect(status).toEqual(400)
+          // tslint:disable-next-line: no-empty
+          return { json: () => {} }
+        },
+      }
+      // @ts-ignore TODO fix req type to make it a mock express req
+      getDistributedBlindedSalt(req, res)
     })
   })
 })
