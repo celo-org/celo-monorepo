@@ -21,18 +21,18 @@ import { getKeyProvider } from '../key-management/key-provider'
 import { getBlockNumber } from '../web3/contracts'
 import { getRemainingQueryCount } from './query-quota'
 
-export interface GetBlindedMessageForSaltRequest {
+export interface GetBlindedMessagePartialSigRequest {
   account: string
   blindedQueryPhoneNumber: string
   hashedPhoneNumber?: string
   timestamp?: number
 }
 
-export async function handleGetBlindedMessageForSalt(
-  request: Request<{}, {}, GetBlindedMessageForSaltRequest>,
+export async function handleGetBlindedMessagePartialSig(
+  request: Request<{}, {}, GetBlindedMessagePartialSigRequest>,
   response: Response
 ) {
-  logger.info('Begin getBlindedSalt request')
+  logger.info('Begin handleGetBlindedMessagePartialSig request')
   try {
     if (!isValidGetSignatureInput(request.body)) {
       respondWithError(response, 400, WarningMessage.INVALID_INPUT)
@@ -86,9 +86,9 @@ export async function handleGetBlindedMessageForSalt(
       await incrementQueryCount(account)
       await storeRequest(request.body)
     } else {
-      logger.debug('Salt request already exists in db. Leaving quota unchanged.')
+      logger.debug('Signature request already exists in db. Leaving quota unchanged.')
     }
-    logger.debug('Salt retrieval success')
+    logger.debug('Signature retrieval success')
 
     let signMessageResponse: SignMessageResponse
     const signMessageResponseSuccess: SignMessageResponse = {
@@ -108,12 +108,12 @@ export async function handleGetBlindedMessageForSalt(
     }
     response.json(signMessageResponse)
   } catch (error) {
-    logger.error('Failed to getSalt', error)
+    logger.error('Failed to get signature', error)
     respondWithError(response, 500, ErrorMessage.UNKNOWN_ERROR)
   }
 }
 
-function isValidGetSignatureInput(requestBody: GetBlindedMessageForSaltRequest): boolean {
+function isValidGetSignatureInput(requestBody: GetBlindedMessagePartialSigRequest): boolean {
   return (
     hasValidAccountParam(requestBody) &&
     hasValidQueryPhoneNumberParam(requestBody) &&
