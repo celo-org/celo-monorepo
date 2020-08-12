@@ -1,5 +1,5 @@
 import { isValidAddress, trimLeading0x } from '@celo/utils/lib/address'
-import { REASONABLE_BODY_CHAR_LIMIT } from './constants'
+import { REASONABLE_BODY_CHAR_LIMIT, REQUEST_EXPIRY_WINDOW_MS } from './constants'
 
 export function hasValidAccountParam(requestBody: any): boolean {
   return requestBody.account && isValidAddress(requestBody.account)
@@ -23,6 +23,15 @@ export function hasValidQueryPhoneNumberParam(requestBody: any): boolean {
 
 export function hasValidPhoneNumberHash(requestBody: any): boolean {
   return requestBody.hashedPhoneNumber && isByte32(requestBody.hashedPhoneNumber)
+}
+
+export function hasValidTimestamp(requestBody: any): boolean {
+  // TODO(Alec): make timestamp required
+  return (
+    !requestBody.timestamp ||
+    (typeof requestBody.timestamp === 'number' &&
+      requestBody.timestamp > Date.now() - REQUEST_EXPIRY_WINDOW_MS)
+  )
 }
 
 export function phoneNumberHashIsValidIfExists(requestBody: any): boolean {

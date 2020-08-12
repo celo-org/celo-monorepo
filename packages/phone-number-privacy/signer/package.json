@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@celo/contractkit": "0.4.5",
-    "@celo/phone-number-privacy-common": "1.0.5",
+    "@celo/phone-number-privacy-common": "1.0.6",
     "@celo/utils": "0.1.13",
     "@google-cloud/secret-manager": "3.0.0",
     "@types/elliptic": "^6.4.12",

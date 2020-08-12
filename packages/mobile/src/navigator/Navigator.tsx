@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import { RouteProp } from '@react-navigation/core'
 import { createStackNavigator, StackScreenProps, TransitionPresets } from '@react-navigation/stack'
 import * as React from 'react'
@@ -186,6 +186,11 @@ const pincodeSetScreenOptions = ({
 
 const nuxScreens = (Navigator: typeof Stack) => (
   <>
+    <Navigator.Screen
+      name={Screens.Language}
+      component={Language}
+      options={Language.navigationOptions}
+    />
     <Navigator.Screen
       name={Screens.OnboardingEducationScreen}
       component={OnboardingEducationScreen}
@@ -456,6 +461,7 @@ type InitialRouteName = ExtractProps<typeof Stack.Navigator>['initialRouteName']
 
 export function MainStackScreen() {
   const [initialRouteName, setInitialRoute] = React.useState<InitialRouteName>(undefined)
+
   React.useEffect(() => {
     const {
       choseToRestoreAccount,

@@ -12,6 +12,7 @@ import BigNumber from 'bignumber.js'
 import { Transaction } from 'web3-eth'
 import { Address } from '../base'
 import { Governance } from '../generated/Governance'
+import { zeroRange } from '../utils/array'
 import {
   BaseWrapper,
   bufferToSolidityBytes,
@@ -336,7 +337,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    */
   async getProposal(proposalID: BigNumber.Value): Promise<Proposal> {
     const metadata = await this.getProposalMetadata(proposalID)
-    const txIndices = Array.from(Array(metadata.transactionCount).keys())
+    const txIndices = zeroRange(metadata.transactionCount)
     return concurrentMap(4, txIndices, (idx) => this.getProposalTransaction(proposalID, idx))
   }
 

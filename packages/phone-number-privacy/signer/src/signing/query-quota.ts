@@ -1,10 +1,65 @@
+import {
+  ErrorMessage,
+  hasValidAccountParam,
+  isBodyReasonablySized,
+  phoneNumberHashIsValidIfExists,
+  RETRY_COUNT,
+  RETRY_DELAY_IN_MS,
+  WarningMessage,
+} from '@celo/phone-number-privacy-common'
 import { retryAsyncWithBackOff } from '@celo/utils/lib/async'
 import { BigNumber } from 'bignumber.js'
-import { RETRY_COUNT, RETRY_DELAY_IN_MS } from '../common/constants'
+import { Request, Response } from 'express'
+import { respondWithError } from '../common/error-utils'
+import { authenticateUser } from '../common/identity'
 import logger from '../common/logger'
-import config from '../config'
+import config, { getVersion } from '../config'
 import { getPerformedQueryCount } from '../database/wrappers/account'
 import { getContractKit, isVerified } from '../web3/contracts'
+
+export interface GetQuotaRequest {
+  account: string
+  hashedPhoneNumber?: string
+}
+
+export async function handleGetQuota(
+  request: Request<{}, {}, GetQuotaRequest>,
+  response: Response
+) {
+  logger.info('Begin getQuota request')
+  try {
+    if (!isValidGetQuotaInput(request.body)) {
+      respondWithError(response, 400, WarningMessage.INVALID_INPUT)
+      return
+    }
+    if (!(await authenticateUser(request))) {
+      respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER)
+      return
+    }
+
+    const { account, hashedPhoneNumber } = request.body
+
+    const queryCount = await getRemainingQueryCount(account, hashedPhoneNumber)
+
+    response.status(200).json({
+      success: true,
+      version: getVersion(),
+      performedQueryCount: queryCount.performedQueryCount,
+      totalQuota: queryCount.totalQuota,
+    })
+  } catch (error) {
+    logger.error('Failed to get user quota', error)
+    respondWithError(response, 500, ErrorMessage.DATABASE_GET_FAILURE)
+  }
+}
+
+function isValidGetQuotaInput(requestBody: GetQuotaRequest): boolean {
+  return (
+    hasValidAccountParam(requestBody) &&
+    phoneNumberHashIsValidIfExists(requestBody) &&
+    isBodyReasonablySized(requestBody)
+  )
+}
 
 /*
  * Returns the number of queries already performed and the calculated query quota.

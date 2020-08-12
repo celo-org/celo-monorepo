@@ -5,7 +5,7 @@ exports[`renders bubble text 1`] = `
   style={
     Object {
       "alignItems": "center",
-      "backgroundColor": "#F8F8F8",
+      "backgroundColor": "#F8F9F9",
       "display": "flex",
       "flexDirection": "row",
       "height": 36,
@@ -36,7 +36,7 @@ exports[`renders bubble text 1`] = `
         },
         Object {
           "alignItems": "center",
-          "backgroundColor": "#3C9BF4",
+          "backgroundColor": "#0768AE",
           "borderRadius": 10,
           "flexDirection": "row",
           "height": 20,
@@ -59,7 +59,7 @@ exports[`renders text 1`] = `
   style={
     Object {
       "alignItems": "center",
-      "backgroundColor": "#F8F8F8",
+      "backgroundColor": "#F8F9F9",
       "display": "flex",
       "flexDirection": "row",
       "height": 36,
