@@ -8,8 +8,8 @@ import config from '../../src/config'
 
 require('dotenv').config()
 
-const PHONE_NUM_PRIVACY_SERVICE = process.env.PHONE_NUM_PRIVACY_SIGNER_SERVICE_URL
-const SIGN_MESSAGE_ENDPOINT = '/getBlindedSalt'
+const ODIS_SIGNER = process.env.ODIS_SIGNER_SERVICE_URL
+const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessagePartialSig'
 const GET_QUOTA_ENDPOINT = '/getQuota'
 
 const PRIVATE_KEY1 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
@@ -29,7 +29,7 @@ jest.setTimeout(15000)
 describe('Running against a deployed service', () => {
   describe('Returns status 400 with invalid input', () => {
     it('With invalid address', async () => {
-      const response = await postToSignGetSaltMessage(
+      const response = await postToSignMessage(
         BLINDED_PHONE_NUMBER,
         PRIVATE_KEY1,
         '0x1234',
@@ -40,18 +40,13 @@ describe('Running against a deployed service', () => {
     })
 
     it('With missing blindedQueryPhoneNumber', async () => {
-      const response = await postToSignGetSaltMessage(
-        '',
-        PRIVATE_KEY1,
-        ACCOUNT_ADDRESS1,
-        Date.now()
-      )
+      const response = await postToSignMessage('', PRIVATE_KEY1, ACCOUNT_ADDRESS1, Date.now())
       expect(response.status).toBe(400)
     })
 
     xit('With invalid blindedQueryPhoneNumber', async () => {
       // TODO: update input-validation.ts to detect invalid blindedQueryPhoneNumber
-      const response = await postToSignGetSaltMessage(
+      const response = await postToSignMessage(
         'invalid',
         PRIVATE_KEY1,
         ACCOUNT_ADDRESS1,
@@ -63,7 +58,7 @@ describe('Running against a deployed service', () => {
 
   describe('Returns status 401 with invalid authentication headers', () => {
     it('With invalid auth header', async () => {
-      const response = await postToSignGetSaltMessage(
+      const response = await postToSignMessage(
         BLINDED_PHONE_NUMBER,
         PRIVATE_KEY1,
         ACCOUNT_ADDRESS1,
@@ -85,7 +80,7 @@ describe('Running against a deployed service', () => {
       const signature = signMessage(JSON.stringify(body), PRIVATE_KEY2, ACCOUNT_ADDRESS2)
       const authHeader = serializeSignature(signature)
 
-      const response = await postToSignGetSaltMessage(
+      const response = await postToSignMessage(
         BLINDED_PHONE_NUMBER,
         PRIVATE_KEY1,
         ACCOUNT_ADDRESS1,
@@ -96,18 +91,13 @@ describe('Running against a deployed service', () => {
     })
 
     it('With missing blindedQueryPhoneNumber', async () => {
-      const response = await postToSignGetSaltMessage(
-        '',
-        PRIVATE_KEY1,
-        ACCOUNT_ADDRESS1,
-        Date.now()
-      )
+      const response = await postToSignMessage('', PRIVATE_KEY1, ACCOUNT_ADDRESS1, Date.now())
       expect(response.status).toBe(400)
     })
   })
 
-  it('Address salt querying out of quota', async () => {
-    const response = await postToSignGetSaltMessage(
+  it('Returns error when querying out of quota', async () => {
+    const response = await postToSignMessage(
       BLINDED_PHONE_NUMBER,
       PRIVATE_KEY1,
       ACCOUNT_ADDRESS1,
@@ -126,9 +116,9 @@ describe('Running against a deployed service', () => {
       timestamp = Date.now()
     })
 
-    it('Address salt querying succeeds with unused request', async () => {
+    it('Returns sig when querying succeeds with unused request', async () => {
       await replenishQuota(ACCOUNT_ADDRESS2, PRIVATE_KEY2, DEFAULT_FORNO_URL)
-      const response = await postToSignGetSaltMessage(
+      const response = await postToSignMessage(
         BLINDED_PHONE_NUMBER,
         PRIVATE_KEY2,
         ACCOUNT_ADDRESS2,
@@ -137,14 +127,14 @@ describe('Running against a deployed service', () => {
       expect(response.status).toBe(200)
     })
 
-    it('Address salt querying with unused request increments query count', async () => {
+    it('Returns count when querying with unused request increments query count', async () => {
       const queryCount = await getQuota(PRIVATE_KEY2, ACCOUNT_ADDRESS2, IDENTIFIER)
       expect(queryCount).toEqual(initialQueryCount + 1)
     })
 
-    it('Address salt querying succeeds with used request', async () => {
+    it('Returns count when querying succeeds with used request', async () => {
       await replenishQuota(ACCOUNT_ADDRESS2, PRIVATE_KEY2, DEFAULT_FORNO_URL)
-      const response = await postToSignGetSaltMessage(
+      const response = await postToSignMessage(
         BLINDED_PHONE_NUMBER,
         PRIVATE_KEY2,
         ACCOUNT_ADDRESS2,
@@ -153,7 +143,7 @@ describe('Running against a deployed service', () => {
       expect(response.status).toBe(200)
     })
 
-    it('Address salt querying with used request does not increment query count', async () => {
+    it('Returns count when querying with used request does not increment query count', async () => {
       const queryCount = await getQuota(PRIVATE_KEY2, ACCOUNT_ADDRESS2, IDENTIFIER)
       expect(queryCount).toEqual(initialQueryCount + 1)
     })
@@ -171,7 +161,7 @@ async function getQuota(
     hashedPhoneNumber,
   })
 
-  const res = await fetch(PHONE_NUM_PRIVACY_SERVICE + GET_QUOTA_ENDPOINT, {
+  const res = await fetch(ODIS_SIGNER + GET_QUOTA_ENDPOINT, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -184,7 +174,7 @@ async function getQuota(
   return (await res.json()).performedQueryCount
 }
 
-async function postToSignGetSaltMessage(
+async function postToSignMessage(
   base64BlindedMessage: string,
   privateKey: string,
   account: string,
@@ -198,7 +188,7 @@ async function postToSignGetSaltMessage(
     timestamp,
   })
 
-  const res = await fetch(PHONE_NUM_PRIVACY_SERVICE + SIGN_MESSAGE_ENDPOINT, {
+  const res = await fetch(ODIS_SIGNER + SIGN_MESSAGE_ENDPOINT, {
     method: 'POST',
     headers: {
       Accept: 'application/json',

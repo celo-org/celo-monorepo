@@ -8,8 +8,8 @@ import config from '../../src/config'
 
 require('dotenv').config()
 
-const PHONE_NUM_PRIVACY_SERVICE = process.env.PHONE_NUM_PRIVACY_COMBINER_SERVICE_URL
-const SIGN_MESSAGE_ENDPOINT = '/getDistributedBlindedSalt'
+const ODIS_COMBINER = process.env.ODIS_COMBINER_SERVICE_URL
+const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessageSig'
 
 const PRIVATE_KEY1 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
 const ACCOUNT_ADDRESS1 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY1))
@@ -95,7 +95,7 @@ describe('Running against a deployed service', () => {
     })
   })
 
-  it('Address salt querying out of quota', async () => {
+  it('Returns sig when querying out of quota', async () => {
     const response = await postToSignMessage(
       BLINDED_PHONE_NUMBER,
       PRIVATE_KEY1,
@@ -109,7 +109,7 @@ describe('Running against a deployed service', () => {
     // if these tests are failing, it may just be that the address needs to be fauceted:
     // celotooljs account faucet --account ACCOUNT_ADDRESS2 --dollar 1 --gold 1 -e <ENV> --verbose
     const timestamp = Date.now()
-    it('Address salt querying succeeds with unused request', async () => {
+    it('Returns sig when querying with unused request', async () => {
       await replenishQuota(ACCOUNT_ADDRESS2, PRIVATE_KEY2, DEFAULT_FORNO_URL)
       const response = await postToSignMessage(
         BLINDED_PHONE_NUMBER,
@@ -120,7 +120,7 @@ describe('Running against a deployed service', () => {
       expect(response.status).toBe(200)
     })
 
-    it('Address salt querying succeeds with used request', async () => {
+    it('Returns sig when querying with used request', async () => {
       await replenishQuota(ACCOUNT_ADDRESS2, PRIVATE_KEY2, DEFAULT_FORNO_URL)
       const response = await postToSignMessage(
         BLINDED_PHONE_NUMBER,
@@ -147,7 +147,7 @@ async function postToSignMessage(
     timestamp,
   })
 
-  const res = await fetch(PHONE_NUM_PRIVACY_SERVICE + SIGN_MESSAGE_ENDPOINT, {
+  const res = await fetch(ODIS_COMBINER + SIGN_MESSAGE_ENDPOINT, {
     method: 'POST',
     headers: {
       Accept: 'application/json',

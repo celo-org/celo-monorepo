@@ -84,18 +84,18 @@ async function getQueryQuota(account: string, hashedPhoneNumber?: string) {
     logger.debug('Account is verified')
     const transactionCount = await getTransactionCountFromAccount(account)
     return (
-      config.salt.unverifiedQueryMax +
-      config.salt.additionalVerifiedQueryMax +
-      config.salt.queryPerTransaction * transactionCount
+      config.quota.unverifiedQueryMax +
+      config.quota.additionalVerifiedQueryMax +
+      config.quota.queryPerTransaction * transactionCount
     )
   }
 
   const accountBalance = await getDollarBalance(account)
-  if (accountBalance.isGreaterThanOrEqualTo(config.salt.minDollarBalance)) {
+  if (accountBalance.isGreaterThanOrEqualTo(config.quota.minDollarBalance)) {
     logger.debug('Account is not verified but meets min balance')
     // TODO consider granting these unverified users slightly less queryPerTx
     const transactionCount = await getTransactionCountFromAccount(account)
-    return config.salt.unverifiedQueryMax + config.salt.queryPerTransaction * transactionCount
+    return config.quota.unverifiedQueryMax + config.quota.queryPerTransaction * transactionCount
   }
 
   logger.debug('Account does not meet query quota criteria')

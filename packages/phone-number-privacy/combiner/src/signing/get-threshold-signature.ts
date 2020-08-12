@@ -20,11 +20,12 @@ import { authenticateUser } from '../common/identity'
 import logger from '../common/logger'
 import config, { VERSION } from '../config'
 
+// TODO change to /getBlindedMessagePartialSig when all signers are running 1.1.0
 const PARTIAL_SIGN_MESSAGE_ENDPOINT = '/getBlindedSalt'
 
 type SignerResponse = SignMessageResponseSuccess | SignMessageResponseFailure
 
-interface GetBlindedMessageForSaltRequest {
+interface GetBlindedMessageSigRequest {
   account: string
   blindedQueryPhoneNumber: string
   hashedPhoneNumber?: string
@@ -41,8 +42,8 @@ interface SignMsgRespWithStatus {
   status: number
 }
 
-export async function handleGetDistributedBlindedMessageForSalt(
-  request: Request<{}, {}, GetBlindedMessageForSaltRequest>,
+export async function handleGetBlindedMessageSig(
+  request: Request<{}, {}, GetBlindedMessageSigRequest>,
   response: Response
 ) {
   try {
@@ -67,12 +68,12 @@ async function requestSignatures(request: Request, response: Response) {
   const errorCodes: Map<number, number> = new Map()
   const blsCryptoClient = new BLSCryptographyClient()
 
-  const signers = JSON.parse(config.pgpnpServices.signers) as SignerService[]
+  const signers = JSON.parse(config.odisServices.signers) as SignerService[]
   const signerReqs = signers.map((service) => {
     const controller = new AbortController()
     const timeout = setTimeout(() => {
       controller.abort()
-    }, config.pgpnpServices.timeoutMilliSeconds)
+    }, config.odisServices.timeoutMilliSeconds)
 
     return requestSignature(service, request, controller)
       .then(async (res: FetchResponse) => {
@@ -240,7 +241,7 @@ function getMajorityErrorCode(errorCodes: Map<number, number>) {
   return maxErrorCode > 0 ? maxErrorCode : null
 }
 
-function isValidGetSignatureInput(requestBody: GetBlindedMessageForSaltRequest): boolean {
+function isValidGetSignatureInput(requestBody: GetBlindedMessageSigRequest): boolean {
   return (
     hasValidAccountParam(requestBody) &&
     hasValidQueryPhoneNumberParam(requestBody) &&

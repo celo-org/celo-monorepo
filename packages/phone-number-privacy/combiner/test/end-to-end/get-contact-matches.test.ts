@@ -7,7 +7,7 @@ import config from '../../src/config'
 
 require('dotenv').config()
 
-const PHONE_NUM_PRIVACY_SERVICE = process.env.PHONE_NUM_PRIVACY_COMBINER_SERVICE_URL
+const ODIS_COMBINER = process.env.ODIS_COMBINER_SERVICE_URL
 const CONTACT_MATCHES_ENDPOINT = '/getContactMatches'
 
 const PRIVATE_KEY2 = 'ba360ff33f7b4536fe50970cfe5dda63f821e36348da9558c720cc8d9c240701'
@@ -21,7 +21,7 @@ const DEFAULT_FORNO_URL = config.blockchain.provider
 jest.setTimeout(15000)
 
 describe('Running against a deployed service', () => {
-  it('Address salt querying fails with account with 0 CELO', async () => {
+  it('Returns error when querying fails with account with 0 CELO', async () => {
     const response = await postToSignMessage(
       PHONE_NUMBER,
       CONTACT_PHONE_NUMBERS,
@@ -52,7 +52,7 @@ async function postToSignMessage(
     authHeader = await contractKit.web3.eth.sign(body, account)
   }
 
-  const res = await fetch(PHONE_NUM_PRIVACY_SERVICE + CONTACT_MATCHES_ENDPOINT, {
+  const res = await fetch(ODIS_COMBINER + CONTACT_MATCHES_ENDPOINT, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
