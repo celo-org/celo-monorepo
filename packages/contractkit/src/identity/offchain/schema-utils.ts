@@ -1,4 +1,4 @@
-import { publicKeyToAddress } from '@celo/utils/lib/address'
+import { ensureLeading0x, privateKeyToAddress, publicKeyToAddress } from '@celo/utils/lib/address'
 import { isLeft, isRight } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import { Address } from '../../base'
@@ -23,6 +23,7 @@ export class SingleSchema<T> {
 const EncryptedCipherText = t.type({
   publicKey: t.string,
   ciphertext: t.string,
+  encryptedKey: t.record(t.string, t.string),
 })
 
 export const readWithSchema = async <T>(
@@ -58,6 +59,35 @@ export const readWithSchema = async <T>(
     )
 
     const parseResultViaCiphertext = type.decode(JSON.parse(decryptedCiphertext.toString()))
+
+    if (isLeft(parseResultViaCiphertext)) {
+      return undefined
+    }
+
+    return parseResultViaCiphertext.right
+  }
+
+  const keyToDecryptDecryptionKey = Object.keys(
+    parseResultAsCiphertext.right.encryptedKey
+  ).find((x) => wallet.hasAccount(publicKeyToAddress(x)))
+
+  if (keyToDecryptDecryptionKey) {
+    const decryptionKeyCiphertext =
+      parseResultAsCiphertext.right.encryptedKey[keyToDecryptDecryptionKey]
+
+    const decryptionKey = await wallet.decrypt(
+      publicKeyToAddress(keyToDecryptDecryptionKey),
+      Buffer.from(decryptionKeyCiphertext, 'hex')
+    )
+
+    wrapper.kit.addAccount(ensureLeading0x(decryptionKey.toString('hex')))
+
+    const actualPlaintext = await wallet.decrypt(
+      privateKeyToAddress(ensureLeading0x(decryptionKey.toString('hex'))),
+      Buffer.from(parseResultAsCiphertext.right.ciphertext, 'hex')
+    )
+
+    const parseResultViaCiphertext = type.decode(JSON.parse(actualPlaintext.toString()))
 
     if (isLeft(parseResultViaCiphertext)) {
       return undefined

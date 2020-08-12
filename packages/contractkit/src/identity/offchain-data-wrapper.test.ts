@@ -111,16 +111,28 @@ testWithGanache('Offchain Data', (web3) => {
           kit.addAccount(readerEncryptionKeyPrivate)
         })
 
-        it("the writer can encrypt data directly to the reader's dataEncryptionKey", async () => {
+        it.only("the writer can encrypt data directly to the reader's dataEncryptionKey", async () => {
+          const newKey = ensureLeading0x(randomBytes(32).toString('hex'))
+          const newKeyPub = privateKeyToPublicKey(newKey)
+
           const testname = 'test'
           const payload = { name: testname }
           const stringifiedPayload = JSON.stringify(payload)
+
+          const keyEncrypted = Encrypt(
+            Buffer.from(trimLeading0x(readerEncryptionKeyPublic), 'hex'),
+            Buffer.from(trimLeading0x(newKey), 'hex')
+          ).toString('hex')
+
           const encryptedPayload = {
-            publicKey: readerEncryptionKeyPublic,
+            publicKey: newKeyPub,
             ciphertext: Encrypt(
-              Buffer.from(trimLeading0x(readerEncryptionKeyPublic), 'hex'),
+              Buffer.from(trimLeading0x(newKeyPub), 'hex'),
               Buffer.from(stringifiedPayload)
             ).toString('hex'),
+            encryptedKey: {
+              [readerEncryptionKeyPublic]: keyEncrypted,
+            },
           }
 
           await wrapper.writeDataTo(JSON.stringify(encryptedPayload), '/account/name')
