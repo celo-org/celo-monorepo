@@ -1,10 +1,10 @@
 import { trimLeading0x } from '@celo/utils/lib/address'
 import BN from 'bn.js'
-import { range } from 'lodash'
 import qrcode from 'qrcode'
 import querystring from 'querystring'
 import { Tx } from 'web3-core'
 import abi from 'web3-eth-abi'
+import { zeroRange } from '../utils/array'
 
 // see https://solidity.readthedocs.io/en/v0.5.3/abi-spec.html#function-selector-and-argument-encoding
 const ABI_TYPE_REGEX = '(u?int(8|16|32|64|128|256)|address|bool|bytes(4|32)?|string)(\\[\\])?'
@@ -90,7 +90,7 @@ export function buildUri(tx: Tx, functionName?: string, abiTypes: string[] = [])
     if (txData.length > 8) {
       const argsEncoded = txData.slice(8)
       const decoded = abi.decodeParameters(abiTypes, argsEncoded)
-      functionArgs = range(0, decoded.__length__).map((idx) => decoded[idx].toLowerCase())
+      functionArgs = zeroRange(decoded.__length__).map((idx) => decoded[idx].toLowerCase())
     }
   }
 

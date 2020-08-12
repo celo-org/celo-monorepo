@@ -73,7 +73,7 @@ exports[`renders correctly with giant numbers 1`] = `
             style={
               Object {
                 "borderStyle": "solid",
-                "borderTopColor": "#EEEEEE",
+                "borderTopColor": "#F8F9F9",
                 "borderTopWidth": 1,
                 "marginBottom": 15,
                 "marginTop": 10,
@@ -308,7 +308,7 @@ exports[`renders correctly with giant numbers 1`] = `
             style={
               Object {
                 "borderStyle": "solid",
-                "borderTopColor": "#EEEEEE",
+                "borderTopColor": "#F8F9F9",
                 "borderTopWidth": 1,
                 "marginBottom": 15,
                 "marginTop": 10,
@@ -562,7 +562,7 @@ exports[`renders correctly with no exchange rate 1`] = `
             style={
               Object {
                 "borderStyle": "solid",
-                "borderTopColor": "#EEEEEE",
+                "borderTopColor": "#F8F9F9",
                 "borderTopWidth": 1,
                 "marginBottom": 15,
                 "marginTop": 10,
@@ -797,7 +797,7 @@ exports[`renders correctly with no exchange rate 1`] = `
             style={
               Object {
                 "borderStyle": "solid",
-                "borderTopColor": "#EEEEEE",
+                "borderTopColor": "#F8F9F9",
                 "borderTopWidth": 1,
                 "marginBottom": 15,
                 "marginTop": 10,

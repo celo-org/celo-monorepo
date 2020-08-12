@@ -12,6 +12,7 @@ export enum ClaimTypes {
   KEYBASE = 'KEYBASE',
   NAME = 'NAME',
   PROFILE_PICTURE = 'PROFILE_PICTURE',
+  STORAGE = 'STORAGE',
   TWITTER = 'TWITTER',
 }
 
