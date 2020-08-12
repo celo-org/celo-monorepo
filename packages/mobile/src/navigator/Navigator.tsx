@@ -461,6 +461,7 @@ type InitialRouteName = ExtractProps<typeof Stack.Navigator>['initialRouteName']
 
 export function MainStackScreen() {
   const [initialRouteName, setInitialRoute] = React.useState<InitialRouteName>(undefined)
+
   React.useEffect(() => {
     const {
       choseToRestoreAccount,
