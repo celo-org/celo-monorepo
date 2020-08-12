@@ -1,14 +1,21 @@
-import { ACCOUNT_ADDRESSES } from '@celo/dev-utils/lib/ganache-setup'
+import { ACCOUNT_ADDRESSES, ACCOUNT_PRIVATE_KEYS } from '@celo/dev-utils/lib/ganache-setup'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
-import { toChecksumAddress } from '@celo/utils/lib/address'
+import {
+  ensureLeading0x,
+  privateKeyToPublicKey,
+  toChecksumAddress,
+  trimLeading0x,
+} from '@celo/utils/lib/address'
+import { Encrypt } from '@celo/utils/lib/ecies'
 import { NativeSigner, serializeSignature } from '@celo/utils/lib/signatureUtils'
+import { randomBytes } from 'crypto'
 import fetchMock from 'fetch-mock'
 import { newKitFromWeb3 } from '../kit'
 import { AccountsWrapper } from '../wrappers/Accounts'
 import { createStorageClaim } from './claims/claim'
 import { IdentityMetadataWrapper } from './metadata'
 import OffchainDataWrapper from './offchain-data-wrapper'
-import { AuthorizedSignerAccessor, NameAccessor } from './offchain/schemas'
+import { AuthorizedSignerAccessor, EncryptionKeysAccessor, NameAccessor } from './offchain/schemas'
 import { MockStorageWriter } from './offchain/storage-writers'
 
 testWithGanache('Offchain Data', (web3) => {
@@ -16,6 +23,10 @@ testWithGanache('Offchain Data', (web3) => {
 
   const writer = ACCOUNT_ADDRESSES[0]
   const signer = ACCOUNT_ADDRESSES[1]
+  const reader = ACCOUNT_ADDRESSES[2]
+  const readerEncryptionKeyPrivate = ACCOUNT_PRIVATE_KEYS[3]
+  const readerEncryptionKeyPublic = privateKeyToPublicKey(readerEncryptionKeyPrivate)
+
   const WRITER_METADATA_URL = 'http://example.com/writer'
   const WRITER_STORAGE_ROOT = 'http://example.com/root'
   const WRITER_LOCAL_STORAGE_ROOT = `/tmp/offchain/${writer}`
@@ -85,6 +96,79 @@ testWithGanache('Offchain Data', (web3) => {
       const authorizedSignerAccessor = new AuthorizedSignerAccessor(wrapper)
       const authorization = await authorizedSignerAccessor.read(writer, signer)
       expect(authorization).not.toBeDefined()
+    })
+
+    describe('with a reader that has a dataEncryptionKey registered', () => {
+      beforeEach(async () => {
+        await accounts.createAccount().sendAndWaitForReceipt({ from: reader })
+        await accounts
+          .setAccountDataEncryptionKey(readerEncryptionKeyPublic)
+          .sendAndWaitForReceipt({ from: reader })
+      })
+
+      describe('when the key is added to the wallet', () => {
+        beforeEach(() => {
+          kit.addAccount(readerEncryptionKeyPrivate)
+        })
+
+        it("the writer can encrypt data directly to the reader's dataEncryptionKey", async () => {
+          const testname = 'test'
+          const payload = { name: testname }
+          const stringifiedPayload = JSON.stringify(payload)
+          const encryptedPayload = {
+            publicKey: readerEncryptionKeyPublic,
+            ciphertext: Encrypt(
+              Buffer.from(trimLeading0x(readerEncryptionKeyPublic), 'hex'),
+              Buffer.from(stringifiedPayload)
+            ).toString('hex'),
+          }
+
+          await wrapper.writeDataTo(JSON.stringify(encryptedPayload), '/account/name')
+
+          const nameAccessor = new NameAccessor(wrapper)
+          const receivedName = await nameAccessor.read(writer)
+          expect(receivedName).toBeDefined()
+        })
+
+        it('the writer can create an encryption key and encrypt that to the readers dataEncryptionKey', async () => {
+          const newKey = ensureLeading0x(randomBytes(32).toString('hex'))
+          const newKeyPub = privateKeyToPublicKey(newKey)
+          const testname = 'test'
+          const payload = { name: testname }
+          const stringifiedPayload = JSON.stringify(payload)
+
+          console.log('encrypt', newKey, readerEncryptionKeyPrivate, readerEncryptionKeyPublic)
+          const encryptedPayload = {
+            publicKey: newKeyPub,
+            ciphertext: Encrypt(
+              Buffer.from(trimLeading0x(newKeyPub), 'hex'),
+              Buffer.from(stringifiedPayload)
+            ).toString('hex'),
+          }
+
+          console.log('write ciphertext')
+
+          await wrapper.writeDataTo(JSON.stringify(encryptedPayload), '/account/name')
+
+          // Write the encryption key
+          const encryptionKeys = {
+            keys: {
+              [newKeyPub]: {
+                privateKey: newKey,
+                publicKey: newKeyPub,
+              },
+            },
+          }
+
+          console.log('write keys')
+          const encryptionKeysAccessor = new EncryptionKeysAccessor(wrapper)
+          await encryptionKeysAccessor.write(reader, encryptionKeys)
+
+          const nameAccessor = new NameAccessor(wrapper)
+          const receivedName = await nameAccessor.read(writer)
+          expect(receivedName).toBeDefined()
+        })
+      })
     })
   })
 
