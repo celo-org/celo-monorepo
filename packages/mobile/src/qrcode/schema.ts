@@ -35,9 +35,10 @@ enum UriMethod {
   pay = 'pay',
 }
 
+// removes undefined parameters for serialization
+export const stripUndefined = (obj: object) => JSON.parse(JSON.stringify(obj))
+
 export const urlFromUriData = (data: Partial<UriData>, method: UriMethod = UriMethod.pay) => {
-  const params = new URLSearchParams(
-    Object(Object.entries(data).filter(([k, v], _) => v !== undefined))
-  )
+  const params = new URLSearchParams(stripUndefined(data))
   return encodeURI(`celo://wallet/${method.toString()}?${params.toString()}`)
 }
