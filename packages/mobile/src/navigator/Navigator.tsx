@@ -187,6 +187,11 @@ const pincodeSetScreenOptions = ({
 const nuxScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen
+      name={Screens.Language}
+      component={Language}
+      options={Language.navigationOptions}
+    />
+    <Navigator.Screen
       name={Screens.OnboardingEducationScreen}
       component={OnboardingEducationScreen}
       options={OnboardingEducationScreen.navigationOptions}
