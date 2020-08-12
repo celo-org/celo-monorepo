@@ -12,4 +12,4 @@
 
 • **PGPNP_QUOTA_ERROR**: = "pgpnpQuotaError"
 
-*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L59)*
+*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:60](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L60)*

@@ -14,6 +14,7 @@
 * [authenticationMethod](_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.signmessagerequest.md#authenticationmethod)
 * [blindedQueryPhoneNumber](_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.signmessagerequest.md#blindedqueryphonenumber)
 * [hashedPhoneNumber](_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.signmessagerequest.md#optional-hashedphonenumber)
+* [timestamp](_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.signmessagerequest.md#timestamp)
 * [version](_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.signmessagerequest.md#version)
 
 ## Properties
@@ -49,6 +50,14 @@ ___
 ### `Optional` hashedPhoneNumber
 
 • **hashedPhoneNumber**? : *undefined | string*
+
+*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L38)*
+
+___
+
+###  timestamp
+
+• **timestamp**: *number*
 
 *Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L37)*
 

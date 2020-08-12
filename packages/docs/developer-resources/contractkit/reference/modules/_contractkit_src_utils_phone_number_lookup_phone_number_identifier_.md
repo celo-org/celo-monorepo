@@ -41,7 +41,7 @@ ___
 
 ▸ **getSaltFromThresholdSignature**(`sigBuf`: Buffer): *string*
 
-*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-identifier.ts:79](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-identifier.ts#L79)*
+*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-identifier.ts:80](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-identifier.ts#L80)*
 
 **Parameters:**
 

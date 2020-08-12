@@ -43,7 +43,7 @@ ___
 
 • **contactPhoneNumbers**: *string[]*
 
-*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L42)*
+*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L43)*
 
 ___
 
@@ -51,7 +51,7 @@ ___
 
 • **hashedPhoneNumber**: *string*
 
-*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L43)*
+*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L44)*
 
 ___
 
@@ -59,7 +59,7 @@ ___
 
 • **userPhoneNumber**: *string*
 
-*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L41)*
+*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L42)*
 
 ___
 
