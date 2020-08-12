@@ -1,6 +1,5 @@
 import { isE164Number } from '@celo/utils/src/phoneNumbers'
 import { Actions, ActionTypes } from 'src/account/actions'
-import { PaymentRequest } from 'src/account/types'
 import { DEV_SETTINGS_ACTIVE_INITIALLY } from 'src/config'
 import { features } from 'src/flags'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
@@ -21,8 +20,6 @@ export interface State {
   backupCompleted: boolean
   backupDelayedTime: number
   socialBackupCompleted: boolean
-  incomingPaymentRequests: PaymentRequest[]
-  outgoingPaymentRequests: PaymentRequest[]
   dismissedInviteFriends: boolean
   dismissedGetVerified: boolean
   promptFornoIfNeeded: boolean
@@ -56,8 +53,6 @@ export const initialState = {
   pincodeType: PincodeType.Unset,
   isSettingPin: false,
   accountCreationTime: 99999999999999,
-  incomingPaymentRequests: [],
-  outgoingPaymentRequests: [],
   backupCompleted: false,
   backupDelayedTime: 0,
   socialBackupCompleted: false,
@@ -169,16 +164,6 @@ export const reducer = (
         backupCompleted: !state.backupCompleted,
         socialBackupCompleted: false,
         backupDelayedTime: 0,
-      }
-    case Actions.UPDATE_INCOMING_PAYMENT_REQUESTS:
-      return {
-        ...state,
-        incomingPaymentRequests: action.paymentRequests,
-      }
-    case Actions.UPDATE_OUTGOING_PAYMENT_REQUESTS:
-      return {
-        ...state,
-        outgoingPaymentRequests: action.paymentRequests,
       }
     case Actions.DISMISS_INVITE_FRIENDS:
       return {

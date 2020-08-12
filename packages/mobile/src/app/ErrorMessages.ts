@@ -51,7 +51,6 @@ export enum ErrorMessages {
   FIREBASE_FAILED = 'firebaseFailed',
   IMPORT_CONTACTS_FAILED = 'importContactsFailed',
   GAS_PRICE_UPDATE_FAILED = 'gasPriceUpdateFailed',
-  QR_FAILED_NO_ADDRESS = 'qrFailedNoAddress',
   QR_FAILED_INVALID_ADDRESS = 'qrFailedInvalidAddress',
   QR_FAILED_INVALID_RECIPIENT = 'qrFailedInvalidRecipient',
   QR_FAILED_NO_PHONE_NUMBER = 'qrFailedNoPhoneNumber',

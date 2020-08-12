@@ -1,3 +1,4 @@
+// TODO migrate CELO_PNP to CELO_ODIS
 export enum ErrorMessage {
   UNKNOWN_ERROR = 'CELO_PNP_ERR_00 Something went wrong',
   DATABASE_UPDATE_FAILURE = 'CELO_PNP_ERR_01 DB_ERR Failed to update database entry',
@@ -16,7 +17,7 @@ export enum ErrorMessage {
 export enum WarningMessage {
   INVALID_INPUT = 'CELO_PNP_WARN_01 BAD_INPUT Invalid input paramaters',
   UNAUTHENTICATED_USER = 'CELO_PNP_WARN_02 BAD_INPUT Missing or invalid authentication header',
-  EXCEEDED_QUOTA = 'CELO_PNP_WARN_03 QUOTA Requester exceeded salt service query quota',
+  EXCEEDED_QUOTA = 'CELO_PNP_WARN_03 QUOTA Requester exceeded service query quota',
   UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE = 'CELO_PNP_WARN_04 QUOTA Unverified user attempting to matchmake',
   DUPLICATE_REQUEST_TO_MATCHMAKE = 'CELO_PNP_WARN_05 QUOTA Attempt to request >1 matchmaking',
 }

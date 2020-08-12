@@ -15,6 +15,7 @@ import { reducer as imports, State as ImportState } from 'src/import/reducer'
 import { inviteReducer as invite, State as InviteState } from 'src/invite/reducer'
 import { reducer as localCurrency, State as LocalCurrencyState } from 'src/localCurrency/reducer'
 import { reducer as networkInfo, State as NetworkInfoState } from 'src/networkInfo/reducer'
+import { reducer as paymentRequest, State as PaymentRequestState } from 'src/paymentRequest/reducer'
 import { recipientsReducer as recipients, State as RecipientsState } from 'src/recipients/reducer'
 import { sendReducer as send, State as SendState } from 'src/send/reducers'
 import { reducer as stableToken, State as StableTokenState } from 'src/stableToken/reducer'
@@ -41,6 +42,7 @@ const appReducer = combineReducers({
   recipients,
   localCurrency,
   imports,
+  paymentRequest,
 }) as (state: RootState | undefined, action: Action) => RootState
 
 const rootReducer = (state: RootState | undefined, action: Action): RootState => {
@@ -80,6 +82,7 @@ export interface RootState {
   recipients: RecipientsState
   localCurrency: LocalCurrencyState
   imports: ImportState
+  paymentRequest: PaymentRequestState
 }
 
 export interface PersistedRootState {

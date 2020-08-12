@@ -99,15 +99,15 @@ async function createNewGeth(sync: boolean = true): Promise<typeof RNGeth> {
   }
 
   // Setup Logging
-  const logFilePath = Logger.getGethLogFilePath()
+  const gethLogFilePath = Logger.getGethLogFilePath()
 
   // Upload logs first
-  await uploadLogs(logFilePath, Logger.getReactNativeLogsFilePath())
-  gethOptions.logFile = logFilePath
+  await uploadLogs(gethLogFilePath, Logger.getReactNativeLogsFilePath())
+  gethOptions.logFile = gethLogFilePath
   // Only log info and above to the log file.
   // The logcat logging mode remains unchanged.
   gethOptions.logFileLogLevel = LogLevel.INFO
-  Logger.debug('Geth@newGeth', 'Geth logs will be piped to ' + logFilePath)
+  Logger.debug('Geth@newGeth', 'Geth logs will be piped to ' + gethLogFilePath)
 
   return new RNGeth(gethOptions)
 }
@@ -123,14 +123,28 @@ export async function initGeth(sync: boolean = true): Promise<typeof gethInstanc
   gethLock = true
 
   try {
-    if (!(await ensureGenesisBlockWritten())) {
-      throw FailedToFetchGenesisBlockError
-    }
-    if (!(await ensureStaticNodesInitialized(sync))) {
-      throw FailedToFetchStaticNodesError
-    }
+    // Write static node and genesis block, canceling if either fail.
+    await Promise.all([
+      ensureGenesisBlockWritten().then((ok) => {
+        if (!ok) {
+          throw FailedToFetchGenesisBlockError
+        }
+      }),
+      ensureStaticNodesInitialized(sync).then((ok) => {
+        if (!ok) {
+          throw FailedToFetchStaticNodesError
+        }
+      }),
+    ])
+
+    let geth: typeof RNGeth
     ValoraAnalytics.track(GethEvents.create_geth_start)
-    const geth = await createNewGeth(sync)
+    try {
+      geth = await createNewGeth(sync)
+    } catch (error) {
+      ValoraAnalytics.track(GethEvents.create_geth_error, { error: error.message })
+      throw error
+    }
     ValoraAnalytics.track(GethEvents.create_geth_finish)
 
     if (!sync) {

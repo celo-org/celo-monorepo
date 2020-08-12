@@ -30,7 +30,7 @@ const OUT_OF_GAS_ERROR = 'out of gas'
 const ALWAYS_FAILING_ERROR = 'always failing transaction'
 const KNOWN_TX_ERROR = 'known transaction'
 
-const getLogger = (tag: string, txId: string) => {
+const getLogger = (tag: string, txId: string, fornoMode?: boolean) => {
   return (event: SendTransactionLogEvent) => {
     switch (event.type) {
       case SendTransactionLogEventType.Confirmed:
@@ -42,7 +42,10 @@ const getLogger = (tag: string, txId: string) => {
         break
       case SendTransactionLogEventType.EstimatedGas:
         Logger.debug(tag, `Transaction with id ${txId} estimated gas: ${event.gas}`)
-        ValoraAnalytics.track(TransactionEvents.transaction_gas_estimated, { txId })
+        ValoraAnalytics.track(TransactionEvents.transaction_gas_estimated, {
+          txId,
+          estimatedGas: event.gas,
+        })
         break
       case SendTransactionLogEventType.ReceiptReceived:
         Logger.debug(
@@ -53,11 +56,14 @@ const getLogger = (tag: string, txId: string) => {
         break
       case SendTransactionLogEventType.TransactionHashReceived:
         Logger.debug(tag, `Transaction id ${txId} hash received: ${event.hash}`)
-        ValoraAnalytics.track(TransactionEvents.transaction_hash_received, { txId })
+        ValoraAnalytics.track(TransactionEvents.transaction_hash_received, {
+          txId,
+          txHash: event.hash,
+        })
         break
       case SendTransactionLogEventType.Started:
         Logger.debug(tag, `Sending transaction with id ${txId}`)
-        ValoraAnalytics.track(TransactionEvents.transaction_start, { txId })
+        ValoraAnalytics.track(TransactionEvents.transaction_start, { txId, fornoMode })
         break
       case SendTransactionLogEventType.Failed:
         Logger.error(tag, `Transaction failed: ${txId}`, event.error)
@@ -124,7 +130,7 @@ export function* sendTransactionPromises(
     stableTokenBalance.isGreaterThan(0)
       ? yield call(getCurrencyAddress, CURRENCY_ENUM.DOLLAR)
       : undefined,
-    getLogger(tag, txId),
+    getLogger(tag, txId, fornoMode),
     staticGas,
     gasPrice ? gasPrice.toString() : gasPrice,
     nonce

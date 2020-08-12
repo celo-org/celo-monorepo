@@ -59,17 +59,17 @@ export default function Button(props: ButtonProps) {
 
   switch (type) {
     case BtnTypes.PRIMARY:
-      textColor = colors.white
-      backgroundColor = disabled ? colors.celoGreenInactive : colors.celoGreen
-      borderColor = disabled ? colors.celoGreenInactive : colors.celoGreen
+      textColor = colors.light
+      backgroundColor = disabled ? colors.greenFaint : colors.greenBrand
+      borderColor = disabled ? colors.greenFaint : colors.greenBrand
       break
     case BtnTypes.SECONDARY:
-      textColor = disabled ? colors.celoGreenInactive : colors.celoGreen
+      textColor = disabled ? colors.greenFaint : colors.greenBrand
       backgroundColor = 'transparent'
-      borderColor = disabled ? colors.celoGreenInactive : colors.celoGreen
+      borderColor = disabled ? colors.greenFaint : colors.greenBrand
       break
     case BtnTypes.TERTIARY:
-      textColor = disabled ? colors.inactiveDark : colors.dark
+      textColor = disabled ? colors.gray4 : colors.dark
       backgroundColor = 'transparent'
       borderColor = 'transparent'
       break
@@ -77,8 +77,8 @@ export default function Button(props: ButtonProps) {
       if (__DEV__) {
         throw new Error('No Button Type Specified')
       }
-      textColor = colors.white
-      backgroundColor = disabled ? colors.celoGreenInactive : colors.celoGreen
+      textColor = colors.light
+      backgroundColor = disabled ? colors.greenFaint : colors.greenBrand
   }
 
   return (
