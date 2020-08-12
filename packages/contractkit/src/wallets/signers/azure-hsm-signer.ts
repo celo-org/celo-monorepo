@@ -1,8 +1,9 @@
+import { RLPEncodedTx } from '@celo/sdk-types/commons'
 import { Signer } from '@celo/sdk-types/wallet'
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import * as ethUtil from 'ethereumjs-util'
 import { AzureKeyVaultClient } from '../../utils/azure-key-vault-client'
-import { getHashFromEncoded, RLPEncodedTx } from '../../utils/signing-utils'
+import { getHashFromEncoded } from '../../utils/signing-utils'
 
 /**
  * Signs the EVM transaction using an HSM key in Azure Key Vault
@@ -55,5 +56,11 @@ export class AzureHSMSigner implements Signer {
 
   getNativeKey(): string {
     return this.keyName
+  }
+
+  decrypt(_ciphertext: Buffer) {
+    throw new Error('Decryption operation is not supported on this signer')
+    // To make the compiler happy
+    return Promise.resolve(_ciphertext)
   }
 }

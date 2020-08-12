@@ -4,6 +4,8 @@ import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
 import RNGeth from 'react-native-geth'
+import { GethEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { DEFAULT_TESTNET } from 'src/config'
 import { SYNCING_MAX_PEERS } from 'src/geth/consts'
 import networkConfig from 'src/geth/networkConfig'
@@ -97,20 +99,21 @@ async function createNewGeth(sync: boolean = true): Promise<typeof RNGeth> {
   }
 
   // Setup Logging
-  const logFilePath = Logger.getGethLogFilePath()
+  const gethLogFilePath = Logger.getGethLogFilePath()
 
   // Upload logs first
-  await uploadLogs(logFilePath, Logger.getReactNativeLogsFilePath())
-  gethOptions.logFile = logFilePath
+  await uploadLogs(gethLogFilePath, Logger.getReactNativeLogsFilePath())
+  gethOptions.logFile = gethLogFilePath
   // Only log info and above to the log file.
   // The logcat logging mode remains unchanged.
   gethOptions.logFileLogLevel = LogLevel.INFO
-  Logger.debug('Geth@newGeth', 'Geth logs will be piped to ' + logFilePath)
+  Logger.debug('Geth@newGeth', 'Geth logs will be piped to ' + gethLogFilePath)
 
   return new RNGeth(gethOptions)
 }
 
 export async function initGeth(sync: boolean = true): Promise<typeof gethInstance> {
+  ValoraAnalytics.track(GethEvents.geth_init_start, { sync })
   Logger.info('Geth@init', `Create a new Geth instance with sync=${sync}`)
 
   if (gethLock) {
@@ -126,7 +129,16 @@ export async function initGeth(sync: boolean = true): Promise<typeof gethInstanc
     if (!(await ensureStaticNodesInitialized(sync))) {
       throw FailedToFetchStaticNodesError
     }
-    const geth = await createNewGeth(sync)
+
+    let geth: typeof RNGeth
+    ValoraAnalytics.track(GethEvents.create_geth_start)
+    try {
+      geth = await createNewGeth(sync)
+    } catch (error) {
+      ValoraAnalytics.track(GethEvents.create_geth_error, { error: error.message })
+      throw error
+    }
+    ValoraAnalytics.track(GethEvents.create_geth_finish)
 
     if (!sync) {
       // chain data must be deleted to prevent geth from syncing with data saver on
@@ -136,7 +148,9 @@ export async function initGeth(sync: boolean = true): Promise<typeof gethInstanc
     }
 
     try {
+      ValoraAnalytics.track(GethEvents.start_geth_start)
       await geth.start()
+      ValoraAnalytics.track(GethEvents.start_geth_finish)
       gethInstance = geth
       if (sync) {
         geth.subscribeNewHead()

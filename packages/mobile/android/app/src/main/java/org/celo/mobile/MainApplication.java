@@ -16,9 +16,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import ru.ivanarh.jndcrash.NDCrash;
-import ru.ivanarh.jndcrash.NDCrashError;
-import ru.ivanarh.jndcrash.NDCrashUnwinder;
 
 public class MainApplication
   extends MultiDexApplication
@@ -53,28 +50,11 @@ public class MainApplication
     super.onCreate();
     SoLoader.init(this, /* native exopackage */false);
     initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
-    initNdkCrashHandler();
   }
 
   @Override
   public String getFileProviderAuthority() {
     return BuildConfig.APPLICATION_ID + ".provider";
-  }
-
-  // Set up the NDK crash handler - this is useful for catching Geth crashes
-  private void initNdkCrashHandler() {
-    final String reportPath = NdkCrashService.getNdkCrashLogReportPath(this);
-    final NDCrashError error = NDCrash.initializeOutOfProcess(
-      this,
-      reportPath,
-      NDCrashUnwinder.libunwind,
-      NdkCrashService.class
-    );
-    if (error == NDCrashError.ok) {
-      Log.i("MainApplication@initJndcrash", "NDK crash handler init successful");
-    } else {
-      Log.e("MainApplication@initJndcrash", "NDK crash handler init failed: " + error);
-    }
   }
 
   /**

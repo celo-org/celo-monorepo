@@ -58,7 +58,6 @@ export class SetClock extends React.Component<WithTranslation> {
 
 const style = StyleSheet.create({
   backgroundContainer: {
-    backgroundColor: 'white',
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'space-between',
@@ -77,7 +76,7 @@ const style = StyleSheet.create({
     paddingBottom: 10,
   },
   bodyText: {
-    color: colors.darkSecondary,
+    color: colors.gray5,
   },
   instructions: {
     textAlign: 'center',

@@ -17,8 +17,15 @@ export interface CeloTxObject<T> {
   encodeABI(): string
 }
 
-export { EventLog, PromiEvent, RLPEncodedTransaction as EncodedTransaction } from 'web3-core'
+export {
+  BlockNumber,
+  EventLog,
+  PromiEvent,
+  RLPEncodedTransaction as EncodedTransaction,
+} from 'web3-core'
 export { Block, BlockHeader } from 'web3-eth'
+export { Contract, PastEventOptions } from 'web3-eth-contract'
+export { AbiItem } from 'web3-utils'
 
 export type CeloTxPending = Transaction & CeloParams
 export type CeloTxReceipt = TransactionReceipt & CeloParams
@@ -33,4 +40,9 @@ export interface JsonRpcPayload extends WebCoreHelper.JsonRpcPayload {}
 
 export interface Provider extends provider {
   send(payload: JsonRpcPayload, callback: Callback<JsonRpcResponse>): void
+}
+
+export interface RLPEncodedTx {
+  transaction: CeloTx
+  rlpEncode: any
 }

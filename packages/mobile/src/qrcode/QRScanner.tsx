@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { StackScreenProps } from '@react-navigation/stack'
 import { memoize } from 'lodash'
@@ -53,17 +53,26 @@ export default function QRScanner({ route }: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
   const inset = useSafeAreaInsets()
 
-  const { scanIsForSecureSend, transactionData } = route.params || {}
+  const { scanIsForSecureSend, isOutgoingPaymentRequest, transactionData, requesterAddress } =
+    route.params || {}
 
   const onBarCodeDetected = useCallback(
     memoize(
       (qrCode: QrCode) => {
         Logger.debug('QRScanner', 'Bar code detected')
-        dispatch(handleBarcodeDetected(qrCode, scanIsForSecureSend, transactionData))
+        dispatch(
+          handleBarcodeDetected(
+            qrCode,
+            scanIsForSecureSend,
+            transactionData,
+            isOutgoingPaymentRequest,
+            requesterAddress
+          )
+        )
       },
       (qrCode) => qrCode.data
     ),
-    [scanIsForSecureSend, transactionData]
+    [scanIsForSecureSend, transactionData, isOutgoingPaymentRequest, requesterAddress]
   )
 
   return (
@@ -106,7 +115,7 @@ const styles = StyleSheet.create({
     bottom: 32,
     ...fontStyles.small600,
     lineHeight: undefined,
-    color: colors.white,
+    color: colors.light,
     textAlign: 'center',
   },
 })

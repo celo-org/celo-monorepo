@@ -1,5 +1,6 @@
+import { ErrorMessage, WarningMessage } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'firebase-functions'
-import { ErrorMessage, respondWithError, WarningMessage } from '../common/error-utils'
+import { respondWithError } from '../common/error-utils'
 import { authenticateUser, isVerified } from '../common/identity'
 import {
   hasValidAccountParam,
@@ -33,7 +34,7 @@ export async function handleGetContactMatches(
       respondWithError(response, 400, WarningMessage.INVALID_INPUT)
       return
     }
-    if (!authenticateUser(request)) {
+    if (!(await authenticateUser(request))) {
       respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER)
       return
     }

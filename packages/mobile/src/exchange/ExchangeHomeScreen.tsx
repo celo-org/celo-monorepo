@@ -2,7 +2,7 @@ import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Bu
 import ItemSeparator from '@celo/react-components/components/ItemSeparator'
 import SectionHead from '@celo/react-components/components/SectionHeadGold'
 import Touchable from '@celo/react-components/components/Touchable'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import { StackScreenProps } from '@react-navigation/stack'
@@ -128,7 +128,7 @@ function ExchangeHomeScreen({ navigation }: Props) {
   const hasGold = new BigNumber(goldBalance || 0).isGreaterThan(0)
 
   return (
-    <SafeAreaView style={styles.background}>
+    <SafeAreaView style={styles.background} edges={['top']}>
       <DrawerTopBar
         scrollPosition={scrollPosition}
         middleElement={
@@ -160,53 +160,55 @@ function ExchangeHomeScreen({ navigation }: Props) {
         stickyHeaderIndices={[]}
         contentContainerStyle={styles.contentContainer}
       >
-        <DisconnectBanner />
-        <View style={styles.goldPrice}>
-          <View style={styles.goldPriceTitleArea}>
-            <Text style={styles.goldPriceTitle}>{t('goldPrice')}</Text>
-            <Touchable onPress={navigateToGuide} hitSlop={variables.iconHitslop}>
-              <InfoIcon size={14} />
-            </Touchable>
-          </View>
-          <View style={styles.goldPriceValues}>
-            <Text style={styles.goldPriceCurrentValue}>
-              {currentGoldRateInLocalCurrency
-                ? displayLocalCurrency(currentGoldRateInLocalCurrency)
-                : '-'}
-            </Text>
-
-            {rateChangeInPercentage && (
-              <Text style={rateWentUp ? styles.goldPriceWentUp : styles.goldPriceWentDown}>
-                {rateWentUp ? '▴' : '▾'} {rateChangeInPercentage.toFormat(2)}%
+        <SafeAreaView style={styles.background} edges={['bottom']}>
+          <DisconnectBanner />
+          <View style={styles.goldPrice}>
+            <View style={styles.goldPriceTitleArea}>
+              <Text style={styles.goldPriceTitle}>{t('goldPrice')}</Text>
+              <Touchable onPress={navigateToGuide} hitSlop={variables.iconHitslop}>
+                <InfoIcon size={14} />
+              </Touchable>
+            </View>
+            <View style={styles.goldPriceValues}>
+              <Text style={styles.goldPriceCurrentValue}>
+                {currentGoldRateInLocalCurrency
+                  ? displayLocalCurrency(currentGoldRateInLocalCurrency)
+                  : '-'}
               </Text>
-            )}
-          </View>
-        </View>
 
-        <CeloGoldHistoryChart />
-        <View style={styles.buttonContainer}>
-          <Button
-            text={t('buy')}
-            size={BtnSizes.FULL}
-            onPress={goToBuyGold}
-            style={styles.button}
-            type={BtnTypes.TERTIARY}
-          />
-          {hasGold && (
+              {rateChangeInPercentage && (
+                <Text style={rateWentUp ? styles.goldPriceWentUp : styles.goldPriceWentDown}>
+                  {rateWentUp ? '▴' : '▾'} {rateChangeInPercentage.toFormat(2)}%
+                </Text>
+              )}
+            </View>
+          </View>
+
+          <CeloGoldHistoryChart />
+          <View style={styles.buttonContainer}>
             <Button
+              text={t('buy')}
               size={BtnSizes.FULL}
-              text={t('sell')}
-              onPress={goToBuyDollars}
+              onPress={goToBuyGold}
               style={styles.button}
               type={BtnTypes.TERTIARY}
             />
-          )}
-        </View>
-        <ItemSeparator />
-        <CeloGoldOverview testID="ExchangeAccountOverview" />
-        <ItemSeparator />
-        <SectionHead text={t('global:activity')} />
-        <TransactionsList currency={CURRENCY_ENUM.GOLD} />
+            {hasGold && (
+              <Button
+                size={BtnSizes.FULL}
+                text={t('sell')}
+                onPress={goToBuyDollars}
+                style={styles.button}
+                type={BtnTypes.TERTIARY}
+              />
+            )}
+          </View>
+          <ItemSeparator />
+          <CeloGoldOverview testID="ExchangeAccountOverview" />
+          <ItemSeparator />
+          <SectionHead text={t('global:activity')} />
+          <TransactionsList currency={CURRENCY_ENUM.GOLD} />
+        </SafeAreaView>
       </Animated.ScrollView>
     </SafeAreaView>
   )
@@ -229,7 +231,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   background: {
-    backgroundColor: colors.background,
     flex: 1,
     justifyContent: 'space-between',
   },
@@ -245,7 +246,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   head: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -289,7 +290,7 @@ const styles = StyleSheet.create({
   },
   goldPriceWentUpHeader: {
     ...fontStyles.small600,
-    color: colors.celoGreen,
+    color: colors.greenBrand,
   },
   goldPriceWentDownHeader: {
     ...fontStyles.small600,

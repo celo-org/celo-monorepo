@@ -1,9 +1,11 @@
+import { RLPEncodedTx } from '@celo/sdk-types/commons'
 import { Signer } from '@celo/sdk-types/wallet'
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
+import { Decrypt } from '@celo/utils/lib/ecies'
 // @ts-ignore-next-line
 import { account as Account } from 'eth-lib'
 import * as ethUtil from 'ethereumjs-util'
-import { decodeSig, getHashFromEncoded, RLPEncodedTx } from '../../utils/signing-utils'
+import { decodeSig, getHashFromEncoded } from '../../utils/signing-utils'
 
 /**
  * Signs the EVM transaction using the provided private key
@@ -42,5 +44,13 @@ export class LocalSigner implements Signer {
       r: Buffer.from(sig.r),
       s: Buffer.from(sig.s),
     }
+  }
+
+  decrypt(ciphertext: Buffer) {
+    const decryptedPlaintext = Decrypt(
+      Buffer.from(trimLeading0x(this.privateKey), 'hex'),
+      ciphertext
+    )
+    return Promise.resolve(decryptedPlaintext)
   }
 }

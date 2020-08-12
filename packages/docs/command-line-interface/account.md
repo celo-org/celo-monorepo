@@ -250,6 +250,41 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/account/claim-name.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-name.ts)_
 
+### Claim-storage
+
+Claim a storage root and add the claim to a local metadata file
+
+```
+USAGE
+  $ celocli account:claim-storage FILE
+
+ARGUMENTS
+  FILE  Path of the metadata file
+
+OPTIONS
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
+                                                     authorized signer for the address in the metadata
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
+  --url=https://www.celo.org                         (required) The URL of the storage root you want to claim
+
+  --useLedger                                        Set it to use a ledger wallet
+
+EXAMPLE
+  claim-storage ~/metadata.json --url http://test.com/myurl --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
+```
+
+_See code: [packages/cli/src/commands/account/claim-storage.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-storage.ts)_
+
 ### Create-metadata
 
 Create an empty identity metadata file. Use this metadata file to store claims attesting to ownership of off-chain resources. Claims can be generated with the account:claim-\* commands.
@@ -357,20 +392,23 @@ _See code: [packages/cli/src/commands/account/lock.ts](https://github.com/celo-o
 
 ### New
 
-Creates a new account locally using the Celo Derivation Path (m/44'/52752'/0/0/indexAddress) and print out the key information. Save this information for local transaction signing or import into a Celo node. Ledger: this command has been tested swapping mnemonics with the Ledger successfully (only supports english)
+Creates a new account locally using the Celo Derivation Path (m/44'/52752'/0/changeIndex/addressIndex) and print out the key information. Save this information for local transaction signing or import into a Celo node. Ledger: this command has been tested swapping mnemonics with the Ledger successfully (only supports english)
 
 ```
 USAGE
   $ celocli account:new
 
 OPTIONS
+  --addressIndex=addressIndex
+      Choose the address index for the derivation path
+
+  --changeIndex=changeIndex
+      Choose the change index for the derivation path
+
   --derivationPath=derivationPath
       Choose a different derivation Path (Celo's default is "m/44'/52752'/0'/0"). Use "eth" as an alias of the Ethereum
       derivation path ("m/44'/60'/0'/0/"). Recreating the same account requires knowledge of the mnemonic, passphrase (if
       any), and the derivation path
-
-  --indexAddress=indexAddress
-      Choose the index address of the derivation path
 
   --language=chinese_simplified|chinese_traditional|english|french|italian|japanese|korean|spanish
       [default: english] Language for the mnemonic words. **WARNING**, some hardware wallets don't support other languages
@@ -382,15 +420,15 @@ OPTIONS
 
   --passphrasePath=passphrasePath
       Path to a file that contains the BIP39 passphrase to combine with the mnemonic specified using the mnemonicPath flag
-      and the index specified using the indexAddress flag. Every passphrase generates a different private key and wallet
+      and the index specified using the addressIndex flag. Every passphrase generates a different private key and wallet
       address.
 
 EXAMPLES
   new
   new --passphrasePath myFolder/my_passphrase_file
   new --language spanish
-  new --passphrasePath some_folder/my_passphrase_file --language japanese --indexAddress 5
-  new --passphrasePath some_folder/my_passphrase_file --mnemonicPath some_folder/my_mnemonic_file --indexAddress 5
+  new --passphrasePath some_folder/my_passphrase_file --language japanese --addressIndex 5
+  new --passphrasePath some_folder/my_passphrase_file --mnemonicPath some_folder/my_mnemonic_file --addressIndex 5
 ```
 
 _See code: [packages/cli/src/commands/account/new.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/new.ts)_

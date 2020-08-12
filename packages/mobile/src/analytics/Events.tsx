@@ -40,6 +40,12 @@ export enum OnboardingEvents {
   onboarding_education_complete = 'onboarding_education_complete',
   onboarding_education_cancel = 'onboarding_education_cancel',
 
+  create_account_start = 'create_account_start',
+  create_account_cancel = 'create_account_cancel',
+
+  restore_account_start = 'create_account_start',
+  restore_account_cancel = 'create_account_cancel',
+
   backup_education_start = 'backup_education_start',
   backup_education_scroll = 'backup_education_scroll',
   backup_education_complete = 'backup_education_complete',
@@ -89,6 +95,8 @@ export enum OnboardingEvents {
   escrow_redeem_start = 'escrow_redeem_start', // when escrow redemption starts (only happens on user invite redeemption)
   escrow_redeem_complete = 'escrow_redeem_complete',
   escrow_redeem_error = 'escrow_redeem_error',
+
+  account_dek_set = 'account_dek_set',
 }
 
 export enum VerificationEvents {
@@ -118,7 +126,6 @@ export enum VerificationEvents {
   verification_code_received = 'verification_code_received',
   verification_code_validate_start = 'verification_code_validate_start',
   verification_code_validate_complete = 'verification_code_validate_complete',
-  verification_account_set = 'verification_account_set',
 
   verification_reveal_all_attestations_start = 'verification_reveal_all_attestations_start',
   verification_reveal_all_attestations_complete = 'verification_reveal_all_attestations_complete',
@@ -188,7 +195,7 @@ export enum SendEvents {
   send_amount_back = 'send_amount_back', // back button pressed on amount screen
   send_amount_continue = 'send_amount_continue', // when next button pressed on amount enter page
   send_confirm_back = 'send_confirm_back', // when back button pressed on send confirmation screen
-  send_confim_send = 'send_confim_send', // when send button pressed on send confirmation screen
+  send_confirm_send = 'send_confirm_send', // when send button pressed on send confirmation screen
 
   send_secure_start = 'send_secure_start', // when either secure send scan or manual confirm button pressed
   send_secure_back = 'send_secure_back', // when back button is pressed during secure send
@@ -231,6 +238,7 @@ export enum TransactionEvents {
   transaction_gas_estimated = 'transaction_gas_estimated',
   transaction_hash_received = 'transaction_hash_received',
   transaction_receipt_received = 'transaction_receipt_received',
+  transaction_confirmed = 'transaction_confirmed',
   transaction_error = 'transaction_error',
   transaction_exception = 'transaction_exception',
 }
@@ -265,10 +273,44 @@ export enum CeloExchangeEvents {
 
 export enum GethEvents {
   blockchain_corruption = 'blockchain_corruption',
+  geth_init_start = 'geth_init_start',
   geth_init_success = 'geth_init_success',
   geth_init_failure = 'geth_init_failure',
   geth_restart_to_fix_init = 'geth_restart_to_fix_init',
   prompt_forno = 'prompt_forno',
+  create_geth_start = 'create_geth_start',
+  create_geth_finish = 'create_geth_finish',
+  create_geth_error = 'create_geth_error',
+  start_geth_start = 'start_geth_start',
+  start_geth_finish = 'start_geth_finish',
+}
+
+export enum NetworkEvents {
+  // Events triggered when the app detects it is connected or disconnected from the Celo network.
+  network_connected = 'network_connected',
+  network_disconnected = 'network_disconnected',
+
+  // Events triggered when the app detects it loses or restores sync with the Celo network.
+  network_sync_lost = 'network_sync_lost',
+  network_sync_restored = 'network_sync_restored',
+
+  // Events triggered during a syncing or waiting to start syncing.
+  network_sync_waiting = 'network_sync_waiting',
+  network_sync_start = 'network_sync_start',
+  network_sync_finish = 'network_sync_finish',
+  network_sync_error = 'network_sync_error',
+}
+
+export enum ContractKitEvents {
+  init_contractkit_start = 'init_contractkit_start',
+  init_contractkit_geth_init_start = 'init_contractkit_geth_init_start',
+  init_contractkit_geth_init_finish = 'init_contractkit_geth_init_finish',
+  init_contractkit_get_ipc_start = 'init_contractkit_get_ipc_start',
+  init_contractkit_get_ipc_finish = 'init_contractkit_get_ipc_finish',
+  init_contractkit_get_wallet_start = 'init_contractkit_get_wallet_start',
+  init_contractkit_get_wallet_finish = 'init_contractkit_get_wallet_finish',
+  init_contractkit_init_wallet_finish = 'init_contractkit_init_wallet_finish',
+  init_contractkit_finish = 'init_contractkit_finish',
 }
 
 export type AnalyticsEventType =
@@ -286,3 +328,4 @@ export type AnalyticsEventType =
   | TransactionEvents
   | CeloExchangeEvents
   | GethEvents
+  | NetworkEvents
