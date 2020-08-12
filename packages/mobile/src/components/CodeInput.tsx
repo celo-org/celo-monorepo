@@ -1,7 +1,7 @@
 import Card from '@celo/react-components/components/Card'
 import TextInput from '@celo/react-components/components/TextInput.v2'
 import Checkmark from '@celo/react-components/icons/Checkmark'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { Shadow, Spacing } from '@celo/react-components/styles/styles.v2'
 import React, { useLayoutEffect } from 'react'

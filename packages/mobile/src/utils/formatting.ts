@@ -39,7 +39,8 @@ export const getExchangeRateDisplayValue = (value: BigNumber.Value): string => {
 
 export const getFeeDisplayValue = (value: BigNumber.Value | null | undefined): string => {
   return value
-    ? BigNumber.max(value, 0.001)
+    ? // Show 0.001 if fee > 0 and <= 0.001
+      BigNumber.max(value, new BigNumber(value).isZero() ? 0 : 0.001)
         .decimalPlaces(4)
         .toFormat()
     : ''
@@ -106,18 +107,18 @@ export function roundUp(
 export const getCurrencyColor = (currencyType: CURRENCY_ENUM): string => {
   switch (currencyType) {
     case CURRENCY_ENUM.DOLLAR:
-      return colors.celoGreen
+      return colors.greenBrand
     case CURRENCY_ENUM.GOLD:
-      return colors.celoGold
+      return colors.goldBrand
   }
 }
 
 export const getBalanceColor = (accountBalance: BigNumber): string => {
   if (accountBalance.isGreaterThan(0)) {
-    return colors.celoGreen
+    return colors.greenBrand
   }
   if (accountBalance.isLessThan(0)) {
-    return colors.errorRed
+    return colors.warning
   }
   return colors.dark
 }

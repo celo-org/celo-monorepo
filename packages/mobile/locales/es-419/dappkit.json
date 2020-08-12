@@ -1,5 +1,5 @@
 {
-  "connectToWallet": "Círculo de Ahorro le gustaría conectarse a {{appName}}",
+  "connectToWallet": "{{dappName}} desea conectarse a {{appName}}",
   "connect": "Conectar",
   "cancel": "Cancelar",
   "allow": "Permitir",

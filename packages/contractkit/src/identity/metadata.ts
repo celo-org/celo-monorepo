@@ -1,7 +1,6 @@
 import { eqAddress } from '@celo/utils/lib/address'
 import { AddressType, SignatureType } from '@celo/utils/lib/io'
 import { guessSigner, Signer, verifySignature } from '@celo/utils/lib/signatureUtils'
-import fetch from 'cross-fetch'
 import { isLeft } from 'fp-ts/lib/Either'
 import { readFileSync } from 'fs'
 import * as t from 'io-ts'

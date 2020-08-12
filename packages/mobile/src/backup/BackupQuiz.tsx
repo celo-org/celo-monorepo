@@ -1,7 +1,7 @@
 import TextButton from '@celo/react-components/components/TextButton.v2'
 import Touchable from '@celo/react-components/components/Touchable'
 import Backspace from '@celo/react-components/icons/Backspace'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { StackNavigationOptions, StackScreenProps } from '@react-navigation/stack'
 import { chunk, flatMap, shuffle, times } from 'lodash'
@@ -320,7 +320,6 @@ function getShuffledWordSet(mnemonic: string) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
     justifyContent: 'space-between',
     paddingHorizontal: 24,
     paddingBottom: 24,

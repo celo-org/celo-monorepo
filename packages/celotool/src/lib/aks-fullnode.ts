@@ -12,7 +12,7 @@ import { execCmdWithExitOnFailure } from './cmd-utils'
 import {
   deletePersistentVolumeClaims,
   installGenericHelmChart,
-  removeGenericHelmChart
+  removeGenericHelmChart,
 } from './helm_deploy'
 import { deleteResource } from './kubernetes'
 
@@ -60,13 +60,12 @@ async function helmParameters(
   deploymentConfig: AKSFullNodeDeploymentConfig
 ) {
   const staticIps = (await allocateStaticIPs(celoEnv, deploymentConfig)).join(',')
-
-  const baseparams = await baseHelmParameters(celoEnv, kubeNamespace, deploymentConfig)
+  const baseParams = await baseHelmParameters(celoEnv, kubeNamespace, deploymentConfig)
   const additionalParameters = [
     `--set geth.azure_provider=true`,
     `--set geth.public_ips='{${staticIps}}'`,
   ]
-  return baseparams.concat(additionalParameters)
+  return baseParams.concat(additionalParameters)
 }
 
 async function allocateStaticIPs(celoEnv: string, deploymentConfig: AKSFullNodeDeploymentConfig) {

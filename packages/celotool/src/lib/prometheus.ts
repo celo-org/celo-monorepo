@@ -26,10 +26,13 @@ const sidecarImageTag = '0.7.3'
 // Prometheus container registry with latest tags: https://hub.docker.com/r/prom/prometheus/tags
 const prometheusImageTag = 'v2.17.0'
 
+const grafanaHelmChartPath = '../helm-charts/grafana'
+const grafanaReleaseName = 'grafana'
+
 export async function installPrometheusIfNotExists(clusterConfig?: ClusterConfig) {
   const prometheusExists = await outputIncludes(
     `helm list`,
-    `prometheus-stackdriver`,
+    releaseName,
     `prometheus-stackdriver exists, skipping install`
   )
   if (!prometheusExists) {
@@ -39,7 +42,7 @@ export async function installPrometheusIfNotExists(clusterConfig?: ClusterConfig
 }
 
 async function installPrometheus(clusterConfig?: ClusterConfig) {
-  await createNamespaceIfNotExists('prometheus')
+  await createNamespaceIfNotExists(kubeNamespace)
   return installGenericHelmChart(
     kubeNamespace,
     releaseName,
@@ -121,4 +124,49 @@ function getServiceAccountName(clusterConfig: ClusterConfig) {
   // Ensure the service account name is within the length restriction
   // and ends with an alphanumeric character
   return `prometheus-${prefix}-${clusterConfig.clusterName}`.substring(0, 30).replace(/[^a-zA-Z0-9]+$/g, '')
+}
+
+export async function installGrafanaIfNotExists() {
+  const grafanaExists = await outputIncludes(
+    `helm list`,
+    grafanaReleaseName,
+    `grafana exists, skipping install`
+  )
+  if (!grafanaExists) {
+    console.info('Installing grafana')
+    await installGrafana()
+  }
+}
+
+async function installGrafana() {
+  await createNamespaceIfNotExists(kubeNamespace)
+  return installGenericHelmChart(
+    kubeNamespace,
+    grafanaReleaseName,
+    grafanaHelmChartPath,
+    await grafanaHelmParameters()
+  )
+}
+
+async function grafanaHelmParameters() {
+  const params = [
+    `--set namespace=${kubeNamespace}`,
+  ]
+  return params
+}
+
+export async function upgradeGrafana() {
+  await createNamespaceIfNotExists(kubeNamespace)
+  return upgradeGenericHelmChart(kubeNamespace, grafanaReleaseName, grafanaHelmChartPath, await grafanaHelmParameters())
+}
+
+export async function removeGrafanaHelmRelease() {
+  const grafanaExists = await outputIncludes(
+    `helm list`,
+    grafanaReleaseName,
+  )
+  if (grafanaExists) {
+    console.info('Removing grafana')
+    await removeGenericHelmChart(releaseName)
+  }
 }

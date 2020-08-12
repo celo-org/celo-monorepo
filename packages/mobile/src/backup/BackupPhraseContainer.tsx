@@ -1,6 +1,6 @@
 import Touchable from '@celo/react-components/components/Touchable'
 import withTextInputPasteAware from '@celo/react-components/components/WithTextInputPasteAware'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -71,13 +71,18 @@ export class BackupPhraseContainer extends React.Component<Props> {
     return (
       <View style={style}>
         <View style={styles.headerContainer}>
-          <Text style={styles.headerText}>
-            {type === BackupPhraseType.BACKUP_KEY
-              ? BackupPhraseContainerMode.INPUT
-                ? t('backupKey')
-                : t('writeDownKey')
-              : t('socialBackupPhraseHeader', { index })}
-          </Text>
+          {type === BackupPhraseType.BACKUP_KEY &&
+            (BackupPhraseContainerMode.INPUT ? (
+              <View style={styles.writeDownKeyContainer}>
+                <Text style={styles.writeDownKey}>{t('writeDownKey')}</Text>
+                <Text style={fontStyles.label}>{t('yourAccountKey')}</Text>
+              </View>
+            ) : (
+              <Text style={styles.headerText}>{t('yourAccountKey')}</Text>
+            ))}
+          {type === BackupPhraseType.SOCIAL_BACKUP && (
+            <Text style={styles.headerText}>{t('socialBackupPhraseHeader', { index })}</Text>
+          )}
           {showCopy && (
             <Touchable borderless={true} onPress={this.onPressCopy}>
               <Text style={styles.headerButton}>{this.props.t('global:copy')}</Text>
@@ -105,7 +110,7 @@ export class BackupPhraseContainer extends React.Component<Props> {
                   : isValidSocialBackupPhrase
               }
               underlineColorAndroid="transparent"
-              placeholderTextColor={colors.inactive}
+              placeholderTextColor={colors.gray4}
               enablesReturnKeyAutomatically={true}
               multiline={true}
               autoCorrect={false}
@@ -127,13 +132,21 @@ const styles = StyleSheet.create({
   },
   headerText: {
     ...fontStyles.regular500,
+    marginBottom: 8,
   },
   headerButton: {
     ...fontStyles.regular,
   },
+  writeDownKeyContainer: {
+    flexDirection: 'column',
+  },
+  writeDownKey: {
+    ...fontStyles.h2,
+    marginBottom: 16,
+  },
   phraseContainer: {
-    marginTop: 16,
-    backgroundColor: colors.brownFaint,
+    marginTop: 8,
+    backgroundColor: colors.beige,
     borderRadius: 4,
     alignContent: 'center',
     justifyContent: 'center',
@@ -148,7 +161,7 @@ const styles = StyleSheet.create({
   phraseInputText: {
     ...fontStyles.regular,
     borderWidth: 1,
-    borderColor: colors.inputBorder,
+    borderColor: colors.gray2,
     borderRadius: 4,
     minHeight: 125,
     padding: 14,

@@ -13,6 +13,7 @@ COPY packages/dev-utils/package.json packages/dev-utils/
 COPY packages/protocol/package.json packages/protocol/
 COPY packages/contractkit/package.json packages/contractkit/
 COPY packages/leaderboard/package.json packages/leaderboard/
+COPY packages/flake-tracker/package.json packages/flake-tracker/package.json
 
 RUN yarn install --frozen-lockfile --network-timeout 100000 && yarn cache clean
 
@@ -23,6 +24,7 @@ COPY packages/dev-utils packages/dev-utils/
 COPY packages/protocol packages/protocol/
 COPY packages/contractkit packages/contractkit/
 COPY packages/leaderboard packages/leaderboard/
+COPY packages/flake-tracker packages/flake-tracker
 
 # build all
 RUN yarn build
