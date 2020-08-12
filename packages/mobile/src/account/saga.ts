@@ -19,6 +19,7 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { clearStoredMnemonic, getStoredMnemonic } from 'src/backup/utils'
 import { firebaseSignOut } from 'src/firebase/firebase'
+import { deleteNodeData } from 'src/geth/geth'
 import { revokePhoneMapping } from 'src/identity/revoke'
 import { Actions as ImportActions } from 'src/import/actions'
 import { importBackupPhraseSaga } from 'src/import/saga'
@@ -109,7 +110,7 @@ function* clearStoredAccountSaga({ account }: ClearStoredAccountAction) {
     yield call(clearStoredMnemonic)
     yield call(ValoraAnalytics.reset)
     yield call(firebaseSignOut, firebase.app())
-    // TODO: Remove the account from geth.
+    yield call(deleteNodeData)
 
     yield call(persistor.flush)
     yield call(restartApp)
