@@ -1,4 +1,4 @@
-import { concurrentMap, retryAsync, sleep } from './async'
+import { concurrentMap, retryAsync, selectiveRetryAsyncWithBackOff, sleep } from './async'
 
 describe('retryAsync()', () => {
   test('tries once if it works', async () => {
@@ -20,6 +20,17 @@ describe('retryAsync()', () => {
     }
 
     expect(mockFunction).toHaveBeenCalledTimes(3)
+  })
+})
+
+describe('selectiveRetryAsyncWithBackOff()', () => {
+  test('tries once if error is in dontRetry array', async () => {
+    const mockFunction = jest.fn()
+    mockFunction.mockImplementation(() => {
+      throw Error('test')
+    })
+    await selectiveRetryAsyncWithBackOff(mockFunction, 3, ['test'], [])
+    expect(mockFunction).toHaveBeenCalledTimes(1)
   })
 })
 
