@@ -17,7 +17,12 @@ OPTIONS
   --estimate                                              Estimate voter rewards from current votes
   --group=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d      Validator Group to show rewards for
   --slashing                                              Show rewards for slashing
+
+  --usdGas                                                If --usdGas is set, the transaction is paid for with a
+                                                          feeCurrency of cUSD
+
   --validator=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  Validator to show rewards for
+
   --voter=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d      Voter to show rewards for
 
 EXAMPLE

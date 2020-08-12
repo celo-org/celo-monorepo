@@ -15,6 +15,9 @@ USAGE
 ARGUMENTS
   TOKEN  (StableToken) [default: StableToken] Token to list the oracles for
 
+OPTIONS
+  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
+
 EXAMPLES
   list StableToken
   list
@@ -45,6 +48,9 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -79,6 +85,9 @@ OPTIONS
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
+
   --useLedger                                        Set it to use a ledger wallet
 
   --value=value                                      (required) Amount of the specified token equal to 1 CELO
@@ -100,6 +109,9 @@ USAGE
 
 ARGUMENTS
   TOKEN  (StableToken) [default: StableToken] Token to list the reports for
+
+OPTIONS
+  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
 
 EXAMPLES
   reports StableToken

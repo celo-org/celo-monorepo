@@ -39,6 +39,9 @@ OPTIONS
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) The signer key that is to be used for voting through
                                                          the ReleaseGold instance
 
+  --usdGas                                               If --usdGas is set, the transaction is paid for with a
+                                                         feeCurrency of cUSD
+
   --useLedger                                            Set it to use a ledger wallet
 
 EXAMPLES
@@ -79,6 +82,9 @@ OPTIONS
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
 
+  --usdGas                                               If --usdGas is set, the transaction is paid for with a
+                                                         feeCurrency of cUSD
+
   --useLedger                                            Set it to use a ledger wallet
 
 EXAMPLE
@@ -108,6 +114,9 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
+
+  --usdGas                                               If --usdGas is set, the transaction is paid for with a
+                                                         feeCurrency of cUSD
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -144,6 +153,9 @@ OPTIONS
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
 
+  --usdGas                                               If --usdGas is set, the transaction is paid for with a
+                                                         feeCurrency of cUSD
+
   --useLedger                                            Set it to use a ledger wallet
 
 EXAMPLE
@@ -171,6 +183,9 @@ OPTIONS
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
 
+  --usdGas                                               If --usdGas is set, the transaction is paid for with a
+                                                         feeCurrency of cUSD
+
   --useLedger                                            Set it to use a ledger wallet
 ```
 
@@ -196,6 +211,9 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
+
+  --usdGas                                               If --usdGas is set, the transaction is paid for with a
+                                                         feeCurrency of cUSD
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -228,6 +246,9 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
+
+  --usdGas                                               If --usdGas is set, the transaction is paid for with a
+                                                         feeCurrency of cUSD
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -263,6 +284,9 @@ OPTIONS
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
 
+  --usdGas                                               If --usdGas is set, the transaction is paid for with a
+                                                         feeCurrency of cUSD
+
   --useLedger                                            Set it to use a ledger wallet
 
 EXAMPLES
@@ -297,6 +321,9 @@ OPTIONS
                                                               --ledgerCustomAddresses "[4,99]"
 
   --pop=pop                                                   ECDSA PoP for signer over contract's account
+
+  --usdGas                                                    If --usdGas is set, the transaction is paid for with a
+                                                              feeCurrency of cUSD
 
   --useLedger                                                 Set it to use a ledger wallet
 
@@ -338,6 +365,9 @@ OPTIONS
                                                             array of index addresses for local signing. Example
                                                             --ledgerCustomAddresses "[4,99]"
 
+  --usdGas                                                  If --usdGas is set, the transaction is paid for with a
+                                                            feeCurrency of cUSD
+
   --useLedger                                               Set it to use a ledger wallet
 
   --yesreally                                               Override prompt to set new beneficiary (be careful!)
@@ -369,6 +399,9 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
+
+  --usdGas                                               If --usdGas is set, the transaction is paid for with a
+                                                         feeCurrency of cUSD
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -402,6 +435,9 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
+
+  --usdGas                                               If --usdGas is set, the transaction is paid for with a
+                                                         feeCurrency of cUSD
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -437,6 +473,9 @@ OPTIONS
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
 
+  --usdGas                                               If --usdGas is set, the transaction is paid for with a
+                                                         feeCurrency of cUSD
+
   --useLedger                                            Set it to use a ledger wallet
 
   --yesreally                                            Override prompt to set new maximum distribution (be careful!)
@@ -467,6 +506,9 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
+
+  --usdGas                                               If --usdGas is set, the transaction is paid for with a
+                                                         feeCurrency of cUSD
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -499,6 +541,9 @@ OPTIONS
 
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d        (required) Address of the recipient of Celo Dollars transfer
 
+  --usdGas                                               If --usdGas is set, the transaction is paid for with a
+                                                         feeCurrency of cUSD
+
   --useLedger                                            Set it to use a ledger wallet
 
   --value=10000000000000000000000                        (required) Value (in Wei) of Celo Dollars to transfer
@@ -530,6 +575,9 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
+
+  --usdGas                                               If --usdGas is set, the transaction is paid for with a
+                                                         feeCurrency of cUSD
 
   --useLedger                                            Set it to use a ledger wallet
 

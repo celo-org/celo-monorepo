@@ -75,6 +75,8 @@ export interface NetworkConfig {
 export interface KitOptions {
   gasInflationFactor: number
   gasPrice: string
+  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
+  gasPriceSuggestionMultiplier: number
   feeCurrency?: Address
   from?: Address
 }
@@ -100,6 +102,7 @@ export class ContractKit {
       gasInflationFactor: 1.3,
       // gasPrice:0 means the node will compute gasPrice on its own
       gasPrice: '0',
+      gasPriceSuggestionMultiplier: 5,
     }
     if (!(web3.currentProvider instanceof CeloProvider)) {
       const celoProviderInstance = new CeloProvider(web3.currentProvider, wallet)
@@ -302,6 +305,13 @@ export class ContractKit {
   ): Promise<TransactionResult> {
     tx = this.fillTxDefaults(tx)
 
+    // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
+    if (tx.feeCurrency && tx.gasPrice === '0') {
+      const gasPriceMinimum = await this.contracts.getGasPriceMinimum()
+      const rawGasPrice = await gasPriceMinimum.getGasPriceMinimum(tx.feeCurrency)
+      tx.gasPrice = rawGasPrice.multipliedBy(this.config.gasPriceSuggestionMultiplier).toFixed()
+    }
+
     let gas = tx.gas
     if (gas == null) {
       const gasEstimator = (_tx: Tx) => txObj.estimateGas({ ..._tx })
@@ -333,10 +343,6 @@ export class ContractKit {
       from: this.config.from,
       feeCurrency: this.config.feeCurrency,
       gasPrice: this.config.gasPrice,
-    }
-
-    if (this.config.feeCurrency) {
-      defaultTx.feeCurrency = this.config.feeCurrency
     }
 
     return {

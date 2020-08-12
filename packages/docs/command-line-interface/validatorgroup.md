@@ -32,6 +32,9 @@ OPTIONS
   --queue-update=queue-update                        Queues an update to the commission, which can be applied after the
                                                      update delay.
 
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
+
   --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLES
@@ -62,6 +65,9 @@ OPTIONS
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
+
   --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLE
@@ -77,6 +83,9 @@ List registered Validator Groups, their names (if provided), commission, and mem
 ```
 USAGE
   $ celocli validatorgroup:list
+
+OPTIONS
+  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
 
 EXAMPLE
   list
@@ -112,6 +121,9 @@ OPTIONS
   --remove                                           Remove a validator from the members list
 
   --reorder=reorder                                  Reorder a validator within the members list. Indices are 0 based
+
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -149,6 +161,9 @@ OPTIONS
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
+
   --useLedger                                        Set it to use a ledger wallet
 
   --yes                                              Answer yes to prompt
@@ -180,6 +195,9 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
 
+  --usdGas                                       If --usdGas is set, the transaction is paid for with a feeCurrency of
+                                                 cUSD
+
   --useLedger                                    Set it to use a ledger wallet
 
 EXAMPLE
@@ -198,6 +216,9 @@ USAGE
 
 ARGUMENTS
   GROUPADDRESS  ValidatorGroup's address
+
+OPTIONS
+  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
 
 EXAMPLE
   show 0x97f7333c51897469E8D98E7af8653aAb468050a3
