@@ -28,7 +28,8 @@ export const Counters = {
   }),
   attestationRequestsUnableToServe: new Counter({
     name: 'attestation_requests_unable_to_serve',
-    help: 'Counter for the number of requests that could not be served',
+    labelNames: ['country'],
+    help: 'Counter for requests not served because no provider was configured, by country',
   }),
   attestationRequestsSentSms: new Counter({
     name: 'attestation_requests_sent_sms',

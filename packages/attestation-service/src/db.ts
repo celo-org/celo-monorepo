@@ -74,9 +74,9 @@ export async function verifyConfiguration() {
     )
   }
 
-  // if (!(await isAttestationSignerUnlocked())) {
-  //   throw Error(`Need to unlock attestation signer account ${signer}`)
-  // }
+  if (!(await isAttestationSignerUnlocked())) {
+    throw Error(`Need to unlock attestation signer account ${signer}`)
+  }
 
   const metadataURL = await accounts.getMetadataURL(validator)
   try {

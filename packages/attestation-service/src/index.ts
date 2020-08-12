@@ -4,7 +4,7 @@ import rateLimit from 'express-rate-limit'
 import requestIdMiddleware from 'express-request-id'
 import * as PromClient from 'prom-client'
 import { initializeDB, initializeKit, verifyConfiguration } from './db'
-import { fetchEnv, fetchEnvOrDefault } from './env'
+import { fetchEnv, fetchEnvOrDefault, isYes } from './env'
 import { rootLogger } from './logger'
 import { asyncHandler, createValidatedHandler, loggerMiddleware } from './request'
 import { AttestationRequestType, handleAttestationRequest } from './requestHandlers/attestation'
@@ -22,8 +22,8 @@ async function init() {
   await initializeKit()
 
   // Verify configuration.
-  const verifyConfig = fetchEnvOrDefault('VERIFY_CONFIG_ON_STARTUP', '1').toLowerCase()
-  if (verifyConfig === '1' || verifyConfig === 'y') {
+
+  if (isYes(fetchEnvOrDefault('VERIFY_CONFIG_ON_STARTUP', '1'))) {
     await verifyConfiguration()
   }
 

@@ -54,7 +54,7 @@ export function smsProvidersFor(countryCode: string, phoneNumber: E164Number) {
   const providersForRegion = fetchEnvOrDefault(`SMS_PROVIDERS_${countryCode}`, '')
     .split(',')
     .filter((t) => t != null && t !== '')
-  var providers =
+  let providers =
     providersForRegion.length === 0
       ? smsProviders
       : providersForRegion.map((name) => smsProvidersByType[name])
@@ -115,6 +115,7 @@ export async function startSendSms(
 
   const providers = smsProvidersFor(countryCode, phoneNumber)
   if (providers.length === 0) {
+    Counters.attestationRequestsUnableToServe.labels(countryCode).inc()
     throw new Error(`No SMS providers available for ${countryCode}`)
   }
 
@@ -126,7 +127,7 @@ export async function startSendSms(
     finallyFailedCallback,
     finallyBelievedDeliveredCallback,
     attemptsForThisProvider: 0,
-    deliveryId: null,
+    ongoingDeliveryId: null,
     status: DeliveryStatus.NotCreated,
   }
 
@@ -139,9 +140,12 @@ const maxProviderAttempts = parseInt(fetchEnvOrDefault('MAX_PROVIDER_RETRIES', '
 const ongoingDeliveries: any = {}
 
 async function attemptToSendSms(delivery: SmsDelivery): Promise<SmsProviderType> {
-  if (delivery.deliveryId) {
-    ongoingDeliveries[delivery.deliveryId!] = delivery
-    delivery.deliveryId = null
+  // If this is a retry, remove mapping for current id, ongoingDeliveryId.
+  // The mapping is used to identify the delivery when a delivery receipt comes in,
+  // and we no longer want to hear about duplicated receipts for that attempt.
+  if (delivery.ongoingDeliveryId) {
+    delete ongoingDeliveries[delivery.ongoingDeliveryId!]
+    delivery.ongoingDeliveryId = null
   }
 
   // If retries to send with this provider are exceeded, move to next provider
@@ -204,17 +208,19 @@ async function attemptToSendSms(delivery: SmsDelivery): Promise<SmsProviderType>
     // If this provider supports delivery status, track the delivery.
     if (delivery.providers[0].supportsDeliveryStatus()) {
       ongoingDeliveries[deliveryId!] = delivery
-      delivery.deliveryId = deliveryId
+      delivery.ongoingDeliveryId = deliveryId
       delivery.status = DeliveryStatus.Created
 
-      // Set timeout to clean up in event of no delivery receipt
+      // Set timeout to callback with success and clean up in the event we
+      // don't receive a delivery receipt AND no other retry has been made
+      // since this one
       setTimeout(() => {
-        if (delivery.deliveryId === deliveryId) {
+        if (delivery.ongoingDeliveryId === deliveryId) {
           delete ongoingDeliveries[deliveryId]
           if (delivery.finallyBelievedDeliveredCallback) {
             delivery.finallyBelievedDeliveredCallback()
           }
-          delivery.deliveryId = null
+          delivery.ongoingDeliveryId = null
         }
       }, timeoutWaitingForDeliveryReceipt)
     }

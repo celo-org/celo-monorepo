@@ -9,7 +9,7 @@ export interface SmsDelivery {
   message: string
   attemptsForThisProvider: number
   providers: SmsProvider[]
-  deliveryId: string | null
+  ongoingDeliveryId: string | null
   status: DeliveryStatus
   createdCallback?: (createdWithProvider: SmsProviderType) => void
   finallyFailedCallback?: () => void

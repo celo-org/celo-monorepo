@@ -13,7 +13,7 @@ import { Counters } from '../metrics'
 import { AttestationModel, AttestationStatus } from '../models/attestation'
 import { respondWithError, Response } from '../request'
 import { startSendSms } from '../sms'
-import { SmsProviderType } from '../sms/base'
+import { obfuscateNumber, SmsProviderType } from '../sms/base'
 
 const SMS_SENDING_ERROR = 'Something went wrong while attempting to send SMS, try again later'
 const ATTESTATION_ERROR = 'Valid attestation could not be provided'
@@ -31,6 +31,12 @@ export const AttestationRequestType = t.type({
 })
 
 export type AttestationRequest = t.TypeOf<typeof AttestationRequestType>
+
+function obfuscateAttestationRequest(attestationRequest: AttestationRequest) {
+  const obfuscatedRequest = { ...attestationRequest }
+  obfuscatedRequest.phoneNumber = obfuscateNumber(attestationRequest.phoneNumber)
+  return obfuscatedRequest
+}
 
 const ATTESTATION_EXPIRY_TIMEOUT_MS = 60 * 60 * 24 * 1000 // 1 day
 
@@ -133,7 +139,9 @@ class AttestationRequestHandler {
   identifier: string
   sequelizeLogger: (_msg: string, sequelizeLog: any) => void
   constructor(public readonly attestationRequest: AttestationRequest, logger: Logger) {
-    this.logger = logger.child({ attestationRequest })
+    this.logger = logger.child({
+      attestationRequest: obfuscateAttestationRequest(attestationRequest),
+    })
     this.sequelizeLogger = (msg: string, sequelizeLogArgs: any) =>
       this.logger.debug({ sequelizeLogArgs, component: 'sequelize' }, msg)
     this.identifier = PhoneNumberUtils.getPhoneHash(
@@ -205,7 +213,7 @@ class AttestationRequestHandler {
     return
   }
 
-  async persistFinalAttesationResult(result: AttestationStatus) {
+  async persistFinalAttestationResult(result: AttestationStatus) {
     if (result === AttestationStatus.COMPLETE) {
       Counters.attestationRequestsBelievedDelivered.inc()
     } else if (result === AttestationStatus.FAILED) {
@@ -251,10 +259,14 @@ class AttestationRequestHandler {
           this.attestationRequest.phoneNumber,
           textMessage,
           () => {
-            void this.persistFinalAttesationResult(AttestationStatus.FAILED)
+            setTimeout(() => {
+              void this.persistFinalAttestationResult(AttestationStatus.FAILED)
+            }, 1000)
           },
           () => {
-            void this.persistFinalAttesationResult(AttestationStatus.COMPLETE)
+            setTimeout(() => {
+              void this.persistFinalAttestationResult(AttestationStatus.COMPLETE)
+            }, 1000)
           }
         )
         Counters.attestationRequestsSentSms.inc()
@@ -263,7 +275,7 @@ class AttestationRequestHandler {
           { transaction, logging: this.sequelizeLogger }
         )
       } catch (err) {
-        this.logger.error({ err })
+        this.logger.error({ err }, 'Failed sending SMS')
         Counters.attestationRequestsFailedToSendSms.inc()
         await attestationRecord.update(
           { status: AttestationStatus.FAILED, smsProvider: SmsProviderType.UNKNOWN },

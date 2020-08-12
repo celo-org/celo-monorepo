@@ -3,7 +3,7 @@ import express from 'express'
 import { PhoneNumberUtil } from 'google-libphonenumber'
 import Nexmo from 'nexmo'
 import { receivedDeliveryReport } from '.'
-import { fetchEnv, fetchEnvOrDefault } from '../env'
+import { fetchEnv, fetchEnvOrDefault, isYes } from '../env'
 import { Gauges } from '../metrics'
 import {
   DeliveryStatus,
@@ -21,7 +21,7 @@ export class NexmoSmsProvider extends SmsProvider {
       fetchEnv('NEXMO_KEY'),
       fetchEnv('NEXMO_SECRET'),
       readUnsupportedRegionsFromEnv('NEXMO_UNSUPPORTED_REGIONS', 'NEXMO_BLACKLIST'),
-      fetchEnvOrDefault('NEXMO_ACCOUNT_BALANCE_METRIC', '')
+      isYes(fetchEnvOrDefault('NEXMO_ACCOUNT_BALANCE_METRIC', ''))
     )
   }
   type = SmsProviderType.NEXMO
@@ -36,14 +36,14 @@ export class NexmoSmsProvider extends SmsProvider {
     apiKey: string,
     apiSecret: string,
     unsupportedRegionCodes: string[],
-    balanceMetric: string
+    balanceMetric: boolean
   ) {
     super()
     this.client = new Nexmo({
       apiKey,
       apiSecret,
     })
-    this.balanceMetric = balanceMetric === '1' || balanceMetric.toLowerCase() === 'y'
+    this.balanceMetric = balanceMetric
     this.unsupportedRegionCodes = unsupportedRegionCodes
   }
 
