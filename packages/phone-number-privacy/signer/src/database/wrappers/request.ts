@@ -1,6 +1,6 @@
 import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
 import logger from '../../common/logger'
-import { GetBlindedMessageForSaltRequest } from '../../salt-generation/get-salt'
+import { GetBlindedMessagePartialSigRequest } from '../../signing/get-partial-signature'
 import { getDatabase } from '../database'
 import { Request, REQUESTS_COLUMNS, REQUESTS_TABLE } from '../models/request'
 
@@ -8,7 +8,9 @@ function requests() {
   return getDatabase()<Request>(REQUESTS_TABLE)
 }
 
-export async function getRequestExists(request: GetBlindedMessageForSaltRequest): Promise<boolean> {
+export async function getRequestExists(
+  request: GetBlindedMessagePartialSigRequest
+): Promise<boolean> {
   if (!request.timestamp) {
     return false // TODO(Alec) make timestamps required
   }
@@ -28,7 +30,7 @@ export async function getRequestExists(request: GetBlindedMessageForSaltRequest)
   }
 }
 
-export async function storeRequest(request: GetBlindedMessageForSaltRequest) {
+export async function storeRequest(request: GetBlindedMessagePartialSigRequest) {
   logger.debug('Storing salt request')
   try {
     await requests()

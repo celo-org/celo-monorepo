@@ -153,7 +153,7 @@ describe(`POST /getBlindedMessageSig endpoint`, () => {
       // @ts-ignore TODO fix req type to make it a mock express req
       await getBlindedMessageSig(req, res)
     })
-    it('expired timestamp returns 400', () => {
+    it('expired timestamp returns 400', async () => {
       const blindedQueryPhoneNumber = '+5555555555'
       const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
       const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
@@ -181,7 +181,7 @@ describe(`POST /getBlindedMessageSig endpoint`, () => {
         },
       }
       // @ts-ignore TODO fix req type to make it a mock express req
-      getDistributedBlindedSalt(req, res)
+      await getBlindedMessageSig(req, res)
     })
   })
 })
