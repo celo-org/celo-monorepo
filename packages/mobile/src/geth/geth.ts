@@ -124,7 +124,7 @@ export async function initGeth(sync: boolean = true): Promise<typeof gethInstanc
 
   try {
     // Write static node and genesis block, canceling if either fail.
-    await Promise.all(
+    await Promise.all([
       ensureGenesisBlockWritten().then((ok) => {
         if (!ok) {
           throw FailedToFetchGenesisBlockError
@@ -134,8 +134,8 @@ export async function initGeth(sync: boolean = true): Promise<typeof gethInstanc
         if (!ok) {
           throw FailedToFetchStaticNodesError
         }
-      })
-    )
+      }),
+    ])
 
     let geth: typeof RNGeth
     ValoraAnalytics.track(GethEvents.create_geth_start)

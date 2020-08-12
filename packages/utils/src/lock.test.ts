@@ -1,5 +1,5 @@
-import { Lock } from './lock'
 import { sleep } from './async'
+import { Lock } from './lock'
 
 async function pause() {
   await sleep(Math.floor(Math.random() * 10))
@@ -18,7 +18,7 @@ test('lock', async () => {
     lock.release()
   }
 
-  const promises: Promise<void>[] = []
+  const promises: Array<Promise<void>> = []
   for (let i = 0; i < 100; i++) {
     promises.push(race(i))
   }
