@@ -20,4 +20,7 @@ export enum WarningMessage {
   EXCEEDED_QUOTA = 'CELO_PNP_WARN_03 QUOTA Requester exceeded service query quota',
   UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE = 'CELO_PNP_WARN_04 QUOTA Unverified user attempting to matchmake',
   DUPLICATE_REQUEST_TO_MATCHMAKE = 'CELO_PNP_WARN_05 QUOTA Attempt to request >1 matchmaking',
+  DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG = 'CELO_PNP_WARN_06 BAD_INPUT Attempt to replay partial sig request',
+  FAILURE_TO_STORE_REQUEST = 'CELO_PNP_WARN_07 QUOTA Failed to store partial sig request',
+  FAILURE_TO_INCREMENT_QUERY_COUNT = 'CELO_PNP_WARN_08 QUOTA Failed to increment user query count',
 }
