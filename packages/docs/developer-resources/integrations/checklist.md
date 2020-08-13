@@ -30,7 +30,7 @@ Celo's core smart contracts use Celo's `Accounts` abstraction to allow balance-m
 There is an audited `ReleaseGold` smart contract which allows for the release of `CELO` over a set schedule through which `CELO` might be distributed to a user.
 
 ## Wallets
-As wallets, we are loosely defining any application that is meant as key store to allow users to interact and transfer value on the Celo platform.
+These suggestions apply to any application that custodies a key and allows users to interact and transfer value on the Celo platform.
 
 ### Key Derivation
 Celo wallets should follow the [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki) for deriving private keys from [BIP39 mnemonics](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki). Celo's key derivation path is at `m/44'/52752'/0'/0`. The first key typically is the `account key` that wallets should register themselves with and accept balance transfers on. The second key can be derived to be an account's `dataEncryptionKey` to allow other users on Celo to encrypt information to.
