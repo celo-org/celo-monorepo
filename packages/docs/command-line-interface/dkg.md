@@ -29,6 +29,9 @@ OPTIONS
 
   --threshold=threshold                              (required) The threshold to use for the DKG
 
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
+
   --useLedger                                        Set it to use a ledger wallet
 ```
 
@@ -56,6 +59,9 @@ OPTIONS
                                                                        signing. Example --ledgerCustomAddresses "[4,99]"
 
   --method=(shares|responses|justifications|participants|phase|group)  (required) Getter method to call
+
+  --usdGas                                                             If --usdGas is set, the transaction is paid for
+                                                                       with a feeCurrency of cUSD
 
   --useLedger                                                          Set it to use a ledger wallet
 ```
@@ -85,6 +91,9 @@ OPTIONS
                                                         index addresses for local signing. Example
                                                         --ledgerCustomAddresses "[4,99]"
 
+  --usdGas                                              If --usdGas is set, the transaction is paid for with a
+                                                        feeCurrency of cUSD
+
   --useLedger                                           Set it to use a ledger wallet
 ```
 
@@ -113,6 +122,9 @@ OPTIONS
                                                         index addresses for local signing. Example
                                                         --ledgerCustomAddresses "[4,99]"
 
+  --usdGas                                              If --usdGas is set, the transaction is paid for with a
+                                                        feeCurrency of cUSD
+
   --useLedger                                           Set it to use a ledger wallet
 ```
 
@@ -139,6 +151,9 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses         [default: [0]] If --useLedger is set, this will get the array of
                                                         index addresses for local signing. Example
                                                         --ledgerCustomAddresses "[4,99]"
+
+  --usdGas                                              If --usdGas is set, the transaction is paid for with a
+                                                        feeCurrency of cUSD
 
   --useLedger                                           Set it to use a ledger wallet
 ```
@@ -168,6 +183,9 @@ OPTIONS
                                                         --ledgerCustomAddresses "[4,99]"
 
   --participantAddress=participantAddress               (required) Address of the participant to whitelist
+
+  --usdGas                                              If --usdGas is set, the transaction is paid for with a
+                                                        feeCurrency of cUSD
 
   --useLedger                                           Set it to use a ledger wallet
 ```
