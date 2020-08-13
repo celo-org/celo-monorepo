@@ -49,7 +49,7 @@ The Celo ecosystem relies on a diverse set of applications to be built so that u
 
 ## Validator Group Explorers
 
-Validator Group Explorers are critical to Celo's Proof of Stake system. Explorers will consider using the following standards to provide a minimum experience across all explorers
+[Validator Group Explorers](../../celo-holder-guide/voting-validators.md#validator-and-validator-group-explorers) are critical to Celo's Proof of Stake system. Explorers will consider using the following standards to provide a minimum experience across all explorers.
 
 ### Names
 
