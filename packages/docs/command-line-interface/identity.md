@@ -11,6 +11,9 @@ Outputs the set of validators currently participating in BFT and which ones are 
 ```
 USAGE
   $ celocli identity:current-attestation-services
+
+OPTIONS
+  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
 ```
 
 _See code: [packages/cli/src/commands/identity/current-attestation-services.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/identity/current-attestation-services.ts)_
@@ -39,6 +42,9 @@ OPTIONS
   --message=message                                  (required) The message of the SMS
 
   --phoneNumber=+14152223333                         (required) The phone number to send the test message to
+
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
