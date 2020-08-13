@@ -143,43 +143,4 @@ export async function postToPhoneNumPrivacyService<ResponseType>(
     dontRetry,
     []
   )
-
-  const tries = 3
-  let lastError
-  for (let i = 1; i <= tries; i++) {
-    const res = await fetch(pgpnpUrl + endpoint, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: authHeader,
-      },
-      body: bodyString,
-    })
-
-    if (res.ok) {
-      debug('Response ok. Parsing.')
-      const response = await res.json()
-      return response as ResponseType
-    }
-
-    debug(`Response not okay. Status ${res.status}`)
-
-    switch (res.status) {
-      case 403:
-        throw new Error(ErrorMessages.ODIS_QUOTA_ERROR)
-      case 400:
-        throw new Error(ErrorMessages.ODIS_INPUT_ERROR)
-      case 401:
-        throw new Error(ErrorMessages.ODIS_AUTH_ERROR)
-      default:
-        lastError = new Error(`Unknown failure ${res.status}`)
-        if (i < tries) {
-          debug(`Retrying request...`)
-          debug(body)
-        }
-    }
-  }
-
-  throw lastError
 }
