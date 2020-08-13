@@ -4,11 +4,11 @@ import { StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import Body from 'src/codename-allegory/Body'
 import SideBar from 'src/codename-allegory/SideBar'
+import preview from 'src/codename-allegory/twit.jpg'
 import OpenGraph from 'src/header/OpenGraph'
 import { useBooleanToggle } from 'src/hooks/useBooleanToggle'
 import menuItems from 'src/shared/menu-items'
 import { fonts, textStyles } from 'src/styles'
-
 const DURATION = 600
 
 export default function Canvas() {
@@ -16,9 +16,10 @@ export default function Canvas() {
   return (
     <>
       <OpenGraph
-        title="A Wish for Collective Propsperity"
-        description="Changing the Heart of Money"
+        title="As Wealth Flowers"
+        description="A Wish for Collective Propsperity"
         path={menuItems.WISH.link}
+        image={preview}
       />
       <Head>
         <script async={true} src="https://platform.twitter.com/widgets.js" />

@@ -50,6 +50,11 @@ export default function Flower() {
 
   const skewX = value.interpolate(SKEW)
 
+  const translateX = value.interpolate({
+    inputRange: [0, 0.4],
+    outputRange: ['0%', '-5%'],
+  })
+
   const rotate = value.interpolate(ROTATE)
 
   return (
@@ -59,13 +64,13 @@ export default function Flower() {
           styles.root,
           isMobile && styles.mobileRoot,
           {
-            transform: [{ scale }, { translateY }, { skewX }, { rotate }],
+            transform: [{ scale }, { translateY }, { translateX }, { skewX }, { rotate }],
             opacity: isLoaded ? 1 : 0,
           },
         ]}
       >
         <AnimatedRatio ratio={1} style={[styles.outline, { opacity: outlineOpacity }]}>
-          <Image source={Outline} style={standardStyles.image} />
+          <Image source={Outline} style={[standardStyles.image, {}]} />
         </AnimatedRatio>
         <AnimatedRatio ratio={1} style={{ opacity: colorOpacity }}>
           <Image source={Cambio} style={standardStyles.image} onLoadEnd={showImage} />

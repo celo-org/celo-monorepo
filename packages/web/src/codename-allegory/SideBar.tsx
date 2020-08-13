@@ -16,12 +16,7 @@ export default function SideBar({ isOpen }) {
   const openStyle = isMobile ? styles.showSideMobile : styles.showSide
   return (
     <>
-      <View
-        style={[
-          isMobile ? styles.expanderMobile : styles.expander,
-          !isMobile && isOpen && styles.expanderOpen,
-        ]}
-      />
+      <View style={[styles.expander, !isMobile && isOpen && styles.expanderOpen]} />
       <View style={[styles.root, isOpen ? openStyle : styles.hideSide]}>
         <View>
           <H4
@@ -83,9 +78,13 @@ function copyURL() {
 }
 
 const TweetButton = React.memo(() => {
+  const text = encodeURI('Blooming more beautiful money, as wealth flowers')
+  const url = 'celo.org/wealth-flowers'
   return (
     <>
-      <LightButon href="https://twitter.com/intent/tweet?hashtags=celoflora&related=celoOrg&via=celoOrg">
+      <LightButon
+        href={`https://twitter.com/intent/tweet?hashtags=celoflora&related=celoOrg&via=celoOrg&text=${text}&url=${url}`}
+      >
         <TweetLogo height={16} color={colors.dark} /> Tweet
       </LightButon>
     </>
@@ -106,7 +105,7 @@ const styles = StyleSheet.create({
     width: 0,
     willChange: 'width',
     transitionProperty: 'width',
-    transitionDuration: '1400ms',
+    transitionDuration: '800ms',
   },
   expanderOpen: {
     width: WIDTH,
