@@ -27,7 +27,7 @@ Users may want to participate in Celo's Proof of Stake system to help secure the
 Celo's core smart contracts use Celo's `Accounts` abstraction to allow balance-moving keys to be held in cold storage, while other keys can be authorized to vote and be held in warm storage or online.
 
 ### Release Gold
-There is an audited `ReleaseGold` smart contract which allows for the release of `CELO` over a set schedule through which `CELO` might be distributed to a user.
+There is an audited `ReleaseGold` smart contract which allows for the release of CELO over a set schedule through which CELO might be distributed to a user.
 
 ## Wallets
 These suggestions apply to any application that custodies a key and allows users to interact and transfer value on the Celo platform.
