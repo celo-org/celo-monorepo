@@ -126,7 +126,7 @@ export async function handleGetBlindedMessagePartialSig(
       signMessageResponse = signMessageResponseSuccess
     }
     logger.debug('Signature retrieval success')
-    response.status(200).json(signMessageResponse)
+    response.json(signMessageResponse)
   } catch (error) {
     logger.error('Failed to get signature', error)
     respondWithError(response, 500, ErrorMessage.UNKNOWN_ERROR)

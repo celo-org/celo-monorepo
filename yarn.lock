@@ -2972,13 +2972,6 @@
     source-map-support "0.5.12"
     yargs "13.2.4"
 
-"@celo/phone-number-privacy-common@1.0.6":
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.6.tgz#aa5e003c71b320807c6be63d4be41d38b5c54fd6"
-  integrity sha512-DXs5O+kLrirPXJ5iCGvPOV+4ofh1nANkEUEaKMYke2Jky+JdvU1d/Ac2qlr0BE+msZdPHK8Si/SBDJYPD8/yAA==
-  dependencies:
-    bignumber.js "^9.0.0"
-
 "@celo/react-native-sms-retriever@git+https://github.com/celo-org/react-native-sms-retriever#b88e502":
   version "1.0.3"
   resolved "git+https://github.com/celo-org/react-native-sms-retriever#b88e502fcd5bab2b6b9a22f59829c3eb40e27780"
