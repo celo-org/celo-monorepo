@@ -1,6 +1,7 @@
-import { getPhoneHash, isE164Number } from '@celo/utils/lib/phoneNumbers'
+import { getPhoneHash, isE164Number } from '@celo/base/lib/phoneNumbers'
 import { createHash } from 'crypto'
 import debugFactory from 'debug'
+import { soliditySha3 } from 'web3-utils'
 import { BlsBlindingClient, WasmBlsBlindingClient } from './bls-blinding-client'
 import {
   AuthSigner,
@@ -9,6 +10,8 @@ import {
   SignMessageRequest,
   SignMessageResponse,
 } from './phone-number-lookup'
+
+const sha3 = (v: string) => soliditySha3({ type: 'string', value: v })
 
 const debug = debugFactory('kit:phone-number-lookup:phone-number-identifier')
 
@@ -69,7 +72,7 @@ export async function getPhoneNumberIdentifier(
 
   debug('Converting sig to salt')
   const salt = getSaltFromThresholdSignature(sigBuf)
-  const phoneHash = getPhoneHash(e164Number, salt)
+  const phoneHash = getPhoneHash(sha3, e164Number, salt)
   return { e164Number, phoneHash, salt }
 }
 
