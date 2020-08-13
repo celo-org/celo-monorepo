@@ -1,7 +1,7 @@
 import {
   AddressListItem as ALI,
   Comparator,
-  linkedListChanges,
+  linkedListChanges as baseLinkedListChanges,
   zip,
 } from '@celo/base/lib/collections'
 import BigNumber from 'bignumber.js'
@@ -19,8 +19,13 @@ import {
 } from '../wrappers/BaseWrapper'
 
 type AddressListItem = ALI<BigNumber>
-// BigNumber comparator
-const bnc: Comparator<BigNumber> = (a: BigNumber, b: BigNumber) => a.lt(b)
+const bigNumberComparator: Comparator<BigNumber> = (a: BigNumber, b: BigNumber) => a.lt(b)
+function linkedListChanges(
+  groups: AddressListItem[],
+  changed: AddressListItem[]
+): { lessers: string[]; greaters: string[]; list: AddressListItem } {
+  return baseLinkedListChanges(groups, changed, bigNumberComparator)
+}
 
 export interface VotingDetails {
   accountAddress: Address

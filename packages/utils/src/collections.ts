@@ -7,18 +7,18 @@ export { intersection, notEmpty, zip, zip3 } from '@celo/base/lib/collections'
 export type AddressListItem = base.AddressListItem<BigNumber>
 
 // BigNumber comparator
-const bnc: base.Comparator<BigNumber> = (a: BigNumber, b: BigNumber) => a.lt(b)
+const bigNumberComparator: base.Comparator<BigNumber> = (a: BigNumber, b: BigNumber) => a.lt(b)
 
 export function linkedListChange(
   sortedList: AddressListItem[],
   change: AddressListItem
 ): { lesser: string; greater: string; list: AddressListItem[] } {
-  return base.linkedListChange(sortedList, change, bnc)
+  return base.linkedListChange(sortedList, change, bigNumberComparator)
 }
 
 export function linkedListChanges(
   sortedList: AddressListItem[],
   changeList: AddressListItem[]
 ): { lessers: string[]; greaters: string[]; list: AddressListItem[] } {
-  return base.linkedListChanges(sortedList, changeList, bnc)
+  return base.linkedListChanges(sortedList, changeList, bigNumberComparator)
 }
