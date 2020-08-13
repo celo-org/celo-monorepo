@@ -6,7 +6,7 @@ This page serves as a checklist for applications building and integrating on Cel
 
 ### Addresses
 
-Addresses are similar to Ethereum addresses. When displaying and asking for user-inputted addresses, consider using and validating address checksums following the [EIP55 standard](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-55.md) to detect typos.
+Addresses are identical to Ethereum addresses. When displaying and asking for user-inputted addresses, consider using and validating address checksums following the [EIP55 standard](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-55.md) to detect typos.
 
 ### QR Codes
 
