@@ -23,7 +23,7 @@ const bigNumberComparator: Comparator<BigNumber> = (a: BigNumber, b: BigNumber) 
 function linkedListChanges(
   groups: AddressListItem[],
   changed: AddressListItem[]
-): { lessers: string[]; greaters: string[]; list: AddressListItem } {
+): { lessers: string[]; greaters: string[]; list: AddressListItem[] } {
   return baseLinkedListChanges(groups, changed, bigNumberComparator)
 }
 
@@ -263,7 +263,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     groups: AddressListItem[]
   ) {
     const changed = await this.computeDecrementsForSlashing(account, penalty, groups)
-    const changes = linkedListChanges(groups, changed, bnc)
+    const changes = linkedListChanges(groups, changed)
     return { ...changes, indices: changed.map((a) => a.index) }
   }
 
