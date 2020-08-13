@@ -52,7 +52,10 @@ const rootReducer = (state: RootState | undefined, action: Action): RootState =>
     const initialState = appReducer(undefined, action)
     return {
       ...initialState,
+      // We keep the chosen currency since it's unlikely the user wants to change that.
       localCurrency: state.localCurrency,
+      // We keep phone number mappings since there's a cost to fetch them and they are
+      // likely to be the same on the same device.
       identity: identity(state.identity, action),
     }
   }

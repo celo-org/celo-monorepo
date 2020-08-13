@@ -1,5 +1,6 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import Switch from '@celo/react-components/components/Switch.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
@@ -16,6 +17,7 @@ import BackupPhraseContainer, {
 } from 'src/backup/BackupPhraseContainer'
 import CancelConfirm from 'src/backup/CancelConfirm'
 import { getStoredMnemonic, onGetMnemonicFail } from 'src/backup/utils'
+import CancelButton from 'src/components/CancelButton.v2'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { navigate, pushToStack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -53,9 +55,20 @@ const mapStateToProps = (state: RootState): StateProps => {
   }
 }
 
-export const navOptionsForBackupPhrase = {
-  headerLeft: () => <CancelConfirm screen={TAG} />,
-  headerRight: () => <HeaderRight />,
+export const navOptionsForBackupPhrase = ({
+  route,
+}: StackScreenProps<StackParamList, Screens.BackupPhrase>) => {
+  const navigatedFromSettings = route.params?.navigatedFromSettings
+  return {
+    headerLeft: () => {
+      return navigatedFromSettings ? (
+        <CancelButton style={styles.cancelButton} />
+      ) : (
+        <CancelConfirm screen={TAG} />
+      )
+    },
+    headerRight: () => <HeaderRight />,
+  }
 }
 
 class BackupPhrase extends React.Component<Props, State> {
@@ -172,6 +185,9 @@ const styles = StyleSheet.create({
     flex: 1,
     ...fontStyles.regular,
     paddingLeft: 8,
+  },
+  cancelButton: {
+    color: colors.gray4,
   },
 })
 

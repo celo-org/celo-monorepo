@@ -18,6 +18,7 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import CancelConfirm from 'src/backup/CancelConfirm'
 import { QuizzBottom } from 'src/backup/QuizzBottom'
 import { getStoredMnemonic, onGetMnemonicFail } from 'src/backup/utils'
+import CancelButton from 'src/components/CancelButton.v2'
 import DevSkipButton from 'src/components/DevSkipButton'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { emptyHeader } from 'src/navigator/Headers.v2'
@@ -71,10 +72,22 @@ const mapStateToProps = (state: RootState): StateProps => {
   }
 }
 
-export const navOptionsForQuiz: StackNavigationOptions = {
-  ...emptyHeader,
-  headerLeft: () => <CancelConfirm screen={TAG} />,
-  headerTitle: i18n.t(`${Namespaces.backupKeyFlow6}:headerTitle`),
+export const navOptionsForQuiz: StackNavigationOptions = ({ route }: OwnProps) => {
+  const navigatedFromSettings = route.params?.navigatedFromSettings
+  const onCancel = () => {
+    navigate(Screens.Settings)
+  }
+  return {
+    ...emptyHeader,
+    headerLeft: () => {
+      return navigatedFromSettings ? (
+        <CancelButton onCancel={onCancel} style={styles.cancelButton} />
+      ) : (
+        <CancelConfirm screen={TAG} />
+      )
+    },
+    headerTitle: i18n.t(`${Namespaces.backupKeyFlow6}:headerTitle`),
+  }
 }
 
 export class BackupQuiz extends React.Component<Props, State> {
@@ -408,6 +421,9 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   resetButton: { alignItems: 'center', padding: 24, marginTop: 8 },
+  cancelButton: {
+    color: colors.gray4,
+  },
 })
 
 export default connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
