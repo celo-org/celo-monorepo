@@ -2,11 +2,14 @@ import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { H4 } from 'src/fonts/Fonts'
 import Chainlink from 'src/icons/Chainlink'
+import { TweetLogo } from 'src/icons/TwitterLogo'
 import { useScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
-import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+import { colors, fonts, standardStyles, textStyles, typeFaces } from 'src/styles'
 import { copyToClipboad } from 'src/utils/utils'
 import LightButon from './LightButton'
+
+const WIDTH = 300
 
 export default function SideBar({ isOpen }) {
   const { isMobile } = useScreenSize()
@@ -16,19 +19,30 @@ export default function SideBar({ isOpen }) {
       <View style={[styles.expander, isOpen && styles.expanderOpen]} />
       <View style={[styles.root, isOpen ? openStyle : styles.hideSide]}>
         <View>
-          <H4 style={[textStyles.italic, standardStyles.elementalMarginBottom]}>
+          <H4
+            style={[
+              textStyles.italic,
+              standardStyles.elementalMarginBottom,
+              isMobile && styles.mobileTitle,
+            ]}
+          >
             As Wealth Flowers
           </H4>
-          <Text style={fonts.p}>
-            This art form is a testament to creative biunity of poetry and illustration. ‘Kuneco’ is
-            an Esperanto word signifying togetherness, and this communal interdependence forms the
-            heart of the creators’ work from within Celo. As a sacred gift, the spirit embodied
-            within this art piece gathers a space for intimate connection and an expressive tenor of
-            togetherness — in dedication to making conditions for collective prosperity to flower
-            throughout the world.
+          <Text style={[fonts.p, styles.aside]}>
+            This art form is a testament to the creative trinity of code, poetry, and illustration.
+            A work centered around channelling the Celo story,{' '}
+            <Text style={textStyles.italic}>As Wealth Flowers</Text> is a gift of optimism — giving
+            form to a spirit of collective prosperity, and celebrating it when seen brought to life.
+          </Text>
+          <Text style={[fonts.p, styles.aside, standardStyles.elementalMarginTop]}>
+            Kuneco is an Esperanto word signifying togetherness, and this communal interdependence
+            forms the heart of the creators’ work from within Celo. As a sacred gift, the spirit
+            embodied within this art piece gathers a space for intimate connection and an expressive
+            tenor of togetherness — in dedication to making conditions for collective prosperity to
+            flower throughout the world.
           </Text>
           <Button
-            style={standardStyles.elementalMargin}
+            style={styles.chevronButton}
             kind={BTN.DARKNAKED}
             text="Read about the poem"
             href="#poemlink"
@@ -38,16 +52,17 @@ export default function SideBar({ isOpen }) {
             kind={BTN.DARKNAKED}
             text="Read about the art"
             href="#artlink"
+            style={styles.chevronButton}
             size={SIZE.normal}
           />
-          <View style={[standardStyles.row, standardStyles.elementalMargin]}>
+          <View style={[standardStyles.row, standardStyles.blockMarginMobile]}>
             <TweetButton />
             <LightButon onPress={copyURL} style={styles.copyButton}>
               <Chainlink size={16} color={colors.dark} /> Copy
             </LightButon>
           </View>
         </View>
-        <View style={standardStyles.elementalMargin}>
+        <View style={standardStyles.blockMarginBottomMobile}>
           <View style={[styles.line, standardStyles.elementalMarginBottom]} />
           <Contributor role="Poetry" name="Gabrielle Micheletti, cLabs" />
           <Contributor role="Code & Animation" name="Aaron DeRuvo, cLabs" />
@@ -64,18 +79,11 @@ function copyURL() {
 
 const TweetButton = React.memo(() => {
   return (
-    <a
-      href="https://twitter.com/share?ref_src=twsrc%5Etfw"
-      className="twitter-share-button"
-      data-size="large"
-      data-text="As Wealth Flowers"
-      data-via="celoOrg"
-      data-hashtags="kuneco"
-      data-related="celoOrg"
-      data-show-count="false"
-    >
-      Tweet
-    </a>
+    <>
+      <LightButon href="https://twitter.com/intent/tweet?hashtags=celoflora&related=celoOrg&via=celoOrg">
+        <TweetLogo height={16} color={colors.dark} /> Tweet
+      </LightButon>
+    </>
   )
 })
 
@@ -93,10 +101,10 @@ const styles = StyleSheet.create({
     width: 0,
     willChange: 'width',
     transitionProperty: 'width',
-    transitionDuration: '600ms',
+    transitionDuration: '1400ms',
   },
   expanderOpen: {
-    width: 270,
+    width: WIDTH,
   },
   root: {
     backgroundColor: colors.white,
@@ -104,8 +112,9 @@ const styles = StyleSheet.create({
     minHeight: 'calc(100vh - 50px)',
     willChange: 'transform, opacity',
     transitionProperty: 'transform, opacity',
-    transitionDuration: '600ms',
-    width: 270,
+    transitionDuration: '1200ms',
+    width: WIDTH,
+    paddingHorizontal: 10,
     position: 'absolute',
     right: 0,
   },
@@ -121,15 +130,18 @@ const styles = StyleSheet.create({
     opacity: 1,
   },
   hideSide: {
-    transform: [{ translateX: 300 }],
+    transform: [{ translateX: 310 }],
     opacity: 0.1,
   },
   role: {
     textTransform: 'uppercase',
     fontWeight: 'bold',
+    letterSpacing: 4,
+    lineHeight: 20,
+    marginBottom: 4,
   },
   contributor: {
-    marginBottom: 10,
+    marginBottom: 16,
   },
   line: {
     width: 26,
@@ -137,4 +149,16 @@ const styles = StyleSheet.create({
     backgroundColor: colors.dark,
   },
   copyButton: { marginLeft: 10 },
+  aside: {
+    fontSize: 18,
+    lineHeight: 24,
+  },
+  chevronButton: {
+    fontFamily: typeFaces.garamond,
+    fontWeight: 'bold',
+    marginTop: 20,
+  },
+  mobileTitle: {
+    fontSize: 30,
+  },
 })

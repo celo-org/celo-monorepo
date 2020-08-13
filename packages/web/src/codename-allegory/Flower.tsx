@@ -147,7 +147,7 @@ const SCALER_MOBILE = {
 
 const POSITIONING_DESKTOP = {
   inputRange: [0, 0.5],
-  outputRange: ['0%', '30%'],
+  outputRange: ['0%', '10%'],
 }
 
 const POSITIONING_MOBILE = {

@@ -1,33 +1,30 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import { H4 } from 'src/fonts/Fonts'
 import { useScreenSize } from 'src/layout/ScreenSize'
+import Fade from 'src/shared/Fade'
 import { fonts, standardStyles, textStyles } from 'src/styles'
 
 export default function Poem() {
   const { isDesktop } = useScreenSize()
   return (
     <View style={isDesktop && styles.root}>
-      <H4 style={[textStyles.italic, standardStyles.elementalMarginBottom]}>
-        <Fade fraction={0.9} bottom={true} duration={2000} delay={300} distance={'20px'}>
-          As Wealth Flowers
+      <Fade duration={3000} rootMargin={'-35% 0% -25% 0%'} fraction={0.9}>
+        <H4 style={[textStyles.italic, standardStyles.elementalMarginBottom]}>As Wealth Flowers</H4>
+      </Fade>
+      {STANZAS.map((verse, i) => (
+        <Fade key={i} duration={3000} rootMargin={'-35% 0% -25% 0%'} fraction={0.9}>
+          <Text style={fonts.p}>{verse}</Text>
         </Fade>
-      </H4>
-      <Text style={fonts.p}>
-        {STANZAS.map((verse, i) => (
-          <Fade fraction={0.85} key={i} bottom={true} duration={2000} delay={100} distance={'50%'}>
-            {verse}
-          </Fade>
-        ))}
-      </Text>
+      ))}
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   root: {
-    marginTop: '40vh',
+    marginTop: '30vh',
+    marginBottom: '30vh',
   },
 })
 

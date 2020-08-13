@@ -25,13 +25,13 @@ export default function Canvas() {
       </Head>
       <View style={styles.root}>
         <View style={styles.nav}>
-          <Text onPress={toggleSidebar} style={[fonts.p, textStyles.heavy]}>
+          <Text onPress={toggleSidebar} style={[fonts.p, textStyles.heavy, styles.navText]}>
             <View style={styles.about}>
-              <Fade duration={DURATION} left={true} cascade={true} opposite={true} when={!isOpen}>
+              <Fade duration={DURATION} when={!isOpen}>
                 About
               </Fade>
             </View>
-            <Fade duration={DURATION} right={true} cascade={true} opposite={true} when={isOpen}>
+            <Fade duration={DURATION} opposite={true} when={isOpen}>
               Close
             </Fade>
           </Text>
@@ -53,6 +53,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
     paddingHorizontal: 40,
     paddingVertical: 10,
+  },
+  navText: {
+    fontSize: 18,
   },
   container: {
     overflow: 'hidden',

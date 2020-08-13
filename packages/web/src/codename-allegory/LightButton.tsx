@@ -64,6 +64,7 @@ export default function LightButon({ href, children, style, onPress }: Props) {
           isPressing && styles.pressing,
         ]}
         href={href}
+        accessibilityRole="link"
       >
         {children}
       </Text>

@@ -1,0 +1,32 @@
+import * as React from 'react'
+import { StyleSheet } from 'react-native'
+import useOnScreen from 'src/hooks/useOnScreen'
+
+export interface Options {
+  duration?: number
+  delay?: number
+  distance?: string
+  fraction?: number
+  bottom?: boolean
+  rootMargin?: string
+}
+
+export default function useFade({ rootMargin, duration, fraction }: Options) {
+  const ref = React.useRef(null)
+
+  const isOnScreen = useOnScreen(ref, fraction, rootMargin)
+
+  const style = React.useMemo(
+    () =>
+      StyleSheet.create({
+        base: {
+          transitionDuration: `${duration}ms`,
+          transitionProperty: 'opacity',
+          opacity: isOnScreen ? 1 : 0,
+        },
+      }),
+    [isOnScreen]
+  )
+
+  return { style: style.base, ref }
+}
