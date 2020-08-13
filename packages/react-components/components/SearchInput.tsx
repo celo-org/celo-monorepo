@@ -1,6 +1,6 @@
 import TextInput, { TextInputProps } from '@celo/react-components/components/TextInput.v2'
 import Search from '@celo/react-components/icons/Search'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import React from 'react'
 import { StyleSheet, View } from 'react-native'
 

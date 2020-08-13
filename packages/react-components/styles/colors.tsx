@@ -1,38 +1,29 @@
-// Todo make the casing consistent with these
-export default {
-  background: '#FFFFFF',
-  backgroundDarker: '#FAFAFA',
-  loadingBarGrey: '#DBDBDB',
-  darkGrey: '#3D3D3D',
-  gray: 'rgba(0, 0, 0, .4)',
-  lightGray: '#BDBDBD',
-  listBorderColor: 'rgba(0, 0, 0, .5)',
-  inputLabelColor: 'rgba(0, 0, 0, 0.3)',
-
-  celoGold: '#FBCC5C', // brandSecondary
-  celoGoldInactive: '#F4E8BE',
-  celoGreen: '#42D689', // brandPrimary
-  celoDarkGreen: '#1AB775',
-  celoDarkGreenInactive: '#5ee8ae',
-  celoGreenInactive: '#A3EBC6',
-  celoGreenInactiveExtra: '#D4EEE0',
-  dark: '#2E3338',
-  darkSecondary: '#81868B',
-  darkLightest: '#EEEEEE',
-  altDarkBg: '#F8F8F8',
-  white: '#FFFFFF',
-  inactive: '#D1D5D8',
-  inactiveDark: 'color: rgba(46, 51, 56, 0.4)',
-  inactiveLabelBar: '#E3E3E5',
-  iconDefault: '#81868B',
-  listBorder: 'rgba(134, 138, 141, 0.15)',
-  inputBorder: '#D1D5D8',
-  sectionBorder: '#C4C4C4',
-  errorRed: '#FD785B',
-  messageBlue: '#3C9BF4',
-  purple: '#D39CFE',
-  teal: '#7AD6FE',
-  orange: '#FEB45E',
-  disconnectBannerGrey: 'rgba(46, 51, 56, 0.4)',
-  disconnectBannerRed: '#FF7F6D',
+// Designer Created Figma Colors
+export enum Colors {
+  greenFaint = '#97DFC1', // green disabled
+  greenBrand = '#42D689',
+  greenUI = '#1AB775',
+  goldFaint = '#E3C376', // gold disabled
+  goldBrand = '#FBCC5C',
+  goldUI = '#EEB93C',
+  goldDark = '#9C6E00',
+  beige = '#F1F0EB',
+  brownFaint = '#FFF9EE',
+  warning = '#EA6042',
+  dark = '#2E3338',
+  gray5 = '#81868B',
+  gray4 = '#9CA4A9',
+  gray3 = '#B4B9BD',
+  gray2 = '#EDEEEF',
+  gray1 = '#F8F9F9',
+  light = '#FFFFFF',
+  purple = '#D39CFE',
+  teal = '#7AD6FE',
+  orange = '#FEB45E',
+  onboardingBrownLight = '#A49B80',
+  onboardingBlue = '#0768AE',
+  onboardingLightBlue = '#D6EAF3',
+  onboardingBackground = '#F9F6F0',
 }
+
+export default Colors

@@ -25,6 +25,9 @@ OPTIONS
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
+
   --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLE
@@ -55,6 +58,9 @@ OPTIONS
                                                      "[4,99]"
 
   --proposalID=proposalID                            (required) UUID of proposal to execute
+
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -88,6 +94,9 @@ OPTIONS
 
   --salt=salt                                        (required) Secret salt associated with hotfix
 
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
+
   --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLE
@@ -119,6 +128,9 @@ OPTIONS
 
   --salt=salt                                    (required) Secret salt associated with hotfix
 
+  --usdGas                                       If --usdGas is set, the transaction is paid for with a feeCurrency of
+                                                 cUSD
+
   --useLedger                                    Set it to use a ledger wallet
 
 EXAMPLE
@@ -135,6 +147,9 @@ List live governance proposals (queued and ongoing)
 ```
 USAGE
   $ celocli governance:list
+
+OPTIONS
+  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
 
 EXAMPLE
   list
@@ -163,6 +178,9 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -201,6 +219,9 @@ OPTIONS
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
+
   --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLE
@@ -231,6 +252,9 @@ OPTIONS
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
+
   --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLE
@@ -254,6 +278,7 @@ OPTIONS
   --notwhitelisted         List validators who have not whitelisted the specified hotfix
   --proposalID=proposalID  UUID of proposal to view
   --raw                    Display proposal in raw bytes format
+  --usdGas                 If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
   --whitelisters           If set, displays validators that have whitelisted the hotfix.
 
 EXAMPLES
@@ -290,6 +315,9 @@ OPTIONS
 
   --proposalID=proposalID                            (required) UUID of proposal to upvote
 
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
+
   --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLE
@@ -309,6 +337,7 @@ USAGE
 OPTIONS
   --proposalID=proposalID  (required) UUID of proposal to view
   --raw                    Display proposal in raw bytes format
+  --usdGas                 If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
 
 EXAMPLES
   view --proposalID 99
@@ -328,6 +357,7 @@ USAGE
 OPTIONS
   --hash=hash        (required) Hash of hotfix transactions
   --nonwhitelisters  If set, displays validators that have not whitelisted the hotfix.
+  --usdGas           If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
   --whitelisters     If set, displays validators that have whitelisted the hotfix.
 
 EXAMPLES
@@ -361,6 +391,9 @@ OPTIONS
 
   --proposalID=proposalID                            (required) UUID of proposal to vote on
 
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
+
   --useLedger                                        Set it to use a ledger wallet
 
   --value=(Abstain|No|Yes)                           (required) Vote
@@ -393,6 +426,9 @@ OPTIONS
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
+
   --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLE
@@ -422,6 +458,9 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 

@@ -50,7 +50,7 @@ export function WarningModal({
 
 const styles = StyleSheet.create({
   modalContainer: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
     padding: 20,
     marginHorizontal: 10,
     borderRadius: 4,
@@ -69,12 +69,12 @@ const styles = StyleSheet.create({
   modalCancelText: {
     ...fontStyles.body,
     ...fontStyles.semiBold,
-    color: colors.gray,
+    color: colors.gray5,
     paddingRight: 40,
   },
   modalContinueText: {
     ...fontStyles.body,
     ...fontStyles.semiBold,
-    color: colors.celoGreen,
+    color: colors.greenBrand,
   },
 })
