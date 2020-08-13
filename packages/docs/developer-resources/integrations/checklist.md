@@ -18,7 +18,7 @@ Celo has [WIP QR code standard CIP16](https://github.com/celo-org/celo-proposals
 Please read more under [Custody](./custody.md), but here is a shortened version:
 
 ### Detect Transfers
-cUSD is a token that can be accessed via the ERC20 interface, however the native asset CELO can be accessed via the `GoldToken` ERC20 interface, or natively, similar to `ETH` on Ethereum.
+Stable-value currencies, currently just cUSD, is a contract `StableToken` that can be accessed via the ERC20 interface. The native asset CELO can be accessed via the `GoldToken` ERC20 interface, or natively, similar to ETH on Ethereum.
 
 ### Proof of Stake
 Users may want to participate in Celo's Proof of Stake system to help secure the network and earn rewards.
