@@ -128,12 +128,19 @@ export async function initGeth(shouldStartNode: boolean = true): Promise<RNGeth 
 
   try {
     if (shouldStartNode) {
-      if (!(await ensureGenesisBlockWritten())) {
-        throw FailedToFetchGenesisBlockError
-      }
-      if (!(await ensureStaticNodesInitialized())) {
-        throw FailedToFetchStaticNodesError
-      }
+      // Write static node and genesis block, canceling if either fail.
+      await Promise.all([
+        ensureGenesisBlockWritten().then((ok) => {
+          if (!ok) {
+            throw FailedToFetchGenesisBlockError
+          }
+        }),
+        ensureStaticNodesInitialized().then((ok) => {
+          if (!ok) {
+            throw FailedToFetchStaticNodesError
+          }
+        }),
+      ])
     }
 
     ValoraAnalytics.track(GethEvents.create_geth_start)

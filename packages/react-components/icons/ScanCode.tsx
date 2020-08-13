@@ -8,7 +8,7 @@ interface Props {
 
 export default class ScanCode extends React.PureComponent<Props> {
   static defaultProps = {
-    color: colors.celoGreen,
+    color: colors.greenBrand,
   }
 
   render() {
