@@ -24,7 +24,7 @@ cUSD is a token that can be accessed via the ERC20 interface, however the native
 Users may want to participate in Celo's Proof of Stake system to help secure the network and earn rewards.
 
 ### Authorized Signers
-Celo's core smart contracts use Celo's `Accounts` abstraction to allow balance-moving keys to be held in cold storage, while other keys can be authorized to vote and held in warm storage or even with the user.
+Celo's core smart contracts use Celo's `Accounts` abstraction to allow balance-moving keys to be held in cold storage, while other keys can be authorized to vote and be held in warm storage or online.
 
 ### Release Gold
 There is an audited `ReleaseGold` smart contract which allows for the release of `CELO` over a set schedule through which `CELO` might be distributed to a user.
