@@ -17,6 +17,7 @@ const EXAMPLE_NAME = 'Test Name'
 const DEFAULT_RECIPIENT_PHONE_NUMBER = '+10000000000'
 const DEFAULT_RECIPIENT_ADDRESS = '0x22c8a9178841ba95a944afd1a1faae517d3f5daa'
 const AMOUNT_TO_SEND = '0.1'
+const CELO_TO_SEND = '0.001'
 const RANDOM_COMMENT = 'poker night winnings'
 
 // clicks an element if it sees it
@@ -193,6 +194,40 @@ describe('Transfer Works', () => {
 
     // TODO(erdal): look for the latest transaction and
     // make sure it was successful
+  })
+
+  it('Wallet Home -> Exchange CELO', async () => {
+    // Open Hamburguer menu and go to CELO screen.
+    await element(by.id('Hamburguer')).tap()
+    await waitFor(element(by.id('DrawerItem/CELO')))
+      .toBeVisible()
+      .withTimeout(10000)
+    await element(by.id('DrawerItem/CELO')).tap()
+    // Go through the education flow.
+    await element(by.id('Education/progressButton')).tap()
+    await element(by.id('Education/progressButton')).tap()
+    await element(by.id('Education/progressButton')).tap()
+    await element(by.id('Education/progressButton')).tap()
+    await waitFor(element(by.id('WithdrawCELO')))
+      .toBeVisible()
+      .withTimeout(10000)
+    // Go to the Withdraw Celo screen and fill the data.
+    await element(by.id('WithdrawCELO')).tap()
+    await waitFor(element(by.id('AccountAddress')))
+      .toBeVisible()
+      .withTimeout(10000)
+    await element(by.id('AccountAddress')).replaceText(DEFAULT_RECIPIENT_ADDRESS)
+    await element(by.id('CeloAmount')).replaceText(CELO_TO_SEND)
+    // Tap review to go to the review screen and confirm.
+    await element(by.id('WithdrawReviewButton')).tap()
+    await waitFor(element(by.id('ConfirmWithdrawButton')))
+      .toBeVisible()
+      .withTimeout(10000)
+    await element(by.id('ConfirmWithdrawButton')).tap()
+    // Make sure we return to the Exchange CELO screen after confirming.
+    await waitFor(element(by.id('WithdrawCELO')))
+      .toBeVisible()
+      .withTimeout(10000)
   })
 
   // TODO(erdal): generate a new invite

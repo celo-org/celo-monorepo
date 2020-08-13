@@ -14,6 +14,13 @@
     "location": "packages/azure",
     "dependencies": []
   },
+  "@celo/base": {
+    "location": "packages/base",
+    "dependencies": [
+      "@celo/flake-tracker",
+      "@celo/typescript"
+    ]
+  },
   "@celo/blockchain-api": {
     "location": "packages/blockchain-api",
     "dependencies": [
@@ -44,6 +51,7 @@
   "@celo/contractkit": {
     "location": "packages/contractkit",
     "dependencies": [
+      "@celo/base",
       "@celo/dev-utils",
       "@celo/flake-tracker",
       "@celo/protocol",
@@ -132,6 +140,7 @@
   "@celo/utils": {
     "location": "packages/utils",
     "dependencies": [
+      "@celo/base",
       "@celo/flake-tracker",
       "@celo/typescript"
     ]

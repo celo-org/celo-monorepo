@@ -8,7 +8,6 @@ import {
   DrawerContentComponentProps,
   DrawerContentOptions,
   DrawerContentScrollView,
-  DrawerItem,
 } from '@react-navigation/drawer'
 import {
   DrawerDescriptorMap,
@@ -49,6 +48,7 @@ import { Gold } from 'src/icons/navigator/Gold'
 import { Help } from 'src/icons/navigator/Help'
 import { Home } from 'src/icons/navigator/Home'
 import { Settings } from 'src/icons/navigator/Settings'
+import DrawerItem from 'src/navigator/DrawerItem'
 import { ensurePincode } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import useSelector from 'src/redux/useSelector'
@@ -107,6 +107,7 @@ function CustomDrawerItemList({
     return (
       <DrawerItem
         {...passThroughProps}
+        testID={`DrawerItem/${title}`}
         key={route.key}
         label={drawerLabel !== undefined ? drawerLabel : title !== undefined ? title : route.name}
         icon={drawerIcon}
