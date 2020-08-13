@@ -35,6 +35,7 @@ export function* fetchContactMatches(e164NumberToRecipients: NumberToRecipient) 
       selfPhoneDetails.e164Number,
       Object.keys(e164NumberToRecipients),
       account,
+      selfPhoneDetails.phoneHash,
       authSigner,
       networkConfig,
       DeviceInfo.getVersion()
