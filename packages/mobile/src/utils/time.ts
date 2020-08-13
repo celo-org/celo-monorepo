@@ -288,7 +288,7 @@ export const getLocalTimezone = () => {
   const timezoneGuess = momentTimezone.tz(momentTimezone.tz.guess())
   momentTimezone.fn.zoneName = function() {
     const abbr = this.zoneAbbr()
-    if (!i18n.language.includes('en')) {
+    if (!i18n.language?.includes('en')) {
       return abbr
     }
     return (

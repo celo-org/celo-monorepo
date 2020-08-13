@@ -18,8 +18,11 @@ export class SetClock extends React.Component<WithTranslation> {
     if (Platform.OS === 'android') {
       return AndroidOpenSettings.dateSettings()
     } else {
-      // TODO: Implement Date Setting on iOS
       navigateHome()
+      // With the following line we would be able to direct to the correct screen in
+      // settings, but it looks like this is a private API and using it risks getting
+      // the app rejected by Apple: https://stackoverflow.com/a/34024467
+      // return Linking.openURL('App-prefs:General&path=DATE_AND_TIME')
     }
   }
 
