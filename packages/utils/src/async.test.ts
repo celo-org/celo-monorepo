@@ -24,13 +24,19 @@ describe('retryAsync()', () => {
 })
 
 describe('selectiveRetryAsyncWithBackOff()', () => {
-  test('tries once if error is in dontRetry array', async () => {
+  test('tries only once if error is in dontRetry array', async () => {
     const mockFunction = jest.fn()
     mockFunction.mockImplementation(() => {
-      throw Error('test')
+      throw new Error('test')
     })
-    await selectiveRetryAsyncWithBackOff(mockFunction, 3, ['test'], [])
+    let didThrowError = false
+    try {
+      await selectiveRetryAsyncWithBackOff(mockFunction, 3, ['test'], [])
+    } catch {
+      didThrowError = true
+    }
     expect(mockFunction).toHaveBeenCalledTimes(1)
+    expect(didThrowError).toBeTruthy()
   })
 })
 
