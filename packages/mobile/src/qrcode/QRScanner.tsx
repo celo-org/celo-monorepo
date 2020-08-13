@@ -1,22 +1,18 @@
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
-import { StackScreenProps } from '@react-navigation/stack'
-import { memoize } from 'lodash'
-import React, { useCallback } from 'react'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text } from 'react-native'
 import { RNCamera } from 'react-native-camera'
 import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Defs, Mask, Rect, Svg } from 'react-native-svg'
-import { useDispatch } from 'react-redux'
 import { Namespaces } from 'src/i18n'
-import { Screens } from 'src/navigator/Screens'
-import { QRTabParamList } from 'src/navigator/types'
 import NotAuthorizedView from 'src/qrcode/NotAuthorizedView'
-import { handleBarcodeDetected, QrCode } from 'src/send/actions'
-import Logger from 'src/utils/Logger'
+import { QrCode } from 'src/send/actions'
 
-type Props = StackScreenProps<QRTabParamList, Screens.QRScanner>
+interface QRScannerProps {
+  onBarCodeDetected: (qrCode: QrCode) => void
+}
 
 const SeeThroughOverlay = () => {
   const { width, height } = useSafeAreaFrame()
@@ -48,32 +44,9 @@ const SeeThroughOverlay = () => {
   )
 }
 
-export default function QRScanner({ route }: Props) {
-  const dispatch = useDispatch()
+export default function QRScanner({ onBarCodeDetected }: QRScannerProps) {
   const { t } = useTranslation(Namespaces.sendFlow7)
   const inset = useSafeAreaInsets()
-
-  const { scanIsForSecureSend, isOutgoingPaymentRequest, transactionData, requesterAddress } =
-    route.params || {}
-
-  const onBarCodeDetected = useCallback(
-    memoize(
-      (qrCode: QrCode) => {
-        Logger.debug('QRScanner', 'Bar code detected')
-        dispatch(
-          handleBarcodeDetected(
-            qrCode,
-            scanIsForSecureSend,
-            transactionData,
-            isOutgoingPaymentRequest,
-            requesterAddress
-          )
-        )
-      },
-      (qrCode) => qrCode.data
-    ),
-    [scanIsForSecureSend, transactionData, isOutgoingPaymentRequest, requesterAddress]
-  )
 
   return (
     <RNCamera
@@ -88,6 +61,7 @@ export default function QRScanner({ route }: Props) {
       // @ts-ignore
       androidCameraPermissionOptions={null}
       notAuthorizedView={<NotAuthorizedView />}
+      testID={'Camera'}
     >
       <SeeThroughOverlay />
       <Text style={[styles.infoText, { marginBottom: inset.bottom }]}>{t('cameraScanInfo')}</Text>

@@ -30,6 +30,7 @@ export interface ButtonProps {
   style?: StyleProp<ViewStyle>
   text: string | ReactNode
   showLoading?: boolean
+  loadingColor?: string
   accessibilityLabel?: string
   type?: BtnTypes
   rounded?: boolean
@@ -49,6 +50,7 @@ export default React.memo(function Button(props: ButtonProps) {
     rounded = true,
     style,
     showLoading,
+    loadingColor = colors.greenBrand,
   } = props
 
   // Debounce onPress event so that it is called once on trigger and
@@ -71,7 +73,7 @@ export default React.memo(function Button(props: ButtonProps) {
           testID={testID}
         >
           {showLoading ? (
-            <ActivityIndicator size="small" color={colors.greenBrand} />
+            <ActivityIndicator size="small" color={loadingColor} />
           ) : (
             <Text
               accessibilityLabel={accessibilityLabel}
