@@ -1,4 +1,4 @@
-import { sleep } from '@celo/utils/lib/async'
+import { sleep } from '@celo/base/lib/async'
 import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import { EncodedTransaction, Tx } from 'web3-core'
 import { Address } from '../base'

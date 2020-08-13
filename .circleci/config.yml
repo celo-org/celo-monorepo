@@ -153,6 +153,7 @@ jobs:
           name: Build packages
           command: |
             # separate build to avoid ENOMEM in CI :(
+            yarn build --scope @celo/base
             yarn build --scope @celo/utils
             yarn build --scope @celo/protocol
             yarn build --ignore @celo/protocol --ignore docs
@@ -675,6 +676,24 @@ jobs:
             cd /tmp
             npm install ~/app/packages/typescript/*.tgz
 
+  base-test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/base
+      - run:
+          name: Install and test the npm package
+          command: |
+            set -euo pipefail
+            cd packages/base
+            yarn pack
+            cd /tmp
+            npm install ~/app/packages/base/*.tgz
+
   utils-test:
     <<: *defaults
     steps:
@@ -688,9 +707,12 @@ jobs:
           name: Install and test the npm package
           command: |
             set -euo pipefail
-            cd packages/utils
+            cd packages/base
+            yarn pack
+            cd ../utils
             yarn pack
             cd /tmp
+            npm install ~/app/packages/base/*.tgz
             npm install ~/app/packages/utils/*.tgz
 
   end-to-end-geth-transfer-test:
@@ -977,6 +999,9 @@ workflows:
           requires:
             - lint-checks
       - typescript-test:
+          requires:
+            - install_dependencies
+      - base-test:
           requires:
             - install_dependencies
       - utils-test:
