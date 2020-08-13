@@ -16,7 +16,12 @@ export default function SideBar({ isOpen }) {
   const openStyle = isMobile ? styles.showSideMobile : styles.showSide
   return (
     <>
-      <View style={[styles.expander, isOpen && styles.expanderOpen]} />
+      <View
+        style={[
+          isMobile ? styles.expanderMobile : styles.expander,
+          !isMobile && isOpen && styles.expanderOpen,
+        ]}
+      />
       <View style={[styles.root, isOpen ? openStyle : styles.hideSide]}>
         <View>
           <H4
@@ -110,8 +115,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     justifyContent: 'space-between',
     minHeight: 'calc(100vh - 50px)',
-    willChange: 'transform, opacity',
-    transitionProperty: 'transform, opacity',
+    willChange: 'transform',
+    transitionProperty: 'transform',
     transitionDuration: '1200ms',
     width: WIDTH,
     paddingHorizontal: 10,
@@ -131,7 +136,6 @@ const styles = StyleSheet.create({
   },
   hideSide: {
     transform: [{ translateX: 310 }],
-    opacity: 0.1,
   },
   role: {
     textTransform: 'uppercase',

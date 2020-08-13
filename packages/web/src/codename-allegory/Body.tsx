@@ -50,9 +50,12 @@ const styles = StyleSheet.create({
     marginVertical: 30,
   },
   open: {
+    opacity: 0,
     height: 'calc(100vh - 50px)',
   },
   mobile: {
+    transitionDuration: '700ms',
+    transitionProperty: 'opacity',
     width: '100vw',
     paddingHorizontal: 0,
     paddingTop: '10vh',
