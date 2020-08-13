@@ -93,11 +93,11 @@ export async function handleGetBlindedMessagePartialSig(
     } else {
       didStoreRequest = !!(await storeRequest(request.body))
       if (!didStoreRequest) {
-        errorMsg = WarningMessage.FAILURE_TO_STORE_REQUEST
+        errorMsg = ErrorMessage.FAILURE_TO_STORE_REQUEST
       }
       didIncrementQueryCount = !!(await incrementQueryCount(account))
       if (!didIncrementQueryCount) {
-        errorMsg = WarningMessage.FAILURE_TO_INCREMENT_QUERY_COUNT
+        errorMsg = ErrorMessage.FAILURE_TO_INCREMENT_QUERY_COUNT
       }
     }
     if (!didStoreRequest) {
