@@ -1,0 +1,60 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TextInputWithButtons renders correctly 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "center",
+      },
+      undefined,
+    ]
+  }
+>
+  <TextInput
+    allowFontScaling={true}
+    onChangeText={[MockFunction]}
+    rejectResponderTermination={true}
+    style={
+      Array [
+        Object {
+          "color": "#2E3338",
+          "flex": 1,
+          "fontFamily": "Inter-Regular",
+          "fontSize": 16,
+          "lineHeight": 22,
+          "paddingHorizontal": 0,
+          "paddingVertical": 12,
+        },
+        undefined,
+      ]
+    }
+    underlineColorAndroid="transparent"
+    value="TestValue"
+  />
+  <View
+    accessible={true}
+    focusable={true}
+    onClick={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      Object {
+        "opacity": 1,
+      }
+    }
+    testID="Touchable"
+  >
+    <Text>
+      Some text
+    </Text>
+  </View>
+</View>
+`;
