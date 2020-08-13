@@ -15,7 +15,7 @@ import { AccountsWrapper } from '../wrappers/Accounts'
 import { createStorageClaim } from './claims/claim'
 import { IdentityMetadataWrapper } from './metadata'
 import OffchainDataWrapper from './offchain-data-wrapper'
-import { AuthorizedSignerAccessor, EncryptionKeysAccessor, NameAccessor } from './offchain/schemas'
+import { AuthorizedSignerAccessor, NameAccessor } from './offchain/schemas'
 import { MockStorageWriter } from './offchain/storage-writers'
 
 testWithGanache('Offchain Data', (web3) => {
@@ -111,7 +111,7 @@ testWithGanache('Offchain Data', (web3) => {
           kit.addAccount(readerEncryptionKeyPrivate)
         })
 
-        it.only("the writer can encrypt data directly to the reader's dataEncryptionKey", async () => {
+        it("the writer can encrypt data directly to the reader's dataEncryptionKey", async () => {
           const newKey = ensureLeading0x(randomBytes(32).toString('hex'))
           const newKeyPub = privateKeyToPublicKey(newKey)
 
@@ -142,14 +142,13 @@ testWithGanache('Offchain Data', (web3) => {
           expect(receivedName).toBeDefined()
         })
 
-        it('the writer can create an encryption key and encrypt that to the readers dataEncryptionKey', async () => {
+        it.only('the writer can create an encryption key and encrypt that to the readers dataEncryptionKey', async () => {
           const newKey = ensureLeading0x(randomBytes(32).toString('hex'))
           const newKeyPub = privateKeyToPublicKey(newKey)
           const testname = 'test'
           const payload = { name: testname }
           const stringifiedPayload = JSON.stringify(payload)
 
-          console.log('encrypt', newKey, readerEncryptionKeyPrivate, readerEncryptionKeyPublic)
           const encryptedPayload = {
             publicKey: newKeyPub,
             ciphertext: Encrypt(
@@ -159,7 +158,6 @@ testWithGanache('Offchain Data', (web3) => {
           }
 
           console.log('write ciphertext')
-
           await wrapper.writeDataTo(JSON.stringify(encryptedPayload), '/account/name')
 
           // Write the encryption key
@@ -172,11 +170,23 @@ testWithGanache('Offchain Data', (web3) => {
             },
           }
 
-          console.log('write keys')
-          const encryptionKeysAccessor = new EncryptionKeysAccessor(wrapper)
-          await encryptionKeysAccessor.write(reader, encryptionKeys)
+          const stringifiedEncryptionKeys = JSON.stringify(encryptionKeys)
+          const encryptedKeys = {
+            publicKey: readerEncryptionKeyPublic,
+            ciphertext: Encrypt(
+              Buffer.from(trimLeading0x(readerEncryptionKeyPublic), 'hex'),
+              Buffer.from(stringifiedEncryptionKeys)
+            ).toString('hex'),
+          }
 
-          const nameAccessor = new NameAccessor(wrapper)
+          await wrapper.writeDataTo(
+            JSON.stringify(encryptedKeys),
+            `/other/${reader}/encryptionKeys`
+          )
+
+          const readerWrapper = new OffchainDataWrapper(reader, kit)
+
+          const nameAccessor = new NameAccessor(readerWrapper)
           const receivedName = await nameAccessor.read(writer)
           expect(receivedName).toBeDefined()
         })

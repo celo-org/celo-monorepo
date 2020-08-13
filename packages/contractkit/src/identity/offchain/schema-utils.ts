@@ -23,7 +23,17 @@ export class SingleSchema<T> {
 const EncryptedCipherText = t.type({
   publicKey: t.string,
   ciphertext: t.string,
-  encryptedKey: t.record(t.string, t.string),
+  encryptedKey: t.union([t.record(t.string, t.string), t.undefined]),
+})
+
+const EncryptionKeysSchema = t.type({
+  keys: t.record(
+    t.string,
+    t.type({
+      privateKey: t.string,
+      publicKey: t.string,
+    })
+  ),
 })
 
 export const readWithSchema = async <T>(
@@ -67,27 +77,52 @@ export const readWithSchema = async <T>(
     return parseResultViaCiphertext.right
   }
 
-  const keyToDecryptDecryptionKey = Object.keys(
-    parseResultAsCiphertext.right.encryptedKey
-  ).find((x) => wallet.hasAccount(publicKeyToAddress(x)))
+  if (parseResultAsCiphertext.right.encryptedKey) {
+    const keyToDecryptDecryptionKey = Object.keys(
+      parseResultAsCiphertext.right.encryptedKey
+    ).find((x) => wallet.hasAccount(publicKeyToAddress(x)))
 
-  if (keyToDecryptDecryptionKey) {
-    const decryptionKeyCiphertext =
-      parseResultAsCiphertext.right.encryptedKey[keyToDecryptDecryptionKey]
+    if (keyToDecryptDecryptionKey) {
+      const decryptionKeyCiphertext =
+        parseResultAsCiphertext.right.encryptedKey[keyToDecryptDecryptionKey]
 
-    const decryptionKey = await wallet.decrypt(
-      publicKeyToAddress(keyToDecryptDecryptionKey),
-      Buffer.from(decryptionKeyCiphertext, 'hex')
-    )
+      const decryptionKey = await wallet.decrypt(
+        publicKeyToAddress(keyToDecryptDecryptionKey),
+        Buffer.from(decryptionKeyCiphertext, 'hex')
+      )
 
-    wrapper.kit.addAccount(ensureLeading0x(decryptionKey.toString('hex')))
+      wrapper.kit.addAccount(ensureLeading0x(decryptionKey.toString('hex')))
 
-    const actualPlaintext = await wallet.decrypt(
-      privateKeyToAddress(ensureLeading0x(decryptionKey.toString('hex'))),
+      const actualPlaintext = await wallet.decrypt(
+        privateKeyToAddress(ensureLeading0x(decryptionKey.toString('hex'))),
+        Buffer.from(parseResultAsCiphertext.right.ciphertext, 'hex')
+      )
+
+      const parseResultViaCiphertext = type.decode(JSON.parse(actualPlaintext.toString()))
+
+      if (isLeft(parseResultViaCiphertext)) {
+        return undefined
+      }
+
+      return parseResultViaCiphertext.right
+    }
+  }
+
+  const encryptionKeys = await readWithSchema(
+    wrapper,
+    EncryptionKeysSchema,
+    account,
+    `/other/${wrapper.self}/encryptionKeys`
+  )
+  if (encryptionKeys && encryptionKeys.keys[pubKey]) {
+    wrapper.kit.addAccount(encryptionKeys.keys[pubKey].privateKey)
+
+    const decryptedCiphertext = await wallet.decrypt(
+      pubKeyAddress,
       Buffer.from(parseResultAsCiphertext.right.ciphertext, 'hex')
     )
 
-    const parseResultViaCiphertext = type.decode(JSON.parse(actualPlaintext.toString()))
+    const parseResultViaCiphertext = type.decode(JSON.parse(decryptedCiphertext.toString()))
 
     if (isLeft(parseResultViaCiphertext)) {
       return undefined
@@ -95,7 +130,6 @@ export const readWithSchema = async <T>(
 
     return parseResultViaCiphertext.right
   }
-
   // TODO: We might not have the encryption key, but it might be encrypted to us
 
   return undefined
