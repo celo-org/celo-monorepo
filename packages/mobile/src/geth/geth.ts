@@ -1,5 +1,5 @@
 import { GenesisBlockUtils, StaticNodeUtils } from '@celo/contractkit'
-// import { call } from 'redux-saga/effects'
+import { call } from 'redux-saga/effects'
 import BigNumber from 'bignumber.js'
 import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
@@ -12,9 +12,10 @@ import { SYNCING_MAX_PEERS } from 'src/geth/consts'
 import networkConfig from 'src/geth/networkConfig'
 import Logger from 'src/utils/Logger'
 import FirebaseLogUploader from 'src/utils/LogUploader'
+import { waitForGethInitialized } from './saga'
 
 let gethLock = false
-let gethInstance: RNGeth | null = null
+let gethBridge: RNGeth | null = null
 
 export const FailedToFetchStaticNodesError = new Error(
   'Failed to fetch static nodes from Google storage'
@@ -137,7 +138,7 @@ export async function initGeth(shouldStartNode: boolean = true): Promise<RNGeth 
 
     ValoraAnalytics.track(GethEvents.create_geth_start)
     try {
-      gethInstance = await createNewGeth(shouldStartNode)
+      gethBridge = await createNewGeth(shouldStartNode)
     } catch (error) {
       ValoraAnalytics.track(GethEvents.create_geth_error, { error: error.message })
       throw error
@@ -147,9 +148,9 @@ export async function initGeth(shouldStartNode: boolean = true): Promise<RNGeth 
     if (shouldStartNode) {
       try {
         ValoraAnalytics.track(GethEvents.start_geth_start)
-        await gethInstance.start()
+        await gethBridge.start()
         ValoraAnalytics.track(GethEvents.start_geth_finish)
-        await gethInstance.subscribeNewHead()
+        await gethBridge.subscribeNewHead()
       } catch (e) {
         const errorType = getGethErrorType(e)
         if (errorType === ErrorType.GethAlreadyRunning) {
@@ -157,25 +158,23 @@ export async function initGeth(shouldStartNode: boolean = true): Promise<RNGeth 
           throw new Error('Geth already running, need to restart app')
         } else if (errorType === ErrorType.CorruptChainData) {
           Logger.warn('Geth@init/startInstance', 'Geth start reported chain data error')
-          await attemptGethCorruptionFix(gethInstance, shouldStartNode)
+          await attemptGethCorruptionFix(gethBridge)
         } else {
           Logger.error('Geth@init/startInstance', 'Unexpected error starting geth', e)
           throw e
         }
       }
     }
-    return gethInstance
+    return gethBridge
   } finally {
     gethLock = false
   }
 }
 
-// TODO: This needs a bigger change to the design
-// I'm exposing this now in order to build a proof
-// of concept but I need input from the wallet team
-// regarding what's the best way to expose the instance.
-export function getGethInstance() {
-  return gethInstance
+// Wait for geth to be initialized before returning the bridge
+export function* getGethBridge() {
+  yield call(waitForGethInitialized)
+  return gethBridge
 }
 
 export function isProviderConnectionError(error: any) {
@@ -207,7 +206,7 @@ async function ensureStaticNodesInitialized(): Promise<boolean> {
 }
 
 export async function stopGethIfInitialized() {
-  if (gethInstance) {
+  if (gethBridge) {
     await stop()
   }
 }
@@ -215,7 +214,7 @@ export async function stopGethIfInitialized() {
 async function stop() {
   try {
     Logger.debug('Geth@stop', 'Stopping Geth')
-    await gethInstance?.stop()
+    await gethBridge?.stop()
     Logger.debug('Geth@stop', 'Geth stopped')
   } catch (e) {
     Logger.error('Geth@stop', 'Error stopping Geth', e)
@@ -282,13 +281,13 @@ async function writeStaticNodes(nodeDir: string, enodes: string) {
   await RNFS.writeFile(staticNodesFile, enodes, 'utf8')
 }
 
-async function attemptGethCorruptionFix(geth: any, shouldStartNodec: boolean = true) {
+async function attemptGethCorruptionFix(geth: RNGeth) {
   const deleteChainDataResult = await deleteChainData()
   const deleteGethLockResult = await deleteGethLockFile()
   if (deleteChainDataResult && deleteGethLockResult) {
     await geth.start()
-    gethInstance = geth
-    geth.subscribeNewHead()
+    gethBridge = geth
+    await geth.subscribeNewHead()
   } else {
     throw new Error('Failed to fix Geth and restart')
   }

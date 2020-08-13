@@ -10,7 +10,7 @@ import { ContractKitEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { DEFAULT_FORNO_URL } from 'src/config'
-import { getGethInstance, isProviderConnectionError } from 'src/geth/geth'
+import { getGethBridge, isProviderConnectionError } from 'src/geth/geth'
 import { waitForGethInitialized } from 'src/geth/saga'
 import { navigateToError } from 'src/navigator/NavigationService'
 import Logger from 'src/utils/Logger'
@@ -28,7 +28,7 @@ let contractKit: ContractKit | undefined
 
 function* initWallet() {
   ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_wallet_start)
-  const wallet = new RNGethWallet(yield call(getGethInstance))
+  const wallet = new RNGethWallet(yield call(getGethBridge))
   ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_wallet_finish)
   yield call([wallet, wallet.init])
   ValoraAnalytics.track(ContractKitEvents.init_contractkit_init_wallet_finish)
