@@ -108,7 +108,7 @@ export async function postToPhoneNumPrivacyService<ResponseType>(
     ErrorMessages.ODIS_INPUT_ERROR,
   ]
 
-  await selectiveRetryAsyncWithBackOff(
+  return await selectiveRetryAsyncWithBackOff(
     async () => {
       const res = await fetch(pgpnpUrl + endpoint, {
         method: 'POST',
