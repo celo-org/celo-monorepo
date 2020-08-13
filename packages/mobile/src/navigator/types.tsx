@@ -194,6 +194,14 @@ export type StackParamList = {
   [Screens.OnboardingSuccessScreen]: undefined
   [Screens.WalletHome]: undefined
   [Screens.Welcome]: undefined
+  [Screens.WithdrawCeloQrScannerScreen]: {
+    onAddressScanned: (address: string) => void
+  }
+  [Screens.WithdrawCeloReviewScreen]: {
+    amount: BigNumber
+    recipientAddress: string
+  }
+  [Screens.WithdrawCeloScreen]: undefined
 }
 
 // tslint:disable-next-line: interface-over-type-literal

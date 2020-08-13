@@ -18,12 +18,13 @@ import {
   FetchTobinTaxAction,
   setExchangeRate,
   setTobinTax,
+  WithdrawCeloAction,
 } from 'src/exchange/actions'
 import { ExchangeRatePair, exchangeRatePairSelector } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { convertToContractDecimals } from 'src/tokens/saga'
+import { convertToContractDecimals, createTokenTransferTransaction } from 'src/tokens/saga'
 import {
   addStandbyTransaction,
   generateStandbyTransactionId,
@@ -338,6 +339,55 @@ function* createStandbyTx(
   return txId
 }
 
+function* withdrawCelo(action: WithdrawCeloAction) {
+  let txId: string | null = null
+  try {
+    const { recipientAddress, amount } = action
+    const account: string = yield call(getConnectedUnlockedAccount)
+
+    navigate(Screens.ExchangeHomeScreen)
+
+    txId = generateStandbyTransactionId(account)
+    yield put(
+      addStandbyTransaction({
+        id: txId,
+        type: TokenTransactionType.Sent,
+        comment: '',
+        status: TransactionStatus.Pending,
+        value: amount.toString(),
+        symbol: CURRENCY_ENUM.GOLD,
+        timestamp: Math.floor(Date.now() / 1000),
+        address: recipientAddress,
+      })
+    )
+
+    const tx: CeloTransactionObject<boolean> = yield call(
+      createTokenTransferTransaction,
+      CURRENCY_ENUM.GOLD,
+      {
+        recipientAddress,
+        amount,
+        comment: '',
+      }
+    )
+
+    yield call(sendAndMonitorTransaction, txId, tx, account, CURRENCY_ENUM.GOLD)
+    ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_completed, {
+      amount: amount.toString(),
+    })
+  } catch (error) {
+    Logger.error(TAG, 'Error withdrawing CELO', error)
+    if (txId) {
+      yield put(removeStandbyTransaction(txId))
+    }
+
+    yield put(showError(ErrorMessages.TRANSACTION_FAILED))
+    ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_error, {
+      error,
+    })
+  }
+}
+
 export function* watchFetchTobinTax() {
   yield takeLatest(Actions.FETCH_TOBIN_TAX, doFetchTobinTax)
 }
@@ -350,8 +400,13 @@ export function* watchExchangeTokens() {
   yield takeEvery(Actions.EXCHANGE_TOKENS, exchangeGoldAndStableTokens)
 }
 
+export function* watchWithdrawCelo() {
+  yield takeEvery(Actions.WITHDRAW_CELO, withdrawCelo)
+}
+
 export function* exchangeSaga() {
   yield spawn(watchFetchExchangeRate)
   yield spawn(watchFetchTobinTax)
   yield spawn(watchExchangeTokens)
+  yield spawn(watchWithdrawCelo)
 }

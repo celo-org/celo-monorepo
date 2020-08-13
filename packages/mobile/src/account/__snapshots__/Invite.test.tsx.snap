@@ -49,6 +49,7 @@ exports[`Invite renders correctly with no recipients 1`] = `
           "position": "absolute",
         }
       }
+      testID="Hamburguer"
     >
       <svg
         fill="none"
@@ -354,6 +355,7 @@ exports[`Invite renders correctly with recipients 1`] = `
           "position": "absolute",
         }
       }
+      testID="Hamburguer"
     >
       <svg
         fill="none"

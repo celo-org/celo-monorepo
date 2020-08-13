@@ -1,7 +1,7 @@
 // HOC to add a paste button to a text input
 
 import * as React from 'react'
-import { AppState, Clipboard, TextInputProps } from 'react-native'
+import { AppState, Clipboard, ViewProps } from 'react-native'
 
 interface PasteAwareProps {
   value: string
@@ -20,7 +20,7 @@ interface PasteAwareState {
   clipboardContent: string | null
 }
 
-export function withPasteAware<P extends TextInputProps>(
+export function withPasteAware<P extends ViewProps>(
   WrappedView: React.ComponentType<P & PasteAwareWrappedElementProps>
 ) {
   return class WithPasteAware extends React.Component<P & PasteAwareProps> {

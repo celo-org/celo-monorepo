@@ -50,6 +50,7 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
           "position": "absolute",
         }
       }
+      testID="Hamburguer"
     >
       <svg
         fill="none"
@@ -681,6 +682,7 @@ exports[`Testnet banner Renders when disconnected 1`] = `
           "position": "absolute",
         }
       }
+      testID="Hamburguer"
     >
       <svg
         fill="none"
@@ -1312,6 +1314,7 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
           "position": "absolute",
         }
       }
+      testID="Hamburguer"
     >
       <svg
         fill="none"

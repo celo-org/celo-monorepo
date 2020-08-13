@@ -49,6 +49,7 @@ exports[`FiatExchange renders correctly 1`] = `
           "position": "absolute",
         }
       }
+      testID="Hamburguer"
     >
       <svg
         fill="none"
