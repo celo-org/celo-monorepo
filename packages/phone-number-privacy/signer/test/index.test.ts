@@ -1,4 +1,4 @@
-import { WarningMessage } from '@celo/phone-number-privacy-common'
+import { WarningMessage, ErrorMessage } from '@celo/phone-number-privacy-common'
 import request from 'supertest'
 import { REQUEST_EXPIRY_WINDOW_MS } from '../../common/src/utils/constants'
 import { computeBlindedSignature } from '../src/bls/bls-cryptography-client'
