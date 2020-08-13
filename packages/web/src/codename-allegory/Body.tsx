@@ -16,7 +16,7 @@ export default React.memo(function Body({ isOpen }: Props) {
 
   return (
     <View style={[styles.root, isMobile && styles.mobile, isMobile && isOpen && styles.open]}>
-      <Fade duration={2500} rootMargin={'-20%'} fraction={1}>
+      <Fade duration={2500} rootMargin={'-15%'} fraction={1}>
         <RingsGlyph color={colors.dark} height={30} />
       </Fade>
       <Flower />
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 24,
     alignItems: 'center',
-    paddingTop: '10%',
+    paddingTop: '15vh',
     marginBottom: '45vh',
   },
   footer: {
@@ -55,6 +55,7 @@ const styles = StyleSheet.create({
   mobile: {
     width: '100vw',
     paddingHorizontal: 0,
+    paddingTop: '10vh',
   },
   imagine: { marginVertical: '25vh' },
 })

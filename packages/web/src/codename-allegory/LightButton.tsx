@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 7,
     borderWidth: 1,
     borderColor: colors.lightGray,
-    paddingVertical: 5,
+    paddingVertical: 9,
     cursor: 'pointer',
     alignItems: 'center',
     display: 'inline-flex',

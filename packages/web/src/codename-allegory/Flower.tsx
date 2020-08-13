@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
   },
   mobileRoot: {
     transformOrigin: 'bottom',
-    marginTop: 0,
+    marginTop: 40,
   },
   outline: {
     position: 'absolute',
@@ -95,6 +95,7 @@ const styles = StyleSheet.create({
   },
   breatheMobile: {
     height: 'calc(100vh - 50px)',
+    justifyContent: 'flex-start',
   },
   breathe: {
     maxWidth: 1270,
@@ -121,8 +122,8 @@ const COLOR_OPACITY = {
 }
 
 const COLOR_OPACITY_MOBILE = {
-  inputRange: [0, 0.15, 0.25],
-  outputRange: [1, 1, 0.1],
+  inputRange: [0, 0.1, 0.17],
+  outputRange: [1, 0.5, 0],
 }
 
 const OUTLINE_OPACITY = {
@@ -131,7 +132,7 @@ const OUTLINE_OPACITY = {
 }
 
 const OUTLINE_OPACITY_MOBILE = {
-  inputRange: [0, 0.1, 0.3, 0.4],
+  inputRange: [0, 0.1, 0.15, 0.25],
   outputRange: [0, 1, 1, 0],
 }
 
@@ -141,18 +142,18 @@ const SCALER_DESKTOP = {
 }
 
 const SCALER_MOBILE = {
-  inputRange: [0, 1],
-  outputRange: [1, 0.75],
+  inputRange: [0, 0.5],
+  outputRange: [1, 0.6],
 }
 
 const POSITIONING_DESKTOP = {
   inputRange: [0, 0.5],
-  outputRange: ['0%', '10%'],
+  outputRange: ['0%', '20%'],
 }
 
 const POSITIONING_MOBILE = {
-  inputRange: [0, 0.1, 0.5],
-  outputRange: ['0%', '10%', '40%'],
+  inputRange: [0, 0.5],
+  outputRange: ['0%', '40%'],
 }
 
 const SKEW = {
