@@ -9,11 +9,11 @@ export default function Poem() {
   const { isDesktop } = useScreenSize()
   return (
     <View style={isDesktop && styles.root}>
-      <Fade duration={3000} rootMargin={'-35% 0% -25% 0%'} fraction={0.9}>
+      <Fade duration={2000} rootMargin={'-35% 0% -25% 0%'} fraction={0.75}>
         <H4 style={[textStyles.italic, standardStyles.elementalMarginBottom]}>As Wealth Flowers</H4>
       </Fade>
       {STANZAS.map((verse, i) => (
-        <Fade key={i} duration={3000} rootMargin={'-35% 0% -25% 0%'} fraction={0.9}>
+        <Fade key={i} duration={2000} rootMargin={'-35% 0% -25% 0%'} fraction={0.75}>
           <Text style={fonts.p}>{verse}</Text>
         </Fade>
       ))}
@@ -24,7 +24,6 @@ export default function Poem() {
 const styles = StyleSheet.create({
   root: {
     marginTop: '30vh',
-    marginBottom: '30vh',
   },
 })
 

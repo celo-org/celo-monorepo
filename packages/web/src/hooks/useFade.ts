@@ -21,8 +21,9 @@ export default function useFade({ rootMargin, duration, fraction }: Options) {
       StyleSheet.create({
         base: {
           transitionDuration: `${duration}ms`,
-          transitionProperty: 'opacity',
+          transitionProperty: 'opacity, transform',
           opacity: isOnScreen ? 1 : 0,
+          transform: [{ translateY: isOnScreen ? 0 : 5 }],
         },
       }),
     [isOnScreen]
