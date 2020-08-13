@@ -66,7 +66,7 @@ Make sure to complete all prerequisites before applying.
 ### Timings
 Cohort 5 application deadline: **Oct 1, 2020 at 23:59 UTC**
 
-Anticipated vote date for selected applicants in Cohort 5: **as of Nov 2, 2020**
+Anticipated vote date for selected applicants in Cohort 5: **Nov 2, 2020**
 
 
 ### Application Prerequisites
