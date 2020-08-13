@@ -49,6 +49,7 @@ exports[`Account renders correctly 1`] = `
           "position": "absolute",
         }
       }
+      testID="Hamburguer"
     >
       <svg
         fill="none"
@@ -175,6 +176,14 @@ exports[`Account renders correctly 1`] = `
                     editProfile
                   </Text>
                 </View>
+                <View
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    }
+                  }
+                />
               </View>
             </View>
           </View>
@@ -735,6 +744,14 @@ exports[`Account renders correctly 1`] = `
                     licenses
                   </Text>
                 </View>
+                <View
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    }
+                  }
+                />
               </View>
             </View>
           </View>
@@ -805,6 +822,14 @@ exports[`Account renders correctly 1`] = `
                     termsOfServiceLink
                   </Text>
                 </View>
+                <View
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    }
+                  }
+                />
               </View>
             </View>
           </View>
@@ -1272,6 +1297,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
           "position": "absolute",
         }
       }
+      testID="Hamburguer"
     >
       <svg
         fill="none"
@@ -1398,6 +1424,14 @@ exports[`Account renders correctly when dev mode active 1`] = `
                     editProfile
                   </Text>
                 </View>
+                <View
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    }
+                  }
+                />
               </View>
             </View>
           </View>
@@ -1958,6 +1992,14 @@ exports[`Account renders correctly when dev mode active 1`] = `
                     licenses
                   </Text>
                 </View>
+                <View
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    }
+                  }
+                />
               </View>
             </View>
           </View>
@@ -2028,6 +2070,14 @@ exports[`Account renders correctly when dev mode active 1`] = `
                     termsOfServiceLink
                   </Text>
                 </View>
+                <View
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    }
+                  }
+                />
               </View>
             </View>
           </View>
