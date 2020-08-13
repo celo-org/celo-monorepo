@@ -84,29 +84,22 @@ export async function handleGetBlindedMessagePartialSig(
     const privateKey = keyProvider.getPrivateKey()
     const signature = computeBlindedSignature(blindedQueryPhoneNumber, privateKey)
 
-    let didIncrementQueryCount: boolean = false
-    let didStoreRequest: boolean = false
-
     if (await getRequestExists(request.body)) {
-      logger.debug('Signature request already exists in db.')
+      logger.debug(
+        'Signature request already exists in db. Will not store request or increment query count.'
+      )
       errorMsg = WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG
     } else {
-      didStoreRequest = !!(await storeRequest(request.body))
-      if (!didStoreRequest) {
+      if (!(await storeRequest(request.body))) {
+        logger.debug('Did not store request.')
         errorMsg = ErrorMessage.FAILURE_TO_STORE_REQUEST
       }
-      didIncrementQueryCount = !!(await incrementQueryCount(account))
-      if (!didIncrementQueryCount) {
+      if (!(await incrementQueryCount(account))) {
+        logger.debug('Did not increment query count.')
         errorMsg = ErrorMessage.FAILURE_TO_INCREMENT_QUERY_COUNT
+      } else {
+        performedQueryCount++
       }
-    }
-    if (!didStoreRequest) {
-      logger.debug('Did not store request.')
-    }
-    if (!didIncrementQueryCount) {
-      logger.debug('Did not increment query count.')
-    } else {
-      performedQueryCount++
     }
 
     let signMessageResponse: SignMessageResponse
