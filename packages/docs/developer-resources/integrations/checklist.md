@@ -61,4 +61,4 @@ Celo accounts can make claims to existing identities, some of which are verifiab
 
 ### Performance indicators
 
-Validator Groups and their validators can perform their duties differently and explorers should reflect that to allow voters to ensure an optimal validator set. While uptime in the form of block signatures by the validators ultimately affect rewards, explorers should also consider displaying other metrics that impact the success of the Celo ecosystem, such as validators' performance in the identity protocol.
+Validator Groups and their validators can perform their duties differently and explorers should reflect that to allow voters to ensure an optimal validator set. While uptime in the form of block signatures by the validators ultimately affect rewards, explorers should also consider displaying [other metrics](../../celo-holder-guide/voting-validators.md#choosing-a-validator-group) that impact the success of the Celo ecosystem, such as validators' performance in the identity protocol.
