@@ -78,19 +78,13 @@ class ContractAddresses {
   }
 }
 
-/*
- * TODO:
- *   Deal with libraries:
- *     For the first iteration of this tool, all libraries should be re-deployed. - DONE
- *     Should check that all contracts linking libraries have changes.- NOT DONE
- *   Figure out setAndInitialize data
- */
 module.exports = async (callback: (error?: any) => number) => {
   try {
     const argv = require('minimist')(process.argv.slice(2), {
-      string: ['report', 'network', 'proposal', 'libraries', 'build_directory'],
+      string: ['report', 'network', 'proposal', 'libraries', 'initialize_data', 'build_directory'],
     })
     const report: ASTDetailedVersionedReport = readJsonSync(argv.report).report
+    const initializationData = readJsonSync(argv.initialize_data)
     const dependencies = new ContractDependencies(linkedLibraries)
     const contracts = readdirSync(join(argv.build_directory, 'contracts')).map((x) =>
       basename(x, '.json')
@@ -120,44 +114,45 @@ module.exports = async (callback: (error?: any) => number) => {
         const deployImplementation = Object.keys(report.contracts).includes(contractName)
         const deployProxy =
           deployImplementation && report.contracts[contractName].changes.storage.length
-
         // 3. Deploy new versions of the contract and proxy, if needed.
         if (deployImplementation || isLibrary) {
-          console.log(`Deploying implementation of ${contractName}`)
+          console.log(`Deploying ${contractName}`)
           const contract = await Contract.new()
           if (deployProxy || isLibrary) {
-            console.log(`Deploying proxy for ${contractName}`)
+            console.log(`Deploying ${contractName}Proxy`)
             const Proxy = await artifacts.require(`${contractName}Proxy`)
             const proxy = await Proxy.new()
-            if (isLibrary) {
-              await proxy._setImplementation(contract.address)
-            } else {
-              // TODO(asa): This is a hack!
-              const initializerAbi = (contract as any).abi.find(
-                (abi: any) => abi.type === 'function' && abi.name === 'initialize'
-              )
-              const args = ['0x000000000000000000000000000000000000ce10', 10, 5, 20]
+            const initializeAbi = (contract as any).abi.find(
+              (abi: any) => abi.type === 'function' && abi.name === 'initialize'
+            )
+            console.log(`Setting ${contractName}Proxy implementation to ${contract.address}`)
+            if (initializeAbi) {
+              const args = initializationData[contractName]
+              console.log(`Initializing ${contractName} with: ${args}`)
               await setAndInitializeImplementation(
                 web3,
                 proxy,
                 contract.address,
-                initializerAbi,
+                initializeAbi,
                 {},
                 ...args
               )
+            } else {
+              await proxy._setImplementation(contract.address)
             }
             // TODO(asa): This makes essentially every contract dependent on Governance.
             // How to handle?
+            console.log(`Transferring ownership of ${contractName}Proxy to Governance`)
             await proxy._transferOwnership(addresses.get('Governance'))
             const proxiedContract = await artifacts.require(contractName).at(proxy.address)
-            // TODO(asa): How to deal with non-ownable
             const transferOwnershipAbi = (contract as any).abi.find(
               (abi: any) => abi.type === 'function' && abi.name === 'transferOwnership'
             )
             if (transferOwnershipAbi) {
+              console.log(`Transferring ownership of ${contractName} to Governance`)
               await proxiedContract.transferOwnership(addresses.get('Governance'))
             } else {
-              console.log(`Unable to transfer ownership for ${contractName}`)
+              console.log(`${contractName} is not ownable`)
             }
             // 4. Update the contract's address, if needed.
             addresses.set(contractName, proxy.address)
