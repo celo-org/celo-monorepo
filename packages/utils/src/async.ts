@@ -5,6 +5,6 @@ export {
   concurrentValuesMap,
   retryAsync,
   retryAsyncWithBackOff,
-  selectiveRetryAsyncWithBackOff
+  selectiveRetryAsyncWithBackOff,
   sleep,
 } from '@celo/base/lib/async'
