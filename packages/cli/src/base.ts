@@ -1,4 +1,4 @@
-import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { stopProvider } from '@celo/contractkit/lib/utils/provider-utils'
 import { AzureHSMWallet } from '@celo/contractkit/lib/wallets/azure-hsm-wallet'
 import {
@@ -43,6 +43,10 @@ export abstract class BaseCommand extends LocalCommand {
     ...LocalCommand.flags,
     privateKey: flags.string({ hidden: true }),
     node: flags.string({ char: 'n', hidden: true }),
+    usdGas: flags.boolean({
+      default: false,
+      description: 'If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD',
+    }),
     useLedger: flags.boolean({
       default: false,
       hidden: false,
@@ -162,15 +166,18 @@ export abstract class BaseCommand extends LocalCommand {
       }
     } else if (res.flags.useAKV) {
       try {
-        const akvWallet = await new AzureHSMWallet(res.flags.azureVaultName)
+        const akvWallet = new AzureHSMWallet(res.flags.azureVaultName)
         await akvWallet.init()
-        console.log(`Found addresses: ${await akvWallet.getAccounts()}`)
+        console.log(`Found addresses: ${akvWallet.getAccounts()}`)
         this._wallet = akvWallet
       } catch (err) {
         console.log(`Failed to connect to AKV ${err}`)
         throw err
       }
     }
+    await this.kit.setFeeCurrency(
+      res.flags.usdGas ? CeloContract.StableToken : CeloContract.GoldToken
+    )
   }
 
   finally(arg: Error | undefined): Promise<any> {
