@@ -607,6 +607,11 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     }
     return toTransactionObject(this.kit, this.contract.methods.revoke(identifer, idx))
   }
+
+  async hasAccountForIdentifier(identifer: string, account: Address): Promise<boolean> {
+    const accounts = await this.contract.methods.lookupAccountsForIdentifier(identifer).call()
+    return accounts.findIndex((acc) => eqAddress(acc, account)) > 0
+  }
 }
 
 enum AttestationServiceStatusState {

@@ -10,6 +10,7 @@ import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
 import { BaseCommand } from '../base'
 import { printValueMapRecursive } from './cli'
+import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 
 export interface CommandCheck {
   name: string
@@ -88,6 +89,13 @@ class CheckBuilder {
     return async () => {
       const accounts = await this.kit.contracts.getAccounts()
       return f(accounts) as Resolve<A>
+    }
+  }
+
+  withAttestations<A>(f: (attestation: AttestationsWrapper) => A): () => Promise<Resolve<A>> {
+    return async () => {
+      const attestation = await this.kit.contracts.getAttestations()
+      return f(attestation) as Resolve<A>
     }
   }
 
@@ -424,6 +432,14 @@ class CheckBuilder {
       return owners.indexOf(from) > -1
     })
   }
+
+  hasAccountForIdentifier = (from: string, identifier: string) =>
+    this.addCheck(
+      `address ${from} is verified to the provided identifier ${identifier}`,
+      this.withAttestations((attestations) =>
+        attestations.hasAccountForIdentifier(identifier, from)
+      )
+    )
 
   async runChecks() {
     console.log(`Running Checks:`)
