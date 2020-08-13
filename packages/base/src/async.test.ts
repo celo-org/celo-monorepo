@@ -1,4 +1,4 @@
-import { concurrentMap, retryAsync, sleep } from './async'
+import { concurrentMap, retryAsync, selectiveRetryAsyncWithBackOff, sleep } from './async'
 
 describe('retryAsync()', () => {
   test('tries once if it works', async () => {
