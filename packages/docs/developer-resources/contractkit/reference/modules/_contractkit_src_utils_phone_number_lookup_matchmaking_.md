@@ -11,7 +11,7 @@
 
 ###  getContactMatches
 
-▸ **getContactMatches**(`e164NumberCaller`: E164Number, `e164NumberContacts`: E164Number[], `account`: string, `signer`: [AuthSigner](_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.md#authsigner), `context`: [ServiceContext](../interfaces/_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.servicecontext.md), `clientVersion?`: undefined | string): *Promise‹E164Number[]›*
+▸ **getContactMatches**(`e164NumberCaller`: E164Number, `e164NumberContacts`: E164Number[], `account`: string, `phoneNumberIdentifier`: string, `signer`: [AuthSigner](_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.md#authsigner), `context`: [ServiceContext](../interfaces/_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.servicecontext.md), `clientVersion?`: undefined | string): *Promise‹E164Number[]›*
 
 *Defined in [contractkit/src/utils/phone-number-lookup/matchmaking.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/matchmaking.ts#L20)*
 
@@ -22,6 +22,7 @@ Name | Type |
 `e164NumberCaller` | E164Number |
 `e164NumberContacts` | E164Number[] |
 `account` | string |
+`phoneNumberIdentifier` | string |
 `signer` | [AuthSigner](_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.md#authsigner) |
 `context` | [ServiceContext](../interfaces/_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.servicecontext.md) |
 `clientVersion?` | undefined &#124; string |
@@ -34,7 +35,7 @@ ___
 
 ▸ **obfuscateNumberForMatchmaking**(`e164Number`: string): *string*
 
-*Defined in [contractkit/src/utils/phone-number-lookup/matchmaking.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/matchmaking.ts#L72)*
+*Defined in [contractkit/src/utils/phone-number-lookup/matchmaking.ts:73](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/matchmaking.ts#L73)*
 
 **Parameters:**
 
