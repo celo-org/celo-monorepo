@@ -1,0 +1,28 @@
+{
+  "name": "@celo/base",
+  "version": "0.0.1-dev",
+  "description": "Celo base common utils, no dependencies",
+  "author": "Celo",
+  "license": "Apache-2.0",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "scripts": {
+    "prepublishOnly": "yarn build",
+    "build": "tsc -b .",
+    "clean": "tsc -b . --clean",
+    "test": "jest --runInBand --ci",
+    "test:verbose": "jest --verbose",
+    "lint": "tslint -c tslint.json --project ."
+  },
+  "files": [
+    "lib/**/*"
+  ],
+  "dependencies": {
+  },
+  "devDependencies": {
+    "@celo/flake-tracker": "0.0.1-dev",
+    "@celo/typescript": "0.0.1",
+    "bignumber.js": "^9.0.0",
+    "elliptic": "^6.5.3"
+  }
+}

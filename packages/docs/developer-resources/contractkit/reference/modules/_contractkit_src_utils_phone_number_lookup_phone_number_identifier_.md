@@ -4,49 +4,49 @@
 
 ### Interfaces
 
-* [PhoneNumberHashDetails](../interfaces/_contractkit_src_utils_phone_number_lookup_phone_number_identifier_.phonenumberhashdetails.md)
+- [PhoneNumberHashDetails](../interfaces/_contractkit_src_utils_phone_number_lookup_phone_number_identifier_.phonenumberhashdetails.md)
 
 ### Functions
 
-* [getPhoneNumberIdentifier](_contractkit_src_utils_phone_number_lookup_phone_number_identifier_.md#getphonenumberidentifier)
-* [getSaltFromThresholdSignature](_contractkit_src_utils_phone_number_lookup_phone_number_identifier_.md#getsaltfromthresholdsignature)
+- [getPhoneNumberIdentifier](_contractkit_src_utils_phone_number_lookup_phone_number_identifier_.md#getphonenumberidentifier)
+- [getSaltFromThresholdSignature](_contractkit_src_utils_phone_number_lookup_phone_number_identifier_.md#getsaltfromthresholdsignature)
 
 ## Functions
 
-###  getPhoneNumberIdentifier
+### getPhoneNumberIdentifier
 
-▸ **getPhoneNumberIdentifier**(`e164Number`: string, `account`: string, `signer`: [AuthSigner](_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.md#authsigner), `context`: [ServiceContext](../interfaces/_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.servicecontext.md), `selfPhoneHash?`: undefined | string, `clientVersion?`: undefined | string, `blsBlindingClient?`: [BlsBlindingClient](../interfaces/_contractkit_src_utils_phone_number_lookup_bls_blinding_client_.blsblindingclient.md)): *Promise‹[PhoneNumberHashDetails](../interfaces/_contractkit_src_utils_phone_number_lookup_phone_number_identifier_.phonenumberhashdetails.md)›*
+▸ **getPhoneNumberIdentifier**(`e164Number`: string, `account`: string, `signer`: [AuthSigner](_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.md#authsigner), `context`: [ServiceContext](../interfaces/_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.servicecontext.md), `selfPhoneHash?`: undefined | string, `clientVersion?`: undefined | string, `blsBlindingClient?`: [BlsBlindingClient](../interfaces/_contractkit_src_utils_phone_number_lookup_bls_blinding_client_.blsblindingclient.md)): _Promise‹[PhoneNumberHashDetails](../interfaces/_contractkit_src_utils_phone_number_lookup_phone_number_identifier_.phonenumberhashdetails.md)›_
 
-*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-identifier.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-identifier.ts#L27)*
+_Defined in [contractkit/src/utils/phone-number-lookup/phone-number-identifier.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-identifier.ts#L30)_
 
 Retrieve the on-chain identifier for the provided phone number
 
 **Parameters:**
 
-Name | Type |
------- | ------ |
-`e164Number` | string |
-`account` | string |
-`signer` | [AuthSigner](_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.md#authsigner) |
-`context` | [ServiceContext](../interfaces/_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.servicecontext.md) |
-`selfPhoneHash?` | undefined &#124; string |
-`clientVersion?` | undefined &#124; string |
-`blsBlindingClient?` | [BlsBlindingClient](../interfaces/_contractkit_src_utils_phone_number_lookup_bls_blinding_client_.blsblindingclient.md) |
+| Name                 | Type                                                                                                                    |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `e164Number`         | string                                                                                                                  |
+| `account`            | string                                                                                                                  |
+| `signer`             | [AuthSigner](_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.md#authsigner)                             |
+| `context`            | [ServiceContext](../interfaces/_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.servicecontext.md)       |
+| `selfPhoneHash?`     | undefined &#124; string                                                                                                 |
+| `clientVersion?`     | undefined &#124; string                                                                                                 |
+| `blsBlindingClient?` | [BlsBlindingClient](../interfaces/_contractkit_src_utils_phone_number_lookup_bls_blinding_client_.blsblindingclient.md) |
 
-**Returns:** *Promise‹[PhoneNumberHashDetails](../interfaces/_contractkit_src_utils_phone_number_lookup_phone_number_identifier_.phonenumberhashdetails.md)›*
+**Returns:** _Promise‹[PhoneNumberHashDetails](../interfaces/_contractkit_src_utils_phone_number_lookup_phone_number_identifier_.phonenumberhashdetails.md)›_
 
-___
+---
 
-###  getSaltFromThresholdSignature
+### getSaltFromThresholdSignature
 
-▸ **getSaltFromThresholdSignature**(`sigBuf`: Buffer): *string*
+▸ **getSaltFromThresholdSignature**(`sigBuf`: Buffer): _string_
 
-*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-identifier.ts:80](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-identifier.ts#L80)*
+_Defined in [contractkit/src/utils/phone-number-lookup/phone-number-identifier.ts:82](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-identifier.ts#L82)_
 
 **Parameters:**
 
-Name | Type |
------- | ------ |
-`sigBuf` | Buffer |
+| Name     | Type   |
+| -------- | ------ |
+| `sigBuf` | Buffer |
 
-**Returns:** *string*
+**Returns:** _string_

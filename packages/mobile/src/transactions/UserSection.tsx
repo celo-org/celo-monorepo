@@ -38,7 +38,7 @@ function getDisplayNumber(e164Number?: string, recipient?: Recipient) {
 }
 
 interface Props {
-  type: 'sent' | 'received'
+  type: 'sent' | 'received' | 'withdrawn'
   address?: string
   addressHasChanged?: boolean
   e164PhoneNumber?: string
@@ -66,13 +66,17 @@ export default function UserSection({
   const displayNumber = getDisplayNumber(e164PhoneNumber, recipient)
   const e164Number = displayName !== displayNumber ? displayNumber : undefined
 
+  const sectionLabel = {
+    received: t('receivedFrom'),
+    sent: t('sentTo'),
+    withdrawn: t('withdrawnTo'),
+  }[type]
+
   return (
     <View>
       <View style={styles.header}>
         <View style={styles.userContainer}>
-          <Text style={styles.sectionLabel}>
-            {type === 'received' ? t('receivedFrom') : t('sentTo')}
-          </Text>
+          <Text style={styles.sectionLabel}>{sectionLabel}</Text>
           <Touchable onPress={toggleExpanded}>
             <>
               <Expandable isExpandable={!e164Number} isExpanded={expanded}>
