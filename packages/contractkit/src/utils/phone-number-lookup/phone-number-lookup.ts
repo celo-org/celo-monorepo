@@ -139,7 +139,7 @@ export async function postToPhoneNumPrivacyService<ResponseType>(
           throw new Error(`Unknown failure ${res.status}`)
       }
     },
-    3,
+    1, // Retries currently disabled
     dontRetry,
     []
   )

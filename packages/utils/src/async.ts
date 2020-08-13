@@ -74,9 +74,11 @@ export const selectiveRetryAsyncWithBackOff = async <T extends any[], U>(
       if (dontRetry.includes((error as Error).message)) {
         throw error
       }
-      await sleep(Math.pow(factor, i) * delay)
       saveError = error
       console.info(`${TAG}/@retryAsync, Failed to execute function on try #${i}`, error)
+    }
+    if (i < tries - 1) {
+      await sleep(Math.pow(factor, i) * delay)
     }
   }
 
