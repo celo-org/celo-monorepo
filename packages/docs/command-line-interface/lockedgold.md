@@ -24,6 +24,9 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
 
+  --usdGas                                       If --usdGas is set, the transaction is paid for with a feeCurrency of
+                                                 cUSD
+
   --useLedger                                    Set it to use a ledger wallet
 
   --value=value                                  (required) The unit amount of CELO
@@ -41,6 +44,9 @@ Show Locked Gold information for a given account. This includes the total amount
 ```
 USAGE
   $ celocli lockedgold:show ACCOUNT
+
+OPTIONS
+  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
 
 EXAMPLE
   show 0x5409ed021d9299bf6814279a6a1411a7e866a631
@@ -68,6 +74,9 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -99,6 +108,9 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
