@@ -27,8 +27,8 @@ import {
   MockValidatorsContract,
   RegistryContract,
   RegistryInstance,
-  TestAttestationsContract,
-  TestAttestationsInstance,
+  AttestationsTestContract,
+  AttestationsTestInstance,
 } from 'types'
 import Web3 from 'web3'
 import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
@@ -43,7 +43,7 @@ const Accounts: AccountsContract = artifacts.require('Accounts')
  * contracts, which are not available in our current ganache fork, which we use
  * for Truffle unit tests.
  */
-const Attestations: TestAttestationsContract = artifacts.require('TestAttestations')
+const Attestations: AttestationsTestContract = artifacts.require('AttestationsTest')
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
@@ -53,7 +53,7 @@ const Registry: RegistryContract = artifacts.require('Registry')
 
 contract('Attestations', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
-  let attestations: TestAttestationsInstance
+  let attestations: AttestationsTestInstance
   let mockStableToken: MockStableTokenInstance
   let otherMockStableToken: MockStableTokenInstance
   let random: MockRandomInstance

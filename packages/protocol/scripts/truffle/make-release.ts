@@ -95,6 +95,29 @@ module.exports = async (callback: (error?: any) => number) => {
     const addresses = await ContractAddresses.create(contracts, registry)
     const released: Set<string> = new Set([])
     const proposal = []
+    // Release 1 will deploy all libraries with proxies so that they're more easily
+    // upgradable. All contracts that link libraries should be upgraded to instead link the proxied
+    // library.
+    // To ensure this actually happens, we check that all contracts that link libraries are marked
+    // as needing to be redeployed.
+    // TODO(asa): Remove this check after release 1.
+    const linksLibrariesWithoutChanges = contracts.map(
+      (c) =>
+        dependencies.get(c).length &&
+        !Object.keys(report.contracts).includes(c) &&
+        !c.endsWith('Test')
+    )
+    if (linksLibrariesWithoutChanges.some((b) => b)) {
+      contracts.forEach((c, i) => {
+        if (linksLibrariesWithoutChanges[i]) {
+          console.log(
+            `${c} links ${dependencies.get(c)} and needs to be upgraded to link proxied libraries.`
+          )
+        }
+      })
+      throw new Error('All contracts linking libraries should be upgraded in release 1')
+    }
+
     const release = async (contractName: string) => {
       if (released.has(contractName)) {
         return
@@ -108,8 +131,9 @@ module.exports = async (callback: (error?: any) => number) => {
         const Contract = await artifacts.require(contractName)
         await Promise.all(contractDependencies.map((d) => Contract.link(d, addresses.get(d))))
 
-        // TODO(asa): Redeploying all libraries is only needed for release 1.
-        // Remove `isLibrary` for future releases.
+        // This is a hack that will re-deploy all libraries with proxies, whether or not they have
+        // changes to them.
+        // TODO(asa): Remove `isLibrary` for future releases.
         const isLibrary = Object.keys(linkedLibraries).includes(contractName)
         const deployImplementation = Object.keys(report.contracts).includes(contractName)
         const deployProxy =
@@ -118,6 +142,15 @@ module.exports = async (callback: (error?: any) => number) => {
         if (deployImplementation || isLibrary) {
           console.log(`Deploying ${contractName}`)
           const contract = await Contract.new()
+          // Sanity check that any contracts that are being changed set a version number.
+          const getVersionNumberAbi = (contract as any).abi.find(
+            (abi: any) => abi.type === 'function' && abi.name === 'getVersionNumber'
+          )
+          if (!getVersionNumberAbi) {
+            throw new Error(
+              `Contract ${contractName} has changes but does not specify a version number`
+            )
+          }
           if (deployProxy || isLibrary) {
             console.log(`Deploying ${contractName}Proxy`)
             const Proxy = await artifacts.require(`${contractName}Proxy`)
