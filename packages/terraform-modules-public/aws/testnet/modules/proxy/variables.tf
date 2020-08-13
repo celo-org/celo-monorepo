@@ -41,13 +41,28 @@ variable ethstats_host {
 
 variable proxies {
   type = map(object({
-    validator_name           = string
-    validator_signer_address = string
-    proxy_address            = string
+    validator_name                  = string
+    validator_signer_address        = string
+    proxy_address                   = string
     proxy_private_key_filename      = string
     proxy_private_key_file_contents = string
     proxy_private_key_password      = string
     proxy_node_private_key          = string
   }))
   description = "Map of proxy configurations."
+}
+
+variable iam_instance_profile {
+  type    = string
+  default = null
+}
+
+variable cloudwatch_log_group_name {
+  type    = string
+  default = ""
+}
+
+variable cloudwatch_collect_disk_and_memory_usage {
+  type    = bool
+  default = false
 }

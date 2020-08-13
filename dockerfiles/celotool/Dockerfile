@@ -16,21 +16,25 @@ RUN apt-get update && \
 COPY lerna.json package.json yarn.lock ./
 COPY scripts/ scripts/
 COPY patches/ patches/
+COPY packages/base/package.json packages/base/
 COPY packages/utils/package.json packages/utils/
 COPY packages/dev-utils/package.json packages/dev-utils/
 COPY packages/typescript/package.json packages/typescript/
 COPY packages/contractkit/package.json packages/contractkit/
 COPY packages/protocol/package.json packages/protocol/
 COPY packages/celotool/package.json packages/celotool/
+COPY packages/flake-tracker/package.json packages/flake-tracker/package.json
 
 RUN yarn install --network-timeout 100000 --frozen-lockfile && yarn cache clean
 
+COPY packages/base packages/base/
 COPY packages/utils packages/utils/
 COPY packages/dev-utils packages/dev-utils/
 COPY packages/typescript packages/typescript/
 COPY packages/contractkit packages/contractkit/
 COPY packages/protocol packages/protocol/
 COPY packages/celotool packages/celotool/
+COPY packages/flake-tracker packages/flake-tracker
 
 RUN yarn build
 

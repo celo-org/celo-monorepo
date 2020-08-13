@@ -47,9 +47,6 @@ interface ReclaimEscrowProps extends CommonProps {
   paymentID: string
 }
 
-// TODO: remove this once we use TS 3.5
-type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
-
 export type PropsWithoutChildren =
   | Omit<InviteProps, 'children'>
   | Omit<SendProps, 'children'>
@@ -72,7 +69,10 @@ function useAsyncShowError<R, Args extends any[]>(
     // Generic error banner
     if (asyncResult.error) {
       Logger.error('CalculateFee', 'Error calculating fee', asyncResult.error)
-      dispatch(showError(ErrorMessages.CALCULATE_FEE_FAILED))
+      const errMsg = asyncResult.error.message.includes('insufficientBalance')
+        ? ErrorMessages.INSUFFICIENT_BALANCE
+        : ErrorMessages.CALCULATE_FEE_FAILED
+      dispatch(showError(errMsg))
     }
   }, [asyncResult.error])
 

@@ -6,13 +6,13 @@ import { SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { calculateFee } from 'src/fees/saga'
-import { completePaymentRequest } from 'src/firebase/actions'
 import { transferGoldToken } from 'src/goldToken/actions'
 import { encryptComment } from 'src/identity/commentEncryption'
 import { addressToE164NumberSelector, e164NumberToAddressSelector } from 'src/identity/reducer'
 import { InviteBy } from 'src/invite/actions'
 import { sendInvite } from 'src/invite/saga'
 import { navigateHome } from 'src/navigator/NavigationService'
+import { completePaymentRequest } from 'src/paymentRequest/actions'
 import { handleBarcode, shareSVGImage } from 'src/qrcode/utils'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import {
@@ -110,9 +110,11 @@ export function* watchQrCodeShare() {
   while (true) {
     const action: ShareQRCodeAction = yield take(Actions.QRCODE_SHARE)
     try {
-      yield call(shareSVGImage, action.qrCodeSvg)
+      const result = yield call(shareSVGImage, action.qrCodeSvg)
+      // Note: when user cancels the share sheet, result contains {"dismissedAction":true}
+      Logger.info(TAG, 'Share done', JSON.stringify(result))
     } catch (error) {
-      Logger.error(TAG, 'Error handling the barcode', error)
+      Logger.error(TAG, 'Error sharing qr code', error)
     }
   }
 }
@@ -160,7 +162,12 @@ function* sendPayment(
         throw new Error(`Sending currency ${currency} not yet supported`)
       }
     }
-    ValoraAnalytics.track(SendEvents.send_tx_complete)
+    ValoraAnalytics.track(SendEvents.send_tx_complete, {
+      txId,
+      recipientAddress,
+      amount: amount.toString(),
+      currency,
+    })
   } catch (error) {
     Logger.error(`${TAG}/sendPayment`, 'Could not send payment', error)
     ValoraAnalytics.track(SendEvents.send_tx_error, { error: error.message })

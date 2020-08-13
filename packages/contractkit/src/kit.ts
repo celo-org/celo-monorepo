@@ -75,14 +75,16 @@ export interface NetworkConfig {
 export interface KitOptions {
   gasInflationFactor: number
   gasPrice: string
+  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
+  gasPriceSuggestionMultiplier: number
   feeCurrency?: Address
   from?: Address
 }
 
 interface AccountBalance {
-  gold: BigNumber
-  usd: BigNumber
-  lockedGold: BigNumber
+  CELO: BigNumber
+  cUSD: BigNumber
+  lockedCELO: BigNumber
   pending: BigNumber
 }
 
@@ -100,6 +102,7 @@ export class ContractKit {
       gasInflationFactor: 1.3,
       // gasPrice:0 means the node will compute gasPrice on its own
       gasPrice: '0',
+      gasPriceSuggestionMultiplier: 5,
     }
     if (!(web3.currentProvider instanceof CeloProvider)) {
       const celoProviderInstance = new CeloProvider(web3.currentProvider, wallet)
@@ -113,22 +116,23 @@ export class ContractKit {
   }
 
   async getTotalBalance(address: string): Promise<AccountBalance> {
-    const goldToken = await this.contracts.getGoldToken()
+    const celoToken = await this.contracts.getGoldToken()
     const stableToken = await this.contracts.getStableToken()
-    const lockedGold = await this.contracts.getLockedGold()
-    const goldBalance = await goldToken.balanceOf(address)
-    const lockedBalance = await lockedGold.getAccountTotalLockedGold(address)
+    const lockedCelo = await this.contracts.getLockedGold()
+    const goldBalance = await celoToken.balanceOf(address)
+    const lockedBalance = await lockedCelo.getAccountTotalLockedGold(address)
     const dollarBalance = await stableToken.balanceOf(address)
     let pending = new BigNumber(0)
     try {
-      pending = await lockedGold.getPendingWithdrawalsTotalValue(address)
+      pending = await lockedCelo.getPendingWithdrawalsTotalValue(address)
     } catch (err) {
       // Just means that it's not an account
     }
+
     return {
-      gold: goldBalance,
-      lockedGold: lockedBalance,
-      usd: dollarBalance,
+      CELO: goldBalance,
+      lockedCELO: lockedBalance,
+      cUSD: dollarBalance,
       pending,
     }
   }
@@ -301,6 +305,13 @@ export class ContractKit {
   ): Promise<TransactionResult> {
     tx = this.fillTxDefaults(tx)
 
+    // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
+    if (tx.feeCurrency && tx.gasPrice === '0') {
+      const gasPriceMinimum = await this.contracts.getGasPriceMinimum()
+      const rawGasPrice = await gasPriceMinimum.getGasPriceMinimum(tx.feeCurrency)
+      tx.gasPrice = rawGasPrice.multipliedBy(this.config.gasPriceSuggestionMultiplier).toFixed()
+    }
+
     let gas = tx.gas
     if (gas == null) {
       const gasEstimator = (_tx: Tx) => txObj.estimateGas({ ..._tx })
@@ -332,10 +343,6 @@ export class ContractKit {
       from: this.config.from,
       feeCurrency: this.config.feeCurrency,
       gasPrice: this.config.gasPrice,
-    }
-
-    if (this.config.feeCurrency) {
-      defaultTx.feeCurrency = this.config.feeCurrency
     }
 
     return {
