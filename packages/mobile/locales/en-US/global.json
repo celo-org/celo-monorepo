@@ -178,5 +178,6 @@
   "amount": "Amount",
   "currentBalance": "Current Balance",
   "restore": "Restore",
-  "commentUnavailable": "Comment Unavailable"
+  "commentUnavailable": "Comment Unavailable",
+  "withdraw": "Withdraw"
 }

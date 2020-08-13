@@ -31,6 +31,9 @@ import EscrowedPaymentListScreen from 'src/escrow/EscrowedPaymentListScreen'
 import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmationScreen'
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
+import WithdrawCeloQrScannerScreen from 'src/exchange/WithdrawCeloQrScannerScreen'
+import WithdrawCeloReviewScreen from 'src/exchange/WithdrawCeloReviewScreen'
+import WithdrawCeloScreen from 'src/exchange/WithdrawCeloScreen'
 import FiatExchangeAmount, {
   fiatExchangesAmountScreenOptions,
 } from 'src/fiatExchanges/FiatExchangeAmount'
@@ -362,6 +365,21 @@ const exchangeScreens = (Navigator: typeof Stack) => (
       name={Screens.ExchangeReview}
       component={ExchangeReview}
       options={exchangeReviewScreenOptions}
+    />
+    <Navigator.Screen
+      name={Screens.WithdrawCeloScreen}
+      component={WithdrawCeloScreen}
+      options={WithdrawCeloScreen.navigationOptions}
+    />
+    <Navigator.Screen
+      name={Screens.WithdrawCeloQrScannerScreen}
+      component={WithdrawCeloQrScannerScreen}
+      options={WithdrawCeloQrScannerScreen.navigationOptions}
+    />
+    <Navigator.Screen
+      name={Screens.WithdrawCeloReviewScreen}
+      component={WithdrawCeloReviewScreen}
+      options={WithdrawCeloReviewScreen.navigationOptions}
     />
   </>
 )
