@@ -3,7 +3,7 @@ import Touchable from '@celo/react-components/components/Touchable'
 import Backspace from '@celo/react-components/icons/Backspace'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
-import { StackNavigationOptions, StackScreenProps } from '@react-navigation/stack'
+import { StackScreenProps } from '@react-navigation/stack'
 import { chunk, flatMap, shuffle, times } from 'lodash'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
@@ -72,7 +72,7 @@ const mapStateToProps = (state: RootState): StateProps => {
   }
 }
 
-export const navOptionsForQuiz: StackNavigationOptions = ({ route }: OwnProps) => {
+export const navOptionsForQuiz = ({ route }: OwnProps) => {
   const navigatedFromSettings = route.params?.navigatedFromSettings
   const onCancel = () => {
     navigate(Screens.Settings)
