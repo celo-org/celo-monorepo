@@ -1,6 +1,5 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import Switch from '@celo/react-components/components/Switch.v2'
-import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import * as React from 'react'
 import { useTranslation, WithTranslation } from 'react-i18next'
@@ -16,7 +15,7 @@ import BackupPhraseContainer, {
 } from 'src/backup/BackupPhraseContainer'
 import CancelConfirm from 'src/backup/CancelConfirm'
 import { getStoredMnemonic, onGetMnemonicFail } from 'src/backup/utils'
-import i18n, { Namespaces, withTranslation } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { navigate, pushToStack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
@@ -51,7 +50,6 @@ const mapStateToProps = (state: RootState): StateProps => {
 
 export const navOptionsForBackupPhrase = {
   headerLeft: () => <CancelConfirm screen={TAG} />,
-  headerTitle: i18n.t(`${Namespaces.backupKeyFlow6}:headerTitle`),
   headerRight: () => <HeaderRight />,
 }
 
@@ -144,7 +142,6 @@ function HeaderRight() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light,
     justifyContent: 'space-between',
     padding: 16,
   },

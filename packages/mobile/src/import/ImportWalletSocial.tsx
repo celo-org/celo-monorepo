@@ -127,7 +127,7 @@ export class ImportWalletSocial extends React.Component<Props, State> {
 
         {isImportingWallet && (
           <View style={styles.loadingSpinnerContainer} testID="ImportWalletLoadingCircle">
-            <ActivityIndicator size="large" color={colors.celoGreen} />
+            <ActivityIndicator size="large" color={colors.greenBrand} />
           </View>
         )}
 
@@ -152,7 +152,6 @@ export class ImportWalletSocial extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
     justifyContent: 'space-between',
   },
   scrollContainer: {
@@ -165,7 +164,7 @@ const styles = StyleSheet.create({
   },
   tip: {
     ...fontStyles.bodySmall,
-    color: colors.darkSecondary,
+    color: colors.gray5,
     marginTop: 20,
     marginHorizontal: 2,
   },

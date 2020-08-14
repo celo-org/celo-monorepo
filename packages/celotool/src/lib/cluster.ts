@@ -8,7 +8,7 @@ import {
   installAndEnableMetricsDeps,
   installCertManagerAndNginx,
   redeployTiller,
-  uploadStorageClass,
+  uploadStorageClass
 } from './helm_deploy'
 import { createServiceAccountIfNotExists } from './service-account-utils'
 import { outputIncludes, switchToProjectFromEnv } from './utils'
@@ -109,7 +109,7 @@ export async function setupCluster(celoEnv: string, createdCluster: boolean) {
     await pollForRunningCluster()
   }
 
-  console.info('Deploying Tiller and Helm chart...')
+  console.info('Deploying Tiller and Cert Manager Helm chart...')
 
   await uploadStorageClass()
   await redeployTiller()
@@ -117,9 +117,10 @@ export async function setupCluster(celoEnv: string, createdCluster: boolean) {
   await installCertManagerAndNginx()
 
   if (envType !== EnvTypes.DEVELOPMENT) {
+    console.info('Installing metric tools installation')
     await installAndEnableMetricsDeps(true)
   } else {
-    console.info('Skipping metrics installation for this development env.')
+    console.info('Skipping metric tools installation for this development env')
   }
 
   await setClusterLabels(celoEnv)

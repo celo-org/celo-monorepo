@@ -131,7 +131,13 @@ export const navigateToPaymentTransferReview = (
   let headerText = ''
   switch (type) {
     case TokenTransactionType.Sent:
-      headerText = i18n.t('walletFlow5:transactionHeaderSent')
+      const isCeloWithdrawal =
+        confirmationProps.amount.currencyCode === CURRENCIES[CURRENCY_ENUM.GOLD].code
+      headerText = i18n.t(
+        isCeloWithdrawal
+          ? 'walletFlow5:transactionHeaderWithdrewCelo'
+          : 'walletFlow5:transactionHeaderSent'
+      )
       break
     case TokenTransactionType.EscrowSent:
       headerText = i18n.t('walletFlow5:transactionHeaderEscrowSent')

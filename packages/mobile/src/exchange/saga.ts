@@ -3,6 +3,7 @@ import { ExchangeWrapper } from '@celo/contractkit/lib/wrappers/Exchange'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
 import { ReserveWrapper } from '@celo/contractkit/lib/wrappers/Reserve'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
+import { CELO_AMOUNT_FOR_ESTIMATE, DOLLAR_AMOUNT_FOR_ESTIMATE } from '@celo/utils/src/celoHistory'
 import BigNumber from 'bignumber.js'
 import { all, call, put, select, spawn, takeEvery, takeLatest } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
@@ -17,12 +18,13 @@ import {
   FetchTobinTaxAction,
   setExchangeRate,
   setTobinTax,
+  WithdrawCeloAction,
 } from 'src/exchange/actions'
 import { ExchangeRatePair, exchangeRatePairSelector } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { convertToContractDecimals } from 'src/tokens/saga'
+import { convertToContractDecimals, createTokenTransferTransaction } from 'src/tokens/saga'
 import {
   addStandbyTransaction,
   generateStandbyTransactionId,
@@ -40,11 +42,6 @@ import * as util from 'util'
 
 const TAG = 'exchange/saga'
 
-// Amounts to estimate the exchange rate, as the rate varies based on transaction size
-// These values needs to be in-sync with the ones here:
-// https://github.com/celo-org/celo-monorepo/blob/master/packages/notification-service/src/exchange/exchangeQuery.ts#L9-L10
-const LARGE_DOLLARS_SELL_AMOUNT_IN_WEI = new BigNumber(10000 * 1000000000000000000) //  100 dollars
-const LARGE_GOLD_SELL_AMOUNT_IN_WEI = new BigNumber(10 * 1000000000000000000) // 10 gold
 const EXCHANGE_DIFFERENCE_TOLERATED = 0.01 // Maximum difference between actual and displayed takerAmount
 
 export function* doFetchTobinTax({ makerAmount, makerToken }: FetchTobinTaxAction) {
@@ -107,11 +104,11 @@ export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
     const goldMakerAmount =
       makerAmountInWei && !makerAmountInWei.isZero() && makerToken === CURRENCY_ENUM.GOLD
         ? makerAmountInWei
-        : LARGE_GOLD_SELL_AMOUNT_IN_WEI
+        : CELO_AMOUNT_FOR_ESTIMATE
     const dollarMakerAmount =
       makerAmountInWei && !makerAmountInWei.isZero() && makerToken === CURRENCY_ENUM.DOLLAR
         ? makerAmountInWei
-        : LARGE_DOLLARS_SELL_AMOUNT_IN_WEI
+        : DOLLAR_AMOUNT_FOR_ESTIMATE
 
     const contractKit = yield call(getContractKit)
 
@@ -215,8 +212,8 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
 
     const exceedsExpectedSize =
       makerToken === CURRENCY_ENUM.GOLD
-        ? convertedMakerAmount.isGreaterThan(LARGE_GOLD_SELL_AMOUNT_IN_WEI)
-        : convertedMakerAmount.isGreaterThan(LARGE_DOLLARS_SELL_AMOUNT_IN_WEI)
+        ? convertedMakerAmount.isGreaterThan(CELO_AMOUNT_FOR_ESTIMATE)
+        : convertedMakerAmount.isGreaterThan(DOLLAR_AMOUNT_FOR_ESTIMATE)
 
     if (exceedsExpectedSize) {
       Logger.error(
@@ -291,7 +288,11 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       return
     }
     yield call(sendAndMonitorTransaction, txId, tx, account)
-    ValoraAnalytics.track(CeloExchangeEvents.celo_exchange_complete)
+    ValoraAnalytics.track(CeloExchangeEvents.celo_exchange_complete, {
+      txId,
+      currency: makerToken,
+      amount: makerAmount.toString(),
+    })
   } catch (error) {
     ValoraAnalytics.track(CeloExchangeEvents.celo_exchange_error, { error: error.message })
     Logger.error(TAG, 'Error doing exchange', error)
@@ -338,6 +339,55 @@ function* createStandbyTx(
   return txId
 }
 
+function* withdrawCelo(action: WithdrawCeloAction) {
+  let txId: string | null = null
+  try {
+    const { recipientAddress, amount } = action
+    const account: string = yield call(getConnectedUnlockedAccount)
+
+    navigate(Screens.ExchangeHomeScreen)
+
+    txId = generateStandbyTransactionId(account)
+    yield put(
+      addStandbyTransaction({
+        id: txId,
+        type: TokenTransactionType.Sent,
+        comment: '',
+        status: TransactionStatus.Pending,
+        value: amount.toString(),
+        symbol: CURRENCY_ENUM.GOLD,
+        timestamp: Math.floor(Date.now() / 1000),
+        address: recipientAddress,
+      })
+    )
+
+    const tx: CeloTransactionObject<boolean> = yield call(
+      createTokenTransferTransaction,
+      CURRENCY_ENUM.GOLD,
+      {
+        recipientAddress,
+        amount,
+        comment: '',
+      }
+    )
+
+    yield call(sendAndMonitorTransaction, txId, tx, account, CURRENCY_ENUM.GOLD)
+    ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_completed, {
+      amount: amount.toString(),
+    })
+  } catch (error) {
+    Logger.error(TAG, 'Error withdrawing CELO', error)
+    if (txId) {
+      yield put(removeStandbyTransaction(txId))
+    }
+
+    yield put(showError(ErrorMessages.TRANSACTION_FAILED))
+    ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_error, {
+      error,
+    })
+  }
+}
+
 export function* watchFetchTobinTax() {
   yield takeLatest(Actions.FETCH_TOBIN_TAX, doFetchTobinTax)
 }
@@ -350,8 +400,13 @@ export function* watchExchangeTokens() {
   yield takeEvery(Actions.EXCHANGE_TOKENS, exchangeGoldAndStableTokens)
 }
 
+export function* watchWithdrawCelo() {
+  yield takeEvery(Actions.WITHDRAW_CELO, withdrawCelo)
+}
+
 export function* exchangeSaga() {
   yield spawn(watchFetchExchangeRate)
   yield spawn(watchFetchTobinTax)
   yield spawn(watchExchangeTokens)
+  yield spawn(watchWithdrawCelo)
 }

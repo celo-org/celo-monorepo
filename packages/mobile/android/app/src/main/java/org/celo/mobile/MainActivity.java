@@ -18,7 +18,7 @@ import org.devio.rn.splashscreen.SplashScreen;
 public class MainActivity
   extends ReactFragmentActivity
   implements ReactInstanceManager.ReactInstanceEventListener {
-  Date appStartTimestamp;
+  long appStartedMillis;
 
   /**
    * Returns the name of the main component registered from JavaScript. This is
@@ -40,7 +40,7 @@ public class MainActivity
         View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
       );
 
-    appStartTimestamp = new Date();
+    appStartedMillis = System.currentTimeMillis();
     SplashScreen.show(this, R.style.SplashTheme);
     super.onCreate(null);
   }
@@ -64,7 +64,7 @@ public class MainActivity
   public void onReactContextInitialized(ReactContext context) {
     context
       .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-      .emit("AppStartedLoading", appStartTimestamp.toString());
+      .emit("AppStartedLoading", "" + appStartedMillis);
   }
 
   @Override

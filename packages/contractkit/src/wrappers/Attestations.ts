@@ -1,9 +1,9 @@
+import { eqAddress } from '@celo/base/lib/address'
+import { concurrentMap, sleep } from '@celo/base/lib/async'
+import { notEmpty, zip3 } from '@celo/base/lib/collections'
+import { parseSolidityStringArray } from '@celo/base/lib/parsing'
+import { appendPath } from '@celo/base/lib/string'
 import { AttestationUtils, SignatureUtils } from '@celo/utils/lib'
-import { eqAddress } from '@celo/utils/lib/address'
-import { concurrentMap, sleep } from '@celo/utils/lib/async'
-import { notEmpty, zip3 } from '@celo/utils/lib/collections'
-import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
-import { appendPath } from '@celo/utils/lib/string'
 import BigNumber from 'bignumber.js'
 import fetch from 'cross-fetch'
 import { Address, CeloContract, NULL_ADDRESS } from '../base'
@@ -137,6 +137,17 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       attestationRequestFeeToken: res[2],
     })
   )
+
+  /**
+   * @notice Checks if attestation request is expired.
+   * @param attestationRequestBlockNumber Attestation Request Block Number to be checked
+   */
+  isAttestationExpired = async (attestationRequestBlockNumber: number) => {
+    // We duplicate the implementation here, until Attestation.sol->isAttestationExpired is not external
+    const attestationExpiryBlocks = await this.attestationExpiryBlocks()
+    const blockNumber = await this.kit.web3.eth.getBlockNumber()
+    return blockNumber >= attestationRequestBlockNumber + attestationExpiryBlocks
+  }
 
   /**
    * @notice Waits for appropriate block numbers for before issuer can be selected

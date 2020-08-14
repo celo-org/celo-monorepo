@@ -1,0 +1,339 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`WithdrawCeloScreen renders correctly 1`] = `
+<RNCSafeAreaView
+  edges={
+    Array [
+      "bottom",
+    ]
+  }
+  style={
+    Object {
+      "flex": 1,
+      "justifyContent": "space-between",
+    }
+  }
+>
+  <RCTScrollView
+    contentContainerStyle={
+      Object {
+        "paddingHorizontal": 16,
+      }
+    }
+    keyboardShouldPersistTaps="always"
+  >
+    <View>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-SemiBold",
+            "fontSize": 13,
+            "lineHeight": 16,
+            "marginBottom": 4,
+            "marginTop": 24,
+          }
+        }
+      >
+        accountAddressLabel
+      </Text>
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "center",
+            },
+            Object {
+              "borderColor": "#B4B9BD",
+              "borderRadius": 4,
+              "borderWidth": 1,
+              "paddingHorizontal": 12,
+            },
+          ]
+        }
+      >
+        <TextInput
+          allowFontScaling={true}
+          onChangeText={[Function]}
+          placeholder="0x1234...5678"
+          placeholderTextColor="#B4B9BD"
+          rejectResponderTermination={true}
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "flex": 1,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingHorizontal": 0,
+                "paddingVertical": 12,
+              },
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+              },
+            ]
+          }
+          testID="AccountAddress"
+          underlineColorAndroid="transparent"
+          value=""
+        />
+        <View
+          accessible={true}
+          focusable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackgroundBorderless",
+              "type": "ThemeAttrAndroid",
+            }
+          }
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          testID="ScanQR"
+        >
+          <svg
+            fill="none"
+            height={32}
+            style={Object {}}
+            viewBox="0 0 32 32"
+            width={32}
+          >
+            <rect
+              height={10}
+              rx={3}
+              stroke="#EEB93C"
+              strokeWidth={2.75}
+              style={Object {}}
+              width={10}
+              x={4}
+              y={4}
+            />
+            <rect
+              height={10}
+              rx={3}
+              stroke="#EEB93C"
+              strokeWidth={2.75}
+              style={Object {}}
+              width={10}
+              x={18}
+              y={4}
+            />
+            <path
+              d="M18 25v1a2 2 0 002 2h1M28 21v-1a2 2 0 00-2-2h-1M21 18h-1a2 2 0 00-2 2v1M25 28h1a2 2 0 002-2v-1"
+              stroke="#EEB93C"
+              strokeLinecap="round"
+              strokeWidth={2.75}
+              style={Object {}}
+            />
+            <rect
+              height={10}
+              rx={3}
+              stroke="#EEB93C"
+              strokeWidth={2.75}
+              style={Object {}}
+              width={10}
+              x={4}
+              y={18}
+            />
+          </svg>
+        </View>
+      </View>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-SemiBold",
+            "fontSize": 13,
+            "lineHeight": 16,
+            "marginBottom": 4,
+            "marginTop": 24,
+          }
+        }
+      >
+        celoAmountLabel
+      </Text>
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "center",
+            },
+            Object {
+              "borderColor": "#B4B9BD",
+              "borderRadius": 4,
+              "borderWidth": 1,
+              "paddingHorizontal": 12,
+            },
+          ]
+        }
+      >
+        <TextInput
+          allowFontScaling={true}
+          keyboardType="decimal-pad"
+          onChangeText={[Function]}
+          placeholder="0"
+          placeholderTextColor="#B4B9BD"
+          rejectResponderTermination={true}
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "flex": 1,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingHorizontal": 0,
+                "paddingVertical": 12,
+              },
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+              },
+            ]
+          }
+          testID="CeloAmount"
+          underlineColorAndroid="transparent"
+          value=""
+        />
+        <View
+          accessible={true}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "opacity": 1,
+            }
+          }
+          testID="MaxAmount"
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                },
+                Object {
+                  "color": "#EEB93C",
+                },
+              ]
+            }
+          >
+            maxSymbol
+          </Text>
+        </View>
+      </View>
+    </View>
+  </RCTScrollView>
+  <View
+    style={
+      Array [
+        Object {
+          "flexDirection": "column",
+        },
+        Object {
+          "padding": 16,
+        },
+      ]
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {
+            "overflow": "hidden",
+          },
+          Object {
+            "borderRadius": 100,
+          },
+        ]
+      }
+    >
+      <View
+        accessible={true}
+        focusable={false}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "alignItems": "center",
+            "backgroundColor": "#F1F0EB",
+            "flexGrow": 1,
+            "height": 48,
+            "justifyContent": "center",
+            "opacity": undefined,
+            "paddingHorizontal": 24,
+            "paddingVertical": 5,
+          }
+        }
+        testID="WithdrawReviewButton"
+      >
+        <Text
+          accessibilityLabel="continue"
+          style={
+            Object {
+              "color": "#9CA4A9",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 16,
+              "lineHeight": 22,
+            }
+          }
+        >
+          global:review
+        </Text>
+      </View>
+    </View>
+  </View>
+  <View
+    collapsable={false}
+    style={
+      Array [
+        Object {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+        },
+        Object {
+          "height": 0,
+        },
+        undefined,
+      ]
+    }
+  />
+</RNCSafeAreaView>
+`;

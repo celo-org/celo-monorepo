@@ -1,8 +1,9 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import ItemSeparator from '@celo/react-components/components/ItemSeparator'
 import SectionHead from '@celo/react-components/components/SectionHeadGold'
+import { SettingsItemTextValue } from '@celo/react-components/components/SettingsItem'
 import Touchable from '@celo/react-components/components/Touchable'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import { StackScreenProps } from '@react-navigation/stack'
@@ -70,6 +71,11 @@ function ExchangeHomeScreen({ navigation }: Props) {
         makerTokenBalance: goldBalance || '0',
       },
     })
+  }
+
+  function goToWithdrawCelo() {
+    ValoraAnalytics.track(CeloExchangeEvents.celo_home_withdraw)
+    navigation.navigate(Screens.WithdrawCeloScreen)
   }
 
   const scrollPosition = useRef(new Animated.Value(0)).current
@@ -206,6 +212,12 @@ function ExchangeHomeScreen({ navigation }: Props) {
           <ItemSeparator />
           <CeloGoldOverview testID="ExchangeAccountOverview" />
           <ItemSeparator />
+          <SettingsItemTextValue
+            title={t('withdrawCelo')}
+            onPress={goToWithdrawCelo}
+            testID={'WithdrawCELO'}
+            showChevron={true}
+          />
           <SectionHead text={t('global:activity')} />
           <TransactionsList currency={CURRENCY_ENUM.GOLD} />
         </SafeAreaView>
@@ -231,7 +243,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   background: {
-    backgroundColor: colors.background,
     flex: 1,
     justifyContent: 'space-between',
   },
@@ -247,7 +258,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   head: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -291,7 +302,7 @@ const styles = StyleSheet.create({
   },
   goldPriceWentUpHeader: {
     ...fontStyles.small600,
-    color: colors.celoGreen,
+    color: colors.greenBrand,
   },
   goldPriceWentDownHeader: {
     ...fontStyles.small600,

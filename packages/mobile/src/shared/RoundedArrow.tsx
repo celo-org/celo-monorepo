@@ -9,7 +9,7 @@ interface Props {
 
 export default class RoundedArrow extends React.PureComponent<Props> {
   static defaultProps = {
-    color: colors.inactive,
+    color: colors.gray4,
     size: 20,
   }
 

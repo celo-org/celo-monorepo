@@ -24,7 +24,7 @@ interface Config {
     host: string
     ssl: boolean
   }
-  pgpnpServices: {
+  odisServices: {
     signers: string
     timeoutMilliSeconds: number
   }
@@ -49,7 +49,7 @@ if (DEV_MODE) {
       host: 'fakeHost',
       ssl: false,
     },
-    pgpnpServices: {
+    odisServices: {
       signers: '[{"url": "http://localhost:3000"}]',
       timeoutMilliSeconds: 5 * 1000,
     },
@@ -71,9 +71,9 @@ if (DEV_MODE) {
       host: `/cloudsql/${functionConfig.db.host}`,
       ssl: toBool(functionConfig.db.ssl, true),
     },
-    pgpnpServices: {
-      signers: functionConfig.pgpnpservices.signers,
-      timeoutMilliSeconds: functionConfig.pgpnpservices.timeoutMilliSeconds || 5 * 1000,
+    odisServices: {
+      signers: functionConfig.odisservices.signers,
+      timeoutMilliSeconds: functionConfig.odisservices.timeoutMilliSeconds || 5 * 1000,
     },
     thresholdSignature: {
       threshold: functionConfig.threshold_signature.threshold_signature_threshold,
