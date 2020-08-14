@@ -1,8 +1,5 @@
-import {
-  ensureLeading0x,
-  normalizeAddressWith0x,
-  privateKeyToAddress,
-} from '@celo/utils/lib/address'
+import { ensureLeading0x, normalizeAddressWith0x } from '@celo/base/lib/address'
+import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { provider, Tx } from 'web3-core'
 import { DefaultRpcCaller, RpcCaller } from '../utils/rpc-caller'
 import { RemoteWallet } from './remote-wallet'

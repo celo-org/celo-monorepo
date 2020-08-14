@@ -1,5 +1,5 @@
 // Copied from '@ledgerhq/hw-app-eth/erc20' because we need to change the path of the blob and support for address+chainId
-import { Address, normalizeAddressWith0x } from '@celo/utils/lib/address'
+import { Address, normalizeAddressWith0x } from '@celo/base/lib/address'
 import blob from './data'
 
 /**

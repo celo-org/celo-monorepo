@@ -1,6 +1,6 @@
+import { Address } from '@celo/base/lib/address'
+import { concurrentMap } from '@celo/base/lib/async'
 import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/ganache-test'
-import { Address } from '@celo/utils/lib/address'
-import { concurrentMap } from '@celo/utils/lib/async'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import { CeloContract } from '..'

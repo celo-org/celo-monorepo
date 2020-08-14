@@ -1,4 +1,4 @@
-import { Address, ensureLeading0x } from '@celo/utils/lib/address'
+import { Address, ensureLeading0x } from '@celo/base/lib/address'
 import * as ethUtil from 'ethereumjs-util'
 import { AzureKeyVaultClient } from '../utils/azure-key-vault-client'
 import { RemoteWallet } from './remote-wallet'

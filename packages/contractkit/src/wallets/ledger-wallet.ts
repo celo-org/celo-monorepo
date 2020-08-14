@@ -1,4 +1,4 @@
-import { CELO_DERIVATION_PATH_BASE } from '@celo/utils/lib/account'
+import { CELO_DERIVATION_PATH_BASE } from '@celo/base/lib/account'
 import { TransportError, TransportStatusError } from '@ledgerhq/errors'
 import Ledger from '@ledgerhq/hw-app-eth'
 import debugFactory from 'debug'
