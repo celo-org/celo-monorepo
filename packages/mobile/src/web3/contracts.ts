@@ -80,6 +80,7 @@ export function* initContractKit() {
       contractKit = newKitFromWeb3(web3, gethWallet)
       Logger.info(`${TAG}@initContractKit`, 'Initialized kit')
       ValoraAnalytics.track(ContractKitEvents.init_contractkit_finish)
+      initContractKitLock = false
       return
     } catch (error) {
       if (isProviderConnectionError(error)) {
@@ -90,6 +91,7 @@ export function* initContractKit() {
           error
         )
         if (retries <= 0) {
+          initContractKitLock = false
           break
         }
 
@@ -97,6 +99,7 @@ export function* initContractKit() {
         yield delay(KIT_INIT_RETRY_DELAY)
       } else {
         Logger.error(`${TAG}@initContractKit`, 'Unexpected error initializing kit', error)
+        initContractKitLock = false
         break
       }
     }
@@ -112,34 +115,49 @@ export function destroyContractKit() {
   gethWallet = undefined
 }
 
+let initContractKitLock = false
+
+async function waitForContractKit(tries: number) {
+  while (!contractKit) {
+    Logger.warn(`${TAG}@getContractKitAsync`, 'Contract Kit not yet initalized')
+    if (tries > 0) {
+      Logger.warn(`${TAG}@getContractKitAsync`, 'Sleeping then retrying')
+      tries -= 1
+      await sleep(1000)
+    } else {
+      throw new Error('Contract kit intialization timeout')
+    }
+  }
+}
+
 export function* getContractKit() {
   if (!contractKit) {
-    yield call(initContractKit)
+    if (initContractKitLock) {
+      yield waitForContractKit(10)
+    } else {
+      initContractKitLock = true
+      yield call(initContractKit)
+    }
   }
   return contractKit
 }
 
 // Used for cases where CK must be access outside of a saga
 export async function getContractKitAsync() {
-  let retries = 10
-  while (!contractKit) {
-    Logger.warn(`${TAG}@getContractKitAsync`, 'Contract Kit not yet initalized')
-    if (retries > 0) {
-      Logger.warn(`${TAG}@getContractKitAsync`, 'Sleeping then retrying')
-      retries -= 1
-      await sleep(1000)
-    } else {
-      throw new Error('Contract kit intialization timeout')
-    }
-  }
-
+  await waitForContractKit(10)
   return contractKit
 }
 
 export function* getWallet() {
   if (!gethWallet) {
-    yield call(initContractKit)
+    if (initContractKitLock) {
+      yield waitForContractKit(10)
+    } else {
+      initContractKitLock = true
+      yield call(initContractKit)
+    }
   }
+
   return gethWallet
 }
 
@@ -167,5 +185,5 @@ export function* getWeb3() {
 // Used for cases where the kit's web3 must be accessed outside a saga
 export async function getWeb3Async() {
   const kit = await getContractKitAsync()
-  return kit.web3
+  return kit?.web3
 }
