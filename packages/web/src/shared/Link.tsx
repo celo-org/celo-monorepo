@@ -8,7 +8,7 @@ interface Props {
   passHref?: boolean
 }
 
-export default ({ href, children, passHref, prefetch = false }: Props) => {
+export default function Link2({ href, children, passHref, prefetch = false }: Props) {
   if (href) {
     return (
       <Link prefetch={prefetch} href={href} passHref={passHref}>
