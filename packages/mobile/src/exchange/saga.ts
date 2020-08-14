@@ -272,6 +272,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       Logger.error(TAG, `Unexpected maker token ${makerToken}`)
       return
     }
+
     yield call(
       sendTransaction,
       approveTx.txo,
@@ -348,17 +349,17 @@ function* createStandbyTx(
 }
 
 function* withdrawCelo(action: WithdrawCeloAction) {
-  let txId: string | null = null
+  let context: TransactionContext | null = null
   try {
     const { recipientAddress, amount } = action
     const account: string = yield call(getConnectedUnlockedAccount)
 
     navigate(Screens.ExchangeHomeScreen)
 
-    txId = generateStandbyTransactionId(account)
+    context = newTransactionContext(TAG, 'Withdraw CELO')
     yield put(
       addStandbyTransaction({
-        id: txId,
+        context,
         type: TokenTransactionType.Sent,
         comment: '',
         status: TransactionStatus.Pending,
@@ -379,14 +380,14 @@ function* withdrawCelo(action: WithdrawCeloAction) {
       }
     )
 
-    yield call(sendAndMonitorTransaction, txId, tx, account, CURRENCY_ENUM.GOLD)
+    yield call(sendAndMonitorTransaction, tx, account, context, CURRENCY_ENUM.GOLD)
     ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_completed, {
       amount: amount.toString(),
     })
   } catch (error) {
     Logger.error(TAG, 'Error withdrawing CELO', error)
-    if (txId) {
-      yield put(removeStandbyTransaction(txId))
+    if (context?.id) {
+      yield put(removeStandbyTransaction(context.id))
     }
 
     yield put(showError(ErrorMessages.TRANSACTION_FAILED))
