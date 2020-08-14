@@ -23,6 +23,7 @@ export enum Actions {
   SET_RETRY_VERIFICATION_WITH_FORNO = 'ACCOUNT/SET_RETRY_VERIFICATION_WITH_FORNO',
   ACCEPT_TERMS = 'ACCOUNT/ACCEPT_TERMS',
   MIGRATE_ACCOUNT_BIP39 = 'MIGRATE_ACCOUNT_BIP39',
+  CLEAR_STORED_ACCOUNT = 'ACCOUNT/CLEAR_STORED_ACCOUNT',
 }
 
 export interface ChooseCreateAccountAction {
@@ -121,6 +122,11 @@ export interface MigrateAccount {
   type: Actions.MIGRATE_ACCOUNT_BIP39
 }
 
+export interface ClearStoredAccountAction {
+  type: Actions.CLEAR_STORED_ACCOUNT
+  account: string
+}
+
 export type ActionTypes =
   | ChooseCreateAccountAction
   | ChooseRestoreAccountAction
@@ -144,6 +150,7 @@ export type ActionTypes =
   | SetRetryVerificationWithFornoAction
   | AcceptTermsAction
   | MigrateAccount
+  | ClearStoredAccountAction
 
 export function chooseCreateAccount(): ChooseCreateAccountAction {
   return {
@@ -256,4 +263,9 @@ export const setUserContactDetails = (
 
 export const migrateAccount = (): MigrateAccount => ({
   type: Actions.MIGRATE_ACCOUNT_BIP39,
+})
+
+export const clearStoredAccount = (account: string): ClearStoredAccountAction => ({
+  type: Actions.CLEAR_STORED_ACCOUNT,
+  account,
 })

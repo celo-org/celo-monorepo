@@ -40,3 +40,14 @@ export async function retrieveStoredItem(key: string) {
     throw new Error(ErrorMessages.KEYCHAIN_STORAGE_ERROR)
   }
 }
+
+export async function removeStoredItem(key: string) {
+  try {
+    return Keychain.resetGenericPassword({
+      service: key,
+    })
+  } catch (error) {
+    Logger.error(TAG, 'Error clearing item', error, true)
+    throw new Error(ErrorMessages.KEYCHAIN_STORAGE_ERROR)
+  }
+}

@@ -1,5 +1,6 @@
 import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
 import {
+  SettingsExpandedItem,
   SettingsItemSwitch,
   SettingsItemTextValue,
 } from '@celo/react-components/components/SettingsItem'
@@ -13,7 +14,7 @@ import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
-import { devModeTriggerClicked, toggleBackupState } from 'src/account/actions'
+import { clearStoredAccount, devModeTriggerClicked, toggleBackupState } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
 import { SettingsEvents } from 'src/analytics/Events'
@@ -26,8 +27,8 @@ import {
   setSessionId,
 } from 'src/app/actions'
 import { sessionIdSelector } from 'src/app/selectors'
+import Dialog from 'src/components/Dialog'
 import SessionId from 'src/components/SessionId'
-import { WarningModal } from 'src/components/WarningModal'
 import { AVAILABLE_LANGUAGES, TOS_LINK } from 'src/config'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { revokeVerification } from 'src/identity/actions'
@@ -53,6 +54,7 @@ interface DispatchProps {
   setRequirePinOnAppOpen: typeof setRequirePinOnAppOpen
   toggleFornoMode: typeof toggleFornoMode
   setSessionId: typeof setSessionId
+  clearStoredAccount: typeof clearStoredAccount
 }
 
 interface StateProps {
@@ -101,10 +103,12 @@ const mapDispatchToProps = {
   setRequirePinOnAppOpen,
   toggleFornoMode,
   setSessionId,
+  clearStoredAccount,
 }
 
 interface State {
   fornoSwitchOffWarning: boolean
+  showAccountKeyModal: boolean
 }
 
 export class Account extends React.Component<Props, State> {
@@ -243,6 +247,7 @@ export class Account extends React.Component<Props, State> {
   hideFornoSwitchOffWarning = () => {
     this.setState({ fornoSwitchOffWarning: false })
   }
+
   onPressPromptModal = () => {
     this.props.toggleFornoMode(true)
     navigateBack()
@@ -258,9 +263,33 @@ export class Account extends React.Component<Props, State> {
     ValoraAnalytics.track(SettingsEvents.tos_view)
   }
 
+  onRemoveAccountPress = () => {
+    this.setState({ showAccountKeyModal: true })
+  }
+
+  hideRemoveAccountModal = () => {
+    this.setState({ showAccountKeyModal: false })
+  }
+
+  onPressContinueWithAccountRemoval = () => {
+    ValoraAnalytics.track(SettingsEvents.start_account_removal)
+    this.setState({ showAccountKeyModal: false })
+    this.props.navigation.navigate(Screens.BackupPhrase, { navigatedFromSettings: true })
+  }
+
+  hideConfirmRemovalModal = () => {
+    this.props.navigation.setParams({ promptConfirmRemovalModal: false })
+  }
+
+  confirmAccountRemoval = () => {
+    ValoraAnalytics.track(SettingsEvents.completed_account_removal)
+    this.props.clearStoredAccount(this.props.account || '')
+  }
+
   render() {
     const { t, i18n } = this.props
     const promptFornoModal = this.props.route.params?.promptFornoModal ?? false
+    const promptConfirmRemovalModal = this.props.route.params?.promptConfirmRemovalModal ?? false
     const currentLanguage = AVAILABLE_LANGUAGES.find((l) => l.code === i18n.language)
     return (
       <SafeAreaView style={styles.container}>
@@ -302,26 +331,56 @@ export class Account extends React.Component<Props, State> {
             <SectionHeadNew text={t('legal')} style={styles.sectionTitle} />
             <SettingsItemTextValue title={t('licenses')} onPress={this.goToLicenses} />
             <SettingsItemTextValue title={t('termsOfServiceLink')} onPress={this.onTermsPress} />
+            <SectionHeadNew text={''} style={styles.sectionTitle} />
+            <SettingsExpandedItem
+              title={t('removeAccountTitle')}
+              details={t('removeAccountDetails')}
+              onPress={this.onRemoveAccountPress}
+            />
           </View>
           {this.getDevSettingsComp()}
-          <WarningModal
+          <Dialog
             isVisible={this.state?.fornoSwitchOffWarning}
-            header={t('restartModalSwitchOff.header')}
-            body1={t('restartModalSwitchOff.body')}
-            continueTitle={t('restartModalSwitchOff.restart')}
-            cancelTitle={t('global:cancel')}
-            onCancel={this.hideFornoSwitchOffWarning}
-            onContinue={this.disableFornoMode}
-          />
-          <WarningModal
+            title={t('restartModalSwitchOff.header')}
+            actionText={t('restartModalSwitchOff.restart')}
+            actionPress={this.disableFornoMode}
+            secondaryActionText={t('global:cancel')}
+            secondaryActionPress={this.hideFornoSwitchOffWarning}
+          >
+            {t('restartModalSwitchOff.body')}
+          </Dialog>
+          <Dialog
             isVisible={promptFornoModal}
-            header={t('promptFornoModal.header')}
-            body1={t('promptFornoModal.body')}
-            continueTitle={t('promptFornoModal.switchToDataSaver')}
-            cancelTitle={t('global:goBack')}
-            onCancel={this.hidePromptModal}
-            onContinue={this.onPressPromptModal}
-          />
+            title={t('promptFornoModal.header')}
+            actionText={t('promptFornoModal.switchToDataSaver')}
+            actionPress={this.onPressPromptModal}
+            secondaryActionText={t('global:goBack')}
+            secondaryActionPress={this.hidePromptModal}
+          >
+            {t('promptFornoModal.body')}
+          </Dialog>
+          <Dialog
+            isVisible={this.state?.showAccountKeyModal}
+            title={t('accountKeyModal.header')}
+            actionText={t('global:continue')}
+            actionPress={this.onPressContinueWithAccountRemoval}
+            secondaryActionText={t('global:cancel')}
+            secondaryActionPress={this.hideRemoveAccountModal}
+          >
+            {t('accountKeyModal.body1')}
+            {'\n\n'}
+            {t('accountKeyModal.body2')}
+          </Dialog>
+          <Dialog
+            isVisible={promptConfirmRemovalModal}
+            title={t('promptConfirmRemovalModal.header')}
+            actionText={t('promptConfirmRemovalModal.resetNow')}
+            actionPress={this.confirmAccountRemoval}
+            secondaryActionText={t('global:cancel')}
+            secondaryActionPress={this.hideConfirmRemovalModal}
+          >
+            {t('promptConfirmRemovalModal.body')}
+          </Dialog>
         </ScrollView>
       </SafeAreaView>
     )

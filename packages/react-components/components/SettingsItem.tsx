@@ -81,6 +81,30 @@ export function SettingsItemSwitch({
   )
 }
 
+type SettingsExpandedItemProps = {
+  details?: string
+} & BaseProps
+
+export function SettingsExpandedItem({
+  testID,
+  title,
+  details,
+  onPress,
+}: SettingsExpandedItemProps) {
+  return (
+    <Wrapper testID={testID} onPress={onPress}>
+      <View style={styles.container}>
+        <Title value={title} />
+      </View>
+      {details && (
+        <View>
+          <Text style={styles.details}>{details}</Text>
+        </View>
+      )}
+    </Wrapper>
+  )
+}
+
 type SettingsItemInputProps = {
   value: string
   placeholder?: string
