@@ -13,7 +13,7 @@ BRANCH_2=""
 NETWORK=""
 REPORT=""
 
-while getopts 'a:b:n:r:' flag; do
+while getopts 'a:b:n:p:i:r:' flag; do
   case "${flag}" in
     a) BRANCH_1="${OPTARG}" ;;
     b) BRANCH_2="${OPTARG}" ;;
