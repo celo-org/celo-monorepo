@@ -1,12 +1,6 @@
 import { ACCOUNT_ADDRESSES, ACCOUNT_PRIVATE_KEYS } from '@celo/dev-utils/lib/ganache-setup'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
-import {
-  ensureLeading0x,
-  privateKeyToPublicKey,
-  toChecksumAddress,
-  trimLeading0x,
-} from '@celo/utils/lib/address'
-import { Encrypt } from '@celo/utils/lib/ecies'
+import { ensureLeading0x, privateKeyToPublicKey, toChecksumAddress } from '@celo/utils/lib/address'
 import { NativeSigner, serializeSignature } from '@celo/utils/lib/signatureUtils'
 import { randomBytes } from 'crypto'
 import fetchMock from 'fetch-mock'
@@ -15,6 +9,7 @@ import { AccountsWrapper } from '../wrappers/Accounts'
 import { createStorageClaim } from './claims/claim'
 import { IdentityMetadataWrapper } from './metadata'
 import OffchainDataWrapper from './offchain-data-wrapper'
+import { EncryptionKeysAccessor } from './offchain/schema-utils'
 import { AuthorizedSignerAccessor, NameAccessor } from './offchain/schemas'
 import { MockStorageWriter } from './offchain/storage-writers'
 
@@ -112,53 +107,22 @@ testWithGanache('Offchain Data', (web3) => {
         })
 
         it("the writer can encrypt data directly to the reader's dataEncryptionKey", async () => {
-          const newKey = ensureLeading0x(randomBytes(32).toString('hex'))
-          const newKeyPub = privateKeyToPublicKey(newKey)
-
           const testname = 'test'
           const payload = { name: testname }
-          const stringifiedPayload = JSON.stringify(payload)
-
-          const keyEncrypted = Encrypt(
-            Buffer.from(trimLeading0x(readerEncryptionKeyPublic), 'hex'),
-            Buffer.from(trimLeading0x(newKey), 'hex')
-          ).toString('hex')
-
-          const encryptedPayload = {
-            publicKey: newKeyPub,
-            ciphertext: Encrypt(
-              Buffer.from(trimLeading0x(newKeyPub), 'hex'),
-              Buffer.from(stringifiedPayload)
-            ).toString('hex'),
-            encryptedKey: {
-              [readerEncryptionKeyPublic]: keyEncrypted,
-            },
-          }
-
-          await wrapper.writeDataTo(JSON.stringify(encryptedPayload), '/account/name')
 
           const nameAccessor = new NameAccessor(wrapper)
+          await nameAccessor.writeEncrypted(payload, [await accounts.getDataEncryptionKey(reader)])
           const receivedName = await nameAccessor.read(writer)
           expect(receivedName).toBeDefined()
         })
 
-        it.only('the writer can create an encryption key and encrypt that to the readers dataEncryptionKey', async () => {
+        it('the writer can create an encryption key and encrypt that to the readers dataEncryptionKey', async () => {
           const newKey = ensureLeading0x(randomBytes(32).toString('hex'))
           const newKeyPub = privateKeyToPublicKey(newKey)
           const testname = 'test'
           const payload = { name: testname }
-          const stringifiedPayload = JSON.stringify(payload)
-
-          const encryptedPayload = {
-            publicKey: newKeyPub,
-            ciphertext: Encrypt(
-              Buffer.from(trimLeading0x(newKeyPub), 'hex'),
-              Buffer.from(stringifiedPayload)
-            ).toString('hex'),
-          }
-
-          console.log('write ciphertext')
-          await wrapper.writeDataTo(JSON.stringify(encryptedPayload), '/account/name')
+          const writerNameAccessor = new NameAccessor(wrapper)
+          await writerNameAccessor.writeEncrypted(payload, [], newKey)
 
           // Write the encryption key
           const encryptionKeys = {
@@ -170,18 +134,12 @@ testWithGanache('Offchain Data', (web3) => {
             },
           }
 
-          const stringifiedEncryptionKeys = JSON.stringify(encryptionKeys)
-          const encryptedKeys = {
-            publicKey: readerEncryptionKeyPublic,
-            ciphertext: Encrypt(
-              Buffer.from(trimLeading0x(readerEncryptionKeyPublic), 'hex'),
-              Buffer.from(stringifiedEncryptionKeys)
-            ).toString('hex'),
-          }
-
-          await wrapper.writeDataTo(
-            JSON.stringify(encryptedKeys),
-            `/other/${reader}/encryptionKeys`
+          const encryptionKeysAccessor = new EncryptionKeysAccessor(wrapper)
+          await encryptionKeysAccessor.writeEncrypted(
+            reader,
+            encryptionKeys,
+            [await accounts.getDataEncryptionKey(reader)],
+            newKey
           )
 
           const readerWrapper = new OffchainDataWrapper(reader, kit)

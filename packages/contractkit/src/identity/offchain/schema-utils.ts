@@ -1,4 +1,11 @@
-import { ensureLeading0x, privateKeyToAddress, publicKeyToAddress } from '@celo/utils/lib/address'
+import {
+  ensureLeading0x,
+  privateKeyToPublicKey,
+  publicKeyToAddress,
+  trimLeading0x,
+} from '@celo/utils/lib/address'
+import { Encrypt } from '@celo/utils/lib/ecies'
+import { randomBytes } from 'crypto'
 import { isLeft, isRight } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import { Address } from '../../base'
@@ -18,13 +25,27 @@ export class SingleSchema<T> {
   async write(data: T) {
     return writeWithSchema(this.wrapper, this.type, this.dataPath, data)
   }
+
+  async writeEncrypted(data: T, pubKeys: string[], decryptionKey?: string | undefined) {
+    return writeEncryptedWithSchema(
+      this.wrapper,
+      this.type,
+      this.dataPath,
+      data,
+      pubKeys,
+      decryptionKey
+    )
+  }
 }
 
-const EncryptedCipherText = t.type({
+// Core Schemas
+const EncryptionWrappedData = t.type({
   publicKey: t.string,
   ciphertext: t.string,
   encryptedKey: t.union([t.record(t.string, t.string), t.undefined]),
 })
+
+type EncryptionWrappedDataType = t.TypeOf<typeof EncryptionWrappedData>
 
 const EncryptionKeysSchema = t.type({
   keys: t.record(
@@ -35,6 +56,89 @@ const EncryptionKeysSchema = t.type({
     })
   ),
 })
+
+type EncryptionKeysType = t.TypeOf<typeof EncryptionKeysSchema>
+export class EncryptionKeysAccessor {
+  basePath = '/others'
+  constructor(readonly wrapper: OffchainDataWrapper) {}
+
+  async read(account: Address, self: Address) {
+    return readWithSchema(
+      this.wrapper,
+      EncryptionKeysSchema,
+      account,
+      this.basePath + '/' + self + '/encryptionKeys'
+    )
+  }
+
+  async write(other: Address, keys: EncryptionKeysType) {
+    return writeWithSchema(
+      this.wrapper,
+      EncryptionKeysSchema,
+      this.basePath + '/' + other + '/encryptionKeys',
+      keys
+    )
+  }
+
+  async writeEncrypted(
+    other: Address,
+    keys: EncryptionKeysType,
+    pubKeys: string[],
+    decryptionKey?: string | undefined
+  ) {
+    return writeEncryptedWithSchema(
+      this.wrapper,
+      EncryptionKeysSchema,
+      this.basePath + '/' + other + '/encryptionKeys',
+      keys,
+      pubKeys,
+      decryptionKey
+    )
+  }
+}
+
+const getDecryptionKey = async (
+  wrapper: OffchainDataWrapper,
+  account: Address,
+  encryptionWrappedData: EncryptionWrappedDataType
+) => {
+  const wallet = wrapper.kit.getWallet()
+  const decryptionPublicKey = encryptionWrappedData.publicKey
+  const decryptionKeyAddress = publicKeyToAddress(decryptionPublicKey)
+
+  if (wallet.hasAccount(decryptionKeyAddress)) {
+    return true
+  }
+
+  if (encryptionWrappedData.encryptedKey) {
+    const keyToDecryptDecryptionKey = Object.keys(encryptionWrappedData.encryptedKey).find((x) =>
+      wallet.hasAccount(publicKeyToAddress(x))
+    )
+
+    if (keyToDecryptDecryptionKey) {
+      const decryptionKeyCiphertext = encryptionWrappedData.encryptedKey[keyToDecryptDecryptionKey]
+
+      const decryptionKey = await wallet.decrypt(
+        publicKeyToAddress(keyToDecryptDecryptionKey),
+        Buffer.from(decryptionKeyCiphertext, 'hex')
+      )
+
+      wrapper.kit.addAccount(ensureLeading0x(decryptionKey.toString('hex')))
+      return true
+    }
+  }
+
+  const encryptionKeysAccessor = new EncryptionKeysAccessor(wrapper)
+  const encryptionKeys = await encryptionKeysAccessor.read(account, wrapper.self)
+
+  // The decryption key is under the encryptionKeys path
+  if (encryptionKeys && encryptionKeys.keys[encryptionWrappedData.publicKey]) {
+    wrapper.kit.addAccount(encryptionKeys.keys[encryptionWrappedData.publicKey].privateKey)
+    return true
+  }
+
+  return false
+}
 
 export const readWithSchema = async <T>(
   wrapper: OffchainDataWrapper,
@@ -54,7 +158,7 @@ export const readWithSchema = async <T>(
     return parseResult.right
   }
 
-  const parseResultAsCiphertext = EncryptedCipherText.decode(asJson)
+  const parseResultAsCiphertext = EncryptionWrappedData.decode(asJson)
   if (isLeft(parseResultAsCiphertext)) {
     return undefined
   }
@@ -62,7 +166,10 @@ export const readWithSchema = async <T>(
   const pubKey = parseResultAsCiphertext.right.publicKey
   const pubKeyAddress = publicKeyToAddress(pubKey)
   const wallet = wrapper.kit.getWallet()
-  if (wallet.hasAccount(pubKeyAddress)) {
+
+  const gotDecryptionKey = await getDecryptionKey(wrapper, account, parseResultAsCiphertext.right)
+
+  if (gotDecryptionKey) {
     const decryptedCiphertext = await wallet.decrypt(
       pubKeyAddress,
       Buffer.from(parseResultAsCiphertext.right.ciphertext, 'hex')
@@ -76,63 +183,50 @@ export const readWithSchema = async <T>(
 
     return parseResultViaCiphertext.right
   }
-
-  if (parseResultAsCiphertext.right.encryptedKey) {
-    const keyToDecryptDecryptionKey = Object.keys(
-      parseResultAsCiphertext.right.encryptedKey
-    ).find((x) => wallet.hasAccount(publicKeyToAddress(x)))
-
-    if (keyToDecryptDecryptionKey) {
-      const decryptionKeyCiphertext =
-        parseResultAsCiphertext.right.encryptedKey[keyToDecryptDecryptionKey]
-
-      const decryptionKey = await wallet.decrypt(
-        publicKeyToAddress(keyToDecryptDecryptionKey),
-        Buffer.from(decryptionKeyCiphertext, 'hex')
-      )
-
-      wrapper.kit.addAccount(ensureLeading0x(decryptionKey.toString('hex')))
-
-      const actualPlaintext = await wallet.decrypt(
-        privateKeyToAddress(ensureLeading0x(decryptionKey.toString('hex'))),
-        Buffer.from(parseResultAsCiphertext.right.ciphertext, 'hex')
-      )
-
-      const parseResultViaCiphertext = type.decode(JSON.parse(actualPlaintext.toString()))
-
-      if (isLeft(parseResultViaCiphertext)) {
-        return undefined
-      }
-
-      return parseResultViaCiphertext.right
-    }
-  }
-
-  const encryptionKeys = await readWithSchema(
-    wrapper,
-    EncryptionKeysSchema,
-    account,
-    `/other/${wrapper.self}/encryptionKeys`
-  )
-  if (encryptionKeys && encryptionKeys.keys[pubKey]) {
-    wrapper.kit.addAccount(encryptionKeys.keys[pubKey].privateKey)
-
-    const decryptedCiphertext = await wallet.decrypt(
-      pubKeyAddress,
-      Buffer.from(parseResultAsCiphertext.right.ciphertext, 'hex')
-    )
-
-    const parseResultViaCiphertext = type.decode(JSON.parse(decryptedCiphertext.toString()))
-
-    if (isLeft(parseResultViaCiphertext)) {
-      return undefined
-    }
-
-    return parseResultViaCiphertext.right
-  }
-  // TODO: We might not have the encryption key, but it might be encrypted to us
 
   return undefined
+}
+
+export const writeEncryptedWithSchema = async <T>(
+  wrapper: OffchainDataWrapper,
+  type: t.Type<T>,
+  dataPath: string,
+  data: T,
+  pubKeys: string[],
+  decryptionKey?: string | undefined
+) => {
+  if (!type.is(data)) {
+    return
+  }
+
+  if (decryptionKey === undefined) {
+    decryptionKey = ensureLeading0x(randomBytes(32).toString('hex'))
+  }
+  const decryptionKeyPub = privateKeyToPublicKey(decryptionKey)
+
+  const stringifiedPayload = JSON.stringify(data)
+
+  const encryptedKeyMapping: Record<string, string> = {}
+  pubKeys.forEach(
+    (pubKey) =>
+      (encryptedKeyMapping[pubKey] = Encrypt(
+        Buffer.from(trimLeading0x(pubKey), 'hex'),
+        Buffer.from(trimLeading0x(decryptionKey!), 'hex')
+      ).toString('hex'))
+  )
+
+  const encryptedPayload: EncryptionWrappedDataType = {
+    publicKey: decryptionKeyPub,
+    ciphertext: Encrypt(
+      Buffer.from(trimLeading0x(decryptionKeyPub), 'hex'),
+      Buffer.from(stringifiedPayload)
+    ).toString('hex'),
+    encryptedKey: encryptedKeyMapping,
+  }
+
+  const serializedData = JSON.stringify(encryptedPayload)
+  await wrapper.writeDataTo(serializedData, dataPath)
+  return
 }
 
 export const writeWithSchema = async <T>(

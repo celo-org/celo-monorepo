@@ -48,37 +48,3 @@ export class AuthorizedSignerAccessor {
     )
   }
 }
-
-const EncryptionKeysSchema = t.type({
-  keys: t.record(
-    t.string,
-    t.type({
-      privateKey: t.string,
-      publicKey: t.string,
-    })
-  ),
-})
-
-type EncryptionKeysType = t.TypeOf<typeof EncryptionKeysSchema>
-export class EncryptionKeysAccessor {
-  basePath = '/others'
-  constructor(readonly wrapper: OffchainDataWrapper) {}
-
-  async read(account: Address, self: Address) {
-    return readWithSchema(
-      this.wrapper,
-      EncryptionKeysSchema,
-      account,
-      this.basePath + '/' + self + '/encryptionKeys'
-    )
-  }
-
-  async write(other: Address, keys: EncryptionKeysType) {
-    return writeWithSchema(
-      this.wrapper,
-      EncryptionKeysSchema,
-      this.basePath + '/' + other + '/encryptionKeys',
-      keys
-    )
-  }
-}
