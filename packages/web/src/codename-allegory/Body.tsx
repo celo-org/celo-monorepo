@@ -23,14 +23,12 @@ export default React.memo(function Body({ isOpen }: Props) {
       <Poem />
 
       <View style={styles.footer}>
-        <Fade duration={2100} rootMargin={'-35% 0% -40% 0%'} fraction={1} style={styles.imagine}>
+        <Fade duration={2100} rootMargin={'-35% 0% -45% 0%'} fraction={1} style={styles.imagine}>
           <Text style={[fonts.legal, textStyles.center]}>
             <RingsGlyph height={15} color={colors.dark} />
             {'  '}
             Imagined with Celo
           </Text>
-        </Fade>
-        <Fade duration={2100} rootMargin={'-40% 0% -35% 0%'} fraction={1}>
           <Text style={[fonts.legal, textStyles.center]}>Design & Built by cLabs, © Celo 2020</Text>
         </Fade>
       </View>
@@ -60,5 +58,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingTop: '10vh',
   },
-  imagine: { marginVertical: '25vh' },
+  imagine: { marginTop: '25vh' },
 })
