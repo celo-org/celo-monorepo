@@ -21,6 +21,7 @@ files=(
   "packages/mobile/ios/sentry.properties"
   "packages/mobile/secrets.json"
   "packages/web/env-config.js"
+  "packages/reserve-site/.env.local"
   "packages/web/server-env-config.js"
   "packages/moonpay-auth/.env"
   ".env.mnemonic"

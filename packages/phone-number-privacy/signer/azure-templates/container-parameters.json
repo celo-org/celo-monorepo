@@ -2,9 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "containerName": {
-            "value": "TODO"
-        },
         "location": {
             "value": "TODO"
         },
@@ -12,7 +9,7 @@
             "value": "Public"
         },
         "imageName": {
-            "value": "us.gcr.io/celo-testnet/celo-monorepo:phone-number-privacy-rc1"
+            "value": "us.gcr.io/celo-testnet/celo-monorepo:phone-number-privacy-rc2"
         },
         "osType": {
             "value": "Linux"
@@ -86,6 +83,12 @@
             ]
         },
         "dnsNameLabel": {
+            "value": "TODO"
+        },
+        "logAnalyticsWorkspaceId": {
+            "value": "TODO"
+        },
+        "logAnalyticsWorkspaceKey": {
             "value": "TODO"
         }
     }

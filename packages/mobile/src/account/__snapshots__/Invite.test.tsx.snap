@@ -4,7 +4,6 @@ exports[`Invite renders correctly with no recipients 1`] = `
 <View
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
@@ -14,19 +13,25 @@ exports[`Invite renders correctly with no recipients 1`] = `
       Object {
         "alignItems": "center",
         "backgroundColor": "transparent",
-        "borderBottomColor": AnimatedValue {
-          " __value": NaN,
-        },
+        "borderBottomColor": 0,
         "borderBottomWidth": 1,
         "flexDirection": "row",
-        "height": 62,
-        "justifyContent": "space-between",
+        "height": 56,
+        "justifyContent": "center",
       }
     }
   >
     <View
       accessible={true}
       focusable={false}
+      hitSlop={
+        Object {
+          "bottom": 10,
+          "left": 10,
+          "right": 10,
+          "top": 10,
+        }
+      }
       onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
@@ -36,10 +41,12 @@ exports[`Invite renders correctly with no recipients 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
+          "left": 0,
           "marginBottom": 0,
-          "marginLeft": 4,
+          "marginLeft": 16,
           "opacity": 1,
-          "padding": 8,
+          "padding": 0,
+          "position": "absolute",
         }
       }
     >
@@ -78,18 +85,11 @@ exports[`Invite renders correctly with no recipients 1`] = `
         />
       </svg>
     </View>
-    <View
-      style={
-        Object {
-          "width": 45,
-        }
-      }
-    />
   </View>
   <View
     style={
       Object {
-        "borderBottomColor": "rgba(134, 138, 141, 0.15)",
+        "borderBottomColor": "#EDEEEF",
         "borderBottomWidth": 1,
         "paddingBottom": 5,
       }
@@ -193,16 +193,15 @@ exports[`Invite renders correctly with no recipients 1`] = `
           style={
             Object {
               "justifyContent": "center",
-              "paddingHorizontal": 50,
+              "paddingHorizontal": 24,
             }
           }
         >
           <View
             style={
               Object {
-                "flexDirection": "row",
                 "justifyContent": "center",
-                "paddingVertical": 20,
+                "paddingVertical": 24,
                 "textAlign": "center",
               }
             }
@@ -210,10 +209,11 @@ exports[`Invite renders correctly with no recipients 1`] = `
             <Text
               style={
                 Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 16,
+                  "color": "#B4B9BD",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 18,
                   "lineHeight": 24,
+                  "textAlign": "center",
                 }
               }
             >
@@ -223,11 +223,7 @@ exports[`Invite renders correctly with no recipients 1`] = `
         </View>
       }
       ListHeaderComponent={[Function]}
-      contentContainerStyle={
-        Object {
-          "paddingBottom": 0,
-        }
-      }
+      contentContainerStyle={null}
       data={Array []}
       disableVirtualization={false}
       getItem={[Function]}
@@ -259,16 +255,15 @@ exports[`Invite renders correctly with no recipients 1`] = `
           style={
             Object {
               "justifyContent": "center",
-              "paddingHorizontal": 50,
+              "paddingHorizontal": 24,
             }
           }
         >
           <View
             style={
               Object {
-                "flexDirection": "row",
                 "justifyContent": "center",
-                "paddingVertical": 20,
+                "paddingVertical": 24,
                 "textAlign": "center",
               }
             }
@@ -276,10 +271,11 @@ exports[`Invite renders correctly with no recipients 1`] = `
             <Text
               style={
                 Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 16,
+                  "color": "#B4B9BD",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 18,
                   "lineHeight": 24,
+                  "textAlign": "center",
                 }
               }
             >
@@ -289,6 +285,22 @@ exports[`Invite renders correctly with no recipients 1`] = `
         </View>
       </View>
     </RCTScrollView>
+    <View
+      collapsable={false}
+      style={
+        Array [
+          Object {
+            "bottom": 0,
+            "left": 0,
+            "right": 0,
+          },
+          Object {
+            "height": 0,
+          },
+          undefined,
+        ]
+      }
+    />
   </View>
 </View>
 `;
@@ -297,7 +309,6 @@ exports[`Invite renders correctly with recipients 1`] = `
 <View
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
@@ -307,19 +318,25 @@ exports[`Invite renders correctly with recipients 1`] = `
       Object {
         "alignItems": "center",
         "backgroundColor": "transparent",
-        "borderBottomColor": AnimatedValue {
-          " __value": NaN,
-        },
+        "borderBottomColor": 0,
         "borderBottomWidth": 1,
         "flexDirection": "row",
-        "height": 62,
-        "justifyContent": "space-between",
+        "height": 56,
+        "justifyContent": "center",
       }
     }
   >
     <View
       accessible={true}
       focusable={false}
+      hitSlop={
+        Object {
+          "bottom": 10,
+          "left": 10,
+          "right": 10,
+          "top": 10,
+        }
+      }
       onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
@@ -329,10 +346,12 @@ exports[`Invite renders correctly with recipients 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
+          "left": 0,
           "marginBottom": 0,
-          "marginLeft": 4,
+          "marginLeft": 16,
           "opacity": 1,
-          "padding": 8,
+          "padding": 0,
+          "position": "absolute",
         }
       }
     >
@@ -371,18 +390,11 @@ exports[`Invite renders correctly with recipients 1`] = `
         />
       </svg>
     </View>
-    <View
-      style={
-        Object {
-          "width": 45,
-        }
-      }
-    />
   </View>
   <View
     style={
       Object {
-        "borderBottomColor": "rgba(134, 138, 141, 0.15)",
+        "borderBottomColor": "#EDEEEF",
         "borderBottomWidth": 1,
         "paddingBottom": 5,
       }
@@ -486,16 +498,15 @@ exports[`Invite renders correctly with recipients 1`] = `
           style={
             Object {
               "justifyContent": "center",
-              "paddingHorizontal": 50,
+              "paddingHorizontal": 24,
             }
           }
         >
           <View
             style={
               Object {
-                "flexDirection": "row",
                 "justifyContent": "center",
-                "paddingVertical": 20,
+                "paddingVertical": 24,
                 "textAlign": "center",
               }
             }
@@ -503,10 +514,11 @@ exports[`Invite renders correctly with recipients 1`] = `
             <Text
               style={
                 Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 16,
+                  "color": "#B4B9BD",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 18,
                   "lineHeight": 24,
+                  "textAlign": "center",
                 }
               }
             >
@@ -516,20 +528,16 @@ exports[`Invite renders correctly with recipients 1`] = `
         </View>
       }
       ListHeaderComponent={[Function]}
-      contentContainerStyle={
-        Object {
-          "paddingBottom": 0,
-        }
-      }
+      contentContainerStyle={null}
       data={
         Array [
           Object {
             "data": Array [
               Object {
                 "contactId": "contactId",
-                "displayId": "21255550000",
+                "displayId": "442012341234",
                 "displayName": "George Bogart",
-                "e164PhoneNumber": "+21255550000",
+                "e164PhoneNumber": "+442012341234",
                 "kind": "Contact",
                 "phoneNumberLabel": "phoneNumLabel",
               },
@@ -585,14 +593,17 @@ exports[`Invite renders correctly with recipients 1`] = `
         >
           <View
             style={
-              Object {
-                "alignItems": "center",
-                "backgroundColor": "#FFFFFF",
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "paddingHorizontal": 16,
-                "paddingVertical": 8,
-              }
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "backgroundColor": "#FFFFFF",
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "paddingHorizontal": 16,
+                  "paddingVertical": 8,
+                },
+                undefined,
+              ]
             }
           >
             <Text
@@ -638,7 +649,7 @@ exports[`Invite renders correctly with recipients 1`] = `
                     "alignItems": "center",
                     "flex": 1,
                     "flexDirection": "row",
-                    "height": 80,
+                    "height": 64,
                     "justifyContent": "space-between",
                     "paddingHorizontal": 16,
                   }
@@ -723,19 +734,13 @@ exports[`Invite renders correctly with recipients 1`] = `
                       }
                     }
                   >
-                    21255550000
+                    442012341234
                   </Text>
                 </View>
               </View>
             </View>
             <View
-              style={
-                Object {
-                  "backgroundColor": "#EEEEEE",
-                  "height": 1,
-                  "marginLeft": 60,
-                }
-              }
+              style={Object {}}
             />
           </View>
         </View>
@@ -768,7 +773,7 @@ exports[`Invite renders correctly with recipients 1`] = `
                     "alignItems": "center",
                     "flex": 1,
                     "flexDirection": "row",
-                    "height": 80,
+                    "height": 64,
                     "justifyContent": "space-between",
                     "paddingHorizontal": 16,
                   }
@@ -859,13 +864,7 @@ exports[`Invite renders correctly with recipients 1`] = `
               </View>
             </View>
             <View
-              style={
-                Object {
-                  "backgroundColor": "#EEEEEE",
-                  "height": 1,
-                  "marginLeft": 60,
-                }
-              }
+              style={Object {}}
             />
           </View>
         </View>
@@ -897,7 +896,7 @@ exports[`Invite renders correctly with recipients 1`] = `
                   "alignItems": "center",
                   "flex": 1,
                   "flexDirection": "row",
-                  "height": 80,
+                  "height": 64,
                   "justifyContent": "space-between",
                   "paddingHorizontal": 16,
                 }
@@ -994,6 +993,22 @@ exports[`Invite renders correctly with recipients 1`] = `
         />
       </View>
     </RCTScrollView>
+    <View
+      collapsable={false}
+      style={
+        Array [
+          Object {
+            "bottom": 0,
+            "left": 0,
+            "right": 0,
+          },
+          Object {
+            "height": 0,
+          },
+          undefined,
+        ]
+      }
+    />
   </View>
 </View>
 `;

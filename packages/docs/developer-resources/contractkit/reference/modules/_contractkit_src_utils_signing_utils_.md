@@ -17,7 +17,6 @@
 * [chainIdTransformationForSigning](_contractkit_src_utils_signing_utils_.md#chainidtransformationforsigning)
 * [decodeSig](_contractkit_src_utils_signing_utils_.md#decodesig)
 * [encodeTransaction](_contractkit_src_utils_signing_utils_.md#encodetransaction)
-* [getAddressFromPublicKey](_contractkit_src_utils_signing_utils_.md#getaddressfrompublickey)
 * [getHashFromEncoded](_contractkit_src_utils_signing_utils_.md#gethashfromencoded)
 * [recoverKeyIndex](_contractkit_src_utils_signing_utils_.md#recoverkeyindex)
 * [recoverMessageSigner](_contractkit_src_utils_signing_utils_.md#recovermessagesigner)
@@ -111,24 +110,6 @@ Name | Type |
 
 ___
 
-###  getAddressFromPublicKey
-
-▸ **getAddressFromPublicKey**(`publicKey`: BigNumber): *[Address](_contractkit_src_base_.md#address)*
-
-*Defined in [contractkit/src/utils/signing-utils.ts:256](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L256)*
-
-Maps the publicKey to its address
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`publicKey` | BigNumber |
-
-**Returns:** *[Address](_contractkit_src_base_.md#address)*
-
-___
-
 ###  getHashFromEncoded
 
 ▸ **getHashFromEncoded**(`rlpEncode`: string): *string*
@@ -216,7 +197,7 @@ ___
 
 ###  verifyEIP712TypedDataSigner
 
-▸ **verifyEIP712TypedDataSigner**(`typedData`: [EIP712TypedData](../interfaces/_contractkit_src_utils_sign_typed_data_utils_.eip712typeddata.md), `signedData`: string, `expectedAddress`: string): *boolean*
+▸ **verifyEIP712TypedDataSigner**(`typedData`: EIP712TypedData, `signedData`: string, `expectedAddress`: string): *boolean*
 
 *Defined in [contractkit/src/utils/signing-utils.ts:207](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L207)*
 
@@ -224,7 +205,7 @@ ___
 
 Name | Type |
 ------ | ------ |
-`typedData` | [EIP712TypedData](../interfaces/_contractkit_src_utils_sign_typed_data_utils_.eip712typeddata.md) |
+`typedData` | EIP712TypedData |
 `signedData` | string |
 `expectedAddress` | string |
 

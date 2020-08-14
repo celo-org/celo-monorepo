@@ -1,16 +1,16 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import Switch from '@celo/react-components/components/Switch.v2'
 import Checkmark from '@celo/react-components/icons/Checkmark'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { StackScreenProps, useHeaderHeight } from '@react-navigation/stack'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import { useSafeArea } from 'react-native-safe-area-view'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { IdentityEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import i18n, { Namespaces } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
 import { cancelImportContacts, denyImportContacts, importContacts } from 'src/identity/actions'
@@ -19,8 +19,8 @@ import { ImportContactsStatus } from 'src/identity/types'
 import { HeaderTitleWithSubtitle, nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
+import TopBarTextButtonOnboarding from 'src/onboarding/TopBarTextButtonOnboarding'
 import { requestContactsPermission } from 'src/utils/permissions'
 
 type ScreenProps = StackScreenProps<StackParamList, Screens.ImportContacts>
@@ -36,7 +36,7 @@ function ImportContactsScreen({ route, navigation }: Props) {
   const matchedContacts = useSelector(matchedContactsSelector)
   const matchedContactsCount = Object.keys(matchedContacts).length
   const dispatch = useDispatch()
-  const insets = useSafeArea()
+  const insets = useSafeAreaInsets()
   const headerHeight = useHeaderHeight()
 
   const renderStatusContainer = () => {
@@ -85,11 +85,11 @@ function ImportContactsScreen({ route, navigation }: Props) {
   }
 
   const onPressConnect = async () => {
-    CeloAnalytics.track(CustomEventNames.import_contacts)
-    const hasGivenContactPermission = await requestContactsPermission()
-    if (hasGivenContactPermission) {
-      dispatch(importContacts(isFindMeSwitchChecked))
-    }
+    ValoraAnalytics.track(IdentityEvents.contacts_connect, {
+      matchMakingEnabled: isFindMeSwitchChecked,
+    })
+    await requestContactsPermission()
+    dispatch(importContacts(isFindMeSwitchChecked))
   }
 
   const onToggleFindMeSwitch = (value: boolean) => {
@@ -168,11 +168,10 @@ ImportContactsScreen.navigationOptions = ({ route }: ScreenProps) => {
     ),
     headerRight: !importDone
       ? () => (
-          <TopBarTextButton
+          <TopBarTextButtonOnboarding
             title={i18n.t('global:skip')}
             testID="ImportContactsSkip"
             onPress={onPressSkip}
-            titleStyle={styles.skipButtonStyle}
           />
         )
       : () => null,
@@ -227,8 +226,5 @@ const styles = StyleSheet.create({
   switchText: {
     ...fontStyles.regular500,
     paddingLeft: 8,
-  },
-  skipButtonStyle: {
-    color: colors.goldDark,
   },
 })

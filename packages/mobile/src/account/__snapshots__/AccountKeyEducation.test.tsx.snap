@@ -1,11 +1,15 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`AccountKeyEducation renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
+  onFinish={[Function]}
   style={
-    Object {
-      "flex": 1,
-    }
+    Array [
+      Object {
+        "flex": 1,
+      },
+      undefined,
+    ]
   }
 >
   <View
@@ -75,7 +79,6 @@ exports[`AccountKeyEducation renders correctly 1`] = `
     style={
       Object {
         "alignItems": "center",
-        "backgroundColor": "white",
         "flex": 1,
         "justifyContent": "center",
         "paddingBottom": 24,
@@ -86,241 +89,266 @@ exports[`AccountKeyEducation renders correctly 1`] = `
       activeDotStyle={
         Object {
           "backgroundColor": "#2E3338",
-          "borderRadius": 8,
+          "borderRadius": 5,
           "flex": 0,
-          "height": 8,
-          "marginHorizontal": 5,
-          "width": 8,
+          "height": 5,
+          "marginHorizontal": 3,
+          "width": 5,
         }
       }
       dotStyle={
         Object {
           "backgroundColor": "#9CA4A9",
-          "borderRadius": 8,
+          "borderRadius": 5,
           "flex": 0,
-          "height": 6,
-          "marginHorizontal": 5,
-          "width": 6,
+          "height": 5,
+          "marginHorizontal": 3,
+          "width": 5,
         }
       }
       loop={false}
       onIndexChanged={[Function]}
+      removeClippedSubviews={false}
     >
       <View
         style={
           Object {
             "flex": 1,
-            "justifyContent": "center",
             "marginBottom": 24,
             "paddingHorizontal": 24,
           }
         }
       >
-        <Image
-          resizeMode="contain"
-          source={
-            Object {
-              "testUri": "../../../packages/mobile/src/images/placeholder.png",
-            }
-          }
+        <View
           style={
             Object {
-              "alignSelf": "center",
-              "height": 200,
-              "width": 200,
-            }
-          }
-        />
-        <Text
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Jost-Medium",
-              "fontSize": 22,
-              "lineHeight": 28,
-              "marginTop": 24,
-              "textAlign": "center",
+              "flex": 1,
+              "justifyContent": "center",
             }
           }
         >
-          guide.0.title
-        </Text>
-        <Text
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Inter-Regular",
-              "fontSize": 16,
-              "lineHeight": 22,
-              "paddingTop": 16,
-              "textAlign": "center",
+          <Image
+            resizeMode="contain"
+            source={
+              Object {
+                "testUri": "../../../packages/mobile/src/images/account-key-1.png",
+              }
             }
-          }
-        >
-          guide.0.text
-        </Text>
+            style={
+              Object {
+                "alignSelf": "center",
+              }
+            }
+          />
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Jost-Medium",
+                "fontSize": 22,
+                "lineHeight": 28,
+                "marginTop": 24,
+                "textAlign": "center",
+              }
+            }
+          >
+            guide.0.title
+          </Text>
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingTop": 16,
+                "textAlign": "center",
+              }
+            }
+          >
+            guide.0.text
+          </Text>
+        </View>
       </View>
       <View
         style={
           Object {
             "flex": 1,
-            "justifyContent": "center",
             "marginBottom": 24,
             "paddingHorizontal": 24,
           }
         }
       >
-        <Image
-          resizeMode="contain"
-          source={
-            Object {
-              "testUri": "../../../packages/mobile/src/images/placeholder.png",
-            }
-          }
+        <View
           style={
             Object {
-              "alignSelf": "center",
-              "height": 200,
-              "width": 200,
-            }
-          }
-        />
-        <Text
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Jost-Medium",
-              "fontSize": 22,
-              "lineHeight": 28,
-              "marginTop": 24,
-              "textAlign": "center",
+              "flex": 1,
+              "justifyContent": "center",
             }
           }
         >
-          guide.1.title
-        </Text>
-        <Text
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Inter-Regular",
-              "fontSize": 16,
-              "lineHeight": 22,
-              "paddingTop": 16,
-              "textAlign": "center",
+          <Image
+            resizeMode="contain"
+            source={
+              Object {
+                "testUri": "../../../packages/mobile/src/images/account-key-2.png",
+              }
             }
-          }
-        >
-          guide.1.text
-        </Text>
+            style={
+              Object {
+                "alignSelf": "center",
+              }
+            }
+          />
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Jost-Medium",
+                "fontSize": 22,
+                "lineHeight": 28,
+                "marginTop": 24,
+                "textAlign": "center",
+              }
+            }
+          >
+            guide.1.title
+          </Text>
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingTop": 16,
+                "textAlign": "center",
+              }
+            }
+          >
+            guide.1.text
+          </Text>
+        </View>
       </View>
       <View
         style={
           Object {
             "flex": 1,
-            "justifyContent": "center",
             "marginBottom": 24,
             "paddingHorizontal": 24,
           }
         }
       >
-        <Image
-          resizeMode="contain"
-          source={
-            Object {
-              "testUri": "../../../packages/mobile/src/images/placeholder.png",
-            }
-          }
+        <View
           style={
             Object {
-              "alignSelf": "center",
-              "height": 200,
-              "width": 200,
-            }
-          }
-        />
-        <Text
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Jost-Medium",
-              "fontSize": 22,
-              "lineHeight": 28,
-              "marginTop": 24,
-              "textAlign": "center",
+              "flex": 1,
+              "justifyContent": "center",
             }
           }
         >
-          guide.2.title
-        </Text>
-        <Text
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Inter-Regular",
-              "fontSize": 16,
-              "lineHeight": 22,
-              "paddingTop": 16,
-              "textAlign": "center",
+          <Image
+            resizeMode="contain"
+            source={
+              Object {
+                "testUri": "../../../packages/mobile/src/images/account-key-3.png",
+              }
             }
-          }
-        >
-          guide.2.text
-        </Text>
+            style={
+              Object {
+                "alignSelf": "center",
+              }
+            }
+          />
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Jost-Medium",
+                "fontSize": 22,
+                "lineHeight": 28,
+                "marginTop": 24,
+                "textAlign": "center",
+              }
+            }
+          >
+            guide.2.title
+          </Text>
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingTop": 16,
+                "textAlign": "center",
+              }
+            }
+          >
+            guide.2.text
+          </Text>
+        </View>
       </View>
       <View
         style={
           Object {
             "flex": 1,
-            "justifyContent": "center",
             "marginBottom": 24,
             "paddingHorizontal": 24,
           }
         }
       >
-        <Image
-          resizeMode="contain"
-          source={
-            Object {
-              "testUri": "../../../packages/mobile/src/images/placeholder.png",
-            }
-          }
+        <View
           style={
             Object {
-              "alignSelf": "center",
-              "height": 200,
-              "width": 200,
-            }
-          }
-        />
-        <Text
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Jost-Medium",
-              "fontSize": 22,
-              "lineHeight": 28,
-              "marginTop": 24,
-              "textAlign": "center",
+              "flex": 1,
+              "justifyContent": "center",
             }
           }
         >
-          guide.3.title
-        </Text>
-        <Text
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Inter-Regular",
-              "fontSize": 16,
-              "lineHeight": 22,
-              "paddingTop": 16,
-              "textAlign": "center",
+          <Image
+            resizeMode="contain"
+            source={
+              Object {
+                "testUri": "../../../packages/mobile/src/images/account-key-4.png",
+              }
             }
-          }
-        >
-          guide.3.text
-        </Text>
+            style={
+              Object {
+                "alignSelf": "center",
+              }
+            }
+          />
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Jost-Medium",
+                "fontSize": 22,
+                "lineHeight": 28,
+                "marginTop": 24,
+                "textAlign": "center",
+              }
+            }
+          >
+            guide.3.title
+          </Text>
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingTop": 16,
+                "textAlign": "center",
+              }
+            }
+          >
+            guide.3.text
+          </Text>
+        </View>
       </View>
     </Swiper>
     <View
@@ -369,7 +397,7 @@ exports[`AccountKeyEducation renders correctly 1`] = `
               "justifyContent": "center",
               "minWidth": 120,
               "opacity": undefined,
-              "paddingHorizontal": 16,
+              "paddingHorizontal": 24,
               "paddingVertical": 5,
             }
           }
@@ -391,5 +419,5 @@ exports[`AccountKeyEducation renders correctly 1`] = `
       </View>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

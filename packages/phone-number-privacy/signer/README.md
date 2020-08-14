@@ -1,10 +1,10 @@
-# Phone Number Privacy - Signer Service
+# ODIS - Signer Service
 
-A service run by distributed partners that generates unique partial signatures for phone number salts. Using a threshold BLS signature scheme, when K/N signatures are combined, a deterministic signature is obtained.
+A service that generates unique partial signatures for blinded messages. Using a threshold BLS signature scheme, when K/N signatures are combined, a deterministic signature is obtained.
 
 ## Configuration
 
-You can use the following environment variables to configure the Phone Number Privacy - Signer service:
+You can use the following environment variables to configure the ODIS Signer service:
 
 ### Server
 
@@ -63,7 +63,7 @@ Use the following to configure the AWS Secrets Manager. To authenticate with Ama
 
 - `KEYSTORE_AWS_REGION` - The AWS Region code where the secret is, for example: `us-east-1`.
 - `KEYSTORE_AWS_SECRET_NAME` - The secret's name.
-- `KEYSTORE_AWS_SECRET_KEY` - The key inside the secret where the private key is save. `key` by default.
+- `KEYSTORE_AWS_SECRET_KEY` - The key for the secret key/value pair.
 
 ## Operations
 

@@ -1,9 +1,9 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import Button, { BtnTypes } from '@celo/react-components/components/Button.v2'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import Switch from '@celo/react-components/components/Switch'
-import TextInput from '@celo/react-components/components/TextInput'
+import TextInput from '@celo/react-components/components/TextInput.v2'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { anonymizedPhone } from '@celo/utils/src/phoneNumbers'
 import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -12,13 +12,12 @@ import DeviceInfo from 'react-native-device-info'
 import { openComposer } from 'react-native-email-link'
 import * as RNFS from 'react-native-fs'
 import Mailer from 'react-native-mail'
-import SafeAreaView from 'react-native-safe-area-view'
 import { useDispatch, useSelector } from 'react-redux'
 import { e164NumberSelector } from 'src/account/selectors'
 import { showMessage } from 'src/alert/actions'
+import { sessionIdSelector } from 'src/app/selectors'
 import { CELO_SUPPORT_EMAIL_ADDRESS, DEFAULT_TESTNET } from 'src/config'
-import i18n, { Namespaces } from 'src/i18n'
-import { headerWithBackButton } from 'src/navigator/Headers'
+import { Namespaces } from 'src/i18n'
 import { navigateBack } from 'src/navigator/NavigationService'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -63,6 +62,7 @@ function SupportContact() {
   const [inProgress, setInProgress] = useState(false)
   const e164PhoneNumber = useSelector(e164NumberSelector)
   const currentAccount = useSelector(currentAccountSelector)
+  const sessionId = useSelector(sessionIdSelector)
   const dispatch = useDispatch()
 
   const navigateBackAndToast = () => {
@@ -78,6 +78,7 @@ function SupportContact() {
       apiLevel: DeviceInfo.getApiLevelSync(),
       deviceId: DeviceInfo.getDeviceId(),
       address: currentAccount,
+      sessionId,
       network: DEFAULT_TESTNET,
     }
     const userId = e164PhoneNumber ? anonymizedPhone(e164PhoneNumber) : 'unknown'
@@ -124,73 +125,69 @@ function SupportContact() {
   }, [message, attachLogs, e164PhoneNumber])
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.innerContainer}>
+        <Text style={styles.title} testID={'ContactTitle'}>
+          {t('contact')}
+        </Text>
         <Text style={styles.headerText}>{t('global:message')}</Text>
         <TextInput
           onChangeText={setMessage}
           value={message}
           multiline={true}
           style={styles.messageTextInput}
-          placeholderTextColor={colors.inactive}
+          placeholderTextColor={colors.gray4}
           underlineColorAndroid="transparent"
           numberOfLines={10}
-          placeholder={t('tellUsMore')}
+          placeholder={t('contactMessagePlaceholder')}
           showClearButton={false}
           testID={'MessageEntry'}
         />
-        <View style={styles.spacer}>
-          <View style={styles.attachLogs}>
-            <Switch
-              testID="SwitchLogs"
-              style={styles.logsSwitch}
-              value={attachLogs}
-              onValueChange={setAttachLogs}
-            />
-            <Text style={fontStyles.body}>{t('attachLogs')}</Text>
-          </View>
+        <View style={styles.attachLogs}>
+          <Switch
+            testID="SwitchLogs"
+            style={styles.logsSwitch}
+            value={attachLogs}
+            onValueChange={setAttachLogs}
+          />
+          <Text style={fontStyles.regular}>{t('attachLogs')}</Text>
         </View>
         {inProgress && (
           <View style={styles.loadingSpinnerContainer} testID="ImportWalletLoadingCircle">
-            <ActivityIndicator size="large" color={colors.celoGreen} />
+            <ActivityIndicator size="large" color={colors.greenBrand} />
           </View>
         )}
 
-        <View>
-          <Text style={fontStyles.body}>{t('supportLegalCheckbox')}</Text>
+        <View style={styles.disclaimer}>
+          <Text style={styles.disclaimerText}>{t('supportLegalCheckbox')}</Text>
         </View>
+        <Button
+          disabled={!message || inProgress}
+          onPress={sendEmail}
+          text={t('global:submit')}
+          type={BtnTypes.PRIMARY}
+          testID="SubmitContactForm"
+        />
       </ScrollView>
-      <Button
-        disabled={!message || inProgress}
-        onPress={sendEmail}
-        text={t('global:submit')}
-        standard={false}
-        type={BtnTypes.PRIMARY}
-        testID="SubmitContactForm"
-      />
       <KeyboardSpacer />
-    </SafeAreaView>
+    </View>
   )
 }
 
-SupportContact.navigationOptions = () => ({
-  ...headerWithBackButton,
-  headerTitle: i18n.t('accountScreen10:contact'),
-})
-
 const styles = StyleSheet.create({
-  spacer: {
-    flex: 1,
+  disclaimer: {
+    marginBottom: 24,
+  },
+  disclaimerText: {
+    ...fontStyles.small,
+    color: colors.gray4,
   },
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   innerContainer: {
     flexGrow: 1,
-    padding: 20,
-    borderTopWidth: 1,
-    borderColor: '#EEEEEE',
+    padding: 16,
   },
   containerList: {
     paddingLeft: 20,
@@ -206,35 +203,35 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     height: 40,
     alignItems: 'center',
-    marginBottom: 20,
-    marginTop: 5,
+    marginTop: 4,
   },
   logsSwitch: {
     marginBottom: 3,
     marginRight: 10,
   },
-  contactLink: {
-    ...fontStyles.bodyBold,
-    color: colors.celoGreen,
-    textDecorationLine: 'none',
-  },
   messageTextInput: {
-    marginTop: 10,
+    ...fontStyles.regular,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    marginTop: 8,
     alignItems: 'flex-start',
-    borderColor: colors.inputBorder,
-    borderRadius: 3,
-    borderWidth: 1,
-    marginBottom: 6,
-    color: colors.inactive,
+    borderColor: colors.gray2,
+    borderRadius: 4,
+    borderWidth: 1.5,
+    marginBottom: 4,
+    color: colors.dark,
     height: 80,
     maxHeight: 150,
   },
   headerText: {
-    ...fontStyles.body,
-    ...fontStyles.semiBold,
+    ...fontStyles.small600,
   },
   loadingSpinnerContainer: {
     marginVertical: 20,
+  },
+  title: {
+    ...fontStyles.h1,
+    marginVertical: 16,
   },
 })
 

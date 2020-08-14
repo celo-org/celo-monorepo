@@ -9,14 +9,12 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
 import Avatar from 'src/components/Avatar'
 import CurrencyDisplay, { DisplayType, FormatType } from 'src/components/CurrencyDisplay'
-import FeeIcon from 'src/components/FeeIcon'
+import { SecurityFeeIcon } from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow.v2'
 import TotalLineItem from 'src/components/TotalLineItem.v2'
 import { FeeType } from 'src/fees/actions'
@@ -99,12 +97,10 @@ export class InviteReview extends React.Component<Props, State> {
   }
 
   onInviteSMS = async () => {
-    CeloAnalytics.track(CustomEventNames.invite_friends_sms)
     await this.onInvite(InviteBy.SMS)
   }
 
   onInviteWhatsApp = async () => {
-    CeloAnalytics.track(CustomEventNames.invite_friends_whatsapp)
     await this.onInvite(InviteBy.WhatsApp)
   }
 
@@ -126,7 +122,6 @@ export class InviteReview extends React.Component<Props, State> {
   }
 
   onEdit = () => {
-    CeloAnalytics.track(CustomEventNames.invite_edit)
     navigateBack()
   }
 
@@ -169,7 +164,7 @@ export class InviteReview extends React.Component<Props, State> {
         />
         {inviteInProgress && (
           <View style={styles.loadingIcon}>
-            <ActivityIndicator size="large" color={colors.celoGreen} />
+            <ActivityIndicator size="large" color={colors.greenBrand} />
           </View>
         )}
       </View>
@@ -232,7 +227,7 @@ export class InviteReview extends React.Component<Props, State> {
                     />
                     <LineItemRow
                       title={t('sendFlow7:securityFee')}
-                      titleIcon={<FeeIcon />}
+                      titleIcon={<SecurityFeeIcon />}
                       amount={
                         securityFeeAmount && (
                           <CurrencyDisplay amount={securityFeeAmount} formatType={FormatType.Fee} />
@@ -279,7 +274,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
   },
 })
 

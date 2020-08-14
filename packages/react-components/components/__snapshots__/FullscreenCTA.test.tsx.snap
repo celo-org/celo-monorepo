@@ -1,11 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`FullscreenCTA renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "alignItems": "center",
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "height": 1292,
       "justifyContent": "space-between",
@@ -161,5 +160,5 @@ exports[`FullscreenCTA renders correctly 1`] = `
       </View>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

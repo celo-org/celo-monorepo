@@ -14,10 +14,11 @@ const storeDataNotificationsEnabled = {
   goldToken: { educationCompleted: false },
   account: {
     backupCompleted: false,
-    dismissedEarnRewards: false,
     dismissedInviteFriends: false,
     dismissedGetVerified: false,
     accountCreationTime: EXPIRED_BACKUP_TIME,
+  },
+  paymentRequest: {
     incomingPaymentRequests: mockPaymentRequests.slice(0, 2),
   },
 }
@@ -26,10 +27,11 @@ const storeDataNotificationsDisabled = {
   goldToken: { educationCompleted: true },
   account: {
     backupCompleted: true,
-    dismissedEarnRewards: true,
     dismissedInviteFriends: true,
     dismissedGetVerified: true,
     accountCreationTime: RECENT_BACKUP_TIME,
+  },
+  paymentRequest: {
     incomingPaymentRequests: [],
   },
 }
@@ -69,7 +71,6 @@ describe('NotificationBox', () => {
       goldToken: { educationCompleted: false },
       account: {
         ...storeDataNotificationsDisabled.account,
-        dismissedEarnRewards: false,
         dismissedInviteFriends: false,
       },
     })
@@ -88,6 +89,8 @@ describe('NotificationBox', () => {
       ...storeDataNotificationsDisabled,
       account: {
         ...storeDataNotificationsDisabled.account,
+      },
+      paymentRequest: {
         incomingPaymentRequests: [mockPaymentRequests[0]],
       },
     })
@@ -110,6 +113,8 @@ describe('NotificationBox', () => {
       ...storeDataNotificationsDisabled,
       account: {
         ...storeDataNotificationsDisabled.account,
+      },
+      paymentRequest: {
         incomingPaymentRequests: mockPaymentRequests,
       },
     })
@@ -126,6 +131,8 @@ describe('NotificationBox', () => {
       ...storeDataNotificationsDisabled,
       account: {
         ...storeDataNotificationsDisabled.account,
+      },
+      paymentRequest: {
         outgoingPaymentRequests: mockPaymentRequests,
       },
     })
@@ -142,6 +149,8 @@ describe('NotificationBox', () => {
       ...storeDataNotificationsDisabled,
       account: {
         ...storeDataNotificationsDisabled.account,
+      },
+      paymentRequest: {
         outgoingPaymentRequests: [mockPaymentRequests[0]],
       },
     })

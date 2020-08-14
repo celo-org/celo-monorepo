@@ -4,9 +4,33 @@ variable google {
   type        = map(string)
 
   default = {
-    project = "my-project"
-    region  = "us-west1"
-    zone    = "us-west1-a"
+    #update these in terraform.tfvars
+    project = "MY_PROJECT_NAME"
+    region  = "MY_REGION"
+    zone    = "MY_ZONE"
+  }
+}
+
+variable replicas {
+  description = "The replica number for each component"
+  type        = map(number)
+
+  default = {
+    validator           = 1 # Also used for proxy
+    txnode              = 1
+    attestation_service = 1
+  }
+}
+
+variable instance_types {
+  description = "The instance type for each component"
+  type        = map(string)
+
+  default = {
+    validator           = "n1-standard-2"   #use n1-standard-2 or better for production
+    proxy               = "n1-standard-2"   #use n1-standard-2 or better for production
+    txnode              = "n1-standard-1"
+    attestation_service = "n1-standard-1"
   }
 }
 
@@ -21,19 +45,19 @@ variable celo_env {
   description = "The celo network to connect with"
   type        = string
 
-  default = "baklava"
+  default = "rc1"
 }
 
 variable network_id {
   description = "The ethereum network ID"
   type        = number
-  default     = 200110
+  default     = 42220
 }
 
 variable ethstats_host {
   description = "Ethstats host to report data"
   type        = string
-  default     = "baklava-ethstats.celo-testnet.org"
+  default     = "stats-server.celo.org"
 }
 
 variable geth_node_docker_image {
@@ -41,31 +65,8 @@ variable geth_node_docker_image {
   type        = map(string)
 
   default = {
-    repository = "us.gcr.io/celo-testnet/celo-node"
-    tag        = "baklava"
-  }
-}
-
-variable replicas {
-  description = "The replica number for each component"
-  type        = map(number)
-
-  default = {
-    validator           = 1 # Also used for proxy
-    txnode              = 0
-    attestation_service = 1
-  }
-}
-
-variable instance_types {
-  description = "The instance type for each component"
-  type        = map(string)
-
-  default = {
-    validator           = "n1-standard-2"
-    proxy               = "n1-standard-2"
-    txnode              = "n1-standard-1"
-    attestation_service = "n1-standard-1"
+    repository = "us.gcr.io/celo-org/celo-node"
+    tag        = "mainnet"
   }
 }
 
@@ -75,13 +76,16 @@ variable validator_signer_accounts {
 
   default = {
     account_addresses = [
-      "0x45...",
+      "secret in terraform.tfvars",
     ]
     private_keys = [
-      "7a2...",
+      "secret in terraform.tfvars",
     ]
     account_passwords = [
-      "secret1",
+      "secret in terraform.tfvars",
+    ]
+    release_gold_addresses = [
+      "secret in terraform.tfvars",
     ]
   }
 }
@@ -91,15 +95,18 @@ variable proxy_accounts {
   type        = map
 
   default = {
-    # account_address is not needed by the module. Can be left blank.
+  
     account_addresses = [
-      "0xF2...",
+      "set in terraform.tfvars",
     ]
     private_keys = [
-      "1b...",
+      "secret in terraform.tfvars",
     ]
     enodes = [
-      "f8...",
+      "set in terraform.tfvars",
+    ]
+    account_passwords = [
+      "set in terraform.tfvars",
     ]
   }
 }
@@ -110,10 +117,13 @@ variable attestation_signer_accounts {
 
   default = {
     account_addresses = [
-      "0x45...",
+      "set in terraform.tfvars",
     ]
     private_keys = [
-      "1b...",
+      "secret in terraform.tfvars",
+    ]
+    account_passwords = [
+      "secret in terraform.tfvars"
     ]
   }
 }
@@ -121,19 +131,19 @@ variable attestation_signer_accounts {
 variable validator_name {
   type        = string
   description = "The validator Name for ethstats"
-  default     = "myvalidator"
+  default     = "YourValidator"
 }
 
 variable proxy_name {
   type        = string
   description = "The proxy Name for ethstats"
-  default     = "myvalidator-proxy"
+  default     = "Your-Proxy"
 }
 
 variable reset_geth_data {
   type        = bool
   description = "Specifies if the existing chain data should be removed while creating the instance"
-  default     = false
+  default     = true    #will restore chaindata from GCS if available
 }
 
 variable geth_verbosity {
@@ -149,7 +159,7 @@ variable attestation_service_db {
 
   default = {
     username = "celo"
-    password = "mysecret"
+    password = "secret in terraform.tfvars"
   }
 }
 
@@ -159,7 +169,7 @@ variable attestation_service_docker_image {
 
   default = {
     repository = "us.gcr.io/celo-testnet/celo-monorepo"
-    tag        = "attestation-service-baklava"
+    tag        = "attestation-service-mainnet"
   }
 }
 
@@ -173,9 +183,9 @@ variable attestation_service_credentials {
     nexmo_key                    = ""
     nexmo_secret                 = ""
     nexmo_blacklist              = ""
-    twilio_account_sid           = "ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-    twilio_messaging_service_sid = "MGXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-    twilio_auth_token            = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    twilio_account_sid           = "secret in terraform.tfvars"
+    twilio_messaging_service_sid = "secret in terraform.tfvars"
+    twilio_auth_token            = "secret in terraform.tfvars"
     twilio_blacklist             = ""
   }
 }
@@ -208,4 +218,123 @@ variable geth_exporter_docker_image {
     repository = "us.gcr.io/celo-testnet/geth-exporter"
     tag        = "ed7d21bd50592709173368cd697ef73c1774a261"
   }
+}
+
+#not yet implemented.  intent is to only install the stackdriver agents and inject the log exclusions if 'true'
+variable "enable_stackdriver" {
+  description = "If set to true, enable Stackdriver for monitoring and logging"
+  type        = bool
+
+  default = true
+}
+
+variable "stackdriver_logging_exclusions" {
+  description = "List of objects that define logs to exclude on stackdriver"
+  type = map(object({
+    description  = string
+    filter       = string
+  }))
+
+  default = {
+    tf_gcm_infinite = {
+      description  = "Ignore stackdriver agent errors re: infinite values"
+      filter       = "resource.type = gce_instance AND \"write_gcm: can not take infinite value\""
+    }
+  
+    tf_gcm_swap = {
+      description  = "Ignore stackdriver agent errors re: swap percent/value"
+      filter       = "resource.type = gce_instance AND \"write_gcm: wg_typed_value_create_from_value_t_inline failed for swap/percent/value! Continuing\""
+    }
+
+    tf_gcm_invalid_time = {
+      description  = "Ignore stackdriver agent errors related to timing"
+      filter       = "resource.type = gce_instance AND \"write_gcm: Unsuccessful HTTP request 400\" AND \"The start time must be before the end time\""
+    }
+
+    tf_gcm_transmit_unique_segments = {
+      description  = "Ignore stackdriver agent errors re: transmit_unique_segments"
+      filter       = "resource.type = gce_instance AND \"write_gcm: wg_transmit_unique_segment\""
+    }
+
+    tf_ver_certs = {
+      description  = "Ignore Eth peer flapping warnings caused by peers disconnecting naturally when exceeding max_peers"
+      filter       = "resource.type = gce_instance AND \"Error sending all version certificates\""
+    }
+  
+    tf_peer_conns = {
+      description  = "Ignore Eth peer connections. Constant flux"
+      filter       = "resource.type = gce_instance AND \"Ethereum peer connected\""
+    }
+  }
+}
+
+variable "stackdriver_logging_metrics" {
+  description = "List of objects that define COUNT (DELTA) logging metric filters to apply to Stackdriver to graph and alert on useful signals"
+  type        = map(object({
+    description = string
+    filter      = string
+  }))
+
+  default = {
+
+    tf_eth_handshake_failed = {
+      description = "Ethereum peer handshake failed"
+       filter      = "resource.type=gce_instance AND \"Ethereum handshake failed\""
+    }
+
+    tf_eth_genesis_mismatch = {
+      description = "Client with different genesis block attempted connection"
+      filter      = "resource.type=gce_instance AND \"Genesis mismatch\""
+    }
+
+    tf_eth_block_ingested = {
+      description = "Ethereum block(s) ingested"
+      filter      = "resource.type=gce_instance AND \"blocks\" AND \"Imported new chain segment\""
+    }
+
+    tf_eth_block_mined = {
+      description = "Block mined"
+      filter = "resource.type=gce_instance AND \"Successfully sealed new block\""
+    }
+
+    tf_eth_block_signed = {
+      description = "Block signed"
+      filter = "resource.type=gce_instance AND \"Commit new mining work\""
+    }
+
+    tf_eth_commit_old_block = {
+      description = "Committed seal on old block"
+      filter = "resource.type=gce_instance AND \"Would have sent a commit message for an old block\""
+    }
+
+    tf_validator_not_elected = {
+      description = "Validator failed to be elected"
+      filter = "resource.type=gce_instance \"Validator Election Results\" AND \"\\\"elected\\\":\\\"false\\\"\" AND NOT \"tx-node\""
+    }
+
+  }
+}
+
+
+variable "service_account_scopes" {
+  description = "Scopes to apply to the service account which all nodes in the cluster will inherit"
+  type        = list(string)
+
+  #scope reference: https://cloud.google.com/sdk/gcloud/reference/alpha/compute/instances/set-scopes#--scopes
+  #verify scopes: curl --silent --connect-timeout 1 -f -H "Metadata-Flavor: Google" http://169.254.169.254/computeMetadata/v1/instance/service-accounts/default/scopes
+  default = [
+    "https://www.googleapis.com/auth/monitoring.write",
+    "https://www.googleapis.com/auth/logging.write",
+    "https://www.googleapis.com/auth/cloud-platform"         #this gives r/w to all storage buckets, which is overly broad
+    ]
+}
+
+variable "GCP_DEFAULT_SERVICE_ACCOUNT" {
+  description = "gcp default service account for project, $projectid-compute@developer.gserviceaccount.com"
+  type = string
+}
+
+variable "public_www_fqdn" {
+  description = "fully qualified domain name for public website"
+  type = string
 }

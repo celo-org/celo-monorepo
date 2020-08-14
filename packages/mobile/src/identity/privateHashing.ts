@@ -1,13 +1,15 @@
-import { ContractKit } from '@celo/contractkit'
+import { PNPUtils } from '@celo/contractkit'
+import { PhoneNumberHashDetails } from '@celo/contractkit/lib/utils/phone-number-lookup/phone-number-identifier'
 import { getPhoneHash, isE164Number, PhoneNumberUtils } from '@celo/utils/src/phoneNumbers'
-import crypto from 'crypto'
-import BlindThresholdBls from 'react-native-blind-threshold-bls'
+import DeviceInfo from 'react-native-device-info'
 import { call, put, select } from 'redux-saga/effects'
 import { e164NumberSelector } from 'src/account/selectors'
+import { IdentityEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import networkConfig from 'src/geth/networkConfig'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
-import { postToPhoneNumPrivacyService } from 'src/identity/phoneNumPrivacyService'
+import { ReactBlsBlindingClient } from 'src/identity/bls-blinding-client'
 import { e164NumberToSaltSelector, E164NumberToSaltType } from 'src/identity/reducer'
 import { isUserBalanceSufficient } from 'src/identity/utils'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
@@ -17,20 +19,12 @@ import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
 import { waitForTransactionWithId } from 'src/transactions/saga'
 import Logger from 'src/utils/Logger'
-import { getContractKit } from 'src/web3/contracts'
-import { getConnectedUnlockedAccount } from 'src/web3/saga'
+import { getAuthSignerForAccount } from 'src/web3/dataEncryptionKey'
+import { getConnectedAccount, unlockAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'identity/privateHashing'
-const SIGN_MESSAGE_ENDPOINT = '/getDistributedBlindedSalt'
-export const SALT_CHAR_LENGTH = 13
 export const LOOKUP_GAS_FEE_ESTIMATE = 0.03
-
-export interface PhoneNumberHashDetails {
-  e164Number: string
-  phoneHash: string
-  salt: string
-}
 
 // Fetch and cache a phone number's salt and hash
 export function* fetchPhoneHashPrivate(e164Number: string) {
@@ -58,8 +52,12 @@ export function* fetchPhoneHashPrivate(e164Number: string) {
   }
 }
 
+/**
+ * Retrieve the salt from the cache if present,
+ * otherwise query from the service
+ */
 function* doFetchPhoneHashPrivate(e164Number: string) {
-  const account: string = yield call(getConnectedUnlockedAccount)
+  const account: string = yield call(getConnectedAccount)
   Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Fetching phone hash details')
   const saltCache: E164NumberToSaltType = yield select(e164NumberToSaltSelector)
   const cachedSalt = saltCache[e164Number]
@@ -71,7 +69,6 @@ function* doFetchPhoneHashPrivate(e164Number: string) {
   }
 
   Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Salt was not cached, fetching')
-  const contractKit: ContractKit = yield call(getContractKit)
   const selfPhoneDetails: PhoneNumberHashDetails | undefined = yield call(
     getUserSelfPhoneHashDetails
   )
@@ -80,7 +77,6 @@ function* doFetchPhoneHashPrivate(e164Number: string) {
     getPhoneHashPrivate,
     e164Number,
     account,
-    contractKit,
     selfPhoneHash
   )
   yield put(updateE164PhoneNumberSalts({ [e164Number]: details.salt }))
@@ -90,105 +86,41 @@ function* doFetchPhoneHashPrivate(e164Number: string) {
 // Unlike the getPhoneHash in utils, this leverages the phone number
 // privacy service to compute a secure, unique salt for the phone number
 // and then appends it before hashing.
-async function getPhoneHashPrivate(
-  e164Number: string,
-  account: string,
-  contractKit: ContractKit,
-  selfPhoneHash?: string
-): Promise<PhoneNumberHashDetails> {
-  const salt = await getPhoneNumberSalt(e164Number, account, contractKit, selfPhoneHash)
-  const phoneHash = getPhoneHash(e164Number, salt)
-  return {
-    e164Number,
-    phoneHash,
-    salt,
-  }
-}
-
-async function getPhoneNumberSalt(
-  e164Number: string,
-  account: string,
-  contractKit: ContractKit,
-  selfPhoneHash?: string
-) {
-  Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Getting phone number salt')
-
+function* getPhoneHashPrivate(e164Number: string, account: string, selfPhoneHash?: string) {
   if (!isE164Number(e164Number)) {
     throw new Error(ErrorMessages.INVALID_PHONE_NUMBER)
   }
 
-  Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Retrieving blinded message')
-  const base64PhoneNumber = Buffer.from(e164Number).toString('base64')
-  const base64BlindedMessage = (await BlindThresholdBls.blindMessage(base64PhoneNumber)).trim()
-  const base64BlindSig = await postToSignMessage(
-    base64BlindedMessage,
-    account,
-    contractKit,
-    selfPhoneHash
-  )
-  Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Retrieving unblinded signature')
-  const { pgpnpPubKey } = networkConfig
-  const base64UnblindedSig = await BlindThresholdBls.unblindMessage(base64BlindSig, pgpnpPubKey)
-  Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Converting sig to salt')
-  return getSaltFromThresholdSignature(base64UnblindedSig)
-}
-
-interface SignMessageRequest {
-  account: string
-  blindedQueryPhoneNumber: string
-  hashedPhoneNumber?: string
-}
-
-interface SignMessageResponse {
-  success: boolean
-  combinedSignature: string
-}
-
-// Send the blinded message off to the phone number privacy service and
-// get back the theshold signed blinded message
-async function postToSignMessage(
-  base64BlindedMessage: string,
-  account: string,
-  contractKit: ContractKit,
-  selfPhoneHash?: string
-) {
-  const body: SignMessageRequest = {
-    account,
-    blindedQueryPhoneNumber: base64BlindedMessage,
-    hashedPhoneNumber: selfPhoneHash,
+  const authSigner = yield call(getAuthSignerForAccount, account)
+  // Unlock the account if the authentication is signed by the wallet
+  if (
+    authSigner.authenticationMethod === PNPUtils.PhoneNumberLookup.AuthenticationMethod.WALLETKEY
+  ) {
+    const success: boolean = yield call(unlockAccount, account)
+    if (!success) {
+      throw new Error(ErrorMessages.INCORRECT_PIN)
+    }
   }
 
+  const { pgpnpPubKey } = networkConfig
+  const blsBlindingClient = new ReactBlsBlindingClient(pgpnpPubKey)
   try {
-    const response = await postToPhoneNumPrivacyService<SignMessageResponse>(
+    return yield call(
+      PNPUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier,
+      e164Number,
       account,
-      contractKit,
-      body,
-      SIGN_MESSAGE_ENDPOINT
+      authSigner,
+      networkConfig,
+      selfPhoneHash,
+      DeviceInfo.getVersion(),
+      blsBlindingClient
     )
-    return response.combinedSignature
   } catch (error) {
     if (error.message === ErrorMessages.PGPNP_QUOTA_ERROR) {
       throw new Error(ErrorMessages.SALT_QUOTA_EXCEEDED)
     }
     throw error
   }
-}
-
-// This is the algorithm that creates a salt from the unblinded message signatures
-// It simply hashes it with sha256 and encodes it to hex
-// If we ever need to compute salts anywhere other than here then we should move this to the utils package
-export function getSaltFromThresholdSignature(base64Sig: string) {
-  if (!base64Sig) {
-    throw new Error('Invalid base64Sig')
-  }
-
-  // Currently uses 13 chars for a 78 bit salt
-  const sigBuf = Buffer.from(base64Sig, 'base64')
-  return crypto
-    .createHash('sha256')
-    .update(sigBuf)
-    .digest('base64')
-    .slice(0, SALT_CHAR_LENGTH)
 }
 
 // Get the wallet user's own phone hash details if they're cached
@@ -220,7 +152,7 @@ function* navigateToQuotaPurchaseScreen() {
     yield new Promise((resolve, reject) => {
       navigate(Screens.PhoneNumberLookupQuota, {
         onBuy: resolve,
-        onSkip: reject,
+        onSkip: () => reject('skipped'),
       })
     })
 
@@ -247,10 +179,18 @@ function* navigateToQuotaPurchaseScreen() {
       throw new Error('Purchase tx failed')
     }
 
+    ValoraAnalytics.track(IdentityEvents.phone_number_lookup_purchase_complete)
     Logger.debug(`${TAG}@navigateToQuotaPurchaseScreen`, `Quota purchase successful`)
     navigateBack()
     return true
   } catch (error) {
+    if (error === 'skipped') {
+      ValoraAnalytics.track(IdentityEvents.phone_number_lookup_purchase_skip)
+    } else {
+      ValoraAnalytics.track(IdentityEvents.phone_number_lookup_purchase_error, {
+        error: error.message,
+      })
+    }
     Logger.error(
       `${TAG}@navigateToQuotaPurchaseScreen`,
       `Quota purchase cancelled or skipped`,

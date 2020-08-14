@@ -25,6 +25,7 @@ aws_access_key_id and aws_secret_access_key in ~/.aws/credentials
 
 ### Methods
 
+* [decrypt](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md#decrypt)
 * [getAccounts](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md#getaccounts)
 * [getAddressFromKeyId](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md#getaddressfromkeyid)
 * [hasAccount](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md#hasaccount)
@@ -51,6 +52,25 @@ Name | Type |
 **Returns:** *[AwsHsmWallet](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md)*
 
 ## Methods
+
+###  decrypt
+
+▸ **decrypt**(`address`: string, `ciphertext`: Buffer): *Promise‹Buffer‹››*
+
+*Inherited from [WalletBase](_contractkit_src_wallets_wallet_.walletbase.md).[decrypt](_contractkit_src_wallets_wallet_.walletbase.md#decrypt)*
+
+*Defined in [contractkit/src/wallets/wallet.ts:121](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L121)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`address` | string |
+`ciphertext` | Buffer |
+
+**Returns:** *Promise‹Buffer‹››*
+
+___
 
 ###  getAccounts
 
@@ -183,7 +203,7 @@ ___
 
 ###  signTypedData
 
-▸ **signTypedData**(`address`: [Address](../modules/_contractkit_src_base_.md#address), `typedData`: [EIP712TypedData](../interfaces/_contractkit_src_utils_sign_typed_data_utils_.eip712typeddata.md)): *Promise‹string›*
+▸ **signTypedData**(`address`: [Address](../modules/_contractkit_src_base_.md#address), `typedData`: EIP712TypedData): *Promise‹string›*
 
 *Inherited from [RemoteWallet](_contractkit_src_wallets_remote_wallet_.remotewallet.md).[signTypedData](_contractkit_src_wallets_remote_wallet_.remotewallet.md#signtypeddata)*
 
@@ -196,7 +216,7 @@ ___
 Name | Type | Description |
 ------ | ------ | ------ |
 `address` | [Address](../modules/_contractkit_src_base_.md#address) | Address of the account to sign with |
-`typedData` | [EIP712TypedData](../interfaces/_contractkit_src_utils_sign_typed_data_utils_.eip712typeddata.md) | the typed data object |
+`typedData` | EIP712TypedData | the typed data object |
 
 **Returns:** *Promise‹string›*
 

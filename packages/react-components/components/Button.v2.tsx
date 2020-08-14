@@ -1,5 +1,5 @@
 import Touchable from '@celo/react-components/components/Touchable'
-import colors, { Colors } from '@celo/react-components/styles/colors.v2'
+import colors, { Colors } from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { debounce } from 'lodash'
 import React, { ReactNode, useCallback } from 'react'
@@ -16,6 +16,7 @@ export enum BtnTypes {
   SECONDARY = 'Secondary',
   TERTIARY = 'Tertiary',
   ONBOARDING = 'Onboarding',
+  ONBOARDING_SECONDARY = 'OnboardingSecondary',
 }
 
 export enum BtnSizes {
@@ -70,7 +71,7 @@ export default React.memo(function Button(props: ButtonProps) {
           testID={testID}
         >
           {showLoading ? (
-            <ActivityIndicator size="small" color={colors.celoGreen} />
+            <ActivityIndicator size="small" color={colors.greenBrand} />
           ) : (
             <Text
               accessibilityLabel={accessibilityLabel}
@@ -97,7 +98,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 5,
-    paddingHorizontal: 16,
+    paddingHorizontal: 24,
   },
   small: {
     height: 40,
@@ -131,8 +132,13 @@ function getColors(type: BtnTypes, disabled: boolean | undefined) {
       backgroundColor = disabled ? colors.goldFaint : colors.goldUI
       break
     case BtnTypes.ONBOARDING:
-      textColor = colors.onboardingAccent
+      textColor = colors.onboardingBlue
       backgroundColor = colors.onboardingLightBlue
+      opacity = disabled ? 0.5 : 1.0
+      break
+    case BtnTypes.ONBOARDING_SECONDARY:
+      textColor = colors.onboardingBlue
+      backgroundColor = colors.light
       opacity = disabled ? 0.5 : 1.0
       break
   }

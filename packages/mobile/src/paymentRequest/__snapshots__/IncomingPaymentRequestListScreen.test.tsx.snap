@@ -1,10 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`IncomingPaymentRequestListScreen renders correctly with no requests 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
@@ -27,14 +26,13 @@ exports[`IncomingPaymentRequestListScreen renders correctly with no requests 1`]
   >
     global:emptyList
   </Text>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
 
 exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
@@ -248,8 +246,10 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                         },
                         Object {
                           "fontSize": 14,
+                          "height": 16,
                           "lineHeight": 16,
                           "marginRight": 24,
+                          "minWidth": 48,
                         },
                       ]
                     }
@@ -286,8 +286,10 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                         },
                         Object {
                           "fontSize": 14,
+                          "height": 16,
                           "lineHeight": 16,
                           "marginRight": 24,
+                          "minWidth": 48,
                         },
                       ]
                     }
@@ -499,8 +501,10 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                         },
                         Object {
                           "fontSize": 14,
+                          "height": 16,
                           "lineHeight": 16,
                           "marginRight": 24,
+                          "minWidth": 48,
                         },
                       ]
                     }
@@ -537,8 +541,10 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                         },
                         Object {
                           "fontSize": 14,
+                          "height": 16,
                           "lineHeight": 16,
                           "marginRight": 24,
+                          "minWidth": 48,
                         },
                       ]
                     }
@@ -750,8 +756,10 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                         },
                         Object {
                           "fontSize": 14,
+                          "height": 16,
                           "lineHeight": 16,
                           "marginRight": 24,
+                          "minWidth": 48,
                         },
                       ]
                     }
@@ -788,8 +796,10 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                         },
                         Object {
                           "fontSize": 14,
+                          "height": 16,
                           "lineHeight": 16,
                           "marginRight": 24,
+                          "minWidth": 48,
                         },
                       ]
                     }
@@ -804,5 +814,5 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
       </View>
     </View>
   </RCTScrollView>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

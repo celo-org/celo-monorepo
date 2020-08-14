@@ -1,4 +1,5 @@
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
+import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
@@ -8,7 +9,6 @@ import * as ethUtil from 'ethereumjs-util'
 import { ecdsaRecover } from 'secp256k1'
 import { EncodedTransaction, Tx } from 'web3-core'
 import * as helpers from 'web3-core-helpers'
-import { EIP712TypedData, generateTypedDataHash } from './sign-typed-data-utils'
 import { bufferToBigNumber } from './signature-utils'
 
 const debug = debugFactory('kit:tx:sign')

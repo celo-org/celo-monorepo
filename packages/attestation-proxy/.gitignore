@@ -1,0 +1,6 @@
+dist/
+
+# Firebase cache
+.firebase/
+
+*.log

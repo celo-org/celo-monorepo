@@ -1,30 +1,23 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
+import { TransitionPresets } from '@react-navigation/stack'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text } from 'react-native'
-import SafeAreaView, { SafeAreaConsumer } from 'react-native-safe-area-view'
+import { SafeAreaInsetsContext, SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { acceptTerms } from 'src/account/actions'
-import { PincodeType } from 'src/account/reducer'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { CELO_TERMS_LINK } from 'src/config'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { nuxNavigationOptions } from 'src/navigator/Headers'
+import Logo, { LogoTypes } from 'src/icons/Logo.v2'
+import { nuxNavigationOptions } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import { navigateToURI } from 'src/utils/linking'
 
 const MARGIN = 24
-
-interface StateProps {
-  pincodeType: PincodeType
-}
-
-function mapStateToProps(state: RootState): StateProps {
-  return { pincodeType: state.account.pincodeType }
-}
 
 interface DispatchProps {
   acceptTerms: typeof acceptTerms
@@ -34,10 +27,13 @@ const mapDispatchToProps: DispatchProps = {
   acceptTerms,
 }
 
-type Props = WithTranslation & DispatchProps & StateProps
+type Props = WithTranslation & DispatchProps
 
 export class RegulatoryTerms extends React.Component<Props> {
-  static navigationOptions = nuxNavigationOptions
+  static navigationOptions = {
+    ...nuxNavigationOptions,
+    ...TransitionPresets.ModalTransition,
+  }
 
   onPressAccept = () => {
     this.props.acceptTerms()
@@ -45,11 +41,7 @@ export class RegulatoryTerms extends React.Component<Props> {
   }
 
   goToNextScreen = () => {
-    if (this.props.pincodeType === PincodeType.Unset) {
-      navigate(Screens.PincodeSet)
-    } else {
-      navigate(Screens.EnterInviteCode)
-    }
+    navigate(Screens.NameAndNumber)
   }
 
   onPressGoToTerms = () => {
@@ -61,12 +53,14 @@ export class RegulatoryTerms extends React.Component<Props> {
 
     return (
       <SafeAreaView style={styles.container}>
-        <DevSkipButton nextScreen={Screens.PincodeSet} />
+        <DevSkipButton nextScreen={Screens.NameAndNumber} />
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           testID="scrollView"
         >
+          <Logo type={LogoTypes.DARK} height={32} />
+          <Text style={styles.title}>{t('terms.title')}</Text>
           <Text style={styles.header}>{t('terms.heading1')}</Text>
           <Text style={styles.disclaimer}>
             <Trans ns={Namespaces.nuxNamePin1} i18nKey={'terms.privacy'}>
@@ -78,7 +72,7 @@ export class RegulatoryTerms extends React.Component<Props> {
           <Text style={styles.header}>{t('terms.heading2')}</Text>
           <Text style={styles.disclaimer}>{t('terms.goldDisclaimer')}</Text>
         </ScrollView>
-        <SafeAreaConsumer>
+        <SafeAreaInsetsContext.Consumer>
           {(insets) => (
             <Button
               style={[styles.button, insets && insets.bottom <= MARGIN && { marginBottom: MARGIN }]}
@@ -89,14 +83,14 @@ export class RegulatoryTerms extends React.Component<Props> {
               testID={'AcceptTermsButton'}
             />
           )}
-        </SafeAreaConsumer>
+        </SafeAreaInsetsContext.Consumer>
       </SafeAreaView>
     )
   }
 }
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
-  mapStateToProps,
+export default connect<{}, DispatchProps, {}, RootState>(
+  null,
   mapDispatchToProps
 )(withTranslation<Props>(Namespaces.nuxNamePin1)(RegulatoryTerms))
 
@@ -115,6 +109,11 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     paddingBottom: 15,
+  },
+  title: {
+    ...fontStyles.h1,
+    marginTop: 30,
+    marginBottom: 24,
   },
   header: {
     ...fontStyles.h2,

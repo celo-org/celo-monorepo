@@ -18,6 +18,7 @@ Implements the signer interface on top of the JSON-RPC interface.
 
 ### Methods
 
+* [decrypt](_contractkit_src_wallets_signers_rpc_signer_.rpcsigner.md#decrypt)
 * [getNativeKey](_contractkit_src_wallets_signers_rpc_signer_.rpcsigner.md#getnativekey)
 * [init](_contractkit_src_wallets_signers_rpc_signer_.rpcsigner.md#init)
 * [isUnlocked](_contractkit_src_wallets_signers_rpc_signer_.rpcsigner.md#isunlocked)
@@ -32,7 +33,7 @@ Implements the signer interface on top of the JSON-RPC interface.
 
 \+ **new RpcSigner**(`rpc`: [RpcCaller](../interfaces/_contractkit_src_utils_rpc_caller_.rpccaller.md), `account`: string, `unlockBufferSeconds`: number, `unlockTime`: number, `unlockDuration`: number): *[RpcSigner](_contractkit_src_wallets_signers_rpc_signer_.rpcsigner.md)*
 
-*Defined in [contractkit/src/wallets/signers/rpc-signer.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/rpc-signer.ts#L48)*
+*Defined in [contractkit/src/wallets/signers/rpc-signer.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/rpc-signer.ts#L53)*
 
 Construct a new instance of the RPC signer
 
@@ -50,11 +51,27 @@ Name | Type | Default | Description |
 
 ## Methods
 
+###  decrypt
+
+▸ **decrypt**(`ciphertext`: Buffer): *Promise‹Buffer‹››*
+
+*Defined in [contractkit/src/wallets/signers/rpc-signer.ts:147](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/rpc-signer.ts#L147)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`ciphertext` | Buffer |
+
+**Returns:** *Promise‹Buffer‹››*
+
+___
+
 ###  getNativeKey
 
 ▸ **getNativeKey**(): *string*
 
-*Defined in [contractkit/src/wallets/signers/rpc-signer.ts:103](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/rpc-signer.ts#L103)*
+*Defined in [contractkit/src/wallets/signers/rpc-signer.ts:108](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/rpc-signer.ts#L108)*
 
 **Returns:** *string*
 
@@ -64,7 +81,7 @@ ___
 
 ▸ **init**(`privateKey`: string, `passphrase`: string): *Promise‹string›*
 
-*Defined in [contractkit/src/wallets/signers/rpc-signer.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/rpc-signer.ts#L68)*
+*Defined in [contractkit/src/wallets/signers/rpc-signer.ts:73](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/rpc-signer.ts#L73)*
 
 **Parameters:**
 
@@ -81,7 +98,7 @@ ___
 
 ▸ **isUnlocked**(): *boolean*
 
-*Defined in [contractkit/src/wallets/signers/rpc-signer.ts:116](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/rpc-signer.ts#L116)*
+*Defined in [contractkit/src/wallets/signers/rpc-signer.ts:132](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/rpc-signer.ts#L132)*
 
 **Returns:** *boolean*
 
@@ -91,7 +108,7 @@ ___
 
 ▸ **signPersonalMessage**(`data`: string): *Promise‹object›*
 
-*Defined in [contractkit/src/wallets/signers/rpc-signer.ts:95](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/rpc-signer.ts#L95)*
+*Defined in [contractkit/src/wallets/signers/rpc-signer.ts:100](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/rpc-signer.ts#L100)*
 
 **Parameters:**
 
@@ -107,7 +124,7 @@ ___
 
 ▸ **signRawTransaction**(`tx`: Tx): *Promise‹EncodedTransaction›*
 
-*Defined in [contractkit/src/wallets/signers/rpc-signer.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/rpc-signer.ts#L74)*
+*Defined in [contractkit/src/wallets/signers/rpc-signer.ts:79](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/rpc-signer.ts#L79)*
 
 **Parameters:**
 
@@ -123,7 +140,7 @@ ___
 
 ▸ **signTransaction**(): *Promise‹object›*
 
-*Defined in [contractkit/src/wallets/signers/rpc-signer.ts:91](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/rpc-signer.ts#L91)*
+*Defined in [contractkit/src/wallets/signers/rpc-signer.ts:96](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/rpc-signer.ts#L96)*
 
 **Returns:** *Promise‹object›*
 
@@ -133,7 +150,7 @@ ___
 
 ▸ **unlock**(`passphrase`: string, `duration`: number): *Promise‹boolean›*
 
-*Defined in [contractkit/src/wallets/signers/rpc-signer.ts:105](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/rpc-signer.ts#L105)*
+*Defined in [contractkit/src/wallets/signers/rpc-signer.ts:110](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/rpc-signer.ts#L110)*
 
 **Parameters:**
 

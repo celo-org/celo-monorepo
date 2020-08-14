@@ -6,11 +6,11 @@ import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { EscrowEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { reclaimEscrowPayment } from 'src/escrow/actions'
 import ReclaimPaymentConfirmationCard from 'src/escrow/ReclaimPaymentConfirmationCard'
@@ -76,7 +76,7 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
 
   onConfirm = async () => {
     const escrowedPayment = this.getReclaimPaymentInput()
-    CeloAnalytics.track(CustomEventNames.escrowed_payment_reclaimed_by_sender)
+    ValoraAnalytics.track(EscrowEvents.escrow_reclaim_confirm)
     const address = this.props.account
     if (!address) {
       throw new Error("Can't reclaim funds without a valid account")
@@ -91,8 +91,8 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
     }
   }
 
-  onPressEdit = () => {
-    CeloAnalytics.track(CustomEventNames.escrowed_payment_reclaimEdit_by_sender)
+  onPressCancel = () => {
+    ValoraAnalytics.track(EscrowEvents.escrow_reclaim_cancel)
     navigateBack()
   }
 
@@ -104,7 +104,7 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
 
   renderFooter = () => {
     return this.props.isReclaiming ? (
-      <ActivityIndicator size="large" color={colors.celoGreen} />
+      <ActivityIndicator size="large" color={colors.greenBrand} />
     ) : null
   }
 
@@ -131,7 +131,7 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
               asyncFee.loading ||
               !!asyncFee.error,
           }}
-          modifyButton={{ action: this.onPressEdit, text: t('cancel'), disabled: isReclaiming }}
+          modifyButton={{ action: this.onPressCancel, text: t('cancel'), disabled: isReclaiming }}
         >
           <ReclaimPaymentConfirmationCard
             recipientPhone={payment.recipientPhone}
@@ -174,7 +174,6 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
     paddingTop: 20,
   },
 })

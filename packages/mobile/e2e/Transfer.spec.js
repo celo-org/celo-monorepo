@@ -41,12 +41,30 @@ describe('Transfer Works', () => {
     await bannerDismiss(by.id('SmartTopAlertButton'))
   })
 
-  it('Language', async () => {
-    await element(by.id('ChooseLanguage/en-US')).tap()
+  // Language is auto selected if it matches one of the available locale
+  // it('Language', async () => {
+  //   await element(by.id('ChooseLanguage/en-US')).tap()
+  // })
+
+  it('Onboarding Education', async () => {
+    // Onboading education has 3 steps
+    for (let i = 0; i < 3; i++) {
+      await element(by.id('Education/progressButton')).tap()
+    }
   })
 
-  it('Join', async () => {
-    await waitFor(element(by.id('JoinCeloContinueButton')))
+  it('Welcome', async () => {
+    await element(by.id('RestoreAccountButton')).tap()
+  })
+
+  it('Terms', async () => {
+    await element(by.id('scrollView')).scrollTo('bottom')
+    expect(element(by.id('AcceptTermsButton'))).toBeVisible()
+    await element(by.id('AcceptTermsButton')).tap()
+  })
+
+  it('Name and Number', async () => {
+    await waitFor(element(by.id('NameAndNumberContinueButton')))
       .toBeVisible()
       .withTimeout(2000)
 
@@ -59,13 +77,7 @@ describe('Transfer Works', () => {
     await expect(element(by.id('PhoneNumberField'))).toBeVisible()
     await element(by.id('PhoneNumberField')).replaceText(VERIFICATION_PHONE_NUMBER)
 
-    await element(by.id('JoinCeloContinueButton')).tap()
-  })
-
-  it('Terms', async () => {
-    await element(by.id('scrollView')).scrollTo('bottom')
-    expect(element(by.id('AcceptTermsButton'))).toBeVisible()
-    await element(by.id('AcceptTermsButton')).tap()
+    await element(by.id('NameAndNumberContinueButton')).tap()
   })
 
   it('Pin', async () => {
@@ -80,12 +92,6 @@ describe('Transfer Works', () => {
 
   // Restore existing wallet
   it('Restore Wallet Backup', async () => {
-    await waitFor(element(by.id('RestoreExistingWallet')))
-      .toBeVisible()
-      .withTimeout(8000)
-
-    await element(by.id('RestoreExistingWallet')).tap()
-
     await waitFor(element(by.id('ImportWalletBackupKeyInputField')))
       .toBeVisible()
       .withTimeout(2000)
@@ -99,15 +105,25 @@ describe('Transfer Works', () => {
       .withTimeout(20000)
 
     await element(by.id('ImportWalletBackupKeyInputField')).tap()
-    await element(by.id('ImportWalletBackupKeyInputField')).typeText(SAMPLE_BACKUP_KEY)
+    await element(by.id('ImportWalletBackupKeyInputField')).replaceText(SAMPLE_BACKUP_KEY)
+    if (device.getPlatform() === 'ios') {
+      // On iOS, type one more space to workaround onChangeText not being triggered with replaceText above
+      // and leaving the restore button disabled
+      await element(by.id('ImportWalletBackupKeyInputField')).typeText(' ')
+    }
 
     await element(by.id('ImportWalletButton')).tap()
+
+    // Wait a little more as import can take some time
+    // and triggers the firebase error banner
+    // otherwise next step will tap the banner instead of the button
+    await sleep(5000)
   })
 
   it('VerifyEducation', async () => {
     await waitFor(element(by.id('VerificationEducationContinue')))
       .toBeVisible()
-      .withTimeout(10000)
+      .withTimeout(30000)
 
     // skip
     await element(by.id('VerificationEducationSkip')).tap()
@@ -158,6 +174,12 @@ describe('Transfer Works', () => {
 
     await element(by.id('commentInput/send')).replaceText(RANDOM_COMMENT)
     await element(by.id('commentInput/send')).tapReturnKey()
+
+    if (device.getPlatform() === 'android') {
+      // Workaround keyboard remaining open on Android (tapReturnKey doesn't work there and just adds a new line)
+      // so we tap something else in the scrollview to hide the soft keyboard
+      await element(by.id('HeaderText')).tap()
+    }
 
     await element(by.id('ConfirmButton')).tap()
   })

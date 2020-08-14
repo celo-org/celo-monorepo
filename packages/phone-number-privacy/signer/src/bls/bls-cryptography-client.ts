@@ -1,5 +1,5 @@
+import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import threshold_bls from 'blind-threshold-bls'
-import { ErrorMessages } from '../common/error-utils'
 import logger from '../common/logger'
 
 /*
@@ -20,7 +20,7 @@ export function computeBlindedSignature(base64BlindedMessage: string, privateKey
 
     return Buffer.from(signedMsg).toString('base64')
   } catch (e) {
-    logger.error(ErrorMessages.SIGNATURE_COMPUTATION_FAILURE, e)
+    logger.error(ErrorMessage.SIGNATURE_COMPUTATION_FAILURE, e)
     throw e
   }
 }

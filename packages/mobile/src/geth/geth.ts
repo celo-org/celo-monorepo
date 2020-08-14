@@ -4,6 +4,8 @@ import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
 import RNGeth from 'react-native-geth'
+import { GethEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { DEFAULT_TESTNET } from 'src/config'
 import { SYNCING_MAX_PEERS } from 'src/geth/consts'
 import networkConfig from 'src/geth/networkConfig'
@@ -19,6 +21,8 @@ export const FailedToFetchStaticNodesError = new Error(
 export const FailedToFetchGenesisBlockError = new Error(
   'Failed to fetch genesis block from Google storage'
 )
+
+export const PROVIDER_CONNECTION_ERROR = "connection error: couldn't connect to node"
 
 // We are never going to run mobile node in full or fast mode.
 enum SyncMode {
@@ -95,46 +99,69 @@ async function createNewGeth(sync: boolean = true): Promise<typeof RNGeth> {
   }
 
   // Setup Logging
-  const logFilePath = Logger.getGethLogFilePath()
+  const gethLogFilePath = Logger.getGethLogFilePath()
 
   // Upload logs first
-  await uploadLogs(logFilePath, Logger.getReactNativeLogsFilePath())
-  gethOptions.logFile = logFilePath
+  await uploadLogs(gethLogFilePath, Logger.getReactNativeLogsFilePath())
+  gethOptions.logFile = gethLogFilePath
   // Only log info and above to the log file.
   // The logcat logging mode remains unchanged.
   gethOptions.logFileLogLevel = LogLevel.INFO
-  Logger.debug('Geth@newGeth', 'Geth logs will be piped to ' + logFilePath)
+  Logger.debug('Geth@newGeth', 'Geth logs will be piped to ' + gethLogFilePath)
 
   return new RNGeth(gethOptions)
 }
 
-async function initGeth(sync: boolean = true) {
+export async function initGeth(sync: boolean = true): Promise<typeof gethInstance> {
+  ValoraAnalytics.track(GethEvents.geth_init_start, { sync })
   Logger.info('Geth@init', `Create a new Geth instance with sync=${sync}`)
 
   if (gethLock) {
     Logger.warn('Geth@init', 'Geth create already in progress.')
-    return
+    return null
   }
   gethLock = true
 
   try {
-    if (gethInstance) {
-      Logger.debug('Geth@init', 'Geth already exists, trying to stop it.')
-      await stop()
-    }
+    // Write static node and genesis block, canceling if either fail.
+    await Promise.all([
+      ensureGenesisBlockWritten().then((ok) => {
+        if (!ok) {
+          throw FailedToFetchGenesisBlockError
+        }
+      }),
+      ensureStaticNodesInitialized(sync).then((ok) => {
+        if (!ok) {
+          throw FailedToFetchStaticNodesError
+        }
+      }),
+    ])
 
-    if (!(await ensureGenesisBlockWritten())) {
-      throw FailedToFetchGenesisBlockError
+    let geth: typeof RNGeth
+    ValoraAnalytics.track(GethEvents.create_geth_start)
+    try {
+      geth = await createNewGeth(sync)
+    } catch (error) {
+      ValoraAnalytics.track(GethEvents.create_geth_error, { error: error.message })
+      throw error
     }
-    if (!(await ensureStaticNodesInitialized(sync))) {
-      throw FailedToFetchStaticNodesError
+    ValoraAnalytics.track(GethEvents.create_geth_finish)
+
+    if (!sync) {
+      // chain data must be deleted to prevent geth from syncing with data saver on
+      // TODO: consider only deleting the geth p2p nodes database
+      // TODO: save chain data s.t. when data saver goes off syncing resumes from data
+      await deleteChainData()
     }
-    const geth = await createNewGeth(sync)
 
     try {
+      ValoraAnalytics.track(GethEvents.start_geth_start)
       await geth.start()
+      ValoraAnalytics.track(GethEvents.start_geth_finish)
       gethInstance = geth
-      geth.subscribeNewHead()
+      if (sync) {
+        geth.subscribeNewHead()
+      }
     } catch (e) {
       const errorType = getGethErrorType(e)
       if (errorType === ErrorType.GethAlreadyRunning) {
@@ -142,23 +169,24 @@ async function initGeth(sync: boolean = true) {
         throw new Error('Geth already running, need to restart app')
       } else if (errorType === ErrorType.CorruptChainData) {
         Logger.warn('Geth@init/startInstance', 'Geth start reported chain data error')
-        await attemptGethCorruptionFix(geth)
+        await attemptGethCorruptionFix(geth, sync)
       } else {
         Logger.error('Geth@init/startInstance', 'Unexpected error starting geth', e)
         throw e
       }
     }
+
+    return gethInstance
   } finally {
     gethLock = false
   }
 }
 
-export async function getGeth(sync: boolean = true): Promise<typeof gethInstance> {
-  Logger.debug('Geth@getGeth', 'Getting Geth Instance')
-  if (!gethInstance) {
-    await initGeth(sync)
-  }
-  return gethInstance
+export function isProviderConnectionError(error: any) {
+  return error
+    ?.toString()
+    ?.toLowerCase()
+    .includes(PROVIDER_CONNECTION_ERROR)
 }
 
 async function ensureStaticNodesInitialized(sync: boolean = true): Promise<boolean> {
@@ -254,16 +282,19 @@ async function writeStaticNodes(nodeDir: string, enodes: string) {
   console.info(`writeStaticNodes enodes are "${enodes}"`)
   const staticNodesFile = getStaticNodesFile(nodeDir)
   await RNFS.mkdir(getFolder(staticNodesFile))
+  await deleteFileIfExists(staticNodesFile)
   await RNFS.writeFile(staticNodesFile, enodes, 'utf8')
 }
 
-async function attemptGethCorruptionFix(geth: any) {
+async function attemptGethCorruptionFix(geth: any, sync: boolean = true) {
   const deleteChainDataResult = await deleteChainData()
   const deleteGethLockResult = await deleteGethLockFile()
   if (deleteChainDataResult && deleteGethLockResult) {
     await geth.start()
     gethInstance = geth
-    geth.subscribeNewHead()
+    if (sync) {
+      geth.subscribeNewHead()
+    }
   } else {
     throw new Error('Failed to fix Geth and restart')
   }
@@ -317,13 +348,10 @@ async function uploadLogs(gethLogFilePath: string, reactNativeLogFilePath: strin
     const bundleId = DeviceInfo.getBundleId()
     const uploadPath = `${bundleId}/${DEFAULT_TESTNET}`
 
-    // Phone number might not be verified here but that does not matter for logging.
-    const phoneNumber = (await DeviceInfo.getPhoneNumber()) || 'unknown'
     const timestamp = new Date().getTime()
     const deviceId = DeviceInfo.getUniqueId()
-    const uploadId = `${timestamp}_${deviceId}`
-    const gethUploadFileName = `${phoneNumber}_${uploadId}_geth.txt`
-    const reactNativeUploadFileName = `${phoneNumber}_${uploadId}_rn.txt`
+    const gethUploadFileName = `${deviceId}_${timestamp}_geth.txt`
+    const reactNativeUploadFileName = `${deviceId}_${timestamp}_rn.txt`
     // Upload one if the other one is uploaded.
 
     const [shouldUploadGeth, shouldUploadRN] = await Promise.all([
