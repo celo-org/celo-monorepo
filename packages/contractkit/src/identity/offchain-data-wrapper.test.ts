@@ -160,7 +160,6 @@ testWithGanache('Offchain Data', (web3) => {
       })
 
       describe('when the key is not added to the wallet', () => {
-        // TODO: Figure out how to get a kit/web3 instance that is connected to ganache but does not have access to the keys of prior runs
         it('the reader cannot decrypt the data', async () => {
           const testname = 'test'
           const payload = { name: testname }

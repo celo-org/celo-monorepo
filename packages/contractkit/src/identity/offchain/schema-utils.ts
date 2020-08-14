@@ -146,42 +146,46 @@ export const readWithSchema = async <T>(
   account: Address,
   dataPath: string
 ) => {
-  const data = await wrapper.readDataFrom(account, dataPath)
-  if (data === undefined) {
+  const rawData = await wrapper.readDataFrom(account, dataPath)
+  if (rawData === undefined) {
     return
   }
 
-  const asJson = JSON.parse(data)
-  const parseResult = type.decode(asJson)
+  const dataAsJson = JSON.parse(rawData)
+  const parsedDataAsType = type.decode(dataAsJson)
 
-  if (isRight(parseResult)) {
-    return parseResult.right
+  if (isRight(parsedDataAsType)) {
+    return parsedDataAsType.right
   }
 
-  const parseResultAsCiphertext = EncryptionWrappedData.decode(asJson)
-  if (isLeft(parseResultAsCiphertext)) {
+  const parseDataAsEncryptionWrapped = EncryptionWrappedData.decode(dataAsJson)
+  if (isLeft(parseDataAsEncryptionWrapped)) {
     return undefined
   }
 
-  const pubKey = parseResultAsCiphertext.right.publicKey
-  const pubKeyAddress = publicKeyToAddress(pubKey)
+  const decryptionKeyPublic = parseDataAsEncryptionWrapped.right.publicKey
+  const decryptionKeyAddress = publicKeyToAddress(decryptionKeyPublic)
   const wallet = wrapper.kit.getWallet()
 
-  const gotDecryptionKey = await getDecryptionKey(wrapper, account, parseResultAsCiphertext.right)
+  const hasDecryptionKey = await getDecryptionKey(
+    wrapper,
+    account,
+    parseDataAsEncryptionWrapped.right
+  )
 
-  if (gotDecryptionKey) {
-    const decryptedCiphertext = await wallet.decrypt(
-      pubKeyAddress,
-      Buffer.from(parseResultAsCiphertext.right.ciphertext, 'hex')
+  if (hasDecryptionKey) {
+    const plaintext = await wallet.decrypt(
+      decryptionKeyAddress,
+      Buffer.from(parseDataAsEncryptionWrapped.right.ciphertext, 'hex')
     )
 
-    const parseResultViaCiphertext = type.decode(JSON.parse(decryptedCiphertext.toString()))
+    const parsedPlaintextAsType = type.decode(JSON.parse(plaintext.toString()))
 
-    if (isLeft(parseResultViaCiphertext)) {
+    if (isLeft(parsedPlaintextAsType)) {
       return undefined
     }
 
-    return parseResultViaCiphertext.right
+    return parsedPlaintextAsType.right
   }
 
   return undefined
@@ -202,9 +206,9 @@ export const writeEncryptedWithSchema = async <T>(
   if (decryptionKey === undefined) {
     decryptionKey = ensureLeading0x(randomBytes(32).toString('hex'))
   }
-  const decryptionKeyPub = privateKeyToPublicKey(decryptionKey)
+  const decryptionKeyPublic = privateKeyToPublicKey(decryptionKey)
 
-  const stringifiedPayload = JSON.stringify(data)
+  const stringifiedData = JSON.stringify(data)
 
   const encryptedKeyMapping: Record<string, string> = {}
   pubKeys.forEach(
@@ -215,16 +219,16 @@ export const writeEncryptedWithSchema = async <T>(
       ).toString('hex'))
   )
 
-  const encryptedPayload: EncryptionWrappedDataType = {
-    publicKey: decryptionKeyPub,
+  const encryptedData: EncryptionWrappedDataType = {
+    publicKey: decryptionKeyPublic,
     ciphertext: Encrypt(
-      Buffer.from(trimLeading0x(decryptionKeyPub), 'hex'),
-      Buffer.from(stringifiedPayload)
+      Buffer.from(trimLeading0x(decryptionKeyPublic), 'hex'),
+      Buffer.from(stringifiedData)
     ).toString('hex'),
     encryptedKey: encryptedKeyMapping,
   }
 
-  const serializedData = JSON.stringify(encryptedPayload)
+  const serializedData = JSON.stringify(encryptedData)
   await wrapper.writeDataTo(serializedData, dataPath)
   return
 }
