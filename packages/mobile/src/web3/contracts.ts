@@ -139,13 +139,13 @@ export function* getContractKit() {
       yield call(initContractKit)
     }
   }
-  return contractKit
+  return contractKit!
 }
 
 // Used for cases where CK must be access outside of a saga
-export async function getContractKitAsync() {
+export async function getContractKitAsync(): Promise<ContractKit> {
   await waitForContractKit(10)
-  return contractKit
+  return contractKit!
 }
 
 export function* getWallet() {
@@ -183,7 +183,7 @@ export function* getWeb3() {
 }
 
 // Used for cases where the kit's web3 must be accessed outside a saga
-export async function getWeb3Async() {
+export async function getWeb3Async(): Promise<Web3> {
   const kit = await getContractKitAsync()
-  return kit?.web3
+  return kit?.web3!
 }
