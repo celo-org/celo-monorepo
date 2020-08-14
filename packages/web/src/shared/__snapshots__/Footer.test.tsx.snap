@@ -518,7 +518,6 @@ Array [
               dir="auto"
               href="/terms"
               onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -628,7 +627,6 @@ Array [
                 dir="auto"
                 href="/"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 rel=" noopener noreferrer"
                 role="link"
                 style={
@@ -682,7 +680,6 @@ Array [
                 dir="auto"
                 href="/about"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 rel=" noopener noreferrer"
                 role="link"
                 style={
@@ -736,7 +733,6 @@ Array [
                 dir="auto"
                 href="/jobs"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 rel=" noopener noreferrer"
                 role="link"
                 style={
@@ -790,7 +786,6 @@ Array [
                 dir="auto"
                 href="/validators"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 rel=" noopener noreferrer"
                 role="link"
                 style={
@@ -844,7 +839,6 @@ Array [
                 dir="auto"
                 href="/developers"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 rel=" noopener noreferrer"
                 role="link"
                 style={
@@ -898,7 +892,6 @@ Array [
                 dir="auto"
                 href="/alliance"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 rel=" noopener noreferrer"
                 role="link"
                 style={
@@ -952,7 +945,6 @@ Array [
                 dir="auto"
                 href="/community"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 rel=" noopener noreferrer"
                 role="link"
                 style={
@@ -1033,7 +1025,6 @@ Array [
                 dir="auto"
                 href="https://docs.celo.org/"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 rel=" noopener noreferrer"
                 role="link"
                 style={
@@ -1087,7 +1078,6 @@ Array [
                 dir="auto"
                 href="/audits"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 rel=" noopener noreferrer"
                 role="link"
                 style={
@@ -1139,9 +1129,8 @@ Array [
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
-                href="https://www.celoreserve.org"
+                href="https://www.celoreserve.org/"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 rel=" noopener noreferrer"
                 role="link"
                 style={
@@ -1195,7 +1184,6 @@ Array [
                 dir="auto"
                 href="/papers"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 rel=" noopener noreferrer"
                 role="link"
                 style={
@@ -1276,7 +1264,6 @@ Array [
                 dir="auto"
                 href="/code-of-conduct"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 rel=" noopener noreferrer"
                 role="link"
                 style={
@@ -1330,7 +1317,6 @@ Array [
                 dir="auto"
                 href="/brand-policy"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 rel=" noopener noreferrer"
                 role="link"
                 style={
@@ -1384,7 +1370,6 @@ Array [
                 dir="auto"
                 href="/community#events"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 rel=" noopener noreferrer"
                 role="link"
                 style={
@@ -1438,7 +1423,6 @@ Array [
                 dir="auto"
                 href="/experience/events"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 rel=" noopener noreferrer"
                 role="link"
                 style={
@@ -1492,7 +1476,6 @@ Array [
                 dir="auto"
                 href="/experience/brand"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 rel=" noopener noreferrer"
                 role="link"
                 style={
@@ -1546,7 +1529,6 @@ Array [
                 dir="auto"
                 href="/experience/merchant"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 rel=" noopener noreferrer"
                 role="link"
                 style={
@@ -1600,7 +1582,6 @@ Array [
                 dir="auto"
                 href="/community#fund"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 rel=" noopener noreferrer"
                 role="link"
                 style={
@@ -1681,7 +1662,6 @@ Array [
                 dir="auto"
                 href="https://medium.com/celoOrg"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 rel=" noopener noreferrer"
                 role="link"
                 style={
@@ -1773,7 +1753,6 @@ Array [
                 dir="auto"
                 href="https://github.com/celo-org"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 rel=" noopener noreferrer"
                 role="link"
                 style={
@@ -1855,7 +1834,6 @@ Array [
                 dir="auto"
                 href="https://twitter.com/CeloOrg"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 rel=" noopener noreferrer"
                 role="link"
                 style={
@@ -1935,7 +1913,6 @@ Array [
                 dir="auto"
                 href="https://forum.celo.org/"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 rel=" noopener noreferrer"
                 role="link"
                 style={
@@ -2015,7 +1992,6 @@ Array [
                 dir="auto"
                 href="https://discord.gg/6yWMkgM"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 rel=" noopener noreferrer"
                 role="link"
                 style={
@@ -2097,7 +2073,6 @@ Array [
                 dir="auto"
                 href="https://youtube.com/channel/UCCZgos_YAJSXm5QX5D5Wkcw"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 rel=" noopener noreferrer"
                 role="link"
                 style={
@@ -2175,9 +2150,8 @@ Array [
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
-                href="https://www.instagram.com/celoorg/"
+                href="https://www.instagram.com/celoorg"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 rel=" noopener noreferrer"
                 role="link"
                 style={
