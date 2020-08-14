@@ -5,22 +5,26 @@ set -euo pipefail
 # a released branch.
 #
 # Flags:
-# -o: Old branch containing smart contracts, which has likely been released.
-# -n: New branch containing smart contracts, on which version numbers may be updated.
+# -a: Old branch containing smart contracts, which has likely been released.
+# -b: New branch containing smart contracts, on which version numbers may be updated.
 
 BRANCH_1=""
 BRANCH_2=""
+NETWORK=""
+REPORT=""
 
-while getopts 'o:n:' flag; do
+while getopts 'a:b:n:r:' flag; do
   case "${flag}" in
-    o) BRANCH_1="${OPTARG}" ;;
-    n) BRANCH_2="${OPTARG}" ;;
+    a) BRANCH_1="${OPTARG}" ;;
+    b) BRANCH_2="${OPTARG}" ;;
+    n) NETWORK="$OPTARG" ;;
+    r) REPORT="${OPTARG}" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
 
-[ -z "$BRANCH_1" ] && echo "Need to set the first branch via the -n flag" && exit 1;
-[ -z "$BRANCH_2" ] && echo "Need to set the second branch via the -o flag" && exit 1;
+[ -z "$BRANCH_1" ] && echo "Need to set the first branch via the -a flag" && exit 1;
+[ -z "$BRANCH_2" ] && echo "Need to set the second branch via the -b flag" && exit 1;
 
 BUILD_DIR_1=$(echo build/$(echo $BRANCH_1 | sed -e 's/\//_/g'))
 git checkout $BRANCH_1
@@ -37,6 +41,11 @@ rm -rf build/contracts
 yarn build:sol
 rm -rf $BUILD_DIR_2 && mkdir -p $BUILD_DIR_2
 mv build/contracts $BUILD_DIR_2
+
+REPORT_FLAG=""
+if [ -z "$REPORT" ]; then
+  REPORT_FLAG="-f "$REPORT
+fi
 
 # Exclude test contracts, mock contracts, contract interfaces, Proxy contracts, MultiSig contracts,
 # and the ReleaseGold contract. 
