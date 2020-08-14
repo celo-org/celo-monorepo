@@ -49,6 +49,7 @@ exports[`Account renders correctly 1`] = `
           "position": "absolute",
         }
       }
+      testID="Hamburguer"
     >
       <svg
         fill="none"
@@ -175,6 +176,14 @@ exports[`Account renders correctly 1`] = `
                     editProfile
                   </Text>
                 </View>
+                <View
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    }
+                  }
+                />
               </View>
             </View>
           </View>
@@ -735,6 +744,14 @@ exports[`Account renders correctly 1`] = `
                     licenses
                   </Text>
                 </View>
+                <View
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    }
+                  }
+                />
               </View>
             </View>
           </View>
@@ -805,6 +822,134 @@ exports[`Account renders correctly 1`] = `
                     termsOfServiceLink
                   </Text>
                 </View>
+                <View
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    }
+                  }
+                />
+              </View>
+            </View>
+          </View>
+        </View>
+        <View
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "backgroundColor": "#FFFFFF",
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "paddingHorizontal": 16,
+                "paddingVertical": 8,
+              },
+              Object {
+                "borderBottomColor": "#EDEEEF",
+                "borderBottomWidth": 1,
+                "marginLeft": 16,
+                "marginTop": 44,
+                "paddingLeft": 0,
+              },
+            ]
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Medium",
+                "fontSize": 13,
+                "lineHeight": 16,
+              }
+            }
+          >
+            
+          </Text>
+        </View>
+        <View
+          style={
+            Object {
+              "backgroundColor": "#FFFFFF",
+            }
+          }
+        >
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <View
+              style={
+                Object {
+                  "borderBottomColor": "#EDEEEF",
+                  "borderBottomWidth": 1,
+                  "marginLeft": 16,
+                  "paddingVertical": 16,
+                }
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                    "paddingRight": 16,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Array [
+                      Object {
+                        "justifyContent": "center",
+                      },
+                    ]
+                  }
+                >
+                  <Text
+                    style={
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
+                      }
+                    }
+                  >
+                    removeAccountTitle
+                  </Text>
+                </View>
+              </View>
+              <View>
+                <Text
+                  style={
+                    Object {
+                      "color": "#9CA4A9",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                      "paddingRight": 16,
+                      "paddingTop": 16,
+                    }
+                  }
+                >
+                  removeAccountDetails
+                </Text>
               </View>
             </View>
           </View>
@@ -822,6 +967,7 @@ exports[`Account renders correctly 1`] = `
         scrollOffset={0}
         scrollOffsetMax={0}
         scrollTo={null}
+        statusBarTranslucent={true}
         supportedOrientations={
           Array [
             "portrait",
@@ -868,6 +1014,7 @@ exports[`Account renders correctly 1`] = `
           scrollOffset={0}
           scrollOffsetMax={0}
           scrollTo={null}
+          statusBarTranslucent={true}
           style={
             Object {
               "flex": 1,
@@ -888,130 +1035,160 @@ exports[`Account renders correctly 1`] = `
           }
           swipeThreshold={100}
         >
-          <View
-            style={
-              Object {
-                "backgroundColor": "#FFFFFF",
-                "borderRadius": 4,
-                "marginHorizontal": 10,
-                "padding": 20,
-              }
-            }
-          >
-            <Text
-              style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Bold",
-                  "fontSize": 18,
-                  "marginVertical": 15,
-                  "textAlign": "center",
-                }
-              }
-            >
-              restartModalSwitchOff.header
-            </Text>
-            <Text
-              style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 16,
-                  "lineHeight": 24,
-                }
-              }
-            >
-              restartModalSwitchOff.body
-            </Text>
+          <RNCSafeAreaView>
             <View
               style={
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "row",
-                  "justifyContent": "space-evenly",
-                  "marginTop": 25,
-                }
+                Array [
+                  Object {
+                    "backgroundColor": "#FFFFFF",
+                    "padding": 16,
+                  },
+                  Object {
+                    "borderRadius": 8,
+                  },
+                  Object {
+                    "elevation": 12,
+                    "shadowColor": "rgba(156, 164, 169, 0.4)",
+                    "shadowOffset": Object {
+                      "height": 2,
+                      "width": 0,
+                    },
+                    "shadowOpacity": 1,
+                    "shadowRadius": 12,
+                  },
+                  Array [
+                    Object {
+                      "backgroundColor": "#FFFFFF",
+                      "maxHeight": "100%",
+                      "padding": 24,
+                    },
+                    undefined,
+                  ],
+                ]
               }
             >
-              <View
-                accessible={true}
-                focusable={true}
-                nativeBackgroundAndroid={
+              <RCTScrollView
+                contentContainerStyle={
                   Object {
-                    "attribute": "selectableItemBackgroundBorderless",
-                    "type": "ThemeAttrAndroid",
+                    "alignItems": "center",
                   }
                 }
-                onClick={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
               >
-                <Text
-                  style={
-                    Array [
+                <View>
+                  <Text
+                    style={
                       Object {
-                        "color": "#42D689",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
+                        "color": "#2E3338",
+                        "fontFamily": "Jost-Medium",
+                        "fontSize": 22,
+                        "lineHeight": 28,
+                        "marginBottom": 12,
+                        "textAlign": "center",
+                      }
+                    }
+                  >
+                    restartModalSwitchOff.header
+                  </Text>
+                  <Text
+                    style={
                       Object {
-                        "color": "#81868B",
-                        "fontFamily": "Hind-SemiBold",
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Regular",
                         "fontSize": 16,
-                        "lineHeight": 24,
-                        "paddingRight": 40,
-                      },
-                    ]
-                  }
-                >
-                  global:cancel
-                </Text>
-              </View>
+                        "lineHeight": 22,
+                        "marginBottom": 24,
+                        "textAlign": "center",
+                      }
+                    }
+                  >
+                    restartModalSwitchOff.body
+                  </Text>
+                </View>
+              </RCTScrollView>
               <View
-                accessible={true}
-                focusable={true}
-                nativeBackgroundAndroid={
+                style={
                   Object {
-                    "attribute": "selectableItemBackgroundBorderless",
-                    "type": "ThemeAttrAndroid",
+                    "flexDirection": "row",
+                    "flexWrap": "wrap",
+                    "justifyContent": "space-around",
+                    "maxWidth": "100%",
                   }
                 }
-                onClick={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
               >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#42D689",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 16,
-                        "lineHeight": 24,
-                      },
-                    ]
+                <View
+                  accessible={true}
+                  focusable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
                   }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
                 >
-                  restartModalSwitchOff.restart
-                </Text>
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "color": "#9CA4A9",
+                          "paddingTop": 16,
+                        },
+                      ]
+                    }
+                  >
+                    global:cancel
+                  </Text>
+                </View>
+                <View
+                  accessible={true}
+                  focusable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
+                  }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                >
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "paddingTop": 16,
+                        },
+                      ]
+                    }
+                  >
+                    restartModalSwitchOff.restart
+                  </Text>
+                </View>
               </View>
             </View>
-          </View>
+          </RNCSafeAreaView>
         </View>
       </Modal>
       <Modal
@@ -1026,6 +1203,7 @@ exports[`Account renders correctly 1`] = `
         scrollOffset={0}
         scrollOffsetMax={0}
         scrollTo={null}
+        statusBarTranslucent={true}
         supportedOrientations={
           Array [
             "portrait",
@@ -1072,6 +1250,7 @@ exports[`Account renders correctly 1`] = `
           scrollOffset={0}
           scrollOffsetMax={0}
           scrollTo={null}
+          statusBarTranslucent={true}
           style={
             Object {
               "flex": 1,
@@ -1092,130 +1271,636 @@ exports[`Account renders correctly 1`] = `
           }
           swipeThreshold={100}
         >
-          <View
-            style={
-              Object {
-                "backgroundColor": "#FFFFFF",
-                "borderRadius": 4,
-                "marginHorizontal": 10,
-                "padding": 20,
-              }
-            }
-          >
-            <Text
-              style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Bold",
-                  "fontSize": 18,
-                  "marginVertical": 15,
-                  "textAlign": "center",
-                }
-              }
-            >
-              promptFornoModal.header
-            </Text>
-            <Text
-              style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 16,
-                  "lineHeight": 24,
-                }
-              }
-            >
-              promptFornoModal.body
-            </Text>
+          <RNCSafeAreaView>
             <View
               style={
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "row",
-                  "justifyContent": "space-evenly",
-                  "marginTop": 25,
-                }
+                Array [
+                  Object {
+                    "backgroundColor": "#FFFFFF",
+                    "padding": 16,
+                  },
+                  Object {
+                    "borderRadius": 8,
+                  },
+                  Object {
+                    "elevation": 12,
+                    "shadowColor": "rgba(156, 164, 169, 0.4)",
+                    "shadowOffset": Object {
+                      "height": 2,
+                      "width": 0,
+                    },
+                    "shadowOpacity": 1,
+                    "shadowRadius": 12,
+                  },
+                  Array [
+                    Object {
+                      "backgroundColor": "#FFFFFF",
+                      "maxHeight": "100%",
+                      "padding": 24,
+                    },
+                    undefined,
+                  ],
+                ]
               }
             >
-              <View
-                accessible={true}
-                focusable={true}
-                nativeBackgroundAndroid={
+              <RCTScrollView
+                contentContainerStyle={
                   Object {
-                    "attribute": "selectableItemBackgroundBorderless",
-                    "type": "ThemeAttrAndroid",
+                    "alignItems": "center",
                   }
                 }
-                onClick={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
               >
-                <Text
-                  style={
-                    Array [
+                <View>
+                  <Text
+                    style={
                       Object {
-                        "color": "#42D689",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
+                        "color": "#2E3338",
+                        "fontFamily": "Jost-Medium",
+                        "fontSize": 22,
+                        "lineHeight": 28,
+                        "marginBottom": 12,
+                        "textAlign": "center",
+                      }
+                    }
+                  >
+                    promptFornoModal.header
+                  </Text>
+                  <Text
+                    style={
                       Object {
-                        "color": "#81868B",
-                        "fontFamily": "Hind-SemiBold",
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Regular",
                         "fontSize": 16,
-                        "lineHeight": 24,
-                        "paddingRight": 40,
-                      },
-                    ]
-                  }
-                >
-                  global:goBack
-                </Text>
-              </View>
+                        "lineHeight": 22,
+                        "marginBottom": 24,
+                        "textAlign": "center",
+                      }
+                    }
+                  >
+                    promptFornoModal.body
+                  </Text>
+                </View>
+              </RCTScrollView>
               <View
-                accessible={true}
-                focusable={true}
-                nativeBackgroundAndroid={
+                style={
                   Object {
-                    "attribute": "selectableItemBackgroundBorderless",
-                    "type": "ThemeAttrAndroid",
+                    "flexDirection": "row",
+                    "flexWrap": "wrap",
+                    "justifyContent": "space-around",
+                    "maxWidth": "100%",
                   }
                 }
-                onClick={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
               >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#42D689",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 16,
-                        "lineHeight": 24,
-                      },
-                    ]
+                <View
+                  accessible={true}
+                  focusable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
                   }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
                 >
-                  promptFornoModal.switchToDataSaver
-                </Text>
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "color": "#9CA4A9",
+                          "paddingTop": 16,
+                        },
+                      ]
+                    }
+                  >
+                    global:goBack
+                  </Text>
+                </View>
+                <View
+                  accessible={true}
+                  focusable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
+                  }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                >
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "paddingTop": 16,
+                        },
+                      ]
+                    }
+                  >
+                    promptFornoModal.switchToDataSaver
+                  </Text>
+                </View>
               </View>
             </View>
-          </View>
+          </RNCSafeAreaView>
+        </View>
+      </Modal>
+      <Modal
+        animationType="none"
+        hardwareAccelerated={false}
+        hideModalContentWhileAnimating={false}
+        onModalHide={[Function]}
+        onModalWillHide={[Function]}
+        onModalWillShow={[Function]}
+        onRequestClose={[Function]}
+        scrollHorizontal={false}
+        scrollOffset={0}
+        scrollOffsetMax={0}
+        scrollTo={null}
+        statusBarTranslucent={true}
+        supportedOrientations={
+          Array [
+            "portrait",
+            "landscape",
+          ]
+        }
+        swipeThreshold={100}
+        transparent={true}
+        visible={false}
+      >
+        <View
+          accessible={true}
+          focusable={true}
+          forwardedRef={[Function]}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "backgroundColor": "black",
+              "bottom": 0,
+              "height": 1334,
+              "left": 0,
+              "opacity": 0,
+              "position": "absolute",
+              "right": 0,
+              "top": 0,
+              "width": 750,
+            }
+          }
+        />
+        <View
+          forwardedRef={[Function]}
+          hideModalContentWhileAnimating={false}
+          onModalHide={[Function]}
+          onModalWillHide={[Function]}
+          onModalWillShow={[Function]}
+          pointerEvents="box-none"
+          scrollHorizontal={false}
+          scrollOffset={0}
+          scrollOffsetMax={0}
+          scrollTo={null}
+          statusBarTranslucent={true}
+          style={
+            Object {
+              "flex": 1,
+              "justifyContent": "center",
+              "margin": 37.5,
+              "transform": Array [
+                Object {
+                  "translateY": 0,
+                },
+              ],
+            }
+          }
+          supportedOrientations={
+            Array [
+              "portrait",
+              "landscape",
+            ]
+          }
+          swipeThreshold={100}
+        >
+          <RNCSafeAreaView>
+            <View
+              style={
+                Array [
+                  Object {
+                    "backgroundColor": "#FFFFFF",
+                    "padding": 16,
+                  },
+                  Object {
+                    "borderRadius": 8,
+                  },
+                  Object {
+                    "elevation": 12,
+                    "shadowColor": "rgba(156, 164, 169, 0.4)",
+                    "shadowOffset": Object {
+                      "height": 2,
+                      "width": 0,
+                    },
+                    "shadowOpacity": 1,
+                    "shadowRadius": 12,
+                  },
+                  Array [
+                    Object {
+                      "backgroundColor": "#FFFFFF",
+                      "maxHeight": "100%",
+                      "padding": 24,
+                    },
+                    undefined,
+                  ],
+                ]
+              }
+            >
+              <RCTScrollView
+                contentContainerStyle={
+                  Object {
+                    "alignItems": "center",
+                  }
+                }
+              >
+                <View>
+                  <Text
+                    style={
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Jost-Medium",
+                        "fontSize": 22,
+                        "lineHeight": 28,
+                        "marginBottom": 12,
+                        "textAlign": "center",
+                      }
+                    }
+                  >
+                    accountKeyModal.header
+                  </Text>
+                  <Text
+                    style={
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
+                        "marginBottom": 24,
+                        "textAlign": "center",
+                      }
+                    }
+                  >
+                    accountKeyModal.body1
+                    
+
+
+                    accountKeyModal.body2
+                  </Text>
+                </View>
+              </RCTScrollView>
+              <View
+                style={
+                  Object {
+                    "flexDirection": "row",
+                    "flexWrap": "wrap",
+                    "justifyContent": "space-around",
+                    "maxWidth": "100%",
+                  }
+                }
+              >
+                <View
+                  accessible={true}
+                  focusable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
+                  }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                >
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "color": "#9CA4A9",
+                          "paddingTop": 16,
+                        },
+                      ]
+                    }
+                  >
+                    global:cancel
+                  </Text>
+                </View>
+                <View
+                  accessible={true}
+                  focusable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
+                  }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                >
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "paddingTop": 16,
+                        },
+                      ]
+                    }
+                  >
+                    global:continue
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </RNCSafeAreaView>
+        </View>
+      </Modal>
+      <Modal
+        animationType="none"
+        hardwareAccelerated={false}
+        hideModalContentWhileAnimating={false}
+        onModalHide={[Function]}
+        onModalWillHide={[Function]}
+        onModalWillShow={[Function]}
+        onRequestClose={[Function]}
+        scrollHorizontal={false}
+        scrollOffset={0}
+        scrollOffsetMax={0}
+        scrollTo={null}
+        statusBarTranslucent={true}
+        supportedOrientations={
+          Array [
+            "portrait",
+            "landscape",
+          ]
+        }
+        swipeThreshold={100}
+        transparent={true}
+        visible={false}
+      >
+        <View
+          accessible={true}
+          focusable={true}
+          forwardedRef={[Function]}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "backgroundColor": "black",
+              "bottom": 0,
+              "height": 1334,
+              "left": 0,
+              "opacity": 0,
+              "position": "absolute",
+              "right": 0,
+              "top": 0,
+              "width": 750,
+            }
+          }
+        />
+        <View
+          forwardedRef={[Function]}
+          hideModalContentWhileAnimating={false}
+          onModalHide={[Function]}
+          onModalWillHide={[Function]}
+          onModalWillShow={[Function]}
+          pointerEvents="box-none"
+          scrollHorizontal={false}
+          scrollOffset={0}
+          scrollOffsetMax={0}
+          scrollTo={null}
+          statusBarTranslucent={true}
+          style={
+            Object {
+              "flex": 1,
+              "justifyContent": "center",
+              "margin": 37.5,
+              "transform": Array [
+                Object {
+                  "translateY": 0,
+                },
+              ],
+            }
+          }
+          supportedOrientations={
+            Array [
+              "portrait",
+              "landscape",
+            ]
+          }
+          swipeThreshold={100}
+        >
+          <RNCSafeAreaView>
+            <View
+              style={
+                Array [
+                  Object {
+                    "backgroundColor": "#FFFFFF",
+                    "padding": 16,
+                  },
+                  Object {
+                    "borderRadius": 8,
+                  },
+                  Object {
+                    "elevation": 12,
+                    "shadowColor": "rgba(156, 164, 169, 0.4)",
+                    "shadowOffset": Object {
+                      "height": 2,
+                      "width": 0,
+                    },
+                    "shadowOpacity": 1,
+                    "shadowRadius": 12,
+                  },
+                  Array [
+                    Object {
+                      "backgroundColor": "#FFFFFF",
+                      "maxHeight": "100%",
+                      "padding": 24,
+                    },
+                    undefined,
+                  ],
+                ]
+              }
+            >
+              <RCTScrollView
+                contentContainerStyle={
+                  Object {
+                    "alignItems": "center",
+                  }
+                }
+              >
+                <View>
+                  <Text
+                    style={
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Jost-Medium",
+                        "fontSize": 22,
+                        "lineHeight": 28,
+                        "marginBottom": 12,
+                        "textAlign": "center",
+                      }
+                    }
+                  >
+                    promptConfirmRemovalModal.header
+                  </Text>
+                  <Text
+                    style={
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
+                        "marginBottom": 24,
+                        "textAlign": "center",
+                      }
+                    }
+                  >
+                    promptConfirmRemovalModal.body
+                  </Text>
+                </View>
+              </RCTScrollView>
+              <View
+                style={
+                  Object {
+                    "flexDirection": "row",
+                    "flexWrap": "wrap",
+                    "justifyContent": "space-around",
+                    "maxWidth": "100%",
+                  }
+                }
+              >
+                <View
+                  accessible={true}
+                  focusable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
+                  }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                >
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "color": "#9CA4A9",
+                          "paddingTop": 16,
+                        },
+                      ]
+                    }
+                  >
+                    global:cancel
+                  </Text>
+                </View>
+                <View
+                  accessible={true}
+                  focusable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
+                  }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                >
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "paddingTop": 16,
+                        },
+                      ]
+                    }
+                  >
+                    promptConfirmRemovalModal.resetNow
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </RNCSafeAreaView>
         </View>
       </Modal>
     </View>
@@ -1272,6 +1957,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
           "position": "absolute",
         }
       }
+      testID="Hamburguer"
     >
       <svg
         fill="none"
@@ -1398,6 +2084,14 @@ exports[`Account renders correctly when dev mode active 1`] = `
                     editProfile
                   </Text>
                 </View>
+                <View
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    }
+                  }
+                />
               </View>
             </View>
           </View>
@@ -1958,6 +2652,14 @@ exports[`Account renders correctly when dev mode active 1`] = `
                     licenses
                   </Text>
                 </View>
+                <View
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    }
+                  }
+                />
               </View>
             </View>
           </View>
@@ -2028,6 +2730,134 @@ exports[`Account renders correctly when dev mode active 1`] = `
                     termsOfServiceLink
                   </Text>
                 </View>
+                <View
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    }
+                  }
+                />
+              </View>
+            </View>
+          </View>
+        </View>
+        <View
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "backgroundColor": "#FFFFFF",
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "paddingHorizontal": 16,
+                "paddingVertical": 8,
+              },
+              Object {
+                "borderBottomColor": "#EDEEEF",
+                "borderBottomWidth": 1,
+                "marginLeft": 16,
+                "marginTop": 44,
+                "paddingLeft": 0,
+              },
+            ]
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Medium",
+                "fontSize": 13,
+                "lineHeight": 16,
+              }
+            }
+          >
+            
+          </Text>
+        </View>
+        <View
+          style={
+            Object {
+              "backgroundColor": "#FFFFFF",
+            }
+          }
+        >
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <View
+              style={
+                Object {
+                  "borderBottomColor": "#EDEEEF",
+                  "borderBottomWidth": 1,
+                  "marginLeft": 16,
+                  "paddingVertical": 16,
+                }
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                    "paddingRight": 16,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Array [
+                      Object {
+                        "justifyContent": "center",
+                      },
+                    ]
+                  }
+                >
+                  <Text
+                    style={
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
+                      }
+                    }
+                  >
+                    removeAccountTitle
+                  </Text>
+                </View>
+              </View>
+              <View>
+                <Text
+                  style={
+                    Object {
+                      "color": "#9CA4A9",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                      "paddingRight": 16,
+                      "paddingTop": 16,
+                    }
+                  }
+                >
+                  removeAccountDetails
+                </Text>
               </View>
             </View>
           </View>
@@ -2251,6 +3081,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
         scrollOffset={0}
         scrollOffsetMax={0}
         scrollTo={null}
+        statusBarTranslucent={true}
         supportedOrientations={
           Array [
             "portrait",
@@ -2297,6 +3128,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
           scrollOffset={0}
           scrollOffsetMax={0}
           scrollTo={null}
+          statusBarTranslucent={true}
           style={
             Object {
               "flex": 1,
@@ -2317,130 +3149,160 @@ exports[`Account renders correctly when dev mode active 1`] = `
           }
           swipeThreshold={100}
         >
-          <View
-            style={
-              Object {
-                "backgroundColor": "#FFFFFF",
-                "borderRadius": 4,
-                "marginHorizontal": 10,
-                "padding": 20,
-              }
-            }
-          >
-            <Text
-              style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Bold",
-                  "fontSize": 18,
-                  "marginVertical": 15,
-                  "textAlign": "center",
-                }
-              }
-            >
-              restartModalSwitchOff.header
-            </Text>
-            <Text
-              style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 16,
-                  "lineHeight": 24,
-                }
-              }
-            >
-              restartModalSwitchOff.body
-            </Text>
+          <RNCSafeAreaView>
             <View
               style={
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "row",
-                  "justifyContent": "space-evenly",
-                  "marginTop": 25,
-                }
+                Array [
+                  Object {
+                    "backgroundColor": "#FFFFFF",
+                    "padding": 16,
+                  },
+                  Object {
+                    "borderRadius": 8,
+                  },
+                  Object {
+                    "elevation": 12,
+                    "shadowColor": "rgba(156, 164, 169, 0.4)",
+                    "shadowOffset": Object {
+                      "height": 2,
+                      "width": 0,
+                    },
+                    "shadowOpacity": 1,
+                    "shadowRadius": 12,
+                  },
+                  Array [
+                    Object {
+                      "backgroundColor": "#FFFFFF",
+                      "maxHeight": "100%",
+                      "padding": 24,
+                    },
+                    undefined,
+                  ],
+                ]
               }
             >
-              <View
-                accessible={true}
-                focusable={true}
-                nativeBackgroundAndroid={
+              <RCTScrollView
+                contentContainerStyle={
                   Object {
-                    "attribute": "selectableItemBackgroundBorderless",
-                    "type": "ThemeAttrAndroid",
+                    "alignItems": "center",
                   }
                 }
-                onClick={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
               >
-                <Text
-                  style={
-                    Array [
+                <View>
+                  <Text
+                    style={
                       Object {
-                        "color": "#42D689",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
+                        "color": "#2E3338",
+                        "fontFamily": "Jost-Medium",
+                        "fontSize": 22,
+                        "lineHeight": 28,
+                        "marginBottom": 12,
+                        "textAlign": "center",
+                      }
+                    }
+                  >
+                    restartModalSwitchOff.header
+                  </Text>
+                  <Text
+                    style={
                       Object {
-                        "color": "#81868B",
-                        "fontFamily": "Hind-SemiBold",
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Regular",
                         "fontSize": 16,
-                        "lineHeight": 24,
-                        "paddingRight": 40,
-                      },
-                    ]
-                  }
-                >
-                  global:cancel
-                </Text>
-              </View>
+                        "lineHeight": 22,
+                        "marginBottom": 24,
+                        "textAlign": "center",
+                      }
+                    }
+                  >
+                    restartModalSwitchOff.body
+                  </Text>
+                </View>
+              </RCTScrollView>
               <View
-                accessible={true}
-                focusable={true}
-                nativeBackgroundAndroid={
+                style={
                   Object {
-                    "attribute": "selectableItemBackgroundBorderless",
-                    "type": "ThemeAttrAndroid",
+                    "flexDirection": "row",
+                    "flexWrap": "wrap",
+                    "justifyContent": "space-around",
+                    "maxWidth": "100%",
                   }
                 }
-                onClick={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
               >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#42D689",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 16,
-                        "lineHeight": 24,
-                      },
-                    ]
+                <View
+                  accessible={true}
+                  focusable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
                   }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
                 >
-                  restartModalSwitchOff.restart
-                </Text>
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "color": "#9CA4A9",
+                          "paddingTop": 16,
+                        },
+                      ]
+                    }
+                  >
+                    global:cancel
+                  </Text>
+                </View>
+                <View
+                  accessible={true}
+                  focusable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
+                  }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                >
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "paddingTop": 16,
+                        },
+                      ]
+                    }
+                  >
+                    restartModalSwitchOff.restart
+                  </Text>
+                </View>
               </View>
             </View>
-          </View>
+          </RNCSafeAreaView>
         </View>
       </Modal>
       <Modal
@@ -2455,6 +3317,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
         scrollOffset={0}
         scrollOffsetMax={0}
         scrollTo={null}
+        statusBarTranslucent={true}
         supportedOrientations={
           Array [
             "portrait",
@@ -2501,6 +3364,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
           scrollOffset={0}
           scrollOffsetMax={0}
           scrollTo={null}
+          statusBarTranslucent={true}
           style={
             Object {
               "flex": 1,
@@ -2521,130 +3385,636 @@ exports[`Account renders correctly when dev mode active 1`] = `
           }
           swipeThreshold={100}
         >
-          <View
-            style={
-              Object {
-                "backgroundColor": "#FFFFFF",
-                "borderRadius": 4,
-                "marginHorizontal": 10,
-                "padding": 20,
-              }
-            }
-          >
-            <Text
-              style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Bold",
-                  "fontSize": 18,
-                  "marginVertical": 15,
-                  "textAlign": "center",
-                }
-              }
-            >
-              promptFornoModal.header
-            </Text>
-            <Text
-              style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 16,
-                  "lineHeight": 24,
-                }
-              }
-            >
-              promptFornoModal.body
-            </Text>
+          <RNCSafeAreaView>
             <View
               style={
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "row",
-                  "justifyContent": "space-evenly",
-                  "marginTop": 25,
-                }
+                Array [
+                  Object {
+                    "backgroundColor": "#FFFFFF",
+                    "padding": 16,
+                  },
+                  Object {
+                    "borderRadius": 8,
+                  },
+                  Object {
+                    "elevation": 12,
+                    "shadowColor": "rgba(156, 164, 169, 0.4)",
+                    "shadowOffset": Object {
+                      "height": 2,
+                      "width": 0,
+                    },
+                    "shadowOpacity": 1,
+                    "shadowRadius": 12,
+                  },
+                  Array [
+                    Object {
+                      "backgroundColor": "#FFFFFF",
+                      "maxHeight": "100%",
+                      "padding": 24,
+                    },
+                    undefined,
+                  ],
+                ]
               }
             >
-              <View
-                accessible={true}
-                focusable={true}
-                nativeBackgroundAndroid={
+              <RCTScrollView
+                contentContainerStyle={
                   Object {
-                    "attribute": "selectableItemBackgroundBorderless",
-                    "type": "ThemeAttrAndroid",
+                    "alignItems": "center",
                   }
                 }
-                onClick={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
               >
-                <Text
-                  style={
-                    Array [
+                <View>
+                  <Text
+                    style={
                       Object {
-                        "color": "#42D689",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
+                        "color": "#2E3338",
+                        "fontFamily": "Jost-Medium",
+                        "fontSize": 22,
+                        "lineHeight": 28,
+                        "marginBottom": 12,
+                        "textAlign": "center",
+                      }
+                    }
+                  >
+                    promptFornoModal.header
+                  </Text>
+                  <Text
+                    style={
                       Object {
-                        "color": "#81868B",
-                        "fontFamily": "Hind-SemiBold",
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Regular",
                         "fontSize": 16,
-                        "lineHeight": 24,
-                        "paddingRight": 40,
-                      },
-                    ]
-                  }
-                >
-                  global:goBack
-                </Text>
-              </View>
+                        "lineHeight": 22,
+                        "marginBottom": 24,
+                        "textAlign": "center",
+                      }
+                    }
+                  >
+                    promptFornoModal.body
+                  </Text>
+                </View>
+              </RCTScrollView>
               <View
-                accessible={true}
-                focusable={true}
-                nativeBackgroundAndroid={
+                style={
                   Object {
-                    "attribute": "selectableItemBackgroundBorderless",
-                    "type": "ThemeAttrAndroid",
+                    "flexDirection": "row",
+                    "flexWrap": "wrap",
+                    "justifyContent": "space-around",
+                    "maxWidth": "100%",
                   }
                 }
-                onClick={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
               >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#42D689",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "color": "#42D689",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 16,
-                        "lineHeight": 24,
-                      },
-                    ]
+                <View
+                  accessible={true}
+                  focusable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
                   }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
                 >
-                  promptFornoModal.switchToDataSaver
-                </Text>
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "color": "#9CA4A9",
+                          "paddingTop": 16,
+                        },
+                      ]
+                    }
+                  >
+                    global:goBack
+                  </Text>
+                </View>
+                <View
+                  accessible={true}
+                  focusable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
+                  }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                >
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "paddingTop": 16,
+                        },
+                      ]
+                    }
+                  >
+                    promptFornoModal.switchToDataSaver
+                  </Text>
+                </View>
               </View>
             </View>
-          </View>
+          </RNCSafeAreaView>
+        </View>
+      </Modal>
+      <Modal
+        animationType="none"
+        hardwareAccelerated={false}
+        hideModalContentWhileAnimating={false}
+        onModalHide={[Function]}
+        onModalWillHide={[Function]}
+        onModalWillShow={[Function]}
+        onRequestClose={[Function]}
+        scrollHorizontal={false}
+        scrollOffset={0}
+        scrollOffsetMax={0}
+        scrollTo={null}
+        statusBarTranslucent={true}
+        supportedOrientations={
+          Array [
+            "portrait",
+            "landscape",
+          ]
+        }
+        swipeThreshold={100}
+        transparent={true}
+        visible={false}
+      >
+        <View
+          accessible={true}
+          focusable={true}
+          forwardedRef={[Function]}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "backgroundColor": "black",
+              "bottom": 0,
+              "height": 1334,
+              "left": 0,
+              "opacity": 0,
+              "position": "absolute",
+              "right": 0,
+              "top": 0,
+              "width": 750,
+            }
+          }
+        />
+        <View
+          forwardedRef={[Function]}
+          hideModalContentWhileAnimating={false}
+          onModalHide={[Function]}
+          onModalWillHide={[Function]}
+          onModalWillShow={[Function]}
+          pointerEvents="box-none"
+          scrollHorizontal={false}
+          scrollOffset={0}
+          scrollOffsetMax={0}
+          scrollTo={null}
+          statusBarTranslucent={true}
+          style={
+            Object {
+              "flex": 1,
+              "justifyContent": "center",
+              "margin": 37.5,
+              "transform": Array [
+                Object {
+                  "translateY": 0,
+                },
+              ],
+            }
+          }
+          supportedOrientations={
+            Array [
+              "portrait",
+              "landscape",
+            ]
+          }
+          swipeThreshold={100}
+        >
+          <RNCSafeAreaView>
+            <View
+              style={
+                Array [
+                  Object {
+                    "backgroundColor": "#FFFFFF",
+                    "padding": 16,
+                  },
+                  Object {
+                    "borderRadius": 8,
+                  },
+                  Object {
+                    "elevation": 12,
+                    "shadowColor": "rgba(156, 164, 169, 0.4)",
+                    "shadowOffset": Object {
+                      "height": 2,
+                      "width": 0,
+                    },
+                    "shadowOpacity": 1,
+                    "shadowRadius": 12,
+                  },
+                  Array [
+                    Object {
+                      "backgroundColor": "#FFFFFF",
+                      "maxHeight": "100%",
+                      "padding": 24,
+                    },
+                    undefined,
+                  ],
+                ]
+              }
+            >
+              <RCTScrollView
+                contentContainerStyle={
+                  Object {
+                    "alignItems": "center",
+                  }
+                }
+              >
+                <View>
+                  <Text
+                    style={
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Jost-Medium",
+                        "fontSize": 22,
+                        "lineHeight": 28,
+                        "marginBottom": 12,
+                        "textAlign": "center",
+                      }
+                    }
+                  >
+                    accountKeyModal.header
+                  </Text>
+                  <Text
+                    style={
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
+                        "marginBottom": 24,
+                        "textAlign": "center",
+                      }
+                    }
+                  >
+                    accountKeyModal.body1
+                    
+
+
+                    accountKeyModal.body2
+                  </Text>
+                </View>
+              </RCTScrollView>
+              <View
+                style={
+                  Object {
+                    "flexDirection": "row",
+                    "flexWrap": "wrap",
+                    "justifyContent": "space-around",
+                    "maxWidth": "100%",
+                  }
+                }
+              >
+                <View
+                  accessible={true}
+                  focusable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
+                  }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                >
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "color": "#9CA4A9",
+                          "paddingTop": 16,
+                        },
+                      ]
+                    }
+                  >
+                    global:cancel
+                  </Text>
+                </View>
+                <View
+                  accessible={true}
+                  focusable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
+                  }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                >
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "paddingTop": 16,
+                        },
+                      ]
+                    }
+                  >
+                    global:continue
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </RNCSafeAreaView>
+        </View>
+      </Modal>
+      <Modal
+        animationType="none"
+        hardwareAccelerated={false}
+        hideModalContentWhileAnimating={false}
+        onModalHide={[Function]}
+        onModalWillHide={[Function]}
+        onModalWillShow={[Function]}
+        onRequestClose={[Function]}
+        scrollHorizontal={false}
+        scrollOffset={0}
+        scrollOffsetMax={0}
+        scrollTo={null}
+        statusBarTranslucent={true}
+        supportedOrientations={
+          Array [
+            "portrait",
+            "landscape",
+          ]
+        }
+        swipeThreshold={100}
+        transparent={true}
+        visible={false}
+      >
+        <View
+          accessible={true}
+          focusable={true}
+          forwardedRef={[Function]}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "backgroundColor": "black",
+              "bottom": 0,
+              "height": 1334,
+              "left": 0,
+              "opacity": 0,
+              "position": "absolute",
+              "right": 0,
+              "top": 0,
+              "width": 750,
+            }
+          }
+        />
+        <View
+          forwardedRef={[Function]}
+          hideModalContentWhileAnimating={false}
+          onModalHide={[Function]}
+          onModalWillHide={[Function]}
+          onModalWillShow={[Function]}
+          pointerEvents="box-none"
+          scrollHorizontal={false}
+          scrollOffset={0}
+          scrollOffsetMax={0}
+          scrollTo={null}
+          statusBarTranslucent={true}
+          style={
+            Object {
+              "flex": 1,
+              "justifyContent": "center",
+              "margin": 37.5,
+              "transform": Array [
+                Object {
+                  "translateY": 0,
+                },
+              ],
+            }
+          }
+          supportedOrientations={
+            Array [
+              "portrait",
+              "landscape",
+            ]
+          }
+          swipeThreshold={100}
+        >
+          <RNCSafeAreaView>
+            <View
+              style={
+                Array [
+                  Object {
+                    "backgroundColor": "#FFFFFF",
+                    "padding": 16,
+                  },
+                  Object {
+                    "borderRadius": 8,
+                  },
+                  Object {
+                    "elevation": 12,
+                    "shadowColor": "rgba(156, 164, 169, 0.4)",
+                    "shadowOffset": Object {
+                      "height": 2,
+                      "width": 0,
+                    },
+                    "shadowOpacity": 1,
+                    "shadowRadius": 12,
+                  },
+                  Array [
+                    Object {
+                      "backgroundColor": "#FFFFFF",
+                      "maxHeight": "100%",
+                      "padding": 24,
+                    },
+                    undefined,
+                  ],
+                ]
+              }
+            >
+              <RCTScrollView
+                contentContainerStyle={
+                  Object {
+                    "alignItems": "center",
+                  }
+                }
+              >
+                <View>
+                  <Text
+                    style={
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Jost-Medium",
+                        "fontSize": 22,
+                        "lineHeight": 28,
+                        "marginBottom": 12,
+                        "textAlign": "center",
+                      }
+                    }
+                  >
+                    promptConfirmRemovalModal.header
+                  </Text>
+                  <Text
+                    style={
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
+                        "marginBottom": 24,
+                        "textAlign": "center",
+                      }
+                    }
+                  >
+                    promptConfirmRemovalModal.body
+                  </Text>
+                </View>
+              </RCTScrollView>
+              <View
+                style={
+                  Object {
+                    "flexDirection": "row",
+                    "flexWrap": "wrap",
+                    "justifyContent": "space-around",
+                    "maxWidth": "100%",
+                  }
+                }
+              >
+                <View
+                  accessible={true}
+                  focusable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
+                  }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                >
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "color": "#9CA4A9",
+                          "paddingTop": 16,
+                        },
+                      ]
+                    }
+                  >
+                    global:cancel
+                  </Text>
+                </View>
+                <View
+                  accessible={true}
+                  focusable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
+                  }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                >
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "paddingTop": 16,
+                        },
+                      ]
+                    }
+                  >
+                    promptConfirmRemovalModal.resetNow
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </RNCSafeAreaView>
         </View>
       </Modal>
     </View>

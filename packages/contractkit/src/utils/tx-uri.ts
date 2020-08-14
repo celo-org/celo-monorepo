@@ -1,4 +1,4 @@
-import { trimLeading0x } from '@celo/utils/lib/address'
+import { trimLeading0x } from '@celo/base/lib/address'
 import BN from 'bn.js'
 import qrcode from 'qrcode'
 import querystring from 'querystring'

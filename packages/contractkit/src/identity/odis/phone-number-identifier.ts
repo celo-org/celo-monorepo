@@ -1,6 +1,7 @@
-import { getPhoneHash, isE164Number } from '@celo/utils/lib/phoneNumbers'
+import { getPhoneHash, isE164Number } from '@celo/base/lib/phoneNumbers'
 import { createHash } from 'crypto'
 import debugFactory from 'debug'
+import { soliditySha3 } from 'web3-utils'
 import { BlsBlindingClient, WasmBlsBlindingClient } from './bls-blinding-client'
 import {
   AuthSigner,
@@ -11,6 +12,7 @@ import {
 } from './phone-number-lookup'
 
 const debug = debugFactory('kit:odis:phone-number-identifier')
+const sha3 = (v: string) => soliditySha3({ type: 'string', value: v })
 
 const PEPPER_CHAR_LENGTH = 13
 const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessageSig'
@@ -50,6 +52,7 @@ export async function getPhoneNumberIdentifier(
 
   const body: SignMessageRequest = {
     account,
+    timestamp: Date.now(),
     blindedQueryPhoneNumber: base64BlindedMessage,
     hashedPhoneNumber: selfPhoneHash,
     version: clientVersion ? clientVersion : 'unknown',
@@ -69,7 +72,7 @@ export async function getPhoneNumberIdentifier(
 
   debug('Converting sig to pepper')
   const pepper = getPepperFromThresholdSignature(sigBuf)
-  const phoneHash = getPhoneHash(e164Number, pepper)
+  const phoneHash = getPhoneHash(sha3, e164Number, pepper)
   return { e164Number, phoneHash, pepper }
 }
 

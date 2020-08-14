@@ -25,6 +25,9 @@ OPTIONS
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
+
   --useLedger                                        Set it to use a ledger wallet
 
   --wait                                             Wait until all pending votes can be activated
@@ -45,6 +48,8 @@ USAGE
   $ celocli election:current
 
 OPTIONS
+  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
+
   --valset  Show currently used signers from valset (by default the authorized validator signers are shown). Useful for
             checking if keys have been rotated.
 ```
@@ -58,6 +63,9 @@ Prints the list of validator groups, the number of votes they have received, the
 ```
 USAGE
   $ celocli election:list
+
+OPTIONS
+  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
 
 EXAMPLE
   list
@@ -87,6 +95,9 @@ OPTIONS
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
+
   --useLedger                                        Set it to use a ledger wallet
 
   --value=value                                      (required) Value of votes to revoke
@@ -105,6 +116,9 @@ Runs a "mock" election and prints out the validators that would be elected if th
 ```
 USAGE
   $ celocli election:run
+
+OPTIONS
+  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
 ```
 
 _See code: [packages/cli/src/commands/election/run.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/run.ts)_
@@ -121,8 +135,9 @@ ARGUMENTS
   ADDRESS  Voter or Validator Groups's address
 
 OPTIONS
-  --group  Show information about a group running in Validator elections
-  --voter  Show information about an account voting in Validator elections
+  --group   Show information about a group running in Validator elections
+  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
+  --voter   Show information about an account voting in Validator elections
 
 EXAMPLES
   show 0x97f7333c51897469E8D98E7af8653aAb468050a3 --voter
@@ -152,6 +167,9 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 

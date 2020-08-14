@@ -1,6 +1,7 @@
 // Utilities for interacting with the Oblivious Decentralized Identifier Service (ODIS)
 
-import { hexToBuffer, trimLeading0x } from '@celo/utils/lib/address'
+import { hexToBuffer, trimLeading0x } from '@celo/base/lib/address'
+import { selectiveRetryAsyncWithBackOff } from '@celo/base/lib/async'
 import debugFactory from 'debug'
 import { ec as EC } from 'elliptic'
 import { ContractKit } from '../../kit'
@@ -34,6 +35,7 @@ export interface PhoneNumberPrivacyRequest {
 
 export interface SignMessageRequest extends PhoneNumberPrivacyRequest {
   blindedQueryPhoneNumber: string
+  timestamp?: number
   hashedPhoneNumber?: string
 }
 
@@ -57,6 +59,8 @@ export interface MatchmakingResponse {
 
 export enum ErrorMessages {
   ODIS_QUOTA_ERROR = 'odisQuotaError',
+  ODIS_INPUT_ERROR = 'odisBadInputError',
+  ODIS_AUTH_ERROR = 'odisAuthError',
 }
 
 export interface ServiceContext {
@@ -96,28 +100,47 @@ export async function postToOdis<ResponseType>(
     authHeader = await signer.contractKit.web3.eth.sign(bodyString, body.account)
   }
 
-  const { odisUrl } = context
-  const res = await fetch(odisUrl + endpoint, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: authHeader,
+  const { pgpnpUrl } = context
+
+  const dontRetry = [
+    ErrorMessages.ODIS_QUOTA_ERROR,
+    ErrorMessages.ODIS_AUTH_ERROR,
+    ErrorMessages.ODIS_INPUT_ERROR,
+  ]
+
+  return selectiveRetryAsyncWithBackOff(
+    async () => {
+      const res = await fetch(pgpnpUrl + endpoint, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: authHeader,
+        },
+        body: bodyString,
+      })
+
+      if (res.ok) {
+        debug('Response ok. Parsing.')
+        const response = await res.json()
+        return response as ResponseType
+      }
+
+      debug(`Response not okay. Status ${res.status}`)
+
+      switch (res.status) {
+        case 403:
+          throw new Error(ErrorMessages.ODIS_QUOTA_ERROR)
+        case 400:
+          throw new Error(ErrorMessages.ODIS_INPUT_ERROR)
+        case 401:
+          throw new Error(ErrorMessages.ODIS_AUTH_ERROR)
+        default:
+          throw new Error(`Unknown failure ${res.status}`)
+      }
     },
-    body: bodyString,
-  })
-
-  if (!res.ok) {
-    debug(`Response not okay. Status ${res.status}`)
-    switch (res.status) {
-      case 403:
-        throw new Error(ErrorMessages.ODIS_QUOTA_ERROR)
-      default:
-        throw new Error(`Unknown failure ${res.status}`)
-    }
-  }
-
-  debug('Response ok. Parsing.')
-  const response = await res.json()
-  return response as ResponseType
+    3,
+    dontRetry,
+    []
+  )
 }

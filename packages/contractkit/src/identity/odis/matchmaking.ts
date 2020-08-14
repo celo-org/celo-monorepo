@@ -21,6 +21,7 @@ export async function getContactMatches(
   e164NumberCaller: E164Number,
   e164NumberContacts: E164Number[],
   account: string,
+  phoneNumberIdentifier: string,
   signer: AuthSigner,
   context: ServiceContext,
   clientVersion?: string
@@ -32,7 +33,7 @@ export async function getContactMatches(
     account,
     userPhoneNumber: selfPhoneNumObfuscated,
     contactPhoneNumbers: Object.keys(obfucsatedNumToE164Number),
-    hashedPhoneNumber: selfPhoneNumObfuscated,
+    hashedPhoneNumber: phoneNumberIdentifier,
     version: clientVersion ? clientVersion : 'unknown',
     authenticationMethod: signer.authenticationMethod,
   }
