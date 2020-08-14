@@ -30,6 +30,8 @@ export enum SettingsEvents {
   forno_toggle = 'forno_toggle',
   licenses_view = 'licenses_view',
   tos_view = 'tos_view',
+  start_account_removal = 'start_account_removal',
+  completed_account_removal = 'completed_account_removal',
   // intentionally not tracking analytics opt in/out
   // to avoid tracking through omission
 }

@@ -315,6 +315,13 @@ async function deleteSingleChainData(syncMode: SyncMode) {
   return deleteFileIfExists(chainDataDir)
 }
 
+export async function deleteNodeData() {
+  const { nodeDir } = networkConfig
+  const dataDir = `${RNFS.DocumentDirectoryPath}/${nodeDir}`
+  Logger.debug('Geth@deleteNodeData', `Going to delete ${dataDir}`)
+  return deleteFileIfExists(dataDir)
+}
+
 async function deleteGethLockFile() {
   // Delete the .ipc file or the Geth will think that some other Geth node is using this datadir.
   const { nodeDir } = networkConfig
