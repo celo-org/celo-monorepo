@@ -32,6 +32,6 @@ done
 [ -z "$PROPOSAL" ] && echo "Need to set the proposal outfile via the -p flag" && exit 1;
 [ -z "$REPORT" ] && echo "Need to set the compatibility report outfile via the -r flag" && exit 1;
 
-yarn check-versions -o $BRANCH_1 -n $BRANCH_2 -r $REPORT
+yarn check-versions -a $BRANCH_1 -b $BRANCH_2 -r $REPORT
 yarn build
 yarn run truffle exec ./scripts/truffle/make-release.js --network $NETWORK --build_directory build/ --report $REPORT --proposal $PROPOSAL --initialize_data $INITITIALIZE_DATA
