@@ -1,7 +1,7 @@
 // Utilities for interacting with the Phone Number Privacy Service service (aka PGPNP)
 
-import { hexToBuffer, trimLeading0x } from '@celo/utils/lib/address'
-import { selectiveRetryAsyncWithBackOff } from '@celo/utils/lib/async'
+import { hexToBuffer, trimLeading0x } from '@celo/base/lib/address'
+import { selectiveRetryAsyncWithBackOff } from '@celo/base/lib/async'
 import debugFactory from 'debug'
 import { ec as EC } from 'elliptic'
 import { ContractKit } from '../../kit'

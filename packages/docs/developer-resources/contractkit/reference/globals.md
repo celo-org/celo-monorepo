@@ -4,6 +4,7 @@
 
 ### External modules
 
+* ["base/src/address"](modules/_base_src_address_.md)
 * ["contractkit/src/address-registry"](modules/_contractkit_src_address_registry_.md)
 * ["contractkit/src/base"](modules/_contractkit_src_base_.md)
 * ["contractkit/src/contract-cache"](modules/_contractkit_src_contract_cache_.md)
@@ -80,4 +81,3 @@
 * ["contractkit/src/wrappers/SortedOracles"](modules/_contractkit_src_wrappers_sortedoracles_.md)
 * ["contractkit/src/wrappers/StableTokenWrapper"](modules/_contractkit_src_wrappers_stabletokenwrapper_.md)
 * ["contractkit/src/wrappers/Validators"](modules/_contractkit_src_wrappers_validators_.md)
-* ["utils/src/address"](modules/_utils_src_address_.md)
