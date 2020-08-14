@@ -1846,9 +1846,8 @@ exports[`Experience/Icons renders 1`] = `
                             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                             data-focusable={true}
                             dir="auto"
-                            href="example.com/tree-icon.png"
+                            href="/example.com/tree-icon.png"
                             onClick={[Function]}
-                            onMouseEnter={[Function]}
                             role="link"
                             style={
                               Object {
@@ -2110,9 +2109,8 @@ exports[`Experience/Icons renders 1`] = `
                             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                             data-focusable={true}
                             dir="auto"
-                            href="example.com/forest-icon.png"
+                            href="/example.com/forest-icon.png"
                             onClick={[Function]}
-                            onMouseEnter={[Function]}
                             role="link"
                             style={
                               Object {
