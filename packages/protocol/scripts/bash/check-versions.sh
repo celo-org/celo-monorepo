@@ -43,7 +43,7 @@ rm -rf $BUILD_DIR_2 && mkdir -p $BUILD_DIR_2
 mv build/contracts $BUILD_DIR_2
 
 REPORT_FLAG=""
-if [ -z "$REPORT" ]; then
+if [ ! -z "$REPORT" ]; then
   REPORT_FLAG="-f "$REPORT
 fi
 
