@@ -1,4 +1,4 @@
-import { Address, ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
+import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
@@ -248,16 +248,4 @@ export function recoverKeyIndex(
     }
   }
   throw new Error('Unable to generate recovery key from signature.')
-}
-
-/**
- * Maps the publicKey to its address
- */
-export function getAddressFromPublicKey(publicKey: BigNumber): Address {
-  const pkBuffer = ethUtil.toBuffer(ensureLeading0x(publicKey.toString(16)))
-  if (!ethUtil.isValidPublic(pkBuffer, true)) {
-    throw new Error(`Invalid secp256k1 public key ${publicKey}`)
-  }
-  const address = ethUtil.pubToAddress(pkBuffer, true)
-  return ensureLeading0x(address.toString('hex'))
 }

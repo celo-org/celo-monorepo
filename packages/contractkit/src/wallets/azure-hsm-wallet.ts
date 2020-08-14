@@ -1,7 +1,6 @@
-import { Address } from '@celo/utils/lib/address'
+import { Address, publicKeyToAddress } from '@celo/utils/lib/address'
 import debugFactory from 'debug'
 import { AzureKeyVaultClient } from '../utils/azure-key-vault-client'
-import { getAddressFromPublicKey } from '../utils/signing-utils'
 import { RemoteWallet } from './remote-wallet'
 import { AzureHSMSigner } from './signers/azure-hsm-signer'
 import { Signer } from './signers/signer'
@@ -56,6 +55,6 @@ export class AzureHSMWallet extends RemoteWallet implements Wallet {
       throw new Error('AzureHSMWallet needs to be initialized first')
     }
     const publicKey = await this.keyVaultClient!.getPublicKey(keyName)
-    return getAddressFromPublicKey(publicKey)
+    return publicKeyToAddress(publicKey.toString(16)).toLowerCase()
   }
 }

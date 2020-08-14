@@ -1,10 +1,10 @@
-import { Address } from '@celo/utils/lib/address'
+import { Address, publicKeyToAddress } from '@celo/utils/lib/address'
 import { KMS } from 'aws-sdk'
 import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
 import { publicKeyFromAsn1 } from '../utils/ber-utils'
 import { bigNumberToBuffer, bufferToBigNumber } from '../utils/signature-utils'
-import { getAddressFromPublicKey, publicKeyPrefix, sixtyFour } from '../utils/signing-utils'
+import { publicKeyPrefix, sixtyFour } from '../utils/signing-utils'
 import { RemoteWallet } from './remote-wallet'
 import AwsHsmSigner from './signers/aws-hsm-signer'
 import { Signer } from './signers/signer'
@@ -49,7 +49,7 @@ export default class AwsHsmWallet extends RemoteWallet implements Wallet {
         }
 
         const publicKey = await this.getPublicKeyFromKeyId(KeyId)
-        const address = getAddressFromPublicKey(publicKey)
+        const address = publicKeyToAddress(publicKey.toString(16))
         addressToSigner.set(address, new AwsHsmSigner(this.kms, KeyId, publicKey))
       } catch (e) {
         // Safely ignore non-secp256k1 keys
@@ -86,6 +86,6 @@ export default class AwsHsmWallet extends RemoteWallet implements Wallet {
    */
   async getAddressFromKeyId(keyId: string): Promise<Address> {
     const publicKey = await this.getPublicKeyFromKeyId(keyId)
-    return getAddressFromPublicKey(publicKey)
+    return publicKeyToAddress(publicKey.toString(16))
   }
 }
