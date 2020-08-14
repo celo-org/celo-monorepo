@@ -1,11 +1,11 @@
 import * as BlsBlindingClient from './bls-blinding-client'
 import * as Matchmaking from './matchmaking'
 import * as PhoneNumberIdentifier from './phone-number-identifier'
-import * as PhoneNumberLookup from './phone-number-lookup'
+import * as Query from './query'
 
-export const PNPUtils = {
+export const OdisUtils = {
   BlsBlindingClient,
-  PhoneNumberLookup,
+  Query,
   Matchmaking,
   PhoneNumberIdentifier,
 }
