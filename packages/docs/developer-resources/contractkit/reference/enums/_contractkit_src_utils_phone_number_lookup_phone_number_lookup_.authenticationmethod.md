@@ -13,7 +13,7 @@
 
 • **ENCRYPTIONKEY**: = "encryption_key"
 
-*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L26)*
+*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L27)*
 
 ___
 
@@ -21,4 +21,4 @@ ___
 
 • **WALLETKEY**: = "wallet_key"
 
-*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L25)*
+*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L26)*
