@@ -37,9 +37,9 @@ import { addStandbyTransaction } from 'src/transactions/actions'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import {
+  newTransactionContext,
   TransactionContext,
   TransactionStatus,
-  newTransactionContext,
 } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { getContractKit, getContractKitAsync } from 'src/web3/contracts'

@@ -29,9 +29,9 @@ import { addStandbyTransaction, removeStandbyTransaction } from 'src/transaction
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import {
+  newTransactionContext,
   TransactionContext,
   TransactionStatus,
-  newTransactionContext,
 } from 'src/transactions/types'
 import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange'
 import { roundDown } from 'src/utils/formatting'
