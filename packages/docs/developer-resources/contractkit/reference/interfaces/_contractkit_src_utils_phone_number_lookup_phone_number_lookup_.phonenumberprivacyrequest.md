@@ -22,7 +22,7 @@
 
 • **account**: *string*
 
-*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L30)*
+*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L31)*
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 • **authenticationMethod**: *[AuthenticationMethod](../enums/_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.authenticationmethod.md)*
 
-*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L32)*
+*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L33)*
 
 ___
 
@@ -38,4 +38,4 @@ ___
 
 • **version**: *string*
 
-*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L31)*
+*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L32)*

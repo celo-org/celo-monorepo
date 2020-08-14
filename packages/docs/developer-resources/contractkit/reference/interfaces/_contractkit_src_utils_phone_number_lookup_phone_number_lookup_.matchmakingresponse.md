@@ -17,7 +17,7 @@
 
 • **matchedContacts**: *Array‹object›*
 
-*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L53)*
+*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L55)*
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **success**: *boolean*
 
-*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L52)*
+*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L54)*

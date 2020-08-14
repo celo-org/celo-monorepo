@@ -17,7 +17,7 @@
 
 • **combinedSignature**: *string*
 
-*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L48)*
+*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L50)*
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **success**: *boolean*
 
-*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L47)*
+*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L49)*

@@ -17,7 +17,7 @@
 
 • **pgpnpPubKey**: *string*
 
-*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L64)*
+*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L68)*
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **pgpnpUrl**: *string*
 
-*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L63)*
+*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:67](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L67)*
