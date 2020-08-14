@@ -324,7 +324,7 @@ ___
 
 ###  getValidatorSignerIndex
 
-▸ **getValidatorSignerIndex**(`validatorOrSignerAddress`: [Address](../modules/_base_.md#address), `blockNumber`: number): *Promise‹any›*
+▸ **getValidatorSignerIndex**(`validatorOrSignerAddress`: [Address](../modules/_base_.md#address), `blockNumber`: number): *Promise‹number›*
 
 *Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:179](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L179)*
 
@@ -337,7 +337,7 @@ Name | Type | Description |
 `validatorOrSignerAddress` | [Address](../modules/_base_.md#address) | Address of the validator account or signer. |
 `blockNumber` | number | Block at which to determine the signer index.  |
 
-**Returns:** *Promise‹any›*
+**Returns:** *Promise‹number›*
 
 ___
 
@@ -385,7 +385,7 @@ ___
 
 ###  wasValidatorDown
 
-▸ **wasValidatorDown**(`validatorOrSignerAddress`: [Address](../modules/_base_.md#address), `startBlocks`: number[], `endBlocks`: number[]): *Promise‹unknown›*
+▸ **wasValidatorDown**(`validatorOrSignerAddress`: [Address](../modules/_base_.md#address), `startBlocks`: number[], `endBlocks`: number[]): *Promise‹boolean›*
 
 *Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:152](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L152)*
 
@@ -400,7 +400,7 @@ Name | Type | Description |
 `startBlocks` | number[] | A list of interval start blocks for which signature bitmaps have already been set. |
 `endBlocks` | number[] | A list of interval end blocks for which signature bitmaps have already been set. |
 
-**Returns:** *Promise‹unknown›*
+**Returns:** *Promise‹boolean›*
 
 True if the validator signature does not appear in any block within the window.
 
@@ -408,7 +408,7 @@ ___
 
 ###  wasValidatorDownForInterval
 
-▸ **wasValidatorDownForInterval**(`validatorOrSignerAddress`: [Address](../modules/_base_.md#address), `startBlock`: number, `endBlock`: number): *Promise‹unknown›*
+▸ **wasValidatorDownForInterval**(`validatorOrSignerAddress`: [Address](../modules/_base_.md#address), `startBlock`: number, `endBlock`: number): *Promise‹boolean›*
 
 *Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:118](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L118)*
 
@@ -422,4 +422,4 @@ Name | Type | Description |
 `startBlock` | number | First block of the interval. |
 `endBlock` | number | Last block of the interval.  |
 
-**Returns:** *Promise‹unknown›*
+**Returns:** *Promise‹boolean›*

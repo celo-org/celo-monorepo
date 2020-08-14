@@ -246,7 +246,7 @@ ___
 
 ###  submitOrConfirmTransaction
 
-▸ **submitOrConfirmTransaction**(`destination`: string, `txObject`: TransactionObject‹any›, `value`: string): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹unknown››*
+▸ **submitOrConfirmTransaction**(`destination`: string, `txObject`: TransactionObject‹any›, `value`: string): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void› | [CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹string››*
 
 *Defined in [contractkit/src/wrappers/MultiSig.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L36)*
 
@@ -262,4 +262,4 @@ Name | Type | Default |
 `txObject` | TransactionObject‹any› | - |
 `value` | string | "0" |
 
-**Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹unknown››*
+**Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void› | [CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹string››*

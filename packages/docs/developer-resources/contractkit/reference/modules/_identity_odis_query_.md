@@ -38,7 +38,7 @@
 
 ###  queryOdis
 
-▸ **queryOdis**<**ResponseType**>(`signer`: [AuthSigner](_identity_odis_query_.md#authsigner), `body`: [PhoneNumberPrivacyRequest](../interfaces/_identity_odis_query_.phonenumberprivacyrequest.md), `context`: [ServiceContext](../interfaces/_identity_odis_query_.servicecontext.md), `endpoint`: string): *Promise‹any›*
+▸ **queryOdis**<**ResponseType**>(`signer`: [AuthSigner](_identity_odis_query_.md#authsigner), `body`: [PhoneNumberPrivacyRequest](../interfaces/_identity_odis_query_.phonenumberprivacyrequest.md), `context`: [ServiceContext](../interfaces/_identity_odis_query_.servicecontext.md), `endpoint`: string): *Promise‹ResponseType›*
 
 *Defined in [contractkit/src/identity/odis/query.ts:78](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L78)*
 
@@ -57,4 +57,4 @@ Name | Type | Description |
 `context` | [ServiceContext](../interfaces/_identity_odis_query_.servicecontext.md) | contains service URL |
 `endpoint` | string | endpoint to hit  |
 
-**Returns:** *Promise‹any›*
+**Returns:** *Promise‹ResponseType›*

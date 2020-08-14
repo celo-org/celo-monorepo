@@ -911,7 +911,7 @@ Contract address
 
 ###  approve
 
-▸ **approve**(`proposalID`: BigNumber.Value): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹unknown››*
+▸ **approve**(`proposalID`: BigNumber.Value): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean››*
 
 *Defined in [contractkit/src/wrappers/Governance.ts:647](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L647)*
 
@@ -925,13 +925,13 @@ Name | Type | Description |
 ------ | ------ | ------ |
 `proposalID` | BigNumber.Value | Governance proposal UUID |
 
-**Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹unknown››*
+**Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean››*
 
 ___
 
 ###  execute
 
-▸ **execute**(`proposalID`: BigNumber.Value): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹unknown››*
+▸ **execute**(`proposalID`: BigNumber.Value): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean››*
 
 *Defined in [contractkit/src/wrappers/Governance.ts:684](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L684)*
 
@@ -943,7 +943,7 @@ Name | Type | Description |
 ------ | ------ | ------ |
 `proposalID` | BigNumber.Value | Governance proposal UUID  |
 
-**Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹unknown››*
+**Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean››*
 
 ___
 
@@ -979,7 +979,7 @@ ___
 
 ###  getDequeue
 
-▸ **getDequeue**(`filterZeroes`: boolean): *Promise‹any›*
+▸ **getDequeue**(`filterZeroes`: boolean): *Promise‹BigNumber‹›[]›*
 
 *Defined in [contractkit/src/wrappers/Governance.ts:490](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L490)*
 
@@ -991,7 +991,7 @@ Name | Type | Default |
 ------ | ------ | ------ |
 `filterZeroes` | boolean | false |
 
-**Returns:** *Promise‹any›*
+**Returns:** *Promise‹BigNumber‹›[]›*
 
 ___
 
@@ -1192,7 +1192,7 @@ ___
 
 ###  revokeUpvote
 
-▸ **revokeUpvote**(`upvoter`: [Address](../modules/_base_.md#address)): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹unknown››*
+▸ **revokeUpvote**(`upvoter`: [Address](../modules/_base_.md#address)): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean››*
 
 *Defined in [contractkit/src/wrappers/Governance.ts:634](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L634)*
 
@@ -1204,7 +1204,7 @@ Name | Type | Description |
 ------ | ------ | ------ |
 `upvoter` | [Address](../modules/_base_.md#address) | Address of upvoter  |
 
-**Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹unknown››*
+**Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean››*
 
 ___
 
@@ -1256,7 +1256,7 @@ ___
 
 ###  upvote
 
-▸ **upvote**(`proposalID`: BigNumber.Value, `upvoter`: [Address](../modules/_base_.md#address)): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹unknown››*
+▸ **upvote**(`proposalID`: BigNumber.Value, `upvoter`: [Address](../modules/_base_.md#address)): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean››*
 
 *Defined in [contractkit/src/wrappers/Governance.ts:618](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L618)*
 
@@ -1269,13 +1269,13 @@ Name | Type | Description |
 `proposalID` | BigNumber.Value | Governance proposal UUID |
 `upvoter` | [Address](../modules/_base_.md#address) | Address of upvoter  |
 
-**Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹unknown››*
+**Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean››*
 
 ___
 
 ###  vote
 
-▸ **vote**(`proposalID`: BigNumber.Value, `vote`: keyof typeof VoteValue): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹unknown››*
+▸ **vote**(`proposalID`: BigNumber.Value, `vote`: keyof typeof VoteValue): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean››*
 
 *Defined in [contractkit/src/wrappers/Governance.ts:660](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L660)*
 
@@ -1288,4 +1288,4 @@ Name | Type | Description |
 `proposalID` | BigNumber.Value | Governance proposal UUID |
 `vote` | keyof typeof VoteValue | Choice to apply (yes, no, abstain)  |
 
-**Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹unknown››*
+**Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean››*
