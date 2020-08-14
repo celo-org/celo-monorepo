@@ -1,4 +1,3 @@
-import { sha256 } from 'ethereumjs-util'
 import { TokenTransactionType, TransactionFeedFragment } from 'src/apollo/types'
 import { ExchangeConfirmationCardProps } from 'src/exchange/ExchangeConfirmationCard'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
@@ -69,10 +68,6 @@ export type ActionTypes =
   | AddHashToStandbyTransactionAction
   | NewTransactionsInFeedAction
   | UpdatedRecentTxRecipientsCacheAction
-
-export const generateStandbyTransactionId = (recipientAddress: string) => {
-  return sha256(recipientAddress + String(Date.now())).toString('hex')
-}
 
 export const addStandbyTransaction = (
   transaction: StandbyTransaction

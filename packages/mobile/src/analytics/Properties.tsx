@@ -457,6 +457,7 @@ interface FeeEventsProperties {
 interface TransactionEventsProperties {
   [TransactionEvents.transaction_start]: {
     txId: string
+    description?: string
     fornoMode?: boolean
   }
   [TransactionEvents.transaction_gas_estimated]: {
