@@ -140,6 +140,10 @@ export abstract class BaseCommand extends LocalCommand {
     }
     const res: ParserOutput<any, any> = this.parse()
     if (res.flags.useLedger) {
+      if (res.flags.usdGas) {
+        console.error('--usdGas is not implemented in the Celo ledger app yet')
+        this.exit(1)
+      }
       let transport: Transport
       try {
         transport = await TransportNodeHid.open('')
