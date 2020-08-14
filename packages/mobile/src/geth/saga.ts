@@ -41,7 +41,7 @@ const INIT_GETH_TIMEOUT = 15000 // ms
 const NEW_BLOCK_TIMEOUT = 30000 // ms
 const GETH_MONITOR_DELAY = 5000 // ms
 
-enum GethInitOutcomes {
+export enum GethInitOutcomes {
   SUCCESS = 'SUCCESS',
   NETWORK_ERROR_FETCHING_STATIC_NODES = 'NETWORK_ERROR_FETCHING_STATIC_NODES',
   IRRECOVERABLE_FAILURE = 'IRRECOVERABLE_FAILURE',
@@ -111,7 +111,7 @@ export function* waitForNextBlock() {
   }
 }
 
-function* waitForGethInstance() {
+export function* waitForGethInstance() {
   try {
     const fornoMode = yield select(fornoSelector)
     // get geth without starting if fornoMode
@@ -127,6 +127,7 @@ function* waitForGethInstance() {
       case FailedToFetchGenesisBlockError:
         return GethInitOutcomes.NETWORK_ERROR_FETCHING_GENESIS_BLOCK
       default: {
+        throw error
         Logger.error(TAG, 'Error getting geth instance', error)
         return GethInitOutcomes.IRRECOVERABLE_FAILURE
       }

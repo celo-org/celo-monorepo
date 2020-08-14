@@ -1,3 +1,4 @@
+import { GoogleStorageUtils } from '@celo/contractkit/lib/network-utils/google-storage-utils'
 import BigNumber from 'bignumber.js'
 import crypto from 'crypto'
 import Web3 from 'web3'
@@ -102,3 +103,11 @@ enum AuthenticationMethod {
   WALLETKEY = 'wallet_key',
   ENCRYPTIONKEY = 'encryption_key',
 }
+
+export const GenesisBlockUtils = jest.fn()
+GenesisBlockUtils.getGenesisBlockAsync = jest.fn()
+GenesisBlockUtils.getChainIdFromGenesis = jest.fn()
+
+export const StaticNodeUtils = jest.fn().mockImplementation()
+StaticNodeUtils.getStaticNodesAsync = jest.fn()
+StaticNodeUtils.getStaticNodesGoogleStorageBucketName = jest.fn()
