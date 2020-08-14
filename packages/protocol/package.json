@@ -50,7 +50,7 @@
     "chai-subset": "^1.6.0",
     "csv-parser": "^2.0.0",
     "csv-stringify": "^4.3.1",
-    "elliptic": "^6.4.1",
+    "elliptic": "6.5.3",
     "ethereumjs-util": "^5.2.0",
     "ethereumjs-vm": "^2.4.0",
     "ethereumjs-wallet": "^0.6.3",

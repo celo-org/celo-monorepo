@@ -8,6 +8,8 @@ Abstract class representing a remote wallet that requires async initialization
 
   ↳ **RemoteWallet**
 
+  ↳ [AwsHsmWallet](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md)
+
   ↳ [AzureHSMWallet](_contractkit_src_wallets_azure_hsm_wallet_.azurehsmwallet.md)
 
   ↳ [LedgerWallet](_contractkit_src_wallets_ledger_wallet_.ledgerwallet.md)

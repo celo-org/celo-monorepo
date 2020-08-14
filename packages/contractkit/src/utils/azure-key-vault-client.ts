@@ -5,7 +5,7 @@ import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
 import { ec as EC } from 'elliptic'
 import { bigNumberToBuffer, bufferToBigNumber, isCanonical, Signature } from './signature-utils'
-import { recoverKeyIndex } from './signing-utils'
+import { publicKeyPrefix, recoverKeyIndex } from './signing-utils'
 
 const debug = debugFactory('kit:wallet:akv-client')
 
@@ -19,10 +19,6 @@ export class AzureKeyVaultClient {
   private readonly credential: DefaultAzureCredential
   private readonly keyClient: KeyClient
   private readonly SIGNING_ALGORITHM: string = 'ECDSA256'
-
-  // 0x04 prefix indicates that the key is not compressed
-  // https://tools.ietf.org/html/rfc5480#section-2.2
-  private readonly publicKeyPrefix: number = 0x04
   private readonly secp256k1Curve = new EC('secp256k1')
   private cryptographyClientSet: Map<string, CryptographyClient> = new Map<
     string,
@@ -51,7 +47,7 @@ export class AzureKeyVaultClient {
   public async getPublicKey(keyName: string): Promise<BigNumber> {
     const signingKey = await this.getKey(keyName)
 
-    const pubKeyPrefix = Buffer.from(new Uint8Array([this.publicKeyPrefix]))
+    const pubKeyPrefix = Buffer.from(new Uint8Array([publicKeyPrefix]))
     const rawPublicKey = Buffer.concat([
       pubKeyPrefix,
       Buffer.from(signingKey.key!.x!),

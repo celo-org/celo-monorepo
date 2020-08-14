@@ -1,10 +1,15 @@
-# Class: AzureHSMWallet
+# Class: AwsHsmWallet
+
+A Cloud HSM wallet built on AWS KMS
+https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/KMS.html
+When using the default credentials, it's expected to set the
+aws_access_key_id and aws_secret_access_key in ~/.aws/credentials
 
 ## Hierarchy
 
   ↳ [RemoteWallet](_contractkit_src_wallets_remote_wallet_.remotewallet.md)
 
-  ↳ **AzureHSMWallet**
+  ↳ **AwsHsmWallet**
 
 ## Implements
 
@@ -16,34 +21,34 @@
 
 ### Constructors
 
-* [constructor](_contractkit_src_wallets_azure_hsm_wallet_.azurehsmwallet.md#constructor)
+* [constructor](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md#constructor)
 
 ### Methods
 
-* [getAccounts](_contractkit_src_wallets_azure_hsm_wallet_.azurehsmwallet.md#getaccounts)
-* [getAddressFromKeyName](_contractkit_src_wallets_azure_hsm_wallet_.azurehsmwallet.md#getaddressfromkeyname)
-* [hasAccount](_contractkit_src_wallets_azure_hsm_wallet_.azurehsmwallet.md#hasaccount)
-* [init](_contractkit_src_wallets_azure_hsm_wallet_.azurehsmwallet.md#init)
-* [isSetupFinished](_contractkit_src_wallets_azure_hsm_wallet_.azurehsmwallet.md#issetupfinished)
-* [signPersonalMessage](_contractkit_src_wallets_azure_hsm_wallet_.azurehsmwallet.md#signpersonalmessage)
-* [signTransaction](_contractkit_src_wallets_azure_hsm_wallet_.azurehsmwallet.md#signtransaction)
-* [signTypedData](_contractkit_src_wallets_azure_hsm_wallet_.azurehsmwallet.md#signtypeddata)
+* [getAccounts](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md#getaccounts)
+* [getAddressFromKeyId](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md#getaddressfromkeyid)
+* [hasAccount](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md#hasaccount)
+* [init](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md#init)
+* [isSetupFinished](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md#issetupfinished)
+* [signPersonalMessage](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md#signpersonalmessage)
+* [signTransaction](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md#signtransaction)
+* [signTypedData](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md#signtypeddata)
 
 ## Constructors
 
 ###  constructor
 
-\+ **new AzureHSMWallet**(`vaultName`: string): *[AzureHSMWallet](_contractkit_src_wallets_azure_hsm_wallet_.azurehsmwallet.md)*
+\+ **new AwsHsmWallet**(`awsCredentials?`: KMS.ClientConfiguration): *[AwsHsmWallet](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md)*
 
-*Defined in [contractkit/src/wallets/azure-hsm-wallet.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/azure-hsm-wallet.ts#L15)*
+*Defined in [contractkit/src/wallets/aws-hsm-wallet.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/aws-hsm-wallet.ts#L28)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`vaultName` | string |
+`awsCredentials?` | KMS.ClientConfiguration |
 
-**Returns:** *[AzureHSMWallet](_contractkit_src_wallets_azure_hsm_wallet_.azurehsmwallet.md)*
+**Returns:** *[AwsHsmWallet](_contractkit_src_wallets_aws_hsm_wallet_.awshsmwallet.md)*
 
 ## Methods
 
@@ -63,20 +68,20 @@ Get a list of accounts in the remote wallet
 
 ___
 
-###  getAddressFromKeyName
+###  getAddressFromKeyId
 
-▸ **getAddressFromKeyName**(`keyName`: string): *Promise‹[Address](../modules/_contractkit_src_base_.md#address)›*
+▸ **getAddressFromKeyId**(`keyId`: string): *Promise‹[Address](../modules/_contractkit_src_base_.md#address)›*
 
-*Defined in [contractkit/src/wallets/azure-hsm-wallet.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/azure-hsm-wallet.ts#L54)*
+*Defined in [contractkit/src/wallets/aws-hsm-wallet.ts:87](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/aws-hsm-wallet.ts#L87)*
 
 Returns the EVM address for the given key
 Useful for initially getting the 'from' field given a keyName
 
 **Parameters:**
 
-Name | Type | Description |
------- | ------ | ------ |
-`keyName` | string | Azure KeyVault key name  |
+Name | Type |
+------ | ------ |
+`keyId` | string |
 
 **Returns:** *Promise‹[Address](../modules/_contractkit_src_base_.md#address)›*
 

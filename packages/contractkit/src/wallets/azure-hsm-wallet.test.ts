@@ -76,7 +76,7 @@ describe('AzureHSMWallet class', () => {
             },
             getPublicKey: async (keyName: string): Promise<BigNumber> => {
               if (!keyVaultAddresses.has(keyName)) {
-                throw new Error(`Key ${keyName} not found in KeyVault ${AZURE_VAULT_NAME}`)
+                throw new Error(`A key with (name/id) ${keyName} was not found in this key vault`)
               }
               const privKey = keyVaultAddresses.get(keyName)!.privateKey
               const pubKey = ethUtil.privateToPublic(ethUtil.toBuffer(privKey))
@@ -140,7 +140,9 @@ describe('AzureHSMWallet class', () => {
               await wallet.getAddressFromKeyName(unknownKey)
               throw new Error('Expected exception to be thrown')
             } catch (e) {
-              expect(e.message).toBe(`Key ${unknownKey} not found in KeyVault ${AZURE_VAULT_NAME}`)
+              expect(e.message).toContain(
+                `A key with (name/id) ${unknownKey} was not found in this key vault`
+              )
             }
           })
 

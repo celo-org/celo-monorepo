@@ -10,7 +10,13 @@ import {
   isCanonical,
   Signature,
 } from '../../utils/signature-utils'
-import { getHashFromEncoded, recoverKeyIndex, RLPEncodedTx } from '../../utils/signing-utils'
+import {
+  getHashFromEncoded,
+  recoverKeyIndex,
+  RLPEncodedTx,
+  sixtyFour,
+  thirtyTwo,
+} from '../../utils/signing-utils'
 import { Signer } from './signer'
 
 const SigningAlgorithm = 'ECDSA_SHA_256'
@@ -56,9 +62,13 @@ export default class AwsHsmSigner implements Signer {
 
   private async sign(buffer: Buffer): Promise<Signature> {
     const { R, S } = await this.findCanonicalSignature(buffer)
-    const rBuff = bigNumberToBuffer(R, 32)
-    const sBuff = bigNumberToBuffer(S, 32)
-    const recoveryParam = recoverKeyIndex(Buffer.concat([rBuff, sBuff], 64), this.publicKey, buffer)
+    const rBuff = bigNumberToBuffer(R, thirtyTwo)
+    const sBuff = bigNumberToBuffer(S, thirtyTwo)
+    const recoveryParam = recoverKeyIndex(
+      Buffer.concat([rBuff, sBuff], sixtyFour),
+      this.publicKey,
+      buffer
+    )
 
     return {
       r: rBuff,
