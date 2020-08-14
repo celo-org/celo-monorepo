@@ -12,6 +12,8 @@ export enum ErrorMessage {
   ERROR_REQUESTING_SIGNATURE = 'CELO_PNP_ERR_09 SIG_ERR Failed to request signature from signer',
   TIMEOUT_FROM_SIGNER = 'CELO_PNP_ERR_10 SIG_ERR Timeout from signer',
   CONTRACT_GET_FAILURE = 'CELO_PNP_ERR_11 SIG_ERR Failed to read contract state',
+  FAILURE_TO_STORE_REQUEST = 'CELO_PNP_ERR_12 DB_ERR Failed to store partial sig request',
+  FAILURE_TO_INCREMENT_QUERY_COUNT = 'CELO_PNP_ERR_13 DB_ERR Failed to increment user query count',
 }
 
 export enum WarningMessage {
@@ -20,4 +22,5 @@ export enum WarningMessage {
   EXCEEDED_QUOTA = 'CELO_PNP_WARN_03 QUOTA Requester exceeded service query quota',
   UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE = 'CELO_PNP_WARN_04 QUOTA Unverified user attempting to matchmake',
   DUPLICATE_REQUEST_TO_MATCHMAKE = 'CELO_PNP_WARN_05 QUOTA Attempt to request >1 matchmaking',
+  DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG = 'CELO_PNP_WARN_06 BAD_INPUT Attempt to replay partial sig request',
 }
