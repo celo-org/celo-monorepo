@@ -28,6 +28,7 @@ export enum Screens {
   IncomingPaymentRequestListScreen = 'IncomingPaymentRequestListScreen',
   Invite = 'Invite',
   InviteReview = 'InviteReview',
+  LanguageModal = 'LanguageModal',
   Language = 'Language',
   Licenses = 'Licenses',
   Main = 'Main',
