@@ -4,7 +4,7 @@
  * but keeping it here for now since that's where other account state is
  */
 
-import { PNPUtils } from '@celo/contractkit'
+import { OdisUtils } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { ensureLeading0x, eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
@@ -179,7 +179,7 @@ export function* getAuthSignerForAccount(account: string) {
       } else {
         Logger.info(TAG + 'getAuthSignerForAccount', 'Using DEK for authentication')
         return {
-          authenticationMethod: PNPUtils.PhoneNumberLookup.AuthenticationMethod.ENCRYPTION_KEY,
+          authenticationMethod: OdisUtils.Query.AuthenticationMethod.ENCRYPTION_KEY,
           rawKey: privateDataKey,
         }
       }
@@ -189,7 +189,7 @@ export function* getAuthSignerForAccount(account: string) {
   // Fallback to using wallet key
   Logger.info(TAG + 'getAuthSignerForAccount', 'Using wallet key for authentication')
   return {
-    authenticationMethod: PNPUtils.PhoneNumberLookup.AuthenticationMethod.WALLET_KEY,
+    authenticationMethod: OdisUtils.Query.AuthenticationMethod.WALLET_KEY,
     contractKit,
   }
 }

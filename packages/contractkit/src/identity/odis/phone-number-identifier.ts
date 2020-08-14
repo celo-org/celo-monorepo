@@ -5,11 +5,11 @@ import { soliditySha3 } from 'web3-utils'
 import { BlsBlindingClient, WasmBlsBlindingClient } from './bls-blinding-client'
 import {
   AuthSigner,
-  postToOdis,
+  queryOdis,
   ServiceContext,
   SignMessageRequest,
   SignMessageResponse,
-} from './phone-number-lookup'
+} from './query'
 
 const debug = debugFactory('kit:odis:phone-number-identifier')
 const sha3 = (v: string) => soliditySha3({ type: 'string', value: v })
@@ -59,7 +59,7 @@ export async function getPhoneNumberIdentifier(
     authenticationMethod: signer.authenticationMethod,
   }
 
-  const response = await postToOdis<SignMessageResponse>(
+  const response = await queryOdis<SignMessageResponse>(
     signer,
     body,
     context,

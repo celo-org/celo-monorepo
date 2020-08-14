@@ -5,9 +5,9 @@ import {
   AuthSigner,
   MatchmakingRequest,
   MatchmakingResponse,
-  postToOdis,
+  queryOdis,
   ServiceContext,
-} from './phone-number-lookup'
+} from './query'
 
 const debug = debugFactory('kit:odis:matchmaking')
 
@@ -38,12 +38,7 @@ export async function getContactMatches(
     authenticationMethod: signer.authenticationMethod,
   }
 
-  const response = await postToOdis<MatchmakingResponse>(
-    signer,
-    body,
-    context,
-    MATCHMAKING_ENDPOINT
-  )
+  const response = await queryOdis<MatchmakingResponse>(signer, body, context, MATCHMAKING_ENDPOINT)
 
   const matchHashes: string[] = response.matchedContacts.map((match) => match.phoneNumber)
 

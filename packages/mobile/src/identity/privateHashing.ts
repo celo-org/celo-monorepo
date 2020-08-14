@@ -1,5 +1,5 @@
-import { PNPUtils } from '@celo/contractkit'
-import { PhoneNumberHashDetails } from '@celo/contractkit/lib/utils/phone-number-lookup/phone-number-identifier'
+import { OdisUtils } from '@celo/contractkit'
+import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import { getPhoneHash, isE164Number, PhoneNumberUtils } from '@celo/utils/src/phoneNumbers'
 import DeviceInfo from 'react-native-device-info'
 import { call, put, select } from 'redux-saga/effects'
@@ -79,7 +79,7 @@ function* doFetchPhoneHashPrivate(e164Number: string) {
     account,
     selfPhoneHash
   )
-  yield put(updateE164PhoneNumberSalts({ [e164Number]: details.salt }))
+  yield put(updateE164PhoneNumberSalts({ [e164Number]: details.pepper }))
   return details
 }
 
@@ -93,9 +93,7 @@ function* getPhoneHashPrivate(e164Number: string, account: string, selfPhoneHash
 
   const authSigner = yield call(getAuthSignerForAccount, account)
   // Unlock the account if the authentication is signed by the wallet
-  if (
-    authSigner.authenticationMethod === PNPUtils.PhoneNumberLookup.AuthenticationMethod.WALLET_KEY
-  ) {
+  if (authSigner.authenticationMethod === OdisUtils.Query.AuthenticationMethod.WALLET_KEY) {
     const success: boolean = yield call(unlockAccount, account)
     if (!success) {
       throw new Error(ErrorMessages.INCORRECT_PIN)
@@ -106,7 +104,7 @@ function* getPhoneHashPrivate(e164Number: string, account: string, selfPhoneHash
   const blsBlindingClient = new ReactBlsBlindingClient(odisPubKey)
   try {
     return yield call(
-      PNPUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier,
+      OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier,
       e164Number,
       account,
       authSigner,
@@ -140,7 +138,7 @@ export function* getUserSelfPhoneHashDetails() {
 
   const details: PhoneNumberHashDetails = {
     e164Number,
-    salt,
+    pepper: salt,
     phoneHash: PhoneNumberUtils.getPhoneHash(e164Number, salt),
   }
 

@@ -6,7 +6,7 @@ import debugFactory from 'debug'
 import { ec as EC } from 'elliptic'
 import { ContractKit } from '../../kit'
 
-const debug = debugFactory('kit:odis:phone-number-lookup')
+const debug = debugFactory('kit:odis:query')
 const ec = new EC('secp256k1')
 
 export interface WalletKeySigner {
@@ -75,7 +75,7 @@ export interface ServiceContext {
  * @param context contains service URL
  * @param endpoint endpoint to hit
  */
-export async function postToOdis<ResponseType>(
+export async function queryOdis<ResponseType>(
   signer: AuthSigner,
   body: PhoneNumberPrivacyRequest,
   context: ServiceContext,
@@ -100,7 +100,7 @@ export async function postToOdis<ResponseType>(
     authHeader = await signer.contractKit.web3.eth.sign(bodyString, body.account)
   }
 
-  const { pgpnpUrl } = context
+  const { odisUrl } = context
 
   const dontRetry = [
     ErrorMessages.ODIS_QUOTA_ERROR,
@@ -110,7 +110,7 @@ export async function postToOdis<ResponseType>(
 
   return selectiveRetryAsyncWithBackOff(
     async () => {
-      const res = await fetch(pgpnpUrl + endpoint, {
+      const res = await fetch(odisUrl + endpoint, {
         method: 'POST',
         headers: {
           Accept: 'application/json',

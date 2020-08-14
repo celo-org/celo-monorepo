@@ -1,5 +1,5 @@
-import { PNPUtils } from '@celo/contractkit'
-import { PhoneNumberHashDetails } from '@celo/contractkit/lib/utils/phone-number-lookup/phone-number-identifier'
+import { OdisUtils } from '@celo/contractkit'
+import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import DeviceInfo from 'react-native-device-info'
 import { call, put } from 'redux-saga/effects'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -31,7 +31,7 @@ export function* fetchContactMatches(e164NumberToRecipients: NumberToRecipient) 
 
   try {
     const matchedE164Number: string[] = yield call(
-      PNPUtils.Matchmaking.getContactMatches,
+      OdisUtils.Matchmaking.getContactMatches,
       selfPhoneDetails.e164Number,
       Object.keys(e164NumberToRecipients),
       account,
