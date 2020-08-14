@@ -1,5 +1,6 @@
 import { OdisUtils } from '@celo/contractkit'
 import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
+import { AuthSigner, ServiceContext } from '@celo/contractkit/lib/identity/odis/query'
 import DeviceInfo from 'react-native-device-info'
 import { call, put } from 'redux-saga/effects'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -27,7 +28,13 @@ export function* fetchContactMatches(e164NumberToRecipients: NumberToRecipient) 
     return
   }
 
-  const authSigner = yield call(getAuthSignerForAccount, account)
+  const authSigner: AuthSigner = yield call(getAuthSignerForAccount, account)
+
+  const { odisPubKey, odisUrl } = networkConfig
+  const serviceContext: ServiceContext = {
+    odisUrl,
+    odisPubKey,
+  }
 
   try {
     const matchedE164Number: string[] = yield call(
@@ -37,7 +44,7 @@ export function* fetchContactMatches(e164NumberToRecipients: NumberToRecipient) 
       account,
       selfPhoneDetails.phoneHash,
       authSigner,
-      networkConfig,
+      serviceContext,
       DeviceInfo.getVersion()
     )
 

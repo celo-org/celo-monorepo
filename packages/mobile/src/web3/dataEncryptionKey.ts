@@ -5,6 +5,7 @@
  */
 
 import { OdisUtils } from '@celo/contractkit'
+import { AuthSigner } from '@celo/contractkit/lib/identity/odis/query'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { ensureLeading0x, eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
@@ -165,7 +166,7 @@ export function* getAuthSignerForAccount(account: string) {
     ])
     const privateDataKey: string | null = yield select(dataEncryptionKeySelector)
     if (!privateDataKey) {
-      Logger.error(TAG + 'getAuthSignerForAccount', 'Missing comment key, should never happen.')
+      Logger.error(TAG + '/getAuthSignerForAccount', 'Missing comment key, should never happen.')
     } else {
       const publicDataKey = compressedPubKey(hexToBuffer(privateDataKey))
       const upToDate: boolean = yield call(
@@ -175,21 +176,23 @@ export function* getAuthSignerForAccount(account: string) {
         publicDataKey
       )
       if (!upToDate) {
-        Logger.error(TAG + 'getAuthSignerForAccount', `DEK mismatch.`)
+        Logger.error(TAG + '/getAuthSignerForAccount', `DEK mismatch.`)
       } else {
-        Logger.info(TAG + 'getAuthSignerForAccount', 'Using DEK for authentication')
-        return {
+        Logger.info(TAG + '/getAuthSignerForAccount', 'Using DEK for authentication')
+        const encyptionKeySigner: AuthSigner = {
           authenticationMethod: OdisUtils.Query.AuthenticationMethod.ENCRYPTION_KEY,
           rawKey: privateDataKey,
         }
+        return encyptionKeySigner
       }
     }
   }
 
   // Fallback to using wallet key
-  Logger.info(TAG + 'getAuthSignerForAccount', 'Using wallet key for authentication')
-  return {
+  Logger.info(TAG + '/getAuthSignerForAccount', 'Using wallet key for authentication')
+  const walletKeySigner: AuthSigner = {
     authenticationMethod: OdisUtils.Query.AuthenticationMethod.WALLET_KEY,
     contractKit,
   }
+  return walletKeySigner
 }

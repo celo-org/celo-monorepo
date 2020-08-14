@@ -1,5 +1,6 @@
 import { OdisUtils } from '@celo/contractkit'
 import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
+import { AuthSigner, ServiceContext } from '@celo/contractkit/lib/identity/odis/query'
 import { getPhoneHash, isE164Number, PhoneNumberUtils } from '@celo/utils/src/phoneNumbers'
 import DeviceInfo from 'react-native-device-info'
 import { call, put, select } from 'redux-saga/effects'
@@ -91,7 +92,7 @@ function* getPhoneHashPrivate(e164Number: string, account: string, selfPhoneHash
     throw new Error(ErrorMessages.INVALID_PHONE_NUMBER)
   }
 
-  const authSigner = yield call(getAuthSignerForAccount, account)
+  const authSigner: AuthSigner = yield call(getAuthSignerForAccount, account)
   // Unlock the account if the authentication is signed by the wallet
   if (authSigner.authenticationMethod === OdisUtils.Query.AuthenticationMethod.WALLET_KEY) {
     const success: boolean = yield call(unlockAccount, account)
@@ -100,7 +101,11 @@ function* getPhoneHashPrivate(e164Number: string, account: string, selfPhoneHash
     }
   }
 
-  const { odisPubKey } = networkConfig
+  const { odisPubKey, odisUrl } = networkConfig
+  const serviceContext: ServiceContext = {
+    odisUrl,
+    odisPubKey,
+  }
   const blsBlindingClient = new ReactBlsBlindingClient(odisPubKey)
   try {
     return yield call(
@@ -108,7 +113,7 @@ function* getPhoneHashPrivate(e164Number: string, account: string, selfPhoneHash
       e164Number,
       account,
       authSigner,
-      networkConfig,
+      serviceContext,
       selfPhoneHash,
       DeviceInfo.getVersion(),
       blsBlindingClient
