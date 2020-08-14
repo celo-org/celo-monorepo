@@ -321,4 +321,12 @@ exports[`CeloExchangeButtons renders correctly 1`] = `
 </View>
 `;
 
-exports[`CeloExchangeButtons returns null when there's no CELO and dollar balance 1`] = `null`;
+exports[`CeloExchangeButtons returns null when there's no CELO and dollar balance 1`] = `
+<View
+  style={
+    Object {
+      "marginTop": 24,
+    }
+  }
+/>
+`;
