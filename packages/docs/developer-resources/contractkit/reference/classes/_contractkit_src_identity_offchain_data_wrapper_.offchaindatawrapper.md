@@ -27,7 +27,7 @@
 
 \+ **new OffchainDataWrapper**(`self`: string, `kit`: [ContractKit](_contractkit_src_kit_.contractkit.md)): *[OffchainDataWrapper](_contractkit_src_identity_offchain_data_wrapper_.offchaindatawrapper.md)*
 
-*Defined in [contractkit/src/identity/offchain-data-wrapper.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L12)*
+*Defined in [contractkit/src/identity/offchain-data-wrapper.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L13)*
 
 **Parameters:**
 
@@ -44,7 +44,7 @@ Name | Type |
 
 • **kit**: *[ContractKit](_contractkit_src_kit_.contractkit.md)*
 
-*Defined in [contractkit/src/identity/offchain-data-wrapper.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L14)*
+*Defined in [contractkit/src/identity/offchain-data-wrapper.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L15)*
 
 ___
 
@@ -52,7 +52,7 @@ ___
 
 • **self**: *string*
 
-*Defined in [contractkit/src/identity/offchain-data-wrapper.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L14)*
+*Defined in [contractkit/src/identity/offchain-data-wrapper.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L15)*
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 • **storageWriter**: *[StorageWriter](_contractkit_src_identity_offchain_storage_writers_.storagewriter.md) | undefined*
 
-*Defined in [contractkit/src/identity/offchain-data-wrapper.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L12)*
+*Defined in [contractkit/src/identity/offchain-data-wrapper.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L13)*
 
 ## Methods
 
@@ -68,7 +68,7 @@ ___
 
 ▸ **readDataFrom**(`account`: string, `dataPath`: string): *Promise‹any›*
 
-*Defined in [contractkit/src/identity/offchain-data-wrapper.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L16)*
+*Defined in [contractkit/src/identity/offchain-data-wrapper.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L17)*
 
 **Parameters:**
 
@@ -85,7 +85,7 @@ ___
 
 ▸ **writeDataTo**(`data`: string, `dataPath`: string): *Promise‹void›*
 
-*Defined in [contractkit/src/identity/offchain-data-wrapper.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L40)*
+*Defined in [contractkit/src/identity/offchain-data-wrapper.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L41)*
 
 **Parameters:**
 

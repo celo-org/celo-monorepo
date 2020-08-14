@@ -1,4 +1,4 @@
-import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
+import { ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
 import { Decrypt } from '@celo/utils/lib/ecies'
 // @ts-ignore-next-line
 import { account as Account } from 'eth-lib'

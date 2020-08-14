@@ -29,7 +29,7 @@
 
 ▸ **addAccount**(`privateKey`: string): *void*
 
-*Defined in [contractkit/src/wallets/local-wallet.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/local-wallet.ts#L10)*
+*Defined in [contractkit/src/wallets/local-wallet.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/local-wallet.ts#L11)*
 
 Register the private key as signer account
 

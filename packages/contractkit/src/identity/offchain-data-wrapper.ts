@@ -1,5 +1,6 @@
-import { eqAddress } from '@celo/utils/lib/address'
-import { guessSigner, NativeSigner } from '@celo/utils/lib/signatureUtils'
+import { eqAddress } from '@celo/base/lib/address'
+import { NativeSigner } from '@celo/base/lib/signatureUtils'
+import { guessSigner } from '@celo/utils/lib/signatureUtils'
 import debugFactory from 'debug'
 import { toChecksumAddress } from 'web3-utils'
 import { ContractKit } from '../kit'

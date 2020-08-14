@@ -1,4 +1,4 @@
-import { Lock } from '@celo/utils/lib/lock'
+import { Lock } from '@celo/base/lib/lock'
 import debugFactory from 'debug'
 import { provider } from 'web3-core'
 import { Callback, JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'

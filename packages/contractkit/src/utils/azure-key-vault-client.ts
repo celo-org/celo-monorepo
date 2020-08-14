@@ -1,7 +1,7 @@
 import { DefaultAzureCredential } from '@azure/identity'
 import { CryptographyClient, KeyClient, KeyVaultKey } from '@azure/keyvault-keys'
 import { SecretClient } from '@azure/keyvault-secrets'
-import { ensureLeading0x } from '@celo/utils/lib/address'
+import { ensureLeading0x } from '@celo/base/lib/address'
 import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
 import { ec as EC } from 'elliptic'
