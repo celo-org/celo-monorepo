@@ -17,20 +17,11 @@ import { basename, join } from 'path'
  *   network: The network for which artifacts should be
  *
  * Run using truffle exec, e.g.:
- * truffle exec scripts/truffle/make-release --report TODO
+ * truffle exec scripts/truffle/make-release \
+ *   --network alfajores --build_directory build/alfajores/ --report report.json \
+ *   --initialize_data initialize_data.json --proposal proposal.json
  *
  */
-
-/*
-const linkLibraries = async () => {
-  // How to get libAddress???
-  const libAddress = '0x123456789009876543211234567890098765432112345678900987654321'
-  Object.keys(linkedLibraries).forEach(async (lib: string) => {
-    const Contracts = linkedLibraries[lib].map((contract: string) => artifacts.require(contract))
-    await Promise.all(Contracts.map((C) => C.link(lib, libAddress))
-  })
-}
-*/
 
 class ContractDependencies {
   dependencies: Map<string, string[]>
@@ -152,6 +143,16 @@ module.exports = async (callback: (error?: any) => number) => {
             )
           }
           if (deployProxy || isLibrary) {
+            // Explicitly forbid upgrading to a new Governance proxy contract.
+            // Upgrading to a new Governance proxy contract would require ownership of all
+            // contracts to be moved to the new governance contract, possibly including contracts
+            // deployed in this script.
+            // Because this depends on ordering (i.e. was the new GovernanceProxy deployed
+            // before or after other contracts in this script?), and that ordering is not being
+            // checked, fail if there are storage incompatible changes to Governance.
+            if (contractName == 'Governance') {
+              throw new Error(`Storage incompatible changes to Governance are not yet supported`)
+            }
             console.log(`Deploying ${contractName}Proxy`)
             const Proxy = await artifacts.require(`${contractName}Proxy`)
             const proxy = await Proxy.new()
@@ -173,8 +174,7 @@ module.exports = async (callback: (error?: any) => number) => {
             } else {
               await proxy._setImplementation(contract.address)
             }
-            // TODO(asa): This makes essentially every contract dependent on Governance.
-            // How to handle?
+            // This makes essentially every contract dependent on Governance.
             console.log(`Transferring ownership of ${contractName}Proxy to Governance`)
             await proxy._transferOwnership(addresses.get('Governance'))
             const proxiedContract = await artifacts.require(contractName).at(proxy.address)
@@ -184,8 +184,6 @@ module.exports = async (callback: (error?: any) => number) => {
             if (transferOwnershipAbi) {
               console.log(`Transferring ownership of ${contractName} to Governance`)
               await proxiedContract.transferOwnership(addresses.get('Governance'))
-            } else {
-              console.log(`${contractName} is not ownable`)
             }
             // 4. Update the contract's address, if needed.
             addresses.set(contractName, proxy.address)
