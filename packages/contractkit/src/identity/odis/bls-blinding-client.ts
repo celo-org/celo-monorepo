@@ -8,11 +8,11 @@ export interface BlsBlindingClient {
 export class WasmBlsBlindingClient implements BlsBlindingClient {
   private thresholdBls: any
   private blindedValue: any
-  private pgpnpPubKey: Uint8Array
+  private odisPubKey: Uint8Array
   private rawMessage: Buffer | undefined
 
-  constructor(pgpnpPubKey: string) {
-    this.pgpnpPubKey = Buffer.from(pgpnpPubKey, 'base64')
+  constructor(odisPubKey: string) {
+    this.odisPubKey = Buffer.from(odisPubKey, 'base64')
     // Dynamically load the Wasm library
     if (!this.isReactNativeEnvironment()) {
       this.thresholdBls = require('blind-threshold-bls')
@@ -38,7 +38,7 @@ export class WasmBlsBlindingClient implements BlsBlindingClient {
       this.blindedValue.blindingFactor
     )
     // this throws on error
-    await this.thresholdBls.verify(this.pgpnpPubKey, this.rawMessage, unblindMessage)
+    await this.thresholdBls.verify(this.odisPubKey, this.rawMessage, unblindMessage)
     return unblindMessage
   }
 

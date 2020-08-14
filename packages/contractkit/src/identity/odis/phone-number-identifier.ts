@@ -5,23 +5,23 @@ import { soliditySha3 } from 'web3-utils'
 import { BlsBlindingClient, WasmBlsBlindingClient } from './bls-blinding-client'
 import {
   AuthSigner,
-  postToPhoneNumPrivacyService,
+  queryOdis,
   ServiceContext,
   SignMessageRequest,
   SignMessageResponse,
-} from './phone-number-lookup'
+} from './query'
 
+const debug = debugFactory('kit:odis:phone-number-identifier')
 const sha3 = (v: string) => soliditySha3({ type: 'string', value: v })
 
-const debug = debugFactory('kit:phone-number-lookup:phone-number-identifier')
-
-const SALT_CHAR_LENGTH = 13
+const PEPPER_CHAR_LENGTH = 13
+// TODO change to /getBlindedMessageSig when combiners are updated in Alfajores and Mainnet
 const SIGN_MESSAGE_ENDPOINT = '/getDistributedBlindedSalt'
 
 export interface PhoneNumberHashDetails {
   e164Number: string
   phoneHash: string
-  salt: string
+  pepper: string
 }
 
 /**
@@ -36,7 +36,7 @@ export async function getPhoneNumberIdentifier(
   clientVersion?: string,
   blsBlindingClient?: BlsBlindingClient
 ): Promise<PhoneNumberHashDetails> {
-  debug('Getting phone number salt')
+  debug('Getting phone number pepper')
 
   if (!isE164Number(e164Number)) {
     throw new Error(`Invalid phone number: ${e164Number}`)
@@ -44,7 +44,7 @@ export async function getPhoneNumberIdentifier(
   // Fallback to using Wasm version if not specified
   if (!blsBlindingClient) {
     debug('No BLSBlindingClient found, using WasmBlsBlindingClient')
-    blsBlindingClient = new WasmBlsBlindingClient(context.pgpnpPubKey)
+    blsBlindingClient = new WasmBlsBlindingClient(context.odisPubKey)
   }
 
   debug('Retrieving blinded message')
@@ -60,7 +60,7 @@ export async function getPhoneNumberIdentifier(
     authenticationMethod: signer.authenticationMethod,
   }
 
-  const response = await postToPhoneNumPrivacyService<SignMessageResponse>(
+  const response = await queryOdis<SignMessageResponse>(
     signer,
     body,
     context,
@@ -71,19 +71,18 @@ export async function getPhoneNumberIdentifier(
   const base64UnblindedSig = await blsBlindingClient.unblindAndVerifyMessage(base64BlindSig)
   const sigBuf = Buffer.from(base64UnblindedSig, 'base64')
 
-  debug('Converting sig to salt')
-  const salt = getSaltFromThresholdSignature(sigBuf)
-  const phoneHash = getPhoneHash(sha3, e164Number, salt)
-  return { e164Number, phoneHash, salt }
+  debug('Converting sig to pepper')
+  const pepper = getPepperFromThresholdSignature(sigBuf)
+  const phoneHash = getPhoneHash(sha3, e164Number, pepper)
+  return { e164Number, phoneHash, pepper }
 }
 
-// This is the algorithm that creates a salt from the unblinded message signatures
+// This is the algorithm that creates a pepper from the unblinded message signatures
 // It simply hashes it with sha256 and encodes it to hex
-// If we ever need to compute salts anywhere other than here then we should move this to the utils package
-export function getSaltFromThresholdSignature(sigBuf: Buffer) {
-  // Currently uses 13 chars for a 78 bit salt
+export function getPepperFromThresholdSignature(sigBuf: Buffer) {
+  // Currently uses 13 chars for a 78 bit pepper
   return createHash('sha256')
     .update(sigBuf)
     .digest('base64')
-    .slice(0, SALT_CHAR_LENGTH)
+    .slice(0, PEPPER_CHAR_LENGTH)
 }

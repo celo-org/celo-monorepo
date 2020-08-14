@@ -1,4 +1,4 @@
-import { PhoneNumberHashDetails } from '@celo/contractkit/lib/utils/phone-number-lookup/phone-number-identifier'
+import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import { IdentifierLookupResult } from '@celo/contractkit/lib/wrappers/Attestations'
 import { hexToBuffer } from '@celo/utils/src/address'
 import { expectSaga } from 'redux-saga-test-plan'
@@ -23,8 +23,8 @@ import {
   mockAccount2,
   mockComment,
   mockE164Number,
-  mockE164NumberHashWithSalt,
-  mockE164NumberSalt,
+  mockE164NumberHashWithPepper,
+  mockE164NumberPepper,
   mockPrivateDEK,
   mockPrivateDEK2,
   mockPublicDEK,
@@ -48,7 +48,7 @@ const complexCommentEnc =
 
 const phoneDetails: PhoneNumberHashDetails = {
   e164Number: mockE164Number,
-  salt: mockE164NumberSalt,
+  pepper: mockE164NumberPepper,
   phoneHash: 'hash',
 }
 
@@ -90,7 +90,7 @@ describe('Encrypt Comment', () => {
   it('Handles comment with metadata enabled', async () => {
     const mockState = getMockStoreData({
       account: { e164PhoneNumber: mockE164Number },
-      identity: { e164NumberToSalt: { [mockE164Number]: mockE164NumberSalt } },
+      identity: { e164NumberToSalt: { [mockE164Number]: mockE164NumberPepper } },
     })
     await expectSaga(encryptComment, simpleComment, mockAccount2, mockAccount, true)
       .withState(mockState)
@@ -134,7 +134,7 @@ describe('Decrypt Comment', () => {
     expect(decryptComment(simpleCommentWithMetadataEnc, mockPrivateDEK2, false)).toMatchObject({
       comment: simpleComment,
       e164Number: mockE164Number,
-      salt: mockE164NumberSalt,
+      salt: mockE164NumberPepper,
     })
   })
 })
@@ -164,7 +164,7 @@ describe(extractPhoneNumberMetadata, () => {
     expect(extractPhoneNumberMetadata(simpleCommentWithMetadata)).toMatchObject({
       comment: simpleComment,
       e164Number: mockE164Number,
-      salt: mockE164NumberSalt,
+      salt: mockE164NumberPepper,
     })
   })
 
@@ -173,7 +173,7 @@ describe(extractPhoneNumberMetadata, () => {
     expect(extractPhoneNumberMetadata(comment)).toMatchObject({
       comment: complexComment,
       e164Number: mockE164Number,
-      salt: mockE164NumberSalt,
+      salt: mockE164NumberPepper,
     })
   })
 })
@@ -227,7 +227,7 @@ describe(checkTxsForIdentityMetadata, () => {
 
   it('Finds metadata and dispatches updates', async () => {
     const lookupResult: IdentifierLookupResult = {
-      [mockE164NumberHashWithSalt]: {
+      [mockE164NumberHashWithPepper]: {
         [mockAccount]: { completed: 3, total: 5 },
       },
     }
@@ -238,7 +238,7 @@ describe(checkTxsForIdentityMetadata, () => {
         [select(e164NumberToSaltSelector), {}],
         [select(e164NumberToAddressSelector), {}],
       ])
-      .put(updateE164PhoneNumberSalts({ [mockE164Number]: mockE164NumberSalt }))
+      .put(updateE164PhoneNumberSalts({ [mockE164Number]: mockE164NumberPepper }))
       .put(
         updateE164PhoneNumberAddresses(
           { [mockE164Number]: [mockAccount] },
