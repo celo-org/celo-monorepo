@@ -17,7 +17,7 @@
 
 ▸ **getPepperFromThresholdSignature**(`sigBuf`: Buffer): *string*
 
-*Defined in [contractkit/src/identity/odis/phone-number-identifier.ts:81](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/phone-number-identifier.ts#L81)*
+*Defined in [contractkit/src/identity/odis/phone-number-identifier.ts:82](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/phone-number-identifier.ts#L82)*
 
 **Parameters:**
 
@@ -33,7 +33,7 @@ ___
 
 ▸ **getPhoneNumberIdentifier**(`e164Number`: string, `account`: string, `signer`: [AuthSigner](_contractkit_src_identity_odis_query_.md#authsigner), `context`: [ServiceContext](../interfaces/_contractkit_src_identity_odis_query_.servicecontext.md), `selfPhoneHash?`: undefined | string, `clientVersion?`: undefined | string, `blsBlindingClient?`: [BlsBlindingClient](../interfaces/_contractkit_src_identity_odis_bls_blinding_client_.blsblindingclient.md)): *Promise‹[PhoneNumberHashDetails](../interfaces/_contractkit_src_identity_odis_phone_number_identifier_.phonenumberhashdetails.md)›*
 
-*Defined in [contractkit/src/identity/odis/phone-number-identifier.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/phone-number-identifier.ts#L29)*
+*Defined in [contractkit/src/identity/odis/phone-number-identifier.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/phone-number-identifier.ts#L30)*
 
 Retrieve the on-chain identifier for the provided phone number
 
