@@ -6,8 +6,6 @@ import { Address, eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { linkedLibraries } from '@celo/protocol/migrationsConfig'
 import { basename, join } from 'path'
 
-// import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
-
 /*
  * A script that reads a backwards compatibility report, deploys changed contracts, and creates
  * a corresponding JSON file to be proposed with `celocli governance:propose`
