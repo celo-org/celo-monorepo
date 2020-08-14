@@ -3,7 +3,7 @@ import express from 'express'
 import rateLimit from 'express-rate-limit'
 import requestIdMiddleware from 'express-request-id'
 import * as PromClient from 'prom-client'
-import { initializeDB, initializeKit, verifyConfiguration } from './db'
+import { initializeDB, initializeKit, verifyConfigurationAndGetURL } from './db'
 import { fetchEnv, fetchEnvOrDefault, isYes } from './env'
 import { rootLogger } from './logger'
 import { asyncHandler, createValidatedHandler, loggerMiddleware } from './request'
@@ -14,18 +14,22 @@ import { handleStatusRequest, StatusRequestType } from './requestHandlers/status
 import { handleTestAttestationRequest } from './requestHandlers/test_attestation'
 import { initializeSmsProviders, smsProvidersWithDeliveryStatus } from './sms'
 
-const deliveryStatusURLForProviderType = (t: string) =>
-  `${fetchEnv('EXTERNAL_CALLBACK_HOSTPORT')}/delivery_status_${t}`
-
 async function init() {
   await initializeDB()
   await initializeKit()
 
-  // Verify configuration.
+  let externalURL: string
 
+  // Verify configuration if VERIFY_CONFIG_ON_STARTUP is set.
+  // (in this case, we can use the URL in the claim if EXTERNAL_CALLBACK_HOSTPORT is missing)
   if (isYes(fetchEnvOrDefault('VERIFY_CONFIG_ON_STARTUP', '1'))) {
-    await verifyConfiguration()
+    const claimURL = await verifyConfigurationAndGetURL()
+    externalURL = fetchEnvOrDefault('EXTERNAL_CALLBACK_HOSTPORT', claimURL)
+  } else {
+    externalURL = fetchEnv('EXTERNAL_CALLBACK_HOSTPORT')
   }
+
+  const deliveryStatusURLForProviderType = (t: string) => `${externalURL}/delivery_status_${t}`
 
   await initializeSmsProviders(deliveryStatusURLForProviderType)
 

@@ -134,8 +134,8 @@ export async function startSendSms(
   return attemptToSendSms(delivery)
 }
 
-// Maximum delivery attempts with any one provider
-const maxProviderAttempts = parseInt(fetchEnvOrDefault('MAX_PROVIDER_RETRIES', '3'), 10)
+// Maximum delivery retries (after first) with any one provider
+const maxProviderRetries = parseInt(fetchEnvOrDefault('MAX_PROVIDER_RETRIES', '2'), 10)
 
 const ongoingDeliveries: any = {}
 
@@ -149,7 +149,7 @@ async function attemptToSendSms(delivery: SmsDelivery): Promise<SmsProviderType>
   }
 
   // If retries to send with this provider are exceeded, move to next provider
-  if (delivery.attemptsForThisProvider > maxProviderAttempts) {
+  if (delivery.attemptsForThisProvider > maxProviderRetries) {
     delivery.providers = delivery.providers.slice(1)
     delivery.attemptsForThisProvider = 0
   }
