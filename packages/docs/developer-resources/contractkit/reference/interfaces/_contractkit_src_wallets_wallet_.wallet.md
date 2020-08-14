@@ -4,6 +4,8 @@
 
 * **Wallet**
 
+  ↳ [WritableWallet](_contractkit_src_wallets_wallet_.writablewallet.md)
+
 ## Implemented by
 
 * [AzureHSMWallet](../classes/_contractkit_src_wallets_azure_hsm_wallet_.azurehsmwallet.md)

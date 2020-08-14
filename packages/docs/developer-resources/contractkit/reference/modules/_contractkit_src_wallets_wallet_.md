@@ -9,3 +9,4 @@
 ### Interfaces
 
 * [Wallet](../interfaces/_contractkit_src_wallets_wallet_.wallet.md)
+* [WritableWallet](../interfaces/_contractkit_src_wallets_wallet_.writablewallet.md)
