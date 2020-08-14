@@ -1,6 +1,7 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import ItemSeparator from '@celo/react-components/components/ItemSeparator'
 import SectionHead from '@celo/react-components/components/SectionHeadGold'
+import { SettingsItemTextValue } from '@celo/react-components/components/SettingsItem'
 import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
@@ -70,6 +71,11 @@ function ExchangeHomeScreen({ navigation }: Props) {
         makerTokenBalance: goldBalance || '0',
       },
     })
+  }
+
+  function goToWithdrawCelo() {
+    ValoraAnalytics.track(CeloExchangeEvents.celo_home_withdraw)
+    navigation.navigate(Screens.WithdrawCeloScreen)
   }
 
   const scrollPosition = useRef(new Animated.Value(0)).current
@@ -206,6 +212,12 @@ function ExchangeHomeScreen({ navigation }: Props) {
           <ItemSeparator />
           <CeloGoldOverview testID="ExchangeAccountOverview" />
           <ItemSeparator />
+          <SettingsItemTextValue
+            title={t('withdrawCelo')}
+            onPress={goToWithdrawCelo}
+            testID={'WithdrawCELO'}
+            showChevron={true}
+          />
           <SectionHead text={t('global:activity')} />
           <TransactionsList currency={CURRENCY_ENUM.GOLD} />
         </SafeAreaView>

@@ -90,6 +90,7 @@
     <!-- contractkit-reference-start -->
     - [Globals](developer-resources/contractkit/reference/globals.md)
     - [External Modules]()
+      - [base/src/address](developer-resources/contractkit/reference/modules/_base_src_address_.md)
       - [contractkit/src/address-registry](developer-resources/contractkit/reference/modules/_contractkit_src_address_registry_.md)
       - [AddressRegistry](developer-resources/contractkit/reference/classes/_contractkit_src_address_registry_.addressregistry.md)
       - [contractkit/src/base](developer-resources/contractkit/reference/modules/_contractkit_src_base_.md)
@@ -307,7 +308,6 @@
       - [ValidatorGroup](developer-resources/contractkit/reference/interfaces/_contractkit_src_wrappers_validators_.validatorgroup.md)
       - [ValidatorReward](developer-resources/contractkit/reference/interfaces/_contractkit_src_wrappers_validators_.validatorreward.md)
       - [ValidatorsConfig](developer-resources/contractkit/reference/interfaces/_contractkit_src_wrappers_validators_.validatorsconfig.md)
-      - [utils/src/address](developer-resources/contractkit/reference/modules/_utils_src_address_.md)
     - [Classes]()
       - [AddressRegistry](developer-resources/contractkit/reference/classes/_contractkit_src_address_registry_.addressregistry.md)
       - [WrapperCache](developer-resources/contractkit/reference/classes/_contractkit_src_contract_cache_.wrappercache.md)
