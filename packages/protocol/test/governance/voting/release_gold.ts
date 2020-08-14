@@ -9,7 +9,7 @@ import {
   NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { addressToPublicKey, Signature } from '@celo/utils/src/signatureUtils'
+import { addressToPublicKey, Signature } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import * as _ from 'lodash'
 import {
