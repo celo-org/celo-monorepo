@@ -1,15 +1,15 @@
-import { normalizeAddressWith0x } from '@celo/utils/src/address'
-import { Tx } from 'web3-core'
-import { Signer } from '@celo/contractkit/lib/wallets/signers/signer'
 import {
   encodeTransaction,
   extractSignature,
   RLPEncodedTx,
   rlpEncodedTx,
 } from '@celo/contractkit/lib/utils/signing-utils'
-import RNGeth from 'react-native-geth'
-import * as ethUtil from 'ethereumjs-util'
+import { Signer } from '@celo/contractkit/lib/wallets/signers/signer'
 import { ensureLeading0x } from '@celo/utils/lib/address'
+import { normalizeAddressWith0x } from '@celo/utils/src/address'
+import * as ethUtil from 'ethereumjs-util'
+import RNGeth from 'react-native-geth'
+import { Tx } from 'web3-core'
 
 const INCORRECT_PASSWORD_ERROR = 'could not decrypt key with given password'
 const currentTimeInSeconds = () => Math.round(Date.now() / 1000)
@@ -17,7 +17,7 @@ const currentTimeInSeconds = () => Math.round(Date.now() / 1000)
 /**
  * Implements the signer interface on top of a RNGeth instance
  */
-export class RNGethSigner implements Signer {
+export class GethNativeBridgeSigner implements Signer {
   /**
    * Construct a new instance of the RPC signer
    *

@@ -1,23 +1,24 @@
+import { RemoteWallet } from '@celo/contractkit/lib/wallets/remote-wallet'
 import { WritableWallet } from '@celo/contractkit/lib/wallets/wallet'
-import { Tx } from 'web3-core'
-import { RNGethSigner } from './RNGethSigner'
 import {
   ensureLeading0x,
   normalizeAddressWith0x,
   privateKeyToAddress,
 } from '@celo/utils/lib/address'
-import { RemoteWallet } from '@celo/contractkit/lib/wallets/remote-wallet'
 import RNGeth from 'react-native-geth'
-import Logger from '../utils/Logger'
+import { GethNativeBridgeSigner } from 'src/geth/GethNativeBridgeSigner'
+import Logger from 'src/utils/Logger'
+import { Tx } from 'web3-core'
 
-export enum RNGethWalletErrors {
-  FetchAccounts = 'RNGethWallet: failed to fetch accounts from geth wrapper',
-  AccountAlreadyExists = 'RNGethWallet: account already exists',
+export enum GethNativeBridgeWalletErrors {
+  FetchAccounts = 'GethNativeBridgeWallet: failed to fetch accounts from geth wrapper',
+  AccountAlreadyExists = 'GethNativeBridgeWallet: account already exists',
 }
 
-const TAG = 'geth/RNGethWallet'
+const TAG = 'geth/GethNativeBridgeWallet'
 
-export class RNGethWallet extends RemoteWallet<RNGethSigner> implements WritableWallet {
+export class GethNativeBridgeWallet extends RemoteWallet<GethNativeBridgeSigner>
+  implements WritableWallet {
   /**
    * Construct a React Native geth wallet which uses the bridge methods
    * instead of communicating with a node
@@ -28,18 +29,20 @@ export class RNGethWallet extends RemoteWallet<RNGethSigner> implements Writable
     super()
   }
 
-  async loadAccountSigners(): Promise<Map<string, RNGethSigner>> {
+  async loadAccountSigners(): Promise<Map<string, GethNativeBridgeSigner>> {
     let accounts: string[]
-    const addressToSigner = new Map<string, RNGethSigner>()
+    const addressToSigner = new Map<string, GethNativeBridgeSigner>()
+
     try {
       accounts = await this.geth.listAccounts()
     } catch (e) {
-      console.log(e)
-      throw new Error(RNGethWalletErrors.FetchAccounts)
+      Logger.error(`${TAG}@loadAccountSigners`, e.toString())
+      throw new Error(GethNativeBridgeWalletErrors.FetchAccounts)
     }
+
     accounts.forEach((address) => {
       const cleanAddress = normalizeAddressWith0x(address)
-      addressToSigner.set(cleanAddress, new RNGethSigner(this.geth, cleanAddress))
+      addressToSigner.set(cleanAddress, new GethNativeBridgeSigner(this.geth, cleanAddress))
     })
     return addressToSigner
   }
@@ -48,9 +51,9 @@ export class RNGethWallet extends RemoteWallet<RNGethSigner> implements Writable
     Logger.info(`${TAG}@addAccount`, `Adding a new account`)
     const address = normalizeAddressWith0x(privateKeyToAddress(ensureLeading0x(privateKey)))
     if (this.hasAccount(address)) {
-      throw new Error(RNGethWalletErrors.AccountAlreadyExists)
+      throw new Error(GethNativeBridgeWalletErrors.AccountAlreadyExists)
     }
-    const signer = new RNGethSigner(this.geth, address)
+    const signer = new GethNativeBridgeSigner(this.geth, address)
     const resultantAddress = await signer.init(privateKey, passphrase)
     this.addSigner(resultantAddress, signer)
     return resultantAddress
@@ -64,7 +67,7 @@ export class RNGethWallet extends RemoteWallet<RNGethSigner> implements Writable
    */
   async unlockAccount(account: string, passphrase: string, duration: number) {
     Logger.info(`${TAG}@unlockAccount`, `Unlocking ${account}`)
-    const signer = this.getSigner(account) as RNGethSigner
+    const signer = this.getSigner(account) as GethNativeBridgeSigner
     return signer.unlock(passphrase, duration)
   }
 

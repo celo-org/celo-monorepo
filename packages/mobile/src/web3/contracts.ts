@@ -11,24 +11,24 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { DEFAULT_FORNO_URL } from 'src/config'
 import { getGethBridge, isProviderConnectionError } from 'src/geth/geth'
+import { GethNativeBridgeWallet } from 'src/geth/GethNativeBridgeWallet'
 import { waitForGethInitialized } from 'src/geth/saga'
 import { navigateToError } from 'src/navigator/NavigationService'
 import Logger from 'src/utils/Logger'
 import { getHttpProvider, getIpcProvider } from 'src/web3/providers'
 import { fornoSelector } from 'src/web3/selectors'
 import Web3 from 'web3'
-import { RNGethWallet } from '../geth/RNGethWallet'
 
 const TAG = 'web3/contracts'
 const KIT_INIT_RETRY_DELAY = 2000
 const CONTRACT_KIT_RETRIES = 3
 
-let gethWallet: RNGethWallet | undefined
+let gethWallet: GethNativeBridgeWallet | undefined
 let contractKit: ContractKit | undefined
 
 function* initWallet() {
   ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_wallet_start)
-  const wallet = new RNGethWallet(yield call(getGethBridge))
+  const wallet = new GethNativeBridgeWallet(yield call(getGethBridge))
   ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_wallet_finish)
   yield call([wallet, wallet.init])
   ValoraAnalytics.track(ContractKitEvents.init_contractkit_init_wallet_finish)
@@ -71,7 +71,7 @@ export function* initContractKit() {
       Logger.info(`${TAG}@initContractKit`, 'Initializing wallet')
 
       gethWallet = yield call(initWallet)
-      let web3 = yield call(initWeb3)
+      const web3 = yield call(initWeb3)
 
       Logger.info(
         `${TAG}@initContractKit`,

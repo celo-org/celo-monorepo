@@ -1,18 +1,18 @@
 import { GenesisBlockUtils, StaticNodeUtils } from '@celo/contractkit'
-import { call } from 'redux-saga/effects'
 import BigNumber from 'bignumber.js'
 import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
 import RNGeth, { NodeConfig } from 'react-native-geth'
+import { call } from 'redux-saga/effects'
 import { GethEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { DEFAULT_TESTNET } from 'src/config'
 import { SYNCING_MAX_PEERS } from 'src/geth/consts'
 import networkConfig from 'src/geth/networkConfig'
+import { waitForGethInitialized } from 'src/geth/saga'
 import Logger from 'src/utils/Logger'
 import FirebaseLogUploader from 'src/utils/LogUploader'
-import { waitForGethInitialized } from './saga'
 
 let gethLock = false
 let gethBridge: RNGeth | null = null

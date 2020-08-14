@@ -1,3 +1,4 @@
+import { Wallet } from '@celo/contractkit/lib/wallets/wallet'
 import {
   AccountAuthRequest,
   AccountAuthResponseSuccess,
@@ -16,7 +17,6 @@ import Logger from 'src/utils/Logger'
 import { getWallet } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
-import { Wallet } from '@celo/contractkit/lib/wallets/wallet'
 
 const TAG = 'dappkit/dappkit'
 

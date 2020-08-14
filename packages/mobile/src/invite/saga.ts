@@ -1,4 +1,5 @@
 import { CeloTransactionObject } from '@celo/contractkit'
+import { WritableWallet } from '@celo/contractkit/lib/wallets/wallet'
 import { privateKeyToAddress } from '@celo/utils/src/address'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
@@ -51,7 +52,6 @@ import Logger from 'src/utils/Logger'
 import { getContractKitAsync, getWallet, getWeb3 } from 'src/web3/contracts'
 import { registerAccountDek } from 'src/web3/dataEncryptionKey'
 import { getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
-import { WritableWallet } from '@celo/contractkit/lib/wallets/wallet'
 
 const TAG = 'invite/saga'
 export const REDEEM_INVITE_TIMEOUT = 2 * 60 * 1000 // 2 minutes

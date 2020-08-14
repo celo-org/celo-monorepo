@@ -1,4 +1,5 @@
 import { RpcWalletErrors } from '@celo/contractkit/lib/wallets/rpc-wallet'
+import { WritableWallet } from '@celo/contractkit/lib/wallets/wallet'
 import { generateKeys, generateMnemonic, MnemonicStrength } from '@celo/utils/src/account'
 import { privateKeyToAddress } from '@celo/utils/src/address'
 import * as bip39 from 'react-native-bip39'
@@ -36,7 +37,6 @@ import { createAccountDek } from 'src/web3/dataEncryptionKey'
 import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
 import { blockIsFresh, getLatestBlock } from 'src/web3/utils'
 import { BlockHeader } from 'web3-eth'
-import { WritableWallet } from '@celo/contractkit/lib/wallets/wallet'
 
 const TAG = 'web3/saga'
 
