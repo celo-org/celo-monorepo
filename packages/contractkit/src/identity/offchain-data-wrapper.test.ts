@@ -1,4 +1,4 @@
-import { ACCOUNT_ADDRESSES, ACCOUNT_PRIVATE_KEYS } from '@celo/dev-utils/lib/ganache-setup'
+import { ACCOUNT_ADDRESSES } from '@celo/dev-utils/lib/ganache-setup'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { ensureLeading0x, privateKeyToPublicKey, toChecksumAddress } from '@celo/utils/lib/address'
 import { NativeSigner, serializeSignature } from '@celo/utils/lib/signatureUtils'
@@ -19,7 +19,7 @@ testWithGanache('Offchain Data', (web3) => {
   const writer = ACCOUNT_ADDRESSES[0]
   const signer = ACCOUNT_ADDRESSES[1]
   const reader = ACCOUNT_ADDRESSES[2]
-  const readerEncryptionKeyPrivate = ACCOUNT_PRIVATE_KEYS[3]
+  const readerEncryptionKeyPrivate = ensureLeading0x(randomBytes(32).toString('hex'))
   const readerEncryptionKeyPublic = privateKeyToPublicKey(readerEncryptionKeyPrivate)
 
   const WRITER_METADATA_URL = 'http://example.com/writer'
