@@ -2730,6 +2730,14 @@ exports[`Account renders correctly when dev mode active 1`] = `
                     termsOfServiceLink
                   </Text>
                 </View>
+                <View
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    }
+                  }
+                />
               </View>
             </View>
           </View>
@@ -2834,14 +2842,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
                     removeAccountTitle
                   </Text>
                 </View>
-                <View
-                  style={
-                    Object {
-                      "alignItems": "center",
-                      "flexDirection": "row",
-                    }
-                  }
-                />
               </View>
               <View>
                 <Text
