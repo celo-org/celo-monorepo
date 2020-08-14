@@ -11,10 +11,10 @@ import * as t from 'io-ts'
 import { Address } from '../../base'
 import OffchainDataWrapper from '../offchain-data-wrapper'
 
-export class SingleSchema<T> {
+export class SimpleSchema<DataType> {
   constructor(
     readonly wrapper: OffchainDataWrapper,
-    readonly type: t.Type<T>,
+    readonly type: t.Type<DataType>,
     readonly dataPath: string
   ) {}
 
@@ -22,11 +22,11 @@ export class SingleSchema<T> {
     return readWithSchema(this.wrapper, this.type, account, this.dataPath)
   }
 
-  async write(data: T) {
+  async write(data: DataType) {
     return writeWithSchema(this.wrapper, this.type, this.dataPath, data)
   }
 
-  async writeEncrypted(data: T, pubKeys: string[], decryptionKey?: string | undefined) {
+  async writeEncrypted(data: DataType, pubKeys: string[], decryptionKey?: string | undefined) {
     return writeEncryptedWithSchema(
       this.wrapper,
       this.type,
@@ -62,12 +62,12 @@ export class EncryptionKeysAccessor {
   basePath = '/others'
   constructor(readonly wrapper: OffchainDataWrapper) {}
 
-  async read(account: Address, self: Address) {
+  async read(account: Address) {
     return readWithSchema(
       this.wrapper,
       EncryptionKeysSchema,
       account,
-      this.basePath + '/' + self + '/encryptionKeys'
+      this.basePath + '/' + this.wrapper.self + '/encryptionKeys'
     )
   }
 
@@ -129,7 +129,7 @@ const getDecryptionKey = async (
   }
 
   const encryptionKeysAccessor = new EncryptionKeysAccessor(wrapper)
-  const encryptionKeys = await encryptionKeysAccessor.read(account, wrapper.self)
+  const encryptionKeys = await encryptionKeysAccessor.read(account)
 
   // The decryption key is under the encryptionKeys path
   if (encryptionKeys && encryptionKeys.keys[encryptionWrappedData.publicKey]) {

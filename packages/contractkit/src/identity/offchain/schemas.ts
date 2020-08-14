@@ -3,14 +3,14 @@ import * as t from 'io-ts'
 import { toChecksumAddress } from 'web3-utils'
 import { Address } from '../../base'
 import OffchainDataWrapper from '../offchain-data-wrapper'
-import { readWithSchema, SingleSchema, writeWithSchema } from './schema-utils'
+import { readWithSchema, SimpleSchema, writeWithSchema } from './schema-utils'
 
 const NameSchema = t.type({
   name: t.string,
 })
 export type NameType = t.TypeOf<typeof NameSchema>
 
-export class NameAccessor extends SingleSchema<NameType> {
+export class NameAccessor extends SimpleSchema<NameType> {
   constructor(readonly wrapper: OffchainDataWrapper) {
     super(wrapper, NameSchema, '/account/name')
   }
