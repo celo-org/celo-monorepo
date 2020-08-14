@@ -50,10 +50,11 @@ export class GethNativeBridgeSigner implements Signer {
   }
 
   async signTransaction(
+    // addToV (chainId) is ignored here because geth will
+    // build it based on its configuration
     addToV: number,
     encodedTx: RLPEncodedTx
   ): Promise<{ v: number; r: Buffer; s: Buffer }> {
-    // addToV (chainId) is ignored here because geth is configured with it
     const signedTxBase64 = await this.geth.signTransaction(
       this.hexToBase64(encodedTx.rlpEncode),
       this.account

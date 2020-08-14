@@ -13,6 +13,7 @@ import { Tx } from 'web3-core'
 export enum GethNativeBridgeWalletErrors {
   FetchAccounts = 'GethNativeBridgeWallet: failed to fetch accounts from geth wrapper',
   AccountAlreadyExists = 'GethNativeBridgeWallet: account already exists',
+  UnexpectedAddressOnAdd = 'GethNativeBridgeWallet: unexpected address returned from addAccount',
 }
 
 const TAG = 'geth/GethNativeBridgeWallet'
@@ -55,6 +56,9 @@ export class GethNativeBridgeWallet extends RemoteWallet<GethNativeBridgeSigner>
     }
     const signer = new GethNativeBridgeSigner(this.geth, address)
     const resultantAddress = await signer.init(privateKey, passphrase)
+    if (normalizeAddressWith0x(resultantAddress) !== address) {
+      throw new Error(GethNativeBridgeWalletErrors.UnexpectedAddressOnAdd)
+    }
     this.addSigner(resultantAddress, signer)
     return resultantAddress
   }
