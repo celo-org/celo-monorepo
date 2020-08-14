@@ -1,4 +1,4 @@
-import { Address } from '@celo/utils/lib/address'
+import { Address } from '@celo/base/lib/address'
 import { EventLog, Log, TransactionReceipt } from 'web3-core'
 import abi, { ABIDefinition } from 'web3-eth-abi'
 import { ContractKit } from '../kit'

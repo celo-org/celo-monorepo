@@ -3,7 +3,7 @@ import Touchable from '@celo/react-components/components/Touchable'
 import Backspace from '@celo/react-components/icons/Backspace'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
-import { StackNavigationOptions, StackScreenProps } from '@react-navigation/stack'
+import { StackScreenProps } from '@react-navigation/stack'
 import { chunk, flatMap, shuffle, times } from 'lodash'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
@@ -18,6 +18,7 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import CancelConfirm from 'src/backup/CancelConfirm'
 import { QuizzBottom } from 'src/backup/QuizzBottom'
 import { getStoredMnemonic, onGetMnemonicFail } from 'src/backup/utils'
+import CancelButton from 'src/components/CancelButton.v2'
 import DevSkipButton from 'src/components/DevSkipButton'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { emptyHeader } from 'src/navigator/Headers.v2'
@@ -71,10 +72,22 @@ const mapStateToProps = (state: RootState): StateProps => {
   }
 }
 
-export const navOptionsForQuiz: StackNavigationOptions = {
-  ...emptyHeader,
-  headerLeft: () => <CancelConfirm screen={TAG} />,
-  headerTitle: i18n.t(`${Namespaces.backupKeyFlow6}:headerTitle`),
+export const navOptionsForQuiz = ({ route }: OwnProps) => {
+  const navigatedFromSettings = route.params?.navigatedFromSettings
+  const onCancel = () => {
+    navigate(Screens.Settings)
+  }
+  return {
+    ...emptyHeader,
+    headerLeft: () => {
+      return navigatedFromSettings ? (
+        <CancelButton onCancel={onCancel} style={styles.cancelButton} />
+      ) : (
+        <CancelConfirm screen={TAG} />
+      )
+    },
+    headerTitle: i18n.t(`${Namespaces.backupKeyFlow6}:headerTitle`),
+  }
 }
 
 export class BackupQuiz extends React.Component<Props, State> {
@@ -175,7 +188,8 @@ export class BackupQuiz extends React.Component<Props, State> {
     if (lengthsMatch && contentMatches(userChosenWords, mnemonic)) {
       Logger.debug(TAG, 'Backup quiz passed')
       this.props.setBackupCompleted()
-      navigate(Screens.BackupComplete)
+      const navigatedFromSettings = this.props.route.params?.navigatedFromSettings ?? false
+      navigate(Screens.BackupComplete, { navigatedFromSettings })
       ValoraAnalytics.track(OnboardingEvents.backup_quiz_complete)
     } else {
       Logger.debug(TAG, 'Backup quiz failed, reseting words')
@@ -407,6 +421,9 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   resetButton: { alignItems: 'center', padding: 24, marginTop: 8 },
+  cancelButton: {
+    color: colors.gray4,
+  },
 })
 
 export default connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
