@@ -1873,9 +1873,8 @@ Change the story.
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
             data-focusable={true}
             dir="auto"
-            href="http://sacred-economics.com/film/"
+            href="http://sacred-economics.com/film"
             onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1907,9 +1906,8 @@ Change the story.
           className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
           data-focusable={true}
           dir="auto"
-          href="http://sacred-economics.com/film/"
+          href="http://sacred-economics.com/film"
           onClick={[Function]}
-          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -2071,7 +2069,6 @@ Change the story.
           dir="auto"
           href="https://medium.com/celoOrg/celos-theory-of-change-b916de44945d"
           onClick={[Function]}
-          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -4190,7 +4187,6 @@ Change the story.
             dir="auto"
             href="mailto:press@celo.org"
             onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
