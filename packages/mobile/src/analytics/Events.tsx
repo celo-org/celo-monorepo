@@ -247,6 +247,7 @@ export enum CeloExchangeEvents {
   celo_home_info = 'celo_home_info', // when the (i) next to Celo Gold price is clicked, launching education (not pictured)
   celo_home_buy = 'celo_home_buy', // when the “Buy” button is clicked
   celo_home_sell = 'celo_home_sell', // when the “Sell” button is clicked
+  celo_home_withdraw = 'celo_home_withdraw', // when the “Withdraw” button is clicked
   celo_transaction_select = 'celo_transaction_select', // when an transaction item is clicked
   celo_transaction_back = 'celo_transaction_back', // when back caret is clicked from drilldown
 
@@ -269,19 +270,43 @@ export enum CeloExchangeEvents {
   celo_fetch_exchange_rate_start = 'celo_fetch_exchange_rate_start',
   celo_fetch_exchange_rate_complete = 'celo_fetch_exchange_rate_complete',
   celo_fetch_exchange_rate_error = 'celo_fetch_exchange_rate_error',
+
+  celo_withdraw_review = 'celo_withdraw_review', // when ‘review’ is clicked on the withdraw amount screen
+  celo_withdraw_edit = 'celo_withdraw_edit', // when ‘edit’ is clicked on the review screen
+  celo_withdraw_cancel = 'celo_withdraw_cancel', // when ’cancel’ is clicked on the review screen
+  celo_withdraw_confirm = 'celo_withdraw_confirm', // when ‘withdraw’ is clicked on the review screen
+  celo_withdraw_completed = 'celo_withdraw_completed', // when the transaction for the withdrawal is completed
+  celo_withdraw_error = 'celo_withdraw_error', // when there's an error on the withdrawal transaction
 }
 
 export enum GethEvents {
   blockchain_corruption = 'blockchain_corruption',
+  geth_init_start = 'geth_init_start',
   geth_init_success = 'geth_init_success',
   geth_init_failure = 'geth_init_failure',
   geth_restart_to_fix_init = 'geth_restart_to_fix_init',
   prompt_forno = 'prompt_forno',
-  geth_init_start = 'geth_init_start',
   create_geth_start = 'create_geth_start',
   create_geth_finish = 'create_geth_finish',
+  create_geth_error = 'create_geth_error',
   start_geth_start = 'start_geth_start',
   start_geth_finish = 'start_geth_finish',
+}
+
+export enum NetworkEvents {
+  // Events triggered when the app detects it is connected or disconnected from the Celo network.
+  network_connected = 'network_connected',
+  network_disconnected = 'network_disconnected',
+
+  // Events triggered when the app detects it loses or restores sync with the Celo network.
+  network_sync_lost = 'network_sync_lost',
+  network_sync_restored = 'network_sync_restored',
+
+  // Events triggered during a syncing or waiting to start syncing.
+  network_sync_waiting = 'network_sync_waiting',
+  network_sync_start = 'network_sync_start',
+  network_sync_finish = 'network_sync_finish',
+  network_sync_error = 'network_sync_error',
 }
 
 export enum ContractKitEvents {
@@ -311,3 +336,4 @@ export type AnalyticsEventType =
   | TransactionEvents
   | CeloExchangeEvents
   | GethEvents
+  | NetworkEvents

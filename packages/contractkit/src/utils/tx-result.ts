@@ -1,4 +1,4 @@
-import { Future } from '@celo/utils/lib/future'
+import { Future } from '@celo/base/lib/future'
 import debugFactory from 'debug'
 import { PromiEvent, TransactionReceipt } from 'web3-core'
 

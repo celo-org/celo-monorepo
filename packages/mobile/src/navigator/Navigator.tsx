@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import { RouteProp } from '@react-navigation/core'
 import { createStackNavigator, StackScreenProps, TransitionPresets } from '@react-navigation/stack'
 import * as React from 'react'
@@ -31,6 +31,9 @@ import EscrowedPaymentListScreen from 'src/escrow/EscrowedPaymentListScreen'
 import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmationScreen'
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
+import WithdrawCeloQrScannerScreen from 'src/exchange/WithdrawCeloQrScannerScreen'
+import WithdrawCeloReviewScreen from 'src/exchange/WithdrawCeloReviewScreen'
+import WithdrawCeloScreen from 'src/exchange/WithdrawCeloScreen'
 import FiatExchangeAmount, {
   fiatExchangesAmountScreenOptions,
 } from 'src/fiatExchanges/FiatExchangeAmount'
@@ -186,6 +189,11 @@ const pincodeSetScreenOptions = ({
 
 const nuxScreens = (Navigator: typeof Stack) => (
   <>
+    <Navigator.Screen
+      name={Screens.Language}
+      component={Language}
+      options={Language.navigationOptions}
+    />
     <Navigator.Screen
       name={Screens.OnboardingEducationScreen}
       component={OnboardingEducationScreen}
@@ -358,6 +366,21 @@ const exchangeScreens = (Navigator: typeof Stack) => (
       component={ExchangeReview}
       options={exchangeReviewScreenOptions}
     />
+    <Navigator.Screen
+      name={Screens.WithdrawCeloScreen}
+      component={WithdrawCeloScreen}
+      options={WithdrawCeloScreen.navigationOptions}
+    />
+    <Navigator.Screen
+      name={Screens.WithdrawCeloQrScannerScreen}
+      component={WithdrawCeloQrScannerScreen}
+      options={WithdrawCeloQrScannerScreen.navigationOptions}
+    />
+    <Navigator.Screen
+      name={Screens.WithdrawCeloReviewScreen}
+      component={WithdrawCeloReviewScreen}
+      options={WithdrawCeloReviewScreen.navigationOptions}
+    />
   </>
 )
 
@@ -456,6 +479,7 @@ type InitialRouteName = ExtractProps<typeof Stack.Navigator>['initialRouteName']
 
 export function MainStackScreen() {
   const [initialRouteName, setInitialRoute] = React.useState<InitialRouteName>(undefined)
+
   React.useEffect(() => {
     const {
       choseToRestoreAccount,

@@ -25,7 +25,7 @@
 
 • **address**: *[Address](../modules/_contractkit_src_base_.md#address)*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L34)*
+*Defined in [contractkit/src/wrappers/Validators.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L35)*
 
 ___
 
@@ -33,7 +33,7 @@ ___
 
 • **affiliates**: *[Address](../modules/_contractkit_src_base_.md#address)[]*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L37)*
+*Defined in [contractkit/src/wrappers/Validators.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L38)*
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 • **commission**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L38)*
+*Defined in [contractkit/src/wrappers/Validators.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L39)*
 
 ___
 
@@ -49,7 +49,7 @@ ___
 
 • **lastSlashed**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L41)*
+*Defined in [contractkit/src/wrappers/Validators.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L42)*
 
 ___
 
@@ -57,7 +57,7 @@ ___
 
 • **members**: *[Address](../modules/_contractkit_src_base_.md#address)[]*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L35)*
+*Defined in [contractkit/src/wrappers/Validators.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L36)*
 
 ___
 
@@ -65,7 +65,7 @@ ___
 
 • **membersUpdated**: *number*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L36)*
+*Defined in [contractkit/src/wrappers/Validators.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L37)*
 
 ___
 
@@ -73,7 +73,7 @@ ___
 
 • **name**: *string*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L33)*
+*Defined in [contractkit/src/wrappers/Validators.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L34)*
 
 ___
 
@@ -81,7 +81,7 @@ ___
 
 • **nextCommission**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L39)*
+*Defined in [contractkit/src/wrappers/Validators.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L40)*
 
 ___
 
@@ -89,7 +89,7 @@ ___
 
 • **nextCommissionBlock**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L40)*
+*Defined in [contractkit/src/wrappers/Validators.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L41)*
 
 ___
 
@@ -97,4 +97,4 @@ ___
 
 • **slashingMultiplier**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L42)*
+*Defined in [contractkit/src/wrappers/Validators.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L43)*
