@@ -44,7 +44,7 @@ ___
 
 • **salt**? : *undefined | string*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L64)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L65)*
 
 ___
 
@@ -52,4 +52,4 @@ ___
 
 • **smsRetrieverAppSig**? : *undefined | string*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L65)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L66)*

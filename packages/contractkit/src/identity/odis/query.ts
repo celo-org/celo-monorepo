@@ -1,4 +1,4 @@
-// Utilities for interacting with the Phone Number Privacy Service service (aka PGPNP)
+// Utilities for interacting with the Oblivious Decentralized Identifier Service (ODIS)
 
 import { hexToBuffer, trimLeading0x } from '@celo/base/lib/address'
 import { selectiveRetryAsyncWithBackOff } from '@celo/base/lib/async'
@@ -6,16 +6,16 @@ import debugFactory from 'debug'
 import { ec as EC } from 'elliptic'
 import { ContractKit } from '../../kit'
 
-const debug = debugFactory('kit:phone-number-lookup:phone-number-lookup')
+const debug = debugFactory('kit:odis:query')
 const ec = new EC('secp256k1')
 
 export interface WalletKeySigner {
-  authenticationMethod: AuthenticationMethod.WALLETKEY
+  authenticationMethod: AuthenticationMethod.WALLET_KEY
   contractKit: ContractKit
 }
 
 export interface EncryptionKeySigner {
-  authenticationMethod: AuthenticationMethod.ENCRYPTIONKEY
+  authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY
   rawKey: string
 }
 
@@ -23,8 +23,8 @@ export interface EncryptionKeySigner {
 export type AuthSigner = WalletKeySigner | EncryptionKeySigner
 
 export enum AuthenticationMethod {
-  WALLETKEY = 'wallet_key',
-  ENCRYPTIONKEY = 'encryption_key',
+  WALLET_KEY = 'wallet_key',
+  ENCRYPTION_KEY = 'encryption_key',
 }
 
 export interface PhoneNumberPrivacyRequest {
@@ -64,8 +64,8 @@ export enum ErrorMessages {
 }
 
 export interface ServiceContext {
-  pgpnpUrl: string // Phone Number Privacy service url
-  pgpnpPubKey: string
+  odisUrl: string // Oblivious Decentralized Identifier Service Url
+  odisPubKey: string
 }
 
 /**
@@ -75,7 +75,7 @@ export interface ServiceContext {
  * @param context contains service URL
  * @param endpoint endpoint to hit
  */
-export async function postToPhoneNumPrivacyService<ResponseType>(
+export async function queryOdis<ResponseType>(
   signer: AuthSigner,
   body: PhoneNumberPrivacyRequest,
   context: ServiceContext,
@@ -87,7 +87,7 @@ export async function postToPhoneNumPrivacyService<ResponseType>(
   const bodyString = JSON.stringify(body)
 
   let authHeader = ''
-  if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTIONKEY) {
+  if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
     const key = ec.keyFromPrivate(hexToBuffer(signer.rawKey))
     authHeader = JSON.stringify(key.sign(bodyString).toDER())
 
@@ -100,7 +100,7 @@ export async function postToPhoneNumPrivacyService<ResponseType>(
     authHeader = await signer.contractKit.web3.eth.sign(bodyString, body.account)
   }
 
-  const { pgpnpUrl } = context
+  const { odisUrl } = context
 
   const dontRetry = [
     ErrorMessages.ODIS_QUOTA_ERROR,
@@ -110,7 +110,7 @@ export async function postToPhoneNumPrivacyService<ResponseType>(
 
   return selectiveRetryAsyncWithBackOff(
     async () => {
-      const res = await fetch(pgpnpUrl + endpoint, {
+      const res = await fetch(odisUrl + endpoint, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
