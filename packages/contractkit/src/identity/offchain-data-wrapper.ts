@@ -52,9 +52,14 @@ export default class OffchainDataWrapper {
 class StorageRoot {
   constructor(readonly account: string, readonly address: string) {}
 
-  // TODO: Add decryption metadata (i.e. indicates ciphertext to be decrypted/which key to use)
   async read(dataPath: string): Promise<[any, any]> {
-    const data = await fetch(this.address + dataPath)
+    let data
+    try {
+      data = await fetch(this.address + dataPath)
+    } catch (error) {
+      return [null, `FetchError: ${error.toString()}`]
+    }
+
     if (!data.ok) {
       return [null, 'No can do']
     }

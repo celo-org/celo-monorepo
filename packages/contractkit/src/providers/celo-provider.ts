@@ -43,11 +43,11 @@ export class CeloProvider {
   }
 
   addAccount(privateKey: string) {
-    if (hasProperty<{ addAccount: (privateKey: string) => void }>(this.wallet, 'addAccount')) {
-      this.wallet.addAccount(privateKey)
-    } else {
-      throw new Error("The wallet used, can't add accounts")
-    }
+    this.wallet.addAccount(privateKey)
+  }
+
+  removeAccount(address: string) {
+    this.wallet.removeAccount(address)
   }
 
   async getAccounts(): Promise<string[]> {

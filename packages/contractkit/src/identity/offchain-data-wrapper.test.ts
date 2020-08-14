@@ -1,6 +1,11 @@
 import { ACCOUNT_ADDRESSES } from '@celo/dev-utils/lib/ganache-setup'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
-import { ensureLeading0x, privateKeyToPublicKey, toChecksumAddress } from '@celo/utils/lib/address'
+import {
+  ensureLeading0x,
+  privateKeyToPublicKey,
+  publicKeyToAddress,
+  toChecksumAddress,
+} from '@celo/utils/lib/address'
 import { NativeSigner, serializeSignature } from '@celo/utils/lib/signatureUtils'
 import { randomBytes } from 'crypto'
 import fetchMock from 'fetch-mock'
@@ -106,6 +111,10 @@ testWithGanache('Offchain Data', (web3) => {
           kit.addAccount(readerEncryptionKeyPrivate)
         })
 
+        afterEach(() => {
+          kit.removeAccount(publicKeyToAddress(readerEncryptionKeyPublic))
+        })
+
         it("the writer can encrypt data directly to the reader's dataEncryptionKey", async () => {
           const testname = 'test'
           const payload = { name: testname }
@@ -147,6 +156,19 @@ testWithGanache('Offchain Data', (web3) => {
           const nameAccessor = new NameAccessor(readerWrapper)
           const receivedName = await nameAccessor.read(writer)
           expect(receivedName).toBeDefined()
+        })
+      })
+
+      describe('when the key is not added to the wallet', () => {
+        // TODO: Figure out how to get a kit/web3 instance that is connected to ganache but does not have access to the keys of prior runs
+        it('the reader cannot decrypt the data', async () => {
+          const testname = 'test'
+          const payload = { name: testname }
+
+          const nameAccessor = new NameAccessor(wrapper)
+          await nameAccessor.writeEncrypted(payload, [await accounts.getDataEncryptionKey(reader)])
+          const receivedName = await nameAccessor.read(writer)
+          expect(receivedName).toBeUndefined()
         })
       })
     })

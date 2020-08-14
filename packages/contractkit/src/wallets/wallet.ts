@@ -12,6 +12,8 @@ import { Signer } from './signers/signer'
 
 export interface Wallet {
   getAccounts: () => Address[]
+  addAccount: (privateKey: string) => void
+  removeAccount: (address: Address) => void
   hasAccount: (address?: Address) => boolean
   signTransaction: (txParams: Tx) => Promise<EncodedTransaction>
   signTypedData: (address: Address, typedData: EIP712TypedData) => Promise<string>
@@ -29,6 +31,22 @@ export abstract class WalletBase implements Wallet {
    */
   getAccounts(): Address[] {
     return Array.from(this.accountSigners.keys())
+  }
+
+  /**
+   * Adds the account via the private key. Needs to be implemented by subclass, otherwise throws error
+   * @param privateKey The private key for the account to be added
+   */
+  addAccount(_privateKey: string) {
+    throw new Error('addAccount is not supported for this wallet')
+  }
+
+  /**
+   * Removes the account with the given address. Needs to be implemented by subclass, otherwise throws error
+   * @param address The address of the account to be removed
+   */
+  removeAccount(_address: string) {
+    throw new Error('removeAccount is not supported for this wallet')
   }
 
   /**
@@ -52,6 +70,15 @@ export abstract class WalletBase implements Wallet {
   protected addSigner(address: Address, signer: Signer) {
     const normalizedAddress = normalizeAddressWith0x(address)
     this.accountSigners.set(normalizedAddress, signer)
+  }
+
+  /**
+   * Removes the account-signer
+   * @param address Account address
+   */
+  protected removeSigner(address: Address) {
+    const normalizedAddress = normalizeAddressWith0x(address)
+    this.accountSigners.delete(normalizedAddress)
   }
 
   /**
