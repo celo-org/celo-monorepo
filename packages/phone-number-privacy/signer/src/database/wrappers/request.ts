@@ -36,7 +36,9 @@ export async function storeRequest(request: GetBlindedMessagePartialSigRequest) 
     await requests()
       .insert(new Request(request))
       .timeout(DB_TIMEOUT)
+    return true
   } catch (e) {
     logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE, e)
+    return null
   }
 }
