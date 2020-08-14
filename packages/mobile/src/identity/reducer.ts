@@ -1,5 +1,6 @@
 import dotProp from 'dot-prop-immutable'
 import { RehydrateAction } from 'redux-persist'
+import { Actions as AccountActions, ClearStoredAccountAction } from 'src/account/actions'
 import { Actions, ActionTypes } from 'src/identity/actions'
 import { ContactMatches, ImportContactsStatus, VerificationStatus } from 'src/identity/types'
 import { AttestationCode } from 'src/identity/verification'
@@ -91,7 +92,7 @@ const initialState: State = {
 
 export const reducer = (
   state: State | undefined = initialState,
-  action: ActionTypes | RehydrateAction
+  action: ActionTypes | RehydrateAction | ClearStoredAccountAction
 ): State => {
   switch (action.type) {
     case REHYDRATE: {
@@ -254,6 +255,15 @@ export const reducer = (
           action.address,
           action.dataEncryptionKey
         ),
+      }
+    case AccountActions.CLEAR_STORED_ACCOUNT:
+      return {
+        ...initialState,
+        addressToE164Number: state.addressToE164Number,
+        e164NumberToAddress: state.e164NumberToAddress,
+        e164NumberToSalt: state.e164NumberToSalt,
+        matchedContacts: state.matchedContacts,
+        secureSendPhoneNumberMapping: state.secureSendPhoneNumberMapping,
       }
     default:
       return state

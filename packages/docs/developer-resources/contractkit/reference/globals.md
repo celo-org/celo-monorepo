@@ -4,6 +4,7 @@
 
 ### External modules
 
+* ["base/src/address"](modules/_base_src_address_.md)
 * ["contractkit/src/address-registry"](modules/_contractkit_src_address_registry_.md)
 * ["contractkit/src/base"](modules/_contractkit_src_base_.md)
 * ["contractkit/src/contract-cache"](modules/_contractkit_src_contract_cache_.md)
@@ -31,6 +32,7 @@
 * ["contractkit/src/test-utils/PromiEventStub"](modules/_contractkit_src_test_utils_promieventstub_.md)
 * ["contractkit/src/test-utils/setup.global"](modules/_contractkit_src_test_utils_setup_global_.md)
 * ["contractkit/src/test-utils/teardown.global"](modules/_contractkit_src_test_utils_teardown_global_.md)
+* ["contractkit/src/utils/array"](modules/_contractkit_src_utils_array_.md)
 * ["contractkit/src/utils/azure-key-vault-client"](modules/_contractkit_src_utils_azure_key_vault_client_.md)
 * ["contractkit/src/utils/ledger-utils"](modules/_contractkit_src_utils_ledger_utils_.md)
 * ["contractkit/src/utils/phone-number-lookup/bls-blinding-client"](modules/_contractkit_src_utils_phone_number_lookup_bls_blinding_client_.md)
@@ -79,4 +81,3 @@
 * ["contractkit/src/wrappers/SortedOracles"](modules/_contractkit_src_wrappers_sortedoracles_.md)
 * ["contractkit/src/wrappers/StableTokenWrapper"](modules/_contractkit_src_wrappers_stabletokenwrapper_.md)
 * ["contractkit/src/wrappers/Validators"](modules/_contractkit_src_wrappers_validators_.md)
-* ["utils/src/address"](modules/_utils_src_address_.md)

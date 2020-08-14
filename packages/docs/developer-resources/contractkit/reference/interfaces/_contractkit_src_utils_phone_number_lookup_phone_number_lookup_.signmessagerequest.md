@@ -14,6 +14,7 @@
 * [authenticationMethod](_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.signmessagerequest.md#authenticationmethod)
 * [blindedQueryPhoneNumber](_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.signmessagerequest.md#blindedqueryphonenumber)
 * [hashedPhoneNumber](_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.signmessagerequest.md#optional-hashedphonenumber)
+* [timestamp](_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.signmessagerequest.md#optional-timestamp)
 * [version](_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.signmessagerequest.md#version)
 
 ## Properties
@@ -24,7 +25,7 @@
 
 *Inherited from [PhoneNumberPrivacyRequest](_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.phonenumberprivacyrequest.md).[account](_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.phonenumberprivacyrequest.md#account)*
 
-*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L30)*
+*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L31)*
 
 ___
 
@@ -34,7 +35,7 @@ ___
 
 *Inherited from [PhoneNumberPrivacyRequest](_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.phonenumberprivacyrequest.md).[authenticationMethod](_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.phonenumberprivacyrequest.md#authenticationmethod)*
 
-*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L32)*
+*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L33)*
 
 ___
 
@@ -42,7 +43,7 @@ ___
 
 • **blindedQueryPhoneNumber**: *string*
 
-*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L36)*
+*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L37)*
 
 ___
 
@@ -50,7 +51,15 @@ ___
 
 • **hashedPhoneNumber**? : *undefined | string*
 
-*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L37)*
+*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L39)*
+
+___
+
+### `Optional` timestamp
+
+• **timestamp**? : *undefined | number*
+
+*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L38)*
 
 ___
 
@@ -60,4 +69,4 @@ ___
 
 *Inherited from [PhoneNumberPrivacyRequest](_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.phonenumberprivacyrequest.md).[version](_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.phonenumberprivacyrequest.md#version)*
 
-*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L31)*
+*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L32)*

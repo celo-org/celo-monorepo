@@ -123,12 +123,19 @@ export async function initGeth(sync: boolean = true): Promise<typeof gethInstanc
   gethLock = true
 
   try {
-    if (!(await ensureGenesisBlockWritten())) {
-      throw FailedToFetchGenesisBlockError
-    }
-    if (!(await ensureStaticNodesInitialized(sync))) {
-      throw FailedToFetchStaticNodesError
-    }
+    // Write static node and genesis block, canceling if either fail.
+    await Promise.all([
+      ensureGenesisBlockWritten().then((ok) => {
+        if (!ok) {
+          throw FailedToFetchGenesisBlockError
+        }
+      }),
+      ensureStaticNodesInitialized(sync).then((ok) => {
+        if (!ok) {
+          throw FailedToFetchStaticNodesError
+        }
+      }),
+    ])
 
     let geth: typeof RNGeth
     ValoraAnalytics.track(GethEvents.create_geth_start)
@@ -306,6 +313,13 @@ async function deleteSingleChainData(syncMode: SyncMode) {
   const chainDataDir = `${getNodeInstancePath(nodeDir)}/${syncMode}chaindata`
   Logger.debug('Geth@deleteSingleChainData', `Going to delete ${chainDataDir}`)
   return deleteFileIfExists(chainDataDir)
+}
+
+export async function deleteNodeData() {
+  const { nodeDir } = networkConfig
+  const dataDir = `${RNFS.DocumentDirectoryPath}/${nodeDir}`
+  Logger.debug('Geth@deleteNodeData', `Going to delete ${dataDir}`)
+  return deleteFileIfExists(dataDir)
 }
 
 async function deleteGethLockFile() {

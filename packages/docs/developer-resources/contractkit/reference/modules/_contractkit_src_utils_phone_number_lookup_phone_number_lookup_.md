@@ -32,7 +32,7 @@
 
 Ƭ **AuthSigner**: *[WalletKeySigner](../interfaces/_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.walletkeysigner.md) | [EncryptionKeySigner](../interfaces/_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.encryptionkeysigner.md)*
 
-*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L22)*
+*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L23)*
 
 ## Functions
 
@@ -40,7 +40,7 @@
 
 ▸ **postToPhoneNumPrivacyService**<**ResponseType**>(`signer`: [AuthSigner](_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.md#authsigner), `body`: [PhoneNumberPrivacyRequest](../interfaces/_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.phonenumberprivacyrequest.md), `context`: [ServiceContext](../interfaces/_contractkit_src_utils_phone_number_lookup_phone_number_lookup_.servicecontext.md), `endpoint`: string): *Promise‹ResponseType›*
 
-*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L74)*
+*Defined in [contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts:78](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/phone-number-lookup/phone-number-lookup.ts#L78)*
 
 Make a request to lookup the phone number identifier or perform matchmaking
 

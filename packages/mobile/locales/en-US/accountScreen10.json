@@ -4,6 +4,8 @@
   "languageSettings": "Language",
   "localCurrencySetting": "Currency",
   "licenses": "Licenses",
+  "removeAccountTitle": "Reset Valora",
+  "removeAccountDetails": "Resetting will remove your account from this device. Your funds will remain in the account, but will only be accessible with your Account Key",
   "legal": "Legal",
   "securityAndData": "Security and Data",
   "requirePinOnAppOpen": "Require PIN on App Open",
@@ -23,6 +25,16 @@
     "header": "Switch Connection Mode?",
     "body": "We’ve noticed you’re having some trouble connecting. We recommend enabling Data Saver mode to allow you to keep using {{appName}} with intermittent connection.",
     "switchToDataSaver": "Switch To Data Saver"
+  },
+  "accountKeyModal": {
+    "header": "Without your Account Key you will lose access to your funds forever",
+    "body1": "In order to reset Valora, you will need to confirm you've written your Account Key.",
+    "body2": "Nobody, not even Valora, can recover your account without your key."
+  },
+  "promptConfirmRemovalModal": {
+    "header": "Are you sure you want to reset Valora?",
+    "body": "You will no longer be able to access your funds or your Account Key from this device. There's no way to recover your Account Key if you haven't written it down.",
+    "resetNow": "Reset Now"
   },
   "testFaqLink": "{{appName}} FAQ",
   "termsOfServiceLink": "Terms of Service",
