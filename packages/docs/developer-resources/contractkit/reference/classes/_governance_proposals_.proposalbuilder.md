@@ -117,13 +117,13 @@ ___
 
 ###  build
 
-▸ **build**(): *Promise‹object[]›*
+▸ **build**(): *Promise‹any›*
 
 *Defined in [contractkit/src/governance/proposals.ts:84](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L84)*
 
 Build calls all of the added build steps and returns the final proposal.
 
-**Returns:** *Promise‹object[]›*
+**Returns:** *Promise‹any›*
 
 A constructed Proposal object (i.e. a list of ProposalTransaction)
 

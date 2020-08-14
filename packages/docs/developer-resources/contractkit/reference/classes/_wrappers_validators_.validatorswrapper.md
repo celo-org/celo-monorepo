@@ -635,13 +635,13 @@ ___
 
 ###  currentValidatorAccountsSet
 
-▸ **currentValidatorAccountsSet**(): *Promise‹object[]›*
+▸ **currentValidatorAccountsSet**(): *Promise‹any›*
 
 *Defined in [contractkit/src/wrappers/Validators.ts:585](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L585)*
 
 Returns the current set of validator signer and account addresses
 
-**Returns:** *Promise‹object[]›*
+**Returns:** *Promise‹any›*
 
 ___
 
