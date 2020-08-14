@@ -1,5 +1,5 @@
-import { PNPUtils } from '@celo/contractkit'
-import { PhoneNumberHashDetails } from '@celo/contractkit/lib/utils/phone-number-lookup/phone-number-identifier'
+import { OdisUtils } from '@celo/contractkit'
+import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import { FetchMock } from 'jest-fetch-mock'
 import { expectSaga } from 'redux-saga-test-plan'
 import * as matchers from 'redux-saga-test-plan/matchers'
@@ -17,7 +17,7 @@ import {
   mockE164Number,
   mockE164Number2,
   mockE164NumberHash,
-  mockE164NumberSalt,
+  mockE164NumberPepper,
 } from 'test/values'
 
 jest.mock('@celo/contractkit', () => ({
@@ -67,7 +67,7 @@ describe('Fetch contact matches', () => {
     const phoneHashDetails: PhoneNumberHashDetails = {
       e164Number: mockE164Number,
       phoneHash: mockE164NumberHash,
-      salt: mockE164NumberSalt,
+      pepper: mockE164NumberPepper,
     }
 
     const expectedMatches = {
@@ -84,7 +84,7 @@ describe('Fetch contact matches', () => {
         [call(getConnectedUnlockedAccount), mockAccount],
         [call(getUserSelfPhoneHashDetails), phoneHashDetails],
         [matchers.call.fn(isAccountUpToDate), true],
-        [matchers.call.fn(PNPUtils.Matchmaking.getContactMatches), [mockE164Number2]],
+        [matchers.call.fn(OdisUtils.Matchmaking.getContactMatches), [mockE164Number2]],
       ])
       .withState(state)
       .put(addContactsMatches(expectedMatches))
@@ -92,9 +92,9 @@ describe('Fetch contact matches', () => {
   })
 })
 
-describe(PNPUtils.Matchmaking.obfuscateNumberForMatchmaking, () => {
+describe(OdisUtils.Matchmaking.obfuscateNumberForMatchmaking, () => {
   it('Hashes sigs correctly', () => {
-    expect(PNPUtils.Matchmaking.obfuscateNumberForMatchmaking(mockE164Number2)).toBe(
+    expect(OdisUtils.Matchmaking.obfuscateNumberForMatchmaking(mockE164Number2)).toBe(
       'Fox23FU+SCdDPhk2I2h4e2UC63lyOWMygxc4wTAXu9w='
     )
   })

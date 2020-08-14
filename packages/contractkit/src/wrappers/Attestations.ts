@@ -61,6 +61,7 @@ export interface AttesationServiceRevealRequest {
   account: Address
   phoneNumber: string
   issuer: string
+  // TODO rename to pepper here and in Attesation Service
   salt?: string
   smsRetrieverAppSig?: string
 }
@@ -467,14 +468,14 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     account: Address,
     issuer: Address,
     serviceURL: string,
-    salt?: string,
+    pepper?: string,
     smsRetrieverAppSig?: string
   ) {
     const body: AttesationServiceRevealRequest = {
       account,
       phoneNumber,
       issuer,
-      salt,
+      salt: pepper,
       smsRetrieverAppSig,
     }
     return fetch(appendPath(serviceURL, 'attestations'), {

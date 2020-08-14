@@ -24,7 +24,7 @@ export enum ErrorMessages {
   VERIFICATION_FAILURE = 'nuxVerification2:verificationFailure',
   VERIFICATION_TIMEOUT = 'nuxVerification2:verificationTimeout',
   ADDRESS_LOOKUP_FAILURE = 'addressLookupFailure',
-  PGPNP_QUOTA_ERROR = 'pgpnpQuotaError',
+  ODIS_QUOTA_ERROR = 'odisQuotaError',
   SALT_FETCH_FAILURE = 'saltFetchFailure',
   SALT_QUOTA_EXCEEDED = 'saltQuotaExceededError',
   MATCHMAKING_QUOTA_EXCEEDED = 'matchmakingQuotaExceededError',
