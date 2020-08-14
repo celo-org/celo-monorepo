@@ -130,6 +130,11 @@ export type StackParamList = {
         nextScreen: keyof StackParamList
       }
     | undefined
+  [Screens.LanguageModal]:
+    | {
+        nextScreen: keyof StackParamList
+      }
+    | undefined
   [Screens.Licenses]: undefined
   [Screens.Main]: undefined
   [Screens.OutgoingPaymentRequestListScreen]: undefined
