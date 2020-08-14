@@ -34,4 +34,4 @@ done
 
 yarn check-versions -a $BRANCH_1 -b $BRANCH_2 -r $REPORT
 yarn build
-yarn run truffle exec ./scripts/truffle/make-release.js --network $NETWORK --build_directory build/ --report $REPORT --proposal $PROPOSAL --initialize_data $INITITIALIZE_DATA
+yarn run truffle exec ./scripts/truffle/make-release.js --network $NETWORK --build_directory build/ --report $REPORT --proposal $PROPOSAL --initialize_data $INITIALIZE_DATA
