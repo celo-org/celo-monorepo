@@ -1,4 +1,4 @@
-import { ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
+import { Address, ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
@@ -234,7 +234,10 @@ export function recoverKeyIndex(
 ): number {
   for (let i = 0; i < 4; i++) {
     const compressed = false
-    const recoveredPublicKeyByteArr = ecdsaRecover(signature, i, hash, compressed)
+    // Force types to be Uint8Array
+    const signatureArray = new Uint8Array(signature)
+    const hashArray = new Uint8Array(hash)
+    const recoveredPublicKeyByteArr = ecdsaRecover(signatureArray, i, hashArray, compressed)
     const publicKeyBuff = Buffer.from(recoveredPublicKeyByteArr)
     const recoveredPublicKey = bufferToBigNumber(publicKeyBuff)
     console.log(
@@ -248,4 +251,13 @@ export function recoverKeyIndex(
     }
   }
   throw new Error('Unable to generate recovery key from signature.')
+}
+
+export function getAddressFromPublicKey(publicKey: BigNumber): Address {
+  const pkBuffer = ethUtil.toBuffer(ensureLeading0x(publicKey.toString(16)))
+  if (!ethUtil.isValidPublic(pkBuffer, true)) {
+    throw new Error(`Invalid secp256k1 public key ${publicKey}`)
+  }
+  const address = ethUtil.pubToAddress(pkBuffer, true)
+  return ensureLeading0x(address.toString('hex'))
 }
