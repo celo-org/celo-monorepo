@@ -1,5 +1,5 @@
 import { CeloTransactionObject } from '@celo/contractkit'
-import { PhoneNumberHashDetails } from '@celo/contractkit/lib/utils/phone-number-lookup/phone-number-identifier'
+import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import {
   ActionableAttestation,
   AttesationServiceRevealRequest,
@@ -540,7 +540,7 @@ function* tryRevealPhoneNumber(
       account,
       issuer,
       phoneNumber: phoneHashDetails.e164Number,
-      salt: phoneHashDetails.salt,
+      salt: phoneHashDetails.pepper,
       smsRetrieverAppSig,
     }
 
