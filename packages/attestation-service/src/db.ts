@@ -1,6 +1,7 @@
 import { ContractKit, newKit } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import { eqAddress } from '@celo/utils/lib/address'
+import 'cross-fetch/polyfill'
 import { FindOptions, Sequelize } from 'sequelize'
 import { fetchEnv, getAccountAddress, getAttestationSignerAddress } from './env'
 import { rootLogger } from './logger'
