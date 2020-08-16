@@ -8,6 +8,8 @@ This page serves as a checklist for applications building and integrating on Cel
 
 Addresses are identical to Ethereum addresses. When displaying and asking for user-inputted addresses, consider using and validating address checksums following the [EIP55 standard](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-55.md) to detect typos.
 
+For core smart contracts, developers are highly encouraged to use the Registry to reference the contracts in case they will have to be repointed (via Governance)
+
 ### QR Codes
 
 Celo has [WIP QR code standard CIP16](https://github.com/celo-org/celo-proposals/pull/40) that aims to standardize how applications can ask wallets for transactions to avoid the user having to manually copy/paste addresses and other transaction metadata.
