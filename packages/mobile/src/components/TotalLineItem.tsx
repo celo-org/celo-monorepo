@@ -58,6 +58,6 @@ const styles = StyleSheet.create({
     marginVertical: 0,
   },
   dollarsText: {
-    color: colors.darkSecondary,
+    color: colors.gray5,
   },
 })

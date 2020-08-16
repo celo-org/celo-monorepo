@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
   },
   iconArea: {
     paddingRight: contentPadding,
