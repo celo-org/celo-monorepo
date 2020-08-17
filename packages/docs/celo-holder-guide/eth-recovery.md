@@ -1,6 +1,6 @@
 # Recovering CELO from an Ethereum Wallet
 
-In this tutorial, steps are outlined to help you recover your [CELO (previously Celo Gold)](../overview.md#background-and-key-concepts) if you accidentally transferred them to an [Ethereum address](https://en.wikipedia.org/wiki/Ethereum#Addresses).
+In this guide, steps are outlined to help you recover your [CELO (previously Celo Gold)](../overview.md#background-and-key-concepts) if you accidentally transferred them to an [Ethereum address](https://en.wikipedia.org/wiki/Ethereum#Addresses).
 
 ## Prerequisites
 
@@ -27,7 +27,7 @@ Write your recovery phrase to a file using the following commands:
 
 1. `nano recovery.txt`
 2. Paste `<word1> <word2> … <word24>`
-3. Replace the `<word>`s in brackets with the 24 words from your recovery phrase.
+3. Replace the `<word>`s in brackets with the 24 words from your recovery phrase
 4. Press ctrl-o to save
 5. Press ctrl-x to exit
 
@@ -57,7 +57,7 @@ Replace `<accountAddress>` with the `accountAddress` you got from the previous s
 
 ### Transfer CELO
 
-Now, you have the freedom to transfer your CELO (Celo Gold) to an address of choice:
+Now, you can transfer your CELO to an address of choice:
 
 ```
 celocli transfer:gold --from <accountAddress> --to <addressOfChoice> --value <valueInCeloWei> --privateKey <privateKey> --node https://rc1-forno.celo-testnet.org
@@ -66,7 +66,6 @@ celocli transfer:gold --from <accountAddress> --to <addressOfChoice> --value <va
 - Replace `<accountAddress>` with the `accountAddress` you got from the previous step.
 - Replace `<addressOfChoice>` with the address that you want to send CELO to.
 - Replace `<valueInCeloWei>` with the amount you want to send, but this number needs to be slightly lower than your balance, as there’s a transaction fee.
-- 
 
 {% hint style="info" %}
 Note that the value has a unit of CELO Wei (1 CELO = 10^18 CELO Wei), so if you want to send 1 CELO, the `<valueInCeloWei>` should be 1000000000000000000.
