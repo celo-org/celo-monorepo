@@ -25,14 +25,14 @@ import { CURRENCY_ENUM } from 'src/geth/consts'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { convertToContractDecimals, createTokenTransferTransaction } from 'src/tokens/saga'
-import {
-  addStandbyTransaction,
-  generateStandbyTransactionId,
-  removeStandbyTransaction,
-} from 'src/transactions/actions'
+import { addStandbyTransaction, removeStandbyTransaction } from 'src/transactions/actions'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
-import { TransactionStatus } from 'src/transactions/types'
+import {
+  newTransactionContext,
+  TransactionContext,
+  TransactionStatus,
+} from 'src/transactions/types'
 import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange'
 import { roundDown } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
@@ -158,7 +158,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
   Logger.debug(`${TAG}@exchangeGoldAndStableTokens`, 'Exchanging gold and stable token')
   const { makerToken, makerAmount } = action
   Logger.debug(TAG, `Exchanging ${makerAmount.toString()} of token ${makerToken}`)
-  let txId: string | null = null
+  let context: TransactionContext | null = null
   try {
     navigate(Screens.ExchangeHomeScreen) // Must navigate to final screen before getting unlocked account which prompts pin
     ValoraAnalytics.track(CeloExchangeEvents.celo_exchange_start)
@@ -180,7 +180,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       throw new Error('Invalid exchange rate')
     }
 
-    txId = yield createStandbyTx(makerToken, makerAmount, exchangeRate, account)
+    context = yield createStandbyTx(makerToken, makerAmount, exchangeRate, account)
 
     const contractKit = yield call(getContractKit)
 
@@ -253,6 +253,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       wei for ${convertedMakerAmount} wei of ${makerToken}`
     )
 
+    // Generate and send a transaction to approve payment to the exchange.
     let approveTx
     if (makerToken === CURRENCY_ENUM.GOLD) {
       approveTx = goldTokenContract.approve(
@@ -271,7 +272,13 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       Logger.error(TAG, `Unexpected maker token ${makerToken}`)
       return
     }
-    yield call(sendTransaction, approveTx.txo, account, TAG, 'approval')
+
+    yield call(
+      sendTransaction,
+      approveTx.txo,
+      account,
+      newTransactionContext(TAG, `Approve exchange of ${makerToken}`)
+    )
     Logger.debug(TAG, `Transaction approved: ${util.inspect(approveTx.txo.arguments)}`)
 
     contractKit.defaultAccount = account
@@ -282,14 +289,16 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       sellGold
     )
 
-    if (!txId) {
-      ValoraAnalytics.track(CeloExchangeEvents.celo_exchange_error, { error: 'Missing tx id ' })
-      Logger.error(TAG, 'No txId. Did not exchange.')
+    if (context === null) {
+      ValoraAnalytics.track(CeloExchangeEvents.celo_exchange_error, {
+        error: 'Missing transaction ID',
+      })
+      Logger.error(TAG, 'No transaction ID. Did not exchange.')
       return
     }
-    yield call(sendAndMonitorTransaction, txId, tx, account)
+    yield call(sendAndMonitorTransaction, tx, account, context)
     ValoraAnalytics.track(CeloExchangeEvents.celo_exchange_complete, {
-      txId,
+      txId: context.id,
       currency: makerToken,
       amount: makerAmount.toString(),
     })
@@ -304,8 +313,8 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
         error,
       }
     )
-    if (txId) {
-      yield put(removeStandbyTransaction(txId))
+    if (context?.id) {
+      yield put(removeStandbyTransaction(context.id))
     }
 
     if (error.message === ErrorMessages.INCORRECT_PIN) {
@@ -323,10 +332,10 @@ function* createStandbyTx(
   account: string
 ) {
   const takerAmount = getTakerAmount(makerAmount, exchangeRate)
-  const txId = generateStandbyTransactionId(account)
+  const context = newTransactionContext(TAG, `Exchange ${makerToken}`)
   yield put(
     addStandbyTransaction({
-      id: txId,
+      context,
       type: TokenTransactionType.Exchange,
       status: TransactionStatus.Pending,
       inSymbol: makerToken,
@@ -336,21 +345,21 @@ function* createStandbyTx(
       timestamp: Math.floor(Date.now() / 1000),
     })
   )
-  return txId
+  return context
 }
 
 function* withdrawCelo(action: WithdrawCeloAction) {
-  let txId: string | null = null
+  let context: TransactionContext | null = null
   try {
     const { recipientAddress, amount } = action
     const account: string = yield call(getConnectedUnlockedAccount)
 
     navigate(Screens.ExchangeHomeScreen)
 
-    txId = generateStandbyTransactionId(account)
+    context = newTransactionContext(TAG, 'Withdraw CELO')
     yield put(
       addStandbyTransaction({
-        id: txId,
+        context,
         type: TokenTransactionType.Sent,
         comment: '',
         status: TransactionStatus.Pending,
@@ -371,14 +380,14 @@ function* withdrawCelo(action: WithdrawCeloAction) {
       }
     )
 
-    yield call(sendAndMonitorTransaction, txId, tx, account, CURRENCY_ENUM.GOLD)
+    yield call(sendAndMonitorTransaction, tx, account, context, CURRENCY_ENUM.GOLD)
     ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_completed, {
       amount: amount.toString(),
     })
   } catch (error) {
     Logger.error(TAG, 'Error withdrawing CELO', error)
-    if (txId) {
-      yield put(removeStandbyTransaction(txId))
+    if (context?.id) {
+      yield put(removeStandbyTransaction(context.id))
     }
 
     yield put(showError(ErrorMessages.TRANSACTION_FAILED))

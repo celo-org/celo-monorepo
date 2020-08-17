@@ -20,6 +20,7 @@ import { features } from 'src/flags'
 import { FetchDataEncryptionKeyAction, updateAddressDekMap } from 'src/identity/actions'
 import { getCurrencyAddress } from 'src/tokens/saga'
 import { sendTransaction } from 'src/transactions/send'
+import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { registerDataEncryptionKey, setDataEncryptionKey } from 'src/web3/actions'
 import { getContractKit, getContractKitAsync } from 'src/web3/contracts'
@@ -109,8 +110,11 @@ export function* registerAccountDek(account: string) {
       return
     }
 
+    // Generate and send a transaction to set the DEK on-chain.
     const setAccountTx = accountsWrapper.setAccount('', publicDataKey, account)
-    yield call(sendTransaction, setAccountTx.txo, account, TAG, 'Set Wallet Address & DEK')
+    const context = newTransactionContext(TAG, 'Set wallet address & DEK')
+    yield call(sendTransaction, setAccountTx.txo, account, context)
+
     yield put(registerDataEncryptionKey())
     ValoraAnalytics.track(OnboardingEvents.account_dek_set)
   } catch (error) {
