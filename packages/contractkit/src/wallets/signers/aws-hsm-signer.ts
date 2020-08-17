@@ -1,13 +1,12 @@
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { KMS } from 'aws-sdk'
 import { BigNumber } from 'bignumber.js'
-import { ec as EC } from 'elliptic'
 import * as ethUtil from 'ethereumjs-util'
 import { parseBERSignature } from '../../utils/ber-utils'
 import {
   bigNumberToBuffer,
   bufferToBigNumber,
-  isCanonical,
+  makeCanonical,
   Signature,
 } from '../../utils/signature-utils'
 import {
@@ -20,7 +19,6 @@ import {
 import { Signer } from './signer'
 
 const SigningAlgorithm = 'ECDSA_SHA_256'
-const secp256k1Curve = new EC('secp256k1')
 
 export default class AwsHsmSigner implements Signer {
   private kms: KMS
@@ -37,25 +35,19 @@ export default class AwsHsmSigner implements Signer {
     let S: BigNumber
     let R: BigNumber
 
-    let flag = true
-    while (flag) {
-      const { Signature: signature } = await this.kms
-        .sign({
-          KeyId: this.keyId,
-          MessageType: 'DIGEST',
-          Message: buffer,
-          SigningAlgorithm,
-        })
-        .promise()
-      const { r, s } = parseBERSignature(signature as Buffer)
-      R = bufferToBigNumber(r)
-      S = bufferToBigNumber(s)
+    const { Signature: signature } = await this.kms
+      .sign({
+        KeyId: this.keyId,
+        MessageType: 'DIGEST',
+        Message: buffer,
+        SigningAlgorithm,
+      })
+      .promise()
+    const { r, s } = parseBERSignature(signature as Buffer)
 
-      const N = bufferToBigNumber(secp256k1Curve.curve.n)
-      if (isCanonical(S, N)) {
-        flag = false
-      }
-    }
+    R = bufferToBigNumber(r)
+    S = bufferToBigNumber(s)
+    S = makeCanonical(S)
 
     return { S: S!, R: R! }
   }

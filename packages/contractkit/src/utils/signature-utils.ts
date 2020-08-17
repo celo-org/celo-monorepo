@@ -1,12 +1,23 @@
 import { ensureLeading0x } from '@celo/utils/lib/address'
 import { BigNumber } from 'bignumber.js'
+import { ec as EC } from 'elliptic'
 import * as ethUtil from 'ethereumjs-util'
 
+const secp256k1Curve = new EC('secp256k1')
+
 /**
- * Returns true if the signature is in the "bottom" of the curve
+ * If the signature is in the "bottom" of the curve, it is non-canonical
+ * Non-canonical signatures are illegal in Ethereum and therefore the S value
+ * must be transposed to the lower intersection
+ * https://github.com/bitcoin/bips/blob/master/bip-0062.mediawiki#Low_S_values_in_signatures
  */
-export const isCanonical = (S: BigNumber, curveN: BigNumber): boolean => {
-  return S.comparedTo(curveN.dividedBy(2)) <= 0
+export const makeCanonical = (S: BigNumber): BigNumber => {
+  const curveN = bufferToBigNumber(secp256k1Curve.curve.n)
+  const isCanonical = S.comparedTo(curveN.dividedBy(2)) <= 0
+  if (!isCanonical) {
+    return curveN.minus(S)
+  }
+  return S
 }
 
 export const bufferToBigNumber = (input: Buffer): BigNumber => {

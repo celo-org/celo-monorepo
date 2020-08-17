@@ -2,12 +2,8 @@ import { DefaultAzureCredential } from '@azure/identity'
 import { CryptographyClient, KeyClient, KeyVaultKey } from '@azure/keyvault-keys'
 import { SecretClient } from '@azure/keyvault-secrets'
 import { BigNumber } from 'bignumber.js'
-import debugFactory from 'debug'
-import { ec as EC } from 'elliptic'
-import { bigNumberToBuffer, bufferToBigNumber, isCanonical, Signature } from './signature-utils'
+import { bigNumberToBuffer, bufferToBigNumber, makeCanonical, Signature } from './signature-utils'
 import { publicKeyPrefix, recoverKeyIndex } from './signing-utils'
-
-const debug = debugFactory('kit:wallet:akv-client')
 
 /**
  * Provides an abstraction on Azure Key Vault for performing signing operations
@@ -19,7 +15,6 @@ export class AzureKeyVaultClient {
   private readonly credential: DefaultAzureCredential
   private readonly keyClient: KeyClient
   private readonly SIGNING_ALGORITHM: string = 'ECDSA256'
-  private readonly secp256k1Curve = new EC('secp256k1')
   private cryptographyClientSet: Map<string, CryptographyClient> = new Map<
     string,
     CryptographyClient
@@ -69,8 +64,8 @@ export class AzureKeyVaultClient {
       throw new Error(`Unable to locate key: ${keyName}`)
     }
     const cryptographyClient = await this.getCryptographyClient(keyName)
-    // @ts-ignore-next-line (ECDSA256 is not included in the client enum but is valid)
     const signResult = await cryptographyClient.sign(
+      // @ts-ignore-next-line (ECDSA256 is not included in the client enum but is valid)
       this.SIGNING_ALGORITHM,
       new Uint8Array(message)
     )
@@ -88,15 +83,7 @@ export class AzureKeyVaultClient {
     // Canonicalize signature
     const R = bufferToBigNumber(Buffer.from(rawSignature.slice(0, 32)))
     let S = bufferToBigNumber(Buffer.from(rawSignature.slice(32, 64)))
-
-    // The Azure Signature MAY not be canonical, which is illegal in Ethereum
-    // thus it must be transposed to the lower intersection.
-    // https://github.com/bitcoin/bips/blob/master/bip-0062.mediawiki#Low_S_values_in_signatures
-    const N = bufferToBigNumber(this.secp256k1Curve.curve.n)
-    if (!isCanonical(S, N)) {
-      debug('Canonicalizing signature')
-      S = N.minus(S)
-    }
+    S = makeCanonical(S)
 
     const rBuff = bigNumberToBuffer(R, 32)
     const sBuff = bigNumberToBuffer(S, 32)
