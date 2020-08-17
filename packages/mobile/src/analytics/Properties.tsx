@@ -87,6 +87,8 @@ interface SettingsEventsProperties {
   }
   [SettingsEvents.licenses_view]: undefined
   [SettingsEvents.tos_view]: undefined
+  [SettingsEvents.start_account_removal]: undefined
+  [SettingsEvents.completed_account_removal]: undefined
 }
 
 interface OnboardingEventsProperties {
