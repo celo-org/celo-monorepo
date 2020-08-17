@@ -205,6 +205,7 @@ spec:
             --verbosity={{ .Values.geth.verbosity }} \
             --vmodule={{ .Values.geth.vmodule }} \
             --istanbul.validator \
+            --istanbul.replica \
             --istanbul.blockperiod={{ .Values.geth.blocktime }} \
             --istanbul.requesttimeout={{ .Values.geth.istanbulrequesttimeout }} \
             --maxpeers=125 \
