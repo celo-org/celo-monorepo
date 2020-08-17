@@ -1,5 +1,6 @@
-import { PNPUtils } from '@celo/contractkit'
-import { PhoneNumberHashDetails } from '@celo/contractkit/lib/utils/phone-number-lookup/phone-number-identifier'
+import { OdisUtils } from '@celo/contractkit'
+import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
+import { AuthSigner, ServiceContext } from '@celo/contractkit/lib/identity/odis/query'
 import DeviceInfo from 'react-native-device-info'
 import { call, put } from 'redux-saga/effects'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -27,24 +28,30 @@ export function* fetchContactMatches(e164NumberToRecipients: NumberToRecipient) 
     return
   }
 
-  const authSigner = yield call(getAuthSignerForAccount, account)
+  const authSigner: AuthSigner = yield call(getAuthSignerForAccount, account)
+
+  const { odisPubKey, odisUrl } = networkConfig
+  const serviceContext: ServiceContext = {
+    odisUrl,
+    odisPubKey,
+  }
 
   try {
     const matchedE164Number: string[] = yield call(
-      PNPUtils.Matchmaking.getContactMatches,
+      OdisUtils.Matchmaking.getContactMatches,
       selfPhoneDetails.e164Number,
       Object.keys(e164NumberToRecipients),
       account,
       selfPhoneDetails.phoneHash,
       authSigner,
-      networkConfig,
+      serviceContext,
       DeviceInfo.getVersion()
     )
 
     const matches = getMatchedContacts(e164NumberToRecipients, matchedE164Number)
     yield put(addContactsMatches(matches))
   } catch (error) {
-    if (error.message === ErrorMessages.PGPNP_QUOTA_ERROR) {
+    if (error.message === ErrorMessages.ODIS_QUOTA_ERROR) {
       throw new Error(ErrorMessages.MATCHMAKING_QUOTA_EXCEEDED)
     }
     throw error

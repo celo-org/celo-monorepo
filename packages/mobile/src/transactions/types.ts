@@ -1,8 +1,9 @@
 import { TokenTransactionType } from 'src/apollo/types'
 import { CURRENCY_ENUM } from 'src/geth/consts'
+import { v4 as uuidv4 } from 'uuid'
 
 export interface ExchangeStandby {
-  id: string
+  context: TransactionContext
   type: TokenTransactionType.Exchange
   status: TransactionStatus
   inSymbol: CURRENCY_ENUM
@@ -12,8 +13,9 @@ export interface ExchangeStandby {
   timestamp: number
   hash?: string
 }
+
 export interface TransferStandby {
-  id: string
+  context: TransactionContext
   type: TransferTransactionType
   status: TransactionStatus
   value: string
@@ -25,6 +27,27 @@ export interface TransferStandby {
 }
 
 export type StandbyTransaction = ExchangeStandby | TransferStandby
+
+// Context used for logging the transaction execution flow.
+export interface TransactionContext {
+  // Unique identifier used for tracking a transaction within logging.
+  // Note that this is not the transaction hash, which is unknown when creating a new transaction.
+  id: string
+
+  // A tag provided by the caller to provide context on the purpose.
+  tag?: string
+
+  // A short contextual description of what the transaction does. (e.g. "Approve attestations")
+  description?: string
+}
+
+export function newTransactionContext(tag: string, description: string) {
+  return {
+    id: uuidv4(),
+    tag,
+    description,
+  }
+}
 
 export enum TransactionStatus {
   Pending = 'Pending',
