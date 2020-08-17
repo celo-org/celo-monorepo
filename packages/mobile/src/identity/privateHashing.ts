@@ -91,7 +91,7 @@ function* doFetchPhoneHashPrivate(e164Number: string) {
 
 export function* balanceSufficientForQuotaRetrieval() {
   const userBalance = yield select(stableTokenBalanceSelector)
-  return new BigNumber(userBalance).isGreaterThan(ODIS_MINIMUM_DOLLAR_BALANCE)
+  return new BigNumber(userBalance).isGreaterThanOrEqualTo(ODIS_MINIMUM_DOLLAR_BALANCE)
 }
 
 // Unlike the getPhoneHash in utils, this leverages the phone number
