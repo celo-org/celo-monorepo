@@ -1,4 +1,3 @@
-import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import ItemSeparator from '@celo/react-components/components/ItemSeparator'
 import SectionHead from '@celo/react-components/components/SectionHeadGold'
 import { SettingsItemTextValue } from '@celo/react-components/components/SettingsItem'
@@ -17,6 +16,7 @@ import { useDispatch } from 'react-redux'
 import { CeloExchangeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { fetchExchangeRate } from 'src/exchange/actions'
+import CeloExchangeButtons from 'src/exchange/CeloExchangeButtons'
 import CeloGoldHistoryChart from 'src/exchange/CeloGoldHistoryChart'
 import CeloGoldOverview from 'src/exchange/CeloGoldOverview'
 import { useExchangeRate } from 'src/exchange/hooks'
@@ -53,26 +53,6 @@ function ExchangeHomeScreen({ navigation }: Props) {
     return getLocalCurrencyDisplayValue(amount, localCurrencyCode || LocalCurrencyCode.USD, true)
   }
 
-  function goToBuyGold() {
-    ValoraAnalytics.track(CeloExchangeEvents.celo_home_buy)
-    navigation.navigate(Screens.ExchangeTradeScreen, {
-      makerTokenDisplay: {
-        makerToken: CURRENCY_ENUM.DOLLAR,
-        makerTokenBalance: dollarBalance || '0',
-      },
-    })
-  }
-
-  function goToBuyDollars() {
-    ValoraAnalytics.track(CeloExchangeEvents.celo_home_sell)
-    navigation.navigate(Screens.ExchangeTradeScreen, {
-      makerTokenDisplay: {
-        makerToken: CURRENCY_ENUM.GOLD,
-        makerTokenBalance: goldBalance || '0',
-      },
-    })
-  }
-
   function goToWithdrawCelo() {
     ValoraAnalytics.track(CeloExchangeEvents.celo_home_withdraw)
     navigation.navigate(Screens.WithdrawCeloScreen)
@@ -105,8 +85,6 @@ function ExchangeHomeScreen({ navigation }: Props) {
   }, [])
 
   const { t } = useTranslation(Namespaces.exchangeFlow9)
-  const dollarBalance = useSelector((state) => state.stableToken.balance)
-  const goldBalance = useSelector((state) => state.goldToken.balance)
 
   // TODO: revert this back to `useLocalCurrencyCode()` when we have history data for cGDL to Local Currency.
   const localCurrencyCode = null
@@ -130,8 +108,6 @@ function ExchangeHomeScreen({ navigation }: Props) {
       rateWentUp = rateChange?.gt(0)
     }
   }
-
-  const hasGold = new BigNumber(goldBalance || 0).isGreaterThan(0)
 
   return (
     <SafeAreaView style={styles.background} edges={['top']}>
@@ -191,24 +167,7 @@ function ExchangeHomeScreen({ navigation }: Props) {
           </View>
 
           <CeloGoldHistoryChart />
-          <View style={styles.buttonContainer}>
-            <Button
-              text={t('buy')}
-              size={BtnSizes.FULL}
-              onPress={goToBuyGold}
-              style={styles.button}
-              type={BtnTypes.TERTIARY}
-            />
-            {hasGold && (
-              <Button
-                size={BtnSizes.FULL}
-                text={t('sell')}
-                onPress={goToBuyDollars}
-                style={styles.button}
-                type={BtnTypes.TERTIARY}
-              />
-            )}
-          </View>
+          <CeloExchangeButtons navigation={navigation} />
           <ItemSeparator />
           <CeloGoldOverview testID="ExchangeAccountOverview" />
           <ItemSeparator />
@@ -245,17 +204,6 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
     justifyContent: 'space-between',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    flex: 1,
-    marginTop: 24,
-    marginBottom: 28,
-    marginHorizontal: 12,
-  },
-  button: {
-    marginHorizontal: 4,
-    flex: 1,
   },
   head: {
     backgroundColor: colors.light,
