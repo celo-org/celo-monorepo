@@ -4,6 +4,8 @@
  * but keeping it here for now since that's where other account state is
  */
 
+import { OdisUtils } from '@celo/contractkit'
+import { AuthSigner } from '@celo/contractkit/lib/identity/odis/query'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { ensureLeading0x, eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
@@ -14,6 +16,7 @@ import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { getStoredMnemonic } from 'src/backup/utils'
+import { features } from 'src/flags'
 import { FetchDataEncryptionKeyAction, updateAddressDekMap } from 'src/identity/actions'
 import { getCurrencyAddress } from 'src/tokens/saga'
 import { sendTransaction } from 'src/transactions/send'
@@ -119,7 +122,7 @@ export function* registerAccountDek(account: string) {
 
 // Check if account address and DEK match what's in
 // the Accounts contract
-async function isAccountUpToDate(
+export async function isAccountUpToDate(
   accountsWrapper: AccountsWrapper,
   address: string,
   dataKey: string
@@ -132,6 +135,7 @@ async function isAccountUpToDate(
     accountsWrapper.getWalletAddress(address),
     accountsWrapper.getDataEncryptionKey(address),
   ])
+  Logger.debug(`${TAG}/isAccountUpToDate`, `DEK associated with account ${currentDEK}`)
   return eqAddress(currentWalletAddress, address) && currentDEK && eqAddress(currentDEK, dataKey)
 }
 
@@ -149,4 +153,46 @@ export async function getRegisterDekTxGas(account: string, currency: CURRENCY_EN
     Logger.warn(`${TAG}/getRegisterDekTxGas`, 'Failed to estimate DEK tx gas', error)
     throw Error(ErrorMessages.INSUFFICIENT_BALANCE)
   }
+}
+
+export function* getAuthSignerForAccount(account: string) {
+  const contractKit = yield call(getContractKit)
+
+  if (features.PNP_USE_DEK_FOR_AUTH) {
+    // Use the DEK for authentication if the current DEK is registered with this account
+    const accountsWrapper: AccountsWrapper = yield call([
+      contractKit.contracts,
+      contractKit.contracts.getAccounts,
+    ])
+    const privateDataKey: string | null = yield select(dataEncryptionKeySelector)
+    if (!privateDataKey) {
+      Logger.error(TAG + '/getAuthSignerForAccount', 'Missing comment key, should never happen.')
+    } else {
+      const publicDataKey = compressedPubKey(hexToBuffer(privateDataKey))
+      const upToDate: boolean = yield call(
+        isAccountUpToDate,
+        accountsWrapper,
+        account,
+        publicDataKey
+      )
+      if (!upToDate) {
+        Logger.error(TAG + '/getAuthSignerForAccount', `DEK mismatch.`)
+      } else {
+        Logger.info(TAG + '/getAuthSignerForAccount', 'Using DEK for authentication')
+        const encyptionKeySigner: AuthSigner = {
+          authenticationMethod: OdisUtils.Query.AuthenticationMethod.ENCRYPTION_KEY,
+          rawKey: privateDataKey,
+        }
+        return encyptionKeySigner
+      }
+    }
+  }
+
+  // Fallback to using wallet key
+  Logger.info(TAG + '/getAuthSignerForAccount', 'Using wallet key for authentication')
+  const walletKeySigner: AuthSigner = {
+    authenticationMethod: OdisUtils.Query.AuthenticationMethod.WALLET_KEY,
+    contractKit,
+  }
+  return walletKeySigner
 }

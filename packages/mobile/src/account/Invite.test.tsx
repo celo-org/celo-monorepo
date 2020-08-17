@@ -8,7 +8,15 @@ import { createMockStore, getMockStackScreenProps } from 'test/utils'
 import { mockE164NumberToInvitableRecipient } from 'test/values'
 
 describe('Invite', () => {
-  it('renders correctly with recipients', () => {
+  beforeAll(() => {
+    jest.useFakeTimers()
+  })
+
+  afterAll(() => {
+    jest.useRealTimers()
+  })
+
+  it('renders correctly with recipients', async () => {
     const tree = renderer.create(
       <Provider
         store={createMockStore({
@@ -21,7 +29,7 @@ describe('Invite', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  it('renders correctly with no recipients', () => {
+  it('renders correctly with no recipients', async () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <Invite {...getMockStackScreenProps(Screens.Invite)} />

@@ -1,6 +1,12 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
+import { Encrypt } from '@celo/utils/lib/ecies'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
-import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/src/address'
+import {
+  normalizeAddressWith0x,
+  privateKeyToAddress,
+  privateKeyToPublicKey,
+  trimLeading0x,
+} from '@celo/utils/src/address'
 import net from 'net'
 import Web3 from 'web3'
 import { Tx } from 'web3-core'
@@ -51,6 +57,7 @@ export const TYPED_DATA = {
 }
 
 export const PRIVATE_KEY1 = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abbdef'
+const PUBLIC_KEY1 = privateKeyToPublicKey(PRIVATE_KEY1)
 export const ACCOUNT_ADDRESS1 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY1))
 export const PRIVATE_KEY2 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890fdeccc'
 export const ACCOUNT_ADDRESS2 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY2))
@@ -233,6 +240,26 @@ testWithGanache('rpc-wallet', (web3) => {
               expect(signedMessage).not.toBeUndefined()
               const valid = verifyEIP712TypedDataSigner(TYPED_DATA, signedMessage, ACCOUNT_ADDRESS1)
               expect(valid).toBeTruthy()
+            })
+          })
+        })
+      })
+
+      describe('decryption', () => {
+        describe('using an unlocked address', () => {
+          beforeAll(async () => {
+            await rpcWallet.unlockAccount(ACCOUNT_ADDRESS1, PASSPHRASE, DURATION)
+          })
+
+          describe('when calling decrypt', () => {
+            test('succcessfully decrypts ciphertext', async () => {
+              const plaintext = 'test_plaintext'
+              const ciphertext = Encrypt(
+                Buffer.from(trimLeading0x(PUBLIC_KEY1), 'hex'),
+                Buffer.from(plaintext)
+              )
+              const decryptedPlaintext = await rpcWallet.decrypt(ACCOUNT_ADDRESS1, ciphertext)
+              expect(decryptedPlaintext.toString()).toEqual(plaintext)
             })
           })
         })
