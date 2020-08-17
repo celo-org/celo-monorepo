@@ -21,14 +21,15 @@ There are [risks](https://www.cryptomathic.com/news-events/blog/cryptographic-ke
 Please follow the instructions below closely, because missteps can lead to errors or permanent loss of your tokens. To understand these steps, please read [What is Ethereum](https://ethereum.org/en/what-is-ethereum/) and [Celo Overview](https://docs.celo.org/overview).
 
 
-### Prepare recovery phases
+### Prepare your recovery phases
 
-Write your recovery phrase to a file using the following commands
-- `nano recovery.txt`
-- Paste `<word1> <word2> … <word24>`
-- Replace the `<word>`s in brackets with the 24 words from your recovery phrase.
-- Press ctrl-o to save
-- Press ctrl-x to exit
+Write your recovery phrase to a file using the following commands:
+
+1. `nano recovery.txt`
+2. Paste `<word1> <word2> … <word24>`
+3. Replace the `<word>`s in brackets with the 24 words from your recovery phrase.
+4. Press ctrl-o to save
+5. Press ctrl-x to exit
 
 ### Recover your Ethereum address on Celo
 
