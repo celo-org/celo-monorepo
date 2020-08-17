@@ -5,8 +5,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
+import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
-import com.facebook.react.ReactFragmentActivity;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactRootView;
 import com.facebook.react.bridge.ReactContext;
@@ -16,7 +16,7 @@ import java.util.Date;
 import org.devio.rn.splashscreen.SplashScreen;
 
 public class MainActivity
-  extends ReactFragmentActivity
+  extends ReactActivity
   implements ReactInstanceManager.ReactInstanceEventListener {
   long appStartedMillis;
 
