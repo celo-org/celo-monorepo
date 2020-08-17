@@ -6,6 +6,7 @@ import {
   EmitterSubscription,
   Linking,
   NativeEventEmitter,
+  Platform,
   StatusBar,
   YellowBox,
 } from 'react-native'
@@ -56,13 +57,27 @@ interface State {
 //   UIManager.setLayoutAnimationEnabledExperimental(true)
 // }
 
+const createEventEmitter: (
+  eventName: string,
+  callback: (reactInitTime: string) => void
+) => EmitterSubscription | null = (
+  eventName: string,
+  callback: (reactInitTime: string) => void
+): EmitterSubscription | null => {
+  if (Platform.OS === 'android') {
+    return new NativeEventEmitter().addListener(eventName, callback)
+  }
+  // TODO: Add listener for iOS
+  return null
+}
+
 export class App extends React.Component {
   state: State = {
     reactInitTime: undefined,
     reactLoadTime: undefined,
   }
 
-  appStartListener: EmitterSubscription = new NativeEventEmitter().addListener(
+  appStartListener: EmitterSubscription | null = createEventEmitter(
     'AppStartedLoading',
     (reactInitTime: string) => {
       this.setState({
@@ -92,7 +107,10 @@ export class App extends React.Component {
       appLoadDuration,
     })
 
-    this.appStartListener.remove()
+    if (this.appStartListener) {
+      this.appStartListener.remove()
+    }
+
     Linking.addEventListener('url', this.handleOpenURL)
   }
 
