@@ -2,12 +2,14 @@ import { OdisUtils } from '@celo/contractkit'
 import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import { AuthSigner, ServiceContext } from '@celo/contractkit/lib/identity/odis/query'
 import { getPhoneHash, isE164Number, PhoneNumberUtils } from '@celo/utils/src/phoneNumbers'
+import BigNumber from 'bignumber.js'
 import DeviceInfo from 'react-native-device-info'
 import { call, put, select } from 'redux-saga/effects'
 import { e164NumberSelector } from 'src/account/selectors'
 import { IdentityEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { ODIS_MINIMUM_DOLLAR_BALANCE } from 'src/config'
 import networkConfig from 'src/geth/networkConfig'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
 import { ReactBlsBlindingClient } from 'src/identity/bls-blinding-client'
@@ -70,6 +72,9 @@ function* doFetchPhoneHashPrivate(e164Number: string) {
   }
 
   Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Salt was not cached, fetching')
+  if (!balanceSufficientForQuotaRetrieval()) {
+    throw new Error(ErrorMessages.ODIS_INSUFFICIENT_BALANCE)
+  }
   const selfPhoneDetails: PhoneNumberHashDetails | undefined = yield call(
     getUserSelfPhoneHashDetails
   )
@@ -82,6 +87,11 @@ function* doFetchPhoneHashPrivate(e164Number: string) {
   )
   yield put(updateE164PhoneNumberSalts({ [e164Number]: details.pepper }))
   return details
+}
+
+export function* balanceSufficientForQuotaRetrieval() {
+  const userBalance = yield select(stableTokenBalanceSelector)
+  return new BigNumber(userBalance).isGreaterThan(ODIS_MINIMUM_DOLLAR_BALANCE)
 }
 
 // Unlike the getPhoneHash in utils, this leverages the phone number
