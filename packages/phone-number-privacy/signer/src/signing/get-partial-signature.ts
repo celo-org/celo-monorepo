@@ -79,16 +79,28 @@ export async function handleGetBlindedMessagePartialSig(
       )
       return
     }
+
     const keyProvider = getKeyProvider()
     const privateKey = keyProvider.getPrivateKey()
     const signature = computeBlindedSignature(blindedQueryPhoneNumber, privateKey)
-    if (!(await getRequestExists(request.body))) {
-      await incrementQueryCount(account)
-      await storeRequest(request.body)
+
+    if (await getRequestExists(request.body)) {
+      logger.debug(
+        'Signature request already exists in db. Will not store request or increment query count.'
+      )
+      errorMsg = WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG
     } else {
-      logger.debug('Signature request already exists in db. Leaving quota unchanged.')
+      if (!(await storeRequest(request.body))) {
+        logger.debug('Did not store request.')
+        errorMsg = ErrorMessage.FAILURE_TO_STORE_REQUEST
+      }
+      if (!(await incrementQueryCount(account))) {
+        logger.debug('Did not increment query count.')
+        errorMsg = ErrorMessage.FAILURE_TO_INCREMENT_QUERY_COUNT
+      } else {
+        performedQueryCount++
+      }
     }
-    logger.debug('Signature retrieval success')
 
     let signMessageResponse: SignMessageResponse
     const signMessageResponseSuccess: SignMessageResponse = {
@@ -106,6 +118,7 @@ export async function handleGetBlindedMessagePartialSig(
     } else {
       signMessageResponse = signMessageResponseSuccess
     }
+    logger.debug('Signature retrieval success')
     response.json(signMessageResponse)
   } catch (error) {
     logger.error('Failed to get signature', error)

@@ -1,4 +1,4 @@
-import { ensureLeading0x, normalizeAddressWith0x, trimLeading0x } from '@celo/utils/src/address'
+import { ensureLeading0x, normalizeAddressWith0x, trimLeading0x } from '@celo/base/lib/address'
 import BigNumber from 'bignumber.js'
 import BN from 'bn.js'
 import { EncodedTransaction, Tx } from 'web3-core'

@@ -1,4 +1,4 @@
-import { Address } from '@celo/utils/lib/address'
+import { Address } from '@celo/base/lib/address'
 import { isLeft } from 'fp-ts/lib/Either'
 import { ContractKit } from '../../kit'
 import { IdentityMetadataWrapper } from '../metadata'

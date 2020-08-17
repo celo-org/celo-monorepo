@@ -9,7 +9,7 @@ import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { getPassword } from 'src/pincode/authentication'
-import { retrieveStoredItem, storeItem } from 'src/storage/keychain'
+import { removeStoredItem, retrieveStoredItem, storeItem } from 'src/storage/keychain'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
 
@@ -106,6 +106,10 @@ export async function storeMnemonic(mnemonic: string, account: string | null) {
   }
   const encryptedMnemonic = await encryptMnemonic(mnemonic, account)
   return storeItem({ key: MNEMONIC_STORAGE_KEY, value: encryptedMnemonic })
+}
+
+export async function clearStoredMnemonic() {
+  await removeStoredItem(MNEMONIC_STORAGE_KEY)
 }
 
 export async function getStoredMnemonic(account: string | null): Promise<string | null> {

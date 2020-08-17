@@ -1,3 +1,4 @@
+import { WarningMessage, ErrorMessage } from '@celo/phone-number-privacy-common'
 import request from 'supertest'
 import { REQUEST_EXPIRY_WINDOW_MS } from '../../common/src/utils/constants'
 import { computeBlindedSignature } from '../src/bls/bls-cryptography-client'
@@ -8,6 +9,7 @@ import {
   incrementQueryCount,
   setDidMatchmaking,
 } from '../src/database/wrappers/account'
+import { getRequestExists, storeRequest } from '../src/database/wrappers/request'
 import { getKeyProvider } from '../src/key-management/key-provider'
 import { createServer } from '../src/server'
 import { getRemainingQueryCount } from '../src/signing/query-quota'
@@ -17,32 +19,41 @@ const BLS_SIGNATURE = '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6I
 
 jest.mock('../src/common/identity')
 const mockAuthenticateUser = authenticateUser as jest.Mock
-mockAuthenticateUser.mockReturnValue(true)
 
 jest.mock('../src/signing/query-quota')
 const mockGetRemainingQueryCount = getRemainingQueryCount as jest.Mock
 
 jest.mock('../src/key-management/key-provider')
 const mockGetKeyProvider = getKeyProvider as jest.Mock
-mockGetKeyProvider.mockReturnValue({ getPrivateKey: jest.fn(() => DEV_PRIVATE_KEY) })
 
 jest.mock('../src/bls/bls-cryptography-client')
 const mockComputeBlindedSignature = computeBlindedSignature as jest.Mock
-mockComputeBlindedSignature.mockReturnValue(BLS_SIGNATURE)
 
 jest.mock('../src/database/wrappers/account')
 const mockIncrementQueryCount = incrementQueryCount as jest.Mock
-mockIncrementQueryCount.mockImplementation()
 const mockGetDidMatchmaking = getDidMatchmaking as jest.Mock
-mockGetDidMatchmaking.mockReturnValue(false)
 const mockSetDidMatchmaking = setDidMatchmaking as jest.Mock
-mockSetDidMatchmaking.mockImplementation()
+
+jest.mock('../src/database/wrappers/request')
+const mockStoreRequest = storeRequest as jest.Mock
+const mockGetRequestExists = getRequestExists as jest.Mock
 
 jest.mock('../src/web3/contracts')
 const mockGetBlockNumber = getBlockNumber as jest.Mock
 
 describe(`POST /getBlindedMessageSignature endpoint`, () => {
   const app = createServer()
+
+  beforeEach(() => {
+    mockAuthenticateUser.mockReturnValue(true)
+    mockGetKeyProvider.mockReturnValue({ getPrivateKey: jest.fn(() => DEV_PRIVATE_KEY) })
+    mockComputeBlindedSignature.mockReturnValue(BLS_SIGNATURE)
+    mockIncrementQueryCount.mockReturnValue(true)
+    mockGetDidMatchmaking.mockReturnValue(false)
+    mockSetDidMatchmaking.mockImplementation()
+    mockStoreRequest.mockReturnValue(true)
+    mockGetRequestExists.mockReturnValue(false)
+  })
 
   describe('with valid input', () => {
     const blindedQueryPhoneNumber = '+5555555555'
@@ -70,7 +81,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
             success: true,
             signature: BLS_SIGNATURE,
             version: getVersion(),
-            performedQueryCount: 0,
+            performedQueryCount: 1,
             totalQuota: 10,
             blockNumber: 10000,
           },
@@ -95,7 +106,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
         .expect(200, done)
     })
     it('returns 500 on bls error', (done) => {
-      mockGetRemainingQueryCount.mockReturnValue(10)
+      mockGetRemainingQueryCount.mockReturnValue({ performedQueryCount: 0, totalQuota: 10 })
       mockComputeBlindedSignature.mockImplementation(() => {
         throw Error()
       })
@@ -104,6 +115,69 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
         .send(mockRequestData)
         .expect('Content-Type', /json/)
         .expect(500, done)
+    })
+    it('returns 200 with warning on replayed request', (done) => {
+      mockGetRemainingQueryCount.mockReturnValue({ performedQueryCount: 0, totalQuota: 10 })
+      mockGetRequestExists.mockReturnValue(true)
+      request(app)
+        .post('/getBlindedMessagePartialSig')
+        .send(mockRequestData)
+        .expect('Content-Type', /json/)
+        .expect(
+          200,
+          {
+            success: false,
+            signature: BLS_SIGNATURE,
+            version: getVersion(),
+            performedQueryCount: 0,
+            error: WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG,
+            totalQuota: 10,
+            blockNumber: 10000,
+          },
+          done
+        )
+    })
+    it('returns 200 with warning on failure to increment query count', (done) => {
+      mockGetRemainingQueryCount.mockReturnValue({ performedQueryCount: 0, totalQuota: 10 })
+      mockIncrementQueryCount.mockReturnValue(false)
+      request(app)
+        .post('/getBlindedMessagePartialSig')
+        .send(mockRequestData)
+        .expect('Content-Type', /json/)
+        .expect(
+          200,
+          {
+            success: false,
+            signature: BLS_SIGNATURE,
+            version: getVersion(),
+            performedQueryCount: 0,
+            error: ErrorMessage.FAILURE_TO_INCREMENT_QUERY_COUNT,
+            totalQuota: 10,
+            blockNumber: 10000,
+          },
+          done
+        )
+    })
+    it('returns 200 with warning on failure to store request', (done) => {
+      mockGetRemainingQueryCount.mockReturnValue({ performedQueryCount: 0, totalQuota: 10 })
+      mockStoreRequest.mockReturnValue(false)
+      request(app)
+        .post('/getBlindedMessagePartialSig')
+        .send(mockRequestData)
+        .expect('Content-Type', /json/)
+        .expect(
+          200,
+          {
+            success: false,
+            signature: BLS_SIGNATURE,
+            version: getVersion(),
+            performedQueryCount: 1,
+            error: ErrorMessage.FAILURE_TO_STORE_REQUEST,
+            totalQuota: 10,
+            blockNumber: 10000,
+          },
+          done
+        )
     })
   })
   describe('with invalid input', () => {
@@ -140,7 +214,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
       }
 
       request(app)
-        .post('/getBlindedSalt')
+        .post('/getBlindedMessagePartialSig')
         .send(mockRequestData)
         .expect(400, done)
     })

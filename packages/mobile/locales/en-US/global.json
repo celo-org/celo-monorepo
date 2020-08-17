@@ -178,5 +178,7 @@
   "amount": "Amount",
   "currentBalance": "Current Balance",
   "restore": "Restore",
-  "commentUnavailable": "Comment Unavailable"
+  "commentUnavailable": "Comment Unavailable",
+  "accountClearFailed": "There was an error while removing your Account Key. You might have to reinstall the app to restore all functionality.",
+  "withdraw": "Withdraw"
 }
