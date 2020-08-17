@@ -15,3 +15,7 @@ This guide assumes that you have access to the following:
 {% hint style="danger" %}
 There are [risks](https://www.cryptomathic.com/news-events/blog/cryptographic-key-management-the-risks-and-mitigations) associated with using a recovery phrase or a private key. Please do not share them with anyone else.
 {% endhint %}
+
+## Steps
+
+Please follow these instructions closely, because missteps can lead to errors or permanent loss of your tokens. To understand these steps, please read [What is Ethereum](https://ethereum.org/en/what-is-ethereum/) and [Celo Overview](https://docs.celo.org/overview).
