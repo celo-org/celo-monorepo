@@ -1,5 +1,5 @@
 import { ProxyInstance } from 'types'
-
+import { stripMetadataIfPresent } from '@celo/protocol/lib/compatibility/ast-code'
 import fs = require('fs')
 const VM = require('ethereumjs-vm').default
 const BN = require('bn.js')
@@ -75,24 +75,9 @@ async function getImplementationBytecode(proxy: ProxyInstance) {
   return res.slice(2)
 }
 
-/*
- * The Solidity compiler appends a Swarm Hash of compilation metadata to the end
- * of bytecode. We find this hash based on the specification here:
- * https://solidity.readthedocs.io/en/develop/metadata.html#encoding-of-the-metadata-hash-in-the-bytecode
- */
-function stripMetadata(bytecode: string) {
-  try {
-    // TODO: use proper CBOR parser
-    const [, bytes] = bytecode.match(/^(.*)a165627a7a72305820.*0029$/i)
-    return bytes
-  } catch (e) {
-    throw new Error('Bytecode metadata not found.')
-  }
-}
-
 async function needsUpgrade(Contract: Truffle.Contract<any>, proxy: ProxyInstance) {
-  const implementationBytecode = stripMetadata(await getImplementationBytecode(proxy))
-  const compiledBytecode = stripMetadata(await getCompiledBytecode(Contract))
+  const implementationBytecode = stripMetadataIfPresent(await getImplementationBytecode(proxy))
+  const compiledBytecode = stripMetadataIfPresent(await getCompiledBytecode(Contract))
   const res = implementationBytecode !== compiledBytecode
   if (!res) {
     console.info(`Hasn't changed ${Contract.contractName}`)

@@ -356,7 +356,7 @@ const getCheckableMethodsFromAST = (contract: ContractAST, id: string): any[] =>
  * of bytecode. We find this hash based on the specification here:
  * https://solidity.readthedocs.io/en/develop/metadata.html#encoding-of-the-metadata-hash-in-the-bytecode
  */
-const stripMetadataIfPresent = (bytecode: string): string => {
+export const stripMetadataIfPresent = (bytecode: string): string => {
   try {
     const regexp = new RegExp(`^(.*)(${CONTRACT_METADATA_REGEXPS.map(r => '(' + r + ')').join('|')})$`, 'i')
     // TODO: use proper CBOR parser
