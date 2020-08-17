@@ -38,8 +38,7 @@ export async function upgradeAWSFullNodeChart(
   const kubeNamespace = getKubeNamespace(celoEnv)
   const aksHelmParameters = await helmParameters(celoEnv, kubeNamespace, deploymentConfig)
 
-  await upgradeBaseFullNodeChart(celoEnv, deploymentConfig, reset, aksHelmParameters)
-  return
+  return upgradeBaseFullNodeChart(celoEnv, deploymentConfig, reset, aksHelmParameters)
 }
 
 export async function removeAWSFullNodeChart(celoEnv: string, deploymentConfig: AWSFullNodeDeploymentConfig) {

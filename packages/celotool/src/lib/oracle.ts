@@ -56,7 +56,7 @@ const oracleContextAzureClusterConfigDynamicEnvVars: { [k in keyof Omit<AzureClu
  */
 const oracleContextAwsClusterConfigDynamicEnvVars: { [k in keyof Omit<AwsClusterConfig, 'cloudProviderName'>]: DynamicEnvVar } = {
   clusterName: DynamicEnvVar.ORACLE_KUBERNETES_CLUSTER_NAME,
-  clusterRegion: DynamicEnvVar.ORACLE_AWS_CLUSTER_REGION, 
+  clusterRegion: DynamicEnvVar.ORACLE_AWS_CLUSTER_REGION,
   resourceGroupTag: DynamicEnvVar.ORACLE_AWS_RESOURCE_GROUP_TAG,
 }
 
@@ -431,12 +431,16 @@ export async function switchToContextCluster(celoEnv: string, oracleContext: str
   if (checkOrPromptIfStagingOrProduction) {
     await doCheckOrPromptIfStagingOrProduction()
   }
-  const isAwsContext = oracleContext.startsWith('AWS')
-  if (isAwsContext) {
-    return switchToAwsContextCluster(celoEnv, oracleContext)
-  } else {
-    return switchToAzureContextCluster(celoEnv, oracleContext)
+  const clusterSwitchFnByPrefix = new Map<string, (celoEnv: string, context: string) => Promise<void>>([
+    ['AWS', switchToAwsContextCluster],
+    ['AZURE', switchToAzureContextCluster]
+  ])
+  for (const [prefix, clusterSwitchFn] of clusterSwitchFnByPrefix.entries()) {
+    if (oracleContext.startsWith(prefix)) {
+      return clusterSwitchFn(celoEnv, oracleContext)
+    }
   }
+  throw Error(`Context did not start with one of ${clusterSwitchFnByPrefix.keys()}`)
 }
 
 /**
@@ -488,7 +492,7 @@ function isValidOracleContext(oracleContext: string) {
 
 /**
  * Middleware for an oracle related command.
- * Must be one of the contexts specified in the environment 
+ * Must be one of the contexts specified in the environment
  * variable ORACLE_CONTEXTS.
  */
 export function addOracleMiddleware(argv: yargs.Argv) {
