@@ -17,8 +17,8 @@ import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { transferStableToken } from 'src/stableToken/actions'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
-import { generateStandbyTransactionId } from 'src/transactions/actions'
 import { waitForTransactionWithId } from 'src/transactions/saga'
+import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { getAuthSignerForAccount } from 'src/web3/dataEncryptionKey'
 import { getConnectedAccount, unlockAccount } from 'src/web3/saga'
@@ -160,24 +160,23 @@ function* navigateToQuotaPurchaseScreen() {
     })
 
     const ownAddress: string = yield select(currentAccountSelector)
-    const txId = generateStandbyTransactionId(ownAddress)
-
     const userBalance = yield select(stableTokenBalanceSelector)
     const userBalanceSufficient = isUserBalanceSufficient(userBalance, LOOKUP_GAS_FEE_ESTIMATE)
     if (!userBalanceSufficient) {
       throw Error(ErrorMessages.INSUFFICIENT_BALANCE)
     }
 
+    const context = newTransactionContext(TAG, 'Purchase lookup quota')
     yield put(
       transferStableToken({
         recipientAddress: ownAddress, // send payment to yourself
         amount: '0.01', // one penny
         comment: 'Lookup Quota Purchase',
-        txId,
+        context,
       })
     )
 
-    const quotaPurchaseTxSuccess = yield call(waitForTransactionWithId, txId)
+    const quotaPurchaseTxSuccess = yield call(waitForTransactionWithId, context.id)
     if (!quotaPurchaseTxSuccess) {
       throw new Error('Purchase tx failed')
     }
