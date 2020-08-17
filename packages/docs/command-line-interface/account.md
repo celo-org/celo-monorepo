@@ -38,6 +38,9 @@ OPTIONS
 
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
 
+  --usdGas                                             If --usdGas is set, the transaction is paid for with a
+                                                       feeCurrency of cUSD
+
   --useLedger                                          Set it to use a ledger wallet
 
 EXAMPLES
@@ -63,6 +66,9 @@ View Celo Dollar and Gold balances for an address
 ```
 USAGE
   $ celocli account:balance ADDRESS
+
+OPTIONS
+  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
 
 EXAMPLE
   balance 0x5409ed021d9299bf6814279a6a1411a7e866a631
@@ -100,6 +106,9 @@ OPTIONS
   --publicKey=publicKey                              The public key of the account that others may use to send you
                                                      encrypted messages
 
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
+
   --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLE
@@ -135,6 +144,9 @@ OPTIONS
                                                      "[4,99]"
 
   --url=https://www.celo.org                         (required) The url you want to claim
+
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -172,6 +184,9 @@ OPTIONS
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
+
   --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLE
@@ -204,6 +219,9 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -242,6 +260,9 @@ OPTIONS
 
   --name=name                                        (required) The name you want to claim
 
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
+
   --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLE
@@ -277,6 +298,9 @@ OPTIONS
 
   --url=https://www.celo.org                         (required) The URL of the storage root you want to claim
 
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
+
   --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLE
@@ -310,6 +334,9 @@ OPTIONS
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
+
   --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLE
@@ -338,6 +365,9 @@ OPTIONS
 
   --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
+
+  --usdGas                                       If --usdGas is set, the transaction is paid for with a feeCurrency of
+                                                 cUSD
 
   --useLedger                                    Set it to use a ledger wallet
 
@@ -368,6 +398,9 @@ OPTIONS
   --[no-]local                                   If set, only show local and hardware wallet accounts. Use no-local to
                                                  only show keystore addresses.
 
+  --usdGas                                       If --usdGas is set, the transaction is paid for with a feeCurrency of
+                                                 cUSD
+
   --useLedger                                    Set it to use a ledger wallet
 ```
 
@@ -383,6 +416,9 @@ USAGE
 
 ARGUMENTS
   ACCOUNT  Account address
+
+OPTIONS
+  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
 
 EXAMPLE
   lock 0x5409ed021d9299bf6814279a6a1411a7e866a631
@@ -457,6 +493,9 @@ OPTIONS
 
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) Address of the signer key to prove possession of.
 
+  --usdGas                                              If --usdGas is set, the transaction is paid for with a
+                                                        feeCurrency of cUSD
+
   --useLedger                                           Set it to use a ledger wallet
 
 EXAMPLE
@@ -465,6 +504,51 @@ EXAMPLE
 ```
 
 _See code: [packages/cli/src/commands/account/proof-of-possession.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/proof-of-possession.ts)_
+
+### Recover-old
+
+Recovers the Valora old account and print out the key information. The old Valora app (in a beta state) generated the user address using a seed of 32 bytes, instead of 64 bytes. As the app fixed that, some old accounts were left with some funds. This command allows the user to recover those funds.
+
+```
+USAGE
+  $ celocli account:recover-old
+
+OPTIONS
+  --addressIndex=addressIndex
+      Choose the address index for the derivation path
+
+  --changeIndex=changeIndex
+      Choose the change index for the derivation path
+
+  --derivationPath=derivationPath
+      Choose a different derivation Path (Celo's default is "m/44'/52752'/0'/0"). Use "eth" as an alias of the Ethereum
+      derivation path ("m/44'/60'/0'/0/"). Recreating the same account requires knowledge of the mnemonic, passphrase (if
+      any), and the derivation path
+
+  --language=chinese_simplified|chinese_traditional|english|french|italian|japanese|korean|spanish
+      [default: english] Language for the mnemonic words. **WARNING**, some hardware wallets don't support other languages
+
+  --mnemonicPath=mnemonicPath
+      (required) Path to a file that contains all the mnemonic words separated by a space (example: "word1 word2 word3 ...
+      word24"). If the words are a language other than English, the --language flag must be used. Only BIP39 mnemonics are
+      supported
+
+  --passphrasePath=passphrasePath
+      Path to a file that contains the BIP39 passphrase to combine with the mnemonic specified using the mnemonicPath flag
+      and the index specified using the addressIndex flag. Every passphrase generates a different private key and wallet
+      address.
+
+EXAMPLES
+  recover-old --mnemonicPath some_folder/my_mnemonic_file
+  recover-old --mnemonicPath some_folder/my_mnemonic_file --passphrasePath myFolder/my_passphrase_file
+  recover-old --mnemonicPath some_folder/my_mnemonic_file --language spanish
+  recover-old --mnemonicPath some_folder/my_mnemonic_file --passphrasePath some_folder/my_passphrase_file --language
+  japanese --addressIndex 5
+  recover-old --mnemonicPath some_folder/my_mnemonic_file --passphrasePath some_folder/my_passphrase_file --addressIndex
+  5
+```
+
+_See code: [packages/cli/src/commands/account/recover-old.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/recover-old.ts)_
 
 ### Register
 
@@ -488,6 +572,9 @@ OPTIONS
                                                      "[4,99]"
 
   --name=name
+
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -522,6 +609,9 @@ OPTIONS
 
   --url=https://www.celo.org                         (required) The url to the metadata you want to register
 
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
+
   --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLE
@@ -553,6 +643,9 @@ OPTIONS
 
   --name=name                                           (required)
 
+  --usdGas                                              If --usdGas is set, the transaction is paid for with a
+                                                        feeCurrency of cUSD
+
   --useLedger                                           Set it to use a ledger wallet
 
 EXAMPLE
@@ -579,6 +672,9 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
 
+  --usdGas                                       If --usdGas is set, the transaction is paid for with a feeCurrency of
+                                                 cUSD
+
   --useLedger                                    Set it to use a ledger wallet
 
 EXAMPLE
@@ -604,6 +700,9 @@ OPTIONS
 
   --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
+
+  --usdGas                                       If --usdGas is set, the transaction is paid for with a feeCurrency of
+                                                 cUSD
 
   --useLedger                                    Set it to use a ledger wallet
 
@@ -634,6 +733,9 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
 
+  --usdGas                                       If --usdGas is set, the transaction is paid for with a feeCurrency of
+                                                 cUSD
+
   --useLedger                                    Set it to use a ledger wallet
 
 EXAMPLE
@@ -656,6 +758,7 @@ ARGUMENTS
 OPTIONS
   --duration=duration  Duration in seconds to leave the account unlocked. Unlocks until the node exits by default.
   --password=password  Password used to unlock the account. If not specified, you will be prompted for a password.
+  --usdGas             If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
 
 EXAMPLES
   unlock 0x5409ed021d9299bf6814279a6a1411a7e866a631
@@ -691,6 +794,9 @@ OPTIONS
 
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) Address of the signer key to verify proof of
                                                         possession.
+
+  --usdGas                                              If --usdGas is set, the transaction is paid for with a
+                                                        feeCurrency of cUSD
 
   --useLedger                                           Set it to use a ledger wallet
 

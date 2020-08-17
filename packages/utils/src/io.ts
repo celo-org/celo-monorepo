@@ -1,15 +1,13 @@
+import { URL_REGEX } from '@celo/base/lib/io'
 import { isValidPublic, toChecksumAddress } from 'ethereumjs-util'
 import { either } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import { isValidAddress } from './address'
 import { isE164NumberStrict } from './phoneNumbers'
 
-// from http://urlregex.com/
-export const URL_REGEX = new RegExp(
-  /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/
-)
-
-export const isValidUrl = (url: string) => URL_REGEX.test(url)
+// Exports moved to @celo/base, forwarding them
+// here for backwards compatibility
+export { isValidUrl, URL_REGEX } from '@celo/base/lib/io'
 
 export const UrlType = new t.Type<string, string, unknown>(
   'Url',

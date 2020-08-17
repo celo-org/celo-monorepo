@@ -1,4 +1,4 @@
-import { GetBlindedMessageForSaltRequest } from '../../salt-generation/get-salt'
+import { GetBlindedMessagePartialSigRequest } from '../../signing/get-partial-signature'
 
 export const REQUESTS_TABLE = 'requests'
 export enum REQUESTS_COLUMNS {
@@ -11,7 +11,7 @@ export class Request {
   [REQUESTS_COLUMNS.timestamp]: Date;
   [REQUESTS_COLUMNS.blindedQuery]: string
 
-  constructor(request: GetBlindedMessageForSaltRequest) {
+  constructor(request: GetBlindedMessagePartialSigRequest) {
     this[REQUESTS_COLUMNS.address] = request.account
     this[REQUESTS_COLUMNS.timestamp] = new Date(request.timestamp as number)
     this[REQUESTS_COLUMNS.blindedQuery] = request.blindedQueryPhoneNumber

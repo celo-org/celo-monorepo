@@ -30,8 +30,8 @@ const state = createMockStore().getState()
 const TRANSFER_ACTION = transferStableToken({
   recipientAddress: mockAccount,
   amount: BALANCE,
-  txId: TX_ID,
   comment: COMMENT,
+  context: { id: TX_ID },
 })
 
 describe('stableToken saga', () => {
@@ -53,7 +53,7 @@ describe('stableToken saga', () => {
       .dispatch(TRANSFER_ACTION)
       .put(
         addStandbyTransaction({
-          id: TX_ID,
+          context: { id: TX_ID },
           type: TokenTransactionType.Sent,
           comment: COMMENT,
           status: TransactionStatus.Pending,
@@ -73,7 +73,7 @@ describe('stableToken saga', () => {
       .dispatch(TRANSFER_ACTION)
       .put(
         addStandbyTransaction({
-          id: TX_ID,
+          context: { id: TX_ID },
           type: TokenTransactionType.Sent,
           comment: COMMENT,
           status: TransactionStatus.Pending,

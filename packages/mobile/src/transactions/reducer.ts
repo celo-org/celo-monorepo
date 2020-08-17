@@ -53,7 +53,7 @@ export const reducer = (
       return {
         ...state,
         standbyTransactions: state.standbyTransactions.filter(
-          (tx: StandbyTransaction) => tx.id !== action.idx
+          (tx: StandbyTransaction) => tx.context.id !== action.idx
         ),
       }
     case Actions.RESET_STANDBY_TRANSACTIONS:
@@ -65,7 +65,7 @@ export const reducer = (
       return {
         ...state,
         standbyTransactions: state.standbyTransactions.map((tx) => {
-          if (tx.id !== action.idx) {
+          if (tx.context.id !== action.idx) {
             return tx
           }
           return {

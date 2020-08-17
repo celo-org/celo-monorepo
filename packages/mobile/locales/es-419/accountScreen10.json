@@ -4,6 +4,8 @@
   "languageSettings": "Idioma",
   "localCurrencySetting": "Moneda",
   "licenses": "Licencias",
+  "removeAccountTitle": "Reiniciar Valora",
+  "removeAccountDetails": "Reiniciar borrará tu cuenta de este dispositivo. Tu cuenta mantendrá el dinero que tenga, pero solo será recuperable con tu Clave de Cuenta",
   "legal": "Legal",
   "securityAndData": "Seguridad y datos",
   "requirePinOnAppOpen": "Requerir PIN en la aplicación abierta",
@@ -23,6 +25,16 @@
     "header": "Cambiar modo de conexión?",
     "body": "Hemos notado que tienes problemas para conectarte. Recomendamos habilitar el modo de ahorro de datos para que pueda seguir usando {{appName}} con una conexión intermitente.",
     "switchToDataSaver": "Habilitar Ahorro de Datos"
+  },
+  "accountKeyModal": {
+    "header": "Sin tu Clave de Cuenta perderás acceso a tu dinero para siempre",
+    "body1": "Para reiniciar Valora, deberás confirmar que has escrito tu Cuenta de clave.",
+    "body2": "Nadie, ni siquiera Valora, podrá recuperar tu cuenta sin tu clave."
+  },
+  "promptConfirmRemovalModal": {
+    "header": "Estás seguro que quieres reiniciar Valora?",
+    "body": "Ya no podrás acceder a tu dinero ni tu Clave de Cuenta desde este dispositivo. No hay forma de recuperar tu Clave de Cuenta si no la has guardado.",
+    "resetNow": "Reiniciar Ahora"
   },
   "testFaqLink": "Las Preguntas Frecuentes del {{appName}}",
   "termsOfServiceLink": "Las Condiciones de Servicio",

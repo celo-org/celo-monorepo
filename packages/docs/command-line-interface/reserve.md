@@ -12,6 +12,9 @@ Shows information about reserve
 USAGE
   $ celocli reserve:status
 
+OPTIONS
+  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
+
 EXAMPLE
   status
 ```
@@ -40,6 +43,9 @@ OPTIONS
                                                      "[4,99]"
 
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Receiving address
+
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
