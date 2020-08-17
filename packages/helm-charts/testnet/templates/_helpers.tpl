@@ -35,6 +35,7 @@ spec:
   selector:
     statefulset.kubernetes.io/pod-name: {{ template "common.fullname" $ }}-{{ .node_name }}-{{ .index }}
   type: {{ .service_type }}
+  publishNotReadyAddresses: true
   {{ if (eq .service_type "LoadBalancer") }}
   loadBalancerIP: {{ .load_balancer_ip }}
   {{ end }}

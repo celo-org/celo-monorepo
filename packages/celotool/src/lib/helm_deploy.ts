@@ -6,7 +6,7 @@ import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
 import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
-import { getStatefulSetReplicas, scaleResource } from './kubernetes'
+import { getServerVersion, getStatefulSetReplicas, scaleResource } from './kubernetes'
 import { installPrometheusIfNotExists } from './prometheus'
 import {
   getGenesisBlockFromGoogleStorage,
@@ -175,11 +175,24 @@ export async function redeployTiller() {
     `Tiller service account exists, skipping creation`
   )
   if (!tillerServiceAccountExists) {
+    const serviceAccountName = 'tiller'
     await execCmdWithExitOnFailure(
-      `kubectl create serviceaccount tiller --namespace=kube-system && kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller && helm init --service-account=tiller`
+      `kubectl create serviceaccount ${serviceAccountName} --namespace=kube-system && kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:${serviceAccountName}`
     )
+    await initHelm(serviceAccountName)
     await sleep(20000)
   }
+}
+
+async function initHelm(serviceAccountName: string) {
+  // If the server version is >= 1.16, we need to modify the helm init command.
+  // See https://github.com/helm/helm/issues/6374#issuecomment-533427268
+  let cmd = `helm init --service-account=${serviceAccountName}`
+  const kubeServerVersion = await getServerVersion()
+  if (kubeServerVersion.major >= 1 && kubeServerVersion.minor >= 16) {
+    cmd = `${cmd} --override spec.selector.matchLabels.'name'='tiller',spec.selector.matchLabels.'app'='helm' --output yaml | sed 's@apiVersion: extensions/v1beta1@apiVersion: apps/v1@' | kubectl apply -f -`
+  }
+  return execCmdWithExitOnFailure(cmd)
 }
 
 export async function installCertManagerAndNginx() {

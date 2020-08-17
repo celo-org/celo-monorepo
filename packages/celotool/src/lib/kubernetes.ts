@@ -58,3 +58,16 @@ export async function deleteResource(
   }
   return run()
 }
+
+export async function getServerVersion() {
+  const [output] = await execCmd(`kubectl version -o json`)
+  const jsonOutput = JSON.parse(output)
+  const [minorNumberStr] = jsonOutput.serverVersion.minor.match(/^([0-9]+)/g)
+  if (!minorNumberStr) {
+    throw Error('Could not get minor version')
+  }
+  return {
+    major: parseInt(jsonOutput.serverVersion.major, 10),
+    minor: parseInt(minorNumberStr, 10),
+  }
+}

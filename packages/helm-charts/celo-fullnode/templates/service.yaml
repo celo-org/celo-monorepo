@@ -7,11 +7,12 @@ metadata:
   # if values.geth.azureprovider, use below, else use aws
   # service.beta.kubernetes.io/azure-load-balancer-mixed-protocols: "true"
     service.beta.kubernetes.io/aws-load-balancer-type: nlb
-    service.beta.kubernetes.io/aws-load-balancer-eip-allocations: {{ index $.Values.geth.eip_allocation_ids $index }}
+    service.beta.kubernetes.io/aws-load-balancer-eip-allocations: {{ index $.Values.geth.eip_allocation_ids_per_node $index }}
   labels:
 {{ include "celo-fullnode.labels" $ | indent 4 }}
 spec:
   type: {{ $.Values.geth.service_type }}
+  publishNotReadyAddresses: true
 {{- if (and $.Values.geth.use_static_ips $.Values.geth.azure_provider) }}
   loadBalancerIP: {{ index $.Values.geth.public_ips $index -}}
 {{- end }}

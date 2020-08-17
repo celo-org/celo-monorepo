@@ -40,8 +40,7 @@ storage:
   # AKS default storageclasses:
   #   - default for Azure Standard storage (HDD)
   #   - managed-premium for Azure Premium Disks (SSD)
-  # AWS DOES NOT have 'default' storage class by default
-  # Need to launch default in cluster first 
+  # AWS does not have 'default' storage class by default, has "gp2"
   storageClass: default
   accessModes: ReadWriteOnce
   size: 20Gi

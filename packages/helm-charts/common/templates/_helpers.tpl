@@ -394,4 +394,3 @@ prometheus.io/scrape: "true"
 prometheus.io/path:  "{{ $pprof.path | default "/debug/metrics/prometheus" }}"
 prometheus.io/port: "{{ $pprof.port | default 6060 }}"
 {{- end -}}
-
