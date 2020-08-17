@@ -57,7 +57,7 @@ interface State {
 //   UIManager.setLayoutAnimationEnabledExperimental(true)
 // }
 
-const createEventEmitter: (
+const createEventListener: (
   eventName: string,
   callback: (reactInitTime: string) => void
 ) => EmitterSubscription | null = (
@@ -77,7 +77,7 @@ export class App extends React.Component {
     reactLoadTime: undefined,
   }
 
-  appStartListener: EmitterSubscription | null = createEventEmitter(
+  appStartListener: EmitterSubscription | null = createEventListener(
     'AppStartedLoading',
     (reactInitTime: string) => {
       this.setState({
