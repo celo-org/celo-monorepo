@@ -1,6 +1,6 @@
 # Recovering CELO from an Ethereum Wallet
 
-In this tutorial, steps are outlined to help you recover your [CELO (previously Celo Gold)](../overview.md#background-and-key-concepts) native assets if you accidentally transferred them to an [Ethereum address](https://en.wikipedia.org/wiki/Ethereum#Addresses).
+In this tutorial, steps are outlined to help you recover your [CELO (previously Celo Gold)](../overview.md#background-and-key-concepts) if you accidentally transferred them to an [Ethereum address](https://en.wikipedia.org/wiki/Ethereum#Addresses).
 
 ## Prerequisites
 
@@ -18,4 +18,22 @@ There are [risks](https://www.cryptomathic.com/news-events/blog/cryptographic-ke
 
 ## Steps
 
-Please follow these instructions closely, because missteps can lead to errors or permanent loss of your tokens. To understand these steps, please read [What is Ethereum](https://ethereum.org/en/what-is-ethereum/) and [Celo Overview](https://docs.celo.org/overview).
+Please follow the instructions below closely, because missteps can lead to errors or permanent loss of your tokens. To understand these steps, please read [What is Ethereum](https://ethereum.org/en/what-is-ethereum/) and [Celo Overview](https://docs.celo.org/overview).
+
+
+### Prepare recovery phases
+
+Write your recovery phrase to a file using the following commands
+- `nano recovery.txt`
+- Paste `<word1> <word2> … <word24>`
+- Replace the `<word>`s in brackets with the 24 words from your recovery phrase.
+- Press ctrl-o to save
+- Press ctrl-x to exit
+
+### Recover your Ethereum address on Celo
+
+Recover your Ethereum address on the Celo network through the following command
+
+```
+celocli account:new --indexAddress 0 --mnemonicPath recovery.txt --derivationPath "m/44'/60'/0'/0" --node https://rc1-forno.celo-testnet.org
+```
