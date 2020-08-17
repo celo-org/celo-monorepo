@@ -64,6 +64,10 @@ export async function verifyConfigurationAndGetURL() {
   const validator = getAccountAddress()
 
   const accounts = await kit.contracts.getAccounts()
+  if (!(await accounts.isAccount(validator))) {
+    throw Error(`${validator} is not registered as an account!`)
+  }
+
   if (!(await accounts.hasAuthorizedAttestationSigner(validator))) {
     throw Error(`No attestation signer authorized for ${validator}!`)
   }
@@ -75,9 +79,9 @@ export async function verifyConfigurationAndGetURL() {
     )
   }
 
-  // if (!(await isAttestationSignerUnlocked())) {
-  //   throw Error(`Need to unlock attestation signer account ${signer}`)
-  // }
+  if (!(await isAttestationSignerUnlocked())) {
+    throw Error(`Need to unlock attestation signer account ${signer}`)
+  }
 
   const metadataURL = await accounts.getMetadataURL(validator)
   try {
