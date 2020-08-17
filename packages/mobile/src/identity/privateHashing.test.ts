@@ -1,4 +1,4 @@
-import { PNPUtils } from '@celo/contractkit'
+import { OdisUtils } from '@celo/contractkit'
 import { FetchMock } from 'jest-fetch-mock'
 import { expectSaga } from 'redux-saga-test-plan'
 import * as matchers from 'redux-saga-test-plan/matchers'
@@ -36,7 +36,7 @@ describe('Fetch phone hash details', () => {
         signature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
       })
     )
-    const expectedSalt = 'piWqRHHYWtfg9'
+    const expectedPepper = 'piWqRHHYWtfg9'
     const expectedHash = '0xf6429456331dedf8bd32b5e3a578e5bc589a28d012724dcd3e0a4b1be67bb454'
 
     const state = createMockStore({
@@ -54,12 +54,12 @@ describe('Fetch phone hash details', () => {
       .withState(state)
       .put(
         updateE164PhoneNumberSalts({
-          [mockE164Number]: expectedSalt,
+          [mockE164Number]: expectedPepper,
         })
       )
       .returns({
         e164Number: mockE164Number,
-        salt: expectedSalt,
+        pepper: expectedPepper,
         phoneHash: expectedHash,
       })
       .run()
@@ -71,11 +71,12 @@ describe('Fetch phone hash details', () => {
   })
 })
 
-describe(PNPUtils.PhoneNumberIdentifier.getSaltFromThresholdSignature, () => {
+// TODO move to contract kit tests
+describe(OdisUtils.PhoneNumberIdentifier.getPepperFromThresholdSignature, () => {
   it('Hashes sigs correctly', () => {
     const base64Sig = 'vJeFZJ3MY5KlpI9+kIIozKkZSR4cMymLPh2GHZUatWIiiLILyOcTiw2uqK/LBReA'
     const signature = new Buffer(base64Sig, 'base64')
-    expect(PNPUtils.PhoneNumberIdentifier.getSaltFromThresholdSignature(signature)).toBe(
+    expect(OdisUtils.PhoneNumberIdentifier.getPepperFromThresholdSignature(signature)).toBe(
       'piWqRHHYWtfg9'
     )
   })

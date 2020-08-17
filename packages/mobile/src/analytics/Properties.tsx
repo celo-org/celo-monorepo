@@ -27,7 +27,8 @@ import { RecipientKind } from 'src/recipients/recipient'
 interface AppEventsProperties {
   [AppEvents.app_launched]: {
     // TODO: Figure out how to measure loadingDuration iOS and make param required
-    loadingDuration?: number
+    reactLoadDuration?: number
+    appLoadDuration?: number
     deviceInfo?: object
     deviceHeight: number
     deviceWidth: number
@@ -87,6 +88,8 @@ interface SettingsEventsProperties {
   }
   [SettingsEvents.licenses_view]: undefined
   [SettingsEvents.tos_view]: undefined
+  [SettingsEvents.start_account_removal]: undefined
+  [SettingsEvents.completed_account_removal]: undefined
 }
 
 interface OnboardingEventsProperties {
@@ -455,6 +458,7 @@ interface FeeEventsProperties {
 interface TransactionEventsProperties {
   [TransactionEvents.transaction_start]: {
     txId: string
+    description?: string
     fornoMode?: boolean
   }
   [TransactionEvents.transaction_gas_estimated]: {
@@ -485,6 +489,7 @@ interface CeloExchangeEventsProperties {
   [CeloExchangeEvents.celo_home_info]: undefined
   [CeloExchangeEvents.celo_home_buy]: undefined
   [CeloExchangeEvents.celo_home_sell]: undefined
+  [CeloExchangeEvents.celo_home_withdraw]: undefined
   [CeloExchangeEvents.celo_transaction_select]: undefined
   [CeloExchangeEvents.celo_transaction_back]: undefined
 
@@ -544,6 +549,21 @@ interface CeloExchangeEventsProperties {
     exchangeRate: number
   }
   [CeloExchangeEvents.celo_fetch_exchange_rate_error]: {
+    error: string
+  }
+
+  [CeloExchangeEvents.celo_withdraw_review]: {
+    amount: string
+  }
+  [CeloExchangeEvents.celo_withdraw_edit]: undefined
+  [CeloExchangeEvents.celo_withdraw_cancel]: undefined
+  [CeloExchangeEvents.celo_withdraw_confirm]: {
+    amount: string
+  }
+  [CeloExchangeEvents.celo_withdraw_completed]: {
+    amount: string
+  }
+  [CeloExchangeEvents.celo_withdraw_error]: {
     error: string
   }
 }

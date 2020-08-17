@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import React, { useMemo } from 'react'
@@ -16,13 +16,10 @@ interface Props {
   qrSvgRef: React.MutableRefObject<SVG>
 }
 
-const mapStateToProps = (state: RootState): UriData => ({
+const mapStateToProps = (state: RootState): Partial<UriData> => ({
   address: currentAccountSelector(state)!,
   displayName: state.account.name || undefined,
   e164PhoneNumber: state.account.e164PhoneNumber || undefined,
-  currencyCode: undefined,
-  amount: undefined,
-  comment: undefined,
 })
 
 export default function QRCodeDisplay({ qrSvgRef }: Props) {
@@ -47,7 +44,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
   },
   qrContainer: {
     paddingTop: 16,

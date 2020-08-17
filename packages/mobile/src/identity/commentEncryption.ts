@@ -2,7 +2,7 @@
 // Use these instead of the functions in @celo/utils/src/commentEncryption
 // because these manage comment metadata
 
-import { PhoneNumberHashDetails } from '@celo/contractkit/lib/utils/phone-number-lookup/phone-number-identifier'
+import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import { IdentifierLookupResult } from '@celo/contractkit/lib/wrappers/Attestations'
 import { eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import {
@@ -134,7 +134,10 @@ export function embedPhoneNumberMetadata(
   phoneNumberDetails?: PhoneNumberHashDetails
 ) {
   return phoneNumberDetails
-    ? comment + METADATA_CONTENT_SEPARATOR + phoneNumberDetails.e164Number + phoneNumberDetails.salt
+    ? comment +
+        METADATA_CONTENT_SEPARATOR +
+        phoneNumberDetails.e164Number +
+        phoneNumberDetails.pepper
     : comment
 }
 

@@ -178,5 +178,7 @@
   "amount": "Monto",
   "currentBalance": "Saldo actual",
   "restore": "Restaurar",
-  "commentUnavailable": "Comentario no disponible"
+  "commentUnavailable": "Comentario no disponible",
+  "accountClearFailed": "Hubo un error al borrar su Clave de Cuenta. Podría tener que reinstalar la app para poder usar todas las funcionalidades.",
+  "withdraw": "Retirar"
 }
