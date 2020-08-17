@@ -33,8 +33,41 @@ Write your recovery phrase to a file using the following commands:
 
 ### Recover your Ethereum address on Celo
 
-Recover your Ethereum address on the Celo network through the following command
+Recover your Ethereum address on the Celo network:
 
 ```
 celocli account:new --indexAddress 0 --mnemonicPath recovery.txt --derivationPath "m/44'/60'/0'/0" --node https://rc1-forno.celo-testnet.org
 ```
+
+This command will return you with:
+
+- `accountAddress`: the same address as your Ethereum address
+- `privateKey`: the private key associated with your address -- please record this private key on paper and not share with anyone else
+- `publicKey`: the public key associated with your address
+
+### Check your CELO balanace
+
+Check your Celo account balance using this command:
+
+```
+celocli account:balance <accountAddress> --node https://rc1-forno.celo-testnet.org
+```
+
+Replace `<accountAddress>` with the `accountAddress` you got from the previous step.
+
+### Transfer CELO
+
+Now, you have the freedom to transfer your CELO (Celo Gold) to an address of choice:
+
+```
+celocli transfer:gold --from <accountAddress> --to <addressOfChoice> --value <valueInCeloWei> --privateKey <privateKey> --node https://rc1-forno.celo-testnet.org
+```
+
+- Replace `<accountAddress>` with the `accountAddress` you got from the previous step.
+- Replace `<addressOfChoice>` with the address that you want to send CELO to.
+- Replace `<valueInCeloWei>` with the amount you want to send, but this number needs to be slightly lower than your balance, as there’s a transaction fee.
+- 
+
+{% hint style="info" %}
+Note that the value has a unit of CELO Wei (1 CELO = 10^18 CELO Wei), so if you want to send 1 CELO, the `<valueInCeloWei>` should be 1000000000000000000.
+{% endhint %}
