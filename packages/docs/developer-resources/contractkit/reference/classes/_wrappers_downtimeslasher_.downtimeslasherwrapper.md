@@ -324,7 +324,7 @@ ___
 
 ###  getValidatorSignerIndex
 
-▸ **getValidatorSignerIndex**(`validatorOrSignerAddress`: [Address](../modules/_base_.md#address), `blockNumber`: number): *Promise‹any›*
+▸ **getValidatorSignerIndex**(`validatorOrSignerAddress`: [Address](../modules/_base_.md#address), `blockNumber`: number): *Promise‹number›*
 
 *Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:179](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L179)*
 
@@ -337,7 +337,7 @@ Name | Type | Description |
 `validatorOrSignerAddress` | [Address](../modules/_base_.md#address) | Address of the validator account or signer. |
 `blockNumber` | number | Block at which to determine the signer index.  |
 
-**Returns:** *Promise‹any›*
+**Returns:** *Promise‹number›*
 
 ___
 

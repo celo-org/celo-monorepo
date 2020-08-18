@@ -70,7 +70,7 @@ Name | Type |
 
 ###  addClaim
 
-▸ **addClaim**(`claim`: [Claim](../modules/_identity_claims_claim_.md#claim), `signer`: [Signer](../interfaces/_wallets_signers_signer_.signer.md)): *Promise‹object | object | object | object | object | object›*
+▸ **addClaim**(`claim`: [Claim](../modules/_identity_claims_claim_.md#claim), `signer`: Signer): *Promise‹object | object | object | object | object | object›*
 
 *Defined in [contractkit/src/identity/metadata.ts:140](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L140)*
 
@@ -79,7 +79,7 @@ Name | Type |
 Name | Type |
 ------ | ------ |
 `claim` | [Claim](../modules/_identity_claims_claim_.md#claim) |
-`signer` | [Signer](../interfaces/_wallets_signers_signer_.signer.md) |
+`signer` | Signer |
 
 **Returns:** *Promise‹object | object | object | object | object | object›*
 

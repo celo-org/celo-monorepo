@@ -68,7 +68,7 @@ ___
 
 ### `Const` proposalToJSON
 
-▸ **proposalToJSON**(`kit`: [ContractKit](../classes/_kit_.contractkit.md), `proposal`: [Proposal](_wrappers_governance_.md#proposal)): *Promise‹any›*
+▸ **proposalToJSON**(`kit`: [ContractKit](../classes/_kit_.contractkit.md), `proposal`: [Proposal](_wrappers_governance_.md#proposal)): *Promise‹[ProposalTransactionJSON](../interfaces/_governance_proposals_.proposaltransactionjson.md)[]›*
 
 *Defined in [contractkit/src/governance/proposals.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L50)*
 
@@ -81,6 +81,6 @@ Name | Type | Description |
 `kit` | [ContractKit](../classes/_kit_.contractkit.md) | Contract kit instance used to resolve addresses to contract names. |
 `proposal` | [Proposal](_wrappers_governance_.md#proposal) | A constructed proposal object. |
 
-**Returns:** *Promise‹any›*
+**Returns:** *Promise‹[ProposalTransactionJSON](../interfaces/_governance_proposals_.proposaltransactionjson.md)[]›*
 
 The JSON encoding of the proposal.
