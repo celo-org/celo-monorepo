@@ -5,6 +5,7 @@ import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import Responsive from 'src/shared/Responsive'
 import { standardStyles } from 'src/styles'
+import MENU from 'src/shared/menu-items'
 const forbes = require('./forbes-logo-white.png')
 const fortune = require('./fortune-white.png')
 const coindesk = require('./coindesk-logo-white.png')
@@ -40,9 +41,7 @@ class Press extends React.PureComponent<I18nProps> {
                 text={t('recentNews')}
                 kind={BTN.NAKED}
                 size={SIZE.normal}
-                href={
-                  'https://www.coindesk.com/libra-minus-facebook-why-celo-is-2020s-buzzy-token-project'
-                }
+                href={MENU.PRESS.link}
               />
             </View>
           </Cell>

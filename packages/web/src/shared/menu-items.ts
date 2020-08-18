@@ -71,6 +71,10 @@ export const pagePaths = {
     name: 'White Papers',
     link: '/papers',
   },
+  PRESS: {
+    name: 'Presss',
+    link: '/press',
+  },
   TECH: {
     name: 'Technology',
     link: '/technology',
