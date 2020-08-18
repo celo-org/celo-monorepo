@@ -146,7 +146,7 @@ describe(watchQrCodeDetections, () => {
         [select(e164NumberToAddressSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
-      .put(showMessage(ErrorMessages.QR_FAILED_INVALID_ADDRESS))
+      .put(showMessage(`global:${ErrorMessages.QR_FAILED_INVALID_ADDRESS}`))
       .silentRun()
     expect(navigate).not.toHaveBeenCalled()
   })
@@ -166,7 +166,7 @@ describe(watchQrCodeDetections, () => {
         [select(e164NumberToAddressSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
-      .put(showMessage(ErrorMessages.QR_FAILED_INVALID_ADDRESS))
+      .put(showMessage(`global:${ErrorMessages.QR_FAILED_INVALID_ADDRESS}`))
       .silentRun()
     expect(navigate).not.toHaveBeenCalled()
   })
