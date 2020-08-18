@@ -4,6 +4,11 @@ import { deletePersistentVolumeClaims, installAndEnableMetricsDeps, installGener
 import { scaleResource } from 'src/lib/kubernetes'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 
+export enum CloudProvider {
+  AWS,
+  AZURE,
+}
+
 export interface ClusterConfig {
   clusterName: string
   cloudProviderName: string
@@ -19,7 +24,7 @@ export interface FullNodeDeploymentConfig {
  * If a context with the cluster name does not exist, return false.
  * @param clusterConfig
  */
-export async function setContextAndCheckForMissingCredentials(
+export async function switchToClusterContextIfExists(
   clusterConfig: ClusterConfig,
 ) {
   let currentCluster = null
@@ -44,7 +49,7 @@ export async function setContextAndCheckForMissingCredentials(
   return true
 }
 
-export async function setupCloudCluster(celoEnv: string, clusterConfig: ClusterConfig) {
+export async function setupCluster(celoEnv: string, clusterConfig: ClusterConfig) {
   await createNamespaceIfNotExists(celoEnv)
 
   console.info('Performing any cluster setup that needs to be done...')

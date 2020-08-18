@@ -1,4 +1,4 @@
-import { ClusterConfig, setContextAndCheckForMissingCredentials, setupCloudCluster } from 'src/lib/cloud-provider'
+import { ClusterConfig, setupCluster, switchToClusterContextIfExists } from 'src/lib/cloud-provider'
 import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { outputIncludes, retryCmd } from 'src/lib/utils'
 
@@ -27,7 +27,7 @@ export async function switchToAzureCluster(
     await execCmdWithExitOnFailure(`az account set --subscription ${clusterConfig.subscriptionId}`)
   }
 
-  const isContextSetCorrectly = await setContextAndCheckForMissingCredentials(clusterConfig)
+  const isContextSetCorrectly = await switchToClusterContextIfExists(clusterConfig)
   if (!isContextSetCorrectly) {
       // If we don't already have the context, get it.
       // If a context is edited for some reason (eg switching default namespace),
@@ -37,13 +37,13 @@ export async function switchToAzureCluster(
       `az aks get-credentials --resource-group ${clusterConfig.resourceGroup} --name ${clusterConfig.clusterName} --subscription ${clusterConfig.subscriptionId} --overwrite-existing`
     )
   }
-  await setupCluster(celoEnv, clusterConfig)
+  await setupAKSCluster(celoEnv, clusterConfig)
 }
 
 // setupCluster is idempotent-- it will only make changes that have not been made
 // before. Therefore, it's safe to be called for a cluster that's been fully set up before
-async function setupCluster(celoEnv: string, clusterConfig: AzureClusterConfig) {
-  await setupCloudCluster(celoEnv, clusterConfig)
+async function setupAKSCluster(celoEnv: string, clusterConfig: AzureClusterConfig) {
+  await setupCluster(celoEnv, clusterConfig)
   await installAADPodIdentity()
 }
 

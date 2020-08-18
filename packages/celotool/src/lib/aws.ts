@@ -1,4 +1,4 @@
-import { ClusterConfig, setContextAndCheckForMissingCredentials, setupCloudCluster } from 'src/lib/cloud-provider'
+import { ClusterConfig, setupCluster, switchToClusterContextIfExists } from 'src/lib/cloud-provider'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 
 /**
@@ -14,25 +14,22 @@ export async function switchToAwsCluster(
   celoEnv: string,
   clusterConfig: AwsClusterConfig,
 ) {
-
   // TODO Look into switching subscription between testing and production
-  console.info(clusterConfig.resourceGroupTag)
-  const isContextSetCorrectly = await setContextAndCheckForMissingCredentials(clusterConfig)
+  const isContextSetCorrectly = await switchToClusterContextIfExists(clusterConfig)
   if (!isContextSetCorrectly) {
     // If context does not exist, fetch it.
     await execCmdWithExitOnFailure(
       `aws eks --region ${clusterConfig.clusterRegion} update-kubeconfig --name ${clusterConfig.clusterName} --alias ${clusterConfig.clusterName}`
-      ) 
+    )
   }
-
-  await setupCluster(celoEnv, clusterConfig)
+  return setupAwsCluster(celoEnv, clusterConfig)
 }
 
-// setupCluster is idempotent-- it will only make changes that have not been made
+// setupAwsCluster is idempotent-- it will only make changes that have not been made
 // before. Therefore, it's safe to be called for a cluster that's been fully set up before
-async function setupCluster(celoEnv: string, clusterConfig: AwsClusterConfig) {
-  await setupCloudCluster(celoEnv, clusterConfig)
+async function setupAwsCluster(celoEnv: string, clusterConfig: AwsClusterConfig) {
   // TODO Find a substitute for AADPodIdentity on AWS
+  return setupCluster(celoEnv, clusterConfig)
 }
 
 // IP ADDRESS RELATED
@@ -63,7 +60,7 @@ export async function registerAWSStaticIPIfNotRegistered(name: string, resourceG
 
   // Add tags to allocationID
   await execCmdWithExitOnFailure(
-    `aws ec2 create-tags --resources ${allocationID.trim()} --tags Key=resourceGroupTag,Value=${resourceGroup} Key=IPNodeName,Value=${name}` 
+    `aws ec2 create-tags --resources ${allocationID.trim()} --tags Key=resourceGroupTag,Value=${resourceGroup} Key=IPNodeName,Value=${name}`
   )
 
   // Fetch Address of newly created

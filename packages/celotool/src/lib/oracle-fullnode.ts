@@ -1,8 +1,9 @@
-import { AWSFullNodeDeploymentConfig, installAWSFullNodeChart, removeAWSFullNodeChart, upgradeAWSFullNodeChart } from 'src/lib/aws-fullnode'
-import { FullNodeDeploymentConfig } from 'src/lib/cloud-provider'
-import { AKSFullNodeDeploymentConfig, installAKSFullNodeChart, removeAKSFullNodeChart, upgradeAKSFullNodeChart } from './aks-fullnode'
+import { CloudProvider, FullNodeDeploymentConfig } from './cloud-provider'
 import { DynamicEnvVar } from './env-utils'
-import { getAwsClusterConfig, getAzureClusterConfig, getOracleContextDynamicEnvVarValues } from './oracle'
+import { AKSFullNodeDeploymentConfig } from './k8s-fullnode/aks-fullnode'
+import { AWSFullNodeDeploymentConfig } from './k8s-fullnode/aws-fullnode'
+import { getFullNodeDeployer } from './k8s-fullnode/utils'
+import { getOracleContextDynamicEnvVarValues, getAwsClusterConfig, getAzureClusterConfig } from './oracle'
 
 /**
  * Env vars corresponding to values required for a FullNodeDeploymentConfig
@@ -14,22 +15,41 @@ const oracleContextFullNodeDeploymentEnvVars: {
   replicas: DynamicEnvVar.ORACLE_TX_NODES_COUNT,
 }
 
-export async function installOracleFullNodeChart(celoEnv: string, oracleContext: string) {
-  return oracleContext.startsWith('AWS') ? 
-  installAWSFullNodeChart(celoEnv, getAWSFullNodeDeploymentConfig(oracleContext)) : 
-  installAKSFullNodeChart(celoEnv, getAKSFullNodeDeploymentConfig(oracleContext))
+const deploymentConfigGetterByCloudProvider: {
+  [key in CloudProvider]: (oracleContext: string) => FullNodeDeploymentConfig
+} = {
+  [CloudProvider.AWS]: getAWSFullNodeDeploymentConfig,
+  [CloudProvider.AZURE]: getAKSFullNodeDeploymentConfig,
 }
 
-export async function upgradeOracleFullNodeChart(celoEnv: string, oracleContext: string, reset: boolean) {
-  return oracleContext.startsWith('AWS') ? 
-  upgradeAWSFullNodeChart(celoEnv, getAWSFullNodeDeploymentConfig(oracleContext), reset) : 
-  upgradeAKSFullNodeChart(celoEnv, getAKSFullNodeDeploymentConfig(oracleContext), reset)
+export function getFullNodeDeployerForOracleContext(oracleContext: string) {
+  const cloudProvider: CloudProvider = getCloudProviderFromOracleContext(oracleContext)
+  const deploymentConfig = deploymentConfigGetterByCloudProvider[cloudProvider](oracleContext)
+  return getFullNodeDeployer(cloudProvider, deploymentConfig)
 }
 
-export async function removeOracleFullNodeChart(celoEnv: string, oracleContext: string) {
-  return oracleContext.startsWith('AWS') ? 
-  removeAWSFullNodeChart(celoEnv, getAWSFullNodeDeploymentConfig(oracleContext)) : 
-  removeAKSFullNodeChart(celoEnv, getAKSFullNodeDeploymentConfig(oracleContext))
+function getCloudProviderFromOracleContext(oracleContext: string): CloudProvider {
+  for (const cloudProvider of Object.values(CloudProvider)) {
+    if (oracleContext.startsWith(cloudProvider as string)) {
+      return CloudProvider[cloudProvider as keyof typeof CloudProvider]
+    }
+  }
+  throw Error(`Oracle context ${oracleContext} must start with one of ${Object.values(CloudProvider)}`)
+}
+
+export function installOracleFullNodeChart(celoEnv: string, oracleContext: string) {
+  const deployer = getFullNodeDeployerForOracleContext(oracleContext)
+  return deployer.installChart(celoEnv)
+}
+
+export function upgradeOracleFullNodeChart(celoEnv: string, oracleContext: string, reset: boolean) {
+  const deployer = getFullNodeDeployerForOracleContext(oracleContext)
+  return deployer.upgradeChart(celoEnv, reset)
+}
+
+export function removeOracleFullNodeChart(celoEnv: string, oracleContext: string) {
+  const deployer = getFullNodeDeployerForOracleContext(oracleContext)
+  return deployer.removeChart(celoEnv)
 }
 
 /**
