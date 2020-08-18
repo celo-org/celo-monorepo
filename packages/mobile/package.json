@@ -27,6 +27,7 @@
     "test:verbose": "export TZ=UTC && jest --verbose",
     "test:e2e:android": "./scripts/run_e2e.sh -p android",
     "test:e2e:ios": "./scripts/run_e2e.sh -p ios",
+    "test:e2e:packager": "export CELO_TEST_CONFIG=e2e && yarn react-native start",
     "test:verify-locales": "./scripts/verify_locales.sh",
     "pre-deploy": "./scripts/pre-deploy.sh",
     "deploy:update-disclaimer": "yarn licenses generate-disclaimer > src/account/LicenseDisclaimer.txt && ./scripts/copy_license_to_android_assets.sh",
@@ -38,7 +39,7 @@
     ]
   },
   "dependencies": {
-    "@celo/client": "0.0.309",
+    "@celo/client": "0.0.315",
     "@celo/contractkit": "0.4.12-dev",
     "@celo/react-components": "1.0.0",
     "@celo/react-native-sms-retriever": "git+https://github.com/celo-org/react-native-sms-retriever#b88e502",
@@ -193,12 +194,24 @@
     "test-runner": "jest",
     "configurations": {
       "android.emu.debug": {
-        "binaryPath": "android/app/build/outputs/apk/debug/app-x86-debug.apk",
+        "binaryPath": "android/app/build/outputs/apk/debug/app-x86_64-debug.apk",
         "testBinaryPath": "android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk",
         "build": "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
         "type": "android.emulator",
-        "name": "Nexus_5X_API_28_x86",
-        "__comment": "Nexus_5X_API_28_x86 is currently hardcoded but it should be the result from $ANDROID_SDK_ROOT/emulator/emulator -list-avds | grep 'x86' | head -n 1`",
+        "device": {
+          "avdName": "Pixel_API_29_AOSP_x86_64"
+        },
+        "behavior": {
+          "init": {
+            "reinstallApp": true,
+            "launchApp": true,
+            "exposeGlobals": true
+          },
+          "cleanup": {
+            "shutdownDevice": false
+          }
+        },
+        "__comment": "Pixel_API_29_AOSP_x86_64 is currently hardcoded but it should be the result from $ANDROID_SDK_ROOT/emulator/emulator -list-avds | grep 'x86' | head -n 1`",
         "__comment2": "Specifying 'testBinaryPath' otherwise detox infers the wrong APK name because we're using split APKs"
       },
       "android.emu.release": {
@@ -206,8 +219,8 @@
         "testBinaryPath": "android/app/build/outputs/apk/androidTest/release/app-release-androidTest.apk",
         "build": "cd android && ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release && cd ..",
         "type": "android.emulator",
-        "name": "Nexus_5X_API_28_x86",
-        "__comment": "Nexus_5X_API_28_x86 is currently hardcoded but it should be the result from $ANDROID_SDK_ROOT/emulator/emulator -list-avds | grep 'x86' | head -n 1`",
+        "name": "Pixel_API_29_AOSP_x86_64",
+        "__comment": "Pixel_API_29_AOSP_x86_64 is currently hardcoded but it should be the result from $ANDROID_SDK_ROOT/emulator/emulator -list-avds | grep 'x86' | head -n 1`",
         "__comment2": "Specifying 'testBinaryPath' otherwise detox infers the wrong APK name because we're using split APKs"
       },
       "ios.sim.debug": {
