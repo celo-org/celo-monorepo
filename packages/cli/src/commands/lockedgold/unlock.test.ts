@@ -1,6 +1,6 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
-import { addressToPublicKey } from '@celo/utils/src/signatureUtils'
+import { addressToPublicKey } from '@celo/utils/lib/signatureUtils'
 import Web3 from 'web3'
 import Register from '../account/register'
 import Vote from '../election/vote'

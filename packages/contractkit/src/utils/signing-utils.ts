@@ -130,8 +130,6 @@ export async function encodeTransaction(
   rlpEncoded: RLPEncodedTx,
   signature: { v: number; r: Buffer; s: Buffer }
 ): Promise<EncodedTransaction> {
-  const hash = getHashFromEncoded(rlpEncoded.rlpEncode)
-
   const sanitizedSignature = signatureFormatter(signature)
   const v = sanitizedSignature.v
   const r = sanitizedSignature.r
@@ -141,6 +139,7 @@ export async function encodeTransaction(
     .concat([v, r, s])
 
   const rawTransaction = RLP.encode(rawTx)
+  const hash = getHashFromEncoded(rawTransaction)
 
   const result: EncodedTransaction = {
     tx: {
