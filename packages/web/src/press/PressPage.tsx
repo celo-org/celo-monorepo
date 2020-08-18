@@ -9,46 +9,27 @@ import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { fonts, standardStyles, textStyles } from 'src/styles'
 import { HelpfullLink } from 'src/terms/HelpfullLink'
 
-interface Audit {
-  auditor: string
-  title: string
-  type: 'economics' | 'contracts' | 'security'
-  link?: string
+interface Props {
+  press: any
 }
 
-const DATA: Audit[] = [
-  {
-    auditor: 'OpenZeppelin',
-    title: 'Smart Contract Audit',
-    link: 'https://blog.openzeppelin.com/celo-contracts-audit',
-    type: 'contracts',
-  },
-  { auditor: 'Teserakt', title: 'Crypto Library Audit', type: 'security' },
-  { auditor: 'Trailofbits', title: 'Security Audit', type: 'security' },
-  {
-    auditor: 'Certora',
-    title: 'Formal Verification of Celo Governance Protocols',
-    type: 'contracts',
-    link: 'https://www.certora.com/pubs/CeloMay2020.pdf',
-  },
-  { auditor: 'Gauntlet', title: 'Stability Protocol Analysis', type: 'economics' },
-  { auditor: 'Prysm Group', title: 'Economic Analysis', type: 'economics' },
-  { auditor: 'NCC', title: 'Reserve Audit', type: 'economics' },
-]
-
-const AUDITS = DATA.reduce((agg, current) => {
-  const arrayOfType = agg[current.type] || []
-  agg[current.type] = [...arrayOfType, current]
-
-  return agg
-}, {})
-
-class PressPage extends React.PureComponent<I18nProps> {
-  static getInitialProps() {
-    return { namespacesRequired: [NameSpaces.audits, NameSpaces.common] }
+class PressPage extends React.PureComponent<I18nProps & Props> {
+  static async getInitialProps({ req }) {
+    let press = []
+    try {
+      if (req) {
+        const getpress = await import('src/../server/fetchPress')
+        press = await getpress.default()
+      } else {
+        press = await fetch(`/api/press`).then((result) => result.json())
+      }
+      return { press }
+    } catch {
+      return { press }
+    }
   }
   render() {
-    const { t } = this.props
+    const { t, press } = this.props
     return (
       <>
         <OpenGraph
@@ -67,15 +48,20 @@ class PressPage extends React.PureComponent<I18nProps> {
               <H1 style={textStyles.center}>{t('title')}</H1>
             </Cell>
           </GridRow>
-          {Object.keys(AUDITS).map((type) => {
+          {Object.keys(press).map((date) => {
             return (
-              <SideTitledSection key={type} span={Spans.three4th} title={t(type)}>
-                {AUDITS[type].map((audit: Audit) => (
-                  <View style={styles.reference} key={audit.title}>
-                    <Text style={fonts.p}>
-                      {audit.title} by <Text style={textStyles.italic}>{audit.auditor}</Text>
+              <SideTitledSection
+                key={date}
+                span={Spans.three4th}
+                title={new Date(date).toLocaleDateString(this.props.i18n.language, DATE_FORMAT)}
+              >
+                {press[date].map((item) => (
+                  <View style={styles.reference} key={item.title}>
+                    <Text style={fonts.p}>{item.title}</Text>
+                    <Text style={[fonts.legal, textStyles.italic]}>
+                      {t('by')} {item.publication}
                     </Text>
-                    {audit.link && <HelpfullLink text={t('download')} href={audit.link} />}
+                    {item.link && <HelpfullLink text={t('read')} href={item.link} />}
                   </View>
                 ))}
               </SideTitledSection>
@@ -87,7 +73,9 @@ class PressPage extends React.PureComponent<I18nProps> {
   }
 }
 
-export default withNamespaces(NameSpaces.audits)(PressPage)
+const DATE_FORMAT = { year: 'numeric', month: 'long' }
+
+export default withNamespaces(NameSpaces.press)(PressPage)
 
 const styles = StyleSheet.create({
   container: {
@@ -96,6 +84,7 @@ const styles = StyleSheet.create({
     minHeight: 450,
   },
   reference: {
-    marginBottom: 20,
+    marginBottom: 40,
+    maxWidth: 700,
   },
 })
