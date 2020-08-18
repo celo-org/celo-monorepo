@@ -16,6 +16,8 @@ import { range, uniq } from 'lodash'
 import {
   AccountsContract,
   AccountsInstance,
+  AttestationsTestContract,
+  AttestationsTestInstance,
   MockElectionContract,
   MockElectionInstance,
   MockLockedGoldContract,
@@ -27,8 +29,6 @@ import {
   MockValidatorsContract,
   RegistryContract,
   RegistryInstance,
-  AttestationsTestContract,
-  AttestationsTestInstance,
 } from 'types'
 import Web3 from 'web3'
 import { getParsedSignatureOfAddress } from '../../lib/signing-utils'

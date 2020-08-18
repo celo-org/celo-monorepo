@@ -1,9 +1,10 @@
-/* tslint:disable:no-console */
-import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
-import { readdirSync, readJsonSync, writeJsonSync } from 'fs-extra'
+// tslint:disable: max-classes-per-file
+// tslint:disable: no-console
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
-import { Address, eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
+import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
 import { linkedLibraries } from '@celo/protocol/migrationsConfig'
+import { Address, eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
+import { readdirSync, readJsonSync, writeJsonSync } from 'fs-extra'
 import { basename, join } from 'path'
 
 /*
@@ -23,10 +24,10 @@ import { basename, join } from 'path'
 
 class ContractDependencies {
   dependencies: Map<string, string[]>
-  constructor(linkedLibraries: any) {
+  constructor(libraries: any) {
     this.dependencies = new Map()
-    Object.keys(linkedLibraries).forEach((lib: string) => {
-      linkedLibraries[lib].forEach((contract: string) => {
+    Object.keys(libraries).forEach((lib: string) => {
+      libraries[lib].forEach((contract: string) => {
         if (this.dependencies.has(contract)) {
           this.dependencies.get(contract).push(lib)
         } else {
@@ -42,7 +43,6 @@ class ContractDependencies {
 }
 
 class ContractAddresses {
-  constructor(public addresses: Map<string, Address>) {}
   static async create(contracts: string[], registry: any) {
     const addresses = new Map()
     await Promise.all(
@@ -55,6 +55,8 @@ class ContractAddresses {
     )
     return new ContractAddresses(addresses)
   }
+
+  constructor(public addresses: Map<string, Address>) {}
 
   public get = (contract: string): Address => {
     if (this.addresses.has(contract)) {
@@ -69,10 +71,13 @@ class ContractAddresses {
   }
 }
 
+const REGISTRY_ADDRESS = '0x000000000000000000000000000000000000ce10'
+
 module.exports = async (callback: (error?: any) => number) => {
   try {
     const argv = require('minimist')(process.argv.slice(2), {
       string: ['report', 'network', 'proposal', 'libraries', 'initialize_data', 'build_directory'],
+      boolean: ['dry_run'],
     })
     const report: ASTDetailedVersionedReport = readJsonSync(argv.report).report
     const initializationData = readJsonSync(argv.initialize_data)
@@ -80,9 +85,7 @@ module.exports = async (callback: (error?: any) => number) => {
     const contracts = readdirSync(join(argv.build_directory, 'contracts')).map((x) =>
       basename(x, '.json')
     )
-    const registry = await artifacts
-      .require('Registry')
-      .at('0x000000000000000000000000000000000000ce10')
+    const registry = await artifacts.require('Registry').at(REGISTRY_ADDRESS)
     const addresses = await ContractAddresses.create(contracts, registry)
     const released: Set<string> = new Set([])
     const proposal = []
@@ -111,8 +114,8 @@ module.exports = async (callback: (error?: any) => number) => {
 
     const deployImplementation = async (contractName: string, Contract: any) => {
       console.log(`Deploying ${contractName}`)
-      // const contract = await Contract.new()
-      const contract = await Contract.at(web3.utils.randomHex(20))
+      // Hack to trick truffle, which checks that the provided address has code
+      const contract = await (argv.dry_run ? Contract.at(REGISTRY_ADDRESS) : Contract.new())
       // Sanity check that any contracts that are being changed set a version number.
       const getVersionNumberAbi = (contract as any).abi.find(
         (abi: any) => abi.type === 'function' && abi.name === 'getVersionNumber'
@@ -133,12 +136,13 @@ module.exports = async (callback: (error?: any) => number) => {
       // Because this depends on ordering (i.e. was the new GovernanceProxy deployed
       // before or after other contracts in this script?), and that ordering is not being
       // checked, fail if there are storage incompatible changes to Governance.
-      if (contractName == 'Governance') {
+      if (contractName === 'Governance') {
         throw new Error(`Storage incompatible changes to Governance are not yet supported`)
       }
       console.log(`Deploying ${contractName}Proxy`)
       const Proxy = await artifacts.require(`${contractName}Proxy`)
-      const proxy = await Proxy.new()
+      // Hack to trick truffle, which checks that the provided address has code
+      const proxy = await (argv.dry_run ? Proxy.at(REGISTRY_ADDRESS) : Proxy.new())
       const initializeAbi = (contract as any).abi.find(
         (abi: any) => abi.type === 'function' && abi.name === 'initialize'
       )
@@ -146,27 +150,35 @@ module.exports = async (callback: (error?: any) => number) => {
       if (initializeAbi) {
         const args = initializationData[contractName]
         console.log(`Initializing ${contractName} with: ${args}`)
-        await setAndInitializeImplementation(
-          web3,
-          proxy,
-          contract.address,
-          initializeAbi,
-          {},
-          ...args
-        )
+        if (!argv.dry_run) {
+          await setAndInitializeImplementation(
+            web3,
+            proxy,
+            contract.address,
+            initializeAbi,
+            {},
+            ...args
+          )
+        }
       } else {
-        await proxy._setImplementation(contract.address)
+        if (!argv.dry_run) {
+          await proxy._setImplementation(contract.address)
+        }
       }
       // This makes essentially every contract dependent on Governance.
       console.log(`Transferring ownership of ${contractName}Proxy to Governance`)
-      await proxy._transferOwnership(addresses.get('Governance'))
+      if (!argv.dry_run) {
+        await proxy._transferOwnership(addresses.get('Governance'))
+      }
       const proxiedContract = await artifacts.require(contractName).at(proxy.address)
       const transferOwnershipAbi = (contract as any).abi.find(
         (abi: any) => abi.type === 'function' && abi.name === 'transferOwnership'
       )
       if (transferOwnershipAbi) {
         console.log(`Transferring ownership of ${contractName} to Governance`)
-        await proxiedContract.transferOwnership(addresses.get('Governance'))
+        if (!argv.dry_run) {
+          await proxiedContract.transferOwnership(addresses.get('Governance'))
+        }
       }
       return proxy
     }
@@ -190,7 +202,7 @@ module.exports = async (callback: (error?: any) => number) => {
         const isLibrary = Object.keys(linkedLibraries).includes(contractName)
         const shouldDeployImplementation = Object.keys(report.contracts).includes(contractName)
         const shouldDeployProxy =
-          deployImplementation && report.contracts[contractName].changes.storage.length
+          shouldDeployImplementation && report.contracts[contractName].changes.storage.length > 0
         // 3. Deploy new versions of the contract and proxy, if needed.
         if (shouldDeployImplementation || isLibrary) {
           const contract = await deployImplementation(contractName, Contract)
