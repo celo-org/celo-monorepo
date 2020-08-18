@@ -3,7 +3,7 @@ import { CryptographyClient, KeyClient, KeyVaultKey } from '@azure/keyvault-keys
 import { SecretClient } from '@azure/keyvault-secrets'
 import { BigNumber } from 'bignumber.js'
 import { bigNumberToBuffer, bufferToBigNumber, makeCanonical, Signature } from './signature-utils'
-import { publicKeyPrefix, recoverKeyIndex } from './signing-utils'
+import { publicKeyPrefix, recoverKeyIndex, sixtyFour, thirtyTwo } from './signing-utils'
 
 /**
  * Provides an abstraction on Azure Key Vault for performing signing operations
@@ -74,19 +74,19 @@ export class AzureKeyVaultClient {
     if (
       typeof signResult === 'undefined' ||
       typeof signResult.result === 'undefined' ||
-      signResult.result.length !== 64
+      signResult.result.length !== sixtyFour
     ) {
       throw new Error(`Invalid signature returned from Azure: ${signResult}`)
     }
     const rawSignature = signResult.result
 
     // Canonicalize signature
-    const R = bufferToBigNumber(Buffer.from(rawSignature.slice(0, 32)))
-    let S = bufferToBigNumber(Buffer.from(rawSignature.slice(32, 64)))
+    const R = bufferToBigNumber(Buffer.from(rawSignature.slice(0, thirtyTwo)))
+    let S = bufferToBigNumber(Buffer.from(rawSignature.slice(thirtyTwo, sixtyFour)))
     S = makeCanonical(S)
 
-    const rBuff = bigNumberToBuffer(R, 32)
-    const sBuff = bigNumberToBuffer(S, 32)
+    const rBuff = bigNumberToBuffer(R, thirtyTwo)
+    const sBuff = bigNumberToBuffer(S, thirtyTwo)
     const canonicalizedSignature = Buffer.concat([rBuff, sBuff])
     const publicKey = await this.getPublicKey(keyName)
 

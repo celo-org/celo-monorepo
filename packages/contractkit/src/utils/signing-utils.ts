@@ -239,12 +239,7 @@ export function recoverKeyIndex(
     const recoveredPublicKeyByteArr = ecdsaRecover(signatureArray, i, hashArray, compressed)
     const publicKeyBuff = Buffer.from(recoveredPublicKeyByteArr)
     const recoveredPublicKey = bufferToBigNumber(publicKeyBuff)
-    console.log(
-      'Recovered key: ' + recoveredPublicKey,
-      'expected',
-      publicKey,
-      publicKey.eq(recoveredPublicKey)
-    )
+    debug('Recovered key: %s expected %s' + recoveredPublicKey, publicKey)
     if (publicKey.eq(recoveredPublicKey)) {
       return i
     }

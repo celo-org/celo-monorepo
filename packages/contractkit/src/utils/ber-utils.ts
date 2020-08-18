@@ -9,6 +9,9 @@ export const toArrayBuffer = (b: Buffer): ArrayBuffer => {
 export function publicKeyFromAsn1(b: Buffer): BigNumber {
   const { result } = asn1.fromBER(toArrayBuffer(b))
   const values = (result as asn1.Sequence).valueBlock.value
+  if (values.length < 2) {
+    throw new Error('Cannot get public key from Asn1: invalid sequence')
+  }
   const value = values[1] as asn1.BitString
   return bufferToBigNumber(Buffer.from(value.valueBlock.valueHex.slice(1)))
 }
