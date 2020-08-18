@@ -1,6 +1,8 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import Switch from '@celo/react-components/components/Switch.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { useTranslation, WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
@@ -15,10 +17,12 @@ import BackupPhraseContainer, {
 } from 'src/backup/BackupPhraseContainer'
 import CancelConfirm from 'src/backup/CancelConfirm'
 import { getStoredMnemonic, onGetMnemonicFail } from 'src/backup/utils'
+import CancelButton from 'src/components/CancelButton.v2'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { navigate, pushToStack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import { currentAccountSelector } from 'src/web3/selectors'
 
@@ -39,7 +43,10 @@ interface DispatchProps {
   hideAlert: typeof hideAlert
 }
 
-type Props = StateProps & DispatchProps & WithTranslation
+type Props = StateProps &
+  DispatchProps &
+  WithTranslation &
+  StackScreenProps<StackParamList, Screens.BackupPhrase>
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -48,9 +55,20 @@ const mapStateToProps = (state: RootState): StateProps => {
   }
 }
 
-export const navOptionsForBackupPhrase = {
-  headerLeft: () => <CancelConfirm screen={TAG} />,
-  headerRight: () => <HeaderRight />,
+export const navOptionsForBackupPhrase = ({
+  route,
+}: StackScreenProps<StackParamList, Screens.BackupPhrase>) => {
+  const navigatedFromSettings = route.params?.navigatedFromSettings
+  return {
+    headerLeft: () => {
+      return navigatedFromSettings ? (
+        <CancelButton style={styles.cancelButton} />
+      ) : (
+        <CancelConfirm screen={TAG} />
+      )
+    },
+    headerRight: () => <HeaderRight />,
+  }
 }
 
 class BackupPhrase extends React.Component<Props, State> {
@@ -92,12 +110,17 @@ class BackupPhrase extends React.Component<Props, State> {
 
   onPressContinue = () => {
     ValoraAnalytics.track(OnboardingEvents.backup_continue)
-    navigate(Screens.BackupQuiz)
+    navigate(Screens.BackupQuiz, { navigatedFromSettings: this.navigatedFromSettings() })
+  }
+
+  navigatedFromSettings = () => {
+    return this.props.route.params?.navigatedFromSettings ?? false
   }
 
   render() {
     const { t, backupCompleted } = this.props
     const { mnemonic, isConfirmChecked } = this.state
+    const navigatedFromSettings = this.navigatedFromSettings()
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -108,7 +131,7 @@ class BackupPhrase extends React.Component<Props, State> {
           />
           <Text style={styles.body}>{t('backupKeySummary')}</Text>
         </ScrollView>
-        {!backupCompleted && (
+        {(!backupCompleted || navigatedFromSettings) && (
           <>
             <View style={styles.confirmationSwitchContainer}>
               <Switch value={isConfirmChecked} onValueChange={this.onPressConfirmSwitch} />
@@ -162,6 +185,9 @@ const styles = StyleSheet.create({
     flex: 1,
     ...fontStyles.regular,
     paddingLeft: 8,
+  },
+  cancelButton: {
+    color: colors.gray4,
   },
 })
 

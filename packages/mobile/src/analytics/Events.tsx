@@ -30,6 +30,8 @@ export enum SettingsEvents {
   forno_toggle = 'forno_toggle',
   licenses_view = 'licenses_view',
   tos_view = 'tos_view',
+  start_account_removal = 'start_account_removal',
+  completed_account_removal = 'completed_account_removal',
   // intentionally not tracking analytics opt in/out
   // to avoid tracking through omission
 }
@@ -247,6 +249,7 @@ export enum CeloExchangeEvents {
   celo_home_info = 'celo_home_info', // when the (i) next to Celo Gold price is clicked, launching education (not pictured)
   celo_home_buy = 'celo_home_buy', // when the “Buy” button is clicked
   celo_home_sell = 'celo_home_sell', // when the “Sell” button is clicked
+  celo_home_withdraw = 'celo_home_withdraw', // when the “Withdraw” button is clicked
   celo_transaction_select = 'celo_transaction_select', // when an transaction item is clicked
   celo_transaction_back = 'celo_transaction_back', // when back caret is clicked from drilldown
 
@@ -269,6 +272,13 @@ export enum CeloExchangeEvents {
   celo_fetch_exchange_rate_start = 'celo_fetch_exchange_rate_start',
   celo_fetch_exchange_rate_complete = 'celo_fetch_exchange_rate_complete',
   celo_fetch_exchange_rate_error = 'celo_fetch_exchange_rate_error',
+
+  celo_withdraw_review = 'celo_withdraw_review', // when ‘review’ is clicked on the withdraw amount screen
+  celo_withdraw_edit = 'celo_withdraw_edit', // when ‘edit’ is clicked on the review screen
+  celo_withdraw_cancel = 'celo_withdraw_cancel', // when ’cancel’ is clicked on the review screen
+  celo_withdraw_confirm = 'celo_withdraw_confirm', // when ‘withdraw’ is clicked on the review screen
+  celo_withdraw_completed = 'celo_withdraw_completed', // when the transaction for the withdrawal is completed
+  celo_withdraw_error = 'celo_withdraw_error', // when there's an error on the withdrawal transaction
 }
 
 export enum GethEvents {

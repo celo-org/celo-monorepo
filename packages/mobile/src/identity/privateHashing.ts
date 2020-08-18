@@ -1,5 +1,6 @@
-import { PNPUtils } from '@celo/contractkit'
-import { PhoneNumberHashDetails } from '@celo/contractkit/lib/utils/phone-number-lookup/phone-number-identifier'
+import { OdisUtils } from '@celo/contractkit'
+import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
+import { AuthSigner, ServiceContext } from '@celo/contractkit/lib/identity/odis/query'
 import { getPhoneHash, isE164Number, PhoneNumberUtils } from '@celo/utils/src/phoneNumbers'
 import DeviceInfo from 'react-native-device-info'
 import { call, put, select } from 'redux-saga/effects'
@@ -16,8 +17,8 @@ import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { transferStableToken } from 'src/stableToken/actions'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
-import { generateStandbyTransactionId } from 'src/transactions/actions'
 import { waitForTransactionWithId } from 'src/transactions/saga'
+import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { getAuthSignerForAccount } from 'src/web3/dataEncryptionKey'
 import { getConnectedAccount, unlockAccount } from 'src/web3/saga'
@@ -79,7 +80,7 @@ function* doFetchPhoneHashPrivate(e164Number: string) {
     account,
     selfPhoneHash
   )
-  yield put(updateE164PhoneNumberSalts({ [e164Number]: details.salt }))
+  yield put(updateE164PhoneNumberSalts({ [e164Number]: details.pepper }))
   return details
 }
 
@@ -91,32 +92,34 @@ function* getPhoneHashPrivate(e164Number: string, account: string, selfPhoneHash
     throw new Error(ErrorMessages.INVALID_PHONE_NUMBER)
   }
 
-  const authSigner = yield call(getAuthSignerForAccount, account)
+  const authSigner: AuthSigner = yield call(getAuthSignerForAccount, account)
   // Unlock the account if the authentication is signed by the wallet
-  if (
-    authSigner.authenticationMethod === PNPUtils.PhoneNumberLookup.AuthenticationMethod.WALLETKEY
-  ) {
+  if (authSigner.authenticationMethod === OdisUtils.Query.AuthenticationMethod.WALLET_KEY) {
     const success: boolean = yield call(unlockAccount, account)
     if (!success) {
       throw new Error(ErrorMessages.INCORRECT_PIN)
     }
   }
 
-  const { pgpnpPubKey } = networkConfig
-  const blsBlindingClient = new ReactBlsBlindingClient(pgpnpPubKey)
+  const { odisPubKey, odisUrl } = networkConfig
+  const serviceContext: ServiceContext = {
+    odisUrl,
+    odisPubKey,
+  }
+  const blsBlindingClient = new ReactBlsBlindingClient(odisPubKey)
   try {
     return yield call(
-      PNPUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier,
+      OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier,
       e164Number,
       account,
       authSigner,
-      networkConfig,
+      serviceContext,
       selfPhoneHash,
       DeviceInfo.getVersion(),
       blsBlindingClient
     )
   } catch (error) {
-    if (error.message === ErrorMessages.PGPNP_QUOTA_ERROR) {
+    if (error.message === ErrorMessages.ODIS_QUOTA_ERROR) {
       throw new Error(ErrorMessages.SALT_QUOTA_EXCEEDED)
     }
     throw error
@@ -140,7 +143,7 @@ export function* getUserSelfPhoneHashDetails() {
 
   const details: PhoneNumberHashDetails = {
     e164Number,
-    salt,
+    pepper: salt,
     phoneHash: PhoneNumberUtils.getPhoneHash(e164Number, salt),
   }
 
@@ -157,24 +160,23 @@ function* navigateToQuotaPurchaseScreen() {
     })
 
     const ownAddress: string = yield select(currentAccountSelector)
-    const txId = generateStandbyTransactionId(ownAddress)
-
     const userBalance = yield select(stableTokenBalanceSelector)
     const userBalanceSufficient = isUserBalanceSufficient(userBalance, LOOKUP_GAS_FEE_ESTIMATE)
     if (!userBalanceSufficient) {
       throw Error(ErrorMessages.INSUFFICIENT_BALANCE)
     }
 
+    const context = newTransactionContext(TAG, 'Purchase lookup quota')
     yield put(
       transferStableToken({
         recipientAddress: ownAddress, // send payment to yourself
         amount: '0.01', // one penny
         comment: 'Lookup Quota Purchase',
-        txId,
+        context,
       })
     )
 
-    const quotaPurchaseTxSuccess = yield call(waitForTransactionWithId, txId)
+    const quotaPurchaseTxSuccess = yield call(waitForTransactionWithId, context.id)
     if (!quotaPurchaseTxSuccess) {
       throw new Error('Purchase tx failed')
     }

@@ -1,4 +1,3 @@
-import { sha256 } from 'ethereumjs-util'
 import { TokenTransactionType, TransactionFeedFragment } from 'src/apollo/types'
 import { ExchangeConfirmationCardProps } from 'src/exchange/ExchangeConfirmationCard'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
@@ -70,10 +69,6 @@ export type ActionTypes =
   | NewTransactionsInFeedAction
   | UpdatedRecentTxRecipientsCacheAction
 
-export const generateStandbyTransactionId = (recipientAddress: string) => {
-  return sha256(recipientAddress + String(Date.now())).toString('hex')
-}
-
 export const addStandbyTransaction = (
   transaction: StandbyTransaction
 ): AddStandbyTransactionAction => ({
@@ -131,7 +126,13 @@ export const navigateToPaymentTransferReview = (
   let headerText = ''
   switch (type) {
     case TokenTransactionType.Sent:
-      headerText = i18n.t('walletFlow5:transactionHeaderSent')
+      const isCeloWithdrawal =
+        confirmationProps.amount.currencyCode === CURRENCIES[CURRENCY_ENUM.GOLD].code
+      headerText = i18n.t(
+        isCeloWithdrawal
+          ? 'walletFlow5:transactionHeaderWithdrewCelo'
+          : 'walletFlow5:transactionHeaderSent'
+      )
       break
     case TokenTransactionType.EscrowSent:
       headerText = i18n.t('walletFlow5:transactionHeaderEscrowSent')
