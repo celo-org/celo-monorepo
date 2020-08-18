@@ -45,12 +45,14 @@ class ContractAddresses {
   constructor(public addresses: Map<string, Address>) {}
   static async create(contracts: string[], registry: any) {
     const addresses = new Map()
-    contracts.forEach(async (contract: string) => {
-      const registeredAddress = await registry.getAddressForString(contract)
-      if (!eqAddress(registeredAddress, NULL_ADDRESS)) {
-        addresses.set(contract, registeredAddress)
-      }
-    })
+    await Promise.all(
+      contracts.map(async (contract: string) => {
+        const registeredAddress = await registry.getAddressForString(contract)
+        if (!eqAddress(registeredAddress, NULL_ADDRESS)) {
+          addresses.set(contract, registeredAddress)
+        }
+      })
+    )
     return new ContractAddresses(addresses)
   }
 
@@ -107,6 +109,68 @@ module.exports = async (callback: (error?: any) => number) => {
       throw new Error('All contracts linking libraries should be upgraded in release 1')
     }
 
+    const deployImplementation = async (contractName: string, Contract: any) => {
+      console.log(`Deploying ${contractName}`)
+      // const contract = await Contract.new()
+      const contract = await Contract.at(web3.utils.randomHex(20))
+      // Sanity check that any contracts that are being changed set a version number.
+      const getVersionNumberAbi = (contract as any).abi.find(
+        (abi: any) => abi.type === 'function' && abi.name === 'getVersionNumber'
+      )
+      if (!getVersionNumberAbi) {
+        throw new Error(
+          `Contract ${contractName} has changes but does not specify a version number`
+        )
+      }
+      return contract
+    }
+
+    const deployProxy = async (contractName: string, contract: any) => {
+      // Explicitly forbid upgrading to a new Governance proxy contract.
+      // Upgrading to a new Governance proxy contract would require ownership of all
+      // contracts to be moved to the new governance contract, possibly including contracts
+      // deployed in this script.
+      // Because this depends on ordering (i.e. was the new GovernanceProxy deployed
+      // before or after other contracts in this script?), and that ordering is not being
+      // checked, fail if there are storage incompatible changes to Governance.
+      if (contractName == 'Governance') {
+        throw new Error(`Storage incompatible changes to Governance are not yet supported`)
+      }
+      console.log(`Deploying ${contractName}Proxy`)
+      const Proxy = await artifacts.require(`${contractName}Proxy`)
+      const proxy = await Proxy.new()
+      const initializeAbi = (contract as any).abi.find(
+        (abi: any) => abi.type === 'function' && abi.name === 'initialize'
+      )
+      console.log(`Setting ${contractName}Proxy implementation to ${contract.address}`)
+      if (initializeAbi) {
+        const args = initializationData[contractName]
+        console.log(`Initializing ${contractName} with: ${args}`)
+        await setAndInitializeImplementation(
+          web3,
+          proxy,
+          contract.address,
+          initializeAbi,
+          {},
+          ...args
+        )
+      } else {
+        await proxy._setImplementation(contract.address)
+      }
+      // This makes essentially every contract dependent on Governance.
+      console.log(`Transferring ownership of ${contractName}Proxy to Governance`)
+      await proxy._transferOwnership(addresses.get('Governance'))
+      const proxiedContract = await artifacts.require(contractName).at(proxy.address)
+      const transferOwnershipAbi = (contract as any).abi.find(
+        (abi: any) => abi.type === 'function' && abi.name === 'transferOwnership'
+      )
+      if (transferOwnershipAbi) {
+        console.log(`Transferring ownership of ${contractName} to Governance`)
+        await proxiedContract.transferOwnership(addresses.get('Governance'))
+      }
+      return proxy
+    }
+
     const release = async (contractName: string) => {
       if (released.has(contractName)) {
         return
@@ -124,65 +188,14 @@ module.exports = async (callback: (error?: any) => number) => {
         // changes to them.
         // TODO(asa): Remove `isLibrary` for future releases.
         const isLibrary = Object.keys(linkedLibraries).includes(contractName)
-        const deployImplementation = Object.keys(report.contracts).includes(contractName)
-        const deployProxy =
+        const shouldDeployImplementation = Object.keys(report.contracts).includes(contractName)
+        const shouldDeployProxy =
           deployImplementation && report.contracts[contractName].changes.storage.length
         // 3. Deploy new versions of the contract and proxy, if needed.
-        if (deployImplementation || isLibrary) {
-          console.log(`Deploying ${contractName}`)
-          const contract = await Contract.new()
-          // Sanity check that any contracts that are being changed set a version number.
-          const getVersionNumberAbi = (contract as any).abi.find(
-            (abi: any) => abi.type === 'function' && abi.name === 'getVersionNumber'
-          )
-          if (!getVersionNumberAbi) {
-            throw new Error(
-              `Contract ${contractName} has changes but does not specify a version number`
-            )
-          }
-          if (deployProxy || isLibrary) {
-            // Explicitly forbid upgrading to a new Governance proxy contract.
-            // Upgrading to a new Governance proxy contract would require ownership of all
-            // contracts to be moved to the new governance contract, possibly including contracts
-            // deployed in this script.
-            // Because this depends on ordering (i.e. was the new GovernanceProxy deployed
-            // before or after other contracts in this script?), and that ordering is not being
-            // checked, fail if there are storage incompatible changes to Governance.
-            if (contractName == 'Governance') {
-              throw new Error(`Storage incompatible changes to Governance are not yet supported`)
-            }
-            console.log(`Deploying ${contractName}Proxy`)
-            const Proxy = await artifacts.require(`${contractName}Proxy`)
-            const proxy = await Proxy.new()
-            const initializeAbi = (contract as any).abi.find(
-              (abi: any) => abi.type === 'function' && abi.name === 'initialize'
-            )
-            console.log(`Setting ${contractName}Proxy implementation to ${contract.address}`)
-            if (initializeAbi) {
-              const args = initializationData[contractName]
-              console.log(`Initializing ${contractName} with: ${args}`)
-              await setAndInitializeImplementation(
-                web3,
-                proxy,
-                contract.address,
-                initializeAbi,
-                {},
-                ...args
-              )
-            } else {
-              await proxy._setImplementation(contract.address)
-            }
-            // This makes essentially every contract dependent on Governance.
-            console.log(`Transferring ownership of ${contractName}Proxy to Governance`)
-            await proxy._transferOwnership(addresses.get('Governance'))
-            const proxiedContract = await artifacts.require(contractName).at(proxy.address)
-            const transferOwnershipAbi = (contract as any).abi.find(
-              (abi: any) => abi.type === 'function' && abi.name === 'transferOwnership'
-            )
-            if (transferOwnershipAbi) {
-              console.log(`Transferring ownership of ${contractName} to Governance`)
-              await proxiedContract.transferOwnership(addresses.get('Governance'))
-            }
+        if (shouldDeployImplementation || isLibrary) {
+          const contract = await deployImplementation(contractName, Contract)
+          if (shouldDeployProxy || isLibrary) {
+            const proxy = await deployProxy(contractName, contract)
             // 4. Update the contract's address, if needed.
             addresses.set(contractName, proxy.address)
             proposal.push({
