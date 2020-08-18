@@ -142,6 +142,7 @@ Next install [Android Studio][android studio] and add the [Android NDK][android 
 Execute the following (and make sure the lines are in your `~/.bash_profile`).
 
 _Note that these paths may differ on your machine. You can find the path to the SDK and NDK via the [Android Studio menu](https://stackoverflow.com/questions/40520324/how-to-find-the-path-to-ndk)._
+
 ```bash
 export ANDROID_HOME=/usr/local/share/android-sdk
 export ANDROID_NDK=/usr/local/share/android-ndk
@@ -150,10 +151,10 @@ export ANDROID_SDK_ROOT=/usr/local/share/android-sdk
 export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
 ```
 
-Then install the Android 28 platform:
+Then install the Android 29 platform:
 
 ```bash
-sdkmanager 'platforms;android-28'
+sdkmanager 'platforms;android-29'
 ```
 
 ##### Linux
@@ -178,11 +179,11 @@ You can find the complete instructions about how to install the tools in Linux e
 
 ##### Configure an emulator using the Android SDK Manager
 
-Install the Android 28 system image and create an Android Virtual Device:
+Install the Android 29 system image and create an Android Virtual Device:
 
 ```bash
-sdkmanager "system-images;android-28;google_apis;x86"
-avdmanager create avd --force --name Nexus_5X_API_28_x86 --device "Nexus 5X" -k "system-images;android-28;google_apis;x86" --abi "google_apis/x86"
+sdkmanager "system-images;android-29;default;x86_64"
+avdmanager create avd --force --name Pixel_API_29_AOSP_x86_64 --device pixel -k "system-images;android-29;default;x86_64"
 ```
 
 Execute the following and add it to your `~/.bash_profile`:
