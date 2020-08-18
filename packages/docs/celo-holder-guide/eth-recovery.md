@@ -1,4 +1,4 @@
-# Recovering CELO from an Ethereum Wallet
+# Recovering CELO from an Ethereum Address
 
 In this guide, steps are outlined to help you recover your [CELO (previously Celo Gold)](../overview.md#background-and-key-concepts) if you accidentally transferred them to an [Ethereum address](https://en.wikipedia.org/wiki/Ethereum#Addresses).
 
@@ -10,6 +10,7 @@ This guide assumes that you have access to the following:
     - [Windows](https://www.howtogeek.com/270810/how-to-quickly-launch-a-bash-shell-from-windows-10s-file-explorer/)
     - [Mac](https://macpaw.com/how-to/use-terminal-on-mac)
     - [Linux](https://askubuntu.com/questions/196212/how-do-you-open-a-command-line)
+- [Celo Command Line Interface](../command-line-interface/overview.md) installed on your computer
 - The [24-word recovery phrase](https://kb.myetherwallet.com/en/security-and-privacy/what-is-a-mnemonic-phrase/) of your Ethereum address
 
 {% hint style="danger" %}
@@ -60,7 +61,7 @@ Replace `<accountAddress>` with the `accountAddress` you got from the previous s
 Now, you can transfer your CELO to an address of choice:
 
 ```
-celocli transfer:gold --from <accountAddress> --to <addressOfChoice> --value <valueInCeloWei> --privateKey <privateKey> --node https://rc1-forno.celo-testnet.org
+celocli transfer:celo --from <accountAddress> --to <addressOfChoice> --value <valueInCeloWei> --privateKey <privateKey> --node https://rc1-forno.celo-testnet.org
 ```
 
 - Replace `<accountAddress>` with the `accountAddress` you got from the previous step.
