@@ -1,4 +1,5 @@
 import getConfig from 'next/config'
+import { PressArticleFields } from 'src/press/PressPage'
 import airtableInit from './airtable'
 import cache from './cache'
 
@@ -18,15 +19,7 @@ function getAirtable() {
   return airtableInit(getConfig().serverRuntimeConfig.AIRTABLE_ANNOUNCEMENT_ID)('Press')
 }
 
-export interface Fields {
-  date: string
-  publication: string
-  title: string
-  link: string
-  language?: string
-}
-
 interface Record {
   id: string
-  fields: Fields
+  fields: PressArticleFields
 }

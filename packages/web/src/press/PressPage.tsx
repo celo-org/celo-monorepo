@@ -10,8 +10,16 @@ import { fonts, standardStyles, textStyles } from 'src/styles'
 import { HelpfullLink } from 'src/terms/HelpfullLink'
 import { Languages } from 'src/utils/languages'
 
+export interface PressArticleFields {
+  date: string
+  publication: string
+  title: string
+  link: string
+  language: string
+}
+
 interface Props {
-  press: any[]
+  press: PressArticleFields[]
 }
 
 class PressPage extends React.PureComponent<I18nProps & Props> {
@@ -66,7 +74,8 @@ class PressPage extends React.PureComponent<I18nProps & Props> {
                     <Text style={[fonts.p, textStyles.heavy]}>{item.title}</Text>
                     <Text style={fonts.p}>
                       <Text style={textStyles.italic}>
-                        {t('by')} {item.publication}{' '}
+                        {t('by')} {item.publication}
+                        {'  '}
                       </Text>
                       {item.link && <HelpfullLink text={t('read')} href={item.link} />}
                     </Text>
