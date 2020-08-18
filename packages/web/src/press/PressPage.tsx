@@ -8,16 +8,17 @@ import SideTitledSection from 'src/layout/SideTitledSection'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { fonts, standardStyles, textStyles } from 'src/styles'
 import { HelpfullLink } from 'src/terms/HelpfullLink'
+import { Languages } from 'src/utils/languages'
 
 interface Props {
-  press: any
+  press: any[]
 }
 
 class PressPage extends React.PureComponent<I18nProps & Props> {
-  static async getInitialProps({ req }) {
+  static async getInitialProps(context) {
     let press = []
     try {
-      if (req) {
+      if (context.req) {
         const getpress = await import('src/../server/fetchPress')
         press = await getpress.default()
       } else {
@@ -29,7 +30,12 @@ class PressPage extends React.PureComponent<I18nProps & Props> {
     }
   }
   render() {
-    const { t, press } = this.props
+    const { t, press, i18n } = this.props
+
+    const formated = press
+      .filter((article) => article.language === Languages[i18n.language])
+      .reduce(groupByMonth, {})
+
     return (
       <>
         <OpenGraph
@@ -48,20 +54,22 @@ class PressPage extends React.PureComponent<I18nProps & Props> {
               <H1 style={textStyles.center}>{t('title')}</H1>
             </Cell>
           </GridRow>
-          {Object.keys(press).map((date) => {
+          {Object.keys(formated).map((date) => {
             return (
               <SideTitledSection
                 key={date}
                 span={Spans.three4th}
                 title={new Date(date).toLocaleDateString(this.props.i18n.language, DATE_FORMAT)}
               >
-                {press[date].map((item) => (
+                {formated[date].map((item) => (
                   <View style={styles.reference} key={item.title}>
-                    <Text style={fonts.p}>{item.title}</Text>
-                    <Text style={[fonts.legal, textStyles.italic]}>
-                      {t('by')} {item.publication}
+                    <Text style={[fonts.p, textStyles.heavy]}>{item.title}</Text>
+                    <Text style={fonts.p}>
+                      <Text style={textStyles.italic}>
+                        {t('by')} {item.publication}{' '}
+                      </Text>
+                      {item.link && <HelpfullLink text={t('read')} href={item.link} />}
                     </Text>
-                    {item.link && <HelpfullLink text={t('read')} href={item.link} />}
                   </View>
                 ))}
               </SideTitledSection>
@@ -88,3 +96,17 @@ const styles = StyleSheet.create({
     maxWidth: 700,
   },
 })
+
+export function groupByMonth(previous: any, current) {
+  const originDate = new Date(current.date)
+
+  originDate.setDate(14)
+
+  const groupedDate = originDate.toISOString().split('T')[0]
+
+  const month = (previous[groupedDate] = previous[groupedDate] || [])
+
+  month.push(current)
+
+  return previous
+}

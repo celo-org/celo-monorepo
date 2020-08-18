@@ -1,5 +1,5 @@
-import { groupByMonth, Fields } from './fetchPress'
-const TEST_DATA: Fields[] = [
+import { groupByMonth } from 'src/press/PressPage'
+const TEST_DATA = [
   {
     date: '2020-07-31',
     title: 'Money Rising',
