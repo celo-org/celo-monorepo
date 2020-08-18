@@ -1,7 +1,8 @@
-import { CloudProvider, FullNodeDeploymentConfig } from './cloud-provider'
+import { CloudProvider } from './cloud-provider'
 import { DynamicEnvVar } from './env-utils'
-import { AKSFullNodeDeploymentConfig } from './k8s-fullnode/aks-fullnode'
-import { AWSFullNodeDeploymentConfig } from './k8s-fullnode/aws-fullnode'
+import { AKSFullNodeDeploymentConfig } from './k8s-fullnode/aks'
+import { AWSFullNodeDeploymentConfig } from './k8s-fullnode/aws'
+import { BaseFullNodeDeploymentConfig } from './k8s-fullnode/base'
 import { getFullNodeDeployer } from './k8s-fullnode/utils'
 import { getOracleContextDynamicEnvVarValues, getAwsClusterConfig, getAzureClusterConfig } from './oracle'
 
@@ -9,23 +10,23 @@ import { getOracleContextDynamicEnvVarValues, getAwsClusterConfig, getAzureClust
  * Env vars corresponding to values required for a FullNodeDeploymentConfig
  */
 const oracleContextFullNodeDeploymentEnvVars: {
-  [k in keyof FullNodeDeploymentConfig]: DynamicEnvVar
+  [k in keyof BaseFullNodeDeploymentConfig]: DynamicEnvVar
 } = {
   diskSizeGb: DynamicEnvVar.ORACLE_TX_NODES_DISK_SIZE,
   replicas: DynamicEnvVar.ORACLE_TX_NODES_COUNT,
 }
 
 const deploymentConfigGetterByCloudProvider: {
-  [key in CloudProvider]: (oracleContext: string) => FullNodeDeploymentConfig
+  [key in CloudProvider]: (oracleContext: string) => BaseFullNodeDeploymentConfig
 } = {
   [CloudProvider.AWS]: getAWSFullNodeDeploymentConfig,
   [CloudProvider.AZURE]: getAKSFullNodeDeploymentConfig,
 }
 
-export function getFullNodeDeployerForOracleContext(oracleContext: string) {
+export function getFullNodeDeployerForOracleContext(celoEnv: string, oracleContext: string) {
   const cloudProvider: CloudProvider = getCloudProviderFromOracleContext(oracleContext)
   const deploymentConfig = deploymentConfigGetterByCloudProvider[cloudProvider](oracleContext)
-  return getFullNodeDeployer(cloudProvider, deploymentConfig)
+  return getFullNodeDeployer(cloudProvider, celoEnv, deploymentConfig)
 }
 
 function getCloudProviderFromOracleContext(oracleContext: string): CloudProvider {
@@ -38,29 +39,29 @@ function getCloudProviderFromOracleContext(oracleContext: string): CloudProvider
 }
 
 export function installOracleFullNodeChart(celoEnv: string, oracleContext: string) {
-  const deployer = getFullNodeDeployerForOracleContext(oracleContext)
-  return deployer.installChart(celoEnv)
+  const deployer = getFullNodeDeployerForOracleContext(celoEnv, oracleContext)
+  return deployer.installChart()
 }
 
 export function upgradeOracleFullNodeChart(celoEnv: string, oracleContext: string, reset: boolean) {
-  const deployer = getFullNodeDeployerForOracleContext(oracleContext)
-  return deployer.upgradeChart(celoEnv, reset)
+  const deployer = getFullNodeDeployerForOracleContext(oracleContext, celoEnv)
+  return deployer.upgradeChart(reset)
 }
 
 export function removeOracleFullNodeChart(celoEnv: string, oracleContext: string) {
-  const deployer = getFullNodeDeployerForOracleContext(oracleContext)
-  return deployer.removeChart(celoEnv)
+  const deployer = getFullNodeDeployerForOracleContext(oracleContext, celoEnv)
+  return deployer.removeChart()
 }
 
 /**
  * Returns the base FullNodeDeploymentConfig independent of oracleContext
  */
-function getFullNodeDeploymentConfig(oracleContext: string) : FullNodeDeploymentConfig {
+function getFullNodeDeploymentConfig(oracleContext: string) : BaseFullNodeDeploymentConfig {
   const fullNodeDeploymentEnvVarValues = getOracleContextDynamicEnvVarValues(
     oracleContextFullNodeDeploymentEnvVars,
     oracleContext
   )
-  const fullNodeDeploymentConfig: FullNodeDeploymentConfig = {
+  const fullNodeDeploymentConfig: BaseFullNodeDeploymentConfig = {
     diskSizeGb: parseInt(fullNodeDeploymentEnvVarValues.diskSizeGb, 10),
     replicas: parseInt(fullNodeDeploymentEnvVarValues.replicas, 10),
   }
@@ -71,7 +72,7 @@ function getFullNodeDeploymentConfig(oracleContext: string) : FullNodeDeployment
  * For a given OracleAzureContext, returns the appropriate AKSFullNodeDeploymentConfig
  */
 function getAKSFullNodeDeploymentConfig(oracleContext: string): AKSFullNodeDeploymentConfig {
-  const fullNodeDeploymentConfig: FullNodeDeploymentConfig = getFullNodeDeploymentConfig(oracleContext)
+  const fullNodeDeploymentConfig: BaseFullNodeDeploymentConfig = getFullNodeDeploymentConfig(oracleContext)
   return {
     clusterConfig: getAzureClusterConfig(oracleContext),
     ...fullNodeDeploymentConfig,
@@ -82,7 +83,7 @@ function getAKSFullNodeDeploymentConfig(oracleContext: string): AKSFullNodeDeplo
  * For a given OracleAwsContext, returns the appropriate AKSFullNodeDeploymentConfig
  */
 function getAWSFullNodeDeploymentConfig(oracleContext: string): AWSFullNodeDeploymentConfig {
-  const fullNodeDeploymentConfig: FullNodeDeploymentConfig = getFullNodeDeploymentConfig(oracleContext)
+  const fullNodeDeploymentConfig: BaseFullNodeDeploymentConfig = getFullNodeDeploymentConfig(oracleContext)
   return {
     clusterConfig: getAwsClusterConfig(oracleContext),
     ...fullNodeDeploymentConfig,

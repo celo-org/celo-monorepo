@@ -1,4 +1,3 @@
-import { FullNodeDeploymentConfig, getKubeNamespace, getReleaseName } from '../cloud-provider'
 import { createNamespaceIfNotExists } from '../cluster'
 import { envVar, fetchEnv, fetchEnvOrFallback } from '../env-utils'
 import {
@@ -19,61 +18,51 @@ export interface BaseFullNodeDeploymentConfig {
 
 export abstract class BaseFullNodeDeployer {
 
-  protected _deploymentConfig: FullNodeDeploymentConfig
+  protected _deploymentConfig: BaseFullNodeDeploymentConfig
+  protected _celoEnv: string
 
-  constructor(deploymentConfig: FullNodeDeploymentConfig) {
+  constructor(deploymentConfig: BaseFullNodeDeploymentConfig, celoEnv: string) {
     this._deploymentConfig = deploymentConfig
+    this._celoEnv = celoEnv
   }
 
-  async installChart(celoEnv: string) {
-    const kubeNamespace = getKubeNamespace(celoEnv)
-    const releaseName = getReleaseName(celoEnv)
-    await createNamespaceIfNotExists(kubeNamespace)
+  async installChart() {
+    await createNamespaceIfNotExists(this.kubeNamespace)
 
     return installGenericHelmChart(
-      kubeNamespace,
-      releaseName,
+      this.kubeNamespace,
+      this.releaseName,
       helmChartPath,
-      await this.helmParameters(celoEnv, kubeNamespace)
+      await this.helmParameters()
     )
   }
 
-  async upgradeChart(
-    celoEnv: string,
-    reset: boolean
-  ) {
-    const kubeNamespace = getKubeNamespace(celoEnv)
-    const releaseName = getReleaseName(celoEnv)
-
+  async upgradeChart(reset: boolean) {
     if (reset) {
-      await scaleResource(celoEnv, 'StatefulSet', `${celoEnv}-fullnodes`, 0)
-      await deletePersistentVolumeClaims(celoEnv, ['celo-fullnode'])
+      await scaleResource(this.celoEnv, 'StatefulSet', `${this.celoEnv}-fullnodes`, 0)
+      await deletePersistentVolumeClaims(this.celoEnv, ['celo-fullnode'])
     }
 
     await upgradeGenericHelmChart(
-      kubeNamespace,
-      releaseName,
+      this.kubeNamespace,
+      this.releaseName,
       helmChartPath,
-      await this.helmParameters(celoEnv, celoEnv)
+      await this.helmParameters()
     )
 
-    return scaleResource(celoEnv, 'StatefulSet', `${celoEnv}-fullnodes`, this._deploymentConfig.replicas)
+    return scaleResource(this.celoEnv, 'StatefulSet', `${this.celoEnv}-fullnodes`, this._deploymentConfig.replicas)
   }
 
-  async removeChart(celoEnv: string) {
-    const releaseName = getReleaseName(celoEnv)
-    await removeGenericHelmChart(releaseName)
-    await deletePersistentVolumeClaims(celoEnv, ['celo-fullnode'])
-    await this.deallocateIPs(celoEnv)
+  async removeChart() {
+    await removeGenericHelmChart(this.releaseName)
+    await deletePersistentVolumeClaims(this.celoEnv, ['celo-fullnode'])
+    await this.deallocateIPs()
   }
 
-  async helmParameters(
-    celoEnv: string,
-    kubeNamespace: string,
-  ) {
+  async helmParameters() {
     const rpcApis = 'eth,net,rpc,web3'
     return [
-      `--set namespace=${kubeNamespace}`,
+      `--set namespace=${this.kubeNamespace}`,
       `--set replicaCount=${this._deploymentConfig.replicas}`,
       `--set storage.size=${this._deploymentConfig.diskSizeGb}Gi`,
       `--set geth.expose_rpc_externally=false`,
@@ -82,16 +71,28 @@ export abstract class BaseFullNodeDeployer {
       `--set-string geth.rpc_apis='${rpcApis.split(',').join('\\\,')}'`,
       `--set geth.metrics=${fetchEnvOrFallback(envVar.GETH_ENABLE_METRICS, 'false')}`,
       `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
-      `--set genesis.network=${celoEnv}`,
-      ...(await this.additionalHelmParameters(celoEnv))
+      `--set genesis.network=${this.celoEnv}`,
+      ...(await this.additionalHelmParameters())
     ]
   }
 
-  abstract async additionalHelmParameters(
-    celoEnv: string,
-  ): Promise<string[]>
+  abstract async additionalHelmParameters(): Promise<string[]>
 
-  abstract async deallocateIPs(
-    celoEnv: string,
-  ): Promise<void>
+  abstract async deallocateIPs(): Promise<void>
+
+  get releaseName() {
+    return `${this.celoEnv}-fullnodes`
+  }
+
+  get kubeNamespace() {
+    return this.celoEnv
+  }
+
+  get staticIPNamePrefix() {
+    return `${this.celoEnv}-nodes`
+  }
+
+  get celoEnv(): string {
+    return this._celoEnv
+  }
 }
