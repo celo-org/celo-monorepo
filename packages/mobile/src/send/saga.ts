@@ -6,13 +6,13 @@ import { SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { calculateFee } from 'src/fees/saga'
-import { completePaymentRequest } from 'src/firebase/actions'
 import { transferGoldToken } from 'src/goldToken/actions'
 import { encryptComment } from 'src/identity/commentEncryption'
 import { addressToE164NumberSelector, e164NumberToAddressSelector } from 'src/identity/reducer'
 import { InviteBy } from 'src/invite/actions'
 import { sendInvite } from 'src/invite/saga'
 import { navigateHome } from 'src/navigator/NavigationService'
+import { completePaymentRequest } from 'src/paymentRequest/actions'
 import { handleBarcode, shareSVGImage } from 'src/qrcode/utils'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import {
@@ -29,7 +29,7 @@ import {
   createTokenTransferTransaction,
   getCurrencyAddress,
 } from 'src/tokens/saga'
-import { generateStandbyTransactionId } from 'src/transactions/actions'
+import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { getRegisterDekTxGas, registerAccountDek } from 'src/web3/dataEncryptionKey'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -127,7 +127,6 @@ function* sendPayment(
 ) {
   try {
     ValoraAnalytics.track(SendEvents.send_tx_start)
-    const txId = generateStandbyTransactionId(recipientAddress)
 
     const ownAddress: string = yield select(currentAccountSelector)
     // Ensure comment encryption is possible by first ensuring the account's DEK has been registered
@@ -135,6 +134,7 @@ function* sendPayment(
     yield call(registerAccountDek, ownAddress)
     const encryptedComment = yield call(encryptComment, comment, recipientAddress, ownAddress, true)
 
+    const context = newTransactionContext(TAG, 'Send payment')
     switch (currency) {
       case CURRENCY_ENUM.GOLD: {
         yield put(
@@ -142,7 +142,7 @@ function* sendPayment(
             recipientAddress,
             amount: amount.toString(),
             comment: encryptedComment,
-            txId,
+            context,
           })
         )
         break
@@ -153,7 +153,7 @@ function* sendPayment(
             recipientAddress,
             amount: amount.toString(),
             comment: encryptedComment,
-            txId,
+            context,
           })
         )
         break
@@ -162,7 +162,12 @@ function* sendPayment(
         throw new Error(`Sending currency ${currency} not yet supported`)
       }
     }
-    ValoraAnalytics.track(SendEvents.send_tx_complete)
+    ValoraAnalytics.track(SendEvents.send_tx_complete, {
+      txId: context.id,
+      recipientAddress,
+      amount: amount.toString(),
+      currency,
+    })
   } catch (error) {
     Logger.error(`${TAG}/sendPayment`, 'Could not send payment', error)
     ValoraAnalytics.track(SendEvents.send_tx_error, { error: error.message })

@@ -1049,7 +1049,6 @@ exports[`HomePage renders 1`] = `
               dir="auto"
               href="https://medium.com/celoorg/an-introductory-guide-to-celo-b185c62d3067"
               onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -1149,7 +1148,6 @@ exports[`HomePage renders 1`] = `
               dir="auto"
               href="/papers"
               onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -1828,7 +1826,6 @@ exports[`HomePage renders 1`] = `
                   dir="auto"
                   href="/papers"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -2077,7 +2074,6 @@ exports[`HomePage renders 1`] = `
                   dir="auto"
                   href="https://celoreserve.org"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -2173,7 +2169,6 @@ exports[`HomePage renders 1`] = `
                   dir="auto"
                   href="https://medium.com/celoorg/celo-gold-holders-make-your-voice-heard-through-on-chain-governance-96cb5a1e8b90"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -2600,7 +2595,6 @@ exports[`HomePage renders 1`] = `
                 dir="auto"
                 href="https://www.coindesk.com/libra-minus-facebook-why-celo-is-2020s-buzzy-token-project"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -3351,7 +3345,6 @@ exports[`HomePage renders 1`] = `
                 dir="auto"
                 href="https://docs.celo.org/v/master/developer-guide/overview/introduction"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -3447,7 +3440,6 @@ exports[`HomePage renders 1`] = `
                   dir="auto"
                   href="https://www.crowdcast.io/e/celo-tech-talks-part-2"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -7048,7 +7040,6 @@ exports[`HomePage renders 1`] = `
               dir="auto"
               href="/about#backers"
               onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {

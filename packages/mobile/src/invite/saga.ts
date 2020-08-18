@@ -43,9 +43,9 @@ import { getPasswordSaga } from 'src/pincode/authentication'
 import { getSendFee, getSendTxGas } from 'src/send/saga'
 import { fetchDollarBalance, transferStableToken } from 'src/stableToken/actions'
 import { createTokenTransferTransaction, fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
-import { generateStandbyTransactionId } from 'src/transactions/actions'
 import { waitForTransactionWithId } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
+import { newTransactionContext } from 'src/transactions/types'
 import { getAppStoreId } from 'src/utils/appstore'
 import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
@@ -155,8 +155,9 @@ export function* sendInvite(
   amount?: BigNumber,
   currency?: CURRENCY_ENUM
 ) {
+  const escrowIncluded = !!amount
   try {
-    ValoraAnalytics.track(InviteEvents.invite_tx_start)
+    ValoraAnalytics.track(InviteEvents.invite_tx_start, { escrowIncluded })
     const web3 = yield call(getWeb3)
     const randomness = yield call(asyncRandomBytes, 64)
     const temporaryWalletAccount = web3.eth.accounts.create(randomness.toString('ascii'))
@@ -185,19 +186,18 @@ export function* sendInvite(
     // Store the Temp Address locally so we know which transactions were invites
     yield put(storeInviteeData(inviteDetails))
 
-    const txId = generateStandbyTransactionId(temporaryAddress)
-
+    const context = newTransactionContext(TAG, 'Transfer to invite address')
     yield put(
       transferStableToken({
         recipientAddress: temporaryAddress,
         amount: INVITE_FEE,
         comment: SENTINEL_INVITE_COMMENT,
-        txId,
+        context,
       })
     )
 
-    yield call(waitForTransactionWithId, txId)
-    ValoraAnalytics.track(InviteEvents.invite_tx_complete)
+    yield call(waitForTransactionWithId, context.id)
+    ValoraAnalytics.track(InviteEvents.invite_tx_complete, { escrowIncluded })
     Logger.debug(TAG + '@sendInviteSaga', 'Sent money to new wallet')
 
     // If this invitation has a payment attached to it, send the payment to the escrow.
@@ -211,14 +211,14 @@ export function* sendInvite(
     yield put(updateE164PhoneNumberAddresses({}, addressToE164Number))
     yield call(navigateToInviteMessageApp, e164Number, inviteMode, message)
   } catch (e) {
-    ValoraAnalytics.track(InviteEvents.invite_tx_error, { error: e.message })
+    ValoraAnalytics.track(InviteEvents.invite_tx_error, { escrowIncluded, error: e.message })
     Logger.error(TAG, 'Send invite error: ', e)
     throw e
   }
 }
 
 function* initiateEscrowTransfer(temporaryAddress: string, e164Number: string, amount: BigNumber) {
-  const escrowTxId = generateStandbyTransactionId(temporaryAddress)
+  const context = newTransactionContext(TAG, 'Escrow funds')
   try {
     let phoneHash: string
     if (features.USE_PHONE_NUMBER_PRIVACY) {
@@ -227,8 +227,8 @@ function* initiateEscrowTransfer(temporaryAddress: string, e164Number: string, a
     } else {
       phoneHash = getPhoneHash(e164Number)
     }
-    yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress, escrowTxId))
-    yield call(waitForTransactionWithId, escrowTxId)
+    yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress, context))
+    yield call(waitForTransactionWithId, context.id)
     Logger.debug(TAG + '@sendInviteSaga', 'Escrowed money to new wallet')
   } catch (e) {
     Logger.error(TAG, 'Error sending payment to unverified user: ', e)
@@ -429,7 +429,8 @@ export function* moveAllFundsFromAccount(
     comment,
   })
 
-  yield call(sendTransaction, tx.txo, account, TAG, 'Transfer from temp wallet')
+  const context = newTransactionContext(TAG, 'Transfer from temp wallet')
+  yield call(sendTransaction, tx.txo, account, context)
   Logger.debug(TAG + '@moveAllFundsFromAccount', 'Done withdrawal')
 }
 
