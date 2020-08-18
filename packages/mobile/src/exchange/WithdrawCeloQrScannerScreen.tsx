@@ -6,12 +6,12 @@ import { componentStyles } from '@celo/react-components/styles/styles'
 import { StackScreenProps } from '@react-navigation/stack'
 import { memoize } from 'lodash'
 import React from 'react'
-import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import { showMessage } from 'src/alert/actions'
+import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackButton from 'src/components/BackButton.v2'
-import i18n, { Namespaces } from 'src/i18n'
+import { ADDRESS_LENGTH } from 'src/exchange/reducer'
+import i18n from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers.v2'
 import { navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -35,8 +35,6 @@ function fetchAddressFromQrData(data: string): string | null {
 
 function WithdrawCeloQrScannerScreen({ route }: Props) {
   const { onAddressScanned } = route.params
-
-  const { t } = useTranslation(Namespaces.global)
   const dispatch = useDispatch()
 
   const onBarCodeDetected = memoize(
@@ -44,11 +42,11 @@ function WithdrawCeloQrScannerScreen({ route }: Props) {
       const qrData = qrCode.data
       Logger.debug(TAG, 'Bar code detected: ' + qrData)
       const address = fetchAddressFromQrData(qrData) || qrData
-      if (address.startsWith('0x') && address.length === 42) {
+      if (address.startsWith('0x') && address.length === ADDRESS_LENGTH) {
         onAddressScanned(address)
         navigateBack()
       } else {
-        dispatch(showMessage(t(ErrorMessages.QR_FAILED_INVALID_ADDRESS)))
+        dispatch(showError(ErrorMessages.QR_FAILED_INVALID_ADDRESS))
       }
     },
     (qrCode) => qrCode.data

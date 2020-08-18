@@ -1,11 +1,10 @@
 import * as RNFS from 'react-native-fs'
 import Share from 'react-native-share'
 import { call, put } from 'redux-saga/effects'
-import { showMessage } from 'src/alert/actions'
+import { showError, showMessage } from 'src/alert/actions'
 import { SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import i18n from 'src/i18n'
 import { validateRecipientAddressSuccess } from 'src/identity/actions'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import { replace } from 'src/navigator/NavigationService'
@@ -104,7 +103,7 @@ export function* handleBarcode(
   try {
     qrData = uriDataFromUrl(barcode.data)
   } catch (e) {
-    yield put(showMessage(i18n.t(`global:${ErrorMessages.QR_FAILED_INVALID_ADDRESS}`)))
+    yield put(showError(ErrorMessages.QR_FAILED_INVALID_ADDRESS))
     Logger.error(TAG, 'qr scan failed', e)
     return
   }
