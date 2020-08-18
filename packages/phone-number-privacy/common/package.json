@@ -16,6 +16,7 @@
     "lib/**/*"
   ],
   "dependencies": {
+    "@celo/utils": "^0.1.17-dev",
     "bignumber.js": "^9.0.0"
   },
   "devDependencies": {},

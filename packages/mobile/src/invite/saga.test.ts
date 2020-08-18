@@ -77,17 +77,17 @@ describe(watchSendInvite, () => {
       .provide([
         [call(waitWeb3LastBlock), true],
         [call(getConnectedUnlockedAccount), mockAccount],
-        [matchers.call.fn(waitForTransactionWithId), 'a sha3 hash'],
+        [matchers.call.fn(waitForTransactionWithId), 'a uuid'],
       ])
       .withState(state)
       .dispatch(sendInvite(mockInviteDetails.e164Number, InviteBy.SMS))
-      .dispatch(transactionConfirmed('a sha3 hash'))
+      .dispatch(transactionConfirmed('a uuid'))
       .put(
         transferStableToken({
           recipientAddress: mockAccount,
           amount: '0.25',
           comment: SENTINEL_INVITE_COMMENT,
-          txId: 'a sha3 hash',
+          context: { id: 'a uuid' },
         })
       )
       .put(storeInviteeData(mockInviteDetails))
@@ -108,17 +108,17 @@ describe(watchSendInvite, () => {
       .provide([
         [call(waitWeb3LastBlock), true],
         [call(getConnectedUnlockedAccount), mockAccount],
-        [matchers.call.fn(waitForTransactionWithId), 'a sha3 hash'],
+        [matchers.call.fn(waitForTransactionWithId), 'a uuid'],
       ])
       .withState(state)
       .dispatch(sendInvite(mockInviteDetails.e164Number, InviteBy.SMS))
-      .dispatch(transactionConfirmed('a sha3 hash'))
+      .dispatch(transactionConfirmed('a uuid'))
       .put(
         transferStableToken({
           recipientAddress: mockAccount,
           amount: '0.25',
           comment: SENTINEL_INVITE_COMMENT,
-          txId: 'a sha3 hash',
+          context: { id: 'a uuid' },
         })
       )
       .put(storeInviteeData(mockInviteDetails))
@@ -139,17 +139,17 @@ describe(watchSendInvite, () => {
       .provide([
         [call(waitWeb3LastBlock), true],
         [call(getConnectedUnlockedAccount), mockAccount],
-        [matchers.call.fn(waitForTransactionWithId), 'a sha3 hash'],
+        [matchers.call.fn(waitForTransactionWithId), 'a uuid'],
       ])
       .withState(state)
       .dispatch(sendInvite(mockInviteDetails.e164Number, InviteBy.WhatsApp))
-      .dispatch(transactionConfirmed('a sha3 hash'))
+      .dispatch(transactionConfirmed('a uuid'))
       .put(
         transferStableToken({
           recipientAddress: mockAccount,
           amount: '0.25',
           comment: SENTINEL_INVITE_COMMENT,
-          txId: 'a sha3 hash',
+          context: { id: 'a uuid' },
         })
       )
       .put(storeInviteeData(mockInviteDetails))
@@ -164,17 +164,17 @@ describe(watchSendInvite, () => {
       .provide([
         [call(waitWeb3LastBlock), true],
         [call(getConnectedUnlockedAccount), mockAccount],
-        [matchers.call.fn(waitForTransactionWithId), 'a sha3 hash'],
+        [matchers.call.fn(waitForTransactionWithId), 'a uuid'],
       ])
       .withState(state)
       .dispatch(sendInvite(mockInviteDetails.e164Number, InviteBy.WhatsApp))
-      .dispatch(transactionConfirmed('a sha3 hash'))
+      .dispatch(transactionConfirmed('a uuid'))
       .put(
         transferStableToken({
           recipientAddress: mockAccount,
           amount: '0.25',
           comment: SENTINEL_INVITE_COMMENT,
-          txId: 'a sha3 hash',
+          context: { id: 'a uuid' },
         })
       )
       .put(storeInviteeData(mockInviteDetails))
