@@ -1,5 +1,5 @@
 import express from 'express'
-import { isAttestationSignerUnlocked, isDBOnline, isNodeSyncing } from '../db'
+import { getAgeOfLatestBlock, isAttestationSignerUnlocked, isDBOnline, isNodeSyncing } from '../db'
 import { ErrorMessages, respondWithError } from '../request'
 
 export async function handleLivenessRequest(_req: express.Request, res: express.Response) {
@@ -11,6 +11,11 @@ export async function handleLivenessRequest(_req: express.Request, res: express.
 
     if (await isNodeSyncing()) {
       respondWithError(res, 504, ErrorMessages.NODE_IS_SYNCING)
+    }
+
+    const { ageOfLatestBlock } = await getAgeOfLatestBlock()
+    if (ageOfLatestBlock > 30) {
+      respondWithError(res, 504, ErrorMessages.NODE_IS_STUCK)
     }
 
     try {

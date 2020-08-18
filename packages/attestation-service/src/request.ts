@@ -11,6 +11,7 @@ export enum ErrorMessages {
   ATTESTATION_SIGNER_CANNOT_SIGN = 'Attestation signer could not sign',
   DATABASE_IS_OFFLINE = 'Database is offline',
   NODE_IS_SYNCING = 'Full node is not synced',
+  NODE_IS_STUCK = 'Full node is not up to date',
 }
 
 export function asyncHandler<T>(handler: (req: express.Request, res: Response) => Promise<T>) {
