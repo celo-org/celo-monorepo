@@ -533,8 +533,8 @@ const linkedLibraries = {
   AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianTest'],
   Signatures: [
     'Accounts',
-    'TestAttestations',
     'Attestations',
+    'AttestationsTest',
     'LockedGold',
     'Escrow',
     'MetaTransactionWallet',
