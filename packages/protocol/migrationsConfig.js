@@ -55,8 +55,8 @@ const DefaultConfig = {
     slashableDowntime: (8 * HOUR) / 5, // ~8 hours
   },
   election: {
-    minElectableValidators: '22',
-    maxElectableValidators: '100',
+    minElectableValidators: '3',
+    maxElectableValidators: '10',
     maxVotesPerAccount: 10,
     electabilityThreshold: 1 / 1000,
     frozen: false,
@@ -272,7 +272,8 @@ const NetworkConfigs = {
       slashableDowntime: 60, // epoch length is 100 for unit tests
     },
     election: {
-      minElectableValidators: '10',
+      minElectableValidators: '3',
+      maxElectableValidators: '10',
       frozen: false,
     },
     epochRewards: {

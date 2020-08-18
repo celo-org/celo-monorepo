@@ -176,7 +176,12 @@ spec:
           fi
 
           PROXY_COUNT=$(cat /root/.celo/proxyCount)
-          [ "$PROXY_COUNT" -gt 0 ] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxied ${PROXY_FLAG}=$(cat /root/.celo/proxyEnodeUrlPairs) --nodiscover --proxy.allowprivateip"
+          if [ "$PROXY_COUNT" -gt 0 ]; then
+            ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxied ${PROXY_FLAG}=$(cat /root/.celo/proxyEnodeUrlPairs) --nodiscover --proxy.allowprivateip"
+            #ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxycelostats=$(cat /root/.celo/proxyEnodeUrlPairs  | cut -d';' -f1)"
+          else
+            ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@${ETHSTATS_SVC}"
+          fi
           [ -z "$PROXY_COUNT" ] && rm -f /root/.celo/static-nodes.json
 
           [[ "$PING_IP_FROM_PACKET" == "true" ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ping-ip-from-packet"
@@ -203,10 +208,9 @@ spec:
             --wsaddr 0.0.0.0 \
             --wsorigins=* \
             --wsapi=eth,net,web3,debug \
-            --etherbase=${ACCOUNT_ADDRESS} \
             --networkid=${NETWORK_ID} \
             --syncmode=full \
-            --ethstats=${HOSTNAME}@${ETHSTATS_SVC} \
+            --etherbase=${ACCOUNT_ADDRESS} \
             --consoleformat=json \
             --consoleoutput=stdout \
             --verbosity={{ .Values.geth.verbosity }} \

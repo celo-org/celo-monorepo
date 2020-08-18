@@ -103,6 +103,9 @@ async function registerValidatorGroup(
   // We do not use web3 provided by Truffle since the eth.accounts.encrypt behaves differently
   // in the version we use elsewhere.
   const encryptionWeb3 = new (Web3Class as any)('http://localhost:8545')
+  console.info(
+    `jcortejoso Validator Group address ${account.address} and key ${account.privateKey}`
+  )
   const encryptedPrivateKey = encryptionWeb3.eth.accounts.encrypt(account.privateKey, privateKey)
   const encodedKey = serializeKeystore(encryptedPrivateKey)
 

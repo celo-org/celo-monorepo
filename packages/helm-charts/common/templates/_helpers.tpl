@@ -111,10 +111,6 @@ release: {{ .Release.Name }}
     VALIDATOR_HEX_ADDRESS=$(cat /root/.celo/validator_address)
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxiedvalidatoraddress $VALIDATOR_HEX_ADDRESS --proxy.proxy --proxy.internalendpoint :30503"
     {{- end }}
-
-    {{ if .proxied | default false }}
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxiedvalidatoraddress $VALIDATOR_HEX_ADDRESS --proxy.proxy --proxy.internalendpoint :30503"
-    {{ end }}
     {{- if .unlock | default false }}
     ACCOUNT_ADDRESS=$(cat /root/.celo/address)
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --unlock=${ACCOUNT_ADDRESS} --password /root/.celo/account/accountSecret --allow-insecure-unlock"
@@ -128,14 +124,18 @@ release: {{ .Release.Name }}
     {{- end }}
     {{- if .in_memory_discovery_table_flag | default false }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --use-in-memory-discovery-table"
-    {{- end }}
+    {{ end -}}
     {{- if .proxy_allow_private_ip_flag | default false }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.allowprivateip"
-    {{- end }}
-    {{- if .ethstats | default false }}
-    ACCOUNT_ADDRESS=$(cat /root/.celo/address)
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }} --etherbase=${ACCOUNT_ADDRESS}"
-    {{- end }}
+    {{ end -}}
+    {{- if .ethstats | default false -}}
+    {{- if .proxy | default false }}
+    if [ "$RID" -eq "0" ]; then
+      ACCOUNT_ADDRESS=$(cat /root/.celo/address)
+      ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }} --etherbase=${ACCOUNT_ADDRESS}"
+    fi
+    {{ end -}}
+    {{- end -}}
     {{- if .metrics | default true }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
     {{- end }}
