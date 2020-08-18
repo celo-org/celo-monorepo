@@ -1,5 +1,5 @@
 import { eqAddress } from '@celo/base/lib/address'
-import { Err, isOk, Ok, Result, RootError } from '@celo/base/lib/result'
+import { Err, isOk, makeAsyncThrowable, Ok, Result, RootError } from '@celo/base/lib/result'
 import { NativeSigner } from '@celo/base/lib/signatureUtils'
 import { guessSigner } from '@celo/utils/lib/signatureUtils'
 import debugFactory from 'debug'
@@ -17,13 +17,13 @@ export enum OffchainErrorTypes {
   NoStorageRootProvidedData = 'NoStorageRootProvidedData',
 }
 
-interface FetchError {
+interface FetchError extends Error {
   errorType: OffchainErrorTypes.FetchError
 }
-interface InvalidSignature {
+interface InvalidSignature extends Error {
   errorType: OffchainErrorTypes.InvalidSignature
 }
-interface NoStorageRootProvidedData {
+interface NoStorageRootProvidedData extends Error {
   errorType: OffchainErrorTypes.NoStorageRootProvidedData
 }
 
@@ -34,7 +34,10 @@ export default class OffchainDataWrapper {
 
   constructor(readonly self: string, readonly kit: ContractKit) {}
 
-  async readDataFrom(account: string, dataPath: string): Promise<Result<string, OffchainErrors>> {
+  async readDataFromAsResult(
+    account: string,
+    dataPath: string
+  ): Promise<Result<string, OffchainErrors>> {
     const accounts = await this.kit.contracts.getAccounts()
     const metadataURL = await accounts.getMetadataURL(account)
     debug({ account, metadataURL })
@@ -49,7 +52,9 @@ export default class OffchainDataWrapper {
       return Err(new RootError(OffchainErrorTypes.FetchError))
     }
 
-    const item = await (await Promise.all(storageRoots.map((_) => _.read(dataPath)))).find(isOk)
+    const item = await (await Promise.all(storageRoots.map((_) => _.readAsResult(dataPath)))).find(
+      isOk
+    )
 
     if (item === undefined) {
       return Err(new RootError(OffchainErrorTypes.FetchError))
@@ -57,6 +62,8 @@ export default class OffchainDataWrapper {
 
     return item
   }
+
+  readDataFrom = makeAsyncThrowable(this.readDataFromAsResult)
 
   async writeDataTo(data: string, dataPath: string) {
     if (this.storageWriter === undefined) {
@@ -73,10 +80,10 @@ class StorageRoot {
   constructor(readonly account: string, readonly address: string) {}
 
   // TODO: Add decryption metadata (i.e. indicates ciphertext to be decrypted/which key to use)
-  async read(dataPath: string): Promise<Result<string, FetchError>> {
+  async readAsResult(dataPath: string): Promise<Result<string, FetchError>> {
     const data = await fetch(this.address + dataPath)
     if (!data.ok) {
-      return Err(new RootError<OffchainErrorTypes.FetchError>(OffchainErrorTypes.FetchError))
+      return Err(new RootError(OffchainErrorTypes.FetchError))
     }
 
     const body = await data.text()
@@ -84,7 +91,7 @@ class StorageRoot {
     const signature = await fetch(this.address + dataPath + '.signature')
 
     if (!signature.ok) {
-      return Err(new RootError<OffchainErrorTypes.FetchError>(OffchainErrorTypes.FetchError))
+      return Err(new RootError(OffchainErrorTypes.FetchError))
     }
 
     // TODO: Compare against registered on-chain signers or off-chain signers
@@ -96,6 +103,8 @@ class StorageRoot {
 
     // The signer might be authorized off-chain
     // TODO: Only if the signer is authorized with an on-chain key
-    return this.read(`/account/authorizedSigners/${toChecksumAddress(signer)}`)
+    return this.readAsResult(`/account/authorizedSigners/${toChecksumAddress(signer)}`)
   }
+
+  read = makeAsyncThrowable(this.readAsResult)
 }

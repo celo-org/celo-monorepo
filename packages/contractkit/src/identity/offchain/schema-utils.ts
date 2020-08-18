@@ -1,4 +1,4 @@
-import { Err, isError, Ok, Result, RootError } from '@celo/base/lib/result'
+import { Err, isError, makeAsyncThrowable, Ok, Result, RootError } from '@celo/base/lib/result'
 import { isRight } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import { Address } from '../../base'
@@ -9,10 +9,10 @@ export enum SchemaErrorTypes {
   OffchainError = 'OffchainError',
 }
 
-export interface InvalidDataError {
+export interface InvalidDataError extends Error {
   errorType: SchemaErrorTypes.InvalidDataError
 }
-export interface IOffchainError {
+export interface IOffchainError extends Error {
   errorType: SchemaErrorTypes.OffchainError
   error: OffchainErrors
 }
@@ -33,22 +33,24 @@ export class SingleSchema<T> {
     readonly dataPath: string
   ) {}
 
-  async read(account: string) {
-    return readWithSchema(this.wrapper, this.type, account, this.dataPath)
+  async readAsResult(account: string) {
+    return readWithSchemaAsResult(this.wrapper, this.type, account, this.dataPath)
   }
+
+  read = makeAsyncThrowable(this.readAsResult)
 
   async write(data: T) {
     return writeWithSchema(this.wrapper, this.type, this.dataPath, data)
   }
 }
 
-export const readWithSchema = async <T>(
+export const readWithSchemaAsResult = async <T>(
   wrapper: OffchainDataWrapper,
   type: t.Type<T>,
   account: Address,
   dataPath: string
 ): Promise<Result<T, SchemaErrors>> => {
-  const resp = await wrapper.readDataFrom(account, dataPath)
+  const resp = await wrapper.readDataFromAsResult(account, dataPath)
 
   if (isError(resp)) {
     return Err(new OffchainError(resp.error))
@@ -60,11 +62,13 @@ export const readWithSchema = async <T>(
     if (isRight(parseResult)) {
       return Ok(parseResult.right)
     }
-    return Err(new RootError<SchemaErrorTypes.InvalidDataError>(SchemaErrorTypes.InvalidDataError))
+    return Err(new RootError(SchemaErrorTypes.InvalidDataError))
   } catch (error) {
-    return Err(new RootError<SchemaErrorTypes.InvalidDataError>(SchemaErrorTypes.InvalidDataError))
+    return Err(new RootError(SchemaErrorTypes.InvalidDataError))
   }
 }
+
+export const readWithSchema = makeAsyncThrowable(readWithSchemaAsResult)
 
 export const writeWithSchema = async <T>(
   wrapper: OffchainDataWrapper,

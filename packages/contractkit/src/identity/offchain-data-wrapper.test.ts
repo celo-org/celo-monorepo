@@ -58,7 +58,7 @@ testWithGanache('Offchain Data', (web3) => {
       const nameAccessor = new NameAccessor(wrapper)
       await nameAccessor.write({ name: testname })
 
-      const resp = await nameAccessor.read(writer)
+      const resp = await nameAccessor.readAsResult(writer)
 
       if (isOk(resp)) {
         expect(resp.result.name).toEqual(testname)
@@ -106,7 +106,7 @@ testWithGanache('Offchain Data', (web3) => {
       const nameAccessor = new NameAccessor(wrapper)
       await nameAccessor.write({ name: testname })
 
-      const receivedName = await nameAccessor.read(writer)
+      const receivedName = await nameAccessor.readAsResult(writer)
       expect(isError(receivedName)).toEqual(true)
 
       const authorizedSignerAccessor = new AuthorizedSignerAccessor(wrapper)
@@ -147,7 +147,7 @@ testWithGanache('Offchain Data', (web3) => {
       const nameAccessor = new NameAccessor(wrapper)
       await nameAccessor.write({ name: testname })
 
-      const resp = await nameAccessor.read(writer)
+      const resp = await nameAccessor.readAsResult(writer)
       if (isOk(resp)) {
         expect(resp.result.name).toEqual(testname)
       }
