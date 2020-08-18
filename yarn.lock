@@ -2665,10 +2665,10 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@celo/client@0.0.309":
-  version "0.0.309"
-  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.309.tgz#dbfdd4a45fef98950f8122a8a902e52ef20e9238"
-  integrity sha512-D708ud45fdNIltfEqjqmXrVjtNwNFYYIJ+TZzbulu12yl3AzbYlILFtNZ+vFXwzm9Iy/kYBZOm2DpEzAVbPNgg==
+"@celo/client@0.0.315":
+  version "0.0.315"
+  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.315.tgz#1672802254d0533ab08b7ecd03f68b153ec3e6a4"
+  integrity sha512-oNfvf5rv4PzkjRdhqJNvCQOf0FSFTLaV6yO1+KufVh6Clcxsr1ClntJAajjV3GdDoHf8qUzBJ4KDcjU/51Un0w==
 
 "@celo/contractkit@0.3.1":
   version "0.3.1"
