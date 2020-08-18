@@ -38,8 +38,8 @@ export const mockE164Number = '+14155550000'
 export const mockDisplayNumber = '(415) 555-0000'
 export const mockE164NumberHash =
   '0xefbc804cdddcb76544e1dd2c25e9624edae290d175ccd20538e5cae06c7dbe9e'
-export const mockE164NumberSalt = 'piWqRHHYWtfg9'
-export const mockE164NumberHashWithSalt =
+export const mockE164NumberPepper = 'piWqRHHYWtfg9'
+export const mockE164NumberHashWithPepper =
   '0xf6429456331dedf8bd32b5e3a578e5bc589a28d012724dcd3e0a4b1be67bb454'
 
 export const mockE164Number2 = '+12095559790'

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import { setRetryVerificationWithForno } from 'src/account/actions'
-import { WarningModal } from 'src/components/WarningModal'
+import Dialog from 'src/components/Dialog'
 import { Namespaces } from 'src/i18n'
 import { cancelVerification } from 'src/identity/actions'
 import { VerificationStatus } from 'src/identity/types'
@@ -61,66 +61,76 @@ export function VerificationFailedModal({ verificationStatus, retryWithForno, fo
   if (promptRetryWithForno) {
     // Retry verification with forno with option to skip verificaion
     return (
-      <WarningModal
+      <Dialog
         isVisible={isVisible}
-        header={t('retryWithFornoModal.header')}
-        body1={t('retryWithFornoModal.body1')}
-        body2={t('retryWithFornoModal.body2')}
-        continueTitle={t('retryWithFornoModal.retryButton')}
-        cancelTitle={t('education.skip')}
-        onCancel={onSkip}
-        onContinue={onRetry}
-      />
+        title={t('retryWithFornoModal.header')}
+        actionText={t('retryWithFornoModal.retryButton')}
+        actionPress={onRetry}
+        secondaryActionText={t('education.skip')}
+        secondaryActionPress={onSkip}
+      >
+        {t('retryWithFornoModal.body1')}
+        {'\n\n'}
+        {t('retryWithFornoModal.body2')}
+      </Dialog>
     )
   } else if (allowEnterCodes) {
     // Option to enter codes if reveal attempt failed
     return (
-      <WarningModal
+      <Dialog
         isVisible={isVisible}
-        header={t('failModal.header')}
-        body1={t('failModal.body1')}
-        body2={t('failModal.enterCodesBody')}
-        continueTitle={t('education.skip')}
-        cancelTitle={t('failModal.enterCodesButton')}
-        onCancel={onDismiss}
-        onContinue={onSkip}
-      />
+        title={t('failModal.header')}
+        actionText={t('education.skip')}
+        actionPress={onSkip}
+        secondaryActionText={t('failModal.enterCodesButton')}
+        secondaryActionPress={onDismiss}
+      >
+        {t('failModal.body1')}
+        {'\n\n'}
+        {t('failModal.enterCodesBody')}
+      </Dialog>
     )
   } else if (userBalanceInsufficient) {
     // Show userBalanceInsufficient message and skip verification
     return (
-      <WarningModal
+      <Dialog
         isVisible={isVisible}
-        header={t('failModal.header')}
-        body1={t('failModal.body1InsufficientBalance')}
-        body2={t('failModal.body2InsufficientBalance')}
-        continueTitle={t('education.skip')}
-        onContinue={onSkip}
-      />
+        title={t('failModal.header')}
+        actionText={t('education.skip')}
+        actionPress={onSkip}
+      >
+        {t('failModal.body1InsufficientBalance')}
+        {'\n\n'}
+        {t('failModal.body2InsufficientBalance')}
+      </Dialog>
     )
   } else if (saltQuotaExceeded) {
     // Show saltQuotaExceeded message and skip verification
     return (
-      <WarningModal
+      <Dialog
         isVisible={isVisible}
-        header={t('failModal.header')}
-        body1={t('failModal.body1SaltQuotaExceeded')}
-        body2={t('failModal.body2SaltQuotaExceeded')}
-        continueTitle={t('education.skip')}
-        onContinue={onSkip}
-      />
+        title={t('failModal.header')}
+        actionText={t('education.skip')}
+        actionPress={onSkip}
+      >
+        {t('failModal.body1SaltQuotaExceeded')}
+        {'\n\n'}
+        {t('failModal.body2SaltQuotaExceeded')}
+      </Dialog>
     )
   } else {
     return (
       // Show general error and skip verification
-      <WarningModal
+      <Dialog
         isVisible={isVisible}
-        header={t('failModal.header')}
-        body1={t('failModal.body1')}
-        body2={t('failModal.body2')}
-        continueTitle={t('education.skip')}
-        onContinue={onSkip}
-      />
+        title={t('failModal.header')}
+        actionText={t('education.skip')}
+        actionPress={onSkip}
+      >
+        {t('failModal.body1')}
+        {'\n\n'}
+        {t('failModal.body2')}
+      </Dialog>
     )
   }
 }

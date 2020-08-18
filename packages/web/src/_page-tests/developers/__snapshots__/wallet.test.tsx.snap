@@ -571,7 +571,6 @@ exports[`Wallet renders 1`] = `
               dir="auto"
               href="/developers/faucet"
               onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
