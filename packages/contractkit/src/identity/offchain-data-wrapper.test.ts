@@ -110,7 +110,7 @@ testWithGanache('Offchain Data', (web3) => {
       expect(isError(receivedName)).toEqual(true)
 
       const authorizedSignerAccessor = new AuthorizedSignerAccessor(wrapper)
-      const authorization = await authorizedSignerAccessor.read(writer, signer)
+      const authorization = await authorizedSignerAccessor.readAsResult(writer, signer)
       expect(isError(authorization)).toEqual(true)
     })
   })
@@ -138,7 +138,7 @@ testWithGanache('Offchain Data', (web3) => {
 
     it('can read the authorization', async () => {
       const authorizedSignerAccessor = new AuthorizedSignerAccessor(wrapper)
-      const authorization = await authorizedSignerAccessor.read(writer, signer)
+      const authorization = await authorizedSignerAccessor.readAsResult(writer, signer)
       expect(authorization).toBeDefined()
     })
 
