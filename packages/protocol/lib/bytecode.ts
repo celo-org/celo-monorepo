@@ -23,3 +23,25 @@ export const stripMetadata = (bytecode: string): string => {
   }
   return match[1]
 }
+
+export interface LibraryLinks {
+  [name: string]: string
+}
+
+/*
+ * Unresolved libraries appear as "__LibraryName___..." in bytecode output by
+ * solc. The length of the entire string is 40 characters (accounting for the 20
+ * bytes of the address that should be substituted in).
+ */
+const padForLink = (name: string): string => {
+  return `__${name}`.padEnd(40, '_')
+}
+
+export const linkLibraries = (bytecode: string, libraryLinks: LibraryLinks): string => {
+  Object.keys(libraryLinks).forEach(libraryName => {
+    const linkString = padForLink(libraryName)
+    bytecode = bytecode.replace(RegExp(linkString, 'g'), libraryLinks[libraryName])
+  })
+
+  return bytecode
+}
