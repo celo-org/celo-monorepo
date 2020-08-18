@@ -1,4 +1,5 @@
 import { eqAddress } from '@celo/base/lib/address'
+import { Err, isOk, Ok, Result, RootError } from '@celo/base/lib/result'
 import { NativeSigner } from '@celo/base/lib/signatureUtils'
 import { guessSigner } from '@celo/utils/lib/signatureUtils'
 import debugFactory from 'debug'
@@ -7,7 +8,6 @@ import { ContractKit } from '../kit'
 import { ClaimTypes } from './claims/types'
 import { IdentityMetadataWrapper } from './metadata'
 import { StorageWriter } from './offchain/storage-writers'
-import { Err, isResult, Ok, RootError, Task } from './task'
 
 const debug = debugFactory('offchaindata')
 
@@ -34,7 +34,7 @@ export default class OffchainDataWrapper {
 
   constructor(readonly self: string, readonly kit: ContractKit) {}
 
-  async readDataFrom(account: string, dataPath: string): Promise<Task<string, OffchainErrors>> {
+  async readDataFrom(account: string, dataPath: string): Promise<Result<string, OffchainErrors>> {
     const accounts = await this.kit.contracts.getAccounts()
     const metadataURL = await accounts.getMetadataURL(account)
     debug({ account, metadataURL })
@@ -49,7 +49,7 @@ export default class OffchainDataWrapper {
       return Err(new RootError(OffchainErrorTypes.FetchError))
     }
 
-    const item = await (await Promise.all(storageRoots.map((_) => _.read(dataPath)))).find(isResult)
+    const item = await (await Promise.all(storageRoots.map((_) => _.read(dataPath)))).find(isOk)
 
     if (item === undefined) {
       return Err(new RootError(OffchainErrorTypes.FetchError))
@@ -73,7 +73,7 @@ class StorageRoot {
   constructor(readonly account: string, readonly address: string) {}
 
   // TODO: Add decryption metadata (i.e. indicates ciphertext to be decrypted/which key to use)
-  async read(dataPath: string): Promise<Task<string, FetchError>> {
+  async read(dataPath: string): Promise<Result<string, FetchError>> {
     const data = await fetch(this.address + dataPath)
     if (!data.ok) {
       return Err(new RootError<OffchainErrorTypes.FetchError>(OffchainErrorTypes.FetchError))

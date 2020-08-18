@@ -1,8 +1,8 @@
+import { Err, isError, Ok, Result, RootError } from '@celo/base/lib/result'
 import { isRight } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import { Address } from '../../base'
 import OffchainDataWrapper, { OffchainErrors } from '../offchain-data-wrapper'
-import { Err, isError, Ok, RootError, Task } from '../task'
 
 export enum SchemaErrorTypes {
   InvalidDataError = 'InvalidDataError',
@@ -42,23 +42,12 @@ export class SingleSchema<T> {
   }
 }
 
-function foo(err: SchemaErrors) {
-  switch (err.errorType) {
-    case SchemaErrorTypes.OffchainError:
-      err
-      break
-
-    default:
-      break
-  }
-}
-
 export const readWithSchema = async <T>(
   wrapper: OffchainDataWrapper,
   type: t.Type<T>,
   account: Address,
   dataPath: string
-): Promise<Task<T, SchemaErrors>> => {
+): Promise<Result<T, SchemaErrors>> => {
   const resp = await wrapper.readDataFrom(account, dataPath)
 
   if (isError(resp)) {

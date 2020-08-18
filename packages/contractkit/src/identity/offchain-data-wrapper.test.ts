@@ -1,3 +1,4 @@
+import { isError, isOk } from '@celo/base/lib/result'
 import { ACCOUNT_ADDRESSES } from '@celo/dev-utils/lib/ganache-setup'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { toChecksumAddress } from '@celo/utils/lib/address'
@@ -11,7 +12,6 @@ import OffchainDataWrapper, { OffchainErrorTypes } from './offchain-data-wrapper
 import { SchemaErrorTypes } from './offchain/schema-utils'
 import { AuthorizedSignerAccessor, NameAccessor } from './offchain/schemas'
 import { MockStorageWriter } from './offchain/storage-writers'
-import { isResult } from './task'
 
 testWithGanache('Offchain Data', (web3) => {
   const kit = newKitFromWeb3(web3)
@@ -60,7 +60,7 @@ testWithGanache('Offchain Data', (web3) => {
 
       const resp = await nameAccessor.read(writer)
 
-      if (isResult(resp)) {
+      if (isOk(resp)) {
         expect(resp.result.name).toEqual(testname)
       } else {
         const error = resp.error
@@ -107,11 +107,11 @@ testWithGanache('Offchain Data', (web3) => {
       await nameAccessor.write({ name: testname })
 
       const receivedName = await nameAccessor.read(writer)
-      expect(receivedName).not.toBeDefined()
+      expect(isError(receivedName)).toEqual(true)
 
       const authorizedSignerAccessor = new AuthorizedSignerAccessor(wrapper)
       const authorization = await authorizedSignerAccessor.read(writer, signer)
-      expect(authorization).not.toBeDefined()
+      expect(isError(authorization)).toEqual(true)
     })
   })
 
@@ -148,7 +148,7 @@ testWithGanache('Offchain Data', (web3) => {
       await nameAccessor.write({ name: testname })
 
       const resp = await nameAccessor.read(writer)
-      if (isResult(resp)) {
+      if (isOk(resp)) {
         expect(resp.result.name).toEqual(testname)
       }
     })
