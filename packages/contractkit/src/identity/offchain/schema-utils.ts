@@ -59,7 +59,7 @@ const EncryptionKeysSchema = t.type({
 
 type EncryptionKeysType = t.TypeOf<typeof EncryptionKeysSchema>
 export class EncryptionKeysAccessor {
-  basePath = '/others'
+  basePath = '/accounts'
   constructor(readonly wrapper: OffchainDataWrapper) {}
 
   async read(account: Address) {
