@@ -4,13 +4,13 @@ import { BaseFullNodeDeployer, BaseFullNodeDeploymentConfig } from './base'
 
 import { CloudProvider } from '../cloud-provider'
 
-const fullNodeDeployerByPrefix: {
+const fullNodeDeployerByCloudProvider: {
   [key in CloudProvider]: (deploymentConfig: BaseFullNodeDeploymentConfig, celoEnv: string) => BaseFullNodeDeployer
 } = {
-  [CloudProvider.AWS]: (deploymentConfig, celoEnv: string) => new AWSFullNodeDeployer(deploymentConfig as AWSFullNodeDeploymentConfig, celoEnv),
-  [CloudProvider.AZURE]: (deploymentConfig, celoEnv: string) => new AKSFullNodeDeployer(deploymentConfig as AKSFullNodeDeploymentConfig, celoEnv),
+  [CloudProvider.AWS]: (deploymentConfig: BaseFullNodeDeploymentConfig, celoEnv: string) => new AWSFullNodeDeployer(deploymentConfig as AWSFullNodeDeploymentConfig, celoEnv),
+  [CloudProvider.AZURE]: (deploymentConfig: BaseFullNodeDeploymentConfig, celoEnv: string) => new AKSFullNodeDeployer(deploymentConfig as AKSFullNodeDeploymentConfig, celoEnv),
 }
 
 export function getFullNodeDeployer(cloudProvider: CloudProvider, celoEnv: string, deploymentConfig: BaseFullNodeDeploymentConfig) {
-  return fullNodeDeployerByPrefix[cloudProvider](deploymentConfig, celoEnv)
+  return fullNodeDeployerByCloudProvider[cloudProvider](deploymentConfig, celoEnv)
 }

@@ -4,7 +4,8 @@ import { AKSFullNodeDeploymentConfig } from './k8s-fullnode/aks'
 import { AWSFullNodeDeploymentConfig } from './k8s-fullnode/aws'
 import { BaseFullNodeDeploymentConfig } from './k8s-fullnode/base'
 import { getFullNodeDeployer } from './k8s-fullnode/utils'
-import { getOracleContextDynamicEnvVarValues, getAwsClusterConfig, getAzureClusterConfig } from './oracle'
+import { getOracleContextDynamicEnvVarValues, getAWSClusterConfig, getAzureClusterConfig } from './oracle'
+import { getCloudProviderFromOracleContext } from './oracle/utils'
 
 /**
  * Env vars corresponding to values required for a FullNodeDeploymentConfig
@@ -27,15 +28,6 @@ export function getFullNodeDeployerForOracleContext(celoEnv: string, oracleConte
   const cloudProvider: CloudProvider = getCloudProviderFromOracleContext(oracleContext)
   const deploymentConfig = deploymentConfigGetterByCloudProvider[cloudProvider](oracleContext)
   return getFullNodeDeployer(cloudProvider, celoEnv, deploymentConfig)
-}
-
-function getCloudProviderFromOracleContext(oracleContext: string): CloudProvider {
-  for (const cloudProvider of Object.values(CloudProvider)) {
-    if (oracleContext.startsWith(cloudProvider as string)) {
-      return CloudProvider[cloudProvider as keyof typeof CloudProvider]
-    }
-  }
-  throw Error(`Oracle context ${oracleContext} must start with one of ${Object.values(CloudProvider)}`)
 }
 
 export function installOracleFullNodeChart(celoEnv: string, oracleContext: string) {
@@ -85,7 +77,7 @@ function getAKSFullNodeDeploymentConfig(oracleContext: string): AKSFullNodeDeplo
 function getAWSFullNodeDeploymentConfig(oracleContext: string): AWSFullNodeDeploymentConfig {
   const fullNodeDeploymentConfig: BaseFullNodeDeploymentConfig = getFullNodeDeploymentConfig(oracleContext)
   return {
-    clusterConfig: getAwsClusterConfig(oracleContext),
+    clusterConfig: getAWSClusterConfig(oracleContext),
     ...fullNodeDeploymentConfig,
   }
 }

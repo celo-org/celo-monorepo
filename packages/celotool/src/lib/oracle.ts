@@ -1,11 +1,15 @@
 import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/src/address'
-import { AwsClusterConfig, switchToAwsCluster } from 'src/lib/aws'
-import { assignRoleIfNotAssigned, AzureClusterConfig, createIdentityIfNotExists, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity, switchToAzureCluster } from 'src/lib/azure'
+import { AwsClusterConfig } from 'src/lib/aws'
+import { assignRoleIfNotAssigned, AzureClusterConfig, createIdentityIfNotExists, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity } from 'src/lib/azure'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { getFornoUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInternalUrl } from 'src/lib/endpoints'
 import { addCeloEnvMiddleware, doCheckOrPromptIfStagingOrProduction, DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback, getDynamicEnvVarName } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
+import { CloudProvider } from './cloud-provider'
+import { BaseClusterConfig, BaseClusterManager } from './k8s-cluster/base'
+import { getClusterManager } from './k8s-cluster/utils'
+import { getCloudProviderFromOracleContext } from './oracle/utils'
 import yargs from 'yargs'
 
 const helmChartPath = '../helm-charts/oracle'
@@ -375,7 +379,7 @@ export function getAzureClusterConfig(oracleContext: string): AzureClusterConfig
  * @param oracleContext the oracle context to use
  * @return an AwsClusterConfig for the context
  */
-export function getAwsClusterConfig(oracleContext: string): AwsClusterConfig {
+export function getAWSClusterConfig(oracleContext: string): AwsClusterConfig {
   const awsDynamicEnvVars = getOracleContextDynamicEnvVarValues(oracleContextAwsClusterConfigDynamicEnvVars, oracleContext)
   const clusterConfig: AwsClusterConfig = {
     cloudProviderName: 'aws',
@@ -424,40 +428,55 @@ export function getOracleContextDynamicEnvVarValues<T>(
 /**
  * Reads the context and swithces to the appropriate Azure or AWS Cluster
  */
-export async function switchToContextCluster(celoEnv: string, oracleContext: string, checkOrPromptIfStagingOrProduction = true) {
+export async function switchToOracleContextCluster(celoEnv: string, oracleContext: string, checkOrPromptIfStagingOrProduction = true) {
   if (!isValidOracleContext(oracleContext)) {
     throw Error(`Invalid oracle context, must be one of ${fetchEnv(envVar.ORACLE_CONTEXTS)}`)
   }
   if (checkOrPromptIfStagingOrProduction) {
     await doCheckOrPromptIfStagingOrProduction()
   }
-  const clusterSwitchFnByPrefix = new Map<string, (celoEnv: string, context: string) => Promise<void>>([
-    ['AWS', switchToAwsContextCluster],
-    ['AZURE', switchToAzureContextCluster]
-  ])
-  for (const [prefix, clusterSwitchFn] of clusterSwitchFnByPrefix.entries()) {
-    if (oracleContext.startsWith(prefix)) {
-      return clusterSwitchFn(celoEnv, oracleContext)
-    }
-  }
-  throw Error(`Context did not start with one of ${clusterSwitchFnByPrefix.keys()}`)
+  const clusterManager: BaseClusterManager = getClusterManagerForOracleContext(celoEnv, oracleContext)
+  return clusterManager.switchToClusterContext()
+  // const clusterSwitchFnByPrefix = new Map<string, (celoEnv: string, context: string) => Promise<void>>([
+  //   ['AWS', switchToAwsContextCluster],
+  //   ['AZURE', switchToAzureContextCluster]
+  // ])
+  // for (const [prefix, clusterSwitchFn] of clusterSwitchFnByPrefix.entries()) {
+  //   if (oracleContext.startsWith(prefix)) {
+  //     return clusterSwitchFn(celoEnv, oracleContext)
+  //   }
+  // }
+  // throw Error(`Context did not start with one of ${clusterSwitchFnByPrefix.keys()}`)
 }
 
-/**
- * Switches to the AKS cluster associated with the given context
- */
-export function switchToAzureContextCluster(celoEnv: string, oracleContext: string) {
-  const azureClusterConfig = getAzureClusterConfig(oracleContext)
-  return switchToAzureCluster(celoEnv, azureClusterConfig)
+const clusterConfigGetterByCloudProvider: {
+  [key in CloudProvider]: (oracleContext: string) => BaseClusterConfig
+} = {
+  [CloudProvider.AWS]: getAWSClusterConfig,
+  [CloudProvider.AZURE]: getAzureClusterConfig,
 }
 
-/**
- * Switches to the AWS cluster associated with the given context
- */
-export function switchToAwsContextCluster(celoEnv: string, context: string) {
-  const awsClusterConfig = getAwsClusterConfig(context)
-  return switchToAwsCluster(celoEnv, awsClusterConfig)
+export function getClusterManagerForOracleContext(celoEnv: string, oracleContext: string) {
+  const cloudProvider: CloudProvider = getCloudProviderFromOracleContext(oracleContext)
+  const deploymentConfig = clusterConfigGetterByCloudProvider[cloudProvider](oracleContext)
+  return getClusterManager(cloudProvider, celoEnv, deploymentConfig)
 }
+
+// /**
+//  * Switches to the AKS cluster associated with the given context
+//  */
+// export function switchToAzureContextCluster(celoEnv: string, oracleContext: string) {
+//   const azureClusterConfig = getAzureClusterConfig(oracleContext)
+//   return switchToAzureCluster(celoEnv, azureClusterConfig)
+// }
+//
+// /**
+//  * Switches to the AWS cluster associated with the given context
+//  */
+// export function switchToAwsContextCluster(celoEnv: string, context: string) {
+//   const awsClusterConfig = getAWSClusterConfig(context)
+//   return switchToAwsCluster(celoEnv, awsClusterConfig)
+// }
 
 
 /**

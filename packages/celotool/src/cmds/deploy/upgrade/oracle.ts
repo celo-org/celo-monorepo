@@ -2,7 +2,7 @@ import { UpgradeArgv } from 'src/cmds/deploy/upgrade'
 import {
   addOracleMiddleware,
   OracleArgv,
-  switchToContextCluster,
+  switchToOracleContextCluster,
   upgradeOracleChart,
 } from 'src/lib/oracle'
 import yargs from 'yargs'
@@ -25,6 +25,6 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: OracleUpgradeArgv) => {
-  await switchToContextCluster(argv.celoEnv, argv.context)
+  await switchToOracleContextCluster(argv.celoEnv, argv.context)
   await upgradeOracleChart(argv.celoEnv, argv.context, argv.useForno)
 }

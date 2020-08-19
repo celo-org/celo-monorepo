@@ -1,5 +1,5 @@
 import { InitialArgv } from 'src/cmds/deploy/initial'
-import { addOracleMiddleware, OracleArgv, switchToContextCluster } from 'src/lib/oracle'
+import { addOracleMiddleware, OracleArgv, switchToOracleContextCluster } from 'src/lib/oracle'
 import { installOracleFullNodeChart } from 'src/lib/oracle-fullnode'
 
 export const command = 'oracle-fullnode'
@@ -11,6 +11,6 @@ type OracleFullNodeInitialArgv = InitialArgv & OracleArgv
 export const builder = addOracleMiddleware
 
 export const handler = async (argv: OracleFullNodeInitialArgv) => {
-  await switchToContextCluster(argv.celoEnv, argv.context)
+  await switchToOracleContextCluster(argv.celoEnv, argv.context)
   await installOracleFullNodeChart(argv.celoEnv, argv.context)
 }

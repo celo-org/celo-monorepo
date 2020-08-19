@@ -17,9 +17,8 @@ export interface BaseFullNodeDeploymentConfig {
 }
 
 export abstract class BaseFullNodeDeployer {
-
   protected _deploymentConfig: BaseFullNodeDeploymentConfig
-  protected _celoEnv: string
+  private _celoEnv: string
 
   constructor(deploymentConfig: BaseFullNodeDeploymentConfig, celoEnv: string) {
     this._deploymentConfig = deploymentConfig

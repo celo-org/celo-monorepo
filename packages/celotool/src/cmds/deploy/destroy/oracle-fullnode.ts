@@ -1,5 +1,5 @@
 import { DestroyArgv } from 'src/cmds/deploy/destroy'
-import { addOracleMiddleware, OracleArgv, switchToContextCluster } from 'src/lib/oracle'
+import { addOracleMiddleware, OracleArgv, switchToOracleContextCluster } from 'src/lib/oracle'
 import { removeOracleFullNodeChart } from 'src/lib/oracle-fullnode'
 
 export const command = 'oracle-fullnode'
@@ -11,6 +11,6 @@ type OracleFullNodeDestroyArgv = DestroyArgv & OracleArgv
 export const builder = addOracleMiddleware
 
 export const handler = async (argv: OracleFullNodeDestroyArgv) => {
-  await switchToContextCluster(argv.celoEnv, argv.context)
+  await switchToOracleContextCluster(argv.celoEnv, argv.context)
   await removeOracleFullNodeChart(argv.celoEnv, argv.context)
 }
