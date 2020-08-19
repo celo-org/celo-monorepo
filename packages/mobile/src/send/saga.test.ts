@@ -1,6 +1,6 @@
 import { expectSaga } from 'redux-saga-test-plan'
 import { select } from 'redux-saga/effects'
-import { showMessage } from 'src/alert/actions'
+import { showError, showMessage } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { validateRecipientAddressSuccess } from 'src/identity/actions'
 import {
@@ -146,7 +146,7 @@ describe(watchQrCodeDetections, () => {
         [select(e164NumberToAddressSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
-      .put(showMessage(ErrorMessages.QR_FAILED_INVALID_ADDRESS))
+      .put(showError(ErrorMessages.QR_FAILED_INVALID_ADDRESS))
       .silentRun()
     expect(navigate).not.toHaveBeenCalled()
   })
@@ -166,7 +166,7 @@ describe(watchQrCodeDetections, () => {
         [select(e164NumberToAddressSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
-      .put(showMessage(ErrorMessages.QR_FAILED_INVALID_ADDRESS))
+      .put(showError(ErrorMessages.QR_FAILED_INVALID_ADDRESS))
       .silentRun()
     expect(navigate).not.toHaveBeenCalled()
   })
