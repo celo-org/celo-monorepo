@@ -42,10 +42,6 @@ jest.mock('src/firebase/dynamicLinks', () => ({
   generateShortInviteLink: jest.fn(async () => 'http://celo.page.link/PARAMS'),
 }))
 
-jest.mock('src/utils/appstore', () => ({
-  getAppStoreId: jest.fn(async () => '1482389446'),
-}))
-
 jest.mock('src/account/actions', () => ({
   ...jest.requireActual('src/account/actions'),
   getPincode: async () => 'pin',
@@ -54,6 +50,13 @@ jest.mock('src/account/actions', () => ({
 jest.mock('src/transactions/send', () => ({
   sendTransaction: async () => true,
 }))
+
+jest.mock('src/config', () => {
+  return {
+    ...jest.requireActual('src/config'),
+    APP_STORE_ID: '1482389446',
+  }
+})
 
 SendIntentAndroid.sendSms = jest.fn()
 SendSMS.send = jest.fn()
@@ -258,7 +261,7 @@ describe(generateInviteLink, () => {
     expect(result).toBe('http://celo.page.link/PARAMS')
     expect(generateShortInviteLink).toBeCalledTimes(1)
     expect(generateShortInviteLink).toHaveBeenCalledWith({
-      link: `https://celo.org/build/wallet?invite-code=${mockKey}`,
+      link: `https://valoraapp.com/?invite-code=${mockKey}`,
       appStoreId: '1482389446',
       bundleId: 'org.celo.mobile.alfajores',
     })
