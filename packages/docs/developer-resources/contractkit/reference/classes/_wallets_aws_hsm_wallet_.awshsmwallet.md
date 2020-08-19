@@ -1,10 +1,15 @@
-# Class: AzureHSMWallet
+# Class: AwsHsmWallet
+
+A Cloud HSM wallet built on AWS KMS
+https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/KMS.html
+When using the default credentials, it's expected to set the
+aws_access_key_id and aws_secret_access_key in ~/.aws/credentials
 
 ## Hierarchy
 
   ↳ [RemoteWallet](_wallets_remote_wallet_.remotewallet.md)
 
-  ↳ **AzureHSMWallet**
+  ↳ **AwsHsmWallet**
 
 ## Implements
 
@@ -16,35 +21,35 @@
 
 ### Constructors
 
-* [constructor](_wallets_azure_hsm_wallet_.azurehsmwallet.md#constructor)
+* [constructor](_wallets_aws_hsm_wallet_.awshsmwallet.md#constructor)
 
 ### Methods
 
-* [decrypt](_wallets_azure_hsm_wallet_.azurehsmwallet.md#decrypt)
-* [getAccounts](_wallets_azure_hsm_wallet_.azurehsmwallet.md#getaccounts)
-* [getAddressFromKeyName](_wallets_azure_hsm_wallet_.azurehsmwallet.md#getaddressfromkeyname)
-* [hasAccount](_wallets_azure_hsm_wallet_.azurehsmwallet.md#hasaccount)
-* [init](_wallets_azure_hsm_wallet_.azurehsmwallet.md#init)
-* [isSetupFinished](_wallets_azure_hsm_wallet_.azurehsmwallet.md#issetupfinished)
-* [signPersonalMessage](_wallets_azure_hsm_wallet_.azurehsmwallet.md#signpersonalmessage)
-* [signTransaction](_wallets_azure_hsm_wallet_.azurehsmwallet.md#signtransaction)
-* [signTypedData](_wallets_azure_hsm_wallet_.azurehsmwallet.md#signtypeddata)
+* [decrypt](_wallets_aws_hsm_wallet_.awshsmwallet.md#decrypt)
+* [getAccounts](_wallets_aws_hsm_wallet_.awshsmwallet.md#getaccounts)
+* [getAddressFromKeyId](_wallets_aws_hsm_wallet_.awshsmwallet.md#getaddressfromkeyid)
+* [hasAccount](_wallets_aws_hsm_wallet_.awshsmwallet.md#hasaccount)
+* [init](_wallets_aws_hsm_wallet_.awshsmwallet.md#init)
+* [isSetupFinished](_wallets_aws_hsm_wallet_.awshsmwallet.md#issetupfinished)
+* [signPersonalMessage](_wallets_aws_hsm_wallet_.awshsmwallet.md#signpersonalmessage)
+* [signTransaction](_wallets_aws_hsm_wallet_.awshsmwallet.md#signtransaction)
+* [signTypedData](_wallets_aws_hsm_wallet_.awshsmwallet.md#signtypeddata)
 
 ## Constructors
 
 ###  constructor
 
-\+ **new AzureHSMWallet**(`vaultName`: string): *[AzureHSMWallet](_wallets_azure_hsm_wallet_.azurehsmwallet.md)*
+\+ **new AwsHsmWallet**(`awsCredentials?`: KMS.ClientConfiguration): *[AwsHsmWallet](_wallets_aws_hsm_wallet_.awshsmwallet.md)*
 
-*Defined in [contractkit/src/wallets/azure-hsm-wallet.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/azure-hsm-wallet.ts#L15)*
+*Defined in [contractkit/src/wallets/aws-hsm-wallet.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/aws-hsm-wallet.ts#L28)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`vaultName` | string |
+`awsCredentials?` | KMS.ClientConfiguration |
 
-**Returns:** *[AzureHSMWallet](_wallets_azure_hsm_wallet_.azurehsmwallet.md)*
+**Returns:** *[AwsHsmWallet](_wallets_aws_hsm_wallet_.awshsmwallet.md)*
 
 ## Methods
 
@@ -83,20 +88,20 @@ Get a list of accounts in the remote wallet
 
 ___
 
-###  getAddressFromKeyName
+###  getAddressFromKeyId
 
-▸ **getAddressFromKeyName**(`keyName`: string): *Promise‹[Address](../modules/_base_.md#address)›*
+▸ **getAddressFromKeyId**(`keyId`: string): *Promise‹[Address](../modules/_base_.md#address)›*
 
-*Defined in [contractkit/src/wallets/azure-hsm-wallet.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/azure-hsm-wallet.ts#L54)*
+*Defined in [contractkit/src/wallets/aws-hsm-wallet.ts:87](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/aws-hsm-wallet.ts#L87)*
 
 Returns the EVM address for the given key
 Useful for initially getting the 'from' field given a keyName
 
 **Parameters:**
 
-Name | Type | Description |
------- | ------ | ------ |
-`keyName` | string | Azure KeyVault key name  |
+Name | Type |
+------ | ------ |
+`keyId` | string |
 
 **Returns:** *Promise‹[Address](../modules/_base_.md#address)›*
 
