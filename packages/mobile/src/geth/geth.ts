@@ -4,13 +4,11 @@ import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
 import GethBridge, { NodeConfig } from 'react-native-geth'
-import { call } from 'redux-saga/effects'
 import { GethEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { DEFAULT_TESTNET } from 'src/config'
 import { SYNCING_MAX_PEERS } from 'src/geth/consts'
 import networkConfig from 'src/geth/networkConfig'
-import { waitForGethInitialized } from 'src/geth/saga'
 import Logger from 'src/utils/Logger'
 import FirebaseLogUploader from 'src/utils/LogUploader'
 
@@ -124,21 +122,18 @@ export async function initGeth(shouldStartNode: boolean = true): Promise<boolean
   gethLock = true
 
   try {
-    if (shouldStartNode) {
-      // Write static node and genesis block, canceling if either fail.
-      await Promise.all([
-        ensureGenesisBlockWritten().then((ok) => {
-          if (!ok) {
-            throw FailedToFetchGenesisBlockError
-          }
-        }),
-        ensureStaticNodesInitialized().then((ok) => {
-          if (!ok) {
-            throw FailedToFetchStaticNodesError
-          }
-        }),
-      ])
-    }
+    await Promise.all([
+      ensureGenesisBlockWritten().then((ok) => {
+        if (!ok) {
+          throw FailedToFetchGenesisBlockError
+        }
+      }),
+      ensureStaticNodesInitialized().then((ok) => {
+        if (!ok) {
+          throw FailedToFetchStaticNodesError
+        }
+      }),
+    ])
 
     ValoraAnalytics.track(GethEvents.create_geth_start)
     try {
@@ -170,6 +165,7 @@ export async function initGeth(shouldStartNode: boolean = true): Promise<boolean
         }
       }
     }
+    return true
   } finally {
     gethLock = false
   }
@@ -212,7 +208,7 @@ export async function stopGethIfInitialized() {
 async function stop() {
   try {
     Logger.debug('Geth@stop', 'Stopping Geth')
-    await gethBridge?.stop()
+    await GethBridge.stopNode()
     Logger.debug('Geth@stop', 'Geth stopped')
   } catch (e) {
     Logger.error('Geth@stop', 'Error stopping Geth', e)

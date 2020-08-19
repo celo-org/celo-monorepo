@@ -10,12 +10,13 @@ import { ContractKitEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { DEFAULT_FORNO_URL } from 'src/config'
-import { getGethBridge, isProviderConnectionError } from 'src/geth/geth'
+import { isProviderConnectionError } from 'src/geth/geth'
 import { GethNativeBridgeWallet } from 'src/geth/GethNativeBridgeWallet'
 import { waitForGethInitialized } from 'src/geth/saga'
 import { navigateToError } from 'src/navigator/NavigationService'
 import Logger from 'src/utils/Logger'
 import { getHttpProvider, getIpcProvider } from 'src/web3/providers'
+import GethBridge from 'react-native-geth'
 import { fornoSelector } from 'src/web3/selectors'
 import Web3 from 'web3'
 
@@ -28,7 +29,7 @@ let contractKit: ContractKit | undefined
 
 function* initWallet() {
   ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_wallet_start)
-  const wallet = new GethNativeBridgeWallet(yield call(getGethBridge))
+  const wallet = new GethNativeBridgeWallet(GethBridge)
   ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_wallet_finish)
   yield call([wallet, wallet.init])
   ValoraAnalytics.track(ContractKitEvents.init_contractkit_init_wallet_finish)

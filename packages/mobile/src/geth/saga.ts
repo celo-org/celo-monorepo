@@ -111,13 +111,12 @@ export function* waitForNextBlock() {
   }
 }
 
-export function* waitForGethInstance() {
+export function* waitForGethInit() {
   try {
     const fornoMode = yield select(fornoSelector)
-    // get geth without starting if fornoMode
-    const gethInstance = yield call(initGeth, !fornoMode)
-    if (!gethInstance) {
-      throw new Error('Geth instance is null')
+    let gethInitialized = yield call(initGeth, !fornoMode)
+    if (!gethInitialized) {
+      throw new Error('Geth not initialized correctly')
     }
     return GethInitOutcomes.SUCCESS
   } catch (error) {
@@ -140,7 +139,7 @@ export function* initGethSaga() {
   yield put(setInitState(InitializationState.INITIALIZING))
 
   const { result } = yield race({
-    result: call(waitForGethInstance),
+    result: call(waitForGethInit),
     timeout: delay(INIT_GETH_TIMEOUT),
   })
 

@@ -1,9 +1,7 @@
 // @ts-ignore
-export default jest.fn().mockImplementation(() => {
-  return {
-    setConfig: jest.fn(),
-    start: jest.fn(),
-    stop: jest.fn(),
-    subscribeNewHead: jest.fn(),
-  }
-})
+export default {
+  setConfig: jest.fn(),
+  startNode: jest.fn(),
+  stop: jest.fn(),
+  subscribeNewHead: jest.fn(),
+}
