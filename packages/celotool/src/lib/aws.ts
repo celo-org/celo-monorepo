@@ -9,29 +9,6 @@ export interface AwsClusterConfig extends ClusterConfig {
   resourceGroupTag: string
 }
 
-// // switchToAwsCluster configures kubectl to connect to the EKS cluster
-// export async function switchToAwsCluster(
-//   celoEnv: string,
-//   clusterConfig: AwsClusterConfig,
-// ) {
-//   // TODO Look into switching subscription between testing and production
-//   const isContextSetCorrectly = await switchToClusterContextIfExists(clusterConfig)
-//   if (!isContextSetCorrectly) {
-//     // If context does not exist, fetch it.
-//     await execCmdWithExitOnFailure(
-//       `aws eks --region ${clusterConfig.clusterRegion} update-kubeconfig --name ${clusterConfig.clusterName} --alias ${clusterConfig.clusterName}`
-//     )
-//   }
-//   return setupAwsCluster(celoEnv, clusterConfig)
-// }
-//
-// // setupAwsCluster is idempotent-- it will only make changes that have not been made
-// // before. Therefore, it's safe to be called for a cluster that's been fully set up before
-// async function setupAwsCluster(celoEnv: string, clusterConfig: AwsClusterConfig) {
-//   // TODO Find a substitute for AADPodIdentity on AWS
-//   return setupCluster(celoEnv, clusterConfig)
-// }
-
 // IP ADDRESS RELATED
 // IP addresses in AWS will have the following tags:
 // tag=resourceGroupTag Value=DynamicEnvVar.ORACLE_RESOURCE_GROUP_TAG

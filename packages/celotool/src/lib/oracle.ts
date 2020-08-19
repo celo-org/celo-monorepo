@@ -86,6 +86,13 @@ const oracleContextOracleMnemonicIdentityConfigDynamicEnvVars: { [k in keyof Ora
   addressesFromMnemonicCount: DynamicEnvVar.ORACLE_ADDRESSES_FROM_MNEMONIC_COUNT,
 }
 
+const clusterConfigGetterByCloudProvider: {
+  [key in CloudProvider]: (oracleContext: string) => BaseClusterConfig
+} = {
+  [CloudProvider.AWS]: getAWSClusterConfig,
+  [CloudProvider.AZURE]: getAzureClusterConfig,
+}
+
 function releaseName(celoEnv: string) {
   return `${celoEnv}-oracle`
 }
@@ -424,7 +431,6 @@ export function getOracleContextDynamicEnvVarValues<T>(
   {})
 }
 
-
 /**
  * Reads the context and swithces to the appropriate Azure or AWS Cluster
  */
@@ -437,23 +443,6 @@ export async function switchToOracleContextCluster(celoEnv: string, oracleContex
   }
   const clusterManager: BaseClusterManager = getClusterManagerForOracleContext(celoEnv, oracleContext)
   return clusterManager.switchToClusterContext()
-  // const clusterSwitchFnByPrefix = new Map<string, (celoEnv: string, context: string) => Promise<void>>([
-  //   ['AWS', switchToAwsContextCluster],
-  //   ['AZURE', switchToAzureContextCluster]
-  // ])
-  // for (const [prefix, clusterSwitchFn] of clusterSwitchFnByPrefix.entries()) {
-  //   if (oracleContext.startsWith(prefix)) {
-  //     return clusterSwitchFn(celoEnv, oracleContext)
-  //   }
-  // }
-  // throw Error(`Context did not start with one of ${clusterSwitchFnByPrefix.keys()}`)
-}
-
-const clusterConfigGetterByCloudProvider: {
-  [key in CloudProvider]: (oracleContext: string) => BaseClusterConfig
-} = {
-  [CloudProvider.AWS]: getAWSClusterConfig,
-  [CloudProvider.AZURE]: getAzureClusterConfig,
 }
 
 export function getClusterManagerForOracleContext(celoEnv: string, oracleContext: string) {
@@ -461,23 +450,6 @@ export function getClusterManagerForOracleContext(celoEnv: string, oracleContext
   const deploymentConfig = clusterConfigGetterByCloudProvider[cloudProvider](oracleContext)
   return getClusterManager(cloudProvider, celoEnv, deploymentConfig)
 }
-
-// /**
-//  * Switches to the AKS cluster associated with the given context
-//  */
-// export function switchToAzureContextCluster(celoEnv: string, oracleContext: string) {
-//   const azureClusterConfig = getAzureClusterConfig(oracleContext)
-//   return switchToAzureCluster(celoEnv, azureClusterConfig)
-// }
-//
-// /**
-//  * Switches to the AWS cluster associated with the given context
-//  */
-// export function switchToAwsContextCluster(celoEnv: string, context: string) {
-//   const awsClusterConfig = getAWSClusterConfig(context)
-//   return switchToAwsCluster(celoEnv, awsClusterConfig)
-// }
-
 
 /**
  * yargs argv type for an oracle related command.
