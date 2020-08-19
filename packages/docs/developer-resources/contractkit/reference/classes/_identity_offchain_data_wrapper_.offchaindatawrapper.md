@@ -13,12 +13,13 @@
 ### Properties
 
 * [kit](_identity_offchain_data_wrapper_.offchaindatawrapper.md#kit)
+* [readDataFrom](_identity_offchain_data_wrapper_.offchaindatawrapper.md#readdatafrom)
 * [self](_identity_offchain_data_wrapper_.offchaindatawrapper.md#self)
 * [storageWriter](_identity_offchain_data_wrapper_.offchaindatawrapper.md#storagewriter)
 
 ### Methods
 
-* [readDataFrom](_identity_offchain_data_wrapper_.offchaindatawrapper.md#readdatafrom)
+* [readDataFromAsResult](_identity_offchain_data_wrapper_.offchaindatawrapper.md#readdatafromasresult)
 * [writeDataTo](_identity_offchain_data_wrapper_.offchaindatawrapper.md#writedatato)
 
 ## Constructors
@@ -48,6 +49,24 @@ Name | Type |
 
 ___
 
+###  readDataFrom
+
+• **readDataFrom**: *function* = makeAsyncThrowable(this.readDataFromAsResult)
+
+*Defined in [packages/contractkit/src/identity/offchain-data-wrapper.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L66)*
+
+#### Type declaration:
+
+▸ (...`args`: TArgs): *Promise‹TResult›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | TArgs |
+
+___
+
 ###  self
 
 • **self**: *string*
@@ -64,9 +83,9 @@ ___
 
 ## Methods
 
-###  readDataFrom
+###  readDataFromAsResult
 
-▸ **readDataFrom**(`account`: string, `dataPath`: string): *Promise‹[Task](../modules/_identity_task_.md#task)‹string, [OffchainErrors](../modules/_identity_offchain_data_wrapper_.md#offchainerrors)››*
+▸ **readDataFromAsResult**(`account`: string, `dataPath`: string): *Promise‹Result‹string, [OffchainErrors](../modules/_identity_offchain_data_wrapper_.md#offchainerrors)››*
 
 *Defined in [packages/contractkit/src/identity/offchain-data-wrapper.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L37)*
 
@@ -77,7 +96,7 @@ Name | Type |
 `account` | string |
 `dataPath` | string |
 
-**Returns:** *Promise‹[Task](../modules/_identity_task_.md#task)‹string, [OffchainErrors](../modules/_identity_offchain_data_wrapper_.md#offchainerrors)››*
+**Returns:** *Promise‹Result‹string, [OffchainErrors](../modules/_identity_offchain_data_wrapper_.md#offchainerrors)››*
 
 ___
 
@@ -85,7 +104,7 @@ ___
 
 ▸ **writeDataTo**(`data`: string, `dataPath`: string): *Promise‹void›*
 
-*Defined in [packages/contractkit/src/identity/offchain-data-wrapper.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L61)*
+*Defined in [packages/contractkit/src/identity/offchain-data-wrapper.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L68)*
 
 **Parameters:**
 

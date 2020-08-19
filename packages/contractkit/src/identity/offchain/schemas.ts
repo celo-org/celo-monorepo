@@ -37,7 +37,7 @@ export class AuthorizedSignerAccessor {
     )
   }
 
-  read = makeAsyncThrowable(this.readAsResult)
+  read = makeAsyncThrowable(this.readAsResult.bind(this))
 
   async write(signer: Address, proofOfPossession: string, filteredDataPaths: string) {
     return writeWithSchema(

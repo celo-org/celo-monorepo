@@ -2,13 +2,13 @@
 
 ## Hierarchy
 
-  ↳ [RootError](_identity_task_.rooterror.md)‹[OffchainError](../enums/_identity_offchain_schema_utils_.schemaerrortypes.md#offchainerror)›
+* RootError‹[OffchainError](../enums/_identity_offchain_schema_utils_.schemaerrortypes.md#offchainerror)›
 
   ↳ **OffchainError**
 
 ## Implements
 
-* [BaseError](../interfaces/_identity_task_.baseerror.md)‹[OffchainError](../enums/_identity_offchain_schema_utils_.schemaerrortypes.md#offchainerror)›
+* BaseError‹[OffchainError](../enums/_identity_offchain_schema_utils_.schemaerrortypes.md#offchainerror)›
 * [IOffchainError](../interfaces/_identity_offchain_schema_utils_.ioffchainerror.md)
 
 ## Index
@@ -31,7 +31,7 @@
 
 \+ **new OffchainError**(`error`: [OffchainErrors](../modules/_identity_offchain_data_wrapper_.md#offchainerrors)): *[OffchainError](_identity_offchain_schema_utils_.offchainerror.md)*
 
-*Overrides [RootError](_identity_task_.rooterror.md).[constructor](_identity_task_.rooterror.md#constructor)*
+*Overrides void*
 
 *Defined in [packages/contractkit/src/identity/offchain/schema-utils.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L21)*
 
@@ -61,9 +61,9 @@ ___
 
 *Implementation of [IOffchainError](../interfaces/_identity_offchain_schema_utils_.ioffchainerror.md).[errorType](../interfaces/_identity_offchain_schema_utils_.ioffchainerror.md#errortype)*
 
-*Inherited from [RootError](_identity_task_.rooterror.md).[errorType](_identity_task_.rooterror.md#errortype)*
+*Inherited from [OffchainError](_identity_offchain_schema_utils_.offchainerror.md).[errorType](_identity_offchain_schema_utils_.offchainerror.md#errortype)*
 
-*Defined in [packages/contractkit/src/identity/task.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/task.ts#L34)*
+Defined in packages/base/lib/result.d.ts:25
 
 ___
 
@@ -71,7 +71,9 @@ ___
 
 • **message**: *string*
 
-*Inherited from [RootError](_identity_task_.rooterror.md).[message](_identity_task_.rooterror.md#message)*
+*Implementation of [IOffchainError](../interfaces/_identity_offchain_schema_utils_.ioffchainerror.md).[message](../interfaces/_identity_offchain_schema_utils_.ioffchainerror.md#message)*
+
+*Inherited from [InvalidDataError](../interfaces/_identity_offchain_schema_utils_.invaliddataerror.md).[message](../interfaces/_identity_offchain_schema_utils_.invaliddataerror.md#message)*
 
 Defined in node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts:974
 
@@ -81,7 +83,9 @@ ___
 
 • **name**: *string*
 
-*Inherited from [RootError](_identity_task_.rooterror.md).[name](_identity_task_.rooterror.md#name)*
+*Implementation of [IOffchainError](../interfaces/_identity_offchain_schema_utils_.ioffchainerror.md).[name](../interfaces/_identity_offchain_schema_utils_.ioffchainerror.md#name)*
+
+*Inherited from [InvalidDataError](../interfaces/_identity_offchain_schema_utils_.invaliddataerror.md).[name](../interfaces/_identity_offchain_schema_utils_.invaliddataerror.md#name)*
 
 Defined in node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts:973
 
@@ -91,6 +95,8 @@ ___
 
 • **stack**? : *undefined | string*
 
-*Inherited from [RootError](_identity_task_.rooterror.md).[stack](_identity_task_.rooterror.md#optional-stack)*
+*Implementation of [IOffchainError](../interfaces/_identity_offchain_schema_utils_.ioffchainerror.md).[stack](../interfaces/_identity_offchain_schema_utils_.ioffchainerror.md#optional-stack)*
+
+*Inherited from [InvalidDataError](../interfaces/_identity_offchain_schema_utils_.invaliddataerror.md).[stack](../interfaces/_identity_offchain_schema_utils_.invaliddataerror.md#optional-stack)*
 
 Defined in node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts:975

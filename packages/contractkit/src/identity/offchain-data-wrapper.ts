@@ -63,7 +63,7 @@ export default class OffchainDataWrapper {
     return item
   }
 
-  readDataFrom = makeAsyncThrowable(this.readDataFromAsResult)
+  readDataFrom = makeAsyncThrowable(this.readDataFromAsResult.bind(this))
 
   async writeDataTo(data: string, dataPath: string) {
     if (this.storageWriter === undefined) {
@@ -106,5 +106,5 @@ class StorageRoot {
     return this.readAsResult(`/account/authorizedSigners/${toChecksumAddress(signer)}`)
   }
 
-  read = makeAsyncThrowable(this.readAsResult)
+  read = makeAsyncThrowable(this.readAsResult.bind(this))
 }

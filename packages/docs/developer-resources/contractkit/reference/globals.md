@@ -27,7 +27,6 @@
 * ["identity/offchain/schema-utils"](modules/_identity_offchain_schema_utils_.md)
 * ["identity/offchain/schemas"](modules/_identity_offchain_schemas_.md)
 * ["identity/offchain/storage-writers"](modules/_identity_offchain_storage_writers_.md)
-* ["identity/task"](modules/_identity_task_.md)
 * ["kit"](modules/_kit_.md)
 * ["network-utils/genesis-block-utils"](modules/_network_utils_genesis_block_utils_.md)
 * ["network-utils/google-storage-utils"](modules/_network_utils_google_storage_utils_.md)

@@ -492,7 +492,7 @@ Contract address
 
 ###  authorizeAttestationSigner
 
-▸ **authorizeAttestationSigner**(`signer`: [Address](../modules/_base_.md#address), `proofOfSigningKeyPossession`: [Signature](_utils_azure_key_vault_client_.signature.md)): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
+▸ **authorizeAttestationSigner**(`signer`: [Address](../modules/_base_.md#address), `proofOfSigningKeyPossession`: Signature): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
 *Defined in [packages/contractkit/src/wrappers/Accounts.ts:160](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L160)*
 
@@ -503,7 +503,7 @@ Authorize an attestation signing key on behalf of this account to another addres
 Name | Type | Description |
 ------ | ------ | ------ |
 `signer` | [Address](../modules/_base_.md#address) | The address of the signing key to authorize. |
-`proofOfSigningKeyPossession` | [Signature](_utils_azure_key_vault_client_.signature.md) | The account address signed by the signer address. |
+`proofOfSigningKeyPossession` | Signature | The account address signed by the signer address. |
 
 **Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
@@ -513,7 +513,7 @@ ___
 
 ###  authorizeValidatorSigner
 
-▸ **authorizeValidatorSigner**(`signer`: [Address](../modules/_base_.md#address), `proofOfSigningKeyPossession`: [Signature](_utils_azure_key_vault_client_.signature.md)): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
+▸ **authorizeValidatorSigner**(`signer`: [Address](../modules/_base_.md#address), `proofOfSigningKeyPossession`: Signature): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
 *Defined in [packages/contractkit/src/wrappers/Accounts.ts:201](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L201)*
 
@@ -524,7 +524,7 @@ Authorizes an address to sign consensus messages on behalf of the account.
 Name | Type | Description |
 ------ | ------ | ------ |
 `signer` | [Address](../modules/_base_.md#address) | The address of the signing key to authorize. |
-`proofOfSigningKeyPossession` | [Signature](_utils_azure_key_vault_client_.signature.md) | The account address signed by the signer address. |
+`proofOfSigningKeyPossession` | Signature | The account address signed by the signer address. |
 
 **Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
@@ -534,7 +534,7 @@ ___
 
 ###  authorizeValidatorSignerAndBls
 
-▸ **authorizeValidatorSignerAndBls**(`signer`: [Address](../modules/_base_.md#address), `proofOfSigningKeyPossession`: [Signature](_utils_azure_key_vault_client_.signature.md), `blsPublicKey`: string, `blsPop`: string): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
+▸ **authorizeValidatorSignerAndBls**(`signer`: [Address](../modules/_base_.md#address), `proofOfSigningKeyPossession`: Signature, `blsPublicKey`: string, `blsPop`: string): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
 *Defined in [packages/contractkit/src/wrappers/Accounts.ts:249](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L249)*
 
@@ -545,7 +545,7 @@ Authorizes an address to sign consensus messages on behalf of the account. Also 
 Name | Type | Description |
 ------ | ------ | ------ |
 `signer` | [Address](../modules/_base_.md#address) | The address of the signing key to authorize. |
-`proofOfSigningKeyPossession` | [Signature](_utils_azure_key_vault_client_.signature.md) | The account address signed by the signer address. |
+`proofOfSigningKeyPossession` | Signature | The account address signed by the signer address. |
 `blsPublicKey` | string | The BLS public key that the validator is using for consensus, should pass proof   of possession. 48 bytes. |
 `blsPop` | string | The BLS public key proof-of-possession, which consists of a signature on the   account address. 96 bytes. |
 
@@ -557,7 +557,7 @@ ___
 
 ###  authorizeVoteSigner
 
-▸ **authorizeVoteSigner**(`signer`: [Address](../modules/_base_.md#address), `proofOfSigningKeyPossession`: [Signature](_utils_azure_key_vault_client_.signature.md)): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
+▸ **authorizeVoteSigner**(`signer`: [Address](../modules/_base_.md#address), `proofOfSigningKeyPossession`: Signature): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
 *Defined in [packages/contractkit/src/wrappers/Accounts.ts:180](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L180)*
 
@@ -568,7 +568,7 @@ Authorizes an address to sign votes on behalf of the account.
 Name | Type | Description |
 ------ | ------ | ------ |
 `signer` | [Address](../modules/_base_.md#address) | The address of the vote signing key to authorize. |
-`proofOfSigningKeyPossession` | [Signature](_utils_azure_key_vault_client_.signature.md) | The account address signed by the signer address. |
+`proofOfSigningKeyPossession` | Signature | The account address signed by the signer address. |
 
 **Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
@@ -709,7 +709,7 @@ ___
 
 ###  setAccount
 
-▸ **setAccount**(`name`: string, `dataEncryptionKey`: string, `walletAddress`: [Address](../modules/_base_.md#address), `proofOfPossession`: [Signature](_utils_azure_key_vault_client_.signature.md) | null): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void›*
+▸ **setAccount**(`name`: string, `dataEncryptionKey`: string, `walletAddress`: [Address](../modules/_base_.md#address), `proofOfPossession`: Signature | null): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void›*
 
 *Defined in [packages/contractkit/src/wrappers/Accounts.ts:336](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L336)*
 
@@ -722,7 +722,7 @@ Name | Type | Default | Description |
 `name` | string | - | A string to set as the name of the account |
 `dataEncryptionKey` | string | - | secp256k1 public key for data encryption. Preferably compressed. |
 `walletAddress` | [Address](../modules/_base_.md#address) | - | The wallet address to set for the account |
-`proofOfPossession` | [Signature](_utils_azure_key_vault_client_.signature.md) &#124; null | null | Signature from the wallet address key over the sender's address  |
+`proofOfPossession` | Signature &#124; null | null | Signature from the wallet address key over the sender's address  |
 
 **Returns:** *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void›*
 
@@ -730,7 +730,7 @@ ___
 
 ###  setWalletAddress
 
-▸ **setWalletAddress**(`walletAddress`: [Address](../modules/_base_.md#address), `proofOfPossession`: [Signature](_utils_azure_key_vault_client_.signature.md) | null): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void›*
+▸ **setWalletAddress**(`walletAddress`: [Address](../modules/_base_.md#address), `proofOfPossession`: Signature | null): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void›*
 
 *Defined in [packages/contractkit/src/wrappers/Accounts.ts:387](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L387)*
 
@@ -741,6 +741,6 @@ Sets the wallet address for the account
 Name | Type | Default |
 ------ | ------ | ------ |
 `walletAddress` | [Address](../modules/_base_.md#address) | - |
-`proofOfPossession` | [Signature](_utils_azure_key_vault_client_.signature.md) &#124; null | null |
+`proofOfPossession` | Signature &#124; null | null |
 
 **Returns:** *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void›*

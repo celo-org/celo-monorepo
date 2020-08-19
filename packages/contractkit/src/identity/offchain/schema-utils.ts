@@ -37,7 +37,7 @@ export class SingleSchema<T> {
     return readWithSchemaAsResult(this.wrapper, this.type, account, this.dataPath)
   }
 
-  read = makeAsyncThrowable(this.readAsResult)
+  read = makeAsyncThrowable(this.readAsResult.bind(this))
 
   async write(data: T) {
     return writeWithSchema(this.wrapper, this.type, this.dataPath, data)

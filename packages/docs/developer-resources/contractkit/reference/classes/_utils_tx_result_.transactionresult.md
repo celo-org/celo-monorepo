@@ -39,22 +39,22 @@ Name | Type |
 
 ###  getHash
 
-▸ **getHash**(): *any*
+▸ **getHash**(): *Promise‹string›*
 
 *Defined in [packages/contractkit/src/utils/tx-result.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-result.ts#L47)*
 
 Get (& wait for) transaction hash
 
-**Returns:** *any*
+**Returns:** *Promise‹string›*
 
 ___
 
 ###  waitReceipt
 
-▸ **waitReceipt**(): *Promise‹any›*
+▸ **waitReceipt**(): *Promise‹TransactionReceipt›*
 
 *Defined in [packages/contractkit/src/utils/tx-result.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-result.ts#L59)*
 
 Get (& wait for) transaction receipt
 
-**Returns:** *Promise‹any›*
+**Returns:** *Promise‹TransactionReceipt›*
