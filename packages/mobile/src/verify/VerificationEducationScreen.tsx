@@ -95,14 +95,14 @@ function VerificationEducationScreen({ route, navigation }: Props) {
 }
 
 VerificationEducationScreen.navigationOptions = ({ navigation, route }: ScreenProps) => {
-  const title = route.params?.hideOnboardingStep ? (
-    i18n.t('onboarding:verificationEducation.title')
-  ) : (
-    <HeaderTitleWithSubtitle
-      title={i18n.t('onboarding:verificationEducation.title')}
-      subTitle={i18n.t('onboarding:step', { step: '4' })}
-    />
-  )
+  const title = route.params?.hideOnboardingStep
+    ? i18n.t('onboarding:verificationEducation.title')
+    : () => (
+        <HeaderTitleWithSubtitle
+          title={i18n.t('onboarding:verificationEducation.title')}
+          subTitle={i18n.t('onboarding:step', { step: '4' })}
+        />
+      )
   return {
     ...nuxNavigationOptions,
     headerTitle: title,
