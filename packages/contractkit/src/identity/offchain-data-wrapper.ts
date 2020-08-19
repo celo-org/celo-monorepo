@@ -1,5 +1,5 @@
 import { eqAddress } from '@celo/base/lib/address'
-import { Err, isOk, makeAsyncThrowable, Ok, Result, RootError } from '@celo/base/lib/result'
+import { Err, makeAsyncThrowable, Ok, Result, RootError } from '@celo/base/lib/result'
 import { NativeSigner } from '@celo/base/lib/signatureUtils'
 import { guessSigner } from '@celo/utils/lib/signatureUtils'
 import debugFactory from 'debug'
@@ -61,7 +61,7 @@ export default class OffchainDataWrapper {
     }
 
     const item = await (await Promise.all(storageRoots.map((_) => _.readAsResult(dataPath)))).find(
-      isOk
+      (_) => _.ok
     )
 
     if (item === undefined) {

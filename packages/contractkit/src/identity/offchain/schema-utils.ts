@@ -1,4 +1,4 @@
-import { Err, isError, makeAsyncThrowable, Ok, Result, RootError } from '@celo/base/lib/result'
+import { Err, makeAsyncThrowable, Ok, Result, RootError } from '@celo/base/lib/result'
 import { isRight } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import { Address } from '../../base'
@@ -49,7 +49,7 @@ export const readWithSchemaAsResult = async <T>(
 ): Promise<Result<T, SchemaErrors>> => {
   const resp = await wrapper.readDataFromAsResult(account, dataPath)
 
-  if (isError(resp)) {
+  if (!resp.ok) {
     return Err(new OffchainError(resp.error))
   }
 

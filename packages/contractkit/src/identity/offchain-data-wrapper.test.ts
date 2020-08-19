@@ -1,4 +1,3 @@
-import { isError, isOk } from '@celo/base/lib/result'
 import { ACCOUNT_ADDRESSES } from '@celo/dev-utils/lib/ganache-setup'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { toChecksumAddress } from '@celo/utils/lib/address'
@@ -60,7 +59,7 @@ testWithGanache('Offchain Data', (web3) => {
 
       const resp = await nameAccessor.readAsResult(writer)
 
-      if (isOk(resp)) {
+      if (resp.ok) {
         expect(resp.result.name).toEqual(testname)
       } else {
         const error = resp.error
@@ -107,11 +106,11 @@ testWithGanache('Offchain Data', (web3) => {
       await nameAccessor.write({ name: testname })
 
       const receivedName = await nameAccessor.readAsResult(writer)
-      expect(isError(receivedName)).toEqual(true)
+      expect(receivedName.ok).toEqual(false)
 
       const authorizedSignerAccessor = new AuthorizedSignerAccessor(wrapper)
       const authorization = await authorizedSignerAccessor.readAsResult(writer, signer)
-      expect(isError(authorization)).toEqual(true)
+      expect(authorization.ok).toEqual(false)
     })
   })
 
@@ -148,7 +147,7 @@ testWithGanache('Offchain Data', (web3) => {
       await nameAccessor.write({ name: testname })
 
       const resp = await nameAccessor.readAsResult(writer)
-      if (isOk(resp)) {
+      if (resp.ok) {
         expect(resp.result.name).toEqual(testname)
       }
     })

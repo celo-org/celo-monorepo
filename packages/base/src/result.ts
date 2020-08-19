@@ -1,43 +1,28 @@
-export enum ResultStatus {
-  Ok = 'Ok',
-  Error = 'Error',
-}
 export interface OkResult<TResult> {
-  status: ResultStatus.Ok
+  ok: true
   result: TResult
 }
 export interface ErrorResult<TError extends Error> {
-  status: ResultStatus.Error
+  ok: false
   error: TError
 }
 
 export type Result<TResult, TError extends Error> = OkResult<TResult> | ErrorResult<TError>
 
 export const Ok = <TResult>(result: TResult): OkResult<TResult> => ({
-  status: ResultStatus.Ok,
+  ok: true,
   result,
 })
 export const Err = <TError extends Error>(error: TError): ErrorResult<TError> => ({
-  status: ResultStatus.Error,
+  ok: false,
   error,
 })
-
-export function isError<TResult, TError extends Error>(
-  result: Result<TResult, TError>
-): result is ErrorResult<TError> {
-  return result.status === ResultStatus.Error
-}
-export function isOk<TResult, TError extends Error>(
-  result: Result<TResult, TError>
-): result is OkResult<TResult> {
-  return result.status === ResultStatus.Ok
-}
 
 export function throwIfError<TResult, TError extends Error, TModifiedError extends Error>(
   result: Result<TResult, TError>,
   errorModifier?: (error: TError) => TModifiedError
 ) {
-  if (isError(result)) {
+  if (!result.ok) {
     if (errorModifier) {
       throw errorModifier(result.error)
     }
@@ -56,9 +41,7 @@ export function makeThrowable<
   f: (...args: TArgs) => Result<TResult, TError>,
   errorModifier?: (error: TError) => TModifiedError
 ) {
-  return (...args: TArgs) => {
-    return throwIfError(f(...args), errorModifier)
-  }
+  return (...args: TArgs) => throwIfError(f(...args), errorModifier)
 }
 
 export function makeAsyncThrowable<
