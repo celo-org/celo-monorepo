@@ -24,7 +24,7 @@ Please follow the instructions below closely, because missteps can lead to error
 
 ### Prepare your recovery phases
 
-Write your recovery phrase to a file using the following commands:
+Open the command-line interface on your computer. Write your recovery phrase to a file using the following commands:
 
 1. `nano recovery.txt`
 2. Paste `<word1> <word2> … <word24>`
