@@ -4,6 +4,7 @@ import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persi
 import { RootState } from 'src/redux/reducers'
 
 export const MAX_HISTORY_RETENTION = 30 * 24 * 3600 * 1000 // (ms) ~ 180 days
+export const ADDRESS_LENGTH = 42
 
 export interface ExchangeRatePair {
   goldMaker: string // number of dollarTokens received for one goldToken
