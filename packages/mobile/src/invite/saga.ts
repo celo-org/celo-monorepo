@@ -13,7 +13,7 @@ import { showError, showMessage } from 'src/alert/actions'
 import { InviteEvents, OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION, APP_STORE_ID } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
@@ -46,7 +46,6 @@ import { createTokenTransferTransaction, fetchTokenBalanceInWeiWithRetry } from 
 import { waitForTransactionWithId } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import { newTransactionContext } from 'src/transactions/types'
-import { getAppStoreId } from 'src/utils/appstore'
 import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 import { getContractKitAsync, getWallet, getWeb3 } from 'src/web3/contracts'
@@ -103,16 +102,9 @@ export async function generateInviteLink(inviteCode: string) {
   bundleId = bundleId.replace(/\.(debug|dev)$/g, '.alfajores')
 
   // trying to fetch appStoreId needed to build a dynamic link
-  let appStoreId
-  try {
-    appStoreId = await getAppStoreId(bundleId)
-  } catch (error) {
-    Logger.error(TAG, 'Failed to load AppStore ID: ' + error.toString())
-  }
-
   const shortUrl = await generateShortInviteLink({
-    link: `https://celo.org/build/wallet?invite-code=${inviteCode}`,
-    appStoreId,
+    link: `https://valoraapp.com/?invite-code=${inviteCode}`,
+    appStoreId: APP_STORE_ID,
     bundleId,
   })
 
