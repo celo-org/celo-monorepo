@@ -124,6 +124,13 @@ export class Account extends React.Component<Props, State> {
     this.props.navigation.navigate(Screens.Profile)
   }
 
+  goToConfirmNumber = () => {
+    ValoraAnalytics.track(SettingsEvents.settings_verify_number)
+    this.props.navigation.navigate(Screens.VerificationEducationScreen, {
+      hideOnboardingStep: true,
+    })
+  }
+
   goToLanguageSetting = () => {
     this.props.navigation.navigate(Screens.Language, { nextScreen: this.props.route.name })
   }
@@ -287,7 +294,7 @@ export class Account extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, i18n } = this.props
+    const { t, i18n, numberVerified } = this.props
     const promptFornoModal = this.props.route.params?.promptFornoModal ?? false
     const promptConfirmRemovalModal = this.props.route.params?.promptConfirmRemovalModal ?? false
     const currentLanguage = AVAILABLE_LANGUAGES.find((l) => l.code === i18n.language)
@@ -300,6 +307,9 @@ export class Account extends React.Component<Props, State> {
           </Text>
           <View style={styles.containerList}>
             <SettingsItemTextValue title={t('editProfile')} onPress={this.goToProfile} />
+            {!numberVerified && (
+              <SettingsItemTextValue title={t('confirmNumber')} onPress={this.goToConfirmNumber} />
+            )}
             <SettingsItemTextValue
               title={t('languageSettings')}
               value={currentLanguage?.name ?? t('global:unknown')}
