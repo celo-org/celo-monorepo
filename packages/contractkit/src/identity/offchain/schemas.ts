@@ -28,7 +28,6 @@ export class AuthorizedSignerAccessor {
   constructor(readonly wrapper: OffchainDataWrapper) {}
 
   async readAsResult(account: Address, signer: Address) {
-    console.log(this)
     return readWithSchemaAsResult(
       this.wrapper,
       AuthorizedSignerSchema,

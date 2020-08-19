@@ -28,9 +28,9 @@ export function isError<TResult, TError extends Error>(
   return result.status === ResultStatus.Error
 }
 export function isOk<TResult, TError extends Error>(
-  task: Result<TResult, TError>
-): task is OkResult<TResult> {
-  return task.status === ResultStatus.Ok
+  result: Result<TResult, TError>
+): result is OkResult<TResult> {
+  return result.status === ResultStatus.Ok
 }
 
 export function throwIfError<TResult, TError extends Error, TModifiedError extends Error>(
