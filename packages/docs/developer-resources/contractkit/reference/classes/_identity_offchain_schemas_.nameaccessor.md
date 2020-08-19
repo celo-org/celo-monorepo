@@ -50,7 +50,7 @@ Name | Type |
 
 *Inherited from [SingleSchema](_identity_offchain_schema_utils_.singleschema.md).[dataPath](_identity_offchain_schema_utils_.singleschema.md#datapath)*
 
-*Defined in [packages/contractkit/src/identity/offchain/schema-utils.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L33)*
+*Defined in [packages/contractkit/src/identity/offchain/schema-utils.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L30)*
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 *Inherited from [SingleSchema](_identity_offchain_schema_utils_.singleschema.md).[read](_identity_offchain_schema_utils_.singleschema.md#read)*
 
-*Defined in [packages/contractkit/src/identity/offchain/schema-utils.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L40)*
+*Defined in [packages/contractkit/src/identity/offchain/schema-utils.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L37)*
 
 #### Type declaration:
 
@@ -80,7 +80,7 @@ ___
 
 *Inherited from [SingleSchema](_identity_offchain_schema_utils_.singleschema.md).[type](_identity_offchain_schema_utils_.singleschema.md#type)*
 
-*Defined in [packages/contractkit/src/identity/offchain/schema-utils.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L32)*
+*Defined in [packages/contractkit/src/identity/offchain/schema-utils.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L29)*
 
 ___
 
@@ -96,11 +96,11 @@ ___
 
 ###  readAsResult
 
-▸ **readAsResult**(`account`: string): *Promise‹ErrorResult‹[IOffchainError](../interfaces/_identity_offchain_schema_utils_.ioffchainerror.md) | [InvalidDataError](../interfaces/_identity_offchain_schema_utils_.invaliddataerror.md)› | OkResult‹T››*
+▸ **readAsResult**(`account`: string): *Promise‹ErrorResult‹[InvalidDataError](_identity_offchain_schema_utils_.invaliddataerror.md)‹› | [OffchainError](_identity_offchain_schema_utils_.offchainerror.md)‹›› | OkResult‹T››*
 
 *Inherited from [SingleSchema](_identity_offchain_schema_utils_.singleschema.md).[readAsResult](_identity_offchain_schema_utils_.singleschema.md#readasresult)*
 
-*Defined in [packages/contractkit/src/identity/offchain/schema-utils.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L36)*
+*Defined in [packages/contractkit/src/identity/offchain/schema-utils.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L33)*
 
 **Parameters:**
 
@@ -108,7 +108,7 @@ Name | Type |
 ------ | ------ |
 `account` | string |
 
-**Returns:** *Promise‹ErrorResult‹[IOffchainError](../interfaces/_identity_offchain_schema_utils_.ioffchainerror.md) | [InvalidDataError](../interfaces/_identity_offchain_schema_utils_.invaliddataerror.md)› | OkResult‹T››*
+**Returns:** *Promise‹ErrorResult‹[InvalidDataError](_identity_offchain_schema_utils_.invaliddataerror.md)‹› | [OffchainError](_identity_offchain_schema_utils_.offchainerror.md)‹›› | OkResult‹T››*
 
 ___
 
@@ -118,7 +118,7 @@ ___
 
 *Inherited from [SingleSchema](_identity_offchain_schema_utils_.singleschema.md).[write](_identity_offchain_schema_utils_.singleschema.md#write)*
 
-*Defined in [packages/contractkit/src/identity/offchain/schema-utils.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L42)*
+*Defined in [packages/contractkit/src/identity/offchain/schema-utils.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L39)*
 
 **Parameters:**
 
