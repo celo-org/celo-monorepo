@@ -17,14 +17,22 @@ export enum OffchainErrorTypes {
   NoStorageRootProvidedData = 'NoStorageRootProvidedData',
 }
 
-interface FetchError extends Error {
-  errorType: OffchainErrorTypes.FetchError
+class FetchError extends RootError<OffchainErrorTypes.FetchError> {
+  constructor() {
+    super(OffchainErrorTypes.FetchError)
+  }
 }
-interface InvalidSignature extends Error {
-  errorType: OffchainErrorTypes.InvalidSignature
+
+class InvalidSignature extends RootError<OffchainErrorTypes.InvalidSignature> {
+  constructor() {
+    super(OffchainErrorTypes.InvalidSignature)
+  }
 }
-interface NoStorageRootProvidedData extends Error {
-  errorType: OffchainErrorTypes.NoStorageRootProvidedData
+
+class NoStorageRootProvidedData extends RootError<OffchainErrorTypes.NoStorageRootProvidedData> {
+  constructor() {
+    super(OffchainErrorTypes.NoStorageRootProvidedData)
+  }
 }
 
 export type OffchainErrors = FetchError | InvalidSignature | NoStorageRootProvidedData
@@ -49,7 +57,7 @@ export default class OffchainDataWrapper {
     debug({ account, storageRoots })
 
     if (storageRoots.length === 0) {
-      return Err(new RootError(OffchainErrorTypes.FetchError))
+      return Err(new NoStorageRootProvidedData())
     }
 
     const item = await (await Promise.all(storageRoots.map((_) => _.readAsResult(dataPath)))).find(
@@ -57,7 +65,7 @@ export default class OffchainDataWrapper {
     )
 
     if (item === undefined) {
-      return Err(new RootError(OffchainErrorTypes.FetchError))
+      return Err(new NoStorageRootProvidedData())
     }
 
     return item
@@ -80,10 +88,10 @@ class StorageRoot {
   constructor(readonly account: string, readonly address: string) {}
 
   // TODO: Add decryption metadata (i.e. indicates ciphertext to be decrypted/which key to use)
-  async readAsResult(dataPath: string): Promise<Result<string, FetchError>> {
+  async readAsResult(dataPath: string): Promise<Result<string, OffchainErrors>> {
     const data = await fetch(this.address + dataPath)
     if (!data.ok) {
-      return Err(new RootError(OffchainErrorTypes.FetchError))
+      return Err(new FetchError())
     }
 
     const body = await data.text()
@@ -91,7 +99,7 @@ class StorageRoot {
     const signature = await fetch(this.address + dataPath + '.signature')
 
     if (!signature.ok) {
-      return Err(new RootError(OffchainErrorTypes.FetchError))
+      return Err(new InvalidSignature())
     }
 
     // TODO: Compare against registered on-chain signers or off-chain signers

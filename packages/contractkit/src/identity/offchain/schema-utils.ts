@@ -9,22 +9,19 @@ export enum SchemaErrorTypes {
   OffchainError = 'OffchainError',
 }
 
-export interface InvalidDataError extends Error {
-  errorType: SchemaErrorTypes.InvalidDataError
-}
-export interface IOffchainError extends Error {
-  errorType: SchemaErrorTypes.OffchainError
-  error: OffchainErrors
+export class InvalidDataError extends RootError<SchemaErrorTypes.InvalidDataError> {
+  constructor() {
+    super(SchemaErrorTypes.InvalidDataError)
+  }
 }
 
-export class OffchainError extends RootError<SchemaErrorTypes.OffchainError>
-  implements IOffchainError {
+export class OffchainError extends RootError<SchemaErrorTypes.OffchainError> {
   constructor(readonly error: OffchainErrors) {
     super(SchemaErrorTypes.OffchainError)
   }
 }
 
-type SchemaErrors = InvalidDataError | IOffchainError
+type SchemaErrors = InvalidDataError | OffchainError
 
 export class SingleSchema<T> {
   constructor(
