@@ -190,11 +190,6 @@ const pincodeSetScreenOptions = ({
 const nuxScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen
-      name={Screens.Language}
-      component={Language}
-      options={Language.navigationOptions}
-    />
-    <Navigator.Screen
       name={Screens.OnboardingEducationScreen}
       component={OnboardingEducationScreen}
       options={OnboardingEducationScreen.navigationOptions}
@@ -406,6 +401,16 @@ const settingsScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen options={headerWithBackButton} name={Screens.Profile} component={Profile} />
     <Navigator.Screen
+      name={Screens.Language}
+      component={Language}
+      options={Language.navigationOptions(false)}
+    />
+    <Navigator.Screen
+      name={Screens.SelectLocalCurrency}
+      component={SelectLocalCurrency}
+      options={headerWithBackButton}
+    />
+    <Navigator.Screen
       options={headerWithBackButton}
       name={Screens.InviteReview}
       component={InviteReview}
@@ -536,16 +541,6 @@ const modalAnimatedScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen name={Screens.Send} component={Send} options={Send.navigationOptions} />
     <Navigator.Screen
-      name={Screens.Language}
-      component={Language}
-      options={Language.navigationOptions}
-    />
-    <Navigator.Screen
-      name={Screens.SelectLocalCurrency}
-      component={SelectLocalCurrency}
-      options={headerWithBackButton}
-    />
-    <Navigator.Screen
       name={Screens.PincodeEnter}
       component={PincodeEnter}
       options={PincodeEnter.navigationOptions}
@@ -569,6 +564,11 @@ const modalAnimatedScreens = (Navigator: typeof Stack) => (
       name={Screens.AccountKeyEducation}
       component={AccountKeyEducation}
       options={AccountKeyEducation.navigationOptions}
+    />
+    <Navigator.Screen
+      name={Screens.LanguageModal}
+      component={Language}
+      options={Language.navigationOptions(true)}
     />
     <Navigator.Screen
       name={Screens.SelectCountry}
