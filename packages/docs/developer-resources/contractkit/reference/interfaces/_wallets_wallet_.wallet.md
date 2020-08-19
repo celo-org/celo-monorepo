@@ -6,6 +6,9 @@
 
 ## Implemented by
 
+* [AwsHsmWallet](../classes/_wallets_aws_hsm_wallet_.awshsmwallet.md)
+* [AwsHsmWallet](../classes/_wallets_aws_hsm_wallet_.awshsmwallet.md)
+* [AwsHsmWallet](../classes/_wallets_aws_hsm_wallet_.awshsmwallet.md)
 * [AzureHSMWallet](../classes/_wallets_azure_hsm_wallet_.azurehsmwallet.md)
 * [AzureHSMWallet](../classes/_wallets_azure_hsm_wallet_.azurehsmwallet.md)
 * [AzureHSMWallet](../classes/_wallets_azure_hsm_wallet_.azurehsmwallet.md)
