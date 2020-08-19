@@ -25,6 +25,7 @@ export enum HomeEvents {
 export enum SettingsEvents {
   settings_profile_edit = 'settings_profile_edit',
   settings_profile_name_edit = 'settings_profile_name_edit',
+  settings_verify_number = 'settings_verify_number',
   language_select = 'language_select',
   pin_require_on_load = 'pin_require_on_load',
   forno_toggle = 'forno_toggle',
