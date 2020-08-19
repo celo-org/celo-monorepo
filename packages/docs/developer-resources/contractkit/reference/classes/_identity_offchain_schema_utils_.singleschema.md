@@ -58,7 +58,7 @@ ___
 
 ###  read
 
-• **read**: *function* = makeAsyncThrowable(this.readAsResult)
+• **read**: *function* = makeAsyncThrowable(this.readAsResult.bind(this))
 
 *Defined in [packages/contractkit/src/identity/offchain/schema-utils.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L40)*
 

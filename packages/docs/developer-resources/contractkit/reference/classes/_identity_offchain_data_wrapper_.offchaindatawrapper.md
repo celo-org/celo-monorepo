@@ -51,7 +51,7 @@ ___
 
 ###  readDataFrom
 
-• **readDataFrom**: *function* = makeAsyncThrowable(this.readDataFromAsResult)
+• **readDataFrom**: *function* = makeAsyncThrowable(this.readDataFromAsResult.bind(this))
 
 *Defined in [packages/contractkit/src/identity/offchain-data-wrapper.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L66)*
 

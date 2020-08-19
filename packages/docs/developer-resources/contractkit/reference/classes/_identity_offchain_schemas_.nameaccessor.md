@@ -56,7 +56,7 @@ ___
 
 ###  read
 
-• **read**: *function* = makeAsyncThrowable(this.readAsResult)
+• **read**: *function* = makeAsyncThrowable(this.readAsResult.bind(this))
 
 *Inherited from [SingleSchema](_identity_offchain_schema_utils_.singleschema.md).[read](_identity_offchain_schema_utils_.singleschema.md#read)*
 
