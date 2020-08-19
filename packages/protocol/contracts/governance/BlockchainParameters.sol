@@ -16,10 +16,12 @@ contract BlockchainParameters is Ownable, Initializable {
   ClientVersion private minimumClientVersion;
   uint256 public blockGasLimit;
   uint256 public intrinsicGasForAlternativeFeeCurrency;
+  uint256 public uptimeLookbackWindow;
 
   event MinimumClientVersionSet(uint256 major, uint256 minor, uint256 patch);
   event IntrinsicGasForAlternativeFeeCurrencySet(uint256 gas);
   event BlockGasLimitSet(uint256 limit);
+  event UptimeLookbackWindowSet(uint256 window);
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -28,18 +30,29 @@ contract BlockchainParameters is Ownable, Initializable {
    * @param patch Minimum client version that can be used in the chain, patch level.
    * @param _gasForNonGoldCurrencies Intrinsic gas for non-gold gas currencies.
    * @param gasLimit Block gas limit.
+   * @param lookbackWindow Lookback window for measuring validator uptime.
    */
   function initialize(
     uint256 major,
     uint256 minor,
     uint256 patch,
     uint256 _gasForNonGoldCurrencies,
-    uint256 gasLimit
+    uint256 gasLimit,
+    uint256 lookbackWindow
   ) external initializer {
     _transferOwnership(msg.sender);
     setMinimumClientVersion(major, minor, patch);
     setBlockGasLimit(gasLimit);
     setIntrinsicGasForAlternativeFeeCurrency(_gasForNonGoldCurrencies);
+    setUptimeLookbackWindow(lookbackWindow);
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 2, 0, 0);
   }
 
   /**
@@ -73,6 +86,15 @@ contract BlockchainParameters is Ownable, Initializable {
   function setIntrinsicGasForAlternativeFeeCurrency(uint256 gas) public onlyOwner {
     intrinsicGasForAlternativeFeeCurrency = gas;
     emit IntrinsicGasForAlternativeFeeCurrencySet(gas);
+  }
+
+  /**
+   * @notice Sets the uptime lookback window.
+   * @param window New window.
+   */
+  function setUptimeLookbackWindow(uint256 window) public onlyOwner {
+    uptimeLookbackWindow = window;
+    emit UptimeLookbackWindowSet(window);
   }
 
   /**

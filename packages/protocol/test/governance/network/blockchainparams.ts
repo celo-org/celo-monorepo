@@ -17,6 +17,7 @@ contract('BlockchainParameters', (accounts: string[]) => {
   }
   const gasLimit = 7000000
   const gasForNonGoldCurrencies = 50000
+  const lookbackWindow = 12
 
   beforeEach(async () => {
     blockchainParameters = await BlockchainParameters.new()
@@ -84,6 +85,7 @@ contract('BlockchainParameters', (accounts: string[]) => {
       )
     })
   })
+
   describe('#setIntrinsicGasForAlternativeFeeCurrency()', () => {
     it('should set the variable', async () => {
       await blockchainParameters.setIntrinsicGasForAlternativeFeeCurrency(gasForNonGoldCurrencies)
@@ -114,6 +116,31 @@ contract('BlockchainParameters', (accounts: string[]) => {
     })
   })
 
+  describe('#setUptimeLookbackWindow()', () => {
+    it('should set the variable', async () => {
+      await blockchainParameters.setUptimeLookbackWindow(lookbackWindow)
+      assert.equal((await blockchainParameters.uptimeLookbackWindow()).toNumber(), lookbackWindow)
+    })
+    it('should emit the corresponding event', async () => {
+      const resp = await blockchainParameters.setUptimeLookbackWindow(lookbackWindow)
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertContainSubset(log, {
+        event: 'UptimeLookbackWindowSet',
+        args: {
+          window: new BigNumber(lookbackWindow),
+        },
+      })
+    })
+    it('only owner should be able to set', async () => {
+      await assertRevert(
+        blockchainParameters.setUptimeLookbackWindow(lookbackWindow, {
+          from: accounts[1],
+        })
+      )
+    })
+  })
+
   describe('#initialize()', () => {
     it('should set the variables', async () => {
       await blockchainParameters.initialize(
@@ -121,13 +148,15 @@ contract('BlockchainParameters', (accounts: string[]) => {
         version.minor,
         version.patch,
         gasForNonGoldCurrencies,
-        gasLimit
+        gasLimit,
+        lookbackWindow
       )
       const versionQueried = await blockchainParameters.getMinimumClientVersion()
       assert.equal(version.major, versionQueried[0].toNumber())
       assert.equal(version.minor, versionQueried[1].toNumber())
       assert.equal(version.patch, versionQueried[2].toNumber())
       assert.equal((await blockchainParameters.blockGasLimit()).toNumber(), gasLimit)
+      assert.equal((await blockchainParameters.uptimeLookbackWindow()).toNumber(), lookbackWindow)
     })
     it('should emit correct events', async () => {
       const resp = await blockchainParameters.initialize(
@@ -135,9 +164,10 @@ contract('BlockchainParameters', (accounts: string[]) => {
         version.minor,
         version.patch,
         gasForNonGoldCurrencies,
-        gasLimit
+        gasLimit,
+        lookbackWindow
       )
-      assert.equal(resp.logs.length, 4)
+      assert.equal(resp.logs.length, 5)
       assertContainSubset(resp.logs[1], {
         event: 'MinimumClientVersionSet',
         args: {
@@ -163,6 +193,12 @@ contract('BlockchainParameters', (accounts: string[]) => {
         args: {
           previousOwner: accounts[0],
           newOwner: accounts[0],
+        },
+      })
+      assertContainSubset(resp.logs[4], {
+        event: 'UptimeLookbackWindowSet',
+        args: {
+          window: new BigNumber(lookbackWindow),
         },
       })
     })
