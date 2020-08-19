@@ -10,7 +10,7 @@ This guide assumes that you have access to the following:
     - [Windows](https://www.howtogeek.com/270810/how-to-quickly-launch-a-bash-shell-from-windows-10s-file-explorer/)
     - [Mac](https://macpaw.com/how-to/use-terminal-on-mac)
     - [Linux](https://askubuntu.com/questions/196212/how-do-you-open-a-command-line)
-- [Celo Command Line Interface](../command-line-interface/overview.md) installed on your computer
+- [Celo Command Line Interface](../command-line-interface/introduction.md) installed on your computer
 - The [24-word recovery phrase](https://kb.myetherwallet.com/en/security-and-privacy/what-is-a-mnemonic-phrase/) of your Ethereum address
 
 {% hint style="danger" %}
