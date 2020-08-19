@@ -114,7 +114,7 @@ export function* waitForNextBlock() {
 export function* waitForGethInit() {
   try {
     const fornoMode = yield select(fornoSelector)
-    let gethInitialized = yield call(initGeth, !fornoMode)
+    const gethInitialized = yield call(initGeth, !fornoMode)
     if (!gethInitialized) {
       throw new Error('Geth not initialized correctly')
     }

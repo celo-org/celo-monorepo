@@ -5,6 +5,7 @@
  */
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { sleep } from '@celo/utils/src/async'
+import GethBridge from 'react-native-geth'
 import { call, delay, select } from 'redux-saga/effects'
 import { ContractKitEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
@@ -16,7 +17,6 @@ import { waitForGethInitialized } from 'src/geth/saga'
 import { navigateToError } from 'src/navigator/NavigationService'
 import Logger from 'src/utils/Logger'
 import { getHttpProvider, getIpcProvider } from 'src/web3/providers'
-import GethBridge from 'react-native-geth'
 import { fornoSelector } from 'src/web3/selectors'
 import Web3 from 'web3'
 
