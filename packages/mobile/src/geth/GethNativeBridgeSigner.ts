@@ -8,7 +8,7 @@ import { Signer } from '@celo/contractkit/lib/wallets/signers/signer'
 import { ensureLeading0x } from '@celo/utils/lib/address'
 import { normalizeAddressWith0x } from '@celo/utils/src/address'
 import * as ethUtil from 'ethereumjs-util'
-import RNGeth from 'react-native-geth'
+import { GethNativeModule } from 'react-native-geth'
 import { Tx } from 'web3-core'
 
 const INCORRECT_PASSWORD_ERROR = 'could not decrypt key with given password'
@@ -29,7 +29,7 @@ export class GethNativeBridgeSigner implements Signer {
    * @param unlockDuration Number of seconds that the signer was last unlocked for
    */
   constructor(
-    protected geth: RNGeth,
+    protected geth: GethNativeModule,
     protected account: string,
     protected unlockBufferSeconds = 5,
     protected unlockTime = -1,

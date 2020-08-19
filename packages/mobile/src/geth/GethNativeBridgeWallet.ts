@@ -5,7 +5,7 @@ import {
   normalizeAddressWith0x,
   privateKeyToAddress,
 } from '@celo/utils/lib/address'
-import RNGeth from 'react-native-geth'
+import { GethNativeModule } from 'react-native-geth'
 import { GethNativeBridgeSigner } from 'src/geth/GethNativeBridgeSigner'
 import Logger from 'src/utils/Logger'
 import { Tx } from 'web3-core'
@@ -26,7 +26,7 @@ export class GethNativeBridgeWallet extends RemoteWallet<GethNativeBridgeSigner>
    * @param geth The instance of the bridge object
    * @dev overrides WalletBase.signTransaction
    */
-  constructor(private geth: RNGeth) {
+  constructor(private geth: GethNativeModule) {
     super()
   }
 

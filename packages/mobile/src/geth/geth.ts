@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
-import RNGeth, { NodeConfig } from 'react-native-geth'
+import GethBridge, { NodeConfig } from 'react-native-geth'
 import { call } from 'redux-saga/effects'
 import { GethEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
@@ -15,7 +15,7 @@ import Logger from 'src/utils/Logger'
 import FirebaseLogUploader from 'src/utils/LogUploader'
 
 let gethLock = false
-let gethBridge: RNGeth | null = null
+let gethInitialized = false
 
 export const FailedToFetchStaticNodesError = new Error(
   'Failed to fetch static nodes from Google storage'
@@ -80,7 +80,7 @@ function getFolder(filePath: string) {
   return filePath.substr(0, filePath.lastIndexOf('/'))
 }
 
-async function createNewGeth(sync: boolean = true): Promise<RNGeth> {
+async function setupGeth(sync: boolean = true): Promise<boolean> {
   Logger.debug('Geth@newGeth', 'Configure and create new Geth')
   const { nodeDir, syncMode } = networkConfig
   const genesis: string = await readGenesisBlockFile(nodeDir)
@@ -110,19 +110,16 @@ async function createNewGeth(sync: boolean = true): Promise<RNGeth> {
   // The logcat logging mode remains unchanged.
   gethOptions.logFileLogLevel = LogLevel.INFO
   Logger.debug('Geth@newGeth', 'Geth logs will be piped to ' + gethLogFilePath)
-  const geth = new RNGeth()
-  await geth.setConfig(gethOptions)
-
-  return geth
+  return GethBridge.setConfig(gethOptions)
 }
 
-export async function initGeth(shouldStartNode: boolean = true): Promise<RNGeth | null> {
+export async function initGeth(shouldStartNode: boolean = true): Promise<boolean> {
   ValoraAnalytics.track(GethEvents.geth_init_start, { shouldStartNode })
   Logger.info('Geth@init', `Create a new Geth instance with shouldStartNode=${shouldStartNode}`)
 
   if (gethLock) {
     Logger.warn('Geth@init', 'Geth create already in progress.')
-    return null
+    return false
   }
   gethLock = true
 
@@ -145,19 +142,20 @@ export async function initGeth(shouldStartNode: boolean = true): Promise<RNGeth 
 
     ValoraAnalytics.track(GethEvents.create_geth_start)
     try {
-      gethBridge = await createNewGeth(shouldStartNode)
+      await setupGeth(shouldStartNode)
     } catch (error) {
       ValoraAnalytics.track(GethEvents.create_geth_error, { error: error.message })
       throw error
     }
     ValoraAnalytics.track(GethEvents.create_geth_finish)
+    gethInitialized = true
 
     if (shouldStartNode) {
       try {
         ValoraAnalytics.track(GethEvents.start_geth_start)
-        await gethBridge.start()
+        await GethBridge.startNode()
         ValoraAnalytics.track(GethEvents.start_geth_finish)
-        await gethBridge.subscribeNewHead()
+        await GethBridge.subscribeNewHead()
       } catch (e) {
         const errorType = getGethErrorType(e)
         if (errorType === ErrorType.GethAlreadyRunning) {
@@ -165,23 +163,16 @@ export async function initGeth(shouldStartNode: boolean = true): Promise<RNGeth 
           throw new Error('Geth already running, need to restart app')
         } else if (errorType === ErrorType.CorruptChainData) {
           Logger.warn('Geth@init/startInstance', 'Geth start reported chain data error')
-          await attemptGethCorruptionFix(gethBridge)
+          await attemptGethCorruptionFix()
         } else {
           Logger.error('Geth@init/startInstance', 'Unexpected error starting geth', e)
           throw e
         }
       }
     }
-    return gethBridge
   } finally {
     gethLock = false
   }
-}
-
-// Wait for geth to be initialized before returning the bridge
-export function* getGethBridge() {
-  yield call(waitForGethInitialized)
-  return gethBridge
 }
 
 export function isProviderConnectionError(error: any) {
@@ -213,7 +204,7 @@ async function ensureStaticNodesInitialized(): Promise<boolean> {
 }
 
 export async function stopGethIfInitialized() {
-  if (gethBridge) {
+  if (gethInitialized) {
     await stop()
   }
 }
@@ -288,13 +279,12 @@ async function writeStaticNodes(nodeDir: string, enodes: string) {
   await RNFS.writeFile(staticNodesFile, enodes, 'utf8')
 }
 
-async function attemptGethCorruptionFix(geth: RNGeth) {
+async function attemptGethCorruptionFix() {
   const deleteChainDataResult = await deleteChainData()
   const deleteGethLockResult = await deleteGethLockFile()
   if (deleteChainDataResult && deleteGethLockResult) {
-    await geth.start()
-    gethBridge = geth
-    await geth.subscribeNewHead()
+    await GethBridge.startNode()
+    await GethBridge.subscribeNewHead()
   } else {
     throw new Error('Failed to fix Geth and restart')
   }
