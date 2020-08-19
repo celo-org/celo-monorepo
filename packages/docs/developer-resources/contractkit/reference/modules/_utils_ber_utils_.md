@@ -15,7 +15,7 @@
 
 ▸ **asn1FromPublicKey**(`bn`: BigNumber): *Buffer*
 
-*Defined in [contractkit/src/utils/ber-utils.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/ber-utils.ts#L20)*
+*Defined in [contractkit/src/utils/ber-utils.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/ber-utils.ts#L23)*
 
 This is used only for mocking
 Creates an asn1 key to emulate KMS response
@@ -34,7 +34,7 @@ ___
 
 ▸ **parseBERSignature**(`b`: Buffer): *object*
 
-*Defined in [contractkit/src/utils/ber-utils.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/ber-utils.ts#L41)*
+*Defined in [contractkit/src/utils/ber-utils.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/ber-utils.ts#L44)*
 
 AWS returns DER encoded signatures but DER is valid BER
 

@@ -115,7 +115,7 @@ ___
 
 ▸ **getAddressFromPublicKey**(`publicKey`: BigNumber): *[Address](_base_.md#address)*
 
-*Defined in [contractkit/src/utils/signing-utils.ts:255](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L255)*
+*Defined in [contractkit/src/utils/signing-utils.ts:250](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L250)*
 
 **Parameters:**
 
