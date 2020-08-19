@@ -1,6 +1,6 @@
 # Recovering CELO from Alfajores Wallet
 
-In this guide, steps are outlined to help you recover your Mainnet [CELO (previously Celo Gold)](../overview.md#background-and-key-concepts) if you accidentally transferred them to your [Alfajores Testnet](../getting-started/alfajores-test.md) wallet.
+In this guide, steps are outlined to help you recover your Mainnet [CELO (previously Celo Gold)](../overview.md#background-and-key-concepts) if you accidentally transferred them to your [Alfajores Testnet](../getting-started/alfajores-testnet.md) wallet.
 
 ## Prerequisites
 
