@@ -25,8 +25,10 @@
 - [Understanding ReleaseGold](celo-holder-guide/release-gold.md)
 - [Voting on Validator Groups](celo-holder-guide/voting-validators.md)
 - [Voting on Governance](celo-holder-guide/voting-governance.md)
-- [Recovering CELO from an Ethereum Address](celo-holder-guide/eth-recovery.md)
-- [Recovering CELO from Alfajores Wallet](celo-holder-guide/alfajores-recovery.md)
+
+## Recover CELO from Other Wallets
+- [Recovering CELO from an Ethereum Address](recover-celo/eth-recovery.md)
+- [Recovering CELO from Alfajores Wallet](recover-celo/alfajores-recovery.md)
 
 ## Validator Guide
 
