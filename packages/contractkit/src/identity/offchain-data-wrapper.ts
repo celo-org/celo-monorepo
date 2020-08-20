@@ -60,7 +60,7 @@ export default class OffchainDataWrapper {
       return Err(new NoStorageRootProvidedData())
     }
 
-    const item = await (await Promise.all(storageRoots.map((_) => _.readAsResult(dataPath)))).find(
+    const item = (await Promise.all(storageRoots.map((_) => _.readAsResult(dataPath)))).find(
       (_) => _.ok
     )
 
