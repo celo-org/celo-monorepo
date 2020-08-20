@@ -1,5 +1,6 @@
 import dotProp from 'dot-prop-immutable'
 import { RehydrateAction } from 'redux-persist'
+import { Actions as AccountActions, ClearStoredAccountAction } from 'src/account/actions'
 import { Actions, ActionTypes } from 'src/identity/actions'
 import { ContactMatches, ImportContactsStatus, VerificationStatus } from 'src/identity/types'
 import { AttestationCode } from 'src/identity/verification'
@@ -19,6 +20,10 @@ export interface E164NumberToAddressType {
 
 export interface E164NumberToSaltType {
   [e164PhoneNumber: string]: string | null // null means unverified
+}
+
+export interface AddressToDataEncryptionKeyType {
+  [address: string]: string | null // null means no DEK registered
 }
 
 export interface ImportContactProgress {
@@ -56,6 +61,7 @@ export interface State {
   // Note: Do not access values in this directly, use the `getAddressFromPhoneNumber` helper in contactMapping
   e164NumberToAddress: E164NumberToAddressType
   e164NumberToSalt: E164NumberToSaltType
+  addressToDataEncryptionKey: AddressToDataEncryptionKeyType
   // Has the user already been asked for contacts permission
   askedContactsPermission: boolean
   importContactsProgress: ImportContactProgress
@@ -73,6 +79,7 @@ const initialState: State = {
   addressToE164Number: {},
   e164NumberToAddress: {},
   e164NumberToSalt: {},
+  addressToDataEncryptionKey: {},
   askedContactsPermission: false,
   importContactsProgress: {
     status: ImportContactsStatus.Stopped,
@@ -85,7 +92,7 @@ const initialState: State = {
 
 export const reducer = (
   state: State | undefined = initialState,
-  action: ActionTypes | RehydrateAction
+  action: ActionTypes | RehydrateAction | ClearStoredAccountAction
 ): State => {
   switch (action.type) {
     case REHYDRATE: {
@@ -113,26 +120,28 @@ export const reducer = (
       return {
         ...state,
         verificationStatus: action.status,
-        // Reset accepted codes on fail otherwise there's no way for user
-        // to try again with same codes
-        acceptedAttestationCodes:
-          action.status === VerificationStatus.Failed ? [] : state.acceptedAttestationCodes,
       }
     case Actions.SET_SEEN_VERIFICATION_NUX:
       return {
         ...state,
         hasSeenVerificationNux: action.status,
       }
+    case Actions.SET_COMPLETED_CODES:
+      return {
+        ...state,
+        ...completeCodeReducer(state, action.numComplete),
+      }
+
     case Actions.INPUT_ATTESTATION_CODE:
       return {
         ...state,
         attestationCodes: [...state.attestationCodes, action.code],
-        acceptedAttestationCodes: [...state.acceptedAttestationCodes, action.code],
       }
     case Actions.COMPLETE_ATTESTATION_CODE:
       return {
         ...state,
-        ...completeCodeReducer(state, state.numCompleteAttestations + action.numComplete),
+        ...completeCodeReducer(state, state.numCompleteAttestations + 1),
+        acceptedAttestationCodes: [...state.acceptedAttestationCodes, action.code],
       }
     case Actions.UPDATE_E164_PHONE_NUMBER_ADDRESSES:
       return {
@@ -237,6 +246,24 @@ export const reducer = (
           `${action.e164Number}.isFetchingAddresses`,
           false
         ),
+      }
+    case Actions.UPDATE_ADDRESS_DEK_MAP:
+      return {
+        ...state,
+        addressToDataEncryptionKey: dotProp.set(
+          state.addressToDataEncryptionKey,
+          action.address,
+          action.dataEncryptionKey
+        ),
+      }
+    case AccountActions.CLEAR_STORED_ACCOUNT:
+      return {
+        ...initialState,
+        addressToE164Number: state.addressToE164Number,
+        e164NumberToAddress: state.e164NumberToAddress,
+        e164NumberToSalt: state.e164NumberToSalt,
+        matchedContacts: state.matchedContacts,
+        secureSendPhoneNumberMapping: state.secureSendPhoneNumberMapping,
       }
     default:
       return state

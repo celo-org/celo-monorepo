@@ -17,7 +17,7 @@ export ENVFILE="${ENVFILE:-.env.test}"
 # TODO ^ release doesn't work currently b.c. the run_app.sh script assumes we want a debug build
 
 PLATFORM=""
-VD_NAME="Nexus_5X_API_28_x86"
+VD_NAME="Pixel_API_29_AOSP_x86_64"
 FAST=false
 RELEASE=false
 NET_DELAY="none"
@@ -134,7 +134,14 @@ if [ $PLATFORM = "android" ]; then
   fi
 
   echo "Starting the emulator"
-  $ANDROID_SDK_ROOT/emulator/emulator -avd $VD_NAME -no-boot-anim -noaudio -gpu swiftshader_indirect -no-snapshot -no-window -netdelay $NET_DELAY &
+  $ANDROID_SDK_ROOT/emulator/emulator \
+    -avd $VD_NAME \
+    -no-boot-anim \
+    -noaudio \
+    -no-snapshot \
+    -netdelay $NET_DELAY \
+    ${CI:+-gpu swiftshader_indirect -no-window} \
+    &
 
   echo "Waiting for device to connect to Wifi, this is a good proxy the device is ready"
   until [ `adb shell dumpsys wifi | grep "mNetworkInfo" | grep "state: CONNECTED" | wc -l` -gt 0 ]

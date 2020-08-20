@@ -15,10 +15,12 @@
   "celoDollarAmount_plural": "<0></0> {{CeloDollars}}",
   "addDescription": "Agregar descripción",
   "sentTo": "Enviado A",
+  "withdrawnTo": "Retirado en",
   "receivedFrom": "Recibido De",
   "accountNumberLabel": "Cuenta\nNo.",
   "commentLabel": "Mensaje",
   "amountSent": "Cantidad Enviada",
+  "amountCeloWithdrawn": "Cantidad (CELO)",
   "fee": "Comisión",
   "securityFee": "Comisión de seguridad",
   "inviteFee": "Comisión de Invitación",
@@ -113,5 +115,13 @@
   "addressConfirmed": "Número de cuenta confirmado",
   "sending": "Enviando",
   "feeActual": "Tarifas",
-  "feeEstimate": "Tarifas estimadas"
+  "feeEstimate": "Tarifas estimadas",
+  "encryption": {
+    "warningLabel": "Este comentario no será encriptado",
+    "warningModalHeader": "Sobre Cifrado",
+    "warningModalBody": "El cifrado garantiza que sus comentarios se mantengan privados. Valora utiliza el cifrado en los comentarios de transacciones cuando el remitente y el receptor tienen esta función configurada. La configuración normalmente se realizará automáticamente una vez que un usuario envíe su primera transacción.",
+    "feeLabel": "Tarifa de Cifrado Unica",
+    "feeModalHeader": "Tarifa de Cifrado Unica",
+    "feeModalBody": "El cifrado ayuda a mantener la privacidad de sus datos confidenciales. Se agrega una pequeña tarifa única a su primera transacción para configurar el cifrado. Esto garantiza que sus comentarios se enviarán de forma segura y privada."
+  }
 }

@@ -1,7 +1,8 @@
 import { newKit } from '@celo/contractkit'
+import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
+import { RETRY_COUNT, RETRY_DELAY_IN_MS } from '@celo/phone-number-privacy-common'
 import { retryAsyncWithBackOff } from '@celo/utils/lib/async'
-import { RETRY_COUNT, RETRY_DELAY_IN_MS } from '../common/constants'
 import logger from '../common/logger'
 import config from '../config'
 
@@ -35,6 +36,18 @@ export async function isVerified(account: string, hashedPhoneNumber: string): Pr
         `Account ${account} is verified=${_isVerified} with ${completed} completed attestations, ${numAttestationsRemaining} remaining, total of ${total} requested.`
       )
       return _isVerified
+    },
+    RETRY_COUNT,
+    [],
+    RETRY_DELAY_IN_MS
+  )
+}
+
+export async function getDataEncryptionKey(address: string): Promise<string> {
+  return retryAsyncWithBackOff(
+    async () => {
+      const accountWrapper: AccountsWrapper = await getContractKit().contracts.getAccounts()
+      return accountWrapper.getDataEncryptionKey(address)
     },
     RETRY_COUNT,
     [],

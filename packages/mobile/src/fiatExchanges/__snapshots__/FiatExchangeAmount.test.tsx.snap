@@ -45,7 +45,7 @@ exports[`FiatExchangeAmount renders correctly 1`] = `
               }
             }
           >
-            global:amount
+            amountCelo
           </Text>
         </View>
         <TextInput
@@ -57,112 +57,26 @@ exports[`FiatExchangeAmount renders correctly 1`] = `
           placeholderTextColor="#B4B9BD"
           rejectResponderTermination={true}
           style={
-            Object {
-              "color": "#1AB775",
-              "flex": 1,
-              "fontFamily": "Inter-Regular",
-              "fontSize": 19,
-              "height": 48,
-              "lineHeight": 27,
-              "marginLeft": 10,
-              "textAlign": "right",
-            }
+            Array [
+              Object {
+                "color": "#2E3338",
+                "flex": 1,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 19,
+                "height": 48,
+                "lineHeight": 27,
+                "marginLeft": 10,
+                "textAlign": "right",
+              },
+              Object {
+                "color": "#9C6E00",
+              },
+            ]
           }
           testID="FiatExchangeInput"
           underlineColorAndroid="transparent"
           value=""
         />
-      </View>
-      <View
-        style={
-          Array [
-            Object {
-              "flexDirection": "row",
-              "justifyContent": "space-between",
-              "marginVertical": 5,
-            },
-            undefined,
-          ]
-        }
-      >
-        <View
-          style={
-            Object {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "marginRight": 5,
-            }
-          }
-        >
-          <Text
-            style={
-              Array [
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "lineHeight": 24,
-                },
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Inter-Regular",
-                  "fontSize": 14,
-                  "lineHeight": 18,
-                },
-              ]
-            }
-          >
-            Celo Dollars @ 
-            <Text
-              numberOfLines={1}
-              style={
-                Array [
-                  undefined,
-                  Object {
-                    "color": undefined,
-                  },
-                ]
-              }
-            >
-              
-              $
-              1.33
-            </Text>
-          </Text>
-        </View>
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 24,
-              },
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Inter-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-            ]
-          }
-        >
-          <Text
-            numberOfLines={1}
-            style={
-              Array [
-                undefined,
-                Object {
-                  "color": undefined,
-                },
-              ]
-            }
-          >
-            
-            0.00
-          </Text>
-        </Text>
       </View>
     </View>
   </RCTScrollView>
@@ -178,7 +92,7 @@ exports[`FiatExchangeAmount renders correctly 1`] = `
       }
     }
   >
-    dollarsNotYetEnabledNote disclaimerCeloDollars
+    dollarsNotYetEnabledNote
   </Text>
   <View
     style={
@@ -223,7 +137,7 @@ exports[`FiatExchangeAmount renders correctly 1`] = `
         style={
           Object {
             "alignItems": "center",
-            "backgroundColor": "#97DFC1",
+            "backgroundColor": "#F1F0EB",
             "flexGrow": 1,
             "height": 48,
             "justifyContent": "center",
@@ -238,7 +152,7 @@ exports[`FiatExchangeAmount renders correctly 1`] = `
           accessibilityLabel="global:next"
           style={
             Object {
-              "color": "#FFFFFF",
+              "color": "#9CA4A9",
               "fontFamily": "Inter-SemiBold",
               "fontSize": 16,
               "lineHeight": 22,

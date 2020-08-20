@@ -1,0 +1,563 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`WithdrawCeloReviewScreen renders correctly 1`] = `
+<RNCSafeAreaView
+  edges={
+    Array [
+      "bottom",
+    ]
+  }
+  style={
+    Object {
+      "flex": 1,
+      "justifyContent": "space-between",
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "flex": 1,
+        "marginTop": 38,
+        "paddingHorizontal": 16,
+      }
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+            "marginVertical": 5,
+          },
+          undefined,
+        ]
+      }
+    >
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "marginRight": 5,
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+              },
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+              },
+            ]
+          }
+        >
+          exchangeFlow9:withdrawCeloTo
+        </Text>
+      </View>
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-Regular",
+              "fontSize": 16,
+              "lineHeight": 22,
+            },
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-Regular",
+              "fontSize": 16,
+              "lineHeight": 22,
+            },
+          ]
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-Regular",
+              "fontSize": 19,
+              "lineHeight": 22,
+            }
+          }
+        >
+          0xcc64...d23c
+        </Text>
+      </Text>
+    </View>
+    <View
+      style={
+        Object {
+          "borderStyle": "solid",
+          "borderTopColor": "#F8F9F9",
+          "borderTopWidth": 1,
+          "marginBottom": 15,
+          "marginTop": 10,
+          "width": "100%",
+        }
+      }
+    />
+    <View>
+      <View
+        style={
+          Array [
+            Object {
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "marginVertical": 5,
+            },
+            undefined,
+          ]
+        }
+      >
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "marginRight": 5,
+            }
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+              ]
+            }
+          >
+            exchangeFlow9:withdrawCeloAmount
+          </Text>
+        </View>
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+              },
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+              },
+            ]
+          }
+        >
+          <Text
+            numberOfLines={1}
+            style={
+              Array [
+                undefined,
+                Object {
+                  "color": undefined,
+                },
+              ]
+            }
+          >
+            
+            
+            5.001
+          </Text>
+        </Text>
+      </View>
+      <View>
+        <View
+          accessible={true}
+          focusable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
+            }
+          }
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          testID="feeDrawer/WithdrawCelo"
+        >
+          <View
+            style={
+              Object {
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  }
+                }
+              >
+                feeEstimate
+              </Text>
+              <View
+                style={
+                  Object {
+                    "transform": Array [
+                      Object {
+                        "rotate": "0deg",
+                      },
+                    ],
+                  }
+                }
+              >
+                <svg
+                  fill="none"
+                  height={16}
+                  viewBox="0 0 16 16"
+                  width={16}
+                >
+                  <path
+                    d="M3 6l5 5 5-5"
+                    stroke="#B4B9BD"
+                  />
+                </svg>
+              </View>
+            </View>
+            <View
+              style={
+                Array [
+                  Object {
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                    "marginVertical": 5,
+                  },
+                  undefined,
+                ]
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "marginRight": 5,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
+                      },
+                      undefined,
+                    ]
+                  }
+                >
+                  
+                </Text>
+              </View>
+              <View
+                style={
+                  Object {
+                    "transform": Array [
+                      Object {
+                        "scale": 0.7,
+                      },
+                    ],
+                  }
+                }
+              >
+                <ActivityIndicator
+                  animating={true}
+                  color="#42D689"
+                  hidesWhenStopped={true}
+                  size="small"
+                />
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Array [
+            Object {
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "marginVertical": 5,
+            },
+            undefined,
+          ]
+        }
+      >
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "marginRight": 5,
+            }
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+              ]
+            }
+          >
+            total
+          </Text>
+        </View>
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+              },
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-SemiBold",
+                "fontSize": 16,
+                "lineHeight": 22,
+              },
+            ]
+          }
+        >
+          <Text
+            numberOfLines={1}
+            style={
+              Array [
+                undefined,
+                Object {
+                  "color": undefined,
+                },
+              ]
+            }
+          >
+            
+            
+            5.001
+          </Text>
+        </Text>
+      </View>
+      <View
+        style={
+          Array [
+            Object {
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "marginVertical": 5,
+            },
+            Object {
+              "marginVertical": 0,
+            },
+          ]
+        }
+      >
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "marginRight": 5,
+            }
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+                Object {
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                },
+              ]
+            }
+          >
+            Celo Dollars @
+             
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  undefined,
+                  Object {
+                    "color": undefined,
+                  },
+                ]
+              }
+            >
+              
+              $
+              0.75
+            </Text>
+          </Text>
+        </View>
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+              },
+              Object {
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
+              },
+            ]
+          }
+        >
+          <Text
+            numberOfLines={1}
+            style={
+              Array [
+                undefined,
+                Object {
+                  "color": undefined,
+                },
+              ]
+            }
+          >
+            
+            5.001
+          </Text>
+        </Text>
+      </View>
+    </View>
+  </View>
+  <View
+    style={
+      Array [
+        Object {
+          "flexDirection": "column",
+        },
+        Object {
+          "padding": 16,
+        },
+      ]
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {
+            "overflow": "hidden",
+          },
+          Object {
+            "borderRadius": 100,
+          },
+        ]
+      }
+    >
+      <View
+        accessible={true}
+        focusable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "alignItems": "center",
+            "backgroundColor": "#EEB93C",
+            "flexGrow": 1,
+            "height": 48,
+            "justifyContent": "center",
+            "opacity": undefined,
+            "paddingHorizontal": 24,
+            "paddingVertical": 5,
+          }
+        }
+        testID="ConfirmWithdrawButton"
+      >
+        <Text
+          style={
+            Object {
+              "color": "#FFFFFF",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 16,
+              "lineHeight": 22,
+            }
+          }
+        >
+          global:withdraw
+        </Text>
+      </View>
+    </View>
+  </View>
+</RNCSafeAreaView>
+`;

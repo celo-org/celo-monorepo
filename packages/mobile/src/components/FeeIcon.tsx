@@ -22,7 +22,7 @@ interface State {
 // /* tslint:disable:max-classes-per-file */
 class FeeIcon extends React.Component<Props, State> {
   static defaultProps = {
-    tintColor: colors.lightGray,
+    tintColor: colors.gray3,
   }
 
   state = {
@@ -81,6 +81,18 @@ export const SecurityFeeIcon = ({ tintColor }: Pick<Props, 'tintColor'>) => {
     <FeeIcon
       title={t('securityFee')}
       description={t('feeEducation')}
+      dismissText={t('global:dismiss')}
+      tintColor={tintColor}
+    />
+  )
+}
+
+export const EncryptionFeeIcon = ({ tintColor }: Pick<Props, 'tintColor'>) => {
+  const { t } = useTranslation(Namespaces.sendFlow7)
+  return (
+    <FeeIcon
+      title={t('encryption.feeLabel')}
+      description={t('encryption.feeModalBody')}
       dismissText={t('global:dismiss')}
       tintColor={tintColor}
     />

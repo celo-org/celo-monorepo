@@ -33,12 +33,10 @@ class DappKitTxDataScreen extends React.Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
     justifyContent: 'space-between',
   },
   scrollContainer: {
     flex: 1,
-    backgroundColor: colors.background,
     marginHorizontal: '5%',
   },
   header: {
@@ -49,7 +47,7 @@ const styles = StyleSheet.create({
   bodyText: {
     ...fontStyles.paragraph,
     fontSize: 15,
-    color: colors.darkSecondary,
+    color: colors.gray5,
   },
 })
 
