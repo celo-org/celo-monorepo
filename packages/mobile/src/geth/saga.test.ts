@@ -2,7 +2,7 @@ import { GenesisBlockUtils, StaticNodeUtils } from '@celo/contractkit'
 import GethBridge from 'react-native-geth'
 import { expectSaga } from 'redux-saga-test-plan'
 import { InitializationState } from 'src/geth/reducer'
-import { GethInitOutcomes, initGethSaga, waitForGethInit } from 'src/geth/saga'
+import { _waitForGethInit, GethInitOutcomes, initGethSaga } from 'src/geth/saga'
 import { createMockStore } from 'test/utils'
 
 describe(initGethSaga, () => {
@@ -21,7 +21,7 @@ describe(initGethSaga, () => {
 
   it('initializes the bridge and starts the node', async () => {
     const state = createMockStore({}).getState()
-    await expectSaga(waitForGethInit)
+    await expectSaga(_waitForGethInit)
       .withState(state)
       .returns(GethInitOutcomes.SUCCESS)
       .run()
@@ -31,7 +31,7 @@ describe(initGethSaga, () => {
 
   it('initializes the bridge but does not start the node in data-saver mode', async () => {
     const state = createMockStore({ web3: { fornoMode: true } }).getState()
-    await expectSaga(waitForGethInit)
+    await expectSaga(_waitForGethInit)
       .withState(state)
       .returns(GethInitOutcomes.SUCCESS)
       .run()

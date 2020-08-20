@@ -7,8 +7,7 @@ import { decodeSig } from '../../utils/signing-utils'
 import { Signer } from './signer'
 
 const INCORRECT_PASSWORD_ERROR = 'could not decrypt key with given password'
-
-const currentTimeInSeconds = () => Math.round(Date.now() / 1000)
+const currentTimeInSeconds = () => Math.floor(Date.now() / 1000)
 
 const toRpcHex = (val: string | number | BigNumber | BN | undefined) => {
   if (typeof val === 'number' || val instanceof BigNumber) {

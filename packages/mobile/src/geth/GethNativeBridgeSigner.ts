@@ -12,7 +12,7 @@ import { GethNativeModule } from 'react-native-geth'
 import { Tx } from 'web3-core'
 
 const INCORRECT_PASSWORD_ERROR = 'could not decrypt key with given password'
-const currentTimeInSeconds = () => Math.round(Date.now() / 1000)
+const currentTimeInSeconds = () => Math.floor(Date.now() / 1000)
 
 /**
  * Implements the signer interface on top of a RNGeth instance

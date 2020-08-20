@@ -1,6 +1,6 @@
 /**
- * This file is called 'contracts' but it's responsibilies have changed over time.
- * It now manages contractKit and gethWallet initialization.
+ * This file is called 'contracts' but it's responsibilities have changed over time.
+ * It now manages contractKit and wallet initialization.
  * Leaving the name for recognizability to current devs
  */
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
@@ -24,16 +24,16 @@ const TAG = 'web3/contracts'
 const KIT_INIT_RETRY_DELAY = 2000
 const CONTRACT_KIT_RETRIES = 3
 
-let gethWallet: GethNativeBridgeWallet | undefined
+let wallet: GethNativeBridgeWallet | undefined
 let contractKit: ContractKit | undefined
 
 function* initWallet() {
   ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_wallet_start)
-  const wallet = new GethNativeBridgeWallet(GethBridge)
+  const newWallet = new GethNativeBridgeWallet(GethBridge)
   ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_wallet_finish)
-  yield call([wallet, wallet.init])
+  yield call([newWallet, newWallet.init])
   ValoraAnalytics.track(ContractKitEvents.init_contractkit_init_wallet_finish)
-  return wallet
+  return newWallet
 }
 
 function* initWeb3() {
@@ -56,7 +56,7 @@ export function* initContractKit() {
   // listen for this readiness
   while (retries > 0) {
     try {
-      if (contractKit || gethWallet) {
+      if (contractKit || wallet) {
         throw new Error('Kit not properly destroyed')
       }
 
@@ -71,14 +71,14 @@ export function* initContractKit() {
       Logger.info(`${TAG}@initContractKit`, `Initializing contractkit, forno mode: ${fornoMode}`)
       Logger.info(`${TAG}@initContractKit`, 'Initializing wallet')
 
-      gethWallet = yield call(initWallet)
+      wallet = yield call(initWallet)
       const web3 = yield call(initWeb3)
 
       Logger.info(
         `${TAG}@initContractKit`,
-        `Initialized wallet with accounts: ${gethWallet?.getAccounts()}`
+        `Initialized wallet with accounts: ${wallet?.getAccounts()}`
       )
-      contractKit = newKitFromWeb3(web3, gethWallet)
+      contractKit = newKitFromWeb3(web3, wallet)
       Logger.info(`${TAG}@initContractKit`, 'Initialized kit')
       ValoraAnalytics.track(ContractKitEvents.init_contractkit_finish)
       initContractKitLock = false
@@ -113,68 +113,74 @@ export function* initContractKit() {
 export function destroyContractKit() {
   Logger.debug(`${TAG}@closeContractKit`)
   contractKit = undefined
-  gethWallet = undefined
+  wallet = undefined
 }
 
 let initContractKitLock = false
 
-async function waitForContractKit(tries: number) {
+async function waitForContractKitAsync(tries: number) {
   while (!contractKit) {
-    Logger.warn(`${TAG}@getContractKitAsync`, 'Contract Kit not yet initalized')
+    Logger.warn(`${TAG}@waitForContractKitAsync`, 'Contract Kit not yet initalized')
     if (tries > 0) {
-      Logger.warn(`${TAG}@getContractKitAsync`, 'Sleeping then retrying')
+      Logger.warn(`${TAG}@waitForContractKitAsync`, 'Sleeping then retrying')
       tries -= 1
       await sleep(1000)
     } else {
-      throw new Error('Contract kit intialization timeout')
+      throw new Error('Contract kit initialisation timeout')
     }
   }
+  return contractKit
 }
 
-export function* getContractKit() {
+export async function* getContractKit() {
   if (!contractKit) {
     if (initContractKitLock) {
-      yield waitForContractKit(10)
+      await waitForContractKitAsync(10)
     } else {
       initContractKitLock = true
       yield call(initContractKit)
     }
   }
-  return contractKit!
+  return contractKit
 }
 
 // Used for cases where CK must be access outside of a saga
 export async function getContractKitAsync(): Promise<ContractKit> {
-  await waitForContractKit(10)
-  return contractKit!
+  await waitForContractKitAsync(10)
+  if (!contractKit) {
+    Logger.warn(`${TAG}@getContractKitAsync`, 'contractKit is undefined')
+    throw new Error('contractKit is undefined')
+  }
+  return contractKit
 }
 
-export function* getWallet() {
-  if (!gethWallet) {
+export async function* getWallet() {
+  if (!wallet) {
     if (initContractKitLock) {
-      yield waitForContractKit(10)
+      await waitForContractKitAsync(10)
     } else {
       initContractKitLock = true
       yield call(initContractKit)
     }
   }
 
-  return gethWallet
+  return wallet
 }
 
 // Used for cases where the wallet must be access outside of a saga
 export async function getWalletAsync() {
-  if (!gethWallet) {
-    await getContractKitAsync()
+  if (!wallet) {
+    await waitForContractKitAsync(10)
   }
 
-  if (!gethWallet) {
+  if (!wallet) {
+    Logger.warn(`${TAG}@getWalletAsync`, 'gethWallet is undefined')
     throw new Error(
       'Geth wallet still undefined even after contract kit init. Should never happen.'
     )
   }
 
-  return gethWallet
+  return wallet
 }
 
 // Convinience util for getting the kit's web3 instance
@@ -186,5 +192,5 @@ export function* getWeb3() {
 // Used for cases where the kit's web3 must be accessed outside a saga
 export async function getWeb3Async(): Promise<Web3> {
   const kit = await getContractKitAsync()
-  return kit?.web3!
+  return kit.web3
 }

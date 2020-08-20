@@ -111,7 +111,7 @@ export function* waitForNextBlock() {
   }
 }
 
-export function* waitForGethInit() {
+function* waitForGethInit() {
   try {
     const fornoMode = yield select(fornoSelector)
     const gethInitialized = yield call(initGeth, !fornoMode)
@@ -133,6 +133,8 @@ export function* waitForGethInit() {
     }
   }
 }
+
+export const _waitForGethInit = waitForGethInit
 
 export function* initGethSaga() {
   Logger.debug(TAG, 'Initializing Geth')

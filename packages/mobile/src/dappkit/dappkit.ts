@@ -1,4 +1,3 @@
-import { Wallet } from '@celo/contractkit/lib/wallets/wallet'
 import {
   AccountAuthRequest,
   AccountAuthResponseSuccess,
@@ -14,7 +13,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { navigateToURI } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
-import { getWallet } from 'src/web3/contracts'
+import { getWeb3 } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 
@@ -59,7 +58,7 @@ function* produceTxSignature(action: RequestTxSignatureAction) {
   Logger.debug(TAG, 'Producing tx signature')
 
   yield call(getConnectedUnlockedAccount)
-  const wallet: Wallet = yield call(getWallet)
+  const web3 = yield call(getWeb3)
 
   const rawTxs = yield Promise.all(
     action.request.txs.map(async (tx) => {
@@ -88,7 +87,7 @@ function* produceTxSignature(action: RequestTxSignatureAction) {
         params.to = tx.to
       }
       Logger.debug(TAG, 'Signing tx with params', JSON.stringify(params))
-      const signedTx = await wallet.signTransaction(params)
+      const signedTx = await web3.eth.signTransaction(params)
       return signedTx.raw
     })
   )
