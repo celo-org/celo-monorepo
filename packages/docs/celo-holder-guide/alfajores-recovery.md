@@ -37,7 +37,7 @@ Open the command-line interface on your computer. Write your recovery phrase to 
 Recover your Alfajores address on Celo Mainnet:
 
 ```
-celocli account:recover-old --mnemonicPath recovery.txt --node https://rc1-forno.celo-testnet.org
+celocli account:recover-old --mnemonicPath recovery.txt
 ```
 
 This command will return you with:
