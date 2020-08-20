@@ -118,6 +118,20 @@ export function destroyContractKit() {
 
 let initContractKitLock = false
 
+function* waitForContractKit(tries: number) {
+  while (!contractKit) {
+    Logger.warn(`${TAG}@waitForContractKitAsync`, 'Contract Kit not yet initalized')
+    if (tries > 0) {
+      Logger.warn(`${TAG}@waitForContractKitAsync`, 'Sleeping then retrying')
+      tries -= 1
+      yield sleep(1000)
+    } else {
+      throw new Error('Contract kit initialisation timeout')
+    }
+  }
+  return contractKit
+}
+
 async function waitForContractKitAsync(tries: number) {
   while (!contractKit) {
     Logger.warn(`${TAG}@waitForContractKitAsync`, 'Contract Kit not yet initalized')
@@ -132,10 +146,10 @@ async function waitForContractKitAsync(tries: number) {
   return contractKit
 }
 
-export async function* getContractKit() {
+export function* getContractKit() {
   if (!contractKit) {
     if (initContractKitLock) {
-      await waitForContractKitAsync(10)
+      yield call(waitForContractKit, 10)
     } else {
       initContractKitLock = true
       yield call(initContractKit)
@@ -154,10 +168,10 @@ export async function getContractKitAsync(): Promise<ContractKit> {
   return contractKit
 }
 
-export async function* getWallet() {
+export function* getWallet() {
   if (!wallet) {
     if (initContractKitLock) {
-      await waitForContractKitAsync(10)
+      yield call(waitForContractKit, 10)
     } else {
       initContractKitLock = true
       yield call(initContractKit)
