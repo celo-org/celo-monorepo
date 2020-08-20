@@ -116,6 +116,7 @@ const deployImplementation = async (contractName: string, Contract: any, dryRun:
 const deployProxy = async (
   contractName: string,
   contract: any,
+  addresses: ContractAddresses,
   initializationData: any,
   dryRun: boolean
 ) => {
@@ -140,7 +141,7 @@ const deployProxy = async (
   if (initializeAbi) {
     const args = initializationData[contractName]
     console.log(`Initializing ${contractName} with: ${args}`)
-    if (!argv.dry_run) {
+    if (!dryRun) {
       await setAndInitializeImplementation(
         web3,
         proxy,
@@ -151,7 +152,7 @@ const deployProxy = async (
       )
     }
   } else {
-    if (!argv.dry_run) {
+    if (!dryRun) {
       await proxy._setImplementation(contract.address)
     }
   }
@@ -224,6 +225,7 @@ module.exports = async (callback: (error?: any) => number) => {
             const proxy = await deployProxy(
               contractName,
               contract,
+              addresses,
               initializationData,
               argv.dry_run
             )
