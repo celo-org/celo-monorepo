@@ -39,6 +39,7 @@
   "testFaqLink": "Las Preguntas Frecuentes del {{appName}}",
   "termsOfServiceLink": "Las Condiciones de Servicio",
   "editProfile": "Editar perfil",
+  "confirmNumber": "Verificar número telefónico",
   "cancel": "Cancelar",
   "changeProfilePhoto": "Cambiar la foto de perfil",
   "name": "Apellido",
