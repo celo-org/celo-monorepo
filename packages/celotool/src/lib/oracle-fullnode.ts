@@ -8,7 +8,7 @@ import { getOracleContextDynamicEnvVarValues, getAWSClusterConfig, getAzureClust
 import { getCloudProviderFromOracleContext } from './oracle/utils'
 
 /**
- * Env vars corresponding to values required for a FullNodeDeploymentConfig
+ * Env vars corresponding to values required for a BaseFullNodeDeploymentConfig
  */
 const oracleContextFullNodeDeploymentEnvVars: {
   [k in keyof BaseFullNodeDeploymentConfig]: DynamicEnvVar
@@ -17,6 +17,10 @@ const oracleContextFullNodeDeploymentEnvVars: {
   replicas: DynamicEnvVar.ORACLE_TX_NODES_COUNT,
 }
 
+/**
+ * Maps each cloud provider to the correct function to get the appropriate full
+ * node deployment config
+ */
 const deploymentConfigGetterByCloudProvider: {
   [key in CloudProvider]: (oracleContext: string) => BaseFullNodeDeploymentConfig
 } = {
@@ -24,29 +28,46 @@ const deploymentConfigGetterByCloudProvider: {
   [CloudProvider.AZURE]: getAKSFullNodeDeploymentConfig,
 }
 
+/**
+ * Gets the appropriate cloud platform's full node deployer given the celoEnv
+ * and oracleContext.
+ */
 export function getFullNodeDeployerForOracleContext(celoEnv: string, oracleContext: string) {
   const cloudProvider: CloudProvider = getCloudProviderFromOracleContext(oracleContext)
   const deploymentConfig = deploymentConfigGetterByCloudProvider[cloudProvider](oracleContext)
   return getFullNodeDeployer(cloudProvider, celoEnv, deploymentConfig)
 }
 
+/**
+ * Uses the appropriate cloud platform's full node deployer to install the full
+ * node chart.
+ */
 export function installOracleFullNodeChart(celoEnv: string, oracleContext: string) {
   const deployer = getFullNodeDeployerForOracleContext(celoEnv, oracleContext)
   return deployer.installChart()
 }
 
+/**
+ * Uses the appropriate cloud platform's full node deployer to upgrade the full
+ * node chart.
+ */
 export function upgradeOracleFullNodeChart(celoEnv: string, oracleContext: string, reset: boolean) {
-  const deployer = getFullNodeDeployerForOracleContext(oracleContext, celoEnv)
+  const deployer = getFullNodeDeployerForOracleContext(celoEnv, oracleContext)
   return deployer.upgradeChart(reset)
 }
 
+/**
+ * Uses the appropriate cloud platform's full node deployer to remove the full
+ * node chart.
+ */
 export function removeOracleFullNodeChart(celoEnv: string, oracleContext: string) {
-  const deployer = getFullNodeDeployerForOracleContext(oracleContext, celoEnv)
+  const deployer = getFullNodeDeployerForOracleContext(celoEnv, oracleContext)
   return deployer.removeChart()
 }
 
 /**
- * Returns the base FullNodeDeploymentConfig independent of oracleContext
+ * Returns the BaseFullNodeDeploymentConfig that is not specific to a cloud
+ * provider for an oracleContext.
  */
 function getFullNodeDeploymentConfig(oracleContext: string) : BaseFullNodeDeploymentConfig {
   const fullNodeDeploymentEnvVarValues = getOracleContextDynamicEnvVarValues(
@@ -61,23 +82,23 @@ function getFullNodeDeploymentConfig(oracleContext: string) : BaseFullNodeDeploy
 }
 
 /**
- * For a given OracleAzureContext, returns the appropriate AKSFullNodeDeploymentConfig
+ * For a given oracleContext, returns the appropriate AKSFullNodeDeploymentConfig
  */
 function getAKSFullNodeDeploymentConfig(oracleContext: string): AKSFullNodeDeploymentConfig {
   const fullNodeDeploymentConfig: BaseFullNodeDeploymentConfig = getFullNodeDeploymentConfig(oracleContext)
   return {
-    clusterConfig: getAzureClusterConfig(oracleContext),
     ...fullNodeDeploymentConfig,
+    clusterConfig: getAzureClusterConfig(oracleContext),
   }
 }
 
 /**
- * For a given OracleAwsContext, returns the appropriate AKSFullNodeDeploymentConfig
+ * For a given oracleContext, returns the appropriate AWSFullNodeDeploymentConfig
  */
 function getAWSFullNodeDeploymentConfig(oracleContext: string): AWSFullNodeDeploymentConfig {
   const fullNodeDeploymentConfig: BaseFullNodeDeploymentConfig = getFullNodeDeploymentConfig(oracleContext)
   return {
-    clusterConfig: getAWSClusterConfig(oracleContext),
     ...fullNodeDeploymentConfig,
+    clusterConfig: getAWSClusterConfig(oracleContext),
   }
 }

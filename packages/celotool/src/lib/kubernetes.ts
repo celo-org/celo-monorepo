@@ -50,7 +50,7 @@ export async function deleteResource(
   const run = () => execFn(`kubectl delete ${type} ${resourceName} --namespace ${namespace}`)
   if (allowFail) {
     try {
-      return run()
+      return await run()
     } catch (e) {
       console.info('Error deleting resource, not failing', e)
       return Promise.resolve()

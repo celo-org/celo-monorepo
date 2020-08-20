@@ -1,17 +1,19 @@
 import { range } from 'lodash'
 import sleep from 'sleep-promise'
 import { BaseFullNodeDeployer, BaseFullNodeDeploymentConfig } from './base'
-import { AwsClusterConfig, deallocateAWSStaticIP, registerAWSStaticIPIfNotRegistered } from '../aws'
+import { AwsClusterConfig, deallocateAWSStaticIP, describeElasticIPAddresses, getOrRegisterStaticIP } from '../aws'
 import { execCmdWithExitOnFailure } from '../cmd-utils'
 import { deleteResource } from '../kubernetes'
+// import { AWSClusterManager } from '../k8s-cluster/aws'
 
 export interface AWSFullNodeDeploymentConfig extends BaseFullNodeDeploymentConfig {
   clusterConfig: AwsClusterConfig
 }
 
 export class AWSFullNodeDeployer extends BaseFullNodeDeployer {
-  // constructor(deploymentConfig: AWSFullNodeDeploymentConfig) {
-  //   super(deploymentConfig)
+  // constructor(deploymentConfig: AWSFullNodeDeploymentConfig, celoEnv: string) {
+  //   super(deploymentConfig, celoEnv)
+  //
   // }
 
   async additionalHelmParameters() {
@@ -40,24 +42,81 @@ export class AWSFullNodeDeployer extends BaseFullNodeDeployer {
   async allocateStaticIPs() {
     console.info(`Creating static IPs on AWS for ${this.celoEnv}`)
     // const resourceGroup = await getAKSNodeResourceGroup(deploymentConfig.clusterConfig)
-    const resourceGroup = this.deploymentConfig.clusterConfig.resourceGroupTag
+    // const resourceGroup = this.deploymentConfig.clusterConfig.resourceGroupTag
     const { replicas } = this.deploymentConfig
-    if (false) {
-      // Deallocate static ip if we are scaling down the replica count
-      const existingStaticIPsCount = await this.getAWSStaticIPsCount(resourceGroup)
-      for (let i = existingStaticIPsCount - 1; i > replicas - 1; i--) {
-        await deleteResource(this.celoEnv, 'service', `${this.celoEnv}-fullnodes-${i}`, false)
-        await this.waitDeattachingStaticIP(`${this.staticIPNamePrefix}-${i}`, resourceGroup)
-        await deallocateAWSStaticIP(`${this.staticIPNamePrefix}-${i}`, resourceGroup)
+
+    // These are tags that we expect to be present for all IP addresses for this
+    // specific deployment if a deployment has occurred already
+    const existingTargetIPTags = {
+      resourceGroup: this.deploymentConfig.clusterConfig.resourceGroupTag,
+      celoEnv: this.celoEnv,
+      namePrefix: this.staticIPNamePrefix,
+    }
+    const existingIPs = await describeElasticIPAddresses(existingTargetIPTags)
+    // const existingIPNames =
+    console.log(JSON.stringify(existingIPs))
+    const subnets = await this.getPublicSubnets()
+
+    const tagsArrayToObject = (tagsArray: { [key: string]: string }[]) => {
+      const obj: { [key: string]: string } = {}
+      for (const tag of tagsArray) {
+        if (tag.hasOwnProperty('Key') && tag.hasOwnProperty('Value')) {
+          obj[tag['Key']] = tag['Value']
+        }
+      }
+      return obj
+    }
+
+    const releaseExistingIP = async (tags: { [key: string]: string }, serviceName?: string) => {
+      if (serviceName) {
+        await deleteResource(this.celoEnv, 'service', serviceName, true)
+      }
+      // await this.waitDeattachingStaticIP(ipName, resourceGroup)
+      await deallocateAWSStaticIP(tags)
+    }
+    // Remove any IPs that shouldn't exist
+    for (const existingIP of existingIPs.Addresses) {
+      const tags = tagsArrayToObject(existingIP.Tags)
+      // const serviceName
+      // index too large
+      const index = parseInt(tags.index, 10)
+      if (index === NaN) {
+        await releaseExistingIP(tags)
+        continue
+      }
+      const serviceName = `${this.celoEnv}-fullnodes-${index}`
+      if (index >= replicas) {
+        await releaseExistingIP(tags, serviceName)
+        continue
+      }
+      // subnet doesn't exist
+      if (!subnets.includes(tags.subnet)) {
+        await releaseExistingIP(tags, serviceName)
+        continue
       }
     }
 
-    const subnets = await this.getPublicSubnets()
+    // process.exit(1)
+
+    // if (false) {
+    //
+    //   // AWSClusterManager.describeElasticIPAddresses
+    //
+    //   // Deallocate static ip if we are scaling down the replica count
+    //   const existingStaticIPsCount = await this.getAWSStaticIPsCount(resourceGroup)
+    //   for (let i = existingStaticIPsCount - 1; i > replicas - 1; i--) {
+    //     await deleteResource(this.celoEnv, 'service', `${this.celoEnv}-fullnodes-${i}`, false)
+    //     await this.waitDeattachingStaticIP(`${this.staticIPNamePrefix}-${i}`, resourceGroup)
+    //     await deallocateAWSStaticIP(`${this.staticIPNamePrefix}-${i}`, resourceGroup)
+    //   }
+    // }
+
+
     const staticAllocationIdsPerFullNode = await Promise.all(
       range(replicas).map((i) =>
         Promise.all(
           subnets.map((subnet: string) =>
-            registerAWSStaticIPIfNotRegistered(`${this.staticIPNamePrefix}-${i}-${subnet}`, resourceGroup)
+            getOrRegisterStaticIP(this.getElasticIPTags(subnet, i))
           )
         )
       )
@@ -128,18 +187,29 @@ export class AWSFullNodeDeployer extends BaseFullNodeDeployer {
   }
 
   async deallocateIPs() {
-    console.info(`Deallocating static IPs on AWS for ${this.celoEnv}`)
+    // console.info(`Deallocating static IPs on AWS for ${this.celoEnv}`)
+    //
+    // const resourceGroup = this.deploymentConfig.clusterConfig.resourceGroupTag
+    // const replicaCount = await this.getAWSStaticIPsCount(resourceGroup)
+    //
+    // await this.waitDeattachingStaticIPs()
+    //
+    // await Promise.all(
+    //   range(replicaCount).map((i) =>
+    //     deallocateAWSStaticIP(`${this.staticIPNamePrefix}-${i}`, resourceGroup)
+    //   )
+    // )
+  }
 
-    const resourceGroup = this.deploymentConfig.clusterConfig.resourceGroupTag
-    const replicaCount = await this.getAWSStaticIPsCount(resourceGroup)
-
-    await this.waitDeattachingStaticIPs()
-
-    await Promise.all(
-      range(replicaCount).map((i) =>
-        deallocateAWSStaticIP(`${this.staticIPNamePrefix}-${i}`, resourceGroup)
-      )
-    )
+  getElasticIPTags(subnet: string, index: number) {
+    return {
+      Name: `${this.staticIPNamePrefix}-${index}-${subnet}`,
+      resourceGroup: this.deploymentConfig.clusterConfig.resourceGroupTag,
+      celoEnv: this.celoEnv,
+      namePrefix: this.staticIPNamePrefix,
+      index: index.toString(10),
+      subnet,
+    }
   }
 
   get deploymentConfig(): AWSFullNodeDeploymentConfig {

@@ -9,7 +9,7 @@ import {
 import { scaleResource } from '../kubernetes'
 
 
-const helmChartPath = '../../helm-charts/celo-fullnode'
+const helmChartPath = '../helm-charts/celo-fullnode'
 
 export interface BaseFullNodeDeploymentConfig {
   diskSizeGb: number
@@ -88,7 +88,7 @@ export abstract class BaseFullNodeDeployer {
   }
 
   get staticIPNamePrefix() {
-    return `${this.celoEnv}-nodes`
+    return `${this.celoEnv}-fullnodes`
   }
 
   get celoEnv(): string {
