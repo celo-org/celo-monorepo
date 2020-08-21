@@ -10,14 +10,14 @@ export interface AWSClusterConfig extends BaseClusterConfig {
 }
 
 export class AWSClusterManager extends BaseClusterManager {
+  async switchToSubscription() {
+    // TODO: not yet supported
+  }
+
   async getAndSwitchToClusterContext() {
     await execCmdWithExitOnFailure(
       `aws eks --region ${this.clusterConfig.clusterRegion} update-kubeconfig --name ${this.clusterConfig.clusterName} --alias ${this.clusterConfig.clusterName}`
     )
-  }
-
-  async switchToSubscription() {
-    // not yet supported
   }
 
   get clusterConfig(): AWSClusterConfig {

@@ -1,10 +1,9 @@
 import { range } from 'lodash'
-// import sleep from 'sleep-promise'
-import { BaseFullNodeDeployer, BaseFullNodeDeploymentConfig } from './base'
-import { deallocateAWSStaticIP, describeElasticIPAddresses, getOrRegisterElasticIP, getElasticIPAddressesFromAllocationIDs, tagsArrayToAWSResourceTags, waitForElasticIPAssociationIDRemoval } from '../aws'
+import { deallocateAWSStaticIP, describeElasticIPAddresses, getElasticIPAddressesFromAllocationIDs, getOrRegisterElasticIP, tagsArrayToAWSResourceTags, waitForElasticIPAssociationIDRemoval } from '../aws'
 import { execCmdWithExitOnFailure } from '../cmd-utils'
-import { deleteResource } from '../kubernetes'
 import { AWSClusterConfig } from '../k8s-cluster/aws'
+import { deleteResource } from '../kubernetes'
+import { BaseFullNodeDeployer, BaseFullNodeDeploymentConfig } from './base'
 
 export interface AWSFullNodeDeploymentConfig extends BaseFullNodeDeploymentConfig {
   clusterConfig: AWSClusterConfig
@@ -22,7 +21,6 @@ export class AWSFullNodeDeployer extends BaseFullNodeDeployer {
     const ipPerNode = await getElasticIPAddressesFromAllocationIDs(
       allocationIdsPerNode.map((allocationIDs: string[]) => allocationIDs[0])
     )
-    console.log('ipPerNode', ipPerNode)
 
     return [
       `--set geth.azure_provider=false`,
@@ -33,7 +31,11 @@ export class AWSFullNodeDeployer extends BaseFullNodeDeployer {
   }
 
   /**
-   * Returns a list of Allocation Ids corresponded to allocated static IPs
+   * AWS requires each load balancer to have N IP addresses where there N public
+   * subnets. An EKS cluster that is distributed across multiple availability zones
+   * will have multiple subnets. We therefore have each full node have N IP addresses,
+   * and return them in a 2d array of allocation IDs.
+   * This function will also remove any unused IP addresses from past deployments.
    * @param celoEnv
    * @param deploymentConfig
    */
@@ -50,7 +52,7 @@ export class AWSFullNodeDeployer extends BaseFullNodeDeployer {
       const tags = tagsArrayToAWSResourceTags(existingIP.Tags)
       // Ideally should never happen, but to be safe check
       const index = parseInt(tags.index, 10)
-      if (index === NaN) {
+      if (isNaN(index)) {
         deallocationPromises.push(this.deallocateElasticIP(existingIP.AllocationId))
         continue
       }
@@ -101,18 +103,6 @@ export class AWSFullNodeDeployer extends BaseFullNodeDeployer {
         this.deallocateElasticIP(elasticIP.AllocationId)
       )
     )
-    // console.info(`Deallocating static IPs on AWS for ${this.celoEnv}`)
-    //
-    // const resourceGroup = this.deploymentConfig.clusterConfig.resourceGroupTag
-    // const replicaCount = await this.getAWSStaticIPsCount(resourceGroup)
-    //
-    // await this.waitDeattachingStaticIPs()
-    //
-    // await Promise.all(
-    //   range(replicaCount).map((i) =>
-    //     deallocateAWSStaticIP(`${this.staticIPNamePrefix}-${i}`, resourceGroup)
-    //   )
-    // )
   }
 
   async deallocateElasticIP(allocationID: string, kubeServiceName?: string) {

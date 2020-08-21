@@ -5,7 +5,6 @@ import { BaseClusterConfig, BaseClusterManager, CloudProvider } from './base'
 const clusterManagerByCloudProvider: {
   [key in CloudProvider]: (clusterConfig: BaseClusterConfig, celoEnv: string) => BaseClusterManager
 } = {
-  // TODO need to change this to be AWS specific
   [CloudProvider.AWS]: (clusterConfig: BaseClusterConfig, celoEnv: string) => new AWSClusterManager(clusterConfig as AWSClusterConfig, celoEnv),
   [CloudProvider.AZURE]: (clusterConfig: BaseClusterConfig, celoEnv: string) => new AKSClusterManager(clusterConfig as AKSClusterConfig, celoEnv),
 }

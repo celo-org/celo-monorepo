@@ -4,8 +4,8 @@ import { AKSFullNodeDeploymentConfig } from './k8s-fullnode/aks'
 import { AWSFullNodeDeploymentConfig } from './k8s-fullnode/aws'
 import { BaseFullNodeDeploymentConfig } from './k8s-fullnode/base'
 import { getFullNodeDeployer } from './k8s-fullnode/utils'
-import { getOracleContextDynamicEnvVarValues, getAKSClusterConfig, getAWSClusterConfig } from './oracle'
-import { getCloudProviderFromOracleContext } from './oracle/utils'
+import { getAKSClusterConfig, getAWSClusterConfig, getOracleContextDynamicEnvVarValues } from './oracle'
+import { getCloudProviderFromOracleContext } from './oracle-utils'
 
 /**
  * Env vars corresponding to values required for a BaseFullNodeDeploymentConfig

@@ -1,6 +1,6 @@
 import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
-import { BaseClusterConfig, BaseClusterManager } from './base'
 import { outputIncludes } from '../utils'
+import { BaseClusterConfig, BaseClusterManager } from './base'
 
 export interface AKSClusterConfig extends BaseClusterConfig {
   tenantId: string
@@ -9,17 +9,6 @@ export interface AKSClusterConfig extends BaseClusterConfig {
 }
 
 export class AKSClusterManager extends BaseClusterManager {
-  async getAndSwitchToClusterContext() {
-    await execCmdWithExitOnFailure(
-      `az aks get-credentials --resource-group ${this.clusterConfig.resourceGroup} --name ${this.clusterConfig.clusterName} --subscription ${this.clusterConfig.subscriptionId} --overwrite-existing`
-    )
-  }
-
-  async setupCluster() {
-    await super.setupCluster()
-    await this.installAADPodIdentity()
-  }
-
   async switchToSubscription() {
     let currentTenantId = null
     try {
@@ -30,6 +19,17 @@ export class AKSClusterManager extends BaseClusterManager {
     if (currentTenantId === null || currentTenantId.trim() !== this.clusterConfig.tenantId) {
       await execCmdWithExitOnFailure(`az account set --subscription ${this.clusterConfig.subscriptionId}`)
     }
+  }
+
+  async getAndSwitchToClusterContext() {
+    await execCmdWithExitOnFailure(
+      `az aks get-credentials --resource-group ${this.clusterConfig.resourceGroup} --name ${this.clusterConfig.clusterName} --subscription ${this.clusterConfig.subscriptionId} --overwrite-existing`
+    )
+  }
+
+  async setupCluster() {
+    await super.setupCluster()
+    await this.installAADPodIdentity()
   }
 
   // installAADPodIdentity installs the resources necessary for AAD pod level identities

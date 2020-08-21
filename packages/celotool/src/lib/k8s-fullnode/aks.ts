@@ -1,9 +1,9 @@
 import { range } from 'lodash'
-import sleep from 'sleep-promise'
 import {
   deallocateStaticIP,
   getAKSNodeResourceGroup,
-  registerStaticIPIfNotRegistered
+  registerStaticIPIfNotRegistered,
+  waitForStaticIPDetachment
 } from '../azure'
 import { execCmdWithExitOnFailure } from '../cmd-utils'
 import { AKSClusterConfig } from '../k8s-cluster/aks'
@@ -31,7 +31,7 @@ export class AKSFullNodeDeployer extends BaseFullNodeDeployer {
     const existingStaticIPsCount = await this.getAzureStaticIPsCount(resourceGroup)
     for (let i = existingStaticIPsCount - 1; i > replicas - 1; i--) {
       await deleteResource(this.celoEnv, 'service', `${this.celoEnv}-fullnodes-${i}`, false)
-      await this.waitDeattachingStaticIP(`${this.staticIPNamePrefix}-${i}`, resourceGroup)
+      await waitForStaticIPDetachment(`${this.staticIPNamePrefix}-${i}`, resourceGroup)
       await deallocateStaticIP(`${this.staticIPNamePrefix}-${i}`, resourceGroup)
     }
 
@@ -46,7 +46,6 @@ export class AKSFullNodeDeployer extends BaseFullNodeDeployer {
     return addresses
   }
 
-
   async getAzureStaticIPsCount(resourceGroup: string) {
     const [staticIPsCount] = await execCmdWithExitOnFailure(
       `az network public-ip list --resource-group ${resourceGroup} --query "[?contains(name,'${this.staticIPNamePrefix}')].{Name:name, IPAddress:ipAddress}" -o tsv | wc -l`
@@ -60,7 +59,7 @@ export class AKSFullNodeDeployer extends BaseFullNodeDeployer {
     const resourceGroup = await getAKSNodeResourceGroup(this.deploymentConfig.clusterConfig)
     const replicaCount = await this.getAzureStaticIPsCount(resourceGroup)
 
-    await this.waitDeattachingStaticIPs()
+    await this.waitForAllStaticIPDetachment()
 
     await Promise.all(
       range(replicaCount).map((i) =>
@@ -69,31 +68,15 @@ export class AKSFullNodeDeployer extends BaseFullNodeDeployer {
     )
   }
 
-  async waitDeattachingStaticIPs() {
+  async waitForAllStaticIPDetachment() {
     const resourceGroup = await getAKSNodeResourceGroup(this.deploymentConfig.clusterConfig)
 
     await Promise.all(
       range(this.deploymentConfig.replicas).map((i) =>
-        this.waitDeattachingStaticIP(`${this.staticIPNamePrefix}-${i}`, resourceGroup)
+        waitForStaticIPDetachment(`${this.staticIPNamePrefix}-${i}`, resourceGroup)
       )
     )
   }
-
-  async waitDeattachingStaticIP(name: string, resourceGroup: string) {
-    const retries = 10
-    const sleepTime = 5
-    for (let i = 0; i <= retries; i++) {
-      const [allocated] = await execCmdWithExitOnFailure(
-        `az network public-ip show --resource-group ${resourceGroup} --name ${name} --query ipConfiguration.id -o tsv`
-      )
-      if (allocated.trim() === '') {
-        return true
-      }
-      sleep(sleepTime)
-    }
-    return false
-  }
-
 
   get deploymentConfig(): AKSFullNodeDeploymentConfig {
     return this._deploymentConfig as AKSFullNodeDeploymentConfig

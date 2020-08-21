@@ -1,7 +1,7 @@
+import { CloudProvider } from '../k8s-cluster/base'
 import { AKSFullNodeDeployer, AKSFullNodeDeploymentConfig } from './aks'
 import { AWSFullNodeDeployer, AWSFullNodeDeploymentConfig } from './aws'
 import { BaseFullNodeDeployer, BaseFullNodeDeploymentConfig } from './base'
-import { CloudProvider } from '../k8s-cluster/base'
 
 const fullNodeDeployerByCloudProvider: {
   [key in CloudProvider]: (deploymentConfig: BaseFullNodeDeploymentConfig, celoEnv: string) => BaseFullNodeDeployer

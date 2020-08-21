@@ -1,7 +1,7 @@
 import sleep from 'sleep-promise'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 
-export type AWSResourceTags = { [key: string]: string }
+export interface AWSResourceTags { [key: string]: string }
 
 /**
  * Registers an elastic IP address with the given tags if one does not already exist.
@@ -95,11 +95,11 @@ export async function describeElasticIPAddresses(tags: AWSResourceTags, cmdFlags
 
 // The AWS CLI gives tags in the form [{ "Key": "theKey", "Value": "theValue" }],
 // so we convert this into an object { "theKey": "theValue" }
-export function tagsArrayToAWSResourceTags(tagsArray: { [key: string]: string }[]): AWSResourceTags {
+export function tagsArrayToAWSResourceTags(tagsArray: Array<{ [key: string]: string }>): AWSResourceTags {
   const tags: AWSResourceTags = {}
   for (const tag of tagsArray) {
     if (tag.hasOwnProperty('Key') && tag.hasOwnProperty('Value')) {
-      tags[tag['Key']] = tag['Value']
+      tags[tag.Key] = tag.Value
     }
   }
   return tags

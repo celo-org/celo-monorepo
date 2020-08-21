@@ -1,3 +1,4 @@
+import sleep from 'sleep-promise'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { retryCmd } from 'src/lib/utils'
 import { AKSClusterConfig } from './k8s-cluster/aks'
@@ -138,4 +139,19 @@ export async function deallocateStaticIP(name: string, resourceGroupIP: string) 
   return execCmdWithExitOnFailure(
     `az network public-ip delete --resource-group ${resourceGroupIP} --name ${name}`
   )
+}
+
+export async function waitForStaticIPDetachment(name: string, resourceGroup: string) {
+  const maxTryCount = 15
+  const tryIntervalMs = 3000
+  for (let tryCount = 0; tryCount < maxTryCount; tryCount++) {
+    const [allocated] = await execCmdWithExitOnFailure(
+      `az network public-ip show --resource-group ${resourceGroup} --name ${name} --query ipConfiguration.id -o tsv`
+    )
+    if (allocated.trim() === '') {
+      return true
+    }
+    await sleep(tryIntervalMs)
+  }
+  throw Error(`Too many tries waiting for elastic IP association ID removal`)
 }
