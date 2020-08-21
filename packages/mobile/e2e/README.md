@@ -4,7 +4,7 @@
 
 These are the End-to-End (e2e) tests for the wallet mobile app. They run an emulator and simulate a user clicking through the app.
 
-## Setting up the Emulator
+## Setting up the VM
 
 ### Android
 
