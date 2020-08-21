@@ -66,7 +66,8 @@ function* doFetchPhoneHashPrivate(e164Number: string) {
   if (cachedSalt) {
     Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Salt was cached')
     const phoneHash = getPhoneHash(e164Number, cachedSalt)
-    return { e164Number, phoneHash, salt: cachedSalt }
+    const cachedDetails: PhoneNumberHashDetails = { e164Number, phoneHash, pepper: cachedSalt }
+    return cachedDetails
   }
 
   Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Salt was not cached, fetching')

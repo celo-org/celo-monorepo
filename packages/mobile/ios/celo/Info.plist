@@ -38,6 +38,7 @@
 	<key>FirebaseDynamicLinksCustomDomains</key>
 	<array>
 		<string>https://l.celo.org</string>
+		<string>https://vlra.app</string>
 	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
