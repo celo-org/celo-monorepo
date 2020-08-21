@@ -72,7 +72,7 @@ export async function deallocateAWSStaticIP(allocationID: string) {
  */
 export async function waitForElasticIPAssociationIDRemoval(allocationID: string) {
   const maxTryCount = 15
-  const tryIntervalSeconds = 5
+  const tryIntervalMs = 3000
   for (let tryCount = 0; tryCount < maxTryCount; tryCount++) {
     const associationID = await describeElasticIPAddresses({}, {
       'allocation-ids': allocationID,
@@ -81,7 +81,7 @@ export async function waitForElasticIPAssociationIDRemoval(allocationID: string)
     if (!associationID) {
       return
     }
-    await sleep(tryIntervalSeconds)
+    await sleep(tryIntervalMs)
   }
   throw Error(`Too many tries waiting for elastic IP association ID removal`)
 }
