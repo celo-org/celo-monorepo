@@ -1,44 +1,35 @@
+import sleep from 'sleep-promise'
 import { ClusterConfig } from 'src/lib/cloud-provider'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 
 /**
  * Basic info for an EKS cluster
  */
-export interface AwsClusterConfig extends ClusterConfig {
+export interface AWSClusterConfig extends ClusterConfig {
   clusterRegion: string,
   resourceGroupTag: string
 }
 
-// IP ADDRESS RELATED
-// IP addresses in AWS will have the following tags:
-// tag=resourceGroupTag Value=DynamicEnvVar.ORACLE_RESOURCE_GROUP_TAG
-// tag=IPNodeName Value=`${getStaticIPNamePrefix(celoEnv)}-${i}`
+export type AWSResourceTags = { [key: string]: string }
 
-export async function getOrRegisterStaticIP(tags: { [key: string]: string }) {
-  // This returns an array of matching Allocation Ids for IP addresses. If there is no matching IP
-  // address, an empty array is returned. We expect at most 1 matching Allocation ID
-
-  // const filters = Object.entries(tags).map(([key, value]) =>
-  //   `"Name=tag:${key},Values=${value}"`
-  // )
-  const existingAllocIds = await describeElasticIPAddresses(tags, 'Addresses[*].AllocationId')
-
-  // // This fetches the IP allocation ID that have the corresponding tag values of resourceGroup and name
-  // const [existingAllocIdsStr] = await execCmdWithExitOnFailure(
-  //   `aws ec2 describe-addresses --filters ${filters.join(' ')} --query 'Addresses[*].[AllocationId]' --output json`
-  // )
-  // const existingAllocIds = JSON.parse(existingAllocIdsStr)
+/**
+ * Registers an elastic IP address with the given tags if one does not already exist.
+ * @return the allocation id of the IP address.
+ */
+export async function getOrRegisterElasticIP(tags: AWSResourceTags) {
+  const existingAllocIds = await describeElasticIPAddresses(tags, { query: 'Addresses[*].AllocationId' })
   if (existingAllocIds.length) {
     console.info(`Skipping IP address registration, address with tags ${JSON.stringify(tags)} exists`)
     // We expect only 1 matching IP
     return existingAllocIds[0]
   }
-  console.info(`Registering IP address with tags ${JSON.stringify(tags)}`)
 
+  console.info(`Registering IP address with tags ${JSON.stringify(tags)}`)
   // Allocate address on AWS and store allocationID
-  const [allocationID] = await execCmdWithExitOnFailure(
+  const [allocationIDUntrimmed] = await execCmdWithExitOnFailure(
     `aws ec2 allocate-address --query '[AllocationId]' --output text`
   )
+  const allocationID = allocationIDUntrimmed.trim()
 
   const tagStrings = Object.entries(tags).map(([key, value]) =>
     `Key=${key},Value=${value}`
@@ -46,43 +37,79 @@ export async function getOrRegisterStaticIP(tags: { [key: string]: string }) {
 
   // Add tags to allocationID
   await execCmdWithExitOnFailure(
-    `aws ec2 create-tags --resources ${allocationID.trim()} --tags ${tagStrings.join(' ')}`
+    `aws ec2 create-tags --resources ${allocationID} --tags ${tagStrings.join(' ')}`
   )
 
-  // `aws ec2 create-tags --resources ${allocationID.trim()} --tags Key=resourceGroupTag,Value=${resourceGroup} Key=IPNodeName,Value=${name}`
-  // Fetch Address of newly created
-  // const [address] = await execCmdWithExitOnFailure(
-  //   `aws ec2 describe-addresses --filters "Name=tag:resourceGroupTag,Values=${resourceGroup}" "Name=tag:IPNodeName,Values=${name}" --query 'Addresses[*].[PublicIp]' --output json`
-  // )
-
-  // return address.trim()
-  return allocationID.trim()
+  return allocationID
 }
 
-export async function describeElasticIPAddresses(tags: { [key: string]: string }, query?: string) {
+export function getElasticIPAddressesFromAllocationIDs(allocationIDs: string[]) {
+  return Promise.all(
+    allocationIDs.map(getElasticIPAddressFromAllocationID)
+  )
+}
+
+function getElasticIPAddressFromAllocationID(allocationID: string) {
+  return describeElasticIPAddresses({}, {
+    'allocation-ids': allocationID,
+    query: 'Addresses[0].PublicIp'
+  })
+}
+
+export async function deallocateAWSStaticIP(allocationID: string) {
+  console.info(`Deallocating IP address with allocationID ${allocationID}`)
+  return execCmdWithExitOnFailure(
+    `aws ec2 release-address --allocation-id ${allocationID}`
+  )
+}
+
+/**
+ * An elastic IP will have an association ID if it is associated with a resource
+ * (like a load balancer). An elastic IP will fail to be removed if it is still
+ * associated with a resource. This waits until an elastic IP with the given
+ * tags does not have an association ID. This function does not do anything to
+ * actually remove the association.
+ */
+export async function waitForElasticIPAssociationIDRemoval(allocationID: string) {
+  const maxTryCount = 15
+  const tryIntervalSeconds = 5
+  for (let tryCount = 0; tryCount < maxTryCount; tryCount++) {
+    const associationID = await describeElasticIPAddresses({}, {
+      'allocation-ids': allocationID,
+      query: 'Addresses[0].AssociationId'
+    })
+    if (!associationID) {
+      return
+    }
+    await sleep(tryIntervalSeconds)
+  }
+  throw Error(`Too many tries waiting for elastic IP association ID removal`)
+}
+
+export async function describeElasticIPAddresses(tags: AWSResourceTags, cmdFlags?: { [key: string]: string }) {
   const filters = Object.entries(tags).map(([key, value]) =>
     `"Name=tag:${key},Values=${value}"`
   )
-  console.log(`aws ec2 describe-addresses --filters ${filters.join(' ')} ${query ? `--query '${query}'` : ''} --output json`)
+  const flags = cmdFlags ? Object.entries(cmdFlags).map(([flag, value]) =>
+    `--${flag} '${value}'`
+  ) : []
   // This fetches the IP allocation ID that have the corresponding tag values of resourceGroup and name
   const [response] = await execCmdWithExitOnFailure(
-    `aws ec2 describe-addresses --filters ${filters.join(' ')} ${query ? `--query '${query}'` : ''} --output json`
+    `aws ec2 describe-addresses ${
+      filters.length ? `--filters ${filters.join(' ')}` : ''
+    } ${flags.join(' ')} --output json`
   )
   return JSON.parse(response)
 }
 
-export async function deallocateAWSStaticIP(tags: { [key: string]: string }) {
-  console.info(`Deallocating IP address with tags ${tags}`)
-  const [allocationID] = await describeElasticIPAddresses(tags, 'Addresses[*].AllocationId')
-  console.log('allocationID', allocationID)
-  if (!allocationID) {
-    throw Error(`Could not find allocationID for tags ${tags}`)
+// The AWS CLI gives tags in the form [{ "Key": "theKey", "Value": "theValue" }],
+// so we convert this into an object { "theKey": "theValue" }
+export function tagsArrayToAWSResourceTags(tagsArray: { [key: string]: string }[]): AWSResourceTags {
+  const tags: AWSResourceTags = {}
+  for (const tag of tagsArray) {
+    if (tag.hasOwnProperty('Key') && tag.hasOwnProperty('Value')) {
+      tags[tag['Key']] = tag['Value']
+    }
   }
-
-  // const [allocationID] = await execCmdWithExitOnFailure(
-  //   `aws ec2 describe-addresses --filters "Name=tag:resourceGroupTag,Values=${resourceGroup}" "Name=tag:IPNodeName,Values=${name}" --query 'Addresses[*].[AllocationId]' --output text`
-  // )
-  return execCmdWithExitOnFailure(
-    `aws ec2 release-address --allocation-id ${allocationID.trim()}`
-  )
+  return tags
 }

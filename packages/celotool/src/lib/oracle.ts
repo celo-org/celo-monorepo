@@ -1,5 +1,5 @@
 import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/src/address'
-import { AwsClusterConfig } from 'src/lib/aws'
+import { AWSClusterConfig } from 'src/lib/aws'
 import { assignRoleIfNotAssigned, AzureClusterConfig, createIdentityIfNotExists, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity } from 'src/lib/azure'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { getFornoUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInternalUrl } from 'src/lib/endpoints'
@@ -58,7 +58,7 @@ const oracleContextAzureClusterConfigDynamicEnvVars: { [k in keyof Omit<AzureClu
 /**
  * Env vars corresponding to each value for the AwslusterConfig for a particular context
  */
-const oracleContextAwsClusterConfigDynamicEnvVars: { [k in keyof Omit<AwsClusterConfig, 'cloudProviderName'>]: DynamicEnvVar } = {
+const oracleContextAWSClusterConfigDynamicEnvVars: { [k in keyof Omit<AWSClusterConfig, 'cloudProviderName'>]: DynamicEnvVar } = {
   clusterName: DynamicEnvVar.ORACLE_KUBERNETES_CLUSTER_NAME,
   clusterRegion: DynamicEnvVar.ORACLE_AWS_CLUSTER_REGION,
   resourceGroupTag: DynamicEnvVar.ORACLE_AWS_RESOURCE_GROUP_TAG,
@@ -384,11 +384,11 @@ export function getAzureClusterConfig(oracleContext: string): AzureClusterConfig
 /**
  * Fetches the env vars for a particular context
  * @param oracleContext the oracle context to use
- * @return an AwsClusterConfig for the context
+ * @return an AWSClusterConfig for the context
  */
-export function getAWSClusterConfig(oracleContext: string): AwsClusterConfig {
-  const awsDynamicEnvVars = getOracleContextDynamicEnvVarValues(oracleContextAwsClusterConfigDynamicEnvVars, oracleContext)
-  const clusterConfig: AwsClusterConfig = {
+export function getAWSClusterConfig(oracleContext: string): AWSClusterConfig {
+  const awsDynamicEnvVars = getOracleContextDynamicEnvVarValues(oracleContextAWSClusterConfigDynamicEnvVars, oracleContext)
+  const clusterConfig: AWSClusterConfig = {
     cloudProviderName: 'aws',
     ...awsDynamicEnvVars
   }

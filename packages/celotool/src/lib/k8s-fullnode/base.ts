@@ -55,7 +55,7 @@ export abstract class BaseFullNodeDeployer {
   async removeChart() {
     await removeGenericHelmChart(this.releaseName)
     await deletePersistentVolumeClaims(this.celoEnv, ['celo-fullnode'])
-    await this.deallocateIPs()
+    await this.deallocateAllIPs()
   }
 
   async helmParameters() {
@@ -77,7 +77,7 @@ export abstract class BaseFullNodeDeployer {
 
   abstract async additionalHelmParameters(): Promise<string[]>
 
-  abstract async deallocateIPs(): Promise<void>
+  abstract async deallocateAllIPs(): Promise<void>
 
   get releaseName() {
     return `${this.celoEnv}-fullnodes`

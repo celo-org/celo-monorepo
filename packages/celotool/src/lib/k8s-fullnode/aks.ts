@@ -54,7 +54,7 @@ export class AKSFullNodeDeployer extends BaseFullNodeDeployer {
     return parseInt(staticIPsCount.trim(), 10)
   }
 
-  async deallocateIPs() {
+  async deallocateAllIPs() {
     console.info(`Deallocating static IPs on Azure for ${this.celoEnv}`)
 
     const resourceGroup = await getAKSNodeResourceGroup(this.deploymentConfig.clusterConfig)
