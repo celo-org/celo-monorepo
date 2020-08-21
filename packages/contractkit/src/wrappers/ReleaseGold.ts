@@ -1,3 +1,4 @@
+import { CeloTransactionObject, toTransactionObject } from '@celo/communication'
 import { Address, findAddressIndex } from '@celo/utils/lib/address'
 import {
   hashMessageWithPrefix,
@@ -8,12 +9,10 @@ import BigNumber from 'bignumber.js'
 import { ReleaseGold } from '../generated/ReleaseGold'
 import {
   BaseWrapper,
-  CeloTransactionObject,
   proxyCall,
   proxySend,
   stringIdentity,
   stringToSolidityBytes,
-  toTransactionObject,
   tupleParser,
   valueToBigNumber,
   valueToInt,
@@ -258,17 +257,19 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
    * Revoke a Release schedule
    * @return A CeloTransactionObject
    */
-  async revokeReleasing(): Promise<CeloTransactionObject<void>> {
-    return toTransactionObject(this.kit, this.contract.methods.revoke())
-  }
+  revokeReleasing: () => CeloTransactionObject<void> = proxySend(
+    this.kit,
+    this.contract.methods.revoke
+  )
 
   /**
    * Refund `refundAddress` and `beneficiary` after the ReleaseGold schedule has been revoked.
    * @return A CeloTransactionObject
    */
-  async refundAndFinalize(): Promise<CeloTransactionObject<void>> {
-    return toTransactionObject(this.kit, this.contract.methods.refundAndFinalize())
-  }
+  refundAndFinalize: () => CeloTransactionObject<void> = proxySend(
+    this.kit,
+    this.contract.methods.refundAndFinalize
+  )
 
   /**
    * Locks gold to be used for voting.
@@ -437,7 +438,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
     proofOfSigningKeyPossession: Signature
   ): Promise<CeloTransactionObject<void>> {
     return toTransactionObject(
-      this.kit,
+      this.kit.communication,
       this.contract.methods.authorizeVoteSigner(
         signer,
         proofOfSigningKeyPossession.v,
@@ -460,7 +461,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
     const validators = await this.kit.contracts.getValidators()
     const account = this.address
     if (await validators.isValidator(account)) {
-      const message = this.kit.web3.utils.soliditySha3({ type: 'address', value: account })
+      const message = this.kit.communication.soliditySha3({ type: 'address', value: account })
       const prefixedMsg = hashMessageWithPrefix(message!)
       const pubKey = signedMessageToPublicKey(
         prefixedMsg!,
@@ -469,7 +470,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
         proofOfSigningKeyPossession.s
       )
       return toTransactionObject(
-        this.kit,
+        this.kit.communication,
         this.contract.methods.authorizeValidatorSignerWithPublicKey(
           signer,
           proofOfSigningKeyPossession.v,
@@ -480,7 +481,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
       )
     } else {
       return toTransactionObject(
-        this.kit,
+        this.kit.communication,
         this.contract.methods.authorizeValidatorSigner(
           signer,
           proofOfSigningKeyPossession.v,
@@ -508,7 +509,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
     blsPop: string
   ): Promise<CeloTransactionObject<void>> {
     const account = this.address
-    const message = this.kit.web3.utils.soliditySha3({ type: 'address', value: account })
+    const message = this.kit.communication.soliditySha3({ type: 'address', value: account })
     const prefixedMsg = hashMessageWithPrefix(message!)
     const pubKey = signedMessageToPublicKey(
       prefixedMsg!,
@@ -517,7 +518,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
       proofOfSigningKeyPossession.s
     )
     return toTransactionObject(
-      this.kit,
+      this.kit.communication,
       this.contract.methods.authorizeValidatorSignerWithKeys(
         signer,
         proofOfSigningKeyPossession.v,
@@ -541,7 +542,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
     proofOfSigningKeyPossession: Signature
   ): Promise<CeloTransactionObject<void>> {
     return toTransactionObject(
-      this.kit,
+      this.kit.communication,
       this.contract.methods.authorizeAttestationSigner(
         signer,
         proofOfSigningKeyPossession.v,
@@ -571,7 +572,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
     )
 
     return toTransactionObject(
-      this.kit,
+      this.kit.communication,
       this.contract.methods.revokePending(group, value.toFixed(), lesser, greater, index)
     )
   }
@@ -596,7 +597,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
     )
 
     return toTransactionObject(
-      this.kit,
+      this.kit.communication,
       this.contract.methods.revokeActive(group, value.toFixed(), lesser, greater, index)
     )
   }

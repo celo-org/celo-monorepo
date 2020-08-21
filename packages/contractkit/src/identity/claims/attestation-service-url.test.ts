@@ -14,7 +14,7 @@ testWithGanache('AttestationServiceURL claims', (web3) => {
     const metadata = IdentityMetadataWrapper.fromEmpty(address)
     await metadata.addClaim(
       createAttestationServiceURLClaim(url),
-      NativeSigner(kit.web3.eth.sign, address)
+      NativeSigner(kit.communication.sign, address)
     )
   })
 
@@ -22,13 +22,13 @@ testWithGanache('AttestationServiceURL claims', (web3) => {
     const metadata = IdentityMetadataWrapper.fromEmpty(address)
     await metadata.addClaim(
       createAttestationServiceURLClaim(url),
-      NativeSigner(kit.web3.eth.sign, address)
+      NativeSigner(kit.communication.sign, address)
     )
 
     const newUrl = 'https://example.com/new'
     await metadata.addClaim(
       createAttestationServiceURLClaim(newUrl),
-      NativeSigner(kit.web3.eth.sign, address)
+      NativeSigner(kit.communication.sign, address)
     )
 
     expect(metadata.claims).toHaveLength(1)

@@ -14,7 +14,10 @@ testWithGanache('Domain claims', (web3) => {
   it('can make a domain claim', async () => {
     const domain = 'test.com'
     const metadata = IdentityMetadataWrapper.fromEmpty(address)
-    await metadata.addClaim(createDomainClaim(domain), NativeSigner(kit.web3.eth.sign, address))
+    await metadata.addClaim(
+      createDomainClaim(domain),
+      NativeSigner(kit.communication.sign, address)
+    )
   })
 
   describe('verifying', () => {
@@ -38,7 +41,7 @@ testWithGanache('Domain claims', (web3) => {
     }
 
     beforeEach(async () => {
-      signer = NativeSigner(kit.web3.eth.sign, address)
+      signer = NativeSigner(kit.communication.sign, address)
       metadata = IdentityMetadataWrapper.fromEmpty(address)
       claim = createDomainClaim(domain)
 
@@ -64,7 +67,7 @@ testWithGanache('Domain claims', (web3) => {
         const newClaim = createDomainClaim('orco.dev')
         newClaim.timestamp = 1584618795
 
-        const newSignature = await NativeSigner(kit.web3.eth.sign, secondAddress).sign(
+        const newSignature = await NativeSigner(kit.communication.sign, secondAddress).sign(
           serializeClaim(newClaim)
         )
 

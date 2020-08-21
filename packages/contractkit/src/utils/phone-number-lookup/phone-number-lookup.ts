@@ -93,7 +93,7 @@ export async function postToPhoneNumPrivacyService<ResponseType>(
     const validSignature: boolean = pubkey.verify(bodyString, JSON.parse(authHeader))
     debug(`Signature is valid: ${validSignature} signed by ${dek}`)
   } else {
-    authHeader = await signer.contractKit.web3.eth.sign(bodyString, body.account)
+    authHeader = await signer.contractKit.communication.sign(bodyString, body.account)
   }
 
   const { pgpnpUrl } = context

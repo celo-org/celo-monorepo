@@ -1,8 +1,9 @@
 /* tslint:disable no-console */
-import { newKit } from '@celo/contractkit'
+import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { addCeloEnvMiddleware, CeloEnvArgv } from 'src/lib/env-utils'
 import { portForwardAnd } from 'src/lib/port_forward'
+import Web3 from 'web3'
 import yargs from 'yargs'
 
 export const command = 'unfreeze-contracts'
@@ -50,10 +51,11 @@ export const handler = async (argv: UnfreezeContractsArgv) => {
   await switchToClusterFromEnv()
 
   const cb = async () => {
-    const kit = newKit('http://localhost:8545')
-    const account = (await kit.web3.eth.getAccounts())[0]
+    const web3: Web3 = new Web3('http://localhost:8545')
+    const kit: ContractKit = newKitFromWeb3(web3)
+    const account = (await kit.communication.getAccounts())[0]
     console.log(`Using account: ${account}`)
-    kit.defaultAccount = account
+    kit.communication.defaultAccount = account
 
     const [exchange, epochRewards] = await Promise.all([
       argv.exchange ? kit._web3Contracts.getExchange() : null,

@@ -1,5 +1,6 @@
 import { CeloTx, CeloTxObject, CeloTxReceipt, PromiEvent } from '@celo/sdk-types/commons'
-import { newKit } from './kit'
+import Web3 from 'web3'
+import { newKitFromWeb3 } from './kit'
 import { promiEventSpy } from './test-utils/PromiEventStub'
 
 interface TransactionObjectStub<T> extends CeloTxObject<T> {
@@ -37,12 +38,12 @@ export function txoStub<T>(): TransactionObjectStub<T> {
 }
 
 describe('kit.sendTransactionObject()', () => {
-  const kit = newKit('http://')
+  const kit = newKitFromWeb3(new Web3('http://'))
 
   test('should send transaction on simple case', async () => {
     const txo = txoStub()
     txo.estimateGasMock.mockResolvedValue(1000)
-    const txRes = await kit.sendTransactionObject(txo)
+    const txRes = await kit.communication.sendTransactionObject(txo)
 
     txo.resolveHash('HASH')
     txo.resolveReceipt('Receipt' as any)
@@ -53,15 +54,15 @@ describe('kit.sendTransactionObject()', () => {
 
   test('should not estimateGas if gas is provided', async () => {
     const txo = txoStub()
-    await kit.sendTransactionObject(txo, { gas: 555 })
+    await kit.communication.sendTransactionObject(txo, { gas: 555 })
     expect(txo.estimateGasMock).not.toBeCalled()
   })
 
   test('should use inflation factor on gas', async () => {
     const txo = txoStub()
     txo.estimateGasMock.mockResolvedValue(1000)
-    kit.gasInflationFactor = 2
-    await kit.sendTransactionObject(txo)
+    kit.communication.defaultGasInflationFactor = 2
+    await kit.communication.sendTransactionObject(txo)
     expect(txo.send).toBeCalledWith(
       expect.objectContaining({
         gas: 1000 * 2,
@@ -71,7 +72,11 @@ describe('kit.sendTransactionObject()', () => {
 
   test('should forward txoptions to txo.send()', async () => {
     const txo = txoStub()
-    await kit.sendTransactionObject(txo, { gas: 555, feeCurrency: 'XXX', from: '0xAAFFF' })
+    await kit.communication.sendTransactionObject(txo, {
+      gas: 555,
+      feeCurrency: 'XXX',
+      from: '0xAAFFF',
+    })
     expect(txo.send).toBeCalledWith({
       gasPrice: '0',
       gas: 555,

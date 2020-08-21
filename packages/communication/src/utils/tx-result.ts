@@ -2,12 +2,10 @@ import { CeloTxReceipt, PromiEvent } from '@celo/sdk-types/commons'
 import { Future } from '@celo/utils/lib/future'
 import debugFactory from 'debug'
 
-const debug = debugFactory('kit:tx:result')
+const debug = debugFactory('communication:tx:result')
 
 /**
  * Transforms a `PromiEvent` to a `TransactionResult`.
- *
- * PromiEvents are returned by web3 when we do a `contract.method.xxx.send()`
  */
 export function toTxResult(pe: PromiEvent<any>) {
   return new TransactionResult(pe)

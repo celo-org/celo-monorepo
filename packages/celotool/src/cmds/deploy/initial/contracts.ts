@@ -1,5 +1,5 @@
 /* tslint:disable no-console */
-import { IdentityMetadataWrapper, newKit } from '@celo/contractkit'
+import { ContractKit, IdentityMetadataWrapper, newKitFromWeb3 } from '@celo/contractkit'
 import { createAttestationServiceURLClaim } from '@celo/contractkit/lib/identity/claims/attestation-service-url'
 import { createNameClaim } from '@celo/contractkit/lib/identity/claims/claim'
 import { concurrentMap } from '@celo/utils/lib/async'
@@ -13,6 +13,7 @@ import { privateKeyToAddress } from 'src/lib/generate_utils'
 import { migrationOverrides, truffleOverrides, validatorKeys } from 'src/lib/migration-utils'
 import { portForwardAnd } from 'src/lib/port_forward'
 import { uploadFileToGoogleStorage } from 'src/lib/testnet-utils'
+import Web3 from 'web3'
 import yargs from 'yargs'
 import { InitialArgv } from '../../deploy/initial'
 
@@ -72,8 +73,10 @@ export async function registerMetadata(testnet: string, privateKey: string, inde
   const address = privateKeyToAddress(privateKey)
   await makeMetadata(testnet, address, index, privateKey)
 
-  const kit = newKit('http://localhost:8545')
-  kit.addAccount(privateKey)
+  const web3: Web3 = new Web3('http://localhost:8545')
+  const kit: ContractKit = newKitFromWeb3(web3)
+  kit.communication.wallet = new LocalWallet()
+  kit.communication.addAccount(privateKey)
   kit.defaultAccount = address
 
   const accounts = await kit.contracts.getAccounts()

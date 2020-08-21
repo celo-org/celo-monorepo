@@ -1,7 +1,6 @@
-import { CeloTxReceipt, EventLog } from '@celo/sdk-types/commons'
+import { ABIDefinition } from '@celo/sdk-types/abi'
+import { CeloTxReceipt, EventLog, Log } from '@celo/sdk-types/commons'
 import { Address } from '@celo/utils/lib/address'
-import { Log } from 'web3-core'
-import abi, { ABIDefinition } from 'web3-eth-abi'
 import { ContractKit } from '../kit'
 import { ContractDetails, mapFromPairs, obtainKitContractDetails } from './base'
 
@@ -48,7 +47,7 @@ export class LogExplorer {
   }
 
   async fetchTxReceipt(txhash: string): Promise<CeloTxReceipt> {
-    return this.kit.web3.eth.getTransactionReceipt(txhash)
+    return this.kit.communication.getTransactionReceipt(txhash)
   }
 
   getKnownLogs(tx: CeloTxReceipt): EventLog[] {
@@ -77,7 +76,9 @@ export class LogExplorer {
       return null
     }
 
-    const returnValues = abi.decodeLog(matchedAbi.inputs || [], log.data || '', log.topics.slice(1))
+    const returnValues = this.kit.communication
+      .getAbiCoder()
+      .decodeLog(matchedAbi.inputs || [], log.data || '', log.topics.slice(1))
     delete (returnValues as any).__length__
     Object.keys(returnValues).forEach((key) => {
       if (Number.parseInt(key, 10) >= 0) {

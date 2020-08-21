@@ -1,5 +1,5 @@
+import { ABIDefinition } from '@celo/sdk-types/abi'
 import Web3 from 'web3'
-import { ABIDefinition } from 'web3-eth-abi'
 
 export const PROXY_ABI: ABIDefinition[] = [
   {

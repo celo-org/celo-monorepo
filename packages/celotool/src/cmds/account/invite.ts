@@ -1,11 +1,12 @@
 /* tslint:disable no-console */
-import { newKit } from '@celo/contractkit'
+import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { BigNumber } from 'bignumber.js'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { execCmd } from 'src/lib/cmd-utils'
 import { convertToContractDecimals } from 'src/lib/contract-utils'
 import { portForwardAnd } from 'src/lib/port_forward'
 import twilio from 'twilio'
+import Web3 from 'web3'
 import { Argv } from 'yargs'
 import { AccountArgv } from '../account'
 
@@ -38,8 +39,9 @@ export const handler = async (argv: InviteArgv) => {
     --key=github-key --keyring=celo-keyring --location=global'
   )
   const cb = async () => {
-    const kit = newKit('http://localhost:8545')
-    const account = (await kit.web3.eth.getAccounts())[0]
+    const web3: Web3 = new Web3('http://localhost:8545')
+    const kit: ContractKit = newKitFromWeb3(web3)
+    const account = (await kit.communication.getAccounts())[0]
     console.log(`Using account: ${account}`)
     kit.defaultAccount = account
 
@@ -48,7 +50,7 @@ export const handler = async (argv: InviteArgv) => {
     // TODO: this default gas price might not be accurate
     const gasPrice = 100000000000
 
-    const temporaryWalletAccount = await kit.web3.eth.accounts.create()
+    const temporaryWalletAccount = web3.eth.accounts.create()
     const temporaryAddress = temporaryWalletAccount.address
     // Buffer.from doesn't expect a 0x for hex input
     const privateKeyHex = temporaryWalletAccount.privateKey.substring(2)
@@ -67,10 +69,10 @@ export const handler = async (argv: InviteArgv) => {
     const stableTokenInviteAmount = attestationFee.times(10).toString()
     const stableTokenEscrowAmount = (await convertToContractDecimals(5, stableToken)).toString()
 
-    const phoneHash: string = kit.web3.utils.soliditySha3({
+    const phoneHash: string = kit.communication.soliditySha3({
       type: 'string',
       value: phone,
-    })
+    })!
 
     await stableToken.approve(escrow.address, stableTokenEscrowAmount).sendAndWaitForReceipt()
     const expirySeconds = 60 * 60 * 24 * 5 // 5 days

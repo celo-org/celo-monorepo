@@ -1,8 +1,9 @@
 import { Address } from '@celo/sdk-types/commons'
-import { eqAddress } from '@celo/utils/lib/address'
+import { ensureLeading0x, eqAddress } from '@celo/utils/lib/address'
 import { AttestationServiceStatusResponseType, UrlType } from '@celo/utils/lib/io'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import fetch from 'cross-fetch'
+import { randomBytes } from 'crypto'
 import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import { ContractKit } from '../../kit'
@@ -30,7 +31,7 @@ export async function validateAttestationServiceUrl(
   address: Address
 ): Promise<string | undefined> {
   try {
-    const randomMessage = kit.web3.utils.randomHex(32)
+    const randomMessage = ensureLeading0x(randomBytes(32).toString('hex'))
 
     const url = claim.url + '/status?messageToSign=' + randomMessage
 

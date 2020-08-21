@@ -1,5 +1,5 @@
 /* tslint:disable no-console */
-import { newKit } from '@celo/contractkit'
+import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { sleep } from '@celo/utils/lib/async'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { execCmd } from 'src/lib/cmd-utils'
@@ -8,6 +8,7 @@ import { getBlockscoutUrl } from 'src/lib/endpoints'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { portForwardAnd } from 'src/lib/port_forward'
 import { validateAccountAddress } from 'src/lib/utils'
+import Web3 from 'web3'
 import yargs from 'yargs'
 import { AccountArgv } from '../account'
 
@@ -69,10 +70,11 @@ export const handler = async (argv: FaucetArgv) => {
   const addresses = argv.account
 
   const cb = async () => {
-    const kit = newKit('http://localhost:8545')
-    const account = (await kit.web3.eth.getAccounts())[0]
+    const web3: Web3 = new Web3('http://localhost:8545')
+    const kit: ContractKit = newKitFromWeb3(web3)
+    const account = (await kit.communication.getAccounts())[0]
     console.log(`Using account: ${account}`)
-    kit.defaultAccount = account
+    kit.communication.defaultAccount = account
 
     const [goldToken, stableToken, reserve] = await Promise.all([
       kit.contracts.getGoldToken(),

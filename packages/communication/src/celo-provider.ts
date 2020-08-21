@@ -1,14 +1,20 @@
-import { Callback, JsonRpcPayload, JsonRpcResponse, Provider } from '@celo/sdk-types/commons'
-import { Wallet } from '@celo/sdk-types/wallet'
+import {
+  Callback,
+  EncodedTransaction,
+  JsonRpcPayload,
+  JsonRpcResponse,
+  Provider,
+} from '@celo/sdk-types/commons'
 import debugFactory from 'debug'
-import { hasProperty, stopProvider } from '../utils/provider-utils'
-import { DefaultRpcCaller, RpcCaller, rpcCallHandler } from '../utils/rpc-caller'
-import { TxParamsNormalizer } from '../utils/tx-params-normalizer'
-import { LocalWallet } from '../wallets/local-wallet'
+import { NodeCommunicationWrapper } from '.'
+import { hasProperty, stopProvider } from './utils/provider-utils'
+import { rpcCallHandler } from './utils/rpc-caller'
 
-const debug = debugFactory('kit:provider:connection')
-const debugPayload = debugFactory('kit:provider:payload')
-const debugResponse = debugFactory('kit:provider:response')
+const debug = debugFactory('provider:connection')
+const debugPayload = debugFactory('provider:payload')
+const debugTxToSend = debugFactory('provider:tx-to-send')
+const debugEncodedTx = debugFactory('provider:encoded-tx')
+const debugResponse = debugFactory('provider:response')
 
 enum InterceptedMethods {
   accounts = 'eth_accounts',
@@ -19,36 +25,37 @@ enum InterceptedMethods {
   signTypedData = 'eth_signTypedData',
 }
 
+export function assertIsCeloProvider(provider: any): asserts provider is CeloProvider {
+  if (!(provider instanceof CeloProvider)) {
+    throw new Error(
+      'A different Provider was manually added to the kit. The kit should have a CeloProvider'
+    )
+  }
+}
+
 export class CeloProvider implements Provider {
-  private readonly rpcCaller: RpcCaller
-  private readonly paramsPopulator: TxParamsNormalizer
   private alreadyStopped: boolean = false
-  wallet: Wallet
 
-  constructor(readonly existingProvider: Provider, wallet: Wallet = new LocalWallet()) {
-    this.rpcCaller = new DefaultRpcCaller(existingProvider)
-    this.paramsPopulator = new TxParamsNormalizer(this.rpcCaller)
-    this.wallet = wallet
-
+  constructor(
+    readonly existingProvider: Provider,
+    readonly communication: NodeCommunicationWrapper
+  ) {
     this.addProviderDelegatedFunctions()
   }
 
+  // Used for backwards compatibility. Use the `addAccount` from the NodeCommunicationWrapper
   addAccount(privateKey: string) {
-    if (hasProperty<{ addAccount: (privateKey: string) => void }>(this.wallet, 'addAccount')) {
-      this.wallet.addAccount(privateKey)
-    } else {
-      throw new Error("The wallet used, can't add accounts")
-    }
+    this.communication.addAccount(privateKey)
   }
 
+  // Used for backwards compatibility. Use the `getAccounts` from the NodeCommunicationWrapper
   async getAccounts(): Promise<string[]> {
-    const nodeAccountsResp = await this.rpcCaller.call('eth_accounts', [])
-
-    return nodeAccountsResp.result.concat(this.wallet.getAccounts())
+    return this.communication.getAccounts()
   }
 
+  // Used for backwards compatibility. Use the `getAccounts` from the NodeCommunicationWrapper
   isLocalAccount(address?: string): boolean {
-    return this.wallet.hasAccount(address)
+    return this.communication.wallet != null && this.communication.wallet.hasAccount(address)
   }
 
   /**
@@ -78,7 +85,7 @@ export class CeloProvider implements Provider {
         this.checkPayloadWithAtLeastNParams(payload, 1)
         txParams = payload.params[0]
 
-        if (this.isLocalAccount(txParams.from)) {
+        if (this.communication.isLocalAccount(txParams.from)) {
           rpcCallHandler(payload, this.handleSendTransaction.bind(this), decoratedCallback)
         } else {
           this.forwardSend(payload, callback)
@@ -89,7 +96,7 @@ export class CeloProvider implements Provider {
         this.checkPayloadWithAtLeastNParams(payload, 1)
         txParams = payload.params[0]
 
-        if (this.isLocalAccount(txParams.from)) {
+        if (this.communication.isLocalAccount(txParams.from)) {
           rpcCallHandler(payload, this.handleSignTransaction.bind(this), decoratedCallback)
         } else {
           this.forwardSend(payload, callback)
@@ -105,7 +112,7 @@ export class CeloProvider implements Provider {
         }
         address = payload.method === InterceptedMethods.sign ? payload.params[0] : payload.params[1]
 
-        if (this.isLocalAccount(address)) {
+        if (this.communication.isLocalAccount(address)) {
           rpcCallHandler(payload, this.handleSignPersonalMessage.bind(this), decoratedCallback)
         } else {
           this.forwardSend(payload, callback)
@@ -117,7 +124,7 @@ export class CeloProvider implements Provider {
         this.checkPayloadWithAtLeastNParams(payload, 1)
         address = payload.params[0]
 
-        if (this.isLocalAccount(address)) {
+        if (this.communication.isLocalAccount(address)) {
           rpcCallHandler(payload, this.handleSignTypedData.bind(this), decoratedCallback)
         } else {
           this.forwardSend(payload, callback)
@@ -150,32 +157,36 @@ export class CeloProvider implements Provider {
 
   private async handleSignTypedData(payload: JsonRpcPayload): Promise<any> {
     const [address, typedData] = payload.params
-    const signature = this.wallet.signTypedData(address, typedData)
+    const signature = this.communication.wallet!.signTypedData(address, typedData)
     return signature
   }
 
   private async handleSignPersonalMessage(payload: JsonRpcPayload): Promise<any> {
     const address = payload.method === 'eth_sign' ? payload.params[0] : payload.params[1]
     const data = payload.method === 'eth_sign' ? payload.params[1] : payload.params[0]
-    const ecSignatureHex = this.wallet.signPersonalMessage(address, data)
+    const ecSignatureHex = this.communication.wallet!.signPersonalMessage(address, data)
     return ecSignatureHex
   }
 
-  private async handleSignTransaction(payload: JsonRpcPayload): Promise<any> {
+  private async handleSignTransaction(payload: JsonRpcPayload): Promise<EncodedTransaction> {
     const txParams = payload.params[0]
-    const filledParams = await this.paramsPopulator.populate(txParams)
-    const signedTx = await this.wallet.signTransaction(filledParams)
-    return { raw: signedTx.raw, tx: txParams }
+    const filledParams = await this.communication.paramsPopulator.populate(txParams)
+    debugTxToSend('%O', filledParams)
+    const signedTx = await this.communication.wallet!.signTransaction(filledParams)
+    debugEncodedTx('%O', signedTx)
+    return signedTx
   }
 
   private async handleSendTransaction(payload: JsonRpcPayload): Promise<any> {
     const signedTx = await this.handleSignTransaction(payload)
-    const response = await this.rpcCaller.call('eth_sendRawTransaction', [signedTx.raw])
+    const response = await this.communication.rpcCaller.call('eth_sendRawTransaction', [
+      signedTx.raw,
+    ])
     return response.result
   }
 
   private forwardSend(payload: JsonRpcPayload, callback: Callback<JsonRpcResponse>): void {
-    this.rpcCaller.send(payload, callback)
+    this.communication.rpcCaller.send(payload, callback)
   }
 
   private checkPayloadWithAtLeastNParams(payload: JsonRpcPayload, n: number) {

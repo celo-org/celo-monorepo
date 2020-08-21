@@ -1,3 +1,4 @@
+import { NodeCommunicationWrapper } from '@celo/communication'
 import {
   Callback,
   CeloTx,
@@ -8,7 +9,7 @@ import {
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import debugFactory from 'debug'
 import Web3 from 'web3'
-import { CeloProvider } from '../providers/celo-provider'
+import { LocalWallet } from '../wallets/local-wallet'
 import { recoverTransaction } from './signing-utils'
 
 const debug = debugFactory('kit:txtest:sign')
@@ -140,7 +141,7 @@ async function verifyLocalSigningInAllPermutations(
 // These tests verify the signTransaction WITHOUT the ParamsPopulator
 describe('Transaction Utils', () => {
   // only needed for the eth_coinbase rcp call
-  let celoProvider: CeloProvider
+  let communication: NodeCommunicationWrapper
   const mockProvider: Provider = {
     send: (payload: JsonRpcPayload, callback: Callback<JsonRpcResponse>): void => {
       if (payload.method === 'eth_coinbase') {
@@ -158,20 +159,19 @@ describe('Transaction Utils', () => {
   const web3: Web3 = new Web3()
 
   beforeEach(() => {
-    celoProvider = new CeloProvider(mockProvider)
-    web3.setProvider(celoProvider as any)
+    web3.setProvider(mockProvider as any)
+    communication = new NodeCommunicationWrapper(web3)
+    communication.wallet = new LocalWallet()
   })
 
   afterEach(() => {
-    if (web3.currentProvider instanceof CeloProvider) {
-      web3.currentProvider.stop()
-    }
+    communication.stop()
   })
 
   describe('Signer Testing with single local account and pay gas in CELO', () => {
     it('Test1 should be able to sign and get the signer back with single local account', async () => {
       jest.setTimeout(60 * 1000)
-      celoProvider.addAccount(PRIVATE_KEY1)
+      communication.addAccount(PRIVATE_KEY1)
       await verifyLocalSigningInAllPermutations(web3, ACCOUNT_ADDRESS1, ACCOUNT_ADDRESS2)
     })
   })
@@ -179,15 +179,15 @@ describe('Transaction Utils', () => {
   describe('Signer Testing with multiple local accounts', () => {
     it('Test2 should be able to sign with first account and get the signer back with multiple local accounts', async () => {
       jest.setTimeout(60 * 1000)
-      celoProvider.addAccount(PRIVATE_KEY1)
-      celoProvider.addAccount(PRIVATE_KEY2)
+      communication.addAccount(PRIVATE_KEY1)
+      communication.addAccount(PRIVATE_KEY2)
       await verifyLocalSigningInAllPermutations(web3, ACCOUNT_ADDRESS1, ACCOUNT_ADDRESS2)
     })
 
     it('Test3 should be able to sign with second account and get the signer back with multiple local accounts', async () => {
       jest.setTimeout(60 * 1000)
-      celoProvider.addAccount(PRIVATE_KEY1)
-      celoProvider.addAccount(PRIVATE_KEY2)
+      communication.addAccount(PRIVATE_KEY1)
+      communication.addAccount(PRIVATE_KEY2)
       await verifyLocalSigningInAllPermutations(web3, ACCOUNT_ADDRESS2, ACCOUNT_ADDRESS1)
     })
   })

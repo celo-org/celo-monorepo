@@ -1,0 +1,6 @@
+{
+  "extends": "../typescript/tsconfig.library.json",
+  // "compilerOptions": {
+  //   "skipLibCheck": false
+  // }
+}

@@ -1,3 +1,4 @@
+import { CeloTransactionObject, getAbiTypes } from '@celo/communication'
 import { CeloTxObject, CeloTxPending } from '@celo/sdk-types/commons'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { keccak256 } from 'ethereumjs-util'
@@ -7,15 +8,17 @@ import { obtainKitContractDetails } from '../explorer/base'
 import { BlockExplorer } from '../explorer/block-explorer'
 import { ABI as GovernanceABI } from '../generated/Governance'
 import { ContractKit } from '../kit'
-import { getAbiTypes } from '../utils/web3-utils'
-import { CeloTransactionObject, valueToString } from '../wrappers/BaseWrapper'
+import { valueToString } from '../wrappers/BaseWrapper'
 import { hotfixToParams, Proposal, ProposalTransaction } from '../wrappers/Governance'
 import { setImplementationOnProxy } from './proxy'
 
 export const HOTFIX_PARAM_ABI_TYPES = getAbiTypes(GovernanceABI as any, 'executeHotfix')
 
 export const hotfixToEncodedParams = (kit: ContractKit, proposal: Proposal, salt: Buffer) =>
-  kit.web3.eth.abi.encodeParameters(HOTFIX_PARAM_ABI_TYPES, hotfixToParams(proposal, salt))
+  kit.communication.web3.eth.abi.encodeParameters(
+    HOTFIX_PARAM_ABI_TYPES,
+    hotfixToParams(proposal, salt)
+  )
 
 export const hotfixToHash = (kit: ContractKit, proposal: Proposal, salt: Buffer) =>
   keccak256(hotfixToEncodedParams(kit, proposal, salt)) as Buffer

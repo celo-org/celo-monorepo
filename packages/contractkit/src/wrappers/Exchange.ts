@@ -1,8 +1,8 @@
+import { CeloTransactionObject } from '@celo/communication'
 import BigNumber from 'bignumber.js'
 import { Exchange } from '../generated/Exchange'
 import {
   BaseWrapper,
-  CeloTransactionObject,
   fixidityValueToBigNumber,
   identity,
   proxyCall,

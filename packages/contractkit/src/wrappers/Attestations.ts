@@ -1,3 +1,4 @@
+import { toTransactionObject } from '@celo/communication'
 import { Address, NULL_ADDRESS } from '@celo/sdk-types/commons'
 import { AttestationUtils, SignatureUtils } from '@celo/utils/lib'
 import { eqAddress } from '@celo/utils/lib/address'
@@ -10,13 +11,7 @@ import fetch from 'cross-fetch'
 import { CeloContract } from '../base'
 import { Attestations } from '../generated/Attestations'
 import { ClaimTypes, IdentityMetadataWrapper } from '../identity'
-import {
-  BaseWrapper,
-  proxyCall,
-  toTransactionObject,
-  valueToBigNumber,
-  valueToInt,
-} from './BaseWrapper'
+import { BaseWrapper, proxyCall, valueToBigNumber, valueToInt } from './BaseWrapper'
 import { Validator } from './Validators'
 
 export interface AttestationStat {
@@ -146,7 +141,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   isAttestationExpired = async (attestationRequestBlockNumber: number) => {
     // We duplicate the implementation here, until Attestation.sol->isAttestationExpired is not external
     const attestationExpiryBlocks = await this.attestationExpiryBlocks()
-    const blockNumber = await this.kit.web3.eth.getBlockNumber()
+    const blockNumber = await this.kit.communication.getBlockNumber()
     return blockNumber >= attestationRequestBlockNumber + attestationExpiryBlocks
   }
 
@@ -171,7 +166,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     // Technically should use subscriptions here but not all providers support it.
     // TODO: Use subscription if provider supports
     while (Date.now() - startTime < timeoutSeconds * 1000) {
-      const blockNumber = await this.kit.web3.eth.getBlockNumber()
+      const blockNumber = await this.kit.communication.getBlockNumber()
       if (blockNumber >= unselectedRequest.blockNumber + waitBlocks) {
         return
       }
@@ -351,7 +346,10 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       code,
       attestationSigner
     )
-    return toTransactionObject(this.kit, this.contract.methods.complete(identifier, v, r, s))
+    return toTransactionObject(
+      this.kit.communication,
+      this.contract.methods.complete(identifier, v, r, s)
+    )
   }
 
   /**
@@ -450,7 +448,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   async request(identifier: string, attestationsRequested: number) {
     const tokenAddress = await this.kit.registry.addressFor(CeloContract.StableToken)
     return toTransactionObject(
-      this.kit,
+      this.kit.communication,
       this.contract.methods.request(identifier, attestationsRequested, tokenAddress)
     )
   }
@@ -460,7 +458,10 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @param identifier Attestation identifier (e.g. phone hash)
    */
   selectIssuers(identifier: string) {
-    return toTransactionObject(this.kit, this.contract.methods.selectIssuers(identifier))
+    return toTransactionObject(
+      this.kit.communication,
+      this.contract.methods.selectIssuers(identifier)
+    )
   }
 
   revealPhoneNumberToIssuer(
@@ -605,7 +606,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     if (idx < 0) {
       throw new Error("Account not found in identifier's accounts")
     }
-    return toTransactionObject(this.kit, this.contract.methods.revoke(identifer, idx))
+    return toTransactionObject(this.kit.communication, this.contract.methods.revoke(identifer, idx))
   }
 }
 

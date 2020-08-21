@@ -1,6 +1,7 @@
 import { CeloTx } from '@celo/sdk-types/commons'
+import Web3 from 'web3'
 import { CeloContract } from '../base'
-import { newKit } from '../kit'
+import { newKitFromWeb3 } from '../kit'
 import { buildUri, parseUri } from './tx-uri'
 
 describe('URI utils', () => {
@@ -19,7 +20,7 @@ describe('URI utils', () => {
   let lockGoldUri: string
   let lockGoldTx: CeloTx
 
-  const kit = newKit('http://localhost:8545')
+  const kit = newKitFromWeb3(new Web3('http://localhost:8545'))
 
   beforeAll(async () => {
     const stableTokenAddr = await kit.registry.addressFor(CeloContract.StableToken)

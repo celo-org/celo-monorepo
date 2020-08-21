@@ -1,17 +1,10 @@
-import {
-  CeloTx,
-  CeloTxObject,
-  CeloTxReceipt,
-  Contract,
-  EventLog,
-  PastEventOptions,
-} from '@celo/sdk-types/commons'
+import { CeloTransactionObject, toTransactionObject } from '@celo/communication'
+import { CeloTxObject, Contract, EventLog, PastEventOptions } from '@celo/sdk-types/commons'
 import { bufferToHex, ensureLeading0x } from '@celo/utils/lib/address'
 import { zip } from '@celo/utils/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { ContractKit } from '../kit'
-import { TransactionResult } from '../utils/tx-result'
 
 /** Represents web3 native contract Method */
 type Method<I extends any[], O> = (...args: I) => CeloTxObject<O>
@@ -226,36 +219,10 @@ export function proxySend<InputArgs extends any[], ParsedInputArgs extends any[]
   if (sendArgs.length === 2) {
     const methodFn = sendArgs[0]
     const preParse = sendArgs[1]
-    return (...args: InputArgs) => toTransactionObject(kit, methodFn(...preParse(...args)))
+    return (...args: InputArgs) =>
+      toTransactionObject(kit.communication, methodFn(...preParse(...args)))
   } else {
     const methodFn = sendArgs[0]
-    return (...args: InputArgs) => toTransactionObject(kit, methodFn(...args))
+    return (...args: InputArgs) => toTransactionObject(kit.communication, methodFn(...args))
   }
-}
-
-export type CeloTransactionParams = Omit<CeloTx, 'data'>
-
-export function toTransactionObject<O>(
-  kit: ContractKit,
-  txo: CeloTxObject<O>,
-  defaultParams?: CeloTransactionParams
-): CeloTransactionObject<O> {
-  return new CeloTransactionObject(kit, txo, defaultParams)
-}
-
-export class CeloTransactionObject<O> {
-  constructor(
-    private kit: ContractKit,
-    readonly txo: CeloTxObject<O>,
-    readonly defaultParams?: CeloTransactionParams
-  ) {}
-
-  /** send the transaction to the chain */
-  send = (params?: CeloTransactionParams): Promise<TransactionResult> => {
-    return this.kit.sendTransactionObject(this.txo, { ...this.defaultParams, ...params })
-  }
-
-  /** send the transaction and waits for the receipt */
-  sendAndWaitForReceipt = (params?: CeloTransactionParams): Promise<CeloTxReceipt> =>
-    this.send(params).then((result) => result.waitReceipt())
 }

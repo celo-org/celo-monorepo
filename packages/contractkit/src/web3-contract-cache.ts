@@ -150,7 +150,7 @@ export class Web3ContractCache {
         : (ContractFactories[contract] as CFType[C])
       // @ts-ignore: Too compplex union type
       this.cacheMap[contract] = createFn(
-        this.kit.web3,
+        this.kit.communication.web3,
         address ? address : await this.kit.registry.addressFor(contract)
       ) as NonNullable<ContractCacheMap[C]>
     }

@@ -1,3 +1,4 @@
+import { toTransactionObject } from '@celo/communication'
 import { Address, CeloTxPending } from '@celo/sdk-types/commons'
 import {
   bufferToHex,
@@ -19,7 +20,6 @@ import {
   proxySend,
   solidityBytesToString,
   stringIdentity,
-  toTransactionObject,
   tupleParser,
   valueToBigNumber,
   valueToInt,
@@ -616,7 +616,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async upvote(proposalID: BigNumber.Value, upvoter: Address) {
     const { lesserID, greaterID } = await this.lesserAndGreaterAfterUpvote(upvoter, proposalID)
     return toTransactionObject(
-      this.kit,
+      this.kit.communication,
       this.contract.methods.upvote(
         valueToString(proposalID),
         valueToString(lesserID),
@@ -632,7 +632,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async revokeUpvote(upvoter: Address) {
     const { lesserID, greaterID } = await this.lesserAndGreaterAfterRevoke(upvoter)
     return toTransactionObject(
-      this.kit,
+      this.kit.communication,
       this.contract.methods.revokeUpvote(valueToString(lesserID), valueToString(greaterID))
     )
   }
@@ -645,7 +645,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async approve(proposalID: BigNumber.Value) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
     return toTransactionObject(
-      this.kit,
+      this.kit.communication,
       this.contract.methods.approve(valueToString(proposalID), proposalIndex)
     )
   }
@@ -659,7 +659,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     const proposalIndex = await this.getDequeueIndex(proposalID)
     const voteNum = Object.keys(VoteValue).indexOf(vote)
     return toTransactionObject(
-      this.kit,
+      this.kit.communication,
       this.contract.methods.vote(valueToString(proposalID), proposalIndex, voteNum)
     )
   }
@@ -682,7 +682,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async execute(proposalID: BigNumber.Value) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
     return toTransactionObject(
-      this.kit,
+      this.kit.communication,
       this.contract.methods.execute(valueToString(proposalID), proposalIndex)
     )
   }

@@ -1,9 +1,9 @@
+import { RpcCaller } from '@celo/communication'
 import { CeloTx, EncodedTransaction } from '@celo/sdk-types/commons'
 import { Signer } from '@celo/sdk-types/wallet'
 import { ensureLeading0x, normalizeAddressWith0x, trimLeading0x } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import BN from 'bn.js'
-import { RpcCaller } from '../../utils/rpc-caller'
 import { decodeSig } from '../../utils/signing-utils'
 
 const INCORRECT_PASSWORD_ERROR = 'could not decrypt key with given password'

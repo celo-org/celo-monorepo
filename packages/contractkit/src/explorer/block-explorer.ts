@@ -1,8 +1,8 @@
+import { parseDecodedParams } from '@celo/communication'
+import { ABIDefinition } from '@celo/sdk-types/abi'
 import { Address, Block, CeloTxPending } from '@celo/sdk-types/commons'
-import abi, { ABIDefinition } from 'web3-eth-abi'
 import { PROXY_ABI } from '../governance/proxy'
 import { ContractKit } from '../kit'
-import { parseDecodedParams } from '../utils/web3-utils'
 import { ContractDetails, mapFromPairs, obtainKitContractDetails } from './base'
 
 export interface CallDetails {
@@ -51,11 +51,10 @@ export class BlockExplorer {
   }
 
   async fetchBlockByHash(blockHash: string): Promise<Block> {
-    // TODO fix typing: eth.getBlock support hashes and numbers
-    return this.kit.web3.eth.getBlock(blockHash as any, true)
+    return this.kit.communication.getBlock(blockHash)
   }
   async fetchBlock(blockNumber: number): Promise<Block> {
-    return this.kit.web3.eth.getBlock(blockNumber, true)
+    return this.kit.communication.getBlock(blockNumber)
   }
 
   async fetchBlockRange(from: number, to: number): Promise<Block[]> {
@@ -110,7 +109,7 @@ export class BlockExplorer {
     }
 
     const { args, params } = parseDecodedParams(
-      abi.decodeParameters(matchedAbi.inputs!, encodedParameters)
+      this.kit.communication.getAbiCoder().decodeParameters(matchedAbi.inputs!, encodedParameters)
     )
 
     return {

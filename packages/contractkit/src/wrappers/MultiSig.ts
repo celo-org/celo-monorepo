@@ -1,14 +1,13 @@
+import { CeloTransactionObject, toTransactionObject } from '@celo/communication'
 import { Address, CeloTxObject } from '@celo/sdk-types/commons'
 import BigNumber from 'bignumber.js'
 import { MultiSig } from '../generated/MultiSig'
 import {
   BaseWrapper,
-  CeloTransactionObject,
   proxyCall,
   proxySend,
   stringIdentity,
   stringToSolidityBytes,
-  toTransactionObject,
   tupleParser,
   valueToBigNumber,
   valueToInt,
@@ -49,13 +48,13 @@ export class MultiSigWrapper extends BaseWrapper<MultiSig> {
         !transaction.executed
       ) {
         return toTransactionObject(
-          this.kit,
+          this.kit.communication,
           this.contract.methods.confirmTransaction(transactionId)
         )
       }
     }
     return toTransactionObject(
-      this.kit,
+      this.kit.communication,
       this.contract.methods.submitTransaction(destination, value, data)
     )
   }

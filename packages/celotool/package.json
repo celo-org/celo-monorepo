@@ -8,6 +8,7 @@
   "dependencies": {
     "@celo/utils": "0.1.17-dev",
     "@celo/contractkit": "0.4.11-dev",
+    "@celo/communication": "0.0.1-dev",
     "@google-cloud/monitoring": "0.7.1",
     "@google-cloud/pubsub": "^0.28.1",
     "@google-cloud/storage": "^2.4.3",
@@ -31,7 +32,7 @@
     "yargs": "14.0.0"
   },
   "devDependencies": {
-    "@celo/dev-utils": "file:../dev-utils",
+    "@celo/dev-utils": "0.0.1-dev",
     "@celo/flake-tracker": "0.0.1-dev",
     "@celo/protocol": "*",
     "@celo/sdk-types": "1.0.0-dev",

@@ -167,6 +167,7 @@ export class LedgerSigner implements Signer {
         rlpEncoded.transaction.to!,
         rlpEncoded.transaction.chainId!
       )
+      console.log(tokenInfo)
       if (tokenInfo) {
         await this.ledger!.provideERC20TokenInformation(tokenInfo)
       }

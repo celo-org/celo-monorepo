@@ -43,7 +43,7 @@ export default class OffchainDataWrapper {
     }
     await this.storageWriter.write(data, dataPath)
     // TODO: Prefix signing abstraction
-    const sig = await NativeSigner(this.kit.web3.eth.sign, this.self).sign(data)
+    const sig = await NativeSigner(this.kit.communication.sign, this.self).sign(data)
     await this.storageWriter.write(sig, dataPath + '.signature')
   }
 }

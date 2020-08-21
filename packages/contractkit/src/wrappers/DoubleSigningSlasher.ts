@@ -1,15 +1,9 @@
+import { CeloTransactionObject, toTransactionObject } from '@celo/communication'
 import { Address } from '@celo/sdk-types/commons'
 import { findAddressIndex } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import { DoubleSigningSlasher } from '../generated/DoubleSigningSlasher'
-import {
-  BaseWrapper,
-  CeloTransactionObject,
-  proxyCall,
-  toTransactionObject,
-  valueToBigNumber,
-  valueToInt,
-} from './BaseWrapper'
+import { BaseWrapper, proxyCall, valueToBigNumber, valueToInt } from './BaseWrapper'
 
 /**
  * Contract handling slashing for Validator double-signing
@@ -109,7 +103,7 @@ export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlashe
     )
 
     return toTransactionObject(
-      this.kit,
+      this.kit.communication,
       this.contract.methods.slash(
         signer,
         signerIndex,

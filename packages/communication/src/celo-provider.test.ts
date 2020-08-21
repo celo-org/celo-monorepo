@@ -1,3 +1,4 @@
+import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import {
   Callback,
   CeloTx,
@@ -6,7 +7,9 @@ import {
   Provider,
 } from '@celo/sdk-types/commons'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
-import { CeloProvider } from '../providers/celo-provider'
+import Web3 from 'web3'
+import { CeloProvider } from './celo-provider'
+import { NodeCommunicationWrapper } from './node-communication-wrapper'
 
 // Random private keys
 const PRIVATE_KEY1 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
@@ -15,7 +18,7 @@ const PRIVATE_KEY2 = '0x1234567890abcdef1234567890abcdef1234567890abcdef12345678
 const ACCOUNT_ADDRESS2 = privateKeyToAddress(PRIVATE_KEY2)
 
 // These tests verify the signTransaction WITHOUT the ParamsPopulator
-describe('CeloProvider', () => {
+testWithGanache('CeloProvider', (web3: Web3) => {
   let mockCallback: any
   let mockProvider: Provider
   let celoProvider: CeloProvider
@@ -43,7 +46,7 @@ describe('CeloProvider', () => {
       send: mockCallback,
     }
 
-    celoProvider = new CeloProvider(mockProvider)
+    celoProvider = new CeloProvider(mockProvider, new NodeCommunicationWrapper(web3))
   })
 
   describe("when celo provider don't have any local account", () => {

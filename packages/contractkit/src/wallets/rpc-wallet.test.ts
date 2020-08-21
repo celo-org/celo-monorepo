@@ -4,7 +4,7 @@ import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/src/address'
 import net from 'net'
 import Web3 from 'web3'
-import { newKit } from '../kit'
+import { newKitFromWeb3 } from '../kit'
 import { recoverTransaction, verifyEIP712TypedDataSigner } from '../utils/signing-utils'
 import { RpcWallet } from './rpc-wallet'
 
@@ -78,8 +78,10 @@ describe.skip('rpc-wallet', () => {
     const result = await wallet.signTransaction(tx)
     console.log(result)
 
-    const kit = newKit(ipcUrl, wallet)
-    const txResult = await kit.web3.eth.sendSignedTransaction(result.raw)
+    const web3 = new Web3(ipcProvider)
+    const kit = newKitFromWeb3(web3)
+    kit.communication.wallet = wallet
+    const txResult = await kit.communication.sendSignedTransaction(result.raw)
     console.log(txResult)
   })
 })

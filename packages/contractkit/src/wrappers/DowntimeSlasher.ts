@@ -1,14 +1,13 @@
+import { CeloTransactionObject, toTransactionObject } from '@celo/communication'
 import { Address } from '@celo/sdk-types/commons'
 import { findAddressIndex } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import { DowntimeSlasher } from '../generated/DowntimeSlasher'
 import {
   BaseWrapper,
-  CeloTransactionObject,
   proxyCall,
   proxySend,
   solidityBytesToString,
-  toTransactionObject,
   valueToBigNumber,
   valueToInt,
 } from './BaseWrapper'
@@ -290,7 +289,7 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     )
 
     return toTransactionObject(
-      this.kit,
+      this.kit.communication,
       this.contract.methods.slash(
         startBlocks,
         endBlocks,
@@ -356,7 +355,7 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     }
 
     // Use the latest grandparent because that is the most recent block eligible for inclusion.
-    const latest = (await this.kit.web3.eth.getBlockNumber()) - 2
+    const latest = (await this.kit.communication.getBlockNumber()) - 2
     return {
       start: latest - length + 1,
       end: latest,

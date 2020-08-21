@@ -1,18 +1,11 @@
+import { CeloTransactionObject, toTransactionObject } from '@celo/communication'
 import { Address, NULL_ADDRESS } from '@celo/sdk-types/commons'
 import { eqAddress } from '@celo/utils/lib/address'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { CeloContract, CeloToken } from '../base'
 import { SortedOracles } from '../generated/SortedOracles'
-import {
-  BaseWrapper,
-  CeloTransactionObject,
-  proxyCall,
-  toTransactionObject,
-  valueToBigNumber,
-  valueToFrac,
-  valueToInt,
-} from './BaseWrapper'
+import { BaseWrapper, proxyCall, valueToBigNumber, valueToFrac, valueToInt } from './BaseWrapper'
 
 export enum MedianRelation {
   Undefined,
@@ -132,7 +125,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
       numReports = (await this.getReports(token)).length - 1
     }
     return toTransactionObject(
-      this.kit,
+      this.kit.communication,
       this.contract.methods.removeExpiredReports(tokenAddress, numReports)
     )
   }
@@ -157,7 +150,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     )
 
     return toTransactionObject(
-      this.kit,
+      this.kit.communication,
       this.contract.methods.report(tokenAddress, fixedValue.toFixed(), lesserKey, greaterKey),
       { from: oracleAddress }
     )
