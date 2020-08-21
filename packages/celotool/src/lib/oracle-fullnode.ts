@@ -1,10 +1,10 @@
-import { CloudProvider } from './cloud-provider'
 import { DynamicEnvVar } from './env-utils'
+import { CloudProvider } from './k8s-cluster/base'
 import { AKSFullNodeDeploymentConfig } from './k8s-fullnode/aks'
 import { AWSFullNodeDeploymentConfig } from './k8s-fullnode/aws'
 import { BaseFullNodeDeploymentConfig } from './k8s-fullnode/base'
 import { getFullNodeDeployer } from './k8s-fullnode/utils'
-import { getOracleContextDynamicEnvVarValues, getAWSClusterConfig, getAzureClusterConfig } from './oracle'
+import { getOracleContextDynamicEnvVarValues, getAKSClusterConfig, getAWSClusterConfig } from './oracle'
 import { getCloudProviderFromOracleContext } from './oracle/utils'
 
 /**
@@ -88,7 +88,7 @@ function getAKSFullNodeDeploymentConfig(oracleContext: string): AKSFullNodeDeplo
   const fullNodeDeploymentConfig: BaseFullNodeDeploymentConfig = getFullNodeDeploymentConfig(oracleContext)
   return {
     ...fullNodeDeploymentConfig,
-    clusterConfig: getAzureClusterConfig(oracleContext),
+    clusterConfig: getAKSClusterConfig(oracleContext),
   }
 }
 

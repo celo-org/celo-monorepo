@@ -2,6 +2,11 @@ import { createNamespaceIfNotExists } from 'src/lib/cluster'
 import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { installAndEnableMetricsDeps, redeployTiller } from 'src/lib/helm_deploy'
 
+export enum CloudProvider {
+  AWS,
+  AZURE,
+}
+
 export interface BaseClusterConfig {
   clusterName: string
   cloudProviderName: string
@@ -29,6 +34,8 @@ export abstract class BaseClusterManager {
    * @param clusterConfig
    */
   async switchToClusterContextIfExists() {
+    await this.switchToSubscription()
+
     let currentCluster = null
     try {
       ;[currentCluster] = await execCmd('kubectl config current-context')
@@ -60,6 +67,7 @@ export abstract class BaseClusterManager {
     await installAndEnableMetricsDeps(true, this.clusterConfig)
   }
 
+  abstract switchToSubscription(): Promise<void>
   abstract getAndSwitchToClusterContext(): Promise<void>
 
   get clusterConfig(): BaseClusterConfig {

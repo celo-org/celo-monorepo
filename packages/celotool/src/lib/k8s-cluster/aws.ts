@@ -16,6 +16,10 @@ export class AWSClusterManager extends BaseClusterManager {
     )
   }
 
+  async switchToSubscription() {
+    // not yet supported
+  }
+
   get clusterConfig(): AWSClusterConfig {
     return this._clusterConfig as AWSClusterConfig
   }

@@ -1,13 +1,14 @@
 import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/src/address'
-import { AWSClusterConfig } from 'src/lib/aws'
-import { assignRoleIfNotAssigned, AzureClusterConfig, createIdentityIfNotExists, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity } from 'src/lib/azure'
+import {  } from 'src/lib/aws'
+import { assignRoleIfNotAssigned, createIdentityIfNotExists, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity } from 'src/lib/azure'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { getFornoUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInternalUrl } from 'src/lib/endpoints'
 import { addCeloEnvMiddleware, doCheckOrPromptIfStagingOrProduction, DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback, getDynamicEnvVarName } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
-import { CloudProvider } from './cloud-provider'
-import { BaseClusterConfig, BaseClusterManager } from './k8s-cluster/base'
+import { AKSClusterConfig } from './k8s-cluster/aks'
+import { AWSClusterConfig } from './k8s-cluster/aws'
+import { BaseClusterConfig, BaseClusterManager, CloudProvider } from './k8s-cluster/base'
 import { getClusterManager } from './k8s-cluster/utils'
 import { getCloudProviderFromOracleContext } from './oracle/utils'
 import yargs from 'yargs'
@@ -22,7 +23,7 @@ interface OracleAzureHsmIdentity {
   identityName: string
   keyVaultName: string
   // If a resource group is not specified, it is assumed to be the same
-  // as the kubernetes cluster resource group specified in the AzureClusterConfig
+  // as the kubernetes cluster resource group specified in the AKSClusterConfig
   resourceGroup?: string
 }
 
@@ -45,10 +46,10 @@ interface OracleConfig {
 }
 
 /**
- * Env vars corresponding to each value for the AzureClusterConfig for a particular context
+ * Env vars corresponding to each value for the AKSClusterConfig for a particular context
  */
 
-const oracleContextAzureClusterConfigDynamicEnvVars: { [k in keyof Omit<AzureClusterConfig, 'cloudProviderName'>]: DynamicEnvVar } = {
+const oracleContextAKSClusterConfigDynamicEnvVars: { [k in keyof Omit<AKSClusterConfig, 'cloudProviderName'>]: DynamicEnvVar } = {
   clusterName: DynamicEnvVar.ORACLE_KUBERNETES_CLUSTER_NAME,
   subscriptionId: DynamicEnvVar.ORACLE_AZURE_SUBSCRIPTION_ID,
   tenantId: DynamicEnvVar.ORACLE_AZURE_TENANT_ID,
@@ -90,7 +91,7 @@ const clusterConfigGetterByCloudProvider: {
   [key in CloudProvider]: (oracleContext: string) => BaseClusterConfig
 } = {
   [CloudProvider.AWS]: getAWSClusterConfig,
-  [CloudProvider.AZURE]: getAzureClusterConfig,
+  [CloudProvider.AZURE]: getAKSClusterConfig,
 }
 
 function releaseName(celoEnv: string) {
@@ -209,7 +210,7 @@ async function createOracleAzureIdentityIfNotExists(
   oracleContext: string,
   oracleIdentity: OracleIdentity
 ) {
-  const clusterConfig = getAzureClusterConfig(oracleContext)
+  const clusterConfig = getAKSClusterConfig(oracleContext)
   const identity = await createIdentityIfNotExists(clusterConfig, oracleIdentity.azureHsmIdentity!.identityName!)
   // We want to grant the identity for the cluster permission to manage the oracle identity.
   // Get the correct object ID depending on the cluster configuration, either
@@ -228,7 +229,7 @@ async function createOracleAzureIdentityIfNotExists(
 }
 
 async function setOracleKeyVaultPolicyIfNotSet(
-  clusterConfig: AzureClusterConfig,
+  clusterConfig: AKSClusterConfig,
   oracleIdentity: OracleIdentity,
   azureIdentity: any
 ) {
@@ -257,13 +258,13 @@ async function deleteOracleAzureIdentity(
   oracleContext: string,
   oracleIdentity: OracleIdentity
 ) {
-  const clusterConfig = getAzureClusterConfig(oracleContext)
+  const clusterConfig = getAKSClusterConfig(oracleContext)
   await deleteOracleKeyVaultPolicy(clusterConfig, oracleIdentity)
   return deleteIdentity(clusterConfig, oracleIdentity.azureHsmIdentity!.identityName)
 }
 
 async function deleteOracleKeyVaultPolicy(
-  clusterConfig: AzureClusterConfig,
+  clusterConfig: AKSClusterConfig,
   oracleIdentity: OracleIdentity
 ) {
   const azureIdentity = await getIdentity(clusterConfig, oracleIdentity.azureHsmIdentity!.identityName)
@@ -370,11 +371,11 @@ function getOracleAzureIdentityName(keyVaultName: string, address: string) {
 /**
  * Fetches the env vars for a particular context
  * @param oracleContext the oracle context to use
- * @return an AzureClusterConfig for the context
+ * @return an AKSClusterConfig for the context
  */
-export function getAzureClusterConfig(oracleContext: string): AzureClusterConfig {
-  const azureDynamicEnvVars = getOracleContextDynamicEnvVarValues(oracleContextAzureClusterConfigDynamicEnvVars, oracleContext)
-  const clusterConfig: AzureClusterConfig = {
+export function getAKSClusterConfig(oracleContext: string): AKSClusterConfig {
+  const azureDynamicEnvVars = getOracleContextDynamicEnvVarValues(oracleContextAKSClusterConfigDynamicEnvVars, oracleContext)
+  const clusterConfig: AKSClusterConfig = {
     cloudProviderName: 'azure',
     ...azureDynamicEnvVars
   }

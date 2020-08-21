@@ -1,5 +1,4 @@
 import fs from 'fs'
-import { ClusterConfig } from 'src/lib/cloud-provider'
 import { createNamespaceIfNotExists } from './cluster'
 import { execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv } from './env-utils'
@@ -8,6 +7,7 @@ import {
   removeGenericHelmChart,
   upgradeGenericHelmChart
 } from './helm_deploy'
+import { BaseClusterConfig } from './k8s-cluster/base'
 import {
   createServiceAccountIfNotExists,
   getServiceAccountEmail,
@@ -29,7 +29,7 @@ const prometheusImageTag = 'v2.17.0'
 const grafanaHelmChartPath = '../helm-charts/grafana'
 const grafanaReleaseName = 'grafana'
 
-export async function installPrometheusIfNotExists(clusterConfig?: ClusterConfig) {
+export async function installPrometheusIfNotExists(clusterConfig?: BaseClusterConfig) {
   const prometheusExists = await outputIncludes(
     `helm list`,
     releaseName,
@@ -41,7 +41,7 @@ export async function installPrometheusIfNotExists(clusterConfig?: ClusterConfig
   }
 }
 
-async function installPrometheus(clusterConfig?: ClusterConfig) {
+async function installPrometheus(clusterConfig?: BaseClusterConfig) {
   await createNamespaceIfNotExists(kubeNamespace)
   return installGenericHelmChart(
     kubeNamespace,
@@ -60,7 +60,7 @@ export async function upgradePrometheus() {
   return upgradeGenericHelmChart(kubeNamespace, releaseName, helmChartPath, await helmParameters())
 }
 
-async function helmParameters(clusterConfig?: ClusterConfig) {
+async function helmParameters(clusterConfig?: BaseClusterConfig) {
   const params = [
     `--set namespace=${kubeNamespace}`,
     `--set gcloud.project=${fetchEnv(envVar.TESTNET_PROJECT_NAME)}`,
@@ -93,7 +93,7 @@ async function helmParameters(clusterConfig?: ClusterConfig) {
   return params
 }
 
-async function getPrometheusGcloudServiceAccountKeyBase64(clusterConfig: ClusterConfig) {
+async function getPrometheusGcloudServiceAccountKeyBase64(clusterConfig: BaseClusterConfig) {
   await switchToGCPProjectFromEnv()
 
   const serviceAccountName = getServiceAccountName(clusterConfig)
@@ -119,7 +119,7 @@ async function createPrometheusGcloudServiceAccount(serviceAccountName: string) 
   }
 }
 
-function getServiceAccountName(clusterConfig: ClusterConfig) {
+function getServiceAccountName(clusterConfig: BaseClusterConfig) {
   const prefix = (clusterConfig.cloudProviderName === 'azure') ? 'aks' : 'aws'
   // Ensure the service account name is within the length restriction
   // and ends with an alphanumeric character

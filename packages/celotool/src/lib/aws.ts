@@ -1,14 +1,5 @@
 import sleep from 'sleep-promise'
-import { ClusterConfig } from 'src/lib/cloud-provider'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
-
-/**
- * Basic info for an EKS cluster
- */
-export interface AWSClusterConfig extends ClusterConfig {
-  clusterRegion: string,
-  resourceGroupTag: string
-}
 
 export type AWSResourceTags = { [key: string]: string }
 

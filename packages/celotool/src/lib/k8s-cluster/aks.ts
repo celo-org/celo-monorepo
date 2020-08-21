@@ -16,13 +16,11 @@ export class AKSClusterManager extends BaseClusterManager {
   }
 
   async setupCluster() {
-    await this.switchToSubscription()
     await super.setupCluster()
     await this.installAADPodIdentity()
   }
 
   async switchToSubscription() {
-    // Azure subscription switch
     let currentTenantId = null
     try {
       ;[currentTenantId] = await execCmd('az account show --query id -o tsv')

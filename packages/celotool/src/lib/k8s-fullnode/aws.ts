@@ -1,10 +1,10 @@
 import { range } from 'lodash'
 // import sleep from 'sleep-promise'
 import { BaseFullNodeDeployer, BaseFullNodeDeploymentConfig } from './base'
-import { AWSClusterConfig, deallocateAWSStaticIP, describeElasticIPAddresses, getOrRegisterElasticIP, getElasticIPAddressesFromAllocationIDs, tagsArrayToAWSResourceTags, waitForElasticIPAssociationIDRemoval } from '../aws'
+import { deallocateAWSStaticIP, describeElasticIPAddresses, getOrRegisterElasticIP, getElasticIPAddressesFromAllocationIDs, tagsArrayToAWSResourceTags, waitForElasticIPAssociationIDRemoval } from '../aws'
 import { execCmdWithExitOnFailure } from '../cmd-utils'
 import { deleteResource } from '../kubernetes'
-// import { AWSClusterManager } from '../k8s-cluster/aws'
+import { AWSClusterConfig } from '../k8s-cluster/aws'
 
 export interface AWSFullNodeDeploymentConfig extends BaseFullNodeDeploymentConfig {
   clusterConfig: AWSClusterConfig
@@ -120,7 +120,6 @@ export class AWSFullNodeDeployer extends BaseFullNodeDeployer {
       await deleteResource(this.celoEnv, 'service', kubeServiceName, true)
     }
     await waitForElasticIPAssociationIDRemoval(allocationID)
-    // await this.waitDeattachingStaticIP(ipName, resourceGroup)
     await deallocateAWSStaticIP(allocationID)
   }
 

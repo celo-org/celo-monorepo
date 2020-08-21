@@ -1,4 +1,4 @@
-import { CloudProvider } from '../cloud-provider'
+import { CloudProvider } from '../k8s-cluster/base'
 
 export function getCloudProviderFromOracleContext(oracleContext: string): CloudProvider {
   for (const cloudProvider of Object.values(CloudProvider)) {

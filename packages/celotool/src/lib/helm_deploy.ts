@@ -1,11 +1,11 @@
 import { entries, range } from 'lodash'
 import sleep from 'sleep-promise'
-import { ClusterConfig } from 'src/lib/cloud-provider'
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
 import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
 import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
+import { BaseClusterConfig } from './k8s-cluster/base'
 import { getServerVersion, getStatefulSetReplicas, scaleResource } from './kubernetes'
 import { installPrometheusIfNotExists } from './prometheus'
 import {
@@ -232,7 +232,7 @@ export async function installCertManager() {
 
 export async function installAndEnableMetricsDeps(
   installPrometheus: boolean,
-  clusterConfig?: ClusterConfig
+  clusterConfig?: BaseClusterConfig
 ) {
   const kubeStateMetricsReleaseExists = await outputIncludes(
     `helm list`,

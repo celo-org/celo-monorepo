@@ -1,22 +1,13 @@
-import { ClusterConfig } from 'src/lib/cloud-provider'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { retryCmd } from 'src/lib/utils'
-
-/**
- * Basic info for an AKS cluster
- */
-export interface AzureClusterConfig extends ClusterConfig {
-  tenantId: string
-  resourceGroup: string
-  subscriptionId: string
-}
+import { AKSClusterConfig } from './k8s-cluster/aks'
 
 /**
  * getIdentity gets basic info on an existing identity. If the identity doesn't
  * exist, undefined is returned
  */
 export async function getIdentity(
-  clusterConfig: AzureClusterConfig,
+  clusterConfig: AKSClusterConfig,
   identityName: string
 ) {
   const [matchingIdentitiesStr] = await execCmdWithExitOnFailure(
@@ -33,7 +24,7 @@ export async function getIdentity(
 // createIdentityIfNotExists creates an identity if it doesn't already exist.
 // Returns an object including basic info on the identity.
 export async function createIdentityIfNotExists(
-  clusterConfig: AzureClusterConfig,
+  clusterConfig: AKSClusterConfig,
   identityName: string
 ) {
   const identity = await getIdentity(clusterConfig, identityName)
@@ -52,7 +43,7 @@ export async function createIdentityIfNotExists(
 /**
  * deleteIdentity gets basic info on an existing identity
  */
-export function deleteIdentity(clusterConfig: AzureClusterConfig, identityName: string) {
+export function deleteIdentity(clusterConfig: AKSClusterConfig, identityName: string) {
   return execCmdWithExitOnFailure(
     `az identity delete -n ${identityName} -g ${clusterConfig.resourceGroup} -o json`
   )
@@ -84,7 +75,7 @@ export async function assignRoleIfNotAssigned(assigneeObjectId: string, assignee
   )
 }
 
-export async function getAKSNodeResourceGroup(clusterConfig: AzureClusterConfig) {
+export async function getAKSNodeResourceGroup(clusterConfig: AKSClusterConfig) {
   const [nodeResourceGroup] = await execCmdWithExitOnFailure(
     `az aks show --name ${clusterConfig.clusterName} --resource-group ${clusterConfig.resourceGroup} --query nodeResourceGroup -o tsv`
   )
@@ -94,7 +85,7 @@ export async function getAKSNodeResourceGroup(clusterConfig: AzureClusterConfig)
 /**
  * Gets the AKS Service Principal Object ID if one exists. Otherwise, an empty string is given.
  */
-export async function getAKSServicePrincipalObjectId(clusterConfig: AzureClusterConfig) {
+export async function getAKSServicePrincipalObjectId(clusterConfig: AKSClusterConfig) {
   // Get the correct object ID depending on the cluster configuration
   // See https://github.com/Azure/aad-pod-identity/blob/b547ba86ab9b16d238db8a714aaec59a046afdc5/docs/readmes/README.role-assignment.md#obtaining-the-id-of-the-managed-identity--service-principal
   const [rawServicePrincipalClientId] = await execCmdWithExitOnFailure(
@@ -116,7 +107,7 @@ export async function getAKSServicePrincipalObjectId(clusterConfig: AzureCluster
  * If an AKS cluster is using a managed service identity, the objectId is returned.
  * Otherwise, an empty string is given.
  */
-export async function getAKSManagedServiceIdentityObjectId(clusterConfig: AzureClusterConfig) {
+export async function getAKSManagedServiceIdentityObjectId(clusterConfig: AKSClusterConfig) {
   const [managedIdentityObjectId] = await execCmdWithExitOnFailure(
     `az aks show -n ${clusterConfig.clusterName} --query identityProfile.kubeletidentity.objectId -g ${clusterConfig.resourceGroup} -o tsv`
   )

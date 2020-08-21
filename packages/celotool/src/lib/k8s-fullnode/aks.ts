@@ -1,17 +1,17 @@
 import { range } from 'lodash'
 import sleep from 'sleep-promise'
 import {
-  AzureClusterConfig,
   deallocateStaticIP,
   getAKSNodeResourceGroup,
   registerStaticIPIfNotRegistered
 } from '../azure'
 import { execCmdWithExitOnFailure } from '../cmd-utils'
+import { AKSClusterConfig } from '../k8s-cluster/aks'
 import { deleteResource } from '../kubernetes'
 import { BaseFullNodeDeployer, BaseFullNodeDeploymentConfig } from './base'
 
 export interface AKSFullNodeDeploymentConfig extends BaseFullNodeDeploymentConfig {
-  clusterConfig: AzureClusterConfig
+  clusterConfig: AKSClusterConfig
 }
 
 export class AKSFullNodeDeployer extends BaseFullNodeDeployer {
