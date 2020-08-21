@@ -12,6 +12,7 @@ import * as Sentry from '@sentry/react-native'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { clearStoredAccount, devModeTriggerClicked, toggleBackupState } from 'src/account/actions'
@@ -174,6 +175,10 @@ export class Account extends React.Component<Props, State> {
     this.props.navigation.navigate(Screens.Debug)
   }
 
+  onDevSettingsTriggerPress = () => {
+    this.props.devModeTriggerClicked()
+  }
+
   getDevSettingsComp() {
     const { devModeActive } = this.props
 
@@ -302,9 +307,11 @@ export class Account extends React.Component<Props, State> {
       <SafeAreaView style={styles.container}>
         <DrawerTopBar />
         <ScrollView>
-          <Text style={styles.title} testID={'SettingsTitle'}>
-            {t('global:settings')}
-          </Text>
+          <TouchableWithoutFeedback onPress={this.onDevSettingsTriggerPress}>
+            <Text style={styles.title} testID={'SettingsTitle'}>
+              {t('global:settings')}
+            </Text>
+          </TouchableWithoutFeedback>
           <View style={styles.containerList}>
             <SettingsItemTextValue title={t('editProfile')} onPress={this.goToProfile} />
             {!numberVerified && (
