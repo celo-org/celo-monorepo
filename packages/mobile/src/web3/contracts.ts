@@ -4,6 +4,7 @@
  * Leaving the name for recognizability to current devs
  */
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { WritableWallet } from '@celo/contractkit/lib/wallets/wallet'
 import { sleep } from '@celo/utils/src/async'
 import GethBridge from 'react-native-geth'
 import { call, delay, select } from 'redux-saga/effects'
@@ -24,7 +25,7 @@ const TAG = 'web3/contracts'
 const KIT_INIT_RETRY_DELAY = 2000
 const CONTRACT_KIT_RETRIES = 3
 
-let wallet: GethNativeBridgeWallet | undefined
+let wallet: WritableWallet | undefined
 let contractKit: ContractKit | undefined
 
 function* initWallet() {

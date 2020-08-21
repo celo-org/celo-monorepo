@@ -9,11 +9,13 @@ import { ensureLeading0x } from '@celo/utils/lib/address'
 import { normalizeAddressWith0x } from '@celo/utils/src/address'
 import * as ethUtil from 'ethereumjs-util'
 import { GethNativeModule } from 'react-native-geth'
+import Logger from 'src/utils/Logger'
 import { Tx } from 'web3-core'
 
 const INCORRECT_PASSWORD_ERROR = 'could not decrypt key with given password'
 const currentTimeInSeconds = () => Math.floor(Date.now() / 1000)
 
+const TAG = 'geth/GethNativeBridgeSigner'
 /**
  * Implements the signer interface on top of a RNGeth instance
  */
@@ -63,7 +65,8 @@ export class GethNativeBridgeSigner implements Signer {
   }
 
   async signPersonalMessage(data: string): Promise<{ v: number; r: Buffer; s: Buffer }> {
-    const hash = ethUtil.hashPersonalMessage(Buffer.from(data, 'hex'))
+    Logger.info(`${TAG}@signPersonalMessage`, `Signing ${data}`)
+    const hash = ethUtil.hashPersonalMessage(Buffer.from(data.replace('0x', ''), 'hex'))
     const signatureBase64 = await this.geth.signHash(hash.toString('base64'), this.account)
     return ethUtil.fromRpcSig(this.base64ToHex(signatureBase64))
   }
