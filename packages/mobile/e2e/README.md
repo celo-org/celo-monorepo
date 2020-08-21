@@ -16,7 +16,7 @@ Next, to improve reliability of the tests, configure the VM as described in the 
 
 ### iOS
 
-Ensure you have XCode installed.
+Ensure you have Xcode installed.
 
 Install [AppleSimulatorUtils](https://github.com/wix/AppleSimulatorUtils#installing) which is used in e2e scripts to launch the iOS simulator.
 
