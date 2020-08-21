@@ -50,7 +50,6 @@ The ODIS endpoint URL for each environment can be found here:
 |  Alfajores Staging | https://alfajoresstaging-dot-celo-testnet.wl.r.appspot.com |
 | Alfajores  | https://us-central1-celo-phone-number-privacy.cloudfunctions.net |
 | Mainnet  |  https://us-central1-celo-odis-mainnet.cloudfunctions.net |
-&nbsp;
 
 The ODIS public key for each environment can be found here:
 | Environment  | Key  | 
@@ -58,7 +57,6 @@ The ODIS public key for each environment can be found here:
 |  Alfajores Staging | 7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA  |
 | Alfajores  |  kPoRxWdEdZ/Nd3uQnp3FJFs54zuiS+ksqvOm9x8vY6KHPG8jrfqysvIRU0wtqYsBKA7SoAsICMBv8C/Fb2ZpDOqhSqvr/sZbZoHmQfvbqrzbtDIPvUIrHgRS0ydJCMsA |
 | Mainnet  |  FvreHfLmhBjwxHxsxeyrcOLtSonC9j7K3WrS4QapYsQH6LdaDTaNGmnlQMfFY04Bp/K4wAvqQwO9/bqPVCKf8Ze8OZo8Frmog4JY4xAiwrsqOXxug11+htjEe1pj4uMA |
-&nbsp;
 
 ## Query phone number identifier
 This call consumes quota. When the user runs out of quota, it's recommended to prompt the user to "purchase" more quota by sending a transaction to themselves. This method returns the pepper retrieved from the service as well as the the computed on-chain identifier that is generated using this pepper and the phone number.
@@ -83,7 +81,6 @@ Now you're ready to get the phone number identifier. Call `OdisUtils.PhoneNumber
 | selfPhoneHash | string | no | The caller's on-chain identifier (from a previous call). This helps the service provide extra quota by checking if the number is verified. |
 | clientVersion | string | no | The client's version. Caller should prefix the version with a unique app identifier (ex. "celocli-1.0.0") |
 | blsBlindingClient | BlsBlindingClient | no | The BLS blinding client described above |
-&nbsp;
 
 The response will be an object with the original phone number, the on-chain identifier (phoneHash), and the phone number's pepper.
 ```ts
