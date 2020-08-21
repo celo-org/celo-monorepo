@@ -142,6 +142,7 @@ Next install [Android Studio][android studio] and add the [Android NDK][android 
 Execute the following (and make sure the lines are in your `~/.bash_profile`).
 
 _Note that these paths may differ on your machine. You can find the path to the SDK and NDK via the [Android Studio menu](https://stackoverflow.com/questions/40520324/how-to-find-the-path-to-ndk)._
+
 ```bash
 export ANDROID_HOME=/usr/local/share/android-sdk
 export ANDROID_NDK=/usr/local/share/android-ndk
@@ -312,9 +313,9 @@ See [`src/identity/verification.test.ts`] for an example.
 ### End-to-End testing
 
 We use [Detox][detox] for E2E testing. In order to run the tests locally, you
-must have the proper emulator set up. Follow the instrutions in [e2e/README.md][e2e readme].
+must have the proper emulator set up. Follow the instructions in [e2e/README.md][e2e readme].
 
-Once setup is done, you can run the tests with `yarn test:e2e:android`
+Once setup is done, you can run the tests with `yarn test:e2e:android` or `yarn test:e2e:ios`.
 
 ## Building APKs / Bundles
 
