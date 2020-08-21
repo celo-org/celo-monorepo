@@ -11,7 +11,7 @@ import { Command, flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
 import net from 'net'
 import Web3 from 'web3'
-import { getNodeUrl } from './utils/config'
+import { getGasCurrency, getNodeUrl } from './utils/config'
 import { requireNodeIsSynced } from './utils/helpers'
 
 // Base for commands that do not need web3.
@@ -37,7 +37,7 @@ export abstract class LocalCommand extends Command {
   }
 }
 
-enum GasOptions {
+export enum GasOptions {
   celo = 'celo',
   CELO = 'celo',
   cusd = 'cusd',
@@ -107,6 +107,7 @@ export abstract class BaseCommand extends LocalCommand {
   // to its definition:
   //   requireSynced = false
   public requireSynced: boolean = true
+  protected gasCurrencyConfig?: GasOptions | undefined
 
   private _web3: Web3 | null = null
   private _kit: ContractKit | null = null
@@ -185,11 +186,16 @@ export abstract class BaseCommand extends LocalCommand {
         throw err
       }
     }
-    if (res.flags.gasCurrency) {
+
+    this.gasCurrencyConfig = res.flags.gasCurrency
+      ? GasOptions[res.flags.gasCurrency as keyof typeof GasOptions]
+      : getGasCurrency(this.config.configDir)
+
+    if (this.gasCurrencyConfig) {
       const setUsd = () => this.kit.setFeeCurrency(CeloContract.StableToken)
-      if (res.flags.gasCurrency === GasOptions.cUSD) {
+      if (this.gasCurrencyConfig === GasOptions.cUSD) {
         await setUsd()
-      } else if (res.flags.gasCurrency === GasOptions.auto && this.kit.defaultAccount) {
+      } else if (this.gasCurrencyConfig === GasOptions.auto && this.kit.defaultAccount) {
         const balances = await this.kit.getTotalBalance(this.kit.defaultAccount)
         if (balances.CELO.isZero()) {
           await setUsd()

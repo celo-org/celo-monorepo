@@ -1,7 +1,7 @@
 import { CeloContract } from '@celo/contractkit'
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
-import { BaseCommand } from '../../base'
+import { BaseCommand, GasOptions } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
@@ -31,22 +31,21 @@ export default class TransferDollars extends BaseCommand {
     this.kit.defaultAccount = from
     const stableToken = await this.kit.contracts.getStableToken()
 
-    const balance = await stableToken.balanceOf(from)
-
     const tx = res.flags.comment
       ? stableToken.transferWithComment(to, value.toFixed(), res.flags.comment)
       : stableToken.transfer(to, value.toFixed())
 
-    if (res.flags.gasCurrency && res.flags.gasCurrency === 'auto') {
+    // resolve auto gasCurrencyConfig such that feeCurrency is cUSD with sufficient balance
+    if (this.gasCurrencyConfig && this.gasCurrencyConfig === GasOptions.auto) {
       const gas = await tx.txo.estimateGas({ feeCurrency: stableToken.address })
       const { gasPrice } = await this.kit.fillGasPrice({
         gasPrice: '0',
         feeCurrency: stableToken.address,
       })
+      const balance = await stableToken.balanceOf(from)
+      // check if cUSD balance is sufficient for transfer + gas
       if (value.plus(new BigNumber(gas).times(gasPrice as string)).isLessThanOrEqualTo(balance)) {
         await this.kit.setFeeCurrency(CeloContract.StableToken)
-      } else {
-        await this.kit.setFeeCurrency(CeloContract.GoldToken)
       }
     }
 
