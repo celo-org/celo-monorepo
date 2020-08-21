@@ -31,7 +31,6 @@ const signMoonpayUrlStaging =
   'https://us-central1-celo-org-mobile.cloudfunctions.net/signMoonpayStaging'
 const signMoonpayUrlProd =
   'https://us-central1-celo-mobile-mainnet.cloudfunctions.net/signMoonpayProd'
-
 const networkConfigs: { [testnet: string]: NetworkConfig } = {
   [Testnets.integration]: {
     nodeDir: `.${Testnets.integration}`,
