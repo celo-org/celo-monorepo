@@ -37,17 +37,25 @@ export abstract class LocalCommand extends Command {
   }
 }
 
+enum GasOptions {
+  celo = 'celo',
+  CELO = 'celo',
+  cusd = 'cusd',
+  cUSD = 'cusd',
+  auto = 'auto',
+  Auto = 'auto',
+}
+
 // tslint:disable-next-line:max-classes-per-file
 export abstract class BaseCommand extends LocalCommand {
   static flags = {
     ...LocalCommand.flags,
     privateKey: flags.string({ hidden: true }),
     node: flags.string({ char: 'n', hidden: true }),
-    usdGas: flags.boolean({
-      default: false,
-      description: 'If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD',
-      // TODO: remove once feeCurrency is implemented in ledger app
-      exclusive: ['useLedger'],
+    gasCurrency: flags.enum({
+      options: Object.keys(GasOptions),
+      description:
+        "Use a specific gas currency for transaction fees ('auto' defaults to denomination of transfer or whatever is available)",
     }),
     useLedger: flags.boolean({
       default: false,
@@ -177,9 +185,17 @@ export abstract class BaseCommand extends LocalCommand {
         throw err
       }
     }
-    await this.kit.setFeeCurrency(
-      res.flags.usdGas ? CeloContract.StableToken : CeloContract.GoldToken
-    )
+    if (res.flags.gasCurrency) {
+      const setUsd = () => this.kit.setFeeCurrency(CeloContract.StableToken)
+      if (res.flags.gasCurrency === GasOptions.cUSD) {
+        await setUsd()
+      } else if (res.flags.gasCurrency === GasOptions.auto && this.kit.defaultAccount) {
+        const balances = await this.kit.getTotalBalance(this.kit.defaultAccount)
+        if (balances.CELO.isZero()) {
+          await setUsd()
+        }
+      }
+    }
   }
 
   finally(arg: Error | undefined): Promise<any> {
