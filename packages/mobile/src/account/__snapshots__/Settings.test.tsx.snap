@@ -89,41 +89,29 @@ exports[`Account renders correctly 1`] = `
   </View>
   <RCTScrollView>
     <View>
-      <RNGestureHandlerButton
-        collapsable={false}
-        onGestureEvent={[Function]}
-        onGestureHandlerEvent={[Function]}
-        onGestureHandlerStateChange={[Function]}
-        onHandlerStateChange={[Function]}
-        rippleColor={0}
+      <Text
+        accessible={true}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
         style={
-          Array [
-            Object {
-              "overflow": "hidden",
-            },
-            undefined,
-          ]
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Jost-Book",
+            "fontSize": 26,
+            "lineHeight": 32,
+            "margin": 16,
+          }
         }
+        testID="SettingsTitle"
       >
-        <View
-          accessible={true}
-        >
-          <Text
-            style={
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Jost-Book",
-                "fontSize": 26,
-                "lineHeight": 32,
-                "margin": 16,
-              }
-            }
-            testID="SettingsTitle"
-          >
-            global:settings
-          </Text>
-        </View>
-      </RNGestureHandlerButton>
+        global:settings
+      </Text>
       <View
         style={
           Object {
@@ -2096,41 +2084,29 @@ exports[`Account renders correctly when dev mode active 1`] = `
   </View>
   <RCTScrollView>
     <View>
-      <RNGestureHandlerButton
-        collapsable={false}
-        onGestureEvent={[Function]}
-        onGestureHandlerEvent={[Function]}
-        onGestureHandlerStateChange={[Function]}
-        onHandlerStateChange={[Function]}
-        rippleColor={0}
+      <Text
+        accessible={true}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
         style={
-          Array [
-            Object {
-              "overflow": "hidden",
-            },
-            undefined,
-          ]
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Jost-Book",
+            "fontSize": 26,
+            "lineHeight": 32,
+            "margin": 16,
+          }
         }
+        testID="SettingsTitle"
       >
-        <View
-          accessible={true}
-        >
-          <Text
-            style={
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Jost-Book",
-                "fontSize": 26,
-                "lineHeight": 32,
-                "margin": 16,
-              }
-            }
-            testID="SettingsTitle"
-          >
-            global:settings
-          </Text>
-        </View>
-      </RNGestureHandlerButton>
+        global:settings
+      </Text>
       <View
         style={
           Object {
