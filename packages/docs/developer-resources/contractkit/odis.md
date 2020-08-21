@@ -91,7 +91,7 @@ PhoneNumberHashDetails {
 }
 ```
 
-You can view an example of this call in [our mobile project here](https://github.com/celo-org/celo-monorepo/blob/41e3e6a0e7b99506a27b026b41e09bec1d9c3cd6/packages/mobile/src/identity/privateHashing.ts#L112).
+You can view an example of this call in [our mobile project here](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/src/identity/privateHashing.ts).
 
 ## Matchmaking
 
@@ -110,4 +110,4 @@ Call `OdisUtils.Matchmaking.getContactMatches` and pass in the following paramet
 
 The response will be a subset of the input `e164NumberContacts` that are matched by the matchmaking service.
 
-You can view an example of this call in [our mobile project here](https://github.com/celo-org/celo-monorepo/blob/41e3e6a0e7b99506a27b026b41e09bec1d9c3cd6/packages/mobile/src/identity/matchmaking.ts#L40-L49).
+You can view an example of this call in [our mobile project here](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/src/identity/matchmaking.ts).
