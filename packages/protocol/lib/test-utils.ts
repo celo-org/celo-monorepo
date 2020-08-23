@@ -111,6 +111,17 @@ export async function assertBalance(address: string, balance: BigNumber) {
   }
 }
 
+export const assertThrowsAsync = async (promise: any, errorMessage: string = '') => {
+  let failed = false
+  try {
+    await promise
+  } catch (_) {
+    failed = true
+  }
+
+  assert.isTrue(failed, errorMessage)
+}
+
 // TODO: Use assertRevert directly from openzeppelin-solidity
 export async function assertRevert(promise: any, errorMessage: string = '') {
   try {
