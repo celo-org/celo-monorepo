@@ -13,6 +13,7 @@ const serviceContext: ServiceContext = {
   odisPubKey:
     '7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA',
 }
+const endpoint = serviceContext.odisUrl + '/getContactMatches'
 
 const authSigner: EncryptionKeySigner = {
   authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
@@ -25,7 +26,7 @@ describe(getContactMatches, () => {
   })
 
   it('Retrieves matches correctly', async () => {
-    fetchMock.mock(serviceContext.odisUrl + '/getContactMatches', {
+    fetchMock.mock(endpoint, {
       success: true,
       matchedContacts: [{ phoneNumber: obfuscateNumberForMatchmaking(mockE164Number2) }],
     })
@@ -43,7 +44,7 @@ describe(getContactMatches, () => {
   })
 
   it('Throws quota error', async () => {
-    fetchMock.mock(serviceContext.odisUrl + '/getContactMatches', 403)
+    fetchMock.mock(endpoint, 403)
 
     await expect(
       getContactMatches(
@@ -58,7 +59,7 @@ describe(getContactMatches, () => {
   })
 
   it('Throws auth error', async () => {
-    fetchMock.mock(serviceContext.odisUrl + '/getContactMatches', 401)
+    fetchMock.mock(endpoint, 401)
     await expect(
       getContactMatches(
         mockE164Number,

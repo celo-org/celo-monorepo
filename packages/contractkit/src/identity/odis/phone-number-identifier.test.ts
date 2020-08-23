@@ -23,6 +23,7 @@ const serviceContext: ServiceContext = {
   odisPubKey:
     '7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA',
 }
+const endpoint = serviceContext.odisUrl + '/getBlindedMessageSig'
 
 const authSigner: EncryptionKeySigner = {
   authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
@@ -35,7 +36,7 @@ describe(getPhoneNumberIdentifier, () => {
   })
 
   it('Retrieves a pepper correctly', async () => {
-    fetchMock.mock(serviceContext.odisUrl + '/getDistributedBlindedSalt', {
+    fetchMock.mock(endpoint, {
       success: true,
       combinedSignature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
     })
@@ -50,7 +51,7 @@ describe(getPhoneNumberIdentifier, () => {
   })
 
   it('Throws quota error', async () => {
-    fetchMock.mock(serviceContext.odisUrl + '/getDistributedBlindedSalt', 403)
+    fetchMock.mock(endpoint, 403)
 
     await expect(
       getPhoneNumberIdentifier(mockE164Number, mockAccount, authSigner, serviceContext)
@@ -58,7 +59,7 @@ describe(getPhoneNumberIdentifier, () => {
   })
 
   it('Throws auth error', async () => {
-    fetchMock.mock(serviceContext.odisUrl + '/getDistributedBlindedSalt', 401)
+    fetchMock.mock(endpoint, 401)
     await expect(
       getPhoneNumberIdentifier(mockE164Number, mockAccount, authSigner, serviceContext)
     ).rejects.toThrow(ErrorMessages.ODIS_AUTH_ERROR)
