@@ -1,4 +1,4 @@
-import SmartTopAlert, { NotificationTypes } from '@celo/react-components/components/SmartTopAlert'
+import SmartTopAlert, { AlertTypes } from '@celo/react-components/components/SmartTopAlert'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { hideAlert } from 'src/alert/actions'
@@ -35,7 +35,7 @@ export class AlertBanner extends React.Component<Props> {
         timestamp={Date.now()}
         text={alert && alert.message}
         onPress={hideAlertAction}
-        type={alert && alert.type === 'error' ? NotificationTypes.ERROR : NotificationTypes.MESSAGE}
+        type={alert && alert.type === 'error' ? AlertTypes.ERROR : AlertTypes.MESSAGE}
         dismissAfter={alert && alert.dismissAfter}
         buttonMessage={alert && alert.buttonMessage}
         title={alert && alert.title}

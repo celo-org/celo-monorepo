@@ -361,6 +361,26 @@ export const v3Schema = {
   },
 }
 
+// Skipping v4 to match the Redux store version
+// It's not critical but it's good to keep those in sync
+export const v5Schema = {
+  ...v3Schema,
+  account: {
+    ...v3Schema.account,
+    incomingPaymentRequests: undefined,
+    outgoingPaymentRequests: undefined,
+  },
+  paymentRequest: {
+    incomingPaymentRequests: [],
+    outgoingPaymentRequests: [],
+  },
+  web3: {
+    ...v3Schema.web3,
+    dataEncryptionKey: '0x0000000000000000000000000000000000008F68',
+    commentKey: undefined,
+  },
+}
+
 export function getLatestSchema(): Partial<RootState> {
-  return v3Schema as Partial<RootState>
+  return v5Schema as Partial<RootState>
 }

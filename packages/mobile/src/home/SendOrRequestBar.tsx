@@ -1,7 +1,7 @@
 import Button, { BtnSizes } from '@celo/react-components/components/Button.v2'
 import Touchable from '@celo/react-components/components/Touchable'
 import QRCodeBorderlessIcon from '@celo/react-components/icons/QRCodeBorderless'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import variables from '@celo/react-components/styles/variables'
 import React from 'react'
 import { useTranslation } from 'react-i18next'

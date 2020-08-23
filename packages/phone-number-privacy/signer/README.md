@@ -1,10 +1,10 @@
-# Phone Number Privacy - Signer Service
+# ODIS - Signer Service
 
-A service run by distributed partners that generates unique partial signatures for phone number salts. Using a threshold BLS signature scheme, when K/N signatures are combined, a deterministic signature is obtained.
+A service that generates unique partial signatures for blinded messages. Using a threshold BLS signature scheme, when K/N signatures are combined, a deterministic signature is obtained.
 
 ## Configuration
 
-You can use the following environment variables to configure the Phone Number Privacy - Signer service:
+You can use the following environment variables to configure the ODIS Signer service:
 
 ### Server
 

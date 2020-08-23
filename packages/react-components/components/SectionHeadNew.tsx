@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
@@ -19,7 +19,7 @@ export default function SectionheadNew({ text, style }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
     paddingHorizontal: variables.contentPadding,
     paddingVertical: 8,
     flexDirection: 'row',

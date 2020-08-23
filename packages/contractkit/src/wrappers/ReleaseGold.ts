@@ -1,9 +1,6 @@
-import { findAddressIndex } from '@celo/utils/lib/address'
-import {
-  hashMessageWithPrefix,
-  Signature,
-  signedMessageToPublicKey,
-} from '@celo/utils/lib/signatureUtils'
+import { findAddressIndex } from '@celo/base/lib/address'
+import { Signature } from '@celo/base/lib/signatureUtils'
+import { hashMessageWithPrefix, signedMessageToPublicKey } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import { Address } from '../base'
 import { ReleaseGold } from '../generated/ReleaseGold'

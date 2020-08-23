@@ -84,8 +84,8 @@ export class CTextInput extends React.Component<Props, State> {
             onPress={this.onClear}
             solid={true}
             size={20}
-            activeColor={colors.gray}
-            inactiveColor={colors.darkLightest}
+            activeColor={colors.gray5}
+            inactiveColor={colors.gray1}
           />
         )}
       </View>
@@ -111,7 +111,7 @@ const style = StyleSheet.create({
   borderedText: {
     ...fontStyles.regular,
     flex: 1,
-    borderColor: colors.inputBorder,
+    borderColor: colors.gray2,
     borderRadius: 3,
     padding: 8,
     backgroundColor: '#FFFFFF',

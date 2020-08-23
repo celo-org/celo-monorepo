@@ -6,18 +6,18 @@ import { StyleSheet, View } from 'react-native'
 import { HomeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
-import { cancelPaymentRequest, updatePaymentRequestNotified } from 'src/firebase/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
 import { Namespaces, withTranslation } from 'src/i18n'
+import { cancelPaymentRequest, updatePaymentRequestNotified } from 'src/paymentRequest/actions'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 import Logger from 'src/utils/Logger'
 
 interface OwnProps {
+  id: string
   requestee: Recipient
   amount: string
-  comment: string
-  id: string
+  comment?: string
   cancelPaymentRequest: typeof cancelPaymentRequest
   updatePaymentRequestNotified: typeof updatePaymentRequestNotified
 }

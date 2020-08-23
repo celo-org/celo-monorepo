@@ -1,5 +1,5 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { Spacing } from '@celo/react-components/styles/styles.v2'
 import React from 'react'
