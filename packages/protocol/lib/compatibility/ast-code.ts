@@ -1,6 +1,6 @@
 // tslint:disable: max-classes-per-file
-import { makeZContract } from '@celo/protocol/lib/compatibility/internal'
 import { stripMetadata } from '@celo/protocol/lib/bytecode'
+import { makeZContract } from '@celo/protocol/lib/compatibility/internal'
 import {
   BuildArtifacts,
   Contract as ZContract
