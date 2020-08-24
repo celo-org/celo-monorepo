@@ -140,7 +140,7 @@ export async function queryOdis<ResponseType>(
         default:
           if (Math.floor(res.status / 100) === 4) {
             // Don't retry error codes in 400s
-            throw new Error(ErrorMessages.ODIS_CLIENT_ERROR + ' ' + res.status)
+            throw new Error(`${ErrorMessages.ODIS_CLIENT_ERROR} ${res.status}`)
           }
           throw new Error(`Unknown failure ${res.status}`)
       }
