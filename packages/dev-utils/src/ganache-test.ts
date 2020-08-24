@@ -1,4 +1,4 @@
-import { JsonRpcResponse } from '@celo/sdk-types/commons'
+import { JsonRpcResponse } from '@celo/communication/types/commons'
 import Web3 from 'web3'
 import migrationOverride from './migration-override.json'
 

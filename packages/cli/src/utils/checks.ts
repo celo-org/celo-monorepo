@@ -1,9 +1,9 @@
+import { Address } from '@celo/communication/types/commons'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { GovernanceWrapper, ProposalStage } from '@celo/contractkit/lib/wrappers/Governance'
 import { LockedGoldWrapper } from '@celo/contractkit/lib/wrappers/LockedGold'
 import { MultiSigWrapper } from '@celo/contractkit/lib/wrappers/MultiSig'
 import { ValidatorsWrapper } from '@celo/contractkit/lib/wrappers/Validators'
-import { Address } from '@celo/sdk-types/commons'
 import { eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
@@ -164,7 +164,7 @@ class CheckBuilder {
     this.addCheck('Account can sign', async () => {
       try {
         const message = 'test'
-        const signature = await this.kit.web3.eth.sign(message, account)
+        const signature = await this.kit.communication.sign(message, account)
         return verifySignature(message, signature, account)
       } catch (error) {
         console.error(error)
@@ -293,7 +293,7 @@ class CheckBuilder {
     )
 
   hasEnoughGold = (account: Address, value: BigNumber) => {
-    const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
+    const valueInEth = this.kit.communication.web3.utils.fromWei(value.toFixed(), 'ether')
     return this.addCheck(`Account has at least ${valueInEth} CELO`, () =>
       this.kit.contracts
         .getGoldToken()
@@ -303,7 +303,7 @@ class CheckBuilder {
   }
 
   hasEnoughUsd = (account: Address, value: BigNumber) => {
-    const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
+    const valueInEth = this.kit.communication.web3.utils.fromWei(value.toFixed(), 'ether')
     return this.addCheck(`Account has at least ${valueInEth} cUSD`, () =>
       this.kit.contracts
         .getStableToken()
@@ -327,7 +327,7 @@ class CheckBuilder {
     )
 
   hasEnoughLockedGold = (value: BigNumber) => {
-    const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
+    const valueInEth = this.kit.communication.web3.utils.fromWei(value.toFixed(), 'ether')
     return this.addCheck(
       `Account has at least ${valueInEth} Locked Gold`,
       this.withLockedGold(async (lockedGold, _signer, account) =>
@@ -337,7 +337,7 @@ class CheckBuilder {
   }
 
   hasEnoughNonvotingLockedGold = (value: BigNumber) => {
-    const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
+    const valueInEth = this.kit.communication.web3.utils.fromWei(value.toFixed(), 'ether')
     return this.addCheck(
       `Account has at least ${valueInEth} non-voting Locked Gold`,
       this.withLockedGold(async (lockedGold, _signer, account) =>
@@ -347,7 +347,7 @@ class CheckBuilder {
   }
 
   hasEnoughLockedGoldToUnlock = (value: BigNumber) => {
-    const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
+    const valueInEth = this.kit.communication.web3.utils.fromWei(value.toFixed(), 'ether')
     return this.addCheck(
       `Account has at least ${valueInEth} non-voting Locked Gold over requirement`,
       this.withLockedGold(async (lockedGold, _signer, account, validators) => {

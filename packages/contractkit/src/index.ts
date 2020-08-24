@@ -1,4 +1,4 @@
-export { Address, NULL_ADDRESS } from '@celo/sdk-types/commons'
+export { Address, NULL_ADDRESS } from '@celo/communication/types/commons'
 export { AllContracts, CeloContract, CeloToken } from './base'
 export { IdentityMetadataWrapper } from './identity'
 export * from './kit'

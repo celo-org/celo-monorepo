@@ -1,5 +1,5 @@
 import { CeloTransactionObject } from '@celo/communication'
-import { Address, EventLog } from '@celo/sdk-types/commons'
+import { Address, EventLog } from '@celo/communication/types/commons'
 import { AddressListItem, linkedListChanges, zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import { LockedGold } from '../generated/LockedGold'

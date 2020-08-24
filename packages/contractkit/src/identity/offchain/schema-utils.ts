@@ -1,4 +1,4 @@
-import { Address } from '@celo/sdk-types/commons'
+import { Address } from '@celo/communication/types/commons'
 import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import OffchainDataWrapper from '../offchain-data-wrapper'

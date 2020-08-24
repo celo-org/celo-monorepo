@@ -1,5 +1,5 @@
 import { CeloTransactionObject, toTransactionObject } from '@celo/communication'
-import { Address } from '@celo/sdk-types/commons'
+import { Address } from '@celo/communication/types/commons'
 import { findAddressIndex } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import { DowntimeSlasher } from '../generated/DowntimeSlasher'

@@ -1,4 +1,4 @@
-import { EventLog } from '@celo/sdk-types/commons'
+import { EventLog } from '@celo/communication/types/commons'
 import { AbiInput as Web3AbiInput, AbiItem as Web3AbiItem } from 'web3-utils'
 
 export interface JsonRpcPayload extends WebCoreHelper.JsonRpcPayload {}

@@ -1,5 +1,5 @@
 import { CeloTransactionObject, toTransactionObject } from '@celo/communication'
-import { Address, EventLog, NULL_ADDRESS } from '@celo/sdk-types/commons'
+import { Address, EventLog, NULL_ADDRESS } from '@celo/communication/types/commons'
 import { eqAddress, findAddressIndex } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'

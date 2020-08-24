@@ -1,4 +1,4 @@
-import { Address } from '@celo/sdk-types/commons'
+import { Address } from '@celo/communication/types/commons'
 import { Signer, Wallet } from '@celo/sdk-types/wallet'
 import { CELO_DERIVATION_PATH_BASE } from '@celo/utils/lib/account'
 import { TransportError, TransportStatusError } from '@ledgerhq/errors'

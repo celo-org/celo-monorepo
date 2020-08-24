@@ -1,4 +1,4 @@
-import { Provider } from '@celo/sdk-types/commons'
+import { Provider } from '@celo/communication/types/commons'
 
 export function hasProperty<T>(object: any, property: string): object is T {
   return property in object

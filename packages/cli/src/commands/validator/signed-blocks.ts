@@ -1,5 +1,5 @@
+import { Provider } from '@celo/communication/types/commons'
 import { stopProvider } from '@celo/contractkit/lib/utils/provider-utils'
-import { Provider } from '@celo/sdk-types/commons'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { flags } from '@oclif/command'
 import chalk from 'chalk'

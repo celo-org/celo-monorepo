@@ -1,7 +1,7 @@
+import { Address } from '@celo/communication/types/commons'
 import { newKitFromWeb3 } from '@celo/contractkit'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
-import { Address } from '@celo/sdk-types/commons'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import TransferGold from './transfergold'

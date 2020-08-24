@@ -1,4 +1,4 @@
-import { Address } from '@celo/sdk-types/commons'
+import { Address } from '@celo/communication/types/commons'
 import { AddressType, SignatureType } from '@celo/utils/lib/io'
 import * as t from 'io-ts'
 import { toChecksumAddress } from 'web3-utils'

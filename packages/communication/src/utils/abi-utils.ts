@@ -1,5 +1,5 @@
-import { AbiCoder, AbiItem, DecodedParamsObject } from '@celo/sdk-types/abi'
 import { ensureLeading0x } from '@celo/utils/lib/address'
+import { AbiCoder, AbiItem, DecodedParamsObject } from '../../types/abi'
 
 export const getAbiTypes = (abi: AbiItem[], methodName: string) =>
   abi.find((entry) => entry.name! === methodName)!.inputs!.map((input) => input.type)

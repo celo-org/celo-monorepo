@@ -1,4 +1,4 @@
-import { Block } from '@celo/sdk-types/commons'
+import { Block } from '@celo/communication/types/commons'
 import Web3 from 'web3'
 import { failWith } from './cli'
 

@@ -1,11 +1,11 @@
-import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import {
   Callback,
   CeloTx,
   JsonRpcPayload,
   JsonRpcResponse,
   Provider,
-} from '@celo/sdk-types/commons'
+} from '@celo/communication/types/commons'
+import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import Web3 from 'web3'
 import { CeloProvider } from './celo-provider'

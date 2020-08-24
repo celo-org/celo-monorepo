@@ -1,4 +1,4 @@
-import { Address } from '@celo/sdk-types/commons'
+import { Address } from '@celo/communication/types/commons'
 import { Signer, Wallet } from '@celo/sdk-types/wallet'
 import { ensureLeading0x } from '@celo/utils/lib/address'
 import * as ethUtil from 'ethereumjs-util'

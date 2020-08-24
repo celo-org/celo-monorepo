@@ -186,7 +186,7 @@ class AttestationRequestHandler {
       salt
     )
 
-    return kit.web3.eth.sign(message, getAttestationSignerAddress())
+    return kit.communication.sign(message, getAttestationSignerAddress())
   }
 
   async validateAttestation(attestationCode: string) {

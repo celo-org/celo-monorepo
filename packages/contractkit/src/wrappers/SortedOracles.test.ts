@@ -1,5 +1,5 @@
+import { Address } from '@celo/communication/types/commons'
 import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/ganache-test'
-import { Address } from '@celo/sdk-types/commons'
 import { CeloContract } from '../base'
 import { newKitFromWeb3 } from '../kit'
 import { OracleRate, SortedOraclesWrapper } from './SortedOracles'

@@ -1,5 +1,5 @@
-import { AbiItem } from '@celo/sdk-types/abi'
-import { Address } from '@celo/utils/lib/address'
+import { AbiItem } from '@celo/communication/types/abi'
+import { Address } from '@celo/communication/types/commons'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { AllContracts } from '../base'
 import { ContractKit } from '../kit'

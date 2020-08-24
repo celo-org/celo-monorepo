@@ -1,4 +1,4 @@
-import { Address, CeloTx, EncodedTransaction } from '@celo/sdk-types/commons'
+import { Address, CeloTx, EncodedTransaction } from '@celo/communication/types/commons'
 import {
   ensureLeading0x,
   normalizeAddressWith0x,

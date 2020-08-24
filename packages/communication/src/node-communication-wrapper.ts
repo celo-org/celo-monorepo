@@ -1,4 +1,3 @@
-import { AbiCoder } from '@celo/sdk-types/abi'
 import {
   Address,
   Block,
@@ -8,8 +7,10 @@ import {
   CeloTxReceipt,
   Mixed,
   Provider,
-} from '@celo/sdk-types/commons'
+} from '@celo/communication/types/commons'
+import { AbiCoder } from '../types/abi'
 import { Wallet } from '@celo/sdk-types/wallet'
+import { toChecksumAddress } from '@celo/utils/lib/address'
 import debugFactory from 'debug'
 import Web3 from 'web3'
 import { assertIsCeloProvider, CeloProvider } from './celo-provider'
@@ -64,11 +65,6 @@ export class NodeCommunicationWrapper {
   async setFeeCurrency(tokenAddress?: Address) {
     this.config.feeCurrency = tokenAddress
   }
-
-  // addAccount(privateKey: string) {
-  //   assertIsCeloProvider(this.web3.currentProvider)
-  //   this.web3.currentProvider.addAccount(privateKey)
-  // }
 
   /**
    * Set default account for generated transactions (eg. tx.from )
@@ -135,15 +131,19 @@ export class NodeCommunicationWrapper {
 
   async getNodeAccounts(): Promise<string[]> {
     const nodeAccountsResp = await this.rpcCaller.call('eth_accounts', [])
-    return nodeAccountsResp.result ?? []
+    return this.toChecksumAddresses(nodeAccountsResp.result ?? [])
   }
 
-  async getLocalAccounts(): Promise<string[]> {
-    return this.wallet ? this.wallet.getAccounts() : []
+  getLocalAccounts(): string[] {
+    return this.wallet ? this.toChecksumAddresses(this.wallet.getAccounts()) : []
   }
 
   async getAccounts(): Promise<string[]> {
-    return (await this.getNodeAccounts()).concat(await this.getLocalAccounts())
+    return (await this.getNodeAccounts()).concat(this.getLocalAccounts())
+  }
+
+  private toChecksumAddresses(addresses: string[]) {
+    return addresses.map((value) => toChecksumAddress(value))
   }
 
   isListening(): Promise<boolean> {

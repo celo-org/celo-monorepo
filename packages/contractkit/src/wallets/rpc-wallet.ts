@@ -1,5 +1,5 @@
 import { DefaultRpcCaller, RpcCaller } from '@celo/communication'
-import { CeloTx, Provider } from '@celo/sdk-types/commons'
+import { CeloTx, Provider } from '@celo/communication/types/commons'
 import { Signer } from '@celo/sdk-types/wallet'
 import {
   ensureLeading0x,

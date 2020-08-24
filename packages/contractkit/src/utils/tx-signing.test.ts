@@ -5,7 +5,7 @@ import {
   JsonRpcPayload,
   JsonRpcResponse,
   Provider,
-} from '@celo/sdk-types/commons'
+} from '@celo/communication/types/commons'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import debugFactory from 'debug'
 import Web3 from 'web3'

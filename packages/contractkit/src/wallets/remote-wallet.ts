@@ -1,4 +1,4 @@
-import { Address, CeloTx, EncodedTransaction } from '@celo/sdk-types/commons'
+import { Address, CeloTx, EncodedTransaction } from '@celo/communication/types/commons'
 import { Signer, Wallet } from '@celo/sdk-types/wallet'
 import { sleep } from '@celo/utils/lib/async'
 import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'

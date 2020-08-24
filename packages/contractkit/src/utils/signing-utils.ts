@@ -1,4 +1,4 @@
-import { CeloTx, EncodedTransaction, RLPEncodedTx } from '@celo/sdk-types/commons'
+import { CeloTx, EncodedTransaction, RLPEncodedTx } from '@celo/communication/types/commons'
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'

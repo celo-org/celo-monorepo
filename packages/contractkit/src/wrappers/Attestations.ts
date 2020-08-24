@@ -1,5 +1,5 @@
 import { toTransactionObject } from '@celo/communication'
-import { Address, NULL_ADDRESS } from '@celo/sdk-types/commons'
+import { Address, NULL_ADDRESS } from '@celo/communication/types/commons'
 import { AttestationUtils, SignatureUtils } from '@celo/utils/lib'
 import { eqAddress } from '@celo/utils/lib/address'
 import { concurrentMap, sleep } from '@celo/utils/lib/async'

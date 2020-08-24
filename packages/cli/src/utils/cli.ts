@@ -1,6 +1,5 @@
-import { CeloTransactionObject } from '@celo/contractkit'
-import { parseDecodedParams } from '@celo/contractkit/lib/utils/web3-utils'
-import { CeloTx, EventLog } from '@celo/sdk-types/commons'
+import { CeloTransactionObject, parseDecodedParams } from '@celo/communication'
+import { CeloTx, EventLog } from '@celo/communication/types/commons'
 import { CLIError } from '@oclif/errors'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'

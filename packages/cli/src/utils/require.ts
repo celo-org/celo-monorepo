@@ -1,4 +1,4 @@
-import { CeloTxObject } from '@celo/sdk-types/commons'
+import { CeloTxObject } from '@celo/communication/types/commons'
 import { failWith } from './cli'
 
 export enum Op {

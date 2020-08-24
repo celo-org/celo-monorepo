@@ -1,5 +1,5 @@
 import { RpcCaller } from '@celo/communication'
-import { CeloTx, EncodedTransaction } from '@celo/sdk-types/commons'
+import { CeloTx, EncodedTransaction } from '@celo/communication/types/commons'
 import { Signer } from '@celo/sdk-types/wallet'
 import { ensureLeading0x, normalizeAddressWith0x, trimLeading0x } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'

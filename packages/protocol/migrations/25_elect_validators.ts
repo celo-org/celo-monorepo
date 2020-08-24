@@ -1,10 +1,10 @@
 /* tslint:disable:no-console */
+import { CeloTxObject, NULL_ADDRESS } from '@celo/communication/types/commons'
 import {
   getDeployedProxiedContract,
   sendTransactionWithPrivateKey,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { CeloTxObject, NULL_ADDRESS } from '@celo/sdk-types/commons'
 import { privateKeyToAddress, privateKeyToPublicKey } from '@celo/utils/lib/address'
 import { getBlsPoP, getBlsPublicKey } from '@celo/utils/lib/bls'
 import { toFixed } from '@celo/utils/lib/fixidity'

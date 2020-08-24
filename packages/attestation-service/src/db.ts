@@ -1,5 +1,6 @@
-import { ContractKit, newKit } from '@celo/contractkit'
+import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { FindOptions, Sequelize } from 'sequelize'
+import Web3 from 'web3'
 import { fetchEnv, getAttestationSignerAddress } from './env'
 import { rootLogger } from './logger'
 import Attestation, { AttestationModel, AttestationStatic } from './models/attestation'
@@ -29,12 +30,12 @@ export function isDBOnline() {
 export let kit: ContractKit
 
 export async function isNodeSyncing() {
-  const syncProgress = await kit.web3.eth.isSyncing()
+  const syncProgress = await kit.communication.isSyncing()
   return typeof syncProgress === 'boolean' && syncProgress
 }
 
 export async function getAgeOfLatestBlock() {
-  const latestBlock = await kit.web3.eth.getBlock('latest')
+  const latestBlock = await kit.communication.getBlock('latest')
   const ageOfLatestBlock = Date.now() / 1000 - Number(latestBlock.timestamp)
   return {
     ageOfLatestBlock,
@@ -45,7 +46,7 @@ export async function getAgeOfLatestBlock() {
 export async function isAttestationSignerUnlocked() {
   // The only way to see if a key is unlocked is to try to sign something
   try {
-    await kit.web3.eth.sign('DO_NOT_USE', getAttestationSignerAddress())
+    await kit.communication.sign('DO_NOT_USE', getAttestationSignerAddress())
     return true
   } catch {
     return false
@@ -54,7 +55,7 @@ export async function isAttestationSignerUnlocked() {
 
 export async function initializeKit() {
   if (kit === undefined) {
-    kit = newKit(fetchEnv('CELO_PROVIDER'))
+    kit = newKitFromWeb3(new Web3(fetchEnv('CELO_PROVIDER')))
     // Copied from @celo/cli/src/utils/helpers
     try {
       const { ageOfLatestBlock } = await getAgeOfLatestBlock()

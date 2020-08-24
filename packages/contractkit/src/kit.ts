@@ -1,5 +1,5 @@
 import { NodeCommunicationWrapper } from '@celo/communication'
-import { Address } from '@celo/sdk-types/commons'
+import { Address } from '@celo/communication/types/commons'
 import { BigNumber } from 'bignumber.js'
 import Web3 from 'web3'
 import { AddressRegistry } from './address-registry'

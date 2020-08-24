@@ -4,7 +4,7 @@ import {
   JsonRpcPayload,
   JsonRpcResponse,
   Provider,
-} from '@celo/sdk-types/commons'
+} from '@celo/communication/types/commons'
 import debugFactory from 'debug'
 import { NodeCommunicationWrapper } from '.'
 import { hasProperty, stopProvider } from './utils/provider-utils'

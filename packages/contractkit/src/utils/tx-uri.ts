@@ -1,5 +1,5 @@
-import { AbiCoder } from '@celo/sdk-types/abi'
-import { CeloTx } from '@celo/sdk-types/commons'
+import { AbiCoder } from '@celo/communication/types/abi'
+import { CeloTx } from '@celo/communication/types/commons'
 import { trimLeading0x } from '@celo/utils/lib/address'
 import BN from 'bn.js'
 import { range } from 'lodash'

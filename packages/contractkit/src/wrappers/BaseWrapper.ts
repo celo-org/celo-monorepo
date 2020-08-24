@@ -1,5 +1,10 @@
 import { CeloTransactionObject, toTransactionObject } from '@celo/communication'
-import { CeloTxObject, Contract, EventLog, PastEventOptions } from '@celo/sdk-types/commons'
+import {
+  CeloTxObject,
+  Contract,
+  EventLog,
+  PastEventOptions,
+} from '@celo/communication/types/commons'
 import { bufferToHex, ensureLeading0x } from '@celo/utils/lib/address'
 import { zip } from '@celo/utils/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'

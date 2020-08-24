@@ -1,4 +1,4 @@
-import { Address, Block } from '@celo/sdk-types/commons'
+import { Address, Block } from '@celo/communication/types/commons'
 import { eqAddress } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { flags } from '@oclif/command'

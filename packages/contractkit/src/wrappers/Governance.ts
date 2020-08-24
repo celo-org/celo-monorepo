@@ -1,5 +1,5 @@
 import { toTransactionObject } from '@celo/communication'
-import { Address, CeloTxPending } from '@celo/sdk-types/commons'
+import { Address, CeloTxPending } from '@celo/communication/types/commons'
 import {
   bufferToHex,
   ensureLeading0x,

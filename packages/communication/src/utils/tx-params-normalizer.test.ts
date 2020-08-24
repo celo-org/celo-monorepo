@@ -1,4 +1,4 @@
-// import { Callback, CeloTx, JsonRpcPayload, JsonRpcResponse } from '@celo/sdk-types/commons'
+// import { Callback, CeloTx, JsonRpcPayload, JsonRpcResponse } from '@celo/communication/types/commons'
 // import { RpcCaller } from './rpc-caller'
 // import { TxParamsNormalizer } from './tx-params-normalizer'
 

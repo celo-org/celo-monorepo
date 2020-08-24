@@ -1,11 +1,9 @@
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { stopProvider } from '@celo/contractkit/lib/utils/provider-utils'
 import { AzureHSMWallet } from '@celo/contractkit/lib/wallets/azure-hsm-wallet'
 import {
   AddressValidation,
   newLedgerWalletWithSetup,
 } from '@celo/contractkit/lib/wallets/ledger-wallet'
-import { Provider } from '@celo/sdk-types/commons'
 import { Wallet } from '@celo/sdk-types/wallet'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import { Command, flags } from '@oclif/command'
@@ -121,12 +119,13 @@ export abstract class BaseCommand extends LocalCommand {
 
   get kit() {
     if (!this._kit) {
-      this._kit = newKitFromWeb3(this.web3, this._wallet)
+      this._kit = newKitFromWeb3(this.web3)
+      this._kit.communication.wallet = this._wallet
     }
 
     const res: ParserOutput<any, any> = this.parse()
     if (res.flags && res.flags.privateKey && !res.flags.useLedger && !res.flags.useAKV) {
-      this._kit.addAccount(res.flags.privateKey)
+      this._kit.communication.addAccount(res.flags.privateKey)
     }
     return this._kit
   }
@@ -176,7 +175,7 @@ export abstract class BaseCommand extends LocalCommand {
 
   finally(arg: Error | undefined): Promise<any> {
     try {
-      stopProvider(this.web3.currentProvider as Provider)
+      this.kit.communication.stop()
     } catch (error) {
       this.log(`Failed to close the connection: ${error}`)
     }

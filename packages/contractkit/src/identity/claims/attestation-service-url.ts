@@ -1,4 +1,4 @@
-import { Address } from '@celo/sdk-types/commons'
+import { Address } from '@celo/communication/types/commons'
 import { ensureLeading0x, eqAddress } from '@celo/utils/lib/address'
 import { AttestationServiceStatusResponseType, UrlType } from '@celo/utils/lib/io'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'

@@ -1,4 +1,4 @@
-import { CeloTx, CeloTxObject, CeloTxReceipt } from '@celo/sdk-types/commons'
+import { CeloTx, CeloTxObject, CeloTxReceipt } from '@celo/communication/types/commons'
 import { NodeCommunicationWrapper } from '..'
 import { TransactionResult } from './tx-result'
 

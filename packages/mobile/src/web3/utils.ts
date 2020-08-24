@@ -1,5 +1,5 @@
+import { BlockHeader, CeloTx, CeloTxObject } from '@celo/communication/types/commons'
 import { estimateGas as ckEstimateGas } from '@celo/contractkit/lib/utils/web3-utils'
-import { BlockHeader, CeloTx, CeloTxObject } from '@celo/sdk-types/commons'
 import BigNumber from 'bignumber.js'
 import { call } from 'redux-saga/effects'
 import { GAS_INFLATION_FACTOR } from 'src/config'

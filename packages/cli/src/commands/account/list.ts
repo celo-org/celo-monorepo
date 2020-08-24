@@ -1,6 +1,4 @@
-import { CeloProvider } from '@celo/contractkit/lib'
 import { flags } from '@oclif/command'
-import { toChecksumAddress } from 'ethereumjs-util'
 import { BaseCommand } from '../../base'
 
 export default class AccountList extends BaseCommand {
@@ -21,14 +19,11 @@ export default class AccountList extends BaseCommand {
     const res = this.parse(AccountList)
 
     // Retreive accounts from the connected Celo node.
-    const allAddresses = !res.flags.local ? await this.kit.web3.eth.getAccounts() : []
+    const allAddresses = !res.flags.local ? await this.kit.communication.getAccounts() : []
 
     // Get addresses from the local wallet.
-    const celoProvider: CeloProvider = this.kit.web3.currentProvider as any
     const localAddresses =
-      res.flags.local ?? true
-        ? celoProvider.wallet.getAccounts().map((value) => toChecksumAddress(value))
-        : []
+      res.flags.local ?? true ? await this.kit.communication.getLocalAccounts() : []
 
     // Display the addresses.
     const localName = res.flags.useLedger ? 'Ledger' : 'Local'

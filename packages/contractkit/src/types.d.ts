@@ -1,4 +1,4 @@
-// import { EventLog } from '@celo/sdk-types/commons'
+// import { EventLog } from '@celo/communication/types/commons'
 // import { AbiItem } from 'web3-utils'
 // declare module 'web3-eth-abi' {
 //   export interface ABIDefinition extends AbiItem {

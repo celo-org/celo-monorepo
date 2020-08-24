@@ -1,4 +1,4 @@
-import { CeloTx, CeloTxObject, CeloTxReceipt, PromiEvent } from '@celo/sdk-types/commons'
+import { CeloTx, CeloTxObject, CeloTxReceipt, PromiEvent } from '@celo/communication/types/commons'
 import Web3 from 'web3'
 import { newKitFromWeb3 } from './kit'
 import { promiEventSpy } from './test-utils/PromiEventStub'

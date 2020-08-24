@@ -1,5 +1,5 @@
-import { ABIDefinition } from '@celo/sdk-types/abi'
-import { CeloTxReceipt, EventLog, Log } from '@celo/sdk-types/commons'
+import { ABIDefinition } from '@celo/communication/types/abi'
+import { CeloTxReceipt, EventLog, Log } from '@celo/communication/types/commons'
 import { Address } from '@celo/utils/lib/address'
 import { ContractKit } from '../kit'
 import { ContractDetails, mapFromPairs, obtainKitContractDetails } from './base'

@@ -1,4 +1,4 @@
-import { CeloTxReceipt, PromiEvent } from '@celo/sdk-types/commons'
+import { CeloTxReceipt, PromiEvent } from '@celo/communication/types/commons'
 import { Future } from '@celo/utils/lib/future'
 import debugFactory from 'debug'
 
