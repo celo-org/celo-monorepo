@@ -40,13 +40,20 @@ done
 [ -z "$FROM" ] && echo "Need to set the FROM address vai the -f flag" && exit 1;
 [ -z "$GRANTS_FILE" ] && echo "Need to set the GRANTS_FILE via the -g flag" && exit 1;
 [ -z "$START_GOLD" ] && echo "No starting gold provided via -s flag: defaulting to 1cGld" && START_GOLD=1;
-[ -z "$DEPLOYED_GRANTS" ] && echo "No deployed grants file provided via -d flag: defaulting to `scripts/truffle/deployedGrants.json`" && DEPLOYED_GRANTS="scripts/truffle/deployedGrants.json"
+[ -z "$DEPLOYED_GRANTS" ] && echo 'No deployed grants file provided via -d flag: defaulting to `scripts/truffle/deployedGrants.json`' && DEPLOYED_GRANTS="scripts/truffle/deployedGrants.json"
 [ -z "$OUTPUT_FILE" ] && echo "Need to set output file via the -o flag" && exit 1;
+
+CONTRACT_ARTIFACTS_DIR="$PWD/build/$NETWORK"
+
+if [[ ! -d "$CONTRACT_ARTIFACTS_DIR" ]]; then
+  echo "Error: no contract artifacts found in $CONTRACT_ARTIFACTS_DIR. Use download-artifacts to obtain them, or build them locally." >&2
+  exit 1
+fi
 
 if ! nc -z 127.0.0.1 8545 ; then
   echo "Warning: port 8545 not open" >&2
 fi
 
-yarn run build && \
+yarn run build:ts && \
 yarn run truffle exec ./scripts/truffle/deploy_release_contracts.js \
-  --network $NETWORK --from $FROM --grants $GRANTS_FILE --start_gold $START_GOLD --deployed_grants $DEPLOYED_GRANTS --output_file $OUTPUT_FILE $REALLY --build_directory $PWD/build/$NETWORK \
+  --network $NETWORK --from $FROM --grants $GRANTS_FILE --start_gold $START_GOLD --deployed_grants $DEPLOYED_GRANTS --output_file $OUTPUT_FILE $REALLY --build_directory $CONTRACT_ARTIFACTS_DIR \
