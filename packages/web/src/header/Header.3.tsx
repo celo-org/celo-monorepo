@@ -15,7 +15,7 @@ import LogoLightBg from 'src/logos/LogoLightBg'
 import Button, { BTN } from 'src/shared/Button.3'
 import Hoverable from 'src/shared/Hoverable'
 import Link from 'src/shared/Link'
-import menu, { CeloLinks, MAIN_MENU, pagePaths } from 'src/shared/menu-items'
+import menu, { CeloLinks, MAIN_MENU, pagePaths, MenuLink } from 'src/shared/menu-items'
 import MobileMenu from 'src/shared/MobileMenu'
 import OvalCoin from 'src/shared/OvalCoin'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
@@ -28,22 +28,11 @@ const CookieConsent = dynamic(
 const menuItems = MAIN_MENU
 const mobileMenu = [menu.HOME, ...MAIN_MENU]
 
-const DARK_PAGES = new Set([
-  menu.BUILD.link,
-  menu.ALLIANCE_COLLECTIVE.link,
-  menu.DEVELOPERS.link,
-  menu.VALIDATORS_LIST.link,
-  menu.VALIDATORS_LIST__BAKLAVA.link,
-  menu.VALIDATORS_LIST_BAKLAVASTAGING.link,
-  CeloLinks.walletApp,
-])
+const PATH_TO_ATTRIBUTES: Record<string, MenuLink> = Object.keys(pagePaths).reduce((last, key) => {
+  last[pagePaths[key].link] = pagePaths[key]
 
-const TRANSLUCENT_PAGES = new Set([
-  menu.ABOUT_US.link,
-  menu.ALLIANCE_COLLECTIVE.link,
-  menu.CBE.link,
-])
-const TRANSLUCENT_PAGES_WITH_HOVER = new Set([menu.ABOUT_US.link, menu.ALLIANCE_COLLECTIVE.link])
+  return last
+}, {})
 
 interface OwnProps {
   router: Router
@@ -108,9 +97,7 @@ export class Header extends React.PureComponent<Props, State> {
 
   menuHidePoint() {
     // TODO use constant for the amount
-    return this.props.router.pathname === pagePaths.CBE.link
-      ? 450 - HEADER_HEIGHT
-      : Dimensions.get('window').height - HEADER_HEIGHT - 1
+    return this.getAttributes().menuHidePoint || Dimensions.get('window').height - HEADER_HEIGHT - 1
   }
 
   componentDidMount() {
@@ -128,15 +115,22 @@ export class Header extends React.PureComponent<Props, State> {
     this.setState({ mobileMenuActive: false })
   }
 
-  isDarkMode = () => {
+  getAttributes = () => {
     return (
-      DARK_PAGES.has(this.props.router.pathname) ||
-      (TRANSLUCENT_PAGES.has(this.props.router.pathname) && !this.state.belowFoldUpScroll)
+      PATH_TO_ATTRIBUTES[this.props.router.pathname] || {
+        isDark: false,
+        translucent: null,
+        menuHidePoint: null,
+      }
     )
   }
 
+  isDarkMode = () => {
+    return this.getAttributes().isDark || (this.isTranslucent() && !this.state.belowFoldUpScroll)
+  }
+
   isTranslucent = () => {
-    return TRANSLUCENT_PAGES.has(this.props.router.pathname)
+    return this.getAttributes().translucent
   }
 
   getForegroundColor = () => {
@@ -145,8 +139,8 @@ export class Header extends React.PureComponent<Props, State> {
 
   getBackgroundColor = () => {
     if (this.isTranslucent() && !this.state.belowFoldUpScroll) {
-      return this.state.isHovering && TRANSLUCENT_PAGES_WITH_HOVER.has(this.props.router.pathname)
-        ? colors.darkTransparent
+      return this.state.isHovering
+        ? this.getAttributes().translucent.backgroundHover
         : 'transparent'
     }
     return this.isDarkMode() ? colors.dark : colors.white
