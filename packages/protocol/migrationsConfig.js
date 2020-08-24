@@ -520,13 +520,6 @@ const linkedLibraries = {
     'Validators',
   ],
   Proposals: ['Governance', 'GovernanceTest', 'ProposalsTest'],
-  LinkedList: ['AddressLinkedList', 'SortedLinkedList', 'LinkedListTest'],
-  SortedLinkedList: [
-    'AddressSortedLinkedList',
-    'IntegerSortedLinkedList',
-    'SortedLinkedListWithMedian',
-  ],
-  SortedLinkedListWithMedian: ['AddressSortedLinkedListWithMedian'],
   AddressLinkedList: ['Validators', 'ValidatorsTest'],
   AddressSortedLinkedList: ['Election', 'ElectionTest'],
   IntegerSortedLinkedList: ['Governance', 'GovernanceTest', 'IntegerSortedLinkedListTest'],

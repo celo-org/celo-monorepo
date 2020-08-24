@@ -23,21 +23,13 @@ library LinkedList {
   }
 
   /**
-   * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return The storage, major, minor, and patch version of the contract.
-   */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
-  }
-
-  /**
    * @notice Inserts an element into a doubly linked list.
    * @param list A storage pointer to the underlying list.
    * @param key The key of the element to insert.
    * @param previousKey The key of the element that comes before the element to insert.
    * @param nextKey The key of the element that comes after the element to insert.
    */
-  function insert(List storage list, bytes32 key, bytes32 previousKey, bytes32 nextKey) public {
+  function insert(List storage list, bytes32 key, bytes32 previousKey, bytes32 nextKey) internal {
     require(key != bytes32(0), "Key must be defined");
     require(!contains(list, key), "Can't insert an existing element");
     require(
@@ -90,7 +82,7 @@ library LinkedList {
    * @param list A storage pointer to the underlying list.
    * @param key The key of the element to insert.
    */
-  function push(List storage list, bytes32 key) public {
+  function push(List storage list, bytes32 key) internal {
     insert(list, key, bytes32(0), list.tail);
   }
 
@@ -99,7 +91,7 @@ library LinkedList {
    * @param list A storage pointer to the underlying list.
    * @param key The key of the element to remove.
    */
-  function remove(List storage list, bytes32 key) public {
+  function remove(List storage list, bytes32 key) internal {
     Element storage element = list.elements[key];
     require(key != bytes32(0) && contains(list, key), "key not in list");
     if (element.previousKey != bytes32(0)) {
@@ -127,7 +119,7 @@ library LinkedList {
    * @param previousKey The key of the element that comes before the updated element.
    * @param nextKey The key of the element that comes after the updated element.
    */
-  function update(List storage list, bytes32 key, bytes32 previousKey, bytes32 nextKey) public {
+  function update(List storage list, bytes32 key, bytes32 previousKey, bytes32 nextKey) internal {
     require(
       key != bytes32(0) && key != previousKey && key != nextKey && contains(list, key),
       "key on in list"
@@ -142,7 +134,7 @@ library LinkedList {
    * @param key The element key.
    * @return Whether or not the key is in the sorted list.
    */
-  function contains(List storage list, bytes32 key) public view returns (bool) {
+  function contains(List storage list, bytes32 key) internal view returns (bool) {
     return list.elements[key].exists;
   }
 
@@ -153,7 +145,7 @@ library LinkedList {
    * @return The keys of the N elements at the head of the list.
    * @dev Reverts if n is greater than the number of elements in the list.
    */
-  function headN(List storage list, uint256 n) public view returns (bytes32[] memory) {
+  function headN(List storage list, uint256 n) internal view returns (bytes32[] memory) {
     require(n <= list.numElements, "not enough elements");
     bytes32[] memory keys = new bytes32[](n);
     bytes32 key = list.head;
@@ -169,7 +161,7 @@ library LinkedList {
    * @param list A storage pointer to the underlying list.
    * @return All element keys from head to tail.
    */
-  function getKeys(List storage list) public view returns (bytes32[] memory) {
+  function getKeys(List storage list) internal view returns (bytes32[] memory) {
     return headN(list, list.numElements);
   }
 }

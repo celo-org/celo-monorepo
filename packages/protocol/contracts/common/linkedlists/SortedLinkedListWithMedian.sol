@@ -22,14 +22,6 @@ library SortedLinkedListWithMedian {
   }
 
   /**
-   * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return The storage, major, minor, and patch version of the contract.
-   */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
-  }
-
-  /**
    * @notice Inserts an element into a doubly linked list.
    * @param list A storage pointer to the underlying list.
    * @param key The key of the element to insert.
@@ -43,7 +35,7 @@ library SortedLinkedListWithMedian {
     uint256 value,
     bytes32 lesserKey,
     bytes32 greaterKey
-  ) public {
+  ) internal {
     list.list.insert(key, value, lesserKey, greaterKey);
     LinkedList.Element storage element = list.list.list.elements[key];
 
@@ -85,7 +77,7 @@ library SortedLinkedListWithMedian {
    * @param list A storage pointer to the underlying list.
    * @param key The key of the element to remove.
    */
-  function remove(List storage list, bytes32 key) public {
+  function remove(List storage list, bytes32 key) internal {
     MedianAction action = MedianAction.None;
     if (list.list.list.numElements == 0) {
       list.median = bytes32(0);
@@ -128,7 +120,7 @@ library SortedLinkedListWithMedian {
     uint256 value,
     bytes32 lesserKey,
     bytes32 greaterKey
-  ) public {
+  ) internal {
     // TODO(asa): Optimize by not making any changes other than value if lesserKey and greaterKey
     // don't change.
     // TODO(asa): Optimize by not updating lesserKey/greaterKey for key
@@ -141,7 +133,7 @@ library SortedLinkedListWithMedian {
    * @param list A storage pointer to the underlying list.
    * @param key The key of the element to insert.
    */
-  function push(List storage list, bytes32 key) public {
+  function push(List storage list, bytes32 key) internal {
     insert(list, key, 0, bytes32(0), list.list.list.tail);
   }
 
@@ -151,7 +143,7 @@ library SortedLinkedListWithMedian {
    * @param n The number of elements to pop.
    * @return The keys of the popped elements.
    */
-  function popN(List storage list, uint256 n) public returns (bytes32[] memory) {
+  function popN(List storage list, uint256 n) internal returns (bytes32[] memory) {
     require(n <= list.list.list.numElements, "not enough elements");
     bytes32[] memory keys = new bytes32[](n);
     for (uint256 i = 0; i < n; i = i.add(1)) {
@@ -168,7 +160,7 @@ library SortedLinkedListWithMedian {
    * @param key The element key.
    * @return Whether or not the key is in the sorted list.
    */
-  function contains(List storage list, bytes32 key) public view returns (bool) {
+  function contains(List storage list, bytes32 key) internal view returns (bool) {
     return list.list.contains(key);
   }
 
@@ -178,7 +170,7 @@ library SortedLinkedListWithMedian {
    * @param key The element key.
    * @return The element value.
    */
-  function getValue(List storage list, bytes32 key) public view returns (uint256) {
+  function getValue(List storage list, bytes32 key) internal view returns (uint256) {
     return list.list.values[key];
   }
 
@@ -187,7 +179,7 @@ library SortedLinkedListWithMedian {
    * @param list A storage pointer to the underlying list.
    * @return The median value.
    */
-  function getMedianValue(List storage list) public view returns (uint256) {
+  function getMedianValue(List storage list) internal view returns (uint256) {
     return getValue(list, list.median);
   }
 
@@ -233,7 +225,7 @@ library SortedLinkedListWithMedian {
    * @return An unpacked list of elements from largest to smallest.
    */
   function getElements(List storage list)
-    public
+    internal
     view
     returns (bytes32[] memory, uint256[] memory, MedianRelation[] memory)
   {
@@ -252,7 +244,7 @@ library SortedLinkedListWithMedian {
    * @param list A storage pointer to the underlying list.
    * @return All element keys from head to tail.
    */
-  function getKeys(List storage list) public view returns (bytes32[] memory) {
+  function getKeys(List storage list) internal view returns (bytes32[] memory) {
     return list.list.getKeys();
   }
 
