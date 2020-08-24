@@ -1188,7 +1188,7 @@ export async function connectBipartiteClique(
             }
             const success = await admin.addPeer(enode)
             if (!success) {
-              throw new Error('Connecting validators failed!')
+              throw new Error('Connecting geth peers failed!')
             }
           })
         )
