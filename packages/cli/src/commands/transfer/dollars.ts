@@ -28,7 +28,6 @@ export default class TransferDollars extends BaseCommand {
     const to: string = res.flags.to
     const value = new BigNumber(res.flags.value)
 
-    this.kit.defaultAccount = from
     const stableToken = await this.kit.contracts.getStableToken()
 
     const tx = res.flags.comment
