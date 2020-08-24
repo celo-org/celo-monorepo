@@ -27,6 +27,12 @@ export default class Authorize extends ReleaseGoldCommand {
       description:
         'The BLS public key proof-of-possession, which consists of a signature on the account address. 48 bytes.',
     }),
+    force: flags.boolean({
+      description:
+        'Allow rotation of validator ECDSA key without rotating the BLS key. Only intended for validators with a special reason to do so.',
+      default: false,
+      hidden: true,
+    }),
   }
 
   static args = []
@@ -60,14 +66,18 @@ export default class Authorize extends ReleaseGoldCommand {
     let tx: any
     if (role === 'vote') {
       tx = await this.releaseGoldWrapper.authorizeVoteSigner(flags.signer, sig)
-    } else if (role === 'validator' && flags.blsKey) {
+    } else if (role === 'validator' && flags.blsKey && flags.blsPop) {
       tx = await this.releaseGoldWrapper.authorizeValidatorSignerAndBls(
         flags.signer,
         sig,
         flags.blsKey,
-        flags.blsPop!
+        flags.blsPop
       )
     } else if (role === 'validator') {
+      if (!flags.force) {
+        this.error(`BLS key and PoP must be provided to rotate validator keys`)
+        return
+      }
       tx = await this.releaseGoldWrapper.authorizeValidatorSigner(flags.signer, sig)
     } else if (role === 'attestation') {
       tx = await this.releaseGoldWrapper.authorizeAttestationSigner(flags.signer, sig)

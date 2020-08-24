@@ -30,13 +30,19 @@ export default class Authorize extends BaseCommand {
       description:
         'The BLS public key proof-of-possession, which consists of a signature on the account address. 48 bytes.',
     }),
+    force: flags.boolean({
+      description:
+        'Allow rotation of validator ECDSA key without rotating the BLS key. Only intended for validators with a special reason to do so.',
+      default: false,
+      hidden: true,
+    }),
   }
 
   static args = []
 
   static examples = [
     'authorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role vote --signer 0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --signature 0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d1a1eebad8452eb',
-    'authorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role vote --signer 0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --signature 0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d1a1eebad8452eb --blsKey 0x4fa3f67fc913878b068d1fa1cdddc54913d3bf988dbe5a36a20fa888f20d4894c408a6773f3d7bde11154f2a3076b700d345a42fd25a0e5e83f4db5586ac7979ac2053cd95d8f2efd3e959571ceccaa743e02cf4be3f5d7aaddb0b06fc9aff00 --blsPop 0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900',
+    'authorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role validator --signer 0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --signature 0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d1a1eebad8452eb --blsKey 0x4fa3f67fc913878b068d1fa1cdddc54913d3bf988dbe5a36a20fa888f20d4894c408a6773f3d7bde11154f2a3076b700d345a42fd25a0e5e83f4db5586ac7979ac2053cd95d8f2efd3e959571ceccaa743e02cf4be3f5d7aaddb0b06fc9aff00 --blsPop 0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900',
   ]
 
   async run() {
@@ -56,14 +62,18 @@ export default class Authorize extends BaseCommand {
     let tx: any
     if (res.flags.role === 'vote') {
       tx = await accounts.authorizeVoteSigner(res.flags.signer, sig)
-    } else if (res.flags.role === 'validator' && res.flags.blsKey) {
+    } else if (res.flags.role === 'validator' && res.flags.blsKey && res.flags.blsPop) {
       tx = await accounts.authorizeValidatorSignerAndBls(
         res.flags.signer,
         sig,
         res.flags.blsKey,
-        res.flags.blsPop!
+        res.flags.blsPop
       )
     } else if (res.flags.role === 'validator') {
+      if (!res.flags.force) {
+        this.error(`BLS key and PoP must be provided to rotate validator keys`)
+        return
+      }
       tx = await accounts.authorizeValidatorSigner(res.flags.signer, sig)
     } else if (res.flags.role === 'attestation') {
       tx = await accounts.authorizeAttestationSigner(res.flags.signer, sig)
