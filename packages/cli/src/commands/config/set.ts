@@ -10,14 +10,16 @@ export default class Set extends LocalCommand {
     // Overrides base command node flag.
     node: flags.string({
       char: 'n',
-      required: false,
       description: 'URL of the node to run commands against',
-      default: 'http://localhost:8545',
     }),
     gasCurrency: BaseCommand.flags.gasCurrency,
   }
 
-  static examples = ['set  --node ws://localhost:2500', 'set  --node <geth-location>/geth.ipc']
+  static examples = [
+    'set  --node ws://localhost:2500',
+    'set  --node <geth-location>/geth.ipc',
+    'set --gasCurrency cUSD',
+  ]
 
   async run() {
     const res = this.parse(Set)

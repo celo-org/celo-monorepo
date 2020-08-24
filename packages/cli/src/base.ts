@@ -107,7 +107,6 @@ export abstract class BaseCommand extends LocalCommand {
   // to its definition:
   //   requireSynced = false
   public requireSynced: boolean = true
-  protected gasCurrencyConfig?: GasOptions | undefined
 
   private _web3: Web3 | null = null
   private _kit: ContractKit | null = null
@@ -191,19 +190,17 @@ export abstract class BaseCommand extends LocalCommand {
       this.kit.defaultAccount = res.flags.from
     }
 
-    this.gasCurrencyConfig = res.flags.gasCurrency
+    const gasCurrencyConfig = res.flags.gasCurrency
       ? GasOptions[res.flags.gasCurrency as keyof typeof GasOptions]
       : getGasCurrency(this.config.configDir)
 
-    if (this.gasCurrencyConfig) {
-      const setUsd = () => this.kit.setFeeCurrency(CeloContract.StableToken)
-      if (this.gasCurrencyConfig === GasOptions.cUSD) {
-        await setUsd()
-      } else if (this.gasCurrencyConfig === GasOptions.auto && this.kit.defaultAccount) {
-        const balances = await this.kit.getTotalBalance(this.kit.defaultAccount)
-        if (balances.CELO.isZero()) {
-          await setUsd()
-        }
+    const setUsdGas = () => this.kit.setFeeCurrency(CeloContract.StableToken)
+    if (gasCurrencyConfig === GasOptions.cUSD) {
+      await setUsdGas()
+    } else if (gasCurrencyConfig === GasOptions.auto && this.kit.defaultAccount) {
+      const balances = await this.kit.getTotalBalance(this.kit.defaultAccount)
+      if (balances.CELO.isZero()) {
+        await setUsdGas()
       }
     }
   }

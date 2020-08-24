@@ -1,7 +1,6 @@
-import { CeloContract } from '@celo/contractkit'
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
-import { BaseCommand, GasOptions } from '../../base'
+import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
@@ -34,22 +33,24 @@ export default class TransferDollars extends BaseCommand {
       ? stableToken.transferWithComment(to, value.toFixed(), res.flags.comment)
       : stableToken.transfer(to, value.toFixed())
 
-    // resolve auto gasCurrencyConfig such that feeCurrency is cUSD with sufficient balance
-    if (this.gasCurrencyConfig && this.gasCurrencyConfig === GasOptions.auto) {
-      const gas = await tx.txo.estimateGas({ feeCurrency: stableToken.address })
-      const { gasPrice } = await this.kit.fillGasPrice({
-        gasPrice: '0',
-        feeCurrency: stableToken.address,
-      })
-      const balance = await stableToken.balanceOf(from)
-      // check if cUSD balance is sufficient for transfer + gas
-      if (value.plus(new BigNumber(gas).times(gasPrice as string)).isLessThanOrEqualTo(balance)) {
-        await this.kit.setFeeCurrency(CeloContract.StableToken)
-      }
-    }
-
     await newCheckBuilder(this)
       .hasEnoughUsd(from, value)
+      .addConditionalCheck(
+        'Account can afford transfer and gas paid in cUSD',
+        this.kit.defaultFeeCurrency === stableToken.address,
+        async () => {
+          const gas = await tx.txo.estimateGas({ feeCurrency: stableToken.address })
+          // TODO: replace with gasPrice rpc once supported by min client version
+          const { gasPrice } = await this.kit.fillGasPrice({
+            gasPrice: '0',
+            feeCurrency: stableToken.address,
+          })
+          const gasValue = new BigNumber(gas).times(gasPrice as string)
+          const balance = await stableToken.balanceOf(from)
+          return balance.gte(value.plus(gasValue))
+        },
+        `Cannot afford transfer with cUSD gasCurrency; try using gasCurrency=CELO or reducing value slightly`
+      )
       .runChecks()
 
     await displaySendTx(res.flags.comment ? 'transferWithComment' : 'transfer', tx)

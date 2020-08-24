@@ -6,11 +6,12 @@ import { GasOptions } from '../base'
 
 export interface CeloConfig {
   node: string
-  gasCurrency?: GasOptions
+  gasCurrency: GasOptions
 }
 
 export const localGeth: CeloConfig = {
   node: 'http://localhost:8545',
+  gasCurrency: GasOptions.auto,
 }
 
 const configFile = 'config.json'
@@ -31,7 +32,7 @@ export function getNodeUrl(configDir: string): string {
   return readConfig(configDir).node
 }
 
-export function getGasCurrency(configDir: string): GasOptions | undefined {
+export function getGasCurrency(configDir: string): GasOptions {
   return readConfig(configDir).gasCurrency
 }
 
