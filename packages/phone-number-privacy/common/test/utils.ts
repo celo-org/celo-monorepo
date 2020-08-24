@@ -10,7 +10,7 @@ export function createMockAttestation(completed: number, total: number) {
   }
 }
 
-export function createMockStableToken(balance: BigNumber) {
+export function createMockToken(balance: BigNumber) {
   return {
     balanceOf: jest.fn(() => balance),
   }
@@ -37,6 +37,7 @@ export function createMockContractKit(
 export enum ContractRetrieval {
   getAttestations = 'getAttestations',
   getStableToken = 'getStableToken',
+  getGoldToken = 'getGoldToken',
 }
 
 export function createMockWeb3(txCount: number) {
