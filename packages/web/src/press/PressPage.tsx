@@ -107,9 +107,11 @@ const styles = StyleSheet.create({
   },
 })
 
+// groups by month by changing all dates to the 15th of month they are in
 export function groupByMonth(previous: any, current) {
   const originDate = new Date(current.date)
 
+  // date is zero indexed
   originDate.setDate(14)
 
   const groupedDate = originDate.toISOString().split('T')[0]

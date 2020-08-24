@@ -16,6 +16,4 @@ Math.random = function random() {
 
 require('jest-fetch-mock').enableMocks()
 
-module.exports = async () => {
-  process.env.TZ = 'UTC'
-}
+process.env.TZ = 'UTC'
