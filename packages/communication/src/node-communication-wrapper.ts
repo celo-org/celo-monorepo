@@ -4,15 +4,16 @@ import {
   BlockNumber,
   CeloTx,
   CeloTxObject,
+  CeloTxPending,
   CeloTxReceipt,
   Mixed,
   Provider,
 } from '@celo/communication/types/commons'
-import { AbiCoder } from '../types/abi'
 import { Wallet } from '@celo/sdk-types/wallet'
 import { toChecksumAddress } from '@celo/utils/lib/address'
 import debugFactory from 'debug'
 import Web3 from 'web3'
+import { AbiCoder } from '../types/abi'
 import { assertIsCeloProvider, CeloProvider } from './celo-provider'
 import { decodeStringParameter } from './utils/abi-utils'
 import { hasProperty } from './utils/provider-utils'
@@ -31,30 +32,39 @@ export interface CommunicationOptions {
 
 export class NodeCommunicationWrapper {
   private config: CommunicationOptions
-  readonly rpcCaller: RpcCaller
   readonly paramsPopulator: TxParamsNormalizer
+  rpcCaller!: RpcCaller
   wallet?: Wallet
 
-  constructor(readonly web3: Web3) {
+  constructor(readonly web3: Web3, _wallet?: Wallet) {
     this.config = {
       gasInflationFactor: 1.3,
       // gasPrice:0 means the node will compute gasPrice on its own
       gasPrice: '0',
     }
 
-    if (!web3.currentProvider) {
-      throw new Error('Must have a valid Provider')
-    }
-    if (web3.currentProvider instanceof CeloProvider) {
-      throw new Error('Lib with Provider already wrapped')
-    }
     const existingProvider: Provider = web3.currentProvider as Provider
-    const celoProviderInstance = new CeloProvider(existingProvider, this)
-    // as any because of web3 migration
-    web3.setProvider(celoProviderInstance as any)
-    this.rpcCaller = new DefaultRpcCaller(existingProvider)
+    this.setProvider(existingProvider)
+    // TODO: Add this line with the wallets separation completed
+    // this.wallet = _wallet ?? new LocalWallet()
     this.config.from = web3.eth.defaultAccount ?? undefined
     this.paramsPopulator = new TxParamsNormalizer(this)
+  }
+
+  setProvider(provider: Provider) {
+    if (!provider) {
+      throw new Error('Must have a valid Provider')
+    }
+    try {
+      if (!(provider instanceof CeloProvider)) {
+        provider = new CeloProvider(provider, this)
+      }
+      this.web3.setProvider(provider as any)
+      this.rpcCaller = new DefaultRpcCaller(provider)
+      return true
+    } catch {
+      return false
+    }
   }
 
   /**
@@ -316,15 +326,22 @@ export class NodeCommunicationWrapper {
     return this.web3.utils.soliditySha3(...val)
   }
 
-  async getBalance(address: Address): Promise<string> {
+  async getBalance(address: Address, defaultBlock?: BlockNumber): Promise<string> {
+    if (defaultBlock) {
+      return this.web3.eth.getBalance(address, defaultBlock)
+    }
     return this.web3.eth.getBalance(address)
+  }
+
+  async getTransaction(transactionHash: string): Promise<CeloTxPending> {
+    return this.web3.eth.getTransaction(transactionHash)
   }
 
   async getTransactionReceipt(txhash: string): Promise<CeloTxReceipt> {
     return this.web3.eth.getTransactionReceipt(txhash)
   }
 
-  async sign(dataToSign: string, address: Address) {
+  async sign(dataToSign: string, address: Address): Promise<string> {
     return this.web3.eth.sign(dataToSign, address)
   }
 

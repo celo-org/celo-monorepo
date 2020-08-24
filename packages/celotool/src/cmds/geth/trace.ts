@@ -45,7 +45,7 @@ export const handler = async (argv: TraceArgv) => {
     try {
       web3AndContracts = await getWeb3AndTokensContracts()
       const { kit: kit1 } = web3AndContracts
-      const latestBlock = await kit1.web3.eth.getBlock('latest')
+      const latestBlock = await kit1.communication.getBlock('latest')
       if (latestBlock.number === 0) {
         throw new Error('Latest block is zero')
       } else {

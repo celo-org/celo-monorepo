@@ -75,9 +75,8 @@ export async function registerMetadata(testnet: string, privateKey: string, inde
 
   const web3: Web3 = new Web3('http://localhost:8545')
   const kit: ContractKit = newKitFromWeb3(web3)
-  kit.communication.wallet = new LocalWallet()
   kit.communication.addAccount(privateKey)
-  kit.defaultAccount = address
+  kit.communication.defaultAccount = address
 
   const accounts = await kit.contracts.getAccounts()
   return accounts

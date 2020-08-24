@@ -1,7 +1,8 @@
 // tslint:disable:no-console
-import { ContractKit, newKit } from '@celo/contractkit'
+import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { BlockchainParametersWrapper } from '@celo/contractkit/lib/wrappers/BlockchainParameters'
 import { assert } from 'chai'
+import Web3 from 'web3'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { getHooks, sleep } from './utils'
 
@@ -52,9 +53,9 @@ describe('Blockchain parameters tests', function(this: any) {
     // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
     await sleep(2)
 
-    kit = newKit(rpcURL)
+    kit = newKitFromWeb3(new Web3(rpcURL))
 
-    await kit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000)
+    await kit.communication.web3.eth.personal.unlockAccount(validatorAddress, '', 1000)
     parameters = await kit.contracts.getBlockchainParameters()
   }
 
@@ -84,7 +85,7 @@ describe('Blockchain parameters tests', function(this: any) {
       await sleep(120, true)
       try {
         // It should have exited by now, call RPC to trigger error
-        await kit.web3.eth.getBlockNumber()
+        await kit.communication.getBlockNumber()
       } catch (_) {
         return
       }

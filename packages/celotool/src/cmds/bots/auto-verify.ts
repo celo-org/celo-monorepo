@@ -1,4 +1,6 @@
-import { Address, CeloTransactionParams, newKit } from '@celo/contractkit'
+import { CeloTransactionParams } from '@celo/communication'
+import { Address } from '@celo/communication/types/commons'
+import { newKitFromWeb3 } from '@celo/contractkit'
 import {
   ActionableAttestation,
   AttestationsWrapper,
@@ -22,6 +24,7 @@ import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { AccountType, generatePrivateKey } from 'src/lib/generate_utils'
 import { ensure0x } from 'src/lib/utils'
 import twilio, { Twilio } from 'twilio'
+import Web3 from 'web3'
 import { Argv } from 'yargs'
 import { BotsArgv } from '../bots'
 
@@ -79,7 +82,7 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
     streams: [createStream(Level.INFO)],
   })
   try {
-    const kit = newKit(argv.celoProvider)
+    const kit = newKitFromWeb3(new Web3(argv.celoProvider))
     const mnemonic = fetchEnv(envVar.MNEMONIC)
     // This really should be the ATTESTATION_BOT key, but somehow we can't get it to have cUSD
     const clientKey = ensure0x(
@@ -87,7 +90,7 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
     )
     const clientAddress = privateKeyToAddress(clientKey)
     logger = logger.child({ address: clientAddress })
-    kit.addAccount(clientKey)
+    kit.communication.addAccount(clientKey)
 
     const twilioClient = twilio(
       fetchEnv(envVar.TWILIO_ACCOUNT_SID),

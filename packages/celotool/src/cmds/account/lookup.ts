@@ -1,9 +1,10 @@
 /* tslint:disable no-console */
 
-import { newKit } from '@celo/contractkit'
+import { newKitFromWeb3 } from '@celo/contractkit'
 import { PhoneNumberUtils } from '@celo/utils'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { portForwardAnd } from 'src/lib/port_forward'
+import Web3 from 'web3'
 import { Argv } from 'yargs'
 import { AccountArgv } from '../account'
 
@@ -40,7 +41,7 @@ export const handler = async (argv: LookupArgv) => {
     )
   }
   const cb = async () => {
-    const kit = newKit('http://localhost:8545')
+    const kit = newKitFromWeb3(new Web3('http://localhost:8545'))
     const phoneHash = PhoneNumberUtils.getPhoneHash(argv.phone, argv.salt)
     const attestations = await kit.contracts.getAttestations()
     const lookupResult = await attestations.lookupIdentifiers([phoneHash])

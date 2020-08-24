@@ -1,5 +1,4 @@
-import { ContractKit, newKit } from '@celo/contractkit'
-import { CeloProvider } from '@celo/contractkit/lib/providers/celo-provider'
+import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { getFornoUrl } from 'src/lib/endpoints'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
@@ -25,7 +24,7 @@ export async function setupVotingBotAccounts(celoEnv: string) {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   const numBotAccounts = parseInt(fetchEnv(envVar.VOTING_BOTS), 10)
 
-  const kit: ContractKit = newKit(fornoUrl)
+  const kit: ContractKit = newKitFromWeb3(new Web3(fornoUrl))
   const goldToken = await kit.contracts.getGoldToken()
   const lockedGold = await kit.contracts.getLockedGold()
   const accounts = await kit.contracts.getAccounts()
@@ -40,7 +39,7 @@ export async function setupVotingBotAccounts(celoEnv: string) {
       continue
     }
 
-    kit.addAccount(key)
+    kit.communication.addAccount(key)
 
     if (!(await accounts.isAccount(botAccount))) {
       const registerTx = await accounts.createAccount()
@@ -65,10 +64,7 @@ export async function setupVotingBotAccounts(celoEnv: string) {
   }
   console.info('Finished/confirmed setup of voting bot accounts')
 
-  if (kit.web3.currentProvider instanceof CeloProvider) {
-    const celoProvider = kit.web3.currentProvider as CeloProvider
-    celoProvider.stop()
-  }
+  kit.communication.stop()
 }
 
 function helmParameters(celoEnv: string, excludedGroups?: string[]) {

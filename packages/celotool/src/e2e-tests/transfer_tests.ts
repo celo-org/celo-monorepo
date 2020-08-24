@@ -1,7 +1,7 @@
 // tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
+import { TransactionResult } from '@celo/communication'
 import { CeloTxPending, CeloTxReceipt } from '@celo/communication/types/commons'
-import { CeloContract, CeloToken, ContractKit, newKit, newKitFromWeb3 } from '@celo/contractkit'
-import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
+import { CeloContract, CeloToken, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { eqAddress } from '@celo/utils/lib/address'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
@@ -22,12 +22,12 @@ class InflationManager {
   private readonly minUpdateDelay = 10
 
   constructor(readonly validatorUri: string, readonly validatorAddress: string) {
-    this.kit = newKit(validatorUri)
-    this.kit.defaultAccount = validatorAddress
+    this.kit = newKitFromWeb3(new Web3(validatorUri))
+    this.kit.communication.defaultAccount = validatorAddress
   }
 
   now = async (): Promise<number> => {
-    return Number((await this.kit.web3.eth.getBlock('pending')).timestamp)
+    return Number((await this.kit.communication.getBlock('pending')).timestamp)
   }
 
   getNextUpdateRate = async (): Promise<number> => {
@@ -68,14 +68,14 @@ class InflationManager {
 }
 
 const freeze = async (validatorUri: string, validatorAddress: string, token: CeloToken) => {
-  const kit = newKit(validatorUri)
+  const kit = newKitFromWeb3(new Web3(validatorUri))
   const tokenAddress = await kit.registry.addressFor(token)
   const freezer = await kit.contracts.getFreezer()
   await freezer.freeze(tokenAddress).sendAndWaitForReceipt({ from: validatorAddress })
 }
 
 const unfreeze = async (validatorUri: string, validatorAddress: string, token: CeloToken) => {
-  const kit = newKit(validatorUri)
+  const kit = newKitFromWeb3(new Web3(validatorUri))
   const tokenAddress = await kit.registry.addressFor(token)
   const freezer = await kit.contracts.getFreezer()
   await freezer.unfreeze(tokenAddress).sendAndWaitForReceipt({ from: validatorAddress })
@@ -86,7 +86,7 @@ const whitelistAddress = async (
   validatorAddress: string,
   address: string
 ) => {
-  const kit = newKit(validatorUri)
+  const kit = newKitFromWeb3(new Web3(validatorUri))
   const whitelistContract = await kit._web3Contracts.getTransferWhitelist()
   await whitelistContract.methods.whitelistAddress(address).send({ from: validatorAddress })
 }
@@ -96,7 +96,7 @@ const setAddressWhitelist = async (
   validatorAddress: string,
   whitelist: string[]
 ) => {
-  const kit = newKit(validatorUri)
+  const kit = newKitFromWeb3(new Web3(validatorUri))
   const whitelistContract = await kit._web3Contracts.getTransferWhitelist()
   await whitelistContract.methods
     .setDirectlyWhitelistedAddresses(whitelist)
@@ -104,7 +104,7 @@ const setAddressWhitelist = async (
 }
 
 const setIntrinsicGas = async (validatorUri: string, validatorAddress: string, gasCost: number) => {
-  const kit = newKit(validatorUri)
+  const kit = newKitFromWeb3(new Web3(validatorUri))
   const parameters = await kit.contracts.getBlockchainParameters()
   await parameters
     .setIntrinsicGasForAlternativeFeeCurrency(gasCost.toString())
@@ -252,12 +252,12 @@ describe('Transfer tests', function(this: any) {
     await hooks.restart()
 
     kit = newKitFromWeb3(new Web3('http://localhost:8545'))
-    kit.gasInflationFactor = 1
+    kit.communication.defaultGasInflationFactor = 1
 
     // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
     await sleep(2)
     // Assuming empty password
-    await kit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
+    await kit.communication.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
 
     await initAndSyncGethWithRetry(
       gethConfig,
@@ -312,16 +312,16 @@ describe('Transfer tests', function(this: any) {
     )
 
     // Reset contracts to send RPCs through transferring node.
-    kit.web3.setProvider(new Web3.providers.HttpProvider('http://localhost:8549'))
+    kit.communication.setProvider(new Web3.providers.HttpProvider('http://localhost:8549'))
 
     // Give the node time to sync the latest block.
     const upstream = await new Web3('http://localhost:8545').eth.getBlock('latest')
-    while ((await kit.web3.eth.getBlock('latest')).number < upstream.number) {
+    while ((await kit.communication.getBlock('latest')).number < upstream.number) {
       await sleep(0.5)
     }
 
     // Unlock Node account
-    await kit.web3.eth.personal.unlockAccount(FromAddress, '', 1000000)
+    await kit.communication.web3.eth.personal.unlockAccount(FromAddress, '', 1000000)
   }
 
   const transferCeloGold = async (
@@ -336,7 +336,7 @@ describe('Transfer tests', function(this: any) {
       gatewayFee?: string
     } = {}
   ) => {
-    const res = await kit.sendTransaction({
+    const res = await kit.communication.sendTransaction({
       from: fromAddress,
       to: toAddress,
       value: amount.toString(),
@@ -445,7 +445,7 @@ describe('Transfer tests', function(this: any) {
     const gasVal = receipt ? receipt.gasUsed : expectedGasUsed
     assert.isAbove(gasVal, 0)
     const txHash = await txResult.getHash()
-    const tx: CeloTxPending = await kit.web3.eth.getTransaction(txHash)
+    const tx: CeloTxPending = await kit.communication.getTransaction(txHash)
     assert.isAbove(parseInt(tx.gasPrice, 10), 0)
     const txFee = new BigNumber(gasVal).times(tx.gasPrice)
     const txFeeBase = new BigNumber(gasVal).times(minGasPrice)

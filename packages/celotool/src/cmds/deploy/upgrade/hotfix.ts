@@ -1,6 +1,6 @@
 // This is a more unusual Celotool command. It basically helps you to execute Hotfixes on testnets. Because constructing proposals is difficult to do via a CLI, you should define them here in code. There are two examples below that you can start from.
 
-import { newKit } from '@celo/contractkit'
+import { newKitFromWeb3 } from '@celo/contractkit'
 import {
   hotfixToHash,
   ProposalBuilder,
@@ -12,6 +12,7 @@ import { randomBytes } from 'crypto'
 import { getFornoUrl } from 'src/lib/endpoints'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
+import Web3 from 'web3'
 import yargs from 'yargs'
 import { UpgradeArgv } from '../../deploy/upgrade'
 
@@ -27,7 +28,7 @@ export const builder = (argv: yargs.Argv) => {
 
 export const handler = async (argv: EthstatsArgv) => {
   try {
-    const kit = newKit(getFornoUrl(argv.celoEnv))
+    const kit = newKitFromWeb3(new Web3(getFornoUrl(argv.celoEnv)))
     const governance = await kit.contracts.getGovernance()
     const keys = getPrivateKeysFor(
       AccountType.VALIDATOR,
@@ -38,7 +39,7 @@ export const handler = async (argv: EthstatsArgv) => {
 
     console.info('Add keys to ContractKit')
     for (const key of keys) {
-      kit.addAccount(key)
+      kit.communication.addAccount(key)
     }
 
     // Here you'll want to assert the current state

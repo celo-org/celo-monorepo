@@ -1,10 +1,10 @@
 // tslint:disable:no-console
-import { CeloContract, ContractKit, newKit } from '@celo/contractkit'
-import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
+import { TransactionResult } from '@celo/communication'
+import { CeloTxReceipt } from '@celo/communication/types/commons'
+import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
 import { waitForPortOpen } from '@celo/dev-utils/lib/network'
-import { CeloTxReceipt } from '@celo/sdk-types/commons'
 import BigNumber from 'bignumber.js'
 import { spawn } from 'child_process'
 import fs from 'fs'
@@ -187,7 +187,7 @@ export const checkGethStarted = (dataDir: string) => {
 }
 
 export const getWeb3AndTokensContracts = async () => {
-  const kit = newKit('http://localhost:8545')
+  const kit = newKitFromWeb3(new Web3('http://localhost:8545'))
   const [goldToken, stableToken] = await Promise.all([
     kit.contracts.getGoldToken(),
     kit.contracts.getStableToken(),
@@ -219,7 +219,7 @@ const validateGethRPC = async (
   from: string,
   handleError: HandleErrorCallback
 ) => {
-  const transaction = await kit.web3.eth.getTransaction(txHash)
+  const transaction = await kit.communication.getTransaction(txHash)
   const txFrom = transaction.from.toLowerCase()
   const expectedFrom = from.toLowerCase()
   handleError(!transaction.from || expectedFrom !== txFrom, {
@@ -496,7 +496,7 @@ export const simulateClient = async (
   index: number
 ) => {
   // Assume the node is accessible via localhost with senderAddress unlocked
-  const kit = newKit('http://localhost:8545')
+  const kit = newKitFromWeb3(new Web3('http://localhost:8545'))
   kit.defaultAccount = senderAddress
 
   const baseLogMessage: any = {
@@ -640,7 +640,7 @@ export const transferERC20Token = async (
   onError?: (error: any) => void
 ) => {
   txParams.from = from
-  await unlockAccount(kit.web3, 0, password, from)
+  await unlockAccount(kit.communication.web3, 0, password, from)
 
   const convertedAmount = await convertToContractDecimals(amount, token)
 
