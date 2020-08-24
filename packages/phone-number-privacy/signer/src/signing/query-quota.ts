@@ -90,8 +90,21 @@ async function getQueryQuota(account: string, hashedPhoneNumber?: string) {
     )
   }
 
-  const cUSDAccountBalance = await getDollarBalance(account)
-  const celoAccountBalance = await getCeloBalance(account)
+  let cUSDAccountBalance = new BigNumber(0)
+  let celoAccountBalance = new BigNumber(0)
+
+  await Promise.all([
+    new Promise((resolve) => {
+      resolve(getDollarBalance(account))
+    }),
+    new Promise((resolve) => {
+      resolve(getCeloBalance(account))
+    }),
+  ]).then((values) => {
+    cUSDAccountBalance = values[0] as BigNumber
+    celoAccountBalance = values[1] as BigNumber
+  })
+
   // Min balance can be in either cUSD or CELO
   if (
     cUSDAccountBalance.isGreaterThanOrEqualTo(config.quota.minDollarBalance) ||
