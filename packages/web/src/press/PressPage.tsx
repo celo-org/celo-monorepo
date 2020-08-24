@@ -26,6 +26,7 @@ class PressPage extends React.PureComponent<I18nProps & Props> {
   static async getInitialProps(context) {
     let press = []
     try {
+      // when run on server import fetching code and run. on client send req to api
       if (context.req) {
         const getpress = await import('src/../server/fetchPress')
         press = await getpress.default()
