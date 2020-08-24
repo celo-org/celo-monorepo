@@ -316,6 +316,7 @@ export function* doRedeemInvite(inviteCode: string) {
       yield put(showError(ErrorMessages.EMPTY_INVITE_CODE))
       return false
     }
+    ValoraAnalytics.track(OnboardingEvents.invite_redeem_balance_checked)
 
     const newAccount = yield call(getOrCreateAccount)
     yield call(addTempAccountToWallet, inviteCode)
