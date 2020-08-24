@@ -47,7 +47,7 @@ const serviceContext: ServiceContext = {
 The ODIS endpoint URL for each environment can be found here:
 | Environment  | Key  | 
 |---|---|
-|  Alfajores Staging | https://alfajoresstaging-dot-celo-testnet.wl.r.appspot.com |
+| Alfajores Staging | https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net |
 | Alfajores  | https://us-central1-celo-phone-number-privacy.cloudfunctions.net |
 | Mainnet  |  https://us-central1-celo-odis-mainnet.cloudfunctions.net |
 
