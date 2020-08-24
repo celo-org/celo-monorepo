@@ -19,7 +19,7 @@ while getopts 'a:b:n:r:' flag; do
   case "${flag}" in
     a) BRANCH_1="${OPTARG}" ;;
     b) BRANCH_2="${OPTARG}" ;;
-    n) NETWORK="$OPTARG" ;;
+    n) NETWORK="${OPTARG}" ;;
     r) REPORT="${OPTARG}" ;;
     *) error "Unexpected option ${flag}" ;;
   esac

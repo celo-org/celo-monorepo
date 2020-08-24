@@ -6,6 +6,7 @@ import { linkedLibraries } from '@celo/protocol/migrationsConfig'
 import { Address, eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { readdirSync, readJsonSync, writeJsonSync } from 'fs-extra'
 import { basename, join } from 'path'
+import { RegistryInstance } from 'types'
 
 /*
  * A script that reads a backwards compatibility report, deploys changed contracts, and creates
@@ -19,12 +20,11 @@ import { basename, join } from 'path'
  * truffle exec scripts/truffle/make-release \
  *   --network alfajores --build_directory build/alfajores/ --report report.json \
  *   --initialize_data initialize_data.json --proposal proposal.json
- *
  */
 
 class ContractDependencies {
   dependencies: Map<string, string[]>
-  constructor(libraries: any) {
+  constructor(libraries: { [library: string]: string[] }) {
     this.dependencies = new Map()
     Object.keys(libraries).forEach((lib: string) => {
       libraries[lib].forEach((contract: string) => {
@@ -43,7 +43,7 @@ class ContractDependencies {
 }
 
 class ContractAddresses {
-  static async create(contracts: string[], registry: any) {
+  static async create(contracts: string[], registry: RegistryInstance) {
     const addresses = new Map()
     await Promise.all(
       contracts.map(async (contract: string) => {
@@ -99,12 +99,16 @@ const ensureAllContractsThatLinkLibrariesHaveChanges = (
   }
 }
 
-const deployImplementation = async (contractName: string, Contract: any, dryRun: boolean) => {
+const deployImplementation = async (
+  contractName: string,
+  Contract: Truffle.Contract<Truffle.ContractInstance>,
+  dryRun: boolean
+) => {
   console.log(`Deploying ${contractName}`)
   // Hack to trick truffle, which checks that the provided address has code
   const contract = await (dryRun ? Contract.at(REGISTRY_ADDRESS) : Contract.new())
   // Sanity check that any contracts that are being changed set a version number.
-  const getVersionNumberAbi = (contract as any).abi.find(
+  const getVersionNumberAbi = contract.abi.find(
     (abi: any) => abi.type === 'function' && abi.name === 'getVersionNumber'
   )
   if (!getVersionNumberAbi) {
@@ -115,9 +119,9 @@ const deployImplementation = async (contractName: string, Contract: any, dryRun:
 
 const deployProxy = async (
   contractName: string,
-  contract: any,
+  contract: Truffle.ContractInstance,
   addresses: ContractAddresses,
-  initializationData: any,
+  initializationData: { [contract: string]: any[] },
   dryRun: boolean
 ) => {
   // Explicitly forbid upgrading to a new Governance proxy contract.
@@ -174,6 +178,14 @@ const deployProxy = async (
   return proxy
 }
 
+interface ProposalTx {
+  contract: string
+  function: string
+  args: string[]
+  value: string
+  description?: string
+}
+
 module.exports = async (callback: (error?: any) => number) => {
   try {
     const argv = require('minimist')(process.argv.slice(2), {
@@ -189,7 +201,7 @@ module.exports = async (callback: (error?: any) => number) => {
     const registry = await artifacts.require('Registry').at(REGISTRY_ADDRESS)
     const addresses = await ContractAddresses.create(contracts, registry)
     const released: Set<string> = new Set([])
-    const proposal = []
+    const proposal: ProposalTx[] = []
     // Release 1 will deploy all libraries with proxies so that they're more easily
     // upgradable. All contracts that link libraries should be upgraded to instead link the proxied
     // library.

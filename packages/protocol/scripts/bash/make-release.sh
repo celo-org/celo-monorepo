@@ -21,9 +21,9 @@ while getopts 'a:b:n:p:i:r:' flag; do
   case "${flag}" in
     a) BRANCH_1="${OPTARG}" ;;
     b) BRANCH_2="${OPTARG}" ;;
-    n) NETWORK="$OPTARG" ;;
-    p) PROPOSAL="$OPTARG" ;;
-    i) INITIALIZE_DATA="$OPTARG" ;;
+    n) NETWORK="${OPTARG}" ;;
+    p) PROPOSAL="${OPTARG}" ;;
+    i) INITIALIZE_DATA="${OPTARG}" ;;
     r) REPORT="${OPTARG}" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
