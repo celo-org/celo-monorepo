@@ -21,6 +21,7 @@ export enum NameSpaces {
   applications = 'applications',
   audits = 'audits',
   brand = 'brand',
+  cbe = 'cbe',
   community = 'community',
   alliance = 'alliance',
   download = 'download',

@@ -31,6 +31,10 @@ export const pagePaths = {
     name: 'Validators',
     link: '/validators',
   },
+  CBE: {
+    name: 'CBE',
+    link: '/cbe',
+  },
   CODE_OF_CONDUCT: {
     name: 'Code of Conduct',
     link: '/code-of-conduct',

@@ -15,7 +15,7 @@ import LogoLightBg from 'src/logos/LogoLightBg'
 import Button, { BTN } from 'src/shared/Button.3'
 import Hoverable from 'src/shared/Hoverable'
 import Link from 'src/shared/Link'
-import menu, { CeloLinks, MAIN_MENU } from 'src/shared/menu-items'
+import menu, { CeloLinks, MAIN_MENU, pagePaths } from 'src/shared/menu-items'
 import MobileMenu from 'src/shared/MobileMenu'
 import OvalCoin from 'src/shared/OvalCoin'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
@@ -38,7 +38,12 @@ const DARK_PAGES = new Set([
   CeloLinks.walletApp,
 ])
 
-const TRANSLUCENT_PAGES = new Set([menu.ABOUT_US.link, menu.ALLIANCE_COLLECTIVE.link])
+const TRANSLUCENT_PAGES = new Set([
+  menu.ABOUT_US.link,
+  menu.ALLIANCE_COLLECTIVE.link,
+  menu.CBE.link,
+])
+const TRANSLUCENT_PAGES_WITH_HOVER = new Set([menu.ABOUT_US.link, menu.ALLIANCE_COLLECTIVE.link])
 
 interface OwnProps {
   router: Router
@@ -59,10 +64,6 @@ function scrollOffset() {
   return window.scrollY || document.documentElement.scrollTop
 }
 
-function menuHidePoint() {
-  return Dimensions.get('window').height - HEADER_HEIGHT - 1
-}
-
 export class Header extends React.PureComponent<Props, State> {
   lastScrollOffset: number
 
@@ -78,7 +79,7 @@ export class Header extends React.PureComponent<Props, State> {
 
   handleScroll = throttle(() => {
     const goingUp = this.lastScrollOffset > scrollOffset()
-    const belowFold = scrollOffset() > menuHidePoint()
+    const belowFold = scrollOffset() > this.menuHidePoint()
 
     if (goingUp && belowFold) {
       this.setState({ belowFoldUpScroll: true })
@@ -105,6 +106,13 @@ export class Header extends React.PureComponent<Props, State> {
     }
   }, 200)
 
+  menuHidePoint() {
+    // TODO use constant for the amount
+    return this.props.router.pathname === pagePaths.CBE.link
+      ? 450 - HEADER_HEIGHT
+      : Dimensions.get('window').height - HEADER_HEIGHT - 1
+  }
+
   componentDidMount() {
     this.lastScrollOffset = scrollOffset()
     window.addEventListener('scroll', this.handleScroll)
@@ -123,7 +131,7 @@ export class Header extends React.PureComponent<Props, State> {
   isDarkMode = () => {
     return (
       DARK_PAGES.has(this.props.router.pathname) ||
-      (this.props.router.pathname === menu.ABOUT_US.link && !this.state.belowFoldUpScroll)
+      (TRANSLUCENT_PAGES.has(this.props.router.pathname) && !this.state.belowFoldUpScroll)
     )
   }
 
@@ -137,7 +145,9 @@ export class Header extends React.PureComponent<Props, State> {
 
   getBackgroundColor = () => {
     if (this.isTranslucent() && !this.state.belowFoldUpScroll) {
-      return this.state.isHovering ? colors.darkTransparent : 'transparent'
+      return this.state.isHovering && TRANSLUCENT_PAGES_WITH_HOVER.has(this.props.router.pathname)
+        ? colors.darkTransparent
+        : 'transparent'
     }
     return this.isDarkMode() ? colors.dark : colors.white
   }
