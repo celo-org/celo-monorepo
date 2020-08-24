@@ -111,8 +111,7 @@ const styles = StyleSheet.create({
 export function groupByMonth(previous: any, current) {
   const originDate = new Date(current.date)
 
-  // date is zero indexed
-  originDate.setDate(14)
+  originDate.setDate(15)
 
   const groupedDate = originDate.toISOString().split('T')[0]
 
