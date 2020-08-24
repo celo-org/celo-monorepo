@@ -187,6 +187,10 @@ export abstract class BaseCommand extends LocalCommand {
       }
     }
 
+    if (res.flags.from) {
+      this.kit.defaultAccount = res.flags.from
+    }
+
     this.gasCurrencyConfig = res.flags.gasCurrency
       ? GasOptions[res.flags.gasCurrency as keyof typeof GasOptions]
       : getGasCurrency(this.config.configDir)
