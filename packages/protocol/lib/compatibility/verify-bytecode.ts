@@ -5,7 +5,16 @@ import { BuildArtifacts, } from '@openzeppelin/upgrades'
 
 import Web3 from 'web3'
 
-const Proxy: Truffle.Contract<ProxyInstance> = artifacts.require('Proxy')
+const IS_PRE_RELEASE_1 = true
+
+const ignoredContracts = [
+  // This contract is not proxied
+  'TransferWhitelist',
+
+  // These contracts are not in the Registry (before release 1)
+  'ReserveSpenderMultiSig',
+  'GovernanceApproverMultiSig'
+]
 
 export interface LibraryPositions {
   [library: string]: number[]
@@ -78,12 +87,12 @@ const isProxyAddress = async (address: string, web3: Web3): Promise<boolean> => 
   return isProxyBytecode(bytecode)
 }
 
-const getRegisteredProxiedAddress = async (contract: string, registry: RegistryInstance, web3: Web3): Promise<string> => {
+const getRegisteredProxiedAddress = async (contract: string, registry: RegistryInstance, Proxy: Truffle.Contract<ProxyInstance>, web3: Web3): Promise<string> => {
   const proxyAddress = await registry.getAddressForString(contract)
-  return await getProxiedAddress(proxyAddress, web3)
+  return await getProxiedAddress(proxyAddress, Proxy, web3)
 }
 
-const getProxiedAddress = async (address: string, web3: Web3): Promise<string> => {
+const getProxiedAddress = async (address: string, Proxy: Truffle.Contract<ProxyInstance>, web3: Web3): Promise<string> => {
   if (!isProxyAddress(address, web3)) {
     throw new Error(`The contract registered as ${contract} does not have bytecode recognized as a Proxy's bytecode`)
   }
@@ -100,7 +109,7 @@ const verifyLibraryPrefix = (bytecode: string, address: string) => {
   }
 }
 
-export const verifyBytecodesDfs = async (contracts: string[], artifacts: BuildArtifacts, registry: RegistryInstance, web3: Web3) => {
+export const verifyBytecodesDfs = async (contracts: string[], artifacts: BuildArtifacts, registry: RegistryInstance, Proxy: Truffle.Contract<ProxyInstance>, web3: Web3) => {
   const queue = [...contracts]
   const visited: Set<string> = new Set()
   const libraryAddresses: LibraryAddresses = {}
@@ -108,6 +117,10 @@ export const verifyBytecodesDfs = async (contracts: string[], artifacts: BuildAr
 
   // Checks one contract's bytecode, adding any unvisited libraries to the DFS queue.
   const dfsStep = async (contract: string) => {
+    if (ignoredContracts.includes(contract)) {
+      return
+    }
+
     const sourceBytecodeWithMetadata = artifacts.getArtifactByName(contract).deployedBytecode
     const sourceBytecode = stripMetadata(sourceBytecodeWithMetadata)
     const isLibrary = !contracts.includes(contract)
@@ -118,10 +131,14 @@ export const verifyBytecodesDfs = async (contracts: string[], artifacts: BuildAr
     // We get libraries by collecting their Proxies' addresses during the DFS.
     // Core contracts are the ones passed into this function, all contracts
     // found during the DFS are libraries.
-    if (isLibrary) {
-      address = await getProxiedAddress(libraryAddresses[contract], web3)
+    // TODO: remove IS_PRE_RELEASE_1, before the first contracts upgrade,
+    // libraries are not proxied.
+    if (isLibrary && IS_PRE_RELEASE_1) {
+      address = '0x' + libraryAddresses[contract]
+    } else if (isLibrary) {
+      address = await getProxiedAddress(libraryAddresses[contract], Proxy, web3)
     } else {
-      address = await getRegisteredProxiedAddress(contract, registry, web3)
+      address = await getRegisteredProxiedAddress(contract, registry, Proxy, web3)
     }
     const onchainBytecodeWithMetadata = await web3.eth.getCode(address)
     const onchainBytecode = stripMetadata(onchainBytecodeWithMetadata)
