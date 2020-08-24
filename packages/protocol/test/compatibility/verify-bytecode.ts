@@ -110,14 +110,16 @@ contract('', (accounts) => {
 
   describe('verifyBytecodesDfs', () => {
     it(`doesn't throw on matching contracts`, async () => {
-      await verifyBytecodesDfs(['TestContract'], buildArtifacts, registry, web3)
+      await verifyBytecodesDfs(['TestContract'], buildArtifacts, registry, Proxy, web3)
       assert(true)
     })
 
     it(`throws when a contract's bytecodes don't match`, async () => {
       const oldBytecode = artifact.deployedBytecode
       artifact.deployedBytecode = '0x0' + oldBytecode.slice(3, artifact.deployedBytecode.length)
-      await assertThrowsAsync(verifyBytecodesDfs(['TestContract'], buildArtifacts, registry, web3))
+      await assertThrowsAsync(
+        verifyBytecodesDfs(['TestContract'], buildArtifacts, registry, Proxy, web3)
+      )
       artifact.deployedBytecode = oldBytecode
     })
 
@@ -126,7 +128,9 @@ contract('', (accounts) => {
       const oldBytecode = libraryArtifact.deployedBytecode
       libraryArtifact.deployedBytecode =
         oldBytecode.slice(0, 44) + '00' + oldBytecode.slice(46, oldBytecode.length)
-      await assertThrowsAsync(verifyBytecodesDfs(['TestContract'], buildArtifacts, registry, web3))
+      await assertThrowsAsync(
+        verifyBytecodesDfs(['TestContract'], buildArtifacts, registry, Proxy, web3)
+      )
       libraryArtifact.deployedBytecode = oldBytecode
     })
   })
