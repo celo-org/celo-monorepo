@@ -3,6 +3,7 @@ import { Actions, ActionTypes } from 'src/account/actions'
 import { DEV_SETTINGS_ACTIVE_INITIALLY } from 'src/config'
 import { features } from 'src/flags'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
+import Logger from 'src/utils/Logger'
 import { getRemoteTime } from 'src/utils/time'
 import { Actions as Web3Actions, ActionTypes as Web3ActionTypes } from 'src/web3/actions'
 
@@ -111,10 +112,14 @@ export const reducer = (
       }
     case Actions.DEV_MODE_TRIGGER_CLICKED:
       const newClickCount = (state.devModeClickCount + 1) % 6
+      const devModeActive = newClickCount >= 3
+      if (devModeActive) {
+        Logger.showMessage('Debug Mode Activated')
+      }
       return {
         ...state,
         devModeClickCount: newClickCount,
-        devModeActive: newClickCount >= 3,
+        devModeActive,
       }
     case Actions.PHOTOSNUX_CLICKED:
       return {
