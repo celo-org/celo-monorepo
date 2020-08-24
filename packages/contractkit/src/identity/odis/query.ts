@@ -106,6 +106,7 @@ export async function queryOdis<ResponseType>(
     ErrorMessages.ODIS_QUOTA_ERROR,
     ErrorMessages.ODIS_AUTH_ERROR,
     ErrorMessages.ODIS_INPUT_ERROR,
+    'Unknown Client Error',
   ]
 
   return selectiveRetryAsyncWithBackOff(
@@ -136,6 +137,10 @@ export async function queryOdis<ResponseType>(
         case 401:
           throw new Error(ErrorMessages.ODIS_AUTH_ERROR)
         default:
+          if (Math.floor(res.status / 400) === 1) {
+            // Don't retry error codes in 400s
+            throw new Error(`Unknown Client Error ${res.status}`)
+          }
           throw new Error(`Unknown failure ${res.status}`)
       }
     },

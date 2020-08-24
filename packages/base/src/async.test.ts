@@ -27,7 +27,7 @@ describe('selectiveRetryAsyncWithBackOff()', () => {
   test('tries only once if error is in dontRetry array', async () => {
     const mockFunction = jest.fn()
     mockFunction.mockImplementation(() => {
-      throw new Error('test')
+      throw new Error('test ')
     })
     let didThrowError = false
     try {
