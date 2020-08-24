@@ -49,7 +49,7 @@ export default class TransferDollars extends BaseCommand {
           const balance = await stableToken.balanceOf(from)
           return balance.gte(value.plus(gasValue))
         },
-        `Cannot afford transfer with cUSD gasCurrency; try using gasCurrency=CELO or reducing value slightly`
+        `Cannot afford transfer with cUSD gasCurrency; try reducing value slightly or using gasCurrency=CELO`
       )
       .runChecks()
 

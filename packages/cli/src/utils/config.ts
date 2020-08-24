@@ -9,7 +9,7 @@ export interface CeloConfig {
   gasCurrency: GasOptions
 }
 
-export const localGeth: CeloConfig = {
+export const defaultConfig: CeloConfig = {
   node: 'http://localhost:8545',
   gasCurrency: GasOptions.auto,
 }
@@ -24,7 +24,7 @@ export function readConfig(configDir: string): CeloConfig {
   if (fs.pathExistsSync(configPath(configDir))) {
     return fs.readJSONSync(configPath(configDir))
   } else {
-    return localGeth
+    return defaultConfig
   }
 }
 
