@@ -138,9 +138,9 @@ export async function queryOdis<ResponseType>(
         case 401:
           throw new Error(ErrorMessages.ODIS_AUTH_ERROR)
         default:
-          if (Math.floor(res.status / 100) === 4) {
+          if (res.status >= 400 && res.status < 500) {
             // Don't retry error codes in 400s
-            throw new Error(ErrorMessages.ODIS_CLIENT_ERROR + ' ' + res.status)
+            throw new Error(`${ErrorMessages.ODIS_CLIENT_ERROR} ${res.status}`)
           }
           throw new Error(`Unknown failure ${res.status}`)
       }

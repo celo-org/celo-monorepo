@@ -1,4 +1,4 @@
-import Knex from 'knex'
+import * as Knex from 'knex'
 import { ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from '../src/database/models/account'
 
 export async function up(knex: Knex): Promise<any> {

@@ -1,4 +1,4 @@
-import Knex from 'knex'
+import * as Knex from 'knex'
 import { REQUESTS_COLUMNS, REQUESTS_TABLE } from '../src/database/models/request'
 
 export async function up(knex: Knex): Promise<any> {
