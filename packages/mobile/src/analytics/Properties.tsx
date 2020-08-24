@@ -168,6 +168,7 @@ interface OnboardingEventsProperties {
 
   [OnboardingEvents.invite_redeem_start]: undefined
   [OnboardingEvents.invite_redeem_complete]: undefined
+  [OnboardingEvents.invite_redeem_cancel]: undefined
   [OnboardingEvents.invite_redeem_timeout]: undefined
   [OnboardingEvents.invite_redeem_error]: {
     error: string

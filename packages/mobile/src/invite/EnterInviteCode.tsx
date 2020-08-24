@@ -67,6 +67,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
         // Note: redux state reset is handled by UseBackToWelcomeScreen
         // tslint:disable-next-line: jsx-no-lambda
         onPress={() => navigate(Screens.Welcome)}
+        eventName={OnboardingEvents.invite_redeem_cancel}
       />
     ),
     headerTitle: () => (

@@ -88,6 +88,7 @@ export enum OnboardingEvents {
 
   invite_redeem_start = 'invite_redeem_start',
   invite_redeem_complete = 'invite_redeem_complete',
+  invite_redeem_cancel = 'invite_redeem_cancel',
   invite_redeem_timeout = 'invite_redeem_timeout',
   invite_redeem_error = 'invite_redeem_error',
   invite_redeem_balance_checked = 'invite_redeem_balance_checked',
