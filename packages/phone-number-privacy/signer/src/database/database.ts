@@ -57,6 +57,13 @@ export async function initDatabase(doTestQuery = true) {
     await executeTestQuery(db)
   }
 
+  logger.info('Running Migrations')
+
+  await db.migrate.latest({
+    directory: './migrations',
+    extension: 'ts',
+  })
+
   logger.info('Database initialized successfully')
   return db
 }
