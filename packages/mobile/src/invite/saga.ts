@@ -315,6 +315,9 @@ export function* doRedeemInvite(inviteCode: string) {
     ])
 
     if (tempAccountBalanceWei.isLessThanOrEqualTo(0)) {
+      ValoraAnalytics.track(OnboardingEvents.invite_redeem_error, {
+        error: 'Empty invite',
+      })
       yield put(showError(ErrorMessages.EMPTY_INVITE_CODE))
       return false
     }
