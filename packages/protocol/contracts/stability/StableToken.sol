@@ -28,7 +28,8 @@ contract StableToken is
   CalledByVm,
   IStableToken,
   IERC20,
-  ICeloToken
+  ICeloToken,
+  ICeloVersionedContract
 {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
@@ -86,9 +87,15 @@ contract StableToken is
   }
 
   /**
+<<<<<<< HEAD
   * @notice Returns the storage, major, minor, and patch version of the contract.
   * @return The storage, major, minor, and patch version of the contract.
   */
+=======
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+>>>>>>> 8a8b82252... Script to deploy smart contract changes to a network via governance (#4706)
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 1, 0);
   }

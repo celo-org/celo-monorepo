@@ -4,6 +4,14 @@ import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
 
 library Signatures {
   /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
+
+  /**
   * @notice Given a signed address, returns the signer of the address.
   * @param message The address that was signed.
   * @param v The recovery id of the incoming ECDSA signature.
