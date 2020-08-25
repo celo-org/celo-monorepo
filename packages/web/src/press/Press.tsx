@@ -3,6 +3,7 @@ import { Image, ImageRequireSource, StyleSheet, View } from 'react-native'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
+import MENU from 'src/shared/menu-items'
 import Responsive from 'src/shared/Responsive'
 import { standardStyles } from 'src/styles'
 const forbes = require('./forbes-logo-white.png')
@@ -40,9 +41,7 @@ class Press extends React.PureComponent<I18nProps> {
                 text={t('recentNews')}
                 kind={BTN.NAKED}
                 size={SIZE.normal}
-                href={
-                  'https://www.coindesk.com/libra-minus-facebook-why-celo-is-2020s-buzzy-token-project'
-                }
+                href={MENU.PRESS.link}
               />
             </View>
           </Cell>
