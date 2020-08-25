@@ -275,10 +275,13 @@ USAGE
 OPTIONS
   --all                                                   get the status of all registered validators
 
-  --lookback=lookback                                     [default: 100] how many blocks to look back for signer
-                                                          activity
+  --end=end                                               [default: -1] what block to end at when looking at signer
+                                                          activity. defaults to the latest block
 
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     address of the signer to check if elected and validating
+
+  --start=start                                           [default: -1] what block to start at when looking at signer
+                                                          activity. defaults to the last 100 blocks
 
   --usdGas                                                If --usdGas is set, the transaction is paid for with a
                                                           feeCurrency of cUSD
@@ -287,7 +290,8 @@ OPTIONS
 
 EXAMPLES
   status --validator 0x5409ED021D9299bf6814279A6A1411A7e866A631
-  status --all --lookback 100
+  status --validator 0x5409ED021D9299bf6814279A6A1411A7e866A631 --start 1480000
+  status --all --start 1480000 --end 1490000
 ```
 
 _See code: [packages/cli/src/commands/validator/status.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/status.ts)_
