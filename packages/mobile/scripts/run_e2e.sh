@@ -17,7 +17,7 @@ export ENVFILE="${ENVFILE:-.env.test}"
 # TODO ^ release doesn't work currently b.c. the run_app.sh script assumes we want a debug build
 
 PLATFORM=""
-VD_NAME="Pixel_API_29_AOSP_x86_64"
+VD_NAME="Nexus_5X_API_28_x86"
 FAST=false
 RELEASE=false
 NET_DELAY="none"
