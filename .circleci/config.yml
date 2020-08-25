@@ -503,7 +503,7 @@ jobs:
             yarn --cwd packages/celotool cli port-forward -e baklava &
             PID=$!
             sleep 10
-            yarn build:ts
+            yarn --cwd packages/protocol build:ts
             yarn --cwd packages/protocol truffle exec --network baklava scripts/truffle/verify-bytecode.js
             kill $PID
 
