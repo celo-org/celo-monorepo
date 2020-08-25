@@ -499,8 +499,8 @@ jobs:
       - run:
           name: Verify Baklava bytecode
           command: |
-            yarn --cwd package/protocol download-artifacts -n baklava
-            yarn --cwd package/celotool cli port-forward -e baklava &
+            yarn --cwd packages/protocol download-artifacts -n baklava
+            yarn --cwd packages/celotool cli port-forward -e baklava &
             PID=$!
             sleep 10
             yarn build:ts
