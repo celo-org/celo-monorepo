@@ -41,13 +41,13 @@ const styles = StyleSheet.create({
   },
   header: {
     ...fontStyles.h1,
-    textAlign: 'center',
+    textAlign: 'left',
     paddingBottom: 15,
   },
   bodyText: {
-    ...fontStyles.paragraph,
-    fontSize: 15,
-    color: colors.gray5,
+    ...fontStyles.bodySmall,
+    fontSize: 14,
+    color: colors.gray4,
   },
 })
 
