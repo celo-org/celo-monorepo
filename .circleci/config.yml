@@ -977,12 +977,9 @@ workflows:
   celo-monorepo-build:
     jobs:
       - install_dependencies
-      - lint-checks:
-          requires:
-            - install_dependencies
       - protocol-verify-baklava-bytecode:
           requires:
-            - lint-checks
+            - install_dependencies
   npm-install-testing-cron-workflow:
     triggers:
       - schedule:
