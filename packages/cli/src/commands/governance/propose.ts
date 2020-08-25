@@ -36,7 +36,7 @@ export default class Propose extends BaseCommand {
     this.kit.defaultAccount = account
 
     await newCheckBuilder(this, account)
-      .hasEnoughGold(account, deposit)
+      .hasEnoughCelo(account, deposit)
       .exceedsProposalMinDeposit(deposit)
       .runChecks()
 
