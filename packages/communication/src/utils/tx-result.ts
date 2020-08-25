@@ -1,5 +1,5 @@
+import { Future } from '@celo/base/lib/future'
 import { CeloTxReceipt, PromiEvent } from '@celo/communication/types/commons'
-import { Future } from '@celo/utils/lib/future'
 import debugFactory from 'debug'
 
 const debug = debugFactory('communication:tx:result')

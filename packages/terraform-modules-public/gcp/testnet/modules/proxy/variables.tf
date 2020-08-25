@@ -8,6 +8,11 @@ variable celo_env {
   description = "Name of the testnet Celo environment"
 }
 
+variable gcloud_project {
+  type        = string
+  description = "Name of the Google Cloud project to use"
+}
+
 variable instance_type {
   description = "The instance type"
   type        = string
@@ -97,7 +102,7 @@ variable bootnodes_base64 {
 variable reset_geth_data {
   type        = bool
   description = "Specifies if the existing chain data should be removed while creating the instance"
-  default     = false
+  default     = true
 }
 
 variable proxy_name {
@@ -105,8 +110,24 @@ variable proxy_name {
   description = "The proxy Name for ethstats"
 }
 
+variable proxy_addresses {
+  type        = list(string)
+  description = "The proxy address for ethstats"
+}
+
 variable proxy_max_peers {
   type        = number
   description = "Max number of peers to connect with"
-  default     = 120
+  default     = 250
+  #note this does not behave as expected.  120 means we get 20 (unelected).
+}
+
+variable proxy_account_passwords {
+  type        = list(string)
+  description = "Array with the proxy account passwords"
+}
+
+variable "service_account_scopes" {
+  description = "Scopes to apply to the service account which all nodes in the cluster will inherit"
+  type        = list(string)
 }

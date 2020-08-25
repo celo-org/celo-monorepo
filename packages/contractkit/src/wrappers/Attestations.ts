@@ -1,11 +1,11 @@
+import { eqAddress } from '@celo/base/lib/address'
+import { concurrentMap, sleep } from '@celo/base/lib/async'
+import { notEmpty, zip3 } from '@celo/base/lib/collections'
+import { parseSolidityStringArray } from '@celo/base/lib/parsing'
+import { appendPath } from '@celo/base/lib/string'
 import { toTransactionObject } from '@celo/communication'
 import { Address, NULL_ADDRESS } from '@celo/communication/types/commons'
 import { AttestationUtils, SignatureUtils } from '@celo/utils/lib'
-import { eqAddress } from '@celo/utils/lib/address'
-import { concurrentMap, sleep } from '@celo/utils/lib/async'
-import { notEmpty, zip3 } from '@celo/utils/lib/collections'
-import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
-import { appendPath } from '@celo/utils/lib/string'
 import BigNumber from 'bignumber.js'
 import fetch from 'cross-fetch'
 import { CeloContract } from '../base'
@@ -57,6 +57,7 @@ export interface AttesationServiceRevealRequest {
   account: Address
   phoneNumber: string
   issuer: string
+  // TODO rename to pepper here and in Attesation Service
   salt?: string
   smsRetrieverAppSig?: string
 }
@@ -469,14 +470,14 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     account: Address,
     issuer: Address,
     serviceURL: string,
-    salt?: string,
+    pepper?: string,
     smsRetrieverAppSig?: string
   ) {
     const body: AttesationServiceRevealRequest = {
       account,
       phoneNumber,
       issuer,
-      salt,
+      salt: pepper,
       smsRetrieverAppSig,
     }
     return fetch(appendPath(serviceURL, 'attestations'), {

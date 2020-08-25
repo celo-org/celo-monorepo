@@ -1,13 +1,11 @@
+import { NativeSigner, Signature, Signer } from '@celo/base/lib/signatureUtils'
 import { CeloTransactionObject, toTransactionObject } from '@celo/communication'
 import { Address } from '@celo/communication/types/commons'
 import {
   hashMessageWithPrefix,
   LocalSigner,
-  NativeSigner,
   parseSignature,
-  Signature,
   signedMessageToPublicKey,
-  Signer,
 } from '@celo/utils/lib/signatureUtils'
 import { Accounts } from '../generated/Accounts'
 import {

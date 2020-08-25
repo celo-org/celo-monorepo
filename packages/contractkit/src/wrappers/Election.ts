@@ -1,11 +1,11 @@
+import { eqAddress, findAddressIndex, normalizeAddress } from '@celo/base/lib/address'
+import { concurrentMap, concurrentValuesMap } from '@celo/base/lib/async'
+import { zip } from '@celo/base/lib/collections'
 import { CeloTransactionObject, toTransactionObject } from '@celo/communication'
 import { Address, EventLog, NULL_ADDRESS } from '@celo/communication/types/commons'
-import { eqAddress, findAddressIndex, normalizeAddress } from '@celo/utils/lib/address'
-import { concurrentMap, concurrentValuesMap } from '@celo/utils/lib/async'
-import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
-import { range } from 'lodash'
 import { Election } from '../generated/Election'
+import { zeroRange } from '../utils/array'
 import {
   BaseWrapper,
   fixidityValueToBigNumber,
@@ -149,7 +149,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    */
   async getValidatorSigners(blockNumber: number): Promise<Address[]> {
     const numValidators = await this.numberValidatorsInSet(blockNumber)
-    return concurrentMap(10, range(0, numValidators, 1), (i: number) =>
+    return concurrentMap(10, zeroRange(numValidators), (i: number) =>
       this.validatorSignerAddressFromSet(i, blockNumber)
     )
   }

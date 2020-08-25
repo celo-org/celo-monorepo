@@ -58,6 +58,9 @@ export class ContractKit {
   /** factory for core contract's kit wrappers  */
   readonly contracts: WrapperCache
 
+  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
+  gasPriceSuggestionMultiplier = 5
+
   constructor(readonly communication: NodeCommunicationWrapper) {
     this.registry = new AddressRegistry(this)
     this._web3Contracts = new Web3ContractCache(this)
@@ -147,6 +150,14 @@ export class ContractKit {
     const address =
       token === CeloContract.GoldToken ? undefined : await this.registry.addressFor(token)
     await this.communication.setFeeCurrency(address)
+  }
+
+  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
+  async updateGasPriceInCommunicationLayer(currency: Address) {
+    const gasPriceMinimum = await this.contracts.getGasPriceMinimum()
+    const rawGasPrice = await gasPriceMinimum.getGasPriceMinimum(currency)
+    const gasPrice = rawGasPrice.multipliedBy(this.gasPriceSuggestionMultiplier).toFixed()
+    this.communication.setGasPriceForCurrency(currency, gasPrice)
   }
 
   async getEpochSize(): Promise<number> {

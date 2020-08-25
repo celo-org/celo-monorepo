@@ -35,6 +35,9 @@ export class NodeCommunicationWrapper {
   readonly paramsPopulator: TxParamsNormalizer
   rpcCaller!: RpcCaller
 
+  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
+  private currencyGasPrice: Map<Address, string> = new Map<Address, string>()
+
   constructor(readonly web3: Web3, public wallet?: Wallet) {
     this.config = {
       gasInflationFactor: 1.3,
@@ -185,6 +188,7 @@ export class NodeCommunicationWrapper {
    */
   async sendTransaction(tx: CeloTx): Promise<TransactionResult> {
     tx = this.fillTxDefaults(tx)
+    await this.fillGasPrice(tx)
 
     let gas = tx.gas
     if (gas == null) {
@@ -204,6 +208,7 @@ export class NodeCommunicationWrapper {
     tx?: Omit<CeloTx, 'data'>
   ): Promise<TransactionResult> {
     tx = this.fillTxDefaults(tx)
+    await this.fillGasPrice(tx)
 
     let gas = tx.gas
     if (gas == null) {
@@ -226,6 +231,21 @@ export class NodeCommunicationWrapper {
 
   async sendSignedTransaction(signedTransactionData: string): Promise<TransactionResult> {
     return toTxResult(this.web3.eth.sendSignedTransaction(signedTransactionData))
+  }
+
+  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
+  async fillGasPrice(tx: CeloTx): Promise<CeloTx> {
+    if (tx.feeCurrency && tx.gasPrice === '0' && this.currencyGasPrice.has(tx.feeCurrency)) {
+      return {
+        ...tx,
+        gasPrice: this.currencyGasPrice.get(tx.feeCurrency),
+      }
+    }
+    return tx
+  }
+  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
+  async setGasPriceForCurrency(address: Address, gasPrice: string) {
+    this.currencyGasPrice.set(address, gasPrice)
   }
 
   async estimateGas(

@@ -1,9 +1,10 @@
+import { CELO_DERIVATION_PATH_BASE } from '@celo/base/lib/account'
 import { Address } from '@celo/communication/types/commons'
 import { Signer, Wallet } from '@celo/sdk-types/wallet'
-import { CELO_DERIVATION_PATH_BASE } from '@celo/utils/lib/account'
 import { TransportError, TransportStatusError } from '@ledgerhq/errors'
 import Ledger from '@ledgerhq/hw-app-eth'
 import debugFactory from 'debug'
+import { zeroRange } from '../utils/array'
 import { transportErrorFriendlyMessage } from '../utils/ledger-utils'
 import { RemoteWallet } from './remote-wallet'
 import { LedgerSigner } from './signers/ledger-signer'
@@ -53,7 +54,7 @@ export class LedgerWallet extends RemoteWallet implements Wallet {
    * @param transport Transport to connect the ledger device
    */
   constructor(
-    readonly derivationPathIndexes: number[] = Array.from(Array(ADDRESS_QTY).keys()),
+    readonly derivationPathIndexes: number[] = zeroRange(ADDRESS_QTY),
     readonly baseDerivationPath: string = CELO_BASE_DERIVATION_PATH,
     readonly transport: any = {},
     readonly ledgerAddressValidation: AddressValidation = AddressValidation.firstTransactionPerAddress

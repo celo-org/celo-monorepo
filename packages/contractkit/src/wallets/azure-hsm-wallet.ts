@@ -1,10 +1,12 @@
 import { Address } from '@celo/communication/types/commons'
 import { Signer, Wallet } from '@celo/sdk-types/wallet'
-import { ensureLeading0x } from '@celo/utils/lib/address'
-import * as ethUtil from 'ethereumjs-util'
+import debugFactory from 'debug'
 import { AzureKeyVaultClient } from '../utils/azure-key-vault-client'
+import { getAddressFromPublicKey } from '../utils/signing-utils'
 import { RemoteWallet } from './remote-wallet'
 import { AzureHSMSigner } from './signers/azure-hsm-signer'
+
+const debug = debugFactory('kit:wallet:aws-hsm-wallet')
 
 // Azure Key Vault implementation of a RemoteWallet
 export class AzureHSMWallet extends RemoteWallet implements Wallet {
@@ -30,6 +32,8 @@ export class AzureHSMWallet extends RemoteWallet implements Wallet {
         // Safely ignore non-secp256k1 keys
         if (!e.message.includes('Invalid secp256k1')) {
           throw e
+        } else {
+          debug(`Ignoring non-secp256k1 key ${key}`)
         }
       }
     }
@@ -51,11 +55,6 @@ export class AzureHSMWallet extends RemoteWallet implements Wallet {
       throw new Error('AzureHSMWallet needs to be initialized first')
     }
     const publicKey = await this.keyVaultClient!.getPublicKey(keyName)
-    const pkBuffer = ethUtil.toBuffer(ensureLeading0x(publicKey.toString(16)))
-    if (!ethUtil.isValidPublic(pkBuffer, true)) {
-      throw new Error(`Invalid secp256k1 public key for keyname ${keyName}`)
-    }
-    const address = ethUtil.pubToAddress(pkBuffer, true)
-    return ensureLeading0x(address.toString('hex'))
+    return getAddressFromPublicKey(publicKey)
   }
 }

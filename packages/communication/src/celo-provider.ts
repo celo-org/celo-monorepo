@@ -1,3 +1,4 @@
+import { Lock } from '@celo/base/lib/lock'
 import {
   Callback,
   EncodedTransaction,
@@ -35,6 +36,11 @@ export function assertIsCeloProvider(provider: any): asserts provider is CeloPro
 
 export class CeloProvider implements Provider {
   private alreadyStopped: boolean = false
+  // Transaction nonce is calculated as the max of an account's nonce on-chain, and any pending transactions in a node's
+  // transaction pool. As a result, once a nonce is used, the transaction must be sent to the node before the nonce can
+  // be calculated for another transaction. In particular the sign and send operation must be completed atomically with
+  // relation to other sign and send operations.
+  private nonceLock: Lock = new Lock()
 
   constructor(
     readonly existingProvider: Provider,
@@ -178,11 +184,16 @@ export class CeloProvider implements Provider {
   }
 
   private async handleSendTransaction(payload: JsonRpcPayload): Promise<any> {
-    const signedTx = await this.handleSignTransaction(payload)
-    const response = await this.communication.rpcCaller.call('eth_sendRawTransaction', [
-      signedTx.raw,
-    ])
-    return response.result
+    await this.nonceLock.acquire()
+    try {
+      const signedTx = await this.handleSignTransaction(payload)
+      const response = await this.communication.rpcCaller.call('eth_sendRawTransaction', [
+        signedTx.raw,
+      ])
+      return response.result
+    } finally {
+      this.nonceLock.release()
+    }
   }
 
   private forwardSend(payload: JsonRpcPayload, callback: Callback<JsonRpcResponse>): void {

@@ -29,13 +29,16 @@ export const uriDataFromJson = (obj: object): UriData => {
   }
   return either.right
 }
-export const uriDataFromUrl = (url: string) => uriDataFromJson(parse(url, true).query)
+export const uriDataFromUrl = (url: string) => uriDataFromJson(parse(decodeURI(url), true).query)
 
 enum UriMethod {
   pay = 'pay',
 }
 
+// removes undefined parameters for serialization
+export const stripUndefined = (obj: object) => JSON.parse(JSON.stringify(obj))
+
 export const urlFromUriData = (data: Partial<UriData>, method: UriMethod = UriMethod.pay) => {
-  const params = new URLSearchParams(Object(data))
-  return `celo://wallet/${method.toString()}?${params.toString()}`
+  const params = new URLSearchParams(stripUndefined(data))
+  return encodeURI(`celo://wallet/${method.toString()}?${params.toString()}`)
 }

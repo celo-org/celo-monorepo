@@ -1,6 +1,6 @@
+import { findAddressIndex } from '@celo/base/lib/address'
 import { CeloTransactionObject, toTransactionObject } from '@celo/communication'
 import { Address } from '@celo/communication/types/commons'
-import { findAddressIndex } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import { DoubleSigningSlasher } from '../generated/DoubleSigningSlasher'
 import { BaseWrapper, proxyCall, valueToBigNumber, valueToInt } from './BaseWrapper'

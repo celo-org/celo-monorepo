@@ -1,3 +1,3 @@
-## Phone Number Privacy
+## ODIS Combiner
 
-A firebase function that generates unique salts for phone numbers.
+A firebase function that orchestrates distributed BLS threshold signing with the set of ODIS signers.

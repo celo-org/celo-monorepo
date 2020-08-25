@@ -1,6 +1,11 @@
+import {
+  AddressListItem as ALI,
+  Comparator,
+  linkedListChanges as baseLinkedListChanges,
+  zip,
+} from '@celo/base/lib/collections'
 import { CeloTransactionObject } from '@celo/communication'
 import { Address, EventLog } from '@celo/communication/types/commons'
-import { AddressListItem, linkedListChanges, zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import { LockedGold } from '../generated/LockedGold'
 import {
@@ -11,6 +16,15 @@ import {
   valueToBigNumber,
   valueToString,
 } from '../wrappers/BaseWrapper'
+
+type AddressListItem = ALI<BigNumber>
+const bigNumberComparator: Comparator<BigNumber> = (a: BigNumber, b: BigNumber) => a.lt(b)
+function linkedListChanges(
+  groups: AddressListItem[],
+  changed: AddressListItem[]
+): { lessers: string[]; greaters: string[]; list: AddressListItem[] } {
+  return baseLinkedListChanges(groups, changed, bigNumberComparator)
+}
 
 export interface VotingDetails {
   accountAddress: Address

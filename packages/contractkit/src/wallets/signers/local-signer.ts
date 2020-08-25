@@ -1,6 +1,6 @@
+import { ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
 import { RLPEncodedTx } from '@celo/communication/types/commons'
 import { Signer } from '@celo/sdk-types/wallet'
-import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { Decrypt } from '@celo/utils/lib/ecies'
 // @ts-ignore-next-line
 import { account as Account } from 'eth-lib'

@@ -1,11 +1,11 @@
+import { trimLeading0x } from '@celo/base/lib/address'
 import { AbiCoder } from '@celo/communication/types/abi'
 import { CeloTx } from '@celo/communication/types/commons'
-import { trimLeading0x } from '@celo/utils/lib/address'
 import BN from 'bn.js'
-import { range } from 'lodash'
 import qrcode from 'qrcode'
 import querystring from 'querystring'
 import abiWeb3 from 'web3-eth-abi'
+import { zeroRange } from '../utils/array'
 
 const abi = (abiWeb3 as unknown) as AbiCoder
 
@@ -93,7 +93,7 @@ export function buildUri(tx: CeloTx, functionName?: string, abiTypes: string[] =
     if (txData.length > 8) {
       const argsEncoded = txData.slice(8)
       const decoded = abi.decodeParameters(abiTypes, argsEncoded)
-      functionArgs = range(0, decoded.__length__).map((idx) => decoded[idx].toLowerCase())
+      functionArgs = zeroRange(decoded.__length__).map((idx) => decoded[idx].toLowerCase())
     }
   }
 

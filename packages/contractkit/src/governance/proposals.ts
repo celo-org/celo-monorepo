@@ -1,6 +1,6 @@
+import { concurrentMap } from '@celo/base/lib/async'
 import { CeloTransactionObject, getAbiTypes } from '@celo/communication'
 import { CeloTxObject, CeloTxPending } from '@celo/communication/types/commons'
-import { concurrentMap } from '@celo/utils/lib/async'
 import { keccak256 } from 'ethereumjs-util'
 import { Contract } from 'web3-eth-contract'
 import { CeloContract } from '../base'

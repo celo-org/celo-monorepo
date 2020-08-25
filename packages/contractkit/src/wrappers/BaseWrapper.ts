@@ -1,3 +1,5 @@
+import { bufferToHex, ensureLeading0x } from '@celo/base/lib/address'
+import { zip } from '@celo/base/lib/collections'
 import { CeloTransactionObject, toTransactionObject } from '@celo/communication'
 import {
   CeloTxObject,
@@ -5,8 +7,6 @@ import {
   EventLog,
   PastEventOptions,
 } from '@celo/communication/types/commons'
-import { bufferToHex, ensureLeading0x } from '@celo/utils/lib/address'
-import { zip } from '@celo/utils/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { ContractKit } from '../kit'
