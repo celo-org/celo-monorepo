@@ -188,7 +188,12 @@ interface OnboardingEventsProperties {
     error: string
   }
 
-  [OnboardingEvents.account_dek_set]: undefined
+  [OnboardingEvents.account_dek_register_start]: undefined
+  [OnboardingEvents.account_dek_register_account_unlocked]: undefined
+  [OnboardingEvents.account_dek_register_account_checked]: undefined
+  [OnboardingEvents.account_dek_register_complete]: {
+    newRegistration: boolean
+  }
 }
 
 interface VerificationEventsProperties {

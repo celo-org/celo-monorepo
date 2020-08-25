@@ -67,6 +67,7 @@ export function* registerAccountDek(account: string) {
     if (isAlreadyRegistered) {
       return
     }
+    ValoraAnalytics.track(OnboardingEvents.account_dek_register_start)
 
     Logger.debug(
       `${TAG}@registerAccountDEK`,
@@ -74,6 +75,8 @@ export function* registerAccountDek(account: string) {
     )
 
     yield call(getConnectedUnlockedAccount)
+    ValoraAnalytics.track(OnboardingEvents.account_dek_register_account_unlocked)
+
     const privateDataKey: string | null = yield select(dataEncryptionKeySelector)
     if (!privateDataKey) {
       throw new Error('No data key in store. Should never happen.')
@@ -88,9 +91,14 @@ export function* registerAccountDek(account: string) {
     ])
 
     const upToDate: boolean = yield call(isAccountUpToDate, accountsWrapper, account, publicDataKey)
+    ValoraAnalytics.track(OnboardingEvents.account_dek_register_account_checked)
+
     if (upToDate) {
       Logger.debug(`${TAG}@registerAccountDEK`, 'Address and DEK up to date, skipping.')
       yield put(registerDataEncryptionKey())
+      ValoraAnalytics.track(OnboardingEvents.account_dek_register_complete, {
+        newRegistration: false,
+      })
       return
     }
 
@@ -100,7 +108,9 @@ export function* registerAccountDek(account: string) {
     yield call(sendTransaction, setAccountTx.txo, account, context)
 
     yield put(registerDataEncryptionKey())
-    ValoraAnalytics.track(OnboardingEvents.account_dek_set)
+    ValoraAnalytics.track(OnboardingEvents.account_dek_register_complete, {
+      newRegistration: true,
+    })
   } catch (error) {
     // DEK registration failures are not considered fatal. Swallow the error and allow calling saga to proceed.
     // Registration will be re-attempted on next payment send
