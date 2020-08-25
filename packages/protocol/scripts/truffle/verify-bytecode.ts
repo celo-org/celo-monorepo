@@ -11,8 +11,15 @@ const Proxy: Truffle.Contract<ProxyInstance> = artifacts.require('Proxy')
 module.exports = async (callback: (error?: any) => number) => {
   try {
     const registry = await Registry.at(celoRegistryAddress)
-    const buildArtifacts = getBuildArtifacts('./build/contracts')
-    await verifyBytecodesDfs(Object.keys(CeloContractName), buildArtifacts, registry, Proxy, web3)
+    const buildArtifacts = getBuildArtifacts('./build/baklava/contracts')
+    await verifyBytecodesDfs(
+      Object.keys(CeloContractName),
+      buildArtifacts,
+      registry,
+      Proxy,
+      web3,
+      true
+    )
   } catch (error) {
     callback(error)
   }
