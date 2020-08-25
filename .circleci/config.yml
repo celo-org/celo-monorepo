@@ -486,6 +486,27 @@ jobs:
           name: Unit tests
           command: yarn --cwd packages/protocol test common/
 
+  protocol-verify-baklava-bytecode:
+    <<: *defaults
+    resource_class: large
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
+      - run:
+          name: Verify Baklava bytecode
+          command: |
+            yarn --cwd package/protocol download-artifacts -n baklava
+            yarn --cwd package/celotool cli port-forward -e baklava &
+            PID=$!
+            sleep 10
+            yarn build:ts
+            yarn --cwd packages/protocol truffle exec --network baklava scripts/truffle/verify-bytecode.js
+            kill $PID
+
   protocol-test-compatibility:
     <<: *defaults
     resource_class: large
@@ -956,102 +977,12 @@ workflows:
   celo-monorepo-build:
     jobs:
       - install_dependencies
-      - certora-test:
-          requires:
-            - install_dependencies
       - lint-checks:
           requires:
             - install_dependencies
-      - general-test:
-          requires:
-            - install_dependencies
-      - cli-test:
-          requires:
-            - install_dependencies
-      - contractkit-test:
-          requires:
-            - install_dependencies
-      - mobile-test:
+      - protocol-verify-baklava-bytecode:
           requires:
             - lint-checks
-      - end-to-end-mobile-test-android
-      - end-to-end-mobile-test-ios
-      - protocol-test-common:
-          requires:
-            - lint-checks
-      - protocol-test-compatibility:
-          requires:
-            - lint-checks
-      - protocol-test-governance-network:
-          requires:
-            - lint-checks
-      - protocol-test-governance-validators:
-          requires:
-            - lint-checks
-      - protocol-test-governance-voting:
-          requires:
-            - lint-checks
-      - protocol-test-identity:
-          requires:
-            - lint-checks
-      - protocol-test-stability:
-          requires:
-            - lint-checks
-      - typescript-test:
-          requires:
-            - install_dependencies
-      - base-test:
-          requires:
-            - install_dependencies
-      - utils-test:
-          requires:
-            - install_dependencies
-      - end-to-end-geth-transfer-test:
-          requires:
-            - lint-checks
-            - contractkit-test
-      - end-to-end-geth-blockchain-parameters-test:
-          requires:
-            - lint-checks
-            - contractkit-test
-      - end-to-end-geth-slashing-test:
-          requires:
-            - lint-checks
-            - contractkit-test
-      - end-to-end-geth-governance-test:
-          requires:
-            - lint-checks
-            - contractkit-test
-      - end-to-end-geth-sync-test:
-          requires:
-            - lint-checks
-            - contractkit-test
-      - end-to-end-geth-validator-order-test:
-          requires:
-            - lint-checks
-            - contractkit-test
-      - phone-number-privacy-test:
-          requires:
-            - lint-checks
-      - flakey-test-summary:
-          requires:
-            - end-to-end-mobile-test-android
-            - end-to-end-mobile-test-ios
-            - protocol-test-common
-            - protocol-test-compatibility
-            - protocol-test-governance-network
-            - protocol-test-governance-validators
-            - protocol-test-governance-voting
-            - protocol-test-identity
-            - protocol-test-stability
-            - mobile-test
-            - end-to-end-geth-transfer-test
-            - end-to-end-geth-blockchain-parameters-test
-            - end-to-end-geth-slashing-test
-            - end-to-end-geth-governance-test
-            - end-to-end-geth-sync-test
-            - end-to-end-geth-validator-order-test
-            - phone-number-privacy-test
   npm-install-testing-cron-workflow:
     triggers:
       - schedule:
