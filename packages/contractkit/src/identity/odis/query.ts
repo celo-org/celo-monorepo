@@ -61,6 +61,7 @@ export enum ErrorMessages {
   ODIS_QUOTA_ERROR = 'odisQuotaError',
   ODIS_INPUT_ERROR = 'odisBadInputError',
   ODIS_AUTH_ERROR = 'odisAuthError',
+  ODIS_CLIENT_ERROR = 'Unknown Client Error',
 }
 
 export interface ServiceContext {
@@ -106,6 +107,7 @@ export async function queryOdis<ResponseType>(
     ErrorMessages.ODIS_QUOTA_ERROR,
     ErrorMessages.ODIS_AUTH_ERROR,
     ErrorMessages.ODIS_INPUT_ERROR,
+    ErrorMessages.ODIS_CLIENT_ERROR,
   ]
 
   return selectiveRetryAsyncWithBackOff(
@@ -136,6 +138,10 @@ export async function queryOdis<ResponseType>(
         case 401:
           throw new Error(ErrorMessages.ODIS_AUTH_ERROR)
         default:
+          if (res.status >= 400 && res.status < 500) {
+            // Don't retry error codes in 400s
+            throw new Error(`${ErrorMessages.ODIS_CLIENT_ERROR} ${res.status}`)
+          }
           throw new Error(`Unknown failure ${res.status}`)
       }
     },

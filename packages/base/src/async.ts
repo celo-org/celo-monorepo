@@ -71,7 +71,7 @@ export const selectiveRetryAsyncWithBackOff = async <T extends any[], U>(
       // it awaits otherwise it'd always do all the retries
       return await inFunction(...params)
     } catch (error) {
-      if (dontRetry.includes((error as Error).message)) {
+      if (dontRetry.some((msg) => (error as Error).message.includes(msg))) {
         throw error
       }
       saveError = error

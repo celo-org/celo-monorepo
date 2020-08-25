@@ -40,7 +40,7 @@
 
 ▸ **queryOdis**<**ResponseType**>(`signer`: [AuthSigner](_identity_odis_query_.md#authsigner), `body`: [PhoneNumberPrivacyRequest](../interfaces/_identity_odis_query_.phonenumberprivacyrequest.md), `context`: [ServiceContext](../interfaces/_identity_odis_query_.servicecontext.md), `endpoint`: string): *Promise‹ResponseType›*
 
-*Defined in [contractkit/src/identity/odis/query.ts:78](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L78)*
+*Defined in [contractkit/src/identity/odis/query.ts:79](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L79)*
 
 Make a request to lookup the phone number identifier or perform matchmaking
 
