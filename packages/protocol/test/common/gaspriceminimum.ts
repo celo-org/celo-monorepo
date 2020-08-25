@@ -1,9 +1,5 @@
-import {
-  assertEqualBN,
-  assertLogMatches2,
-  assertRevert,
-  NULL_ADDRESS,
-} from '@celo/protocol/lib/test-utils'
+import { NULL_ADDRESS } from '@celo/base/lib/address'
+import { assertEqualBN, assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {

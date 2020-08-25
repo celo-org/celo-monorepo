@@ -1,6 +1,5 @@
 // tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
-import { TransactionResult } from '@celo/communication'
-import { CeloTxPending, CeloTxReceipt } from '@celo/communication/types/commons'
+import { CeloTxPending, CeloTxReceipt, TransactionResult } from '@celo/communication'
 import { CeloContract, CeloToken, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { eqAddress } from '@celo/utils/lib/address'
 import { toFixed } from '@celo/utils/lib/fixidity'

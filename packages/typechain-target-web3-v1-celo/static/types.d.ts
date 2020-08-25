@@ -1,4 +1,4 @@
-import { BlockNumber, EventLog } from '@celo/communication/types/commons'
+import { BlockNumber, EventLog } from '@celo/communication'
 import { EventEmitter } from 'events'
 
 export interface EventOptions {

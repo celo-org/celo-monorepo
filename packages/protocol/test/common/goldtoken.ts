@@ -1,10 +1,6 @@
+import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import {
-  assertBalance,
-  assertEqualBN,
-  assertRevert,
-  NULL_ADDRESS,
-} from '@celo/protocol/lib/test-utils'
+import { assertBalance, assertEqualBN, assertRevert } from '@celo/protocol/lib/test-utils'
 import { BigNumber } from 'bignumber.js'
 import * as _ from 'lodash'
 import {

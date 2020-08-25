@@ -1,10 +1,5 @@
-import {
-  Callback,
-  JsonRpcPayload,
-  JsonRpcResponse,
-  Provider,
-} from '@celo/communication/types/commons'
 import debugFactory from 'debug'
+import { Callback, JsonRpcPayload, JsonRpcResponse, Provider } from '../commons'
 
 const debugRpcPayload = debugFactory('rpc:payload')
 const debugRpcResponse = debugFactory('rpc:response')

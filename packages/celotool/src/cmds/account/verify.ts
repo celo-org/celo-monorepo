@@ -24,8 +24,6 @@ interface VerifyArgv extends AccountArgv {
   num: number
 }
 
-export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
-
 export const builder = (argv: yargs.Argv) => {
   return argv
     .option('phone', {

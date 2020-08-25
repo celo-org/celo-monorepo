@@ -1,5 +1,6 @@
 /* tslint:disable:no-console */
-import { CeloTxObject, NULL_ADDRESS } from '@celo/communication/types/commons'
+import { NULL_ADDRESS } from '@celo/base/lib/address'
+import { CeloTxObject } from '@celo/communication'
 import {
   getDeployedProxiedContract,
   sendTransactionWithPrivateKey,

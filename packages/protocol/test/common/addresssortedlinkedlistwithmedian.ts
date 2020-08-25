@@ -1,4 +1,5 @@
-import { assertRevert, assertSameAddress, NULL_ADDRESS } from '@celo/protocol/lib/test-utils'
+import { NULL_ADDRESS } from '@celo/base/lib/address'
+import { assertRevert, assertSameAddress } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
 import {
   AddressSortedLinkedListWithMedianTestContract,

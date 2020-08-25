@@ -1,4 +1,4 @@
-export { Address, NULL_ADDRESS } from '@celo/communication/types/commons'
+export { Address, NULL_ADDRESS } from '@celo/base/lib/address'
 export { AllContracts, CeloContract, CeloToken } from './base'
 export { IdentityMetadataWrapper } from './identity'
 export { OdisUtils } from './identity/odis'

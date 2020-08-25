@@ -1,4 +1,4 @@
-import { Address, EventLog } from '@celo/communication/types/commons'
+import { Address, EventLog } from '@celo/communication'
 import BigNumber from 'bignumber.js'
 import { Reserve } from '../generated/Reserve'
 import { BaseWrapper, proxyCall, proxySend, valueToBigNumber } from './BaseWrapper'

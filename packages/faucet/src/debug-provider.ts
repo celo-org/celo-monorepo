@@ -1,4 +1,4 @@
-import { JsonRpcPayload, JsonRpcResponse, Provider } from '@celo/communication/types/commons'
+import { JsonRpcPayload, JsonRpcResponse, Provider } from '@celo/communication'
 import Web3 from 'web3'
 
 export type Callback<T> = (error: Error | null, result?: T) => void

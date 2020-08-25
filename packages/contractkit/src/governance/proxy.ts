@@ -1,4 +1,4 @@
-import { ABIDefinition } from '@celo/communication/types/abi'
+import { ABIDefinition } from '@celo/communication'
 import Web3 from 'web3'
 
 export const PROXY_ABI: ABIDefinition[] = [

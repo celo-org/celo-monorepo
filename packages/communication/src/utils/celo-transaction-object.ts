@@ -1,5 +1,5 @@
-import { CeloTx, CeloTxObject, CeloTxReceipt } from '@celo/communication/types/commons'
-import { NodeCommunicationWrapper } from '..'
+import { CeloTx, CeloTxObject, CeloTxReceipt } from '../commons'
+import { NodeCommunicationWrapper } from '../node-communication-wrapper'
 import { TransactionResult } from './tx-result'
 
 export type CeloTransactionParams = Omit<CeloTx, 'data'>

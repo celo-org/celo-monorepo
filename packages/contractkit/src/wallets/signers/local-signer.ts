@@ -1,5 +1,5 @@
 import { ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
-import { RLPEncodedTx } from '@celo/communication/types/commons'
+import { RLPEncodedTx } from '@celo/communication'
 import { Signer } from '@celo/sdk-types/wallet'
 import { Decrypt } from '@celo/utils/lib/ecies'
 // @ts-ignore-next-line

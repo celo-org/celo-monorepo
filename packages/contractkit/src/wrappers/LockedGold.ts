@@ -4,8 +4,7 @@ import {
   linkedListChanges as baseLinkedListChanges,
   zip,
 } from '@celo/base/lib/collections'
-import { CeloTransactionObject } from '@celo/communication'
-import { Address, EventLog } from '@celo/communication/types/commons'
+import { Address, CeloTransactionObject, EventLog } from '@celo/communication'
 import BigNumber from 'bignumber.js'
 import { LockedGold } from '../generated/LockedGold'
 import {

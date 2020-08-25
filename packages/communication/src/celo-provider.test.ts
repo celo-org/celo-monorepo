@@ -1,14 +1,8 @@
-import {
-  Callback,
-  CeloTx,
-  JsonRpcPayload,
-  JsonRpcResponse,
-  Provider,
-} from '@celo/communication/types/commons'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import Web3 from 'web3'
 import { CeloProvider } from './celo-provider'
+import { Callback, CeloTx, JsonRpcPayload, JsonRpcResponse, Provider } from './commons'
 import { NodeCommunicationWrapper } from './node-communication-wrapper'
 
 // Random private keys

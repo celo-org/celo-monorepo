@@ -1,3 +1,4 @@
+import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertEqualBN,
@@ -5,7 +6,6 @@ import {
   assertRevert,
   assertSameAddress,
   mineBlocks,
-  NULL_ADDRESS,
 } from '@celo/protocol/lib/test-utils'
 import { AttestationUtils } from '@celo/utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'

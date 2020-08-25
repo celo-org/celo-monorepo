@@ -1,6 +1,5 @@
 import { ensureLeading0x, normalizeAddressWith0x } from '@celo/base/lib/address'
-import { DefaultRpcCaller, RpcCaller } from '@celo/communication'
-import { CeloTx, Provider } from '@celo/communication/types/commons'
+import { CeloTx, DefaultRpcCaller, Provider, RpcCaller } from '@celo/communication'
 import { Signer } from '@celo/sdk-types/wallet'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { RemoteWallet } from './remote-wallet'

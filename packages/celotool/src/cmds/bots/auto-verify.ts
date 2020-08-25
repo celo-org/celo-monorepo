@@ -1,5 +1,4 @@
-import { CeloTransactionParams } from '@celo/communication'
-import { Address } from '@celo/communication/types/commons'
+import { Address, CeloTransactionParams } from '@celo/communication'
 import { newKitFromWeb3 } from '@celo/contractkit'
 import {
   ActionableAttestation,

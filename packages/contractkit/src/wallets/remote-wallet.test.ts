@@ -1,4 +1,4 @@
-import { CeloTx } from '@celo/communication/types/commons'
+import { CeloTx } from '@celo/communication'
 import { Signer } from '@celo/sdk-types/wallet'
 import { Address } from '@celo/utils/lib/address'
 import Web3 from 'web3'

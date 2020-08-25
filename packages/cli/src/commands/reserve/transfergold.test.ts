@@ -1,4 +1,4 @@
-import { Address } from '@celo/communication/types/commons'
+import { Address } from '@celo/communication'
 import { newKitFromWeb3 } from '@celo/contractkit'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'

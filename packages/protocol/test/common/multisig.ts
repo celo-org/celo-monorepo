@@ -1,4 +1,5 @@
-import { assertEqualBN, assertRevert, NULL_ADDRESS } from '@celo/protocol/lib/test-utils'
+import { NULL_ADDRESS } from '@celo/base/lib/address'
+import { assertEqualBN, assertRevert } from '@celo/protocol/lib/test-utils'
 import { parseMultiSigTransaction } from '@celo/protocol/lib/web3-utils'
 import * as _ from 'lodash'
 import { MultiSigContract, MultiSigInstance } from 'types'

@@ -1,13 +1,7 @@
 import { Lock } from '@celo/base/lib/lock'
-import {
-  Callback,
-  EncodedTransaction,
-  JsonRpcPayload,
-  JsonRpcResponse,
-  Provider,
-} from '@celo/communication/types/commons'
 import debugFactory from 'debug'
 import { NodeCommunicationWrapper } from '.'
+import { Callback, EncodedTransaction, JsonRpcPayload, JsonRpcResponse, Provider } from './commons'
 import { hasProperty, stopProvider } from './utils/provider-utils'
 import { rpcCallHandler } from './utils/rpc-caller'
 

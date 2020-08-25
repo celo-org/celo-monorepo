@@ -1,4 +1,4 @@
-import { Address } from '@celo/communication/types/commons'
+import { Address } from '@celo/communication'
 import { Signer, Wallet } from '@celo/sdk-types/wallet'
 import debugFactory from 'debug'
 import { AzureKeyVaultClient } from '../utils/azure-key-vault-client'

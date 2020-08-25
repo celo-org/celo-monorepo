@@ -1,4 +1,4 @@
-import { CeloTx } from '@celo/communication/types/commons'
+import { CeloTx } from '@celo/communication'
 import Web3 from 'web3'
 import { CeloContract } from '../base'
 import { newKitFromWeb3 } from '../kit'

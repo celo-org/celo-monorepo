@@ -1,4 +1,4 @@
-import { Address } from '@celo/communication/types/commons'
+import { Address } from '@celo/communication'
 import { newKitFromWeb3 } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import {

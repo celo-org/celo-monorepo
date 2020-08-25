@@ -1,5 +1,5 @@
 import { ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
-import { RLPEncodedTx } from '@celo/communication/types/commons'
+import { RLPEncodedTx } from '@celo/communication'
 import { Signer } from '@celo/sdk-types/wallet'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { TransportStatusError } from '@ledgerhq/errors'

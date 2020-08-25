@@ -1,6 +1,8 @@
 import { Wallet } from '@celo/sdk-types/wallet'
 import Web3 from 'web3'
 import { NodeCommunicationWrapper } from './node-communication-wrapper'
+export * from './abi'
+export * from './commons'
 export * from './node-communication-wrapper'
 export * from './utils/abi-utils'
 export * from './utils/celo-transaction-object'

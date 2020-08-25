@@ -1,11 +1,11 @@
-import { NodeCommunicationWrapper } from '@celo/communication'
 import {
   Callback,
   CeloTx,
   JsonRpcPayload,
   JsonRpcResponse,
+  NodeCommunicationWrapper,
   Provider,
-} from '@celo/communication/types/commons'
+} from '@celo/communication'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import debugFactory from 'debug'
 import Web3 from 'web3'

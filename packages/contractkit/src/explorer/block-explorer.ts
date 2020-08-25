@@ -1,6 +1,10 @@
-import { parseDecodedParams } from '@celo/communication'
-import { Address, Block, CeloTxPending } from '@celo/communication/types/commons'
-import { ABIDefinition } from '@celo/communication/types/abi'
+import {
+  ABIDefinition,
+  Address,
+  Block,
+  CeloTxPending,
+  parseDecodedParams,
+} from '@celo/communication'
 import { PROXY_ABI } from '../governance/proxy'
 import { ContractKit } from '../kit'
 import { ContractDetails, mapFromPairs, obtainKitContractDetails } from './base'

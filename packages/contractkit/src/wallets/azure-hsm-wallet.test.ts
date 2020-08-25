@@ -1,5 +1,5 @@
 import { ensureLeading0x, normalizeAddressWith0x, trimLeading0x } from '@celo/base/lib/address'
-import { Address, CeloTx, EncodedTransaction } from '@celo/communication/types/commons'
+import { Address, CeloTx, EncodedTransaction } from '@celo/communication'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import * as ethUtil from 'ethereumjs-util'

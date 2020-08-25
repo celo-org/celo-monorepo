@@ -1,4 +1,4 @@
-import { ContractSendMethod } from '@celo/communication/types/commons'
+import { ContractSendMethod } from '@celo/communication'
 import { CeloContract, ContractKit } from '@celo/contractkit'
 import {
   AccountAuthRequest,

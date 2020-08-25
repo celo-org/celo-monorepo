@@ -1,4 +1,5 @@
 /* tslint:disable:no-console */
+import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
@@ -6,8 +7,6 @@ import { SortedOraclesInstance, StableTokenInstance } from 'types'
 
 const fs = require('fs')
 const parse = require('csv-parser')
-
-const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 interface SortedElement {
   key: string

@@ -1,4 +1,4 @@
-import { Address, NULL_ADDRESS } from '@celo/communication/types/commons'
+import { Address, NULL_ADDRESS } from '@celo/base/lib/address'
 import debugFactory from 'debug'
 import { AllContracts, CeloContract } from './base'
 import { newRegistry, Registry } from './generated/Registry'

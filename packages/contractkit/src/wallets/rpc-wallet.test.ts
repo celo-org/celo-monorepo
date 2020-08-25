@@ -1,4 +1,4 @@
-import { CeloTx, Provider } from '@celo/communication/types/commons'
+import { CeloTx, Provider } from '@celo/communication'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { Encrypt } from '@celo/utils/lib/ecies'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'

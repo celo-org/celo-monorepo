@@ -1,4 +1,4 @@
-import { Address } from '@celo/communication/types/commons'
+import { Address } from '@celo/communication'
 import { GroupVoterReward, VoterReward } from '@celo/contractkit/lib/wrappers/Election'
 import { AccountSlashed } from '@celo/contractkit/lib/wrappers/LockedGold'
 import { Validator, ValidatorReward } from '@celo/contractkit/lib/wrappers/Validators'

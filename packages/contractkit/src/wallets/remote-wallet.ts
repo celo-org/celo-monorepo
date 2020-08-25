@@ -1,5 +1,5 @@
 import { sleep } from '@celo/base/lib/async'
-import { Address, CeloTx, EncodedTransaction } from '@celo/communication/types/commons'
+import { Address, CeloTx, EncodedTransaction } from '@celo/communication'
 import { Signer, Wallet } from '@celo/sdk-types/wallet'
 import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import { WalletBase } from './wallet-base'

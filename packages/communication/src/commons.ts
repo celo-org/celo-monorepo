@@ -1,11 +1,6 @@
-import { provider, Transaction, TransactionConfig, TransactionReceipt } from 'web3-core'
-import {
-  JsonRpcPayload as Web3JsonRpcPayload,
-  JsonRpcResponse as Web3JsonRpcResponse,
-} from 'web3-core-helpers'
+import { PromiEvent, Transaction, TransactionConfig, TransactionReceipt } from 'web3-core'
 
 export type Address = string
-export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000' as Address
 
 export interface CeloParams {
   feeCurrency: string
@@ -52,13 +47,21 @@ export type CeloTxReceipt = TransactionReceipt & Partial<CeloParams>
 
 export type Callback<T> = (error: Error | null, result?: T) => void
 
-export interface JsonRpcResponse extends Web3JsonRpcResponse {
+export interface JsonRpcResponse {
+  jsonrpc: string
+  id: number
+  result?: any
   error?: string | { message: string; code: number }
 }
 
-export interface JsonRpcPayload extends Web3JsonRpcPayload {}
+export interface JsonRpcPayload {
+  jsonrpc: string
+  method: string
+  params: any[]
+  id?: string | number
+}
 
-export interface Provider extends provider {
+export interface Provider {
   send(payload: JsonRpcPayload, callback: Callback<JsonRpcResponse>): void
 }
 

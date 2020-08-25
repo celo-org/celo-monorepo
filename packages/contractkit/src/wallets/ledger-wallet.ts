@@ -1,5 +1,5 @@
 import { CELO_DERIVATION_PATH_BASE } from '@celo/base/lib/account'
-import { Address } from '@celo/communication/types/commons'
+import { Address } from '@celo/communication'
 import { Signer, Wallet } from '@celo/sdk-types/wallet'
 import { TransportError, TransportStatusError } from '@ledgerhq/errors'
 import Ledger from '@ledgerhq/hw-app-eth'

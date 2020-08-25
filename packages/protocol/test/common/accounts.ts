@@ -1,11 +1,7 @@
+import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
-import {
-  assertLogMatches,
-  assertLogMatches2,
-  assertRevert,
-  NULL_ADDRESS,
-} from '@celo/protocol/lib/test-utils'
+import { assertLogMatches, assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
 import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
 import { upperFirst } from 'lodash'
 import {

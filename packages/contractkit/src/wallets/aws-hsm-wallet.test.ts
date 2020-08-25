@@ -1,4 +1,4 @@
-import { CeloTx, EncodedTransaction } from '@celo/communication/types/commons'
+import { CeloTx, EncodedTransaction } from '@celo/communication'
 import { ensureLeading0x, normalizeAddressWith0x, trimLeading0x } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'

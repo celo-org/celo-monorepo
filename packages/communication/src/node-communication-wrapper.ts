@@ -1,3 +1,9 @@
+import { Wallet } from '@celo/sdk-types/wallet'
+import { toChecksumAddress } from '@celo/utils/lib/address'
+import debugFactory from 'debug'
+import Web3 from 'web3'
+import { AbiCoder } from './abi'
+import { assertIsCeloProvider, CeloProvider } from './celo-provider'
 import {
   Address,
   Block,
@@ -8,13 +14,7 @@ import {
   CeloTxReceipt,
   Mixed,
   Provider,
-} from '@celo/communication/types/commons'
-import { Wallet } from '@celo/sdk-types/wallet'
-import { toChecksumAddress } from '@celo/utils/lib/address'
-import debugFactory from 'debug'
-import Web3 from 'web3'
-import { AbiCoder } from '../types/abi'
-import { assertIsCeloProvider, CeloProvider } from './celo-provider'
+} from './commons'
 import { decodeStringParameter } from './utils/abi-utils'
 import { hasProperty } from './utils/provider-utils'
 import { DefaultRpcCaller, RpcCaller } from './utils/rpc-caller'

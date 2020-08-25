@@ -1,4 +1,4 @@
-import { RLPEncodedTx } from '@celo/communication/types/commons'
+import { RLPEncodedTx } from '@celo/communication'
 import { Signer } from '@celo/sdk-types/wallet'
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { KMS } from 'aws-sdk'

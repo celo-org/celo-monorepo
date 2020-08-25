@@ -1,9 +1,4 @@
-import {
-  Callback,
-  JsonRpcPayload,
-  JsonRpcResponse,
-  Provider,
-} from '@celo/communication/types/commons'
+import { Callback, JsonRpcPayload, JsonRpcResponse, Provider } from '../commons'
 import { DefaultRpcCaller, RpcCaller, rpcCallHandler } from './rpc-caller'
 
 const mockProvider: Provider = {

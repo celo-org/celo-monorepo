@@ -1,4 +1,4 @@
-import { BlockHeader, CeloTx, CeloTxObject } from '@celo/communication/types/commons'
+import { BlockHeader, CeloTx, CeloTxObject } from '@celo/communication'
 import BigNumber from 'bignumber.js'
 import { call } from 'redux-saga/effects'
 import { GAS_INFLATION_FACTOR } from 'src/config'

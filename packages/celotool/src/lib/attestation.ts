@@ -1,8 +1,7 @@
-import { CeloTransactionParams } from '@celo/communication'
-import { Address } from '@celo/communication/types/commons'
+import { Address, CeloTransactionParams } from '@celo/communication'
 import {
-  ActionableAttestation,
-  AttestationsWrapper
+    ActionableAttestation,
+    AttestationsWrapper
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { AttestationUtils, PhoneNumberUtils } from '@celo/utils'
 import { concurrentMap } from '@celo/utils/lib/async'

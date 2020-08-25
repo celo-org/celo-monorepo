@@ -1,4 +1,4 @@
-import { CeloTxObject } from '@celo/communication/types/commons'
+import { CeloTxObject } from '@celo/communication'
 import { CURRENCY_ENUM } from '@celo/utils/src'
 import { BigNumber } from 'bignumber.js'
 import { call, delay, race, select, take } from 'redux-saga/effects'

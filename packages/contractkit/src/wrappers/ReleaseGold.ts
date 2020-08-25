@@ -1,7 +1,6 @@
 import { findAddressIndex } from '@celo/base/lib/address'
 import { Signature } from '@celo/base/lib/signatureUtils'
-import { CeloTransactionObject, toTransactionObject } from '@celo/communication'
-import { Address } from '@celo/communication/types/commons'
+import { Address, CeloTransactionObject, toTransactionObject } from '@celo/communication'
 import { hashMessageWithPrefix, signedMessageToPublicKey } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import { ReleaseGold } from '../generated/ReleaseGold'

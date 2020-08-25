@@ -1,6 +1,5 @@
 import { trimLeading0x } from '@celo/base/lib/address'
-import { AbiCoder } from '@celo/communication/types/abi'
-import { CeloTx } from '@celo/communication/types/commons'
+import { AbiCoder, CeloTx } from '@celo/communication'
 import BN from 'bn.js'
 import qrcode from 'qrcode'
 import querystring from 'querystring'

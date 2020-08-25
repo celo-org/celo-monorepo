@@ -1,6 +1,5 @@
-import { eqAddress } from '@celo/base/lib/address'
-import { CeloTransactionObject, toTransactionObject } from '@celo/communication'
-import { Address, NULL_ADDRESS } from '@celo/communication/types/commons'
+import { eqAddress, NULL_ADDRESS } from '@celo/base/lib/address'
+import { Address, CeloTransactionObject, toTransactionObject } from '@celo/communication'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { CeloContract, CeloToken } from '../base'

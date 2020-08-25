@@ -122,7 +122,7 @@ async function getQueryQuota(account: string, hashedPhoneNumber?: string) {
 
 export async function getTransactionCountFromAccount(account: string): Promise<number> {
   return retryAsyncWithBackOff(
-    () => getContractKit().web3.eth.getTransactionCount(account),
+    () => getContractKit().communication.getTransactionCount(account),
     RETRY_COUNT,
     [],
     RETRY_DELAY_IN_MS

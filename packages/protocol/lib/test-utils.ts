@@ -20,7 +20,6 @@ const assert = chai.assert
 
 // hard coded in ganache
 export const EPOCH = 100
-export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 export function stripHexEncoding(hexString: string) {
   return hexString.substr(0, 2) === '0x' ? hexString.substr(2) : hexString

@@ -1,6 +1,5 @@
 // tslint:disable:no-console
-import { TransactionResult } from '@celo/communication'
-import { CeloTxReceipt } from '@celo/communication/types/commons'
+import { CeloTxReceipt, TransactionResult } from '@celo/communication'
 import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
@@ -18,11 +17,11 @@ import { spawnCmd, spawnCmdWithExitOnFailure } from './cmd-utils'
 import { convertToContractDecimals } from './contract-utils'
 import { envVar, fetchEnv, isVmBased } from './env-utils'
 import {
-  AccountType,
-  generateGenesis,
-  generatePrivateKey,
-  privateKeyToPublicKey,
-  Validator
+    AccountType,
+    generateGenesis,
+    generatePrivateKey,
+    privateKeyToPublicKey,
+    Validator
 } from './generate_utils'
 import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
 import { GethInstanceConfig } from './interfaces/geth-instance-config'

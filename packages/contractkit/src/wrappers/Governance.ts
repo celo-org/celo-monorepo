@@ -1,5 +1,3 @@
-import { toTransactionObject } from '@celo/communication'
-import { Address, CeloTxPending } from '@celo/communication/types/commons'
 import {
   bufferToHex,
   ensureLeading0x,
@@ -9,6 +7,7 @@ import {
 } from '@celo/base/lib/address'
 import { concurrentMap } from '@celo/base/lib/async'
 import { zip } from '@celo/base/lib/collections'
+import { Address, CeloTxPending, toTransactionObject } from '@celo/communication'
 import { fromFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { Governance } from '../generated/Governance'

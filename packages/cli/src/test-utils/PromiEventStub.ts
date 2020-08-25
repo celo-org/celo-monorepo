@@ -1,4 +1,4 @@
-import { CeloTxReceipt, PromiEvent } from '@celo/communication/types/commons'
+import { CeloTxReceipt, PromiEvent } from '@celo/communication'
 import { EventEmitter } from 'events'
 
 interface PromiEventStub<T> extends PromiEvent<T> {

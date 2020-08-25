@@ -1,7 +1,5 @@
-import { EventLog } from '@celo/communication/types/commons'
-import { AbiInput as Web3AbiInput, AbiItem as Web3AbiItem } from 'web3-utils'
-
-export interface JsonRpcPayload extends WebCoreHelper.JsonRpcPayload {}
+import { AbiInput, AbiItem } from 'web3-utils'
+import { EventLog } from './commons'
 
 export type ABIType = 'uint256' | 'boolean' | 'string' | 'bytes' | string // TODO complete list
 
@@ -13,8 +11,8 @@ export interface DecodedParamsObject extends DecodedParamsArray {
   [key: string]: any
 }
 
-export interface AbiItem extends Web3AbiItem {}
-export interface AbiInput extends Web3AbiInput {}
+export { AbiItem }
+export { AbiInput }
 
 export interface ABIDefinition extends AbiItem {
   signature: string

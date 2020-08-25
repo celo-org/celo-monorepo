@@ -1,5 +1,9 @@
-import { CeloTransactionObject, toTransactionObject } from '@celo/communication'
-import { Address, CeloTxObject } from '@celo/communication/types/commons'
+import {
+  Address,
+  CeloTransactionObject,
+  CeloTxObject,
+  toTransactionObject,
+} from '@celo/communication'
 import BigNumber from 'bignumber.js'
 import { MultiSig } from '../generated/MultiSig'
 import {

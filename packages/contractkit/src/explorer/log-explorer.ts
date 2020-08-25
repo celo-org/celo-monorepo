@@ -1,5 +1,4 @@
-import { ABIDefinition } from '@celo/communication/types/abi'
-import { Address, CeloTxReceipt, EventLog, Log } from '@celo/communication/types/commons'
+import { ABIDefinition, Address, CeloTxReceipt, EventLog, Log } from '@celo/communication'
 import { ContractKit } from '../kit'
 import { ContractDetails, mapFromPairs, obtainKitContractDetails } from './base'
 

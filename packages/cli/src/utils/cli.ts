@@ -1,5 +1,4 @@
-import { CeloTransactionObject, parseDecodedParams } from '@celo/communication'
-import { CeloTx, EventLog } from '@celo/communication/types/commons'
+import { CeloTransactionObject, CeloTx, EventLog, parseDecodedParams } from '@celo/communication'
 import { CLIError } from '@oclif/errors'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'

@@ -8,6 +8,7 @@
   "dependencies": {
     "@celo/communication": "0.0.1-dev",
     "@celo/utils": "0.1.19-dev",
+    "@celo/base": "0.0.2-dev",
     "@celo/contractkit": "0.4.13-dev",
     "@google-cloud/monitoring": "0.7.1",
     "@google-cloud/pubsub": "^0.28.1",

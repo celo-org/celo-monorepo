@@ -1,4 +1,4 @@
-import { CeloTx, EncodedTransaction } from '@celo/communication/types/commons'
+import { CeloTx, EncodedTransaction } from '@celo/communication'
 import {
   normalizeAddressWith0x,
   privateKeyToAddress,

@@ -1,4 +1,4 @@
-import { CeloTx, CeloTxObject, CeloTxReceipt, PromiEvent } from '@celo/communication/types/commons'
+import { CeloTx, CeloTxObject, CeloTxReceipt, PromiEvent } from '@celo/communication'
 import { BigNumber } from 'bignumber.js'
 import Web3 from 'web3'
 import { newKitFromWeb3 } from './kit'

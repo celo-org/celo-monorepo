@@ -1,5 +1,5 @@
-import { CeloTx } from '@celo/communication/types/commons'
 import { NodeCommunicationWrapper } from '..'
+import { CeloTx } from '../commons'
 
 function isEmpty(value: string | undefined) {
   return (
