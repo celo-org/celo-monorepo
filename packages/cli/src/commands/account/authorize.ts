@@ -25,10 +25,12 @@ export default class Authorize extends BaseCommand {
     blsKey: Flags.blsPublicKey({
       description:
         'The BLS public key that the validator is using for consensus, should pass proof of possession. 96 bytes.',
+      dependsOn: ['blsPop'],
     }),
     blsPop: Flags.blsProofOfPossession({
       description:
         'The BLS public key proof-of-possession, which consists of a signature on the account address. 48 bytes.',
+      dependsOn: ['blsKey'],
     }),
     force: flags.boolean({
       description:
