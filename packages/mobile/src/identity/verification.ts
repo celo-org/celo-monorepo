@@ -43,7 +43,7 @@ import { sendTransaction } from 'src/transactions/send'
 import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
-import { registerAccountDek } from 'src/web3/dataEncryptionKey'
+import { registerAccountDekSaga } from 'src/web3/dataEncryptionKey'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 
 const TAG = 'identity/verification'
@@ -200,7 +200,7 @@ export function* doVerificationFlow() {
         ),
         // Set acccount and data encryption key in Accounts contract
         // This is done in other places too, intentionally keeping it for more coverage
-        call(registerAccountDek, account),
+        call(registerAccountDekSaga, account),
       ])
       ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_complete)
 

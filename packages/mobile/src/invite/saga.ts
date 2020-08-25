@@ -49,12 +49,14 @@ import { newTransactionContext } from 'src/transactions/types'
 import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 import { getContractKitAsync, getWallet, getWeb3 } from 'src/web3/contracts'
-import { registerAccountDek } from 'src/web3/dataEncryptionKey'
+import { registerAccountDekSaga } from 'src/web3/dataEncryptionKey'
 import { getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 
 const TAG = 'invite/saga'
 export const REDEEM_INVITE_TIMEOUT = 2 * 60 * 1000 // 2 minutes
 export const INVITE_FEE = '0.25'
+// Hardcoding estimate at 1/2 cent. Fees are currently an order of magnitude smaller ($0.0003)
+const SEND_TOKEN_FEE_ESTIMATE = new BigNumber(0.005)
 
 export async function getInviteTxGas(
   account: string,
@@ -275,22 +277,29 @@ function* sendInviteSaga(action: SendInviteAction) {
   }
 }
 
+function* registerAccountDek(newAccount: string) {
+  yield call(registerAccountDekSaga, newAccount)
+}
+
 export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
   yield call(waitWeb3LastBlock)
   Logger.debug(TAG, 'Starting Redeem Invite')
 
-  const { result, timeout } = yield race({
+  const {
+    result,
+    timeout,
+  }: { result: { success: boolean; newAccount: string } | false; timeout: true } = yield race({
     result: call(doRedeemInvite, inviteCode),
     timeout: delay(REDEEM_INVITE_TIMEOUT),
   })
 
-  if (result.success === true) {
+  if (result && result.success === true) {
     Logger.debug(TAG, 'Redeem Invite completed successfully')
     yield put(redeemInviteSuccess())
     navigate(Screens.VerificationEducationScreen)
     // Note: We are ok with this succeeding or failing silently in the background,
     // user will have another chance to register DEK when sending their first tx
-    yield call(registerAccountDek, result.newAccount)
+    yield spawn(registerAccountDek, result.newAccount)
   } else if (result === false) {
     Logger.debug(TAG, 'Redeem Invite failed')
     yield put(redeemInviteFailure())
@@ -403,9 +412,8 @@ export function* moveAllFundsFromAccount(
   )
   const tempAccountBalance = divideByWei(accountBalanceWei)
 
-  // Temporarily hardcoding fee estimate to be 1/2 a cent to save time on estimation. Actual
-  // fees are currently an order of magnitude smaller (0.0003)
-  const sendTokenFee = new BigNumber(0.005)
+  // Temporarily hardcoding fee estimate to save time on gas estimation
+  const sendTokenFee = SEND_TOKEN_FEE_ESTIMATE
   // const sendTokenFeeInWei: BigNumber = yield call(getSendFee, account, currency, {
   //   recipientAddress: toAccount,
   //   amount: tempAccountBalance,

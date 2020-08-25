@@ -31,7 +31,7 @@ import {
 } from 'src/tokens/saga'
 import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
-import { getRegisterDekTxGas, registerAccountDek } from 'src/web3/dataEncryptionKey'
+import { getRegisterDekTxGas, registerAccountDekSaga } from 'src/web3/dataEncryptionKey'
 import { currentAccountSelector } from 'src/web3/selectors'
 import { estimateGas } from 'src/web3/utils'
 
@@ -131,7 +131,7 @@ function* sendPayment(
     const ownAddress: string = yield select(currentAccountSelector)
     // Ensure comment encryption is possible by first ensuring the account's DEK has been registered
     // For most users, this happens during redeem invite or verification. This is a fallback.
-    yield call(registerAccountDek, ownAddress)
+    yield call(registerAccountDekSaga, ownAddress)
     const encryptedComment = yield call(encryptComment, comment, recipientAddress, ownAddress, true)
 
     const context = newTransactionContext(TAG, 'Send payment')
