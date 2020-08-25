@@ -40,7 +40,7 @@ import { createInviteCode } from 'src/invite/utils'
 import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getPasswordSaga } from 'src/pincode/authentication'
-import { getSendFee, getSendTxGas } from 'src/send/saga'
+import { getSendTxGas } from 'src/send/saga'
 import { fetchDollarBalance, transferStableToken } from 'src/stableToken/actions'
 import { createTokenTransferTransaction, fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
 import { waitForTransactionWithId } from 'src/transactions/saga'
@@ -284,10 +284,13 @@ export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
     timeout: delay(REDEEM_INVITE_TIMEOUT),
   })
 
-  if (result === true) {
+  if (result.success === true) {
     Logger.debug(TAG, 'Redeem Invite completed successfully')
     yield put(redeemInviteSuccess())
     navigate(Screens.VerificationEducationScreen)
+    // Note: We are ok with this succeeding or failing silently in the background,
+    // user will have another chance to register DEK when sending their first tx
+    yield call(registerAccountDek, result.newAccount)
   } else if (result === false) {
     Logger.debug(TAG, 'Redeem Invite failed')
     yield put(redeemInviteFailure())
@@ -326,10 +329,9 @@ export function* doRedeemInvite(inviteCode: string) {
     )
     ValoraAnalytics.track(OnboardingEvents.invite_redeem_move_funds_complete)
 
-    yield call(registerAccountDek, newAccount)
     yield put(fetchDollarBalance())
     ValoraAnalytics.track(OnboardingEvents.invite_redeem_complete)
-    return true
+    return { success: true, newAccount }
   } catch (e) {
     Logger.error(TAG + '@doRedeemInvite', 'Failed to redeem invite', e)
     ValoraAnalytics.track(OnboardingEvents.invite_redeem_error, { error: e.message })
@@ -339,16 +341,6 @@ export function* doRedeemInvite(inviteCode: string) {
       yield put(showError(ErrorMessages.REDEEM_INVITE_FAILED))
     }
     return false
-  }
-}
-
-export function* getOrCreateAccountAndAddToWallet(inviteCode: string) {
-  try {
-    const newAccount = yield call(getOrCreateAccount)
-    yield call(addTempAccountToWallet, inviteCode)
-    return newAccount
-  } catch (error) {
-    throw error
   }
 }
 
@@ -406,13 +398,17 @@ export function* moveAllFundsFromAccount(
     `Temp account balance is ${accountBalanceWei.toString()}. Calculating withdrawal fee`
   )
   const tempAccountBalance = divideByWei(accountBalanceWei)
-  const sendTokenFeeInWei: BigNumber = yield call(getSendFee, account, currency, {
-    recipientAddress: toAccount,
-    amount: tempAccountBalance,
-    comment,
-  })
-  // Inflate fee by 10% to harden against minor gas changes
-  const sendTokenFee = divideByWei(sendTokenFeeInWei).times(1.1)
+
+  // Temporarily hardcoding fee estimate to be 1/2 a cent to save time on estimation. Actual
+  // fees are currently an order of magnitude smaller (0.0003)
+  const sendTokenFee = new BigNumber(0.005)
+  // const sendTokenFeeInWei: BigNumber = yield call(getSendFee, account, currency, {
+  //   recipientAddress: toAccount,
+  //   amount: tempAccountBalance,
+  //   comment,
+  // })
+  // // Inflate fee by 10% to harden against minor gas changes
+  // const sendTokenFee = divideByWei(sendTokenFeeInWei).times(1.1)
 
   if (sendTokenFee.isGreaterThanOrEqualTo(tempAccountBalance)) {
     throw new Error('Fee is too large for amount in temp wallet')
