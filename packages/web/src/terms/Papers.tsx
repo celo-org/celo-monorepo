@@ -33,7 +33,7 @@ class Papers extends React.PureComponent<I18nProps> {
             <Text style={fonts.p}>{t('whitepaperTitle')}</Text>
             <View style={styles.links}>
               <HelpfulLink text={t('download')} href={'/papers/whitepaper'} />
-              <HelpfulLink text={'阅读'} href={'/papers/celo-wp-simplified-chinese.pdf'} />
+              <HelpfulLink text={'阅读'} href={'/papers/whitepaper/chinese'} />
             </View>
           </SideTitledSection>
           <SideTitledSection span={Spans.three4th} title={t('economics')}>
