@@ -29,7 +29,7 @@ library SortedLinkedList {
     uint256 value,
     bytes32 lesserKey,
     bytes32 greaterKey
-  ) public {
+  ) internal {
     require(
       key != bytes32(0) && key != lesserKey && key != greaterKey && !contains(list, key),
       "invalid key"
@@ -50,7 +50,7 @@ library SortedLinkedList {
    * @param list A storage pointer to the underlying list.
    * @param key The key of the element to remove.
    */
-  function remove(List storage list, bytes32 key) public {
+  function remove(List storage list, bytes32 key) internal {
     list.list.remove(key);
     list.values[key] = 0;
   }
@@ -70,7 +70,7 @@ library SortedLinkedList {
     uint256 value,
     bytes32 lesserKey,
     bytes32 greaterKey
-  ) public {
+  ) internal {
     // TODO(asa): Optimize by not making any changes other than value if lesserKey and greaterKey
     // don't change.
     // TODO(asa): Optimize by not updating lesserKey/greaterKey for key
@@ -83,7 +83,7 @@ library SortedLinkedList {
    * @param list A storage pointer to the underlying list.
    * @param key The key of the element to insert.
    */
-  function push(List storage list, bytes32 key) public {
+  function push(List storage list, bytes32 key) internal {
     insert(list, key, 0, bytes32(0), list.list.tail);
   }
 
@@ -93,7 +93,7 @@ library SortedLinkedList {
    * @param n The number of elements to pop.
    * @return The keys of the popped elements.
    */
-  function popN(List storage list, uint256 n) public returns (bytes32[] memory) {
+  function popN(List storage list, uint256 n) internal returns (bytes32[] memory) {
     require(n <= list.list.numElements, "not enough elements");
     bytes32[] memory keys = new bytes32[](n);
     for (uint256 i = 0; i < n; i = i.add(1)) {
@@ -110,7 +110,7 @@ library SortedLinkedList {
    * @param key The element key.
    * @return Whether or not the key is in the sorted list.
    */
-  function contains(List storage list, bytes32 key) public view returns (bool) {
+  function contains(List storage list, bytes32 key) internal view returns (bool) {
     return list.list.contains(key);
   }
 
@@ -120,7 +120,7 @@ library SortedLinkedList {
    * @param key The element key.
    * @return The element value.
    */
-  function getValue(List storage list, bytes32 key) public view returns (uint256) {
+  function getValue(List storage list, bytes32 key) internal view returns (uint256) {
     return list.values[key];
   }
 
@@ -129,7 +129,11 @@ library SortedLinkedList {
    * @param list A storage pointer to the underlying list.
    * @return An unpacked list of elements from largest to smallest.
    */
-  function getElements(List storage list) public view returns (bytes32[] memory, uint256[] memory) {
+  function getElements(List storage list)
+    internal
+    view
+    returns (bytes32[] memory, uint256[] memory)
+  {
     bytes32[] memory keys = getKeys(list);
     uint256[] memory values = new uint256[](keys.length);
     for (uint256 i = 0; i < keys.length; i = i.add(1)) {
@@ -143,7 +147,7 @@ library SortedLinkedList {
    * @param list A storage pointer to the underlying list.
    * @return All element keys from head to tail.
    */
-  function getKeys(List storage list) public view returns (bytes32[] memory) {
+  function getKeys(List storage list) internal view returns (bytes32[] memory) {
     return list.list.getKeys();
   }
 
@@ -154,7 +158,7 @@ library SortedLinkedList {
    * @return The keys of the first n elements.
    * @dev Reverts if n is greater than the number of elements in the list.
    */
-  function headN(List storage list, uint256 n) public view returns (bytes32[] memory) {
+  function headN(List storage list, uint256 n) internal view returns (bytes32[] memory) {
     return list.list.headN(n);
   }
 
