@@ -56,7 +56,9 @@ const TAG = 'invite/saga'
 export const REDEEM_INVITE_TIMEOUT = 2 * 60 * 1000 // 2 minutes
 export const INVITE_FEE = '0.25'
 // Hardcoding estimate at 1/2 cent. Fees are currently an order of magnitude smaller ($0.0003)
+// TODO: Extract offline gas estimation into an independent library.
 const SEND_TOKEN_FEE_ESTIMATE = new BigNumber(0.005)
+const SEND_TOKEN_GAS_ESTIMATE = 200_000 // Transfer for invite flow consistently takes 191775 gas. 200k is rounded up from there.
 
 export async function getInviteTxGas(
   account: string,
@@ -439,7 +441,7 @@ export function* moveAllFundsFromAccount(
   })
 
   const context = newTransactionContext(TAG, 'Transfer from temp wallet')
-  yield call(sendTransaction, tx.txo, account, context)
+  yield call(sendTransaction, tx.txo, account, context, SEND_TOKEN_GAS_ESTIMATE)
   Logger.debug(TAG + '@moveAllFundsFromAccount', 'Done withdrawal')
 }
 
