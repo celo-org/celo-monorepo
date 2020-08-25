@@ -173,7 +173,8 @@ interface OnboardingEventsProperties {
   [OnboardingEvents.invite_redeem_error]: {
     error: string
   }
-  [OnboardingEvents.invite_redeem_balance_checked]: undefined
+  [OnboardingEvents.invite_redeem_move_funds_start]: undefined
+  [OnboardingEvents.invite_redeem_move_funds_complete]: undefined
 
   [OnboardingEvents.invite_redeem_skip_start]: undefined
   [OnboardingEvents.invite_redeem_skip_complete]: undefined

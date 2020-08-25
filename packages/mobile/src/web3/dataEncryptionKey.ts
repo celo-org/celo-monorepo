@@ -74,7 +74,7 @@ export function* registerAccountDek(account: string) {
     )
 
     yield call(getConnectedUnlockedAccount)
-    let privateDataKey: string | null = yield select(dataEncryptionKeySelector)
+    const privateDataKey: string | null = yield select(dataEncryptionKeySelector)
     if (!privateDataKey) {
       throw new Error('No data key in store. Should never happen.')
     }

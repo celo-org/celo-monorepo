@@ -91,7 +91,8 @@ export enum OnboardingEvents {
   invite_redeem_cancel = 'invite_redeem_cancel',
   invite_redeem_timeout = 'invite_redeem_timeout',
   invite_redeem_error = 'invite_redeem_error',
-  invite_redeem_balance_checked = 'invite_redeem_balance_checked',
+  invite_redeem_move_funds_start = 'invite_redeem_move_funds_start',
+  invite_redeem_move_funds_complete = 'invite_redeem_move_funds_complete',
 
   invite_redeem_skip_start = 'invite_redeem_skip_start',
   invite_redeem_skip_complete = 'invite_redeem_skip_complete',

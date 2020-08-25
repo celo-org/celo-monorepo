@@ -8,7 +8,7 @@ import DeviceInfo from 'react-native-device-info'
 import { asyncRandomBytes } from 'react-native-secure-randombytes'
 import SendIntentAndroid from 'react-native-send-intent'
 import SendSMS from 'react-native-sms'
-import { call, delay, put, race, spawn, take, takeLeading } from 'redux-saga/effects'
+import { all, call, delay, put, race, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError, showMessage } from 'src/alert/actions'
 import { InviteEvents, OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
@@ -304,22 +304,18 @@ export function* doRedeemInvite(inviteCode: string) {
     ValoraAnalytics.track(OnboardingEvents.invite_redeem_start)
     const tempAccount = privateKeyToAddress(inviteCode)
     Logger.debug(TAG + '@doRedeemInvite', 'Invite code contains temp account', tempAccount)
-    const tempAccountBalanceWei: BigNumber = yield call(
-      fetchTokenBalanceInWeiWithRetry,
-      CURRENCY_ENUM.DOLLAR,
-      tempAccount
-    )
-    if (tempAccountBalanceWei.isLessThanOrEqualTo(0)) {
-      ValoraAnalytics.track(OnboardingEvents.invite_redeem_error, {
-        error: 'Empty invite',
-      })
-      yield put(showError(ErrorMessages.EMPTY_INVITE_CODE))
-      return false
-    }
-    ValoraAnalytics.track(OnboardingEvents.invite_redeem_balance_checked)
 
-    const newAccount = yield call(getOrCreateAccount)
-    yield call(addTempAccountToWallet, inviteCode)
+    const [tempAccountBalanceWei, newAccount]: [BigNumber, string] = yield all([
+      call(fetchTokenBalanceInWeiWithRetry, CURRENCY_ENUM.DOLLAR, tempAccount),
+      call(getOrCreateAccount),
+      call(addTempAccountToWallet, inviteCode),
+    ])
+
+    if (tempAccountBalanceWei.isLessThanOrEqualTo(0)) {
+      throw Error(ErrorMessages.EMPTY_INVITE_CODE)
+    }
+
+    ValoraAnalytics.track(OnboardingEvents.invite_redeem_move_funds_start)
     yield call(
       moveAllFundsFromAccount,
       tempAccount,
@@ -328,6 +324,8 @@ export function* doRedeemInvite(inviteCode: string) {
       CURRENCY_ENUM.DOLLAR,
       SENTINEL_INVITE_COMMENT
     )
+    ValoraAnalytics.track(OnboardingEvents.invite_redeem_move_funds_complete)
+
     yield call(registerAccountDek, newAccount)
     yield put(fetchDollarBalance())
     ValoraAnalytics.track(OnboardingEvents.invite_redeem_complete)
@@ -341,6 +339,16 @@ export function* doRedeemInvite(inviteCode: string) {
       yield put(showError(ErrorMessages.REDEEM_INVITE_FAILED))
     }
     return false
+  }
+}
+
+export function* getOrCreateAccountAndAddToWallet(inviteCode: string) {
+  try {
+    const newAccount = yield call(getOrCreateAccount)
+    yield call(addTempAccountToWallet, inviteCode)
+    return newAccount
+  } catch (error) {
+    throw error
   }
 }
 
