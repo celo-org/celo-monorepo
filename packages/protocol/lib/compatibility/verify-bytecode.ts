@@ -5,8 +5,6 @@ import { BuildArtifacts, } from '@openzeppelin/upgrades'
 
 import Web3 from 'web3'
 
-const IS_PRE_RELEASE_1 = true
-
 const ignoredContracts = [
   // This contract is not proxied
   'TransferWhitelist',
@@ -109,7 +107,7 @@ const verifyLibraryPrefix = (bytecode: string, address: string) => {
   }
 }
 
-export const verifyBytecodesDfs = async (contracts: string[], artifacts: BuildArtifacts, registry: RegistryInstance, Proxy: Truffle.Contract<ProxyInstance>, web3: Web3) => {
+export const verifyBytecodesDfs = async (contracts: string[], artifacts: BuildArtifacts, registry: RegistryInstance, Proxy: Truffle.Contract<ProxyInstance>, web3: Web3, isBeforeRelease1: boolean = false ) => {
   const queue = [...contracts]
   const visited: Set<string> = new Set()
   const libraryAddresses: LibraryAddresses = {}
@@ -131,9 +129,9 @@ export const verifyBytecodesDfs = async (contracts: string[], artifacts: BuildAr
     // We get libraries by collecting their Proxies' addresses during the DFS.
     // Core contracts are the ones passed into this function, all contracts
     // found during the DFS are libraries.
-    // TODO: remove IS_PRE_RELEASE_1, before the first contracts upgrade,
+    // TODO: remove isBeforeRelease1. Before the first contracts upgrade,
     // libraries are not proxied.
-    if (isLibrary && IS_PRE_RELEASE_1) {
+    if (isLibrary && isBeforeRelease1) {
       address = '0x' + libraryAddresses[contract]
     } else if (isLibrary) {
       address = await getProxiedAddress(libraryAddresses[contract], Proxy, web3)
