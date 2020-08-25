@@ -89,16 +89,16 @@ const isProxyAddress = async (address: string, web3: Web3): Promise<boolean> => 
 
 const getRegisteredProxiedAddress = async (contract: string, registry: RegistryInstance, Proxy: Truffle.Contract<ProxyInstance>, web3: Web3): Promise<string> => {
   const proxyAddress = await registry.getAddressForString(contract)
-  return await getProxiedAddress(proxyAddress, Proxy, web3)
+  return getProxiedAddress(proxyAddress, Proxy, web3)
 }
 
 const getProxiedAddress = async (address: string, Proxy: Truffle.Contract<ProxyInstance>, web3: Web3): Promise<string> => {
-  if (!isProxyAddress(address, web3)) {
+  if (!(await isProxyAddress(address, web3))) {
     throw new Error(`The contract registered as ${contract} does not have bytecode recognized as a Proxy's bytecode`)
   }
 
   const proxy: ProxyInstance = await Proxy.at(web3.utils.toChecksumAddress(address))
-  return await proxy._getImplementation()
+  return proxy._getImplementation()
 }
 
 const verifyLibraryPrefix = (bytecode: string, address: string) => {
