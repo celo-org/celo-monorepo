@@ -315,7 +315,8 @@ export function* doRedeemInvite(inviteCode: string) {
     ])
 
     if (tempAccountBalanceWei.isLessThanOrEqualTo(0)) {
-      throw Error(ErrorMessages.EMPTY_INVITE_CODE)
+      yield put(showError(ErrorMessages.EMPTY_INVITE_CODE))
+      return false
     }
 
     ValoraAnalytics.track(OnboardingEvents.invite_redeem_move_funds_start)
