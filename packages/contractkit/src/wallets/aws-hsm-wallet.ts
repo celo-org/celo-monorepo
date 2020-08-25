@@ -1,3 +1,4 @@
+import { Signer, Wallet } from '@celo/sdk-types/wallet'
 import { Address } from '@celo/utils/lib/address'
 import { KMS } from 'aws-sdk'
 import { BigNumber } from 'bignumber.js'
@@ -7,8 +8,6 @@ import { bigNumberToBuffer, bufferToBigNumber } from '../utils/signature-utils'
 import { getAddressFromPublicKey, publicKeyPrefix, sixtyFour } from '../utils/signing-utils'
 import { RemoteWallet } from './remote-wallet'
 import AwsHsmSigner from './signers/aws-hsm-signer'
-import { Signer } from './signers/signer'
-import { Wallet } from './wallet'
 
 const debug = debugFactory('kit:wallet:aws-hsm-wallet')
 

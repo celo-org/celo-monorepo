@@ -1,10 +1,10 @@
+import { CeloTx, EncodedTransaction } from '@celo/communication/types/commons'
 import { ensureLeading0x, normalizeAddressWith0x, trimLeading0x } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import { ec as EC } from 'elliptic'
 import * as ethUtil from 'ethereumjs-util'
 import Web3 from 'web3'
-import { EncodedTransaction, Tx } from 'web3-core'
 import { asn1FromPublicKey } from '../utils/ber-utils'
 import { recoverTransaction, verifyEIP712TypedDataSigner } from '../utils/signing-utils'
 import AwsHsmWallet from './aws-hsm-wallet'
@@ -118,7 +118,7 @@ describe('AwsHsmWallet class', () => {
   })
 
   describe('signing', () => {
-    let celoTransaction: Tx
+    let celoTransaction: CeloTx
     const unknownKey: string = '00000000-0000-0000-0000-000000000000'
     const unknownAddress = ACCOUNT_ADDRESS_NEVER
 

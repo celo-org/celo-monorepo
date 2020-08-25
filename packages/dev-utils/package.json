@@ -25,7 +25,7 @@
   "devDependencies": {
     "@types/fs-extra": "^8.1.0",
     "@types/targz": "1.0.0",
-    "@celo/communication": "0.0.1-dev"
+    "web3-core-helpers": "1.2.11"
   },
   "engines": {
     "node": ">=8.13.0"

@@ -1,8 +1,8 @@
+import { CeloTx } from '@celo/communication/types/commons'
+import { Signer } from '@celo/sdk-types/wallet'
 import { Address } from '@celo/utils/lib/address'
 import Web3 from 'web3'
-import { Tx } from 'web3-core'
 import { RemoteWallet } from './remote-wallet'
-import { Signer } from './signers/signer'
 import { ACCOUNT_ADDRESS1, CHAIN_ID, TYPED_DATA } from './test-utils'
 
 class RemoteWalletImpl extends RemoteWallet {
@@ -21,7 +21,7 @@ describe('RemoteWallet', () => {
 
   describe('without initializing', () => {
     const knownAddress = ACCOUNT_ADDRESS1
-    let celoTransaction: Tx
+    let celoTransaction: CeloTx
     beforeEach(() => {
       celoTransaction = {
         from: knownAddress,
