@@ -29,7 +29,7 @@ import {
   createTokenTransferTransaction,
   getCurrencyAddress,
 } from 'src/tokens/saga'
-import { generateStandbyTransactionId } from 'src/transactions/actions'
+import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { getRegisterDekTxGas, registerAccountDek } from 'src/web3/dataEncryptionKey'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -127,7 +127,6 @@ function* sendPayment(
 ) {
   try {
     ValoraAnalytics.track(SendEvents.send_tx_start)
-    const txId = generateStandbyTransactionId(recipientAddress)
 
     const ownAddress: string = yield select(currentAccountSelector)
     // Ensure comment encryption is possible by first ensuring the account's DEK has been registered
@@ -135,6 +134,7 @@ function* sendPayment(
     yield call(registerAccountDek, ownAddress)
     const encryptedComment = yield call(encryptComment, comment, recipientAddress, ownAddress, true)
 
+    const context = newTransactionContext(TAG, 'Send payment')
     switch (currency) {
       case CURRENCY_ENUM.GOLD: {
         yield put(
@@ -142,7 +142,7 @@ function* sendPayment(
             recipientAddress,
             amount: amount.toString(),
             comment: encryptedComment,
-            txId,
+            context,
           })
         )
         break
@@ -153,7 +153,7 @@ function* sendPayment(
             recipientAddress,
             amount: amount.toString(),
             comment: encryptedComment,
-            txId,
+            context,
           })
         )
         break
@@ -163,7 +163,7 @@ function* sendPayment(
       }
     }
     ValoraAnalytics.track(SendEvents.send_tx_complete, {
-      txId,
+      txId: context.id,
       recipientAddress,
       amount: amount.toString(),
       currency,
