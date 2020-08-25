@@ -1,7 +1,8 @@
-import { newKit } from '@celo/contractkit'
+import { newKitFromWeb3 } from '@celo/contractkit'
+import Web3 from 'web3'
 import config from '../config'
 
-const contractKit = newKit(config.blockchain.provider)
+const contractKit = newKitFromWeb3(new Web3(config.blockchain.provider))
 
 export function getContractKit() {
   return contractKit

@@ -1,12 +1,13 @@
-import { newKit } from '@celo/contractkit'
+import { newKitFromWeb3 } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { retryAsyncWithBackOff } from '@celo/utils/lib/async'
+import Web3 from 'web3'
 import { RETRY_COUNT, RETRY_DELAY_IN_MS } from '../common/constants'
 import logger from '../common/logger'
 import config from '../config'
 
-const contractKit = newKit(config.blockchain.provider)
+const contractKit = newKitFromWeb3(new Web3(config.blockchain.provider))
 
 export function getContractKit() {
   return contractKit
@@ -14,7 +15,7 @@ export function getContractKit() {
 
 export async function getBlockNumber(): Promise<number> {
   return retryAsyncWithBackOff(
-    () => getContractKit().web3.eth.getBlockNumber(),
+    () => getContractKit().communication.getBlockNumber(),
     RETRY_COUNT,
     [],
     RETRY_DELAY_IN_MS

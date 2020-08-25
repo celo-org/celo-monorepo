@@ -63,7 +63,7 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
     ])
 
     Logger.debug(TAG + '@transferToEscrow', 'Approving escrow transfer')
-    const convertedAmount = contractKit.web3.utils.toWei(amount.toString())
+    const convertedAmount = contractKit.communication.web3.utils.toWei(amount.toString())
     const approvalTx = stableToken.approve(escrow.address, convertedAmount)
 
     yield call(sendTransaction, approvalTx.txo, account, TAG, 'approval')

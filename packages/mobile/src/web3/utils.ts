@@ -1,10 +1,9 @@
 import { BlockHeader, CeloTx, CeloTxObject } from '@celo/communication/types/commons'
-import { estimateGas as ckEstimateGas } from '@celo/contractkit/lib/utils/web3-utils'
 import BigNumber from 'bignumber.js'
 import { call } from 'redux-saga/effects'
 import { GAS_INFLATION_FACTOR } from 'src/config'
 import Logger from 'src/utils/Logger'
-import { getWeb3, getWeb3Async } from 'src/web3/contracts'
+import { getContractKitAsync, getWeb3, getWeb3Async } from 'src/web3/contracts'
 
 const TAG = 'web3/utils'
 
@@ -16,16 +15,18 @@ export const BLOCK_AGE_LIMIT = 60 // seconds
 
 // Estimate gas taking into account the configured inflation factor
 export async function estimateGas(txObj: CeloTxObject<any>, txParams: CeloTx) {
-  const web3 = await getWeb3Async()
+  const contractKit = await getContractKitAsync()
   const gasEstimator = (_tx: CeloTx) => txObj.estimateGas({ ..._tx })
   const getCallTx = (_tx: CeloTx) => {
     // @ts-ignore missing _parent property from TransactionObject type.
     return { ..._tx, data: txObj.encodeABI(), to: txObj._parent._address }
   }
-  const caller = (_tx: CeloTx) => web3.eth.call(getCallTx(_tx))
-  const gas = new BigNumber(await ckEstimateGas(txParams, gasEstimator, caller))
-    .times(GAS_INFLATION_FACTOR)
-    .integerValue()
+  const caller = (_tx: CeloTx) => contractKit.communication.web3.eth.call(getCallTx(_tx))
+
+  contractKit.communication.defaultGasInflationFactor = GAS_INFLATION_FACTOR
+  const gas = new BigNumber(
+    await contractKit.communication.estimateGasWithInflationFactor(txParams, gasEstimator, caller)
+  )
   return gas
 }
 

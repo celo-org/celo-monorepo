@@ -1,4 +1,5 @@
-import { CeloContract, CeloTransactionObject } from '@celo/contractkit'
+import { CeloTransactionObject } from '@celo/communication'
+import { CeloContract } from '@celo/contractkit'
 import { retryAsync } from '@celo/utils/src/async'
 import BigNumber from 'bignumber.js'
 import { call, put, take, takeEvery } from 'redux-saga/effects'

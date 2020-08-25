@@ -25,7 +25,7 @@ export interface CeloTxObject<T> {
 
 export { BlockNumber, EventLog, Log, PromiEvent } from 'web3-core'
 export { Block, BlockHeader } from 'web3-eth'
-export { Contract, PastEventOptions } from 'web3-eth-contract'
+export { Contract, ContractSendMethod, PastEventOptions } from 'web3-eth-contract'
 export { Mixed } from 'web3-utils'
 
 export interface EncodedTransaction {

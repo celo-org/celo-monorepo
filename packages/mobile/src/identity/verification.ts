@@ -1,4 +1,4 @@
-import { CeloTransactionObject } from '@celo/contractkit'
+import { CeloTransactionObject } from '@celo/communication'
 import { PhoneNumberHashDetails } from '@celo/contractkit/lib/utils/phone-number-lookup/phone-number-identifier'
 import {
   ActionableAttestation,

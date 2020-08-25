@@ -148,7 +148,7 @@
     "@apollo/react-testing": "^3.1.3",
     "@celo/flake-tracker": "0.0.1-dev",
     "@celo/typescript": "0.0.1",
-    "@celo/sdk-types": "1.0.0-dev",
+    "@celo/communication": "0.0.1-dev",
     "@graphql-codegen/add": "^1.10.0",
     "@graphql-codegen/cli": "^1.10.0",
     "@graphql-codegen/fragment-matcher": "1.10.0",

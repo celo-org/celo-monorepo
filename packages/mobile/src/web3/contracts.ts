@@ -66,7 +66,8 @@ export function* initContractKit() {
         `${TAG}@initContractKit`,
         `Initialized wallet with accounts: ${gethWallet.getAccounts()}`
       )
-      contractKit = newKitFromWeb3(web3, gethWallet)
+      contractKit = newKitFromWeb3(web3)
+      contractKit.communication.wallet = gethWallet
       Logger.info(`${TAG}@initContractKit`, 'Initialized kit')
       ValoraAnalytics.track(ContractKitEvents.init_contractkit_finish)
       return
@@ -151,11 +152,11 @@ export async function getWalletAsync() {
 // Convinience util for getting the kit's web3 instance
 export function* getWeb3() {
   const kit: ContractKit = yield call(getContractKit)
-  return kit.web3
+  return kit.communication.web3
 }
 
 // Used for cases where the kit's web3 must be accessed outside a saga
 export async function getWeb3Async() {
   const kit = await getContractKitAsync()
-  return kit.web3
+  return kit.communication.web3
 }

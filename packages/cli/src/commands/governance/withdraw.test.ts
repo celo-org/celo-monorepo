@@ -36,10 +36,10 @@ testWithGanache('governance:withdraw', (web3: Web3) => {
   test('can withdraw', async () => {
     console.log(await governance.getProposalMetadata(1))
     console.log(await governance.getProposalStage(1))
-    const balanceBefore = await kit.web3.eth.getBalance(accounts[0])
+    const balanceBefore = await kit.communication.getBalance(accounts[0])
     console.log(accounts[0], await governance.getRefundedDeposits(accounts[0]))
     console.log(await Withdraw.run(['--from', accounts[0]]))
-    const balanceAfter = await kit.web3.eth.getBalance(accounts[0])
+    const balanceAfter = await kit.communication.getBalance(accounts[0])
     const difference = new BigNumber(balanceAfter).minus(balanceBefore)
     expect(difference.toFixed()).toEqual(minDeposit)
   })

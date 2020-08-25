@@ -1,5 +1,3 @@
-import { Provider } from '@celo/communication/types/commons'
-import { stopProvider } from '@celo/contractkit/lib/utils/provider-utils'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { flags } from '@oclif/command'
 import chalk from 'chalk'
@@ -73,8 +71,7 @@ export default class ValidatorSignedBlocks extends BaseCommand {
       }
 
       if (res.flags.follow) {
-        const web3 = await this.newWeb3()
-        const subscription = web3.eth
+        const subscription = this.web3.eth
           .subscribe('newBlockHeaders', (error) => {
             if (error) {
               this.error(error)
@@ -96,7 +93,6 @@ export default class ValidatorSignedBlocks extends BaseCommand {
           } while (response !== 'q' && response !== '\u0003' /* ctrl-c */)
         } finally {
           await subscription.unsubscribe()
-          await stopProvider(web3.currentProvider as Provider)
         }
       }
     } finally {

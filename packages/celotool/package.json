@@ -35,7 +35,6 @@
     "@celo/dev-utils": "0.0.1-dev",
     "@celo/flake-tracker": "0.0.1-dev",
     "@celo/protocol": "*",
-    "@celo/sdk-types": "1.0.0-dev",
     "@types/bunyan": "1.8.4",
     "@types/dotenv": "^8.2.0",
     "@types/node-fetch": "^2.1.2",

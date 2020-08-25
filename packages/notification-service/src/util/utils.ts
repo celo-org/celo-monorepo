@@ -35,7 +35,7 @@ export async function getTokenAddresses() {
 
 let contractKit: ContractKit
 export async function getContractKit(): Promise<ContractKit> {
-  if (contractKit && (await contractKit.isListening())) {
+  if (contractKit && (await contractKit.communication.isListening())) {
     // Already connected
     return contractKit
   } else {

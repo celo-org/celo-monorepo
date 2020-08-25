@@ -34,9 +34,8 @@ export class NodeCommunicationWrapper {
   private config: CommunicationOptions
   readonly paramsPopulator: TxParamsNormalizer
   rpcCaller!: RpcCaller
-  wallet?: Wallet
 
-  constructor(readonly web3: Web3, _wallet?: Wallet) {
+  constructor(readonly web3: Web3, public wallet?: Wallet) {
     this.config = {
       gasInflationFactor: 1.3,
       // gasPrice:0 means the node will compute gasPrice on its own
@@ -290,12 +289,16 @@ export class NodeCommunicationWrapper {
     return parseInt(result.result.toString(), 10)
   }
 
-  async nonce(address: Address): Promise<number> {
+  async getTransactionCount(address: Address): Promise<number> {
     // Reference: https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_gettransactioncount
     const result = await this.rpcCaller.call('eth_getTransactionCount', [address, 'pending'])
 
     const nonce = parseInt(result.result.toString(), 16)
     return nonce
+  }
+
+  async nonce(address: Address): Promise<number> {
+    return this.getTransactionCount(address)
   }
 
   async coinbase(): Promise<string> {

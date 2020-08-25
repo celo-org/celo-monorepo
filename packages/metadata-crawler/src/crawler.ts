@@ -1,4 +1,5 @@
-import { Address, newKit } from '@celo/contractkit'
+import { Address } from '@celo/communication/types/commons'
+import { newKitFromWeb3 } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import {
   verifyAccountClaim,
@@ -10,6 +11,7 @@ import { normalizeAddressWith0x, trimLeading0x } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import Logger from 'bunyan'
 import { Client } from 'pg'
+import Web3 from 'web3'
 import { dataLogger, logger, operationalLogger } from './logger'
 
 const CONCURRENCY = 10
@@ -29,7 +31,7 @@ const client = new Client({
   database: PGDATABASE,
 })
 
-const kit = newKit(PROVIDER_URL)
+const kit = newKitFromWeb3(new Web3(PROVIDER_URL))
 
 async function jsonQuery(query: string) {
   let res = await client.query(`SELECT json_agg(t) FROM (${query}) t`)
@@ -208,7 +210,7 @@ async function processAttestationServices() {
   const attestationsWrapper = await kit.contracts.getAttestations()
   const validators = await validatorsWrapper.getRegisteredValidators()
 
-  const currentEpoch = await kit.getEpochNumberOfBlock(await kit.web3.eth.getBlockNumber())
+  const currentEpoch = await kit.getEpochNumberOfBlock(await kit.communication.getBlockNumber())
   const electedValidators = await electionsWrapper.getElectedValidators(currentEpoch)
   const electedValidatorsSet: Set<Address> = new Set()
   electedValidators.forEach((validator) => electedValidatorsSet.add(validator.address))

@@ -1,3 +1,4 @@
+import { ContractSendMethod } from '@celo/communication/types/commons'
 import { CeloContract, ContractKit } from '@celo/contractkit'
 import {
   AccountAuthRequest,
@@ -12,7 +13,6 @@ import {
   TxToSignParam,
 } from '@celo/utils'
 import { Linking } from 'expo'
-import { ContractSendMethod } from 'web3-eth-contract'
 export {
   AccountAuthRequest,
   DappKitRequestMeta,
@@ -128,7 +128,7 @@ export async function requestTxSig(
   meta: DappKitRequestMeta
 ) {
   // TODO: For multi-tx payloads, we for now just assume the same from address for all txs. We should apply a better heuristic
-  const baseNonce = await kit.web3.eth.getTransactionCount(txParams[0].from)
+  const baseNonce = await kit.communication.nonce(txParams[0].from)
   const txs: TxToSignParam[] = await Promise.all(
     txParams.map(async (txParam, index) => {
       const feeCurrency = txParam.feeCurrency ? txParam.feeCurrency : FeeCurrency.cGLD

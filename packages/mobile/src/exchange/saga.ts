@@ -1,4 +1,4 @@
-import { CeloTransactionObject } from '@celo/contractkit'
+import { CeloTransactionObject } from '@celo/communication'
 import { ExchangeWrapper } from '@celo/contractkit/lib/wrappers/Exchange'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
 import { ReserveWrapper } from '@celo/contractkit/lib/wrappers/Reserve'
