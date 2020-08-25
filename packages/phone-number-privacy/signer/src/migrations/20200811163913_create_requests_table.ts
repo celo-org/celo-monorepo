@@ -15,7 +15,7 @@ export async function up(knex: Knex): Promise<any> {
       ])
     })
   }
-  return new Promise((resolve) => resolve(null))
+  return null
 }
 
 export async function down(knex: Knex): Promise<any> {
