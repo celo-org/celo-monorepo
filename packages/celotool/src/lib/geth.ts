@@ -1203,8 +1203,7 @@ export async function connectBipartiteClique(
 // Add validator 0 as a peer of each other validator.
 export async function connectValidatorPeers(instances: GethInstanceConfig[]) {
   const validators = instances.filter(
-    (node) =>
-      ((node.validating && !node.isProxied) || node.isProxy) && (node.wsport || node.rpcport)
+    (node) => ((node.validating && !node.isProxied) || node.isProxy)
   )
   // Determine which validators are isolated (i.e. currently just that they are not using a bootnode)
   const isolated = validators.filter((node) => !node.bootnodeEnode)

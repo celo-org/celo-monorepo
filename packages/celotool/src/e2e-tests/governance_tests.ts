@@ -11,7 +11,12 @@ import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import path from 'path'
 import Web3 from 'web3'
-import { connectPeers, connectValidatorPeers, importGenesis, initAndStartGeth } from '../lib/geth'
+import {
+  connectBipartiteClique,
+  connectPeers,
+  /*connectValidatorPeers,*/ importGenesis,
+  initAndStartGeth,
+} from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import {
@@ -916,8 +921,6 @@ describe('governance tests', () => {
 
       await waitToFinishInstanceSyncing(validatorGroup)
 
-      // Connect the validating nodes to the non-validating nodes, to test that announce messages
-      // are properly gossiped.
       const additionalValidatingNodes: GethInstanceConfig[] = [
         {
           name: 'validator2KeyRotation0',
@@ -947,7 +950,8 @@ describe('governance tests', () => {
         )
       )
 
-      await connectValidatorPeers([...gethConfig.instances, ...additionalValidatingNodes])
+      // Connect the validating nodes to the non-validating nodes, to test that announce messages are properly gossiped.
+      await connectBipartiteClique(gethConfig.instances, additionalValidatingNodes, verbose)
 
       await Promise.all(additionalValidatingNodes.map((i) => waitToFinishInstanceSyncing(i)))
 
@@ -958,6 +962,7 @@ describe('governance tests', () => {
 
       // Wait for an epoch transition to ensure everyone is connected to one another.
       await waitForEpochTransition(web3, epoch)
+      await sleep(5.5)
 
       const groupWeb3Url = 'ws://localhost:8555'
       const groupWeb3 = new Web3(groupWeb3Url)
@@ -1022,13 +1027,19 @@ describe('governance tests', () => {
       assert.equal(errorWhileChangingValidatorSet, '')
     })
 
-    it('key rotation should have worked', async () => {
+    it('validator 0 should have signed at least one block', async () => {
       const rotation0MinedBlock = miners.some((a) => eqAddress(a, rotation0Address))
-      const rotation1MinedBlock = miners.some((a) => eqAddress(a, rotation1Address))
-      if (!rotation0MinedBlock || !rotation1MinedBlock) {
+      if (!rotation0MinedBlock) {
         console.log(rotation0Address, rotation1Address, miners)
       }
       assert.isTrue(rotation0MinedBlock)
+    })
+
+    it('validator 1 should have signed at least one block', async () => {
+      const rotation1MinedBlock = miners.some((a) => eqAddress(a, rotation1Address))
+      if (!rotation1MinedBlock) {
+        console.log(rotation0Address, rotation1Address, miners)
+      }
       assert.isTrue(rotation1MinedBlock)
     })
   })
