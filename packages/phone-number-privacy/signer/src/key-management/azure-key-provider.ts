@@ -11,9 +11,11 @@ export class AzureKeyProvider extends KeyProviderBase {
 
       // Set environment variables for service principal auth
       // The lib relies on these
-      process.env.AZURE_CLIENT_ID = clientID
-      process.env.AZURE_CLIENT_SECRET = clientSecret
-      process.env.AZURE_TENANT_ID = tenant
+      if (clientID && clientSecret && tenant) {
+        process.env.AZURE_CLIENT_ID = clientID
+        process.env.AZURE_CLIENT_SECRET = clientSecret
+        process.env.AZURE_TENANT_ID = tenant
+      }
 
       const keyVaultClient = new AzureKeyVaultClient(vaultName)
       const privateKey = await keyVaultClient.getSecret(secretName)
