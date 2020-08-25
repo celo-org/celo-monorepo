@@ -49,6 +49,14 @@ library Proposals {
   }
 
   /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
+
+  /**
    * @notice Constructs a proposal.
    * @param proposal The proposal struct to be constructed.
    * @param values The values of Celo Gold to be sent in the proposed transactions.
