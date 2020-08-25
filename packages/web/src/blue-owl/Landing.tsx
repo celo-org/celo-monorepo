@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import Cover from 'src/blue-owl/Cover'
 import OpenGraph from 'src/header/OpenGraph'
 import { H1, H4 } from 'src/fonts/Fonts'
@@ -10,8 +10,8 @@ import nonProfitIMG from 'src/icons/non-profit-light-bg.png'
 import sendToPhoneImg from 'src/icons/sent-to-phone_light-bg.png'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 // import menuItems from 'src/shared/menu-items'
-
-import { standardStyles, textStyles } from 'src/styles'
+import sequenceTopImage from 'src/illustrations/03-Inclusive-money-(light-bg).png'
+import { standardStyles, textStyles, colors, fontInfo, fonts } from 'src/styles'
 import { Adventure } from 'src/home/Adventure'
 
 export default function Landing() {
@@ -59,7 +59,35 @@ export default function Landing() {
           link={{ href: 'https://valoraapp.co/32d561R', text: t('adventure3.link') }}
         />
       </GridRow>
+      <GridRow>
+        <Cell span={Spans.full} style={standardStyles.centered}>
+          <Image
+            source={sequenceTopImage}
+            style={{ width: 275, height: 75 }}
+            resizeMode="contain"
+          />
+          <H4>{t('sequenceTitle')}</H4>
+        </Cell>
+      </GridRow>
+      <GridRow>
+        <ContentPreview title="Part 1" time={'2 min'} />
+        <ContentPreview title="Part 2" time={'5 min'} />
+        <ContentPreview title="Part 3" time={'3 min'} />
+      </GridRow>
     </View>
+  )
+}
+
+function ContentPreview({ title, time }) {
+  return (
+    <Cell span={Spans.third}>
+      <Image
+        style={{ backgroundColor: colors.gray, height: 222, marginBottom: 10 }}
+        source={sequenceTopImage}
+      />
+      <Text style={fonts.h5}>{title}</Text>
+      <Text style={[fonts.h5, { color: colors.grayHeavy }]}>{time}</Text>
+    </Cell>
   )
 }
 
