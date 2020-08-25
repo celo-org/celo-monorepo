@@ -1,5 +1,5 @@
 import { range } from 'lodash'
-import { deallocateAWSStaticIP, describeElasticIPAddresses, getElasticIPAddressesFromAllocationIDs, getOrRegisterElasticIP, tagsArrayToAWSResourceTags, waitForElasticIPAssociationIDRemoval } from '../aws'
+import { deallocateAWSStaticIP, describeElasticIPAddresses, getElasticIPAddressesFromAllocationIDs, getOrRegisterElasticIP, subnetIsPublic, tagsArrayToAWSResourceTags, waitForElasticIPAssociationIDRemoval } from '../aws'
 import { execCmdWithExitOnFailure } from '../cmd-utils'
 import { AWSClusterConfig } from '../k8s-cluster/aws'
 import { deleteResource } from '../kubernetes'
@@ -12,20 +12,92 @@ export interface AWSFullNodeDeploymentConfig extends BaseFullNodeDeploymentConfi
 export class AWSFullNodeDeployer extends BaseFullNodeDeployer {
 
   async additionalHelmParameters() {
-    const allocationIdsPerNode: string[][] = await this.allocateElasticIPs()
-    const allocationIdsPerNodeParamStr = allocationIdsPerNode.map((ips: string[]) =>
-      ips.join('\\\,')
+    const subnets = await this.getAllSubnetsSortedByAZ()
+    console.log('subnets', subnets)
+    const allocationIDPerPublicSubnetPerFullNode: Array<{
+      [subnetID: string]: string
+    }> = await this.allocateElasticIPs()
+    console.log('allocationIDPerPublicSubnetPerFullNode', allocationIDPerPublicSubnetPerFullNode)
+    const publicSubnets = subnets.filter(subnetIsPublic)
+
+    const publicSubnetIDPerAZ: {
+      [az: string]: string
+    } = publicSubnets.reduce((
+      agg: {
+        [az: string]: string
+      },
+      subnet: any
+    ) => {
+      console.log('agg', agg, 'subnet.AvailabilityZone', subnet.AvailabilityZone)
+      return {
+        ...agg,
+        [subnet.AvailabilityZone]: subnet.SubnetId
+      }
+    }, {})
+
+    const allocationIDForEachPublicSubnetPerFullNode: string[][] = allocationIDPerPublicSubnetPerFullNode.map(
+      (allocationIDPerPublicSubnet: {
+        [subnetID: string]: string
+      }) =>
+        publicSubnets.map((publicSubnet: any) => allocationIDPerPublicSubnet[publicSubnet.SubnetId])
+      )
+
+    const ipAddressPerPublicSubnetPerFullNode: Array<{
+      [subnetID: string]: string
+    }> = await Promise.all(
+      allocationIDPerPublicSubnetPerFullNode.map(
+        async (allocationIDPerPublicSubnet: {
+          [subnetID: string]: string
+        }) => {
+          const subnetIDs = Object.keys(allocationIDPerPublicSubnet)
+          const allocIDs = subnetIDs.map((subnetID: string) => allocationIDPerPublicSubnet[subnetID])
+          const ips = await getElasticIPAddressesFromAllocationIDs(allocIDs)
+          let index = 0
+          return subnetIDs.reduce((agg: {
+            [subnetID: string]: string
+          }, subnetID: string) => ({
+            ...agg,
+            [subnetID]: ips[index++]
+          }), {})
+        }
+      )
+    )
+
+    console.log('ipAddressPerPublicSubnetPerFullNode', ipAddressPerPublicSubnetPerFullNode)
+
+    console.log('publicSubnetIDPerAZ', publicSubnetIDPerAZ)
+
+    const ipAddressForEachSubnetPerFullNode: string[][] = ipAddressPerPublicSubnetPerFullNode.map(
+      (ipAddressPerPublicSubnet: {
+        [subnetID: string]: string
+      }) => {
+        return subnets.map((subnet: any) => {
+          console.log('subnet.AvailabilityZone', subnet.AvailabilityZone)
+          console.log('publicSubnetIDPerAZ[subnet.AvailabilityZone]', publicSubnetIDPerAZ[subnet.AvailabilityZone])
+          const publicSubnetIDForThisAZ = publicSubnetIDPerAZ[subnet.AvailabilityZone]
+          return ipAddressPerPublicSubnet[publicSubnetIDForThisAZ]
+       })
+      }
+    )
+
+    console.log('ipAddressForEachSubnetPerFullNode', ipAddressForEachSubnetPerFullNode)
+
+    const allocationIdsPerPublicSubnetPerNodeParamStr = allocationIDForEachPublicSubnetPerFullNode.map((allocIDs: string[]) =>
+      allocIDs.join('\\\,')
     ).join(',')
-    // Arbitrarily pick the first IP address for each node.
-    // TODO make this smarter
-    const ipPerNode = await getElasticIPAddressesFromAllocationIDs(
-      allocationIdsPerNode.map((allocationIDs: string[]) => allocationIDs[0])
+
+    const subnetCIDRBlocks = subnets.map((subnet: any) => subnet.CidrBlock)
+    console.log('subnetCIDRBlocks', subnetCIDRBlocks)
+
+    const ipAddressesPerSubnetPerNode = ipAddressForEachSubnetPerFullNode.map((ips: string[]) =>
+      ips.join('\\\,')
     )
 
     return [
+      `--set geth.all_subnet_cidr_blocks='{${subnetCIDRBlocks.join(',')}}'`,
       `--set geth.azure_provider=false`,
-      `--set geth.eip_allocation_ids_per_node='{${allocationIdsPerNodeParamStr}}'`,
-      `--set geth.public_ip_per_node='{${ipPerNode.join(',')}}'`,
+      `--set geth.eip_allocation_ids_per_public_subnet_per_node='{${allocationIdsPerPublicSubnetPerNodeParamStr}}'`,
+      `--set geth.ip_addresses_per_subnet_per_node='{${ipAddressesPerSubnetPerNode.join(',')}}'`,
       `--set storage.storageClass=gp2`,
     ]
   }
@@ -44,7 +116,8 @@ export class AWSFullNodeDeployer extends BaseFullNodeDeployer {
 
     // Get existing elastic IPs with tags that indicate they are from a previous deployment
     const existingElasticIPs = await describeElasticIPAddresses(this.genericElasticIPTags)
-    const subnets = await this.getPublicSubnets()
+    const subnets = await this.getAllSubnetsSortedByAZ()
+    const publicSubnetIDs = subnets.filter(subnetIsPublic).map((subnet:any) => subnet.SubnetId)
 
     // Remove any IPs that shouldn't exist
     const deallocationPromises = []
@@ -64,33 +137,62 @@ export class AWSFullNodeDeployer extends BaseFullNodeDeployer {
         continue
       }
       // subnet doesn't exist - if for some reason subnets changed, this would occur
-      if (!subnets.includes(tags.subnet)) {
+      if (!publicSubnetIDs.includes(tags.subnetID)) {
         deallocationPromises.push(this.deallocateElasticIP(existingIP.AllocationId, serviceName))
         continue
       }
     }
     await Promise.all(deallocationPromises)
 
-    // This is a 2d array of allocation IDs. Each element of the array corresponds
-    // to the full node with the same index, which has 1 IP per subnet.
-    const allocationIdsPerFullNode = await Promise.all(
-      range(replicas).map((i) =>
-        Promise.all(
-          subnets.map((subnet: string) =>
-            getOrRegisterElasticIP(this.getElasticIPTags(subnet, i))
+    const allocationIDPerSubnetPerFullNode: Array<{
+      [subnetID: string]: string
+    }> = await Promise.all(
+      range(replicas).map(async (i) =>
+        {
+          const allocationIDPerSubnet: string[] = await Promise.all(
+            publicSubnetIDs.map((subnet: string) =>
+              getOrRegisterElasticIP(this.getElasticIPTags(subnet, i))
+            )
           )
-        )
+          let index = 0
+          console.log('allocationIDPerSubnet', allocationIDPerSubnet)
+          console.log('index', index)
+          return allocationIDPerSubnet.reduce(
+            (obj: {
+              [subnetID: string]: string
+            }, allocationID: string) => ({
+              ...obj,
+              [publicSubnetIDs[index++]]: allocationID
+            }),
+            {}
+          )
+        }
       )
     )
-    return allocationIdsPerFullNode
+    return allocationIDPerSubnetPerFullNode
+
+    // This is a 2d array of allocation IDs. Each element of the array corresponds
+    // to the full node with the same index, which has 1 IP per subnet.
   }
 
-  async getPublicSubnets(): Promise<string[]> {
+  async getPublicSubnetIDs(): Promise<string[]> {
     const clusterName: string = this.deploymentConfig.clusterConfig.clusterName
     const [subnets] = await execCmdWithExitOnFailure(
       `aws ec2 describe-subnets --filters "Name=tag-key,Values=kubernetes.io/cluster/${clusterName}" "Name=tag-key,Values=kubernetes.io/role/elb" --query "Subnets[*].SubnetId" --output json`
     )
     return JSON.parse(subnets)
+  }
+
+  async getAllSubnetsSortedByAZ(): Promise<any> {
+    const clusterName: string = this.deploymentConfig.clusterConfig.clusterName
+    console.log(`aws ec2 describe-subnets --filters "Name=tag-key,Values=kubernetes.io/cluster/${clusterName}" --query "Subnets" --output json`)
+    const [subnetsStr] = await execCmdWithExitOnFailure(
+      `aws ec2 describe-subnets --filters "Name=tag-key,Values=kubernetes.io/cluster/${clusterName}" --query "Subnets" --output json`
+    )
+    const subnets = JSON.parse(subnetsStr)
+    return subnets.sort((a: any, b: any) =>
+      b.AvailabilityZone < a.AvailabilityZone ? 1 : -1
+    )
   }
 
   /**
@@ -113,12 +215,12 @@ export class AWSFullNodeDeployer extends BaseFullNodeDeployer {
     await deallocateAWSStaticIP(allocationID)
   }
 
-  getElasticIPTags(subnet: string, index: number) {
+  getElasticIPTags(subnetID: string, index: number) {
     return {
       ...this.genericElasticIPTags,
-      Name: `${this.staticIPNamePrefix}-${index}-${subnet}`,
+      Name: `${this.staticIPNamePrefix}-${index}-${subnetID}`,
       index: index.toString(10),
-      subnet,
+      subnetID,
     }
   }
 

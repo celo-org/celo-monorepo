@@ -153,5 +153,5 @@ export async function waitForStaticIPDetachment(name: string, resourceGroup: str
     }
     await sleep(tryIntervalMs)
   }
-  throw Error(`Too many tries waiting for elastic IP association ID removal`)
+  throw Error(`Too many tries waiting for static IP association ID removal`)
 }

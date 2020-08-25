@@ -72,6 +72,7 @@ export async function waitForElasticIPAssociationIDRemoval(allocationID: string)
     if (!associationID) {
       return
     }
+    console.log('sleeping', tryIntervalMs)
     await sleep(tryIntervalMs)
   }
   throw Error(`Too many tries waiting for elastic IP association ID removal`)
@@ -104,3 +105,9 @@ export function tagsArrayToAWSResourceTags(tagsArray: Array<{ [key: string]: str
   }
   return tags
 }
+
+export function subnetIsPublic(subnet: any): boolean {
+    const tags = tagsArrayToAWSResourceTags(subnet.Tags)
+    // If the subnet is public, it will have a tag of this name
+    return tags.hasOwnProperty('kubernetes.io/role/elb')
+  }

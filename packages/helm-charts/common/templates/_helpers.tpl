@@ -143,6 +143,8 @@ release: {{ .Release.Name }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .pprof_port }} --pprofaddr 0.0.0.0"
     {{- end }}
 
+{{ .extra }}
+
     exec geth \
       --bootnodes=$(cat /root/.celo/bootnodeEnode) \
       --light.serve {{ .light_serve | default 90 }} \
@@ -170,6 +172,10 @@ release: {{ .Release.Name }}
     valueFrom:
       fieldRef:
         fieldPath: metadata.name
+  - name: POD_IP
+    valueFrom:
+      fieldRef:
+        fieldPath: status.podIP
 {{/* TODO: make this use IPC */}}
 {{- if .expose }}
   readinessProbe:

@@ -4,6 +4,14 @@
 
 replicaCount: 1
 fullnameOverride: false
+#
+# all_subnet_cidr_blocks:
+# - 192.168.0.0/19
+# - 192.168.64.0/19
+# - 192.168.32.0/19
+# ip_addresses_per_subnet_per_node:
+# - 44.232.73.231,44.232.73.231,52.13.61.244
+# - 100.21.28.113,52.11.114.52,44.229.76.208
 
 ingress:
   enabled: false

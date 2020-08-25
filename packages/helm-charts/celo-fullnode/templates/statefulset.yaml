@@ -33,10 +33,23 @@ spec:
 {{ include "common.prometheus-annotations" . | indent 8 }}
 {{ end }}
     spec:
+      # see https://www.verygoodsecurity.com/blog/posts/kubernetes-multi-az-deployments-using-pod-anti-affinity
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: component
+                  operator: In
+                  values:
+                  - celo-fullnode
+              topologyKey: failure-domain.beta.kubernetes.io/zone
+            weight: 100
       initContainers:
 {{ include "common.init-genesis-container" .  | indent 6 }}
       containers:
-{{ include "common.full-node-container" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "expose" true "ip_addresses" .Values.geth.public_ip_per_node "syncmode" .Values.geth.syncmode "gcmode" .Values.geth.syncmodex "max_latest_block_age_seconds" .Values.geth.readiness_probe_max_block_age_seconds "rpc_apis" .Values.geth.rpc_apis "pprof" (or (.Values.prometheus) (.Values.pprof.enabled)) "pprof_port" (.Values.pprof.port) "metrics" (or (.Values.prometheus) (.Values.metrics))) | indent 6 }}
+{{ include "common.full-node-container" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "expose" true "ip_addresses" .Values.geth.public_ip_per_node "syncmode" .Values.geth.syncmode "gcmode" .Values.geth.syncmodex "max_latest_block_age_seconds" .Values.geth.readiness_probe_max_block_age_seconds "rpc_apis" .Values.geth.rpc_apis "pprof" (or (.Values.prometheus) (.Values.pprof.enabled)) "pprof_port" (.Values.pprof.port) "metrics" (or (.Values.prometheus) (.Values.metrics)) "extra" ((include "celo-fullnode.subnet-specific-nat-ip" $) | indent 4)) | indent 6 }}
       volumes:
       - name: data
         emptyDir: {}
