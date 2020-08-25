@@ -188,7 +188,7 @@ library SortedLinkedListWithMedian {
    * @param list A storage pointer to the underlying list.
    * @return The key of the first element in the list.
    */
-  function getHead(List storage list) external view returns (bytes32) {
+  function getHead(List storage list) internal view returns (bytes32) {
     return list.list.list.head;
   }
 
@@ -197,7 +197,7 @@ library SortedLinkedListWithMedian {
    * @param list A storage pointer to the underlying list.
    * @return The key of the median element in the list.
    */
-  function getMedian(List storage list) external view returns (bytes32) {
+  function getMedian(List storage list) internal view returns (bytes32) {
     return list.median;
   }
 
@@ -206,7 +206,7 @@ library SortedLinkedListWithMedian {
    * @param list A storage pointer to the underlying list.
    * @return The key of the last element in the list.
    */
-  function getTail(List storage list) external view returns (bytes32) {
+  function getTail(List storage list) internal view returns (bytes32) {
     return list.list.list.tail;
   }
 
@@ -215,7 +215,7 @@ library SortedLinkedListWithMedian {
    * @param list A storage pointer to the underlying list.
    * @return The number of elements in the list.
    */
-  function getNumElements(List storage list) external view returns (uint256) {
+  function getNumElements(List storage list) internal view returns (uint256) {
     return list.list.list.numElements;
   }
 
