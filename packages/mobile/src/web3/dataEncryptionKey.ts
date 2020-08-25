@@ -15,7 +15,6 @@ import { call, put, select } from 'redux-saga/effects'
 import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { getStoredMnemonic } from 'src/backup/utils'
 import { features } from 'src/flags'
 import { FetchDataEncryptionKeyAction, updateAddressDekMap } from 'src/identity/actions'
 import { getCurrencyAddress } from 'src/tokens/saga'
@@ -79,21 +78,6 @@ export function* registerAccountDek(account: string) {
     if (!privateDataKey) {
       throw new Error('No data key in store. Should never happen.')
     }
-
-    /**
-     * BEGIN MIGRATION HACK
-     * This code can be safely removed once existing Valora users have all run it
-     * It's needed because we need to regenerate their DEKs now that the scheme has changed
-     * If it's still here by 2020/08/23 please remove it.
-     */
-    const mnemonic = yield call(getStoredMnemonic, account)
-    privateDataKey = yield call(createAccountDek, mnemonic)
-    if (!privateDataKey) {
-      throw new Error('Failed to create new DEK in migration hack')
-    }
-    /**
-     * END MIGRATION HACK
-     */
 
     const publicDataKey = compressedPubKey(hexToBuffer(privateDataKey))
 
