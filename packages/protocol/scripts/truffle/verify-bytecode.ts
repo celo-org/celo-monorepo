@@ -12,7 +12,7 @@ module.exports = async (callback: (error?: any) => number) => {
   try {
     const registry = await Registry.at(celoRegistryAddress)
     const buildArtifacts = getBuildArtifacts('./build/contracts')
-    verifyBytecodesDfs(Object.keys(CeloContractName), buildArtifacts, registry, Proxy, web3)
+    await verifyBytecodesDfs(Object.keys(CeloContractName), buildArtifacts, registry, Proxy, web3)
   } catch (error) {
     callback(error)
   }
