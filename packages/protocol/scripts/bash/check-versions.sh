@@ -49,7 +49,7 @@ if [ ! -z "$REPORT" ]; then
   REPORT_FLAG="-f "$REPORT
 fi
 
-# Exclude test contracts, mock contracts, contract interfaces, Proxy contracts, MultiSig contracts,
-# and the ReleaseGold contract. 
-CONTRACT_EXCLUSION_REGEX=".*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold"
+# Exclude test contracts, mock contracts, contract interfaces, Proxy contracts, inlined libraries,
+# MultiSig contracts, and the ReleaseGold contract.
+CONTRACT_EXCLUSION_REGEX=".*Test|Mock.*|I[A-Z].*|.*Proxy|LinkedList|SortedLinkedList|SortedLinkedListWithMedian|MultiSig.*|ReleaseGold"
 yarn ts-node scripts/check-backward.ts sem_check -o $BUILD_DIR_1/contracts -n $BUILD_DIR_2/contracts -e $CONTRACT_EXCLUSION_REGEX $REPORT_FLAG
