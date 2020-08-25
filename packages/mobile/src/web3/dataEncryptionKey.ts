@@ -61,7 +61,7 @@ export function* createAccountDek(mnemonic: string) {
 
 // Register the address and DEK with the Accounts contract
 // A no-op if registration has already been done
-export function* registerAccountDekSaga(account: string) {
+export function* registerAccountDek(account: string) {
   try {
     const isAlreadyRegistered = yield select(isDekRegisteredSelector)
     if (isAlreadyRegistered) {
@@ -70,7 +70,7 @@ export function* registerAccountDekSaga(account: string) {
     ValoraAnalytics.track(OnboardingEvents.account_dek_register_start)
 
     Logger.debug(
-      `${TAG}@registerAccountDekSaga`,
+      `${TAG}@registerAccountDek`,
       'Setting wallet address and public data encryption key'
     )
 
@@ -94,7 +94,7 @@ export function* registerAccountDekSaga(account: string) {
     ValoraAnalytics.track(OnboardingEvents.account_dek_register_account_checked)
 
     if (upToDate) {
-      Logger.debug(`${TAG}@registerAccountDekSaga`, 'Address and DEK up to date, skipping.')
+      Logger.debug(`${TAG}@registerAccountDek`, 'Address and DEK up to date, skipping.')
       yield put(registerDataEncryptionKey())
       ValoraAnalytics.track(OnboardingEvents.account_dek_register_complete, {
         newRegistration: false,
@@ -114,7 +114,7 @@ export function* registerAccountDekSaga(account: string) {
   } catch (error) {
     // DEK registration failures are not considered fatal. Swallow the error and allow calling saga to proceed.
     // Registration will be re-attempted on next payment send
-    Logger.error(`${TAG}@registerAccountDekSaga`, 'Failure registering DEK', error)
+    Logger.error(`${TAG}@registerAccountDek`, 'Failure registering DEK', error)
   }
 }
 

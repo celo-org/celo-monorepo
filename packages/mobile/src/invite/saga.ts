@@ -49,7 +49,7 @@ import { newTransactionContext } from 'src/transactions/types'
 import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 import { getContractKitAsync, getWallet, getWeb3 } from 'src/web3/contracts'
-import { registerAccountDekSaga } from 'src/web3/dataEncryptionKey'
+import { registerAccountDek } from 'src/web3/dataEncryptionKey'
 import { getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 
 const TAG = 'invite/saga'
@@ -275,10 +275,6 @@ function* sendInviteSaga(action: SendInviteAction) {
     yield put(sendInviteFailure(ErrorMessages.INVITE_FAILED))
     navigateHome()
   }
-}
-
-function* registerAccountDek(newAccount: string) {
-  yield call(registerAccountDekSaga, newAccount)
 }
 
 export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
