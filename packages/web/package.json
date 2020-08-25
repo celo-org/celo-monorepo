@@ -21,7 +21,7 @@
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "kill-dev": "kill -9 $(lsof -ti :3000)",
     "clean-next-cache": "rm -rf .next",
-    "test": "jest --coverage --runInBand",
+    "test": "TZ=UTC jest --coverage --runInBand",
     "spec": "jest"
   },
   "dependencies": {
