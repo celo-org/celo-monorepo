@@ -8,6 +8,7 @@ import { e164NumberSelector } from 'src/account/selectors'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
 import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import { e164NumberToSaltSelector } from 'src/identity/reducer'
+import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { isAccountUpToDate } from 'src/web3/dataEncryptionKey'
 import { getConnectedAccount } from 'src/web3/saga'
 import { createMockStore } from 'test/utils'
@@ -47,6 +48,7 @@ describe('Fetch phone hash details', () => {
     await expectSaga(fetchPhoneHashPrivate, mockE164Number)
       .provide([
         [call(getConnectedAccount), mockAccount],
+        [select(stableTokenBalanceSelector), 0.21],
         [select(e164NumberSelector), mockE164Number2],
         [select(e164NumberToSaltSelector), {}],
         [matchers.call.fn(isAccountUpToDate), true],
