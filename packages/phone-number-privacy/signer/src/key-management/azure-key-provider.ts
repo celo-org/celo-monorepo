@@ -7,17 +7,7 @@ import { KeyProviderBase } from './key-provider-base'
 export class AzureKeyProvider extends KeyProviderBase {
   public async fetchPrivateKeyFromStore() {
     try {
-      const { clientID, clientSecret, tenant, vaultName, secretName } = config.keystore.azure
-
-      // Set environment variables for service principal auth
-      // The lib relies on these
-      if (tenant) {
-        process.env.AZURE_TENANT_ID = tenant
-      }
-      if (clientID && clientSecret) {
-        process.env.AZURE_CLIENT_ID = clientID
-        process.env.AZURE_CLIENT_SECRET = clientSecret
-      }
+      const { vaultName, secretName } = config.keystore.azure
 
       const keyVaultClient = new AzureKeyVaultClient(vaultName)
       const privateKey = await keyVaultClient.getSecret(secretName)
