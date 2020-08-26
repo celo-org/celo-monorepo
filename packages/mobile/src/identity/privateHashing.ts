@@ -73,7 +73,8 @@ function* doFetchPhoneHashPrivate(e164Number: string) {
   }
 
   Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Salt was not cached, fetching')
-  if (!balanceSufficientForQuotaRetrieval()) {
+  const isBalanceSufficientForQuota = yield call(balanceSufficientForQuotaRetrieval)
+  if (!isBalanceSufficientForQuota) {
     throw new Error(ErrorMessages.ODIS_INSUFFICIENT_BALANCE)
   }
   const selfPhoneDetails: PhoneNumberHashDetails | undefined = yield call(
@@ -90,7 +91,9 @@ function* doFetchPhoneHashPrivate(e164Number: string) {
   return details
 }
 
+// TODO move to Contract kit ODIS utils
 export function* balanceSufficientForQuotaRetrieval() {
+  // TODO add CELO balance lookup as well
   const userBalance = yield select(stableTokenBalanceSelector)
   return new BigNumber(userBalance).isGreaterThanOrEqualTo(ODIS_MINIMUM_DOLLAR_BALANCE)
 }
