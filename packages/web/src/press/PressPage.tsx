@@ -7,7 +7,7 @@ import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import SideTitledSection from 'src/layout/SideTitledSection'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { fonts, standardStyles, textStyles } from 'src/styles'
-import { HelpfullLink } from 'src/terms/HelpfullLink'
+import { HelpfulLink } from 'src/terms/HelpfulLink'
 import { Languages } from 'src/utils/languages'
 
 export interface PressArticleFields {
@@ -78,7 +78,7 @@ class PressPage extends React.PureComponent<I18nProps & Props> {
                         {t('by')} {item.publication}
                         {'  '}
                       </Text>
-                      {item.link && <HelpfullLink text={t('read')} href={item.link} />}
+                      {item.link && <HelpfulLink text={t('read')} href={item.link} />}
                     </Text>
                   </View>
                 ))}
