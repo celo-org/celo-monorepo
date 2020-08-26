@@ -177,12 +177,6 @@
       "@celo/typescript"
     ]
   },
-  "@celo/wallet": {
-    "location": "packages/wallet",
-    "dependencies": [
-      "@celo/sdk-types"
-    ]
-  },
   "@celo/web": {
     "location": "packages/web",
     "dependencies": [
