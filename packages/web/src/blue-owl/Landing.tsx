@@ -11,7 +11,7 @@ import sendToPhoneImg from 'src/icons/sent-to-phone_light-bg.png'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 // import menuItems from 'src/shared/menu-items'
 import sequenceTopImage from 'src/illustrations/03-Inclusive-money-(light-bg).png'
-import { standardStyles, textStyles, colors, fontInfo, fonts } from 'src/styles'
+import { standardStyles, textStyles, colors, fonts } from 'src/styles'
 import { Adventure } from 'src/home/Adventure'
 
 export default function Landing() {
@@ -56,16 +56,16 @@ export default function Landing() {
           source={valora}
           title={t('adventure3.title')}
           text={t('adventure3.text')}
-          link={{ href: 'https://valoraapp.co/32d561R', text: t('adventure3.link') }}
+          link={{ href: 'https://valoraapp.com', text: t('adventure3.link') }}
         />
       </GridRow>
-      <GridRow>
+      <GridRow
+        desktopStyle={standardStyles.blockMarginBottom}
+        tabletStyle={standardStyles.blockMarginBottomTablet}
+        mobileStyle={standardStyles.blockMarginBottomMobile}
+      >
         <Cell span={Spans.full} style={standardStyles.centered}>
-          <Image
-            source={sequenceTopImage}
-            style={{ width: 275, height: 75 }}
-            resizeMode="contain"
-          />
+          <Image source={sequenceTopImage} style={styles.logo} resizeMode="contain" />
           <H4>{t('sequenceTitle')}</H4>
         </Cell>
       </GridRow>
@@ -81,12 +81,9 @@ export default function Landing() {
 function ContentPreview({ title, time }) {
   return (
     <Cell span={Spans.third}>
-      <Image
-        style={{ backgroundColor: colors.gray, height: 222, marginBottom: 10 }}
-        source={sequenceTopImage}
-      />
+      <Image style={styles.preview} source={sequenceTopImage} />
       <Text style={fonts.h5}>{title}</Text>
-      <Text style={[fonts.h5, { color: colors.grayHeavy }]}>{time}</Text>
+      <Text style={[fonts.h5, styles.minutes]}>{time}</Text>
     </Cell>
   )
 }
@@ -95,4 +92,7 @@ const styles = StyleSheet.create({
   root: {
     alignItems: 'center',
   },
+  preview: { backgroundColor: colors.gray, height: 222, marginBottom: 10 },
+  logo: { width: 275, height: 75 },
+  minutes: { color: colors.grayHeavy },
 })
