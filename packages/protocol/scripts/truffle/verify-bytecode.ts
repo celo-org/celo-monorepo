@@ -8,10 +8,16 @@ import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/regist
 const Registry: Truffle.Contract<RegistryInstance> = artifacts.require('Registry')
 const Proxy: Truffle.Contract<ProxyInstance> = artifacts.require('Proxy')
 
+const argv = require('minimist')(process.argv.slice(2), {
+  string: ['build_artifacts'],
+})
+
+const artifactsDirectory = argv.build_artifacts ? argv.build_artifacts : './build/contracts'
+
 module.exports = async (callback: (error?: any) => number) => {
   try {
     const registry = await Registry.at(celoRegistryAddress)
-    const buildArtifacts = getBuildArtifacts('./build/rc1/contracts')
+    const buildArtifacts = getBuildArtifacts(artifactsDirectory)
     await verifyBytecodesDfs(
       Object.keys(CeloContractName),
       buildArtifacts,
