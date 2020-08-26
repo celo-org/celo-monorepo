@@ -174,7 +174,9 @@ export class NotificationBox extends React.Component<Props, State> {
                 notificationType: NotificationBannerTypes.verification_prompt,
                 selectedAction: NotificationBannerCTATypes.accept,
               })
-              navigate(Screens.VerificationEducationScreen)
+              navigate(Screens.VerificationEducationScreen, {
+                hideOnboardingStep: true,
+              })
             },
           },
           {
