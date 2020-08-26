@@ -275,7 +275,7 @@ exports[`Papers renders 1`] = `
               }
               target="_blank"
             >
-              Read Paper
+              Read paper
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -582,7 +582,7 @@ exports[`Papers renders 1`] = `
             }
             target="_blank"
           >
-            Read Paper
+            Read paper
             <div
               className="css-view-1dbjc4n"
               style={
@@ -805,7 +805,7 @@ exports[`Papers renders 1`] = `
               }
               target="_blank"
             >
-              Read Paper
+              Read paper
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -904,7 +904,7 @@ exports[`Papers renders 1`] = `
               }
               target="_blank"
             >
-              Lee el Informe
+              Lee el informe
               <div
                 className="css-view-1dbjc4n"
                 style={

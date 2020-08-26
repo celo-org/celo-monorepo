@@ -44,7 +44,7 @@ class Papers extends React.PureComponent<I18nProps> {
             <Text style={fonts.p}>{t('velocityTitle')}</Text>
             <View style={styles.links}>
               <HelpfulLink text={t('download')} href={'/papers/cbdc-velocity'} />
-              <HelpfulLink text={'Lee el Informe'} href={'/papers/cbdc-velocity/spanish'} />
+              <HelpfulLink text={'Lee el informe'} href={'/papers/cbdc-velocity/spanish'} />
             </View>
           </SideTitledSection>
         </View>

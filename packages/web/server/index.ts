@@ -106,11 +106,13 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
   })
 
   server.get('/papers/whitepaper', (_, res) => {
-    res.redirect('/papers/Celo_WP.pdf')
+    res.redirect(
+      '/papers/Celo__A_Multi_Asset_Cryptographic_Protocol_for_Decentralized_Social_Payments.pdf'
+    )
   })
 
   server.get('/papers/whitepaper/chinese', (_, res) => {
-    res.redirect('/papers/Celo_WP_Simplified_Chinese.pdf')
+    res.redirect('/papers/celo-wp-simplified-chinese.pdf')
   })
 
   server.get('/brand', (_, res) => {
