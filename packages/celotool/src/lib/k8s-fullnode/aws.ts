@@ -126,11 +126,11 @@ export class AWSFullNodeDeployer extends BaseFullNodeDeployer {
     )
 
     return [
-      `--set geth.all_subnet_cidr_blocks='{${subnetCIDRBlocks.join(',')}}'`,
-      `--set geth.azure_provider=false`,
-      `--set geth.eip_allocation_ids_per_public_subnet_per_node='{${allocationIdsPerPublicSubnetPerNodeParamStr}}'`,
-      `--set geth.ip_addresses_per_subnet_per_node='{${ipAddressesPerSubnetPerNode.join(',')}}'`,
+      `--set aws=true`,
       `--set storage.storageClass=gp2`,
+      `--set geth.aws.all_subnet_cidr_blocks='{${subnetCIDRBlocks.join(',')}}'`,
+      `--set geth.aws.eip_allocation_ids_per_public_subnet_per_node='{${allocationIdsPerPublicSubnetPerNodeParamStr}}'`,
+      `--set geth.aws.ip_addresses_per_subnet_per_node='{${ipAddressesPerSubnetPerNode.join(',')}}'`,
     ]
   }
 

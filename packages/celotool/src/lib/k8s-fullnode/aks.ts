@@ -18,7 +18,7 @@ export class AKSFullNodeDeployer extends BaseFullNodeDeployer {
   async additionalHelmParameters() {
     const staticIps = (await this.allocateStaticIPs()).join(',')
     return [
-      `--set geth.azure_provider=true`,
+      `--set azure=true`,
       `--set geth.public_ip_per_node='{${staticIps}}'`,
     ]
   }
