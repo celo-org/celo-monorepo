@@ -622,7 +622,7 @@
     tslib "^1.9.3"
     uuid "^3.3.2"
 
-"@azure/identity@^1.1.0":
+"@azure/identity@^1.1.0-preview":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@azure/identity/-/identity-1.1.0.tgz#e7c9a99d0408c7f8776d4f268a343d645971c662"
   integrity sha512-S4jYqegLWXIwVnkiArFlcTA7KOZmv+LMhQeQJhnmYy/CxrJHyIAEQyJ7qsrSt58bSyDZI2NkmKUBKaYGZU3/5g==
