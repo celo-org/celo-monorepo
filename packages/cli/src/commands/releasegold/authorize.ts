@@ -1,15 +1,15 @@
 import { flags } from '@oclif/command'
+import { ReleaseGoldBaseCommand } from '../../release-gold-base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-import { ReleaseGoldCommand } from './release-gold'
 
-export default class Authorize extends ReleaseGoldCommand {
+export default class Authorize extends ReleaseGoldBaseCommand {
   static description =
     'Authorize an alternative key to be used for a given action (Vote, Validate, Attest) on behalf of the ReleaseGold instance contract.'
 
   static flags = {
-    ...ReleaseGoldCommand.flags,
+    ...ReleaseGoldBaseCommand.flags,
     role: flags.string({ required: true, options: ['vote', 'validator', 'attestation'] }),
     signer: Flags.address({
       required: true,
