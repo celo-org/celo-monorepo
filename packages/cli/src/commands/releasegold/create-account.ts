@@ -1,11 +1,11 @@
+import { ReleaseGoldBaseCommand } from '../../release-gold-base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
-import { ReleaseGoldCommand } from './release-gold'
-export default class CreateAccount extends ReleaseGoldCommand {
+export default class CreateAccount extends ReleaseGoldBaseCommand {
   static description = 'Creates a new account for the ReleaseGold instance'
 
   static flags = {
-    ...ReleaseGoldCommand.flags,
+    ...ReleaseGoldBaseCommand.flags,
   }
 
   static args = []
