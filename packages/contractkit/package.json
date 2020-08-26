@@ -27,7 +27,7 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
-    "@azure/identity": "^1.1.0-preview",
+    "@azure/identity": "^1.1.0",
     "@azure/keyvault-keys": "^4.1.0",
     "@azure/keyvault-secrets": "^4.1.0",
     "@celo/base": "0.0.2-dev",
