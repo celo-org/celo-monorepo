@@ -500,8 +500,7 @@ jobs:
           name: Verify RC1 bytecode
           command: |
             yarn --cwd packages/protocol download-artifacts -n rc1
-            yarn --cwd packages/protocol build:ts
-            yarn --cwd packages/protocol truffle exec --network rc1 scripts/truffle/verify-bytecode.js --rc1_forno
+            yarn --cwd packages/protocol truffle exec --network rc1 scripts/truffle/verify-bytecode.js --rc1_forno --build_artifacts build/rc1/contracts
 
   protocol-test-compatibility:
     <<: *defaults
