@@ -597,6 +597,7 @@ export const simulateClient = async (
 }
 
 export const onLoadTestTxResult = async (
+  // @ts-ignore
   kit: ContractKit,
   senderAddress: string,
   txResult: TransactionResult,
@@ -639,15 +640,15 @@ export const onLoadTestTxResult = async (
     )
   }
 
-  await validateGethRPC(kit, txHash, senderAddress, (isError, data) => {
-    if (isError) {
-      tracerLog({
-        tag: LOG_TAG_GETH_RPC_ERROR,
-        ...data,
-        ...baseLogMessage,
-      })
-    }
-  })
+  // await validateGethRPC(kit, txHash, senderAddress, (isError, data) => {
+  //   if (isError) {
+  //     tracerLog({
+  //       tag: LOG_TAG_GETH_RPC_ERROR,
+  //       ...data,
+  //       ...baseLogMessage,
+  //     })
+  //   }
+  // })
 }
 
 /**
