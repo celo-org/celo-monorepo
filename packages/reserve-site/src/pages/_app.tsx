@@ -8,7 +8,10 @@ export default function App({ Component, pageProps }) {
   const { FATHOM_KEY } = getConfig().publicRuntimeConfig
   useEffect(() => {
     // Initialize Fathom when the app loads
-    Fathom.load(FATHOM_KEY)
+    Fathom.load(FATHOM_KEY, {
+      excludedDomains: ['localhost'],
+    })
+
     function onRouteChangeComplete() {
       Fathom.trackPageview()
     }
