@@ -95,6 +95,7 @@
     "@types/yargs": "^13.0.2",
     "cross-env": "^5.1.6",
     "eth-gas-reporter": "^0.2.16",
+    "node-html-parser": "^1.2.20",
     "nodemailer": "^4.6.8",
     "targz": "^1.0.1",
     "tmp": "^0.1.0",
