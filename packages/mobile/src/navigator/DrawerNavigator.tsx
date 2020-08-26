@@ -18,6 +18,7 @@ import {
   DrawerActions,
   DrawerNavigationState,
   useLinkBuilder,
+  useNavigationState,
 } from '@react-navigation/native'
 import { TransitionPresets } from '@react-navigation/stack'
 import * as React from 'react'
@@ -50,6 +51,7 @@ import { Home } from 'src/icons/navigator/Home'
 import { Settings } from 'src/icons/navigator/Settings'
 import DrawerItem from 'src/navigator/DrawerItem'
 import { ensurePincode } from 'src/navigator/NavigationService'
+import { getActiveRouteName } from 'src/navigator/NavigatorWrapper'
 import { Screens } from 'src/navigator/Screens'
 import useSelector from 'src/redux/useSelector'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
@@ -78,6 +80,7 @@ function CustomDrawerItemList({
   ...passThroughProps
 }: CustomDrawerItemListProps) {
   const buildLink = useLinkBuilder()
+  const navigationState = useNavigationState((navState) => navState)
 
   return (state.routes.map((route, i) => {
     const focused = i === state.index
@@ -92,7 +95,8 @@ function CustomDrawerItemList({
       })
     }
     const onPress = () => {
-      if (protectedRoutes.includes(route.name)) {
+      const activeRouteName = getActiveRouteName(navigationState)
+      if (protectedRoutes.includes(route.name) && activeRouteName !== route.name) {
         // Route should be protected by PIN code
         ensurePincode()
           .then(navigateToItem)
