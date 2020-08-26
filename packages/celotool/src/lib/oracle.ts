@@ -408,7 +408,7 @@ export function getAWSClusterConfig(oracleContext: string): AWSClusterConfig {
 export function getOracleContextDynamicEnvVarValues<T>(
   dynamicEnvVars: { [k in keyof T]: DynamicEnvVar },
   oracleContext: string,
-  defaultValues?: { [k in keyof T]: string}
+  defaultValues?: { [k in keyof T]: string }
 ): {
   [k in keyof T]: string
 } {
@@ -432,7 +432,7 @@ export function getOracleContextDynamicEnvVarValues<T>(
 }
 
 /**
- * Reads the context and swithces to the appropriate Azure or AWS Cluster
+ * Reads the context and switches to the appropriate Azure or AWS Cluster
  */
 export async function switchToOracleContextCluster(celoEnv: string, oracleContext: string, checkOrPromptIfStagingOrProduction = true) {
   if (!isValidOracleContext(oracleContext)) {

@@ -15,7 +15,6 @@ import {
 } from './service-account-utils'
 import { outputIncludes, switchToProjectFromEnv as switchToGCPProjectFromEnv } from './utils'
 
-
 const helmChartPath = '../helm-charts/prometheus-stackdriver'
 const releaseName = 'prometheus-stackdriver'
 const kubeNamespace = 'prometheus'

@@ -172,10 +172,12 @@ release: {{ .Release.Name }}
     valueFrom:
       fieldRef:
         fieldPath: metadata.name
+{{- if .Values.aws }}
   - name: POD_IP
     valueFrom:
       fieldRef:
         fieldPath: status.podIP
+{{- end }}
 {{/* TODO: make this use IPC */}}
 {{- if .expose }}
   readinessProbe:

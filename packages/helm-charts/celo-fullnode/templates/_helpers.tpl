@@ -79,6 +79,11 @@ while [ $INDEX -lt {{ len .Values.geth.aws.all_subnet_cidr_blocks }} -a -z $IP_T
   fi
   INDEX=$((INDEX + 1))
 done
+# this should never happen, but let's be safe
+if [ -z $IP_TO_USE ]; then
+  echo "IP_TO_USE is not specified, failing"
+  exit 1
+fi
 echo "Using IP $IP_TO_USE from subnet $SUBNET_CIDR"
 NAT_FLAG="--nat=extip:${IP_TO_USE}"
 {{- end -}}
