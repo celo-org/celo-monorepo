@@ -90,6 +90,15 @@ exports[`Account renders correctly 1`] = `
   <RCTScrollView>
     <View>
       <Text
+        accessible={true}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
         style={
           Object {
             "color": "#2E3338",
@@ -2076,6 +2085,15 @@ exports[`Account renders correctly when dev mode active 1`] = `
   <RCTScrollView>
     <View>
       <Text
+        accessible={true}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
         style={
           Object {
             "color": "#2E3338",
