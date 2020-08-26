@@ -486,7 +486,7 @@ jobs:
           name: Unit tests
           command: yarn --cwd packages/protocol test common/
 
-  protocol-verify-baklava-bytecode:
+  protocol-verify-rc1-bytecode:
     <<: *defaults
     resource_class: large
     steps:
@@ -497,15 +497,11 @@ jobs:
           command: |
             ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
       - run:
-          name: Verify Baklava bytecode
+          name: Verify RC1 bytecode
           command: |
-            yarn --cwd packages/protocol download-artifacts -n baklava
-            yarn --cwd packages/celotool cli port-forward -e baklava &
-            PID=$!
-            sleep 10
+            yarn --cwd packages/protocol download-artifacts -n rc1
             yarn --cwd packages/protocol build:ts
-            yarn --cwd packages/protocol truffle exec --network baklava scripts/truffle/verify-bytecode.js
-            kill $PID
+            yarn --cwd packages/protocol truffle exec --network rc1 scripts/truffle/verify-bytecode.js --rc1_forno
 
   protocol-test-compatibility:
     <<: *defaults
@@ -977,7 +973,7 @@ workflows:
   celo-monorepo-build:
     jobs:
       - install_dependencies
-      - protocol-verify-baklava-bytecode:
+      - protocol-verify-rc1-bytecode:
           requires:
             - install_dependencies
   npm-install-testing-cron-workflow:
