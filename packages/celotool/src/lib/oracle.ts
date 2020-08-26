@@ -48,7 +48,7 @@ interface OracleConfig {
  * Env vars corresponding to each value for the AKSClusterConfig for a particular context
  */
 
-const oracleContextAKSClusterConfigDynamicEnvVars: { [k in keyof Omit<AKSClusterConfig, 'cloudProviderName'>]: DynamicEnvVar } = {
+const oracleContextAKSClusterConfigDynamicEnvVars: { [k in keyof Omit<AKSClusterConfig, 'cloudProvider'>]: DynamicEnvVar } = {
   clusterName: DynamicEnvVar.ORACLE_KUBERNETES_CLUSTER_NAME,
   subscriptionId: DynamicEnvVar.ORACLE_AZURE_SUBSCRIPTION_ID,
   tenantId: DynamicEnvVar.ORACLE_AZURE_TENANT_ID,
@@ -58,7 +58,7 @@ const oracleContextAKSClusterConfigDynamicEnvVars: { [k in keyof Omit<AKSCluster
 /**
  * Env vars corresponding to each value for the AwslusterConfig for a particular context
  */
-const oracleContextAWSClusterConfigDynamicEnvVars: { [k in keyof Omit<AWSClusterConfig, 'cloudProviderName'>]: DynamicEnvVar } = {
+const oracleContextAWSClusterConfigDynamicEnvVars: { [k in keyof Omit<AWSClusterConfig, 'cloudProvider'>]: DynamicEnvVar } = {
   clusterName: DynamicEnvVar.ORACLE_KUBERNETES_CLUSTER_NAME,
   clusterRegion: DynamicEnvVar.ORACLE_AWS_CLUSTER_REGION,
   resourceGroupTag: DynamicEnvVar.ORACLE_AWS_RESOURCE_GROUP_TAG,
@@ -375,7 +375,7 @@ function getOracleAzureIdentityName(keyVaultName: string, address: string) {
 export function getAKSClusterConfig(oracleContext: string): AKSClusterConfig {
   const azureDynamicEnvVars = getOracleContextDynamicEnvVarValues(oracleContextAKSClusterConfigDynamicEnvVars, oracleContext)
   const clusterConfig: AKSClusterConfig = {
-    cloudProviderName: 'azure',
+    cloudProvider: CloudProvider.AZURE,
     ...azureDynamicEnvVars
   }
   return clusterConfig
@@ -389,7 +389,7 @@ export function getAKSClusterConfig(oracleContext: string): AKSClusterConfig {
 export function getAWSClusterConfig(oracleContext: string): AWSClusterConfig {
   const awsDynamicEnvVars = getOracleContextDynamicEnvVarValues(oracleContextAWSClusterConfigDynamicEnvVars, oracleContext)
   const clusterConfig: AWSClusterConfig = {
-    cloudProviderName: 'aws',
+    cloudProvider: CloudProvider.AZURE,
     ...awsDynamicEnvVars
   }
   return clusterConfig

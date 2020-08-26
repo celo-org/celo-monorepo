@@ -55,13 +55,19 @@ component: celo-fullnode
  * want geth to use the IP address that corresponds to the particular availability zone
  * the pod is scheduled in.
 */}}
-{{- define "celo-fullnode.subnet-specific-nat-ip" -}}
+{{- define "celo-fullnode.aws-subnet-specific-nat-ip" -}}
+{{- if .Values.aws -}}
 IP_TO_USE=
 SUBNET_CIDR=
-SUBNET_CIDRS={{ join "," .Values.geth.all_subnet_cidr_blocks }}
-IP_ADDRESSES_PER_NODE={{ join "-" .Values.geth.ip_addresses_per_subnet_per_node }}
+SUBNET_CIDRS={{ join "," .Values.geth.aws.all_subnet_cidr_blocks }}
+IP_ADDRESSES_PER_NODE={{ join "-" .Values.geth.aws.ip_addresses_per_subnet_per_node }}
 INDEX=0
-while [ $INDEX -lt {{ len .Values.geth.all_subnet_cidr_blocks }} -a -z $IP_TO_USE ]; do
+# We have the CIDR blocks of all subnets, and an array of public IP addresses
+# for each full node that correspond to each subnet. We aim to use the pod IP
+# address to figure out which subnet CIDR blocks it belongs to, and use this
+# information to set the `--nat` flag to use an IP address that is being used by
+# the pod's network load balancer that lives in the same AZ this pod lives in.
+while [ $INDEX -lt {{ len .Values.geth.aws.all_subnet_cidr_blocks }} -a -z $IP_TO_USE ]; do
   SUBNET_CIDR=$(echo $SUBNET_CIDRS | cut -d ',' -f $((INDEX + 1)))
   NETMASK=$(ipcalc -m $SUBNET_CIDR | grep -Eow '[0-9.]+')
   NETWORK=$(ipcalc -n $POD_IP $NETMASK | grep -Eow '[0-9.]+')
@@ -75,4 +81,5 @@ while [ $INDEX -lt {{ len .Values.geth.all_subnet_cidr_blocks }} -a -z $IP_TO_US
 done
 echo "Using IP $IP_TO_USE from subnet $SUBNET_CIDR"
 NAT_FLAG="--nat=extip:${IP_TO_USE}"
+{{- end -}}
 {{- end -}}

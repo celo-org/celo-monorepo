@@ -143,7 +143,7 @@ release: {{ .Release.Name }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .pprof_port }} --pprofaddr 0.0.0.0"
     {{- end }}
 
-{{ .extra }}
+{{ .extra_setup }}
 
     exec geth \
       --bootnodes=$(cat /root/.celo/bootnodeEnode) \

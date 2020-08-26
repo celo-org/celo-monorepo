@@ -126,6 +126,16 @@ export function tagsArrayToAWSResourceTags(tagsArray: Array<{ [key: string]: str
   return tags
 }
 
+export async function getAllSubnetsSortedByAZ(clusterName: string): Promise<any> {
+  const [subnetsStr] = await execCmdWithExitOnFailure(
+    `aws ec2 describe-subnets --filters "Name=tag-key,Values=kubernetes.io/cluster/${clusterName}" --query "Subnets" --output json`
+  )
+  const subnets = JSON.parse(subnetsStr)
+  return subnets.sort((a: any, b: any) =>
+    b.AvailabilityZone < a.AvailabilityZone ? 1 : -1
+  )
+}
+
 /**
  * Given subnet information (likely given from teh AWS CLI), determines
  * if the subnet is publicly facing.

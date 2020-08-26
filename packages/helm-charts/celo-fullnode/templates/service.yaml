@@ -4,10 +4,13 @@ kind: Service
 metadata:
   name: {{ template "common.fullname" $ }}-{{ $index }}
   annotations:
-  # if values.geth.azureprovider, use below, else use aws
-  # service.beta.kubernetes.io/azure-load-balancer-mixed-protocols: "true"
+{{ if $.Values.azure }}
+    service.beta.kubernetes.io/azure-load-balancer-mixed-protocols: "true"
+{{ end }}
+{{ if $.Values.aws }}
     service.beta.kubernetes.io/aws-load-balancer-type: nlb
-    service.beta.kubernetes.io/aws-load-balancer-eip-allocations: {{ index $.Values.geth.eip_allocation_ids_per_public_subnet_per_node $index }}
+    service.beta.kubernetes.io/aws-load-balancer-eip-allocations: {{ index $.Values.geth.aws.eip_allocation_ids_per_public_subnet_per_node $index }}
+{{ end }}
   labels:
 {{ include "celo-fullnode.labels" $ | indent 4 }}
 spec:

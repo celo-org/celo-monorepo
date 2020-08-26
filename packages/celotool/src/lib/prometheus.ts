@@ -7,7 +7,7 @@ import {
   removeGenericHelmChart,
   upgradeGenericHelmChart
 } from './helm_deploy'
-import { BaseClusterConfig } from './k8s-cluster/base'
+import { BaseClusterConfig, CloudProvider } from './k8s-cluster/base'
 import {
   createServiceAccountIfNotExists,
   getServiceAccountEmail,
@@ -120,7 +120,11 @@ async function createPrometheusGcloudServiceAccount(serviceAccountName: string) 
 }
 
 function getServiceAccountName(clusterConfig: BaseClusterConfig) {
-  const prefix = (clusterConfig.cloudProviderName === 'azure') ? 'aks' : 'aws'
+  const prefixByCloudProvider: { [key in CloudProvider]: string } = {
+    [CloudProvider.AWS]: 'aws',
+    [CloudProvider.AZURE]: 'aks',
+  }
+  const prefix = prefixByCloudProvider[clusterConfig.cloudProvider]
   // Ensure the service account name is within the length restriction
   // and ends with an alphanumeric character
   return `prometheus-${prefix}-${clusterConfig.clusterName}`.substring(0, 30).replace(/[^a-zA-Z0-9]+$/g, '')

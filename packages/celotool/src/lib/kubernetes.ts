@@ -50,6 +50,7 @@ export async function deleteResource(
   const run = () => execFn(`kubectl delete ${type} ${resourceName} --namespace ${namespace}`)
   if (allowFail) {
     try {
+      // By awaiting here, we ensure that a rejected promise gets caught
       return await run()
     } catch (e) {
       console.info('Error deleting resource, not failing', e)

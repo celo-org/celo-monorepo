@@ -8,8 +8,8 @@ export enum CloudProvider {
 }
 
 export interface BaseClusterConfig {
+  cloudProvider: CloudProvider
   clusterName: string
-  cloudProviderName: string
 }
 
 export abstract class BaseClusterManager {
