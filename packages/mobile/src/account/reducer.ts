@@ -111,15 +111,16 @@ export const reducer = (
         defaultCountryCode: action.countryCode,
       }
     case Actions.DEV_MODE_TRIGGER_CLICKED:
-      const newClickCount = (state.devModeClickCount + 1) % 6
-      const devModeActive = newClickCount >= 3
-      if (devModeActive) {
+      const newClickCount = (state.devModeClickCount + 1) % 10
+      if (newClickCount === 5) {
         Logger.showMessage('Debug Mode Activated')
+      } else if (newClickCount === 0) {
+        Logger.showMessage('Debug Mode Deactivated')
       }
       return {
         ...state,
         devModeClickCount: newClickCount,
-        devModeActive,
+        devModeActive: newClickCount >= 5,
       }
     case Actions.PHOTOSNUX_CLICKED:
       return {
