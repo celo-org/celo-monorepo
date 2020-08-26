@@ -226,6 +226,7 @@ const validateGethRPC = async (
     location: '[GethRPC]',
     error: `Contractkit did not return a valid transaction`,
   })
+  console.log(`jcortejoso transaction: ${transaction}`)
   const txFrom = transaction.from.toLowerCase()
   const expectedFrom = from.toLowerCase()
   handleError(!transaction.from || expectedFrom !== txFrom, {
