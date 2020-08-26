@@ -10,7 +10,7 @@ var net = require('net')
 
 const argv = require('minimist')(process.argv.slice(2), {
   string: ['truffle_override', 'network'],
-  boolean: ['reset'],
+  boolean: ['reset', 'rc1_forno'],
 })
 
 const SOLC_VERSION = '0.5.13'
@@ -180,6 +180,14 @@ if (argv.truffle_override || !(argv.network in networks)) {
     networks[argv.network] = { ...networks[argv.network], ...configOverride }
   } else {
     networks[argv.network] = { ...defaultConfig, ...configOverride }
+  }
+}
+
+if (argv.rc1_forno) {
+  networks['rc1'].host = undefined
+  networks['rc1'].port = undefined
+  networks['rc1'].provider = function() {
+    return new Web3.providers.HttpProvider('https://rc1-forno.celo-testnet.org')
   }
 }
 
