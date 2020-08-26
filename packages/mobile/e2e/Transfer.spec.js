@@ -111,6 +111,9 @@ describe('Transfer Works', () => {
       // On iOS, type one more space to workaround onChangeText not being triggered with replaceText above
       // and leaving the restore button disabled
       await element(by.id('ImportWalletBackupKeyInputField')).typeText(' ')
+    } else if (device.getPlatform() === 'android') {
+      // Press back button to close the keyboard
+      await device.pressBack()
     }
 
     await element(by.id('ImportWalletButton')).tap()
@@ -210,7 +213,8 @@ describe('Transfer Works', () => {
     await element(by.id('Education/progressButton')).tap()
     await waitFor(element(by.id('WithdrawCELO')))
       .toBeVisible()
-      .withTimeout(10000)
+      .whileElement(by.id('ExchangeScrollView'))
+      .scroll(50, 'down')
     // Go to the Withdraw Celo screen and fill the data.
     await element(by.id('WithdrawCELO')).tap()
     await waitFor(element(by.id('AccountAddress')))
