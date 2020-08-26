@@ -122,6 +122,7 @@
   "addressLookupFailure": "Failed to look up phone number address",
   "saltFetchFailure": "Failed to retrieve phone number secret",
   "saltQuotaExceededError": "Your phone number lookup quota is used up",
+  "odisInsufficientBalance": "Your balance is too low to complete this process",
   "matchmakingQuotaExceededError": "Matchmaking can be done only once",
   "paymentLimitReached": "The daily limit is {{dailyLimitcUSD}} cUSD ({{currencySymbol}}{{dailyLimit}})\n{{dailyRemainingcUSD}} cUSD ({{currencySymbol}}{{dailyRemaining}}) remaining",
   "ordinals": [

@@ -217,6 +217,8 @@ export function* doVerificationFlow() {
     Logger.error(TAG, 'Error occured during verification flow', error)
     if (error.message === ErrorMessages.SALT_QUOTA_EXCEEDED) {
       yield put(setVerificationStatus(VerificationStatus.SaltQuotaExceeded))
+    } else if (error.message === ErrorMessages.ODIS_INSUFFICIENT_BALANCE) {
+      yield put(setVerificationStatus(VerificationStatus.InsufficientBalance))
     } else {
       yield put(setVerificationStatus(VerificationStatus.Failed))
       yield put(showErrorOrFallback(error, ErrorMessages.VERIFICATION_FAILURE))
