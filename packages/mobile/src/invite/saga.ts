@@ -53,7 +53,7 @@ import { registerAccountDek } from 'src/web3/dataEncryptionKey'
 import { getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 
 const TAG = 'invite/saga'
-export const REDEEM_INVITE_TIMEOUT = 2 * 60 * 1000 // 2 minutes
+export const REDEEM_INVITE_TIMEOUT = 1.5 * 60 * 1000 // 1.5 minutes
 export const INVITE_FEE = '0.25'
 // TODO: Extract offline gas estimation into an independent library.
 // Hardcoding estimate at 1/2 cent. Fees are currently an order of magnitude smaller ($0.0003)

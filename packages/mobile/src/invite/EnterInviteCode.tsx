@@ -163,6 +163,12 @@ export class EnterInviteCode extends React.Component<Props, State> {
                       onInputChange={this.onInputChange}
                       shouldShowClipboard={this.shouldShowClipboard}
                     />
+                    {isRedeemingInvite && (
+                      <View style={styles.loadingContainer}>
+                        <Text style={styles.loadingText}>{t('inviteCode.loadingHeader')}</Text>
+                        <Text style={styles.loadingText}>{t('inviteCode.loadingBody')}</Text>
+                      </View>
+                    )}
                   </View>
                   {isSkippingInvite && (
                     <View>
@@ -177,7 +183,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
                           <Text onPress={this.onPressSkip} style={styles.askInviteLink} />
                         </Trans>
                       </Text>
-                    ) : (
+                    ) : !isRedeemingInvite ? (
                       <TextButton
                         style={styles.bottomButton}
                         onPress={this.onPressSkip}
@@ -185,7 +191,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
                       >
                         {t('inviteCode.noCode')}
                       </TextButton>
-                    )}
+                    ) : null}
                   </View>
                 </KeyboardAwareScrollView>
                 <KeyboardSpacer onToggle={this.onToggleKeyboard} />
@@ -227,6 +233,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: colors.onboardingBrownLight,
     padding: 16,
+  },
+  loadingContainer: {
+    marginTop: 16,
+  },
+  loadingText: {
+    textAlign: 'center',
+    ...fontStyles.regular,
+    color: colors.onboardingBrownLight,
   },
 })
 
