@@ -19,7 +19,7 @@ import { e164NumberSelector } from 'src/account/selectors'
 import { showError, showErrorOrFallback } from 'src/alert/actions'
 import { VerificationEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { setNumberVerified } from 'src/app/actions'
+import { setNumberVerified, setVerificationPossible } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { DEFAULT_TESTNET, SMS_RETRIEVER_APP_SIGNATURE } from 'src/config'
 import { features } from 'src/flags'
@@ -34,7 +34,11 @@ import {
   setCompletedCodes,
   setVerificationStatus,
 } from 'src/identity/actions'
-import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
+import {
+  balanceSufficientForQuotaRetrieval,
+  fetchPhoneHashPrivate,
+  getSaltCache,
+} from 'src/identity/privateHashing'
 import { acceptedAttestationCodesSelector, attestationCodesSelector } from 'src/identity/reducer'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
 import { VerificationStatus } from 'src/identity/types'
@@ -62,6 +66,13 @@ export enum CodeInputType {
 export interface AttestationCode {
   code: string
   issuer: string
+}
+
+export function* isSufficientBalance() {
+  const e164Number: string = yield select(e164NumberSelector)
+  const cachedSalt = yield call(getSaltCache, e164Number)
+  const isSufficientForQuota = cachedSalt ? true : yield call(balanceSufficientForQuotaRetrieval)
+  yield put(setVerificationPossible(isSufficientForQuota))
 }
 
 export function* startVerification() {

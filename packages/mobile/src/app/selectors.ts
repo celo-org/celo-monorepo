@@ -19,3 +19,5 @@ export const getLastTimeBackgrounded = (state: RootState) => {
 export const sessionIdSelector = (state: RootState) => {
   return state.app.sessionId
 }
+
+export const verificationPossibleSelector = (state: RootState) => state.app.verificationPossible

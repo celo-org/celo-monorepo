@@ -3,6 +3,7 @@ import { render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import { DAYS_TO_BACKUP } from 'src/backup/utils'
 import NotificationBox from 'src/home/NotificationBox'
+import { VerificationStatus } from 'src/identity/types'
 import { createMockStore, getElementText } from 'test/utils'
 import { mockPaymentRequests } from 'test/values'
 
@@ -175,6 +176,9 @@ describe('NotificationBox', () => {
         ...storeDataNotificationsDisabled.account,
         dismissedGetVerified: false,
       },
+      app: {
+        verificationPossible: true,
+      },
     })
     const { getByText } = render(
       <Provider store={store}>
@@ -182,5 +186,24 @@ describe('NotificationBox', () => {
       </Provider>
     )
     expect(getByText('nuxVerification2:notification.body')).toBeTruthy()
+  })
+
+  it('does not render verification reminder when insufficient balance', () => {
+    const store = createMockStore({
+      ...storeDataNotificationsDisabled,
+      account: {
+        ...storeDataNotificationsDisabled.account,
+        dismissedGetVerified: false,
+      },
+      identity: {
+        verificationStatus: VerificationStatus.InsufficientBalance,
+      },
+    })
+    const { queryByText } = render(
+      <Provider store={store}>
+        <NotificationBox />
+      </Provider>
+    )
+    expect(queryByText('nuxVerification2:notification.body')).toBeFalsy()
   })
 })

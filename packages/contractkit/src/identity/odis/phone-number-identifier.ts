@@ -1,4 +1,5 @@
 import { getPhoneHash, isE164Number } from '@celo/base/lib/phoneNumbers'
+import BigNumber from 'bignumber.js'
 import { createHash } from 'crypto'
 import debugFactory from 'debug'
 import { soliditySha3 } from 'web3-utils'
@@ -10,6 +11,10 @@ import {
   SignMessageRequest,
   SignMessageResponse,
 } from './query'
+
+// ODIS minimum dollar balance for pepper quota retrieval
+// TODO change this to new ODIS minimum dollar balance once deployed
+export const ODIS_MINIMUM_DOLLAR_BALANCE = 0.1
 
 const debug = debugFactory('kit:odis:phone-number-identifier')
 const sha3 = (v: string) => soliditySha3({ type: 'string', value: v })
@@ -85,4 +90,11 @@ export function getPepperFromThresholdSignature(sigBuf: Buffer) {
     .update(sigBuf)
     .digest('base64')
     .slice(0, PEPPER_CHAR_LENGTH)
+}
+
+/**
+ * Check if balance is sufficient for quota retrieval
+ */
+export function isSufficientBalanceForQuotaRetrieval(balance: BigNumber.Value) {
+  return new BigNumber(balance).isGreaterThanOrEqualTo(ODIS_MINIMUM_DOLLAR_BALANCE)
 }

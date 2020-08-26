@@ -14,6 +14,7 @@ export enum Actions {
   SET_APP_STATE = 'APP/SET_APP_STATE',
   SET_LOGGED_IN = 'APP/SET_LOGGED_IN',
   SET_NUMBER_VERIFIED = 'APP/SET_NUMBER_VERIFIED',
+  SET_VERIFICATION_POSSIBLE = 'APP/SET_VERIFICATION_POSSIBLE',
   SET_LANGUAGE = 'APP/SET_LANGUAGE',
   OPEN_DEEP_LINK = 'APP/OPEN_DEEP_LINK',
   RESET_APP_OPENED_STATE = 'APP/RESET_APP_OPENED_STATE',
@@ -40,6 +41,11 @@ interface SetLoggedIn {
 interface SetNumberVerifiedAction {
   type: Actions.SET_NUMBER_VERIFIED
   numberVerified: boolean
+}
+
+interface SetVerificationPossible {
+  type: Actions.SET_VERIFICATION_POSSIBLE
+  verificationPossible: boolean
 }
 
 export interface SetLanguage {
@@ -91,6 +97,7 @@ export type ActionTypes =
   | SetAppState
   | SetLoggedIn
   | SetNumberVerifiedAction
+  | SetVerificationPossible
   | ResetAppOpenedState
   | SetLanguage
   | OpenDeepLink
@@ -115,6 +122,11 @@ export const setLoggedIn = (loggedIn: boolean) => ({
 export const setNumberVerified = (numberVerified: boolean) => ({
   type: Actions.SET_NUMBER_VERIFIED,
   numberVerified,
+})
+
+export const setVerificationPossible = (verificationPossible: boolean) => ({
+  type: Actions.SET_VERIFICATION_POSSIBLE,
+  verificationPossible,
 })
 
 export const setLanguage = (language: string) => {
