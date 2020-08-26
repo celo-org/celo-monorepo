@@ -156,7 +156,7 @@ export class ContractKit {
     const gasPriceMinimum = await this.contracts.getGasPriceMinimum()
     const rawGasPrice = await gasPriceMinimum.getGasPriceMinimum(currency)
     const gasPrice = rawGasPrice.multipliedBy(this.gasPriceSuggestionMultiplier).toFixed()
-    this.communication.setGasPriceForCurrency(currency, gasPrice)
+    await this.communication.setGasPriceForCurrency(currency, gasPrice)
   }
 
   async getEpochSize(): Promise<number> {
