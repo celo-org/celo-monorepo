@@ -91,9 +91,10 @@ const DefaultConfig = {
     frozen: false,
   },
   gasPriceMinimum: {
-    minimumFloor: 100000000,
-    targetDensity: 1 / 2,
-    adjustmentSpeed: 1 / 2,
+    minimumFloor: 1,
+    targetDensity: 1,
+    // adjustmentSpeed: 1 / 2,
+    adjustmentSpeed: 0,
   },
   goldToken: {
     frozen: false,
@@ -259,6 +260,7 @@ const DefaultConfig = {
 
     // Register cLabs groups to contain an initial set of validators to run test networks.
     validatorKeys: [],
+    validatorGroupKeys: [],
     attestationKeys: [],
     groupName: 'cLabs',
     commission: 0.1,
@@ -516,6 +518,12 @@ const NetworkConfigs = {
 
 NetworkConfigs.baklavastaging = NetworkConfigs.baklava
 NetworkConfigs.alfajoresstaging = NetworkConfigs.alfajores
+NetworkConfigs.loadtesting = NetworkConfigs.development
+NetworkConfigs.loadtesting.gasPriceMinimum = {
+  adjustmentSpeed: 0,
+  minimumFloor: 100000000,
+  targetDensity: 1 / 2,
+}
 
 const linkedLibraries = {
   FixidityLib: [
@@ -555,6 +563,7 @@ const config = lodash.cloneDeep(DefaultConfig)
 
 const migrationOverride = argv.migration_override ? JSON.parse(argv.migration_override) : {}
 
+// TODO(jcortejoso): Now default config is development. Use the `ENV_TYPE` variable to get the config
 const networkOverride =
   argv.network && argv.network in NetworkConfigs ? argv.network : `development`
 

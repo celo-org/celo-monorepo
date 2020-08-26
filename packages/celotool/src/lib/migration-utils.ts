@@ -1,4 +1,5 @@
 /* tslint:disable:no-console */
+// import { config } from '@celo/protocol/migrationsConfig'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   AccountType,
@@ -23,6 +24,19 @@ export function validatorKeys() {
     AccountType.VALIDATOR,
     fetchEnv(envVar.MNEMONIC),
     parseInt(fetchEnv(envVar.VALIDATORS), 10)
+  ).map(ensure0x)
+}
+
+export function validatorGroupKeys() {
+  const validatorCount = parseInt(fetchEnv(envVar.VALIDATORS), 10)
+  // const maxGroupSize = config.validators.maxGroupSize
+  const maxGroupSize = 5 // TODO
+  const validatorGroupCountFloor = Math.floor(validatorCount/maxGroupSize)
+  const validatorGroupCount = validatorCount % maxGroupSize === 0 ? validatorGroupCountFloor : validatorGroupCountFloor + 1
+  return getPrivateKeysFor(
+    AccountType.VALIDATOR_GROUP,
+    fetchEnv(envVar.MNEMONIC),
+    validatorGroupCount
   ).map(ensure0x)
 }
 
@@ -60,6 +74,7 @@ export function migrationOverrides(faucet: boolean) {
     ...overrides,
     validators: {
       validatorKeys: validatorKeys(),
+      validatorGroupKeys: validatorGroupKeys(),
       attestationKeys: getAttestationKeys(),
     },
   }

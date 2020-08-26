@@ -114,22 +114,21 @@ spec:
           --rpc \
           --rpcapi=eth,web3,debug,admin,personal,net \
           --allow-insecure-unlock \
-          --bootnodes=enode://$(cat /root/.celo/bootnodeEnode) \
           --rpcvhosts=* \
           --networkid={{ $.Values.geth.networkID }} \
           --nodekey=/root/.celo/pkey{{ $index }} \
           --syncmode=lightest \
           --consoleformat=json \
           --consoleoutput=stdout \
-          --verbosity=1 \
+          --verbosity=4 \
           --unlock=$ACCOUNT_ADDRESS \
           --password=/root/.celo/account/accountSecret \
           --port {{ add 30303 $index }} \
           --rpcport {{ add 8545 $index }}
         resources:
           requests:
-            memory: 200Mi
-            cpu: 50m
+            memory: 500Mi
+            cpu: 400m
         volumeMounts:
         - name: data
           mountPath: /root/.celo_share
@@ -161,11 +160,11 @@ spec:
               --mnemonic "$MNEMONIC" \
               --blockscout-url {{ .Values.blockscout.url }} \
               --blockscoutMeasurePercent {{ .Values.blockscout.measurePercent }} \
-              --client-count {{ .Values.threads | default "1" }} > /dev/null
+              --client-count {{ .Values.threads | default "1" }}
         resources:
           requests:
-            memory: 256Mi
-            cpu: 25m
+            memory: 500Mi
+            cpu: 400m
         env:
         - name: MNEMONIC
           valueFrom:

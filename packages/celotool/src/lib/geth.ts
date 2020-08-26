@@ -501,6 +501,7 @@ export const simulateClient = async (
   // Assume the node is accessible via localhost with senderAddress unlocked
   const kit = newKit(web3Provider)
   kit.defaultAccount = senderAddress
+  const gasPriceFixed = 200000000
 
   const baseLogMessage: any = {
     loadTestID: index,
@@ -543,13 +544,17 @@ export const simulateClient = async (
         gasPrice = new BigNumber(
           await gasPriceMinimum.getGasPriceMinimum(feeCurrency)
         ).times(1)
+        gasPrice = gasPriceFixed // TODO
         txOptions = {
           // gas: 70000,
           gasPrice: gasPrice.toString(),
           feeCurrency,
         }
       } else {
-        txOptions = {}
+        gasPrice = gasPriceFixed // TODO
+        txOptions = {
+          gasPrice: gasPrice.toString(),
+        }
       }
     } catch (error) {
       tracerLog({
