@@ -16,7 +16,7 @@ export async function getOrRegisterElasticIP(tags: AWSResourceTags) {
   }
 
   console.info(`Registering IP address with tags ${JSON.stringify(tags)}`)
-  // Allocate address on AWS and store allocationID
+  // Allocate address on AWS and get the allocationID
   const [allocationIDUntrimmed] = await execCmdWithExitOnFailure(
     `aws ec2 allocate-address --query '[AllocationId]' --output text`
   )
@@ -34,12 +34,20 @@ export async function getOrRegisterElasticIP(tags: AWSResourceTags) {
   return allocationID
 }
 
+/**
+ * @param allocationIDs array of elastic IP allocation IDs
+ * @return array of IP addresses corresponding to input allocationIDs
+ */
 export function getElasticIPAddressesFromAllocationIDs(allocationIDs: string[]) {
   return Promise.all(
     allocationIDs.map(getElasticIPAddressFromAllocationID)
   )
 }
 
+/**
+ * @param allocationID an elastic IP allocation ID
+ * @return the IP address of the elastic IP
+ */
 function getElasticIPAddressFromAllocationID(allocationID: string) {
   return describeElasticIPAddresses({}, {
     'allocation-ids': allocationID,
@@ -47,6 +55,10 @@ function getElasticIPAddressFromAllocationID(allocationID: string) {
   })
 }
 
+/**
+ * Deallocates a specific elastic IP
+ * @param allocationID an elastic IP allocation ID
+ */
 export async function deallocateAWSStaticIP(allocationID: string) {
   console.info(`Deallocating IP address with allocationID ${allocationID}`)
   return execCmdWithExitOnFailure(
@@ -72,12 +84,16 @@ export async function waitForElasticIPAssociationIDRemoval(allocationID: string)
     if (!associationID) {
       return
     }
-    console.log('sleeping', tryIntervalMs)
     await sleep(tryIntervalMs)
   }
   throw Error(`Too many tries waiting for elastic IP association ID removal`)
 }
 
+/**
+ * Runs the `aws ec2 describe-addresses` command given tags or custom command line flags
+ * @param tags tags to filter for
+ * @param cmdFlags optional command line flags to run the command with
+ */
 export async function describeElasticIPAddresses(tags: AWSResourceTags, cmdFlags?: { [key: string]: string }) {
   const filters = Object.entries(tags).map(([key, value]) =>
     `"Name=tag:${key},Values=${value}"`
@@ -94,8 +110,12 @@ export async function describeElasticIPAddresses(tags: AWSResourceTags, cmdFlags
   return JSON.parse(response)
 }
 
-// The AWS CLI gives tags in the form [{ "Key": "theKey", "Value": "theValue" }],
-// so we convert this into an object { "theKey": "theValue" }
+/**
+ * The AWS CLI gives tags in the form [{ "Key": "theKey", "Value": "theValue" }],
+ * this function we converts those into an object { "theKey": "theValue" }
+ * @param tagsArray an array of the form `[{ "Key": "theKey", "Value": "theValue" }, ...]`
+ * @return the corresponding AWSResourceTags object
+ */
 export function tagsArrayToAWSResourceTags(tagsArray: Array<{ [key: string]: string }>): AWSResourceTags {
   const tags: AWSResourceTags = {}
   for (const tag of tagsArray) {
@@ -106,8 +126,12 @@ export function tagsArrayToAWSResourceTags(tagsArray: Array<{ [key: string]: str
   return tags
 }
 
+/**
+ * Given subnet information (likely given from teh AWS CLI), determines
+ * if the subnet is publicly facing.
+ */
 export function subnetIsPublic(subnet: any): boolean {
-    const tags = tagsArrayToAWSResourceTags(subnet.Tags)
-    // If the subnet is public, it will have a tag of this name
-    return tags.hasOwnProperty('kubernetes.io/role/elb')
-  }
+  const tags = tagsArrayToAWSResourceTags(subnet.Tags)
+  // If the subnet is public, it will have a tag of this name
+  return tags.hasOwnProperty('kubernetes.io/role/elb')
+}

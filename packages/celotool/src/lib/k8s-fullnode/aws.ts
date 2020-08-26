@@ -11,15 +11,31 @@ export interface AWSFullNodeDeploymentConfig extends BaseFullNodeDeploymentConfi
 
 export class AWSFullNodeDeployer extends BaseFullNodeDeployer {
 
+  /**
+   * Gets AWS-specific helm parameters.
+   * The most complicated part of this is to do with IP addresses.
+   * A multi-availability zone (AZ) cluster will have multiple subnets, where
+   * each subnet belongs to only one AZ. The recommended & default approach is to have
+   * 1 public and 1 private subnet per AZ. A network load balancer requires
+   * a distinct public elastic IP address per public subnet. So if there are N
+   * subnets, we must supply N distinct elastic IP addresses for a particular
+   * network load balancer. Because geth only accommodates using 1 public IP
+   * address with the `--nat` flag, we must choose 1 of the N IP addresses for
+   * geth to use. To be extra resilient to AZ failures, we want to make sure that
+   * the IP address geth decides to use for the `--nat` flag is the IP address
+   * that is being used by the network load balancer in the same AZ that the
+   * geth pod has been scheduled.
+   */
   async additionalHelmParameters() {
+    // Gets public & private subnets
     const subnets = await this.getAllSubnetsSortedByAZ()
-    console.log('subnets', subnets)
-    const allocationIDPerPublicSubnetPerFullNode: Array<{
+    // Gives a mapping of (public) subnetID -> allocationID for each full node
+    const allocationIDPerPublicSubnetForEachFullNode: Array<{
       [subnetID: string]: string
     }> = await this.allocateElasticIPs()
-    console.log('allocationIDPerPublicSubnetPerFullNode', allocationIDPerPublicSubnetPerFullNode)
     const publicSubnets = subnets.filter(subnetIsPublic)
 
+    // Maps az -> (public) subnetID
     const publicSubnetIDPerAZ: {
       [az: string]: string
     } = publicSubnets.reduce((
@@ -28,24 +44,29 @@ export class AWSFullNodeDeployer extends BaseFullNodeDeployer {
       },
       subnet: any
     ) => {
-      console.log('agg', agg, 'subnet.AvailabilityZone', subnet.AvailabilityZone)
       return {
         ...agg,
         [subnet.AvailabilityZone]: subnet.SubnetId
       }
     }, {})
 
-    const allocationIDForEachPublicSubnetPerFullNode: string[][] = allocationIDPerPublicSubnetPerFullNode.map(
+    // For each full node, gives an array of IP allocation IDs that will be used
+    // for the full node's corresponding network load balancer. If there are N
+    // subnets, there are N required IP addresses. The ordered list of IP allocation
+    // IDs are assigned to subnets based off the alphabetical order of the AZs that the subnets
+    // are in.
+    const allocationIDForEachPublicSubnetForEachFullNode: string[][] = allocationIDPerPublicSubnetForEachFullNode.map(
       (allocationIDPerPublicSubnet: {
         [subnetID: string]: string
       }) =>
         publicSubnets.map((publicSubnet: any) => allocationIDPerPublicSubnet[publicSubnet.SubnetId])
       )
 
-    const ipAddressPerPublicSubnetPerFullNode: Array<{
+    // For each full node, gives a mapping of (public) subnetID -> IPv4 IP address
+    const ipAddressPerPublicSubnetForEachFullNode: Array<{
       [subnetID: string]: string
     }> = await Promise.all(
-      allocationIDPerPublicSubnetPerFullNode.map(
+      allocationIDPerPublicSubnetForEachFullNode.map(
         async (allocationIDPerPublicSubnet: {
           [subnetID: string]: string
         }) => {
@@ -63,33 +84,44 @@ export class AWSFullNodeDeployer extends BaseFullNodeDeployer {
       )
     )
 
-    console.log('ipAddressPerPublicSubnetPerFullNode', ipAddressPerPublicSubnetPerFullNode)
-
-    console.log('publicSubnetIDPerAZ', publicSubnetIDPerAZ)
-
-    const ipAddressForEachSubnetPerFullNode: string[][] = ipAddressPerPublicSubnetPerFullNode.map(
+    // For each full node, gives an array of the IP addresses that are intended to
+    // be used with the corresponding subnets (public or private) when the subnets
+    // are sorted by availability zone. Because a network load balancer assigns
+    // an ordered list of IP addresses to subnets by sorting the subnets by AZ,
+    // we can use this 2d array to let a pod determine which IP address to use for
+    // the geth --nat flag if the pod knows which subnet it is in.
+    const ipAddressForEachSubnetForEachFullNode: string[][] = ipAddressPerPublicSubnetForEachFullNode.map(
       (ipAddressPerPublicSubnet: {
         [subnetID: string]: string
       }) => {
         return subnets.map((subnet: any) => {
-          console.log('subnet.AvailabilityZone', subnet.AvailabilityZone)
-          console.log('publicSubnetIDPerAZ[subnet.AvailabilityZone]', publicSubnetIDPerAZ[subnet.AvailabilityZone])
           const publicSubnetIDForThisAZ = publicSubnetIDPerAZ[subnet.AvailabilityZone]
           return ipAddressPerPublicSubnet[publicSubnetIDForThisAZ]
        })
       }
     )
 
-    console.log('ipAddressForEachSubnetPerFullNode', ipAddressForEachSubnetPerFullNode)
-
-    const allocationIdsPerPublicSubnetPerNodeParamStr = allocationIDForEachPublicSubnetPerFullNode.map((allocIDs: string[]) =>
+    // Effectively an array of comma separated allocation IDs to pass to helm.
+    // Gives the allocation IDs of the IP addresses for public subnets for
+    // each full node to be used by the NLB.
+    const allocationIdsPerPublicSubnetPerNodeParamStr = allocationIDForEachPublicSubnetForEachFullNode.map((allocIDs: string[]) =>
       allocIDs.join('\\\,')
     ).join(',')
 
+    // Subnet CIDR blocks, sorted by AZ. Given these CIDR ranges, a pod can
+    // determine which subnet it belongs to by looking at its own IP address
     const subnetCIDRBlocks = subnets.map((subnet: any) => subnet.CidrBlock)
-    console.log('subnetCIDRBlocks', subnetCIDRBlocks)
 
-    const ipAddressesPerSubnetPerNode = ipAddressForEachSubnetPerFullNode.map((ips: string[]) =>
+    // An array of comma separated IPv4 addresses, each IP address corresponds
+    // to a subnet when the subnets are sorted by AZ. For example, if there is a
+    // public subnet PUBLIC_A, a private subnet PRIVATE_A, both in us-west2-a,
+    // and the same for us-west2-b, public subnet PUBLIC_B, a private subnet PRIVATE_B,
+    // then we get the sorted subnets PUBLIC_A, PRIVATE_A, PUBLIC_B, PRIVATE_B.
+    // We then have IP address A.A.A.A and B.B.B.B, each in zones us-west2-a and
+    // us-west2-b respectively. Then, we get the IP addresses
+    // A.A.A.A, A.A.A.A, B.B.B.B, B.B.B.B because we want the indices of the
+    // IP addresses to correspond to the sorted subnets.
+    const ipAddressesPerSubnetPerNode = ipAddressForEachSubnetForEachFullNode.map((ips: string[]) =>
       ips.join('\\\,')
     )
 
@@ -155,8 +187,6 @@ export class AWSFullNodeDeployer extends BaseFullNodeDeployer {
             )
           )
           let index = 0
-          console.log('allocationIDPerSubnet', allocationIDPerSubnet)
-          console.log('index', index)
           return allocationIDPerSubnet.reduce(
             (obj: {
               [subnetID: string]: string
@@ -185,7 +215,6 @@ export class AWSFullNodeDeployer extends BaseFullNodeDeployer {
 
   async getAllSubnetsSortedByAZ(): Promise<any> {
     const clusterName: string = this.deploymentConfig.clusterConfig.clusterName
-    console.log(`aws ec2 describe-subnets --filters "Name=tag-key,Values=kubernetes.io/cluster/${clusterName}" --query "Subnets" --output json`)
     const [subnetsStr] = await execCmdWithExitOnFailure(
       `aws ec2 describe-subnets --filters "Name=tag-key,Values=kubernetes.io/cluster/${clusterName}" --query "Subnets" --output json`
     )

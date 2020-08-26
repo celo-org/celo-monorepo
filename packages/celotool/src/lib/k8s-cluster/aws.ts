@@ -11,7 +11,7 @@ export interface AWSClusterConfig extends BaseClusterConfig {
 
 export class AWSClusterManager extends BaseClusterManager {
   async switchToSubscription() {
-    // TODO: not yet supported
+    // TODO: not supported at the moment
   }
 
   async getAndSwitchToClusterContext() {
