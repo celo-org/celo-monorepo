@@ -1,10 +1,10 @@
 import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold'
 import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold'
 import { ParserOutput } from '@oclif/parser/lib/parse'
-import { BaseCommand } from '../../base'
-import { Flags } from '../../utils/command'
+import { BaseCommand } from './base'
+import { Flags } from './utils/command'
 
-export abstract class ReleaseGoldCommand extends BaseCommand {
+export abstract class ReleaseGoldBaseCommand extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
     contract: Flags.address({ required: true, description: 'Address of the ReleaseGold Contract' }),
