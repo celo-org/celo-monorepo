@@ -132,7 +132,7 @@ if [ $PLATFORM = "android" ]; then
     ./scripts/run_app.sh -p $PLATFORM -b
   fi
 
-  if [ $DEV = false ]; then
+  if [ $DEV_MODE = false ]; then
     echo "Building detox"
     yarn detox build -c $CONFIG_NAME
 
