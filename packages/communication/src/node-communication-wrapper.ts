@@ -59,10 +59,10 @@ export class NodeCommunicationWrapper {
     }
     try {
       if (!(provider instanceof CeloProvider)) {
+        this.rpcCaller = new DefaultRpcCaller(provider)
         provider = new CeloProvider(provider, this)
       }
       this.web3.setProvider(provider as any)
-      this.rpcCaller = new DefaultRpcCaller(provider)
       return true
     } catch {
       return false
