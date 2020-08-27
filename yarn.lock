@@ -622,7 +622,7 @@
     tslib "^1.9.3"
     uuid "^3.3.2"
 
-"@azure/identity@^1.1.0-preview":
+"@azure/identity@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@azure/identity/-/identity-1.1.0.tgz#e7c9a99d0408c7f8776d4f268a343d645971c662"
   integrity sha512-S4jYqegLWXIwVnkiArFlcTA7KOZmv+LMhQeQJhnmYy/CxrJHyIAEQyJ7qsrSt58bSyDZI2NkmKUBKaYGZU3/5g==
@@ -2776,6 +2776,11 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
+"@celo/base@0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@celo/base/-/base-0.0.1.tgz#81e83aa430cba2a7424a4c016af58356404ea707"
+  integrity sha512-0hsd6hOUvt3o1DbiZKGpKghYhGQsu3eGApqHsXZtWRINHaakfxFGtZgI1r8u1iwqXenlAImCZ91P0WYNwsqI9A==
+
 "@celo/client@0.0.315":
   version "0.0.315"
   resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.315.tgz#1672802254d0533ab08b7ecd03f68b153ec3e6a4"
@@ -2824,6 +2829,37 @@
     web3-eth-abi "1.2.4"
     web3-eth-contract "1.2.4"
     web3-utils "1.2.4"
+
+"@celo/contractkit@0.4.12":
+  version "0.4.12"
+  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.4.12.tgz#bee540fc38035b12c6517f2415d4c6934133d802"
+  integrity sha512-fkIKyqP3MmEk4RWtgohBQwHelFQLKg8ozTjKmsqOeZS4thtGJyqEgKvXOaMqhlgBLhDjnxHBVacv/heJAfmZMQ==
+  dependencies:
+    "@azure/identity" "^1.0.2"
+    "@azure/keyvault-keys" "^4.0.2"
+    "@azure/keyvault-secrets" "^4.0.2"
+    "@celo/base" "0.0.1"
+    "@celo/utils" "0.1.18"
+    "@ledgerhq/hw-app-eth" "^5.11.0"
+    "@ledgerhq/hw-transport" "^5.11.0"
+    bignumber.js "^9.0.0"
+    blind-threshold-bls "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a"
+    cross-fetch "3.0.4"
+    debug "^4.1.1"
+    elliptic "6.5.3"
+    eth-lib "^0.2.8"
+    ethereumjs-util "^5.2.0"
+    fp-ts "2.1.1"
+    io-ts "2.0.1"
+    qrcode "^1.4.4"
+    secp256k1 "^4.0.0"
+    web3 "1.2.4"
+    web3-core "1.2.4"
+    web3-core-helpers "1.2.4"
+    web3-eth "1.2.4"
+    web3-eth-abi "1.2.4"
+    web3-eth-contract "1.2.4"
+    web3-utils "1.2.11"
 
 "@celo/contractkit@0.4.5":
   version "0.4.5"
@@ -2964,6 +3000,33 @@
     keccak256 "^1.0.0"
     lodash "^4.17.14"
     numeral "^2.0.6"
+    web3-utils "1.2.4"
+
+"@celo/utils@0.1.18":
+  version "0.1.18"
+  resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.1.18.tgz#5b838d27a5edc0635d6915fb427a718c49c3dd72"
+  integrity sha512-gX4sLb6T78Qzf16Kr/79HfwjlP2778A+IFB900U/zY4EhGW+GwkyWtZTaC1f1ZfCVbFbEsEZpSOxKYYvZp12Vg==
+  dependencies:
+    "@celo/base" "0.0.1"
+    "@umpirsky/country-list" "git://github.com/umpirsky/country-list#05fda51"
+    bigi "^1.1.0"
+    bignumber.js "^9.0.0"
+    bip32 "2.0.5"
+    bip39 "3.0.2"
+    bls12377js "https://github.com/celo-org/bls12377js#cb38a4cfb643c778619d79b20ca3e5283a2122a6"
+    bn.js "4.11.8"
+    buffer-reverse "^1.0.1"
+    country-data "^0.0.31"
+    crypto-js "^3.1.9-1"
+    elliptic "^6.5.3"
+    ethereumjs-util "^5.2.0"
+    fp-ts "2.1.1"
+    google-libphonenumber "^3.2.4"
+    io-ts "2.0.1"
+    keccak256 "^1.0.0"
+    lodash "^4.17.14"
+    numeral "^2.0.6"
+    web3-eth-abi "1.2.4"
     web3-utils "1.2.4"
 
 "@celo/utils@0.1.8":
