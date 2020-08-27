@@ -57,9 +57,20 @@ export default class Authorize extends BaseCommand {
       res.flags.signature
     )
 
-    await newCheckBuilder(this)
-      .isAccount(res.flags.from)
-      .runChecks()
+    // Check that the account is registered on-chain.
+    // Additionally, if the authorization is for a validator, the BLS key must be provided when the
+    // validator is already registered, and cannot be provided if the validator is not registered.
+    // (Because the BLS key is stored on the validator entry, which would not exist yet)
+    // Using the --force flag allows setting the ECDSA key on the validator without the BLS key.
+    const checker = newCheckBuilder(this).isAccount(res.flags.from)
+    if (res.flags.role === 'validator' && !res.flags.force) {
+      if (res.flags.blsKey && res.flags.blsPop) {
+        checker.isValidator(res.flags.from)
+      } else {
+        checker.isNotValidator(res.flags.from)
+      }
+    }
+    await checker.runChecks()
 
     let tx: any
     if (res.flags.role === 'vote') {
@@ -72,10 +83,6 @@ export default class Authorize extends BaseCommand {
         res.flags.blsPop
       )
     } else if (res.flags.role === 'validator') {
-      if (!res.flags.force) {
-        this.error(`BLS key and PoP must be provided to rotate validator keys`)
-        return
-      }
       tx = await accounts.authorizeValidatorSigner(res.flags.signer, sig)
     } else if (res.flags.role === 'attestation') {
       tx = await accounts.authorizeAttestationSigner(res.flags.signer, sig)

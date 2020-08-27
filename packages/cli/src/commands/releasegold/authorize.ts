@@ -50,9 +50,20 @@ export default class Authorize extends ReleaseGoldBaseCommand {
     const { flags } = this.parse(Authorize)
     const role = flags.role
 
-    await newCheckBuilder(this)
-      .isAccount(this.releaseGoldWrapper.address)
-      .runChecks()
+    // Check that the account is registered on-chain.
+    // Additionally, if the authorization is for a validator, the BLS key must be provided when the
+    // validator is already registered, and cannot be provided if the validator is not registered.
+    // (Because the BLS key is stored on the validator entry, which would not exist yet)
+    // Using the --force flag allows setting the ECDSA key on the validator without the BLS key.
+    const checker = newCheckBuilder(this).isAccount(this.releaseGoldWrapper.address)
+    if (flags.role === 'validator' && !flags.force) {
+      if (flags.blsKey && flags.blsPop) {
+        checker.isValidator(this.releaseGoldWrapper.address)
+      } else {
+        checker.isNotValidator(this.releaseGoldWrapper.address)
+      }
+    }
+    await checker.runChecks()
 
     const accounts = await this.kit.contracts.getAccounts()
     const sig = accounts.parseSignatureOfAddress(
@@ -76,10 +87,6 @@ export default class Authorize extends ReleaseGoldBaseCommand {
         flags.blsPop
       )
     } else if (role === 'validator') {
-      if (!flags.force) {
-        this.error(`BLS key and PoP must be provided to rotate validator keys`)
-        return
-      }
       tx = await this.releaseGoldWrapper.authorizeValidatorSigner(flags.signer, sig)
     } else if (role === 'attestation') {
       tx = await this.releaseGoldWrapper.authorizeAttestationSigner(flags.signer, sig)
