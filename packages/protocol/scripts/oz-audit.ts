@@ -2,10 +2,12 @@ import { exec } from 'child_process'
 import { readFileSync, writeFileSync } from 'fs'
 import { parse } from 'node-html-parser'
 
-const html = readFileSync(
-  '/Users/yorhodes/Downloads/Private Report August 25 – OpenZeppelin blog.htm',
-  'utf8'
-)
+const reportPath = '/Users/yorhodes/celo/oz-report.htm'
+const REPO = 'celo-org/celo-labs'
+const PROJECT = 'OpenZeppelin Audit Phase 4'
+const LABELS = 'oz-audit'
+
+const html = readFileSync(reportPath, 'utf8')
 const root = parse(html)
 const text = root.structuredText
 
@@ -45,15 +47,13 @@ phases.forEach((phase, i) => {
   po[`phase ${i + 1}`] = o
 })
 
-const REPO = 'celo-org/celo-labs'
-const LABELS = 'oz-audit'
-
-const phase4issues = po['phase 3']
-const createIssues = [...phase4issues.Low, ...phase4issues.Medium]
+// const phase4issues = po['phase 3']
+// const createIssues = [...phase4issues.Medium, ...phase4issues.Low, ...phase4issues.Notes]
+const createIssues = []
 
 createIssues.forEach((i) =>
   exec(
-    `gh issue create --repo ${REPO} --label ${LABELS} --title \"${i.title}\" --body \"${i.body}\"`,
+    `gh issue create --repo ${REPO} --label ${LABELS} --project ${PROJECT} --title \"${i.title}\" --body \"${i.body}\"`,
     (e) => (e ? console.log(e) : null)
   )
 )
