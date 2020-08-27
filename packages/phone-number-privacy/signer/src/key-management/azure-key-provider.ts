@@ -14,11 +14,17 @@ export class AzureKeyProvider extends KeyProviderBase {
       process.env.AZURE_CLIENT_ID = clientID
       process.env.AZURE_CLIENT_SECRET = clientSecret
       process.env.AZURE_TENANT_ID = tenant
-
-      await snooze(30000)
-      const keyVaultClient = new AzureKeyVaultClient(vaultName)
-      const privateKey = await keyVaultClient.getSecret(secretName)
-      this.setPrivateKey(privateKey)
+      let success = false
+      while (!success) {
+        try {
+          const keyVaultClient = new AzureKeyVaultClient(vaultName)
+          const privateKey = await keyVaultClient.getSecret(secretName)
+          this.setPrivateKey(privateKey)
+          success = true
+        } catch {
+          await snooze(30000)
+        }
+      }
     } catch (error) {
       logger.error('Error retrieving key', error)
       throw new Error(ErrorMessage.KEY_FETCH_ERROR)
