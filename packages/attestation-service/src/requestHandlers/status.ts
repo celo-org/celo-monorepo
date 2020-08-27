@@ -4,7 +4,7 @@ import * as t from 'io-ts'
 import { getAgeOfLatestBlock, isNodeSyncing, kit } from '../db'
 import { fetchEnvOrDefault, getAccountAddress, getAttestationSignerAddress } from '../env'
 import { ErrorMessages, respondWithError } from '../request'
-import { blacklistRegionCodes, configuredSmsProviders } from '../sms'
+import { configuredSmsProviders } from '../sms'
 
 export const VERSION = process.env.npm_package_version as string
 export const SIGNATURE_PREFIX = 'attestation-service-status-signature:'
@@ -34,7 +34,6 @@ export async function handleStatusRequest(
         AttestationServiceStatusResponseType.encode({
           status: 'ok',
           smsProviders: configuredSmsProviders(),
-          blacklistedRegionCodes: blacklistRegionCodes(),
           accountAddress: getAccountAddress(),
           signature: await produceSignature(statusRequest.messageToSign),
           version: VERSION,

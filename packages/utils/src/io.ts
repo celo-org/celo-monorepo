@@ -79,7 +79,6 @@ export const SaltType = t.string
 export const AttestationServiceStatusResponseType = t.type({
   status: t.literal('ok'),
   smsProviders: t.array(t.string),
-  blacklistedRegionCodes: t.array(t.string),
   accountAddress: AddressType,
   signature: t.union([SignatureType, t.undefined]),
   version: t.string,
