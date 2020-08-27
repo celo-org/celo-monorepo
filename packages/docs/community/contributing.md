@@ -60,7 +60,7 @@ Participation in the Celo project is subject to the [Code of Conduct](https://ce
 
 #### **Submitting CIPs**
 
-Draft all proposals following the template below and submit to the CIPs repository via a PR \(pull request\).
+Draft all proposals following the template below and submit to the [CIPs repository](https://github.com/celo-org/celo-proposals) via a PR \(pull request\).
 
 CIP template:
 
