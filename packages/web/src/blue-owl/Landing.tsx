@@ -1,19 +1,18 @@
 import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import Cover from 'src/blue-owl/Cover'
-import OpenGraph from 'src/header/OpenGraph'
 import { H1, H4 } from 'src/fonts/Fonts'
+import OpenGraph from 'src/header/OpenGraph'
+import { Adventure } from 'src/home/Adventure'
 import { NameSpaces, useTranslation } from 'src/i18n'
-import pagePaths from 'src/shared/menu-items'
-import valora from 'src/icons/valora-icon.png'
 import nonProfitIMG from 'src/icons/non-profit-light-bg.png'
 import sendToPhoneImg from 'src/icons/sent-to-phone_light-bg.png'
-import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-// import menuItems from 'src/shared/menu-items'
+import valora from 'src/icons/valora-icon.png'
 import sequenceTopImage from 'src/illustrations/03-Inclusive-money-(light-bg).png'
-import { standardStyles, textStyles, colors, fonts } from 'src/styles'
-import { Adventure } from 'src/home/Adventure'
+import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { useScreenSize } from 'src/layout/ScreenSize'
+import pagePaths from 'src/shared/menu-items'
+import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
 export default function Landing() {
   const [t] = useTranslation(NameSpaces.cbe)
@@ -75,9 +74,9 @@ export default function Landing() {
         </Cell>
       </GridRow>
       <GridRow>
-        <ContentPreview title={t('lesson1')} time={'2 min'} />
-        <ContentPreview title={t('lesson2')} time={'5 min'} />
-        <ContentPreview title={t('lesson3')} time={'3 min'} />
+        <ContentPreview title={t('lesson1')} time={'2 min'} href={'/lesson1'} />
+        <ContentPreview title={t('lesson2')} time={'5 min'} href={'/lesson2'} />
+        <ContentPreview title={t('lesson3')} time={'3 min'} href={'/lesson3'} />
       </GridRow>
     </View>
   )
@@ -86,13 +85,18 @@ export default function Landing() {
 interface ContentPreviewProps {
   title: string
   time: string
+  href: string
 }
 
-function ContentPreview({ title, time }: ContentPreviewProps) {
+function ContentPreview({ title, time, href }: ContentPreviewProps) {
   return (
     <Cell span={Spans.third}>
-      <Image style={styles.preview} source={sequenceTopImage} />
-      <Text style={fonts.h6}>{title}</Text>
+      <a href={href}>
+        <Image style={styles.preview} source={sequenceTopImage} />
+      </a>
+      <Text accessibilityRole="link" href={href} style={fonts.h6}>
+        {title}
+      </Text>
       <Text style={[fonts.h6, styles.minutes]}>{time}</Text>
     </Cell>
   )
