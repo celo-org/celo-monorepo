@@ -28,15 +28,25 @@ The run_e2e.sh script will take care of configuring and building the app for you
 
 ## Adding a test
 
-There is meant to be one e2e test file per screen in the app. (e.g. the tests for the home screen are in `e2e/home.spec.js`.) If you can't find a file for the screen you want to test, add a new file in the e2e folder.
+There is one main file called `TestRunner.spec.js` which calls the specific tests for each use case which live in the root of the `src` folder.
 
-Most of the time, the test files should have two sections: describe('visuals') and describe('actions'). The actions test things that change what's on screen, so the state of the app needs to be reset in between 'action' tests. Test for the 'visuals' don't reset the app, and are therefore faster.
+While developing and adding new tests, it's useful to run only the ones we are working on and not go through the onboading on each run. To do this, the following strategy might be useful:
+- First, go to `TestRunner` and comment out or skip all tests except the `Onboarding` one.
+- Run `yarn test:e2e:ios`. Wait while the app goes through the onboarding process.
+- If the tests passes you should see the Wallet Home screen.
+- Run `yarn test:e2e:packager` to start the packager.
+- Comment out or skip the `Onboarding` test and uncomment or unskip whatever test you would like to run or develop against.
+- Run `yarn test:e2e:ios -d`. The `-d` flag will prevent the app from reinstalling and reuse the previous install and will not restart the packager.
+
+When doing the steps above note that some tests will require the PIN if run standalone but not require it if run after the rest of the tests because a previous one already set it.
 
 For most e2e tests you will only need to do three things:
 
 - Finding elements using `element(by.id('SomeTestID'))`: You give the element you want to find a testID, then you can reliably find it, if it's on screen.
 - Performing actions on the element like `element.tap()` or `element.typeText('Some Text ')`. Detox will automatically wait for these actions to finish.
 - Testing properties of the element using expectations, like `expect(element).toBeVisible()`. You will mostly need `.toBeVisible()` and `.toHaveText()`.
+
+For more information about Detox, check out the [API reference](https://github.com/wix/Detox/blob/master/docs/README.md#api-reference)
 
 ### Example
 
@@ -119,7 +129,7 @@ These files are uploaded by by the [a script](../scripts/ci-e2e.sh), that is exe
 
 ## Troubleshooting
 
-If tests are failing, and you don't why:
+If tests are failing, and you don't know why:
 
 - Rebuild, re-yarn and rerun. Sometimes the problem just goes away.
 - Delete snapshots in the emulator

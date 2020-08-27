@@ -109,8 +109,12 @@ function* clearStoredAccountSaga({ account }: ClearStoredAccountAction) {
     yield call(removeAccountLocally, account)
     yield call(clearStoredMnemonic)
     yield call(ValoraAnalytics.reset)
-    yield call(firebaseSignOut, firebase.app())
     yield call(deleteNodeData)
+
+    // Ignore error if it was caused by Firebase.
+    try {
+      yield call(firebaseSignOut, firebase.app())
+    } catch (error) {}
 
     yield call(persistor.flush)
     yield call(restartApp)
