@@ -210,16 +210,18 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
       '0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900',
       '--yes',
     ])
-    await Authorize.run([
-      '--contract',
-      contractAddress,
-      '--role',
-      'validator',
-      '--signer',
-      signerNew,
-      '--signature',
-      serializeSignature(popNew),
-    ])
+    await expect(
+      Authorize.run([
+        '--contract',
+        contractAddress,
+        '--role',
+        'validator',
+        '--signer',
+        signerNew,
+        '--signature',
+        serializeSignature(popNew),
+      ])
+    ).rejects.toThrow()
   })
 
   test('fails if contract is not registered as an account', async () => {
