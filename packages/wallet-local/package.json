@@ -21,9 +21,7 @@
     "eth-lib": "^0.2.8",
     "ethereumjs-util": "^5.2.0"
   },
-  "devDependencies": {
-    "@celo/sdk-types": "1.0.0-dev"
-  },
+  "devDependencies": {},
   "engines": {
     "node": ">=8.13.0"
   }
