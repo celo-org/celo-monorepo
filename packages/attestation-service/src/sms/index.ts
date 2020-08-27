@@ -2,10 +2,17 @@ import { sleep } from '@celo/utils/lib/async'
 import { intersection } from '@celo/utils/lib/collections'
 import { E164Number } from '@celo/utils/lib/io'
 import { PhoneNumberUtil } from 'google-libphonenumber'
+import {
+  findAttestationByDeliveryId,
+  findAttestationByKey,
+  findOrCreateAttestation,
+  sequelize,
+} from '../db'
 import { fetchEnv, fetchEnvOrDefault } from '../env'
 import { rootLogger } from '../logger'
 import { Counters } from '../metrics'
-import { DeliveryStatus, obfuscateNumber, SmsDelivery, SmsProvider, SmsProviderType } from './base'
+import { AttestationKey, AttestationModel, AttestationStatus } from '../models/attestation'
+import { DeliveryStatus, obfuscateNumber, SmsProvider, SmsProviderType } from './base'
 import { NexmoSmsProvider } from './nexmo'
 import { TwilioSmsProvider } from './twilio'
 
@@ -100,197 +107,245 @@ export function unsupportedRegionCodes() {
   return intersection(smsProviders.map((provider) => provider.unsupportedRegionCodes))
 }
 
+// Maximum delivery attempts (including first) regardless of provider
+const maxDeliveryAttempts = parseInt(fetchEnvOrDefault('MAX_DELIVERY_ATTEMPTS', '4'), 10)
+
 // Main entry point for sending SMS via preferred providers.
+// TODO pass through logging
+export async function startSendSms(key: AttestationKey, phoneNumber: E164Number, message: string) {
+  let shouldRetry = false
+  let attestation: AttestationModel | null = null
 
-export async function startSendSms(
-  phoneNumber: E164Number,
-  message: string,
-  finallyFailedCallback?: () => void,
-  finallyBelievedDeliveredCallback?: () => void
-): Promise<SmsProviderType> {
-  const countryCode = phoneUtil.getRegionCodeForNumber(phoneUtil.parse(phoneNumber))
-  if (!countryCode) {
-    throw new Error('Could not parse number')
-  }
+  const transaction = await sequelize!.transaction({ logging: this.sequelizeLogger })
 
-  const providers = smsProvidersFor(countryCode, phoneNumber)
-  if (providers.length === 0) {
-    Counters.attestationRequestsUnableToServe.labels(countryCode).inc()
-    throw new Error(`No SMS providers available for ${countryCode}`)
-  }
+  try {
+    const countryCode = phoneUtil.getRegionCodeForNumber(phoneUtil.parse(phoneNumber))
+    const providers = countryCode ? smsProvidersFor(countryCode, phoneNumber) : []
 
-  const delivery: SmsDelivery = {
-    countryCode,
-    phoneNumber,
-    message,
-    providers,
-    finallyFailedCallback,
-    finallyBelievedDeliveredCallback,
-    attemptsForThisProvider: 0,
-    ongoingDeliveryId: null,
-    status: DeliveryStatus.NotCreated,
-  }
-
-  return attemptToSendSms(delivery)
-}
-
-// Maximum delivery retries (after first) with any one provider
-const maxProviderRetries = parseInt(fetchEnvOrDefault('MAX_PROVIDER_RETRIES', '2'), 10)
-
-const ongoingDeliveries: any = {}
-
-async function attemptToSendSms(delivery: SmsDelivery): Promise<SmsProviderType> {
-  // If this is a retry, remove mapping for current id, ongoingDeliveryId.
-  // The mapping is used to identify the delivery when a delivery receipt comes in,
-  // and we no longer want to hear about duplicated receipts for that attempt.
-  if (delivery.ongoingDeliveryId) {
-    delete ongoingDeliveries[delivery.ongoingDeliveryId!]
-    delivery.ongoingDeliveryId = null
-  }
-
-  // If retries to send with this provider are exceeded, move to next provider
-  if (delivery.attemptsForThisProvider > maxProviderRetries) {
-    delivery.providers = delivery.providers.slice(1)
-    delivery.attemptsForThisProvider = 0
-  }
-
-  if (delivery.providers.length === 0) {
-    // No more providers to try.
-    rootLogger.info(
+    attestation = await findOrCreateAttestation(
+      key,
       {
-        phoneNumber: obfuscateNumber(delivery.phoneNumber),
+        account: key.account,
+        issuer: key.issuer,
+        identifier: key.identifier,
+        phoneNumber,
+        countryCode,
+        status: AttestationStatus.Sent,
+        message,
+        providers: providers.join(','),
+        attempt: 0,
       },
-      'Final failure to send'
+      transaction
     )
 
-    if (delivery.finallyFailedCallback) {
-      delivery.finallyFailedCallback()
+    if (!countryCode) {
+      Counters.attestationRequestsUnableToServe.labels('unknown').inc()
+      attestation.errorCode = `Could not parse ${phoneNumber}`
     }
-    throw new Error('Could not deliver via any provider')
+    if (providers.length === 0) {
+      Counters.attestationRequestsUnableToServe.labels(countryCode).inc()
+      attestation.errorCode = `No SMS providers available for ${countryCode}`
+    } else {
+      // Parsed number and found providers. Attempt delivery.
+      shouldRetry = await doSendSms(attestation, providers)
+    }
+
+    // rootLogger.info(
+    //   {
+    //     phoneNumber: obfuscateNumber(delivery.phoneNumber),
+    //   },
+
+    await attestation.save({ transaction, logging: this.sequelizeLogger })
+    await transaction.commit()
+  } catch (err) {
+    this.logger.error({ err })
+    await transaction.rollback()
   }
 
-  // Attempt (re)delivery with this provider, and if that fails, backoff.
-  delivery.attemptsForThisProvider++
+  // If there was an error sending, backoff and retry while holding open client conn.
+  if (shouldRetry) {
+    await sleep(Math.pow(2, attestation.attempt) * 500)
+    await findAttestationAndSendSms(key, logger)
+  }
+
+  return attestation
+}
+
+async function findAttestationAndSendSms(key: AttestationKey, logger) {
+  let shouldRetry = false
+
+  const transaction = await sequelize!.transaction({ logging: this.sequelizeLogger })
+
+  try {
+    const attestation = await findAttestationByKey(key, transaction)
+    if (!attestation) {
+      return
+    }
+
+    const providers = getProvidersFor(attestation)
+
+    // Parsed number and found providers. Attempt delivery.
+    shouldRetry = await doSendSms(attestation, providers)
+
+    await attestation.save({ transaction, logging: this.sequelizeLogger })
+    await transaction.commit()
+  } catch (err) {
+    this.logger.error({ err })
+    await transaction.rollback()
+  }
+
+  // If there was an error sending, backoff and retry while holding open client conn.
+  if (shouldRetry) {
+    await sleep(Math.pow(2, attestation.attempt) * 500)
+    await findAttestationAndSendSms(key, logger)
+  }
+}
+
+// Make first or next delivery attempt
+async function doSendSms(
+  attestation: AttestationModel,
+  providers: any[],
+  logger
+): Promise<boolean> {
+  const provider = providers[attestation.attempt % providers.length]
+
   try {
     rootLogger.info(
       {
-        provider: delivery.providers[0].type,
-        phoneNumber: obfuscateNumber(delivery.phoneNumber),
-        attempt: delivery.attemptsForThisProvider,
+        provider: provider.type,
+        attempt: attestation.attempt,
       },
       'Attempting to create SMS'
     )
 
-    const deliveryId = await delivery.providers[0].sendSms(delivery)
+    const deliveryId = await provider.sendSms(attestation)
+
+    attestation.status = AttestationStatus.Sent
+    attestation.errorCode = null
+    attestation.ongoingDeliveryId = deliveryId
 
     rootLogger.info(
       {
-        provider: delivery.providers[0].type,
-        phoneNumber: obfuscateNumber(delivery.phoneNumber),
-        attempt: delivery.attemptsForThisProvider,
+        provider: provider.type,
+        attempt: attestation.attempt,
         deliveryId,
       },
-      'Created SMS'
+      'Sent SMS'
     )
 
     Counters.attestationProviderDeliveryStatus
-      .labels(
-        delivery.providers[0].type,
-        delivery.countryCode,
-        DeliveryStatus[DeliveryStatus.Created]
-      )
+      .labels(provider.type, attestation.countryCode, DeliveryStatus[DeliveryStatus.Sent])
       .inc()
 
-    if (delivery.createdCallback) {
-      delivery.createdCallback(delivery.providers[0].type)
-    }
-
-    // If this provider supports delivery status, track the delivery.
-    if (delivery.providers[0].supportsDeliveryStatus()) {
-      ongoingDeliveries[deliveryId!] = delivery
-      delivery.ongoingDeliveryId = deliveryId
-      delivery.status = DeliveryStatus.Created
-
-      // Set timeout to callback with success and clean up in the event we
-      // don't receive a delivery receipt AND no other retry has been made
-      // since this one
-      setTimeout(() => {
-        if (delivery.ongoingDeliveryId === deliveryId) {
-          delete ongoingDeliveries[deliveryId]
-          if (delivery.finallyBelievedDeliveredCallback) {
-            delivery.finallyBelievedDeliveredCallback()
-          }
-          delivery.ongoingDeliveryId = null
-        }
-      }, timeoutWaitingForDeliveryReceipt)
-    }
-    return delivery.providers[0].type
+    return false
   } catch (error) {
+    attestation.status = AttestationStatus.NotSent
+    attestation.errorCode = error
+    attestation.ongoingDeliveryId = null
+    attestation.attempt += 1
+
     rootLogger.info(
       {
-        provider: delivery.providers[0].type,
-        phoneNumber: obfuscateNumber(delivery.phoneNumber),
-        attempt: delivery.attemptsForThisProvider,
+        provider: provider.type,
+        attempt: attestation.attempt,
         error,
       },
       'SMS creation failed'
     )
 
-    // Error sending. Set timeout to backoff and retry
-    await sleep(Math.pow(2, delivery.attemptsForThisProvider) * 1000)
-    return attemptToSendSms(delivery)
+    if (attestation.attempt > maxDeliveryAttempts) {
+      logger.info('Final failure to send')
+      return false
+    }
+
+    return true
   }
 }
 
-// Timeout waiting for a delivery receipt (may never come, even on success) before delivery state is cleaned up
-const timeoutWaitingForDeliveryReceipt =
-  parseInt(fetchEnvOrDefault('TIMEOUT_CLEANUP_NO_RECEIPT_MIN', '10'), 10) * 60 * 1000
+function getProvidersFor(attestation: AttestationModel) {
+  const providers = smsProvidersFor(attestation.countryCode, attestation.phoneNumber)
+  const providerString = providers.join(',')
+  if (providerString !== attestation.providers) {
+    throw new Error(
+      `Detected inconsistent provider configuration between instances: ` +
+        `got ${providerString} but attestation for ${attestation.countryCode} recorded ${attestation.providers}`
+    )
+  }
+  return providers
+}
 
 // Act on a delivery report for an SMS, scheduling a resend if last one failed.
-export function receivedDeliveryReport(
+export async function receivedDeliveryReport(
   deliveryId: string,
-  deliveryStatus: DeliveryStatus,
+  deliveryStatus: AttestationStatus,
   errorCode: string | null
 ) {
-  const delivery = ongoingDeliveries[deliveryId]
-  if (delivery) {
-    rootLogger.info(
-      {
-        provider: delivery.providers[0].type,
-        phoneNumber: obfuscateNumber(delivery.phoneNumber),
-        deliveryId,
-        deliveryStatus: DeliveryStatus[deliveryStatus],
-        errorCode,
-      },
-      'Received delivery status'
-    )
+  let shouldRetry = false
+  let attestation: AttestationModel | null = null
 
-    if (delivery.status !== deliveryStatus) {
-      delivery.status = deliveryStatus
+  const transaction = await sequelize!.transaction({ logging: this.sequelizeLogger })
+
+  try {
+    attestation = await findAttestationByDeliveryId(deliveryId, { transaction })
+
+    if (!attestation || !attestation.countryCode) {
+      // TODO log
+      return
+    }
+
+    if (attestation.status !== deliveryStatus) {
+      const providers = getProvidersFor(attestation)
+      const provider = providers[attestation.attempt % providers.length]
+
+      rootLogger.info(
+        {
+          provider: provider.type,
+          phoneNumber: obfuscateNumber(delivery.phoneNumber),
+          deliveryId,
+          deliveryStatus: DeliveryStatus[deliveryStatus],
+          errorCode,
+        },
+        'Received delivery status'
+      )
+
+      attestation.status = deliveryStatus
+
+      const errors = attestation.errorCode ? JSON.parse(attestation.errorCode) : []
+      attestation.errorCode = JSON.stringify(
+        errors.append({ provider, errorCode, attempt: attestation.attempt })
+      )
 
       Counters.attestationProviderDeliveryStatus
-        .labels(delivery.providers[0].type, delivery.countryCode, DeliveryStatus[deliveryStatus])
+        .labels(provider.type, attestation.countryCode, DeliveryStatus[deliveryStatus])
         .inc()
 
       if (errorCode != null) {
         Counters.attestationProviderDeliveryErrorCodes
-          .labels(delivery.providers[0].type, delivery.countryCode, errorCode)
+          .labels(provider.type, attestation.countryCode, errorCode)
           .inc()
+      }
+
+      if (deliveryStatus === DeliveryStatus.Failed) {
+        attestation.ongoingDeliveryId = null
+        attestation.attempt += 1
+
+        if (attestation.attempt > maxDeliveryAttempts) {
+          logger.info('Final failure to send')
+        } else {
+          shouldRetry = true
+        }
       }
     }
 
-    if (deliveryStatus === DeliveryStatus.Delivered) {
-      delete ongoingDeliveries[deliveryId]
-      ongoingDeliveries.deliveryId = null
-      if (delivery.finallyBelievedDeliveredCallback) {
-        delivery.finallyBelievedDeliveredCallback()
-      }
-    } else if (deliveryStatus === DeliveryStatus.Failed) {
-      delete ongoingDeliveries[deliveryId]
-      ongoingDeliveries.deliveryId = null
-      setTimeout(() => {
-        void attemptToSendSms(delivery)
-      }, Math.pow(2, delivery.attemptsForThisProvider) * 3000)
-    }
+    transaction.commit()
+  } catch (err) {
+    logger.error(err)
+    transaction.rollback()
+  }
+
+  if (attestation && shouldRetry) {
+    // TODO do this in the future
+    await sleep(Math.pow(2, attestation.attempt) * 500)
+    findAttestationAndSendSms(key, logger)
   }
 }

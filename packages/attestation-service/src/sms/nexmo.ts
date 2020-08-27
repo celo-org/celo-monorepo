@@ -5,13 +5,8 @@ import Nexmo from 'nexmo'
 import { receivedDeliveryReport } from '.'
 import { fetchEnv, fetchEnvOrDefault, isYes } from '../env'
 import { Gauges } from '../metrics'
-import {
-  DeliveryStatus,
-  readUnsupportedRegionsFromEnv,
-  SmsDelivery,
-  SmsProvider,
-  SmsProviderType,
-} from './base'
+import { AttestationStatus } from '../models/attestation'
+import { readUnsupportedRegionsFromEnv, SmsProvider, SmsProviderType } from './base'
 
 const phoneUtil = PhoneNumberUtil.getInstance()
 
@@ -64,23 +59,23 @@ export class NexmoSmsProvider extends SmsProvider {
   async receiveDeliveryStatusReport(req: express.Request) {
     const errCode =
       req.body['err-code'] == null || req.body['err-code'] === '0' ? null : req.body['err-code']
-    receivedDeliveryReport(req.body.messageId, this.deliveryStatus(req.body.status), errCode)
+    await receivedDeliveryReport(req.body.messageId, this.deliveryStatus(req.body.status), errCode)
   }
 
-  deliveryStatus(messageStatus: string | null): DeliveryStatus {
+  deliveryStatus(messageStatus: string | null): AttestationStatus {
     switch (messageStatus) {
       case 'delivered':
-        return DeliveryStatus.Delivered
+        return AttestationStatus.Delivered
       case 'failed':
-        return DeliveryStatus.Failed
+        return AttestationStatus.Failed
       case 'rejected':
-        return DeliveryStatus.Failed
+        return AttestationStatus.Failed
       case 'accepted':
-        return DeliveryStatus.Upstream
+        return AttestationStatus.Upstream
       case 'buffered':
-        return DeliveryStatus.Queued
+        return AttestationStatus.Queued
     }
-    return DeliveryStatus.Other
+    return AttestationStatus.Other
   }
 
   supportsDeliveryStatus = () => true

@@ -2,13 +2,8 @@ import bodyParser from 'body-parser'
 import express from 'express'
 import twilio, { Twilio } from 'twilio'
 import { fetchEnv } from '../env'
-import {
-  DeliveryStatus,
-  readUnsupportedRegionsFromEnv,
-  SmsDelivery,
-  SmsProvider,
-  SmsProviderType,
-} from './base'
+import { AttestationModel, AttestationStatus } from '../models/attestation'
+import { readUnsupportedRegionsFromEnv, SmsProvider, SmsProviderType } from './base'
 import { receivedDeliveryReport } from './index'
 
 export class TwilioSmsProvider extends SmsProvider {
@@ -39,27 +34,27 @@ export class TwilioSmsProvider extends SmsProvider {
   }
 
   async receiveDeliveryStatusReport(req: express.Request) {
-    receivedDeliveryReport(
+    await receivedDeliveryReport(
       req.body.MessageSid,
       this.deliveryStatus(req.body.MessageStatus),
       req.body.ErrorCode
     )
   }
 
-  deliveryStatus(messageStatus: string | null): DeliveryStatus {
+  deliveryStatus(messageStatus: string | null): AttestationStatus {
     switch (messageStatus) {
       case 'delivered':
-        return DeliveryStatus.Delivered
+        return AttestationStatus.Delivered
       case 'failed':
-        return DeliveryStatus.Failed
+        return AttestationStatus.Failed
       case 'undelivered':
-        return DeliveryStatus.Failed
+        return AttestationStatus.Failed
       case 'sent':
-        return DeliveryStatus.Upstream
+        return AttestationStatus.Upstream
       case 'queued':
-        return DeliveryStatus.Queued
+        return AttestationStatus.Queued
     }
-    return DeliveryStatus.Other
+    return AttestationStatus.Other
   }
 
   supportsDeliveryStatus = () => true
@@ -76,10 +71,10 @@ export class TwilioSmsProvider extends SmsProvider {
     }
   }
 
-  async sendSms(delivery: SmsDelivery) {
+  async sendSms(attestation: AttestationModel) {
     const m = await this.client.messages.create({
-      body: delivery.message,
-      to: delivery.phoneNumber,
+      body: attestation.message,
+      to: attestation.phoneNumber,
       from: this.messagingServiceSid,
       statusCallback: this.deliveryStatusURL,
     })

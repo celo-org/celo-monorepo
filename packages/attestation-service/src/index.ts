@@ -9,6 +9,10 @@ import { rootLogger } from './logger'
 import { asyncHandler, createValidatedHandler, loggerMiddleware } from './request'
 import { AttestationRequestType, handleAttestationRequest } from './requestHandlers/attestation'
 import { handleAttestationDeliveryStatus } from './requestHandlers/delivery'
+import {
+  GetAttestationRequestType,
+  handleGetAttestationRequest,
+} from './requestHandlers/get_attestation'
 import { handleLivenessRequest } from './requestHandlers/liveness'
 import { handleStatusRequest, StatusRequestType } from './requestHandlers/status'
 import { handleTestAttestationRequest } from './requestHandlers/test_attestation'
@@ -50,6 +54,11 @@ async function init() {
     res.send('Ready').status(200)
   })
   app.get('/healthz', rateLimiter, asyncHandler(handleLivenessRequest))
+  app.get(
+    '/get_attestations',
+    rateLimiter,
+    createValidatedHandler(GetAttestationRequestType, handleGetAttestationRequest)
+  )
   app.post(
     '/attestations',
     express.json(),

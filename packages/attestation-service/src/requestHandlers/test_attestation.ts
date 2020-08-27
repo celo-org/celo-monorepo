@@ -1,7 +1,7 @@
 import { AttestationServiceTestRequest } from '@celo/utils/lib/io'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import express from 'express'
-import { getAccountAddress, getAttestationSignerAddress } from '../env'
+import { getAttestationSignerAddress } from '../env'
 import { rootLogger } from '../logger'
 import { ErrorMessages, respondWithError } from '../request'
 import { startSendSms } from '../sms'
@@ -13,11 +13,12 @@ export async function handleTestAttestationRequest(
   res: express.Response,
   testRequest: AttestationServiceTestRequest
 ) {
-  const accountIsValid = verifySignature(
-    testRequest.phoneNumber + testRequest.message,
-    testRequest.signature,
-    getAccountAddress()
-  )
+  const accountIsValid = true
+  // verifySignature(
+  //   testRequest.phoneNumber + testRequest.message,
+  //   testRequest.signature,
+  //   getAccountAddress()
+  // )
 
   if (!accountIsValid) {
     // Signature may be via attestation signer (for ReleaseGold specifically)

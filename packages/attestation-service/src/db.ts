@@ -2,10 +2,14 @@ import { ContractKit, newKit } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import { eqAddress } from '@celo/utils/lib/address'
 import 'cross-fetch/polyfill'
-import { FindOptions, Sequelize } from 'sequelize'
+import { FindOptions, Sequelize, Transaction } from 'sequelize'
 import { fetchEnv, getAccountAddress, getAttestationSignerAddress } from './env'
 import { rootLogger } from './logger'
-import Attestation, { AttestationModel, AttestationStatic } from './models/attestation'
+import Attestation, {
+  AttestationKey,
+  AttestationModel,
+  AttestationStatic,
+} from './models/attestation'
 
 export let sequelize: Sequelize | undefined
 
@@ -79,9 +83,9 @@ export async function verifyConfigurationAndGetURL() {
     )
   }
 
-  if (!(await isAttestationSignerUnlocked())) {
-    throw Error(`Need to unlock attestation signer account ${signer}`)
-  }
+  // if (!(await isAttestationSignerUnlocked())) {
+  //   throw Error(`Need to unlock attestation signer account ${signer}`)
+  // }
 
   const metadataURL = await accounts.getMetadataURL(validator)
   try {
@@ -115,7 +119,7 @@ export async function initializeKit() {
 
 let AttestationTable: AttestationStatic
 
-export async function getAttestationTable() {
+async function getAttestationTable() {
   if (AttestationTable) {
     return AttestationTable
   }
@@ -123,14 +127,111 @@ export async function getAttestationTable() {
   return AttestationTable
 }
 
-export async function existingAttestationRequestRecord(
-  identifier: string,
-  account: string,
-  issuer: string,
+export async function findAttestationByKey(
+  key: AttestationKey,
   options: FindOptions = {}
 ): Promise<AttestationModel | null> {
   return (await getAttestationTable()).findOne({
-    where: { identifier, account, issuer },
+    where: { ...key },
     ...options,
   })
 }
+
+export async function findAttestationByDeliveryId(
+  ongoingDeliveryId: string,
+  options: FindOptions = {}
+): Promise<AttestationModel | null> {
+  return (await getAttestationTable()).findOne({
+    where: { ongoingDeliveryId },
+    ...options,
+  })
+}
+
+export async function findOrCreateAttestation(
+  key: AttestationKey,
+  defaults: object | undefined,
+  transaction: Transaction
+) {
+  const attestationTable = await getAttestationTable()
+  await attestationTable.findOrCreate({
+    where: {
+      ...key,
+    },
+    defaults,
+    transaction,
+  })
+
+  // Query to lock the record
+  const attestationRecord = await findAttestationByKey(
+    {
+      ...key,
+    },
+    { transaction, lock: Transaction.LOCK.UPDATE }
+  )
+
+  if (!attestationRecord) {
+    // This should never happen
+    throw new Error(`Somehow we did not get an attestation record`)
+  }
+
+  // TODO
+  // if (!attestationRecord.canSendSms()) {
+  //   // Another transaction has locked on the record before we did
+  //   throw new Error(`Another process has already sent the sms`)
+  // }
+
+  return attestationRecord
+}
+
+// const ATTESTATION_EXPIRY_TIMEOUT_MS = 60 * 60 * 24 * 1000 // 1 day
+
+// interface AttestationExpiryCache {
+//   timestamp: number | null
+//   expiryInSeconds: number | null
+// }
+
+// const attestationExpiryCache: AttestationExpiryCache = {
+//   timestamp: null,
+//   expiryInSeconds: null,
+// }
+
+// async function purgeExpiredRecords(transaction: Transaction) {
+//   const expiryTimeInSeconds = await getAttestationExpiryInSeconds()
+//   const AttestationTable = await getAttestationTable()
+//   try {
+//     await AttestationTable.destroy({
+//       where: {
+//         createdAt: {
+//           [Op.lte]: moment()
+//             .subtract(expiryTimeInSeconds, 'seconds')
+//             .toDate(),
+//         },
+//       },
+//       transaction,
+//     })
+//     await transaction.commit()
+//   } catch (err) {
+//     await transaction.rollback()
+//   }
+// }
+
+// async function getAttestationExpiryInSeconds() {
+//   if (
+//     attestationExpiryCache.expiryInSeconds &&
+//     attestationExpiryCache.timestamp &&
+//     Date.now() - attestationExpiryCache.timestamp < ATTESTATION_EXPIRY_TIMEOUT_MS
+//   ) {
+//     return attestationExpiryCache.expiryInSeconds
+//   }
+//   const attestations = await kit.contracts.getAttestations()
+//   const expiryTimeInSeconds = (await attestations.attestationExpiryBlocks()) * 5
+//   attestationExpiryCache.expiryInSeconds = expiryTimeInSeconds
+//   attestationExpiryCache.timestamp = Date.now()
+//   return expiryTimeInSeconds
+// }
+
+// // TODO fix
+// async purgeExpiredAttestations() {
+//   const transaction = await sequelize!.transaction({ logging: this.sequelizeLogger })
+//   return purgeExpiredRecords(transaction)
+// }

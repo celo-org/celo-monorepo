@@ -1,23 +1,36 @@
+import { E164Number } from '@celo/utils/lib/io'
 import { BuildOptions, DataTypes, Model, Sequelize } from 'sequelize'
-import { SmsProviderType } from '../sms/base'
 
 export interface AttestationModel extends Model {
   readonly id: number
   account: string
   identifier: string
   issuer: string
+  countryCode: string
+  phoneNumber: E164Number
+  message: string
+  ongoingDeliveryId: string | null
+  providers: string
+  attempt: number
   status: AttestationStatus
-  smsProvider: SmsProviderType
+  errorCode: string | null
+  key: () => AttestationKey
+}
 
-  canSendSms: () => boolean
+export interface AttestationKey {
+  account: string
+  identifier: string
+  issuer: string
 }
 
 export enum AttestationStatus {
-  DISPATCHING = 'DISPATCHING',
-  UNABLE_TO_SERVE = 'UNABLE_TO_SERVE',
-  FAILED = 'FAILED',
-  SENT = 'SMS_SEND_SUCCESS',
-  COMPLETE = 'COMPLETE',
+  NotSent, // Not yet received ok by a provider
+  Sent, // Received ok by provider
+  Queued, // Buffered or queued, but still in flight
+  Upstream, // Reached upstream carrier
+  Other,
+  Delivered, // Success!
+  Failed, // We will try to retransmit.
 }
 
 export type AttestationStatic = typeof Model &
@@ -28,16 +41,18 @@ export default (sequelize: Sequelize) => {
     account: DataTypes.STRING,
     identifier: DataTypes.STRING,
     issuer: DataTypes.STRING,
+    countryCode: DataTypes.STRING,
+    phoneNumber: DataTypes.STRING,
+    message: DataTypes.STRING,
+    ongoingDeliveryId: DataTypes.STRING,
+    providers: DataTypes.STRING,
+    attempt: DataTypes.INTEGER,
     status: DataTypes.STRING,
-    smsProvider: DataTypes.STRING,
+    errorCode: DataTypes.STRING,
   }) as AttestationStatic
 
-  model.prototype.canSendSms = function() {
-    return [
-      AttestationStatus.DISPATCHING,
-      AttestationStatus.FAILED,
-      AttestationStatus.UNABLE_TO_SERVE,
-    ].includes(this.status)
+  model.prototype.key = function(): AttestationKey {
+    return { account: this.account, identifier: this.identifier, issuer: this.issuer }
   }
 
   return model
