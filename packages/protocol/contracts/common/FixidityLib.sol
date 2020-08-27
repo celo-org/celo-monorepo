@@ -18,6 +18,14 @@ library FixidityLib {
   }
 
   /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
+
+  /**
    * @notice Number of positions that the comma is shifted to the right.
    */
   function digits() internal pure returns (uint8) {

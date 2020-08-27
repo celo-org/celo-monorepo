@@ -1,7 +1,10 @@
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
+import { eqAddress } from '@celo/utils/lib/address'
+import 'cross-fetch/polyfill'
 import { FindOptions, Sequelize } from 'sequelize'
 import Web3 from 'web3'
-import { fetchEnv, getAttestationSignerAddress } from './env'
+import { fetchEnv, getAccountAddress, getAttestationSignerAddress } from './env'
 import { rootLogger } from './logger'
 import Attestation, { AttestationModel, AttestationStatic } from './models/attestation'
 
@@ -53,6 +56,47 @@ export async function isAttestationSignerUnlocked() {
   }
 }
 
+// Verify a signer and validator address are provided, are valid, match the on-chain signer,
+// that signer account is unlocked, that metadata is accessible and valid and that the
+// attestationServiceURL claim is present in the metadata (external name/port may be
+// different to instance, so we cannot validate its details)
+export async function verifyConfigurationAndGetURL() {
+  const signer = getAttestationSignerAddress()
+  const validator = getAccountAddress()
+
+  const accounts = await kit.contracts.getAccounts()
+  if (!(await accounts.isAccount(validator))) {
+    throw Error(`${validator} is not registered as an account!`)
+  }
+
+  if (!(await accounts.hasAuthorizedAttestationSigner(validator))) {
+    throw Error(`No attestation signer authorized for ${validator}!`)
+  }
+
+  const signerOnChain = await accounts.getAttestationSigner(validator)
+  if (!eqAddress(signerOnChain, signer)) {
+    throw Error(
+      `Different attestation signer in config ${signer} than on-chain ${signerOnChain} for ${validator}!`
+    )
+  }
+
+  if (!(await isAttestationSignerUnlocked())) {
+    throw Error(`Need to unlock attestation signer account ${signer}`)
+  }
+
+  const metadataURL = await accounts.getMetadataURL(validator)
+  try {
+    const metadata = await IdentityMetadataWrapper.fetchFromURL(kit, metadataURL)
+    const claim = metadata.findClaim(ClaimTypes.ATTESTATION_SERVICE_URL)
+    if (!claim) {
+      throw Error('Missing ATTESTATION_SERVICE_URL claim')
+    }
+    return claim.url
+  } catch (error) {
+    throw Error(`Could not verify metadata at ${metadataURL}: ${error}`)
+  }
+}
+
 export async function initializeKit() {
   if (kit === undefined) {
     kit = newKitFromWeb3(new Web3(fetchEnv('CELO_PROVIDER')))
@@ -62,8 +106,8 @@ export async function initializeKit() {
       rootLogger.info({ ageOfLatestBlock }, 'Initializing ContractKit')
     } catch (error) {
       rootLogger.error(
-        'Initializing Kit failed, are you running your node and specified it with the "CELO_PROVIDER" env var?. It\' currently set as ' +
-          fetchEnv('CELO_PROVIDER')
+        'Initializing ContractKit failed. Is the Celo node running and accessible via ' +
+          `the "CELO_PROVIDER" env var? Currently set as ${fetchEnv('CELO_PROVIDER')}`
       )
       throw error
     }
