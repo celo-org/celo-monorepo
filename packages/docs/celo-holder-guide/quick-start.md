@@ -96,6 +96,12 @@ You will now need to point the Celo CLI to a node that is synchronized with the 
 
 ## Locate and verify your `ReleaseGold` contract address
 
+First, copy the beneficiary address into the clipboard, and set it in an environment variable:
+
+```bash
+export CELO_BENEFICIARY_ADDRESS=<Beneficiary>
+```
+
 Next, you will find the address of the `ReleaseGold` contract deployed for your beneficiary address. The `ReleaseGold` contract has its own address and is separate from the beneficiary address, but there are certain aspects of it that can be controlled only by the beneficiary.
 
 Open the list of [all ReleaseGold deployments](https://storage.googleapis.com/celo-website/releasegold/CeloMainnetReleaseGoldAll.json) and locate your address (use Edit>Find in your browser, then paste the beneficiary address). Copy the matching value next to `ContractAddress` into your clipboard.
@@ -104,11 +110,10 @@ If you cannot locate your address in these mappings, please contact cLabs.
 
 If you have more than one beneficiary address, you'll want to step through this guide and complete the steps for each one separately.
 
-Record the `Beneficiary` and `ContractAddress` values in environment variables:
+Record the value of the `ContractAddress` in an environment variable:
 
 ```bash
-export CELO_BENEFICIARY_ADDRESS=<YOUR-CELO-BENEFICIARY-ADDRESS>
-export CELO_RG_ADDRESS=<YOUR-CELO-RELEASEGOLD-ADDRESS>
+export CELO_RG_ADDRESS=<ContractAddress>
 ```
 
 You should find your beneficiary account already has a very small CELO balance to pay for transaction fees (values are shown in wei, so For example, 1 CELO = 1000000000000000000):
