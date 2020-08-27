@@ -547,7 +547,7 @@
     "@opentelemetry/api" "^0.10.2"
     tslib "^2.0.0"
 
-"@azure/identity@^1.1.0":
+"@azure/identity@^1.0.2", "@azure/identity@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@azure/identity/-/identity-1.1.0.tgz#e7c9a99d0408c7f8776d4f268a343d645971c662"
   integrity sha512-S4jYqegLWXIwVnkiArFlcTA7KOZmv+LMhQeQJhnmYy/CxrJHyIAEQyJ7qsrSt58bSyDZI2NkmKUBKaYGZU3/5g==
@@ -565,7 +565,7 @@
   optionalDependencies:
     keytar "^5.4.0"
 
-"@azure/keyvault-keys@^4.1.0":
+"@azure/keyvault-keys@^4.0.2", "@azure/keyvault-keys@^4.1.0":
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/@azure/keyvault-keys/-/keyvault-keys-4.1.0.tgz#3a55d819370bfe6bb6e6588125b0cf6734c18528"
   integrity sha512-xdz7nkYulWSo2+CsBRxaOe2JrGWQP3WxEjPLdIzZNHyaYBuLlnKHL3XWYH5j0UUVoDcmQClZUlZ2P/kdOiy/aQ==
@@ -578,7 +578,7 @@
     "@opentelemetry/api" "^0.10.2"
     tslib "^2.0.0"
 
-"@azure/keyvault-secrets@^4.1.0":
+"@azure/keyvault-secrets@^4.0.2", "@azure/keyvault-secrets@^4.1.0":
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/@azure/keyvault-secrets/-/keyvault-secrets-4.1.0.tgz#47f30639344eefe6ac9e5b558347ea1f626163ef"
   integrity sha512-26ARU97svPkv8q6QbIdwdky8ntn+Q5mxTTCjpp9FUIyA2LTXmEL0wZDPBeM3mxZLHKnMEXQxEo+KYutrJW5xPQ==
@@ -6677,6 +6677,13 @@
   integrity sha512-3DiI3Zxf81CgX+VhxNNFJBv/sfr1BFBKQK2sQ85hU9FwWJJMWV5gRDV79OUNShiwj3tYYIezU94qpucsb3dThQ==
   dependencies:
     bignumber.js "7.2.1"
+
+"@types/ethereumjs-abi@0.6.3":
+  version "0.6.3"
+  resolved "https://registry.yarnpkg.com/@types/ethereumjs-abi/-/ethereumjs-abi-0.6.3.tgz#eb5ed09fd86b9e2b1c0eb75d1e9bc29c50715c86"
+  integrity sha512-DnHvqPkrJS5w4yZexTa5bdPNb8IyKPYciou0+zZCIg5fpzvGtyptTvshy0uZKzti2/k/markwjlxWRBWt7Mjuw==
+  dependencies:
+    "@types/node" "*"
 
 "@types/ethereumjs-util@^5.2.0":
   version "5.2.0"
@@ -15417,7 +15424,7 @@ ethereumjs-abi@0.6.7, "ethereumjs-abi@git+https://github.com/ethereumjs/ethereum
     bn.js "^4.11.8"
     ethereumjs-util "^6.0.0"
 
-ethereumjs-abi@^0.6.8:
+ethereumjs-abi@^0.6.5, ethereumjs-abi@^0.6.8:
   version "0.6.8"
   resolved "https://registry.yarnpkg.com/ethereumjs-abi/-/ethereumjs-abi-0.6.8.tgz#71bc152db099f70e62f108b7cdfca1b362c6fcae"
   integrity sha512-Tx0r/iXI6r+lRsdvkFDlut0N08jWMnKRZ6Gkq+Nmw75lZe4e6o3EkSnkaBP5NF6+m5PTGAr9JP43N3LyeoglsA==
