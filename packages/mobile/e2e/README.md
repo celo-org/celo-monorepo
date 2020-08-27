@@ -6,11 +6,19 @@ These are the End-to-End (e2e) tests for the wallet mobile app. They run an emul
 
 ## Setting up the VM
 
+### Android
+
 First install the emulator as described in the [SETUP readme](../../../SETUP.md#optional-install-an-android-emulator).
 
 By default, the e2e scripts will assume the VM name of `Pixel_API_29_AOSP_x86_64` recommended in the instructions but you can rename the VM as you like.
 
 Next, to improve reliability of the tests, configure the VM as described in the [Detox best practices doc](https://github.com/wix/Detox/blob/master/docs/Introduction.AndroidEmulatorsBestPractices.md).
+
+### iOS
+
+Ensure you have Xcode installed.
+
+Install [AppleSimulatorUtils](https://github.com/wix/AppleSimulatorUtils#installing) which is used in e2e scripts to launch the iOS simulator.
 
 ## Running the tests
 

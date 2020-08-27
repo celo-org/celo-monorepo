@@ -164,33 +164,6 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/releasegold/refund-and-finalize.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/refund-and-finalize.ts)_
 
-### Release-gold
-
-```
-USAGE
-  $ celocli releasegold:release-gold
-
-OPTIONS
-  --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
-
-  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
-                                                         addresses for local signing
-
-  --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
-                                                         from the ledger
-
-  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
-                                                         of index addresses for local signing. Example
-                                                         --ledgerCustomAddresses "[4,99]"
-
-  --usdGas                                               If --usdGas is set, the transaction is paid for with a
-                                                         feeCurrency of cUSD
-
-  --useLedger                                            Set it to use a ledger wallet
-```
-
-_See code: [packages/cli/src/commands/releasegold/release-gold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/release-gold.ts)_
-
 ### Revoke
 
 Revoke the given contract instance. Once revoked, any Locked Gold can be unlocked by the release owner. The beneficiary will then be able to withdraw any released Gold that had yet to be withdrawn, and the remainder can be transferred by the release owner to the refund address. Note that not all ReleaseGold instances are revokable.

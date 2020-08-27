@@ -90,8 +90,26 @@ async function getQueryQuota(account: string, hashedPhoneNumber?: string) {
     )
   }
 
-  const accountBalance = await getDollarBalance(account)
-  if (accountBalance.isGreaterThanOrEqualTo(config.quota.minDollarBalance)) {
+  let cUSDAccountBalance = new BigNumber(0)
+  let celoAccountBalance = new BigNumber(0)
+
+  await Promise.all([
+    new Promise((resolve) => {
+      resolve(getDollarBalance(account))
+    }),
+    new Promise((resolve) => {
+      resolve(getCeloBalance(account))
+    }),
+  ]).then((values) => {
+    cUSDAccountBalance = values[0] as BigNumber
+    celoAccountBalance = values[1] as BigNumber
+  })
+
+  // Min balance can be in either cUSD or CELO
+  if (
+    cUSDAccountBalance.isGreaterThanOrEqualTo(config.quota.minDollarBalance) ||
+    celoAccountBalance.isGreaterThanOrEqualTo(config.quota.minCeloBalance)
+  ) {
     logger.debug('Account is not verified but meets min balance')
     // TODO consider granting these unverified users slightly less queryPerTx
     const transactionCount = await getTransactionCountFromAccount(account)
@@ -114,6 +132,15 @@ export async function getTransactionCountFromAccount(account: string): Promise<n
 export async function getDollarBalance(account: string): Promise<BigNumber> {
   return retryAsyncWithBackOff(
     async () => (await getContractKit().contracts.getStableToken()).balanceOf(account),
+    RETRY_COUNT,
+    [],
+    RETRY_DELAY_IN_MS
+  )
+}
+
+export async function getCeloBalance(account: string): Promise<BigNumber> {
+  return retryAsyncWithBackOff(
+    async () => (await getContractKit().contracts.getGoldToken()).balanceOf(account),
     RETRY_COUNT,
     [],
     RETRY_DELAY_IN_MS

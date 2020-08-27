@@ -313,9 +313,9 @@ See [`src/identity/verification.test.ts`] for an example.
 ### End-to-End testing
 
 We use [Detox][detox] for E2E testing. In order to run the tests locally, you
-must have the proper emulator set up. Follow the instrutions in [e2e/README.md][e2e readme].
+must have the proper emulator set up. Follow the instructions in [e2e/README.md][e2e readme].
 
-Once setup is done, you can run the tests with `yarn test:e2e:android`
+Once setup is done, you can run the tests with `yarn test:e2e:android` or `yarn test:e2e:ios`.
 
 ## Building APKs / Bundles
 
