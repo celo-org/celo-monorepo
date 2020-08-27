@@ -22,7 +22,7 @@
     "ethereumjs-util": "^5.2.0"
   },
   "devDependencies": {
-    "@celo/sdk-types": "1.0.0-dev"
+    "@celo/communication": "0.0.1-dev"
   },
   "engines": {
     "node": ">=8.13.0"
