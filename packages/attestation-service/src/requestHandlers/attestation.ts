@@ -213,31 +213,6 @@ class AttestationRequestHandler {
     return
   }
 
-  async persistFinalAttestationResult(result: AttestationStatus) {
-    if (result === AttestationStatus.COMPLETE) {
-      Counters.attestationRequestsBelievedDelivered.inc()
-    } else if (result === AttestationStatus.FAILED) {
-      Counters.attestationRequestsFailedToDeliverSms.inc()
-    }
-
-    const transaction = await sequelize!.transaction({ logging: this.sequelizeLogger })
-    try {
-      const attestationRecord = await ensureLockedRecord(
-        this.attestationRequest,
-        this.identifier,
-        transaction
-      )
-      await attestationRecord.update(
-        { status: result },
-        { transaction, logging: this.sequelizeLogger }
-      )
-      await transaction.commit()
-    } catch (err) {
-      this.logger.error({ err })
-      await transaction.rollback()
-    }
-  }
-
   async sendSmsAndPersistAttestation(attestationCode: string) {
     const textMessage = createAttestationTextMessage(
       attestationCode,
@@ -255,20 +230,7 @@ class AttestationRequestHandler {
       )
 
       try {
-        const sentVia = await startSendSms(
-          this.attestationRequest.phoneNumber,
-          textMessage,
-          () => {
-            setTimeout(() => {
-              void this.persistFinalAttestationResult(AttestationStatus.FAILED)
-            }, 1000)
-          },
-          () => {
-            setTimeout(() => {
-              void this.persistFinalAttestationResult(AttestationStatus.COMPLETE)
-            }, 1000)
-          }
-        )
+        const sentVia = await startSendSms(this.attestationRequest.phoneNumber, textMessage)
         Counters.attestationRequestsSentSms.inc()
         await attestationRecord.update(
           { status: AttestationStatus.SENT, smsProvider: sentVia },
