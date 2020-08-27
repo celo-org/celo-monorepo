@@ -1,7 +1,7 @@
-import { CeloTx, EncodedTransaction } from '@celo/sdk-types/commons'
-import { Signer, Wallet } from '@celo/sdk-types/wallet'
+import { CeloTx, EncodedTransaction } from '@celo/communication'
 import { Address, isHexString, normalizeAddressWith0x } from '@celo/utils/lib/address'
 import * as ethUtil from 'ethereumjs-util'
+import { Signer, Wallet } from '../types'
 import { EIP712TypedData, generateTypedDataHash } from './sign-typed-data-utils'
 import { chainIdTransformationForSigning, encodeTransaction, rlpEncodedTx } from './signing-utils'
 

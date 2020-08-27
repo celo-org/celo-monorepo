@@ -1,4 +1,4 @@
-import { CeloTx, EncodedTransaction } from '@celo/sdk-types/commons'
+import { CeloTx, EncodedTransaction } from '@celo/communication'
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import debugFactory from 'debug'
@@ -140,6 +140,9 @@ export async function encodeTransaction(
       to: rlpEncoded.transaction.to!.toString(),
       value: rlpEncoded.transaction.value!.toString(),
       input: rlpEncoded.transaction.data!,
+      feeCurrency: rlpEncoded.transaction.feeCurrency!.toString(),
+      gatewayFeeRecipient: rlpEncoded.transaction.feeCurrency!.toString(),
+      gatewayFee: rlpEncoded.transaction.feeCurrency!.toString(),
       v,
       r,
       s,

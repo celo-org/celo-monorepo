@@ -1,4 +1,4 @@
-import { Wallet } from '@celo/sdk-types/wallet'
+import { Wallet } from '@celo/wallet-base/types'
 import Web3 from 'web3'
 import { NodeCommunicationWrapper } from './node-communication-wrapper'
 export * from './abi'

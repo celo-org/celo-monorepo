@@ -24,7 +24,7 @@
     "debug": "^4.1.1"
   },
   "devDependencies": {
-    "@celo/sdk-types": "1.0.0-dev",
+    "@celo/communication": "0.0.1-dev",
     "@types/ethereumjs-abi": "0.6.3"
   },
   "engines": {

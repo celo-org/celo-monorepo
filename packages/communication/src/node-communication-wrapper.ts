@@ -1,5 +1,5 @@
-import { Wallet } from '@celo/sdk-types/wallet'
 import { toChecksumAddress } from '@celo/utils/lib/address'
+import { Wallet } from '@celo/wallet-base/types'
 import debugFactory from 'debug'
 import Web3 from 'web3'
 import { AbiCoder } from './abi'
