@@ -27,7 +27,8 @@ import { RecipientKind } from 'src/recipients/recipient'
 interface AppEventsProperties {
   [AppEvents.app_launched]: {
     // TODO: Figure out how to measure loadingDuration iOS and make param required
-    loadingDuration?: number
+    reactLoadDuration?: number
+    appLoadDuration?: number
     deviceInfo?: object
     deviceHeight: number
     deviceWidth: number
@@ -79,6 +80,7 @@ interface SettingsEventsProperties {
   [SettingsEvents.language_select]: {
     language: string
   }
+  [SettingsEvents.settings_verify_number]: undefined
   [SettingsEvents.pin_require_on_load]: {
     enabled: boolean
   }

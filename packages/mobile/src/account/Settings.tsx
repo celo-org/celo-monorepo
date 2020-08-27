@@ -11,7 +11,14 @@ import { StackScreenProps } from '@react-navigation/stack'
 import * as Sentry from '@sentry/react-native'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { clearStoredAccount, devModeTriggerClicked, toggleBackupState } from 'src/account/actions'
@@ -124,6 +131,13 @@ export class Account extends React.Component<Props, State> {
     this.props.navigation.navigate(Screens.Profile)
   }
 
+  goToConfirmNumber = () => {
+    ValoraAnalytics.track(SettingsEvents.settings_verify_number)
+    this.props.navigation.navigate(Screens.VerificationEducationScreen, {
+      hideOnboardingStep: true,
+    })
+  }
+
   goToLanguageSetting = () => {
     this.props.navigation.navigate(Screens.Language, { nextScreen: this.props.route.name })
   }
@@ -165,6 +179,10 @@ export class Account extends React.Component<Props, State> {
 
   showDebugScreen = () => {
     this.props.navigation.navigate(Screens.Debug)
+  }
+
+  onDevSettingsTriggerPress = () => {
+    this.props.devModeTriggerClicked()
   }
 
   getDevSettingsComp() {
@@ -287,7 +305,7 @@ export class Account extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, i18n } = this.props
+    const { t, i18n, numberVerified } = this.props
     const promptFornoModal = this.props.route.params?.promptFornoModal ?? false
     const promptConfirmRemovalModal = this.props.route.params?.promptConfirmRemovalModal ?? false
     const currentLanguage = AVAILABLE_LANGUAGES.find((l) => l.code === i18n.language)
@@ -295,11 +313,16 @@ export class Account extends React.Component<Props, State> {
       <SafeAreaView style={styles.container}>
         <DrawerTopBar />
         <ScrollView>
-          <Text style={styles.title} testID={'SettingsTitle'}>
-            {t('global:settings')}
-          </Text>
+          <TouchableWithoutFeedback onPress={this.onDevSettingsTriggerPress}>
+            <Text style={styles.title} testID={'SettingsTitle'}>
+              {t('global:settings')}
+            </Text>
+          </TouchableWithoutFeedback>
           <View style={styles.containerList}>
             <SettingsItemTextValue title={t('editProfile')} onPress={this.goToProfile} />
+            {!numberVerified && (
+              <SettingsItemTextValue title={t('confirmNumber')} onPress={this.goToConfirmNumber} />
+            )}
             <SettingsItemTextValue
               title={t('languageSettings')}
               value={currentLanguage?.name ?? t('global:unknown')}
