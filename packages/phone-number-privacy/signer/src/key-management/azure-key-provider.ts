@@ -11,7 +11,7 @@ export class AzureKeyProvider extends KeyProviderBase {
     try {
       const { vaultName, secretName } = config.keystore.azure
 
-      await snooze(7000)
+      await snooze(30000)
       const keyVaultClient = new AzureKeyVaultClient(vaultName)
       const privateKey = await keyVaultClient.getSecret(secretName)
       this.setPrivateKey(privateKey)
