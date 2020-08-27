@@ -1,12 +1,12 @@
 # Attestation Service
 
-Celo Validators are strongly encouraged to operate an [Attestation Service](https://github.com/celo-org/celo-monorepo/tree/master/packages/attestation-service) instance.
+Celo Validators are strongly encouraged to operate an [Attestation Service](https://github.com/celo-org/celo-monorepo/tree/master/packages/attestation-service) instance.  If you are a recipient of or considering applying to receive [votes from the Celo Foundation](celo-foundation-voting-policy.md), running a reliable Attestation Service is a requirement for eligibility.
 
-The Attestation Service is part of the [Celo identity protocol](/celo-codebase/protocol/identity). It sends SMS on behalf of users to allow them to attest to having access to a phone number and to map that securely and privately to a Celo account. This is shown as Steps 3 and 4 in this diagram:
+The Attestation Service is part of the [Celo identity protocol](../celo-codebase/protocol/identity/README.md). It sends SMS on behalf of users to allow them to attest to having access to a phone number and to map that to a Celo account, securely and privately. This is shown as Steps 3 and 4 in this diagram:
 
 ![](https://storage.googleapis.com/celo-website/docs/attestations-flow.jpg)
 
-Validators receive a fee (set by Governance, currently 0.05 cUSD) for every attestation that they process and that is then successfully redeemed on-chain by the user. In a future release, the Attestation Service will automatically claim and withdraw this fee.
+Validators receive a fee (set by [on-chain governance](../celo-holder-guide/voting-governance.md), currently 0.05 cUSD) for every attestation that they process and that is then successfully redeemed on-chain by the user. In a future release, the Attestation Service will automatically claim and withdraw this fee.
 
 ## Outline
 
@@ -37,7 +37,7 @@ Currently the Attestation Service supports two SMS providers: [Twilio](https://w
 
 ### Twilio
 
-After you sign up for Twilio at [https://www.twilio.com/try-twilio](https://www.twilio.com/try-twilio), you should see your `ACCOUNT SID` and your `AUTH_TOKEN` in the top right of the console. You'll also want to enter in a credit card to fund the account. For most text messages, the costs are typically very low (and significantly lower than the attestation fee paid by the user). Find a more comprehensive price list at [https://www.twilio.com/sms/pricing](https://www.twilio.com/sms/pricing). If there are countries that you do not want to serve, you can specify them with the `TWILIO_UNSUPPORTED_REGIONS` configuration option. 
+After you sign up for Twilio at [https://www.twilio.com/try-twilio](https://www.twilio.com/try-twilio), you should see your `ACCOUNT SID` and your `AUTH_TOKEN` in the top right of the console. You'll also want to enter in a credit card to fund the account. For most text messages, the costs are typically very low (and significantly lower than the attestation fee paid by the user). Find a more comprehensive price list at [https://www.twilio.com/sms/pricing](https://www.twilio.com/sms/pricing). If there are countries that you do not want to serve, you can specify them with the `TWILIO_UNSUPPORTED_REGIONS` configuration option.
 
 Next, adjust the Geo settings to serve phone numbers globally under [https://www.twilio.com/console/sms/settings/geo-permissions](https://www.twilio.com/console/sms/settings/geo-permissions). Otherwise, the service will not be able to send SMS to Celo's global user base and your validator will negatively impact the Celo user experience.
 
@@ -47,7 +47,7 @@ Now that you have provisioned your messaging service, you need to buy at least 1
 
 ### Nexmo
 
-Click the balance in the top-left to go to [Billing and Payments](https://dashboard.nexmo.com/billing-and-payments), where you can add funds. It is strongly recommended that you enable auto-reload to avoid failing to deliver SMS when your funds are exhausted.
+Click the balance in the top-left to go to [Billing and Payments](https://dashboard.nexmo.com/billing-and-payments), where you can add funds. It is strongly recommended that you use a credit or debit card (as opposed to other forms of payment) as you will then be able to enable `Auto reload`. You should also enable `Low balance alerts`. Both of these will help avoid failing to deliver SMS when your funds are exhausted.
 
 Under [Your Numbers](https://dashboard.nexmo.com/your-numbers), create a US number and ensure that is enabled for SMS.
 
@@ -143,7 +143,7 @@ Optional environment variables:
 |--------------------------------|-------------------------------------------------------------------------------------------------|
 | `PORT`                           | Port to listen on. Default `3000`. |
 | `SMS_PROVIDERS_<country>`        | Override to set SMS providers and order for a specific country code (e.g `SMS_PROVIDERS_MX=nexmo,twilio`) |
-| `MAX_PROVIDER_RETRIES`           | Number of retries (after first) when sending SMS before considering next provider Default `2`.  |
+| `MAX_PROVIDER_RETRIES`           | Number of retries (after first) when sending SMS before considering next provider Default `3`.  |
 | `EXTERNAL_CALLBACK_HOSTPORT`     | Provide the external URL at which providers can attempt callbacks with delivery receipts. If not provided, defaults to the value retrieved from the validator metadata. |
 | `TIMEOUT_CLEANUP_NO_RECEIPT_MIN` | If a delivery report appears to be supported but is not received within this number of minutes, assume delivery success                                               |
 | `VERIFY_CONFIG_ON_STARTUP`       | Refuse to start if signer or metadata is misconfigured. Default `1`. |
@@ -157,7 +157,7 @@ Twilio configuration options:
 | `TWILIO_ACCOUNT_SID`           | The Twilio account ID                                           |
 | `TWILIO_MESSAGING_SERVICE_SID` | The Twilio Message Service ID. Starts with `MG`                 |
 | `TWILIO_AUTH_TOKEN`            | The API authentication token                                    |
-| `TWILIO_UNSUPPORTED_REGIONS`   | Optional. A comma-separated list of country codes to not serve  |
+| `TWILIO_UNSUPPORTED_REGIONS`   | Optional. A comma-separated list of country codes to not serve, e.g `US,MX`  |
 
 Nexmo configuration options:
 
@@ -165,7 +165,8 @@ Nexmo configuration options:
 | --------------------------- | --------------------------------------------------------------- |
 | `NEXMO_KEY`                 | The API key to the Nexmo API                                    |
 | `NEXMO_SECRET`              | The API secret to the Nexmo API                                 |
-| `NEXMO_UNSUPPORTED_REGIONS` | Optional. A comma-separated list of country codes to not serve  |
+| `NEXMO_UNSUPPORTED_REGIONS` | Optional. A comma-separated list of country codes to not serve, e.g `US,MX`  |
+| `NEXMO_ACCOUNT_BALANCE_METRIC` | Optional. Disabled by default. If set to `1`, Nexmo balances will be published under the `attestation_provider_balance` metric. |
 
 
 ## Running the Attestation Service
@@ -177,11 +178,13 @@ Before running the attestation service, ensure that your local node is fully syn
 sudo celocli node:synced --node geth.ipc
 ```
 
-The following command for running the Attestation Service is using Twilio and uses `--network host` to access a local database (only works on Linux), and listens for connections on port 80.
+The following command for running the Attestation Service uses `--network host` to access a local database (only works on Linux), and listens for connections on port 80.
+
+It assumes all of the configuration options needed have been added to the config file located under `$CONFIG`.  You can pass other environment variables directly by adding arguments of the form `-e DATABASE_URL=$DATABASE_URL`.
 
 ```bash
 # On the Attestation machine
-docker run --name celo-attestation-service -it --restart always --entrypoint /bin/bash --network host -e CONFIG=$CONFIG -e PORT=80 -p 80:80 us.gcr.io/celo-testnet/celo-monorepo:attestation-service-1-0-1 -c " cd /celo-monorepo/packages/attestation-service && yarn run db:migrate && yarn start "
+docker run --name celo-attestation-service -it --restart always --entrypoint /bin/bash --network host -e CONFIG=$CONFIG -e PORT=80 -p 80:80 us.gcr.io/celo-testnet/celo-monorepo:attestation-service-1-0-2 -c " cd /celo-monorepo/packages/attestation-service && yarn run db:migrate && yarn start "
 ```
 
 ### Registering Metadata
@@ -265,6 +268,8 @@ Attestation Service also has a `/status` endpoint for configuration information.
 ### Metrics
 
 Attestation Service exposes the following Prometheus format metrics at `/metrics` for attestations made. Please note that metrics are per instance.
+
+Please note that monitoring endpoints including metrics are exposed as a path on the usual host port. This means they are public by default. If you want metrics to be internal only, you will need to configure a load balancer appropriately.
 
 - `attestation_requests_total`: Counter for the number of attestation requests.
 
