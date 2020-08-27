@@ -506,7 +506,7 @@ export const simulateClient = async (
   // Assume the node is accessible via localhost with senderAddress unlocked
   const kit = newKit(web3Provider)
   kit.defaultAccount = senderAddress
-  const gasPriceFixed = 11100000
+  const gasPriceFixed = 21100000
 
   const baseLogMessage: any = {
     loadTestID: index,
