@@ -3,6 +3,8 @@ import { Image, ImageSourcePropType, StyleSheet, Text } from 'react-native'
 import { Cell, Spans } from 'src/layout/GridRow'
 import { fonts, standardStyles } from 'src/styles'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
+import { ImageStyle, View } from 'react-native'
+import { useScreenSize } from 'src/layout/ScreenSize'
 interface Props {
   source: ImageSourcePropType
   title: string
@@ -11,13 +13,20 @@ interface Props {
     text: string
     href: string
   }
+  imageStyle?: ImageStyle
 }
-export function Adventure({ title, text, source, link }: Props) {
+export function Adventure({ title, text, source, link, imageStyle }: Props) {
+  const { isMobile } = useScreenSize()
   return (
-    <Cell span={Spans.third}>
-      <Image source={source} style={styles.image} resizeMode="contain" />
-      <Text style={[fonts.h6, standardStyles.elementalMargin]}>{title}</Text>
-      <Text style={fonts.p}>{text}</Text>
+    <Cell
+      span={Spans.third}
+      style={[styles.root, isMobile && standardStyles.elementalMarginBottom]}
+    >
+      <View>
+        <Image source={source} style={[styles.image, imageStyle]} resizeMode="contain" />
+        <Text style={[fonts.h6, standardStyles.elementalMargin]}>{title}</Text>
+        <Text style={fonts.p}>{text}</Text>
+      </View>
       {link && (
         <Button
           style={standardStyles.elementalMarginTop}
@@ -31,6 +40,9 @@ export function Adventure({ title, text, source, link }: Props) {
   )
 }
 const styles = StyleSheet.create({
+  root: {
+    justifyContent: 'space-between',
+  },
   links: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',

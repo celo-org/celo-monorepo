@@ -13,10 +13,11 @@ import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import sequenceTopImage from 'src/illustrations/03-Inclusive-money-(light-bg).png'
 import { standardStyles, textStyles, colors, fonts } from 'src/styles'
 import { Adventure } from 'src/home/Adventure'
+import { useScreenSize } from 'src/layout/ScreenSize'
 
 export default function Landing() {
   const [t] = useTranslation(NameSpaces.cbe)
-
+  const { isMobile, isDesktop } = useScreenSize()
   return (
     <View style={styles.root}>
       <OpenGraph title={t('pageTitle')} description={t('description')} path={pagePaths.CBE.link} />
@@ -24,21 +25,28 @@ export default function Landing() {
       <GridRow
         desktopStyle={standardStyles.blockMarginTop}
         tabletStyle={standardStyles.blockMarginTopTablet}
-        mobileStyle={standardStyles.blockMarginTopMobile}
+        mobileStyle={standardStyles.elementalMarginTop}
         allStyle={standardStyles.centered}
       >
         <Cell tabletSpan={Spans.full} span={Spans.full}>
-          <H4 style={[textStyles.center, standardStyles.elementalMarginTop]}>{t('subTitle')}</H4>
-          <H1 style={[textStyles.center, standardStyles.elementalMarginBottom]}>
+          <H4 style={!isMobile && [textStyles.center, standardStyles.elementalMarginBottom]}>
+            {t('subTitle')}
+          </H4>
+          <H1
+            style={
+              isMobile
+                ? [fonts.h1, { marginTop: 5 }]
+                : [textStyles.center, standardStyles.elementalMarginBottom]
+            }
+          >
             {t('mainTitle')}
           </H1>
         </Cell>
       </GridRow>
       <GridRow
-        allStyle={standardStyles.blockMarginTopMobile}
-        desktopStyle={standardStyles.sectionMarginBottom}
-        tabletStyle={standardStyles.sectionMarginBottomTablet}
-        mobileStyle={standardStyles.sectionMarginBottomMobile}
+        desktopStyle={standardStyles.blockMarginBottom}
+        tabletStyle={standardStyles.blockMarginBottomTablet}
+        mobileStyle={standardStyles.blockMarginBottomMobile}
       >
         <Adventure
           source={sendToPhoneImg}
@@ -57,33 +65,35 @@ export default function Landing() {
           title={t('adventure3.title')}
           text={t('adventure3.text')}
           link={{ href: 'https://valoraapp.com', text: t('adventure3.link') }}
+          imageStyle={isDesktop ? styles.valoraDesktop : styles.valora}
         />
       </GridRow>
-      <GridRow
-        desktopStyle={standardStyles.blockMarginBottom}
-        tabletStyle={standardStyles.blockMarginBottomTablet}
-        mobileStyle={standardStyles.blockMarginBottomMobile}
-      >
-        <Cell span={Spans.full} style={standardStyles.centered}>
+      <GridRow allStyle={standardStyles.elementalMarginBottom}>
+        <Cell span={Spans.full} style={!isMobile && standardStyles.centered}>
           <Image source={sequenceTopImage} style={styles.logo} resizeMode="contain" />
           <H4>{t('sequenceTitle')}</H4>
         </Cell>
       </GridRow>
       <GridRow>
-        <ContentPreview title="Part 1" time={'2 min'} />
-        <ContentPreview title="Part 2" time={'5 min'} />
-        <ContentPreview title="Part 3" time={'3 min'} />
+        <ContentPreview title={t('lesson1')} time={'2 min'} />
+        <ContentPreview title={t('lesson2')} time={'5 min'} />
+        <ContentPreview title={t('lesson3')} time={'3 min'} />
       </GridRow>
     </View>
   )
 }
 
-function ContentPreview({ title, time }) {
+interface ContentPreviewProps {
+  title: string
+  time: string
+}
+
+function ContentPreview({ title, time }: ContentPreviewProps) {
   return (
     <Cell span={Spans.third}>
       <Image style={styles.preview} source={sequenceTopImage} />
-      <Text style={fonts.h5}>{title}</Text>
-      <Text style={[fonts.h5, styles.minutes]}>{time}</Text>
+      <Text style={fonts.h6}>{title}</Text>
+      <Text style={[fonts.h6, styles.minutes]}>{time}</Text>
     </Cell>
   )
 }
@@ -93,6 +103,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   preview: { backgroundColor: colors.gray, height: 222, marginBottom: 10 },
-  logo: { width: 275, height: 75 },
-  minutes: { color: colors.grayHeavy },
+  logo: { width: 275, height: 75, backgroundColor: colors.lightBlue },
+  valora: { height: 70, width: 70 },
+  valoraDesktop: { marginTop: 30, height: 70, width: 70 },
+  minutes: { color: colors.grayHeavy, marginTop: 2 },
 })

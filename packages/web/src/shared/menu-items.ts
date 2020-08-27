@@ -8,6 +8,7 @@ export interface MenuLink {
     backgroundHover: string
   }
   menuHidePoint?: number
+  menuHidePointMobile?: number
 }
 export const pagePaths = {
   HOME: {
@@ -59,6 +60,7 @@ export const pagePaths = {
       backgroundHover: 'rgba(22, 82, 235, 0.6)',
     },
     menuHidePoint: 420,
+    menuHidePointMobile: 320,
   },
   CODE_OF_CONDUCT: {
     name: 'Code of Conduct',

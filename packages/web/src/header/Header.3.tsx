@@ -96,8 +96,11 @@ export class Header extends React.PureComponent<Props, State> {
   }, 200)
 
   menuHidePoint() {
-    // TODO use constant for the amount
-    return this.getAttributes().menuHidePoint || Dimensions.get('window').height - HEADER_HEIGHT - 1
+    const attributes = this.getAttributes()
+    if (this.props.screen === ScreenSizes.MOBILE && attributes.menuHidePointMobile) {
+      return attributes.menuHidePointMobile
+    }
+    return attributes.menuHidePoint || Dimensions.get('window').height - HEADER_HEIGHT - 1
   }
 
   componentDidMount() {
@@ -121,6 +124,7 @@ export class Header extends React.PureComponent<Props, State> {
         isDark: false,
         translucent: null,
         menuHidePoint: null,
+        menuHidePointMobile: null,
       }
     )
   }
