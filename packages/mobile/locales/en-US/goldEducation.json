@@ -14,7 +14,7 @@
     },
     {
       "title": "Please buy and sell responsibly",
-      "text": "*Celo* allows you to buy and sell CELO. CELO presents a risk of financial loss, please exercise caution."
+      "text": "{{appName}} allows you to buy and sell CELO. CELO presents a risk of financial loss, please exercise caution."
     }
   ] 
 }
