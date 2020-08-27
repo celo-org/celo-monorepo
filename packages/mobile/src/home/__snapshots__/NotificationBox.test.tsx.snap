@@ -372,6 +372,185 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                 }
                 testID="undefined/Text"
               >
+                nuxVerification2:notification.body
+              </Text>
+              <View
+                style={
+                  Object {
+                    "flexDirection": "row",
+                  }
+                }
+                testID="undefined/CallToActions"
+              >
+                <View
+                  accessible={true}
+                  focusable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
+                  }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                  testID="undefined/CallToActions/nuxVerification2:notification.cta/Button"
+                >
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "fontSize": 14,
+                          "height": 16,
+                          "lineHeight": 16,
+                          "marginRight": 24,
+                          "minWidth": 48,
+                        },
+                      ]
+                    }
+                  >
+                    nuxVerification2:notification.cta
+                  </Text>
+                </View>
+                <View
+                  accessible={true}
+                  focusable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
+                  }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                  testID="undefined/CallToActions/global:remind/Button"
+                >
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#1AB775",
+                          "fontFamily": "Inter-SemiBold",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        Object {
+                          "fontSize": 14,
+                          "height": 16,
+                          "lineHeight": 16,
+                          "marginRight": 24,
+                          "minWidth": 48,
+                        },
+                      ]
+                    }
+                  >
+                    global:remind
+                  </Text>
+                </View>
+              </View>
+            </View>
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "justifyContent": "center",
+                  "width": 80,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  Object {
+                    "testUri": "../../../packages/mobile/src/images/get-verified.png",
+                  }
+                }
+              />
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "margin": 16,
+            "marginBottom": 24,
+            "width": 718,
+          }
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "padding": 16,
+              },
+              Object {
+                "borderRadius": 8,
+              },
+              Object {
+                "elevation": 12,
+                "shadowColor": "rgba(156, 164, 169, 0.4)",
+                "shadowOffset": Object {
+                  "height": 2,
+                  "width": 0,
+                },
+                "shadowOpacity": 1,
+                "shadowRadius": 12,
+              },
+              Array [
+                Object {
+                  "height": 144,
+                },
+                Object {},
+              ],
+            ]
+          }
+        >
+          <View
+            style={
+              Object {
+                "flex": 1,
+                "flexDirection": "row",
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "flex": 1,
+                  "justifyContent": "space-between",
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 18,
+                    "lineHeight": 24,
+                    "marginRight": 12,
+                  }
+                }
+                testID="undefined/Text"
+              >
                 exchangeFlow9:whatIsGold
               </Text>
               <View
@@ -505,6 +684,18 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
       style={
         Object {
           "backgroundColor": "#2E3338",
+          "borderRadius": 5,
+          "flex": 0,
+          "height": 5,
+          "marginHorizontal": 3,
+          "width": 5,
+        }
+      }
+    />
+    <View
+      style={
+        Object {
+          "backgroundColor": "#9CA4A9",
           "borderRadius": 5,
           "flex": 0,
           "height": 5,

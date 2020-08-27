@@ -7,7 +7,7 @@ import { e164NumberSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
 import { AppEvents, VerificationEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { setNumberVerified, setVerificationPossible } from 'src/app/actions'
+import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
   cancelVerification,
@@ -15,20 +15,18 @@ import {
   setCompletedCodes,
   setVerificationStatus,
 } from 'src/identity/actions'
-import { fetchPhoneHashPrivate, getSaltCache } from 'src/identity/privateHashing'
+import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import { attestationCodesSelector } from 'src/identity/reducer'
 import { VerificationStatus } from 'src/identity/types'
 import {
   AttestationCode,
   balanceSufficientForAttestations,
   doVerificationFlow,
-  isSufficientBalance,
   NUM_ATTESTATIONS_REQUIRED,
   requestAndRetrieveAttestations,
   startVerification,
   VERIFICATION_TIMEOUT,
 } from 'src/identity/verification'
-import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { getContractKitAsync } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { dataEncryptionKeySelector } from 'src/web3/selectors'
@@ -66,11 +64,6 @@ jest.mock('@celo/utils', () => {
     SignatureUtils: { parseSignature: mockParseSig, parseSignatureWithoutPrefix: mockParseSig },
   }
 })
-
-jest.mock('@celo/contractkit', () => ({
-  ...jest.requireActual('@celo/contractkit'),
-  ...jest.requireActual('../../__mocks__/@celo/contractkit/index'),
-}))
 
 const attestationCode0: AttestationCode = {
   code:
@@ -164,38 +157,6 @@ const mockAccountsWrapper = {
   getWalletAddress: jest.fn(() => Promise.resolve(mockAccount)),
   getDataEncryptionKey: jest.fn(() => Promise.resolve(mockPublicDEK)),
 }
-
-describe(isSufficientBalance, () => {
-  it('triggers InsufficientBalance verification status if balance is not sufficient', async () => {
-    await expectSaga(isSufficientBalance)
-      .provide([
-        [select(e164NumberSelector), mockE164Number],
-        [call(getSaltCache, mockE164Number), undefined],
-        [select(stableTokenBalanceSelector), 0.09],
-      ])
-      .put(setVerificationPossible(false))
-      .run()
-  })
-
-  it('triggers Stopped verification status if the previous one was InsufficientBalance', async () => {
-    await expectSaga(isSufficientBalance)
-      .provide([
-        [select(e164NumberSelector), mockE164Number],
-        [call(getSaltCache, mockE164Number), undefined],
-        [select(stableTokenBalanceSelector), 0.1],
-      ])
-      .put(setVerificationPossible(true))
-      .run()
-    await expectSaga(isSufficientBalance)
-      .provide([
-        [select(e164NumberSelector), mockE164Number],
-        [call(getSaltCache, mockE164Number), 'salt'],
-        [select(stableTokenBalanceSelector), 0],
-      ])
-      .put(setVerificationPossible(true))
-      .run()
-  })
-})
 
 describe('Start Verification Saga', () => {
   beforeEach(() => {

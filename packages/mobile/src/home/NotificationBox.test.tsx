@@ -3,9 +3,8 @@ import { render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import { DAYS_TO_BACKUP } from 'src/backup/utils'
 import NotificationBox from 'src/home/NotificationBox'
-import { VerificationStatus } from 'src/identity/types'
 import { createMockStore, getElementText } from 'test/utils'
-import { mockPaymentRequests } from 'test/values'
+import { mockE164Number, mockE164NumberPepper, mockPaymentRequests } from 'test/values'
 
 const TWO_DAYS_MS = 2 * 24 * 60 * 1000
 const RECENT_BACKUP_TIME = new Date().getTime() - TWO_DAYS_MS
@@ -41,6 +40,12 @@ describe('NotificationBox', () => {
   it('renders correctly for with all notifications', () => {
     const store = createMockStore({
       ...storeDataNotificationsEnabled,
+      account: {
+        ...storeDataNotificationsEnabled.account,
+        e164PhoneNumber: mockE164Number,
+      },
+      identity: { e164NumberToSalt: { [mockE164Number]: mockE164NumberPepper } },
+      stableToken: { balance: '0.00' },
     })
     const tree = render(
       <Provider store={store}>
@@ -175,10 +180,10 @@ describe('NotificationBox', () => {
       account: {
         ...storeDataNotificationsDisabled.account,
         dismissedGetVerified: false,
+        e164PhoneNumber: mockE164Number,
       },
-      app: {
-        verificationPossible: true,
-      },
+      identity: { e164NumberToSalt: { [mockE164Number]: mockE164NumberPepper } },
+      stableToken: { balance: '0.00' },
     })
     const { getByText } = render(
       <Provider store={store}>
@@ -191,13 +196,6 @@ describe('NotificationBox', () => {
   it('does not render verification reminder when insufficient balance', () => {
     const store = createMockStore({
       ...storeDataNotificationsDisabled,
-      account: {
-        ...storeDataNotificationsDisabled.account,
-        dismissedGetVerified: false,
-      },
-      identity: {
-        verificationStatus: VerificationStatus.InsufficientBalance,
-      },
     })
     const { queryByText } = render(
       <Provider store={store}>

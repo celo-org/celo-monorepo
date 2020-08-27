@@ -20,8 +20,7 @@ import { checkTxsForIdentityMetadata } from 'src/identity/commentEncryption'
 import { doImportContactsWrapper, fetchAddressesAndValidateSaga } from 'src/identity/contactMapping'
 import { AddressValidationType, e164NumberToAddressSelector } from 'src/identity/reducer'
 import { validateAndReturnMatch } from 'src/identity/secureSend'
-import { isSufficientBalance, startVerification } from 'src/identity/verification'
-import { Actions as StableTokenActions } from 'src/stableToken/actions'
+import { startVerification } from 'src/identity/verification'
 import { Actions as TransactionActions } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
 import { fetchDataEncryptionKeyWrapper } from 'src/web3/dataEncryptionKey'
@@ -109,12 +108,6 @@ function* watchFetchDataEncryptionKey() {
   yield takeLeading(Actions.FETCH_DATA_ENCRYPTION_KEY, fetchDataEncryptionKeyWrapper)
 }
 
-function* watchBalanceChange() {
-  // TODO: add check for CELO balance as well
-  yield isSufficientBalance()
-  yield takeEvery(StableTokenActions.SET_BALANCE, isSufficientBalance)
-}
-
 export function* identitySaga() {
   Logger.debug(TAG, 'Initializing identity sagas')
   try {
@@ -123,7 +116,6 @@ export function* identitySaga() {
     yield spawn(watchValidateRecipientAddress)
     yield spawn(watchNewFeedTransactions)
     yield spawn(watchFetchDataEncryptionKey)
-    yield spawn(watchBalanceChange)
   } catch (error) {
     Logger.error(TAG, 'Error initializing identity sagas', error)
   } finally {

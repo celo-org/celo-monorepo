@@ -379,10 +379,6 @@ export const v5Schema = {
     dataEncryptionKey: '0x0000000000000000000000000000000000008F68',
     commentKey: undefined,
   },
-  app: {
-    ...v3Schema.app,
-    verificationPossible: false,
-  },
 }
 
 export function getLatestSchema(): Partial<RootState> {

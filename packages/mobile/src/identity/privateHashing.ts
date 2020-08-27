@@ -2,14 +2,12 @@ import { OdisUtils } from '@celo/contractkit'
 import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import { AuthSigner, ServiceContext } from '@celo/contractkit/lib/identity/odis/query'
 import { getPhoneHash, isE164Number, PhoneNumberUtils } from '@celo/utils/src/phoneNumbers'
-import BigNumber from 'bignumber.js'
 import DeviceInfo from 'react-native-device-info'
 import { call, put, select } from 'redux-saga/effects'
 import { e164NumberSelector } from 'src/account/selectors'
 import { IdentityEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ODIS_MINIMUM_DOLLAR_BALANCE } from 'src/config'
 import networkConfig from 'src/geth/networkConfig'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
 import { ReactBlsBlindingClient } from 'src/identity/bls-blinding-client'
@@ -65,8 +63,8 @@ export function* fetchPhoneHashPrivate(e164Number: string) {
 function* doFetchPhoneHashPrivate(e164Number: string) {
   const account: string = yield call(getConnectedAccount)
   Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Fetching phone hash details')
-
-  const cachedSalt = yield getSaltCache(e164Number)
+  const saltCache: E164NumberToSaltType = yield select(e164NumberToSaltSelector)
+  const cachedSalt = saltCache[e164Number]
 
   if (cachedSalt) {
     Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Salt was cached')
@@ -94,9 +92,10 @@ function* doFetchPhoneHashPrivate(e164Number: string) {
   return details
 }
 
-export function* getSaltCache(e164Number: string) {
-  const saltCache: E164NumberToSaltType = yield select(e164NumberToSaltSelector)
-  return saltCache[e164Number]
+export function* balanceSufficientForQuotaRetrieval() {
+  // TODO add CELO balance lookup as well
+  const userBalance = yield select(stableTokenBalanceSelector)
+  return OdisUtils.PhoneNumberIdentifier.isSufficientBalanceForQuotaRetrieval(userBalance)
 }
 
 // Unlike the getPhoneHash in utils, this leverages the phone number

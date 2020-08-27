@@ -7,7 +7,6 @@ import { RootState } from 'src/redux/reducers'
 export interface State {
   loggedIn: boolean
   numberVerified: boolean
-  verificationPossible: boolean
   language: string | null
   doingBackupFlow: boolean
   analyticsEnabled: boolean
@@ -22,7 +21,6 @@ const initialState = {
   loading: false,
   loggedIn: false,
   numberVerified: false,
-  verificationPossible: false,
   language: null,
   doingBackupFlow: false,
   analyticsEnabled: true,
@@ -47,7 +45,6 @@ export const appReducer = (
         ...state,
         ...rehydratePayload,
         appState: initialState.appState,
-        verificationPossible: false,
         locked: rehydratePayload.requirePinOnAppOpen ?? initialState.locked,
         sessionId: '',
       }
@@ -83,11 +80,6 @@ export const appReducer = (
       return {
         ...state,
         numberVerified: action.numberVerified,
-      }
-    case Actions.SET_VERIFICATION_POSSIBLE:
-      return {
-        ...state,
-        verificationPossible: action.verificationPossible,
       }
     case Actions.SET_LANGUAGE:
       return {
