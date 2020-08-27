@@ -1,14 +1,14 @@
+import { ReleaseGoldBaseCommand } from '../../release-gold-base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-import { ReleaseGoldCommand } from './release-gold'
 
-export default class Withdraw extends ReleaseGoldCommand {
+export default class Withdraw extends ReleaseGoldBaseCommand {
   static description =
     'Withdraws `value` released gold to the beneficiary address. Fails if `value` worth of gold has not been released yet.'
 
   static flags = {
-    ...ReleaseGoldCommand.flags,
+    ...ReleaseGoldBaseCommand.flags,
     value: Flags.wei({
       required: true,
       description: 'Amount of released gold (in wei) to withdraw',

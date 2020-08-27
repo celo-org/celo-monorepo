@@ -30,6 +30,7 @@ export enum NameSpaces {
   home = 'home',
   jobs = 'jobs',
   papers = 'papers',
+  press = 'press',
   terms = 'terms',
   technology = 'technology',
 }

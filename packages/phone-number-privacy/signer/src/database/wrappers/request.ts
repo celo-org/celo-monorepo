@@ -31,6 +31,9 @@ export async function getRequestExists(
 }
 
 export async function storeRequest(request: GetBlindedMessagePartialSigRequest) {
+  if (!request.timestamp) {
+    return true // TODO remove once backwards compatibility isn't necessary
+  }
   logger.debug('Storing salt request')
   try {
     await requests()

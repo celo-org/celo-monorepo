@@ -7,11 +7,19 @@ import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "./interfaces/IAttestations.sol";
 import "./interfaces/IEscrow.sol";
 import "../common/Initializable.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/UsingRegistry.sol";
 import "../common/Signatures.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
-contract Escrow is IEscrow, ReentrancyGuard, Ownable, Initializable, UsingRegistry {
+contract Escrow is
+  IEscrow,
+  ICeloVersionedContract,
+  ReentrancyGuard,
+  Ownable,
+  Initializable,
+  UsingRegistry
+{
   using SafeMath for uint256;
 
   event Transfer(
@@ -60,6 +68,14 @@ contract Escrow is IEscrow, ReentrancyGuard, Ownable, Initializable, UsingRegist
 
   // Maps senders' addresses to a list of sent escrowed payment IDs.
   mapping(address => address[]) public sentPaymentIds;
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
