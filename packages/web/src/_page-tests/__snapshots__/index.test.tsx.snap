@@ -3815,7 +3815,7 @@ exports[`HomePage renders 1`] = `
           }
         }
       >
-        The Celo Community's past and upcoming milestones, focused on finding use cases, innovating on technology, and preparing for Mainnet release.
+        The Celo Community's past and upcoming milestones.
       </div>
     </div>
   </div>
