@@ -1,24 +1,26 @@
-import { CeloTx, EncodedTransaction } from '@celo/communication'
+import { CeloTx, EncodedTransaction, RLPEncodedTx } from '@celo/communication'
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
+import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import debugFactory from 'debug'
 // @ts-ignore-next-line
 import { account as Account, bytes as Bytes, hash as Hash, RLP } from 'eth-lib'
 import * as ethUtil from 'ethereumjs-util'
-import { EIP712TypedData, generateTypedDataHash } from './sign-typed-data-utils'
+import * as helpers from 'web3-core-helpers'
 
 const debug = debugFactory('kit:tx:sign')
 
 // Original code taken from
 // https://github.com/ethereum/web3.js/blob/1.x/packages/web3-eth-accounts/src/index.js
 
+// 0x04 prefix indicates that the key is not compressed
+// https://tools.ietf.org/html/rfc5480#section-2.2
+export const publicKeyPrefix: number = 0x04
+export const sixtyFour: number = 64
+export const thirtyTwo: number = 32
+
 function isNullOrUndefined(value: any): boolean {
   return value === null || value === undefined
-}
-
-export interface RLPEncodedTx {
-  transaction: CeloTx
-  rlpEncode: any
 }
 
 // Simple replay attack protection
@@ -84,7 +86,7 @@ export function rlpEncodedTx(tx: CeloTx): RLPEncodedTx {
   if (tx.nonce! < 0 || tx.gas! < 0 || tx.gasPrice! < 0 || tx.chainId! < 0) {
     throw new Error('Gas, gasPrice, nonce or chainId is lower than 0')
   }
-  let transaction: CeloTx = tx
+  const transaction: CeloTx = helpers.formatters.inputCallFormatter(tx)
   transaction.to = Bytes.fromNat(tx.to || '0x').toLowerCase()
   transaction.nonce = Number(((tx.nonce as any) !== '0x' ? tx.nonce : 0) || 0)
   transaction.data = Bytes.fromNat(tx.data || '0x').toLowerCase()
@@ -120,8 +122,6 @@ export async function encodeTransaction(
   rlpEncoded: RLPEncodedTx,
   signature: { v: number; r: Buffer; s: Buffer }
 ): Promise<EncodedTransaction> {
-  const hash = getHashFromEncoded(rlpEncoded.rlpEncode)
-
   const sanitizedSignature = signatureFormatter(signature)
   const v = sanitizedSignature.v
   const r = sanitizedSignature.r
@@ -131,6 +131,7 @@ export async function encodeTransaction(
     .concat([v, r, s])
 
   const rawTransaction = RLP.encode(rawTx)
+  const hash = getHashFromEncoded(rawTransaction)
 
   const result: EncodedTransaction = {
     tx: {
@@ -141,8 +142,8 @@ export async function encodeTransaction(
       value: rlpEncoded.transaction.value!.toString(),
       input: rlpEncoded.transaction.data!,
       feeCurrency: rlpEncoded.transaction.feeCurrency!.toString(),
-      gatewayFeeRecipient: rlpEncoded.transaction.feeCurrency!.toString(),
-      gatewayFee: rlpEncoded.transaction.feeCurrency!.toString(),
+      gatewayFeeRecipient: rlpEncoded.transaction.gatewayFeeRecipient!.toString(),
+      gatewayFee: rlpEncoded.transaction.gatewayFee!.toString(),
       v,
       r,
       s,

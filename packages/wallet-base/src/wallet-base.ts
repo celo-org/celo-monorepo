@@ -1,8 +1,8 @@
-import { CeloTx, EncodedTransaction } from '@celo/communication'
-import { Address, isHexString, normalizeAddressWith0x } from '@celo/utils/lib/address'
+import { isHexString, normalizeAddressWith0x } from '@celo/base/lib/address'
+import { Address, CeloTx, EncodedTransaction } from '@celo/communication'
+import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import * as ethUtil from 'ethereumjs-util'
 import { Signer, Wallet } from '../types'
-import { EIP712TypedData, generateTypedDataHash } from './sign-typed-data-utils'
 import { chainIdTransformationForSigning, encodeTransaction, rlpEncodedTx } from './signing-utils'
 
 export abstract class WalletBase implements Wallet {
@@ -102,5 +102,10 @@ export abstract class WalletBase implements Wallet {
       throw new Error(`Could not find address ${normalizedAddress}`)
     }
     return this.accountSigners.get(normalizedAddress)!
+  }
+
+  async decrypt(address: string, ciphertext: Buffer) {
+    const signer = this.getSigner(address)
+    return signer.decrypt(ciphertext)
   }
 }
