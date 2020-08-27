@@ -11,11 +11,9 @@
   ],
   "scripts": {
     "build": "tsc -b .",
-    "clean": "tsc -b . --clean",
-    "test": "jest --runInBand",
-    "lint": "tslint -c tslint.json --project ."
+    "clean": "tsc -b . --clean"
   },
-  "devDependencies": {
+  "dependencies": {
     "web3-core": "1.2.11",
     "web3-core-helpers": "1.2.11",
     "web3-eth": "1.2.11",

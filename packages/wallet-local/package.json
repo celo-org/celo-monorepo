@@ -1,0 +1,30 @@
+{
+  "name": "@celo/wallet-local",
+  "version": "1.0.0-dev",
+  "description": "Local wallet implementation",
+  "author": "Celo",
+  "license": "Apache-2.0",
+  "keywords": [
+    "celo",
+    "blockchain",
+    "sdk"
+  ],
+  "scripts": {
+    "build": "tsc -b .",
+    "clean": "tsc -b . --clean",
+    "test": "jest --runInBand",
+    "lint": "tslint -c tslint.json --project ."
+  },
+  "dependencies": {
+    "@celo/utils": "0.1.17-dev",
+    "@celo/wallet-base": "1.0.0-dev",
+    "eth-lib": "^0.2.8",
+    "ethereumjs-util": "^5.2.0"
+  },
+  "devDependencies": {
+    "@celo/sdk-types": "1.0.0-dev"
+  },
+  "engines": {
+    "node": ">=8.13.0"
+  }
+}

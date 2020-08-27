@@ -42,8 +42,8 @@ export interface EncodedTransaction {
   }
 }
 
-export type CeloTxPending = Transaction & Partial<CeloParams>
-export type CeloTxReceipt = TransactionReceipt & Partial<CeloParams>
+export type CeloTxPending = Transaction & CeloParams
+export type CeloTxReceipt = TransactionReceipt & CeloParams
 
 export type Callback<T> = (error: Error | null, result?: T) => void
 

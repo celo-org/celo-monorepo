@@ -1,5 +1,6 @@
+import { Address } from '@celo/utils/lib/address'
 import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
-import { Address, CeloTx, EncodedTransaction, RLPEncodedTx } from '../commons'
+import { CeloTx, EncodedTransaction, RLPEncodedTx } from '../commons'
 
 export interface Wallet {
   getAccounts: () => Address[]
