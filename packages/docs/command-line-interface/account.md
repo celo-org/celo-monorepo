@@ -48,7 +48,7 @@ EXAMPLES
   0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --signature
   0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d
   1a1eebad8452eb
-  authorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role vote --signer
+  authorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role validator --signer
   0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --signature
   0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d
   1a1eebad8452eb --blsKey
