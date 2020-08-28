@@ -20,12 +20,13 @@
     "build": "tsc -b .",
     "lint": "tslint --project .",
     "test": "jest --runInBand --testPathIgnorePatterns test/end-to-end",
+    "test:e2e": "jest test/end-to-end --verbose",
     "db:migrate": "NODE_ENV=dev ts-node scripts/run-migrations.ts"
   },
   "dependencies": {
-    "@celo/contractkit": "0.4.5",
+    "@celo/contractkit": "0.4.12",
     "@celo/phone-number-privacy-common": "1.0.7",
-    "@celo/utils": "0.1.13",
+    "@celo/utils": "0.1.18",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
     "elliptic": "6.5.3",
     "firebase-admin": "^8.10.0",

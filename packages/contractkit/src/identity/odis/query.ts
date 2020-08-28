@@ -30,8 +30,8 @@ export enum AuthenticationMethod {
 
 export interface PhoneNumberPrivacyRequest {
   account: string
-  version: string
   authenticationMethod: AuthenticationMethod
+  version?: string
 }
 
 export interface SignMessageRequest extends PhoneNumberPrivacyRequest {
