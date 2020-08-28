@@ -46,6 +46,7 @@ describe('NotificationBox', () => {
       },
       identity: { e164NumberToSalt: { [mockE164Number]: mockE164NumberPepper } },
       stableToken: { balance: '0.00' },
+      goldToken: { balance: '0.00' },
     })
     const tree = render(
       <Provider store={store}>

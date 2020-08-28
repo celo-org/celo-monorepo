@@ -14,6 +14,7 @@ import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentReminderSummaryNotification from 'src/escrow/EscrowedPaymentReminderSummaryNotification'
 import { getReclaimableEscrowPayments } from 'src/escrow/reducer'
 import { pausedFeatures } from 'src/flags'
+import { dismissCeloEducation } from 'src/goldToken/actions'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { backupKey, getVerified, inviteFriends, learnCelo } from 'src/images/Images'
 import { InviteDetails } from 'src/invite/actions'
@@ -53,7 +54,8 @@ export enum NotificationBannerCTATypes {
 interface StateProps {
   backupCompleted: boolean
   numberVerified: boolean
-  goldEducationCompleted: boolean
+  celoEducationCompleted: boolean
+  celoEducationDismissed: boolean
   dismissedInviteFriends: boolean
   dismissedGetVerified: boolean
   verificationPossible: boolean
@@ -67,6 +69,7 @@ interface StateProps {
 interface DispatchProps {
   dismissInviteFriends: typeof dismissInviteFriends
   dismissGetVerified: typeof dismissGetVerified
+  dismissCeloEducation: typeof dismissCeloEducation
 }
 
 type Props = DispatchProps & StateProps & WithTranslation
@@ -74,7 +77,8 @@ type Props = DispatchProps & StateProps & WithTranslation
 const mapStateToProps = (state: RootState): StateProps => ({
   backupCompleted: state.account.backupCompleted,
   numberVerified: state.app.numberVerified,
-  goldEducationCompleted: state.goldToken.educationCompleted,
+  celoEducationCompleted: state.goldToken.educationCompleted,
+  celoEducationDismissed: state.goldToken.educationDismissed,
   incomingPaymentRequests: getIncomingPaymentRequests(state),
   outgoingPaymentRequests: getOutgoingPaymentRequests(state),
   dismissedInviteFriends: state.account.dismissedInviteFriends,
@@ -88,6 +92,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
 const mapDispatchToProps = {
   dismissInviteFriends,
   dismissGetVerified,
+  dismissCeloEducation,
 }
 
 interface State {
@@ -138,7 +143,8 @@ export class NotificationBox extends React.Component<Props, State> {
       t,
       backupCompleted,
       numberVerified,
-      goldEducationCompleted,
+      celoEducationCompleted,
+      celoEducationDismissed,
       dismissedInviteFriends,
       dismissedGetVerified,
       verificationPossible,
@@ -197,7 +203,7 @@ export class NotificationBox extends React.Component<Props, State> {
       })
     }
 
-    if (!goldEducationCompleted) {
+    if (!celoEducationCompleted && !celoEducationDismissed) {
       actions.push({
         title: t('global:celoGold'),
         text: t('exchangeFlow9:whatIsGold'),
@@ -220,6 +226,7 @@ export class NotificationBox extends React.Component<Props, State> {
                 notificationType: NotificationBannerTypes.celo_asset_education,
                 selectedAction: NotificationBannerCTATypes.decline,
               })
+              this.props.dismissCeloEducation()
             },
           },
         ],

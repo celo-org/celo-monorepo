@@ -12,9 +12,10 @@ import {
   SignMessageResponse,
 } from './query'
 
-// ODIS minimum dollar balance for pepper quota retrieval
-// TODO change this to new ODIS minimum dollar balance once deployed
-export const ODIS_MINIMUM_DOLLAR_BALANCE = 0.1
+// ODIS minimum dollar balance for sig retrieval
+export const ODIS_MINIMUM_DOLLAR_BALANCE = 0.01
+// ODIS minimum celo balance for sig retrieval
+export const ODIS_MINIMUM_CELO_BALANCE = 0.005
 
 const debug = debugFactory('kit:odis:phone-number-identifier')
 const sha3 = (v: string) => soliditySha3({ type: 'string', value: v })
@@ -94,6 +95,12 @@ export function getPepperFromThresholdSignature(sigBuf: Buffer) {
 /**
  * Check if balance is sufficient for quota retrieval
  */
-export function isSufficientBalanceForQuotaRetrieval(balance: BigNumber.Value) {
-  return new BigNumber(balance).isGreaterThanOrEqualTo(ODIS_MINIMUM_DOLLAR_BALANCE)
+export function isBalanceSufficientForSigRetrieval(
+  dollarBalance: BigNumber.Value,
+  celoBalance: BigNumber.Value
+) {
+  return (
+    new BigNumber(dollarBalance).isGreaterThanOrEqualTo(ODIS_MINIMUM_DOLLAR_BALANCE) ||
+    new BigNumber(celoBalance).isGreaterThanOrEqualTo(ODIS_MINIMUM_CELO_BALANCE)
+  )
 }

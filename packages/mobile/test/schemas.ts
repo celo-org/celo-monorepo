@@ -379,6 +379,10 @@ export const v5Schema = {
     dataEncryptionKey: '0x0000000000000000000000000000000000008F68',
     commentKey: undefined,
   },
+  goldToken: {
+    ...v3Schema.goldToken,
+    educationDismissed: false,
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {

@@ -9,6 +9,7 @@ import { IdentityEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import networkConfig from 'src/geth/networkConfig'
+import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
 import { ReactBlsBlindingClient } from 'src/identity/bls-blinding-client'
 import { e164NumberToSaltSelector, E164NumberToSaltType } from 'src/identity/reducer'
@@ -74,7 +75,7 @@ function* doFetchPhoneHashPrivate(e164Number: string) {
   }
 
   Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Salt was not cached, fetching')
-  const isBalanceSufficientForQuota = yield call(balanceSufficientForQuotaRetrieval)
+  const isBalanceSufficientForQuota = yield call(balanceSufficientForSigRetrieval)
   if (!isBalanceSufficientForQuota) {
     throw new Error(ErrorMessages.ODIS_INSUFFICIENT_BALANCE)
   }
@@ -92,10 +93,13 @@ function* doFetchPhoneHashPrivate(e164Number: string) {
   return details
 }
 
-export function* balanceSufficientForQuotaRetrieval() {
-  // TODO add CELO balance lookup as well
-  const userBalance = yield select(stableTokenBalanceSelector)
-  return OdisUtils.PhoneNumberIdentifier.isSufficientBalanceForQuotaRetrieval(userBalance)
+export function* balanceSufficientForSigRetrieval() {
+  const userDollarBalance = yield select(stableTokenBalanceSelector)
+  const userCeloBalance = yield select(celoTokenBalanceSelector)
+  return OdisUtils.PhoneNumberIdentifier.isBalanceSufficientForSigRetrieval(
+    userDollarBalance,
+    userCeloBalance
+  )
 }
 
 // Unlike the getPhoneHash in utils, this leverages the phone number

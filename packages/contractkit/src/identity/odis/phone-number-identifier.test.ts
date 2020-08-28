@@ -2,7 +2,7 @@ import fetchMock from 'fetch-mock'
 import {
   getPepperFromThresholdSignature,
   getPhoneNumberIdentifier,
-  isSufficientBalanceForQuotaRetrieval,
+  isBalanceSufficientForSigRetrieval,
 } from './phone-number-identifier'
 import { AuthenticationMethod, EncryptionKeySigner, ErrorMessages, ServiceContext } from './query'
 
@@ -31,10 +31,11 @@ const authSigner: EncryptionKeySigner = {
   rawKey: '41e8e8593108eeedcbded883b8af34d2f028710355c57f4c10a056b72486aa04',
 }
 
-describe(isSufficientBalanceForQuotaRetrieval, () => {
+describe(isBalanceSufficientForSigRetrieval, () => {
   it('identifies sufficient balance correctly', () => {
-    expect(isSufficientBalanceForQuotaRetrieval(0.09)).toBe(false)
-    expect(isSufficientBalanceForQuotaRetrieval(0.1)).toBe(true)
+    expect(isBalanceSufficientForSigRetrieval(0.009, 0.004)).toBe(false)
+    expect(isBalanceSufficientForSigRetrieval(0.01, 0)).toBe(true)
+    expect(isBalanceSufficientForSigRetrieval(0, 0.005)).toBe(true)
   })
 })
 
