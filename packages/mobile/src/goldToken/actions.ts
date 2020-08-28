@@ -26,16 +26,11 @@ export type TransferAction = {
   type: Actions.TRANSFER
 } & TokenTransferAction
 
-export interface DismissCeloEducation {
-  type: Actions.DISMISS_CELO_EDUCATION
-}
-
 export type ActionTypes =
   | SetBalanceAction
   | SetEducationCompletedAction
   | FetchBalanceAction
   | TransferAction
-  | DismissCeloEducation
 
 export const fetchGoldBalance = (): FetchBalanceAction => ({
   type: Actions.FETCH_BALANCE,
@@ -57,10 +52,6 @@ export const transferGoldToken = ({
   amount,
   comment,
   context,
-})
-
-export const dismissCeloEducation = (): DismissCeloEducation => ({
-  type: Actions.DISMISS_CELO_EDUCATION,
 })
 
 export const setEducationCompleted = (): SetEducationCompletedAction => ({

@@ -5,7 +5,7 @@ import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { NativeScrollEvent, ScrollView, StyleSheet, View } from 'react-native'
 import { connect } from 'react-redux'
-import { dismissGetVerified, dismissInviteFriends } from 'src/account/actions'
+import { dismissGetVerified, dismissGoldEducation, dismissInviteFriends } from 'src/account/actions'
 import { HomeEvents } from 'src/analytics/Events'
 import { ScrollDirection } from 'src/analytics/types'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
@@ -14,7 +14,6 @@ import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentReminderSummaryNotification from 'src/escrow/EscrowedPaymentReminderSummaryNotification'
 import { getReclaimableEscrowPayments } from 'src/escrow/reducer'
 import { pausedFeatures } from 'src/flags'
-import { dismissCeloEducation } from 'src/goldToken/actions'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { backupKey, getVerified, inviteFriends, learnCelo } from 'src/images/Images'
 import { InviteDetails } from 'src/invite/actions'
@@ -54,11 +53,11 @@ export enum NotificationBannerCTATypes {
 interface StateProps {
   backupCompleted: boolean
   numberVerified: boolean
-  celoEducationCompleted: boolean
-  celoEducationDismissed: boolean
+  goldEducationCompleted: boolean
   dismissedInviteFriends: boolean
   dismissedGetVerified: boolean
   verificationPossible: boolean
+  dismissedGoldEducation: boolean
   incomingPaymentRequests: PaymentRequest[]
   outgoingPaymentRequests: PaymentRequest[]
   backupTooLate: boolean
@@ -69,7 +68,7 @@ interface StateProps {
 interface DispatchProps {
   dismissInviteFriends: typeof dismissInviteFriends
   dismissGetVerified: typeof dismissGetVerified
-  dismissCeloEducation: typeof dismissCeloEducation
+  dismissGoldEducation: typeof dismissGoldEducation
 }
 
 type Props = DispatchProps & StateProps & WithTranslation
@@ -77,13 +76,13 @@ type Props = DispatchProps & StateProps & WithTranslation
 const mapStateToProps = (state: RootState): StateProps => ({
   backupCompleted: state.account.backupCompleted,
   numberVerified: state.app.numberVerified,
-  celoEducationCompleted: state.goldToken.educationCompleted,
-  celoEducationDismissed: state.goldToken.educationDismissed,
+  goldEducationCompleted: state.goldToken.educationCompleted,
   incomingPaymentRequests: getIncomingPaymentRequests(state),
   outgoingPaymentRequests: getOutgoingPaymentRequests(state),
   dismissedInviteFriends: state.account.dismissedInviteFriends,
   dismissedGetVerified: state.account.dismissedGetVerified,
   verificationPossible: verificationPossibleSelector(state),
+  dismissedGoldEducation: state.account.dismissedGoldEducation,
   backupTooLate: isBackupTooLate(state),
   reclaimableEscrowPayments: getReclaimableEscrowPayments(state),
   invitees: inviteesSelector(state),
@@ -92,7 +91,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
 const mapDispatchToProps = {
   dismissInviteFriends,
   dismissGetVerified,
-  dismissCeloEducation,
+  dismissGoldEducation,
 }
 
 interface State {
@@ -143,11 +142,11 @@ export class NotificationBox extends React.Component<Props, State> {
       t,
       backupCompleted,
       numberVerified,
-      celoEducationCompleted,
-      celoEducationDismissed,
+      goldEducationCompleted,
       dismissedInviteFriends,
       dismissedGetVerified,
       verificationPossible,
+      dismissedGoldEducation,
     } = this.props
     const actions = []
 
@@ -203,7 +202,7 @@ export class NotificationBox extends React.Component<Props, State> {
       })
     }
 
-    if (!celoEducationCompleted && !celoEducationDismissed) {
+    if (!dismissedGoldEducation && !goldEducationCompleted) {
       actions.push({
         title: t('global:celoGold'),
         text: t('exchangeFlow9:whatIsGold'),
@@ -226,7 +225,7 @@ export class NotificationBox extends React.Component<Props, State> {
                 notificationType: NotificationBannerTypes.celo_asset_education,
                 selectedAction: NotificationBannerCTATypes.decline,
               })
-              this.props.dismissCeloEducation()
+              this.props.dismissGoldEducation()
             },
           },
         ],
