@@ -3,7 +3,7 @@ import { getMockStoreData } from 'test/utils'
 import { mockE164Number, mockE164NumberPepper } from 'test/values'
 
 describe(verificationPossibleSelector, () => {
-  it('returns true', () => {
+  it('returns true when the number pepper is already cached', () => {
     // cached salt
     expect(
       verificationPossibleSelector(
@@ -14,7 +14,8 @@ describe(verificationPossibleSelector, () => {
         })
       )
     ).toBe(true)
-
+  })
+  it('returns true when balance is sufficient', () => {
     // balance is sufficient
     expect(
       verificationPossibleSelector(
@@ -26,7 +27,7 @@ describe(verificationPossibleSelector, () => {
       )
     ).toBe(true)
   })
-  it('returns false', () => {
+  it('returns true when balance is not sufficient', () => {
     // balance is not sufficient
     expect(
       verificationPossibleSelector(
