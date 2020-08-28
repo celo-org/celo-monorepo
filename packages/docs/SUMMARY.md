@@ -29,6 +29,7 @@
 
 ## Validator Guide
 
+- [Attestation Service](operations-manual/attestation-service.md)
 - [Key Management](operations-manual/key-management/summary.md)
   - [Detailed Role Descriptions](operations-manual/key-management/detailed.md)
   - [Validator Signer Key Rotation](operations-manual/key-management/key-rotation.md)
