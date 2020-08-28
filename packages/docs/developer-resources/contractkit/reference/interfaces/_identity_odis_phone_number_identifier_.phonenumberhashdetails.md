@@ -18,7 +18,7 @@
 
 • **e164Number**: *string*
 
-*Defined in [contractkit/src/identity/odis/phone-number-identifier.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/phone-number-identifier.ts#L22)*
+*Defined in [contractkit/src/identity/odis/phone-number-identifier.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/phone-number-identifier.ts#L21)*
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **pepper**: *string*
 
-*Defined in [contractkit/src/identity/odis/phone-number-identifier.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/phone-number-identifier.ts#L24)*
+*Defined in [contractkit/src/identity/odis/phone-number-identifier.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/phone-number-identifier.ts#L23)*
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **phoneHash**: *string*
 
-*Defined in [contractkit/src/identity/odis/phone-number-identifier.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/phone-number-identifier.ts#L23)*
+*Defined in [contractkit/src/identity/odis/phone-number-identifier.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/phone-number-identifier.ts#L22)*

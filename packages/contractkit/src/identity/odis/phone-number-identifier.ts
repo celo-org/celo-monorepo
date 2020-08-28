@@ -15,8 +15,7 @@ const debug = debugFactory('kit:odis:phone-number-identifier')
 const sha3 = (v: string) => soliditySha3({ type: 'string', value: v })
 
 const PEPPER_CHAR_LENGTH = 13
-// TODO change to /getBlindedMessageSig when combiners are updated in Alfajores and Mainnet
-const SIGN_MESSAGE_ENDPOINT = '/getDistributedBlindedSalt'
+const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessageSig'
 
 export interface PhoneNumberHashDetails {
   e164Number: string
