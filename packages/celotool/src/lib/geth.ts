@@ -518,6 +518,9 @@ export const simulateClient = async (
     feeCurrency: '',
     txHash: '',
   }
+  while (true) {
+    sleep(1000000)
+  }
 
   while (true) {
     const sendTransactionTime = Date.now()
@@ -596,27 +599,35 @@ export const simulateClient = async (
         })
       })
     await sleep(txPeriodMs)
-  //   const txResult = await transferFn(kit, senderAddress, recipientAddress, LOAD_TEST_TRANSFER_WEI, txOptions)
-  //   await onLoadTestTxResult(
-  //     kit,
-  //     senderAddress,
-  //     txResult,
-  //     sendTransactionTime,
-  //     baseLogMessage,
-  //     blockscoutUrl,
-  //     blockscoutMeasurePercent
-  //   )
-  //   .catch((error: any) => {
-  //     console.error('Load test transaction failed with error:', error)
-  //     tracerLog({
-  //       tag: LOG_TAG_TRANSACTION_ERROR,
-  //       error: error.toString(),
-  //       ...baseLogMessage,
-  //     })
-  //   })
-  //   if (sendTransactionTime + txPeriodMs > Date.now() ) {
-  //     await sleep(sendTransactionTime + txPeriodMs - Date.now())
-  //   }
+
+    // const txHash = await transferFn(kit, senderAddress, recipientAddress, LOAD_TEST_TRANSFER_WEI, txOptions)
+    // while (true) {
+    //   const receipt = web3.eth.getTransactionReceipt(txResult)
+    //   if (receipt && receipt.blockNumber) {
+    //     break
+    //   }
+    //   await sleep(1000)
+    // }
+    // await onLoadTestTxResult(
+    //   kit,
+    //   senderAddress,
+    //   txHash,
+    //   sendTransactionTime,
+    //   baseLogMessage,
+    //   blockscoutUrl,
+    //   blockscoutMeasurePercent
+    // )
+    // .catch((error: any) => {
+    //   console.error('Load test transaction failed with error:', error)
+    //   tracerLog({
+    //     tag: LOG_TAG_TRANSACTION_ERROR,
+    //     error: error.toString(),
+    //     ...baseLogMessage,
+    //   })
+    // })
+    // if (sendTransactionTime + txPeriodMs > Date.now() ) {
+    //   await sleep(sendTransactionTime + txPeriodMs - Date.now())
+    // }
   }
 }
 
