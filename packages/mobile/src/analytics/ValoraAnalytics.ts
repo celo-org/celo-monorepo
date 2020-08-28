@@ -32,7 +32,7 @@ async function getDeviceInfo() {
     SystemVersion: await DeviceInfo.getSystemVersion(),
     TotalDiskCapacity: await DeviceInfo.getTotalDiskCapacity(),
     TotalMemory: await DeviceInfo.getTotalMemory(),
-    UniqueID: DeviceInfo.getUniqueId(),
+    UniqueID: await DeviceInfo.getUniqueId(),
     UserAgent: await DeviceInfo.getUserAgent(),
     Version: await DeviceInfo.getVersion(),
     isEmulator: await DeviceInfo.isEmulator(),

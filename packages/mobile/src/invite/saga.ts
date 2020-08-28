@@ -287,21 +287,22 @@ export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
   const {
     result,
     timeout,
-  }: { result: { success: boolean; newAccount?: string }; timeout: true } = yield race({
+  }: {
+    result: { success: true; newAccount: string } | { success: false }
+    timeout: true
+  } = yield race({
     result: call(doRedeemInvite, inviteCode),
     timeout: delay(REDEEM_INVITE_TIMEOUT),
   })
 
-  const { success, newAccount } = result
-
-  if (success === true && newAccount) {
+  if (result.success === true) {
     Logger.debug(TAG, 'Redeem Invite completed successfully')
     yield put(redeemInviteSuccess())
     navigate(Screens.VerificationEducationScreen)
     // Note: We are ok with this succeeding or failing silently in the background,
     // user will have another chance to register DEK when sending their first tx
-    yield spawn(registerAccountDek, newAccount)
-  } else if (success === false) {
+    yield spawn(registerAccountDek, result.newAccount)
+  } else if (result.success === false) {
     Logger.debug(TAG, 'Redeem Invite failed')
     yield put(redeemInviteFailure())
   } else if (timeout) {
@@ -440,6 +441,7 @@ export function* moveAllFundsFromAccount(
   })
 
   const context = newTransactionContext(TAG, 'Transfer from temp wallet')
+  // Temporarily hardcoding gas estimate to save time on estimation
   yield call(sendTransaction, tx.txo, account, context, SEND_TOKEN_GAS_ESTIMATE)
   Logger.debug(TAG + '@moveAllFundsFromAccount', 'Done withdrawal')
 }
