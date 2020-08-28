@@ -12,7 +12,7 @@ import { CeloExchangeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { DOLLAR_TRANSACTION_MIN_AMOUNT, GOLD_TRANSACTION_MIN_AMOUNT } from 'src/config'
 import { exchangeRatePairSelector } from 'src/exchange/reducer'
-import { getCeloBalance } from 'src/goldToken/selectors'
+import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import { Namespaces } from 'src/i18n'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -26,7 +26,7 @@ export default function CeloExchangeButtons({ navigation }: Props) {
   const { t } = useTranslation(Namespaces.exchangeFlow9)
 
   const dollarBalance = useSelector(stableTokenBalanceSelector)
-  const goldBalance = useSelector(getCeloBalance)
+  const goldBalance = useSelector(celoTokenBalanceSelector)
   const exchangeRate = useSelector(exchangeRatePairSelector)
 
   const hasDollars = new BigNumber(dollarBalance || 0).isGreaterThan(DOLLAR_TRANSACTION_MIN_AMOUNT)
