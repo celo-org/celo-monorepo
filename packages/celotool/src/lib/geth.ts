@@ -226,7 +226,7 @@ const validateGethRPC = async (
     location: '[GethRPC]',
     error: `Contractkit did not return a valid transaction`,
   })
-  console.log(`jcortejoso transaction: ${transaction}`)
+  // console.log(`jcortejoso transaction: ${transaction}`)
   const txFrom = transaction.from.toLowerCase()
   const expectedFrom = from.toLowerCase()
   handleError(!transaction.from || expectedFrom !== txFrom, {
@@ -571,27 +571,26 @@ export const simulateClient = async (
 
     // We purposely do not use await syntax so we sleep after sending the transaction,
     // not after processing a transaction's result
-    transferFn(kit, senderAddress, recipientAddress, LOAD_TEST_TRANSFER_WEI, txOptions)
-      .then(async (txResult: TransactionResult) => {
-        await onLoadTestTxResult(
-          kit,
-          senderAddress,
-          txResult,
-          sendTransactionTime,
-          baseLogMessage,
-          blockscoutUrl,
-          blockscoutMeasurePercent
-        )
+
+
+    const txResult = await transferFn(kit, senderAddress, recipientAddress, LOAD_TEST_TRANSFER_WEI, txOptions)
+    await onLoadTestTxResult(
+      kit,
+      senderAddress,
+      txResult,
+      sendTransactionTime,
+      baseLogMessage,
+      blockscoutUrl,
+      blockscoutMeasurePercent
+    )
+    .catch((error: any) => {
+      console.error('Load test transaction failed with error:', error)
+      tracerLog({
+        tag: LOG_TAG_TRANSACTION_ERROR,
+        error: error.toString(),
+        ...baseLogMessage,
       })
-      .catch((error: any) => {
-        // console.error('Load test transaction failed with error:', JSON.stringify(error))
-        console.error('Load test transaction failed with error:', error)
-        tracerLog({
-          tag: LOG_TAG_TRANSACTION_ERROR,
-          error: error.toString(),
-          ...baseLogMessage,
-        })
-      })
+    })
     await sleep(txPeriodMs)
   }
 }
@@ -640,15 +639,15 @@ export const onLoadTestTxResult = async (
     )
   }
 
-  // await validateGethRPC(kit, txHash, senderAddress, (isError, data) => {
-  //   if (isError) {
-  //     tracerLog({
-  //       tag: LOG_TAG_GETH_RPC_ERROR,
-  //       ...data,
-  //       ...baseLogMessage,
-  //     })
-  //   }
-  // })
+  await validateGethRPC(kit, txHash, senderAddress, (isError, data) => {
+    if (isError) {
+      tracerLog({
+        tag: LOG_TAG_GETH_RPC_ERROR,
+        ...data,
+        ...baseLogMessage,
+      })
+    }
+  })
 }
 
 /**

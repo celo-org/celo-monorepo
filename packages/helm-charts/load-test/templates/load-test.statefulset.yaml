@@ -127,8 +127,8 @@ spec:
           --rpcport {{ add 8545 $index }}
         resources:
           requests:
-            memory: 500Mi
-            cpu: 400m
+            memory: 250Mi
+            cpu: 150m
         volumeMounts:
         - name: data
           mountPath: /root/.celo_share
@@ -163,8 +163,8 @@ spec:
               --client-count {{ .Values.threads | default "1" }}
         resources:
           requests:
-            memory: 500Mi
-            cpu: 400m
+            memory: 200Mi
+            cpu: 200m
         env:
         - name: MNEMONIC
           valueFrom:
