@@ -99,8 +99,7 @@ release: {{ .Release.Name }}
     else
       NAT_IP=$(cat /root/.celo/ipAddress)
     fi
-    # im messing with this!
-    NAT_FLAG="--nat=extip:${HOST_IP}"
+    NAT_FLAG="--nat=extip:${NAT_IP}"
 
     ADDITIONAL_FLAGS='{{ .geth_flags | default "" }}'
     if [[ -f /root/.celo/pkey ]]; then
@@ -144,10 +143,16 @@ release: {{ .Release.Name }}
     {{- if .pprof | default false }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .pprof_port }} --pprofaddr 0.0.0.0"
     {{- end }}
+    PORT=30303
+    {{- if .ports }}
+    PORTS_PER_RID={{ join "," .ports }}
+    PORT=$(echo $PORTS_PER_RID | cut -d ',' -f $((RID + 1)))
+    {{- end }}
 
 {{ .extra_setup }}
 
     exec geth \
+      --port $PORT  \
       --bootnodes=$(cat /root/.celo/bootnodeEnode) \
       --light.serve {{ .light_serve | default 90 }} \
       --light.maxpeers {{ .light_maxpeers | default 1000 }} \
@@ -216,11 +221,21 @@ release: {{ .Release.Name }}
     periodSeconds: 10
 {{- end }}
   ports:
+{{- if .ports }}
+{{- range $index, $port := .ports }}
+  - name: discovery-{{ $port }}
+    containerPort: {{ $port }}
+    protocol: UDP
+  - name: ethereum-{{ $port }}
+    containerPort: {{ $port }}
+{{- end }}
+{{- else }}
   - name: discovery
-    containerPort: 30303
+    containerPort: {{ .port | default 30303 }}
     protocol: UDP
   - name: ethereum
-    containerPort: 30303
+    containerPort: {{ .port | default 30303 }}
+{{- end }}
 {{- if .expose }}
   - name: rpc
     containerPort: 8545

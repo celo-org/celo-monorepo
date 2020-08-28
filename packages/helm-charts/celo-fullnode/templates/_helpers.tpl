@@ -57,34 +57,7 @@ component: celo-fullnode
 */}}
 {{- define "celo-fullnode.aws-subnet-specific-nat-ip" -}}
 {{- if .Values.aws -}}
-IP_TO_USE=
-SUBNET_CIDR=
-SUBNET_CIDRS={{ join "," .Values.geth.aws.all_subnet_cidr_blocks }}
-IP_ADDRESSES_PER_NODE={{ join "-" .Values.geth.aws.ip_addresses_per_subnet_per_node }}
-INDEX=0
-# We have the CIDR blocks of all subnets, and an array of public IP addresses
-# for each full node that correspond to each subnet. We aim to use the pod IP
-# address to figure out which subnet CIDR blocks it belongs to, and use this
-# information to set the `--nat` flag to use an IP address that is being used by
-# the pod's network load balancer that lives in the same AZ this pod lives in.
-while [ $INDEX -lt {{ len .Values.geth.aws.all_subnet_cidr_blocks }} -a -z $IP_TO_USE ]; do
-  SUBNET_CIDR=$(echo $SUBNET_CIDRS | cut -d ',' -f $((INDEX + 1)))
-  NETMASK=$(ipcalc -m $SUBNET_CIDR | grep -Eow '[0-9.]+')
-  NETWORK=$(ipcalc -n $POD_IP $NETMASK | grep -Eow '[0-9.]+')
-  echo "NETMASK $NETMASK NETWORK $NETWORK SUBNET_CIDR $SUBNET_CIDR POD_IP $POD_IP"
-  SUBNET_NETWORK=$(echo $SUBNET_CIDR | cut -d '/' -f 1)
-  if [ $NETWORK = $SUBNET_NETWORK ]; then
-    IP_ADDRESSES_FOR_THIS_NODE=$(echo $IP_ADDRESSES_PER_NODE | cut -d '-' -f $((RID + 1)))
-    IP_TO_USE=$(echo $IP_ADDRESSES_FOR_THIS_NODE | cut -d ',' -f $((INDEX + 1)))
-  fi
-  INDEX=$((INDEX + 1))
-done
-# this should never happen, but let's be safe
-if [ -z $IP_TO_USE ]; then
-  echo "IP_TO_USE is not specified, failing"
-  exit 1
-fi
-echo "Using IP $IP_TO_USE from subnet $SUBNET_CIDR"
-NAT_FLAG="--nat=extip:${IP_TO_USE}"
+PUBLIC_IP=$(wget https://ipinfo.io/ip -O - -q)
+NAT_FLAG="--nat=extip:${PUBLIC_IP}"
 {{- end -}}
 {{- end -}}

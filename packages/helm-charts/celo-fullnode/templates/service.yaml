@@ -16,16 +16,16 @@ spec:
   loadBalancerIP: {{ index $.Values.geth.public_ips $index -}}
 {{- end }}
   ports:
-{{- range $protocol, $node_port := (index $.Values.geth.service_node_port_per_full_node $index) }}
-    - targetPort: ethereum
-      port: 30303
-      nodePort: {{ $node_port }}
-      name: {{ lower $protocol }}
-      protocol: {{ $protocol }}
-{{- end }}
-    # - port: 30303
-    #   targetPort: ethereum
-    #   name: ethereum
+    - targetPort: {{ index $.Values.geth.service_node_port_per_full_node $index }}
+      port: {{ index $.Values.geth.service_node_port_per_full_node $index }}
+      nodePort: {{ index $.Values.geth.service_node_port_per_full_node $index }}
+      name: tcp
+      protocol: TCP
+    - targetPort: {{ index $.Values.geth.service_node_port_per_full_node $index }}
+      port: {{ index $.Values.geth.service_node_port_per_full_node $index }}
+      nodePort: {{ index $.Values.geth.service_node_port_per_full_node $index }}
+      name: udp
+      protocol: UDP
 {{- if $.Values.geth.expose_rpc_externally }}
 {{ include "celo-fullnode.rpc-ports" . | indent 4 }}
 {{- end }}

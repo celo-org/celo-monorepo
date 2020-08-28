@@ -1,5 +1,5 @@
 import { range } from 'lodash'
-import { deallocateAWSStaticIP, describeElasticIPAddresses, getAllSubnetsSortedByAZ, getElasticIPAddressesFromAllocationIDs, getOrRegisterElasticIP, subnetIsPublic, tagsArrayToAWSResourceTags, waitForElasticIPAssociationIDRemoval } from '../aws'
+import { deallocateAWSStaticIP, describeElasticIPAddresses, getAllSubnetsSortedByAZ, getOrRegisterElasticIP, subnetIsPublic, tagsArrayToAWSResourceTags, waitForElasticIPAssociationIDRemoval } from '../aws'
 import { AWSClusterConfig } from '../k8s-cluster/aws'
 import { deleteResource, getAllUsedNodePorts, getService } from '../kubernetes'
 import { BaseFullNodeDeployer, BaseFullNodeDeploymentConfig } from './base'
@@ -26,110 +26,6 @@ export class AWSFullNodeDeployer extends BaseFullNodeDeployer {
    * geth pod has been scheduled.
    */
   async additionalHelmParameters() {
-    if (false) {
-    // Gets public & private subnets
-    const subnets = await this.getAllSubnetsSortedByAZ()
-    // Gives a mapping of (public) subnetID -> allocationID for each full node
-    const allocationIDPerPublicSubnetForEachFullNode: Array<{
-      [subnetID: string]: string
-    }> = await this.allocateElasticIPs()
-    const publicSubnets = subnets.filter(subnetIsPublic)
-
-    // Maps az -> (public) subnetID
-    const publicSubnetIDPerAZ: {
-      [az: string]: string
-    } = publicSubnets.reduce((
-      agg: {
-        [az: string]: string
-      },
-      subnet: any
-    ) => {
-      return {
-        ...agg,
-        [subnet.AvailabilityZone]: subnet.SubnetId
-      }
-    }, {})
-
-    // For each full node, gives an array of IP allocation IDs that will be used
-    // for the full node's corresponding network load balancer. If there are N
-    // subnets, there are N required IP addresses. The ordered list of IP allocation
-    // IDs are assigned to subnets based off the alphabetical order of the AZs that the subnets
-    // are in.
-    const allocationIDForEachPublicSubnetForEachFullNode: string[][] = allocationIDPerPublicSubnetForEachFullNode.map(
-      (allocationIDPerPublicSubnet: {
-        [subnetID: string]: string
-      }) =>
-        publicSubnets.map((publicSubnet: any) => allocationIDPerPublicSubnet[publicSubnet.SubnetId])
-      )
-
-    // For each full node, gives a mapping of (public) subnetID -> IPv4 IP address
-    const ipAddressPerPublicSubnetForEachFullNode: Array<{
-      [subnetID: string]: string
-    }> = await Promise.all(
-      allocationIDPerPublicSubnetForEachFullNode.map(
-        async (allocationIDPerPublicSubnet: {
-          [subnetID: string]: string
-        }) => {
-          const subnetIDs = Object.keys(allocationIDPerPublicSubnet)
-          const allocIDs = subnetIDs.map((subnetID: string) => allocationIDPerPublicSubnet[subnetID])
-          const ips = await getElasticIPAddressesFromAllocationIDs(allocIDs)
-          let index = 0
-          return subnetIDs.reduce((agg: {
-            [subnetID: string]: string
-          }, subnetID: string) => ({
-            ...agg,
-            [subnetID]: ips[index++]
-          }), {})
-        }
-      )
-    )
-
-    // For each full node, gives an array of the IP addresses that are intended to
-    // be used with the corresponding subnets (public or private) when the subnets
-    // are sorted by availability zone. Because a network load balancer assigns
-    // an ordered list of IP addresses to subnets by sorting the subnets by AZ,
-    // we can use this 2d array to let a pod determine which IP address to use for
-    // the geth --nat flag if the pod knows which subnet it is in.
-    const ipAddressForEachSubnetForEachFullNode: string[][] = ipAddressPerPublicSubnetForEachFullNode.map(
-      (ipAddressPerPublicSubnet: {
-        [subnetID: string]: string
-      }) => {
-        return subnets.map((subnet: any) => {
-          const publicSubnetIDForThisAZ = publicSubnetIDPerAZ[subnet.AvailabilityZone]
-          return ipAddressPerPublicSubnet[publicSubnetIDForThisAZ]
-       })
-      }
-    )
-
-    // Effectively an array of comma separated allocation IDs to pass to helm.
-    // Gives the allocation IDs of the IP addresses for public subnets for
-    // each full node to be used by the NLB.
-    // @ts-ignore
-    const allocationIdsPerPublicSubnetPerNodeParamStr = allocationIDForEachPublicSubnetForEachFullNode.map((allocIDs: string[]) =>
-      allocIDs.join('\\\,')
-    ).join(',')
-
-    // Subnet CIDR blocks, sorted by AZ. Given these CIDR ranges, a pod can
-    // determine which subnet it belongs to by looking at its own IP address
-    // @ts-ignore
-    const subnetCIDRBlocks = subnets.map((subnet: any) => subnet.CidrBlock)
-
-    // An array of comma separated IPv4 addresses, each IP address corresponds
-    // to a subnet when the subnets are sorted by AZ. For example, if there is a
-    // public subnet PUBLIC_A, a private subnet PRIVATE_A, both in us-west2-a,
-    // and the same for us-west2-b, public subnet PUBLIC_B, a private subnet PRIVATE_B,
-    // then we get the sorted subnets PUBLIC_A, PRIVATE_A, PUBLIC_B, PRIVATE_B.
-    // We then have IP address A.A.A.A and B.B.B.B, each in zones us-west2-a and
-    // us-west2-b respectively. Then, we get the IP addresses
-    // A.A.A.A, A.A.A.A, B.B.B.B, B.B.B.B because we want the indices of the
-    // IP addresses to correspond to the sorted subnets.
-    // @ts-ignore
-    const ipAddressesPerSubnetPerNode = ipAddressForEachSubnetForEachFullNode.map((ips: string[]) =>
-      ips.join('\\\,')
-    )
-
-  }
-
     const replicas = this._deploymentConfig.replicas
     const allUsedNodePorts = await getAllUsedNodePorts()
     const serviceForEachFullNode = await Promise.all(
@@ -137,88 +33,64 @@ export class AWSFullNodeDeployer extends BaseFullNodeDeployer {
         getService(`${this.celoEnv}-fullnodes-${i}`, this.kubeNamespace)
       )
     )
-    const desiredProtocols = ['TCP', 'UDP']
-    // Assumes no 2 ports for a service have the same protocol.
-    const nodePortsByProtocolForEachFullNode: Array<{
-      [protocol: string]: number
-    }> = serviceForEachFullNode.map((service: any) => {
+
+    const NO_KNOWN_NODE_PORT = -1
+    const nodePortForEachFullNode: number[] = serviceForEachFullNode.map((service: any) => {
       if (!service) {
-        return {}
+        return NO_KNOWN_NODE_PORT
       }
-      return service.spec.ports.reduce((agg: any, portsSpec: any) => {
+      return service.spec.ports.reduce((existingNodePort: number, portsSpec: any) => {
         if (!portsSpec.nodePort) {
-          return agg
+          return existingNodePort
         }
-        return {
-          ...agg,
-          [portsSpec.protocol]: portsSpec.nodePort,
+        if (existingNodePort !== NO_KNOWN_NODE_PORT && existingNodePort !== portsSpec.nodePort) {
+          throw Error(`Expected all nodePorts to be the same in service, got ${existingNodePort} !== ${portsSpec.nodePort}`)
         }
-      }, {})
+        return portsSpec.nodePort
+      }, NO_KNOWN_NODE_PORT)
     })
-    //
-    // allUsedNodePorts.unshift(30002)
-    // allUsedNodePorts.unshift(30000)
 
 
-    console.log('nodePortsByProtocolForEachFullNode b4', nodePortsByProtocolForEachFullNode)
+    console.log('nodePortForEachFullNode b4', nodePortForEachFullNode)
     console.log('allUsedNodePorts b4', allUsedNodePorts)
-
-
 
     const minPort = 30000
     const maxPort = 32767
     let potentialPort = minPort
     let allUsedNodePortsIndex = 0
-    for (const nodePortsByProtocol of nodePortsByProtocolForEachFullNode) {
-      for (const desiredProtocol of desiredProtocols) {
-        // if (nodePortsByProtocol[desiredProtocol])
-        // If there is no port yet allocated
-        if (!nodePortsByProtocol[desiredProtocol]) {
-          // find the first "open" port. We take advantage of allUsedNodePorts
-          // being ordered low -> high
-          for (; allUsedNodePortsIndex < allUsedNodePorts.length; allUsedNodePortsIndex++) {
-            if (potentialPort > maxPort) {
-              throw Error(`No available node ports`)
-            }
-            const usedPort = allUsedNodePorts[allUsedNodePortsIndex]
-            if (potentialPort < usedPort) {
-              break
-            }
-            // Try the next port on the next iteration
-            potentialPort = usedPort + 1
+    for (let i = 0; i < nodePortForEachFullNode.length; i++) {
+      const nodePort = nodePortForEachFullNode[i]
+      if (nodePort === NO_KNOWN_NODE_PORT) {
+        for (; allUsedNodePortsIndex < allUsedNodePorts.length; allUsedNodePortsIndex++) {
+          if (potentialPort > maxPort) {
+            throw Error(`No available node ports`)
           }
-          // Assign the port
-          nodePortsByProtocol[desiredProtocol] = potentialPort
-          // Add the newly assigned port to allUsedNodePorts
-          allUsedNodePorts.splice(allUsedNodePortsIndex, 0, potentialPort)
-          // Increment potential port for a potential subsequent NodePort assignment
-          potentialPort++
+          const usedPort = allUsedNodePorts[allUsedNodePortsIndex]
+          if (potentialPort < usedPort) {
+            break
+          }
+          // Try the next port on the next iteration
+          potentialPort = usedPort + 1
         }
+        // Assign the port
+        nodePortForEachFullNode[i] = potentialPort
+        // Add the newly assigned port to allUsedNodePorts
+        allUsedNodePorts.splice(allUsedNodePortsIndex, 0, potentialPort)
+        // Increment potential port for a potential subsequent NodePort assignment
+        potentialPort++
       }
     }
 
-    console.log('nodePortsByProtocolForEachFullNode aft3r', nodePortsByProtocolForEachFullNode)
+    console.log('nodePortForEachFullNode aft3r', nodePortForEachFullNode)
     console.log('allUsedNodePorts after', allUsedNodePorts)
 
-    const nodePortsPerFullNodeStrs = nodePortsByProtocolForEachFullNode.map((nodePortsByProtocol: any, index: number) => {
-      const strs = []
-      for (const [protocol, nodePort] of Object.entries(nodePortsByProtocol)) {
-        strs.push(
-          `--set geth.service_node_port_per_full_node[${index}].${protocol}=${nodePort}`
-        )
-      }
-      return strs
-    }).reduce((agg: string[], nodePorts: string[]) => [
-      ...agg,
-      ...nodePorts
-    ], [])
-
-    console.log('nodePortsPerFullNodeStrs', nodePortsPerFullNodeStrs)
-
-    // process.exit(1)
+    const nodePortPerFullNodeStrs = nodePortForEachFullNode.map((nodePort: number, index: number) =>
+      `--set geth.service_node_port_per_full_node[${index}]=${nodePort}`
+    )
+    console.log('nodePortPerFullNodeStrs', nodePortPerFullNodeStrs)
 
     return [
-      ...nodePortsPerFullNodeStrs,
+      ...nodePortPerFullNodeStrs,
       `--set aws=true`,
       `--set storage.storageClass=gp2`,
       // At the moment we cannot use LoadBalancer for TCP & UDP ingress traffic
