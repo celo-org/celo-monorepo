@@ -11,11 +11,11 @@ import {
   recoverTransaction,
   verifyEIP712TypedDataSigner,
 } from '@celo/wallet-base/lib/signing-utils'
+import { Signature } from '@celo/wallet-hsm/lib/signature-utils'
 import { BigNumber } from 'bignumber.js'
 import * as ethUtil from 'ethereumjs-util'
 import Web3 from 'web3'
 import { AzureHSMWallet } from './azure-hsm-wallet'
-import { Signature } from './azure-key-vault-client'
 
 // Env var should hold service principal credentials
 // https://www.npmjs.com/package/@azure/keyvault-keys
