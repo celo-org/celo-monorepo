@@ -1,6 +1,7 @@
-import { Signer } from '@celo/sdk-types/wallet'
+import { RLPEncodedTx } from '@celo/communication'
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
-import { getHashFromEncoded, RLPEncodedTx } from '@celo/wallet-base/lib/signing-utils'
+import { getHashFromEncoded } from '@celo/wallet-base/lib/signing-utils'
+import { Signer } from '@celo/wallet-base/types'
 import * as ethUtil from 'ethereumjs-util'
 import { AzureKeyVaultClient } from './azure-key-vault-client'
 
@@ -55,5 +56,11 @@ export class AzureHSMSigner implements Signer {
 
   getNativeKey(): string {
     return this.keyName
+  }
+
+  decrypt(_ciphertext: Buffer) {
+    throw new Error('Decryption operation is not supported on this signer')
+    // To make the compiler happy
+    return Promise.resolve(_ciphertext)
   }
 }

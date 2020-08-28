@@ -30,7 +30,7 @@
     "debug": "^4.1.1"
   },
   "devDependencies": {
-    "@celo/sdk-types": "1.0.0-dev",
+    "@celo/communication": "0.0.1-dev",
     "web3": "1.2.11"
   },
   "engines": {
