@@ -8,7 +8,7 @@ export default class ValidatorUpdateBlsPublicKey extends BaseCommand {
 
 Regular (ECDSA and BLS) key rotation is recommended for Validator operational security.
 
-WARNING: By default, the BLS key used by the validator node is derived from the ECDSA private key. As a result, rotating the BLS key without rotating the ECDSA key will result in validator downtime without special configuration. use this method only if you know what you are doing.`
+WARNING: By default, the BLS key used by the validator node is derived from the ECDSA private key. As a result, rotating the BLS key without rotating the ECDSA key will result in validator downtime without special configuration. Use this method only if you know what you are doing.`
 
   static flags = {
     ...BaseCommand.flags,
