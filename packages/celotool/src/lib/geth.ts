@@ -571,28 +571,50 @@ export const simulateClient = async (
 
     // We purposely do not use await syntax so we sleep after sending the transaction,
     // not after processing a transaction's result
-
-
-    const txResult = await transferFn(kit, senderAddress, recipientAddress, LOAD_TEST_TRANSFER_WEI, txOptions)
-    await onLoadTestTxResult(
-      kit,
-      senderAddress,
-      txResult,
-      sendTransactionTime,
-      baseLogMessage,
-      blockscoutUrl,
-      blockscoutMeasurePercent
-    )
-    .catch((error: any) => {
-      console.error('Load test transaction failed with error:', error)
-      tracerLog({
-        tag: LOG_TAG_TRANSACTION_ERROR,
-        error: error.toString(),
-        ...baseLogMessage,
+    await transferFn(kit, senderAddress, recipientAddress, LOAD_TEST_TRANSFER_WEI, txOptions)
+      .then(async (txResult: TransactionResult) => {
+        await onLoadTestTxResult(
+          kit,
+          senderAddress,
+          txResult,
+          sendTransactionTime,
+          baseLogMessage,
+          blockscoutUrl,
+          blockscoutMeasurePercent
+        )
       })
-    })
+      .catch((error: any) => {
+        // console.error('Load test transaction failed with error:', JSON.stringify(error))
+        console.error('Load test transaction failed with error:', error)
+        tracerLog({
+          tag: LOG_TAG_TRANSACTION_ERROR,
+          error: error.toString(),
+          ...baseLogMessage,
+        })
+      })
     await sleep(txPeriodMs)
-  }
+  //   const txResult = await transferFn(kit, senderAddress, recipientAddress, LOAD_TEST_TRANSFER_WEI, txOptions)
+  //   await onLoadTestTxResult(
+  //     kit,
+  //     senderAddress,
+  //     txResult,
+  //     sendTransactionTime,
+  //     baseLogMessage,
+  //     blockscoutUrl,
+  //     blockscoutMeasurePercent
+  //   )
+  //   .catch((error: any) => {
+  //     console.error('Load test transaction failed with error:', error)
+  //     tracerLog({
+  //       tag: LOG_TAG_TRANSACTION_ERROR,
+  //       error: error.toString(),
+  //       ...baseLogMessage,
+  //     })
+  //   })
+  //   if (sendTransactionTime + txPeriodMs > Date.now() ) {
+  //     await sleep(sendTransactionTime + txPeriodMs - Date.now())
+  //   }
+  // }
 }
 
 export const onLoadTestTxResult = async (
