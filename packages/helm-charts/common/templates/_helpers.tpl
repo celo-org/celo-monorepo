@@ -99,7 +99,9 @@ release: {{ .Release.Name }}
     else
       NAT_IP=$(cat /root/.celo/ipAddress)
     fi
-    NAT_FLAG="--nat=extip:${NAT_IP}"
+    # im messing with this!
+    NAT_FLAG="--nat=extip:${HOST_IP}"
+
     ADDITIONAL_FLAGS='{{ .geth_flags | default "" }}'
     if [[ -f /root/.celo/pkey ]]; then
       NODE_KEY=$(cat /root/.celo/pkey)
@@ -173,10 +175,10 @@ release: {{ .Release.Name }}
       fieldRef:
         fieldPath: metadata.name
 {{- if .Values.aws }}
-  - name: POD_IP
+  - name: HOST_IP
     valueFrom:
       fieldRef:
-        fieldPath: status.podIP
+        fieldPath: status.hostIP
 {{- end }}
 {{/* TODO: make this use IPC */}}
 {{- if .expose }}

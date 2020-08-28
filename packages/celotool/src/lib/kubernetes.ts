@@ -60,6 +60,32 @@ export async function deleteResource(
   return run()
 }
 
+/**
+ * Returns a sorted array of used node ports
+ */
+export async function getAllUsedNodePorts(namespace?: string, cmdFlags?: { [key: string]: string }) {
+  const namespaceFlag = namespace ? `--namespace ${namespace}` : `--all-namespaces`
+  // const selectorFlag = selector ? `--selector ${selector}` : ''
+  const cmdFlagStrs = cmdFlags ? Object.entries(cmdFlags).map(([flag, value]) =>
+    `--${flag} ${value}`
+  ) : []
+  const [output] = await execCmd(
+    `kubectl get svc ${namespaceFlag} ${cmdFlagStrs.join(' ')} -o go-template='{{range .items}}{{range .spec.ports}}{{if .nodePort}}{{.nodePort}}{{"\\n"}}{{end}}{{end}}{{end}}'`
+  )
+  return output.trim().split('\n').map((portStr: string) => parseInt(portStr, 10)).sort((a: number, b: number) => b - a)
+}
+
+export async function getService(serviceName: string, namespace: string) {
+  try {
+    const [output] = await execCmd(
+      `kubectl get svc ${serviceName} --namespace ${namespace} -o json`
+    )
+    return JSON.parse(output)
+  } catch (e) {
+    return undefined
+  }
+}
+
 export async function getServerVersion() {
   const [output] = await execCmd(`kubectl version -o json`)
   const jsonOutput = JSON.parse(output)

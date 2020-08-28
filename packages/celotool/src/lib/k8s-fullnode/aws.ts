@@ -1,7 +1,7 @@
 import { range } from 'lodash'
 import { deallocateAWSStaticIP, describeElasticIPAddresses, getAllSubnetsSortedByAZ, getElasticIPAddressesFromAllocationIDs, getOrRegisterElasticIP, subnetIsPublic, tagsArrayToAWSResourceTags, waitForElasticIPAssociationIDRemoval } from '../aws'
 import { AWSClusterConfig } from '../k8s-cluster/aws'
-import { deleteResource } from '../kubernetes'
+import { deleteResource, getAllUsedNodePorts, getService } from '../kubernetes'
 import { BaseFullNodeDeployer, BaseFullNodeDeploymentConfig } from './base'
 
 export interface AWSFullNodeDeploymentConfig extends BaseFullNodeDeploymentConfig {
@@ -26,6 +26,7 @@ export class AWSFullNodeDeployer extends BaseFullNodeDeployer {
    * geth pod has been scheduled.
    */
   async additionalHelmParameters() {
+    if (false) {
     // Gets public & private subnets
     const subnets = await this.getAllSubnetsSortedByAZ()
     // Gives a mapping of (public) subnetID -> allocationID for each full node
@@ -103,12 +104,14 @@ export class AWSFullNodeDeployer extends BaseFullNodeDeployer {
     // Effectively an array of comma separated allocation IDs to pass to helm.
     // Gives the allocation IDs of the IP addresses for public subnets for
     // each full node to be used by the NLB.
+    // @ts-ignore
     const allocationIdsPerPublicSubnetPerNodeParamStr = allocationIDForEachPublicSubnetForEachFullNode.map((allocIDs: string[]) =>
       allocIDs.join('\\\,')
     ).join(',')
 
     // Subnet CIDR blocks, sorted by AZ. Given these CIDR ranges, a pod can
     // determine which subnet it belongs to by looking at its own IP address
+    // @ts-ignore
     const subnetCIDRBlocks = subnets.map((subnet: any) => subnet.CidrBlock)
 
     // An array of comma separated IPv4 addresses, each IP address corresponds
@@ -120,16 +123,110 @@ export class AWSFullNodeDeployer extends BaseFullNodeDeployer {
     // us-west2-b respectively. Then, we get the IP addresses
     // A.A.A.A, A.A.A.A, B.B.B.B, B.B.B.B because we want the indices of the
     // IP addresses to correspond to the sorted subnets.
+    // @ts-ignore
     const ipAddressesPerSubnetPerNode = ipAddressForEachSubnetForEachFullNode.map((ips: string[]) =>
       ips.join('\\\,')
     )
 
+  }
+
+    const replicas = this._deploymentConfig.replicas
+    const allUsedNodePorts = await getAllUsedNodePorts()
+    const serviceForEachFullNode = await Promise.all(
+      range(replicas).map(async (i: number) =>
+        getService(`${this.celoEnv}-fullnodes-${i}`, this.kubeNamespace)
+      )
+    )
+    const desiredProtocols = ['TCP', 'UDP']
+    // Assumes no 2 ports for a service have the same protocol.
+    const nodePortsByProtocolForEachFullNode: Array<{
+      [protocol: string]: number
+    }> = serviceForEachFullNode.map((service: any) => {
+      if (!service) {
+        return {}
+      }
+      return service.spec.ports.reduce((agg: any, portsSpec: any) => {
+        if (!portsSpec.nodePort) {
+          return agg
+        }
+        return {
+          ...agg,
+          [portsSpec.protocol]: portsSpec.nodePort,
+        }
+      }, {})
+    })
+    //
+    // allUsedNodePorts.unshift(30002)
+    // allUsedNodePorts.unshift(30000)
+
+
+    console.log('nodePortsByProtocolForEachFullNode b4', nodePortsByProtocolForEachFullNode)
+    console.log('allUsedNodePorts b4', allUsedNodePorts)
+
+
+
+    const minPort = 30000
+    const maxPort = 32767
+    let potentialPort = minPort
+    let allUsedNodePortsIndex = 0
+    for (const nodePortsByProtocol of nodePortsByProtocolForEachFullNode) {
+      for (const desiredProtocol of desiredProtocols) {
+        // if (nodePortsByProtocol[desiredProtocol])
+        // If there is no port yet allocated
+        if (!nodePortsByProtocol[desiredProtocol]) {
+          // find the first "open" port. We take advantage of allUsedNodePorts
+          // being ordered low -> high
+          for (; allUsedNodePortsIndex < allUsedNodePorts.length; allUsedNodePortsIndex++) {
+            if (potentialPort > maxPort) {
+              throw Error(`No available node ports`)
+            }
+            const usedPort = allUsedNodePorts[allUsedNodePortsIndex]
+            if (potentialPort < usedPort) {
+              break
+            }
+            // Try the next port on the next iteration
+            potentialPort = usedPort + 1
+          }
+          // Assign the port
+          nodePortsByProtocol[desiredProtocol] = potentialPort
+          // Add the newly assigned port to allUsedNodePorts
+          allUsedNodePorts.splice(allUsedNodePortsIndex, 0, potentialPort)
+          // Increment potential port for a potential subsequent NodePort assignment
+          potentialPort++
+        }
+      }
+    }
+
+    console.log('nodePortsByProtocolForEachFullNode aft3r', nodePortsByProtocolForEachFullNode)
+    console.log('allUsedNodePorts after', allUsedNodePorts)
+
+    const nodePortsPerFullNodeStrs = nodePortsByProtocolForEachFullNode.map((nodePortsByProtocol: any, index: number) => {
+      const strs = []
+      for (const [protocol, nodePort] of Object.entries(nodePortsByProtocol)) {
+        strs.push(
+          `--set geth.service_node_port_per_full_node[${index}].${protocol}=${nodePort}`
+        )
+      }
+      return strs
+    }).reduce((agg: string[], nodePorts: string[]) => [
+      ...agg,
+      ...nodePorts
+    ], [])
+
+    console.log('nodePortsPerFullNodeStrs', nodePortsPerFullNodeStrs)
+
+    // process.exit(1)
+
     return [
+      ...nodePortsPerFullNodeStrs,
       `--set aws=true`,
       `--set storage.storageClass=gp2`,
-      `--set geth.aws.all_subnet_cidr_blocks='{${subnetCIDRBlocks.join(',')}}'`,
-      `--set geth.aws.eip_allocation_ids_per_public_subnet_per_node='{${allocationIdsPerPublicSubnetPerNodeParamStr}}'`,
-      `--set geth.aws.ip_addresses_per_subnet_per_node='{${ipAddressesPerSubnetPerNode.join(',')}}'`,
+      // At the moment we cannot use LoadBalancer for TCP & UDP ingress traffic
+      // with same IP on a Network Load Balancer :(
+      `--set geth.service_type=NodePort`,
+      // `--set geth.aws.all_subnet_cidr_blocks='{${subnetCIDRBlocks.join(',')}}'`,
+      // `--set geth.aws.eip_allocation_ids_per_public_subnet_per_node='{${allocationIdsPerPublicSubnetPerNodeParamStr}}'`,
+      // `--set geth.aws.ip_addresses_per_subnet_per_node='{${ipAddressesPerSubnetPerNode.join(',')}}'`,
     ]
   }
 

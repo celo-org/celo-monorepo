@@ -7,10 +7,6 @@ metadata:
 {{ if $.Values.azure }}
     service.beta.kubernetes.io/azure-load-balancer-mixed-protocols: "true"
 {{ end }}
-{{ if $.Values.aws }}
-    service.beta.kubernetes.io/aws-load-balancer-type: nlb
-    service.beta.kubernetes.io/aws-load-balancer-eip-allocations: {{ index $.Values.geth.aws.eip_allocation_ids_per_public_subnet_per_node $index }}
-{{ end }}
   labels:
 {{ include "celo-fullnode.labels" $ | indent 4 }}
 spec:
@@ -20,9 +16,16 @@ spec:
   loadBalancerIP: {{ index $.Values.geth.public_ips $index -}}
 {{- end }}
   ports:
-    - port: 30303
-      targetPort: ethereum
-      name: ethereum
+{{- range $protocol, $node_port := (index $.Values.geth.service_node_port_per_full_node $index) }}
+    - targetPort: ethereum
+      port: 30303
+      nodePort: {{ $node_port }}
+      name: {{ lower $protocol }}
+      protocol: {{ $protocol }}
+{{- end }}
+    # - port: 30303
+    #   targetPort: ethereum
+    #   name: ethereum
 {{- if $.Values.geth.expose_rpc_externally }}
 {{ include "celo-fullnode.rpc-ports" . | indent 4 }}
 {{- end }}
