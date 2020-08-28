@@ -203,7 +203,10 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     const account =
       this.kit.communication.defaultAccount || (await this.kit.communication.getAccounts())[0]
     if (await validators.isValidator(account)) {
-      const message = this.kit.communication.soliditySha3({ type: 'address', value: account })
+      const message = this.kit.communication.web3.utils.soliditySha3({
+        type: 'address',
+        value: account,
+      })
       const prefixedMsg = hashMessageWithPrefix(message!)
       const pubKey = signedMessageToPublicKey(
         prefixedMsg!,
@@ -252,7 +255,10 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   ): Promise<CeloTransactionObject<void>> {
     const account =
       this.kit.communication.defaultAccount || (await this.kit.communication.getAccounts())[0]
-    const message = this.kit.communication.soliditySha3({ type: 'address', value: account })
+    const message = this.kit.communication.web3.utils.soliditySha3({
+      type: 'address',
+      value: account,
+    })
     const prefixedMsg = hashMessageWithPrefix(message!)
     const pubKey = signedMessageToPublicKey(
       prefixedMsg!,
@@ -406,12 +412,12 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   }
 
   parseSignatureOfAddress(address: Address, signer: string, signature: string) {
-    const hash = this.kit.communication.soliditySha3({ type: 'address', value: address })
+    const hash = this.kit.communication.web3.utils.soliditySha3({ type: 'address', value: address })
     return parseSignature(hash!, signature, signer)
   }
 
   private async getParsedSignatureOfAddress(address: Address, signer: string, signerFn: Signer) {
-    const hash = this.kit.communication.soliditySha3({ type: 'address', value: address })
+    const hash = this.kit.communication.web3.utils.soliditySha3({ type: 'address', value: address })
     const signature = await signerFn.sign(hash!)
     return parseSignature(hash!, signature, signer)
   }

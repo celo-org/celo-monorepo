@@ -69,7 +69,7 @@ export const handler = async (argv: InviteArgv) => {
     const stableTokenInviteAmount = attestationFee.times(10).toString()
     const stableTokenEscrowAmount = (await convertToContractDecimals(5, stableToken)).toString()
 
-    const phoneHash: string = kit.communication.soliditySha3({
+    const phoneHash: string = kit.communication.web3.utils.soliditySha3({
       type: 'string',
       value: phone,
     })!

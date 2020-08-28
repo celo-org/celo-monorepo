@@ -11,7 +11,6 @@ import {
   CeloTxObject,
   CeloTxPending,
   CeloTxReceipt,
-  Mixed,
   Provider,
 } from './commons'
 import { decodeStringParameter } from './utils/abi-utils'
@@ -343,10 +342,6 @@ export class NodeCommunicationWrapper {
 
   async getBlock(blockHashOrBlockNumber: BlockNumber): Promise<Block> {
     return this.web3.eth.getBlock(blockHashOrBlockNumber, true)
-  }
-
-  soliditySha3(...val: Mixed[]): string | null {
-    return this.web3.utils.soliditySha3(...val)
   }
 
   async getBalance(address: Address, defaultBlock?: BlockNumber): Promise<string> {

@@ -458,7 +458,10 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
     const validators = await this.kit.contracts.getValidators()
     const account = this.address
     if (await validators.isValidator(account)) {
-      const message = this.kit.communication.soliditySha3({ type: 'address', value: account })
+      const message = this.kit.communication.web3.utils.soliditySha3({
+        type: 'address',
+        value: account,
+      })
       const prefixedMsg = hashMessageWithPrefix(message!)
       const pubKey = signedMessageToPublicKey(
         prefixedMsg!,
@@ -506,7 +509,10 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
     blsPop: string
   ): Promise<CeloTransactionObject<void>> {
     const account = this.address
-    const message = this.kit.communication.soliditySha3({ type: 'address', value: account })
+    const message = this.kit.communication.web3.utils.soliditySha3({
+      type: 'address',
+      value: account,
+    })
     const prefixedMsg = hashMessageWithPrefix(message!)
     const pubKey = signedMessageToPublicKey(
       prefixedMsg!,
