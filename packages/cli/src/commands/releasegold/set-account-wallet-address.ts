@@ -1,14 +1,14 @@
 import { flags } from '@oclif/command'
+import { ReleaseGoldBaseCommand } from '../../release-gold-base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-import { ReleaseGoldCommand } from './release-gold'
 
-export default class SetAccountWalletAddress extends ReleaseGoldCommand {
+export default class SetAccountWalletAddress extends ReleaseGoldBaseCommand {
   static description = "Set the ReleaseGold contract account's wallet address"
 
   static flags = {
-    ...ReleaseGoldCommand.flags,
+    ...ReleaseGoldBaseCommand.flags,
     walletAddress: Flags.address({
       required: true,
       description:
