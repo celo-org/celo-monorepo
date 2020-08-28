@@ -256,6 +256,7 @@ export const v0Schema = {
     dismissedGetVerified: false,
     dismissedEarnRewards: false,
     dismissedInviteFriends: false,
+    dismissedGoldEducation: false,
     promptFornoIfNeeded: false,
     acceptedTerms: false,
   },
