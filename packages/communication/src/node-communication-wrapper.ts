@@ -1,5 +1,4 @@
 import { toChecksumAddress } from '@celo/utils/lib/address'
-import { Wallet } from '@celo/wallet-base/types'
 import debugFactory from 'debug'
 import Web3 from 'web3'
 import { AbiCoder } from './abi'
@@ -20,6 +19,7 @@ import { hasProperty } from './utils/provider-utils'
 import { DefaultRpcCaller, RpcCaller } from './utils/rpc-caller'
 import { TxParamsNormalizer } from './utils/tx-params-normalizer'
 import { toTxResult, TransactionResult } from './utils/tx-result'
+import { Wallet } from './wallet'
 
 const debugGasEstimation = debugFactory('communication:gas-estimation')
 

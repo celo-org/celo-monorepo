@@ -4,6 +4,6 @@
     "rootDir": "src",
     "outDir": "lib"
   },
-  "include": ["src", "test-utils"],
+  "include": ["src", "src/test-utils"],
   "references": [{ "path": "../utils" }]
 }

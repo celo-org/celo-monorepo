@@ -33,7 +33,9 @@
   "dependencies": {
     "@celo/contractkit": "0.4.13-dev",
     "@celo/utils": "0.1.19-dev",
-    "@celo/wallet-base": "1.0.0-dev",
+    "@celo/wallet-local": "0.0.1-dev",
+    "@celo/wallet-remote-azurehsm": "0.0.1-dev",
+    "@celo/wallet-remote-ledger": "0.0.1-dev",
     "@ledgerhq/hw-transport-node-hid": "^5.11.0",
     "@oclif/command": "^1",
     "@oclif/config": "^1",

@@ -1,5 +1,4 @@
-import { CeloTx, Provider } from '@celo/communication'
-import { newKit } from '@celo/contractkit'
+import { CeloTx, newCommunicationWrapperFromWeb3, Provider } from '@celo/communication'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/src/address'
@@ -81,8 +80,8 @@ describe.skip('rpc-wallet', () => {
     const result = await wallet.signTransaction(tx)
     console.log(result)
 
-    const kit = newKit(ipcUrl, wallet as any)
-    const txResult = await kit.web3.eth.sendSignedTransaction(result.raw)
+    const communication = newCommunicationWrapperFromWeb3(new Web3(ipcUrl, wallet as any))
+    const txResult = await communication.web3.eth.sendSignedTransaction(result.raw)
     console.log(txResult)
   })
 })

@@ -1,10 +1,11 @@
+import { Wallet } from '@celo/communication'
 import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { AzureHSMWallet } from '@celo/contractkit/lib/wallets/azure-hsm-wallet'
+import { LocalWallet } from '@celo/wallet-local/lib/local-wallet'
+import { AzureHSMWallet } from '@celo/wallet-remote-azurehsm/lib/azure-hsm-wallet'
 import {
   AddressValidation,
   newLedgerWalletWithSetup,
-} from '@celo/contractkit/lib/wallets/ledger-wallet'
-import { Wallet } from '@celo/wallet-base/types'
+} from '@celo/wallet-remote-ledger/lib/ledger-wallet'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import { Command, flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
@@ -168,6 +169,8 @@ export abstract class BaseCommand extends LocalCommand {
         console.log(`Failed to connect to AKV ${err}`)
         throw err
       }
+    } else {
+      this._wallet = new LocalWallet()
     }
     await this.kit.setFeeCurrency(
       res.flags.usdGas ? CeloContract.StableToken : CeloContract.GoldToken

@@ -1,6 +1,6 @@
 {
   "name": "@celo/wallet-remote-rpc",
-  "version": "1.0.0-dev",
+  "version": "0.0.1-dev",
   "description": "Geth RPC wallet implementation",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -17,13 +17,14 @@
   },
   "dependencies": {
     "@celo/utils": "0.1.19-dev",
-    "@celo/wallet-base": "1.0.0-dev",
-    "@celo/wallet-remote": "1.0.0-dev",
+    "@celo/wallet-base": "0.0.1-dev",
+    "@celo/wallet-remote": "0.0.1-dev",
     "bignumber.js": "^9.0.0",
     "debug": "^4.1.1"
   },
   "devDependencies": {
     "@celo/dev-utils": "0.0.1-dev",
+    "@celo/communication": "0.0.1-dev",
     "@celo/contractkit": "0.4.13-dev"
   },
   "engines": {

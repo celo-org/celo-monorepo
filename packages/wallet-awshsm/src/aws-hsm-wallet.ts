@@ -1,5 +1,4 @@
-import { Address } from '@celo/utils/lib/address'
-import { Signer, Wallet } from '@celo/wallet-base/types'
+import { Address, Signer, Wallet } from '@celo/communication'
 import { publicKeyFromAsn1 } from '@celo/wallet-hsm/lib/ber-utils'
 import {
   bigNumberToBuffer,

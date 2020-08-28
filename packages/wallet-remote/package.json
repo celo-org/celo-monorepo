@@ -1,6 +1,6 @@
 {
   "name": "@celo/wallet-remote",
-  "version": "1.0.0-dev",
+  "version": "0.0.1-dev",
   "description": "Remote wallet implementation",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@celo/utils": "0.1.19-dev",
-    "@celo/wallet-base": "1.0.0-dev",
+    "@celo/wallet-base": "0.0.1-dev",
     "eth-lib": "^0.2.8",
     "ethereumjs-util": "^5.2.0"
   },

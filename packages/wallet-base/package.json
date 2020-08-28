@@ -1,6 +1,6 @@
 {
   "name": "@celo/wallet-base",
-  "version": "1.0.0-dev",
+  "version": "0.0.1-dev",
   "description": "Wallet base implementation",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -16,6 +16,7 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
+    "@celo/base": "0.0.2-dev",
     "@celo/utils": "0.1.19-dev",
     "bignumber.js": "^9.0.0",
     "eth-lib": "^0.2.8",

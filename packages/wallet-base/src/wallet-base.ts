@@ -1,8 +1,7 @@
 import { isHexString, normalizeAddressWith0x } from '@celo/base/lib/address'
-import { Address, CeloTx, EncodedTransaction } from '@celo/communication'
+import { Address, CeloTx, EncodedTransaction, Signer, Wallet } from '@celo/communication'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import * as ethUtil from 'ethereumjs-util'
-import { Signer, Wallet } from '../types'
 import { chainIdTransformationForSigning, encodeTransaction, rlpEncodedTx } from './signing-utils'
 
 export abstract class WalletBase implements Wallet {

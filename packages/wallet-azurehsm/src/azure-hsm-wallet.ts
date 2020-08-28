@@ -1,5 +1,5 @@
+import { Signer, Wallet } from '@celo/communication'
 import { Address, publicKeyToAddress } from '@celo/utils/lib/address'
-import { Signer, Wallet } from '@celo/wallet-base/types'
 import { RemoteWallet } from '@celo/wallet-remote/lib/remote-wallet'
 import debugFactory from 'debug'
 import { AzureHSMSigner } from './azure-hsm-signer'

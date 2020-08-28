@@ -1,4 +1,4 @@
-import { Address, ensureLeading0x } from '@celo/utils/lib/address'
+import { Address, ensureLeading0x } from '@celo/base/lib/address'
 import { BigNumber } from 'bignumber.js'
 import { ec as EC } from 'elliptic'
 import * as ethUtil from 'ethereumjs-util'

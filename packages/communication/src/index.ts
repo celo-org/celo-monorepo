@@ -1,6 +1,6 @@
-import { Wallet } from '@celo/wallet-base/types'
 import Web3 from 'web3'
 import { NodeCommunicationWrapper } from './node-communication-wrapper'
+import { Wallet } from './wallet'
 export * from './abi'
 export * from './commons'
 export * from './node-communication-wrapper'
@@ -8,6 +8,7 @@ export * from './utils/abi-utils'
 export * from './utils/celo-transaction-object'
 export * from './utils/rpc-caller'
 export * from './utils/tx-result'
+export * from './wallet'
 
 /**
  * Creates a new instance of `CommunicationWrapper` with a web3 instance
