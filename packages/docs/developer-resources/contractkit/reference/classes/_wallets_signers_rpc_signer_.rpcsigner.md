@@ -31,7 +31,7 @@ Implements the signer interface on top of the JSON-RPC interface.
 
 ###  constructor
 
-\+ **new RpcSigner**(`rpc`: [RpcCaller](../interfaces/_utils_rpc_caller_.rpccaller.md), `account`: string, `unlockBufferSeconds`: number, `unlockTime`: number, `unlockDuration`: number): *[RpcSigner](_wallets_signers_rpc_signer_.rpcsigner.md)*
+\+ **new RpcSigner**(`rpc`: [RpcCaller](../interfaces/_utils_rpc_caller_.rpccaller.md), `account`: string, `unlockBufferSeconds`: number, `unlockTime?`: undefined | number, `unlockDuration?`: undefined | number): *[RpcSigner](_wallets_signers_rpc_signer_.rpcsigner.md)*
 
 *Defined in [contractkit/src/wallets/signers/rpc-signer.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/rpc-signer.ts#L52)*
 
@@ -44,8 +44,8 @@ Name | Type | Default | Description |
 `rpc` | [RpcCaller](../interfaces/_utils_rpc_caller_.rpccaller.md) | - | RPC caller instance |
 `account` | string | - | Account address derived from the private key to be called in init |
 `unlockBufferSeconds` | number | 5 | Number of seconds to shrink the unlocked duration by to account for latency and timing inconsistencies on the node |
-`unlockTime` | number | -1 | Timestamp in seconds when the signer was last unlocked |
-`unlockDuration` | number | -1 | Number of seconds that the signer was last unlocked for   |
+`unlockTime?` | undefined &#124; number | - | Timestamp in seconds when the signer was last unlocked |
+`unlockDuration?` | undefined &#124; number | - | Number of seconds that the signer was last unlocked for   |
 
 **Returns:** *[RpcSigner](_wallets_signers_rpc_signer_.rpcsigner.md)*
 
@@ -55,7 +55,7 @@ Name | Type | Default | Description |
 
 ▸ **decrypt**(`ciphertext`: Buffer): *Promise‹Buffer‹››*
 
-*Defined in [contractkit/src/wallets/signers/rpc-signer.ts:146](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/rpc-signer.ts#L146)*
+*Defined in [contractkit/src/wallets/signers/rpc-signer.ts:149](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/rpc-signer.ts#L149)*
 
 **Parameters:**
 
