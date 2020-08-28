@@ -25,11 +25,14 @@ export enum HomeEvents {
 export enum SettingsEvents {
   settings_profile_edit = 'settings_profile_edit',
   settings_profile_name_edit = 'settings_profile_name_edit',
+  settings_verify_number = 'settings_verify_number',
   language_select = 'language_select',
   pin_require_on_load = 'pin_require_on_load',
   forno_toggle = 'forno_toggle',
   licenses_view = 'licenses_view',
   tos_view = 'tos_view',
+  start_account_removal = 'start_account_removal',
+  completed_account_removal = 'completed_account_removal',
   // intentionally not tracking analytics opt in/out
   // to avoid tracking through omission
 }

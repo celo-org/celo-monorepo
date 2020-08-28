@@ -469,7 +469,6 @@ exports[`DevelopersPage renders 1`] = `
                     dir="auto"
                     href="https://docs.celo.org/v/master/developer-guide/overview/introduction"
                     onClick={[Function]}
-                    onMouseEnter={[Function]}
                     role="link"
                     style={
                       Object {
@@ -667,7 +666,6 @@ exports[`DevelopersPage renders 1`] = `
                     dir="auto"
                     href="https://docs.celo.org/v/master/developer-guide/start"
                     onClick={[Function]}
-                    onMouseEnter={[Function]}
                     role="link"
                     style={
                       Object {
@@ -865,7 +863,6 @@ exports[`DevelopersPage renders 1`] = `
                     dir="auto"
                     href="https://github.com/celo-org"
                     onClick={[Function]}
-                    onMouseEnter={[Function]}
                     role="link"
                     style={
                       Object {
@@ -1290,7 +1287,6 @@ exports[`DevelopersPage renders 1`] = `
                 dir="auto"
                 href="/developers/wallet"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -1395,7 +1391,6 @@ exports[`DevelopersPage renders 1`] = `
                   dir="auto"
                   href="https://github.com/celo-org/celo-monorepo"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -1625,7 +1620,6 @@ exports[`DevelopersPage renders 1`] = `
                 dir="auto"
                 href="https://docs.celo.org/overview"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -1730,7 +1724,6 @@ exports[`DevelopersPage renders 1`] = `
                   dir="auto"
                   href="https://github.com/celo-org/celo-monorepo"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -1960,7 +1953,6 @@ exports[`DevelopersPage renders 1`] = `
                 dir="auto"
                 href="https://docs.celo.org/overview"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -2065,7 +2057,6 @@ exports[`DevelopersPage renders 1`] = `
                   dir="auto"
                   href="https://github.com/celo-org/celo-blockchain"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -2181,7 +2172,6 @@ exports[`DevelopersPage renders 1`] = `
               dir="auto"
               href="https://github.com/celo-org"
               onClick={[Function]}
-              onMouseEnter={[Function]}
               rel=" noopener noreferrer"
               role="link"
               style={
@@ -3703,7 +3693,6 @@ Build dApps for the Celo platform.
                 dir="auto"
                 href="/developers/wallet"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -3984,7 +3973,6 @@ Build dApps for the Celo platform.
                 dir="auto"
                 href="/developers/faucet"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -4241,7 +4229,6 @@ Build dApps for the Celo platform.
                 dir="auto"
                 href="https://docs.celo.org/"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -4396,7 +4383,6 @@ Build dApps for the Celo platform.
           dir="auto"
           href="https://c-labs.typeform.com/to/gj9aUp"
           onClick={[Function]}
-          onMouseEnter={[Function]}
           role="link"
           style={
             Object {

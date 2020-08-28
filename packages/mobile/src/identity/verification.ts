@@ -1,5 +1,5 @@
 import { CeloTransactionObject } from '@celo/contractkit'
-import { PhoneNumberHashDetails } from '@celo/contractkit/lib/utils/phone-number-lookup/phone-number-identifier'
+import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import {
   ActionableAttestation,
   AttesationServiceRevealRequest,
@@ -40,6 +40,7 @@ import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
 import { VerificationStatus } from 'src/identity/types'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { sendTransaction } from 'src/transactions/send'
+import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
 import { registerAccountDek } from 'src/web3/dataEncryptionKey'
@@ -216,6 +217,8 @@ export function* doVerificationFlow() {
     Logger.error(TAG, 'Error occured during verification flow', error)
     if (error.message === ErrorMessages.SALT_QUOTA_EXCEEDED) {
       yield put(setVerificationStatus(VerificationStatus.SaltQuotaExceeded))
+    } else if (error.message === ErrorMessages.ODIS_INSUFFICIENT_BALANCE) {
+      yield put(setVerificationStatus(VerificationStatus.InsufficientBalance))
     } else {
       yield put(setVerificationStatus(VerificationStatus.Failed))
       yield put(showErrorOrFallback(error, ErrorMessages.VERIFICATION_FAILURE))
@@ -350,7 +353,12 @@ function* requestAttestations(
       numAttestationsRequestsNeeded
     )
 
-    yield call(sendTransaction, approveTx.txo, account, TAG, 'Approve Attestations')
+    yield call(
+      sendTransaction,
+      approveTx.txo,
+      account,
+      newTransactionContext(TAG, 'Approve attestations')
+    )
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_approve_tx_sent)
 
     Logger.debug(
@@ -364,21 +372,31 @@ function* requestAttestations(
       numAttestationsRequestsNeeded
     )
 
-    yield call(sendTransaction, requestTx.txo, account, TAG, 'Request Attestations')
+    yield call(
+      sendTransaction,
+      requestTx.txo,
+      account,
+      newTransactionContext(TAG, 'Request attestations')
+    )
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_request_tx_sent)
   }
 
-  Logger.debug(`${TAG}@requestAttestations`, 'Waiting for block to select issuer')
+  Logger.debug(`${TAG}@requestAttestations`, 'Waiting for block to select issuers')
   ValoraAnalytics.track(VerificationEvents.verification_request_attestation_await_issuer_selection)
 
   yield call([attestationsWrapper, attestationsWrapper.waitForSelectingIssuers], phoneHash, account)
 
-  Logger.debug(`${TAG}@requestAttestations`, 'Selecting issuer')
+  Logger.debug(`${TAG}@requestAttestations`, 'Selecting issuers')
   ValoraAnalytics.track(VerificationEvents.verification_request_attestation_select_issuer)
 
   const selectIssuersTx = attestationsWrapper.selectIssuers(phoneHash)
 
-  yield call(sendTransaction, selectIssuersTx.txo, account, TAG, 'Select Issuer')
+  yield call(
+    sendTransaction,
+    selectIssuersTx.txo,
+    account,
+    newTransactionContext(TAG, 'Select attestation issuers')
+  )
   ValoraAnalytics.track(VerificationEvents.verification_request_attestation_issuer_tx_sent)
 }
 
@@ -504,6 +522,7 @@ function* revealAndCompleteAttestation(
 
   Logger.debug(TAG + '@revealAttestation', `Completing code for issuer: ${code.issuer}`)
 
+  // Generate and send the transaction to complete the attestation from the given issuer.
   const completeTx: CeloTransactionObject<void> = yield call(
     [attestationsWrapper, attestationsWrapper.complete],
     phoneHashDetails.phoneHash,
@@ -511,7 +530,8 @@ function* revealAndCompleteAttestation(
     code.issuer,
     code.code
   )
-  yield call(sendTransaction, completeTx.txo, account, TAG, `Complete ${issuer}`)
+  const context = newTransactionContext(TAG, `Complete attestation from ${issuer}`)
+  yield call(sendTransaction, completeTx.txo, account, context)
 
   ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_complete, { issuer })
 
@@ -540,7 +560,7 @@ function* tryRevealPhoneNumber(
       account,
       issuer,
       phoneNumber: phoneHashDetails.e164Number,
-      salt: phoneHashDetails.salt,
+      salt: phoneHashDetails.pepper,
       smsRetrieverAppSig,
     }
 

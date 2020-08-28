@@ -46,6 +46,8 @@ export abstract class BaseCommand extends LocalCommand {
     usdGas: flags.boolean({
       default: false,
       description: 'If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD',
+      // TODO: remove once feeCurrency is implemented in ledger app
+      exclusive: ['useLedger'],
     }),
     useLedger: flags.boolean({
       default: false,

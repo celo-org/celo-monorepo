@@ -122,6 +122,7 @@
   "addressLookupFailure": "Failed to look up phone number address",
   "saltFetchFailure": "Failed to retrieve phone number secret",
   "saltQuotaExceededError": "Your phone number lookup quota is used up",
+  "odisInsufficientBalance": "Your balance is too low to complete this process",
   "matchmakingQuotaExceededError": "Matchmaking can be done only once",
   "paymentLimitReached": "The daily limit is {{dailyLimitcUSD}} cUSD ({{currencySymbol}}{{dailyLimit}})\n{{dailyRemainingcUSD}} cUSD ({{currencySymbol}}{{dailyRemaining}}) remaining",
   "ordinals": [
@@ -179,5 +180,6 @@
   "currentBalance": "Current Balance",
   "restore": "Restore",
   "commentUnavailable": "Comment Unavailable",
+  "accountClearFailed": "There was an error while removing your Account Key. You might have to reinstall the app to restore all functionality.",
   "withdraw": "Withdraw"
 }
