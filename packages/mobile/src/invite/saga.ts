@@ -287,19 +287,21 @@ export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
   const {
     result,
     timeout,
-  }: { result: { success: boolean; newAccount: string } | false; timeout: true } = yield race({
+  }: { result: { success: boolean; newAccount?: string }; timeout: true } = yield race({
     result: call(doRedeemInvite, inviteCode),
     timeout: delay(REDEEM_INVITE_TIMEOUT),
   })
 
-  if (result && result.success === true) {
+  const { success, newAccount } = result
+
+  if (success === true && newAccount) {
     Logger.debug(TAG, 'Redeem Invite completed successfully')
     yield put(redeemInviteSuccess())
     navigate(Screens.VerificationEducationScreen)
     // Note: We are ok with this succeeding or failing silently in the background,
     // user will have another chance to register DEK when sending their first tx
-    yield spawn(registerAccountDek, result.newAccount)
-  } else if (result === false) {
+    yield spawn(registerAccountDek, newAccount)
+  } else if (success === false) {
     Logger.debug(TAG, 'Redeem Invite failed')
     yield put(redeemInviteFailure())
   } else if (timeout) {
@@ -327,7 +329,7 @@ export function* doRedeemInvite(inviteCode: string) {
         error: 'Empty invite',
       })
       yield put(showError(ErrorMessages.EMPTY_INVITE_CODE))
-      return false
+      return { success: false }
     }
 
     ValoraAnalytics.track(OnboardingEvents.invite_redeem_move_funds_start)
@@ -352,7 +354,7 @@ export function* doRedeemInvite(inviteCode: string) {
     } else {
       yield put(showError(ErrorMessages.REDEEM_INVITE_FAILED))
     }
-    return false
+    return { success: false }
   }
 }
 
