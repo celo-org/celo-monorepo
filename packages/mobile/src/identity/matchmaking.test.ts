@@ -91,11 +91,3 @@ describe('Fetch contact matches', () => {
       .run()
   })
 })
-
-describe(OdisUtils.Matchmaking.obfuscateNumberForMatchmaking, () => {
-  it('Hashes sigs correctly', () => {
-    expect(OdisUtils.Matchmaking.obfuscateNumberForMatchmaking(mockE164Number2)).toBe(
-      'Fox23FU+SCdDPhk2I2h4e2UC63lyOWMygxc4wTAXu9w='
-    )
-  })
-})
