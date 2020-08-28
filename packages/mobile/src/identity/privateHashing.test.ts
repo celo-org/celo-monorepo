@@ -5,6 +5,7 @@ import { call, select } from 'redux-saga/effects'
 import { PincodeType } from 'src/account/reducer'
 import { e164NumberSelector } from 'src/account/selectors'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
 import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import { e164NumberToSaltSelector } from 'src/identity/reducer'
@@ -77,7 +78,8 @@ describe('Fetch phone hash details', () => {
       await expectSaga(fetchPhoneHashPrivate, mockE164Number)
         .provide([
           [call(getConnectedAccount), mockAccount],
-          [select(stableTokenBalanceSelector), 0.09],
+          [select(stableTokenBalanceSelector), 0.009],
+          [select(celoTokenBalanceSelector), 0.004],
           [select(e164NumberSelector), mockE164Number2],
           [select(e164NumberToSaltSelector), {}],
           [matchers.call.fn(isAccountUpToDate), true],

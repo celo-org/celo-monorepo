@@ -9,6 +9,7 @@ import { dismissGetVerified, dismissGoldEducation, dismissInviteFriends } from '
 import { HomeEvents } from 'src/analytics/Events'
 import { ScrollDirection } from 'src/analytics/types'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
+import { verificationPossibleSelector } from 'src/app/selectors'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentReminderSummaryNotification from 'src/escrow/EscrowedPaymentReminderSummaryNotification'
 import { getReclaimableEscrowPayments } from 'src/escrow/reducer'
@@ -55,6 +56,7 @@ interface StateProps {
   goldEducationCompleted: boolean
   dismissedInviteFriends: boolean
   dismissedGetVerified: boolean
+  verificationPossible: boolean
   dismissedGoldEducation: boolean
   incomingPaymentRequests: PaymentRequest[]
   outgoingPaymentRequests: PaymentRequest[]
@@ -79,6 +81,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   outgoingPaymentRequests: getOutgoingPaymentRequests(state),
   dismissedInviteFriends: state.account.dismissedInviteFriends,
   dismissedGetVerified: state.account.dismissedGetVerified,
+  verificationPossible: verificationPossibleSelector(state),
   dismissedGoldEducation: state.account.dismissedGoldEducation,
   backupTooLate: isBackupTooLate(state),
   reclaimableEscrowPayments: getReclaimableEscrowPayments(state),
@@ -142,6 +145,7 @@ export class NotificationBox extends React.Component<Props, State> {
       goldEducationCompleted,
       dismissedInviteFriends,
       dismissedGetVerified,
+      verificationPossible,
       dismissedGoldEducation,
     } = this.props
     const actions = []
@@ -166,7 +170,7 @@ export class NotificationBox extends React.Component<Props, State> {
       })
     }
 
-    if (!dismissedGetVerified && !numberVerified) {
+    if (!dismissedGetVerified && !numberVerified && verificationPossible) {
       actions.push({
         title: t('nuxVerification2:notification.title'),
         text: t('nuxVerification2:notification.body'),

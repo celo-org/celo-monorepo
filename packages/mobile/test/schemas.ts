@@ -256,7 +256,6 @@ export const v0Schema = {
     dismissedGetVerified: false,
     dismissedEarnRewards: false,
     dismissedInviteFriends: false,
-    dismissedGoldEducation: false,
     promptFornoIfNeeded: false,
     acceptedTerms: false,
   },
@@ -370,6 +369,7 @@ export const v5Schema = {
     ...v3Schema.account,
     incomingPaymentRequests: undefined,
     outgoingPaymentRequests: undefined,
+    dismissedGoldEducation: false,
   },
   paymentRequest: {
     incomingPaymentRequests: [],

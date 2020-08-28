@@ -2,6 +2,7 @@ import fetchMock from 'fetch-mock'
 import {
   getPepperFromThresholdSignature,
   getPhoneNumberIdentifier,
+  isBalanceSufficientForSigRetrieval,
 } from './phone-number-identifier'
 import { AuthenticationMethod, EncryptionKeySigner, ErrorMessages, ServiceContext } from './query'
 
@@ -29,6 +30,14 @@ const authSigner: EncryptionKeySigner = {
   authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
   rawKey: '41e8e8593108eeedcbded883b8af34d2f028710355c57f4c10a056b72486aa04',
 }
+
+describe(isBalanceSufficientForSigRetrieval, () => {
+  it('identifies sufficient balance correctly', () => {
+    expect(isBalanceSufficientForSigRetrieval(0.009, 0.004)).toBe(false)
+    expect(isBalanceSufficientForSigRetrieval(0.01, 0)).toBe(true)
+    expect(isBalanceSufficientForSigRetrieval(0, 0.005)).toBe(true)
+  })
+})
 
 describe(getPhoneNumberIdentifier, () => {
   afterEach(() => {
