@@ -126,7 +126,11 @@ export function showLimitReachedError(
   return showError(ErrorMessages.PAYMENT_LIMIT_REACHED, ALERT_BANNER_DURATION, translationParams)
 }
 
-export function* handleSendPaymentData(data: UriData, cachedRecipient?: RecipientWithContact) {
+export function* handleSendPaymentData(
+  data: UriData,
+  cachedRecipient?: RecipientWithContact,
+  isOutgoingPaymentRequest?: true
+) {
   const recipient: RecipientWithQrCode = {
     kind: RecipientKind.QrCode,
     address: data.address,
@@ -168,7 +172,7 @@ export function* handleSendPaymentData(data: UriData, cachedRecipient?: Recipien
     }
     navigate(Screens.SendConfirmation, { transactionData, isFromScan: true })
   } else {
-    navigate(Screens.SendAmount, { recipient, isFromScan: true })
+    navigate(Screens.SendAmount, { recipient, isFromScan: true, isOutgoingPaymentRequest })
   }
 }
 
