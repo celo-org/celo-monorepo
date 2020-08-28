@@ -126,7 +126,6 @@ function* waitForGethInit() {
       case FailedToFetchGenesisBlockError:
         return GethInitOutcomes.NETWORK_ERROR_FETCHING_GENESIS_BLOCK
       default: {
-        throw error
         Logger.error(TAG, 'Error getting geth instance', error)
         return GethInitOutcomes.IRRECOVERABLE_FAILURE
       }

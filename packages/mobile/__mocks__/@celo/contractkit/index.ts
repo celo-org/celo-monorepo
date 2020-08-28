@@ -1,4 +1,3 @@
-import { GoogleStorageUtils } from '@celo/contractkit/lib/network-utils/google-storage-utils'
 import BigNumber from 'bignumber.js'
 import crypto from 'crypto'
 import Web3 from 'web3'

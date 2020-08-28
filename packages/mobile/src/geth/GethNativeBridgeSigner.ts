@@ -34,8 +34,8 @@ export class GethNativeBridgeSigner implements Signer {
     protected geth: GethNativeModule,
     protected account: string,
     protected unlockBufferSeconds = 5,
-    protected unlockTime = -1,
-    protected unlockDuration = -1
+    protected unlockTime?: number,
+    protected unlockDuration?: number
   ) {}
 
   async init(privateKey: string, passphrase: string) {
@@ -92,7 +92,10 @@ export class GethNativeBridgeSigner implements Signer {
     return true
   }
 
-  isUnlocked() {
+  isUnlocked(): boolean {
+    if (this.unlockDuration === undefined || this.unlockTime === undefined) {
+      return false
+    }
     return this.unlockTime + this.unlockDuration - this.unlockBufferSeconds > currentTimeInSeconds()
   }
 

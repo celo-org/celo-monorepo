@@ -6,15 +6,10 @@ import {
   privateKeyToAddress,
 } from '@celo/utils/lib/address'
 import { GethNativeModule } from 'react-native-geth'
+import { ErrorMessages } from 'src/app/ErrorMessages'
 import { GethNativeBridgeSigner } from 'src/geth/GethNativeBridgeSigner'
 import Logger from 'src/utils/Logger'
 import { Tx } from 'web3-core'
-
-export enum GethNativeBridgeWalletErrors {
-  FetchAccounts = 'GethNativeBridgeWallet: failed to fetch accounts from geth wrapper',
-  AccountAlreadyExists = 'GethNativeBridgeWallet: account already exists',
-  UnexpectedAddressOnAdd = 'GethNativeBridgeWallet: unexpected address returned from addAccount',
-}
 
 const TAG = 'geth/GethNativeBridgeWallet'
 
@@ -37,8 +32,8 @@ export class GethNativeBridgeWallet extends RemoteWallet<GethNativeBridgeSigner>
     try {
       accounts = await this.geth.listAccounts()
     } catch (e) {
-      Logger.error(`${TAG}@loadAccountSigners`, e.toString())
-      throw new Error(GethNativeBridgeWalletErrors.FetchAccounts)
+      Logger.error(`${TAG}@loadAccountSigners`, 'Error listing accounts', e)
+      throw new Error(ErrorMessages.GETH_FETCH_ACCOUNTS)
     }
 
     accounts.forEach((address) => {
@@ -52,12 +47,12 @@ export class GethNativeBridgeWallet extends RemoteWallet<GethNativeBridgeSigner>
     Logger.info(`${TAG}@addAccount`, `Adding a new account`)
     const address = normalizeAddressWith0x(privateKeyToAddress(ensureLeading0x(privateKey)))
     if (this.hasAccount(address)) {
-      throw new Error(GethNativeBridgeWalletErrors.AccountAlreadyExists)
+      throw new Error(ErrorMessages.GETH_ACCOUNT_ALREADY_EXISTS)
     }
     const signer = new GethNativeBridgeSigner(this.geth, address)
     const resultantAddress = await signer.init(privateKey, passphrase)
     if (normalizeAddressWith0x(resultantAddress) !== address) {
-      throw new Error(GethNativeBridgeWalletErrors.UnexpectedAddressOnAdd)
+      throw new Error(ErrorMessages.GETH_UNEXPECTED_ADDRESS_ON_ADD)
     }
     this.addSigner(resultantAddress, signer)
     return resultantAddress
