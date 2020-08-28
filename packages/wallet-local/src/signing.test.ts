@@ -7,10 +7,10 @@ import {
   Provider,
 } from '@celo/communication'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
+import { recoverTransaction } from '@celo/wallet-base/lib/signing-utils'
 import debugFactory from 'debug'
 import Web3 from 'web3'
-import { LocalWallet } from '../wallets/local-wallet'
-import { recoverTransaction } from './signing-utils'
+import { LocalWallet } from './local-wallet'
 
 const debug = debugFactory('kit:txtest:sign')
 
