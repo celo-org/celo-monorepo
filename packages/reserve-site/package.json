@@ -19,10 +19,10 @@
     "airtable": "^0.8.1",
     "front-matter": "^4.0.2",
     "markdown-to-jsx": "^6.11.4",
-    "next": "9.4.4",
+    "next": "^9.5.2",
     "raw-loader": "^4.0.1",
-    "react": "^16.11.0",
-    "react-dom": "^16.11.0"
+    "react": "16.11.0",
+    "react-dom": "16.11.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.1",
