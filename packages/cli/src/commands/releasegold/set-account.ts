@@ -1,14 +1,14 @@
 import { flags } from '@oclif/command'
+import { ReleaseGoldBaseCommand } from '../../release-gold-base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
-import { ReleaseGoldCommand } from './release-gold'
 
-export default class SetAccount extends ReleaseGoldCommand {
+export default class SetAccount extends ReleaseGoldBaseCommand {
   static description =
     'Set account properties of the ReleaseGold instance account such as name, data encryption key, and the metadata URL'
 
   static flags = {
-    ...ReleaseGoldCommand.flags,
+    ...ReleaseGoldBaseCommand.flags,
     property: flags.string({
       char: 'p',
       options: ['name', 'dataEncryptionKey', 'metaURL'],

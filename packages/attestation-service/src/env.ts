@@ -19,6 +19,19 @@ export function fetchEnvOrDefault(name: string, defaultValue: string): string {
     : (process.env[name] as string)
 }
 
+export function isYes(value: string) {
+  switch (value.toLowerCase().trim()) {
+    case '1':
+    case 'y':
+    case 'yes':
+    case 't':
+    case 'true':
+      return true
+    default:
+      return false
+  }
+}
+
 export function getAttestationSignerAddress() {
   if (
     process.env.ATTESTATION_SIGNER_ADDRESS === undefined ||
