@@ -222,7 +222,7 @@ const validateGethRPC = async (
   handleError: HandleErrorCallback
 ) => {
   const transaction = await kit.web3.eth.getTransaction(txHash)
-  handleError(transaction == null, {
+  handleError(!transaction || !transaction.from, {
     location: '[GethRPC]',
     error: `Contractkit did not return a valid transaction`,
   })
@@ -614,7 +614,7 @@ export const simulateClient = async (
   //   if (sendTransactionTime + txPeriodMs > Date.now() ) {
   //     await sleep(sendTransactionTime + txPeriodMs - Date.now())
   //   }
-  // }
+  }
 }
 
 export const onLoadTestTxResult = async (
