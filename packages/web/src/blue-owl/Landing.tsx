@@ -1,6 +1,9 @@
 import * as React from 'react'
-import { Image, StyleSheet, Text, View } from 'react-native'
+import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native'
 import Cover from 'src/blue-owl/Cover'
+import lesson1Image from 'src/blue-owl/lesson1.jpg'
+import lesson2Image from 'src/blue-owl/lesson2.jpg'
+import lesson3Image from 'src/blue-owl/lesson3.jpg'
 import { H1, H4 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { Adventure } from 'src/home/Adventure'
@@ -11,6 +14,7 @@ import valora from 'src/icons/valora-icon.png'
 import sequenceTopImage from 'src/illustrations/03-Inclusive-money-(light-bg).png'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { useScreenSize } from 'src/layout/ScreenSize'
+import AspectRatio from 'src/shared/AspectRatio'
 import pagePaths from 'src/shared/menu-items'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
@@ -74,9 +78,9 @@ export default function Landing() {
         </Cell>
       </GridRow>
       <GridRow>
-        <ContentPreview title={t('lesson1')} time={'2 min'} href={'/lesson1'} />
-        <ContentPreview title={t('lesson2')} time={'5 min'} href={'/lesson2'} />
-        <ContentPreview title={t('lesson3')} time={'3 min'} href={'/lesson3'} />
+        <ContentPreview title={t('lesson1')} time={'2 min'} href={'/lesson1'} src={lesson1Image} />
+        <ContentPreview title={t('lesson2')} time={'5 min'} href={'/lesson2'} src={lesson2Image} />
+        <ContentPreview title={t('lesson3')} time={'3 min'} href={'/lesson3'} src={lesson3Image} />
       </GridRow>
     </View>
   )
@@ -86,13 +90,16 @@ interface ContentPreviewProps {
   title: string
   time: string
   href: string
+  src: ImageSourcePropType
 }
 
-function ContentPreview({ title, time, href }: ContentPreviewProps) {
+function ContentPreview({ title, time, href, src }: ContentPreviewProps) {
   return (
     <Cell span={Spans.third}>
       <a href={href}>
-        <Image style={styles.preview} source={sequenceTopImage} />
+        <AspectRatio ratio={612 / 343} style={styles.preview}>
+          <Image style={standardStyles.image} source={src} />
+        </AspectRatio>
       </a>
       <Text accessibilityRole="link" href={href} style={fonts.h6}>
         {title}
@@ -106,7 +113,7 @@ const styles = StyleSheet.create({
   root: {
     alignItems: 'center',
   },
-  preview: { backgroundColor: colors.gray, height: 222, marginBottom: 10 },
+  preview: { marginBottom: 15 },
   logo: { width: 275, height: 75, backgroundColor: colors.lightBlue },
   valora: { height: 70, width: 70 },
   valoraDesktop: { marginTop: 30, height: 70, width: 70 },
