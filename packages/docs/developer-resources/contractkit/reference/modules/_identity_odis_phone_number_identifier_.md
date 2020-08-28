@@ -30,7 +30,7 @@
 
 ▸ **getPepperFromThresholdSignature**(`sigBuf`: Buffer): *string*
 
-*Defined in [contractkit/src/identity/odis/phone-number-identifier.ts:87](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/phone-number-identifier.ts#L87)*
+*Defined in [contractkit/src/identity/odis/phone-number-identifier.ts:86](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/phone-number-identifier.ts#L86)*
 
 **Parameters:**
 
@@ -46,7 +46,7 @@ ___
 
 ▸ **getPhoneNumberIdentifier**(`e164Number`: string, `account`: string, `signer`: [AuthSigner](_identity_odis_query_.md#authsigner), `context`: [ServiceContext](../interfaces/_identity_odis_query_.servicecontext.md), `selfPhoneHash?`: undefined | string, `clientVersion?`: undefined | string, `blsBlindingClient?`: [BlsBlindingClient](../interfaces/_identity_odis_bls_blinding_client_.blsblindingclient.md)): *Promise‹[PhoneNumberHashDetails](../interfaces/_identity_odis_phone_number_identifier_.phonenumberhashdetails.md)›*
 
-*Defined in [contractkit/src/identity/odis/phone-number-identifier.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/phone-number-identifier.ts#L35)*
+*Defined in [contractkit/src/identity/odis/phone-number-identifier.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/phone-number-identifier.ts#L34)*
 
 Retrieve the on-chain identifier for the provided phone number
 
@@ -70,7 +70,7 @@ ___
 
 ▸ **isSufficientBalanceForQuotaRetrieval**(`balance`: BigNumber.Value): *boolean*
 
-*Defined in [contractkit/src/identity/odis/phone-number-identifier.ts:98](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/phone-number-identifier.ts#L98)*
+*Defined in [contractkit/src/identity/odis/phone-number-identifier.ts:97](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/phone-number-identifier.ts#L97)*
 
 Check if balance is sufficient for quota retrieval
 
