@@ -43,6 +43,6 @@ export class WasmBlsBlindingClient implements BlsBlindingClient {
   }
 
   private isReactNativeEnvironment(): boolean {
-    return navigator && navigator.product === 'ReactNative'
+    return typeof navigator !== 'undefined' && navigator.product === 'ReactNative'
   }
 }
