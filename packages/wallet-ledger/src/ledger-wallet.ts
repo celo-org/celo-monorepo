@@ -1,6 +1,6 @@
-import { Signer, Wallet } from '@celo/sdk-types/wallet'
 import { CELO_DERIVATION_PATH_BASE } from '@celo/utils/lib/account'
 import { Address } from '@celo/utils/lib/address'
+import { Signer, Wallet } from '@celo/wallet-base/types'
 import { RemoteWallet } from '@celo/wallet-remote/lib/remote-wallet'
 import { TransportError, TransportStatusError } from '@ledgerhq/errors'
 import Ledger from '@ledgerhq/hw-app-eth'

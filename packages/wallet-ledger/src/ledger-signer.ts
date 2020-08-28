@@ -1,7 +1,7 @@
-import { Signer } from '@celo/sdk-types/wallet'
+import { RLPEncodedTx } from '@celo/communication'
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/wallet-base/lib/sign-typed-data-utils'
-import { RLPEncodedTx } from '@celo/wallet-base/lib/signing-utils'
+import { Signer } from '@celo/wallet-base/types'
 import { TransportStatusError } from '@ledgerhq/errors'
 import debugFactory from 'debug'
 import * as ethUtil from 'ethereumjs-util'
@@ -180,5 +180,11 @@ export class LedgerSigner implements Signer {
         }
       }
     }
+  }
+
+  decrypt(_ciphertext: Buffer) {
+    throw new Error('Decryption operation is not supported on this signer')
+    // To make the compiler happy
+    return Promise.resolve(_ciphertext)
   }
 }
