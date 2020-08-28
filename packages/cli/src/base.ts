@@ -4,7 +4,7 @@ import {
   AddressValidation,
   newLedgerWalletWithSetup,
 } from '@celo/contractkit/lib/wallets/ledger-wallet'
-import { Wallet } from '@celo/sdk-types/wallet'
+import { Wallet } from '@celo/wallet-base/types'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import { Command, flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'

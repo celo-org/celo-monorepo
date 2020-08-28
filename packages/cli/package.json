@@ -33,6 +33,7 @@
   "dependencies": {
     "@celo/contractkit": "0.4.13-dev",
     "@celo/utils": "0.1.19-dev",
+    "@celo/wallet-base": "1.0.0-dev",
     "@ledgerhq/hw-transport-node-hid": "^5.11.0",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
@@ -65,7 +66,6 @@
     "@celo/dev-cli": "^2.0.3",
     "@celo/dev-utils": "0.0.1-dev",
     "@celo/flake-tracker": "0.0.1-dev",
-    "@celo/sdk-types": "1.0.0-dev",
     "@types/cli-table": "^0.3.0",
     "@types/debug": "^4.1.4",
     "@types/fs-extra": "^8.0.0",
