@@ -130,7 +130,7 @@ export class RpcSigner implements Signer {
 
   isUnlocked() {
     if (this.unlockDuration === undefined || this.unlockTime === undefined) {
-      return true
+      return false
     }
     return this.unlockTime + this.unlockDuration - this.unlockBufferSeconds > currentTimeInSeconds()
   }
