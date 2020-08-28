@@ -12,7 +12,6 @@ COPY packages/utils/package.json packages/utils/
 COPY packages/typescript/package.json packages/typescript/
 COPY packages/typechain-target-web3-v1-celo/package.json packages/typechain-target-web-v1-celo/
 COPY packages/dev-utils/package.json packages/dev-utils/
-COPY packages/sdk-types/package.json packages/sdk-types/
 COPY packages/communication/package.json packages/communication/
 COPY packages/protocol/package.json packages/protocol/
 COPY packages/contractkit/package.json packages/contractkit/
@@ -27,7 +26,6 @@ COPY packages/utils packages/utils/
 COPY packages/typescript packages/typescript/
 COPY packages/typechain-target-web3-v1-celo packages/typechain-target-web-v1-celo/
 COPY packages/dev-utils packages/dev-utils/
-COPY packages/sdk-types packages/sdk-types/
 COPY packages/communication packages/communication/
 COPY packages/protocol packages/protocol/
 COPY packages/contractkit packages/contractkit/
