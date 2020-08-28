@@ -164,12 +164,12 @@ export class Account extends React.Component<Props, State> {
     this.props.setNumberVerified(!this.props.numberVerified)
   }
 
-  revokeNumberVerification = async () => {
+  revokeNumberVerification = () => {
     if (this.props.e164PhoneNumber && !isE164Number(this.props.e164PhoneNumber)) {
-      Logger.showMessage('Cannot revoke verificaton: number invalid')
+      Logger.showError('Cannot revoke verificaton: number invalid')
       return
     }
-    Logger.showMessage(`Revoking verification`)
+    Logger.showMessage('Revoking verification')
     this.props.revokeVerification()
   }
 
@@ -193,13 +193,6 @@ export class Account extends React.Component<Props, State> {
     } else {
       return (
         <View style={styles.devSettings}>
-          {/*
-          // TODO: It's commented because it broke a while back but this is something we'd like to re-enable
-          <View style={style.devSettingsItem}>
-            <TouchableOpacity onPress={this.revokeNumberVerification}>
-              <Text>Revoke Number Verification</Text>
-            </TouchableOpacity>
-          </View> */}
           <View style={styles.devSettingsItem}>
             <Text style={fontStyles.label}>Session ID</Text>
             <SessionId sessionId={this.props.sessionId || ''} />
@@ -207,6 +200,11 @@ export class Account extends React.Component<Props, State> {
           <View style={styles.devSettingsItem}>
             <TouchableOpacity onPress={this.toggleNumberVerified}>
               <Text>Toggle verification done</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.devSettingsItem}>
+            <TouchableOpacity onPress={this.revokeNumberVerification}>
+              <Text>Revoke Number Verification</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.devSettingsItem}>
