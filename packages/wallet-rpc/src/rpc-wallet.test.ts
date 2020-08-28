@@ -1,6 +1,6 @@
+import { CeloTx, Provider } from '@celo/communication'
 import { newKit } from '@celo/contractkit'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
-import { CeloTx, Provider } from '@celo/sdk-types/commons'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/src/address'
 import {

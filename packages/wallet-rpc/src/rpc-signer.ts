@@ -1,15 +1,15 @@
-import { CeloTx, EncodedTransaction } from '@celo/sdk-types/commons'
-import { Signer } from '@celo/sdk-types/wallet'
+import { CeloTx, EncodedTransaction, RpcCaller } from '@celo/communication'
 import { ensureLeading0x, normalizeAddressWith0x, trimLeading0x } from '@celo/utils/src/address'
 import { decodeSig } from '@celo/wallet-base/lib/signing-utils'
+import { Signer } from '@celo/wallet-base/types'
 import BigNumber from 'bignumber.js'
-import { RpcCaller } from './rpc-caller'
+import BN from 'bn.js'
 
 const INCORRECT_PASSWORD_ERROR = 'could not decrypt key with given password'
 
 const currentTimeInSeconds = () => Math.round(Date.now() / 1000)
 
-const toRpcHex = (val: CeloTx['value']) => {
+const toRpcHex = (val: string | number | BigNumber | BN | undefined) => {
   if (typeof val === 'number' || val instanceof BigNumber) {
     return ensureLeading0x(val.toString(16))
   } else if (typeof val === 'string') {
@@ -25,6 +25,7 @@ enum RpcSignerEndpoint {
   UnlockAccount = 'personal_unlockAccount',
   SignTransaction = 'eth_signTransaction',
   SignBytes = 'eth_sign',
+  Decrypt = 'personal_decrypt',
 }
 
 // tslint:disable-next-line: interface-over-type-literal
@@ -33,6 +34,7 @@ type RpcSignerEndpointInputs = {
   personal_unlockAccount: [string, string, number]
   eth_signTransaction: [any] // RpcTx doesn't match Tx because of nonce as string instead of number
   eth_sign: [string, string]
+  personal_decrypt: [string, string]
 }
 
 // tslint:disable-next-line: interface-over-type-literal
@@ -41,6 +43,7 @@ type RpcSignerEndpointResult = {
   personal_unlockAccount: boolean
   eth_signTransaction: EncodedTransaction
   eth_sign: string
+  personal_decrypt: string
 }
 
 /**
@@ -138,5 +141,14 @@ export class RpcSigner implements Signer {
       throw new Error(`RpcSigner@${endpoint} failed with \n'${(response.error as any).message}'`)
     }
     return response.result! as RpcSignerEndpointResult[typeof endpoint]
+  }
+
+  async decrypt(ciphertext: Buffer) {
+    const resp = await this.callAndCheckResponse(RpcSignerEndpoint.Decrypt, [
+      this.account,
+      ensureLeading0x(ciphertext.toString('hex')),
+    ])
+
+    return Buffer.from(trimLeading0x(resp), 'hex')
   }
 }

@@ -24,7 +24,6 @@
   },
   "devDependencies": {
     "@celo/dev-utils": "0.0.1-dev",
-    "@celo/sdk-types": "1.0.0-dev",
     "@celo/contractkit": "0.4.13-dev"
   },
   "engines": {
