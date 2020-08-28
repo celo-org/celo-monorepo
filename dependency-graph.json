@@ -271,7 +271,8 @@
       "@celo/contractkit",
       "@celo/flake-tracker",
       "@celo/phone-number-privacy-common",
-      "@celo/utils"
+      "@celo/utils",
+      "@celo/wallet-remote-azurehsm"
     ]
   }
 }
