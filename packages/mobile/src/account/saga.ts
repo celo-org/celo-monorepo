@@ -114,7 +114,9 @@ function* clearStoredAccountSaga({ account }: ClearStoredAccountAction) {
     // Ignore error if it was caused by Firebase.
     try {
       yield call(firebaseSignOut, firebase.app())
-    } catch (error) {}
+    } catch (error) {
+      Logger.error(TAG + '@clearStoredAccount', 'Failed to sign out from Firebase', error)
+    }
 
     yield call(persistor.flush)
     yield call(restartApp)
