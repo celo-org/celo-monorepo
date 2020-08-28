@@ -205,13 +205,13 @@ Run `$ node helloCelo.js` again to send the transaction and see the printed outp
 
 The above instructions apply to building NodeJS applications. If you want to build an integration with a web application, you can still use the ContractKit by following slightly modified instructions.
 
-You will need to have the following `npm` libraries installed: `web3`, `@celo/contractkit`, `@ledgerhq/hw-app-eth`, `@ledgerhq/hw-transport-u2f` and `@ledgerhq/hw-transport-webusb`.
+You will need to have the following `npm` libraries installed: `web3`, `@celo/contractkit`, `@celo/wallet-remote-ledger`, `@ledgerhq/hw-app-eth`, `@ledgerhq/hw-transport-u2f` and `@ledgerhq/hw-transport-webusb`.
 
 Then, you can create a new instance of the ContractKit with the following code:
 
 ```javascript
 import { ContractKit, newKitFromWeb3 } from "@celo/contractkit";
-import { newLedgerWalletWithSetup } from "@celo/contractkit/lib/wallets/ledger-wallet";
+import { newLedgerWalletWithSetup } from "@celo/wallet-remote-ledger/lib/ledger-wallet";
 import Eth from "@ledgerhq/hw-app-eth";
 import TransportU2F from "@ledgerhq/hw-transport-u2f";
 import TransportUSB from "@ledgerhq/hw-transport-webusb";

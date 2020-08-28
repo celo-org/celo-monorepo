@@ -4,8 +4,8 @@
  * Leaving the name for recognizability to current devs
  */
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { RpcWallet } from '@celo/contractkit/lib/wallets/rpc-wallet'
 import { sleep } from '@celo/utils/src/async'
+import { RpcWallet } from '@celo/wallet-remote-rpc/lib/rpc-wallet'
 import { call, delay, select } from 'redux-saga/effects'
 import { ContractKitEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
