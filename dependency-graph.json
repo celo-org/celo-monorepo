@@ -116,7 +116,8 @@
       "@celo/flake-tracker",
       "@celo/react-components",
       "@celo/typescript",
-      "@celo/utils"
+      "@celo/utils",
+      "@celo/wallet-remote-rpc"
     ]
   },
   "@celo/moonpay-auth": {
