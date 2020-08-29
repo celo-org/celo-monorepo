@@ -1,6 +1,6 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -110,14 +110,12 @@ class DappKitSignTxScreen extends React.Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'space-between',
   },
   scrollContainer: {
-    flex: 1,
+    flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
     marginHorizontal: '15%',
-    marginVertical: '50%',
   },
   header: {
     ...fontStyles.h1,
@@ -125,9 +123,8 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   share: {
-    ...fontStyles.subSmall,
+    ...fontStyles.regular,
     color: colors.gray4,
-    fontSize: 16,
     textAlign: 'center',
   },
   space: {
@@ -137,13 +134,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   sectionHeaderText: {
-    ...fontStyles.sectionLabelNew,
-    fontSize: 13,
+    ...fontStyles.label,
     marginTop: 16,
   },
   bodyText: {
     ...fontStyles.regular,
-    fontSize: 16,
     color: colors.gray4,
     textAlign: 'center',
   },
@@ -151,9 +146,6 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   button: {
-    flex: 1,
-    flexDirection: 'column',
-    alignItems: 'center',
     marginTop: 24,
   },
 })
