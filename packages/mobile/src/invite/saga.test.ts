@@ -42,10 +42,6 @@ jest.mock('src/firebase/dynamicLinks', () => ({
   generateShortInviteLink: jest.fn(async () => 'http://celo.page.link/PARAMS'),
 }))
 
-jest.mock('src/utils/appstore', () => ({
-  getAppStoreId: jest.fn(async () => '1482389446'),
-}))
-
 jest.mock('src/account/actions', () => ({
   ...jest.requireActual('src/account/actions'),
   getPincode: async () => 'pin',
@@ -54,6 +50,13 @@ jest.mock('src/account/actions', () => ({
 jest.mock('src/transactions/send', () => ({
   sendTransaction: async () => true,
 }))
+
+jest.mock('src/config', () => {
+  return {
+    ...jest.requireActual('src/config'),
+    APP_STORE_ID: '1482389446',
+  }
+})
 
 SendIntentAndroid.sendSms = jest.fn()
 SendSMS.send = jest.fn()
@@ -77,17 +80,17 @@ describe(watchSendInvite, () => {
       .provide([
         [call(waitWeb3LastBlock), true],
         [call(getConnectedUnlockedAccount), mockAccount],
-        [matchers.call.fn(waitForTransactionWithId), 'a sha3 hash'],
+        [matchers.call.fn(waitForTransactionWithId), 'a uuid'],
       ])
       .withState(state)
       .dispatch(sendInvite(mockInviteDetails.e164Number, InviteBy.SMS))
-      .dispatch(transactionConfirmed('a sha3 hash'))
+      .dispatch(transactionConfirmed('a uuid'))
       .put(
         transferStableToken({
           recipientAddress: mockAccount,
-          amount: '0.25',
+          amount: '0.30',
           comment: SENTINEL_INVITE_COMMENT,
-          txId: 'a sha3 hash',
+          context: { id: 'a uuid' },
         })
       )
       .put(storeInviteeData(mockInviteDetails))
@@ -108,17 +111,17 @@ describe(watchSendInvite, () => {
       .provide([
         [call(waitWeb3LastBlock), true],
         [call(getConnectedUnlockedAccount), mockAccount],
-        [matchers.call.fn(waitForTransactionWithId), 'a sha3 hash'],
+        [matchers.call.fn(waitForTransactionWithId), 'a uuid'],
       ])
       .withState(state)
       .dispatch(sendInvite(mockInviteDetails.e164Number, InviteBy.SMS))
-      .dispatch(transactionConfirmed('a sha3 hash'))
+      .dispatch(transactionConfirmed('a uuid'))
       .put(
         transferStableToken({
           recipientAddress: mockAccount,
-          amount: '0.25',
+          amount: '0.30',
           comment: SENTINEL_INVITE_COMMENT,
-          txId: 'a sha3 hash',
+          context: { id: 'a uuid' },
         })
       )
       .put(storeInviteeData(mockInviteDetails))
@@ -139,17 +142,17 @@ describe(watchSendInvite, () => {
       .provide([
         [call(waitWeb3LastBlock), true],
         [call(getConnectedUnlockedAccount), mockAccount],
-        [matchers.call.fn(waitForTransactionWithId), 'a sha3 hash'],
+        [matchers.call.fn(waitForTransactionWithId), 'a uuid'],
       ])
       .withState(state)
       .dispatch(sendInvite(mockInviteDetails.e164Number, InviteBy.WhatsApp))
-      .dispatch(transactionConfirmed('a sha3 hash'))
+      .dispatch(transactionConfirmed('a uuid'))
       .put(
         transferStableToken({
           recipientAddress: mockAccount,
-          amount: '0.25',
+          amount: '0.30',
           comment: SENTINEL_INVITE_COMMENT,
-          txId: 'a sha3 hash',
+          context: { id: 'a uuid' },
         })
       )
       .put(storeInviteeData(mockInviteDetails))
@@ -164,17 +167,17 @@ describe(watchSendInvite, () => {
       .provide([
         [call(waitWeb3LastBlock), true],
         [call(getConnectedUnlockedAccount), mockAccount],
-        [matchers.call.fn(waitForTransactionWithId), 'a sha3 hash'],
+        [matchers.call.fn(waitForTransactionWithId), 'a uuid'],
       ])
       .withState(state)
       .dispatch(sendInvite(mockInviteDetails.e164Number, InviteBy.WhatsApp))
-      .dispatch(transactionConfirmed('a sha3 hash'))
+      .dispatch(transactionConfirmed('a uuid'))
       .put(
         transferStableToken({
           recipientAddress: mockAccount,
-          amount: '0.25',
+          amount: '0.30',
           comment: SENTINEL_INVITE_COMMENT,
-          txId: 'a sha3 hash',
+          context: { id: 'a uuid' },
         })
       )
       .put(storeInviteeData(mockInviteDetails))
@@ -258,7 +261,7 @@ describe(generateInviteLink, () => {
     expect(result).toBe('http://celo.page.link/PARAMS')
     expect(generateShortInviteLink).toBeCalledTimes(1)
     expect(generateShortInviteLink).toHaveBeenCalledWith({
-      link: `https://celo.org/build/wallet?invite-code=${mockKey}`,
+      link: `https://valoraapp.com/?invite-code=${mockKey}`,
       appStoreId: '1482389446',
       bundleId: 'org.celo.mobile.alfajores',
     })

@@ -24,9 +24,10 @@ export enum ErrorMessages {
   VERIFICATION_FAILURE = 'nuxVerification2:verificationFailure',
   VERIFICATION_TIMEOUT = 'nuxVerification2:verificationTimeout',
   ADDRESS_LOOKUP_FAILURE = 'addressLookupFailure',
-  PGPNP_QUOTA_ERROR = 'pgpnpQuotaError',
+  ODIS_QUOTA_ERROR = 'odisQuotaError',
   SALT_FETCH_FAILURE = 'saltFetchFailure',
   SALT_QUOTA_EXCEEDED = 'saltQuotaExceededError',
+  ODIS_INSUFFICIENT_BALANCE = 'odisInsufficientBalance',
   MATCHMAKING_QUOTA_EXCEEDED = 'matchmakingQuotaExceededError',
   INVALID_ACCOUNT = 'invalidAccount',
   ACCOUNT_UNLOCK_FAILED = 'global:accountUnlockFailed',
@@ -68,4 +69,5 @@ export enum ErrorMessages {
   ADDRESS_VALIDATION_PARTIAL_OWN_ADDRESS = 'addressValidationPartialOwnAddress',
   KEYCHAIN_STORAGE_ERROR = 'keychainStorageError',
   PROVIDER_RATE_FETCH_FAILED = 'providerRateFetchFailed',
+  ACCOUNT_CLEAR_FAILED = 'accountClearFailed',
 }

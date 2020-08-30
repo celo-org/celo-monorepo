@@ -1,13 +1,13 @@
+import { ReleaseGoldBaseCommand } from '../../release-gold-base'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-import { ReleaseGoldCommand } from './release-gold'
 
-export default class TransferDollars extends ReleaseGoldCommand {
+export default class TransferDollars extends ReleaseGoldBaseCommand {
   static description =
     'Transfer Celo Dollars from the given contract address. Dollars may be accrued to the ReleaseGold contract via validator epoch rewards.'
 
   static flags = {
-    ...ReleaseGoldCommand.flags,
+    ...ReleaseGoldBaseCommand.flags,
     to: Flags.address({
       required: true,
       description: 'Address of the recipient of Celo Dollars transfer',

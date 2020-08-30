@@ -18,11 +18,13 @@ export enum Actions {
   TOGGLE_BACKUP_STATE = 'ACCOUNT/TOGGLE_BACKUP_STATE',
   DISMISS_INVITE_FRIENDS = 'ACCOUNT/DISMISS_INVITE_FRIENDS',
   DISMISS_GET_VERIFIED = 'ACCOUNT/DISMISS_GET_VERIFIED',
+  DISMISS_GOLD_EDUCATION = 'ACCOUNT/DISMISS_GOLD_EDUCATION',
   SET_USER_CONTACT_DETAILS = 'ACCOUNT/SET_USER_CONTACT_DETAILS',
   SET_PROMPT_FORNO = 'ACCOUNT/SET_PROMPT_FORNO',
   SET_RETRY_VERIFICATION_WITH_FORNO = 'ACCOUNT/SET_RETRY_VERIFICATION_WITH_FORNO',
   ACCEPT_TERMS = 'ACCOUNT/ACCEPT_TERMS',
   MIGRATE_ACCOUNT_BIP39 = 'MIGRATE_ACCOUNT_BIP39',
+  CLEAR_STORED_ACCOUNT = 'ACCOUNT/CLEAR_STORED_ACCOUNT',
 }
 
 export interface ChooseCreateAccountAction {
@@ -101,6 +103,10 @@ export interface DismissGetVerifiedAction {
   type: Actions.DISMISS_GET_VERIFIED
 }
 
+export interface DismissGoldEducationAction {
+  type: Actions.DISMISS_GOLD_EDUCATION
+}
+
 export interface SetContactDetailsAction {
   type: Actions.SET_USER_CONTACT_DETAILS
   contactId: string
@@ -121,6 +127,11 @@ export interface MigrateAccount {
   type: Actions.MIGRATE_ACCOUNT_BIP39
 }
 
+export interface ClearStoredAccountAction {
+  type: Actions.CLEAR_STORED_ACCOUNT
+  account: string
+}
+
 export type ActionTypes =
   | ChooseCreateAccountAction
   | ChooseRestoreAccountAction
@@ -139,11 +150,13 @@ export type ActionTypes =
   | ToggleBackupState
   | DismissInviteFriendsAction
   | DismissGetVerifiedAction
+  | DismissGoldEducationAction
   | SetContactDetailsAction
   | SetPromptFornoAction
   | SetRetryVerificationWithFornoAction
   | AcceptTermsAction
   | MigrateAccount
+  | ClearStoredAccountAction
 
 export function chooseCreateAccount(): ChooseCreateAccountAction {
   return {
@@ -233,6 +246,10 @@ export const dismissGetVerified = (): DismissGetVerifiedAction => ({
   type: Actions.DISMISS_GET_VERIFIED,
 })
 
+export const dismissGoldEducation = (): DismissGoldEducationAction => ({
+  type: Actions.DISMISS_GOLD_EDUCATION,
+})
+
 export const setPromptForno = (promptIfNeeded: boolean): SetPromptFornoAction => ({
   type: Actions.SET_PROMPT_FORNO,
   promptIfNeeded,
@@ -256,4 +273,9 @@ export const setUserContactDetails = (
 
 export const migrateAccount = (): MigrateAccount => ({
   type: Actions.MIGRATE_ACCOUNT_BIP39,
+})
+
+export const clearStoredAccount = (account: string): ClearStoredAccountAction => ({
+  type: Actions.CLEAR_STORED_ACCOUNT,
+  account,
 })

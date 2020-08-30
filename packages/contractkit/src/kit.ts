@@ -75,6 +75,8 @@ export interface NetworkConfig {
 export interface KitOptions {
   gasInflationFactor: number
   gasPrice: string
+  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
+  gasPriceSuggestionMultiplier: number
   feeCurrency?: Address
   from?: Address
 }
@@ -100,6 +102,7 @@ export class ContractKit {
       gasInflationFactor: 1.3,
       // gasPrice:0 means the node will compute gasPrice on its own
       gasPrice: '0',
+      gasPriceSuggestionMultiplier: 5,
     }
     if (!(web3.currentProvider instanceof CeloProvider)) {
       const celoProviderInstance = new CeloProvider(web3.currentProvider, wallet)
@@ -264,6 +267,20 @@ export class ContractKit {
     })
   }
 
+  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
+  async fillGasPrice(tx: Tx): Promise<Tx> {
+    if (tx.feeCurrency && tx.gasPrice === '0') {
+      const gasPriceMinimum = await this.contracts.getGasPriceMinimum()
+      const rawGasPrice = await gasPriceMinimum.getGasPriceMinimum(tx.feeCurrency)
+      return {
+        ...tx,
+        gasPrice: rawGasPrice.multipliedBy(this.config.gasPriceSuggestionMultiplier).toFixed(),
+      }
+    } else {
+      return tx
+    }
+  }
+
   /**
    * Send a transaction to celo-blockchain.
    *
@@ -274,6 +291,7 @@ export class ContractKit {
    */
   async sendTransaction(tx: Tx): Promise<TransactionResult> {
     tx = this.fillTxDefaults(tx)
+    tx = await this.fillGasPrice(tx)
 
     let gas = tx.gas
     if (gas == null) {
@@ -301,6 +319,7 @@ export class ContractKit {
     tx?: Omit<Tx, 'data'>
   ): Promise<TransactionResult> {
     tx = this.fillTxDefaults(tx)
+    tx = await this.fillGasPrice(tx)
 
     let gas = tx.gas
     if (gas == null) {
@@ -333,10 +352,6 @@ export class ContractKit {
       from: this.config.from,
       feeCurrency: this.config.feeCurrency,
       gasPrice: this.config.gasPrice,
-    }
-
-    if (this.config.feeCurrency) {
-      defaultTx.feeCurrency = this.config.feeCurrency
     }
 
     return {

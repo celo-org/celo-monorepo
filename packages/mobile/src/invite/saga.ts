@@ -13,7 +13,7 @@ import { showError, showMessage } from 'src/alert/actions'
 import { InviteEvents, OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION, APP_STORE_ID } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
@@ -43,10 +43,9 @@ import { getPasswordSaga } from 'src/pincode/authentication'
 import { getSendFee, getSendTxGas } from 'src/send/saga'
 import { fetchDollarBalance, transferStableToken } from 'src/stableToken/actions'
 import { createTokenTransferTransaction, fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
-import { generateStandbyTransactionId } from 'src/transactions/actions'
 import { waitForTransactionWithId } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
-import { getAppStoreId } from 'src/utils/appstore'
+import { newTransactionContext } from 'src/transactions/types'
 import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 import { getContractKitAsync, getWallet, getWeb3 } from 'src/web3/contracts'
@@ -55,7 +54,7 @@ import { getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 
 const TAG = 'invite/saga'
 export const REDEEM_INVITE_TIMEOUT = 2 * 60 * 1000 // 2 minutes
-export const INVITE_FEE = '0.25'
+export const INVITE_FEE = '0.30'
 
 export async function getInviteTxGas(
   account: string,
@@ -103,16 +102,9 @@ export async function generateInviteLink(inviteCode: string) {
   bundleId = bundleId.replace(/\.(debug|dev)$/g, '.alfajores')
 
   // trying to fetch appStoreId needed to build a dynamic link
-  let appStoreId
-  try {
-    appStoreId = await getAppStoreId(bundleId)
-  } catch (error) {
-    Logger.error(TAG, 'Failed to load AppStore ID: ' + error.toString())
-  }
-
   const shortUrl = await generateShortInviteLink({
-    link: `https://celo.org/build/wallet?invite-code=${inviteCode}`,
-    appStoreId,
+    link: `https://valoraapp.com/?invite-code=${inviteCode}`,
+    appStoreId: APP_STORE_ID,
     bundleId,
   })
 
@@ -186,18 +178,17 @@ export function* sendInvite(
     // Store the Temp Address locally so we know which transactions were invites
     yield put(storeInviteeData(inviteDetails))
 
-    const txId = generateStandbyTransactionId(temporaryAddress)
-
+    const context = newTransactionContext(TAG, 'Transfer to invite address')
     yield put(
       transferStableToken({
         recipientAddress: temporaryAddress,
         amount: INVITE_FEE,
         comment: SENTINEL_INVITE_COMMENT,
-        txId,
+        context,
       })
     )
 
-    yield call(waitForTransactionWithId, txId)
+    yield call(waitForTransactionWithId, context.id)
     ValoraAnalytics.track(InviteEvents.invite_tx_complete, { escrowIncluded })
     Logger.debug(TAG + '@sendInviteSaga', 'Sent money to new wallet')
 
@@ -219,7 +210,7 @@ export function* sendInvite(
 }
 
 function* initiateEscrowTransfer(temporaryAddress: string, e164Number: string, amount: BigNumber) {
-  const escrowTxId = generateStandbyTransactionId(temporaryAddress)
+  const context = newTransactionContext(TAG, 'Escrow funds')
   try {
     let phoneHash: string
     if (features.USE_PHONE_NUMBER_PRIVACY) {
@@ -228,8 +219,8 @@ function* initiateEscrowTransfer(temporaryAddress: string, e164Number: string, a
     } else {
       phoneHash = getPhoneHash(e164Number)
     }
-    yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress, escrowTxId))
-    yield call(waitForTransactionWithId, escrowTxId)
+    yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress, context))
+    yield call(waitForTransactionWithId, context.id)
     Logger.debug(TAG + '@sendInviteSaga', 'Escrowed money to new wallet')
   } catch (e) {
     Logger.error(TAG, 'Error sending payment to unverified user: ', e)
@@ -430,7 +421,8 @@ export function* moveAllFundsFromAccount(
     comment,
   })
 
-  yield call(sendTransaction, tx.txo, account, TAG, 'Transfer from temp wallet')
+  const context = newTransactionContext(TAG, 'Transfer from temp wallet')
+  yield call(sendTransaction, tx.txo, account, context)
   Logger.debug(TAG + '@moveAllFundsFromAccount', 'Done withdrawal')
 }
 
