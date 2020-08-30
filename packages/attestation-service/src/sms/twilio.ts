@@ -64,7 +64,12 @@ export class TwilioSmsProvider extends SmsProvider {
 
   supportsDeliveryStatus = () => true
 
-  deliveryStatusHandlers = () => [bodyParser.urlencoded({ extended: false }), twilio.webhook()]
+  deliveryStatusHandlers() {
+    return [
+      bodyParser.urlencoded({ extended: false }),
+      twilio.webhook({ url: this.deliveryStatusURL! }),
+    ]
+  }
 
   async initialize(deliveryStatusURL: string) {
     // Ensure the messaging service exists
