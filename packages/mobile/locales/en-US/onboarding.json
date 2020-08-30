@@ -43,7 +43,7 @@
   "verificationEducation": {
     "title": "Confirm",
     "header": "Confirm phone number",
-    "body": "To make sure your number is really yours, we’re going to send you three messages that will cost about 0.07 cUSD each.\n\nConfirming your number takes about three minutes.",
+    "body": "To make sure your number is really yours, we’re going to send you three messages that will cost about 0.05 cUSD each.\n\nConfirming your number takes about three minutes.",
     "start": "Start",
     "resume": "Resume",
     "learnMore": "Learn more"
