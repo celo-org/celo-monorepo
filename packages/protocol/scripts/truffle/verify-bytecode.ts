@@ -22,6 +22,7 @@ module.exports = async (callback: (error?: any) => number) => {
       Object.keys(CeloContractName),
       buildArtifacts,
       registry,
+      [],
       Proxy,
       web3,
       true

@@ -37,6 +37,7 @@ const deployProxiedContract = async (Contract: any, from: string) => {
 
 contract('', (accounts) => {
   const buildArtifacts = getTestArtifacts('linked_libraries')
+  const upgradedBuildArtifacts = getTestArtifacts('linked_libraries_upgraded')
   const artifact = buildArtifacts.getArtifactByName('TestContract')
 
   const TestContract = makeTruffleContract(buildArtifacts.getArtifactByName('TestContract'))
@@ -111,7 +112,7 @@ contract('', (accounts) => {
 
     describe('verifyBytecodesDfs', () => {
       it(`doesn't throw on matching contracts`, async () => {
-        await verifyBytecodesDfs(['TestContract'], buildArtifacts, registry, Proxy, web3)
+        await verifyBytecodesDfs(['TestContract'], buildArtifacts, registry, [], Proxy, web3)
         assert(true)
       })
 
@@ -119,7 +120,7 @@ contract('', (accounts) => {
         const oldBytecode = artifact.deployedBytecode
         artifact.deployedBytecode = '0x0' + oldBytecode.slice(3, artifact.deployedBytecode.length)
         await assertThrowsAsync(
-          verifyBytecodesDfs(['TestContract'], buildArtifacts, registry, Proxy, web3)
+          verifyBytecodesDfs(['TestContract'], buildArtifacts, registry, [], Proxy, web3)
         )
         artifact.deployedBytecode = oldBytecode
       })
@@ -130,9 +131,122 @@ contract('', (accounts) => {
         libraryArtifact.deployedBytecode =
           oldBytecode.slice(0, 44) + '00' + oldBytecode.slice(46, oldBytecode.length)
         await assertThrowsAsync(
-          verifyBytecodesDfs(['TestContract'], buildArtifacts, registry, Proxy, web3)
+          verifyBytecodesDfs(['TestContract'], buildArtifacts, registry, [], Proxy, web3)
         )
         libraryArtifact.deployedBytecode = oldBytecode
+      })
+
+      describe(`when a proposal upgrades a library's implementation`, () => {
+        let LinkedLibrary3Upgraded = makeTruffleContract(
+          upgradedBuildArtifacts.getArtifactByName('LinkedLibrary3')
+        )
+        beforeEach(async () => {
+          library3 = await LinkedLibrary3Upgraded.new({ from: accounts[0] })
+        })
+
+        it(`doesn't throw on matching contracts`, async () => {
+          const proposal = [
+            {
+              contract: 'LinkedLibrary3Proxy',
+              function: '_setImplementation',
+              args: [library3.address],
+              value: '0',
+            },
+          ]
+
+          await verifyBytecodesDfs(
+            ['TestContract'],
+            upgradedBuildArtifacts,
+            registry,
+            proposal,
+            Proxy,
+            web3
+          )
+          assert(true)
+        })
+
+        it(`throws on different contracts`, async () => {
+          const proposal = [
+            {
+              contract: 'LinkedLibrary3Proxy',
+              function: '_setImplementation',
+              args: [library3.address],
+              value: '0',
+            },
+          ]
+
+          await assertThrowsAsync(
+            verifyBytecodesDfs(['TestContract'], buildArtifacts, registry, proposal, Proxy, web3)
+          )
+        })
+
+        it(`throws when the proposed address is wrong`, async () => {
+          const proposal = [
+            {
+              contract: 'LinkedLibrary3Proxy',
+              function: '_setImplementation',
+              args: [accounts[1]],
+              value: '0',
+            },
+          ]
+
+          await verifyBytecodesDfs(
+            ['TestContract'],
+            buildArtifacts,
+            registry,
+            proposal,
+            Proxy,
+            web3
+          )
+        })
+      })
+
+      describe(`when a proposal changes a library's proxy`, () => {
+        let LinkedLibrary3Upgraded = makeTruffleContract(
+          upgradedBuildArtifacts.getArtifactByName('LinkedLibrary3')
+        )
+        let newLibrary2Implementation
+        beforeEach(async () => {
+          library3 = await deployProxiedContract(LinkedLibrary3Upgraded, accounts[0])
+          LinkedLibrary2.link('LinkedLibrary3', library3.address)
+          newLibrary2Implementation = await LinkedLibrary2.new({ from: accounts[0] })
+        })
+
+        it(`doesn't throw on matching contracts`, async () => {
+          const proposal = [
+            {
+              contract: 'LinkedLibrary2Proxy',
+              function: '_setImplementation',
+              args: [newLibrary2Implementation.address],
+              value: '0',
+            },
+          ]
+
+          await verifyBytecodesDfs(
+            ['TestContract'],
+            upgradedBuildArtifacts,
+            registry,
+            proposal,
+            Proxy,
+            web3
+          )
+          assert(true)
+        })
+
+        it(`throws when dependent contract wasn't repointed`, async () => {
+          const proposal = []
+
+          await assertThrowsAsync(
+            verifyBytecodesDfs(
+              ['TestContract'],
+              upgradedBuildArtifacts,
+              registry,
+              proposal,
+              Proxy,
+              web3
+            )
+          )
+        })
       })
     })
   })
