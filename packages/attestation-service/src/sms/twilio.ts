@@ -65,8 +65,10 @@ export class TwilioSmsProvider extends SmsProvider {
   supportsDeliveryStatus = () => true
 
   deliveryStatusHandlers() {
-    const host = new URL(this.deliveryStatusURL!).host
-    return [bodyParser.urlencoded({ extended: false }), twilio.webhook({ host })]
+    return [
+      bodyParser.urlencoded({ extended: false }),
+      twilio.webhook({ url: this.deliveryStatusURL! }),
+    ]
   }
 
   async initialize(deliveryStatusURL: string) {
