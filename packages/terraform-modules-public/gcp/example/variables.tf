@@ -16,7 +16,7 @@ variable replicas {
   type        = map(number)
 
   default = {
-    validator           = 1 # Also used for proxy
+    validator           = 0 # Also used for proxy
     txnode              = 1
     attestation_service = 1
   }
@@ -27,8 +27,8 @@ variable instance_types {
   type        = map(string)
 
   default = {
-    validator           = "n1-standard-2"   #use n1-standard-2 or better for production
-    proxy               = "n1-standard-2"   #use n1-standard-2 or better for production
+    validator           = "n1-standard-1"   #use n1-standard-2 or better for production
+    proxy               = "n1-standard-1"   #use n1-standard-2 or better for production
     txnode              = "n1-standard-1"
     attestation_service = "n1-standard-1"
   }
@@ -169,7 +169,7 @@ variable attestation_service_docker_image {
 
   default = {
     repository = "us.gcr.io/celo-testnet/celo-monorepo"
-    tag        = "attestation-service-mainnet"
+    tag        = "attestation-service-1-0-2"
   }
 }
 
@@ -183,10 +183,12 @@ variable attestation_service_credentials {
     nexmo_key                    = ""
     nexmo_secret                 = ""
     nexmo_blacklist              = ""
+    nexmo_unsupported_regions    = ""
     twilio_account_sid           = "secret in terraform.tfvars"
     twilio_messaging_service_sid = "secret in terraform.tfvars"
     twilio_auth_token            = "secret in terraform.tfvars"
     twilio_blacklist             = ""
+    twilio_unsupported_regions   = ""
   }
 }
 

@@ -214,6 +214,12 @@ variable attestation_service_nexmo_blacklist {
   default     = ""
 }
 
+variable attestation_service_nexmo_unsupported_regions {
+  type        = string
+  description = "Nexmo unsupported country codes, separated by comma (check nexmo documentation)"
+  default     = ""
+}
+
 variable attestation_service_twilio_account_sid {
   type        = string
   description = "Twilio account SID (check twilio documentation)"
@@ -235,6 +241,12 @@ variable attestation_service_twilio_auth_token {
 variable attestation_service_twilio_blacklist {
   type        = string
   description = "Twilio blacklisted country codes, separated by comma  (check twilio documentation)"
+  default     = ""
+}
+
+variable attestation_service_twilio_unsupported_regions {
+  type        = string
+  description = "Twilio unsupported country codes, separated by comma  (check twilio documentation)"
   default     = ""
 }
 
