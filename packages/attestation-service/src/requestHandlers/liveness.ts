@@ -11,11 +11,13 @@ export async function handleLivenessRequest(_req: express.Request, res: express.
 
     if (await isNodeSyncing()) {
       respondWithError(res, 504, ErrorMessages.NODE_IS_SYNCING)
+      return
     }
 
     const { ageOfLatestBlock } = await getAgeOfLatestBlock()
     if (ageOfLatestBlock > 30) {
       respondWithError(res, 504, ErrorMessages.NODE_IS_STUCK)
+      return
     }
 
     try {
