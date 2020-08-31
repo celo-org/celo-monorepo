@@ -127,8 +127,8 @@ spec:
           --rpcport {{ add 8545 $index }}
         resources:
           requests:
-            memory: 250Mi
-            cpu: 150m
+            memory: 400Mi
+            cpu: 200m
         volumeMounts:
         - name: data
           mountPath: /root/.celo_share
