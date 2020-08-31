@@ -1,4 +1,3 @@
-import fetchMock from 'fetch-mock'
 import {
   getPepperFromThresholdSignature,
   getPhoneNumberIdentifier,
