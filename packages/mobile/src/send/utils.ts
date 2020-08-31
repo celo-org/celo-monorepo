@@ -96,11 +96,11 @@ function dailySpent(now: number, recentPayments: PaymentInfo[]) {
   return amount
 }
 
-export function isPaymentLimitReached(amountToTransfer: BigNumber): boolean {
-  return _isPaymentLimitReachedWithStore(store.getState(), amountToTransfer)
+export function validateDailyTransferLimit(amountToTransfer: BigNumber): boolean {
+  return _validateDailyTransferLimitWithState(store.getState(), amountToTransfer)
 }
 
-export function _isPaymentLimitReachedWithStore(
+export function _validateDailyTransferLimitWithState(
   state: RootState,
   amountToTransfer: BigNumber
 ): boolean {

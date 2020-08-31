@@ -30,7 +30,7 @@ import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import { emptyHeader, HeaderTitleWithBalance } from 'src/navigator/Headers.v2'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
-import { isPaymentLimitReached } from 'src/send/utils'
+import { validateDailyTransferLimit } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 
@@ -78,7 +78,8 @@ export function ExchangeTradeScreen({ navigation, route }: Props) {
   }
 
   function goNext() {
-    if (isPaymentLimitReached(dollarAmount)) {
+    const isLimitReached = validateDailyTransferLimit(dollarAmount)
+    if (isLimitReached) {
       return
     }
 

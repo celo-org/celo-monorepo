@@ -24,7 +24,7 @@ import { HeaderTitleWithBalance, headerWithBackButton } from 'src/navigator/Head
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import useSelector from 'src/redux/useSelector'
-import { isPaymentLimitReached } from 'src/send/utils'
+import { validateDailyTransferLimit } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { getRateForMakerToken, goldToDollarAmount } from 'src/utils/currencyExchange'
 
@@ -55,7 +55,8 @@ function WithdrawCeloScreen({ navigation }: Props) {
     )
     const dollarAmount = goldToDollarAmount(celoToTransfer, exchangeRate) || new BigNumber(0)
 
-    if (isPaymentLimitReached(dollarAmount)) {
+    const isLimitReached = validateDailyTransferLimit(dollarAmount)
+    if (isLimitReached) {
       return
     }
 
