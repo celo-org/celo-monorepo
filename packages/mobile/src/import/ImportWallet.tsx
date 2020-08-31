@@ -156,7 +156,7 @@ export class ImportWallet extends React.Component<Props, State> {
             {(insets) => (
               <View style={styles.container}>
                 <UseBackToWelcomeScreen
-                  backAnalyticsEvent={OnboardingEvents.restore_account_cancel}
+                  backAnalyticsEvents={[OnboardingEvents.restore_account_cancel]}
                 />
                 <KeyboardAwareScrollView
                   style={headerHeight ? { marginTop: headerHeight } : undefined}
