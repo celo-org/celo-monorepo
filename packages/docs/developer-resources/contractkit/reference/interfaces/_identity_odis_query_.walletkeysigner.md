@@ -17,7 +17,7 @@
 
 • **authenticationMethod**: *[WALLET_KEY](../enums/_identity_odis_query_.authenticationmethod.md#wallet_key)*
 
-*Defined in [contractkit/src/identity/odis/query.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L13)*
+*Defined in [contractkit/src/identity/odis/query.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L14)*
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **contractKit**: *[ContractKit](../classes/_kit_.contractkit.md)*
 
-*Defined in [contractkit/src/identity/odis/query.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L14)*
+*Defined in [contractkit/src/identity/odis/query.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L15)*

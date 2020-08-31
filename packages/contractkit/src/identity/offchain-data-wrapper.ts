@@ -1,12 +1,14 @@
 import { eqAddress } from '@celo/base/lib/address'
 import { NativeSigner } from '@celo/base/lib/signatureUtils'
 import { guessSigner } from '@celo/utils/lib/signatureUtils'
+import fetch from 'cross-fetch'
 import debugFactory from 'debug'
 import { toChecksumAddress } from 'web3-utils'
 import { ContractKit } from '../kit'
 import { ClaimTypes } from './claims/types'
 import { IdentityMetadataWrapper } from './metadata'
 import { StorageWriter } from './offchain/storage-writers'
+
 const debug = debugFactory('offchaindata')
 
 export default class OffchainDataWrapper {
