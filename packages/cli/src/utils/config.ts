@@ -11,7 +11,7 @@ export interface CeloConfig {
 
 export const defaultConfig: CeloConfig = {
   node: 'http://localhost:8545',
-  gasCurrency: GasOptions.auto,
+  gasCurrency: 'auto' as GasOptions,
 }
 
 const configFile = 'config.json'
