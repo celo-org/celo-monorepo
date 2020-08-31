@@ -9,7 +9,9 @@ export enum ErrorMessages {
   NO_PROVIDER_SETUP = 'No provider was setup for this phone number',
   UNKNOWN_ERROR = 'Something went wrong',
   ATTESTATION_SIGNER_CANNOT_SIGN = 'Attestation signer could not sign',
-  DATABASE_IS_OFFLONE = 'Database is offline',
+  DATABASE_IS_OFFLINE = 'Database is offline',
+  NODE_IS_SYNCING = 'Full node is not synced',
+  NODE_IS_STUCK = 'Full node is not up to date',
 }
 
 export function asyncHandler<T>(handler: (req: express.Request, res: Response) => Promise<T>) {

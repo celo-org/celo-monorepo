@@ -1,13 +1,15 @@
-import { OdisUtils } from '@celo/contractkit'
 import { FetchMock } from 'jest-fetch-mock'
 import { expectSaga } from 'redux-saga-test-plan'
 import * as matchers from 'redux-saga-test-plan/matchers'
 import { call, select } from 'redux-saga/effects'
 import { PincodeType } from 'src/account/reducer'
 import { e164NumberSelector } from 'src/account/selectors'
+import { ErrorMessages } from 'src/app/ErrorMessages'
+import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
 import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import { e164NumberToSaltSelector } from 'src/identity/reducer'
+import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { isAccountUpToDate } from 'src/web3/dataEncryptionKey'
 import { getConnectedAccount } from 'src/web3/saga'
 import { createMockStore } from 'test/utils'
@@ -47,6 +49,7 @@ describe('Fetch phone hash details', () => {
     await expectSaga(fetchPhoneHashPrivate, mockE164Number)
       .provide([
         [call(getConnectedAccount), mockAccount],
+        [select(stableTokenBalanceSelector), 0.21],
         [select(e164NumberSelector), mockE164Number2],
         [select(e164NumberToSaltSelector), {}],
         [matchers.call.fn(isAccountUpToDate), true],
@@ -65,19 +68,31 @@ describe('Fetch phone hash details', () => {
       .run()
   })
 
+  it('warns about insufficient balance', async () => {
+    const state = createMockStore({
+      web3: { account: mockAccount },
+      account: { pincodeType: PincodeType.CustomPin },
+    }).getState()
+
+    try {
+      await expectSaga(fetchPhoneHashPrivate, mockE164Number)
+        .provide([
+          [call(getConnectedAccount), mockAccount],
+          [select(stableTokenBalanceSelector), 0.009],
+          [select(celoTokenBalanceSelector), 0.004],
+          [select(e164NumberSelector), mockE164Number2],
+          [select(e164NumberToSaltSelector), {}],
+          [matchers.call.fn(isAccountUpToDate), true],
+        ])
+        .withState(state)
+        .run()
+    } catch (e) {
+      expect(e.message).toEqual(ErrorMessages.ODIS_INSUFFICIENT_BALANCE)
+    }
+  })
+
   it.skip('handles failure from quota', async () => {
     mockFetch.mockResponseOnce(JSON.stringify({ success: false }), { status: 403 })
     // TODO confirm it navs to quota purchase screen
-  })
-})
-
-// TODO move to contract kit tests
-describe(OdisUtils.PhoneNumberIdentifier.getPepperFromThresholdSignature, () => {
-  it('Hashes sigs correctly', () => {
-    const base64Sig = 'vJeFZJ3MY5KlpI9+kIIozKkZSR4cMymLPh2GHZUatWIiiLILyOcTiw2uqK/LBReA'
-    const signature = new Buffer(base64Sig, 'base64')
-    expect(OdisUtils.PhoneNumberIdentifier.getPepperFromThresholdSignature(signature)).toBe(
-      'piWqRHHYWtfg9'
-    )
   })
 })
