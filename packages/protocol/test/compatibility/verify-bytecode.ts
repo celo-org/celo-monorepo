@@ -37,7 +37,8 @@ const deployProxiedContract = async (Contract: any, from: string) => {
 
 contract('', (accounts) => {
   const buildArtifacts = getTestArtifacts('linked_libraries')
-  const upgradedBuildArtifacts = getTestArtifacts('linked_libraries_upgraded')
+  const upgradedLibBuildArtifacts = getTestArtifacts('linked_libraries_upgraded_lib')
+  const upgradedContractBuildArtifacts = getTestArtifacts('linked_libraries_upgraded_contract')
   const artifact = buildArtifacts.getArtifactByName('TestContract')
 
   const TestContract = makeTruffleContract(buildArtifacts.getArtifactByName('TestContract'))
@@ -138,7 +139,7 @@ contract('', (accounts) => {
 
       describe(`when a proposal upgrades a library's implementation`, () => {
         let LinkedLibrary3Upgraded = makeTruffleContract(
-          upgradedBuildArtifacts.getArtifactByName('LinkedLibrary3')
+          upgradedLibBuildArtifacts.getArtifactByName('LinkedLibrary3')
         )
         beforeEach(async () => {
           library3 = await LinkedLibrary3Upgraded.new({ from: accounts[0] })
@@ -156,7 +157,7 @@ contract('', (accounts) => {
 
           await verifyBytecodesDfs(
             ['TestContract'],
-            upgradedBuildArtifacts,
+            upgradedLibBuildArtifacts,
             registry,
             proposal,
             Proxy,
@@ -190,20 +191,15 @@ contract('', (accounts) => {
             },
           ]
 
-          await verifyBytecodesDfs(
-            ['TestContract'],
-            buildArtifacts,
-            registry,
-            proposal,
-            Proxy,
-            web3
+          await assertThrowsAsync(
+            verifyBytecodesDfs(['TestContract'], buildArtifacts, registry, proposal, Proxy, web3)
           )
         })
       })
 
       describe(`when a proposal changes a library's proxy`, () => {
         let LinkedLibrary3Upgraded = makeTruffleContract(
-          upgradedBuildArtifacts.getArtifactByName('LinkedLibrary3')
+          upgradedLibBuildArtifacts.getArtifactByName('LinkedLibrary3')
         )
         let newLibrary2Implementation
         beforeEach(async () => {
@@ -224,7 +220,7 @@ contract('', (accounts) => {
 
           await verifyBytecodesDfs(
             ['TestContract'],
-            upgradedBuildArtifacts,
+            upgradedLibBuildArtifacts,
             registry,
             proposal,
             Proxy,
@@ -233,13 +229,191 @@ contract('', (accounts) => {
           assert(true)
         })
 
+        it(`throws on different contracts`, async () => {
+          const proposal = [
+            {
+              contract: 'LinkedLibrary2Proxy',
+              function: '_setImplementation',
+              args: [newLibrary2Implementation.address],
+              value: '0',
+            },
+          ]
+
+          await assertThrowsAsync(
+            verifyBytecodesDfs(['TestContract'], buildArtifacts, registry, proposal, Proxy, web3)
+          )
+        })
+
         it(`throws when dependent contract wasn't repointed`, async () => {
           const proposal = []
 
           await assertThrowsAsync(
             verifyBytecodesDfs(
               ['TestContract'],
-              upgradedBuildArtifacts,
+              upgradedLibBuildArtifacts,
+              registry,
+              proposal,
+              Proxy,
+              web3
+            )
+          )
+        })
+      })
+
+      describe(`when a proposal upgrades a contract's implementation`, () => {
+        let TestContractUpgraded = makeTruffleContract(
+          upgradedContractBuildArtifacts.getArtifactByName('TestContract')
+        )
+        beforeEach(async () => {
+          TestContractUpgraded.link('LinkedLibrary1', library1.address)
+          TestContractUpgraded.link('LinkedLibrary2', library2.address)
+          testContract = await TestContractUpgraded.new({ from: accounts[0] })
+        })
+
+        it(`doesn't throw on matching contracts`, async () => {
+          const proposal = [
+            {
+              contract: 'TestContractProxy',
+              function: '_setImplementation',
+              args: [testContract.address],
+              value: '0',
+            },
+          ]
+
+          await verifyBytecodesDfs(
+            ['TestContract'],
+            upgradedContractBuildArtifacts,
+            registry,
+            proposal,
+            Proxy,
+            web3
+          )
+          assert(true)
+        })
+
+        it(`throws on different contracts`, async () => {
+          const proposal = [
+            {
+              contract: 'TestContractProxy',
+              function: '_setImplementation',
+              args: [testContract.address],
+              value: '0',
+            },
+          ]
+
+          await assertThrowsAsync(
+            verifyBytecodesDfs(['TestContract'], buildArtifacts, registry, proposal, Proxy, web3)
+          )
+        })
+
+        it(`throws when the proposed address is wrong`, async () => {
+          const proposal = [
+            {
+              contract: 'TestContractProxy',
+              function: '_setImplementation',
+              args: [accounts[1]],
+              value: '0',
+            },
+          ]
+
+          await assertThrowsAsync(
+            verifyBytecodesDfs(['TestContract'], buildArtifacts, registry, proposal, Proxy, web3)
+          )
+        })
+
+        it(`throws when there is no proposal`, async () => {
+          const proposal = []
+
+          await assertThrowsAsync(
+            verifyBytecodesDfs(
+              ['TestContract'],
+              upgradedContractBuildArtifacts,
+              registry,
+              proposal,
+              Proxy,
+              web3
+            )
+          )
+        })
+      })
+
+      describe(`when a proposal changes a contract's proxy`, () => {
+        let TestContractUpgraded = makeTruffleContract(
+          upgradedContractBuildArtifacts.getArtifactByName('TestContract')
+        )
+        beforeEach(async () => {
+          TestContractUpgraded.link('LinkedLibrary1', library1.address)
+          TestContractUpgraded.link('LinkedLibrary2', library2.address)
+          testContract = await deployProxiedContract(TestContractUpgraded, accounts[0])
+        })
+
+        it(`doesn't throw on matching contracts`, async () => {
+          const proposal = [
+            {
+              contract: 'Registry',
+              function: 'setAddressFor',
+              args: [
+                web3.utils.soliditySha3({ type: 'string', value: 'TestContract' }),
+                testContract.address,
+              ],
+              value: '0',
+            },
+          ]
+
+          await verifyBytecodesDfs(
+            ['TestContract'],
+            upgradedContractBuildArtifacts,
+            registry,
+            proposal,
+            Proxy,
+            web3
+          )
+          assert(true)
+        })
+
+        it(`throws on different contracts`, async () => {
+          const proposal = [
+            {
+              contract: 'Registry',
+              function: 'setAddressFor',
+              args: [
+                web3.utils.soliditySha3({ type: 'string', value: 'TestContract' }),
+                testContract.address,
+              ],
+              value: '0',
+            },
+          ]
+
+          await assertThrowsAsync(
+            verifyBytecodesDfs(['TestContract'], buildArtifacts, registry, proposal, Proxy, web3)
+          )
+        })
+
+        it(`throws when the proposed address is wrong`, async () => {
+          const proposal = [
+            {
+              contract: 'Registry',
+              function: 'setAddressFor',
+              args: [
+                web3.utils.soliditySha3({ type: 'string', value: 'TestContract' }),
+                accounts[0],
+              ],
+              value: '0',
+            },
+          ]
+
+          await assertThrowsAsync(
+            verifyBytecodesDfs(['TestContract'], buildArtifacts, registry, proposal, Proxy, web3)
+          )
+        })
+
+        it(`throws when there is no proposal`, async () => {
+          const proposal = []
+
+          await assertThrowsAsync(
+            verifyBytecodesDfs(
+              ['TestContract'],
+              upgradedContractBuildArtifacts,
               registry,
               proposal,
               Proxy,
