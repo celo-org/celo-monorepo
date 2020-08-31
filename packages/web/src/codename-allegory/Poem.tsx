@@ -2,20 +2,17 @@ import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { H4 } from 'src/fonts/Fonts'
 import { useScreenSize } from 'src/layout/ScreenSize'
-import Fade from 'src/shared/Fade'
 import { fonts, standardStyles, textStyles } from 'src/styles'
 
 export default function Poem() {
   const { isDesktop } = useScreenSize()
   return (
     <View style={isDesktop && styles.root}>
-      <Fade duration={2000} rootMargin={'-30% 0% -25% 0%'} fraction={0.75}>
-        <H4 style={[textStyles.italic, standardStyles.elementalMarginBottom]}>As Wealth Flowers</H4>
-      </Fade>
-      {STANZAS.map((verse, i) => (
-        <Fade key={i} duration={2000} rootMargin={'-30% 0% -25% 0%'} fraction={0.75}>
-          <Text style={fonts.p}>{verse}</Text>
-        </Fade>
+      <H4 style={[textStyles.italic, standardStyles.elementalMarginBottom]}>As Wealth Flowers</H4>
+      {STANZAS.map((verse) => (
+        <Text key={verse.slice(0, 20)} style={fonts.p}>
+          {verse}
+        </Text>
       ))}
     </View>
   )
@@ -23,7 +20,8 @@ export default function Poem() {
 
 const styles = StyleSheet.create({
   root: {
-    marginTop: '30vh',
+    marginTop: '25vh',
+    zIndex: -5,
   },
 })
 

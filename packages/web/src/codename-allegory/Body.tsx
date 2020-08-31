@@ -20,6 +20,7 @@ export default React.memo(function Body({ isOpen }: Props) {
         <RingsGlyph color={colors.dark} height={30} />
       </Fade>
       <Flower />
+      <View style={styles.mist} />
       <Poem />
 
       <View style={styles.footer}>
@@ -58,5 +59,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingTop: '10vh',
   },
-  imagine: { marginTop: '25vh' },
+  imagine: { marginTop: '45vh' },
+  mist: {
+    zIndex: -2,
+    position: 'fixed',
+    boxShadow: 'inset 0px -50px 8vh 15vh rgba(255,255,255,1)',
+    width: '100%',
+    bottom: 0,
+    top: 0,
+  },
 })
