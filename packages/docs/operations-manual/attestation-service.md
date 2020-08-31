@@ -51,7 +51,11 @@ Click the balance in the top-left to go to [Billing and Payments](https://dashbo
 
 Under [Your Numbers](https://dashboard.nexmo.com/your-numbers), create a US number and ensure that is enabled for SMS.
 
-Under [Settings](https://dashboard.nexmo.com/settings), copy the API key into the environment variable `NEXMO_KEY`, and API secret into `NEXMO_SECRET`. (You'll come back to this page later to fill in the `Delivery Receipts` setting).
+If you want to support a single Attestation Service from this account, under [Settings](https://dashboard.nexmo.com/settings), copy the API key into the environment variable `NEXMO_KEY`, and API secret into `NEXMO_SECRET`. (You'll come back to this page later to fill in the `Delivery Receipts` setting).
+
+If you want to support multiple Attestation Services from this account, say in a setup where you have multiple validators and one service for each validator, or validators in different environments using the same account, you will need to configure a [Nexmo application](https://dashboard.nexmo.com/applications/) for each one. Enable the `Messages` features for each and assign a number to each.
+
+Note that Nexmo numbers appear to have a rate limit of 250 SMS per day.
 
 ## Installation
 
@@ -227,7 +231,9 @@ celocli account:get-metadata $CELO_VALIDATOR_RG_ADDRESS
 
 Attestation Services supports Twilio and Nexmo delivery receipts so that these services can callback to provide delivery information. This triggers retries as needed, even between providers, and enables delivery success metrics to be logged.
 
-Nexmo requires manual configuration to enable this. Go to [Settings](https://dashboard.nexmo.com/settings), and under `Delivery Receipts`, enter the external URL of your Attestation Service appended by `/delivery_status_nexmo` -- for example `http://1.2.3.4:80/delivery_status_nexmo`. This should correspond to the URL printed when Attestation Service is started.
+Nexmo requires manual configuration to enable this. If you have not configured a [Nexmo application](https://dashboard.nexmo.com/applications/), go to [Settings](https://dashboard.nexmo.com/settings), and under `Delivery Receipts`, enter the external URL of your Attestation Service appended by `/delivery_status_nexmo` -- for example `http://1.2.3.4:80/delivery_status_nexmo`. This should correspond to the URL printed when Attestation Service is started.
+
+If you have configured [Nexmo applications](https://dashboard.nexmo.com/applications/), open the matching application, click `Edit`, then enter this value as the `Status URL` (you may also be required to enter an `Inbound URL`, though it will be unused).
 
 There is no configuration necessary to enable Twilio delivery receipts. The Attestation Service uses the URL in the validator metadata (can be overridden with the `EXTERNAL_CALLBACK_HOSTPORT` configuration option) appended by `/delivery_status_twilio`, and supplies that to Twilio through its API.
 
