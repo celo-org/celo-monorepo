@@ -70,4 +70,7 @@ export enum ErrorMessages {
   KEYCHAIN_STORAGE_ERROR = 'keychainStorageError',
   PROVIDER_RATE_FETCH_FAILED = 'providerRateFetchFailed',
   ACCOUNT_CLEAR_FAILED = 'accountClearFailed',
+  GETH_FETCH_ACCOUNTS = 'gethFetchAccounts',
+  GETH_ACCOUNT_ALREADY_EXISTS = 'gethAccountAlreadyExists',
+  GETH_UNEXPECTED_ADDRESS_ON_ADD = 'gethUnexpectedAddressOnAdd',
 }
