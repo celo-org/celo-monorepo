@@ -45,7 +45,7 @@
 
 ###  constructor
 
-\+ **new ContractKit**(`web3`: Web3, `wallet?`: [Wallet](../interfaces/_wallets_wallet_.wallet.md)): *[ContractKit](_kit_.contractkit.md)*
+\+ **new ContractKit**(`web3`: Web3, `wallet?`: [ReadOnlyWallet](../interfaces/_wallets_wallet_.readonlywallet.md)): *[ContractKit](_kit_.contractkit.md)*
 
 *Defined in [contractkit/src/kit.ts:99](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L99)*
 
@@ -54,7 +54,7 @@
 Name | Type |
 ------ | ------ |
 `web3` | Web3 |
-`wallet?` | [Wallet](../interfaces/_wallets_wallet_.wallet.md) |
+`wallet?` | [ReadOnlyWallet](../interfaces/_wallets_wallet_.readonlywallet.md) |
 
 **Returns:** *[ContractKit](_kit_.contractkit.md)*
 

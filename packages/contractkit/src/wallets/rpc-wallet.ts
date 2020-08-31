@@ -4,7 +4,7 @@ import { provider, Tx } from 'web3-core'
 import { DefaultRpcCaller, RpcCaller } from '../utils/rpc-caller'
 import { RemoteWallet } from './remote-wallet'
 import { RpcSigner } from './signers/rpc-signer'
-import { Signer } from './signers/signer'
+import { UnlockableWallet } from './wallet'
 
 export enum RpcWalletErrors {
   FetchAccounts = 'RpcWallet: failed to fetch accounts from server',
@@ -15,7 +15,7 @@ export enum RpcWalletErrors {
  *   WARNING: This class should only be used with well-permissioned providers (ie IPC)
  *   to avoid sensitive user 'privateKey' and 'passphrase' information being exposed
  */
-export class RpcWallet extends RemoteWallet {
+export class RpcWallet extends RemoteWallet<RpcSigner> implements UnlockableWallet {
   protected readonly rpc: RpcCaller
 
   constructor(protected _provider: provider) {
@@ -23,8 +23,8 @@ export class RpcWallet extends RemoteWallet {
     this.rpc = new DefaultRpcCaller(_provider)
   }
 
-  async loadAccountSigners(): Promise<Map<string, Signer>> {
-    const addressToSigner = new Map<string, Signer>()
+  async loadAccountSigners(): Promise<Map<string, RpcSigner>> {
+    const addressToSigner = new Map<string, RpcSigner>()
     const resp = await this.rpc.call('eth_accounts', [])
     if (resp.error) {
       throw new Error(RpcWalletErrors.FetchAccounts)
@@ -48,12 +48,12 @@ export class RpcWallet extends RemoteWallet {
   }
 
   async unlockAccount(address: string, passphrase: string, duration: number) {
-    const signer = this.getSigner(address) as RpcSigner
+    const signer = this.getSigner(address)
     return signer.unlock(passphrase, duration)
   }
 
   isAccountUnlocked(address: string) {
-    const signer = this.getSigner(address) as RpcSigner
+    const signer = this.getSigner(address)
     return signer.isUnlocked()
   }
 
@@ -65,7 +65,7 @@ export class RpcWallet extends RemoteWallet {
   async signTransaction(txParams: Tx) {
     // Get the signer from the 'from' field
     const fromAddress = txParams.from!.toString()
-    const signer = this.getSigner(fromAddress) as RpcSigner
+    const signer = this.getSigner(fromAddress)
     return signer.signRawTransaction(txParams)
   }
 }

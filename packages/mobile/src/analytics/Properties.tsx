@@ -582,7 +582,7 @@ interface GethEventsProperties {
     context: string
   }
   [GethEvents.geth_init_start]: {
-    sync: boolean
+    shouldStartNode: boolean
   }
   [GethEvents.create_geth_start]: undefined
   [GethEvents.create_geth_finish]: undefined
