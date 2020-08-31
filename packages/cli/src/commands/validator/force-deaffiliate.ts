@@ -19,7 +19,7 @@ export default class ValidatorForceDeaffiliate extends BaseCommand {
 
   async run() {
     const res = this.parse(ValidatorForceDeaffiliate)
-    this.kit.defaultAccount = res.flags.from
+
     const validators = await this.kit.contracts.getValidators()
 
     await newCheckBuilder(this, res.flags.validator)

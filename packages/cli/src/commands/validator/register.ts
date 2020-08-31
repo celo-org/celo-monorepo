@@ -24,7 +24,6 @@ export default class ValidatorRegister extends BaseCommand {
 
   async run() {
     const res = this.parse(ValidatorRegister)
-    this.kit.defaultAccount = res.flags.from
 
     const validators = await this.kit.contracts.getValidators()
     const accounts = await this.kit.contracts.getAccounts()
