@@ -72,12 +72,9 @@ export async function getAllUsedNodePorts(namespace?: string, cmdFlags?: { [key:
   const [output] = await execCmd(
     `kubectl get svc ${namespaceFlag} ${cmdFlagStrs.join(' ')} -o go-template='{{range .items}}{{range .spec.ports}}{{if .nodePort}}{{.nodePort}}{{"\\n"}}{{end}}{{end}}{{end}}'`
   )
-  console.log(
-    `kubectl get svc ${namespaceFlag} ${cmdFlagStrs.join(' ')} -o go-template='{{range .items}}{{range .spec.ports}}{{if .nodePort}}{{.nodePort}}{{"\\n"}}{{end}}{{end}}{{end}}'`
-  )
-  console.log('output', output)
-  const nodePortStrs = output.trim().split('\n').filter((portStr: string) => portStr.length)
-  return nodePortStrs.map((portStr: string) => parseInt(portStr, 10)).sort((a: number, b: number) => b - a)
+  const nodePorts = output.trim().split('\n').filter((portStr: string) => portStr.length).map((portStr: string) => parseInt(portStr, 10))
+  // Remove duplicates and sort low -> high
+  return Array.from(new Set(nodePorts)).sort((a: number, b: number) => a - b)
 }
 
 export async function getService(serviceName: string, namespace: string) {

@@ -12,10 +12,11 @@ metadata:
 spec:
   type: {{ $.Values.geth.service_type }}
   publishNotReadyAddresses: true
-{{- if (and $.Values.geth.use_static_ips $.Values.azure) }}
+{{- if (eq $.Values.geth.service_type "LoadBalancer") }}
   loadBalancerIP: {{ index $.Values.geth.public_ips $index -}}
 {{- end }}
   ports:
+{{- if $.Values.geth.service_node_port_per_full_node }}
     - targetPort: {{ index $.Values.geth.service_node_port_per_full_node $index }}
       port: {{ index $.Values.geth.service_node_port_per_full_node $index }}
       nodePort: {{ index $.Values.geth.service_node_port_per_full_node $index }}
@@ -26,6 +27,11 @@ spec:
       nodePort: {{ index $.Values.geth.service_node_port_per_full_node $index }}
       name: udp
       protocol: UDP
+{{- else }}
+    - port: 30303
+      targetPort: ethereum
+      name: ethereum
+{{- end }}
 {{- if $.Values.geth.expose_rpc_externally }}
 {{ include "celo-fullnode.rpc-ports" . | indent 4 }}
 {{- end }}
