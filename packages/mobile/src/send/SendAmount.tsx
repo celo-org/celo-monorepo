@@ -19,7 +19,12 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackButton from 'src/components/BackButton.v2'
-import { DOLLAR_TRANSACTION_MIN_AMOUNT, NUMBER_INPUT_MAX_DECIMALS } from 'src/config'
+import {
+  ALERT_BANNER_DURATION,
+  DAILY_PAYMENT_LIMIT_CUSD,
+  DOLLAR_TRANSACTION_MIN_AMOUNT,
+  NUMBER_INPUT_MAX_DECIMALS,
+} from 'src/config'
 import { getFeeEstimateDollars } from 'src/fees/selectors'
 import i18n, { Namespaces } from 'src/i18n'
 import { fetchAddressesAndValidate } from 'src/identity/actions'
@@ -249,6 +254,15 @@ function SendAmount(props: Props) {
   ])
 
   const onRequest = React.useCallback(() => {
+    if (dollarAmount.isGreaterThan(DAILY_PAYMENT_LIMIT_CUSD)) {
+      dispatch(
+        showError(ErrorMessages.REQUEST_LIMIT, ALERT_BANNER_DURATION, {
+          limit: DAILY_PAYMENT_LIMIT_CUSD,
+        })
+      )
+      return
+    }
+
     const transactionData = getTransactionData(TokenTransactionType.PayRequest)
 
     if (
