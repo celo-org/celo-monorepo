@@ -18,6 +18,7 @@ import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { clearStoredMnemonic, getStoredMnemonic } from 'src/backup/utils'
+import { FIREBASE_ENABLED } from 'src/config'
 import { firebaseSignOut } from 'src/firebase/firebase'
 import { deleteNodeData } from 'src/geth/geth'
 import { revokePhoneMapping } from 'src/identity/revoke'
@@ -115,7 +116,9 @@ function* clearStoredAccountSaga({ account }: ClearStoredAccountAction) {
     try {
       yield call(firebaseSignOut, firebase.app())
     } catch (error) {
-      Logger.error(TAG + '@clearStoredAccount', 'Failed to sign out from Firebase', error)
+      if (FIREBASE_ENABLED) {
+        Logger.error(TAG + '@clearStoredAccount', 'Failed to sign out from Firebase', error)
+      }
     }
 
     yield call(persistor.flush)
