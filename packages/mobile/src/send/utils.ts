@@ -135,7 +135,7 @@ export function showLimitReachedError(
   const dailyLimit = convertDollarsToLocalAmount(
     DAILY_PAYMENT_LIMIT_CUSD,
     localCurrencyExchangeRate
-  )
+  )?.decimalPlaces(2)
 
   const translationParams = {
     currencySymbol: localCurrencySymbol,
