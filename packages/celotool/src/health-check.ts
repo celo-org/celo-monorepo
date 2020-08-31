@@ -50,6 +50,18 @@ async function main() {
   let totalSigners = 0
   const numValidators = 30
 
+  for (let j = 0; j < numValidators; j++) {
+    if (!signerInfo[j]) {
+      signerInfo[j] = 0
+    }
+    if (!sequenceInfo[j]) {
+      sequenceInfo[j] = 0
+    }
+    if (!maxSequenceInfo[j]) {
+      maxSequenceInfo[j] = 0
+    }
+  }
+
   for (let i = startBlock; i <= endBlock; i++) {
     let bn = await kit.web3.eth.getBlockNumber()
     while (bn - 1 < i) {
@@ -68,15 +80,6 @@ async function main() {
     }
     minerInfo[nextBlock.miner]++
     for (let j = 0; j < numValidators; j++) {
-      if (!signerInfo[j]) {
-        signerInfo[j] = 0
-      }
-      if (!sequenceInfo[j]) {
-        sequenceInfo[j] = 0
-      }
-      if (!maxSequenceInfo[j]) {
-        maxSequenceInfo[j] = 0
-      }
       if (binary.charAt(j) === '0') {
         signerInfo[j]++
         sequenceInfo[j]++
