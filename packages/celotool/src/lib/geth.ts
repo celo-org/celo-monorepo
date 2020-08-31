@@ -518,9 +518,6 @@ export const simulateClient = async (
     feeCurrency: '',
     txHash: '',
   }
-  while (true) {
-    sleep(1000000)
-  }
 
   while (true) {
     const sendTransactionTime = Date.now()
