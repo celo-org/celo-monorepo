@@ -164,6 +164,10 @@ spec:
             ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --istanbul.faultymode $FAULTY_NODE_TYPE"
           fi
 
+          if [ "$RID" -lt "$OLD_NODES" ]; then 
+            cp /usr/local/bin/geth-0 /usr/local/bin/geth
+          fi
+
           if geth --help | grep -q 'proxy.proxyenodeurlpairs'; then
             PROXY_FLAG="--proxy.proxyenodeurlpairs"
           else
@@ -224,6 +228,8 @@ spec:
             configMapKeyRef:
               name: {{ template "common.fullname" . }}-geth-config
               key: networkid
+        - name: OLD_NODES
+          value: {{ .Values.geth.oldValidators | quote }}
         - name: FAULTY_NODES
           value: {{ .Values.geth.faultyValidators | quote }}
         - name: FAULTY_NODE_TYPE

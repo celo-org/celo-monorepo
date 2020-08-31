@@ -1,6 +1,7 @@
 import { entries, range } from 'lodash'
 import sleep from 'sleep-promise'
 import { AzureClusterConfig } from './azure'
+import { buildImage } from './build-multi-geth'
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
 import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
 import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './env-utils'
@@ -660,8 +661,17 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
   const genesisContent = useExistingGenesis
     ? await getGenesisBlockFromGoogleStorage(celoEnv)
     : generateGenesisFromEnv()
-
-  return [
+  
+    let gethImageRepository = fetchEnv('GETH_NODE_DOCKER_IMAGE_REPOSITORY')
+    let gethImageTag = fetchEnv('GETH_NODE_DOCKER_IMAGE_TAG')
+  
+    // Here we should build a new docker file if needed
+    if (fetchEnv('OLD_GETH_NODE_DOCKER_IMAGE_TAG')) {
+      gethImageTag = await buildImage(gethImageRepository, fetchEnv('GETH_NODE_DOCKER_IMAGE_TAG'), [fetchEnv('OLD_GETH_NODE_DOCKER_IMAGE_TAG')])
+      gethImageRepository = `${gethImageRepository}-multi`
+    }
+  
+    return [
     `--set domain.name=${fetchEnv('CLUSTER_DOMAIN_NAME')}`,
     `--set genesis.genesisFileBase64=${Buffer.from(genesisContent).toString('base64')}`,
     `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
@@ -669,8 +679,8 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     `--set geth.vmodule=${fetchEnvOrFallback('GETH_VMODULE', '')}`,
     `--set geth.resources.requests.cpu=${fetchEnv('GETH_NODE_CPU_REQUEST')}`,
     `--set geth.resources.requests.memory=${fetchEnv('GETH_NODE_MEMORY_REQUEST')}`,
-    `--set geth.image.repository=${fetchEnv('GETH_NODE_DOCKER_IMAGE_REPOSITORY')}`,
-    `--set geth.image.tag=${fetchEnv('GETH_NODE_DOCKER_IMAGE_TAG')}`,
+    `--set geth.image.repository=${gethImageRepository}`,
+    `--set geth.image.tag=${gethImageTag}`,
     `--set bootnode.image.repository=${fetchEnv('GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY')}`,
     `--set bootnode.image.tag=${fetchEnv('GETH_BOOTNODE_DOCKER_IMAGE_TAG')}`,
     `--set celotool.image.repository=${fetchEnv('CELOTOOL_DOCKER_IMAGE_REPOSITORY')}`,
@@ -683,6 +693,7 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
       'ISTANBUL_REQUEST_TIMEOUT_MS',
       '3000'
     )}`,
+    `--set geth.oldValidators="${fetchEnvOrFallback('OLD_VALIDATORS', '0')}"`,
     `--set geth.faultyValidators="${fetchEnvOrFallback('FAULTY_VALIDATORS', '0')}"`,
     `--set geth.faultyValidatorType="${fetchEnvOrFallback('FAULTY_VALIDATOR_TYPE', '0')}"`,
     `--set geth.tx_nodes="${fetchEnv('TX_NODES')}"`,
