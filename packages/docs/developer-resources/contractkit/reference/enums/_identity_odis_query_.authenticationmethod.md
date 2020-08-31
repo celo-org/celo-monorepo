@@ -13,7 +13,7 @@
 
 • **ENCRYPTION_KEY**: = "encryption_key"
 
-*Defined in [contractkit/src/identity/odis/query.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L27)*
+*Defined in [contractkit/src/identity/odis/query.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L28)*
 
 ___
 
@@ -21,4 +21,4 @@ ___
 
 • **WALLET_KEY**: = "wallet_key"
 
-*Defined in [contractkit/src/identity/odis/query.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L26)*
+*Defined in [contractkit/src/identity/odis/query.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L27)*

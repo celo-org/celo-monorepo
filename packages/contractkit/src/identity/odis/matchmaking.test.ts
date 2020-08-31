@@ -1,4 +1,3 @@
-import fetchMock from 'fetch-mock'
 import { getContactMatches, obfuscateNumberForMatchmaking } from './matchmaking'
 import { AuthenticationMethod, EncryptionKeySigner, ErrorMessages, ServiceContext } from './query'
 
