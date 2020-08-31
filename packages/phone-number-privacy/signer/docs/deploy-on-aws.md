@@ -16,7 +16,7 @@ The next steps will explain how to create a new VPC and a RDS Postgres database 
 1. Create the security groups for the database and signer:
 
     ```bash
-    aws ec2 create-security-group --description "pgpnp database" --group-name pgpnp-db --vpc-id <id>
+    aws ec2 create-security-group --description "odis database" --group-name odis-db --vpc-id <id>
     aws ec2 create-security-group --description "signer" --group-name signer --vpc-id <id>
     ```
 
@@ -102,7 +102,7 @@ First we will create the `assume-role` policy that allows ECS tasks to be assign
 1. Create ECS Fargate cluster
 
     ```bash
-    aws ecs create-cluster --cluster-name pgpnp --capacity-providers FARGATE_SPOT --default-capacity-provider-strategy FARGATE_SPOT
+    aws ecs create-cluster --cluster-name odis --capacity-providers FARGATE_SPOT --default-capacity-provider-strategy FARGATE_SPOT
     ```
 
 1. Create task definition. Using the web interface, create a task definition with the next configuration:

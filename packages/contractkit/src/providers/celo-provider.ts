@@ -1,3 +1,4 @@
+import { Lock } from '@celo/base/lib/lock'
 import debugFactory from 'debug'
 import { provider } from 'web3-core'
 import { Callback, JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
@@ -5,7 +6,7 @@ import { hasProperty, stopProvider } from '../utils/provider-utils'
 import { DefaultRpcCaller, RpcCaller, rpcCallHandler } from '../utils/rpc-caller'
 import { TxParamsNormalizer } from '../utils/tx-params-normalizer'
 import { LocalWallet } from '../wallets/local-wallet'
-import { Wallet } from '../wallets/wallet'
+import { ReadOnlyWallet } from '../wallets/wallet'
 
 const debug = debugFactory('kit:provider:connection')
 const debugPayload = debugFactory('kit:provider:payload')
@@ -24,11 +25,18 @@ export class CeloProvider {
   private readonly rpcCaller: RpcCaller
   private readonly paramsPopulator: TxParamsNormalizer
   private alreadyStopped: boolean = false
-  wallet: Wallet
+  wallet: ReadOnlyWallet
 
-  constructor(readonly existingProvider: provider, wallet: Wallet = new LocalWallet()) {
+  // Transaction nonce is calculated as the max of an account's nonce on-chain, and any pending transactions in a node's
+  // transaction pool. As a result, once a nonce is used, the transaction must be sent to the node before the nonce can
+  // be calculated for another transaction. In particular the sign and send operation must be completed atomically with
+  // relation to other sign and send operations.
+  nonceLock: Lock
+
+  constructor(readonly existingProvider: provider, wallet: ReadOnlyWallet = new LocalWallet()) {
     this.rpcCaller = new DefaultRpcCaller(existingProvider)
     this.paramsPopulator = new TxParamsNormalizer(this.rpcCaller)
+    this.nonceLock = new Lock()
     this.wallet = wallet
 
     this.addProviderDelegatedFunctions()
@@ -170,9 +178,14 @@ export class CeloProvider {
   }
 
   private async handleSendTransaction(payload: JsonRpcPayload): Promise<any> {
-    const signedTx = await this.handleSignTransaction(payload)
-    const response = await this.rpcCaller.call('eth_sendRawTransaction', [signedTx.raw])
-    return response.result
+    await this.nonceLock.acquire()
+    try {
+      const signedTx = await this.handleSignTransaction(payload)
+      const response = await this.rpcCaller.call('eth_sendRawTransaction', [signedTx.raw])
+      return response.result
+    } finally {
+      this.nonceLock.release()
+    }
   }
 
   private forwardSend(payload: JsonRpcPayload, callback: Callback<JsonRpcResponse>): void {

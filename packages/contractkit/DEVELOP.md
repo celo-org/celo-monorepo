@@ -4,7 +4,7 @@
 
 To run test, we first need to generate a devchain snapshot:
 
-`yarn test:prepare`
+`yarn test:reset`
 
 and then:
 

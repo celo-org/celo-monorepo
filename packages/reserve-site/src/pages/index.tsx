@@ -132,11 +132,11 @@ export async function getStaticProps() {
       // we will attempt to re-generate the page:
       // - when a request comes in
       // - at most once every X seconds
-      unstable_revalidate: 60,
+      revalidate: 60,
     }
   } catch {
     return {
-      unstable_revalidate: 1,
+      revalidate: 1,
     }
   }
 }

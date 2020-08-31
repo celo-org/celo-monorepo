@@ -1,4 +1,4 @@
-import colorsV2 from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
@@ -55,6 +55,6 @@ export default function CancelConfirm({ screen }: Props) {
 
 const styles = StyleSheet.create({
   button: {
-    color: colorsV2.gray4,
+    color: colors.gray4,
   },
 })

@@ -1,5 +1,5 @@
-import { eqAddress } from '@celo/utils/lib/address'
-import { isValidUrl } from '@celo/utils/lib/io'
+import { eqAddress } from '@celo/base/lib/address'
+import { isValidUrl } from '@celo/base/lib/io'
 import { resolveTxt } from 'dns'
 import { promisify } from 'util'
 import { ContractKit } from '../..'

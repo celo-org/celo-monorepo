@@ -1,5 +1,5 @@
 import { unknownUserIcon } from '@celo/react-components/images/Images'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { getContactNameHash } from '@celo/utils/src/contacts'
 import * as React from 'react'

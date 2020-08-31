@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import { RouteProp } from '@react-navigation/core'
 import { createStackNavigator, StackScreenProps, TransitionPresets } from '@react-navigation/stack'
 import * as React from 'react'
@@ -31,6 +31,9 @@ import EscrowedPaymentListScreen from 'src/escrow/EscrowedPaymentListScreen'
 import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmationScreen'
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
+import WithdrawCeloQrScannerScreen from 'src/exchange/WithdrawCeloQrScannerScreen'
+import WithdrawCeloReviewScreen from 'src/exchange/WithdrawCeloReviewScreen'
+import WithdrawCeloScreen from 'src/exchange/WithdrawCeloScreen'
 import FiatExchangeAmount, {
   fiatExchangesAmountScreenOptions,
 } from 'src/fiatExchanges/FiatExchangeAmount'
@@ -358,6 +361,21 @@ const exchangeScreens = (Navigator: typeof Stack) => (
       component={ExchangeReview}
       options={exchangeReviewScreenOptions}
     />
+    <Navigator.Screen
+      name={Screens.WithdrawCeloScreen}
+      component={WithdrawCeloScreen}
+      options={WithdrawCeloScreen.navigationOptions}
+    />
+    <Navigator.Screen
+      name={Screens.WithdrawCeloQrScannerScreen}
+      component={WithdrawCeloQrScannerScreen}
+      options={WithdrawCeloQrScannerScreen.navigationOptions}
+    />
+    <Navigator.Screen
+      name={Screens.WithdrawCeloReviewScreen}
+      component={WithdrawCeloReviewScreen}
+      options={WithdrawCeloReviewScreen.navigationOptions}
+    />
   </>
 )
 
@@ -382,6 +400,16 @@ const backupScreens = (Navigator: typeof Stack) => (
 const settingsScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen options={headerWithBackButton} name={Screens.Profile} component={Profile} />
+    <Navigator.Screen
+      name={Screens.Language}
+      component={Language}
+      options={Language.navigationOptions(false)}
+    />
+    <Navigator.Screen
+      name={Screens.SelectLocalCurrency}
+      component={SelectLocalCurrency}
+      options={headerWithBackButton}
+    />
     <Navigator.Screen
       options={headerWithBackButton}
       name={Screens.InviteReview}
@@ -456,6 +484,7 @@ type InitialRouteName = ExtractProps<typeof Stack.Navigator>['initialRouteName']
 
 export function MainStackScreen() {
   const [initialRouteName, setInitialRoute] = React.useState<InitialRouteName>(undefined)
+
   React.useEffect(() => {
     const {
       choseToRestoreAccount,
@@ -512,16 +541,6 @@ const modalAnimatedScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen name={Screens.Send} component={Send} options={Send.navigationOptions} />
     <Navigator.Screen
-      name={Screens.Language}
-      component={Language}
-      options={Language.navigationOptions}
-    />
-    <Navigator.Screen
-      name={Screens.SelectLocalCurrency}
-      component={SelectLocalCurrency}
-      options={headerWithBackButton}
-    />
-    <Navigator.Screen
       name={Screens.PincodeEnter}
       component={PincodeEnter}
       options={PincodeEnter.navigationOptions}
@@ -545,6 +564,11 @@ const modalAnimatedScreens = (Navigator: typeof Stack) => (
       name={Screens.AccountKeyEducation}
       component={AccountKeyEducation}
       options={AccountKeyEducation.navigationOptions}
+    />
+    <Navigator.Screen
+      name={Screens.LanguageModal}
+      component={Language}
+      options={Language.navigationOptions(true)}
     />
     <Navigator.Screen
       name={Screens.SelectCountry}

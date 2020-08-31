@@ -21,7 +21,7 @@
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "kill-dev": "kill -9 $(lsof -ti :3000)",
     "clean-next-cache": "rm -rf .next",
-    "test": "jest --coverage --runInBand",
+    "test": "TZ=UTC jest --coverage --runInBand",
     "spec": "jest"
   },
   "dependencies": {
@@ -64,7 +64,7 @@
     "mobile-detect": "^1.4.4",
     "net": "^1.0.2",
     "network-speed": "^2.0.4",
-    "next": "9.3.5",
+    "next": "^9.5.2",
     "next-i18next": "^4.2.1",
     "next-images": "^1.2.0",
     "next-plugin-transpile-modules": "^2.0.0",
@@ -94,7 +94,6 @@
     "yiq": "^3.0.1"
   },
   "devDependencies": {
-    "@celo/flake-tracker": "0.0.1-dev",
     "@firebase/app-types": "^0.6.0",
     "@sentry/types": "^5.20.1",
     "@testing-library/dom": "^7.2.1",
@@ -122,5 +121,8 @@
     "postcss-scss": "^2.0.0",
     "react-native-svg": "^9.13.6",
     "webpack": "4.41.2"
+  },
+  "peerDependencies": {
+    "@celo/flake-tracker": "0.0.1-dev"
   }
 }

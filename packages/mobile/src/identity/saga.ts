@@ -19,6 +19,7 @@ import {
 import { checkTxsForIdentityMetadata } from 'src/identity/commentEncryption'
 import { doImportContactsWrapper, fetchAddressesAndValidateSaga } from 'src/identity/contactMapping'
 import { AddressValidationType, e164NumberToAddressSelector } from 'src/identity/reducer'
+import { revokeVerificationSaga } from 'src/identity/revoke'
 import { validateAndReturnMatch } from 'src/identity/secureSend'
 import { startVerification } from 'src/identity/verification'
 import { Actions as TransactionActions } from 'src/transactions/actions'
@@ -89,6 +90,7 @@ export function* validateRecipientAddressSaga({
 
 function* watchVerification() {
   yield takeLatest(Actions.START_VERIFICATION, startVerification)
+  yield takeLeading(Actions.REVOKE_VERIFICATION, revokeVerificationSaga)
 }
 
 function* watchContactMapping() {

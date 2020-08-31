@@ -1,9 +1,9 @@
 import { isE164Number } from '@celo/utils/src/phoneNumbers'
 import { Actions, ActionTypes } from 'src/account/actions'
-import { PaymentRequest } from 'src/account/types'
 import { DEV_SETTINGS_ACTIVE_INITIALLY } from 'src/config'
 import { features } from 'src/flags'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
+import Logger from 'src/utils/Logger'
 import { getRemoteTime } from 'src/utils/time'
 import { Actions as Web3Actions, ActionTypes as Web3ActionTypes } from 'src/web3/actions'
 
@@ -21,10 +21,9 @@ export interface State {
   backupCompleted: boolean
   backupDelayedTime: number
   socialBackupCompleted: boolean
-  incomingPaymentRequests: PaymentRequest[]
-  outgoingPaymentRequests: PaymentRequest[]
   dismissedInviteFriends: boolean
   dismissedGetVerified: boolean
+  dismissedGoldEducation: boolean
   promptFornoIfNeeded: boolean
   retryVerificationWithForno: boolean
   acceptedTerms: boolean
@@ -56,13 +55,12 @@ export const initialState = {
   pincodeType: PincodeType.Unset,
   isSettingPin: false,
   accountCreationTime: 99999999999999,
-  incomingPaymentRequests: [],
-  outgoingPaymentRequests: [],
   backupCompleted: false,
   backupDelayedTime: 0,
   socialBackupCompleted: false,
   dismissedInviteFriends: false,
   dismissedGetVerified: false,
+  dismissedGoldEducation: false,
   promptFornoIfNeeded: false,
   acceptedTerms: false,
   retryVerificationWithForno: features.VERIFICATION_FORNO_RETRY,
@@ -115,11 +113,16 @@ export const reducer = (
         defaultCountryCode: action.countryCode,
       }
     case Actions.DEV_MODE_TRIGGER_CLICKED:
-      const newClickCount = (state.devModeClickCount + 1) % 6
+      const newClickCount = (state.devModeClickCount + 1) % 10
+      if (newClickCount === 5) {
+        Logger.showMessage('Debug Mode Activated')
+      } else if (newClickCount === 0) {
+        Logger.showMessage('Debug Mode Deactivated')
+      }
       return {
         ...state,
         devModeClickCount: newClickCount,
-        devModeActive: newClickCount >= 3,
+        devModeActive: newClickCount >= 5,
       }
     case Actions.PHOTOSNUX_CLICKED:
       return {
@@ -170,16 +173,6 @@ export const reducer = (
         socialBackupCompleted: false,
         backupDelayedTime: 0,
       }
-    case Actions.UPDATE_INCOMING_PAYMENT_REQUESTS:
-      return {
-        ...state,
-        incomingPaymentRequests: action.paymentRequests,
-      }
-    case Actions.UPDATE_OUTGOING_PAYMENT_REQUESTS:
-      return {
-        ...state,
-        outgoingPaymentRequests: action.paymentRequests,
-      }
     case Actions.DISMISS_INVITE_FRIENDS:
       return {
         ...state,
@@ -189,6 +182,11 @@ export const reducer = (
       return {
         ...state,
         dismissedGetVerified: true,
+      }
+    case Actions.DISMISS_GOLD_EDUCATION:
+      return {
+        ...state,
+        dismissedGoldEducation: true,
       }
     case Actions.SET_USER_CONTACT_DETAILS:
       return {

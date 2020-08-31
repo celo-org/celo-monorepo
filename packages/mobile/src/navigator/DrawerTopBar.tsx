@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import { iconHitslop } from '@celo/react-components/styles/variables'
 import { useNavigation } from '@react-navigation/native'
 import * as React from 'react'
@@ -34,6 +34,7 @@ function DrawerTopBar({ middleElement, scrollPosition, testID }: Props) {
         // @ts-ignore Only used in a drawer
         onPress={navigation.toggleDrawer}
         hitSlop={iconHitslop}
+        testID={'Hamburguer'}
       >
         <Hamburger />
       </TouchableOpacity>

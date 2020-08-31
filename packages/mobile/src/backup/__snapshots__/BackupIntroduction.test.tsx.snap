@@ -50,6 +50,7 @@ exports[`BackupIntroduction renders correctly when backup completed 1`] = `
           "position": "absolute",
         }
       }
+      testID="Hamburguer"
     >
       <svg
         fill="none"
@@ -237,6 +238,7 @@ exports[`BackupIntroduction renders correctly when backup not complete 1`] = `
           "position": "absolute",
         }
       }
+      testID="Hamburguer"
     >
       <svg
         fill="none"

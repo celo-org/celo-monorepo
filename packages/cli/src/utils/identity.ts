@@ -123,6 +123,9 @@ export const displayMetadata = async (metadata: IdentityMetadataWrapper, kit: Co
       case ClaimTypes.NAME:
         extra = `Name: "${claim.name}"`
         break
+      case ClaimTypes.STORAGE:
+        extra = `URL: "${claim.address}"`
+        break
       default:
         extra = JSON.stringify(claim)
         break
