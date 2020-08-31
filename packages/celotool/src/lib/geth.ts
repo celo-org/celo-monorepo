@@ -574,7 +574,7 @@ export const simulateClient = async (
 
     // We purposely do not use await syntax so we sleep after sending the transaction,
     // not after processing a transaction's result
-    await transferFn(kit, senderAddress, recipientAddress, LOAD_TEST_TRANSFER_WEI, txOptions)
+    transferFn(kit, senderAddress, recipientAddress, LOAD_TEST_TRANSFER_WEI, txOptions)
       .then(async (txResult: TransactionResult) => {
         await onLoadTestTxResult(
           kit,
