@@ -2,15 +2,15 @@
 
 ## Hierarchy
 
-  ↳ [RemoteWallet](_wallets_remote_wallet_.remotewallet.md)
+  ↳ [RemoteWallet](_wallets_remote_wallet_.remotewallet.md)‹[AzureHSMSigner](_wallets_signers_azure_hsm_signer_.azurehsmsigner.md)›
 
   ↳ **AzureHSMWallet**
 
 ## Implements
 
-* [Wallet](../interfaces/_wallets_wallet_.wallet.md)
-* [Wallet](../interfaces/_wallets_wallet_.wallet.md)
-* [Wallet](../interfaces/_wallets_wallet_.wallet.md)
+* [ReadOnlyWallet](../interfaces/_wallets_wallet_.readonlywallet.md)
+* [ReadOnlyWallet](../interfaces/_wallets_wallet_.readonlywallet.md)
+* [ReadOnlyWallet](../interfaces/_wallets_wallet_.readonlywallet.md)
 
 ## Index
 
@@ -36,7 +36,7 @@
 
 \+ **new AzureHSMWallet**(`vaultName`: string): *[AzureHSMWallet](_wallets_azure_hsm_wallet_.azurehsmwallet.md)*
 
-*Defined in [contractkit/src/wallets/azure-hsm-wallet.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/azure-hsm-wallet.ts#L15)*
+*Defined in [contractkit/src/wallets/azure-hsm-wallet.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/azure-hsm-wallet.ts#L14)*
 
 **Parameters:**
 
@@ -54,7 +54,7 @@ Name | Type |
 
 *Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[decrypt](_wallets_wallet_.walletbase.md#decrypt)*
 
-*Defined in [contractkit/src/wallets/wallet.ts:121](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L121)*
+*Defined in [contractkit/src/wallets/wallet.ts:133](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L133)*
 
 **Parameters:**
 
@@ -75,7 +75,7 @@ ___
 
 *Overrides [WalletBase](_wallets_wallet_.walletbase.md).[getAccounts](_wallets_wallet_.walletbase.md#getaccounts)*
 
-*Defined in [contractkit/src/wallets/remote-wallet.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/remote-wallet.ts#L61)*
+*Defined in [contractkit/src/wallets/remote-wallet.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/remote-wallet.ts#L62)*
 
 Get a list of accounts in the remote wallet
 
@@ -87,7 +87,7 @@ ___
 
 ▸ **getAddressFromKeyName**(`keyName`: string): *Promise‹[Address](../modules/_base_.md#address)›*
 
-*Defined in [contractkit/src/wallets/azure-hsm-wallet.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/azure-hsm-wallet.ts#L54)*
+*Defined in [contractkit/src/wallets/azure-hsm-wallet.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/azure-hsm-wallet.ts#L53)*
 
 Returns the EVM address for the given key
 Useful for initially getting the 'from' field given a keyName
@@ -110,7 +110,7 @@ ___
 
 *Overrides [WalletBase](_wallets_wallet_.walletbase.md).[hasAccount](_wallets_wallet_.walletbase.md#hasaccount)*
 
-*Defined in [contractkit/src/wallets/remote-wallet.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/remote-wallet.ts#L70)*
+*Defined in [contractkit/src/wallets/remote-wallet.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/remote-wallet.ts#L71)*
 
 Returns true if account is in the remote wallet
 
@@ -130,7 +130,7 @@ ___
 
 *Inherited from [RemoteWallet](_wallets_remote_wallet_.remotewallet.md).[init](_wallets_remote_wallet_.remotewallet.md#init)*
 
-*Defined in [contractkit/src/wallets/remote-wallet.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/remote-wallet.ts#L20)*
+*Defined in [contractkit/src/wallets/remote-wallet.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/remote-wallet.ts#L21)*
 
 Discovers wallet accounts and caches results in memory
 Idempotent to ensure multiple calls are benign
@@ -145,7 +145,7 @@ ___
 
 *Inherited from [RemoteWallet](_wallets_remote_wallet_.remotewallet.md).[isSetupFinished](_wallets_remote_wallet_.remotewallet.md#issetupfinished)*
 
-*Defined in [contractkit/src/wallets/remote-wallet.ts:110](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/remote-wallet.ts#L110)*
+*Defined in [contractkit/src/wallets/remote-wallet.ts:111](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/remote-wallet.ts#L111)*
 
 **Returns:** *boolean*
 
@@ -159,7 +159,7 @@ ___
 
 *Overrides [WalletBase](_wallets_wallet_.walletbase.md).[signPersonalMessage](_wallets_wallet_.walletbase.md#signpersonalmessage)*
 
-*Defined in [contractkit/src/wallets/remote-wallet.ts:89](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/remote-wallet.ts#L89)*
+*Defined in [contractkit/src/wallets/remote-wallet.ts:90](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/remote-wallet.ts#L90)*
 
 **Parameters:**
 
@@ -182,7 +182,7 @@ ___
 
 *Overrides [WalletBase](_wallets_wallet_.walletbase.md).[signTransaction](_wallets_wallet_.walletbase.md#signtransaction)*
 
-*Defined in [contractkit/src/wallets/remote-wallet.ts:79](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/remote-wallet.ts#L79)*
+*Defined in [contractkit/src/wallets/remote-wallet.ts:80](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/remote-wallet.ts#L80)*
 
 Signs the EVM transaction using the signer pulled from the from field
 
@@ -204,7 +204,7 @@ ___
 
 *Overrides [WalletBase](_wallets_wallet_.walletbase.md).[signTypedData](_wallets_wallet_.walletbase.md#signtypeddata)*
 
-*Defined in [contractkit/src/wallets/remote-wallet.ts:99](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/remote-wallet.ts#L99)*
+*Defined in [contractkit/src/wallets/remote-wallet.ts:100](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/remote-wallet.ts#L100)*
 
 **Parameters:**
 

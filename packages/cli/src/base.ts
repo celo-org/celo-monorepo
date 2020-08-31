@@ -5,7 +5,7 @@ import {
   AddressValidation,
   newLedgerWalletWithSetup,
 } from '@celo/contractkit/lib/wallets/ledger-wallet'
-import { Wallet } from '@celo/contractkit/lib/wallets/wallet'
+import { ReadOnlyWallet } from '@celo/contractkit/lib/wallets/wallet'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import { Command, flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
@@ -102,7 +102,7 @@ export abstract class BaseCommand extends LocalCommand {
 
   private _web3: Web3 | null = null
   private _kit: ContractKit | null = null
-  private _wallet?: Wallet
+  private _wallet?: ReadOnlyWallet
 
   get web3() {
     if (!this._web3) {
