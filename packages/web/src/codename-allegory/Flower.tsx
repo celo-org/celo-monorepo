@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Animated, Image, StyleSheet, View } from 'react-native'
+import { Animated, Image, StyleSheet } from 'react-native'
 import Cambio from 'src/codename-allegory/full-color-flower.png'
 import Outline from 'src/codename-allegory/outline-flower.png'
 import { useScreenSize } from 'src/layout/ScreenSize'
@@ -50,21 +50,23 @@ export default function Flower() {
 
   const skewX = value.interpolate(SKEW)
 
-  const translateX = value.interpolate({
-    inputRange: [0, 0.4],
-    outputRange: ['0%', '-5%'],
-  })
-
   const rotate = value.interpolate(ROTATE)
+  const rotate2 = value.interpolate(ROTATE2)
 
   return (
-    <View style={[styles.breathe, isMobile && styles.breatheMobile]}>
+    <Animated.View
+      style={[
+        styles.breathe,
+        isMobile && styles.breatheMobile,
+        { transform: [{ rotate: rotate2 }] },
+      ]}
+    >
       <Animated.View
         style={[
           styles.root,
           isMobile && styles.mobileRoot,
           {
-            transform: [{ scale }, { translateY }, { translateX }, { skewX }, { rotate }],
+            transform: [{ scale }, { translateY }, { skewX }, { rotate }],
             opacity: isLoaded ? 1 : 0,
           },
         ]}
@@ -76,7 +78,7 @@ export default function Flower() {
           <Image source={Cambio} style={standardStyles.image} onLoadEnd={showImage} />
         </AnimatedRatio>
       </Animated.View>
-    </View>
+    </Animated.View>
   )
 }
 
@@ -106,16 +108,16 @@ const styles = StyleSheet.create({
     maxWidth: 1270,
     justifyContent: 'center',
     width: '100%',
-    animationIterationCount: 100,
+    animationIterationCount: 'infinite',
     animationDirection: 'alternate',
     animationDuration: '3s',
     animationFillMode: 'both',
     animationKeyframes: [
       {
-        from: { opacity: 0.7 },
-        '10%': { opacity: 0.7 },
+        from: { opacity: 0.85, filter: 'brightness(1.1)' },
+        '10%': { opacity: 0.85 },
         '90%': { opacity: 1 },
-        to: { opacity: 1, transform: [{ scale: 1.01 }] },
+        to: { opacity: 1, filter: 'brightness(1) hue-rotate(-5deg)' },
       },
     ],
   },
@@ -169,4 +171,9 @@ const SKEW = {
 const ROTATE = {
   inputRange: [0, 0.66],
   outputRange: ['0deg', '45deg'],
+}
+
+const ROTATE2 = {
+  inputRange: [0, 0.66],
+  outputRange: ['0deg', '18deg'],
 }

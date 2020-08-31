@@ -51,6 +51,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   nav: {
+    zIndex: 10,
     flexDirection: 'row-reverse',
     paddingHorizontal: 40,
     paddingVertical: 10,
