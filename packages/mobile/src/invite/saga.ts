@@ -1,5 +1,5 @@
 import { CeloTransactionObject } from '@celo/contractkit'
-import { RpcWallet } from '@celo/contractkit/lib/wallets/rpc-wallet'
+import { UnlockableWallet } from '@celo/contractkit/lib/wallets/wallet'
 import { privateKeyToAddress } from '@celo/utils/src/address'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
@@ -54,7 +54,7 @@ import { getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 
 const TAG = 'invite/saga'
 export const REDEEM_INVITE_TIMEOUT = 1.5 * 60 * 1000 // 1.5 minutes
-export const INVITE_FEE = '0.25'
+export const INVITE_FEE = '0.30'
 // TODO: Extract offline gas estimation into an independent library.
 // Hardcoding estimate at 1/2 cent. Fees are currently an order of magnitude smaller ($0.0003)
 const SEND_TOKEN_FEE_ESTIMATE = new BigNumber(0.005)
@@ -381,7 +381,7 @@ function* addTempAccountToWallet(inviteCode: string) {
   Logger.debug(TAG + '@addTempAccountToWallet', 'Attempting to add temp wallet')
   try {
     // Import account into the local geth node
-    const wallet: RpcWallet = yield call(getWallet)
+    const wallet: UnlockableWallet = yield call(getWallet)
     const account = privateKeyToAddress(inviteCode)
     const password: string = yield call(getPasswordSaga, account, false, true)
     const tempAccount = yield call([wallet, wallet.addAccount], inviteCode, password)
@@ -404,7 +404,7 @@ export function* moveAllFundsFromAccount(
   comment: string
 ) {
   Logger.debug(TAG + '@moveAllFundsFromAccount', 'Unlocking account')
-  const wallet: RpcWallet = yield call(getWallet)
+  const wallet: UnlockableWallet = yield call(getWallet)
   const password: string = yield call(getPasswordSaga, account, false, true)
   yield call([wallet, wallet.unlockAccount], account, password, UNLOCK_DURATION)
 

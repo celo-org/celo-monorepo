@@ -49,7 +49,7 @@ import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 const TAG = 'identity/verification'
 
 export const NUM_ATTESTATIONS_REQUIRED = 3
-export const ESTIMATED_COST_PER_ATTESTATION = 0.07
+export const ESTIMATED_COST_PER_ATTESTATION = 0.051
 export const VERIFICATION_TIMEOUT = 10 * 60 * 1000 // 10 minutes
 const REVEAL_RETRY_DELAY = 10 * 1000 // 10 seconds
 

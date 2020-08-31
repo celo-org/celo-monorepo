@@ -20,7 +20,7 @@ import Logger from 'src/utils/Logger'
 const PERSISTENCE_KEY = 'NAVIGATION_STATE'
 
 // @ts-ignore https://reactnavigation.org/docs/screen-tracking/
-const getActiveRouteName = (state: NavigationState) => {
+export const getActiveRouteName = (state: NavigationState) => {
   const route = state.routes[state.index]
 
   if (route.state) {
