@@ -21,6 +21,9 @@ OPTIONS
 
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)          Use a specific gas currency for transaction fees (defaults to
+                                                         'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
 
@@ -38,9 +41,6 @@ OPTIONS
 
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) The signer key that is to be used for voting through
                                                          the ReleaseGold instance
-
-  --usdGas                                               If --usdGas is set, the transaction is paid for with a
-                                                         feeCurrency of cUSD
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -72,6 +72,9 @@ USAGE
 OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)          Use a specific gas currency for transaction fees (defaults to
+                                                         'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
 
@@ -81,9 +84,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
-
-  --usdGas                                               If --usdGas is set, the transaction is paid for with a
-                                                         feeCurrency of cUSD
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -105,6 +105,9 @@ OPTIONS
   -a, --action=lock|unlock|withdraw                      (required) Action to perform on contract's gold
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)          Use a specific gas currency for transaction fees (defaults to
+                                                         'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
 
@@ -114,9 +117,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
-
-  --usdGas                                               If --usdGas is set, the transaction is paid for with a
-                                                         feeCurrency of cUSD
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -143,6 +143,9 @@ USAGE
 OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)          Use a specific gas currency for transaction fees (defaults to
+                                                         'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
 
@@ -152,9 +155,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
-
-  --usdGas                                               If --usdGas is set, the transaction is paid for with a
-                                                         feeCurrency of cUSD
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -163,33 +163,6 @@ EXAMPLE
 ```
 
 _See code: [packages/cli/src/commands/releasegold/refund-and-finalize.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/refund-and-finalize.ts)_
-
-### Release-gold
-
-```
-USAGE
-  $ celocli releasegold:release-gold
-
-OPTIONS
-  --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
-
-  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
-                                                         addresses for local signing
-
-  --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
-                                                         from the ledger
-
-  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
-                                                         of index addresses for local signing. Example
-                                                         --ledgerCustomAddresses "[4,99]"
-
-  --usdGas                                               If --usdGas is set, the transaction is paid for with a
-                                                         feeCurrency of cUSD
-
-  --useLedger                                            Set it to use a ledger wallet
-```
-
-_See code: [packages/cli/src/commands/releasegold/release-gold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/release-gold.ts)_
 
 ### Revoke
 
@@ -202,6 +175,9 @@ USAGE
 OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)          Use a specific gas currency for transaction fees (defaults to
+                                                         'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
 
@@ -211,9 +187,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
-
-  --usdGas                                               If --usdGas is set, the transaction is paid for with a
-                                                         feeCurrency of cUSD
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -235,6 +208,10 @@ USAGE
 
 OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)          Use a specific gas currency for transaction fees (defaults to
+                                                         'auto' which uses whatever feeCurrency is available)
+
   --group=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the group to revoke votes from
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
@@ -246,9 +223,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
-
-  --usdGas                                               If --usdGas is set, the transaction is paid for with a
-                                                         feeCurrency of cUSD
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -274,6 +248,9 @@ OPTIONS
   -v, --value=value                                      (required) Property value to set
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)          Use a specific gas currency for transaction fees (defaults to
+                                                         'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
 
@@ -283,9 +260,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
-
-  --usdGas                                               If --usdGas is set, the transaction is paid for with a
-                                                         feeCurrency of cUSD
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -310,6 +284,9 @@ USAGE
 OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d       (required) Address of the ReleaseGold Contract
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)               Use a specific gas currency for transaction fees (defaults
+                                                              to 'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                           [default: 1] If --useLedger is set, this will get the
                                                               first N addresses for local signing
 
@@ -321,9 +298,6 @@ OPTIONS
                                                               --ledgerCustomAddresses "[4,99]"
 
   --pop=pop                                                   ECDSA PoP for signer over contract's account
-
-  --usdGas                                                    If --usdGas is set, the transaction is paid for with a
-                                                              feeCurrency of cUSD
 
   --useLedger                                                 Set it to use a ledger wallet
 
@@ -355,6 +329,9 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d         (required) Address to submit multisig transaction from (one
                                                             of the owners)
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)             Use a specific gas currency for transaction fees (defaults
+                                                            to 'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                         [default: 1] If --useLedger is set, this will get the first
                                                             N addresses for local signing
 
@@ -364,9 +341,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses             [default: [0]] If --useLedger is set, this will get the
                                                             array of index addresses for local signing. Example
                                                             --ledgerCustomAddresses "[4,99]"
-
-  --usdGas                                                  If --usdGas is set, the transaction is paid for with a
-                                                            feeCurrency of cUSD
 
   --useLedger                                               Set it to use a ledger wallet
 
@@ -390,6 +364,9 @@ USAGE
 OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)          Use a specific gas currency for transaction fees (defaults to
+                                                         'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
 
@@ -399,9 +376,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
-
-  --usdGas                                               If --usdGas is set, the transaction is paid for with a
-                                                         feeCurrency of cUSD
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -426,6 +400,9 @@ USAGE
 OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)          Use a specific gas currency for transaction fees (defaults to
+                                                         'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
 
@@ -435,9 +412,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
-
-  --usdGas                                               If --usdGas is set, the transaction is paid for with a
-                                                         feeCurrency of cUSD
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -463,6 +437,9 @@ OPTIONS
   --distributionRatio=distributionRatio                  (required) Amount in range [0, 1000] (3 significant figures)
                                                          indicating % of total balance available for distribution.
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)          Use a specific gas currency for transaction fees (defaults to
+                                                         'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
 
@@ -472,9 +449,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
-
-  --usdGas                                               If --usdGas is set, the transaction is paid for with a
-                                                         feeCurrency of cUSD
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -497,6 +471,9 @@ USAGE
 OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)          Use a specific gas currency for transaction fees (defaults to
+                                                         'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
 
@@ -506,9 +483,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
-
-  --usdGas                                               If --usdGas is set, the transaction is paid for with a
-                                                         feeCurrency of cUSD
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -529,6 +503,9 @@ USAGE
 OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)          Use a specific gas currency for transaction fees (defaults to
+                                                         'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
 
@@ -540,9 +517,6 @@ OPTIONS
                                                          --ledgerCustomAddresses "[4,99]"
 
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d        (required) Address of the recipient of Celo Dollars transfer
-
-  --usdGas                                               If --usdGas is set, the transaction is paid for with a
-                                                         feeCurrency of cUSD
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -566,6 +540,9 @@ USAGE
 OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)          Use a specific gas currency for transaction fees (defaults to
+                                                         'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
 
@@ -575,9 +552,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
-
-  --usdGas                                               If --usdGas is set, the transaction is paid for with a
-                                                         feeCurrency of cUSD
 
   --useLedger                                            Set it to use a ledger wallet
 
