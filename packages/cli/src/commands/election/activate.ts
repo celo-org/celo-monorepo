@@ -23,7 +23,6 @@ export default class ElectionVote extends BaseCommand {
   async run() {
     const res = this.parse(ElectionVote)
 
-    this.kit.defaultAccount = res.flags.from
     await newCheckBuilder(this, res.flags.from)
       .isSignerOrAccount()
       .runChecks()
