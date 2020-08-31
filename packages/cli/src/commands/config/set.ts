@@ -10,7 +10,7 @@ export default class Set extends LocalCommand {
     // Overrides base command node flag.
     node: flags.string({
       char: 'n',
-      description: 'URL of the node to run commands against',
+      description: "URL of the node to run commands against (defaults to 'http://localhost:8545')",
     }),
     gasCurrency: BaseCommand.flags.gasCurrency,
   }

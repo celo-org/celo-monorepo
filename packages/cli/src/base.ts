@@ -55,7 +55,7 @@ export abstract class BaseCommand extends LocalCommand {
     gasCurrency: flags.enum({
       options: Object.keys(GasOptions),
       description:
-        "Use a specific gas currency for transaction fees ('auto' defaults to denomination of transfer or whatever is available)",
+        "Use a specific gas currency for transaction fees (defaults to 'auto' which uses whatever feeCurrency is available)",
     }),
     useLedger: flags.boolean({
       default: false,
