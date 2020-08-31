@@ -1,9 +1,11 @@
 {
-  "name": "@celo/wallet-remote-awshsm",
+  "name": "@celo/wallet-hsm-aws",
   "version": "0.0.1-dev",
   "description": "AWS HSM wallet implementation",
   "author": "Celo",
   "license": "Apache-2.0",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "keywords": [
     "celo",
     "blockchain",

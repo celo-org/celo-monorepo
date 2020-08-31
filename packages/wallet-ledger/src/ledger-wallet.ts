@@ -1,7 +1,7 @@
 import { Signer, Wallet } from '@celo/communication'
 import { CELO_DERIVATION_PATH_BASE } from '@celo/utils/lib/account'
 import { Address } from '@celo/utils/lib/address'
-import { RemoteWallet } from '@celo/wallet-remote/lib/remote-wallet'
+import { RemoteWallet } from '@celo/wallet-remote'
 import { TransportError, TransportStatusError } from '@ledgerhq/errors'
 import Ledger from '@ledgerhq/hw-app-eth'
 import debugFactory from 'debug'

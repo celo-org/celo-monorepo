@@ -16,7 +16,7 @@ jest.mock('../../src/config', () => ({
 
 const getSecret = jest.fn()
 
-jest.mock('@celo/wallet-remote-azurehsm/lib/azure-key-vault-client', () => ({
+jest.mock('@celo/wallet-hsm-azure', () => ({
   AzureKeyVaultClient: jest.fn(() => ({ getSecret })),
 }))
 

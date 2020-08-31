@@ -90,7 +90,7 @@ To leverage your HSM keys in `contractkit`, first create an `AzureHSMWallet` obj
 
 ```js
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { AzureHSMWallet } from '@celo/wallet-remote-azurehsm/lib/rpc-wallet'
+import { AzureHSMWallet } from '@celo/wallet-hsm-azure'
 
 const azureVaultName = "AZURE-VAULT-NAME"
 const akvWallet = await new AzureHSMWallet(azureVaultName)

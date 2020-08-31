@@ -1,16 +1,16 @@
 import { RLPEncodedTx, Signer } from '@celo/communication'
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
-import { getHashFromEncoded } from '@celo/wallet-base/lib/signing-utils'
-import { parseBERSignature } from '@celo/wallet-hsm/lib/ber-utils'
+import { getHashFromEncoded } from '@celo/wallet-base'
 import {
   bigNumberToBuffer,
   bufferToBigNumber,
   makeCanonical,
+  parseBERSignature,
   recoverKeyIndex,
   Signature,
   sixtyFour,
   thirtyTwo,
-} from '@celo/wallet-hsm/lib/signature-utils'
+} from '@celo/wallet-hsm'
 import { KMS } from 'aws-sdk'
 import { BigNumber } from 'bignumber.js'
 import * as ethUtil from 'ethereumjs-util'

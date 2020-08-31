@@ -4,6 +4,8 @@
   "description": "HSM wallet implementation utils",
   "author": "Celo",
   "license": "Apache-2.0",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "keywords": [
     "celo",
     "blockchain",

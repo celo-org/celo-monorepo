@@ -7,7 +7,7 @@ import {
   getHashFromEncoded,
   recoverTransaction,
   verifyEIP712TypedDataSigner,
-} from '@celo/wallet-base/lib/signing-utils'
+} from '@celo/wallet-base'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 // @ts-ignore-next-line
 import { account as Account } from 'eth-lib'

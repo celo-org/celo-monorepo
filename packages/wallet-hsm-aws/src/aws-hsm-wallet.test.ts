@@ -6,11 +6,8 @@ import {
   trimLeading0x,
 } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
-import {
-  recoverTransaction,
-  verifyEIP712TypedDataSigner,
-} from '@celo/wallet-base/lib/signing-utils'
-import { asn1FromPublicKey } from '@celo/wallet-hsm/lib/ber-utils'
+import { recoverTransaction, verifyEIP712TypedDataSigner } from '@celo/wallet-base'
+import { asn1FromPublicKey } from '@celo/wallet-hsm'
 import { BigNumber } from 'bignumber.js'
 import { ec as EC } from 'elliptic'
 import * as ethUtil from 'ethereumjs-util'

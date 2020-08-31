@@ -1,12 +1,12 @@
 import { Address, Signer, Wallet } from '@celo/communication'
-import { publicKeyFromAsn1 } from '@celo/wallet-hsm/lib/ber-utils'
 import {
   bigNumberToBuffer,
   bufferToBigNumber,
   getAddressFromPublicKey,
+  publicKeyFromAsn1,
   publicKeyPrefix,
   sixtyFour,
-} from '@celo/wallet-hsm/lib/signature-utils'
+} from '@celo/wallet-hsm'
 import { RemoteWallet } from '@celo/wallet-remote/lib/remote-wallet'
 import { KMS } from 'aws-sdk'
 import { BigNumber } from 'bignumber.js'

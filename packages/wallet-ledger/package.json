@@ -1,9 +1,11 @@
 {
-  "name": "@celo/wallet-remote-ledger",
+  "name": "@celo/wallet-ledger",
   "version": "0.0.1-dev",
   "description": "Ledger wallet implementation",
   "author": "Celo",
   "license": "Apache-2.0",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "keywords": [
     "celo",
     "blockchain",

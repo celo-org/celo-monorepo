@@ -7,10 +7,7 @@ import {
 } from '@celo/utils/lib/address'
 import { Encrypt } from '@celo/utils/lib/ecies'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
-import {
-  recoverTransaction,
-  verifyEIP712TypedDataSigner,
-} from '@celo/wallet-base/lib/signing-utils'
+import { recoverTransaction, verifyEIP712TypedDataSigner } from '@celo/wallet-base'
 import Web3 from 'web3'
 import { LocalWallet } from './local-wallet'
 

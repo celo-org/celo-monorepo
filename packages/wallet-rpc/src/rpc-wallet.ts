@@ -4,7 +4,7 @@ import {
   normalizeAddressWith0x,
   privateKeyToAddress,
 } from '@celo/utils/lib/address'
-import { RemoteWallet } from '@celo/wallet-remote/lib/remote-wallet'
+import { RemoteWallet } from '@celo/wallet-remote'
 import { RpcSigner } from './rpc-signer'
 
 export enum RpcWalletErrors {

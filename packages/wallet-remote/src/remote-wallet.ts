@@ -2,7 +2,7 @@ import { CeloTx, EncodedTransaction, Signer, Wallet } from '@celo/communication'
 import { Address } from '@celo/utils/lib/address'
 import { sleep } from '@celo/utils/lib/async'
 import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
-import { WalletBase } from '@celo/wallet-base/lib/wallet-base'
+import { WalletBase } from '@celo/wallet-base'
 
 /**
  * Abstract class representing a remote wallet that requires async initialization

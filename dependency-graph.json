@@ -48,9 +48,9 @@
       "@celo/dev-utils",
       "@celo/flake-tracker",
       "@celo/utils",
-      "@celo/wallet-local",
-      "@celo/wallet-remote-azurehsm",
-      "@celo/wallet-remote-ledger"
+      "@celo/wallet-hsm-azure",
+      "@celo/wallet-ledger",
+      "@celo/wallet-local"
     ]
   },
   "@celo/communication": {
@@ -173,32 +173,32 @@
       "@celo/typescript"
     ]
   },
-  "@celo/wallet-remote-awshsm": {
-    "location": "packages/wallet-awshsm",
-    "dependencies": [
-      "@celo/communication",
-      "@celo/utils",
-      "@celo/wallet-base",
-      "@celo/wallet-hsm",
-      "@celo/wallet-remote"
-    ]
-  },
-  "@celo/wallet-remote-azurehsm": {
-    "location": "packages/wallet-azurehsm",
-    "dependencies": [
-      "@celo/communication",
-      "@celo/utils",
-      "@celo/wallet-base",
-      "@celo/wallet-hsm",
-      "@celo/wallet-remote"
-    ]
-  },
   "@celo/wallet-base": {
     "location": "packages/wallet-base",
     "dependencies": [
       "@celo/base",
       "@celo/communication",
       "@celo/utils"
+    ]
+  },
+  "@celo/wallet-hsm-aws": {
+    "location": "packages/wallet-hsm-aws",
+    "dependencies": [
+      "@celo/communication",
+      "@celo/utils",
+      "@celo/wallet-base",
+      "@celo/wallet-hsm",
+      "@celo/wallet-remote"
+    ]
+  },
+  "@celo/wallet-hsm-azure": {
+    "location": "packages/wallet-hsm-azure",
+    "dependencies": [
+      "@celo/communication",
+      "@celo/utils",
+      "@celo/wallet-base",
+      "@celo/wallet-hsm",
+      "@celo/wallet-remote"
     ]
   },
   "@celo/wallet-hsm": {
@@ -208,7 +208,7 @@
       "@celo/communication"
     ]
   },
-  "@celo/wallet-remote-ledger": {
+  "@celo/wallet-ledger": {
     "location": "packages/wallet-ledger",
     "dependencies": [
       "@celo/communication",
@@ -273,7 +273,7 @@
       "@celo/flake-tracker",
       "@celo/phone-number-privacy-common",
       "@celo/utils",
-      "@celo/wallet-remote-azurehsm"
+      "@celo/wallet-hsm-azure"
     ]
   }
 }

@@ -1,11 +1,8 @@
 import { CeloTx, newCommunicationWrapperFromWeb3, Provider } from '@celo/communication'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
+import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
-import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/src/address'
-import {
-  recoverTransaction,
-  verifyEIP712TypedDataSigner,
-} from '@celo/wallet-base/lib/signing-utils'
+import { recoverTransaction, verifyEIP712TypedDataSigner } from '@celo/wallet-base'
 import net from 'net'
 import Web3 from 'web3'
 import { RpcWallet } from './rpc-wallet'

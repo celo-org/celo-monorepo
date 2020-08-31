@@ -1,11 +1,8 @@
 import { Wallet } from '@celo/communication'
 import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { LocalWallet } from '@celo/wallet-local/lib/local-wallet'
-import { AzureHSMWallet } from '@celo/wallet-remote-azurehsm/lib/azure-hsm-wallet'
-import {
-  AddressValidation,
-  newLedgerWalletWithSetup,
-} from '@celo/wallet-remote-ledger/lib/ledger-wallet'
+import { AzureHSMWallet } from '@celo/wallet-hsm-azure'
+import { AddressValidation, newLedgerWalletWithSetup } from '@celo/wallet-ledger'
+import { LocalWallet } from '@celo/wallet-local'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import { Command, flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'

@@ -10,7 +10,7 @@ import {
   Signature,
   sixtyFour,
   thirtyTwo,
-} from '@celo/wallet-hsm/lib/signature-utils'
+} from '@celo/wallet-hsm'
 import { BigNumber } from 'bignumber.js'
 
 /**

@@ -1,6 +1,6 @@
 import { CeloTx, EncodedTransaction, RpcCaller, Signer } from '@celo/communication'
-import { ensureLeading0x, normalizeAddressWith0x, trimLeading0x } from '@celo/utils/src/address'
-import { decodeSig } from '@celo/wallet-base/lib/signing-utils'
+import { ensureLeading0x, normalizeAddressWith0x, trimLeading0x } from '@celo/utils/lib/address'
+import { decodeSig } from '@celo/wallet-base'
 import BigNumber from 'bignumber.js'
 import BN from 'bn.js'
 

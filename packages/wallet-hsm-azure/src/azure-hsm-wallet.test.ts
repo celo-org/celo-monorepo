@@ -7,11 +7,8 @@ import {
   trimLeading0x,
 } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
-import {
-  recoverTransaction,
-  verifyEIP712TypedDataSigner,
-} from '@celo/wallet-base/lib/signing-utils'
-import { Signature } from '@celo/wallet-hsm/lib/signature-utils'
+import { recoverTransaction, verifyEIP712TypedDataSigner } from '@celo/wallet-base'
+import { Signature } from '@celo/wallet-hsm'
 import { BigNumber } from 'bignumber.js'
 import * as ethUtil from 'ethereumjs-util'
 import Web3 from 'web3'

@@ -1,7 +1,7 @@
 import { RLPEncodedTx, Signer } from '@celo/communication'
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { Decrypt } from '@celo/utils/lib/ecies'
-import { decodeSig, getHashFromEncoded } from '@celo/wallet-base/lib/signing-utils'
+import { decodeSig, getHashFromEncoded } from '@celo/wallet-base'
 // @ts-ignore-next-line
 import { account as Account } from 'eth-lib'
 import * as ethUtil from 'ethereumjs-util'

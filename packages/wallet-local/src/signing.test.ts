@@ -7,7 +7,7 @@ import {
   Provider,
 } from '@celo/communication'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
-import { recoverTransaction } from '@celo/wallet-base/lib/signing-utils'
+import { recoverTransaction } from '@celo/wallet-base'
 import debugFactory from 'debug'
 import Web3 from 'web3'
 import { LocalWallet } from './local-wallet'

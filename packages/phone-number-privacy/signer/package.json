@@ -20,7 +20,7 @@
     "@celo/contractkit": "0.4.13-dev",
     "@celo/phone-number-privacy-common": "1.0.7",
     "@celo/utils": "0.1.19-dev",
-    "@celo/wallet-remote-azurehsm": "0.0.1-dev",
+    "@celo/wallet-hsm-azure": "0.0.1-dev",
     "@google-cloud/secret-manager": "3.0.0",
     "@types/elliptic": "^6.4.12",
     "aws-sdk": "^2.696.0",

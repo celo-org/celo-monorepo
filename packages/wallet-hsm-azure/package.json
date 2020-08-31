@@ -1,9 +1,11 @@
 {
-  "name": "@celo/wallet-remote-azurehsm",
+  "name": "@celo/wallet-hsm-azure",
   "version": "0.0.1-dev",
   "description": "Azure HSM wallet implementation",
   "author": "Celo",
   "license": "Apache-2.0",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "keywords": [
     "celo",
     "blockchain",
