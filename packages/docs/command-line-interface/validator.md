@@ -329,7 +329,7 @@ DESCRIPTION
 
   WARNING: By default, the BLS key used by the validator node is derived from the ECDSA private key. As a result,
   rotating the BLS key without rotating the ECDSA key will result in validator downtime without special configuration.
-  use this method only if you know what you are doing.
+  Use this method only if you know what you are doing.
 
 EXAMPLE
   update-bls-key --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --blsKey
