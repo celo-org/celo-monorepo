@@ -33,7 +33,7 @@ import {
   setRequirePinOnAppOpen,
   setSessionId,
 } from 'src/app/actions'
-import { sessionIdSelector } from 'src/app/selectors'
+import { sessionIdSelector, verificationPossibleSelector } from 'src/app/selectors'
 import Dialog from 'src/components/Dialog'
 import SessionId from 'src/components/SessionId'
 import { AVAILABLE_LANGUAGES, TOS_LINK } from 'src/config'
@@ -70,6 +70,7 @@ interface StateProps {
   devModeActive: boolean
   analyticsEnabled: boolean
   numberVerified: boolean
+  verificationPossible: boolean
   pincodeType: PincodeType
   backupCompleted: boolean
   requirePinOnAppOpen: boolean
@@ -91,6 +92,7 @@ const mapStateToProps = (state: RootState): StateProps => {
     e164PhoneNumber: state.account.e164PhoneNumber,
     analyticsEnabled: state.app.analyticsEnabled,
     numberVerified: state.app.numberVerified,
+    verificationPossible: verificationPossibleSelector(state),
     pincodeType: pincodeTypeSelector(state),
     requirePinOnAppOpen: state.app.requirePinOnAppOpen,
     fornoEnabled: state.web3.fornoMode,
@@ -303,7 +305,7 @@ export class Account extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, i18n, numberVerified } = this.props
+    const { t, i18n, numberVerified, verificationPossible } = this.props
     const promptFornoModal = this.props.route.params?.promptFornoModal ?? false
     const promptConfirmRemovalModal = this.props.route.params?.promptConfirmRemovalModal ?? false
     const currentLanguage = AVAILABLE_LANGUAGES.find((l) => l.code === i18n.language)
@@ -318,7 +320,7 @@ export class Account extends React.Component<Props, State> {
           </TouchableWithoutFeedback>
           <View style={styles.containerList}>
             <SettingsItemTextValue title={t('editProfile')} onPress={this.goToProfile} />
-            {!numberVerified && (
+            {!numberVerified && verificationPossible && (
               <SettingsItemTextValue title={t('confirmNumber')} onPress={this.goToConfirmNumber} />
             )}
             <SettingsItemTextValue

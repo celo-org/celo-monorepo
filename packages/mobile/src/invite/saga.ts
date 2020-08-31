@@ -54,7 +54,7 @@ import { getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 
 const TAG = 'invite/saga'
 export const REDEEM_INVITE_TIMEOUT = 2 * 60 * 1000 // 2 minutes
-export const INVITE_FEE = '0.25'
+export const INVITE_FEE = '0.30'
 
 export async function getInviteTxGas(
   account: string,
