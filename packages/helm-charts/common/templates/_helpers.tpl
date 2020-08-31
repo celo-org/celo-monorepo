@@ -231,10 +231,10 @@ release: {{ .Release.Name }}
 {{- end }}
 {{- else }}
   - name: discovery
-    containerPort: {{ .port | default 30303 }}
+    containerPort: 30303
     protocol: UDP
   - name: ethereum
-    containerPort: {{ .port | default 30303 }}
+    containerPort: 30303
 {{- end }}
 {{- if .expose }}
   - name: rpc

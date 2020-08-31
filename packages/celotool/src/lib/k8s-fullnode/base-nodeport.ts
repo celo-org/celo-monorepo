@@ -18,26 +18,25 @@ export abstract class BaseNodePortFullNodeDeployer extends BaseFullNodeDeployer 
   async getNodePortForEachFullNode() {
     // Get all node ports that are currently used on the entire cluster
     const allUsedNodePorts: number[] = await getAllUsedNodePorts()
-    console.log('allUsedNodePorts start', allUsedNodePorts)
     // Get the service for each full node. An element will be undefined if does not exist
     const serviceForEachFullNode: any[] = await this.getServiceForEachFullNode()
 
-    const NO_KNOWN_NODE_PORT = -1
+    const NO_NODE_PORT = -1
     // Get the node port for each existing full node service. If none has been
     // assigned, give `NO_KNOWN_NODE_PORT`
     const nodePortForEachFullNode: number[] = serviceForEachFullNode.map((service: any) => {
       if (!service) {
-        return NO_KNOWN_NODE_PORT
+        return NO_NODE_PORT
       }
       return service.spec.ports.reduce((existingNodePort: number, portsSpec: any) => {
         if (!portsSpec.nodePort) {
           return existingNodePort
         }
-        if (existingNodePort !== NO_KNOWN_NODE_PORT && existingNodePort !== portsSpec.nodePort) {
+        if (existingNodePort !== NO_NODE_PORT && existingNodePort !== portsSpec.nodePort) {
           throw Error(`Expected all nodePorts to be the same in service, got ${existingNodePort} !== ${portsSpec.nodePort}`)
         }
         return portsSpec.nodePort
-      }, NO_KNOWN_NODE_PORT)
+      }, NO_NODE_PORT)
     })
 
     const minPort = 30000
@@ -50,7 +49,7 @@ export abstract class BaseNodePortFullNodeDeployer extends BaseFullNodeDeployer 
     // possible. Doing so makes reasoning about node ports and port ranges way easier.
     for (let i = 0; i < nodePortForEachFullNode.length; i++) {
       const nodePort = nodePortForEachFullNode[i]
-      if (nodePort === NO_KNOWN_NODE_PORT) {
+      if (nodePort === NO_NODE_PORT) {
         for (; allUsedNodePortsIndex < allUsedNodePorts.length; allUsedNodePortsIndex++) {
           if (potentialPort > maxPort) {
             throw Error(`No available node ports`)
@@ -70,7 +69,7 @@ export abstract class BaseNodePortFullNodeDeployer extends BaseFullNodeDeployer 
         potentialPort++
       }
     }
-    this.printNodePortsToAllow(allUsedNodePorts)
+    this.printNodePortsActionRequired(allUsedNodePorts)
     return nodePortForEachFullNode
   }
 
@@ -79,8 +78,7 @@ export abstract class BaseNodePortFullNodeDeployer extends BaseFullNodeDeployer 
    * now-unused ports from the security group whitelist
    */
   async deallocateAllIPs() {
-    const allUsedNodePorts: number[] = await getAllUsedNodePorts()
-    this.printNodePortsToAllow(allUsedNodePorts)
+    // Do nothing
   }
 
   getServiceForEachFullNode() {
@@ -92,7 +90,7 @@ export abstract class BaseNodePortFullNodeDeployer extends BaseFullNodeDeployer 
     )
   }
 
-  abstract printNodePortsToAllow(nodePorts: number[]): void
+  abstract printNodePortsActionRequired(nodePorts: number[]): void
 
   get deploymentConfig(): BaseFullNodeDeploymentConfig {
     return this._deploymentConfig

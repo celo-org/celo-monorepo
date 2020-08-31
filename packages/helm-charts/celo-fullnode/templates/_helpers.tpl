@@ -48,12 +48,9 @@ component: celo-fullnode
 {{- end -}}
 
 {{/*
- * AWS requires a network load balancer to have a distinct public IP address for
- * each public subnet the cluster is in. A subnet can only exist in one availability zone.
- * Geth only supports advertising itself with one IP with the `--nat` flag.
- * Because a pod will be assigned to a node in a single availability zone, we
- * want geth to use the IP address that corresponds to the particular availability zone
- * the pod is scheduled in.
+ * The easiest way to get the public IP for the node (VM) that a EKS pod is on
+ * is to just make a web request. Unfortunately it is not possible to get it
+ * from the downward k8s API.
 */}}
 {{- define "celo-fullnode.aws-subnet-specific-nat-ip" -}}
 {{- if .Values.aws -}}

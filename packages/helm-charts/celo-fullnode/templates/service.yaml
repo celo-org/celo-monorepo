@@ -17,14 +17,15 @@ spec:
 {{- end }}
   ports:
 {{- if $.Values.geth.service_node_port_per_full_node }}
-    - targetPort: {{ index $.Values.geth.service_node_port_per_full_node $index }}
-      port: {{ index $.Values.geth.service_node_port_per_full_node $index }}
-      nodePort: {{ index $.Values.geth.service_node_port_per_full_node $index }}
+{{- port := index $.Values.geth.service_node_port_per_full_node $index -}}
+    - targetPort: {{ $port }}
+      port: {{ $port }}
+      nodePort: {{ $port }}
       name: tcp
       protocol: TCP
-    - targetPort: {{ index $.Values.geth.service_node_port_per_full_node $index }}
-      port: {{ index $.Values.geth.service_node_port_per_full_node $index }}
-      nodePort: {{ index $.Values.geth.service_node_port_per_full_node $index }}
+    - targetPort: {{ $port }}
+      port: {{ $port }}
+      nodePort: {{ $port }}
       name: udp
       protocol: UDP
 {{- else }}

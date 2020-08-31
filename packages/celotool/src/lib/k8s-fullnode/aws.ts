@@ -23,19 +23,34 @@ export class AWSFullNodeDeployer extends BaseNodePortFullNodeDeployer {
     ]
   }
 
+  /**
+   * Prints action required to remove the node ports, and removes the chart
+   */
   async removeChart() {
     const serviceForEachFullNode = await this.getServiceForEachFullNode()
     const serviceNodePortsSet = serviceForEachFullNode.reduce((set: Set<number>, service: any) => {
-      for (const port of service.spec.ports) {
-        set.add(port)
+      // If there is no service for a full node, it is undefined. Just ignore
+      if (!service) {
+        return set
+      }
+      for (const portSpec of service.spec.ports) {
+        if (portSpec.nodePort) {
+          set.add(portSpec.nodePort)
+        }
       }
       return set
     }, new Set<number>())
-    this.printNodePortsToAllow(Array.from(serviceNodePortsSet), true)
+    this.printNodePortsActionRequired(Array.from(serviceNodePortsSet), true)
     await super.removeChart()
   }
 
-  printNodePortsToAllow(nodePorts: number[], destroy: boolean = false) {
+  /**
+   * In order for NodePort to work on an EKS cluster, you need to manually
+   * allow ingress traffic to the specific ports for each VM in the cluster.
+   * This prints a message showing which ports need to be added and how to modify
+   * the security group that is common to all VMs in a cluster.
+   */
+  printNodePortsActionRequired(nodePorts: number[], destroy: boolean = false) {
     const CYAN = '\x1b[36m'
     const RESET = '\x1b[0m'
     const RED = '\x1b[31m'
@@ -58,6 +73,5 @@ export class AWSFullNodeDeployer extends BaseNodePortFullNodeDeployer {
         RESET
       )
     )
-    console.info('test')
   }
 }
