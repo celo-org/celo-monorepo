@@ -65,6 +65,7 @@ const styles = StyleSheet.create({
     position: 'fixed',
     boxShadow: 'inset 0px -50px 8vh 15vh rgba(255,255,255,1)',
     width: '100%',
+    transform: [{ scaleX: 2 }],
     bottom: 0,
     top: 0,
   },

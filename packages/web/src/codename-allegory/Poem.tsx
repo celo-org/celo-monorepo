@@ -7,7 +7,7 @@ import { fonts, standardStyles, textStyles } from 'src/styles'
 export default function Poem() {
   const { isDesktop } = useScreenSize()
   return (
-    <View style={isDesktop && styles.root}>
+    <View style={[styles.root, isDesktop && styles.desktopRoot]}>
       <H4 style={[textStyles.italic, standardStyles.elementalMarginBottom]}>As Wealth Flowers</H4>
       {STANZAS.map((verse) => (
         <Text key={verse.slice(0, 20)} style={fonts.p}>
@@ -20,8 +20,10 @@ export default function Poem() {
 
 const styles = StyleSheet.create({
   root: {
-    marginTop: '25vh',
     zIndex: -5,
+  },
+  desktopRoot: {
+    marginTop: '25vh',
   },
 })
 
