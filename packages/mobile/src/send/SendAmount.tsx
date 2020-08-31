@@ -52,7 +52,7 @@ import { StackParamList } from 'src/navigator/types'
 import { getRecipientVerificationStatus, Recipient, RecipientKind } from 'src/recipients/recipient'
 import useSelector from 'src/redux/useSelector'
 import { getRecentPayments } from 'src/send/selectors'
-import { getFeeType, isPaymentLimitReached, showLimitReachedError } from 'src/send/utils'
+import { getFeeType, isPaymentLimitReached } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
@@ -213,12 +213,7 @@ function SendAmount(props: Props) {
       return
     }
 
-    const now = Date.now()
-    const isLimitReached = isPaymentLimitReached(now, recentPayments, dollarAmount.toNumber())
-    if (isLimitReached) {
-      dispatch(
-        showLimitReachedError(now, recentPayments, localCurrencyExchangeRate, localCurrencySymbol)
-      )
+    if (isPaymentLimitReached(dollarAmount)) {
       return
     }
 

@@ -16,7 +16,7 @@ import {
 } from 'src/localCurrency/actions'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 import { convertDollarsToLocalAmount, convertLocalAmountToDollars } from 'src/localCurrency/convert'
-import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
+import { getLocalCurrencyExchangeRate, getLocalCurrencySymbol } from 'src/localCurrency/selectors'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { UriData, uriDataFromUrl } from 'src/qrcode/schema'
@@ -26,8 +26,11 @@ import {
   RecipientWithContact,
   RecipientWithQrCode,
 } from 'src/recipients/recipient'
+import { RootState } from 'src/redux/reducers'
+import { store } from 'src/redux/store'
 import { storeLatestInRecents } from 'src/send/actions'
 import { PaymentInfo } from 'src/send/reducers'
+import { getRecentPayments } from 'src/send/selectors'
 import { TransactionDataInput } from 'src/send/SendAmount'
 import Logger from 'src/utils/Logger'
 import { timeDeltaInHours } from 'src/utils/time'
@@ -93,13 +96,29 @@ function dailySpent(now: number, recentPayments: PaymentInfo[]) {
   return amount
 }
 
-export function isPaymentLimitReached(
-  now: number,
-  recentPayments: PaymentInfo[],
-  initial: number
+export function isPaymentLimitReached(amountToTransfer: BigNumber): boolean {
+  return _isPaymentLimitReachedWithStore(store.getState(), amountToTransfer)
+}
+
+export function _isPaymentLimitReachedWithStore(
+  state: RootState,
+  amountToTransfer: BigNumber
 ): boolean {
-  const amount = dailySpent(now, recentPayments) + initial
-  return amount > DAILY_PAYMENT_LIMIT_CUSD
+  const recentPayments = getRecentPayments(state)
+  const localCurrencyExchangeRate = getLocalCurrencyExchangeRate(state)
+  const localCurrencySymbol = getLocalCurrencySymbol(state)
+
+  const now = Date.now()
+
+  const dailyAmount = dailySpent(now, recentPayments) + amountToTransfer.toNumber()
+  const isLimitReached = dailyAmount > DAILY_PAYMENT_LIMIT_CUSD
+  if (isLimitReached) {
+    store.dispatch(
+      showLimitReachedError(now, recentPayments, localCurrencyExchangeRate, localCurrencySymbol)
+    )
+    return true
+  }
+  return false
 }
 
 export function showLimitReachedError(

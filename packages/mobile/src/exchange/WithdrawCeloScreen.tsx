@@ -7,75 +7,76 @@ import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
+import { parseInputAmount } from '@celo/utils/lib/parsing'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text } from 'react-native'
+import { getNumberFormatSettings } from 'react-native-localize'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useDispatch } from 'react-redux'
 import { CeloExchangeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import AccountAddressInput from 'src/components/AccountAddressInput'
 import CeloAmountInput from 'src/components/CeloAmountInput'
 import { ADDRESS_LENGTH } from 'src/exchange/reducer'
-import { celoTocUsd } from 'src/exchange/utils'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
-import { getLocalCurrencyExchangeRate, getLocalCurrencySymbol } from 'src/localCurrency/selectors'
+import {
+  convertDollarsToMaxSupportedPrecision,
+  convertLocalAmountToDollars,
+} from 'src/localCurrency/convert'
+import { useLocalCurrencyCode } from 'src/localCurrency/hooks'
+import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import { HeaderTitleWithBalance, headerWithBackButton } from 'src/navigator/Headers.v2'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import useSelector from 'src/redux/useSelector'
-import { getRecentPayments } from 'src/send/selectors'
-import { isPaymentLimitReached, showLimitReachedError } from 'src/send/utils'
+import { isPaymentLimitReached } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
+
+const { decimalSeparator } = getNumberFormatSettings()
 
 type Props = StackScreenProps<StackParamList, Screens.WithdrawCeloScreen>
 
 function WithdrawCeloScreen({ navigation }: Props) {
-  const dispatch = useDispatch()
-
   const [accountAddress, setAccountAddress] = useState('')
-  const [celoToTransfer, setCeloToTransfer] = useState('')
-  const [isLoading, setLoading] = useState(false)
+  const [celoInput, setCeloToTransfer] = useState('')
 
-  const recentPayments = useSelector(getRecentPayments)
-  const localCurrencyExchangeRate = useSelector(getLocalCurrencyExchangeRate)
-  const localCurrencySymbol = useSelector(getLocalCurrencySymbol)
+  const localExchangeRate = useSelector(getLocalCurrencyExchangeRate)
+  const localCurrencyCode = useLocalCurrencyCode()
 
   const goldBalance = useSelector((state) => state.goldToken.balance)
   const goldBalanceNumber = new BigNumber(goldBalance || 0)
   const { t } = useTranslation(Namespaces.exchangeFlow9)
 
-  const celoToTransferNumber = new BigNumber(celoToTransfer)
+  const celoToTransfer = new BigNumber(celoInput)
   const readyToReview =
     accountAddress.startsWith('0x') &&
     accountAddress.length === ADDRESS_LENGTH &&
-    celoToTransferNumber.isGreaterThan(0) &&
-    celoToTransferNumber.isLessThanOrEqualTo(goldBalanceNumber)
+    celoToTransfer.isGreaterThan(0) &&
+    celoToTransfer.isLessThanOrEqualTo(goldBalanceNumber)
 
   const onConfirm = async () => {
-    setLoading(true)
-    const celoAmount = new BigNumber(celoToTransfer)
-    const cUsdAmount = await celoTocUsd(celoAmount)
+    const parsedInputAmount = parseInputAmount(celoInput, decimalSeparator)
+    const dollarAmount = convertDollarsToMaxSupportedPrecision(
+      (!parsedInputAmount.isNaN() &&
+        convertLocalAmountToDollars(
+          parsedInputAmount,
+          localCurrencyCode ? localExchangeRate : 1
+        )) ||
+        new BigNumber('0')
+    )
 
-    const now = Date.now()
-    const isLimitReached = isPaymentLimitReached(now, recentPayments, cUsdAmount.toNumber())
-    if (isLimitReached) {
-      dispatch(
-        showLimitReachedError(now, recentPayments, localCurrencyExchangeRate, localCurrencySymbol)
-      )
-      setLoading(false)
+    if (isPaymentLimitReached(dollarAmount)) {
       return
     }
 
     ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_review, {
-      amount: celoAmount.toString(),
+      amount: celoToTransfer.toString(),
     })
-    setLoading(false)
     navigation.navigate(Screens.WithdrawCeloReviewScreen, {
-      amount: celoAmount,
+      amount: celoToTransfer,
       recipientAddress: accountAddress,
     })
   }
@@ -99,12 +100,11 @@ function WithdrawCeloScreen({ navigation }: Props) {
           inputContainerStyle={styles.inputContainer}
           inputStyle={styles.input}
           onCeloChanged={setCeloToTransfer}
-          celo={celoToTransfer}
+          celo={celoInput}
         />
       </KeyboardAwareScrollView>
       <Button
         onPress={onConfirm}
-        showLoading={isLoading}
         text={t(`global:review`)}
         accessibilityLabel={t('continue')}
         disabled={!readyToReview}

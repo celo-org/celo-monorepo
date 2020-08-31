@@ -13,7 +13,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import { Platform, StyleSheet, Text, TextInput, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import BackButton from 'src/components/BackButton.v2'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import LineItemRow from 'src/components/LineItemRow'
@@ -26,12 +26,11 @@ import {
   convertLocalAmountToDollars,
 } from 'src/localCurrency/convert'
 import { useLocalCurrencyCode } from 'src/localCurrency/hooks'
-import { getLocalCurrencyExchangeRate, getLocalCurrencySymbol } from 'src/localCurrency/selectors'
+import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import { emptyHeader, HeaderTitleWithBalance } from 'src/navigator/Headers.v2'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
-import { getRecentPayments } from 'src/send/selectors'
-import { isPaymentLimitReached, showLimitReachedError } from 'src/send/utils'
+import { isPaymentLimitReached } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 
@@ -79,10 +78,7 @@ export function ExchangeTradeScreen({ navigation, route }: Props) {
   }
 
   function goNext() {
-    const now = Date.now()
-    const isLimitReached = isPaymentLimitReached(now, recentPayments, dollarAmount.toNumber())
-    if (isLimitReached) {
-      dispatch(showLimitReachedError(now, recentPayments, localExchangeRate, localCurrencySymbol))
+    if (isPaymentLimitReached(dollarAmount)) {
       return
     }
 
@@ -95,13 +91,10 @@ export function ExchangeTradeScreen({ navigation, route }: Props) {
 
   const { isAddFunds } = route.params
   const { t } = useTranslation(Namespaces.fiatExchangeFlow)
-  const dispatch = useDispatch()
   const [inputAmount, setInputAmount] = React.useState('')
   const dollarBalance = useSelector(stableTokenBalanceSelector)
   const localExchangeRate = useSelector(getLocalCurrencyExchangeRate)
-  const localCurrencySymbol = useSelector(getLocalCurrencySymbol)
   const localCurrencyCode = useLocalCurrencyCode()
-  const recentPayments = useSelector(getRecentPayments)
 
   const parsedInputAmount = parseInputAmount(inputAmount, decimalSeparator)
   const dollarAmount = convertDollarsToMaxSupportedPrecision(
