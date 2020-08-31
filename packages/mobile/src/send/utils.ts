@@ -108,8 +108,11 @@ export function showLimitReachedError(
   localCurrencyExchangeRate: string | null | undefined,
   localCurrencySymbol: LocalCurrencySymbol | null
 ) {
-  const dailyRemainingcUSD = dailyAmountRemaining(now, recentPayments)
-  const dailyRemaining = convertDollarsToLocalAmount(dailyRemainingcUSD, localCurrencyExchangeRate)
+  const dailyRemainingcUSD = dailyAmountRemaining(now, recentPayments).toFixed(2)
+  const dailyRemaining = convertDollarsToLocalAmount(
+    dailyRemainingcUSD,
+    localCurrencyExchangeRate
+  )?.decimalPlaces(2)
   const dailyLimit = convertDollarsToLocalAmount(
     DAILY_PAYMENT_LIMIT_CUSD,
     localCurrencyExchangeRate

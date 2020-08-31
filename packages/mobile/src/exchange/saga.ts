@@ -21,9 +21,11 @@ import {
   WithdrawCeloAction,
 } from 'src/exchange/actions'
 import { ExchangeRatePair, exchangeRatePairSelector } from 'src/exchange/reducer'
+import { celoToUsd } from 'src/exchange/utils'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { sendPaymentOrInviteSuccess } from 'src/send/actions'
 import { convertToContractDecimals, createTokenTransferTransaction } from 'src/tokens/saga'
 import { addStandbyTransaction, removeStandbyTransaction } from 'src/transactions/actions'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
@@ -381,6 +383,10 @@ function* withdrawCelo(action: WithdrawCeloAction) {
     )
 
     yield call(sendAndMonitorTransaction, tx, account, context, CURRENCY_ENUM.GOLD)
+
+    const cUsdAmount = yield call(celoToUsd, amount)
+    yield put(sendPaymentOrInviteSuccess(cUsdAmount))
+
     ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_completed, {
       amount: amount.toString(),
     })
