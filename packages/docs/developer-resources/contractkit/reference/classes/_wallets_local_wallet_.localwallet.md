@@ -2,13 +2,13 @@
 
 ## Hierarchy
 
-* [WalletBase](_wallets_wallet_.walletbase.md)
+* [WalletBase](_wallets_wallet_.walletbase.md)‹[LocalSigner](_wallets_signers_local_signer_.localsigner.md)›
 
   ↳ **LocalWallet**
 
 ## Implements
 
-* [Wallet](../interfaces/_wallets_wallet_.wallet.md)
+* [ReadOnlyWallet](../interfaces/_wallets_wallet_.readonlywallet.md)
 * [Wallet](../interfaces/_wallets_wallet_.wallet.md)
 
 ## Index
@@ -49,7 +49,7 @@ ___
 
 *Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[decrypt](_wallets_wallet_.walletbase.md#decrypt)*
 
-*Defined in [contractkit/src/wallets/wallet.ts:121](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L121)*
+*Defined in [contractkit/src/wallets/wallet.ts:133](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L133)*
 
 **Parameters:**
 
@@ -68,7 +68,7 @@ ___
 
 *Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[getAccounts](_wallets_wallet_.walletbase.md#getaccounts)*
 
-*Defined in [contractkit/src/wallets/wallet.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L30)*
+*Defined in [contractkit/src/wallets/wallet.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L42)*
 
 Gets a list of accounts that have been registered
 
@@ -82,7 +82,7 @@ ___
 
 *Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[hasAccount](_wallets_wallet_.walletbase.md#hasaccount)*
 
-*Defined in [contractkit/src/wallets/wallet.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L38)*
+*Defined in [contractkit/src/wallets/wallet.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L50)*
 
 Returns true if account has been registered
 
@@ -102,7 +102,7 @@ ___
 
 *Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[signPersonalMessage](_wallets_wallet_.walletbase.md#signpersonalmessage)*
 
-*Defined in [contractkit/src/wallets/wallet.ts:82](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L82)*
+*Defined in [contractkit/src/wallets/wallet.ts:94](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L94)*
 
 Sign a personal Ethereum signed message.
 
@@ -125,7 +125,7 @@ ___
 
 *Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[signTransaction](_wallets_wallet_.walletbase.md#signtransaction)*
 
-*Defined in [contractkit/src/wallets/wallet.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L61)*
+*Defined in [contractkit/src/wallets/wallet.ts:73](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L73)*
 
 Gets the signer based on the 'from' field in the tx body
 
@@ -145,7 +145,7 @@ ___
 
 *Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[signTypedData](_wallets_wallet_.walletbase.md#signtypeddata)*
 
-*Defined in [contractkit/src/wallets/wallet.ts:99](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L99)*
+*Defined in [contractkit/src/wallets/wallet.ts:111](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L111)*
 
 Sign an EIP712 Typed Data message.
 
