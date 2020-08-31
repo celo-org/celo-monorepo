@@ -1,7 +1,7 @@
 import { CeloTransactionObject } from '@celo/communication'
 import { privateKeyToAddress } from '@celo/utils/src/address'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
-import { RpcWallet } from '@celo/wallet-remote-rpc/src/rpc-wallet'
+import { RpcWallet } from '@celo/wallet-rpc/src/rpc-wallet'
 import BigNumber from 'bignumber.js'
 import { Clipboard, Linking, Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'

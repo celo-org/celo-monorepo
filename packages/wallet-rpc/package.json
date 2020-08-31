@@ -1,5 +1,5 @@
 {
-  "name": "@celo/wallet-remote-rpc",
+  "name": "@celo/wallet-rpc",
   "version": "0.0.1-dev",
   "description": "Geth RPC wallet implementation",
   "author": "Celo",

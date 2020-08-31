@@ -1,6 +1,6 @@
 import { generateKeys, generateMnemonic, MnemonicStrength } from '@celo/utils/src/account'
 import { privateKeyToAddress } from '@celo/utils/src/address'
-import { RpcWallet, RpcWalletErrors } from '@celo/wallet-remote-rpc/src/rpc-wallet'
+import { RpcWallet, RpcWalletErrors } from '@celo/wallet-rpc/src/rpc-wallet'
 import * as bip39 from 'react-native-bip39'
 import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { setAccountCreationTime, setPromptForno } from 'src/account/actions'

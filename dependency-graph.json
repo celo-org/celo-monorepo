@@ -117,7 +117,7 @@
       "@celo/react-components",
       "@celo/typescript",
       "@celo/utils",
-      "@celo/wallet-remote-rpc"
+      "@celo/wallet-rpc"
     ]
   },
   "@celo/moonpay-auth": {
@@ -233,7 +233,7 @@
       "@celo/wallet-base"
     ]
   },
-  "@celo/wallet-remote-rpc": {
+  "@celo/wallet-rpc": {
     "location": "packages/wallet-rpc",
     "dependencies": [
       "@celo/communication",
