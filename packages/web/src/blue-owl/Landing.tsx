@@ -81,19 +81,19 @@ export default function Landing() {
         <ContentPreview
           title={t('lesson1')}
           time={t('minutes', { count: 3 })}
-          href={'/lesson1'}
+          href={'https://coinbase.com/earn/celo/lesson/1'}
           src={lesson1Image}
         />
         <ContentPreview
           title={t('lesson2')}
           time={t('minutes', { count: 2 })}
-          href={'/lesson2'}
+          href={'https://coinbase.com/earn/celo/lesson/2'}
           src={lesson2Image}
         />
         <ContentPreview
           title={t('lesson3')}
           time={t('minutes', { count: 3 })}
-          href={'/lesson3'}
+          href={'https://coinbase.com/earn/celo/lesson/3'}
           src={lesson3Image}
         />
       </GridRow>
@@ -111,12 +111,12 @@ interface ContentPreviewProps {
 function ContentPreview({ title, time, href, src }: ContentPreviewProps) {
   return (
     <Cell span={Spans.third}>
-      <a href={href}>
+      <a href={href} target={'_blank'}>
         <AspectRatio ratio={612 / 343} style={styles.preview}>
           <Image style={standardStyles.image} source={src} />
         </AspectRatio>
       </a>
-      <Text accessibilityRole="link" href={href} style={fonts.h6}>
+      <Text target={'_blank'} accessibilityRole="link" href={href} style={fonts.h6}>
         {title}
       </Text>
       <Text style={[fonts.h6, styles.minutes]}>{time}</Text>
