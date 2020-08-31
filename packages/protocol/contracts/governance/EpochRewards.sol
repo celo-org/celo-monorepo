@@ -158,7 +158,10 @@ contract EpochRewards is
    * @return True upon success.
    */
   function setCommunityRewardFraction(uint256 value) public onlyOwner returns (bool) {
-    require(value != communityRewardFraction.unwrap() && value < FixidityLib.fixed1().unwrap());
+    require(
+      value != communityRewardFraction.unwrap() && value < FixidityLib.fixed1().unwrap(),
+      "Value must be different from existing community reward fraction and less than 1"
+    );
     communityRewardFraction = FixidityLib.wrap(value);
     emit CommunityRewardFractionSet(value);
     return true;
@@ -179,8 +182,11 @@ contract EpochRewards is
    * @return True upon success.
    */
   function setCarbonOffsettingFund(address partner, uint256 value) public onlyOwner returns (bool) {
-    require(partner != carbonOffsettingPartner || value != carbonOffsettingFraction.unwrap());
-    require(value < FixidityLib.fixed1().unwrap());
+    require(
+      partner != carbonOffsettingPartner || value != carbonOffsettingFraction.unwrap(),
+      "Partner and value must be different from existing carbon offsetting fund"
+    );
+    require(value < FixidityLib.fixed1().unwrap(), "Value must be less than 1");
     carbonOffsettingPartner = partner;
     carbonOffsettingFraction = FixidityLib.wrap(value);
     emit CarbonOffsettingFundSet(partner, value);
