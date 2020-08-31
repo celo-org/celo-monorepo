@@ -17,24 +17,21 @@ import { CeloExchangeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import AccountAddressInput from 'src/components/AccountAddressInput'
 import CeloAmountInput from 'src/components/CeloAmountInput'
-import { ADDRESS_LENGTH, exchangeRatePairSelector } from 'src/exchange/reducer'
+import { ADDRESS_LENGTH } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import { HeaderTitleWithBalance, headerWithBackButton } from 'src/navigator/Headers.v2'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import useSelector from 'src/redux/useSelector'
-import { validateDailyTransferLimit } from 'src/send/utils'
+import { useDailyTransferLimitValidator } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
-import { getRateForMakerToken, goldToDollarAmount } from 'src/utils/currencyExchange'
 
 type Props = StackScreenProps<StackParamList, Screens.WithdrawCeloScreen>
 
 function WithdrawCeloScreen({ navigation }: Props) {
   const [accountAddress, setAccountAddress] = useState('')
   const [celoInput, setCeloToTransfer] = useState('')
-
-  const exchangeRatePair = useSelector(exchangeRatePairSelector)
 
   const goldBalance = useSelector((state) => state.goldToken.balance)
   const goldBalanceNumber = new BigNumber(goldBalance || 0)
@@ -47,16 +44,14 @@ function WithdrawCeloScreen({ navigation }: Props) {
     celoToTransfer.isGreaterThan(0) &&
     celoToTransfer.isLessThanOrEqualTo(goldBalanceNumber)
 
-  const onConfirm = async () => {
-    const exchangeRate = getRateForMakerToken(
-      exchangeRatePair,
-      CURRENCY_ENUM.DOLLAR,
-      CURRENCY_ENUM.GOLD
-    )
-    const dollarAmount = goldToDollarAmount(celoToTransfer, exchangeRate) || new BigNumber(0)
+  const [isTransferLimitReached, showLimitReachedBanner] = useDailyTransferLimitValidator(
+    celoToTransfer,
+    CURRENCY_ENUM.GOLD
+  )
 
-    const isLimitReached = validateDailyTransferLimit(dollarAmount)
-    if (isLimitReached) {
+  const onConfirm = async () => {
+    if (isTransferLimitReached) {
+      showLimitReachedBanner()
       return
     }
 

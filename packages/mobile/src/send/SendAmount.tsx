@@ -51,8 +51,7 @@ import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { getRecipientVerificationStatus, Recipient, RecipientKind } from 'src/recipients/recipient'
 import useSelector from 'src/redux/useSelector'
-import { getRecentPayments } from 'src/send/selectors'
-import { getFeeType, validateDailyTransferLimit } from 'src/send/utils'
+import { getFeeType, useDailyTransferLimitValidator } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
@@ -191,7 +190,6 @@ function SendAmount(props: Props) {
     }),
     [recipient, dollarAmount]
   )
-  const recentPayments = useSelector(getRecentPayments)
   const localCurrencyAmount = convertDollarsToLocalAmount(dollarAmount, localCurrencyExchangeRate)
 
   const continueAnalyticsParams = React.useMemo(() => {
@@ -207,14 +205,19 @@ function SendAmount(props: Props) {
     }
   }, [props.route, localCurrencyCode, localCurrencyExchangeRate, dollarAmount])
 
+  const [isTransferLimitReached, showLimitReachedBanner] = useDailyTransferLimitValidator(
+    dollarAmount,
+    CURRENCY_ENUM.DOLLAR
+  )
+
   const onSend = React.useCallback(() => {
     if (!isDollarBalanceSufficient) {
       dispatch(showError(ErrorMessages.NSF_TO_SEND))
       return
     }
 
-    const isLimitReached = validateDailyTransferLimit(dollarAmount)
-    if (isLimitReached) {
+    if (isTransferLimitReached) {
+      showLimitReachedBanner()
       return
     }
 
@@ -241,13 +244,7 @@ function SendAmount(props: Props) {
         isFromScan: props.route.params?.isFromScan,
       })
     }
-  }, [
-    recipientVerificationStatus,
-    addressValidationType,
-    recentPayments,
-    dollarAmount,
-    getTransactionData,
-  ])
+  }, [recipientVerificationStatus, addressValidationType, dollarAmount, getTransactionData])
 
   const onRequest = React.useCallback(() => {
     if (dollarAmount.isGreaterThan(DAILY_PAYMENT_LIMIT_CUSD)) {

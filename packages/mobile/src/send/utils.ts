@@ -1,10 +1,14 @@
 import BigNumber from 'bignumber.js'
+import { useMemo } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { call, put, select, take } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ALERT_BANNER_DURATION, DAILY_PAYMENT_LIMIT_CUSD } from 'src/config'
+import { exchangeRatePairSelector } from 'src/exchange/reducer'
 import { FeeType } from 'src/fees/actions'
+import { CURRENCY_ENUM } from 'src/geth/consts'
 import { getAddressFromPhoneNumber } from 'src/identity/contactMapping'
 import { E164NumberToAddressType, SecureSendPhoneNumberMapping } from 'src/identity/reducer'
 import { RecipientVerificationStatus } from 'src/identity/types'
@@ -26,12 +30,11 @@ import {
   RecipientWithContact,
   RecipientWithQrCode,
 } from 'src/recipients/recipient'
-import { RootState } from 'src/redux/reducers'
-import { store } from 'src/redux/store'
 import { storeLatestInRecents } from 'src/send/actions'
 import { PaymentInfo } from 'src/send/reducers'
 import { getRecentPayments } from 'src/send/selectors'
 import { TransactionDataInput } from 'src/send/SendAmount'
+import { getRateForMakerToken, goldToDollarAmount } from 'src/utils/currencyExchange'
 import Logger from 'src/utils/Logger'
 import { timeDeltaInHours } from 'src/utils/time'
 
@@ -96,29 +99,41 @@ function dailySpent(now: number, recentPayments: PaymentInfo[]) {
   return amount
 }
 
-export function validateDailyTransferLimit(amountToTransfer: BigNumber): boolean {
-  return _validateDailyTransferLimitWithState(store.getState(), amountToTransfer)
-}
+export function useDailyTransferLimitValidator(
+  amount: BigNumber,
+  currency: CURRENCY_ENUM
+): [boolean, () => void] {
+  const dispatch = useDispatch()
 
-export function _validateDailyTransferLimitWithState(
-  state: RootState,
-  amountToTransfer: BigNumber
-): boolean {
-  const recentPayments = getRecentPayments(state)
-  const localCurrencyExchangeRate = getLocalCurrencyExchangeRate(state)
-  const localCurrencySymbol = getLocalCurrencySymbol(state)
+  const exchangeRatePair = useSelector(exchangeRatePairSelector)
+
+  const dollarAmount = useMemo(() => {
+    if (currency === CURRENCY_ENUM.DOLLAR) {
+      return amount
+    } else {
+      const exchangeRate = getRateForMakerToken(
+        exchangeRatePair,
+        CURRENCY_ENUM.DOLLAR,
+        CURRENCY_ENUM.GOLD
+      )
+      return goldToDollarAmount(amount, exchangeRate) || new BigNumber(0)
+    }
+  }, [amount])
+
+  const recentPayments = useSelector(getRecentPayments)
+  const localCurrencyExchangeRate = useSelector(getLocalCurrencyExchangeRate)
+  const localCurrencySymbol = useSelector(getLocalCurrencySymbol)
 
   const now = Date.now()
 
-  const dailyAmount = dailySpent(now, recentPayments) + amountToTransfer.toNumber()
+  const dailyAmount = dailySpent(now, recentPayments) + dollarAmount.toNumber()
   const isLimitReached = dailyAmount > DAILY_PAYMENT_LIMIT_CUSD
-  if (isLimitReached) {
-    store.dispatch(
+  const showLimitReachedBanner = () => {
+    dispatch(
       showLimitReachedError(now, recentPayments, localCurrencyExchangeRate, localCurrencySymbol)
     )
-    return true
   }
-  return false
+  return [isLimitReached, showLimitReachedBanner]
 }
 
 export function showLimitReachedError(
