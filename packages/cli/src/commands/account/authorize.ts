@@ -41,7 +41,7 @@ export default class Authorize extends BaseCommand {
 
   async run() {
     const res = this.parse(Authorize)
-    this.kit.defaultAccount = res.flags.from
+
     const accounts = await this.kit.contracts.getAccounts()
     const sig = accounts.parseSignatureOfAddress(
       res.flags.from,
