@@ -28,20 +28,9 @@
 
 ###  addAccount
 
-• **addAccount**: *function*
+• **addAccount**: *addInMemoryAccount | addRemoteAccount*
 
-*Defined in [contractkit/src/wallets/wallet.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L23)*
-
-#### Type declaration:
-
-▸ (`privateKey`: string, `passphrase`: string): *Promise‹string›*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`privateKey` | string |
-`passphrase` | string |
+*Defined in [contractkit/src/wallets/wallet.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L26)*
 
 ___
 

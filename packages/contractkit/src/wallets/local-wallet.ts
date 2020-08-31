@@ -8,13 +8,13 @@ export class LocalWallet extends WalletBase<LocalSigner> implements Wallet {
    * Register the private key as signer account
    * @param privateKey account private key
    */
-  addAccount(privateKey: string): Promise<string> {
+  addAccount(privateKey: string): void {
     // Prefix 0x here or else the signed transaction produces dramatically different signer!!!
     privateKey = normalizeAddressWith0x(privateKey)
     const accountAddress = normalizeAddressWith0x(privateKeyToAddress(privateKey))
-    if (!this.hasAccount(accountAddress)) {
-      this.addSigner(accountAddress, new LocalSigner(privateKey))
+    if (this.hasAccount(accountAddress)) {
+      return
     }
-    return Promise.resolve(accountAddress)
+    this.addSigner(accountAddress, new LocalSigner(privateKey))
   }
 }

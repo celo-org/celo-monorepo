@@ -28,22 +28,11 @@
 
 ###  addAccount
 
-• **addAccount**: *function*
+• **addAccount**: *addInMemoryAccount | addRemoteAccount*
 
 *Inherited from [Wallet](_wallets_wallet_.wallet.md).[addAccount](_wallets_wallet_.wallet.md#addaccount)*
 
-*Defined in [contractkit/src/wallets/wallet.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L23)*
-
-#### Type declaration:
-
-▸ (`privateKey`: string, `passphrase`: string): *Promise‹string›*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`privateKey` | string |
-`passphrase` | string |
+*Defined in [contractkit/src/wallets/wallet.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L26)*
 
 ___
 
@@ -106,7 +95,7 @@ ___
 
 • **isAccountUnlocked**: *function*
 
-*Defined in [contractkit/src/wallets/wallet.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L28)*
+*Defined in [contractkit/src/wallets/wallet.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L31)*
 
 #### Type declaration:
 
@@ -186,7 +175,7 @@ ___
 
 • **unlockAccount**: *function*
 
-*Defined in [contractkit/src/wallets/wallet.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L27)*
+*Defined in [contractkit/src/wallets/wallet.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L30)*
 
 #### Type declaration:
 

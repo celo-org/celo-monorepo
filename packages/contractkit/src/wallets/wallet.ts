@@ -19,8 +19,11 @@ export interface ReadOnlyWallet {
   decrypt: (address: Address, ciphertext: Buffer) => Promise<Buffer>
 }
 
+type addInMemoryAccount = (privateKey: string) => void
+type addRemoteAccount = (privateKey: string, passphrase: string) => Promise<string>
+
 export interface Wallet extends ReadOnlyWallet {
-  addAccount: (privateKey: string, passphrase: string) => Promise<string>
+  addAccount: addInMemoryAccount | addRemoteAccount
 }
 
 export interface UnlockableWallet extends Wallet {
