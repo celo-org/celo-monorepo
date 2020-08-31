@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native'
 import Cover from 'src/blue-owl/Cover'
+import learnLogo from 'src/blue-owl/Learn_Light.png'
 import lesson1Image from 'src/blue-owl/lesson1.jpg'
 import lesson2Image from 'src/blue-owl/lesson2.jpg'
 import lesson3Image from 'src/blue-owl/lesson3.jpg'
@@ -11,7 +12,6 @@ import { NameSpaces, useTranslation } from 'src/i18n'
 import nonProfitIMG from 'src/icons/non-profit-light-bg.png'
 import sendToPhoneImg from 'src/icons/sent-to-phone_light-bg.png'
 import valora from 'src/icons/valora-icon.png'
-import sequenceTopImage from 'src/illustrations/03-Inclusive-money-(light-bg).png'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { useScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
@@ -73,14 +73,29 @@ export default function Landing() {
       </GridRow>
       <GridRow allStyle={standardStyles.elementalMarginBottom}>
         <Cell span={Spans.full} style={!isMobile && standardStyles.centered}>
-          <Image source={sequenceTopImage} style={styles.logo} resizeMode="contain" />
+          <Image source={learnLogo} style={styles.logo} resizeMode="contain" />
           <H4>{t('sequenceTitle')}</H4>
         </Cell>
       </GridRow>
       <GridRow>
-        <ContentPreview title={t('lesson1')} time={'2 min'} href={'/lesson1'} src={lesson1Image} />
-        <ContentPreview title={t('lesson2')} time={'5 min'} href={'/lesson2'} src={lesson2Image} />
-        <ContentPreview title={t('lesson3')} time={'3 min'} href={'/lesson3'} src={lesson3Image} />
+        <ContentPreview
+          title={t('lesson1')}
+          time={t('minutes', { count: 3 })}
+          href={'/lesson1'}
+          src={lesson1Image}
+        />
+        <ContentPreview
+          title={t('lesson2')}
+          time={t('minutes', { count: 2 })}
+          href={'/lesson2'}
+          src={lesson2Image}
+        />
+        <ContentPreview
+          title={t('lesson3')}
+          time={t('minutes', { count: 3 })}
+          href={'/lesson3'}
+          src={lesson3Image}
+        />
       </GridRow>
     </View>
   )
@@ -114,7 +129,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   preview: { marginBottom: 15 },
-  logo: { width: 275, height: 75, backgroundColor: colors.lightBlue },
+  logo: { width: 239, height: 77 },
   valora: { height: 70, width: 70 },
   valoraDesktop: { marginTop: 30, height: 70, width: 70 },
   minutes: { color: colors.grayHeavy, marginTop: 2 },

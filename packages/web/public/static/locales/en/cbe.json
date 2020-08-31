@@ -1,5 +1,5 @@
 {
-  "pageTitle": "CBE",
+  "pageTitle": "Learn about Celo on Coinbase",
   "description": "Learn about how the Celo community is creating an open, accessible, and mobile-first financial system.",
   "mainTitle": "Mobile-first financial solutions",
   "subTitle": "Empowering 6B mobile phone users worldwide with",
@@ -18,8 +18,9 @@
     "text": "Start sending and sharing value easily around the world with Valora.",
     "link": "Get Valora"
   },
-  "sequenceTitle": "Hello Lemons in Cornish Earl",
+  "sequenceTitle": "Celo Lessons on Coinbase Earn",
   "lesson1": "Lesson 1: What is the Celo Platform?",
   "lesson2": "Lesson 2: What is CELO?",
-  "lesson3": "Lesson 3: What can Celo Dollars do?"
+  "lesson3": "Lesson 3: What can Celo Dollars do?",
+  "minutes": "{{count}} minutes"
 }

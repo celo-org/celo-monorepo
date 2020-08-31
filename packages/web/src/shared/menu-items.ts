@@ -53,8 +53,8 @@ export const pagePaths = {
     isDark: true,
   },
   CBE: {
-    name: 'CBE',
-    link: '/cbe',
+    name: 'Coinbase',
+    link: '/coinbase',
     isDark: false,
     translucent: {
       backgroundHover: 'rgba(22, 82, 235, 0.6)',

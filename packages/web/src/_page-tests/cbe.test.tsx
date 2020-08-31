@@ -1,4 +1,4 @@
-import CBE from 'pages/cbe'
+import CBE from 'pages/coinbase'
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
 import { TestProvider } from 'src/_page-tests/test-utils'
