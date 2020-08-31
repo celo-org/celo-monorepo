@@ -499,7 +499,6 @@ contract EpochRewards is
   function calculateTargetEpochRewards()
     external
     view
-    onlyWhenNotFrozen
     returns (uint256, uint256, uint256, uint256)
   {
     uint256 targetVoterReward = getTargetVoterRewards();

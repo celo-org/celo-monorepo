@@ -926,7 +926,7 @@ contract Election is
    *   method.
    * @return The list of elected validators.
    */
-  function electValidatorSigners() external view onlyWhenNotFrozen returns (address[] memory) {
+  function electValidatorSigners() external view returns (address[] memory) {
     return electNValidatorSigners(electableValidators.min, electableValidators.max);
   }
 
