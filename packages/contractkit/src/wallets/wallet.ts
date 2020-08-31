@@ -10,7 +10,7 @@ import {
 } from '../utils/signing-utils'
 import { Signer } from './signers/signer'
 
-export interface Wallet {
+export interface ReadOnlyWallet {
   getAccounts: () => Address[]
   hasAccount: (address?: Address) => boolean
   signTransaction: (txParams: Tx) => Promise<EncodedTransaction>
@@ -19,13 +19,16 @@ export interface Wallet {
   decrypt: (address: Address, ciphertext: Buffer) => Promise<Buffer>
 }
 
-export interface WritableWallet extends Wallet {
-  isAccountUnlocked: (address: string) => boolean
-  unlockAccount: (address: string, passphrase: string, duration: number) => Promise<boolean>
+export interface Wallet extends ReadOnlyWallet {
   addAccount: (privateKey: string, passphrase: string) => Promise<string>
 }
 
-export abstract class WalletBase<TSigner extends Signer> implements Wallet {
+export interface UnlockableWallet extends Wallet {
+  unlockAccount: (address: string, passphrase: string, duration: number) => Promise<boolean>
+  isAccountUnlocked: (address: string) => boolean
+}
+
+export abstract class WalletBase<TSigner extends Signer> implements ReadOnlyWallet {
   // By creating the Signers in advance we can have a common pattern across wallets
   // Each implementation is responsible for populating this map through addSigner
   private accountSigners = new Map<Address, TSigner>()

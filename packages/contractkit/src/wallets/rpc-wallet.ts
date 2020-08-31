@@ -4,7 +4,7 @@ import { provider, Tx } from 'web3-core'
 import { DefaultRpcCaller, RpcCaller } from '../utils/rpc-caller'
 import { RemoteWallet } from './remote-wallet'
 import { RpcSigner } from './signers/rpc-signer'
-import { WritableWallet } from './wallet'
+import { UnlockableWallet } from './wallet'
 
 export enum RpcWalletErrors {
   FetchAccounts = 'RpcWallet: failed to fetch accounts from server',
@@ -15,7 +15,7 @@ export enum RpcWalletErrors {
  *   WARNING: This class should only be used with well-permissioned providers (ie IPC)
  *   to avoid sensitive user 'privateKey' and 'passphrase' information being exposed
  */
-export class RpcWallet extends RemoteWallet<RpcSigner> implements WritableWallet {
+export class RpcWallet extends RemoteWallet<RpcSigner> implements UnlockableWallet {
   protected readonly rpc: RpcCaller
 
   constructor(protected _provider: provider) {

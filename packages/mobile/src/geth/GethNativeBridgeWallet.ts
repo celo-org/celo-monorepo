@@ -1,5 +1,5 @@
 import { RemoteWallet } from '@celo/contractkit/lib/wallets/remote-wallet'
-import { WritableWallet } from '@celo/contractkit/lib/wallets/wallet'
+import { UnlockableWallet } from '@celo/contractkit/lib/wallets/wallet'
 import {
   ensureLeading0x,
   normalizeAddressWith0x,
@@ -14,7 +14,7 @@ import { Tx } from 'web3-core'
 const TAG = 'geth/GethNativeBridgeWallet'
 
 export class GethNativeBridgeWallet extends RemoteWallet<GethNativeBridgeSigner>
-  implements WritableWallet {
+  implements UnlockableWallet {
   /**
    * Construct a React Native geth wallet which uses the bridge methods
    * instead of communicating with a node

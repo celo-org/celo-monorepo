@@ -8,9 +8,9 @@
 
 ## Implements
 
-* [Wallet](../interfaces/_wallets_wallet_.wallet.md)
-* [Wallet](../interfaces/_wallets_wallet_.wallet.md)
-* [WritableWallet](../interfaces/_wallets_wallet_.writablewallet.md)
+* [ReadOnlyWallet](../interfaces/_wallets_wallet_.readonlywallet.md)
+* [ReadOnlyWallet](../interfaces/_wallets_wallet_.readonlywallet.md)
+* [UnlockableWallet](../interfaces/_wallets_wallet_.unlockablewallet.md)
 
 ## Index
 
@@ -74,7 +74,7 @@ ___
 
 *Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[decrypt](_wallets_wallet_.walletbase.md#decrypt)*
 
-*Defined in [contractkit/src/wallets/wallet.ts:127](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L127)*
+*Defined in [contractkit/src/wallets/wallet.ts:130](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L130)*
 
 **Parameters:**
 

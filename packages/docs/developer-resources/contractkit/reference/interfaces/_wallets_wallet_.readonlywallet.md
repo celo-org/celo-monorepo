@@ -1,55 +1,45 @@
-# Interface: WritableWallet
+# Interface: ReadOnlyWallet
 
 ## Hierarchy
 
-* [Wallet](_wallets_wallet_.wallet.md)
+* **ReadOnlyWallet**
 
-  ↳ **WritableWallet**
+  ↳ [Wallet](_wallets_wallet_.wallet.md)
 
 ## Implemented by
 
+* [AwsHsmWallet](../classes/_wallets_aws_hsm_wallet_.awshsmwallet.md)
+* [AwsHsmWallet](../classes/_wallets_aws_hsm_wallet_.awshsmwallet.md)
+* [AwsHsmWallet](../classes/_wallets_aws_hsm_wallet_.awshsmwallet.md)
+* [AzureHSMWallet](../classes/_wallets_azure_hsm_wallet_.azurehsmwallet.md)
+* [AzureHSMWallet](../classes/_wallets_azure_hsm_wallet_.azurehsmwallet.md)
+* [AzureHSMWallet](../classes/_wallets_azure_hsm_wallet_.azurehsmwallet.md)
+* [LedgerWallet](../classes/_wallets_ledger_wallet_.ledgerwallet.md)
+* [LedgerWallet](../classes/_wallets_ledger_wallet_.ledgerwallet.md)
+* [LedgerWallet](../classes/_wallets_ledger_wallet_.ledgerwallet.md)
+* [LocalWallet](../classes/_wallets_local_wallet_.localwallet.md)
+* [RemoteWallet](../classes/_wallets_remote_wallet_.remotewallet.md)
+* [RemoteWallet](../classes/_wallets_remote_wallet_.remotewallet.md)
 * [RpcWallet](../classes/_wallets_rpc_wallet_.rpcwallet.md)
+* [RpcWallet](../classes/_wallets_rpc_wallet_.rpcwallet.md)
+* [WalletBase](../classes/_wallets_wallet_.walletbase.md)
 
 ## Index
 
 ### Properties
 
-* [addAccount](_wallets_wallet_.writablewallet.md#addaccount)
-* [decrypt](_wallets_wallet_.writablewallet.md#decrypt)
-* [getAccounts](_wallets_wallet_.writablewallet.md#getaccounts)
-* [hasAccount](_wallets_wallet_.writablewallet.md#hasaccount)
-* [isAccountUnlocked](_wallets_wallet_.writablewallet.md#isaccountunlocked)
-* [signPersonalMessage](_wallets_wallet_.writablewallet.md#signpersonalmessage)
-* [signTransaction](_wallets_wallet_.writablewallet.md#signtransaction)
-* [signTypedData](_wallets_wallet_.writablewallet.md#signtypeddata)
-* [unlockAccount](_wallets_wallet_.writablewallet.md#unlockaccount)
+* [decrypt](_wallets_wallet_.readonlywallet.md#decrypt)
+* [getAccounts](_wallets_wallet_.readonlywallet.md#getaccounts)
+* [hasAccount](_wallets_wallet_.readonlywallet.md#hasaccount)
+* [signPersonalMessage](_wallets_wallet_.readonlywallet.md#signpersonalmessage)
+* [signTransaction](_wallets_wallet_.readonlywallet.md#signtransaction)
+* [signTypedData](_wallets_wallet_.readonlywallet.md#signtypeddata)
 
 ## Properties
-
-###  addAccount
-
-• **addAccount**: *function*
-
-*Defined in [contractkit/src/wallets/wallet.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L25)*
-
-#### Type declaration:
-
-▸ (`privateKey`: string, `passphrase`: string): *Promise‹string›*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`privateKey` | string |
-`passphrase` | string |
-
-___
 
 ###  decrypt
 
 • **decrypt**: *function*
-
-*Inherited from [Wallet](_wallets_wallet_.wallet.md).[decrypt](_wallets_wallet_.wallet.md#decrypt)*
 
 *Defined in [contractkit/src/wallets/wallet.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L19)*
 
@@ -70,8 +60,6 @@ ___
 
 • **getAccounts**: *function*
 
-*Inherited from [Wallet](_wallets_wallet_.wallet.md).[getAccounts](_wallets_wallet_.wallet.md#getaccounts)*
-
 *Defined in [contractkit/src/wallets/wallet.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L14)*
 
 #### Type declaration:
@@ -83,8 +71,6 @@ ___
 ###  hasAccount
 
 • **hasAccount**: *function*
-
-*Inherited from [Wallet](_wallets_wallet_.wallet.md).[hasAccount](_wallets_wallet_.wallet.md#hasaccount)*
 
 *Defined in [contractkit/src/wallets/wallet.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L15)*
 
@@ -100,29 +86,9 @@ Name | Type |
 
 ___
 
-###  isAccountUnlocked
-
-• **isAccountUnlocked**: *function*
-
-*Defined in [contractkit/src/wallets/wallet.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L23)*
-
-#### Type declaration:
-
-▸ (`address`: string): *boolean*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`address` | string |
-
-___
-
 ###  signPersonalMessage
 
 • **signPersonalMessage**: *function*
-
-*Inherited from [Wallet](_wallets_wallet_.wallet.md).[signPersonalMessage](_wallets_wallet_.wallet.md#signpersonalmessage)*
 
 *Defined in [contractkit/src/wallets/wallet.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L18)*
 
@@ -143,8 +109,6 @@ ___
 
 • **signTransaction**: *function*
 
-*Inherited from [Wallet](_wallets_wallet_.wallet.md).[signTransaction](_wallets_wallet_.wallet.md#signtransaction)*
-
 *Defined in [contractkit/src/wallets/wallet.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L16)*
 
 #### Type declaration:
@@ -163,8 +127,6 @@ ___
 
 • **signTypedData**: *function*
 
-*Inherited from [Wallet](_wallets_wallet_.wallet.md).[signTypedData](_wallets_wallet_.wallet.md#signtypeddata)*
-
 *Defined in [contractkit/src/wallets/wallet.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L17)*
 
 #### Type declaration:
@@ -177,23 +139,3 @@ Name | Type |
 ------ | ------ |
 `address` | [Address](../modules/_base_.md#address) |
 `typedData` | EIP712TypedData |
-
-___
-
-###  unlockAccount
-
-• **unlockAccount**: *function*
-
-*Defined in [contractkit/src/wallets/wallet.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L24)*
-
-#### Type declaration:
-
-▸ (`address`: string, `passphrase`: string, `duration`: number): *Promise‹boolean›*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`address` | string |
-`passphrase` | string |
-`duration` | number |

@@ -1,5 +1,5 @@
 import { RpcWalletErrors } from '@celo/contractkit/lib/wallets/rpc-wallet'
-import { WritableWallet } from '@celo/contractkit/lib/wallets/wallet'
+import { UnlockableWallet } from '@celo/contractkit/lib/wallets/wallet'
 import { generateKeys, generateMnemonic, MnemonicStrength } from '@celo/utils/src/account'
 import { privateKeyToAddress } from '@celo/utils/src/address'
 import * as bip39 from 'react-native-bip39'
@@ -211,7 +211,7 @@ export function* getOrCreateAccount() {
 export function* assignAccountFromPrivateKey(privateKey: string, mnemonic: string) {
   try {
     const account = privateKeyToAddress(privateKey)
-    const wallet: WritableWallet = yield call(getWallet)
+    const wallet: UnlockableWallet = yield call(getWallet)
     const password: string = yield call(getPasswordSaga, account, false, true)
 
     try {
@@ -257,7 +257,7 @@ export function* getAccount() {
 
 export function* unlockAccount(account: string) {
   Logger.debug(TAG + '@unlockAccount', `Unlocking account: ${account}`)
-  const wallet: WritableWallet = yield call(getWallet)
+  const wallet: UnlockableWallet = yield call(getWallet)
   if (wallet.isAccountUnlocked(account)) {
     return true
   }

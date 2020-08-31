@@ -7,7 +7,7 @@ import { zeroRange } from '../utils/array'
 import { transportErrorFriendlyMessage } from '../utils/ledger-utils'
 import { RemoteWallet } from './remote-wallet'
 import { LedgerSigner } from './signers/ledger-signer'
-import { Wallet } from './wallet'
+import { ReadOnlyWallet } from './wallet'
 
 export const CELO_BASE_DERIVATION_PATH = CELO_DERIVATION_PATH_BASE.slice(2)
 const ADDRESS_QTY = 5
@@ -42,7 +42,7 @@ export async function newLedgerWalletWithSetup(
 
 const debug = debugFactory('kit:wallet:ledger')
 
-export class LedgerWallet extends RemoteWallet<LedgerSigner> implements Wallet {
+export class LedgerWallet extends RemoteWallet<LedgerSigner> implements ReadOnlyWallet {
   private ledger: any
 
   /**

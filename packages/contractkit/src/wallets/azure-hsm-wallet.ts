@@ -4,12 +4,12 @@ import { AzureKeyVaultClient } from '../utils/azure-key-vault-client'
 import { getAddressFromPublicKey } from '../utils/signing-utils'
 import { RemoteWallet } from './remote-wallet'
 import { AzureHSMSigner } from './signers/azure-hsm-signer'
-import { Wallet } from './wallet'
+import { ReadOnlyWallet } from './wallet'
 
 const debug = debugFactory('kit:wallet:aws-hsm-wallet')
 
 // Azure Key Vault implementation of a RemoteWallet
-export class AzureHSMWallet extends RemoteWallet<AzureHSMSigner> implements Wallet {
+export class AzureHSMWallet extends RemoteWallet<AzureHSMSigner> implements ReadOnlyWallet {
   private readonly vaultName: string
   private keyVaultClient: AzureKeyVaultClient | undefined
 
