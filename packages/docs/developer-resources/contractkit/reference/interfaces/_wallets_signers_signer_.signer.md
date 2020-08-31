@@ -6,19 +6,40 @@
 
 ## Implemented by
 
+* [AwsHsmSigner](../classes/_wallets_signers_aws_hsm_signer_.awshsmsigner.md)
 * [AzureHSMSigner](../classes/_wallets_signers_azure_hsm_signer_.azurehsmsigner.md)
 * [LedgerSigner](../classes/_wallets_signers_ledger_signer_.ledgersigner.md)
 * [LocalSigner](../classes/_wallets_signers_local_signer_.localsigner.md)
+* [RpcSigner](../classes/_wallets_signers_rpc_signer_.rpcsigner.md)
 
 ## Index
 
 ### Properties
 
+* [decrypt](_wallets_signers_signer_.signer.md#decrypt)
 * [getNativeKey](_wallets_signers_signer_.signer.md#getnativekey)
 * [signPersonalMessage](_wallets_signers_signer_.signer.md#signpersonalmessage)
 * [signTransaction](_wallets_signers_signer_.signer.md#signtransaction)
 
 ## Properties
+
+###  decrypt
+
+• **decrypt**: *function*
+
+*Defined in [contractkit/src/wallets/signers/signer.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/signer.ts#L15)*
+
+#### Type declaration:
+
+▸ (`ciphertext`: Buffer): *Promise‹Buffer›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`ciphertext` | Buffer |
+
+___
 
 ###  getNativeKey
 

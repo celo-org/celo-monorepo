@@ -1,3 +1,7 @@
+export interface MenuLink {
+  name: string
+  link: string
+}
 export const pagePaths = {
   HOME: {
     name: 'Home',
@@ -55,6 +59,10 @@ export const pagePaths = {
     name: 'Join',
     link: '/jobs',
   },
+  MERCHANTS: {
+    name: 'MerchantKit',
+    link: '/experience/merchant',
+  },
   PRIVACY: {
     name: 'Privacy Policy',
     link: '/privacy',
@@ -62,6 +70,10 @@ export const pagePaths = {
   PAPERS: {
     name: 'White Papers',
     link: '/papers',
+  },
+  PRESS: {
+    name: 'Press',
+    link: '/press',
   },
   TECH: {
     name: 'Technology',
@@ -113,6 +125,7 @@ export enum CeloLinks {
   gettingStarted = 'https://docs.celo.org/getting-started/alfajores-testnet',
   coinlist = 'https://coinlist.co/celo?utm_source=celo%20website&utm_medium=website%20widget&utm_campaign=celowebsite_20200318',
   gitHub = 'https://github.com/celo-org',
+  reserve = 'https://www.celoreserve.org',
   instagram = 'https://www.instagram.com/celoorg/',
   twitter = 'https://twitter.com/CeloOrg',
   medium = 'https://medium.com/celoOrg',

@@ -11,15 +11,16 @@
   "contacts": "Contactos",
   "invite": "Invitar",
   "sendTo": "Enviar a",
-  "amount": "Monto",
   "celoDollarAmount": "<0></0> {{CeloDollar}}",
   "celoDollarAmount_plural": "<0></0> {{CeloDollars}}",
   "addDescription": "Agregar descripción",
   "sentTo": "Enviado A",
+  "withdrawnTo": "Retirado en",
   "receivedFrom": "Recibido De",
   "accountNumberLabel": "Cuenta\nNo.",
   "commentLabel": "Mensaje",
   "amountSent": "Cantidad Enviada",
+  "amountCeloWithdrawn": "Cantidad (CELO)",
   "fee": "Comisión",
   "securityFee": "Comisión de seguridad",
   "inviteFee": "Comisión de Invitación",
@@ -33,21 +34,20 @@
   "activity": "Actividad",
   "exchange": "Cambio",
   "inviteSendTo": "Invitar y enviar a",
-  "keepMoneySafe": "Mantendremos este dinero seguro hasta que tu amigo cree una cuenta de Celo",
+  "keepMoneySafe": "Mantendremos este dinero seguro hasta que tu amigo cree una cuenta de {{appName}}",
   "searchFriends": "Ingrese un número de teléfono si no encuentra a la persona que busca",
   "inviteVerifyPayment": "Invitar y verificar el pago",
   "inviteFriends": "Invitar a amigos",
   "noResultsFor": "Sin resultados para",
   "noContacts": "No se encontraron contactos",
   "searchForSomeone": "Busque a alguien según el nombre, el número de teléfono, o el dirección",
-  "nameOrPhoneNumber": "Nombre o número de teléfono",
   "pending": "Pendiente",
   "sentPayment": "Enviar pago",
   "sentEscrowPayment": "Pago de depósito enviado",
   "mobileNumber": "Número de teléfono",
   "walletAddress": "Dirección del Monedero",
-  "inviteSMS": "¡Bienvenido a Celo! Obtén Celo en {{link}} e ingresa tu código para comenzar: {{code}}",
-  "inviteSMSWithEscrowedPayment": "¡Bienvenido a Celo! Te he enviado Dólares Celo. Obtenga en {{link}} e ingrese su código para comenzar: {{code}}",
+  "inviteSMS": "¡Bienvenido a {{appName}}! Obtén {{appName}} en {{link}} e ingresa tu código para comenzar: {{code}}",
+  "inviteSMSWithEscrowedPayment": "¡Bienvenido a {{appName}}! Te he enviado Dólares Celo. Obtenga en {{link}} e ingrese su código para comenzar: {{code}}",
   "inviteSent": "Código de invitación enviado!",
   "inviteFailed": "Falló el envío de la invitación",
   "loadingContacts": "Encontrando tus contactos",
@@ -89,8 +89,8 @@
     "button": "Confirma el número de cuenta"
   },
   "secureSendExplanation": {
-    "body1": "{{e164PhoneNumber}} tiene multipes cuentas asociadas. {{displayName}} puede haber creado una nueva cuenta de Celo, perdido su teléfono o su cuenta puede haber sido interceptada o comprometida.",
-    "body1NoDisplayName": "Su contacto tiene varias cuentas asociadas. Su contacto podría haber creado una nueva cuenta de Celo, o podría haber perdido su teléfono o haber comprometido su cuenta.",
+    "body1": "{{e164PhoneNumber}} tiene multipes cuentas asociadas. {{displayName}} puede haber creado una nueva cuenta de {{appName}}, perdido su teléfono o su cuenta puede haber sido interceptada o comprometida.",
+    "body1NoDisplayName": "Su contacto tiene varias cuentas asociadas. Su contacto podría haber creado una nueva cuenta de {{appName}}, o podría haber perdido su teléfono o haber comprometido su cuenta.",
     "body2": "Puedes realizar esto escaneando el código QR o confirmado su número de cuenta directamente antes de realizar transacciones"
   },
   "confirmAccountNumber": {
@@ -115,5 +115,13 @@
   "addressConfirmed": "Número de cuenta confirmado",
   "sending": "Enviando",
   "feeActual": "Tarifas",
-  "feeEstimate": "Tarifas estimadas"
+  "feeEstimate": "Tarifas estimadas",
+  "encryption": {
+    "warningLabel": "Este comentario no será encriptado",
+    "warningModalHeader": "Sobre Cifrado",
+    "warningModalBody": "El cifrado garantiza que sus comentarios se mantengan privados. Valora utiliza el cifrado en los comentarios de transacciones cuando el remitente y el receptor tienen esta función configurada. La configuración normalmente se realizará automáticamente una vez que un usuario envíe su primera transacción.",
+    "feeLabel": "Tarifa de Cifrado Unica",
+    "feeModalHeader": "Tarifa de Cifrado Unica",
+    "feeModalBody": "El cifrado ayuda a mantener la privacidad de sus datos confidenciales. Se agrega una pequeña tarifa única a su primera transacción para configurar el cifrado. Esto garantiza que sus comentarios se enviarán de forma segura y privada."
+  }
 }

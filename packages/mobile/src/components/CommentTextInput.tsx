@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import * as React from 'react'
 import {
@@ -29,7 +29,7 @@ export default function CommentTextInput({ testID, onCommentChange, comment, onB
     <TextInput
       testID={`commentInput/${testID}`}
       style={styles.inputContainer}
-      autoFocus={true}
+      autoFocus={false}
       multiline={true}
       numberOfLines={5}
       maxLength={MAX_COMMENT_LENGTH}
@@ -49,7 +49,8 @@ const styles = StyleSheet.create({
     flex: 1,
     // Fixed height to increase surface area for input
     // to focus on press
-    height: 200,
+    height: 100,
+    textAlignVertical: 'top',
     alignSelf: 'stretch',
     ...fontStyles.large,
   },

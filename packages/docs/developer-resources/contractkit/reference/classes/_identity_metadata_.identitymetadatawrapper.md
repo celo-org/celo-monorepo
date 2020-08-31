@@ -60,17 +60,17 @@ Name | Type |
 
 ###  claims
 
-• **get claims**(): *object | object | object | object | object[]*
+• **get claims**(): *object | object | object | object | object | object[]*
 
 *Defined in [contractkit/src/identity/metadata.ts:125](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L125)*
 
-**Returns:** *object | object | object | object | object[]*
+**Returns:** *object | object | object | object | object | object[]*
 
 ## Methods
 
 ###  addClaim
 
-▸ **addClaim**(`claim`: [Claim](../modules/_identity_claims_claim_.md#claim), `signer`: Signer): *Promise‹object | object | object | object | object›*
+▸ **addClaim**(`claim`: [Claim](../modules/_identity_claims_claim_.md#claim), `signer`: Signer): *Promise‹object | object | object | object | object | object›*
 
 *Defined in [contractkit/src/identity/metadata.ts:140](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L140)*
 
@@ -81,7 +81,7 @@ Name | Type |
 `claim` | [Claim](../modules/_identity_claims_claim_.md#claim) |
 `signer` | Signer |
 
-**Returns:** *Promise‹object | object | object | object | object›*
+**Returns:** *Promise‹object | object | object | object | object | object›*
 
 ___
 

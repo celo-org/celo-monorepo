@@ -1,10 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ImportWalletSocial renders correctly and is disabled with no text 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
     }
@@ -111,6 +110,7 @@ exports[`ImportWalletSocial renders correctly and is disabled with no text 1`] =
                 "fontFamily": "Inter-Medium",
                 "fontSize": 16,
                 "lineHeight": 22,
+                "marginBottom": 8,
               }
             }
           >
@@ -184,6 +184,7 @@ exports[`ImportWalletSocial renders correctly and is disabled with no text 1`] =
                 "fontFamily": "Inter-Medium",
                 "fontSize": 16,
                 "lineHeight": 22,
+                "marginBottom": 8,
               }
             }
           >
@@ -271,7 +272,7 @@ exports[`ImportWalletSocial renders correctly and is disabled with no text 1`] =
         null,
         undefined,
         Object {
-          "backgroundColor": "#A3EBC6",
+          "backgroundColor": "#97DFC1",
         },
       ]
     }
@@ -300,7 +301,7 @@ exports[`ImportWalletSocial renders correctly and is disabled with no text 1`] =
             "justifyContent": "center",
           },
           Object {
-            "backgroundColor": "#A3EBC6",
+            "backgroundColor": "#97DFC1",
           },
           Object {
             "height": 50,
@@ -344,5 +345,21 @@ exports[`ImportWalletSocial renders correctly and is disabled with no text 1`] =
       </View>
     </View>
   </View>
-</SafeAreaView>
+  <View
+    collapsable={false}
+    style={
+      Array [
+        Object {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+        },
+        Object {
+          "height": 0,
+        },
+        undefined,
+      ]
+    }
+  />
+</RNCSafeAreaView>
 `;

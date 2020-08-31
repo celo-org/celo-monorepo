@@ -3,11 +3,12 @@
  */
 
 import CircleButton from '@celo/react-components/components/CircleButton'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import * as React from 'react'
 import {
   NativeSyntheticEvent,
+  Platform,
   StyleProp,
   StyleSheet,
   TextInput as RNTextInput,
@@ -81,7 +82,7 @@ export class CTextInput extends React.Component<Props, State> {
           onFocus={this.handleInputFocus}
           onBlur={this.handleInputBlur}
         />
-        {isFocused && !!value && showClearButton && (
+        {!passThroughProps.multiline && isFocused && !!value && showClearButton && (
           <CircleButton
             style={styles.icon}
             onPress={this.onClear}
@@ -115,6 +116,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     paddingHorizontal: 0,
+    lineHeight: Platform.select({ android: 22, ios: 20 }), // vertical align = center
   },
   icon: {
     marginLeft: 8,

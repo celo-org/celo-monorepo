@@ -1,3 +1,4 @@
+import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import { IdentifierLookupResult } from '@celo/contractkit/lib/wrappers/Attestations'
 import { hexToBuffer } from '@celo/utils/src/address'
 import { expectSaga } from 'redux-saga-test-plan'
@@ -11,20 +12,19 @@ import {
   embedPhoneNumberMetadata,
   encryptComment,
   extractPhoneNumberMetadata,
-  getCommentKey,
 } from 'src/identity/commentEncryption'
 import { lookupAttestationIdentifiers } from 'src/identity/contactMapping'
-import { PhoneNumberHashDetails } from 'src/identity/privateHashing'
 import { e164NumberToAddressSelector, e164NumberToSaltSelector } from 'src/identity/reducer'
-import { privateCommentKeySelector } from 'src/web3/selectors'
+import { doFetchDataEncryptionKey } from 'src/web3/dataEncryptionKey'
+import { dataEncryptionKeySelector } from 'src/web3/selectors'
 import { getMockStoreData } from 'test/utils'
 import {
   mockAccount,
   mockAccount2,
   mockComment,
   mockE164Number,
-  mockE164NumberHashWithSalt,
-  mockE164NumberSalt,
+  mockE164NumberHashWithPepper,
+  mockE164NumberPepper,
   mockPrivateDEK,
   mockPrivateDEK2,
   mockPublicDEK,
@@ -48,7 +48,7 @@ const complexCommentEnc =
 
 const phoneDetails: PhoneNumberHashDetails = {
   e164Number: mockE164Number,
-  salt: mockE164NumberSalt,
+  pepper: mockE164NumberPepper,
   phoneHash: 'hash',
 }
 
@@ -70,8 +70,8 @@ describe('Encrypt Comment', () => {
   it('Handles basic comment', async () => {
     await expectSaga(encryptComment, simpleComment, mockAccount2, mockAccount)
       .provide([
-        [call(getCommentKey, mockAccount), hexToBuffer(mockPublicDEK)],
-        [call(getCommentKey, mockAccount2), hexToBuffer(mockPublicDEK2)],
+        [call(doFetchDataEncryptionKey, mockAccount), hexToBuffer(mockPublicDEK)],
+        [call(doFetchDataEncryptionKey, mockAccount2), hexToBuffer(mockPublicDEK2)],
       ])
       .returns(simpleCommentEnc)
       .run()
@@ -80,8 +80,8 @@ describe('Encrypt Comment', () => {
   it('Handles complex comment', async () => {
     await expectSaga(encryptComment, complexComment, mockAccount2, mockAccount)
       .provide([
-        [call(getCommentKey, mockAccount), hexToBuffer(mockPublicDEK)],
-        [call(getCommentKey, mockAccount2), hexToBuffer(mockPublicDEK2)],
+        [call(doFetchDataEncryptionKey, mockAccount), hexToBuffer(mockPublicDEK)],
+        [call(doFetchDataEncryptionKey, mockAccount2), hexToBuffer(mockPublicDEK2)],
       ])
       .returns(complexCommentEnc)
       .run()
@@ -90,13 +90,13 @@ describe('Encrypt Comment', () => {
   it('Handles comment with metadata enabled', async () => {
     const mockState = getMockStoreData({
       account: { e164PhoneNumber: mockE164Number },
-      identity: { e164NumberToSalt: { [mockE164Number]: mockE164NumberSalt } },
+      identity: { e164NumberToSalt: { [mockE164Number]: mockE164NumberPepper } },
     })
     await expectSaga(encryptComment, simpleComment, mockAccount2, mockAccount, true)
       .withState(mockState)
       .provide([
-        [call(getCommentKey, mockAccount), hexToBuffer(mockPublicDEK)],
-        [call(getCommentKey, mockAccount2), hexToBuffer(mockPublicDEK2)],
+        [call(doFetchDataEncryptionKey, mockAccount), hexToBuffer(mockPublicDEK)],
+        [call(doFetchDataEncryptionKey, mockAccount2), hexToBuffer(mockPublicDEK2)],
       ])
       .returns(simpleCommentWithMetadataEnc)
       .run()
@@ -134,7 +134,7 @@ describe('Decrypt Comment', () => {
     expect(decryptComment(simpleCommentWithMetadataEnc, mockPrivateDEK2, false)).toMatchObject({
       comment: simpleComment,
       e164Number: mockE164Number,
-      salt: mockE164NumberSalt,
+      salt: mockE164NumberPepper,
     })
   })
 })
@@ -164,7 +164,7 @@ describe(extractPhoneNumberMetadata, () => {
     expect(extractPhoneNumberMetadata(simpleCommentWithMetadata)).toMatchObject({
       comment: simpleComment,
       e164Number: mockE164Number,
-      salt: mockE164NumberSalt,
+      salt: mockE164NumberPepper,
     })
   })
 
@@ -173,7 +173,7 @@ describe(extractPhoneNumberMetadata, () => {
     expect(extractPhoneNumberMetadata(comment)).toMatchObject({
       comment: complexComment,
       e164Number: mockE164Number,
-      salt: mockE164NumberSalt,
+      salt: mockE164NumberPepper,
     })
   })
 })
@@ -227,18 +227,18 @@ describe(checkTxsForIdentityMetadata, () => {
 
   it('Finds metadata and dispatches updates', async () => {
     const lookupResult: IdentifierLookupResult = {
-      [mockE164NumberHashWithSalt]: {
+      [mockE164NumberHashWithPepper]: {
         [mockAccount]: { completed: 3, total: 5 },
       },
     }
     await expectSaga(checkTxsForIdentityMetadata, { transactions })
       .provide([
-        [select(privateCommentKeySelector), mockPrivateDEK2],
+        [select(dataEncryptionKeySelector), mockPrivateDEK2],
         [matchers.call.fn(lookupAttestationIdentifiers), lookupResult],
         [select(e164NumberToSaltSelector), {}],
         [select(e164NumberToAddressSelector), {}],
       ])
-      .put(updateE164PhoneNumberSalts({ [mockE164Number]: mockE164NumberSalt }))
+      .put(updateE164PhoneNumberSalts({ [mockE164Number]: mockE164NumberPepper }))
       .put(
         updateE164PhoneNumberAddresses(
           { [mockE164Number]: [mockAccount] },
@@ -251,7 +251,7 @@ describe(checkTxsForIdentityMetadata, () => {
   it('Ignores invalid identity claims', async () => {
     await expectSaga(checkTxsForIdentityMetadata, { transactions })
       .provide([
-        [select(privateCommentKeySelector), mockPrivateDEK2],
+        [select(dataEncryptionKeySelector), mockPrivateDEK2],
         [matchers.call.fn(lookupAttestationIdentifiers), {}],
       ])
       .run()

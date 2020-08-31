@@ -1,205 +1,152 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import Link from '@celo/react-components/components/Link'
-import TextButton from '@celo/react-components/components/TextButton'
-import VerifyPhone from '@celo/react-components/icons/VerifyPhone'
+import Button, { BtnTypes } from '@celo/react-components/components/Button.v2'
+import TextButton from '@celo/react-components/components/TextButton.v2'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
-import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
+import { Spacing } from '@celo/react-components/styles/styles.v2'
+import { StackScreenProps, useHeaderHeight } from '@react-navigation/stack'
+import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import Modal from 'react-native-modal'
-import SafeAreaView from 'react-native-safe-area-view'
-import { connect } from 'react-redux'
-import { ErrorMessages } from 'src/app/ErrorMessages'
-import ErrorMessageInline from 'src/components/ErrorMessageInline'
-import { Namespaces, withTranslation } from 'src/i18n'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useDispatch, useSelector } from 'react-redux'
+import i18n, { Namespaces } from 'src/i18n'
 import { setHasSeenVerificationNux } from 'src/identity/actions'
-import { isUserBalanceSufficient } from 'src/identity/utils'
-import { INVITE_FEE } from 'src/invite/saga'
-import { nuxNavigationOptions } from 'src/navigator/Headers'
-import { navigate, navigateHome } from 'src/navigator/NavigationService'
+import { attestationCodesSelector } from 'src/identity/reducer'
+import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers.v2'
+import { navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { RootState } from 'src/redux/reducers'
+import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
+import { StackParamList } from 'src/navigator/types'
+import VerificationLearnMoreDialog from 'src/verify/VerificationLearnMoreDialog'
+import VerificationSkipDialog from 'src/verify/VerificationSkipDialog'
 
-const VERIFICATION_FEE_ESTIMATE = Number(INVITE_FEE) * 0.9
+type ScreenProps = StackScreenProps<StackParamList, Screens.VerificationEducationScreen>
 
-interface DispatchProps {
-  setHasSeenVerificationNux: typeof setHasSeenVerificationNux
-}
+type Props = ScreenProps
 
-interface StateProps {
-  userBalance: string | null
-}
+function VerificationEducationScreen({ route, navigation }: Props) {
+  const showSkipDialog = route.params?.showSkipDialog || false
+  const [showLearnMoreDialog, setShowLearnMoreDialog] = useState(false)
+  const { t } = useTranslation(Namespaces.onboarding)
+  const dispatch = useDispatch()
+  const headerHeight = useHeaderHeight()
+  const insets = useSafeAreaInsets()
+  const attestationCodes = useSelector(attestationCodesSelector)
 
-type Props = WithTranslation & DispatchProps & StateProps
-
-interface State {
-  isModalVisible: boolean
-}
-
-const mapStateToProps = (state: RootState): StateProps => ({
-  userBalance: state.stableToken.balance,
-})
-
-const mapDispatchToProps = {
-  setHasSeenVerificationNux,
-}
-
-class VerificationEducationScreen extends React.Component<Props, State> {
-  static navigationOptions = nuxNavigationOptions
-
-  state: State = {
-    isModalVisible: false,
+  const onPressStart = () => {
+    dispatch(setHasSeenVerificationNux(true))
+    navigation.navigate(Screens.VerificationLoadingScreen)
   }
 
-  onPressLearnMore = () => {
-    navigate(Screens.VerificationLearnMoreScreen)
+  const onPressSkipCancel = () => {
+    navigation.setParams({ showSkipDialog: false })
   }
 
-  onPressStart = () => {
-    this.props.setHasSeenVerificationNux(true)
-    navigate(Screens.VerificationLoadingScreen)
-  }
-
-  onPressSkip = () => {
-    this.setState({ isModalVisible: true })
-  }
-
-  onPressSkipCancel = () => {
-    this.setState({ isModalVisible: false })
-  }
-
-  onPressSkipConfirm = () => {
-    this.props.setHasSeenVerificationNux(true)
+  const onPressSkipConfirm = () => {
+    dispatch(setHasSeenVerificationNux(true))
     navigateHome()
   }
 
-  render() {
-    const { t } = this.props
-    return (
-      <SafeAreaView style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <VerifyPhone />
-          <Text style={styles.h1} testID="VerificationEducationHeader">
-            {t('education.header')}
-          </Text>
-          <Text style={styles.body}>{t('education.body1')}</Text>
-          <Text style={styles.body}>{t('education.body2')}</Text>
-          <Link onPress={this.onPressLearnMore}>{t('education.learnMore')}</Link>
-        </ScrollView>
-        <>
-          <View style={styles.errorMessageContainer}>
-            <ErrorMessageInline
-              error={
-                isUserBalanceSufficient(this.props.userBalance, VERIFICATION_FEE_ESTIMATE)
-                  ? null
-                  : ErrorMessages.INSUFFICIENT_BALANCE
-              }
-            />
-          </View>
-          <Button
-            text={t('education.start')}
-            disabled={!isUserBalanceSufficient(this.props.userBalance, VERIFICATION_FEE_ESTIMATE)}
-            onPress={this.onPressStart}
-            standard={false}
-            type={BtnTypes.PRIMARY}
-            testID="VerificationEducationContinue"
-          />
-          <Button
-            text={t('education.skip')}
-            onPress={this.onPressSkip}
-            standard={false}
-            type={BtnTypes.SECONDARY}
-            testID="VerificationEducationSkip"
-          />
-        </>
-        <Modal isVisible={this.state.isModalVisible}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalHeader}>{t('skipModal.header')}</Text>
-            <Text style={fontStyles.body}>{t('skipModal.body1')}</Text>
-            <Text style={[fontStyles.body, componentStyles.marginTop10]}>
-              {t('skipModal.body2')}
-            </Text>
-            <View style={styles.modalButtonsContainer}>
-              <TextButton
-                onPress={this.onPressSkipCancel}
-                style={styles.modalCancelText}
-                testID="ModalCancel"
-              >
-                {t('global:cancel')}
-              </TextButton>
-              <TextButton
-                onPress={this.onPressSkipConfirm}
-                style={styles.modalSkipText}
-                testID="ModalSkip"
-              >
-                {t('global:skip')}
-              </TextButton>
-            </View>
-          </View>
-        </Modal>
-      </SafeAreaView>
-    )
+  const onPressLearnMore = () => {
+    setShowLearnMoreDialog(true)
+  }
+
+  const onPressLearnMoreDismiss = () => {
+    setShowLearnMoreDialog(false)
+  }
+
+  return (
+    <View style={styles.container}>
+      <ScrollView
+        style={headerHeight ? { marginTop: headerHeight } : undefined}
+        contentContainerStyle={[styles.scrollContainer, insets && { marginBottom: insets.bottom }]}
+      >
+        <Text style={styles.header} testID="VerificationEducationHeader">
+          {t('verificationEducation.header')}
+        </Text>
+        <Text style={styles.body}>{t('verificationEducation.body')}</Text>
+        <Button
+          text={
+            attestationCodes.length
+              ? t('verificationEducation.resume')
+              : t('verificationEducation.start')
+          }
+          onPress={onPressStart}
+          type={BtnTypes.ONBOARDING}
+          style={styles.startButton}
+          testID="VerificationEducationContinue"
+        />
+        <View style={styles.spacer} />
+        <TextButton style={styles.learnMoreButton} onPress={onPressLearnMore}>
+          {t('verificationEducation.learnMore')}
+        </TextButton>
+      </ScrollView>
+      <VerificationSkipDialog
+        isVisible={showSkipDialog}
+        onPressCancel={onPressSkipCancel}
+        onPressConfirm={onPressSkipConfirm}
+      />
+      <VerificationLearnMoreDialog
+        isVisible={showLearnMoreDialog}
+        onPressDismiss={onPressLearnMoreDismiss}
+      />
+    </View>
+  )
+}
+
+VerificationEducationScreen.navigationOptions = ({ navigation, route }: ScreenProps) => {
+  const title = route.params?.hideOnboardingStep
+    ? i18n.t('onboarding:verificationEducation.title')
+    : () => (
+        <HeaderTitleWithSubtitle
+          title={i18n.t('onboarding:verificationEducation.title')}
+          subTitle={i18n.t('onboarding:step', { step: '4' })}
+        />
+      )
+  return {
+    ...nuxNavigationOptions,
+    headerTitle: title,
+    headerRight: () => (
+      <TopBarTextButton
+        title={i18n.t('global:skip')}
+        testID="VerificationEducationSkip"
+        // tslint:disable-next-line: jsx-no-lambda
+        onPress={() => navigation.setParams({ showSkipDialog: true })}
+        titleStyle={{ color: colors.goldDark }}
+      />
+    ),
   }
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'space-between',
-    backgroundColor: colors.background,
+    backgroundColor: colors.onboardingBackground,
   },
   scrollContainer: {
-    flex: 1,
-    padding: 30,
-    paddingTop: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexGrow: 1,
+    paddingHorizontal: 20,
+    paddingTop: 32,
   },
-  h1: {
-    ...fontStyles.h1,
-    marginTop: 20,
+  header: {
+    ...fontStyles.h2,
+    marginBottom: Spacing.Regular16,
   },
   body: {
-    ...fontStyles.bodyLarge,
+    ...fontStyles.regular,
+    marginBottom: Spacing.Thick24,
+  },
+  startButton: {
+    marginBottom: Spacing.Thick24,
+  },
+  spacer: {
+    flex: 1,
+  },
+  learnMoreButton: {
     textAlign: 'center',
-    marginBottom: 20,
-  },
-  modalContainer: {
-    backgroundColor: colors.background,
-    padding: 20,
-    marginHorizontal: 10,
-    borderRadius: 4,
-  },
-  modalHeader: {
-    ...fontStyles.h2,
-    ...fontStyles.bold,
-    marginVertical: 15,
-  },
-  modalButtonsContainer: {
-    marginTop: 25,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-evenly',
-  },
-  modalCancelText: {
-    ...fontStyles.body,
-    ...fontStyles.semiBold,
-    paddingRight: 20,
-  },
-  modalSkipText: {
-    ...fontStyles.body,
-    ...fontStyles.semiBold,
-    color: colors.celoGreen,
-    paddingLeft: 20,
-  },
-  errorMessageContainer: {
-    alignItems: 'center',
+    color: colors.onboardingBrownLight,
+    padding: Spacing.Regular16,
   },
 })
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
-  mapStateToProps,
-  mapDispatchToProps
-)(withTranslation(Namespaces.nuxVerification2)(VerificationEducationScreen))
+export default VerificationEducationScreen

@@ -1,14 +1,12 @@
 // tslint:disable: no-console
-import { v4 as uuidv4 } from 'uuid'
 
-// This allows us to differentiate parallel instantiations of this function
-const prefix = uuidv4().slice(0, 8)
+const now = () => new Date().toISOString()
 
 const logger = {
-  debug: (...args: any[]) => console.debug(`${prefix}::`, ...args),
-  info: (...args: any[]) => console.info(`${prefix}::`, ...args),
-  warn: (...args: any[]) => console.warn(`${prefix}::`, ...args),
-  error: (...args: any[]) => console.error(`${prefix}::`, ...args),
+  debug: (...args: any[]) => console.debug(`${now()}::`, ...args),
+  info: (...args: any[]) => console.info(`${now()}::`, ...args),
+  warn: (...args: any[]) => console.warn(`${now()}::`, ...args),
+  error: (...args: any[]) => console.error(`${now()}::`, ...args),
 }
 
 export default logger

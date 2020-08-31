@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import variables from '@celo/react-components/styles/variables'
 import BigNumber from 'bignumber.js'
 import _ from 'lodash'
@@ -287,4 +287,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withTranslation(Namespaces.exchangeFlow9)(CeloGoldHistoryChart)
+export default withTranslation<Props>(Namespaces.exchangeFlow9)(CeloGoldHistoryChart)

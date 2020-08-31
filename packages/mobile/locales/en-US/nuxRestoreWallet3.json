@@ -1,18 +1,10 @@
 {
-  "title": "Restore your Celo Wallet",
+  "title": "Restore your {{appName}} account",
   "userYourBackupKey":
-    "Already have a Celo Wallet? Enter your Backup Key to restore it to this phone.",
-  "backupKeyPrompt":
-    "horse leopard dog monkey shark tiger lemur whale squid wolf squirrel mouse lion elephant cat shrimp bear penguin deer turtle fox zebra goat giraffe",
+    "Already have a {{appName}} account? Enter your Account Key to restore it to this phone.",
   "tip": "Tip: ",
   "backupKeyTip": "Backup Keys are 24 words long, separated by a space.",
-  "restoreWallet": "Restore",
-  "emptyWalletWarning": "This wallet is empty.",
-  "useEmptyAnyway": "Would you like to use it anyway?",
-  "useEmptyWallet": "Use Empty Wallet",
-  "tryAnotherKey": "Try Another Backup Key",
   "restoreSocial": "Restore with Safeguards",
-  "socialImportInfo":
-    "If you enabled Safeguards, you sent Safeguard Phrases to two friends. Please retrieve these phrases and enter them here (in any order) to regain access to your funds.",
+  "socialImportInfo": "If you enabled Safeguards, you sent Safeguard Phrases to two friends. Please retrieve these phrases and enter them here (in any order) to regain access to your funds.",
   "socialTip": "Phrases are lists of 13 words separated by spaces."
 }

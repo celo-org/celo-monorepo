@@ -1,6 +1,6 @@
 import Expandable from '@celo/react-components/components/Expandable'
 import Touchable from '@celo/react-components/components/Touchable'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import BigNumber from 'bignumber.js'
@@ -8,7 +8,7 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LayoutAnimation, StyleSheet, Text, View } from 'react-native'
 import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
-import FeeIcon from 'src/components/FeeIcon'
+import { EncryptionFeeIcon, ExchangeFeeIcon, SecurityFeeIcon } from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow.v2'
 import { Namespaces } from 'src/i18n'
 
@@ -17,7 +17,11 @@ interface Props {
   currency: CURRENCY_ENUM
   inviteFee?: BigNumber
   isInvite?: boolean
+  isExchange?: boolean
   securityFee?: BigNumber
+  exchangeFee?: BigNumber
+  dekFee?: BigNumber
+  showDekfee?: boolean
   feeLoading?: boolean
   feeHasError?: boolean
   totalFee?: BigNumber
@@ -29,7 +33,11 @@ export default function FeeDrawer({
   currency,
   inviteFee,
   isInvite,
+  isExchange,
   securityFee,
+  exchangeFee,
+  showDekfee,
+  dekFee,
   feeLoading,
   feeHasError,
   totalFee,
@@ -50,8 +58,18 @@ export default function FeeDrawer({
     currencyCode: CURRENCIES[currency].code,
   }
 
+  const exchangeAmount = exchangeFee && {
+    value: exchangeFee,
+    currencyCode: CURRENCIES[currency].code,
+  }
+
   const inviteFeeAmount = inviteFee && {
     value: inviteFee,
+    currencyCode: CURRENCIES[currency].code,
+  }
+
+  const dekFeeAmount = dekFee && {
+    value: dekFee,
     currencyCode: CURRENCIES[currency].code,
   }
 
@@ -89,9 +107,30 @@ export default function FeeDrawer({
               textStyle={styles.dropDownText}
             />
           )}
+          {isExchange && (
+            <LineItemRow
+              title={t('exchangeFlow9:exchangeFee')}
+              titleIcon={<ExchangeFeeIcon />}
+              amount={
+                exchangeAmount && (
+                  <CurrencyDisplay amount={exchangeAmount} formatType={FormatType.Fee} />
+                )
+              }
+              textStyle={styles.dropDownText}
+            />
+          )}
+          {showDekfee && dekFeeAmount && (
+            <LineItemRow
+              title={t('encryption.feeLabel')}
+              titleIcon={<EncryptionFeeIcon />}
+              amount={<CurrencyDisplay amount={dekFeeAmount} formatType={FormatType.Fee} />}
+              textStyle={styles.dropDownText}
+            />
+          )}
+
           <LineItemRow
             title={t('securityFee')}
-            titleIcon={<FeeIcon />}
+            titleIcon={<SecurityFeeIcon />}
             amount={
               securityAmount && (
                 <CurrencyDisplay amount={securityAmount} formatType={FormatType.Fee} />

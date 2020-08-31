@@ -15,6 +15,9 @@ USAGE
 ARGUMENTS
   TOKEN  (StableToken) [default: StableToken] Token to list the oracles for
 
+OPTIONS
+  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
+
 EXAMPLES
   list StableToken
   list
@@ -46,6 +49,9 @@ OPTIONS
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
+
   --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLES
@@ -57,7 +63,7 @@ _See code: [packages/cli/src/commands/oracle/remove-expired-reports.ts](https://
 
 ### Report
 
-Report the price of Celo Gold in a specified token (currently just Celo Dollar, aka "StableToken")
+Report the price of CELO in a specified token (currently just Celo Dollar, aka "StableToken")
 
 ```
 USAGE
@@ -79,9 +85,12 @@ OPTIONS
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
+
   --useLedger                                        Set it to use a ledger wallet
 
-  --value=value                                      (required) Amount of the specified token equal to 1 cGLD
+  --value=value                                      (required) Amount of the specified token equal to 1 CELO
 
 EXAMPLES
   report StableToken --value 1.02 --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1
@@ -100,6 +109,9 @@ USAGE
 
 ARGUMENTS
   TOKEN  (StableToken) [default: StableToken] Token to list the reports for
+
+OPTIONS
+  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
 
 EXAMPLES
   reports StableToken

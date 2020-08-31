@@ -4,8 +4,9 @@ import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { appUnlock } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { Namespaces } from 'src/i18n'
+import { checkPin } from 'src/pincode/authentication'
 import PincodeLock from 'src/pincode/PincodeLock'
-import { isPinCorrect } from 'src/pincode/utils'
 import { createMockStore } from 'test/utils'
 
 const pin = '123456'
@@ -22,7 +23,7 @@ describe('PincodeLock', () => {
   })
 
   it('unlocks if PIN is correct', async () => {
-    ;(isPinCorrect as jest.Mock).mockResolvedValueOnce(pin)
+    ;(checkPin as jest.Mock).mockResolvedValueOnce(true)
     const store = createMockStore()
 
     const { getByTestId } = render(
@@ -37,7 +38,7 @@ describe('PincodeLock', () => {
   })
 
   it('shows wrong PIN notification', async () => {
-    ;(isPinCorrect as jest.Mock).mockRejectedValue('')
+    ;(checkPin as jest.Mock).mockResolvedValue(false)
     const store = createMockStore()
 
     const { getByTestId, getByText } = render(
@@ -48,7 +49,7 @@ describe('PincodeLock', () => {
     pin.split('').forEach((number) => fireEvent.press(getByTestId(`digit${number}`)))
     jest.runAllTimers()
     await flushMicrotasksQueue()
-    expect(getByText(ErrorMessages.INCORRECT_PIN)).toBeDefined()
+    expect(getByText(`${Namespaces.global}:${ErrorMessages.INCORRECT_PIN}`)).toBeDefined()
     expect(store.getActions()).toEqual([])
   })
 })

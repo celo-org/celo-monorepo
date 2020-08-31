@@ -6,18 +6,20 @@ exports[`SummaryNotification renders correctly 1`] = `
     Array [
       Object {
         "backgroundColor": "#FFFFFF",
-        "elevation": 12,
         "padding": 16,
-        "shadowColor": "black",
-        "shadowOffset": Object {
-          "height": 6,
-          "width": 0,
-        },
-        "shadowOpacity": 0.3,
-        "shadowRadius": 9.600000000000001,
       },
       Object {
         "borderRadius": 8,
+      },
+      Object {
+        "elevation": 12,
+        "shadowColor": "rgba(156, 164, 169, 0.4)",
+        "shadowOffset": Object {
+          "height": 2,
+          "width": 0,
+        },
+        "shadowOpacity": 1,
+        "shadowRadius": 12,
       },
       Array [
         Object {
@@ -58,8 +60,8 @@ exports[`SummaryNotification renders correctly 1`] = `
         style={
           Object {
             "color": "#2E3338",
-            "fontFamily": "Inter-Medium",
-            "fontSize": 16,
+            "fontFamily": "Jost-Medium",
+            "fontSize": 18,
             "lineHeight": 22,
             "marginBottom": 4,
           }
@@ -118,8 +120,10 @@ exports[`SummaryNotification renders correctly 1`] = `
                 },
                 Object {
                   "fontSize": 14,
+                  "height": 16,
                   "lineHeight": 16,
                   "marginRight": 24,
+                  "minWidth": 48,
                 },
               ]
             }

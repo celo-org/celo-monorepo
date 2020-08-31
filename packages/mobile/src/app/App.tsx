@@ -1,22 +1,22 @@
-import colors from '@celo/react-components/styles/colors'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { ApolloProvider } from 'react-apollo'
 import {
-  DeviceEventEmitter,
+  Dimensions,
+  EmitterSubscription,
   Linking,
+  NativeEventEmitter,
   Platform,
   StatusBar,
-  UIManager,
   YellowBox,
 } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
-import { SafeAreaProvider } from 'react-native-safe-area-view'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { enableScreens } from 'react-native-screens'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { DefaultEventNames } from 'src/analytics/constants'
+import { AppEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { apolloClient } from 'src/apollo/index'
 import { openDeepLink } from 'src/app/actions'
 import AppLoading from 'src/app/AppLoading'
@@ -45,24 +45,71 @@ BigNumber.config({
   },
 })
 
-// Enables LayoutAnimation on Android. Need to check if method exists before using
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
-  UIManager.setLayoutAnimationEnabledExperimental(true)
+interface State {
+  reactInitTime?: number
+  reactLoadTime?: number
+}
+
+// Enables LayoutAnimation on Android. It makes transitions between states smoother.
+// https://reactnative.dev/docs/layoutanimation
+// Disabling it for now as it seems to cause blank white screens on certain android devices
+// if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+//   UIManager.setLayoutAnimationEnabledExperimental(true)
+// }
+
+const createEventListener: (
+  eventName: string,
+  callback: (reactInitTime: string) => void
+) => EmitterSubscription | null = (
+  eventName: string,
+  callback: (reactInitTime: string) => void
+): EmitterSubscription | null => {
+  if (Platform.OS === 'android') {
+    return new NativeEventEmitter().addListener(eventName, callback)
+  }
+  // TODO: Add listener for iOS
+  return null
 }
 
 export class App extends React.Component {
+  state: State = {
+    reactInitTime: undefined,
+    reactLoadTime: undefined,
+  }
+
+  appStartListener: EmitterSubscription | null = createEventListener(
+    'AppStartedLoading',
+    (reactInitTime: string) => {
+      this.setState({
+        reactInitTime: +reactInitTime,
+        reactLoadTime: Date.now(),
+      })
+    }
+  )
+
   async componentDidMount() {
-    CeloAnalytics.track(DefaultEventNames.appLoaded, {}, true)
-    const appLoadedAt: Date = new Date()
-    const appStartListener = DeviceEventEmitter.addListener(
-      'AppStartedLoading',
-      (appInitializedAtString: string) => {
-        const appInitializedAt = new Date(appInitializedAtString)
-        const tti = appLoadedAt.getTime() - appInitializedAt.getTime()
-        CeloAnalytics.track(DefaultEventNames.appLoadTTIInMilliseconds, { tti }, true)
-        appStartListener.remove()
-      }
-    )
+    await ValoraAnalytics.init()
+    const { width, height } = Dimensions.get('window')
+
+    let reactLoadDuration
+    let appLoadDuration
+
+    if (this.state.reactInitTime && this.state.reactLoadTime) {
+      const appLoadedTime = Date.now()
+      reactLoadDuration = (this.state.reactLoadTime - this.state.reactInitTime) / 1000
+      appLoadDuration = (appLoadedTime - this.state.reactInitTime) / 1000
+    }
+
+    ValoraAnalytics.startSession(AppEvents.app_launched, {
+      deviceHeight: height,
+      deviceWidth: width,
+      reactLoadDuration,
+      appLoadDuration,
+    })
+
+    if (this.appStartListener) {
+      this.appStartListener.remove()
+    }
 
     Linking.addEventListener('url', this.handleOpenURL)
   }
@@ -81,7 +128,7 @@ export class App extends React.Component {
         <ApolloProvider client={apolloClient}>
           <Provider store={store}>
             <PersistGate loading={<AppLoading />} persistor={persistor}>
-              <StatusBar backgroundColor={colors.white} barStyle="dark-content" />
+              <StatusBar backgroundColor="transparent" barStyle="dark-content" />
               <ErrorBoundary>
                 <NavigatorWrapper />
               </ErrorBoundary>

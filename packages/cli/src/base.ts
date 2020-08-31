@@ -1,11 +1,11 @@
-import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { stopProvider } from '@celo/contractkit/lib/utils/provider-utils'
 import { AzureHSMWallet } from '@celo/contractkit/lib/wallets/azure-hsm-wallet'
 import {
   AddressValidation,
   newLedgerWalletWithSetup,
 } from '@celo/contractkit/lib/wallets/ledger-wallet'
-import { Wallet } from '@celo/contractkit/lib/wallets/wallet'
+import { ReadOnlyWallet } from '@celo/contractkit/lib/wallets/wallet'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import { Command, flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
@@ -43,6 +43,12 @@ export abstract class BaseCommand extends LocalCommand {
     ...LocalCommand.flags,
     privateKey: flags.string({ hidden: true }),
     node: flags.string({ char: 'n', hidden: true }),
+    usdGas: flags.boolean({
+      default: false,
+      description: 'If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD',
+      // TODO: remove once feeCurrency is implemented in ledger app
+      exclusive: ['useLedger'],
+    }),
     useLedger: flags.boolean({
       default: false,
       hidden: false,
@@ -96,7 +102,7 @@ export abstract class BaseCommand extends LocalCommand {
 
   private _web3: Web3 | null = null
   private _kit: ContractKit | null = null
-  private _wallet?: Wallet
+  private _wallet?: ReadOnlyWallet
 
   get web3() {
     if (!this._web3) {
@@ -108,6 +114,14 @@ export abstract class BaseCommand extends LocalCommand {
           : new Web3(nodeUrl)
     }
     return this._web3
+  }
+
+  async newWeb3() {
+    const res: ParserOutput<any, any> = this.parse()
+    const nodeUrl = (res.flags && res.flags.node) || getNodeUrl(this.config.configDir)
+    return nodeUrl && nodeUrl.endsWith('.ipc')
+      ? new Web3(new Web3.providers.IpcProvider(nodeUrl, net))
+      : new Web3(nodeUrl)
   }
 
   get kit() {
@@ -154,15 +168,18 @@ export abstract class BaseCommand extends LocalCommand {
       }
     } else if (res.flags.useAKV) {
       try {
-        const akvWallet = await new AzureHSMWallet(res.flags.azureVaultName)
+        const akvWallet = new AzureHSMWallet(res.flags.azureVaultName)
         await akvWallet.init()
-        console.log(`Found addresses: ${await akvWallet.getAccounts()}`)
+        console.log(`Found addresses: ${akvWallet.getAccounts()}`)
         this._wallet = akvWallet
       } catch (err) {
         console.log(`Failed to connect to AKV ${err}`)
         throw err
       }
     }
+    await this.kit.setFeeCurrency(
+      res.flags.usdGas ? CeloContract.StableToken : CeloContract.GoldToken
+    )
   }
 
   finally(arg: Error | undefined): Promise<any> {

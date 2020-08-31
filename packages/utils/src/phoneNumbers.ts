@@ -1,3 +1,8 @@
+import {
+  getPhoneHash as baseGetPhoneHash,
+  isE164Number,
+  ParsedPhoneNumber,
+} from '@celo/base/lib/phoneNumbers'
 import CountryData from 'country-data'
 import {
   PhoneNumber,
@@ -5,21 +10,19 @@ import {
   PhoneNumberType,
   PhoneNumberUtil,
 } from 'google-libphonenumber'
-import * as Web3Utils from 'web3-utils'
-import { getIdentifierPrefix, IdentifierType } from './attestations'
+import { soliditySha3 } from 'web3-utils'
 
-export interface ParsedPhoneNumber {
-  e164Number: string
-  displayNumber: string
-  displayNumberInternational: string
-  countryCode?: number
-  regionCode?: string
+// Exports moved to @celo/base, forwarding them
+// here for backwards compatibility
+export { anonymizedPhone, isE164Number, ParsedPhoneNumber } from '@celo/base/lib/phoneNumbers'
+
+const sha3 = (v: string): string | null => soliditySha3({ type: 'string', value: v })
+export const getPhoneHash = (phoneNumber: string, salt?: string): string => {
+  return baseGetPhoneHash(sha3, phoneNumber, salt)
 }
 
 const phoneUtil = PhoneNumberUtil.getInstance()
 const MIN_PHONE_LENGTH = 4
-const PHONE_SALT_SEPARATOR = '__'
-const E164_REGEX = /^\+[1-9][0-9]{1,14}$/
 
 export function getCountryEmoji(
   e164PhoneNumber: string,
@@ -40,15 +43,6 @@ export function getCountryEmoji(
   const country = userCountryArray.length > 0 ? userCountryArray[0] : undefined
 
   return country ? country.emoji : ''
-}
-
-export const getPhoneHash = (phoneNumber: string, salt?: string): string => {
-  if (!phoneNumber || !isE164Number(phoneNumber)) {
-    throw Error('Attempting to hash a non-e164 number: ' + phoneNumber)
-  }
-  const prefix = getIdentifierPrefix(IdentifierType.PHONE_NUMBER)
-  const value = prefix + (salt ? phoneNumber + PHONE_SALT_SEPARATOR + salt : phoneNumber)
-  return Web3Utils.soliditySha3({ type: 'string', value })
 }
 
 export function getCountryCode(e164PhoneNumber: string) {
@@ -120,10 +114,6 @@ export function getE164Number(phoneNumber: string, defaultCountryCode: string) {
   } else {
     return null
   }
-}
-
-export function isE164Number(phoneNumber: string) {
-  return E164_REGEX.test(phoneNumber)
 }
 
 // Actually runs through the parsing instead of using a regex
@@ -226,6 +216,7 @@ function handleSpecialCasesForDisplay(parsedNumber: PhoneNumber, countryCode?: n
  * Some countries require a prefix before the area code depending on if the number is
  * mobile vs landline and international vs national
  */
+
 function prependToFormMobilePhoneNumber(
   parsedNumber: PhoneNumber,
   regionCode: string,
@@ -247,10 +238,6 @@ function prependToFormMobilePhoneNumber(
 
   const adjustedNumber = phoneUtil.parse(prefix + nationalNumber, regionCode)
   return phoneUtil.getNumberType(adjustedNumber) === PhoneNumberType.MOBILE ? adjustedNumber : null
-}
-
-export function anonymizedPhone(phoneNumber: string) {
-  return phoneNumber.slice(0, -4) + 'XXXX'
 }
 
 export function getExampleNumber(

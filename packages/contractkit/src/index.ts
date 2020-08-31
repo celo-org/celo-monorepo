@@ -2,6 +2,7 @@ import Web3 from 'web3'
 
 export { Address, AllContracts, CeloContract, CeloToken, NULL_ADDRESS } from './base'
 export { IdentityMetadataWrapper } from './identity'
+export { OdisUtils } from './identity/odis'
 export * from './kit'
 export { GenesisBlockUtils } from './network-utils/genesis-block-utils'
 export { StaticNodeUtils } from './network-utils/static-node-utils'

@@ -1,5 +1,5 @@
 import Times from '@celo/react-components/icons/Times'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import { StackNavigationOptions } from '@react-navigation/stack'
@@ -27,7 +27,7 @@ export const noHeaderGestureDisabled: StackNavigationOptions = {
 
 const styles = StyleSheet.create({
   headerTitle: {
-    ...fontStyles.regular500,
+    ...fontStyles.navigationHeader,
   },
   headerSubTitle: {
     ...fontStyles.small,
@@ -42,9 +42,7 @@ const styles = StyleSheet.create({
 export const nuxNavigationOptions: StackNavigationOptions = {
   headerShown: true,
   headerTransparent: true,
-  headerLeftContainerStyle: { paddingHorizontal: 10 },
-  headerLeft: () => <BackButton />,
-  headerRightContainerStyle: { paddingHorizontal: 10 },
+  headerLeft: ({ canGoBack }) => (canGoBack ? <BackButton /> : <View />),
   headerRight: () => <View />,
   headerTitle: () => <DisconnectBanner />,
   headerTitleContainerStyle: {
@@ -70,7 +68,7 @@ export const emptyHeader: StackNavigationOptions = {
     alignItems: 'center',
   },
   headerTitleAlign: 'center',
-  cardStyle: { backgroundColor: colors.background },
+  cardStyle: { backgroundColor: colors.light },
   headerStyle: {
     backgroundColor: colors.light,
     shadowRadius: 0,
@@ -97,7 +95,7 @@ export const drawerHeader: StackNavigationOptions = {
 
 export const headerWithBackButton: StackNavigationOptions = {
   ...emptyHeader,
-  headerLeft: () => <BackButton />,
+  headerLeft: ({ canGoBack }) => (canGoBack ? <BackButton /> : null),
 }
 
 export const headerWithCancelButton: StackNavigationOptions = {

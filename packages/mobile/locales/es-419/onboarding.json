@@ -1,15 +1,26 @@
 {
+  "education": {
+    "step1": "Envía y recibe dinero al instante",
+    "step2": "Pague a cualquiera, en cualquier lugar con tarifas muy bajass",
+    "step3": "Use {{appName}} con seguridad y seguridad"
+  },
+  "welcome": {
+    "title": "Tu valor,\nen tu teléfono",
+    "createAccount": "Crear una nueva cuenta",
+    "restoreAccount": "Tengo una cuenta"
+  },
   "contacts": {
     "header": "Conectar Contactos",
     "body": "Agregar sus contactos hace que sea fácil enviar y solicitar pagos con sus amigos. La conexión no envía invitaciones a sus contactos.",
     "findSwitch": "Permita que los contactos lo encuentren",
     "syncing": {
-      "loadingHeader": "Sincronizando contactos...",
-      "loadingStatus0": "Importando",
+      "loadingHeader": "Sincronizando...",
+      "loadingStatus0": "Importando contactos",
       "loadingStatus1": "Procesando {{total}} contactos",
-      "loadingStatus2": "Encontrar coincidencias",
-      "successHeader": "Tienes {{matches}} amigos en Celo",
-      "successStatus": "Todos estas sincronizados"
+      "loadingStatus2": "Encontrar amigos",
+      "successHeader": "Terminado",
+      "successWithMatches": "{{matches}} amigos en {{appName}}",
+      "successWithoutMatches": "Sincronización completa"
     }
   },
   "accountInfo": "Informacion de cuenta",
@@ -18,6 +29,79 @@
   "pincodeSet": {
     "create": "Crea un PIN",
     "verify": "Ingrese el PIN nuevamente",
-    "pinsDontMatch": "Los PIN no coinciden"
+    "pinsDontMatch": "Los PIN no coinciden",
+    "invalidPin": "Por favor use un PIN más fuerte"
+  },
+  "inviteCode": {
+    "title": "Codigo de invitacion",
+    "body": "¿Recibiste un pago o una invitación? Si es así, copie y pegue el código de invitación a continuación.",
+    "label": "Codigo de invitacion",
+    "codePlaceholder": "Ingrese el código de invitación",
+    "noCode": "No tengo un código de invitación",
+    "nodeCodeInviteLink": "¿No tienes un código de invitación? Solicite uno en <0>celo.org/developers/wallet</0> o <1>continúe sin</1>"
+  },
+  "verificationEducation": {
+    "title": "Confirmar",
+    "header": "Confirmar número de teléfono",
+    "body": "Para asegurarnos de que su número sea realmente suyo, le enviaremos tres mensajes que costarán alrededor de 0.05 cUSD cada uno.\n\nConfirmar su número lleva unos tres minutos.",
+    "start": "Comienzo",
+    "resume": "Reanudar",
+    "learnMore": "Aprende más"
+  },
+  "verificationSkipDialog": {
+    "title": "Estas seguro",
+    "body": "Confirmar le permite enviar y recibir fondos fácilmente a su número de teléfono.\n\nLas cuentas no confirmadas solo pueden enviar pagos utilizando direcciones de Celo o códigos QR.",
+    "cancel": "Regresa",
+    "confirm": "Saltar por ahora"
+  },
+  "verificationLearnMoreDialog": {
+    "title": "Confirmación de número de teléfono",
+    "body": "La confirmación del número de teléfono funciona asociando su cuenta con su número de teléfono.\n\n<0>¿Necesito completar esto?</0>\n\nNo se requiere confirmación, sin embargo, las cuentas no confirmadas solo pueden enviar pagos utilizando direcciones Celo o códigos QR.\n\n<1>Seguridad y privacidad</1>\n\nPara proteger su privacidad, solo una versión ofuscada de su número de teléfono se almacena en la cadena de bloques de Celo.",
+    "dismiss": "Descartar"
+  },
+  "importExistingKey": {
+    "explanation": "La clave de su cuenta es una frase de 24 palabras que escribió y guardó cuando configuró su cuenta. Por favor ingréselo aquí para restaurar su cuenta.",
+    "keyPlaceholder": "horse leopard dog monkey ..."
+  },
+  "verificationInput": {
+    "title": "Confirmar",
+    "body": "We sent you three messages (SMS). Please copy and paste them below.",
+    "body_ios": "Te enviamos tres mensajes (SMS). Cópielos y péguelos a continuación.",
+    "codeLabel1": "Primer código",
+    "codeLabel2": "Segundo código",
+    "codeLabel3": "Tercer código",
+    "codePlaceholder1": "Copia el primer mensaje",
+    "codePlaceholder1_ios": "Toca o copia el primer mensaje",
+    "codePlaceholder2": "Copia el segundo mensaje",
+    "codePlaceholder2_ios": "Toca o copia el segundo mensaje",
+    "codePlaceholder3": "Copia el tercer mensaje",
+    "codePlaceholder3_ios": "Toca o copia el tercer mensaje",
+    "codePlaceholderWithCodeInClipboard": "¡Excelente! Péguelo aquí",
+    "typingTip": "¿Mecanografía? Intenta copiar y pegar"
+  },
+  "verificationInputHelpDialog": {
+    "title": "Ayuda",
+    "bodySection1": {
+      "title": "¿Recibió los tres mensajes?",
+      "content": "Si sus mensajes contienen un enlace, simplemente toque los enlaces para confirmar.\n\nSi no hay enlaces, copie y pegue los mensajes en los campos. Puede pegar todo el mensaje."
+    },
+    "bodySection2": {
+      "title": "¿Faltan algunos o todos los mensajes?",
+      "defaultContent": "Si tiene problemas para recibir mensajes, puede omitir este paso por ahora e intentarlo más tarde. A veces los mensajes pueden tardar unos minutos en llegar.",
+      "content": "$t(verificationInputHelpDialog.bodySection2.defaultContent)",
+      "content_countdown": "$t(verificationInputHelpDialog.bodySection2.defaultContent) La siguiente opción de omisión estará disponible en {{count}} segundo.",
+      "content_countdown_plural": "$t(verificationInputHelpDialog.bodySection2.defaultContent) La siguiente opción de omisión estará disponible en {{count}} segundos."
+    },
+    "body": "<0>$t(verificationInputHelpDialog.bodySection1.title)</0>\n\n$t(verificationInputHelpDialog.bodySection1.content)\n\n<1>$t(verificationInputHelpDialog.bodySection2.title)</1>\n\n$t(verificationInputHelpDialog.bodySection2.content)",
+    "skip": "Saltar por ahora",
+    "back": "Regresa"
+  },
+  "emptyAccount": {
+    "description": "Esta cuenta no tiene fondos. ¿Todavía te gustaría usarlo?",
+    "useAccount": "Usar cuenta",
+    "title": "Saldo <0></0>"
+  },
+  "success": {
+    "message": "Estás listo!"
   }
 }

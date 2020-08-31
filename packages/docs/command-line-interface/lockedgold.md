@@ -1,12 +1,12 @@
 ---
-description: View and manage locked Celo Gold
+description: View and manage locked CELO
 ---
 
 ## Commands
 
 ### Lock
 
-Locks Celo Gold to be used in governance and validator elections.
+Locks CELO to be used in governance and validator elections.
 
 ```
 USAGE
@@ -24,9 +24,12 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
 
+  --usdGas                                       If --usdGas is set, the transaction is paid for with a feeCurrency of
+                                                 cUSD
+
   --useLedger                                    Set it to use a ledger wallet
 
-  --value=value                                  (required) The unit amount of Celo Gold (cGLD)
+  --value=value                                  (required) The unit amount of CELO
 
 EXAMPLE
   lock --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --value 10000000000000000000000
@@ -42,6 +45,9 @@ Show Locked Gold information for a given account. This includes the total amount
 USAGE
   $ celocli lockedgold:show ACCOUNT
 
+OPTIONS
+  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
+
 EXAMPLE
   show 0x5409ed021d9299bf6814279a6a1411a7e866a631
 ```
@@ -50,7 +56,7 @@ _See code: [packages/cli/src/commands/lockedgold/show.ts](https://github.com/cel
 
 ### Unlock
 
-Unlocks Celo Gold, which can be withdrawn after the unlocking period. Unlocked gold will appear as a "pending withdrawal" until the unlocking period is over, after which it can be withdrawn via "lockedgold:withdraw".
+Unlocks CELO, which can be withdrawn after the unlocking period. Unlocked gold will appear as a "pending withdrawal" until the unlocking period is over, after which it can be withdrawn via "lockedgold:withdraw".
 
 ```
 USAGE
@@ -69,9 +75,12 @@ OPTIONS
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
+
   --useLedger                                        Set it to use a ledger wallet
 
-  --value=value                                      (required) The unit amount of Celo Gold (cGLD)
+  --value=value                                      (required) The unit amount of CELO
 
 EXAMPLE
   unlock --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --value 500000000
@@ -99,6 +108,9 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
+                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 

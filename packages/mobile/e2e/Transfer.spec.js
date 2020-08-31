@@ -17,6 +17,7 @@ const EXAMPLE_NAME = 'Test Name'
 const DEFAULT_RECIPIENT_PHONE_NUMBER = '+10000000000'
 const DEFAULT_RECIPIENT_ADDRESS = '0x22c8a9178841ba95a944afd1a1faae517d3f5daa'
 const AMOUNT_TO_SEND = '0.1'
+const CELO_TO_SEND = '0.001'
 const RANDOM_COMMENT = 'poker night winnings'
 
 // clicks an element if it sees it
@@ -41,12 +42,30 @@ describe('Transfer Works', () => {
     await bannerDismiss(by.id('SmartTopAlertButton'))
   })
 
-  it('Language', async () => {
-    await element(by.id('ChooseLanguage/en-US')).tap()
+  // Language is auto selected if it matches one of the available locale
+  // it('Language', async () => {
+  //   await element(by.id('ChooseLanguage/en-US')).tap()
+  // })
+
+  it('Onboarding Education', async () => {
+    // Onboading education has 3 steps
+    for (let i = 0; i < 3; i++) {
+      await element(by.id('Education/progressButton')).tap()
+    }
   })
 
-  it('Join', async () => {
-    await waitFor(element(by.id('JoinCeloContinueButton')))
+  it('Welcome', async () => {
+    await element(by.id('RestoreAccountButton')).tap()
+  })
+
+  it('Terms', async () => {
+    await element(by.id('scrollView')).scrollTo('bottom')
+    expect(element(by.id('AcceptTermsButton'))).toBeVisible()
+    await element(by.id('AcceptTermsButton')).tap()
+  })
+
+  it('Name and Number', async () => {
+    await waitFor(element(by.id('NameAndNumberContinueButton')))
       .toBeVisible()
       .withTimeout(2000)
 
@@ -59,13 +78,7 @@ describe('Transfer Works', () => {
     await expect(element(by.id('PhoneNumberField'))).toBeVisible()
     await element(by.id('PhoneNumberField')).replaceText(VERIFICATION_PHONE_NUMBER)
 
-    await element(by.id('JoinCeloContinueButton')).tap()
-  })
-
-  it('Terms', async () => {
-    await element(by.id('scrollView')).scrollTo('bottom')
-    expect(element(by.id('AcceptTermsButton'))).toBeVisible()
-    await element(by.id('AcceptTermsButton')).tap()
+    await element(by.id('NameAndNumberContinueButton')).tap()
   })
 
   it('Pin', async () => {
@@ -80,12 +93,6 @@ describe('Transfer Works', () => {
 
   // Restore existing wallet
   it('Restore Wallet Backup', async () => {
-    await waitFor(element(by.id('InviteCodeTitle')))
-      .toBeVisible()
-      .withTimeout(8000)
-
-    await element(by.id('RestoreExistingWallet')).tap()
-
     await waitFor(element(by.id('ImportWalletBackupKeyInputField')))
       .toBeVisible()
       .withTimeout(2000)
@@ -99,24 +106,33 @@ describe('Transfer Works', () => {
       .withTimeout(20000)
 
     await element(by.id('ImportWalletBackupKeyInputField')).tap()
-    await element(by.id('ImportWalletBackupKeyInputField')).typeText(SAMPLE_BACKUP_KEY)
+    await element(by.id('ImportWalletBackupKeyInputField')).replaceText(SAMPLE_BACKUP_KEY)
+    if (device.getPlatform() === 'ios') {
+      // On iOS, type one more space to workaround onChangeText not being triggered with replaceText above
+      // and leaving the restore button disabled
+      await element(by.id('ImportWalletBackupKeyInputField')).typeText(' ')
+    } else if (device.getPlatform() === 'android') {
+      // Press back button to close the keyboard
+      await device.pressBack()
+    }
 
     await element(by.id('ImportWalletButton')).tap()
+
+    // Wait a little more as import can take some time
+    // and triggers the firebase error banner
+    // otherwise next step will tap the banner instead of the button
+    await sleep(5000)
   })
 
   it('VerifyEducation', async () => {
-    await waitFor(element(by.id('VerificationEducationHeader')))
-      .toBeVisible()
-      .withTimeout(10000)
-
     await waitFor(element(by.id('VerificationEducationContinue')))
       .toBeVisible()
-      .withTimeout(10000)
+      .withTimeout(30000)
 
     // skip
     await element(by.id('VerificationEducationSkip')).tap()
     // confirmation popup skip
-    await element(by.id('ModalSkip')).tap()
+    await element(by.id('VerificationSkipDialog/PrimaryAction')).tap()
   })
 
   it.skip('Verify', async () => {
@@ -133,9 +149,9 @@ describe('Transfer Works', () => {
   it('Wallet Home->Send', async () => {
     await element(by.id('SendOrRequestBar/SendButton')).tap()
 
-    await element(by.id('RecipientSearchInput')).tap()
-    await element(by.id('RecipientSearchInput')).replaceText(DEFAULT_RECIPIENT_ADDRESS)
-    await element(by.id('RecipientSearchInput')).tapReturnKey()
+    await element(by.id('SearchInput')).tap()
+    await element(by.id('SearchInput')).replaceText(DEFAULT_RECIPIENT_ADDRESS)
+    await element(by.id('SearchInput')).tapReturnKey()
 
     await waitFor(element(by.id('RecipientPicker')))
       .toBeVisible()
@@ -163,6 +179,12 @@ describe('Transfer Works', () => {
     await element(by.id('commentInput/send')).replaceText(RANDOM_COMMENT)
     await element(by.id('commentInput/send')).tapReturnKey()
 
+    if (device.getPlatform() === 'android') {
+      // Workaround keyboard remaining open on Android (tapReturnKey doesn't work there and just adds a new line)
+      // so we tap something else in the scrollview to hide the soft keyboard
+      await element(by.id('HeaderText')).tap()
+    }
+
     await element(by.id('ConfirmButton')).tap()
   })
 
@@ -175,6 +197,41 @@ describe('Transfer Works', () => {
 
     // TODO(erdal): look for the latest transaction and
     // make sure it was successful
+  })
+
+  it('Wallet Home -> Exchange CELO', async () => {
+    // Open Hamburguer menu and go to CELO screen.
+    await element(by.id('Hamburguer')).tap()
+    await waitFor(element(by.id('DrawerItem/CELO')))
+      .toBeVisible()
+      .withTimeout(10000)
+    await element(by.id('DrawerItem/CELO')).tap()
+    // Go through the education flow.
+    await element(by.id('Education/progressButton')).tap()
+    await element(by.id('Education/progressButton')).tap()
+    await element(by.id('Education/progressButton')).tap()
+    await element(by.id('Education/progressButton')).tap()
+    await waitFor(element(by.id('WithdrawCELO')))
+      .toBeVisible()
+      .whileElement(by.id('ExchangeScrollView'))
+      .scroll(50, 'down')
+    // Go to the Withdraw Celo screen and fill the data.
+    await element(by.id('WithdrawCELO')).tap()
+    await waitFor(element(by.id('AccountAddress')))
+      .toBeVisible()
+      .withTimeout(10000)
+    await element(by.id('AccountAddress')).replaceText(DEFAULT_RECIPIENT_ADDRESS)
+    await element(by.id('CeloAmount')).replaceText(CELO_TO_SEND)
+    // Tap review to go to the review screen and confirm.
+    await element(by.id('WithdrawReviewButton')).tap()
+    await waitFor(element(by.id('ConfirmWithdrawButton')))
+      .toBeVisible()
+      .withTimeout(10000)
+    await element(by.id('ConfirmWithdrawButton')).tap()
+    // Make sure we return to the Exchange CELO screen after confirming.
+    await waitFor(element(by.id('WithdrawCELO')))
+      .toBeVisible()
+      .withTimeout(10000)
   })
 
   // TODO(erdal): generate a new invite

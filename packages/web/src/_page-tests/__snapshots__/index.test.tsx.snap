@@ -1049,7 +1049,6 @@ exports[`HomePage renders 1`] = `
               dir="auto"
               href="https://medium.com/celoorg/an-introductory-guide-to-celo-b185c62d3067"
               onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -1149,7 +1148,6 @@ exports[`HomePage renders 1`] = `
               dir="auto"
               href="/papers"
               onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -1774,98 +1772,110 @@ exports[`HomePage renders 1`] = `
           </div>
           <div
             className="css-view-1dbjc4n"
-            onClick={[Function]}
-            onMouseDown={[Function]}
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
-            onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
+            style={
+              Object {
+                "WebkitBoxPack": "justify",
+                "WebkitJustifyContent": "space-between",
+                "justifyContent": "space-between",
+                "minHeight": "50px",
+                "msFlexPack": "justify",
+              }
+            }
           >
             <div
               className="css-view-1dbjc4n"
-              style={
-                Object {
-                  "WebkitBoxDirection": "normal",
-                  "WebkitBoxFlex": 0,
-                  "WebkitBoxOrient": "horizontal",
-                  "WebkitBoxPack": "center",
-                  "WebkitFlexDirection": "row",
-                  "WebkitFlexGrow": 0,
-                  "WebkitJustifyContent": "center",
-                  "backgroundColor": "rgba(0,0,0,0.00)",
-                  "borderBottomColor": "rgba(0,0,0,0.00)",
-                  "borderLeftColor": "rgba(0,0,0,0.00)",
-                  "borderRightColor": "rgba(0,0,0,0.00)",
-                  "borderTopColor": "rgba(0,0,0,0.00)",
-                  "flexDirection": "row",
-                  "flexGrow": 0,
-                  "justifyContent": "center",
-                  "msFlexDirection": "row",
-                  "msFlexPack": "center",
-                  "msFlexPositive": 0,
-                  "opacity": 1,
-                  "outlineColor": "transparent",
-                  "width": "fit-content",
-                }
-              }
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
             >
-              <a
-                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
-                data-focusable={true}
-                dir="auto"
-                href="/papers"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-                role="link"
+              <div
+                className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "WebkitAlignItems": "center",
-                    "WebkitBoxAlign": "center",
-                    "alignItems": "center",
-                    "color": "rgba(53,208,127,1.00)",
-                    "cursor": "pointer",
-                    "display": "inline-flex",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "16px",
-                    "fontWeight": "500",
-                    "lineHeight": "16px",
-                    "msFlexAlign": "center",
-                    "textAlign": "center",
-                    "textRendering": "geometricPrecision",
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxFlex": 0,
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitBoxPack": "center",
+                    "WebkitFlexDirection": "row",
+                    "WebkitFlexGrow": 0,
+                    "WebkitJustifyContent": "center",
+                    "backgroundColor": "rgba(0,0,0,0.00)",
+                    "borderBottomColor": "rgba(0,0,0,0.00)",
+                    "borderLeftColor": "rgba(0,0,0,0.00)",
+                    "borderRightColor": "rgba(0,0,0,0.00)",
+                    "borderTopColor": "rgba(0,0,0,0.00)",
+                    "flexDirection": "row",
+                    "flexGrow": 0,
+                    "justifyContent": "center",
+                    "msFlexDirection": "row",
+                    "msFlexPack": "center",
+                    "msFlexPositive": 0,
+                    "opacity": 1,
+                    "outlineColor": "transparent",
+                    "width": "fit-content",
                   }
                 }
               >
-                Read Stability White Paper
-                <div
-                  className="css-view-1dbjc4n"
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                  data-focusable={true}
+                  dir="auto"
+                  href="/papers"
+                  onClick={[Function]}
+                  role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "alignItems": "center",
+                      "color": "rgba(53,208,127,1.00)",
+                      "cursor": "pointer",
                       "display": "inline-flex",
-                      "paddingLeft": "0.4em",
-                      "paddingTop": "0.185em",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "16px",
+                      "msFlexAlign": "center",
+                      "textAlign": "center",
+                      "textRendering": "geometricPrecision",
                     }
                   }
                 >
-                  <svg
-                    fill="none"
-                    height="0.75em"
-                    style={Object {}}
-                    transform="rotate(0)"
-                    viewBox="0 0 8 12"
-                    width="0.75em"
+                  Read Stability White Paper
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "display": "inline-flex",
+                        "paddingLeft": "0.4em",
+                        "paddingTop": "0.185em",
+                      }
+                    }
                   >
-                    <path
-                      clipRule="evenodd"
-                      d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
-                      fill="#35D07F"
-                      fillRule="evenodd"
-                      opacity={1}
+                    <svg
+                      fill="none"
+                      height="0.75em"
                       style={Object {}}
-                    />
-                  </svg>
-                </div>
-              </a>
+                      transform="rotate(0)"
+                      viewBox="0 0 8 12"
+                      width="0.75em"
+                    >
+                      <path
+                        clipRule="evenodd"
+                        d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+                        fill="#35D07F"
+                        fillRule="evenodd"
+                        opacity={1}
+                        style={Object {}}
+                      />
+                    </svg>
+                  </div>
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -1938,26 +1948,36 @@ exports[`HomePage renders 1`] = `
               <svg
                 height="60px"
                 style={Object {}}
-                viewBox="0 0 1000 1000"
+                viewBox="0 0  100 100"
                 width="60px"
+                x="0px"
+                y="0px"
               >
                 <desc>
-                  Symbol for the Celo cGLD Currency
+                  Symbol for the Celo native asset (CELO)
                 </desc>
                 <path
-                  d="M0 0h1000v1000H0z"
+                  d="M0,0h100v100H0V0z"
                   fill="#FBCC5C"
                   style={Object {}}
                 />
                 <path
-                  d="M453 778c104 0 196-69 226-170h-81c-25 57-82 94-145 94-88 0-159-71-159-159 0-63 37-120 94-145v-81c-101 30-170 122-170 226 0 129 106 235 235 235zm154-210c95 0 163-71 163-170v-35H603l-23 71h112c-6 35-41 62-83 62-61 0-105-45-105-108s45-108 108-108c36 0 65 9 104 31v-80c-32-15-68-23-104-23-102 0-183 80-182 180 1 103 77 180 177 180z"
+                  d="M79.4,44c0-13-10.5-23.5-23.5-23.5c-9.6,0-17.9,5.8-21.5,14.1C26.2,38.3,20.5,46.5,20.5,56
+        C20.5,69,31,79.5,44,79.5c9.6,0,17.9-5.8,21.5-14.1C73.8,61.8,79.4,53.6,79.4,44z M59.7,59.5c-1.2,0.3-2.4,0.4-3.6,0.4
+        c-8.8,0-15.9-7.2-15.9-15.9c0-1.2,0.1-2.3,0.4-3.4c1.2-0.3,2.4-0.4,3.6-0.4c8.8,0,15.9,7.1,15.9,15.9C60,57.3,59.9,58.4,59.7,59.5z
+        M28.2,56.1c0-4.3,1.7-8.1,4.4-11C33.2,57.3,43,67,55.2,67.5c-2.9,2.8-6.8,4.6-11.1,4.6C35.3,72,28.2,64.9,28.2,56.1z M67.6,55
+        C67,42.8,57.2,33.1,45,32.6c2.9-2.8,6.8-4.6,11.1-4.6C64.9,28,72,35.1,72,43.9C71.9,48.3,70.2,52.2,67.6,55z"
                   fill="#F9B73E"
                   style={Object {}}
                 />
                 <path
-                  d="M453 768c98 0 181-63 212-150h-61c-27 56-85 94-151 94-93 0-169-76-169-169 0-66 38-124 94-151v-61c-87 31-150 114-150 212 0 124 101 225 225 225zm154-210c90 0 153-67 153-160v-25H610l-16 51h109c0 45-42 82-94 82-67 0-115-50-115-118s50-118 118-118c33 0 61 7 94 24v-57c-30-13-63-19-94-19-97 0-173 76-172 170 1 97 72 170 167 170z"
-                  fill="#FFF"
-                  id="symbol-celo-gold"
+                  d="M78.6,44c0-12.4-10.1-22.5-22.5-22.5c-9.4,0-17.4,5.7-20.8,13.9c-8,3.4-13.7,11.4-13.7,20.7
+        c0,12.4,10.1,22.5,22.5,22.5c9.4,0,17.4-5.7,20.8-13.9C72.8,61.3,78.6,53.3,78.6,44z M44.1,73c-9.3,0-16.9-7.6-16.9-16.9
+        c0-5.3,2.5-10.1,6.4-13.2c0,0.4,0,0.8,0,1.1c0,12.4,10.1,22.5,22.5,22.5c0.5,0,0.9,0,1.4,0C54.3,70.5,49.5,73,44.1,73z M60.5,60.3
+        c-1.4,0.4-2.9,0.6-4.4,0.6c-9.3,0-16.9-7.6-16.9-16.9c0-1.5,0.2-2.9,0.6-4.2c1.4-0.4,2.9-0.6,4.4-0.6c9.3,0,16.9,7.6,16.9,16.9
+        C61,57.6,60.8,59,60.5,60.3z M66.6,57.2c0-0.4,0-0.8,0-1.1c0-12.4-10.1-22.5-22.5-22.5c-0.5,0-0.9,0-1.4,0c3.1-4,7.9-6.5,13.3-6.5
+        c9.3,0,16.9,7.6,16.9,16.9C72.9,49.4,70.4,54.1,66.6,57.2z"
+                  fill="#FFFFFF"
                   style={Object {}}
                 />
               </svg>
@@ -2000,98 +2020,205 @@ exports[`HomePage renders 1`] = `
           </div>
           <div
             className="css-view-1dbjc4n"
-            onClick={[Function]}
-            onMouseDown={[Function]}
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
-            onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
+            style={
+              Object {
+                "WebkitBoxPack": "justify",
+                "WebkitJustifyContent": "space-between",
+                "justifyContent": "space-between",
+                "minHeight": "50px",
+                "msFlexPack": "justify",
+              }
+            }
           >
             <div
               className="css-view-1dbjc4n"
-              style={
-                Object {
-                  "WebkitBoxDirection": "normal",
-                  "WebkitBoxFlex": 0,
-                  "WebkitBoxOrient": "horizontal",
-                  "WebkitBoxPack": "center",
-                  "WebkitFlexDirection": "row",
-                  "WebkitFlexGrow": 0,
-                  "WebkitJustifyContent": "center",
-                  "backgroundColor": "rgba(0,0,0,0.00)",
-                  "borderBottomColor": "rgba(0,0,0,0.00)",
-                  "borderLeftColor": "rgba(0,0,0,0.00)",
-                  "borderRightColor": "rgba(0,0,0,0.00)",
-                  "borderTopColor": "rgba(0,0,0,0.00)",
-                  "flexDirection": "row",
-                  "flexGrow": 0,
-                  "justifyContent": "center",
-                  "msFlexDirection": "row",
-                  "msFlexPack": "center",
-                  "msFlexPositive": 0,
-                  "opacity": 1,
-                  "outlineColor": "transparent",
-                  "width": "fit-content",
-                }
-              }
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
             >
-              <a
-                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
-                data-focusable={true}
-                dir="auto"
-                href="https://medium.com/celoorg/celo-gold-holders-make-your-voice-heard-through-on-chain-governance-96cb5a1e8b90"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-                role="link"
+              <div
+                className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "WebkitAlignItems": "center",
-                    "WebkitBoxAlign": "center",
-                    "alignItems": "center",
-                    "color": "rgba(53,208,127,1.00)",
-                    "cursor": "pointer",
-                    "display": "inline-flex",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "16px",
-                    "fontWeight": "500",
-                    "lineHeight": "16px",
-                    "msFlexAlign": "center",
-                    "textAlign": "center",
-                    "textRendering": "geometricPrecision",
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxFlex": 0,
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitBoxPack": "center",
+                    "WebkitFlexDirection": "row",
+                    "WebkitFlexGrow": 0,
+                    "WebkitJustifyContent": "center",
+                    "backgroundColor": "rgba(0,0,0,0.00)",
+                    "borderBottomColor": "rgba(0,0,0,0.00)",
+                    "borderLeftColor": "rgba(0,0,0,0.00)",
+                    "borderRightColor": "rgba(0,0,0,0.00)",
+                    "borderTopColor": "rgba(0,0,0,0.00)",
+                    "flexDirection": "row",
+                    "flexGrow": 0,
+                    "justifyContent": "center",
+                    "msFlexDirection": "row",
+                    "msFlexPack": "center",
+                    "msFlexPositive": 0,
+                    "opacity": 1,
+                    "outlineColor": "transparent",
+                    "width": "fit-content",
                   }
                 }
               >
-                Learn About Governance
-                <div
-                  className="css-view-1dbjc4n"
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                  data-focusable={true}
+                  dir="auto"
+                  href="https://celoreserve.org"
+                  onClick={[Function]}
+                  role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "alignItems": "center",
+                      "color": "rgba(53,208,127,1.00)",
+                      "cursor": "pointer",
                       "display": "inline-flex",
-                      "paddingLeft": "0.4em",
-                      "paddingTop": "0.185em",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "16px",
+                      "msFlexAlign": "center",
+                      "textAlign": "center",
+                      "textRendering": "geometricPrecision",
                     }
                   }
                 >
-                  <svg
-                    fill="none"
-                    height="0.75em"
-                    style={Object {}}
-                    transform="rotate(0)"
-                    viewBox="0 0 8 12"
-                    width="0.75em"
+                  View Reserve
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "display": "inline-flex",
+                        "paddingLeft": "0.4em",
+                        "paddingTop": "0.185em",
+                      }
+                    }
                   >
-                    <path
-                      clipRule="evenodd"
-                      d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
-                      fill="#35D07F"
-                      fillRule="evenodd"
-                      opacity={1}
+                    <svg
+                      fill="none"
+                      height="0.75em"
                       style={Object {}}
-                    />
-                  </svg>
-                </div>
-              </a>
+                      transform="rotate(0)"
+                      viewBox="0 0 8 12"
+                      width="0.75em"
+                    >
+                      <path
+                        clipRule="evenodd"
+                        d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+                        fill="#35D07F"
+                        fillRule="evenodd"
+                        opacity={1}
+                        style={Object {}}
+                      />
+                    </svg>
+                  </div>
+                </a>
+              </div>
+            </div>
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
+            >
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxFlex": 0,
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitBoxPack": "center",
+                    "WebkitFlexDirection": "row",
+                    "WebkitFlexGrow": 0,
+                    "WebkitJustifyContent": "center",
+                    "backgroundColor": "rgba(0,0,0,0.00)",
+                    "borderBottomColor": "rgba(0,0,0,0.00)",
+                    "borderLeftColor": "rgba(0,0,0,0.00)",
+                    "borderRightColor": "rgba(0,0,0,0.00)",
+                    "borderTopColor": "rgba(0,0,0,0.00)",
+                    "flexDirection": "row",
+                    "flexGrow": 0,
+                    "justifyContent": "center",
+                    "msFlexDirection": "row",
+                    "msFlexPack": "center",
+                    "msFlexPositive": 0,
+                    "opacity": 1,
+                    "outlineColor": "transparent",
+                    "width": "fit-content",
+                  }
+                }
+              >
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                  data-focusable={true}
+                  dir="auto"
+                  href="https://medium.com/celoorg/celo-gold-holders-make-your-voice-heard-through-on-chain-governance-96cb5a1e8b90"
+                  onClick={[Function]}
+                  role="link"
+                  style={
+                    Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "alignItems": "center",
+                      "color": "rgba(53,208,127,1.00)",
+                      "cursor": "pointer",
+                      "display": "inline-flex",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "16px",
+                      "msFlexAlign": "center",
+                      "textAlign": "center",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                >
+                  Learn About Governance
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "display": "inline-flex",
+                        "paddingLeft": "0.4em",
+                        "paddingTop": "0.185em",
+                      }
+                    }
+                  >
+                    <svg
+                      fill="none"
+                      height="0.75em"
+                      style={Object {}}
+                      transform="rotate(0)"
+                      viewBox="0 0 8 12"
+                      width="0.75em"
+                    >
+                      <path
+                        clipRule="evenodd"
+                        d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+                        fill="#35D07F"
+                        fillRule="evenodd"
+                        opacity={1}
+                        style={Object {}}
+                      />
+                    </svg>
+                  </div>
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -2466,9 +2593,8 @@ exports[`HomePage renders 1`] = `
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
-                href="https://www.coindesk.com/libra-minus-facebook-why-celo-is-2020s-buzzy-token-project"
+                href="/press"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -3219,7 +3345,6 @@ exports[`HomePage renders 1`] = `
                 dir="auto"
                 href="https://docs.celo.org/v/master/developer-guide/overview/introduction"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -3315,7 +3440,6 @@ exports[`HomePage renders 1`] = `
                   dir="auto"
                   href="https://www.crowdcast.io/e/celo-tech-talks-part-2"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -3691,7 +3815,7 @@ exports[`HomePage renders 1`] = `
           }
         }
       >
-        The Celo Community's past and upcoming milestones, focused on finding use cases, innovating on technology, and preparing for Mainnet release.
+        The Celo Community's past and upcoming milestones.
       </div>
     </div>
   </div>
@@ -6916,7 +7040,6 @@ exports[`HomePage renders 1`] = `
               dir="auto"
               href="/about#backers"
               onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {

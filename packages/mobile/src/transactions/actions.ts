@@ -8,7 +8,6 @@ import { NumberToRecipient } from 'src/recipients/recipient'
 import { TransactionDataInput } from 'src/send/SendAmount'
 import { TransferConfirmationCardProps } from 'src/transactions/TransferConfirmationCard'
 import { StandbyTransaction } from 'src/transactions/types'
-import { web3ForUtils } from 'src/web3/contracts'
 
 export enum Actions {
   ADD_STANDBY_TRANSACTION = 'TRANSACTIONS/ADD_STANDBY_TRANSACTION',
@@ -70,10 +69,6 @@ export type ActionTypes =
   | NewTransactionsInFeedAction
   | UpdatedRecentTxRecipientsCacheAction
 
-export const generateStandbyTransactionId = (recipientAddress: string) => {
-  return web3ForUtils.utils.sha3(recipientAddress + String(Date.now()))
-}
-
 export const addStandbyTransaction = (
   transaction: StandbyTransaction
 ): AddStandbyTransactionAction => ({
@@ -131,7 +126,13 @@ export const navigateToPaymentTransferReview = (
   let headerText = ''
   switch (type) {
     case TokenTransactionType.Sent:
-      headerText = i18n.t('walletFlow5:transactionHeaderSent')
+      const isCeloWithdrawal =
+        confirmationProps.amount.currencyCode === CURRENCIES[CURRENCY_ENUM.GOLD].code
+      headerText = i18n.t(
+        isCeloWithdrawal
+          ? 'walletFlow5:transactionHeaderWithdrewCelo'
+          : 'walletFlow5:transactionHeaderSent'
+      )
       break
     case TokenTransactionType.EscrowSent:
       headerText = i18n.t('walletFlow5:transactionHeaderEscrowSent')

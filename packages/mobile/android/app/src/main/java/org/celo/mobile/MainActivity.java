@@ -1,9 +1,12 @@
 package org.celo.mobile;
 
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.view.WindowManager;
+import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
-import com.facebook.react.ReactFragmentActivity;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactRootView;
 import com.facebook.react.bridge.ReactContext;
@@ -13,9 +16,9 @@ import java.util.Date;
 import org.devio.rn.splashscreen.SplashScreen;
 
 public class MainActivity
-  extends ReactFragmentActivity
+  extends ReactActivity
   implements ReactInstanceManager.ReactInstanceEventListener {
-  Date appStartTimestamp;
+  long appStartedMillis;
 
   /**
    * Returns the name of the main component registered from JavaScript. This is
@@ -28,8 +31,17 @@ public class MainActivity
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    appStartTimestamp = new Date();
-    SplashScreen.show(this);
+    getWindow()
+      .getDecorView()
+      .setSystemUiVisibility(
+        // fullscreen layout so we can draw under the status bar / notch area
+        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+        View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+        View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+      );
+
+    appStartedMillis = System.currentTimeMillis();
+    SplashScreen.show(this, R.style.SplashTheme);
     super.onCreate(null);
   }
 
@@ -52,7 +64,7 @@ public class MainActivity
   public void onReactContextInitialized(ReactContext context) {
     context
       .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-      .emit("AppStartedLoading", appStartTimestamp.toString());
+      .emit("AppStartedLoading", "" + appStartedMillis);
   }
 
   @Override
