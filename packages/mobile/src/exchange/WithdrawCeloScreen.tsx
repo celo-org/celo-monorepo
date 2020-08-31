@@ -19,7 +19,7 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import AccountAddressInput from 'src/components/AccountAddressInput'
 import CeloAmountInput from 'src/components/CeloAmountInput'
 import { ADDRESS_LENGTH } from 'src/exchange/reducer'
-import { celoToUsd } from 'src/exchange/utils'
+import { celoTocUsd } from 'src/exchange/utils'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import { getLocalCurrencyExchangeRate, getLocalCurrencySymbol } from 'src/localCurrency/selectors'
@@ -58,7 +58,7 @@ function WithdrawCeloScreen({ navigation }: Props) {
   const onConfirm = async () => {
     setLoading(true)
     const celoAmount = new BigNumber(celoToTransfer)
-    const cUsdAmount = await celoToUsd(celoAmount)
+    const cUsdAmount = await celoTocUsd(celoAmount)
 
     const now = Date.now()
     const isLimitReached = isPaymentLimitReached(now, recentPayments, cUsdAmount.toNumber())
