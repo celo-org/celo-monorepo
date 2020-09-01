@@ -30,15 +30,14 @@ export default function SideBar({ isOpen }) {
           </H4>
           <Text style={[fonts.p, styles.aside]}>
             This art form is a testament to the creative trinity of code, poetry, and illustration.
-            A work centered around channelling the Celo story,{' '}
-            <Text style={textStyles.italic}>As Wealth Flowers</Text> is a gift of optimism — giving
-            form to a spirit of collective prosperity, and celebrating it when seen brought to life.
+            As a work centered around channelling the Celo story,{' '}
+            <Text style={textStyles.italic}>As Wealth Flowers</Text> is a gift of optimism. It gives
+            shape to a spirit of collective prosperity, and celebrates it when brought to life.
           </Text>
           <Text style={[fonts.p, styles.aside, standardStyles.elementalMarginTop]}>
-            Kuneco is an Esperanto word signifying togetherness, and this communal interdependence
-            forms the heart of the creators’ work from within Celo. As a sacred gift, the spirit
-            embodied within this art piece gathers a space for intimate connection and an expressive
-            tenor of togetherness — in dedication to making conditions for collective prosperity to
+            Our intention for this gift is to ground a space for a special, expressive tone of
+            togetherness, our 'Kuneco'. Here, we gather — for the intimate connection that forms the
+            heart of communal interdependence, dedicated to making the conditions for prosperity to
             flower throughout the world.
           </Text>
           <Button
