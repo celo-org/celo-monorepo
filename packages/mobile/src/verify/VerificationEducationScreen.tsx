@@ -1,6 +1,6 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button.v2'
 import TextButton from '@celo/react-components/components/TextButton.v2'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { Spacing } from '@celo/react-components/styles/styles.v2'
 import { StackScreenProps, useHeaderHeight } from '@react-navigation/stack'
@@ -94,24 +94,29 @@ function VerificationEducationScreen({ route, navigation }: Props) {
   )
 }
 
-VerificationEducationScreen.navigationOptions = ({ navigation }: ScreenProps) => ({
-  ...nuxNavigationOptions,
-  headerTitle: () => (
-    <HeaderTitleWithSubtitle
-      title={i18n.t('onboarding:verificationEducation.title')}
-      subTitle={i18n.t('onboarding:step', { step: '4' })}
-    />
-  ),
-  headerRight: () => (
-    <TopBarTextButton
-      title={i18n.t('global:skip')}
-      testID="VerificationEducationSkip"
-      // tslint:disable-next-line: jsx-no-lambda
-      onPress={() => navigation.setParams({ showSkipDialog: true })}
-      titleStyle={{ color: colors.goldDark }}
-    />
-  ),
-})
+VerificationEducationScreen.navigationOptions = ({ navigation, route }: ScreenProps) => {
+  const title = route.params?.hideOnboardingStep
+    ? i18n.t('onboarding:verificationEducation.title')
+    : () => (
+        <HeaderTitleWithSubtitle
+          title={i18n.t('onboarding:verificationEducation.title')}
+          subTitle={i18n.t('onboarding:step', { step: '4' })}
+        />
+      )
+  return {
+    ...nuxNavigationOptions,
+    headerTitle: title,
+    headerRight: () => (
+      <TopBarTextButton
+        title={i18n.t('global:skip')}
+        testID="VerificationEducationSkip"
+        // tslint:disable-next-line: jsx-no-lambda
+        onPress={() => navigation.setParams({ showSkipDialog: true })}
+        titleStyle={{ color: colors.goldDark }}
+      />
+    ),
+  }
+}
 
 const styles = StyleSheet.create({
   container: {

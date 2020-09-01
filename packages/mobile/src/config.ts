@@ -52,6 +52,9 @@ export const ESCROW_PAYMENT_EXPIRY_SECONDS = 86400 // 1 days
 export const DEFAULT_TESTNET = Config.DEFAULT_TESTNET || 'integration'
 export const DAILY_PAYMENT_LIMIT_CUSD = 500
 export const SMS_RETRIEVER_APP_SIGNATURE = Config.SMS_RETRIEVER_APP_SIGNATURE
+// ODIS minimum dollar balance for pepper quota retrieval
+// TODO change this to new ODIS minimum dollar balance once deployed
+export const ODIS_MINIMUM_DOLLAR_BALANCE = 0.1
 
 // TODO: remove special case for mainnet
 export const DEFAULT_FORNO_URL = `https://${
@@ -84,3 +87,5 @@ export const GETH_USE_FULL_NODE_DISCOVERY = true
 export const GETH_USE_STATIC_NODES = true
 // Development purposes only
 export const GETH_START_HTTP_RPC_SERVER = false
+export const APP_STORE_ID = Config.APP_STORE_ID
+export const DYNAMIC_LINK_DOMAIN = Config.DYNAMIC_LINK_DOMAIN

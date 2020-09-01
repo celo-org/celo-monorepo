@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
-import RNGeth from 'react-native-geth'
+import GethBridge, { NodeConfig } from 'react-native-geth'
 import { GethEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { DEFAULT_TESTNET, GETH_START_HTTP_RPC_SERVER } from 'src/config'
@@ -13,7 +13,7 @@ import Logger from 'src/utils/Logger'
 import FirebaseLogUploader from 'src/utils/LogUploader'
 
 let gethLock = false
-let gethInstance: typeof RNGeth | null = null
+let gethInitialized = false
 
 export const FailedToFetchStaticNodesError = new Error(
   'Failed to fetch static nodes from Google storage'
@@ -78,10 +78,7 @@ function getFolder(filePath: string) {
   return filePath.substr(0, filePath.lastIndexOf('/'))
 }
 
-async function createNewGeth(
-  sync: boolean = true,
-  bootnodeEnodes: string[]
-): Promise<typeof RNGeth> {
+async function setupGeth(sync: boolean = true, bootnodeEnodes: string[]): Promise<boolean> {
   Logger.debug('Geth@newGeth', 'Configure and create new Geth')
   const { nodeDir, useDiscovery, syncMode } = networkConfig
   const genesis: string = await readGenesisBlockFile(nodeDir)
@@ -91,7 +88,7 @@ async function createNewGeth(
 
   const maxPeers = sync ? SYNCING_MAX_PEERS : 0
 
-  let gethOptions: any = {
+  let gethOptions: NodeConfig = {
     nodeDir,
     networkID,
     genesis,
@@ -128,79 +125,72 @@ async function createNewGeth(
   // The logcat logging mode remains unchanged.
   gethOptions.logFileLogLevel = LogLevel.INFO
   Logger.debug('Geth@newGeth', 'Geth logs will be piped to ' + gethLogFilePath)
-
-  return new RNGeth(gethOptions)
+  return GethBridge.setConfig(gethOptions)
 }
 
-export async function initGeth(sync: boolean = true): Promise<typeof gethInstance> {
-  ValoraAnalytics.track(GethEvents.geth_init_start, { sync })
-  Logger.info('Geth@init', `Create a new Geth instance with sync=${sync}`)
+export async function initGeth(shouldStartNode: boolean = true): Promise<boolean> {
+  ValoraAnalytics.track(GethEvents.geth_init_start, { shouldStartNode })
+  Logger.info('Geth@init', `Create a new Geth instance with shouldStartNode=${shouldStartNode}`)
 
   if (gethLock) {
     Logger.warn('Geth@init', 'Geth create already in progress.')
-    return null
+    return false
   }
   gethLock = true
 
   const { useDiscovery, useStaticNodes } = networkConfig
 
   try {
-    if (!(await ensureGenesisBlockWritten())) {
-      throw FailedToFetchGenesisBlockError
-    }
     let staticNodes: string[] = []
-    // Static nodes enodes are also used as bootnodes for discovery
-    if (sync && (useDiscovery || useStaticNodes)) {
-      staticNodes = await getStaticNodes(sync)
-    }
-    Logger.info('Geth@init', `Retrieved static nodes: ${staticNodes}`)
-    // Always write the static nodes file, even if staticNodes is empty,
-    // to ensure any static nodes written from a previous session are not used
-    await initializeStaticNodesFile(useStaticNodes ? staticNodes : [])
+    await Promise.all([
+      ensureGenesisBlockWritten().then((ok) => {
+        if (!ok) {
+          throw FailedToFetchGenesisBlockError
+        }
+      }),
+      async () => {
+        if (shouldStartNode && (useDiscovery || useStaticNodes)) {
+          staticNodes = await getStaticNodes(shouldStartNode)
+        }
+        Logger.info('Geth@init', `Got static nodes: ${staticNodes}`)
+        return initializeStaticNodesFile(useStaticNodes ? staticNodes : [])
+      },
+    ])
 
-    let geth: typeof RNGeth
     ValoraAnalytics.track(GethEvents.create_geth_start)
     try {
       // Use staticNodes as bootnodes because they support v4 and v5 discovery,
       // and there are many of them.
       // The dedicated bootnode currently only supports v4.
-      geth = await createNewGeth(sync, staticNodes)
+      await setupGeth(shouldStartNode, staticNodes)
     } catch (error) {
       ValoraAnalytics.track(GethEvents.create_geth_error, { error: error.message })
       throw error
     }
     ValoraAnalytics.track(GethEvents.create_geth_finish)
+    gethInitialized = true
 
-    if (!sync) {
-      // chain data must be deleted to prevent geth from syncing with data saver on
-      // TODO: consider only deleting the geth p2p nodes database
-      // TODO: save chain data s.t. when data saver goes off syncing resumes from data
-      await deleteChainData()
-    }
-
-    try {
-      ValoraAnalytics.track(GethEvents.start_geth_start)
-      await geth.start()
-      ValoraAnalytics.track(GethEvents.start_geth_finish)
-      gethInstance = geth
-      if (sync) {
-        geth.subscribeNewHead()
-      }
-    } catch (e) {
-      const errorType = getGethErrorType(e)
-      if (errorType === ErrorType.GethAlreadyRunning) {
-        Logger.error('Geth@init/startInstance', 'Geth start reported geth already running')
-        throw new Error('Geth already running, need to restart app')
-      } else if (errorType === ErrorType.CorruptChainData) {
-        Logger.warn('Geth@init/startInstance', 'Geth start reported chain data error')
-        await attemptGethCorruptionFix(geth, sync)
-      } else {
-        Logger.error('Geth@init/startInstance', 'Unexpected error starting geth', e)
-        throw e
+    if (shouldStartNode) {
+      try {
+        ValoraAnalytics.track(GethEvents.start_geth_start)
+        await GethBridge.startNode()
+        ValoraAnalytics.track(GethEvents.start_geth_finish)
+        await GethBridge.subscribeNewHead()
+      } catch (e) {
+        const errorType = getGethErrorType(e)
+        if (errorType === ErrorType.GethAlreadyRunning) {
+          Logger.error('Geth@init/startInstance', 'Geth start reported geth already running')
+          throw new Error('Geth already running, need to restart app')
+        } else if (errorType === ErrorType.CorruptChainData) {
+          Logger.warn('Geth@init/startInstance', 'Geth start reported chain data error')
+          await attemptGethCorruptionFix()
+        } else {
+          Logger.error('Geth@init/startInstance', 'Unexpected error starting geth', e)
+          throw e
+        }
       }
     }
-
-    return gethInstance
+    return true
   } finally {
     gethLock = false
   }
@@ -233,12 +223,12 @@ async function getStaticNodes(sync: boolean): Promise<string[]> {
 // Writes static nodes to the correct location
 async function initializeStaticNodesFile(staticNodes: string[]): Promise<void> {
   const { nodeDir } = networkConfig
-  Logger.debug('Geth@ensureStaticNodesInitialized', 'initializing static nodes')
+  Logger.debug('Geth@initializeStaticNodesFile', 'initializing static nodes')
   return writeStaticNodes(nodeDir, JSON.stringify(staticNodes))
 }
 
 export async function stopGethIfInitialized() {
-  if (gethInstance) {
+  if (gethInitialized) {
     await stop()
   }
 }
@@ -246,7 +236,7 @@ export async function stopGethIfInitialized() {
 async function stop() {
   try {
     Logger.debug('Geth@stop', 'Stopping Geth')
-    await gethInstance.stop()
+    await GethBridge.stopNode()
     Logger.debug('Geth@stop', 'Geth stopped')
   } catch (e) {
     Logger.error('Geth@stop', 'Error stopping Geth', e)
@@ -314,15 +304,12 @@ async function writeStaticNodes(nodeDir: string, enodes: string) {
   await RNFS.writeFile(staticNodesFile, enodes, 'utf8')
 }
 
-async function attemptGethCorruptionFix(geth: any, sync: boolean = true) {
+async function attemptGethCorruptionFix() {
   const deleteChainDataResult = await deleteChainData()
   const deleteGethLockResult = await deleteGethLockFile()
   if (deleteChainDataResult && deleteGethLockResult) {
-    await geth.start()
-    gethInstance = geth
-    if (sync) {
-      geth.subscribeNewHead()
-    }
+    await GethBridge.startNode()
+    await GethBridge.subscribeNewHead()
   } else {
     throw new Error('Failed to fix Geth and restart')
   }
@@ -341,6 +328,13 @@ async function deleteSingleChainData(syncMode: SyncMode) {
   const chainDataDir = `${getNodeInstancePath(nodeDir)}/${syncMode}chaindata`
   Logger.debug('Geth@deleteSingleChainData', `Going to delete ${chainDataDir}`)
   return deleteFileIfExists(chainDataDir)
+}
+
+export async function deleteNodeData() {
+  const { nodeDir } = networkConfig
+  const dataDir = `${RNFS.DocumentDirectoryPath}/${nodeDir}`
+  Logger.debug('Geth@deleteNodeData', `Going to delete ${dataDir}`)
+  return deleteFileIfExists(dataDir)
 }
 
 async function deleteGethLockFile() {

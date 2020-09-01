@@ -11,7 +11,7 @@ export default class GoldTab extends React.Component<Props> {
   static defaultProps = {
     width: 22.5,
     height: 22.5,
-    color: colors.darkSecondary,
+    color: colors.gray5,
   }
 
   render() {

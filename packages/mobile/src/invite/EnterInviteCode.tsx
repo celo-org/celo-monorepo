@@ -1,7 +1,7 @@
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import TextButton from '@celo/react-components/components/TextButton.v2'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { HeaderHeightContext } from '@react-navigation/stack'
 import * as React from 'react'
@@ -10,6 +10,7 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { OnboardingEvents } from 'src/analytics/Events'
+import { AnalyticsPropertiesList } from 'src/analytics/Properties'
 import CodeInput, { CodeInputStatus } from 'src/components/CodeInput'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { CELO_FAUCET_LINK, SHOW_GET_INVITE_LINK } from 'src/config'
@@ -133,6 +134,13 @@ export class EnterInviteCode extends React.Component<Props, State> {
     } else if (redeemComplete) {
       codeStatus = CodeInputStatus.ACCEPTED
     }
+    const backAnalyticsEvents: [keyof AnalyticsPropertiesList] = [
+      OnboardingEvents.create_account_cancel,
+    ]
+
+    if (isRedeemingInvite) {
+      backAnalyticsEvents.push(OnboardingEvents.invite_redeem_cancel)
+    }
 
     return (
       <HeaderHeightContext.Consumer>
@@ -140,9 +148,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
           <SafeAreaInsetsContext.Consumer>
             {(insets) => (
               <View style={styles.container}>
-                <UseBackToWelcomeScreen
-                  backAnalyticsEvent={OnboardingEvents.create_account_cancel}
-                />
+                <UseBackToWelcomeScreen backAnalyticsEvents={backAnalyticsEvents} />
                 <DevSkipButton nextScreen={Screens.VerificationEducationScreen} />
                 <KeyboardAwareScrollView
                   style={headerHeight ? { marginTop: headerHeight } : undefined}
@@ -162,10 +168,16 @@ export class EnterInviteCode extends React.Component<Props, State> {
                       onInputChange={this.onInputChange}
                       shouldShowClipboard={this.shouldShowClipboard}
                     />
+                    {isRedeemingInvite && (
+                      <View style={styles.loadingContainer}>
+                        <Text style={styles.loadingText}>{t('inviteCode.loadingHeader')}</Text>
+                        <Text style={styles.loadingText}>{t('inviteCode.loadingBody')}</Text>
+                      </View>
+                    )}
                   </View>
                   {isSkippingInvite && (
                     <View>
-                      <ActivityIndicator size="large" color={colors.celoGreen} />
+                      <ActivityIndicator size="large" color={colors.greenBrand} />
                     </View>
                   )}
                   <View>
@@ -176,7 +188,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
                           <Text onPress={this.onPressSkip} style={styles.askInviteLink} />
                         </Trans>
                       </Text>
-                    ) : (
+                    ) : !isRedeemingInvite ? (
                       <TextButton
                         style={styles.bottomButton}
                         onPress={this.onPressSkip}
@@ -184,7 +196,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
                       >
                         {t('inviteCode.noCode')}
                       </TextButton>
-                    )}
+                    ) : null}
                   </View>
                 </KeyboardAwareScrollView>
                 <KeyboardSpacer onToggle={this.onToggleKeyboard} />
@@ -226,6 +238,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: colors.onboardingBrownLight,
     padding: 16,
+  },
+  loadingContainer: {
+    marginTop: 16,
+  },
+  loadingText: {
+    textAlign: 'center',
+    ...fontStyles.regular,
+    color: colors.onboardingBrownLight,
   },
 })
 

@@ -25,11 +25,14 @@ export enum HomeEvents {
 export enum SettingsEvents {
   settings_profile_edit = 'settings_profile_edit',
   settings_profile_name_edit = 'settings_profile_name_edit',
+  settings_verify_number = 'settings_verify_number',
   language_select = 'language_select',
   pin_require_on_load = 'pin_require_on_load',
   forno_toggle = 'forno_toggle',
   licenses_view = 'licenses_view',
   tos_view = 'tos_view',
+  start_account_removal = 'start_account_removal',
+  completed_account_removal = 'completed_account_removal',
   // intentionally not tracking analytics opt in/out
   // to avoid tracking through omission
 }
@@ -85,8 +88,11 @@ export enum OnboardingEvents {
 
   invite_redeem_start = 'invite_redeem_start',
   invite_redeem_complete = 'invite_redeem_complete',
+  invite_redeem_cancel = 'invite_redeem_cancel',
   invite_redeem_timeout = 'invite_redeem_timeout',
   invite_redeem_error = 'invite_redeem_error',
+  invite_redeem_move_funds_start = 'invite_redeem_move_funds_start',
+  invite_redeem_move_funds_complete = 'invite_redeem_move_funds_complete',
 
   invite_redeem_skip_start = 'invite_redeem_skip_start',
   invite_redeem_skip_complete = 'invite_redeem_skip_complete',
@@ -96,7 +102,10 @@ export enum OnboardingEvents {
   escrow_redeem_complete = 'escrow_redeem_complete',
   escrow_redeem_error = 'escrow_redeem_error',
 
-  account_dek_set = 'account_dek_set',
+  account_dek_register_start = 'account_dek_register_start',
+  account_dek_register_account_unlocked = 'account_dek_register_account_unlocked',
+  account_dek_register_account_checked = 'account_dek_register_account_checked',
+  account_dek_register_complete = 'account_dek_register_complete',
 }
 
 export enum VerificationEvents {
@@ -247,6 +256,7 @@ export enum CeloExchangeEvents {
   celo_home_info = 'celo_home_info', // when the (i) next to Celo Gold price is clicked, launching education (not pictured)
   celo_home_buy = 'celo_home_buy', // when the “Buy” button is clicked
   celo_home_sell = 'celo_home_sell', // when the “Sell” button is clicked
+  celo_home_withdraw = 'celo_home_withdraw', // when the “Withdraw” button is clicked
   celo_transaction_select = 'celo_transaction_select', // when an transaction item is clicked
   celo_transaction_back = 'celo_transaction_back', // when back caret is clicked from drilldown
 
@@ -269,6 +279,13 @@ export enum CeloExchangeEvents {
   celo_fetch_exchange_rate_start = 'celo_fetch_exchange_rate_start',
   celo_fetch_exchange_rate_complete = 'celo_fetch_exchange_rate_complete',
   celo_fetch_exchange_rate_error = 'celo_fetch_exchange_rate_error',
+
+  celo_withdraw_review = 'celo_withdraw_review', // when ‘review’ is clicked on the withdraw amount screen
+  celo_withdraw_edit = 'celo_withdraw_edit', // when ‘edit’ is clicked on the review screen
+  celo_withdraw_cancel = 'celo_withdraw_cancel', // when ’cancel’ is clicked on the review screen
+  celo_withdraw_confirm = 'celo_withdraw_confirm', // when ‘withdraw’ is clicked on the review screen
+  celo_withdraw_completed = 'celo_withdraw_completed', // when the transaction for the withdrawal is completed
+  celo_withdraw_error = 'celo_withdraw_error', // when there's an error on the withdrawal transaction
 }
 
 export enum GethEvents {

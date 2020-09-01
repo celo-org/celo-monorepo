@@ -3,7 +3,7 @@ import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import TextButton from '@celo/react-components/components/TextButton.v2'
 import Touchable from '@celo/react-components/components/Touchable'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { iconHitslop } from '@celo/react-components/styles/variables'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src/currencies'
@@ -176,8 +176,13 @@ export class SendConfirmation extends React.Component<Props, State> {
       recipient,
       recipientAddress,
       firebasePendingRequestUid,
+      reason,
     } = this.props.confirmationInput
-    const { comment } = this.state
+
+    const comment =
+      type === TokenTransactionType.PayRequest || type === TokenTransactionType.PayPrefill
+        ? reason || ''
+        : this.state.comment
 
     const localCurrencyAmount = convertDollarsToLocalAmount(
       amount,
@@ -192,7 +197,7 @@ export class SendConfirmation extends React.Component<Props, State> {
       localCurrency: this.props.localCurrencyCode,
       dollarAmount: amount.toString(),
       localCurrencyAmount: localCurrencyAmount ? localCurrencyAmount.toString() : null,
-      commentLength: this.state.comment.length,
+      commentLength: comment.length,
     })
 
     this.props.sendPaymentOrInvite(
@@ -299,7 +304,7 @@ export class SendConfirmation extends React.Component<Props, State> {
     }
 
     let primaryBtnInfo
-    if (type === TokenTransactionType.PayRequest) {
+    if (type === TokenTransactionType.PayRequest || type === TokenTransactionType.PayPrefill) {
       primaryBtnInfo = {
         action: this.sendOrInvite,
         text: i18n.t('global:pay'),
@@ -313,7 +318,7 @@ export class SendConfirmation extends React.Component<Props, State> {
       }
     }
 
-    const paymentRequestComment = reason || ''
+    const paymentComment = reason || ''
 
     const FeeContainer = () => {
       let securityFee
@@ -415,9 +420,10 @@ export class SendConfirmation extends React.Component<Props, State> {
               style={styles.amount}
               amount={subtotalAmount}
             />
-            {type === TokenTransactionType.PayRequest ? (
+            {type === TokenTransactionType.PayRequest ||
+            type === TokenTransactionType.PayPrefill ? (
               <View>
-                <Text style={styles.paymentRequestComment}>{paymentRequestComment}</Text>
+                <Text style={styles.paymentComment}>{paymentComment}</Text>
               </View>
             ) : (
               <CommentTextInput
@@ -523,7 +529,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     ...fontStyles.largeNumber,
   },
-  paymentRequestComment: {
+  paymentComment: {
     ...fontStyles.large,
     color: colors.gray5,
   },

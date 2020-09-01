@@ -6,19 +6,25 @@ This is the Celo Foundation website, which is deployed to https://celo.org/
 
 ### Steps to get running
 
-1. ensuring you have installed the latest dependencies:
+1. Ensure you have installed the latest dependencies:
 
-`yarn`
+    `yarn`
 
-2. decrypted the secrets files, (this requires being authenticated on gcloud)
+2. Decrypt the secrets files
 
-  * `brew cask install google-cloud-sdk` && `gcloud auth login` 
+   * Install the [gcloud SDK](https://cloud.google.com/sdk/gcloud/).
 
-  * from root of monorepo run `yarn run keys:decrypt`  
+      `brew cask install google-cloud-sdk`
 
-3. from web directory run `yarn run dev`
+   * Log in (You may need to be granted additional permissions).
 
-which will start a server accessible at [http://localhost:3000](http://localhost:3000)
+      `gcloud auth login`
+
+    * From the root of monorepo:
+
+      `yarn run keys:decrypt`  
+
+3. From the web directory, run `yarn run dev`.  The server will now be accessible at [http://localhost:3000](http://localhost:3000).
 
 ## Architecture
 
