@@ -24,7 +24,7 @@ class Licenses extends React.Component<Props> {
   render() {
     return (
       <View style={styles.container}>
-        <WebView style={styles.licensesWebView} source={LICENSE_SOURCE} />
+        <WebView style={styles.licensesWebView} source={LICENSE_SOURCE} originWhitelist={['*']} />
       </View>
     )
   }
