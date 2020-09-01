@@ -56,7 +56,6 @@
   "@celo/communication": {
     "location": "packages/communication",
     "dependencies": [
-      "@celo/dev-utils",
       "@celo/flake-tracker",
       "@celo/utils"
     ]
