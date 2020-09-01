@@ -79,6 +79,7 @@ export const SaltType = t.string
 export const AttestationServiceStatusResponseType = t.type({
   status: t.literal('ok'),
   smsProviders: t.array(t.string),
+  blacklistedRegionCodes: t.union([t.array(t.string), t.undefined]),
   accountAddress: AddressType,
   signature: t.union([SignatureType, t.undefined]),
   version: t.string,
@@ -92,6 +93,7 @@ export const AttestationServiceTestRequestType = t.type({
   phoneNumber: E164PhoneNumberType,
   message: t.string,
   signature: SignatureType,
+  provider: t.union([t.string, t.undefined]),
 })
 export type AttestationServiceTestRequest = t.TypeOf<typeof AttestationServiceTestRequestType>
 
