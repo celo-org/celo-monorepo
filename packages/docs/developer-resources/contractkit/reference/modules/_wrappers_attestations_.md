@@ -4,6 +4,7 @@
 
 ### Enumerations
 
+* [AttestationServiceStatusState](../enums/_wrappers_attestations_.attestationservicestatusstate.md)
 * [AttestationState](../enums/_wrappers_attestations_.attestationstate.md)
 
 ### Classes
@@ -14,6 +15,7 @@
 
 * [ActionableAttestation](../interfaces/_wrappers_attestations_.actionableattestation.md)
 * [AttesationServiceRevealRequest](../interfaces/_wrappers_attestations_.attesationservicerevealrequest.md)
+* [AttestationServiceStatusResponse](../interfaces/_wrappers_attestations_.attestationservicestatusresponse.md)
 * [AttestationStat](../interfaces/_wrappers_attestations_.attestationstat.md)
 * [AttestationStateForIssuer](../interfaces/_wrappers_attestations_.attestationstateforissuer.md)
 * [AttestationsConfig](../interfaces/_wrappers_attestations_.attestationsconfig.md)
