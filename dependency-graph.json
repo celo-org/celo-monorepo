@@ -58,7 +58,8 @@
     "dependencies": [
       "@celo/dev-utils",
       "@celo/flake-tracker",
-      "@celo/utils"
+      "@celo/utils",
+      "@celo/wallet-local"
     ]
   },
   "@celo/contractkit": {
