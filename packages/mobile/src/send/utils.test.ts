@@ -6,6 +6,8 @@ import { PaymentInfo } from 'src/send/reducers'
 import {
   dailyAmountRemaining,
   handlePaymentDeeplink,
+  // The formatter contradicts the linter :(
+  // tslint:disable-next-line: ordered-imports
   handleSendPaymentData,
   _isPaymentLimitReached,
 } from 'src/send/utils'
