@@ -13,7 +13,7 @@
 
 ▸ **getContactMatches**(`e164NumberCaller`: E164Number, `e164NumberContacts`: E164Number[], `account`: string, `phoneNumberIdentifier`: string, `signer`: [AuthSigner](_identity_odis_query_.md#authsigner), `context`: [ServiceContext](../interfaces/_identity_odis_query_.servicecontext.md), `clientVersion?`: undefined | string): *Promise‹E164Number[]›*
 
-*Defined in [contractkit/src/identity/odis/matchmaking.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/matchmaking.ts#L20)*
+*Defined in [packages/contractkit/src/identity/odis/matchmaking.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/matchmaking.ts#L20)*
 
 **Parameters:**
 
@@ -35,7 +35,7 @@ ___
 
 ▸ **obfuscateNumberForMatchmaking**(`e164Number`: string): *string*
 
-*Defined in [contractkit/src/identity/odis/matchmaking.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/matchmaking.ts#L68)*
+*Defined in [packages/contractkit/src/identity/odis/matchmaking.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/matchmaking.ts#L68)*
 
 **Parameters:**
 

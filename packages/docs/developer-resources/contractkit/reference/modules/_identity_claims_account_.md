@@ -21,7 +21,7 @@
 
 Ƭ **AccountClaim**: *t.TypeOf‹typeof AccountClaimTypeH›*
 
-*Defined in [contractkit/src/identity/claims/account.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/account.ts#L34)*
+*Defined in [packages/contractkit/src/identity/claims/account.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/account.ts#L34)*
 
 ## Variables
 
@@ -45,7 +45,7 @@
   (x) => x
 )
 
-*Defined in [contractkit/src/identity/claims/account.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/account.ts#L16)*
+*Defined in [packages/contractkit/src/identity/claims/account.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/account.ts#L16)*
 
 ___
 
@@ -59,7 +59,7 @@ ___
   publicKey: t.union([t.undefined, PublicKeyType]),
 })
 
-*Defined in [contractkit/src/identity/claims/account.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/account.ts#L8)*
+*Defined in [packages/contractkit/src/identity/claims/account.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/account.ts#L8)*
 
 ## Functions
 
@@ -67,7 +67,7 @@ ___
 
 ▸ **createAccountClaim**(`address`: string, `publicKey?`: undefined | string): *[AccountClaim](_identity_claims_account_.md#accountclaim)*
 
-*Defined in [contractkit/src/identity/claims/account.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/account.ts#L36)*
+*Defined in [packages/contractkit/src/identity/claims/account.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/account.ts#L36)*
 
 **Parameters:**
 
