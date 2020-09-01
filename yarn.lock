@@ -28446,9 +28446,9 @@ react-native-gesture-handler@^1.6.1:
     invariant "^2.2.4"
     prop-types "^15.7.2"
 
-"react-native-geth@https://github.com/celo-org/react-native-geth#6beb2b3":
+"react-native-geth@https://github.com/celo-org/react-native-geth#5bc4089":
   version "1.0.0"
-  resolved "https://github.com/celo-org/react-native-geth#6beb2b396c9217813290957915db430bb5187e2d"
+  resolved "https://github.com/celo-org/react-native-geth#5bc4089822e4475b5df330cde43329bc4859c34c"
 
 react-native-iphone-x-helper@^1.0.3, react-native-iphone-x-helper@^1.2.1:
   version "1.2.1"

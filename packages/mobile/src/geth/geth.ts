@@ -148,13 +148,13 @@ export async function initGeth(shouldStartNode: boolean = true): Promise<boolean
           throw FailedToFetchGenesisBlockError
         }
       }),
-      async () => {
+      (async () => {
         if (shouldStartNode && (useDiscovery || useStaticNodes)) {
           staticNodes = await getStaticNodes(shouldStartNode)
         }
         Logger.info('Geth@init', `Got static nodes: ${staticNodes}`)
         return initializeStaticNodesFile(useStaticNodes ? staticNodes : [])
-      },
+      })(),
     ])
 
     ValoraAnalytics.track(GethEvents.create_geth_start)
