@@ -1,3 +1,4 @@
+import { wait } from '@apollo/react-testing'
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import NumberKeypad from '@celo/react-components/components/NumberKeypad'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
@@ -106,7 +107,8 @@ function SendAmount(props: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
 
   const [amount, setAmount] = useState('')
-  const [buttonWasPressed, setButtonWasPressed] = useState(false)
+  const [reviewButtonWasPressed, setReviewButtonToPressed] = useState(false)
+  const [isFetchingAddressMapping, setIsFetchingAddressMapping] = useState(true)
 
   const localCurrencyCode = useSelector(getLocalCurrencyCode)
   const localCurrencyExchangeRate = useSelector(getLocalCurrencyExchangeRate)
@@ -169,8 +171,8 @@ function SendAmount(props: Props) {
   const isAmountValid = parsedLocalAmount.isGreaterThanOrEqualTo(DOLLAR_TRANSACTION_MIN_AMOUNT)
   const isDollarBalanceSufficient = isAmountValid && newAccountBalance.isGreaterThanOrEqualTo(0)
 
-  const sendButtonText =
-    buttonWasPressed && recipientVerificationStatus === RecipientVerificationStatus.UNKNOWN ? (
+  const reviewButtonText =
+    reviewButtonWasPressed && isFetchingAddressMapping ? (
       <ActivityIndicator testID={'loading/sendAmount'} />
     ) : (
       t('global:review')
@@ -207,9 +209,26 @@ function SendAmount(props: Props) {
     }
   }, [props.route, localCurrencyCode, localCurrencyExchangeRate, dollarAmount])
 
+  const onReviewButtonPressed = async () => {
+    setReviewButtonToPressed(true)
+    // Wait until verification status is known to proceed
+    while (recipientVerificationStatus === RecipientVerificationStatus.UNKNOWN) {
+      await wait(250)
+    }
+
+    setIsFetchingAddressMapping(false)
+
+    if (isOutgoingPaymentRequest) {
+      onRequest()
+    } else {
+      onSend()
+    }
+  }
+
   const onSend = React.useCallback(() => {
     if (!isDollarBalanceSufficient) {
       dispatch(showError(ErrorMessages.NSF_TO_SEND))
+      setReviewButtonToPressed(false)
       return
     }
 
@@ -219,10 +238,9 @@ function SendAmount(props: Props) {
       dispatch(
         showLimitReachedError(now, recentPayments, localCurrencyExchangeRate, localCurrencySymbol)
       )
+      setReviewButtonToPressed(false)
       return
     }
-
-    setButtonWasPressed(true)
 
     const transactionData =
       recipientVerificationStatus === RecipientVerificationStatus.VERIFIED
@@ -256,7 +274,6 @@ function SendAmount(props: Props) {
   ])
 
   const onRequest = React.useCallback(() => {
-    setButtonWasPressed(true)
     const transactionData = getTransactionData(TokenTransactionType.PayRequest)
 
     if (
@@ -305,9 +322,9 @@ function SendAmount(props: Props) {
       <Button
         style={styles.nextBtn}
         size={BtnSizes.FULL}
-        text={sendButtonText}
+        text={reviewButtonText}
         type={BtnTypes.SECONDARY}
-        onPress={isOutgoingPaymentRequest ? onRequest : onSend}
+        onPress={onReviewButtonPressed}
         disabled={!isAmountValid}
         testID="Review"
       />
