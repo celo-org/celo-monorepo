@@ -96,31 +96,24 @@ You will now need to point the Celo CLI to a node that is synchronized with the 
 
 ## Locate and verify your `ReleaseGold` contract address
 
-Next, you will find the address of the `ReleaseGold` contract deployed for your beneficiary address. The `ReleaseGold` contract has its own address and is separate from the beneficiary address, but there are certain aspects of it that can be controlled only by the beneficiary.
+First, copy the beneficiary address into the clipboard, and set it in an environment variable:
 
-Use the mapping from this list (you can use Edit>Find in your browser):
+```bash
+export CELO_BENEFICIARY_ADDRESS=<Beneficiary>
+```
 
-- [ReleaseGold deployments on 4/23/20 ("Wave 1")](https://gist.githubusercontent.com/timmoreton/704404484cf8f641b5464a237592a341/raw/6ad2615f219c71fe370bac84e5ac7aa1653fffac/CeloRC1ReleaseGoldWave1.json)
+Next, you will find the address of the `ReleaseGold` contract deployed for your beneficiary address. The `ReleaseGold` contract has its own address and is separate from the beneficiary address, but there are certain aspects of it that can be controlled only by the beneficiary. For more details, please refer to the [Understanding ReleaseGold page](release-gold.md).
 
-- [ReleaseGold deployments on 4/30/20 ("Wave 1b")](https://gist.githubusercontent.com/timmoreton/32d36dcc48e52a4747df8cfa8e4a4d0f/raw/1557209b59fa863cc8ed9b66e72e6111fbfe3475/CeloRC1ReleaseGoldWave1b.json)
-
-- [ReleaseGold deployments on 5/16/20 ("Wave 2")](https://gist.githubusercontent.com/timmoreton/27e975bbca63723e218288b1a1f9fa54/raw/d55f51fde470fe040407c02462aeb5a7adc3d57f/CeloRC1ReleaseGoldWave2.json): includes self-custodying CoinList auction participants that completed the address submission process by 5/14/20
-
-- [ReleaseGold deployments on 5/20/20 ("Wave 2b")](https://gist.githubusercontent.com/timmoreton/f22e70b8149706f738327da8ff71c7d7/raw/944458feda304c7077f2bbb3e190ec677a5ed976/CeloMainnetReleaseGoldWave2b.json): includes self-custodying CoinList auction participants that completed the address submission process by 5/16/20
-
-- [ReleaseGold deployments on 5/27/20 ("Wave 3")](https://gist.githubusercontent.com/timmoreton/40c4a4136827c00a5cc1bc9b5885136e/raw/ebf5cb3b3934e295785d52c35e3129302592bece/CeloMainnetReleaseGoldWave3.json): includes self-custodying CoinList auction participants that completed the address submission process by 5/22/20
-
-- [ReleaseGold deployments on 6/12/20 (“Wave 4”)](https://gist.githubusercontent.com/marekolszewski/70c65c9b379fdfc892bf8ab0fb915a8c/raw/d7e22bcad1ee53dfd998c46571d1c93503119a15/CeloMainnetReleaseGoldWave4.json): includes recipients that completed the address submission process by 6/8/20
-
-If you have more than one beneficiary address, you'll want to step through this guide for each one.
+Open the list of [all ReleaseGold deployments](https://storage.googleapis.com/celo-website/releasegold/CeloMainnetReleaseGoldAll.json) and locate your address (use Edit>Find in your browser, then paste the beneficiary address). Copy the matching value next to `ContractAddress` into your clipboard.
 
 If you cannot locate your address in these mappings, please contact cLabs.
 
-Record the `Beneficiary` and `ContractAddress` values in environment variables:
+If you have more than one beneficiary address, you'll want to step through this guide and complete the steps for each one separately.
+
+Record the value of the `ContractAddress` in an environment variable:
 
 ```bash
-export CELO_BENEFICIARY_ADDRESS=<YOUR-CELO-BENEFICIARY-ADDRESS>
-export CELO_RG_ADDRESS=<YOUR-CELO-RELEASEGOLD-ADDRESS>
+export CELO_RG_ADDRESS=<ContractAddress>
 ```
 
 You should find your beneficiary account already has a very small CELO balance to pay for transaction fees (values are shown in wei, so For example, 1 CELO = 1000000000000000000):

@@ -324,7 +324,7 @@ PODS:
     - React
   - react-native-fast-crypto (1.8.3):
     - React
-  - react-native-geth (0.1.0-development):
+  - react-native-geth (1.0.0):
     - CeloBlockchain
     - React
   - react-native-keep-awake (4.0.0):
@@ -789,7 +789,7 @@ SPEC CHECKSUMS:
   react-native-config: 8f6b2b9e017f6a5e92a97353c768e19e67294bb1
   react-native-contacts: d1a60e38dadb67dbbe481480338988e00966a30d
   react-native-fast-crypto: 2ca87a31247365bbef25b2682d4cf88182cbf806
-  react-native-geth: b643560e11512a3c0b1d78df929cb9f2409cf4a2
+  react-native-geth: 51d17abd8bac4b80c4e12adb446242ba1407a0c3
   react-native-keep-awake: afad8a51dfef9fe9655a6344771be32c8596d774
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
   react-native-netinfo: b9650ab1b8b4362b3c455b1274e4bc48223cc957

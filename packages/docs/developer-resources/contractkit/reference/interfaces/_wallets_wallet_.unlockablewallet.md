@@ -1,34 +1,36 @@
-# Interface: Wallet
+# Interface: UnlockableWallet
 
 ## Hierarchy
 
-* [ReadOnlyWallet](_wallets_wallet_.readonlywallet.md)
+  ↳ [Wallet](_wallets_wallet_.wallet.md)
 
-  ↳ **Wallet**
-
-  ↳ [UnlockableWallet](_wallets_wallet_.unlockablewallet.md)
+  ↳ **UnlockableWallet**
 
 ## Implemented by
 
-* [LocalWallet](../classes/_wallets_local_wallet_.localwallet.md)
+* [RpcWallet](../classes/_wallets_rpc_wallet_.rpcwallet.md)
 
 ## Index
 
 ### Properties
 
-* [addAccount](_wallets_wallet_.wallet.md#addaccount)
-* [decrypt](_wallets_wallet_.wallet.md#decrypt)
-* [getAccounts](_wallets_wallet_.wallet.md#getaccounts)
-* [hasAccount](_wallets_wallet_.wallet.md#hasaccount)
-* [signPersonalMessage](_wallets_wallet_.wallet.md#signpersonalmessage)
-* [signTransaction](_wallets_wallet_.wallet.md#signtransaction)
-* [signTypedData](_wallets_wallet_.wallet.md#signtypeddata)
+* [addAccount](_wallets_wallet_.unlockablewallet.md#addaccount)
+* [decrypt](_wallets_wallet_.unlockablewallet.md#decrypt)
+* [getAccounts](_wallets_wallet_.unlockablewallet.md#getaccounts)
+* [hasAccount](_wallets_wallet_.unlockablewallet.md#hasaccount)
+* [isAccountUnlocked](_wallets_wallet_.unlockablewallet.md#isaccountunlocked)
+* [signPersonalMessage](_wallets_wallet_.unlockablewallet.md#signpersonalmessage)
+* [signTransaction](_wallets_wallet_.unlockablewallet.md#signtransaction)
+* [signTypedData](_wallets_wallet_.unlockablewallet.md#signtypeddata)
+* [unlockAccount](_wallets_wallet_.unlockablewallet.md#unlockaccount)
 
 ## Properties
 
 ###  addAccount
 
 • **addAccount**: *addInMemoryAccount | addRemoteAccount*
+
+*Inherited from [Wallet](_wallets_wallet_.wallet.md).[addAccount](_wallets_wallet_.wallet.md#addaccount)*
 
 *Defined in [contractkit/src/wallets/wallet.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L26)*
 
@@ -86,6 +88,24 @@ ___
 Name | Type |
 ------ | ------ |
 `address?` | [Address](../modules/_base_.md#address) |
+
+___
+
+###  isAccountUnlocked
+
+• **isAccountUnlocked**: *function*
+
+*Defined in [contractkit/src/wallets/wallet.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L31)*
+
+#### Type declaration:
+
+▸ (`address`: string): *boolean*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`address` | string |
 
 ___
 
@@ -148,3 +168,23 @@ Name | Type |
 ------ | ------ |
 `address` | [Address](../modules/_base_.md#address) |
 `typedData` | EIP712TypedData |
+
+___
+
+###  unlockAccount
+
+• **unlockAccount**: *function*
+
+*Defined in [contractkit/src/wallets/wallet.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L30)*
+
+#### Type declaration:
+
+▸ (`address`: string, `passphrase`: string, `duration`: number): *Promise‹boolean›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`address` | string |
+`passphrase` | string |
+`duration` | number |

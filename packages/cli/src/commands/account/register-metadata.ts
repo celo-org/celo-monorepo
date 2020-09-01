@@ -29,7 +29,6 @@ export default class RegisterMetadata extends BaseCommand {
 
   async run() {
     const res = this.parse(RegisterMetadata)
-    this.kit.defaultAccount = res.flags.from
 
     await newCheckBuilder(this)
       .isAccount(res.flags.from)
