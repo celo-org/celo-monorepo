@@ -40,7 +40,7 @@ export default class Lock extends BaseCommand {
     const lockValue = value.minus(relockValue)
 
     await newCheckBuilder(this)
-      .hasEnoughGold(address, lockValue)
+      .hasEnoughCelo(address, lockValue)
       .runChecks()
 
     const txos = await lockedGold.relock(address, relockValue)

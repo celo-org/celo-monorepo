@@ -112,7 +112,7 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
     ])
   })
 
-  test('can authorize signer with bls keys after registering as validator', async () => {
+  test('can authorize signer with BLS keys after registering as validator', async () => {
     const accounts = await web3.eth.getAccounts()
     const accountsWrapper = await kit.contracts.getAccounts()
     const signer = accounts[1]
@@ -168,6 +168,60 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
       '--blsPop',
       newBlsPoP,
     ])
+  })
+
+  test('cannot authorize signer without BLS keys after registering as validator', async () => {
+    const accounts = await web3.eth.getAccounts()
+    const accountsWrapper = await kit.contracts.getAccounts()
+    const signer = accounts[1]
+    const pop = await accountsWrapper.generateProofOfKeyPossession(contractAddress, signer)
+    const ecdsaPublicKey = await addressToPublicKey(signer, web3.eth.sign)
+
+    const signerNew = accounts[2]
+    const popNew = await accountsWrapper.generateProofOfKeyPossession(contractAddress, signerNew)
+
+    await LockedGold.run([
+      '--contract',
+      contractAddress,
+      '--action',
+      'lock',
+      '--value',
+      '10000000000000000000000',
+      '--yes',
+    ])
+    await Authorize.run([
+      '--contract',
+      contractAddress,
+      '--role',
+      'validator',
+      '--signer',
+      signer,
+      '--signature',
+      serializeSignature(pop),
+    ])
+    await ValidatorRegister.run([
+      '--from',
+      signer,
+      '--ecdsaKey',
+      ecdsaPublicKey,
+      '--blsKey',
+      '0x4fa3f67fc913878b068d1fa1cdddc54913d3bf988dbe5a36a20fa888f20d4894c408a6773f3d7bde11154f2a3076b700d345a42fd25a0e5e83f4db5586ac7979ac2053cd95d8f2efd3e959571ceccaa743e02cf4be3f5d7aaddb0b06fc9aff00',
+      '--blsSignature',
+      '0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900',
+      '--yes',
+    ])
+    await expect(
+      Authorize.run([
+        '--contract',
+        contractAddress,
+        '--role',
+        'validator',
+        '--signer',
+        signerNew,
+        '--signature',
+        serializeSignature(popNew),
+      ])
+    ).rejects.toThrow()
   })
 
   test('fails if contract is not registered as an account', async () => {
