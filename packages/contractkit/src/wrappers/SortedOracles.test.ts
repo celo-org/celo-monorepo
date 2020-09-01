@@ -204,7 +204,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
    * The purpose of these tests is to verify that these wrapper functions exist,
    * are calling the contract methods correctly, and get some value back. The
    * values checked here are often dependent on setup occuring in the protocol
-   * migrations run in `yarn test:prepare`. If these tests are failing, the first
+   * migrations run in `yarn test:reset`. If these tests are failing, the first
    * thing to check is if there have been changes to the migrations
    */
   describe('#getRates', () => {

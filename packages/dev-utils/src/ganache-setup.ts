@@ -118,7 +118,7 @@ export default function setup(
       ;(global as any).stopGanache = stopGanache
     })
     .catch((err) => {
-      console.error('Error starting ganache, Doing `yarn test:prepare` might help')
+      console.error('Error starting ganache, Doing `yarn test:reset` might help')
       console.error(err)
       process.exit(1)
     })

@@ -1,5 +1,6 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
+import { LocalWallet } from '@celo/wallet-local'
 import Web3 from 'web3'
 import { CeloProvider } from './celo-provider'
 import { Callback, CeloTx, JsonRpcPayload, JsonRpcResponse, Provider } from './commons'
@@ -40,7 +41,9 @@ testWithGanache('CeloProvider', (web3: Web3) => {
       send: mockCallback,
     }
 
-    celoProvider = new CeloProvider(mockProvider, new NodeCommunicationWrapper(web3))
+    const communication = new NodeCommunicationWrapper(web3, new LocalWallet())
+    communication.setProvider(mockProvider)
+    celoProvider = (communication.web3.currentProvider as any) as CeloProvider
   })
 
   describe("when celo provider don't have any local account", () => {
