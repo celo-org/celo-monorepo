@@ -48,7 +48,7 @@ export default class LockedGold extends ReleaseGoldBaseCommand {
       const relockValue = BigNumber.minimum(pendingWithdrawalsValue, value)
       const lockValue = value.minus(relockValue)
       await newCheckBuilder(this, this.contractAddress)
-        .hasEnoughGold(this.contractAddress, lockValue)
+        .hasEnoughCelo(this.contractAddress, lockValue)
         .runChecks()
       const txos = await this.releaseGoldWrapper.relockGold(relockValue)
       for (const txo of txos) {

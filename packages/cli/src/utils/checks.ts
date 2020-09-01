@@ -195,10 +195,10 @@ class CheckBuilder {
       this.withValidators((validators, _s, account) => validators.isValidatorGroup(account))
     )
 
-  isValidator = (account: Address) =>
+  isValidator = (account?: Address) =>
     this.addCheck(
       `${account} is Validator`,
-      this.withValidators((validators) => validators.isValidator(account))
+      this.withValidators((validators, _, _account) => validators.isValidator(account ?? _account))
     )
 
   isValidatorGroup = (account: Address) =>
@@ -207,18 +207,18 @@ class CheckBuilder {
       this.withValidators((validators) => validators.isValidatorGroup(account))
     )
 
-  isNotValidator = () =>
+  isNotValidator = (account?: Address) =>
     this.addCheck(
       `${this.signer!} is not a registered Validator`,
-      this.withValidators((validators, _signer, account) => negate(validators.isValidator(account)))
+      this.withValidators((validators, _, _account) =>
+        negate(validators.isValidator(account ?? _account))
+      )
     )
 
   isNotValidatorGroup = () =>
     this.addCheck(
       `${this.signer!} is not a registered ValidatorGroup`,
-      this.withValidators((validators, _signer, account) =>
-        negate(validators.isValidatorGroup(account))
-      )
+      this.withValidators((validators, _, account) => negate(validators.isValidatorGroup(account)))
     )
 
   signerMeetsValidatorBalanceRequirements = () =>
@@ -292,7 +292,7 @@ class CheckBuilder {
       `${address} is currently voting in governance. Revoke your upvotes or wait for the referendum to end.`
     )
 
-  hasEnoughGold = (account: Address, value: BigNumber) => {
+  hasEnoughCelo = (account: Address, value: BigNumber) => {
     const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
     return this.addCheck(`Account has at least ${valueInEth} CELO`, () =>
       this.kit.contracts
