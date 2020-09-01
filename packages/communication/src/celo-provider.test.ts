@@ -1,16 +1,62 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
-import { privateKeyToAddress } from '@celo/utils/lib/address'
-import { LocalWallet } from '@celo/wallet-local'
 import Web3 from 'web3'
 import { CeloProvider } from './celo-provider'
-import { Callback, CeloTx, JsonRpcPayload, JsonRpcResponse, Provider } from './commons'
+import {
+  Address,
+  Callback,
+  CeloTx,
+  EncodedTransaction,
+  JsonRpcPayload,
+  JsonRpcResponse,
+  Provider,
+} from './commons'
 import { NodeCommunicationWrapper } from './node-communication-wrapper'
+import { Wallet } from './wallet'
 
-// Random private keys
-const PRIVATE_KEY1 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
-const ACCOUNT_ADDRESS1 = privateKeyToAddress(PRIVATE_KEY1)
-const PRIVATE_KEY2 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890fdeccc'
-const ACCOUNT_ADDRESS2 = privateKeyToAddress(PRIVATE_KEY2)
+const ACCOUNT_ADDRESS1 = '0x1234567890123456789012345678901234567890'
+const ACCOUNT_ADDRESS2 = '0x0987654321098765432109876543210987654321'
+
+class MockWallet implements Wallet {
+  private addresses = new Array<Address>()
+  addAccount(privateKey: Address): void {
+    this.addresses.push(privateKey)
+  }
+  getAccounts(): Address[] {
+    return this.addresses
+  }
+  hasAccount(address?: string | undefined): boolean {
+    console.log('addresses: ', this.addresses)
+    console.log('address: ', address)
+    console.log('result: ', address != null && this.addresses.includes(address))
+    return address != null && this.addresses.includes(address)
+  }
+  signTransaction(_txParams: CeloTx): Promise<EncodedTransaction> {
+    return Promise.resolve({
+      raw: 'mock',
+      tx: {
+        nonce: 'nonce',
+        gasPrice: 'gasPrice',
+        gas: 'gas',
+        feeCurrency: 'feeCurrency',
+        gatewayFeeRecipient: 'gatewayFeeRecipient',
+        gatewayFee: 'gatewayFee',
+        to: 'to',
+        value: 'value',
+        input: 'input',
+        r: 'r',
+        s: 's',
+        v: 'v',
+        hash: 'hash',
+      },
+    })
+  }
+  signTypedData(_address: string, _typedData: any): Promise<string> {
+    return Promise.resolve('mock')
+  }
+  signPersonalMessage(_address: string, _data: string): Promise<string> {
+    return Promise.resolve('mock')
+  }
+}
 
 // These tests verify the signTransaction WITHOUT the ParamsPopulator
 testWithGanache('CeloProvider', (web3: Web3) => {
@@ -41,7 +87,7 @@ testWithGanache('CeloProvider', (web3: Web3) => {
       send: mockCallback,
     }
 
-    const communication = new NodeCommunicationWrapper(web3, new LocalWallet())
+    const communication = new NodeCommunicationWrapper(web3, new MockWallet())
     communication.setProvider(mockProvider)
     celoProvider = (communication.web3.currentProvider as any) as CeloProvider
   })
@@ -130,7 +176,7 @@ testWithGanache('CeloProvider', (web3: Web3) => {
     }
 
     beforeEach(() => {
-      celoProvider.addAccount(PRIVATE_KEY1)
+      celoProvider.addAccount(ACCOUNT_ADDRESS1)
     })
 
     describe('but tries to use it with a different account', () => {
