@@ -25,7 +25,7 @@
 
 \+ **new WasmBlsBlindingClient**(`odisPubKey`: string): *[WasmBlsBlindingClient](_identity_odis_bls_blinding_client_.wasmblsblindingclient.md)*
 
-*Defined in [contractkit/src/identity/odis/bls-blinding-client.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/bls-blinding-client.ts#L12)*
+*Defined in [packages/contractkit/src/identity/odis/bls-blinding-client.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/bls-blinding-client.ts#L12)*
 
 **Parameters:**
 
@@ -41,7 +41,7 @@ Name | Type |
 
 ▸ **blindMessage**(`base64PhoneNumber`: string): *Promise‹string›*
 
-*Defined in [contractkit/src/identity/odis/bls-blinding-client.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/bls-blinding-client.ts#L26)*
+*Defined in [packages/contractkit/src/identity/odis/bls-blinding-client.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/bls-blinding-client.ts#L26)*
 
 **Parameters:**
 
@@ -57,7 +57,7 @@ ___
 
 ▸ **unblindAndVerifyMessage**(`base64BlindSig`: string): *Promise‹string›*
 
-*Defined in [contractkit/src/identity/odis/bls-blinding-client.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/bls-blinding-client.ts#L34)*
+*Defined in [packages/contractkit/src/identity/odis/bls-blinding-client.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/bls-blinding-client.ts#L34)*
 
 **Parameters:**
 

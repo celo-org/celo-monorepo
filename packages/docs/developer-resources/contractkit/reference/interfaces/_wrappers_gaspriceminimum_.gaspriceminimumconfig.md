@@ -18,7 +18,7 @@
 
 • **adjustmentSpeed**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/GasPriceMinimum.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GasPriceMinimum.ts#L8)*
+*Defined in [packages/contractkit/src/wrappers/GasPriceMinimum.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GasPriceMinimum.ts#L8)*
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **gasPriceMinimum**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/GasPriceMinimum.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GasPriceMinimum.ts#L6)*
+*Defined in [packages/contractkit/src/wrappers/GasPriceMinimum.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GasPriceMinimum.ts#L6)*
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **targetDensity**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/GasPriceMinimum.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GasPriceMinimum.ts#L7)*
+*Defined in [packages/contractkit/src/wrappers/GasPriceMinimum.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GasPriceMinimum.ts#L7)*
