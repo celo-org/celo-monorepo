@@ -242,6 +242,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
                 usd: weiToDecimal(+usd),
                 gold: weiToDecimal(+lockedGold),
                 elected: lastElected >= latestBlock,
+                neverElected: !lastElected,
                 online: lastOnline >= latestBlock,
                 uptime: (+score * 100) / 10 ** 24,
                 attestation:
@@ -264,8 +265,9 @@ class ValidatorsList extends React.PureComponent<Props, State> {
           { elected: 0, online: 0, total: 0, uptime: 0, attestation: 0 }
         )
         data.uptime = data.uptime / group.validators.length
-        // Gets average attestation score for group, filtering out 0s
-        data.attestation /= group.validators.filter((v) => v.attestation > 0).length
+        // Averages attestation score for group
+        // Validators that have never been elected won't affect average
+        data.attestation /= group.validators.filter((v) => !v.neverElected).length
         return {
           id,
           ...group,
