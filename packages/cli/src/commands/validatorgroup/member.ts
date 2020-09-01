@@ -43,7 +43,6 @@ export default class ValidatorGroupMembers extends BaseCommand {
       return
     }
 
-    this.kit.defaultAccount = res.flags.from
     const validators = await this.kit.contracts.getValidators()
 
     await newCheckBuilder(this, res.flags.from)

@@ -4,13 +4,12 @@ import { AzureKeyVaultClient } from '../utils/azure-key-vault-client'
 import { getAddressFromPublicKey } from '../utils/signing-utils'
 import { RemoteWallet } from './remote-wallet'
 import { AzureHSMSigner } from './signers/azure-hsm-signer'
-import { Signer } from './signers/signer'
-import { Wallet } from './wallet'
+import { ReadOnlyWallet } from './wallet'
 
 const debug = debugFactory('kit:wallet:aws-hsm-wallet')
 
 // Azure Key Vault implementation of a RemoteWallet
-export class AzureHSMWallet extends RemoteWallet implements Wallet {
+export class AzureHSMWallet extends RemoteWallet<AzureHSMSigner> implements ReadOnlyWallet {
   private readonly vaultName: string
   private keyVaultClient: AzureKeyVaultClient | undefined
 
@@ -19,12 +18,12 @@ export class AzureHSMWallet extends RemoteWallet implements Wallet {
     this.vaultName = vaultName
   }
 
-  protected async loadAccountSigners(): Promise<Map<Address, Signer>> {
+  protected async loadAccountSigners(): Promise<Map<Address, AzureHSMSigner>> {
     if (!this.keyVaultClient) {
       this.keyVaultClient = this.generateNewKeyVaultClient(this.vaultName)
     }
     const keys = await this.keyVaultClient.getKeys()
-    const addressToSigner = new Map<Address, Signer>()
+    const addressToSigner = new Map<Address, AzureHSMSigner>()
     for (const key of keys) {
       try {
         const address = await this.getAddressFromKeyName(key)

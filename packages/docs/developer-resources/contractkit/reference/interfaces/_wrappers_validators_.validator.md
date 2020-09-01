@@ -22,7 +22,7 @@
 
 • **address**: *[Address](../modules/_base_.md#address)*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L25)*
+*Defined in [packages/contractkit/src/wrappers/Validators.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L25)*
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 • **affiliation**: *string | null*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L28)*
+*Defined in [packages/contractkit/src/wrappers/Validators.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L28)*
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 • **blsPublicKey**: *string*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L27)*
+*Defined in [packages/contractkit/src/wrappers/Validators.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L27)*
 
 ___
 
@@ -46,7 +46,7 @@ ___
 
 • **ecdsaPublicKey**: *string*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L26)*
+*Defined in [packages/contractkit/src/wrappers/Validators.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L26)*
 
 ___
 
@@ -54,7 +54,7 @@ ___
 
 • **name**: *string*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L24)*
+*Defined in [packages/contractkit/src/wrappers/Validators.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L24)*
 
 ___
 
@@ -62,7 +62,7 @@ ___
 
 • **score**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L29)*
+*Defined in [packages/contractkit/src/wrappers/Validators.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L29)*
 
 ___
 
@@ -70,4 +70,4 @@ ___
 
 • **signer**: *[Address](../modules/_base_.md#address)*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L30)*
+*Defined in [packages/contractkit/src/wrappers/Validators.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L30)*

@@ -10,9 +10,8 @@ import {
 } from '../utils/signing-utils'
 import { Signer } from './signers/signer'
 
-export interface Wallet {
+export interface ReadOnlyWallet {
   getAccounts: () => Address[]
-  addAccount: (privateKey: string) => void
   removeAccount: (address: Address) => void
   hasAccount: (address?: Address) => boolean
   signTransaction: (txParams: Tx) => Promise<EncodedTransaction>
@@ -21,10 +20,22 @@ export interface Wallet {
   decrypt: (address: Address, ciphertext: Buffer) => Promise<Buffer>
 }
 
-export abstract class WalletBase implements Wallet {
+type addInMemoryAccount = (privateKey: string) => void
+type addRemoteAccount = (privateKey: string, passphrase: string) => Promise<string>
+
+export interface Wallet extends ReadOnlyWallet {
+  addAccount: addInMemoryAccount | addRemoteAccount
+}
+
+export interface UnlockableWallet extends Wallet {
+  unlockAccount: (address: string, passphrase: string, duration: number) => Promise<boolean>
+  isAccountUnlocked: (address: string) => boolean
+}
+
+export abstract class WalletBase<TSigner extends Signer> implements ReadOnlyWallet {
   // By creating the Signers in advance we can have a common pattern across wallets
   // Each implementation is responsible for populating this map through addSigner
-  private accountSigners = new Map<Address, Signer>()
+  private accountSigners = new Map<Address, TSigner>()
 
   /**
    * Gets a list of accounts that have been registered
@@ -67,7 +78,7 @@ export abstract class WalletBase implements Wallet {
    * @param address Account address
    * @param signer Account signer
    */
-  protected addSigner(address: Address, signer: Signer) {
+  protected addSigner(address: Address, signer: TSigner) {
     const normalizedAddress = normalizeAddressWith0x(address)
     this.accountSigners.set(normalizedAddress, signer)
   }
@@ -137,7 +148,7 @@ export abstract class WalletBase implements Wallet {
     return ethUtil.toRpcSig(sig.v, sig.r, sig.s)
   }
 
-  protected getSigner(address: string): Signer {
+  protected getSigner(address: string): TSigner {
     const normalizedAddress = normalizeAddressWith0x(address)
     if (!this.accountSigners.has(normalizedAddress)) {
       throw new Error(`Could not find address ${normalizedAddress}`)

@@ -1,3 +1,4 @@
+import { Err, makeAsyncThrowable, Ok, Result, RootError } from '@celo/base/lib/result'
 import {
   ensureLeading0x,
   privateKeyToPublicKey,
@@ -9,7 +10,33 @@ import { randomBytes } from 'crypto'
 import { isLeft, isRight } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import { Address } from '../../base'
-import OffchainDataWrapper from '../offchain-data-wrapper'
+import OffchainDataWrapper, { OffchainErrors } from '../offchain-data-wrapper'
+
+export enum SchemaErrorTypes {
+  InvalidDataError = 'InvalidDataError',
+  OffchainError = 'OffchainError',
+  UnknownCiphertext = 'UnknownCiphertext',
+}
+
+export class InvalidDataError extends RootError<SchemaErrorTypes.InvalidDataError> {
+  constructor() {
+    super(SchemaErrorTypes.InvalidDataError)
+  }
+}
+
+export class OffchainError extends RootError<SchemaErrorTypes.OffchainError> {
+  constructor(readonly error: OffchainErrors) {
+    super(SchemaErrorTypes.OffchainError)
+  }
+}
+
+export class UnknownCiphertext extends RootError<SchemaErrorTypes.UnknownCiphertext> {
+  constructor() {
+    super(SchemaErrorTypes.UnknownCiphertext)
+  }
+}
+
+type SchemaErrors = InvalidDataError | OffchainError | UnknownCiphertext
 
 export class SimpleSchema<DataType> {
   constructor(
@@ -18,9 +45,11 @@ export class SimpleSchema<DataType> {
     readonly dataPath: string
   ) {}
 
-  async read(account: string) {
-    return readWithSchema(this.wrapper, this.type, account, this.dataPath)
+  async readAsResult(account: string) {
+    return readWithSchemaAsResult(this.wrapper, this.type, account, this.dataPath)
   }
+
+  read = makeAsyncThrowable(this.readAsResult.bind(this))
 
   async write(data: DataType) {
     return writeWithSchema(this.wrapper, this.type, this.dataPath, data)
@@ -140,27 +169,27 @@ const getDecryptionKey = async (
   return false
 }
 
-export const readWithSchema = async <T>(
+export const readWithSchemaAsResult = async <DataType>(
   wrapper: OffchainDataWrapper,
-  type: t.Type<T>,
+  type: t.Type<DataType>,
   account: Address,
   dataPath: string
-) => {
-  const rawData = await wrapper.readDataFrom(account, dataPath)
-  if (rawData === undefined) {
-    return
+): Promise<Result<DataType, SchemaErrors>> => {
+  const rawData = await wrapper.readDataFromAsResult(account, dataPath)
+  if (!rawData.ok) {
+    return Err(new OffchainError(rawData.error))
   }
 
-  const dataAsJson = JSON.parse(rawData)
+  const dataAsJson = JSON.parse(rawData.result)
   const parsedDataAsType = type.decode(dataAsJson)
 
   if (isRight(parsedDataAsType)) {
-    return parsedDataAsType.right
+    return Ok(parsedDataAsType.right)
   }
 
   const parseDataAsEncryptionWrapped = EncryptionWrappedData.decode(dataAsJson)
   if (isLeft(parseDataAsEncryptionWrapped)) {
-    return undefined
+    return Err(new InvalidDataError())
   }
 
   const decryptionKeyPublic = parseDataAsEncryptionWrapped.right.publicKey
@@ -182,13 +211,13 @@ export const readWithSchema = async <T>(
     const parsedPlaintextAsType = type.decode(JSON.parse(plaintext.toString()))
 
     if (isLeft(parsedPlaintextAsType)) {
-      return undefined
+      return Err(new InvalidDataError())
     }
 
-    return parsedPlaintextAsType.right
+    return Ok(parsedPlaintextAsType.right)
   }
 
-  return undefined
+  return Err(new UnknownCiphertext())
 }
 
 export const writeEncryptedWithSchema = async <T>(
@@ -233,11 +262,13 @@ export const writeEncryptedWithSchema = async <T>(
   return
 }
 
-export const writeWithSchema = async <T>(
+export const readWithSchema = makeAsyncThrowable(readWithSchemaAsResult)
+
+export const writeWithSchema = async <DataType>(
   wrapper: OffchainDataWrapper,
-  type: t.Type<T>,
+  type: t.Type<DataType>,
   dataPath: string,
-  data: T
+  data: DataType
 ) => {
   if (!type.is(data)) {
     return
