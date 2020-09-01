@@ -13,11 +13,12 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { isAddressFormat } from 'src/account/utils'
 import { CeloExchangeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import AccountAddressInput from 'src/components/AccountAddressInput'
 import CeloAmountInput from 'src/components/CeloAmountInput'
-import { ADDRESS_LENGTH, exchangeRatePairSelector } from 'src/exchange/reducer'
+import { exchangeRatePairSelector } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import { HeaderTitleWithBalance, headerWithBackButton } from 'src/navigator/Headers.v2'
@@ -39,8 +40,7 @@ function WithdrawCeloScreen({ navigation }: Props) {
 
   const celoToTransfer = new BigNumber(celoInput)
   const readyToReview =
-    accountAddress.startsWith('0x') &&
-    accountAddress.length === ADDRESS_LENGTH &&
+    isAddressFormat(accountAddress) &&
     celoToTransfer.isGreaterThan(0) &&
     celoToTransfer.isLessThanOrEqualTo(goldBalanceNumber)
 
