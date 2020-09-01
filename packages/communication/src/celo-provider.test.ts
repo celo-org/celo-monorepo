@@ -1,4 +1,3 @@
-import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import Web3 from 'web3'
 import { CeloProvider } from './celo-provider'
 import {
@@ -59,7 +58,7 @@ class MockWallet implements Wallet {
 }
 
 // These tests verify the signTransaction WITHOUT the ParamsPopulator
-testWithGanache('CeloProvider', (web3: Web3) => {
+describe('CeloProvider', () => {
   let mockCallback: any
   let mockProvider: Provider
   let celoProvider: CeloProvider
@@ -87,8 +86,9 @@ testWithGanache('CeloProvider', (web3: Web3) => {
       send: mockCallback,
     }
 
+    const web3 = new Web3()
+    web3.setProvider(mockProvider as any)
     const communication = new NodeCommunicationWrapper(web3, new MockWallet())
-    communication.setProvider(mockProvider)
     celoProvider = (communication.web3.currentProvider as any) as CeloProvider
   })
 
