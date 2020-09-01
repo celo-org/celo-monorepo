@@ -57,7 +57,7 @@ oracle:
   allowNotCGLD: false
   apiRequestTimeoutMs: 5000
   circuitBreakerPriceChangeThreshold: 0.25
-  exchanges: BITTREX,OKCOIN
+  exchanges: BITTREX,OKCOIN,COINBASE
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:
