@@ -17,7 +17,7 @@ import { CeloExchangeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import AccountAddressInput from 'src/components/AccountAddressInput'
 import CeloAmountInput from 'src/components/CeloAmountInput'
-import { ADDRESS_LENGTH } from 'src/exchange/reducer'
+import { ADDRESS_LENGTH, exchangeRatePairSelector } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import { HeaderTitleWithBalance, headerWithBackButton } from 'src/navigator/Headers.v2'
@@ -43,6 +43,8 @@ function WithdrawCeloScreen({ navigation }: Props) {
     accountAddress.length === ADDRESS_LENGTH &&
     celoToTransfer.isGreaterThan(0) &&
     celoToTransfer.isLessThanOrEqualTo(goldBalanceNumber)
+
+  const exchangeRatePair = useSelector(exchangeRatePairSelector)
 
   const [isTransferLimitReached, showLimitReachedBanner] = useDailyTransferLimitValidator(
     celoToTransfer,
@@ -94,6 +96,7 @@ function WithdrawCeloScreen({ navigation }: Props) {
         type={BtnTypes.SECONDARY}
         size={BtnSizes.FULL}
         style={styles.reviewBtn}
+        showLoading={exchangeRatePair === null}
         testID="WithdrawReviewButton"
       />
       <KeyboardSpacer />

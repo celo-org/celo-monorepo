@@ -9,15 +9,18 @@ import { RouteProp } from '@react-navigation/core'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
+import { useEffect } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { Platform, StyleSheet, Text, TextInput, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import BackButton from 'src/components/BackButton.v2'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import LineItemRow from 'src/components/LineItemRow'
 import { DOLLAR_ADD_FUNDS_MIN_AMOUNT, DOLLAR_CASH_OUT_MIN_AMOUNT } from 'src/config'
+import { fetchExchangeRate } from 'src/exchange/actions'
+import { exchangeRatePairSelector } from 'src/exchange/reducer'
 import { features } from 'src/flags'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
@@ -104,9 +107,15 @@ export function ExchangeTradeScreen({ navigation, route }: Props) {
       new BigNumber('0')
   )
 
+  const dispatch = useDispatch()
+  const exchangeRatePair = useSelector(exchangeRatePairSelector)
+  useEffect(() => {
+    dispatch(fetchExchangeRate())
+  }, [])
+
   const [isTransferLimitReached, showLimitReachedBanner] = useDailyTransferLimitValidator(
-    dollarAmount,
-    CURRENCY_ENUM.DOLLAR
+    features.CUSD_MOONPAY_ENABLED ? dollarAmount : parsedInputAmount,
+    features.CUSD_MOONPAY_ENABLED ? CURRENCY_ENUM.DOLLAR : CURRENCY_ENUM.GOLD
   )
 
   return (
@@ -164,6 +173,7 @@ export function ExchangeTradeScreen({ navigation, route }: Props) {
       )}
       <Button
         onPress={goNext}
+        showLoading={exchangeRatePair === null}
         text={t('global:next')}
         type={BtnTypes.SECONDARY}
         accessibilityLabel={t('global:next')}
