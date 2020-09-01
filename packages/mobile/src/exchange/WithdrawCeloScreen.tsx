@@ -17,39 +17,51 @@ import { CeloExchangeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import AccountAddressInput from 'src/components/AccountAddressInput'
 import CeloAmountInput from 'src/components/CeloAmountInput'
-import { ADDRESS_LENGTH } from 'src/exchange/reducer'
+import { ADDRESS_LENGTH, exchangeRatePairSelector } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import { HeaderTitleWithBalance, headerWithBackButton } from 'src/navigator/Headers.v2'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import useSelector from 'src/redux/useSelector'
+import { useDailyTransferLimitValidator } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 
 type Props = StackScreenProps<StackParamList, Screens.WithdrawCeloScreen>
 
 function WithdrawCeloScreen({ navigation }: Props) {
   const [accountAddress, setAccountAddress] = useState('')
-  const [celoToTransfer, setCeloToTransfer] = useState('')
+  const [celoInput, setCeloToTransfer] = useState('')
 
   const goldBalance = useSelector((state) => state.goldToken.balance)
   const goldBalanceNumber = new BigNumber(goldBalance || 0)
   const { t } = useTranslation(Namespaces.exchangeFlow9)
 
-  const celoToTransferNumber = new BigNumber(celoToTransfer)
+  const celoToTransfer = new BigNumber(celoInput)
   const readyToReview =
     accountAddress.startsWith('0x') &&
     accountAddress.length === ADDRESS_LENGTH &&
-    celoToTransferNumber.isGreaterThan(0) &&
-    celoToTransferNumber.isLessThanOrEqualTo(goldBalanceNumber)
+    celoToTransfer.isGreaterThan(0) &&
+    celoToTransfer.isLessThanOrEqualTo(goldBalanceNumber)
 
-  const onConfirm = () => {
-    const celoAmount = new BigNumber(celoToTransfer)
+  const exchangeRatePair = useSelector(exchangeRatePairSelector)
+
+  const [isTransferLimitReached, showLimitReachedBanner] = useDailyTransferLimitValidator(
+    celoToTransfer,
+    CURRENCY_ENUM.GOLD
+  )
+
+  const onConfirm = async () => {
+    if (isTransferLimitReached) {
+      showLimitReachedBanner()
+      return
+    }
+
     ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_review, {
-      amount: celoAmount.toString(),
+      amount: celoToTransfer.toString(),
     })
     navigation.navigate(Screens.WithdrawCeloReviewScreen, {
-      amount: celoAmount,
+      amount: celoToTransfer,
       recipientAddress: accountAddress,
     })
   }
@@ -73,7 +85,7 @@ function WithdrawCeloScreen({ navigation }: Props) {
           inputContainerStyle={styles.inputContainer}
           inputStyle={styles.input}
           onCeloChanged={setCeloToTransfer}
-          celo={celoToTransfer}
+          celo={celoInput}
         />
       </KeyboardAwareScrollView>
       <Button
@@ -84,6 +96,7 @@ function WithdrawCeloScreen({ navigation }: Props) {
         type={BtnTypes.SECONDARY}
         size={BtnSizes.FULL}
         style={styles.reviewBtn}
+        showLoading={exchangeRatePair === null}
         testID="WithdrawReviewButton"
       />
       <KeyboardSpacer />
