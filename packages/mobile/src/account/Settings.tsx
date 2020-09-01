@@ -230,6 +230,11 @@ export class Account extends React.Component<Props, State> {
               <Text>Trigger a crash</Text>
             </TouchableOpacity>
           </View>
+          <View style={styles.devSettingsItem}>
+            <TouchableOpacity onPress={this.confirmAccountRemoval}>
+              <Text>Valora Quick Reset</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       )
     }
@@ -312,7 +317,7 @@ export class Account extends React.Component<Props, State> {
     return (
       <SafeAreaView style={styles.container}>
         <DrawerTopBar />
-        <ScrollView>
+        <ScrollView testID="SettingsScrollView">
           <TouchableWithoutFeedback onPress={this.onDevSettingsTriggerPress}>
             <Text style={styles.title} testID={'SettingsTitle'}>
               {t('global:settings')}
@@ -359,6 +364,7 @@ export class Account extends React.Component<Props, State> {
               title={t('removeAccountTitle')}
               details={t('removeAccountDetails')}
               onPress={this.onRemoveAccountPress}
+              testID="ResetAccount"
             />
           </View>
           {this.getDevSettingsComp()}
@@ -389,6 +395,7 @@ export class Account extends React.Component<Props, State> {
             actionPress={this.onPressContinueWithAccountRemoval}
             secondaryActionText={t('global:cancel')}
             secondaryActionPress={this.hideRemoveAccountModal}
+            testID="RemoveAccountModal"
           >
             {t('accountKeyModal.body1')}
             {'\n\n'}
@@ -401,6 +408,7 @@ export class Account extends React.Component<Props, State> {
             actionPress={this.confirmAccountRemoval}
             secondaryActionText={t('global:cancel')}
             secondaryActionPress={this.hideConfirmRemovalModal}
+            testID="ConfirmAccountRemovalModal"
           >
             {t('promptConfirmRemovalModal.body')}
           </Dialog>
