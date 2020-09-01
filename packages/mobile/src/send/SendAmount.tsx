@@ -7,9 +7,9 @@ import { parseInputAmount } from '@celo/utils/src/parsing'
 import { RouteProp } from '@react-navigation/native'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
-import * as React from 'react'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
@@ -105,7 +105,8 @@ function SendAmount(props: Props) {
 
   const { t } = useTranslation(Namespaces.sendFlow7)
 
-  const [amount, setAmount] = React.useState('')
+  const [amount, setAmount] = useState('')
+  const [buttonWasPressed, setButtonWasPressed] = useState(false)
 
   const localCurrencyCode = useSelector(getLocalCurrencyCode)
   const localCurrencyExchangeRate = useSelector(getLocalCurrencyExchangeRate)
@@ -168,8 +169,12 @@ function SendAmount(props: Props) {
   const isAmountValid = parsedLocalAmount.isGreaterThanOrEqualTo(DOLLAR_TRANSACTION_MIN_AMOUNT)
   const isDollarBalanceSufficient = isAmountValid && newAccountBalance.isGreaterThanOrEqualTo(0)
 
-  const reviewBtnDisabled =
-    !isAmountValid || recipientVerificationStatus === RecipientVerificationStatus.UNKNOWN
+  const sendButtonText =
+    buttonWasPressed && recipientVerificationStatus === RecipientVerificationStatus.UNKNOWN ? (
+      <ActivityIndicator testID={'loading/sendAmount'} />
+    ) : (
+      t('global:review')
+    )
 
   const secureSendPhoneNumberMapping = useSelector(secureSendPhoneNumberMappingSelector)
   const addressValidationType: AddressValidationType = getAddressValidationType(
@@ -217,6 +222,8 @@ function SendAmount(props: Props) {
       return
     }
 
+    setButtonWasPressed(true)
+
     const transactionData =
       recipientVerificationStatus === RecipientVerificationStatus.VERIFIED
         ? getTransactionData(TokenTransactionType.Sent)
@@ -249,6 +256,7 @@ function SendAmount(props: Props) {
   ])
 
   const onRequest = React.useCallback(() => {
+    setButtonWasPressed(true)
     const transactionData = getTransactionData(TokenTransactionType.PayRequest)
 
     if (
@@ -297,10 +305,10 @@ function SendAmount(props: Props) {
       <Button
         style={styles.nextBtn}
         size={BtnSizes.FULL}
-        text={t('global:review')}
+        text={sendButtonText}
         type={BtnTypes.SECONDARY}
         onPress={isOutgoingPaymentRequest ? onRequest : onSend}
-        disabled={reviewBtnDisabled}
+        disabled={!isAmountValid}
         testID="Review"
       />
     </SafeAreaView>
