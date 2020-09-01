@@ -139,6 +139,10 @@ contract Reserve is
    * @param value The reserve ratio at which the tobin tax sets in.
    */
   function setTobinTaxReserveRatio(uint256 value) public onlyOwner {
+    require(
+      FixidityLib.wrap(value).gte(FixidityLib.fixed1()),
+      "tobin tax reserve ratio cannot be less than 1"
+    );
     tobinTaxReserveRatio = value;
     emit TobinTaxReserveRatioSet(value);
   }
