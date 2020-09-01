@@ -7,8 +7,8 @@ import ResetAccount from './src/ResetAccount'
 describe('Run tests', () => {
   beforeEach(dismissBanners)
 
-  // describe('Onboarding', Onboarding)
-  // describe('Send cUSD', Send)
+  describe('Onboarding', Onboarding)
+  describe('Send cUSD', Send)
   describe('Withdraw CELO', Withdraw)
-  // describe('Reset Account', ResetAccount)
+  describe('Reset Account', ResetAccount)
 })
