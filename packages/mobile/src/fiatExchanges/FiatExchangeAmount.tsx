@@ -9,7 +9,6 @@ import { RouteProp } from '@react-navigation/core'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { useEffect } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { Platform, StyleSheet, Text, TextInput, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
@@ -109,7 +108,7 @@ export function ExchangeTradeScreen({ navigation, route }: Props) {
 
   const dispatch = useDispatch()
   const exchangeRatePair = useSelector(exchangeRatePairSelector)
-  useEffect(() => {
+  React.useEffect(() => {
     dispatch(fetchExchangeRate())
   }, [])
 
