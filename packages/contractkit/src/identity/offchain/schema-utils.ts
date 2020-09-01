@@ -1,4 +1,11 @@
-import { Err, makeAsyncThrowable, Ok, Result, RootError } from '@celo/base/lib/result'
+import {
+  Err,
+  makeAsyncThrowable,
+  Ok,
+  parseJsonAsResult,
+  Result,
+  RootError,
+} from '@celo/base/lib/result'
 import {
   ensureLeading0x,
   privateKeyToPublicKey,
@@ -91,14 +98,16 @@ export class EncryptionKeysAccessor {
   basePath = '/accounts'
   constructor(readonly wrapper: OffchainDataWrapper) {}
 
-  async read(account: Address) {
-    return readWithSchema(
+  async readAsResult(account: Address) {
+    return readWithSchemaAsResult(
       this.wrapper,
       EncryptionKeysSchema,
       account,
       this.basePath + '/' + this.wrapper.self + '/encryptionKeys'
     )
   }
+
+  read = makeAsyncThrowable(this.readAsResult.bind(this))
 
   async write(other: Address, keys: EncryptionKeysType) {
     return writeWithSchema(
@@ -158,11 +167,15 @@ const getDecryptionKey = async (
   }
 
   const encryptionKeysAccessor = new EncryptionKeysAccessor(wrapper)
-  const encryptionKeys = await encryptionKeysAccessor.read(account)
+  const encryptionKeys = await encryptionKeysAccessor.readAsResult(account)
+
+  if (!encryptionKeys.ok) {
+    return false
+  }
 
   // The decryption key is under the encryptionKeys path
-  if (encryptionKeys && encryptionKeys.keys[encryptionWrappedData.publicKey]) {
-    wrapper.kit.addAccount(encryptionKeys.keys[encryptionWrappedData.publicKey].privateKey)
+  if (encryptionKeys.result.keys[encryptionWrappedData.publicKey]) {
+    wrapper.kit.addAccount(encryptionKeys.result.keys[encryptionWrappedData.publicKey].privateKey)
     return true
   }
 
@@ -180,14 +193,19 @@ export const readWithSchemaAsResult = async <DataType>(
     return Err(new OffchainError(rawData.error))
   }
 
-  const dataAsJson = JSON.parse(rawData.result)
-  const parsedDataAsType = type.decode(dataAsJson)
+  const dataAsJson = parseJsonAsResult(rawData.result)
+
+  if (!dataAsJson.ok) {
+    return Err(new InvalidDataError())
+  }
+
+  const parsedDataAsType = type.decode(dataAsJson.result)
 
   if (isRight(parsedDataAsType)) {
     return Ok(parsedDataAsType.right)
   }
 
-  const parseDataAsEncryptionWrapped = EncryptionWrappedData.decode(dataAsJson)
+  const parseDataAsEncryptionWrapped = EncryptionWrappedData.decode(dataAsJson.result)
   if (isLeft(parseDataAsEncryptionWrapped)) {
     return Err(new InvalidDataError())
   }
@@ -208,8 +226,12 @@ export const readWithSchemaAsResult = async <DataType>(
       Buffer.from(parseDataAsEncryptionWrapped.right.ciphertext, 'hex')
     )
 
-    const parsedPlaintextAsType = type.decode(JSON.parse(plaintext.toString()))
+    const parsedPlaintextAsObject = parseJsonAsResult(plaintext.toString())
+    if (!parsedPlaintextAsObject.ok) {
+      return Err(new InvalidDataError())
+    }
 
+    const parsedPlaintextAsType = type.decode(parsedPlaintextAsObject.result)
     if (isLeft(parsedPlaintextAsType)) {
       return Err(new InvalidDataError())
     }

@@ -73,3 +73,18 @@ export class RootError<T> extends Error implements BaseError<T> {
     }
   }
 }
+
+export const JSONParseErrorType = 'JsonParseError'
+// tslint:disable-next-line:max-classes-per-file
+export class JSONParseError extends RootError<string> {
+  constructor(readonly error: Error) {
+    super(JSONParseErrorType)
+  }
+}
+export function parseJsonAsResult(data: string) {
+  try {
+    return Ok(JSON.parse(data))
+  } catch (error) {
+    return Err(new JSONParseError(error))
+  }
+}

@@ -61,7 +61,7 @@ testWithGanache('Offchain Data', (web3) => {
       )
     })
 
-    it.only('can write a name', async () => {
+    it('can write a name', async () => {
       const testname = 'test'
       const nameAccessor = new NameAccessor(wrapper)
       await nameAccessor.write({ name: testname })
@@ -190,8 +190,13 @@ testWithGanache('Offchain Data', (web3) => {
 
           const nameAccessor = new NameAccessor(wrapper)
           await nameAccessor.writeEncrypted(payload, [await accounts.getDataEncryptionKey(reader)])
-          const receivedName = await nameAccessor.read(writer)
-          expect(receivedName).toBeUndefined()
+          const receivedName = await nameAccessor.readAsResult(writer)
+
+          if (receivedName.ok) {
+            throw new Error('Should not get here')
+          }
+
+          expect(receivedName.error.errorType).toEqual(SchemaErrorTypes.UnknownCiphertext)
         })
       })
     })
