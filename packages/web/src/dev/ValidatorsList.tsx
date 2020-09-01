@@ -264,7 +264,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
           { elected: 0, online: 0, total: 0, uptime: 0, attestation: 0 }
         )
         data.uptime = data.uptime / group.validators.length
-        data.attestation = data.attestation / group.validators.length
+        data.attestation /= group.validators.filter((v) => v.attestation > 0).length
         return {
           id,
           ...group,
