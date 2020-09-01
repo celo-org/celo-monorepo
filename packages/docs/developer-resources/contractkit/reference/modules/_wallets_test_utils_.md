@@ -28,7 +28,7 @@
 
 • **ACCOUNT_ADDRESS1**: *string* = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY1))
 
-*Defined in [contractkit/src/wallets/test-utils.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L4)*
+*Defined in [packages/contractkit/src/wallets/test-utils.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L4)*
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **ACCOUNT_ADDRESS2**: *string* = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY2))
 
-*Defined in [contractkit/src/wallets/test-utils.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L6)*
+*Defined in [packages/contractkit/src/wallets/test-utils.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L6)*
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • **ACCOUNT_ADDRESS3**: *string* = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY3))
 
-*Defined in [contractkit/src/wallets/test-utils.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L8)*
+*Defined in [packages/contractkit/src/wallets/test-utils.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L8)*
 
 ___
 
@@ -52,7 +52,7 @@ ___
 
 • **ACCOUNT_ADDRESS4**: *string* = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY4))
 
-*Defined in [contractkit/src/wallets/test-utils.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L10)*
+*Defined in [packages/contractkit/src/wallets/test-utils.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L10)*
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 • **ACCOUNT_ADDRESS5**: *string* = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY5))
 
-*Defined in [contractkit/src/wallets/test-utils.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L12)*
+*Defined in [packages/contractkit/src/wallets/test-utils.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L12)*
 
 ___
 
@@ -68,7 +68,7 @@ ___
 
 • **ACCOUNT_ADDRESS_NEVER**: *string* = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY_NEVER))
 
-*Defined in [contractkit/src/wallets/test-utils.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L15)*
+*Defined in [packages/contractkit/src/wallets/test-utils.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L15)*
 
 ___
 
@@ -76,7 +76,7 @@ ___
 
 • **CHAIN_ID**: *44378* = 44378
 
-*Defined in [contractkit/src/wallets/test-utils.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L17)*
+*Defined in [packages/contractkit/src/wallets/test-utils.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L17)*
 
 ___
 
@@ -84,7 +84,7 @@ ___
 
 • **PRIVATE_KEY1**: *"0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"* = "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
 
-*Defined in [contractkit/src/wallets/test-utils.ts:3](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L3)*
+*Defined in [packages/contractkit/src/wallets/test-utils.ts:3](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L3)*
 
 ___
 
@@ -92,7 +92,7 @@ ___
 
 • **PRIVATE_KEY2**: *"0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890fdeccc"* = "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890fdeccc"
 
-*Defined in [contractkit/src/wallets/test-utils.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L5)*
+*Defined in [packages/contractkit/src/wallets/test-utils.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L5)*
 
 ___
 
@@ -100,7 +100,7 @@ ___
 
 • **PRIVATE_KEY3**: *"0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890fffff1"* = "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890fffff1"
 
-*Defined in [contractkit/src/wallets/test-utils.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L7)*
+*Defined in [packages/contractkit/src/wallets/test-utils.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L7)*
 
 ___
 
@@ -108,7 +108,7 @@ ___
 
 • **PRIVATE_KEY4**: *"0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890fffff2"* = "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890fffff2"
 
-*Defined in [contractkit/src/wallets/test-utils.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L9)*
+*Defined in [packages/contractkit/src/wallets/test-utils.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L9)*
 
 ___
 
@@ -116,7 +116,7 @@ ___
 
 • **PRIVATE_KEY5**: *"0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890fffff3"* = "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890fffff3"
 
-*Defined in [contractkit/src/wallets/test-utils.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L11)*
+*Defined in [packages/contractkit/src/wallets/test-utils.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L11)*
 
 ___
 
@@ -124,7 +124,7 @@ ___
 
 • **PRIVATE_KEY_NEVER**: *"0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890ffffff"* = "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890ffffff"
 
-*Defined in [contractkit/src/wallets/test-utils.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L13)*
+*Defined in [packages/contractkit/src/wallets/test-utils.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L13)*
 
 ## Object literals
 
@@ -132,17 +132,17 @@ ___
 
 ### ▪ **TYPED_DATA**: *object*
 
-*Defined in [contractkit/src/wallets/test-utils.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L19)*
+*Defined in [packages/contractkit/src/wallets/test-utils.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L19)*
 
 ###  primaryType
 
 • **primaryType**: *string* = "Mail"
 
-*Defined in [contractkit/src/wallets/test-utils.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L37)*
+*Defined in [packages/contractkit/src/wallets/test-utils.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L37)*
 
 ▪ **domain**: *object*
 
-*Defined in [contractkit/src/wallets/test-utils.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L38)*
+*Defined in [packages/contractkit/src/wallets/test-utils.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L38)*
 
 * **chainId**: *number* = 1
 
@@ -154,7 +154,7 @@ ___
 
 ▪ **message**: *object*
 
-*Defined in [contractkit/src/wallets/test-utils.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L44)*
+*Defined in [packages/contractkit/src/wallets/test-utils.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L44)*
 
 * **contents**: *string* = "Hello, Bob!"
 
@@ -172,7 +172,7 @@ ___
 
 ▪ **types**: *object*
 
-*Defined in [contractkit/src/wallets/test-utils.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L20)*
+*Defined in [packages/contractkit/src/wallets/test-utils.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/test-utils.ts#L20)*
 
 * **EIP712Domain**: *object[]* = [
       { name: 'name', type: 'string' },

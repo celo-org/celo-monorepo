@@ -27,7 +27,7 @@
 
 \+ **new AuthorizedSignerAccessor**(`wrapper`: [OffchainDataWrapper](_identity_offchain_data_wrapper_.offchaindatawrapper.md)): *[AuthorizedSignerAccessor](_identity_offchain_schemas_.authorizedsigneraccessor.md)*
 
-*Defined in [contractkit/src/identity/offchain/schemas.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schemas.ts#L27)*
+*Defined in [packages/contractkit/src/identity/offchain/schemas.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schemas.ts#L27)*
 
 **Parameters:**
 
@@ -43,15 +43,25 @@ Name | Type |
 
 • **basePath**: *string* = "/account/authorizedSigners"
 
-*Defined in [contractkit/src/identity/offchain/schemas.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schemas.ts#L27)*
+*Defined in [packages/contractkit/src/identity/offchain/schemas.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schemas.ts#L27)*
 
 ___
 
 ###  read
 
-• **read**: *any* = makeAsyncThrowable(this.readAsResult.bind(this))
+• **read**: *function* = makeAsyncThrowable(this.readAsResult.bind(this))
 
-*Defined in [contractkit/src/identity/offchain/schemas.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schemas.ts#L39)*
+*Defined in [packages/contractkit/src/identity/offchain/schemas.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schemas.ts#L39)*
+
+#### Type declaration:
+
+▸ (...`args`: TArgs): *Promise‹TResult›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | TArgs |
 
 ___
 
@@ -59,15 +69,15 @@ ___
 
 • **wrapper**: *[OffchainDataWrapper](_identity_offchain_data_wrapper_.offchaindatawrapper.md)*
 
-*Defined in [contractkit/src/identity/offchain/schemas.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schemas.ts#L28)*
+*Defined in [packages/contractkit/src/identity/offchain/schemas.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schemas.ts#L28)*
 
 ## Methods
 
 ###  readAsResult
 
-▸ **readAsResult**(`account`: [Address](../modules/_base_.md#address), `signer`: [Address](../modules/_base_.md#address)): *Promise‹any›*
+▸ **readAsResult**(`account`: [Address](../modules/_base_.md#address), `signer`: [Address](../modules/_base_.md#address)): *Promise‹ErrorResult‹[InvalidDataError](_identity_offchain_schema_utils_.invaliddataerror.md)‹› | [OffchainError](_identity_offchain_schema_utils_.offchainerror.md)‹›› | OkResult‹object››*
 
-*Defined in [contractkit/src/identity/offchain/schemas.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schemas.ts#L30)*
+*Defined in [packages/contractkit/src/identity/offchain/schemas.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schemas.ts#L30)*
 
 **Parameters:**
 
@@ -76,7 +86,7 @@ Name | Type |
 `account` | [Address](../modules/_base_.md#address) |
 `signer` | [Address](../modules/_base_.md#address) |
 
-**Returns:** *Promise‹any›*
+**Returns:** *Promise‹ErrorResult‹[InvalidDataError](_identity_offchain_schema_utils_.invaliddataerror.md)‹› | [OffchainError](_identity_offchain_schema_utils_.offchainerror.md)‹›› | OkResult‹object››*
 
 ___
 
@@ -84,7 +94,7 @@ ___
 
 ▸ **write**(`signer`: [Address](../modules/_base_.md#address), `proofOfPossession`: string, `filteredDataPaths`: string): *Promise‹void›*
 
-*Defined in [contractkit/src/identity/offchain/schemas.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schemas.ts#L41)*
+*Defined in [packages/contractkit/src/identity/offchain/schemas.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schemas.ts#L41)*
 
 **Parameters:**
 

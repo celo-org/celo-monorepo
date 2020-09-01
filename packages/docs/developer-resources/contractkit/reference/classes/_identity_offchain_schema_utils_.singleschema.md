@@ -34,7 +34,7 @@
 
 \+ **new SingleSchema**(`wrapper`: [OffchainDataWrapper](_identity_offchain_data_wrapper_.offchaindatawrapper.md), `type`: Type‹T›, `dataPath`: string): *[SingleSchema](_identity_offchain_schema_utils_.singleschema.md)*
 
-*Defined in [contractkit/src/identity/offchain/schema-utils.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L26)*
+*Defined in [packages/contractkit/src/identity/offchain/schema-utils.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L26)*
 
 **Parameters:**
 
@@ -52,15 +52,25 @@ Name | Type |
 
 • **dataPath**: *string*
 
-*Defined in [contractkit/src/identity/offchain/schema-utils.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L30)*
+*Defined in [packages/contractkit/src/identity/offchain/schema-utils.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L30)*
 
 ___
 
 ###  read
 
-• **read**: *any* = makeAsyncThrowable(this.readAsResult.bind(this))
+• **read**: *function* = makeAsyncThrowable(this.readAsResult.bind(this))
 
-*Defined in [contractkit/src/identity/offchain/schema-utils.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L37)*
+*Defined in [packages/contractkit/src/identity/offchain/schema-utils.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L37)*
+
+#### Type declaration:
+
+▸ (...`args`: TArgs): *Promise‹TResult›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | TArgs |
 
 ___
 
@@ -68,7 +78,7 @@ ___
 
 • **type**: *Type‹T›*
 
-*Defined in [contractkit/src/identity/offchain/schema-utils.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L29)*
+*Defined in [packages/contractkit/src/identity/offchain/schema-utils.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L29)*
 
 ___
 
@@ -76,15 +86,15 @@ ___
 
 • **wrapper**: *[OffchainDataWrapper](_identity_offchain_data_wrapper_.offchaindatawrapper.md)*
 
-*Defined in [contractkit/src/identity/offchain/schema-utils.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L28)*
+*Defined in [packages/contractkit/src/identity/offchain/schema-utils.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L28)*
 
 ## Methods
 
 ###  readAsResult
 
-▸ **readAsResult**(`account`: string): *Promise‹any›*
+▸ **readAsResult**(`account`: string): *Promise‹ErrorResult‹[InvalidDataError](_identity_offchain_schema_utils_.invaliddataerror.md)‹› | [OffchainError](_identity_offchain_schema_utils_.offchainerror.md)‹›› | OkResult‹T››*
 
-*Defined in [contractkit/src/identity/offchain/schema-utils.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L33)*
+*Defined in [packages/contractkit/src/identity/offchain/schema-utils.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L33)*
 
 **Parameters:**
 
@@ -92,7 +102,7 @@ Name | Type |
 ------ | ------ |
 `account` | string |
 
-**Returns:** *Promise‹any›*
+**Returns:** *Promise‹ErrorResult‹[InvalidDataError](_identity_offchain_schema_utils_.invaliddataerror.md)‹› | [OffchainError](_identity_offchain_schema_utils_.offchainerror.md)‹›› | OkResult‹T››*
 
 ___
 
@@ -100,7 +110,7 @@ ___
 
 ▸ **write**(`data`: T): *Promise‹void›*
 
-*Defined in [contractkit/src/identity/offchain/schema-utils.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L39)*
+*Defined in [packages/contractkit/src/identity/offchain/schema-utils.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L39)*
 
 **Parameters:**
 
