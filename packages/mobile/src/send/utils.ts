@@ -118,7 +118,7 @@ export function useDailyTransferLimitValidator(
       )
       return goldToDollarAmount(amount, exchangeRate) || new BigNumber(0)
     }
-  }, [amount])
+  }, [amount, currency])
 
   const recentPayments = useSelector(getRecentPayments)
   const localCurrencyExchangeRate = useSelector(getLocalCurrencyExchangeRate)
@@ -126,14 +126,22 @@ export function useDailyTransferLimitValidator(
 
   const now = Date.now()
 
-  const dailyAmount = dailySpent(now, recentPayments) + dollarAmount.toNumber()
-  const isLimitReached = dailyAmount > DAILY_PAYMENT_LIMIT_CUSD
+  const isLimitReached = _isPaymentLimitReached(now, recentPayments, dollarAmount.toNumber())
   const showLimitReachedBanner = () => {
     dispatch(
       showLimitReachedError(now, recentPayments, localCurrencyExchangeRate, localCurrencySymbol)
     )
   }
   return [isLimitReached, showLimitReachedBanner]
+}
+
+export function _isPaymentLimitReached(
+  now: number,
+  recentPayments: PaymentInfo[],
+  initial: number
+): boolean {
+  const amount = dailySpent(now, recentPayments) + initial
+  return amount > DAILY_PAYMENT_LIMIT_CUSD
 }
 
 export function showLimitReachedError(
