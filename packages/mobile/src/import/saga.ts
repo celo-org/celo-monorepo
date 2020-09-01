@@ -10,6 +10,7 @@ import { storeMnemonic } from 'src/backup/utils'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
 import { setHasSeenVerificationNux } from 'src/identity/actions'
+import { fetchVerificationState } from 'src/identity/verification'
 import {
   Actions,
   ImportBackupPhraseAction,
@@ -82,6 +83,7 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
       yield put(setHasSeenVerificationNux(true))
       navigateHome()
     } else {
+      yield call(fetchVerificationState)
       navigate(Screens.VerificationEducationScreen)
     }
 
