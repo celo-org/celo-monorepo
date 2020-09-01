@@ -55,7 +55,7 @@ The following behaviors are considered harassment and are unacceptable within th
   * Other attributes
 
 * Posting or displaying sexually explicit or violent material.
-* Deceptive, fraudulent, or otherwise misleading communications or actions.  
+* Deceptive, fraudulent, or otherwise misleading communications or actions, including attempts to manipulate the price of any digital assets.  
 * Posting or threatening to post other people’s personally identifying information ("doxing").
 * Personal insults, including but not limited to those related to gender, sexual orientation, race, religion, or disability.
 * Inappropriate photography or recording.
