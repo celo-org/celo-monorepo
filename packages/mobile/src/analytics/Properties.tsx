@@ -80,6 +80,7 @@ interface SettingsEventsProperties {
   [SettingsEvents.language_select]: {
     language: string
   }
+  [SettingsEvents.settings_verify_number]: undefined
   [SettingsEvents.pin_require_on_load]: {
     enabled: boolean
   }
@@ -167,10 +168,13 @@ interface OnboardingEventsProperties {
 
   [OnboardingEvents.invite_redeem_start]: undefined
   [OnboardingEvents.invite_redeem_complete]: undefined
+  [OnboardingEvents.invite_redeem_cancel]: undefined
   [OnboardingEvents.invite_redeem_timeout]: undefined
   [OnboardingEvents.invite_redeem_error]: {
     error: string
   }
+  [OnboardingEvents.invite_redeem_move_funds_start]: undefined
+  [OnboardingEvents.invite_redeem_move_funds_complete]: undefined
 
   [OnboardingEvents.invite_redeem_skip_start]: undefined
   [OnboardingEvents.invite_redeem_skip_complete]: undefined
@@ -184,7 +188,12 @@ interface OnboardingEventsProperties {
     error: string
   }
 
-  [OnboardingEvents.account_dek_set]: undefined
+  [OnboardingEvents.account_dek_register_start]: undefined
+  [OnboardingEvents.account_dek_register_account_unlocked]: undefined
+  [OnboardingEvents.account_dek_register_account_checked]: undefined
+  [OnboardingEvents.account_dek_register_complete]: {
+    newRegistration: boolean
+  }
 }
 
 interface VerificationEventsProperties {
@@ -581,7 +590,7 @@ interface GethEventsProperties {
     context: string
   }
   [GethEvents.geth_init_start]: {
-    sync: boolean
+    shouldStartNode: boolean
   }
   [GethEvents.create_geth_start]: undefined
   [GethEvents.create_geth_finish]: undefined

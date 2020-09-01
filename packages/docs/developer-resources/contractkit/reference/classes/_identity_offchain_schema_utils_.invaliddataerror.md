@@ -43,7 +43,7 @@
 
 *Inherited from [InvalidDataError](_identity_offchain_schema_utils_.invaliddataerror.md).[errorType](_identity_offchain_schema_utils_.invaliddataerror.md#errortype)*
 
-Defined in packages/base/lib/result.d.ts:25
+Defined in packages/base/lib/result.d.ts:19
 
 ___
 

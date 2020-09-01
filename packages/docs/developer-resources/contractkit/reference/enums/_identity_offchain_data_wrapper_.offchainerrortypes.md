@@ -14,7 +14,7 @@
 
 • **FetchError**: = "FetchError"
 
-*Defined in [packages/contractkit/src/identity/offchain-data-wrapper.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L15)*
+*Defined in [packages/contractkit/src/identity/offchain-data-wrapper.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L16)*
 
 ___
 
@@ -22,7 +22,7 @@ ___
 
 • **InvalidSignature**: = "InvalidSignature"
 
-*Defined in [packages/contractkit/src/identity/offchain-data-wrapper.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L16)*
+*Defined in [packages/contractkit/src/identity/offchain-data-wrapper.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L17)*
 
 ___
 
@@ -30,4 +30,4 @@ ___
 
 • **NoStorageRootProvidedData**: = "NoStorageRootProvidedData"
 
-*Defined in [packages/contractkit/src/identity/offchain-data-wrapper.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L17)*
+*Defined in [packages/contractkit/src/identity/offchain-data-wrapper.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L18)*
