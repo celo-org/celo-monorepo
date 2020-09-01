@@ -1,0 +1,95 @@
+{
+  "variables": {
+    "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
+    "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
+    "azure_subscription_id": "{{env `AZURE_SUBSCRIPTION_ID`}}",
+    "gcp_project_id": "{{env `GCP_PROJECT_ID`}}",
+    "region": "eu-central-1",
+    "celo_image": "us.gcr.io/celo-org/celo-node:mainnet",
+    "network_id": "42220",
+    "sync_mode": "full"
+  },
+  "builders": [
+    {
+      "name": "aws",
+      "type": "amazon-ebs",
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "ami_name": "celo-full-node-latest",
+      "instance_type": "t2.medium",
+      "region": "{{user `region`}}",
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name": "ubuntu/images/*ubuntu-bionic-18.04-amd64-server-*",
+          "root-device-type": "ebs"
+        },
+        "owners": ["099720109477"],
+        "most_recent": true
+      },
+      "ssh_username": "ubuntu"
+    },
+    {
+      "name": "azure",
+      "type": "azure-arm",
+      "subscription_id": "{{user `azure_subscription_id`}}",
+
+      "image_publisher": "Canonical",
+      "image_offer": "UbuntuServer",
+      "image_sku": "18.04-LTS",
+      "managed_image_name": "FullNode",
+      "managed_image_resource_group_name": "CeloNodeImages",
+      "location": "West Us",
+      "temp_resource_group_name": "CeloNodeBuilder",
+      "os_type": "Linux",
+      "ssh_username": "ubuntu"
+    },
+    {
+      "name": "gcp",
+      "type": "googlecompute",
+      "project_id": "{{user `gcp_project_id`}}",
+      "source_image": "ubuntu-1804-bionic-v20200317",
+      "ssh_username": "ubuntu",
+      "zone": "us-central1-a"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "execute_command": "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'",
+      "script": "../aws/testnet/modules/startup-scripts/install-base.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'",
+      "script": "../aws/testnet/modules/startup-scripts/install-docker.sh"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "echo {{user `celo_image`}} >> celo_image",
+        "echo {{user `network_id`}} >> network_id",
+        "echo {{user `sync_mode`}} >> sync_mode"
+      ]
+    },
+    {
+      "type": "shell",
+      "execute_command": "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'",
+      "script": "scripts/init.sh",
+      "environment_vars": ["CELO_IMAGE={{user `celo_image`}}"]
+    },
+    {
+      "type": "file",
+      "source": "scripts/start.sh",
+      "destination": "/tmp/start.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'",
+      "inline": [
+        "cp /tmp/start.sh /var/lib/cloud/scripts/per-instance/start.sh",
+        "chmod +x /var/lib/cloud/scripts/per-instance/start.sh"
+      ]
+    }
+  ]
+}
