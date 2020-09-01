@@ -47,7 +47,7 @@ Now that you have provisioned your messaging service, you need to buy at least 1
 
 ### Nexmo
 
-Click the balance in the top-left to go to [Billing and Payments](https://dashboard.nexmo.com/billing-and-payments), where you can add funds. It is strongly recommended that you use a credit or debit card (as opposed to other forms of payment) as you will then be able to enable `Auto reload`. You should also enable `Low balance alerts`. Both of these will help avoid failing to deliver SMS when your funds are exhausted.
+After signing up for [Nexmo](https://dashboard.nexmo.com/sign-up), click the balance in the top-left to go to [Billing and Payments](https://dashboard.nexmo.com/billing-and-payments), where you can add funds. It is strongly recommended that you use a credit or debit card (as opposed to other forms of payment) as you will then be able to enable `Auto reload`. You should also enable `Low balance alerts`. Both of these will help avoid failing to deliver SMS when your funds are exhausted. It appears that these options may not be immediately available for all new accounts due to fraud checks: try sending a few SMS, checking back after a few days, or raising a support ticket.
 
 Under [Your Numbers](https://dashboard.nexmo.com/your-numbers), create a US number and ensure that is enabled for SMS.
 
@@ -133,7 +133,7 @@ Required options:
 |--------------------------------|-------------------------------------------------------------------------------------------------|
 | `DATABASE_URL`                   | The URL to access the local database, e.g. `sqlite://db/attestations.db` |
 | `CELO_PROVIDER`                  | The node URL for your local full node at which your attestation signer key is unlocked. e.g. `http://localhost:8545`. Do not expose this port to the public internet! |
-| `CELO_VALIDATOR_ADDRESS`         | Address of the Validator account |
+| `CELO_VALIDATOR_ADDRESS`         | Address of the Validator account. If Validator is deployed via a `ReleaseGold` contract, this is the contract's address (i.e. `$CELO_VALIDATOR_RG_ADDRESS`), not the beneficiary. |
 | `ATTESTATION_SIGNER_ADDRESS`     | Address of the Validator's attestation signer key  |
 | `SMS_PROVIDERS`                  | Comma-separated list of all enabled SMS providers, by order of preference. Can include `twilio`, `nexmo` |
 
@@ -144,11 +144,12 @@ Optional environment variables:
 | `PORT`                           | Port to listen on. Default `3000`. |
 | `SMS_PROVIDERS_<country>`        | Override to set SMS providers and order for a specific country code (e.g `SMS_PROVIDERS_MX=nexmo,twilio`) |
 | `MAX_PROVIDER_RETRIES`           | Number of retries (after first) when sending SMS before considering next provider Default `3`.  |
-| `EXTERNAL_CALLBACK_HOSTPORT`     | Provide the external URL at which providers can attempt callbacks with delivery receipts. If not provided, defaults to the value retrieved from the validator metadata. |
+| `EXTERNAL_CALLBACK_HOSTPORT`     | Provide the full external URL at which the service can be reached, usually the same as the value of the `ATTESTATION_SERVICE_URL` claim in your metadata. This value, plus a suffix e.g. `/delivery_status_twilio` will be the URL at which service can receive delivery receipt callbacks. If this value is not set, and `VERIFY_CONFIG_ON_STARTUP=1` (the default), the URL will be taken from the validator metadata. Otherwise, it must be supplied. |
 | `TIMEOUT_CLEANUP_NO_RECEIPT_MIN` | If a delivery report appears to be supported but is not received within this number of minutes, assume delivery success                                               |
-| `VERIFY_CONFIG_ON_STARTUP`       | Refuse to start if signer or metadata is misconfigured. Default `1`. |
+| `VERIFY_CONFIG_ON_STARTUP`       | Refuse to start if signer or metadata is misconfigured. Default `1`. If you disable this, you must specify `EXTERNAL_CALLBACK_HOSTPORT`. |
 | `LOG_LEVEL`                      | One of `fatal`, `error`, `warn`, `info`, `debug`, `trace` |
 | `LOG_FORMAT`                     | One of `json`, `human`, `stackdriver`  |
+| `APP_SIGNATURE`                  | A value that is shown under the key `appSignature` field in the `/status` endpoint that you can use to identify multiple instances. |
 
 Twilio configuration options:
 
@@ -168,7 +169,6 @@ Nexmo configuration options:
 | `NEXMO_UNSUPPORTED_REGIONS` | Optional. A comma-separated list of country codes to not serve, e.g `US,MX`  |
 | `NEXMO_ACCOUNT_BALANCE_METRIC` | Optional. Disabled by default. If set to `1`, Nexmo balances will be published under the `attestation_provider_balance` metric. |
 
-
 ## Running the Attestation Service
 
 Before running the attestation service, ensure that your local node is fully synced.
@@ -180,11 +180,11 @@ sudo celocli node:synced --node geth.ipc
 
 The following command for running the Attestation Service uses `--network host` to access a local database (only works on Linux), and listens for connections on port 80.
 
-It assumes all of the configuration options needed have been added to the config file located under `$CONFIG`.  You can pass other environment variables directly by adding arguments of the form `-e DATABASE_URL=$DATABASE_URL`.
+It assumes all of the configuration options needed have been added to the config file located under `$CONFIG` which Docker will process. Alternatively, you can pass the config file for the service to read on startup using `-e CONFIG=<docker-path-to-config-file>`, and other environment variables directly by adding arguments of the form `-e DATABASE_URL=$DATABASE_URL`.
 
 ```bash
 # On the Attestation machine
-docker run --name celo-attestation-service -it --restart always --entrypoint /bin/bash --network host -e CONFIG=$CONFIG -e PORT=80 -p 80:80 us.gcr.io/celo-testnet/celo-monorepo:attestation-service-1-0-2 -c " cd /celo-monorepo/packages/attestation-service && yarn run db:migrate && yarn start "
+docker run --name celo-attestation-service -it --restart always --entrypoint /bin/bash --network host --env-file $CONFIG -e PORT=80 -p 80:80 us.gcr.io/celo-testnet/celo-monorepo:attestation-service-1-0-3 -c " cd /celo-monorepo/packages/attestation-service && yarn run db:migrate && yarn start "
 ```
 
 ### Registering Metadata
@@ -227,7 +227,7 @@ celocli account:get-metadata $CELO_VALIDATOR_RG_ADDRESS
 
 Attestation Services supports Twilio and Nexmo delivery receipts so that these services can callback to provide delivery information. This triggers retries as needed, even between providers, and enables delivery success metrics to be logged.
 
-Nexmo requires manual configuration to enable this. Go to [Settings](https://dashboard.nexmo.com/settings), and under `Delivery Receipts`, enter the external URL of your Attestation Service appended by `/delivery_status_nexmo` -- for example `http://1.2.3.4:80/delivery_status_nexmo`. This should correspond to the URL printed when Attestation Service is started.
+Nexmo requires manual configuration to enable this. If your Nexmo account is used by a single Attestation Service, go to [Settings](https://dashboard.nexmo.com/settings), and under `Delivery Receipts`, enter the external URL of your Attestation Service appended by `/delivery_status_nexmo` -- for example `http://1.2.3.4:80/delivery_status_nexmo`. This should correspond to the URL printed when Attestation Service is started. In a future release, it will be possible to use a separate [Nexmo application](https://dashboard.nexmo.com/applications/) for each Attestation Service instance.
 
 There is no configuration necessary to enable Twilio delivery receipts. The Attestation Service uses the URL in the validator metadata (can be overridden with the `EXTERNAL_CALLBACK_HOSTPORT` configuration option) appended by `/delivery_status_twilio`, and supplies that to Twilio through its API.
 
@@ -247,7 +247,7 @@ You need the attestation signer key available and unlocked on your local machine
 
 Note that this does not use an identical code path to real attestations (since those require specific on-chain state) so this endpoint should not be used in place of monitoring logs and metrics.
 
-You should receive an SMS, and the Attestation Service should log messages indicating that the message was `Sent` and then, if delivery reports can be made successfully, `Delivered`.
+You should receive an SMS, and the Attestation Service should log messages indicating that the message was `Sent` and then, if delivery reports can be made successfully, `Delivered`. Depending on the provider, you may receive several callbacks as the message progresses through the network.
 
 If this works then your attestation service should be successfully deployed!
 

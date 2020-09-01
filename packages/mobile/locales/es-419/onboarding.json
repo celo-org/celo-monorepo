@@ -38,12 +38,14 @@
     "label": "Codigo de invitacion",
     "codePlaceholder": "Ingrese el código de invitación",
     "noCode": "No tengo un código de invitación",
-    "nodeCodeInviteLink": "¿No tienes un código de invitación? Solicite uno en <0>celo.org/developers/wallet</0> o <1>continúe sin</1>"
+    "nodeCodeInviteLink": "¿No tienes un código de invitación? Solicite uno en <0>celo.org/developers/wallet</0> o <1>continúe sin</1>",
+    "loadingHeader": "Creando una cuenta...",
+    "loadingBody": "Esto puede tardar hasta 90 segundos"
   },
   "verificationEducation": {
     "title": "Confirmar",
     "header": "Confirmar número de teléfono",
-    "body": "Para asegurarnos de que su número sea realmente suyo, le enviaremos tres mensajes que costarán alrededor de 0.07 cUSD cada uno.\n\nConfirmar su número lleva unos tres minutos.",
+    "body": "Para asegurarnos de que su número sea realmente suyo, le enviaremos tres mensajes que costarán alrededor de 0.05 cUSD cada uno.\n\nConfirmar su número lleva unos tres minutos.",
     "start": "Comienzo",
     "resume": "Reanudar",
     "learnMore": "Aprende más"

@@ -51,7 +51,6 @@ export default class ExchangeCelo extends BaseCommand {
       }
     }
 
-    this.kit.defaultAccount = res.flags.from
     const celoToken = await this.kit.contracts.getGoldToken()
     const exchange = await this.kit.contracts.getExchange()
 

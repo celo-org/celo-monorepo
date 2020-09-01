@@ -51,7 +51,7 @@ export default class ExchangeDollars extends BaseCommand {
         return
       }
     }
-    this.kit.defaultAccount = res.flags.from
+
     const stableToken = await this.kit.contracts.getStableToken()
     const exchange = await this.kit.contracts.getExchange()
 

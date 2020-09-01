@@ -125,6 +125,7 @@
   "odisInsufficientBalance": "Your balance is too low to complete this process",
   "matchmakingQuotaExceededError": "Matchmaking can be done only once",
   "paymentLimitReached": "The daily limit is {{dailyLimitcUSD}} cUSD ({{currencySymbol}}{{dailyLimit}})\n{{dailyRemainingcUSD}} cUSD ({{currencySymbol}}{{dailyRemaining}}) remaining",
+  "requestLimitError": "Can't request more than the {{limit}} cUSD daily limit.",
   "ordinals": [
     "zeroth",
     "first",
