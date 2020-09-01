@@ -13,7 +13,7 @@
 
 ▸ **hasProperty**<**T**>(`object`: any, `property`: string): *object is T*
 
-*Defined in [contractkit/src/utils/provider-utils.ts:3](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/provider-utils.ts#L3)*
+*Defined in [packages/contractkit/src/utils/provider-utils.ts:3](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/provider-utils.ts#L3)*
 
 **Type parameters:**
 
@@ -34,7 +34,7 @@ ___
 
 ▸ **stopProvider**(`defaultProvider`: provider): *void*
 
-*Defined in [contractkit/src/utils/provider-utils.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/provider-utils.ts#L7)*
+*Defined in [packages/contractkit/src/utils/provider-utils.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/provider-utils.ts#L7)*
 
 **Parameters:**
 

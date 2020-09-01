@@ -18,7 +18,7 @@
 
 • **address**: *[Address](../modules/_base_.md#address)*
 
-*Defined in [contractkit/src/explorer/base.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/base.ts#L9)*
+*Defined in [packages/contractkit/src/explorer/base.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/base.ts#L9)*
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **jsonInterface**: *ABIDefinition[]*
 
-*Defined in [contractkit/src/explorer/base.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/base.ts#L10)*
+*Defined in [packages/contractkit/src/explorer/base.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/base.ts#L10)*
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **name**: *string*
 
-*Defined in [contractkit/src/explorer/base.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/base.ts#L8)*
+*Defined in [packages/contractkit/src/explorer/base.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/base.ts#L8)*

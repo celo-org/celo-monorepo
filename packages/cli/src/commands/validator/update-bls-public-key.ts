@@ -22,7 +22,7 @@ WARNING: By default, the BLS key used by the validator node is derived from the 
   ]
   async run() {
     const res = this.parse(ValidatorUpdateBlsPublicKey)
-    this.kit.defaultAccount = res.flags.from
+
     const validators = await this.kit.contracts.getValidators()
     await newCheckBuilder(this, res.flags.from)
       .isSignerOrAccount()

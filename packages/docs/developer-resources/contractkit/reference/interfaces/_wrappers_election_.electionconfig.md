@@ -20,7 +20,7 @@
 
 • **currentThreshold**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/Election.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L65)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L65)*
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **electabilityThreshold**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/Election.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L62)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L62)*
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **electableValidators**: *[ElectableValidators](_wrappers_election_.electablevalidators.md)*
 
-*Defined in [contractkit/src/wrappers/Election.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L61)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L61)*
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • **maxNumGroupsVotedFor**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/Election.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L63)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L63)*
 
 ___
 
@@ -52,4 +52,4 @@ ___
 
 • **totalVotes**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/Election.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L64)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L64)*
