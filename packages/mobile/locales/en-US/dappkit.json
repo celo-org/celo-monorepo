@@ -1,15 +1,14 @@
 {
   "connectToWallet": "{{dappName}} would like to connect to {{appName}}",
-  "connect": "Connect",
   "cancel": "Cancel",
   "allow": "Allow",
-  "address": "Address",
+  "address": "Account No.",
   "transaction": {
     "operation": "Operation",
     "data": "Data",
     "signTX": "Sign TX",
     "details": "Show details"
   },
-  "shareInfo": "Share the following info:",
+  "shareInfo": "This application will be able to access the following information:",
   "data": "Data"
 }

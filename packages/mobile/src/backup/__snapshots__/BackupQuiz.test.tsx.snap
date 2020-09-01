@@ -907,6 +907,7 @@ exports[`BackupQuiz renders correctly 1`] = `
                   "paddingVertical": 8,
                 }
               }
+              testID="backupQuiz/prosper"
             >
               <Text
                 style={
@@ -956,6 +957,7 @@ exports[`BackupQuiz renders correctly 1`] = `
                   "paddingVertical": 8,
                 }
               }
+              testID="backupQuiz/winner"
             >
               <Text
                 style={
@@ -1005,6 +1007,7 @@ exports[`BackupQuiz renders correctly 1`] = `
                   "paddingVertical": 8,
                 }
               }
+              testID="backupQuiz/find"
             >
               <Text
                 style={
@@ -1054,6 +1057,7 @@ exports[`BackupQuiz renders correctly 1`] = `
                   "paddingVertical": 8,
                 }
               }
+              testID="backupQuiz/donate"
             >
               <Text
                 style={
@@ -1103,6 +1107,7 @@ exports[`BackupQuiz renders correctly 1`] = `
                   "paddingVertical": 8,
                 }
               }
+              testID="backupQuiz/tape"
             >
               <Text
                 style={
@@ -1152,6 +1157,7 @@ exports[`BackupQuiz renders correctly 1`] = `
                   "paddingVertical": 8,
                 }
               }
+              testID="backupQuiz/history"
             >
               <Text
                 style={

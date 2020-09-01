@@ -13,21 +13,24 @@ export ENVFILE="${ENVFILE:-.env.test}"
 # -v (Optional): Name of virual machine to run
 # -f (Optional): Fast (skip build step)
 # -r (Optional): Use release build (by default uses debug)
-# -n (Optional): Network delay (gsm, hscsd, gprs, edge, umts, hsdpa, lte, evdo, none)
 # TODO ^ release doesn't work currently b.c. the run_app.sh script assumes we want a debug build
+# -n (Optional): Network delay (gsm, hscsd, gprs, edge, umts, hsdpa, lte, evdo, none)
+# -d (Optional): Run in dev mode, which doesn't rebuild or reinstall the app and doesn't restart the packager.
 
 PLATFORM=""
 VD_NAME="Pixel_API_29_AOSP_x86_64"
 FAST=false
 RELEASE=false
 NET_DELAY="none"
-while getopts 'p:fr' flag; do
+DEV_MODE=false
+while getopts 'p:frd' flag; do
   case "${flag}" in
     p) PLATFORM="$OPTARG" ;;
     v) VD_NAME="$OPTARG" ;;
     f) FAST=true ;;
     r) RELEASE=true ;;
     n) NET_DELAY="$OPTARG" ;;
+    d) DEV_MODE=true ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
@@ -75,13 +78,18 @@ preloadBundle() {
 }
 
 runTest() {
+  reuse_param=""
+  if [[ $DEV_MODE == true ]]; then
+    reuse_param="--reuse"
+  fi
   yarn detox test \
     --configuration $CONFIG_NAME \
     --artifacts-location e2e/artifacts \
     --take-screenshots=all \
     --record-logs=failing \
     --detectOpenHandles \
-    --loglevel verbose
+    --loglevel verbose \
+    "${reuse_param}"
   TEST_STATUS=$?
 }
 
@@ -92,9 +100,11 @@ export CELO_TEST_CONFIG=e2e
 # Ensure jest is accessible to detox
 cp ../../node_modules/.bin/jest node_modules/.bin/
 
-# Just to be safe kill any process that listens on the port 'yarn start' is going to use
-echo "Killing previous metro server (if any)"
-yarn react-native-kill-packager || echo "Failed to kill package manager, proceeding anyway"
+if [ $DEV_MODE = false ]; then
+  # Just to be safe kill any process that listens on the port 'yarn start' is going to use
+  echo "Killing previous metro server (if any)"
+  yarn react-native-kill-packager || echo "Failed to kill package manager, proceeding anyway"
+fi
 
 # Build the app and run it
 if [ $PLATFORM = "android" ]; then
@@ -122,11 +132,13 @@ if [ $PLATFORM = "android" ]; then
     ./scripts/run_app.sh -p $PLATFORM -b
   fi
 
-  echo "Building detox"
-  yarn detox build -c $CONFIG_NAME
+  if [ $DEV_MODE = false ]; then
+    echo "Building detox"
+    yarn detox build -c $CONFIG_NAME
 
-  startPackager
-
+    startPackager
+  fi
+  
   NUM_DEVICES=`adb devices -l | wc -l`
   if [ $NUM_DEVICES -gt 2 ]; then
     echo "Emulator already running or device attached. Please shutdown / remove first"
@@ -168,10 +180,12 @@ elif [ $PLATFORM = "ios" ]; then
     ./scripts/run_app.sh -p $PLATFORM -b
   fi
 
-  echo "Building detox"
-  yarn detox build -c $CONFIG_NAME
+  if [ $DEV_MODE = false ]; then
+    echo "Building detox"
+    yarn detox build -c $CONFIG_NAME
 
-  startPackager
+    startPackager
+  fi
 
   runTest
 
@@ -181,7 +195,9 @@ else
 fi
 
 echo "Done test, cleaning up"
-yarn react-native-kill-packager
+if [ $DEV_MODE = false ]; then
+  yarn react-native-kill-packager
+fi
 
 echo "Exiting with test result status $TEST_STATUS"
 exit $TEST_STATUS
