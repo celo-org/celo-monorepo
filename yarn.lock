@@ -2776,6 +2776,11 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
+"@celo/base@0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@celo/base/-/base-0.0.1.tgz#81e83aa430cba2a7424a4c016af58356404ea707"
+  integrity sha512-0hsd6hOUvt3o1DbiZKGpKghYhGQsu3eGApqHsXZtWRINHaakfxFGtZgI1r8u1iwqXenlAImCZ91P0WYNwsqI9A==
+
 "@celo/client@0.0.315":
   version "0.0.315"
   resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.315.tgz#1672802254d0533ab08b7ecd03f68b153ec3e6a4"
@@ -2825,34 +2830,36 @@
     web3-eth-contract "1.2.4"
     web3-utils "1.2.4"
 
-"@celo/contractkit@0.4.5":
-  version "0.4.5"
-  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.4.5.tgz#8b4e249e67ecd87ae383804b37d7a235e49ff17d"
-  integrity sha512-DyzDY+ZR4HRkJubqw7uVVU70lbts7D7oQA+yRUc0rleiZKFZHGhjp7rmCorqtCv6ptAEtIyG+VDtUKZ/a2Nl6A==
+"@celo/contractkit@0.4.12":
+  version "0.4.12"
+  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.4.12.tgz#bee540fc38035b12c6517f2415d4c6934133d802"
+  integrity sha512-fkIKyqP3MmEk4RWtgohBQwHelFQLKg8ozTjKmsqOeZS4thtGJyqEgKvXOaMqhlgBLhDjnxHBVacv/heJAfmZMQ==
   dependencies:
     "@azure/identity" "^1.0.2"
     "@azure/keyvault-keys" "^4.0.2"
     "@azure/keyvault-secrets" "^4.0.2"
-    "@celo/utils" "0.1.14"
+    "@celo/base" "0.0.1"
+    "@celo/utils" "0.1.18"
     "@ledgerhq/hw-app-eth" "^5.11.0"
     "@ledgerhq/hw-transport" "^5.11.0"
     bignumber.js "^9.0.0"
+    blind-threshold-bls "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a"
     cross-fetch "3.0.4"
     debug "^4.1.1"
-    elliptic "6.5.2"
+    elliptic "6.5.3"
     eth-lib "^0.2.8"
     ethereumjs-util "^5.2.0"
     fp-ts "2.1.1"
     io-ts "2.0.1"
-    ms-rest-azure "^3.0.0"
     qrcode "^1.4.4"
     secp256k1 "^4.0.0"
     web3 "1.2.4"
     web3-core "1.2.4"
     web3-core-helpers "1.2.4"
+    web3-eth "1.2.4"
     web3-eth-abi "1.2.4"
     web3-eth-contract "1.2.4"
-    web3-utils "1.2.4"
+    web3-utils "1.2.11"
 
 "@celo/dev-cli@^2.0.3":
   version "2.0.3"
@@ -2918,35 +2925,12 @@
     typechain "1.0.5"
     web3 "1.2.4"
 
-"@celo/utils@0.1.13":
-  version "0.1.13"
-  resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.1.13.tgz#af0d5a5e80d2045f3514f71553cc418c8022ccc9"
-  integrity sha512-dPVNP5gd83w9Xxf/NNK0wcVU4RNyed+hMRmo6uZKckbwwTGhE1S/c+pjkooSOuRKQxEcLSqHqTue1uFpVbvbrA==
+"@celo/utils@0.1.18":
+  version "0.1.18"
+  resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.1.18.tgz#5b838d27a5edc0635d6915fb427a718c49c3dd72"
+  integrity sha512-gX4sLb6T78Qzf16Kr/79HfwjlP2778A+IFB900U/zY4EhGW+GwkyWtZTaC1f1ZfCVbFbEsEZpSOxKYYvZp12Vg==
   dependencies:
-    "@umpirsky/country-list" "git://github.com/umpirsky/country-list#05fda51"
-    bigi "^1.1.0"
-    bignumber.js "^9.0.0"
-    bip32 "2.0.5"
-    bip39 "3.0.2"
-    bls12377js "https://github.com/celo-org/bls12377js#400bcaeec9e7620b040bfad833268f5289699cac"
-    bn.js "4.11.8"
-    buffer-reverse "^1.0.1"
-    country-data "^0.0.31"
-    crypto-js "^3.1.9-1"
-    elliptic "^6.4.1"
-    ethereumjs-util "^5.2.0"
-    futoin-hkdf "^1.0.3"
-    google-libphonenumber "^3.2.4"
-    keccak256 "^1.0.0"
-    lodash "^4.17.14"
-    numeral "^2.0.6"
-    web3-utils "1.2.4"
-
-"@celo/utils@0.1.14":
-  version "0.1.14"
-  resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.1.14.tgz#b567fb8ef8025d65d96b16361f3955ab77f9ef8e"
-  integrity sha512-yCVnQt8/DR6b4PqcTKuhwyra2CvME/tJptXQt3N+J+t+PIcCEbN7DGa7+kzeaW7D8ARXSfw+UH7UsCVKT1fI8Q==
-  dependencies:
+    "@celo/base" "0.0.1"
     "@umpirsky/country-list" "git://github.com/umpirsky/country-list#05fda51"
     bigi "^1.1.0"
     bignumber.js "^9.0.0"
@@ -2957,13 +2941,15 @@
     buffer-reverse "^1.0.1"
     country-data "^0.0.31"
     crypto-js "^3.1.9-1"
-    elliptic "^6.4.1"
+    elliptic "^6.5.3"
     ethereumjs-util "^5.2.0"
-    futoin-hkdf "^1.0.3"
+    fp-ts "2.1.1"
     google-libphonenumber "^3.2.4"
+    io-ts "2.0.1"
     keccak256 "^1.0.0"
     lodash "^4.17.14"
     numeral "^2.0.6"
+    web3-eth-abi "1.2.4"
     web3-utils "1.2.4"
 
 "@celo/utils@0.1.8":
@@ -9283,13 +9269,6 @@ async@1.x, async@^1.3.0, async@^1.4.0, async@^1.4.2, async@^1.5.2:
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/async/-/async-1.5.2.tgz#ec6a61ae56480c0c3cb241c95618e20892f9672a"
   integrity sha1-7GphrlZIDAw8skHJVhjiCJL5Zyo=
-
-async@2.6.0:
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/async/-/async-2.6.0.tgz#61a29abb6fcc026fea77e56d1c6ec53a795951f4"
-  integrity sha512-xAfGg1/NTLBBKlHFmnd7PlmUW9KhVQIUuSrYem9xzFUZy13ScvtyGGejaae9iAVRiRq9+Cx7DPFaAAhCpyxyPw==
-  dependencies:
-    lodash "^4.14.0"
 
 async@2.6.1:
   version "2.6.1"
@@ -16470,6 +16449,11 @@ fastq@^1.6.0:
   dependencies:
     reusify "^1.0.0"
 
+fathom-client@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/fathom-client/-/fathom-client-3.0.0.tgz#409c047cf1e2fea45b148e28d50fcd635e992893"
+  integrity sha512-d0oH2SHWCMIVLbbegB7nBIjSvbqbHrZBZxIOWSVAxlJL/roL0Ah9NNb6rTIcKMlA4gov9AjWQGEcZRzlnGc3XQ==
+
 fault@^1.0.0, fault@^1.0.2:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/fault/-/fault-1.0.4.tgz#eafcfc0a6d214fc94601e170df29954a4f842f13"
@@ -19975,7 +19959,7 @@ is-boolean-object@^1.0.0:
   resolved "https://registry.yarnpkg.com/is-boolean-object/-/is-boolean-object-1.0.0.tgz#98f8b28030684219a95f375cfbd88ce3405dff93"
   integrity sha1-mPiygDBoQhmpXzdc+9iM40Bd/5M=
 
-is-buffer@^1.0.2, is-buffer@^1.1.5, is-buffer@^1.1.6:
+is-buffer@^1.0.2, is-buffer@^1.1.5:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/is-buffer/-/is-buffer-1.1.6.tgz#efaa2ea9daa0d7ab2ea13a97b2b8ad51fefbe8be"
   integrity sha512-NcdALwpXkTm5Zvvbk7owOUSvVvBKDgKP5/ewfXEznmQFfs4ZRmanOeKBTjRVjka3QFoN6XJ+9F3USqfHqTaU5w==
@@ -22927,7 +22911,7 @@ lodash.xorby@^4.7.0:
   resolved "https://registry.yarnpkg.com/lodash.xorby/-/lodash.xorby-4.7.0.tgz#9c19a6f9f063a6eb53dd03c1b6871799801463d7"
   integrity sha1-nBmm+fBjputT3QPBtocXmYAUY9c=
 
-lodash@4.17.14, lodash@4.17.15, lodash@4.17.4, lodash@4.x.x, lodash@^2.4.1, lodash@^3.10.1, lodash@^4.0.0, lodash@^4.14.0, lodash@^4.16.4, lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.12, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.3.0, lodash@^4.5.0, lodash@^4.6.0, lodash@~4.17.4:
+lodash@4.17.14, lodash@4.17.15, lodash@4.17.4, lodash@4.x.x, lodash@^2.4.1, lodash@^3.10.1, lodash@^4.0.0, lodash@^4.16.4, lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.12, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.3.0, lodash@^4.5.0, lodash@^4.6.0, lodash@~4.17.4:
   version "4.17.15"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
   integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
@@ -24399,7 +24383,7 @@ moment-timezone@^0.5.21, moment-timezone@^0.5.23:
   dependencies:
     moment ">= 2.9.0"
 
-moment@2.24.0, "moment@>= 2.9.0", moment@^2.10.6, moment@^2.21.0, moment@^2.22.1, moment@^2.22.2, moment@^2.24.0:
+moment@2.24.0, "moment@>= 2.9.0", moment@^2.10.6, moment@^2.22.1, moment@^2.24.0:
   version "2.24.0"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.24.0.tgz#0d055d53f5052aa653c9f6eb68bb5d12bf5c2b5b"
   integrity sha512-bV7f+6l2QigeBBZSM/6yTNq4P2fNpSWj/0e7jQcy87A8e7o2nAfP/34/2ky5Vw4B9S446EtIhodAzkFCcR4dQg==
@@ -24431,32 +24415,6 @@ mri@^1.1.4:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/mri/-/mri-1.1.4.tgz#7cb1dd1b9b40905f1fac053abe25b6720f44744a"
   integrity sha512-6y7IjGPm8AzlvoUrwAaw1tLnUBudaS3752vcd8JtrpGGQn+rXIe63LFVHm/YMwtqAuh+LJPCFdlLYPWM1nYn6w==
-
-ms-rest-azure@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/ms-rest-azure/-/ms-rest-azure-3.0.0.tgz#54d0341c2aeef7b9f17f2a46258788740b2f0ec5"
-  integrity sha512-cttN01/TtMDB4v3rt/WQ/slgffB6jcUYxcPzcL0VNSB+WFPE1j4y5ICNHMuD1RaNNekCYMI4Pv51BDQ/BXNq7Q==
-  dependencies:
-    adal-node "^0.1.28"
-    async "2.6.0"
-    moment "^2.22.2"
-    ms-rest "^2.3.2"
-    request "^2.88.0"
-    uuid "^3.2.1"
-
-ms-rest@^2.3.2:
-  version "2.5.3"
-  resolved "https://registry.yarnpkg.com/ms-rest/-/ms-rest-2.5.3.tgz#ae36fc46c1c60a90511d2f29246fe0f5b55297b3"
-  integrity sha512-p0CnzrTzEkS8UTEwgCqT2O5YVK9E8KGBBlJVm3hFtMZvf0dmncKYXWFPyUa4PAsfBL7h4jfu39tOIFTu6exntg==
-  dependencies:
-    duplexer "^0.1.1"
-    is-buffer "^1.1.6"
-    is-stream "^1.1.0"
-    moment "^2.21.0"
-    request "^2.88.0"
-    through "^2.3.8"
-    tunnel "0.0.5"
-    uuid "^3.2.1"
 
 ms@2.0.0:
   version "2.0.0"
@@ -28488,9 +28446,9 @@ react-native-gesture-handler@^1.6.1:
     invariant "^2.2.4"
     prop-types "^15.7.2"
 
-"react-native-geth@https://github.com/celo-org/react-native-geth#2352feb":
-  version "0.1.0-development"
-  resolved "https://github.com/celo-org/react-native-geth#2352feb8fb866181dc545ccd3bf9dc60edaec0ce"
+"react-native-geth@https://github.com/celo-org/react-native-geth#6beb2b3":
+  version "1.0.0"
+  resolved "https://github.com/celo-org/react-native-geth#6beb2b396c9217813290957915db430bb5187e2d"
 
 react-native-iphone-x-helper@^1.0.3, react-native-iphone-x-helper@^1.2.1:
   version "1.2.1"
@@ -33187,11 +33145,6 @@ tunnel-agent@^0.6.0:
   integrity sha1-J6XeoGs2sEoKmWZ3SykIaPD8QP0=
   dependencies:
     safe-buffer "^5.0.1"
-
-tunnel@0.0.5:
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/tunnel/-/tunnel-0.0.5.tgz#d1532254749ed36620fcd1010865495a1fa9d0ae"
-  integrity sha512-gj5sdqherx4VZKMcBA4vewER7zdK25Td+z1npBqpbDys4eJrLx+SlYjJvq1bDXs2irkuJM5pf8ktaEQVipkrbA==
 
 tunnel@0.0.6, tunnel@^0.0.6:
   version "0.0.6"

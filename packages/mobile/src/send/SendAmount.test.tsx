@@ -21,6 +21,7 @@ const AMOUNT_ZERO = '0.00'
 const AMOUNT_VALID = '4.93'
 const AMOUNT_TOO_MUCH = '106.98'
 const BALANCE_VALID = '23.85'
+const REQUEST_OVER_LIMIT = '670'
 
 const storeData = {
   stableToken: { balance: BALANCE_VALID },
@@ -112,6 +113,34 @@ describe('SendAmount', () => {
           title: null,
           type: 'ALERT/SHOW',
           underlyingError: 'needMoreFundsToSend',
+        },
+      ])
+    })
+
+    it('shows an error when requesting more than the daily limit', () => {
+      const store = createMockStore(storeData)
+      const wrapper = render(
+        <Provider store={store}>
+          <SendAmount {...mockScreenProps(true)} />
+        </Provider>
+      )
+      enterAmount(wrapper, REQUEST_OVER_LIMIT)
+
+      const sendButton = wrapper.getByTestId('Review')
+      expect(sendButton.props.disabled).toBe(false)
+
+      store.clearActions()
+      fireEvent.press(sendButton)
+      expect(store.getActions()).toEqual([
+        {
+          alertType: 'error',
+          buttonMessage: null,
+          dismissAfter: 5000,
+          displayMethod: ErrorDisplayType.BANNER,
+          message: 'requestLimitError',
+          title: null,
+          type: 'ALERT/SHOW',
+          underlyingError: 'requestLimitError',
         },
       ])
     })

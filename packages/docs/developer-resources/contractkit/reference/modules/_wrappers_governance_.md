@@ -42,7 +42,7 @@
 
 Ƭ **HotfixParams**: *Parameters‹Governance["methods"]["executeHotfix"]›*
 
-*Defined in [contractkit/src/wrappers/Governance.ts:112](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L112)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:112](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L112)*
 
 ___
 
@@ -50,7 +50,7 @@ ___
 
 Ƭ **Proposal**: *[ProposalTransaction](_wrappers_governance_.md#proposaltransaction)[]*
 
-*Defined in [contractkit/src/wrappers/Governance.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L72)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L72)*
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 Ƭ **ProposalParams**: *Parameters‹Governance["methods"]["propose"]›*
 
-*Defined in [contractkit/src/wrappers/Governance.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L70)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L70)*
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 Ƭ **ProposalTransaction**: *Pick‹Transaction, "to" | "input" | "value"›*
 
-*Defined in [contractkit/src/wrappers/Governance.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L71)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L71)*
 
 ## Functions
 
@@ -74,7 +74,7 @@ ___
 
 ▸ **hotfixToParams**(`proposal`: [Proposal](_wrappers_governance_.md#proposal), `salt`: Buffer): *[HotfixParams](_wrappers_governance_.md#hotfixparams)*
 
-*Defined in [contractkit/src/wrappers/Governance.ts:113](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L113)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:113](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L113)*
 
 **Parameters:**
 
@@ -91,7 +91,7 @@ ___
 
 ▸ **proposalToParams**(`proposal`: [Proposal](_wrappers_governance_.md#proposal), `descriptionURL`: string): *[ProposalParams](_wrappers_governance_.md#proposalparams)*
 
-*Defined in [contractkit/src/wrappers/Governance.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L74)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L74)*
 
 **Parameters:**
 

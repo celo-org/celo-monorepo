@@ -22,7 +22,7 @@ export default class Unlock extends BaseCommand {
 
   async run() {
     const res = this.parse(Unlock)
-    this.kit.defaultAccount = res.flags.from
+
     const lockedgold = await this.kit.contracts.getLockedGold()
     const value = new BigNumber(res.flags.value)
 

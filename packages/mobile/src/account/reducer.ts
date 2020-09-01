@@ -23,6 +23,7 @@ export interface State {
   socialBackupCompleted: boolean
   dismissedInviteFriends: boolean
   dismissedGetVerified: boolean
+  dismissedGoldEducation: boolean
   promptFornoIfNeeded: boolean
   retryVerificationWithForno: boolean
   acceptedTerms: boolean
@@ -59,6 +60,7 @@ export const initialState = {
   socialBackupCompleted: false,
   dismissedInviteFriends: false,
   dismissedGetVerified: false,
+  dismissedGoldEducation: false,
   promptFornoIfNeeded: false,
   acceptedTerms: false,
   retryVerificationWithForno: features.VERIFICATION_FORNO_RETRY,
@@ -111,15 +113,16 @@ export const reducer = (
         defaultCountryCode: action.countryCode,
       }
     case Actions.DEV_MODE_TRIGGER_CLICKED:
-      const newClickCount = (state.devModeClickCount + 1) % 6
-      const devModeActive = newClickCount >= 3
-      if (devModeActive) {
+      const newClickCount = (state.devModeClickCount + 1) % 10
+      if (newClickCount === 5) {
         Logger.showMessage('Debug Mode Activated')
+      } else if (newClickCount === 0) {
+        Logger.showMessage('Debug Mode Deactivated')
       }
       return {
         ...state,
         devModeClickCount: newClickCount,
-        devModeActive,
+        devModeActive: newClickCount >= 5,
       }
     case Actions.PHOTOSNUX_CLICKED:
       return {
@@ -179,6 +182,11 @@ export const reducer = (
       return {
         ...state,
         dismissedGetVerified: true,
+      }
+    case Actions.DISMISS_GOLD_EDUCATION:
+      return {
+        ...state,
+        dismissedGoldEducation: true,
       }
     case Actions.SET_USER_CONTACT_DETAILS:
       return {
