@@ -17,7 +17,6 @@ export default class ValidatorGroupDeRegister extends BaseCommand {
   async run() {
     const res = this.parse(ValidatorGroupDeRegister)
 
-    this.kit.defaultAccount = res.flags.from
     const validators = await this.kit.contracts.getValidators()
 
     const account = await validators.signerToAccount(res.flags.from)

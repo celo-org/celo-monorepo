@@ -17,7 +17,7 @@
 
 ▸ **getStaticNodesAsync**(`networkName`: string): *Promise‹string›*
 
-*Defined in [contractkit/src/network-utils/static-node-utils.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/network-utils/static-node-utils.ts#L17)*
+*Defined in [packages/contractkit/src/network-utils/static-node-utils.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/network-utils/static-node-utils.ts#L17)*
 
 Fetches the static nodes (as JSON data) from Google Storage.
 If the network is not working, the method will reject the returned promise
@@ -37,6 +37,6 @@ ___
 
 ▸ **getStaticNodesGoogleStorageBucketName**(): *string*
 
-*Defined in [contractkit/src/network-utils/static-node-utils.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/network-utils/static-node-utils.ts#L7)*
+*Defined in [packages/contractkit/src/network-utils/static-node-utils.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/network-utils/static-node-utils.ts#L7)*
 
 **Returns:** *string*

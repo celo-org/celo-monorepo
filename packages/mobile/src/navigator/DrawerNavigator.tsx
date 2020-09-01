@@ -50,6 +50,7 @@ import { Home } from 'src/icons/navigator/Home'
 import { Settings } from 'src/icons/navigator/Settings'
 import DrawerItem from 'src/navigator/DrawerItem'
 import { ensurePincode } from 'src/navigator/NavigationService'
+import { getActiveRouteName } from 'src/navigator/NavigatorWrapper'
 import { Screens } from 'src/navigator/Screens'
 import useSelector from 'src/redux/useSelector'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
@@ -92,7 +93,8 @@ function CustomDrawerItemList({
       })
     }
     const onPress = () => {
-      if (protectedRoutes.includes(route.name)) {
+      const activeRouteName = getActiveRouteName(navigation.dangerouslyGetState())
+      if (protectedRoutes.includes(route.name) && activeRouteName !== route.name) {
         // Route should be protected by PIN code
         ensurePincode()
           .then(navigateToItem)

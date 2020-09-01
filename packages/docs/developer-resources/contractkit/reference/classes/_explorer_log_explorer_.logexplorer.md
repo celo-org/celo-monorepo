@@ -26,7 +26,7 @@
 
 \+ **new LogExplorer**(`kit`: [ContractKit](_kit_.contractkit.md), `contractDetails`: [ContractDetails](../interfaces/_explorer_base_.contractdetails.md)[]): *[LogExplorer](_explorer_log_explorer_.logexplorer.md)*
 
-*Defined in [contractkit/src/explorer/log-explorer.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/log-explorer.ts#L17)*
+*Defined in [packages/contractkit/src/explorer/log-explorer.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/log-explorer.ts#L17)*
 
 **Parameters:**
 
@@ -43,7 +43,7 @@ Name | Type |
 
 • **contractDetails**: *[ContractDetails](../interfaces/_explorer_base_.contractdetails.md)[]*
 
-*Defined in [contractkit/src/explorer/log-explorer.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/log-explorer.ts#L19)*
+*Defined in [packages/contractkit/src/explorer/log-explorer.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/log-explorer.ts#L19)*
 
 ## Methods
 
@@ -51,7 +51,7 @@ Name | Type |
 
 ▸ **fetchTxReceipt**(`txhash`: string): *Promise‹TransactionReceipt›*
 
-*Defined in [contractkit/src/explorer/log-explorer.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/log-explorer.ts#L49)*
+*Defined in [packages/contractkit/src/explorer/log-explorer.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/log-explorer.ts#L49)*
 
 **Parameters:**
 
@@ -67,7 +67,7 @@ ___
 
 ▸ **getKnownLogs**(`tx`: TransactionReceipt): *EventLog[]*
 
-*Defined in [contractkit/src/explorer/log-explorer.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/log-explorer.ts#L53)*
+*Defined in [packages/contractkit/src/explorer/log-explorer.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/log-explorer.ts#L53)*
 
 **Parameters:**
 
@@ -83,7 +83,7 @@ ___
 
 ▸ **tryParseLog**(`log`: Log): *null | EventLog*
 
-*Defined in [contractkit/src/explorer/log-explorer.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/log-explorer.ts#L64)*
+*Defined in [packages/contractkit/src/explorer/log-explorer.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/log-explorer.ts#L64)*
 
 **Parameters:**
 
