@@ -77,7 +77,7 @@ class DappKitSignTxScreen extends React.Component<Props> {
         <TopBarTextButton
           title={t('cancel')}
           onPress={this.cancel}
-          titleStyle={{ color: colors.dark }}
+          titleStyle={styles.cancelButton}
         />
 
         <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -147,6 +147,9 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 24,
+  },
+  cancelButton: {
+    color: colors.dark,
   },
 })
 
