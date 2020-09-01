@@ -18,6 +18,7 @@ export enum Actions {
   TOGGLE_BACKUP_STATE = 'ACCOUNT/TOGGLE_BACKUP_STATE',
   DISMISS_INVITE_FRIENDS = 'ACCOUNT/DISMISS_INVITE_FRIENDS',
   DISMISS_GET_VERIFIED = 'ACCOUNT/DISMISS_GET_VERIFIED',
+  DISMISS_GOLD_EDUCATION = 'ACCOUNT/DISMISS_GOLD_EDUCATION',
   SET_USER_CONTACT_DETAILS = 'ACCOUNT/SET_USER_CONTACT_DETAILS',
   SET_PROMPT_FORNO = 'ACCOUNT/SET_PROMPT_FORNO',
   SET_RETRY_VERIFICATION_WITH_FORNO = 'ACCOUNT/SET_RETRY_VERIFICATION_WITH_FORNO',
@@ -102,6 +103,10 @@ export interface DismissGetVerifiedAction {
   type: Actions.DISMISS_GET_VERIFIED
 }
 
+export interface DismissGoldEducationAction {
+  type: Actions.DISMISS_GOLD_EDUCATION
+}
+
 export interface SetContactDetailsAction {
   type: Actions.SET_USER_CONTACT_DETAILS
   contactId: string
@@ -145,6 +150,7 @@ export type ActionTypes =
   | ToggleBackupState
   | DismissInviteFriendsAction
   | DismissGetVerifiedAction
+  | DismissGoldEducationAction
   | SetContactDetailsAction
   | SetPromptFornoAction
   | SetRetryVerificationWithFornoAction
@@ -238,6 +244,10 @@ export const dismissInviteFriends = (): DismissInviteFriendsAction => ({
 
 export const dismissGetVerified = (): DismissGetVerifiedAction => ({
   type: Actions.DISMISS_GET_VERIFIED,
+})
+
+export const dismissGoldEducation = (): DismissGoldEducationAction => ({
+  type: Actions.DISMISS_GOLD_EDUCATION,
 })
 
 export const setPromptForno = (promptIfNeeded: boolean): SetPromptFornoAction => ({

@@ -18,9 +18,10 @@ import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { clearStoredMnemonic, getStoredMnemonic } from 'src/backup/utils'
+import { FIREBASE_ENABLED } from 'src/config'
 import { firebaseSignOut } from 'src/firebase/firebase'
 import { deleteNodeData } from 'src/geth/geth'
-import { revokePhoneMapping } from 'src/identity/revoke'
+import { revokeVerificationSaga } from 'src/identity/revoke'
 import { Actions as ImportActions } from 'src/import/actions'
 import { importBackupPhraseSaga } from 'src/import/saga'
 import { moveAllFundsFromAccount } from 'src/invite/saga'
@@ -61,7 +62,7 @@ function* migrateAccountToProperBip39() {
   }
 
   yield call(getConnectedUnlockedAccount)
-  yield call(revokePhoneMapping, e164Number, account)
+  yield call(revokeVerificationSaga)
 
   const mnemonic = yield call(getStoredMnemonic, account)
   yield call(importBackupPhraseSaga, {
@@ -109,8 +110,16 @@ function* clearStoredAccountSaga({ account }: ClearStoredAccountAction) {
     yield call(removeAccountLocally, account)
     yield call(clearStoredMnemonic)
     yield call(ValoraAnalytics.reset)
-    yield call(firebaseSignOut, firebase.app())
     yield call(deleteNodeData)
+
+    // Ignore error if it was caused by Firebase.
+    try {
+      yield call(firebaseSignOut, firebase.app())
+    } catch (error) {
+      if (FIREBASE_ENABLED) {
+        Logger.error(TAG + '@clearStoredAccount', 'Failed to sign out from Firebase', error)
+      }
+    }
 
     yield call(persistor.flush)
     yield call(restartApp)

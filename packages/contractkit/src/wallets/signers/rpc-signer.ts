@@ -7,8 +7,7 @@ import { decodeSig } from '../../utils/signing-utils'
 import { Signer } from './signer'
 
 const INCORRECT_PASSWORD_ERROR = 'could not decrypt key with given password'
-
-const currentTimeInSeconds = () => Math.round(Date.now() / 1000)
+const currentTimeInSeconds = () => Math.floor(Date.now() / 1000)
 
 const toRpcHex = (val: string | number | BigNumber | BN | undefined) => {
   if (typeof val === 'number' || val instanceof BigNumber) {
@@ -66,8 +65,8 @@ export class RpcSigner implements Signer {
     protected rpc: RpcCaller,
     protected account: string,
     protected unlockBufferSeconds = 5,
-    protected unlockTime = -1,
-    protected unlockDuration = -1
+    protected unlockTime?: number,
+    protected unlockDuration?: number
   ) {}
 
   init = (privateKey: string, passphrase: string) =>
@@ -130,6 +129,9 @@ export class RpcSigner implements Signer {
   }
 
   isUnlocked() {
+    if (this.unlockDuration === undefined || this.unlockTime === undefined) {
+      return false
+    }
     return this.unlockTime + this.unlockDuration - this.unlockBufferSeconds > currentTimeInSeconds()
   }
 

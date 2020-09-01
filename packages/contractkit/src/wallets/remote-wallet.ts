@@ -3,12 +3,13 @@ import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import { EncodedTransaction, Tx } from 'web3-core'
 import { Address } from '../base'
 import { Signer } from './signers/signer'
-import { Wallet, WalletBase } from './wallet'
+import { ReadOnlyWallet, WalletBase } from './wallet'
 
 /**
  * Abstract class representing a remote wallet that requires async initialization
  */
-export abstract class RemoteWallet extends WalletBase implements Wallet {
+export abstract class RemoteWallet<TSigner extends Signer> extends WalletBase<TSigner>
+  implements ReadOnlyWallet {
   private setupFinished = false
   private setupLocked = false
   private INIT_TIMEOUT_IN_MS = 10 * 1000
@@ -53,7 +54,7 @@ export abstract class RemoteWallet extends WalletBase implements Wallet {
   /**
    * Discover accounts and store mapping in accountSigners
    */
-  protected abstract async loadAccountSigners(): Promise<Map<Address, Signer>>
+  protected abstract async loadAccountSigners(): Promise<Map<Address, TSigner>>
 
   /**
    * Get a list of accounts in the remote wallet

@@ -20,9 +20,9 @@
 
 ###  newKit
 
-▸ **newKit**(`url`: string, `wallet?`: [Wallet](../interfaces/_wallets_wallet_.wallet.md)): *[ContractKit](../classes/_kit_.contractkit.md)‹›*
+▸ **newKit**(`url`: string, `wallet?`: [ReadOnlyWallet](../interfaces/_wallets_wallet_.readonlywallet.md)): *[ContractKit](../classes/_kit_.contractkit.md)‹›*
 
-*Defined in [contractkit/src/kit.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L34)*
+*Defined in [packages/contractkit/src/kit.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L34)*
 
 Creates a new instance of `ContractKit` give a nodeUrl
 
@@ -33,7 +33,7 @@ Creates a new instance of `ContractKit` give a nodeUrl
 Name | Type | Description |
 ------ | ------ | ------ |
 `url` | string | CeloBlockchain node url |
-`wallet?` | [Wallet](../interfaces/_wallets_wallet_.wallet.md) | - |
+`wallet?` | [ReadOnlyWallet](../interfaces/_wallets_wallet_.readonlywallet.md) | - |
 
 **Returns:** *[ContractKit](../classes/_kit_.contractkit.md)‹›*
 
@@ -41,9 +41,9 @@ ___
 
 ###  newKitFromWeb3
 
-▸ **newKitFromWeb3**(`web3`: Web3, `wallet?`: [Wallet](../interfaces/_wallets_wallet_.wallet.md)): *[ContractKit](../classes/_kit_.contractkit.md)‹›*
+▸ **newKitFromWeb3**(`web3`: Web3, `wallet?`: [ReadOnlyWallet](../interfaces/_wallets_wallet_.readonlywallet.md)): *[ContractKit](../classes/_kit_.contractkit.md)‹›*
 
-*Defined in [contractkit/src/kit.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L46)*
+*Defined in [packages/contractkit/src/kit.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L46)*
 
 Creates a new instance of `ContractKit` give a web3 instance
 
@@ -54,6 +54,6 @@ Creates a new instance of `ContractKit` give a web3 instance
 Name | Type | Description |
 ------ | ------ | ------ |
 `web3` | Web3 | Web3 instance |
-`wallet?` | [Wallet](../interfaces/_wallets_wallet_.wallet.md) | - |
+`wallet?` | [ReadOnlyWallet](../interfaces/_wallets_wallet_.readonlywallet.md) | - |
 
 **Returns:** *[ContractKit](../classes/_kit_.contractkit.md)‹›*

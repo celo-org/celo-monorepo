@@ -1,4 +1,3 @@
-import { newKitFromWeb3 } from '@celo/contractkit'
 import BigNumber from 'bignumber.js'
 import * as threshold from 'blind-threshold-bls'
 import btoa from 'btoa'
@@ -61,11 +60,7 @@ function uint8ArrayToBase64(bytes: Uint8Array) {
   return btoa(binary)
 }
 
-export async function replenishQuota(account: string, privateKey: string, providerURL: string) {
-  const web3 = new Web3(new Web3.providers.HttpProvider(providerURL))
-  const contractKit = newKitFromWeb3(web3)
-  contractKit.addAccount(privateKey)
-  contractKit.defaultAccount = account
+export async function replenishQuota(account: string, contractKit: any) {
   const goldToken = await contractKit.contracts.getGoldToken()
   const selfTransferTx = goldToken.transfer(account, 1)
   await selfTransferTx.sendAndWaitForReceipt()
