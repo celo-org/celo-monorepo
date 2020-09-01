@@ -2,12 +2,12 @@ import { ACCOUNT_ADDRESSES } from '@celo/dev-utils/lib/ganache-setup'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { toChecksumAddress } from '@celo/utils/lib/address'
 import { NativeSigner, serializeSignature } from '@celo/utils/lib/signatureUtils'
-import fetchMock from 'fetch-mock'
 import { newKitFromWeb3 } from '../kit'
 import { AccountsWrapper } from '../wrappers/Accounts'
 import { createStorageClaim } from './claims/claim'
 import { IdentityMetadataWrapper } from './metadata'
-import OffchainDataWrapper from './offchain-data-wrapper'
+import OffchainDataWrapper, { OffchainErrorTypes } from './offchain-data-wrapper'
+import { SchemaErrorTypes } from './offchain/schema-utils'
 import { AuthorizedSignerAccessor, NameAccessor } from './offchain/schemas'
 import { MockStorageWriter } from './offchain/storage-writers'
 
@@ -56,9 +56,34 @@ testWithGanache('Offchain Data', (web3) => {
       const nameAccessor = new NameAccessor(wrapper)
       await nameAccessor.write({ name: testname })
 
-      const receivedName = await nameAccessor.read(writer)
-      expect(receivedName).toBeDefined()
-      expect(receivedName!.name).toEqual(testname)
+      const resp = await nameAccessor.readAsResult(writer)
+
+      if (resp.ok) {
+        expect(resp.result.name).toEqual(testname)
+      } else {
+        const error = resp.error
+        switch (error.errorType) {
+          case SchemaErrorTypes.InvalidDataError:
+            console.log("Something was wrong with the schema, can't try again")
+            break
+          case SchemaErrorTypes.OffchainError:
+            const offchainError = error.error
+            switch (offchainError.errorType) {
+              case OffchainErrorTypes.FetchError:
+                console.log('Something went wrong with fetching, try again')
+                break
+              case OffchainErrorTypes.InvalidSignature:
+                console.log('Signature was wrong')
+                break
+              case OffchainErrorTypes.NoStorageRootProvidedData:
+                console.log('Account has not data for this type')
+                break
+            }
+
+          default:
+            break
+        }
+      }
     })
 
     it('cannot write with a signer that is not authorized', async () => {
@@ -79,12 +104,12 @@ testWithGanache('Offchain Data', (web3) => {
       const nameAccessor = new NameAccessor(wrapper)
       await nameAccessor.write({ name: testname })
 
-      const receivedName = await nameAccessor.read(writer)
-      expect(receivedName).not.toBeDefined()
+      const receivedName = await nameAccessor.readAsResult(writer)
+      expect(receivedName.ok).toEqual(false)
 
       const authorizedSignerAccessor = new AuthorizedSignerAccessor(wrapper)
-      const authorization = await authorizedSignerAccessor.read(writer, signer)
-      expect(authorization).not.toBeDefined()
+      const authorization = await authorizedSignerAccessor.readAsResult(writer, signer)
+      expect(authorization.ok).toEqual(false)
     })
   })
 
@@ -111,7 +136,7 @@ testWithGanache('Offchain Data', (web3) => {
 
     it('can read the authorization', async () => {
       const authorizedSignerAccessor = new AuthorizedSignerAccessor(wrapper)
-      const authorization = await authorizedSignerAccessor.read(writer, signer)
+      const authorization = await authorizedSignerAccessor.readAsResult(writer, signer)
       expect(authorization).toBeDefined()
     })
 
@@ -120,9 +145,10 @@ testWithGanache('Offchain Data', (web3) => {
       const nameAccessor = new NameAccessor(wrapper)
       await nameAccessor.write({ name: testname })
 
-      const receivedName = await nameAccessor.read(writer)
-      expect(receivedName).toBeDefined()
-      expect(receivedName!.name).toEqual(testname)
+      const resp = await nameAccessor.readAsResult(writer)
+      if (resp.ok) {
+        expect(resp.result.name).toEqual(testname)
+      }
     })
   })
 })

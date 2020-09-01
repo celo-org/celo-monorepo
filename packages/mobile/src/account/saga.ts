@@ -21,7 +21,7 @@ import { clearStoredMnemonic, getStoredMnemonic } from 'src/backup/utils'
 import { FIREBASE_ENABLED } from 'src/config'
 import { firebaseSignOut } from 'src/firebase/firebase'
 import { deleteNodeData } from 'src/geth/geth'
-import { revokePhoneMapping } from 'src/identity/revoke'
+import { revokeVerificationSaga } from 'src/identity/revoke'
 import { Actions as ImportActions } from 'src/import/actions'
 import { importBackupPhraseSaga } from 'src/import/saga'
 import { moveAllFundsFromAccount } from 'src/invite/saga'
@@ -62,7 +62,7 @@ function* migrateAccountToProperBip39() {
   }
 
   yield call(getConnectedUnlockedAccount)
-  yield call(revokePhoneMapping, e164Number, account)
+  yield call(revokeVerificationSaga)
 
   const mnemonic = yield call(getStoredMnemonic, account)
   yield call(importBackupPhraseSaga, {

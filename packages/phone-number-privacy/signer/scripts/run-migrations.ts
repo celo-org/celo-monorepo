@@ -3,7 +3,8 @@ import { initDatabase } from '../src/database/database'
 
 async function start() {
   console.info('Running migrations')
-  const db = await initDatabase(false)
+  console.warn('It is no longer necessary to run db migrations seperately prior to startup')
+  await initDatabase(false)
 }
 
 start()

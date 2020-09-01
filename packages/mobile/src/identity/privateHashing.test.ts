@@ -1,11 +1,12 @@
 import { OdisUtils } from '@celo/contractkit'
-import { FetchMock } from 'jest-fetch-mock'
+import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import { expectSaga } from 'redux-saga-test-plan'
 import * as matchers from 'redux-saga-test-plan/matchers'
 import { call, select } from 'redux-saga/effects'
 import { PincodeType } from 'src/account/reducer'
 import { e164NumberSelector } from 'src/account/selectors'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
 import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import { e164NumberToSaltSelector } from 'src/identity/reducer'
@@ -26,20 +27,15 @@ jest.mock('@celo/contractkit', () => ({
 }))
 
 describe('Fetch phone hash details', () => {
-  const mockFetch = fetch as FetchMock
-  beforeEach(() => {
-    mockFetch.resetMocks()
-  })
-
   it('retrieves salts correctly', async () => {
-    mockFetch.mockResponseOnce(
-      JSON.stringify({
-        success: true,
-        signature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
-      })
-    )
     const expectedPepper = 'piWqRHHYWtfg9'
     const expectedHash = '0xf6429456331dedf8bd32b5e3a578e5bc589a28d012724dcd3e0a4b1be67bb454'
+
+    const lookupResult: PhoneNumberHashDetails = {
+      e164Number: mockE164Number,
+      phoneHash: expectedHash,
+      pepper: expectedPepper,
+    }
 
     const state = createMockStore({
       web3: { account: mockAccount },
@@ -53,6 +49,7 @@ describe('Fetch phone hash details', () => {
         [select(e164NumberSelector), mockE164Number2],
         [select(e164NumberToSaltSelector), {}],
         [matchers.call.fn(isAccountUpToDate), true],
+        [matchers.call.fn(OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier), lookupResult],
       ])
       .withState(state)
       .put(
@@ -78,7 +75,8 @@ describe('Fetch phone hash details', () => {
       await expectSaga(fetchPhoneHashPrivate, mockE164Number)
         .provide([
           [call(getConnectedAccount), mockAccount],
-          [select(stableTokenBalanceSelector), 0.09],
+          [select(stableTokenBalanceSelector), 0.009],
+          [select(celoTokenBalanceSelector), 0.004],
           [select(e164NumberSelector), mockE164Number2],
           [select(e164NumberToSaltSelector), {}],
           [matchers.call.fn(isAccountUpToDate), true],
@@ -91,18 +89,6 @@ describe('Fetch phone hash details', () => {
   })
 
   it.skip('handles failure from quota', async () => {
-    mockFetch.mockResponseOnce(JSON.stringify({ success: false }), { status: 403 })
     // TODO confirm it navs to quota purchase screen
-  })
-})
-
-// TODO move to contract kit tests
-describe(OdisUtils.PhoneNumberIdentifier.getPepperFromThresholdSignature, () => {
-  it('Hashes sigs correctly', () => {
-    const base64Sig = 'vJeFZJ3MY5KlpI9+kIIozKkZSR4cMymLPh2GHZUatWIiiLILyOcTiw2uqK/LBReA'
-    const signature = new Buffer(base64Sig, 'base64')
-    expect(OdisUtils.PhoneNumberIdentifier.getPepperFromThresholdSignature(signature)).toBe(
-      'piWqRHHYWtfg9'
-    )
   })
 })

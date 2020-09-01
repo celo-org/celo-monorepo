@@ -2,8 +2,10 @@ import { AttestationServiceTestRequest } from '@celo/utils/lib/io'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import express from 'express'
 import { getAccountAddress, getAttestationSignerAddress } from '../env'
+import { rootLogger } from '../logger'
 import { ErrorMessages, respondWithError } from '../request'
-import { smsProviderFor } from '../sms'
+import { startSendSms } from '../sms'
+
 export { AttestationServiceTestRequestType } from '@celo/utils/lib/io'
 
 export async function handleTestAttestationRequest(
@@ -30,12 +32,11 @@ export async function handleTestAttestationRequest(
     }
   }
 
-  const provider = smsProviderFor(testRequest.phoneNumber)
-  if (provider === undefined) {
-    respondWithError(res, 422, ErrorMessages.NO_PROVIDER_SETUP)
-    return
+  try {
+    const provider = await startSendSms(testRequest.phoneNumber, testRequest.message)
+    res.json({ success: true, provider }).status(201)
+  } catch (error) {
+    rootLogger.error(error)
+    res.json({ success: false, error: error.message }).status(500)
   }
-
-  await provider!.sendSms(testRequest.phoneNumber, testRequest.message)
-  res.json({ success: true }).status(201)
 }

@@ -20,7 +20,7 @@
 
 • **address**: *[Address](../modules/_base_.md#address)*
 
-*Defined in [contractkit/src/wrappers/Election.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L24)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L24)*
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **capacity**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/Election.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L27)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L27)*
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **eligible**: *boolean*
 
-*Defined in [contractkit/src/wrappers/Election.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L28)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L28)*
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • **name**: *string*
 
-*Defined in [contractkit/src/wrappers/Election.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L25)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L25)*
 
 ___
 
@@ -52,4 +52,4 @@ ___
 
 • **votes**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/Election.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L26)*
+*Defined in [packages/contractkit/src/wrappers/Election.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L26)*

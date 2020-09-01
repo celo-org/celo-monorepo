@@ -15,6 +15,9 @@ USAGE
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the sender
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
@@ -28,9 +31,6 @@ OPTIONS
   --phaseDuration=phaseDuration                      (required) Duration of each DKG phase in blocks
 
   --threshold=threshold                              (required) The threshold to use for the DKG
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 ```
@@ -48,6 +48,10 @@ USAGE
 OPTIONS
   --address=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d                 (required) DKG Contract Address
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)                        Use a specific gas currency for transaction fees
+                                                                       (defaults to 'auto' which uses whatever
+                                                                       feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                                    [default: 1] If --useLedger is set, this will get
                                                                        the first N addresses for local signing
 
@@ -59,9 +63,6 @@ OPTIONS
                                                                        signing. Example --ledgerCustomAddresses "[4,99]"
 
   --method=(shares|responses|justifications|participants|phase|group)  (required) Getter method to call
-
-  --usdGas                                                             If --usdGas is set, the transaction is paid for
-                                                                       with a feeCurrency of cUSD
 
   --useLedger                                                          Set it to use a ledger wallet
 ```
@@ -81,6 +82,9 @@ OPTIONS
   --data=data                                           (required) Path to the data being published
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the sender
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)         Use a specific gas currency for transaction fees (defaults to
+                                                        'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                     [default: 1] If --useLedger is set, this will get the first N
                                                         addresses for local signing
 
@@ -90,9 +94,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses         [default: [0]] If --useLedger is set, this will get the array of
                                                         index addresses for local signing. Example
                                                         --ledgerCustomAddresses "[4,99]"
-
-  --usdGas                                              If --usdGas is set, the transaction is paid for with a
-                                                        feeCurrency of cUSD
 
   --useLedger                                           Set it to use a ledger wallet
 ```
@@ -112,6 +113,9 @@ OPTIONS
   --blsKey=blsKey                                       (required)
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the sender
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)         Use a specific gas currency for transaction fees (defaults to
+                                                        'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                     [default: 1] If --useLedger is set, this will get the first N
                                                         addresses for local signing
 
@@ -121,9 +125,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses         [default: [0]] If --useLedger is set, this will get the array of
                                                         index addresses for local signing. Example
                                                         --ledgerCustomAddresses "[4,99]"
-
-  --usdGas                                              If --usdGas is set, the transaction is paid for with a
-                                                        feeCurrency of cUSD
 
   --useLedger                                           Set it to use a ledger wallet
 ```
@@ -142,6 +143,9 @@ OPTIONS
   --address=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) DKG Contract Address
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the sender
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)         Use a specific gas currency for transaction fees (defaults to
+                                                        'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                     [default: 1] If --useLedger is set, this will get the first N
                                                         addresses for local signing
 
@@ -151,9 +155,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses         [default: [0]] If --useLedger is set, this will get the array of
                                                         index addresses for local signing. Example
                                                         --ledgerCustomAddresses "[4,99]"
-
-  --usdGas                                              If --usdGas is set, the transaction is paid for with a
-                                                        feeCurrency of cUSD
 
   --useLedger                                           Set it to use a ledger wallet
 ```
@@ -172,6 +173,9 @@ OPTIONS
   --address=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) DKG Contract Address
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the sender
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)         Use a specific gas currency for transaction fees (defaults to
+                                                        'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                     [default: 1] If --useLedger is set, this will get the first N
                                                         addresses for local signing
 
@@ -183,9 +187,6 @@ OPTIONS
                                                         --ledgerCustomAddresses "[4,99]"
 
   --participantAddress=participantAddress               (required) Address of the participant to whitelist
-
-  --usdGas                                              If --usdGas is set, the transaction is paid for with a
-                                                        feeCurrency of cUSD
 
   --useLedger                                           Set it to use a ledger wallet
 ```
