@@ -14,7 +14,7 @@ describe('VerificationEducationScreen', () => {
           status: {
             numAttestationsRemaining: 2,
           },
-          isBalanceSufficientForAttestations: true,
+          isBalanceSufficient: true,
           actionableAttestations: [{}, {}],
         },
       },

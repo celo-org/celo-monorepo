@@ -34,12 +34,9 @@ function VerificationEducationScreen({ route, navigation }: Props) {
   const dispatch = useDispatch()
   const headerHeight = useHeaderHeight()
   const insets = useSafeAreaInsets()
-  const {
-    isBalanceSufficientForAttestations,
-    isLoading,
-    status,
-    actionableAttestations,
-  } = useSelector(verificationStateSelector)
+  const { isBalanceSufficient, isLoading, status, actionableAttestations } = useSelector(
+    verificationStateSelector
+  )
   const { numAttestationsRemaining } = status
   const numberVerified = useSelector(numberVerifiedSelector)
   const partOfOnboarding = !route.params?.hideOnboardingStep
@@ -56,10 +53,10 @@ function VerificationEducationScreen({ route, navigation }: Props) {
     }
   }, [])
 
-  const onPressStart = (withoutRevelaling: boolean) => {
+  const onPressStart = (withoutRevealing: boolean) => {
     return () => {
       dispatch(setHasSeenVerificationNux(true))
-      navigation.navigate(Screens.VerificationLoadingScreen, { withoutRevelaling })
+      navigation.navigate(Screens.VerificationLoadingScreen, { withoutRevealing })
     }
   }
 
@@ -113,7 +110,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
         testID="VerificationEducationSkip"
       />
     )
-  } else if (isBalanceSufficientForAttestations) {
+  } else if (isBalanceSufficient) {
     // Sufficient balance
     bodyText = t('verificationEducation.body')
     firstButton = (

@@ -43,7 +43,7 @@ export enum Actions {
 
 export interface StartVerificationAction {
   type: Actions.START_VERIFICATION
-  withoutRevelaling: boolean
+  withoutRevealing: boolean
 }
 
 export interface SetVerificationStatusAction {
@@ -214,9 +214,9 @@ export type ActionTypes =
   | FetchVerificationState
   | UpdateVerificationState
 
-export const startVerification = (withoutRevelaling: boolean = false): StartVerificationAction => ({
+export const startVerification = (withoutRevealing: boolean = false): StartVerificationAction => ({
   type: Actions.START_VERIFICATION,
-  withoutRevelaling,
+  withoutRevealing,
 })
 
 export const cancelVerification = (): CancelVerificationAction => ({

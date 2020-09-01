@@ -58,7 +58,7 @@ export interface VerificationState {
   phoneHashDetails: PhoneNumberHashDetails
   actionableAttestations: ActionableAttestation[]
   status: AttestationsStatus
-  isBalanceSufficientForAttestations: boolean
+  isBalanceSufficient: boolean
 }
 
 export interface State {
@@ -120,7 +120,7 @@ const initialState: State = {
       total: 0,
       completed: 0,
     },
-    isBalanceSufficientForAttestations: true,
+    isBalanceSufficient: true,
     lastFetch: null,
   },
 }

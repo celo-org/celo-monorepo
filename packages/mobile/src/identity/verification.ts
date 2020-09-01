@@ -44,6 +44,7 @@ import {
   acceptedAttestationCodesSelector,
   attestationCodesSelector,
   isVerificationStateExpiredSelector,
+  VerificationState,
   verificationStateSelector,
 } from 'src/identity/reducer'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
@@ -86,13 +87,13 @@ export function* fetchVerificationState() {
 
     let phoneHash: string
     let phoneHashDetails: PhoneNumberHashDetails
-    const isBalanceSufficientForQuota = yield call(balanceSufficientForSigRetrieval)
-    if (!isBalanceSufficientForQuota) {
+    const isBalanceSufficientForSigRetrieval = yield call(balanceSufficientForSigRetrieval)
+    if (!isBalanceSufficientForSigRetrieval) {
       const currentState = yield select(verificationStateSelector)
       yield put(
         udpateVerificationState({
           ...currentState,
-          isBalanceSufficientForAttestations: false,
+          isBalanceSufficient: false,
         })
       )
       return
@@ -128,13 +129,14 @@ export function* fetchVerificationState() {
       ...status,
     })
 
-    const actionableAttestations: ActionableAttestation[] = yield getActionableAttestations(
+    const actionableAttestations: ActionableAttestation[] = yield call(
+      getActionableAttestations,
       attestationsWrapper,
       phoneHash,
       account
     )
 
-    const isBalanceSufficientForAttestations = yield call(
+    const isBalanceSufficient = yield call(
       balanceSufficientForAttestations,
       status.numAttestationsRemaining - actionableAttestations.length
     )
@@ -144,7 +146,7 @@ export function* fetchVerificationState() {
         phoneHashDetails,
         actionableAttestations,
         status,
-        isBalanceSufficientForAttestations,
+        isBalanceSufficient,
       })
     )
   } catch (error) {
@@ -152,7 +154,7 @@ export function* fetchVerificationState() {
   }
 }
 
-export function* startVerification({ withoutRevelaling }: StartVerificationAction) {
+export function* startVerification({ withoutRevealing }: StartVerificationAction) {
   ValoraAnalytics.track(VerificationEvents.verification_start)
 
   yield put(resetVerification())
@@ -164,7 +166,7 @@ export function* startVerification({ withoutRevelaling }: StartVerificationActio
   Logger.debug(TAG, 'Starting verification')
 
   const { result, cancel, timeout } = yield race({
-    result: call(doVerificationFlow, withoutRevelaling),
+    result: call(doVerificationFlow, withoutRevealing),
     cancel: take(Actions.CANCEL_VERIFICATION),
     timeout: delay(VERIFICATION_TIMEOUT),
   })
@@ -189,15 +191,15 @@ export function* startVerification({ withoutRevelaling }: StartVerificationActio
   yield put(refreshAllBalances())
 }
 
-export function* doVerificationFlow(withoutRevelaling: boolean = false) {
+export function* doVerificationFlow(withoutRevealing: boolean = false) {
   try {
     yield put(setVerificationStatus(VerificationStatus.Prepping))
     const {
       phoneHashDetails,
       status,
       actionableAttestations,
-      isBalanceSufficientForAttestations,
-    } = yield select(verificationStateSelector)
+      isBalanceSufficient,
+    }: VerificationState = yield select(verificationStateSelector)
     if (!status.isVerified) {
       const { phoneHash } = phoneHashDetails
       const account: string = yield call(getConnectedUnlockedAccount)
@@ -209,7 +211,7 @@ export function* doVerificationFlow(withoutRevelaling: boolean = false) {
         contractKit.contracts.getAttestations,
       ])
 
-      if (!isBalanceSufficientForAttestations) {
+      if (!isBalanceSufficient) {
         yield put(setVerificationStatus(VerificationStatus.InsufficientBalance))
         // Return error message for logging purposes
         return ErrorMessages.INSUFFICIENT_BALANCE
@@ -262,7 +264,7 @@ export function* doVerificationFlow(withoutRevelaling: boolean = false) {
           account,
           phoneHashDetails,
           attestations,
-          withoutRevelaling
+          withoutRevealing
         ),
         // Set acccount and data encryption key in Accounts contract
         // This is done in other places too, intentionally keeping it for more coverage
@@ -550,7 +552,7 @@ function* revealNeededAttestations(
   account: string,
   phoneHashDetails: PhoneNumberHashDetails,
   attestations: ActionableAttestation[],
-  withoutRevelaling: boolean = false
+  withoutRevealing: boolean = false
 ) {
   Logger.debug(TAG + '@revealNeededAttestations', `Revealing ${attestations.length} attestations`)
   yield all(
@@ -561,7 +563,7 @@ function* revealNeededAttestations(
         account,
         phoneHashDetails,
         attestation,
-        withoutRevelaling
+        withoutRevealing
       )
     })
   )
@@ -572,10 +574,10 @@ function* revealAndCompleteAttestation(
   account: string,
   phoneHashDetails: PhoneNumberHashDetails,
   attestation: ActionableAttestation,
-  withoutRevelaling: boolean = false
+  withoutRevealing: boolean = false
 ) {
   const issuer = attestation.issuer
-  if (!withoutRevelaling) {
+  if (!withoutRevealing) {
     ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_start, { issuer })
     yield call(tryRevealPhoneNumber, attestationsWrapper, account, phoneHashDetails, attestation)
   }

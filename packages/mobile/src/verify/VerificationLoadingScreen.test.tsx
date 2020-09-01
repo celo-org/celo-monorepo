@@ -21,7 +21,7 @@ const mockRoute = {
   name: Screens.VerificationLoadingScreen as Screens.VerificationLoadingScreen,
   key: '1',
   params: {
-    withoutRevelaling: false,
+    withoutRevealing: false,
   },
 }
 

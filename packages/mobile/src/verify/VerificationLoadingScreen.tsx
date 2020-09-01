@@ -62,7 +62,7 @@ export default function VerificationLoadingScreen({ route }: Props) {
   const isFocused = useIsFocused()
 
   useEffect(() => {
-    dispatch(startVerification(!!route.params.withoutRevelaling))
+    dispatch(startVerification(!!route.params.withoutRevealing))
   }, [])
 
   useEffect(() => {
@@ -78,7 +78,7 @@ export default function VerificationLoadingScreen({ route }: Props) {
         () => {
           navigate(Screens.VerificationInputScreen)
         },
-        route.params.withoutRevelaling ? 0 : WAIT_AFTER_REVEAL
+        route.params.withoutRevealing ? 0 : WAIT_AFTER_REVEAL
       )
     } else if (verificationStatus === VerificationStatus.Done) {
       navigate(Screens.ImportContacts)
@@ -225,7 +225,7 @@ export default function VerificationLoadingScreen({ route }: Props) {
         >
           <Animated.View style={statusContainerStyle}>
             <Text style={styles.statusText}>{t('loading.confirming')}</Text>
-            {!route.params.withoutRevelaling && (
+            {!route.params.withoutRevealing && (
               <VerificationCountdown onFinish={onFinishCountdown} />
             )}
           </Animated.View>
