@@ -1,4 +1,6 @@
+import { AttestationServiceStatusState } from '@celo/contractkit/lib/wrappers/Attestations'
 import { concurrentMap } from '@celo/utils/lib/async'
+import chalk from 'chalk'
 import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
 
@@ -21,23 +23,48 @@ export default class AttestationServicesCurrent extends BaseCommand {
       signers.map((addr) => validators.getValidatorFromSigner(addr))
     )
     const validatorInfo = await concurrentMap(
-      10,
+      5,
       validatorList,
       attestations.getAttestationServiceStatus.bind(this)
     )
 
     cli.action.stop()
     cli.table(
-      validatorInfo,
+      validatorInfo.sort((a, b) => {
+        if (a.affiliation === b.affiliation) {
+          return 0
+        } else if (a.affiliation === null) {
+          return 1
+        } else if (b.affiliation === null) {
+          return -1
+        }
+        return a.affiliation.toLowerCase().localeCompare(b.affiliation.toLowerCase())
+      }),
       {
         address: {},
         affiliation: {},
         name: {},
-        state: {},
+        state: {
+          get: (r) => {
+            switch (r.state) {
+              case AttestationServiceStatusState.NoMetadataURL:
+              case AttestationServiceStatusState.InvalidMetadata:
+              case AttestationServiceStatusState.UnreachableAttestationService:
+              case AttestationServiceStatusState.WrongAccount:
+              case AttestationServiceStatusState.Unhealthy:
+                return chalk.red(r.state)
+              case AttestationServiceStatusState.Valid:
+                return chalk.green(r.state)
+              case AttestationServiceStatusState.NoAttestationSigner:
+                return r.state
+              default:
+                return chalk.yellow(r.state)
+            }
+          },
+        },
+        version: {},
         attestationServiceURL: {},
         smsProviders: {},
-        blacklistedRegionCodes: {},
-        rightAccount: {},
       },
       { 'no-truncate': !res.flags.truncate }
     )
