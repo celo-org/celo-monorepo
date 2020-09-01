@@ -25,7 +25,7 @@ interface Props {
 
 class PressPage extends React.PureComponent<I18nProps & Props> {
   static async getInitialProps(context) {
-    let press
+    let press = []
     let languages
     try {
       // when run on server import fetching code and run. on client send req to api
@@ -53,7 +53,10 @@ class PressPage extends React.PureComponent<I18nProps & Props> {
     )
 
     const formated = press
-      .filter((article) => langList.has(Languages[article.language]))
+      .filter(
+        (article) =>
+          langList.has(Languages[article.language]) || Languages[article.language] === i18n.language
+      )
       .reduce(groupByMonth, {})
 
     return (
