@@ -54,7 +54,7 @@ export const pagePaths = {
   },
   CBE: {
     name: 'Coinbase',
-    link: '/coinbase',
+    link: '/coinbase-earn',
     isDark: false,
     translucent: {
       backgroundHover: 'rgba(22, 82, 235, 0.6)',
