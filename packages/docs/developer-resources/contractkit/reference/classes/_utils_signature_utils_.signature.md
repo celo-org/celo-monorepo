@@ -22,7 +22,7 @@
 
 \+ **new Signature**(`v`: number, `r`: Buffer, `s`: Buffer): *[Signature](_utils_signature_utils_.signature.md)*
 
-*Defined in [contractkit/src/utils/signature-utils.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signature-utils.ts#L39)*
+*Defined in [packages/contractkit/src/utils/signature-utils.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signature-utils.ts#L39)*
 
 **Parameters:**
 
@@ -40,7 +40,7 @@ Name | Type |
 
 • **r**: *Buffer*
 
-*Defined in [contractkit/src/utils/signature-utils.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signature-utils.ts#L38)*
+*Defined in [packages/contractkit/src/utils/signature-utils.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signature-utils.ts#L38)*
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 • **s**: *Buffer*
 
-*Defined in [contractkit/src/utils/signature-utils.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signature-utils.ts#L39)*
+*Defined in [packages/contractkit/src/utils/signature-utils.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signature-utils.ts#L39)*
 
 ___
 
@@ -56,4 +56,4 @@ ___
 
 • **v**: *number*
 
-*Defined in [contractkit/src/utils/signature-utils.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signature-utils.ts#L37)*
+*Defined in [packages/contractkit/src/utils/signature-utils.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signature-utils.ts#L37)*
