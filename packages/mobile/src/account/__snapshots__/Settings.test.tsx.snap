@@ -4355,7 +4355,9 @@ exports[`Account renders correctly when verification is not possible 1`] = `
       </svg>
     </View>
   </View>
-  <RCTScrollView>
+  <RCTScrollView
+    testID="SettingsScrollView"
+  >
     <View>
       <Text
         accessible={true}
@@ -5168,6 +5170,7 @@ exports[`Account renders correctly when verification is not possible 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            testID="ResetAccount"
           >
             <View
               style={
@@ -5884,6 +5887,7 @@ exports[`Account renders correctly when verification is not possible 1`] = `
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="RemoveAccountModal/SecondaryAction"
                 >
                   <Text
                     style={
@@ -5920,6 +5924,7 @@ exports[`Account renders correctly when verification is not possible 1`] = `
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="RemoveAccountModal/PrimaryAction"
                 >
                   <Text
                     style={
@@ -6120,6 +6125,7 @@ exports[`Account renders correctly when verification is not possible 1`] = `
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="ConfirmAccountRemovalModal/SecondaryAction"
                 >
                   <Text
                     style={
@@ -6156,6 +6162,7 @@ exports[`Account renders correctly when verification is not possible 1`] = `
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="ConfirmAccountRemovalModal/PrimaryAction"
                 >
                   <Text
                     style={
