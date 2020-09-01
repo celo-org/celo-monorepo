@@ -34,6 +34,7 @@ export async function handleStatusRequest(
         AttestationServiceStatusResponseType.encode({
           status: 'ok',
           smsProviders: configuredSmsProviders(),
+          blacklistedRegionCodes: [], // for backwards compatibility
           accountAddress: getAccountAddress(),
           signature: await produceSignature(statusRequest.messageToSign),
           version: VERSION,

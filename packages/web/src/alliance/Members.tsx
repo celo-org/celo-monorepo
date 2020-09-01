@@ -150,14 +150,19 @@ const Member = React.memo(function _Member({ logo, name, url }: Ally) {
       {(onLoad: () => void) => (
         <View style={styles.member}>
           <a target={'_blank'} href={href}>
-            <Image
-              resizeMode="contain"
-              resizeMethod="resize"
-              onLoad={onLoad}
-              source={{ uri: logo.uri }}
-              accessibilityLabel={name}
-              style={[styles.logo, { width: logo.width / divisor }]}
-            />
+            <View style={styles.memberName}>
+              <Image
+                resizeMode="contain"
+                resizeMethod="resize"
+                onLoad={onLoad}
+                source={{ uri: logo.uri }}
+                accessibilityLabel={name}
+                style={[styles.logo, { width: logo.width / divisor }]}
+              />
+              <Text style={[fonts.mini, textStyles.italic, textStyles.center, textStyles.caption]}>
+                {name}
+              </Text>
+            </View>
           </a>
           {href && <Outbound url={href} />}
         </View>
@@ -187,6 +192,7 @@ const styles = StyleSheet.create({
   selectionArea: { maxWidth: 220 },
   membersArea: { minHeight: 650 },
   memberTitle: { marginBottom: 5 },
+  memberName: { flexDirection: 'column' },
   grayLine: {
     marginTop: 2,
     borderBottomColor: colors.gray,

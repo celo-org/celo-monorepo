@@ -18,6 +18,8 @@ import BackButton from 'src/components/BackButton.v2'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import LineItemRow from 'src/components/LineItemRow'
 import { DOLLAR_ADD_FUNDS_MIN_AMOUNT, DOLLAR_CASH_OUT_MIN_AMOUNT } from 'src/config'
+import { fetchExchangeRate } from 'src/exchange/actions'
+import { exchangeRatePairSelector } from 'src/exchange/reducer'
 import { features } from 'src/flags'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
@@ -26,12 +28,11 @@ import {
   convertLocalAmountToDollars,
 } from 'src/localCurrency/convert'
 import { useLocalCurrencyCode } from 'src/localCurrency/hooks'
-import { getLocalCurrencyExchangeRate, getLocalCurrencySymbol } from 'src/localCurrency/selectors'
+import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import { emptyHeader, HeaderTitleWithBalance } from 'src/navigator/Headers.v2'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
-import { getRecentPayments } from 'src/send/selectors'
-import { isPaymentLimitReached, showLimitReachedError } from 'src/send/utils'
+import { useDailyTransferLimitValidator } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 
@@ -79,10 +80,8 @@ export function ExchangeTradeScreen({ navigation, route }: Props) {
   }
 
   function goNext() {
-    const now = Date.now()
-    const isLimitReached = isPaymentLimitReached(now, recentPayments, dollarAmount.toNumber())
-    if (isLimitReached) {
-      dispatch(showLimitReachedError(now, recentPayments, localExchangeRate, localCurrencySymbol))
+    if (isTransferLimitReached) {
+      showLimitReachedBanner()
       return
     }
 
@@ -95,19 +94,27 @@ export function ExchangeTradeScreen({ navigation, route }: Props) {
 
   const { isAddFunds } = route.params
   const { t } = useTranslation(Namespaces.fiatExchangeFlow)
-  const dispatch = useDispatch()
   const [inputAmount, setInputAmount] = React.useState('')
   const dollarBalance = useSelector(stableTokenBalanceSelector)
   const localExchangeRate = useSelector(getLocalCurrencyExchangeRate)
-  const localCurrencySymbol = useSelector(getLocalCurrencySymbol)
   const localCurrencyCode = useLocalCurrencyCode()
-  const recentPayments = useSelector(getRecentPayments)
 
   const parsedInputAmount = parseInputAmount(inputAmount, decimalSeparator)
   const dollarAmount = convertDollarsToMaxSupportedPrecision(
     (!parsedInputAmount.isNaN() &&
       convertLocalAmountToDollars(parsedInputAmount, localCurrencyCode ? localExchangeRate : 1)) ||
       new BigNumber('0')
+  )
+
+  const dispatch = useDispatch()
+  const exchangeRatePair = useSelector(exchangeRatePairSelector)
+  React.useEffect(() => {
+    dispatch(fetchExchangeRate())
+  }, [])
+
+  const [isTransferLimitReached, showLimitReachedBanner] = useDailyTransferLimitValidator(
+    features.CUSD_MOONPAY_ENABLED ? dollarAmount : parsedInputAmount,
+    features.CUSD_MOONPAY_ENABLED ? CURRENCY_ENUM.DOLLAR : CURRENCY_ENUM.GOLD
   )
 
   return (
@@ -165,6 +172,7 @@ export function ExchangeTradeScreen({ navigation, route }: Props) {
       )}
       <Button
         onPress={goNext}
+        showLoading={exchangeRatePair === null}
         text={t('global:next')}
         type={BtnTypes.SECONDARY}
         accessibilityLabel={t('global:next')}
