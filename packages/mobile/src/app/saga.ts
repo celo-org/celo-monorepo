@@ -37,10 +37,7 @@ const DO_NOT_LOCK_PERIOD = 30000 // 30 sec
 // Work that's done before other sagas are initalized
 // Be mindful to not put long blocking tasks here
 export function* appInit() {
-  if (false) {
-    yield call(isAppVersionDeprecated)
-  }
-  const isDeprecated: boolean = false
+  const isDeprecated: boolean = yield call(isAppVersionDeprecated)
 
   if (isDeprecated) {
     Logger.warn(TAG, 'App version is deprecated')
