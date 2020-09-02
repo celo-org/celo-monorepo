@@ -13,7 +13,7 @@
   "SMSError": "Error al enviar SMS",
   "notifications": "Notificaciones",
   "getBackupKey": "Obtener Clave de Cuenta",
-  "setBackupKey": "Configure tu Clave de Cuenta para mejorar la seguridad y habilitar la recuperación de la cuenta",
+  "setBackupKey": "Configura tu Clave de Cuenta para mejorar la seguridad y habilitar la recuperación de la cuenta",
   "activity": "Actividad",
   "wallet": "Monedero",
   "send": "Enviar",
