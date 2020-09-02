@@ -1,25 +1,25 @@
 {
   "headerTitle": "Clave de la cuenta",
-  "introTitle": "La clave de tu cuenta",
-  "introBody": "La llave de su cuenta es la parte más importante de su cuenta. Lleva unos cinco minutos",
+  "introTitle": "La Clave de Cuenta",
+  "introBody": "La clave de tu cuenta es la parte más importante de tu cuenta. Configurarla toma cinco minutos",
   "introPrimaryAction": "Configurar Ahora",
   "delayBackup": "Espere una hora",
-  "postSetupTitle": "La clave de tu cuenta",
-  "postSetupBody": "Si pierdes tu Clave de Cuenta, perderás el acceso a todos tus Celo Dólares y CELO. Nadie, ni siquiera {{appName}}, podrá ayudarle a recuperar su cuenta sin su clave. Guárdela en un lugar seguro y no la comparta",
-  "postSetupCTA": "Conozca las claves de la cuenta",
-  "getBackupKey": "Obtener Clave de Respaldo",
+  "postSetupTitle": "La Clave de Cuenta",
+  "postSetupBody": "Si pierdes tu Clave de Cuenta, perderás el acceso a todos tus Celo Dólares y CELO. Nadie, ni siquiera {{appName}}, podrá ayudarte a recuperar tu cuenta sin tu clave. Guárdala en un lugar seguro y no la compartas",
+  "postSetupCTA": "Conoce más sobre la Clave de Cuenta",
+  "getBackupKey": "Obtener Clave de Cuenta",
   "setUpSocialBackup": "Configurar Salvaguardas",
-  "failedFetchMnemonic": "No se pudo obtener su clave de respaldo",
+  "failedFetchMnemonic": "No se pudo obtener tu Clave de Cuenta",
   "backupAndRecovery": "Respaldo y recuperación",
-  "writeDownKey": "Por favor, escriba su llave",
-  "completeEducation": "Comprendo",
-  "yourAccountKey": "Su clave de la cuenta",
+  "writeDownKey": "Por favor, anota tu clave",
+  "completeEducation": "Entiendo",
+  "yourAccountKey": "Esta es tu Clave de Cuenta",
   "moreInfo": "Más Información",
-  "backupKeyNotification": "Su clave de cuenta es la parte más importante de su cuenta",
-  "backupKeySummary": "Encuentra un lugar privado y anota tu Clave de Cuenta. Por favor, guárdela en un lugar seguro. No la guardes en tu teléfono.",
-  "backupPrompt": "Para seguridad de sus fondos, su cuenta está bloqueada hasta que obtenga su clave de respaldo.",
+  "backupKeyNotification": "Tu Clave de Cuenta es la parte más importante de tu cuenta",
+  "backupKeySummary": "Encuentra un lugar privado y anota tu Clave de Cuenta. Por favor, guárdala en un lugar seguro. No la guardes en tu celular.",
+  "backupPrompt": "Para seguridad de tus fondos, tu cuenta está bloqueada hasta que obtengas tu Clave de Cuenta.",
   "copied": "Clave copiada al portapapeles",
-  "savedConfirmation": "Sí, he escrito mi llave",
+  "savedConfirmation": "Sí, he escrito mi clave",
   "invalidBackupPhrase": "Clave de cuenta inválida",
   "importBackupFailed": "No se pudo importar la billetera",
   "backupQuizFailed": "La clave de la cuenta que ha introducido es incorrecta. Por favor, inténtelo de nuevo.",
@@ -31,40 +31,40 @@
   },
   "socialBackupIntro": {
     "header": "Cómo incluir salvaguardas",
-    "body": "Las salvaguardas son una capa adicional de resguardo para su cuenta en el caso de que pierda la clave de respaldo. Una vez configuradas las salvaguardas, podrá restaurar su cuenta con la ayuda de dos amigos o miembros de su familia. ",
+    "body": "Las salvaguardas son una capa adicional de resguardo para tu cuenta en el caso de que pierda la clave de cuenta. Una vez configuradas las salvaguardas, podrá restaurar tu cuenta con la ayuda de dos amigos o miembros de tu familia. ",
     "warning": "NO DEBE REVELARLE A NADIE LAS IDENTIDADES DE SUS SALVAGUARDAS.",
     "skip": "Omitir por ahora"
   },
   "socialBackupPhraseHeader": "Frase de protección {{index}}",
-  "backupQuizWordCount": "¿Cuál es la palabra <0>{{{ordinal}}</0> de su clave de cuenta?",
+  "backupQuizWordCount": "¿Cuál es la palabra <0>{{{ordinal}}</0> de tu Clave de Cuenta?",
   "socialBackup": {
     "body": "Comparta cada frase que aparece a continuación con un amigo. Asegúrese de enviar solo una frase a cada persona.",
     "confirmation": "He enviado cada una de las salvaguardas a un amigo de confianza.",
-    "yourSafeguards": "Sus salvaguardas"
+    "yourSafeguards": "Tus salvaguardas"
   },
   "cancelDialog": {
-    "title": "Termine de configurar su Clave de Cuenta",
-    "body": "Las claves de la cuenta son extremadamente importantes. Sin una llave, puedes perder el acceso a tu billetera para siempre. Estarás bloqueado para enviar cualquier transacción hasta que termines de configurar tu Clave de Cuenta",
+    "title": "Termina de configurar tu Clave de Cuenta",
+    "body": "Las claves de la cuenta son extremadamente importantes. Sin una clave, puedes perder el acceso a tu app para siempre. Estarás bloqueado para enviar cualquier transacción hasta que termines de configurar tu Clave de Cuenta",
     "action": "Completar ahora",
     "secondary": "Establecer más tarde"
   },
   "backupPhrasePlaceholder": "caballo leopardo perro mono tiburón tigre lémur ballena calamar lobo ardilla ratón león elefante gato langostino oso pingüino ciervo tortuga zorro cebra cabra jirafa",
   "guide": [
     {
-      "title": "La clave de su cuenta es un tipo especial de contraseña",
-      "text": "La clave de su cuenta es la única manera de acceder a su cuenta"
+      "title": "Tu Clave de Cuenta es un tipo de contraseña especial",
+      "text": "La Clave de Cuenta es la única manera de acceder a tu cuenta"
     },
     {
-      "title": "Sin tu llave, puedes perder el acceso para siempre",
-      "text": "Si pierde su teléfono, debe tener la llave para recuperar su cuenta. Nadie, ni siquiera {{appName}}, podrá recuperar sus fondos sin ella"
+      "title": "Sin tu clave, puedes perder el acceso para siempre",
+      "text": "Si pierdes tu celular, debes tener la clave para recuperar tu cuenta. Nadie, ni siquiera {{appName}}, podrá recuperar tus fondos sin ella"
     },
     {
-      "title": "Escríbelo",
-      "text": "Escriba su clave de cuenta y guárdela en un lugar seguro. No la guardes en tu teléfono."
+      "title": "Anótala",
+      "text": "Escribe tu Clave de Cuenta y guárdala en un lugar seguro. No la guardes en tu celular."
     },
     {
-      "title": "Mantenga su llave en privado",
-      "text": "Cualquiera con su llave tendrá acceso a su cuenta y a todos sus fondos. No lo comparta con otros"
+      "title": "Mantén tu Clave de forma privada",
+      "text": "Cualquier persona que acceda a tu Clave tendrá acceso a tu cuenta y a todos tus fondos. No la compartas con otros"
     }
   ]
 }
