@@ -438,7 +438,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
-                  testID="undefined/CallToActions/global:remind/Button"
+                  testID="undefined/CallToActions/global:dismiss/Button"
                 >
                   <Text
                     style={
@@ -459,7 +459,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                       ]
                     }
                   >
-                    global:remind
+                    global:dismiss
                   </Text>
                 </View>
               </View>

@@ -1,11 +1,16 @@
+import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
+import { ActionableAttestation } from '@celo/contractkit/lib/wrappers/Attestations'
+import { AttestationsStatus } from '@celo/utils/src/attestations'
 import dotProp from 'dot-prop-immutable'
 import { RehydrateAction } from 'redux-persist'
 import { Actions as AccountActions, ClearStoredAccountAction } from 'src/account/actions'
+import { VERIFICATION_STATE_EXPIRY_SECONDS } from 'src/config'
 import { Actions, ActionTypes } from 'src/identity/actions'
 import { ContactMatches, ImportContactsStatus, VerificationStatus } from 'src/identity/types'
-import { AttestationCode } from 'src/identity/verification'
+import { AttestationCode, NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
 import { getRehydratePayload, REHYDRATE } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
+import { timeDeltaInSeconds } from 'src/utils/time'
 
 export const ATTESTATION_CODE_PLACEHOLDER = 'ATTESTATION_CODE_PLACEHOLDER'
 export const ATTESTATION_ISSUER_PLACEHOLDER = 'ATTESTATION_ISSUER_PLACEHOLDER'
@@ -49,11 +54,19 @@ export interface SecureSendDetails {
   validationSuccessful: boolean | undefined
 }
 
+export interface VerificationState {
+  phoneHashDetails: PhoneNumberHashDetails
+  actionableAttestations: ActionableAttestation[]
+  status: AttestationsStatus
+  isBalanceSufficient: boolean
+}
+
 export interface State {
   attestationCodes: AttestationCode[]
   // we store acceptedAttestationCodes to tell user if code
   // was already used even after Actions.RESET_VERIFICATION
   acceptedAttestationCodes: AttestationCode[]
+  // numCompleteAttestations is controlled locally
   numCompleteAttestations: number
   verificationStatus: VerificationStatus
   hasSeenVerificationNux: boolean
@@ -68,6 +81,11 @@ export interface State {
   // Contacts found during the matchmaking process
   matchedContacts: ContactMatches
   secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
+  // verificationState is fetched from the network
+  verificationState: {
+    isLoading: boolean
+    lastFetch: number | null
+  } & VerificationState
 }
 
 const initialState: State = {
@@ -88,6 +106,23 @@ const initialState: State = {
   },
   matchedContacts: {},
   secureSendPhoneNumberMapping: {},
+  verificationState: {
+    isLoading: false,
+    phoneHashDetails: {
+      e164Number: '',
+      phoneHash: '',
+      pepper: '',
+    },
+    actionableAttestations: [],
+    status: {
+      isVerified: false,
+      numAttestationsRemaining: NUM_ATTESTATIONS_REQUIRED,
+      total: 0,
+      completed: 0,
+    },
+    isBalanceSufficient: true,
+    lastFetch: null,
+  },
 }
 
 export const reducer = (
@@ -106,6 +141,7 @@ export const reducer = (
           current: 0,
           total: 0,
         },
+        verificationState: initialState.verificationState,
         isFetchingAddresses: false,
       }
     }
@@ -265,6 +301,23 @@ export const reducer = (
         matchedContacts: state.matchedContacts,
         secureSendPhoneNumberMapping: state.secureSendPhoneNumberMapping,
       }
+    case Actions.FETCH_VERIFICATION_STATE:
+      return {
+        ...state,
+        verificationState: {
+          ...initialState.verificationState,
+          isLoading: true,
+        },
+      }
+    case Actions.UPDATE_VERIFICATION_STATE:
+      return {
+        ...state,
+        verificationState: {
+          lastFetch: Date.now(),
+          isLoading: false,
+          ...action.state,
+        },
+      }
     default:
       return state
   }
@@ -296,3 +349,11 @@ export const secureSendPhoneNumberMappingSelector = (state: RootState) =>
 export const importContactsProgressSelector = (state: RootState) =>
   state.identity.importContactsProgress
 export const matchedContactsSelector = (state: RootState) => state.identity.matchedContacts
+export const verificationStateSelector = (state: RootState) => state.identity.verificationState
+export const isVerificationStateExpiredSelector = (state: RootState) => {
+  return (
+    !state.identity.verificationState.lastFetch ||
+    timeDeltaInSeconds(Date.now(), state.identity.verificationState.lastFetch) >
+      VERIFICATION_STATE_EXPIRY_SECONDS
+  )
+}

@@ -290,7 +290,11 @@ const Word = React.memo(function _Word({ word, index, onPressWord }: WordProps) 
 
   return (
     <View key={'mnemonic-button-' + word} style={styles.mnemonicWordButtonOutterRim}>
-      <Touchable style={styles.mnemonicWordButton} onPress={onPressMnemonicWord}>
+      <Touchable
+        style={styles.mnemonicWordButton}
+        onPress={onPressMnemonicWord}
+        testID={`backupQuiz/${word}`}
+      >
         <Text style={styles.mnemonicWordButonText}>{word}</Text>
       </Touchable>
     </View>

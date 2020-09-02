@@ -35,3 +35,5 @@ export const verificationPossibleSelector = (state: RootState) => {
     isBalanceSufficientForSigRetrieval(dollarBalance, celoBalance)
   )
 }
+
+export const numberVerifiedSelector = (state: RootState) => state.app.numberVerified
