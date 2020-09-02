@@ -70,7 +70,7 @@
   "estimatedFee": "Tarifa estimada: ",
   "verificationCta": {
     "header": "¿Enviar a un amigo?",
-    "body": "Verifica tu celular y sincroniza tus contactos para poder enviarles dinero rápidamente a tus amigos.",
+    "body": "Verifica tu celular y sincroniza tus contactos para poder enviar dinero rápidamente a tus amigos.",
     "cta": "Confirma tu número"
   },
   "importContactsCta": {
@@ -85,20 +85,20 @@
   },
   "confirmAccount": {
     "header": "Por favor confirma la cuenta de {{displayName}}",
-    "headerNoDisplayName": "Por favor confirme la cuenta de tucontacto",
+    "headerNoDisplayName": "Por favor confirma la cuenta de tu contacto",
     "button": "Confirma el número de cuenta"
   },
   "secureSendExplanation": {
     "body1": "{{e164PhoneNumber}} tiene multipes cuentas asociadas. {{displayName}} puede haber creado una nueva cuenta de {{appName}}, perdido tuteléfono o tu cuenta puede haber sido interceptada o comprometida.",
-    "body1NoDisplayName": "tucontacto tiene varias cuentas asociadas. tucontacto podría haber creado una nueva cuenta de {{appName}}, o podría haber perdido tuteléfono o haber comprometido tu cuenta.",
-    "body2": "Puedes realizar esto escaneando el código QR o confirmado tunúmero de cuenta directamente antes de realizar transacciones"
+    "body1NoDisplayName": "Tu contacto tiene varias cuentas asociadas. Tu contacto podría haber creado una nueva cuenta de {{appName}}, o podría haber perdido tu teléfono o haber comprometido tu cuenta.",
+    "body2": "Puedes realizar esto escaneando el código QR o confirmado tu número de cuenta directamente antes de realizar transacciones"
   },
   "confirmAccountNumber": {
     "title": "Confirma el número de cuenta",
-    "bodyPartial": "Por favor solicita a {{displayName}} los últimos cuatro dígitos de tunúmero de cuenta. Por razones de seguridad, es mejor preguntar en persona o por teléfono.",
-    "bodyPartialNoDisplayName": "Solicite a tucontacto los últimos cuatro dígitos de tunúmero de cuenta. Es más seguro hacerlo en persona o por teléfono.",
-    "body1Full": "Por favor solicita a {{displayName}} tunúmero de cuenta",
-    "body1FullNoDisplayName": "Solicite a tucontacto tunúmero de cuenta.",
+    "bodyPartial": "Por favor solicita a {{displayName}} los últimos cuatro dígitos de tu número de cuenta. Por razones de seguridad, es mejor preguntar en persona o por teléfono.",
+    "bodyPartialNoDisplayName": "Solicita a tu contacto los últimos cuatro dígitos de tu número de cuenta. Es más seguro hacerlo en persona o por teléfono.",
+    "body1Full": "Por favor solicita a {{displayName}} tu número de cuenta",
+    "body1FullNoDisplayName": "Solicita a tu contacto tu número de cuenta.",
     "body2Full": "Por razones de seguridad, por favor no utilices mensajes de texto (SMS). Se recomienda altamente preguntar en persona o por teléfono a través de WhastApp, Messenger o por correo electrónico",
     "help": "Cómo encontrar el número de cuenta",
     "submit": "Enviar"
@@ -107,7 +107,7 @@
   "accountInputHeaderFull": "Número de Cuenta",
   "helpModal": {
     "header": "Encuentra el número de cuenta de tu contacto",
-    "body1": "Tu contacto puede encontrar tunúmero de cuenta (también conocido como dirección) al inicio del Menú de Ajustes",
+    "body1": "Tu contacto puede encontrar tu número de cuenta (también conocido como dirección) al inicio del Menú de Ajustes",
     "body2": "Se encuentran directamente debajo de la foto de perfil",
     "body3": "Los números de cuenta comienzan con 0x, contienen solo números y letras y tienen 42 caracteres. Haz click en el siguiente enlace para obtener ayuda"
   },

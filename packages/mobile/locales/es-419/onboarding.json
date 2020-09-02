@@ -11,7 +11,7 @@
   },
   "contacts": {
     "header": "Conectar Contactos",
-    "body": "Agregar tus conatactos hace que sea fácil enviar y solicitar pagos con tus amigos. La conexión no envía invitaciones a tus contactos.",
+    "body": "Agregar tus contactos hace que sea fácil enviar y solicitar pagos a tus amigos. La conexión no envía invitaciones a tus contactos.",
     "findSwitch": "Permita que los contactos lo encuentren",
     "syncing": {
       "loadingHeader": "Sincronizando...",
@@ -89,7 +89,7 @@
     "title": "Ayuda",
     "bodySection1": {
       "title": "¿Recibió los tres mensajes?",
-      "content": "Si tus mensajes contienen un enlace, simplemente toque los enlaces para confirmar.\n\nSi no hay enlaces, copie y pega los mensajes en los campos. Puede pegar todo el mensaje."
+      "content": "Si tus mensajes contienen un enlace, simplemente toque los enlaces para confirmar.\n\nSi no hay enlaces, copia y pega los mensajes en los campos. Puedes pegar todo el mensaje."
     },
     "bodySection2": {
       "title": "¿Faltan algunos o todos los mensajes?",

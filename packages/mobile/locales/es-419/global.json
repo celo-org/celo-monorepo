@@ -105,7 +105,7 @@
   "contractKitInitFailed": "No se pudo inicializar el kit de contrato, intente reinicializar la aplicación o enviar un correo electrónico de soporte.",
   "web3FailedToSync": "Fallo la sincronización, por favor verifica tu conexión",
   "errorDuringSync": "Ocurrió un error duranet la sincronización, por favor intente más tarde",
-  "accountUnlockFailed": "No se puede desbloquear tu cuenta",
+  "accountUnlockFailed": "No se pudo desbloquear tu cuenta",
   "calculateFeeFailed": "No se pudo calcular la comisión",
   "failedToSwitchSyncModes": "Error al cambiar de red modos",
   "gold": "Oro",

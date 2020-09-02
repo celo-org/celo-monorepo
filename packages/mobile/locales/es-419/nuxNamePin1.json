@@ -36,7 +36,7 @@
   "importContactsPermission": {
     "title": "Importar contactos",
     "0": "Conectar tu lista de contactos facilita el envío y la solicitud de pagos con tus amigos. De lo contrario, deberás ingresar tu información individualmente.",
-    "1": "No se preocupe: la conexión no envía invitaciones a tus contactos.",
+    "1": "No te preocupes: la conexión no envía invitaciones a tus contactos.",
     "enable": "Habilitar acceso a contactos",
     "loading": "Encontrar amigos usando {{appName}}..."
   }
