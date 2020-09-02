@@ -91,7 +91,7 @@ i18n
     debug: true,
     interpolation: {
       escapeValue: false,
-      defaultVariables: { appName: APP_NAME, tosLink: TOS_LINK },
+      defaultVariables: { appName: APP_NAME, tosLink: TOS_LINK.replace(/^https?\:\/\//i, '') },
     },
     missingInterpolationHandler: currencyInterpolator,
   })
