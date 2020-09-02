@@ -4,8 +4,11 @@ import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class ValidatorUpdateBlsPublicKey extends BaseCommand {
-  static description =
-    'Update the BLS public key for a Validator to be used in consensus. Regular (ECDSA and BLS) key rotation is recommended for Validator operational security.'
+  static description = `Update the BLS public key for a Validator to be used in consensus.
+
+Regular (ECDSA and BLS) key rotation is recommended for Validator operational security.
+
+WARNING: By default, the BLS key used by the validator node is derived from the ECDSA private key. As a result, rotating the BLS key without rotating the ECDSA key will result in validator downtime without special configuration. Use this method only if you know what you are doing.`
 
   static flags = {
     ...BaseCommand.flags,
@@ -19,7 +22,7 @@ export default class ValidatorUpdateBlsPublicKey extends BaseCommand {
   ]
   async run() {
     const res = this.parse(ValidatorUpdateBlsPublicKey)
-    this.kit.defaultAccount = res.flags.from
+
     const validators = await this.kit.contracts.getValidators()
     await newCheckBuilder(this, res.flags.from)
       .isSignerOrAccount()

@@ -12,60 +12,60 @@
   "pleaseRetry": "Por favor reinicie la verificación.",
   "retryVerification": "Reintentar la verificación",
   "education": {
-    "header": "Verificar el teléfono",
-    "body1": "Le solicitamos que verifique su número telefónico.",
+    "header": "Verificar el celular",
+    "body1": "Te solicitamos que verifiques tu número telefónico.",
     "body2": "Esto facilita el envío y la recepción de valores entre amigos. Puede omitir este paso ahora y hacerlo después.",
     "learnMore": "Más información sobre la verificación telefónica",
     "start": "Comenzar la verificación",
     "skip": "Omitir por ahora"
   },
   "learnMore": {
-    "header": "Verificación del teléfono",
-    "intro": "La verificación del número telefónico consiste en asociar su billetera de Celo con su teléfono.",
+    "header": "Verificación del celular",
+    "intro": "La verificación del número telefónico consiste en asociar tu billetera de Celo con tu celular.",
     "section1Header": "¿Tengo que completar este paso?",
     "section1Body": "La verificación no es obligatoria.  Sin verificar, solo es posible enviar y recibir valor utilizando códigos QR o direcciones.",
     "section2Header": "Seguridad y privacidad",
-    "section2Body": "Para proteger su privacidad, solo se guarda una versión oculta de su teléfono en la cadena de bloques de Celo."
+    "section2Body": "Para proteger tu privacidad, solo se guarda una versión oculta de tu celular en la cadena de bloques de Celo."
   },
   "loading": {
     "confirming": "Confirmando…",
     "learnMore": "Aprende más",
-    "card1": "Para asegurarnos de que su número de teléfono sea realmente suyo, le enviamos tres mensajes.",
-    "card2": "Una vez que se confirma su número, puede enviar y recibir fondos fácilmente a su número de teléfono.",
-    "card3": "Confirmar también le permite ver cuáles de sus amigos están en {{appName}}.",
-    "card4": "Requerimos tres mensajes de confirmación para mantener su cuenta más segura."
+    "card1": "Para asegurarnos de que tu número sea realmente tuyo, te enviaremos tres mensajes de texto.",
+    "card2": "Una vez que se confirme tu número, podrás enviar y recibir fondos fácilmente a tu número de teléfono.",
+    "card3": "Confirmar también te permite ver cuáles de tus amigos están en {{appName}}.",
+    "card4": "Requerimos tres mensajes de confirmación para mantener tu cuenta más segura."
   },
   "skipModal": {
     "header": "¿Omitir la verificación?",
-    "body1": "La verificación permite que otras personas le envíen valores a su número telefónico.",
+    "body1": "La verificación permite que otras personas te envíen valores a tu número telefónico.",
     "body2": "Sin la verificación, igual podrá recibir pagos, pero solo mediante las direcciones de cuenta o códigos QR."
   },
   "failModal": {
     "header": "Error de verificación",
-    "body1": "Se produjo un problema al verificar su número de teléfono.",
+    "body1": "Se produjo un problema al verificar tu número de teléfono.",
     "body2": "Puede saltar la verificación y volver a intentarlo más tarde.",
-    "body1InsufficientBalance": "Su saldo actual no es lo suficientemente alto como para completar el proceso de verificación.",
-    "body2InsufficientBalance": "Intente nuevamente cuando haya agregado fondos a su billetera.",
-    "body1SaltQuotaExceeded": "Su cuota de búsqueda de número de teléfono está agotada",
+    "body1InsufficientBalance": "Tu saldo actual no es lo suficientemente alto para completar el proceso de verificación.",
+    "body2InsufficientBalance": "Intenta nuevamente cuando hayas agregado fondos a tu app.",
+    "body1SaltQuotaExceeded": "Tu cuota de búsqueda de número de teléfono está agotada",
     "body2SaltQuotaExceeded": "Intente nuevamente cuando haya comprado más búsquedas",
     "enterCodesBody": "Si ya recibió tres códigos por SMS, aún puede ingresarlos.",
     "enterCodesButton": "Ingresar códigos"
   },
   "retryWithFornoModal": {
     "header": "¿Volver a intentar la verificación con Ahorro de Datos?",
-    "body1": "Se ha producido un problema al verificar su número de teléfono. Recomendamos volver a intentarlo con el modo Ahorro de Datos habilitado",
+    "body1": "Se ha producido un problema al verificar tu número de teléfono. Recomendamos volver a intentarlo con el modo Ahorro de Datos habilitado",
     "body2": "Ahorro de Datos le permite comunicarse en la red de Celo de manera más consistente utilizando una conexión confiable",
     "retryButton": "Reintentar con Ahorro de Datos"
   },
   "congratsVerified": "¡Felicitaciones se ha verificado tu usuario!",
   "notification": {
     "title": "Confirma el Teléfono",
-    "body": "Reciba pagos directamente a su número de teléfono",
+    "body": "Recibe pagos directamente a tu número de teléfono",
     "cta": "Confirma Ahora"
   },
   "quotaLookup": {
     "title": "Cuota de búsqueda excedida",
-    "body1": "Para mantener su número de teléfono seguro y privado, {{appName}} limita cuántos números de teléfono pueden buscar los usuarios.",
+    "body1": "Para mantener tu número de teléfono seguro y privado, {{appName}} limita cuántos números de teléfono pueden buscar los usuarios.",
     "body2": "Puede comprar más búsquedas por una pequeña tarifa.",
     "cta": "Comprar búsquedas (2)"
   }

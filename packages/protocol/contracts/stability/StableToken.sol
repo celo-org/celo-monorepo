@@ -6,6 +6,7 @@ import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
 import "./interfaces/IStableToken.sol";
 import "../common/interfaces/ICeloToken.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/CalledByVm.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
@@ -26,7 +27,8 @@ contract StableToken is
   CalledByVm,
   IStableToken,
   IERC20,
-  ICeloToken
+  ICeloToken,
+  ICeloVersionedContract
 {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
@@ -81,6 +83,14 @@ contract StableToken is
       emit InflationFactorUpdated(inflationState.factor.unwrap(), inflationState.factorLastUpdated);
     }
     _;
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
   }
 
   /**

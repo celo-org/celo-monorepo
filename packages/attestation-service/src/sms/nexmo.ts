@@ -1,9 +1,17 @@
-import { retryAsyncWithBackOff } from '@celo/utils/lib/async'
-import { E164Number } from '@celo/utils/lib/io'
+import bodyParser from 'body-parser'
+import express from 'express'
 import { PhoneNumberUtil } from 'google-libphonenumber'
 import Nexmo from 'nexmo'
-import { fetchEnv } from '../env'
-import { readBlacklistFromEnv, SmsProvider, SmsProviderType } from './base'
+import { receivedDeliveryReport } from '.'
+import { fetchEnv, fetchEnvOrDefault, isYes } from '../env'
+import { Gauges } from '../metrics'
+import {
+  DeliveryStatus,
+  readUnsupportedRegionsFromEnv,
+  SmsDelivery,
+  SmsProvider,
+  SmsProviderType,
+} from './base'
 
 const phoneUtil = PhoneNumberUtil.getInstance()
 
@@ -12,7 +20,8 @@ export class NexmoSmsProvider extends SmsProvider {
     return new NexmoSmsProvider(
       fetchEnv('NEXMO_KEY'),
       fetchEnv('NEXMO_SECRET'),
-      readBlacklistFromEnv('NEXMO_BLACKLIST')
+      readUnsupportedRegionsFromEnv('NEXMO_UNSUPPORTED_REGIONS', 'NEXMO_BLACKLIST'),
+      isYes(fetchEnvOrDefault('NEXMO_ACCOUNT_BALANCE_METRIC', ''))
     )
   }
   type = SmsProviderType.NEXMO
@@ -21,15 +30,21 @@ export class NexmoSmsProvider extends SmsProvider {
     code: string
     phoneNumber: string
   }> = []
+  balanceMetric: boolean
 
-  constructor(apiKey: string, apiSecret: string, blacklistedRegionCodes: string[]) {
+  constructor(
+    apiKey: string,
+    apiSecret: string,
+    unsupportedRegionCodes: string[],
+    balanceMetric: boolean
+  ) {
     super()
     this.client = new Nexmo({
       apiKey,
       apiSecret,
     })
-
-    this.blacklistedRegionCodes = blacklistedRegionCodes
+    this.balanceMetric = balanceMetric
+    this.unsupportedRegionCodes = unsupportedRegionCodes
   }
 
   initialize = async () => {
@@ -46,37 +61,53 @@ export class NexmoSmsProvider extends SmsProvider {
     }))
   }
 
-  sendSms = async (phoneNumber: E164Number, message: string): Promise<void> => {
-    const countryCode = phoneUtil.getRegionCodeForNumber(phoneUtil.parse(phoneNumber))
-
-    if (!countryCode) {
-      throw new Error('could not extract country code')
-    }
-
-    const nexmoNumber = this.getMatchingNumber(countryCode)
-    // Nexmo does not support sending more than 1 text message a second from some phone numbers, so just
-    // repeat with backoff
-    await retryAsyncWithBackOff(
-      () => this.sendSmsViaNexmo(nexmoNumber, phoneNumber, message),
-      10,
-      [],
-      1000
-    )
-    return
+  async receiveDeliveryStatusReport(req: express.Request) {
+    const errCode =
+      req.body['err-code'] == null || req.body['err-code'] === '0' ? null : req.body['err-code']
+    receivedDeliveryReport(req.body.messageId, this.deliveryStatus(req.body.status), errCode)
   }
 
-  private sendSmsViaNexmo(nexmoNumber: string, phoneNumber: string, message: string) {
-    return new Promise((resolve, reject) => {
+  deliveryStatus(messageStatus: string | null): DeliveryStatus {
+    switch (messageStatus) {
+      case 'delivered':
+        return DeliveryStatus.Delivered
+      case 'failed':
+        return DeliveryStatus.Failed
+      case 'rejected':
+        return DeliveryStatus.Failed
+      case 'accepted':
+        return DeliveryStatus.Upstream
+      case 'buffered':
+        return DeliveryStatus.Queued
+    }
+    return DeliveryStatus.Other
+  }
+
+  supportsDeliveryStatus = () => true
+
+  deliveryStatusHandlers = () => [bodyParser.json()]
+
+  async sendSms(delivery: SmsDelivery) {
+    const nexmoNumber = this.getMatchingNumber(delivery.countryCode)
+    return new Promise<string>((resolve, reject) => {
       this.client.message.sendSms(
         nexmoNumber,
-        phoneNumber,
-        message,
+        delivery.phoneNumber,
+        delivery.message,
         (err: Error, responseData: any) => {
           if (err) {
             reject(err)
           } else {
             if (responseData.messages[0].status === '0') {
-              resolve(responseData.messages[0])
+              if (this.balanceMetric) {
+                try {
+                  const balance = parseInt(responseData.messages[0]['remaining-balance'], 10)
+                  Gauges.attestationProviderBalance.labels(this.type).set(balance)
+                } catch {
+                  /* tslint:disable noempty */
+                }
+              }
+              resolve(responseData.messages[0]['message-id'])
             } else {
               reject(responseData.messages[0]['error-text'])
             }

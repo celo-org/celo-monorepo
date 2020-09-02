@@ -21,6 +21,7 @@ const AMOUNT_ZERO = '0.00'
 const AMOUNT_VALID = '4.93'
 const AMOUNT_TOO_MUCH = '106.98'
 const BALANCE_VALID = '23.85'
+const REQUEST_OVER_LIMIT = '670'
 
 const storeData = {
   stableToken: { balance: BALANCE_VALID },
@@ -29,8 +30,22 @@ const storeData = {
       send: {
         feeInWei: '1',
       },
+      invite: {
+        feeInWei: '1',
+      },
     },
   },
+}
+
+const mockE164NumberToAddress: E164NumberToAddressType = {
+  [mockE164NumberInvite]: [mockAccountInvite, mockAccount2Invite],
+}
+
+const mockTransactionData2 = {
+  type: mockTransactionData.type,
+  recipient: mockTransactionData.recipient,
+  amount: new BigNumber('3.70676691729323309'),
+  reason: '',
 }
 
 const mockScreenProps = (isOutgoingPaymentRequest?: true) =>
@@ -97,11 +112,11 @@ describe('SendAmount', () => {
       )
       enterAmount(wrapper, AMOUNT_TOO_MUCH)
 
-      const sendButton = wrapper.getByTestId('Review')
-      expect(sendButton.props.disabled).toBe(false)
+      const reviewButton = wrapper.getByTestId('Review')
+      expect(reviewButton.props.disabled).toBe(false)
 
       store.clearActions()
-      fireEvent.press(sendButton)
+      fireEvent.press(reviewButton)
       expect(store.getActions()).toEqual([
         {
           alertType: 'error',
@@ -116,6 +131,34 @@ describe('SendAmount', () => {
       ])
     })
 
+    it('shows an error when requesting more than the daily limit', () => {
+      const store = createMockStore(storeData)
+      const wrapper = render(
+        <Provider store={store}>
+          <SendAmount {...mockScreenProps(true)} />
+        </Provider>
+      )
+      enterAmount(wrapper, REQUEST_OVER_LIMIT)
+
+      const sendButton = wrapper.getByTestId('Review')
+      expect(sendButton.props.disabled).toBe(false)
+
+      store.clearActions()
+      fireEvent.press(sendButton)
+      expect(store.getActions()).toEqual([
+        {
+          alertType: 'error',
+          buttonMessage: null,
+          dismissAfter: 5000,
+          displayMethod: ErrorDisplayType.BANNER,
+          message: 'requestLimitError',
+          title: null,
+          type: 'ALERT/SHOW',
+          underlyingError: 'requestLimitError',
+        },
+      ])
+    })
+
     it('disables the send button with 0 as amount', () => {
       const store = createMockStore(storeData)
       const wrapper = render(
@@ -125,23 +168,55 @@ describe('SendAmount', () => {
       )
       enterAmount(wrapper, AMOUNT_ZERO)
 
-      const sendButton = wrapper.getByTestId('Review')
-      expect(sendButton.props.disabled).toBe(true)
+      const reviewButton = wrapper.getByTestId('Review')
+      expect(reviewButton.props.disabled).toBe(true)
+    })
+
+    it('displays the loading spinner when review button is pressed and verification status is unknown', () => {
+      let store = createMockStore({
+        identity: {
+          e164NumberToAddress: {},
+          secureSendPhoneNumberMapping: {},
+        },
+        ...storeData,
+      })
+
+      const tree = render(
+        <Provider store={store}>
+          <SendAmount {...mockScreenProps()} />
+        </Provider>
+      )
+
+      enterAmount(tree, AMOUNT_VALID)
+      fireEvent.press(tree.getByTestId('Review'))
+
+      expect(tree.getByTestId('loading/SendAmount')).toBeTruthy()
+
+      store = createMockStore({
+        identity: {
+          e164NumberToAddress: mockE164NumberToAddress,
+          secureSendPhoneNumberMapping: {
+            [mockE164NumberInvite]: {
+              addressValidationType: AddressValidationType.NONE,
+            },
+          },
+        },
+        ...storeData,
+      })
+
+      tree.rerender(
+        <Provider store={store}>
+          <SendAmount {...mockScreenProps()} />
+        </Provider>
+      )
+
+      expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
+        transactionData: mockTransactionData2,
+      })
     })
   })
 
   describe('Navigation', () => {
-    const mockE164NumberToAddress: E164NumberToAddressType = {
-      [mockE164NumberInvite]: [mockAccountInvite, mockAccount2Invite],
-    }
-
-    const mockTransactionData2 = {
-      type: mockTransactionData.type,
-      recipient: mockTransactionData.recipient,
-      amount: new BigNumber('3.70676691729323309'),
-      reason: '',
-    }
-
     it('navigates to ValidateRecipientIntro screen on Send click when a manual address check is needed', () => {
       const store = createMockStore({
         identity: {
@@ -226,7 +301,9 @@ describe('SendAmount', () => {
     it('navigates to PaymentRequestUnavailable screen on Request click when address is unverified', () => {
       const store = createMockStore({
         identity: {
-          e164NumberToAddress: {},
+          e164NumberToAddress: {
+            [mockE164NumberInvite]: null,
+          },
           secureSendPhoneNumberMapping: {},
         },
         ...storeData,

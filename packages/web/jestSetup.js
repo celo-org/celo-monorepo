@@ -15,3 +15,5 @@ Math.random = function random() {
 }
 
 require('jest-fetch-mock').enableMocks()
+
+process.env.TZ = 'UTC'
