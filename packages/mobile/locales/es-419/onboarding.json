@@ -48,7 +48,11 @@
     "body": "Para asegurarnos de que su número sea realmente suyo, le enviaremos tres mensajes que costarán alrededor de 0.05 cUSD cada uno.\n\nConfirmar su número lleva unos tres minutos.",
     "start": "Comienzo",
     "resume": "Reanudar",
-    "learnMore": "Aprende más"
+    "doINeedToConfirm": "¿Necesito confirmar?",
+    "skipForNow": "Saltar por ahora",
+    "bodyInsufficientBalance": "Su saldo actual no es lo suficientemente alto como para completar el proceso de verificación.\n\nIntente nuevamente cuando haya comprado más búsquedas.",
+    "bodyAlreadyVerified": "¡Tu número ya está confirmado!",
+    "receivedCodes": "Ya recibí tres códigos"
   },
   "verificationSkipDialog": {
     "title": "Estas seguro",
