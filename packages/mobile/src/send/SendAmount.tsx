@@ -94,9 +94,6 @@ function SendAmount(props: Props) {
 
   const [amount, setAmount] = useState('')
   const [reviewButtonPressed, setReviewButtonPressed] = useState(false)
-  const [reviewButtonInnerElement, setReviewButtonInnerElement] = useState<string | JSX.Element>(
-    t('global:review')
-  )
 
   const { isOutgoingPaymentRequest, recipient } = props.route.params
 
@@ -125,18 +122,13 @@ function SendAmount(props: Props) {
   }, [])
 
   useEffect(() => {
-    if (!reviewButtonPressed) {
-      return
-    }
-
-    if (recipientVerificationStatus !== RecipientVerificationStatus.UNKNOWN) {
+    if (
+      reviewButtonPressed &&
+      recipientVerificationStatus !== RecipientVerificationStatus.UNKNOWN
+    ) {
       isOutgoingPaymentRequest ? onRequest() : onSend()
       setReviewButtonPressed(false)
-      setReviewButtonInnerElement(t('global:review'))
-      return
     }
-
-    setReviewButtonInnerElement(<ActivityIndicator testID={'loading/SendAmount'} />)
   }, [reviewButtonPressed, recipientVerificationStatus])
 
   const maxLength = React.useMemo(() => {
@@ -322,7 +314,14 @@ function SendAmount(props: Props) {
       <Button
         style={styles.nextBtn}
         size={BtnSizes.FULL}
-        text={reviewButtonInnerElement}
+        text={
+          recipientVerificationStatus === RecipientVerificationStatus.UNKNOWN &&
+          reviewButtonPressed ? (
+            <ActivityIndicator testID={'loading/SendAmount'} />
+          ) : (
+            t('global:review')
+          )
+        }
         type={BtnTypes.SECONDARY}
         onPress={onReviewButtonPressed}
         disabled={!isAmountValid || reviewButtonPressed}
