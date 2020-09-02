@@ -51,7 +51,9 @@
     "lerna": "^3.16.0",
     "prettier": "1.19.1",
     "pretty-quick": "^2.0.1",
-    "minimist": "^1.2.5"
+    "minimist": "^1.2.5",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.8.3"
   },
   "dependencies": {},
   "resolutions": {
