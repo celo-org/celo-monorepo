@@ -94,8 +94,7 @@ describe('attestations tests', () => {
       const request = await Attestations.request(phoneNumber, 2)
       await request.sendAndWaitForReceipt()
 
-      await Attestations.waitForSelectingIssuers(phoneNumber, validatorAddress)
-      const selectIssuers = await Attestations.selectIssuers(phoneNumber)
+      const selectIssuers = await Attestations.selectIssuersAfterWait(phoneNumber, validatorAddress)
       await selectIssuers.sendAndWaitForReceipt()
 
       const stats = await Attestations.getAttestationStat(phoneNumber, validatorAddress)
