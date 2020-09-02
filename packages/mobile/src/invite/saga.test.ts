@@ -88,7 +88,7 @@ describe(watchSendInvite, () => {
       .put(
         transferStableToken({
           recipientAddress: mockAccount,
-          amount: '0.25',
+          amount: '0.30',
           comment: SENTINEL_INVITE_COMMENT,
           context: { id: 'a uuid' },
         })
@@ -119,7 +119,7 @@ describe(watchSendInvite, () => {
       .put(
         transferStableToken({
           recipientAddress: mockAccount,
-          amount: '0.25',
+          amount: '0.30',
           comment: SENTINEL_INVITE_COMMENT,
           context: { id: 'a uuid' },
         })
@@ -150,7 +150,7 @@ describe(watchSendInvite, () => {
       .put(
         transferStableToken({
           recipientAddress: mockAccount,
-          amount: '0.25',
+          amount: '0.30',
           comment: SENTINEL_INVITE_COMMENT,
           context: { id: 'a uuid' },
         })
@@ -175,7 +175,7 @@ describe(watchSendInvite, () => {
       .put(
         transferStableToken({
           recipientAddress: mockAccount,
-          amount: '0.25',
+          amount: '0.30',
           comment: SENTINEL_INVITE_COMMENT,
           context: { id: 'a uuid' },
         })

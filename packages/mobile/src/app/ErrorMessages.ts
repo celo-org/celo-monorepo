@@ -27,6 +27,7 @@ export enum ErrorMessages {
   ODIS_QUOTA_ERROR = 'odisQuotaError',
   SALT_FETCH_FAILURE = 'saltFetchFailure',
   SALT_QUOTA_EXCEEDED = 'saltQuotaExceededError',
+  ODIS_INSUFFICIENT_BALANCE = 'odisInsufficientBalance',
   MATCHMAKING_QUOTA_EXCEEDED = 'matchmakingQuotaExceededError',
   INVALID_ACCOUNT = 'invalidAccount',
   ACCOUNT_UNLOCK_FAILED = 'global:accountUnlockFailed',
@@ -37,6 +38,7 @@ export enum ErrorMessages {
   INVITE_OPEN_APP_FAILED = 'inviteOpenAppFailed',
   SEND_PAYMENT_FAILED = 'sendPaymentFailed',
   PAYMENT_LIMIT_REACHED = 'paymentLimitReached',
+  REQUEST_LIMIT = 'requestLimitError',
   PAYMENT_REQUEST_FAILED = 'paymentRequestFailed',
   ESCROW_TRANSFER_FAILED = 'escrowTransferFailed',
   ESCROW_WITHDRAWAL_FAILED = 'escrowWithdrawalFailed',
@@ -69,4 +71,7 @@ export enum ErrorMessages {
   KEYCHAIN_STORAGE_ERROR = 'keychainStorageError',
   PROVIDER_RATE_FETCH_FAILED = 'providerRateFetchFailed',
   ACCOUNT_CLEAR_FAILED = 'accountClearFailed',
+  GETH_FETCH_ACCOUNTS = 'gethFetchAccounts',
+  GETH_ACCOUNT_ALREADY_EXISTS = 'gethAccountAlreadyExists',
+  GETH_UNEXPECTED_ADDRESS_ON_ADD = 'gethUnexpectedAddressOnAdd',
 }

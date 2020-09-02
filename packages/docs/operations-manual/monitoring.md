@@ -132,43 +132,7 @@ Celo adds specific functions around consensus:
 
 ## Monitoring Attestation Service
 
-### Logging
-
-The Attestation Service provides JSON-format structured logs.
-
-### Metrics
-
-It also exposes the following Prometheus format metrics at `/metrics`:
-
-- `attestation_requests_total`: Counter for the number of attestation requests.
-
-- `attestation_requests_already_sent`: Counter for the number of attestation requests that were received but dropped because the local database records that they have already been completed.
-
-- `attestationRequestsWrongIssuer`: Counter for the number of attestation requests that were received but dropped because they specified the incorrect validator.
-
-- `attestationRequestsWOIncompleteAttestation`: Counter for the number of attestation requests that were received but when querying the blockchain no matching incomplete attestation could be found.
-
-- `attestationRequestsValid`: Counter for the number of requests received that are for the correct issuer and an incomplete attestation exists.
-
-- `attestationRequestsAttestationErrors`: Counter for the number of requests for which producing the attestation failed. This could be due to phone number or salt that does not match the hash, or the attestation was recorded fewer than 4 blocks ago.
-
-- `attestationRequestsUnableToServe`: Counter for the number of requests that could not be served because no SMS provider was configured for the phone number in the request.
-
-- `attestationRequestsSentSms`: Counter for the number of SMS succesfully sent.
-
-- `attestationRequestsFailedToSendSms`: Counter for the number of SMS that failed to send.
-
-- `attestationRequestUnexpectedErrors`: Counter for the number of unexpected errors.
-
-### Test Endpoint
-
-Attestation Service provides a test endpoint.
-
-You can run the following command ([reference](../command-line-interface/identity.md#test-attestation-service)) to test an Attestation Service and send an SMS to yourself:
-
-```bash
-celocli identity:test-attestation-service --from $CELO_ATTESTATION_SIGNER_ADDRESS --phoneNumber <YOUR-PHONE-NUMBER-E164-FORMAT> --message <YOUR_MESSAGE>
-```
+It is also important to [monitor Attestation Service](attestation-service.md#monitoring) and the full node that it depends on.
 
 ## Community Moniting Tools
 

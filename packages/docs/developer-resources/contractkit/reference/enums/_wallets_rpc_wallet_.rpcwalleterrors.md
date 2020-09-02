@@ -13,7 +13,7 @@
 
 • **AccountAlreadyExists**: = "RpcWallet: account already exists"
 
-*Defined in [contractkit/src/wallets/rpc-wallet.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/rpc-wallet.ts#L11)*
+*Defined in [packages/contractkit/src/wallets/rpc-wallet.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/rpc-wallet.ts#L11)*
 
 ___
 
@@ -21,4 +21,4 @@ ___
 
 • **FetchAccounts**: = "RpcWallet: failed to fetch accounts from server"
 
-*Defined in [contractkit/src/wallets/rpc-wallet.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/rpc-wallet.ts#L10)*
+*Defined in [packages/contractkit/src/wallets/rpc-wallet.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/rpc-wallet.ts#L10)*

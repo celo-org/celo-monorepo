@@ -631,7 +631,7 @@ interface AttestationServiceStatusResponse {
   okStatus: boolean
   error: null | Error
   smsProviders: string[]
-  blacklistedRegionCodes: string[]
+  blacklistedRegionCodes: string[] | null
   rightAccount: boolean
   signer: string
   state: AttestationServiceStatusState

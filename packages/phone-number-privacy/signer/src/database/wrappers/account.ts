@@ -41,6 +41,7 @@ export async function incrementQueryCount(account: string) {
       await accounts()
         .where(ACCOUNTS_COLUMNS.address, account)
         .increment(ACCOUNTS_COLUMNS.numLookups, 1)
+      return true
     } else {
       const newAccount = new Account(account)
       newAccount[ACCOUNTS_COLUMNS.numLookups] = 1

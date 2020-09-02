@@ -132,7 +132,7 @@ describe('Running against a deployed service', () => {
       expect(queryCount).toEqual(initialQueryCount + 1)
     })
 
-    it('Returns count when querying succeeds with used request', async () => {
+    it('Returns sig when querying succeeds with used request', async () => {
       await replenishQuota(ACCOUNT_ADDRESS2, PRIVATE_KEY2, DEFAULT_FORNO_URL)
       const response = await postToSignMessage(
         BLINDED_PHONE_NUMBER,
@@ -146,6 +146,17 @@ describe('Running against a deployed service', () => {
     it('Returns count when querying with used request does not increment query count', async () => {
       const queryCount = await getQuota(PRIVATE_KEY2, ACCOUNT_ADDRESS2, IDENTIFIER)
       expect(queryCount).toEqual(initialQueryCount + 1)
+    })
+
+    it('Returns sig when querying succeeds with missing timestamp', async () => {
+      await replenishQuota(ACCOUNT_ADDRESS2, PRIVATE_KEY2, DEFAULT_FORNO_URL)
+      const response = await postToSignMessage(BLINDED_PHONE_NUMBER, PRIVATE_KEY2, ACCOUNT_ADDRESS2)
+      expect(response.status).toBe(200)
+    })
+
+    it('Returns count when querying with missing timestamp increments query count', async () => {
+      const queryCount = await getQuota(PRIVATE_KEY2, ACCOUNT_ADDRESS2, IDENTIFIER)
+      expect(queryCount).toEqual(initialQueryCount + 2)
     })
   })
 })
@@ -178,7 +189,7 @@ async function postToSignMessage(
   base64BlindedMessage: string,
   privateKey: string,
   account: string,
-  timestamp: number,
+  timestamp?: number,
   authHeader?: string
 ): Promise<Response> {
   const body = JSON.stringify({

@@ -101,7 +101,7 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     syncMode: DEFAULT_SYNC_MODE,
     initiallyForno: FORNO_ENABLED_INITIALLY,
     blockchainApiUrl: 'https://blockchain-api-dot-celo-mobile-mainnet.appspot.com/',
-    odisUrl: 'https://us-central1-celo-odis-mainnet.cloudfunctions.net',
+    odisUrl: 'https://us-central1-celo-pgpnp-mainnet.cloudfunctions.net',
     odisPubKey:
       'FvreHfLmhBjwxHxsxeyrcOLtSonC9j7K3WrS4QapYsQH6LdaDTaNGmnlQMfFY04Bp/K4wAvqQwO9/bqPVCKf8Ze8OZo8Frmog4JY4xAiwrsqOXxug11+htjEe1pj4uMA',
     signMoonpayUrl: signMoonpayUrlProd,

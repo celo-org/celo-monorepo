@@ -20,7 +20,7 @@
 
 • **epochNumber**: *number*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L51)*
+*Defined in [packages/contractkit/src/wrappers/LockedGold.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L51)*
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **penalty**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L48)*
+*Defined in [packages/contractkit/src/wrappers/LockedGold.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L48)*
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **reporter**: *[Address](../modules/_base_.md#address)*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L49)*
+*Defined in [packages/contractkit/src/wrappers/LockedGold.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L49)*
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • **reward**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L50)*
+*Defined in [packages/contractkit/src/wrappers/LockedGold.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L50)*
 
 ___
 
@@ -52,4 +52,4 @@ ___
 
 • **slashed**: *[Address](../modules/_base_.md#address)*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L47)*
+*Defined in [packages/contractkit/src/wrappers/LockedGold.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L47)*

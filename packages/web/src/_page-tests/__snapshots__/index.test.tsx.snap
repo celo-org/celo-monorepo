@@ -2593,7 +2593,7 @@ exports[`HomePage renders 1`] = `
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
-                href="https://www.coindesk.com/libra-minus-facebook-why-celo-is-2020s-buzzy-token-project"
+                href="/press"
                 onClick={[Function]}
                 role="link"
                 style={
@@ -3815,7 +3815,7 @@ exports[`HomePage renders 1`] = `
           }
         }
       >
-        The Celo Community's past and upcoming milestones, focused on finding use cases, innovating on technology, and preparing for Mainnet release.
+        The Celo Community's past and upcoming milestones.
       </div>
     </div>
   </div>

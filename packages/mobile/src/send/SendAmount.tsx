@@ -7,19 +7,25 @@ import { parseInputAmount } from '@celo/utils/src/parsing'
 import { RouteProp } from '@react-navigation/native'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
-import * as React from 'react'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
+import sleep from 'sleep-promise'
 import { hideAlert, showError } from 'src/alert/actions'
 import { RequestEvents, SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackButton from 'src/components/BackButton.v2'
-import { DOLLAR_TRANSACTION_MIN_AMOUNT, NUMBER_INPUT_MAX_DECIMALS } from 'src/config'
+import {
+  ALERT_BANNER_DURATION,
+  DAILY_PAYMENT_LIMIT_CUSD,
+  DOLLAR_TRANSACTION_MIN_AMOUNT,
+  NUMBER_INPUT_MAX_DECIMALS,
+} from 'src/config'
 import { getFeeEstimateDollars } from 'src/fees/selectors'
 import i18n, { Namespaces } from 'src/i18n'
 import { fetchAddressesAndValidate } from 'src/identity/actions'
@@ -46,8 +52,7 @@ import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { getRecipientVerificationStatus, Recipient, RecipientKind } from 'src/recipients/recipient'
 import useSelector from 'src/redux/useSelector'
-import { getRecentPayments } from 'src/send/selectors'
-import { getFeeType, isPaymentLimitReached, showLimitReachedError } from 'src/send/utils'
+import { getFeeType, useDailyTransferLimitValidator } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
@@ -105,7 +110,9 @@ function SendAmount(props: Props) {
 
   const { t } = useTranslation(Namespaces.sendFlow7)
 
-  const [amount, setAmount] = React.useState('')
+  const [amount, setAmount] = useState('')
+  const [reviewButtonPressed, setReviewButtonPressed] = useState(false)
+  const [fetchingValidationStatus, setFetchingValidationStatus] = useState(true)
 
   const localCurrencyCode = useSelector(getLocalCurrencyCode)
   const localCurrencyExchangeRate = useSelector(getLocalCurrencyExchangeRate)
@@ -168,8 +175,12 @@ function SendAmount(props: Props) {
   const isAmountValid = parsedLocalAmount.isGreaterThanOrEqualTo(DOLLAR_TRANSACTION_MIN_AMOUNT)
   const isDollarBalanceSufficient = isAmountValid && newAccountBalance.isGreaterThanOrEqualTo(0)
 
-  const reviewBtnDisabled =
-    !isAmountValid || recipientVerificationStatus === RecipientVerificationStatus.UNKNOWN
+  const reviewButtonInnerElement =
+    reviewButtonPressed && fetchingValidationStatus ? (
+      <ActivityIndicator testID={'loading/sendAmount'} />
+    ) : (
+      t('global:review')
+    )
 
   const secureSendPhoneNumberMapping = useSelector(secureSendPhoneNumberMappingSelector)
   const addressValidationType: AddressValidationType = getAddressValidationType(
@@ -186,7 +197,6 @@ function SendAmount(props: Props) {
     }),
     [recipient, dollarAmount]
   )
-  const recentPayments = useSelector(getRecentPayments)
   const localCurrencyAmount = convertDollarsToLocalAmount(dollarAmount, localCurrencyExchangeRate)
 
   const continueAnalyticsParams = React.useMemo(() => {
@@ -202,18 +212,37 @@ function SendAmount(props: Props) {
     }
   }, [props.route, localCurrencyCode, localCurrencyExchangeRate, dollarAmount])
 
+  const [isTransferLimitReached, showLimitReachedBanner] = useDailyTransferLimitValidator(
+    dollarAmount,
+    CURRENCY_ENUM.DOLLAR
+  )
+
+  const onReviewButtonPressed = async () => {
+    setReviewButtonPressed(true)
+    // Wait until verification status is known to proceed
+    while (recipientVerificationStatus === RecipientVerificationStatus.UNKNOWN) {
+      await sleep(250)
+    }
+
+    setFetchingValidationStatus(false)
+
+    if (isOutgoingPaymentRequest) {
+      onRequest()
+    } else {
+      onSend()
+    }
+  }
+
   const onSend = React.useCallback(() => {
     if (!isDollarBalanceSufficient) {
       dispatch(showError(ErrorMessages.NSF_TO_SEND))
+      setReviewButtonPressed(false)
       return
     }
 
-    const now = Date.now()
-    const isLimitReached = isPaymentLimitReached(now, recentPayments, dollarAmount.toNumber())
-    if (isLimitReached) {
-      dispatch(
-        showLimitReachedError(now, recentPayments, localCurrencyExchangeRate, localCurrencySymbol)
-      )
+    if (isTransferLimitReached) {
+      showLimitReachedBanner()
+      setReviewButtonPressed(false)
       return
     }
 
@@ -240,15 +269,18 @@ function SendAmount(props: Props) {
         isFromScan: props.route.params?.isFromScan,
       })
     }
-  }, [
-    recipientVerificationStatus,
-    addressValidationType,
-    recentPayments,
-    dollarAmount,
-    getTransactionData,
-  ])
+  }, [recipientVerificationStatus, addressValidationType, dollarAmount, getTransactionData])
 
   const onRequest = React.useCallback(() => {
+    if (dollarAmount.isGreaterThan(DAILY_PAYMENT_LIMIT_CUSD)) {
+      dispatch(
+        showError(ErrorMessages.REQUEST_LIMIT, ALERT_BANNER_DURATION, {
+          limit: DAILY_PAYMENT_LIMIT_CUSD,
+        })
+      )
+      return
+    }
+
     const transactionData = getTransactionData(TokenTransactionType.PayRequest)
 
     if (
@@ -297,10 +329,10 @@ function SendAmount(props: Props) {
       <Button
         style={styles.nextBtn}
         size={BtnSizes.FULL}
-        text={t('global:review')}
+        text={reviewButtonInnerElement}
         type={BtnTypes.SECONDARY}
-        onPress={isOutgoingPaymentRequest ? onRequest : onSend}
-        disabled={reviewBtnDisabled}
+        onPress={onReviewButtonPressed}
+        disabled={!isAmountValid}
         testID="Review"
       />
     </SafeAreaView>

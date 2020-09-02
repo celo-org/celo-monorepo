@@ -21,12 +21,16 @@ const AMOUNT_ZERO = '0.00'
 const AMOUNT_VALID = '4.93'
 const AMOUNT_TOO_MUCH = '106.98'
 const BALANCE_VALID = '23.85'
+const REQUEST_OVER_LIMIT = '670'
 
 const storeData = {
   stableToken: { balance: BALANCE_VALID },
   fees: {
     estimates: {
       send: {
+        feeInWei: '1',
+      },
+      invite: {
         feeInWei: '1',
       },
     },
@@ -97,11 +101,11 @@ describe('SendAmount', () => {
       )
       enterAmount(wrapper, AMOUNT_TOO_MUCH)
 
-      const sendButton = wrapper.getByTestId('Review')
-      expect(sendButton.props.disabled).toBe(false)
+      const reviewButton = wrapper.getByTestId('Review')
+      expect(reviewButton.props.disabled).toBe(false)
 
       store.clearActions()
-      fireEvent.press(sendButton)
+      fireEvent.press(reviewButton)
       expect(store.getActions()).toEqual([
         {
           alertType: 'error',
@@ -116,6 +120,34 @@ describe('SendAmount', () => {
       ])
     })
 
+    it('shows an error when requesting more than the daily limit', () => {
+      const store = createMockStore(storeData)
+      const wrapper = render(
+        <Provider store={store}>
+          <SendAmount {...mockScreenProps(true)} />
+        </Provider>
+      )
+      enterAmount(wrapper, REQUEST_OVER_LIMIT)
+
+      const sendButton = wrapper.getByTestId('Review')
+      expect(sendButton.props.disabled).toBe(false)
+
+      store.clearActions()
+      fireEvent.press(sendButton)
+      expect(store.getActions()).toEqual([
+        {
+          alertType: 'error',
+          buttonMessage: null,
+          dismissAfter: 5000,
+          displayMethod: ErrorDisplayType.BANNER,
+          message: 'requestLimitError',
+          title: null,
+          type: 'ALERT/SHOW',
+          underlyingError: 'requestLimitError',
+        },
+      ])
+    })
+
     it('disables the send button with 0 as amount', () => {
       const store = createMockStore(storeData)
       const wrapper = render(
@@ -125,8 +157,8 @@ describe('SendAmount', () => {
       )
       enterAmount(wrapper, AMOUNT_ZERO)
 
-      const sendButton = wrapper.getByTestId('Review')
-      expect(sendButton.props.disabled).toBe(true)
+      const reviewButton = wrapper.getByTestId('Review')
+      expect(reviewButton.props.disabled).toBe(true)
     })
   })
 
@@ -226,7 +258,9 @@ describe('SendAmount', () => {
     it('navigates to PaymentRequestUnavailable screen on Request click when address is unverified', () => {
       const store = createMockStore({
         identity: {
-          e164NumberToAddress: {},
+          e164NumberToAddress: {
+            [mockE164NumberInvite]: null,
+          },
           secureSendPhoneNumberMapping: {},
         },
         ...storeData,

@@ -1,6 +1,6 @@
 {
   "name": "@celo/attestation-service",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "Issues attestation messages for Celo's identity protocol",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -34,6 +34,7 @@
     "bunyan": "1.8.12",
     "bunyan-gke-stackdriver": "0.1.2",
     "bunyan-debug-stream": "2.0.0",
+    "cross-fetch": "3.0.4",
     "debug": "^4.1.1",
     "dotenv": "^8.2.0",
     "eth-lib": "^0.2.8",

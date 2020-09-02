@@ -32,7 +32,7 @@ Example:
 
 • **args**: *any[]*
 
-*Defined in [contractkit/src/governance/proposals.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L39)*
+*Defined in [packages/contractkit/src/governance/proposals.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L39)*
 
 ___
 
@@ -40,7 +40,7 @@ ___
 
 • **contract**: *[CeloContract](../enums/_base_.celocontract.md)*
 
-*Defined in [contractkit/src/governance/proposals.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L37)*
+*Defined in [packages/contractkit/src/governance/proposals.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L37)*
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 • **function**: *string*
 
-*Defined in [contractkit/src/governance/proposals.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L38)*
+*Defined in [packages/contractkit/src/governance/proposals.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L38)*
 
 ___
 
@@ -56,7 +56,7 @@ ___
 
 • **params**? : *Record‹string, any›*
 
-*Defined in [contractkit/src/governance/proposals.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L40)*
+*Defined in [packages/contractkit/src/governance/proposals.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L40)*
 
 ___
 
@@ -64,4 +64,4 @@ ___
 
 • **value**: *string*
 
-*Defined in [contractkit/src/governance/proposals.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L41)*
+*Defined in [packages/contractkit/src/governance/proposals.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L41)*

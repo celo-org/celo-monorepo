@@ -14,7 +14,7 @@
     },
     {
       "title": "Por favor, compre y venda responsablemente",
-      "text": "Celo le permite comprar y vender CELO. CELO presenta un riesgo de pérdida financiera, así que por favor hágalo responsablemente." 
+      "text": "{{appName}} le permite comprar y vender CELO. CELO presenta un riesgo de pérdida financiera, así que por favor hágalo responsablemente." 
     }
   ] 
 }
