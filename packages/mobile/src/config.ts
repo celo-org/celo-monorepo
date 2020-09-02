@@ -71,6 +71,14 @@ export const FORNO_ENABLED_INITIALLY = Config.FORNO_ENABLED_INITIALLY
 export const DEFAULT_SYNC_MODE: GethSyncMode = Config.DEFAULT_SYNC_MODE
   ? new BigNumber(Config.DEFAULT_SYNC_MODE).toNumber()
   : GethSyncMode.Lightest
+export const GETH_USE_FULL_NODE_DISCOVERY = stringToBoolean(
+  Config.GETH_USE_FULL_NODE_DISCOVERY || 'true'
+)
+export const GETH_USE_STATIC_NODES = stringToBoolean(Config.GETH_USE_STATIC_NODES || 'true')
+// NOTE: Development purposes only
+export const GETH_START_HTTP_RPC_SERVER = stringToBoolean(
+  Config.GETH_START_HTTP_RPC_SERVER || 'false'
+)
 
 // SECRETS
 export const SEGMENT_API_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SEGMENT_API_KEY')
@@ -83,9 +91,5 @@ export const MOONPAY_PUBLIC_KEY = keyOrUndefined(
 )
 export const MOONPAY_RATE_API = `https://api.moonpay.io/v3/currencies/celo/price?apiKey=${MOONPAY_PUBLIC_KEY}`
 
-export const GETH_USE_FULL_NODE_DISCOVERY = true
-export const GETH_USE_STATIC_NODES = false
-// Development purposes only
-export const GETH_START_HTTP_RPC_SERVER = false
 export const APP_STORE_ID = Config.APP_STORE_ID
 export const DYNAMIC_LINK_DOMAIN = Config.DYNAMIC_LINK_DOMAIN

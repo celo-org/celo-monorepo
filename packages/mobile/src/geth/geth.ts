@@ -104,7 +104,7 @@ async function setupGeth(sync: boolean = true, bootnodeEnodes: string[]): Promis
     gethOptions.bootnodeEnodes = bootnodeEnodes
   }
 
-  if (GETH_START_HTTP_RPC_SERVER) {
+  if (__DEV__ && GETH_START_HTTP_RPC_SERVER) {
     Logger.debug('Geth@newGeth', 'Starting HTTP RPC server')
     gethOptions = {
       ...gethOptions,
@@ -296,9 +296,9 @@ function getStaticNodesFile(nodeDir: string) {
 }
 
 async function writeStaticNodes(nodeDir: string, enodes: string) {
-  console.info(`writeStaticNodes enodes are "${enodes}"`)
+  Logger.info('Geth@writeStaticNodes', `enodes are "${enodes}"`)
   const staticNodesFile = getStaticNodesFile(nodeDir)
-  console.info(`writeStaticNodes static nodes file is ${staticNodesFile}`)
+  Logger.info('Geth@writeStaticNodes', `static nodes file is ${staticNodesFile}"`)
   await RNFS.mkdir(getFolder(staticNodesFile))
   await deleteFileIfExists(staticNodesFile)
   await RNFS.writeFile(staticNodesFile, enodes, 'utf8')

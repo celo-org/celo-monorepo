@@ -1,10 +1,4 @@
-import {
-  DEFAULT_SYNC_MODE,
-  DEFAULT_TESTNET,
-  FORNO_ENABLED_INITIALLY,
-  GETH_USE_FULL_NODE_DISCOVERY,
-  GETH_USE_STATIC_NODES,
-} from 'src/config'
+import { DEFAULT_SYNC_MODE, DEFAULT_TESTNET, FORNO_ENABLED_INITIALLY } from 'src/config'
 import { GethSyncMode } from 'src/geth/consts'
 import Logger from 'src/utils/Logger'
 
@@ -27,8 +21,6 @@ interface NetworkConfig {
   odisUrl: string // Phone Number Privacy service url
   odisPubKey: string
   signMoonpayUrl: string
-  useDiscovery: boolean
-  useStaticNodes: boolean
 }
 
 const odisUrlStaging = 'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net'
@@ -48,8 +40,6 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     odisUrl: odisUrlStaging,
     odisPubKey: odisPubKeyStaging,
     signMoonpayUrl: signMoonpayUrlStaging,
-    useDiscovery: GETH_USE_FULL_NODE_DISCOVERY,
-    useStaticNodes: GETH_USE_STATIC_NODES,
   },
   [Testnets.alfajoresstaging]: {
     nodeDir: `.${Testnets.alfajoresstaging}`,
@@ -59,8 +49,6 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     odisUrl: odisUrlStaging,
     odisPubKey: odisPubKeyStaging,
     signMoonpayUrl: signMoonpayUrlStaging,
-    useDiscovery: GETH_USE_FULL_NODE_DISCOVERY,
-    useStaticNodes: GETH_USE_STATIC_NODES,
   },
   [Testnets.alfajores]: {
     nodeDir: `.${Testnets.alfajores}`,
@@ -71,8 +59,6 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     odisPubKey:
       'kPoRxWdEdZ/Nd3uQnp3FJFs54zuiS+ksqvOm9x8vY6KHPG8jrfqysvIRU0wtqYsBKA7SoAsICMBv8C/Fb2ZpDOqhSqvr/sZbZoHmQfvbqrzbtDIPvUIrHgRS0ydJCMsA',
     signMoonpayUrl: signMoonpayUrlStaging,
-    useDiscovery: GETH_USE_FULL_NODE_DISCOVERY,
-    useStaticNodes: GETH_USE_STATIC_NODES,
   },
   [Testnets.pilot]: {
     nodeDir: `.${Testnets.pilot}`,
@@ -82,8 +68,6 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     odisUrl: odisUrlStaging,
     odisPubKey: odisPubKeyStaging,
     signMoonpayUrl: signMoonpayUrlStaging,
-    useDiscovery: GETH_USE_FULL_NODE_DISCOVERY,
-    useStaticNodes: GETH_USE_STATIC_NODES,
   },
   [Testnets.pilotstaging]: {
     nodeDir: `.${Testnets.pilotstaging}`,
@@ -93,8 +77,6 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     odisUrl: odisUrlStaging,
     odisPubKey: odisPubKeyStaging,
     signMoonpayUrl: signMoonpayUrlStaging,
-    useDiscovery: GETH_USE_FULL_NODE_DISCOVERY,
-    useStaticNodes: GETH_USE_STATIC_NODES,
   },
   [Testnets.baklavastaging]: {
     nodeDir: `.${Testnets.baklavastaging}`,
@@ -104,8 +86,6 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     odisUrl: odisUrlStaging,
     odisPubKey: odisPubKeyStaging,
     signMoonpayUrl: signMoonpayUrlStaging,
-    useDiscovery: GETH_USE_FULL_NODE_DISCOVERY,
-    useStaticNodes: GETH_USE_STATIC_NODES,
   },
   [Testnets.baklava]: {
     nodeDir: `.${Testnets.baklava}`,
@@ -115,8 +95,6 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     odisUrl: odisUrlStaging,
     odisPubKey: odisPubKeyStaging,
     signMoonpayUrl: signMoonpayUrlStaging,
-    useDiscovery: GETH_USE_FULL_NODE_DISCOVERY,
-    useStaticNodes: GETH_USE_STATIC_NODES,
   },
   [Testnets.mainnet]: {
     nodeDir: `.${Testnets.mainnet}`,
@@ -127,8 +105,6 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     odisPubKey:
       'FvreHfLmhBjwxHxsxeyrcOLtSonC9j7K3WrS4QapYsQH6LdaDTaNGmnlQMfFY04Bp/K4wAvqQwO9/bqPVCKf8Ze8OZo8Frmog4JY4xAiwrsqOXxug11+htjEe1pj4uMA',
     signMoonpayUrl: signMoonpayUrlProd,
-    useDiscovery: GETH_USE_FULL_NODE_DISCOVERY,
-    useStaticNodes: GETH_USE_STATIC_NODES,
   },
 }
 
