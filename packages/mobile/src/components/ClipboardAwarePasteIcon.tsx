@@ -10,6 +10,7 @@ import Paste from '@celo/react-components/icons/Paste'
 import { iconHitslop } from '@celo/react-components/styles/variables'
 import React from 'react'
 import { StyleProp, ViewProps, ViewStyle } from 'react-native'
+import { isAddressFormat } from 'src/account/utils'
 
 interface PasteAwareProps {
   style?: StyleProp<ViewStyle>
@@ -40,6 +41,5 @@ export default function ClipboardAwarePasteIcon({
   }
 
   const Icon = withPasteAware(Wrapper)
-  const shouldShowClipboard = () => true
-  return <Icon shouldShowClipboard={shouldShowClipboard} {...otherProps} />
+  return <Icon shouldShowClipboard={isAddressFormat} {...otherProps} />
 }
