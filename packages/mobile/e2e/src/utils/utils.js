@@ -74,3 +74,12 @@ export async function inputNumberKeypad(amount) {
     await element(by.id(`digit${digit}`)).tap()
   }
 }
+
+export async function isElementVisible(elementId) {
+  try {
+    await expect(element(by.id(elementId))).toBeVisible()
+    return true
+  } catch (e) {
+    return false
+  }
+}
