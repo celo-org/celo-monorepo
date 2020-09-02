@@ -51,6 +51,7 @@ export default {
       await initializeAnalytics()
     }
     ReactGA.event({
+      category: 'User',
       action: key,
       label,
     })
