@@ -86,5 +86,5 @@ This Code of Conduct is distributed under a [Creative Commons Attribution-ShareA
 
 The Celo Foundation may amend this Code of Conduct from time to time and may also vary the procedures it sets out where appropriate in a particular case. Your agreement to comply with the guidelines will be deemed agreement to any changes to it.
 
-*Last updated June 10, 2020*
+*Last updated on the 1st of September 2020*
 
