@@ -68,6 +68,7 @@
       - [Using the kit](developer-resources/contractkit/usage.md)
       - [Using Web3 from the Kit](developer-resources/contractkit/notes-web3-with-contractkit.md)
       - [Celo Core Contracts. Wrappers / Registry](developer-resources/contractkit/contracts-wrappers-registry.md)
+      - [Querying on-chain identifiers with ODIS](developer-resources/contractkit/odis.md)
     - [Forno](developer-resources/forno/README.md)
       <!-- - [Example of querying (web3, kit)]()
       - [Example of sending tx (kit)]() -->

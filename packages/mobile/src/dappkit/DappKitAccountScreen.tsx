@@ -1,6 +1,6 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -10,10 +10,10 @@ import { connect } from 'react-redux'
 import { e164NumberSelector } from 'src/account/selectors'
 import { approveAccountAuth } from 'src/dappkit/dappkit'
 import { Namespaces, withTranslation } from 'src/i18n'
-import DappkitExchangeIcon from 'src/icons/DappkitExchange'
 import { noHeader } from 'src/navigator/Headers.v2'
 import { navigateBack, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
@@ -76,10 +76,13 @@ class DappKitAccountAuthScreen extends React.Component<Props> {
     const { dappName } = route.params.dappKitRequest
     return (
       <SafeAreaView style={styles.container}>
+        <TopBarTextButton
+          title={t('cancel')}
+          onPress={this.cancel}
+          titleStyle={styles.cancelButton}
+        />
+
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <View style={styles.logo}>
-            <DappkitExchangeIcon />
-          </View>
           {!!dappName && <Text style={styles.header}>{t('connectToWallet', { dappName })}</Text>}
 
           <Text style={styles.share}>{t('shareInfo')}</Text>
@@ -88,22 +91,14 @@ class DappKitAccountAuthScreen extends React.Component<Props> {
             <Text style={styles.sectionHeaderText}>{t('address')}</Text>
             <Text style={styles.bodyText}>{account}</Text>
           </View>
-        </ScrollView>
-
-        <View style={styles.footer}>
           <Button
-            text={t('connect')}
-            onPress={this.linkBack}
-            standard={false}
+            style={styles.button}
             type={BtnTypes.PRIMARY}
+            size={BtnSizes.MEDIUM}
+            text={t('allow')}
+            onPress={this.linkBack}
           />
-          <Button
-            text={t('cancel')}
-            onPress={this.cancel}
-            standard={false}
-            type={BtnTypes.SECONDARY}
-          />
-        </View>
+        </ScrollView>
       </SafeAreaView>
     )
   }
@@ -112,10 +107,9 @@ class DappKitAccountAuthScreen extends React.Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'space-between',
   },
   scrollContainer: {
-    flex: 1,
+    flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
     marginHorizontal: '15%',
@@ -123,37 +117,31 @@ const styles = StyleSheet.create({
   header: {
     ...fontStyles.h1,
     alignItems: 'center',
-    paddingBottom: 30,
-  },
-  footer: {
-    flexDirection: 'column',
-    alignItems: 'flex-end',
-    textAlign: 'center',
-  },
-  logo: {
-    marginBottom: 20,
+    paddingBottom: 16,
   },
   share: {
-    ...fontStyles.bodySecondary,
-    fontSize: 13,
-    alignSelf: 'center',
+    ...fontStyles.regular,
+    color: colors.gray4,
+    textAlign: 'center',
   },
   sectionDivider: {
     alignItems: 'center',
     width: 200,
   },
   sectionHeaderText: {
-    ...fontStyles.bodyBold,
-    textTransform: 'uppercase',
-    fontSize: 12,
-    marginTop: 20,
-    marginBottom: 5,
+    ...fontStyles.label,
+    marginTop: 16,
   },
   bodyText: {
-    ...fontStyles.paragraph,
-    fontSize: 15,
-    color: colors.gray5,
+    ...fontStyles.regular,
+    color: colors.gray4,
     textAlign: 'center',
+  },
+  button: {
+    marginTop: 24,
+  },
+  cancelButton: {
+    color: colors.dark,
   },
 })
 
