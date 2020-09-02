@@ -18,7 +18,7 @@
   "restartModalSwitchOff": {
     "header": "Reinicia la app para apagar Ahorro de Datos",
     "body": "Para encender y apagar Ahorro de Datos repetidamente, deberás reiniciar la aplicación y volver a esta pantalla.",
-    "restart": "Reinicializar para alternar"
+    "restart": "Reinicializa para cambiar"
   },
   "addFunds": "Añadir Fondos",
   "promptFornoModal": {
