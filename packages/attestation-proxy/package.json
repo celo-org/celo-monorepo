@@ -14,9 +14,11 @@
   },
   "dependencies": {
     "firebase-functions": "^3.6.0",
+    "firebase-admin": "^8.0.0",
     "node-fetch": "^2.6.0"
   },
   "devDependencies": {
+    "@firebase/app-types": "^0.6.1",
     "firebase-functions-test": "^0.2.0"
   },
   "engines": {

@@ -7,13 +7,19 @@
   "dependencies": {
     "@celo/contractkit": "0.4.13-dev",
     "@celo/utils": "0.1.19-dev",
+    "@babel/core": "^7.0.0-0",
     "expo": "^36.0.2",
     "expo-contacts": "8.0.0",
+    "react": "16.11.0",
+    "react-native": "^0.62.2",
     "libphonenumber-js": "^1.7.22",
     "web3-eth-contract": "1.2.4"
   },
   "devDependencies": {
   },
   "main": "./lib/index.js",
-  "files": ["src/**/*", "lib/**/*"]
+  "files": [
+    "src/**/*",
+    "lib/**/*"
+  ]
 }

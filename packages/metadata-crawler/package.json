@@ -13,6 +13,7 @@
     "@celo/utils": "^0.1.19-dev",
     "@types/pg": "^7.14.3",
     "bunyan": "1.8.12",
+    "typescript": "^3.8.3",
     "bunyan-gke-stackdriver": "0.1.2",
     "debug": "^4.1.1",
     "dotenv": "^8.2.0",

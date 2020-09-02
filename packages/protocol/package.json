@@ -39,6 +39,7 @@
     "set-exchange-rate": "./scripts/bash/set_exchange_rate.sh"
   },
   "dependencies": {
+    "@truffle/contract": "^4.0.39",
     "@0x/sol-compiler": "^3.1.11",
     "@0x/sol-coverage": "^3.0.8",
     "@0x/sol-profiler": "^3.0.0",
@@ -47,6 +48,8 @@
     "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#e933297",
     "@celo/utils": "0.1.19-dev",
     "@openzeppelin/upgrades": "^2.8.0",
+    "@codechecks/client": "^0.1.0",
+    "typescript": "^3.8.3",
     "apollo-client": "^2.4.13",
     "bip39": "^3.0.2",
     "bls12377js": "https://github.com/celo-org/bls12377js#cb38a4cfb643c778619d79b20ca3e5283a2122a6",
@@ -98,6 +101,7 @@
     "eth-gas-reporter": "^0.2.16",
     "nodemailer": "^4.6.8",
     "targz": "^1.0.1",
+    "chai": "^4.2.0",
     "tmp": "^0.1.0",
     "truffle-typings": "^1.0.6",
     "typechain": "1.0.5",

@@ -71,6 +71,9 @@
     "typescript": "^3.8.3",
     "cross-fetch": "^3.0.5"
   },
+  "bundledDependencies": [
+    "source-map-support@^0.5.19"
+  ],
   "files": [
     "README.md",
     "/bin",

@@ -9,6 +9,7 @@
     "build-rules": "tsc"
   },
   "devDependencies": {
+    "typescript": "^3.0.0",
     "tslint": "^5.20.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-eslint-rules": "^5.4.0",
