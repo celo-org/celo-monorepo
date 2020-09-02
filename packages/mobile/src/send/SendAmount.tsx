@@ -189,7 +189,7 @@ function SendAmount(props: Props) {
     .minus(estimateFeeDollars || 0)
 
   const isAmountValid = parsedLocalAmount.isGreaterThanOrEqualTo(DOLLAR_TRANSACTION_MIN_AMOUNT)
-  const isDollarBalanceSufficient = isAmountValid && newAccountBalance.isGreaterThanOrEqualTo(0)
+  const isDollarBalanceSufficient = isAmountValid && newAccountBalance.isGreaterThan(0)
 
   const secureSendPhoneNumberMapping = useSelector(secureSendPhoneNumberMappingSelector)
   const addressValidationType: AddressValidationType = getAddressValidationType(
@@ -231,13 +231,11 @@ function SendAmount(props: Props) {
   const onSend = React.useCallback(() => {
     if (!isDollarBalanceSufficient) {
       dispatch(showError(ErrorMessages.NSF_TO_SEND))
-      setReviewButtonPressed(false)
       return
     }
 
     if (isTransferLimitReached) {
       showLimitReachedBanner()
-      setReviewButtonPressed(false)
       return
     }
 
