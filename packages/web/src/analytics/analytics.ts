@@ -22,10 +22,11 @@ export async function showVisitorCookieConsent() {
 }
 
 export async function initializeAnalytics() {
-  ReactGA = await import('react-ga').then((mod) => mod.default)
+  if (!ReactGA && (await canTrack())) {
+    ReactGA = await import('react-ga').then((mod) => mod.default)
 
-  ReactGA.initialize(publicRuntimeConfig.GA_KEY)
-  ReactGA.pageview('initial pageview')
+    ReactGA.initialize(publicRuntimeConfig.GA_KEY)
+  }
 }
 
 export async function agree() {
@@ -47,9 +48,8 @@ export default {
     if (!(await canTrack())) {
       return noTrack()
     }
-    if (!ReactGA) {
-      await initializeAnalytics()
-    }
+
+    await initializeAnalytics()
     ReactGA.event({
       category: 'User',
       action: key,
@@ -60,9 +60,8 @@ export default {
     if (!(await canTrack())) {
       return noTrack()
     }
-    if (!ReactGA) {
-      await initializeAnalytics()
-    }
+
+    await initializeAnalytics()
     ReactGA.pageview(window.location.pathname + window.location.search)
   },
 }
