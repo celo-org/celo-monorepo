@@ -4,6 +4,7 @@ import {
   AddressValidationType,
   E164NumberToAddressType,
   E164NumberToSaltType,
+  VerificationState,
 } from 'src/identity/reducer'
 import { ContactMatches, ImportContactsStatus, VerificationStatus } from 'src/identity/types'
 import { AttestationCode, CodeInputType } from 'src/identity/verification'
@@ -36,10 +37,13 @@ export enum Actions {
   REQUIRE_SECURE_SEND = 'IDENTITY/REQUIRE_SECURE_SEND',
   FETCH_DATA_ENCRYPTION_KEY = 'IDENTITY/FETCH_DATA_ENCRYPTION_KEY',
   UPDATE_ADDRESS_DEK_MAP = 'IDENTITY/UPDATE_ADDRESS_DEK_MAP',
+  FETCH_VERIFICATION_STATE = 'IDENTITY/FETCH_VERIFICATION_STATE',
+  UPDATE_VERIFICATION_STATE = 'IDENTITY/UPDATE_VERIFICATION_STATE',
 }
 
 export interface StartVerificationAction {
   type: Actions.START_VERIFICATION
+  withoutRevealing: boolean
 }
 
 export interface SetVerificationStatusAction {
@@ -173,6 +177,15 @@ export interface UpdateAddressDekMapAction {
   dataEncryptionKey: string | null
 }
 
+export interface FetchVerificationState {
+  type: Actions.FETCH_VERIFICATION_STATE
+}
+
+export interface UpdateVerificationState {
+  type: Actions.UPDATE_VERIFICATION_STATE
+  state: VerificationState
+}
+
 export type ActionTypes =
   | StartVerificationAction
   | CancelVerificationAction
@@ -198,9 +211,12 @@ export type ActionTypes =
   | EndFetchingAddressesAction
   | FetchDataEncryptionKeyAction
   | UpdateAddressDekMapAction
+  | FetchVerificationState
+  | UpdateVerificationState
 
-export const startVerification = (): StartVerificationAction => ({
+export const startVerification = (withoutRevealing: boolean = false): StartVerificationAction => ({
   type: Actions.START_VERIFICATION,
+  withoutRevealing,
 })
 
 export const cancelVerification = (): CancelVerificationAction => ({
@@ -363,4 +379,13 @@ export const updateAddressDekMap = (
   type: Actions.UPDATE_ADDRESS_DEK_MAP,
   address,
   dataEncryptionKey,
+})
+
+export const fetchVerificationState = (): FetchVerificationState => ({
+  type: Actions.FETCH_VERIFICATION_STATE,
+})
+
+export const udpateVerificationState = (state: VerificationState): UpdateVerificationState => ({
+  type: Actions.UPDATE_VERIFICATION_STATE,
+  state,
 })
