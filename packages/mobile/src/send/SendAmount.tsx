@@ -20,7 +20,12 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackButton from 'src/components/BackButton.v2'
-import { DOLLAR_TRANSACTION_MIN_AMOUNT, NUMBER_INPUT_MAX_DECIMALS } from 'src/config'
+import {
+  ALERT_BANNER_DURATION,
+  DAILY_PAYMENT_LIMIT_CUSD,
+  DOLLAR_TRANSACTION_MIN_AMOUNT,
+  NUMBER_INPUT_MAX_DECIMALS,
+} from 'src/config'
 import { getFeeEstimateDollars } from 'src/fees/selectors'
 import i18n, { Namespaces } from 'src/i18n'
 import { fetchAddressesAndValidate } from 'src/identity/actions'
@@ -47,8 +52,7 @@ import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { getRecipientVerificationStatus, Recipient, RecipientKind } from 'src/recipients/recipient'
 import useSelector from 'src/redux/useSelector'
-import { getRecentPayments } from 'src/send/selectors'
-import { getFeeType, isPaymentLimitReached, showLimitReachedError } from 'src/send/utils'
+import { getFeeType, useDailyTransferLimitValidator } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
@@ -193,7 +197,6 @@ function SendAmount(props: Props) {
     }),
     [recipient, dollarAmount]
   )
-  const recentPayments = useSelector(getRecentPayments)
   const localCurrencyAmount = convertDollarsToLocalAmount(dollarAmount, localCurrencyExchangeRate)
 
   const continueAnalyticsParams = React.useMemo(() => {
@@ -208,6 +211,11 @@ function SendAmount(props: Props) {
         : localCurrencyAmount,
     }
   }, [props.route, localCurrencyCode, localCurrencyExchangeRate, dollarAmount])
+
+  const [isTransferLimitReached, showLimitReachedBanner] = useDailyTransferLimitValidator(
+    dollarAmount,
+    CURRENCY_ENUM.DOLLAR
+  )
 
   const onReviewButtonPressed = async () => {
     setReviewButtonPressed(true)
@@ -232,13 +240,8 @@ function SendAmount(props: Props) {
       return
     }
 
-    const now = Date.now()
-    const isLimitReached = isPaymentLimitReached(now, recentPayments, dollarAmount.toNumber())
-    if (isLimitReached) {
-      dispatch(
-        showLimitReachedError(now, recentPayments, localCurrencyExchangeRate, localCurrencySymbol)
-      )
-      setReviewButtonPressed(false)
+    if (isTransferLimitReached) {
+      showLimitReachedBanner()
       return
     }
 
@@ -265,15 +268,18 @@ function SendAmount(props: Props) {
         isFromScan: props.route.params?.isFromScan,
       })
     }
-  }, [
-    recipientVerificationStatus,
-    addressValidationType,
-    recentPayments,
-    dollarAmount,
-    getTransactionData,
-  ])
+  }, [recipientVerificationStatus, addressValidationType, dollarAmount, getTransactionData])
 
   const onRequest = React.useCallback(() => {
+    if (dollarAmount.isGreaterThan(DAILY_PAYMENT_LIMIT_CUSD)) {
+      dispatch(
+        showError(ErrorMessages.REQUEST_LIMIT, ALERT_BANNER_DURATION, {
+          limit: DAILY_PAYMENT_LIMIT_CUSD,
+        })
+      )
+      return
+    }
+
     const transactionData = getTransactionData(TokenTransactionType.PayRequest)
 
     if (

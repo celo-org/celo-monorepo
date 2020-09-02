@@ -189,7 +189,7 @@ export class NotificationBox extends React.Component<Props, State> {
             },
           },
           {
-            text: t('global:remind'),
+            text: t('global:dismiss'),
             onPress: () => {
               ValoraAnalytics.track(HomeEvents.notification_select, {
                 notificationType: NotificationBannerTypes.verification_prompt,

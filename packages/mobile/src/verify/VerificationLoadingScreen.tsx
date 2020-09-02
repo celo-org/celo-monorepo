@@ -4,6 +4,7 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { Spacing } from '@celo/react-components/styles/styles.v2'
 import { useIsFocused } from '@react-navigation/native'
+import { StackScreenProps } from '@react-navigation/stack'
 import LottieView from 'lottie-react-native'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -28,6 +29,7 @@ import {
 import { noHeaderGestureDisabled } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import useBackHandler from 'src/utils/useBackHandler'
@@ -47,7 +49,9 @@ const mapStateToProps = (state: RootState) => {
   }
 }
 
-export default function VerificationLoadingScreen() {
+type Props = StackScreenProps<StackParamList, Screens.VerificationLoadingScreen>
+
+export default function VerificationLoadingScreen({ route }: Props) {
   const verificationStatusRef = useRef<VerificationStatus | undefined>()
   const { fornoMode, retryWithForno, verificationStatus } = useSelector(
     mapStateToProps,
@@ -58,7 +62,7 @@ export default function VerificationLoadingScreen() {
   const isFocused = useIsFocused()
 
   useEffect(() => {
-    dispatch(startVerification())
+    dispatch(startVerification(!!route.params.withoutRevealing))
   }, [])
 
   useEffect(() => {
@@ -70,9 +74,12 @@ export default function VerificationLoadingScreen() {
     let timeout: number | undefined
 
     if (verificationStatus === VerificationStatus.RevealingNumber) {
-      timeout = window.setTimeout(() => {
-        navigate(Screens.VerificationInputScreen)
-      }, WAIT_AFTER_REVEAL)
+      timeout = window.setTimeout(
+        () => {
+          navigate(Screens.VerificationInputScreen)
+        },
+        route.params.withoutRevealing ? 0 : WAIT_AFTER_REVEAL
+      )
     } else if (verificationStatus === VerificationStatus.Done) {
       navigate(Screens.ImportContacts)
     }
@@ -145,7 +152,7 @@ export default function VerificationLoadingScreen() {
     }
   )
 
-  const onContentSizeChange = (w: number, h: number) => {
+  const onContentSizeChange = (_w: number, h: number) => {
     setContentHeight(h)
   }
 
@@ -218,7 +225,9 @@ export default function VerificationLoadingScreen() {
         >
           <Animated.View style={statusContainerStyle}>
             <Text style={styles.statusText}>{t('loading.confirming')}</Text>
-            <VerificationCountdown onFinish={onFinishCountdown} />
+            {!route.params.withoutRevealing && (
+              <VerificationCountdown onFinish={onFinishCountdown} />
+            )}
           </Animated.View>
           <Animated.View style={learnMoreContainerStyle}>
             <TouchableOpacity style={styles.upHandleContainer} onPress={onPressLearnMore}>

@@ -1,4 +1,5 @@
 import { eqAddress } from '@celo/base/lib/address'
+import { Err, makeAsyncThrowable, Ok, Result, RootError } from '@celo/base/lib/result'
 import { NativeSigner } from '@celo/base/lib/signatureUtils'
 import { guessSigner } from '@celo/utils/lib/signatureUtils'
 import fetch from 'cross-fetch'
@@ -11,12 +12,41 @@ import { StorageWriter } from './offchain/storage-writers'
 
 const debug = debugFactory('offchaindata')
 
+export enum OffchainErrorTypes {
+  FetchError = 'FetchError',
+  InvalidSignature = 'InvalidSignature',
+  NoStorageRootProvidedData = 'NoStorageRootProvidedData',
+}
+
+class FetchError extends RootError<OffchainErrorTypes.FetchError> {
+  constructor() {
+    super(OffchainErrorTypes.FetchError)
+  }
+}
+
+class InvalidSignature extends RootError<OffchainErrorTypes.InvalidSignature> {
+  constructor() {
+    super(OffchainErrorTypes.InvalidSignature)
+  }
+}
+
+class NoStorageRootProvidedData extends RootError<OffchainErrorTypes.NoStorageRootProvidedData> {
+  constructor() {
+    super(OffchainErrorTypes.NoStorageRootProvidedData)
+  }
+}
+
+export type OffchainErrors = FetchError | InvalidSignature | NoStorageRootProvidedData
+
 export default class OffchainDataWrapper {
   storageWriter: StorageWriter | undefined
 
   constructor(readonly self: string, readonly kit: ContractKit) {}
 
-  async readDataFrom(account: string, dataPath: string) {
+  async readDataFromAsResult(
+    account: string,
+    dataPath: string
+  ): Promise<Result<string, OffchainErrors>> {
     const accounts = await this.kit.contracts.getAccounts()
     const metadataURL = await accounts.getMetadataURL(account)
     debug({ account, metadataURL })
@@ -26,19 +56,23 @@ export default class OffchainDataWrapper {
       .filterClaims(ClaimTypes.STORAGE)
       .map((_) => new StorageRoot(account, _.address))
     debug({ account, storageRoots })
-    const data = (await Promise.all(storageRoots.map((_) => _.read(dataPath)))).find((_) => _)
 
-    if (data === undefined) {
-      return undefined
+    if (storageRoots.length === 0) {
+      return Err(new NoStorageRootProvidedData())
     }
 
-    const [actualData, error] = data
-    if (error) {
-      return undefined
+    const item = (await Promise.all(storageRoots.map((_) => _.readAsResult(dataPath)))).find(
+      (_) => _.ok
+    )
+
+    if (item === undefined) {
+      return Err(new NoStorageRootProvidedData())
     }
 
-    return actualData
+    return item
   }
+
+  readDataFrom = makeAsyncThrowable(this.readDataFromAsResult.bind(this))
 
   async writeDataTo(data: string, dataPath: string) {
     if (this.storageWriter === undefined) {
@@ -55,10 +89,10 @@ class StorageRoot {
   constructor(readonly account: string, readonly address: string) {}
 
   // TODO: Add decryption metadata (i.e. indicates ciphertext to be decrypted/which key to use)
-  async read(dataPath: string): Promise<[any, any]> {
+  async readAsResult(dataPath: string): Promise<Result<string, OffchainErrors>> {
     const data = await fetch(this.address + dataPath)
     if (!data.ok) {
-      return [null, 'No can do']
+      return Err(new FetchError())
     }
 
     const body = await data.text()
@@ -66,24 +100,20 @@ class StorageRoot {
     const signature = await fetch(this.address + dataPath + '.signature')
 
     if (!signature.ok) {
-      return [null, 'Signature could not be fetched']
+      return Err(new InvalidSignature())
     }
 
     // TODO: Compare against registered on-chain signers or off-chain signers
     const signer = guessSigner(body, await signature.text())
 
     if (eqAddress(signer, this.account)) {
-      return [body, null]
+      return Ok(body)
     }
 
     // The signer might be authorized off-chain
     // TODO: Only if the signer is authorized with an on-chain key
-    const [, err] = await this.read(`/account/authorizedSigners/${toChecksumAddress(signer)}`)
-
-    if (err) {
-      return [null, err]
-    }
-
-    return [body, null]
+    return this.readAsResult(`/account/authorizedSigners/${toChecksumAddress(signer)}`)
   }
+
+  read = makeAsyncThrowable(this.readAsResult.bind(this))
 }

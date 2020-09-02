@@ -284,3 +284,67 @@ export const mockPaymentRequests: PaymentRequest[] = [
     type: NotificationTypes.PAYMENT_REQUESTED,
   },
 ]
+
+export const mockVerificationStateUnverified = {
+  phoneHashDetails: {
+    e164Number: mockE164Number,
+    phoneHash: mockE164NumberHash,
+    pepper: mockE164NumberPepper,
+  },
+  actionableAttestations: [],
+  status: {
+    isVerified: false,
+    numAttestationsRemaining: 3,
+    total: 0,
+    completed: 0,
+  },
+  isBalanceSufficient: true,
+}
+
+export const mockVerificationStatePartlyVerified = {
+  phoneHashDetails: {
+    e164Number: mockE164Number,
+    phoneHash: mockE164NumberHash,
+    pepper: mockE164NumberPepper,
+  },
+  actionableAttestations: [],
+  status: {
+    isVerified: false,
+    numAttestationsRemaining: 1,
+    total: 3,
+    completed: 2,
+  },
+  isBalanceSufficient: true,
+}
+
+export const mockVerificationStateVerified = {
+  phoneHashDetails: {
+    e164Number: mockE164Number,
+    phoneHash: mockE164NumberHash,
+    pepper: mockE164NumberPepper,
+  },
+  actionableAttestations: [],
+  status: {
+    isVerified: true,
+    numAttestationsRemaining: 0,
+    total: 0,
+    completed: 0,
+  },
+  isBalanceSufficient: true,
+}
+
+export const mockVerificationStateInsufficientBalance = {
+  phoneHashDetails: {
+    e164Number: mockE164Number,
+    phoneHash: mockE164NumberHash,
+    pepper: mockE164NumberPepper,
+  },
+  actionableAttestations: [],
+  status: {
+    isVerified: false,
+    numAttestationsRemaining: 0,
+    total: 0,
+    completed: 0,
+  },
+  isBalanceSufficient: false,
+}

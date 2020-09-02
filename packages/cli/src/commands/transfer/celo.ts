@@ -32,7 +32,7 @@ export default class TransferCelo extends BaseCommand {
     const celoToken = await this.kit.contracts.getGoldToken()
 
     await newCheckBuilder(this)
-      .hasEnoughGold(from, value)
+      .hasEnoughCelo(from, value)
       .runChecks()
 
     if (res.flags.comment) {

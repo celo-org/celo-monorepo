@@ -87,7 +87,9 @@ exports[`Account renders correctly 1`] = `
       </svg>
     </View>
   </View>
-  <RCTScrollView>
+  <RCTScrollView
+    testID="SettingsScrollView"
+  >
     <View>
       <Text
         accessible={true}
@@ -978,6 +980,7 @@ exports[`Account renders correctly 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            testID="ResetAccount"
           >
             <View
               style={
@@ -1694,6 +1697,7 @@ exports[`Account renders correctly 1`] = `
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="RemoveAccountModal/SecondaryAction"
                 >
                   <Text
                     style={
@@ -1730,6 +1734,7 @@ exports[`Account renders correctly 1`] = `
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="RemoveAccountModal/PrimaryAction"
                 >
                   <Text
                     style={
@@ -1930,6 +1935,7 @@ exports[`Account renders correctly 1`] = `
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="ConfirmAccountRemovalModal/SecondaryAction"
                 >
                   <Text
                     style={
@@ -1966,6 +1972,7 @@ exports[`Account renders correctly 1`] = `
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="ConfirmAccountRemovalModal/PrimaryAction"
                 >
                   <Text
                     style={
@@ -2082,7 +2089,9 @@ exports[`Account renders correctly when dev mode active 1`] = `
       </svg>
     </View>
   </View>
-  <RCTScrollView>
+  <RCTScrollView
+    testID="SettingsScrollView"
+  >
     <View>
       <Text
         accessible={true}
@@ -2973,6 +2982,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            testID="ResetAccount"
           >
             <View
               style={
@@ -3271,6 +3281,35 @@ exports[`Account renders correctly when dev mode active 1`] = `
             </Text>
           </View>
         </View>
+        <View
+          style={
+            Object {
+              "alignSelf": "stretch",
+              "margin": 4,
+            }
+          }
+        >
+          <View
+            accessible={true}
+            focusable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "opacity": 1,
+              }
+            }
+          >
+            <Text>
+              Valora Quick Reset
+            </Text>
+          </View>
+        </View>
       </View>
       <Modal
         animationType="none"
@@ -3924,6 +3963,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="RemoveAccountModal/SecondaryAction"
                 >
                   <Text
                     style={
@@ -3960,6 +4000,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="RemoveAccountModal/PrimaryAction"
                 >
                   <Text
                     style={
@@ -4160,6 +4201,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="ConfirmAccountRemovalModal/SecondaryAction"
                 >
                   <Text
                     style={
@@ -4196,6 +4238,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="ConfirmAccountRemovalModal/PrimaryAction"
                 >
                   <Text
                     style={
@@ -4312,7 +4355,9 @@ exports[`Account renders correctly when verification is not possible 1`] = `
       </svg>
     </View>
   </View>
-  <RCTScrollView>
+  <RCTScrollView
+    testID="SettingsScrollView"
+  >
     <View>
       <Text
         accessible={true}
@@ -5125,6 +5170,7 @@ exports[`Account renders correctly when verification is not possible 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            testID="ResetAccount"
           >
             <View
               style={
@@ -5841,6 +5887,7 @@ exports[`Account renders correctly when verification is not possible 1`] = `
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="RemoveAccountModal/SecondaryAction"
                 >
                   <Text
                     style={
@@ -5877,6 +5924,7 @@ exports[`Account renders correctly when verification is not possible 1`] = `
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="RemoveAccountModal/PrimaryAction"
                 >
                   <Text
                     style={
@@ -6077,6 +6125,7 @@ exports[`Account renders correctly when verification is not possible 1`] = `
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="ConfirmAccountRemovalModal/SecondaryAction"
                 >
                   <Text
                     style={
@@ -6113,6 +6162,7 @@ exports[`Account renders correctly when verification is not possible 1`] = `
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="ConfirmAccountRemovalModal/PrimaryAction"
                 >
                   <Text
                     style={

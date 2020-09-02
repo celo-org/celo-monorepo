@@ -33,7 +33,7 @@
 
 ▸ **decrypt**(`address`: string, `ciphertext`: Buffer): *Promise‹Buffer‹››*
 
-*Defined in [contractkit/src/wallets/wallet.ts:133](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L133)*
+*Defined in [packages/contractkit/src/wallets/wallet.ts:133](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L133)*
 
 **Parameters:**
 
@@ -50,7 +50,7 @@ ___
 
 ▸ **getAccounts**(): *[Address](../modules/_base_.md#address)[]*
 
-*Defined in [contractkit/src/wallets/wallet.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L42)*
+*Defined in [packages/contractkit/src/wallets/wallet.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L42)*
 
 Gets a list of accounts that have been registered
 
@@ -62,7 +62,7 @@ ___
 
 ▸ **hasAccount**(`address?`: [Address](../modules/_base_.md#address)): *boolean*
 
-*Defined in [contractkit/src/wallets/wallet.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L50)*
+*Defined in [packages/contractkit/src/wallets/wallet.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L50)*
 
 Returns true if account has been registered
 
@@ -80,7 +80,7 @@ ___
 
 ▸ **signPersonalMessage**(`address`: [Address](../modules/_base_.md#address), `data`: string): *Promise‹string›*
 
-*Defined in [contractkit/src/wallets/wallet.ts:94](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L94)*
+*Defined in [packages/contractkit/src/wallets/wallet.ts:94](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L94)*
 
 Sign a personal Ethereum signed message.
 
@@ -101,7 +101,7 @@ ___
 
 ▸ **signTransaction**(`txParams`: Tx): *Promise‹EncodedTransaction›*
 
-*Defined in [contractkit/src/wallets/wallet.ts:73](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L73)*
+*Defined in [packages/contractkit/src/wallets/wallet.ts:73](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L73)*
 
 Gets the signer based on the 'from' field in the tx body
 
@@ -119,7 +119,7 @@ ___
 
 ▸ **signTypedData**(`address`: [Address](../modules/_base_.md#address), `typedData`: EIP712TypedData): *Promise‹string›*
 
-*Defined in [contractkit/src/wallets/wallet.ts:111](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L111)*
+*Defined in [packages/contractkit/src/wallets/wallet.ts:111](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L111)*
 
 Sign an EIP712 Typed Data message.
 

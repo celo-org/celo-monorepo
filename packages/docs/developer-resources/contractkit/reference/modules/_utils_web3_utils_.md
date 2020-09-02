@@ -14,7 +14,7 @@
 
 ▸ **estimateGas**(`tx`: Tx, `gasEstimator`: function, `caller`: function): *Promise‹number›*
 
-*Defined in [contractkit/src/utils/web3-utils.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L21)*
+*Defined in [packages/contractkit/src/utils/web3-utils.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L21)*
 
 **Parameters:**
 
@@ -48,7 +48,7 @@ ___
 
 ▸ **getAbiTypes**(`abi`: ABIDefinition[], `methodName`: string): *string[]*
 
-*Defined in [contractkit/src/utils/web3-utils.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L5)*
+*Defined in [packages/contractkit/src/utils/web3-utils.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L5)*
 
 **Parameters:**
 
@@ -65,7 +65,7 @@ ___
 
 ▸ **parseDecodedParams**(`params`: DecodedParamsObject): *object*
 
-*Defined in [contractkit/src/utils/web3-utils.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L8)*
+*Defined in [packages/contractkit/src/utils/web3-utils.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L8)*
 
 **Parameters:**
 
