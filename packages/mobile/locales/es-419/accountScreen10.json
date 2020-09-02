@@ -8,7 +8,7 @@
   "removeAccountDetails": "Al reiniciar se borrará tu cuenta de este dispositivo. Tu cuenta mantendrá los fondos que tenga, pero solo la podrás recuperar con tu Clave de Cuenta.",
   "legal": "Legal",
   "securityAndData": "Seguridad y datos",
-  "requirePinOnAppOpen": "Requerir PIN cuando al app esté abierta",
+  "requirePinOnAppOpen": "Requerir PIN cuando la app esté abierta",
   "analytics": "Estadisticas de uso",
   "shareAnalytics": "Compartir estadísticas de uso",
   "shareAnalytics_detail": "Recopilamos datos anónimos sobre cómo utilizas {{appName}} para mejorar la aplicación para todos.",
