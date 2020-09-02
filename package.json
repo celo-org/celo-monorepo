@@ -53,5 +53,8 @@
     "pretty-quick": "^2.0.1",
     "minimist": "^1.2.5"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "resolutions": {
+    "ganache-core": "https://github.com/celo-org/ganache-core.git#e7bc0bd"
+  }
 }

@@ -56,6 +56,9 @@
   },
   "devDependencies": {
     "tslint": "^6.1.3",
+    "jest": "^26.1.0",
+    "ts-jest": "^26.1.1",
+    "jest-circus": "^26.1.0",
     "@celo/typescript": "^0.0.1",
     "@celo/dev-cli": "^2.0.3",
     "@celo/dev-utils": "0.0.1-dev",
@@ -63,7 +66,6 @@
     "@types/cli-table": "^0.3.0",
     "@types/fs-extra": "^8.0.0",
     "@types/humanize-duration": "^3.18.0",
-    "@types/mocha": "^7.0.2",
     "@types/node": "^10",
     "prettier": "1.19.1",
     "typescript": "^3.8.3",
