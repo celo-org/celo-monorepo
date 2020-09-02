@@ -12,7 +12,7 @@ describe(initGethSaga, () => {
 
   beforeEach(() => {
     const getStaticNodesAsync = StaticNodeUtils.getStaticNodesAsync as jest.Mock
-    getStaticNodesAsync.mockReturnValue(Promise.resolve('enodes'))
+    getStaticNodesAsync.mockReturnValue(Promise.resolve('["enode://foo"]'))
     const getGenesisBlockAsync = GenesisBlockUtils.getGenesisBlockAsync as jest.Mock
     getGenesisBlockAsync.mockReturnValue(Promise.resolve({}))
     const MockGethBridge = (GethBridge as unknown) as Record<string, jest.Mock>
