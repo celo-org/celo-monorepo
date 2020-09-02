@@ -25,7 +25,7 @@ export async function initializeAnalytics() {
   ReactGA = await import('react-ga').then((mod) => mod.default)
 
   ReactGA.initialize(publicRuntimeConfig.GA_KEY)
-  ReactGA.pageview('test-init-pageview')
+  ReactGA.pageview('initial pageview')
 }
 
 export async function agree() {
