@@ -1,4 +1,3 @@
-import { wait } from '@apollo/react-testing'
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import NumberKeypad from '@celo/react-components/components/NumberKeypad'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
@@ -14,6 +13,7 @@ import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-nat
 import { getNumberFormatSettings } from 'react-native-localize'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
+import sleep from 'sleep-promise'
 import { hideAlert, showError } from 'src/alert/actions'
 import { RequestEvents, SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
@@ -107,8 +107,8 @@ function SendAmount(props: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
 
   const [amount, setAmount] = useState('')
-  const [reviewButtonWasPressed, setReviewButtonToPressed] = useState(false)
-  const [isFetchingAddressMapping, setIsFetchingAddressMapping] = useState(true)
+  const [reviewButtonPressed, setReviewButtonPressed] = useState(false)
+  const [fetchingValidationStatus, setFetchingValidationStatus] = useState(true)
 
   const localCurrencyCode = useSelector(getLocalCurrencyCode)
   const localCurrencyExchangeRate = useSelector(getLocalCurrencyExchangeRate)
@@ -171,8 +171,8 @@ function SendAmount(props: Props) {
   const isAmountValid = parsedLocalAmount.isGreaterThanOrEqualTo(DOLLAR_TRANSACTION_MIN_AMOUNT)
   const isDollarBalanceSufficient = isAmountValid && newAccountBalance.isGreaterThanOrEqualTo(0)
 
-  const reviewButtonText =
-    reviewButtonWasPressed && isFetchingAddressMapping ? (
+  const reviewButtonInnerElement =
+    reviewButtonPressed && fetchingValidationStatus ? (
       <ActivityIndicator testID={'loading/sendAmount'} />
     ) : (
       t('global:review')
@@ -210,13 +210,13 @@ function SendAmount(props: Props) {
   }, [props.route, localCurrencyCode, localCurrencyExchangeRate, dollarAmount])
 
   const onReviewButtonPressed = async () => {
-    setReviewButtonToPressed(true)
+    setReviewButtonPressed(true)
     // Wait until verification status is known to proceed
     while (recipientVerificationStatus === RecipientVerificationStatus.UNKNOWN) {
-      await wait(250)
+      await sleep(250)
     }
 
-    setIsFetchingAddressMapping(false)
+    setFetchingValidationStatus(false)
 
     if (isOutgoingPaymentRequest) {
       onRequest()
@@ -228,7 +228,7 @@ function SendAmount(props: Props) {
   const onSend = React.useCallback(() => {
     if (!isDollarBalanceSufficient) {
       dispatch(showError(ErrorMessages.NSF_TO_SEND))
-      setReviewButtonToPressed(false)
+      setReviewButtonPressed(false)
       return
     }
 
@@ -238,7 +238,7 @@ function SendAmount(props: Props) {
       dispatch(
         showLimitReachedError(now, recentPayments, localCurrencyExchangeRate, localCurrencySymbol)
       )
-      setReviewButtonToPressed(false)
+      setReviewButtonPressed(false)
       return
     }
 
@@ -322,7 +322,7 @@ function SendAmount(props: Props) {
       <Button
         style={styles.nextBtn}
         size={BtnSizes.FULL}
-        text={reviewButtonText}
+        text={reviewButtonInnerElement}
         type={BtnTypes.SECONDARY}
         onPress={onReviewButtonPressed}
         disabled={!isAmountValid}
