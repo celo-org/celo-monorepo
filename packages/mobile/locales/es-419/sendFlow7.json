@@ -47,7 +47,7 @@
   "mobileNumber": "Número de teléfono",
   "walletAddress": "Dirección del Monedero",
   "inviteSMS": "¡Bienvenido a {{appName}}! Obtén {{appName}} en {{link}} e ingresa tu código para comenzar: {{code}}",
-  "inviteSMSWithEscrowedPayment": "¡Bienvenido a {{appName}}! Te he enviado Dólares Celo. Obtenga en {{link}} e ingrese tucódigo para comenzar: {{code}}",
+  "inviteSMSWithEscrowedPayment": "¡Bienvenido a {{appName}}! Te he enviado Dólares Celo. Obtén en {{link}} e ingresa tu código para comenzar: {{code}}",
   "inviteSent": "Código de invitación enviado!",
   "inviteFailed": "Falló el envío de la invitación",
   "loadingContacts": "Encontrando tus contactos",
@@ -57,7 +57,7 @@
   "writeStorageNeededForQrDownload": "Se necesita permiso de escritura de almacenamiento para descargar el código QR",
   "cameraScanInfo": "Centra el código QR en el cuadro",
   "cameraNotAuthorizedTitle": "Habilitar Cámara",
-  "cameraNotAuthorizedDescription": "Habilite la cámara en la configuración de tuteléfono. Lo necesitará para escanear códigos QR.",
+  "cameraNotAuthorizedDescription": "Habilita la cámara en la configuración de tu teléfono. Lo necesitarás para escanear códigos QR.",
   "cameraSettings": "Configuraciones",
   "toSentOrRequestPayment": "enviar o solicitar pago",
   "reminderSent": "Recordatorio Enviado",
@@ -75,7 +75,7 @@
   },
   "importContactsCta": {
     "header": "Importar contactos",
-    "body": "Habilite Contactos en la Configuración de tuteléfono para encontrar a tus amigos por nombre.",
+    "body": "Habilita Contactos en la Configuración de tu teléfono para encontrar a tus amigos por nombre.",
     "cta": "Configuraciones"
   },
   "contactSyncProgress": {
@@ -122,6 +122,6 @@
     "warningModalBody": "El cifrado garantiza que tus comentarios se mantengan privados. Valora utiliza el cifrado en los comentarios de transacciones cuando el remitente y el receptor tienen esta función configurada. La configuración normalmente se realizará automáticamente una vez que un usuario envíe tuprimera transacción.",
     "feeLabel": "Tarifa de Cifrado Unica",
     "feeModalHeader": "Tarifa de Cifrado Unica",
-    "feeModalBody": "El cifrado ayuda a mantener la privacidad de tus datos confidenciales. Se agrega una pequeña tarifa única a tuprimera transacción para configurar el cifrado. Esto garantiza que tus comentarios se enviarán de forma segura y privada."
+    "feeModalBody": "El cifrado ayuda a mantener la privacidad de tus datos confidenciales. Se agrega una pequeña tarifa única a tu primera transacción para configurar el cifrado. Esto garantiza que tus comentarios se envíen de forma segura y privada."
   }
 }

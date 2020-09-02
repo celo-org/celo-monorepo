@@ -2,7 +2,7 @@
   "education": {
     "step1": "Envía y recibe dinero al instante",
     "step2": "Paga a cualquiera, en cualquier lugar con tarifas muy bajas",
-    "step3": "Use {{appName}} con confianza y seguridad"
+    "step3": "Usa {{appName}} con confianza y seguridad"
   },
   "welcome": {
     "title": "Tu valor,\nen tu celular",
@@ -56,7 +56,7 @@
   },
   "verificationSkipDialog": {
     "title": "Estas seguro",
-    "body": "Confirmar le permite enviar y recibir fondos fácilmente a tu número de teléfono.\n\nLas cuentas no confirmadas solo pueden enviar pagos utilizando direcciones de Celo o códigos QR.",
+    "body": "Confirmar te permite enviar y recibir fondos fácilmente a tu número de teléfono.\n\nLas cuentas no confirmadas solo pueden enviar pagos utilizando direcciones de Celo o códigos QR.",
     "cancel": "Regresa",
     "confirm": "Saltar por ahora"
   },

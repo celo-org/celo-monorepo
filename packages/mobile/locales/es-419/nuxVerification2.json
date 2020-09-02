@@ -13,7 +13,7 @@
   "retryVerification": "Reintentar la verificación",
   "education": {
     "header": "Verificar el celular",
-    "body1": "Le solicitamos que verifique tu número telefónico.",
+    "body1": "Te solicitamos que verifiques tu número telefónico.",
     "body2": "Esto facilita el envío y la recepción de valores entre amigos. Puede omitir este paso ahora y hacerlo después.",
     "learnMore": "Más información sobre la verificación telefónica",
     "start": "Comenzar la verificación",
@@ -31,13 +31,13 @@
     "confirming": "Confirmando…",
     "learnMore": "Aprende más",
     "card1": "Para asegurarnos de que tu número sea realmente tuyo, te enviaremos tres mensajes de texto.",
-    "card2": "Una vez que se confirma tu número, puede enviar y recibir fondos fácilmente a tu número de teléfono.",
-    "card3": "Confirmar también le permite ver cuáles de tus amigos están en {{appName}}.",
+    "card2": "Una vez que se confirme tu número, podrás enviar y recibir fondos fácilmente a tu número de teléfono.",
+    "card3": "Confirmar también te permite ver cuáles de tus amigos están en {{appName}}.",
     "card4": "Requerimos tres mensajes de confirmación para mantener tu cuenta más segura."
   },
   "skipModal": {
     "header": "¿Omitir la verificación?",
-    "body1": "La verificación permite que otras personas le envíen valores a tu número telefónico.",
+    "body1": "La verificación permite que otras personas te envíen valores a tu número telefónico.",
     "body2": "Sin la verificación, igual podrá recibir pagos, pero solo mediante las direcciones de cuenta o códigos QR."
   },
   "failModal": {
@@ -60,7 +60,7 @@
   "congratsVerified": "¡Felicitaciones se ha verificado tu usuario!",
   "notification": {
     "title": "Confirma el Teléfono",
-    "body": "Reciba pagos directamente a tu número de teléfono",
+    "body": "Recibe pagos directamente a tu número de teléfono",
     "cta": "Confirma Ahora"
   },
   "quotaLookup": {

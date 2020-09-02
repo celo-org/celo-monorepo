@@ -43,7 +43,7 @@
     "yourSafeguards": "Tus salvaguardas"
   },
   "cancelDialog": {
-    "title": "Termine de configurar tu Clave de Cuenta",
+    "title": "Termina de configurar tu Clave de Cuenta",
     "body": "Las claves de la cuenta son extremadamente importantes. Sin una clave, puedes perder el acceso a tu app para siempre. Estarás bloqueado para enviar cualquier transacción hasta que termines de configurar tu Clave de Cuenta",
     "action": "Completar ahora",
     "secondary": "Establecer más tarde"
