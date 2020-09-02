@@ -1,5 +1,5 @@
 import * as ganache from '@celo/ganache-cli'
-import chalk from 'chalk'
+import * as chalk from 'chalk'
 import { spawn, SpawnOptions } from 'child_process'
 import * as fs from 'fs-extra'
 import * as path from 'path'

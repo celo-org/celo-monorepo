@@ -29,7 +29,7 @@
     "@celo/typescript": "0.0.1",
     "@types/hoist-non-react-statics": "^3.3.1",
     "@types/react": "^16.9.34",
-    "@types/react-native": "^0.62.4",
+    "@types/react-native": "0.62.4",
     "@types/react-native-autocomplete-input": "^4.0.1",
     "react": "16.11.0",
     "react-dom": "16.11.0",

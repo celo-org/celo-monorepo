@@ -2,7 +2,7 @@ import { retryTx } from '@celo/protocol/lib/proxy-utils'
 import { _setInitialProxyImplementation } from '@celo/protocol/lib/web3-utils'
 import { Address, isValidAddress } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
-import chalk from 'chalk'
+import * as chalk from 'chalk'
 import fs = require('fs')
 import * as prompts from 'prompts'
 import {

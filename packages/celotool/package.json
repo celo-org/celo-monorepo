@@ -35,7 +35,6 @@
     "@celo/flake-tracker": "0.0.1-dev",
     "@celo/protocol": "*",
     "@types/bunyan": "1.8.4",
-    "@types/dotenv": "^8.2.0",
     "@types/node-fetch": "^2.1.2",
     "@types/prompts": "^1.1.1",
     "@types/yargs": "^13.0.2",

@@ -60,7 +60,7 @@
     "@react-navigation/native": "^5.7.1",
     "@react-navigation/stack": "^5.7.1",
     "@segment/analytics-react-native": "^1.1.1-beta.2",
-    "@segment/analytics-react-native-firebase": "^1.1.1-beta.2",
+    "@segment/analytics-react-native-firebase": "1.1.1-beta.2",
     "@sentry/react-native": "^1.7.1",
     "@ungap/url-search-params": "^0.1.2",
     "Base64": "^1.0.1",
@@ -158,12 +158,10 @@
     "@react-native-community/eslint-config": "^1.1.0",
     "@types/crypto-js": "^3.1.47",
     "@types/ethereumjs-util": "^5.2.0",
-    "@types/graphql": "^14.0.7",
     "@types/isomorphic-fetch": "^0.0.35",
     "@types/lodash": "^4.14.136",
     "@types/react": "^16.9.34",
-    "@types/react-native": "^0.62.4",
-    "@types/react-native-fs": "^2.13.0",
+    "@types/react-native": "0.62.4",
     "@types/react-native-keep-awake": "^2.0.1",
     "@types/react-redux": "^7.1.7",
     "@types/react-test-renderer": "^16.9.2",
@@ -188,7 +186,8 @@
     "redux-saga-test-plan": "^4.0.0-beta.2",
     "remote-redux-devtools": "^0.5.12",
     "web3-core": "1.2.4",
-    "web3-eth": "1.2.4"
+    "web3-eth": "1.2.4",
+    "typescript": "^3.8.3"
   },
   "detox": {
     "test-runner": "jest",

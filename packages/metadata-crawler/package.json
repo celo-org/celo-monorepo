@@ -22,7 +22,6 @@
   },
   "devDependencies": {
     "@types/bunyan": "1.8.4",
-    "@types/dotenv": "^8.2.0",
     "bunyan-debug-stream": "^2.0.0"
   },
   "scripts": {
