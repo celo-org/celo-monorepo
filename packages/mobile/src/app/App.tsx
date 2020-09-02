@@ -6,6 +6,7 @@ import {
   EmitterSubscription,
   Linking,
   NativeEventEmitter,
+  NativeModules,
   Platform,
   StatusBar,
   YellowBox,
@@ -25,6 +26,7 @@ import i18n from 'src/i18n'
 import NavigatorWrapper from 'src/navigator/NavigatorWrapper'
 import { persistor, store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
+const { ModuleWithEmitter } = NativeModules
 
 enableScreens()
 
@@ -66,8 +68,20 @@ const createEventListener: (
 ): EmitterSubscription | null => {
   if (Platform.OS === 'android') {
     return new NativeEventEmitter().addListener(eventName, callback)
+  } else {
+    // ios
+    const eventEmitter = new NativeEventEmitter(ModuleWithEmitter)
+
+    // TODO: types
+    const onSessionConnect = (event: any) => {
+      Logger.debug('onSessionConnect', 'event: ' + event)
+    }
+
+    // TODO: do we need to unsubscribe?
+    const subscription = eventEmitter.addListener('onSessionConnect', onSessionConnect)
+    return subscription
   }
-  // TODO: Add listener for iOS
+
   return null
 }
 
