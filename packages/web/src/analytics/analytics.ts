@@ -43,7 +43,7 @@ function noTrack() {
 }
 
 export default {
-  track: async function track(key: string, label: string) {
+  track: async function track(key: string, label?: string) {
     if (!(await canTrack())) {
       return noTrack()
     }
