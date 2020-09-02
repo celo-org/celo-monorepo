@@ -28,7 +28,7 @@
   },
   "accountKeyModal": {
     "header": "Sin tu Clave de Cuenta perderás acceso a tu dinero para siempre",
-    "body1": "Para reinicializar Valora, deberás confirmar que has anotado tu Cuenta de Clave.",
+    "body1": "Para reinicializar Valora, deberás confirmar que has anotado tu Clave de Cuenta.",
     "body2": "Nadie, ni siquiera Valora, podrá recuperar tu cuenta sin tu clave."
   },
   "promptConfirmRemovalModal": {
