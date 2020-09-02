@@ -29,6 +29,9 @@ const storeData = {
       send: {
         feeInWei: '1',
       },
+      invite: {
+        feeInWei: '1',
+      },
     },
   },
 }
@@ -97,11 +100,11 @@ describe('SendAmount', () => {
       )
       enterAmount(wrapper, AMOUNT_TOO_MUCH)
 
-      const sendButton = wrapper.getByTestId('Review')
-      expect(sendButton.props.disabled).toBe(false)
+      const reviewButton = wrapper.getByTestId('Review')
+      expect(reviewButton.props.disabled).toBe(false)
 
       store.clearActions()
-      fireEvent.press(sendButton)
+      fireEvent.press(reviewButton)
       expect(store.getActions()).toEqual([
         {
           alertType: 'error',
@@ -125,8 +128,8 @@ describe('SendAmount', () => {
       )
       enterAmount(wrapper, AMOUNT_ZERO)
 
-      const sendButton = wrapper.getByTestId('Review')
-      expect(sendButton.props.disabled).toBe(true)
+      const reviewButton = wrapper.getByTestId('Review')
+      expect(reviewButton.props.disabled).toBe(true)
     })
   })
 
@@ -226,7 +229,9 @@ describe('SendAmount', () => {
     it('navigates to PaymentRequestUnavailable screen on Request click when address is unverified', () => {
       const store = createMockStore({
         identity: {
-          e164NumberToAddress: {},
+          e164NumberToAddress: {
+            [mockE164NumberInvite]: null,
+          },
           secureSendPhoneNumberMapping: {},
         },
         ...storeData,
