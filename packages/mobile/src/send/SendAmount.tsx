@@ -231,11 +231,13 @@ function SendAmount(props: Props) {
   const onSend = React.useCallback(() => {
     if (!isDollarBalanceSufficient) {
       dispatch(showError(ErrorMessages.NSF_TO_SEND))
+      setReviewButtonPressed(false)
       return
     }
 
     if (isTransferLimitReached) {
       showLimitReachedBanner()
+      setReviewButtonPressed(false)
       return
     }
 
