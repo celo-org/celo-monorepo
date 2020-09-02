@@ -150,7 +150,7 @@ export async function initGeth(shouldStartNode: boolean = true): Promise<boolean
       }),
       (async () => {
         if (shouldStartNode && (useDiscovery || useStaticNodes)) {
-          staticNodes = await getStaticNodes(shouldStartNode)
+          staticNodes = await getStaticNodes()
         }
         Logger.info('Geth@init', `Got static nodes: ${staticNodes}`)
         return initializeStaticNodesFile(useStaticNodes ? staticNodes : [])
@@ -203,10 +203,7 @@ export function isProviderConnectionError(error: any) {
     .includes(PROVIDER_CONNECTION_ERROR)
 }
 
-async function getStaticNodes(sync: boolean): Promise<string[]> {
-  if (!sync) {
-    return []
-  }
+async function getStaticNodes(): Promise<string[]> {
   try {
     const enodesStr = await StaticNodeUtils.getStaticNodesAsync(DEFAULT_TESTNET)
     return JSON.parse(enodesStr)
