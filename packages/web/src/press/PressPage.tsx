@@ -20,29 +20,43 @@ export interface PressArticleFields {
 
 interface Props {
   press: PressArticleFields[]
+  languages: string
 }
 
 class PressPage extends React.PureComponent<I18nProps & Props> {
   static async getInitialProps(context) {
     let press = []
+    let languages
     try {
       // when run on server import fetching code and run. on client send req to api
       if (context.req) {
         const getpress = await import('src/../server/fetchPress')
         press = await getpress.default()
+        languages = context.req.headers['accept-language']
       } else {
-        press = await fetch(`/api/press`).then((result) => result.json())
+        const res = await fetch(`/api/press`)
+        press = await res.json()
+        languages = res.headers.get('accept-language')
       }
-      return { press }
+      return { press, languages }
     } catch {
-      return { press }
+      return { press, languages }
     }
   }
   render() {
-    const { t, press, i18n } = this.props
+    const { t, press, languages, i18n } = this.props
+    const langList = new Set(
+      languages
+        .toLowerCase()
+        .split(',')
+        .map((s) => s.substr(0, 2))
+    )
 
     const formated = press
-      .filter((article) => article.language === Languages[i18n.language])
+      .filter(
+        (article) =>
+          langList.has(Languages[article.language]) || Languages[article.language] === i18n.language
+      )
       .reduce(groupByMonth, {})
 
     return (
