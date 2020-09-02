@@ -380,6 +380,26 @@ export const v5Schema = {
     dataEncryptionKey: '0x0000000000000000000000000000000000008F68',
     commentKey: undefined,
   },
+  identity: {
+    ...v3Schema.identity,
+    verificationState: {
+      isLoading: false,
+      phoneHashDetails: {
+        e164Number: '',
+        phoneHash: '',
+        pepper: '',
+      },
+      actionableAttestations: [],
+      status: {
+        isVerified: false,
+        numAttestationsRemaining: 3,
+        total: 0,
+        completed: 0,
+      },
+      isBalanceSufficient: true,
+      lastFetch: null,
+    },
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {

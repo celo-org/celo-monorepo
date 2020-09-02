@@ -249,7 +249,9 @@ class Send extends React.Component<Props, State> {
   }
 
   onPressStartVerification = () => {
-    navigate(Screens.VerificationEducationScreen)
+    navigate(Screens.VerificationEducationScreen, {
+      hideOnboardingStep: true,
+    })
   }
 
   onPressContactsSettings = () => {
