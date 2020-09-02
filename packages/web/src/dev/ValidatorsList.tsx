@@ -207,7 +207,14 @@ class ValidatorsList extends React.PureComponent<Props, State> {
             .multipliedBy(100)
           const votesPer = new BigNumber(votes).dividedBy(receivableVotes).multipliedBy(100)
           const votesAbsolutePer = receivableVotesPer.multipliedBy(votesPer).dividedBy(100)
+          const totalFulfilled = affiliates.edges.reduce((acc, obj) => {
+            return acc + obj.node.attestationsFulfilled
+          }, 0)
+          const totalRequested = affiliates.edges.reduce((acc, obj) => {
+            return acc + obj.node.attestationsRequested
+          }, 0)
           return {
+            attestation: Math.max(0, totalFulfilled / (totalRequested || -1)) * 100,
             order: Math.random(),
             pinned: this.isPinned(group.address),
             name: group.name,
@@ -242,7 +249,6 @@ class ValidatorsList extends React.PureComponent<Props, State> {
                 usd: weiToDecimal(+usd),
                 gold: weiToDecimal(+lockedGold),
                 elected: lastElected >= latestBlock,
-                neverElected: !lastElected,
                 online: lastOnline >= latestBlock,
                 uptime: (+score * 100) / 10 ** 24,
                 attestation:
@@ -255,19 +261,15 @@ class ValidatorsList extends React.PureComponent<Props, State> {
       )
       .map((group, id) => {
         const data = group.validators.reduce(
-          ({ elected, online, total, uptime, attestation }, validator) => ({
+          ({ elected, online, total, uptime }, validator) => ({
             elected: elected + +validator.elected,
             online: online + +validator.online,
             total: total + 1,
             uptime: uptime + validator.uptime,
-            attestation: attestation + validator.attestation,
           }),
-          { elected: 0, online: 0, total: 0, uptime: 0, attestation: 0 }
+          { elected: 0, online: 0, total: 0, uptime: 0 }
         )
         data.uptime = data.uptime / group.validators.length
-        // Averages attestation score for group
-        // Validators that have never been elected won't affect average
-        data.attestation /= group.validators.filter((v) => !v.neverElected).length
         return {
           id,
           ...group,
