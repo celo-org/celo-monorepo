@@ -134,7 +134,7 @@ testWithGanache('account:authorize cmd', (web3: Web3) => {
       '0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900',
       '--yes',
     ])
-    Authorize.run([
+    await Authorize.run([
       '--from',
       accounts[0],
       '--role',
