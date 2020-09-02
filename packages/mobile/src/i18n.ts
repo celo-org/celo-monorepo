@@ -13,7 +13,6 @@ import Logger from 'src/utils/Logger'
 
 const TAG = 'i18n'
 const TOS_LINK_DISPLAY = TOS_LINK.replace(/^https?\:\/\//i, '')
-const TOS_LINK_DISPLAY = TOS_LINK.replace(/^https?\:\/\//i, '')
 
 export enum Namespaces {
   accountScreen10 = 'accountScreen10',
