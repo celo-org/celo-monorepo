@@ -242,6 +242,7 @@ function SendAmount(props: Props) {
 
     if (isTransferLimitReached) {
       showLimitReachedBanner()
+      setReviewButtonPressed(false)
       return
     }
 
