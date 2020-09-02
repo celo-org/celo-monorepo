@@ -8,10 +8,11 @@ import {
   withTranslation as withTranslationI18Next,
 } from 'react-i18next'
 import * as RNLocalize from 'react-native-localize'
-import { APP_NAME } from 'src/config'
+import { APP_NAME, TOS_LINK } from 'src/config'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'i18n'
+const TOS_LINK_DISPLAY = TOS_LINK.replace(/^https?\:\/\//i, '')
 
 export enum Namespaces {
   accountScreen10 = 'accountScreen10',
@@ -91,7 +92,7 @@ i18n
     debug: true,
     interpolation: {
       escapeValue: false,
-      defaultVariables: { appName: APP_NAME },
+      defaultVariables: { appName: APP_NAME, tosLink: TOS_LINK_DISPLAY },
     },
     missingInterpolationHandler: currencyInterpolator,
   })
