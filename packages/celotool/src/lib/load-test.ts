@@ -4,17 +4,18 @@ import { getEnodesWithExternalIPAddresses } from 'src/lib/geth'
 import {
   installGenericHelmChart,
   removeGenericHelmChart,
-  upgradeGenericHelmChart,
+  saveHelmValuesFile,
+  upgradeGenericHelmChart
 } from 'src/lib/helm_deploy'
-import { getGenesisBlockFromGoogleStorage } from 'src/lib/testnet-utils'
 
 export async function installHelmChart(
   celoEnv: string,
   blockscoutProb: number,
   delayMs: number,
-  replicas: number
+  replicas: number,
+  threads: number
 ) {
-  const params = await helmParameters(celoEnv, blockscoutProb, delayMs, replicas)
+  const params = await helmParameters(celoEnv, blockscoutProb, delayMs, replicas, threads)
   return installGenericHelmChart(
     celoEnv,
     celoEnv + '-load-test',
@@ -27,9 +28,10 @@ export async function upgradeHelmChart(
   celoEnv: string,
   blockscoutProb: number,
   delayMs: number,
-  replicas: number
+  replicas: number,
+  threads: number
 ) {
-  const params = await helmParameters(celoEnv, blockscoutProb, delayMs, replicas)
+  const params = await helmParameters(celoEnv, blockscoutProb, delayMs, replicas, threads)
   await upgradeGenericHelmChart(
     celoEnv,
     celoEnv + '-load-test',
@@ -46,14 +48,17 @@ async function helmParameters(
   celoEnv: string,
   blockscoutProb: number,
   delayMs: number,
-  replicas: number
+  replicas: number,
+  threads: number
 ) {
   const enodes = await getEnodesWithExternalIPAddresses(celoEnv)
   const staticNodesJsonB64 = Buffer.from(JSON.stringify(enodes)).toString('base64')
   // Uses the genesis file from google storage to ensure it's the correct genesis for the network
-  const genesisContents = await getGenesisBlockFromGoogleStorage(celoEnv)
-  const genesisFileJsonB64 = Buffer.from(genesisContents).toString('base64')
+  const valueFilePath = `/tmp/${celoEnv}-testnet-values.yaml`
+  await saveHelmValuesFile(celoEnv, valueFilePath, true)
+
   return [
+    `-f ${valueFilePath}`,
     `--set geth.accountSecret="${fetchEnv(envVar.GETH_ACCOUNT_SECRET)}"`,
     `--set blockscout.measurePercent=${blockscoutProb}`,
     `--set blockscout.url=${getBlockscoutUrl(celoEnv)}`,
@@ -61,7 +66,6 @@ async function helmParameters(
     `--set celotool.image.tag=${fetchEnv(envVar.CELOTOOL_DOCKER_IMAGE_TAG)}`,
     `--set delay=${delayMs}`, // send txs every 5 seconds
     `--set environment=${celoEnv}`,
-    `--set geth.genesisFile=${genesisFileJsonB64}`,
     `--set geth.image.repository=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY)}`,
     `--set geth.image.tag=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_TAG)}`,
     `--set geth.networkID=${fetchEnv(envVar.NETWORK_ID)}`,
@@ -69,5 +73,7 @@ async function helmParameters(
     `--set geth.verbosity=${fetchEnv('GETH_VERBOSITY')}`,
     `--set mnemonic="${fetchEnv(envVar.MNEMONIC)}"`,
     `--set replicas=${replicas}`,
+    `--set threads=${threads}`,
+    `--set genesis.useGenesisFileBase64=true`,
   ]
 }

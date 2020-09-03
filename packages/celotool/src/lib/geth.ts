@@ -226,6 +226,7 @@ const validateGethRPC = async (
     location: '[GethRPC]',
     error: `Contractkit did not return a valid transaction`,
   })
+  console.log(`jcortejoso transaction: ${transaction}`)
   if (transaction == null) {
     return
   }
@@ -550,13 +551,13 @@ export const simulateClient = async (
         gasPrice = new BigNumber(
           await gasPriceMinimum.getGasPriceMinimum(feeCurrency)
         ).times(1)
-        gasPrice = gasPriceFixed // TODO Do not use fixed gas
+        gasPrice = gasPriceFixed // TODO do not use fixed gasPrice
         txOptions = {
           gasPrice: gasPrice.toString(),
           feeCurrency,
         }
       } else {
-        gasPrice = gasPriceFixed // TODO Do not use fixed gas
+        gasPrice = gasPriceFixed // TODO do not use fixed gasPrice
         txOptions = {
           gasPrice: gasPrice.toString(),
         }
@@ -950,7 +951,7 @@ export async function startGeth(
     '--gcmode=archive', // Needed to retrieve historical state
     '--istanbul.blockperiod',
     blocktime.toString(),
-  ]
+    ]
 
   if (rpcport) {
     gethArgs.push(

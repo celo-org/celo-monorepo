@@ -1,5 +1,7 @@
+import fs from 'fs'
 import { entries, range } from 'lodash'
 import sleep from 'sleep-promise'
+import { getEnodesWithExternalIPAddresses } from 'src/lib/geth'
 import { AzureClusterConfig } from './azure'
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
 import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
@@ -14,6 +16,7 @@ import {
   getProxyName
 } from './testnet-utils'
 import { outputIncludes } from './utils'
+const generator = require('generate-password')
 
 const CLOUDSQL_SECRET_NAME = 'blockscout-cloudsql-credentials'
 const BACKUP_GCS_SECRET_NAME = 'backup-blockchain-credentials'
@@ -638,6 +641,8 @@ async function helmIPParameters(celoEnv: string) {
 }
 
 async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
+  const valueFilePath = `/tmp/${celoEnv}-testnet-values.yaml`
+  await saveHelmValuesFile(celoEnv, valueFilePath, useExistingGenesis)
   const productionTagOverrides = isProduction()
     ? [
         `--set gethexporter.image.repository=${fetchEnv('GETH_EXPORTER_DOCKER_IMAGE_REPOSITORY')}`,
@@ -657,13 +662,9 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
         `--set pprof.enabled="false"`,
       ]
 
-  const genesisContent = useExistingGenesis
-    ? await getGenesisBlockFromGoogleStorage(celoEnv)
-    : generateGenesisFromEnv()
-
   return [
+    `-f ${valueFilePath}`,
     `--set domain.name=${fetchEnv('CLUSTER_DOMAIN_NAME')}`,
-    `--set genesis.genesisFileBase64=${Buffer.from(genesisContent).toString('base64')}`,
     `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
     `--set geth.verbosity=${fetchEnvOrFallback('GETH_VERBOSITY', '4')}`,
     `--set geth.vmodule=${fetchEnvOrFallback('GETH_VMODULE', '')}`,
@@ -715,6 +716,7 @@ async function helmCommand(command: string) {
 
 function buildHelmChartDependencies(chartDir: string) {
   console.info(`Building any chart dependencies...`)
+  console.info(`helm dep build ${chartDir}`)
   return helmCommand(`helm dep build ${chartDir}`)
 }
 
@@ -869,4 +871,19 @@ export async function deleteFromCluster(celoEnv: string) {
 
 function useStaticIPsForGethNodes() {
   return fetchEnv(envVar.STATIC_IPS_FOR_GETH_NODES) === 'true'
+}
+
+export async function saveHelmValuesFile(celoEnv:string, valueFilePath: string, useExistingGenesis: boolean) {
+  const genesisContent = useExistingGenesis
+  ? await getGenesisBlockFromGoogleStorage(celoEnv)
+  : generateGenesisFromEnv()
+  const enodes = await getEnodesWithExternalIPAddresses(celoEnv)
+
+  const valueFileContent = `
+genesis:
+  genesisFileBase64: ${Buffer.from(genesisContent).toString('base64')}
+staticnodes:
+  staticnodesBase64: ${Buffer.from(JSON.stringify(enodes)).toString('base64')}
+`
+  fs.writeFileSync(valueFilePath, valueFileContent)
 }
