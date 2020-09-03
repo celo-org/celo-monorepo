@@ -5,7 +5,7 @@ import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { getRecipientThumbnail, Recipient, RecipientKind } from 'src/recipients/recipient'
+import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 
 interface Props {
   recipient: Recipient
@@ -15,9 +15,7 @@ interface Props {
 class RecipientItem extends React.PureComponent<Props> {
   onPress = () => {
     const recipient = this.props.recipient
-    if (recipient.kind === RecipientKind.Address) {
-      recipient.address = recipient.address.toLowerCase()
-    }
+    recipient.address = recipient.address?.toLowerCase()
     this.props.onSelectRecipient(recipient)
   }
 
