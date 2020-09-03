@@ -7,9 +7,9 @@ import { parseInputAmount } from '@celo/utils/src/parsing'
 import { RouteProp } from '@react-navigation/native'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
-import * as React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
@@ -90,11 +90,25 @@ export const sendAmountScreenNavOptions = ({
 }
 
 function SendAmount(props: Props) {
-  const dispatch = useDispatch()
+  const { t } = useTranslation(Namespaces.sendFlow7)
+
+  const [amount, setAmount] = useState('')
+  const [reviewButtonPressed, setReviewButtonPressed] = useState(false)
 
   const { isOutgoingPaymentRequest, recipient } = props.route.params
 
-  React.useEffect(() => {
+  const localCurrencyCode = useSelector(getLocalCurrencyCode)
+  const localCurrencyExchangeRate = useSelector(getLocalCurrencyExchangeRate)
+  const localCurrencySymbol = useSelector(getLocalCurrencySymbol)
+  const e164NumberToAddress = useSelector(e164NumberToAddressSelector)
+  const dollarBalance = useSelector(stableTokenBalanceSelector)
+  const recipientVerificationStatus = getRecipientVerificationStatus(recipient, e164NumberToAddress)
+  const feeType = getFeeType(recipientVerificationStatus)
+  const estimateFeeDollars = useSelector(getFeeEstimateDollars(feeType))
+
+  const dispatch = useDispatch()
+
+  useEffect(() => {
     dispatch(fetchDollarBalance())
     if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
       return
@@ -107,18 +121,15 @@ function SendAmount(props: Props) {
     dispatch(fetchAddressesAndValidate(recipient.e164PhoneNumber))
   }, [])
 
-  const { t } = useTranslation(Namespaces.sendFlow7)
-
-  const [amount, setAmount] = React.useState('')
-
-  const localCurrencyCode = useSelector(getLocalCurrencyCode)
-  const localCurrencyExchangeRate = useSelector(getLocalCurrencyExchangeRate)
-  const localCurrencySymbol = useSelector(getLocalCurrencySymbol)
-  const e164NumberToAddress = useSelector(e164NumberToAddressSelector)
-  const dollarBalance = useSelector(stableTokenBalanceSelector)
-  const recipientVerificationStatus = getRecipientVerificationStatus(recipient, e164NumberToAddress)
-  const feeType = getFeeType(recipientVerificationStatus)
-  const estimateFeeDollars = useSelector(getFeeEstimateDollars(feeType))
+  useEffect(() => {
+    if (
+      reviewButtonPressed &&
+      recipientVerificationStatus !== RecipientVerificationStatus.UNKNOWN
+    ) {
+      isOutgoingPaymentRequest ? onRequest() : onSend()
+      setReviewButtonPressed(false)
+    }
+  }, [reviewButtonPressed, recipientVerificationStatus])
 
   const maxLength = React.useMemo(() => {
     const decimalPos = amount.indexOf(decimalSeparator ?? '.')
@@ -170,10 +181,7 @@ function SendAmount(props: Props) {
     .minus(estimateFeeDollars || 0)
 
   const isAmountValid = parsedLocalAmount.isGreaterThanOrEqualTo(DOLLAR_TRANSACTION_MIN_AMOUNT)
-  const isDollarBalanceSufficient = isAmountValid && newAccountBalance.isGreaterThanOrEqualTo(0)
-
-  const reviewBtnDisabled =
-    !isAmountValid || recipientVerificationStatus === RecipientVerificationStatus.UNKNOWN
+  const isDollarBalanceSufficient = isAmountValid && newAccountBalance.isGreaterThan(0)
 
   const secureSendPhoneNumberMapping = useSelector(secureSendPhoneNumberMappingSelector)
   const addressValidationType: AddressValidationType = getAddressValidationType(
@@ -209,6 +217,8 @@ function SendAmount(props: Props) {
     dollarAmount,
     CURRENCY_ENUM.DOLLAR
   )
+
+  const onReviewButtonPressed = () => setReviewButtonPressed(true)
 
   const onSend = React.useCallback(() => {
     if (!isDollarBalanceSufficient) {
@@ -304,10 +314,17 @@ function SendAmount(props: Props) {
       <Button
         style={styles.nextBtn}
         size={BtnSizes.FULL}
-        text={t('global:review')}
+        text={
+          recipientVerificationStatus === RecipientVerificationStatus.UNKNOWN &&
+          reviewButtonPressed ? (
+            <ActivityIndicator testID={'loading/SendAmount'} />
+          ) : (
+            t('global:review')
+          )
+        }
         type={BtnTypes.SECONDARY}
-        onPress={isOutgoingPaymentRequest ? onRequest : onSend}
-        disabled={reviewBtnDisabled}
+        onPress={onReviewButtonPressed}
+        disabled={!isAmountValid || reviewButtonPressed}
         testID="Review"
       />
     </SafeAreaView>
