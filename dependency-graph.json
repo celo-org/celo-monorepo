@@ -45,6 +45,7 @@
       "@celo/contractkit",
       "@celo/dev-utils",
       "@celo/flake-tracker",
+      "@celo/typescript",
       "@celo/utils"
     ]
   },
