@@ -2,7 +2,7 @@
   "cancel": "Cancelar",
   "dollarsSent": "{{Dollars}} Enviados",
   "to": "Para",
-  "send": "Envío",
+  "send": "Enviar",
   "payment": "Pago",
   "sendOrRequest": "Enviar o solicitar",
   "characterLimitExceeded": "Límite de {{max}} caracteres superado",
@@ -26,9 +26,9 @@
   "inviteFee": "Comisión de Invitación",
   "feeEducation": "Enviar pagos y hacer cambios incluye una pequeña comisión de seguridad y mantenimiento.",
   "learnMore": "Saber más",
-  "inviteMoneyEscrow": "Invitaremos a este contacto y mantendremos seguros sus fondos hasta que verifiquen su cuenta.",
+  "inviteMoneyEscrow": "Invitaremos a este contacto y mantendremos seguros tus fondos hasta que verifiquen tu cuenta.",
   "reviewPayment": "Revisar pago",
-  "requestPayment": "Solicitud pago",
+  "requestPayment": "Solicitar pago",
   "continue": "Continuar",
   "edit": "Editar",
   "activity": "Actividad",
@@ -47,7 +47,7 @@
   "mobileNumber": "Número de teléfono",
   "walletAddress": "Dirección del Monedero",
   "inviteSMS": "¡Bienvenido a {{appName}}! Obtén {{appName}} en {{link}} e ingresa tu código para comenzar: {{code}}",
-  "inviteSMSWithEscrowedPayment": "¡Bienvenido a {{appName}}! Te he enviado Dólares Celo. Obtenga en {{link}} e ingrese su código para comenzar: {{code}}",
+  "inviteSMSWithEscrowedPayment": "¡Bienvenido a {{appName}}! Te he enviado Dólares Celo. Obtén en {{link}} e ingresa tu código para comenzar: {{code}}",
   "inviteSent": "Código de invitación enviado!",
   "inviteFailed": "Falló el envío de la invitación",
   "loadingContacts": "Encontrando tus contactos",
@@ -55,9 +55,9 @@
   "scanCode": "Escanear",
   "scanQRCode": "Escanear Código QR",
   "writeStorageNeededForQrDownload": "Se necesita permiso de escritura de almacenamiento para descargar el código QR",
-  "cameraScanInfo": "Centro de código en el cuadro de arriba",
+  "cameraScanInfo": "Centra el código QR en el cuadro",
   "cameraNotAuthorizedTitle": "Habilitar Cámara",
-  "cameraNotAuthorizedDescription": "Habilite la cámara en la configuración de su teléfono. Lo necesitará para escanear códigos QR.",
+  "cameraNotAuthorizedDescription": "Habilita la cámara en la configuración de tu teléfono. Lo necesitarás para escanear códigos QR.",
   "cameraSettings": "Configuraciones",
   "toSentOrRequestPayment": "enviar o solicitar pago",
   "reminderSent": "Recordatorio Enviado",
@@ -70,12 +70,12 @@
   "estimatedFee": "Tarifa estimada: ",
   "verificationCta": {
     "header": "¿Enviar a un amigo?",
-    "body": "Verifique su teléfono y sincronice sus contactos para enviarlos rápidamente a sus amigos.",
-    "cta": "Iniciar verificación"
+    "body": "Verifica tu celular y sincroniza tus contactos para poder enviar dinero rápidamente a tus amigos.",
+    "cta": "Confirma tu número"
   },
   "importContactsCta": {
     "header": "Importar contactos",
-    "body": "Habilite Contactos en la Configuración de su teléfono para encontrar a sus amigos por nombre.",
+    "body": "Habilita Contactos en la Configuración de tu teléfono para encontrar a tus amigos por nombre.",
     "cta": "Configuraciones"
   },
   "contactSyncProgress": {
@@ -85,33 +85,33 @@
   },
   "confirmAccount": {
     "header": "Por favor confirma la cuenta de {{displayName}}",
-    "headerNoDisplayName": "Por favor confirme la cuenta de su contacto",
+    "headerNoDisplayName": "Por favor confirma la cuenta de tu contacto",
     "button": "Confirma el número de cuenta"
   },
   "secureSendExplanation": {
-    "body1": "{{e164PhoneNumber}} tiene multipes cuentas asociadas. {{displayName}} puede haber creado una nueva cuenta de {{appName}}, perdido su teléfono o su cuenta puede haber sido interceptada o comprometida.",
-    "body1NoDisplayName": "Su contacto tiene varias cuentas asociadas. Su contacto podría haber creado una nueva cuenta de {{appName}}, o podría haber perdido su teléfono o haber comprometido su cuenta.",
-    "body2": "Puedes realizar esto escaneando el código QR o confirmado su número de cuenta directamente antes de realizar transacciones"
+    "body1": "{{e164PhoneNumber}} tiene multipes cuentas asociadas. {{displayName}} puede haber creado una nueva cuenta de {{appName}}, perdido tuteléfono o tu cuenta puede haber sido interceptada o comprometida.",
+    "body1NoDisplayName": "Tu contacto tiene varias cuentas asociadas. Tu contacto podría haber creado una nueva cuenta de {{appName}}, o podría haber perdido tu teléfono o haber comprometido tu cuenta.",
+    "body2": "Puedes realizar esto escaneando el código QR o confirmado tu número de cuenta directamente antes de realizar transacciones"
   },
   "confirmAccountNumber": {
     "title": "Confirma el número de cuenta",
-    "bodyPartial": "Por favor solicita a {{displayName}} los últimos cuatro dígitos de su número de cuenta. Por razones de seguridad, preguntar en persona o por teléfono.",
-    "bodyPartialNoDisplayName": "Solicite a su contacto los últimos cuatro dígitos de su número de cuenta. Es más seguro hacerlo en persona o por teléfono.",
-    "body1Full": "Por favor solicita a {{displayName}} su número de cuenta",
-    "body1FullNoDisplayName": "Solicite a su contacto su número de cuenta.",
+    "bodyPartial": "Por favor solicita a {{displayName}} los últimos cuatro dígitos de tu número de cuenta. Por razones de seguridad, es mejor preguntar en persona o por teléfono.",
+    "bodyPartialNoDisplayName": "Solicita a tu contacto los últimos cuatro dígitos de tu número de cuenta. Es más seguro hacerlo en persona o por teléfono.",
+    "body1Full": "Por favor solicita a {{displayName}} tu número de cuenta",
+    "body1FullNoDisplayName": "Solicita a tu contacto tu número de cuenta.",
     "body2Full": "Por razones de seguridad, por favor no utilices mensajes de texto (SMS). Se recomienda altamente preguntar en persona o por teléfono a través de WhastApp, Messenger o por correo electrónico",
-    "help": "Ayude a encontrar su número de cuenta",
+    "help": "Cómo encontrar el número de cuenta",
     "submit": "Enviar"
   },
-  "accountInputHeaderPartial": "4 Últimos Dígitos",
+  "accountInputHeaderPartial": "Los últimos 4 dígitos",
   "accountInputHeaderFull": "Número de Cuenta",
   "helpModal": {
     "header": "Encuentra el número de cuenta de tu contacto",
-    "body1": "Tu contacto puede encontrar su número de cuenta (también conocido como dirección) al inicio del Menú de Ajustes",
+    "body1": "Tu contacto puede encontrar tu número de cuenta (también conocido como dirección) al inicio del Menú de Ajustes",
     "body2": "Se encuentran directamente debajo de la foto de perfil",
     "body3": "Los números de cuenta comienzan con 0x, contienen solo números y letras y tienen 42 caracteres. Haz click en el siguiente enlace para obtener ayuda"
   },
-  "transferAddressChanged": "Este contacto cambió su número de cuenta desde la transacción. Este pago fue enviado a:",
+  "transferAddressChanged": "Este contacto cambió tu número de cuenta desde la transacción. Este pago fue enviado a:",
   "addressConfirmed": "Número de cuenta confirmado",
   "sending": "Enviando",
   "feeActual": "Tarifas",
@@ -119,9 +119,9 @@
   "encryption": {
     "warningLabel": "Este comentario no será encriptado",
     "warningModalHeader": "Sobre Cifrado",
-    "warningModalBody": "El cifrado garantiza que sus comentarios se mantengan privados. Valora utiliza el cifrado en los comentarios de transacciones cuando el remitente y el receptor tienen esta función configurada. La configuración normalmente se realizará automáticamente una vez que un usuario envíe su primera transacción.",
+    "warningModalBody": "El cifrado garantiza que tus comentarios se mantengan privados. Valora utiliza el cifrado en los comentarios de transacciones cuando el remitente y el receptor tienen esta función configurada. La configuración normalmente se realizará automáticamente una vez que un usuario envíe tuprimera transacción.",
     "feeLabel": "Tarifa de Cifrado Unica",
     "feeModalHeader": "Tarifa de Cifrado Unica",
-    "feeModalBody": "El cifrado ayuda a mantener la privacidad de sus datos confidenciales. Se agrega una pequeña tarifa única a su primera transacción para configurar el cifrado. Esto garantiza que sus comentarios se enviarán de forma segura y privada."
+    "feeModalBody": "El cifrado ayuda a mantener la privacidad de tus datos confidenciales. Se agrega una pequeña tarifa única a tu primera transacción para configurar el cifrado. Esto garantiza que tus comentarios se envíen de forma segura y privada."
   }
 }

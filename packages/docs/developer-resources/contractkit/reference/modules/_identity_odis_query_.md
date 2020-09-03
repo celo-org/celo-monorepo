@@ -32,7 +32,7 @@
 
 Ƭ **AuthSigner**: *[WalletKeySigner](../interfaces/_identity_odis_query_.walletkeysigner.md) | [EncryptionKeySigner](../interfaces/_identity_odis_query_.encryptionkeysigner.md)*
 
-*Defined in [contractkit/src/identity/odis/query.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L24)*
+*Defined in [packages/contractkit/src/identity/odis/query.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L24)*
 
 ## Functions
 
@@ -40,7 +40,7 @@
 
 ▸ **queryOdis**<**ResponseType**>(`signer`: [AuthSigner](_identity_odis_query_.md#authsigner), `body`: [PhoneNumberPrivacyRequest](../interfaces/_identity_odis_query_.phonenumberprivacyrequest.md), `context`: [ServiceContext](../interfaces/_identity_odis_query_.servicecontext.md), `endpoint`: string): *Promise‹ResponseType›*
 
-*Defined in [contractkit/src/identity/odis/query.ts:80](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L80)*
+*Defined in [packages/contractkit/src/identity/odis/query.ts:80](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L80)*
 
 Make a request to lookup the phone number identifier or perform matchmaking
 

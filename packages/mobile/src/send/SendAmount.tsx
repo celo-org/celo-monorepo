@@ -7,9 +7,9 @@ import { parseInputAmount } from '@celo/utils/src/parsing'
 import { RouteProp } from '@react-navigation/native'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
-import * as React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
@@ -19,7 +19,12 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackButton from 'src/components/BackButton.v2'
-import { DOLLAR_TRANSACTION_MIN_AMOUNT, NUMBER_INPUT_MAX_DECIMALS } from 'src/config'
+import {
+  ALERT_BANNER_DURATION,
+  DAILY_PAYMENT_LIMIT_CUSD,
+  DOLLAR_TRANSACTION_MIN_AMOUNT,
+  NUMBER_INPUT_MAX_DECIMALS,
+} from 'src/config'
 import { getFeeEstimateDollars } from 'src/fees/selectors'
 import i18n, { Namespaces } from 'src/i18n'
 import { fetchAddressesAndValidate } from 'src/identity/actions'
@@ -46,8 +51,7 @@ import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { getRecipientVerificationStatus, Recipient, RecipientKind } from 'src/recipients/recipient'
 import useSelector from 'src/redux/useSelector'
-import { getRecentPayments } from 'src/send/selectors'
-import { getFeeType, isPaymentLimitReached, showLimitReachedError } from 'src/send/utils'
+import { getFeeType, useDailyTransferLimitValidator } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
@@ -86,11 +90,25 @@ export const sendAmountScreenNavOptions = ({
 }
 
 function SendAmount(props: Props) {
-  const dispatch = useDispatch()
+  const { t } = useTranslation(Namespaces.sendFlow7)
+
+  const [amount, setAmount] = useState('')
+  const [reviewButtonPressed, setReviewButtonPressed] = useState(false)
 
   const { isOutgoingPaymentRequest, recipient } = props.route.params
 
-  React.useEffect(() => {
+  const localCurrencyCode = useSelector(getLocalCurrencyCode)
+  const localCurrencyExchangeRate = useSelector(getLocalCurrencyExchangeRate)
+  const localCurrencySymbol = useSelector(getLocalCurrencySymbol)
+  const e164NumberToAddress = useSelector(e164NumberToAddressSelector)
+  const dollarBalance = useSelector(stableTokenBalanceSelector)
+  const recipientVerificationStatus = getRecipientVerificationStatus(recipient, e164NumberToAddress)
+  const feeType = getFeeType(recipientVerificationStatus)
+  const estimateFeeDollars = useSelector(getFeeEstimateDollars(feeType))
+
+  const dispatch = useDispatch()
+
+  useEffect(() => {
     dispatch(fetchDollarBalance())
     if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
       return
@@ -103,18 +121,15 @@ function SendAmount(props: Props) {
     dispatch(fetchAddressesAndValidate(recipient.e164PhoneNumber))
   }, [])
 
-  const { t } = useTranslation(Namespaces.sendFlow7)
-
-  const [amount, setAmount] = React.useState('')
-
-  const localCurrencyCode = useSelector(getLocalCurrencyCode)
-  const localCurrencyExchangeRate = useSelector(getLocalCurrencyExchangeRate)
-  const localCurrencySymbol = useSelector(getLocalCurrencySymbol)
-  const e164NumberToAddress = useSelector(e164NumberToAddressSelector)
-  const dollarBalance = useSelector(stableTokenBalanceSelector)
-  const recipientVerificationStatus = getRecipientVerificationStatus(recipient, e164NumberToAddress)
-  const feeType = getFeeType(recipientVerificationStatus)
-  const estimateFeeDollars = useSelector(getFeeEstimateDollars(feeType))
+  useEffect(() => {
+    if (
+      reviewButtonPressed &&
+      recipientVerificationStatus !== RecipientVerificationStatus.UNKNOWN
+    ) {
+      isOutgoingPaymentRequest ? onRequest() : onSend()
+      setReviewButtonPressed(false)
+    }
+  }, [reviewButtonPressed, recipientVerificationStatus])
 
   const maxLength = React.useMemo(() => {
     const decimalPos = amount.indexOf(decimalSeparator ?? '.')
@@ -166,10 +181,7 @@ function SendAmount(props: Props) {
     .minus(estimateFeeDollars || 0)
 
   const isAmountValid = parsedLocalAmount.isGreaterThanOrEqualTo(DOLLAR_TRANSACTION_MIN_AMOUNT)
-  const isDollarBalanceSufficient = isAmountValid && newAccountBalance.isGreaterThanOrEqualTo(0)
-
-  const reviewBtnDisabled =
-    !isAmountValid || recipientVerificationStatus === RecipientVerificationStatus.UNKNOWN
+  const isDollarBalanceSufficient = isAmountValid && newAccountBalance.isGreaterThan(0)
 
   const secureSendPhoneNumberMapping = useSelector(secureSendPhoneNumberMappingSelector)
   const addressValidationType: AddressValidationType = getAddressValidationType(
@@ -186,7 +198,6 @@ function SendAmount(props: Props) {
     }),
     [recipient, dollarAmount]
   )
-  const recentPayments = useSelector(getRecentPayments)
   const localCurrencyAmount = convertDollarsToLocalAmount(dollarAmount, localCurrencyExchangeRate)
 
   const continueAnalyticsParams = React.useMemo(() => {
@@ -202,18 +213,21 @@ function SendAmount(props: Props) {
     }
   }, [props.route, localCurrencyCode, localCurrencyExchangeRate, dollarAmount])
 
+  const [isTransferLimitReached, showLimitReachedBanner] = useDailyTransferLimitValidator(
+    dollarAmount,
+    CURRENCY_ENUM.DOLLAR
+  )
+
+  const onReviewButtonPressed = () => setReviewButtonPressed(true)
+
   const onSend = React.useCallback(() => {
     if (!isDollarBalanceSufficient) {
       dispatch(showError(ErrorMessages.NSF_TO_SEND))
       return
     }
 
-    const now = Date.now()
-    const isLimitReached = isPaymentLimitReached(now, recentPayments, dollarAmount.toNumber())
-    if (isLimitReached) {
-      dispatch(
-        showLimitReachedError(now, recentPayments, localCurrencyExchangeRate, localCurrencySymbol)
-      )
+    if (isTransferLimitReached) {
+      showLimitReachedBanner()
       return
     }
 
@@ -240,15 +254,18 @@ function SendAmount(props: Props) {
         isFromScan: props.route.params?.isFromScan,
       })
     }
-  }, [
-    recipientVerificationStatus,
-    addressValidationType,
-    recentPayments,
-    dollarAmount,
-    getTransactionData,
-  ])
+  }, [recipientVerificationStatus, addressValidationType, dollarAmount, getTransactionData])
 
   const onRequest = React.useCallback(() => {
+    if (dollarAmount.isGreaterThan(DAILY_PAYMENT_LIMIT_CUSD)) {
+      dispatch(
+        showError(ErrorMessages.REQUEST_LIMIT, ALERT_BANNER_DURATION, {
+          limit: DAILY_PAYMENT_LIMIT_CUSD,
+        })
+      )
+      return
+    }
+
     const transactionData = getTransactionData(TokenTransactionType.PayRequest)
 
     if (
@@ -297,10 +314,17 @@ function SendAmount(props: Props) {
       <Button
         style={styles.nextBtn}
         size={BtnSizes.FULL}
-        text={t('global:review')}
+        text={
+          recipientVerificationStatus === RecipientVerificationStatus.UNKNOWN &&
+          reviewButtonPressed ? (
+            <ActivityIndicator testID={'loading/SendAmount'} />
+          ) : (
+            t('global:review')
+          )
+        }
         type={BtnTypes.SECONDARY}
-        onPress={isOutgoingPaymentRequest ? onRequest : onSend}
-        disabled={reviewBtnDisabled}
+        onPress={onReviewButtonPressed}
+        disabled={!isAmountValid || reviewButtonPressed}
         testID="Review"
       />
     </SafeAreaView>
