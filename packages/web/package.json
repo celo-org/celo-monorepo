@@ -30,7 +30,7 @@
     "@next/bundle-analyzer": "^9.3.5",
     "@sentry/browser": "^5.20.1",
     "@sentry/node": "^5.20.1",
-    "airtable": "^0.8.1",
+    "airtable": "^0.9.0",
     "apollo-boost": "^0.4.4",
     "big-integer": "^1.6.48",
     "body-parser": "^1.19.0",
