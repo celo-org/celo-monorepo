@@ -970,7 +970,7 @@ export async function startGeth(
       gethArgs.push(`--proxy.internalendpoint=:${proxyport.toString()}`)
     }
     gethArgs.push(`--proxy.proxiedvalidatoraddress=${instance.proxiedValidatorAddress}`)
-    // gethArgs.push(`--nodekeyhex=${privateKey}`)
+    gethArgs.push(`--nodekeyhex=${privateKey}`)
   }
 
   if (bootnodeEnode) {
@@ -983,7 +983,7 @@ export async function startGeth(
     if (proxyAllowPrivateIp) {
       gethArgs.push('--proxy.allowprivateip=true')
     }
-    gethArgs.push(`--proxy.proxyenodeurlpair=${instance.proxies[0]!};${instance.proxies[1]!}`)
+    gethArgs.push(`--proxy.proxyenodeurlpairs=${instance.proxies[0]!};${instance.proxies[1]!}`)
   }
 
   if (privateKey || ethstats) {
@@ -1169,7 +1169,7 @@ export async function connectPeers(instances: GethInstanceConfig[], verbose: boo
 // Add validator 0 as a peer of each other validator.
 export async function connectValidatorPeers(instances: GethInstanceConfig[]) {
   await connectPeers(
-    instances.filter(({ wsport, rpcport, validating }) => validating && (wsport || rpcport))
+    instances.filter(({ wsport, rpcport, validating, isProxy, isProxied }) => ((validating && !isProxied) || isProxy)  && (wsport || rpcport))
   )
 }
 
