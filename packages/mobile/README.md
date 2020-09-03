@@ -395,6 +395,26 @@ There are two major differences in Forno mode:
 
 Websockets (`ws`) would have been a better choice but we cannot use unencrypted `ws` provider since it would be bad to send plain-text data from a privacy perspective. Geth does not support `wss` by [default](https://github.com/ethereum/go-ethereum/issues/16423). And Kubernetes does not support it either. This forced us to use https provider.
 
+### Attaching to the geth instance
+
+#### Android
+
+1. Start geth's HTTP RPC server by setting the config variable `GETH_START_HTTP_RPC_SERVER` to true. This is meant for development purposes only and can be a serious vulnerability if used in production.
+2. Forward traffic from your computer's port 8545 to the android device's: `adb forward tcp:8545 tcp:8545`
+3. Using a geth binary on your computer, run `geth attach http://localhost:8545`
+
+#### iOS
+
+We need the IP address of the iOS device. If it is being run in a simulator, the IP address is `127.0.0.1`. If not running in a simulator:
+
+1. Ensure the iOS device is on the same network as your computer.
+2. Find the device's local IP address by going to the Settings app, Wi-Fi, and tapping the 'i' next to the network.
+
+To attach:
+
+1. Start geth's HTTP RPC server by setting the config variable `GETH_START_HTTP_RPC_SERVER` to true. This is meant for development purposes only and can be a serious vulnerability if used in production.
+2. Using a geth binary on your computer, run `geth attach http://<DEVICE_IP_ADDRESS>:8545`
+
 ### Troubleshooting
 
 #### `Activity class {org.celo.mobile.staging/org.celo.mobile.MainActivity} does not exist.`
