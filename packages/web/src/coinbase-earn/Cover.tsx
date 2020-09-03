@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Image, StyleSheet, View } from 'react-native'
-import HeroMobile from 'src/blue-owl/hero-mobile.png'
-import Hero from 'src/blue-owl/hero.png'
+import HeroMobile from 'src/coinbase-earn/hero-mobile.png'
+import Hero from 'src/coinbase-earn/hero.png'
 import { useScreenSize } from 'src/layout/ScreenSize'
 
 export default function Cover() {

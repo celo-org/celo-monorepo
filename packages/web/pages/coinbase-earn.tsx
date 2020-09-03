@@ -1,3 +1,3 @@
-import Landing from 'src/blue-owl/Landing'
+import Landing from 'src/coinbase-earn/Landing'
 
 export default Landing
