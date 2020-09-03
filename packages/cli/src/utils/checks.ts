@@ -292,7 +292,7 @@ class CheckBuilder {
       `${address} is currently voting in governance. Revoke your upvotes or wait for the referendum to end.`
     )
 
-  hasEnoughGold = (account: Address, value: BigNumber) => {
+  hasEnoughCelo = (account: Address, value: BigNumber) => {
     const valueInEth = this.kit.communication.web3.utils.fromWei(value.toFixed(), 'ether')
     return this.addCheck(`Account has at least ${valueInEth} CELO`, () =>
       this.kit.contracts

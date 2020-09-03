@@ -1,16 +1,10 @@
-import {
-  encodeTransaction,
-  extractSignature,
-  RLPEncodedTx,
-  rlpEncodedTx,
-} from '@celo/contractkit/lib/utils/signing-utils'
-import { Signer } from '@celo/contractkit/lib/wallets/signers/signer'
-import { ensureLeading0x } from '@celo/utils/lib/address'
+import { ensureLeading0x } from '@celo/base/lib/address'
+import { CeloTx, RLPEncodedTx, Signer } from '@celo/communication'
 import { normalizeAddressWith0x } from '@celo/utils/src/address'
+import { encodeTransaction, extractSignature, rlpEncodedTx } from '@celo/wallet-base'
 import * as ethUtil from 'ethereumjs-util'
 import { GethNativeModule } from 'react-native-geth'
 import Logger from 'src/utils/Logger'
-import { Tx } from 'web3-core'
 
 const INCORRECT_PASSWORD_ERROR = 'could not decrypt key with given password'
 const currentTimeInSeconds = () => Math.floor(Date.now() / 1000)
@@ -42,7 +36,7 @@ export class GethNativeBridgeSigner implements Signer {
     return this.geth.addAccount(this.hexToBase64(privateKey), passphrase)
   }
 
-  async signRawTransaction(tx: Tx) {
+  async signRawTransaction(tx: CeloTx) {
     if (normalizeAddressWith0x(tx.from! as string) !== this.account) {
       throw new Error(`RNGethSigner(${this.account}) cannot sign tx with 'from' ${tx.from}`)
     }
