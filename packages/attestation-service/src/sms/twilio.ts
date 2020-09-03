@@ -1,4 +1,5 @@
 import bodyParser from 'body-parser'
+import Logger from 'bunyan'
 import express from 'express'
 import twilio, { Twilio } from 'twilio'
 import { fetchEnv } from '../env'
@@ -33,11 +34,12 @@ export class TwilioSmsProvider extends SmsProvider {
     this.unsupportedRegionCodes = unsupportedRegionCodes
   }
 
-  async receiveDeliveryStatusReport(req: express.Request) {
+  async receiveDeliveryStatusReport(req: express.Request, logger: Logger) {
     await receivedDeliveryReport(
       req.body.MessageSid,
       this.deliveryStatus(req.body.MessageStatus),
-      req.body.ErrorCode
+      req.body.ErrorCode,
+      logger
     )
   }
 

@@ -4,7 +4,7 @@ import rateLimit from 'express-rate-limit'
 import requestIdMiddleware from 'express-request-id'
 import * as PromClient from 'prom-client'
 import { initializeDB, initializeKit, verifyConfigurationAndGetURL } from './db'
-import { fetchEnv, fetchEnvOrDefault, isYes } from './env'
+import { fetchEnv, fetchEnvOrDefault, isDevMode, isYes } from './env'
 import { rootLogger } from './logger'
 import { asyncHandler, createValidatedHandler, loggerMiddleware } from './request'
 import { AttestationRequestType, handleAttestationRequest } from './requestHandlers/attestation'
@@ -26,7 +26,7 @@ async function init() {
 
   // Verify configuration if VERIFY_CONFIG_ON_STARTUP is set.
   // (in this case, we can use the URL in the claim if EXTERNAL_CALLBACK_HOSTPORT is missing)
-  if (isYes(fetchEnvOrDefault('VERIFY_CONFIG_ON_STARTUP', '1'))) {
+  if (!isDevMode() && isYes(fetchEnvOrDefault('VERIFY_CONFIG_ON_STARTUP', '1'))) {
     const claimURL = await verifyConfigurationAndGetURL()
     externalURL = fetchEnvOrDefault('EXTERNAL_CALLBACK_HOSTPORT', claimURL)
   } else {

@@ -1,11 +1,12 @@
 import bodyParser from 'body-parser'
+import Logger from 'bunyan'
 import express from 'express'
 import { PhoneNumberUtil } from 'google-libphonenumber'
 import Nexmo from 'nexmo'
 import { receivedDeliveryReport } from '.'
 import { fetchEnv, fetchEnvOrDefault, isYes } from '../env'
 import { Gauges } from '../metrics'
-import { AttestationStatus } from '../models/attestation'
+import { AttestationModel, AttestationStatus } from '../models/attestation'
 import { readUnsupportedRegionsFromEnv, SmsProvider, SmsProviderType } from './base'
 
 const phoneUtil = PhoneNumberUtil.getInstance()
@@ -56,10 +57,15 @@ export class NexmoSmsProvider extends SmsProvider {
     }))
   }
 
-  async receiveDeliveryStatusReport(req: express.Request) {
+  async receiveDeliveryStatusReport(req: express.Request, logger: Logger) {
     const errCode =
       req.body['err-code'] == null || req.body['err-code'] === '0' ? null : req.body['err-code']
-    await receivedDeliveryReport(req.body.messageId, this.deliveryStatus(req.body.status), errCode)
+    await receivedDeliveryReport(
+      req.body.messageId,
+      this.deliveryStatus(req.body.status),
+      errCode,
+      logger
+    )
   }
 
   deliveryStatus(messageStatus: string | null): AttestationStatus {
@@ -82,13 +88,13 @@ export class NexmoSmsProvider extends SmsProvider {
 
   deliveryStatusHandlers = () => [bodyParser.json()]
 
-  async sendSms(delivery: SmsDelivery) {
-    const nexmoNumber = this.getMatchingNumber(delivery.countryCode)
+  async sendSms(attestation: AttestationModel) {
+    const nexmoNumber = this.getMatchingNumber(attestation.countryCode)
     return new Promise<string>((resolve, reject) => {
       this.client.message.sendSms(
         nexmoNumber,
-        delivery.phoneNumber,
-        delivery.message,
+        attestation.phoneNumber,
+        attestation.message,
         (err: Error, responseData: any) => {
           if (err) {
             reject(err)

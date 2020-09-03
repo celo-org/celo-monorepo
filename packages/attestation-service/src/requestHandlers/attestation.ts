@@ -5,7 +5,7 @@ import { AddressType, E164PhoneNumberType, SaltType } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
 import express from 'express'
 import * as t from 'io-ts'
-import { findAttestationByKey, kit } from '../db'
+import { findAttestationByKey, kit, SequelizeLogger } from '../db'
 import { getAccountAddress, getAttestationSignerAddress } from '../env'
 import { Counters } from '../metrics'
 import { AttestationKey, AttestationModel, AttestationStatus } from '../models/attestation'
@@ -30,12 +30,6 @@ export const AttestationRequestType = t.type({
 
 export type AttestationRequest = t.TypeOf<typeof AttestationRequestType>
 
-function obfuscateAttestationRequest(attestationRequest: AttestationRequest) {
-  const obfuscatedRequest = { ...attestationRequest }
-  obfuscatedRequest.phoneNumber = obfuscateNumber(attestationRequest.phoneNumber)
-  return obfuscatedRequest
-}
-
 function toBase64(str: string) {
   return Buffer.from(str.slice(2), 'hex').toString('base64')
 }
@@ -59,10 +53,12 @@ function getAttestationKey(attestationRequest: AttestationRequest): AttestationK
 class AttestationRequestHandler {
   logger: Logger
   key: AttestationKey
-  sequelizeLogger: (_msg: string, sequelizeLog: any) => void
+  sequelizeLogger: SequelizeLogger
   constructor(public readonly attestationRequest: AttestationRequest, logger: Logger) {
     this.logger = logger.child({
-      attestationRequest: obfuscateAttestationRequest(attestationRequest),
+      account: attestationRequest.account,
+      issuer: attestationRequest.issuer,
+      phoneNumber: obfuscateNumber(attestationRequest.phoneNumber),
     })
     this.sequelizeLogger = (msg: string, sequelizeLogArgs: any) =>
       this.logger.debug({ sequelizeLogArgs, component: 'sequelize' }, msg)
@@ -72,18 +68,20 @@ class AttestationRequestHandler {
   async validateAttestationRequest() {
     const { account, issuer } = this.attestationRequest
 
-    const attestationRecord = await findAttestationByKey(this.key, {
-      logging: this.sequelizeLogger,
-    })
-    // check if it exists in the database
-    if (attestationRecord && !attestationRecord.canSendSms()) {
-      Counters.attestationRequestsAlreadySent.inc()
-      throw new Error(ATTESTATION_ALREADY_SENT_ERROR)
-    }
     const address = getAccountAddress()
     if (!eqAddress(address, issuer)) {
       Counters.attestationRequestsWrongIssuer.inc()
       throw new Error(`Mismatching issuer, I am ${address}`)
+    }
+
+    const attestationRecord = await findAttestationByKey(this.key, {
+      logging: this.sequelizeLogger,
+    })
+
+    // TODO what conditions should we allow retransmit under
+    if (attestationRecord && attestationRecord.status !== AttestationStatus.NotSent) {
+      Counters.attestationRequestsAlreadySent.inc()
+      throw new Error(ATTESTATION_ALREADY_SENT_ERROR)
     }
 
     const attestations = await kit.contracts.getAttestations()
@@ -134,40 +132,13 @@ class AttestationRequestHandler {
     )
 
     // TODO metrics
-    return startSendSms(this.key, this.attestationRequest.phoneNumber, textMessage)
-
-    // let attestationRecord: AttestationModel | null = null
-
-    // const transaction = await sequelize!.transaction({ logging: this.sequelizeLogger })
-
-    // try {
-    //   // attestationRecord = await ensureLockedRecord(
-    //   //   this.attestationRequest,
-    //   //   this.identifier,
-    //   //   transaction
-    //   // )
-
-    //   try {
-    //     const sentVia = await startSendSms(this.attestationRequest.phoneNumber, textMessage)
-    //     Counters.attestationRequestsSentSms.inc()
-    //     await attestationRecord.update(
-    //       { status: AttestationStatus.SENT, smsProvider: sentVia },
-    //       { transaction, logging: this.sequelizeLogger }
-    //     )
-    //   } catch (err) {
-    //     this.logger.error({ err }, 'Failed sending SMS')
-    //     Counters.attestationRequestsFailedToSendSms.inc()
-    //     await attestationRecord.update(
-    //       { status: AttestationStatus.FAILED, smsProvider: SmsProviderType.UNKNOWN },
-    //       { transaction, logging: this.sequelizeLogger }
-    //     )
-    //   }
-
-    //   await transaction.commit()
-    // } catch (err) {
-    //   this.logger.error({ err })
-    //   await transaction.rollback()
-    // }
+    return startSendSms(
+      this.key,
+      this.attestationRequest.phoneNumber,
+      textMessage,
+      this.logger,
+      this.sequelizeLogger
+    )
   }
 
   respondAfterSendingSms(res: express.Response, attestationRecord: AttestationModel | null) {
@@ -178,14 +149,15 @@ class AttestationRequestHandler {
     }
 
     switch (attestationRecord.status) {
-      case AttestationStatus.SENT:
-      case AttestationStatus.RECEIPT_DELIVERED:
-        res.status(201).json({ success: true })
+      case AttestationStatus.Sent:
+      case AttestationStatus.Delivered:
+        res.status(201).json({ success: true, status: attestationRecord.status })
         return
-      case AttestationStatus.RECEIPT_FAILED:
-        respondWithError(res, 500, SMS_SENDING_ERROR)
-        return
-      case AttestationStatus.UNABLE_TO_SERVE: // TODO Verify what Valora is looking for here.
+      // TODO what conditions which reply
+      // case AttestationStatus.:
+      //   respondWithError(res, 500, SMS_SENDING_ERROR)
+      //   return
+      case AttestationStatus.NotSent: // TODO Verify what Valora is looking for here.
         respondWithError(res, 422, COUNTRY_CODE_NOT_SERVED_ERROR)
         return
       default:

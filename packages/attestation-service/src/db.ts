@@ -1,7 +1,6 @@
 import { ContractKit, newKit } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import { eqAddress } from '@celo/utils/lib/address'
-import 'cross-fetch/polyfill'
 import { FindOptions, Sequelize, Transaction } from 'sequelize'
 import { fetchEnv, getAccountAddress, getAttestationSignerAddress } from './env'
 import { rootLogger } from './logger'
@@ -12,6 +11,8 @@ import Attestation, {
 } from './models/attestation'
 
 export let sequelize: Sequelize | undefined
+
+export type SequelizeLogger = boolean | ((sql: string, timing?: number) => void)
 
 export function initializeDB() {
   if (sequelize === undefined) {
@@ -83,9 +84,9 @@ export async function verifyConfigurationAndGetURL() {
     )
   }
 
-  // if (!(await isAttestationSignerUnlocked())) {
-  //   throw Error(`Need to unlock attestation signer account ${signer}`)
-  // }
+  if (!(await isAttestationSignerUnlocked())) {
+    throw Error(`Need to unlock attestation signer account ${signer}`)
+  }
 
   const metadataURL = await accounts.getMetadataURL(validator)
   try {

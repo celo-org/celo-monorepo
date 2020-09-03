@@ -1,10 +1,12 @@
+import { PhoneNumberUtils } from '@celo/utils'
 import { AttestationServiceTestRequest } from '@celo/utils/lib/io'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
+import { randomBytes } from 'crypto'
 import express from 'express'
-import { getAttestationSignerAddress } from '../env'
-import { rootLogger } from '../logger'
+import { getAccountAddress, getAttestationSignerAddress, isDevMode } from '../env'
 import { ErrorMessages, respondWithError } from '../request'
 import { startSendSms } from '../sms'
+import { obfuscateNumber } from '../sms/base'
 
 export { AttestationServiceTestRequestType } from '@celo/utils/lib/io'
 
@@ -13,31 +15,57 @@ export async function handleTestAttestationRequest(
   res: express.Response,
   testRequest: AttestationServiceTestRequest
 ) {
-  const accountIsValid = true
-  // verifySignature(
-  //   testRequest.phoneNumber + testRequest.message,
-  //   testRequest.signature,
-  //   getAccountAddress()
-  // )
+  const logger = res.locals.logger.child({
+    testProvider: testRequest.provider,
+    phoneNumber: obfuscateNumber(testRequest.phoneNumber),
+  })
 
-  if (!accountIsValid) {
-    // Signature may be via attestation signer (for ReleaseGold specifically)
-    const signerIsValid = verifySignature(
-      testRequest.phoneNumber + testRequest.message,
-      testRequest.signature,
-      getAttestationSignerAddress()
-    )
-    if (!signerIsValid) {
+  try {
+    // Signature may be via account key or attestation signer (for ReleaseGold specifically)
+    // If we're in dev mode, don't do a signature check.
+    const accountIsValid =
+      isDevMode() ||
+      verifySignature(
+        testRequest.phoneNumber + testRequest.message,
+        testRequest.signature,
+        getAccountAddress()
+      ) ||
+      verifySignature(
+        testRequest.phoneNumber + testRequest.message,
+        testRequest.signature,
+        getAttestationSignerAddress()
+      )
+
+    if (!accountIsValid) {
       respondWithError(res, 422, ErrorMessages.INVALID_SIGNATURE)
       return
     }
-  }
 
-  try {
-    const provider = await startSendSms(testRequest.phoneNumber, testRequest.message)
-    res.json({ success: true, provider }).status(201)
+    // Generate attestation key for the test
+    const salt = randomBytes(32).toString('hex')
+    const key = {
+      identifier: PhoneNumberUtils.getPhoneHash(testRequest.phoneNumber, salt),
+      account: getAccountAddress(),
+      issuer: getAccountAddress(),
+    }
+
+    const sequelizeLogger = (msg: string, sequelizeLogArgs: any) =>
+      logger.debug({ sequelizeLogArgs, component: 'sequelize' }, msg)
+
+    const attestation = await startSendSms(
+      key,
+      testRequest.phoneNumber,
+      testRequest.message,
+      logger,
+      sequelizeLogger,
+      testRequest.provider
+    )
+
+    // TODO check attestation response
+
+    res.json({ success: true, provider: attestation.provider() }).status(201)
   } catch (error) {
-    rootLogger.error(error)
+    logger.error(error)
     res.json({ success: false, error: error.message }).status(500)
   }
 }

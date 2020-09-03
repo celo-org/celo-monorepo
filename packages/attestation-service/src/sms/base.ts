@@ -1,4 +1,5 @@
 import { E164Number } from '@celo/utils/lib/io'
+import Logger from 'bunyan'
 import express from 'express'
 import { fetchEnvOrDefault } from '../env'
 import { AttestationModel } from '../models/attestation'
@@ -19,7 +20,7 @@ export abstract class SmsProvider {
   abstract deliveryStatusHandlers(): express.Handler[]
 
   // Should throw Error when unsuccesful, return if successful
-  abstract receiveDeliveryStatusReport(req: express.Request): Promise<void>
+  abstract receiveDeliveryStatusReport(req: express.Request, logger: Logger): Promise<void>
 }
 
 export enum SmsProviderType {

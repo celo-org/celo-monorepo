@@ -1,18 +1,19 @@
 import { sleep } from '@celo/utils/lib/async'
 import { intersection } from '@celo/utils/lib/collections'
 import { E164Number } from '@celo/utils/lib/io'
+import Logger from 'bunyan'
 import { PhoneNumberUtil } from 'google-libphonenumber'
 import {
   findAttestationByDeliveryId,
   findAttestationByKey,
   findOrCreateAttestation,
   sequelize,
+  SequelizeLogger,
 } from '../db'
 import { fetchEnv, fetchEnvOrDefault } from '../env'
-import { rootLogger } from '../logger'
 import { Counters } from '../metrics'
 import { AttestationKey, AttestationModel, AttestationStatus } from '../models/attestation'
-import { DeliveryStatus, obfuscateNumber, SmsProvider, SmsProviderType } from './base'
+import { obfuscateNumber, SmsProvider, SmsProviderType } from './base'
 import { NexmoSmsProvider } from './nexmo'
 import { TwilioSmsProvider } from './twilio'
 
@@ -57,7 +58,7 @@ export async function initializeSmsProviders(
 
 // Return all SMS providers for the given phone number, in order of preference for that region,
 // and not including any providers that has that region on its denylist.
-export function smsProvidersFor(countryCode: string, phoneNumber: E164Number) {
+function smsProvidersFor(countryCode: string, phoneNumber: E164Number, logger: Logger) {
   const providersForRegion = fetchEnvOrDefault(`SMS_PROVIDERS_${countryCode}`, '')
     .split(',')
     .filter((t) => t != null && t !== '')
@@ -69,7 +70,7 @@ export function smsProvidersFor(countryCode: string, phoneNumber: E164Number) {
     (provider) => provider != null && provider.canServePhoneNumber(countryCode, phoneNumber)
   )
   if (providers.length === 0) {
-    rootLogger.warn(
+    logger.warn(
       {
         countryCode,
         phoneNumber: obfuscateNumber(phoneNumber),
@@ -79,7 +80,7 @@ export function smsProvidersFor(countryCode: string, phoneNumber: E164Number) {
         `check *_UNSUPPORTED_REGIONS are not overly restrictive, and that if provided SMS_PROVIDERS_${countryCode} lists valid providers`
     )
   } else {
-    rootLogger.debug(
+    logger.debug(
       {
         countryCode,
         phoneNumber: obfuscateNumber(phoneNumber),
@@ -108,19 +109,30 @@ export function unsupportedRegionCodes() {
 }
 
 // Maximum delivery attempts (including first) regardless of provider
-const maxDeliveryAttempts = parseInt(fetchEnvOrDefault('MAX_DELIVERY_ATTEMPTS', '4'), 10)
+const maxDeliveryAttempts = parseInt(fetchEnvOrDefault('MAX_DELIVERY_ATTEMPTS', '3'), 10)
 
-// Main entry point for sending SMS via preferred providers.
-// TODO pass through logging
-export async function startSendSms(key: AttestationKey, phoneNumber: E164Number, message: string) {
+// Main entry point for sending SMS.
+export async function startSendSms(
+  key: AttestationKey,
+  phoneNumber: E164Number,
+  message: string,
+  logger: Logger,
+  sequelizeLogger: SequelizeLogger,
+  onlyUseProvider: string | null = null
+): Promise<AttestationModel> {
   let shouldRetry = false
   let attestation: AttestationModel | null = null
 
-  const transaction = await sequelize!.transaction({ logging: this.sequelizeLogger })
+  const transaction = await sequelize!.transaction({ logging: sequelizeLogger })
 
   try {
     const countryCode = phoneUtil.getRegionCodeForNumber(phoneUtil.parse(phoneNumber))
-    const providers = countryCode ? smsProvidersFor(countryCode, phoneNumber) : []
+    let providers = countryCode ? smsProvidersFor(countryCode, phoneNumber, logger) : []
+
+    if (onlyUseProvider) {
+      // If onlyUseProvider is specified, filter returned list to make it only item.
+      providers = providers.find((provider) => provider.type === onlyUseProvider!)
+    }
 
     attestation = await findOrCreateAttestation(
       key,
@@ -141,40 +153,39 @@ export async function startSendSms(key: AttestationKey, phoneNumber: E164Number,
     if (!countryCode) {
       Counters.attestationRequestsUnableToServe.labels('unknown').inc()
       attestation.errorCode = `Could not parse ${phoneNumber}`
-    }
-    if (providers.length === 0) {
+    } else if (providers.length === 0) {
       Counters.attestationRequestsUnableToServe.labels(countryCode).inc()
       attestation.errorCode = `No SMS providers available for ${countryCode}`
     } else {
       // Parsed number and found providers. Attempt delivery.
-      shouldRetry = await doSendSms(attestation, providers)
+      shouldRetry = await doSendSms(attestation, providers, logger)
     }
 
-    // rootLogger.info(
-    //   {
-    //     phoneNumber: obfuscateNumber(delivery.phoneNumber),
-    //   },
-
-    await attestation.save({ transaction, logging: this.sequelizeLogger })
+    await attestation.save({ transaction, logging: sequelizeLogger })
     await transaction.commit()
+
+    // If there was an error sending, backoff and retry while holding open client conn.
+    if (shouldRetry) {
+      await sleep(Math.pow(2, attestation!.attempt) * 1000)
+      await findAttestationAndSendSms(key, logger, sequelizeLogger)
+    }
+
+    return attestation
   } catch (err) {
-    this.logger.error({ err })
+    logger.error({ err })
     await transaction.rollback()
+    throw err
   }
-
-  // If there was an error sending, backoff and retry while holding open client conn.
-  if (shouldRetry) {
-    await sleep(Math.pow(2, attestation.attempt) * 500)
-    await findAttestationAndSendSms(key, logger)
-  }
-
-  return attestation
 }
 
-async function findAttestationAndSendSms(key: AttestationKey, logger) {
+async function findAttestationAndSendSms(
+  key: AttestationKey,
+  logger: Logger,
+  sequelizeLogger: SequelizeLogger
+) {
   let shouldRetry = false
 
-  const transaction = await sequelize!.transaction({ logging: this.sequelizeLogger })
+  const transaction = await sequelize!.transaction({ logging: sequelizeLogger })
 
   try {
     const attestation = await findAttestationByKey(key, transaction)
@@ -182,35 +193,36 @@ async function findAttestationAndSendSms(key: AttestationKey, logger) {
       return
     }
 
-    const providers = getProvidersFor(attestation)
+    const providers = getProvidersFor(attestation, logger)
 
     // Parsed number and found providers. Attempt delivery.
-    shouldRetry = await doSendSms(attestation, providers)
+    shouldRetry = await doSendSms(attestation, providers, logger)
 
-    await attestation.save({ transaction, logging: this.sequelizeLogger })
+    await attestation.save({ transaction, logging: sequelizeLogger })
     await transaction.commit()
-  } catch (err) {
-    this.logger.error({ err })
-    await transaction.rollback()
-  }
 
-  // If there was an error sending, backoff and retry while holding open client conn.
-  if (shouldRetry) {
-    await sleep(Math.pow(2, attestation.attempt) * 500)
-    await findAttestationAndSendSms(key, logger)
+    // If there was an error sending, backoff and retry while holding open client conn.
+    if (shouldRetry) {
+      await sleep(Math.pow(2, attestation.attempt) * 1000)
+      await findAttestationAndSendSms(key, logger, sequelizeLogger)
+    }
+  } catch (err) {
+    logger.error({ err })
+    await transaction.rollback()
+    throw err
   }
 }
 
-// Make first or next delivery attempt
+// Make first or next delivery attempt -- returns true if we should retry.
 async function doSendSms(
   attestation: AttestationModel,
   providers: any[],
-  logger
+  logger: Logger
 ): Promise<boolean> {
   const provider = providers[attestation.attempt % providers.length]
 
   try {
-    rootLogger.info(
+    logger.info(
       {
         provider: provider.type,
         attempt: attestation.attempt,
@@ -224,7 +236,7 @@ async function doSendSms(
     attestation.errorCode = null
     attestation.ongoingDeliveryId = deliveryId
 
-    rootLogger.info(
+    logger.info(
       {
         provider: provider.type,
         attempt: attestation.attempt,
@@ -234,7 +246,7 @@ async function doSendSms(
     )
 
     Counters.attestationProviderDeliveryStatus
-      .labels(provider.type, attestation.countryCode, DeliveryStatus[DeliveryStatus.Sent])
+      .labels(provider.type, attestation.countryCode, AttestationStatus[AttestationStatus.Sent])
       .inc()
 
     return false
@@ -244,7 +256,7 @@ async function doSendSms(
     attestation.ongoingDeliveryId = null
     attestation.attempt += 1
 
-    rootLogger.info(
+    logger.info(
       {
         provider: provider.type,
         attempt: attestation.attempt,
@@ -262,8 +274,8 @@ async function doSendSms(
   }
 }
 
-function getProvidersFor(attestation: AttestationModel) {
-  const providers = smsProvidersFor(attestation.countryCode, attestation.phoneNumber)
+function getProvidersFor(attestation: AttestationModel, logger: Logger) {
+  const providers = smsProvidersFor(attestation.countryCode, attestation.phoneNumber, logger)
   const providerString = providers.join(',')
   if (providerString !== attestation.providers) {
     throw new Error(
@@ -278,12 +290,19 @@ function getProvidersFor(attestation: AttestationModel) {
 export async function receivedDeliveryReport(
   deliveryId: string,
   deliveryStatus: AttestationStatus,
-  errorCode: string | null
+  errorCode: string | null,
+  logger: Logger
 ) {
   let shouldRetry = false
   let attestation: AttestationModel | null = null
 
-  const transaction = await sequelize!.transaction({ logging: this.sequelizeLogger })
+  let childLogger = logger.child({
+    deliveryId,
+  })
+  const sequelizeLogger = (msg: string, sequelizeLogArgs: any) =>
+    childLogger.debug({ sequelizeLogArgs, component: 'sequelize' }, msg)
+
+  const transaction = await sequelize!.transaction({ logging: sequelizeLogger })
 
   try {
     attestation = await findAttestationByDeliveryId(deliveryId, { transaction })
@@ -293,16 +312,18 @@ export async function receivedDeliveryReport(
       return
     }
 
+    childLogger = logger.child({
+      phoneNumber: obfuscateNumber(attestation.phoneNumber),
+    })
+
     if (attestation.status !== deliveryStatus) {
-      const providers = getProvidersFor(attestation)
+      const providers = getProvidersFor(attestation, childLogger)
       const provider = providers[attestation.attempt % providers.length]
 
-      rootLogger.info(
+      childLogger.info(
         {
           provider: provider.type,
-          phoneNumber: obfuscateNumber(delivery.phoneNumber),
-          deliveryId,
-          deliveryStatus: DeliveryStatus[deliveryStatus],
+          status: AttestationStatus[deliveryStatus],
           errorCode,
         },
         'Received delivery status'
@@ -316,7 +337,7 @@ export async function receivedDeliveryReport(
       )
 
       Counters.attestationProviderDeliveryStatus
-        .labels(provider.type, attestation.countryCode, DeliveryStatus[deliveryStatus])
+        .labels(provider.type, attestation.countryCode, AttestationStatus[deliveryStatus])
         .inc()
 
       if (errorCode != null) {
@@ -325,7 +346,7 @@ export async function receivedDeliveryReport(
           .inc()
       }
 
-      if (deliveryStatus === DeliveryStatus.Failed) {
+      if (deliveryStatus === AttestationStatus.Failed) {
         attestation.ongoingDeliveryId = null
         attestation.attempt += 1
 
@@ -339,13 +360,13 @@ export async function receivedDeliveryReport(
 
     transaction.commit()
   } catch (err) {
-    logger.error(err)
+    childLogger.error(err)
     transaction.rollback()
   }
 
   if (attestation && shouldRetry) {
-    // TODO do this in the future
-    await sleep(Math.pow(2, attestation.attempt) * 500)
-    findAttestationAndSendSms(key, logger)
+    const key = attestation.key()
+    const timeout = Math.pow(2, attestation.attempt) * 1000
+    setTimeout(() => findAttestationAndSendSms(key, childLogger, sequelizeLogger), timeout)
   }
 }

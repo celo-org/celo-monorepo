@@ -15,6 +15,7 @@ export interface AttestationModel extends Model {
   status: AttestationStatus
   errorCode: string | null
   key: () => AttestationKey
+  provider: () => string | null
 }
 
 export interface AttestationKey {
@@ -53,6 +54,10 @@ export default (sequelize: Sequelize) => {
 
   model.prototype.key = function(): AttestationKey {
     return { account: this.account, identifier: this.identifier, issuer: this.issuer }
+  }
+
+  model.prototype.provider = function(): string | null {
+    return this.providers ? this.providers[this.attempt % this.providers.length] : null
   }
 
   return model
