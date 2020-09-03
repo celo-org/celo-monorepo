@@ -34,6 +34,7 @@ function DrawerTopBar({ middleElement, scrollPosition, testID }: Props) {
         // @ts-ignore Only used in a drawer
         onPress={navigation.toggleDrawer}
         hitSlop={iconHitslop}
+        testID={'Hamburguer'}
       >
         <Hamburger />
       </TouchableOpacity>

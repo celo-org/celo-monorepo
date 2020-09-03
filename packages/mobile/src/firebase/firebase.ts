@@ -73,6 +73,10 @@ export const initializeAuth = async (app: ReactNativeFirebase.Module, address: s
   Logger.info(TAG, 'Firebase Auth initialized successfully')
 }
 
+export const firebaseSignOut = async (app: ReactNativeFirebase.FirebaseApp) => {
+  await app.auth().signOut()
+}
+
 export function* initializeCloudMessaging(app: ReactNativeFirebase.Module, address: string) {
   Logger.info(TAG, 'Initializing Firebase Cloud Messaging')
 

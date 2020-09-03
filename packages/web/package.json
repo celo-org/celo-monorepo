@@ -21,7 +21,7 @@
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "kill-dev": "kill -9 $(lsof -ti :3000)",
     "clean-next-cache": "rm -rf .next",
-    "test": "jest --coverage --runInBand",
+    "test": "TZ=UTC jest --coverage --runInBand",
     "spec": "jest"
   },
   "dependencies": {
@@ -55,7 +55,6 @@
     "hex-rgba": "^1.0.2",
     "html-to-formatted-text": "^2.7.0",
     "js-cookie": "^2.2.1",
-    "load-segment": "^1.0.1",
     "lodash.throttle": "^4.1.1",
     "lottie-web": "^5.6.10",
     "mailgun-js": "^0.22.0",
@@ -64,7 +63,7 @@
     "mobile-detect": "^1.4.4",
     "net": "^1.0.2",
     "network-speed": "^2.0.4",
-    "next": "9.3.5",
+    "next": "^9.5.2",
     "next-i18next": "^4.2.1",
     "next-images": "^1.2.0",
     "next-plugin-transpile-modules": "^2.0.0",
@@ -77,6 +76,7 @@
     "react-autosuggest": "^9.4.3",
     "react-debounce-input": "^3.2.2",
     "react-dom": "16.11.0",
+    "react-ga": "^3.1.2",
     "react-google-recaptcha": "^2.0.1",
     "react-is": "16.11.0",
     "react-lazyload": "^2.6.5",

@@ -27,7 +27,8 @@ import { RecipientKind } from 'src/recipients/recipient'
 interface AppEventsProperties {
   [AppEvents.app_launched]: {
     // TODO: Figure out how to measure loadingDuration iOS and make param required
-    loadingDuration?: number
+    reactLoadDuration?: number
+    appLoadDuration?: number
     deviceInfo?: object
     deviceHeight: number
     deviceWidth: number
@@ -79,6 +80,7 @@ interface SettingsEventsProperties {
   [SettingsEvents.language_select]: {
     language: string
   }
+  [SettingsEvents.settings_verify_number]: undefined
   [SettingsEvents.pin_require_on_load]: {
     enabled: boolean
   }
@@ -87,6 +89,8 @@ interface SettingsEventsProperties {
   }
   [SettingsEvents.licenses_view]: undefined
   [SettingsEvents.tos_view]: undefined
+  [SettingsEvents.start_account_removal]: undefined
+  [SettingsEvents.completed_account_removal]: undefined
 }
 
 interface OnboardingEventsProperties {
@@ -164,10 +168,13 @@ interface OnboardingEventsProperties {
 
   [OnboardingEvents.invite_redeem_start]: undefined
   [OnboardingEvents.invite_redeem_complete]: undefined
+  [OnboardingEvents.invite_redeem_cancel]: undefined
   [OnboardingEvents.invite_redeem_timeout]: undefined
   [OnboardingEvents.invite_redeem_error]: {
     error: string
   }
+  [OnboardingEvents.invite_redeem_move_funds_start]: undefined
+  [OnboardingEvents.invite_redeem_move_funds_complete]: undefined
 
   [OnboardingEvents.invite_redeem_skip_start]: undefined
   [OnboardingEvents.invite_redeem_skip_complete]: undefined
@@ -181,7 +188,12 @@ interface OnboardingEventsProperties {
     error: string
   }
 
-  [OnboardingEvents.account_dek_set]: undefined
+  [OnboardingEvents.account_dek_register_start]: undefined
+  [OnboardingEvents.account_dek_register_account_unlocked]: undefined
+  [OnboardingEvents.account_dek_register_account_checked]: undefined
+  [OnboardingEvents.account_dek_register_complete]: {
+    newRegistration: boolean
+  }
 }
 
 interface VerificationEventsProperties {
@@ -455,6 +467,7 @@ interface FeeEventsProperties {
 interface TransactionEventsProperties {
   [TransactionEvents.transaction_start]: {
     txId: string
+    description?: string
     fornoMode?: boolean
   }
   [TransactionEvents.transaction_gas_estimated]: {
@@ -485,6 +498,7 @@ interface CeloExchangeEventsProperties {
   [CeloExchangeEvents.celo_home_info]: undefined
   [CeloExchangeEvents.celo_home_buy]: undefined
   [CeloExchangeEvents.celo_home_sell]: undefined
+  [CeloExchangeEvents.celo_home_withdraw]: undefined
   [CeloExchangeEvents.celo_transaction_select]: undefined
   [CeloExchangeEvents.celo_transaction_back]: undefined
 
@@ -546,6 +560,21 @@ interface CeloExchangeEventsProperties {
   [CeloExchangeEvents.celo_fetch_exchange_rate_error]: {
     error: string
   }
+
+  [CeloExchangeEvents.celo_withdraw_review]: {
+    amount: string
+  }
+  [CeloExchangeEvents.celo_withdraw_edit]: undefined
+  [CeloExchangeEvents.celo_withdraw_cancel]: undefined
+  [CeloExchangeEvents.celo_withdraw_confirm]: {
+    amount: string
+  }
+  [CeloExchangeEvents.celo_withdraw_completed]: {
+    amount: string
+  }
+  [CeloExchangeEvents.celo_withdraw_error]: {
+    error: string
+  }
 }
 
 interface GethEventsProperties {
@@ -561,7 +590,7 @@ interface GethEventsProperties {
     context: string
   }
   [GethEvents.geth_init_start]: {
-    sync: boolean
+    shouldStartNode: boolean
   }
   [GethEvents.create_geth_start]: undefined
   [GethEvents.create_geth_finish]: undefined

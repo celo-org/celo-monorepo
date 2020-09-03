@@ -30,24 +30,24 @@ type BaseProps = {
 
 type SettingsItemTextValueProps = {
   value?: string
+  showChevron?: boolean
 } & BaseProps
 
 export function SettingsItemTextValue({
   testID,
   title,
   value,
+  showChevron,
   onPress,
 }: SettingsItemTextValueProps) {
   return (
     <Wrapper testID={testID} onPress={onPress}>
       <View style={styles.container}>
         <Title value={title} />
-        {value && (
-          <View style={styles.right}>
-            <Text style={styles.value}>{value}</Text>
-            <ForwardChevron />
-          </View>
-        )}
+        <View style={styles.right}>
+          {value && <Text style={styles.value}>{value}</Text>}
+          {(value || showChevron) && <ForwardChevron />}
+        </View>
       </View>
     </Wrapper>
   )
@@ -71,6 +71,30 @@ export function SettingsItemSwitch({
       <View style={styles.container}>
         <Title value={title} />
         <Switch testID={testID} value={value} onValueChange={onValueChange} />
+      </View>
+      {details && (
+        <View>
+          <Text style={styles.details}>{details}</Text>
+        </View>
+      )}
+    </Wrapper>
+  )
+}
+
+type SettingsExpandedItemProps = {
+  details?: string
+} & BaseProps
+
+export function SettingsExpandedItem({
+  testID,
+  title,
+  details,
+  onPress,
+}: SettingsExpandedItemProps) {
+  return (
+    <Wrapper testID={testID} onPress={onPress}>
+      <View style={styles.container}>
+        <Title value={title} />
       </View>
       {details && (
         <View>

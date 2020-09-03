@@ -1,4 +1,6 @@
 import dynamicLinks, { FirebaseDynamicLinksTypes } from '@react-native-firebase/dynamic-links'
+import { DYNAMIC_LINK_DOMAIN } from 'src/config'
+
 import Logger from 'src/utils/Logger'
 
 const TAG = 'firebase/dynamicLink'
@@ -15,7 +17,7 @@ export async function generateShortInviteLink({
   try {
     const dynamicLinkParams: FirebaseDynamicLinksTypes.DynamicLinkParameters = {
       link,
-      domainUriPrefix: 'https://l.celo.org',
+      domainUriPrefix: DYNAMIC_LINK_DOMAIN,
     }
 
     if (bundleId) {

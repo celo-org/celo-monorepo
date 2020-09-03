@@ -112,6 +112,24 @@ describe('TransferConfirmationCard', () => {
     expect(tree).toMatchSnapshot()
   })
 
+  it('renders correctly for CELO withdrawal transaction drilldown', () => {
+    const props = {
+      type: TokenTransactionType.Sent,
+      addressHasChanged: false,
+      address: mockAccount,
+      comment: mockComment,
+      amount: { value: '-100', currencyCode: 'cGLD', localAmount: null },
+      fee: new BigNumber(0.01),
+    }
+
+    const tree = renderer.create(
+      <Provider store={store}>
+        <TransferConfirmationCard {...props} />
+      </Provider>
+    )
+    expect(tree).toMatchSnapshot()
+  })
+
   it('renders correctly for sent escrow transaction drilldown', () => {
     const props = {
       type: TokenTransactionType.EscrowSent,

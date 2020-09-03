@@ -4,9 +4,9 @@ import {
   hexToBuffer,
   NULL_ADDRESS,
   trimLeading0x,
-} from '@celo/utils/lib/address'
-import { concurrentMap } from '@celo/utils/lib/async'
-import { zip } from '@celo/utils/lib/collections'
+} from '@celo/base/lib/address'
+import { concurrentMap } from '@celo/base/lib/async'
+import { zip } from '@celo/base/lib/collections'
 import { fromFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { Transaction } from 'web3-eth'

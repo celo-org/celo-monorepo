@@ -12,6 +12,14 @@ library AddressLinkedList {
   using LinkedList for LinkedList.List;
   using SafeMath for uint256;
 
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
+
   function toBytes(address a) public pure returns (bytes32) {
     return bytes32(uint256(a) << 96);
   }

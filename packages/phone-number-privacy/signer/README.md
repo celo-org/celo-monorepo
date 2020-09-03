@@ -69,27 +69,21 @@ Use the following to configure the AWS Secrets Manager. To authenticate with Ama
 
 ### Setup
 
-The service requires a connection to a secret store and to a SQL database. The SQL connection parameters should be configured with the `DB_*` configs stated above. Before performing the migration below, be sure to create a database and set the name as the value in the `DB_DATABASE` environment variable.
+The service requires a connection to a secret store and to a SQL database. The SQL connection parameters should be configured with the `DB_*` configs stated above. Before starting the service, be sure to create a database and set the name as the value in the `DB_DATABASE` environment variable.
 
 #### Running locally or without docker
 
 To run without docker, or for development, start by git cloning the celo-monorepo. Next, run `yarn` from the monorepo root to install dependencies.
 
-Before the service can work, the db migrations must be run once. Set the DB env variables and then run: `yarn db:migrate`
-
 Then start the service: `yarn start`
 
 #### Running in docker
 
-Docker images for the signer service are published to Celo's [container registry on Google Cloud](https://console.cloud.google.com/gcr/images/celo-testnet/US/celo-monorepo). Search for images with tag `phone-number-privacy-*`. Then pull the image: 
+Docker images for the signer service are published to Celo's [container registry on Google Cloud](https://console.cloud.google.com/gcr/images/celo-testnet/US/celo-monorepo). Search for images with tag `phone-number-privacy-*`. Then pull the image:
 
 `docker pull us.gcr.io/celo-testnet/celo-monorepo:phone-number-privacy-{LATEST_TAG_HERE}`
 
-Before the service can work, the db migrations must be run once. So for the first run, use a run command like this:
-
-`docker run -d -p 80:8080 {ENV_VARS_HERE} --entrypoint /bin/bash {IMAGE_TAG_HERE} -c " cd /celo-phone-number-privacy/signer && yarn run db:migrate && yarn start "`
-
-For subsequent runs, this simpler command will suffice:
+To start the service, run:
 
 `docker run -d -p 80:8080 {ENV_VARS_HERE} {IMAGE_TAG_HERE}`
 
@@ -101,4 +95,4 @@ Then check on the service to make sure its running:
 
 ### Logs
 
-Error logs will be prefixed with `CELO_PNP_ERROR_XX`.  You can see a full list of them in [error.utils.ts](https://github.com/celo-org/celo-monorepo/blob/master/packages/phone-number-privacy/signer/src/common/error-utils.ts).
+Error logs will be prefixed with `CELO_PNP_ERROR_XX`. You can see a full list of them in [error.utils.ts](https://github.com/celo-org/celo-monorepo/blob/master/packages/phone-number-privacy/signer/src/common/error-utils.ts).

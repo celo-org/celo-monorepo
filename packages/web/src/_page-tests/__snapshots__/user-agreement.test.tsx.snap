@@ -216,7 +216,6 @@ exports[`UserAgreement renders 1`] = `
             dir="auto"
             href="/privacy"
             onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -266,7 +265,6 @@ You understand that you are participating in a test, and that the Celo Services 
             dir="auto"
             href="https://play.google.com/store/apps/details?id=org.celo.mobile.alfajores"
             onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -321,7 +319,6 @@ The Company reserves the right in its sole and absolute discretion to terminate 
             dir="auto"
             href="/privacy"
             onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {

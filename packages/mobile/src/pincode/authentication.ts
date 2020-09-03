@@ -19,6 +19,7 @@ import i18n from 'src/i18n'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import {
+  clearPasswordCaches,
   getCachedPassword,
   getCachedPasswordHash,
   getCachedPepper,
@@ -28,7 +29,7 @@ import {
   setCachedPepper,
   setCachedPin,
 } from 'src/pincode/PasswordCache'
-import { retrieveStoredItem, storeItem } from 'src/storage/keychain'
+import { removeStoredItem, retrieveStoredItem, storeItem } from 'src/storage/keychain'
 import Logger from 'src/utils/Logger'
 import { getWalletAsync } from 'src/web3/contracts'
 
@@ -229,4 +230,12 @@ export async function ensureCorrectPassword(
     Logger.showError(i18n.t(ErrorMessages.ACCOUNT_UNLOCK_FAILED))
     return false
   }
+}
+
+export async function removeAccountLocally(account: string) {
+  clearPasswordCaches()
+  return Promise.all([
+    removeStoredItem(STORAGE_KEYS.PEPPER),
+    removeStoredItem(passwordHashStorageKey(account)),
+  ])
 }

@@ -26,10 +26,14 @@ type NestedNavigatorParams<ParamList> = {
 
 // tslint:disable-next-line: interface-over-type-literal
 export type StackParamList = {
-  [Screens.BackupComplete]: undefined
+  [Screens.BackupComplete]:
+    | undefined
+    | {
+        navigatedFromSettings: boolean
+      }
   [Screens.BackupIntroduction]:
     | {
-        fromSettings?: boolean
+        navigatedFromSettings?: boolean
       }
     | undefined
   [Screens.AccountKeyEducation]:
@@ -37,8 +41,16 @@ export type StackParamList = {
     | {
         nextScreen: keyof StackParamList
       }
-  [Screens.BackupPhrase]: undefined
-  [Screens.BackupQuiz]: undefined
+  [Screens.BackupPhrase]:
+    | undefined
+    | {
+        navigatedFromSettings: boolean
+      }
+  [Screens.BackupQuiz]:
+    | undefined
+    | {
+        navigatedFromSettings: boolean
+      }
   [Screens.BackupSocial]: undefined
   [Screens.BackupSocialIntro]: {
     incomingFromBackupFlow: boolean
@@ -118,6 +130,11 @@ export type StackParamList = {
         nextScreen: keyof StackParamList
       }
     | undefined
+  [Screens.LanguageModal]:
+    | {
+        nextScreen: keyof StackParamList
+      }
+    | undefined
   [Screens.Licenses]: undefined
   [Screens.Main]: undefined
   [Screens.OutgoingPaymentRequestListScreen]: undefined
@@ -166,7 +183,9 @@ export type StackParamList = {
     isFromScan?: boolean
   }
   [Screens.SetClock]: undefined
-  [Screens.Settings]: { promptFornoModal: boolean } | undefined
+  [Screens.Settings]:
+    | { promptFornoModal?: boolean; promptConfirmRemovalModal?: boolean }
+    | undefined
   [Screens.Support]: undefined
   [Screens.SupportContact]: undefined
   [Screens.Sync]: undefined
@@ -187,13 +206,23 @@ export type StackParamList = {
     isOutgoingPaymentRequest?: true
     requesterAddress?: string
   }
-  [Screens.VerificationEducationScreen]: { showSkipDialog: boolean } | undefined
+  [Screens.VerificationEducationScreen]:
+    | { showSkipDialog?: boolean; hideOnboardingStep?: boolean }
+    | undefined
   [Screens.VerificationInputScreen]: { showHelpDialog: boolean } | undefined
-  [Screens.VerificationLoadingScreen]: undefined
+  [Screens.VerificationLoadingScreen]: { withoutRevealing: boolean }
   [Screens.OnboardingEducationScreen]: undefined
   [Screens.OnboardingSuccessScreen]: undefined
   [Screens.WalletHome]: undefined
   [Screens.Welcome]: undefined
+  [Screens.WithdrawCeloQrScannerScreen]: {
+    onAddressScanned: (address: string) => void
+  }
+  [Screens.WithdrawCeloReviewScreen]: {
+    amount: BigNumber
+    recipientAddress: string
+  }
+  [Screens.WithdrawCeloScreen]: undefined
 }
 
 // tslint:disable-next-line: interface-over-type-literal

@@ -12,8 +12,8 @@ import {
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { concurrentMap } from '@celo/utils/lib/async'
+import { zip } from '@celo/utils/lib/collections'
 import { fixed1, multiply, toFixed } from '@celo/utils/lib/fixidity'
-import { zip } from '@celo/utils/src/collections'
 import BigNumber from 'bignumber.js'
 import { keccak256 } from 'ethereumjs-util'
 import {

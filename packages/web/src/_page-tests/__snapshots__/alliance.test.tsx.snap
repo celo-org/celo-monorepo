@@ -3697,7 +3697,6 @@ exports[`Alliance renders 1`] = `
                 dir="auto"
                 href="https://medium.com/celoorg/how-to-design-for-all-stories-from-tanzania-refugees-8b34594d64ae"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -4142,7 +4141,6 @@ exports[`Alliance renders 1`] = `
                 dir="auto"
                 href="https://medium.com/celoorg/a-cryptocurrency-for-every-juan-144144e62d5"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -6653,7 +6651,6 @@ exports[`Alliance renders 1`] = `
               dir="auto"
               href="https://medium.com/celoOrg"
               onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
