@@ -28,5 +28,5 @@ export const EXCHANGE_ICONS_PKG_TRACKING: Tracker = {
 export const VOICE_DOC_TRACKING: Tracker = { name: 'Celo Voice Doc', type: AssetTypes.logo }
 
 export async function trackDownload({ name, type }: Tracker) {
-  await analytics.track(`${name} Downloaded`, { assetType: type, scope: 'brand-kit' })
+  await analytics.track(`${name} Downloaded`, `brand-kit: ${type}`)
 }
