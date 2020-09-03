@@ -40,7 +40,7 @@
     "@types/supertest": "^2.0.9",
     "dotenv": "^8.2.0",
     "supertest": "^4.0.2",
-    "ts-node": "^8.3.0",
+    "ts-node": "8.3.0",
     "typescript": "^3.8.3"
   },
   "peerDependencies": {

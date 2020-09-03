@@ -16,6 +16,9 @@
     "gitbook-plugin-theme-default": "^1.0.7",
     "gitbook-plugin-youtube": "^2.0.0"
   },
+  "resolutions": {
+    "gitbook-cli/npm": "^6.14.8"
+  },
   "scripts": {
     "build": "gitbook install && gitbook build",
     "lint": "remark -qf -u validate-links --ignore-pattern developer-resources/contractkit/reference --ignore-pattern _book .",
