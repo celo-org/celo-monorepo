@@ -208,10 +208,10 @@ class ValidatorsList extends React.PureComponent<Props, State> {
           const votesPer = new BigNumber(votes).dividedBy(receivableVotes).multipliedBy(100)
           const votesAbsolutePer = receivableVotesPer.multipliedBy(votesPer).dividedBy(100)
           const totalFulfilled = affiliates.edges.reduce((acc, obj) => {
-            return acc + obj.node.attestationsFulfilled
+            return acc + (obj.node.attestationsFulfilled || 0)
           }, 0)
           const totalRequested = affiliates.edges.reduce((acc, obj) => {
-            return acc + obj.node.attestationsRequested
+            return acc + (obj.node.attestationsRequested || 0)
           }, 0)
           return {
             attestation: Math.max(0, totalFulfilled / (totalRequested || -1)) * 100,
