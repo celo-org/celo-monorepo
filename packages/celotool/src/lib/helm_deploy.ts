@@ -16,7 +16,6 @@ import {
   getProxyName
 } from './testnet-utils'
 import { outputIncludes } from './utils'
-const generator = require('generate-password')
 
 const CLOUDSQL_SECRET_NAME = 'blockscout-cloudsql-credentials'
 const BACKUP_GCS_SECRET_NAME = 'backup-blockchain-credentials'

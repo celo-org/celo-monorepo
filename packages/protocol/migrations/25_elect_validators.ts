@@ -76,7 +76,8 @@ async function lockGold(
   })
 }
 
-function mnemonicAccountOrUseFromGanache(valGroupKey: string) {
+function mnemonicAccountOrUseFromGanache(valGroupKey?: string) {
+  // If Ganache, we generate a new random account
   if (isGanache) {
     const privateKey = extraKeys.pop()
     return { address: privateKeyToAddress(privateKey), privateKey }
@@ -98,8 +99,7 @@ async function registerValidatorGroup(
   // validator group with, and set the name of the group account to the private key of this account
   // encrypted with the private key of the first validator, so that the group private key
   // can be recovered.
-  // const account = mnemonicAccountOrUseFromGanache(valGroupKey)
-  const account = { address: privateKeyToAddress(valGroupKey), privateKey: valGroupKey }
+  const account = mnemonicAccountOrUseFromGanache(valGroupKey)
 
   // We do not use web3 provided by Truffle since the eth.accounts.encrypt behaves differently
   // in the version we use elsewhere.
