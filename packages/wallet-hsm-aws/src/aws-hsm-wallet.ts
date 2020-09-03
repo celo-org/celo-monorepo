@@ -1,4 +1,4 @@
-import { Address, Signer, Wallet } from '@celo/communication'
+import { Address, ReadOnlyWallet } from '@celo/communication'
 import {
   bigNumberToBuffer,
   bufferToBigNumber,
@@ -7,7 +7,7 @@ import {
   publicKeyPrefix,
   sixtyFour,
 } from '@celo/wallet-hsm'
-import { RemoteWallet } from '@celo/wallet-remote/lib/remote-wallet'
+import { RemoteWallet } from '@celo/wallet-remote'
 import { KMS } from 'aws-sdk'
 import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
@@ -26,7 +26,7 @@ const defaultCredentials: KMS.ClientConfiguration = {
  * When using the default credentials, it's expected to set the
  * aws_access_key_id and aws_secret_access_key in ~/.aws/credentials
  */
-export default class AwsHsmWallet extends RemoteWallet implements Wallet {
+export default class AwsHsmWallet extends RemoteWallet<AwsHsmSigner> implements ReadOnlyWallet {
   private kms: KMS | undefined
   private credentials: KMS.ClientConfiguration
 
@@ -35,12 +35,12 @@ export default class AwsHsmWallet extends RemoteWallet implements Wallet {
     this.credentials = awsCredentials || defaultCredentials
   }
 
-  protected async loadAccountSigners(): Promise<Map<Address, Signer>> {
+  protected async loadAccountSigners(): Promise<Map<Address, AwsHsmSigner>> {
     if (!this.kms) {
       this.kms = this.generateKmsClient()
     }
     const { Keys } = await this.kms.listKeys().promise()
-    const addressToSigner = new Map<Address, Signer>()
+    const addressToSigner = new Map<Address, AwsHsmSigner>()
     for (const { KeyId } of Keys!) {
       if (!KeyId) {
         throw new Error(`Missing KeyId in KMS response object ${Keys!}`)

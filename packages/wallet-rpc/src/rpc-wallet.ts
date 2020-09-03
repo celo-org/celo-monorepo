@@ -1,9 +1,7 @@
-import { CeloTx, DefaultRpcCaller, Provider, RpcCaller, Signer } from '@celo/communication'
-import {
-  ensureLeading0x,
-  normalizeAddressWith0x,
-  privateKeyToAddress,
-} from '@celo/utils/lib/address'
+import { ensureLeading0x, normalizeAddressWith0x } from '@celo/base/lib/address'
+import { CeloTx, DefaultRpcCaller, Provider, RpcCaller } from '@celo/communication'
+import { privateKeyToAddress } from '@celo/utils/lib/address'
+import { UnlockableWallet } from '@celo/wallet-base'
 import { RemoteWallet } from '@celo/wallet-remote'
 import { RpcSigner } from './rpc-signer'
 
@@ -16,7 +14,7 @@ export enum RpcWalletErrors {
  *   WARNING: This class should only be used with well-permissioned providers (ie IPC)
  *   to avoid sensitive user 'privateKey' and 'passphrase' information being exposed
  */
-export class RpcWallet extends RemoteWallet {
+export class RpcWallet extends RemoteWallet<RpcSigner> implements UnlockableWallet {
   protected readonly rpc: RpcCaller
 
   constructor(protected _provider: Provider) {
@@ -24,8 +22,8 @@ export class RpcWallet extends RemoteWallet {
     this.rpc = new DefaultRpcCaller(_provider)
   }
 
-  async loadAccountSigners(): Promise<Map<string, Signer>> {
-    const addressToSigner = new Map<string, Signer>()
+  async loadAccountSigners(): Promise<Map<string, RpcSigner>> {
+    const addressToSigner = new Map<string, RpcSigner>()
     const resp = await this.rpc.call('eth_accounts', [])
     if (resp.error) {
       throw new Error(RpcWalletErrors.FetchAccounts)
@@ -49,12 +47,12 @@ export class RpcWallet extends RemoteWallet {
   }
 
   async unlockAccount(address: string, passphrase: string, duration: number) {
-    const signer = this.getSigner(address) as RpcSigner
+    const signer = this.getSigner(address)
     return signer.unlock(passphrase, duration)
   }
 
   isAccountUnlocked(address: string) {
-    const signer = this.getSigner(address) as RpcSigner
+    const signer = this.getSigner(address)
     return signer.isUnlocked()
   }
 
@@ -66,7 +64,7 @@ export class RpcWallet extends RemoteWallet {
   async signTransaction(txParams: CeloTx) {
     // Get the signer from the 'from' field
     const fromAddress = txParams.from!.toString()
-    const signer = this.getSigner(fromAddress) as RpcSigner
+    const signer = this.getSigner(fromAddress)
     return signer.signRawTransaction(txParams)
   }
 }

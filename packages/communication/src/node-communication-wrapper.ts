@@ -18,7 +18,7 @@ import { hasProperty } from './utils/provider-utils'
 import { DefaultRpcCaller, RpcCaller } from './utils/rpc-caller'
 import { TxParamsNormalizer } from './utils/tx-params-normalizer'
 import { toTxResult, TransactionResult } from './utils/tx-result'
-import { Wallet } from './wallet'
+import { ReadOnlyWallet } from './wallet'
 
 const debugGasEstimation = debugFactory('communication:gas-estimation')
 
@@ -37,7 +37,7 @@ export class NodeCommunicationWrapper {
   // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
   private currencyGasPrice: Map<Address, string> = new Map<Address, string>()
 
-  constructor(readonly web3: Web3, public wallet?: Wallet) {
+  constructor(readonly web3: Web3, public wallet?: ReadOnlyWallet) {
     this.config = {
       gasInflationFactor: 1.3,
       // gasPrice:0 means the node will compute gasPrice on its own

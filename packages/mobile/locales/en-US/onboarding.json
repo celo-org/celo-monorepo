@@ -38,15 +38,21 @@
     "label": "Invite Code",
     "codePlaceholder": "Enter invite code",
     "noCode": "Don’t have an Invite Code",
-    "nodeCodeInviteLink": "Don’t have an invite code? Request one at <0>celo.org/developers/wallet</0> or <1>continue without</1>"
+    "nodeCodeInviteLink": "Don’t have an invite code? Request one at <0>celo.org/developers/wallet</0> or <1>continue without</1>",
+    "loadingHeader": "Creating account...",
+    "loadingBody": "This can take up to 90 seconds"
   },
   "verificationEducation": {
     "title": "Confirm",
     "header": "Confirm phone number",
-    "body": "To make sure your number is really yours, we’re going to send you three messages that will cost about 0.07 cUSD each.\n\nConfirming your number takes about three minutes.",
+    "body": "To make sure your number is really yours, we’re going to send you three messages that will cost about 0.05 cUSD each.\n\nConfirming your number takes about three minutes.",
     "start": "Start",
     "resume": "Resume",
-    "learnMore": "Learn more"
+    "doINeedToConfirm": "Do I need to confirm?",
+    "skipForNow": "Skip for now",
+    "bodyInsufficientBalance": "Your current balance is not high enough to complete the verification process.\n\nPlease try again when you have added funds to your wallet.",
+    "bodyAlreadyVerified": "Your number is already confirmed!",
+    "receivedCodes": "I already received three codes"
   },
   "verificationSkipDialog": {
     "title": "Are you sure?",

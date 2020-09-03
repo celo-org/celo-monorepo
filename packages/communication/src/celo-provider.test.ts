@@ -10,12 +10,12 @@ import {
   Provider,
 } from './commons'
 import { NodeCommunicationWrapper } from './node-communication-wrapper'
-import { Wallet } from './wallet'
+import { ReadOnlyWallet } from './wallet'
 
 const ACCOUNT_ADDRESS1 = '0x1234567890123456789012345678901234567890'
 const ACCOUNT_ADDRESS2 = '0x0987654321098765432109876543210987654321'
 
-class MockWallet implements Wallet {
+class MockWallet implements ReadOnlyWallet {
   private addresses = new Array<Address>()
   addAccount(privateKey: Address): void {
     this.addresses.push(privateKey)
@@ -54,6 +54,9 @@ class MockWallet implements Wallet {
   }
   signPersonalMessage(_address: string, _data: string): Promise<string> {
     return Promise.resolve('mock')
+  }
+  decrypt(_address: string, _ciphertext: Buffer): Promise<Buffer> {
+    return Promise.resolve(new Buffer('mock'))
   }
 }
 

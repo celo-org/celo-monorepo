@@ -1,13 +1,25 @@
 import { isHexString, normalizeAddressWith0x } from '@celo/base/lib/address'
-import { Address, CeloTx, EncodedTransaction, Signer, Wallet } from '@celo/communication'
+import { Address, CeloTx, EncodedTransaction, ReadOnlyWallet, Signer } from '@celo/communication'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import * as ethUtil from 'ethereumjs-util'
 import { chainIdTransformationForSigning, encodeTransaction, rlpEncodedTx } from './signing-utils'
 
-export abstract class WalletBase implements Wallet {
+type addInMemoryAccount = (privateKey: string) => void
+type addRemoteAccount = (privateKey: string, passphrase: string) => Promise<string>
+
+export interface Wallet extends ReadOnlyWallet {
+  addAccount: addInMemoryAccount | addRemoteAccount
+}
+
+export interface UnlockableWallet extends Wallet {
+  unlockAccount: (address: string, passphrase: string, duration: number) => Promise<boolean>
+  isAccountUnlocked: (address: string) => boolean
+}
+
+export abstract class WalletBase<TSigner extends Signer> implements ReadOnlyWallet {
   // By creating the Signers in advance we can have a common pattern across wallets
   // Each implementation is responsible for populating this map through addSigner
-  private accountSigners = new Map<Address, Signer>()
+  private accountSigners = new Map<Address, TSigner>()
 
   /**
    * Gets a list of accounts that have been registered
@@ -34,7 +46,7 @@ export abstract class WalletBase implements Wallet {
    * @param address Account address
    * @param signer Account signer
    */
-  protected addSigner(address: Address, signer: Signer) {
+  protected addSigner(address: Address, signer: TSigner) {
     const normalizedAddress = normalizeAddressWith0x(address)
     this.accountSigners.set(normalizedAddress, signer)
   }
@@ -95,7 +107,7 @@ export abstract class WalletBase implements Wallet {
     return ethUtil.toRpcSig(sig.v, sig.r, sig.s)
   }
 
-  protected getSigner(address: string): Signer {
+  protected getSigner(address: string): TSigner {
     const normalizedAddress = normalizeAddressWith0x(address)
     if (!this.accountSigners.has(normalizedAddress)) {
       throw new Error(`Could not find address ${normalizedAddress}`)

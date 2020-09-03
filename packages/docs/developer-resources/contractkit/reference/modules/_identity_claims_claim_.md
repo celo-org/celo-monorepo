@@ -35,7 +35,7 @@
 
 Ƭ **Claim**: *[AttestationServiceURLClaim](_identity_claims_attestation_service_url_.md#attestationserviceurlclaim) | [DomainClaim](_identity_claims_claim_.md#domainclaim) | [KeybaseClaim](_identity_claims_claim_.md#keybaseclaim) | [NameClaim](_identity_claims_claim_.md#nameclaim) | [AccountClaim](_identity_claims_account_.md#accountclaim) | [StorageClaim](_identity_claims_claim_.md#storageclaim)*
 
-*Defined in [contractkit/src/identity/claims/claim.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L57)*
+*Defined in [packages/contractkit/src/identity/claims/claim.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L57)*
 
 ___
 
@@ -43,7 +43,7 @@ ___
 
 Ƭ **ClaimPayload**: *K extends typeof DOMAIN ? DomainClaim : K extends typeof NAME ? NameClaim : K extends typeof KEYBASE ? KeybaseClaim : K extends typeof ATTESTATION_SERVICE_URL ? AttestationServiceURLClaim : K extends typeof ACCOUNT ? AccountClaim : StorageClaim*
 
-*Defined in [contractkit/src/identity/claims/claim.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L65)*
+*Defined in [packages/contractkit/src/identity/claims/claim.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L65)*
 
 ___
 
@@ -51,7 +51,7 @@ ___
 
 Ƭ **DomainClaim**: *t.TypeOf‹typeof DomainClaimType›*
 
-*Defined in [contractkit/src/identity/claims/claim.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L54)*
+*Defined in [packages/contractkit/src/identity/claims/claim.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L54)*
 
 ___
 
@@ -59,7 +59,7 @@ ___
 
 Ƭ **KeybaseClaim**: *t.TypeOf‹typeof KeybaseClaimType›*
 
-*Defined in [contractkit/src/identity/claims/claim.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L18)*
+*Defined in [packages/contractkit/src/identity/claims/claim.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L18)*
 
 ___
 
@@ -67,7 +67,7 @@ ___
 
 Ƭ **NameClaim**: *t.TypeOf‹typeof NameClaimType›*
 
-*Defined in [contractkit/src/identity/claims/claim.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L55)*
+*Defined in [packages/contractkit/src/identity/claims/claim.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L55)*
 
 ___
 
@@ -75,7 +75,7 @@ ___
 
 Ƭ **StorageClaim**: *t.TypeOf‹typeof StorageClaimType›*
 
-*Defined in [contractkit/src/identity/claims/claim.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L56)*
+*Defined in [packages/contractkit/src/identity/claims/claim.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L56)*
 
 ## Variables
 
@@ -90,7 +90,7 @@ ___
   StorageClaimType,
 ])
 
-*Defined in [contractkit/src/identity/claims/claim.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L39)*
+*Defined in [packages/contractkit/src/identity/claims/claim.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L39)*
 
 ___
 
@@ -98,7 +98,7 @@ ___
 
 • **DOMAIN_TXT_HEADER**: *"celo-site-verification"* = "celo-site-verification"
 
-*Defined in [contractkit/src/identity/claims/claim.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L53)*
+*Defined in [packages/contractkit/src/identity/claims/claim.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L53)*
 
 ___
 
@@ -111,7 +111,7 @@ ___
   username: t.string,
 })
 
-*Defined in [contractkit/src/identity/claims/claim.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L12)*
+*Defined in [packages/contractkit/src/identity/claims/claim.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L12)*
 
 ___
 
@@ -122,7 +122,7 @@ ___
   signature: SignatureType,
 })
 
-*Defined in [contractkit/src/identity/claims/claim.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L48)*
+*Defined in [packages/contractkit/src/identity/claims/claim.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L48)*
 
 ## Functions
 
@@ -130,7 +130,7 @@ ___
 
 ▸ **createDomainClaim**(`domain`: string): *[DomainClaim](_identity_claims_claim_.md#domainclaim)*
 
-*Defined in [contractkit/src/identity/claims/claim.ts:116](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L116)*
+*Defined in [packages/contractkit/src/identity/claims/claim.ts:116](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L116)*
 
 **Parameters:**
 
@@ -146,7 +146,7 @@ ___
 
 ▸ **createNameClaim**(`name`: string): *[NameClaim](_identity_claims_claim_.md#nameclaim)*
 
-*Defined in [contractkit/src/identity/claims/claim.ts:110](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L110)*
+*Defined in [packages/contractkit/src/identity/claims/claim.ts:110](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L110)*
 
 **Parameters:**
 
@@ -162,7 +162,7 @@ ___
 
 ▸ **createStorageClaim**(`storageURL`: string): *[StorageClaim](_identity_claims_claim_.md#storageclaim)*
 
-*Defined in [contractkit/src/identity/claims/claim.ts:122](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L122)*
+*Defined in [packages/contractkit/src/identity/claims/claim.ts:122](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L122)*
 
 **Parameters:**
 
@@ -178,7 +178,7 @@ ___
 
 ▸ **hashOfClaim**(`claim`: [Claim](_identity_claims_claim_.md#claim)): *string*
 
-*Defined in [contractkit/src/identity/claims/claim.ts:97](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L97)*
+*Defined in [packages/contractkit/src/identity/claims/claim.ts:97](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L97)*
 
 **Parameters:**
 
@@ -194,7 +194,7 @@ ___
 
 ▸ **hashOfClaims**(`claims`: [Claim](_identity_claims_claim_.md#claim)[]): *string*
 
-*Defined in [contractkit/src/identity/claims/claim.ts:101](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L101)*
+*Defined in [packages/contractkit/src/identity/claims/claim.ts:101](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L101)*
 
 **Parameters:**
 
@@ -210,7 +210,7 @@ ___
 
 ▸ **isOfType**<**K**>(`type`: K): *(Anonymous function)*
 
-*Defined in [contractkit/src/identity/claims/claim.ts:77](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L77)*
+*Defined in [packages/contractkit/src/identity/claims/claim.ts:77](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L77)*
 
 **Type parameters:**
 
@@ -230,7 +230,7 @@ ___
 
 ▸ **serializeClaim**(`claim`: [Claim](_identity_claims_claim_.md#claim)): *string*
 
-*Defined in [contractkit/src/identity/claims/claim.ts:106](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L106)*
+*Defined in [packages/contractkit/src/identity/claims/claim.ts:106](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L106)*
 
 **Parameters:**
 
@@ -246,7 +246,7 @@ ___
 
 ▸ **validateClaim**(`kit`: [ContractKit](../classes/_kit_.contractkit.md), `claim`: [Claim](_identity_claims_claim_.md#claim), `address`: string): *Promise‹undefined | string›*
 
-*Defined in [contractkit/src/identity/claims/claim.ts:87](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L87)*
+*Defined in [packages/contractkit/src/identity/claims/claim.ts:87](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/claim.ts#L87)*
 
 Validates a claim made by an account, i.e. whether the claim is usable
 

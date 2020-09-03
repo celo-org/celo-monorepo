@@ -1,4 +1,5 @@
 import { Address } from '@celo/base/lib/address'
+import fetch from 'cross-fetch'
 import { isLeft } from 'fp-ts/lib/Either'
 import { ContractKit } from '../../kit'
 import { IdentityMetadataWrapper } from '../metadata'

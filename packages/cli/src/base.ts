@@ -1,4 +1,4 @@
-import { Wallet } from '@celo/communication'
+import { ReadOnlyWallet } from '@celo/communication'
 import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { AzureHSMWallet } from '@celo/wallet-hsm-azure'
 import { AddressValidation, newLedgerWalletWithSetup } from '@celo/wallet-ledger'
@@ -8,7 +8,7 @@ import { Command, flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
 import net from 'net'
 import Web3 from 'web3'
-import { getNodeUrl } from './utils/config'
+import { getGasCurrency, getNodeUrl } from './utils/config'
 import { requireNodeIsSynced } from './utils/helpers'
 
 // Base for commands that do not need web3.
@@ -34,17 +34,25 @@ export abstract class LocalCommand extends Command {
   }
 }
 
+export enum GasOptions {
+  celo = 'celo',
+  CELO = 'celo',
+  cusd = 'cusd',
+  cUSD = 'cusd',
+  auto = 'auto',
+  Auto = 'auto',
+}
+
 // tslint:disable-next-line:max-classes-per-file
 export abstract class BaseCommand extends LocalCommand {
   static flags = {
     ...LocalCommand.flags,
     privateKey: flags.string({ hidden: true }),
     node: flags.string({ char: 'n', hidden: true }),
-    usdGas: flags.boolean({
-      default: false,
-      description: 'If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD',
-      // TODO: remove once feeCurrency is implemented in ledger app
-      exclusive: ['useLedger'],
+    gasCurrency: flags.enum({
+      options: Object.keys(GasOptions),
+      description:
+        "Use a specific gas currency for transaction fees (defaults to 'auto' which uses whatever feeCurrency is available)",
     }),
     useLedger: flags.boolean({
       default: false,
@@ -99,7 +107,7 @@ export abstract class BaseCommand extends LocalCommand {
 
   private _web3: Web3 | null = null
   private _kit: ContractKit | null = null
-  private _wallet?: Wallet
+  private _wallet?: ReadOnlyWallet
 
   get web3() {
     if (!this._web3) {
@@ -169,9 +177,27 @@ export abstract class BaseCommand extends LocalCommand {
     } else {
       this._wallet = new LocalWallet()
     }
-    await this.kit.setFeeCurrency(
-      res.flags.usdGas ? CeloContract.StableToken : CeloContract.GoldToken
-    )
+
+    if (res.flags.from) {
+      this.kit.defaultAccount = res.flags.from
+    }
+
+    const gasCurrencyConfig = res.flags.gasCurrency
+      ? GasOptions[res.flags.gasCurrency as keyof typeof GasOptions]
+      : getGasCurrency(this.config.configDir)
+
+    const setUsdGas = async () => {
+      await this.kit.setFeeCurrency(CeloContract.StableToken)
+      await this.kit.updateGasPriceInCommunicationLayer(CeloContract.StableToken)
+    }
+    if (gasCurrencyConfig === GasOptions.cUSD) {
+      await setUsdGas()
+    } else if (gasCurrencyConfig === GasOptions.auto && this.kit.defaultAccount) {
+      const balances = await this.kit.getTotalBalance(this.kit.defaultAccount)
+      if (balances.CELO.isZero()) {
+        await setUsdGas()
+      }
+    }
   }
 
   finally(arg: Error | undefined): Promise<any> {

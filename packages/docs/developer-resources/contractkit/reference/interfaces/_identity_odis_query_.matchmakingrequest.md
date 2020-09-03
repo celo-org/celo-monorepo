@@ -15,7 +15,7 @@
 * [contactPhoneNumbers](_identity_odis_query_.matchmakingrequest.md#contactphonenumbers)
 * [hashedPhoneNumber](_identity_odis_query_.matchmakingrequest.md#hashedphonenumber)
 * [userPhoneNumber](_identity_odis_query_.matchmakingrequest.md#userphonenumber)
-* [version](_identity_odis_query_.matchmakingrequest.md#version)
+* [version](_identity_odis_query_.matchmakingrequest.md#optional-version)
 
 ## Properties
 
@@ -25,7 +25,7 @@
 
 *Inherited from [PhoneNumberPrivacyRequest](_identity_odis_query_.phonenumberprivacyrequest.md).[account](_identity_odis_query_.phonenumberprivacyrequest.md#account)*
 
-*Defined in [contractkit/src/identity/odis/query.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L31)*
+*Defined in [packages/contractkit/src/identity/odis/query.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L32)*
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 *Inherited from [PhoneNumberPrivacyRequest](_identity_odis_query_.phonenumberprivacyrequest.md).[authenticationMethod](_identity_odis_query_.phonenumberprivacyrequest.md#authenticationmethod)*
 
-*Defined in [contractkit/src/identity/odis/query.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L33)*
+*Defined in [packages/contractkit/src/identity/odis/query.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L33)*
 
 ___
 
@@ -43,7 +43,7 @@ ___
 
 • **contactPhoneNumbers**: *string[]*
 
-*Defined in [contractkit/src/identity/odis/query.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L44)*
+*Defined in [packages/contractkit/src/identity/odis/query.ts:45](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L45)*
 
 ___
 
@@ -51,7 +51,7 @@ ___
 
 • **hashedPhoneNumber**: *string*
 
-*Defined in [contractkit/src/identity/odis/query.ts:45](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L45)*
+*Defined in [packages/contractkit/src/identity/odis/query.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L46)*
 
 ___
 
@@ -59,14 +59,14 @@ ___
 
 • **userPhoneNumber**: *string*
 
-*Defined in [contractkit/src/identity/odis/query.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L43)*
+*Defined in [packages/contractkit/src/identity/odis/query.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L44)*
 
 ___
 
-###  version
+### `Optional` version
 
-• **version**: *string*
+• **version**? : *undefined | string*
 
-*Inherited from [PhoneNumberPrivacyRequest](_identity_odis_query_.phonenumberprivacyrequest.md).[version](_identity_odis_query_.phonenumberprivacyrequest.md#version)*
+*Inherited from [PhoneNumberPrivacyRequest](_identity_odis_query_.phonenumberprivacyrequest.md).[version](_identity_odis_query_.phonenumberprivacyrequest.md#optional-version)*
 
-*Defined in [contractkit/src/identity/odis/query.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L32)*
+*Defined in [packages/contractkit/src/identity/odis/query.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L34)*

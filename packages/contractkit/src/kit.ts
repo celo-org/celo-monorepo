@@ -1,4 +1,4 @@
-import { Address, NodeCommunicationWrapper } from '@celo/communication'
+import { Address, NodeCommunicationWrapper, ReadOnlyWallet } from '@celo/communication'
 import { BigNumber } from 'bignumber.js'
 import Web3 from 'web3'
 import { AddressRegistry } from './address-registry'
@@ -21,11 +21,11 @@ import { ValidatorsConfig } from './wrappers/Validators'
  * Creates a new instance of the `ContractKit` with a web3 instance
  * @param web3 Web3 instance
  */
-export function newKitFromWeb3(web3: Web3): ContractKit {
+export function newKitFromWeb3(web3: Web3, wallet?: ReadOnlyWallet) {
   if (!web3.currentProvider) {
     throw new Error('Must have a valid Provider')
   }
-  return new ContractKit(new NodeCommunicationWrapper(web3))
+  return new ContractKit(new NodeCommunicationWrapper(web3, wallet))
 }
 
 export interface NetworkConfig {

@@ -1,5 +1,4 @@
-import { CeloTx, EncodedTransaction, Signer, Wallet } from '@celo/communication'
-import { Address } from '@celo/utils/lib/address'
+import { Address, CeloTx, EncodedTransaction, ReadOnlyWallet, Signer } from '@celo/communication'
 import { sleep } from '@celo/utils/lib/async'
 import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import { WalletBase } from '@celo/wallet-base'
@@ -7,7 +6,8 @@ import { WalletBase } from '@celo/wallet-base'
 /**
  * Abstract class representing a remote wallet that requires async initialization
  */
-export abstract class RemoteWallet extends WalletBase implements Wallet {
+export abstract class RemoteWallet<TSigner extends Signer> extends WalletBase<TSigner>
+  implements ReadOnlyWallet {
   private setupFinished = false
   private setupLocked = false
   private INIT_TIMEOUT_IN_MS = 10 * 1000
@@ -52,7 +52,7 @@ export abstract class RemoteWallet extends WalletBase implements Wallet {
   /**
    * Discover accounts and store mapping in accountSigners
    */
-  protected abstract async loadAccountSigners(): Promise<Map<Address, Signer>>
+  protected abstract async loadAccountSigners(): Promise<Map<Address, TSigner>>
 
   /**
    * Get a list of accounts in the remote wallet

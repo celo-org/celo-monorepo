@@ -12,7 +12,7 @@
 
 ▸ **zeroRange**(`to`: number): *number[]*
 
-*Defined in [contractkit/src/utils/array.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/array.ts#L7)*
+*Defined in [packages/contractkit/src/utils/array.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/array.ts#L7)*
 
 Returns an array [0, 1, ..., to - 1]
 

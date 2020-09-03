@@ -21,7 +21,7 @@
 
 • **blindMessage**: *function*
 
-*Defined in [contractkit/src/identity/odis/bls-blinding-client.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/bls-blinding-client.ts#L4)*
+*Defined in [packages/contractkit/src/identity/odis/bls-blinding-client.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/bls-blinding-client.ts#L4)*
 
 #### Type declaration:
 
@@ -39,7 +39,7 @@ ___
 
 • **unblindAndVerifyMessage**: *function*
 
-*Defined in [contractkit/src/identity/odis/bls-blinding-client.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/bls-blinding-client.ts#L5)*
+*Defined in [packages/contractkit/src/identity/odis/bls-blinding-client.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/bls-blinding-client.ts#L5)*
 
 #### Type declaration:
 

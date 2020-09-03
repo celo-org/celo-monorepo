@@ -1,6 +1,5 @@
-import { Signer, Wallet } from '@celo/communication'
+import { Address, ReadOnlyWallet } from '@celo/communication'
 import { CELO_DERIVATION_PATH_BASE } from '@celo/utils/lib/account'
-import { Address } from '@celo/utils/lib/address'
 import { RemoteWallet } from '@celo/wallet-remote'
 import { TransportError, TransportStatusError } from '@ledgerhq/errors'
 import Ledger from '@ledgerhq/hw-app-eth'
@@ -41,7 +40,7 @@ export async function newLedgerWalletWithSetup(
 
 const debug = debugFactory('kit:wallet:ledger')
 
-export class LedgerWallet extends RemoteWallet implements Wallet {
+export class LedgerWallet extends RemoteWallet<LedgerSigner> implements ReadOnlyWallet {
   private ledger: any
 
   /**
@@ -67,12 +66,12 @@ export class LedgerWallet extends RemoteWallet implements Wallet {
     }
   }
 
-  protected async loadAccountSigners(): Promise<Map<Address, Signer>> {
+  protected async loadAccountSigners(): Promise<Map<Address, LedgerSigner>> {
     if (!this.ledger) {
       this.ledger = this.generateNewLedger(this.transport)
     }
     debug('Fetching addresses from the ledger')
-    let addressToSigner = new Map<Address, Signer>()
+    let addressToSigner = new Map<Address, LedgerSigner>()
     try {
       addressToSigner = await this.retrieveAccounts()
     } catch (error) {
@@ -89,8 +88,8 @@ export class LedgerWallet extends RemoteWallet implements Wallet {
     return new Ledger(transport)
   }
 
-  private async retrieveAccounts(): Promise<Map<Address, Signer>> {
-    const addressToSigner = new Map<Address, Signer>()
+  private async retrieveAccounts(): Promise<Map<Address, LedgerSigner>> {
+    const addressToSigner = new Map<Address, LedgerSigner>()
     const appConfiguration = await this.retrieveAppConfiguration()
     const validationRequired = this.ledgerAddressValidation === AddressValidation.initializationOnly
 

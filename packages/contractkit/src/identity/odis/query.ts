@@ -2,6 +2,7 @@
 
 import { hexToBuffer, trimLeading0x } from '@celo/base/lib/address'
 import { selectiveRetryAsyncWithBackOff } from '@celo/base/lib/async'
+import fetch from 'cross-fetch'
 import debugFactory from 'debug'
 import { ec as EC } from 'elliptic'
 import { ContractKit } from '../../kit'
@@ -29,8 +30,8 @@ export enum AuthenticationMethod {
 
 export interface PhoneNumberPrivacyRequest {
   account: string
-  version: string
   authenticationMethod: AuthenticationMethod
+  version?: string
 }
 
 export interface SignMessageRequest extends PhoneNumberPrivacyRequest {

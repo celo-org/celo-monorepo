@@ -24,6 +24,7 @@ import { ExchangeRatePair, exchangeRatePairSelector } from 'src/exchange/reducer
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { sendPaymentOrInviteSuccess } from 'src/send/actions'
 import { convertToContractDecimals, createTokenTransferTransaction } from 'src/tokens/saga'
 import { addStandbyTransaction, removeStandbyTransaction } from 'src/transactions/actions'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
@@ -33,7 +34,11 @@ import {
   TransactionContext,
   TransactionStatus,
 } from 'src/transactions/types'
-import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange'
+import {
+  getRateForMakerToken,
+  getTakerAmount,
+  goldToDollarAmount,
+} from 'src/utils/currencyExchange'
 import { roundDown } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
@@ -348,6 +353,16 @@ function* createStandbyTx(
   return context
 }
 
+function* celoToDollarAmount(amount: BigNumber) {
+  const exchangeRatePair: ExchangeRatePair = yield select(exchangeRatePairSelector)
+  const exchangeRate = getRateForMakerToken(
+    exchangeRatePair,
+    CURRENCY_ENUM.DOLLAR,
+    CURRENCY_ENUM.GOLD
+  )
+  return goldToDollarAmount(amount, exchangeRate) || new BigNumber(0)
+}
+
 function* withdrawCelo(action: WithdrawCeloAction) {
   let context: TransactionContext | null = null
   try {
@@ -381,6 +396,10 @@ function* withdrawCelo(action: WithdrawCeloAction) {
     )
 
     yield call(sendAndMonitorTransaction, tx, account, context, CURRENCY_ENUM.GOLD)
+
+    const dollarAmount = yield call(celoToDollarAmount, amount)
+    yield put(sendPaymentOrInviteSuccess(dollarAmount))
+
     ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_completed, {
       amount: amount.toString(),
     })

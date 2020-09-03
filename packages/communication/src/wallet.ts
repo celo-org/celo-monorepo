@@ -1,12 +1,13 @@
 import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import { Address, CeloTx, EncodedTransaction, RLPEncodedTx } from './commons'
 
-export interface Wallet {
+export interface ReadOnlyWallet {
   getAccounts: () => Address[]
   hasAccount: (address?: Address) => boolean
   signTransaction: (txParams: CeloTx) => Promise<EncodedTransaction>
   signTypedData: (address: Address, typedData: EIP712TypedData) => Promise<string>
   signPersonalMessage: (address: Address, data: string) => Promise<string>
+  decrypt: (address: Address, ciphertext: Buffer) => Promise<Buffer>
 }
 
 export interface Signer {

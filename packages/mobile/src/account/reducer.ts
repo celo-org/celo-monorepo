@@ -23,6 +23,7 @@ export interface State {
   socialBackupCompleted: boolean
   dismissedInviteFriends: boolean
   dismissedGetVerified: boolean
+  dismissedGoldEducation: boolean
   promptFornoIfNeeded: boolean
   retryVerificationWithForno: boolean
   acceptedTerms: boolean
@@ -59,6 +60,7 @@ export const initialState = {
   socialBackupCompleted: false,
   dismissedInviteFriends: false,
   dismissedGetVerified: false,
+  dismissedGoldEducation: false,
   promptFornoIfNeeded: false,
   acceptedTerms: false,
   retryVerificationWithForno: features.VERIFICATION_FORNO_RETRY,
@@ -180,6 +182,11 @@ export const reducer = (
       return {
         ...state,
         dismissedGetVerified: true,
+      }
+    case Actions.DISMISS_GOLD_EDUCATION:
+      return {
+        ...state,
+        dismissedGoldEducation: true,
       }
     case Actions.SET_USER_CONTACT_DETAILS:
       return {
