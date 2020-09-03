@@ -45,7 +45,7 @@ export function parseUri(uri: string): CeloTx {
       const functionSig = abi.encodeFunctionSignature(namedGroups.function)
       tx.data = functionSig
 
-      if (namedGroups.inputTypes !== undefined) {
+      if (namedGroups.inputTypes != null && namedGroups.inputTypes !== '') {
         const abiTypes = namedGroups.inputTypes.split(',')
         const rawArgs = (parsedQuery.args || '[]') as string
         const builtArgs = rawArgs.slice(1, rawArgs.length - 1).split(',')

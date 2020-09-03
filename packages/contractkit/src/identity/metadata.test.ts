@@ -13,7 +13,10 @@ testWithGanache('Metadata', (web3) => {
   test('correctly recovers the claims when signed by the account', async () => {
     const name = 'Celo'
     const metadata = IdentityMetadataWrapper.fromEmpty(address)
-    await metadata.addClaim(createNameClaim(name), NativeSigner(kit.communication.sign, address))
+    await metadata.addClaim(
+      createNameClaim(name),
+      NativeSigner(kit.communication.web3.eth.sign, address)
+    )
     const serializedMetadata = metadata.toString()
     const parsedMetadata = await IdentityMetadataWrapper.fromRawString(kit, serializedMetadata)
     const nameClaim = parsedMetadata.findClaim(ClaimTypes.NAME)
@@ -45,7 +48,10 @@ testWithGanache('Metadata', (web3) => {
       } else if (action === 'attestation') {
         await (await accounts.authorizeAttestationSigner(signer, pop)).send({ from: address })
       }
-      await metadata.addClaim(createNameClaim(name), NativeSigner(kit.communication.sign, signer))
+      await metadata.addClaim(
+        createNameClaim(name),
+        NativeSigner(kit.communication.web3.eth.sign, signer)
+      )
       const serializedMetadata = metadata.toString()
       const parsedMetadata = await IdentityMetadataWrapper.fromRawString(kit, serializedMetadata)
       const nameClaim = parsedMetadata.findClaim(ClaimTypes.NAME)
@@ -63,7 +69,7 @@ testWithGanache('Metadata', (web3) => {
     const metadata = IdentityMetadataWrapper.fromEmpty(address)
     await metadata.addClaim(
       createNameClaim(name),
-      NativeSigner(kit.communication.sign, otherAddress)
+      NativeSigner(kit.communication.web3.eth.sign, otherAddress)
     )
     const serializedMetadata = metadata.toString()
     try {

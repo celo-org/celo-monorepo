@@ -303,7 +303,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     return {
       name,
       address,
-      members: res[0],
+      members: Array.from(res[0]),
       commission: fromFixed(new BigNumber(res[1])),
       nextCommission: fromFixed(new BigNumber(res[2])),
       nextCommissionBlock: new BigNumber(res[3]),

@@ -49,7 +49,7 @@ export async function getAgeOfLatestBlock() {
 export async function isAttestationSignerUnlocked() {
   // The only way to see if a key is unlocked is to try to sign something
   try {
-    await kit.communication.sign('DO_NOT_USE', getAttestationSignerAddress())
+    await kit.communication.web3.eth.sign('DO_NOT_USE', getAttestationSignerAddress())
     return true
   } catch {
     return false

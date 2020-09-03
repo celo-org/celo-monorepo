@@ -187,7 +187,7 @@ export class NodeCommunicationWrapper {
    */
   async sendTransaction(tx: CeloTx): Promise<TransactionResult> {
     tx = this.fillTxDefaults(tx)
-    await this.fillGasPrice(tx)
+    tx = this.fillGasPrice(tx)
 
     let gas = tx.gas
     if (gas == null) {
@@ -207,7 +207,7 @@ export class NodeCommunicationWrapper {
     tx?: Omit<CeloTx, 'data'>
   ): Promise<TransactionResult> {
     tx = this.fillTxDefaults(tx)
-    await this.fillGasPrice(tx)
+    tx = this.fillGasPrice(tx)
 
     let gas = tx.gas
     if (gas == null) {
@@ -233,7 +233,7 @@ export class NodeCommunicationWrapper {
   }
 
   // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
-  async fillGasPrice(tx: CeloTx): Promise<CeloTx> {
+  fillGasPrice(tx: CeloTx): CeloTx {
     if (tx.feeCurrency && tx.gasPrice === '0' && this.currencyGasPrice.has(tx.feeCurrency)) {
       return {
         ...tx,
@@ -357,10 +357,6 @@ export class NodeCommunicationWrapper {
 
   async getTransactionReceipt(txhash: string): Promise<CeloTxReceipt> {
     return this.web3.eth.getTransactionReceipt(txhash)
-  }
-
-  async sign(dataToSign: string, address: Address): Promise<string> {
-    return this.web3.eth.sign(dataToSign, address)
   }
 
   private fillTxDefaults(tx?: CeloTx): CeloTx {

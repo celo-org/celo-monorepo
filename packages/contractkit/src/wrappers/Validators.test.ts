@@ -55,7 +55,10 @@ testWithGanache('Validators Wrapper', (web3) => {
 
   const setupValidator = async (validatorAccount: string) => {
     await registerAccountWithLockedGold(validatorAccount)
-    const ecdsaPublicKey = await addressToPublicKey(validatorAccount, kit.communication.sign)
+    const ecdsaPublicKey = await addressToPublicKey(
+      validatorAccount,
+      kit.communication.web3.eth.sign
+    )
     await validators
       // @ts-ignore
       .registerValidator(ecdsaPublicKey, blsPublicKey, blsPoP)
@@ -123,6 +126,7 @@ testWithGanache('Validators Wrapper', (web3) => {
   })
 
   describe('SBAT reorderMember', () => {
+    jest.setTimeout(30 * 1000)
     let groupAccount: string, validator1: string, validator2: string
 
     beforeEach(async () => {

@@ -80,6 +80,7 @@ describe('kit.sendTransactionObject()', () => {
       },
     }))
     kit.contracts.getGasPriceMinimum = getGasPriceMin.bind(kit.contracts)
+    await kit.updateGasPriceInCommunicationLayer('XXX')
     const options: CeloTx = { gas: 555, feeCurrency: 'XXX', from: '0xAAFFF' }
     await kit.communication.sendTransactionObject(txo, options)
     expect(txo.send).toBeCalledWith({

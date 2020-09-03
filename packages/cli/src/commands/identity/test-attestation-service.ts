@@ -65,7 +65,7 @@ export default class TestAttestationService extends BaseCommand {
       return
     }
 
-    const signature = await this.kit.communication.sign(phoneNumber + message, address)
+    const signature = await this.kit.communication.web3.eth.sign(phoneNumber + message, address)
 
     try {
       const response = await fetch(
