@@ -52,6 +52,14 @@ export const ESCROW_PAYMENT_EXPIRY_SECONDS = 86400 // 1 days
 export const DEFAULT_TESTNET = Config.DEFAULT_TESTNET || 'integration'
 export const DAILY_PAYMENT_LIMIT_CUSD = 500
 export const SMS_RETRIEVER_APP_SIGNATURE = Config.SMS_RETRIEVER_APP_SIGNATURE
+// ODIS minimum dollar balance for pepper quota retrieval
+// TODO change this to new ODIS minimum dollar balance once deployed
+export const ODIS_MINIMUM_DOLLAR_BALANCE = 0.1
+// When user goes to VerificationEducationScreen - we fetch current verification state.
+// Then user decides on what to do and go to VerificationInputScreen.
+// If user were "deciding" for more than VERIFICATION_STATE_EXPIRY_SECONDS, then
+// we would refetch verification state before going to VerificationInputScreen
+export const VERIFICATION_STATE_EXPIRY_SECONDS = 30
 
 // TODO: remove special case for mainnet
 export const DEFAULT_FORNO_URL = `https://${
@@ -68,6 +76,14 @@ export const FORNO_ENABLED_INITIALLY = Config.FORNO_ENABLED_INITIALLY
 export const DEFAULT_SYNC_MODE: GethSyncMode = Config.DEFAULT_SYNC_MODE
   ? new BigNumber(Config.DEFAULT_SYNC_MODE).toNumber()
   : GethSyncMode.Lightest
+export const GETH_USE_FULL_NODE_DISCOVERY = stringToBoolean(
+  Config.GETH_USE_FULL_NODE_DISCOVERY || 'true'
+)
+export const GETH_USE_STATIC_NODES = stringToBoolean(Config.GETH_USE_STATIC_NODES || 'true')
+// NOTE: Development purposes only
+export const GETH_START_HTTP_RPC_SERVER = stringToBoolean(
+  Config.GETH_START_HTTP_RPC_SERVER || 'false'
+)
 
 // SECRETS
 export const SEGMENT_API_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SEGMENT_API_KEY')
@@ -79,3 +95,6 @@ export const MOONPAY_PUBLIC_KEY = keyOrUndefined(
   'MOONPAY_PUBLIC_KEY'
 )
 export const MOONPAY_RATE_API = `https://api.moonpay.io/v3/currencies/celo/price?apiKey=${MOONPAY_PUBLIC_KEY}`
+
+export const APP_STORE_ID = Config.APP_STORE_ID
+export const DYNAMIC_LINK_DOMAIN = Config.DYNAMIC_LINK_DOMAIN

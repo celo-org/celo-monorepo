@@ -201,6 +201,7 @@ exports[`renders correctly with backup not completed 1`] = `
       onChange={[Function]}
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
+      testID="backupKeySavedSwitch"
       thumbTintColor="#EDEEEF"
       trackColorForFalse="#B4B9BD"
       trackColorForTrue="#1AB775"
@@ -272,6 +273,7 @@ exports[`renders correctly with backup not completed 1`] = `
             "paddingVertical": 5,
           }
         }
+        testID="backupKeyContinue"
       >
         <Text
           style={

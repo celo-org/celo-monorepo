@@ -3,7 +3,7 @@ import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { LocalSigner } from './signers/local-signer'
 import { Wallet, WalletBase } from './wallet'
 
-export class LocalWallet extends WalletBase implements Wallet {
+export class LocalWallet extends WalletBase<LocalSigner> implements Wallet {
   /**
    * Register the private key as signer account
    * @param privateKey account private key

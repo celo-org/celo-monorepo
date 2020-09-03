@@ -18,7 +18,7 @@
 
 ▸ **write**(`_data`: string, `_dataPath`: string): *Promise‹void›*
 
-*Defined in [contractkit/src/identity/offchain/storage-writers.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/storage-writers.ts#L6)*
+*Defined in [packages/contractkit/src/identity/offchain/storage-writers.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/storage-writers.ts#L6)*
 
 **Parameters:**
 
