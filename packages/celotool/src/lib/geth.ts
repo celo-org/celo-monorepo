@@ -17,11 +17,11 @@ import { spawnCmd, spawnCmdWithExitOnFailure } from './cmd-utils'
 import { convertToContractDecimals } from './contract-utils'
 import { envVar, fetchEnv, isVmBased } from './env-utils'
 import {
-    AccountType,
-    generateGenesis,
-    generatePrivateKey,
-    privateKeyToPublicKey,
-    Validator
+  AccountType,
+  generateGenesis,
+  generatePrivateKey,
+  privateKeyToPublicKey,
+  Validator
 } from './generate_utils'
 import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
 import { GethInstanceConfig } from './interfaces/geth-instance-config'
@@ -770,7 +770,7 @@ export async function importPrivateKey(
 ) {
   const keyFile = path.join(getDatadir(getConfig.runPath, instance), 'key.txt')
 
-  fs.writeFileSync(keyFile, instance.privateKey, { flag: 'a' })
+  fs.writeFileSync(keyFile, instance.privateKey!, { flag: 'a' })
 
   if (verbose) {
     console.info(`geth:${instance.name}: import account`)
