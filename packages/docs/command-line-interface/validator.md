@@ -18,6 +18,9 @@ ARGUMENTS
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or Validator's address
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
@@ -27,9 +30,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -52,6 +52,9 @@ USAGE
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or Validator's address
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
@@ -61,9 +64,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -84,6 +84,9 @@ USAGE
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or Validator's address
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
@@ -93,9 +96,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -116,6 +116,9 @@ USAGE
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d       (required) Initiator
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)           Use a specific gas currency for transaction fees (defaults to
+                                                          'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                       [default: 1] If --useLedger is set, this will get the first N
                                                           addresses for local signing
 
@@ -125,9 +128,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses           [default: [0]] If --useLedger is set, this will get the array
                                                           of index addresses for local signing. Example
                                                           --ledgerCustomAddresses "[4,99]"
-
-  --usdGas                                                If --usdGas is set, the transaction is paid for with a
-                                                          feeCurrency of cUSD
 
   --useLedger                                             Set it to use a ledger wallet
 
@@ -149,7 +149,8 @@ USAGE
   $ celocli validator:list
 
 OPTIONS
-  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
+                                                 which uses whatever feeCurrency is available)
 
 EXAMPLE
   list
@@ -171,6 +172,9 @@ OPTIONS
   --ecdsaKey=0x                                      (required) ECDSA Public Key
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
@@ -180,9 +184,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -208,7 +209,8 @@ USAGE
   $ celocli validator:requirements
 
 OPTIONS
-  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
+                                                 which uses whatever feeCurrency is available)
 
 EXAMPLE
   requirements
@@ -228,7 +230,8 @@ ARGUMENTS
   VALIDATORADDRESS  Validator's address
 
 OPTIONS
-  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
+                                                 which uses whatever feeCurrency is available)
 
 EXAMPLE
   show 0x97f7333c51897469E8D98E7af8653aAb468050a3
@@ -246,11 +249,13 @@ USAGE
 
 OPTIONS
   --at-block=at-block                                  latest block to examine for signer activity
-  --lookback=lookback                                  [default: 120] how many blocks to look back for signer activity
-  --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) address of the signer to check for signatures
 
-  --usdGas                                             If --usdGas is set, the transaction is paid for with a
-                                                       feeCurrency of cUSD
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)        Use a specific gas currency for transaction fees (defaults to
+                                                       'auto' which uses whatever feeCurrency is available)
+
+  --lookback=lookback                                  [default: 120] how many blocks to look back for signer activity
+
+  --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) address of the signer to check for signatures
 
   --width=width                                        [default: 40] line width for printing marks
 
@@ -278,13 +283,13 @@ OPTIONS
   --end=end                                               [default: -1] what block to end at when looking at signer
                                                           activity. defaults to the latest block
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)           Use a specific gas currency for transaction fees (defaults to
+                                                          'auto' which uses whatever feeCurrency is available)
+
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     address of the signer to check if elected and validating
 
   --start=start                                           [default: -1] what block to start at when looking at signer
                                                           activity. defaults to the last 100 blocks
-
-  --usdGas                                                If --usdGas is set, the transaction is paid for with a
-                                                          feeCurrency of cUSD
 
   --validator=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  address of the validator to check if elected and validating
 
@@ -298,7 +303,7 @@ _See code: [packages/cli/src/commands/validator/status.ts](https://github.com/ce
 
 ### Update-bls-public-key
 
-Update the BLS public key for a Validator to be used in consensus. Regular (ECDSA and BLS) key rotation is recommended for Validator operational security.
+Update the BLS public key for a Validator to be used in consensus.
 
 ```
 USAGE
@@ -308,6 +313,9 @@ OPTIONS
   --blsKey=0x                                        (required) BLS Public Key
   --blsPop=0x                                        (required) BLS Proof-of-Possession
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Validator's address
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -319,10 +327,14 @@ OPTIONS
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
-
   --useLedger                                        Set it to use a ledger wallet
+
+DESCRIPTION
+  Regular (ECDSA and BLS) key rotation is recommended for Validator operational security.
+
+  WARNING: By default, the BLS key used by the validator node is derived from the ECDSA private key. As a result,
+  rotating the BLS key without rotating the ECDSA key will result in validator downtime without special configuration.
+  Use this method only if you know what you are doing.
 
 EXAMPLE
   update-bls-key --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --blsKey
