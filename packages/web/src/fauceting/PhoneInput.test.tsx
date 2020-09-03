@@ -1,7 +1,7 @@
 import { fireEvent, render } from '@testing-library/react'
 import * as React from 'react'
-import { onPress } from 'src/_page-tests/test-utils'
 import PhoneInput from 'src/fauceting/PhoneInput'
+import { onPress } from 'src/_page-tests/test-utils'
 
 describe('PhoneInput', () => {
   describe('on initial', () => {
