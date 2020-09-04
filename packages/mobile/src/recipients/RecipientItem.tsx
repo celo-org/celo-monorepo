@@ -14,8 +14,13 @@ interface Props {
 
 class RecipientItem extends React.PureComponent<Props> {
   onPress = () => {
-    const recipient = this.props.recipient
-    recipient.address = recipient.address?.toLowerCase()
+    let recipient = this.props.recipient
+    if (recipient.address) {
+      recipient = {
+        ...recipient,
+        address: recipient.address.toLowerCase(),
+      }
+    }
     this.props.onSelectRecipient(recipient)
   }
 
