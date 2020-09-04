@@ -12,12 +12,12 @@ const TAG = 'ValoraAnalytics'
 
 async function getDeviceInfo() {
   return {
-    AppName: DeviceInfo.getApplicationName(),
-    Brand: DeviceInfo.getBrand(),
-    BuildNumber: DeviceInfo.getBuildNumber(),
-    BundleId: DeviceInfo.getBundleId(),
+    AppName: await DeviceInfo.getApplicationName(),
+    Brand: await DeviceInfo.getBrand(),
+    BuildNumber: await DeviceInfo.getBuildNumber(),
+    BundleId: await DeviceInfo.getBundleId(),
     Carrier: await DeviceInfo.getCarrier(),
-    DeviceId: DeviceInfo.getDeviceId(),
+    DeviceId: await DeviceInfo.getDeviceId(),
     FirstInstallTime: await DeviceInfo.getFirstInstallTime(),
     FontScale: await DeviceInfo.getFontScale(),
     FreeDiskStorage: await DeviceInfo.getFreeDiskStorage(),
@@ -26,17 +26,18 @@ async function getDeviceInfo() {
     LastUpdateTime: await DeviceInfo.getLastUpdateTime(),
     Manufacturer: await DeviceInfo.getManufacturer(),
     MaxMemory: await DeviceInfo.getMaxMemory(),
-    Model: DeviceInfo.getModel(),
-    ReadableVersion: DeviceInfo.getReadableVersion(),
-    SystemName: DeviceInfo.getSystemName(),
-    SystemVersion: DeviceInfo.getSystemVersion(),
+    Model: await DeviceInfo.getModel(),
+    ReadableVersion: await DeviceInfo.getReadableVersion(),
+    SystemName: await DeviceInfo.getSystemName(),
+    SystemVersion: await DeviceInfo.getSystemVersion(),
     TotalDiskCapacity: await DeviceInfo.getTotalDiskCapacity(),
     TotalMemory: await DeviceInfo.getTotalMemory(),
-    UniqueID: DeviceInfo.getUniqueId(),
+    UniqueID: await DeviceInfo.getUniqueId(),
     UserAgent: await DeviceInfo.getUserAgent(),
-    Version: DeviceInfo.getVersion(),
+    Version: await DeviceInfo.getVersion(),
     isEmulator: await DeviceInfo.isEmulator(),
-    isTablet: DeviceInfo.isTablet(),
+    isTablet: await DeviceInfo.isTablet(),
+    UsedMemory: await DeviceInfo.getUsedMemory(),
   }
 }
 

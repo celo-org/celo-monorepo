@@ -134,7 +134,11 @@ class BackupPhrase extends React.Component<Props, State> {
         {(!backupCompleted || navigatedFromSettings) && (
           <>
             <View style={styles.confirmationSwitchContainer}>
-              <Switch value={isConfirmChecked} onValueChange={this.onPressConfirmSwitch} />
+              <Switch
+                value={isConfirmChecked}
+                onValueChange={this.onPressConfirmSwitch}
+                testID="backupKeySavedSwitch"
+              />
               <Text onPress={this.onPressConfirmArea} style={styles.confirmationSwitchLabel}>
                 {t('savedConfirmation')}
               </Text>
@@ -145,6 +149,7 @@ class BackupPhrase extends React.Component<Props, State> {
               text={t('global:continue')}
               size={BtnSizes.FULL}
               type={BtnTypes.SECONDARY}
+              testID="backupKeyContinue"
             />
           </>
         )}

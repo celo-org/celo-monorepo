@@ -2,7 +2,7 @@ import * as React from 'react'
 import { StyleSheet } from 'react-native'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 
-export function HelpfullLink({ text, href }) {
+export function HelpfulLink({ text, href }) {
   return (
     <Button
       kind={BTN.NAKED}

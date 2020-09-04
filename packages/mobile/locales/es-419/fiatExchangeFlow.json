@@ -5,10 +5,10 @@
   "celoDollarsAt": "Celo Dollars @ <1></1>",
   "amountCelo": "Monto (CELO)",
   "disclaimerCeloDollars": "Los valores del dólar celo son estimados.",
-  "dollarsNotYetEnabledNote": "Los dólares celos aún no están disponibles en ningún proveedor. Para obtener dólares celos, compre CELO y cámbielos por dólares celos en la pestaña CELO.",
-  "pleaseSelectProvider": "Seleccione un proveedor a continuación. Estos enlaces se conectan a un servicio de terceros.",
+  "dollarsNotYetEnabledNote": "Los Celo Dólares aún no están disponibles en ningún proveedor. Para obtener Celo Dólares, compra CELO y cámbialos por Celo Dólares dentro de Valora, bajo la pestaña CELO.",
+  "pleaseSelectProvider": "Selecciona un proveedor a continuación. Estos enlaces te conectan a un servicio de terceros.",
   "explanationModal": {
     "title": "Sobre proveedores",
-    "body": "Los proveedores le permiten agregar fondos o retirar dinero de su cuenta. Determinan sus propias tarifas y restricciones según la ubicación, la cantidad y otros factores. Visite el sitio web del proveedor para obtener ayuda específica. Visita las preguntas frecuentes para obtener más información."
+    "body": "Los proveedores le permiten agregar fondos o retirar dinero de tu cuenta. Determinan tus propias tarifas y restricciones según la ubicación, la cantidad y otros factores. Visite el sitio web del proveedor para obtener ayuda específica. Visita las preguntas frecuentes para obtener más información."
   }
 }

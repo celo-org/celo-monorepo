@@ -7,8 +7,7 @@ import { bigNumberToBuffer, bufferToBigNumber } from '../utils/signature-utils'
 import { getAddressFromPublicKey, publicKeyPrefix, sixtyFour } from '../utils/signing-utils'
 import { RemoteWallet } from './remote-wallet'
 import AwsHsmSigner from './signers/aws-hsm-signer'
-import { Signer } from './signers/signer'
-import { Wallet } from './wallet'
+import { ReadOnlyWallet } from './wallet'
 
 const debug = debugFactory('kit:wallet:aws-hsm-wallet')
 
@@ -23,7 +22,7 @@ const defaultCredentials: KMS.ClientConfiguration = {
  * When using the default credentials, it's expected to set the
  * aws_access_key_id and aws_secret_access_key in ~/.aws/credentials
  */
-export default class AwsHsmWallet extends RemoteWallet implements Wallet {
+export default class AwsHsmWallet extends RemoteWallet<AwsHsmSigner> implements ReadOnlyWallet {
   private kms: KMS | undefined
   private credentials: KMS.ClientConfiguration
 
@@ -32,12 +31,12 @@ export default class AwsHsmWallet extends RemoteWallet implements Wallet {
     this.credentials = awsCredentials || defaultCredentials
   }
 
-  protected async loadAccountSigners(): Promise<Map<Address, Signer>> {
+  protected async loadAccountSigners(): Promise<Map<Address, AwsHsmSigner>> {
     if (!this.kms) {
       this.kms = this.generateKmsClient()
     }
     const { Keys } = await this.kms.listKeys().promise()
-    const addressToSigner = new Map<Address, Signer>()
+    const addressToSigner = new Map<Address, AwsHsmSigner>()
     for (const { KeyId } of Keys!) {
       if (!KeyId) {
         throw new Error(`Missing KeyId in KMS response object ${Keys!}`)

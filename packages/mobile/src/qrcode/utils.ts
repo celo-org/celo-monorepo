@@ -131,6 +131,8 @@ export function* handleBarcode(
         addressJustValidated: true,
       })
     }
+
+    return
   }
 
   const cachedRecipient = getRecipientFromAddress(
@@ -139,5 +141,5 @@ export function* handleBarcode(
     recipientCache
   )
 
-  yield call(handleSendPaymentData, qrData, cachedRecipient)
+  yield call(handleSendPaymentData, qrData, cachedRecipient, isOutgoingPaymentRequest)
 }

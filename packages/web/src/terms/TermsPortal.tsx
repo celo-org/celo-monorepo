@@ -8,7 +8,7 @@ import SideTitledSection from 'src/layout/SideTitledSection'
 import menuItems, { CeloLinks } from 'src/shared/menu-items'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { fonts, standardStyles, textStyles } from 'src/styles'
-import { HelpfullLink } from './HelpfullLink'
+import { HelpfulLink } from './HelpfulLink'
 
 class TermsPortal extends React.PureComponent<I18nProps> {
   static getInitialProps() {
@@ -32,15 +32,15 @@ class TermsPortal extends React.PureComponent<I18nProps> {
           </GridRow>
           <SideTitledSection title={t('helpfulLinks')}>
             <View style={styles.links}>
-              <HelpfullLink text={t('userAgreementLink')} href={CeloLinks.agreement} />
-              <HelpfullLink text={t('faq')} href={menuItems.FAQ.link} />
-              <HelpfullLink text={t('privacyPolicy')} href={menuItems.PRIVACY.link} />
-              <HelpfullLink text={t('disclaimer')} href={CeloLinks.disclaimer} />
+              <HelpfulLink text={t('userAgreementLink')} href={CeloLinks.agreement} />
+              <HelpfulLink text={t('faq')} href={menuItems.FAQ.link} />
+              <HelpfulLink text={t('privacyPolicy')} href={menuItems.PRIVACY.link} />
+              <HelpfulLink text={t('disclaimer')} href={CeloLinks.disclaimer} />
             </View>
           </SideTitledSection>
           <SideTitledSection title={t('privacy')}>
             <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>{t('privacyNote')}</Text>
-            <HelpfullLink text={t('privacyLink')} href={CeloLinks.privacyDocs} />
+            <HelpfulLink text={t('privacyLink')} href={CeloLinks.privacyDocs} />
           </SideTitledSection>
         </View>
       </>

@@ -1,7 +1,7 @@
 {
   "name": "@celo/celocli",
   "description": "CLI Tool for transacting with the Celo protocol",
-  "version": "0.0.55-dev",
+  "version": "0.0.57-dev",
   "author": "Celo",
   "license": "Apache-2.0",
   "repository": "celo-org/celo-monorepo",
@@ -31,8 +31,8 @@
     "test": "TZ=UTC jest --runInBand"
   },
   "dependencies": {
-    "@celo/contractkit": "0.4.13-dev",
-    "@celo/utils": "0.1.19-dev",
+    "@celo/contractkit": "0.4.14-dev",
+    "@celo/utils": "0.1.20-dev",
     "@ledgerhq/hw-transport-node-hid": "^5.11.0",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
@@ -45,7 +45,7 @@
     "bls12377js": "https://github.com/celo-org/bls12377js#cb38a4cfb643c778619d79b20ca3e5283a2122a6",
     "chalk": "^2.4.2",
     "cli-table": "^0.3.1",
-    "cli-ux": "^5.3.1",
+    "cli-ux": "^5.4.9",
     "command-exists": "^1.2.9",
     "debug": "^4.1.1",
     "ethereumjs-util": "^5.2.0",

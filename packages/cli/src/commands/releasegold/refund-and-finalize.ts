@@ -1,13 +1,13 @@
+import { ReleaseGoldBaseCommand } from '../../release-gold-base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
-import { ReleaseGoldCommand } from './release-gold'
 
-export default class RefundAndFinalize extends ReleaseGoldCommand {
+export default class RefundAndFinalize extends ReleaseGoldBaseCommand {
   static description =
     "Refund the given contract's balance to the appopriate parties and destroy the contact. Can only be called by the release owner of revocable ReleaseGold instances."
 
   static flags = {
-    ...ReleaseGoldCommand.flags,
+    ...ReleaseGoldBaseCommand.flags,
   }
 
   static args = []
