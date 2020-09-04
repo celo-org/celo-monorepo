@@ -11,15 +11,15 @@ export abstract class BaseNodePortFullNodeDeployer extends BaseFullNodeDeployer 
     const existingNodePortSet = await this.getExistingNodePortSet()
     const newNodePortForEachFullNode = await this.getNodePortForEachFullNode()
     const newNodePortSet = new Set(newNodePortForEachFullNode)
-    // Essentially existingNodePortSet \ newNodePortForEachFullNode
+    // Essentially existingNodePortSet - newNodePortForEachFullNode
     const nodePortsToRemove = new Set(
       Array.from(existingNodePortSet).filter(existing => !newNodePortSet.has(existing))
     )
-    console.log('existingNodePortSet', [...existingNodePortSet])
-    console.log('newNodePortSet', [...newNodePortSet])
-    console.log('nodePortsToRemove', [...nodePortsToRemove])
+    // Ensure all the new node ports have ingress rules set
     await this.setIngressRulesTCPAndUDP(newNodePortForEachFullNode, true)
+    // Remove any removed node port ingress rules
     await this.setIngressRulesTCPAndUDP(Array.from(nodePortsToRemove), false)
+
     const nodePortPerFullNodeStrs = newNodePortForEachFullNode.map((nodePort: number, index: number) =>
       `--set geth.service_node_port_per_full_node[${index}]=${nodePort}`
     )
@@ -81,7 +81,6 @@ export abstract class BaseNodePortFullNodeDeployer extends BaseFullNodeDeployer 
         potentialPort++
       }
     }
-    this.printNodePortsActionRequired(allUsedNodePorts)
     return nodePortForEachFullNode
   }
 
@@ -93,6 +92,10 @@ export abstract class BaseNodePortFullNodeDeployer extends BaseFullNodeDeployer 
     // Do nothing
   }
 
+  /**
+   * Returns an array with each element as the corresponding full node's service.
+   * An element will be undefined if the service doesn't exist.
+   */
   getServiceForEachFullNode() {
     const replicas = this.deploymentConfig.replicas
     return Promise.all(
@@ -102,12 +105,18 @@ export abstract class BaseNodePortFullNodeDeployer extends BaseFullNodeDeployer 
     )
   }
 
+  /**
+   * Returns an array of all services that currently exist for full nodes.
+   * Does so using a selector, and has no guarantees about the order of the services.
+   */
   async getExistingFullNodeServices() {
     const response = await getService(`--selector=component=celo-fullnode-protocol-traffic`, this.kubeNamespace)
-    console.log('getExistingFullNodeServices.items', response.items)
     return response.items
   }
 
+  /**
+   * Looks at the existing full node services and returns which nodePorts are currently used.
+   */
   async getExistingNodePortSet(): Promise<Set<number>> {
     const serviceForEachFullNode = await this.getExistingFullNodeServices()
     return serviceForEachFullNode.reduce((set: Set<number>, service: any) => {
@@ -124,11 +133,13 @@ export abstract class BaseNodePortFullNodeDeployer extends BaseFullNodeDeployer 
     }, new Set<number>())
   }
 
+  /**
+   * Determines if a given port number is a valid node port.
+   */
   isNodePort(portNumber: number): boolean {
     return portNumber >= NODE_PORT_MIN && portNumber <= NODE_PORT_MAX
   }
 
-  abstract printNodePortsActionRequired(nodePorts: number[]): void
   abstract async setIngressRulesTCPAndUDP(nodePorts: number[], authorize: boolean): Promise<void>
 
   get deploymentConfig(): BaseFullNodeDeploymentConfig {
