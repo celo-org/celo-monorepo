@@ -15,7 +15,11 @@ import DevSkipButton from 'src/components/DevSkipButton'
 import { CELO_FAUCET_LINK, SHOW_GET_INVITE_LINK } from 'src/config'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { redeemInvite, skipInvite } from 'src/invite/actions'
-import { extractValidInviteCode, getValidInviteCodeFromReferrerData } from 'src/invite/utils'
+import {
+  ExtractedInviteCodeAndPrivateKey,
+  extractInviteCodeAndPrivateKey,
+  extractValuesFromDeepLink,
+} from 'src/invite/utils'
 import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -88,10 +92,11 @@ export class EnterInviteCode extends React.Component<Props, State> {
 
   checkForInviteCode = async () => {
     // Check deeplink
-    const validCode = await getValidInviteCodeFromReferrerData()
-    if (validCode) {
-      this.setState({ inputValue: validCode })
-      this.props.redeemInvite(validCode)
+    const extractedValues: ExtractedInviteCodeAndPrivateKey = await extractValuesFromDeepLink()
+    if (extractedValues) {
+      const { inviteCode, privateKey } = extractedValues
+      this.setState({ inputValue: inviteCode })
+      this.props.redeemInvite(privateKey)
       return
     }
   }
@@ -105,10 +110,11 @@ export class EnterInviteCode extends React.Component<Props, State> {
   }
 
   onInputChange = (value: string) => {
-    const inviteCode = extractValidInviteCode(value)
-    if (inviteCode) {
+    const extractedValues: ExtractedInviteCodeAndPrivateKey = extractInviteCodeAndPrivateKey(value)
+    if (extractedValues) {
+      const { inviteCode, privateKey } = extractedValues
       this.setState({ inputValue: inviteCode })
-      this.props.redeemInvite(inviteCode)
+      this.props.redeemInvite(privateKey)
     } else {
       this.setState({ inputValue: value })
     }
@@ -119,8 +125,13 @@ export class EnterInviteCode extends React.Component<Props, State> {
   }
 
   shouldShowClipboard = (clipboardContent: string): boolean => {
-    const inviteCode = extractValidInviteCode(clipboardContent)
-    return !!inviteCode && !this.state.inputValue.toLowerCase().startsWith(inviteCode.toLowerCase())
+    const extractedValues: ExtractedInviteCodeAndPrivateKey = extractInviteCodeAndPrivateKey(
+      clipboardContent
+    )
+    return (
+      !!extractedValues &&
+      !this.state.inputValue.toLowerCase().startsWith(extractedValues.inviteCode.toLowerCase())
+    )
   }
 
   render() {

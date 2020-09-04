@@ -291,7 +291,7 @@ function* sendInviteSaga(action: SendInviteAction) {
   }
 }
 
-export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
+export function* redeemInviteSaga({ tempAccountPrivateKey }: RedeemInviteAction) {
   yield call(waitWeb3LastBlock)
   Logger.debug(TAG, 'Starting Redeem Invite')
 
@@ -304,7 +304,7 @@ export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
     cancel: TakeEffect | undefined
     timeout: true | undefined
   } = yield race({
-    result: call(doRedeemInvite, inviteCode),
+    result: call(doRedeemInvite, tempAccountPrivateKey),
     cancel: take(AccountActions.CANCEL_CREATE_OR_RESTORE_ACCOUNT),
     timeout: delay(REDEEM_INVITE_TIMEOUT),
   })
@@ -330,16 +330,16 @@ export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
   }
 }
 
-export function* doRedeemInvite(inviteCode: string) {
+export function* doRedeemInvite(tempAccountPrivateKey: string) {
   try {
     ValoraAnalytics.track(OnboardingEvents.invite_redeem_start)
-    const tempAccount = privateKeyToAddress(inviteCode)
+    const tempAccount = privateKeyToAddress(tempAccountPrivateKey)
     Logger.debug(TAG + '@doRedeemInvite', 'Invite code contains temp account', tempAccount)
 
     const [tempAccountBalanceWei, newAccount]: [BigNumber, string] = yield all([
       call(fetchTokenBalanceInWeiWithRetry, CURRENCY_ENUM.DOLLAR, tempAccount),
       call(getOrCreateAccount),
-      call(addTempAccountToWallet, inviteCode),
+      call(addTempAccountToWallet, tempAccountPrivateKey),
     ])
 
     if (tempAccountBalanceWei.isLessThanOrEqualTo(0)) {
@@ -394,14 +394,14 @@ export function* skipInvite() {
   }
 }
 
-function* addTempAccountToWallet(inviteCode: string) {
+function* addTempAccountToWallet(tempAccountPrivateKey: string) {
   Logger.debug(TAG + '@addTempAccountToWallet', 'Attempting to add temp wallet')
   try {
     // Import account into the local geth node
     const wallet: UnlockableWallet = yield call(getWallet)
-    const account = privateKeyToAddress(inviteCode)
+    const account = privateKeyToAddress(tempAccountPrivateKey)
     const password: string = yield call(getPasswordSaga, account, false, true)
-    const tempAccount = yield call([wallet, wallet.addAccount], inviteCode, password)
+    const tempAccount = yield call([wallet, wallet.addAccount], tempAccountPrivateKey, password)
     Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount)
   } catch (e) {
     if (e.toString().includes('account already exists')) {

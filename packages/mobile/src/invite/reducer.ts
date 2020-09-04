@@ -9,7 +9,7 @@ export interface State {
   isSkippingInvite: boolean
   invitees: InviteDetails[]
   redeemComplete: boolean
-  redeemedInviteCode: string | null
+  redeemedTempAccountPrivateKey: string | null
 }
 
 export const initialState: State = {
@@ -18,7 +18,7 @@ export const initialState: State = {
   isSkippingInvite: false,
   invitees: [],
   redeemComplete: false,
-  redeemedInviteCode: null,
+  redeemedTempAccountPrivateKey: null,
 }
 
 export const inviteReducer = (
@@ -55,7 +55,7 @@ export const inviteReducer = (
     case Actions.REDEEM_INVITE:
       return {
         ...state,
-        redeemedInviteCode: action.inviteCode,
+        redeemedTempAccountPrivateKey: action.tempAccountPrivateKey,
         isRedeemingInvite: true,
       }
     case Actions.REDEEM_INVITE_SUCCESS:
