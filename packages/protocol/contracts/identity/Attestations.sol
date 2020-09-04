@@ -748,7 +748,7 @@ contract Attestations is
   }
 
   // TODO(@i1skn): make this method external, so we can check it from outside
-  function isAttestationExpired(uint128 attestationRequestBlock) internal view returns (bool) {
+  function isAttestationExpired(uint32 attestationRequestBlock) internal view returns (bool) {
     return block.number >= uint256(attestationRequestBlock).add(attestationExpiryBlocks);
   }
 
