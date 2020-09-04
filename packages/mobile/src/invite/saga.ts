@@ -19,6 +19,7 @@ import {
   TakeEffect,
   takeLeading,
 } from 'redux-saga/effects'
+import { Actions as AccountActions } from 'src/account/actions'
 import { showError, showMessage } from 'src/alert/actions'
 import { InviteEvents, OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
@@ -304,7 +305,7 @@ export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
     timeout: true | undefined
   } = yield race({
     result: call(doRedeemInvite, inviteCode),
-    cancel: take(Actions.CANCEL_REDEEM_INVITE),
+    cancel: take(AccountActions.CANCEL_CREATE_OR_RESTORE_ACCOUNT),
     timeout: delay(REDEEM_INVITE_TIMEOUT),
   })
 
@@ -320,7 +321,6 @@ export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
     yield put(redeemInviteFailure())
   } else if (cancel) {
     ValoraAnalytics.track(OnboardingEvents.invite_redeem_cancel)
-    yield put(redeemInviteFailure())
     Logger.debug(TAG, 'Redeem Invite cancelled')
   } else if (timeout) {
     Logger.debug(TAG, 'Redeem Invite timed out')

@@ -1,3 +1,4 @@
+import { Actions as AccountActions, ActionTypes as AccountActionTypes } from 'src/account/actions'
 import { Actions, ActionTypes, InviteDetails } from 'src/invite/actions'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
@@ -22,7 +23,7 @@ export const initialState: State = {
 
 export const inviteReducer = (
   state: State | undefined = initialState,
-  action: ActionTypes | RehydrateAction
+  action: ActionTypes | AccountActionTypes | RehydrateAction
 ): State => {
   switch (action.type) {
     case REHYDRATE: {
@@ -64,6 +65,12 @@ export const inviteReducer = (
         isRedeemingInvite: false,
       }
     case Actions.REDEEM_INVITE_FAILURE:
+      return {
+        ...state,
+        redeemComplete: false,
+        isRedeemingInvite: false,
+      }
+    case AccountActions.CANCEL_CREATE_OR_RESTORE_ACCOUNT:
       return {
         ...state,
         redeemComplete: false,
