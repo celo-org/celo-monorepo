@@ -14069,10 +14069,10 @@ detect-node@^2.0.4:
   resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.0.4.tgz#014ee8f8f669c5c58023da64b8179c083a28c46c"
   integrity sha512-ZIzRpLJrOj7jjP2miAtgqIfmzbxa4ZOr5jJc601zklsfEx9oTzmmj2nVpIPRpNlRTIh8lc1kyViIY7BWSGNmKw==
 
-detox@^16.9.2:
-  version "16.9.2"
-  resolved "https://registry.yarnpkg.com/detox/-/detox-16.9.2.tgz#3b99be3df54ef0f35ffe12d3aa87b556d00a50d3"
-  integrity sha512-yi74zL3hHFRU131B5tgZiYh0hPWvpryntllAKEpxRGRRuz+11s2+TjpuS0M02jGOdDMFBk5BzcXFGM57FWbWNA==
+detox@^17.4.5:
+  version "17.4.5"
+  resolved "https://registry.yarnpkg.com/detox/-/detox-17.4.5.tgz#3d6dbf1a3ba5903625aeea4452ba773b28e2db12"
+  integrity sha512-TGphxJAPp90U+OoRwV32WqLoEUt2BBHIRQDVLKcHhR0Z/+LbfMqxl0ij+Na1Gi+L2XhDAV8Xz48lNNmqhF6jzw==
   dependencies:
     bunyan "^1.8.12"
     bunyan-debug-stream "^1.1.0"
