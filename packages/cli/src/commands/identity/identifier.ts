@@ -4,9 +4,11 @@ import { flags as oFlags } from '@oclif/command'
 import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
+import { printValueMap } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 export default class IdentifierQuery extends BaseCommand {
-  static description = 'Queries ODIS for the on-chain identifier of a given phone number.'
+  static description =
+    'Queries ODIS for the on-chain identifier and pepper corresponding to a given phone number.'
 
   static flags = {
     ...BaseCommand.flags,
@@ -20,12 +22,12 @@ export default class IdentifierQuery extends BaseCommand {
     }),
     env: oFlags.string({
       required: false,
-      description: 'mainnet (default), alfajores, or staging',
+      description: 'mainnet (default), alfajores, or alfajores_staging',
     }),
   }
 
   static examples = [
-    'identifier --phoneNumber +12345678910 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631 --env alfajores',
+    'identifier --phoneNumber +14151231234 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631 --env alfajores',
   ]
 
   async run() {
@@ -34,14 +36,9 @@ export default class IdentifierQuery extends BaseCommand {
 
     await newCheckBuilder(this, flags.from)
       .isSignerOrAccount()
-      .canSign(from)
       .runChecks()
 
-    // if (!isE164Number(e164Number)) {
-    //   throw new Error(ErrorMessages.INVALID_PHONE_NUMBER)
-    // }
-
-    cli.action.start('Querying ODIS for identifier...')
+    cli.action.start('Querying ODIS for identifier')
 
     const authSigner: AuthSigner = {
       authenticationMethod: OdisUtils.Query.AuthenticationMethod.WALLET_KEY,
@@ -70,39 +67,18 @@ export default class IdentifierQuery extends BaseCommand {
         }
     }
 
-    const identifier = await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+    const res = await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
       phoneNumber,
       from,
       authSigner,
       serviceContext
     )
 
-    console.log(identifier)
-
-    // const { odisPubKey, odisUrl } = networkConfig
-    // const serviceContext: ServiceContext = {
-    //   odisUrl,
-    //   odisPubKey,
-    // }
-    // const blsBlindingClient = new WasmBlsBlindingClient(odisPubKey)
-    // try {
-    //   return yield call(
-    //     OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier,
-    //     e164Number,
-    //     account,
-    //     authSigner,
-    //     serviceContext,
-    //     selfPhoneHash,
-    //     DeviceInfo.getVersion(),
-    //     blsBlindingClient
-    //   )
-    // } catch (error) {
-    //   if (error.message === ErrorMessages.ODIS_QUOTA_ERROR) {
-    //     throw new Error(ErrorMessages.SALT_QUOTA_EXCEEDED)
-    //   }
-    //   throw error
-    // }
-
     cli.action.stop()
+
+    printValueMap({
+      identifier: res.phoneHash,
+      pepper: res.pepper,
+    })
   }
 }
