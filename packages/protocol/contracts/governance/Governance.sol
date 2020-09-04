@@ -3,6 +3,7 @@ pragma solidity ^0.5.3;
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/utils/Address.sol";
 
 import "./interfaces/IGovernance.sol";
 import "./Proposals.sol";
@@ -34,6 +35,7 @@ contract Governance is
   using SafeMath for uint256;
   using IntegerSortedLinkedList for SortedLinkedList.List;
   using BytesLib for bytes;
+  using Address for address;
 
   uint256 private constant FIXED_HALF = 500000000000000000000000;
 
@@ -754,7 +756,7 @@ contract Governance is
     require(value > 0, "Nothing to withdraw");
     require(value <= address(this).balance, "Inconsistent balance");
     refundedDeposits[msg.sender] = 0;
-    msg.sender.transfer(value);
+    msg.sender.sendValue(value);
     return true;
   }
 

@@ -2,6 +2,7 @@ pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import "openzeppelin-solidity/contracts/utils/Address.sol";
 
 import "./interfaces/IReleaseGold.sol";
 import "./interfaces/IValidators.sol";
@@ -14,6 +15,7 @@ import "../common/UsingRegistry.sol";
 contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializable {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
+  using Address for address;
 
   struct ReleaseSchedule {
     // Timestamp (in UNIX time) that releasing begins.
@@ -355,7 +357,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
       "Insufficient unlocked balance to withdraw amount"
     );
     totalWithdrawn = totalWithdrawn.add(amount);
-    beneficiary.transfer(amount);
+    beneficiary.sendValue(amount);
     if (getRemainingTotalBalance() == 0) {
       emit ReleaseGoldInstanceDestroyed(beneficiary, address(this));
       selfdestruct(refundAddress);
@@ -369,9 +371,9 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     require(getRemainingLockedBalance() == 0, "Total gold balance must be unlocked");
     uint256 beneficiaryAmount = revocationInfo.releasedBalanceAtRevoke.sub(totalWithdrawn);
     require(address(this).balance >= beneficiaryAmount, "Inconsistent balance");
-    beneficiary.transfer(beneficiaryAmount);
+    beneficiary.sendValue(beneficiaryAmount);
     uint256 revokerAmount = getRemainingUnlockedBalance();
-    refundAddress.transfer(revokerAmount);
+    refundAddress.sendValue(revokerAmount);
     emit ReleaseGoldInstanceDestroyed(beneficiary, address(this));
     selfdestruct(refundAddress);
   }
@@ -510,7 +512,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     // Fund signer account with 1 cGLD.
     uint256 value = 1 ether;
     require(address(this).balance >= value, "no available cGLD to fund signer");
-    signer.transfer(value);
+    signer.sendValue(value);
     require(getRemainingTotalBalance() > 0, "no remaining balance");
   }
 

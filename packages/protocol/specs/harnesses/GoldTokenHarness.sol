@@ -1,8 +1,10 @@
 pragma solidity ^0.5.8;
 
 import "contracts/common/GoldToken.sol";
+import "openzeppelin-solidity/contracts/utils/Address.sol";
 
 contract GoldTokenHarness is GoldToken {
+  using Address for address;
   /* solhint-disable no-empty-blocks */
   function init_state() public {}
 
@@ -11,7 +13,7 @@ contract GoldTokenHarness is GoldToken {
     require(to != address(this), "GoldToken cannot transfer to itself");
     require(value <= balanceOf(msg.sender), "Transfer value exceeded balance of sender");
 
-    address(uint160(to)).transfer(value); // TRANSFER.call.value(0).gas(gasleft())(abi.encode(msg.sender, to, value));
+    address(uint160(to)).sendValue(value); // TRANSFER.call.value(0).gas(gasleft())(abi.encode(msg.sender, to, value));
     emit Transfer(msg.sender, to, value);
     return true;
   }

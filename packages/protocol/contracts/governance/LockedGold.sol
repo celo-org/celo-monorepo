@@ -3,6 +3,7 @@ pragma solidity ^0.5.3;
 import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/utils/Address.sol";
 
 import "./interfaces/ILockedGold.sol";
 
@@ -20,6 +21,7 @@ contract LockedGold is
   UsingRegistry
 {
   using SafeMath for uint256;
+  using Address for address;
 
   struct PendingWithdrawal {
     // The value of the pending withdrawal.
@@ -215,7 +217,7 @@ contract LockedGold is
     uint256 value = pendingWithdrawal.value;
     deletePendingWithdrawal(account.pendingWithdrawals, index);
     require(value <= address(this).balance, "Inconsistent balance");
-    msg.sender.transfer(value);
+    msg.sender.sendValue(value);
     emit GoldWithdrawn(msg.sender, value);
   }
 
@@ -378,7 +380,7 @@ contract LockedGold is
     address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
     address payable communityFundPayable = address(uint160(communityFund));
     require(maxSlash.sub(reward) <= address(this).balance, "Inconsistent balance");
-    communityFundPayable.transfer(maxSlash.sub(reward));
+    communityFundPayable.sendValue(maxSlash.sub(reward));
     emit AccountSlashed(account, maxSlash, reporter, reward);
   }
 }

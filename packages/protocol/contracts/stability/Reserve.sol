@@ -2,6 +2,7 @@ pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/utils/Address.sol";
 
 import "./interfaces/IReserve.sol";
 import "./interfaces/ISortedOracles.sol";
@@ -25,6 +26,7 @@ contract Reserve is
 {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
+  using Address for address;
 
   struct TobinTaxCache {
     uint128 numerator;
@@ -332,7 +334,7 @@ contract Reserve is
    */
   function _transferGold(address payable to, uint256 value) internal returns (bool) {
     require(value <= getUnfrozenBalance(), "Exceeding unfrozen reserves");
-    to.transfer(value);
+    to.sendValue(value);
     emit ReserveGoldTransferred(msg.sender, to, value);
     return true;
   }
