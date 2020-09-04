@@ -10,7 +10,6 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { OnboardingEvents } from 'src/analytics/Events'
-import { AnalyticsPropertiesList } from 'src/analytics/Properties'
 import CodeInput, { CodeInputStatus } from 'src/components/CodeInput'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { CELO_FAUCET_LINK, SHOW_GET_INVITE_LINK } from 'src/config'
@@ -134,13 +133,6 @@ export class EnterInviteCode extends React.Component<Props, State> {
     } else if (redeemComplete) {
       codeStatus = CodeInputStatus.ACCEPTED
     }
-    const backAnalyticsEvents: [keyof AnalyticsPropertiesList] = [
-      OnboardingEvents.create_account_cancel,
-    ]
-
-    if (isRedeemingInvite) {
-      backAnalyticsEvents.push(OnboardingEvents.invite_redeem_cancel)
-    }
 
     return (
       <HeaderHeightContext.Consumer>
@@ -148,7 +140,9 @@ export class EnterInviteCode extends React.Component<Props, State> {
           <SafeAreaInsetsContext.Consumer>
             {(insets) => (
               <View style={styles.container}>
-                <UseBackToWelcomeScreen backAnalyticsEvents={backAnalyticsEvents} />
+                <UseBackToWelcomeScreen
+                  backAnalyticsEvents={[OnboardingEvents.create_account_cancel]}
+                />
                 <DevSkipButton nextScreen={Screens.VerificationEducationScreen} />
                 <KeyboardAwareScrollView
                   style={headerHeight ? { marginTop: headerHeight } : undefined}

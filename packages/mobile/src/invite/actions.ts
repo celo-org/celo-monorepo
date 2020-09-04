@@ -11,6 +11,7 @@ export enum Actions {
   REDEEM_INVITE = 'INVITE/REDEEM_INVITE',
   REDEEM_INVITE_SUCCESS = 'INVITE/REDEEM_INVITE_SUCCESS',
   REDEEM_INVITE_FAILURE = 'INVITE/REDEEM_INVITE_FAILURE',
+  CANCEL_REDEEM_INVITE = 'CANCEL_REDEEM_INVITE',
   SKIP_INVITE = 'INVITE/SKIP_INVITE',
   SKIP_INVITE_SUCCESS = 'INVITE/SKIP_INVITE_SUCCESS',
   SKIP_INVITE_FAILURE = 'INVITE/SKIP_INVITE_FAILURE',
@@ -104,6 +105,14 @@ export interface RedeemInviteFailureAction {
 
 export const redeemInviteFailure = (): RedeemInviteFailureAction => ({
   type: Actions.REDEEM_INVITE_FAILURE,
+})
+
+export interface CancelRedeemInviteAction {
+  type: Actions.CANCEL_REDEEM_INVITE
+}
+
+export const cancelRedeemInvite = (): CancelRedeemInviteAction => ({
+  type: Actions.CANCEL_REDEEM_INVITE,
 })
 
 export interface SkipInviteAction {

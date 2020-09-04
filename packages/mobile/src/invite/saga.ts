@@ -8,7 +8,17 @@ import DeviceInfo from 'react-native-device-info'
 import { asyncRandomBytes } from 'react-native-secure-randombytes'
 import SendIntentAndroid from 'react-native-send-intent'
 import SendSMS from 'react-native-sms'
-import { all, call, delay, put, race, spawn, take, takeLeading } from 'redux-saga/effects'
+import {
+  all,
+  call,
+  delay,
+  put,
+  race,
+  spawn,
+  take,
+  TakeEffect,
+  takeLeading,
+} from 'redux-saga/effects'
 import { showError, showMessage } from 'src/alert/actions'
 import { InviteEvents, OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
@@ -286,25 +296,32 @@ export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
 
   const {
     result,
+    cancel,
     timeout,
   }: {
-    result: { success: true; newAccount: string } | { success: false }
+    result: { success: true; newAccount: string } | { success: false } | undefined
+    cancel: TakeEffect
     timeout: true
   } = yield race({
     result: call(doRedeemInvite, inviteCode),
+    cancel: take(Actions.CANCEL_REDEEM_INVITE),
     timeout: delay(REDEEM_INVITE_TIMEOUT),
   })
 
-  if (result.success === true) {
+  if (result?.success === true) {
     Logger.debug(TAG, 'Redeem Invite completed successfully')
     yield put(redeemInviteSuccess())
     navigate(Screens.VerificationEducationScreen)
     // Note: We are ok with this succeeding or failing silently in the background,
     // user will have another chance to register DEK when sending their first tx
     yield spawn(registerAccountDek, result.newAccount)
-  } else if (result.success === false) {
+  } else if (result?.success === false) {
     Logger.debug(TAG, 'Redeem Invite failed')
     yield put(redeemInviteFailure())
+  } else if (cancel) {
+    ValoraAnalytics.track(OnboardingEvents.invite_redeem_cancel)
+    yield put(redeemInviteFailure())
+    Logger.debug(TAG, 'Redeem Invite cancelled')
   } else if (timeout) {
     Logger.debug(TAG, 'Redeem Invite timed out')
     ValoraAnalytics.track(OnboardingEvents.invite_redeem_timeout)

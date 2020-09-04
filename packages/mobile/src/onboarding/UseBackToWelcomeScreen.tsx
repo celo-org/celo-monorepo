@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux'
 import { cancelCreateOrRestoreAccount } from 'src/account/actions'
 import { AnalyticsPropertiesList } from 'src/analytics/Properties'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
+import { cancelRedeemInvite } from 'src/invite/actions'
 import { Screens } from 'src/navigator/Screens'
 
 interface Props {
@@ -59,6 +60,7 @@ export function useBackToWelcomeScreen({ backAnalyticsEvents }: Props) {
           ValoraAnalytics.track(analyticsEvent)
         })
         dispatch(cancelCreateOrRestoreAccount())
+        dispatch(cancelRedeemInvite())
       }
     })
 
