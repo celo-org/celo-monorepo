@@ -3,7 +3,6 @@ import * as React from 'react'
 import { ApolloProvider } from 'react-apollo'
 import {
   Dimensions,
-  EmitterSubscription,
   Linking,
   NativeEventEmitter,
   NativeModules,
@@ -26,7 +25,7 @@ import i18n from 'src/i18n'
 import NavigatorWrapper from 'src/navigator/NavigatorWrapper'
 import { persistor, store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
-const { ModuleWithEmitter } = NativeModules
+const { AnalyticsManager } = NativeModules
 
 enableScreens()
 
@@ -59,30 +58,13 @@ interface State {
 //   UIManager.setLayoutAnimationEnabledExperimental(true)
 // }
 
-const createEventListener: (
-  eventName: string,
-  callback: (reactInitTime: string) => void
-) => EmitterSubscription | null = (
-  eventName: string,
-  callback: (reactInitTime: string) => void
-): EmitterSubscription | null => {
+function getEventEmitter() {
   if (Platform.OS === 'android') {
-    return new NativeEventEmitter().addListener(eventName, callback)
+    return new NativeEventEmitter()
   } else {
     // ios
-    const eventEmitter = new NativeEventEmitter(ModuleWithEmitter)
-
-    // TODO: types
-    const onSessionConnect = (event: any) => {
-      Logger.debug('onSessionConnect', 'event: ' + event)
-    }
-
-    // TODO: do we need to unsubscribe?
-    const subscription = eventEmitter.addListener('onSessionConnect', onSessionConnect)
-    return subscription
+    return new NativeEventEmitter(AnalyticsManager)
   }
-
-  return null
 }
 
 export class App extends React.Component {
@@ -91,15 +73,7 @@ export class App extends React.Component {
     reactLoadTime: undefined,
   }
 
-  appStartListener: EmitterSubscription | null = createEventListener(
-    'AppStartedLoading',
-    (reactInitTime: string) => {
-      this.setState({
-        reactInitTime: +reactInitTime,
-        reactLoadTime: Date.now(),
-      })
-    }
-  )
+  appStartListener = null
 
   async componentDidMount() {
     await ValoraAnalytics.init()
@@ -130,6 +104,16 @@ export class App extends React.Component {
 
   componentWillUnmount() {
     Linking.removeEventListener('url', this.handleOpenURL)
+  }
+
+  componentWillMount() {
+    this.appStartListener = getEventEmitter().addListener('AppStartedLoading', (reactInitTime) => {
+      Logger.debug('AppStartedLoading', 'event: ' + reactInitTime)
+      this.setState({
+        reactInitTime: +reactInitTime,
+        reactLoadTime: Date.now(),
+      })
+    })
   }
 
   handleOpenURL = (event: any) => {
