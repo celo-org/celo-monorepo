@@ -304,7 +304,15 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
             await wallet.executeTransactions(
               transactions.map((t) => t.destination),
               transactions.map((t) => t.value),
-              ensureLeading0x(transactions.map((t) => trimLeading0x(t.data)).join('')),
+              ensureLeading0x(
+                transactions
+                  .map((t) => {
+                    const data = trimLeading0x(t.data)
+                    const lengthHex = (data.length / 2).toString(16).padStart(2, '0')
+                    return `${lengthHex}${data}`
+                  })
+                  .join('')
+              ),
               transactions.map((t) => trimLeading0x(t.data).length / 2),
               { from: signer }
             )
@@ -328,7 +336,15 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
               .executeTransactions(
                 transactions.map((t) => t.destination),
                 transactions.map((t) => t.value),
-                ensureLeading0x(transactions.map((t) => trimLeading0x(t.data)).join('')),
+                ensureLeading0x(
+                  transactions
+                    .map((t) => {
+                      const data = trimLeading0x(t.data) // @ts-ignore
+                      const lengthHex = (data.length / 2).toString(16).padStart(2, '0')
+                      return `${lengthHex}${data}`
+                    })
+                    .join('')
+                ),
                 transactions.map((t) => trimLeading0x(t.data).length / 2)
               )
               .encodeABI()
@@ -352,6 +368,29 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
 
           it('should increment the nonce', async () => {
             assertEqualBN(await wallet.nonce(), 1)
+          })
+        })
+
+        describe('when lengths in length array do not match up with lengths in data', async () => {
+          it('reverts with correct message', async () => {
+            await assertRevert(
+              wallet.executeTransactions(
+                transactions.map((t) => t.destination),
+                transactions.map((t) => t.value),
+                ensureLeading0x(
+                  transactions
+                    .map((t) => {
+                      const data = trimLeading0x(t.data)
+                      const lengthHex = (data.length / 2).toString(16).padStart(2, '0')
+                      return `${lengthHex}${data}`
+                    })
+                    .join('')
+                ),
+                // take length without dividing by 2 for invalid length
+                transactions.map((t) => trimLeading0x(t.data).length),
+                { from: signer }
+              )
+            )
           })
         })
       })

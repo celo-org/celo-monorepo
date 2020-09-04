@@ -198,7 +198,7 @@ contract MetaTransactionWallet is
    * @notice Executes multiple transactions on behalf of the signer.`
    * @param destinations The address to which each transaction is to be sent.
    * @param values The CELO value to be sent with each transaction.
-   * @param data The concatenated data to be sent in each transaction.
+   * @param data The concatenated transaction data with their respective lengths <length+data>.
    * @param dataLengths The length of each transaction's data.
    */
   function executeTransactions(
@@ -213,8 +213,16 @@ contract MetaTransactionWallet is
     );
     uint256 dataPosition = 0;
     for (uint256 i = 0; i < destinations.length; i++) {
-      executeTransaction(destinations[i], values[i], sliceData(data, dataPosition, dataLengths[i]));
-      dataPosition = dataPosition.add(dataLengths[i]);
+      require(
+        uint8(data[dataPosition]) == dataLengths[i],
+        "Data length must match specified length"
+      );
+      executeTransaction(
+        destinations[i],
+        values[i],
+        sliceData(data, dataPosition.add(1), dataLengths[i])
+      );
+      dataPosition = dataPosition.add(dataLengths[i].add(1));
     }
   }
 
@@ -227,6 +235,7 @@ contract MetaTransactionWallet is
    */
   function sliceData(bytes memory data, uint256 start, uint256 length)
     internal
+    pure
     returns (bytes memory)
   {
     // When length == 0 bytes.slice does not seem to always return an empty byte array.
