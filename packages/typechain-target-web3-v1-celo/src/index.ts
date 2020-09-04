@@ -1,8 +1,8 @@
-import { join, resolve } from 'path'
 import { readFileSync } from 'fs'
-import { codegen } from './generation'
+import { join, resolve } from 'path'
 import { TContext, TFileDesc, TsGeneratorPlugin } from 'ts-generator'
 import { extractAbi, getFilename, parse } from 'typechain'
+import { codegen } from './generation'
 
 export interface IWeb3Cfg {
   outDir?: string
