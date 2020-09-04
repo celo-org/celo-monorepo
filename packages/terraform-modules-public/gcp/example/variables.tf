@@ -169,7 +169,7 @@ variable attestation_service_docker_image {
 
   default = {
     repository = "us.gcr.io/celo-testnet/celo-monorepo"
-    tag        = "attestation-service-1-0-2"
+    tag        = "attestation-service-1-0-3"
   }
 }
 
