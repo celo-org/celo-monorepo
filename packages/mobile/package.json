@@ -39,11 +39,11 @@
     ]
   },
   "dependencies": {
-    "@celo/client": "0.0.316",
-    "@celo/contractkit": "0.4.13-dev",
+    "@celo/client": "0.0.317",
+    "@celo/contractkit": "0.4.14-dev",
     "@celo/react-components": "1.0.0",
     "@celo/react-native-sms-retriever": "git+https://github.com/celo-org/react-native-sms-retriever#b88e502",
-    "@celo/utils": "0.1.19-dev",
+    "@celo/utils": "0.1.20-dev",
     "@celo/wallet-rpc": "0.0.1-dev",
     "@react-native-community/async-storage": "^1.9.0",
     "@react-native-community/masked-view": "^0.1.10",

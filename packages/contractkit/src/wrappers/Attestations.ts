@@ -172,6 +172,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       }
       await sleep(pollDurationSeconds * 1000)
     }
+    throw new Error('Timeout while waiting for selecting issuers')
   }
 
   /**
@@ -462,6 +463,21 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       this.kit.communication,
       this.contract.methods.selectIssuers(identifier)
     )
+  }
+
+  /**
+   * Waits appropriate number of blocks, then selects issuers for previously requested phone number attestations
+   * @param identifier Attestation identifier (e.g. phone hash)
+   * @param account Address of the account
+   */
+  async selectIssuersAfterWait(
+    identifier: string,
+    account: string,
+    timeoutSeconds?: number,
+    pollDurationSeconds?: number
+  ) {
+    await this.waitForSelectingIssuers(identifier, account, timeoutSeconds, pollDurationSeconds)
+    return this.selectIssuers(identifier)
   }
 
   revealPhoneNumberToIssuer(

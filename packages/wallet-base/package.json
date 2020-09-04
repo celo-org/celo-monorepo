@@ -18,8 +18,8 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
-    "@celo/base": "0.0.2-dev",
-    "@celo/utils": "0.1.19-dev",
+    "@celo/base": "0.0.3-dev",
+    "@celo/utils": "0.1.20-dev",
     "bignumber.js": "^9.0.0",
     "eth-lib": "^0.2.8",
     "ethereumjs-util": "^5.2.0",

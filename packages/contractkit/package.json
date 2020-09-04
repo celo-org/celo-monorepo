@@ -1,6 +1,6 @@
 {
   "name": "@celo/contractkit",
-  "version": "0.4.13-dev",
+  "version": "0.4.14-dev",
   "description": "Celo's ContractKit to interact with Celo network",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -27,9 +27,9 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
-    "@celo/base": "0.0.2-dev",
+    "@celo/base": "0.0.3-dev",
     "@celo/communication": "0.0.1-dev",
-    "@celo/utils": "0.1.19-dev",
+    "@celo/utils": "0.1.20-dev",
     "bignumber.js": "^9.0.0",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
     "cross-fetch": "3.0.4",
@@ -58,7 +58,6 @@
     "fetch-mock": "9.10.4",
     "@types/secp256k1": "^3.5.3",
     "dotenv": "^8.2.0",
-    "fetch-mock": "9.10.4",
     "ts-node": "8.3.0",
     "typedoc": "^0.16.9",
     "typedoc-plugin-markdown": "^2.2.16"

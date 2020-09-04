@@ -18,7 +18,7 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
-    "@celo/base": "0.0.2-dev",
+    "@celo/base": "0.0.3-dev",
     "eth-lib": "^0.2.8",
     "ethereumjs-util": "^5.2.0",
     "asn1js": "^2.0.26",

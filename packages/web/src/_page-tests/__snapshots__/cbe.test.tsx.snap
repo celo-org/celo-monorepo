@@ -1,0 +1,1328 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CBE renders 1`] = `
+<div
+  className="css-view-1dbjc4n"
+  style={
+    Object {
+      "WebkitAlignItems": "center",
+      "WebkitBoxAlign": "center",
+      "alignItems": "center",
+      "msFlexAlign": "center",
+    }
+  }
+>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignItems": "center",
+        "WebkitBoxAlign": "center",
+        "alignItems": "center",
+        "backgroundColor": "rgba(22,82,235,1.00)",
+        "height": "450px",
+        "msFlexAlign": "center",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitFlexBasis": "auto",
+          "flexBasis": "auto",
+          "height": "100%",
+          "maxWidth": "1050px",
+          "minWidth": "600px",
+          "msFlexPreferredSize": "auto",
+          "overflowX": "hidden",
+          "overflowY": "hidden",
+          "width": "100%",
+          "zIndex": 0,
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "backgroundColor": "rgba(0,0,0,0.00)",
+            "backgroundImage": "url(\\"image.png\\")",
+            "backgroundPosition": "center",
+            "backgroundRepeat": "no-repeat",
+            "backgroundSize": "cover",
+            "bottom": "0px",
+            "height": "100%",
+            "left": "0px",
+            "position": "absolute",
+            "right": "0px",
+            "top": "0px",
+            "width": "100%",
+            "zIndex": -1,
+          }
+        }
+      />
+      <img
+        alt=""
+        className="css-accessibilityImage-9pa8cd"
+        draggable={false}
+        src="image.png"
+      />
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignItems": "center",
+        "WebkitAlignSelf": "center",
+        "WebkitBoxAlign": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitBoxPack": "center",
+        "WebkitFlexDirection": "column",
+        "WebkitJustifyContent": "center",
+        "alignItems": "center",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "justifyContent": "center",
+        "marginTop": "20px",
+        "maxWidth": "100vw",
+        "msFlexAlign": "center",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "msFlexPack": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <h4
+        aria-level="4"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "24px",
+            "lineHeight": "32px",
+            "marginBottom": "20px",
+            "textAlign": "center",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        subTitle
+      </h4>
+      <h1
+        aria-level="1"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "36px",
+            "lineHeight": "40px",
+            "marginBottom": "20px",
+            "textAlign": "center",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        mainTitle
+      </h1>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignSelf": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitFlexDirection": "column",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "marginBottom": "30px",
+        "maxWidth": "100vw",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitBoxPack": "justify",
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "WebkitJustifyContent": "space-between",
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "justifyContent": "space-between",
+          "msFlexNegative": 0,
+          "msFlexPack": "justify",
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitFlexBasis": "auto",
+              "flexBasis": "auto",
+              "height": "100px",
+              "msFlexPreferredSize": "auto",
+              "overflowX": "hidden",
+              "overflowY": "hidden",
+              "width": "100px",
+              "zIndex": 0,
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "backgroundColor": "rgba(0,0,0,0.00)",
+                "backgroundImage": "url(\\"image.png\\")",
+                "backgroundPosition": "center",
+                "backgroundRepeat": "no-repeat",
+                "backgroundSize": "contain",
+                "bottom": "0px",
+                "height": "100%",
+                "left": "0px",
+                "position": "absolute",
+                "right": "0px",
+                "top": "0px",
+                "width": "100%",
+                "zIndex": -1,
+              }
+            }
+          />
+          <img
+            alt=""
+            className="css-accessibilityImage-9pa8cd"
+            draggable={false}
+            src="image.png"
+          />
+        </div>
+        <div
+          className="css-text-901oao"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "fontSize": "16px",
+              "fontWeight": "500",
+              "lineHeight": "18px",
+              "marginBottom": "20px",
+              "marginTop": "20px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          adventure1.title
+        </div>
+        <div
+          className="css-text-901oao"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          adventure1.text
+        </div>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        onClick={[Function]}
+        onMouseDown={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onResponderGrant={[Function]}
+        onResponderRelease={[Function]}
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxFlex": 0,
+              "WebkitBoxOrient": "horizontal",
+              "WebkitBoxPack": "center",
+              "WebkitFlexDirection": "row",
+              "WebkitFlexGrow": 0,
+              "WebkitJustifyContent": "center",
+              "backgroundColor": "rgba(0,0,0,0.00)",
+              "borderBottomColor": "rgba(0,0,0,0.00)",
+              "borderLeftColor": "rgba(0,0,0,0.00)",
+              "borderRightColor": "rgba(0,0,0,0.00)",
+              "borderTopColor": "rgba(0,0,0,0.00)",
+              "flexDirection": "row",
+              "flexGrow": 0,
+              "justifyContent": "center",
+              "msFlexDirection": "row",
+              "msFlexPack": "center",
+              "msFlexPositive": 0,
+              "opacity": 1,
+              "outlineColor": "transparent",
+              "width": "fit-content",
+            }
+          }
+        >
+          <a
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+            data-focusable={true}
+            dir="auto"
+            href="https://valoraapp.co/3j0mTjS"
+            onClick={[Function]}
+            role="link"
+            style={
+              Object {
+                "WebkitAlignItems": "center",
+                "WebkitBoxAlign": "center",
+                "alignItems": "center",
+                "color": "rgba(53,208,127,1.00)",
+                "cursor": "pointer",
+                "display": "inline-flex",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "16px",
+                "marginTop": "20px",
+                "msFlexAlign": "center",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            adventure1.link
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "display": "inline-flex",
+                  "paddingLeft": "0.4em",
+                  "paddingTop": "0.185em",
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height="0.75em"
+                style={Object {}}
+                transform="rotate(0)"
+                viewBox="0 0 8 12"
+                width="0.75em"
+              >
+                <path
+                  clipRule="evenodd"
+                  d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+                  fill="#35D07F"
+                  fillRule="evenodd"
+                  opacity={1}
+                  style={Object {}}
+                />
+              </svg>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitBoxPack": "justify",
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "WebkitJustifyContent": "space-between",
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "justifyContent": "space-between",
+          "msFlexNegative": 0,
+          "msFlexPack": "justify",
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitFlexBasis": "auto",
+              "flexBasis": "auto",
+              "height": "100px",
+              "msFlexPreferredSize": "auto",
+              "overflowX": "hidden",
+              "overflowY": "hidden",
+              "width": "100px",
+              "zIndex": 0,
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "backgroundColor": "rgba(0,0,0,0.00)",
+                "backgroundImage": "url(\\"image.png\\")",
+                "backgroundPosition": "center",
+                "backgroundRepeat": "no-repeat",
+                "backgroundSize": "contain",
+                "bottom": "0px",
+                "height": "100%",
+                "left": "0px",
+                "position": "absolute",
+                "right": "0px",
+                "top": "0px",
+                "width": "100%",
+                "zIndex": -1,
+              }
+            }
+          />
+          <img
+            alt=""
+            className="css-accessibilityImage-9pa8cd"
+            draggable={false}
+            src="image.png"
+          />
+        </div>
+        <div
+          className="css-text-901oao"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "fontSize": "16px",
+              "fontWeight": "500",
+              "lineHeight": "18px",
+              "marginBottom": "20px",
+              "marginTop": "20px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          adventure2.title
+        </div>
+        <div
+          className="css-text-901oao"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          adventure2.text
+        </div>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        onClick={[Function]}
+        onMouseDown={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onResponderGrant={[Function]}
+        onResponderRelease={[Function]}
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxFlex": 0,
+              "WebkitBoxOrient": "horizontal",
+              "WebkitBoxPack": "center",
+              "WebkitFlexDirection": "row",
+              "WebkitFlexGrow": 0,
+              "WebkitJustifyContent": "center",
+              "backgroundColor": "rgba(0,0,0,0.00)",
+              "borderBottomColor": "rgba(0,0,0,0.00)",
+              "borderLeftColor": "rgba(0,0,0,0.00)",
+              "borderRightColor": "rgba(0,0,0,0.00)",
+              "borderTopColor": "rgba(0,0,0,0.00)",
+              "flexDirection": "row",
+              "flexGrow": 0,
+              "justifyContent": "center",
+              "msFlexDirection": "row",
+              "msFlexPack": "center",
+              "msFlexPositive": 0,
+              "opacity": 1,
+              "outlineColor": "transparent",
+              "width": "fit-content",
+            }
+          }
+        >
+          <a
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+            data-focusable={true}
+            dir="auto"
+            href="https://valoraapp.co/3l5XLtC"
+            onClick={[Function]}
+            role="link"
+            style={
+              Object {
+                "WebkitAlignItems": "center",
+                "WebkitBoxAlign": "center",
+                "alignItems": "center",
+                "color": "rgba(53,208,127,1.00)",
+                "cursor": "pointer",
+                "display": "inline-flex",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "16px",
+                "marginTop": "20px",
+                "msFlexAlign": "center",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            adventure2.link
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "display": "inline-flex",
+                  "paddingLeft": "0.4em",
+                  "paddingTop": "0.185em",
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height="0.75em"
+                style={Object {}}
+                transform="rotate(0)"
+                viewBox="0 0 8 12"
+                width="0.75em"
+              >
+                <path
+                  clipRule="evenodd"
+                  d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+                  fill="#35D07F"
+                  fillRule="evenodd"
+                  opacity={1}
+                  style={Object {}}
+                />
+              </svg>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitBoxPack": "justify",
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "WebkitJustifyContent": "space-between",
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "justifyContent": "space-between",
+          "msFlexNegative": 0,
+          "msFlexPack": "justify",
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitFlexBasis": "auto",
+              "flexBasis": "auto",
+              "height": "70px",
+              "msFlexPreferredSize": "auto",
+              "overflowX": "hidden",
+              "overflowY": "hidden",
+              "width": "70px",
+              "zIndex": 0,
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "backgroundColor": "rgba(0,0,0,0.00)",
+                "backgroundImage": "url(\\"image.png\\")",
+                "backgroundPosition": "center",
+                "backgroundRepeat": "no-repeat",
+                "backgroundSize": "contain",
+                "bottom": "0px",
+                "height": "100%",
+                "left": "0px",
+                "position": "absolute",
+                "right": "0px",
+                "top": "0px",
+                "width": "100%",
+                "zIndex": -1,
+              }
+            }
+          />
+          <img
+            alt=""
+            className="css-accessibilityImage-9pa8cd"
+            draggable={false}
+            src="image.png"
+          />
+        </div>
+        <div
+          className="css-text-901oao"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "fontSize": "16px",
+              "fontWeight": "500",
+              "lineHeight": "18px",
+              "marginBottom": "20px",
+              "marginTop": "20px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          adventure3.title
+        </div>
+        <div
+          className="css-text-901oao"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          adventure3.text
+        </div>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        onClick={[Function]}
+        onMouseDown={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onResponderGrant={[Function]}
+        onResponderRelease={[Function]}
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxFlex": 0,
+              "WebkitBoxOrient": "horizontal",
+              "WebkitBoxPack": "center",
+              "WebkitFlexDirection": "row",
+              "WebkitFlexGrow": 0,
+              "WebkitJustifyContent": "center",
+              "backgroundColor": "rgba(0,0,0,0.00)",
+              "borderBottomColor": "rgba(0,0,0,0.00)",
+              "borderLeftColor": "rgba(0,0,0,0.00)",
+              "borderRightColor": "rgba(0,0,0,0.00)",
+              "borderTopColor": "rgba(0,0,0,0.00)",
+              "flexDirection": "row",
+              "flexGrow": 0,
+              "justifyContent": "center",
+              "msFlexDirection": "row",
+              "msFlexPack": "center",
+              "msFlexPositive": 0,
+              "opacity": 1,
+              "outlineColor": "transparent",
+              "width": "fit-content",
+            }
+          }
+        >
+          <a
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+            data-focusable={true}
+            dir="auto"
+            href="https://valoraapp.com"
+            onClick={[Function]}
+            role="link"
+            style={
+              Object {
+                "WebkitAlignItems": "center",
+                "WebkitBoxAlign": "center",
+                "alignItems": "center",
+                "color": "rgba(53,208,127,1.00)",
+                "cursor": "pointer",
+                "display": "inline-flex",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "16px",
+                "marginTop": "20px",
+                "msFlexAlign": "center",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            adventure3.link
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "display": "inline-flex",
+                  "paddingLeft": "0.4em",
+                  "paddingTop": "0.185em",
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height="0.75em"
+                style={Object {}}
+                transform="rotate(0)"
+                viewBox="0 0 8 12"
+                width="0.75em"
+              >
+                <path
+                  clipRule="evenodd"
+                  d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+                  fill="#35D07F"
+                  fillRule="evenodd"
+                  opacity={1}
+                  style={Object {}}
+                />
+              </svg>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignSelf": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitFlexDirection": "column",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "marginBottom": "20px",
+        "maxWidth": "100vw",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitAlignItems": "center",
+          "WebkitBoxAlign": "center",
+          "WebkitBoxFlex": 0,
+          "WebkitBoxPack": "center",
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "WebkitJustifyContent": "center",
+          "alignItems": "center",
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "justifyContent": "center",
+          "msFlexAlign": "center",
+          "msFlexNegative": 0,
+          "msFlexPack": "center",
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitFlexBasis": "auto",
+            "flexBasis": "auto",
+            "height": "77px",
+            "msFlexPreferredSize": "auto",
+            "overflowX": "hidden",
+            "overflowY": "hidden",
+            "width": "239px",
+            "zIndex": 0,
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "backgroundColor": "rgba(0,0,0,0.00)",
+              "backgroundImage": "url(\\"image.png\\")",
+              "backgroundPosition": "center",
+              "backgroundRepeat": "no-repeat",
+              "backgroundSize": "contain",
+              "bottom": "0px",
+              "height": "100%",
+              "left": "0px",
+              "position": "absolute",
+              "right": "0px",
+              "top": "0px",
+              "width": "100%",
+              "zIndex": -1,
+            }
+          }
+        />
+        <img
+          alt=""
+          className="css-accessibilityImage-9pa8cd"
+          draggable={false}
+          src="image.png"
+        />
+      </div>
+      <h4
+        aria-level="4"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "24px",
+            "lineHeight": "32px",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        sequenceTitle
+      </h4>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignSelf": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitFlexDirection": "column",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "maxWidth": "100vw",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <a
+        href="https://coinbase.com/earn/celo/lesson/1"
+        target="_blank"
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "display": "block",
+              "marginBottom": "15px",
+              "overflowX": "hidden",
+              "overflowY": "hidden",
+            }
+          }
+        >
+          <div
+            style={
+              Object {
+                "display": "block",
+                "paddingBottom": "56.045751633986924%",
+                "width": "100%",
+              }
+            }
+          />
+          <div
+            style={
+              Object {
+                "bottom": "0px",
+                "height": "100%",
+                "left": "0px",
+                "position": "absolute",
+                "top": "0px",
+                "width": "100%",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "WebkitFlexBasis": "auto",
+                  "flexBasis": "auto",
+                  "height": "100%",
+                  "msFlexPreferredSize": "auto",
+                  "overflowX": "hidden",
+                  "overflowY": "hidden",
+                  "width": "100%",
+                  "zIndex": 0,
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "backgroundColor": "rgba(0,0,0,0.00)",
+                    "backgroundImage": "url(\\"image.png\\")",
+                    "backgroundPosition": "center",
+                    "backgroundRepeat": "no-repeat",
+                    "backgroundSize": "cover",
+                    "bottom": "0px",
+                    "height": "100%",
+                    "left": "0px",
+                    "position": "absolute",
+                    "right": "0px",
+                    "top": "0px",
+                    "width": "100%",
+                    "zIndex": -1,
+                  }
+                }
+              />
+              <img
+                alt=""
+                className="css-accessibilityImage-9pa8cd"
+                draggable={false}
+                src="image.png"
+              />
+            </div>
+          </div>
+        </div>
+      </a>
+      <a
+        className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+        data-focusable={true}
+        dir="auto"
+        href="https://coinbase.com/earn/celo/lesson/1"
+        rel=" noopener noreferrer"
+        role="link"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            "fontSize": "16px",
+            "fontWeight": "500",
+            "lineHeight": "18px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+        target="_blank"
+      >
+        lesson1
+      </a>
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        style={
+          Object {
+            "color": "rgba(171,173,175,1.00)",
+            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            "fontSize": "16px",
+            "fontWeight": "500",
+            "lineHeight": "18px",
+            "marginTop": "2px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+      >
+        minutes
+      </div>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <a
+        href="https://coinbase.com/earn/celo/lesson/2"
+        target="_blank"
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "display": "block",
+              "marginBottom": "15px",
+              "overflowX": "hidden",
+              "overflowY": "hidden",
+            }
+          }
+        >
+          <div
+            style={
+              Object {
+                "display": "block",
+                "paddingBottom": "56.045751633986924%",
+                "width": "100%",
+              }
+            }
+          />
+          <div
+            style={
+              Object {
+                "bottom": "0px",
+                "height": "100%",
+                "left": "0px",
+                "position": "absolute",
+                "top": "0px",
+                "width": "100%",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "WebkitFlexBasis": "auto",
+                  "flexBasis": "auto",
+                  "height": "100%",
+                  "msFlexPreferredSize": "auto",
+                  "overflowX": "hidden",
+                  "overflowY": "hidden",
+                  "width": "100%",
+                  "zIndex": 0,
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "backgroundColor": "rgba(0,0,0,0.00)",
+                    "backgroundImage": "url(\\"image.png\\")",
+                    "backgroundPosition": "center",
+                    "backgroundRepeat": "no-repeat",
+                    "backgroundSize": "cover",
+                    "bottom": "0px",
+                    "height": "100%",
+                    "left": "0px",
+                    "position": "absolute",
+                    "right": "0px",
+                    "top": "0px",
+                    "width": "100%",
+                    "zIndex": -1,
+                  }
+                }
+              />
+              <img
+                alt=""
+                className="css-accessibilityImage-9pa8cd"
+                draggable={false}
+                src="image.png"
+              />
+            </div>
+          </div>
+        </div>
+      </a>
+      <a
+        className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+        data-focusable={true}
+        dir="auto"
+        href="https://coinbase.com/earn/celo/lesson/2"
+        rel=" noopener noreferrer"
+        role="link"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            "fontSize": "16px",
+            "fontWeight": "500",
+            "lineHeight": "18px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+        target="_blank"
+      >
+        lesson2
+      </a>
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        style={
+          Object {
+            "color": "rgba(171,173,175,1.00)",
+            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            "fontSize": "16px",
+            "fontWeight": "500",
+            "lineHeight": "18px",
+            "marginTop": "2px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+      >
+        minutes
+      </div>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <a
+        href="https://coinbase.com/earn/celo/lesson/3"
+        target="_blank"
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "display": "block",
+              "marginBottom": "15px",
+              "overflowX": "hidden",
+              "overflowY": "hidden",
+            }
+          }
+        >
+          <div
+            style={
+              Object {
+                "display": "block",
+                "paddingBottom": "56.045751633986924%",
+                "width": "100%",
+              }
+            }
+          />
+          <div
+            style={
+              Object {
+                "bottom": "0px",
+                "height": "100%",
+                "left": "0px",
+                "position": "absolute",
+                "top": "0px",
+                "width": "100%",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "WebkitFlexBasis": "auto",
+                  "flexBasis": "auto",
+                  "height": "100%",
+                  "msFlexPreferredSize": "auto",
+                  "overflowX": "hidden",
+                  "overflowY": "hidden",
+                  "width": "100%",
+                  "zIndex": 0,
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "backgroundColor": "rgba(0,0,0,0.00)",
+                    "backgroundImage": "url(\\"image.png\\")",
+                    "backgroundPosition": "center",
+                    "backgroundRepeat": "no-repeat",
+                    "backgroundSize": "cover",
+                    "bottom": "0px",
+                    "height": "100%",
+                    "left": "0px",
+                    "position": "absolute",
+                    "right": "0px",
+                    "top": "0px",
+                    "width": "100%",
+                    "zIndex": -1,
+                  }
+                }
+              />
+              <img
+                alt=""
+                className="css-accessibilityImage-9pa8cd"
+                draggable={false}
+                src="image.png"
+              />
+            </div>
+          </div>
+        </div>
+      </a>
+      <a
+        className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+        data-focusable={true}
+        dir="auto"
+        href="https://coinbase.com/earn/celo/lesson/3"
+        rel=" noopener noreferrer"
+        role="link"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            "fontSize": "16px",
+            "fontWeight": "500",
+            "lineHeight": "18px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+        target="_blank"
+      >
+        lesson3
+      </a>
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        style={
+          Object {
+            "color": "rgba(171,173,175,1.00)",
+            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            "fontSize": "16px",
+            "fontWeight": "500",
+            "lineHeight": "18px",
+            "marginTop": "2px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+      >
+        minutes
+      </div>
+    </div>
+  </div>
+</div>
+`;

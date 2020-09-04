@@ -117,7 +117,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
       timestamp: new Date(),
       requesterAddress: address,
       requesterE164Number: this.props.e164PhoneNumber ?? undefined,
-      requesteeAddress,
+      requesteeAddress: requesteeAddress.toLowerCase(),
       currency: currencyToShortMap[CURRENCY_ENUM.DOLLAR],
       status: PaymentRequestStatus.REQUESTED,
       notified: false,
