@@ -873,6 +873,7 @@ export async function startGeth(
     rpcport,
     wsport,
     validating,
+    replica,
     validatingGasPrice,
     bootnodeEnode,
     isProxy,
@@ -955,7 +956,10 @@ export async function startGeth(
   }
 
   if (validating) {
-    gethArgs.push('--mine', '--minerthreads=10', `--nodekeyhex=${privateKey}`)
+    gethArgs.push('--mine', '--minerthreads=10')
+    if (!replica) {
+      gethArgs.push(`--nodekeyhex=${privateKey}`)
+    }
 
     if (validatingGasPrice) {
       gethArgs.push(`--miner.gasprice=${validatingGasPrice}`)
@@ -963,6 +967,9 @@ export async function startGeth(
 
     if (isProxied) {
       gethArgs.push('--proxy.proxied')
+    }
+    if (replica) {
+      gethArgs.push('--istanbul.replica')
     }
   } else if (isProxy) {
     gethArgs.push('--proxy.proxy')
