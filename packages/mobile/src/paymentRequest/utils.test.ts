@@ -135,10 +135,10 @@ describe('Encrypt Payment Request', () => {
 
 describe('Decrypt Payment Request', () => {
   it('Derypts valid payment request', () => {
-    expect(decryptPaymentRequest(encryptedPaymentReq, mockPrivateDEK)).toMatchObject(req)
+    expect(decryptPaymentRequest(encryptedPaymentReq, mockPrivateDEK, false)).toMatchObject(req)
   })
 
   it('Handles unencrypted payment request correctly', () => {
-    expect(decryptPaymentRequest(req, mockPrivateDEK)).toMatchObject(req)
+    expect(decryptPaymentRequest(req, mockPrivateDEK, false)).toMatchObject(req)
   })
 })
