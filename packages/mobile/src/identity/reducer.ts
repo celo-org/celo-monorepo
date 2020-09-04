@@ -7,6 +7,7 @@ import { AttestationsStatus } from '@celo/utils/src/attestations'
 import BigNumber from 'bignumber.js'
 import dotProp from 'dot-prop-immutable'
 import { RehydrateAction } from 'redux-persist'
+import { createSelector } from 'reselect'
 import { Actions as AccountActions, ClearStoredAccountAction } from 'src/account/actions'
 import { VERIFICATION_STATE_EXPIRY_SECONDS } from 'src/config'
 import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
@@ -375,7 +376,9 @@ function isBalanceSufficientForAttestations(state: RootState, attestationsRemain
   )
 }
 
-export const verificationStateSelector = (state: RootState): VerificationState => {
+const identityVerificationStateSelector = (state: RootState) => state.identity.verificationState
+
+const isBalanceSufficientSelector = (state: RootState) => {
   const verificationState = state.identity.verificationState
   const { phoneHashDetails, status, actionableAttestations } = verificationState
   const attestationsRemaining = status.numAttestationsRemaining - actionableAttestations.length
@@ -383,11 +386,17 @@ export const verificationStateSelector = (state: RootState): VerificationState =
     ? isBalanceSufficientForSigRetrievalSelector(state)
     : isBalanceSufficientForAttestations(state, attestationsRemaining)
 
-  return {
+  return isBalanceSufficient
+}
+
+export const verificationStateSelector = createSelector(
+  identityVerificationStateSelector,
+  isBalanceSufficientSelector,
+  (verificationState, isBalanceSufficient): VerificationState => ({
     ...verificationState,
     isBalanceSufficient,
-  }
-}
+  })
+)
 
 export const isVerificationStateExpiredSelector = (state: RootState) => {
   return (
