@@ -15,7 +15,7 @@ import "../common/UsingRegistry.sol";
 contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializable {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
-  using Address for addressssss;
+  using Address for address payable; // prettier-ignore
 
   struct ReleaseSchedule {
     // Timestamp (in UNIX time) that releasing begins.

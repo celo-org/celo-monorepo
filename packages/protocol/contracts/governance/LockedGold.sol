@@ -21,7 +21,7 @@ contract LockedGold is
   UsingRegistry
 {
   using SafeMath for uint256;
-  using Address for addressssss;
+  using Address for address payable; // prettier-ignore
 
   struct PendingWithdrawal {
     // The value of the pending withdrawal.

@@ -4,7 +4,7 @@ import "contracts/common/GoldToken.sol";
 import "openzeppelin-solidity/contracts/utils/Address.sol";
 
 contract GoldTokenHarness is GoldToken {
-  using Address for addressssss;
+  using Address for address payable; // prettier-ignore
   /* solhint-disable no-empty-blocks */
   function init_state() public {}
 

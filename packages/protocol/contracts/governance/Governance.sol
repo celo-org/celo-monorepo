@@ -35,7 +35,7 @@ contract Governance is
   using SafeMath for uint256;
   using IntegerSortedLinkedList for SortedLinkedList.List;
   using BytesLib for bytes;
-  using Address for addressssss;
+  using Address for address payable; // prettier-ignore
 
   uint256 private constant FIXED_HALF = 500000000000000000000000;
 
