@@ -1,6 +1,7 @@
 import * as React from 'react'
-import { View, StyleSheet } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { H1, H4 } from 'src/fonts/Fonts'
+import { Adventure } from 'src/home/Adventure'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import expandreachImg from 'src/icons/expand-reach_light-bg.png'
 import nonProfitIMG from 'src/icons/non-profit-light-bg.png'
@@ -9,7 +10,6 @@ import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import menuItems from 'src/shared/menu-items'
 import { standardStyles, textStyles } from 'src/styles'
-import { Adventure } from 'src/home/Adventure'
 
 export default function HomeBenefits() {
   const { t } = useTranslation(NameSpaces.home)

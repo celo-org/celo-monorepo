@@ -1,10 +1,9 @@
 import * as React from 'react'
-import { Image, ImageSourcePropType, StyleSheet, Text } from 'react-native'
+import { Image, ImageSourcePropType, ImageStyle, StyleSheet, Text, View } from 'react-native'
 import { Cell, Spans } from 'src/layout/GridRow'
-import { fonts, standardStyles } from 'src/styles'
-import Button, { BTN, SIZE } from 'src/shared/Button.3'
-import { ImageStyle, View } from 'react-native'
 import { useScreenSize } from 'src/layout/ScreenSize'
+import Button, { BTN, SIZE } from 'src/shared/Button.3'
+import { fonts, standardStyles } from 'src/styles'
 interface Props {
   source: ImageSourcePropType
   title: string
