@@ -28,7 +28,7 @@ USAGE
   $ celocli identity:identifier
 
 OPTIONS
-  --env=env                                          mainnet (default), alfajores, or alfajores_staging
+  --context=context                                  mainnet (default), alfajores, or alfajoresstaging
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address from which to perform the query
 
   --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
@@ -44,13 +44,13 @@ OPTIONS
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
-  --phoneNumber=+14152223333                         (required) The phone number for which to query the identifier (w/
-                                                     country code)
+  --phoneNumber=+14152223333                         (required) The phone number for which to query the identifier.
+                                                     Should be in e164 format with country code.
 
   --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLE
-  identifier --phoneNumber +14151231234 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631 --env alfajores
+  identifier --phoneNumber +14151231234 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631 --context alfajores
 ```
 
 _See code: [packages/cli/src/commands/identity/identifier.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/identity/identifier.ts)_
