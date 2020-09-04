@@ -144,9 +144,9 @@ Optional environment variables:
 | `PORT`                           | Port to listen on. Default `3000`. |
 | `SMS_PROVIDERS_<country>`        | Override to set SMS providers and order for a specific country code (e.g `SMS_PROVIDERS_MX=nexmo,twilio`) |
 | `MAX_PROVIDER_RETRIES`           | Number of retries (after first) when sending SMS before considering next provider Default `3`.  |
-| `EXTERNAL_CALLBACK_HOSTPORT`     | Provide the external URL at which providers can attempt callbacks with delivery receipts. If not provided, defaults to the value retrieved from the validator metadata. |
+| `EXTERNAL_CALLBACK_HOSTPORT`     | Provide the full external URL at which the service can be reached, usually the same as the value of the `ATTESTATION_SERVICE_URL` claim in your metadata. This value, plus a suffix e.g. `/delivery_status_twilio` will be the URL at which service can receive delivery receipt callbacks. If this value is not set, and `VERIFY_CONFIG_ON_STARTUP=1` (the default), the URL will be taken from the validator metadata. Otherwise, it must be supplied. |
 | `TIMEOUT_CLEANUP_NO_RECEIPT_MIN` | If a delivery report appears to be supported but is not received within this number of minutes, assume delivery success                                               |
-| `VERIFY_CONFIG_ON_STARTUP`       | Refuse to start if signer or metadata is misconfigured. Default `1`. |
+| `VERIFY_CONFIG_ON_STARTUP`       | Refuse to start if signer or metadata is misconfigured. Default `1`. If you disable this, you must specify `EXTERNAL_CALLBACK_HOSTPORT`. |
 | `LOG_LEVEL`                      | One of `fatal`, `error`, `warn`, `info`, `debug`, `trace` |
 | `LOG_FORMAT`                     | One of `json`, `human`, `stackdriver`  |
 | `APP_SIGNATURE`                  | A value that is shown under the key `appSignature` field in the `/status` endpoint that you can use to identify multiple instances. |
