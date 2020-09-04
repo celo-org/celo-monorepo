@@ -85,7 +85,8 @@ function* subscribeToPaymentRequests(
   addressKeyField: ADDRESS_KEY_FIELD,
   updatePaymentRequestsActionCreator: (
     paymentRequests: PaymentRequest[]
-  ) => UpdateIncomingPaymentRequestsAction | UpdateOutgoingPaymentRequestsAction
+  ) => UpdateIncomingPaymentRequestsAction | UpdateOutgoingPaymentRequestsAction,
+  isOutgoingRequest: boolean
 ) {
   yield all([call(waitForFirebaseAuth), call(getAccount)])
   const address = yield select(currentAccountSelector)
@@ -104,7 +105,7 @@ function* subscribeToPaymentRequests(
         }))
         .sort(compareTimestamps)
         .filter(onlyRequested)
-        .map((pr) => decryptPaymentRequest(pr, dataEncryptionKey))
+        .map((pr) => decryptPaymentRequest(pr, dataEncryptionKey, isOutgoingRequest))
 
       yield put(updatePaymentRequestsActionCreator(paymentRequests))
     } catch (error) {
@@ -173,11 +174,11 @@ function* updatePaymentRequestStatus({
 }
 
 function* subscribeToIncomingPaymentRequests() {
-  yield call(subscribeToPaymentRequests, REQUESTEE_ADDRESS, updateIncomingPaymentRequests)
+  yield call(subscribeToPaymentRequests, REQUESTEE_ADDRESS, updateIncomingPaymentRequests, false)
 }
 
 function* subscribeToOutgoingPaymentRequests() {
-  yield call(subscribeToPaymentRequests, REQUESTER_ADDRESS, updateOutgoingPaymentRequests)
+  yield call(subscribeToPaymentRequests, REQUESTER_ADDRESS, updateOutgoingPaymentRequests, true)
 }
 
 function* watchPaymentRequestStatusUpdates() {
