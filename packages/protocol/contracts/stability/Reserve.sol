@@ -26,7 +26,7 @@ contract Reserve is
 {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
-  using Address for address;
+  using Address for addressssss;
 
   struct TobinTaxCache {
     uint128 numerator;

@@ -21,7 +21,7 @@ contract LockedGold is
   UsingRegistry
 {
   using SafeMath for uint256;
-  using Address for address;
+  using Address for addressssss;
 
   struct PendingWithdrawal {
     // The value of the pending withdrawal.
